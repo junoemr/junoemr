@@ -27,20 +27,25 @@
 <%@page import="org.oscarehr.common.model.PatientLabRouting"%>
 <%@page import="oscar.util.ConversionUtils"%>
 <%@page import="org.oscarehr.common.dao.PatientLabRoutingDao"%>
-<%@page errorPage="../provider/errorpage.jsp" %>
-<%@ page import="java.util.*,
-		 java.sql.*,
-		 oscar.oscarDB.*,
-		 oscar.oscarLab.ca.all.*,
-		 oscar.oscarLab.ca.all.util.*,org.oscarehr.util.SpringUtils,
-		 oscar.oscarLab.ca.all.parsers.*,
-		 oscar.oscarLab.LabRequestReportLink,
-		 oscar.oscarMDS.data.ReportStatus,oscar.log.*,
-         oscar.OscarProperties,
-		 org.apache.commons.codec.binary.Base64,org.oscarehr.common.dao.Hl7TextInfoDao,org.oscarehr.common.model.Hl7TextInfo,
-		 org.oscarehr.common.dao.UserPropertyDAO, org.oscarehr.common.model.UserProperty,
-		javax.swing.text.rtf.RTFEditorKit,
-		java.io.ByteArrayInputStream"%>
+<%@page errorPage="../../../provider/errorpage.jsp" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.oscarLab.LabRequestReportLink" %>
+<%@ page import="oscar.oscarMDS.data.ReportStatus,oscar.log.*" %>
+<%@ page import="org.oscarehr.common.dao.Hl7TextInfoDao" %>
+<%@ page import="org.oscarehr.common.model.Hl7TextInfo" %>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="javax.swing.text.rtf.RTFEditorKit" %>
+<%@ page import="java.io.ByteArrayInputStream"%>
+<%@ page import="org.oscarehr.labs.model.Hl7DocumentLink" %>
+<%@ page import="org.oscarehr.labs.dao.Hl7DocumentLinkDao" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
+<%@ page import="oscar.oscarLab.ca.all.AcknowledgementData" %>
+<%@ page import="oscar.oscarLab.ca.all.Hl7textResultsData" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.Factory" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.MessageHandler" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.PATHL7Handler" %>
 <%@ page import="java.util.regex.Pattern" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler" %>
@@ -128,6 +133,8 @@ String multiLabId = Hl7textResultsData.getMatchingLabs(segmentID);
 MessageHandler handler = Factory.getHandler(segmentID);
 String hl7 = Factory.getHL7Body(segmentID);
 Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
+Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
+
 int lab_no = Integer.parseInt(segmentID);
 String label = ""; Hl7TextInfo hl7Lab = hl7TextInfoDao.findLabId(lab_no);
 if (hl7Lab.getLabel()!=null) label = hl7Lab.getLabel();
@@ -861,13 +868,21 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                         for(i=0;i<headers.size();i++){
                             linenum=0;
     						boolean isUnstructuredDoc = handler.isUnstructured();
+                            boolean isPDF = false;
     						boolean	isVIHARtf = false;
     						boolean isSGorCDC = false;
+
+	    					List<Hl7DocumentLink> documentLinks = null;
 
     						//Checks to see if the PATHL7 lab is an unstructured document, a VIHA RTF pathology report, or if the patient location is SG/CDC
     						//labs that fall into any of these categories have certain requirements per Excelleris
     						if(handler.getMsgType().equals("PATHL7")){
     							isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(headers.get(i));
+    							isPDF = ((PATHL7Handler)handler).hasEmbeddedPDF();
+    							if (isPDF)
+    							{
+    								documentLinks = hl7DocumentLinkDao.getDocumentsForLab(lab_no);
+    							}
     							isVIHARtf = ((PATHL7Handler) handler).vihaRtfCheck(headers.get(i));
     							if(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")){
     								isSGorCDC = true;
@@ -902,7 +917,23 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                    %>
 	                           </tr>
 	                       </table>
-                           	<%if(isUnstructuredDoc){%>
+
+                            <%
+                                if (isPDF)
+                                {
+                            %>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
+                                    <tr class="Field2">
+                                        <td width="60%" align="middle" valign="bottom" class="Cell">
+                                            <bean:message key="oscarMDS.segmentDisplay.formResult"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            <%
+                                }
+                                else if(isUnstructuredDoc)
+                                {
+                            %>
 	                       <table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
 	                           <tr class="Field2">
 	                               <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formTestName"/></td>

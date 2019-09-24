@@ -24,11 +24,7 @@
 
 package org.oscarehr.managers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.casemgmt.model.ProviderExt;
@@ -39,13 +35,19 @@ import org.oscarehr.common.model.Property;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.common.model.ProviderPreference.QuickLink;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.model.ProviderSettings;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import oscar.OscarProperties;
 import oscar.log.LogAction;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ProviderManager2 {
@@ -240,7 +242,34 @@ public class ProviderManager2 {
 		if(map.get("cpp_single_line") != null) {
 			settings.setCppSingleLine("yes".equals(map.get("cpp_single_line").getValue())?true:false);
 		}
-		
+
+		if(map.get(UserProperty.SCHEDULE_SITE) != null)
+		{
+			settings.setSiteSelected(map.get(UserProperty.SCHEDULE_SITE).getValue());
+		}
+		if(map.get(UserProperty.SCHEDULE_VIEW) != null)
+		{
+			settings.setViewSelected(map.get(UserProperty.SCHEDULE_VIEW).getValue());
+		}
+
+		Property patientNameLengthProp = map.get(UserProperty.PATIENT_NAME_LENGTH);
+		if(patientNameLengthProp != null)
+		{
+			String patientNameLengthStr = patientNameLengthProp.getValue();
+			if(StringUtils.isNumeric(patientNameLengthStr))
+			{
+				settings.setPatientNameLength(Integer.parseInt(patientNameLengthStr));
+			}
+		}
+
+		// default to the legacy properties file setting
+		boolean intakeFormEnabled = OscarProperties.getInstance().isAppointmentIntakeFormEnabled();
+		if(map.get(UserProperty.INTAKE_FORM_ENABLED) != null)
+		{
+			intakeFormEnabled = "yes".equals(map.get(UserProperty.INTAKE_FORM_ENABLED).getValue());
+		}
+		settings.setIntakeFormEnabled(intakeFormEnabled);
+
 		//custom summary display
 		//NEW
 		/*
@@ -711,7 +740,20 @@ public class ProviderManager2 {
 		
 		p = getMappedOrNewProperty(map, "cobalt", providerNo);
 		p.setValue(settings.isUseCobaltOnLogin()?"yes":"no");
-	
+
+		p = getMappedOrNewProperty(map, UserProperty.SCHEDULE_SITE, providerNo);
+		p.setValue(settings.getSiteSelected());
+
+		p = getMappedOrNewProperty(map, UserProperty.SCHEDULE_VIEW, providerNo);
+		p.setValue(settings.getViewSelected());
+
+		p = getMappedOrNewProperty(map, UserProperty.PATIENT_NAME_LENGTH, providerNo);
+		Integer patientNameLength = settings.getPatientNameLength();
+		p.setValue((patientNameLength == null)? null : String.valueOf(patientNameLength));
+
+		p = getMappedOrNewProperty(map, UserProperty.INTAKE_FORM_ENABLED, providerNo);
+		p.setValue(settings.isIntakeFormEnabled()?"yes":"no");
+
 		if(map.get("rx_use_rx3") != null) {
 			settings.setUseRx3("yes".equals(map.get("rx_use_rx3").getValue())?true:false);
 		}
@@ -743,12 +785,79 @@ public class ProviderManager2 {
 		providerExtDao.merge(providerExt);		
 				
 	}
-	
-	public void updateProvider(LoggedInInfo loggedInInfo, Provider provider) {
-		providerDao.updateProvider(provider);
-		
-		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.updateProvider", "providerNo=" + provider.getProviderNo());
 
+	/**
+	 * update a single user setting
+	 * @param providerNo - the provider id
+	 * @param key - the property name
+	 * @param value - the property value to save
+	 * @throws IllegalArgumentException - if the key or value is invalid
+	 */
+	public void updateSingleSetting(String providerNo, String key, String value)
+	{
+		boolean isProviderPreferenceEntry = updateSinglePreference(providerNo, key, value);
+
+		if(!isProviderPreferenceEntry)
+		{
+			//TODO check for valid key
+//			throw new IllegalArgumentException(key + " is not a valid provider property");
+
+			List<Property> userPropList = propertyDao.findByNameAndProvider(key, providerNo);
+
+			Property userProp;
+			if(userPropList.isEmpty())
+			{
+				userProp = new Property();
+				userProp.setProviderNo(providerNo);
+				userProp.setName(key);
+			}
+			else if(userPropList.size() == 1)
+			{
+				userProp = userPropList.get(0);
+			}
+			else
+			{
+				throw new IllegalStateException("Multiple values found for property " + key + " and provider " + providerNo);
+			}
+			userProp.setValue(value);
+			propertyDao.merge(userProp);
+		}
+	}
+
+	/**
+	 * convert a key value pair to a provider preference entry. save if key value is valid.
+	 * @param providerNo - the provider id
+	 * @param key - the property name
+	 * @param value - the property value to save
+	 * @return true if the key was a valid provider preference entry and the entry was updated, false otherwise
+	 */
+	private boolean updateSinglePreference(String providerNo, String key, String value)
+	{
+		ProviderPreference preference = providerPreferenceDao.find(providerNo);
+		if(preference == null)
+		{
+			preference = new ProviderPreference();
+		}
+
+		switch(key)
+		{
+			case "startHour" : preference.setStartHour(Integer.parseInt(value)); break;
+			case "endHour" : preference.setEndHour(Integer.parseInt(value)); break;
+			case "everyMin" : preference.setEveryMin(Integer.parseInt(value)); break;
+			case "myGroupNo" : preference.setMyGroupNo(value); break;
+			case "colourTemplate" : preference.setColourTemplate(value); break;
+			case "newTicklerWarningWindow" : preference.setNewTicklerWarningWindow(value); break;
+			case "defaultServiceType" : preference.setDefaultServiceType(value); break;
+			case "defaultCaisiPmm" : preference.setDefaultCaisiPmm(value); break;
+			case "defaultNewOscarCme" : preference.setDefaultNewOscarCme(value); break;
+			case "printQrCodeOnPrescriptions" : preference.setPrintQrCodeOnPrescriptions(Boolean.parseBoolean(value)); break;
+			case "appointmentScreenLinkNameDisplayLength" : preference.setAppointmentScreenLinkNameDisplayLength(Integer.parseInt(value)); break;
+			case "defaultDoNotDeleteBilling" : preference.setDefaultDoNotDeleteBilling(Integer.parseInt(value)); break;
+			case "defaultDxCode" : preference.setDefaultDxCode(value); break;
+			default: return false;
+		}
+
+		providerPreferenceDao.merge(preference);
+		return true;
 	}
 }

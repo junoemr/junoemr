@@ -28,13 +28,15 @@
 
 <div id="patient-search-page" ng-init="patientSearchCtrl.init()">
 
-	<div ng-show="patientSearchCtrl.demographicReadAccess" class="col-lg-12">
+	<div class="patient-search-header vertical-align">
+		<div class="col-lg-12">
+			<h3>
+				<bean:message key="patientsearch.title" bundle="ui"/>
+			</h3>
+		</div>
+	</div>
 
-		<h2>
-			<bean:message key="patientsearch.title" bundle="ui"/>
-		</h2>
-		<hr>
-
+	<div ng-show="patientSearchCtrl.demographicReadAccess" class="col-lg-12 patient-search-content">
 		<form role="form"
 			  id="search-form"
 			  ng-submit="patientSearchCtrl.searchPatients()">

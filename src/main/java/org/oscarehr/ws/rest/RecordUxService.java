@@ -26,6 +26,7 @@ package org.oscarehr.ws.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -116,7 +117,6 @@ public class RecordUxService extends AbstractServiceImpl {
 	@Path("/{demographicNo}/recordMenu")
 	@Produces("application/json")
 	public List<MenuItemTo1> getRecordMenu(@PathParam("demographicNo") Integer demographicNo){
-		logger.error("getRecordMenu getting called for demo "+demographicNo);
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		ResourceBundle bundle = getResourceBundle();
 		
@@ -124,22 +124,22 @@ public class RecordUxService extends AbstractServiceImpl {
 		
 		List<MenuItemTo1> menulist = new ArrayList<MenuItemTo1>();
 		if(securityInfoManager.hasPrivilege(loggedInInfo, "_demographic", "r", null)) {
-			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter, "Details", "record.details"));
+			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter, "Details", Arrays.asList("record.details")));
 		}
 		
 		if(securityInfoManager.hasPrivilege(loggedInInfo, "_eChart", "r", null)) {
-			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Summary", "record.summary"));
+			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Summary", Arrays.asList("record.summary")));
 		}
 		
 		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.forms", "r", null) || securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.eforms", "r", null)) {
-			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Forms", "record.forms"));
+			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Forms", Arrays.asList("record.forms", "record.forms.completed", "record.forms.revisions", "record.forms.deleted", "record.forms.add")));
 		}
 		
 		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.viewTickler", "r", null)) {
-			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Tickler", "record.tickler"));
+			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Tickler", Arrays.asList("record.tickler")));
 		}
 		
-		menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Health Tracker", "record.tracker"));
+		menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Health Tracker", Arrays.asList("record.tracker")));
 		
 		//PHR
 		if( ProviderMyOscarIdData.idIsSet(loggedInInfo.getLoggedInProviderNo())) {
@@ -149,7 +149,7 @@ public class RecordUxService extends AbstractServiceImpl {
 			if (demographic.getMyOscarUserName()==null ||demographic.getMyOscarUserName().equals("")) {		/*register link -myoscar (strikethrough) links to create account*/
 				menulist.add(new MenuItemTo1(idCounter++, "PHR", "../phr/indivo/RegisterIndivo.jsp?demographicNo="+demographicNo));
 			}else{
-				menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "PHR", "record.phr"));
+				menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "PHR", Arrays.asList("record.phr")));
 				
 			}
 			
@@ -161,21 +161,21 @@ public class RecordUxService extends AbstractServiceImpl {
 			String outstanding = consultationManager.hasOutstandingConsultations(loggedInInfo, demographicNo)? "outstanding" : null;
 			
 			if (!consultationManager.isConsultRequestEnabled() && consultationManager.isConsultResponseEnabled()) {
-				menulist.add(new MenuItemTo1(idCounter++,  demographicNo, bundle.getString("navbar.menu.consults"), "record.consultResponses", null));
+				menulist.add(new MenuItemTo1(idCounter++,  demographicNo, bundle.getString("navbar.menu.consults"), Arrays.asList("record.consultResponses"), null));
 			}
 			else if (consultationManager.isConsultRequestEnabled() && consultationManager.isConsultResponseEnabled()) {
 				MenuItemTo1 consultMenu = new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consults"), null, outstanding);
 				consultMenu.setDropdown(true);
 				
 				List<MenuItemTo1> consultList = new ArrayList<MenuItemTo1>();
-				consultList.add(new MenuItemTo1(idCounter++, demographicNo, bundle.getString("navbar.menu.consultRequests"), "record.consultRequests", outstanding));
-				consultList.add(new MenuItemTo1(idCounter++, demographicNo, bundle.getString("navbar.menu.consultResponses"), "record.consultResponses", null));
+				consultList.add(new MenuItemTo1(idCounter++, demographicNo, bundle.getString("navbar.menu.consultRequests"), Arrays.asList("record.consultRequests"), outstanding));
+				consultList.add(new MenuItemTo1(idCounter++, demographicNo, bundle.getString("navbar.menu.consultResponses"), Arrays.asList("record.consultResponses"), null));
 				consultMenu.setDropdownItems(consultList);
 				
 				menulist.add(consultMenu);
 			}
 			else {
-				menulist.add(new MenuItemTo1(idCounter++,  demographicNo, bundle.getString("navbar.menu.consults"), "record.consultRequests", outstanding));
+				menulist.add(new MenuItemTo1(idCounter++,  demographicNo, bundle.getString("navbar.menu.consults"), Arrays.asList("record.consultRequests"), outstanding));
 			}
 		}
 
@@ -225,11 +225,16 @@ public class RecordUxService extends AbstractServiceImpl {
 		
 		if("right".equals(summaryName )){
 			summaryList = new ArrayList<SummaryTo1>();
-			if( (securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.documents", "r", null) || securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.labResult", "r", null) )  && preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.INCOMING_POS) ) {
+			if( (securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.documents", "r", null)
+					|| securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.labResult", "r", null) )
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.INCOMING_POS) )
+			{
 				summaryList.add(new SummaryTo1("Incoming",count++,SummaryTo1.INCOMING_CODE));
 			}
 
-			if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.decisionSupportAlerts", "r", null) && preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.DS_SUPPORT_POS)) {
+			if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.decisionSupportAlerts", "r", null)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.DS_SUPPORT_POS))
+			{
 				summaryList.add(new SummaryTo1("Decision Support",count++,SummaryTo1.DECISIONSUPPORT_CODE)); 
 			}
 			
@@ -277,7 +282,7 @@ public class RecordUxService extends AbstractServiceImpl {
 			}
 			
 			if( (securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.forms", "r", null) || securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.eforms", "r", null)) && preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ASSESSMENTS_POS)  ){
-				summaryList.add(new SummaryTo1("Assessments",count++,SummaryTo1.ASSESSMENTS_CODE));
+				summaryList.add(new SummaryTo1("Forms",count++,SummaryTo1.FORMS_CODE));
 			}
 		}
 		return summaryList;
@@ -296,7 +301,7 @@ public class RecordUxService extends AbstractServiceImpl {
         result.put("medhx","issueNoteSummary"); 
 		result.put("socfamhx","issueNoteSummary"); 		
 		result.put("reminders","issueNoteSummary");
-		result.put("assessments","formsSummary");
+		result.put("forms","formsSummary");
 		result.put("outgoing","formsSummary");	
 		result.put("sochx","issueNoteSummary"); 
 		result.put("famhx","issueNoteSummary"); 

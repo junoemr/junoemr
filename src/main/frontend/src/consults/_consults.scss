@@ -1,3 +1,8 @@
+
+.consult-page-header {
+	@extend %juno-page-header;
+}
+
 #consult-request-section,
 #consult-response-section {
 	.consult-request-form {
@@ -40,5 +45,12 @@
 	.search-buttons {
 		margin-bottom: $margin-md;
 		margin-top: $margin-md;
+	}
+	.consultation-search-filter>div{
+		margin-top: $margin-sm;
+	}
+	.consultation-search-filter {
+		display:flex;
+		flex-wrap:wrap;
 	}
 }

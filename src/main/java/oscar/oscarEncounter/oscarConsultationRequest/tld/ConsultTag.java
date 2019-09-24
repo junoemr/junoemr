@@ -86,13 +86,12 @@ public class ConsultTag extends TagSupport {
                
                Calendar cal = Calendar.getInstance();
                int countback = -1;
-               if (timeperiod != null){
+               if (timeperiod != null)
+               {
                        countback = Integer.parseInt(timeperiod);
                        countback = countback * -1;
-                       cal.add(Calendar.MONTH,countback );
-                        
                }
-               cal.add(Calendar.MONTH,countback );
+               cal.add(Calendar.MONTH, countback);
                Date cutoffDate = cal.getTime();
                
                

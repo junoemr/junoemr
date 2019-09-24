@@ -412,7 +412,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			var letterheadFax = Juno.Common.Util.toTrimmedString(consult.letterheadFax);
 			var fax = Juno.Common.Util.toTrimmedString(consult.referringDoctor.faxNumber);
 
-			window.open("../fax/CoverPage.jsp?consultResponsePage=" + consultResponsePage + "&reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&fax=" + fax);
+			window.open("../fax/CoverPage.jsp?consultResponsePage=" + consultResponsePage + "&reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&faxRecipients=" + fax);
 		};
 
 		controller.printPreview = function printPreview()

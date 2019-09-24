@@ -1,0 +1,42 @@
+
+// scss for the custom select dropdown directives
+.directive-appt-status-select {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	border-radius: 30px;
+
+	select {
+		@include juno-select(16px);
+		background-image: url($icon-down-white);
+		padding-right: 2.5em; //allow extra space for dropdown arrow
+		height: $form-input-height;
+		border: 0;
+		border-radius: 0;
+		box-shadow: transparent 0 0 0 0;
+		color: $color-neutral-darkest;
+		&:focus {
+			outline: 0;
+			-webkit-box-shadow: none;
+			box-shadow: none;
+		}
+	}
+
+	$icon-padding: 5px;
+	$icon-size: calc(#{$form-input-height} - (#{$icon-padding} * 2));
+	.icon-wrapper {
+		display: flex;
+		justify-content: space-evenly;
+		align-items: center;
+		padding: 0 $icon-padding;
+
+		.btn-icon {
+			width: $icon-size;
+			height: $icon-size;
+			.icon {
+				color: $color-neutral-darkest;
+				font-size: $icon-size;
+			}
+		}
+	}
+}

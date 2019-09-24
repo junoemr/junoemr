@@ -54,5 +54,4 @@ public class Hl7DocumentLinkDao extends AbstractDao<Hl7DocumentLink>
 
 		return documentLinks;
 	}
-
 }

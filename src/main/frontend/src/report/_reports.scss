@@ -1,0 +1,52 @@
+
+.report-page {
+	.report-page-header {
+		@extend %juno-page-header;
+
+		display: flex;
+		align-items: center;
+
+		.control-right {
+			padding: 0 8px;
+
+			.dropdown-menu {
+				position: absolute;
+				top: calc(#{$primary-navbar-height} + #{$page-header-height});
+				right: 0;
+			}
+		}
+	}
+	.report-page-content {
+		@extend %juno-primary-view-pane;
+		@include juno-page-padding-none;
+		overflow: hidden;
+
+		.report-selection {
+			@include juno-page-padding-default;
+			overflow: auto;
+			width: 340px;
+			background-color: $color-neutral-lightest;
+			border-right: $color-neutral-lighter 8px solid;
+
+			.form-control {
+				background-color: $color-neutral-white;
+			}
+			.list-group-item {
+				&:hover {
+					background-color: $color-neutral-lighter;
+				}
+				.numberLabel {
+					float: left;
+					min-width: 24px;
+					margin-right: 4px;
+					font-weight: bold;
+				}
+			}
+		}
+		.report-display {
+			@include juno-page-padding-default;
+			flex-grow: 1;
+			overflow: auto;
+		}
+	}
+}

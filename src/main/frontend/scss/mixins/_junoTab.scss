@@ -1,0 +1,89 @@
+
+@mixin juno-tab-rounded($radius: 8px)
+{
+	.round-top {
+		border-radius: $radius $radius 0 0;
+	}
+	.round-top-left {
+		border-radius: $radius 0 0 0;
+	}
+	.round-top-right {
+		border-radius: 0 $radius 0 0;
+	}
+}
+@mixin juno-tab($tabs-height, $padding-v, $padding-h, $round-radius) {
+	li {
+		a {
+			font-weight: 400;
+			display: flex;
+			align-items: center;
+			height: $tabs-height;
+			padding: $padding-v $padding-h;
+		}
+		&.active {
+			a {
+				font-weight: 700;
+			}
+		}
+	}
+	@include juno-tab-rounded($round-radius);
+}
+
+@mixin juno-tab-xxs($tabs-height) {
+	@include juno-tab($tabs-height, 2px, 6px, 4px);
+}
+@mixin juno-tab-sm($tabs-height) {
+	@include juno-tab($tabs-height, 4px, 12px, 8px);
+}
+@mixin juno-tab-md($tabs-height) {
+	@include juno-tab($tabs-height, 1em, 2em, 12px);
+}
+@mixin juno-tab-lg($tabs-height) {
+	@include juno-tab($tabs-height, 16px, 46px, 18px);
+}
+
+@mixin juno-tab-color-scheme($bg-color, $tab-bg-color, $font-color, $hover-color, $active-bg-color, $active-font-color, $bottom-border-size: 0) {
+	&.nav,.nav,ul {
+		background-color: $bg-color;
+		border-color: transparent;
+
+		li {
+			border-bottom: $bottom-border-size solid $tab-bg-color;
+			a {
+				border-color: transparent;
+				color: $font-color;
+				background-color: $tab-bg-color;
+				&:hover {
+					background-color: $hover-color;
+				}
+			}
+			&.active {
+				border-bottom: $bottom-border-size solid $active-font-color;
+				a {
+					color: $active-font-color;
+					background-color: $active-bg-color;
+				}
+			}
+		}
+	}
+}
+
+@mixin juno-tab-color-scheme-white($bottom-border-size: 0) {
+	@include juno-tab-color-scheme($color-neutral-white, $color-neutral-white, $color-neutral-darker,
+			$color-neutral-lighter, $color-neutral-white, $color-primary-base, $bottom-border-size);
+}
+
+@mixin juno-tab-color-scheme-light {
+	@include juno-tab-color-scheme($color-neutral-lighter, $color-neutral-lighter, $color-neutral-darker,
+			$color-neutral-light, $color-neutral-white, $color-primary-base);
+}
+
+@mixin juno-tab-color-scheme-dark {
+	@include juno-tab-color-scheme($color-neutral-darkest, $color-neutral-darkest, $color-neutral-white,
+			$color-primary-dark, $color-primary-base, $color-neutral-white);
+}
+
+@mixin juno-tab-color-scheme-primary {
+	@include juno-tab-color-scheme($color-primary-base, $color-primary-base, $color-neutral-white,
+			$color-primary-dark, $color-neutral-lightest, $color-primary-base);
+}

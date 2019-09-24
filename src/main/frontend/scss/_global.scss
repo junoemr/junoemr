@@ -1,7 +1,68 @@
 // global styles
+
+h1,h2,h3,h4,h5,h6 {
+	@include juno-font-default;
+}
+h1,h2,h3 {
+	font-weight: bold;
+}
+
+a {
+	color: $color-neutral-darker;
+	&:hover {
+		color: $color-primary-base;
+	}
+}
+
+
+.hand-hover {
+	cursor: pointer;
+}
+
+.hand-hover:hover {
+	text-decoration: none;
+}
+
 .vertical-align {
 	display: flex;
 	align-items: center;
+}
+.align-items-center {
+	align-items: center;
+}
+.align-items-baseline {
+	align-items: baseline;
+}
+.justify-content-center {
+	justify-content: center;
+}
+.justify-content-evenly {
+	justify-content: space-evenly;
+}
+.justify-content-between {
+	justify-content: space-between;
+}
+
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}
+.flex-row-reverse {
+	display: flex;
+	flex-direction: row-reverse;
+}
+.flex-column {
+	display: flex;
+	flex-direction: column;
+}
+.flex-grow {
+	flex-grow: 1;
+}
+.overflow-auto {
+	overflow: auto;
+}
+.overflow-hidden {
+	overflow: hidden;
 }
 
 .p-inline p {
@@ -28,24 +89,6 @@
 	margin: 0;
 }
 
-// Displays a red asterisk next to form labels if they are marked as required
-.form-group {
-	.required:after {
-		content: "*";
-		color: red;
-	}
-}
-
-// Hides wrapping buttons, allowing for icon buttons
-.icon-button {
-	appearance: none;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	outline: none;
-	border: 0;
-	background: transparent;
-}
-
 // Makes checkbox flush with input (as long as checkbox margin is 0)
 .big-checkbox {
 	height: 34px;
@@ -56,55 +99,72 @@
 	width: 100%;
 }
 
+a,.clickable {
+	&:hover {
+		cursor: pointer;
+	}
+}
+
 .blue-text {
-	color: $primary-blue-text;
+	color: $color-primary-base;
 }
 
-.clickable {
-	&:hover {
-		cursor: pointer;
+.highlight,
+.highlight:hover {
+	color: $color-red-base;
+}
+
+.refused,
+.refused:hover {
+	color: #EAACAC;
+}
+
+.ineligible,
+.ineligible:hover {
+	color: $color-yellow-base;
+}
+
+.pending,
+.pending:hover {
+	color: $color-pink-base;
+}
+
+.abnormal-prev,
+.abnormal-prev:hover {
+	color: #FF4D4D;
+}
+
+.abnormal,
+.abnormal:hover {
+	color: $color-red-base;
+}
+
+/* page header css. page specific css should extend this */
+%juno-page-header {
+	height: $page-header-height;
+	color: $color-neutral-white;
+	background-color: $color-primary-base;
+	padding-left: $page-header-height;
+
+	h1,h2,h3,h4,h5,h6 {
+		margin: 0;
 	}
 }
 
-a {
-	&:hover {
-		cursor: pointer;
-	}
+%juno-content-control {
+	color: $color-neutral-darker;
+	background-color: $color-neutral-lightest;
 }
 
-.btn-warning-static {
-	background-color: $btn-warning-bg;
-	cursor: default;
-	color: #fff;
+%juno-primary-view-pane {
+	overflow: auto;
+	height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height});
 }
-.btn-warning-static:focus,
-.btn-warning-static:visited,
-.btn-warning-static:hover
-{
-	color: #fff;
+%juno-primary-view-pane-tabs {
+	overflow: auto;
+	height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height} - #{$page-tabs-height});
 }
-
-.btn-warning-static:active {
-	-moz-box-shadow:    inset 0 0 0px $btn-warning-bg;
-	-webkit-box-shadow: inset 0 0 0px $btn-warning-bg;
-	box-shadow:         inset 0 0 0px $btn-warning-bg;
-	color: #fff;
-}
-
-@media (max-width: 1730px) {
-	.hidden-1730 {
-		display: none !important;
-	}
-	.visible-1730 {
-		display: block !important;
-	}
-}
-
-@media (max-width: 1500px) {
-	.hidden-1500 {
-		display: none !important;
-	}
-	.visible-1500 {
-		display: block !important;
-	}
+%juno-primary-view-pane-tabs-subheader {
+	overflow: auto;
+	height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height} - #{$page-tabs-height} - #{$page-subheader-height});
 }

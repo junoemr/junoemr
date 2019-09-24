@@ -1,0 +1,17 @@
+
+@import '../fonts/JunoIcons/stylesheet.css';
+
+$images-root: '../images/';
+
+$icon-logo: $images-root + 'logo.svg';
+$icon-down: $images-root + 'icon-16-arrow-down.svg';
+$icon-down-white: $images-root + 'icon-16-arrow-down-white.svg';
+
+.icon {
+}
+.icon-logo {
+	background-image: url($icon-logo);
+}
+.icon-down {
+	background-image: url($icon-down);
+}

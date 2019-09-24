@@ -1,0 +1,51 @@
+
+@import '../fonts/Hinde/stylesheet.css';
+
+@mixin juno-font-default()
+{
+	font-family: Hinde, Arial, sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+
+	/* prevent this mixin from killing font awesome icons */
+    .fa {
+        font-family: FontAwesome;
+    }
+}
+@mixin juno-font-button($font-size: 12px, $weight : normal, $line-height: normal)
+{
+	font-family: Hinde, Arial, sans-serif;
+    font-weight: $weight;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: $line-height;
+    letter-spacing: normal;
+    font-size: $font-size;
+
+	/* prevent this mixin from killing font awesome icons */
+    .fa {
+        font-family: FontAwesome;
+    }
+}
+
+@mixin juno-font-default-size($font-size)
+{
+	@include juno-font-default;
+    font-size: $font-size;
+}
+
+@mixin juno-font-tab($font-size : 12px)
+{
+	@include juno-font-default-size($font-size);
+}
+@mixin juno-font-input($font-size : 14px)
+{
+	@include juno-font-default-size($font-size);
+}
+@mixin juno-font-label($font-size : 12px)
+{
+	@include juno-font-default-size($font-size);
+}

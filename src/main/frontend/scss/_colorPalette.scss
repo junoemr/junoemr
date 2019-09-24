@@ -1,0 +1,163 @@
+
+// Colour Palette
+$color-primary-darkest: #1a2033;
+$color-primary-darker: #1f2e59;
+$color-primary-dark: #384d8c;
+$color-primary-base: #455899;
+$color-primary-light: #6680cc;
+$color-primary-lighter: #8aa1e6;
+$color-primary-lightest: #bfcfff;
+
+$color-secondary-darkest: #2b331f;
+$color-secondary-darker: #3f591b;
+$color-secondary-dark: #588c0e;
+$color-secondary-base: #70b312;
+$color-secondary-light: #91cc3d;
+$color-secondary-lighter: #b6e673;
+$color-secondary-lightest: #e4ffbf;
+
+$color-neutral-black: #242833;
+$color-neutral-darkest: #262933;
+$color-neutral-darker: #393e4d;
+$color-neutral-dark: #585f73;
+$color-neutral-dark-grey: #70778c;
+$color-neutral-grey: #8f95a8;
+$color-neutral-light-grey: #b5bac9;
+$color-neutral-light: #d0d5e3;
+$color-neutral-lighter: #e6e9f2;
+$color-neutral-lightest: #f5f6fa;
+$color-neutral-white: #ffffff;
+
+$color-red-darkest: #401616;
+$color-red-darker: #661a1a;
+$color-red-dark: #991f1f;
+$color-red-base: #cc2929;
+$color-red-light: #e65c5c;
+$color-red-lighter: #e68a8a;
+$color-red-lightest: #ffcccc;
+
+$color-orange-darkest: #4d2a08;
+$color-orange-darker: #80460d;
+$color-orange-dark: #b36212;
+$color-orange-base: #e67e17;
+$color-orange-light: #e69545;
+$color-orange-lighter: #f2b679;
+$color-orange-lightest: #ffd9b3;
+
+$color-yellow-darkest: #4d420f;
+$color-yellow-darker: #806e19;
+$color-yellow-dark: #b39b24;
+$color-yellow-base: #e6c72e;
+$color-yellow-light: #e6cf5c;
+$color-yellow-lighter: #f2e291;
+$color-yellow-lightest: #fff7cc;
+
+$color-lime-darkest: #243811;
+$color-lime-darker: #406619;
+$color-lime-dark: #609926;
+$color-lime-base: #80cc33;
+$color-lime-light: #a6e667;
+$color-lime-lighter: #bde695;
+$color-lime-lightest: #e6ffcc;
+
+$color-green-darkest: #0d3313;
+$color-green-darker: #1a6626;
+$color-green-dark: #238c35;
+$color-green-base: #30bf48;
+$color-green-light: #62d975;
+$color-green-lighter: #95e6a3;
+$color-green-lightest: #ccffd4;
+
+$color-teal-darkest: #0d3326;
+$color-teal-darker: #165943;
+$color-teal-dark: #238c69;
+$color-teal-base: #30bf8f;
+$color-teal-light: #62d9b1;
+$color-teal-lighter: #95e6cb;
+$color-teal-lightest: #ccffee;
+
+$color-cyan-darkest: #0d3333;
+$color-cyan-darker: #165959;
+$color-cyan-dark: #238c8c;
+$color-cyan-base: #30bfbf;
+$color-cyan-light: #62d9d9;
+$color-cyan-lighter: #95e6e6;
+$color-cyan-lightest: #ccffff;
+
+$color-blue-darkest: #102f40;
+$color-blue-darker: #164259;
+$color-blue-dark: #23678c;
+$color-blue-base: #308dbf;
+$color-blue-light: #62afd9;
+$color-blue-lighter: #8ac5e6;
+$color-blue-lightest: #ccedff;
+
+$color-indigo-darkest: #1a2040;
+$color-indigo-darker: #1f2b66;
+$color-indigo-dark: #263999;
+$color-indigo-base: #334dcc;
+$color-indigo-light: #5c73e6;
+$color-indigo-lighter: #8a99e6;
+$color-indigo-lightest: #ccd5ff;
+
+$color-violet-darkest: #231b4d;
+$color-violet-darker: #302080;
+$color-violet-dark: #432db3;
+$color-violet-base: #5639e6;
+$color-violet-light: #7c67e6;
+$color-violet-lighter: #ac9df2;
+$color-violet-lightest: #d4ccff;
+
+$color-grape-darkest: #301640;
+$color-grape-darker: #4b1f66;
+$color-grape-dark: #6d2699;
+$color-grape-base: #9133cc;
+$color-grape-light: #a15ccc;
+$color-grape-lighter: #c795e6;
+$color-grape-lightest: #ebccff;
+
+$color-pink-darkest: #401624;
+$color-pink-darker: #661933;
+$color-pink-dark: #99264d;
+$color-pink-base: #cc3366;
+$color-pink-light: #e66791;
+$color-pink-lighter: #e6a1b8;
+$color-pink-lightest: #ffccdd;
+
+// colour variables based on the palette above
+$semantic-info-base: $color-primary-light;
+$semantic-info-light: $color-primary-lightest;
+$semantic-success-base: $color-secondary-base;
+$semantic-success-light: $color-secondary-lightest;
+$semantic-warning-base: $color-orange-base;
+$semantic-warning-light: $color-orange-lightest;
+$semantic-error-base: $color-red-base;
+$semantic-error-light: $color-red-lightest;
+
+// OLD names, use above
+// Imported from Clinicaid (schedule + datepicker stuff)
+$color-btn-addon-bg: #FFF;
+$color-btn-addon-text: #333;
+$color-btn-addon-border: #CCC;
+
+$color-info-box-top-bg: #555;
+$color-info-box-top-text: #FFF;
+$color-info-box-top-border: #999;
+$color-info-box-content-bg: #F5F5F5;
+$color-info-box-content-border: #B9B9B9;
+$color-info-box-table-header-bg: #F5F5F5;
+$color-info-box-table-header-border: #B9B9B9;
+$color-info-box-table-bg: #EDEDED;
+$color-info-box-table-bg-odd: #E1E1E1;
+$color-info-box-table-border: #B9B9B9;
+
+$color-bg-modal-header: #A4A4A4;
+
+$color-timepicker-bg: #DDD;
+$color-timepicker-text: #333;
+$color-timepicker-border: #CCC;
+
+// fax
+$input-color-invalid-background: #ffefef;
+$input-color-invalid-border: #a94442;
+$input-color-invalid-text: #a94442;

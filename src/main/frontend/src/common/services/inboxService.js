@@ -78,6 +78,27 @@ angular.module("Common.Services").service("inboxService", [
 				});
 			return deferred.promise;
 		};
+		service.getInboxCountByStatus = function getInboxCountByStatus(providerId, statusCode)
+		{
+			var deferred = $q.defer();
+
+			$http(
+				{
+					url: service.apiPath + '/' +encodeURIComponent(providerId)+ '/' +encodeURIComponent(statusCode)+ '/count',
+					method: "GET",
+					headers: Juno.Common.ServiceHelper.configHeaders()
+				}).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("inboxService::getUnAckLabDocCount error", errors);
+					deferred.reject("An error occured while getting inbox content");
+				});
+			return deferred.promise;
+		};
 
 		return service;
 	}

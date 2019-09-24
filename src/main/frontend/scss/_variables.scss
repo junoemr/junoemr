@@ -1,21 +1,4 @@
 // LESS variables for global use, imported first so can be referenced in bootstrap customization
-// Colours
-$primary-blue: #235ba3;
-$secondary-blue: #15417a;
-$primary-hover-blue: #1b4883;
-$secondary-hover-blue: #386fc1;
-$primary-blue-text: #235ba3;
-
-$primary-white: #fff;
-$secondary-white: #ebebeb;
-$hover-white: #fff;
-$primary-white-text: #fff;
-
-$light-grey: #ededed;
-$medium-grey: #c0c0c0;
-$dark-grey: #767676;
-
-$modal-color: #996633;
 
 // Margins
 $margin-lg: 30px;
@@ -23,43 +6,33 @@ $margin-md: 20px;
 $margin-sm: 10px;
 
 // Other
-$toggle-patient-list-btn-width: 25px;
+$left-aside-width: 400px;
+$left-aside-width-collapsed: 0;
+
+$right-aside-width: 400px;
+$right-aside-width-collapsed: 0;
+
+$primary-navbar-height: 56px;
+$page-header-height: 48px;
+$page-tabs-height: 40px;
+$page-tabs-height-alt: 32px;
+$page-subheader-height: 56px;
+
+$modal-height: 560px;
+$modal-width: 960px;
+$modal-header-height: 64px;
+$modal-footer-height: 64px;
+
+$modal-border-space: 16px;
+
+$modal-body-height: calc(#{$modal-height} - #{$modal-header-height} - #{$modal-footer-height} - #{$modal-border-space});
+$modal-body-no-footer-height: calc(#{$modal-height} - #{$modal-header-height} - #{$modal-border-space});
+
+
+$form-input-height: 2.25em;
 
 // Media queries breakpoints
 // $screen-nav-lg-max: 1305px;
-$screen-nav-lg: 1357px;
-$screen-nav-md: 1130px;
-$screen-nav-sm: 768px;
-
-$dashboard-header-height: 72px;
-
-// Imported from Clinicaid
-
-$color-btn-addon-bg: #FFF;
-$color-btn-addon-text: #333;
-$color-btn-addon-border: #CCC;
-
-$info-icon-color: rgb(30, 144, 255);
-$color-info-box-top-bg: #555;
-$color-info-box-top-text: #FFF;
-$color-info-box-top-border: #999;
-$color-info-box-content-bg: #F5F5F5;
-$color-info-box-content-border: #B9B9B9;
-$color-info-box-table-header-bg: #F5F5F5;
-$color-info-box-table-header-border: #B9B9B9;
-$color-info-box-table-bg: #EDEDED;
-$color-info-box-table-bg-odd: #E1E1E1;
-$color-info-box-table-border: #B9B9B9;
-
-$color-bg-modal-header: #A4A4A4;
-
-$color-timepicker-bg: #DDD;
-$color-timepicker-text: #333;
-$color-timepicker-border: #CCC;
-
-$success-green: rgb(153, 226, 120);
-$failure-red: rgb(188, 64, 71);
-
-$input-color-invalid-background: #ffefef;
-$input-color-invalid-border: #a94442;
-$input-color-invalid-text: #a94442;
+$screen-nav-lg: 1540px;
+$screen-nav-md: 1290px;
+$screen-nav-sm: 768px; //matches the angular.js mobile check size, probably should not be changed

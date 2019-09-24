@@ -117,7 +117,7 @@ public class AppointmentStatusList
 			}
 
 			calendarAppointmentStatusList.add(new CalendarAppointmentStatus(
-				appointmentStatus.getColor(),
+				appointmentStatus.getJunoColor(),
 				appointmentStatus.getStatus(),
 				getTitle(appointmentStatus.getStatus(), DEFAULT_CALENDAR_LOCALE),
 				rotates,

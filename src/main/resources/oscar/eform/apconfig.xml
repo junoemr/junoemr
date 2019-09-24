@@ -134,37 +134,37 @@
 	<databaseap>
 		<ap-name>current_user</ap-name>
 		<ap-sql>SELECT provider.first_name, provider.last_name FROM provider
-			WHERE provider.provider_no='${provider}' </ap-sql>
+			WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
 		<ap-output>${last_name}, ${first_name}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_userF</ap-name>
 		<ap-sql>SELECT provider.first_name FROM provider
-			WHERE provider.provider_no='${provider}' </ap-sql>
+			WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
 		<ap-output>${first_name}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_userL</ap-name>
 		<ap-sql>SELECT provider.last_name FROM provider
-			WHERE provider.provider_no='${provider}' </ap-sql>
+			WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
 		<ap-output>${last_name}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_user_fname_lname</ap-name>
 		<ap-sql>SELECT provider.first_name, provider.last_name FROM provider
-			WHERE provider.provider_no='${provider}' </ap-sql>
+			WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
 		<ap-output>${first_name} ${last_name}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_user_ohip_no</ap-name>
 		<ap-sql>SELECT provider.ohip_no FROM provider WHERE
-			provider.provider_no='${provider}' </ap-sql>
+			provider.provider_no='${loggedInProvider}' </ap-sql>
 		<ap-output>${ohip_no}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_user_specialty</ap-name>
 		<ap-sql>SELECT provider.specialty FROM provider WHERE
-			provider.provider_no='${provider}'</ap-sql>
+			provider.provider_no='${loggedInProvider}'</ap-sql>
 		<ap-output>${specialty}</ap-output>
 	</databaseap>
 	<databaseap>
@@ -174,25 +174,25 @@
 			INSTR(comments,'&lt;xml_p_specialty_code&gt;')+22,
 			INSTR(comments,'&lt;/xml_p_specialty_code&gt;')-INSTR(comments,'&lt;xml_p_specialty_code&gt;')-22
 			) AS specialty_code
-			FROM provider WHERE provider_no='${provider}'
+			FROM provider WHERE provider_no='${loggedInProvider}'
 		</ap-sql>
 		<ap-output>${specialty_code}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_user_cpsid</ap-name>
 		<ap-sql>SELECT provider.practitionerNo FROM provider WHERE
-			provider.provider_no='${provider}' </ap-sql>
+			provider.provider_no='${loggedInProvider}' </ap-sql>
 		<ap-output>${practitionerNo}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_user_id</ap-name>
-		<ap-sql>SELECT '${provider}' AS providerId</ap-sql>
+		<ap-sql>SELECT '${loggedInProvider}' AS providerId</ap-sql>
 		<ap-output>${providerId}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_user_signature</ap-name>
 		<ap-sql>SELECT providerExt.signature FROM providerExt WHERE
-			providerExt.provider_no='${provider}' </ap-sql>
+			providerExt.provider_no='${loggedInProvider}' </ap-sql>
 		<ap-output>${signature}</ap-output>
 	</databaseap>
 	<databaseap>
@@ -245,13 +245,20 @@
 	<databaseap>
 		<ap-name>current_user_takno</ap-name>
 		<ap-sql>SELECT p.alberta_tak_no as takno FROM provider p WHERE
-			p.provider_no='${provider}' </ap-sql>
+			p.provider_no='${loggedInProvider}' </ap-sql>
 		<ap-output>${takno}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_logged_in_user_takno</ap-name>
 		<ap-sql>SELECT p.alberta_tak_no as takno FROM provider p WHERE
 			p.provider_no='${loggedInProvider}' </ap-sql>
+		<ap-output>${takno}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>appt_provider_takno</ap-name>
+		<ap-sql>SELECT p.alberta_tak_no AS takno FROM provider p JOIN appointment a ON p.provider_no=a.provider_no
+			WHERE a.appointment_no='${appt_no}'
+		</ap-sql>
 		<ap-output>${takno}</ap-output>
 	</databaseap>
 

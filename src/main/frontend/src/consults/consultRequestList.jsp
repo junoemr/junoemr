@@ -45,11 +45,15 @@
 
 </style>
 
+<div class="consult-page-header"
+     ng-if="consultRequestListCtrl.hideSearchPatient != true">
+	<!-- TODO -->
+</div>
 <div ng-show="consultRequestListCtrl.consultReadAccess" class="col-lg-12">
 
 	<form name="searchForm" id="search-form">
 
-		<div class="row search-filters">
+		<div class="row search-filters consultation-search-filter">
 			<div class="col-lg-3 col-xs-6">
 				<juno-datepicker-popup juno-model="consultRequestListCtrl.search.referralStartDate" 
 					placeholder="<bean:message key="consult.list.referralStartDate" bundle="ui"/>"

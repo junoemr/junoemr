@@ -23,6 +23,7 @@
     Ontario, Canada
 
 */
+import {AppointmentApi} from "../../generated/api/AppointmentApi";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -30,6 +31,7 @@ angular.module('Record').controller('Record.RecordController', [
 	'$scope',
 	'$window',
 	'$http',
+	'$httpParamSerializer',
 	'$localStorage',
 	'$location',
 	'$state',
@@ -44,7 +46,6 @@ angular.module('Record').controller('Record.RecordController', [
 	'noteService',
 	'uxService',
 	'securityService',
-	'scheduleService',
 	'billingService',
 
 	function(
@@ -52,6 +53,7 @@ angular.module('Record').controller('Record.RecordController', [
 		$scope,
 		$window,
 		$http,
+		$httpParamSerializer,
 		$localStorage,
 		$location,
 		$state,
@@ -66,11 +68,13 @@ angular.module('Record').controller('Record.RecordController', [
 		noteService,
 		uxService,
 		securityService,
-		scheduleService,
 		billingService)
 	{
 
 		var controller = this;
+
+		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
+			'../ws/rs');
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.demographic = demo;
@@ -88,6 +92,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.$storage = $localStorage; // Define persistent storage
 		controller.recordtabs2 = [];
+		controller.working = false;
 
 		controller.init = function init()
 		{
@@ -141,18 +146,19 @@ angular.module('Record').controller('Record.RecordController', [
 			if (Juno.Common.Util.isDefinedAndNotNull(temp.state))
 			{
 				if(Juno.Common.Util.isDefinedAndNotNull(temp.demoId)){
-					$state.go(temp.state,
+					$state.go(temp.state[0],
 						{
 							demographicNo: temp.demoId
 						});
 				}
 				else
 				{
-					$state.go(temp.state);
+					$state.go(temp.state[0]);
 				}
 			}
 			else if (angular.isDefined(temp.url))
 			{
+				var win;
 				if (temp.label == "Rx")
 				{
 					win = temp.label + controller.demographicNo;
@@ -171,7 +177,7 @@ angular.module('Record').controller('Record.RecordController', [
 			if(Juno.Common.Util.isDefinedAndNotNull($state.current.name) &&
 				Juno.Common.Util.isDefinedAndNotNull(tab.state))
 			{
-				return ($state.current.name === tab.state);
+				return (tab.state.includes($state.current.name));
 			}
 
 			return false;
@@ -317,6 +323,10 @@ angular.module('Record').controller('Record.RecordController', [
 		});
 		//////		
 
+		controller.isWorking = function isWorking()
+		{
+			return controller.working;
+		};
 
 		// Note Input Logic
 		controller.toggleNote = function toggleNote()
@@ -336,7 +346,7 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			console.log('CANCELLING EDIT');
 			controller.page.encounterNote = null;
-			$rootScope.$emit('stopEditingNote');
+			$scope.$broadcast('stopEditingNote');
 			skipTmpSave = true;
 			controller.getCurrentNote(false);
 			controller.removeEditingNoteFlag();
@@ -352,12 +362,19 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.saveNote = function saveNote()
 		{
+			if(controller.isWorking())
+			{
+				return;
+			}
 			// Don't let users save an empty note
 			if (controller.page.encounterNote.note.length === 0)
 			{
 				alert("Can't save a blank note!"); // Placeholder error handling
 				return;
 			}
+
+			controller.working = true;
+
 			// Check if this is a new note, if it isn't, we don't want to overwrite the existing observationDate
 			// Need to find a better way of preventing this date overwrite
 			controller.page.encounterNote.assignedIssues = controller.page.assignedCMIssues;
@@ -374,28 +391,38 @@ angular.module('Record').controller('Record.RecordController', [
 				function success(results)
 				{
 					controller.page.isNoteSaved = true;
-					$rootScope.$emit('noteSaved', results);
+					$scope.$broadcast('noteSaved', results);
 					skipTmpSave = true;
 					controller.page.encounterNote = results;
 					controller.$storage.hideNote = true;
 					controller.getCurrentNote(false);
 					controller.page.assignedCMIssues = [];
+					controller.working = false;
 				},
 				function error(errors)
 				{
 					console.log(errors);
+					controller.working = false;
 				});
 			controller.removeEditingNoteFlag();
 		};
 
 		controller.saveSignNote = function saveSignNote()
 		{
+			if(controller.isWorking())
+			{
+				return;
+			}
 			controller.page.encounterNote.isSigned = true;
 			controller.saveNote();
 		};
 
 		controller.saveSignVerifyNote = function saveSignVerifyNote()
 		{
+			if(controller.isWorking())
+			{
+				return;
+			}
 			controller.page.encounterNote.isVerified = true;
 			controller.page.encounterNote.isSigned = true;
 			controller.saveNote();
@@ -421,10 +448,10 @@ angular.module('Record').controller('Record.RecordController', [
 			});
 		if ($location.search().appointmentNo != null)
 		{
-			scheduleService.getAppointment($location.search().appointmentNo).then(
+			controller.appointmentApi.getAppointment($location.search().appointmentNo).then(
 				function success(results)
 				{
-					controller.page.appointment = results;
+					controller.page.appointment = results.data.body;
 				},
 				function error(errors)
 				{
@@ -434,6 +461,10 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.saveSignBillNote = function saveSignBillNote()
 		{
+			if(controller.isWorking())
+			{
+				return;
+			}
 			controller.page.encounterNote.isSigned = true;
 			controller.saveNote();
 
@@ -496,7 +527,7 @@ angular.module('Record').controller('Record.RecordController', [
 					controller.page.encounterNote = results;
 					controller.page.initNote = results.note; //compare this with current note content to determine tmpsave or not
 					controller.getIssueNote();
-					$rootScope.$emit('currentlyEditingNote', controller.page.encounterNote);
+					$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
 					controller.initAppendNoteEditor();
 					controller.initObservationDate();
 				},
@@ -510,7 +541,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.editNote = function editNote(note)
 		{
-			$rootScope.$emit('', note);
+			$scope.$broadcast('', note);
 		};
 
 		$rootScope.$on('loadNoteForEdit', function(event, data)
@@ -527,7 +558,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 			//Need to check if note has been saved yet.
 			controller.$storage.hideNote = false;
-			$rootScope.$emit('currentlyEditingNote', controller.page.encounterNote);
+			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
 
 			controller.removeEditingNoteFlag();
 		});

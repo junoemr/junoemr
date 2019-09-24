@@ -339,6 +339,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.AllergyService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.AppointmentService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.AppService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.BatchOperationService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.BillingService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ConsultationWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicMergeService"/>
@@ -362,6 +363,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProductDispensingService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProgramService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProviderService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.ProviderPreferenceWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProvidersService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.RecordUxService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ReferralDoctorsService"/>

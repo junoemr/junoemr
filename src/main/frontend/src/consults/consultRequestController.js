@@ -479,7 +479,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			}
 		};
 
-		controller.saveAndFax = function saveAndPrint()
+		controller.saveAndFax = function saveAndFax()
 		{
 			controller.save().then(
 				function success(reqId)
@@ -488,7 +488,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 					var letterheadFax = Juno.Common.Util.noNull(consult.letterhead.fax);
 					var fax = Juno.Common.Util.noNull(consult.professionalSpecialist.faxNumber);
 
-					window.open("../fax/CoverPage.jsp?reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&fax=" + fax);
+					window.open("../fax/CoverPage.jsp?reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&faxRecipients=" + fax);
 				},
 				function failure(error)
 				{

@@ -37,6 +37,7 @@ public class AppointmentStatusConverter extends AbstractConverter<AppointmentSta
 	public AppointmentStatus getAsDomainObject(LoggedInInfo loggedInInfo,AppointmentStatusTo1 t) throws ConversionException {
 		AppointmentStatus d = new AppointmentStatus();
 		BeanUtils.copyProperties(t, d);
+		d.setJunoColor(t.getColor());
 		return d;
 	}
 	
@@ -44,6 +45,7 @@ public class AppointmentStatusConverter extends AbstractConverter<AppointmentSta
 	public AppointmentStatusTo1 getAsTransferObject(LoggedInInfo loggedInInfo,AppointmentStatus d) throws ConversionException {
 		AppointmentStatusTo1 t = new AppointmentStatusTo1();
 		BeanUtils.copyProperties(d, t);
+		t.setColor(d.getJunoColor());
 		return t;
 	}
 }

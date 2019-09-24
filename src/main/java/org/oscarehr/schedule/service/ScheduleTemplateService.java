@@ -24,25 +24,23 @@
 
 package org.oscarehr.schedule.service;
 
+import com.google.common.collect.RangeMap;
 import org.oscarehr.schedule.dao.ScheduleTemplateCodeDao;
 import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.dto.AvailabilityType;
 import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.schedule.model.ScheduleTemplate;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.util.ConversionUtils;
 
-import java.math.BigInteger;
-import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-//import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -54,8 +52,8 @@ public class ScheduleTemplateService
 	@Autowired
 	ScheduleTemplateCodeDao scheduleTemplateCodeDao;
 
-	private final String NO_APPOINTMENT_CHARACTER = "_";
-	private final String SCHEDULE_TEMPLATE_CLASSNAME= null;
+	private static final String NO_APPOINTMENT_CHARACTER = "_";
+	private static final String SCHEDULE_TEMPLATE_CLASSNAME= null;
 
 
 	/**
@@ -77,6 +75,17 @@ public class ScheduleTemplateService
 		return scheduleTemplateCodeDao.findAll();
 	}
 
+	public List<CalendarEvent> getCalendarEventsScheduleOnly(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, Integer siteId)
+	{
+		// get the schedule slot length, return null if no schedule is set
+		Integer scheduleSlotLength = scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId);
+		if(scheduleSlotLength != null)
+		{
+			return getAllCalendarEvents(providerId, date, startTime, endTime, siteId, scheduleSlotLength);
+		}
+		return null;
+	}
+
 	/**
 	 * Gets a list of schedule template slots and creates a list with adjacent slots of the same
 	 * type grouped together.  It basically converts from the Juno database format into the format
@@ -86,103 +95,103 @@ public class ScheduleTemplateService
 	 * @param providerId The provider to get the schedule for
 	 * @return A list of CalendarEvent objects
 	 */
-	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate date)
+	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, Integer siteId, int defaultSlotLengthInMin)
 	{
-		List<Object[]> results = scheduleTemplateDao.getRawScheduleSlots(providerId, date);
-
+		// get the schedule slot length, or use the default
+		Integer scheduleSlotLength = scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId);
+		if(scheduleSlotLength == null)
+		{
+			scheduleSlotLength = defaultSlotLengthInMin;
+		}
+		return getAllCalendarEvents(providerId, date, startTime, endTime, siteId, scheduleSlotLength);
+	}
+	private List<CalendarEvent> getAllCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, Integer siteId, int scheduleSlotLength)
+	{
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
 
-		Iterator<Object[]> iterator = results.iterator();
+		// Get schedule slots
+		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(date, providerId, siteId);
+		String prevCode = null;
 
-		int resourceId = 1; // Increments to identify rows
-		Object[] previousRow = null; // Save the previous row to at to result
-		LocalDateTime startDateTime = null;
-
-		while(iterator.hasNext())
+		for(LocalTime slotTime = startTime; slotTime.isBefore(endTime); slotTime = plusNoWrap(slotTime, scheduleSlotLength))
 		{
-			Object[] result = iterator.next();
+			LocalDateTime startDateTime = LocalDateTime.of(date, slotTime);
+			ScheduleSlot slot = scheduleSlots.get(slotTime);
 
-			String currentCode = (String)result[1];
+			CalendarEvent event;
+			boolean visibleCode = false;
 
-			// If the code changed or if this is the last row
-			//   save the previous row with the saved start date
-			//   reset the saved row and start date
-			if(previousRow != null && previousRow[1] != null && !previousRow[1].equals(currentCode))
+			/* add a fake event if there is no schedule slot at this time,
+			it is the no-appt slot marker, or the slot ends before the time period */
+			if(slot == null || NO_APPOINTMENT_CHARACTER.equals(slot.getCode()))
 			{
-				calendarEvents.add(createCalendarEvent(startDateTime, previousRow, providerId));
-
-				previousRow = null;
-				startDateTime = null;
+				event = createFakeCalendarEvent(startDateTime, scheduleSlotLength, providerId);
 			}
-
-			// If this is the last row, also add a result for that
-			if(!iterator.hasNext() && !NO_APPOINTMENT_CHARACTER.equals(currentCode))
+			else
 			{
-				// Use this date if there wasn't one set already
-				if(startDateTime == null)
-				{
-					startDateTime = ConversionUtils.getLocalDateTimeFromSqlDateAndTime(
-						(java.sql.Date) result[2],
-						(java.sql.Time) result[3]
-					);
-				}
-
 				// Add this row because it is the last
-				calendarEvents.add(createCalendarEvent(startDateTime, result, providerId));
+				event = createCalendarEvent(slot, scheduleSlotLength, providerId);
+				visibleCode = (prevCode == null || !prevCode.equals(event.getAvailabilityType().getSystemCode()));
 			}
 
-			// If this is not a _, save the current row and maybe start date
+			// if the code changes, set it to be visible. this allows the calendar to display codes once for repeated types
+			event.getAvailabilityType().setSystemCodeVisible(visibleCode);
+			prevCode = event.getAvailabilityType().getSystemCode();
 
-			if(!NO_APPOINTMENT_CHARACTER.equals(currentCode))
-			{
-				previousRow = result;
-				if(startDateTime == null)
-				{
-					startDateTime = ConversionUtils.getLocalDateTimeFromSqlDateAndTime(
-						(java.sql.Date) result[2],
-						(java.sql.Time)result[3]
-					);
-				}
-			}
+			calendarEvents.add(event);
 		}
-
 		return calendarEvents;
 	}
 
-	private CalendarEvent createCalendarEvent(LocalDateTime startDateTime, Object[] result, int resourceId)
+	private LocalTime plusNoWrap(LocalTime time, int slotLengthInMinutes)
 	{
-		java.sql.Date appointmentDate = (java.sql.Date) result[2];
-		Time appointmentTime = (java.sql.Time) result[3];
-		String code = (String) result[1];
-		Integer durationMinutes = ((BigInteger) result[5]).intValue();
-		String description = (String) result[6];
-		String color = (String) result[7];
+		LocalTime outTime = time.plusMinutes(slotLengthInMinutes);
 
-		LocalDateTime appointmentDateTime = ConversionUtils.getLocalDateTimeFromSqlDateAndTime(
-			appointmentDate,
-			appointmentTime
-		);
+		if(outTime.compareTo(time) == -1 || slotLengthInMinutes >= (24*60))
+		{
+			return LocalTime.MAX;
+		}
 
+		return outTime;
+	}
+
+	private CalendarEvent createFakeCalendarEvent(LocalDateTime startDateTime, int durationMin, int resourceId)
+	{
+		ScheduleSlot slot = new ScheduleSlot(
+				startDateTime,
+				null,
+				durationMin,
+				"No Schedule",
+				null,
+				null,
+				"N",
+				10);
+
+		return createCalendarEvent(slot, durationMin, resourceId);
+	}
+
+	private CalendarEvent createCalendarEvent(ScheduleSlot slot, int scheduleSlotLength, int resourceId)
+	{
 		// package up the event and add to the list
-		LocalDateTime endDateTime =
-			appointmentDateTime.plus(Duration.ofMinutes(durationMinutes));
+		LocalDateTime startDateTime = slot.getAppointmentDateTime();
+		LocalDateTime endDateTime = startDateTime.plus(Duration.ofMinutes(scheduleSlotLength));
 
 		AvailabilityType availabilityType = new AvailabilityType(
-			color,
-			description,
-			durationMinutes,
-			null
+			slot.getJunoColor(),
+			slot.getDescription(),
+			slot.getDurationMinutes(),
+			slot.getCode()
 		);
 
 		return new CalendarEvent(
-			startDateTime, //.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-			endDateTime, //.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-			color,
-			CalendarEvent.RENDERING_BACKGROUND,
-			SCHEDULE_TEMPLATE_CLASSNAME,
-			resourceId,
-			code,
-			availabilityType,
-			null);
+				startDateTime,
+				endDateTime,
+				slot.getJunoColor(),
+				CalendarEvent.RENDERING_BACKGROUND,
+				SCHEDULE_TEMPLATE_CLASSNAME,
+				resourceId,
+				slot.getCode(),
+				availabilityType,
+				null);
 	}
 }

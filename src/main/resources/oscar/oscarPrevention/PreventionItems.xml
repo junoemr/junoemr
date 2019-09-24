@@ -552,4 +552,20 @@ Varicella Immunoglobulin	VarIg
 		link="https://www.cancer.ca/en/cancer-information/diagnosis-and-treatment/tests-and-procedures/digital-rectal-exam/?region=bc"
 		showIfMinRecordNum="1" />
 
+	<item
+		resultDesc=""
+		desc="Electrocardiogram"
+		name="ECG"
+		healthCanadaType="ECG"
+		layout="PAPMAM"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc="Fecal Immunochemical Test"
+		name="FIT"
+		healthCanadaType="FIT"
+		layout="PAPMAM"
+		showIfMinRecordNum="1" />
+
 </preventions>

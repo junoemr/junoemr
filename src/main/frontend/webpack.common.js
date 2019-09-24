@@ -24,12 +24,17 @@ module.exports = {
 			},
 			{
 				// URL loader.  Falls back to file loader for large files.
-				test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+				test: /\.(woff(2)?|ttf|eot|svg|gif|png)(\?v=\d+\.\d+\.\d+)?$/,
 				loader: 'url-loader',
 				options: {
 					limit: 10000,
 				}
-			}
+			},
+			{
+				// html loader
+				test: /\.html?$/,
+				use: 'html-loader'
+			},
 		]
 	},
 	plugins: [
@@ -146,6 +151,7 @@ module.exports = {
 			'./src/common/services/demographicsService.js',
 			'./src/common/services/diseaseRegistryService.js',
 			'./src/common/services/errorsService.js',
+			'./src/common/services/eFormService.js',
 			'./src/common/services/faxAccountService.js',
 			'./src/common/services/faxInboundService.js',
 			'./src/common/services/faxOutboundService.js',
@@ -164,7 +170,6 @@ module.exports = {
 			'./src/common/services/providersService.js',
 			'./src/common/services/reportingService.js',
 			'./src/common/services/resultsService.js',
-			'./src/common/services/scheduleService.js',
 			'./src/common/services/securityService.js',
 			'./src/common/services/staticDataService.js',
 			'./src/common/services/summaryService.js',
@@ -182,6 +187,7 @@ module.exports = {
 			'./src/common/filters/startFrom.js',
 
 			'./src/common/directives/module.js',
+			'./src/common/directives/junoConfirmClick.js',
 			'./src/common/directives/typeaheadHelper.js',
 			'./src/common/directives/patientSearchTypeahead.js',
 			'./src/common/directives/patientTypeahead.js',
@@ -190,6 +196,8 @@ module.exports = {
 			'./src/common/directives/jqueryUIDraggable.js',
 			'./src/common/directives/angular-ui-calendar.js',
 			'./src/common/directives/selectOptionTooltip.js',
+
+			'./src/common/directives/appointment/juno_appointment_status_select.js',
 
 			'./src/common/directives/clinicaid/ca_field_alphadate.js',
 			'./src/common/directives/clinicaid/ca_field_alpha.js',
@@ -221,25 +229,21 @@ module.exports = {
 			'./src/common/directives/clinicaid/scroll.js',
 			'./src/common/directives/clinicaid/zero_pad.js',
 
+			'./src/common/components/module.js',
+			'./src/common/components/modalComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
-			'./src/layout/navBarController.js',
+			'./src/layout/primaryNavComponent.js',
+			'./src/layout/leftAsideComponent.js',
 
 			'./src/patient/module.js',
 			'./src/patient/newPatientController.js',
+			'./src/patient/demographicCardComponent.js',
 
 			'./src/dashboard/module.js',
 			'./src/dashboard/dashboardController.js',
 			'./src/dashboard/ticklerConfigureController.js',
-
-			'./src/patientlist/module.js',
-			'./src/patientlist/patientListState.js',
-			'./src/patientlist/patientListController.js',
-			'./src/patientlist/patientListAppointmentListController.js',
-			'./src/patientlist/patientListConfigController.js',
-			'./src/patientlist/patientListDemographicSetController.js',
-			'./src/patientlist/patientListProgramController.js',
 
 			'./src/record/module.js',
 			'./src/record/recordController.js',
@@ -248,10 +252,17 @@ module.exports = {
 			'./src/record/summary/recordPrintController.js',
 			'./src/record/summary/groupNotesController.js',
 			'./src/record/summary/saveWarningController.js',
+			'./src/record/summary/summaryModuleComponent.js',
+			'./src/record/summary/encounterNoteComponent.js',
+			'./src/record/summary/encounterNoteListComponent.js',
 			'./src/record/forms/module.js',
 			'./src/record/forms/formsController.js',
+			'./src/record/forms/components/formView/formViewComponent.js',
+			'./src/record/forms/components/modeSelector/modeSelectorComponent.js',
+			'./src/record/forms/components/groupSelector/groupSelectorComponent.js',
 			'./src/record/details/module.js',
 			'./src/record/details/detailsController.js',
+			'./src/record/details/swipecardController.js',
 			'./src/record/phr/module.js',
 			'./src/record/phr/phrController.js',
 
@@ -268,8 +279,7 @@ module.exports = {
 			'./src/schedule/module.js',
 			'./src/schedule/scheduleController.js',
 			'./src/schedule/eventController.js',
-			'./src/schedule/appointmentAddController.js',
-			'./src/schedule/appointmentViewController.js',
+			'./src/schedule/scheduleService.js',
 
 			'./src/admin/module.js',
 			'./src/admin/adminController.js',
@@ -305,12 +315,9 @@ module.exports = {
 			'./src/report/reportBadAppointmentSheetController.js',
 			'./src/report/reportDaySheetController.js',
 			'./src/report/reportEdbListController.js',
-			'./src/report/reportFollowUpIntakeController.js',
 			'./src/report/reportNoShowAppointmentSheetController.js',
 			'./src/report/reportOldPatientsController.js',
 			'./src/report/reportPatientChartListController.js',
-			'./src/report/reportRegistrationIntakeController.js',
-			'./src/report/reportSHMentalHealthController.js',
 
 			'./src/document/module.js',
 			'./src/document/documentsController.js',
@@ -319,6 +326,7 @@ module.exports = {
 			'./src/settings/settingsController.js',
 			'./src/settings/changePasswordController.js',
 			'./src/settings/quickLinkController.js',
+			'./src/settings/summaryItemSettingsController.js',
 
 			'./src/help/module.js',
 			'./src/help/supportController.js',

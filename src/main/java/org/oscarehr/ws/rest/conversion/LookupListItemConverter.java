@@ -43,6 +43,4 @@ public class LookupListItemConverter extends AbstractConverter<LookupListItem, L
 		BeanUtils.copyProperties(d, t);
 		return t;
     }
-
-	
 }

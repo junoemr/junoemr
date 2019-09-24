@@ -27,19 +27,21 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.appointment.service.Appointment;
 import org.oscarehr.common.dao.MyGroupDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.ProviderSiteDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.MyGroup;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Site;
-import org.oscarehr.schedule.dto.AppointmentDetails;
-import org.oscarehr.schedule.dto.CalendarEvent;
-import org.oscarehr.schedule.dto.ResourceSchedule;
-import org.oscarehr.schedule.dto.ScheduleSlot;
-import org.oscarehr.schedule.dto.UserDateSchedule;
 import org.oscarehr.schedule.dao.RScheduleDao;
 import org.oscarehr.schedule.dao.ScheduleDateDao;
 import org.oscarehr.schedule.dao.ScheduleHolidayDao;
 import org.oscarehr.schedule.dao.ScheduleTemplateDao;
+import org.oscarehr.schedule.dto.AppointmentDetails;
+import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.schedule.dto.CalendarSchedule;
+import org.oscarehr.schedule.dto.ResourceSchedule;
+import org.oscarehr.schedule.dto.ScheduleSlot;
+import org.oscarehr.schedule.dto.UserDateSchedule;
 import org.oscarehr.schedule.model.RSchedule;
 import org.oscarehr.schedule.model.ScheduleDate;
 import org.oscarehr.schedule.model.ScheduleHoliday;
@@ -55,17 +57,18 @@ import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.ArrayList;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
 
@@ -85,6 +88,9 @@ public class Schedule
 
 	@Autowired
 	ProviderDao providerDao;
+
+	@Autowired
+	ProviderSiteDao providerSiteDao;
 
 	@Autowired
 	ScheduleDateDao scheduleDateDao;
@@ -345,17 +351,8 @@ public class Schedule
 
 		if (viewAll && site != null)
 		{
-			List<Site> providerSites = siteDao.getActiveSitesByProviderNo(providerNo);
-			boolean siteMatch = false;
-			for (Site providerSite : providerSites)
-			{
-				if (providerSite.getName().equals(site))
-				{
-					siteMatch = true;
-				}
-			}
-			if (!siteMatch)
-			{// no schedule results for this provider
+			if (!isProviderAssignedToSite(site, providerNo))
+			{ // skip this provider
 				return new ResourceSchedule(userDateSchedules);
 			}
 
@@ -423,17 +420,8 @@ public class Schedule
 				//in view all we filter by site assigned to provider
 				if (site != null)
 				{
-					List<Site> providerSites = siteDao.getActiveSitesByProviderNo(result.getId().getProviderNo());
-					boolean siteMatch = false;
-					for (Site providerSite : providerSites)
-					{
-						if (providerSite.getName().equals(site))
-						{
-							siteMatch = true;
-						}
-					}
-					if (!siteMatch)
-					{// skip this provider
+					if (!isProviderAssignedToSite(site, result.getId().getProviderNo()))
+					{ // skip this provider
 						continue;
 					}
 				}
@@ -574,17 +562,20 @@ public class Schedule
 		Integer providerId,
 		LocalDate startDate,
 		LocalDate endDate,
-		String siteName
+		LocalTime startTime,
+		LocalTime endTime,
+		String siteName,
+		Integer siteId,
+		Integer slotDurationInMin
 	)
 	{
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
 
-		// Loop through the dates between startDate and endDate (inclusive) and add schedule
-		// templates
+		// Loop through the dates between startDate and endDate (inclusive) and add schedule templates
 		for(LocalDate date: ConversionUtils.getDateList(startDate, endDate))
 		{
 			// Get schedule templates for this provider/date
-			calendarEvents.addAll(scheduleTemplateService.getCalendarEvents(providerId, date));
+			calendarEvents.addAll(scheduleTemplateService.getCalendarEvents(providerId, date, startTime, endTime, siteId, slotDurationInMin));
 		}
 
 		// Get appointments for this provider/date range
@@ -592,5 +583,214 @@ public class Schedule
 			session, providerId, startDate, endDate, siteName));
 
 		return calendarEvents;
+	}
+	public CalendarSchedule getCalendarScheduleByProvider(
+			HttpSession session,
+			Integer providerId,
+			boolean viewSchedulesOnly,
+			LocalDate startDate,
+			LocalDate endDate,
+			LocalTime startTime,
+			LocalTime endTime,
+			String siteName,
+			Integer slotDurationInMin
+	)
+	{
+		List<CalendarEvent> allCalendarEvents;
+		List<Integer> hiddenDaysList;
+		List<String> providerIdList;
+		boolean visibleSchedules = false;
+
+		if(siteName == null || isProviderAssignedToSite(siteName, String.valueOf(providerId)))
+		{
+			providerIdList = new ArrayList<>(1);
+			providerIdList.add(String.valueOf(providerId));
+
+			Integer siteId = null;
+			if(siteName != null)
+			{
+				Site site = siteDao.findByName(siteName);
+				if(site != null)
+				{
+					siteId = site.getSiteId();
+				}
+			}
+
+			if(viewSchedulesOnly)
+			{
+				allCalendarEvents = new ArrayList<>();
+
+				/* The fullCalendar plugin we are using has a hiddenDays parameter that allows us to hide certain days in the middle of a week/month view etc.
+				   We are utilizing this setting to create the schedule view, but we don't want to send back events for hidden days, so here we are building a
+				   'day of the week' filter and sending back the days to be hidden based on if they have a schedule set up.
+				 */
+				int[] daysWithSchedules = {0, 0, 0, 0, 0, 0, 0};
+
+				//TODO somehow consolidate with regular getCalendarEvents method
+				// Loop through the dates between startDate and endDate (inclusive) and add schedule templates
+				for(LocalDate date : ConversionUtils.getDateList(startDate, endDate))
+				{
+					// Get schedule templates for this provider/date
+					List<CalendarEvent> eventList = scheduleTemplateService.getCalendarEventsScheduleOnly(providerId, date, startTime, endTime, siteId);
+					if(eventList != null)
+					{
+						// provider has a schedule, add them to results normally
+						allCalendarEvents.addAll(eventList);
+
+						int dayOfWeek = date.getDayOfWeek().getValue(); // 1 index based starting Monday
+						dayOfWeek = dayOfWeek % 7;// shift to be 0 index based starting on Sunday
+						daysWithSchedules[dayOfWeek] = 1;
+					}
+				}
+				hiddenDaysList = new ArrayList<>(7);
+				for(int i = 0; i < daysWithSchedules.length; i++)
+				{
+					if(daysWithSchedules[i] == 0)
+					{
+						hiddenDaysList.add(i);
+					}
+					else if(daysWithSchedules[i] == 1)
+					{
+						visibleSchedules = true;
+					}
+				}
+
+				// Get appointments for this provider/date range
+				allCalendarEvents.addAll(appointmentService.getCalendarEvents(
+						session, providerId, startDate, endDate, siteName, hiddenDaysList));
+			}
+			else
+			{
+				allCalendarEvents = getCalendarEvents(session, providerId,
+						startDate, endDate, startTime, endTime, siteName, siteId, slotDurationInMin);
+				hiddenDaysList = new ArrayList<>(0); //always empty for all view
+				visibleSchedules = true;
+			}
+		}
+		else //provider not available with this site, return nothing.
+		{
+			allCalendarEvents = new ArrayList<>(0);
+			hiddenDaysList = Arrays.asList(0,1,2,3,4,5,6); //hide all the days (for consistency)
+			providerIdList = new ArrayList<>(0);
+			visibleSchedules = false;
+		}
+
+		CalendarSchedule calendarSchedule = new CalendarSchedule();
+
+		calendarSchedule.setGroupName(String.valueOf(providerId));
+		calendarSchedule.setProviderIdList(providerIdList);
+		calendarSchedule.setEventList(allCalendarEvents);
+		calendarSchedule.setPreferredSlotDuration(slotDurationInMin);
+		calendarSchedule.setVisibleSchedules(visibleSchedules);
+		calendarSchedule.setHiddenDaysList(hiddenDaysList);
+
+		return calendarSchedule;
+	}
+
+	public CalendarSchedule getCalendarScheduleByGroup(
+			HttpSession session,
+			String groupName,
+			boolean viewSchedulesOnly,
+			LocalDate startDate,
+			LocalDate endDate,
+			LocalTime startTime,
+			LocalTime endTime,
+			String siteName,
+			Integer slotDurationInMin
+	)
+	{
+		String userProviderNo = (String) session.getAttribute("user");
+
+		Integer siteId = null;
+		if(siteName != null)
+		{
+			Site site = siteDao.findByName(siteName);
+			if(site != null)
+			{
+				siteId = site.getSiteId();
+			}
+		}
+
+		List<MyGroup> userGroupMappings;
+		if(viewSchedulesOnly)
+		{
+			userGroupMappings = myGroupDao.getGroupWithScheduleByGroupNo(groupName, startDate, Integer.parseInt(userProviderNo));
+		}
+		else
+		{
+			userGroupMappings = myGroupDao.getGroupByGroupNo(groupName);
+		}
+
+		List<String> providerIdList = new ArrayList<>(userGroupMappings.size());
+		List<CalendarEvent> allCalendarEvents = new ArrayList<>();
+		for(MyGroup userGroup : userGroupMappings)
+		{
+			String providerIdStr = userGroup.getId().getProviderNo();
+			List<CalendarEvent> calendarEvents;
+
+			// filter by site selection if applicable
+			if(siteName != null)
+			{
+				if (!isProviderAssignedToSite(siteName, providerIdStr))
+				{ // skip this provider
+					continue;
+				}
+			}
+
+			if(viewSchedulesOnly)
+			{
+				//TODO refactor similar logic with provider version
+				calendarEvents = new ArrayList<>();
+
+				// Loop through the dates between startDate and endDate (inclusive) and add schedule templates
+				for(LocalDate date: ConversionUtils.getDateList(startDate, endDate))
+				{
+					// Get schedule templates for this provider/date/site
+					List<CalendarEvent> eventList = scheduleTemplateService.getCalendarEventsScheduleOnly(Integer.parseInt(providerIdStr), date, startTime, endTime, siteId);
+					if(eventList != null)
+					{
+						// only add the provider to the provider list if they have a schedule for the correct site
+						calendarEvents.addAll(eventList);
+						providerIdList.add(providerIdStr);
+
+						// Get appointments for this provider/date range
+						calendarEvents.addAll(appointmentService.getCalendarEvents(
+								session, Integer.parseInt(providerIdStr), startDate, endDate, siteName));
+					}
+				}
+			}
+			else
+			{
+				providerIdList.add(providerIdStr);
+
+				calendarEvents = getCalendarEvents(session, Integer.parseInt(providerIdStr),
+						startDate, endDate, startTime, endTime, siteName, siteId, slotDurationInMin);
+			}
+			allCalendarEvents.addAll(calendarEvents);
+		}
+
+		CalendarSchedule calendarSchedule = new CalendarSchedule();
+
+		calendarSchedule.setGroupName(groupName);
+		calendarSchedule.setProviderIdList(providerIdList);
+		calendarSchedule.setVisibleSchedules(!providerIdList.isEmpty());
+		calendarSchedule.setEventList(allCalendarEvents);
+		calendarSchedule.setPreferredSlotDuration(5); //TODO calculate based on lowest common slot size
+		calendarSchedule.setHiddenDaysList(new ArrayList<>(0)); // always empty in group view
+
+		return calendarSchedule;
+	}
+
+	private boolean isProviderAssignedToSite(String siteName, String providerId)
+	{
+		List<Site> providerSites = siteDao.getActiveSitesByProviderNo(providerId);
+		for (Site providerSite : providerSites)
+		{
+			if (siteName.equals(providerSite.getName()))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

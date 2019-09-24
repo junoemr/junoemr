@@ -1,0 +1,28 @@
+/*css to add back colours for badges and make use of the colours*/
+.badge-default {
+  background-color: $color-neutral-grey;
+}
+
+.badge-primary {
+  background-color: $color-primary-base;
+}
+
+.badge-success {
+  background-color: $semantic-success-base;
+}
+
+.badge-info {
+  background-color: $semantic-info-base;
+}
+
+.badge-warning {
+  background-color: $semantic-warning-base;
+}
+
+.badge-danger {
+  background-color: $semantic-error-base;
+}
+
+.badge {
+  font-size: 10px;
+}

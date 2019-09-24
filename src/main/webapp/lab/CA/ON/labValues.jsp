@@ -39,16 +39,20 @@ if(!authed) {
 }
 %>
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="java.io.Serializable"%>
-<%@page import="org.w3c.dom.Document"%>
-<%@page import="org.oscarehr.caisi_integrator.ws.CachedDemographicLabResult"%>
-<%@page import="oscar.oscarLab.ca.all.web.LabDisplayHelper"%>
-<%@ page
-	import="java.util.*,oscar.oscarLab.ca.on.*,oscar.oscarDemographic.data.*"%>
+<%@ page import="org.oscarehr.util.LoggedInInfo"%>
+<%@ page import="java.io.Serializable"%>
+<%@ page import="org.w3c.dom.Document"%>
+<%@ page import="org.oscarehr.caisi_integrator.ws.CachedDemographicLabResult"%>
+<%@ page import="oscar.oscarLab.ca.all.web.LabDisplayHelper"%>
+<%@ page import="oscar.oscarDemographic.data.*"%>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="org.oscarehr.util.DateMapComparator" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="oscar.oscarLab.ca.on.CommonLabTestValues" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -74,10 +78,24 @@ ArrayList list = null;
 
 	SimpleDateFormat dateOutputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
 	DateMapComparator comparator = new DateMapComparator("collDate");
-if (!(demographicNo == null || demographicNo.equals("null"))){
+
+	int demographicNoAsNumber = 0;
+
+	try
+	{
+		demographicNoAsNumber = Integer.valueOf(demographicNo);
+	}
+	catch (NumberFormatException exception)
+	{
+		MiscUtils.getLogger().warn("Failed to parse '" + demographicNo + "' as an integer");
+	}
+
+
+if (!(demographicNo == null || demographicNo.equals("null") || demographicNoAsNumber == 0)){
+
 	if(remoteFacilityIdString==null)
 	{
-		list = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographicNo), testName, identifier);
+		list = CommonLabTestValues.findValuesForTest(labType, demographicNoAsNumber, testName, identifier);
 	}
 	else
 	{

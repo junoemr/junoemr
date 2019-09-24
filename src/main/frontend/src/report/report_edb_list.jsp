@@ -28,23 +28,20 @@
 <div class="row" ng-controller="Report.ReportEdbListController as reportEdbListCtrl">
     <div class="col-md-4">
         <form role="form">
-            <div class="form-group">
-                <label for="startDate">Start Date</label>
-                <input ng-model="reportEdbListCtrl.params.startDate"
-                       type="date" id="startDate"
-                       name="startDate"
-                       class="form-control"
-                       placeholder="">
-            </div>
-            <div class="form-group">
-                <label for="endDate">End Date</label>
-                <input ng-model="reportEdbListCtrl.params.endDate"
-                       type="date"
-                       id="endDate"
-                       name="endDate"
-                       class="form-control"
-                       placeholder="">
-            </div>
+            <ca-field-date
+		            ca-title="Start Date"
+                    ca-date-picker-id="edb-list-startDate"
+                    ca-name="edb-list-startDate"
+                    ca-model="reportEdbListCtrl.params.startDate"
+                    ca-orientation="auto"
+            ></ca-field-date>
+            <ca-field-date
+		            ca-title="End Date"
+		            ca-date-picker-id="edb-list-endDate"
+		            ca-name="edb-list-endDate"
+		            ca-model="reportEdbListCtrl.params.endDate"
+		            ca-orientation="auto"
+            ></ca-field-date>
             <div class="form-group">
                 <label for="version">Version</label>
                 <select ng-model="reportEdbListCtrl.params.version" name="version" id="version" class="form-control" >

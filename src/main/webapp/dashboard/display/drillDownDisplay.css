@@ -1,0 +1,10 @@
+
+#batch_operation_banner
+{
+    display:none;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    padding-top: 5px;
+    justify-content: center;
+    transition: opacity 2s;
+}

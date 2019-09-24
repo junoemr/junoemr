@@ -288,7 +288,6 @@ public final class MessageUploader {
 			{
 				String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
 				// Every PDF should be prefixed with this due to b64 encoding of PDF header
-				final String pdfPrefix = "JVBERi0xLj";
 
 				for (i = 0; i < messageHandler.getOBRCount(); i++)
 				{
@@ -300,7 +299,7 @@ public final class MessageUploader {
 							for (int k = 1; k <= referenceStrings.length; k++)
 							{
 								String embeddedPdf = messageHandler.getOBXResult(i, c, k);
-								if (embeddedPdf.startsWith(pdfPrefix))
+								if (embeddedPdf.startsWith(PATHL7Handler.embeddedPdfPrefix))
 								{
 									MiscUtils.getLogger().info("Found embedded PDF in lab upload, pulling it out");
 									hasPDF = true;
@@ -324,7 +323,7 @@ public final class MessageUploader {
 						String fileName = "-" + accessionNum + "-" + fillerOrderNum + "-" + count + "-" + (int)(Math.random()*1000000000) + ".pdf";
 						// Replace original PDF string with meta info to prevent saving > 500k char strings in table
 						docId = createDocumentFromEmbeddedPDF(pdf, fileName);
-						hl7Body = hl7Body.replace(pdf, "embedded_doc_id_" + docId);
+						hl7Body = hl7Body.replace(pdf, PATHL7Handler.pdfReplacement + docId);
 						if (docId <= 0)
 						{
 							throw new ParseException("did not save embedded lab document correctly", 0);

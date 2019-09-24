@@ -37,17 +37,15 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.ProviderManager2;
-import org.oscarehr.managers.model.ProviderSettings;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.web.PatientListApptItemBean;
-import org.oscarehr.ws.rest.conversion.ProviderConverter;
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.to.AbstractSearchResponse;
-import org.oscarehr.ws.rest.to.GenericRESTResponse;
-import org.oscarehr.ws.rest.to.model.ProviderTo1;
+import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
+import org.oscarehr.ws.rest.conversion.ProviderConverter;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
+import org.oscarehr.ws.rest.to.AbstractSearchResponse;
+import org.oscarehr.ws.rest.to.model.ProviderTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -196,44 +194,37 @@ public class ProviderService extends AbstractServiceImpl {
 	@GET
 	@Path("/getRecentDemographicsViewed")
 	@Produces("application/json")
-	public RestResponse<List<PatientListApptItemBean>> getRecentDemographicsViewed()
+	public RestSearchResponse<PatientListItemTransfer> getRecentDemographicsViewed()
 	{
-		List<PatientListApptItemBean> resultList = new ArrayList<>();
 
-		try
+		int providerNo = Integer.parseInt(getLoggedInInfo().getLoggedInProviderNo());
+		int offset = 0;
+		int limit = 8;
+
+		String recentPatients = preferenceManager.getProviderPreference(getLoggedInInfo(), "recentPatients");
+		if(recentPatients != null)
 		{
-			int providerNo = Integer.parseInt(getLoggedInInfo().getLoggedInProviderNo());
-			int offset = 0;
-			int limit = 8;
-
-			String recentPatients = preferenceManager.getProviderPreference(getLoggedInInfo(), "recentPatients");
-			if(recentPatients != null)
-			{
-				limit = Integer.parseInt(recentPatients);
-			}
-
-			List<RecentDemographicAccess> results = recentDemographicAccessService.getRecentAccessList(providerNo, offset, limit);
-
-			//TODO avoid the loop over demographics to get the display name
-			for(RecentDemographicAccess result : results)
-			{
-				Integer demographicNo = result.getDemographicNo();
-				Date accessDateTime = result.getAccessDateTime();
-				Demographic demographic = demographicManager.getDemographic(getLoggedInInfo(), demographicNo);
-
-				PatientListApptItemBean item = new PatientListApptItemBean();
-				item.setDemographicNo(demographicNo);
-				item.setDate(accessDateTime);
-				item.setName(demographic.getDisplayName());
-				resultList.add(item);
-			}
+			limit = Integer.parseInt(recentPatients);
 		}
-		catch(Exception e)
+
+		List<RecentDemographicAccess> results = recentDemographicAccessService.getRecentAccessList(providerNo, offset, limit);
+		List<PatientListItemTransfer> resultList = new ArrayList<>(results.size());
+
+		//TODO avoid the loop over demographics to get the display name
+		for(RecentDemographicAccess result : results)
 		{
-			logger.error("Error retrieving recent demographics viewed", e);
-			return RestResponse.errorResponse("Error retrieving recent demographics viewed");
+			Integer demographicNo = result.getDemographicNo();
+			Date accessDateTime = result.getAccessDateTime();
+			Demographic demographic = demographicManager.getDemographic(getLoggedInInfo(), demographicNo);
+
+			PatientListItemTransfer item = new PatientListItemTransfer();
+			item.setDemographicNo(demographicNo);
+			item.setDate(accessDateTime);
+			item.setName(demographic.getDisplayName());
+			resultList.add(item);
 		}
-		return RestResponse.successResponse(resultList);
+
+		return RestSearchResponse.successResponseOnePage(resultList);
 	}
 	
 	@GET
@@ -249,30 +240,30 @@ public class ProviderService extends AbstractServiceImpl {
 		return response;
 	}
 	
-	@GET
-	@Path("/settings/get")
-	@Produces("application/json")
-	public AbstractSearchResponse<ProviderSettings> getProviderSettings() {	
-		AbstractSearchResponse<ProviderSettings> response = new AbstractSearchResponse<ProviderSettings>();
-		
-		ProviderSettings settings = providerManager.getProviderSettings(getLoggedInInfo().getLoggedInProviderNo());
-		List<ProviderSettings> content = new ArrayList<ProviderSettings>();
-		content.add(settings);
-		response.setContent(content);
-		response.setTotal(1);
-		return response;
-	}
-	
-	@POST
-	@Path("/settings/{providerNo}/save")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public GenericRESTResponse saveProviderSettings(ProviderSettings json,@PathParam("providerNo")String providerNo){
-		GenericRESTResponse response = new GenericRESTResponse();
-		
-		MiscUtils.getLogger().warn(json.toString());
-		
-		providerManager.updateProviderSettings(getLoggedInInfo(),providerNo,json);
-		return response;
-	}
+//	@GET
+//	@Path("/settings/get")
+//	@Produces("application/json")
+//	public AbstractSearchResponse<ProviderSettings> getProviderSettings() {
+//		AbstractSearchResponse<ProviderSettings> response = new AbstractSearchResponse<ProviderSettings>();
+//
+//		ProviderSettings settings = providerManager.getProviderSettings(getLoggedInInfo().getLoggedInProviderNo());
+//		List<ProviderSettings> content = new ArrayList<ProviderSettings>();
+//		content.add(settings);
+//		response.setContent(content);
+//		response.setTotal(1);
+//		return response;
+//	}
+//
+//	@POST
+//	@Path("/settings/{providerNo}/save")
+//	@Produces("application/json")
+//	@Consumes("application/json")
+//	public GenericRESTResponse saveProviderSettings(ProviderSettings json,@PathParam("providerNo")String providerNo){
+//		GenericRESTResponse response = new GenericRESTResponse();
+//
+//		MiscUtils.getLogger().warn(json.toString());
+//
+//		providerManager.updateProviderSettings(getLoggedInInfo(),providerNo,json);
+//		return response;
+//	}
 }

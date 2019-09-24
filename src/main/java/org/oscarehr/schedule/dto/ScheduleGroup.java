@@ -27,13 +27,21 @@ import java.util.Objects;
 
 public class ScheduleGroup
 {
+	public enum IdentifierType
+	{
+		GROUP,
+		PROVIDER
+	}
+
 	private String name;
 	private String identifier;
+	private IdentifierType identifierType;
 	private List<Integer> providerNos;
 
-	public ScheduleGroup(String identifier, String name, List<Integer> providerNos)
+	public ScheduleGroup(String identifier, IdentifierType identifierType, String name, List<Integer> providerNos)
 	{
 		this.identifier = identifier;
+		this.identifierType = identifierType;
 		this.name = name;
 		this.providerNos = providerNos;
 	}
@@ -41,6 +49,16 @@ public class ScheduleGroup
 	public String getIdentifier()
 	{
 		return identifier;
+	}
+
+	public IdentifierType getIdentifierType()
+	{
+		return identifierType;
+	}
+
+	public void setIdentifierType(IdentifierType identifierType)
+	{
+		this.identifierType = identifierType;
 	}
 
 	public String getName()

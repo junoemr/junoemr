@@ -23,22 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -56,7 +40,7 @@ import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.schedule.dto.CalendarSchedule;
 import org.oscarehr.schedule.dto.ScheduleGroup;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.schedule.service.Schedule;
@@ -64,8 +48,6 @@ import org.oscarehr.schedule.service.ScheduleGroupService;
 import org.oscarehr.schedule.service.ScheduleTemplateService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.web.PatientListApptBean;
-import org.oscarehr.web.PatientListApptItemBean;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentStatusConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentTypeConverter;
@@ -75,10 +57,27 @@ import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.SchedulingResponse;
 import org.oscarehr.ws.rest.to.model.AppointmentStatusTo1;
-import org.oscarehr.ws.rest.to.model.AppointmentTo1;
+import org.oscarehr.ws.rest.to.model.AppointmentTypeTo1;
+import org.oscarehr.ws.rest.to.model.LookupListItemTo1;
+import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Path("/schedule")
 @Component("scheduleService")
@@ -107,26 +106,9 @@ public class ScheduleService extends AbstractServiceImpl {
 	@GET
 	@Path("/day/{date}")
 	@Produces("application/json")
-	public RestResponse<PatientListApptBean> getAppointmentsForDay(@PathParam("date") String date) throws ParseException
+	public RestSearchResponse<PatientListItemTransfer> getAppointmentsForDay(@PathParam("date") String dateStr) throws ParseException
 	{
 		String providerNo = this.getCurrentProvider().getProviderNo();
-		return getAppointmentsForDay(providerNo, date);
-	}
-
-	/**
-	 * Will substitute "me" to your logged in provider no, and "today" to today's date.
-	 * eg /schedule/me/day/today
-	 *
-	 * @param providerNo
-	 * @param dateStr
-	 * @return list of appointments by provider and date
-	 */
-	@GET
-	@Path("/{providerNo}/day/{date}")
-	@Produces("application/json")
-	public RestResponse<PatientListApptBean> getAppointmentsForDay(@PathParam("providerNo") String providerNo,
-	                                                               @PathParam("date") String dateStr) throws ParseException
-	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		if("".equals(providerNo))
 		{
@@ -135,7 +117,6 @@ public class ScheduleService extends AbstractServiceImpl {
 		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.READ, null, "_appointment");
 
 		SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm aa");
-		PatientListApptBean response = new PatientListApptBean();
 
 		Date dateObj;
 		if("today".equals(dateStr))
@@ -148,9 +129,11 @@ public class ScheduleService extends AbstractServiceImpl {
 		}
 
 		List<Appointment> appts = scheduleManager.getDayAppointments(loggedInInfo, providerNo, dateObj);
+		List<PatientListItemTransfer> response = new ArrayList<>(appts.size());
+
 		for(Appointment appt : appts)
 		{
-			PatientListApptItemBean item = new PatientListApptItemBean();
+			PatientListItemTransfer item = new PatientListItemTransfer();
 			item.setDemographicNo(appt.getDemographicNo());
 			if(appt.getDemographicNo() == 0)
 			{
@@ -160,163 +143,45 @@ public class ScheduleService extends AbstractServiceImpl {
 			{
 				item.setName(demographicManager.getDemographicFormattedName(loggedInInfo, appt.getDemographicNo()));
 			}
+
+			String rawStatus = appt.getStatus();
+			String status = null;
+			String statusModifier = null;
+			if(rawStatus != null && rawStatus.length() > 0)
+			{
+				status = rawStatus.substring(0, 1);
+
+				if(rawStatus.length() > 1)
+				{
+					statusModifier = rawStatus.substring(1,2);
+				}
+			}
+
 			item.setStartTime(timeFormatter.format(appt.getStartTime()));
 			item.setReason(appt.getReason());
-			item.setStatus(appt.getStatus());
+			item.setStatus(status);
+			item.setStatusModifier(statusModifier);
 			item.setAppointmentNo(appt.getId());
 			item.setDate(appt.getStartTimeAsFullDate());
-			response.getPatients().add(item);
+			response.add(item);
 		}
-		return RestResponse.successResponse(response);
+		return RestSearchResponse.successResponseOnePage(response);
 	}
 
 	@GET
-	@Path("/statuses")
-	@Produces("application/json")
-	public AbstractSearchResponse<AppointmentStatusTo1> getAppointmentStatuses() {
-		AbstractSearchResponse<AppointmentStatusTo1> response = new AbstractSearchResponse<AppointmentStatusTo1>();
-
-		List<AppointmentStatus> results = scheduleManager.getAppointmentStatuses(getLoggedInInfo());
-		AppointmentStatusConverter converter = new AppointmentStatusConverter();
-
-		response.setContent(converter.getAllAsTransferObjects(getLoggedInInfo(), results));
-		response.setTotal(results.size());
-
-		return response;
-	}
-
-	/*
-	@POST
-	@Path("/add")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public RestResponse<AppointmentTo1> addAppointment(NewAppointmentTo1 appointmentTo) {
-		//SchedulingResponse response = new SchedulingResponse();
-
-		logger.info(appointmentTo.toString());
-
-		NewAppointmentConverter converter = new NewAppointmentConverter();
-
-		//TODO: Need to add some more validation here
-
-		Appointment appt = converter.getAsDomainObject(getLoggedInInfo(), appointmentTo);
-
-		appointmentManager.addAppointment(getLoggedInInfo(), appt);
-
-		//response.setAppointment(new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt));
-		AppointmentTo1 appointment = new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt);
-
-		return RestResponse.successResponse(appointment);
-	}
-	*/
-
-	@POST
-	@Path("/getAppointment")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public SchedulingResponse getAppointment(AppointmentTo1 appointmentTo) {
-		SchedulingResponse response = new SchedulingResponse();
-
-		AppointmentConverter converter = new AppointmentConverter(true, true);
-
-		Appointment appt = appointmentManager.getAppointment(getLoggedInInfo(), appointmentTo.getId());
-
-		response.setAppointment(converter.getAsTransferObject(getLoggedInInfo(), appt));
-
-		return response;
-	}
-
-	/*
-	@POST
-	@Path("/updateAppointment")
-	@Consumes("application/json")
-	@Produces("application/json")
-	public SchedulingResponse updateAppointment(AppointmentTo1 appointmentTo) {
-		SchedulingResponse response = new SchedulingResponse();
-
-		AppointmentConverter converter = new AppointmentConverter();
-		Appointment appt = converter.getAsDomainObject(getLoggedInInfo(), appointmentTo);
-
-		appointmentManager.updateAppointment(getLoggedInInfo(), appt);
-
-		response.setAppointment(converter.getAsTransferObject(getLoggedInInfo(), appt));
-		return response;
-	}
-	*/
-
-	@POST
 	@Path("/{demographicNo}/appointmentHistory")
 	@Produces("application/json")
-	public SchedulingResponse findExistAppointments(@PathParam("demographicNo") Integer demographicNo) {
+	public SchedulingResponse getAppointmentHistory(@PathParam("demographicNo") Integer demographicNo)
+	{
 		SchedulingResponse response = new SchedulingResponse();
 		List<Appointment> appts = appointmentManager.getAppointmentHistoryWithoutDeleted(getLoggedInInfo(), demographicNo, 0, OscarAppointmentDao.MAX_LIST_RETURN_SIZE);
-		if(appts.size() == OscarAppointmentDao.MAX_LIST_RETURN_SIZE) {
+		if(appts.size() == OscarAppointmentDao.MAX_LIST_RETURN_SIZE)
+		{
 			logger.warn("appointment history over MAX_LIST_RETURN_SIZE for demographic " + demographicNo);
 		}
 		AppointmentConverter converter = new AppointmentConverter();
 		response.setAppointments(converter.getAllAsTransferObjects(getLoggedInInfo(), appts));
-		
-		return response;
-	}
 
-	@POST
-	@Path("/appointment/{id}/updateStatus")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public SchedulingResponse updateAppointmentStatus(@PathParam("id") Integer id, AppointmentTo1 appt) {
-		SchedulingResponse response = new SchedulingResponse();
-		AppointmentConverter converter = new AppointmentConverter();
-		String status = appt.getStatus();
-
-		Appointment appointment = appointmentManager.updateAppointmentStatus(getLoggedInInfo(), id, status);
-
-		response.setAppointment(converter.getAsTransferObject(getLoggedInInfo(), appointment));
-
-		return response;
-	}
-
-	@POST
-	@Path("/appointment/{id}/updateType")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public SchedulingResponse updateAppointmentType(@PathParam("id") Integer id, AppointmentTo1 appt) {
-		SchedulingResponse response = new SchedulingResponse();
-		AppointmentConverter converter = new AppointmentConverter();
-		String type = appt.getType();
-
-		Appointment appointment = appointmentManager.updateAppointmentType(getLoggedInInfo(), id, type);
-
-		response.setAppointment(converter.getAsTransferObject(getLoggedInInfo(), appointment));
-
-		return response;
-	}
-
-	@Path("/appointment/{id}/updateUrgency")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public SchedulingResponse updateAppointmentUrgency(@PathParam("id") Integer id, AppointmentTo1 appt) {
-		SchedulingResponse response = new SchedulingResponse();
-		AppointmentConverter converter = new AppointmentConverter();
-		String urgency = appt.getUrgency();
-
-		Appointment appointment = appointmentManager.updateAppointmentUrgency(getLoggedInInfo(), id, urgency);
-
-		response.setAppointment(converter.getAsTransferObject(getLoggedInInfo(), appointment));
-
-		return response;
-	}
-
-	@GET
-	@Path("/fetchMonthly/{providerNo}/{year}/{month}")
-	@Produces("application/json")
-	public SchedulingResponse fetchMonthlyData(@PathParam("year") Integer year, @PathParam("month") Integer month, @PathParam("providerNo") String providerNo) {
-		SchedulingResponse response = new SchedulingResponse();
-		
-		List<Appointment> appts = appointmentManager.findMonthlyAppointments(getLoggedInInfo(), providerNo, year, month);
-		
-		AppointmentConverter converter = new AppointmentConverter();
-		response.setAppointments(converter.getAllAsTransferObjects(getLoggedInInfo(), appts));
-		
 		return response;
 	}
 
@@ -358,36 +223,46 @@ public class ScheduleService extends AbstractServiceImpl {
 		return Response.status(Status.OK).build();
 	}
 */
-	
+
 	@GET
-	@Path("/types")
+	@Path("/statuses")
 	@Produces("application/json")
-	public SchedulingResponse getAppointmentTypes() {
-		SchedulingResponse response = new SchedulingResponse();
+	public AbstractSearchResponse<AppointmentStatusTo1> getAppointmentStatuses() {
+		AbstractSearchResponse<AppointmentStatusTo1> response = new AbstractSearchResponse<>();
 
-		List<AppointmentType> types = scheduleManager.getAppointmentTypes();
+		List<AppointmentStatus> results = scheduleManager.getAppointmentStatuses(getLoggedInInfo());
+		AppointmentStatusConverter converter = new AppointmentStatusConverter();
 
-		AppointmentTypeConverter converter = new AppointmentTypeConverter();
-
-		response.setTypes(converter.getAllAsTransferObjects(getLoggedInInfo(), types));
+		response.setContent(converter.getAllAsTransferObjects(getLoggedInInfo(), results));
+		response.setTotal(results.size());
 
 		return response;
 	}
 
 	@GET
+	@Path("/types")
+	@Produces("application/json")
+	public RestSearchResponse<AppointmentTypeTo1> getAppointmentTypes() {
+
+		List<AppointmentType> types = scheduleManager.getAppointmentTypes();
+
+		AppointmentTypeConverter converter = new AppointmentTypeConverter();
+		List<AppointmentTypeTo1> transferList = converter.getAllAsTransferObjects(getLoggedInInfo(), types);
+
+		return RestSearchResponse.successResponseOnePage(transferList);
+	}
+
+	@GET
 	@Path("/reasons")
 	@Produces("application/json")
-	public SchedulingResponse getAppointmentReasons() {
-
-		SchedulingResponse response = new SchedulingResponse();
-
+	public RestSearchResponse<LookupListItemTo1> getAppointmentReasons()
+	{
 		List<LookupListItem> items = appointmentManager.getReasons();
 
 		LookupListItemConverter converter = new LookupListItemConverter();
+		List<LookupListItemTo1> transferList = converter.getAllAsTransferObjects(getLoggedInInfo(), items);
 
-		response.setReasons(converter.getAllAsTransferObjects(getLoggedInInfo(), items));
-		
-		return response;
+		return RestSearchResponse.successResponseOnePage(transferList);
 	}
 
 	// TODO: make the services below match the current status quo (logging, limits, etc)
@@ -425,33 +300,44 @@ public class ScheduleService extends AbstractServiceImpl {
 	}
 
 	@GET
-	@Path("/calendar/{providerId}/")
+	@Path("/calendar")
 	@Produces("application/json")
-	public RestSearchResponse<CalendarEvent> getCalendarEvents(
-		@PathParam("providerId") Integer providerId,
-		@QueryParam("startDate") String startDateString,
-		@QueryParam("endDate") String endDateString,
-		@QueryParam("site") String siteName
+	public RestResponse<CalendarSchedule> getCalendarSchedule(
+			@QueryParam("scheduleId") String scheduleId,
+			@QueryParam("scheduleIdType") String scheduleIdType,
+			@QueryParam("scheduleFilter") Boolean viewSchedulesOnly,
+			@QueryParam("startDate") String startDateString,
+			@QueryParam("endDate") String endDateString,
+			@QueryParam("startTime") String startTimeString,
+			@QueryParam("endTime") String endTimeString,
+			@QueryParam("site") String siteName,
+			@QueryParam("slotDuration") Integer slotDurationInMin
 	)
 	{
 		Message message = PhaseInterceptorChain.getCurrentMessage();
 		HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
 		HttpSession session = request.getSession(true);
 
-		LocalDate startDate = ConversionUtils.dateStringToNullableLocalDate(startDateString);
-		LocalDate endDate = ConversionUtils.dateStringToNullableLocalDate(endDateString);
+		// conversions will throw exception without valid date/time strings
+		LocalDate startDate = ConversionUtils.dateStringToLocalDate(startDateString);
+		LocalDate endDate = ConversionUtils.dateStringToLocalDate(endDateString);
+		LocalTime startTime = ConversionUtils.toLocalTime(startTimeString);
+		LocalTime endTime = ConversionUtils.toLocalTime(endTimeString);
 
-		// TODO: Change this to throw an exception
-		// Default to today if either date is null
-		if(startDate == null || endDate == null)
+		CalendarSchedule calendarSchedule;
+		if(ScheduleGroup.IdentifierType.valueOf(scheduleIdType).equals(ScheduleGroup.IdentifierType.GROUP))
 		{
-			startDate = LocalDate.now();
-			endDate = LocalDate.now();
+			calendarSchedule =
+					scheduleService.getCalendarScheduleByGroup(session, scheduleId, viewSchedulesOnly,
+							startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
 		}
-
-		List<CalendarEvent> calendarEvents =
-			scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName);
-
-		return RestSearchResponse.successResponseOnePage(calendarEvents);
+		else
+		{
+			//TODO change all providerNos to strings in this chain
+			calendarSchedule =
+					scheduleService.getCalendarScheduleByProvider(session, Integer.parseInt(scheduleId), viewSchedulesOnly,
+							startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
+		}
+		return RestResponse.successResponse(calendarSchedule);
 	}
 }

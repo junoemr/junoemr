@@ -1,0 +1,51 @@
+
+
+.directive-juno-typeahead {
+	position: relative;
+
+	.icon {
+		position: absolute;
+		padding: 0 10px;
+		pointer-events: none;
+		font-size: 16px;
+		height: 100%;
+	}
+	/* align icon */
+	&.left-addon {
+		.icon {
+			left: 0;
+		}
+		input {
+			padding-left: 30px;
+		}
+	}
+	&.right-addon {
+		.icon {
+			right: 0;
+		}
+		input {
+			padding-right: 30px;
+		}
+	}
+
+	.dropdown-menu {
+		@include juno-tab-md(56px);
+		max-height: 300px;
+		overflow: auto;
+		width: 100%;
+
+		.patient-selector-option {
+			&:hover {
+				cursor: pointer;
+			}
+			.name {
+				font-weight: bold;
+				font-size: 14px;
+			}
+			.hin, .dob, .more-total {
+				margin-left: 5px;
+				font-style: italic;
+			}
+		}
+	}
+}

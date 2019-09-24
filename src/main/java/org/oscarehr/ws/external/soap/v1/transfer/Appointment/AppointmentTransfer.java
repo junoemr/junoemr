@@ -28,6 +28,7 @@ package org.oscarehr.ws.external.soap.v1.transfer.Appointment;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -71,6 +72,8 @@ public final class AppointmentTransfer {
 	private String remarks;
 	private String urgency;
 	private BookingSource bookingSource;
+	private boolean isVirtual;
+	private Calendar currentClinicTime;
 
 	public Integer getId() {
 		return (id);
@@ -248,6 +251,24 @@ public final class AppointmentTransfer {
     	this.bookingSource = bookingSource;
     }
 
+	public boolean getIsVirtual() {
+		return (isVirtual);
+	}
+
+	public void setIsVirtual(boolean isVirtual) {
+		this.isVirtual = isVirtual;
+	}
+
+	public Calendar getCurrentClinicTime()
+	{
+		return currentClinicTime;
+	}
+
+	public void setCurrentClinicTime(Calendar currentClinicTime)
+	{
+		this.currentClinicTime = currentClinicTime;
+	}
+
 	public Appointment copyTo(Appointment appointment) {
 
 		List<String> ignored = new ArrayList<>(Arrays.asList("id", "appointmentDate", "startTime", "endTime", "createDateTime", "updateDateTime", "creator", "creatorSecurityId"));
@@ -283,6 +304,8 @@ public final class AppointmentTransfer {
 		if (appointment==null) return(null);
 		
 		AppointmentTransfer appointmentTransfer = new AppointmentTransfer();
+
+		appointmentTransfer.setCurrentClinicTime(DateUtils.toGregorianCalendar(new Date()));
 		
 		String[] ignored = { "appointmentDate", "startTime", "endTime", "createDateTime", "updateDateTime", "creatorSecurityId" };
 		BeanUtils.copyProperties(appointment, appointmentTransfer, ignored);

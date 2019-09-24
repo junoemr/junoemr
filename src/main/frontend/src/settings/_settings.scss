@@ -2,6 +2,26 @@
 	#summary-items {
 		margin-bottom: $margin-lg;
 	}
+	.settings-header {
+		@extend %juno-page-header;
+
+		display: flex;
+		align-items: center;
+		.control-right {
+			padding: 0 8px;
+		}
+	}
+
+	.settings-nav {
+		$border-bottom-size: 4px;
+		@include juno-tab-md(calc(#{$page-tabs-height} - #{$border-bottom-size}));
+		@include juno-tab-color-scheme-white($border-bottom-size);
+		@include juno-font-tab;
+	}
+	.primary-content-window {
+		@extend %juno-primary-view-pane-tabs;
+		@include juno-page-padding-default;
+	}
 
 	.settings-footer {
 		margin-top: $margin-md;

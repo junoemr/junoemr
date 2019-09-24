@@ -107,6 +107,26 @@ angular.module("Common.Services").service("providersService", [
 			return deferred.promise;
 		};
 
+		service.getAll = function getAll()
+		{
+			var deferred = $q.defer();
+
+			var config = Juno.Common.ServiceHelper.configHeaders();
+
+			junoHttp.get(service.apiPath + '/all', config).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("providersService::getAll error", errors);
+					deferred.reject("An error occurred while getting providers data");
+				});
+
+			return deferred.promise;
+		};
+
 		return service;
 	}
 ]);

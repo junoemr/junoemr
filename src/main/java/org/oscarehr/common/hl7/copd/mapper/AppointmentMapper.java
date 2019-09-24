@@ -27,6 +27,8 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.model.v24.segment.SCH;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.AppointmentStatus;
+import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;
 
@@ -34,12 +36,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AppointmentMapper extends AbstractMapper
 {
-	public AppointmentMapper(ZPD_ZTR message)
+	public AppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		super(message);
+		super(message, importSource);
 	}
 
 	public int getNumAppointments()
@@ -63,6 +67,11 @@ public class AppointmentMapper extends AbstractMapper
 		Appointment appointment = new Appointment();
 		Date appointmentDate = getAppointmentDate(rep);
 
+		if (appointmentDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			appointmentDate = getCreationDate(rep);
+		}
+
 		appointment.setAppointmentDate(appointmentDate);
 		appointment.setStartTime(appointmentDate);
 		appointment.setEndTime(getAppointmentEnd(rep));
@@ -71,7 +80,7 @@ public class AppointmentMapper extends AbstractMapper
 		appointment.setNotes(StringUtils.trimToEmpty(getNotes(rep)));
 		appointment.setReason(StringUtils.trimToEmpty(getReason(rep)));
 		appointment.setCreateDateTime(getCreationDate(rep));
-		appointment.setStatus(getStatus(rep));
+		appointment.setStatus(getStatus(rep, importSource));
 		appointment.setType("");
 		appointment.setLocation("");
 		appointment.setResources("");
@@ -115,7 +124,8 @@ public class AppointmentMapper extends AbstractMapper
 	public Date getAppointmentDate(int rep) throws HL7Exception
 	{
 		SCH sch = message.getPATIENT().getSCH(rep);
-		return ConversionUtils.fromDateString(sch.getSch11_AppointmentTimingQuantity(0).getStartDateTime().getTimeOfAnEvent().getValue(), "yyyyMMddHHmmss");
+		Date apptDate = ConversionUtils.getLegacyDateFromDateString(sch.getSch11_AppointmentTimingQuantity(0).getStartDateTime().getTimeOfAnEvent().getValue(), "yyyyMMddHHmmss");
+		return apptDate;
 	}
 
 	public Date getAppointmentEnd(int rep) throws HL7Exception
@@ -125,20 +135,92 @@ public class AppointmentMapper extends AbstractMapper
 		Integer apptDuration = Integer.parseInt(sch.getSch9_AppointmentDuration().getValue());
 		String apptDurationUnit = sch.getSch10_AppointmentDurationUnits().getCe1_Identifier().getValue();
 
+		if (appointmentDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{// if no appointment date, use creation date instead.
+			appointmentDate = getCreationDate(rep);
+		}
+
 		return calcEndTime(appointmentDate, apptDuration, apptDurationUnit);
 	}
 
 	public String getStatus(int rep) throws HL7Exception
 	{
+		return getStatus(rep, CoPDImportService.IMPORT_SOURCE.UNKNOWN);
+	}
+
+	public String getStatus(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	{
 		//TODO how to determine status from import data?
 		Date apptDate = getAppointmentDate(rep);
-		if(apptDate.compareTo(new Date()) < 0)
+
+		if (apptDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			apptDate = getCreationDate(rep);
+		}
+
+		// attempt to map status based on znote text
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			String znote = getNotes(rep);
+			if (znote != null)
+			{
+				try
+				{
+					return getStatusFromNote(znote);
+				}
+				catch (RuntimeException e)
+				{
+					// use default logic
+				}
+			}
+		}
+
+		if (apptDate.compareTo(new Date()) < 0)
 		{
 			// appointment date is before current date
-			return "B";
+			return AppointmentStatus.APPOINTMENT_STATUS_BILLED;
 		}
-		return "t";
+		return AppointmentStatus.APPOINTMENT_STATUS_NEW;
+	}
 
+	private String getStatusFromNote(String note) throws RuntimeException
+	{
+		Matcher statusMatcher = Pattern.compile("^\\s*([\\w\\d]+)").matcher(note);
+		if (statusMatcher.find())
+		{
+			String statusString = statusMatcher.group(1);
+
+			switch (statusString)
+			{
+				case "Done":
+				case "Billed":
+				{
+					return AppointmentStatus.APPOINTMENT_STATUS_BILLED;
+				}
+				case "Arrived":
+				{
+					return AppointmentStatus.APPOINTMENT_STATUS_HERE;
+				}
+				case "Cancel":
+				case "Resched":
+				case "Recall":
+				{
+					return AppointmentStatus.APPOINTMENT_STATUS_CANCELLED;
+				}
+				case "No":
+				{
+					if (note.contains("Show"))
+					{
+						return AppointmentStatus.APPOINTMENT_STATUS_NO_SHOW;
+					}
+				}
+				case "Left":
+				{
+					return AppointmentStatus.APPOINTMENT_STATUS_NO_SHOW;
+				}
+			}
+		}
+		throw new RuntimeException("Cannot match znote text to appointment status");
 	}
 
 	private Date calcEndTime(Date startTime, Integer duration, String units)

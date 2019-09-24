@@ -79,7 +79,7 @@ public class Security extends AbstractModel<Integer> {
 	private Boolean forcePasswordReset = true;
 
 	@Column(name = "myhealthaccess_auth_token")
-	private String myHealthAccessAuthToken;
+	private String myHealthAccessLongToken;
 
 	/** default constructor */
 	public Security() {
@@ -202,25 +202,24 @@ public class Security extends AbstractModel<Integer> {
 		this.id = id;
 	}
 
-	public ClinicUserAccessTokenTo1 getMyHealthAccessAuthToken()
+	public ClinicUserAccessTokenTo1 getMyHealthAccessLongToken()
 	{
-		if(this.myHealthAccessAuthToken == null || this.myHealthAccessAuthToken.isEmpty())
+		if(this.myHealthAccessLongToken == null || this.myHealthAccessLongToken.isEmpty())
 		{
 			return null;
 		}
-		MiscUtils.getLogger().error("this id: " + this.getId());
-		MiscUtils.getLogger().error("this token: " + this.myHealthAccessAuthToken);
 
 		ClinicUserAccessTokenTo1 accessTokenTo = new ClinicUserAccessTokenTo1();
-		accessTokenTo.setToken(this.myHealthAccessAuthToken);
+		accessTokenTo.setToken(this.myHealthAccessLongToken);
 
 		return accessTokenTo;
 	}
 
-	public void setMyHealthAccessAuthToken(String myHealthAccessAuthToken)
+	public void setMyHealthAccessLongToken(String myHealthAccessAuthToken)
 	{
-		this.myHealthAccessAuthToken = myHealthAccessAuthToken;
+		this.myHealthAccessLongToken = myHealthAccessAuthToken;
 	}
+
 
 	/**
 	 * @return true if inputed password equals password in the DB, false otherwise.

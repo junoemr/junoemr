@@ -63,6 +63,7 @@
 		<th><bean:message key="admin.appt.status.mgr.label.status" /></th>
 		<th><bean:message key="admin.appt.status.mgr.label.desc" /></th>
 		<th><bean:message key="admin.appt.status.mgr.label.color" /></th>
+		<th><bean:message key="admin.appt.status.mgr.label.junoColor" /></th>
 		<th><bean:message key="admin.appt.status.mgr.label.enable" /></th>
 		<th><bean:message key="admin.appt.status.mgr.label.active" /></th>
 		<th>&nbsp;</th>
@@ -74,6 +75,7 @@
             String strStatus = "";
             String strDesc = "";
             String strColor = "";
+			String strJunoColor = "";
             int iActive = 0;
             int iEditable = 0;
             for (int i = 0; i < apptsList.size(); i++) {
@@ -81,7 +83,8 @@
                 iStatusID = apptStatus.getId();
                 strStatus = apptStatus.getStatus();
                 strDesc = apptStatus.getDescription();
-                strColor = apptStatus.getColor();
+	            strColor = apptStatus.getColor();
+	            strJunoColor = apptStatus.getJunoColor();
                 iActive = apptStatus.getActive();
                 iEditable = apptStatus.getEditable();
 %>
@@ -89,6 +92,7 @@
 		<td class="nowrap"><%=strStatus%></td>
 		<td class="nowrap"><%=strDesc%></td>
 		<td class="nowrap" bgcolor="<%=strColor%>"><%=strColor%></td>
+		<td class="nowrap" bgcolor="<%=strJunoColor%>"><%=strJunoColor%></td>
 		<td class="nowrap"><%=iActive%></td>
 		<td class="nowrap">
 		<%

@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.util.MiscUtils;
@@ -35,34 +36,38 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 public class CoPDPreProcessorService
 {
+	public static final String HL7_TIMESTAMP_BEGINNING_OF_TIME = "19700101";
 	private static final Logger logger = MiscUtils.getLogger();
 
-	public String getFileString(GenericFile genericFile) throws IOException
+	public boolean looksLikeCoPDFormat(GenericFile genericFile) throws IOException
 	{
-		logger.info("Read import file");
+		// read first 100 lines to check file format
 		File file = genericFile.getFileObject();
 		InputStream is = new FileInputStream(file);
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
 		StringBuffer sb = new StringBuffer();
 		String line;
+		int lineCount = 0;
 		while((line = br.readLine()) != null)
 		{
+			if (lineCount > 100)
+			{
+				break;
+			}
 			sb.append(line);
+			lineCount++;
 		}
-		return sb.toString();
-	}
 
-	public boolean looksLikeCoPDFormat(String fileString)
-	{
 		//TODO make this more robust or whatever
-		return fileString.contains("<ZPD_ZTR");
+		return sb.toString().contains("<ZPD_ZTR") || sb.toString().contains("<v2:ZPD_ZTR");
 	}
 
 	/**
@@ -104,7 +109,246 @@ public class CoPDPreProcessorService
 			message = formatWolfFollowupSegments(message);
 		}
 
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			message = fixTimestamps(message);
+			message = fixTimestampsAttachments(message);
+		}
+
+		if (CoPDImportService.IMPORT_SOURCE.MEDACCESS.equals(importSource))
+		{
+			message = stripTagWhiteSpace(message);
+			message = fixDoubleBPMeasurements(message);
+			message = fixSlashBPMeasurements(message);
+			message = fixZATDateString(message);
+
+			// should come last
+			message = ensureNumeric(message);
+		}
+
 		return message;
+	}
+
+	/**
+	 * iterate over each tag with name=tagName found in the message. Allowing modification
+	 * to its content
+	 * @param message message to process
+	 * @param tagName the tag on which the callback is triggered
+	 * @param callback the callback to call for all instances of the tag (tag content in -> , -> modified content out).
+	 * @return a modified message.
+	 */
+	private String foreachTag(String message, String tagName, Function<String, String> callback)
+	{
+		Pattern tagPattern = Pattern.compile("<" + tagName + ">(.*?)<\\/" + tagName + ">");
+		Matcher tagMatcher = tagPattern.matcher(message);
+
+		StringBuffer sb = new StringBuffer(message.length());
+		while (tagMatcher.find())
+		{
+			String newContent = callback.apply(tagMatcher.group(1));
+			tagMatcher.appendReplacement(sb, "<" + tagName + ">" + newContent + "</" + tagName + ">");
+		}
+		tagMatcher.appendTail(sb);
+		return sb.toString();
+	}
+
+	/**
+	 * Fix timestamp strings. Mediplan outputs unknown timestamps like, 00000 or 00000000 this causes parsing exceptions.
+	 * This function switches <TS.1>00000[0000]</TS.1> to, <TS.1>00010101</TS.1>
+	 * @param message the message to process
+	 * @return fixed message
+	 */
+	private String fixTimestamps(String message)
+	{
+		Function<String, String> callback = new Function<String,String>() {
+
+			private final Pattern timeStampPattern = Pattern.compile("(\\d{8})(\\d{2})(\\d{4})$");
+
+			@Override
+			public String apply(String timeStamp)
+			{
+				Matcher timeStampMatcher = timeStampPattern.matcher(timeStamp);
+				if ("00000".equals(timeStamp) || "00000000".equals(timeStamp) || "00000000000".equals(timeStamp))
+				{
+					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
+				}
+				else if (timeStampMatcher.find())
+				{// look for timestamps with bad hour.
+					try
+					{
+						Integer hours = Integer.parseInt(timeStampMatcher.group(2));
+						if (hours > 23)
+						{// sub in fake hour
+							return timeStampMatcher.group(1) + "12" + timeStampMatcher.group(3);
+						}
+					}
+					catch (NumberFormatException e)
+					{
+						//nop
+					}
+				}
+				return timeStamp;
+			}
+		};
+
+		return foreachTag(message, "TS.1", callback);
+	}
+
+	/**
+	 * fix timestamps in ZAT segments (attachments)
+	 * @param message the message to fix
+	 * @return the fixed message
+	 */
+	public String fixTimestampsAttachments(String message)
+	{
+		Function<String, String> callback = new Function<String,String>() {
+			@Override
+			public String apply(String timeStamp)
+			{
+				if (timeStamp.contains("00000"))
+				{
+					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
+				}
+				return timeStamp;
+			}
+		};
+
+		return foreachTag(message, "ZAT.2", callback);
+	}
+
+	/**
+	 * strip out white space in tag values ie. <ZQO.5> 80</ZQO.5> => <ZQO.5>80</ZQO.5>. The Hl7 parser
+	 * sees ' 80' as invalid while '80' is valid.
+	 * @param message - the message to process
+	 * @return - the message with tag white space striped.
+	 */
+	private String stripTagWhiteSpace(String message)
+	{
+		Function<String, String> trimValueCallback = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				return StringUtils.trimToEmpty(tagValue);
+			}
+		};
+
+		message = foreachTag(message, "ZQO.4", trimValueCallback);
+		message = foreachTag(message, "ZQO.5", trimValueCallback);
+		message = foreachTag(message, "ZQO.6", trimValueCallback);
+		message = foreachTag(message, "ZQO.7", trimValueCallback);
+		return message;
+	}
+
+	/**
+	 * Insure that some numeric elements of the hl7 message are indeed numeric. If not replace with "0".
+	 * @param message - the message to operate on.
+	 * @return - the resulting message
+	 */
+	private String ensureNumeric(String message)
+	{
+		Function<String, String> ensureNumeric = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				try
+				{
+					Float.parseFloat(tagValue);
+					return tagValue;
+				}
+				catch (NumberFormatException e)
+				{
+					logger.warn("Replacing invalid numeric value:" + tagValue + " with: \"0\"");
+					return "0";
+				}
+			}
+		};
+
+		message = foreachTag(message, "ZQO.4", ensureNumeric);
+		message = foreachTag(message, "ZQO.5", ensureNumeric);
+		message = foreachTag(message, "ZQO.6", ensureNumeric);
+		message = foreachTag(message, "ZQO.7", ensureNumeric);
+		return message;
+	}
+
+	/**
+	 * Fix double blood pressure measurements in the ZQO.4 / ZQO.5 tags.
+	 * Some times blood pressure is recorded as "num num" but the COPD spec only allows "num".
+	 * To fix simply take the first number.
+	 * @param message - the message to fix
+	 * @return - the fixed message
+	 */
+	private String fixDoubleBPMeasurements(String message)
+	{
+		Function<String, String> deleteDoubleValue = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				if (tagValue.contains(" "))
+				{
+					String [] nums = tagValue.split(" ");
+					return nums[0];
+				}
+				else
+				{
+					return tagValue;
+				}
+			}
+		};
+
+		message = foreachTag(message, "ZQO.4", deleteDoubleValue);
+		return foreachTag(message, "ZQO.5", deleteDoubleValue);
+	}
+
+	/**
+	 * fix BP measurements of the form "/<num>" convert to "<num>".
+	 * @param message - message to operate on
+	 * @return - the transformed message
+	 */
+	private String fixSlashBPMeasurements(String message)
+	{
+		Function<String, String> fixBPSlash = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				if (StringUtils.trimToEmpty(tagValue).startsWith("/"))
+				{
+					return tagValue.substring(tagValue.indexOf("/") + 1);
+				}
+				else
+				{
+					return tagValue;
+				}
+			}
+		};
+
+		message = foreachTag(message, "ZQO.4", fixBPSlash);
+		return foreachTag(message, "ZQO.5", fixBPSlash);
+	}
+
+	/**
+	 * Some ZAT.2 date strings do not follow the spec and include a timestamp instead of a date. This causes parsing errors.
+	 * If there is a timestamp in ZAT.2 simply strip the timestamp information.
+	 * @param message
+	 * @return
+	 */
+	private String fixZATDateString(String message)
+	{
+		Function<String, String> fixZATDate = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				if (tagValue.length() > 8)
+				{ // ZAT.2 length is 8 in CoPD spec (YYYYMMDD)
+					return tagValue.substring(0,8);
+				}
+				else
+				{
+					return tagValue;
+				}
+			}
+		};
+
+		return foreachTag(message, "ZAT.2", fixZATDate);
 	}
 
 	/**

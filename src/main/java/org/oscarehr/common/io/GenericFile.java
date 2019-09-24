@@ -32,6 +32,7 @@ import oscar.OscarProperties;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -239,19 +240,16 @@ public class GenericFile
 	{
 		return new FileInputStream(this.javaFile);
 	}
+	public FileOutputStream asFileOutputStream() throws FileNotFoundException
+	{
+		return new FileOutputStream(this.javaFile);
+	}
+
 	public String getContentType() throws IOException
 	{
-		String contentType;
-		if(isValid)
-		{
-			contentType = GenericFile.getContentType(javaFile);
-		}
-		else
-		{
-			contentType = getInvalidContentType();
-		}
-		return contentType;
+		return GenericFile.getContentType(javaFile);
 	}
+
 	public int getPageCount() throws IOException
 	{
 		return 0;

@@ -43,6 +43,8 @@ import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
+import org.oscarehr.labs.dao.Hl7DocumentLinkDao;
+import org.oscarehr.util.SpringUtils;
 import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
@@ -63,8 +65,14 @@ public class PATHL7Handler extends ORU_R01MessageHandler
     Logger logger = Logger.getLogger(PATHL7Handler.class);
     protected ORU_R01 msg;
 
-	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","CYTO", "DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF", "BCCASMP", "BCCACSP");
+    private static Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
+
+	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","CYTO", "DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF", "BCCASMP", "BCCACSP", "CYTOGEN");
 	public static final String VIHARTF = "CELLPATHR";
+
+	// Embedded PDF strings that show up in OBX messages
+	public static final String embeddedPdfPrefix = "JVBERi0xLj";
+	public static final String pdfReplacement = "embedded_doc_id";
 
     /** Creates a new instance of CMLHandler */
     public PATHL7Handler(){
@@ -79,10 +87,11 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 
         // Legacy Excelleris labs with embedded PDFs don't have proper identifier segment set-up
         // if this is the case then we need to modify the message
-        if (hasEmbeddedPDF() && getOBXCount(0) == 0)
+        if (getOBXValueType(0, 0).equals("ED") && getOBXCount(0) == 0)
         {
             addOBXIdentifierText("PDF");
         }
+
     }
 
     @Override
@@ -741,14 +750,41 @@ public class PATHL7Handler extends ORU_R01MessageHandler
         return (header.equals(VIHARTF));
     }
 
-    /*
+    /**
      * Only commonalities between embedded PDF uploads:
-     * - They have a value type of ED
-     * - The embedded PDF is contained in a single OBX message at the beginning of the lab
+     * - the identifier is "ED", a.k.a. Electronic Document
+     * - the PDF message itself is contained in an OBX and takes the form of ^Text^PDF^Base64^...
+     * @return true if any OBX in this message contains an embedded PDF
      */
     public boolean hasEmbeddedPDF()
     {
-        return getOBXValueType(0, 0).equals("ED");
+        // First, check legacy case where the OBX is just OBX|1|ED|PDF|...
+        if (getOBXValueType(0, 0).equals("ED") && getOBXIdentifier(0, 0).equals("PDF"))
+        {
+            return true;
+        }
+
+        for (int i = 0; i < getOBRCount(); i++)
+        {
+            for (int j = 0; j < getOBXCount(i); j++)
+            {
+                if (getOBXResult(i, j,4).startsWith(embeddedPdfPrefix))
+                {
+                    logger.error("LAB " + getAccessionNum() + " CONTAINS UNPROCESSED EMBEDDED PDF");
+                    return false;
+                }
+
+                if (getOBXValueType(i, j).equals("ED")
+                        && getOBXResult(i, j, 2).equals("TEXT")
+                        && getOBXResult(i, j, 3).equals("PDF")
+                        && getOBXResult(i, j, 4).equals("Base64")
+                        && getOBXResult(i, j, 5).startsWith(pdfReplacement))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public String getNteForPID(){
