@@ -241,6 +241,19 @@ public class DemographicManager {
 		return demographicContactDao.findActiveByDemographicNo(id);
 	}
 
+	/**
+	 * Given a demographic and the type of contact, get all active demographic contact entries
+	 * @param loggedInInfo user's logged in information so we can authenticate
+	 * @param demographicNo demographic to get contacts for
+	 * @param type the type of contact to pull
+	 * @return list of matching DemographicContact entries
+	 */
+	public List<DemographicContact> getDemographicContactsByType(LoggedInInfo loggedInInfo, Integer demographicNo, Integer type)
+	{
+		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
+		return demographicContactDao.findByDemographicNoAndType(demographicNo, type);
+	}
+
 	public List<Demographic> getDemographicsByProvider(LoggedInInfo loggedInInfo, Provider provider) {
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		List<Demographic> result = demographicDao.getDemographicByProvider(provider.getProviderNo(), true);
