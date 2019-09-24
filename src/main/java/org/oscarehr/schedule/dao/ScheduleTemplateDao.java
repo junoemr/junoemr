@@ -505,7 +505,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 
 
-		MiscUtils.getLogger().warn("Query Start: " + LocalDateTime.now().toString());
+		MiscUtils.getLogger().info("Query Start: " + LocalDateTime.now().toString());
 		Query query = entityManager.createNativeQuery(availableSlots);
 		query.setParameter("startDateTime", java.sql.Timestamp.valueOf(startDateTime), TemporalType.TIMESTAMP);
 		query.setParameter("endDateTime", java.sql.Timestamp.valueOf(endDateTime), TemporalType.TIMESTAMP);
@@ -538,6 +538,8 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		}
 
 		List<Object[]> results = query.getResultList();
+		MiscUtils.getLogger().info("Query End: " + LocalDateTime.now().toString());
+
 		HashMap<String, List<DayTimeSlots>> providerSchedule = new HashMap<>();
 		ProviderScheduleTransfer providerScheduleTransfer = new ProviderScheduleTransfer();
 		List<DayTimeSlots> dayTimeSlots;

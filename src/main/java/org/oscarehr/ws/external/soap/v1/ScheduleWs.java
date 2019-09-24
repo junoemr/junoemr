@@ -146,7 +146,7 @@ public class ScheduleWs extends AbstractWs {
 																		  String demographicNo,
 																		  String jsonRules)
 	{
-		MiscUtils.getLogger().warn("Start Service: " + LocalDateTime.now().toString());
+		MiscUtils.getLogger().info("Start Get Provider Schedule Service: " + LocalDateTime.now().toString());
 		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
 		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = new ArrayList<>();
 
@@ -190,7 +190,7 @@ public class ScheduleWs extends AbstractWs {
 			MiscUtils.getLogger().error("Exception: " + e);
 		}
 
-		MiscUtils.getLogger().warn("END Service: " + LocalDateTime.now().toString());
+		MiscUtils.getLogger().info("End Get Provider Schedule Service: " + LocalDateTime.now().toString());
 		return scheduleTransfer;
 	}
 
