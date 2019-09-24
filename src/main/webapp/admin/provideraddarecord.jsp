@@ -215,17 +215,11 @@ boolean isDefaultRoleNameExist = true;
  	 	isOk=true;
 
  	 	// make newly added provider by default a 'doctor' and 'primary' role
-
-		int providerStatus = Integer.parseInt(provider.getStatus());
-
  	 	int providerNo = Integer.parseInt(provider.getProviderNo());
-
-		String providerDefaultRoleName = OscarProperties.getInstance().getProperty("default_provider_role_name");
 
 		ProviderRoleService providerRoleService = SpringUtils.getBean(ProviderRoleService.class);
 
-		isDefaultRoleNameExist =
-				providerRoleService.setDefaultRoleForNewProvider(providerNo,providerDefaultRoleName, providerStatus);
+		isDefaultRoleNameExist = providerRoleService.setDefaultRoleForNewProvider(providerNo);
 
 
 	}

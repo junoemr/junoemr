@@ -34,6 +34,7 @@ import org.oscarehr.common.model.SecRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.OscarProperties;
 
 import java.util.List;
 
@@ -62,26 +63,24 @@ public class ProviderRoleService
 
 
 	/**
-	 * set Default Role For Newly added Provider so users can use their new provider account conveniently
-	 * without manully assign a role.
-	 *
-	 * @param providerID, of the newly added provider
-	 * @param roleName, from the property file 'default_provider_role_name'
-	 * @param status, is this provider active or not
+	 * @param providerID, of the newly added provider's
 	 */
 
-	public boolean setDefaultRoleForNewProvider(Integer providerID, String roleName, int status)
+	public boolean setDefaultRoleForNewProvider(Integer providerID)
 	{
+
+		String providerDefaultRoleName = OscarProperties.getInstance().getProperty("default_provider_role_name");
+
 		Secuserrole secUserRole = new Secuserrole();
 
-		boolean isDefaultRoleNameExist = setPrimaryRole(providerID, roleName);
+		boolean isDefaultRoleNameExist = setPrimaryRole(providerID, providerDefaultRoleName);
 
 		if(!isDefaultRoleNameExist)
 		{
 			return false;
 		}
 
-		addRole(secUserRole,providerID, roleName, status);
+		addRole(secUserRole, providerID, providerDefaultRoleName);
 
 		return true;
 	}
@@ -124,12 +123,13 @@ public class ProviderRoleService
 	}
 
 
-	private void addRole(Secuserrole secUserRole,Integer roleProviderId, String roleName, int activeStatus)
+	private void addRole(Secuserrole secUserRole,Integer roleProviderId, String roleName)
 	{
+		int defaultActiveyn = 1;
 
 		secUserRole.setProviderNo(String.valueOf(roleProviderId));
 		secUserRole.setRoleName(roleName);
-		secUserRole.setActiveyn(activeStatus);
+		secUserRole.setActiveyn(defaultActiveyn);
 		secUserRoleDao.save(secUserRole);
 	}
 
@@ -137,7 +137,7 @@ public class ProviderRoleService
 	{
 		Secuserrole secUserRole = new Secuserrole();
 
-		addRole(secUserRole,roleProviderId,roleName,1);
+		addRole(secUserRole, roleProviderId, roleName);
 
 		Long caisiProgram = new Long(programManager.getDefaultProgramId());
 		ProgramProvider programProvider = programProviderDao.getProgramProvider(String.valueOf(roleProviderId), caisiProgram);
@@ -195,18 +195,5 @@ public class ProviderRoleService
 		return (secRoleDao.findByName(roleName) != null);
 	}
 
-	private int getDoctorRoleNo(String doctorRoleName)
-	{
-		int roleId = -1000;
-		List<SecRole> secRoles = secRoleDao.findAll();
-		for(SecRole secRole: secRoles)
-		{
-			if(secRole.getName().equalsIgnoreCase(doctorRoleName))
-			{
-				roleId = secRole.getId();
-				break;
-			}
-		}
-		return roleId;
-	}
+
 }
