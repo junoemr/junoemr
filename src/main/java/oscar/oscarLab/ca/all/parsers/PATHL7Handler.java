@@ -72,7 +72,7 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 
 	// Embedded PDF strings that show up in OBX messages
 	public static final String embeddedPdfPrefix = "JVBERi0xLj";
-	public static final String pdfReplacement = "embedded_doc_id";
+	public static final String pdfReplacement = "embedded_doc_id_";
 
     /** Creates a new instance of CMLHandler */
     public PATHL7Handler(){
