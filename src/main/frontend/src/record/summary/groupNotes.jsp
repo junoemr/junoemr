@@ -304,7 +304,11 @@
 							<tr ng-repeat="i in groupNotesCtrl.groupNotesForm.assignedCMIssues | filter: {issue: { type: '!' + 'system'} }" class="note-editor-issue-row">
 								<td>{{i.issue.description}} ({{i.issue.code}})</td>
 								<td class="text-right">
-									<button class="btn btn-xs btn-danger" type="button" ng-click="groupNotesCtrl.removeGroupNoteIssue(i)" ng-if="i.unchecked == null || i.unchecked == false">Remove</button>
+									<button class="btn btn-xs btn-danger" type="button"
+									        ng-click="groupNotesCtrl.removeGroupNoteIssue(i)"
+									        ng-if="i.unchecked == null || i.unchecked == false">
+										Remove
+									</button>
 								</td>
 							</tr>
 						</table>
@@ -319,11 +323,20 @@
 		<input type="image"	src="<c:out value="${ctx}/oscarEncounter/graphics/copy.png"/>" title='<bean:message key="oscarEncounter.Index.btnCopy"/>' onclick="copyCppToCurrentNote(); return false;"> 
 		<input type="image"	src="<c:out value="${ctx}/oscarEncounter/graphics/annotation.png"/>" title='<bean:message key="oscarEncounter.Index.btnAnnotation"/>' id="anno" style="padding-right: 10px;"> 
 		<input type="image"	src="<c:out value="${ctx}/oscarEncounter/graphics/edit-cut.png"/>" title='<bean:message key="oscarEncounter.Index.btnArchive"/>' onclick="$('archived').value='true';" style="padding-right: 10px;">-->
-		<button ng-click="groupNotesCtrl.cancel()" type="button" class="btn"><bean:message key="modal.newPatient.cancel" bundle="ui"/></button>
-		<button ng-click="groupNotesCtrl.archiveGroupNotes()" type="button" class="btn btn-danger" ng-hide="groupNotesCtrl.page.cannotChange">
+		<button type="button" class="btn"
+		        ng-click="groupNotesCtrl.cancel()">
+			<bean:message key="modal.newPatient.cancel" bundle="ui"/>
+		</button>
+		<button type="button" class="btn btn-danger"
+		        ng-click="groupNotesCtrl.archiveGroupNotes()"
+		        data-ng-disabled="groupNotesCtrl.isWorking()"
+		        ng-hide="groupNotesCtrl.page.cannotChange">
 			<bean:message key="oscarEncounter.Index.btnArchive"/>
 		</button>	
-		<button ng-click="groupNotesCtrl.saveGroupNotes()" type="button" class="btn btn-success" ng-hide="groupNotesCtrl.page.cannotChange">
+		<button type="button" class="btn btn-success"
+		        ng-click="groupNotesCtrl.saveGroupNotes()"
+		        data-ng-disabled="groupNotesCtrl.isWorking()"
+		        ng-hide="groupNotesCtrl.page.cannotChange">
 			<bean:message key="oscarEncounter.Index.btnSignSave"/>
 		</button>	
 	</div>

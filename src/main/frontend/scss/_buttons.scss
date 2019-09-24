@@ -32,12 +32,20 @@
 		line-height: 1.5;
 		border-radius: 3px;
 	}
+	&.btn-lg {
+		padding: 10px 16px;
+		font-size: 18px;
+		border-radius: 6px;
+	}
 
 	&.btn-default,&.btn-addon {
 		@include juno-button-colour-scheme($color-primary-base, $color-neutral-white, $color-neutral-light);
 	}
 	&.btn-primary {
 		@include juno-button-colour-scheme($color-neutral-white, $color-primary-base, $color-primary-dark);
+	}
+	&.btn-primary-inverted {
+		@include juno-button-colour-scheme($color-primary-base, $color-neutral-white, $color-neutral-white);
 	}
 	&.btn-success {
 		@include juno-button-colour-scheme($color-neutral-white, $color-lime-base, $color-lime-dark);

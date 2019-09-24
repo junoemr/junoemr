@@ -23,24 +23,8 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -63,10 +47,10 @@ import org.oscarehr.casemgmt.service.NoteService;
 import org.oscarehr.casemgmt.web.CaseManagementEntryAction;
 import org.oscarehr.casemgmt.web.NoteDisplay;
 import org.oscarehr.casemgmt.web.NoteDisplayLocal;
-import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.EncounterUtil;
@@ -88,13 +72,27 @@ import org.oscarehr.ws.rest.to.model.NoteTo1;
 import org.oscarehr.ws.rest.to.model.TicklerNoteTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
+
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @Path("/notes")
@@ -129,20 +127,15 @@ public class NotesService extends AbstractServiceImpl {
 	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
-	private CaseManagementNoteLinkDAO caseManagementNoteLinkDAO;
-
-	@Autowired
 	private DocumentDao documentDao;
 	
 	
-	@POST
+	@GET
 	@Path("/{demographicNo}/all")
 	@Produces("application/json")
-	@Consumes("application/json")
 	public RestResponse<NoteSelectionTo1> getNotesWithFilter(@PathParam("demographicNo") Integer demographicNo,
-	                                                                 @QueryParam("numToReturn") @DefaultValue("20") Integer numToReturn,
-	                                                                 @QueryParam("offset") @DefaultValue("0") Integer offset,
-	                                                                 JSONObject jsonobject)
+	                                                         @QueryParam("numToReturn") @DefaultValue("20") Integer numToReturn,
+	                                                         @QueryParam("offset") @DefaultValue("0") Integer offset)
 	{
 		NoteSelectionTo1 returnResult = new NoteSelectionTo1();
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
@@ -162,7 +155,8 @@ public class NotesService extends AbstractServiceImpl {
 		{
 			logger.info("skipping domain check..provider is a moderator");
 		}
-		else if(!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo))
+		else if(!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo)
+				&& !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo))
 		{
 			return RestResponse.errorResponse("Domain Error");
 		}
@@ -185,10 +179,10 @@ public class NotesService extends AbstractServiceImpl {
 		{
 			criteria.setProgramId(programId);
 		}
-
-		processJsonArray(jsonobject, "filterRoles", criteria.getRoles());
-		processJsonArray(jsonobject, "filterProviders", criteria.getProviders());
-		processJsonArray(jsonobject, "filterIssues", criteria.getIssues());
+//
+//		processJsonArray(jsonobject, "filterRoles", criteria.getRoles());
+//		processJsonArray(jsonobject, "filterProviders", criteria.getProviders());
+//		processJsonArray(jsonobject, "filterIssues", criteria.getIssues());
 
 		NoteSelectionResult result = noteService.findNotes(loggedInInfo, criteria);
 
@@ -197,6 +191,8 @@ public class NotesService extends AbstractServiceImpl {
 		for(NoteDisplay nd : result.getNotes())
 		{
 			NoteTo1 note = new NoteTo1();
+			note.setNoteId(nd.getNoteId());
+
 			boolean isDeleted = false;
 			if(nd.isDocument()) {
 				Document doc = getDocumentByNoteId(nd.getNoteId().longValue());
@@ -206,7 +202,13 @@ public class NotesService extends AbstractServiceImpl {
 				}
 			}
 
-			note.setNoteId(nd.getNoteId());
+			if(nd.isEformData())
+			{
+				//TODO why is the note id fake and also the eform id???
+				note.setEformDataId(nd.getNoteId());
+				note.setNoteId(null);
+			}
+
 			note.setArchived(nd.isArchived());
 			note.setIsSigned(nd.isSigned());
 			note.setIsEditable(nd.isEditable());

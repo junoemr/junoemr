@@ -28,19 +28,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.oscarehr.common.dao.DaoTestFixtures;
+import oscar.eform.EFormUtil;
 import oscar.eform.data.EForm;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /*
-	Test a bug where buy the inserted value="" tag escapes its tag, getting injected in to the HTML body instead.
+	Test a bug, where the user enters single quotes in to their string. This causes html parsing errors.
  */
 @RunWith(Parameterized.class)
-public class TestSetValuesValueEscapeBug
+public class RemoveQuotesTest
 {
 	private String inputHtml;
 	private String expectHtml;
@@ -48,7 +48,7 @@ public class TestSetValuesValueEscapeBug
 	private List<String> allValues;
 
 
-	public TestSetValuesValueEscapeBug(String html, List<String> allNames, List<String> allValues, String expectHtml)
+	public RemoveQuotesTest(String html, List<String> allNames, List<String> allValues, String expectHtml)
 	{
 		this.inputHtml = html;
 		this.expectHtml = expectHtml;
@@ -68,26 +68,41 @@ public class TestSetValuesValueEscapeBug
 		return Arrays.asList(new Object[][]
 				{
 						{
-								"<div name=\"demographics\">\n</div>",
-								Arrays.asList("demographics"),
-								Arrays.asList("myValue"),
-								"<div name=\"demographics\" value=\"myValue\" >\n</div>"
-						}
+								"<div name=\"quote\">\n</div>",
+								Arrays.asList("quote"),
+								Arrays.asList("'"),
+								"<div name=\"quote\" value=\"'\" >\n</div>"
+						},
+						{
+								"<div name=\"quote\">\n</div>",
+								Arrays.asList("quote"),
+								Arrays.asList("'fizbang'"),
+								"<div name=\"quote\" value=\"fizbang\" >\n</div>"
+						},
+						{
+								"<div name=\"quote\">\n</div>",
+								Arrays.asList("quote"),
+								Arrays.asList("\"'\""),
+								"<div name=\"quote\" value=\"'\" >\n</div>"
+						},
 				});
 	}
 
 	/**
-	 * test that html value attributes are set correctly
+	 * test the single quote parsing error bug.
 	 */
 	@Test
-	public void testSetValues()
+	public void testQuoteParsingError()
 	{
 		EForm eform = new EForm();
 		eform.setFormHtml(this.inputHtml);
-		//twice to attempt to cause duplicate bug
-		eform.setValues(this.allNames, this.allValues);
-		eform.setValues(this.allNames, this.allValues);
 
+		ArrayList<String> valNoQuotes = new ArrayList<>();
+		for(String val : this.allValues)
+		{
+			valNoQuotes.add(EFormUtil.removeQuotes(val));
+		}
+		eform.setValues(this.allNames, valNoQuotes);
 		String outHTML = eform.getFormHtml();
 
 		Assert.assertEquals("expected: \n" + this.expectHtml + "\n But got: \n" + outHTML + "\n", outHTML, this.expectHtml);

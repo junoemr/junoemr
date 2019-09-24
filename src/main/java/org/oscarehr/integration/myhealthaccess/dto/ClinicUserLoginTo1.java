@@ -29,11 +29,14 @@ import java.io.Serializable;
 
 public class ClinicUserLoginTo1 implements Serializable
 {
-	@JsonProperty("email")
+	@JsonProperty(value="email", required=true)
 	private String email;
 
-	@JsonProperty("password")
+	@JsonProperty(value="password", required=true)
 	private String password;
+
+	@JsonProperty("remote_id")
+	private String remoteID;
 
 	public ClinicUserLoginTo1(String email, String password)
 	{
@@ -59,5 +62,15 @@ public class ClinicUserLoginTo1 implements Serializable
 	public void setPassword(String password)
 	{
 		this.password = password;
+	}
+
+	public String getRemoteID()
+	{
+		return remoteID;
+	}
+
+	public void setRemoteID(String remoteId)
+	{
+		this.remoteID = remoteId;
 	}
 }

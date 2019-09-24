@@ -38,6 +38,7 @@ public class GenericErrorTo1 implements Serializable
 	public static final String ERROR_SESSION_EXPIRED = "error_session_expired";
 	public static final String ERROR_RECORD_NOT_FOUND = "error_record_not_found";
 	public static final String ERROR_VALIDATION = "error_field_validation";
+	public static final String ERROR_DUPLICATE_RECORD = "error_duplicate_record";
 
 	@JsonProperty("code")
 	private String code;
