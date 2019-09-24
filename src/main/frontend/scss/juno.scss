@@ -25,8 +25,9 @@
 @import "index";
 @import "directives/date_picker";
 @import "directives/time_picker";
-@import "directives/toggle-switch";
+@import "directives/juno-toggle";
 @import "directives/juno-checkbox";
+@import "directives/juno-radio";
 @import "directives/juno-select";
 @import "directives/juno-typeahead";
 @import "../src/common/components/junoLoadingIndicator";
@@ -37,6 +38,8 @@
 @import "../src/layout/leftAside";
 @import "../src/help/support";
 @import "../src/schedule/schedule";
+@import "../src/schedule/eventModal";
+@import "../src/schedule/scheduleSearchModal";
 @import "../src/dashboard/dashboard";
 @import "../src/patient/patient";
 @import "../src/patient/demographicCard";

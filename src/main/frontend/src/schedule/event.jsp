@@ -22,7 +22,9 @@
 	Canada
 
 --%>
-<juno-modal id="schedule-modal">
+<juno-modal id="schedule-modal"
+            show-loading="eventController.isWorking()"
+>
 	<modal-title>
 		<i class="icon icon-modal-header icon-calendar-add"></i>
 		<div class="align-baseline">
@@ -43,10 +45,15 @@
 		<div class="tabs-heading">
 			<ul class="nav nav-tabs round-top">
 				<li class="active">
-					<a class="round-top-left" data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointment);">
+					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointment);">
 						Appointment</a>
 				</li>
-				<li>
+				<li ng-if="!eventController.inEditMode()">
+					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.repeatBooking);">
+						Repeat Booking
+					</a>
+				</li>
+				<li ng-if="eventController.inEditMode()">
 					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.history);">
 						History
 					</a>
@@ -73,7 +80,7 @@
 				</div>
 				<div ng-show="isInitialized() && !isWorking()">
 					<div class="tab-bar-inputs form-row">
-						<div class="col-sm-8 pull-right">
+						<div class="col-sm-6 pull-right">
 							<juno-appointment-status-select
 									ca-name="event-appt-status"
 									ca-no-label="true"
@@ -153,6 +160,7 @@
 												ca-model="eventData.type"
 												ca-options="eventController.appointmentTypeList"
 												ca-empty-option="true"
+												ca-text-placeholder="Select an Appointment Type"
 										>
 										</ca-field-select>
 									</div>
@@ -269,6 +277,108 @@
 								</ca-field-text>
 							</div>
 						</div>
+					</div>
+				</div>
+			</div>
+			<div id="tabRepeatBooking" class="tab-pane"
+			     ng-show="eventController.isTabActive(eventController.tabEnum.repeatBooking)">
+				<div class="flex-row pane-container">
+					<div class="pane repeat-options-pane">
+						<h4 class="pane-header">Repeat Booking Settings</h4>
+
+						<ca-field-toggle
+								ca-name="repeatBookingEnabled"
+								ca-title="Enable Repeat Booking"
+								ca-model="eventController.repeatBookingData.enabled"
+								ca-true-text="On"
+								ca-false-text="Off"
+								ca-true-value="{{eventController.repeatBooking.toggleEnum.on}}"
+								ca-false-value="{{eventController.repeatBooking.toggleEnum.off}}"
+						>
+						</ca-field-toggle>
+
+						<div class="row">
+							<div class="col-md-4">
+								<ca-field-select
+									ca-name="repeatSelectUnit"
+									ca-title="Every"
+									ca-template="label"
+									ca-model="eventController.repeatBookingData.units"
+									ca-error="{{displayMessages.field_errors()['repeatSelectUnit']}}"
+									ca-options="eventController.repeatBooking.unitOptions"
+									ca-disabled="!eventController.isRepeatBookingEnabled()"
+								>
+								</ca-field-select>
+							</div>
+							<div class="col-md-8">
+								<ca-field-select
+										ca-name="repeatSelectPeriod"
+										ca-title="Period"
+										ca-template="label"
+										ca-model="eventController.repeatBookingData.period"
+										ca-error="{{displayMessages.field_errors()['repeatSelectPeriod']}}"
+										ca-options="eventController.repeatBooking.periodOptions"
+										ca-disabled="!eventController.isRepeatBookingEnabled()"
+								>
+								</ca-field-select>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-2">
+								<ca-field-radio
+										ca-name="repeat-radio-1"
+										ca-title="&nbsp"
+										ca-model="eventController.repeatBookingData.endType"
+										ca-value="{{eventController.repeatBooking.endTypeEnum.date}}"
+										ca-disabled="!eventController.isRepeatBookingEnabled()"
+								>
+								</ca-field-radio>
+							</div>
+							<div class="col-md-10">
+								<ca-field-date
+										ca-title="On"
+										ca-modal="eventController.repeatBookingData.endDate"
+										ca-date-picker-id="repeat-end-on-date"
+										ca-name="repeatEndOnDate"
+										ca-error="{{displayMessages.field_errors()['repeatEndOnDate']}}"
+										ca-orientation="auto"
+										ca-disabled="!eventController.isRepeatBookingEnabled()"
+								>
+								</ca-field-date>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-2">
+								<ca-field-radio
+										ca-name="repeat-radio-2"
+										ca-title="&nbsp"
+										ca-model="eventController.repeatBookingData.endType"
+										ca-value="{{eventController.repeatBooking.endTypeEnum.after}}"
+										ca-disabled="!eventController.isRepeatBookingEnabled()"
+								>
+								</ca-field-radio>
+							</div>
+							<div class="col-md-6">
+								<ca-field-text
+										ca-name="repeatEndAfterNumber"
+										ca-title="After"
+										ca-model="eventController.repeatBookingData.endAfterNumber"
+										ca-error="{{displayMessages.field_errors()['repeatEndAfterNumber']}}"
+										ca-disabled="!eventController.isRepeatBookingEnabled()"
+								>
+								</ca-field-text>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<label class="control-label">&nbsp</label>
+									<span class="form-control-static">Bookings</span>
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+					<div class="pane repeat-display-pane flex-column flex-grow">
 					</div>
 				</div>
 			</div>

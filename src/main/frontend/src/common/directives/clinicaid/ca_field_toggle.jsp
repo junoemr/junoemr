@@ -1,4 +1,4 @@
-<div class="form-group {{form_group_class}}"
+<div class="juno-toggle-switch form-group {{form_group_class}}"
 		 ng-class="{ 'has-error' : error_message, 'has-warning' : warning_message }"
 		 title="{{title_string}}"
 		 ng-hide="hide">
@@ -9,7 +9,12 @@
 		{{title}}
 	</label>
 
-	<div class="{{input_size}}">
+	<label ng-if="false_text && false_text.length > 0"
+	       for="input-{{name}}"
+	       class="state-label">
+		{{false_text}}
+	</label>
+	<label class="switch form-control-static {{input_size}}">
 		<input type="checkbox"
 					 bs-switch
 					 switch-on-text="{{true_text}}"
@@ -22,6 +27,11 @@
 					 ng-focus="focus_fn()"
 					 ng-change="change_fn()"
 					 tabindex="{{tab_index}}"/>
-	</div>
-
+		<span class="slider round"></span>
+	</label>
+	<label ng-if="true_text && true_text.length > 0"
+	       for="input-{{name}}"
+	       class="state-label">
+		{{true_text}}
+	</label>
 </div>

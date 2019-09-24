@@ -65,7 +65,8 @@ angular.module('Schedule').component('eventComponent', {
 			controller.useOldEchart = true; //TODO load from a setting?
 			controller.tabEnum = Object.freeze({
 				appointment: 0,
-				history: 1,
+				repeatBooking: 1,
+				history: 2,
 			});
 			controller.activeTab = controller.tabEnum.appointment;
 
@@ -89,6 +90,14 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.repeatBooking =
 				{
+					toggleEnum: Object.freeze({
+						on: 'on',
+						off: 'off',
+					}),
+					endTypeEnum: Object.freeze({
+						date: 'date',
+						after: 'after',
+					}),
 					periodOptions: [
 						{
 							label: 'days',
@@ -102,12 +111,29 @@ angular.module('Schedule').component('eventComponent', {
 							label: 'months',
 							value: 'months'
 						},
-					]
+					],
+					unitOptions: [
+						{
+							label: '1x',
+							value: 1
+						},
+						{
+							label: '2x',
+							value: 2
+						},
+						{
+							label: '3x',
+							value: 3
+						},
+					],
 				};
 			controller.repeatBookingData = {
-				units: null,
+				enabled: controller.repeatBooking.toggleEnum.off,
+				units: controller.repeatBooking.unitOptions[0].value,
 				period: controller.repeatBooking.periodOptions[0].value,
-				endDate: null
+				endDate: null,
+				endAfterNumber: 1,
+				endType: controller.repeatBooking.endTypeEnum.date,
 			};
 			controller.eventHistory = [];
 
@@ -519,16 +545,16 @@ angular.module('Schedule').component('eventComponent', {
 				Juno.Common.Util.validateIntegerString($scope.eventData.duration,
 					$scope.displayMessages, 'duration', 'Duration', true, true, true);
 
-				Juno.Common.Util.validateIntegerString(controller.repeatBookingData.units,
-					$scope.displayMessages, 'repeatUnits', 'Repeat Units', false, true, false);
-
-				Juno.Common.Util.validateDateString(controller.repeatBookingData.endDate,
-					$scope.displayMessages, 'repeatEndDate', 'Repeat End Date', false);
-
 				if (controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
 				{
 					$scope.displayMessages.add_field_error('site', "A valid site must be selected");
 				}
+
+				Juno.Common.Util.validateIntegerString(controller.repeatBookingData.endAfterNumber,
+					$scope.displayMessages, 'repeatEndAfterNumber', 'Repeat End After', false, true, false);
+
+				Juno.Common.Util.validateDateString(controller.repeatBookingData.endDate,
+					$scope.displayMessages, 'repeatEndOnDate', 'Repeat End Date', false);
 
 				return !$scope.displayMessages.has_errors();
 			};
@@ -696,6 +722,14 @@ angular.module('Schedule').component('eventComponent', {
 			controller.hasAppointmentId = function hasAppointmentId()
 			{
 				return Juno.Common.Util.exists($scope.eventUuid);
+			};
+			controller.inEditMode = function inEditMode()
+			{
+				return controller.editMode;
+			};
+			controller.isRepeatBookingEnabled = function isRepeatBookingEnabled()
+			{
+				return (!controller.inEditMode() && controller.repeatBookingData.enabled === controller.repeatBooking.toggleEnum.on);
 			};
 
 			$scope.hasSites = function hasSites()
