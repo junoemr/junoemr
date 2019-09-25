@@ -42,7 +42,6 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
-import org.oscarehr.util.MiscUtils;
 import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
@@ -865,7 +864,6 @@ public class PATHL7Handler extends MessageHandler
         if ("TRANSPDF".equals(origHeader)
                 && (getPatientLocation().equals("VIHAMTM") || getPatientLocation().equals("TRANSCST")))
         {
-            MiscUtils.getLogger().info("OBX: " + i);
             return msg.getRESPONSE().getORDER_OBSERVATION().getOBSERVATION(i).getOBX().getObservationIdentifier().getText().toString();
         }
         else // other custom matched headers pull from OBR 4-2
