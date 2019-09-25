@@ -43,10 +43,16 @@
     }
 
     Boolean hasCustomBillingAddress = (Boolean) request.getAttribute("hasCustomBillingAddress");
+    UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
 %>
 
 <%@ page import="java.util.*,oscar.oscarReport.reportByTemplate.*" %>
 <%@ page import="org.oscarehr.rx.service.RxWatermarkService" %>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="oscar.OscarProperties" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -196,12 +202,46 @@
             </fieldset>
         </div>
     </div>
+
     <div id="clinic">
         <div class="clinic-details">
             <div class="clinic-info">
-                <fieldset>
-                    <legend>Prescription Watermark</legend>
+                <fieldset class="rx-settings-panel">
+                    <legend>Rx Settings</legend>
+                    <form  id="rx-form" action="../RxSettings.do" method="POST">
+                        <h3>General Settings</h3>
+                        <hr>
+                        <input id="rx-settings-action" name="method" type="hidden" value="setSettings">
+                        <div class="rx-fields">
+                            <div class="input-field">
+                                <label>Rx Footer - <span style="color: grey;">95 character max</span></label>
+                                <%
+                                    UserProperty promoProp = userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT);
+                                    String promoText = "";
+                                    if (promoProp != null)
+                                    {
+                                        promoText = promoProp.getValue();
+                                    }
+                                    else
+                                    {
+                                        promoText = OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT");
+                                    }
+                                %>
+                                <input name="rx_promo_text" type="text" maxlength="95" value="<%=promoText%>">
+                            </div>
+
+                            <div class="submit flex-fill-row">
+                                <input class="submit-button" type="submit" value="Update">
+                            </div>
+                            <div class="flex-fill-row">
+                                <span id="rx-general-success-msg">Settings updated</span>
+                                <span id="rx-general-error-msg">Error updating settings</span>
+                            </div>
+                        </div>
+                    </form>
                     <form action="../RxWatermark.do" method="POST" enctype="multipart/form-data" id="watermark-form">
+                        <h3>Rx Watermark</h3>
+                        <hr>
                         <input id="watermark-upload-action" type="hidden" name="method" value="setWatermark">
 
                         <div class="input-field flex-fill-row">
@@ -209,7 +249,7 @@
                         </div>
                         <div class="watermark-fields" id="watermark-input-form">
                             <div class="watermark-input-field flex-fill-row">
-                                <div style="display:flex; flex-direction:row;">
+                                <div style="display:flex; flex-direction:row; align-items:end;">
                                     <div style="margin-right: 5px;">
                                         <img id="current-watermark-preview" src="../RxWatermark.do?method=getWatermark" width="100" height="100" style="background-color: #fefefe;" onerror="this.style.display='none';"/>
                                     </div>
@@ -379,6 +419,28 @@
             })
         }
 
+        function submitRxSettings(event, action)
+        {
+
+            let formData = new FormData(event.target);
+
+            jQuery.ajax({
+                url: "../RxSettings.do",
+                type: "post",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function() {
+                    jQuery("#rx-general-success-msg").css('display', 'block');
+                    jQuery("#rx-general-error-msg").css('display', 'none');
+                },
+                error: function () {
+                    jQuery("#rx-general-error-msg").css('display', 'block');
+                    jQuery("#rx-general-success-msg").css('display', 'none');
+                }
+            })
+        }
+
         jQuery(document).ready(function ()
         {
             let submitAction = "setWatermark";
@@ -394,6 +456,11 @@
             jQuery("#watermark-form").submit(function(event)
             {
                 submitWatermarkForm(event, submitAction);
+            });
+
+            jQuery("#rx-form").submit(function(event) {
+                event.preventDefault();
+                submitRxSettings(event, "setSettings");
             });
 
             <% if (!RxWatermarkService.isWatermarkEnabled()) { %>

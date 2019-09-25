@@ -44,6 +44,7 @@
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
 <%@ page import="org.oscarehr.rx.service.RxWatermarkService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 <!-- end -->
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -604,17 +605,27 @@ if(custom_logo_name != null ){
 		                                                    </tr>
                                                     	<%
                                                     	}
-                                                    	
-                                                    	
-	                                     				if (oscar.OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT") != null)
+
+                                                    	UserProperty promoText = userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT);
+                                                    	if (promoText != null)
+														{
+															%>
+																<tr valign=bottom align="center" style="font-size: 9px">
+																	<td height=25px colspan="2"></br>
+																		<%=promoText.getValue()%>
+																	</td>
+																</tr>
+															<%
+														}
+	                                     				else if (oscar.OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT") != null)
 	                                     				{
-	                                     				%>
-		                                                    <tr valign=bottom align="center" style="font-size: 9px">
-		                                                            <td height=25px colspan="2"></br>
-		                                                            <%= oscar.OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT") %>
-		                                                            </td>
-		                                                    </tr>
-	                                                    <%
+															%>
+																<tr valign=bottom align="center" style="font-size: 9px">
+																		<td height=25px colspan="2"></br>
+																		<%= oscar.OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT") %>
+																		</td>
+																</tr>
+															<%
                                                     	}
                                                     %>
                                             </table>
