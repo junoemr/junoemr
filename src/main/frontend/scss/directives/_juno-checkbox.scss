@@ -3,6 +3,11 @@
  */
 
 .juno-checkbox {
+
+	$check-size: 16px;
+	$input-height: $form-input-height;
+	$vertical-margin: calc((#{$input-height} - #{$check-size})/2);
+
 	display: flex;
 	align-items: center;
 	position: relative;
@@ -30,19 +35,21 @@
 				color: $color-neutral-white;
 			}
 		}
-		&:disabled + .radio {
+		&:disabled + .checkmark {
 			background-color: $color-neutral-light;
 		}
 	}
 	/* style a custom checkbox */
 	.checkmark {
-		height: 16px;
-		width: 16px;
+		height: $check-size;
+		width: $check-size;
+		min-width: $check-size;
+		min-height: $check-size;
 		background-color: $color-neutral-white;
 		border: solid 1px $color-primary-light;
 		border-radius: 4px;
 		cursor: pointer;
-		margin: 0;
+		margin: $vertical-margin 0 $vertical-margin;
 		padding: 0;
 		.icon {
 			font-size: 12px;

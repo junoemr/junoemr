@@ -3,6 +3,11 @@
  */
 
 .juno-radio {
+
+	$radio-size: 16px;
+	$input-height: $form-input-height;
+	$vertical-margin: calc((#{$input-height} - #{$radio-size})/2);
+
 	display: flex;
 	align-items: center;
 	position: relative;
@@ -43,13 +48,15 @@
 	}
 	/* style a custom checkbox */
 	.radio {
-		height: 16px;
-		width: 16px;
+		height: $radio-size;
+		width: $radio-size;
+		min-width: $radio-size;
+		min-height: $radio-size;
 		background-color: $color-neutral-white;
 		border: solid 1px $color-primary-light;
 		border-radius: 50%;
 		cursor: pointer;
-		margin: 0;
+		margin: $vertical-margin 0 $vertical-margin;
 		padding: 0;
 	}
 }

@@ -19,7 +19,7 @@
 		       tabindex="{{tab_index}}"
 		       ng-disabled="disabled"
 		/>
-		<label for="input-{{name}}" class="form-control radio">
+		<label for="input-{{name}}" class="radio">
 		</label>
 	</div>
 
