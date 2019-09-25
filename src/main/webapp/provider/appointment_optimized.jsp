@@ -77,6 +77,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="java.util.SortedMap" %>
+<%@ page import="org.oscarehr.common.model.Appointment" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 <jsp:useBean id="appointmentInfo" class="org.oscarehr.appointment.AppointmentDisplayController" scope="page" />
@@ -1392,7 +1393,24 @@ private long getAppointmentRowSpan(
 									int appointmentCount = 0;
 									for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
 									{
-										appointmentCount += appointmentDetailsList.size();
+
+										for(AppointmentDetails appointmentDetails : appointmentDetailsList)
+										{
+
+											/*
+											 *.Do_Not_Book type appointments shall not been count for appointment total
+											 * on the top of the schedule page
+											 */
+
+											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName()) == 0)
+											{
+												continue;
+											}
+
+											appointmentCount++;
+
+										}
+
 									}
 								%>
 								<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>
@@ -1792,7 +1810,7 @@ private long getAppointmentRowSpan(
 															{
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-														<% 	} 
+														<% 	}
 														} else
 														{%>
 															<!--Inline display of reason -->
@@ -2075,9 +2093,24 @@ private long getAppointmentRowSpan(
 								if (showApptCountForProvider)
 								{
 									int appointmentCount = 0;
+
 									for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
 									{
-										appointmentCount += appointmentDetailsList.size();
+										for(AppointmentDetails appointmentDetails : appointmentDetailsList)
+										{
+
+
+											/*
+											 *.Do_Not_Book type appointments shall not been count for appointment total
+											 * on the top of the schedule page
+											 */
+											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName()) == 0)
+											{
+												continue;
+											}
+
+											appointmentCount++;
+										}
 									}
 									%>
 									<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>
