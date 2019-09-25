@@ -298,26 +298,26 @@
 						</ca-field-toggle>
 
 						<div class="row">
-							<div class="col-md-4">
+							<div class="col-md-8">
 								<ca-field-select
-									ca-name="repeatSelectUnit"
-									ca-title="Every"
-									ca-template="label"
-									ca-model="eventController.repeatBookingData.units"
-									ca-error="{{displayMessages.field_errors()['repeatSelectUnit']}}"
-									ca-options="eventController.repeatBooking.unitOptions"
-									ca-disabled="!eventController.isRepeatBookingEnabled()"
+										ca-name="repeatSelectInterval"
+										ca-title="Interval"
+										ca-template="label"
+										ca-model="eventController.repeatBookingData.interval"
+										ca-error="{{displayMessages.field_errors()['repeatSelectInterval']}}"
+										ca-options="eventController.repeatBooking.intervalOptions"
+										ca-disabled="!eventController.isRepeatBookingEnabled()"
 								>
 								</ca-field-select>
 							</div>
-							<div class="col-md-8">
+							<div class="col-md-4">
 								<ca-field-select
-										ca-name="repeatSelectPeriod"
-										ca-title="Period"
+										ca-name="repeatSelectFrequency"
+										ca-title="Frequency"
 										ca-template="label"
-										ca-model="eventController.repeatBookingData.period"
-										ca-error="{{displayMessages.field_errors()['repeatSelectPeriod']}}"
-										ca-options="eventController.repeatBooking.periodOptions"
+										ca-model="eventController.repeatBookingData.frequency"
+										ca-error="{{displayMessages.field_errors()['repeatSelectFrequency']}}"
+										ca-options="eventController.repeatBooking.frequencyOptions"
 										ca-disabled="!eventController.isRepeatBookingEnabled()"
 								>
 								</ca-field-select>
@@ -336,13 +336,13 @@
 							</div>
 							<div class="col-md-10">
 								<ca-field-date
-										ca-title="On"
+										ca-title="End On"
 										ca-modal="eventController.repeatBookingData.endDate"
 										ca-date-picker-id="repeat-end-on-date"
 										ca-name="repeatEndOnDate"
 										ca-error="{{displayMessages.field_errors()['repeatEndOnDate']}}"
 										ca-orientation="auto"
-										ca-disabled="!eventController.isRepeatBookingEnabled()"
+										ca-disabled="!eventController.isRepeatBookingEnabled() || !eventController.isRepeatBookingEndTypeDate()"
 								>
 								</ca-field-date>
 							</div>
@@ -361,10 +361,11 @@
 							<div class="col-md-6">
 								<ca-field-text
 										ca-name="repeatEndAfterNumber"
-										ca-title="After"
+										ca-title="End After"
 										ca-model="eventController.repeatBookingData.endAfterNumber"
 										ca-error="{{displayMessages.field_errors()['repeatEndAfterNumber']}}"
-										ca-disabled="!eventController.isRepeatBookingEnabled()"
+										ca-disabled="!eventController.isRepeatBookingEnabled() || !eventController.isRepeatBookingEndTypeAfter()"
+										<%--ca-max-characters="3"--%>
 								>
 								</ca-field-text>
 							</div>

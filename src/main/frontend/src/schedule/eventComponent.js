@@ -98,7 +98,8 @@ angular.module('Schedule').component('eventComponent', {
 						date: 'date',
 						after: 'after',
 					}),
-					periodOptions: [
+					intervalOptions: [
+						// interval values should match moment.js time units
 						{
 							label: 'days',
 							value: 'days'
@@ -112,7 +113,7 @@ angular.module('Schedule').component('eventComponent', {
 							value: 'months'
 						},
 					],
-					unitOptions: [
+					frequencyOptions: [
 						{
 							label: '1x',
 							value: 1
@@ -129,8 +130,8 @@ angular.module('Schedule').component('eventComponent', {
 				};
 			controller.repeatBookingData = {
 				enabled: controller.repeatBooking.toggleEnum.off,
-				units: controller.repeatBooking.unitOptions[0].value,
-				period: controller.repeatBooking.periodOptions[0].value,
+				frequency: controller.repeatBooking.frequencyOptions[0].value,
+				interval: controller.repeatBooking.intervalOptions[0].value,
 				endDate: null,
 				endAfterNumber: 1,
 				endType: controller.repeatBooking.endTypeEnum.date,
@@ -559,6 +560,37 @@ angular.module('Schedule').component('eventComponent', {
 				return !$scope.displayMessages.has_errors();
 			};
 
+			controller.generateRepeatBookingDateList = function generateRepeatBookingDateList()
+			{
+				var dateList = [];
+				var startDate = moment($scope.eventData.startDate);
+				var endDate = moment(controller.repeatBookingData.endDate);
+				var maxRepeats = controller.repeatBookingData.endAfterNumber;
+
+				var interval = controller.repeatBookingData.interval;
+				var frequency = controller.repeatBookingData.frequency;
+
+				var bUseEndDate = controller.isRepeatBookingEndTypeDate();
+				var bUseMaxRepeat = controller.isRepeatBookingEndTypeAfter();
+
+				var count = 0;
+				var lastDate = startDate;
+				while(true)
+				{
+					var nextDate = lastDate.add(frequency, interval);
+					count += 1;
+
+					if((bUseMaxRepeat && count > maxRepeats) || (bUseEndDate && nextDate.isAfter(endDate, 'day')))
+					{
+						break;
+					}
+
+					dateList.push(Juno.Common.Util.formatMomentDate(nextDate));
+					lastDate = nextDate;
+				}
+				return dateList;
+			};
+
 			$scope.saveEvent = function saveEvent()
 			{
 				var deferred = $q.defer();
@@ -571,6 +603,12 @@ angular.module('Schedule').component('eventComponent', {
 				var demographicNo = ($scope.eventData.doNotBook) ? null : controller.demographicModel.demographicNo;
 				var appointmentName = (demographicNo == null && Juno.Common.Util.exists(controller.patientTypeahead.searchQuery)) ?
 					controller.patientTypeahead.searchQuery : null;
+
+				var repeatOnDates = null;
+				if(controller.isRepeatBookingEnabled())
+				{
+					repeatOnDates = controller.generateRepeatBookingDateList();
+				}
 
 				controller.parentScope.saveEvent(
 					controller.editMode,
@@ -590,7 +628,9 @@ angular.module('Schedule').component('eventComponent', {
 						site: $scope.eventData.site,
 						doNotBook: $scope.eventData.doNotBook,
 						urgency: (($scope.eventData.critical) ? 'critical' : null),
-					}
+					},
+					repeatOnDates,
+
 				).then(
 					function (results)
 					{
@@ -730,6 +770,14 @@ angular.module('Schedule').component('eventComponent', {
 			controller.isRepeatBookingEnabled = function isRepeatBookingEnabled()
 			{
 				return (!controller.inEditMode() && controller.repeatBookingData.enabled === controller.repeatBooking.toggleEnum.on);
+			};
+			controller.isRepeatBookingEndTypeDate = function isRepeatBookingEndTypeDate()
+			{
+				return controller.repeatBookingData.endType === controller.repeatBooking.endTypeEnum.date;
+			};
+			controller.isRepeatBookingEndTypeAfter = function isRepeatBookingEndTypeAfter()
+			{
+				return controller.repeatBookingData.endType === controller.repeatBooking.endTypeEnum.after;
 			};
 
 			$scope.hasSites = function hasSites()

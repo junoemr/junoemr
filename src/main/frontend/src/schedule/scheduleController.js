@@ -656,7 +656,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.applyUiConfig($scope.uiConfig);
 		};
 
-		$scope.saveEvent = function saveEvent(editMode, calendarAppointment)
+		$scope.saveEvent = function saveEvent(editMode, calendarAppointment, repeatOnDateList)
 		{
 			var deferred = $q.defer();
 
@@ -670,6 +670,25 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					function failure(result)
 					{
 						$scope.displayMessages.add_standard_error("Failed to update appointment");
+						deferred.reject(result.data);
+					}
+				);
+			}
+			else if (repeatOnDateList && repeatOnDateList.length > 0)
+			{
+				var calendarAppointmentRepeating = {
+					appointment: calendarAppointment,
+					dateList: repeatOnDateList,
+				};
+
+				$scope.appointmentApi.addRepeatingAppointment(calendarAppointmentRepeating).then(
+					function success(result)
+					{
+						deferred.resolve(result.data);
+					},
+					function failure(result)
+					{
+						$scope.displayMessages.add_standard_error("Failed to add reoccurring appointment");
 						deferred.reject(result.data);
 					}
 				);
