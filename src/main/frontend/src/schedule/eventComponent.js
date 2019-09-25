@@ -132,7 +132,7 @@ angular.module('Schedule').component('eventComponent', {
 				enabled: controller.repeatBooking.toggleEnum.off,
 				frequency: controller.repeatBooking.frequencyOptions[0].value,
 				interval: controller.repeatBooking.intervalOptions[0].value,
-				endDate: null,
+				endDate: Juno.Common.Util.formatMomentDate(moment()),
 				endAfterNumber: 1,
 				endType: controller.repeatBooking.endTypeEnum.date,
 			};

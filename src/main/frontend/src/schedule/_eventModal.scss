@@ -80,7 +80,6 @@
 			// TODO combine with appt search css
 			$repeat-options-pane-width: 272px;
 			.pane-container {
-				@include modal-split-pane-colors($color-neutral-lighter, $repeat-options-pane-width, $color-neutral-white);
 
 				height: 100%;
 				.pane-header {

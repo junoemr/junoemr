@@ -37,6 +37,9 @@
 				background: $color-primary-base;
 			}
 		}
+		&:disabled + .radio {
+			background-color: $color-neutral-light;
+		}
 	}
 	/* style a custom checkbox */
 	.radio {

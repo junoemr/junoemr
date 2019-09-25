@@ -284,8 +284,6 @@
 			     ng-show="eventController.isTabActive(eventController.tabEnum.repeatBooking)">
 				<div class="flex-row pane-container">
 					<div class="pane repeat-options-pane">
-						<h4 class="pane-header">Repeat Booking Settings</h4>
-
 						<ca-field-toggle
 								ca-name="repeatBookingEnabled"
 								ca-title="Enable Repeat Booking"
@@ -337,14 +335,13 @@
 							<div class="col-md-10">
 								<ca-field-date
 										ca-title="End On"
-										ca-modal="eventController.repeatBookingData.endDate"
 										ca-date-picker-id="repeat-end-on-date"
 										ca-name="repeatEndOnDate"
+										ca-model="eventController.repeatBookingData.endDate"
 										ca-error="{{displayMessages.field_errors()['repeatEndOnDate']}}"
 										ca-orientation="auto"
 										ca-disabled="!eventController.isRepeatBookingEnabled() || !eventController.isRepeatBookingEndTypeDate()"
-								>
-								</ca-field-date>
+								></ca-field-date>
 							</div>
 						</div>
 						<div class="row">

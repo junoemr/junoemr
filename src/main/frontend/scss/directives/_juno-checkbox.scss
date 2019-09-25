@@ -30,6 +30,9 @@
 				color: $color-neutral-white;
 			}
 		}
+		&:disabled + .radio {
+			background-color: $color-neutral-light;
+		}
 	}
 	/* style a custom checkbox */
 	.checkmark {
