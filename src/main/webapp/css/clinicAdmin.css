@@ -141,6 +141,7 @@ form {
 
 .rx-settings-panel {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .rx-settings-panel h3 {
@@ -153,6 +154,10 @@ form {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+}
+
+.rx-fields .input-field {
+    width: 80%;
 }
 
 #rx-general-success-msg {

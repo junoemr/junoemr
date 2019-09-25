@@ -52,6 +52,7 @@
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="oscar.OscarProperties" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -213,7 +214,7 @@
                         <input id="rx-settings-action" name="method" type="hidden" value="setSettings">
                         <div class="rx-fields">
                             <div class="input-field">
-                                <label>Rx Promo Text</label>
+                                <label>Rx Footer - <span style="color: grey;">95 character max</span></label>
                                 <%
                                     UserProperty promoProp = userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT);
                                     String promoText = "";
@@ -221,8 +222,12 @@
                                     {
                                         promoText = promoProp.getValue();
                                     }
+                                    else
+                                    {
+                                        promoText = OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT");
+                                    }
                                 %>
-                                <input name="rx_promo_text" type="text" value="<%=promoText%>">
+                                <input name="rx_promo_text" type="text" maxlength="95" value="<%=promoText%>">
                             </div>
 
                             <div class="submit flex-fill-row">

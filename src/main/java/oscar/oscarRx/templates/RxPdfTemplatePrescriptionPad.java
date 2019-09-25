@@ -256,8 +256,7 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 			this.rxDate = rxDate;
 
 			UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
-			if (userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT) == null ||
-					userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT).getValue().isEmpty())
+			if (userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT) == null)
 			{
 				this.promoText = OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT");
 			}

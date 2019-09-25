@@ -607,7 +607,7 @@ if(custom_logo_name != null ){
                                                     	}
 
                                                     	UserProperty promoText = userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT);
-                                                    	if (promoText != null && !promoText.getValue().isEmpty())
+                                                    	if (promoText != null)
 														{
 															%>
 																<tr valign=bottom align="center" style="font-size: 9px">
