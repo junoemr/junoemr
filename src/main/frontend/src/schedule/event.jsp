@@ -80,7 +80,7 @@
 				</div>
 				<div ng-show="isInitialized() && !isWorking()">
 					<div class="tab-bar-inputs form-row">
-						<div class="col-sm-6 pull-right">
+						<div class="col-sm-8 pull-right">
 							<juno-appointment-status-select
 									ca-name="event-appt-status"
 									ca-no-label="true"
@@ -377,6 +377,20 @@
 
 					</div>
 					<div class="pane repeat-display-pane flex-column flex-grow">
+						<table ng-table="repeatBookingTable">
+							<tr ng-repeat="apptDate in eventController.repeatBookingDates">
+								<td data-title="'Appointment Date'">
+									{{ apptDate | date : eventController.formattedDate}}
+								</td>
+								<td class="action-column" header-class="'action-column'">
+									<button class="btn btn-xs btn-default"
+									        ng-click="eventController.removeRepeatBookingDate(apptDate)"
+									>
+										Remove
+									</button>
+								</td>
+							</tr>
+						</table>
 					</div>
 				</div>
 			</div>

@@ -24,7 +24,7 @@
 					}
 				}
 				&.result-pane {
-					@include juno-table-default(6px);
+					@include juno-table-default-selectable(6px);
 
 					.appt-code {
 						width: 16px;

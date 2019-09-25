@@ -59,9 +59,6 @@
 
 				.directive-appt-status-select-wrapper {
 					margin-top: 16px;
-					select {
-						height: 24px;
-					}
 				}
 			}
 
@@ -80,8 +77,8 @@
 			// TODO combine with appt search css
 			$repeat-options-pane-width: 272px;
 			.pane-container {
-
 				height: 100%;
+
 				.pane-header {
 					color: $color-primary-base;
 					font-weight: normal;
@@ -95,6 +92,13 @@
 						width: $repeat-options-pane-width;
 					}
 					&.repeat-display-pane {
+						@include juno-table-default(6px);
+						overflow: auto;
+
+						.action-column {
+							width: 96px;
+							border-left: 0;
+						}
 					}
 				}
 			}

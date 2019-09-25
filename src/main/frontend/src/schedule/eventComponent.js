@@ -132,10 +132,12 @@ angular.module('Schedule').component('eventComponent', {
 				enabled: controller.repeatBooking.toggleEnum.off,
 				frequency: controller.repeatBooking.frequencyOptions[0].value,
 				interval: controller.repeatBooking.intervalOptions[0].value,
-				endDate: Juno.Common.Util.formatMomentDate(moment()),
+				endDate: Juno.Common.Util.formatMomentDate(moment().add(1, 'days')),
 				endAfterNumber: 1,
 				endType: controller.repeatBooking.endTypeEnum.date,
 			};
+			controller.repeatBookingDates = null;
+
 			controller.eventHistory = [];
 
 			controller.patientTypeahead = {};
@@ -560,6 +562,19 @@ angular.module('Schedule').component('eventComponent', {
 				return !$scope.displayMessages.has_errors();
 			};
 
+			controller.updateRepeatBookingDates = function updateRepeatBookingDates()
+			{
+				controller.repeatBookingDates = [];
+				if(controller.isRepeatBookingEnabled())
+				{
+					controller.repeatBookingDates = controller.generateRepeatBookingDateList();
+				}
+			};
+			controller.removeRepeatBookingDate = function removeRepeatBookingDate(dataObj)
+			{
+				controller.repeatBookingDates = controller.repeatBookingDates.filter(function(e) { return e !== dataObj })
+			};
+
 			controller.generateRepeatBookingDateList = function generateRepeatBookingDateList()
 			{
 				var dateList = [];
@@ -607,7 +622,7 @@ angular.module('Schedule').component('eventComponent', {
 				var repeatOnDates = null;
 				if(controller.isRepeatBookingEnabled())
 				{
-					repeatOnDates = controller.generateRepeatBookingDateList();
+					repeatOnDates = controller.repeatBookingDates;
 				}
 
 				controller.parentScope.saveEvent(
@@ -739,6 +754,21 @@ angular.module('Schedule').component('eventComponent', {
 						controller.autofillDataFromType(newValue);
 					}
 				});
+				$scope.$watch('[' +
+					'eventController.repeatBookingData.enabled,' +
+					'eventController.repeatBookingData.frequency,' +
+					'eventController.repeatBookingData.interval,' +
+					'eventController.repeatBookingData.endType, ' +
+					'eventController.repeatBookingData.endDate,' +
+					'eventController.repeatBookingData.endAfterNumber' +
+					']',
+					function (newValue, oldValue)
+					{
+						if (newValue !== oldValue)
+						{
+							controller.updateRepeatBookingDates();
+						}
+					});
 			};
 
 			//=========================================================================
