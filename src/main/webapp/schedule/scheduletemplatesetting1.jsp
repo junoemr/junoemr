@@ -192,7 +192,7 @@ function submission()
 <body bgcolor="ivory" bgproperties="fixed" onLoad="setfocus()"
 	topmargin="0" leftmargin="0" rightmargin="0">
 <form method="post" name="schedule" action="schedulecreatedate.jsp"
-	onSubmit="return(submission())">
+	onSubmit="submission()">
 
 <table border="0" width="100%">
 	<tr>
