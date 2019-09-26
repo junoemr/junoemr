@@ -121,7 +121,7 @@ public class ProviderRoleService
 	}
 
 
-	private Secuserrole addRole(Integer roleProviderId, String roleName)
+	public Secuserrole addRole(Integer roleProviderId, String roleName)
 	{
 		Secuserrole secUserRole = new Secuserrole();
 		int defaultActiveyn = 1;
@@ -132,6 +132,7 @@ public class ProviderRoleService
 		secUserRoleDao.save(secUserRole);
 		return secUserRole;
 	}
+
 
 	public Secuserrole addRoleAndAssignPrimary(Integer roleProviderId, String roleName)
 	{
