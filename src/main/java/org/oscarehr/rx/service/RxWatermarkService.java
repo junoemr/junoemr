@@ -24,6 +24,7 @@
 
 package org.oscarehr.rx.service;
 
+import org.oscarehr.clinic.service.ClinicImageService;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
@@ -39,9 +40,6 @@ import java.io.InputStream;
 @Service
 public class RxWatermarkService
 {
-	// document dir appended to this
-	private static String WATERMARK_FILE = "watermark.png";
-
 	private static UserPropertyDAO userPropertyDao;
 	@Autowired
 	@Qualifier("UserPropertyDAO")
@@ -54,16 +52,28 @@ public class RxWatermarkService
 	}
 
 
+	/**
+	 * enabled this watermark
+	 * @param enable - if true the configured watermark will display on Rx prescriptions
+	 */
 	public static void enableWatermark(Boolean enable)
 	{
 		userPropertyDao.saveProp(UserProperty.ENABLE_RX_WATERMARK, enable.toString());
 	}
 
+	/**
+	 * set watermark display layer
+	 * @param isForeground - if true watermark is forground else background
+	 */
 	public static void setWatermarkBackground(Boolean isForeground)
 	{
 		userPropertyDao.saveProp(UserProperty.IS_BACKGROUND_RX_WATERMARK, isForeground.toString());
 	}
 
+	/**
+	 * check if the watermark is enabled
+	 * @return - true if the watermark is enabled, else false
+	 */
 	public static boolean isWatermarkEnabled()
 	{
 		UserProperty watermarkEnabledProperty = userPropertyDao.getProp(UserProperty.ENABLE_RX_WATERMARK);
@@ -75,6 +85,10 @@ public class RxWatermarkService
 		return false;
 	}
 
+	/**
+	 * check if the watermark is configured in background mode
+	 * @return - true if watermark is background
+	 */
 	public static boolean isWatermarkBackground()
 	{
 		UserProperty watermarkForegroundProperty = userPropertyDao.getProp(UserProperty.IS_BACKGROUND_RX_WATERMARK);
@@ -86,26 +100,34 @@ public class RxWatermarkService
 		return false;
 	}
 
+	/**
+	 * get the watermark image
+	 * @return - the watermark image file
+	 * @throws IOException - if an io error occurs retrieving the image file
+	 */
 	public static GenericFile getWatermark() throws IOException
 	{
-		return FileFactory.getResourceFile(WATERMARK_FILE);
+		return ClinicImageService.getImage(ClinicImageService.IMAGE_TYPE.WATERMARK);
 	}
 
+	/**
+	 * set the watermark image
+	 * @param fileData - an input stream containing the new watermark
+	 * @throws IOException - if there is an error writing watermark file
+	 * @throws InterruptedException - if the system triggers an interrupt while writing the watermark file
+	 */
 	public static void setWatermark(InputStream fileData) throws IOException, InterruptedException
 	{
-		if (!FileFactory.isResourceFileExist(WATERMARK_FILE))
-		{
-			FileFactory.createResourceFile(fileData, WATERMARK_FILE);
-		}
-		else
-		{
-			FileFactory.overwriteFileContents(FileFactory.getResourceFile(WATERMARK_FILE), fileData);
-		}
+		ClinicImageService.setImage(ClinicImageService.IMAGE_TYPE.WATERMARK, fileData);
 	}
 
+	/**
+	 * delete watermark image
+	 * @throws IOException - if error deleting watermark
+	 */
 	public static void deleteWatermark() throws IOException
 	{
-		getWatermark().deleteFile();
+		ClinicImageService.deleteImage(ClinicImageService.IMAGE_TYPE.WATERMARK);
 	}
 
 }

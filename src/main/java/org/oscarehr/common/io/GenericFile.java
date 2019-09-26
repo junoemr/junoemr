@@ -26,6 +26,7 @@ package org.oscarehr.common.io;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.myoscar_server.ws.IOException_Exception;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
@@ -34,6 +35,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
@@ -226,6 +229,27 @@ public class GenericFile
 	public String getInvalidContentType()
 	{
 		return this.invalidContentType;
+	}
+
+	/**
+	 * write the entirety of this file to the given outputStream
+	 * @param outS - the output stream to write to
+	 * @throws FileNotFoundException - if this file does not exists
+	 * @throws IOException - if there is an error reading from the file input / writing to the output stream
+	 */
+	public void writeToOutputStream(OutputStream outS) throws FileNotFoundException, IOException
+	{
+		InputStream inS = null;
+		try {
+			inS = asFileInputStream();
+			int data;
+			while ((data = inS.read()) != -1) {
+				outS.write(data);
+			}
+		} finally {
+			if (inS!=null) inS.close();
+			outS.flush();
+		}
 	}
 
 	/**
