@@ -26,7 +26,6 @@ package org.oscarehr.common.io;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.myoscar_server.ws.IOException_Exception;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 

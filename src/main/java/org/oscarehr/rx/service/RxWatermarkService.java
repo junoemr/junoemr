@@ -26,7 +26,6 @@ package org.oscarehr.rx.service;
 
 import org.oscarehr.clinic.service.ClinicImageService;
 import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.UserProperty;
 import org.springframework.beans.factory.annotation.Autowired;

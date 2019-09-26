@@ -27,19 +27,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.apache.struts.upload.FormFile;
-import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.rx.service.RxWatermarkService;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 
 public class RxWatermarkAction  extends DispatchAction
 {
