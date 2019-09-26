@@ -64,7 +64,7 @@ public class ProviderRoleAction extends DispatchAction
 
 			if(!providerRoleService.hasRole(providerId, roleNew))
 			{
-				Secuserrole role = providerRoleService.addRole(providerId, roleNew);
+				Secuserrole role = providerRoleService.addRoleAndAssignPrimary(providerId, roleNew);
 				LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_ADD, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS,
 						String.valueOf(role.getId()), ip, providerId + "|" + roleNew);
 				request.setAttribute("message", "Role " + roleNew + " is added. (" + providerId + ")");
