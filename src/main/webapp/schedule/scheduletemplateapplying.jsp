@@ -403,8 +403,6 @@ function disableSubmitButton()
 function submission()
 {
 
-	//the following one line and one 'if statement' is from the legacy code.
-
 	var isAlternateChecked = "<%=  bAlternate %>";
 
 	if(isAlternateChecked === "true" )
