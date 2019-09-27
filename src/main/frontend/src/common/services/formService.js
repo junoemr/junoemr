@@ -260,20 +260,21 @@ angular.module("Common.Services").service("formService", [
 			return deferred.promise;
 		};
 
-		// open a popup window for the specified eform.
+		// open a popup window for the specified eform. returns a promise that is resolved when the popup is closed
 		service.openEFormPopup = function (demographicNo, id)
 		{
 			let url = '../eform/efmformadd_data.jsp?fid=' + id + '&demographic_no=' + demographicNo + '&appointment=null';
-			window.open(url,'popUpWindow', service.popupOptions);
+			return Juno.Common.Util.windowClosedPromise(window.open(url,'popUpWindow', service.popupOptions));
 		};
 
-		// open a popup window for the specified eform instance
+		// open a popup window for the specified eform instance. returns a promise that is resolved when the popup is closed
 		service.openEFormInstancePopup = function (demographicNo, fdid)
 		{
 			let url = '../eform/efmshowform_data.jsp?fdid=' + fdid + '&demographic_no=' + demographicNo + '&appointment=null';
-			window.open(url,'popUpWindow', service.popupOptions);
+			return Juno.Common.Util.windowClosedPromise(window.open(url,'popUpWindow', service.popupOptions));
 		};
 
+		// open a popup window for the specified form. returns a promise that is resolved when the popup is closed
 		service.openFormPopup = function (providerNo, demographicNo, appointmentNo, url)
 		{
 			if (appointmentNo === undefined)
@@ -282,10 +283,10 @@ angular.module("Common.Services").service("formService", [
 			}
 
 			url = url + encodeURIComponent(demographicNo) + "&formId=0&provNo=" + encodeURIComponent(providerNo) + "&parentAjaxId=forms&appointmentNo=" + encodeURIComponent(appointmentNo);
-			window.open(url,
-				'popUpWindow', service.popupOptions);
+			return Juno.Common.Util.windowClosedPromise(window.open(url, 'popUpWindow', service.popupOptions));
 		};
 
+		// open a popup window for the specified form instance. returns a promise that is resolved when the popup is closed
 		service.openFormInstancePopup = function(formName, demographicNo, appointmentNo, id)
 		{
 			if (appointmentNo === undefined)
@@ -295,8 +296,7 @@ angular.module("Common.Services").service("formService", [
 
 			let url = "../form/forwardshortcutname.jsp?formname=" + encodeURIComponent(formName) + "&demographic_no=" + encodeURIComponent(demographicNo) +
 				"&appointmentNo=" + encodeURIComponent(appointmentNo) + "&formId=" + encodeURIComponent(id);
-			window.open(url,
-				'popUpWindow', service.popupOptions);
+			return Juno.Common.Util.windowClosedPromise(window.open(url, 'popUpWindow', service.popupOptions));
 		};
 
 
