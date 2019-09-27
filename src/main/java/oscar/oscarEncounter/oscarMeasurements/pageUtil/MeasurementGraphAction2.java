@@ -282,7 +282,7 @@ public class MeasurementGraphAction2 extends Action {
 	 * Pull and parse measurement parameters out of a string-based range
 	 * @param range The string that we're trying to interpret
 	 * @param units Any written suffix associated with the measurement that we want to discard
-	 * @return double array containing the measurements we can pull out, empty array if we can't pull them out
+	 * @return double array containing the measurements we can pull out or null if no measurements can be found
 	 */
 	public static double[] getParameters(String range, String units)
 	{
@@ -314,7 +314,8 @@ public class MeasurementGraphAction2 extends Action {
 			}
 			catch (NumberFormatException | ArrayIndexOutOfBoundsException ex)
 			{
-				return measurementParams;
+				MiscUtils.getLogger().warn(ex);
+				return null;
 			}
 		}
 
@@ -355,8 +356,7 @@ public class MeasurementGraphAction2 extends Action {
 				nameSet = true;
 			}
 			String mdbResult = (String)mdb.get("result");
-			mdbResult = mdbResult.replaceAll("<>=", "");
-
+			mdbResult = mdbResult.replaceAll("<|>|=", "");
 			newSeries.addOrUpdate(new Day((Date) mdb.get("collDateDate")), Double.parseDouble(mdbResult));
 
 			if (mdb.get("range") != null)

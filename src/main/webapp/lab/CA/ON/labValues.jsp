@@ -54,6 +54,7 @@
 <%@ page import="oscar.oscarDemographic.data.DemographicData" %>
 <%@ page import="oscar.oscarLab.ca.on.CommonLabTestValues" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.MeasurementGraphAction2" %>
+<%@ page import="java.net.URLEncoder" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -299,7 +300,7 @@
 							String units = (String)hashMap.get("units");
 
 							double[] possibleMeasurements = MeasurementGraphAction2.getParameters(refRange, units);
-							if (possibleMeasurements.length == 0)
+							if (possibleMeasurements == null)
 							{
 								canGraph = false;
 							}
@@ -336,7 +337,7 @@
 					%>
 					<input type="button"
 						   value="Plot"
-						   onclick="window.location = 'labValuesGraph.jsp?demographic_no=<%=demographicNo%>&labType=<%=labType%>&identifier=<%=identifier%>&testName=<%=testName%>';"/>
+						   onclick="window.location = 'labValuesGraph.jsp?demographic_no=<%=demographicNo%>&labType=<%=labType%>&identifier=<%=URLEncoder.encode(identifier.replaceAll("&","%26"),"UTF-8")%>&testName=<%=testName%>';"/>
 					<%
 						}
 						else
