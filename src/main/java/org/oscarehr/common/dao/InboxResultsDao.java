@@ -394,44 +394,6 @@ public class InboxResultsDao
 					+ "AND proLR.status != 'X' "
 					+ filterSql;
 
-
-			sql += " UNION ALL "
-
-
-					// This side of the union is for HRM documents.  This is entirely untested because we don't
-					// have any example records.  It is included in the query because it is expected to be used soon.
-					+ "SELECT "
-					+ "  'HRM' AS result_type, "
-					+ "  hrm.id, "
-					+ "  hrm.id AS document_no, "
-					+ "  null AS status, "
-					+ "  null AS provider_no, "
-					+ "  null AS doctype, "
-					+ "  CAST(CASE WHEN d.demographic_no IS NULL THEN 0 ELSE 1 END as int) as has_demographic, "
-					+ "  d.last_name AS last_name, "
-					+ "  d.first_name AS first_name, "
-					+ "  d.hin AS hin, "
-					+ "  d.sex AS sex, "
-					+ "  d.demographic_no AS demographic_no, "
-					+ "  hrm.timeReceived AS observationdate, "
-					+ "  null AS description, "
-					+ "  null as update_date_time, "
-					+ "  null AS uploadedBy, "
-					+ "  null AS label, "
-					+ "  null AS result_status, "
-					+ "  null AS priority, "
-					+ "  null AS requesting_client, "
-					+ "  null AS discipline, "
-					+ "  null AS report_status, "
-					+ "  null AS accessionNum, "
-					+ "  null AS final_result_count, "
-					+ "  reportFile AS report_file "
-					+ "FROM HRMDocument hrm "
-					+ "LEFT JOIN HRMDocumentToProvider hrmtp ON hrm.id = hrmtp.hrmDocumentId "
-					+ "LEFT JOIN HRMDocumentToDemographic hrmtd ON hrm.id = hrmtd.hrmDocumentId "
-					+ "LEFT JOIN demographic d ON d.demographic_no = hrmtd.demographicNo "
-					+ "WHERE TRUE ";
-
 			if (!"".equals(patientFirstName)) {
 				sql = sql + "AND d.first_name LIKE :first_name ";
 				qp_hrm_first_name = true;
