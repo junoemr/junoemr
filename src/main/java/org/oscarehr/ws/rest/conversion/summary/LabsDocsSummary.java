@@ -26,8 +26,6 @@ package org.oscarehr.ws.rest.conversion.summary;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,7 +45,6 @@ import oscar.dms.EDocUtil;
 import oscar.dms.EDocUtil.EDocSort;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
-import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 @Component
@@ -82,17 +79,13 @@ public class LabsDocsSummary implements Summary {
 			} else {
 				try
 				{
-					if (!accessionMap.containsKey(result.accessionNumber + result.labType))
+					if (!accessionMap.containsKey(result.accessionNumber + result.labType) ||
+							Integer.parseInt(accessionMap.get(result.accessionNumber + result.labType).segmentID) < Integer.parseInt(labs.get(i).segmentID))
 					{
-						accessionMap.put(result.accessionNumber + result.labType, result);
-					} else if (ConversionUtils.toLocalDate(accessionMap.get(result.accessionNumber + result.labType).dateTime, DateTimeFormatter.ofPattern(ConversionUtils.DEFAULT_TS_PATTERN)).isBefore(
-							ConversionUtils.toLocalDate(labs.get(i).dateTime, DateTimeFormatter.ofPattern(ConversionUtils.DEFAULT_TS_PATTERN))))
-					{
-						// if this lab is newer than the previously stored lab, overwrite.
 						accessionMap.put(result.accessionNumber + result.labType, result);
 					}
 				}
-				catch (DateTimeParseException e)
+				catch (NumberFormatException e)
 				{
 					MiscUtils.getLogger().error("Error parsing incoming lab list. error: " + e.toString());
 				}
