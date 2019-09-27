@@ -70,24 +70,22 @@ public class LabsDocsSummary implements Summary {
 		
 		CommonLabResultData comLab = new CommonLabResultData();
         ArrayList<LabResultData> labs = comLab.populateLabResultsData(loggedInInfo, "",""+demographicNo, "", "","","U");
-                
+
+        // sort so that only the newest version of the lab is selected
+        Collections.sort(labs);
+
 		LinkedHashMap<String,LabResultData> accessionMap = new LinkedHashMap<String,LabResultData>();
-		for (int i = 0; i < labs.size(); i++) {
+		for (int i = 0; i < labs.size(); i++)
+		{
 			LabResultData result = labs.get(i);
-			if (result.accessionNumber == null || result.accessionNumber.equals("")) {
+			if (result.accessionNumber == null || result.accessionNumber.equals(""))
+			{
 				accessionMap.put("noAccessionNum" + i + result.labType, result);
-			} else {
-				try
+			} else
+			{
+				if (!accessionMap.containsKey(result.accessionNumber + result.labType))
 				{
-					if (!accessionMap.containsKey(result.accessionNumber + result.labType) ||
-							Integer.parseInt(accessionMap.get(result.accessionNumber + result.labType).segmentID) < Integer.parseInt(labs.get(i).segmentID))
-					{
-						accessionMap.put(result.accessionNumber + result.labType, result);
-					}
-				}
-				catch (NumberFormatException e)
-				{
-					MiscUtils.getLogger().error("Error parsing incoming lab list. error: " + e.toString());
+					accessionMap.put(result.accessionNumber + result.labType, result);
 				}
 			}
 		}
