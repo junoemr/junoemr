@@ -74,7 +74,7 @@ public class EncounterNoteMapper extends AbstractMapper
 		return note;
 	}
 
-	private String getEncounterNoteText(int rep) throws HL7Exception
+	protected String getEncounterNoteText(int rep) throws HL7Exception
 	{
 		String reasonText = StringUtils.trimToEmpty(getEncounterNoteReason(rep));
 		String commentText = StringUtils.trimToEmpty(getEncounterNoteComment(rep));
