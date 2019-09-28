@@ -393,7 +393,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			{
 				formService.openEFormInstancePopup($stateParams.demographicNo, item.id).then(function (val)
 				{
-					// reload left nav
+					// reload data model
 					controller.refreshModel();
 				});
 			}
