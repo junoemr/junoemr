@@ -30,13 +30,12 @@ import java.util.List;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.FormsManager;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;
 import org.oscarehr.ws.rest.to.model.SummaryTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-
-
+import oscar.oscarEncounter.data.EctFormData;
 
 
 @Component
@@ -51,39 +50,36 @@ public class FormsSummary implements Summary{
 		SummaryTo1 summary = new SummaryTo1("Assessments",0,SummaryTo1.FORMS_CODE);
 		
 		List<SummaryItemTo1> list = summary.getSummaryItem();
-		int count = 0;
 		
-	    fillEforms( loggedInInfo, list,demographicNo,count);
+	    fillEforms( loggedInInfo, list,demographicNo);
 
 		return summary;
 	}
 	
 	
 	
-	private  void fillEforms(LoggedInInfo loggedInInfo,List<SummaryItemTo1> list,Integer demographicNo,int count){
+	private  void fillEforms(LoggedInInfo loggedInInfo,List<SummaryItemTo1> list,Integer demographicNo){
 
 		List<EFormData> completedEforms = formsManager.findInstancedByDemographicId(loggedInInfo,demographicNo);
+		List<EctFormData.PatientForm> completedForms = formsManager.getCompletedEncounterForms(demographicNo.toString());
 		Collections.sort(completedEforms, Collections.reverseOrder(EFormData.FORM_DATE_COMPARATOR));
 			
 		for(EFormData eformData: completedEforms){	
 			int id = eformData.getId();
-			
-			//list.add(new SummaryItemTo1(id, eformData.getFormName(),"#/record/"+demographicNo+"/forms/eform/id/"+id));
-			list.add(new SummaryItemTo1(id, eformData.getFormName(),"record.forms.view","eform"));
-			count++;
-			/*int formId = eformData.getFormId();
-			String name = eformData.getFormName();
-			String subject = eformData.getSubject();
-			String status = eformData.getSubject();
-			Date date = eformData.getFormDate();
-			Boolean showLatestFormOnly = eformData.isShowLatestFormOnly();
-			formListTo1.add(FormTo1.create(id, demographicNo, formId, FormsManager.EFORM, name, subject, status, date, showLatestFormOnly));
-			*/
+			list.add(new SummaryItemTo1(eformData.getId(), eformData.getFormName(),"record.forms.completed","eform"));
 		}
-		
-		
-		
 
+		for(EctFormData.PatientForm form : completedForms)
+		{
+			try
+			{
+				list.add(new SummaryItemTo1(Integer.parseInt(form.getFormId()), form.getFormName(), "record.forms.completed", "form"));
+			}
+			catch (NumberFormatException e)
+			{
+ 				MiscUtils.getLogger().warn("Could not add from to summary list with error: " + e.toString(), e);
+			}
+		}
 	}
 	
 }

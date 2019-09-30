@@ -386,6 +386,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			{
 				formService.openEFormInstancePopup($stateParams.demographicNo, item.id);
 			}
+			else if (item.type === 'form')
+			{
+				formService.openFormInstancePopup(item.displayName, $stateParams.demographicNo, null, item.id);
+			}
 			else if (item.action == 'action')
 			{
 				controller.editGroupedNotes('lg', mod, item.id, successCallback, dismissCallback);

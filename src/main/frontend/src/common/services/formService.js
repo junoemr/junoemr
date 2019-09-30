@@ -288,7 +288,7 @@ angular.module("Common.Services").service("formService", [
 
 		service.openFormInstancePopup = function(formName, demographicNo, appointmentNo, id)
 		{
-			if (appointmentNo === undefined)
+			if (appointmentNo === undefined || appointmentNo === null)
 			{
 				appointmentNo = "";
 			}
