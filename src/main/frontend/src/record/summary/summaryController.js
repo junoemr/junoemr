@@ -393,13 +393,15 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			{
 				formService.openEFormInstancePopup($stateParams.demographicNo, item.id).then(function (val)
 				{
-					// reload data model
 					controller.refreshModel();
 				});
 			}
 			else if (item.type === 'form')
 			{
-				formService.openFormInstancePopup(item.displayName, $stateParams.demographicNo, null, item.id);
+				formService.openFormInstancePopup(item.displayName, $stateParams.demographicNo, null, item.id).then(function (val)
+				{
+					controller.refreshModel();
+				});
 			}
 			else if (item.action == 'action')
 			{
