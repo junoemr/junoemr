@@ -38,9 +38,11 @@ angular.module('Record.Summary').component('encounterNote', {
 		'$scope',
 		'$state',
 		'$stateParams',
+		'formService',
 		function ($scope,
 		          $state,
-		          $stateParams)
+		          $stateParams,
+				  formService)
 	{
 		var ctrl = this;
 
@@ -84,7 +86,7 @@ angular.module('Record.Summary').component('encounterNote', {
 		{
 			if(ctrl.note.eformData && ctrl.note.eformDataId)
 			{
-				ctrl.viewEform(ctrl.note.eformDataId);
+				formService.openEFormInstancePopup($stateParams.demographicNo, ctrl.note.eformDataId);
 			}
 			else if(ctrl.note.document && ctrl.note.documentId)
 			{
