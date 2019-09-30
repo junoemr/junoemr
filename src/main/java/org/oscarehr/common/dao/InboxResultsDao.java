@@ -394,26 +394,6 @@ public class InboxResultsDao
 					+ "AND proLR.status != 'X' "
 					+ filterSql;
 
-			if (!"".equals(patientFirstName)) {
-				sql = sql + "AND d.first_name LIKE :first_name ";
-				qp_hrm_first_name = true;
-			}
-
-			if (!"".equals(patientLastName)) {
-				sql = sql + "AND d.demographic_no LIKE :last_name ";
-				qp_hrm_last_name = true;
-			}
-
-			if (!"".equals(patientHealthNumber)) {
-				sql = sql + "AND d.hin LIKE :hin ";
-				qp_hrm_hin = true;
-			}
-
-			if (demographicNo != null && !"".equals(demographicNo)) {
-				sql = sql + "AND (d.demographic_no = :demographic_no) ";
-				qp_hrm_demographic_no = true;
-			}
-
 			sql = sql + "  "
 					+ "ORDER BY observationdate desc, document_no desc ";
 
@@ -439,10 +419,6 @@ public class InboxResultsDao
 			if (qp_start_date) { q.setParameter("start_date", startDate, TemporalType.DATE); }
 			if (qp_end_date) { q.setParameter("end_date", endDate, TemporalType.DATE); }
 			if (qp_demographic_no) { q.setParameter("demographic_no", demographicNo); }
-			if (qp_hrm_first_name) { q.setParameter("first_name", "%" + patientFirstName + "%"); }
-			if (qp_hrm_last_name) { q.setParameter("last_name", "%" + patientLastName + "%"); }
-			if (qp_hrm_hin) { q.setParameter("hin", "%" + patientHealthNumber + "%"); }
-			if (qp_hrm_demographic_no) { q.setParameter("demographic_no", demographicNo); }
 			if (qp_page) {
 				q.setParameter("page_start", page * pageSize);
 				q.setParameter("page_size", pageSize);
