@@ -215,19 +215,6 @@ angular.module('Record.Summary').component('encounterNote', {
 			var url = "../CaseManagementEntry.do?method=notehistory&noteId=" + ctrl.note.noteId;
 			window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
 		};
-		ctrl.viewEform = function viewEform(eFormId)
-		{
-			$state.transitionTo('record.forms.view',
-				{
-					demographicNo: $stateParams.demographicNo,
-					type: 'eform',
-					id: eFormId
-				},
-				{
-					location: 'replace',
-					notify: true
-				});
-		};
 		ctrl.viewDocument = function viewDocument(documentId)
 		{
 			var win = "revision";
