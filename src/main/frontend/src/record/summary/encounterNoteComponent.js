@@ -93,8 +93,9 @@ angular.module('Record.Summary').component('encounterNote', {
 				ctrl.viewDocument(ctrl.note.documentId);
 			}
 			if (ctrl.note.encounterForm)
-			{// TODO - figure this out
-
+			{
+				//note, noteId is formId.
+				formService.openFormInstancePopup(ctrl.note.note, $stateParams.demographicNo, null, ctrl.note.noteId);
 			}
 
 		};
