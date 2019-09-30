@@ -1,4 +1,4 @@
-<%--
+/*
 
 	Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
 	This software is published under the GPL GNU General Public License.
@@ -21,20 +21,33 @@
 	Victoria, British Columbia
 	Canada
 
---%>
-<div class="juno-modal-root">
-	<div class="modal-header">
-		<div ng-transclude="title" class="modal-title"></div>
-		<div ng-transclude="ctlButtons" class="modal-ctl-buttons"></div>
-	</div>
-	<div ng-transclude="body" class="modal-body" ng-class="$ctrl.hideFooter ? 'no-footer' : ''"></div>
-	<div ng-transclude="footer" class="modal-footer" ng-if="!$ctrl.hideFooter"></div>
-	<juno-loading-indicator
-			ng-if="$ctrl.showLoading"
-			class="loading-indicator-container"
-			message = "Loading"
-			message-alignment="horizontal"
-			indicator-type="spinner"
-	>
-	</juno-loading-indicator>
-</div>
+ */
+
+angular.module('Common.Components').component('junoLoadingIndicator', {
+	bindings: {
+		message: '@',
+		messageAlignment: '@',
+		indicatorType: '@',
+	},
+	templateUrl: "src/common/components/loadingIndicatorTemplate.jsp",
+	controller: function ()
+	{
+		let ctrl = this;
+		ctrl.$onInit = function ()
+		{
+			console.info(ctrl.messageAlignment);
+			ctrl.message = ctrl.message || null;
+			ctrl.messageAlignment = ctrl.messageAlignment || 'vertical';
+			ctrl.indicatorType = ctrl.indicatorType || 'spinner';
+		};
+
+		ctrl.isAlignmentVertical = function ()
+		{
+			return (ctrl.messageAlignment === 'V' || ctrl.messageAlignment === 'vertical');
+		};
+		ctrl.isAlignmentHorizontal = function ()
+		{
+			return (ctrl.messageAlignment === 'H' || ctrl.messageAlignment === 'horizontal');
+		};
+	}
+});

@@ -231,6 +231,8 @@ module.exports = {
 
 			'./src/common/components/module.js',
 			'./src/common/components/modalComponent.js',
+			'./src/common/components/loadingIndicatorComponent.js',
+			'./src/common/components/zeroStateDisplayComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
@@ -278,7 +280,8 @@ module.exports = {
 
 			'./src/schedule/module.js',
 			'./src/schedule/scheduleController.js',
-			'./src/schedule/eventController.js',
+			'./src/schedule/eventComponent.js',
+			'./src/schedule/scheduleSearchComponent.js',
 			'./src/schedule/scheduleService.js',
 
 			'./src/admin/module.js',
