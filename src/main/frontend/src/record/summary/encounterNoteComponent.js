@@ -26,13 +26,13 @@
 angular.module('Record.Summary').component('encounterNote', {
 	templateUrl: "src/record/summary/encounterNoteTemplate.jsp",
 	bindings: {
-		note: '<',
-		onEditCpp: '&',
-		onEditNote: '&',
-		onToggleSelect: '&',
+		note: '<?',
+		onEditCpp: '&?',
+		onEditNote: '&?',
+		onToggleSelect: '&?',
 
-		minimized: '<',
-		selectedForPrint: '<',
+		minimized: '<?',
+		selectedForPrint: '<?',
 	},
 	controller: [
 		'$scope',
@@ -77,7 +77,7 @@ angular.module('Record.Summary').component('encounterNote', {
 
 		ctrl.showNoteViewButton = function showNoteViewButton()
 		{
-			return (ctrl.note.eformData || ctrl.note.document);
+			return (ctrl.note.eformData || ctrl.note.document || ctrl.note.encounterForm);
 		};
 
 		ctrl.viewButtonClick = function viewButtonClick()
@@ -90,6 +90,11 @@ angular.module('Record.Summary').component('encounterNote', {
 			{
 				ctrl.viewDocument(ctrl.note.documentId);
 			}
+			if (ctrl.note.encounterForm)
+			{// TODO - figure this out
+
+			}
+
 		};
 
 		ctrl.showNoteEditButton = function showNoteEditButton()
@@ -185,13 +190,13 @@ angular.module('Record.Summary').component('encounterNote', {
 
 		ctrl.allowNoteExpansion = function allowNoteExpansion()
 		{
-			return !(ctrl.note.cpp === true || ctrl.note.document === true || ctrl.note.eformData === true);
+			return !(ctrl.note.cpp === true || ctrl.note.document === true || ctrl.note.eformData === true || ctrl.note.encounterForm);
 		};
 
 		// Returns true if the given note is an unsigned encounter note
 		ctrl.isUnsignedEncounterNote = function isUnsignedEncounterNote()
 		{
-			return (!ctrl.note.isSigned && !ctrl.note.cpp && !ctrl.note.document && !ctrl.note.ticklerNote && !ctrl.note.eformData);
+			return (!ctrl.note.isSigned && !ctrl.note.cpp && !ctrl.note.document && !ctrl.note.ticklerNote && !ctrl.note.eformData && !ctrl.note.encounterForm);
 		};
 
 		// Check if note regular note
@@ -200,6 +205,7 @@ angular.module('Record.Summary').component('encounterNote', {
 			return !(ctrl.note.document ||
 				ctrl.note.rxAnnotation ||
 				ctrl.note.eformData ||
+				ctrl.note.encounterForm ||
 				ctrl.note.encounterForm ||
 				ctrl.note.invoice ||
 				ctrl.note.ticklerNote ||
