@@ -32,6 +32,7 @@ angular.module('Record.Forms').component('formViewComponent', {
         instancedForms: '<', // true if forms are instance types
 
         filterForms: '&',
+        reloadForms: '&'
 
     },
     controller:[ 'formService', '$scope', '$stateParams', 'NgTableParams', function (formService, $scope, $stateParams, NgTableParams)
@@ -45,11 +46,15 @@ angular.module('Record.Forms').component('formViewComponent', {
         {
             if (ctrl.instancedForms)
             {
-                formService.openEFormInstancePopup($stateParams.demographicNo, form.id);
+                formService.openEFormInstancePopup($stateParams.demographicNo, form.id).then(function (val) {
+                    ctrl.reloadForms({});
+                });
             }
             else
             {
-                formService.openEFormPopup($stateParams.demographicNo, form.formId);
+                formService.openEFormPopup($stateParams.demographicNo, form.formId).then(function (val) {
+                    ctrl.reloadForms({});
+                });
             }
         };
 
@@ -57,11 +62,15 @@ angular.module('Record.Forms').component('formViewComponent', {
         {
             if (ctrl.instancedForms)
             {
-                formService.openFormInstancePopup(form.name, $stateParams.demographicNo, $stateParams.appointmentNo, form.id);
+                formService.openFormInstancePopup(form.name, $stateParams.demographicNo, $stateParams.appointmentNo, form.id).then(function (val) {
+                    ctrl.reloadForms({});
+                });
             }
             else
             {
-                formService.openFormPopup(ctrl.providerNo, $stateParams.demographicNo, $stateParams.appointmentNo, form.subject);
+                formService.openFormPopup(ctrl.providerNo, $stateParams.demographicNo, $stateParams.appointmentNo, form.subject).then(function (val) {
+                    ctrl.reloadForms({});
+                });
             }
         };
 

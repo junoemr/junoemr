@@ -300,3 +300,19 @@ Juno.Common.Util.trimToLength = function trimToLength(string, maxLength)
 	}
 	return shortString;
 };
+
+// create a promise that resolves when the provided window is closed
+Juno.Common.Util.windowClosedPromise = function (popup)
+{
+	return new Promise(function (resolve, reject)
+	{
+		let interId = window.setInterval(function()
+		{
+			if (popup.closed)
+			{
+				resolve(true);
+				window.clearInterval(interId);
+			}
+		}, 500);
+	});
+};
