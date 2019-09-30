@@ -156,8 +156,9 @@
 				var drugrefId = $("#drugrefId").val();
 				var typeCode = $("#type").val();
 				var drugName = $("#drugName").val();
+				var allergyId = $("#allergyId").val();
 
-				var isDuplicate = Juno.AllergyHelpers.isDuplicateAllergy(<%=demographicNo%>, drugrefId, typeCode, drugName);
+				var isDuplicate = Juno.AllergyHelpers.isDuplicateAllergy(<%=demographicNo%>, drugrefId, typeCode, drugName, allergyId);
 
 				if (isDuplicate)
 				{

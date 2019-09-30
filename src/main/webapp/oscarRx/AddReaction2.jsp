@@ -73,6 +73,12 @@
 				allergyToArchive = new Allergy();
 			}
 
+			String prevId = "";
+			if (allergyToArchive.getId() != null)
+			{
+				prevId = allergyToArchive.getId().toString();
+			}
+
 			PartialDateDao partialDateDao = SpringUtils.getBean(PartialDateDao.class);
 			String startDate = "";
 			if (allergyToArchive.getStartDate() != null)
@@ -146,7 +152,7 @@
 										<input type="hidden" name="ID" id="drugrefId" value="<%=allergyId%>">
 										<input type="hidden" name="name" id="drugName" value="<%=name%>">
 										<input type="hidden" name="type" id="type" value="<%=type%>">
-										<html:hidden property="allergyToArchive" value="${allergy.id}" />
+										<input type="hidden" name="allergyToArchive" id="allergyId" value="<%=prevId%>">
 									</td>
 								</tr>
 

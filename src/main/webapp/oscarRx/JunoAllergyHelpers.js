@@ -33,12 +33,14 @@ Juno.AllergyHelpers.LIFESTAGE_ADULT_LOWER_BOUND = 18;
  * @param drugrefId id in drugref db (0 if a custom drug)
  * @param typeCode type of drug being added (0 if a custom drug)
  * @param drugName user-friendly text name for the drug
+ * @param currEntryId primary key of the allergy being added/modified, if available
  * @return {boolean} true if a duplicate allergy exists, false otherwise
  */
 Juno.AllergyHelpers.isDuplicateAllergy = function isDuplicateAllergy(demographicNo,
 																	 drugrefId,
 																	 typeCode,
-																	 drugName)
+																	 drugName,
+																	 currEntryId)
 {
 	var isDuplicate = false;
 	$.ajax({
@@ -50,6 +52,11 @@ Juno.AllergyHelpers.isDuplicateAllergy = function isDuplicateAllergy(demographic
 			for (var i = 0; i < data.allergies.length; i++)
 			{
 				var allergyEntry = data.allergies[i];
+				if (String(allergyEntry['id']) === currEntryId)
+				{
+					continue;
+				}
+
 				if (allergyEntry['drugrefId'] === drugrefId &&
 					String(allergyEntry['typeCode']) === typeCode &&
 					allergyEntry['description'] === drugName)
