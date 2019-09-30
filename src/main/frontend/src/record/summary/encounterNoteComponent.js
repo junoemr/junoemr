@@ -94,8 +94,7 @@ angular.module('Record.Summary').component('encounterNote', {
 			}
 			if (ctrl.note.encounterForm)
 			{
-				//note, noteId is formId.
-				formService.openFormInstancePopup(ctrl.note.note, $stateParams.demographicNo, null, ctrl.note.noteId);
+				formService.openFormInstancePopup(ctrl.note.note, $stateParams.demographicNo, null, ctrl.note.encounterFormId);
 			}
 
 		};
@@ -208,7 +207,6 @@ angular.module('Record.Summary').component('encounterNote', {
 			return !(ctrl.note.document ||
 				ctrl.note.rxAnnotation ||
 				ctrl.note.eformData ||
-				ctrl.note.encounterForm ||
 				ctrl.note.encounterForm ||
 				ctrl.note.invoice ||
 				ctrl.note.ticklerNote ||
