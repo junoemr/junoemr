@@ -1993,13 +1993,13 @@
 		</ap-sql>
 		<ap-output>${list}</ap-output>
 	</databaseap>
-	<!-- end OHSUPPORT-3539 - measurement info for WHO forms -->
-	<!-- OHSUPPORT-5992 - Health Care Team -->
+
+	<!-- Health Care Team -->
 	<databaseap>
 		<ap-name>health_care_team_nameF</ap-name>
 		<ap-sql>
 			SELECT GROUP_CONCAT(COALESCE(provider.first_name, '-') SEPARATOR ', ') AS fName FROM DemographicContact
-			JOIN provider ON DemographicContact.contactId = provider.provider_no
+			JOIN provider ON DemographicContact.contactId = provider.provider_no AND DemographicContact.type = 0
 			WHERE demographicNo=${demographic};
 		</ap-sql>
 		<ap-output>${fName}</ap-output>
@@ -2008,7 +2008,7 @@
 		<ap-name>health_care_team_nameL</ap-name>
 		<ap-sql>
 			SELECT GROUP_CONCAT(COALESCE(provider.last_name, '-') SEPARATOR ', ') AS lName FROM DemographicContact
-			JOIN provider ON DemographicContact.contactId = provider.provider_no
+			JOIN provider ON DemographicContact.contactId = provider.provider_no AND DemographicContact.type = 0
 			WHERE demographicNo=${demographic};
 		</ap-sql>
 		<ap-output>${lName}</ap-output>
@@ -2017,7 +2017,7 @@
 		<ap-name>health_care_team_fax</ap-name>
 		<ap-sql>
 			SELECT GROUP_CONCAT(COALESCE(property.value, '-') SEPARATOR ', ') AS faxNumber FROM DemographicContact
-			JOIN provider ON DemographicContact.contactId = provider.provider_no
+			JOIN provider ON DemographicContact.contactId = provider.provider_no AND DemographicContact.type = 0
 			LEFT JOIN property ON property.provider_no = DemographicContact.contactId and property.name='faxnumber'
 			WHERE demographicNo=${demographic};
 		</ap-sql>
@@ -2027,12 +2027,11 @@
 		<ap-name>health_care_team_phone</ap-name>
 		<ap-sql>
 			SELECT GROUP_CONCAT(IF(provider.work_phone = '', '-',provider.work_phone) SEPARATOR ', ') AS phone FROM DemographicContact
-			JOIN provider ON DemographicContact.contactId = provider.provider_no
+			JOIN provider ON DemographicContact.contactId = provider.provider_no AND DemographicContact.type = 0
 			WHERE demographicNo=${demographic};
 		</ap-sql>
 		<ap-output>${phone}</ap-output>
 	</databaseap>
-	<!-- end OHSUPPORT-5992 - Health Care Team -->
 
 	<!-- family doctor -->
 	<databaseap>
