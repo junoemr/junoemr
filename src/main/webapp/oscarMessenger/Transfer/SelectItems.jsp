@@ -50,19 +50,6 @@ if(!authed) {
 <%
 String demoNo   = request.getParameter("val2");
 String prov     = request.getParameter("val1");
-
-oscar.oscarMessenger.pageUtil.MsgSessionBean bean = null;
-bean = new oscar.oscarMessenger.pageUtil.MsgSessionBean();
-
-bean.setProviderNo(prov);
-
-
-
-    bean.estUserName();
-    request.getSession().setAttribute("msgSessionBean", bean);
-
-
-
 %>
 
 
