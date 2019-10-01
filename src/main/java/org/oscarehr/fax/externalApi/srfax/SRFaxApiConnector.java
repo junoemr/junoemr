@@ -447,7 +447,7 @@ public class SRFaxApiConnector
 		ListWrapper<T> result = null;
 		try
 		{
-			if (response.isEmpty())
+			if (response.trim().isEmpty())
 			{// if the response is empty. SRFax has locked the account
 				logger.warn("API Response Error: Account is blocked at this IP");
 				result = new ListWrapper<>();
@@ -485,7 +485,7 @@ public class SRFaxApiConnector
 	private static <T> SingleWrapper processSingleResponse(String response, TypeReference typeReference)
 	{
 		SingleWrapper<T> result = null;
-		if (response.isEmpty())
+		if (response.trim().isEmpty())
 		{// if the response is empty. SRFax has locked the account
 			logger.warn("API Response Error: Account is blocked at this IP");
 			result = new SingleWrapper<>();
