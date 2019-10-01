@@ -70,14 +70,23 @@ public class LabsDocsSummary implements Summary {
 		
 		CommonLabResultData comLab = new CommonLabResultData();
         ArrayList<LabResultData> labs = comLab.populateLabResultsData(loggedInInfo, "",""+demographicNo, "", "","","U");
-                
+
+        // sort so that only the newest version of the lab is selected
+        Collections.sort(labs);
+
 		LinkedHashMap<String,LabResultData> accessionMap = new LinkedHashMap<String,LabResultData>();
-		for (int i = 0; i < labs.size(); i++) {
+		for (int i = 0; i < labs.size(); i++)
+		{
 			LabResultData result = labs.get(i);
-			if (result.accessionNumber == null || result.accessionNumber.equals("")) {
+			if (result.accessionNumber == null || result.accessionNumber.equals(""))
+			{
 				accessionMap.put("noAccessionNum" + i + result.labType, result);
-			} else {
-				if (!accessionMap.containsKey(result.accessionNumber + result.labType)) accessionMap.put(result.accessionNumber + result.labType, result);
+			} else
+			{
+				if (!accessionMap.containsKey(result.accessionNumber + result.labType))
+				{
+					accessionMap.put(result.accessionNumber + result.labType, result);
+				}
 			}
 		}
 		labs = new ArrayList<LabResultData>(accessionMap.values());
