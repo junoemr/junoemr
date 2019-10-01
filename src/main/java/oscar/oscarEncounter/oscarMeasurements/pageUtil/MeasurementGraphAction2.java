@@ -314,7 +314,7 @@ public class MeasurementGraphAction2 extends Action {
 			}
 			catch (NumberFormatException | ArrayIndexOutOfBoundsException ex)
 			{
-				MiscUtils.getLogger().warn(ex);
+				MiscUtils.getLogger().warn("Exception occurred when trying to split range: " + ex);
 				return null;
 			}
 		}

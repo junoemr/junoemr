@@ -55,6 +55,7 @@
 <%@ page import="oscar.oscarLab.ca.on.CommonLabTestValues" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.MeasurementGraphAction2" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.util.List" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -75,7 +76,7 @@
 	DemographicData dData = new DemographicData();
 	org.oscarehr.common.model.Demographic demographic =  dData.getDemographic(loggedInInfo, demographicNo);
 
-	ArrayList list = null;
+	List<Map<String, Serializable>> list = new ArrayList<Map<String, Serializable>>();
 
 	DateMapComparator comparator = new DateMapComparator("collDate");
 
@@ -100,7 +101,7 @@
 		{
 			CachedDemographicLabResult remoteLab = LabDisplayHelper.getRemoteLab(loggedInInfo, Integer.parseInt(remoteFacilityIdString), remoteLabKey,Integer.parseInt(demographicNo));
 			Document labContentsAsXml = LabDisplayHelper.getXmlDocument(remoteLab);
-			HashMap<String, ArrayList<Map<String, Serializable>>> mapOfTestValues=LabDisplayHelper.getMapOfTestValues(labContentsAsXml);
+			HashMap<String, ArrayList<Map<String, Serializable>>> mapOfTestValues = LabDisplayHelper.getMapOfTestValues(labContentsAsXml);
 			list = mapOfTestValues.get(identifier);
 		}
 
@@ -272,9 +273,8 @@
 				boolean canGraph = true;
 				if (list != null)
 				{
-					for (int i = 0 ;  i < list.size(); i++)
+					for (Map<String, Serializable> hashMap : list)
 					{
-						Map hashMap = (Map) list.get(i);
 						String lineClass = "NormalRes";
 						if (hashMap.get("abn") != null && hashMap.get("abn").equals("A"))
 						{
