@@ -26,6 +26,7 @@ package org.oscarehr.casemgmt.service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,16 +57,13 @@ import org.oscarehr.casemgmt.util.ExtPrint;
 import org.oscarehr.casemgmt.web.NoteDisplay;
 import org.oscarehr.casemgmt.web.NoteDisplayLocal;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
-import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.consultations.service.ConsultationPDFCreationService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
-import oscar.oscarLab.ca.all.pageUtil.LabPDFCreator;
-import oscar.oscarLab.ca.all.parsers.Factory;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConcatPDF;
@@ -81,6 +79,8 @@ public class CaseManagementPrint {
 	private CaseManagementManager caseManagementMgr = SpringUtils.getBean(CaseManagementManager.class);
 	private Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
 
+	// Re-using logic within the consultation PDF creation for printing labs
+	private ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
 	private NoteService noteService = SpringUtils.getBean(NoteService.class);
 	
 	private ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
@@ -303,27 +303,8 @@ public class CaseManagementPrint {
 			});
 
 
-			for (LabResultData result : labResults) {
-				String segmentId;
-
-				if (result.accessionNumber == null || result.accessionNumber.equals(""))
-				{
-					segmentId = result.segmentID;
-				}
-				else
-				{
-					Hl7TextInfo textInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(result.accessionNumber);
-					segmentId = String.valueOf(textInfo.getLabNumber());
-				}
-
-				MessageHandler handler = Factory.getHandler(segmentId);
-				String fileName2 = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "//" + handler.getPatientName().replaceAll("\\s", "_") + "_" + handler.getMsgDate() + "_LabReport.pdf";
-                                file2= new File(fileName2);
-				os2 = new FileOutputStream(file2);
-				LabPDFCreator pdfCreator = new LabPDFCreator(os2, segmentId, loggedInInfo.getLoggedInProviderNo());
-				pdfCreator.printPdf();
-				pdfDocs.add(fileName2);
-			}
+			List<InputStream> labPrintouts = consultationPDFCreationService.toLabInputStreams(labResults);
+			pdfDocs.addAll(labPrintouts);
 
 		}
 		ConcatPDF.concat(pdfDocs, os);
