@@ -24,6 +24,7 @@
 package org.oscarehr.casemgmt.service;
 
 import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.util.LoggedInInfo;
 import oscar.oscarRx.data.RxPatientData;
@@ -37,13 +38,16 @@ import java.util.List;
 
 public class EncounterAllergyService extends EncounterSectionService
 {
-	public List<EncounterSectionNote> getNotes(
+	public EncounterNotes getNotes(
 			LoggedInInfo loggedInInfo,
 			String roleName,
 			String providerNo,
 			String demographicNo,
 			String appointmentNo,
-			String programId)
+			String programId,
+			Integer limit,
+			Integer offset
+	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
@@ -66,9 +70,9 @@ public class EncounterAllergyService extends EncounterSectionService
 		}
 
 		// --- sort all results ---
-		Collections.sort(out, new EncounterSectionNote.SortChronologicAsc());
+		Collections.sort(out, new EncounterSectionNote.SortChronologicDateAsc());
 
-		return out;
+		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
 
 	private static EncounterSectionNote makeItem(Date entryDate, String description,

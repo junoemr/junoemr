@@ -296,27 +296,30 @@
 	<bean id="vacancyProgramManager" class="org.oscarehr.schedule.service.Schedule" autowire="byName" />
 	<bean id="ticklerManager" class="org.oscarehr.managers.TicklerManager" autowire="byName" />
 
-	<bean id="encounterService" class="org.oscarehr.casemgmt.service.EncounterService" autowire="byName" />
 	<bean id="encounterCPPNoteService" class="org.oscarehr.casemgmt.service.EncounterCPPNoteService" autowire="byName" />
-	<bean id="encounterPreventionNoteService" class="org.oscarehr.casemgmt.service.EncounterPreventionNoteService" autowire="byName" />
-	<bean id="encounterTicklerService" class="org.oscarehr.casemgmt.service.EncounterTicklerService" autowire="byName" />
-	<bean id="encounterDiseaseRegistryService" class="org.oscarehr.casemgmt.service.EncounterDiseaseRegistryService" autowire="byName" />
-	<bean id="encounterFormService" class="org.oscarehr.casemgmt.service.EncounterFormService" autowire="byName" />
-	<bean id="encounterEFormService" class="org.oscarehr.casemgmt.service.EncounterEFormService" autowire="byName" />
-	<bean id="encounterDocumentService" class="org.oscarehr.casemgmt.service.EncounterDocumentService" autowire="byName" />
-	<bean id="encounterMessengerService" class="org.oscarehr.casemgmt.service.EncounterMessengerService" autowire="byName" />
-	<bean id="encounterMeasurementsService" class="org.oscarehr.casemgmt.service.EncounterMeasurementsService" autowire="byName" />
-	<bean id="encounterConsultationService" class="org.oscarehr.casemgmt.service.EncounterConsultationService" autowire="byName" />
+
+	<bean id="encounterService" class="org.oscarehr.casemgmt.service.EncounterService" autowire="byName" />
+
 	<bean id="encounterAllergyService" class="org.oscarehr.casemgmt.service.EncounterAllergyService" autowire="byName" />
+	<bean id="encounterConsultationService" class="org.oscarehr.casemgmt.service.EncounterConsultationService" autowire="byName" />
+	<bean id="encounterDiseaseRegistryService" class="org.oscarehr.casemgmt.service.EncounterDiseaseRegistryService" autowire="byName" />
+	<bean id="encounterDocumentService" class="org.oscarehr.casemgmt.service.EncounterDocumentService" autowire="byName" />
+	<bean id="encounterEFormService" class="org.oscarehr.casemgmt.service.EncounterEFormService" autowire="byName" />
+	<bean id="encounterEpisodeService" class="org.oscarehr.casemgmt.service.EncounterEpisodeService" autowire="byName" />
+	<bean id="encounterFormService" class="org.oscarehr.casemgmt.service.EncounterFormService" autowire="byName" />
+	<bean id="encounterLabResultService" class="org.oscarehr.casemgmt.service.EncounterLabResultService" autowire="byName" />
+	<bean id="encounterMeasurementsService" class="org.oscarehr.casemgmt.service.EncounterMeasurementsService" autowire="byName" />
 	<bean id="encounterMedicationService" class="org.oscarehr.casemgmt.service.EncounterMedicationService" autowire="byName" />
-	<bean id="encounterUnresolvedIssueService" class="org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService" autowire="byName">
-		<property name="caseManagementManager" ref="caseManagementManager" />
-	</bean>
+	<bean id="encounterMessengerService" class="org.oscarehr.casemgmt.service.EncounterMessengerService" autowire="byName" />
+	<bean id="encounterPreventionNoteService" class="org.oscarehr.casemgmt.service.EncounterPreventionNoteService" autowire="byName" />
 	<bean id="encounterResolvedIssueService" class="org.oscarehr.casemgmt.service.EncounterResolvedIssueService" autowire="byName">
 		<property name="caseManagementManager" ref="caseManagementManager" />
 	</bean>
-	<bean id="encounterEpisodeService" class="org.oscarehr.casemgmt.service.EncounterEpisodeService" autowire="byName" />
 	<bean id="encounterTeamService" class="org.oscarehr.casemgmt.service.EncounterTeamService" autowire="byName" />
+	<bean id="encounterTicklerService" class="org.oscarehr.casemgmt.service.EncounterTicklerService" autowire="byName" />
+	<bean id="encounterUnresolvedIssueService" class="org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService" autowire="byName">
+		<property name="caseManagementManager" ref="caseManagementManager" />
+	</bean>
 
 	<!-- This is from the applicationContextCaisi.xml, but there is a struts action that relies -->
 	<!-- on it existing. -->

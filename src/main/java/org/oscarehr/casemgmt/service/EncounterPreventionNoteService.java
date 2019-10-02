@@ -24,6 +24,7 @@
 package org.oscarehr.casemgmt.service;
 
 import org.drools.FactException;
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.prevention.dao.PreventionDao;
@@ -54,10 +55,18 @@ public class EncounterPreventionNoteService extends EncounterSectionService
 	@Autowired
 	PreventionDao preventionDao;
 
-	public List<EncounterSectionNote> getNotes(LoggedInInfo loggedInInfo, String roleName, String providerNo, String demographicNo, String appointmentNo, String programId)
-			throws FactException
+	public EncounterNotes getNotes(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId,
+			Integer limit,
+			Integer offset
+	) throws FactException
 	{
-		List<EncounterSectionNote> out = new ArrayList<>();
+		List<EncounterSectionNote> noteList = new ArrayList<>();
 
 		//list warnings first as module items
 		Prevention p = PreventionData.getPrevention(loggedInInfo, Integer.valueOf(demographicNo));
@@ -167,9 +176,9 @@ public class EncounterPreventionNoteService extends EncounterSectionService
 
 		Collections.sort(items, new EncounterSectionNote.SortChronologicAsc());
 
-		out.addAll(warnings);
-		out.addAll(items);
+		noteList.addAll(warnings);
+		noteList.addAll(items);
 
-		return out;
+		return EncounterNotes.limitedEncounterNotes(noteList, offset, limit);
 	}
 }

@@ -23,6 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.model.OscarMsgType;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -45,12 +46,21 @@ public class EncounterMessengerService extends EncounterSectionService
 	//@Autowired
 	//private EFormDataDao eFormDataDao;
 
-	public List<EncounterSectionNote> getNotes(LoggedInInfo loggedInInfo, String roleName, String providerNo, String demographicNo, String appointmentNo, String programId)
+	public EncounterNotes getNotes(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId,
+			Integer limit,
+			Integer offset
+	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_msg", "r", null))
 		{
-			return out; //Oscar message link won't show up on new CME screen.
+			return EncounterNotes.noNotes();
 		}
 
 		//set text for lefthand module title
@@ -101,6 +111,6 @@ public class EncounterMessengerService extends EncounterSectionService
 			out.add(sectionNote);
 		}
 
-		return out;
+		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
 }

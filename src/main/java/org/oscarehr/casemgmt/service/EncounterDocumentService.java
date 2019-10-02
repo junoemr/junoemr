@@ -23,6 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -41,13 +42,22 @@ public class EncounterDocumentService extends EncounterSectionService
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 
-	public List<EncounterSectionNote> getNotes(LoggedInInfo loggedInInfo, String roleName, String providerNo, String demographicNo, String appointmentNo, String programId)
+	public EncounterNotes getNotes(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId,
+			Integer limit,
+			Integer offset
+	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
     	if (!securityInfoManager.hasPrivilege(loggedInInfo, "_edoc", "r", null))
     	{
-			return out; // documents link won't show up on new CME screen.
+			return EncounterNotes.noNotes();
 		}
 
     	// XXX: I think this is only used for the eyeform
@@ -210,7 +220,6 @@ public class EncounterDocumentService extends EncounterSectionService
 			out.add(sectionNote);
 		}
 
-
-		return out;
+		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
 }

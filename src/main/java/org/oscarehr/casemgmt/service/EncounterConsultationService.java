@@ -23,6 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.UserProperty;
@@ -49,12 +50,22 @@ public class EncounterConsultationService extends EncounterSectionService
 	@Autowired
 	private UserPropertyDAO userPropertyDAO;
 
-	public List<EncounterSectionNote> getNotes(LoggedInInfo loggedInInfo, String roleName, String providerNo, String demographicNo, String appointmentNo, String programId)
+	public EncounterNotes getNotes(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId,
+			Integer limit,
+			Integer offset
+	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
-		if(!securityInfoManager.hasPrivilege(loggedInInfo, "_con", "r", null)) {
-			return out; //Consultations link won't show up on new CME screen.
+		if(!securityInfoManager.hasPrivilege(loggedInInfo, "_con", "r", null))
+		{
+			return EncounterNotes.noNotes();
 		}
 
 		//set lefthand module heading and link
@@ -142,6 +153,6 @@ public class EncounterConsultationService extends EncounterSectionService
 			//Dao.addItem(item);
 		}
 
-		return out;
+		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
 }

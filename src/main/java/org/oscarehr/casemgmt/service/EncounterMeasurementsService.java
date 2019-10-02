@@ -23,6 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.dao.FlowsheetDao;
 import org.oscarehr.common.model.Flowsheet;
@@ -40,7 +41,6 @@ import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
@@ -53,13 +53,22 @@ public class EncounterMeasurementsService extends EncounterSectionService
 	@Autowired
 	FlowsheetDao flowsheetDao;
 
-	public List<EncounterSectionNote> getNotes(LoggedInInfo loggedInInfo, String roleName, String providerNo, String demographicNo, String appointmentNo, String programId)
+	public EncounterNotes getNotes(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId,
+			Integer limit,
+			Integer offset
+	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_measurement", "r", null))
 		{
-			return out; //Messurement link won't show up on new CME screen.
+			return EncounterNotes.noNotes();
 		}
 
 		//String menuId = "3"; //div id for popup menu
@@ -315,7 +324,10 @@ public class EncounterMeasurementsService extends EncounterSectionService
 				//item.setLinkTitle(title + " " + data.getDataField() + " " + formattedDate);
 				title = EctDisplayMeasurementsAction.padd(title, data.getDataField());
 				//String tmp = "<span class=\"measureCol1\">" + title + "</span>";
+
 				sectionNote.setText(title);
+
+				sectionNote.setValue(data.getDataField());
 
 				//tmp += "<span class=\"measureCol2\">" + data.getDataField() + "&nbsp;</span>";
 				//item.setValue(data.getDataField());
@@ -333,8 +345,8 @@ public class EncounterMeasurementsService extends EncounterSectionService
 		}
 
 		//Dao.sortItems(NavBarDisplayDAO.DATESORT_ASC);
-		Collections.sort(out, new EncounterSectionNote.SortChronologicAsc());
+		//Collections.sort(out, new EncounterSectionNote.SortAlphabetic());
 
-		return out;
+		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
 }

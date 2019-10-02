@@ -52,6 +52,7 @@ public class EncounterHeader
 	private String echartLinks;
 	private String imagePresentPlaceholderUrl;
 	private String imageMissingPlaceholderUrl;
+	private String appointmentNo;
 
 
 	public String getUserColour()
@@ -322,6 +323,16 @@ public class EncounterHeader
 	public void setImageMissingPlaceholderUrl(String imageMissingPlaceholderUrl)
 	{
 		this.imageMissingPlaceholderUrl = imageMissingPlaceholderUrl;
+	}
+
+	public String getAppointmentNo()
+	{
+		return appointmentNo;
+	}
+
+	public void setAppointmentNo(String appointmentNo)
+	{
+		this.appointmentNo = appointmentNo;
 	}
 
 	//=============================================================================

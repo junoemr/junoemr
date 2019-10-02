@@ -25,6 +25,7 @@ package org.oscarehr.casemgmt.service;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.casemgmt.dto.EncounterHeader;
+import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.model.ClientImage;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,80 @@ public class EncounterService
 
 	@Autowired
 	WebApplicationContext appContext;
+
+	@Autowired
+	private EncounterPreventionNoteService encounterPreventionNoteService;
+
+	@Autowired
+	private EncounterTicklerService encounterTicklerService;
+
+	@Autowired
+	private EncounterDiseaseRegistryService encounterDiseaseRegistryService;
+
+	@Autowired
+	private EncounterFormService encounterFormService;
+
+	@Autowired
+	private EncounterEFormService encounterEFormService;
+
+	@Autowired
+	private EncounterDocumentService encounterDocumentService;
+
+	@Autowired
+	private EncounterLabResultService encounterLabResultService;
+
+	@Autowired
+	private EncounterMessengerService encounterMessengerService;
+
+	@Autowired
+	private EncounterMeasurementsService encounterMeasurementsService;
+
+	@Autowired
+	private EncounterConsultationService encounterConsultationService;
+
+	@Autowired
+	private EncounterAllergyService encounterAllergyService;
+
+	@Autowired
+	private EncounterMedicationService encounterMedicationService;
+
+	@Autowired
+	private EncounterUnresolvedIssueService encounterUnresolvedIssueService;
+
+	@Autowired
+	private EncounterResolvedIssueService encounterResolvedIssueService;
+
+	@Autowired
+	private EncounterEpisodeService encounterEpisodeService;
+
+	@Autowired
+	private EncounterTeamService encounterTeamService;
+
+	public EncounterSectionService getEncounterSectionServiceByName(String serviceName)
+	{
+		switch(serviceName)
+		{
+			case EncounterSection.TYPE_PREVENTIONS: return encounterPreventionNoteService;
+			case EncounterSection.TYPE_TICKLER: return encounterTicklerService;
+			case EncounterSection.TYPE_DISEASE_REGISTRY: return encounterDiseaseRegistryService;
+			case EncounterSection.TYPE_FORMS: return encounterFormService;
+			case EncounterSection.TYPE_EFORMS: return encounterEFormService;
+			case EncounterSection.TYPE_DOCUMENTS: return encounterDocumentService;
+			case EncounterSection.TYPE_LAB_RESULTS: return encounterLabResultService;
+			case EncounterSection.TYPE_MESSENGER: return encounterMessengerService;
+			case EncounterSection.TYPE_MEASUREMENTS: return encounterMeasurementsService;
+			case EncounterSection.TYPE_CONSULTATIONS: return encounterConsultationService;
+			case EncounterSection.TYPE_ALLERGIES: return encounterAllergyService;
+			case EncounterSection.TYPE_MEDICATIONS: return encounterMedicationService;
+			case EncounterSection.TYPE_UNRESOLVED_ISSUES: return encounterUnresolvedIssueService;
+			case EncounterSection.TYPE_RESOLVED_ISSUES: return encounterResolvedIssueService;
+			case EncounterSection.TYPE_EPISODES: return encounterEpisodeService;
+			case EncounterSection.TYPE_HEALTH_CARE_TEAM: return encounterTeamService;
+		}
+
+		throw new IllegalArgumentException(String.format(
+				"EncounterSectionService identified by %s doesn't exist.", serviceName));
+	}
 
 	public EncounterHeader getEncounterHeader(
 			String providerNo,
@@ -196,6 +271,8 @@ public class EncounterService
 
 		encounterHeader.setImagePresentPlaceholderUrl(contextPath + ClientImage.imagePresentPlaceholderUrl);
 		encounterHeader.setImageMissingPlaceholderUrl(contextPath + ClientImage.imageMissingPlaceholderUrl);
+
+		encounterHeader.setAppointmentNo(appointmentNo);
 
 		return encounterHeader;
 	}

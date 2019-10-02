@@ -189,6 +189,14 @@ public class OscarProperties extends Properties {
 		return getProperty(key, "").trim().equalsIgnoreCase(val);
 	}
 
+	public Integer getIntegerProperty(String key, Integer defaultValue) {
+		key = key==null ? null : key.trim();
+
+		String propertyValue = getProperty(key, defaultValue.toString());
+
+		return Integer.parseInt(propertyValue);
+	}
+
 	/**
 	 * Will check the properties to see if that property is set and if it's set to "true", "yes" or "on".
 	 * If it is method returns true if not method returns false.
@@ -567,5 +575,9 @@ public class OscarProperties extends Properties {
 	public boolean isHealthcareTeamEnabled()
 	{
 		return isPropertyActive("DEMOGRAPHIC_PATIENT_HEALTH_CARE_TEAM");
+	}
+
+	public static Integer getNumLoadedNotes(int defaultValue) {
+		return oscarProperties.getIntegerProperty("num_loaded_notes", defaultValue);
 	}
 }

@@ -23,6 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -35,7 +36,6 @@ import oscar.util.StringUtils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -47,13 +47,37 @@ public class EncounterTicklerService extends EncounterSectionService
 	@Autowired
 	TicklerManager ticklerManager;
 
-	public List<EncounterSectionNote> getNotes(LoggedInInfo loggedInInfo, String roleName, String providerNo, String demographicNo, String appointmentNo, String programId)
+	public int getNoteCount(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId
+	)
 	{
-		List<EncounterSectionNote> out = new ArrayList<>();
+		return ticklerManager.getActiveByDemographicNoCount(
+				loggedInInfo,
+				Integer.parseInt(demographicNo)
+		);
+	}
+
+	public EncounterNotes getNotes(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId,
+			Integer limit,
+			Integer offset
+	)
+	{
+		List<EncounterSectionNote> notes = new ArrayList<>();
 
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", "r", null))
 		{
-			return out; //The link of tickler won't show up on new CME screen.
+			return EncounterNotes.noNotes();
 		}
 
 		////Set lefthand module heading and link
@@ -92,7 +116,12 @@ public class EncounterTicklerService extends EncounterSectionService
 		//String dateBegin = "1900-01-01";
 		//String dateEnd = "8888-12-31";
 
-		List<Tickler> ticklers = ticklerManager.findActiveByDemographicNo(loggedInInfo, Integer.parseInt(demographicNo));
+		List<Tickler> ticklers = ticklerManager.findActiveByDemographicNo(
+				loggedInInfo,
+				Integer.parseInt(demographicNo),
+				limit,
+				offset
+		);
 
 		//Date serviceDate;
 		//Date today = new Date(System.currentTimeMillis());
@@ -135,11 +164,16 @@ public class EncounterTicklerService extends EncounterSectionService
 
 			//item.setURL(url);
 			//Dao.addItem(item);
-			out.add(sectionNote);
+			notes.add(sectionNote);
 		}
 
-		Collections.sort(out, new EncounterSectionNote.SortChronologic());
+		//Collections.sort(out, new EncounterSectionNote.SortChronologic());
 
-		return out;
+		int noteCount = ticklerManager.getActiveByDemographicNoCount(
+				loggedInInfo,
+				Integer.parseInt(demographicNo)
+		);
+
+		return new EncounterNotes(notes, offset, limit, noteCount);
 	}
 }

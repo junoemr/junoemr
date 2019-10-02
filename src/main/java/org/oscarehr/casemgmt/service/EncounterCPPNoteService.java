@@ -24,8 +24,11 @@
 package org.oscarehr.casemgmt.service;
 
 import org.oscarehr.casemgmt.dto.EncounterCPPNote;
+import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
+import org.oscarehr.encounterNote.dao.IssueDao;
+import org.oscarehr.encounterNote.model.Issue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.util.StringUtils;
@@ -39,7 +42,73 @@ public class EncounterCPPNoteService
 	@Autowired
 	CaseManagementNoteDao caseManagementNoteDao;
 
-	public List<EncounterSectionNote> getCPPNotes(String demographicNo, long issueId)
+	@Autowired
+	private IssueDao issueDao;
+
+	public EncounterSection getInitialSection(
+			String contextPath,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String identUrl,
+			String title,
+			String colour,
+			String sectionName
+	)
+	{
+
+		return getSection(
+			contextPath,
+			providerNo,
+			demographicNo,
+			appointmentNo,
+			identUrl,
+			title,
+			colour,
+			sectionName,
+			EncounterSectionService.INITIAL_ENTRIES_TO_SHOW,
+			EncounterSectionService.INITIAL_OFFSET
+		);
+	}
+
+	public EncounterSection getSection(
+			String contextPath,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String identUrl,
+			String title,
+			String colour,
+			String sectionName,
+			Integer limit,
+			Integer offset
+	)
+	{
+
+		String addUrl = contextPath + "/CaseManagementEntry.do?method=issueNoteSave" +
+				"&providerNo=" + providerNo + "" +
+				"&demographicNo=" + demographicNo + "" +
+				"&appointmentNo=" + appointmentNo + "" +
+				"&noteId=";
+
+		// Get issue id from type
+		Issue issue = issueDao.findByCode(sectionName);
+
+		String cppIssues = issue.getId() + ";" + issue.getCode() + ";" + issue.getDescription();
+
+		EncounterSection section = new EncounterSection();
+
+		section.setTitle(title);
+		section.setColour(colour);
+		section.setCppIssues(cppIssues);
+		section.setAddUrl(addUrl);
+		section.setIdentUrl(identUrl);
+		section.setNotes(getCPPNotes(demographicNo, issue.getIssueId()));
+
+		return section;
+	}
+
+	private List<EncounterSectionNote> getCPPNotes(String demographicNo, long issueId)
 	{
 		// Get notes for that type
 		List<EncounterSectionNote> out = new ArrayList<>();

@@ -23,8 +23,95 @@
 
 package org.oscarehr.casemgmt.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EncounterNotes
 {
-	//Date serverDate;
+	private List<EncounterSectionNote> encounterSectionNotes;
+	private Integer offset;
+	private Integer limit;
+	private int noteCount;
 
+	public EncounterNotes()
+	{
+	}
+
+	public EncounterNotes(List<EncounterSectionNote> encounterSectionNotes, Integer offset, Integer limit, int noteCount)
+	{
+		this.encounterSectionNotes = encounterSectionNotes;
+		this.offset = offset;
+		this.limit = limit;
+		this.noteCount = noteCount;
+	}
+
+	public static EncounterNotes noNotes()
+	{
+		return new EncounterNotes(new ArrayList<>(), null, null, 0);
+	}
+
+	public static EncounterNotes limitedEncounterNotes(List<EncounterSectionNote> noteList, Integer offset, Integer limit)
+	{
+		EncounterNotes notes = new EncounterNotes();
+		notes.setOffset(offset);
+		notes.setLimit(limit);
+		notes.setNoteCount(noteList.size());
+
+		// Limit the whole list every time.  Seems quite complicated to convert the logic to sql.
+		if(limit != null && offset != null)
+		{
+			int upperLimit = offset + limit;
+			if(upperLimit > noteList.size())
+			{
+				upperLimit = noteList.size();
+			}
+			notes.setEncounterSectionNotes(noteList.subList(offset, upperLimit));
+		}
+		else
+		{
+			notes.setEncounterSectionNotes(noteList);
+		}
+
+		return notes;
+	}
+
+	public List<EncounterSectionNote> getEncounterSectionNotes()
+	{
+		return encounterSectionNotes;
+	}
+
+	public void setEncounterSectionNotes(List<EncounterSectionNote> encounterSectionNotes)
+	{
+		this.encounterSectionNotes = encounterSectionNotes;
+	}
+
+	public Integer getOffset()
+	{
+		return offset;
+	}
+
+	public void setOffset(Integer offset)
+	{
+		this.offset = offset;
+	}
+
+	public Integer getLimit()
+	{
+		return limit;
+	}
+
+	public void setLimit(Integer limit)
+	{
+		this.limit = limit;
+	}
+
+	public int getNoteCount()
+	{
+		return noteCount;
+	}
+
+	public void setNoteCount(int noteCount)
+	{
+		this.noteCount = noteCount;
+	}
 }

@@ -23,6 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
@@ -45,7 +46,16 @@ public class EncounterEFormService extends EncounterSectionService
 	@Autowired
 	private EFormDataDao eFormDataDao;
 
-	public List<EncounterSectionNote> getNotes(LoggedInInfo loggedInInfo, String roleName, String providerNo, String demographicNo, String appointmentNo, String programId)
+	public EncounterNotes getNotes(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId,
+			Integer limit,
+			Integer offset
+	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
@@ -53,7 +63,7 @@ public class EncounterEFormService extends EncounterSectionService
 		//String roleName = (String)request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
 
 		if(!securityInfoManager.hasPrivilege(loggedInInfo, "_eform", "r", null)) {
-			return out; //eforms link won't show up on new CME screen.
+			return EncounterNotes.noNotes();
 		}
 
 		// XXX: appears to only be used in eyeform
@@ -160,6 +170,6 @@ public class EncounterEFormService extends EncounterSectionService
 		//Dao.setJavaScript(javascript.toString());
 
 
-		return out;
+		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
 }

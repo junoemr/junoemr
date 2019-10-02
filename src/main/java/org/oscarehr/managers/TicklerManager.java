@@ -650,11 +650,20 @@ public class TicklerManager {
     		  
     		  return result;
     	  }
-    	  
-    	  public List<Tickler> findActiveByDemographicNo(LoggedInInfo loggedInInfo, Integer demographicNo) {
-    		  checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+
+		public int getActiveByDemographicNoCount(LoggedInInfo loggedInInfo, Integer demographicNo) {
+			checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+			return ticklerDao.getActiveByDemographicNoCount(demographicNo);
+		}
+
+		public List<Tickler> findActiveByDemographicNo(LoggedInInfo loggedInInfo, Integer demographicNo) {
+    	  	return findActiveByDemographicNo(loggedInInfo, demographicNo, null, null);
+		  }
+
+		  public List<Tickler> findActiveByDemographicNo(LoggedInInfo loggedInInfo, Integer demographicNo, Integer limit, Integer offset) {
+				  checkPrivilege(loggedInInfo, PRIVILEGE_READ);
     		  
-    		  List<Tickler> result = ticklerDao.findActiveByDemographicNo(demographicNo);
+    		  List<Tickler> result = ticklerDao.findActiveByDemographicNo(demographicNo, limit, offset);
     		  
     		  for(Tickler tmp:result) {
 	    		//--- log action ---

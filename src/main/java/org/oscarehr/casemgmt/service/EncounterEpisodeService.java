@@ -23,6 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.dao.EpisodeDao;
 import org.oscarehr.common.model.Episode;
@@ -38,13 +39,16 @@ import java.util.List;
 
 public class EncounterEpisodeService extends EncounterSectionService
 {
-	public List<EncounterSectionNote> getNotes(
+	public EncounterNotes getNotes(
 			LoggedInInfo loggedInInfo,
 			String roleName,
 			String providerNo,
 			String demographicNo,
 			String appointmentNo,
-			String programId)
+			String programId,
+			Integer limit,
+			Integer offset
+	)
 	{
 		// XXX: as per EctDisplayEpisodeAction, this file appears to ignore permissions, so I have
 		//      left the check out.
@@ -99,9 +103,9 @@ public class EncounterEpisodeService extends EncounterSectionService
 		catch( Exception e )
 		{
 			MiscUtils.getLogger().error("Error", e);
-			return new ArrayList<>();
+			return EncounterNotes.noNotes();
 		}
 
-		return out;
+		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
 }

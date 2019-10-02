@@ -24,10 +24,10 @@
 package org.oscarehr.casemgmt.service;
 
 import org.drools.FactException;
-import org.oscarehr.casemgmt.dto.EncounterSectionNote;
+import org.oscarehr.casemgmt.dto.EncounterNotes;
+import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.util.LoggedInInfo;
 
-import java.util.List;
 
 public abstract class EncounterSectionService
 {
@@ -42,11 +42,106 @@ public abstract class EncounterSectionService
 	protected static final String COLOUR_PENDING = "#FF00FF";
 	protected static final String COLOUR_WARNING = "#FFA500";
 
-	public abstract List<EncounterSectionNote> getNotes(
+	public static final int INITIAL_ENTRIES_TO_SHOW = 6;
+	public static final int INITIAL_OFFSET = 0;
+
+	public abstract EncounterNotes getNotes(
 			LoggedInInfo loggedInInfo,
 			String roleName,
 			String providerNo,
 			String demographicNo,
 			String appointmentNo,
-			String programId) throws FactException;
+			String programId,
+			Integer limit,
+			Integer offset
+	) throws FactException;
+
+	/*
+	public int getNoteCount(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId
+	)
+	{
+		return 0;
+	}
+	 */
+
+	public EncounterSection getInitialSection(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId,
+			String title,
+			String colour
+	) throws FactException
+	{
+		return getSection(
+				loggedInInfo,
+				roleName,
+				providerNo,
+				demographicNo,
+				appointmentNo,
+				programId,
+				title,
+				colour,
+				INITIAL_ENTRIES_TO_SHOW,
+				INITIAL_OFFSET
+		);
+	}
+
+	public EncounterSection getSection(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId,
+			String title,
+			String colour,
+			Integer limit,
+			Integer offset
+	) throws FactException
+	{
+		EncounterSection section = new EncounterSection();
+
+		section.setTitle(title);
+		section.setColour(colour);
+		section.setCppIssues("");
+		section.setAddUrl("");
+		section.setIdentUrl("");
+
+		EncounterNotes notes = getNotes(
+				loggedInInfo,
+				roleName,
+				providerNo,
+				demographicNo,
+				appointmentNo,
+				programId,
+				limit,
+				offset
+		);
+
+		section.setNotes(notes.getEncounterSectionNotes());
+
+		section.setRemainingNotes(notes.getNoteCount() - notes.getEncounterSectionNotes().size());
+
+		/*
+		// Ask for one more note than is required.  If the full amount is returned, show the
+		// controls to show all notes, and remove it from the results.
+		if(notes.size() > INITIAL_ENTRIES_TO_SHOW)
+		{
+			notes.remove(notes.size() - 1);
+			section.setShowingPartialNoteList(true);
+		}
+		 */
+
+
+		return section;
+	}
 }

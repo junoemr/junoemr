@@ -23,6 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -44,13 +45,22 @@ public class EncounterDiseaseRegistryService extends EncounterSectionService
 	@Autowired
 	protected SecurityInfoManager securityInfoManager;
 
-	public List<EncounterSectionNote> getNotes(LoggedInInfo loggedInInfo, String roleName, String providerNo, String demographicNo, String appointmentNo, String programId)
+	public EncounterNotes getNotes(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId,
+			Integer limit,
+			Integer offset
+	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_dxresearch", "r", null))
 		{
-			return out;
+			return EncounterNotes.noNotes();
 		}
 
 		////set lefthand module heading and link
@@ -120,9 +130,9 @@ public class EncounterDiseaseRegistryService extends EncounterSectionService
 			out.add(sectionNote);
 		}
 
-		Collections.sort(out, new EncounterSectionNote.SortChronologic());
+		Collections.sort(out, new EncounterSectionNote.SortChronologicAsc());
 
 
-		return out;
+		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
 }

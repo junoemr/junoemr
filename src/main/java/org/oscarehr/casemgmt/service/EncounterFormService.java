@@ -23,6 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.dao.EncounterFormDao;
 import org.oscarehr.common.model.EncounterForm;
@@ -48,13 +49,22 @@ public class EncounterFormService extends EncounterSectionService
 	@Autowired
 	private EncounterFormDao encounterFormDao;
 
-	public List<EncounterSectionNote> getNotes(LoggedInInfo loggedInInfo, String roleName, String providerNo, String demographicNo, String appointmentNo, String programId)
+	public EncounterNotes getNotes(
+			LoggedInInfo loggedInInfo,
+			String roleName,
+			String providerNo,
+			String demographicNo,
+			String appointmentNo,
+			String programId,
+			Integer limit,
+			Integer offset
+	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_form", "r", null))
 		{
-			return out; // The link of form won't show up on new CME screen.
+			return EncounterNotes.noNotes();
 		}
 
 		//try
@@ -242,6 +252,6 @@ public class EncounterFormService extends EncounterSectionService
 		//	return false;
 		//}
 
-		return out;
+		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
 }

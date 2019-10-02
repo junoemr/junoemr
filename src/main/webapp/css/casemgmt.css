@@ -1,5 +1,5 @@
 BODY {
-	FONT-SIZE: Normal;
+	font-size: Normal;
 	FONT-FAMILY: Verdana, Tahoma, Arial, sans-serif;
 }
 
@@ -37,7 +37,7 @@ TH {
 	color: #FFFFFF;
 	font-size: 14pt;
 	font-weight: bold;
-	text-align: centre;
+	text-align: center;
 }
 
 .searchTitle {
@@ -45,8 +45,7 @@ TH {
 	color: #000000;
 	font-weight: bold;
 	text-align: left;
-	height
-	="20px"
+	height: 20px;
 }
 
 .title {
@@ -54,8 +53,7 @@ TH {
 	color: #000000;
 	font-weight: bold;
 	text-align: center;
-	height
-	="20px"
+	height: 20px;
 }
 
 .fieldTitle {
@@ -406,3 +404,68 @@ div.autocomplete ul li {
 
 .reviewer {
 }
+
+a.expandCasemgmtSidebar {
+	text-decoration:none;
+	width:7px;
+	z-index: 100;
+	position:relative;
+	margin: 0px;
+	padding-bottom: 0px;
+	vertical-align: bottom;
+	display: inline;
+	float: right;
+	clear:both;
+}
+
+div.encounterNavBar li.encounterNote {
+	overflow: hidden;
+	clear:both;
+	position:relative;
+	display:block;
+	white-space:nowrap;
+}
+
+div.encounterNavBar li.encounterNoteEven, div.topBox li.encounterNoteEven {
+	background-color: #f3f3f3;
+}
+
+div.encounterNavBar li.encounterNoteOdd, div.topBox li.encounterNoteOdd {
+	background-color: white;
+}
+
+div.encounterNavBar span.encounterNoteTitle {
+	z-index: 1;
+	position:absolute;
+	margin-right:10px;
+	width:90%;
+	overflow:hidden;
+	height:1.2em;
+	white-space:nowrap;
+	float:left;
+	text-align:left;
+}
+
+div.encounterNavBar a.encounterNoteTitle {
+	text-decoration: none;
+	width: 7px;
+	z-index: 100;
+	position: relative;
+	margin: 0px;
+	padding-bottom: 0px;
+	vertical-align: bottom;
+	display: inline;
+	float: right;
+	clear: both;
+}
+
+div.encounterNavBar span.encounterNoteDate {
+	z-index: 100;
+	overflow:hidden;
+	position:relative;
+	height:1.2em;
+	white-space:nowrap;
+	float:right;
+	text-align:right;
+}
+

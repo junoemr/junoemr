@@ -24,6 +24,7 @@
 package org.oscarehr.casemgmt.service;
 
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.dao.ContactDao;
 import org.oscarehr.common.dao.DemographicContactDao;
@@ -40,7 +41,7 @@ import oscar.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EncounterTeamService extends EncounterEpisodeService
+public class EncounterTeamService extends EncounterSectionService
 {
 	@Autowired
 	DemographicContactDao demographicContactDao;
@@ -54,15 +55,18 @@ public class EncounterTeamService extends EncounterEpisodeService
 	@Autowired
 	ProfessionalSpecialistDao professionalSpecialistDao;
 
-	public List<EncounterSectionNote> getNotes(
+	public EncounterNotes getNotes(
 			LoggedInInfo loggedInInfo,
 			String roleName,
 			String providerNo,
 			String demographicNo,
 			String appointmentNo,
-			String programId)
+			String programId,
+			Integer limit,
+			Integer offset
+	)
 	{
-		List<EncounterSectionNote> out = new ArrayList<>();
+		List<EncounterSectionNote> notes = new ArrayList<>();
 
 		try
 		{
@@ -205,16 +209,16 @@ public class EncounterTeamService extends EncounterEpisodeService
 
 
 				//Dao.addItem(item);
-				out.add(sectionNote);
+				notes.add(sectionNote);
 			}
 
 		}
 		catch(Exception e)
 		{
 			MiscUtils.getLogger().error("Error", e);
-			return new ArrayList<>();
+			return EncounterNotes.noNotes();
 		}
 
-		return out;
+		return EncounterNotes.limitedEncounterNotes(notes, offset, limit);
 	}
 }

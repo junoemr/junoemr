@@ -48,6 +48,7 @@ import java.util.Properties;
 import java.util.Vector;
  */
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.util.LoggedInInfo;
 
@@ -59,13 +60,16 @@ public class EncounterDecisionSupportService extends EncounterSectionService
 	//@Autowired
 	//DSService dsService;
 
-	public List<EncounterSectionNote> getNotes(
+	public EncounterNotes getNotes(
 			LoggedInInfo loggedInInfo,
 			String roleName,
 			String providerNo,
 			String demographicNo,
 			String appointmentNo,
-			String programId)
+			String programId,
+			Integer limit,
+			Integer offset
+	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 		/*
@@ -212,6 +216,6 @@ public class EncounterDecisionSupportService extends EncounterSectionService
 			javascript.append("</script>");
 			Dao.setJavaScript(javascript.toString());
 		 */
-		return out;
+		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
 }

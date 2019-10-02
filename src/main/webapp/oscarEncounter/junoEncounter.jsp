@@ -39,6 +39,7 @@
 <%@ page import="java.util.List"%>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="oscar.util.StringUtils" %>
+<%@ page import="org.oscarehr.sharingcenter.SharingCenterUtil" %>
 
 <jsp:useBean id="junoEncounterForm" scope="request" type="org.oscarehr.casemgmt.web.formbeans.JunoEncounterFormBean"/>
 
@@ -115,9 +116,17 @@
 		<!-- phr popups -->
 		<script type="text/javascript" src="<c:out value="${ctx}/phr/phr.js"/>"></script>
 
+		<script type="text/javascript" src="<c:out value="${ctx}/casemgmt/EncounterTimer.js"/>"></script>
+
 		<script type="text/javascript">
 
 			var ctx = '<c:out value="${ctx}"/>';
+
+			var notesOffset = 0;
+			var notesIncrement = <%= OscarProperties.getNumLoadedNotes(20) %>;
+			var notesRetrieveOk = false;
+			var notesCurrentTop = null;
+			var notesScrollCheckInterval = null;
 
 			var cppIssues = new Array(7);
 			var cppNames = new Array(7);
@@ -172,7 +181,6 @@
 			exKeys[8] = "Life Stage";
 			exKeys[9] = "Hide Cpp";
 			exKeys[10] = "Problem Description";
-
 
 			function prepareExtraFields(cpp, exts)
 			{
@@ -582,9 +590,30 @@
 				return false;
 			}
 
-			function notesLoader(ctx, offset, numToReturn, demoNo)
+			function notesIncrementAndLoadMore(demographicNo)
+			{
+				//console.log("==================================");
+				//console.log("scroll check");
+				//console.log(notesRetrieveOk);
+				//console.log($("encMainDiv").scrollTop);
+
+				if (notesRetrieveOk && $("encMainDiv").scrollTop == 0)
+				{
+					if ($("encMainDiv").scrollHeight > $("encMainDiv").getHeight())
+					{
+						notesOffset += notesIncrement;
+						notesRetrieveOk = false;
+						notesCurrentTop = $("encMainDiv").children[0].id;
+						notesLoader(ctx, notesOffset, notesIncrement, demographicNo, false);
+					}
+				}
+			}
+
+			function notesLoader(ctx, offset, numToReturn, demoNo, scrollToBottom)
 			{
 				$("notesLoading").style.display = "inline";
+
+/*
 				var params = "method=viewNotesOpt&offset=" + offset + "&numToReturn=" + numToReturn + "&demographicNo=" + demoNo;
 				var params2 = jQuery("input[name='filter_providers'],input[name='filter_roles'],input[name='issues'],input[name='note_sort']").serialize();
 				if (params2.length > 0)
@@ -609,16 +638,35 @@
 							if (notesCurrentTop != null) $(notesCurrentTop).scrollIntoView();
 						}
 					});
+*/
 
 				jQuery.ajax({
-					type: "POST",
+					type: "GET",
 					contentType: "application/json",
 					dataType: "json",
-					url: "../ws/rs/notes/" + demoNo + "/all?numberToReturn=20&offset=0",
-					data: {},
+					url: "../ws/rs/notes/" + demoNo + "/all?numberToReturn=" + notesIncrement + "&offset=" + offset,
 					success: function(response)
 					{
-						displayNotes(response.body.notelist);
+
+						$("notesLoading").style.display = "none";
+						displayNotes(response.body.notelist, scrollToBottom, offset);
+
+
+						if(typeof response !== undefined && 'body' in response)
+						{
+							notesRetrieveOk = response.body.moreNotes;
+						}
+
+						if (!notesRetrieveOk)
+						{
+							clearInterval(scrollCheckInterval);
+						}
+/*
+						if (notesCurrentTop != null)
+						{
+							$(notesCurrentTop).scrollIntoView();
+						}
+*/
 					}
 				});
 
@@ -651,24 +699,44 @@
 				 */
 			}
 
-			function displayNotes(noteArray)
+			function displayNotes(noteArray, scrollToBottom, offset)
 			{
+				if(!jQuery.isArray(noteArray) || noteArray.length == 0)
+				{
+					return;
+				}
+
 				var containerDiv = jQuery('div#encMainDiv');
 
-				jQuery.each(noteArray.reverse(), function(index, note)
+				var firstNoteNode = null;
+				jQuery.each(noteArray, function(index, note)
 				{
+					var noteNode = null;
 
 					if(isEncounterNote(note))
 					{
-						buildNoteEntry(containerDiv, index, note);
+						noteNode = buildNoteEntry(containerDiv, index + offset, note);
 					}
 					else
 					{
-						buildNonNoteEntry(containerDiv, index, note);
+						noteNode = buildNonNoteEntry(containerDiv, index + offset, note);
+					}
+
+					if(firstNoteNode === null)
+					{
+						firstNoteNode = noteNode;
 					}
 				});
 
-
+				if(scrollToBottom)
+				{
+					containerDiv.scrollTop(containerDiv.prop("scrollHeight"));
+				}
+				else
+				{
+					console.log(firstNoteNode);
+					firstNoteNode[0].scrollIntoView();
+				}
 
 				<%--
 					//display last saved note for editing
@@ -713,7 +781,7 @@
 				var date = moment(note.observationDate);
 
 				var noteDiv = jQuery('<div id="nc' + index + '" style="display:block;" class="note" />')
-					.appendTo(containerDiv);
+					.prependTo(containerDiv);
 
 				var noteDiv2 = jQuery('<div id="n' + note.noteId + '" />')
 					.appendTo(noteDiv);
@@ -738,6 +806,8 @@
 				noteDiv5.append(" &nbsp; Rev ");
 
 				noteDiv5.append('<a style="color:#ddddff;" href="#" onclick="return showHistory(\'' + note.noteId +'\', event);">' + note.revision + '</a>');
+
+				return noteDiv;
 			}
 
 			function buildNoteEntry(containerDiv, index, note)
@@ -748,7 +818,9 @@
 					noteLineArray: note.note.split("\n")
 				};
 
-				jQuery('#encounterNoteTemplate').tmpl(templateParameters).appendTo(containerDiv);
+				var newNode = jQuery('#encounterNoteTemplate').tmpl(templateParameters);
+
+				return newNode.prependTo(containerDiv);
 			}
 
 			function isEncounterNote(note)
@@ -809,6 +881,87 @@
 				return '#000000';
 			}
 
+			function getEncounterSectionUrl(sectionName, demographicNo, appointmentNo, limit, offset)
+			{
+				var limitString = "";
+				var offsetString = "";
+
+				if(limit !== null)
+				{
+					limitString = "&limit=" + limit;
+				}
+
+				if(offset !== null)
+				{
+					offsetString = "&offset=" + offset;
+				}
+
+				return "../ws/rs/encounterSections/" + demographicNo + "/" + sectionName + "/?appointmentNo=" +
+					appointmentNo + limitString + offsetString;
+			}
+
+			function getSectionRemote(sectionName, getAll)
+			{
+				var appointmentNo = <c:out value="${junoEncounterForm.header.appointmentNo}" />;
+				var demographicNo = <c:out value="${junoEncounterForm.header.demographicNo}" />;
+				//var sectionNoteJsonString = "[{\"sectionName\":\"Section Name\",\"remainingNotes\":\"10\",\"colour\":\"#005500\",\"text\":\"OMG! TEXT!\",\"updateDate\":\"01-Jan-1900\"}]";
+				//var sectionNoteArray = jQuery.parseJSON(sectionNoteJsonString);
+
+				var limit = null;
+				var offset = null;
+				if(!getAll)
+				{
+					limit = 6;
+					offset = 0;
+				}
+
+				jQuery.ajax({
+					type: "GET",
+					contentType: "application/json",
+					dataType: "json",
+					url: getEncounterSectionUrl(sectionName, demographicNo, appointmentNo, limit, offset),
+					success: function(response)
+					{
+						var containerDiv = jQuery('#' + sectionName + 'list');
+
+						containerDiv.empty();
+
+						jQuery.each(response.body.notes, function(index, note)
+						{
+							note.sectionName = sectionName;
+							note.updateDateFormatted = "";
+							if(note.updateDate !== null)
+							{
+								var updateMoment = moment(note.updateDate);
+								note.updateDateFormatted = updateMoment.format("DD-MMM-YYYY");
+							}
+
+							note.rowClass = "encounterNoteOdd";
+							if(index % 2 == 0)
+							{
+								note.rowClass = "encounterNoteEven";
+							}
+
+							// Show the close arrow on the first and last row
+							if(getAll && (index == 0 || index == response.body.notes.length - 1))
+							{
+								note.showCollapse = true;
+							}
+							else if(!getAll && index == response.body.notes.length - 1)
+							{
+								note.showExpand = true;
+							}
+
+							var newNode = jQuery('#sectionNoteTemplate').tmpl(note);
+
+							return newNode.appendTo(containerDiv);
+						});
+					}
+				});
+
+
+			}
+
 
 			function init() {
 
@@ -853,10 +1006,15 @@
 
 				//var calculatorMenu = jQuery('#calculators_menu');
 
-				notesIncrement = parseInt("<%=OscarProperties.getInstance().getProperty("num_loaded_notes", "20") %>");
+				//notesIncrement = parseInt("<%=OscarProperties.getInstance().getProperty("num_loaded_notes", "20") %>");
 
-				notesLoader(ctx, 0, notesIncrement, ${junoEncounterForm.header.demographicNo});
-				//notesScrollCheckInterval = setInterval('notesIncrementAndLoadMore()', 2000);
+				var demographicNo = ${junoEncounterForm.header.demographicNo};
+				notesLoader(ctx, 0, notesIncrement, demographicNo, true);
+
+				notesScrollCheckInterval = setInterval(function()
+				{
+					notesIncrementAndLoadMore(demographicNo)
+				}, 2000);
 
 				//bindCalculatorListener(calculatorMenu);
 			}
@@ -923,6 +1081,8 @@
 
 			<style type="text/css">
 
+			html {overflow-y: scroll; }
+
 			.encTypeCombo /* look&feel of scriptaculous select box*/ {
 				margin: 0px; /* 5px 10px 0px;*/
 				font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
@@ -960,6 +1120,51 @@
 
 		</style>
 
+
+		<script id="sectionNoteTemplate" type="text/x-jquery-tmpl">
+
+			<li class="encounterNote \${rowClass}">
+				{{if showExpand }}
+				<a href="#" class="expandCasemgmtSidebar" onclick="getSectionRemote('\${sectionName}', true); return false;" title="\${remainingNotes} more items">
+					<img id="imgpreventions5" src="graphics/expand.gif" />&nbsp;&nbsp;
+				</a>
+				{{else showCollapse }}
+				<a href="#" class="expandCasemgmtSidebar" onclick="getSectionRemote('\${sectionName}', false); return false;" title="\${remainingNotes} more items">
+					<img id="imgpreventions5" src="../oscarMessenger/img/collapse.gif" />&nbsp;&nbsp;
+				</a>
+				{{else}}
+				<a border="0" class="expandCasemgmtSidebar">
+					<img id="img\${sectionName}1" src="/images/clear.gif" />&nbsp;&nbsp;
+				</a>
+				{{/if}}
+				<span class="encounterNoteTitle">
+					<a
+						class="links"
+						style="color: \${colour};"
+						onmouseover="this.className='linkhover'"
+						onmouseout="this.className='links'"
+						href="#" onclick=""
+						title="Flu=Influenza vaccine"
+					>
+						\${text}
+					</a>
+				</span>
+				<span class="encounterNoteDate">
+					{{if updateDateFormatted}}...{{/if}}<a
+						class="links"
+						style="margin-right: 2px; color: \${colour};"
+						onmouseover="this.className='linkhover'"
+						onmouseout="this.className='links'"
+						href="#"
+						onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;"
+						title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
+					>
+						\${value}
+						\${updateDateFormatted}
+					</a>
+				</span>
+			</li>
+		</script>
 
 		<script id="encounterNoteTemplate" type="text/x-jquery-tmpl">
 
@@ -1114,6 +1319,7 @@
 
 
 
+		<%--
 		<div id="rightNavBar" style="display: inline; float: right; width: 20%; margin-left: -3px;">
 			<%
 			String demo=request.getParameter("demographicNo");
@@ -1140,6 +1346,7 @@
 					</c:otherwise>
 				</c:choose>
 			</security:oscarSec>
+			--%>
 
 			<!-- MARC-HI's Sharing Center -->
 <%--			<% if (isSharingCenterEnabled) { %>
@@ -1150,166 +1357,260 @@
 			</div>
 			<% } %>--%>
 
-			<div id="rightColLoader" style="width: 100%;">
+					<%--
+			<div class="encounterNavBar" id="rightColLoader" style="width: 100%;">
 
-				<%
-				// =================================================================================
-				// Right sidebar
-				// =================================================================================
-				%>
-				<c:forEach items="${junoEncounterForm.rightNoteSections}" var="sectionName" varStatus="loop">
-
-					<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
-
-					<div class="leftBox" id="${sectionName}" style="display: block;">
-
-						<form style="display: none;" name="dummyForm" action="">
-							<input type="hidden" id="reloadDiv" name="reloadDiv" value="none" onchange="updateDiv();">
-						</form>
-
-						<div id='menuTitle${sectionName}' style="width: 10%; float: right; text-align: center;">
-							<h3 style="padding:0px; background-color: ${section.colour};">
-								<a href="javascript:void(0);" onclick="return false;">+</a>
-							</h3>
-						</div>
-
-						<div style="clear: left; float: left; width: 90%;">
-							<h3 style="width:100%; background-color: ${section.colour}">
-								<a href="#" onclick="return false;">
-									${section.title}
-								</a>
-							</h3>
-						</div>
-
-						<ul id="${sectionName}list">
+						<%
+						// =================================================================================
+						// Right sidebar
+						// =================================================================================
+						%>
+						<c:forEach items="${junoEncounterForm.rightNoteSections}" var="sectionName" varStatus="loop">
 
 							<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
 
-							<c:forEach items="${section.notes}" var="note" varStatus="loop">
+							<div class="leftBox" id="${sectionName}" style="display: block;">
 
-								<li style="overflow: hidden; clear:both; position:relative; display:block; white-space:nowrap; ">
-									<a border="0" style="text-decoration:none; width:7px; z-index: 100; background-color: white; position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;"><img id="img${sectionName}1" src="/images/clear.gif">&nbsp;&nbsp;</a>
-									<span style=" z-index: 1; position:absolute; margin-right:10px; width:90%; overflow:hidden;  height:1.2em; white-space:nowrap; float:left; text-align:left; ">
-									<a
-											class="links"
-											style="color: ${note.colour};"
-											onmouseover="this.className='linkhover'"
-											onmouseout="this.className='links'"
-											href="#" onclick=""
-											title="Flu=Influenza vaccine"
-									>
-										<c:choose>
-											<c:when test="${note.colouredTitle}">
-												<span class="${fn:join(note.titleClasses, ' ')}">
-													<c:out value="${note.text}" />
+								<form style="display: none;" name="dummyForm" action="">
+									<input type="hidden" id="reloadDiv" name="reloadDiv" value="none" onchange="updateDiv();">
+								</form>
+
+								<div id='menuTitle${sectionName}' style="width: 10%; float: right; text-align: center;">
+									<h3 style="padding:0px; background-color: ${section.colour};">
+										<a href="javascript:void(0);" onclick="return false;">+</a>
+									</h3>
+								</div>
+
+								<div style="clear: left; float: left; width: 90%;">
+									<h3 style="width:100%; background-color: ${section.colour}">
+										<a href="#" onclick="return false;">
+											${section.title}
+										</a>
+									</h3>
+								</div>
+
+								<ul id="${sectionName}list">
+
+									<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
+
+									<c:forEach items="${section.notes}" var="note" varStatus="loop">
+
+										<li class="encounterNote ${loop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
+											<a class="encounterNoteTitle" border="0" style=""><img id="img${sectionName}1" src="/images/clear.gif">&nbsp;&nbsp;</a>
+											<span class="encounterNoteTitle">
+												<a
+														class="links"
+														style="color: ${note.colour};"
+														onmouseover="this.className='linkhover'"
+														onmouseout="this.className='links'"
+														href="#" onclick=""
+														title="Flu=Influenza vaccine"
+												>
+													<c:choose>
+														<c:when test="${note.colouredTitle}">
+															<span class="${fn:join(note.titleClasses, ' ')}">
+																<c:out value="${note.text}" />
+															</span>
+														</c:when>
+														<c:otherwise>
+															<c:out value="${note.text}" />
+														</c:otherwise>
+													</c:choose>
+												</a>
+											</span>
+											<fmt:parseDate value="${note.updateDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedUpdateDate" />
+											<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
+											<c:if test="${not empty updateDate}">
+												<span class="encounterNoteDate">
+													...<a
+															class="links"
+															style="margin-right: 2px; color: ${note.colour};"
+															onmouseover="this.className='linkhover'"
+															onmouseout="this.className='links'"
+															href="#"
+															onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;"
+															title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
+													>
+														<c:out value="${updateDate}" />
+													</a>
 												</span>
-											</c:when>
-											<c:otherwise>
-												<c:out value="${note.text}" />
-											</c:otherwise>
-										</c:choose>
-									</a>
-								</span>
-									<span style="z-index: 100; background-color: #f3f3f3; overflow:hidden;   position:relative; height:1.2em; white-space:nowrap; float:right; text-align:right;">
-									<fmt:parseDate value="${note.updateDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedUpdateDate" />
-									<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
-									...<a
-											class="links"
-											style="margin-right: 2px; color: ${note.colour};"
-											onmouseover="this.className='linkhover'"
-											onmouseout="this.className='links'"
-											href="#"
-											onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;"
-											title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
-									>
-										<c:out value="${updateDate}" />
-									</a>
-								</span>
-								</li>
+											</c:if>
 
-							</c:forEach>
-						</ul>
+											if (curNum == 0 && xpanded)
+											{
+											imgName = "img" + request.getAttribute("navbarName") + curNum;
+											out.println("<a href='#' onclick=\"return false;\" style='text-decoration:none; width:7px; z-index: 100; " + dateColour + " position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;'><img id='" + imgName + "' src='" + request.getContextPath() + "/oscarMessenger/img/collapse.gif'/>&nbsp;&nbsp;</a>");
+											js.append("imgfunc['" + imgName + "'] = clickListDisplay.bindAsEventListener(obj,'" + request.getAttribute("navbarName") + "', '" + displayThreshold + "');");
+											js.append("Element.observe($('" + imgName + "'), 'click', imgfunc['" + imgName + "']);");
+											}
+											else if (j == (numToDisplay - 1) && xpanded)
+											{
+											imgName = "img" + request.getAttribute("navbarName") + curNum;
+											out.println("<a href='#' onclick=\"return false;\" style='text-decoration:none; width:7px; z-index: 100; " + dateColour + " position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;'><img id='" + imgName + "' src='" + request.getContextPath() + "/oscarMessenger/img/collapse.gif'/>&nbsp;&nbsp;</a>");
+											js.append("imgfunc['" + imgName + "'] = clickListDisplay.bindAsEventListener(obj,'" + request.getAttribute("navbarName") + "', '" + displayThreshold + "');");
+											js.append("Element.observe($('" + imgName + "'), 'click', imgfunc['" + imgName + "']);");
+											}
+											else if (j == (numToDisplay - 1) && numItems > (curNum + 1))
+											{
+											imgName = "img" + request.getAttribute("navbarName") + curNum;
+											out.println("<a href='#' onclick=\"return false;\" title='" + String.valueOf(numItems - j - 1) + " more items' style=' text-decoration:none; width:7px; z-index: 100; " + dateColour + " position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;'><img id='" + imgName + "' src='" + request.getContextPath() + "/oscarEncounter/graphics/expand.gif'/>&nbsp;&nbsp;</a>");
+											js.append("imgfunc['" + imgName + "'] = clickLoadMore.bindAsEventListener(obj,'" + request.getAttribute("navbarName") + "','" + reloadUrl + "');");
+											js.append("Element.observe($('" + imgName + "'), 'click', imgfunc['" + imgName + "']);");
+											}
+											else
+											{
+											out.println("<a border=0 style='text-decoration:none; width:7px; z-index: 100; " + dateColour + " position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;'><img  id='img" + request.getAttribute("navbarName") + curNum + "' src='" + request.getContextPath() + "/images/clear.gif'/>&nbsp;&nbsp;</a>");
+											}
+											<c:if test="${ section.remainingNotes > 0 }">
+												<a href="#" onclick="return false;" title="${section.remainingNotes} more items" class="expandCasemgmtSidebar">
+													<img id="imgpreventions5" src="/bcdemo15/oscarEncounter/graphics/expand.gif">&nbsp;&nbsp;
+												</a>
+											</c:if>
+										</li>
+
+									</c:forEach>
+								</ul>
+							</div>
+						</c:forEach>
 					</div>
-				</c:forEach>
+				</div>
+		--%>
 
+		<c:set var="navbarSides" value="${fn:split('right,left', ',')}"></c:set>
+		<c:forEach items="${navbarSides}" var="navbarSide">
+			<c:if test="${navbarSide == 'left'}">
+				<c:set var="noteSections" value="${junoEncounterForm.leftNoteSections}" />
+				<div id="leftNavBar" style="display: inline; float: left; width: 20%;">
+			</c:if>
+			<c:if test="${navbarSide == 'right'}">
+				<c:set var="noteSections" value="${junoEncounterForm.rightNoteSections}" />
+				<div id="rightNavBar" style="display: inline; float: right; width: 20%; margin-left: -3px;">
+					<%
+						String demo=request.getParameter("demographicNo");
+						String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 
+						// XXX: Do we want the sharing center?  If so put this in the action form.
+						// MARC-HI's Sharing Center
+						boolean isSharingCenterEnabled = SharingCenterUtil.isEnabled();
 
-			</div>
-		</div>
+					%>
 
-		<div id="leftNavBar" style="display: inline; float: left; width: 20%;">
-
-			<%
-			// =================================================================================
-			// Left sidebar
-			// =================================================================================
-			%>
-			<c:forEach items="${junoEncounterForm.leftNoteSections}" var="sectionName" varStatus="loop">
-
-				<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
-
-				<div class="leftBox" id="${sectionName}" style="display: block;">
-
-					<form style="display: none;" name="dummyForm" action="">
-						<input type="hidden" id="reloadDiv" name="reloadDiv" value="none" onchange="updateDiv();">
-					</form>
-
-					<div id='menuTitle${sectionName}' style="width: 10%; float: right; text-align: center;">
-						<h3 style="padding:0px; background-color: ${section.colour};">
-							<a href="javascript:void(0);" onclick="return false;">+</a>
-						</h3>
+					<!--dummmy div to force browser to allocate space -->
+					<security:oscarSec roleName="<%=roleName$%>" objectName="_newCasemgmt.photo" rights="r">
+						<c:choose>
+							<c:when test="${not empty requestScope.image_exists}">
+								<img style="cursor: pointer;" id="ci" src="${fn:escapeXml(junoEncounterForm.header.imagePresentPlaceholderUrl)}" alt="id_photo" height="100" title="Click to upload new photo."
+									 OnMouseOver="document.getElementById('ci').src='../imageRenderingServlet?source=local_client&clientId=${fn:escapeXml(junoEncounterForm.header.demographicNo)}'"
+									 OnMouseOut="delay(5000)" window.status='Click to upload new photo'; return true;"
+								onClick="popupUploadPage('uploadimage.jsp',${fn:escapeXml(junoEncounterForm.header.demographicNo)});return false;" />
+							</c:when>
+							<c:otherwise>
+								<img style="cursor: pointer;" src="${fn:escapeXml(junoEncounterForm.header.imageMissingPlaceholderUrl)}" alt="No_Id_Photo" height="100" title="Click to upload new photo." OnMouseOver="window.status='Click to upload new photo';return true"
+									 onClick="popupUploadPage('../casemgmt/uploadimage.jsp',${fn:escapeXml(junoEncounterForm.header.demographicNo)});return false;" />
+							</c:otherwise>
+						</c:choose>
+					</security:oscarSec>
+					<!-- MARC-HI's Sharing Center -->
+					<% if (isSharingCenterEnabled) { %>
+					<div>
+						<button type="button" onclick="window.open('${ctx}/sharingcenter/documents/demographicExport.jsp?demographic_no=<%=demo%>');">
+							Export Patient Demographic
+						</button>
 					</div>
+					<% } %>
+			</c:if>
 
-					<div style="clear: left; float: left; width: 90%;">
-						<h3 style="width:100%; background-color: ${section.colour}">
-							<a href="#" onclick="return false;">
-								${section.title}
-							</a>
-						</h3>
-					</div>
 
-					<ul id="${sectionName}list">
+				<div class="encounterNavBar" id="${navbarSide}ColLoader" style="width: 100%;">
+					<%
+						// =================================================================================
+						// Left sidebar
+						// =================================================================================
+						// XXX: Maybe replace this with JSON/Javascript code
+					%>
+					<c:forEach items="${noteSections}" var="sectionName" varStatus="loop">
 
 						<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
 
-						<c:forEach items="${section.notes}" var="note" varStatus="loop">
+						<div class="leftBox" id="${sectionName}" style="display: block;">
 
-							<li style="overflow: hidden; clear:both; position:relative; display:block; white-space:nowrap; ">
-								<a border="0" style="text-decoration:none; width:7px; z-index: 100; background-color: white; position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;"><img id="img${sectionName}1" src="/images/clear.gif">&nbsp;&nbsp;</a>
-								<span style=" z-index: 1; position:absolute; margin-right:10px; width:90%; overflow:hidden;  height:1.2em; white-space:nowrap; float:left; text-align:left; ">
-									<a
-										class="links"
-										style="color: ${note.colour};"
-										onmouseover="this.className='linkhover'"
-										onmouseout="this.className='links'"
-										href="#" onclick=""
-										title="Flu=Influenza vaccine"
-									>
-										<c:out value="${note.text}" />
-									</a>
-								</span>
-								<span style="z-index: 100; background-color: #f3f3f3; overflow:hidden;   position:relative; height:1.2em; white-space:nowrap; float:right; text-align:right;">
-									<fmt:parseDate value="${note.updateDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedUpdateDate" />
-									<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
-									...<a
-										class="links"
-										style="margin-right: 2px; color: ${note.colour};"
-										onmouseover="this.className='linkhover'"
-										onmouseout="this.className='links'"
-										href="#"
-										onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;"
-										title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
-									>
-										<c:out value="${updateDate}" />
-									</a>
-								</span>
-							</li>
+							<form style="display: none;" name="dummyForm" action="">
+								<input type="hidden" id="reloadDiv" name="reloadDiv" value="none" onchange="updateDiv();">
+							</form>
 
-						</c:forEach>
-					</ul>
+							<div id='menuTitle${sectionName}' style="width: 10%; float: right; text-align: center;">
+								<h3 style="padding:0px; background-color: ${section.colour};">
+									<a href="javascript:void(0);" onclick="return false;">+</a>
+								</h3>
+							</div>
+
+							<div style="clear: left; float: left; width: 90%;">
+								<h3 style="width:100%; background-color: ${section.colour}">
+									<a href="#" onclick="return false;">
+										${section.title}
+									</a>
+								</h3>
+							</div>
+
+							<ul id="${sectionName}list">
+
+								<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
+
+								<c:forEach items="${section.notes}" var="note" varStatus="loop">
+
+									<li class="encounterNote ${loop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
+										<c:choose>
+											<c:when test="${ section.remainingNotes > 0 && loop.last }">
+												<a href="#" class="expandCasemgmtSidebar encounterNoteTitle" onclick="getSectionRemote('${sectionName}', true); return false;" title="${section.remainingNotes} more items">
+													<img id="img${sectionName}5" src="graphics/expand.gif" />&nbsp;&nbsp;
+												</a>
+											</c:when>
+											<c:otherwise>
+												<a border="0" class="expandCasemgmtSidebar encounterNoteTitle">
+													<img id="img${sectionName}1" src="/images/clear.gif" />&nbsp;&nbsp;
+												</a>
+											</c:otherwise>
+										</c:choose>
+										<span class="encounterNoteTitle">
+											<a
+												class="links ${fn:join(note.titleClasses, ' ')}"
+												<c:if test="${note.colour != null}">
+													style="color: ${note.colour};"
+												</c:if>
+												onmouseover="this.className='linkhover ${fn:join(note.titleClasses, ' ')}'"
+												onmouseout="this.className='links ${fn:join(note.titleClasses, ' ')}'"
+												href="#" onclick=""
+												title="Flu=Influenza vaccine"
+											>
+												<c:out value="${note.text}" />
+											</a>
+										</span>
+										<fmt:parseDate value="${note.updateDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedUpdateDate" />
+										<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
+										<c:if test="${not empty updateDate}">
+											<span class="encounterNoteDate">
+												...<a
+													class="links"
+													style="margin-right: 2px; color: ${note.colour};"
+													onmouseover="this.className='linkhover'"
+													onmouseout="this.className='links'"
+													href="#"
+													onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;"
+													title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
+												>
+													<c:out value="${note.value}" />
+													<c:out value="${updateDate}" />
+												</a>
+											</span>
+										</c:if>
+									</li>
+								</c:forEach>
+							</ul>
+						</div>
+					</c:forEach>
 				</div>
-			</c:forEach>
-		</div>
+			</div>
+		</c:forEach>
 
 		<div id="content" style="display: inline; float: left; width: 60%; background-color: #CCCCFF;">
 
@@ -1385,7 +1686,7 @@
 										<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
 										<fmt:parseDate value="${note.observationDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedObservationDate" />
 										<fmt:formatDate value="${parsedObservationDate}" pattern="dd-MMM-yyyy" var="observationDate" />
-										<li>
+										<li class="${noteLoop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
 											<span id="spanListNote${fn:escapeXml(noteLoop.index)}">
 												<a class="topLinks"
 												   onmouseover="this.className='topLinkhover'"

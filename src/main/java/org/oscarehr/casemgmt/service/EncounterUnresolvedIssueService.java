@@ -23,6 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.util.CppUtils;
@@ -41,13 +42,16 @@ public class EncounterUnresolvedIssueService extends EncounterSectionService
 		this.caseManagementMgr = caseManagementMgr;
 	}
 
-	public List<EncounterSectionNote> getNotes(
+	public EncounterNotes getNotes(
 			LoggedInInfo loggedInInfo,
 			String roleName,
 			String providerNo,
 			String demographicNo,
 			String appointmentNo,
-			String programId)
+			String programId,
+			Integer limit,
+			Integer offset
+	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
@@ -122,7 +126,7 @@ public class EncounterUnresolvedIssueService extends EncounterSectionService
 			//navBarDisplayDAO.addItem(item);
 		}
 
-		return out;
+		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
 
 	public static boolean containsIssue(String[]  issues, String issueCode)

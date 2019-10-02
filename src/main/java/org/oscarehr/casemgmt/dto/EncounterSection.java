@@ -27,11 +27,33 @@ import java.util.List;
 
 public class EncounterSection
 {
+	public static final String TYPE_PREVENTIONS = "Preventions";
+	public static final String TYPE_TICKLER = "Tickler";
+	public static final String TYPE_DISEASE_REGISTRY = "DiseaseRegistry";
+	public static final String TYPE_FORMS = "Forms";
+	public static final String TYPE_EFORMS = "eForms";
+	public static final String TYPE_DOCUMENTS = "Documents";
+	public static final String TYPE_LAB_RESULTS = "LabResults";
+	public static final String TYPE_MESSENGER = "Messenger";
+	public static final String TYPE_MEASUREMENTS = "Measurments";
+	public static final String TYPE_CONSULTATIONS = "Consultations";
+	public static final String TYPE_ALLERGIES = "Allergies";
+	public static final String TYPE_MEDICATIONS = "Medications";
+	public static final String TYPE_OTHER_MEDS = "OMeds";
+	public static final String TYPE_RISK_FACTORS = "RiskFactors";
+	public static final String TYPE_FAMILY_HISTORY = "FamHistory";
+	public static final String TYPE_UNRESOLVED_ISSUES = "UnresolvedIssues";
+	public static final String TYPE_RESOLVED_ISSUES = "ResolvedIssues";
+	public static final String TYPE_DECISION_SUPPORT_ALERTS = "DecisionSupportAlerts";
+	public static final String TYPE_EPISODES = "Episodes";
+	public static final String TYPE_HEALTH_CARE_TEAM = "HealthCareTeam";
+
 	private String title;
 	private String cppIssues;
 	private String addUrl;
 	private String identUrl;
 	private String colour;
+	private Integer remainingNotes;
 	private List<EncounterSectionNote> notes;
 
 	public String getTitle()
@@ -82,6 +104,16 @@ public class EncounterSection
 	public void setColour(String colour)
 	{
 		this.colour = colour;
+	}
+
+	public Integer getRemainingNotes()
+	{
+		return remainingNotes;
+	}
+
+	public void setRemainingNotes(Integer remainingNotes)
+	{
+		this.remainingNotes = remainingNotes;
 	}
 
 	public List<EncounterSectionNote> getNotes()
