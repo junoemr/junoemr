@@ -37,6 +37,9 @@ import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
+import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,12 +71,13 @@ public class FaxAccountService
 
 	/**
 	 * Test the connection to the fax service based on the configuration settings
+	 *
 	 * @return true if the connection succeeded, false otherwise
 	 */
 	public boolean testConnectionStatus(String accountId, String password)
 	{
 		// don't hit the api if username or password are empty/missing
-		if(StringUtils.trimToNull(accountId) == null || StringUtils.trimToNull(password) == null)
+		if (StringUtils.trimToNull(accountId) == null || StringUtils.trimToNull(password) == null)
 		{
 			return false;
 		}
@@ -87,7 +91,9 @@ public class FaxAccountService
 		return (result != null && result.isSuccess());
 	}
 
-	/** get the default fax account to be used. return null if none exists */
+	/**
+	 * get the default fax account to be used. return null if none exists
+	 */
 	public FaxAccount getDefaultFaxAccount()
 	{
 		//TODO provider specific logic etc?
@@ -101,12 +107,62 @@ public class FaxAccountService
 		return faxAccountList.isEmpty() ? null : faxAccountList.get(0);
 	}
 
+	public RestSearchResponse<FaxAccountTransferOutbound> listAccounts(Integer page, Integer perPage)
+	{
+		int offset = calculatedOffset(page, perPage);
+
+		FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
+		criteriaSearch.setOffset(offset);
+		criteriaSearch.setLimit(perPage);
+		criteriaSearch.setSortDirAscending();
+
+		int total = faxAccountDao.criteriaSearchCount(criteriaSearch);
+		List<FaxAccount> accountList = faxAccountDao.criteriaSearch(criteriaSearch);
+		return RestSearchResponse.successResponse(FaxTransferConverter.getAllAsOutboundTransferObject(accountList), page, perPage, total);
+	}
+
+	public RestResponse<Long> getOutboxNotificationCount(Long id,
+														 Integer page,
+														 Integer perPage,
+														 String endDateStr,
+														 String startDateStr,
+														 String combinedStatus,
+														 String archived)
+	{
+		int offset = calculatedOffset(page, perPage);
+
+		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
+		criteriaSearch.setOffset(offset);
+		criteriaSearch.setLimit(perPage);
+		criteriaSearch.setFaxAccountId(id);
+		criteriaSearch.setSortDirDescending();
+		criteriaSearch.setNotificationStatus(FaxOutbound.NotificationStatus.NOTIFY);
+		if (endDateStr != null)
+		{
+			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
+		}
+		if (startDateStr != null)
+		{
+			criteriaSearch.setStartDate(ConversionUtils.toLocalDate(startDateStr));
+		}
+		if (StringUtils.trimToNull(combinedStatus) != null)
+		{
+			criteriaSearch.setCombinedStatus(FaxOutboxTransferOutbound.CombinedStatus.valueOf(combinedStatus));
+		}
+		if (StringUtils.trimToNull(archived) != null)
+		{
+			criteriaSearch.setArchived(Boolean.parseBoolean(archived));
+		}
+
+		return RestResponse.successResponse(new Long(faxOutboundDao.criteriaSearchCount(criteriaSearch)));
+	}
+
 	public List<FaxOutboxTransferOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
 	{
 		List<FaxOutbound> outboundList = faxOutboundDao.criteriaSearch(criteriaSearch);
 
 		ArrayList<FaxOutboxTransferOutbound> transferList = new ArrayList<>(outboundList.size());
-		for(FaxOutbound faxOutbound : outboundList)
+		for (FaxOutbound faxOutbound : outboundList)
 		{
 			transferList.add(FaxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound));
 		}
@@ -119,11 +175,30 @@ public class FaxAccountService
 		List<FaxInbound> inboundList = faxInboundDao.criteriaSearch(criteriaSearch);
 
 		ArrayList<FaxInboxTransferOutbound> transferList = new ArrayList<>(inboundList.size());
-		for(FaxInbound faxInbound : inboundList)
+		for (FaxInbound faxInbound : inboundList)
 		{
 			transferList.add(FaxTransferConverter.getAsInboxTransferObject(faxInbound));
 		}
 
 		return transferList;
+	}
+
+	public void setFaxNotificationStatus(int id, String status)
+	{
+		faxOutboundDao.runNativeQuery("UPDATE fax_outbound " +
+				"SET notification_status = SILENT " +
+				"WHERE id =  " + id);
+	}
+
+	/**
+	 * calculate the offset based on the current page number and resultCount
+	 *
+	 * @param pageNo         - page
+	 * @param resultsPerPage - limit of results
+	 * @return offset
+	 */
+	protected int calculatedOffset(int pageNo, int resultsPerPage)
+	{
+		return resultsPerPage * (pageNo - 1);
 	}
 }
