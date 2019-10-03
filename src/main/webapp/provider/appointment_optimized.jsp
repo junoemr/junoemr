@@ -933,19 +933,13 @@ private long getAppointmentRowSpan(
 						</oscar:oscarPropertiesCheck>
 					</security:oscarSec>
 
-						<li>
-							<oscar:failedOutboxFax>
-								<%--<a HREF="#" ONCLICK ="popupInboxManager('<html:rewrite page="/dms/inboxManage.do?method=prepareForIndexPage"/>&providerNo=<%=curUser_no%>', 'Lab');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.viewLabReports"/>">
-                                    <span id="oscar_fax_failed"><bean:message key="global.lab"/></span>
-                                </a>--%>
-								<a class="tabalert" HREF="#"
-							   ONCLICK="newWindow('<html:rewrite page="/administration/?show=Faxes&load=SendReceive"/>');return false;"
-							   TITLE='<bean:message key="admin.admin.FaxDeliveryFailure"/>'><bean:message key="admin.admin.FaxDeliveryFailure"/></a>
-
-							</oscar:failedOutboxFax>
-						</li>
-
-
+					<li>
+						<oscar:failedOutboxFax>
+							<a class="tabalert" HREF="#"
+						   ONCLICK="newWindow('<html:rewrite page="/administration/?show=Faxes&load=SendReceive"/>');return false;"
+						   TITLE='<bean:message key="admin.admin.FaxDeliveryFailure"/>'><bean:message key="admin.admin.FaxDeliveryFailure"/></a>
+						</oscar:failedOutboxFax>
+					</li>
 
 					<!-- Added logout link for mobile version -->
 					<li id="logoutMobile">
