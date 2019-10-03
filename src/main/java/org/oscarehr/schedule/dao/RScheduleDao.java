@@ -136,6 +136,15 @@ public class RScheduleDao extends AbstractDao<RSchedule>
 		return results;
 	}
 
+	public List<RSchedule> searchRscheduleByEdateAfterATime(String providerNo, Date timeAfter) {
+		Query query = entityManager.createQuery("select s from RSchedule s where s.providerNo=? and s.eDate > ? and s.status='A' order by s.sDate");
+		query.setParameter(1, providerNo);
+		query.setParameter(2, timeAfter);
+
+		List<RSchedule> results = query.getResultList();
+		return results;
+	}
+
 	public List<RSchedule> findByProviderNoAndDates(String providerNo, Date apptDate) {
 		Query query = createQuery("r", "r.providerNo = :providerNo AND r.sDate <= :apptDate AND r.eDate >= :apptDate");
 		query.setParameter("providerNo", providerNo);
@@ -144,7 +153,7 @@ public class RScheduleDao extends AbstractDao<RSchedule>
     }
 
 	public List<RSchedule> findByProviderNoAndStartEndDates(String providerNo, Date startDate, Date endDate) {
-		Query query = createQuery("r", "r.providerNo = :providerNo AND r.sDate = :startDate AND (:endDate IS NULL OR r.eDate=:endDate)");
+		Query query = createQuery("r", "r.providerNo = :providerNo AND r.sDate = :startDate AND (:timeAfter IS NULL OR r.eDate=:timeAfter)");
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("startDate", startDate);
 		query.setParameter("endDate", endDate);
