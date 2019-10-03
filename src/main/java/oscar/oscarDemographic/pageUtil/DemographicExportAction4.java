@@ -921,7 +921,7 @@ public class DemographicExportAction4 extends Action {
 									ClinicalNotes cNote = patientRec.addNewClinicalNotes();
 									for (CaseManagementIssue isu : sisu) {
 										String codeSystem = isu.getIssue().getType();
-										if (!codeSystem.equals("system")) {
+										if (!"system".equals(codeSystem)) {
 											encounter = Util.addLine(encounter, "Diagnosis: ", isu.getIssue().getDescription());
 										}
 									}
