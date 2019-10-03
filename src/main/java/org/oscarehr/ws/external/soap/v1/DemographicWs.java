@@ -27,6 +27,8 @@ package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
+import org.oscarehr.billing.CA.service.EligibilityCheckService;
+import org.oscarehr.billing.CA.transfer.EligibilityCheckTransfer;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.PHRVerification;
@@ -66,6 +68,9 @@ public class DemographicWs extends AbstractWs {
 
 	@Autowired
 	private DemographicCustDao demographicCustDao;
+
+	@Autowired
+	private EligibilityCheckService eligibilityCheckService;
 
 	public DemographicTransfer getDemographic(Integer demographicId)
 	{
@@ -258,5 +263,13 @@ public class DemographicWs extends AbstractWs {
 		demographicManager.updateDemographicExtras(loggedInInfo, demographic, demographicTransfer);
 		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
 
+	}
+
+	public EligibilityCheckTransfer checkEligibility(DemographicTransfer demographicTransfer) throws Exception
+	{
+		Demographic demographic = new Demographic();
+		demographicTransfer.copyTo(demographic);
+
+		return eligibilityCheckService.checkEligibility(demographic);
 	}
 }
