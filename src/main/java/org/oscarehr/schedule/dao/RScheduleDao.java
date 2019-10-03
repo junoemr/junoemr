@@ -136,8 +136,9 @@ public class RScheduleDao extends AbstractDao<RSchedule>
 		return results;
 	}
 
-	public List<RSchedule> searchRscheduleByEdateAfterATime(String providerNo, Date timeAfter) {
-		Query query = entityManager.createQuery("select s from RSchedule s where s.providerNo=? and s.eDate > ? and s.status='A' order by s.sDate");
+	public List<RSchedule> searchRscheduleByEdateAfterATime(String providerNo, Date timeAfter)
+	{
+		Query query = entityManager.createQuery("SELECT s FROM RSchedule s WHERE s.providerNo=? AND s.eDate > ? AND s.status='A' ORDER BY s.sDate");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, timeAfter);
 
