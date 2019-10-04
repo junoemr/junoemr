@@ -39,10 +39,15 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
+import static org.oscarehr.billing.CA.transfer.EligibilityCheckTransfer.ValidationStatus.COMPLETE;
+import static org.oscarehr.billing.CA.transfer.EligibilityCheckTransfer.ValidationStatus.UNAVAILABLE;
+
 @Service
 public class EligibilityCheckService
 {
 	private static final OscarProperties properties = OscarProperties.getInstance();
+
+	private static final String HC_TYPE_BC = "BC";
 
 	public EligibilityCheckTransfer checkEligibility(Demographic demo) throws IOException, InterruptedException
 	{
@@ -57,8 +62,9 @@ public class EligibilityCheckService
 			transfer.setMessage(clinicaidResponse.get("msg"));
 			transfer.setResult(clinicaidResponse.get("result"));
 			transfer.setEligible(Boolean.valueOf(clinicaidResponse.get("isEligible")));
+			transfer.setValidationStatus(COMPLETE);
 		}
-		else if(properties.isBritishColumbiaBillingType())
+		else if(properties.isBritishColumbiaBillingType() && (demo.getHcType().equalsIgnoreCase(HC_TYPE_BC)))
 		{
 			TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
 			String[] userpass = dao.getUsernamePassword();
@@ -86,11 +92,13 @@ public class EligibilityCheckService
 			transfer.setMessage(tr.getMsgs());
 			transfer.setRealFilename(tr.getRealFilename());
 			transfer.setEligible(tr.isSuccess());
+			transfer.setValidationStatus(COMPLETE);
 		}
 		else
 		{
 			transfer.setEligible(false);
-			transfer.setError("Unsupported province & billing type combination");
+			transfer.setMessage("Results unavailable. Unsupported province");
+			transfer.setValidationStatus(UNAVAILABLE);
 		}
 
 		return transfer;

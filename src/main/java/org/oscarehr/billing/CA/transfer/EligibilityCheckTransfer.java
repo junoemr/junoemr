@@ -27,11 +27,20 @@ import java.io.Serializable;
 
 public class EligibilityCheckTransfer implements Serializable
 {
+	public enum ValidationStatus
+	{
+		COMPLETE,
+		INCOMPLETE,
+		UNAVAILABLE
+	}
+
 	private Boolean isEligible = false;
 	private String result;
 	private String error;
 	private String message;
+	private ValidationStatus validationStatus = ValidationStatus.INCOMPLETE;
 
+	//TODO refactor this out of the transfer object
 	private String realFilename;
 
 	public Boolean getEligible()
@@ -42,6 +51,16 @@ public class EligibilityCheckTransfer implements Serializable
 	public void setEligible(Boolean eligible)
 	{
 		isEligible = eligible;
+	}
+
+	public ValidationStatus getValidationStatus()
+	{
+		return validationStatus;
+	}
+
+	public void setValidationStatus(ValidationStatus validationStatus)
+	{
+		this.validationStatus = validationStatus;
 	}
 
 	public String getResult()

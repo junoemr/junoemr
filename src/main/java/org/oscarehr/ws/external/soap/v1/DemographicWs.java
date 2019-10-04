@@ -265,11 +265,23 @@ public class DemographicWs extends AbstractWs {
 
 	}
 
-	public EligibilityCheckTransfer checkEligibility(DemographicTransfer demographicTransfer) throws Exception
+	public EligibilityCheckTransfer checkEligibility(DemographicTransfer demographicTransfer)
 	{
-		Demographic demographic = new Demographic();
-		demographicTransfer.copyTo(demographic);
+		EligibilityCheckTransfer transfer;
+		try
+		{
+			Demographic demographic = new Demographic();
+			demographicTransfer.copyTo(demographic);
 
-		return eligibilityCheckService.checkEligibility(demographic);
+			transfer = eligibilityCheckService.checkEligibility(demographic);
+			transfer.setRealFilename(null); // we don't want outside users to try to parse this
+		}
+		catch(Exception e)
+		{
+			logger.error("check eligibility error", e);
+			transfer = new EligibilityCheckTransfer();
+			transfer.setError(e.getMessage());
+		}
+		return transfer;
 	}
 }
