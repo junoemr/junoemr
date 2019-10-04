@@ -84,7 +84,6 @@ public class EligibilityCheckService
 
 			transfer.setResult(tr.getResult());
 			transfer.setMessage(tr.getMsgs());
-			transfer.setFilename(tr.getFilename());
 			transfer.setRealFilename(tr.getRealFilename());
 			transfer.setEligible(tr.isSuccess());
 		}

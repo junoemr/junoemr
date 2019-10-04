@@ -32,7 +32,6 @@ public class EligibilityCheckTransfer implements Serializable
 	private String error;
 	private String message;
 
-	private String filename;
 	private String realFilename;
 
 	public Boolean getEligible()
@@ -73,16 +72,6 @@ public class EligibilityCheckTransfer implements Serializable
 	public void setMessage(String message)
 	{
 		this.message = message;
-	}
-
-	public String getFilename()
-	{
-		return filename;
-	}
-
-	public void setFilename(String filename)
-	{
-		this.filename = filename;
 	}
 
 	public String getRealFilename()
