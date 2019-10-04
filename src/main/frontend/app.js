@@ -130,8 +130,14 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		.state('admin',
 		{
 			url: '/admin',
-			templateUrl: 'src/admin/admin_popup.jsp',
-			controller: 'AdminCtrl'
+			templateUrl: 'src/admin/admin.jsp',
+			controller: 'Admin.AdminController as AdminCtrl'
+		})
+		.state('admin.frame',
+		{
+			url: '/frame?frameUrl',
+			templateUrl: 'src/admin/integration/frameContent/frameContent.jsp',
+			controller: 'Admin.Integration.FrameContentController as FrameCtrl'
 		})
 		.state('ticklers',
 		{

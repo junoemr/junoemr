@@ -233,6 +233,7 @@ module.exports = {
 			'./src/common/components/modalComponent.js',
 			'./src/common/components/loadingIndicatorComponent.js',
 			'./src/common/components/zeroStateDisplayComponent.js',
+			'./src/common/components/accordionList/accordionListComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
@@ -295,6 +296,7 @@ module.exports = {
 			'./src/admin/integration/know2act/Know2actConfigController.js',
 			'./src/admin/integration/know2act/Know2actNotificationController.js',
 			'./src/admin/integration/know2act/Know2actTemplateController.js',
+			'./src/admin/integration/frameContent/frameContentController.js',
 
 			'./src/billing/billingController.js',
 

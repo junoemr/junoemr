@@ -32,6 +32,7 @@
 @import "../src/common/components/junoLoadingIndicator";
 @import "../src/common/components/modal";
 @import "../src/common/components/zeroStateDisplay";
+@import "../src/common/components/accordionList/accordionList";
 // Section-specific things
 @import "../src/layout/primaryNav";
 @import "../src/layout/leftAside";
@@ -52,6 +53,8 @@
 @import "../src/consults/consults";
 @import "../src/admin/integration/know2act/Know2act";
 @import "../src/admin/integration/fax/fax";
+@import "../src/admin/admin";
+@import "../src/admin/integration/frameContent/frameContent";
 @import "../src/record/forms/forms";
 @import "../src/record/forms/components/groupSelector/groupSelector";
 @import "../src/record/forms/components/modeSelector/modeSelector";

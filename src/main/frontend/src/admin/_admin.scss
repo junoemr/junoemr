@@ -1,0 +1,20 @@
+#admin-page {
+  @include juno-font-default;
+
+  #admin-page-header {
+    @extend %juno-page-header;
+    padding-left: 63px;
+
+    //margin-bottom: $margin-md;
+    h3 {
+      color: $color-neutral-white;
+    }
+    h3, p {
+      margin: 0;
+    }
+  }
+
+  #admin-page-body {
+
+  }
+}

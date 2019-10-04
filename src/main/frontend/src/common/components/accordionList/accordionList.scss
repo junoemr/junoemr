@@ -1,0 +1,47 @@
+.accordion-list-component {
+  @include juno-font-default;
+  @include juno-tab-md(16px);
+  @include juno-tab-color-scheme-white;
+
+  .accordion-group {
+    h4 {
+      margin: 0;
+    }
+
+    div {
+      margin-right: auto;
+    }
+
+    a {
+      &:hover, &:active, &:visited, &:focus {
+        text-decoration: none;
+      }
+    }
+
+    .expanded-group {
+      background-color: $color-neutral-light;
+    }
+
+    .accordion-group-header {
+      border-bottom: 1px solid $color-neutral-lighter;
+
+      a {
+        padding-left: 16px;
+      }
+    }
+
+    .group-items-list {
+      overflow: hidden;
+
+      .accordion-item {
+        padding-left: 20px;
+        border-bottom: 1px solid $color-neutral-lighter;
+      }
+    }
+  }
+
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+}

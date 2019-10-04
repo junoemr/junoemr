@@ -459,11 +459,6 @@ angular.module('Layout').component("primaryNavigation", {
 					url = "../billing.do?billRegion=CLINICAID&action=invoice_reports";
 					wname = "billing";
 				}
-				else if (item.label === "Admin")
-				{
-					url = "../administration/";
-					wname = "admin";
-				}
 				else if (item.label === "eDocs")
 				{
 					url = "../dms/documentReport.jsp?function=provider&functionid=" +
