@@ -26,7 +26,6 @@ package oscar.oscarFax.client.tld;
 import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
 
 import javax.servlet.jsp.JspException;
