@@ -295,6 +295,7 @@
 						>
 						</ca-field-toggle>
 
+						<div class="vertical-divider-sm"></div>
 						<div class="row">
 							<div class="col-md-8">
 								<ca-field-select
@@ -321,20 +322,31 @@
 								</ca-field-select>
 							</div>
 						</div>
+						<div class="vertical-divider-md"></div>
 						<div class="row">
-							<div class="col-md-2">
+							<div class="col-md-12">
+								<div class="form-group">
+									<label class="control-label">Ends</label>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-4">
 								<ca-field-radio
+										ca-form-group-class="vertical-align"
 										ca-name="repeat-radio-1"
-										ca-title="&nbsp"
+										ca-title="On"
+										ca-label-size="col-md-6"
+										ca-input-size="col-md-6"
 										ca-model="eventController.repeatBookingData.endType"
 										ca-value="{{eventController.repeatBooking.endTypeEnum.date}}"
 										ca-disabled="!eventController.isRepeatBookingEnabled()"
 								>
 								</ca-field-radio>
 							</div>
-							<div class="col-md-10">
+							<div class="col-md-8">
 								<ca-field-date
-										ca-title="End On"
+										ca-form-group-class="vertical-align"
 										ca-date-picker-id="repeat-end-on-date"
 										ca-name="repeatEndOnDate"
 										ca-model="eventController.repeatBookingData.endDate"
@@ -344,21 +356,25 @@
 								></ca-field-date>
 							</div>
 						</div>
+						<div class="vertical-divider-lg"></div>
 						<div class="row">
-							<div class="col-md-2">
+							<div class="col-md-4">
 								<ca-field-radio
+										ca-form-group-class="vertical-align"
 										ca-name="repeat-radio-2"
-										ca-title="&nbsp"
+										ca-title="After"
+										ca-label-size="col-md-6"
+										ca-input-size="col-md-6"
 										ca-model="eventController.repeatBookingData.endType"
 										ca-value="{{eventController.repeatBooking.endTypeEnum.after}}"
 										ca-disabled="!eventController.isRepeatBookingEnabled()"
 								>
 								</ca-field-radio>
 							</div>
-							<div class="col-md-6">
+							<div class="col-md-4">
 								<ca-field-text
+										ca-form-group-class="vertical-align"
 										ca-name="repeatEndAfterNumber"
-										ca-title="End After"
 										ca-model="eventController.repeatBookingData.endAfterNumber"
 										ca-error="{{displayMessages.field_errors()['repeatEndAfterNumber']}}"
 										ca-disabled="!eventController.isRepeatBookingEnabled() || !eventController.isRepeatBookingEndTypeAfter()"
@@ -368,8 +384,7 @@
 							</div>
 							<div class="col-md-4">
 								<div class="form-group">
-									<label class="control-label">&nbsp</label>
-									<span class="form-control-static">Bookings</span>
+									<label class="control-label">Bookings</label>
 								</div>
 							</div>
 						</div>

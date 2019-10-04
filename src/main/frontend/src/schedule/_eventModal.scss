@@ -90,6 +90,19 @@
 
 					&.repeat-options-pane {
 						width: $repeat-options-pane-width;
+
+						.vertical-divider-lg {
+							height: 32px;
+							width: 100%;
+						}
+						.vertical-divider-md {
+							height: 24px;
+							width: 100%;
+						}
+						.vertical-divider-sm {
+							height: 16px;
+							width: 100%;
+						}
 					}
 					&.repeat-display-pane {
 						@include juno-table-default(6px);

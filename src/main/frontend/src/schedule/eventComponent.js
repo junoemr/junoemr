@@ -90,6 +90,7 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.repeatBooking =
 				{
+					max_bookings_limit: 100,
 					toggleEnum: Object.freeze({
 						on: 'on',
 						off: 'off',
@@ -567,7 +568,7 @@ angular.module('Schedule').component('eventComponent', {
 				controller.repeatBookingDates = [];
 				if(controller.isRepeatBookingEnabled())
 				{
-					controller.repeatBookingDates = controller.generateRepeatBookingDateList();
+					controller.repeatBookingDates = controller.generateRepeatBookingDateList(controller.repeatBooking.max_bookings_limit);
 				}
 			};
 			controller.removeRepeatBookingDate = function removeRepeatBookingDate(dataObj)
@@ -575,7 +576,7 @@ angular.module('Schedule').component('eventComponent', {
 				controller.repeatBookingDates = controller.repeatBookingDates.filter(function(e) { return e !== dataObj })
 			};
 
-			controller.generateRepeatBookingDateList = function generateRepeatBookingDateList()
+			controller.generateRepeatBookingDateList = function generateRepeatBookingDateList(limit)
 			{
 				var dateList = [];
 				var startDate = moment($scope.eventData.startDate);
@@ -587,6 +588,7 @@ angular.module('Schedule').component('eventComponent', {
 
 				var bUseEndDate = controller.isRepeatBookingEndTypeDate();
 				var bUseMaxRepeat = controller.isRepeatBookingEndTypeAfter();
+				$scope.displayMessages.remove_field_error('repeatEndAfterNumber');
 
 				var count = 0;
 				var lastDate = startDate;
@@ -597,6 +599,11 @@ angular.module('Schedule').component('eventComponent', {
 
 					if((bUseMaxRepeat && count > maxRepeats) || (bUseEndDate && nextDate.isAfter(endDate, 'day')))
 					{
+						break;
+					}
+					if(count > limit)
+					{
+						$scope.displayMessages.add_field_error('repeatEndAfterNumber', "limit of " + limit);
 						break;
 					}
 
