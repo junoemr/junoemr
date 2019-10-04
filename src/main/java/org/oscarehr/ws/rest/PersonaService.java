@@ -27,6 +27,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.model.ProgramProvider;
+import org.oscarehr.admin.service.AdminService;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.Dashboard;
 import org.oscarehr.common.model.Provider;
@@ -52,6 +53,7 @@ import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.NavbarResponse;
 import org.oscarehr.ws.rest.to.PersonaResponse;
 import org.oscarehr.ws.rest.to.PersonaRightsResponse;
+import org.oscarehr.ws.rest.to.model.AdminNavGroupTo1;
 import org.oscarehr.ws.rest.to.model.MenuItemTo1;
 import org.oscarehr.ws.rest.to.model.MenuTo1;
 import org.oscarehr.ws.rest.to.model.NavBarMenuTo1;
@@ -96,6 +98,9 @@ public class PersonaService extends AbstractServiceImpl {
 	
 	@Autowired
 	private DashboardManager dashboardManager;
+
+	@Autowired
+	private AdminService adminService;
 	
 	
 	@GET
@@ -512,7 +517,15 @@ public class PersonaService extends AbstractServiceImpl {
 		}
 		
 		return result;
-		
 	}
+
+	@GET
+	@Path("/adminNav")
+	@Produces("application/json")
+	public List<AdminNavGroupTo1> getAdminNavItems()
+	{
+		return adminService.getAdminNavGroups(getOscarResourcesBundle(), getCurrentProvider().getProviderNo());
+	}
+
 }
 

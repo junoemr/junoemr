@@ -20,16 +20,16 @@
  * Victoria, British Columbia
  * Canada
 --%>
-<div id="admin-page">
+<div id="admin-page" class="height-100">
 	<div id="admin-page-header" class="row vertical-align">
 		<h3>Administration</h3>
 	</div>
-	<div id="admin-page-body" class="row">
+	<div id="admin-page-body" class="row height-100">
 		<div class="col-sm-2">
 			<accordion-list item-list="AdminCtrl.navList"></accordion-list>
 		</div>
-		<div class="col-sm-10">
-			<div class="admin-subpage-view" ui-view></div>
+		<div class="col-sm-10 height-100">
+			<div class="admin-subpage-view height-100" ui-view></div>
 		</div>
 	</div>
 </div>

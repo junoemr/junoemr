@@ -1,4 +1,4 @@
-<%--
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -19,7 +19,42 @@
  * CloudPractice Inc.
  * Victoria, British Columbia
  * Canada
---%>
-<div class="frame-content-controller height-100">
-	<iframe class="content-frame" width="98%" height="92%" frameborder="0" type="text/html" src="{{ FrameCtrl.frameUrl }}"></iframe>
-</div>
+ */
+package org.oscarehr.ws.rest.to.model;
+
+import com.sun.xml.txw2.annotation.XmlElement;
+
+import java.io.Serializable;
+
+@XmlElement
+public class AdminNavItemTo1 implements Serializable
+{
+	private String name;
+	private String transitionState;
+
+	public AdminNavItemTo1(String name, String transition)
+	{
+		this.name = name;
+		this.transitionState = transition;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public String getTransitionState()
+	{
+		return transitionState;
+	}
+
+	public void setTransitionState(String transitionState)
+	{
+		this.transitionState = transitionState;
+	}
+}

@@ -78,6 +78,28 @@ angular.module("Common.Services").service("personaService", [
 			return deferred.promise;
 		};
 
+		service.getAdminNav = function()
+		{
+			var deferred = $q.defer();
+			$http(
+				{
+					url: service.apiPath + '/adminNav',
+					method: "GET",
+					headers: Juno.Common.ServiceHelper.configHeaders()
+				}).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.error("personaService::getAdminNav error", errors);
+					deferred.reject("An error occured while getting admin nav from persona");
+				});
+
+			return deferred.promise;
+		};
+
 		service.getPatientListConfig = function getPatientListConfig()
 		{
 			var deferred = $q.defer();

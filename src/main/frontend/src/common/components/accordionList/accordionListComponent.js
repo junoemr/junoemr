@@ -45,18 +45,16 @@ angular.module('Common.Components').component('accordionList', {
 			let targetItem = ctrl.itemList[idx];
 			if (!targetItem.eventsBound)
 			{
-				let collapseEl = angular.element(document.querySelector("#collapse-target-" + ctrl.getGroupCollapseId(targetItem)));
+				let collapseEl = angular.element(document.querySelector("#accordion-collapse-target-" + ctrl.getGroupCollapseId(targetItem)));
 
 				collapseEl.on('hidden.bs.collapse', function ()
 				{
-					console.log("collapse, " + targetItem.name);
 					targetItem.expanded = false;
 					$scope.$apply();
 				});
 
 				collapseEl.on('shown.bs.collapse', function ()
 				{
-					console.log("show, " + targetItem.name);
 					targetItem.expanded = true;
 					$scope.$apply();
 				});
@@ -76,7 +74,7 @@ angular.module('Common.Components').component('accordionList', {
 				if (group.name !== ctrl.itemList[i].name)
 				{
 					// collapse all. because we mixed boostrap and angular we need to do this the nasty way.
-					angular.element(document.querySelector("#collapse-target-" + ctrl.getGroupCollapseId(ctrl.itemList[i]))).collapse('hide');
+					angular.element(document.querySelector("#accordion-collapse-target-" + ctrl.getGroupCollapseId(ctrl.itemList[i]))).collapse('hide');
 				}
 			}
 		};
