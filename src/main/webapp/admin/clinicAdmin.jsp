@@ -207,6 +207,39 @@
         <div class="clinic-details">
             <div class="clinic-info">
                 <fieldset class="rx-settings-panel">
+                    <legend>Clinic Logos</legend>
+                    <form  id="card-logo-form" action="../RxSettings.do" method="POST">
+                        <input id="card-logo-upload-action" type="hidden" name="method" value="uploadImage">
+                        <input type="hidden" name="image_type" value="CARD_LOGO">
+                        <div class="flex-fill-row">
+                            <h3>Appointment Card Logo</h3>
+                            <hr>
+                        </div>
+                        <div>
+                            <div style="display:flex; flex-direction:row; align-items:end;">
+                                <div style="margin-right: 5px;">
+                                    <img id="card-logo-preview" src="../ClinicImage.do?method=getImage&image_type=CARD_LOGO" width="100" height="100" style="background-color: #fefefe;" onerror="this.style.display='none';"/>
+                                </div>
+                                <div>
+                                    <label><b>Appointment Card Logo Image</b></label>
+                                    <input id="image_file" type="file" name="image_file" accept="image/png"/>
+                                </div>
+                            </div>
+                            <div class="clinic-logo-input-field flex-fill-row" style="flex-direction: row; justify-content: center;">
+                                <input id="card-logo-submit-upload" class="submit-button" style="display:flex; flex: 0 1 auto; margin-right: 10px" type="submit" value="Upload">
+                                <input id="card-logo-submit-delete" class="submit-button" style="display:flex; flex: 0 1 auto;" type="submit" value="Delete">
+                            </div>
+                        </div>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+    <div id="clinic">
+        <div class="clinic-details">
+            <div class="clinic-info">
+                <fieldset class="rx-settings-panel">
                     <legend>Rx Settings</legend>
                     <form  id="rx-form" action="../RxSettings.do" method="POST">
                         <h3>General Settings</h3>
@@ -239,10 +272,11 @@
                             </div>
                         </div>
                     </form>
-                    <form action="../RxWatermark.do" method="POST" enctype="multipart/form-data" id="watermark-form">
+                    <form action="../ClinicImage.do" method="POST" enctype="multipart/form-data" id="watermark-form">
                         <h3>Rx Watermark</h3>
                         <hr>
-                        <input id="watermark-upload-action" type="hidden" name="method" value="setWatermark">
+                        <input id="watermark-upload-action" type="hidden" name="method" value="uploadImage">
+                        <input type="hidden" name="image_type" value="WATERMARK">
 
                         <div class="input-field flex-fill-row">
                             <input id="watermark-toggle" <% if (RxWatermarkService.isWatermarkEnabled()) {%>checked<%}%> type="checkbox">
@@ -251,11 +285,11 @@
                             <div class="watermark-input-field flex-fill-row">
                                 <div style="display:flex; flex-direction:row; align-items:end;">
                                     <div style="margin-right: 5px;">
-                                        <img id="current-watermark-preview" src="../RxWatermark.do?method=getWatermark" width="100" height="100" style="background-color: #fefefe;" onerror="this.style.display='none';"/>
+                                        <img id="current-watermark-preview" src="../ClinicImage.do?method=getImage&image_type=WATERMARK" width="100" height="100" style="background-color: #fefefe;" onerror="this.style.display='none';"/>
                                     </div>
                                     <div>
                                         <label><b>Rx Prescription watermark</b></label>
-                                        <input id="watermark-file" type="file" name="watermarkFile" accept="image/png"/>
+                                        <input id="watermark-file" type="file" name="image_file" accept="image/png"/>
                                     </div>
                                 </div>
                             </div>
@@ -393,7 +427,7 @@
         function submitWatermarkForm(event, action)
         {
             event.preventDefault();
-            if (action === "deleteWatermark")
+            if (action === "deleteImage")
             {
                 if(!confirm("are you sure you want to delete your Rx watermark image"))
                 {
@@ -405,16 +439,16 @@
             let formData = new FormData(event.target);
 
             jQuery.ajax({
-                url: "../RxWatermark.do",
+                url: "../ClinicImage.do",
                 type: "post",
                 data: formData,
                 contentType: false,
                 processData: false,
                 success: function() {
                     jQuery("#watermark-file").val("");
-                    let watermarkPreview = jQuery("#current-watermark-preview")
+                    let watermarkPreview = jQuery("#current-watermark-preview");
                     watermarkPreview.css("display", "flex");
-                    watermarkPreview.attr("src", "../RxWatermark.do?method=getWatermark&rand=" + Math.random())
+                    watermarkPreview.attr("src", "../ClinicImage.do?method=getImage&image_type=WATERMARK&rand=" + Math.random())
                 }
             })
         }
@@ -441,16 +475,45 @@
             })
         }
 
+        function submitCardLogoForm(event, action)
+        {
+            event.preventDefault();
+            if (action === "deleteImage")
+            {
+                if(!confirm("Are you sure you want to delete your Card Logo Image"))
+                {
+                    return;
+                }
+            }
+
+            jQuery("#card-logo-upload-action").val(action);
+            let formData = new FormData(event.target);
+
+            jQuery.ajax({
+                url: "../ClinicImage.do",
+                type: "post",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function() {
+                    let cardLogoPreview =  jQuery("#card-logo-preview");
+                    cardLogoPreview.css("display", "inline-block");
+                    cardLogoPreview.attr("src", "../ClinicImage.do?method=getImage&image_type=CARD_LOGO&rand=" + Math.random())
+                }
+            })
+        }
+
         jQuery(document).ready(function ()
         {
-            let submitAction = "setWatermark";
+            // watermark
+            let submitAction = "uploadImage";
             jQuery("#watermark-submit-upload").click(function()
             {
-                submitAction = "setWatermark";
+                submitAction = "uploadImage";
             });
             jQuery("#watermark-submit-delete").click(function()
             {
-                submitAction = "deleteWatermark";
+                submitAction = "deleteImage";
             });
 
             jQuery("#watermark-form").submit(function(event)
@@ -466,6 +529,22 @@
             <% if (!RxWatermarkService.isWatermarkEnabled()) { %>
                 toggleWatermarkFields(false);
             <%}%>
+
+            // clinic logos
+            let clinicLogoSubmitAction = "uploadImage";
+            jQuery("#card-logo-submit-upload").click(function ()
+            {
+                clinicLogoSubmitAction = "uploadImage"
+            });
+            jQuery("#card-logo-submit-delete").click(function ()
+            {
+                clinicLogoSubmitAction = "deleteImage"
+            });
+
+            jQuery("#card-logo-form").submit(function (event)
+            {
+               submitCardLogoForm(event, clinicLogoSubmitAction);
+            });
         });
 
     </script>

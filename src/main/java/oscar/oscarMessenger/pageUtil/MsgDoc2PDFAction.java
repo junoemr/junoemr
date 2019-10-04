@@ -41,7 +41,7 @@ import org.apache.struts.action.ActionMapping;
 import org.oscarehr.util.MiscUtils;
 
 import oscar.util.Doc2PDF;
-
+// DELETE, UNUSED?
 public final class MsgDoc2PDFAction extends Action {
 
 
@@ -63,19 +63,7 @@ public final class MsgDoc2PDFAction extends Action {
             frm.setIsPreview(false);
         }
         else{
-            
-            oscar.oscarMessenger.pageUtil.MsgSessionBean bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean) request.getSession().getAttribute("msgSessionBean");
-
-            if ( bean != null ) {
-                
-                bean.setAppendPDFAttachment(Doc2PDF.parseString2Bin ( request, response, "<HTML>" + srcText + "</HTML>" ), pdfTitle );
-                
-                frm.setIsPreview(false);
-
-            }
-            else {
-                MiscUtils.getLogger().debug( " oscar.oscarMessenger.pageUtil.MsgSessionBean is null");
-            }
+            MiscUtils.getLogger().warn("oscar.oscarMessenger.pageUtil.MsgSessionBean no longer supported");
         }
         return (mapping.findForward("success"));
     }

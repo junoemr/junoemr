@@ -30,6 +30,7 @@ boolean bFirstDisp=true; //this is the first time to display the window
 if (request.getParameter("bFirstDisp")!=null) bFirstDisp= (request.getParameter("bFirstDisp")).equals("true");
 %>
 <%@page import="java.util.Enumeration"%>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -64,21 +65,7 @@ height:100% !important;
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-
-<logic:notPresent name="msgSessionBean" scope="session">
-	<logic:redirect href="index.jsp" />
-</logic:notPresent>
-<logic:present name="msgSessionBean" scope="session">
-	<bean:define id="bean"
-		type="oscar.oscarMessenger.pageUtil.MsgSessionBean"
-		name="msgSessionBean" scope="session" />
-	<logic:equal name="bean" property="valid" value="false">
-		<logic:redirect href="index.jsp" />
-	</logic:equal>
-</logic:present>
 <%
-oscar.oscarMessenger.pageUtil.MsgSessionBean bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)pageContext.findAttribute("bean");
-
 oscar.oscarMessenger.util.MsgDemoMap msgDemoMap = new oscar.oscarMessenger.util.MsgDemoMap();
 java.util.Hashtable demoMap = msgDemoMap.getDemoMap((String) request.getAttribute("viewMessageId"));
 
@@ -92,8 +79,8 @@ int iNextMsg = sNextMsg==null?0:Integer.parseInt(sNextMsg) + 1;
 String messageId = (String) request.getAttribute("viewMessageId");
 String isLastMessage = (String) request.getAttribute("viewMessageIsLastMsg");
 String orderBy = (String) request.getAttribute("orderBy");
-String demographic_no = bean.getDemographic_no();
-String provider_no = bean.getProviderNo();
+String demographic_no = request.getParameter("demographic_no");
+String provider_no = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 String msgCount = request.getParameter("msgCount");
 int iMsgCount =0;
 if(msgCount!=null){

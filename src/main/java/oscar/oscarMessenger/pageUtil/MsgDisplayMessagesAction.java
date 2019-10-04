@@ -36,8 +36,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.MessageListDao;
 import org.oscarehr.common.model.MessageList;
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -55,35 +53,12 @@ public class MsgDisplayMessagesAction extends Action {
 			throw new SecurityException("missing required security object (_msg)");
 		}
 		
-		// Setup variables            
-		oscar.oscarMessenger.pageUtil.MsgSessionBean bean = null;
+		// Setup variables
 		String[] messageNo = ((MsgDisplayMessagesForm) form).getMessageNo();
 		String providerNo;
 
 		//Initialize forward location
 		String findForward = "success";
-
-		if (request.getParameter("providerNo") != null && request.getParameter("userName") != null) {
-
-			bean = new oscar.oscarMessenger.pageUtil.MsgSessionBean();
-			bean.setProviderNo(request.getParameter("providerNo"));
-			bean.setUserName(request.getParameter("userName"));
-			request.getSession().setAttribute("msgSessionBean", bean);
-
-		}//if
-		else if(request.getParameter("providerNo") != null && request.getParameter("userName") == null) {
-			ProviderManager2 providerManager = SpringUtils.getBean(ProviderManager2.class);
-			Provider p = providerManager.getProvider(LoggedInInfo.getLoggedInInfoFromSession(request), request.getParameter("providerNo"));
-			if(p != null) {
-				bean = new oscar.oscarMessenger.pageUtil.MsgSessionBean();
-				bean.setProviderNo(request.getParameter("providerNo"));
-				bean.setUserName(p.getFirstName() + " " + p.getLastName());
-				request.getSession().setAttribute("msgSessionBean", bean);
-			}
-		}
-		else {
-			bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean) request.getSession().getAttribute("msgSessionBean");
-		}//else
 
 		/*
 		 *edit 2006-0811-01 by wreby
@@ -100,7 +75,7 @@ public class MsgDisplayMessagesAction extends Action {
 			//This will go through the array of message Numbers and set them
 			//to del.which stands for deleted. but you prolly could have figured that out
 
-			providerNo = bean.getProviderNo();
+			providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 			MessageListDao dao = SpringUtils.getBean(MessageListDao.class);
 			for (int i = 0; i < messageNo.length; i++) {
 				List<MessageList> msgs = dao.findByProviderNoAndMessageNo(providerNo, ConversionUtils.fromLongString(messageNo[i]));

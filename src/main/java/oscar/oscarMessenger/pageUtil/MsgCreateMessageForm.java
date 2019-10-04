@@ -32,10 +32,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import oscar.util.Doc2PDF;
+
+import java.net.URLDecoder;
 
 public final class MsgCreateMessageForm extends ActionForm {
     
     private String[] provider;
+    private String[] attachments;
+    private String[] attachmentTitles;
     private String message,subject;
     private String demographic_no;
     
@@ -70,9 +75,27 @@ public final class MsgCreateMessageForm extends ActionForm {
     public void setMessage(String msg){
         this.message = msg;
     }
-    
-    
-    
+
+    public String[] getAttachments()
+    {
+        return attachments;
+    }
+
+    public void setAttachments(String[] attachments)
+    {
+        this.attachments = attachments;
+    }
+
+    public String[] getAttachmentTitles()
+    {
+        return attachmentTitles;
+    }
+
+    public void setAttachmentTitles(String[] attachmentTitles)
+    {
+        this.attachmentTitles = attachmentTitles;
+    }
+
     /**
      * An Array of Strings thats contains provider numbers
      * @return String[], the provider numbers that this message will be set to
@@ -150,5 +173,53 @@ public final class MsgCreateMessageForm extends ActionForm {
         return errors;
         
     }
-    
+
+    /**
+     * concatenate all attachments in to one XML string
+     * @param request - an http servlet request. used in pdf to binary conversion
+     * @return - all documents concatenated together in to an xml string
+     */
+    public String getAttachmentXml(HttpServletRequest request)
+    {
+        if (attachments != null && attachmentTitles != null)
+        {
+            if (attachments.length != attachmentTitles.length)
+            {
+                throw new RuntimeException("The number of attachments [" + attachments.length + "] does not match the number of attachment titles [" + attachmentTitles.length + "]");
+            }
+
+            String attachmentXML = "";
+            for(int i =0; i < attachments.length; i++)
+            {
+                String attachBin = Doc2PDF.parseString2Bin(request, null, "<HTML>" + URLDecoder.decode(attachments[i]) + "</HTML>");
+                attachmentXML += " " + getPDFStartTag(attachments.length) + getStatusTag("OK") + getPDFTitleTag(URLDecoder.decode(attachmentTitles[i])) + getContentTag(attachBin) + getPDFEndTag();
+            }
+            return attachmentXML;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private String getPDFStartTag(int attachmentCount) {
+        return "<PDF><FILE_ID>" + attachmentCount + "</FILE_ID>";
+    }
+
+    private String getPDFTitleTag(String pdfTitle) {
+        return "<TITLE>" + pdfTitle + "</TITLE>";
+    }
+
+    private String getContentTag(String binStr) {
+        return "<CONTENT>" + binStr + "</CONTENT>";
+    }
+
+    private String getStatusTag(String statusStr) {
+        return "<STATUS>" + statusStr + "</STATUS>";
+    }
+
+    private String getPDFEndTag() {
+        return "</PDF>";
+    }
+
 }//CreateMessageForm
