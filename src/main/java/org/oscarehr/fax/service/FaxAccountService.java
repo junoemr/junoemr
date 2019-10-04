@@ -182,14 +182,7 @@ public class FaxAccountService
 
 		return transferList;
 	}
-
-	public void setFaxNotificationStatus(int id, String status)
-	{
-		faxOutboundDao.runNativeQuery("UPDATE fax_outbound " +
-				"SET notification_status = SILENT " +
-				"WHERE id =  " + id);
-	}
-
+	
 	/**
 	 * calculate the offset based on the current page number and resultCount
 	 *
