@@ -47,60 +47,68 @@ public class EligibilityCheckService
 {
 	private static final OscarProperties properties = OscarProperties.getInstance();
 
-	private static final String HC_TYPE_BC = "BC";
-
 	public EligibilityCheckTransfer checkEligibility(Demographic demo) throws IOException, InterruptedException
 	{
 		EligibilityCheckTransfer transfer = new EligibilityCheckTransfer();
 
-		if (properties.isClinicaidBillingType())
+		/* Eligibility checking only works in the same province.
+		Ex: asking BC teleplan for an AB hin type will never be eligible */
+		if(properties.getInstanceTypeUpperCase().equalsIgnoreCase(demo.getHcType()))
 		{
-			ClinicaidAPIService clinicaidAPIService = SpringUtils.getBean(ClinicaidAPIService.class);
-			Map<String, String> clinicaidResponse = clinicaidAPIService.checkEligibility(demo);
+			if(properties.isClinicaidBillingType())
+			{
+				ClinicaidAPIService clinicaidAPIService = SpringUtils.getBean(ClinicaidAPIService.class);
+				Map<String, String> clinicaidResponse = clinicaidAPIService.checkEligibility(demo);
 
-			transfer.setError(clinicaidResponse.get("error"));
-			transfer.setMessage(clinicaidResponse.get("msg"));
-			transfer.setResult(clinicaidResponse.get("result"));
-			transfer.setEligible(Boolean.valueOf(clinicaidResponse.get("isEligible")));
-			transfer.setValidationStatus(COMPLETE);
-		}
-		else if(properties.isBritishColumbiaBillingType() && (demo.getHcType().equalsIgnoreCase(HC_TYPE_BC)))
-		{
-			TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
-			String[] userpass = dao.getUsernamePassword();
-			TeleplanService tService = new TeleplanService();
-			Date billingDate = new Date();
+				transfer.setError(clinicaidResponse.get("error"));
+				transfer.setMessage(clinicaidResponse.get("msg"));
+				transfer.setResult(clinicaidResponse.get("result"));
+				transfer.setEligible(Boolean.valueOf(clinicaidResponse.get("isEligible")));
+				transfer.setValidationStatus(COMPLETE);
+			}
+			else if(properties.isBritishColumbiaBillingType())
+			{
+				TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
+				String[] userpass = dao.getUsernamePassword();
+				TeleplanService tService = new TeleplanService();
+				Date billingDate = new Date();
 
-			TeleplanAPI tAPI = tService.getTeleplanAPI(userpass[0], userpass[1]);
+				TeleplanAPI tAPI = tService.getTeleplanAPI(userpass[0], userpass[1]);
 
-			String phn = demo.getHin();
-			String dateofbirthyyyy = demo.getYearOfBirth();
-			String dateofbirthmm = demo.getMonthOfBirth();
-			String dateofbirthdd = demo.getDateOfBirth();
-			String dateofserviceyyyy = UtilDateUtilities.justYear(billingDate);
-			String dateofservicemm = UtilDateUtilities.justMonth(billingDate);
-			String dateofservicedd = UtilDateUtilities.justDay(billingDate);
-			boolean patientvisitcharge = true;
-			boolean lasteyeexam = true;
-			boolean patientrestriction = true;
+				String phn = demo.getHin();
+				String dateofbirthyyyy = demo.getYearOfBirth();
+				String dateofbirthmm = demo.getMonthOfBirth();
+				String dateofbirthdd = demo.getDateOfBirth();
+				String dateofserviceyyyy = UtilDateUtilities.justYear(billingDate);
+				String dateofservicemm = UtilDateUtilities.justMonth(billingDate);
+				String dateofservicedd = UtilDateUtilities.justDay(billingDate);
+				boolean patientvisitcharge = true;
+				boolean lasteyeexam = true;
+				boolean patientrestriction = true;
 
-			TeleplanResponse tr = tAPI.checkElig(phn, dateofbirthyyyy, dateofbirthmm, dateofbirthdd,
-					dateofserviceyyyy, dateofservicemm, dateofservicedd,
-					patientvisitcharge, lasteyeexam, patientrestriction);
+				TeleplanResponse tr = tAPI.checkElig(phn, dateofbirthyyyy, dateofbirthmm, dateofbirthdd,
+						dateofserviceyyyy, dateofservicemm, dateofservicedd,
+						patientvisitcharge, lasteyeexam, patientrestriction);
 
-			transfer.setResult(tr.getResult());
-			transfer.setMessage(tr.getMsgs());
-			transfer.setRealFilename(tr.getRealFilename());
-			transfer.setEligible(tr.isSuccess());
-			transfer.setValidationStatus(COMPLETE);
+				transfer.setResult(tr.getResult());
+				transfer.setMessage(tr.getMsgs());
+				transfer.setRealFilename(tr.getRealFilename());
+				transfer.setEligible(tr.isSuccess());
+				transfer.setValidationStatus(COMPLETE);
+			}
+			else
+			{
+				transfer.setEligible(false);
+				transfer.setMessage("Results unavailable: " + properties.getBillingTypeUpperCase() + " not supported");
+				transfer.setValidationStatus(UNAVAILABLE);
+			}
 		}
 		else
 		{
 			transfer.setEligible(false);
-			transfer.setMessage("Results unavailable. Unsupported province");
+			transfer.setMessage("Results unavailable. Out of province hin");
 			transfer.setValidationStatus(UNAVAILABLE);
 		}
-
 		return transfer;
 	}
 }
