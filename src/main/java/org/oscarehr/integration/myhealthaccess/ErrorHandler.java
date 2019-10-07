@@ -27,9 +27,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.oscarehr.integration.myhealthaccess.dto.BaseErrorTo1;
 import org.oscarehr.integration.myhealthaccess.dto.GenericErrorTo1;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.DuplicateRecordException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
+import org.oscarehr.integration.myhealthaccess.exception.SessionExpiredException;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -101,6 +103,16 @@ public class ErrorHandler <T> extends DefaultResponseErrorHandler
 			if (genericError.getCode().equals(GenericErrorTo1.ERROR_DUPLICATE_RECORD))
 			{
 				throw new DuplicateRecordException("Duplicate MyHealthAccess record for key found");
+			}
+
+			if (genericError.getCode().equals(GenericErrorTo1.ERROR_AUTHENTICATION))
+			{
+				throw new InvalidAccessException("Invalid or expired authentication key");
+			}
+
+			if (genericError.getCode().equals(GenericErrorTo1.ERROR_SESSION_EXPIRED))
+			{
+				throw new SessionExpiredException("Your session has expired");
 			}
 		}
 

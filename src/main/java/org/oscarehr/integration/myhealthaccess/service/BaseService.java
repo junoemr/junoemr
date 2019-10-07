@@ -24,7 +24,9 @@
 package org.oscarehr.integration.myhealthaccess.service;
 
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
+import org.oscarehr.managers.IntegrationManager;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -42,12 +44,14 @@ import javax.net.ssl.SSLContext;
 @Service
 public class BaseService extends org.oscarehr.integration.BaseService
 {
+	@Autowired
+	IntegrationManager integrationManager;
+
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
 	protected final String MYHEALTHACCESS_PROTOCOL = oscarProps.getProperty("myhealthaccess_protocol");
 	protected final String MYHEALTHACCESS_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
 	protected final String BASE_API_URI = oscarProps.getProperty("myhealthaccess_api_uri");
 	protected final String BASE_END_POINT = concatEndpointStrings(MYHEALTHACCESS_DOMAIN, BASE_API_URI);
-	protected final String CLINIC_ID = oscarProps.getProperty("myhealthaccess_clinic_id");
 	protected final String CLINIC_API_KEY = oscarProps.getProperty("myhealthaccess_clinic_api_key");
 
 	public String buildUrl(String endPoint)
@@ -89,29 +93,30 @@ public class BaseService extends org.oscarehr.integration.BaseService
 		return response.getBody();
 	}
 
-	protected <S, T, U> T executeRequest(String endPoint, HttpMethod method, S body,
+	protected <S, T, U> T executeRequest(String endPoint, String apiKey, HttpMethod method, S body,
 									  Class<T> responseClass, Class<U> errorClass)
 	{
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set("X-API-Key", CLINIC_API_KEY);
+		headers.set("X-API-Key", apiKey);
 		return executeRequest(endPoint, method, headers, body, responseClass, errorClass);
 	}
 
-	protected <S, T, U> T executeRequestWithToken(String endPoint, HttpMethod method, String token, S body, Class<T> responseClass, Class<U> errorClass)
+	protected <S, T, U> T executeRequestWithToken(String endPoint, String apiKey, HttpMethod method,
+												  String token, S body, Class<T> responseClass, Class<U> errorClass)
 	{
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set("X-API-Key", CLINIC_API_KEY);
+		headers.set("X-API-Key", apiKey);
 		headers.set("X-Auth-Token", token);
 
 		return executeRequest(endPoint, method, headers, body, responseClass, errorClass);
 	}
 
-	protected <T, U> T executeRequest(String endPoint, HttpMethod method,
+	protected <T, U> T executeRequest(String endPoint, String apiKey, HttpMethod method,
 								   Class<T> responseClass, Class<U> errorClass)
 	{
-		return executeRequest(endPoint, method, null, responseClass, errorClass);
+		return executeRequest(endPoint, apiKey, method, null, responseClass, errorClass);
 	}
 
 	private void IgnoreSSLVerifyInDevMode()

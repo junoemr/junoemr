@@ -25,7 +25,8 @@ package org.oscarehr.integration.myhealthaccess.model;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserShortTokenTo1;
+import oscar.util.StringUtils;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -33,6 +34,8 @@ import java.util.Date;
 
 public class MHAUserToken
 {
+	private static final int EXPIRE_RENEWAL_DAYS = 7;
+
 	private String token;
 	private Date expiryDate;
 	private String clinicUserID;
@@ -44,7 +47,7 @@ public class MHAUserToken
 		ACCESS
 	}
 
-	private MHAUserToken(ClinicUserAccessTokenTo1 transfer)
+	private MHAUserToken(ClinicUserShortTokenTo1 transfer)
 	{
 		this.token = transfer.getToken();
 
@@ -55,14 +58,15 @@ public class MHAUserToken
 		this.type = TYPE.valueOf(decodedToken.getClaim("type").asString());
 	}
 
-	public static MHAUserToken decodeToken(ClinicUserAccessTokenTo1 transfer)
+	public static MHAUserToken decodeToken(String token)
 	{
-		if (transfer == null)
+		if (StringUtils.isNullOrEmpty(token))
 		{
 			return null;
 		}
 
-		return new MHAUserToken(transfer);
+		ClinicUserShortTokenTo1 accessTokenTo1 = new ClinicUserShortTokenTo1(token);
+		return new MHAUserToken(accessTokenTo1);
 	}
 
 	@Override
@@ -100,5 +104,10 @@ public class MHAUserToken
 		Duration timeToExpire = Duration.between(new Date().toInstant(), expiryDate.toInstant());
 
 		return duration.compareTo(timeToExpire) >= 0;
+	}
+
+	public boolean shouldRenew()
+	{
+		return this.expiresWithinDays(EXPIRE_RENEWAL_DAYS);
 	}
 }

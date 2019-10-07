@@ -25,15 +25,19 @@
 package org.oscarehr.common.model;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.EncryptionUtils;
 import org.oscarehr.util.MiscUtils;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -55,9 +59,10 @@ public class Security extends AbstractModel<Integer> {
 	
 	@Column(name = "password")
 	private String password;
-	
-	@Column(name = "provider_no")
-	private String providerNo;
+
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+	@JoinColumn(name = "provider_no", referencedColumnName = "provider_no")
+	private ProviderData provider;
 
 	@Column(name = "pin")
 	private String pin;
@@ -77,9 +82,6 @@ public class Security extends AbstractModel<Integer> {
 
 	@Column(name="forcePasswordReset")
 	private Boolean forcePasswordReset = true;
-
-	@Column(name = "myhealthaccess_auth_token")
-	private String myHealthAccessLongToken;
 
 	/** default constructor */
 	public Security() {
@@ -107,7 +109,7 @@ public class Security extends AbstractModel<Integer> {
 	public Security(String userName, String password, String providerNo, String pin, Integer BRemotelockset, Integer BLocallockset, Date dateExpiredate, Integer BExpireset, Boolean forcePasswordReset) {
 		this.userName = userName;
 		this.password = password;
-		this.providerNo = providerNo;
+		this.setProviderNo(providerNo);
 		this.pin = pin;
 		this.BRemotelockset = BRemotelockset;
 		this.BLocallockset = BLocallockset;
@@ -147,11 +149,16 @@ public class Security extends AbstractModel<Integer> {
 	}
 
 	public String getProviderNo() {
-		return providerNo;
+		if (this.provider == null)
+		{
+			return null;
+		}
+
+		return Integer.toString(this.provider.getProviderNo());
 	}
 
 	public void setProviderNo(String providerNo) {
-		this.providerNo = providerNo;
+		this.provider.setProviderNo(Integer.parseInt(providerNo));
 	}
 
 	public String getPin() {
@@ -202,22 +209,14 @@ public class Security extends AbstractModel<Integer> {
 		this.id = id;
 	}
 
-	public ClinicUserAccessTokenTo1 getMyHealthAccessLongToken()
+	public ProviderData getProvider()
 	{
-		if(this.myHealthAccessLongToken == null || this.myHealthAccessLongToken.isEmpty())
-		{
-			return null;
-		}
-
-		ClinicUserAccessTokenTo1 accessTokenTo = new ClinicUserAccessTokenTo1();
-		accessTokenTo.setToken(this.myHealthAccessLongToken);
-
-		return accessTokenTo;
+		return provider;
 	}
 
-	public void setMyHealthAccessLongToken(String myHealthAccessAuthToken)
+	public void setProvider(ProviderData provider)
 	{
-		this.myHealthAccessLongToken = myHealthAccessAuthToken;
+		this.provider = provider;
 	}
 
 

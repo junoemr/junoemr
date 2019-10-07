@@ -770,7 +770,6 @@ private long getAppointmentRowSpan(
 // =================================================================================================
 // START OF MENU BAR
 // =================================================================================================
-
 %>
 
 <table BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%" id="firstTable" class="noprint">
@@ -901,7 +900,7 @@ private long getAppointmentRowSpan(
 				</c:if>
 				<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
 					<li id="admin2">
-						<a href="../telehealth/myhealthaccess.do?method=startTelehealth"
+						<a href="../telehealth/myhealthaccess.do?method=openTelehealth&siteName=<%= selectedSite != null ? selectedSite : "" %>"
 							 id="myhealthaccess"
 							 title='MyHealthAccess'
 							 target="_blank">MyHealthAccess</a>
@@ -1877,7 +1876,7 @@ private long getAppointmentRowSpan(
 														<c:if test="<%= appointmentInfo.isVirtual() && org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
 																<a href="#"
 																	 onClick='popupPage(800, 1280,
-																					 "../telehealth/myhealthaccess.do?method=startTelehealth" +
+																					 "../telehealth/myhealthaccess.do?method=openTelehealth" +
 																					 "&demographicNo=${appointmentInfo.demographicNo}" +
 																					 "&siteName=${appointmentInfo.siteName}" +
                                                                                      "&appt=${appointmentInfo.appointmentNo}");return false;'

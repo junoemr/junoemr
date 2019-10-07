@@ -24,14 +24,16 @@
 package org.oscarehr.telehealth.service;
 
 import org.oscarehr.common.model.Security;
-import org.oscarehr.common.model.Site;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
+import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.model.IntegrationData;
+import org.oscarehr.integration.model.UserIntegrationAccess;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserShortTokenTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
 import org.oscarehr.integration.myhealthaccess.model.MHAUserToken;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
+import org.oscarehr.managers.IntegrationManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,119 +52,83 @@ public class MyHealthAccessService
 	ProviderDataDao providerDataDao;
 
 	@Autowired
+	IntegrationManager integrationManager;
+
+	@Autowired
 	ClinicService clinicService;
 
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
-	protected static final String MYHEALTHACCESS_PROTOCOL = oscarProps.getProperty("myhealthaccess_protocol");
-	protected static final String MYHEALTHACCESS_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
-	protected static final String CLINIC_ID = oscarProps.getProperty("myhealthaccess_clinic_id");
+	protected static final String MHA_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
+	protected static final String MHA_HOME_URL = "home";
+	protected static final String MHA_BASE_TELEHEALTH_URL = "/provider/clinic/%s/telehealth/appointment/%s/";
 
-	public String buildTeleHealthRedirectURL(String remotedId, Site site, String appointmentNo)
+	public String getTelehealthURL(IntegrationData integrationData, String appointmentNo)
 	{
 		try
 		{
-			String redirectUrl;
-
 			if (appointmentNo == null)
 			{
-				redirectUrl = "home";
-			}
-			else
-			{
-				final String baseTelehealthURL = "/provider/clinic/%s/telehealth/appointment/%s/";
-				redirectUrl = URLEncoder.encode(String.format(baseTelehealthURL, getClinicID(site), appointmentNo), "UTF-8");
+				throw new UnsupportedEncodingException();
 			}
 
-			String endPointPath = "clinic_users/push_token?";
-			String endPoint = ClinicService.concatEndpointStrings(MYHEALTHACCESS_DOMAIN, endPointPath);
+			MHAUserToken shortToken = getShortToken(integrationData);
 
-			return clinicService.buildUrl(endPoint) +
-					"clinic_id=" + getClinicID(site) +
-					"&user_id=" + remotedId +
-					"&redirect_url=" + redirectUrl;
+			String clinicId = integrationData.getIntegration().getRemoteId();
+			String clinicUserId = integrationData.getRemoteUserId();
 
+			String redirectUrl = String.format(MHA_BASE_TELEHEALTH_URL, clinicId, appointmentNo);
+
+			String clinicUserPath = "clinic_users/push_token?";
+			String endpoint = ClinicService.concatEndpointStrings(MHA_DOMAIN, clinicUserPath);
+			endpoint = clinicService.buildUrl(endpoint) + "clinic_id=%s&user_id=%s&redirect_url=%s#token=%s";
+			endpoint = String.format(endpoint, clinicId, clinicUserId, redirectUrl, shortToken.getToken());
+
+			return URLEncoder.encode(endpoint, "UTF-8");
 		}
 		catch (UnsupportedEncodingException e)
 		{
 			MiscUtils.getLogger().error("Error encoding MyHealthAccess redirect URL " + e.getMessage());
-			return "home";
+			return MHA_HOME_URL;
 		}
 	}
 
-	public ClinicUserTo1 getLinkedUser(Security loggedInUser, Site site)
+	public UserIntegrationAccess createRemoteUser(IntegrationData integrationData, Security loggedInUser, ClinicUserTo1 clinicUserTo1)
 	{
-		return clinicService.getLinkedUser(getClinicID(site), Integer.toString(loggedInUser.getId()));
+		Integration integration = integrationData.getIntegration();
+		ClinicUserTo1 newUser = clinicService.createUser(integrationData, clinicUserTo1);
+
+		UserIntegrationAccess integrationAccess = new UserIntegrationAccess(
+				integration,
+				loggedInUser,
+				newUser.getMyhealthaccessId(),
+				clinicUserTo1.getEmail(),
+				newUser.getToken());
+
+		integrationManager.updateUserIntegrationAccess(integrationAccess);
+		return integrationAccess;
 	}
 
-	public ClinicUserTo1 getUserByEmail(String email, Site site)
+	public IntegrationData createUserIntegration(IntegrationData integrationData, ClinicUserLoginTo1 userLogin)
 	{
-		MiscUtils.getLogger().error("email1: " + email);
-		return clinicService.getUserByEmail(getClinicID(site), email);
+		ClinicUserTo1 longToken = clinicService.getLongToken(integrationData, userLogin);
+
+		UserIntegrationAccess integrationAccess = integrationData.getUserIntegrationAccess();
+		integrationAccess.setAccessToken(longToken.getToken());
+
+		integrationManager.updateUserIntegrationAccess(integrationAccess);
+		return integrationData;
 	}
 
-	public ClinicUserCreateTo1 createUser(Security loggedInUser, ProviderData loggedInProvider,
-	                                String email, Site site)
+	public void renewLongToken(IntegrationData integrationData)
 	{
-		ClinicUserCreateTo1 newUser = clinicService.createUser(
-				getClinicID(site),
-				Integer.toString(loggedInUser.getId()),
-				email,
-				loggedInProvider.getFirstName(),
-				loggedInProvider.getLastName()
-		);
-
-		return newUser;
+		ClinicUserTo1 renewedToken = clinicService.renewLongToken(integrationData);
+		integrationData.getUserIntegrationAccess().setAccessToken(renewedToken.getToken());
+		integrationManager.updateUserIntegrationAccess(integrationData.getUserIntegrationAccess());
 	}
 
-	public MHAUserToken getShortToken(Site site, String remoteUserID, Security loggedInUser)
+	public MHAUserToken getShortToken(IntegrationData integrationData)
 	{
-		ClinicUserAccessTokenTo1 longToken = loggedInUser.getMyHealthAccessLongToken();
-		ClinicUserAccessTokenTo1 shortToken = clinicService.getLoginToken(getClinicID(site), remoteUserID, longToken);
-
-		return MHAUserToken.decodeToken(shortToken);
+		ClinicUserShortTokenTo1 shortToken = clinicService.getShortToken(integrationData);
+		return MHAUserToken.decodeToken(shortToken.getToken());
 	}
-
-	public MHAUserToken getLongToken(Site site, String remoteUserID,
-	                                             Security loggedInUser, String email, String password)
-	{
-		ClinicUserAccessTokenTo1 longToken = clinicService.getAuthToken(
-				getClinicID(site),
-				remoteUserID,
-				Integer.toString(loggedInUser.getId()),
-				email,
-				password);
-
-		return MHAUserToken.decodeToken(longToken);
-	}
-
-	public MHAUserToken renewLongToken(Site site, String remoteUserID, Security loggedInUser)
-	{
-		ClinicUserAccessTokenTo1 longToken = loggedInUser.getMyHealthAccessLongToken();
-		ClinicUserAccessTokenTo1 renewedToken = clinicService.renewAuthToken(getClinicID(site), remoteUserID, longToken);
-
-		return MHAUserToken.decodeToken(renewedToken);
-	}
-
-	public static String getClinicID(Site site)
-	{
-		String clinic_id;
-		if (site == null)
-		{
-			clinic_id = CLINIC_ID;
-		}
-		else
-		{
-			// TODO GET BY SITE
-			clinic_id = CLINIC_ID;
-		}
-
-		if (clinic_id.isEmpty())
-		{
-			throw new IllegalArgumentException("Missing required MyHealthAccess Clinic ID");
-		}
-
-		return clinic_id;
-	}
-
-
 }

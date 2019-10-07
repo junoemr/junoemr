@@ -29,10 +29,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ClinicUserAccessTokenTo1 implements Serializable
+public class ClinicUserShortTokenTo1 implements Serializable
 {
-	@JsonProperty("access_token")
+	@JsonProperty("short_token")
 	private String token;
+
+	public ClinicUserShortTokenTo1(String token)
+	{
+		this.token = token;
+	}
 
 	public String getToken()
 	{
