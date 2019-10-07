@@ -25,6 +25,7 @@ package org.oscarehr.fax.service;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
@@ -219,6 +220,42 @@ public class OutgoingFaxService
 
 		sendQueuedFax(faxOutbound, fileToResend);
 		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+	}
+
+
+	public int getOutboxNotificationCount(Long id,
+										  Integer page,
+										  Integer perPage,
+										  String endDateStr,
+										  String startDateStr,
+										  String combinedStatus,
+										  String archived)
+	{
+		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
+		criteriaSearch.setLimit(perPage);
+		criteriaSearch.setFaxAccountId(id);
+		criteriaSearch.setSortDirDescending();
+
+		if (startDateStr != null)
+		{
+			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
+		}
+		if (startDateStr != null)
+		{
+			criteriaSearch.setStartDate(ConversionUtils.toLocalDate(startDateStr));
+		}
+		if (StringUtils.trimToNull(combinedStatus) != null)
+		{
+			criteriaSearch.setCombinedStatus(FaxOutboxTransferOutbound.CombinedStatus.valueOf(combinedStatus));
+		}
+		if (StringUtils.trimToNull(archived) != null)
+		{
+			criteriaSearch.setArchived(Boolean.parseBoolean(archived));
+		}
+		criteriaSearch.setOffset(perPage * (page - 1));
+		criteriaSearch.setNotificationStatus(FaxOutbound.NotificationStatus.NOTIFY);
+
+		return faxOutboundDao.criteriaSearchCount(criteriaSearch);
 	}
 
 	public FaxOutboxTransferOutbound setNotificationStatus(Long faxOutId, String status)

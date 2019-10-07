@@ -23,9 +23,12 @@
 package oscar.oscarFax.client.tld;
 
 import org.oscarehr.fax.service.FaxAccountService;
+import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -38,10 +41,13 @@ public class FailedOutboxFaxTag extends TagSupport
 
 	private final FaxAccountService faxService;
 
+	private final OutgoingFaxService outgoingFaxService;
+
 	public FailedOutboxFaxTag()
 	{
 		numFailures = 0;
 		faxService = SpringUtils.getBean(FaxAccountService.class);
+		outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
 	}
 
 	public int doStartTag() throws JspException
@@ -50,26 +56,20 @@ public class FailedOutboxFaxTag extends TagSupport
 		{
 			numFailures = 0;
 
+			RestSearchResponse<FaxAccountTransferOutbound> accountsResp;
 			List<FaxAccountTransferOutbound> accounts;
+			int page = 0;
 			do
 			{
-				accounts = faxService.listAccounts(1, 10).getBody();
+				accountsResp = faxService.listAccounts(++page, 10);
+				accounts = accountsResp.getBody();
 				for (FaxAccountTransferOutbound account : accounts)
 				{
-					long count;
-					do
-					{
-						count = faxService.getOutboxNotificationCount(account.getId(), 1, 10, null, null, "ERROR", null).getBody();
-						numFailures += count;
-					}
-					while(count >= 10);
-					do{
-						count =faxService.getOutboxNotificationCount(account.getId(), 1, 10, null, null, "INTEGRATION_FAILED", null).getBody();
-						numFailures += count;
-					}
-					while(count >= 10);
+					numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), 1, 10, null, null, FaxOutboxTransferOutbound.CombinedStatus.ERROR.toString(), null);
+					numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), 1, 10, null, null, FaxOutboxTransferOutbound.CombinedStatus.INTEGRATION_FAILED.toString(), null);
 				}
-			}while(accounts.size() >= 10);
+			}
+			while (accounts.size() >= accountsResp.getHeaders().getPerPage());
 
 			JspWriter out = super.pageContext.getOut();
 			if (numFailures > 0)

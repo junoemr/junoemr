@@ -93,7 +93,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 
 		page = validPageNo(page);
 		perPage = limitedResultCount(perPage);
-		return faxAccountDao.listAccounts(page,perPage);
+		return faxAccountService.listAccounts(page,perPage);
 	}
 
 	@GET
@@ -262,11 +262,11 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		int offset = calculatedOffset(page, perPage);
 
 		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
-		criteriaSearch.setOffset(offset);
 		criteriaSearch.setLimit(perPage);
 		criteriaSearch.setFaxAccountId(id);
 		criteriaSearch.setSortDirDescending();
-		if (endDateStr != null)
+
+		if (startDateStr != null)
 		{
 			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
 		}
@@ -282,7 +282,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		{
 			criteriaSearch.setArchived(Boolean.parseBoolean(archived));
 		}
-
+		criteriaSearch.setOffset(offset);
 		int total = faxOutboundDao.criteriaSearchCount(criteriaSearch);
 
 		FaxAccount faxAccount = faxAccountDao.find(id);
