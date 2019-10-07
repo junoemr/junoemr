@@ -129,7 +129,7 @@ public class RScheduleDao extends AbstractDao<RSchedule>
 	
 
 
-	public List<RSchedule> findByEdateAfterATime(String providerNo, Date timeAfter)
+	public List<RSchedule> findByEdateAfter(String providerNo, Date timeAfter)
 	{
 		Query query = createQuery("s","s.providerNo = :providerNo AND s.eDate > :timeAfter AND s.status='A' ORDER BY s.sDate");
 		query.setParameter("providerNo", providerNo);
