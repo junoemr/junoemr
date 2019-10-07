@@ -34,15 +34,18 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.external.soap.v1.transfer.DemographicIntegrationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.PhrVerificationTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
 
+import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -65,6 +68,9 @@ public class DemographicWs extends AbstractWs {
 
 	@Autowired
 	private DemographicManager demographicManager;
+
+	@Autowired
+	private DemographicService demographicService;
 
 	@Autowired
 	private DemographicCustDao demographicCustDao;
@@ -154,7 +160,8 @@ public class DemographicWs extends AbstractWs {
 		return(results.toArray(new Integer[0]));
 	}
 	
-	public Integer[] getDemographicIdsWithMyOscarAccounts(@WebParam(name="startDemographicIdExclusive") Integer startDemographicIdExclusive, @WebParam(name="itemsToReturn") int itemsToReturn)
+	public Integer[] getDemographicIdsWithMyOscarAccounts(@WebParam(name="startDemographicIdExclusive") Integer startDemographicIdExclusive,
+	                                                      @WebParam(name="itemsToReturn") int itemsToReturn)
 	{
 		List<Integer> results=demographicManager.getDemographicIdsWithMyOscarAccounts(getLoggedInInfo(), startDemographicIdExclusive, itemsToReturn);
 		return(results.toArray(new Integer[0]));
@@ -217,7 +224,8 @@ public class DemographicWs extends AbstractWs {
 	/**
 	 * @return the ID of the demographic just added
 	 */
-	public Integer addDemographic(DemographicTransfer demographicTransfer) throws Exception
+	public Integer addDemographic(DemographicTransfer demographicTransfer,
+	                              @Nullable DemographicIntegrationTransfer integrationTransfer) throws Exception
 	{
 		MessageContext mc = wsContext.getMessageContext();
 		HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
@@ -236,6 +244,11 @@ public class DemographicWs extends AbstractWs {
 		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
 		demographicManager.addDemographicExtras(loggedInInfo, demographic, demographicTransfer);
 		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
+
+		if(integrationTransfer != null)
+		{
+			demographicService.addDemographicIntegrationRecord(demographic.getDemographicNo(), integrationTransfer);
+		}
 
 		return demographic.getDemographicNo();
 	}
