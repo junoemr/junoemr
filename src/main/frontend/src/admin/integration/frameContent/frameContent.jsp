@@ -21,5 +21,5 @@
  * Canada
 --%>
 <div class="frame-content-controller height-100">
-	<iframe class="content-frame" width="98%" height="92%" frameborder="0" type="text/html" src="{{ FrameCtrl.frameUrl }}"></iframe>
+	<iframe class="content-frame" name="content-frame" width="98%" height="92%" frameborder="0" type="text/html" src="{{ FrameCtrl.frameUrl }}"></iframe>
 </div>
