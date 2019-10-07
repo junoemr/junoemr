@@ -994,9 +994,10 @@ function updateGeneticD() {
 	            adjustDynamicListTotals();
 	            jQuery.ajax({
 	            	url:'<%=request.getContextPath()%>/Pregnancy.do?method=saveFormAjax',
+					type: 'POST',
 	            	data: $("form").serialize(),
-	            	async:false, 
-	            	dataType:'json', 
+	            	async:false,
+	            	dataType:'json',
 	            	success:function(data) {
 	        			if(data.value == 'error') {
 	        				alert('Error saving form.');
@@ -1995,7 +1996,7 @@ $(document).ready(function(){
 
 <div id="maincontent">
 <div id="content_bar" class="innertube" style="background-color: #c4e9f6">
-<html:form action="/form/formname">
+<html:form action="/form/formname" method="POST">
 	<input type="hidden" name="c_lastVisited"
 		value=<%=props.getProperty("c_lastVisited", "pg1")%> />
 	<input type="hidden" name="demographic_no"
