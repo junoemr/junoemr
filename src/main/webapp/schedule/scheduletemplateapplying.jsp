@@ -527,7 +527,7 @@ function addDataString1() {
 					name="select" onChange="selectrschedule(this)">
 					<%
 
-						List<RSchedule> rss = rScheduleDao.searchRscheduleByEdateAfterATime(request.getParameter("provider_no"), ConversionUtils.fromDateString(threeYearsBack));
+						List<RSchedule> rss = rScheduleDao.findByEdateAfterATime(request.getParameter("provider_no"), ConversionUtils.fromDateString(threeYearsBack));
 
 						for(RSchedule rs : rss)
 						{
