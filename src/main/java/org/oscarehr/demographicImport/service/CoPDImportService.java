@@ -62,6 +62,7 @@ import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.search.ProviderCriteriaSearch;
+import org.oscarehr.provider.service.ProviderRoleService;
 import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.rx.dao.PrescriptionDao;
@@ -150,6 +151,9 @@ public class CoPDImportService
 
 	@Autowired
 	MeasurementDao measurementDao;
+
+	@Autowired
+	ProviderRoleService providerRoleService;
 
 	private static long missingDocumentCount = 0;
 
@@ -307,6 +311,8 @@ public class CoPDImportService
 
 			String billCenterCode = properties.getProperty("default_bill_center","");
 			provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
+			providerRoleService.setPrimaryRole(provider.getProviderNo(), "doctor");
+
 			logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 		}
 		else if(matchedProviders.size() == 1)
