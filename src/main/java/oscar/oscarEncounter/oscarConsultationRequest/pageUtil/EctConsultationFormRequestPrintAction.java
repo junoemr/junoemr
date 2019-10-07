@@ -36,6 +36,7 @@ import oscar.dms.EDoc;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.UtilDateUtilities;
 
+import javax.naming.SizeLimitExceededException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -78,6 +79,8 @@ public class EctConsultationFormRequestPrintAction extends Action
 		Exception exception = null;
 	    List<InputStream> streamList = new ArrayList<>();
 
+	    long excessBytes = 0L;
+
 	    try
 		{
 			List<EDoc> attachedDocuments = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demographicNo, requestId);
@@ -90,7 +93,11 @@ public class EctConsultationFormRequestPrintAction extends Action
 			streamList.addAll(consultationPDFCreationService.toEFormInputStreams(request, attachedEForms));
 
 			ByteOutputStream bos = new ByteOutputStream();
-			consultationPDFCreationService.combineStreams(streamList, bos);
+			excessBytes = consultationPDFCreationService.combineStreams(streamList, bos);
+			if (excessBytes > 0)
+			{
+				throw new SizeLimitExceededException();
+			}
 
 			response.setContentType("application/pdf"); // octet-stream
 			response.setHeader(
@@ -114,6 +121,11 @@ public class EctConsultationFormRequestPrintAction extends Action
 		{
 			error = "IOException";
 			exception = ioe;
+		}
+	    catch (SizeLimitExceededException slee)
+		{
+			error = "SizeLimitExceededException";
+			exception = slee;
 		}
 		finally
 		{
