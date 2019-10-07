@@ -22,33 +22,34 @@
  */
 package org.oscarehr.common.hl7.copd.mapper;
 
-import ca.uhn.hl7v2.HL7Exception;
-import org.jsoup.Jsoup;
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-// override of EncounterNoteMapper with custom functionality for MedAccess
-public class EncounterNoteMapperMedAccess extends EncounterNoteMapper
+public class DocumentMapperMedaccess extends DocumentMapper
 {
-	public EncounterNoteMapperMedAccess(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public DocumentMapperMedaccess(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
 		super(message, providerRep, importSource);
 	}
 
-	@Override
-	protected String getEncounterNoteText(int rep) throws HL7Exception
-	{
-		return stripHTML(super.getEncounterNoteText(rep));
-	}
-
 	/**
-	 * strip html tags from text
-	 * @param text - text to preform the stripping on
-	 * @return - the modified text
+	 * get, Juno document type. things like, Consult, Lab, Procedure, ect.
+	 * For Medaccess imports the document type is stored (some times) on the front of the description as, <doctype>;<description>
+	 * @param rep - the document you wish to get the type for.
+	 * @return - the document type if possible else returns the string "N/A"
 	 */
-	private String stripHTML(String text)
+	@Override
+	public String getDocType(int rep)
 	{
-		return Jsoup.parse(text).wholeText();
+		Matcher match = Pattern.compile("([\\d\\w\\s]+);.*").matcher(StringUtils.trimToEmpty(getDescription(rep)));
+		if (match.matches())
+		{
+			return match.group(1);
+		}
+		return "N/A";
 	}
 }

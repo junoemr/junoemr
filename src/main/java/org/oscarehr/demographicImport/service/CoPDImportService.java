@@ -398,6 +398,14 @@ public class CoPDImportService
 			drug.setDemographicId(demographic.getDemographicId());
 			drug.setProviderNo(String.valueOf(provider.getProviderNo()));
 			drug.setScriptNo(prescription.getId());
+
+			if (!medicationMapper.isDrugMostRecent(i) && importSource != IMPORT_SOURCE.WOLF)
+			{
+				drug.setArchived(true);
+				drug.setArchivedReason("represcribed");
+			}
+
+
 			drugDao.persist(drug);
 
 			if(note != null)

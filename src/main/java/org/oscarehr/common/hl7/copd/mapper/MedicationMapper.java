@@ -109,6 +109,27 @@ public class MedicationMapper extends AbstractMapper
 		return drug;
 	}
 
+	/**
+	 * check if the drug at rep is the most recent prescription of the drug.
+	 * @param rep - the rep of the drug to check.
+	 * @return - true if the drug is the most recent, false otherwise.
+	 */
+	public boolean isDrugMostRecent(int rep) throws HL7Exception
+	{
+		String drugId = getRequestedGiveCodeId(rep);
+		Date drugStart = getAdministrationStartDate(rep);
+
+		for (int i =0; i < getNumMedications(); i ++ )
+		{
+			if (drugId.equals(getRequestedGiveCodeId(i)) && drugStart.before(getAdministrationStartDate(i)))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	public Prescription getPrescription(int rep)
 	{
 		Prescription prescription = new Prescription();

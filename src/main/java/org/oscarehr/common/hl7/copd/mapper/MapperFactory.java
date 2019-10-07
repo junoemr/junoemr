@@ -96,7 +96,13 @@ public class MapperFactory
 	 */
 	public static DocumentMapper newDocumentMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		return new DocumentMapper(message, providerRep, importSource);
+		switch (importSource)
+		{
+			case MEDACCESS:
+				return new DocumentMapperMedaccess(message, providerRep, importSource);
+			default:
+				return new DocumentMapper(message, providerRep, importSource);
+		}
 	}
 
 	/**
