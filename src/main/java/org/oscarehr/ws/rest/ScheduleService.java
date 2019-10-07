@@ -24,6 +24,7 @@
 package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -31,6 +32,9 @@ import org.apache.log4j.Logger;
 import org.apache.tools.ant.util.DateUtils;
 import org.oscarehr.appointment.dto.CalendarAppointmentStatus;
 import org.oscarehr.appointment.service.AppointmentStatusService;
+import org.oscarehr.appointment.web.NextAppointmentSearchBean;
+import org.oscarehr.appointment.web.NextAppointmentSearchHelper;
+import org.oscarehr.appointment.web.NextAppointmentSearchResult;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentStatus;
@@ -42,6 +46,8 @@ import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.schedule.dto.CalendarSchedule;
 import org.oscarehr.schedule.dto.ScheduleGroup;
+import org.oscarehr.schedule.dto.ScheduleSearchResult;
+import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.schedule.service.Schedule;
 import org.oscarehr.schedule.service.ScheduleGroupService;
@@ -52,6 +58,7 @@ import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentStatusConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentTypeConverter;
 import org.oscarehr.ws.rest.conversion.LookupListItemConverter;
+import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
@@ -66,6 +73,7 @@ import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -102,6 +110,53 @@ public class ScheduleService extends AbstractServiceImpl {
 	private ScheduleGroupService scheduleGroupService;
 	@Autowired
 	private ScheduleTemplateService scheduleTemplateService;
+
+	@GET
+	@Path("/search/available")
+	@Produces("application/json")
+	public RestSearchResponse<ScheduleSearchResult> searchAvailable(@QueryParam("providerNo") String providerNo,
+	                                                                @QueryParam("dayOfWeek") String dayOfWeek,
+	                                                                @QueryParam("startTime") String startTime,
+	                                                                @QueryParam("endTime") String endTime,
+	                                                                @QueryParam("code") String code,
+	                                                                @DefaultValue("8") @QueryParam("resultCount") Integer resultCount
+	)
+	{
+		List<ScheduleSearchResult> resultList = new ArrayList<>();
+		ProviderConverter providerConverter = new ProviderConverter();
+
+		NextAppointmentSearchBean searchBean = new NextAppointmentSearchBean();
+		searchBean.setProviderNo(StringUtils.trimToEmpty(providerNo));
+		searchBean.setDayOfWeek(dayOfWeek);
+		searchBean.setStartTimeOfDay(StringUtils.trimToEmpty(startTime).split(":")[0]);
+		searchBean.setEndTimeOfDay(StringUtils.trimToEmpty(endTime).split(":")[0]);
+		searchBean.setCode(StringUtils.trimToEmpty(code));
+		searchBean.setNumResults(resultCount);
+		List<NextAppointmentSearchResult> results = NextAppointmentSearchHelper.search(searchBean);
+
+		for(NextAppointmentSearchResult result : results)
+		{
+			ScheduleTemplateCode templateCode = result.getScheduleTemplateCode();
+			ScheduleSlot slot = new ScheduleSlot(
+					ConversionUtils.toLocalDateTime(result.getDate()),
+					String.valueOf(templateCode.getCode()),
+					result.getDuration(),
+					templateCode.getDescription(),
+					templateCode.getColor(),
+					templateCode.getJunoColor(),
+					templateCode.getConfirm(),
+					templateCode.getBookinglimit()
+			);
+
+			ScheduleSearchResult searchResult = new ScheduleSearchResult();
+			searchResult.setProvider(providerConverter.getAsTransferObject(null, result.getProvider()));
+			searchResult.setScheduleSlot(slot);
+			resultList.add(searchResult);
+		}
+
+		return RestSearchResponse.successResponseOnePage(resultList);
+	}
+
 
 	@GET
 	@Path("/day/{date}")

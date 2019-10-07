@@ -16,6 +16,7 @@
 		<input id="input-{{name}}"
 		       type="text"
 		       class="form-control"
+		       placeholder="{{text_placeholder}}"
 		       ng-class="{'no_scroll_bar': max_characters > 0}"
 		       ng-model="model"
 		       ng-focus="focus_fn()"

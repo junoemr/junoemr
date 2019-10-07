@@ -88,6 +88,10 @@
 <link rel="stylesheet" type="text/css" media="all"
 	href="../share/calendar/calendar.css" title="win2k-cold-1" />
 
+	<!-- Helper scripts for submission -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+
 <!-- main calendar program -->
 <script type="text/javascript" src="../share/calendar/calendar.js"></script>
 
@@ -209,6 +213,7 @@
     
     function onGraph(url) {    
         if( checkMeasures() ) {
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             document.forms["graph"].action = url;
             document.forms["graph"].submit();
         }          
@@ -218,8 +223,8 @@
         document.forms[0].submit.value="print"; 
                 
         document.forms[0].action = "../form/createpdf?__title=Rourke+Baby+Report+Pg2&__cfgfile=rourke2006printCfgPg2&__template=rourke2006p2";
-        document.forms[0].target="_blank";            
-        
+        document.forms[0].target="_blank";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         return true;
     }
     
@@ -227,14 +232,15 @@
         document.forms[0].submit.value="printAll"; 
                 
         document.forms[0].action = "../form/formname.do?__title=Rourke+Baby+Report&__cfgfile=rourke2006printCfgPg1&__cfgfile=rourke2006printCfgPg2&__cfgfile=rourke2006printCfgPg3&__cfgfile=rourke2006printCfgPg4&__template=rourke2006";
-        document.forms[0].target="_blank";            
-        
+        document.forms[0].target="_blank";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         return true;
     }
     
     function onSave() {
         if( checkMeasures() ) {
-            document.forms[0].submit.value="save";                
+            document.forms[0].submit.value="save";
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             reset();                
             return confirm("Are you sure you want to save this form?");
         }
@@ -245,6 +251,7 @@
     function onSaveExit() {
         if( checkMeasures() ) {
             document.forms[0].submit.value="exit";
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             reset();
             return confirm("Are you sure you wish to save and close this window?");
         }

@@ -25,10 +25,30 @@ package org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules;
 
 import org.json.simple.JSONObject;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.schedule.model.ScheduleSearchResult;
 
 public abstract class BookingRule implements Comparable<BookingRule>
 {
+	static final String PERIOD_TYPE_CUTOFF_DAY = "cuttoff_day";
+	static final String PERIOD_TYPE_BLACKOUT_NOW_UNTIL_HOUR = "blackout_now_until_hour";
+	static final String PERIOD_TYPE_BLACKOUT_NOW_UNTIL_DAY = "blackout_now_until_day";
+	static final String PERIOD_TYPE_HOUR = "hour";
+	static final String PERIOD_TYPE_DAY = "day";
+	static final String PERIOD_TYPE_WEEK = "week";
+	static final String PERIOD_TYPE_MONTH = "month";
+	static final String PRIMARY_PROVIDER_ONLY = "primary_provider_only";
+	static final String APPOINTMENT_AVAILABLE = "appointment_is_available";
+
+	static final String[] MULTIPLE_BOOKINGS_TYPES = {
+			PERIOD_TYPE_HOUR,
+			PERIOD_TYPE_DAY,
+			PERIOD_TYPE_WEEK,
+			PERIOD_TYPE_MONTH
+	};
+	static final String[] BLACKOUT_TYPES = {
+			PERIOD_TYPE_BLACKOUT_NOW_UNTIL_HOUR,
+			PERIOD_TYPE_BLACKOUT_NOW_UNTIL_DAY
+	};
+
     protected BookingRule(BookingRuleType ruletype, String jsonType)
     {
         this.ruleType = ruletype;
@@ -44,13 +64,6 @@ public abstract class BookingRule implements Comparable<BookingRule>
      * @return true if rule is violated
      */
     public abstract Boolean isViolated(Appointment appointment);
-
-    /**
-     * Determines if the schedule slot would violate the booking rule if an appointment were to be booked into it.
-     * @param result
-     * @return true if rule is violated
-     */
-    public abstract Boolean isViolated(ScheduleSearchResult result);
 
     /**
      * Transform this rule into a JSON object for serialization which is compatible with MyHealthAccess schema

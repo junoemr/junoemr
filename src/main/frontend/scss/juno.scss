@@ -5,6 +5,7 @@
 @import "mixins/junoFonts";
 @import "mixins/junoSelect";
 @import "mixins/junoTab";
+@import "mixins/junoTable";
 @import "mixins/junoPageSizing";
 // Custom Bootstrap
 @import "bootstrap/bootstrap_variables";
@@ -28,8 +29,9 @@
 @import "directives/juno-checkbox";
 @import "directives/juno-select";
 @import "directives/juno-typeahead";
-@import "directives/juno-loading";
+@import "../src/common/components/junoLoadingIndicator";
 @import "../src/common/components/modal";
+@import "../src/common/components/zeroStateDisplay";
 // Section-specific things
 @import "../src/layout/primaryNav";
 @import "../src/layout/leftAside";
