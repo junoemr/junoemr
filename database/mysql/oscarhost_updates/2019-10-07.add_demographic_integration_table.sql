@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS demographic_integration(
   created_by_source varchar(64),
   remote_id varchar (32),
 
-  CONSTRAINT `demographic_demographic_no_fk`
+  CONSTRAINT `demographic_integration_demographic_no_fk`
   FOREIGN KEY(demographic_no) REFERENCES demographic (demographic_no)
   ON DELETE CASCADE ON UPDATE CASCADE
 );
