@@ -181,12 +181,12 @@
 						</div>
 						<div class="form-row">
 							<div class="form-group col-md-6 info-frame-container">
-								<div ng-show="isPatientSelected()">
-									<label class="control-label">Demographic</label>
-									<demographic-card
-											demographic-model="eventController.demographicModel.data">
-									</demographic-card>
-								</div>
+								<label class="control-label">Demographic</label>
+								<demographic-card
+										demographic-model="eventController.demographicModel.data"
+										disabled="!isPatientSelected()"
+								>
+								</demographic-card>
 							</div>
 							<div class="col-md-6 lower-content">
 								<div class="row">
@@ -292,6 +292,8 @@
 								ca-false-text="Off"
 								ca-true-value="{{eventController.repeatBooking.toggleEnum.on}}"
 								ca-false-value="{{eventController.repeatBooking.toggleEnum.off}}"
+								ca-input-size="col-md-5"
+								ca-label-size="col-md-7"
 						>
 						</ca-field-toggle>
 
@@ -453,7 +455,7 @@
 					type="button"
 					class="btn btn-default"
 					ng-click="eventController.saveAndReceipt()"
-					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Receipt
+					ng-disabled="isWorking() || eventController.isDoubleBookPrevented || !isPatientSelected()">Receipt
 			</button>
 
 			<button
@@ -463,7 +465,7 @@
 					tooltip-append-to-body="true"
 					uib-tooltip="{{eventController.keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 					ng-click="eventController.saveAndPrint()"
-					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Print
+					ng-disabled="isWorking() || eventController.isDoubleBookPrevented || !isPatientSelected()">Print
 			</button>
 
 			<button

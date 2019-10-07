@@ -11,16 +11,16 @@ set the html structure up like this:
 
 @mixin juno-toggle-switch($switch-height: 16px, $slider-padding: 4px, $transition-time: .4s) {
 	&.switch,.switch {
-		//$slider-padding: 4px;
-		//$switch-height: 24px;
+
 		$switch-width: calc((#{$switch-height} * 2) - (2 * #{$slider-padding}));
 		$translate-px: calc(#{$switch-height} - (2 * #{$slider-padding}));
-		//$transition-time: .4s;
 
 		position: relative;
 		display: inline-block;
-		width: $switch-width; //60px;
-		height: $switch-height; // 34
+		width: $switch-width;
+		min-width: $switch-width;
+		height: $switch-height;
+		min-heigh: $switch-height;
 
 		/* Hide default HTML checkbox */
 		input {
@@ -71,13 +71,13 @@ set the html structure up like this:
 			}
 		}
 	}
+	.state-label {
+		padding-left: 4px;
+		padding-right: 4px;
+	}
 }
 
 .juno-toggle-switch {
 	@include juno-toggle-switch(16px, 2px, .3s);
-
-	.state-label {
-		margin-bottom: 0;
-	}
 }
 

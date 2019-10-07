@@ -36,7 +36,8 @@
 			}
 		}
 		&:disabled + .checkmark {
-			background-color: $color-neutral-light;
+			background-color: $color-neutral-lightest;
+			border-color: $color-neutral-grey;
 		}
 	}
 	/* style a custom checkbox */

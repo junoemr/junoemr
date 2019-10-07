@@ -589,6 +589,7 @@ angular.module('Schedule').component('eventComponent', {
 				var bUseEndDate = controller.isRepeatBookingEndTypeDate();
 				var bUseMaxRepeat = controller.isRepeatBookingEndTypeAfter();
 				$scope.displayMessages.remove_field_error('repeatEndAfterNumber');
+				$scope.displayMessages.remove_field_error('repeatEndOnDate');
 
 				var count = 0;
 				var lastDate = startDate;
@@ -603,7 +604,14 @@ angular.module('Schedule').component('eventComponent', {
 					}
 					if(count > limit)
 					{
-						$scope.displayMessages.add_field_error('repeatEndAfterNumber', "limit of " + limit);
+						if(bUseMaxRepeat)
+						{
+							$scope.displayMessages.add_field_error('repeatEndAfterNumber', "limit of " + limit);
+						}
+						if(bUseEndDate)
+						{
+							$scope.displayMessages.add_field_error('repeatEndOnDate', "limit of " + limit);
+						}
 						break;
 					}
 
