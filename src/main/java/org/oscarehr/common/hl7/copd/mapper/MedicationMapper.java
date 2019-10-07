@@ -119,11 +119,14 @@ public class MedicationMapper extends AbstractMapper
 		String drugId = getRequestedGiveCodeId(rep);
 		Date drugStart = getAdministrationStartDate(rep);
 
-		for (int i =0; i < getNumMedications(); i ++ )
+		if (drugStart != null && drugId != null)
 		{
-			if (drugId.equals(getRequestedGiveCodeId(i)) && drugStart.before(getAdministrationStartDate(i)))
+			for (int i = 0; i < getNumMedications(); i++)
 			{
-				return false;
+				if (getAdministrationStartDate(i) != null && getRequestedGiveCodeId(i) != null && drugId.equals(getRequestedGiveCodeId(i)) && drugStart.before(getAdministrationStartDate(i)))
+				{
+					return false;
+				}
 			}
 		}
 
