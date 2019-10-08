@@ -266,7 +266,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		criteriaSearch.setFaxAccountId(id);
 		criteriaSearch.setSortDirDescending();
 
-		if (startDateStr != null)
+		if (endDateStr != null)
 		{
 			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
 		}
