@@ -25,7 +25,13 @@ package org.oscarehr.fax.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
+import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
+import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class FaxAccountDao extends AbstractDao<FaxAccount>
@@ -33,5 +39,30 @@ public class FaxAccountDao extends AbstractDao<FaxAccount>
 	public FaxAccountDao()
 	{
 		super(FaxAccount.class);
+	}
+
+	public RestSearchResponse<FaxAccountTransferOutbound> listAccounts(Integer page, Integer perPage)
+	{
+		int offset = calculatedOffset(page, perPage);
+
+		FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
+		criteriaSearch.setOffset(offset);
+		criteriaSearch.setLimit(perPage);
+		criteriaSearch.setSortDirAscending();
+
+		int total = criteriaSearchCount(criteriaSearch);
+		List<FaxAccount> accountList = criteriaSearch(criteriaSearch);
+		return RestSearchResponse.successResponse(FaxTransferConverter.getAllAsOutboundTransferObject(accountList), page, perPage, total);
+	}
+
+	/**
+	 * calculate the offset based on the current page number and resultCount
+	 * @param pageNo - page
+	 * @param resultsPerPage - limit of results
+	 * @return offset
+	 */
+	protected int calculatedOffset(int pageNo, int resultsPerPage)
+	{
+		return resultsPerPage * (pageNo - 1);
 	}
 }

@@ -919,7 +919,8 @@ function onPrint2() {
 	            jQuery.ajax({
 	            	url:'<%=request.getContextPath()%>/Pregnancy.do?method=saveFormAjax',
 	            	data: $("form").serialize(),
-	            	async:false, 
+	            	async:false,
+					type: 'POST',
 	            	dataType:'json', 
 	            	success:function(data) {
 	        			if(data.value == 'error') {
@@ -1952,7 +1953,7 @@ $(document).ready(function(){
 			
 			//where does this U/S fall under in terms of GA given LMP
 			var diff = (usDate.getTime() - dLMP.getTime())/1000/60/60/24;
-			
+
 			//first trimester?
 			if(diff >= 77 && diff <= 97) {
 				var week = parseInt(usGA.substring(0,usGA.indexOf('w')));
@@ -2158,7 +2159,7 @@ $(document).ready(function(){
 <div id="maincontent">
 <div id="content_bar" class="innertube" style="background-color: #c4e9f6">
 
-<html:form action="/form/formname">
+<html:form action="/form/formname" method="POST">
 
 	<input type="hidden" name="commonField" value="ar2_" />
 	<input type="hidden" name="c_lastVisited"
