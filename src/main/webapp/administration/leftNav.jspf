@@ -937,19 +937,19 @@ OscarProperties props = OscarProperties.getInstance();
 <!-- #Fax Management -->
 <security:oscarSec roleName="<%=roleName$%>" objectName="_admin.fax" rights="r" reverse="<%=false%>">
 	<div class="accordion-heading">
-				<a class="accordion-toggle" data-toggle="collapse" data-parent="#adminNav" href="#collapseFaxes">
+				<a class="accordion-toggle" data-toggle="collapse" data-parent="#adminNav" href="#collapseFifteen">
 				Faxes
 				<i class="icon-chevron-right"></i>
 				</a>
 				</div>
 				
-				<div id="collapseFaxes" class="accordion-body collapse">
+				<div id="collapseFifteen" class="accordion-body collapse">
 					<div class="accordion-inner">
 						<ul>
 							<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">
 								<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/faxConfiguration.jsp" >Fax Configuration</a></li>
 							</security:oscarSec>
-							<li><a href="javascript:void(0);" class="xlink defaultFaxesSendReceive" rel="${ctx}/web/faxSendReceive.jsp" >Fax Sent/Received</a></li>
+							<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/faxSendReceive.jsp" >Fax Sent/Received</a></li>
 						</ul>
 					</div>
 				</div>		
@@ -1261,46 +1261,32 @@ $(document).ready(function(){
 
 		if(show!=null){
 			var load = getUrlVars()["load"];
-			var link = null;
+			var pageToLoad="";
 			
 			if(show!=null & load!=null){
-				link=$('.default'+show+load);
+				pageToLoad=$('.default'+show+load).attr('href');
 			}else{
-				link=$('.default'+show);
+				pageToLoad=$('.default'+show).attr('href');		
 			}
 
-			if(link.attr('rel') != null)
-			{
-				console.log(link.attr('rel'));
-				$("#dynamic-content")
-						.html('<iframe id="myFrame" name="myFrame" frameborder="0" width="950" height="1000" src="' + link.attr('rel') + '">');
-			}
-			else if(link.attr('href') != null)
-			{
-				var pageToLoad = link.attr('href');
-				//load request page or load default
-				$("#dynamic-content").load(pageToLoad,
-					function(response, status, xhr) {
-						if (status == "error") {
-							var msg = "Sorry but there was an error: ";
-							$("#dynamic-content").html(msg + xhr.status + " " + xhr.statusText);
-						}
-					});
-			}
-			else
-			{
+		//expand request menu item
+		$("#collapse"+show).collapse('show');	
 
-			}
-
-
-			//expand request menu item
-			$("#collapse"+show).collapse('show');
+		//load request page or load default
+		$("#dynamic-content").load(pageToLoad, 
+				function(response, status, xhr) {
+			  		if (status == "error") {
+				    	var msg = "Sorry but there was an error: ";
+				    	$("#dynamic-content").html(msg + xhr.status + " " + xhr.statusText);
+					}
+		});	
+		
 		}
 	  }
 	catch(err)
 	  {
 	  //do nothing
-	  }
+	  }	
 
 });
 

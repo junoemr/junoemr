@@ -90,7 +90,7 @@ String login_input_style="login_txt_fields";
             else
                 document.getElementById(id).style.display = 'none';
         }
-
+        
   <!-- hide
   function setfocus() {
     document.loginForm.username.focus();
@@ -103,24 +103,24 @@ String login_input_style="login_txt_fields";
   }
   -->
         </script>
-
+        
         <style type="text/css">
-            body {
+            body { 
                font-family: Verdana, helvetica, sans-serif;
                margin: 0px;
                padding:0px;
             }
-
+            
             .login_txt_fields {
-
-
+		
+			 
 				border: 1px solid #999;
 				height: 25px;
 				-webkit-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
 				-moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
 				box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
 			}
-
+			 
 			.login_txt_fields_error {
 			  border: 1px solid #F78181;
 				height: 25px;
@@ -128,7 +128,7 @@ String login_input_style="login_txt_fields";
 				-moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
 				box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
 			}
-
+            
             td.topbar{
                background-color: gold;
             }
@@ -163,25 +163,25 @@ String login_input_style="login_txt_fields";
         </style>
         <% } %>
     </head>
-
+    
     <body onLoad="setfocus()" bgcolor="#ffffff">
-
+        
         <table border=0 width="100%">
             <tr>
                 <td align="center" class="leftbar" height="20px" width="200px"><%
                     String key = "loginApplication.formLabel" ;
                     if(request.getParameter("login")!=null && request.getParameter("login").equals("failed") ){
                     key = "loginApplication.formFailedLabel" ;
-                    login_input_style="login_txt_fields_error";
+                    login_input_style="login_txt_fields_error";                    
                     }
-                    %><bean:message key="<%=key%>"/>
+                    %><bean:message key="<%=key%>"/>        
                 </td>
                 <td  class="topbar" align="center" >
                     <span id="buildInfo">build date: <%= OscarProperties.getBuildDate() %> <br/> build tag: <%=OscarProperties.getBuildTag()%> </span>
                     <%=props.getProperty("logintitle", "")%>
                     <% if (props.getProperty("logintitle", "").equals("")) { %>
                     <bean:message key="loginApplication.alert"/>
-                    <% } %>
+                    <% } %>                    
                 </td>
             </tr>
         </table>
@@ -189,37 +189,38 @@ String login_input_style="login_txt_fields";
             <tr>
                 <td id="loginText" valign="top">
                     <!--- left side -->
-
+                        
                             <html:form action="login" >
                             <bean:message key="loginApplication.formUserName"/><%
                             if(oscar.oscarSecurity.CRHelper.isCRFrameworkEnabled() && !net.sf.cookierevolver.CRFactory.getManager().isMachineIdentified(request)){
                             %><img src="gatekeeper/appid/?act=image&/empty<%=System.currentTimeMillis() %>.gif" width='1' height='1'><%
                             }
                             %>
-
-                        <br/>
-                        <input type="text" name="username" value="" size="15" maxlength="30" autocomplete="off" class="<%=login_input_style %>"/>
-                        <br/>
+                        
+                        <br/>            
+                        <input type="text" name="username" value="" size="15" maxlength="15" autocomplete="off" class="<%=login_input_style %>"/>
+                        <br/>                
                         <bean:message key="loginApplication.formPwd"/><br/>
                         <input type="password" name="password" value="" size="15" maxlength="32" autocomplete="off" class="<%=login_input_style %>"/><br/>
-                        <bean:message key="index.formPIN"/>:
+                                <input type="submit" value="<bean:message key="index.btnSignIn"/>" />
+                        <br/>
+                        <bean:message key="index.formPIN"/>: 
                         <br/>
                         <input type="password" name="pin" value="" size="15" maxlength="15" autocomplete="off" class="<%=login_input_style %>"/><br/>
-
+                       
                         <span class="extrasmall">
                             <bean:message key="loginApplication.formCmt"/>
                         </span>
                         <input type=hidden name='propname' value='<bean:message key="loginApplication.propertyFile"/>' />
-                        <input type="submit" value="<bean:message key="index.btnSignIn"/>" />
                         </html:form>
-
+                        
                         <%if (AcceptableUseAgreementManager.hasAUA()){ %>
                         <span class="extrasmall">
                         	<bean:message key="global.aua" /> &nbsp; <a href="javascript:void(0);" onclick="showHideItem('auaText');"><bean:message key="global.showhide"/></a>
                         </span>
                         <%} %>
                         <hr width="100%" color="navy">
-
+                        
                         <span class="extrasmall">
                             <div id="mobileMsg"><bean:message key="loginApplication.mobileMsg"/>
                                 <a href="index.jsp?full=true"><bean:message key="loginApplication.fullSite"/></a>
@@ -258,10 +259,10 @@ String login_input_style="login_txt_fields";
                                 <% } %>
                             </font>
                     </div>
-
+                    
                 </td>
-            </tr>
+            </tr>     
         </table>
-
+        
     </body>
 </html:html>

@@ -598,7 +598,7 @@ public class DemographicExportAction4 extends Action {
 									summary = Util.addSummary("Personal History", socHist);
 									for (CaseManagementIssue isu : sisu) {
 										String codeSystem = isu.getIssue().getType();
-										if (!"system".equals(codeSystem)) {
+										if (!codeSystem.equals("system")) {
 											summary = Util.addSummary(summary, "Diagnosis", isu.getIssue().getDescription());
 										}
 									}
@@ -634,7 +634,7 @@ public class DemographicExportAction4 extends Action {
 									boolean diagnosisAssigned = false;
 									for (CaseManagementIssue isu : sisu) {
 										String codeSystem = isu.getIssue().getType();
-										if (!"system".equals(codeSystem)) {
+										if (!codeSystem.equals("system")) {
 											if (diagnosisAssigned) {
 												summary = Util.addSummary(summary, "Diagnosis", isu.getIssue().getDescription());
 											}
@@ -709,7 +709,7 @@ public class DemographicExportAction4 extends Action {
 									boolean diagnosisAssigned = false;
 									for (CaseManagementIssue isu : sisu) {
 										String codeSystem = isu.getIssue().getType();
-										if (!"system".equals(codeSystem)) {
+										if (!codeSystem.equals("system")) {
 											if (diagnosisAssigned) {
 												summary = Util.addSummary(summary, "Diagnosis", isu.getIssue().getDescription());
 											}
@@ -779,7 +779,7 @@ public class DemographicExportAction4 extends Action {
 									boolean diagnosisAssigned = false;
 									for (CaseManagementIssue isu : sisu) {
 										String codeSystem = isu.getIssue().getType();
-										if (!"system".equals(codeSystem)) {
+										if (!codeSystem.equals("system")) {
 											if (diagnosisAssigned) {
 												summary = Util.addSummary(summary, "Diagnosis", isu.getIssue().getDescription());
 											}
@@ -907,7 +907,7 @@ public class DemographicExportAction4 extends Action {
 									}
 									for (CaseManagementIssue isu : sisu) {
 										String codeSystem = isu.getIssue().getType();
-										if (!"system".equals(codeSystem)) {
+										if (!codeSystem.equals("system")) {
 											summary = Util.addSummary(summary, "Diagnosis", isu.getIssue().getDescription());
 										}
 									}
@@ -921,7 +921,7 @@ public class DemographicExportAction4 extends Action {
 									ClinicalNotes cNote = patientRec.addNewClinicalNotes();
 									for (CaseManagementIssue isu : sisu) {
 										String codeSystem = isu.getIssue().getType();
-										if (!"system".equals(codeSystem)) {
+										if (!codeSystem.equals("system")) {
 											encounter = Util.addLine(encounter, "Diagnosis: ", isu.getIssue().getDescription());
 										}
 									}
