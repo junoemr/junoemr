@@ -67,9 +67,8 @@ import java.util.List;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class ConsultationPDFCreationService
 {
-	// Half the usual memory usage as a temporary thing
-	// Hoping to increase this at some point since we *should* be able to handle it
-	private static final long maxMemoryUsage = OscarProperties.getInstance().getPDFMaxMemUsage() / 2;
+	// 256*1024*1024 (256MB)
+	private static final long maxMemoryUsage = 268435456L;
 
 	private static final Logger logger = MiscUtils.getLogger();
 	@Autowired
