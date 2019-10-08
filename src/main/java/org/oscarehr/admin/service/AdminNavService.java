@@ -73,7 +73,25 @@ public class AdminNavService
 		{
 			adminNavList.add(getAdminNavReports(contextPath, resourceBundle, providerNo));
 		}
-
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.encounter"))
+		{
+			adminNavList.add(getAdminNavEchart(contextPath, resourceBundle));
+		}
+		if (securityInfoManager.hasOnePrivileges(providerNo, securityInfoManager.READ, null, "_admin", "_admin.schedule"))
+		{
+			adminNavList.add(getAdminNavSchedule(contextPath, resourceBundle));
+		}
+		if (oscarProperties.isPropertyActive("caisi"))
+		{// CAISI module loaded
+			if (securityInfoManager.hasPrivilege(providerNo, "_admin.caisi", SecurityInfoManager.READ, null))
+			{
+				adminNavList.add(getAdminNavCaisiHasPermission(contextPath, resourceBundle));
+			}
+			else
+			{
+				adminNavList.add(getAdminNavCaisiNoPermission(contextPath, resourceBundle, providerNo));
+			}
+		}
 
 		return adminNavList;
 	}
@@ -114,7 +132,7 @@ public class AdminNavService
 
 			if (oscarProperties.isBritishColumbiaBillingType())
 			{
-				billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp"));
+				billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp&useCompat=true"));
 			}
 		}
 		else if (oscarProperties.isBritishColumbiaBillingType())
@@ -129,7 +147,7 @@ public class AdminNavService
 
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageServiceDiagnosticCodeAssoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/showServiceCodeAssocs.do"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageProcedureFeeCodeAssoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/supServiceCodeAssocAction.do"));
-			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp"));// TODO fix
+			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp&useCompat=true"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.bcQuickBilling"), "frame?frameUrl=" + contextPath + "/quickBillingBC.do"));
 
 			if (oscarProperties.isPropertyActive("NEW_BC_TELEPLAN"))
@@ -161,7 +179,7 @@ public class AdminNavService
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.gstReport"), "frame?frameUrl=" + contextPath + "/admin/gstreport.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAddBillingLocation"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/manageBillingLocation.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnManageBillingForm"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/manageBillingform.jsp"));
-			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSimulationOHIPDiskette"), "frame?frameUrl=" + contextPath + "problem.jpg"));//TODO fix
+			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSimulationOHIPDiskette"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingOHIPsimulation.jsp&useCompat=true"));// TODO Fix
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGenerateOHIPDiskette"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingOHIPreport.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnBillingCorrection"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingCorrection.jsp?admin&billing_no="));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnBatchBilling"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/batchBilling.jsp?service_code=all"));
@@ -214,8 +232,8 @@ public class AdminNavService
 			labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.oldLabUpload"), "frame?frameUrl=" + contextPath + "/lab/CA/BC/LabUpload.jsp"));
 		}
 
-		labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.labFwdRules"), "frame?frameUrl=" + contextPath + "/admin/labforwardingrules.jsp")); // TODO fix
-		labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.AddNewQueue"), "frame?frameUrl=" + contextPath + "/admin/addQueue.jsp")); // TODO fix
+		labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.labFwdRules"), "frame?frameUrl=" + contextPath + "/admin/labforwardingrules.jsp&useCompat=true"));
+		labItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.AddNewQueue"), "frame?frameUrl=" + contextPath + "/admin/addQueue.jsp&useCompat=true"));
 
 		labGroup.setItems(labItems);
 		return labGroup;
@@ -228,13 +246,13 @@ public class AdminNavService
 
 		formGroup.setName(resourceBundle.getString("admin.admin.FormsEforms"));
 
-		formItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSelectForm"), "frame?frameUrl=" + contextPath + "/form/setupSelect.do")); // TODO fix
-		formItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnImportFormData"), "frame?frameUrl=" + contextPath + "/form/formXmlUpload.jsp")); // TODO fix
-		formItems.add(new AdminNavItemTo1(resourceBundle.getString("eform.showmyform.msgManageEFrm"), "frame?frameUrl=" + contextPath + "/eform/efmformmanager.jsp")); // TODO fix
-		formItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnUploadImage"), "frame?frameUrl=" + contextPath + "/eform/efmimagemanager.jsp")); // TODO fix
-		formItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.frmGroups"), "frame?frameUrl=" + contextPath + "/eform/efmmanageformgroups.jsp")); // TODO fix
-		formItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.richTextLetter"), "frame?frameUrl=" + contextPath + "/eform/efmformrtl_config.jsp")); // TODO fix
-		formItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.frmIndependent"), "frame?frameUrl=" + contextPath + "/eform/efmmanageindependent.jsp")); // TODO fix
+		formItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSelectForm"), "frame?frameUrl=" + contextPath + "/form/setupSelect.do&useCompat=true"));
+		formItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnImportFormData"), "frame?frameUrl=" + contextPath + "/form/formXmlUpload.jsp&useCompat=true"));
+		formItems.add(new AdminNavItemTo1(resourceBundle.getString("eform.showmyform.msgManageEFrm"), "frame?frameUrl=" + contextPath + "/eform/efmformmanager.jsp&useCompat=true"));
+		formItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnUploadImage"), "frame?frameUrl=" + contextPath + "/eform/efmimagemanager.jsp&useCompat=true"));
+		formItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.frmGroups"), "frame?frameUrl=" + contextPath + "/eform/efmmanageformgroups.jsp&useCompat=true"));
+		formItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.richTextLetter"), "frame?frameUrl=" + contextPath + "/eform/efmformrtl_config.jsp&useCompat=true"));
+		formItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.frmIndependent"), "frame?frameUrl=" + contextPath + "/eform/efmmanageindependent.jsp&useCompat=true"));
 
 		formGroup.setItems(formItems);
 		return formGroup;
@@ -256,34 +274,33 @@ public class AdminNavService
 		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnQueryByExample"), "frame?frameUrl=" + contextPath + "/oscarReport/RptByExample.do"));
 		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.rptbyTemplate"), "frame?frameUrl=" + contextPath + "/oscarReport/reportByTemplate/homePage.jsp"));
 		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAgeSexReport"), "frame?frameUrl=" + contextPath + "/oscarReport/dbReportAgeSex.jsp"));
-		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnVisitReport"), "frame?frameUrl=" + contextPath + "/oscarReport/oscarReportVisitControl.jsp"));
-		reportItems.add(new AdminNavItemTo1("PCN", "frame?frameUrl=" + contextPath + "/oscarReport/oscarReportCatchment.jsp"));
-		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnFluBillingReport"), "frame?frameUrl=" + contextPath + "/oscarReport/FluBilling.do?orderby=")); // TODO fix
-		reportItems.add(new AdminNavItemTo1("Overnight\t\t\t\t\t\t\tBatch", "frame?frameUrl=" + contextPath + "/oscarReport/obec.jsp")); // TODO fix
-		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.report.SurveillanceReport"), "frame?frameUrl=" + contextPath + "/oscarSurveillance/ReportSurveillance.jsp")); // TODO fix
-		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.rehabStudy"), "frame?frameUrl=" + contextPath + "/oscarReport/oscarReportRehabStudy.jsp")); // TODO fix
-		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.exportPatientbyAppt"), "frame?frameUrl=" + contextPath + "/oscarReport/patientlist.jsp")); // TODO fix
-		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.providerServiceRpt"), "frame?frameUrl=" + contextPath + "/oscarReport/provider_service_report_form.jsp")); // TODO fix
-		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.providerServiceRpt"), "frame?frameUrl=" + contextPath + "/oscarReport/provider_service_report_form.jsp")); // TODO fix
+		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnVisitReport"), "frame?frameUrl=" + contextPath + "/oscarReport/oscarReportVisitControl.jsp&useCompat=true"));
+		reportItems.add(new AdminNavItemTo1("PCN", "frame?frameUrl=" + contextPath + "/oscarReport/oscarReportCatchment.jsp&useCompat=true"));
+		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnFluBillingReport"), "frame?frameUrl=" + contextPath + "/oscarReport/FluBilling.do&useCompat=true"));
+		reportItems.add(new AdminNavItemTo1("Overnight\t\t\t\t\t\t\tBatch", "frame?frameUrl=" + contextPath + "/oscarReport/obec.jsp&useCompat=true"));
+		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.report.SurveillanceReport"), "frame?frameUrl=" + contextPath + "/oscarSurveillance/ReportSurveillance.jsp&useCompat=true"));
+		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.rehabStudy"), "frame?frameUrl=" + contextPath + "/oscarReport/oscarReportRehabStudy.jsp&useCompat=true"));
+		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.exportPatientbyAppt"), "frame?frameUrl=" + contextPath + "/oscarReport/patientlist.jsp&useCompat=true"));
+		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.providerServiceRpt"), "frame?frameUrl=" + contextPath + "/oscarReport/provider_service_report_form.jsp&useCompat=true"));
 
 		if (oscarProperties.isPropertyActive("caisi"))
 		{// CAISI module loaded
 			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.activityRpt"), "frame?frameUrl=" + contextPath + "/PMmodule/Reports/ProgramActivityReport"));
-			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.popRpt"), "frame?frameUrl=" + contextPath + "/PopulationReport.do")); // TODO fix
-			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.cdsRpt"), "frame?frameUrl=" + contextPath + "/oscarReport/cds_4_report_form.jsp")); // TODO fix
-			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.misRpt"), "frame?frameUrl=" + contextPath + "/oscarReport/mis_report_form.jsp")); // TODO fix
-			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ocanRpt"), "frame?frameUrl=" + contextPath + "/oscarReport/ocan_report_form.jsp")); // TODO fix
-			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ocanIarRpt"), "frame?frameUrl=" + contextPath + "/oscarReport/ocan_iar.jsp")); // TODO fix
+			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.popRpt"), "frame?frameUrl=" + contextPath + "/PopulationReport.do&useCompat=true"));
+			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.cdsRpt"), "frame?frameUrl=" + contextPath + "/oscarReport/cds_4_report_form.jsp&useCompat=true"));
+			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.misRpt"), "frame?frameUrl=" + contextPath + "/oscarReport/mis_report_form.jsp&useCompat=true"));
+			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ocanRpt"), "frame?frameUrl=" + contextPath + "/oscarReport/ocan_report_form.jsp&useCompat=true"));
+			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ocanIarRpt"), "frame?frameUrl=" + contextPath + "/oscarReport/ocan_iar.jsp&useCompat=true"));
 			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ocanReporting"), "frame?frameUrl=" + contextPath + "/oscarReport/ocan_reporting.js"));
 			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.cbiSubmit"), "frame?frameUrl=" + contextPath + "/oscarReport/cbi_submit_form.jsp"));
 			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.cbi.reportlink"), "frame?frameUrl=" + contextPath + "/admin/cbiAdmin.jsp"));
 			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.cbiRpt"), "frame?frameUrl=" + contextPath + "/oscarReport/cbi_report_form.jsp"));
 		}
 
-		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.usageRpt"), "frame?frameUrl=" + contextPath + "/admin/UsageReport.jsp")); // TODO fix
+		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.usageRpt"), "frame?frameUrl=" + contextPath + "/admin/UsageReport.jsp&useCompat=true"));
 		if (oscarProperties.isPropertyActive("SERVERLOGGING"))
 		{
-			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.serverLog"), "frame?frameUrl=" + contextPath + "/admin/oscarLogging.jsp")); // TODO fix
+			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.serverLog"), "frame?frameUrl=" + contextPath + "/admin/oscarLogging.jsp&useCompat=true"));
 		}
 		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.DiseaseRegistry"), "frame?frameUrl=" + contextPath + "/report/DxresearchReport.do"));
 		reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnStudy"), "frame?frameUrl=" + contextPath + "/admin/demographicstudy.jsp"));
@@ -316,5 +333,83 @@ public class AdminNavService
 
 		reportGroup.setItems(reportItems);
 		return reportGroup;
+	}
+
+	private AdminNavGroupTo1 getAdminNavEchart(String contextPath, ResourceBundle resourceBundle)
+	{
+		AdminNavGroupTo1 echartGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> echartItems = new ArrayList<>();
+
+		echartGroup.setName(resourceBundle.getString("admin.admin.eChart"));
+
+		echartItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnInsertTemplate"), "frame?frameUrl=" + contextPath + "/admin/providertemplate.jsp"));
+
+		echartGroup.setItems(echartItems);
+		return echartGroup;
+	}
+
+	private AdminNavGroupTo1 getAdminNavSchedule(String contextPath, ResourceBundle resourceBundle)
+	{
+		AdminNavGroupTo1 scheduleGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> scheduleItems = new ArrayList<>();
+
+		scheduleGroup.setName(resourceBundle.getString("admin.admin.ScheduleManagement"));
+
+		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.scheduleSetting"), "frame?frameUrl=" + contextPath + "/schedule/scheduletemplatesetting.jsp"));
+		if (oscarProperties.isPropertyActive("ENABLE_EDIT_APPT_STATUS"))
+		{
+			scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.appointmentStatusSetting"), "frame?frameUrl=" + contextPath + "/appointment/appointmentstatuscontrol.jsp"));
+		}
+
+		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.appointmentTypeList"), "frame?frameUrl=" + contextPath + "/appointment/appointmentTypeAction.do"));
+		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAddGroupNoRecord"), "frame?frameUrl=" + contextPath + "/admin/adminnewgroup.jsp"));
+		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSearchGroupNoRecords"), "frame?frameUrl=" + contextPath + "/admin/admindisplaymygroup.jsp"));
+		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGroupNoAcl"), "frame?frameUrl=" + contextPath + "/admin/groupnoacl.jsp"));
+		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGroupPreference"), "frame?frameUrl=" + contextPath + "/admin/groupPreferences.jsp"));
+		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.preventionNotification.title"), "frame?frameUrl=" + contextPath + "/oscarPrevention/PreventionManager.jsp"));
+
+		scheduleGroup.setItems(scheduleItems);
+		return scheduleGroup;
+	}
+
+	private AdminNavGroupTo1 getAdminNavCaisiHasPermission(String contextPath, ResourceBundle resourcebundle)
+	{
+		AdminNavGroupTo1 caisiGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> caisiItems = new ArrayList<>();
+
+		caisiGroup.setName(resourcebundle.getString("admin.admin.caisi"));
+
+		caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.systemMessage"), "frame?frameUrl=" + contextPath + "/SystemMessage.do"));
+		caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.FacilitiesMsgs"), "frame?frameUrl=" + contextPath + "/FacilityMessage.do"));
+		caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.issueEditor"), "frame?frameUrl=" + contextPath + "/issueAdmin.do"));
+		caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.surveyManager"), "frame?frameUrl=" + contextPath + "/SurveyManager.do"));
+		caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.defaultEncounterIssue"), "frame?frameUrl=" + contextPath + "/DefaultEncounterIssue.do"));
+
+		caisiGroup.setItems(caisiItems);
+		return caisiGroup;
+	}
+
+	private AdminNavGroupTo1 getAdminNavCaisiNoPermission(String contextPath, ResourceBundle resourcebundle, String providerNo)
+	{
+		AdminNavGroupTo1 caisiGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> caisiItems = new ArrayList<>();
+
+		caisiGroup.setName(resourcebundle.getString("admin.admin.caisi"));
+
+		if (securityInfoManager.hasPrivilege(providerNo, "_admin.systemMessage", SecurityInfoManager.READ, null))
+		{
+			caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.systemMessage"), "frame?frameUrl=" + contextPath + "/SystemMessage.do"));
+		}
+		if (securityInfoManager.hasPrivilege(providerNo, "_admin.facilityMessage", SecurityInfoManager.READ, null))
+		{
+			caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.FacilitiesMsgs"), "frame?frameUrl=" + contextPath + "/FacilityMessage.do"));
+		}
+		if (securityInfoManager.hasPrivilege(providerNo, "_admin.lookupFieldEditor", SecurityInfoManager.READ, null))
+		{
+			caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.LookupFieldEditor"), "frame?frameUrl=" + contextPath + "/FacilityMessage.do"));
+		}
+
+		caisiGroup.setItems(caisiItems);
+		return caisiGroup;
 	}
 }

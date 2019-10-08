@@ -135,7 +135,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		})
 		.state('admin.frame',
 		{
-			url: '/frame?frameUrl',
+			url: '/frame?frameUrl&useCompat',
 			templateUrl: 'src/admin/integration/frameContent/frameContent.jsp',
 			controller: 'Admin.Integration.FrameContentController as FrameCtrl'
 		})

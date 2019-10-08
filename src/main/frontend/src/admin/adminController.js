@@ -3,7 +3,8 @@ angular.module('Admin').controller('Admin.AdminController', [
 	'$http',
 	'$location',
 	'personaService',
-	function ($scope, $http, $location, personaService)
+	'$stateParams',
+	function ($scope, $http, $location, personaService, $stateParams)
 	{
 		let controller = this;
 		controller.navList = [];
@@ -27,6 +28,12 @@ angular.module('Admin').controller('Admin.AdminController', [
 			results.forEach(function (group) {
 				group.items.forEach(function (item) {
 					item.callback = generateTransition(item.transitionState);
+
+					if ($stateParams.frameUrl !== undefined && item.transitionState.includes($stateParams.frameUrl))
+					{
+						console.log("expanding: " + item.transitionState);
+						group.expanded = true;
+					}
 				})
 			});
 

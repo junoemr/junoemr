@@ -31,7 +31,7 @@
 						<i class="icon icon-chevron-down" ng-if="group.expanded"></i>
 					</a>
 				</h4>
-				<nav class="group-items-list" ng-class="group.expanded ? '' : 'collapse'" id="{{ 'accordion-collapse-target-' + $ctrl.getGroupCollapseId(group)}}">
+				<nav class="group-items-list" ng-class="group.expanded ? 'in' : 'collapse'" id="{{ 'accordion-collapse-target-' + $ctrl.getGroupCollapseId(group)}}">
 					<ul>
 						<li class="accordion-item" ng-repeat="item in group.items">
 							<a href="javascript:" ng-click="$ctrl.onItemClicked(item)">

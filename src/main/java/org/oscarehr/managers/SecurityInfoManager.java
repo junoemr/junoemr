@@ -155,7 +155,6 @@ public class SecurityInfoManager {
 		{
 			if(hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
 			{
-				MiscUtils.getLogger().info("Provider: " + providerNo + " Missing Privilege: " + privilege + " On object: " + objectName);
 				return true;
 			}
 		}

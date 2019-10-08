@@ -21,5 +21,7 @@
  * Canada
 --%>
 <div class="frame-content-controller height-100">
-	<iframe class="content-frame" name="content-frame" width="98%" height="92%" frameborder="0" type="text/html" src="{{ FrameCtrl.frameUrl }}"></iframe>
+	<iframe ng-if="FrameCtrl.useCompat === 'true'" class="content-frame" name="content-frame" width="98%" height="85%" frameborder="0" type="text/html"
+			src="{{ '../administration/adminNewUICompatWrapper.jsp?frameUrl=' + FrameCtrl.frameUrlEncoded }}"></iframe>
+	<iframe ng-if="FrameCtrl.useCompat !== 'true'" class="content-frame" name="content-frame" width="98%" height="85%" frameborder="0" type="text/html" src="{{ FrameCtrl.frameUrl }}"></iframe>
 </div>
