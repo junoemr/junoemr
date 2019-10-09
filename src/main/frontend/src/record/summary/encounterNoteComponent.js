@@ -26,21 +26,23 @@
 angular.module('Record.Summary').component('encounterNote', {
 	templateUrl: "src/record/summary/encounterNoteTemplate.jsp",
 	bindings: {
-		note: '<',
-		onEditCpp: '&',
-		onEditNote: '&',
-		onToggleSelect: '&',
+		note: '<?',
+		onEditCpp: '&?',
+		onEditNote: '&?',
+		onToggleSelect: '&?',
 
-		minimized: '<',
-		selectedForPrint: '<',
+		minimized: '<?',
+		selectedForPrint: '<?',
 	},
 	controller: [
 		'$scope',
 		'$state',
 		'$stateParams',
+		'formService',
 		function ($scope,
 		          $state,
-		          $stateParams)
+		          $stateParams,
+				  formService)
 	{
 		var ctrl = this;
 
@@ -77,19 +79,24 @@ angular.module('Record.Summary').component('encounterNote', {
 
 		ctrl.showNoteViewButton = function showNoteViewButton()
 		{
-			return (ctrl.note.eformData || ctrl.note.document);
+			return (ctrl.note.eformData || ctrl.note.document || ctrl.note.encounterForm);
 		};
 
 		ctrl.viewButtonClick = function viewButtonClick()
 		{
 			if(ctrl.note.eformData && ctrl.note.eformDataId)
 			{
-				ctrl.viewEform(ctrl.note.eformDataId);
+				formService.openEFormInstancePopup($stateParams.demographicNo, ctrl.note.eformDataId);
 			}
 			else if(ctrl.note.document && ctrl.note.documentId)
 			{
 				ctrl.viewDocument(ctrl.note.documentId);
 			}
+			if (ctrl.note.encounterForm)
+			{
+				formService.openFormInstancePopup(ctrl.note.note, $stateParams.demographicNo, null, ctrl.note.encounterFormId);
+			}
+
 		};
 
 		ctrl.showNoteEditButton = function showNoteEditButton()
@@ -185,13 +192,13 @@ angular.module('Record.Summary').component('encounterNote', {
 
 		ctrl.allowNoteExpansion = function allowNoteExpansion()
 		{
-			return !(ctrl.note.cpp === true || ctrl.note.document === true || ctrl.note.eformData === true);
+			return !(ctrl.note.cpp === true || ctrl.note.document === true || ctrl.note.eformData === true || ctrl.note.encounterForm);
 		};
 
 		// Returns true if the given note is an unsigned encounter note
 		ctrl.isUnsignedEncounterNote = function isUnsignedEncounterNote()
 		{
-			return (!ctrl.note.isSigned && !ctrl.note.cpp && !ctrl.note.document && !ctrl.note.ticklerNote && !ctrl.note.eformData);
+			return (!ctrl.note.isSigned && !ctrl.note.cpp && !ctrl.note.document && !ctrl.note.ticklerNote && !ctrl.note.eformData && !ctrl.note.encounterForm);
 		};
 
 		// Check if note regular note
