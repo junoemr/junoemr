@@ -92,12 +92,17 @@ public class AdminNavService
 				adminNavList.add(getAdminNavCaisiNoPermission(contextPath, resourceBundle, providerNo));
 			}
 		}
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.measurements", "_admin.document", "_admin.consult"))
+		{
+			adminNavList.
+		}
 
 		return adminNavList;
 	}
 
 	/**
 	 * get the user management admin nav group
+	 * @param contextPath - the instance context path
 	 * @param resourceBundle - a resource bundle from which to pull message strings
 	 * @return - the adminNavGroup for the user management list.
 	 */
@@ -119,6 +124,12 @@ public class AdminNavService
 		return userManagement;
 	}
 
+	/**
+	 * get the billing admin nav group
+	 * @param contextPath - the instance context path
+	 * @param resourceBundle - a resource bundle from which to pull message strings
+	 * @return - the admin nav group for the billing section
+	 */
 	private AdminNavGroupTo1 getAdminNavBilling(String contextPath, ResourceBundle resourceBundle)
 	{
 		AdminNavGroupTo1 billing = new AdminNavGroupTo1();
@@ -406,10 +417,31 @@ public class AdminNavService
 		}
 		if (securityInfoManager.hasPrivilege(providerNo, "_admin.lookupFieldEditor", SecurityInfoManager.READ, null))
 		{
-			caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.LookupFieldEditor"), "frame?frameUrl=" + contextPath + "/FacilityMessage.do"));
+			caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.LookupFieldEditor"), "frame?frameUrl=" + contextPath + "/Lookup/LookupTableList.do"));
+		}
+		if (securityInfoManager.hasPrivilege(providerNo, "_admin.issueEditor", SecurityInfoManager.READ, null))
+		{
+			caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.issueEditor"), "frame?frameUrl=" + contextPath + "/issueAdmin.do"));
+		}
+		if(securityInfoManager.hasPrivilege(providerNo, "_admin.userCreatedForms", SecurityInfoManager.READ, null))
+		{
+			caisiItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.surveyManager"), "frame?frameUrl=" + contextPath + "/SurveyManager.do"));
 		}
 
 		caisiGroup.setItems(caisiItems);
 		return caisiGroup;
+	}
+
+	private AdminNavGroupTo1 getAdminNavSystemManagement(String contextPath, ResourceBundle resourcebundle, String providerNo)
+	{
+		AdminNavGroupTo1 systemManagementGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> systemManagementItems = new ArrayList<>();
+
+		systemManagementGroup.setName(resourcebundle.getString(""));
+
+
+
+		systemManagementGroup.setItems(systemManagementItems);
+		return systemManagementGroup;
 	}
 }
