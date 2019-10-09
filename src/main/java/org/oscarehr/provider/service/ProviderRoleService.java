@@ -71,8 +71,6 @@ public class ProviderRoleService
 
 		String providerDefaultRoleName = OscarProperties.getInstance().getProperty("default_provider_role_name");
 
-		Secuserrole secUserRole = new Secuserrole();
-
 		boolean isDefaultRoleNameExist = setPrimaryRole(providerID, providerDefaultRoleName);
 
 		if(!isDefaultRoleNameExist)
@@ -80,7 +78,7 @@ public class ProviderRoleService
 			return false;
 		}
 
-		addRole(secUserRole, providerID, providerDefaultRoleName);
+		addRole(providerID, providerDefaultRoleName);
 
 		return true;
 	}
@@ -123,21 +121,24 @@ public class ProviderRoleService
 	}
 
 
-	private void addRole(Secuserrole secUserRole,Integer roleProviderId, String roleName)
+	public Secuserrole addRole(Integer roleProviderId, String roleName)
 	{
+		Secuserrole secUserRole = new Secuserrole();
 		int defaultActiveyn = 1;
 
 		secUserRole.setProviderNo(String.valueOf(roleProviderId));
 		secUserRole.setRoleName(roleName);
 		secUserRole.setActiveyn(defaultActiveyn);
 		secUserRoleDao.save(secUserRole);
+		return secUserRole;
 	}
 
-	public Secuserrole addRole(Integer roleProviderId, String roleName)
-	{
-		Secuserrole secUserRole = new Secuserrole();
 
-		addRole(secUserRole, roleProviderId, roleName);
+	public Secuserrole addRoleAndAssignPrimary(Integer roleProviderId, String roleName)
+	{
+
+
+		Secuserrole secUserRole = addRole(roleProviderId, roleName);
 
 		Long caisiProgram = new Long(programManager.getDefaultProgramId());
 		ProgramProvider programProvider = programProviderDao.getProgramProvider(String.valueOf(roleProviderId), caisiProgram);
@@ -181,13 +182,6 @@ public class ProviderRoleService
 		recycleBin.setTableContent("<provider_no>" + roleProviderId + "</provider_no>" + "<role_name>" + oldRole + "</role_name>");
 		recycleBinDao.persist(recycleBin);
 
-		// TODO this may be doing un-needed things
-		Long caisiProgram = new Long(programManager.getDefaultProgramId());
-		ProgramProvider programProvider = programProviderDao.getProgramProvider(String.valueOf(roleProviderId), caisiProgram);
-		if(programProvider != null)
-		{
-			programProviderDao.deleteProgramProvider(programProvider.getId());
-		}
 	}
 
 	public boolean validRoleName(String roleName)
