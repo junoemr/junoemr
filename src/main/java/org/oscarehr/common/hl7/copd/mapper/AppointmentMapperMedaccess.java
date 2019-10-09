@@ -60,10 +60,43 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 	}
 
 	/**
+	 * Medaccess does not have appointment reasons
+	 * @param rep - the appointment you want
+	 * @return - the appointment reason
+	 * @throws HL7Exception - if there is an error parsing the hl7
+	 */
+	@Override
+	public String getReason(int rep) throws HL7Exception
+	{
+		return "";
+	}
+
+	/**
+	 * get the appointment type from the beginning of the reason string
+	 * @param rep - the rep that you want the type for
+	 * @return - the type string
+	 * @throws HL7Exception - if an hl7 parsing error occurs.
+	 */
+	@Override
+	public String getType(int rep) throws HL7Exception
+	{
+		String apptType = StringUtils.trimToNull(message.getPATIENT().getSCH(rep).getSch29_zAppointmentReason().getValue());
+		if (apptType != null)
+		{
+			String[] typeList = apptType.split(":");
+			if (typeList.length > 1)
+			{
+				return typeList[1];
+			}
+		}
+		return apptType;
+	}
+
+	/**
 	 * get the appointment status by looking at the appointment reason text field
 	 * @param rep - the rep of the appointment to look at
 	 * @return - the appointment status or "" if no mapping could be found.
-	 * @throws HL7Exception
+	 * @throws HL7Exception - if there is an error parsing the hl7
 	 */
 	protected String getAppointmentStatusFromApptReason(int rep) throws HL7Exception
 	{

@@ -81,7 +81,7 @@ public class AppointmentMapper extends AbstractMapper
 		appointment.setReason(StringUtils.trimToEmpty(getReason(rep)));
 		appointment.setCreateDateTime(getCreationDate(rep));
 		appointment.setStatus(getStatus(rep, importSource));
-		appointment.setType("");
+		appointment.setType(getType(rep));
 		appointment.setLocation("");
 		appointment.setResources("");
 		appointment.setReasonCode(17); // TODO look this up somewhere
@@ -113,6 +113,17 @@ public class AppointmentMapper extends AbstractMapper
 	public String getReason(int rep) throws HL7Exception
 	{
 		return StringUtils.trimToNull(message.getPATIENT().getSCH(rep).getSch29_zAppointmentReason().getValue());
+	}
+
+	/**
+	 * get the appointment type
+	 * @param rep - the rep that you want the type for
+ 	 * @return - the type string
+	 * @throws HL7Exception - if an hl7 parsing error occurs.
+	 */
+	public String getType(int rep) throws HL7Exception
+	{
+		return "";
 	}
 
 	public Date getCreationDate(int rep) throws HL7Exception

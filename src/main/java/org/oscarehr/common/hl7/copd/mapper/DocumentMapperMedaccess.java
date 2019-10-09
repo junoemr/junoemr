@@ -22,6 +22,7 @@
  */
 package org.oscarehr.common.hl7.copd.mapper;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
@@ -45,11 +46,32 @@ public class DocumentMapperMedaccess extends DocumentMapper
 	@Override
 	public String getDocType(int rep)
 	{
-		Matcher match = Pattern.compile("([\\d\\w\\s]+);.*").matcher(StringUtils.trimToEmpty(getDescription(rep)));
+		Matcher match = Pattern.compile("([\\d\\w\\s]+);.*").matcher(StringUtils.trimToEmpty(provider.getZAT(rep).getZat3_Name().getValue()));
 		if (match.matches())
 		{
 			return match.group(1);
 		}
 		return "N/A";
+	}
+
+	/**
+	 * get the document description with leading type name removed, semicolons replaced with dashes.
+	 * @param rep - the rep to get the description for
+	 * @return - the document description
+	 */
+	@Override
+	public String getDescription(int rep)
+	{
+		String description = provider.getZAT(rep).getZat3_Name().getValue();
+
+
+		Matcher stripType = Pattern.compile("[^;]+;(.+)").matcher(description);
+		if (stripType.matches())
+		{
+			description = stripType.group(1);
+		}
+		description = StringUtils.stripEnd(description, ";");
+		description = description.replace(";", " - ");
+		return StringEscapeUtils.unescapeXml(description);
 	}
 }

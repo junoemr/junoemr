@@ -118,7 +118,7 @@ public class EncounterNoteMapper extends AbstractMapper
 
 	public Date getEncounterNoteContactDate(int rep) throws HL7Exception
 	{
-		return getNullableDate(provider.getZPV(rep)
+		return getNullableDateTime(provider.getZPV(rep)
 				.getZpv2_contactDate().getTs1_TimeOfAnEvent().getValue());
 	}
 

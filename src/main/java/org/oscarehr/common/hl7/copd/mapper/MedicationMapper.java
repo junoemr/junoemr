@@ -102,7 +102,7 @@ public class MedicationMapper extends AbstractMapper
 		drug.setDispenseInterval(getDispenseInterval(rep));
 		drug.setDrugForm(getDispenseUnitsId(rep));
 
-		drug.setPosition(rep+1); // this is for display order
+		drug.setPosition(0); // this is display order. set to all zero so that medications are ordered by date.
 		drug.setSpecialInstruction(getPharmacyInstructions(rep));
 
 		drug.setSpecial(generateSpecial(drug));
