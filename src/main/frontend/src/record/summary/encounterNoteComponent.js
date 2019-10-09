@@ -86,7 +86,9 @@ angular.module('Record.Summary').component('encounterNote', {
 		{
 			if(ctrl.note.eformData && ctrl.note.eformDataId)
 			{
-				formService.openEFormInstancePopup($stateParams.demographicNo, ctrl.note.eformDataId);
+				formService.openEFormInstancePopup($stateParams.demographicNo, ctrl.note.eformDataId).then(function () {
+					$scope.$emit('summary_page_refresh', true);
+				})
 			}
 			else if(ctrl.note.document && ctrl.note.documentId)
 			{

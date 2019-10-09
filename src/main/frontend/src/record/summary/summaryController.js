@@ -350,6 +350,14 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			getRightItems();
 		};
 
+		$scope.$on('summary_page_refresh', function (refresh)
+		{
+			if (refresh)
+			{
+				controller.refreshModel();
+			}
+		});
+
 		//TODO I would really like to refactor this out
 		controller.gotoState = function gotoState(item, mod, successCallback, dismissCallback)
 		{
