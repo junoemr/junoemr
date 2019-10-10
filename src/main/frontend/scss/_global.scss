@@ -1,10 +1,17 @@
 // global styles
 
 h1,h2,h3,h4,h5,h6 {
-	font-family: Arial, Helvetica, sans-serif;
+	@include juno-font-default;
 }
 h1,h2,h3 {
 	font-weight: bold;
+}
+
+a {
+	color: $color-neutral-darker;
+	&:hover {
+		color: $color-primary-base;
+	}
 }
 
 
@@ -26,6 +33,9 @@ h1,h2,h3 {
 .align-items-baseline {
 	align-items: baseline;
 }
+.justify-content-center {
+	justify-content: center;
+}
 .justify-content-evenly {
 	justify-content: space-evenly;
 }
@@ -36,6 +46,10 @@ h1,h2,h3 {
 .flex-row {
 	display: flex;
 	flex-direction: row;
+}
+.flex-row-reverse {
+	display: flex;
+	flex-direction: row-reverse;
 }
 .flex-column {
 	display: flex;
@@ -92,12 +106,12 @@ a,.clickable {
 }
 
 .blue-text {
-	color: $primary-blue-text;
+	color: $color-primary-base;
 }
 
 .highlight,
 .highlight:hover {
-	color: $red;
+	color: $color-red-base;
 }
 
 .refused,
@@ -107,12 +121,12 @@ a,.clickable {
 
 .ineligible,
 .ineligible:hover {
-	color: $yellow;
+	color: $color-yellow-base;
 }
 
 .pending,
 .pending:hover {
-	color: $pink;
+	color: $color-pink-base;
 }
 
 .abnormal-prev,
@@ -122,20 +136,24 @@ a,.clickable {
 
 .abnormal,
 .abnormal:hover {
-	color: $red;
+	color: $color-red-base;
 }
 
 /* page header css. page specific css should extend this */
 %juno-page-header {
 	height: $page-header-height;
-	color: $white;
-	background-color: $primary;
+	color: $color-neutral-white;
+	background-color: $color-primary-base;
 	padding-left: $page-header-height;
+
+	h1,h2,h3,h4,h5,h6 {
+		margin: 0;
+	}
 }
 
 %juno-content-control {
-	color: $grey-02;
-	background-color: $grey-08;
+	color: $color-neutral-darker;
+	background-color: $color-neutral-lightest;
 }
 
 %juno-primary-view-pane {

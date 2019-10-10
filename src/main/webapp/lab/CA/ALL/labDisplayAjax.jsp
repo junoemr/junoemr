@@ -27,20 +27,25 @@
 <%@page import="org.oscarehr.common.model.PatientLabRouting"%>
 <%@page import="oscar.util.ConversionUtils"%>
 <%@page import="org.oscarehr.common.dao.PatientLabRoutingDao"%>
-<%@page errorPage="../provider/errorpage.jsp" %>
-<%@ page import="java.util.*,
-		 java.sql.*,
-		 oscar.oscarDB.*,
-		 oscar.oscarLab.ca.all.*,
-		 oscar.oscarLab.ca.all.util.*,org.oscarehr.util.SpringUtils,
-		 oscar.oscarLab.ca.all.parsers.*,
-		 oscar.oscarLab.LabRequestReportLink,
-		 oscar.oscarMDS.data.ReportStatus,oscar.log.*,
-         oscar.OscarProperties,
-		 org.apache.commons.codec.binary.Base64,org.oscarehr.common.dao.Hl7TextInfoDao,org.oscarehr.common.model.Hl7TextInfo,
-		 org.oscarehr.common.dao.UserPropertyDAO, org.oscarehr.common.model.UserProperty,
-		javax.swing.text.rtf.RTFEditorKit,
-		java.io.ByteArrayInputStream"%>
+<%@page errorPage="../../../provider/errorpage.jsp" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.oscarLab.LabRequestReportLink" %>
+<%@ page import="oscar.oscarMDS.data.ReportStatus,oscar.log.*" %>
+<%@ page import="org.oscarehr.common.dao.Hl7TextInfoDao" %>
+<%@ page import="org.oscarehr.common.model.Hl7TextInfo" %>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="javax.swing.text.rtf.RTFEditorKit" %>
+<%@ page import="java.io.ByteArrayInputStream"%>
+<%@ page import="org.oscarehr.labs.model.Hl7DocumentLink" %>
+<%@ page import="org.oscarehr.labs.dao.Hl7DocumentLinkDao" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
+<%@ page import="oscar.oscarLab.ca.all.AcknowledgementData" %>
+<%@ page import="oscar.oscarLab.ca.all.Hl7textResultsData" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.Factory" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.MessageHandler" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.PATHL7Handler" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -124,6 +129,8 @@ String multiLabId = Hl7textResultsData.getMatchingLabs(segmentID);
 MessageHandler handler = Factory.getHandler(segmentID);
 String hl7 = Factory.getHL7Body(segmentID);
 Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
+Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
+
 int lab_no = Integer.parseInt(segmentID);
 String label = ""; Hl7TextInfo hl7Lab = hl7TextInfoDao.findLabId(lab_no);
 if (hl7Lab.getLabel()!=null) label = hl7Lab.getLabel();
@@ -790,13 +797,21 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                         for(i=0;i<headers.size();i++){
                             linenum=0;
     						boolean isUnstructuredDoc = false;
+    						boolean isPDF = false;
     						boolean	isVIHARtf = false;
     						boolean isSGorCDC = false;
+
+	    					List<Hl7DocumentLink> documentLinks = null;
 
     						//Checks to see if the PATHL7 lab is an unstructured document, a VIHA RTF pathology report, or if the patient location is SG/CDC
     						//labs that fall into any of these categories have certain requirements per Excelleris
     						if(handler.getMsgType().equals("PATHL7")){
     							isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(headers.get(i));
+    							isPDF = ((PATHL7Handler)handler).hasEmbeddedPDF();
+    							if (isPDF)
+    							{
+    								documentLinks = hl7DocumentLinkDao.getDocumentsForLab(lab_no);
+    							}
     							isVIHARtf = ((PATHL7Handler) handler).vihaRtfCheck(headers.get(i));
     							if(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")){
     								isSGorCDC = true;
@@ -818,7 +833,23 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 	                               <td width="*">&nbsp;</td>
 	                           </tr>
 	                       </table>
-                           	<%if(isUnstructuredDoc){%>
+
+                            <%
+                                if (isPDF)
+                                {
+                            %>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
+                                    <tr class="Field2">
+                                        <td width="60%" align="middle" valign="bottom" class="Cell">
+                                            <bean:message key="oscarMDS.segmentDisplay.formResult"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            <%
+                                }
+                                else if(isUnstructuredDoc)
+                                {
+                            %>
 	                       <table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
 	                           <tr class="Field2">
 	                               <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formTestName"/></td>
@@ -949,7 +980,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 											    	rtfParser.read(rtfStream, doc, 0);
 											    	String rtfText = doc.getText(0, doc.getLength()).replaceAll("\n", "<br>");
 											    	String disclaimer = "<br>IMPORTANT DISCLAIMER: You are viewing a PREVIEW of the original report. The rich text formatting contained in the original report may convey critical information that must be considered for clinical decision making. Please refer to the ORIGINAL report, by clicking 'Print', prior to making any decision on diagnosis or treatment.";%>
-											    	<td align="left"><%= rtfText + disclaimer %></td><%} %><%
+											    	<td align="left"><%= rtfText + disclaimer %></td><%}
 												else{%>
 	                                           		<td align="left"><%= handler.getOBXResult( j, k) %></td><%} %>
 	                                           	<%if(handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1)) && (obxCount>1)){
@@ -958,26 +989,40 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                    			}//end of isUnstructuredDoc
 
                                    			else{//if it isn't a PATHL7 doc
+                                   			    if (handler.getMsgType().equals("PATHL7") && isPDF)
+                                                {
+                                                    int docId = documentLinks.get(j).getDocumentNo();
+                                                %>
+                                                    <td valign="top" align="middle">
+                                                        <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '<%=request.getContextPath()%>/dms/ManageDocument.do?method=display&doc_no=<%=docId%>');">Display PDF</a>
+                                                    </td>
+                                                <%
+                                                }
                                    				//if there are duplicate FT/TX obxNames, only display the first (only if handler is PATHL7)
-	                                   			if(handler.getMsgType().equals("PATHL7")&& !isAllowedDuplicate && (obxCount>1) && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (handler.getOBXValueType(j, k).equals("TX") || handler.getOBXValueType(j, k).equals("FT"))){%>
+	                                   			else if(handler.getMsgType().equals("PATHL7")&& !isAllowedDuplicate && (obxCount>1) && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (handler.getOBXValueType(j, k).equals("TX") || handler.getOBXValueType(j, k).equals("FT"))){%>
 	                                   				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"></a><%
 	                                   				}
 	                               				else{%>
 	                                            <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(j, k)%>'))"><%=obxName %></a></td><%}%>
 	                                            <%
-	                                          	//for pathl7, if it is an SG/CDC result greater than 100 characters, left justify it 
-	                                            if((handler.getOBXResult(j, k).length() > 100) && isSGorCDC){%>
-	                                            	<td align="left"><%= handler.getOBXResult( j, k) %></td><%
-	                                            }else{%>
-	                                            <td align="right"><%= handler.getOBXResult( j, k) %></td><%}%>
-	                                            <td align="center">
-	                                                    <%= handler.getOBXAbnormalFlag(j, k)%>
-	                                            </td>
-	                                            <td align="left"><%=handler.getOBXReferenceRange( j, k)%></td>
-	                                            <td align="left"><%=handler.getOBXUnits( j, k) %></td>
-	                                            <td align="center"><%= handler.getTimeStamp(j, k) %></td>
-	                                            <td align="center"><%= handler.getOBXResultStatus( j, k) %></td><%
-	                                   			}//end of PATHL7 else %>
+
+                                                // Excelleris embedded PDFs only want a single link as the OBX result
+                                                if (!isPDF)
+                                                {
+                                                    //for pathl7, if it is an SG/CDC result greater than 100 characters, left justify it
+                                                    if((handler.getOBXResult(j, k).length() > 100) && isSGorCDC){%>
+                                                        <td align="left"><%= handler.getOBXResult( j, k) %></td><%
+                                                    }else{%>
+                                                    <td align="right"><%= handler.getOBXResult( j, k) %></td><%}%>
+                                                    <td align="center">
+                                                            <%= handler.getOBXAbnormalFlag(j, k)%>
+                                                    </td>
+                                                    <td align="left"><%=handler.getOBXReferenceRange( j, k)%></td>
+                                                    <td align="left"><%=handler.getOBXUnits( j, k) %></td>
+                                                    <td align="center"><%= handler.getTimeStamp(j, k) %></td>
+                                                    <td align="center"><%= handler.getOBXResultStatus( j, k) %></td><%
+												}
+                                            }//end of PATHL7 else %>
                                         </tr>
 
                                         <%for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>

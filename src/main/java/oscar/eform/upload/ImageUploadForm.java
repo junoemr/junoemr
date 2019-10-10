@@ -56,6 +56,11 @@ public class ImageUploadForm extends ActionForm {
         if (image.getFileSize() == 0) {
             errors.add("image", new ActionMessage("eform.uploadimages.imageMissing"));
         }
+
+        if (!isEformImageNameValid(image.getFileName()))
+        {
+            errors.add("image", new ActionMessage("eform.uploadimages.imageFileNameInvalid"));
+        }
         
         String serverImagePath = OscarProperties.getInstance().getProperty("eform_image") + "/" + image.getFileName();
         File testimage = new File(serverImagePath);
@@ -69,5 +74,15 @@ public class ImageUploadForm extends ActionForm {
         }
         
         return errors;
+    }
+
+    /**
+     * check if the image file has a valid name
+     * @param imgFileName - the file name to check
+     * @return - true if the image file name is valid.
+     */
+    public static boolean isEformImageNameValid(String imgFileName)
+    {
+        return !imgFileName.contains("'");
     }
 }

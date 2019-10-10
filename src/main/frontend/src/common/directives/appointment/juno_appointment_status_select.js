@@ -50,19 +50,19 @@ angular.module('Common').directive(
 			{
 				var model = $scope.model;
 				var option = $scope.options[model];
-				var statusElem = element.find(".icon-status");
+				var statusElem = element.find(".icon");
 
 				// remove old status icon class
 				statusElem.removeClass(function (index, className)
 				{
-					return (className.match(/(^|\s)icon-status-\S+/g) || []).join(' ');
+					return (className.match(/(^|\s)icon-\S+/g) || []).join(' ');
 				});
 
 				if(Juno.Common.Util.exists(option))
 				{
 					element.find(".directive-appt-status-select").css("background-color", option.color);
 					var statusIcon = option.icon.substr(0, option.icon.indexOf('.'));
-					statusElem.addClass("icon-status-" + statusIcon);
+					statusElem.addClass("icon-" + statusIcon);
 				}
 			};
 

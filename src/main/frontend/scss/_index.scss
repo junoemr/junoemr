@@ -19,7 +19,7 @@
 }
 
 li.cpp-note-list {
-	background: $white;
+	background: $color-neutral-white;
 	border: none;
 	border-bottom: 1px solid #ddd;
 	text-align: left;
@@ -33,78 +33,6 @@ li.cpp-note-list:last-child {
 }
 
 
-#index-header {
-
-	height: $primary-navbar-height;
-	@include juno-tab-md($primary-navbar-height);
-	@include juno-tab-color-scheme-dark;
-	@include juno-font-tab;
-
-	@include juno-breakpoints($screen-nav-lg, $screen-nav-md, 870px);
-
-	.btn-icon {
-		width: $primary-navbar-height;
-		height: $primary-navbar-height;
-		.icon {
-			width: 48px;
-			height: 16px;
-		}
-	}
-
-	.navbar-left {
-		.patient-search-form {
-			height: $primary-navbar-height;
-			padding: 0 24px;
-
-			.form-group {
-				margin-bottom: 0;
-				padding: 0 4px;
-
-				$input-size: 32px;
-				.form-control {
-					height: $input-size;
-					width: 304px;
-					background-color: $white;
-					border: 1px solid $grey-06;
-				}
-				.btn {
-					height: $input-size;
-					padding-top: 0;
-					padding-bottom: 0;
-					color: $grey-01;
-				}
-				.btn-visible {
-					height: $input-size;
-					width: $input-size;
-					background-color: $white;
-					border: 1px solid $grey-06;
-					.icon {
-						width: 16px;
-						height: 16px;
-					}
-				}
-			}
-
-		}
-	}
-	.navbar-right-menu {
-		height: $primary-navbar-height;
-
-		span {
-			padding: 2px;
-		}
-		.fa {
-			color: $white;
-		}
-		.dropdown-toggle {
-			color: $white;
-		}
-		.dropdown-menu {
-			top: auto;
-			@include juno-tab-sm(24px);
-		}
-	}
-}
 #index-content {
 	height: calc(100vh - #{$primary-navbar-height});
 

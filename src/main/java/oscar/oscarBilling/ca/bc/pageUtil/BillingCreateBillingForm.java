@@ -66,6 +66,8 @@ public final class BillingCreateBillingForm extends ActionForm {
   private String xml_endtime_min = "";
   private String xml_starttime_hr = "";
   private String xml_starttime_min = "";
+  private final String CHECKBOX_OFF = "off";
+  private String oin_insurer_pay_patient = CHECKBOX_OFF;
   String requestId;
 
   /**
@@ -699,66 +701,97 @@ public final class BillingCreateBillingForm extends ActionForm {
   public ActionErrors validate(ActionMapping mapping,
                                HttpServletRequest request) {
     ActionErrors errors = new ActionErrors();
-    
 
-   this.refertype1 = this.xml_refer1.equals("")?"":this.refertype1;
-   this.refertype2 = this.xml_refer2.equals("")?"":this.refertype2;
-   
-   
-   if("WCB".equals(this.getXml_billtype()) && request.getParameter("WCBid") == null ){
-        errors.add("",new ActionMessage("oscar.billing.CA.BC.billingBC.wcb.error.formRequired"));
-        request.setAttribute("FormMissing","YES");
+    //checkbox's don't send any value on "off". manually set oin_insurer_pay_patient to "off"
+    if (request.getParameter("oin_insurer_pay_patient") == null)
+    {
+      setOin_insurer_pay_patient(CHECKBOX_OFF);
+    }
+
+    this.refertype1 = this.xml_refer1.equals("")?"":this.refertype1;
+    this.refertype2 = this.xml_refer2.equals("")?"":this.refertype2;
+
+
+    if("WCB".equals(this.getXml_billtype()) && request.getParameter("WCBid") == null ){
+      errors.add("",new ActionMessage("oscar.billing.CA.BC.billingBC.wcb.error.formRequired"));
+      request.setAttribute("FormMissing","YES");
     }
 
     if (this.xml_refer1.equals("") && this.xml_refer2.equals("")) {
-      if (this.xml_other1 == null || xml_other1.equals("")) {
-          if (this.service == null || service.length == 0) {
-            errors.add("",
-                       new ActionMessage(
-                           "oscar.billing.CA.BC.billingBC.error.nullservicecode"));
-          }
-      }
-      if (!"pri".equalsIgnoreCase(this.getXml_billtype())) {
-        if ( (this.xml_diagnostic_detail1 == null ||
-              xml_diagnostic_detail1.equals("")) &&
-            (this.xml_diagnostic_detail2 == null ||
-             xml_diagnostic_detail2.equals("")) &&
-            (this.xml_diagnostic_detail3 == null ||
-             xml_diagnostic_detail3.equals(""))) {
+    if (this.xml_other1 == null || xml_other1.equals("")) {
+        if (this.service == null || service.length == 0) {
           errors.add("",
                      new ActionMessage(
-                         "oscar.billing.CA.BC.billingBC.error.nulldxcodes"));
+                         "oscar.billing.CA.BC.billingBC.error.nullservicecode"));
         }
+    }
+    if (!"pri".equalsIgnoreCase(this.getXml_billtype())) {
+      if ( (this.xml_diagnostic_detail1 == null ||
+            xml_diagnostic_detail1.equals("")) &&
+          (this.xml_diagnostic_detail2 == null ||
+           xml_diagnostic_detail2.equals("")) &&
+          (this.xml_diagnostic_detail3 == null ||
+           xml_diagnostic_detail3.equals(""))) {
+        errors.add("",
+                   new ActionMessage(
+                       "oscar.billing.CA.BC.billingBC.error.nulldxcodes"));
       }
     }
+    }
     /**
-        int starttime = new Integer(this.xml_starttime_hr + this.xml_starttime_min).intValue();
-        int endtime = new Integer(this.xml_endtime_hr + this.xml_endtime_min).intValue();
-        if(starttime>endtime||starttime==endtime){
-          errors.add("",
-                       new ActionMessage(
-     "oscar.billing.CA.BC.billingBC.error.invalidtimeselection"));
+      int starttime = new Integer(this.xml_starttime_hr + this.xml_starttime_min).intValue();
+      int endtime = new Integer(this.xml_endtime_hr + this.xml_endtime_min).intValue();
+      if(starttime>endtime||starttime==endtime){
+        errors.add("",
+                     new ActionMessage(
+    "oscar.billing.CA.BC.billingBC.error.invalidtimeselection"));
 
-        }
-     **/
+      }
+    **/
     BillingSessionBean bean = (BillingSessionBean) request.getSession().getAttribute("billingSessionBean");
     if (bean != null){
-        bean.setStartTimeHr(this.getXml_starttime_hr());
-        bean.setStartTimeMin(this.getXml_starttime_min());
-        bean.setEndTimeHr(this.getXml_endtime_hr());
-        bean.setEndTimeMin(this.getXml_endtime_min());
+      bean.setStartTimeHr(this.getXml_starttime_hr());
+      bean.setStartTimeMin(this.getXml_starttime_min());
+      bean.setEndTimeHr(this.getXml_endtime_hr());
+      bean.setEndTimeMin(this.getXml_endtime_min());
     }
     request.setAttribute("loadFromSession", "y");
 
     //fixes bug where redirection to wcb form was occurring
     //when billing form in error
     if("WCB".equals(xml_billtype)){
-      request.setAttribute("newWCBClaim","1");
+    request.setAttribute("newWCBClaim","1");
     }
 
     _log.debug("About to return errors "+errors.size());
     return errors;
   }
+
+  /**
+   * get the oin pay patient flag
+   */
+  public String getOin_insurer_pay_patient()
+  {
+    return oin_insurer_pay_patient;
+  }
+
+  /**
+   * check if the pay patient flag (checkbox) is set
+   * @return return true if pay patient is set.
+   */
+  public boolean isOinPayPatient()
+  {
+    return oin_insurer_pay_patient.equalsIgnoreCase("on");
+  }
+
+  /**
+   * set the oin pay patient flag
+   */
+  public void setOin_insurer_pay_patient(String oin_insurer_pay_patient)
+  {
+    this.oin_insurer_pay_patient = oin_insurer_pay_patient;
+  }
+
   /**
    * Validate the properties that have been set from this HTTP request,
    * and return an <code>ActionErrors</code> object that encapsulates any

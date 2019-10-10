@@ -15,6 +15,11 @@ Juno.Common.Util.settings = {
 	dayofweek_format: "dddd"
 };
 
+Juno.Common.Util.DisplaySettings = {
+	dateFormat: "yyyy-MM-dd",
+	timeFormat: "HH:mm a",
+};
+
 Juno.Common.Util.exists = function exists(object) {
 	// not undefined and not null
 	return angular.isDefined(object) && object !== null;
@@ -61,8 +66,13 @@ Juno.Common.Util.formatTime = function formatTime(d) {
 	return d;
 };
 
-Juno.Common.Util.formatMomentDate = function formatMomentDate(d) {
-	return d.format(Juno.Common.Util.settings.date_format);
+Juno.Common.Util.formatMomentDate = function formatMomentDate(d, format)
+{
+	if (!format)
+	{
+		format = Juno.Common.Util.settings.date_format;
+	}
+	return d.format(format);
 };
 
 Juno.Common.Util.formatMomentTime = function formatMomentTime(d, format) {
@@ -88,7 +98,7 @@ Juno.Common.Util.getTimeMoment = function getTimeMoment(time_string)
 
 Juno.Common.Util.getDateMomentFromComponents = function getDateMomentFromComponents(year_string, month_string, day_string)
 {
-	return moment.utc({year: year_string, month: month_string, day: day_string});
+	return moment.utc({year: year_string, month: (Number(month_string)-1), day: day_string});
 };
 
 Juno.Common.Util.getDateAndTimeMoment = function getCombinedMoment(dateString, timeString)
@@ -242,6 +252,10 @@ Juno.Common.Util.isIntegerString = function isIntegerString(string)
 
 	return false;
 };
+Juno.Common.Util.isNumber = function isNumber(object)
+{
+	return typeof object === "number";
+};
 
 Juno.Common.Util.escapeHtml = function escapeHtml(str)
 {
@@ -276,4 +290,14 @@ Juno.Common.Util.formatName = function formatName(firstName, lastName)
 	}
 
 	return lastName + ', ' + firstName;
+};
+
+Juno.Common.Util.trimToLength = function trimToLength(string, maxLength)
+{
+	var shortString = string;
+	if(shortString.length > maxLength)
+	{
+		shortString = shortString.substring(0, maxLength);
+	}
+	return shortString;
 };

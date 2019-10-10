@@ -390,33 +390,31 @@ function checkName() {
     }
 	return typeInOK;
 }
-function checkDate(yyyy,mm,dd,err_msg) {
-
+function checkDate(year, month, day, errMsg)
+{
 	var typeInOK = false;
 
-	if(checkTypeNum(yyyy) && checkTypeNum(mm) && checkTypeNum(dd) ){
-        var check_date = new Date(yyyy,(mm-1),dd);
-		var now = new Date();
-		var year=now.getFullYear();
-		var month=now.getMonth()+1;
-		var date=now.getDate();
-		//alert(yyyy + " | " + mm + " | " + dd + " " + year + " " + month + " " +date);
+	if (checkTypeNum(year) && checkTypeNum(month) && checkTypeNum(day))
+	{
+		var checkDate = new Date(year, month-1, day);
+		var old = new Date(1800, 1, 1);
 
-		var young = new Date(year,month,date);
-		var old = new Date(1800,01,01);
-		//alert(check_date.getTime() + " | " + young.getTime() + " | " + old.getTime());
-		if (check_date.getTime() <= young.getTime() && check_date.getTime() >= old.getTime() && yyyy.length==4) {
-		    typeInOK = true;
+		if (checkDate.getTime() >= old.getTime() && year.length === 4)
+		{
+			typeInOK = true;
 		}
-		if ( yyyy == "0000"){
-                    typeInOK = false;
-                }
-        }
 
-	if (!isValidDate(dd,mm,yyyy) || !typeInOK){
-            alert (err_msg+"\n<bean:message key="demographic.demographiceditdemographic.msgWrongDate"/>");
-            typeInOK = false;
-        }
+		if (year === "0000")
+		{
+			typeInOK = false;
+		}
+	}
+
+	if (!isValidDate(day, month, year) || !typeInOK)
+	{
+		alert(errMsg + "\n<bean:message key="demographic.demographiceditdemographic.msgWrongDate"/>");
+		typeInOK = false;
+	}
 
 	return typeInOK;
 }
@@ -1062,7 +1060,7 @@ if(wLReadonly.equals("")){
 					}
 				%>
 				<td><a
-					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t<%=referral_no_parameter%>"
+					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName()) + URLEncoder.encode(", ") + URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t<%=referral_no_parameter%>"
 					target="_blank"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>

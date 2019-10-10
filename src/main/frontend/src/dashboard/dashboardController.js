@@ -27,6 +27,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
     '$scope',
     '$uibModal',
+    '$interval',
     'NgTableParams',
     'providerService',
     'ticklerService',
@@ -39,6 +40,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
     function($scope,
              $uibModal,
+             $interval,
              NgTableParams,
              providerService,
              ticklerService,
@@ -51,6 +53,14 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
     {
 
         var controller = this;
+
+        // Intervals for periodic updates
+        controller.dashboardInterval = undefined;
+        controller.dashboardMessageInterval = undefined;
+
+        // Interval takes update times in ms, so 60s * 1000 * num_minutes
+        controller.intervalLengthOneMinute = 60000;
+        controller.intervalLengthFiveMinutes = 60000 * 5;
 
         //header
         controller.displayDate = function displayDate()
@@ -395,11 +405,9 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
         controller.updateDashboard = function updateDashboard()
         {
             controller.updateTicklers();
-            controller.updateMessages();
             controller.updateReports();
             controller.updateFeed(0, 10);
             controller.updateK2aActive();
-
         };
 
         $scope.$watch(function()
@@ -412,7 +420,25 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
             if (newVal != null)
             {
                 controller.updateDashboard();
+                controller.updateMessages();
             }
+
+            if (!angular.isDefined(controller.dashboardInterval))
+            {
+                controller.dashboardInterval = $interval(function()
+                {
+                    controller.updateDashboard();
+                }, controller.intervalLengthFiveMinutes);
+            }
+
+            if (!angular.isDefined(controller.dashboardMessageInterval))
+            {
+                controller.dashboardMessageInterval = $interval(function()
+                {
+                    controller.updateMessages();
+                }, controller.intervalLengthOneMinute);
+            }
+
         }, true);
 
 
@@ -541,5 +567,21 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
                 });
 
         };
+
+        // Destroy interval before controller closes to ensure background updates don't occur
+        $scope.$on('$destroy', function()
+        {
+            if (angular.isDefined(controller.dashboardInterval))
+            {
+                $interval.cancel(controller.dashboardInterval);
+                controller.dashboardInterval = undefined;
+            }
+
+            if (angular.isDefined(controller.dashboardMessageInterval))
+            {
+                $interval.cancel(controller.dashboardMessageInterval);
+                controller.dashboardMessageInterval = undefined;
+            }
+        })
     }
 ]);

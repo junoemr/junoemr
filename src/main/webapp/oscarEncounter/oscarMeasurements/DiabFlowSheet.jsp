@@ -1024,22 +1024,31 @@ fieldset[disabled] .btn-primary:active
    							hdata.put("prevention_date",mdb.getDateObserved());
    							hdata.put("comments",mdb.getComments());
    							hdata.put("unixTime", Long.toString(mdb.getDateEnteredAsDate().getTime()));
-   						%>
+							hdata.put("type", mdb.getType());
+							String editPage = request.getContextPath()
+									+ "/oscarEncounter/oscarMeasurements/AddMeasurementData.jsp"
+									+ "?measurement=" + response.encodeURL(measure)
+									+ "&demographic_no=" + demographic_no
+									+ "&template=" + URLEncoder.encode(temp, "UTF-8") + UUIDParamStr
+									+ "&id=" + mdb.getId();
+						%>
 
-					<div itemtime="<%=hdata.get("unixTime")%>" class="recentBlock measurements" id="mView-<%=hdata.get("id")%>">
-
+					<div itemtime="<%=hdata.get("unixTime")%>"
+						 class="recentBlock measurements"
+						 id="mView-<%=hdata.get("id")%>"
+						 onclick="popupPage(660, 900, '<%=editPage%>')">
 					<b><%=hdata.get("data")%></b>; <%=hdata.get("prevention_date")%> <br>
 					<b>
 					<%=hdata.get("comments")%>
 					</b>
 					</div>
-					
+
 					<div id="mMessage-<%=hdata.get("id")%>" style="display:none;">
-					
+
 					<h1><%=name%>: <%=hdata.get("data")%></h1>
 					Date Observed: <%=hdata.get("prevention_date")%><br>
 					<%=hdata.get("comments")%><br>
-					
+
 
 					</div>
 					<%
@@ -1062,9 +1071,19 @@ fieldset[disabled] .btn-primary:active
 		                hdata.put("comments",mdb.getComments());
 		                hdata.put("id",""+mdb.getId());
 		            	hdata.put("unixTime", Long.toString(mdb.getDateEnteredAsDate().getTime()));
-		                %>
+						String editPage = request.getContextPath()
+								+ "/oscarEncounter/oscarMeasurements/AddMeasurementData.jsp"
+								+ "?measurement=" + response.encodeURL(measure)
+								+ "&demographic_no=" + demographic_no
+								+ "&template=" + URLEncoder.encode(temp, "UTF-8") + UUIDParamStr
+								+ "&id=" + mdb.getId();
 
-			        <div itemtime="<%=hdata.get("unixTime")%>" id="mView-<%=hdata.get("id")%>"  <%if (mdb.getIndicationColour()!=null) {%> <%}%> class="block measurements <%=name%>" >
+					%>
+
+			        <div itemtime="<%=hdata.get("unixTime")%>"
+						 id="mView-<%=hdata.get("id")%>"
+						 <%if (mdb.getIndicationColour()!=null) {%> <%}%>
+						 class="block measurements <%=name%>" onclick="popupPage(660, 900, '<%=editPage%>')">
 			                <%if (!hdata.get("data").equals("")) { %>
 			                <b><%=hdata.get("data")%></b>, <%=hdata.get("prevention_date")%><br>
 			                <%}else{ %>

@@ -17,6 +17,7 @@ angular.module('Common.Services').factory(
 				label_size: '@caLabelSize',
 				input_size: '@caInputSize',
 				text_length: '@caTextLength',
+				text_placeholder: '@caTextPlaceholder',
 				hide_label_colon: '@caTitleNoColon',
 				template: '@caTemplate',
 
@@ -40,7 +41,9 @@ angular.module('Common.Services').factory(
 
 				on_focus_fn: '&caFocus',
 				change_fn: '&caChange',
-				blur_fn: '&caBlur'
+				blur_fn: '&caBlur',
+
+				keypress_enter_fn: '&caKeypressEnter',
 			};
 
 			helper.resolve_template = function(attributes, base_default_template)
@@ -135,6 +138,21 @@ angular.module('Common.Services').factory(
 						}
 					}
 				});
+
+				if(angular.isFunction($scope.keypress_enter_fn))
+				{
+					element.bind("keydown keypress", function(event)
+					{
+						if(event.which === 13)
+						{
+							$scope.$apply(function ()
+							{
+								$scope.$eval($scope.keypress_enter_fn);
+							});
+							event.preventDefault();
+						}
+					});
+				}
 			};
 
 			helper.default_controller = ['$scope', '$element', '$attrs', function default_controller($scope, $element, $attrs)

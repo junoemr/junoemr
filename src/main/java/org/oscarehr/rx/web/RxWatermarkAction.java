@@ -27,96 +27,17 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.apache.struts.upload.FormFile;
-import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.rx.service.RxWatermarkService;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 
 public class RxWatermarkAction  extends DispatchAction
 {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-
-	//returns the watermark image
-	public ActionForward getWatermark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
-	{
-		try
-		{
-			GenericFile outfile = RxWatermarkService.getWatermark();
-			response.setContentType("image/png");
-
-			ServletOutputStream output = response.getOutputStream();
-			InputStream buffIn = null;
-			try {
-				buffIn = outfile.asFileInputStream();
-				int data;
-				while ((data = buffIn.read()) != -1) {
-					output.write(data);
-				}
-			} finally {
-				if (buffIn!=null) buffIn.close();
-			}
-
-			output.flush();
-			output.close();
-
-			return null;
-		}
-		catch (FileNotFoundException e)
-		{
-			MiscUtils.getLogger().error("could not find watermark file: " + e.getMessage());
-			response.setStatus(500);
-			return null;
-		}
-	}
-
-	//update the watermark image
-	public ActionForward setWatermark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
-	{
-		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
-
-		FormFile watermarkFile = (FormFile) form.getMultipartRequestHandler().getFileElements().get("watermarkFile");
-		if (watermarkFile != null && !watermarkFile.getFileName().isEmpty())
-		{
-			MiscUtils.getLogger().info("new watermark file: " + watermarkFile.getFileName());
-			try
-			{
-				RxWatermarkService.setWatermark(watermarkFile.getInputStream());
-			}
-			catch (Exception e)
-			{
-				MiscUtils.getLogger().error("error while writing watermark file: " + e.getMessage());
-			}
-		}
-		else
-		{
-			MiscUtils.getLogger().error("failed to retrieve watermark file");
-		}
-
-		response.setStatus(200);
-		return null;
-	}
-
-	// delete the watermark file
-	public ActionForward deleteWatermark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
-	{
-		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
-
-		RxWatermarkService.deleteWatermark();
-
-		response.setStatus(200);
-		return null;
-	}
 
 	public ActionForward enableWatermark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
@@ -125,6 +46,18 @@ public class RxWatermarkAction  extends DispatchAction
 
 		boolean enableWatermark = Boolean.parseBoolean(request.getParameter("enable"));
 		RxWatermarkService.enableWatermark(enableWatermark);
+
+		response.setStatus(200);
+		return null;
+	}
+
+	public ActionForward setWatermarkBackground(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
+		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
+
+		boolean isBackground = Boolean.parseBoolean(request.getParameter("isBackground"));
+		RxWatermarkService.setWatermarkBackground(isBackground);
 
 		response.setStatus(200);
 		return null;

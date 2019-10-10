@@ -43,10 +43,16 @@
     }
 
     Boolean hasCustomBillingAddress = (Boolean) request.getAttribute("hasCustomBillingAddress");
+    UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
 %>
 
 <%@ page import="java.util.*,oscar.oscarReport.reportByTemplate.*" %>
 <%@ page import="org.oscarehr.rx.service.RxWatermarkService" %>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="oscar.OscarProperties" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -196,45 +202,106 @@
             </fieldset>
         </div>
     </div>
+
     <div id="clinic">
         <div class="clinic-details">
             <div class="clinic-info">
-                <fieldset>
-                    <legend>Prescription Watermark</legend>
-                    <form action="../RxWatermark.do" method="POST" enctype="multipart/form-data" id="watermark-form">
-                        <input id="watermark-upload-action" type="hidden" name="method" value="setWatermark">
+                <fieldset class="rx-settings-panel">
+                    <legend>Clinic Logos</legend>
+                    <form  id="card-logo-form" action="../RxSettings.do" method="POST">
+                        <input id="card-logo-upload-action" type="hidden" name="method" value="uploadImage">
+                        <input type="hidden" name="image_type" value="CARD_LOGO">
+                        <div class="flex-fill-row">
+                            <h3>Appointment Card Logo</h3>
+                            <hr>
+                        </div>
+                        <div>
+                            <div style="display:flex; flex-direction:row; align-items:end;">
+                                <div style="margin-right: 5px;">
+                                    <img id="card-logo-preview" src="../ClinicImage.do?method=getImage&image_type=CARD_LOGO" width="100" height="100" style="background-color: #fefefe;" onerror="this.style.display='none';"/>
+                                </div>
+                                <div>
+                                    <label><b>Appointment Card Logo Image</b></label>
+                                    <input id="image_file" type="file" name="image_file" accept="image/png"/>
+                                </div>
+                            </div>
+                            <div class="clinic-logo-input-field flex-fill-row" style="flex-direction: row; justify-content: center;">
+                                <input id="card-logo-submit-upload" class="submit-button" style="display:flex; flex: 0 1 auto; margin-right: 10px" type="submit" value="Upload">
+                                <input id="card-logo-submit-delete" class="submit-button" style="display:flex; flex: 0 1 auto;" type="submit" value="Delete">
+                            </div>
+                        </div>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+    <div id="clinic">
+        <div class="clinic-details">
+            <div class="clinic-info">
+                <fieldset class="rx-settings-panel">
+                    <legend>Rx Settings</legend>
+                    <form  id="rx-form" action="../RxSettings.do" method="POST">
+                        <h3>General Settings</h3>
+                        <hr>
+                        <input id="rx-settings-action" name="method" type="hidden" value="setSettings">
+                        <div class="rx-fields">
+                            <div class="input-field">
+                                <label>Rx Footer - <span style="color: grey;">95 character max</span></label>
+                                <%
+                                    UserProperty promoProp = userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT);
+                                    String promoText = "";
+                                    if (promoProp != null)
+                                    {
+                                        promoText = promoProp.getValue();
+                                    }
+                                    else
+                                    {
+                                        promoText = OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT");
+                                    }
+                                %>
+                                <input name="rx_promo_text" type="text" maxlength="95" value="<%=promoText%>">
+                            </div>
+
+                            <div class="submit flex-fill-row">
+                                <input class="submit-button" type="submit" value="Update">
+                            </div>
+                            <div class="flex-fill-row">
+                                <span id="rx-general-success-msg">Settings updated</span>
+                                <span id="rx-general-error-msg">Error updating settings</span>
+                            </div>
+                        </div>
+                    </form>
+                    <form action="../ClinicImage.do" method="POST" enctype="multipart/form-data" id="watermark-form">
+                        <h3>Rx Watermark</h3>
+                        <hr>
+                        <input id="watermark-upload-action" type="hidden" name="method" value="uploadImage">
+                        <input type="hidden" name="image_type" value="WATERMARK">
 
                         <div class="input-field flex-fill-row">
                             <input id="watermark-toggle" <% if (RxWatermarkService.isWatermarkEnabled()) {%>checked<%}%> type="checkbox">
-                            <script>
-                                let toggle = $('#watermark-toggle');
-                                toggle.bootstrapToggle({
-                                    width: 50,
-                                    height: 20,
-                                    size: 'small'
-                                });
-                                toggle.change(function() {
-                                    let enabled = jQuery(this).prop('checked');
-                                    toggleWatermarkFields(enabled);
-                                    enableWatermark(enabled);
-                                })
-                            </script>
                         </div>
                         <div class="watermark-fields" id="watermark-input-form">
                             <div class="watermark-input-field flex-fill-row">
-                                <div style="display:flex; flex-direction:row;">
+                                <div style="display:flex; flex-direction:row; align-items:end;">
                                     <div style="margin-right: 5px;">
-                                        <img id="current-watermark-preview" src="../RxWatermark.do?method=getWatermark" width="100" height="100" style="background-color: #fefefe;" onerror="this.style.display='none';"/>
+                                        <img id="current-watermark-preview" src="../ClinicImage.do?method=getImage&image_type=WATERMARK" width="100" height="100" style="background-color: #fefefe;" onerror="this.style.display='none';"/>
                                     </div>
                                     <div>
                                         <label><b>Rx Prescription watermark</b></label>
-                                        <input id="watermark-file" type="file" name="watermarkFile" accept="image/png"/>
+                                        <input id="watermark-file" type="file" name="image_file" accept="image/png"/>
                                     </div>
                                 </div>
                             </div>
                             <div class="watermark-input-field flex-fill-row" style="flex-direction: row; justify-content: center;">
                                 <input id="watermark-submit-upload" class="submit-button" style="display:flex; flex: 0 1 auto; margin-right: 10px" type="submit" value="Upload">
                                 <input id="watermark-submit-delete" class="submit-button" style="display:flex; flex: 0 1 auto;" type="submit" value="Delete">
+                            </div>
+                            <div class="watermark-input-field flex-fill-row" style="margin-top: 20px;">
+                                <label><b>Watermark Position</b></label>
+                                <div class="watermark-background-selector">
+                                <input id="watermark-background-toggle" <% if (!RxWatermarkService.isWatermarkBackground()) {%>checked<%}%> type="checkbox" data-toggle="toggle" data-on="Foreground" data-off="Background">
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -247,6 +314,34 @@
         const billingCheckbox = document.querySelector('#billingCheckbox');
         const billingFields = document.querySelector('#billing-fields');
         const addressFields = document.querySelector('#address-fields');
+
+        // setup toggle switches
+
+        // watermark on / off toggle
+        let toggle = $('#watermark-toggle');
+        toggle.bootstrapToggle({
+            width: 50,
+            height: 20,
+            size: 'small'
+        });
+        toggle.change(function() {
+            let enabled = jQuery(this).prop('checked');
+            toggleWatermarkFields(enabled);
+            enableWatermark(enabled);
+        })
+
+        // watermark position toggle
+        let backgroundToggle = $('#watermark-background-toggle');
+        backgroundToggle.bootstrapToggle({
+            width: 90,
+            height: 20,
+            size: 'small'
+        });
+        backgroundToggle.change(function() {
+            let state = !jQuery(this).prop('checked');
+            setWatermarkBackground(state);
+        })
+
 
         function showBilling(showBilling) {
             if (showBilling) {
@@ -286,7 +381,29 @@
                     enable: enable
                 },
                 success: function() {
-                    console.log("JOB DONE");
+                    console.log("watermark on");
+                }
+            });
+        }
+
+        function setWatermarkBackground(isBackground)
+        {
+            jQuery.ajax({
+                url: "../RxWatermark.do",
+                type: "post",
+                data: {
+                    method: "setWatermarkBackground",
+                    isBackground: isBackground
+                },
+                success: function() {
+                    if (isBackground)
+                    {
+                        console.log("watermark background");
+                    }
+                    else
+                    {
+                        console.log("watermark foreground");
+                    }
                 }
             });
         }
@@ -310,7 +427,7 @@
         function submitWatermarkForm(event, action)
         {
             event.preventDefault();
-            if (action === "deleteWatermark")
+            if (action === "deleteImage")
             {
                 if(!confirm("are you sure you want to delete your Rx watermark image"))
                 {
@@ -322,30 +439,81 @@
             let formData = new FormData(event.target);
 
             jQuery.ajax({
-                url: "../RxWatermark.do",
+                url: "../ClinicImage.do",
                 type: "post",
                 data: formData,
                 contentType: false,
                 processData: false,
                 success: function() {
                     jQuery("#watermark-file").val("");
-                    let watermarkPreview = jQuery("#current-watermark-preview")
+                    let watermarkPreview = jQuery("#current-watermark-preview");
                     watermarkPreview.css("display", "flex");
-                    watermarkPreview.attr("src", "../RxWatermark.do?method=getWatermark&rand=" + Math.random())
+                    watermarkPreview.attr("src", "../ClinicImage.do?method=getImage&image_type=WATERMARK&rand=" + Math.random())
+                }
+            })
+        }
+
+        function submitRxSettings(event, action)
+        {
+
+            let formData = new FormData(event.target);
+
+            jQuery.ajax({
+                url: "../RxSettings.do",
+                type: "post",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function() {
+                    jQuery("#rx-general-success-msg").css('display', 'block');
+                    jQuery("#rx-general-error-msg").css('display', 'none');
+                },
+                error: function () {
+                    jQuery("#rx-general-error-msg").css('display', 'block');
+                    jQuery("#rx-general-success-msg").css('display', 'none');
+                }
+            })
+        }
+
+        function submitCardLogoForm(event, action)
+        {
+            event.preventDefault();
+            if (action === "deleteImage")
+            {
+                if(!confirm("Are you sure you want to delete your Card Logo Image"))
+                {
+                    return;
+                }
+            }
+
+            jQuery("#card-logo-upload-action").val(action);
+            let formData = new FormData(event.target);
+
+            jQuery.ajax({
+                url: "../ClinicImage.do",
+                type: "post",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function() {
+                    let cardLogoPreview =  jQuery("#card-logo-preview");
+                    cardLogoPreview.css("display", "inline-block");
+                    cardLogoPreview.attr("src", "../ClinicImage.do?method=getImage&image_type=CARD_LOGO&rand=" + Math.random())
                 }
             })
         }
 
         jQuery(document).ready(function ()
         {
-            let submitAction = "setWatermark";
+            // watermark
+            let submitAction = "uploadImage";
             jQuery("#watermark-submit-upload").click(function()
             {
-                submitAction = "setWatermark";
+                submitAction = "uploadImage";
             });
             jQuery("#watermark-submit-delete").click(function()
             {
-                submitAction = "deleteWatermark";
+                submitAction = "deleteImage";
             });
 
             jQuery("#watermark-form").submit(function(event)
@@ -353,9 +521,30 @@
                 submitWatermarkForm(event, submitAction);
             });
 
+            jQuery("#rx-form").submit(function(event) {
+                event.preventDefault();
+                submitRxSettings(event, "setSettings");
+            });
+
             <% if (!RxWatermarkService.isWatermarkEnabled()) { %>
                 toggleWatermarkFields(false);
             <%}%>
+
+            // clinic logos
+            let clinicLogoSubmitAction = "uploadImage";
+            jQuery("#card-logo-submit-upload").click(function ()
+            {
+                clinicLogoSubmitAction = "uploadImage"
+            });
+            jQuery("#card-logo-submit-delete").click(function ()
+            {
+                clinicLogoSubmitAction = "deleteImage"
+            });
+
+            jQuery("#card-logo-form").submit(function (event)
+            {
+               submitCardLogoForm(event, clinicLogoSubmitAction);
+            });
         });
 
     </script>

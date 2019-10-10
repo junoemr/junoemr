@@ -1,0 +1,48 @@
+
+.zero-state-display {
+	width: 100%;
+	height: 100%;
+
+	.square {
+		position: relative;
+		width: 75%;
+
+		&:after {
+			content: "";
+			display: block;
+			padding-bottom: 100%;
+		}
+
+		.content-container {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+
+			.zero-state-message {
+				position: absolute;
+				top: 75%;
+				color: $color-neutral-darker;
+			}
+			.zero-state-content {
+				position: absolute;
+				width: 35%;
+				height: 35%;
+				top: 25%;
+
+				.zero-state-image  {
+					display: inline-block;
+					width: 100%;
+					height: 100%;
+					background-size: contain;
+					background-position: center;
+					background-repeat: no-repeat;
+				}
+			}
+		}
+		.image-zero-state-background {
+			background-size: contain;
+			background-repeat: no-repeat;
+			background-position: center;
+		}
+	}
+}

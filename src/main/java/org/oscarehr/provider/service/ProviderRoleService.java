@@ -34,6 +34,7 @@ import org.oscarehr.common.model.SecRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.OscarProperties;
 
 import java.util.List;
 
@@ -41,6 +42,7 @@ import java.util.List;
 @Transactional
 public class ProviderRoleService
 {
+
 	@Autowired
 	SecRoleDao securityRoleDao;
 
@@ -59,14 +61,43 @@ public class ProviderRoleService
 	@Autowired
 	RecycleBinDao recycleBinDao;
 
+
+	/**
+	 * @param providerID, of the newly added provider's
+	 */
+
+	public boolean setDefaultRoleForNewProvider(Integer providerID)
+	{
+
+		String providerDefaultRoleName = OscarProperties.getInstance().getProperty("default_provider_role_name");
+
+		boolean isDefaultRoleNameExist = setPrimaryRole(providerID, providerDefaultRoleName);
+
+		if(!isDefaultRoleNameExist)
+		{
+			return false;
+		}
+
+		addRole(providerID, providerDefaultRoleName);
+
+		return true;
+	}
+
 	/**
 	 * Assign a primary role to the provider
 	 * @param providerId - provider record id
 	 * @param roleName - name of the role to assign
+	 * @return - if no role in the table match property file's default role, return false;
 	 */
-	public void setPrimaryRole(Integer providerId, String roleName)
+	public boolean setPrimaryRole(Integer providerId, String roleName)
 	{
 		SecRole secRole = securityRoleDao.findByName(roleName);
+
+		// not roleName in the table that matching default roleName from property file
+		if(secRole == null)
+		{
+			return false;
+		}
 
 		Long roleId = secRole.getId().longValue();
 		Long caisiProgram = new Long(programManager.getDefaultProgramId());
@@ -85,15 +116,29 @@ public class ProviderRoleService
 			programProvider.setRoleId(roleId);
 			programProviderDao.saveProgramProvider(programProvider);
 		}
+
+		return true;
 	}
+
 
 	public Secuserrole addRole(Integer roleProviderId, String roleName)
 	{
 		Secuserrole secUserRole = new Secuserrole();
+		int defaultActiveyn = 1;
+
 		secUserRole.setProviderNo(String.valueOf(roleProviderId));
 		secUserRole.setRoleName(roleName);
-		secUserRole.setActiveyn(1);
+		secUserRole.setActiveyn(defaultActiveyn);
 		secUserRoleDao.save(secUserRole);
+		return secUserRole;
+	}
+
+
+	public Secuserrole addRoleAndAssignPrimary(Integer roleProviderId, String roleName)
+	{
+
+
+		Secuserrole secUserRole = addRole(roleProviderId, roleName);
 
 		Long caisiProgram = new Long(programManager.getDefaultProgramId());
 		ProgramProvider programProvider = programProviderDao.getProgramProvider(String.valueOf(roleProviderId), caisiProgram);
@@ -137,17 +182,12 @@ public class ProviderRoleService
 		recycleBin.setTableContent("<provider_no>" + roleProviderId + "</provider_no>" + "<role_name>" + oldRole + "</role_name>");
 		recycleBinDao.persist(recycleBin);
 
-		// TODO this may be doing un-needed things
-		Long caisiProgram = new Long(programManager.getDefaultProgramId());
-		ProgramProvider programProvider = programProviderDao.getProgramProvider(String.valueOf(roleProviderId), caisiProgram);
-		if(programProvider != null)
-		{
-			programProviderDao.deleteProgramProvider(programProvider.getId());
-		}
 	}
 
 	public boolean validRoleName(String roleName)
 	{
 		return (secRoleDao.findByName(roleName) != null);
 	}
+
+
 }

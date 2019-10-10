@@ -151,6 +151,7 @@ module.exports = {
 			'./src/common/services/demographicsService.js',
 			'./src/common/services/diseaseRegistryService.js',
 			'./src/common/services/errorsService.js',
+			'./src/common/services/eFormService.js',
 			'./src/common/services/faxAccountService.js',
 			'./src/common/services/faxInboundService.js',
 			'./src/common/services/faxOutboundService.js',
@@ -186,6 +187,7 @@ module.exports = {
 			'./src/common/filters/startFrom.js',
 
 			'./src/common/directives/module.js',
+			'./src/common/directives/junoConfirmClick.js',
 			'./src/common/directives/typeaheadHelper.js',
 			'./src/common/directives/patientSearchTypeahead.js',
 			'./src/common/directives/patientTypeahead.js',
@@ -227,20 +229,23 @@ module.exports = {
 			'./src/common/directives/clinicaid/scroll.js',
 			'./src/common/directives/clinicaid/zero_pad.js',
 
+			'./src/common/components/module.js',
+			'./src/common/components/modalComponent.js',
+			'./src/common/components/loadingIndicatorComponent.js',
+			'./src/common/components/zeroStateDisplayComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
-			'./src/layout/navBarController.js',
+			'./src/layout/primaryNavComponent.js',
+			'./src/layout/leftAsideComponent.js',
 
 			'./src/patient/module.js',
 			'./src/patient/newPatientController.js',
+			'./src/patient/demographicCardComponent.js',
 
 			'./src/dashboard/module.js',
 			'./src/dashboard/dashboardController.js',
 			'./src/dashboard/ticklerConfigureController.js',
-
-			'./src/patientlist/module.js',
-			'./src/patientlist/patientListController.js',
 
 			'./src/record/module.js',
 			'./src/record/recordController.js',
@@ -249,10 +254,17 @@ module.exports = {
 			'./src/record/summary/recordPrintController.js',
 			'./src/record/summary/groupNotesController.js',
 			'./src/record/summary/saveWarningController.js',
+			'./src/record/summary/summaryModuleComponent.js',
+			'./src/record/summary/encounterNoteComponent.js',
+			'./src/record/summary/encounterNoteListComponent.js',
 			'./src/record/forms/module.js',
 			'./src/record/forms/formsController.js',
+			'./src/record/forms/components/formView/formViewComponent.js',
+			'./src/record/forms/components/modeSelector/modeSelectorComponent.js',
+			'./src/record/forms/components/groupSelector/groupSelectorComponent.js',
 			'./src/record/details/module.js',
 			'./src/record/details/detailsController.js',
+			'./src/record/details/swipecardController.js',
 			'./src/record/phr/module.js',
 			'./src/record/phr/phrController.js',
 
@@ -268,7 +280,8 @@ module.exports = {
 
 			'./src/schedule/module.js',
 			'./src/schedule/scheduleController.js',
-			'./src/schedule/eventController.js',
+			'./src/schedule/eventComponent.js',
+			'./src/schedule/scheduleSearchComponent.js',
 			'./src/schedule/scheduleService.js',
 
 			'./src/admin/module.js',
@@ -305,12 +318,9 @@ module.exports = {
 			'./src/report/reportBadAppointmentSheetController.js',
 			'./src/report/reportDaySheetController.js',
 			'./src/report/reportEdbListController.js',
-			'./src/report/reportFollowUpIntakeController.js',
 			'./src/report/reportNoShowAppointmentSheetController.js',
 			'./src/report/reportOldPatientsController.js',
 			'./src/report/reportPatientChartListController.js',
-			'./src/report/reportRegistrationIntakeController.js',
-			'./src/report/reportSHMentalHealthController.js',
 
 			'./src/document/module.js',
 			'./src/document/documentsController.js',
@@ -319,6 +329,7 @@ module.exports = {
 			'./src/settings/settingsController.js',
 			'./src/settings/changePasswordController.js',
 			'./src/settings/quickLinkController.js',
+			'./src/settings/summaryItemSettingsController.js',
 
 			'./src/help/module.js',
 			'./src/help/supportController.js',

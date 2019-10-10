@@ -675,6 +675,11 @@
 								String colo = bMultisites
 										? ApptUtil.getColorFromLocation(sites, loc)
 										: bMoreAddr ? ApptUtil.getColorFromLocation(props.getProperty("scheduleSiteID", ""), props.getProperty("scheduleSiteColor", ""), loc) : "white";
+								String apptType = request.getParameter("type");
+								if (bFirstDisp)
+								{
+									apptType = StringUtils.trimToEmpty(appt.getType());
+								}
 							%>
 
 							<INPUT TYPE="button" NAME="typeButton"
@@ -685,7 +690,7 @@
 
 						<div class="input">
 							<INPUT TYPE="TEXT" NAME="type"
-								   VALUE="<%=bFirstDisp?appt.getType():request.getParameter("type")%>"
+								   VALUE="<%=apptType%>"
 								   WIDTH="25">
 						</div>
 					</li>
@@ -901,7 +906,7 @@
 							<% } else
 							{ %>
 							<INPUT TYPE="TEXT" NAME="location" tabindex="4"
-								   VALUE="<%=bFirstDisp?appt.getLocation():request.getParameter("location")%>"
+								   VALUE="<%=bFirstDisp ? StringUtils.trimToEmpty(appt.getLocation()):request.getParameter("location")%>"
 								   WIDTH="25">
 							<% } %>
 							<% } %>
@@ -911,7 +916,7 @@
 						<div class="input">
 							<input type="TEXT"
 								   name="resources" tabindex="5"
-								   value="<%=bFirstDisp?appt.getResources():request.getParameter("resources")%>"
+								   value="<%=bFirstDisp ? StringUtils.trimToEmpty(appt.getResources()):request.getParameter("resources")%>"
 								   width="25">
 						</div>
 					</li>
@@ -922,8 +927,8 @@
 						<div class="label">Virtual:</div>
 						<div class="input">
 								<input type="checkbox" name="isVirtual"
-												<%= appt.isVirtual() ? "checked='checked'" : "" %>/>
-								<% if(appt.isVirtual()) { %>
+												<%= appt.getIsVirtual() ? "checked='checked'" : "" %>/>
+								<% if(appt.getIsVirtual()) { %>
 								&nbsp;
 								&nbsp;
 								&nbsp;
@@ -1341,7 +1346,7 @@
 				</li>
 				<li>
 					<div class="label"><bean:message key="Appointment.formType"/>:</div>
-					<div class="info"><%=bFirstDisp ? appt.getType() : request.getParameter("type")%>
+					<div class="info"><%=bFirstDisp && appt.getType() != null ? appt.getType() : request.getParameter("type")%>
 					</div>
 				</li>
 				<li>
@@ -1351,12 +1356,12 @@
 				</li>
 				<li>
 					<div class="label"><bean:message key="Appointment.formLocation"/>:</div>
-					<div class="info"><%=bFirstDisp ? appt.getLocation() : request.getParameter("location")%>
+					<div class="info"><%=bFirstDisp && appt.getLocation() != null ? appt.getLocation() : request.getParameter("location")%>
 					</div>
 				</li>
 				<li>
 					<div class="label"><bean:message key="Appointment.formResources"/>:</div>
-					<div class="info"><%=bFirstDisp ? appt.getResources() : request.getParameter("resources")%>
+					<div class="info"><%=bFirstDisp && appt.getResources() != null ? appt.getResources() : request.getParameter("resources")%>
 					</div>
 				</li>
 				<li>&nbsp;</li>

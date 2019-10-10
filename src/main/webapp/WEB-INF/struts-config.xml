@@ -811,9 +811,6 @@
 		<action input="/oscarMessenger/CreateMessage.jsp" name="msgProceedForm" path="/oscarMessenger/Transfer/Proceed" scope="request" type="oscar.oscarMessenger.pageUtil.MsgProceedAction">
 			<forward name="success" path="/oscarMessenger/Transfer/SearchComplete.jsp" />
 		</action>
-		<action input="/oscarMessenger/CreateMessage.jsp" name="msgClearMessageForm" path="/oscarMessenger/ClearMessage" scope="request" type="oscar.oscarMessenger.pageUtil.MsgClearMessageAction">
-			<forward name="success" path="/oscarMessenger/CreateMessage.jsp" />
-		</action>
 		<action input="/oscarMessenger/ViewMessage.jsp" path="/oscarMessenger/WriteToEncounter" scope="request" type="oscar.oscarMessenger.pageUtil.MsgWriteToEncounterAction">
 			<forward name="success" path="/oscarEncounter/IncomingEncounter.do" />
 		</action>
@@ -1690,9 +1687,9 @@
 			<forward name="error" path="/billing/errorpage.jsp" redirect="true" />
 		</action>
         <action parameter="method" path="/telehealth/myhealthaccess" type="oscar.telehealth.actions.MyHealthAccess">
-            <forward name="pushLogin" path="/telehealth/login.jsp" />
+            <forward name="mhaLogin" path="/telehealth/login.jsp" />
             <forward name="createUser" path="/telehealth/createUser.jsp" />
-            <forward name="createdUser" path="/telehealth/createdUser.jsp" />
+            <forward name="confirmUser" path="/telehealth/confirmUser.jsp" />
         </action>
 		<action input="/billing/CA/BC/billingBC.jsp" name="BillingCreateBillingForm" path="/billing/CA/BC/CreateBilling" scope="session" type="oscar.oscarBilling.ca.bc.pageUtil.BillingCreateBillingAction">
 			<forward name="success" path="/billing/CA/BC/billingCreated.jsp" />
@@ -2875,6 +2872,12 @@
 		</action>
 
 		<action path="/RxWatermark" name="FrmForm" type="org.oscarehr.rx.web.RxWatermarkAction" parameter="method">
+		</action>
+
+		<action path="/ClinicImage" name="FrmForm" type="org.oscarehr.clinic.web.ClinicImageAction" parameter="method">
+		</action>
+
+		<action path="/RxSettings" name="FrmForm" type="org.oscarehr.rx.web.RxSettingsAction" parameter="method">
 		</action>
 
      <action path="/consults/Consultations" type="org.oscarehr.consultations.ConsultationAction">

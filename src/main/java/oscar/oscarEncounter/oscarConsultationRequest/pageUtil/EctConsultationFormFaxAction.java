@@ -120,7 +120,7 @@ public class EctConsultationFormFaxAction extends Action
 				streamList.add(consultationPDFCreationService.getConsultationRequestAsStream(request, loggedInInfo));
 			}
 			streamList.addAll(consultationPDFCreationService.toEDocInputStreams(request, attachedDocuments));
-			streamList.addAll(consultationPDFCreationService.toLabInputStreams(request, attachedLabs));
+			streamList.addAll(consultationPDFCreationService.toLabInputStreams(attachedLabs));
 			streamList.addAll(consultationPDFCreationService.toEFormInputStreams(request, attachedEForms));
 
 			if(!streamList.isEmpty())

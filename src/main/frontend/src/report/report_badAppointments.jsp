@@ -38,15 +38,13 @@
 					   typeahead-on-select="reportBadAppointmentSheetCtrl.updateProviderNo($item, $model, $label)"
 					   class="form-control"/>
 			</div>
-			<div class="form-group">
-				<label for="startDate">Start Date</label>
-				<input ng-model="reportBadAppointmentSheetCtrl.params.startDate"
-					   type="date"
-					   id="startDate"
-					   name="startDate"
-					   class="form-control"
-					   placeholder="">
-			</div>
+			<ca-field-date
+					ca-title="Start Date"
+					ca-date-picker-id="bad-appts-startDate"
+					ca-name="bad-appts-startDate"
+					ca-model="reportBadAppointmentSheetCtrl.params.startDate"
+					ca-orientation="auto"
+			></ca-field-date>
 
 			<button type="submit" class="btn btn-default" ng-click="reportBadAppointmentSheetCtrl.generateReport()">Generate Report</button>
 		</form>

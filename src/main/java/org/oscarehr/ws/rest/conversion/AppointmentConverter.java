@@ -88,6 +88,12 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		{
 			name = t.getAppointmentName();
 		}
+		String status = t.getEventStatusCode();
+		String statusModifier = t.getEventStatusModifier();
+		if(statusModifier != null)
+		{
+			status += statusModifier;
+		}
 
 		Date adjustedAppointmentDate =
 				Date.from(t.getStartTime().toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -110,7 +116,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		appointment.setReason(t.getReason());
 		appointment.setReasonCode(t.getReasonCode());
 		appointment.setLocation(t.getSite());
-		appointment.setStatus(t.getEventStatusCode());
+		appointment.setStatus(status);
 		appointment.setResources(t.getResources());
 		appointment.setUrgency(t.getUrgency());
 		appointment.setType(t.getType());
@@ -145,7 +151,8 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		//appointment.setBilling(t.getBilling());
 		//appointment.setImportedStatus(t.getImportedStatus());
 		//appointment.setRemarks(t.getRemarks());
-		//appointment.setBookingSource(t.getBookingSource());
+		Appointment.BookingSource bookingSource = (t.isTagSelfBooked())? Appointment.BookingSource.MYOSCAR_SELF_BOOKING : null;
+		appointment.setBookingSource(bookingSource);
 
 		return appointment;
 	}
@@ -279,7 +286,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		calendarAppointment.setType(appointment.getType());
 		calendarAppointment.setResources(appointment.getResources());
 		calendarAppointment.setSite(appointment.getLocation());
-		calendarAppointment.setTagSelfBooked(false);
+		calendarAppointment.setTagSelfBooked(Appointment.BookingSource.MYOSCAR_SELF_BOOKING.equals(appointment.getBookingSource()));
 		calendarAppointment.setTagSelfCancelled(false);
 		calendarAppointment.setDoNotBook(appointment.getName().equals(Appointment.DONOTBOOK));
 		calendarAppointment.setAppointmentName(appointmentName);

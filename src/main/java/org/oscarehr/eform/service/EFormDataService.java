@@ -219,6 +219,21 @@ public class EFormDataService
 	}
 
 	/**
+	 * Check an eForm and its param value map it was instantiated from for any measurements that may not have a mapping.
+	 * @param eFormData eForm object to use to check validations against
+	 * @param eFormValueMap a map containing eFormFields, eFormValues pairings
+	 * @return a list of any eFormFields that we could not find a mapping for
+	 */
+	public List<String> checkUnmappedMeasurements(EFormData eFormData, Map<String,String> eFormValueMap)
+	{
+		oscar.eform.data.EForm curForm = new oscar.eform.data.EForm(eFormData);
+		ArrayList<String> eFormFields = new ArrayList<>(eFormValueMap.keySet());
+		ArrayList<String> eFormValues = new ArrayList<>(eFormValueMap.values());
+
+		return curForm.checkMeasurements(eFormFields, eFormValues);
+	}
+
+	/**
 	 * Handle all of the major eForm creation logic. save an eForm data model for a demographic.
 	 */
 	private EFormData saveEForm(EFormData eForm, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap,

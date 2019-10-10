@@ -5,10 +5,10 @@
   .fax-config-body {
 	.account-list {
 	  padding: 5px;
-	  background-color: $primary-white;
+	  background-color: $color-neutral-white;
 	  .account-item {
-		background-color: $light-grey;
-		border: 2px $medium-grey;
+		background-color: $color-neutral-lightest;
+		border: 2px $color-neutral-light-grey;
 		padding: 10px;
 
 		display: flex;
@@ -24,10 +24,10 @@
 		  font-size: 15px;
 		}
 		&.enabled {
-		  color: $success-green;
+		  color: $semantic-success-base;
 		}
 		&.disabled {
-		  color: $failure-red;
+		  color: $semantic-error-base;
 		}
 	  }
 	}
@@ -43,11 +43,11 @@
 }
 .faxEditModal {
   .modal-content {
-	background-color: $primary-blue;
+	background-color: $color-primary-base;
   }
   .modal-body {
 	padding:30px;
-	background-color: $primary-white;
+	background-color: $color-neutral-white;
 	input {
 	  &.ng-invalid {
 		background-color: $input-color-invalid-background;
@@ -75,7 +75,7 @@
 		.info-icon {
 		  position: absolute;
 		  font-size: 14px;
-		  color: $info-icon-color;
+		  color: $color-blue-light;
 		}
 	  }
 	  .flex-row-label {
@@ -90,21 +90,21 @@
 	.glyphicon {
 	  font-size: 25px;
 	  &.unknown {
-		color: $dark-grey;
+		color: $color-neutral-dark;
 	  }
 	  &.success {
-		color: $success-green;
+		color: $semantic-success-base;
 	  }
 	  &.failure {
-		color: $failure-red;
+		color: $semantic-error-base;
 	  }
 	}
   }
   .modal-header {
-	color: $primary-white;
+	color: $color-neutral-white;
   }
   .modal-footer {
-	background-color: $light-grey;
+	background-color: $color-neutral-lighter;
 	padding-top: 20px;
 	padding-bottom: 20px;
   }
@@ -122,16 +122,16 @@
 	li {
 	  a {
 		color: black;
-		background-color: $light-grey;
+		background-color: $color-neutral-lighter;
 		&:hover, &:focus {
-		  background-color: $medium-grey;
+		  background-color: $color-neutral-grey;
 		  border-color: transparent;
 		}
 	  }
 	  .active {
 		a {
 		  color: black;
-		  background-color: $primary-white;
+		  background-color: $color-neutral-white;
 		  border-color: black;
 		  border-bottom-color:transparent;
 		}

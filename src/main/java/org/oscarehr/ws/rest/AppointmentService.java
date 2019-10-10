@@ -25,9 +25,7 @@ package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.appointment.dto.AppointmentEditRecord;
-import org.oscarehr.common.dao.AppointmentArchiveDao;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.util.LoggedInInfo;
@@ -39,7 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
-import oscar.util.ConversionUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -49,8 +46,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Path("/appointment")
@@ -60,9 +55,6 @@ public class AppointmentService extends AbstractServiceImpl
 {
 	@Autowired
 	private AppointmentManager appointmentManager;
-
-	@Autowired
-	private AppointmentArchiveDao appointmentArchiveDao;
 
 	@GET
 	@Path("/{appointmentNo}")
@@ -173,28 +165,7 @@ public class AppointmentService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestSearchResponse<AppointmentEditRecord> getEditHistory(@PathParam("appointmentNo") Integer appointmentNo)
 	{
-		List<AppointmentArchive> archiveList = appointmentArchiveDao.findByAppointmentId(appointmentNo, 100, 0);
-		List<AppointmentEditRecord> editList = new ArrayList<>(archiveList.size());
-
-		for(AppointmentArchive archive : archiveList)
-		{
-			AppointmentEditRecord editRecord = new AppointmentEditRecord();
-
-			editRecord.setId(archive.getId());
-			editRecord.setAppointmentNo(archive.getAppointmentNo());
-			editRecord.setDemographicNo(archive.getDemographicNo());
-			editRecord.setCreator(archive.getCreator());
-			editRecord.setProviderNo(archive.getProviderNo());
-			editRecord.setLastUpdateUser(archive.getLastUpdateUser());
-			editRecord.setCreateDateTime(ConversionUtils.toLocalDateTime(archive.getCreateDateTime()));
-			editRecord.setUpdateDateTime(ConversionUtils.toLocalDateTime(archive.getUpdateDateTime()));
-			editRecord.setAppointmentDate(
-					LocalDateTime.of(ConversionUtils.toLocalDateTime(archive.getAppointmentDate()).toLocalDate(),
-							ConversionUtils.toLocalDateTime(archive.getStartTime()).toLocalTime())
-			);
-
-			editList.add(editRecord);
-		}
+		List<AppointmentEditRecord> editList = appointmentManager.getAppointmentEdits(appointmentNo);
 		return RestSearchResponse.successResponseOnePage(editList);
 	}
 }

@@ -33,10 +33,13 @@ import java.util.Locale;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.rx.service.RxWatermarkService;
 import org.oscarehr.util.LocaleUtils;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.oscarehr.web.PrescriptionQrCodeUIBean;
 
 import com.lowagie.text.Document;
@@ -251,7 +254,16 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 			this.patientDOB=patientDOB;
 			this.sigDoctorName = sigDoctorName;
 			this.rxDate = rxDate;
-			this.promoText = OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT");
+
+			UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
+			if (userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT) == null)
+			{
+				this.promoText = OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT");
+			}
+			else
+			{
+				this.promoText = userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT).getValue();
+			}
 			this.origPrintDate = origPrintDate;
 			this.numPrint = numPrint;
 			if (promoText == null) {
@@ -290,10 +302,25 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				float height = page.getHeight();
 				float pageWidth = 285f;
 				boolean showPatientDOB=false;
+				// get the end of paragraph
+				float endPara = writer.getVerticalPosition(true);
 				//head.writeSelectedRows(0, 1,document.leftMargin(), page.height() - document.topMargin()+ head.getTotalHeight(),writer.getDirectContent());
 				if(this.patientDOB!=null && this.patientDOB.length()>0){
 					showPatientDOB=true;
 				}
+
+				// render the watermark in the background
+				if (RxWatermarkService.isWatermarkEnabled() && RxWatermarkService.isWatermarkBackground())
+				{
+					Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
+					float scale = (pageWidth*0.8f)/watermarkImg.getWidth();
+					float x = pageWidth/2 - (watermarkImg.getWidth()*scale)/2;
+					float y = (page.getHeight() - (page.getHeight() - (endPara - 80))/2) - (watermarkImg.getHeight()*scale)/2;
+
+					PdfContentByte cbUnder = writer.getDirectContentUnder();
+					renderImageToPdf(watermarkImg, x, y, scale, cbUnder);
+				}
+
 				//header table for patient's information.
 				PdfPTable head = new PdfPTable(1);
 				String newline = System.getProperty("line.separator");
@@ -370,8 +397,6 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 					writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_LEFT, geti18nTagValue(locale, "RxPreview.msgFax")+":" + this.clinicFax, 188, (page.getHeight() - 88), 0);
 				}
 
-				// get the end of paragraph
-				float endPara = writer.getVerticalPosition(true);
 				// draw left line
 				cb.setRGBColorStrokeF(0f, 0f, 0f);
 				cb.setLineWidth(0.5f);
@@ -442,20 +467,26 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				String footer = "" + writer.getPageNumber();
 				writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_RIGHT, footer, 280, endPara - 77, 0);
 
-				// render watermark
-				if (RxWatermarkService.isWatermarkEnabled())
+				// render watermark in the foreground
+				if (RxWatermarkService.isWatermarkEnabled() && !RxWatermarkService.isWatermarkBackground())
 				{
 					Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
-					float scaleFactor = (pageWidth*0.8f)/watermarkImg.getWidth();
-					watermarkImg.scalePercent(scaleFactor*100f);
-					watermarkImg.setAbsolutePosition(pageWidth/2 - (watermarkImg.getWidth()*scaleFactor)/2,
-							(page.getHeight() - (page.getHeight() - (endPara - 80))/2) - (watermarkImg.getHeight()*scaleFactor)/2);
-					cb.addImage(watermarkImg);
+					float scale = (pageWidth*0.8f)/watermarkImg.getWidth();
+					float x = pageWidth/2 - (watermarkImg.getWidth()*scale)/2;
+					float y = (page.getHeight() - (page.getHeight() - (endPara - 80))/2) - (watermarkImg.getHeight()*scale)/2;
+					renderImageToPdf(watermarkImg, x, y, scale, cb);
 				}
 
 			} catch (Exception e) {
 				logger.error("Error", e);
 			}
+		}
+
+		protected void renderImageToPdf(Image img, float x, float y, float scale, PdfContentByte cb) throws DocumentException
+		{
+			img.scalePercent(scale*100f);
+			img.setAbsolutePosition(x, y);
+			cb.addImage(img);
 		}
 	}
 }

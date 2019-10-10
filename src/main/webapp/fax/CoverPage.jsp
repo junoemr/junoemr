@@ -37,7 +37,6 @@
 <input type="hidden" name="transType" value="<%=request.getAttribute("transType") %>"/>
 <input type="hidden" name="demographicNo" value="<%=request.getParameter("demographicNo")%>"/>
 <input type="hidden" name="letterheadFax" value="<%=request.getParameter("letterheadFax")%>"/>
-<input type="hidden" name="fax" value="<%=request.getParameter("fax")%>"/>
 
 <%
 	String consultResponsePage = request.getParameter("consultResponsePage");

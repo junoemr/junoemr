@@ -1,0 +1,133 @@
+
+.loading-indicator {
+	display: flex;
+	width: 100%;
+	height: 100%;
+
+	&.vertical {
+		flex-direction: column;
+	}
+	&.horizontal {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.loading-message {
+		text-align: center;
+	}
+}
+
+
+
+/**
+ * ==============================================
+ * Spinner
+ * ==============================================
+ */
+
+.loading-spinner-container {
+	height: 100%;
+}
+
+/**
+ * ==============================================
+ * Dot Pulse
+ * ==============================================
+ */
+.loading-dot-container {
+	$dot-size: 20px;
+	$dot-half-size: calc(#{$dot-size}/2);
+	$dot-half-size-neg: calc(#{$dot-half-size} * -1);
+	$dot-20-per: calc(#{$dot-size} * 0.2);
+
+	$dot-spacing: 50px;
+
+	$dot-position: 9999px;
+	$constant1: calc(#{$dot-position} - #{$dot-spacing});
+	$constant2: $dot-position;
+	$constant3: calc(#{$dot-position} + #{$dot-spacing});
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	height: 56px;
+	width: 256px;
+	border-radius: 32px;
+
+	.dot-pulse {
+		position: relative;
+		left: calc(#{$constant2} * -1);
+		width: $dot-size;
+		height: $dot-size;
+		border-radius: $dot-half-size;
+		background-color: $color-primary-base;
+		color: $color-primary-base;
+		box-shadow: $constant2 0 0 $dot-half-size-neg $color-primary-base;
+		animation: dotPulse 1.5s infinite linear;
+		animation-delay: .25s;
+
+		&::before, &::after {
+			content: '';
+			display: inline-block;
+			position: absolute;
+			top: 0;
+			width: $dot-size;
+			height: $dot-size;
+			border-radius: $dot-half-size;
+			background-color: $color-primary-base;
+			color: $color-primary-base;
+		}
+
+		&::before {
+			box-shadow: $constant1 0 0 $dot-half-size-neg $color-primary-base;
+			animation: dotPulseBefore 1.5s infinite linear;
+			animation-delay: 0s;
+		}
+
+		&::after {
+			box-shadow: $constant3 0 0 $dot-half-size-neg $color-primary-base;
+			animation: dotPulseAfter 1.5s infinite linear;
+			animation-delay: .5s;
+		}
+	}
+
+	@keyframes dotPulseBefore {
+		0% {
+			box-shadow: $constant1 0 0 $dot-half-size-neg $color-primary-base;
+		}
+		30% {
+			box-shadow: $constant1 0 0 $dot-20-per $color-primary-base;
+		}
+		60%,
+		100% {
+			box-shadow: $constant1 0 0 $dot-half-size-neg $color-primary-base;
+		}
+	}
+
+	@keyframes dotPulse {
+		0% {
+			box-shadow: $constant2 0 0 $dot-half-size-neg $color-primary-base;
+		}
+		30% {
+			box-shadow: $constant2 0 0 $dot-20-per $color-primary-base;
+		}
+		60%,
+		100% {
+			box-shadow: $constant2 0 0 $dot-half-size-neg $color-primary-base;
+		}
+	}
+
+	@keyframes dotPulseAfter {
+		0% {
+			box-shadow: $constant3 0 0 $dot-half-size-neg $color-primary-base;
+		}
+		30% {
+			box-shadow: $constant3 0 0 $dot-20-per $color-primary-base;
+		}
+		60%,
+		100% {
+			box-shadow: $constant3 0 0 $dot-half-size-neg $color-primary-base;
+		}
+	}
+}

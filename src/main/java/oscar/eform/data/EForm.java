@@ -563,6 +563,11 @@ public class EForm extends EFormBase {
 		this.formDate = UtilDateUtilities.DateToString(new Date(), "yyyy-MM-dd");
 	}
 
+	public List<String> checkMeasurements(List<String> names, List<String> values)
+	{
+		return WriteNewMeasurements.validateMeasurements(names, values);
+	}
+
 	public ActionMessages setMeasurements(List<String> names, List<String> values) {
 		return (WriteNewMeasurements.addMeasurements(names, values, this.demographicNo, this.providerNo));
 	}
@@ -916,6 +921,7 @@ public class EForm extends EFormBase {
 		int attrKeyStart = currIndex;
 		int attrKeyEnd = currIndex;
 		boolean inQuotes = false;
+		boolean isDoubleQuotes = false;
 		while(currIndex < html.length())
 		{
 			if (!inQuotes && html.charAt(currIndex) == ' ')
@@ -930,11 +936,21 @@ public class EForm extends EFormBase {
 			{
 				attrKeyEnd = currIndex;
 			}
-			else if (!inQuotes && (html.charAt(currIndex) == '"' || html.charAt(currIndex) == '\''))
+			else if (!inQuotes && html.charAt(currIndex) == '"' )
 			{
 				inQuotes = true;
+				isDoubleQuotes = true;
 			}
-			else if (inQuotes && (html.charAt(currIndex) == '"' || html.charAt(currIndex) == '\''))
+			else if (!inQuotes && html.charAt(currIndex) == '\'')
+			{
+				inQuotes = true;
+				isDoubleQuotes = false;
+			}
+			else if (inQuotes && html.charAt(currIndex) == '"' && isDoubleQuotes)
+			{
+				inQuotes = false;
+			}
+			else if (inQuotes &&  html.charAt(currIndex) == '\'' && !isDoubleQuotes)
 			{
 				inQuotes = false;
 			}

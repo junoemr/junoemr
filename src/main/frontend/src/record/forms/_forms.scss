@@ -1,5 +1,68 @@
 #forms-page {
-  #forms-panel {
-    margin-top: 10px;
-  }
+	@include juno-font-default-size(12px);
+	@include juno-tab-md(16px);
+	@include juno-tab-color-scheme-white;
+
+	.form-library-title {
+		color: $color-primary-dark;
+		margin-bottom: 18px;
+	}
+
+	@mixin top-bar-padding {
+		margin-top: 24px;
+		margin-bottom: 30px;
+		padding-right: 0;
+		padding-left: 0;
+	}
+
+	.left-header-group {
+		@include top-bar-padding
+	}
+
+	.right-header-group {
+		@include top-bar-padding;
+		.btn {
+			width: 100px;
+			margin-left: 8px;
+		}
+	}
+
+
+
+	.options-panel {
+		position: fixed;
+		min-width: 300px;
+		width: 300px;
+	}
+
+	.options-panel-place-holder {
+		min-width: 300px;
+		width: 300px;
+	}
+
+	a {
+		font-weight: bold;
+	}
+
+	a:hover {
+		color: $color-primary-base;
+	}
+
+	h4 {
+		margin: 0;
+	}
+
+	.list-item-selected {
+		a {
+			color: $color-primary-base;
+		}
+
+		i {
+			float: right;
+		}
+	}
+
+	.list-item-not-selected {
+		background-color: inherit;
+	}
 }

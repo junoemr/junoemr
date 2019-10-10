@@ -559,7 +559,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 			function confirmAck()
 			{
 				<% if (props.getProperty("confirmAck", "").equals("yes")) { %>
-				return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledge"/>');
+				return confirm("<bean:message key="oscarMDS.index.msgConfirmAcknowledge"/>");
 				<% } else { %>
 					return true;
 				<% } %>
@@ -567,12 +567,12 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
 			function confirmCommentUnmatched()
 			{
-				return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledgeUnmatched"/>');
+				return confirm("<bean:message key="oscarMDS.index.msgConfirmAcknowledgeUnmatched"/>");
 			}
 
 			function confirmAckUnmatched()
 			{
-				return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledgeUnmatched"/>');
+				return confirm("<bean:message key="oscarMDS.index.msgConfirmAcknowledgeUnmatched"/>");
 			}
 
 			function updateStatus(formid, labid)
@@ -605,7 +605,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 			function unlinkDemographic(labNo)
 			{
 				var reason = "Incorrect demographic";
-				reason = prompt('<bean:message key="oscarMDS.segmentDisplay.msgUnlink"/>', reason);
+				reason = prompt("<bean:message key="oscarMDS.segmentDisplay.msgUnlink"/>", reason);
 
 				//must include reason
 				if (reason == null || reason.length == 0)
@@ -1270,7 +1270,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						//labs that fall into any of these categories have certain requirements per Excelleris
 						if(handler.getMsgType().equals("PATHL7")){
 							isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(headers.get(i));
-							isPDF = ((PATHL7Handler)handler).hasEmbeddedPDF(lab_no);
+							isPDF = ((PATHL7Handler)handler).hasEmbeddedPDF();
 							isVIHARtf = ((PATHL7Handler) handler).vihaRtfCheck(headers.get(i));
 							if(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")){
 								isSGorCDC = true;

@@ -1,4 +1,4 @@
-<%--
+<%@ page import="org.oscarehr.dashboard.display.beans.DrilldownBean" %><%--
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -47,6 +47,7 @@
  	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/library/DataTables-1.10.12/media/css/jquery.dataTables.min.css" />
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/library/bootstrap2-datepicker/datepicker3.css" />
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/css/bootstrap-timepicker.min.css" />
+	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/dashboard/display/drillDownDisplay.css" />
 	<script>var ctx = "${pageContext.request.contextPath}"</script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/js/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/bootstrap/3.0.0/js/bootstrap.min.js" ></script>
@@ -58,6 +59,7 @@
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/moment.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/datetime-moment.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/dashboard/display/drilldownDisplayController.js" ></script>
+	<script type="text/javascript" src="${ pageContext.request.contextPath }/dashboard/display/drillDownBatchOperation.js" ></script>
 </head>
 <body>
 
@@ -91,10 +93,16 @@
 
 <div class="row content">
 
-	<h3>
+	<h3 id="drill_down_report_title">
 		<c:out value="${ drilldown.name }" />
 	</h3>
 	<hr />
+
+	<div id="batch_operation_banner" >
+		<h4 style="text-align: center;">
+			<!-- filled with message to user -->
+		</h4>
+	</div>
 
 	<c:set scope="page" value="" var="primaryDataType" />
 
@@ -105,7 +113,7 @@
 	</c:forEach>
 
 	<!-- Filter customization. Javascript will integrate this into the DataTable. -->
-	<form id="datatableFilterGroup" class="form-inline" style="display:none;">
+	<form id="datatableFilterGroup" class="form-inline" style="display:none; margin-bottom: 8px;">
 	<div id="datatableFilterGroupBody" >
 	<div class="form-group">
 		<select class="form-control" id="datatableFilterColumnSelector" >
@@ -143,6 +151,40 @@
 			Reset
 		</button>
 	</div>
+	<div class="dropdown" id="ticklerMenu" style="display: inline-block;">
+		<a href="#" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" role="button"
+		   aria-haspopup="true" aria-expanded="false" id="ticklerMenuLink">
+			<span class="glyphicon glyphicon-check"></span>
+			Batch Actions
+			<span class="caret"></span>
+		</a>
+
+
+		<ul id="batch_operations_menu" class="dropdown-menu" aria-labelledby="ticklerMenuLink" style="text-align:left;">
+			<li>
+				<a href="#" class="dropdown-item" id="selectAllDrilldown" title="Select all rows in the current view." >
+					Select All in View
+				</a>
+			</li>
+			<li>
+				<a href="#" class="dropdown-item" id="selectNoneDrilldown" title="Deselect all checked rows.">
+					Select None
+				</a>
+			</li>
+			<li role="separator" class="divider"></li>
+			<li>
+				<a href="/web/dashboard/display/AssignTickler.do" class="dropdown-item"
+				   title="Assign Tickler to Checked Rows." id="assignTicklerChecked" >
+					Assign Tickler
+				</a>
+			</li>
+			<li id="batch_op_list_item_template" style="display:none;">
+				<a href="#">
+					<!-- template used by populateBatchActionListItems -->
+				</a>
+			</li>
+		</ul>
+	</div>
 	</div>
 	</form>
 
@@ -153,35 +195,7 @@
 					<thead>
 						<tr>
 							<th class="donotprint" id="0" >
-								<div class="dropdown" id="ticklerMenu">
-									<a href="#" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" role="button"
-							        	aria-haspopup="true" aria-expanded="false" id="ticklerMenuLink">
-							        	<span class="glyphicon glyphicon-check"></span>
-							        	Tickler
-							        	<span class="caret"></span>
-							        </a>
-
-
-									<ul class="dropdown-menu" aria-labelledby="ticklerMenuLink">
-										<li>
-											<a href="#" class="dropdown-item" id="selectAllDrilldown" title="Select all rows in the current view." >
-												Select All in View
-											</a>
-									    </li>
-									    <li>
-											<a href="#" class="dropdown-item" id="selectNoneDrilldown" title="Deselect all checked rows.">
-												Select None
-											</a>
-										</li>
-										<li role="separator" class="divider"></li>
-										<li>
-									    	<a href="/web/dashboard/display/AssignTickler.do" class="dropdown-item"
-									    		title="Assign Tickler to Checked Rows." id="assignTicklerChecked" >
-												Assign Tickler
-											</a>
-										</li>
-									</ul>
-							    </div>
+								<div style="width: 20px;"></div>
 							</th>
 							<th  class="placeholder" id="1" >&nbsp;</th>
 							<c:forEach items="${ row }" var="heading" varStatus="columnCount">
@@ -258,7 +272,7 @@
 	</table>
 	<hr />
 	<h3>
-		&nbsp;
+
 	</h3>
 </div> <!--  end main content row -->
 

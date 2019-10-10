@@ -1859,7 +1859,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		if (toBill != null && toBill.equalsIgnoreCase("true")) {
 			String region = cform.getBillRegion();
 			String appointmentNo = cform.getAppointmentNo();
-			String name = this.getDemoName(demoNo);
+			String name = caseManagementMgr.getDemoDisplayName(demoNo);
 			String date = cform.getAppointmentDate();
 			String start_time = cform.getStart_time();
 			String apptProvider = cform.getApptProvider();

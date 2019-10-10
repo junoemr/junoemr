@@ -26,6 +26,7 @@ require('ngstorage');
 require('pym.js');
 require('./scss/juno.scss');
 require('font-awesome/css/font-awesome.min.css');
+import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
 
 
 var oscarApp = angular.module('oscarProviderViewModule', [
@@ -42,6 +43,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Common.Services',
 	'Common.Filters',
 	'Common.Directives',
+	'Common.Components',
 	'Common.Util',
 	'Layout',
 	'Tickler',
@@ -56,7 +58,6 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Report',
 	'Patient',
 	'Patient.Search',
-	'PatientList',
 	'Inbox',
 	'Help',
 	'Document',
@@ -68,7 +69,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Admin.Integration.Fax'
 ]);
 
-oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider)
+oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider)
 {
 	//
 	// For any unmatched url, redirect to /state1
@@ -387,22 +388,45 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			templateUrl: 'src/record/forms/forms.jsp',
 			controller: 'Record.Forms.FormController as formCtrl',
 			params: {
-				formListId: 0
+				viewState: FORM_CONTROLLER_STATES.COMPLETED
 			}
 		})
-		.state('record.forms.view',
-		{
-			url: '/view/:type/:id?name',
-			templateUrl: 'src/record/forms/forms.jsp',
-			params: { name: { dynamic: true } },
-			controller: 'Record.Forms.FormController as formCtrl'
-		})
 		.state('record.forms.add',
+			{
+				url: '/add',
+				templateUrl: 'src/record/forms/forms.jsp',
+				controller: 'Record.Forms.FormController as formCtrl',
+				params: {
+					viewState: FORM_CONTROLLER_STATES.ADD
+				}
+			})
+		.state('record.forms.completed',
+			{
+				url: '/completed',
+				templateUrl: 'src/record/forms/forms.jsp',
+				controller: 'Record.Forms.FormController as formCtrl',
+				params: {
+					viewState: FORM_CONTROLLER_STATES.COMPLETED
+				}
+			})
+		.state('record.forms.revisions',
 		{
-			url: '/add/:type/:id',
+			url: '/revisions',
 			templateUrl: 'src/record/forms/forms.jsp',
-			controller: 'Record.Forms.FormController as formCtrl'
+			controller: 'Record.Forms.FormController as formCtrl',
+			params: {
+				viewState: FORM_CONTROLLER_STATES.REVISION
+			}
 		})
+		.state('record.forms.deleted',
+			{
+				url: '/deleted',
+				templateUrl: 'src/record/forms/forms.jsp',
+				controller: 'Record.Forms.FormController as formCtrl',
+				params: {
+					viewState: FORM_CONTROLLER_STATES.DELETED
+				}
+			})
 		.state('record.consultRequests',
 		{
 			url: '/consults',
@@ -511,10 +535,22 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 				url: '/faxSendReceive',
 				templateUrl: 'src/admin/integration/fax/faxSendReceive.jsp',
 				controller: 'Admin.Integration.Fax.FaxSendReceiveController as faxSendReceiveController'
-			})
-	;
+			});
 
+	// redirect to login page on 401 error.
+	$httpProvider.interceptors.push(['$q', function($q) {
+		return {
+			'responseError': function(rejection) {
+				if (rejection.status === 401 && rejection.data === "<error>Not authorized</error>")
+				{ // reload will cause server to redirect
+					location.reload();
+				}
+				return $q.reject(rejection);
+			}
+		};
+	}]);
 }]);
+
 
 // For debugging purposes
 /*

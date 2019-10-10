@@ -1,6 +1,6 @@
 
 <div class="form-group {{form_group_class}}"
-		 ng-class="{ 'has-error': error_message}"
+		 ng-class="{ 'has-error': error_message, 'has-warning': warning_message}"
 		 title="{{error_message}}"
 		 ng-hide="hide">
 
@@ -16,6 +16,7 @@
 		<input id="input-{{name}}"
 		       type="text"
 		       class="form-control"
+		       placeholder="{{text_placeholder}}"
 		       ng-class="{'no_scroll_bar': max_characters > 0}"
 		       ng-model="model"
 		       ng-focus="focus_fn()"

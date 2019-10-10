@@ -47,6 +47,7 @@ public class ProviderSettings {
 	private int period = 15;
 	private String groupNo;
 	private String siteSelected;
+	private String viewSelected;
 	private int appointmentScreenLinkNameDisplayLength=3;
 	private boolean hideOldEchartLinkInAppointment=false;
 	
@@ -141,6 +142,10 @@ public class ProviderSettings {
 	private String myDrugRefId;
 	private boolean useMyMeds;
 	private boolean disableBornPrompts;
+
+	private Integer patientNameLength;
+
+	private boolean intakeFormEnabled;
 	
 	
 
@@ -238,6 +243,16 @@ public class ProviderSettings {
 	public void setSiteSelected(String siteSelected)
 	{
 		this.siteSelected = siteSelected;
+	}
+
+	public String getViewSelected()
+	{
+		return viewSelected;
+	}
+
+	public void setViewSelected(String viewSelected)
+	{
+		this.viewSelected = viewSelected;
 	}
 
 	public int getAppointmentScreenLinkNameDisplayLength() {
@@ -669,9 +684,24 @@ public class ProviderSettings {
 	public void setDisableBornPrompts(boolean disableBornPrompts) {
 		this.disableBornPrompts = disableBornPrompts;
 	}
-	
-	
-	
-	
 
+	public Integer getPatientNameLength()
+	{
+		return patientNameLength;
+	}
+
+	public void setPatientNameLength(Integer patientNameLength)
+	{
+		this.patientNameLength = patientNameLength;
+	}
+
+	public boolean isIntakeFormEnabled()
+	{
+		return intakeFormEnabled;
+	}
+
+	public void setIntakeFormEnabled(boolean intakeFormEnabled)
+	{
+		this.intakeFormEnabled = intakeFormEnabled;
+	}
 }

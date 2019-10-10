@@ -102,6 +102,10 @@ public class CopdCommandLineImporter
 		{
 			importSource = CoPDImportService.IMPORT_SOURCE.MEDIPLAN;
 		}
+		else if (importSourceStr.equalsIgnoreCase("MEDACCESS"))
+		{
+			importSource = CoPDImportService.IMPORT_SOURCE.MEDACCESS;
+		}
 
 		// flag to allow importing demographics with missing document files by skipping those records.
 		boolean skipMissingDocs= Boolean.parseBoolean(args[5]);
@@ -126,7 +130,7 @@ public class CopdCommandLineImporter
 			for(File file : fileList)
 			{
 				fileCounter++;
-				logger.info("Process file " + fileCounter + "/" + fileList.length);
+				logger.info("==== Process file " + fileCounter + "/" + fileList.length + " ====");
 
 				// skip sub directories
 				if(file.isDirectory())
@@ -184,7 +188,6 @@ public class CopdCommandLineImporter
 	/**
 	 * load spring beans.
 	 * @param propertiesFileName the name of the oscar properties file to use during loading
-	 * @return
 	 * @throws IOException
 	 */
 	public static ClassPathXmlApplicationContext loadSpring(String propertiesFileName) throws IOException{

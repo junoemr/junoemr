@@ -25,7 +25,7 @@
  Ontario, Canada
 
  */
-angular.module("Common.Services").service("EFormService", [
+angular.module("Common.Services").service("eFormService", [
 	'$q',
 	'junoHttp',
 	function($q, junoHttp)

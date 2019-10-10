@@ -50,6 +50,7 @@ import org.oscarehr.PMmodule.dao.ProgramProviderDAO;
 import org.oscarehr.PMmodule.dao.ProgramQueueDao;
 import org.oscarehr.PMmodule.model.AccessType;
 import org.oscarehr.PMmodule.model.DefaultRoleAccess;
+import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramAccess;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.model.ProgramQueue;
@@ -979,6 +980,30 @@ public class CaseManagementManager {
 		Demographic dg = demographicDao.getClientByDemographicNo(new Integer(demoNo));
 		if (dg == null) return "";
 		else return dg.getFirstName() + " " + dg.getLastName();
+	}
+
+	/**
+	 * get the demographic's display name
+	 * @param demoNo - demographic no
+	 * @return display name of demographic
+	 */
+	public String getDemoDisplayName(String demoNo)
+	{
+		if (demoNo == null)
+		{
+			return "";
+		}
+
+		Demographic dg = demographicDao.getClientByDemographicNo(new Integer(demoNo));
+
+		if (dg == null)
+		{
+			return "";
+		}
+		else
+		{
+			return dg.getDisplayName();
+		}
 	}
 
 	public String getDemoGender(String demoNo) {
@@ -2049,7 +2074,6 @@ private String updateApptStatus(String status, String type) {
 	public CaseManagementNote saveCaseManagementNote(LoggedInInfo loggedInInfo, CaseManagementNote note,List<CaseManagementIssue> issuelist,CaseManagementCPP cpp,String ongoing,boolean verify,Locale locale,Date now,CaseManagementNote annotationNote,String userName,String user,String remoteAddr,String lastSavedNoteString) throws Exception {
 		ProgramManager programManager = (ProgramManager) SpringUtils.getBean("programManager");
 		AdmissionManager admissionManager = (AdmissionManager) SpringUtils.getBean("admissionManager");	
-		
 
 		Long old_note_id = note.getId(); // saved for use with annotation
 
@@ -2058,20 +2082,32 @@ private String updateApptStatus(String status, String type) {
 		String role = null;
 		String team = null;
 
-		boolean newNote = false;
 		if (note.getCreate_date() == null) {
 			note.setCreate_date(now);
-			newNote = true;
 		}
 
-		try {
-			role = String.valueOf((programManager.getProgramProvider(note.getProviderNo(), note.getProgram_no())).getRole().getId());
-		} catch (Exception e) {
-			role = "0";
+		ProgramProvider programProvider = programManager.getProgramProvider(note.getProviderNo(), note.getProgram_no());
+		if (programProvider != null && programProvider.getRole() != null)
+		{
+			role = String.valueOf(programProvider.getRole().getId());
 		}
-		/*
-		 * if(session.getAttribute("archiveView")!="true") note.setReporter_caisi_role(role); else note.setReporter_caisi_role("1");
-		 */
+		else
+		{
+			// Attempt to read the provider's associated program ID so we can correct the note.
+			// This is less for the note itself and more of a work-around for casemgmt_tmpsave matching behaviour
+			List<Program> programs = programManager.getActiveProgramDomain(note.getProviderNo());
+			if (programs.size() >= 1)
+			{
+				MiscUtils.getLogger().warn("Attempting to reassign program_no for note_id " + note.getId() + " based off provider record");
+				String newProgram = Integer.toString(programs.get(0).getId());
+				MiscUtils.getLogger().warn("Reassigning '" + note.getProgram_no() + "' to '" + newProgram + "'");
+				note.setProgram_no(newProgram);
+			}
+
+			// If something went wrong in trying to get the provider's role, fall back to whatever note had before
+			role = note.getReporter_caisi_role();
+		}
+
 		note.setReporter_caisi_role(role);
 
 		try {

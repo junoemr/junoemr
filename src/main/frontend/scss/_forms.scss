@@ -11,12 +11,14 @@
 	}
 }
 @mixin juno-form-colour-scheme-light {
-	@include juno-form-colour-scheme($grey-08, $grey-06, $grey-02, $grey-03, $white);
+	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-light, $color-neutral-darker, $color-neutral-grey, $color-neutral-white);
+}
+@mixin juno-form-colour-scheme-blue {
+	@include juno-form-colour-scheme($color-primary-dark, $color-primary-dark, $color-neutral-white, $color-neutral-light-grey, $color-primary-dark);
 }
 @mixin juno-form-colour-scheme-dark {
-	@include juno-form-colour-scheme($primary-hover, $primary-hover, $white, $grey-05, $primary-hover);
+	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-light, $color-neutral-darker, $color-neutral-darker, $color-neutral-white);
 }
-
 
 
 // bootstrap fonts look better on form elements
@@ -38,9 +40,9 @@ input[type="checkbox"] {
 }
 
 label {
+	@include juno-font-input(12px);
 	font-weight: 400;
-	font-size: 12px;
-	color: $grey-04;
+	color: $color-neutral-grey;
 
 	input[type="radio"],
 	input[type="checkbox"] {
@@ -48,8 +50,23 @@ label {
 	}
 }
 
+.has-error {
+	@include form-control-validation($color-red-darker, $color-red-light, $color-red-lighter);
+	.form-control {
+		background-color: $color-red-lighter;
+	}
+}
+.has-warning {
+	@include form-control-validation($color-yellow-darkest, $color-yellow-light, $color-yellow-lighter);
+	.form-control {
+		color: $color-neutral-darker;
+		background-color: $color-yellow-lighter;
+	}
+}
+
 .form-control {
 
+	@include juno-font-input(12px);
 	@include juno-form-colour-scheme-light;
 	width: 100%;
 	height: $form-input-height;
@@ -58,10 +75,16 @@ label {
 	border-radius: 4px;
 	border-width: 1px;
 	transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+
+	// remove the blue glow
+	&:focus {
+		outline: 0;
+		-webkit-box-shadow: none;
+		box-shadow: none;
+	}
 }
 .form-control, output {
 	display: block;
-	font-size: 13px;
 	line-height: 1.3;
 }
 .form-group {
@@ -70,18 +93,19 @@ label {
 	// Displays a red asterisk next to form labels if they are marked as required
 	.required:after {
 		content: "*";
-		color: $red;
+		color: $color-red-base;
 	}
 }
+
 .input-group-addon {
 	padding: 6px 12px;
 	font-size: 13px;
 	font-weight: 400;
 	line-height: 1.3;
-	color: $white;
+	color: $color-neutral-white;
 	text-align: center;
-	background-color: $primary;
-	border: 1px solid $primary-hover;
+	background-color: $color-primary-base;
+	border: 1px solid $color-primary-dark;
 	border-radius: 4px;
 }
 
@@ -93,7 +117,7 @@ label {
 
 // make form-control-static the same height as input
 .form-control-static {
-	min-height: $input-height-base;
+	min-height: $form-input-height;
 }
 
 // for ca-field-date3 date in separate inputs

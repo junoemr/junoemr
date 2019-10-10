@@ -44,6 +44,7 @@
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
 <%@ page import="org.oscarehr.rx.service.RxWatermarkService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 <!-- end -->
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -217,10 +218,25 @@ if(custom_logo_name != null ){
         <tr>
             <td>
 				<div style="position: relative;">
-					<% if (RxWatermarkService.isWatermarkEnabled()) {%>
-						<img style="position:absolute; left:50%; top: 50%; transform: translate(-50%, -50%); width:80%" src="../RxWatermark.do?method=getWatermark" onerror="this.style.display='none'"/>
-					<% } %>
+					<% if (RxWatermarkService.isWatermarkEnabled() && !RxWatermarkService.isWatermarkBackground()) {%>
+						<img style="position:absolute; left:50%; top: 50%; transform: translate(-50%, -50%); width:80%" src="../ClinicImage.do?method=getImage&image_type=WATERMARK" onerror="this.style.display='none'"/>
+					<%
+					}
+
+					if (RxWatermarkService.isWatermarkEnabled() && RxWatermarkService.isWatermarkBackground())
+					{
+					%>
+						<table id="pwTable" width="400px" height="500px" cellspacing=0 cellpadding=10 border=2
+							   style="background-image: url(../ClinicImage.do?method=getImage&image_type=WATERMARK); background-size: contain; background-repeat: no-repeat; background-position: center; -webkit-print-color-adjust: exact; color-adjust: exact !important;">
+					<%
+					}
+					else
+					{
+					%>
                             <table id="pwTable" width="400px" height="500px" cellspacing=0 cellpadding=10 border=2>
+					<%
+						}
+					%>
                                     <tr>
                                             <td valign=top height="100px"><input type="image"
                                                     src="<%=logoSrc%>" border="0" alt="[Submit]" style="max-height:100px; max-width:100px;"
@@ -589,17 +605,27 @@ if(custom_logo_name != null ){
 		                                                    </tr>
                                                     	<%
                                                     	}
-                                                    	
-                                                    	
-	                                     				if (oscar.OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT") != null)
+
+                                                    	UserProperty promoText = userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT);
+                                                    	if (promoText != null)
+														{
+															%>
+																<tr valign=bottom align="center" style="font-size: 9px">
+																	<td height=25px colspan="2"></br>
+																		<%=promoText.getValue()%>
+																	</td>
+																</tr>
+															<%
+														}
+	                                     				else if (oscar.OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT") != null)
 	                                     				{
-	                                     				%>
-		                                                    <tr valign=bottom align="center" style="font-size: 9px">
-		                                                            <td height=25px colspan="2"></br>
-		                                                            <%= oscar.OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT") %>
-		                                                            </td>
-		                                                    </tr>
-	                                                    <%
+															%>
+																<tr valign=bottom align="center" style="font-size: 9px">
+																		<td height=25px colspan="2"></br>
+																		<%= oscar.OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT") %>
+																		</td>
+																</tr>
+															<%
                                                     	}
                                                     %>
                                             </table>

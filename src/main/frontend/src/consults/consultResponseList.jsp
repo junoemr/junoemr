@@ -36,7 +36,7 @@ ng-if="consultResponseListCtrl.hideSearchPatient != true">
 
 	<form name="searchForm" id="search-form">
 
-		<div class="row search-filters">
+		<div class="row search-filters consultation-search-filter">
 			<div class="col-lg-3 col-xs-6">
 				<label>Referral Start Date</label>
 				<juno-datepicker-popup

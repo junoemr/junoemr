@@ -78,11 +78,12 @@ public class AppointmentStatusDao extends AbstractDao<AppointmentStatus>
     	return null;
     }
 
-    public void modifyStatus(int ID, String strDesc, String strColor) {
+    public void modifyStatus(int ID, String strDesc, String strColor, String strJunoColor) {
     	AppointmentStatus appts = find(ID);
     	if(appts != null) {
     		appts.setDescription(strDesc);
             appts.setColor(strColor);
+            appts.setJunoColor(strJunoColor);
     	}
     }
 

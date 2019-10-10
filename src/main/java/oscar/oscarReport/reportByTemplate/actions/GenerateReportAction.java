@@ -62,7 +62,7 @@ public class GenerateReportAction extends Action
     {
 
 	    String sessionProviderNo = (String) request.getSession().getAttribute("user");
-	    securityInfoManager.requireAllPrivilege(sessionProviderNo, SecurityInfoManager.READ, null, "_admin", "_report");
+	    securityInfoManager.requireOnePrivilege(sessionProviderNo, SecurityInfoManager.READ, null, "_admin", "_report", "_admin.reporting");
 
 	    try
 	    {

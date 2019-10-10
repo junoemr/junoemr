@@ -45,22 +45,7 @@
 if(!authed) {
 	return;
 }
-%>
 
-
-<logic:notPresent name="msgSessionBean" scope="session">
-	<logic:redirect href="index.jsp" />
-</logic:notPresent>
-<logic:present name="msgSessionBean" scope="session">
-	<bean:define id="bean"
-		type="oscar.oscarMessenger.pageUtil.MsgSessionBean"
-		name="msgSessionBean" scope="session" />
-	<logic:equal name="bean" property="valid" value="false">
-		<logic:redirect href="index.jsp" />
-	</logic:equal>
-</logic:present>
-<%
-oscar.oscarMessenger.pageUtil.MsgSessionBean bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)pageContext.findAttribute("bean");
 oscar.oscarMessenger.data.MsgAddressBook addressBook = new oscar.oscarMessenger.data.MsgAddressBook();
 String myAddressBookXmlString = addressBook.myAddressBook();
 java.util.Vector xmlVector    = addressBook.remoteAddressBooks();
@@ -77,22 +62,17 @@ String demographic_no = (String) request.getAttribute("demographic_no");
 String subjectText = request.getParameter("subject");
 if(subjectText == null) {
 	if (request.getAttribute("ReSubject") != null){
-		bean.setSubject((String)request.getAttribute("ReSubject"));
+		subjectText = (String)request.getAttribute("ReSubject");
 	}
-}
-else if (subjectText != null) {
-	bean.setSubject(subjectText);
 }
 
 String messageText = request.getParameter("message");
 if(messageText == null) {
 	if (request.getAttribute("ReText") != null){
-		bean.setMessage((String)request.getAttribute("ReText"));
+		messageText = (String)request.getAttribute("ReText");
 	}
 }
-else if (messageText != null) {
-	bean.setMessage(messageText);
-}
+
 %>
 <%@page import="org.oscarehr.util.MiscUtils"%><html:html locale="true">
 <head>
@@ -115,6 +95,8 @@ height:100% !important;
 </style>
 
 <script language="javascript">
+	// list of files attached to this message
+	attachments = [];
 
     var browserName=navigator.appName; 
     if (browserName=="Netscape"){ 
@@ -133,6 +115,29 @@ height:100% !important;
             }
         }
     }
+
+    // called by child window to notify this page that the documents have changed
+    function onAttachmentsChange()
+	{
+		// create a message for the user indicating the currently attached documents
+		let html = "<p>Message has attachments!</p><lu>";
+		attachments.forEach(function (attach){
+			html += "<li> " + attach["title"] + "</li>"
+		});
+		html += "</lu>";
+		$("#attachment-msg-display").html(html)
+
+		// clear documents
+		$("form[name='msgCreateMessageForm']").find("input[name='attachments']").remove();
+		$("form[name='msgCreateMessageForm']").find("input[name='attachmentTitles']").remove();
+		// add documents to form for submission.
+		attachments.forEach(function (attach){
+			$("form[name='msgCreateMessageForm']").append(
+				"<input type='hidden' name='attachments' value='" + encodeURIComponent(attach.src) + "'>" +
+				"<input type='hidden' name='attachmentTitles' value='" + encodeURIComponent(attach.title) + "'>"
+			)
+		});
+	}
 
     function checkGroup(tblName,event)
     {
@@ -252,7 +257,8 @@ height:100% !important;
             }
         }
     }
-    
+
+
 </script>
 
 
@@ -335,21 +341,6 @@ function popupSearchDemo(keyword){ // open a new popup window
 }
 
 function popupAttachDemo(demographic){ // open a new popup window
-    var subject = document.forms[0].subject.value;
-    var message = document.forms[0].message.value;
-    var formData = "subject=" + subject + "&message=" + message;
-
-    $.ajax({
-    	type: "post",
-    	data : formData,
-    	success: function(data){
-    		console.log(data);
-    	},
-    	error: function (jqXHR, textStatus, errorThrown){
- 			alert("Error: " + textStatus);
-    	}
-	});
-
     var vheight = 700;
     var vwidth = 900;  
     windowprops = "height="+vheight+",width="+vwidth+",location=0,scrollbars=1,menubar=0,toolbar=1,resizable=1,screenX=0,screenY=0,top=0,left=0";    
@@ -426,11 +417,11 @@ function popupAttachDemo(demographic){ // open a new popup window
 						<td>
 						<table class=messButtonsA cellspacing=0 cellpadding=3>
 							<tr>
-								<td class="messengerButtonsA"><html:link
-									page="/oscarMessenger/ClearMessage.do"
-									styleClass="messengerButtons">
-									<bean:message key="oscarMessenger.CreateMessage.btnClear" />
-								</html:link></td>
+								<td class="messengerButtonsA">
+									<a href="javascript:" class="messengerButtons" onclick="location.reload()">
+										<bean:message key="oscarMessenger.CreateMessage.btnClear" />
+									</a>
+								</td>
 							</tr>
 						</table>
 						</td>
@@ -566,22 +557,13 @@ function popupAttachDemo(demographic){ // open a new popup window
 							<td bgcolor="#EEEEFF" valign=top><!--Message and Subject Cell-->
 							<bean:message key="oscarMessenger.CreateMessage.formSubject" /> :
 							<html:text name="msgCreateMessageForm" property="subject"
-								size="67" value="${bean.subject}"/> <br>
+								size="67" value="<%=subjectText%>"/> <br>
 							<br>
 							<html:textarea name="msgCreateMessageForm" property="message"
-								cols="60" rows="18" value="${bean.message}"/> <%
-                                                String att = bean.getAttachment();
-                                                String pdfAtt = bean.getPDFAttachment();
-                                                if (att != null || pdfAtt != null){ %>
-							<br>
-							<bean:message key="oscarMessenger.CreateMessage.msgAttachments" />
+								cols="60" rows="18" value="<%=messageText%>"/>
+							<div id="attachment-msg-display">
 
-							<% 
-							bean.setSubject(null);
-							bean.setMessage(null);
-							}
-
-                                                %>
+							</div>
 							</td>
 						</tr>
 

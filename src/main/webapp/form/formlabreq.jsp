@@ -50,6 +50,11 @@
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+
+	<!-- Helper scripts for submission -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+
 <title>Laboratory Requisition</title>
 <html:base />
 <link rel="stylesheet" type="text/css" media="screen"
@@ -103,7 +108,7 @@ temp = "";
         var ret = checkAllDates();
         if(ret==true)
         {            
-            
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             //ret = confirm("Do you wish to save this form and view the print preview?");
             //popupFixedPage(650,850,'../provider/notice.htm');
             temp=document.forms[0].action;
@@ -130,6 +135,7 @@ temp = "";
         var ret = checkAllDates();
         if(ret==true)
         {
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             ret = confirm("Are you sure you want to save this form?");
         }
         return ret;
@@ -142,6 +148,7 @@ temp = "";
         var ret = checkAllDates();
         if(ret == true)
         {
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             ret = confirm("Are you sure you wish to save and close this window?");
         }
         return ret;
