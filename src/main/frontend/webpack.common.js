@@ -63,12 +63,12 @@ module.exports = {
 			filename: 'index.jsp'
 		}),
 		new HtmlWebpackPlugin({
-			template: 'raw-loader!./faxConfiguration.jsp',
-			filename: 'faxConfiguration.jsp'
+			template: 'raw-loader!./legacyFaxConfiguration.jsp',
+			filename: 'legacyFaxConfiguration.jsp'
 		}),
 		new HtmlWebpackPlugin({
-			template: 'raw-loader!./faxSendReceive.jsp',
-			filename: 'faxSendReceive.jsp'
+			template: 'raw-loader!./legacyFaxSendReceive.jsp',
+			filename: 'legacyFaxSendReceive.jsp'
 		}),
 		new HtmlWebpackPlugin({
 			template: 'raw-loader!./Know2actConfiguration.jsp',

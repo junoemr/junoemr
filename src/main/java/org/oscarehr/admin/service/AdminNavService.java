@@ -24,6 +24,7 @@
 package org.oscarehr.admin.service;
 
 import org.apache.axis2.transport.http.util.URIEncoderDecoder;
+import org.chip.ping.xml.record.SecurityInfo;
 import org.opensaml.xmlsec.signature.P;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -99,6 +100,10 @@ public class AdminNavService
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.measurements", "_admin.document", "_admin.consult"))
 		{
 			adminNavList.add(getAdminNavSystemManagement(contextPath, resourceBundle, providerNo));
+		}
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin.fax"))
+		{
+			adminNavList.add(getAdminNavFaxManagement(providerNo));
 		}
 
 		return adminNavList;
@@ -527,5 +532,22 @@ public class AdminNavService
 
 		systemManagementGroup.setItems(systemManagementItems);
 		return systemManagementGroup;
+	}
+
+	private AdminNavGroupTo1 getAdminNavFaxManagement(String providerNo)
+	{
+		AdminNavGroupTo1 faxManagementGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> faxManagementItems = new ArrayList<>();
+
+		faxManagementGroup.setName("Faxes");
+
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		{
+			faxManagementItems.add( new AdminNavItemTo1("Fax Configuration", "faxConfig"));
+		}
+		faxManagementItems.add( new AdminNavItemTo1("Fax Sent/Received", "faxSendReceive"));
+
+		faxManagementGroup.setItems(faxManagementItems);
+		return faxManagementGroup;
 	}
 }

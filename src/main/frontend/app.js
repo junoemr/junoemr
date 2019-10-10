@@ -139,6 +139,18 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			templateUrl: 'src/admin/integration/frameContent/frameContent.jsp',
 			controller: 'Admin.Integration.FrameContentController as FrameCtrl'
 		})
+		.state('admin.faxConfig',
+		{
+			url: '/faxConfig',
+			templateUrl: 'src/admin/integration/fax/faxConfiguration.jsp',
+			controller: 'Admin.Integration.Fax.FaxConfigurationController as faxController'
+		})
+		.state('admin.faxSendReceive',
+		{
+			url: '/faxSendReceive',
+			templateUrl: 'src/admin/integration/fax/faxSendReceive.jsp',
+			controller: 'Admin.Integration.Fax.FaxSendReceiveController as faxSendReceiveController'
+		})
 		.state('ticklers',
 		{
 			url: '/ticklers',
