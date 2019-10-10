@@ -23,14 +23,18 @@
 
 package org.oscarehr.admin.service;
 
+import org.apache.axis2.transport.http.util.URIEncoderDecoder;
+import org.opensaml.xmlsec.signature.P;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.to.model.AdminNavGroupTo1;
 import org.oscarehr.ws.rest.to.model.AdminNavItemTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.util.UriEncoder;
 import oscar.OscarProperties;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -94,7 +98,7 @@ public class AdminNavService
 		}
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.measurements", "_admin.document", "_admin.consult"))
 		{
-			adminNavList.
+			adminNavList.add(getAdminNavSystemManagement(contextPath, resourceBundle, providerNo));
 		}
 
 		return adminNavList;
@@ -437,9 +441,89 @@ public class AdminNavService
 		AdminNavGroupTo1 systemManagementGroup = new AdminNavGroupTo1();
 		List<AdminNavItemTo1> systemManagementItems = new ArrayList<>();
 
-		systemManagementGroup.setName(resourcebundle.getString(""));
+		systemManagementGroup.setName(resourcebundle.getString("admin.admin.SystemManagement"));
 
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.userAdmin"))
+		{
+			systemManagementItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.addRole"), "frame?frameUrl=" + contextPath + "/admin/providerAddRole.jsp"));
+		}
 
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.document"))
+		{
+			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("admin.admin.DocumentCategories"), "frame?frameUrl=" + contextPath + "/admin/displayDocumentCategories.jsp"));
+			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("admin.admin.DocumentDescriptionTemplate"), "frame?frameUrl=" + contextPath + "/admin/displayDocumentDescriptionTemplate.jsp"));
+		}
+
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		{
+			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("admin.admin.clinicAdmin"), "frame?frameUrl=" + contextPath + "/admin/ManageClinic.do"));
+			if (oscarProperties.isMultisiteEnabled())
+			{
+				systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("admin.admin.sitesAdmin"), "frame?frameUrl=" + contextPath + "/admin/ManageSites.do"));
+			}
+			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("oscarEncounter.Index.btnCustomize") + resourcebundle.getString("oscar.admin.diseaseRegistryQuickList"),
+					"frame?frameUrl=" + contextPath + "/oscarResearch/oscarDxResearch/dxResearchCustomization.jsp"));
+		}
+
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.consult"))
+		{
+			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("admin.admin.consultationSettings"), "frame?frameUrl=" + contextPath + "/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp"));
+		}
+
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.measurements"))
+		{
+			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("oscarEncounter.Index.btnCustomize") + resourcebundle.getString("admin.admin.oscarMeasurements"),
+					"frame?frameUrl=" + contextPath + "/oscarEncounter/oscarMeasurements/Customization.jsp"));
+		}
+
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		{
+			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("oscarprevention.preventionlistmanager.title"), "frame?frameUrl=" + contextPath + "/oscarPrevention/PreventionListManager.jsp"));
+		}
+
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		{
+			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.btnBaseURLSetting"), "frame?frameUrl=" + contextPath + "/admin/resourcebaseurl.jsp"));
+		}
+
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.messenger"))
+		{
+			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.messages"),
+					"frame?frameUrl=" + URLEncoder.encode(contextPath + "/oscarMessenger/DisplayMessages.do?providerNo=" + providerNo)));// TODO fix (probably broken, requires params)
+			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.btnMessengerAdmin"), "frame?frameUrl=" + contextPath + "/oscarMessenger/config/MessengerAdmin.jsp"));
+		}
+
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		{
+			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.keyPairGen"), "frame?frameUrl=" + contextPath + "/admin/keygen/keyManager.jsp"));
+			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.manageFacilities"), "frame?frameUrl=" + contextPath + "/FacilityManager.do"));
+			systemManagementItems.add( new AdminNavItemTo1( "Create New Flowsheet", "frame?frameUrl=" + contextPath + "/oscarEncounter/oscarMeasurements/adminFlowsheet/NewFlowsheet.jsp"));
+			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.flowsheetManager"), "frame?frameUrl=" + contextPath + "/admin/manageFlowsheets.jsp"));
+			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.add_lot_nr.title"), "frame?frameUrl=" + contextPath + "/admin/lotnraddrecordhtm.jsp"));
+			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.lotnrsearchrecordshtm.title"), "frame?frameUrl=" + contextPath + "/admin/lotnrsearchrecordshtm.jsp"));
+			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobs.title"), "frame?frameUrl=" + contextPath + "/admin/jobs.jsp"));
+			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobtypes.title"), "frame?frameUrl=" + contextPath + "/admin/jobTypes.jsp"));
+
+			if (oscarProperties.isPropertyActive("LOGINTEST"))
+			{
+				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.uploadEntryTxt"), "frame?frameUrl=" + contextPath + "/admin/uploadEntryText.jsp"));
+			}
+		}
+
+		if (oscar.oscarSecurity.CRHelper.isCRFrameworkEnabled())
+		{
+			if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin.cookieRevolver"))
+			{
+				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.ipFilter"), "frame?frameUrl=" + contextPath + "/gatekeeper/ip/show"));
+				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.setCert"), "frame?frameUrl=" + contextPath + "/gatekeeper/cert/"));
+				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.genCert"), "frame?frameUrl=" + contextPath + "/gatekeeper/supercert"));
+				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.clearCookie"), "frame?frameUrl=" + contextPath + "/gatekeeper/clear"));
+				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.adminSecQuestions"), "frame?frameUrl=" + contextPath + "/gatekeeper/quest/adminQuestions"));
+				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.adminSecPolicies"), "frame?frameUrl=" + contextPath + "/gatekeeper/policyadmin/select"));
+				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.removeBans"), "frame?frameUrl=" + contextPath + "/gatekeeper/banremover/show"));
+				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.genMatrixCards"), "frame?frameUrl=" + contextPath + "/gatekeeper/matrixadmin/show"));
+			}
+		}
 
 		systemManagementGroup.setItems(systemManagementItems);
 		return systemManagementGroup;

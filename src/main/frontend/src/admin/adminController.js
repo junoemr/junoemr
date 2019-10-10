@@ -18,6 +18,7 @@ angular.module('Admin').controller('Admin.AdminController', [
 		{
 			return function()
 			{
+				angular.element(document.querySelector("html")).animate({scrollTop: 0}, 500);
 				$location.url("/admin/"+newState);
 			}
 		}
@@ -29,9 +30,10 @@ angular.module('Admin').controller('Admin.AdminController', [
 				group.items.forEach(function (item) {
 					item.callback = generateTransition(item.transitionState);
 
-					if ($stateParams.frameUrl !== undefined && item.transitionState.includes($stateParams.frameUrl))
+					// restore accordion state on reload
+					if ($stateParams.frameUrl !== undefined &&
+						(item.transitionState.includes($stateParams.frameUrl) || item.transitionState.includes(encodeURIComponent($stateParams.frameUrl))))
 					{
-						console.log("expanding: " + item.transitionState);
 						group.expanded = true;
 					}
 				})
