@@ -23,6 +23,7 @@
 
 package org.oscarehr.billing.CA.transfer;
 
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 
 public class EligibilityCheckTransfer implements Serializable
@@ -41,6 +42,7 @@ public class EligibilityCheckTransfer implements Serializable
 	private ValidationStatus validationStatus = ValidationStatus.INCOMPLETE;
 
 	//TODO refactor this out of the transfer object
+	@XmlTransient
 	private String realFilename;
 
 	public Boolean getEligible()

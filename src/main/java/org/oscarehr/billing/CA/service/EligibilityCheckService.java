@@ -33,10 +33,9 @@ import oscar.oscarBilling.ca.bc.Teleplan.TeleplanAPI;
 import oscar.oscarBilling.ca.bc.Teleplan.TeleplanResponse;
 import oscar.oscarBilling.ca.bc.Teleplan.TeleplanService;
 import oscar.oscarBilling.ca.bc.Teleplan.TeleplanUserPassDAO;
-import oscar.util.UtilDateUtilities;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static org.oscarehr.billing.CA.transfer.EligibilityCheckTransfer.ValidationStatus.COMPLETE;
@@ -71,24 +70,11 @@ public class EligibilityCheckService
 				TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
 				String[] userpass = dao.getUsernamePassword();
 				TeleplanService tService = new TeleplanService();
-				Date billingDate = new Date();
+				LocalDate billingDate = LocalDate.now();
 
 				TeleplanAPI tAPI = tService.getTeleplanAPI(userpass[0], userpass[1]);
-
-				String phn = demo.getHin();
-				String dateofbirthyyyy = demo.getYearOfBirth();
-				String dateofbirthmm = demo.getMonthOfBirth();
-				String dateofbirthdd = demo.getDateOfBirth();
-				String dateofserviceyyyy = UtilDateUtilities.justYear(billingDate);
-				String dateofservicemm = UtilDateUtilities.justMonth(billingDate);
-				String dateofservicedd = UtilDateUtilities.justDay(billingDate);
-				boolean patientvisitcharge = true;
-				boolean lasteyeexam = true;
-				boolean patientrestriction = true;
-
-				TeleplanResponse tr = tAPI.checkElig(phn, dateofbirthyyyy, dateofbirthmm, dateofbirthdd,
-						dateofserviceyyyy, dateofservicemm, dateofservicedd,
-						patientvisitcharge, lasteyeexam, patientrestriction);
+				TeleplanResponse tr = tAPI.checkElig(demo.getHin(), demo.getYearOfBirth(), demo.getMonthOfBirth(), demo.getDateOfBirth(),
+						billingDate, true, true, true);
 
 				transfer.setResult(tr.getResult());
 				transfer.setMessage(tr.getMsgs());

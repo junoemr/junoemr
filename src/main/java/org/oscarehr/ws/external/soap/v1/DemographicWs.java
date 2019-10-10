@@ -287,7 +287,6 @@ public class DemographicWs extends AbstractWs {
 			demographicTransfer.copyTo(demographic);
 
 			transfer = eligibilityCheckService.checkEligibility(demographic);
-			transfer.setRealFilename(null); // we don't want outside users to try to parse this
 		}
 		catch(Exception e)
 		{

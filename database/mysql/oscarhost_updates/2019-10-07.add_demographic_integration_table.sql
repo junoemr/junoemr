@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS demographic_integration(
   deleted_at datetime,
   integration_type varchar(64) NOT NULL,
   created_by_source varchar(64),
+  created_by_remote_id varchar (32),
   remote_id varchar (32),
 
   CONSTRAINT `demographic_integration_demographic_no_fk`

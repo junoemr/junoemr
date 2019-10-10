@@ -380,6 +380,7 @@ public class DemographicService
 		integrationRecord.setDemographicNo(demographicNo);
 		integrationRecord.setIntegrationType(transfer.getIntegrationType());
 		integrationRecord.setCreatedBySource(transfer.getCreatedBySource());
+		integrationRecord.setCreatedByRemoteId(transfer.getCreatedByremoteId());
 		integrationRecord.setRemoteId(transfer.getRemoteId());
 		integrationRecord.setCreatedAt(new Date());
 		integrationRecord.setUpdatedAt(new Date());

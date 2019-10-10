@@ -47,6 +47,8 @@ public class DemographicIntegration extends AbstractModel<Integer>
 	private String integrationType;
 	@Column(name = "created_by_source")
 	private String createdBySource;
+	@Column(name = "created_by_remote_id")
+	private String createdByRemoteId;
 	@Column(name = "remote_id")
 	private String remoteId;
 
@@ -108,6 +110,16 @@ public class DemographicIntegration extends AbstractModel<Integer>
 	public void setCreatedBySource(String createdBySource)
 	{
 		this.createdBySource = createdBySource;
+	}
+
+	public String getCreatedByRemoteId()
+	{
+		return createdByRemoteId;
+	}
+
+	public void setCreatedByRemoteId(String createdByRemoteId)
+	{
+		this.createdByRemoteId = createdByRemoteId;
 	}
 
 	public String getRemoteId()

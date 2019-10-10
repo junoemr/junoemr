@@ -26,9 +26,10 @@ import java.io.Serializable;
 
 public class DemographicIntegrationTransfer implements Serializable
 {
+	private String remoteId;
 	private String integrationType;
 	private String createdBySource;
-	private String remoteId;
+	private String createdByremoteId;
 
 	public String getIntegrationType()
 	{
@@ -48,6 +49,16 @@ public class DemographicIntegrationTransfer implements Serializable
 	public void setCreatedBySource(String createdBySource)
 	{
 		this.createdBySource = createdBySource;
+	}
+
+	public String getCreatedByremoteId()
+	{
+		return createdByremoteId;
+	}
+
+	public void setCreatedByremoteId(String createdByremoteId)
+	{
+		this.createdByremoteId = createdByremoteId;
 	}
 
 	public String getRemoteId()
