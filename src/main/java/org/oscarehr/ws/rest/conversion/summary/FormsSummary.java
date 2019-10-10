@@ -36,6 +36,7 @@ import org.oscarehr.ws.rest.to.model.SummaryTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.oscarEncounter.data.EctFormData;
+import oscar.util.ConversionUtils;
 
 
 @Component
@@ -52,6 +53,7 @@ public class FormsSummary implements Summary{
 		List<SummaryItemTo1> list = summary.getSummaryItem();
 		
 	    fillEforms( loggedInInfo, list,demographicNo);
+		list.sort(Collections.reverseOrder(SummaryItemTo1.SUMMARY_ITEM_TO_1_COMPARATOR_DATE));
 
 		return summary;
 	}
@@ -62,18 +64,16 @@ public class FormsSummary implements Summary{
 
 		List<EFormData> completedEforms = formsManager.findInstancedByDemographicId(loggedInInfo,demographicNo);
 		List<EctFormData.PatientForm> completedForms = formsManager.getCompletedEncounterForms(demographicNo.toString());
-		Collections.sort(completedEforms, Collections.reverseOrder(EFormData.FORM_DATE_COMPARATOR));
 			
-		for(EFormData eformData: completedEforms){	
-			int id = eformData.getId();
-			list.add(new SummaryItemTo1(eformData.getId(), eformData.getFormName(),"record.forms.completed","eform"));
+		for(EFormData eformData: completedEforms){
+			list.add(new SummaryItemTo1(eformData.getId(), eformData.getFormName(),"record.forms.completed","eform", ConversionUtils.combineDateAndTime(eformData.getFormDate(), eformData.getFormTime())));
 		}
 
 		for(EctFormData.PatientForm form : completedForms)
 		{
 			try
 			{
-				list.add(new SummaryItemTo1(Integer.parseInt(form.getFormId()), form.getFormName(), "record.forms.completed", "form"));
+				list.add(new SummaryItemTo1(Integer.parseInt(form.getFormId()), form.getFormName(), "record.forms.completed", "form", form.edited));
 			}
 			catch (NumberFormatException e)
 			{

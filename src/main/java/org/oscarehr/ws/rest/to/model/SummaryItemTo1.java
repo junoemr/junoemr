@@ -23,6 +23,7 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
+import java.util.Comparator;
 import java.util.Date;
 
 //import javax.xml.bind.annotation.XmlElement;
@@ -67,6 +68,16 @@ public class SummaryItemTo1 {
 	String warning;
 	private Object extra;
 
+	// compares summary items using the date field
+	public static final Comparator<SummaryItemTo1> SUMMARY_ITEM_TO_1_COMPARATOR_DATE = new Comparator<SummaryItemTo1>()
+	{
+		@Override
+		public int compare(SummaryItemTo1 summaryItemTo1, SummaryItemTo1 t1)
+		{
+			return summaryItemTo1.getDate().compareTo(t1.getDate());
+		}
+	};
+
 	
 	public SummaryItemTo1(){}
 	
@@ -75,6 +86,11 @@ public class SummaryItemTo1 {
 		this.displayName = displayName;
 		this.action = action;
 		this.type = type;
+	}
+
+	public SummaryItemTo1(int id, String displayName,String action,String type, Date date){
+		this(id, displayName, action, type);
+		this.date = date;
 	}
 	
 	
@@ -175,8 +191,6 @@ public class SummaryItemTo1 {
 	public void setExtra(Object extra) {
 	    this.extra = extra;
     }
-	
-	
 }
 
 
