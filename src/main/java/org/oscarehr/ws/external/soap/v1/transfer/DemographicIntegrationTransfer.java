@@ -29,7 +29,7 @@ public class DemographicIntegrationTransfer implements Serializable
 	private String remoteId;
 	private String integrationType;
 	private String createdBySource;
-	private String createdByremoteId;
+	private String createdByRemoteId;
 
 	public String getIntegrationType()
 	{
@@ -51,14 +51,14 @@ public class DemographicIntegrationTransfer implements Serializable
 		this.createdBySource = createdBySource;
 	}
 
-	public String getCreatedByremoteId()
+	public String getCreatedByRemoteId()
 	{
-		return createdByremoteId;
+		return createdByRemoteId;
 	}
 
-	public void setCreatedByremoteId(String createdByremoteId)
+	public void setCreatedByRemoteId(String createdByRemoteId)
 	{
-		this.createdByremoteId = createdByremoteId;
+		this.createdByRemoteId = createdByRemoteId;
 	}
 
 	public String getRemoteId()
