@@ -38,7 +38,7 @@
 
 		function closePage()
 		{
-			if (!window.opener.closed) {
+			if (window.opener && window.opener.closed == false) {
 				var parentAjaxId = "<%=request.getParameter("parentAjaxId")%>";
 				if( window.opener. writeToEncounterNote ) {
 					window.opener.reloadNav(parentAjaxId);
@@ -47,8 +47,8 @@
 						window.opener.location.reload();
 				}
 				window.opener.focus();
-				window.close();
 			}
+			window.close();
 		}
 	</script>
 </head>
