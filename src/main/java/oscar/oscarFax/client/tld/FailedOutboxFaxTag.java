@@ -22,11 +22,11 @@
  */
 package oscar.oscarFax.client.tld;
 
+import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 
@@ -56,20 +56,20 @@ public class FailedOutboxFaxTag extends TagSupport
 		{
 			numFailures = 0;
 
-			RestSearchResponse<FaxAccountTransferOutbound> accountsResp;
 			List<FaxAccountTransferOutbound> accounts;
-			int page = 0;
-			do
+			for(int page = 1; page < 10; page++)
 			{
-				accountsResp = faxService.listAccounts(++page, 10);
-				accounts = accountsResp.getBody();
+				FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
+				criteriaSearch.setLimit(10);
+				criteriaSearch.setSortDirAscending();
+
+				accounts = faxService.listAccounts(criteriaSearch);
 				for (FaxAccountTransferOutbound account : accounts)
 				{
 					numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), 1, 10, null, null, FaxOutboxTransferOutbound.CombinedStatus.ERROR.toString(), null);
 					numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), 1, 10, null, null, FaxOutboxTransferOutbound.CombinedStatus.INTEGRATION_FAILED.toString(), null);
 				}
 			}
-			while (accounts.size() >= accountsResp.getHeaders().getPerPage());
 
 			JspWriter out = super.pageContext.getOut();
 			if (numFailures > 0)

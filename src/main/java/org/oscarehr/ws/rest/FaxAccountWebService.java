@@ -29,6 +29,7 @@ import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.fax.service.FaxAccountService;
@@ -93,7 +94,16 @@ public class FaxAccountWebService extends AbstractServiceImpl
 
 		page = validPageNo(page);
 		perPage = limitedResultCount(perPage);
-		return faxAccountService.listAccounts(page,perPage);
+		int offset = calculatedOffset(page, perPage);
+
+		FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
+		criteriaSearch.setOffset(offset);
+		criteriaSearch.setLimit(perPage);
+		criteriaSearch.setSortDirAscending();
+
+		int total = faxAccountDao.criteriaSearchCount(criteriaSearch);
+		List<FaxAccountTransferOutbound> accountList = faxAccountService.listAccounts(criteriaSearch);
+		return RestSearchResponse.successResponse(accountList, page, perPage, total);
 	}
 
 	@GET

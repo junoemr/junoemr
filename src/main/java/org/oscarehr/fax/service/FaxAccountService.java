@@ -37,7 +37,6 @@ import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
-import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
@@ -106,18 +105,9 @@ public class FaxAccountService
 		return faxAccountList.isEmpty() ? null : faxAccountList.get(0);
 	}
 
-	public RestSearchResponse<FaxAccountTransferOutbound> listAccounts(Integer page, Integer perPage)
+	public List<FaxAccountTransferOutbound> listAccounts(FaxAccountCriteriaSearch criteriaSearch)
 	{
-		int offset = calculatedOffset(page, perPage);
-
-		FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
-		criteriaSearch.setOffset(offset);
-		criteriaSearch.setLimit(perPage);
-		criteriaSearch.setSortDirAscending();
-
-		int total = faxAccountDao.criteriaSearchCount(criteriaSearch);
-		List<FaxAccount> accountList = faxAccountDao.criteriaSearch(criteriaSearch);
-		return RestSearchResponse.successResponse(FaxTransferConverter.getAllAsOutboundTransferObject(accountList), page, perPage, total);
+		return FaxTransferConverter.getAllAsOutboundTransferObject(faxAccountDao.criteriaSearch(criteriaSearch));
 	}
 
 	public List<FaxOutboxTransferOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
@@ -144,17 +134,5 @@ public class FaxAccountService
 		}
 
 		return transferList;
-	}
-
-	/**
-	 * calculate the offset based on the current page number and resultCount
-	 *
-	 * @param pageNo         - page
-	 * @param resultsPerPage - limit of results
-	 * @return offset
-	 */
-	protected int calculatedOffset(int pageNo, int resultsPerPage)
-	{
-		return resultsPerPage * (pageNo - 1);
 	}
 }
