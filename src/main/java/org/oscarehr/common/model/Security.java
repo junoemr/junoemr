@@ -60,9 +60,8 @@ public class Security extends AbstractModel<Integer> {
 	@Column(name = "password")
 	private String password;
 
-	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-	@JoinColumn(name = "provider_no", referencedColumnName = "provider_no")
-	private ProviderData provider;
+	@Column(name = "provider_no")
+	private Integer providerNo;
 
 	@Column(name = "pin")
 	private String pin;
@@ -149,16 +148,11 @@ public class Security extends AbstractModel<Integer> {
 	}
 
 	public String getProviderNo() {
-		if (this.provider == null)
-		{
-			return null;
-		}
-
-		return Integer.toString(this.provider.getProviderNo());
+		return Integer.toString(providerNo);
 	}
 
 	public void setProviderNo(String providerNo) {
-		this.provider.setProviderNo(Integer.parseInt(providerNo));
+		this.providerNo = Integer.valueOf(providerNo);
 	}
 
 	public String getPin() {
@@ -208,17 +202,6 @@ public class Security extends AbstractModel<Integer> {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
-	public ProviderData getProvider()
-	{
-		return provider;
-	}
-
-	public void setProvider(ProviderData provider)
-	{
-		this.provider = provider;
-	}
-
 
 	/**
 	 * @return true if inputed password equals password in the DB, false otherwise.

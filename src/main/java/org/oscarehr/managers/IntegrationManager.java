@@ -34,6 +34,7 @@ import org.oscarehr.integration.myhealthaccess.dto.IntegrationTransfer;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import oscar.util.StringUtils;
 
 @Service
 public class IntegrationManager
@@ -56,11 +57,21 @@ public class IntegrationManager
 
     public Integration findMhaIntegration(String siteName)
     {
+        if (StringUtils.isNullOrEmpty(siteName))
+        {
+            return integrationDao.findDefaultByIntegration(Integration.INTEGRATION_TYPE_MHA);
+        }
+
         return integrationDao.findByIntegrationAndSiteName(siteName, Integration.INTEGRATION_TYPE_MHA);
     }
 
     public UserIntegrationAccess findMhaUserAccessBySecurityAndSiteName(Security security, String siteName)
     {
+        if (StringUtils.isNullOrEmpty(siteName))
+        {
+            return userIntegrationAccessDao.findBySecurityNoAndIntegration(security.getSecurityNo(), Integration.INTEGRATION_TYPE_MHA);
+        }
+
         return userIntegrationAccessDao.findBySecurityNoAndSiteName(security.getSecurityNo(), siteName);
     }
 

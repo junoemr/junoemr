@@ -41,7 +41,7 @@ public class ClinicService extends BaseService
 
 	public ClinicUserTo1 createUser(IntegrationData integrationData, ClinicUserTo1 newUser)
 	{
-		final String ENDPOINT_CREATE_USER = "/%/user/create";
+		final String ENDPOINT_CREATE_USER = "/%s/user/create";
 
 		ClinicUserTo1 response = null;
 		String apiKey = integrationData.getApiKey();
@@ -91,12 +91,11 @@ public class ClinicService extends BaseService
 
 		String apiKey = integrationData.getApiKey();
 		String clinicId = integrationData.getIntegration().getRemoteId();
-		String remoteUserId = integrationData.getRemoteUserId();
-
 		ClinicUserTo1 accessToken = null;
+
 		try
 		{
-			String endpoint = formatEndpoint(ENDPOINT_LONG_TOKEN, clinicId, remoteUserId);
+			String endpoint = formatEndpoint(ENDPOINT_LONG_TOKEN, clinicId);
 			accessToken = post(endpoint, apiKey, userLogin, ClinicUserTo1.class);
 		}
 		catch (BaseException e) {
@@ -155,6 +154,6 @@ public class ClinicService extends BaseService
 
 	private <S, T> T postWithToken(String endPoint, String apiKey, S body, Class<T> responseClass, String token)
 	{
-		return executeRequestWithToken(endPoint, apiKey, HttpMethod.GET, token, body, responseClass, BaseErrorTo1.class);
+		return executeRequestWithToken(endPoint, apiKey, HttpMethod.POST, token, body, responseClass, BaseErrorTo1.class);
 	}
 }

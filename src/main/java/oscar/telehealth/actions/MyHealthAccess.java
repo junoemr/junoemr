@@ -115,7 +115,7 @@ public class MyHealthAccess extends DispatchAction
 				String junoUserId = Integer.toString(loggedInUser.getId());
 
 				ClinicUserLoginTo1 userLogin = new ClinicUserLoginTo1(siteEmail, password, junoUserId);
-				integrationData = myHealthAccessService.createUserIntegration(integrationData, userLogin);
+				integrationData = myHealthAccessService.createUserIntegration(integrationData, loggedInUser, userLogin);
 			}
 
 			return getRemoteRedirect(integrationData, request);
@@ -127,12 +127,17 @@ public class MyHealthAccess extends DispatchAction
 		}
 		catch (RecordNotFoundException e)
 		{
-			logger.info("Invalid MHA API key for loggedInUser: " + loggedInUser.getProviderNo());
-			return redirectLogin(request, mapping, e.getMessage());
+			ActionRedirect redirect = createActionRedirect(request, mapping, Action.CREATE_USER, Param.EMAIL, Param.SITE_NAME);
+			redirect.addParameter(Param.EMAIL, e.getMessage());
+			return redirect;
 		}
 		catch (InvalidAccessException e)
 		{
 			logger.info("Invalid credentials for MHA user: " + request.getParameter(Param.EMAIL));
+			return redirectLogin(request, mapping, e.getMessage());
+		}
+		catch (Exception e)
+		{
 			return redirectLogin(request, mapping, e.getMessage());
 		}
 	}
@@ -167,7 +172,6 @@ public class MyHealthAccess extends DispatchAction
 		catch (InvalidIntegrationException e)
 		{
 			return redirectLogin(request, mapping, e.getMessage());
-
 		}
 		catch (DuplicateRecordException e)
 		{
@@ -175,13 +179,6 @@ public class MyHealthAccess extends DispatchAction
 			loginAction.addParameter(Param.EMAIL, email);
 
 			return loginAction;
-		}
-		catch (RecordNotFoundException e)
-		{
-			ActionRedirect createUserAction = new ActionRedirect(mapping.findForward(Action.CREATE_USER));
-			createUserAction.addParameter(Param.EMAIL, email);
-			createUserAction.addParameter(Param.EMAIL, e.getMessage());
-			return createUserAction;
 		}
 	}
 
@@ -209,11 +206,17 @@ public class MyHealthAccess extends DispatchAction
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		Security security = loggedInInfo.getLoggedInSecurity();
 
-		Integration integration = getMhaIntegration(siteName);
+		Integration integration = integrationManager.findMhaIntegration(siteName);
 
 		if (integration == null)
 		{
-			throw new InvalidIntegrationException(InvalidIntegrationException.NO_INTEGRATION_MHA);
+			String noIntegrationError = InvalidIntegrationException.NO_INTEGRATION_MHA;
+
+			if (!StringUtils.isNullOrEmpty(siteName))
+			{
+				noIntegrationError = String.format("%s for %s", noIntegrationError, siteName);
+			}
+			throw new InvalidIntegrationException(noIntegrationError);
 		}
 
 		IntegrationData integrationData = new IntegrationData(integration);
@@ -254,11 +257,6 @@ public class MyHealthAccess extends DispatchAction
 		myHealthAccessRedirectAction.setPath(myHealthAccessURL);
 		myHealthAccessRedirectAction.setRedirect(true);
 		return myHealthAccessRedirectAction;
-	}
-
-	private Integration getMhaIntegration(String siteName)
-	{
-		return integrationManager.findMhaIntegration(siteName);
 	}
 
 	private String userSiteEmail(String email, Site site)

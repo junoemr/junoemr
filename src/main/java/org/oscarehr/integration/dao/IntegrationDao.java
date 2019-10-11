@@ -26,6 +26,7 @@ package org.oscarehr.integration.dao;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.integration.model.Integration;
 import org.springframework.stereotype.Repository;
+import oscar.util.StringUtils;
 
 import javax.persistence.Query;
 import java.util.List;
@@ -48,10 +49,21 @@ public class IntegrationDao extends AbstractDao<Integration>
         return this.getSingleResultOrNull(query);
     }
 
+    public Integration findDefaultByIntegration(String integrationType)
+    {
+        String sql = "SELECT i FROM Integration i WHERE i.integrationType = :integrationType AND i.site IS NULL";
+
+        Query query = entityManager.createQuery(sql);
+        query.setParameter("integrationType", integrationType);
+
+        return this.getSingleResultOrNull(query);
+    }
+
     public Integration findByIntegrationAndSiteName(String siteName, String integrationType)
     {
-        Query query = entityManager.createQuery(
-                "SELECT i FROM Integration i WHERE i.site.name = :siteName AND i.integrationType = :integrationType");
+        String sql = "SELECT i FROM Integration i WHERE i.integrationType = :integrationType AND i.site.name = :siteName";
+
+        Query query = entityManager.createQuery(sql);
         query.setParameter("siteName", siteName);
         query.setParameter("integrationType", integrationType);
 

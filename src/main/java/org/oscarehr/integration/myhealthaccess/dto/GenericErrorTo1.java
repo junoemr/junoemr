@@ -33,7 +33,7 @@ public class GenericErrorTo1 implements Serializable
 {
 	public static final String ERROR_UNKNOWN = "error_unknown";
 	public static final String ERROR_AUTHENTICATION = "error_authentication";
-	public static final String ERROR_ACCESS = "ERROR_ACCESS";
+	public static final String ERROR_ACCESS = "error_access";
 	public static final String ERROR_CLINIC_ACCESS = "error_clinic_access";
 	public static final String ERROR_SESSION_EXPIRED = "error_session_expired";
 	public static final String ERROR_RECORD_NOT_FOUND = "error_record_not_found";

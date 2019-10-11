@@ -34,6 +34,10 @@ public class ClinicUserShortTokenTo1 implements Serializable
 	@JsonProperty("short_token")
 	private String token;
 
+	public ClinicUserShortTokenTo1()
+	{
+	}
+
 	public ClinicUserShortTokenTo1(String token)
 	{
 		this.token = token;

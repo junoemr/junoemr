@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
+import oscar.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -59,36 +60,35 @@ public class MyHealthAccessService
 
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
 	protected static final String MHA_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
-	protected static final String MHA_HOME_URL = "home";
+	protected static final String MHA_HOME_URL = "/clinic/home";
 	protected static final String MHA_BASE_TELEHEALTH_URL = "/provider/clinic/%s/telehealth/appointment/%s/";
 
 	public String getTelehealthURL(IntegrationData integrationData, String appointmentNo)
 	{
+		MHAUserToken shortToken = getShortToken(integrationData);
+
+		String clinicId = integrationData.getIntegration().getRemoteId();
+		String clinicUserId = integrationData.getRemoteUserId();
+
+		String redirectUrl = String.format(MHA_BASE_TELEHEALTH_URL, clinicId, appointmentNo);
+		String clinicUserPath = "clinic_users/push_token?";
+		String endpoint = ClinicService.concatEndpointStrings(MHA_DOMAIN, clinicUserPath);
+		endpoint = clinicService.buildUrl(endpoint) + "clinic_id=%s&user_id=%s&redirect_url=%s#token=%s";
+
+		if (StringUtils.isNullOrEmpty(appointmentNo))
+		{
+			redirectUrl = MHA_HOME_URL;
+		}
+
 		try
 		{
-			if (appointmentNo == null)
-			{
-				throw new UnsupportedEncodingException();
-			}
-
-			MHAUserToken shortToken = getShortToken(integrationData);
-
-			String clinicId = integrationData.getIntegration().getRemoteId();
-			String clinicUserId = integrationData.getRemoteUserId();
-
-			String redirectUrl = String.format(MHA_BASE_TELEHEALTH_URL, clinicId, appointmentNo);
-
-			String clinicUserPath = "clinic_users/push_token?";
-			String endpoint = ClinicService.concatEndpointStrings(MHA_DOMAIN, clinicUserPath);
-			endpoint = clinicService.buildUrl(endpoint) + "clinic_id=%s&user_id=%s&redirect_url=%s#token=%s";
-			endpoint = String.format(endpoint, clinicId, clinicUserId, redirectUrl, shortToken.getToken());
-
-			return URLEncoder.encode(endpoint, "UTF-8");
+			endpoint = String.format(endpoint, clinicId, clinicUserId, URLEncoder.encode(redirectUrl, "UTF-8"), shortToken.getToken());
+			return endpoint;
 		}
 		catch (UnsupportedEncodingException e)
 		{
 			MiscUtils.getLogger().error("Error encoding MyHealthAccess redirect URL " + e.getMessage());
-			return MHA_HOME_URL;
+			return String.format(endpoint, clinicId, clinicUserId, redirectUrl, shortToken.getToken());
 		}
 	}
 
@@ -108,14 +108,19 @@ public class MyHealthAccessService
 		return integrationAccess;
 	}
 
-	public IntegrationData createUserIntegration(IntegrationData integrationData, ClinicUserLoginTo1 userLogin)
+	public IntegrationData createUserIntegration(IntegrationData integrationData, Security loggedInUser, ClinicUserLoginTo1 userLogin)
 	{
-		ClinicUserTo1 longToken = clinicService.getLongToken(integrationData, userLogin);
+		ClinicUserTo1 authUser = clinicService.getLongToken(integrationData, userLogin);
 
-		UserIntegrationAccess integrationAccess = integrationData.getUserIntegrationAccess();
-		integrationAccess.setAccessToken(longToken.getToken());
+		UserIntegrationAccess integrationAccess = new UserIntegrationAccess(
+				integrationData.getIntegration(),
+				loggedInUser,
+				authUser.getMyhealthaccessId(),
+				authUser.getEmail(),
+				authUser.getToken());
 
 		integrationManager.updateUserIntegrationAccess(integrationAccess);
+		integrationData.setUserIntegrationAccess(integrationAccess);
 		return integrationData;
 	}
 

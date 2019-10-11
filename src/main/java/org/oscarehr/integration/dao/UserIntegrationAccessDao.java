@@ -28,6 +28,7 @@ import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.UserIntegrationAccess;
 import org.springframework.stereotype.Repository;
+import oscar.util.StringUtils;
 
 import javax.persistence.Query;
 
@@ -61,10 +62,26 @@ public class UserIntegrationAccessDao extends AbstractDao<UserIntegrationAccess>
 		return this.getSingleResultOrNull(query);
 	}
 
+	public UserIntegrationAccess findBySecurityNoAndIntegration(Integer securityNo, String integrationType)
+	{
+		String sql = "SELECT i FROM UserIntegrationAccess i " +
+					 "WHERE i.security.id = :securityNo " +
+					 "AND i.integration.integrationType = :integrationType " +
+					 "AND i.integration.site IS NULL";
+
+		Query query = entityManager.createQuery(sql);
+
+		query.setParameter("securityNo", securityNo);
+		query.setParameter("integrationType", integrationType);
+
+		return this.getSingleResultOrNull(query);
+	}
+
 	public UserIntegrationAccess findBySecurityNoAndSiteName(Integer securityNo, String siteName)
 	{
-		Query query = entityManager.createQuery(
-				"SELECT i FROM UserIntegrationAccess i WHERE i.security.id = :securityNo AND i.integration.site.name = :siteName");
+		String sql = "SELECT i FROM UserIntegrationAccess i WHERE i.security.id = :securityNo AND i.integration.site.name = :siteName";
+
+		Query query = entityManager.createQuery(sql);
 
 		query.setParameter("securityNo", securityNo);
 		query.setParameter("siteName", siteName);

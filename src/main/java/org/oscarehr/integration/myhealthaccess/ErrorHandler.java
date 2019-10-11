@@ -95,24 +95,26 @@ public class ErrorHandler <T> extends DefaultResponseErrorHandler
 			GenericErrorTo1 genericError = e.getErrorObject().getGenericErrors().get(0);
 			MiscUtils.getLogger().error(genericError.getCode() + " : " + genericError.getMessage());
 
-			if (genericError.getCode().equals(GenericErrorTo1.ERROR_RECORD_NOT_FOUND))
+			switch (genericError.getCode())
 			{
-				throw new RecordNotFoundException("Unable to find MyHealthAccess record");
+				case GenericErrorTo1.ERROR_RECORD_NOT_FOUND:
+					throw new RecordNotFoundException("Unable to find MyHealthAccess record");
+				case GenericErrorTo1.ERROR_DUPLICATE_RECORD:
+					throw new DuplicateRecordException("Duplicate MyHealthAccess record for key found");
+				case GenericErrorTo1.ERROR_SESSION_EXPIRED:
+					throw new SessionExpiredException("Your session has expired");
 			}
+		}
+		else if (e.getErrorObject().hasAuthError())
+		{
+			GenericErrorTo1 authError = e.getErrorObject().getAuthError();
 
-			if (genericError.getCode().equals(GenericErrorTo1.ERROR_DUPLICATE_RECORD))
+			switch (authError.getCode())
 			{
-				throw new DuplicateRecordException("Duplicate MyHealthAccess record for key found");
-			}
-
-			if (genericError.getCode().equals(GenericErrorTo1.ERROR_AUTHENTICATION))
-			{
-				throw new InvalidAccessException("Invalid or expired authentication key");
-			}
-
-			if (genericError.getCode().equals(GenericErrorTo1.ERROR_SESSION_EXPIRED))
-			{
-				throw new SessionExpiredException("Your session has expired");
+				case GenericErrorTo1.ERROR_AUTHENTICATION:
+					throw new InvalidAccessException("Authentication Failure");
+				case GenericErrorTo1.ERROR_ACCESS:
+					throw new InvalidAccessException("Invalid Email/Password");
 			}
 		}
 
