@@ -121,7 +121,7 @@ public class MeasurementGraphAction2 extends Action {
 		int width = 800;
 		int height = 400;
 
-		String method = request.getParameter("method");
+		String method = StringUtils.trimToEmpty(request.getParameter("method"));
 
 		JFreeChart chart;
 
@@ -144,7 +144,6 @@ public class MeasurementGraphAction2 extends Action {
 		}
 		else
 		{
-			// This should never get hit. Left as a fail-safe
 			chart = defaultChart(demographicNo, typeIdName, typeIdName2, chartTitle);
 		}
 
