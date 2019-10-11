@@ -22,14 +22,12 @@
 --%>
 <div id="admin-page" class="height-100">
 	<div id="admin-page-header" class="row vertical-align">
-		<h3>Administration</h3>
+		<h3><a href="#!/admin/landingPage" ng-click="AdminCtrl.collapseAllNavGroups()">Administration</a></h3>
 	</div>
 	<div id="admin-page-body" class="row height-100">
-		<div class="admin-side-nav col-sm-4 col-md-4 col-lg-2">
+		<div class="admin-side-nav">
 			<accordion-list item-list="AdminCtrl.navList"></accordion-list>
 		</div>
-		<div class="col-sm-8 col-md-8 col-lg-10 height-100">
-			<div class="admin-subpage-view height-100" ui-view></div>
-		</div>
+		<div class="admin-subpage-view height-100" ui-view></div>
 	</div>
 </div>

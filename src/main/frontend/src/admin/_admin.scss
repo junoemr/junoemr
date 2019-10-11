@@ -5,24 +5,34 @@
     @extend %juno-page-header;
     padding-left: 63px;
 
-    //margin-bottom: $margin-md;
     h3 {
       color: $color-neutral-white;
     }
     h3, p {
       margin: 0;
     }
+
+    a  {
+      all: unset;
+      cursor: pointer;
+    }
   }
 
   #admin-page-body {
+    margin: 16px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 
     .admin-subpage-view {
-      margin-top: 30px;
-      margin-right: 10px;
+      margin-left: 20px;
+      margin-right: 20px;
+      margin-top: 10px;
+      flex: 1 1;
     }
 
     .admin-side-nav {
-      max-width: 300px;
+      flex: 0 0 300px;
     }
   }
 }

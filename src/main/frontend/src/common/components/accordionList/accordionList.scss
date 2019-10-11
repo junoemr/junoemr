@@ -1,13 +1,9 @@
 .accordion-list-component {
-  @include juno-font-default;
-  @include juno-tab-md(16px);
+  @include juno-font-body-smallest;
+  @include juno-tab(auto, 8px, 4px, 12px);
   @include juno-tab-color-scheme-white;
 
   .accordion-group {
-    h4 {
-      margin: 0;
-    }
-
     div {
       margin-right: auto;
     }
@@ -24,9 +20,14 @@
 
     .accordion-group-header {
       border-bottom: 1px solid $color-neutral-lighter;
+      margin: 0;
 
       a {
+        @include juno-font-body-smallest;
         padding-left: 16px;
+
+        color: $color-primary-base;
+        font-weight: bold;
       }
     }
 

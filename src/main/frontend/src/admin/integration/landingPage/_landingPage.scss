@@ -1,0 +1,11 @@
+#admin-landing-page {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+
+	icon-card {
+		padding-right: 20px;
+		padding-bottom: 20px;
+	}
+}

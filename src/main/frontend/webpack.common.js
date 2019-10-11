@@ -234,6 +234,7 @@ module.exports = {
 			'./src/common/components/loadingIndicatorComponent.js',
 			'./src/common/components/zeroStateDisplayComponent.js',
 			'./src/common/components/accordionList/accordionListComponent.js',
+			'./src/common/components/iconCard/iconCardComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
@@ -292,6 +293,7 @@ module.exports = {
 			'./src/admin/integration/fax/faxConfigurationController.js',
 			'./src/admin/integration/fax/faxConfigurationEditController.js',
 			'./src/admin/integration/fax/faxSendReceiveController.js',
+			'./src/admin/integration/landingPage/landingPageComponent.js',
 			'./src/admin/integration/know2act/module.js',
 			'./src/admin/integration/know2act/Know2actConfigController.js',
 			'./src/admin/integration/know2act/Know2actNotificationController.js',

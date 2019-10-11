@@ -151,6 +151,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			templateUrl: 'src/admin/integration/fax/faxSendReceive.jsp',
 			controller: 'Admin.Integration.Fax.FaxSendReceiveController as faxSendReceiveController'
 		})
+		.state('admin.landingPage',
+		{
+			url: '/landingPage',
+			component: 'landingPage'
+		})
 		.state('ticklers',
 		{
 			url: '/ticklers',

@@ -89,7 +89,15 @@ angular.module("Common.Services").service("personaService", [
 				}).then(
 				function success(results)
 				{
-					deferred.resolve(results.data);
+					if (results.data.status === "SUCCESS")
+					{
+						deferred.resolve(results.data.body);
+					}
+					else
+					{
+						console.error("personaService::getAdminNav error", results.data.error);
+						deferred.reject("An error occured while getting admin nav from persona");
+					}
 				},
 				function error(errors)
 				{

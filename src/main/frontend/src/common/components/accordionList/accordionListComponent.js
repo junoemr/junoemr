@@ -50,12 +50,16 @@ angular.module('Common.Components').component('accordionList', {
 				collapseEl.on('hidden.bs.collapse', function ()
 				{
 					targetItem.expanded = false;
+					// clear jquery set styling
+					collapseEl.attr('style', '');
 					$scope.$apply();
 				});
 
 				collapseEl.on('shown.bs.collapse', function ()
 				{
 					targetItem.expanded = true;
+					// clear jquery set styling
+					collapseEl.attr('style', '');
 					$scope.$apply();
 				});
 			}

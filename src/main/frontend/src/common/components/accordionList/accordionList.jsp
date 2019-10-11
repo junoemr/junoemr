@@ -24,13 +24,13 @@
 	<nav>
 		<ul>
 			<li class="accordion-group" ng-repeat="group in $ctrl.itemList">
-				<h4 class="accordion-group-header">
+				<h5 class="accordion-group-header">
 					<a href="javascript:" ng-class="group.expanded ? 'expanded-group' : ''" ng-click="$ctrl.onGroupClick(group)" data-toggle="collapse" data-target="{{ '#accordion-collapse-target-' + $ctrl.getGroupCollapseId(group)}}">
 						<div>{{ group.name }}</div>
 						<i class="icon icon-chevron-right" ng-if="!group.expanded"></i>
 						<i class="icon icon-chevron-down" ng-if="group.expanded"></i>
 					</a>
-				</h4>
+				</h5>
 				<nav class="group-items-list" ng-class="group.expanded ? 'in' : 'collapse'" id="{{ 'accordion-collapse-target-' + $ctrl.getGroupCollapseId(group)}}">
 					<ul>
 						<li class="accordion-item" ng-repeat="item in group.items">

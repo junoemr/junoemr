@@ -47,6 +47,7 @@ import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.ProgramProviderConverter;
 import org.oscarehr.ws.rest.conversion.SecobjprivilegeConverter;
 import org.oscarehr.ws.rest.conversion.SecuserroleConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.DashboardPreferences;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
@@ -274,7 +275,7 @@ public class PersonaService extends AbstractServiceImpl {
 		menu.addWithState(idCounter++,bundle.getString("navbar.menu.tickler"),null,"ticklers")
 			//.add(0,"K2A",null,"#/k2a")
 			.addWithState(idCounter++,bundle.getString("navbar.menu.billing"),null,"billing")
-			.addWithState(idCounter++,bundle.getString("navbar.menu.admin"),null,"admin")
+			.addWithState(idCounter++,bundle.getString("navbar.menu.admin"),null,"admin.landingPage")
 			.addWithState(idCounter++,bundle.getString("navbar.menu.reports"),null,"reports")
 			.addWithState(idCounter++,bundle.getString("navbar.menu.documents"),null,"documents");
 
@@ -522,9 +523,9 @@ public class PersonaService extends AbstractServiceImpl {
 	@GET
 	@Path("/adminNav")
 	@Produces("application/json")
-	public List<AdminNavGroupTo1> getAdminNavItems()
+	public RestResponse<List<AdminNavGroupTo1>> getAdminNavItems()
 	{
-		return adminNavService.getAdminNavGroups(getHttpServletRequest().getContextPath(), getOscarResourcesBundle(), getCurrentProvider().getProviderNo(), getHttpServletRequest().getSession());
+		return RestResponse.successResponse(adminNavService.getAdminNavGroups(getHttpServletRequest().getContextPath(), getOscarResourcesBundle(), getCurrentProvider().getProviderNo(), getHttpServletRequest().getSession()));
 	}
 
 }
