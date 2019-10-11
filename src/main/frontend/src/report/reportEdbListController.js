@@ -13,8 +13,8 @@ angular.module('Report').controller('Report.ReportEdbListController', [
 		var controller = this;
 
 		controller.params = {
-			startDate: new Date(),
-			endDate: new Date(),
+			startDate: Juno.Common.Util.formatMomentDate(moment()),
+			endDate: Juno.Common.Util.formatMomentDate(moment()),
 			version: '',
 			region: 'ON'
 		}; //todo: grab region from somewhere

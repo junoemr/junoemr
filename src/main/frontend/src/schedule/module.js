@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('Schedule', ['Common', 'Common.Services', 'PatientList']);
+angular.module('Schedule', ['Common', 'Common.Services', 'Common.Components', 'Patient']);

@@ -53,6 +53,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String RX_DEFAULT_QUANTITY = "rx_default_quantity";
     public static final String RX_PROFILE_VIEW = "rx_profile_view";
     public static final String RX_USE_RX3 = "rx_use_rx3";
+    public static final String RX_PROMO_TEXT = "rx_promo_text";
     public static final String USE_MYMEDS = "use_mymeds";
     public static final String DMFLOW_SHEET_VIEW = "DMFlowsheet_view";
     public static final String DOC_DEFAULT_QUEUE="doc_default_queue";
@@ -116,6 +117,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String UPLOAD_INCOMING_DOCUMENT_FOLDER="upload_incoming_document_folder";
     public static final String HIDE_OLD_ECHART_LINK_IN_APPT="hide_old_echart_link_in_appointment";
     public static final String DISABLE_BORN_PROMPTS = "disable_born_prompts";
+    public static final String INTAKE_FORM_ENABLED = "intake_form_enabled";
 
     
     public static final String DEFAULT_PRINTER_PDF_LABEL="default_printer_pdf_label";

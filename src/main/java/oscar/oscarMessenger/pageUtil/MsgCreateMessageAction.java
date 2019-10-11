@@ -58,20 +58,15 @@ public class MsgCreateMessageAction extends Action {
     	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_msg", "w", null)) {
 			throw new SecurityException("missing required security object (_msg)");
 		}
-    	
+
             // Extract attributes we will need
-            oscar.oscarMessenger.pageUtil.MsgSessionBean bean;
-            bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)request.getSession().getAttribute("msgSessionBean");
-            String userNo   = bean.getProviderNo();
-            String userName = bean.getUserName();
-            String att      = bean.getAttachment();
-            String pdfAtt      = bean.getPDFAttachment();
-            bean.nullAttachment();
+            org.oscarehr.common.model.Provider provider = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProvider();
+            String userNo   = provider.getProviderNo();
+            String userName = provider.getDisplayName();
             String message      = ((MsgCreateMessageForm)form).getMessage();
             String[] providers  = ((MsgCreateMessageForm)form).getProvider();
             String subject      = ((MsgCreateMessageForm)form).getSubject();
-	    bean.setMessage(null);
-            bean.setSubject(null);
+            String pdfAttachments  = ((MsgCreateMessageForm)form).getAttachmentXml(request);
             
             MiscUtils.getLogger().debug("Providers: " + Arrays.toString(providers));
             MiscUtils.getLogger().debug("Subject: " + subject);
@@ -107,9 +102,9 @@ public class MsgCreateMessageAction extends Action {
                 sentToWho = sentToWho+" "+messageData.getRemoteNames(remoteProviderListing);
             }
 
-            messageId = messageData.sendMessage2(message,subject,userName,sentToWho,userNo,providerListing,att, pdfAtt, OscarMsgType.GENERAL_TYPE);
+            messageId = messageData.sendMessage2(message,subject,userName,sentToWho,userNo,providerListing,null, pdfAttachments, OscarMsgType.GENERAL_TYPE);
 
-            //link msg and demogrpahic if both messageId and demographic_no are not null
+            //link msg and demographic if both messageId and demographic_no are not null
             if (demographic_no != null && (demographic_no.equals("") || demographic_no.equals("null")) ){
                demographic_no = null;
             }
@@ -123,5 +118,4 @@ public class MsgCreateMessageAction extends Action {
 
     return (mapping.findForward("success"));
     }
-
 }

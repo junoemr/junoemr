@@ -44,6 +44,7 @@ public class FormTo1 implements Serializable {
 	private String subject;
 	private String status;
 	private Date date;
+	private Date createDate;
     private Boolean showLatestFormOnly;
 
 	public Integer getId() {
@@ -118,7 +119,17 @@ public class FormTo1 implements Serializable {
 	    this.showLatestFormOnly = showLatestFormOnly;
     }
 
-	public static FormTo1 create( Integer id,int demographicNo,int formId,String type,String name,String subject,String status,Date date,Boolean showLatestFormOnly){
+	public Date getCreateDate()
+	{
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate)
+	{
+		this.createDate = createDate;
+	}
+
+	public static FormTo1 create(Integer id, int demographicNo, int formId, String type, String name, String subject, String status, Date date, Date createDate, Boolean showLatestFormOnly){
 		FormTo1 formTo1 = new FormTo1();
 		formTo1.id = id;
 		formTo1.demographicNo = demographicNo;
@@ -129,6 +140,7 @@ public class FormTo1 implements Serializable {
 		formTo1.status = status;
 		formTo1.date = date;
 		formTo1.showLatestFormOnly = showLatestFormOnly;
+		formTo1.createDate = createDate;
 		return formTo1;
 	}
 	

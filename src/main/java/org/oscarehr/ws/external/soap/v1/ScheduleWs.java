@@ -27,6 +27,9 @@ package org.oscarehr.ws.external.soap.v1;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Appointment;
@@ -50,17 +53,18 @@ import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleTemplateCodeTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BlackoutRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.CutoffRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.MultipleBookingsRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import javax.jws.WebService;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -142,6 +146,7 @@ public class ScheduleWs extends AbstractWs {
 																		  String demographicNo,
 																		  String jsonRules)
 	{
+		MiscUtils.getLogger().info("Start Get Provider Schedule Service: " + LocalDateTime.now().toString());
 		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
 		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = new ArrayList<>();
 
@@ -155,12 +160,29 @@ public class ScheduleWs extends AbstractWs {
 				String templateCode = (String) templateDurationJson.get("schedule_template_id");
 				Long duration = (Long) templateDurationJson.get("appointment_duration");
 
-				ScheduleCodeDurationTransfer scheduleDurationTransfer = new ScheduleCodeDurationTransfer(templateCode, duration.intValue());
+				ScheduleCodeDurationTransfer scheduleDurationTransfer =
+						new ScheduleCodeDurationTransfer(templateCode, duration.intValue());
 				scheduleDurationTransfers.add(scheduleDurationTransfer);
 			}
 
-			List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(Integer.valueOf(demographicNo), jsonRules);
-			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, startDate, endDate, scheduleDurationTransfers, demographicNo, bookingRules);
+			List<MultipleBookingsRule> multipleBookingsRules =
+					BookingRuleFactory.buildMultipleBookingsRuleList(jsonRules);
+
+			BlackoutRule blackoutRule = BookingRuleFactory.buildBlackoutRule(jsonRules);
+			CutoffRule cutoffRule = BookingRuleFactory.buildCutoffRule(jsonRules);
+
+			ProviderScheduleTransfer providerScheduleTransfer =
+					scheduleTemplateDao.getValidProviderScheduleSlots(
+							providerNo,
+							startDate,
+							endDate,
+							scheduleDurationTransfers,
+							demographicNo,
+							multipleBookingsRules,
+							blackoutRule,
+							cutoffRule
+					);
+
 			scheduleTransfer = providerScheduleTransfer.toTransfer();
 		}
 		catch(ParseException e)
@@ -168,10 +190,12 @@ public class ScheduleWs extends AbstractWs {
 			MiscUtils.getLogger().error("Exception: " + e);
 		}
 
+		MiscUtils.getLogger().info("End Get Provider Schedule Service: " + LocalDateTime.now().toString());
 		return scheduleTransfer;
 	}
 
-	public ValidatedAppointmentBookingTransfer addAppointmentValidated(AppointmentTransfer appointmentTransfer, String jsonRules) throws ParseException
+	public ValidatedAppointmentBookingTransfer addAppointmentValidated(
+			AppointmentTransfer appointmentTransfer, String jsonRules) throws ParseException
 	{
 		Appointment appointment = new Appointment();
 
@@ -198,7 +222,8 @@ public class ScheduleWs extends AbstractWs {
 		}
 
 		AppointmentTransfer apptTransfer = AppointmentTransfer.toTransfer(appointment, false);
-		ValidatedAppointmentBookingTransfer response = new ValidatedAppointmentBookingTransfer(apptTransfer, violatedRules);
+		ValidatedAppointmentBookingTransfer response =
+				new ValidatedAppointmentBookingTransfer(apptTransfer, violatedRules);
 		return response;
 	}
 
@@ -250,6 +275,14 @@ public class ScheduleWs extends AbstractWs {
 
 		appointmentTransfer.copyTo(appointment);
 		scheduleManager.updateAppointment(getLoggedInInfo(),appointment);
+	}
+
+	public void cancelAppointment(Integer appointmentId)
+	{
+		Appointment appointment = scheduleManager.getAppointment(getLoggedInInfo(), appointmentId);
+
+		appointment.setStatus(Appointment.CANCELLED);
+		scheduleManager.updateAppointment(getLoggedInInfo(), appointment);
 	}
 
 	/**

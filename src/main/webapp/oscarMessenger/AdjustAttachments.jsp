@@ -45,20 +45,7 @@ if(!authed) {
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
-<logic:notPresent name="msgSessionBean" scope="session">
-	<logic:redirect href="index.jsp" />
-</logic:notPresent>
-<logic:present name="msgSessionBean" scope="session">
-	<bean:define id="bean"
-		type="oscar.oscarMessenger.pageUtil.MsgSessionBean"
-		name="msgSessionBean" scope="session" />
-	<logic:equal name="bean" property="valid" value="false">
-		<logic:redirect href="index.jsp" />
-	</logic:equal>
-</logic:present>
-
 <%
-oscar.oscarMessenger.pageUtil.MsgSessionBean bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)pageContext.findAttribute("bean");
     String checks = "";
     java.util.Enumeration names = request.getParameterNames();
 
@@ -79,15 +66,7 @@ oscar.oscarMessenger.pageUtil.MsgSessionBean bean = (oscar.oscarMessenger.pageUt
 
     String sXML = MsgCommxml.toXML(new MsgSendDocument().parseChecks(xmlDoc, checks));
 
-
-     if (bean != null){
-        bean.setAttachment(sXML);
-        bean.setMessageId(idEnc);
-        request.setAttribute("XMLattachment",MsgCommxml.encode64(sXML));
-        request.setAttribute("IDenc",idEnc);
-
-     }
-     response.sendRedirect("Transfer/DemographicSearch.jsp");
+    response.sendRedirect("Transfer/DemographicSearch.jsp");
 %>
 <%//sXML
 %>

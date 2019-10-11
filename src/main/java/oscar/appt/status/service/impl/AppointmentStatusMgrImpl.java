@@ -87,9 +87,10 @@ public class AppointmentStatusMgrImpl implements AppointmentStatusMgr {
         appointStatusDao.changeStatus(ID, iActive);
     }
 
-    public void modifyStatus(int ID, String strDesc, String strColor){
-        appointStatusDao.modifyStatus(ID, strDesc, strColor);
-    }
+	public void modifyStatus(int ID, String strDesc, String strColor, String strJunoColor)
+	{
+		appointStatusDao.modifyStatus(ID, strDesc, strColor, strJunoColor);
+	}
 
 	public List<String> checkStatusUsuage(List<AppointmentStatus> allStatus)
 	{
@@ -97,19 +98,19 @@ public class AppointmentStatusMgrImpl implements AppointmentStatusMgr {
 	}
 
 	public void reset(){
-        appointStatusDao.modifyStatus(1, "To Do", "#FDFEC7");
-        appointStatusDao.modifyStatus(2, "Daysheet Printed", "#FDFEC7");
-        appointStatusDao.modifyStatus(3, "Here", "#00ee00");
-        appointStatusDao.modifyStatus(4, "Picked", "#FFBBFF");
-        appointStatusDao.modifyStatus(5, "Empty Room", "#FFFF33");
-        appointStatusDao.modifyStatus(6, "Costumized 1", "#897DF8");
-        appointStatusDao.modifyStatus(7, "Costumized 2", "#897DF8");
-        appointStatusDao.modifyStatus(8, "Costumized 3", "#897DF8");
-        appointStatusDao.modifyStatus(9, "Costumized 4", "#897DF8");
-        appointStatusDao.modifyStatus(10, "Costumized 5", "#897DF8");
-        appointStatusDao.modifyStatus(11, "Costumized 6", "#897DF8");
-        appointStatusDao.modifyStatus(12, "No Show", "#cccccc");
-        appointStatusDao.modifyStatus(13, "Cancelled", "#999999");
-        appointStatusDao.modifyStatus(14, "Billed", "#3ea4e1");
+        appointStatusDao.modifyStatus(1, "To Do", "#FDFEC7", "#8ac5e6");
+        appointStatusDao.modifyStatus(2, "Daysheet Printed", "#FDFEC7", "#8ac5e6");
+        appointStatusDao.modifyStatus(3, "Here", "#00ee00", "#95e6a3");
+        appointStatusDao.modifyStatus(4, "Picked", "#FFBBFF", "#e6a1b8");
+        appointStatusDao.modifyStatus(5, "Empty Room", "#FFFF33", "#f2e291");
+        appointStatusDao.modifyStatus(6, "Costumized 1", "#897DF8", "#ac9df2");
+        appointStatusDao.modifyStatus(7, "Costumized 2", "#897DF8", "#ac9df2");
+        appointStatusDao.modifyStatus(8, "Costumized 3", "#897DF8", "#ac9df2");
+        appointStatusDao.modifyStatus(9, "Costumized 4", "#897DF8", "#ac9df2");
+        appointStatusDao.modifyStatus(10, "Costumized 5", "#897DF8", "#ac9df2");
+        appointStatusDao.modifyStatus(11, "Costumized 6", "#897DF8", "#ac9df2");
+        appointStatusDao.modifyStatus(12, "No Show", "#cccccc", "#b5bac9");
+        appointStatusDao.modifyStatus(13, "Cancelled", "#999999", "#b5bac9");
+        appointStatusDao.modifyStatus(14, "Billed", "#3ea4e1", "#8a99e6");
     }
 }

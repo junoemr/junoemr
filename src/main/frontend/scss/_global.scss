@@ -7,6 +7,13 @@ h1,h2,h3 {
 	font-weight: bold;
 }
 
+a {
+	color: $color-neutral-darker;
+	&:hover {
+		color: $color-primary-base;
+	}
+}
+
 
 .hand-hover {
 	cursor: pointer;
@@ -39,6 +46,10 @@ h1,h2,h3 {
 .flex-row {
 	display: flex;
 	flex-direction: row;
+}
+.flex-row-reverse {
+	display: flex;
+	flex-direction: row-reverse;
 }
 .flex-column {
 	display: flex;
@@ -134,6 +145,10 @@ a,.clickable {
 	color: $color-neutral-white;
 	background-color: $color-primary-base;
 	padding-left: $page-header-height;
+
+	h1,h2,h3,h4,h5,h6 {
+		margin: 0;
+	}
 }
 
 %juno-content-control {

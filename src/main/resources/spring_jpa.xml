@@ -11,7 +11,7 @@
 	 -->
 	<bean id="dataSource" class="org.oscarehr.util.TrackingBasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${db_driver}" />
-		<property name="url" value="${db_uri}${db_name}" />
+		<property name="url" value="${db_uri}${db_name}${db_params}" />
 		<property name="defaultAutoCommit" value="true" />
 
 		<property name="username" value="${db_username}" />
@@ -36,7 +36,7 @@
 	</bean>
 	<bean id="readOnlyDataSource" class="org.oscarehr.util.TrackingBasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${db_driver}" />
-		<property name="url" value="${db_uri_readonly}${db_name_readonly}" />
+		<property name="url" value="${db_uri_readonly}${db_name_readonly}${db_params_readonly}" />
 		<property name="defaultAutoCommit" value="true" />
 
 		<property name="username" value="${db_username_readonly}" />

@@ -32,7 +32,10 @@ import oscar.OscarProperties;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
@@ -228,6 +231,27 @@ public class GenericFile
 	}
 
 	/**
+	 * write the entirety of this file to the given outputStream
+	 * @param outS - the output stream to write to
+	 * @throws FileNotFoundException - if this file does not exists
+	 * @throws IOException - if there is an error reading from the file input / writing to the output stream
+	 */
+	public void writeToOutputStream(OutputStream outS) throws FileNotFoundException, IOException
+	{
+		InputStream inS = null;
+		try {
+			inS = asFileInputStream();
+			int data;
+			while ((data = inS.read()) != -1) {
+				outS.write(data);
+			}
+		} finally {
+			if (inS!=null) inS.close();
+			outS.flush();
+		}
+	}
+
+	/**
 	 * get the base file object for backwards compatibility
 	 * @return java.io File
 	 */
@@ -238,6 +262,10 @@ public class GenericFile
 	public FileInputStream asFileInputStream() throws FileNotFoundException
 	{
 		return new FileInputStream(this.javaFile);
+	}
+	public FileOutputStream asFileOutputStream() throws FileNotFoundException
+	{
+		return new FileOutputStream(this.javaFile);
 	}
 
 	public String getContentType() throws IOException

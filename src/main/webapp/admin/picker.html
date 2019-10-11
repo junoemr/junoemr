@@ -12,13 +12,28 @@ Note: Script consists of two files: picker.js and picker.html
 <head>
 <title>Tigra Color Picker</title>
 <style>
-.bd {
-	border: 1px inset InactiveBorder;
-}
+	.bd {
+		border: 1px inset InactiveBorder;
+	}
+	.s {
+		width: 181px;
+	}
 
-.s {
-	width: 181
-}
+	table {
+		width: 181px;
+	}
+	table td {
+		/*align:center;*/
+		position: relative;
+		height: 18px;
+	}
+	table td a {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top:0;
+		left: 0;
+	}
 </style>
 </head>
 <body leftmargin="5" topmargin="5" marginheight="5" marginwidth="5"
@@ -28,6 +43,7 @@ Note: Script consists of two files: picker.js and picker.html
 	<tr>
 		<td align="center"><select name="type"
 			onchange="P.C(this.selectedIndex)" class="s">
+			<option>Juno Palette</option>
 			<option>Web Safe Palette</option>
 			<option>Windows System Palette</option>
 			<option>Grey Scale Palette</option>

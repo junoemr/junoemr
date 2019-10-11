@@ -38,7 +38,7 @@ public class MenuItemTo1 implements Serializable {
     private String label;
     private String extra;
     private String url;
-    private String state;
+    private List<String> state;
     private boolean openNewWindow = false;
     private List<MenuItemTo1> dropdownItems;
     private Boolean dropdown = false;
@@ -52,14 +52,14 @@ public class MenuItemTo1 implements Serializable {
     	this.url = url;
     }
     
-    public MenuItemTo1(Integer id, String label, String state, String extra){
+    public MenuItemTo1(Integer id, String label, List<String> state, String extra){
     	this.id = id;
     	this.label = label;
     	this.state = state;
     	this.extra = extra;
     }
 
-	public MenuItemTo1(Integer id, Integer demoId, String label, String state, String extra){
+	public MenuItemTo1(Integer id, Integer demoId, String label, List<String> state, String extra){
 		this.id = id;
 		this.demoId = demoId;
 		this.label = label;
@@ -102,10 +102,10 @@ public class MenuItemTo1 implements Serializable {
 		this.url = url;
 	}
     
-    public String getState() {
+    public List<String> getState() {
 		return state;
 	}
-	public void setState(String state) {
+	public void setState(List<String> state) {
 		this.state = state;
 	}
 
@@ -119,7 +119,7 @@ public class MenuItemTo1 implements Serializable {
 		this.openNewWindow = openNewWindow;
 	}
 
-	public static MenuItemTo1 generateStateMenuItem(Integer id,String label, String state){
+	public static MenuItemTo1 generateStateMenuItem(Integer id,String label, List<String> state){
     	MenuItemTo1 ret = new MenuItemTo1();
     	ret.id = id;
     	ret.label = label;

@@ -10,7 +10,6 @@
 
 .schedule-page-header {
 	@extend %juno-page-header;
-	//@include juno-font-label;
 
 	select {
 		@include juno-select(16px);
@@ -31,7 +30,7 @@
 					@include juno-button-colour-scheme($color-neutral-white, $color-primary-dark, $color-primary-dark);
 				}
 				&.btn-primary {
-					@include juno-button-colour-scheme($color-neutral-white, $color-neutral-darkest, $color-neutral-darkest);
+					@include juno-button-colour-scheme($color-neutral-white, $color-neutral-darker, $color-neutral-darker);
 				}
 				&.btn-icon {
 					width: $input-height;
@@ -48,7 +47,7 @@
 				height: calc(#{$input-height} * 0.75);
 			}
 			.form-control {
-				@include juno-form-colour-scheme-dark;
+				@include juno-form-colour-scheme-blue;
 			}
 			label {
 				margin-right: 5px;
@@ -152,6 +151,7 @@
 					}
 					.fc-content {
 						width: 100%;
+						height: 100%;
 
 						.schedule-event {
 							display: flex;
@@ -163,58 +163,80 @@
 
 							$button-size: 16px;
 
-							.btn-event-link {
-								background: transparent;
-								border: 0;
-								width: $button-size;
-								min-width: $button-size;
-								height: $button-size;
-								color: $color-neutral-darkest;
-								padding: 0;
-								&:hover {
-									background-color: rgba(255, 255, 255, 0.2);
-									border-radius: 50%;
-								}
-							}
-							.event-blk {
-								display: flex;
-								align-items: start;
-								justify-content: flex-start;
-							}
-							.event-blk-label {
-								flex-grow: 1;
-								font-weight: bold;
-							}
-							.btn-icon {
-								width: $button-size;
-								height: $button-size;
-								.icon {
-									font-size: $button-size;
-									//width: $button-size;
-									//height: $button-size;
-								}
-								&:hover {
-									background-color: rgba(255, 255, 255, 0.2);
-									border-radius: 50%;
-								}
-							}
-							.event-status {
-								margin-left: 8px;
-							}
-							.event-tags {
+							.event-block {
 								display: inline-block;
-								text-align: center;
-								margin: 0 4px;
-							}
-							.event-label, .event-details {
-								margin-left: 3px;
-							}
-							.self-book-indicator.visible {
-								width: 12px;
-								height: 12px;
-								background-color: $color-neutral-white;
-								border-radius: 50%;
-								margin: 2px;
+								vertical-align: top;
+								overflow: hidden;
+								margin-right: 4px;
+
+								&.show-self-booked {
+									margin-right: 16px;
+								}
+								.inline-flex {
+									display: inline-flex;
+									align-items: baseline;
+									flex-wrap: wrap;
+								}
+
+								.self-book-indicator.visible {
+									position: absolute;
+									top: 0;
+									right: 0;
+
+									width: 12px;
+									height: 12px;
+									background-color: $color-neutral-white;
+									border-radius: 50%;
+									margin: 2px;
+								}
+
+								.event-item {
+									display: inline-block;
+								}
+								.event-blk-label {
+									height: $button-size;
+									&.event-form-link {
+										margin-left: 2px;
+									}
+									.bold {
+										font-weight: bold;
+									}
+									.event-label {
+										margin-left: 3px;
+										height: $button-size;
+										display: inline-block;
+									}
+								}
+								.btn-event-link {
+									background: transparent;
+									border: 0;
+									width: $button-size;
+									min-width: $button-size;
+									height: $button-size;
+									color: $color-neutral-darkest;
+									padding: 0;
+									&:hover {
+										background-color: rgba(255, 255, 255, 0.2);
+										border-radius: 50%;
+									}
+								}
+								.event-status {
+									margin-left: 8px;
+									align-self: center;
+								}
+
+								.btn-icon {
+									width: $button-size;
+									height: $button-size;
+
+									.icon {
+										font-size: $button-size;
+									}
+									&:hover {
+										background-color: rgba(255, 255, 255, 0.2);
+										border-radius: 50%;
+									}
+								}
 							}
 						}
 					}
@@ -241,6 +263,16 @@
 
 						&.hour-marker {
 							border-top: 1px solid $color-neutral-light-grey;
+						}
+						&.code-visible:after {
+							position: absolute;
+							top: 0;
+							left: 0;
+							width: $scheduleCodeWidth;
+							height: 100%;
+							content: " ";
+							background-color: $color-neutral-black;
+							opacity: 0.1;
 						}
 					}
 					.background-event-body {
@@ -337,110 +369,49 @@
 }
 
 /* schedule specific modal styling */
-.schedule-modal {
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
+#schedule-modal {
 
-	.modal-header {
-		display: flex;
-		align-items: center;
-		flex-direction: row;
-		justify-content: space-between;
-		border-bottom: 0;
-
-		.modal-title {
-			display: flex;
-			flex-grow: 1;
-			flex-direction: row;
-			align-items: center;
-			.align-baseline {
-				display: flex;
-				flex-grow: 1;
-				flex-direction: row;
-				align-items: baseline;
-				h4 {
-					padding: 0 16px;
-				}
-			}
-		}
-		.modal-ctl-buttons {
-			padding: 6px;
-			align-items: center;
-			justify-content: space-between;
-			display: flex;
-
-			.modal-patient-links {
-				margin-right: 20px;
-				.btn {
-					width: 28px;
-				}
-			}
-		}
-		.icon-modal-ctl {
-			font-size: 24px;
-			color: $color-primary-base;
-		}
-		.icon-modal-add-appt {
-			font-size: 40px;
-			color: $color-neutral-white;
-		}
-	}
-
-	.modal-body {
-
+	modal-body {
 		$tabs-height: $page-tabs-height;
-		$alert-container-height: 40px;
 		@include juno-tab-lg($tabs-height);
-		@include juno-tab-color-scheme-light;
+		@include juno-tab-color-scheme-white(2px);
 		@include juno-font-tab;
 
 		.form-group {
-			display: flex;
 			align-items: center;
-
-			&.label-top {
-				align-items: flex-start;
-				& > label {
-					margin-top: 8px;
-				}
-			}
-		}
-		.alert-container {
-			height: $alert-container-height;
 		}
 		.alert-message {
 			color: $color-red-base;
 			@include juno-font-label;
 		}
 		.info-frame-container {
-			height: 160px;
-			.demographic-info-frame {
-				height: 144px;
-				margin-bottom: 12px;
-				background-color: $color-neutral-lightest;
-				border: solid 1px $color-neutral-lighter;
-				border-radius: 8px;
-				padding: 14px;
-
-				.form-group {
-					margin: 0;
-
-					label {
-						font-size: 9px;
-						color: $color-neutral-dark;
-					}
-					span {
-						@include juno-font-label;
-						color: $color-neutral-darker;
-					}
-				}
+			height: 180px;
+		}
+		.lower-content {
+			margin-top: 32px; // lower a label-less column to align with other column content
+		}
+		.padding-left-0 {
+			padding-left: 0;
+		}
+		.control-label {
+			margin-top: 8px;
+		}
+		.modal-patient-links {
+			.btn {
+				width: 26px;
+				height: $form-input-height;
+				padding: 0;
+			}
+		}
+		.directive-appt-status-select-wrapper {
+			margin-top: 16px;
+			select {
+				height: 24px;
 			}
 		}
 		.tab-pane {
-			padding: 0 $modal-border-space $modal-border-space $modal-border-space;
 			overflow: auto;
-			height: calc(#{$modal-body-height} - #{$tabs-height} - #{$alert-container-height});
+			height: calc(#{$modal-body-height} - #{$tabs-height});
 
 			.tab-bar-inputs {
 				position: absolute;
@@ -448,8 +419,6 @@
 				top: 0;
 				height: $tabs-height;
 				width: 40%;
-				display: flex;
-				align-items: center;
 				.form-group {
 					margin-bottom: 0;
 				}
@@ -462,7 +431,59 @@
 
 			.directive-juno-typeahead {
 				@include juno-tab-lg(64px);
+				.icon {
+					color: $color-primary-base;
+				}
 			}
 		}
+	}
+	.form-control-static {
+		min-height: 10px;
+	}
+}
+
+#schedule-search-modal {
+
+	$search-pane-width: 272px;
+	@include juno-font-default-size(12px);
+
+	.modal-body {
+		background: linear-gradient(90deg, $color-neutral-lighter $search-pane-width, $color-neutral-white 0), no-repeat 100% 100%;
+
+		.pane-container {
+			height: 100%;
+			.pane-header {
+				color: $color-primary-base;
+				font-weight: normal;
+				margin-bottom: 10px;
+			}
+			.pane {
+				height: 100%;
+				padding: 16px;
+
+				&.search-pane {
+					width: $search-pane-width;
+					.divider {
+						height: 32px;
+					}
+				}
+				&.result-pane {
+					@include juno-table-default(6px);
+
+					.appt-code {
+						width: 16px;
+						border-left: 0;
+					}
+					.zero-state {
+						color: $color-neutral-darker;
+					}
+				}
+			}
+		}
+
+	}
+	.modal-footer {
+		text-align: left;
+		background: linear-gradient(90deg, $color-neutral-lighter $search-pane-width, $color-neutral-white 0), no-repeat 100% 100%;
 	}
 }

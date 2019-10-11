@@ -170,12 +170,23 @@
 				history.go(0);//
 			}
 
+			function disableSubmitButton()
+			{
+				document.getElementById("submitBTNID").disabled = true;
+			}
+
+			function submission()
+			{
+				disableSubmitButton();
+				return true;
+			}
+
 //-->
 		</script>
 	</head>
 	<body bgcolor="ivory" bgproperties="fixed" onLoad="setfocus()"
 	topmargin="0" leftmargin="0" rightmargin="0">
-	<form method="post" name="schedule" action="scheduledatefinal.jsp">
+	<form method="post" name="schedule" action="scheduledatefinal.jsp" onSubmit="submission()">
 
 <table border="0" width="100%">
 	<tr>
@@ -338,7 +349,9 @@
 				<input type="hidden" name="provider_no" value="<%=provider_no%>">
 				<input type="hidden" name="Submit" value=" Next "> <input
 					type="submit"
-					value='<bean:message key="schedule.schedulecreatedate.btnNext"/>'>
+					value='<bean:message key="schedule.schedulecreatedate.btnNext"/>'
+					id ="submitBTNID"
+					>
 				</div>
 				</td>
 			</tr>

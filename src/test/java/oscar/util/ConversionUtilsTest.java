@@ -26,6 +26,7 @@ package oscar.util;
 import junit.framework.Assert;
 import org.junit.Test;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -1145,5 +1146,13 @@ public class ConversionUtilsTest
 		String dateString = "21:45:00";
 		LocalTime expectedTime = LocalTime.of(21, 45, 0);
 		assertThat(expectedTime, is(ConversionUtils.toLocalTime(dateString, DateTimeFormatter.ISO_TIME)));
+	}
+
+	@Test
+	public void toTimestamp_ServerTimeZoneLocalDateTime_ExpectServerTimeZoneTimestamp()
+	{
+		LocalDateTime currTime = LocalDateTime.now();
+		Timestamp timestamp = ConversionUtils.toTimestamp(currTime);
+		Assert.assertEquals("expected timestamp to equal LocalDateTime",currTime, timestamp.toLocalDateTime());
 	}
 }

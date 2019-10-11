@@ -75,6 +75,7 @@ public class AppointmentStatusAction extends DispatchAction {
         lazyForm.set("apptStatus", appt.getStatus());
         lazyForm.set("apptDesc", appt.getDescription());
         lazyForm.set("apptOldColor", appt.getColor());
+        lazyForm.set("apptOldJunoColor", appt.getJunoColor());
 
         return mapping.findForward("edit");
     }
@@ -87,9 +88,14 @@ public class AppointmentStatusAction extends DispatchAction {
         int ID = Integer.parseInt(lazyForm.get("ID").toString());
         String strDesc = lazyForm.get("apptDesc").toString();
         String strColor = lazyForm.get("apptColor").toString();
-        if (null==strColor || strColor.equals(""))
+	    String strJunoColor = lazyForm.get("apptJunoColor").toString();
+
+	    if (null==strColor || strColor.equals(""))
             strColor = lazyForm.get("apptOldColor").toString();
-        apptStatusMgr.modifyStatus(ID, strDesc, strColor);
+	    if (null==strColor || strColor.equals(""))
+		    strJunoColor = lazyForm.get("apptOldJunoColor").toString();
+
+        apptStatusMgr.modifyStatus(ID, strDesc, strColor, strJunoColor);
         populateAllStatus(request);
         return mapping.findForward("success");
     }

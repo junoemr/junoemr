@@ -66,8 +66,12 @@ public class PATHL7Handler extends MessageHandler
 
     private static Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
 
-	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","CYTO", "DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF", "BCCASMP", "BCCACSP");
+	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","CYTO", "DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF", "BCCASMP", "BCCACSP", "CYTOGEN");
 	public static final String VIHARTF = "CELLPATHR";
+
+	// Embedded PDF strings that show up in OBX messages
+	public static final String embeddedPdfPrefix = "JVBERi0xLj";
+	public static final String pdfReplacement = "embedded_doc_id";
 
     /** Creates a new instance of CMLHandler */
     public PATHL7Handler(){
@@ -86,6 +90,7 @@ public class PATHL7Handler extends MessageHandler
         {
             addOBXIdentifierText("PDF");
         }
+
     }
 
     @Override
@@ -738,16 +743,41 @@ public class PATHL7Handler extends MessageHandler
         return (header.equals(VIHARTF));
     }
 
-    /*
+    /**
      * Only commonalities between embedded PDF uploads:
-     * - They have a value type of ED
-     * - The embedded PDF is contained in a single OBX message at the beginning of the lab
-     * Given that we can't re-check that PDF header once we've stripped it out, check instead
-     * to see if we actually mapped the entry to anything.
+     * - the identifier is "ED", a.k.a. Electronic Document
+     * - the PDF message itself is contained in an OBX and takes the form of ^Text^PDF^Base64^...
+     * @return true if any OBX in this message contains an embedded PDF
      */
-    public boolean hasEmbeddedPDF(int labNo)
+    public boolean hasEmbeddedPDF()
     {
-        return getOBXValueType(0, 0).equals("ED") && hl7DocumentLinkDao.labHasDocument(labNo);
+        // First, check legacy case where the OBX is just OBX|1|ED|PDF|...
+        if (getOBXValueType(0, 0).equals("ED") && getOBXIdentifier(0, 0).equals("PDF"))
+        {
+            return true;
+        }
+
+        for (int i = 0; i < getOBRCount(); i++)
+        {
+            for (int j = 0; j < getOBXCount(i); j++)
+            {
+                if (getOBXResult(i, j,4).startsWith(embeddedPdfPrefix))
+                {
+                    logger.error("LAB " + getAccessionNum() + " CONTAINS UNPROCESSED EMBEDDED PDF");
+                    return false;
+                }
+
+                if (getOBXValueType(i, j).equals("ED")
+                        && getOBXResult(i, j, 2).equals("TEXT")
+                        && getOBXResult(i, j, 3).equals("PDF")
+                        && getOBXResult(i, j, 4).equals("Base64")
+                        && getOBXResult(i, j, 5).startsWith(pdfReplacement))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public String getNteForPID(){

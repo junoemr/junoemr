@@ -25,6 +25,7 @@ package org.oscarehr.demographic.search;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.model.Demographic;
@@ -84,6 +85,7 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private List<STATUS_MODE> statusModes = new ArrayList<>();
 	private boolean negateStatus = false;
 	private boolean customWildcardsEnabled = false;
+	private boolean forceConjoinOnNames = false;
 
 	@Override
 	public Criteria setCriteriaProperties(Criteria criteria)
@@ -94,57 +96,77 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		criteria.createAlias(alias + ".mergedDemographicsList", "dm", Criteria.LEFT_JOIN);
 		criteria.add(Restrictions.or(Restrictions.isNull("dm.id"), Restrictions.ne("dm.deleted", 0)));
 
+		// determine criteria join mode ('AND' filter criteria vs 'OR' filter criteria)
+		Junction junction = getEmptyJunction();
+
 		// set the search filters
 		if(getDemographicNo() != null)
 		{
-			criteria.add(Restrictions.eq("demographicId", getDemographicNo()));
+			junction.add(Restrictions.eq("demographicId", getDemographicNo()));
 		}
-		if(getFirstName() != null)
+
+		/* sometimes (such as when using 'OR' for the junction type) you need to force the search to still and the names
+		* setting the forceConjoinOnNames will do this here */
+		if(forceConjoinOnNames && getFirstName() != null && getLastName() != null)
 		{
-			criteria.add(getRestrictionCriterion("firstName", getFirstName()));
+			Criterion conjunction = Restrictions.conjunction()
+					.add(getRestrictionCriterion("firstName", getFirstName()))
+					.add(getRestrictionCriterion("lastName", getLastName()));
+			junction.add(conjunction);
 		}
-		if(getLastName() != null)
+		else
 		{
-			criteria.add(getRestrictionCriterion("lastName", getLastName()));
+			if(getFirstName() != null)
+			{
+				junction.add(getRestrictionCriterion("firstName", getFirstName()));
+			}
+			if(getLastName() != null)
+			{
+				junction.add(getRestrictionCriterion("lastName", getLastName()));
+			}
 		}
+
 		if(getHin() != null)
 		{
-			criteria.add(getRestrictionCriterion("hin", getHin()));
+			junction.add(getRestrictionCriterion("hin", getHin()));
 		}
 
 		// birthdate searches are always exact due to how the values are stored
 		if(getDateOfBirth() != null)
 		{
-			criteria.add(Restrictions.eq("yearOfBirth", String.valueOf(getDateOfBirth().getYear())));
-			criteria.add(Restrictions.eq("monthOfBirth", StringUtils.leftPad(String.valueOf(getDateOfBirth().getMonthValue()), 2, "0")));
-			criteria.add(Restrictions.eq("dayOfBirth", StringUtils.leftPad(String.valueOf(getDateOfBirth().getDayOfMonth()), 2, "0")));
+			Criterion conjunction = Restrictions.conjunction()
+					.add(Restrictions.eq("yearOfBirth", String.valueOf(getDateOfBirth().getYear())))
+					.add(Restrictions.eq("monthOfBirth", StringUtils.leftPad(String.valueOf(getDateOfBirth().getMonthValue()), 2, "0")))
+					.add(Restrictions.eq("dayOfBirth", StringUtils.leftPad(String.valueOf(getDateOfBirth().getDayOfMonth()), 2, "0")));
+			junction.add(conjunction);
 		}
 
 		if(getAddress() != null)
 		{
-			criteria.add(getRestrictionCriterion("address", getAddress()));
+			junction.add(getRestrictionCriterion("address", getAddress()));
 		}
 		if(getPhone() != null)
 		{
-			criteria.add(Restrictions.or(getRestrictionCriterion("phone", getPhone()), getRestrictionCriterion("phone2", getPhone())));
+			junction.add(Restrictions.or(getRestrictionCriterion("phone", getPhone()), getRestrictionCriterion("phone2", getPhone())));
 		}
 		if(getChartNo() != null)
 		{
-			criteria.add(getRestrictionCriterion("chartNo", getChartNo()));
+			junction.add(getRestrictionCriterion("chartNo", getChartNo()));
 		}
 		if(getSex() != null)
 		{
-			criteria.add(getRestrictionCriterion("sex", getSex()));
+			junction.add(getRestrictionCriterion("sex", getSex()));
 		}
 		if(getProviderNo() != null)
 		{
-			criteria.add(getRestrictionCriterion("providerNo", getProviderNo()));
+			junction.add(getRestrictionCriterion("providerNo", getProviderNo()));
 		}
 		if(getEmail() != null)
 		{
-			criteria.add(getRestrictionCriterion("email", getEmail()));
+			junction.add(getRestrictionCriterion("email", getEmail()));
 		}
 
+		criteria.add(junction);
 
 		// set status filters and result ordering
 		setStatusCriteria(criteria);
@@ -504,5 +526,25 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	public void setMatchModeEnd()
 	{
 		setMatchMode(MatchMode.END);
+	}
+
+	/**
+	 * Set this to true when you always need the name filter to AND the first and last name values.
+	 * By default this will have no effect, but when the Junction type is set to disjunction (OR), this will be important
+	 * @return true if the flag is enabled, false otherwise
+	 */
+	public boolean isForceConjoinOnNames()
+	{
+		return forceConjoinOnNames;
+	}
+
+	/**
+	 * Set this to true when you always need the name filter to AND the first and last name values.
+	 * By default this will have no effect, but when the Junction type is set to disjunction (OR), this will be important
+	 * @param forceConjoinOnNames - default false
+	 */
+	public void setForceConjoinOnNames(boolean forceConjoinOnNames)
+	{
+		this.forceConjoinOnNames = forceConjoinOnNames;
 	}
 }

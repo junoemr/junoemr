@@ -30,8 +30,6 @@ import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.common.model.Appointment;
-import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.schedule.model.ScheduleSearchResult;
 import org.oscarehr.schedule.model.ScheduleTemplate;
@@ -39,8 +37,9 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BlackoutRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.CutoffRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.MultipleBookingsRule;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
@@ -54,8 +53,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -65,23 +62,10 @@ import static org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey.DODGY_FAKE_
 @SuppressWarnings("unchecked")
 public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 {
-	@Autowired
-	private ScheduleManager scheduleManager;
-
-	private static final int SCHEDULE_SLOT_DURATION = 5;
-
 	public ScheduleTemplateDao() {
 		super(ScheduleTemplate.class);
 	}
 	
-	public List<ScheduleTemplate> findBySummary(String summary) {
-		Query query = entityManager.createQuery("SELECT e FROM ScheduleTemplate e WHERE e.summary=? ");
-		query.setParameter(1, summary);
-
-        List<ScheduleTemplate> results = query.getResultList();
-		return results;
-	}
-
 	public List<Object[]> findSchedules(Date date_from, Date date_to, String provider_no) {
 	    String sql = "FROM ScheduleTemplate st, ScheduleDate sd " +
         		"WHERE st.id.name = sd.hour " +
@@ -134,7 +118,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
         List<ScheduleTemplate> results = query.getResultList();
 		return results;
 	}
-	
+
 	@NativeSql({"scheduletemplate", "scheduledate"})
 	public List<Object> findTimeCodeByProviderNo(String providerNo, Date date) {
 		String sql = "select timecode from scheduletemplate, (select hour from (select provider_no, hour, status from scheduledate where sdate = :date) as df where status = 'A' and provider_no= :providerNo) as hf where scheduletemplate.name=hf.hour and (scheduletemplate.provider_no= :providerNo or scheduletemplate.provider_no= :publicCode)";
@@ -144,7 +128,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
 		return query.getResultList();
 	}
-	
+
 	//TODO:modelClass causing error on master record
 	@NativeSql({"scheduletemplate", "scheduledate"})
 	public List<Object> findTimeCodeByProviderNo2(String providerNo, Date date) {
@@ -193,6 +177,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		}
 		return result;
 	}
+
 	private List<Object[]> getRawScheduleSlots(Integer providerNo, LocalDate date, Integer siteId)
 	{
 		String siteFilter = "";
@@ -253,6 +238,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 	{
 		return findScheduleSlots(date, providerNo, null);
 	}
+
 	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
 	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, Integer providerNo, Integer siteId)
 	{
@@ -302,242 +288,293 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 	}
 
 	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
-	public ProviderScheduleTransfer getValidProviderScheduleSlots(String providerNo, LocalDate startDate, LocalDate endDate, List<ScheduleCodeDurationTransfer> scheduleCodeDurationTransfer, String demographicNo, List<BookingRule> bookingRules)
+	public ProviderScheduleTransfer getValidProviderScheduleSlots(
+			String providerNo, LocalDate startDate, LocalDate endDate,
+			List<ScheduleCodeDurationTransfer> scheduleCodeDurationTransfer,
+			String demographicNo, List<MultipleBookingsRule> multipleBookingsRules,
+			BlackoutRule blackoutRule, CutoffRule cutoffRule)
 	{
-		List<String> appointmentTypeList = ScheduleCodeDurationTransfer.getAllTemplateCodes(scheduleCodeDurationTransfer);
+		List<String> appointmentTypeList = ScheduleCodeDurationTransfer.getAllTemplateCodes(
+				scheduleCodeDurationTransfer);
+		int appointmentDuration = scheduleCodeDurationTransfer.get(0).getDurationMinutes();
 
-		if (startDate.isBefore(LocalDate.now()))
+		LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.MIDNIGHT);
+		LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.MAX);
+
+		if (startDateTime.isBefore(LocalDateTime.now()))
 		{
-			startDate = LocalDate.now();
+			startDateTime = LocalDateTime.now();
 		}
 
-		String sql = "SELECT STRAIGHT_JOIN\n" +
-				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
-				"  sd.sdate AS appt_date,\n" +
-				"  SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode))) AS appt_time,\n" +
-				"  stc.code,\n" +
-				"  CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration\n" +
-				"FROM \n" +
-				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2) as n1    \n" +
-				"    CROSS JOIN \n" +
-				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n2     \n" +
-				"    CROSS JOIN \n" +
-				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n3 \n" +
-				"CROSS JOIN scheduledate sd\n" +
-				"JOIN scheduletemplate st ON (sd.hour = st.name AND (sd.provider_no = st.provider_no OR st.provider_no = :publicCode ))\n" +
-				"LEFT JOIN scheduletemplatecode stc " +
-				"  ON BINARY stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
-				"WHERE sd.status = 'A'\n" +
-				"AND stc.code IN (:appointmentTypes) \n" +
-				"AND sd.sdate BETWEEN :minDate AND :maxDate\n" +
-				"AND sd.provider_no = :providerNo\n" +
-				"AND (n3.i + (10 * n2.i) + (100 * n1.i)) < LENGTH(st.timecode)\n" +
-				"ORDER BY sd.sdate, (n3.i + (10 * n2.i) + (100 * n1.i));";
+		int multiBookingsRulesCount = 0;
+		HashMap<String, Long> multiBookingsRuleParams = new HashMap<>();
+		HashMap<String, Integer> multiBookingJoinTags = new HashMap<>();
+		String multiBookingsRulesSelectSql = "";
+		String multiBookingsRulesJoinSql = "";
+		String multiBookingsRulesWhereSql = "";
+		for (MultipleBookingsRule multipleBookingsRule : multipleBookingsRules)
+		{
+			String joinTag = "multi_bookings_appt_" + Integer.toString(multiBookingsRulesCount);
 
-		Query query = entityManager.createNativeQuery(sql);
-		query.setParameter("minDate", java.sql.Date.valueOf(startDate), TemporalType.DATE);
-		query.setParameter("maxDate", java.sql.Date.valueOf(endDate), TemporalType.DATE);
+			multiBookingsRulesSelectSql += ", \n" +
+					"  SUM(Case \n" +
+					"    WHEN " + joinTag + ".appointment_no IS NOT NULL THEN 1 \n" +
+					"    ELSE 0\n" +
+					"  END) AS count_" + joinTag + " ";
+
+			String durationTag = "multi_bookings_rule_" +
+					Integer.toString(multiBookingsRulesCount) + "_duration";
+			multiBookingsRuleParams.put(durationTag, multipleBookingsRule.getDurationOffsetDays());
+
+			multiBookingsRulesJoinSql += "" +
+					"  LEFT JOIN appointment AS " + joinTag + " ON\n" +
+					"    " + joinTag + ".demographic_no = :demographicNo \n" +
+					"    AND " + joinTag + ".status != 'C' \n" +
+					"    AND " + joinTag + ".appointment_date <= " +
+					"      (appointment_slots.slot_date + \n" +
+					"      INTERVAL :" + durationTag + " DAY) \n" +
+					"    AND " + joinTag + ".appointment_date >= " +
+					"      (appointment_slots.slot_date - \n" +
+					"      INTERVAL :" + durationTag + " DAY) \n";
+
+			String multiBookingMaxAllowedTag = joinTag + "_max_allowed";
+			multiBookingJoinTags.put(multiBookingMaxAllowedTag,
+					multipleBookingsRule.getBookingAmount());
+			multiBookingsRulesWhereSql += "" +
+				"  count_" + joinTag + " < :" + multiBookingMaxAllowedTag + " AND \n";
+
+			multiBookingsRulesCount++;
+		}
+
+		String getSlotsSql = "" +
+				"  SELECT * FROM ( \n" +
+				"  SELECT \n" +
+				"   appointment_slots.code_char,\n" +
+				"   appointment_slots.code,\n" +
+				"   appointment_slots.slot_date,\n" +
+				"   appointment_slots.start_datetime,\n" +
+				"   appointment_slots.start_time,\n" +
+				"   appointment_slots.start_time_offset,\n" +
+				"   appointment_slots.duration,\n" +
+				"   appointment_slots.start_datetime + INTERVAL " +
+				"     appointment_slots.start_time_offset MINUTE AS end_time,\n" +
+				"   GROUP_CONCAT(appt.appointment_no SEPARATOR ',') AS ids" +
+				multiBookingsRulesSelectSql +
+				"  \nFROM\n" +
+				"  (\n" +
+				"    SELECT\n" +
+				"      SUBSTRING(st.timecode, seq + 1, 1) AS code_char,\n" +
+				"      sd.sdate AS slot_date,\n" +
+				"      CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND( \n " +
+				"        (24 * 60 * 60) * seq / LENGTH(st.timecode)))) as start_datetime,\n" +
+				"      SEC_TO_TIME(ROUND((24*60*60)*seq/LENGTH(st.timecode))) as start_time,\n" +
+				"      ROUND((24*60) / LENGTH(st.timecode)) as start_time_offset,\n" +
+				"      stc.code,\n" +
+				"      :appointmentDuration AS duration\n" +
+				//"      CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration\n" +
+				"    FROM \n" +
+				"    (\n" +
+				"      SELECT * FROM scheduledate\n" +
+				"      WHERE sdate BETWEEN :startDate AND :endDateTime \n" +
+				"      AND provider_no = :providerNo\n" +
+				"      AND status = 'A'\n" +
+				"    ) as sd\n" +
+				"    CROSS JOIN (SELECT * from seq_1_to_299) as num\n" +
+				"    JOIN scheduletemplate st ON (st.name = sd.hour \n " +
+				"      AND st.provider_no IN (:providerNo, :publicCode))\n" +
+				"    LEFT JOIN scheduletemplatecode stc ON BINARY stc.code = \n " +
+				"      SUBSTRING(st.timecode, seq + 1, 1)\n" +
+				"    WHERE stc.code IN (:appointmentTypes)\n" +
+				"    AND CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND( \n " +
+				"      (24 * 60 * 60) * seq / LENGTH(st.timecode)))) \n " +
+				"      BETWEEN :startDate AND (:endDate + INTERVAL 1 DAY)\n" +
+				"    AND seq < LENGTH(st.timecode)\n" +
+				"  ) AS appointment_slots\n" +
+				"\n" +
+
+				// Join appointments onto slots to exclude any slots that are already taken
+				"  LEFT JOIN appointment appt ON\n" +
+				"    appt.appointment_date = appointment_slots.slot_date\n" +
+				"    AND appt.status != 'C' \n" +
+				"    AND appt.provider_no = :providerNo \n" +
+				"    AND appt.start_time < (appointment_slots.start_time + \n" +
+				"      INTERVAL start_time_offset MINUTE) \n" +
+				"    AND SEC_TO_TIME(FLOOR(TIME_TO_SEC(appt.end_time) / 60 ) * 60 + 60) > \n " +
+				"      appointment_slots.start_time\n" +
+
+				// Join appointments for the specified demographic in order to apply
+				// X bookings in X time rule
+				multiBookingsRulesJoinSql;
+
+		getSlotsSql += "" +
+				"\n" +
+				"  WHERE appt.appointment_no is null\n" +
+				"  AND appointment_slots.start_datetime >= :startDateTime \n" +
+				"  AND appointment_slots.start_datetime >= :blackoutTime \n" +
+				"  AND appointment_slots.start_datetime < :cutoffTime \n" +
+				"  GROUP BY 1,2,3,4,5,6,7,8\n" +
+				"  ORDER BY appointment_slots.start_datetime\n" +
+				"\n" +
+
+				" ) AS appointment_slots_multi_book_applied " +
+						"WHERE " + multiBookingsRulesWhereSql + " TRUE";
+
+		String addStartEndSlotSQL = "" +
+				"SELECT \n" +
+				"slots.code_char, \n" +
+				"slots.code, \n" +
+				"slots.slot_date, \n" +
+				"slots.start_datetime, \n" +
+				"slots.duration, \n" +
+				"slots.start_time, \n" +
+				"slots.end_time, \n" +
+				"start_slot_filter.start_datetime IS NULL AS is_start_slot, \n" +
+				"end_slot_filter.start_datetime IS NULL AS is_end_slot \n" +
+				"FROM \n" +
+				"(\n" +
+					getSlotsSql +
+				") AS slots \n" +
+
+				// self join to get first slot in a series of slots
+				"LEFT JOIN \n" +
+				"(\n" +
+					getSlotsSql +
+				") AS start_slot_filter " +
+				"  ON start_slot_filter.slot_date = slots.slot_date " +
+				"  AND start_slot_filter.start_time = slots.start_time - " +
+				"  INTERVAL slots.start_time_offset MINUTE\n" +
+				"\n" +
+
+				// self join to get last slot in a series of slots
+				"LEFT JOIN \n" +
+				"(\n" +
+					getSlotsSql +
+				") AS end_slot_filter " +
+				"  ON end_slot_filter.slot_date = slots.slot_date " +
+				"  AND end_slot_filter.start_time = slots.start_time + " +
+				"  INTERVAL slots.start_time_offset MINUTE\n" +
+				"GROUP BY 1,2,3,4,5,6,7,8,9 " +
+				"\n";
+
+		String addSlotFitsSQL = "" +
+				"SELECT \n" +
+				"possible_slots.code, \n" +
+				"possible_slots.start_datetime, \n" +
+				"possible_slots.duration, \n" +
+				"possible_slots.start_time, \n" +
+				"possible_slots.is_start_slot, \n" +
+				"possible_slots.is_end_slot, \n" +
+				"possible_slots.start_datetime + " +
+				"  INTERVAL possible_slots.duration MINUTE <= MIN(end_slots.end_time) AS slot_fits \n" +
+				"FROM \n" +
+				"(\n" +
+					addStartEndSlotSQL +
+				") AS possible_slots " +
+				"\n" +
+
+				// self join to get distance from nearest end slot in the future
+				"LEFT JOIN \n" +
+				"(\n" +
+					addStartEndSlotSQL +
+				") AS end_slots " +
+				"  ON end_slots.is_end_slot " +
+				"  AND end_slots.slot_date = possible_slots.slot_date " +
+				"  AND end_slots.start_time >= possible_slots.start_time " +
+				"GROUP BY 1,2,3,4,5,6 " +
+				"ORDER BY start_datetime ASC ";
+
+		String availableSlots = "" +
+				"SELECT * FROM \n" +
+				"(\n" +
+					addSlotFitsSQL +
+				"\n) AS slots_with_end_slots \n " +
+				"WHERE \n" +
+				" slots_with_end_slots.slot_fits\n";
+
+		// This logic limits results to slots with start times that are evenly divisible by the
+		// appointment duration. If we end up using it, this needs to be tweeked to handle
+		// when the start of end of a range isn't evenly divisible.
+//				"( \n" +
+//				"  (\n" +
+//				"    FLOOR\n" +
+//				"    (\n" +
+//				"      TIME_TO_SEC(slots_with_end_slots.start_time) / (slots_with_end_slots.duration * 60)\n" +
+//				"    ) * slots_with_end_slots.duration * 60\n" +
+//				"  ) = TIME_TO_SEC(slots_with_end_slots.start_time) \n" +
+//				"\n" +
+//				"  OR slots_with_end_slots.is_start_slot \n" +
+//				") AND slots_with_end_slots.slot_fits\n";
+
+
+
+		MiscUtils.getLogger().info("Query Start: " + LocalDateTime.now().toString());
+		Query query = entityManager.createNativeQuery(availableSlots);
+		query.setParameter("startDateTime", java.sql.Timestamp.valueOf(startDateTime), TemporalType.TIMESTAMP);
+		query.setParameter("endDateTime", java.sql.Timestamp.valueOf(endDateTime), TemporalType.TIMESTAMP);
+		query.setParameter("startDate", java.sql.Date.valueOf(startDate), TemporalType.DATE);
+		query.setParameter("endDate", java.sql.Date.valueOf(endDate), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("appointmentTypes", appointmentTypeList);
+		query.setParameter("appointmentDuration", appointmentDuration);
 		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
+		query.setParameter("blackoutTime", java.sql.Timestamp.valueOf(
+				blackoutRule.getBlackoutTime()),
+				TemporalType.TIMESTAMP);
+		query.setParameter("cutoffTime",
+				java.sql.Timestamp.valueOf(cutoffRule.getCutoffTime()),
+				TemporalType.TIMESTAMP);
+
+		if(multiBookingsRulesCount > 0)
+		{
+			query.setParameter("demographicNo", demographicNo);
+		}
+		for (Map.Entry<String, Long> multiBookingsRuleParam : multiBookingsRuleParams.entrySet())
+		{
+			query.setParameter(multiBookingsRuleParam.getKey(),
+					multiBookingsRuleParam.getValue());
+		}
+		for (Map.Entry<String, Integer> multiBookingsRuleWhereParam : multiBookingJoinTags.entrySet())
+		{
+			query.setParameter(multiBookingsRuleWhereParam.getKey(),
+					multiBookingsRuleWhereParam.getValue());
+		}
 
 		List<Object[]> results = query.getResultList();
+		MiscUtils.getLogger().info("Query End: " + LocalDateTime.now().toString());
 
-		/*
-		 * Use a linked list here, because we will be removing individual elements from this list if they violate booking rules.
-		 * Adding to the end is not a concern here because the LinkedList is doubly linked.
-		 */
-		LinkedList<ScheduleSearchResult> possibleSlots = new LinkedList<>();
-
+		HashMap<String, List<DayTimeSlots>> providerSchedule = new HashMap<>();
+		ProviderScheduleTransfer providerScheduleTransfer = new ProviderScheduleTransfer();
+		List<DayTimeSlots> dayTimeSlots;
+		HashMap<String, Boolean> scheduleArrMap = new HashMap<>();
 		for (Object[] result : results)
 		{
-			java.sql.Date date = (java.sql.Date) result[1];
-			java.sql.Time time = (java.sql.Time) result[2];
-			char templateCode = (char) result[3];
-			Long length = ((BigInteger)result[4]).longValueExact();
+			char templateCode = (char) result[0];
+			java.sql.Timestamp timestamp = java.sql.Timestamp.valueOf((String) result[1]);
+			Long slotDuration = new Long((int) result[2]);
 
-			ScheduleSearchResult ssr = new ScheduleSearchResult(date, time, templateCode, length, providerNo);
-
-			possibleSlots.addLast(ssr);
-		}
-
-		applyRules(bookingRules, possibleSlots);
-
-		Map<LocalDate, List<Appointment>> monthlyAppointments = scheduleManager.getProviderAppointmentsForMonth(providerNo, startDate, endDate);
-		return generateAppointmentSlots(possibleSlots, monthlyAppointments, scheduleCodeDurationTransfer);
-	}
-
-	private ProviderScheduleTransfer generateAppointmentSlots(
-			List<ScheduleSearchResult> results, Map<LocalDate, List<Appointment>> monthlyAppointments,
-			List<ScheduleCodeDurationTransfer> scheduleCodeDurationTransfer)
-	{
-		HashMap<String, List<DayTimeSlots>> providerSchedule = new HashMap<>();
-
-		HashMap<String, Boolean> scheduleArrMap = new HashMap<>();
-
-		ProviderScheduleTransfer scheduleResponse = new ProviderScheduleTransfer();
-
-		int bookingDuration = scheduleCodeDurationTransfer.get(0).getDurationMinutes();
-
-		for (ScheduleSearchResult result : results)
-		{
-			List<DayTimeSlots> dayTimeSlots;
-
-			List<Appointment> dayAppointments = monthlyAppointments.get(result.dateTime.toLocalDate());
-			List<Map<String, LocalTime>> appointmentsTimeMap = this.getAppointmentsTimeMap(dayAppointments);
-
-			String scheduleDate = result.dateTime.toLocalDate().toString();
-			// String timeSlotCodeStr = Character.toString(result.templateCode);
-
-			LocalTime windowSlotStartTime = result.dateTime.toLocalTime();
-			LocalTime scheduleSlotEndTime = windowSlotStartTime.plusMinutes(result.length);
-
-			if (bookingDuration > result.length)
-			{
-				continue;
-			}
-
-			// Loop through all the 5 minute iterations of this schedule slot, and check whether or not
-			// there is an appointment booked within that 5 minute window in this specific slot
-			while (windowSlotStartTime.isBefore(scheduleSlotEndTime))
-			{
-				Long maxBookingDuration = this.getMaxBookingDurationForSlot(appointmentsTimeMap, windowSlotStartTime, scheduleSlotEndTime);
-
-				if (maxBookingDuration > 0L && maxBookingDuration >= bookingDuration)
-				{
-					LocalDateTime windowDateTime = LocalDateTime.of(result.dateTime.toLocalDate(), windowSlotStartTime);
-
-					DayTimeSlots timeSlotEntry = new DayTimeSlots(
-						windowDateTime.toString(),
-						String.valueOf(bookingDuration)
+			ScheduleSearchResult appointmentSlot = new ScheduleSearchResult(
+					timestamp,
+					templateCode,
+					slotDuration,
+					providerNo
 					);
 
-					// scheduleArrMap keeps track of schedule slots that have already been added to this slot's date.
-					// Update the schedule slots for this day if it's in scheduleArrMap. Otherwise, create a new list of schedule slots.
-					if (!scheduleArrMap.containsKey(scheduleDate))
-					{
-						scheduleArrMap.put(scheduleDate, true);
-						dayTimeSlots = new ArrayList<>();
-					}
-					else
-					{
-						dayTimeSlots = providerSchedule.get(scheduleDate);
-					}
-
-					dayTimeSlots.add(timeSlotEntry);
-					providerSchedule.put(scheduleDate, dayTimeSlots);
-
-				}
-
-				windowSlotStartTime = windowSlotStartTime.plusMinutes(bookingDuration);
-			}
-		}
-
-		scheduleResponse.setProviderScheduleResponse(providerSchedule);
-		return scheduleResponse;
-	}
-
-	/**
-	 * Remove elements from the list of possible slots if they violate any of the booking rules.  To minimize time complexity,
-	 * we enforce the requirement that the schedule search results be stored in a LinkedList.
-	 */
-	private void applyRules(List<BookingRule> bookingRules, LinkedList<ScheduleSearchResult> possibleSlots)
-	{
-		/*
-		 * An important consideration here is which .remove method is used.
-		 *
-		 * Java's LinkedList.remove is O(n) because it requires an additional find as the list cannot be modified in place
-		 * without an iterator. Iterator.remove on a LinkedList is O(1).
-		 */
-		Iterator<ScheduleSearchResult> it = possibleSlots.iterator();
-
-		while (it.hasNext())
-		{
-			ScheduleSearchResult result = it.next();
-
-			for (BookingRule rule : bookingRules)
+			String scheduleDate = appointmentSlot.dateTime.toLocalDate().toString();
+			if (!scheduleArrMap.containsKey(scheduleDate))
 			{
-				if (rule.isViolated(result))
-				{
-					it.remove();
-					break;
-				}
-			}
-		}
-	}
-
-	private List<Map<String, LocalTime>> getAppointmentsTimeMap(List<Appointment> dayAppointments)
-	{
-		List<Map<String, LocalTime>> startEndTimeMap = new ArrayList<>();
-
-		if (dayAppointments != null)
-		{
-			for (Appointment appointment : dayAppointments)
+				scheduleArrMap.put(scheduleDate, true);
+				dayTimeSlots = new ArrayList<>();
+			} else
 			{
-				LocalTime startTime = LocalTime.parse(appointment.getStartTime().toString());
-				LocalTime endTime = LocalTime.parse(appointment.getEndTime().toString());
-				Map<String, LocalTime> appointmentTime = new HashMap<>();
-
-				appointmentTime.put("startTime", startTime);
-				appointmentTime.put("endTime", endTime);
-
-				startEndTimeMap.add(appointmentTime);
+				dayTimeSlots = providerSchedule.get(scheduleDate);
 			}
+			dayTimeSlots.add(new DayTimeSlots(
+					appointmentSlot.dateTime.toString(),
+					Integer.toString(appointmentDuration)));
+			providerSchedule.put(scheduleDate, dayTimeSlots);
 		}
+		providerScheduleTransfer.setProviderScheduleResponse(providerSchedule);
 
-		return startEndTimeMap;
-	}
-
-	private boolean maxBookingDurationIsValid(List<ScheduleCodeDurationTransfer> codeDurationTransfers, Long maxBookingDuration)
-	{
-		int maxTransferDuration = codeDurationTransfers.get(0).getDurationMinutes();
-		int minTransferDuration = codeDurationTransfers.get(codeDurationTransfers.size() - 1).getDurationMinutes();
-
-		return maxBookingDuration <= maxTransferDuration && maxBookingDuration >= minTransferDuration;
-	}
-
-	private List<Appointment> getPatientAppointmentsForBookingRules(String demographicNo, String providerNo, LocalDate minDate, LocalDate maxDate, Integer daysToQuery)
-	{
-		LocalDate minMultiDate = minDate.minusDays(daysToQuery);
-		LocalDate maxMultiDate = maxDate.plusDays(daysToQuery);
-
-		return scheduleManager.getPatientAppointmentsWithProvider(demographicNo, providerNo, minMultiDate, maxMultiDate);
-	}
-
-	private Long getMaxBookingDurationForSlot(List<Map<String, LocalTime>> appointmentsTimeMap, LocalTime windowStartTime, LocalTime scheduleSlotEndTime)
-	{
-		Long maxBookingDuration = Duration.between(windowStartTime, scheduleSlotEndTime).toMinutes();
-
-		if (appointmentsTimeMap.isEmpty())
-		{
-			return maxBookingDuration;
-		}
-		else
-		{
-			// Loop through each scheduled appointment for this day, and check if it falls within this
-			// 5 minute window of this specific schedule slot
-			for (Map<String, LocalTime> appointmentTime : appointmentsTimeMap)
-			{
-				LocalTime bookedStartTime = appointmentTime.get("startTime");
-				LocalTime bookedEndTime = appointmentTime.get("endTime");
-
-				// This 5 minute slot falls within a booked appointment
-				if (windowStartTime.equals(bookedStartTime) || (windowStartTime.isAfter(bookedStartTime) && windowStartTime.isBefore(bookedEndTime)))
-				{
-					return 0L;
-				}
-				// There is a booked appointment within the 5 minute slot, and the schedule slot's end time
-				else if (bookedStartTime.isAfter(windowStartTime) && bookedStartTime.isBefore(scheduleSlotEndTime))
-				{
-					Long durationBetween = Duration.between(windowStartTime, bookedStartTime).toMinutes();
-					if (durationBetween < maxBookingDuration)
-					{
-						maxBookingDuration = durationBetween;
-					}
-				}
-			}
-		}
-
-		return maxBookingDuration;
+		return providerScheduleTransfer;
 	}
 }

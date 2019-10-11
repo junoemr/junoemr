@@ -71,6 +71,8 @@
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
 <title>Antenatal Record 2</title>
 <html:base />
 <link rel="stylesheet" type="text/css"
@@ -85,6 +87,7 @@
 	}
     function onPrint() {
         document.forms[0].submit.value="print"; //printAR1
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret==true)
         {            
@@ -191,6 +194,7 @@
     }
     function onSave() {
         document.forms[0].submit.value="save";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret==true)
         {
@@ -202,6 +206,7 @@
     
     function onSaveExit() {
         document.forms[0].submit.value="exit";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret == true)
         {

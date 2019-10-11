@@ -29,15 +29,18 @@ public class CalendarEvent
 {
 	public static final String RENDERING_BACKGROUND = "background";
 
+	/* required by Full Calendar */
 	private LocalDateTime start;
 	private LocalDateTime end;
 	private String color;
 	private String rendering;
 	private String className;
 	private Integer resourceId;
-	private String scheduleTemplateCode;
-	private AvailabilityType availabilityType;
-	private CalendarAppointment data;
+
+	/* application specific */
+	private String scheduleTemplateCode; //TODO remove? this code exists in availability data
+	private AvailabilityType availabilityType; // contains all schedule slot data
+	private CalendarAppointment data; // contains appointment data
 
 	public CalendarEvent(LocalDateTime start, LocalDateTime end, String color, String rendering, String className,
 		Integer resourceId, String scheduleTemplateCode,

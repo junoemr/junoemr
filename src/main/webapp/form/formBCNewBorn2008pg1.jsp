@@ -93,6 +93,9 @@ if (request.getParameter("view") != null && request.getParameter("view").equals(
 <link rel="stylesheet" type="text/css" media="all"
 	href="../share/calendar/calendar.css" title="win2k-cold-1" />              
               
+        <!-- Helper scripts for submission -->
+        <script type="text/javascript" src="OscarFormHelpers.js"></script>
+        <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
 
         <!-- main calendar program -->
         <script type="text/javascript" src="../share/calendar/calendar.js"></script>
@@ -117,7 +120,8 @@ if (request.getParameter("view") != null && request.getParameter("view").equals(
         }
         function onPrint() {
             document.forms[0].submit.value="print"; //printAR1
-           // var ret = checkAllDates();
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
+            // var ret = checkAllDates();
             var ret = true;
             if(ret==true)
             {
@@ -129,21 +133,19 @@ if (request.getParameter("view") != null && request.getParameter("view").equals(
         }
         
         function onSave() {
-        	document.forms[0].submit.value="save";
-        	var ret = true;
-        	//var ret = checkAllDates();
-        	//if(ret==true) {
-		   //	ret = checkAllTimes();
-    		//}
-         if(ret==true) {
-            reset();
-            ret = confirm("Are you sure you want to save this form?");
-         }
-        	 return ret;
+            document.forms[0].submit.value="save";
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
+            var ret = true;
+            if(ret==true) {
+                reset();
+                ret = confirm("Are you sure you want to save this form?");
+            }
+            return ret;
          }
 
         function onSaveExit() {
             document.forms[0].submit.value="exit";
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             var ret = checkAllDates();
             if(ret==true) {
                 ret = checkAllTimes();

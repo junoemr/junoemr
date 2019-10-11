@@ -304,17 +304,26 @@
 							<button type="button" class="btn btn-success"
 								ng-click="recordCtrl.saveNote()"
 								id="saveButton"
-								data-ng-disabled="recordCtrl.page.encounterNote.isSigned || recordCtrl.page.encounterNote.isSaved"
+								data-ng-disabled="recordCtrl.isWorking() || recordCtrl.page.encounterNote.isSigned || recordCtrl.page.encounterNote.isSaved"
 								title="<bean:message key="oscarEncounter.Index.btnSave"/>">
 								<span class="fa fa-save"  id="theSave"></span>
 							</button>
-							<button type="button" class="btn btn-success" ng-click="recordCtrl.saveSignNote()" title="<bean:message key="oscarEncounter.Index.btnSignSave"/>">
+							<button type="button" class="btn btn-success"
+							        ng-click="recordCtrl.saveSignNote()"
+							        data-ng-disabled="recordCtrl.isWorking()"
+							        title="<bean:message key="oscarEncounter.Index.btnSignSave"/>">
 								<span class="fa fa-pencil-square-o"  id="Sign"></span>
 							</button>
-							<button type="button" class="btn btn-success" ng-click="recordCtrl.saveSignVerifyNote()" title="<bean:message key="oscarEncounter.Index.btnSign"/>">
+							<button type="button" class="btn btn-success"
+							        ng-click="recordCtrl.saveSignVerifyNote()"
+							        data-ng-disabled="recordCtrl.isWorking()"
+							        title="<bean:message key="oscarEncounter.Index.btnSign"/>">
 								<span class="fa fa-thumbs-o-up"  id="SaveSignVerify"></span>
 							</button>
-							<button type="button" class="btn btn-success" ng-click="recordCtrl.saveSignBillNote()" title="<bean:message key="oscarEncounter.Index.btnSignSaveBill"/>">
+							<button type="button" class="btn btn-success"
+							        ng-click="recordCtrl.saveSignBillNote()"
+							        data-ng-disabled="recordCtrl.isWorking()"
+							        title="<bean:message key="oscarEncounter.Index.btnSignSaveBill"/>">
 								<span class="fa fa-dollar"  id="bill"></span>
 							</button>
 						</div>

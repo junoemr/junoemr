@@ -63,10 +63,6 @@ if(!authed) {
     java.util.ArrayList aList = new java.util.ArrayList();
     String sXML = MsgCommxml.toXML(new MsgSendDocument().parseChecks2(xmlDoc, checks, aList));
 
-    oscar.oscarMessenger.pageUtil.MsgSessionBean bean;
-    bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)request.getSession().getAttribute("msgSessionBean");
-    bean.setAttachment(sXML);
-
     response.sendRedirect("../CreateMessage.jsp");
 
 
