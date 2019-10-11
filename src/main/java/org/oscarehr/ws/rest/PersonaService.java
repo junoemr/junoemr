@@ -524,7 +524,7 @@ public class PersonaService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public List<AdminNavGroupTo1> getAdminNavItems()
 	{
-		return adminNavService.getAdminNavGroups(getHttpServletRequest().getContextPath(), getOscarResourcesBundle(), getCurrentProvider().getProviderNo());
+		return adminNavService.getAdminNavGroups(getHttpServletRequest().getContextPath(), getOscarResourcesBundle(), getCurrentProvider().getProviderNo(), getHttpServletRequest().getSession());
 	}
 
 }

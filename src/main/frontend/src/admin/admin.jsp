@@ -25,10 +25,10 @@
 		<h3>Administration</h3>
 	</div>
 	<div id="admin-page-body" class="row height-100">
-		<div class="col-sm-2">
+		<div class="admin-side-nav col-sm-4 col-md-4 col-lg-2">
 			<accordion-list item-list="AdminCtrl.navList"></accordion-list>
 		</div>
-		<div class="col-sm-10 height-100">
+		<div class="col-sm-8 col-md-8 col-lg-10 height-100">
 			<div class="admin-subpage-view height-100" ui-view></div>
 		</div>
 	</div>

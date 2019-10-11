@@ -23,22 +23,24 @@
 
 package org.oscarehr.admin.service;
 
-import org.apache.axis2.transport.http.util.URIEncoderDecoder;
+import org.apache.commons.lang.StringUtils;
 import org.chip.ping.xml.record.SecurityInfo;
-import org.opensaml.xmlsec.signature.P;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
 import org.oscarehr.ws.rest.to.model.AdminNavGroupTo1;
 import org.oscarehr.ws.rest.to.model.AdminNavItemTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.util.UriEncoder;
 import oscar.OscarProperties;
 
+import javax.servlet.http.HttpSession;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import static org.apache.tools.ant.launch.Locator.encodeURI;
 
 @Service
 public class AdminNavService
@@ -49,12 +51,12 @@ public class AdminNavService
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
 
 	/**
-	 * construct a list of admin nav group transfer objects. This group is passed to the adminController.js to build the ui.
+	 * construct a list of admin nav group transfer objects. This group is passed to the adminController.js to build the left nav on the admin page.
 	 * @param resourceBundle - a resource bundle from which to pull message strings
 	 * @param providerNo - the provider viewing this resources
 	 * @return - a list of admin nav group objects
 	 */
-	public List<AdminNavGroupTo1> getAdminNavGroups(String contextPath, ResourceBundle resourceBundle, String providerNo)
+	public List<AdminNavGroupTo1> getAdminNavGroups(String contextPath, ResourceBundle resourceBundle, String providerNo, HttpSession session)
 	{
 		List<AdminNavGroupTo1> adminNavList = new ArrayList<>();
 
@@ -74,6 +76,7 @@ public class AdminNavService
 		{
 			adminNavList.add(getAdminNavForms(contextPath, resourceBundle));
 		}
+
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.reporting"))
 		{
 			adminNavList.add(getAdminNavReports(contextPath, resourceBundle, providerNo));
@@ -104,6 +107,34 @@ public class AdminNavService
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin.fax"))
 		{
 			adminNavList.add(getAdminNavFaxManagement(providerNo));
+		}
+
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		{
+			adminNavList.add(getAdminNavSystemReports(contextPath, resourceBundle, providerNo));
+		}
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		{
+			adminNavList.add(getAdminNavIntegration(contextPath, resourceBundle, session));
+		}
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.backup"))
+		{
+			adminNavList.add(getAdminNavDataManagement(contextPath, resourceBundle));
+		}
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin") &&
+			oscarProperties.isPropertyActive("admin.hph"))
+		{
+			adminNavList.add(getAdminNavHamiltonHealth(contextPath, resourceBundle));
+		}
+		if (oscarProperties.isPropertyActive("sharingcenter.enabled") &&
+						securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null,"_admin", "_admin.sharingcenter"))
+		{
+			adminNavList.add(getAdminNavSharingCenter(contextPath, resourceBundle));
+		}
+		if (oscarProperties.isPropertyActive("OSCAR_LEARNING") &&
+						securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
+		{
+			adminNavList.add(getAdminNavOscarLearning(contextPath, resourceBundle));
 		}
 
 		return adminNavList;
@@ -494,7 +525,7 @@ public class AdminNavService
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.messenger"))
 		{
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.messages"),
-					"frame?frameUrl=" + URLEncoder.encode(contextPath + "/oscarMessenger/DisplayMessages.do?providerNo=" + providerNo)));// TODO fix (probably broken, requires params)
+					"frame?frameUrl=" + URLEncoder.encode(contextPath + "/oscarMessenger/DisplayMessages.do?providerNo=" + providerNo)));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.btnMessengerAdmin"), "frame?frameUrl=" + contextPath + "/oscarMessenger/config/MessengerAdmin.jsp"));
 		}
 
@@ -550,4 +581,158 @@ public class AdminNavService
 		faxManagementGroup.setItems(faxManagementItems);
 		return faxManagementGroup;
 	}
+
+	private AdminNavGroupTo1 getAdminNavSystemReports(String contextPath, ResourceBundle resourceBundle, String providerNo)
+	{
+		AdminNavGroupTo1 systemReportGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> systemReportItems = new ArrayList<>();
+
+		systemReportGroup.setName(resourceBundle.getString("admin.admin.SystemReports"));
+
+		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.securityLogReport"))
+		{
+			systemReportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.securityLogReport"), "frame?frameUrl=" + contextPath + URLEncoder.encode("/admin/logReport.jsp?keyword=admin")));
+
+			if (oscarProperties.isPropertyActive("admin.show_rest_log_report"))
+			{
+				systemReportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.securityLogRestReport"), "frame?frameUrl=" + contextPath + "/admin/logRestReport.jsp"));
+			}
+		}
+
+		systemReportGroup.setItems(systemReportItems);
+		return systemReportGroup;
+	}
+
+	private AdminNavGroupTo1 getAdminNavIntegration(String contextPath, ResourceBundle resourceBundle, HttpSession session)
+	{
+		AdminNavGroupTo1 integrationGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> integrationItems = new ArrayList<>();
+
+		integrationGroup.setName(resourceBundle.getString("admin.admin.Integration"));
+
+		integrationItems.add(new AdminNavItemTo1("REST Clients", "frame?frameUrl=" + contextPath + "/admin/api/clients.jsp"));
+		integrationItems.add(new AdminNavItemTo1("REST API", "frame?frameUrl=" + contextPath + "/admin/api/api.jsp"));
+		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("provider.btnSetIntegratorPreferences"), "frame?frameUrl=" + contextPath + URLEncoder.encode("/setProviderStaleDate.do?method=viewIntegratorProperties")));
+		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.sendOruR01"), "frame?frameUrl=" + contextPath + "/lab/CA/ALL/sendOruR01.jsp"));
+
+		if (oscarProperties.getProperty("olis_keystore", "").length() > 0)
+		{
+			integrationItems.add(new AdminNavItemTo1("OLIS Preferences", "frame?frameUrl=" + contextPath + "/olis/Preferences.jsp"));
+		}
+
+		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.phrconfig"), "frame?frameUrl=" + contextPath + "/admin/MyoscarConfiguration.jsp"));
+
+		MyOscarLoggedInInfo myOscarLoggedInInfo = MyOscarLoggedInInfo.getLoggedInInfo(session);
+		if (StringUtils.trimToNull(oscarProperties.getProperty("oscar_myoscar_sync_component_url"))!=null)
+		{
+			if (myOscarLoggedInInfo != null && myOscarLoggedInInfo.isLoggedIn())
+			{
+				integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.oscar_phr_sync_config"), "frame?frameUrl=" + contextPath + "/admin/oscar_myoscar_sync_config_redirect.jsp"));
+			}
+		}
+
+		if (StringUtils.trimToNull(OscarProperties.getInstance().getProperty("oscar_myoscar_clinic_component_url"))!=null)
+		{
+			if (myOscarLoggedInInfo != null && myOscarLoggedInInfo.isLoggedIn())
+			{
+				integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.oscar_phr_clinic_config"), "frame?frameUrl=" + contextPath + "/admin/oscar_myoscar_clinic_config_redirect.jsp"));
+			}
+		}
+
+		if (!oscarProperties.getProperty("hsfo.loginSiteCode", "").isEmpty())
+		{
+			integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.hsfoSubmit"), "frame?frameUrl=" + contextPath + "/admin/RecommitHSFO.do?method=showSchedule"));
+		}
+
+		if (!oscarProperties.getProperty("hsfo2.loginSiteCode", "").isEmpty())
+		{
+			integrationItems.add(new AdminNavItemTo1("schedule HSFO2 XML resubmit", "frame?frameUrl=" + contextPath + URLEncoder.encode("/admin/RecommitHSFO2.do?method=showSchedule")));
+		}
+
+		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.Know2ActConfig"), "frame?frameUrl=" + contextPath + "/web/Know2actConfiguration.jsp"));
+		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.integratorPush"), "frame?frameUrl=" + contextPath + "/admin/integratorPushStatus.jsp"));
+		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.born"), "frame?frameUrl=" + contextPath + "/admin/born.jsp"));
+
+		integrationGroup.setItems(integrationItems);
+		return integrationGroup;
+	}
+
+	private AdminNavGroupTo1 getAdminNavDataManagement(String contextPath, ResourceBundle resourceBundle)
+	{
+		AdminNavGroupTo1 dataManagementGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> dataManagementItems = new ArrayList<>();
+
+		dataManagementGroup.setName(resourceBundle.getString("admin.admin.DataManagement"));
+
+		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.DemoExport"), "frame?frameUrl=" + contextPath + "/demographic/demographicExport.jsp"));
+		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.DemoImport"), "frame?frameUrl=" + contextPath + "/demographic/demographicImport.jsp"));
+		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.mergeRec"), "frame?frameUrl=" + contextPath + "/admin/demographicmergerecord.jsp"));
+		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnUpdatePatientProvider"), "frame?frameUrl=" + contextPath + "/admin/updatedemographicprovider.jsp"));
+		dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnInventory"), "frame?frameUrl=" + contextPath + "/admin/productDispensing/products.jsp"));
+
+		if (oscarProperties.isPropertyActive("NEW_CONTACTS_UI"))
+		{
+			dataManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.migrate_contacts"), "frame?frameUrl=" + contextPath + "/demographic/migrate_demographic_contacts.jsp"));
+		}
+
+		dataManagementGroup.setItems(dataManagementItems);
+		return dataManagementGroup;
+	}
+
+	private AdminNavGroupTo1 getAdminNavHamiltonHealth(String contextPath, ResourceBundle resourceBundle)
+	{
+		AdminNavGroupTo1 hamiltonHealthGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> hamiltonHealthItems = new ArrayList<>();
+
+		hamiltonHealthGroup.setName("Hamilton Public Health");
+
+		hamiltonHealthItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.setProviderAvailabilities"), "frame?frameUrl=" + contextPath + "/admin/hamiltonPublicHealth/setProviderAvailability.jsp"));
+
+		hamiltonHealthGroup.setItems(hamiltonHealthItems);
+		return hamiltonHealthGroup;
+	}
+
+	private AdminNavGroupTo1 getAdminNavSharingCenter(String contextPath, ResourceBundle resourceBundle)
+	{
+		AdminNavGroupTo1 sharingCenterGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> sharingCenterItems = new ArrayList<>();
+
+		sharingCenterGroup.setName(resourceBundle.getString("sharingcenter.title"));
+
+		sharingCenterItems.add(new AdminNavItemTo1(resourceBundle.getString("sharingcenter.affinitydomain.manage"), "frame?frameUrl=" + contextPath + "/sharingcenter/affinitydomain/manage.jsp&useCompat=true"));
+		sharingCenterItems.add(new AdminNavItemTo1(resourceBundle.getString("sharingcenter.clinicinfo"), "frame?frameUrl=" + contextPath + "/sharingcenter/affinitydomain/clinic.jsp&useCompat=true"));
+		sharingCenterItems.add(new AdminNavItemTo1(resourceBundle.getString("sharingcenter.security"), "frame?frameUrl=" + contextPath + "/sharingcenter/security/infrastructure.jsp&useCompat=true"));
+
+		sharingCenterGroup.setItems(sharingCenterItems);
+		return sharingCenterGroup;
+	}
+
+	private AdminNavGroupTo1 getAdminNavOscarLearning(String contextPath, ResourceBundle resourceBundle)
+	{
+		AdminNavGroupTo1 oscarLearningGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> oscarLearningItems = new ArrayList<>();
+
+		oscarLearningGroup.setName(resourceBundle.getString("admin.admin.learning"));
+
+		oscarLearningItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.learning.manageCourses"), "frame?frameUrl=" + contextPath + "/oscarLearning/CourseManager.jsp"));
+		oscarLearningItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.learning.importPatient"), "frame?frameUrl=" + contextPath + "/demographic/demographicImport.jsp"));
+		oscarLearningItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.learning.importStudent"), "frame?frameUrl=" + contextPath + "/oscarLearning/StudentImport.jsp"));
+
+		oscarLearningGroup.setItems(oscarLearningItems);
+		return oscarLearningGroup;
+	}
+
+	private AdminNavGroupTo1 getAdminNavUpdates(String contextPath, ResourceBundle resourceBundle)
+	{
+		AdminNavGroupTo1 updatesGroup = new AdminNavGroupTo1();
+		List<AdminNavItemTo1> updatesItems = new ArrayList<>();
+
+		updatesGroup.setName(resourceBundle.getString("admin.admin.updates"));
+
+		updatesItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.updates.migrate_onarenhanced"), "frame?frameUrl=" + contextPath + "/pregnancy/migrateToSplitOnArEnhancedForm.jsp"));
+
+		updatesGroup.setItems(updatesItems);
+		return updatesGroup;
+	}
+
 }
