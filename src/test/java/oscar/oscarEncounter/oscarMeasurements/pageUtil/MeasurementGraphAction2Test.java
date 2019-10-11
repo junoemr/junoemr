@@ -33,6 +33,7 @@ public class MeasurementGraphAction2Test
 	{
 		double[] expectedReturnType = {};
 		double[] returnedParams = MeasurementGraphAction2.getParameters(null, "");
+		assert returnedParams != null;
 		Assert.assertEquals(expectedReturnType.length, returnedParams.length);
 	}
 
@@ -41,6 +42,7 @@ public class MeasurementGraphAction2Test
 	{
 		double[] expectedReturnType = {};
 		double[] returnedParams = MeasurementGraphAction2.getParameters("", "");
+		assert returnedParams != null;
 		Assert.assertEquals(expectedReturnType.length, returnedParams.length);
 	}
 
@@ -49,6 +51,16 @@ public class MeasurementGraphAction2Test
 	{
 		String range = "2.3 - 4.6";
 		Assert.assertEquals(5, MeasurementGraphAction2.getParameters(range, null).length);
+	}
+
+
+	@Test
+	public void getParameters_spacePaddedDashAsRange_expectEmptyArray()
+	{
+		double[] expectedReturnType = {};
+		double[] returnedParams = MeasurementGraphAction2.getParameters(" - ", null);
+		assert returnedParams != null;
+		Assert.assertEquals(expectedReturnType.length, returnedParams.length);
 	}
 
 	@Test
@@ -136,7 +148,7 @@ public class MeasurementGraphAction2Test
 	}
 
 	@Test
-	public void reformatRange_nonNumberAndDashSplit_expectSameStrimg()
+	public void reformatRange_nonNumberAndDashSplit_expectSameString()
 	{
 		Assert.assertEquals("string -", MeasurementGraphAction2.reformatRange("string -"));
 	}

@@ -211,7 +211,7 @@ public class MeasurementGraphAction2 extends Action {
 	 */
 	public static String reformatRange(String range)
 	{
-		if (range == null || range.isEmpty())
+		if (range == null || range.isEmpty() || StringUtils.trimToEmpty(range).equals("-"))
 		{
 			return "";
 		}
