@@ -981,12 +981,12 @@ angular.module('Schedule').component('eventComponent', {
 					{
 						var params = {
 							providerNo: controller.providerModel.providerNo,
-							curProviderNo: data.eventData.userProviderNo,
+							curProviderNo: controller.resolve.data.eventData.userProviderNo,
 							demographicNo: controller.demographicModel.demographicNo,
 							userName: "",
 							reason: $scope.eventData.reason,
 							curDate: Juno.Common.Util.formatMomentDate(moment()),
-							providerview: data.eventData.userProviderNo,
+							providerview: controller.resolve.data.eventData.userProviderNo,
 
 							appointmentNo: $scope.eventUuid,
 							appointmentDate: $scope.eventData.startDate,
@@ -1021,10 +1021,10 @@ angular.module('Schedule').component('eventComponent', {
 						demographic_name: controller.demographicModel.fullName,
 						providerNo: controller.providerModel.providerNo,
 						providerview: controller.providerModel.providerNo,
-						user_no: data.eventData.userProviderNo,
+						user_no: controller.resolve.data.eventData.userProviderNo,
 
-						billRegion: data.eventData.billingRegion,
-						billForm: data.eventData.billingForm,
+						billRegion: controller.resolve.data.eventData.billingRegion,
+						billForm: controller.resolve.data.eventData.billingForm,
 						hotclick: "",
 						bNewForm: 1,
 
