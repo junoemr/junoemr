@@ -224,15 +224,12 @@ public class OutgoingFaxService
 
 
 	public int getOutboxNotificationCount(Long id,
-										  Integer page,
-										  Integer perPage,
 										  String endDateStr,
 										  String startDateStr,
 										  String combinedStatus,
 										  String archived)
 	{
 		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
-		criteriaSearch.setLimit(perPage);
 		criteriaSearch.setFaxAccountId(id);
 		criteriaSearch.setSortDirDescending();
 
@@ -252,7 +249,6 @@ public class OutgoingFaxService
 		{
 			criteriaSearch.setArchived(Boolean.parseBoolean(archived));
 		}
-		criteriaSearch.setOffset(perPage * (page - 1));
 		criteriaSearch.setNotificationStatus(FaxOutbound.NotificationStatus.NOTIFY);
 
 		return faxOutboundDao.criteriaSearchCount(criteriaSearch);

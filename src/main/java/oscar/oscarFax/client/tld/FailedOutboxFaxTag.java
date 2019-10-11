@@ -57,18 +57,16 @@ public class FailedOutboxFaxTag extends TagSupport
 			numFailures = 0;
 
 			List<FaxAccountTransferOutbound> accounts;
-			for(int page = 1; page < 10; page++)
-			{
-				FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
-				criteriaSearch.setLimit(10);
-				criteriaSearch.setSortDirAscending();
 
-				accounts = faxService.listAccounts(criteriaSearch);
-				for (FaxAccountTransferOutbound account : accounts)
-				{
-					numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), 1, 10, null, null, FaxOutboxTransferOutbound.CombinedStatus.ERROR.toString(), null);
-					numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), 1, 10, null, null, FaxOutboxTransferOutbound.CombinedStatus.INTEGRATION_FAILED.toString(), null);
-				}
+			FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
+			criteriaSearch.setLimit(10);
+			criteriaSearch.setSortDirAscending();
+
+			accounts = faxService.listAccounts(criteriaSearch);
+			for (FaxAccountTransferOutbound account : accounts)
+			{
+				numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), null, null, FaxOutboxTransferOutbound.CombinedStatus.ERROR.toString(), null);
+				numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), null, null, FaxOutboxTransferOutbound.CombinedStatus.INTEGRATION_FAILED.toString(), null);
 			}
 
 			JspWriter out = super.pageContext.getOut();
