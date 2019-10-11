@@ -14,6 +14,10 @@ if (!Juno.AllergyHelpers)
 }
 
 // *** Library constants so we don't have to redefine this everywhere ***
+// Supported date formats. Structured specifically for momentjs
+Juno.AllergyHelpers.DATE_FORMAT_YEAR_ONLY = "YYYY";
+Juno.AllergyHelpers.DATE_FORMAT_YEAR_MONTH = "YYYY-MM";
+Juno.AllergyHelpers.DATE_FORMAT_YEAR_MONTH_DAY = "YYYY-MM-DD";
 // These numbers correspond to age in days
 Juno.AllergyHelpers.LIFESTAGE_NEWBORN_LOWER_BOUND = 0;
 Juno.AllergyHelpers.LIFESTAGE_NEWBORN_UPPER_BOUND = 28;
@@ -27,17 +31,85 @@ Juno.AllergyHelpers.LIFESTAGE_ADOLESCENT_UPPER_BOUND = 17;
 Juno.AllergyHelpers.LIFESTAGE_ADULT_LOWER_BOUND = 18;
 
 /**
+ * Given a string that should be a start date, confirm that its current format is valid under Oscar's old rules.
+ * @param startDate a string that may be in format YYYY, YYYY-MM, or YYYY-MM-DD.
+ * @return string date format, or null if we can't recognize the date format
+ */
+Juno.AllergyHelpers.isValidStartDate = function isValidStartDate(startDate)
+{
+	// empty start date is valid and fine
+	if (startDate.length === 0)
+	{
+		return "";
+	}
+
+	// YYYY
+	if (startDate.length === 4)
+	{
+		return Juno.AllergyHelpers.DATE_FORMAT_YEAR_ONLY;
+	}
+
+	// YYYY-MM
+	if (startDate.length > 4 && startDate.length <= 7 && startDate[4] === "-")
+	{
+		return Juno.AllergyHelpers.DATE_FORMAT_YEAR_MONTH;
+	}
+
+	// Anything outside of the partial date formats, we can simply shove in to moment to see if it
+	// constructs a valid date object.
+	if (moment(startDate).isValid())
+	{
+		return Juno.AllergyHelpers.DATE_FORMAT_YEAR_MONTH_DAY;
+	}
+
+	return null;
+};
+
+/**
+ * Given a start date and the format it's in, zero-pad the month and date.
+ * @param startDate the date to pad as a string
+ * @param dateFormat the format of the date string
+ * @return string the original date string if in YYYY format or in an unknown format, padded date string otherwise
+ */
+Juno.AllergyHelpers.padStartDate = function padStartDate(startDate, dateFormat)
+{
+	// to make this play nicely with other date validation, we'll treat it as end-of-year
+	if (dateFormat === Juno.AllergyHelpers.DATE_FORMAT_YEAR_ONLY)
+	{
+		startDate += "-12-31";
+		return startDate;
+	}
+
+	if (dateFormat === Juno.AllergyHelpers.DATE_FORMAT_YEAR_MONTH
+		|| dateFormat === Juno.AllergyHelpers.DATE_FORMAT_YEAR_MONTH_DAY)
+	{
+		var splitDate = startDate.split("-");
+		if (splitDate.length >= 2 && splitDate[1].length === 1)
+		{
+			splitDate[1] = "0" + splitDate[1];
+		}
+
+		if (splitDate.length === 3 && splitDate[2].length === 1)
+		{
+			splitDate[2] = "0" + splitDate[2];
+		}
+
+		return splitDate.join("-");
+	}
+
+	return startDate;
+};
+
+/**
  * Given a demographic and identifying information for an allergy being added, check if there are any
  * active entries that are similar to the allergy being added.
  * @param demographicNo demographic to add allergy for
- * @param drugrefId id in drugref db (0 if a custom drug)
  * @param typeCode type of drug being added (0 if a custom drug)
  * @param drugName user-friendly text name for the drug
  * @param currEntryId primary key of the allergy being added/modified, if available
  * @return {boolean} true if a duplicate allergy exists, false otherwise
  */
 Juno.AllergyHelpers.isDuplicateAllergy = function isDuplicateAllergy(demographicNo,
-																	 drugrefId,
 																	 typeCode,
 																	 drugName,
 																	 currEntryId)
@@ -52,17 +124,17 @@ Juno.AllergyHelpers.isDuplicateAllergy = function isDuplicateAllergy(demographic
 			for (var i = 0; i < data.allergies.length; i++)
 			{
 				var allergyEntry = data.allergies[i];
+				// Even if we find a duplicate allergy, user should be allowed to modify an existing active entry
 				if (String(allergyEntry['id']) === currEntryId)
 				{
-					continue;
+					isDuplicate = false;
+					break;
 				}
 
-				if (allergyEntry['drugrefId'] === drugrefId &&
-					String(allergyEntry['typeCode']) === typeCode &&
+				if (String(allergyEntry['typeCode']) === typeCode &&
 					allergyEntry['description'] === drugName)
 				{
 					isDuplicate = true;
-					break;
 				}
 			}
 		}
@@ -81,7 +153,6 @@ Juno.AllergyHelpers.isDuplicateAllergy = function isDuplicateAllergy(demographic
 Juno.AllergyHelpers.checkDateAgainstLifestage = function checkDateAgainstLifestage(lifestage, birthday, compareDate)
 {
 	// Not having lifestage set is OK
-	console.log(compareDate);
 	if (lifestage === '')
 	{
 		return true;
@@ -122,7 +193,6 @@ Juno.AllergyHelpers.getLowerBoundLifestageDate = function getLowerBoundLifestage
 		default:
 			break;
 	}
-	// date.toISOString() return string like "yyyy-MM-ddThh:mm:ss.msZ", we only want yyyy-MM-dd
 	return date;
 };
 
@@ -208,7 +278,6 @@ Juno.AllergyHelpers.getLowerBoundLifestageAge = function getLowerBoundLifestageA
 
 /**
  * Given a lifestage code, return the upper bound for expected age.
- * TODO handle age unit differences better
  * @param lifestage
  */
 Juno.AllergyHelpers.getUpperBoundLifestageAge = function getUpperBoundLifestageAge(lifestage)
@@ -224,8 +293,7 @@ Juno.AllergyHelpers.getUpperBoundLifestageAge = function getUpperBoundLifestageA
 		case 'T':
 			return Juno.AllergyHelpers.LIFESTAGE_ADOLESCENT_UPPER_BOUND;
 		case 'A':
-			// return their age
-			// HAO
 		default:
+			break;
 	}
 };

@@ -116,49 +116,36 @@
 			function validateAllergySubmit()
 			{
 				var startDateSelector = $("#startDate");
-				var startDate = startDateSelector.val().split("-");
+				var startDate = startDateSelector.val();
 
-				var validDate = true;
-
-				if (startDate[0].length === 0)
+				// Only check date if we're actually inputting something
+				if (startDate.length > 0)
 				{
-					// Not adding a date is valid behaviour
-				}
-				// Not adding a date is valid behavior
-				else if (startDate[0].length === 4)
-				{
-					while (validDate && startDate.length < 3)
+					var dateFormat = Juno.AllergyHelpers.isValidStartDate(startDate);
+					if (dateFormat == null)
 					{
-						startDate.push("01");
+						alert("Invalid date in Start Date. Please use one of the following formats:" +
+							"\nyyyy-mm-dd" +
+							"\nyyyy-mm" +
+							"\nyyyy");
+						return false;
 					}
 
-					startDate = startDate[0] + "-" + startDate[1] + "-" + startDate[2];
-					// Use default JS date library, moment.js is too liberal with formatting anything as a date
-					validDate = moment(startDate).isValid();
+					startDate = Juno.AllergyHelpers.padStartDate(startDate, dateFormat);
+
+					var lifestage = $("#lifeStage").children("option:selected").val();
+
+					if (startDate[0].length > 0 && !validateStartDate("<%=demoBirthday%>", startDate, lifestage, dateFormat))
+					{
+						return false;
+					}
 				}
 
-				if (!validDate)
-				{
-					alert("Invalid date in Start Date. Please use one of the following formats:" +
-						"\nyyyy-mm-dd" +
-						"\nyyyy-mm" +
-						"\nyyyy");
-					return false;
-				}
-
-				var lifestage = $("#lifeStage").children("option:selected").val();
-
-				if (startDate[0].length > 0 && !validateStartDate("<%=demoBirthday%>", startDate, lifestage))
-				{
-					return false;
-				}
-
-				var drugrefId = $("#drugrefId").val();
 				var typeCode = $("#type").val();
 				var drugName = $("#drugName").val();
 				var allergyId = $("#allergyId").val();
 
-				var isDuplicate = Juno.AllergyHelpers.isDuplicateAllergy(<%=demographicNo%>, drugrefId, typeCode, drugName, allergyId);
+				var isDuplicate = Juno.AllergyHelpers.isDuplicateAllergy(<%=demographicNo%>, typeCode, drugName, allergyId);
 
 				if (isDuplicate)
 				{
@@ -185,16 +172,27 @@
 					validAge = false;
 				}
 
-				return validDate && validAge;
+				return validAge;
 			}
 
 			/**
 			 * Given a (possibly estimated) start date for the allergy, check the following:
 			 * - that it is after their birthday
 			 * - that it fits within the date range defined by the inputted lifestage
+			 * - that it is not in the future (not greater than today)
 			 */
-			function validateStartDate(birthday, startDate, lifestage)
+			function validateStartDate(birthday, startDate, lifestage, dateFormat)
 			{
+				startDate = moment(startDate).format(dateFormat);
+				var today = moment().format(dateFormat);
+				if (startDate > today)
+				{
+					alert("Your start date is in the future. Please add a start date of today or prior.");
+					return false;
+				}
+
+				// Birthday has to be re-coalesced using the same date format for fairness
+				birthday = moment(birthday).format(dateFormat);
 				if (startDate !== 0 && startDate.length > 0)
 				{
 					if (birthday > startDate)
