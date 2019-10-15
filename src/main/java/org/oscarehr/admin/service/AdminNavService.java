@@ -24,8 +24,6 @@
 package org.oscarehr.admin.service;
 
 import org.apache.commons.lang.StringUtils;
-import org.chip.ping.xml.record.SecurityInfo;
-import org.oscarehr.common.model.Security;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
 import org.oscarehr.ws.rest.to.model.AdminNavGroupTo1;
@@ -39,8 +37,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-
-import static org.apache.tools.ant.launch.Locator.encodeURI;
 
 @Service
 public class AdminNavService

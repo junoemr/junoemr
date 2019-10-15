@@ -70,6 +70,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -275,7 +276,7 @@ public class PersonaService extends AbstractServiceImpl {
 		menu.addWithState(idCounter++,bundle.getString("navbar.menu.tickler"),null,"ticklers")
 			//.add(0,"K2A",null,"#/k2a")
 			.addWithState(idCounter++,bundle.getString("navbar.menu.billing"),null,"billing")
-			.addWithState(idCounter++,bundle.getString("navbar.menu.admin"),null,"admin.landingPage")
+			.addWithStates(idCounter++,bundle.getString("navbar.menu.admin"),null, Arrays.asList("admin.landingPage", "admin.frame", "admin.faxConfig", "admin.faxSendReceive"))
 			.addWithState(idCounter++,bundle.getString("navbar.menu.reports"),null,"reports")
 			.addWithState(idCounter++,bundle.getString("navbar.menu.documents"),null,"documents");
 

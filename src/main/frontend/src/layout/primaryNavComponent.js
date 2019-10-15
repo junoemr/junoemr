@@ -617,7 +617,7 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.isActive = function(tab)
 		{
-			return ($state.current.name === (tab.state != null ? tab.state[0] : null));
+			return tab.state != null ? tab.state.includes($state.current.name) : false;
 		};
 
 		ctrl.changeProgram = function changeProgram(programId)
