@@ -46,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationPDFCreator;
 import oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ImagePDFCreator;
