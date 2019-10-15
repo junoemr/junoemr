@@ -90,6 +90,9 @@ public class OutgoingFaxService
 	private FaxAccountService faxAccountService;
 
 	@Autowired
+	private FaxTransferConverter faxTransferConverter;
+
+	@Autowired
 	private FaxStatus faxStatus;
 
 	public boolean isOutboundFaxEnabled()
@@ -143,7 +146,7 @@ public class OutgoingFaxService
 		{
 			FaxOutbound faxOutbound = queueNewFax(providerId, demographicId, faxAccount, faxNumber, fileType, fileToFax);
 			sendQueuedFax(faxOutbound, fileToFax);
-			transfer = FaxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound);
+			transfer = faxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound);
 		}
 		// if legacy faxing is enabled, write to the outgoing folder.
 		else if(isLegacyFaxEnabled())
@@ -219,7 +222,7 @@ public class OutgoingFaxService
 		}
 
 		sendQueuedFax(faxOutbound, fileToResend);
-		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+		return faxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
 	}
 
 
@@ -259,14 +262,14 @@ public class OutgoingFaxService
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
 		faxOutbound.setNotificationStatus(FaxOutbound.NotificationStatus.valueOf(status));
 		faxOutboundDao.persist(faxOutbound);
-		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+		return faxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
 	}
 	public FaxOutboxTransferOutbound setArchived(Long faxOutId, boolean isArchived)
 	{
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
 		faxOutbound.setArchived(isArchived);
 		faxOutboundDao.persist(faxOutbound);
-		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+		return faxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
 	}
 
 	/**
