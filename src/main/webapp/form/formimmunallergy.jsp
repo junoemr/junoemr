@@ -46,6 +46,11 @@
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+
+	<!-- Helper scripts for submission -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+
 <title>Immunizations/Allergies</title>
 <link rel="stylesheet" type="text/css" href="arStyle.css">
 <html:base />
@@ -103,6 +108,7 @@ function onCheckSlave(a, masterName) {
 	}
     function onPrint() {
         document.forms[0].submit.value="print"; //printAR1
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret==true)
         {
@@ -117,6 +123,7 @@ function onCheckSlave(a, masterName) {
     }
     function onSave() {
         document.forms[0].submit.value="save";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret==true)
         {
@@ -128,6 +135,7 @@ function onCheckSlave(a, masterName) {
     
     function onSaveExit() {
         document.forms[0].submit.value="exit";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret == true)
         {

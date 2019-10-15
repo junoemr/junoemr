@@ -27,7 +27,7 @@
 <%@ page
 	import="oscar.oscarMessenger.docxfer.send.*,oscar.oscarMessenger.docxfer.util.*, 
                 oscar.oscarEncounter.data.*, oscar.oscarEncounter.pageUtil.EctSessionBean, oscar.oscarRx.pageUtil.RxSessionBean,
-                oscar.oscarRx.data.RxPatientData, oscar.oscarMessenger.pageUtil.MsgSessionBean, oscar.oscarDemographic.data.*"%>
+                oscar.oscarRx.data.RxPatientData, oscar.oscarDemographic.data.*"%>
     
 <%@ page import=" java.util.*, org.w3c.dom.*, java.sql.*, oscar.*, java.text.*, java.lang.*,java.net.*" errorPage="../appointment/errorpage.jsp"%>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
@@ -68,7 +68,7 @@ DemographicData demoData = new  DemographicData();
 org.oscarehr.common.model.Demographic demo =  demoData.getDemographic(loggedInInfo, demographic_no);
 String demoName = "";
 if ( demo != null ) {
-    demoName = demo.getLastName()+", "+demo.getFirstName();
+    demoName = demo.getDisplayName();
 }
   
 
@@ -80,8 +80,6 @@ int indexCount = 0;
 
 EctSessionBean bean = new EctSessionBean();
 bean.demographicNo = demographic_no;
-
-oscar.oscarMessenger.pageUtil.MsgSessionBean MsgSessionBean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)request.getSession().getAttribute("msgSessionBean");
 
 request.getSession().setAttribute("EctSessionBean",bean);          
 
@@ -143,7 +141,7 @@ request.getSession().setAttribute("EctSessionBean",bean);
         var uriArray = document.forms[0].uriArray;
         var titleArray = document.forms[0].titleArray;
         var indexArray = document.forms[0].indexArray;
-        var wantedIndex = 0;
+        var wantedIndex = number;
         document.forms[0].srcText.value = "";
         document.forms[0].isPreview.value = false;
         document.forms[0].isAttaching.value = true;
@@ -156,44 +154,43 @@ request.getSession().setAttribute("EctSessionBean",bean);
         else {
             document.forms[0].isNew.value = false;    
         }
-        
-        j = 0;
-        
-        if ( number != -1 ) {
-            for( i = 0; i < indexArray.length ; i ++ ) {
-                if ( indexArray[i].checked ) {
-                   if ( number == j) {
-                        wantedIndex = i;
-                   }        
-                   j++;
-                }
 
-            }
-        }
-        else {
-            for( i = 0; i < indexArray.length ; i ++ ) {
-                if ( indexArray[i].checked ) {
-                   j++;
-
-                   if ( wantedIndex < 0 ) {
-                        wantedIndex = i;
-                   }
-                }
-            }
-        }
-        
-        if ( j ==0 ) {
-            document.forms[0].submit();
-            return;
-        }
-        
-        document.forms[0].attachmentCount.value = j;
-        document.forms[0].attachmentTitle.value = titleArray[wantedIndex].value;        
+        document.forms[0].attachmentTitle.value = titleArray[wantedIndex].value;
         SetBottomURL( uriArray[wantedIndex].value );
         setTimeout("GetBottomSRC()", 1000);
-        timerID = setInterval("CheckSrcText()", 1000);
+		timerID = setInterval(function () {forwardAttachmentsToMsgWindow(wantedIndex)}, 1000);
         timerRunning = true;
-    }    
+    }
+
+    // attach pdfs to the message by feeding pdf information back to the create window
+	// page then closing this page.
+    function attachPDFs()
+	{
+		//show user msg, to let them know documents are beging attached
+		document.getElementById("processing-attachments-msg").style = "display: blocked";
+		parent.window.opener.attachments = [];
+
+		var indexArray = document.forms[0].indexArray;
+		let i = 0;
+		for( i ; i < indexArray.length ; i ++ ) {
+			if ( indexArray[i].checked ) {
+				let interId = null;
+				let docIndex = i;
+				interId = setInterval(function () {
+					clearInterval(interId);
+					AttachingPDF(docIndex);
+				}, i*1200);
+			}
+		}
+
+		let interId = null;
+		interId = setInterval(function () {
+			clearInterval(interId);
+			console.log("PDFs attached");
+			parent.window.opener.onAttachmentsChange();
+			parent.window.close();
+		}, i*1200)
+	}
     
     
     function CheckSrcText() {
@@ -201,14 +198,32 @@ request.getSession().setAttribute("EctSessionBean",bean);
             if(timerRunning) { 
               clearInterval(timerID)
             }
-            timerRunning = false        
-        
+            timerRunning = false;
+
             document.forms[0].submit();
         }
 
         return;
     }
-    
+
+	// forward attachments the the create message window.
+	// then close this window
+	function forwardAttachmentsToMsgWindow(idx)
+	{
+		if (timerRunning)
+		{
+			clearInterval(timerID);
+		}
+		timerRunning = false;
+
+		let createMsgWindow = parent.window.opener;
+		createMsgWindow.attachments.push({
+			title: document.forms[0].titleArray[idx].value,
+			src: document.forms[0].srcText.value
+		})
+
+	}
+
 </script>
 
 
@@ -383,13 +398,17 @@ request.getSession().setAttribute("EctSessionBean",bean);
                                     </td>
                                     </tr>
                                     -->
-
+						<tr>
+							<td id="processing-attachments-msg" colspan="3" style="display:none;">
+								Attaching documents...
+							</td>
+						</tr>
 						<tr>
 							<td colspan="3" align="center">
 							<% if ( request.getParameter("isAttaching") != null ) { %> <input
 								type=text name=status value='' /> <% } else { %> <input
 								type="button" name="Attach" value="Attach Document"
-								onclick="AttachingPDF(-1)" /> <% } %> <br />
+								onclick="attachPDFs()" /> <% } %> <br />
 							</td>
 						</tr>
 
@@ -408,24 +427,8 @@ request.getSession().setAttribute("EctSessionBean",bean);
 						</tr>
 
 					</table>
-				</html:form> <script>
-                                        if ( document.forms[0].isAttaching.value == "true") {
-
-                                            j = 0;
-                                            var indexArray = document.forms[0].indexArray;
-                                            for( i = 0; i < indexArray.length ; i ++ ) {
-                                                if ( indexArray[i].checked ) {
-                                                   j++;
-                                                }
-                                            }
-
-                                            document.forms[0].status.value = "Attaching <%=MsgSessionBean.getCurrentAttachmentCount() + 1%> out of " + j;
-                                            AttachingPDF( <%=MsgSessionBean.getCurrentAttachmentCount()%>);      
-
-                                        }
-
-
-                                    </script></td>
+				</html:form>
+				</td>
 
 
 

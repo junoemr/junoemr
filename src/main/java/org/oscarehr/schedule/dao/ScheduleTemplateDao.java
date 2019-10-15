@@ -329,6 +329,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			multiBookingsRulesJoinSql += "" +
 					"  LEFT JOIN appointment AS " + joinTag + " ON\n" +
 					"    " + joinTag + ".demographic_no = :demographicNo \n" +
+					"    AND " + joinTag + ".status != 'C' \n" +
 					"    AND " + joinTag + ".appointment_date <= " +
 					"      (appointment_slots.slot_date + \n" +
 					"      INTERVAL :" + durationTag + " DAY) \n" +
@@ -394,6 +395,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				// Join appointments onto slots to exclude any slots that are already taken
 				"  LEFT JOIN appointment appt ON\n" +
 				"    appt.appointment_date = appointment_slots.slot_date\n" +
+				"    AND appt.status != 'C' \n" +
 				"    AND appt.provider_no = :providerNo \n" +
 				"    AND appt.start_time < (appointment_slots.start_time + \n" +
 				"      INTERVAL start_time_offset MINUTE) \n" +

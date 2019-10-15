@@ -92,6 +92,11 @@
 
 <link rel="stylesheet" type="text/css" href="bcArStyle.css">
 <!-- calendar stylesheet -->
+
+    <!-- Helper scripts for submission -->
+    <script type="text/javascript" src="OscarFormHelpers.js"></script>
+    <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+
 <link rel="stylesheet" type="text/css" media="all"
 	href="../share/calendar/calendar.css" title="win2k-cold-1" />       
 <!-- main calendar program -->
@@ -118,36 +123,38 @@
 
 
   function onPrint() {
-            document.forms[0].submit.value="print"; //printAR1
-           // var ret = checkAllDates();
-            var ret = true;
-            if(ret==true)
-            {
-            document.forms[0].action = "../form/createpdf?__title=British+Columbia+Newborn+Record+2008+Part+2&__cfgfile=bcNB2008PrintCfgPg3&__template=bcNewBorn2008pg2";
-
-                document.forms[0].target="_blank";
-            }
-            return ret;
-        }	
+      document.forms[0].submit.value="print"; //printAR1
+      Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
+      // var ret = checkAllDates();
+      var ret = true;
+      if(ret==true)
+      {
+        document.forms[0].action = "../form/createpdf?__title=British+Columbia+Newborn+Record+2008+Part+2&__cfgfile=bcNB2008PrintCfgPg3&__template=bcNewBorn2008pg2";
+        document.forms[0].target="_blank";
+      }
+      return ret;
+    }
 	
     function onSave() {
-        	document.forms[0].submit.value="save";
-        	var ret = true;
+        document.forms[0].submit.value="save";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
+        var ret = true;
         	//var ret = checkAllDates();
         	//if(ret==true) {
 		   //	ret = checkAllTimes();
     		//}
-         if(ret==true) {
+        if(ret==true) {
             reset();
             ret = confirm("Are you sure you want to save this form?");
-         }
-        	 return ret;
-         }
+        }
+        return ret;
+    }
 
 
 
     function onSaveExit() {
         document.forms[0].submit.value="exit";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret==true) {
 			ret = checkAllTimes();

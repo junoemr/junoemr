@@ -55,26 +55,18 @@ public class MsgReDisplayMessagesAction extends Action {
     	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_msg", "r", null)) {
 			throw new SecurityException("missing required security object (_msg)");
 		}
-    	
-    oscar.oscarMessenger.pageUtil.MsgSessionBean bean = null;
-    bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)request.getSession().getAttribute("msgSessionBean");
 
-    if (bean == null){
-        return (mapping.findForward("success"));   //should be changed to a eject page
-    }
-    ///
+		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		String[] messageNo = ((MsgDisplayMessagesForm)form).getMessageNo();
+				//This will go through the array of message Numbers and set them
+				//to del.which stands for deleted. but you prolly could have figured that out
+				for (int i =0 ; i < messageNo.length ; i++){
+				  for(MessageList ml:dao.findByProviderNoAndMessageNo(providerNo, Long.valueOf(messageNo[i]))) {
+					  ml.setStatus("read");
+					  dao.merge(ml);
+				  }
+				}//for
 
-    String providerNo= bean.getProviderNo();
-    String[] messageNo = ((MsgDisplayMessagesForm)form).getMessageNo();
-            //This will go through the array of message Numbers and set them
-            //to del.which stands for deleted. but you prolly could have figured that out
-            for (int i =0 ; i < messageNo.length ; i++){   
-        	  for(MessageList ml:dao.findByProviderNoAndMessageNo(providerNo, Long.valueOf(messageNo[i]))) {
-        		  ml.setStatus("read");
-        		  dao.merge(ml);
-        	  }         
-            }//for
-
-    return (mapping.findForward("success"));
-    }
+		return (mapping.findForward("success"));
+		}
 }

@@ -48,6 +48,9 @@
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 
+	<!-- Helper scripts for submission -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
 
 <!-- link rel="stylesheet" href="Style1.css" type="text/css" media="all" -->
 
@@ -91,11 +94,13 @@ TABLE {
 //            ret = confirm("Do you wish to save this form and view the print preview?");
 //        }
 //        return ret;
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         window.print();
     }
     function onSave() 
 	{
         document.forms[0].submit.value="save";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
 		if(ret)
 		{
@@ -111,6 +116,7 @@ TABLE {
     
     function onSaveExit() {
         document.forms[0].submit.value="exit";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
 		if(ret)
 		{

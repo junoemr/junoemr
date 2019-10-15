@@ -237,6 +237,7 @@ import java.util.zip.ZipInputStream;
         ArrayList<String> warnings = new ArrayList<String>();
         ArrayList<String[]> logs = new ArrayList<String[]>();
         File importLog = null;
+        String defaultSite = frm.getDefaultSite();
 
 	try {
             InputStream is = imp.getInputStream();
@@ -264,7 +265,7 @@ import java.util.zip.ZipInputStream;
                         OutputStream out = new FileOutputStream(ofile);
                         while ((len=in.read(buf)) > 0) out.write(buf,0,len);
                         out.close();
-                        logs.add(importXML(LoggedInInfo.getLoggedInInfoFromSession(request) , ofile, warnings, request,frm.getTimeshiftInDays(),students,courseId));
+                        logs.add(importXML(LoggedInInfo.getLoggedInInfoFromSession(request) , ofile, warnings, request,frm.getTimeshiftInDays(),students,courseId, defaultSite));
                         importNo++;
                         demographicNo=null;
                     }
@@ -280,7 +281,7 @@ import java.util.zip.ZipInputStream;
                 Util.cleanFile(ifile);
 
             } else if (matchFileExt(ifile, "xml")) {
-                logs.add(importXML(LoggedInInfo.getLoggedInInfoFromSession(request), ifile, warnings, request,frm.getTimeshiftInDays(),students,courseId));
+                logs.add(importXML(LoggedInInfo.getLoggedInInfoFromSession(request), ifile, warnings, request,frm.getTimeshiftInDays(),students,courseId, defaultSite));
                 demographicNo=null;
                 importLog = makeImportLog(logs, tmpDir);
             } else {
@@ -290,7 +291,8 @@ import java.util.zip.ZipInputStream;
 	} catch (Exception e) {
             warnings.add("Error processing file: " + imp.getFileName());
             logger.error("Error", e);
-	}
+            importLog = makeImportLog(logs, tmpDir);
+    }
 
         //channel warnings and importlog to browser
         request.setAttribute("warnings",warnings);
@@ -300,9 +302,9 @@ import java.util.zip.ZipInputStream;
         return mapping.findForward("success");
     }
 
-    String[] importXML(LoggedInInfo loggedInInfo, String xmlFile, ArrayList<String> warnings, HttpServletRequest request, int timeShiftInDays,List<Provider> students, int courseId) throws SQLException, Exception {
+    String[] importXML(LoggedInInfo loggedInInfo, String xmlFile, ArrayList<String> warnings, HttpServletRequest request, int timeShiftInDays,List<Provider> students, int courseId, String defaultSite) throws SQLException, Exception {
         if(students == null || students.isEmpty()) {
-            return importXML(loggedInInfo, xmlFile,warnings,request,timeShiftInDays,null,null,0);
+            return importXMLForProvider(loggedInInfo, xmlFile,warnings,request,timeShiftInDays,null,null,0, defaultSite);
         }
 
         List<String> logs = new ArrayList<String>();
@@ -317,7 +319,7 @@ import java.util.zip.ZipInputStream;
             }
             Program p = programManager.getProgram(pid);
 
-            String[] result = importXML(loggedInInfo, xmlFile,warnings,request,timeShiftInDays,student,p,courseId);
+            String[] result = importXMLForProvider(loggedInInfo, xmlFile,warnings,request,timeShiftInDays,student,p,courseId, defaultSite);
             logs.addAll(convertLog(result));
         }
         return logs.toArray(new String[logs.size()]);
@@ -331,7 +333,7 @@ import java.util.zip.ZipInputStream;
 
 
 
-    String[] importXML(LoggedInInfo loggedInInfo, String xmlFile, ArrayList<String> warnings, HttpServletRequest request, int timeShiftInDays, Provider student, Program admitTo, int courseId) throws SQLException, Exception {
+    String[] importXMLForProvider(LoggedInInfo loggedInInfo, String xmlFile, ArrayList<String> warnings, HttpServletRequest request, int timeShiftInDays, Provider student, Program admitTo, int courseId, String defaultSite) throws SQLException, Exception {
         ArrayList<String> err_demo = new ArrayList<String>(); //errors: duplicate demographics
         ArrayList<String> err_data = new ArrayList<String>(); //errors: discrete data
         ArrayList<String> err_summ = new ArrayList<String>(); //errors: summary
@@ -860,27 +862,24 @@ import java.util.zip.ZipInputStream;
             //PERSONAL HISTORY
             PersonalHistory[] pHist = patientRec.getPersonalHistoryArray();
             logger.info("IMPORT PERSONAL HISTORY: " + pHist.length + " entries found");
-            for (int i=0; i<pHist.length; i++) {
-                if (i==0) scmi = getCMIssue("SocHistory");
-                CaseManagementNote cmNote = prepareCMNote("1",null);
+            final String historyPrefix = "<cds:CategorySummaryLine xmlns:cds=\"cds\" xmlns:cdsd=\"cds_dt\">[Personal History]:";
+            final String historySuffix = "</cds:CategorySummaryLine>";
+            for (int i=0; i<pHist.length; i++)
+            {
+                if (i == 0)
+                {
+                    scmi = getCMIssue("SocHistory");
+                }
+                CaseManagementNote cmNote = prepareCMNote(programId, null);
                 cmNote.setIssues(scmi);
 
-                //main field
-                String socialHist = "Imported Personal History";
-//                String summary = pHist[i].getCategorySummaryLine();
-                String residual = getResidual(pHist[i].getResidualInfo());
-                if (StringUtils.empty(residual)) continue;
+                String history = org.apache.commons.lang.StringUtils.trimToNull(pHist[i].toString())
+                        .replace(historyPrefix, "")
+                        .replace(historySuffix, "");
 
-                cmNote.setNote(socialHist);
+                cmNote.setNote(history);
                 caseManagementManager.saveNoteSimple(cmNote);
                 addOneEntry(PERSONALHISTORY);
-
-                //to dumpsite
-                /*residual = Util.addLine("imported.cms4.2011.06", residual);
-                Long hostNoteId = cmNote.getId();
-                cmNote = prepareCMNote("2",null);
-                cmNote.setNote(residual);
-                saveLinkNote(hostNoteId, cmNote);*/
             }
 
             //FAMILY HISTORY
@@ -888,7 +887,7 @@ import java.util.zip.ZipInputStream;
             logger.info("IMPORT FAMILY HISTORY: " + fHist.length + " entries found");
             for (int i=0; i<fHist.length; i++) {
                 if (i==0) scmi = getCMIssue("FamHistory");
-                CaseManagementNote cmNote = prepareCMNote("1",null);
+                CaseManagementNote cmNote = prepareCMNote(programId, null);
 
                 //diagnosis code
                 if (fHist[i].getDiagnosisProcedureCode()==null) {
@@ -906,7 +905,7 @@ import java.util.zip.ZipInputStream;
 
                 //annotation
                 Long hostNoteId = cmNote.getId();
-                cmNote = prepareCMNote("2",null);
+                cmNote = prepareCMNote(programId, null);
                 String note = StringUtils.noNull(fHist[i].getNotes());
                 cmNote.setNote(note);
                 saveLinkNote(hostNoteId, cmNote);
@@ -967,7 +966,7 @@ import java.util.zip.ZipInputStream;
             logger.info("IMPORT PAST HEALTH: " + pHealth.length + " entries found");
             for (int i=0; i< pHealth.length; i++) {
                 if (i==0) scmi = getCMIssue("MedHistory");
-                CaseManagementNote cmNote = prepareCMNote("1",null);
+                CaseManagementNote cmNote = prepareCMNote(programId, null);
 
                 //diagnosis code
                 if (pHealth[i].getDiagnosisProcedureCode()==null) {
@@ -985,7 +984,7 @@ import java.util.zip.ZipInputStream;
 
                 //annotation
                 Long hostNoteId = cmNote.getId();
-                cmNote = prepareCMNote("2",null);
+                cmNote = prepareCMNote(programId, null);
                 String note = pHealth[i].getNotes();
                 cmNote.setNote(note);
                 saveLinkNote(hostNoteId, cmNote);
@@ -1041,7 +1040,7 @@ import java.util.zip.ZipInputStream;
                 logger.info("IMPORT PROBLEM LIST: " + probList.length + " entries found");
                 for (int i=0; i<probList.length; i++) {
                     if (i==0) scmi = getCMIssue("Concerns");
-                    CaseManagementNote cmNote = prepareCMNote("1",null);
+                    CaseManagementNote cmNote = prepareCMNote(programId, null);
 
                     //diagnosis code
                     if (probList[i].getDiagnosisCode()==null) {
@@ -1059,7 +1058,7 @@ import java.util.zip.ZipInputStream;
 
                     //annotation
                     Long hostNoteId = cmNote.getId();
-                    cmNote = prepareCMNote("2",null);
+                    cmNote = prepareCMNote(programId, null);
                     String note = probList[i].getNotes();
                     cmNote.setNote(note);
                     saveLinkNote(hostNoteId, cmNote);
@@ -1123,7 +1122,7 @@ import java.util.zip.ZipInputStream;
                 logger.info("IMPORT RISK FACTORS: " + rFactors.length + " entries found");
                 for (int i=0; i<rFactors.length; i++) {
                     if (i==0) scmi = getCMIssue("RiskFactors");
-                    CaseManagementNote cmNote = prepareCMNote("1",null);
+                    CaseManagementNote cmNote = prepareCMNote(programId, null);
                     cmNote.setIssues(scmi);
 
                     //main field
@@ -1135,7 +1134,7 @@ import java.util.zip.ZipInputStream;
 
                     //annotation
                     Long hostNoteId = cmNote.getId();
-                    cmNote = prepareCMNote("2",null);
+                    cmNote = prepareCMNote(programId, null);
                     String note = rFactors[i].getNotes();
                     cmNote.setNote(note);
                     saveLinkNote(hostNoteId, cmNote);
@@ -1180,7 +1179,7 @@ import java.util.zip.ZipInputStream;
                 logger.info("IMPORT ALERTS & SPECIAL NEEDS: " + alerts.length + " entries found");
                 for (int i=0; i<alerts.length; i++) {
                     if (i==0) scmi = getCMIssue("Reminders");
-                    CaseManagementNote cmNote = prepareCMNote("1",null);
+                    CaseManagementNote cmNote = prepareCMNote(programId, null);
                     cmNote.setIssues(scmi);
 
                     //main field
@@ -1195,7 +1194,7 @@ import java.util.zip.ZipInputStream;
 
                     //annotation
                     Long hostNoteId = cmNote.getId();
-                    cmNote = prepareCMNote("2",null);
+                    cmNote = prepareCMNote(programId, null);
                     String note = alerts[i].getNotes();
                     cmNote.setNote(note);
                     saveLinkNote(hostNoteId, cmNote);
@@ -1242,7 +1241,7 @@ import java.util.zip.ZipInputStream;
 
                     }
 
-                    CaseManagementNote cmNote = prepareCMNote("1",null);
+                    CaseManagementNote cmNote = prepareCMNote(programId,null);
                     cmNote.setCreate_date(createDate);
                     cmNote.setObservation_date(observeDate);
                     cmNote.setNote(encounter);
@@ -1254,7 +1253,7 @@ import java.util.zip.ZipInputStream;
                     int p_total = participatingProviders.length + noteReviewers.length;
                     for (int p=0; p<p_total; p++) {
                         if (p>0) {
-                            cmNote = prepareCMNote("1",uuid);
+                            cmNote = prepareCMNote(programId,uuid);
                             cmNote.setObservation_date(observeDate);
                             cmNote.setCreate_date(createDate);
                             cmNote.setNote(encounter);
@@ -1367,7 +1366,7 @@ import java.util.zip.ZipInputStream;
 
                     //annotation
                     String note = StringUtils.noNull(aaReactArray[i].getNotes());
-                    CaseManagementNote cmNote = prepareCMNote("2",null);
+                    CaseManagementNote cmNote = prepareCMNote(programId,null);
                     cmNote.setNote(note);
                     saveLinkNote(cmNote, CaseManagementNoteLink.ALLERGIES, Long.valueOf(allergyId));
                 }
@@ -1379,8 +1378,9 @@ import java.util.zip.ZipInputStream;
                 String duration, quantity, dosage, special;
                 for (int i=0; i<medArray.length; i++) {
                     Drug drug = new Drug();
-                    drug.setCreateDate(new Date());
-                    drug.setWrittenDate(dateTimeFPtoDate(medArray[i].getPrescriptionWrittenDate(), timeShiftInDays));
+                    Date writtenDate = dateTimeFPtoDate(medArray[i].getPrescriptionWrittenDate(), timeShiftInDays);
+                    drug.setCreateDate(writtenDate);
+                    drug.setWrittenDate(writtenDate);
                     String writtenDateFormat = dateFPGetPartial(medArray[i].getPrescriptionWrittenDate());
 
                     drug.setRxDate(dateFPtoDate(medArray[i].getStartDate(), timeShiftInDays));
@@ -1526,7 +1526,7 @@ import java.util.zip.ZipInputStream;
                     partialDateDao.setPartialDate(PartialDate.DRUGS, drug.getId(), PartialDate.DRUGS_WRITTENDATE, writtenDateFormat);
 
                     //annotation
-                    CaseManagementNote cmNote = prepareCMNote("2",null);
+                    CaseManagementNote cmNote = prepareCMNote(programId,null);
                     String note = StringUtils.noNull(medArray[i].getNotes());
                     cmNote.setNote(note);
                     saveLinkNote(cmNote, CaseManagementNoteLink.DRUGS, (long)drug.getId());
@@ -1810,7 +1810,7 @@ import java.util.zip.ZipInputStream;
                         String annotation = labResults.getPhysiciansNotes();
                         if (StringUtils.filled(annotation)) {
                             saveMeasurementsExt(measId, "other_id", "0-0");
-                            CaseManagementNote cmNote = prepareCMNote("2",null);
+                            CaseManagementNote cmNote = prepareCMNote(programId,null);
                             cmNote.setNote(annotation);
                             saveLinkNote(cmNote, CaseManagementNoteLink.LABTEST2, Long.valueOf(lab_ppid), "0-0");
                         }
@@ -1854,20 +1854,15 @@ import java.util.zip.ZipInputStream;
                         notes = appArray[i].getAppointmentNotes();
                     }
                     String apptStatus = appArray[i].getAppointmentStatus();
-                    if (apptStatus!=null) {
-                        for (int j=1; j<allStatus.length; j++) {
-                            String msg = getResources(request).getMessage(allTitle[j]);
-                            if (apptStatus.trim().equalsIgnoreCase(msg)) {
-                                status = allStatus[j];
-                                apptStatus = null;
-                                break;
-                            }
+                    for (int j=1; j<allStatus.length; j++) {
+                        if (allTitle[j].equalsIgnoreCase(org.apache.commons.lang.StringUtils.trimToEmpty(apptStatus))) {
+                            status = allStatus[j];
+                            apptStatus = null;
+                            break;
                         }
-                        if (StringUtils.empty(status)) {
-                        	status = allStatus[0];
-//                        	err_note.add("Cannot map appointment status ["+apptStatus+"]. Appointment Status set to [To Do]");
-                        }
-
+                    }
+                    if (StringUtils.empty(status)) {
+                        status = allStatus[0];
                     }
 
                     reason = StringUtils.noNull(appArray[i].getAppointmentPurpose());
@@ -1888,6 +1883,12 @@ import java.util.zip.ZipInputStream;
                     appt.setEndTime(ConversionUtils.fromTimeString(endTime));
                     appt.setName(patientName);
                     appt.setDemographicNo(Integer.parseInt(demographicNo));
+                    appt.setCreator(admProviderNo);
+                    appt.setLastUpdateUser(admProviderNo);
+                    if (defaultSite != null && !defaultSite.isEmpty())
+                    {
+                        appt.setLocation(defaultSite);
+                    }
                     appt.setNotes(notes);
                     appt.setReason(reason);
                     appt.setStatus(status);
@@ -2300,7 +2301,7 @@ import java.util.zip.ZipInputStream;
                 out.newLine();
                 out.write(fillUp("",'-',tableWidth)); out.newLine();
 
-                for (int i=0; i<importNo; i++) {
+                for (int i=0; i < demo.size(); i++) {
                     Integer id = entries.get(PATIENTID+i);
                     if (id==null) id = 0;
                     out.write(fillUp(id.toString(), ' ', column1.length()));
