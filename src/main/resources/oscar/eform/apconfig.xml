@@ -2094,8 +2094,7 @@
 	<databaseap>
 		<ap-name>bc_family_doctor_address</ap-name>
 		<ap-sql>SELECT CONCAT( b.address1, IF( b.address1 ='', '', '\n' ),
-			b.address2, IF( b.address2 ='', '', '\n' ) , b.city, ' ', b.province,
-			' ', b.postal ) AS raddress
+			b.city, ' ', b.province, ' ', b.postal ) AS raddress
 			FROM billingreferral b, demographic d
 			WHERE d.demographic_no=${demographic}
 			AND LENGTH(b.referral_no) > 0
