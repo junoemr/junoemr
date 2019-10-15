@@ -34,11 +34,6 @@ angular.module('Admin').controller('Admin.AdminController', [
 		let controller = this;
 		controller.navList = [];
 
-		controller.onSideNaveClick = function(group, item)
-		{
-
-		};
-
 		function generateTransition(newState)
 		{
 			return function()
