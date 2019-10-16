@@ -62,7 +62,8 @@ angular.module('Schedule').component('eventComponent', {
 			// Local scope variables
 			//=========================================================================/
 
-			controller.useOldEchart = true; //TODO load from a setting?
+			controller.useOldEchart = true;
+			controller.loadedSettings = {};
 			controller.tabEnum = Object.freeze({
 				appointment: 0,
 				history: 1,
@@ -314,12 +315,13 @@ angular.module('Schedule').component('eventComponent', {
 				}
 
 				controller.changeTab(controller.tabEnum.appointment);
+
+				controller.loadProviderSettings();
 			};
 
 			//=========================================================================
 			// Private methods
 			//=========================================================================/
-
 			controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 			{
 				var eventStatusCode = $scope.defaultEventStatus;
@@ -977,7 +979,19 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				if ($scope.isPatientSelected())
 				{
-					if (controller.useOldEchart)
+					if (controller.loadedSettings.hideOldEchartLinkInAppointment)
+					{
+						var params = {
+							demographicNo: controller.demographicModel.demographicNo,
+						};
+						if (angular.isDefined($scope.eventUuid))
+						{
+							params.appointmentNo = $scope.eventUuid;
+							params.encType = "face to face encounter with client";
+						}
+						$state.go('record.summary', params);
+					}
+					else
 					{
 						var params = {
 							providerNo: controller.providerModel.providerNo,
@@ -995,19 +1009,8 @@ angular.module('Schedule').component('eventComponent', {
 							apptProvider_no: controller.providerModel.providerNo,
 							encType: "face to face encounter with client",
 						};
-						window.open(scheduleService.getEncounterLink(params));
-					}
-					else
-					{
-						var params = {
-							demographicNo: controller.demographicModel.demographicNo,
-						};
-						if (angular.isDefined($scope.eventUuid))
-						{
-							params.appointmentNo = $scope.eventUuid;
-							params.encType = "face to face encounter with client";
-						}
-						$state.go('record.summary', params);
+						window.open(scheduleService.getEncounterLink(params), 'popupWindow',
+								'height=800,width=1000,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
 					}
 					controller.cancel();
 				}
@@ -1060,6 +1063,20 @@ angular.module('Schedule').component('eventComponent', {
 				};
 				window.open(scheduleService.getRxLink(params));
 				controller.cancel();
+			};
+
+			controller.loadProviderSettings = function ()
+			{
+				providerService.getSettings().then(
+						function success(result)
+						{
+							controller.loadedSettings = result;
+						},
+						function error(err)
+						{
+							console.error("Failed to fetch provider settings in event card, with error: " + err);
+						}
+				);
 			};
 
 

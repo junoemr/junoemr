@@ -95,6 +95,37 @@ angular.module('Layout').component('leftAside', {
 					ctrl.initialized = true;
 				}
 			);
+
+			ctrl.loadProvider();
+			ctrl.loadProviderSettings();
+		};
+
+		ctrl.loadProviderSettings = function ()
+		{
+			providerService.getSettings().then(
+					function success(result)
+					{
+						ctrl.loadedSettings = result;
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch provider setting in left aside with error: " + result);
+					}
+			);
+		};
+
+		ctrl.loadProvider = function ()
+		{
+			providerService.getMe().then(
+					function success(result)
+					{
+						ctrl.provider = result;
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch provider info in left aside with error: " + result);
+					}
+			);
 		};
 
 		ctrl.changeTab = function changeTab(tabId)
@@ -107,20 +138,42 @@ angular.module('Layout').component('leftAside', {
 		{
 			if (patient.demographicNo != 0)
 			{
-				var params = {
-					demographicNo: patient.demographicNo
-				};
-				if (angular.isDefined(patient.appointmentNo))
+				if (ctrl.loadedSettings.hideOldEchartLinkInAppointment)
 				{
-					params.appointmentNo = patient.appointmentNo;
-					params.encType = "face to face encounter with client";
-
-					if (angularUtil.inMobileView())
+					var params = {
+						demographicNo: patient.demographicNo
+					};
+					if (angular.isDefined(patient.appointmentNo))
 					{
-						ctrl.showPatientList(false);
+						params.appointmentNo = patient.appointmentNo;
+						params.encType = "face to face encounter with client";
+
+						if (angularUtil.inMobileView())
+						{
+							ctrl.showPatientList(false);
+						}
 					}
+					$state.go('record.summary', params);
+				} else
+				{
+					let startMoment = Juno.Common.Util.getDatetimeNoTimezoneMoment(new Date(patient.date));
+					let params = {
+						providerNo: ctrl.provider.providerNo,
+						curProviderNo: ctrl.provider.providerNo,
+						providerview: ctrl.provider.providerNo,
+						userName: ctrl.displayName,
+						demographicNo: patient.demographicNo,
+
+						curDate: Juno.Common.Util.formatMomentDate(moment()),
+						reason: patient.reason,
+						appointmentNo: patient.appointmentNo,
+						appointmentDate: Juno.Common.Util.formatMomentDate(startMoment),
+						startTime: Juno.Common.Util.formatMomentTime(startMoment),
+						encType: "face to face encounter with client",
+					};
+					window.open(scheduleService.getEncounterLink(params), 'popupWindow',
+							'height=800,width=1000,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
 				}
-				$state.go('record.summary', params);
 			}
 		};
 
