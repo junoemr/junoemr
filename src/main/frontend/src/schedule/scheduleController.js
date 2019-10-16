@@ -1959,6 +1959,15 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return deferred.promise;
 		};
 
+		$scope.$on("$destroy", function ()
+		{
+			// clean up refresh timer.
+			if (controller.refreshSettings.timerVariable)
+			{
+				clearInterval(controller.refreshSettings.timerVariable);
+			}
+		});
+
 		// Any changes to this array need to be applied by calling applyUiConfig()
 		$scope.uiConfig = {
 			calendar: {
