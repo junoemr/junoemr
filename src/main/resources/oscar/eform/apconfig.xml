@@ -1183,6 +1183,14 @@
 			where bcar.demographic_no=${demographic} order by bcar.formEdited desc limit 1;</ap-sql>
 		<ap-output>${c_EDD}</ap-output>
 	</databaseap>
+    <databaseap>
+        <ap-name>provider_billing_group</ap-name>
+        <ap-sql>
+			SELECT REGEXP_REPLACE(comments ,"[^^]*&lt;xml_p_billinggroup_no>(.*?)&lt;\/xml_p_billinggroup_no>[^$]*", "\\1") AS billing_group_no FROM provider
+			WHERE provider_no = ${loggedInProvider}
+		</ap-sql>
+        <ap-output>${billing_group_no}</ap-output>
+    </databaseap>
 
 	<!-- Doctor information -->
 	<databaseap>
