@@ -56,6 +56,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 
 @Path("/faxAccount")
@@ -79,17 +80,20 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Autowired
 	FaxAccountService faxAccountService;
 
+	@Autowired
+	FaxTransferConverter faxTransferConverter;
+
 	@GET
 	@Path("/search")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<FaxAccountTransferOutbound> listAccounts(@QueryParam("page")
-	                                                                   @DefaultValue("1")
-			                                                                   Integer page,
-	                                                                   @QueryParam("perPage")
-	                                                                   @DefaultValue("10")
-			                                                                   Integer perPage)
+																	   @DefaultValue("1")
+																			   Integer page,
+																	   @QueryParam("perPage")
+																	   @DefaultValue("10")
+																			   Integer perPage)
 	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+ 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
 		page = validPageNo(page);
@@ -102,9 +106,8 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		criteriaSearch.setSortDirAscending();
 
 		int total = faxAccountDao.criteriaSearchCount(criteriaSearch);
-		List<FaxAccount> accountList = faxAccountDao.criteriaSearch(criteriaSearch);
-
-		return RestSearchResponse.successResponse(FaxTransferConverter.getAllAsOutboundTransferObject(accountList), page, perPage, total);
+		List<FaxAccountTransferOutbound> transferList = faxTransferConverter.getAllAsOutboundTransferObject(faxAccountService.listAccounts(criteriaSearch));
+		return RestSearchResponse.successResponse(transferList, page, perPage, total);
 	}
 
 	@GET
@@ -127,7 +130,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		FaxAccountTransferOutbound accountSettingsTo1 = FaxTransferConverter.getAsOutboundTransferObject(faxAccountDao.find(id));
+		FaxAccountTransferOutbound accountSettingsTo1 = faxTransferConverter.getAsOutboundTransferObject(faxAccountDao.find(id));
 		return RestResponse.successResponse(accountSettingsTo1);
 	}
 
@@ -141,11 +144,11 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
 
-		FaxAccount faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
+		FaxAccount faxAccount = faxTransferConverter.getAsDomainObject(accountSettingsTo1);
 		faxAccount.setIntegrationType(FaxAccount.INTEGRATION_TYPE_SRFAX);// hardcoded until more than one type exists
 		faxAccountDao.persist(faxAccount);
 
-		return RestResponse.successResponse(FaxTransferConverter.getAsOutboundTransferObject(faxAccount));
+		return RestResponse.successResponse(faxTransferConverter.getAsOutboundTransferObject(faxAccount));
 	}
 
 	@PUT
@@ -154,28 +157,28 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxAccountTransferOutbound> updateAccountSettings(@PathParam("id") Long id,
-	                                                                      FaxAccountTransferInbound accountSettingsTo1)
+																		  FaxAccountTransferInbound accountSettingsTo1)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
 
 		FaxAccount faxAccount = faxAccountDao.find(id);
-		if(faxAccount == null)
+		if (faxAccount == null)
 		{
 			throw new ResourceNotFoundException("Invalid Fax Config Id: " + id);
 		}
 
 		// keep current password if a new one is not set
-		if(accountSettingsTo1.getPassword() == null || accountSettingsTo1.getPassword().trim().isEmpty())
+		if (accountSettingsTo1.getPassword() == null || accountSettingsTo1.getPassword().trim().isEmpty())
 		{
 			accountSettingsTo1.setPassword(faxAccount.getLoginPassword());
 		}
-		faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
+		faxAccount = faxTransferConverter.getAsDomainObject(accountSettingsTo1);
 		faxAccount.setIntegrationType(FaxAccount.INTEGRATION_TYPE_SRFAX);// hardcoded until more than one type exists
 		faxAccount.setId(id);
 		faxAccountDao.merge(faxAccount);
 
-		return RestResponse.successResponse(FaxTransferConverter.getAsOutboundTransferObject(faxAccount));
+		return RestResponse.successResponse(faxTransferConverter.getAsOutboundTransferObject(faxAccount));
 	}
 
 	@POST
@@ -191,13 +194,14 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		boolean success = faxAccountService.testConnectionStatus(accountSettingsTo1.getAccountLogin(), accountSettingsTo1.getPassword());
 		return RestResponse.successResponse(success);
 	}
+
 	@POST
 	@Path("/{id}/testConnection")
 	@MaskParameter
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> testConnection(@PathParam("id") Long id,
-	                                            FaxAccountTransferInbound accountSettingsTo1)
+												FaxAccountTransferInbound accountSettingsTo1)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
@@ -205,7 +209,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		// if the password is not changed, use the saved one
 		String password = accountSettingsTo1.getPassword();
 		String username = accountSettingsTo1.getAccountLogin();
-		if(password == null || password.isEmpty())
+		if (password == null || password.isEmpty())
 		{
 			FaxAccount faxAccount = faxAccountDao.find(id);
 			password = faxAccount.getLoginPassword();
@@ -219,10 +223,10 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<FaxInboxTransferOutbound> getInbox(@PathParam("id") Long id,
-	                                                             @QueryParam("page") @DefaultValue("1") Integer page,
-	                                                             @QueryParam("perPage") @DefaultValue("10") Integer perPage,
-	                                                             @QueryParam("endDate") String endDateStr,
-	                                                             @QueryParam("startDate") String startDateStr)
+																 @QueryParam("page") @DefaultValue("1") Integer page,
+																 @QueryParam("perPage") @DefaultValue("10") Integer perPage,
+																 @QueryParam("endDate") String endDateStr,
+																 @QueryParam("startDate") String startDateStr)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
@@ -237,19 +241,19 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		criteriaSearch.setFaxAccountId(id);
 		criteriaSearch.setSortDirDescending();
 
-		if(endDateStr != null)
+		if (endDateStr != null)
 		{
 			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
 		}
-		if(startDateStr != null)
+		if (startDateStr != null)
 		{
 			criteriaSearch.setStartDate(ConversionUtils.toLocalDate(startDateStr));
 		}
 
 		int total = faxInboundDao.criteriaSearchCount(criteriaSearch);
-		List<FaxInboxTransferOutbound> resultList = faxAccountService.getInboxResults(criteriaSearch);
+		List<FaxInboxTransferOutbound> inboundList = faxTransferConverter.getAllAsInboxTransferObject(faxAccountService.getInboxResults(criteriaSearch));
 
-		return RestSearchResponse.successResponse(resultList, page, perPage, total);
+		return RestSearchResponse.successResponse(inboundList, page, perPage, total);
 	}
 
 	@GET
@@ -257,12 +261,12 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<FaxOutboxTransferOutbound> getOutbox(@PathParam("id") Long id,
-	                                                               @QueryParam("page") @DefaultValue("1") Integer page,
-	                                                               @QueryParam("perPage") @DefaultValue("10") Integer perPage,
-	                                                               @QueryParam("endDate") String endDateStr,
-	                                                               @QueryParam("startDate") String startDateStr,
-	                                                               @QueryParam("combinedStatus") String combinedStatus,
-	                                                               @QueryParam("archived") String archived)
+																   @QueryParam("page") @DefaultValue("1") Integer page,
+																   @QueryParam("perPage") @DefaultValue("10") Integer perPage,
+																   @QueryParam("endDate") String endDateStr,
+																   @QueryParam("startDate") String startDateStr,
+																   @QueryParam("combinedStatus") String combinedStatus,
+																   @QueryParam("archived") String archived)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
@@ -272,32 +276,32 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		int offset = calculatedOffset(page, perPage);
 
 		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
-		criteriaSearch.setOffset(offset);
 		criteriaSearch.setLimit(perPage);
 		criteriaSearch.setFaxAccountId(id);
 		criteriaSearch.setSortDirDescending();
-		if(endDateStr != null)
+
+		if (endDateStr != null)
 		{
 			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
 		}
-		if(startDateStr != null)
+		if (startDateStr != null)
 		{
 			criteriaSearch.setStartDate(ConversionUtils.toLocalDate(startDateStr));
 		}
-		if(StringUtils.trimToNull(combinedStatus) != null)
+		if (StringUtils.trimToNull(combinedStatus) != null)
 		{
 			criteriaSearch.setCombinedStatus(FaxOutboxTransferOutbound.CombinedStatus.valueOf(combinedStatus));
 		}
-		if(StringUtils.trimToNull(archived) != null)
+		if (StringUtils.trimToNull(archived) != null)
 		{
 			criteriaSearch.setArchived(Boolean.parseBoolean(archived));
 		}
-
+		criteriaSearch.setOffset(offset);
 		int total = faxOutboundDao.criteriaSearchCount(criteriaSearch);
 
 		FaxAccount faxAccount = faxAccountDao.find(id);
-		List<FaxOutboxTransferOutbound> resultList = faxAccountService.getOutboxResults(faxAccount, criteriaSearch);
+		ArrayList<FaxOutboxTransferOutbound> transferList = faxTransferConverter.getAllAsOutboxTransferObject(faxAccount, faxAccountService.getOutboxResults(faxAccount, criteriaSearch));
 
-		return RestSearchResponse.successResponse(resultList, page, perPage, total);
+		return RestSearchResponse.successResponse(transferList, page, perPage, total);
 	}
 }

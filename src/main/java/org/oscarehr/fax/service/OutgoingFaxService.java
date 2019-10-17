@@ -25,6 +25,7 @@ package org.oscarehr.fax.service;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
@@ -89,6 +90,9 @@ public class OutgoingFaxService
 	private FaxAccountService faxAccountService;
 
 	@Autowired
+	private FaxTransferConverter faxTransferConverter;
+
+	@Autowired
 	private FaxStatus faxStatus;
 
 	public boolean isOutboundFaxEnabled()
@@ -142,7 +146,7 @@ public class OutgoingFaxService
 		{
 			FaxOutbound faxOutbound = queueNewFax(providerId, demographicId, faxAccount, faxNumber, fileType, fileToFax);
 			sendQueuedFax(faxOutbound, fileToFax);
-			transfer = FaxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound);
+			transfer = faxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound);
 		}
 		// if legacy faxing is enabled, write to the outgoing folder.
 		else if(isLegacyFaxEnabled())
@@ -218,7 +222,39 @@ public class OutgoingFaxService
 		}
 
 		sendQueuedFax(faxOutbound, fileToResend);
-		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+		return faxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+	}
+
+
+	public int getOutboxNotificationCount(Long id,
+										  String endDateStr,
+										  String startDateStr,
+										  String combinedStatus,
+										  String archived)
+	{
+		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
+		criteriaSearch.setFaxAccountId(id);
+		criteriaSearch.setSortDirDescending();
+
+		if (endDateStr != null)
+		{
+			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
+		}
+		if (startDateStr != null)
+		{
+			criteriaSearch.setStartDate(ConversionUtils.toLocalDate(startDateStr));
+		}
+		if (StringUtils.trimToNull(combinedStatus) != null)
+		{
+			criteriaSearch.setCombinedStatus(FaxOutboxTransferOutbound.CombinedStatus.valueOf(combinedStatus));
+		}
+		if (StringUtils.trimToNull(archived) != null)
+		{
+			criteriaSearch.setArchived(Boolean.parseBoolean(archived));
+		}
+		criteriaSearch.setNotificationStatus(FaxOutbound.NotificationStatus.NOTIFY);
+
+		return faxOutboundDao.criteriaSearchCount(criteriaSearch);
 	}
 
 	public FaxOutboxTransferOutbound setNotificationStatus(Long faxOutId, String status)
@@ -226,14 +262,14 @@ public class OutgoingFaxService
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
 		faxOutbound.setNotificationStatus(FaxOutbound.NotificationStatus.valueOf(status));
 		faxOutboundDao.persist(faxOutbound);
-		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+		return faxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
 	}
 	public FaxOutboxTransferOutbound setArchived(Long faxOutId, boolean isArchived)
 	{
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
 		faxOutbound.setArchived(isArchived);
 		faxOutboundDao.persist(faxOutbound);
-		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+		return faxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
 	}
 
 	/**
