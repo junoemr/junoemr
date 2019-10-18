@@ -1199,10 +1199,12 @@
 		<ap-name>doctor_billing_group</ap-name>
 		<ap-sql>
 			SELECT EXTRACTVALUE(provider.comments, '/xml_p_billinggroup_no') AS billing_group_no
-			FROM provider, demographic
+			FROM provider
+
+			INNER JOIN demographic
+			ON demographic.provider_no=provider.provider_no
 
 			WHERE demographic.demographic_no=${demographic}
-			AND demographic.provider_no=provider.provider_no
 		</ap-sql>
 		<ap-output>${billing_group_no}</ap-output>
 	</databaseap>
