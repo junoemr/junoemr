@@ -201,7 +201,7 @@ String login_input_style="login_txt_fields";
                         <input type="text" name="username" value="" size="15" maxlength="30" autocomplete="off" class="<%=login_input_style %>"/>
                         <br/>                
                         <bean:message key="loginApplication.formPwd"/><br/>
-                        <input type="password" name="password" value="" size="15" maxlength="32" autocomplete="off" class="<%=login_input_style %>"/><br/>
+                        <input type="password" name="password" value="" size="15" maxlength="32" autocomplete="off" class="<%=login_input_style %>"/>
                         <br/>
                         <bean:message key="index.formPIN"/>: 
                         <input type="password" name="pin" value="" size="15" maxlength="15" autocomplete="off" class="<%=login_input_style %>"/><br/>
