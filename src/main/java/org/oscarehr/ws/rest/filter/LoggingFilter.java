@@ -164,6 +164,11 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 			try
 			{
 				url = uriInfo.getRequestUri().toURL().toString();
+				// This endpoint is entirely used by our internal metrics and shouldn't be logged
+				if (url.contains("/ws/rs/user_metrics"))
+				{
+					return;
+				}
 				queryString = uriInfo.getRequestUri().getQuery();
 			}
 			catch(MalformedURLException e)
