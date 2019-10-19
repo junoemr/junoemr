@@ -42,6 +42,7 @@ angular.module('Layout').component('leftAside', {
 		"angularUtil",
 		"scheduleService",
 		"providerService",
+		"securityService",
 		function (
 			$rootScope,
 			$scope,
@@ -51,7 +52,8 @@ angular.module('Layout').component('leftAside', {
 			$state,
 			angularUtil,
 			scheduleService,
-			providerService)
+			providerService,
+			securityService)
 	{
 
 		var ctrl = this;
@@ -96,7 +98,7 @@ angular.module('Layout').component('leftAside', {
 				}
 			);
 
-			ctrl.loadProvider();
+			ctrl.provider = securityService.getUser();
 			ctrl.loadProviderSettings();
 		};
 
@@ -110,20 +112,6 @@ angular.module('Layout').component('leftAside', {
 					function error(result)
 					{
 						console.error("Failed to fetch provider setting in left aside with error: " + result);
-					}
-			);
-		};
-
-		ctrl.loadProvider = function ()
-		{
-			providerService.getMe().then(
-					function success(result)
-					{
-						ctrl.provider = result;
-					},
-					function error(result)
-					{
-						console.error("Failed to fetch provider info in left aside with error: " + result);
 					}
 			);
 		};

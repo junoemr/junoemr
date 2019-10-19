@@ -1371,6 +1371,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					{
 						return data;
 					}],
+					loadedSettings: [function ()
+					{
+						return loadedSettings;
+					}],
 					editMode: [function ()
 					{
 						return isEditMode;

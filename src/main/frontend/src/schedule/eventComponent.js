@@ -63,7 +63,6 @@ angular.module('Schedule').component('eventComponent', {
 			//=========================================================================/
 
 			controller.useOldEchart = true;
-			controller.loadedSettings = {};
 			controller.tabEnum = Object.freeze({
 				appointment: 0,
 				history: 1,
@@ -219,6 +218,7 @@ angular.module('Schedule').component('eventComponent', {
 				}
 
 				// resolve data from opener
+				controller.loadedSettings = controller.resolve.loadedSettings;
 				controller.parentScope = controller.resolve.parentScope;
 				controller.keyBinding = controller.resolve.keyBinding;
 				controller.editMode = controller.resolve.editMode;
@@ -315,8 +315,6 @@ angular.module('Schedule').component('eventComponent', {
 				}
 
 				controller.changeTab(controller.tabEnum.appointment);
-
-				controller.loadProviderSettings();
 			};
 
 			//=========================================================================
@@ -979,7 +977,7 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				if ($scope.isPatientSelected())
 				{
-					if (controller.loadedSettings.hideOldEchartLinkInAppointment)
+					if (controller.loadedSettings && controller.loadedSettings.hideOldEchartLinkInAppointment)
 					{
 						var params = {
 							demographicNo: controller.demographicModel.demographicNo,
@@ -1064,21 +1062,6 @@ angular.module('Schedule').component('eventComponent', {
 				window.open(scheduleService.getRxLink(params));
 				controller.cancel();
 			};
-
-			controller.loadProviderSettings = function ()
-			{
-				providerService.getSettings().then(
-						function success(result)
-						{
-							controller.loadedSettings = result;
-						},
-						function error(err)
-						{
-							console.error("Failed to fetch provider settings in event card, with error: " + err);
-						}
-				);
-			};
-
 
 			//=========================================================================
 			//  Key Bindings
