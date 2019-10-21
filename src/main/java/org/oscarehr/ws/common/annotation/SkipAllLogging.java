@@ -22,8 +22,6 @@
  */
 package org.oscarehr.ws.common.annotation;
 
-import org.oscarehr.ws.rest.filter.LoggingFilter;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -33,5 +31,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SkipAllLogging
 {
-	String SKIP_ALL_LOGGING = LoggingFilter.PROP_SKIP_LOGGING;
 }
