@@ -31,8 +31,6 @@ import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.model.FaxInbound;
-import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
@@ -46,7 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -112,27 +109,12 @@ public class FaxAccountService
 
 	public List<FaxOutboxTransferOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
 	{
-		List<FaxOutbound> outboundList = faxOutboundDao.criteriaSearch(criteriaSearch);
-
-		ArrayList<FaxOutboxTransferOutbound> transferList = new ArrayList<>(outboundList.size());
-		for (FaxOutbound faxOutbound : outboundList)
-		{
-			transferList.add(FaxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound));
-		}
-		return transferList;
+		return FaxTransferConverter.getAllAsOutboxTransferObject(faxAccount, faxOutboundDao.criteriaSearch(criteriaSearch));
 	}
 
 	public List<FaxInboxTransferOutbound> getInboxResults(FaxInboundCriteriaSearch criteriaSearch)
 	{
 		// find the list of all inbound results based on the search criteria
-		List<FaxInbound> inboundList = faxInboundDao.criteriaSearch(criteriaSearch);
-
-		ArrayList<FaxInboxTransferOutbound> transferList = new ArrayList<>(inboundList.size());
-		for (FaxInbound faxInbound : inboundList)
-		{
-			transferList.add(FaxTransferConverter.getAsInboxTransferObject(faxInbound));
-		}
-
-		return transferList;
+		return FaxTransferConverter.getAllAsInboxTransferObject(faxInboundDao.criteriaSearch(criteriaSearch));
 	}
 }

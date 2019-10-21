@@ -247,9 +247,9 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		}
 
 		int total = faxInboundDao.criteriaSearchCount(criteriaSearch);
-		List<FaxInboxTransferOutbound> resultList = faxAccountService.getInboxResults(criteriaSearch);
+		List<FaxInboxTransferOutbound> inboundList = faxAccountService.getInboxResults(criteriaSearch);
 
-		return RestSearchResponse.successResponse(resultList, page, perPage, total);
+		return RestSearchResponse.successResponse(inboundList, page, perPage, total);
 	}
 
 	@GET
@@ -296,8 +296,8 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		int total = faxOutboundDao.criteriaSearchCount(criteriaSearch);
 
 		FaxAccount faxAccount = faxAccountDao.find(id);
-		List<FaxOutboxTransferOutbound> resultList = faxAccountService.getOutboxResults(faxAccount, criteriaSearch);
+		List<FaxOutboxTransferOutbound> transferList = faxAccountService.getOutboxResults(faxAccount, criteriaSearch);
 
-		return RestSearchResponse.successResponse(resultList, page, perPage, total);
+		return RestSearchResponse.successResponse(transferList, page, perPage, total);
 	}
 }
