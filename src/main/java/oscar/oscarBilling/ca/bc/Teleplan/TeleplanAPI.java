@@ -35,6 +35,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
@@ -42,6 +43,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 
 /**
  *
@@ -428,28 +430,25 @@ public class TeleplanAPI
 	*           Still to be determined but "SUCCESS" & "FAILURE" will be returned
 	*
 	*/
-	public TeleplanResponse checkElig(String phn, String dateofbirthyyyy, String dateofbirthmm, String dateofbirthdd, 
-              String dateofserviceyyyy, String dateofservicemm, String dateofservicedd, 
-              boolean patientvisitcharge, boolean lasteyeexam, boolean patientrestriction){
-    
-    
-            NameValuePair[] data = {
-                new NameValuePair("PHN",phn),
-                new NameValuePair("dateOfBirthyyyy",dateofbirthyyyy),
-                new NameValuePair("dateOfBirthmm",dateofbirthmm),
-                new NameValuePair("dateOfBirthdd",dateofbirthdd),
-                new NameValuePair("dateOfServiceyyyy",dateofserviceyyyy),
-                new NameValuePair("dateOfServicemm",dateofservicemm),
-                new NameValuePair("dateOfServicedd", dateofservicedd),
-                new NameValuePair("PatientVisitCharge",Boolean.toString(patientvisitcharge)),
-                new NameValuePair("LastEyeExam", Boolean.toString(lasteyeexam)),
-                new NameValuePair("PatientRestriction", Boolean.toString(patientrestriction)),
-                new NameValuePair("ExternalAction", ExternalActionCheckE45)
-            };
-            return processRequest(CONTACT_URL,data);                      
-                                  
-
-        }
+	public TeleplanResponse checkElig(String phn, String dateofbirthyyyy, String dateofbirthmm, String dateofbirthdd,
+	                                  LocalDate dateOfService,
+	                                  boolean patientvisitcharge, boolean lasteyeexam, boolean patientrestriction)
+	{
+		NameValuePair[] data = {
+				new NameValuePair("PHN", phn),
+				new NameValuePair("dateOfBirthyyyy",dateofbirthyyyy),
+				new NameValuePair("dateOfBirthmm",dateofbirthmm),
+				new NameValuePair("dateOfBirthdd",dateofbirthdd),
+				new NameValuePair("dateOfServiceyyyy", StringUtils.leftPad(String.valueOf(dateOfService.getYear()), 4,"0")),
+				new NameValuePair("dateOfServicemm", StringUtils.leftPad(String.valueOf(dateOfService.getMonthValue()), 2,"0")),
+				new NameValuePair("dateOfServicedd", StringUtils.leftPad(String.valueOf(dateOfService.getDayOfMonth()), 2,"0")),
+				new NameValuePair("PatientVisitCharge", Boolean.toString(patientvisitcharge)),
+				new NameValuePair("LastEyeExam", Boolean.toString(lasteyeexam)),
+				new NameValuePair("PatientRestriction", Boolean.toString(patientrestriction)),
+				new NameValuePair("ExternalAction", ExternalActionCheckE45)
+		};
+		return processRequest(CONTACT_URL, data);
+	}
 //-------------------------------------------------------------------------
     
     ///////////

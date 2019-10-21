@@ -32,10 +32,12 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.billing.CA.BC.dao.TeleplanS21Dao;
 import org.oscarehr.billing.CA.BC.model.TeleplanS21;
+import org.oscarehr.billing.CA.service.EligibilityCheckService;
+import org.oscarehr.billing.CA.transfer.EligibilityCheckTransfer;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DiagnosticCodeDao;
+import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.integration.clinicaid.service.ClinicaidAPIService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
@@ -49,7 +51,6 @@ import oscar.oscarBilling.ca.bc.Teleplan.TeleplanService;
 import oscar.oscarBilling.ca.bc.Teleplan.TeleplanUserPassDAO;
 import oscar.oscarBilling.ca.bc.data.BillActivityDAO;
 import oscar.oscarBilling.ca.bc.data.BillingCodeData;
-import oscar.util.UtilDateUtilities;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,7 +60,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -72,7 +72,7 @@ public class ManageTeleplanAction extends DispatchAction {
 	private static final String teleplan_login_failure_msgHdr = "An error occured connecting to teleplan: <br/>";
 	private static final OscarProperties props = OscarProperties.getInstance();
 
-    /** Creates a new instance of ManageTeleplanAction */
+	/** Creates a new instance of ManageTeleplanAction */
     public ManageTeleplanAction() {
     }
 
@@ -515,110 +515,83 @@ public class ManageTeleplanAction extends DispatchAction {
 
 	public ActionForward checkElig(ActionMapping mapping, ActionForm form,
 	                               HttpServletRequest request, HttpServletResponse response)
-			throws Exception
 	{
 		log.debug("checkElig");
 		String demographicNo = request.getParameter("demographic");
 		OscarProperties oscarProperties = OscarProperties.getInstance();
 		DemographicDao dDao = SpringUtils.getBean(DemographicDao.class);
+		EligibilityCheckService eligibilityCheckService = SpringUtils.getBean(EligibilityCheckService.class);
+
 		Demographic demo = dDao.getDemographic(demographicNo);
 
-		Date billingDate = new Date();
-
+		EligibilityCheckTransfer transfer = null;
 		if (oscarProperties.isClinicaidBillingType())
 		{
-			ClinicaidAPIService clinicaidAPIService = SpringUtils.getBean(ClinicaidAPIService.class);
-
 			try
 			{
-				Map<String, String> clinicaidResponse = clinicaidAPIService.checkEligibility(demo);
-				request.setAttribute("error", clinicaidResponse.get("error"));
-				request.setAttribute("Result", clinicaidResponse.get("result"));
-				request.setAttribute("Msgs", clinicaidResponse.get("msg"));
+				transfer = eligibilityCheckService.checkEligibility(demo);
+				request.setAttribute("error", transfer.getError());
+				request.setAttribute("Result", transfer.getResult());
+				request.setAttribute("Msgs", transfer.getMessage());
 			}
-			catch(IOException e)
+			catch(Exception e)
 			{
 				log.error("Failed to get eligibility status through ClinicAid API.", e);
 				request.setAttribute("error", e.getMessage());
 			}
-
-			return mapping.findForward("checkElig");
-		}
-
-		TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
-		String[] userpass = dao.getUsernamePassword();
-		TeleplanService tService = new TeleplanService();
-
-		TeleplanAPI tAPI = null;
-		try
-		{
-			tAPI = tService.getTeleplanAPI(userpass[0], userpass[1]);
-		}
-		catch(Exception e)
-		{
-			log.warn(e.getMessage());
-			request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
-			return mapping.findForward("checkElig");
-		}
-
-		String phn = demo.getHin();
-		String dateofbirthyyyy = demo.getYearOfBirth();
-		String dateofbirthmm = demo.getMonthOfBirth();
-		String dateofbirthdd = demo.getDateOfBirth();
-		String dateofserviceyyyy = UtilDateUtilities.justYear(billingDate);
-		String dateofservicemm = UtilDateUtilities.justMonth(billingDate);
-		String dateofservicedd = UtilDateUtilities.justDay(billingDate);
-		boolean patientvisitcharge = true;
-		boolean lasteyeexam = true;
-		boolean patientrestriction = true;
-
-		TeleplanResponse tr = tAPI.checkElig(phn, dateofbirthyyyy, dateofbirthmm, dateofbirthdd, dateofserviceyyyy, dateofservicemm, dateofservicedd, patientvisitcharge, lasteyeexam, patientrestriction);
-		log.debug(tr.getResult());
-		log.debug(tr.isSuccess());
-		log.debug(tr.toString());
-		request.setAttribute("Result", tr.getResult());
-
-
-		String realFile = tr.getRealFilename();
-		if(realFile != null && !realFile.trim().equals(""))
-		{
-			File file = tr.getFile();
-			BufferedReader buff = new BufferedReader(new FileReader(file));
-			StringBuilder sb = new StringBuilder();
-			String line = null;
-
-			while((line = buff.readLine()) != null)
-			{
-
-				if(line != null && line.startsWith("ELIG_ON_DOS:"))
-				{
-					String el = line.substring(12).trim();
-					if(el.equalsIgnoreCase("no"))
-					{
-						request.setAttribute("Result", "Failure");
-
-						line = "<span style=\"color:red; font-weight:bold;\">" + line + "</span>";
-					}
-					else if(el.equalsIgnoreCase("yes"))
-					{
-						Date lastEligCheck = new Date();
-						demo.setHcRenewDate(lastEligCheck);
-						dDao.save(demo);
-					}
-				}
-				sb.append(line);
-				sb.append("<br>");
-			}
-			request.setAttribute("Msgs", sb.toString());//tr.getMsgs());
-
 		}
 		else
 		{
-			request.setAttribute("Msgs", tr.getMsgs());
+			try
+			{
+				transfer = eligibilityCheckService.checkEligibility(demo);
 
+				request.setAttribute("Result", transfer.getResult());
+
+				String realFile = transfer.getRealFilename();
+				if(realFile != null && !realFile.trim().equals(""))
+				{
+					File file = FileFactory.getRemittanceFile(realFile).getFileObject();
+					BufferedReader buff = new BufferedReader(new FileReader(file));
+					StringBuilder sb = new StringBuilder();
+					String line = null;
+
+					while((line = buff.readLine()) != null)
+					{
+
+						if(line != null && line.startsWith("ELIG_ON_DOS:"))
+						{
+							String el = line.substring(12).trim();
+							if(el.equalsIgnoreCase("no"))
+							{
+								request.setAttribute("Result", "Failure");
+
+								line = "<span style=\"color:red; font-weight:bold;\">" + line + "</span>";
+							}
+							else if(el.equalsIgnoreCase("yes"))
+							{
+								Date lastEligCheck = new Date();
+								demo.setHcRenewDate(lastEligCheck);
+								dDao.save(demo);
+							}
+						}
+						sb.append(line);
+						sb.append("<br>");
+					}
+					request.setAttribute("Msgs", sb.toString());
+
+				}
+				else
+				{
+					request.setAttribute("Msgs", transfer.getMessage());
+				}
+			}
+			catch(Exception e)
+			{
+				log.warn(e.getMessage());
+				request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
+			}
 		}
-
-		//request.setAttribute("message",tr.toString());
 		return mapping.findForward("checkElig");
 	}
 }
