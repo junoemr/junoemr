@@ -30,18 +30,14 @@ import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferInbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component("FaxTransferConverter")
-@Transactional
 public class FaxTransferConverter
 {
-	public FaxAccount getAsDomainObject(FaxAccountTransferInbound transfer)
+	public static FaxAccount getAsDomainObject(FaxAccountTransferInbound transfer)
 	{
 		FaxAccount config = new FaxAccount();
 		config.setIntegrationEnabled(transfer.isEnabled());
@@ -56,7 +52,7 @@ public class FaxTransferConverter
 		return config;
 	}
 
-	public FaxAccountTransferOutbound getAsOutboundTransferObject(FaxAccount config)
+	public static FaxAccountTransferOutbound getAsOutboundTransferObject(FaxAccount config)
 	{
 		FaxAccountTransferOutbound transfer = new FaxAccountTransferOutbound();
 		transfer.setId(config.getId());
@@ -71,7 +67,7 @@ public class FaxTransferConverter
 		return transfer;
 	}
 
-	public List<FaxAccountTransferOutbound> getAllAsOutboundTransferObject(List<FaxAccount> configList)
+	public static List<FaxAccountTransferOutbound> getAllAsOutboundTransferObject(List<FaxAccount> configList)
 	{
 		List<FaxAccountTransferOutbound> transferList = new ArrayList<>(configList.size());
 		for(FaxAccount config : configList)
@@ -81,7 +77,7 @@ public class FaxTransferConverter
 		return transferList;
 	}
 
-	public FaxOutboxTransferOutbound getAsOutboxTransferObject(FaxAccount faxAccount, FaxOutbound faxOutbound)
+	public static FaxOutboxTransferOutbound getAsOutboxTransferObject(FaxAccount faxAccount, FaxOutbound faxOutbound)
 	{
 		FaxOutboxTransferOutbound transfer = new FaxOutboxTransferOutbound();
 		transfer.setId(faxOutbound.getId());
@@ -103,17 +99,7 @@ public class FaxTransferConverter
 		return transfer;
 	}
 
-	public ArrayList<FaxOutboxTransferOutbound> getAllAsOutboxTransferObject(FaxAccount faxAccount, List<FaxOutbound> faxOutboundList)
-	{
-		ArrayList<FaxOutboxTransferOutbound> transferList = new ArrayList<>(faxOutboundList.size());
-		for(FaxOutbound faxOutbound : faxOutboundList)
-		{
-			transferList.add(getAsOutboxTransferObject(faxAccount, faxOutbound));
-		}
-		return transferList;
-	}
-
-	public FaxInboxTransferOutbound getAsInboxTransferObject(FaxInbound faxInbound)
+	public static FaxInboxTransferOutbound getAsInboxTransferObject(FaxInbound faxInbound)
 	{
 		FaxInboxTransferOutbound transfer = new FaxInboxTransferOutbound();
 		transfer.setId(faxInbound.getId());
@@ -126,17 +112,7 @@ public class FaxTransferConverter
 		return transfer;
 	}
 
-	public List<FaxInboxTransferOutbound> getAllAsInboxTransferObject(List<FaxInbound> faxInboundList)
-	{
-		List<FaxInboxTransferOutbound> transferList = new ArrayList<>(faxInboundList.size());
-		for(FaxInbound faxInbound : faxInboundList)
-		{
-			transferList.add(getAsInboxTransferObject(faxInbound));
-		}
-		return transferList;
-	}
-
-	private FaxOutboxTransferOutbound.CombinedStatus toCombinedStatus(FaxOutbound.Status systemStatus, String remoteStatus)
+	private static FaxOutboxTransferOutbound.CombinedStatus toCombinedStatus(FaxOutbound.Status systemStatus, String remoteStatus)
 	{
 		FaxOutboxTransferOutbound.CombinedStatus combinedStatus = null;
 		if(FaxOutbound.Status.ERROR.equals(systemStatus))

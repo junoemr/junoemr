@@ -36,12 +36,17 @@ import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
+import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
+import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -100,19 +105,34 @@ public class FaxAccountService
 		return faxAccountList.isEmpty() ? null : faxAccountList.get(0);
 	}
 
-	public List<FaxAccount> listAccounts(FaxAccountCriteriaSearch criteriaSearch)
+	public List<FaxAccountTransferOutbound> listAccounts(FaxAccountCriteriaSearch criteriaSearch)
 	{
-		return faxAccountDao.criteriaSearch(criteriaSearch);
+		return FaxTransferConverter.getAllAsOutboundTransferObject(faxAccountDao.criteriaSearch(criteriaSearch));
 	}
 
-	public List<FaxOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
+	public List<FaxOutboxTransferOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
 	{
-		return faxOutboundDao.criteriaSearch(criteriaSearch);
+		List<FaxOutbound> outboundList = faxOutboundDao.criteriaSearch(criteriaSearch);
+
+		ArrayList<FaxOutboxTransferOutbound> transferList = new ArrayList<>(outboundList.size());
+		for (FaxOutbound faxOutbound : outboundList)
+		{
+			transferList.add(FaxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound));
+		}
+		return transferList;
 	}
 
-	public List<FaxInbound> getInboxResults(FaxInboundCriteriaSearch criteriaSearch)
+	public List<FaxInboxTransferOutbound> getInboxResults(FaxInboundCriteriaSearch criteriaSearch)
 	{
 		// find the list of all inbound results based on the search criteria
-		return faxInboundDao.criteriaSearch(criteriaSearch);
+		List<FaxInbound> inboundList = faxInboundDao.criteriaSearch(criteriaSearch);
+
+		ArrayList<FaxInboxTransferOutbound> transferList = new ArrayList<>(inboundList.size());
+		for (FaxInbound faxInbound : inboundList)
+		{
+			transferList.add(FaxTransferConverter.getAsInboxTransferObject(faxInbound));
+		}
+
+		return transferList;
 	}
 }

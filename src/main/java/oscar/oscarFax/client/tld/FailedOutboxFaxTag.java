@@ -22,12 +22,12 @@
  */
 package oscar.oscarFax.client.tld;
 
-import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 
 import javax.servlet.jsp.JspException;
@@ -56,12 +56,14 @@ public class FailedOutboxFaxTag extends TagSupport
 		{
 			numFailures = 0;
 
+			List<FaxAccountTransferOutbound> accounts;
+
 			FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
 			criteriaSearch.setLimit(10);
 			criteriaSearch.setSortDirAscending();
 
-			List<FaxAccount> accounts = faxService.listAccounts(criteriaSearch);
-			for (FaxAccount account : accounts)
+			accounts = faxService.listAccounts(criteriaSearch);
+			for (FaxAccountTransferOutbound account : accounts)
 			{
 				numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), null, null, FaxOutboxTransferOutbound.CombinedStatus.ERROR.toString(), null);
 				numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), null, null, FaxOutboxTransferOutbound.CombinedStatus.INTEGRATION_FAILED.toString(), null);
