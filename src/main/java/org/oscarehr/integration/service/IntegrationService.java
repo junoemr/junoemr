@@ -21,7 +21,7 @@
  * Canada
  */
 
-package org.oscarehr.managers;
+package org.oscarehr.integration.service;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.SiteDao;
@@ -37,7 +37,7 @@ import org.springframework.stereotype.Service;
 import oscar.util.StringUtils;
 
 @Service
-public class IntegrationManager
+public class IntegrationService
 {
     private static Logger logger = MiscUtils.getLogger();
 

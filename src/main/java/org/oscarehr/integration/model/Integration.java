@@ -24,6 +24,7 @@
 
 package org.oscarehr.integration.model;
 
+import org.oscarehr.common.encryption.StringEncryptor;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.common.model.Site;
 
@@ -80,12 +81,12 @@ public class Integration extends AbstractModel<String> implements Serializable
 
     public String getApiKey()
     {
-        return apiKey;
+        return (apiKey == null) ? null : StringEncryptor.decrypt(apiKey);
     }
 
     public void setApiKey(String apiKey)
     {
-        this.apiKey = apiKey;
+        this.apiKey = (apiKey == null) ? null : StringEncryptor.encrypt(apiKey);
     }
 
     public Site getSite()

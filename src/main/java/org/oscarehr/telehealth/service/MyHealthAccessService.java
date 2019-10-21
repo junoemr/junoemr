@@ -32,7 +32,7 @@ import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
 import org.oscarehr.integration.myhealthaccess.model.MHAUserToken;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
-import org.oscarehr.managers.IntegrationManager;
+import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class MyHealthAccessService
 	ProviderDataDao providerDataDao;
 
 	@Autowired
-	IntegrationManager integrationManager;
+	IntegrationService integrationService;
 
 	@Autowired
 	ClinicService clinicService;
@@ -104,7 +104,7 @@ public class MyHealthAccessService
 				clinicUserTo1.getEmail(),
 				newUser.getToken());
 
-		integrationManager.updateUserIntegrationAccess(integrationAccess);
+		integrationService.updateUserIntegrationAccess(integrationAccess);
 		return integrationAccess;
 	}
 
@@ -119,7 +119,7 @@ public class MyHealthAccessService
 				authUser.getEmail(),
 				authUser.getToken());
 
-		integrationManager.updateUserIntegrationAccess(integrationAccess);
+		integrationService.updateUserIntegrationAccess(integrationAccess);
 		integrationData.setUserIntegrationAccess(integrationAccess);
 		return integrationData;
 	}
@@ -128,7 +128,7 @@ public class MyHealthAccessService
 	{
 		ClinicUserTo1 renewedToken = clinicService.renewLongToken(integrationData);
 		integrationData.getUserIntegrationAccess().setAccessToken(renewedToken.getToken());
-		integrationManager.updateUserIntegrationAccess(integrationData.getUserIntegrationAccess());
+		integrationService.updateUserIntegrationAccess(integrationData.getUserIntegrationAccess());
 	}
 
 	public MHAUserToken getShortToken(IntegrationData integrationData)

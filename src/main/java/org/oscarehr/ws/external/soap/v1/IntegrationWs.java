@@ -26,7 +26,7 @@ package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
 import org.oscarehr.integration.myhealthaccess.dto.IntegrationTransfer;
-import org.oscarehr.managers.IntegrationManager;
+import org.oscarehr.integration.service.IntegrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,10 +38,10 @@ import javax.jws.WebService;
 public class IntegrationWs extends AbstractWs {
 
     @Autowired
-    private IntegrationManager integrationManager;
+    private IntegrationService integrationService;
 
     public void updateIntegration(IntegrationTransfer integrationTransfer)
     {
-        integrationManager.updateIntegration(integrationTransfer);
+        integrationService.updateIntegration(integrationTransfer);
     }
 }

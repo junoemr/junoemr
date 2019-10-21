@@ -41,7 +41,7 @@ import org.oscarehr.integration.myhealthaccess.exception.DuplicateRecordExceptio
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.model.MHAUserToken;
-import org.oscarehr.managers.IntegrationManager;
+import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
@@ -55,7 +55,7 @@ import javax.servlet.http.HttpServletResponse;
 public class MyHealthAccess extends DispatchAction
 {
 	private static MyHealthAccessService myHealthAccessService = SpringUtils.getBean(MyHealthAccessService.class);
-	private static IntegrationManager integrationManager = SpringUtils.getBean(IntegrationManager.class);
+	private static IntegrationService integrationService = SpringUtils.getBean(IntegrationService.class);
 	private static final Logger logger = MiscUtils.getLogger();
 
 	public ActionForward openTelehealth(ActionMapping mapping, ActionForm form,
@@ -206,7 +206,7 @@ public class MyHealthAccess extends DispatchAction
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		Security security = loggedInInfo.getLoggedInSecurity();
 
-		Integration integration = integrationManager.findMhaIntegration(siteName);
+		Integration integration = integrationService.findMhaIntegration(siteName);
 
 		if (integration == null)
 		{
@@ -221,7 +221,7 @@ public class MyHealthAccess extends DispatchAction
 
 		IntegrationData integrationData = new IntegrationData(integration);
 
-		UserIntegrationAccess userIntegrationAccess = integrationManager.findMhaUserAccessBySecurityAndSiteName(security, siteName);
+		UserIntegrationAccess userIntegrationAccess = integrationService.findMhaUserAccessBySecurityAndSiteName(security, siteName);
 		integrationData.setUserIntegrationAccess(userIntegrationAccess);
 
 		return integrationData;

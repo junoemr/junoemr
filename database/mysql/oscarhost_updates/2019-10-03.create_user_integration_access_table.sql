@@ -4,7 +4,7 @@ create table if not exists `user_integration_access`
 	security_no int(6) not null,
 	integration_remote_id varchar(40),
 	access_email varchar(255),
-	access_token varchar(40),
+	access_token TEXT,
 	remote_user_id varchar(40),
 	primary key(id),
 	constraint user_access_integration_remote_id_fk

@@ -23,8 +23,8 @@
 
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
-import org.oscarehr.managers.IntegrationManager;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -45,7 +45,7 @@ import javax.net.ssl.SSLContext;
 public class BaseService extends org.oscarehr.integration.BaseService
 {
 	@Autowired
-	IntegrationManager integrationManager;
+	IntegrationService integrationService;
 
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
 	protected final String MYHEALTHACCESS_PROTOCOL = oscarProps.getProperty("myhealthaccess_protocol");

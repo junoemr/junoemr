@@ -24,6 +24,7 @@
 
 package org.oscarehr.integration.model;
 
+import org.oscarehr.common.encryption.StringEncryptor;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.common.model.Security;
 
@@ -133,11 +134,11 @@ public class UserIntegrationAccess extends AbstractModel<Integer> implements Ser
 
 	public String getAccessToken()
 	{
-		return accessToken;
+		return (accessToken == null) ? null : StringEncryptor.decrypt(accessToken);
 	}
 
 	public void setAccessToken(String accessToken)
 	{
-		this.accessToken = accessToken;
+		this.accessToken = (accessToken == null) ? null : StringEncryptor.encrypt(accessToken);
 	}
 }
