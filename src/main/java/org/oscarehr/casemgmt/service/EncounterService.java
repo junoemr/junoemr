@@ -38,7 +38,9 @@ import oscar.oscarProvider.data.ProviderColourUpdater;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Collects data required for the header of the encounter page.
@@ -99,6 +101,27 @@ public class EncounterService
 	@Autowired
 	private EncounterTeamService encounterTeamService;
 
+	@Autowired
+	private EncounterSocialHistoryService encounterSocialHistoryService;
+
+	@Autowired
+	private EncounterMedicalHistoryService encounterMedicalHistoryService;
+
+	@Autowired
+	private EncounterOngoingConcernsService encounterOngoingConcernsService;
+
+	@Autowired
+	private EncounterRemindersService encounterRemindersService;
+
+	@Autowired
+	private EncounterOtherMedsService encounterOtherMedsService;
+
+	@Autowired
+	private EncounterRiskFactorsService encounterRiskFactorsService;
+
+	@Autowired
+	private EncounterFamilyHistoryService encounterFamilyHistoryService;
+
 	public EncounterSectionService getEncounterSectionServiceByName(String serviceName)
 	{
 		switch(serviceName)
@@ -119,7 +142,32 @@ public class EncounterService
 			case EncounterSection.TYPE_RESOLVED_ISSUES: return encounterResolvedIssueService;
 			case EncounterSection.TYPE_EPISODES: return encounterEpisodeService;
 			case EncounterSection.TYPE_HEALTH_CARE_TEAM: return encounterTeamService;
+			/*
+			case encounterSocialHistoryService.SECTION_ID: return encounterSocialHistoryService;
+			case encounterMedicalHistoryService.SECTION_ID: return encounterMedicalHistoryService;
+			case encounterOngoingConcernsService.SECTION_ID: return encounterOngoingConcernsService;
+			case encounterRemindersService.SECTION_ID: return encounterRemindersService;
+			 */
 		}
+
+		// XXX: Is this good?
+		List<EncounterSectionService> serviceList = new ArrayList<>();
+		serviceList.add(encounterSocialHistoryService);
+		serviceList.add(encounterMedicalHistoryService);
+		serviceList.add(encounterOngoingConcernsService);
+		serviceList.add(encounterRemindersService);
+		serviceList.add(encounterOtherMedsService);
+		serviceList.add(encounterRiskFactorsService);
+		serviceList.add(encounterFamilyHistoryService);
+
+		for(EncounterSectionService sectionService: serviceList)
+		{
+			if(serviceName.equals(sectionService.getSectionId()))
+			{
+				return sectionService;
+			}
+		}
+
 
 		throw new IllegalArgumentException(String.format(
 				"EncounterSectionService identified by %s doesn't exist.", serviceName));

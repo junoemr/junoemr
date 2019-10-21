@@ -55,7 +55,10 @@ import org.oscarehr.common.dao.CaseManagementIssueNotesDao;
 import org.oscarehr.common.dao.GroupNoteDao;
 import org.oscarehr.common.model.BillingONCHeader1;
 import org.oscarehr.common.model.GroupNoteLink;
+import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.ws.rest.to.model.NoteSelectionTo1;
+import org.oscarehr.ws.rest.to.model.NoteTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -89,6 +92,34 @@ public class DefaultNoteService implements NoteService {
 	@Autowired
 	private CaseManagementIssueNotesDao cmeIssueNotesDao;
 
+	@Autowired
+	private CaseManagementNoteDao cmeNotesDao;
+
+	@Override
+	public NoteSelectionTo1 searchEncounterNotes(LoggedInInfo loggedInInfo, NoteSelectionCriteria criteria)
+	{
+		NoteSelectionTo1 returnResult = new NoteSelectionTo1();
+
+		// Get one more result than needed to determine if there are more notes.
+		List<NoteTo1> noteList = cmeNotesDao.searchEncounterNotes(
+				criteria.getDemographicId(),
+				criteria.getMaxResults() + 1,
+				criteria.getFirstResult()
+		);
+
+		// Remove the last note if there are more notes
+		int lastResult = criteria.getMaxResults();
+		if(noteList.size() < lastResult)
+		{
+			lastResult = noteList.size();
+		}
+
+		returnResult.setNotelist(noteList.subList(0, lastResult));
+		returnResult.setMoreNotes(noteList.size() > criteria.getMaxResults());
+
+		return returnResult;
+	}
+
 	@Override
 	public NoteSelectionResult findNotes(LoggedInInfo loggedInInfo, NoteSelectionCriteria criteria) {
 		logger.debug("LOOKING UP NOTES: " + criteria);
@@ -101,10 +132,12 @@ public class DefaultNoteService implements NoteService {
 		long intTime = System.currentTimeMillis();
 
 		//Gets some of the note data, no relationships, not the note/history..just enough
+		// TODO: Include this in query
 		List<Map<String, Object>> notes = caseManagementNoteDao.getRawNoteInfoMapByDemographic(demoNo);
 		Map<String, Object> filteredNotes = new LinkedHashMap<String, Object>();
 
 		//This gets rid of old revisions (better than left join on a computed subset of itself
+
 		for (Map<String, Object> note : notes) {
 			if (filteredNotes.get(note.get("uuid")) != null) {
 				continue;
@@ -124,6 +157,7 @@ public class DefaultNoteService implements NoteService {
 		logger.debug("FETCHED " + notes.size() + " NOTE META IN " + (System.currentTimeMillis() - intTime) + "ms");
 		intTime = System.currentTimeMillis();
 
+		/* XXX: Don't get remote notes, integrator not enabled
 		List<CachedDemographicNote> remoteNotesInfo = getRemoteNoteIds(loggedInInfo, demographicId);
 		if (remoteNotesInfo != null) {
 			for (CachedDemographicNote note : remoteNotesInfo) {
@@ -140,8 +174,11 @@ public class DefaultNoteService implements NoteService {
 		if (remoteNotesInfo != null) {
 			logger.debug("FETCHED " + remoteNotesInfo.size() + " REMOTE NOTE META IN " + (System.currentTimeMillis() - intTime) + "ms");
 		}
+
+		 */
 		intTime = System.currentTimeMillis();
 
+		// TODO: Include this in query *** NOT GONNA INCLUDE THIS, LOOKS LIKE CAISI
 		List<GroupNoteLink> groupNotesInfo = this.getGroupNoteIds(loggedInInfo, demographicId);
 		if (groupNotesInfo != null) {
 			for (GroupNoteLink note : groupNotesInfo) {
@@ -161,6 +198,7 @@ public class DefaultNoteService implements NoteService {
 		intTime = System.currentTimeMillis();
 
 		String roleName = criteria.getUserRole() + "," + criteria.getUserName();
+		// TODO: Include this in query
 		ArrayList<HashMap<String, ? extends Object>> eForms = EFormUtil.listPatientEFormsNoData(demoNo, roleName);
 		for (HashMap<String, ? extends Object> eform : eForms) {
 			EChartNoteEntry e = new EChartNoteEntry();
@@ -182,6 +220,7 @@ public class DefaultNoteService implements NoteService {
 		intTime = System.currentTimeMillis();
 
 		// TODO: speed up
+		// TODO: Include this in query
 		ArrayList<PatientForm> allPatientForms = EctFormData.getGroupedPatientFormsFromAllTables(demographicId);
 		for (PatientForm patientForm : allPatientForms) {
 			EChartNoteEntry e = new EChartNoteEntry();
@@ -201,6 +240,7 @@ public class DefaultNoteService implements NoteService {
 
 		List<Map<String, Object>> bills = null;
 		if (oscar.OscarProperties.getInstance().isOntarioBillingType()) {
+			// TODO: Include this in query
 			bills = billingONCHeader1Dao.getInvoicesMeta(Integer.parseInt(demoNo));
 			for (Map<String, Object> h1 : bills) {
 				EChartNoteEntry e = new EChartNoteEntry();

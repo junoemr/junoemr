@@ -25,7 +25,6 @@ package org.oscarehr.casemgmt.service;
 
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
-import org.oscarehr.util.LoggedInInfo;
 import oscar.oscarRx.data.RxPrescriptionData.Prescription;
 import oscar.util.StringUtils;
 
@@ -34,14 +33,58 @@ import java.util.List;
 
 public class EncounterMedicationService extends EncounterSectionService
 {
+	private static final String SECTION_ID = "Rx";
+	protected static final String SECTION_TITLE_KEY = "oscarEncounter.NavBar.Medications";
+	protected static final String SECTION_TITLE_COLOUR = "#7D2252";
+
+	@Override
+	public String getSectionId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getSectionTitleKey()
+	{
+		return SECTION_TITLE_KEY;
+	}
+
+	@Override
+	protected String getSectionTitleColour()
+	{
+		return SECTION_TITLE_COLOUR;
+	}
+
+	@Override
+	protected String getOnClickPlus(SectionParameters sectionParams)
+	{
+		String url = sectionParams.getContextPath() + "/oscarRx/choosePatient.do" +
+				"?providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
+				"&ltm=true" +
+				"&reRxExpiredLTM=true" +
+				"&s=true" +
+				"&demographicNo=" + encodeUrlParam(sectionParams.getDemographicNo());
+
+		return "popupPage(580,1027,'" + getWinName(sectionParams) + "', '" + url + "')";
+	}
+
+	@Override
+	protected String getOnClickTitle(SectionParameters sectionParams)
+	{
+		String url = sectionParams.getContextPath() + "/oscarRx/choosePatient.do" +
+				"?providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
+				"&demographicNo=" + encodeUrlParam(sectionParams.getDemographicNo());
+
+		return "popupPage(580,1027,'" + getWinName(sectionParams) + "', '" + url + "')";
+	}
+
+	private String getWinName(SectionParameters sectionParams)
+	{
+		return "Rx" + sectionParams.getDemographicNo();
+	}
+
 	public EncounterNotes getNotes(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			Integer limit,
+			SectionParameters sectionParams, Integer limit,
 			Integer offset
 	)
 	{
@@ -49,7 +92,7 @@ public class EncounterMedicationService extends EncounterSectionService
 
 		//grab all of the diseases associated with patient and add a list item for each
 		oscar.oscarRx.data.RxPrescriptionData prescriptData = new oscar.oscarRx.data.RxPrescriptionData();
-		Prescription[] prescriptions = prescriptData.getUniquePrescriptionsByPatient(Integer.parseInt(demographicNo));
+		Prescription[] prescriptions = prescriptData.getUniquePrescriptionsByPatient(Integer.parseInt(sectionParams.getDemographicNo()));
 
 		long now = System.currentTimeMillis();
 		long month = 1000L * 60L * 60L * 24L * 30L;
@@ -70,20 +113,12 @@ public class EncounterMedicationService extends EncounterSectionService
 
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-			//Date date = drug.getRxDate();
-			//String serviceDateStr = DateUtils.formatDate(date, request.getLocale());
-
 			String fullTitle = "";
 			if (drug.getFullOutLine() != null)
 			{
 				fullTitle = drug.getFullOutLine().replaceAll(";", " ");
 			}
 			String title = StringUtils.maxLenString(fullTitle, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-			//String formattedTitle = "<span " + getClassColour(drug, now, month) + ">" + title + "</span>";
-
-			//item.setTitle(strTitle);
-			//item.setLinkTitle(tmp + " " + serviceDateStr + " - " + drug.getEndDate());
-			//item.setURL("return false;");
 
 			sectionNote.setText(title);
 			sectionNote.setTitleClasses(getTitleClasses(drug, now, month).toArray(new String[0]));

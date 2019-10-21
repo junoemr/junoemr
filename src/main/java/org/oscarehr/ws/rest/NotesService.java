@@ -23,6 +23,8 @@
  */
 package org.oscarehr.ws.rest;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -42,7 +44,6 @@ import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.casemgmt.service.NoteSelectionCriteria;
-import org.oscarehr.casemgmt.service.NoteSelectionResult;
 import org.oscarehr.casemgmt.service.NoteService;
 import org.oscarehr.casemgmt.web.CaseManagementEntryAction;
 import org.oscarehr.casemgmt.web.NoteDisplay;
@@ -97,7 +98,24 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Path("/notes")
 @Component("notesService")
-public class NotesService extends AbstractServiceImpl {
+public class NotesService extends AbstractServiceImpl
+{
+	private static String SUMMARY_CODE_ONGOING_CONCERNS = "ongoingconcerns";
+	private static String SUMMARY_CODE_MEDICAL_HISTORY = "medhx";
+	private static String SUMMARY_CODE_REMINDERS = "reminders";
+	private static String SUMMARY_CODE_OTHER_MEDS = "othermeds";
+	private static String SUMMARY_CODE_SOCIAL_HISTORY = "sochx";
+	private static String SUMMARY_CODE_FAMILY_HISTORY = "famhx";
+	private static String SUMMARY_CODE_RISK_FACTORS = "riskfactors";
+
+	private static String SYSTEM_CODE_ONGOING_CONCERNS = "Concerns";
+	private static String SYSTEM_CODE_MEDICAL_HISTORY = "MedHistory";
+	private static String SYSTEM_CODE_REMINDERS = "Reminders";
+	private static String SYSTEM_CODE_OTHER_MEDS = "OMeds";
+	private static String SYSTEM_CODE_SOCIAL_HISTORY = "SocHistory";
+	private static String SYSTEM_CODE_FAMILY_HISTORY = "FamHistory";
+	private static String SYSTEM_CODE_RISK_FACTORS = "RiskFactors";
+
 
 //	public static String cppCodes[] = {"OMeds", "SocHistory", "MedHistory", "Concerns", "FamHistory", "Reminders", "RiskFactors","OcularMedication","TicklerNote"};
 	
@@ -128,7 +146,7 @@ public class NotesService extends AbstractServiceImpl {
 
 	@Autowired
 	private DocumentDao documentDao;
-	
+
 	
 	@GET
 	@Path("/{demographicNo}/all")
@@ -137,7 +155,6 @@ public class NotesService extends AbstractServiceImpl {
 	                                                         @QueryParam("numToReturn") @DefaultValue("20") Integer numToReturn,
 	                                                         @QueryParam("offset") @DefaultValue("0") Integer offset)
 	{
-		NoteSelectionTo1 returnResult = new NoteSelectionTo1();
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 
 		HttpSession se = loggedInInfo.getSession();
@@ -187,9 +204,16 @@ public class NotesService extends AbstractServiceImpl {
 //		processJsonArray(jsonobject, "filterProviders", criteria.getProviders());
 //		processJsonArray(jsonobject, "filterIssues", criteria.getIssues());
 
-		NoteSelectionResult result = noteService.findNotes(loggedInInfo, criteria);
 
-		returnResult.setMoreNotes(result.isMoreNotes());
+		NoteSelectionTo1 returnResult  = noteService.searchEncounterNotes(loggedInInfo, criteria);
+		/*
+		returnResult.setNotelist(noteList);
+		returnResult.setMoreNotes(false);
+		 */
+		//NoteSelectionResult result = noteService.findNotes(loggedInInfo, criteria);
+
+		//returnResult.setMoreNotes(result.isMoreNotes());
+		/*
 		List<NoteTo1> noteList = returnResult.getNotelist();
 		for(NoteDisplay nd : result.getNotes())
 		{
@@ -249,6 +273,8 @@ public class NotesService extends AbstractServiceImpl {
 			noteList.add(note);
 		}
 		logger.debug("returning note list size " + noteList.size() + "  numToReturn was " + numToReturn + " offset " + offset);
+
+		 */
 
 		return RestResponse.successResponse(returnResult);
 	}
@@ -1488,7 +1514,44 @@ public class NotesService extends AbstractServiceImpl {
 		else editList.put(noteUUID, noteList);
 	}
 
-	private String translateSystemCode(String summaryCode) {
+	private static BiMap<String, String> getSummaryCodeToSystemCodeBiMap()
+	{
+		BiMap<String, String> lookupMap = HashBiMap.create();
+
+		lookupMap.put(SUMMARY_CODE_ONGOING_CONCERNS, SYSTEM_CODE_ONGOING_CONCERNS);
+		lookupMap.put(SUMMARY_CODE_MEDICAL_HISTORY, SYSTEM_CODE_MEDICAL_HISTORY);
+		lookupMap.put(SUMMARY_CODE_REMINDERS, SYSTEM_CODE_REMINDERS);
+		lookupMap.put(SUMMARY_CODE_OTHER_MEDS, SYSTEM_CODE_OTHER_MEDS);
+		lookupMap.put(SUMMARY_CODE_SOCIAL_HISTORY, SYSTEM_CODE_SOCIAL_HISTORY);
+		lookupMap.put(SUMMARY_CODE_FAMILY_HISTORY, SYSTEM_CODE_FAMILY_HISTORY);
+		lookupMap.put(SUMMARY_CODE_RISK_FACTORS, SYSTEM_CODE_RISK_FACTORS);
+
+		return lookupMap;
+	}
+
+	public static String getSummaryCodeFromSystemCode(String systemCode)
+	{
+		BiMap<String, String> lookupMap = getSummaryCodeToSystemCodeBiMap().inverse();
+
+		if (lookupMap.containsKey(systemCode))
+		{
+			return lookupMap.get(systemCode);
+		}
+
+		return systemCode;
+	}
+
+	private String translateSystemCode(String summaryCode)
+	{
+		BiMap<String, String> lookupMap = getSummaryCodeToSystemCodeBiMap();
+
+		if (lookupMap.containsKey(summaryCode))
+		{
+			return lookupMap.get(summaryCode);
+		}
+
+		return summaryCode;
+		/*
 		switch(summaryCode) {
 			case "ongoingconcerns": return "Concerns";
 			case "medhx": return "MedHistory";
@@ -1499,6 +1562,7 @@ public class NotesService extends AbstractServiceImpl {
 			case "riskfactors": return "RiskFactors";
 			default: return summaryCode;
 		}
+		 */
 	}
 	private void copyToNoteExtTo1(List<CaseManagementNoteExt> lcme, NoteExtTo1 noteExt) {
 		if(lcme == null) return;

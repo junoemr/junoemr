@@ -49,9 +49,16 @@ public class EncounterSection
 	public static final String TYPE_HEALTH_CARE_TEAM = "HealthCareTeam";
 
 	private String title;
+	private String titleKey;
 	private String cppIssues;
 	private String addUrl;
 	private String identUrl;
+	private String onClickTitle;
+	private String onClickPlus;
+	private String menuTitle;
+	private String menuHeaderKey;
+	private String menuId;
+	private List<EncounterSectionMenuItem> menuItems;
 	private String colour;
 	private Integer remainingNotes;
 	private List<EncounterSectionNote> notes;
@@ -64,6 +71,16 @@ public class EncounterSection
 	public void setTitle(String title)
 	{
 		this.title = title;
+	}
+
+	public String getTitleKey()
+	{
+		return titleKey;
+	}
+
+	public void setTitleKey(String titleKey)
+	{
+		this.titleKey = titleKey;
 	}
 
 	public String getCppIssues()
@@ -94,6 +111,66 @@ public class EncounterSection
 	public void setIdentUrl(String identUrl)
 	{
 		this.identUrl = identUrl;
+	}
+
+	public String getOnClickTitle()
+	{
+		return onClickTitle;
+	}
+
+	public void setOnClickTitle(String onClickTitle)
+	{
+		this.onClickTitle = onClickTitle;
+	}
+
+	public String getOnClickPlus()
+	{
+		return onClickPlus;
+	}
+
+	public void setOnClickPlus(String onClickPlus)
+	{
+		this.onClickPlus = onClickPlus;
+	}
+
+	public String getMenuTitle()
+	{
+		return menuTitle;
+	}
+
+	public void setMenuTitle(String menuTitle)
+	{
+		this.menuTitle = menuTitle;
+	}
+
+	public String getMenuHeaderKey()
+	{
+		return menuHeaderKey;
+	}
+
+	public void setMenuHeaderKey(String menuHeaderKey)
+	{
+		this.menuHeaderKey = menuHeaderKey;
+	}
+
+	public String getMenuId()
+	{
+		return menuId;
+	}
+
+	public void setMenuId(String menuId)
+	{
+		this.menuId = menuId;
+	}
+
+	public List<EncounterSectionMenuItem> getMenuItems()
+	{
+		return menuItems;
+	}
+
+	public void setMenuItems(List<EncounterSectionMenuItem> menuItems)
+	{
+		this.menuItems = menuItems;
 	}
 
 	public String getColour()

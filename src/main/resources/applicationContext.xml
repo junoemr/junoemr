@@ -296,9 +296,19 @@
 	<bean id="vacancyProgramManager" class="org.oscarehr.schedule.service.Schedule" autowire="byName" />
 	<bean id="ticklerManager" class="org.oscarehr.managers.TicklerManager" autowire="byName" />
 
-	<bean id="encounterCPPNoteService" class="org.oscarehr.casemgmt.service.EncounterCPPNoteService" autowire="byName" />
+<!--
+	<bean id="encounterCPPNoteService" class="org.oscarehr.casemgmt.service.EncounterCPPSectionService" autowire="byName" />
+-->
 
 	<bean id="encounterService" class="org.oscarehr.casemgmt.service.EncounterService" autowire="byName" />
+
+	<bean id="encounterSocialHistoryService" class="org.oscarehr.casemgmt.service.EncounterSocialHistoryService" autowire="byName" />
+	<bean id="encounterMedicalHistoryService" class="org.oscarehr.casemgmt.service.EncounterMedicalHistoryService" autowire="byName" />
+	<bean id="encounterOngoingConcernsService" class="org.oscarehr.casemgmt.service.EncounterOngoingConcernsService" autowire="byName" />
+	<bean id="encounterRemindersService" class="org.oscarehr.casemgmt.service.EncounterRemindersService" autowire="byName" />
+	<bean id="encounterOtherMedsService" class="org.oscarehr.casemgmt.service.EncounterOtherMedsService" autowire="byName" />
+	<bean id="encounterRiskFactorsService" class="org.oscarehr.casemgmt.service.EncounterRiskFactorsService" autowire="byName" />
+	<bean id="encounterFamilyHistoryService" class="org.oscarehr.casemgmt.service.EncounterFamilyHistoryService" autowire="byName" />
 
 	<bean id="encounterAllergyService" class="org.oscarehr.casemgmt.service.EncounterAllergyService" autowire="byName" />
 	<bean id="encounterConsultationService" class="org.oscarehr.casemgmt.service.EncounterConsultationService" autowire="byName" />

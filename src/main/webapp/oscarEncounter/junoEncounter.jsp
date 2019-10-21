@@ -182,7 +182,7 @@
 			exKeys[9] = "Hide Cpp";
 			exKeys[10] = "Problem Description";
 
-			function prepareExtraFields(cpp, exts)
+			function prepareExtraFields(cpp, extObj)
 			{
 				//commented out..this causes a problem in Firefox
 				//console.log("prepare Extra Fields");
@@ -202,18 +202,27 @@
 					$(exFields[i]).value = "";
 				}
 
-				var extsArr = exts.split(";");
-				for (var i = 0; i < extsArr.length; i += 2)
-				{
+				//var extsArr = exts.split(";");
+				//for (var i = 0; i < extsArr.length; i += 2)
+				//{
+					console.log(extObj);
 					for (var j = 0; j < exFields.length; j++)
 					{
+						console.log(exFields[j]);
+						if (extObj.hasOwnProperty(exFields[j]))
+						{
+							$(exFields[j]).value = extObj[exFields[j]];
+							continue;
+						}
+						/*
 						if (extsArr[i] == exKeys[j])
 						{
 							$(exFields[j]).value = extsArr[i + 1];
 							continue;
 						}
+						 */
 					}
-				}
+				//}
 			}
 
 			// TODO: Put all of this somewhere else?  It seems like it might be duplicated all
@@ -333,40 +342,112 @@
 				return false;
 			}
 
-			function showEdit(e, title, noteId, editors, date, revision, note, url, numNotes, position, reloadUrl, noteIssues, noteExts, demoNo)
+			function getFormattedDate(date)
 			{
-
-				//var limit = containerDiv + "threshold";
-				var editElem = "showEditNote";
-				//var pgHeight = pageHeight();
-
-/*				var coords = null;
-				if (document.getElementById("measurements_div") == null)
+				if(date == null || date == "")
 				{
-					coords = Position.page($("topContent"));
+					return null;
+				}
+
+				return moment(date).format("YYYY-MM-DD");
+			}
+
+
+			//function showEdit(e, summaryCode, title, noteId, uuid, editors, date, revision, note, numNotes, position, noteIssues, noteExts, demoNo)
+			function showEdit(e, summaryCode, title, numNotes, noteIssues, demoNo, noteJsonString)
+			{
+				// Gather data
+				var note = JSON.parse(noteJsonString);
+
+				if(note != null)
+				{
+					jQuery.ajax({
+						type: "GET",
+						contentType: "application/json",
+						dataType: "json",
+						url: "../ws/rs/notes/getIssueNote/" + note.noteId,
+						success: function (response)
+						{
+							return showEditBox(e, summaryCode, title, numNotes, response.body.assignedCMIssues, demoNo, note)
+						}
+					});
 				}
 				else
 				{
-					var coords = Position.positionedOffset($("cppBoxes"));
-				}*/
+					return showEditBox(e, summaryCode, title, numNotes, [], demoNo, null)
+				}
+				return false;
+			}
 
-				var coords = Position.positionedOffset($("cppBoxes"));
+			function showEditBox(e, summaryCode, title, numNotes, assignedCMIssues, demoNo, note)
+			{
+				// Gather data
+				//var note = JSON.parse(noteJsonString);
 
-				var top = Math.max(coords[1], 0);
-				var right = Math.round(coords[0] / 0.66);
-				//var height = $("showEditNote").getHeight();
-				var gutterMargin = 150;
-
-				if (right < gutterMargin)
-					right = gutterMargin;
-
-
-				$("noteEditTxt").value = note;
-
-				var editorUl = "<ul style='list-style: none outside none; margin:0px;'>";
-
-				if (editors.length > 0)
+				var noteId, uuid, editors, date, revision, noteText, position, extraFields;
+				if(note != null)
 				{
+					noteId = note.noteId;
+					uuid = note.uuid;
+					editors = note.editors;
+					revision = note.revision;
+					noteText = note.note;
+					position = note.position;
+
+					// Fill extra field data
+					extraFields = {
+						startdate: getFormattedDate(note.extStartDate),
+						resolutiondate: getFormattedDate(note.extResolutionDate),
+						proceduredate: getFormattedDate(note.extProcedureDate),
+						ageatonset: note.extAgeAtOnset,
+						treatment: note.extTreatment,
+						problemstatus: note.extProblemStatus,
+						exposuredetail: note.extExposureDetail,
+						relationship: note.extRelationship,
+						lifestage: note.extLifeStage,
+						hidecpp: note.extHideCpp,
+						problemdescription: note.extProblemDescription
+					};
+				}
+				else
+				{
+					// New note defaults
+					editors = null;
+					noteId = "";
+					noteText = "";
+					position = 1;
+					revision = "";
+					uuid = "";
+					extraFields = {};
+				}
+
+
+
+				var editElement = "showEditNote";
+
+				// Clear Errors
+				jQuery('#editNoteError').html("");
+
+
+
+				// Set hidden data values
+
+				$("noteUuid").value = uuid;
+				$("noteEditTxt").value = noteText;
+				$("noteSummaryCode").value = summaryCode;
+				$("noteEditId").value = noteId;
+				$("noteRevision").value = revision;
+
+
+				// Set editors
+				// XXX: Make this work better for new notes
+				var editorUl = "<ul style='list-style: none outside none; margin:0px;'>";
+				var editorSpan = "";
+
+				if (editors != null && editors.length > 0)
+				{
+					editorSpan = "<span style='float:left;'>Editors: </span>";
+
 					var editorArray = editors.split(";");
 					var idx;
 					for (idx = 0; idx < editorArray.length; ++idx)
@@ -378,76 +459,67 @@
 					}
 
 					if (idx % 2 == 0)
+					{
 						editorUl += "</li>";
+					}
 				}
 				editorUl += "</ul>";
 
+
+				// Set issue list
 				var noteIssueUl = "<ul id='issueIdList' style='list-style: none outside none; margin:0px;'>";
 
-				if (noteIssues.length > 0)
+				if (Array.isArray(assignedCMIssues) && assignedCMIssues.length > 0)
 				{
-					var issueArray = noteIssues.split(";");
-					var idx, rows;
+					//var issueArray = noteIssues.split(";");
+					var idx;
 					var cppDisplay = "";
-					for (idx = 0, rows = 0; idx < issueArray.length; idx += 3, ++rows)
+					for (idx = 0; idx < assignedCMIssues.length; idx++)
 					{
-						if (rows % 2 == 0)
-							noteIssueUl += "<li><input type='checkbox' id='issueId' name='issue_id' checked value='" + issueArray[idx] + "'>" + issueArray[idx + 2];
-						else
-							noteIssueUl += "&nbsp; <input type='checkbox' id='issueId' name='issue_id' checked value='" + issueArray[idx] + "'>" + issueArray[idx + 2] + "</li>";
+						var assignedIssue = assignedCMIssues[idx];
 
-						if (cppDisplay == "") cppDisplay = getCPP(issueArray[idx + 1]);
+						if (idx % 2 == 0)
+						{
+							noteIssueUl += "<li>";
+						}
+						else
+						{
+							noteIssueUl += "&nbsp;";
+						}
+
+						noteIssueUl += "<input type='checkbox' id='issueId' name='issue_id' checked value='" + assignedIssue.issue_id + "' \>" + assignedIssue.issue.description;
+
+						/* XXX: don't show CPP issues
+						if (cppDisplay == "")
+						{
+							cppDisplay = getCPP(issueArray[idx + 1]);
+						}
+						*/
 					}
 
-					if (rows % 2 == 0)
+					if (idx % 2 == 0)
+					{
 						noteIssueUl += "</li>";
+					}
 				}
 				noteIssueUl += "</ul>";
 
 				var noteInfo = "<div style='float:right;'><i>Encounter Date:&nbsp;" + date + "&nbsp;rev<a href='#' onclick='return showHistory(\"" + noteId + "\",event);'>" + revision + "</a></i></div>" +
-					"<div><span style='float:left;'>Editors: </span>" + editorUl + noteIssueUl + "</div><br style='clear:both;'>";
+					editorSpan + "<div>" + editorUl + noteIssueUl + "</div><br style='clear:both;'>";
 
 				$("issueNoteInfo").update(noteInfo);
-				$("frmIssueNotes").action = url;
-				$("reloadUrl").value = reloadUrl;
-				$("containerDiv").value = containerDiv;
-				$("winTitle").update(title);
 
-				$(editElem).style.right = right + "px";
-				$(editElem).style.top = top + "px";
-				// XXX: don't show integrator stuff
-				//$("showIntegratedNote").style.display = "none";
-				if (Prototype.Browser.IE)
-				{
-					//IE6 bug of showing select box
-					$("channel").style.visibility = "hidden";
-					$(editElem).style.display = "block";
-				}
-				else
-				{
-					$(editElem).style.display = "table";
-				}
 
 				//Prepare Annotation Window & Extra Fields
 				var now = new Date();
 				document.getElementById('annotation_attrib').value = "anno" + now.getTime();
 				var obj = {};
-				Element.observe('anno', 'click', openAnnotation.bindAsEventListener(obj, noteId, cppDisplay, demoNo));
-				prepareExtraFields(cppDisplay, noteExts);
+				Element.observe('anno', 'click', openAnnotation.bindAsEventListener(obj, noteId, "issue", demoNo));
 
-				//Set note position order
-				//var elementNum = containerDiv + "num";
-				//var numNotes = $F(elementNum);
-				//var positionElement = containerDiv + noteId;
-				//var position;
-				//if (noteId == "")
-				//{
-				//	position = 0;
-				//}
-				//else
-				//{
-				//	position = $F(positionElement);
-				//}
+				prepareExtraFields(cppDisplay, extraFields);
+
+
+				// Build position dropdown
 
 				var curElem;
 				var numOptions = $("position").length;
@@ -456,15 +528,14 @@
 				var option;
 				var opttxt;
 
-				for (curElem = 0; curElem < max; ++curElem)
+				for (curElem = 2; curElem <= max; ++curElem)
 				{
-
 					optId = "popt" + curElem;
 					if ($(optId) == null)
 					{
 						option = document.createElement("OPTION");
 						option.id = optId;
-						opttxt = curElem + 1;
+						opttxt = curElem;
 						option.text = "" + opttxt;
 						option.value = curElem;
 						$("position").options.add(option, curElem);
@@ -476,24 +547,10 @@
 					}
 				}
 
-				if (max == numNotes)
+				// XXX: What does this do?
+				// XXX: also make sure adding the last note works
+				for (curElem = max; curElem > 0; --curElem)
 				{
-					optId = "popt" + max;
-					if ($(optId) == null)
-					{
-						option = document.createElement("OPTION");
-						option.id = optId;
-						opttxt = 1 * max + 1;
-						option.text = "" + opttxt;
-						option.value = max;
-						$("position").options.add(option, max);
-					}
-
-				}
-
-				for (curElem = max - 1; curElem > 0; --curElem)
-				{
-
 					optId = "popt" + curElem;
 					if (curElem > numNotes)
 					{
@@ -502,9 +559,308 @@
 				}
 
 
+				// Position the modal
+				var coords = null;
+				if (document.getElementById("measurements_div") == null)
+				{
+					coords = Position.page($("topContent"));
+				}
+				else
+				{
+					coords = Position.positionedOffset($("cppBoxes"));
+				}
+
+				var top = Math.max(coords[1], 0);
+				var right = Math.round(coords[0] / 0.66);
+				var gutterMargin = 150;
+
+				if (right < gutterMargin)
+				{
+					right = gutterMargin;
+				}
+
+				$(editElement).style.right = right + "px";
+				$(editElement).style.top = top + "px";
+
+
+				// Display the modal
+				$("winTitle").update(title);
+
+				if (Prototype.Browser.IE)
+				{
+					//IE6 bug of showing select box
+					$("channel").style.visibility = "hidden";
+					$(editElement).style.display = "block";
+				}
+				else
+				{
+					$(editElement).style.display = "table";
+				}
+
 				$("noteEditTxt").focus();
 
 				return false;
+			}
+
+			function getFormData($form)
+			{
+				var unindexed_array = $form.serializeArray();
+				var indexed_array = {};
+
+				jQuery.map(unindexed_array, function(n, i)
+				{
+					indexed_array[n['name']] = n['value'];
+				});
+
+				return indexed_array;
+			}
+
+			function getAssignedIssueArray(issueIdArray)
+			{
+				var deferred = jQuery.Deferred();
+
+				var deferredArray = [];
+
+				for (var i = 0; i < issueIdArray.length; i++)
+				{
+					var issueId = issueIdArray[i];
+
+					var ajaxPromise = jQuery.ajax({
+						type: "POST",
+						url: "../ws/rs/notes/getIssueById/" + issueId
+					});
+
+					deferredArray.push(ajaxPromise);
+				}
+
+				jQuery.when.all(deferredArray).then(function(response)
+				{
+					var adjustedArray = response;
+					if(deferredArray.length == 1)
+					{
+						adjustedArray = [response];
+					}
+
+					var assignedIssueArray = [];
+
+					for(var j = 0; j < adjustedArray.length; j++)
+					{
+						assignedIssueArray.push(adjustedArray[j][0]);
+					}
+
+					deferred.resolve(assignedIssueArray);
+				});
+
+				return deferred.promise();
+			}
+
+			function getCPPObjectFromForm(form, issueIdArray)
+			{
+				var deferred = jQuery.Deferred();
+
+				var noteId = 0;
+				if(form.noteEditId)
+				{
+					noteId = form.noteEditId;
+				}
+
+				getAssignedIssueArray(issueIdArray).then(function(result)
+				{
+					var assignedIssueArray = [];
+					for(var i = 0; i < result.length; i++)
+					{
+
+						var assignedIssue = {
+							acute: false,
+							certain: false,
+							demographic_no: null,
+							id: null,
+							issue: result[i],
+							issue_id: result[i].id,
+							major: false,
+							program_id: null,
+							resolved: false,
+							type: null,
+							unchecked: false,
+							unsaved: true,
+							update_date: new Date()
+						};
+
+						assignedIssueArray.push(assignedIssue);
+					}
+
+					var result = {
+						"assignedCMIssues": assignedIssueArray,
+						"encounterNote":{
+							"noteId": noteId,
+							"uuid": form.noteUuid,
+							"position":form.position,
+							"note": form.value,
+							"archived": form.archived,
+							"cpp":true,
+							"editable":true,
+							"isSigned":true,
+							"observationDate": new Date(),
+							//"observationDate":"2019-10-08T21:23:49.441Z",
+							"encounterType":"",
+							"encounterTime":"",
+							"assignedIssues": assignedIssueArray,
+							"summaryCode": form.noteSummaryCode,
+							"revision": form.noteRevision
+						},
+						"annotation_attrib": form.annotation_attrib,
+						"groupNoteExt": {
+							"noteId": noteId,
+							"hideCpp": form.hidecpp,
+							"startDate": getUTCDateFromString(form.startdate),
+							"resolutionDate": getUTCDateFromString(form.resolutiondate),
+							"procedureDate":getUTCDateFromString(form.proceduredate),
+							"ageAtOnset": form.ageatonset,
+							"treatment": form.treatment,
+							"problemStatus": form.problemstatus,
+							"exposureDetail": form.exposuredetail,
+							"relationship": form.relationship,
+							"lifeStage": form.lifestage,
+							"problemDesc": form.problemdescription
+						}
+					};
+
+					deferred.resolve(result);
+				});
+
+				return deferred.promise();
+			}
+
+			function getUTCDateFromString(dateString)
+			{
+				if(dateString == null || dateString == "")
+				{
+					return null;
+				}
+
+				var dateMoment = moment(dateString);
+
+				if(!dateMoment.isValid())
+				{
+					return null;
+				}
+
+				return dateMoment.toDate();
+			}
+
+			function updateCPPNote(cppType)
+			{
+				var demographicNo = <c:out value="${junoEncounterForm.header.demographicNo}" />;
+				var form = jQuery('#frmIssueNotes');
+				var formData = getFormData(form);
+
+				var issueIdArray = [];
+				jQuery("input:checkbox[name=issue_id]:checked").each(function(){
+					issueIdArray.push(jQuery(this).val());
+				});
+
+				getCPPObjectFromForm(formData, issueIdArray).then(function(restData)
+				{
+					var jsonString = JSON.stringify(restData);
+
+					jQuery.ajax({
+						type: "POST",
+						contentType: "application/json",
+						dataType: "json",
+						url: getSaveCPPNoteUrl(demographicNo),
+						data: jsonString,
+						success: function (response)
+						{
+							if(response.status == "SUCCESS")
+							{
+								// Close window
+								hideEdit();
+
+								// Reload note list
+								getSectionRemote(formData.noteSummaryCode, true, true);
+
+								return false;
+							}
+							else
+							{
+								// Show error
+								jQuery('#editNoteError').html(response.error.message);
+							}
+						}
+					});
+				});
+
+				return false;
+			}
+
+			// XXX: NO!!  NO NO NO!
+			<%--
+			function updateCPPNote()
+			{
+				var url = $("frmIssueNotes").action;
+				var reloadUrl = $("reloadUrl").value;
+				var div = $("containerDiv").value;
+
+				$('channel').style.visibility = 'visible';
+				$('showEditNote').style.display = 'none';
+
+				var curItems = document.forms["frmIssueNotes"].elements["issueId"];
+				if (typeof curItems.length != "undefined")
+				{
+					size = curItems.length;
+
+					for (var idx = 0; idx < size; ++idx)
+					{
+						if (!curItems[idx].checked)
+						{
+							$("issueChange").value = true;
+							break;
+						}
+					}
+				}
+				else
+				{
+					$("issueChange").value = true;
+				}
+
+				$("reloadUrl").value = "method=junoEncounterSaveSuccess";
+
+				var params = $("frmIssueNotes").serialize();
+				var sigId = "sig" + caseNote.substr(13);
+				var objAjax = new Ajax.Request(
+					url,
+					{
+						method: 'post',
+						evalScripts: true,
+						postBody: params,
+						onSuccess: function(request)
+						{
+							if (request.responseText.length > 0)
+							{
+								$(div).update(request.responseText);
+							}
+							if ($("issueChange").value == "true")
+							{
+								ajaxUpdateIssues("edit", sigId);
+								$("issueChange").value = false;
+							}
+
+							notifyDivLoaded($(div).id);
+						},
+						onFailure: function(request)
+						{
+							$(div).innerHTML = "<h3>" + div + "<\/h3>Error: " + request.status;
+						}
+					}
+				);
+				return false;
+
+			}
+			--%>
+
+			function hideEdit()
+			{
+				$('showEditNote').style.display='none';
 			}
 
 			function assembleMainChartParams(displayFullChart) {
@@ -592,59 +948,27 @@
 
 			function notesIncrementAndLoadMore(demographicNo)
 			{
-				//console.log("==================================");
-				//console.log("scroll check");
-				//console.log(notesRetrieveOk);
-				//console.log($("encMainDiv").scrollTop);
-
 				if (notesRetrieveOk && $("encMainDiv").scrollTop == 0)
 				{
-					if ($("encMainDiv").scrollHeight > $("encMainDiv").getHeight())
+					notesRetrieveOk = false;
+					notesCurrentTop = $("encMainDiv").children[0].id;
+					notesLoader(ctx, notesOffset, notesIncrement, demographicNo, false).then(function()
 					{
 						notesOffset += notesIncrement;
-						notesRetrieveOk = false;
-						notesCurrentTop = $("encMainDiv").children[0].id;
-						notesLoader(ctx, notesOffset, notesIncrement, demographicNo, false);
-					}
+					});
 				}
 			}
 
 			function notesLoader(ctx, offset, numToReturn, demoNo, scrollToBottom)
 			{
+				var deferred = jQuery.Deferred();
 				$("notesLoading").style.display = "inline";
-
-/*
-				var params = "method=viewNotesOpt&offset=" + offset + "&numToReturn=" + numToReturn + "&demographicNo=" + demoNo;
-				var params2 = jQuery("input[name='filter_providers'],input[name='filter_roles'],input[name='issues'],input[name='note_sort']").serialize();
-				if (params2.length > 0)
-					params = params + "&" + params2;
-				console.log(params);
-				new Ajax.Updater("encMainDiv",
-					ctx + "/CaseManagementView.do",
-					{
-						method: 'post',
-						asynchronous: false,
-						postBody: params,
-						evalScripts: true,
-						insertion: Insertion.Top,
-						onSuccess: function(data)
-						{
-							notesRetrieveOk = (data.responseText.replace(/\s+/g, '').length > 0);
-							if (!notesRetrieveOk) clearInterval(scrollCheckInterval);
-						},
-						onComplete: function()
-						{
-							$("notesLoading").style.display = "none";
-							if (notesCurrentTop != null) $(notesCurrentTop).scrollIntoView();
-						}
-					});
-*/
 
 				jQuery.ajax({
 					type: "GET",
 					contentType: "application/json",
 					dataType: "json",
-					url: "../ws/rs/notes/" + demoNo + "/all?numberToReturn=" + notesIncrement + "&offset=" + offset,
+					url: "../ws/rs/notes/" + demoNo + "/all?numToReturn=" + numToReturn+ "&offset=" + offset,
 					success: function(response)
 					{
 
@@ -661,42 +985,12 @@
 						{
 							clearInterval(scrollCheckInterval);
 						}
-/*
-						if (notesCurrentTop != null)
-						{
-							$(notesCurrentTop).scrollIntoView();
-						}
-*/
+
+						deferred.resolve();
 					}
 				});
 
-				/*
-				new Ajax.Request(
-					"../ws/rs/notes/" + demoNo + "/all?numberToReturn=20&offset=0",
-					{
-						method: 'post',
-						contentType: 'application/json',
-						onSuccess: function(response)
-						{
-							console.log('========================================================');
-							console.log(response);
-							console.log('========================================================');
-						}
-					}
-				);
-
-				jQuery.getJSON(
-					"../ws/rs/notes/" + demoNo + "/all?numberToReturn=20&offset=0",
-					{async:true},
-					function(xml)
-					{
-						//listJobs();
-						console.log('========================================================');
-						console.log(xml);
-						console.log('========================================================');
-					}
-				);
-				 */
+				return deferred.promise();
 			}
 
 			function displayNotes(noteArray, scrollToBottom, offset)
@@ -738,48 +1032,80 @@
 					firstNoteNode[0].scrollIntoView();
 				}
 
+
+
+				// XXX: this needs to work when regular notes are added
 				<%--
-					//display last saved note for editing
-					if (note.getNoteId()!=null && !"".equals(note.getNoteId()) && note.getNoteId().intValue() == savedId )
-					{
-						found = true;
+				//display last saved note for editing
+				if (note.getNoteId() != null && !"".equals(note.getNoteId()) && note.getNoteId().intValue() == savedId )
+				{
+					found = true;
 					%>
 					<script>
 					savedNoteId=<%=note.getNoteId()%>;
-			</script>
-		<%
-			if (OscarProperties.getInstance().getBooleanProperty("note_program_ui_enabled", "true")) {
-		%>
-		<script>
-			_setupNewNote();
-		</script>
-		<% } %>
+					</script>
+						<%
+					if (OscarProperties.getInstance().getBooleanProperty("note_program_ui_enabled", "true")) {
+				%>
+				<script>
+					_setupNewNote();
+				</script>
+						<% } %>
 
-		<img title="<bean:message key="oscarEncounter.print.title"/>" id='print<%=globalNoteId%>' alt="<bean:message key="oscarEncounter.togglePrintNote.title"/>" onclick="togglePrint(<%=globalNoteId%>, event)" style='float: right; margin-right: 5px;' src='<%=ctx %>/oscarEncounter/graphics/printer.png' />
-		<textarea tabindex="7" cols="84" rows="10" class="txtArea" wrap="soft" style="line-height: 1.1em;" name="caseNote_note" id="caseNote_note<%=savedId%>"><%=caseNote_note%></textarea>
+				<img title="<bean:message key="oscarEncounter.print.title"/>" id='print<%=globalNoteId%>' alt="<bean:message key="oscarEncounter.togglePrintNote.title"/>" onclick="togglePrint(<%=globalNoteId%>, event)" style='float: right; margin-right: 5px;' src='<%=ctx %>/oscarEncounter/graphics/printer.png' />
+				<textarea tabindex="7" cols="84" rows="10" class="txtArea" wrap="soft" style="line-height: 1.1em;" name="caseNote_note" id="caseNote_note<%=savedId%>"><%=caseNote_note%></textarea>
 
-		<div class="sig" style="display:inline;<%=bgColour%>" id="sig<%=globalNoteId%>">
-			<%@ include file="noteIssueList.jsp"%>
-	</div>
-
-
-	<%
-
-	%>
-		}
-				 --%>
+				<div class="sig" style="display:inline;<%=bgColour%>" id="sig<%=globalNoteId%>">
+					<%@ include file="noteIssueList.jsp"%>
+				</div>
+			}
+			--%>
 				console.log('========================================================');
 				console.log(noteArray);
 				console.log('========================================================');
 			}
 
+			function getAppointmentNo()
+			{
+				<c:if test="${not empty junoEncounterForm.header.appointmentNo}">
+				var appointmentNo = <c:out value="${junoEncounterForm.header.appointmentNo}" />;
+				</c:if>
+				<c:if test="${empty junoEncounterForm.header.appointmentNo}">
+				var appointmentNo = null;
+				</c:if>
+
+				return appointmentNo;
+			}
 
 			function buildNonNoteEntry(containerDiv, index, note)
 			{
+				var appointmentNo = getAppointmentNo();
 
-				var color = getNoteColor(note);
 				var date = moment(note.observationDate);
 
+				var onClickString = "";
+				if(note.eformData)
+				{
+					onClickString = "popupPage(700,800,'1689724085','/eform/efmshowform_data.jsp" +
+						"?appointment=" + appointmentNo +
+						"&amp;fdid=" + note.eformDataId + "');";
+				}
+
+				var templateParameters = {
+					index: index,
+					note: note,
+					colour: getNoteColor(note),
+					noteLineArray: note.note.split("\n"),
+					formattedObservationDate: date.format('DD-MMM-YYYY H:mm'),
+					onClickString: onClickString
+				};
+
+
+				var newNode = jQuery('#encounterNonNoteTemplate').tmpl(templateParameters);
+
+				return newNode.prependTo(containerDiv);
+
+				/*
 				var noteDiv = jQuery('<div id="nc' + index + '" style="display:block;" class="note" />')
 					.prependTo(containerDiv);
 
@@ -807,15 +1133,19 @@
 
 				noteDiv5.append('<a style="color:#ddddff;" href="#" onclick="return showHistory(\'' + note.noteId +'\', event);">' + note.revision + '</a>');
 
+
 				return noteDiv;
+				 */
 			}
 
 			function buildNoteEntry(containerDiv, index, note)
 			{
+				var date = moment(note.observationDate);
 				var templateParameters = {
 					index: index,
 					note: note,
-					noteLineArray: note.note.split("\n")
+					noteLineArray: note.note.split("\n"),
+					formattedObservationDate: date.format('DD-MMM-YYYY H:mm')
 				};
 
 				var newNode = jQuery('#encounterNoteTemplate').tmpl(templateParameters);
@@ -900,12 +1230,20 @@
 					appointmentNo + limitString + offsetString;
 			}
 
-			function getSectionRemote(sectionName, getAll)
+			function getSaveCPPNoteUrl(demographicNo)
 			{
-				var appointmentNo = <c:out value="${junoEncounterForm.header.appointmentNo}" />;
+				return "../ws/rs/notes/" + demographicNo + "/saveIssueNote";
+			}
+
+			function isCppSection(sectionName)
+			{
+				return ["SocHistory", "MedHistory", "Concerns", "Reminders"].indexOf(sectionName) != -1;
+			}
+
+			function getSectionRemote(sectionName, getAll, disableExpand)
+			{
+				var appointmentNo = getAppointmentNo();
 				var demographicNo = <c:out value="${junoEncounterForm.header.demographicNo}" />;
-				//var sectionNoteJsonString = "[{\"sectionName\":\"Section Name\",\"remainingNotes\":\"10\",\"colour\":\"#005500\",\"text\":\"OMG! TEXT!\",\"updateDate\":\"01-Jan-1900\"}]";
-				//var sectionNoteArray = jQuery.parseJSON(sectionNoteJsonString);
 
 				var limit = null;
 				var offset = null;
@@ -929,6 +1267,7 @@
 						jQuery.each(response.body.notes, function(index, note)
 						{
 							note.sectionName = sectionName;
+							note.index = index;
 							note.updateDateFormatted = "";
 							if(note.updateDate !== null)
 							{
@@ -943,16 +1282,24 @@
 							}
 
 							// Show the close arrow on the first and last row
-							if(getAll && (index == 0 || index == response.body.notes.length - 1))
+							if(!disableExpand && getAll && (index == 0 || index == response.body.notes.length - 1))
 							{
 								note.showCollapse = true;
 							}
-							else if(!getAll && index == response.body.notes.length - 1)
+							else if(!disableExpand && !getAll && index == response.body.notes.length - 1)
 							{
 								note.showExpand = true;
 							}
 
-							var newNode = jQuery('#sectionNoteTemplate').tmpl(note);
+							var newNode;
+							if(isCppSection(sectionName))
+							{
+								newNode = jQuery('#sectionCppNoteTemplate').tmpl(note);
+							}
+							else
+							{
+								newNode = jQuery('#sectionNoteTemplate').tmpl(note);
+							}
 
 							return newNode.appendTo(containerDiv);
 						});
@@ -962,9 +1309,99 @@
 
 			}
 
+			function showMenu(menuNumber, eventObj)
+			{
+				var menuId = 'menu' + menuNumber;
+				return showPopup(menuId, eventObj);
+			}
 
-			function init() {
+			function autoCompleteShowMenuCPP(element, update)
+			{
+				Effect.Appear($("issueListCPP"), {duration: 0.15});
+				Effect.Appear(update, {duration: 0.15});
+			}
 
+			function autoCompleteHideMenuCPP(element, update)
+			{
+				new Effect.Fade(update, {duration: 0.15});
+				new Effect.Fade($("issueListCPP"), {duration: 0.15});
+			}
+
+			function copyCppToCurrentNote()
+			{
+				// Enable this when encounter notes work
+				/*
+				var currentNoteId = jQuery("input[name='noteId']").val();
+				var currentNoteText = jQuery("#caseNote_note" + currentNoteId).val();
+				currentNoteText += "\n";
+				currentNoteText += jQuery("#noteEditTxt").val();
+				jQuery("#caseNote_note" + currentNoteId).val(currentNoteText);
+				*/
+			}
+
+			function addIssue2CPP(txtField, listItem)
+			{
+				var nodeId = listItem.id;
+				var size = 0;
+				var found = false;
+				var curItems = document.forms["frmIssueNotes"].elements["issueId"];
+
+				if (curItems && typeof curItems.length != "undefined")
+				{
+					size = curItems.length;
+
+					for (var idx = 0; idx < size; ++idx)
+					{
+						if (curItems[idx].value == nodeId)
+						{
+							found = true;
+							break;
+						}
+					}
+				}
+				else if(curItems && typeof curItems.value != "undefined")
+				{
+					found = curItems.value == nodeId;
+				}
+
+				if (!found)
+				{
+					var node = document.createElement("LI");
+
+					var html = "<input type='checkbox' id='issueId' name='issue_id' checked value='" + nodeId + "'>" + listItem.innerHTML;
+					new Insertion.Top(node, html);
+
+					$("issueIdList").appendChild(node);
+					$("issueAutocompleteCPP").value = "";
+
+				}
+
+				$("issueChange").value = true;
+			}
+
+
+			function init()
+			{
+				// This was messing up the serialization of arrays to JSON so I removed it.
+				delete Array.prototype.toJSON
+
+				// Monkey Patch from https://stackoverflow.com/a/16208232
+				if (typeof jQuery.when.all === 'undefined') {
+					jQuery.when.all = function (deferreds) {
+						return jQuery.Deferred(function (def) {
+							jQuery.when.apply(jQuery, deferreds).then(
+								function () {
+									def.resolveWith(this, [Array.prototype.slice.call(arguments)]);
+								},
+								function () {
+									def.rejectWith(this, [Array.prototype.slice.call(arguments)]);
+								});
+						});
+					}
+				}
+
+
+				Date.prototype.toJSON = function(){ return moment(this).format(); }
 
 				// XXX: This is required to set some session state to make saving a note work.
 				//      I feel like this is a terrible idea and should be removed with predjudice.
@@ -990,31 +1427,46 @@
 				Calendar.setup({ inputField : "printStartDate", ifFormat : "%d-%b-%Y", showsTime :false, button : "printStartDate_cal", singleClick : true, step : 1 });
 				Calendar.setup({ inputField : "printEndDate", ifFormat : "%d-%b-%Y", showsTime :false, button : "printEndDate_cal", singleClick : true, step : 1 });
 
-				<%--
 				<c:url value="/CaseManagementEntry.do" var="issueURLCPP">
-				<c:param name="method" value="issueList"/>
-				<c:param name="demographicNo" value="${demographicNo}" />
-				<c:param name="providerNo" value="${providerNo}" />
-				<c:param name="all" value="true" />
+					<c:param name="method" value="issueList"/>
+					<c:param name="demographicNo" value="${junoEncounterForm.header.demographicNo}" />
+					<c:param name="providerNo" value="${junoEncounterForm.header.providerNo}" />
+					<c:param name="all" value="true" />
 				</c:url>
-				var issueAutoCompleterCPP = new Ajax.Autocompleter("issueAutocompleteCPP", "issueAutocompleteListCPP", "<c:out value="${issueURLCPP}" />", {minChars: 3, indicator: 'busy2', afterUpdateElement: addIssue2CPP, onShow: autoCompleteShowMenuCPP, onHide: autoCompleteHideMenuCPP});
 
 				<nested:notEmpty name="DateError">
-				alert("<nested:write name="DateError"/>");
+					alert("<nested:write name="DateError"/>");
 				</nested:notEmpty>
-				--%>
+
+				var issueAutoCompleterCPP = new Ajax.Autocompleter(
+					"issueAutocompleteCPP",
+					"issueAutocompleteListCPP",
+					"<c:out value="${issueURLCPP}" />",
+					{
+						minChars: 3,
+						indicator: 'busy2',
+						afterUpdateElement: addIssue2CPP,
+						onShow: autoCompleteShowMenuCPP,
+						onHide: autoCompleteHideMenuCPP
+					}
+				);
 
 				//var calculatorMenu = jQuery('#calculators_menu');
 
 				//notesIncrement = parseInt("<%=OscarProperties.getInstance().getProperty("num_loaded_notes", "20") %>");
 
 				var demographicNo = ${junoEncounterForm.header.demographicNo};
-				notesLoader(ctx, 0, notesIncrement, demographicNo, true);
 
-				notesScrollCheckInterval = setInterval(function()
+				// Load a few extra notes initially, hopefully fill up the page
+				notesLoader(ctx, 0, notesIncrement * 2, demographicNo, true).then(function()
 				{
-					notesIncrementAndLoadMore(demographicNo)
-				}, 2000);
+					notesOffset += (notesIncrement * 2);
+					notesScrollCheckInterval = setInterval(function()
+					{
+						notesIncrementAndLoadMore(demographicNo)
+					}, 500);
+				});
+
 
 				//bindCalculatorListener(calculatorMenu);
 			}
@@ -1125,11 +1577,11 @@
 
 			<li class="encounterNote \${rowClass}">
 				{{if showExpand }}
-				<a href="#" class="expandCasemgmtSidebar" onclick="getSectionRemote('\${sectionName}', true); return false;" title="\${remainingNotes} more items">
+				<a href="#" class="expandCasemgmtSidebar" onclick="getSectionRemote('\${sectionName}', true, false); return false;" title="\${remainingNotes} more items">
 					<img id="imgpreventions5" src="graphics/expand.gif" />&nbsp;&nbsp;
 				</a>
 				{{else showCollapse }}
-				<a href="#" class="expandCasemgmtSidebar" onclick="getSectionRemote('\${sectionName}', false); return false;" title="\${remainingNotes} more items">
+				<a href="#" class="expandCasemgmtSidebar" onclick="getSectionRemote('\${sectionName}', false, false); return false;" title="\${remainingNotes} more items">
 					<img id="imgpreventions5" src="../oscarMessenger/img/collapse.gif" />&nbsp;&nbsp;
 				</a>
 				{{else}}
@@ -1143,7 +1595,8 @@
 						style="color: \${colour};"
 						onmouseover="this.className='linkhover'"
 						onmouseout="this.className='links'"
-						href="#" onclick=""
+						href="#"
+						onclick="\${onClick};return false;"
 						title="Flu=Influenza vaccine"
 					>
 						\${text}
@@ -1156,7 +1609,7 @@
 						onmouseover="this.className='linkhover'"
 						onmouseout="this.className='links'"
 						href="#"
-						onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;"
+						onclick="\${onClick};return false;"
 						title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
 					>
 						\${value}
@@ -1164,6 +1617,54 @@
 					</a>
 				</span>
 			</li>
+		</script>
+
+
+		<script id="sectionCppNoteTemplate" type="text/x-jquery-tmpl">
+			<li class="\${rowClass}">
+				<span id="spanListNote\${index}">
+					<a class="topLinks"
+					   onmouseover="this.className='topLinkhover'"
+					   onmouseout="this.className='topLinks'"
+					   title="Rev:\${revision} - Last update:\${updateDateFormatted}"
+					   id="listNote\${noteId}"
+					   href="#"
+					   onclick="\${onClick};return false;"
+					   style="width:100%;overflow:scroll;" >
+							\${text}
+					</a>
+				</span>
+			</li>
+		</script>
+
+		<script id="encounterNonNoteTemplate" type="text/x-jquery-tmpl">
+			<div id="nc\${index}" style="display:block;" class="note">
+
+				<div id="n\${note.noteId}">
+
+					<div id="wrapper\${note.noteId}" style="color:#FFFFFF;background-color:\${colour};color:white;font-size:10px;">
+
+						<div id="txt\${note.noteId}" style="display:inline-block;overflow-wrap:break-word;word-wrap:break-word;max-width:60%;">
+							\${note.note}
+						</div>
+						<div id="observation671898" style="display:inline-block;font-size: 11px; float: right; margin-right: 3px;">
+							Encounter Date:&nbsp;
+							<span id="obs">\${formattedObservationDate}</span>
+							&nbsp;
+							{{if note.revision}}
+								 Rev
+
+								<a style="color:#ddddff;" href="#" onclick="return showHistory('\${note.noteId}', event);">\${note.revision}</a>
+							{{/if}}
+							{{if note.eformData}}
+								<a class="links" title="View eForm" id="viewEFORM122582" href="#"
+									onclick="\${onClickString};return false;"
+									style="float: right; margin-right: 5px; font-size: 10px;"> View </a>
+							{{/if}}
+						</div>
+					</div>
+				</div>
+			</div>
 		</script>
 
 		<script id="encounterNoteTemplate" type="text/x-jquery-tmpl">
@@ -1211,7 +1712,7 @@
 						<div id="sumary\${index}">
 							<div id="observation\${index}" style="font-size: 11px; float: right; margin-right: 3px;">
 								Encounter Date:&nbsp;
-								<span id="obs\${index}">22-Aug-2019 11:12</span>&nbsp;
+								<span id="obs\${index}">\${formattedObservationDate}</span>&nbsp;
 								Rev
 
 								<a href="#" onclick="return showHistory('\${index}', event);">2</a>
@@ -1228,7 +1729,7 @@
 							</div>
 							<div style="font-size: 11px; clear: right; margin-right: 3px; float: right;">
 								Enc Type:&nbsp;
-								<span id="encType\${index}">"face to face encounter with client"</span>
+								<span id="encType\${index}">\${encounterType}</span>
 							</div>
 
 
@@ -1317,171 +1818,18 @@
 			</div>
 		</div>
 
-
-
-		<%--
-		<div id="rightNavBar" style="display: inline; float: right; width: 20%; margin-left: -3px;">
-			<%
-			String demo=request.getParameter("demographicNo");
-			String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-
-			// XXX: Do we want the sharing center?
-			// MARC-HI's Sharing Center
-			//boolean isSharingCenterEnabled = SharingCenterUtil.isEnabled();
-
-			%>
-
-			<!--dummmy div to force browser to allocate space -->
-			<security:oscarSec roleName="<%=roleName$%>" objectName="_newCasemgmt.photo" rights="r">
-				<c:choose>
-					<c:when test="${not empty requestScope.image_exists}">
-						<img style="cursor: pointer;" id="ci" src="${fn:escapeXml(junoEncounterForm.header.imagePresentPlaceholderUrl)}" alt="id_photo" height="100" title="Click to upload new photo."
-							 OnMouseOver="document.getElementById('ci').src='../imageRenderingServlet?source=local_client&clientId=${fn:escapeXml(junoEncounterForm.header.demographicNo)}'"
-							 OnMouseOut="delay(5000)" window.status='Click to upload new photo'; return true;"
-						onClick="popupUploadPage('uploadimage.jsp',${fn:escapeXml(junoEncounterForm.header.demographicNo)});return false;" />
-					</c:when>
-					<c:otherwise>
-						<img style="cursor: pointer;" src="${fn:escapeXml(junoEncounterForm.header.imageMissingPlaceholderUrl)}" alt="No_Id_Photo" height="100" title="Click to upload new photo." OnMouseOver="window.status='Click to upload new photo';return true"
-							 onClick="popupUploadPage('../casemgmt/uploadimage.jsp',${fn:escapeXml(junoEncounterForm.header.demographicNo)});return false;" />
-					</c:otherwise>
-				</c:choose>
-			</security:oscarSec>
-			--%>
-
-			<!-- MARC-HI's Sharing Center -->
-<%--			<% if (isSharingCenterEnabled) { %>
-			<div>
-				<button type="button" onclick="window.open('${ctx}/sharingcenter/documents/demographicExport.jsp?demographic_no=<%=demo%>');">
-					Export Patient Demographic
-				</button>
-			</div>
-			<% } %>--%>
-
-					<%--
-			<div class="encounterNavBar" id="rightColLoader" style="width: 100%;">
-
-						<%
-						// =================================================================================
-						// Right sidebar
-						// =================================================================================
-						%>
-						<c:forEach items="${junoEncounterForm.rightNoteSections}" var="sectionName" varStatus="loop">
-
-							<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
-
-							<div class="leftBox" id="${sectionName}" style="display: block;">
-
-								<form style="display: none;" name="dummyForm" action="">
-									<input type="hidden" id="reloadDiv" name="reloadDiv" value="none" onchange="updateDiv();">
-								</form>
-
-								<div id='menuTitle${sectionName}' style="width: 10%; float: right; text-align: center;">
-									<h3 style="padding:0px; background-color: ${section.colour};">
-										<a href="javascript:void(0);" onclick="return false;">+</a>
-									</h3>
-								</div>
-
-								<div style="clear: left; float: left; width: 90%;">
-									<h3 style="width:100%; background-color: ${section.colour}">
-										<a href="#" onclick="return false;">
-											${section.title}
-										</a>
-									</h3>
-								</div>
-
-								<ul id="${sectionName}list">
-
-									<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
-
-									<c:forEach items="${section.notes}" var="note" varStatus="loop">
-
-										<li class="encounterNote ${loop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
-											<a class="encounterNoteTitle" border="0" style=""><img id="img${sectionName}1" src="/images/clear.gif">&nbsp;&nbsp;</a>
-											<span class="encounterNoteTitle">
-												<a
-														class="links"
-														style="color: ${note.colour};"
-														onmouseover="this.className='linkhover'"
-														onmouseout="this.className='links'"
-														href="#" onclick=""
-														title="Flu=Influenza vaccine"
-												>
-													<c:choose>
-														<c:when test="${note.colouredTitle}">
-															<span class="${fn:join(note.titleClasses, ' ')}">
-																<c:out value="${note.text}" />
-															</span>
-														</c:when>
-														<c:otherwise>
-															<c:out value="${note.text}" />
-														</c:otherwise>
-													</c:choose>
-												</a>
-											</span>
-											<fmt:parseDate value="${note.updateDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedUpdateDate" />
-											<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
-											<c:if test="${not empty updateDate}">
-												<span class="encounterNoteDate">
-													...<a
-															class="links"
-															style="margin-right: 2px; color: ${note.colour};"
-															onmouseover="this.className='linkhover'"
-															onmouseout="this.className='links'"
-															href="#"
-															onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;"
-															title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
-													>
-														<c:out value="${updateDate}" />
-													</a>
-												</span>
-											</c:if>
-
-											if (curNum == 0 && xpanded)
-											{
-											imgName = "img" + request.getAttribute("navbarName") + curNum;
-											out.println("<a href='#' onclick=\"return false;\" style='text-decoration:none; width:7px; z-index: 100; " + dateColour + " position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;'><img id='" + imgName + "' src='" + request.getContextPath() + "/oscarMessenger/img/collapse.gif'/>&nbsp;&nbsp;</a>");
-											js.append("imgfunc['" + imgName + "'] = clickListDisplay.bindAsEventListener(obj,'" + request.getAttribute("navbarName") + "', '" + displayThreshold + "');");
-											js.append("Element.observe($('" + imgName + "'), 'click', imgfunc['" + imgName + "']);");
-											}
-											else if (j == (numToDisplay - 1) && xpanded)
-											{
-											imgName = "img" + request.getAttribute("navbarName") + curNum;
-											out.println("<a href='#' onclick=\"return false;\" style='text-decoration:none; width:7px; z-index: 100; " + dateColour + " position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;'><img id='" + imgName + "' src='" + request.getContextPath() + "/oscarMessenger/img/collapse.gif'/>&nbsp;&nbsp;</a>");
-											js.append("imgfunc['" + imgName + "'] = clickListDisplay.bindAsEventListener(obj,'" + request.getAttribute("navbarName") + "', '" + displayThreshold + "');");
-											js.append("Element.observe($('" + imgName + "'), 'click', imgfunc['" + imgName + "']);");
-											}
-											else if (j == (numToDisplay - 1) && numItems > (curNum + 1))
-											{
-											imgName = "img" + request.getAttribute("navbarName") + curNum;
-											out.println("<a href='#' onclick=\"return false;\" title='" + String.valueOf(numItems - j - 1) + " more items' style=' text-decoration:none; width:7px; z-index: 100; " + dateColour + " position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;'><img id='" + imgName + "' src='" + request.getContextPath() + "/oscarEncounter/graphics/expand.gif'/>&nbsp;&nbsp;</a>");
-											js.append("imgfunc['" + imgName + "'] = clickLoadMore.bindAsEventListener(obj,'" + request.getAttribute("navbarName") + "','" + reloadUrl + "');");
-											js.append("Element.observe($('" + imgName + "'), 'click', imgfunc['" + imgName + "']);");
-											}
-											else
-											{
-											out.println("<a border=0 style='text-decoration:none; width:7px; z-index: 100; " + dateColour + " position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;'><img  id='img" + request.getAttribute("navbarName") + curNum + "' src='" + request.getContextPath() + "/images/clear.gif'/>&nbsp;&nbsp;</a>");
-											}
-											<c:if test="${ section.remainingNotes > 0 }">
-												<a href="#" onclick="return false;" title="${section.remainingNotes} more items" class="expandCasemgmtSidebar">
-													<img id="imgpreventions5" src="/bcdemo15/oscarEncounter/graphics/expand.gif">&nbsp;&nbsp;
-												</a>
-											</c:if>
-										</li>
-
-									</c:forEach>
-								</ul>
-							</div>
-						</c:forEach>
-					</div>
-				</div>
-		--%>
-
 		<c:set var="navbarSides" value="${fn:split('right,left', ',')}"></c:set>
 		<c:forEach items="${navbarSides}" var="navbarSide">
+
+			<%-- Show different preamble for left and right sides --%>
+
+			<%-- Left --%>
 			<c:if test="${navbarSide == 'left'}">
 				<c:set var="noteSections" value="${junoEncounterForm.leftNoteSections}" />
 				<div id="leftNavBar" style="display: inline; float: left; width: 20%;">
 			</c:if>
+
+			<%-- Right --%>
 			<c:if test="${navbarSide == 'right'}">
 				<c:set var="noteSections" value="${junoEncounterForm.rightNoteSections}" />
 				<div id="rightNavBar" style="display: inline; float: right; width: 20%; margin-left: -3px;">
@@ -1521,94 +1869,134 @@
 			</c:if>
 
 
-				<div class="encounterNavBar" id="${navbarSide}ColLoader" style="width: 100%;">
-					<%
-						// =================================================================================
-						// Left sidebar
-						// =================================================================================
-						// XXX: Maybe replace this with JSON/Javascript code
-					%>
-					<c:forEach items="${noteSections}" var="sectionName" varStatus="loop">
+			<div class="encounterNavBar" id="${navbarSide}ColLoader" style="width: 100%;">
+				<%
+					// =================================================================================
+					// Sidebar display
+					// =================================================================================
+					// XXX: Maybe replace this with JSON/Javascript code
+				%>
+				<c:forEach items="${noteSections}" var="sectionName" varStatus="loop">
 
-						<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
+					<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
 
-						<div class="leftBox" id="${sectionName}" style="display: block;">
+					<div class="leftBox" id="${sectionName}" style="display: block;">
 
-							<form style="display: none;" name="dummyForm" action="">
-								<input type="hidden" id="reloadDiv" name="reloadDiv" value="none" onchange="updateDiv();">
-							</form>
+						<form style="display: none;" name="dummyForm" action="">
+							<input type="hidden" id="reloadDiv" name="reloadDiv" value="none" onchange="updateDiv();">
+						</form>
 
-							<div id='menuTitle${sectionName}' style="width: 10%; float: right; text-align: center;">
-								<h3 style="padding:0px; background-color: ${section.colour};">
-									<a href="javascript:void(0);" onclick="return false;">+</a>
+						<div id='menuTitle${sectionName}' style="width: 10%; float: right; text-align: center;">
+							<h3 style="padding:0px; background-color: ${section.colour};">
+								<a href="javascript:void(0);"
+								   onclick="${section.onClickPlus};return false;"
+								   onmouseover="return !showMenu('${section.menuId}', event);"
+								>+</a>
+							</h3>
+						</div>
+
+						<%-- Popup Menu --%>
+						<c:if test="${not empty section.menuId}">
+							<%-- XXX: put the 40 + 125 in a constant --%>
+							<c:set var="useColumns" scope="page" value="${fn:length(section.menuItems) > 40}" />
+							<c:set var="menuWidth" scope="page" value="${useColumns ? '250' : '125'}" />
+							<div id='menu${section.menuId}' class='menu' style='width: ${menuWidth}px' onclick='event.cancelBubble = true;'>
+								<h3 style='text-align: center'><bean:message key="${section.menuHeaderKey}" />
 								</h3>
-							</div>
-
-							<div style="clear: left; float: left; width: 90%;">
-								<h3 style="width:100%; background-color: ${section.colour}">
-									<a href="#" onclick="return false;">
-										${section.title}
+								<c:forEach items="${section.menuItems}" var="menuItem" varStatus="loop">
+									<a href="#" class="menuItem${useColumns && loop.index % 2 == 1 ? 'right' : 'left' }"
+										  onmouseover='this.style.color="black"'
+										  onmouseout='this.style.color="white"'
+										  onclick="${menuItem.onClick}; return false;">
+										<c:if test="${not empty menuItem.textKey}"><bean:message key="${menuItem.textKey}" /></c:if>
+										<c:if test="${empty menuItem.textKey}">${menuItem.text}</c:if>
 									</a>
-								</h3>
+									<c:if test="${(!useColumns || loop.index % 2 == 1)}"><br></c:if>
+								</c:forEach>
+								<br>
 							</div>
+						</c:if>
 
-							<ul id="${sectionName}list">
+						<%-- Section title --%>
+						<div style="clear: left; float: left; width: 90%;">
+							<h3 style="width:100%; background-color: ${section.colour}">
+								<a href="#" onclick="${section.onClickTitle};return false;">
+									<%-- XXX: Remove this once all titles are localized --%>
+									<c:if test="${not empty section.titleKey}">
+										<bean:message key="${section.titleKey}"/>
+									</c:if>
+									<c:if test="${empty section.titleKey}">
+										${section.title}
+									</c:if>
+								</a>
+							</h3>
+						</div>
 
-								<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
+						<%-- List of links in the section --%>
+						<ul id="${sectionName}list">
 
-								<c:forEach items="${section.notes}" var="note" varStatus="loop">
+							<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
 
-									<li class="encounterNote ${loop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
-										<c:choose>
-											<c:when test="${ section.remainingNotes > 0 && loop.last }">
-												<a href="#" class="expandCasemgmtSidebar encounterNoteTitle" onclick="getSectionRemote('${sectionName}', true); return false;" title="${section.remainingNotes} more items">
-													<img id="img${sectionName}5" src="graphics/expand.gif" />&nbsp;&nbsp;
-												</a>
-											</c:when>
-											<c:otherwise>
-												<a border="0" class="expandCasemgmtSidebar encounterNoteTitle">
-													<img id="img${sectionName}1" src="/images/clear.gif" />&nbsp;&nbsp;
-												</a>
-											</c:otherwise>
-										</c:choose>
-										<span class="encounterNoteTitle">
-											<a
-												class="links ${fn:join(note.titleClasses, ' ')}"
-												<c:if test="${note.colour != null}">
-													style="color: ${note.colour};"
-												</c:if>
-												onmouseover="this.className='linkhover ${fn:join(note.titleClasses, ' ')}'"
-												onmouseout="this.className='links ${fn:join(note.titleClasses, ' ')}'"
-												href="#" onclick=""
-												title="Flu=Influenza vaccine"
+							<c:forEach items="${section.notes}" var="note" varStatus="loop">
+
+								<li class="encounterNote ${loop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
+
+									<%-- Expand arrows if neccessary --%>
+									<c:choose>
+										<c:when test="${ section.remainingNotes > 0 && loop.last }">
+											<a href="#" class="expandCasemgmtSidebar encounterNoteTitle" onclick="getSectionRemote('${sectionName}', true, false); return false;" title="${section.remainingNotes} more items">
+												<img id="img${sectionName}5" src="graphics/expand.gif" />&nbsp;&nbsp;
+											</a>
+										</c:when>
+										<c:otherwise>
+											<a border="0" class="expandCasemgmtSidebar encounterNoteTitle">
+												<img id="img${sectionName}1" src="/images/clear.gif" />&nbsp;&nbsp;
+											</a>
+										</c:otherwise>
+									</c:choose>
+
+									<%-- Link title --%>
+									<span class="encounterNoteTitle">
+										<a
+											class="links ${fn:join(note.titleClasses, ' ')}"
+											<c:if test="${note.colour != null}">
+												style="color: ${note.colour};"
+											</c:if>
+											onmouseover="this.className='linkhover ${fn:join(note.titleClasses, ' ')}'"
+											onmouseout="this.className='links ${fn:join(note.titleClasses, ' ')}'"
+											href="#"
+											onclick="${note.onClick};return false;"
+											title="Flu=Influenza vaccine"
+										>
+											<c:out value="${note.text}" />
+										</a>
+									</span>
+
+									<%-- Link date --%>
+									<fmt:parseDate value="${note.updateDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedUpdateDate" />
+									<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
+									<c:if test="${not empty updateDate}">
+										<span class="encounterNoteDate">
+											...<a
+												class="links"
+												style="margin-right: 2px; color: ${note.colour};"
+												onmouseover="this.className='linkhover'"
+												onmouseout="this.className='links'"
+												href="#"
+												onclick="${note.onClick};return false;"
+												title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
 											>
-												<c:out value="${note.text}" />
+												<c:out value="${note.value}" />
+												<c:out value="${updateDate}" />
 											</a>
 										</span>
-										<fmt:parseDate value="${note.updateDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedUpdateDate" />
-										<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
-										<c:if test="${not empty updateDate}">
-											<span class="encounterNoteDate">
-												...<a
-													class="links"
-													style="margin-right: 2px; color: ${note.colour};"
-													onmouseover="this.className='linkhover'"
-													onmouseout="this.className='links'"
-													href="#"
-													onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;"
-													title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
-												>
-													<c:out value="${note.value}" />
-													<c:out value="${updateDate}" />
-												</a>
-											</span>
-										</c:if>
-									</li>
-								</c:forEach>
-							</ul>
-						</div>
-					</c:forEach>
-				</div>
+									</c:if>
+								</li>
+							</c:forEach>
+						</ul>
+					</div>
+				</c:forEach>
+			</div>
 			</div>
 		</c:forEach>
 
@@ -1656,31 +2044,21 @@
 
 							<div style="width: 10%; float: right; text-align: center;">
 								<h3 style="padding:0px; background-color: ${section.colour}">
-									<a href="#" title='Add Item' onclick="return showEdit(
-										event,
-										'${fn:escapeXml(section.title)}',
-										'',
-										0,
-										'',
-										'',
-										'',
-										'${fn:escapeXml(section.addUrl)}0',
-										${fn:length(section.notes)},
-										0,
-										'${fn:escapeXml(section.identUrl)}',
-										'${fn:escapeXml(section.cppIssues)}',
-										'',
-										'${fn:escapeXml(junoEncounterForm.header.demographicNo
-									)}');">+</a>
+									<a href="javascript:void(0);"
+									   onclick="${section.onClickPlus};return false;"
+									>+</a>
 								</h3>
 							</div>
 							<div style="clear: left; float: left; width: 90%;">
 								<h3 style="width:100%; background-color: ${section.colour}">
-										<c:out value="${section.title}" />
+									<a href="javascript:void(0);"
+									   onclick="${section.onClickTitle};return false;">
+										<bean:message key="${section.titleKey}"/>
+									</a>
 								</h3>
 							</div>
 							<div style="clear: both; height: calc(100% - 10px); overflow: auto;">
-								<ul style="margin-left: 5px;">
+								<ul id="${sectionName}list" style="margin-left: 5px;">
 									<c:forEach items="${section.notes}" var="note" varStatus="noteLoop">
 										<fmt:parseDate value="${note.updateDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedUpdateDate" />
 										<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
@@ -1694,6 +2072,8 @@
 												   title="Rev:${note.revision} - Last update:${updateDate}"
 												   id="listNote${note.id}"
 												   href="#"
+												   onclick="${note.onClick}"
+												   <%--
 												   onclick="showEdit(
 														   event,
 														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${section.title}</spring:escapeBody>',
@@ -1702,14 +2082,13 @@
 														   '${observationDate}',
 														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.revision}</spring:escapeBody>',
 														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.text}</spring:escapeBody>',
-														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${section.addUrl}${note.id}</spring:escapeBody>',
 													       ${fn:length(section.notes)},
 														   ${noteLoop.index},
-														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${section.identUrl}</spring:escapeBody>',
 														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.noteIssuesString}</spring:escapeBody>',
 														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.noteExtsString}</spring:escapeBody>',
 														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${param.demographicNo}</spring:escapeBody>',
 														   );return false;"
+													--%>
 												   style="width:100%;overflow:scroll;" >
 													${fn:escapeXml(note.text)}
 												</a>
@@ -2105,7 +2484,7 @@
 								</tr>
 							</table>
 						</div>
-						<div id="encMainDiv" style="width: 99%; border-top: thin groove #000000; border-right: thin groove #000000; border-left: thin groove #000000; background-color: #FFFFFF; height: 410px; overflow: auto; margin-left: 2px;">
+						<div id="encMainDiv" class="encMainDiv">
 
 						</div>
 						<script type="text/javascript">
@@ -2119,7 +2498,8 @@
 									windowHeight = document.body.offsetHeight;
 								}
 
-								var divHeight=windowHeight-280;
+								// XXX: this seems like it generally won't work (ocean, etc.)
+								var divHeight = windowHeight - 320;
 								$("encMainDiv").style.height = divHeight+'px';
 							}
 						</script>
@@ -2199,14 +2579,25 @@
 
 		<!-- hovering divs -->
 		<div id="showEditNote" class="showEdContent">
-			<form id="frmIssueNotes" action="" method="post"
-				  onsubmit="return updateCPPNote();">
+			<form
+					id="frmIssueNotes"
+					action=""
+					method="post"
+					onsubmit="return updateCPPNote();">
+
+				<%--
 				<input type="hidden" id="reloadUrl" name="reloadUrl" value="">
 				<input type="hidden" id="containerDiv" name="containerDiv" value="">
-				<input type="hidden" id="issueChange" name="issueChange" value="">
-				<input type="hidden" id="archived" name="archived" value="false">
-				<input type="hidden" id="annotation_attrib" name="annotation_attrib">
+				--%>
+				<input type="hidden" id="noteUuid" name="noteUuid" value="" />
+				<input type="hidden" id="noteSummaryCode" name="noteSummaryCode" value="" />
+				<input type="hidden" id="noteEditId" name="noteEditId" value="" />
+				<input type="hidden" id="noteRevision" name="noteRevision" value="" />
+				<input type="hidden" id="issueChange" name="issueChange" value="" />
+				<input type="hidden" id="archived" name="archived" value="false" />
+				<input type="hidden" id="annotation_attrib" name="annotation_attrib" />
 				<div id="winTitle"></div>
+				<div id="editNoteError" class="error editNoteError"></div>
 				<textarea style="margin: 10px;" cols="50" rows="15" id="noteEditTxt"
 						  name="value"></textarea>
 				<br>
@@ -2315,12 +2706,12 @@
 					<input type="image"
 						   src="<c:out value="${ctx}/oscarEncounter/graphics/system-log-out.png"/>"
 						   title='<bean:message key="global.btnExit"/>'
-						   onclick="this.focus();$('showEditNote').style.display='none';return false;">
+						   onclick="this.focus();hideEdit();return false;">
 						   <%--onclick="this.focus();$('channel').style.visibility ='visible';$('showEditNote').style.display='none';return false;">--%>
 				</span>
 				<bean:message key="oscarEncounter.Index.btnPosition" />
-				<select id="position" name="position"><option id="popt0"
-															  value="0">1</option>
+				<select id="position" name="position">
+					<option id="popt0" value="1">1</option>
 				</select>
 				<div id="issueNoteInfo" style="clear: both; text-align: left;"></div>
 				<div id="issueListCPP"

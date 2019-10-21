@@ -29,7 +29,6 @@ import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.dto.PreventionListData;
-import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.oscarDemographic.data.DemographicData;
@@ -49,27 +48,100 @@ import java.util.Map;
 @Service
 public class EncounterPreventionNoteService extends EncounterSectionService
 {
+	public static final String SECTION_ID = "preventions";
+	protected static final String SECTION_TITLE_KEY = "oscarEncounter.LeftNavBar.Prevent";
+	protected static final String SECTION_TITLE_COLOUR = "#009999";
+
 	@Autowired
 	PreventionDS pf;
 
 	@Autowired
 	PreventionDao preventionDao;
 
-	public EncounterNotes getNotes(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
+	@Override
+	public String getSectionId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getSectionTitleKey()
+	{
+		return SECTION_TITLE_KEY;
+	}
+
+	@Override
+	protected String getSectionTitleColour()
+	{
+		return SECTION_TITLE_COLOUR;
+	}
+
+	@Override
+	protected String getOnClickPlus(SectionParameters sectionParams)
+	{
+		return getOnClick(sectionParams);
+	}
+
+	@Override
+	protected String getOnClickTitle(SectionParameters sectionParams)
+	{
+		return getOnClick(sectionParams);
+	}
+
+	private String getOnClick(SectionParameters sectionParams)
+	{
+		String winName = "prevention" + sectionParams.getDemographicNo();
+
+		String url = sectionParams.getContextPath() + "/oscarPrevention/index.jsp" +
+				"?demographic_no=" + sectionParams.getDemographicNo();
+
+		return "popupPage(700,960,'" + winName + "', '" + url + "')";
+	}
+
+	/*
+	@Override
+	public EncounterSection getSection(
+			SectionParameters sectionParameters,
 			Integer limit,
+			Integer offset
+	) throws FactException
+	{
+		String onClickString = getOnClick(
+				sectionParameters.getContextPath(), sectionParameters.getDemographicNo());
+
+		EncounterSection section = new EncounterSection();
+
+		section.setTitle(SECTION_NAME);
+		section.setColour(SECTION_TITLE_COLOUR);
+		section.setCppIssues("");
+		section.setAddUrl("");
+		section.setIdentUrl("");
+		section.setOnClickTitle(onClickString);
+		section.setOnClickPlus(onClickString);
+
+		EncounterNotes notes = getNotes(
+				sectionParameters,
+				limit,
+				offset
+		);
+
+		section.setNotes(notes.getEncounterSectionNotes());
+
+		section.setRemainingNotes(notes.getNoteCount() - notes.getEncounterSectionNotes().size());
+
+		return section;
+	}
+	 */
+
+	public EncounterNotes getNotes(
+			SectionParameters sectionParams, Integer limit,
 			Integer offset
 	) throws FactException
 	{
 		List<EncounterSectionNote> noteList = new ArrayList<>();
 
 		//list warnings first as module items
-		Prevention p = PreventionData.getPrevention(loggedInInfo, Integer.valueOf(demographicNo));
+		Prevention p = PreventionData.getPrevention(sectionParams.getLoggedInInfo(), Integer.valueOf(sectionParams.getDemographicNo()));
 
 		// Might throw an exception
 		// XXX: make this exception better (FactException)
@@ -80,11 +152,12 @@ public class EncounterPreventionNoteService extends EncounterSectionService
 		ArrayList<HashMap<String,String>> prevList = pdc.getPreventions();
 		Map warningTable = p.getWarningMsgs();
 
-		Map<String, PreventionListData>	preventionListDataMap = preventionDao.getPreventionListData(demographicNo);
+		Map<String, PreventionListData>	preventionListDataMap = preventionDao.getPreventionListData(sectionParams.getDemographicNo());
 
+		String onClickString = getOnClick(sectionParams);
 
 		DemographicData dData = new DemographicData();
-		Demographic demographic = dData.getDemographic(loggedInInfo, demographicNo);
+		Demographic demographic = dData.getDemographic(sectionParams.getLoggedInInfo(), sectionParams.getDemographicNo());
 
 		List<EncounterSectionNote> items = new ArrayList<>();
 		List<EncounterSectionNote> warnings = new ArrayList<>();
@@ -131,7 +204,7 @@ public class EncounterPreventionNoteService extends EncounterSectionService
 			// - Show if there are no ages set but sex matches
 
 
-			boolean show = pdc.display(loggedInInfo, h, demographic, preventionCount);
+			boolean show = pdc.display(sectionParams.getLoggedInInfo(), h, demographic, preventionCount);
 
 			if(show)
 			{
@@ -160,6 +233,7 @@ public class EncounterPreventionNoteService extends EncounterSectionService
 				//item.setLinkTitle(h.get("desc"));
 				//item.setURL(url);
 				sectionNote.setText(title);
+				sectionNote.setOnClick(onClickString);
 
 				//if there's a warning associated with this prevention set item apart
 				if( warningTable.containsKey(prevName) )

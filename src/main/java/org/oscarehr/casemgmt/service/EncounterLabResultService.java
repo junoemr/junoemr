@@ -24,9 +24,15 @@
 package org.oscarehr.casemgmt.service;
 
 import org.oscarehr.casemgmt.dto.EncounterNotes;
+import org.oscarehr.casemgmt.dto.EncounterSectionMenuItem;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
-import org.oscarehr.util.LoggedInInfo;
-import oscar.oscarEncounter.pageUtil.NavBarDisplayDAO;
+import org.oscarehr.common.dao.OscarLogDao;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import oscar.OscarProperties;
+import oscar.oscarEncounter.pageUtil.EctDisplayLabAction2;
+import oscar.oscarLab.ca.all.web.LabDisplayHelper;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.StringUtils;
@@ -36,113 +42,405 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class EncounterLabResultService extends EncounterSectionService
 {
+	private static final String SECTION_ID = "labs";
+	protected static final String SECTION_TITLE_KEY = "oscarEncounter.LeftNavBar.Labs";
+	protected static final String SECTION_TITLE_COLOUR = "#A0509C";
+	protected static final String SECTION_MENU_HEADER_KEY = "oscarEncounter.LeftNavBar.LabMenuHeading";
+
+	@Autowired
+	private SecurityInfoManager securityInfoManager;
+
+	@Autowired
+	private OscarLogDao oscarLogDao;
+
+	@Override
+	public String getSectionId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getSectionTitle()
+	{
+		return SECTION_TITLE_KEY;
+	}
+
+	protected String getSectionTitleKey()
+	{
+		return SECTION_TITLE_KEY;
+	}
+
+	@Override
+	protected String getSectionTitleColour()
+	{
+		return SECTION_TITLE_COLOUR;
+	}
+
+	@Override
+	protected String getOnClickPlus(SectionParameters sectionParams)
+	{
+		// No link, just a menu
+		return "";
+	}
+
+	@Override
+	protected String getOnClickTitle(SectionParameters sectionParams)
+	{
+		String winName = "Labs" + sectionParams.getDemographicNo();
+		String url = sectionParams.getContextPath() + "/lab/DemographicLab.jsp" +
+				"?demographicNo=" + sectionParams.getDemographicNo();
+
+		return "popupPage(700,599,'" + winName + "', '" + url + "')";
+	}
+
+	@Override
+	protected String getMenuId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getMenuHeaderKey()
+	{
+		return SECTION_MENU_HEADER_KEY;
+	}
+
+	@Override
+	protected List<EncounterSectionMenuItem> getMenuItems(SectionParameters sectionParams)
+	{
+		// we're going to display popup menu of 2 selections - row display and grid display
+
+
+		List<EncounterSectionMenuItem> menuItems = new ArrayList<>();
+
+		String winName = "AllLabs" + sectionParams.getDemographicNo();
+
+		if (OscarProperties.getInstance().getBooleanProperty("HL7TEXT_LABS", "yes"))
+		{
+			String url = sectionParams.getContextPath() + "/lab/CumulativeLabValues3.jsp" +
+					"?demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo());
+
+			addMenuItem(
+				menuItems, null,
+				"oscarEncounter.LeftNavBar.LabMenuItem1",
+				"popupPage(700,1000, '" + winName + "','" + url + "')"
+			);
+
+			if (OscarProperties.getInstance().getProperty("labs.hide_old_grid_display",
+					"false").equals("false"))
+			{
+				String gridUrl = sectionParams.getContextPath() + "/lab/CumulativeLabValues2.jsp" +
+						"?demographic_no=" + sectionParams.getDemographicNo();
+
+				addMenuItem(
+						menuItems, null,
+						"oscarEncounter.LeftNavBar.LabMenuItem1old",
+						"popupPage(700,1000, '" + winName + "','" + gridUrl + "')"
+				);
+			}
+		} else
+		{
+			String url = sectionParams.getContextPath() + "/lab/CumulativeLabValues2.jsp" +
+					"?demographic_no=" + sectionParams.getDemographicNo();
+
+			addMenuItem(
+					menuItems, null,
+					"oscarEncounter.LeftNavBar.LabMenuItem1",
+					"popupPage(700,1000, '" + winName + "','" + url + "')"
+			);
+		}
+
+		String url = sectionParams.getContextPath() + "/lab/CumulativeLabValues.jsp" +
+				"?demographic_no=" + sectionParams.getDemographicNo();
+
+		addMenuItem(
+				menuItems, null,
+				"oscarEncounter.LeftNavBar.LabMenuItem2",
+				"popupPage(700,1000, '" + winName + "','" + url + "')"
+		);
+
+		return menuItems;
+	}
+
 	public EncounterNotes getNotes(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			Integer limit,
+			SectionParameters sectionParams, Integer limit,
 			Integer offset
 	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
+		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(), "_lab",
+				"r", null))
+		{
+			return EncounterNotes.noNotes();
+		}
+
+
+		LinkedHashMap<String,LabResultData> accessionMap = new LinkedHashMap<String,LabResultData>();
 		CommonLabResultData comLab = new CommonLabResultData();
-		ArrayList<LabResultData> labs = comLab.populateLabResultsData(
-				loggedInInfo, "", demographicNo, "", "",
-				"","U");
+		ArrayList<LabResultData> labs = comLab.populateLabResultsData(sectionParams.getLoggedInInfo(),
+				"", sectionParams.getDemographicNo(), "", "",
+				"", "U");
+
 		Collections.sort(labs);
 
-		/*
-		//set text for lefthand module title
-		Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.LeftNavBar.Labs"));
-
-		//set link for lefthand module title
-		String winName = "Labs" + bean.demographicNo;
-		String url = "popupPage(700,599,'" + winName + "','" + request.getContextPath() + "/lab/DemographicLab.jsp?demographicNo=" + bean.demographicNo + "'); return false;";
-		Dao.setLeftURL(url);
-
-		//we're going to display popup menu of 2 selections - row display and grid display
-		String menuId = "2";
-		Dao.setRightHeadingID(menuId);
-		Dao.setRightURL("return !showMenu('" + menuId + "', event);");
-		Dao.setMenuHeader(messages.getMessage("oscarEncounter.LeftNavBar.LabMenuHeading"));
-
-		winName = "AllLabs" + bean.demographicNo;
-		url = "popupPage(700,1000, '" + winName + "','" + request.getContextPath() + "/lab/CumulativeLabValues2.jsp?demographic_no=" + bean.demographicNo + "')";
-		Dao.addPopUpUrl(url);
-		Dao.addPopUpText(messages.getMessage("oscarEncounter.LeftNavBar.LabMenuItem1"));
-
-		url = "popupPage(700,1000, '" + winName + "','" + request.getContextPath() + "/lab/CumulativeLabValues.jsp?demographic_no=" + bean.demographicNo + "')";
-		Dao.addPopUpUrl(url);
-		Dao.addPopUpText(messages.getMessage("oscarEncounter.LeftNavBar.LabMenuItem2"));
-		 */
-
-		//now we add individual module items
-		LabResultData result;
-		String labDisplayName, label;
-		//String bgcolour = "FFFFCC";
-		StringBuilder func;
-		int hash;
-		for( int idx = 0; idx < labs.size(); ++idx )
+		for (int i = 0; i < labs.size(); i++)
 		{
+			LabResultData result = labs.get(i);
+			if (result.accessionNumber == null || result.accessionNumber.equals(""))
+			{
+				accessionMap.put("noAccessionNum" + i + result.labType, result);
+			}
+			else
+			{
+				if (!accessionMap.containsKey(result.accessionNumber + result.labType))
+				{
+					accessionMap.put(result.accessionNumber + result.labType, result);
+				}
+			}
+		}
 
+		labs = new ArrayList<LabResultData>(accessionMap.values());
+
+		for (int j = 0; j < labs.size(); j++)
+		{
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-			result =  labs.get(idx);
-			Date date = result.getDateObj();
-			//String formattedDate = DateUtils.formatDate(date,request.getLocale());
-			//func = new StringBuilder("popupPage(700,960,'");
-			label = result.getLabel();
+			LabResultData result = labs.get(j);
 
-			if ( result.isMDS() ){
-				if (label == null || label.equals("")) labDisplayName = result.getDiscipline();
-				else labDisplayName = label;
-				//url = request.getContextPath() + "/oscarMDS/SegmentDisplay.jsp?providerNo="+bean.providerNo+"&segmentID="+result.segmentID+"&status="+result.getReportStatus();
-			}else if (result.isCML()){
-				if (label == null || label.equals("")) labDisplayName = result.getDiscipline();
-				else labDisplayName = label;
-				//url = request.getContextPath() + "/lab/CA/ON/CMLDisplay.jsp?providerNo="+bean.providerNo+"&segmentID="+result.segmentID;
-			}else if (result.isHL7TEXT()){
-				if (label == null || label.equals("")) labDisplayName = result.getDiscipline();
-				else labDisplayName = label;
-				//url = request.getContextPath() + "/lab/CA/ALL/labDisplay.jsp?providerNo="+bean.providerNo+"&segmentID="+result.segmentID;
-			}else {
-				if (label == null || label.equals("")) labDisplayName = result.getDiscipline();
-				else labDisplayName = label;
-				//url = request.getContextPath() + "/lab/CA/BC/labDisplay.jsp?segmentID="+result.segmentID+"&providerNo="+bean.providerNo;
-			}
-
-			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
-			//item.setLinkTitle(labDisplayName + " " + formattedDate);
-			labDisplayName = StringUtils.maxLenString(labDisplayName, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES); // +" "+formattedDate;
-			//hash = winName.hashCode();
-			//hash = hash < 0 ? hash * -1 : hash;
-			//func.append(hash + "','" + url + "'); return false;");
-
-			sectionNote.setText(labDisplayName);
-
+			// Date
+			Date date = EctDisplayLabAction2.getServiceDate(sectionParams.getLoggedInInfo(), result);
 			LocalDateTime serviceDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 			sectionNote.setUpdateDate(serviceDate);
 
-			/*
-			item.setTitle(labDisplayName);
-			item.setURL(func.toString());
-			item.setDate(date);
-			 */
 
-			//item.setBgColour(bgcolour);
-			//Dao.addItem(item);
+			// Colour
+			if (result.isAbnormal())
+			{
+				sectionNote.setColour("red");
+			}
+
+			// Title
+			String label = result.getLabel();
+			String labDisplayName;
+			if (label == null || label.equals(""))
+			{
+				labDisplayName = result.getDiscipline();
+			}
+			else
+			{
+				labDisplayName = label;
+			}
+
+			// XXX: Boooo!
+			String labRead = "";
+			if (!oscarLogDao.hasRead(sectionParams.getProviderNo(), "lab", result.segmentID))
+			{
+				labRead = "*";
+			}
+
+
+			labDisplayName = StringUtils.maxLenString(labDisplayName, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
+			if (labDisplayName == null)
+			{
+				labDisplayName = "";
+			}
+
+			sectionNote.setText(labRead + labDisplayName + labRead);
+
+
+			// Link onClick
+			String remoteFacilityIdQueryString = "";
+			if (result.getRemoteFacilityId() != null)
+			{
+				try
+				{
+					remoteFacilityIdQueryString = "&remoteFacilityId=" +
+							encodeUrlParam(result.getRemoteFacilityId().toString());
+
+					String remoteLabKey = LabDisplayHelper.makeLabKey(
+							Integer.parseInt(result.getLabPatientId()), result.getSegmentID(),
+							result.labType, result.getDateTime());
+
+					remoteFacilityIdQueryString = remoteFacilityIdQueryString +
+							"&remoteLabKey=" + encodeUrlParam(remoteLabKey);
+				}
+				catch (Exception e)
+				{
+					MiscUtils.getLogger().error("Error", e);
+				}
+			}
+
+			String url;
+			if ( result.isMDS() )
+			{
+				url = sectionParams.getContextPath() + "/oscarMDS/SegmentDisplay.jsp" +
+						"?demographicId=" + encodeUrlParam(sectionParams.getDemographicNo())+
+						"&providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
+						"&segmentID=" + encodeUrlParam(result.segmentID) +
+						"&multiID=" + encodeUrlParam(result.multiLabId) +
+						"&status=" + encodeUrlParam(result.getReportStatus()) +
+						remoteFacilityIdQueryString;
+			}
+			else if (result.isCML())
+			{
+				url = sectionParams.getContextPath() + "/lab/CA/ON/CMLDisplay.jsp" +
+						"?demographicId=" + encodeUrlParam(sectionParams.getDemographicNo())+
+						"&providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
+						"&segmentID="+ encodeUrlParam(result.segmentID) +
+						"&multiID=" + encodeUrlParam(result.multiLabId) +
+						remoteFacilityIdQueryString;
+			}
+			else if (result.isHL7TEXT())
+			{
+				url = sectionParams.getContextPath() + "/lab/CA/ALL/labDisplay.jsp" +
+						"?demographicId=" + encodeUrlParam(sectionParams.getDemographicNo())+
+						"&providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
+						"&segmentID=" + encodeUrlParam(result.segmentID) +
+						"&multiID=" + encodeUrlParam(result.multiLabId) +
+						remoteFacilityIdQueryString;
+			}
+			else
+			{
+				url = sectionParams.getContextPath() + "/lab/CA/BC/labDisplay.jsp" +
+						"?demographicId=" + encodeUrlParam(sectionParams.getDemographicNo())+
+						"&segmentID=" + encodeUrlParam(result.segmentID) +
+						"&providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
+						"&multiID=" + encodeUrlParam(result.multiLabId) +
+						remoteFacilityIdQueryString;
+			}
+
+			String winName = "AllLabs" + sectionParams.getDemographicNo();
+			int hash = winName.hashCode();
+			hash = hash < 0 ? hash * -1 : hash;
+
+			sectionNote.setOnClick("popupPage(700,960,'" + hash + "', '" + url + "');");
 
 			out.add(sectionNote);
 		}
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				// OLD STUFF
+				// OLD STUFF
+				// OLD STUFF
+				// OLD STUFF
+
+
+		//		CommonLabResultData comLab = new CommonLabResultData();
+		//ArrayList<LabResultData> labs = comLab.populateLabResultsData(
+		//		sectionParams.getLoggedInInfo(), "", sectionParams.getDemographicNo(),
+		//		"", "", "","U");
+		//Collections.sort(labs);
+
+		///*
+		////set text for lefthand module title
+		//Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.LeftNavBar.Labs"));
+
+		////we're going to display popup menu of 2 selections - row display and grid display
+		//String menuId = "2";
+		//Dao.setRightHeadingID(menuId);
+		//Dao.setRightURL("return !showMenu('" + menuId + "', event);");
+		//Dao.setMenuHeader(messages.getMessage("oscarEncounter.LeftNavBar.LabMenuHeading"));
+
+		//winName = "AllLabs" + bean.demographicNo;
+		//url = "popupPage(700,1000, '" + winName + "','" + request.getContextPath() + "/lab/CumulativeLabValues2.jsp?demographic_no=" + bean.demographicNo + "')";
+		//Dao.addPopUpUrl(url);
+		//Dao.addPopUpText(messages.getMessage("oscarEncounter.LeftNavBar.LabMenuItem1"));
+
+		//url = "popupPage(700,1000, '" + winName + "','" + request.getContextPath() + "/lab/CumulativeLabValues.jsp?demographic_no=" + bean.demographicNo + "')";
+		//Dao.addPopUpUrl(url);
+		//Dao.addPopUpText(messages.getMessage("oscarEncounter.LeftNavBar.LabMenuItem2"));
+		// */
+
+		////now we add individual module items
+		//LabResultData result;
+		////String bgcolour = "FFFFCC";
+		//for( int idx = 0; idx < labs.size(); ++idx )
+		//{
+
+		//	EncounterSectionNote sectionNote = new EncounterSectionNote();
+
+		//	result =  labs.get(idx);
+		//	Date date = result.getDateObj();
+
+		//	String label = result.getLabel();
+
+		//	String labDisplayName;
+		//	if (label == null || label.equals(""))
+		//	{
+		//		labDisplayName = result.getDiscipline();
+		//	}
+		//	else
+		//	{
+		//		labDisplayName = label;
+		//	}
+
+		//	String url;
+		//	if ( result.isMDS() )
+		//	{
+		//		url = sectionParams.getContextPath() + "/oscarMDS/SegmentDisplay.jsp" +
+		//				"?providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
+		//				"&segmentID=" + encodeUrlParam(result.segmentID) +
+		//				"&status=" + encodeUrlParam(result.getReportStatus());
+		//	}
+		//	else if (result.isCML())
+		//	{
+		//		url = sectionParams.getContextPath() + "/lab/CA/ON/CMLDisplay.jsp" +
+		//				"?providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
+		//				"&segmentID="+ encodeUrlParam(result.segmentID);
+		//	}
+		//	else if (result.isHL7TEXT())
+		//	{
+		//		url = sectionParams.getContextPath() + "/lab/CA/ALL/labDisplay.jsp" +
+		//				"?providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
+		//				"&segmentID=" + encodeUrlParam(result.segmentID);
+		//	}
+		//	else
+		//	{
+		//		url = sectionParams.getContextPath() + "/lab/CA/BC/labDisplay.jsp" +
+		//				"?segmentID=" + encodeUrlParam(result.segmentID) +
+		//				"&providerNo=" + encodeUrlParam(sectionParams.getProviderNo());
+		//	}
+
+		//	String winName = "AllLabs" + sectionParams.getDemographicNo();
+		//	int hash = winName.hashCode();
+		//	hash = hash < 0 ? hash * -1 : hash;
+
+		//	sectionNote.setOnClick("popupPage(700,960,'" + hash + "', '" + url + "');");
+
+		//	labDisplayName = StringUtils.maxLenString(labDisplayName, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES); // +" "+formattedDate;
+
+		//	sectionNote.setText(labDisplayName);
+
+		//	LocalDateTime serviceDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		//	sectionNote.setUpdateDate(serviceDate);
+
+		//	out.add(sectionNote);
+		//}
+
 	}
 }

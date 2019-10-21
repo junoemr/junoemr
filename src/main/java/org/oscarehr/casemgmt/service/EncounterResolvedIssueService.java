@@ -27,7 +27,6 @@ import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.util.CppUtils;
-import org.oscarehr.util.LoggedInInfo;
 import oscar.oscarEncounter.pageUtil.NavBarDisplayDAO;
 import oscar.util.StringUtils;
 
@@ -36,6 +35,10 @@ import java.util.List;
 
 public class EncounterResolvedIssueService extends EncounterSectionService
 {
+	private static final String SECTION_ID = "resolvedIssues";
+	protected static final String SECTION_TITLE_KEY = "oscarEncounter.NavBar.resolvedIssues";
+	protected static final String SECTION_TITLE_COLOUR = "#151B8D";
+
 	private CaseManagementManager caseManagementMgr;
 
 	public void setCaseManagementManager(CaseManagementManager caseManagementMgr)
@@ -43,34 +46,53 @@ public class EncounterResolvedIssueService extends EncounterSectionService
 		this.caseManagementMgr = caseManagementMgr;
 	}
 
+	@Override
+	public String getSectionId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getSectionTitleKey()
+	{
+		return SECTION_TITLE_KEY;
+	}
+
+	@Override
+	protected String getSectionTitleColour()
+	{
+		return SECTION_TITLE_COLOUR;
+	}
+
+	@Override
+	protected String getOnClickPlus(SectionParameters sectionParams)
+	{
+		return "";
+	}
+
+	@Override
+	protected String getOnClickTitle(SectionParameters sectionParams)
+	{
+		// XXX: I feel like this won't work
+		return "$('check_issue').value='';document.caseManagementViewForm.submit();";
+	}
+
 	public EncounterNotes getNotes(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			Integer limit,
+			SectionParameters sectionParams, Integer limit,
 			Integer offset
 	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
-		// set lefthand module heading and link
 		//navBarDisplayDAO.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.NavBar.resolvedIssues"));
-
-		//navBarDisplayDAO.setLeftURL("$('check_issue').value='';document.caseManagementViewForm.submit();");
-
-		// set righthand link to same as left so we have visual consistency with other modules
-		//String url = "return false;";
-		//navBarDisplayDAO.setRightURL(url);
 		//navBarDisplayDAO.setRightHeadingID(cmd); // no menu so set div id to unique id for this action
 
 		// grab all of the diseases associated with patient and add a list item for each
 		List<CaseManagementIssue> issues = null;
-		int demographicId = Integer.parseInt(demographicNo);
+		int demographicId = Integer.parseInt(sectionParams.getDemographicNo());
 		issues = caseManagementMgr.getIssues(demographicId);
-		issues = caseManagementMgr.filterIssues(loggedInInfo, providerNo, issues, programId);
+		issues = caseManagementMgr.filterIssues(sectionParams.getLoggedInInfo(),
+				sectionParams.getProviderNo(), issues, sectionParams.getProgramId());
 
 		List<CaseManagementIssue> issues_unr = new ArrayList<CaseManagementIssue>();
 		//only list resolved issues
@@ -101,14 +123,10 @@ public class EncounterResolvedIssueService extends EncounterSectionService
 
 			sectionNote.setText(strTitle);
 
-			out.add(sectionNote);
+			String onClickString = "setIssueCheckbox('" + issue.getId() + "');return filter(false);";
+			sectionNote.setOnClick(onClickString);
 
-			//item.setTitle(strTitle);
-			//item.setLinkTitle(tmp);
-			////issues value=
-			//url = "setIssueCheckbox('"+issue.getId()+"');return filter(false);";
-			//item.setURL(url);
-			//navBarDisplayDAO.addItem(item);
+			out.add(sectionNote);
 		}
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);

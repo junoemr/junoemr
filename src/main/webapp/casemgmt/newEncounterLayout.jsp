@@ -825,8 +825,7 @@
 
 	<!-- hovering divs -->
 	<div id="showEditNote" class="showEdContent">
-		<form id="frmIssueNotes" action="" method="post"
-			  onsubmit="return updateCPPNote();">
+		<form id="frmIssueNotes" action="" method="post" onsubmit="return updateCPPNote();">
 			<input type="hidden" id="reloadUrl" name="reloadUrl" value="">
 			<input type="hidden" id="containerDiv" name="containerDiv" value="">
 			<input type="hidden" id="issueChange" name="issueChange" value="">

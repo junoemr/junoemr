@@ -27,10 +27,8 @@ import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.dao.EpisodeDao;
 import org.oscarehr.common.model.Episode;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import oscar.oscarEncounter.pageUtil.NavBarDisplayDAO;
 import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
@@ -39,14 +37,52 @@ import java.util.List;
 
 public class EncounterEpisodeService extends EncounterSectionService
 {
+	private static final String SECTION_ID = "episode";
+	private static final String SECTION_TITLE_KEY = "global.episode";
+	private static final String SECTION_TITLE_COLOUR = "#045228";
+
+	@Override
+	public String getSectionId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getSectionTitleKey()
+	{
+		return SECTION_TITLE_KEY;
+	}
+
+	@Override
+	protected String getSectionTitleColour()
+	{
+		return SECTION_TITLE_COLOUR;
+	}
+
+	@Override
+	protected String getOnClickPlus(SectionParameters sectionParams)
+	{
+		String winName = "AddEpisode" + sectionParams.getDemographicNo();
+		String url = sectionParams.getContextPath() + "/Episode.do" +
+				"?method=edit" +
+				"&demographicNo=" + encodeUrlParam(sectionParams.getDemographicNo());
+
+		return "popupPage(500,600,'" + winName + "','" + url + "');";
+	}
+
+	@Override
+	protected String getOnClickTitle(SectionParameters sectionParams)
+	{
+		String winName = "episode" + sectionParams.getDemographicNo();
+		String url = sectionParams.getContextPath() + "/Episode.do" +
+				"?method=list" +
+				"&demographicNo=" + encodeUrlParam(sectionParams.getDemographicNo());
+
+		return "popupPage(500,900,'" + winName + "','" + url + "');";
+	}
+
 	public EncounterNotes getNotes(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			Integer limit,
+			SectionParameters sectionParams, Integer limit,
 			Integer offset
 	)
 	{
@@ -57,48 +93,27 @@ public class EncounterEpisodeService extends EncounterSectionService
 
 		try
 		{
-			//Set lefthand module heading and link
-			//String winName = "episode" + bean.demographicNo;
-			//String pathview, pathedit;
-
-			//pathview = request.getContextPath() + "/Episode.do?method=list&demographicNo=" + bean.demographicNo;
-			//pathedit = request.getContextPath() + "/Episode.do?method=edit&demographicNo=" + bean.demographicNo;
-
-
-			//String url = "popupPage(500,900,'" + winName + "','" + pathview + "')";
-			//Dao.setLeftHeading(messages.getMessage(request.getLocale(), "global.episode"));
-			//Dao.setLeftURL(url);
-
-			//set right hand heading link
-			//winName = "AddEpisode" + bean.demographicNo;
-			//url = "popupPage(500,600,'" + winName + "','" + pathedit + "'); return false;";
-			//Dao.setRightURL(url);
-			//Dao.setRightHeadingID(cmd);
-
-
 			EpisodeDao episodeDao = SpringUtils.getBean(EpisodeDao.class);
-			List<Episode> episodes = episodeDao.findAllCurrent(Integer.parseInt(demographicNo));
+			List<Episode> episodes = episodeDao.findAllCurrent(Integer.parseInt(sectionParams.getDemographicNo()));
 
 			for(Episode episode:episodes)
 			{
-				NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 				String itemHeader = StringUtils.maxLenString(episode.getDescription(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 
 				EncounterSectionNote sectionNote = new EncounterSectionNote();
 				sectionNote.setText(itemHeader);
 				sectionNote.setUpdateDate(ConversionUtils.toNullableLocalDateTime(episode.getStartDate()));
 
-				//item.setLinkTitle(itemHeader);
-				//item.setTitle(itemHeader);
-				//item.setDate(episode.getStartDate());
-
-				//int hash = Math.abs(winName.hashCode());
-				//url = "popupPage(500,900,'" + hash + "','" + request.getContextPath() + "/Episode.do?method=edit&episode.id="+ episode.getId() +"'); return false;";
-				//item.setURL(url);
+				String winName = "AddEpisode" + sectionParams.getDemographicNo();
+				int hash = Math.abs(winName.hashCode());
+				String url = sectionParams.getContextPath() + "/Episode.do" +
+						"?method=edit" +
+						"&episode.id="+ encodeUrlParam(episode.getId().toString());
+				String onClickString = "popupPage(500,900,'" + hash + "','" + url +"');";
+				sectionNote.setOnClick(onClickString);
 
 				out.add(sectionNote);
 			}
-
 		}
 		catch( Exception e )
 		{

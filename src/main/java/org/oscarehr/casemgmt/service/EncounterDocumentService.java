@@ -26,7 +26,6 @@ package org.oscarehr.casemgmt.service;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
@@ -39,36 +38,111 @@ import java.util.List;
 
 public class EncounterDocumentService extends EncounterSectionService
 {
+	private static final String SECTION_ID = "docs";
+	protected static final String SECTION_DOC_TITLE_KEY = "oscarEncounter.Index.msgDocuments";
+	protected static final String SECTION_INBOX_TITLE_KEY = "oscarEncounter.Index.inboxManager";
+	protected static final String SECTION_TITLE_COLOUR = "#476BB3";
+
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 
+	@Override
+	public String getSectionId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getSectionTitle()
+	{
+		if (getInboxFlag())
+		{
+			return SECTION_INBOX_TITLE_KEY;
+		}
+
+		return SECTION_DOC_TITLE_KEY;
+	}
+
+		@Override
+		protected String getSectionTitleColour()
+	{
+		return SECTION_TITLE_COLOUR;
+	}
+
+	@Override
+	protected String getOnClickPlus(SectionParameters sectionParams)
+	{
+		// Set the plus link to call addDocument in index jsp
+		String winName = "addDoc" + sectionParams.getDemographicNo();
+
+		if (getInboxFlag())
+		{
+			String url = sectionParams.getContextPath() + "/mod/docmgmtComp/FileUpload.do" +
+					"?method=newupload" +
+					"&demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo());
+
+			return "popupPage(300,600,'" + winName + "','" + url + "');";
+		}
+
+		String url = sectionParams.getContextPath() + "/dms/documentReport.jsp" +
+				"?function=demographic" +
+				"&doctype=lab" +
+				"&functionid=" + encodeUrlParam(sectionParams.getDemographicNo()) +
+				"&curUser=" + encodeUrlParam(sectionParams.getProviderNo()) +
+				"&mode=add" +
+				"&parentAjaxId=" + SECTION_ID;
+
+		return "popupPage(500,1115,'" + winName + "','" + url + "');";
+	}
+
+	@Override
+	protected String getOnClickTitle(SectionParameters sectionParams)
+	{
+		String winName = "docs" + encodeUrlParam(sectionParams.getDemographicNo());
+
+		// XXX: set title later
+		//Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.Index.msgDocuments"));
+		if (getInboxFlag())
+		{
+			// XXX: set title later
+			//Dao.setLeftHeading(messages.getMessage("oscarEncounter.Index.inboxManager"));
+
+			String url = sectionParams.getContextPath() + "/mod/docmgmtComp/DocList.do" +
+					"?method=list" +
+					"&demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo());
+
+			return "popupPage(600,1024,'" + winName + "', '" + url + "');";
+
+		}
+
+		String url = sectionParams.getContextPath() + "/dms/documentReport.jsp" +
+				"?function=demographic" +
+				"&doctype=lab" +
+				"&functionid=" + encodeUrlParam(sectionParams.getDemographicNo()) +
+				"&curUser=" + encodeUrlParam(sectionParams.getProviderNo());
+
+		return "popupPage(500,1115,'" + winName + "', '" + url + "')";
+	}
+
+	private boolean getInboxFlag()
+	{
+		return oscar.util.plugin.IsPropertiesOn.propertiesOn("inboxmnger");
+	}
+
 	public EncounterNotes getNotes(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			Integer limit,
+			SectionParameters sectionParams, Integer limit,
 			Integer offset
 	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
-    	if (!securityInfoManager.hasPrivilege(loggedInInfo, "_edoc", "r", null))
+    	if (!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(), "_edoc", "r", null))
     	{
 			return EncounterNotes.noNotes();
 		}
 
-    	// XXX: I think this is only used for the eyeform
-		//String omitTypeStr = request.getParameter("omit");
-		//String[] omitTypes = new String[0];
-		//if (omitTypeStr != null) {
-		//	omitTypes = omitTypeStr.split(",");
-		//}
-
 		// add for inbox manager
-		boolean inboxflag = oscar.util.plugin.IsPropertiesOn.propertiesOn("inboxmnger");
+		//boolean inboxflag = oscar.util.plugin.IsPropertiesOn.propertiesOn("inboxmnger");
 
 		// set lefthand module heading and link
 		//String winName = "docs" + bean.demographicNo;
@@ -95,9 +169,9 @@ public class EncounterDocumentService extends EncounterSectionService
 		//String js = "";
 
 		ArrayList<EDoc> docList = EDocUtil.listDocs(
-				loggedInInfo,
+				sectionParams.getLoggedInInfo(),
 				"demographic",
-				demographicNo,
+				sectionParams.getDemographicNo(),
 				null,
 				EDocUtil.PRIVATE,
 				EDocUtil.EDocSort.OBSERVATIONDATE,
@@ -105,15 +179,6 @@ public class EncounterDocumentService extends EncounterSectionService
 		);
 
 		String dbFormat = "yyyy-MM-dd";
-		//String serviceDateStr = "";
-		//String key;
-		//String title;
-		//int hash;
-		//String BGCOLOUR = request.getParameter("hC");
-		//Date date;
-
-		// --- add remote documents ---
-
 
 		for (int i = 0; i < docList.size(); i++)
 		{
@@ -202,7 +267,7 @@ public class EncounterDocumentService extends EncounterSectionService
 			//key = StringUtils.maxLenString(curDoc.getDescription(), MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + "(" + serviceDateStr + ")";
 			//key = StringEscapeUtils.escapeJavaScript(key);
 
-			if (inboxflag)
+			if (getInboxFlag())
 			{
 				if (!EDocUtil.getDocReviewFlag(dispDocNo))
 				{

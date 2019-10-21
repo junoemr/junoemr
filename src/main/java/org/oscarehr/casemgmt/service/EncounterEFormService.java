@@ -28,7 +28,6 @@ import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.eform.EFormUtil;
 import oscar.util.ConversionUtils;
@@ -40,51 +39,73 @@ import java.util.List;
 
 public class EncounterEFormService extends EncounterSectionService
 {
+	public static final String SECTION_ID = "eforms";
+	protected static final String SECTION_TITLE_KEY = "global.eForms";
+	protected static final String SECTION_TITLE_COLOUR = "#008000";
+
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
 	private EFormDataDao eFormDataDao;
 
+	@Override
+	public String getSectionId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getSectionTitleKey()
+	{
+		return SECTION_TITLE_KEY;
+	}
+
+	@Override
+	protected String getSectionTitleColour()
+	{
+		return SECTION_TITLE_COLOUR;
+	}
+
+	@Override
+	protected String getOnClickPlus(SectionParameters sectionParams)
+	{
+		String winName = "AddeForm" + sectionParams.getDemographicNo();
+
+		String url = sectionParams.getContextPath() + "/eform/efmformslistadd.jsp" +
+				"?demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo()) +
+				"&appointment=" + encodeUrlParam(sectionParams.getAppointmentNo()) +
+				"&parentAjaxId=" + SECTION_ID;
+
+		return "popupPage(500,950,'" + winName + "','" + url +"');";
+	}
+
+	@Override
+	protected String getOnClickTitle(SectionParameters sectionParams)
+	{
+		String winName = "eForm" + sectionParams.getDemographicNo();
+		String url = sectionParams.getContextPath() + "/eform/efmpatientformlist.jsp" +
+				"?demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo()) +
+				"&apptProvider=" + encodeUrlParam(sectionParams.getProviderNo()) +
+				"&appointment=" + encodeUrlParam(sectionParams.getAppointmentNo()) +
+				"&parentAjaxId=" + SECTION_ID;
+
+		return "popupPage(500,950,'" + winName + "', '" + url + "')";
+	}
+
 	public EncounterNotes getNotes(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			Integer limit,
+			SectionParameters sectionParams, Integer limit,
 			Integer offset
 	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
-
-		//String roleName = (String)request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
-
-		if(!securityInfoManager.hasPrivilege(loggedInInfo, "_eform", "r", null)) {
+		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(), "_eform", "r", null))
+		{
 			return EncounterNotes.noNotes();
 		}
 
-		// XXX: appears to only be used in eyeform
-		//String omitTypeStr = request.getParameter("omit");
-		//String[] omitTypes = new String[0];
-		//if(omitTypeStr!=null) {
-		//	omitTypes = omitTypeStr.split(",");
-		//}
-
-		////set lefthand module heading and link
-		//String winName = "eForm" + bean.demographicNo;
-		//String url = "popupPage(500,950,'" + winName + "', '" + request.getContextPath() + "/eform/efmpatientformlist.jsp?demographic_no="+bean.demographicNo+"&apptProvider="+bean.getCurProviderNo()+"&appointment="+bean.appointmentNo+"&parentAjaxId=" + cmd + "')";
-		//Dao.setLeftHeading(messages.getMessage(request.getLocale(), "global.eForms"));
-		//Dao.setLeftURL(url);
-
-		////set the right hand heading link
-		//winName = "AddeForm" + bean.demographicNo;
-		//url = "popupPage(500,950,'"+winName+"','"+request.getContextPath()+"/eform/efmformslistadd.jsp?demographic_no="+bean.demographicNo+"&appointment="+bean.appointmentNo+"&parentAjaxId="+cmd+"'); return false;";
-		//Dao.setRightURL(url);
-		//Dao.setRightHeadingID(cmd);  //no menu so set div id to unique id for this action
-
+		// Popup menu
 		//StringBuilder javascript = new StringBuilder("<script type=\"text/javascript\">");
 		//String js = "";
 		//ArrayList<HashMap<String, ? extends Object>> eForms = EFormUtil.listEForms(EFormUtil.DATE, EFormUtil.CURRENT, roleName);//EFormUtil.listEForms(EFormUtil.DATE, EFormUtil.NAME, EFormUtil.CURRENT, roleName);
@@ -110,10 +131,8 @@ public class EncounterEFormService extends EncounterSectionService
 		//I've put in an arbitrary limit here of 100. Some people use a single eform/patient for
 		//logging calls, etc. This makes this result set huge. People can click on the eform tab and view the full
 		//history if they need to.
-		List<EFormData> eFormDatas = eFormDataDao.findInstancedByDemographicId(Integer.parseInt(demographicNo), 0, 100, true);
-		//EctDisplayEFormAction.filterRoles(eFormDatas, roleName);
-		//Collections.sort(eFormDatas, EFormData.FORM_DATE_COMPARATOR);
-		//Collections.reverse(eFormDatas);
+		List<EFormData> eFormDatas = eFormDataDao.findInstancedByDemographicId(
+				Integer.parseInt(sectionParams.getDemographicNo()), 0, 100, true);
 
 		for (EFormData eFormData : eFormDatas)
 		{
@@ -122,26 +141,20 @@ public class EncounterEFormService extends EncounterSectionService
 				continue;
 			}
 
-			//boolean skip=false;
-			//for(int x=0;x<omitTypes.length;x++)
-			//{
-			//	if(omitTypes[x].equals(eFormData.getFormName()))
-			//	{
-			//		skip=true;
-			//		break;
-			//	}
-			//}
-			//if(skip)
-			//{
-			//	continue;
-			//}
-
-			//NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-			//winName = eFormData.getFormName() + bean.demographicNo;
-			//hash = Math.abs(winName.hashCode());
-			//url = "popupPage( 700, 800, '" + hash + "', '" + request.getContextPath() + "/eform/efmshowform_data.jsp?fdid="+eFormData.getId()+"&appointment="+bean.appointmentNo+"&parentAjaxId="+cmd+"');";
+			String winName = eFormData.getFormName() + sectionParams.getDemographicNo();
+			int hash = Math.abs(winName.hashCode());
+
+			String url = sectionParams.getContextPath() + "/eform/efmshowform_data.jsp" +
+					"?fdid=" + encodeUrlParam(eFormData.getId().toString()) +
+					"&appointment=" + encodeUrlParam(sectionParams.getAppointmentNo()) +
+					"&parentAjaxId=" + SECTION_ID;
+
+			String onClickString = "popupPage( 700, 800, '" + hash + "', '" + url +"');";
+
+			sectionNote.setOnClick(onClickString);
+
 			//String formattedDate = DateUtils.formatDate(eFormData.getFormDate(),request.getLocale());
 			//key = StringUtils.maxLenString(eFormData.getFormName(), MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + "(" + formattedDate + ")";
 			//item.setLinkTitle(eFormData.getSubject());
@@ -149,20 +162,15 @@ public class EncounterEFormService extends EncounterSectionService
 
 			//js = "itemColours['" + key + "'] = '" + BGCOLOUR + "'; autoCompleted['" + key + "'] = \"" + url + "\"; autoCompList.push('" + key + "');";
 			//javascript.append(js);
-			//url += "return false;";
-			//item.setURL(url);
 
 			String strTitle = StringUtils.maxLenString(eFormData.getFormName() + ": " + eFormData.getSubject(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 
 			//item.setTitle(strTitle);
 			sectionNote.setText(strTitle);
 
-			//item.setDate(eFormData.getFormDate());
 			LocalDate date = ConversionUtils.toNullableLocalDate(eFormData.getFormDate());
-			//LocalDateTime date = eFormData.getFormDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 			sectionNote.setUpdateDate(date.atStartOfDay());
 
-			//Dao.addItem(item);
 			out.add(sectionNote);
 		}
 

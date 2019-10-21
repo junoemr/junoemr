@@ -33,20 +33,31 @@ import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.oscarEncounter.data.EctProgram;
+import oscar.oscarEncounter.pageUtil.EctSessionBean;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.Locale;
 
 @Path("/encounterSections")
 @Component("EncounterSectionsService")
 public class EncounterSectionsService extends AbstractServiceImpl
 {
 	Logger logger = Logger.getLogger(EFormsService.class);
+
+	@Context
+	ServletContext context;
+
+	@Context
+	HttpServletRequest request;
 
 	@Autowired
 	private EncounterService encounterService;
@@ -67,22 +78,40 @@ public class EncounterSectionsService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		HttpSession session = loggedInInfo.getSession();
 
+		Locale locale = request.getLocale();
+
+		String contextPath = context.getContextPath();
+
 		EctProgram prgrmMgr = new EctProgram(session);
 		String programId = prgrmMgr.getProgram(loggedInProviderNo);
 
 		String roleName = session.getAttribute("userrole") + "," + session.getAttribute("user");
 
+		// XXX: Ew, don't like doing this
+		EctSessionBean encounterSessionBean =
+				(EctSessionBean) session.getAttribute("EctSessionBean");
+
 		EncounterSectionService sectionService = encounterService.getEncounterSectionServiceByName(sectionName);
 
+		EncounterSectionService.SectionParameters sectionParams =
+				new EncounterSectionService.SectionParameters();
+
+		sectionParams.setLoggedInInfo(loggedInInfo);
+		sectionParams.setLocale(locale);
+		sectionParams.setContextPath(contextPath);
+		sectionParams.setRoleName(roleName);
+		sectionParams.setProviderNo(loggedInProviderNo);
+		sectionParams.setDemographicNo(encounterSessionBean.demographicNo);
+		sectionParams.setPatientFirstName(encounterSessionBean.patientFirstName);
+		sectionParams.setPatientLastName(encounterSessionBean.patientLastName);
+		sectionParams.setFamilyDoctorNo(encounterSessionBean.familyDoctorNo);
+		sectionParams.setAppointmentNo(appointmentNo);
+		sectionParams.setChartNo(encounterSessionBean.chartNo);
+		sectionParams.setProgramId(programId);
+		sectionParams.setUserName(encounterSessionBean.userName);
+
 		return RestResponse.successResponse(sectionService.getSection(
-				loggedInInfo,
-				roleName,
-				loggedInProviderNo,
-				demographicNo.toString(),
-				appointmentNo,
-				programId,
-				"Tickler",
-				"#FF6600",
+				sectionParams,
 				limit,
 				offset
 		));

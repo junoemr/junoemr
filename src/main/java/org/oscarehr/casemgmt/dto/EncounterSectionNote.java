@@ -32,6 +32,7 @@ public class EncounterSectionNote
 	private Integer id;
 	private String text;
 	private String value;
+	private String onClick;
 	private String editors;
 	private Integer revision;
 	private LocalDateTime updateDate;
@@ -69,6 +70,16 @@ public class EncounterSectionNote
 	public void setValue(String value)
 	{
 		this.value = value;
+	}
+
+	public String getOnClick()
+	{
+		return onClick;
+	}
+
+	public void setOnClick(String onClick)
+	{
+		this.onClick = onClick;
 	}
 
 	public String getEditors()

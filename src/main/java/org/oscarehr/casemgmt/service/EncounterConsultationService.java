@@ -28,7 +28,6 @@ import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.util.ConversionUtils;
@@ -44,51 +43,73 @@ import java.util.List;
 
 public class EncounterConsultationService extends EncounterSectionService
 {
+	private static final String SECTION_ID = "consultation";
+	private static final String SECTION_TITLE_KEY = "oscarEncounter.LeftNavBar.Consult";
+	private static final String SECTION_TITLE_COLOUR = "#6C2DC7";
+
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
 	private UserPropertyDAO userPropertyDAO;
 
+	@Override
+	public String getSectionId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getSectionTitleKey()
+	{
+		return SECTION_TITLE_KEY;
+	}
+
+	@Override
+	protected String getSectionTitleColour()
+	{
+		return SECTION_TITLE_COLOUR;
+	}
+
+	@Override
+	protected String getOnClickPlus(SectionParameters sectionParams)
+	{
+		String winName = "newConsult" + sectionParams.getDemographicNo();
+		String url = sectionParams.getContextPath() + "/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" +
+				"?de=" + encodeUrlParam(sectionParams.getDemographicNo()) +
+				"&teamVar=" +
+				"&appNo=" + encodeUrlParam(sectionParams.getAppointmentNo());
+		return "popupPage(700,960,'" + winName + "','" + url + "');";
+	}
+
+	@Override
+	protected String getOnClickTitle(SectionParameters sectionParams)
+	{
+		String winName = "Consultation" + sectionParams.getDemographicNo();
+		String url = sectionParams.getContextPath() + "/oscarEncounter/oscarConsultationRequest/DisplayDemographicConsultationRequests.jsp" +
+				"?de=" + encodeUrlParam(sectionParams.getDemographicNo());
+		return "popupPage(700,960,'" + winName + "', '" + url + "')";
+	}
+
 	public EncounterNotes getNotes(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			Integer limit,
+			SectionParameters sectionParams, Integer limit,
 			Integer offset
 	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
-		if(!securityInfoManager.hasPrivilege(loggedInInfo, "_con", "r", null))
+		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(), "_con", "r", null))
 		{
 			return EncounterNotes.noNotes();
 		}
 
-		//set lefthand module heading and link
-		//String winName = "Consultation" + bean.demographicNo;
-		//String url = "popupPage(700,960,'" + winName + "','" + request.getContextPath() + "/oscarEncounter/oscarConsultationRequest/DisplayDemographicConsultationRequests.jsp?de=" + bean.demographicNo + "')";
-		//Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.LeftNavBar.Consult"));
-		//Dao.setLeftURL(url);
-
-		////set the right hand heading link\
-		//winName = "newConsult" + bean.demographicNo;
-		//url = "popupPage(700,960,'" + winName + "','" + request.getContextPath() + "/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp?de=" + bean.demographicNo + "&teamVar=&appNo="+appointmentNo+"'); return false;";
-		//Dao.setRightURL(url);
-		//Dao.setRightHeadingID(cmd);  //no menu so set div id to unique id for this action
-
 		//grab all consultations for patient and add list item for each
 		oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctViewConsultationRequestsUtil theRequests;
 		theRequests = new  oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctViewConsultationRequestsUtil();
-		theRequests.estConsultationVecByDemographic(loggedInInfo, demographicNo);
+		theRequests.estConsultationVecByDemographic(sectionParams.getLoggedInInfo(), sectionParams.getDemographicNo());
 
 		//determine cut off period for highlighting
-		//UserPropertyDAO userPropertyDAO = (UserPropertyDAO) WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext()).getBean("UserPropertyDAO");
-
-		UserProperty up = userPropertyDAO.getProp(providerNo, UserProperty.CONSULTATION_TIME_PERIOD_WARNING);
+		UserProperty up = userPropertyDAO.getProp(sectionParams.getProviderNo(), UserProperty.CONSULTATION_TIME_PERIOD_WARNING);
 		String timeperiod = null;
 
 		if ( up != null && up.getValue() != null && !up.getValue().trim().equals(""))
@@ -112,7 +133,6 @@ public class EncounterConsultationService extends EncounterSectionService
 		{
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-			//NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 			String service = theRequests.service.get(idx);
 			String dateStr = theRequests.date.get(idx);
 			String status = theRequests.status.get(idx);
@@ -127,7 +147,6 @@ public class EncounterConsultationService extends EncounterSectionService
 				//if we are after cut off date and not completed set to red
 				if( date.before(cutoffDate) && !status.equals("4") )
 				{
-					//item.setColour(red);
 					sectionNote.setColour(red);
 				}
 			}
@@ -136,21 +155,21 @@ public class EncounterConsultationService extends EncounterSectionService
 				//serviceDateStr = "Error";
 				date = null;
 			}
-			//url = "popupPage(700,960,'" + winName + "','" + request.getContextPath() + "/oscarEncounter/ViewRequest.do?de=" + bean.demographicNo + "&requestId=" + theRequests.ids.get(idx) + "'); return false;";
 
-			//item.setLinkTitle(service + " " + serviceDateStr);
+			String winName = "newConsult" + sectionParams.getDemographicNo();
+			String url = sectionParams.getContextPath() + "/oscarEncounter/ViewRequest.do" +
+					"?de=" + encodeUrlParam(sectionParams.getDemographicNo()) +
+					"&requestId=" + encodeUrlParam(theRequests.ids.get(idx));
+			String onClickString = "popupPage(700,960,'" + winName + "','" + url + "');";
+			sectionNote.setOnClick(onClickString);
+
 
 			String title = StringUtils.maxLenString(service, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-			//item.setTitle(title);
 
 			sectionNote.setText(title);
 			sectionNote.setUpdateDate(ConversionUtils.toNullableLocalDate(date).atStartOfDay());
 
 			out.add(sectionNote);
-
-			//item.setURL(url);
-			//item.setDate(date);
-			//Dao.addItem(item);
 		}
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);

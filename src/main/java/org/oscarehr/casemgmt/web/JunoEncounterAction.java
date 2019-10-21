@@ -30,20 +30,27 @@ import org.apache.struts.action.ActionMapping;
 import org.drools.FactException;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.service.EncounterAllergyService;
-import org.oscarehr.casemgmt.service.EncounterCPPNoteService;
 import org.oscarehr.casemgmt.service.EncounterConsultationService;
 import org.oscarehr.casemgmt.service.EncounterDiseaseRegistryService;
 import org.oscarehr.casemgmt.service.EncounterDocumentService;
 import org.oscarehr.casemgmt.service.EncounterEFormService;
 import org.oscarehr.casemgmt.service.EncounterEpisodeService;
+import org.oscarehr.casemgmt.service.EncounterFamilyHistoryService;
 import org.oscarehr.casemgmt.service.EncounterFormService;
 import org.oscarehr.casemgmt.service.EncounterLabResultService;
 import org.oscarehr.casemgmt.service.EncounterMeasurementsService;
+import org.oscarehr.casemgmt.service.EncounterMedicalHistoryService;
 import org.oscarehr.casemgmt.service.EncounterMedicationService;
 import org.oscarehr.casemgmt.service.EncounterMessengerService;
+import org.oscarehr.casemgmt.service.EncounterOngoingConcernsService;
+import org.oscarehr.casemgmt.service.EncounterOtherMedsService;
+import org.oscarehr.casemgmt.service.EncounterRemindersService;
 import org.oscarehr.casemgmt.service.EncounterResolvedIssueService;
+import org.oscarehr.casemgmt.service.EncounterRiskFactorsService;
+import org.oscarehr.casemgmt.service.EncounterSectionService;
 import org.oscarehr.casemgmt.service.EncounterService;
 import org.oscarehr.casemgmt.service.EncounterPreventionNoteService;
+import org.oscarehr.casemgmt.service.EncounterSocialHistoryService;
 import org.oscarehr.casemgmt.service.EncounterTeamService;
 import org.oscarehr.casemgmt.service.EncounterTicklerService;
 import org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService;
@@ -64,7 +71,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 public class JunoEncounterAction extends DispatchActionSupport
 {
@@ -88,8 +97,10 @@ public class JunoEncounterAction extends DispatchActionSupport
 	@Autowired
 	private EncounterService encounterService;
 
+/*
 	@Autowired
-	private EncounterCPPNoteService encounterCPPNoteService;
+	private EncounterCPPSectionService encounterCPPSectionService;
+*/
 
 	@Autowired
 	private EncounterPreventionNoteService encounterPreventionNoteService;
@@ -139,6 +150,27 @@ public class JunoEncounterAction extends DispatchActionSupport
 	@Autowired
 	private EncounterTeamService encounterTeamService;
 
+	@Autowired
+	private EncounterSocialHistoryService encounterSocialHistoryService;
+
+	@Autowired
+	private EncounterMedicalHistoryService encounterMedicalHistoryService;
+
+	@Autowired
+	private EncounterOngoingConcernsService encounterOngoingConcernsService;
+
+	@Autowired
+	private EncounterRemindersService encounterRemindersService;
+
+	@Autowired
+	private EncounterOtherMedsService encounterOtherMedsService;
+
+	@Autowired
+	private EncounterRiskFactorsService encounterRiskFactorsService;
+
+	@Autowired
+	private EncounterFamilyHistoryService encounterFamilyHistoryService;
+
 	//@Autowired
 	//private PreventionsSummary preventionsSummary;
 
@@ -159,7 +191,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		String roleName = request.getSession().getAttribute("userrole") + "," + request.getSession().getAttribute("user");
 
 		EctSessionBean encounterSessionBean =
-				(EctSessionBean) request.getSession().getAttribute("EctSessionBean");
+				(EctSessionBean) session.getAttribute("EctSessionBean");
 
 		if (encounterSessionBean == null)
 		{
@@ -204,6 +236,8 @@ public class JunoEncounterAction extends DispatchActionSupport
 		String frmName = "caseManagementEntryForm" + encounterSessionBean.demographicNo;
 		CaseManagementEntryFormBean cform = (CaseManagementEntryFormBean)session.getAttribute(frmName);
 
+		Locale locale = request.getLocale();
+
 		// Get data for the header
 		junoEncounterForm.setHeader(
 				encounterService.getEncounterHeader(
@@ -229,86 +263,164 @@ public class JunoEncounterAction extends DispatchActionSupport
 		// Get data for each of the sections
 		Map<String, EncounterSection> sections = new HashMap<>();
 
-		sections.put(CPP_TYPE_SOCIAL_HISTORY, encounterCPPNoteService.getInitialSection(contextPath, user, encounterSessionBean.demographicNo, appointmentNo,
+		/*
+		sections.put(CPP_TYPE_SOCIAL_HISTORY, encounterCPPSectionService.getInitialSection(contextPath, user, encounterSessionBean.demographicNo, appointmentNo,
 				identUrl, "Social History", "#996633", CPP_TYPE_SOCIAL_HISTORY));
 
-		sections.put(CPP_TYPE_MEDICAL_HISTORY, encounterCPPNoteService.getInitialSection(contextPath, user, encounterSessionBean.demographicNo, appointmentNo,
+		sections.put(CPP_TYPE_MEDICAL_HISTORY, encounterCPPSectionService.getInitialSection(contextPath, user, encounterSessionBean.demographicNo, appointmentNo,
 				identUrl, "Medical History", "#996633", CPP_TYPE_MEDICAL_HISTORY));
 
-		sections.put(CPP_TYPE_ONGOING_CONCERNS, encounterCPPNoteService.getInitialSection(contextPath, user, encounterSessionBean.demographicNo, appointmentNo,
+		sections.put(CPP_TYPE_ONGOING_CONCERNS, encounterCPPSectionService.getInitialSection(contextPath, user, encounterSessionBean.demographicNo, appointmentNo,
 				identUrl, "Ongoing Concerns", "#996633", CPP_TYPE_ONGOING_CONCERNS));
 
-		sections.put(CPP_TYPE_REMINDERS, encounterCPPNoteService.getInitialSection(contextPath, user, encounterSessionBean.demographicNo, appointmentNo,
+		sections.put(CPP_TYPE_REMINDERS, encounterCPPSectionService.getInitialSection(contextPath, user, encounterSessionBean.demographicNo, appointmentNo,
 				identUrl, "Reminders", "#996633", CPP_TYPE_REMINDERS));
 
+		 */
 
-		sections.put(EncounterSection.TYPE_PREVENTIONS, encounterPreventionNoteService.getInitialSection(loggedInInfo, roleName, user, encounterSessionBean.demographicNo, appointmentNo,
-				programId, "Preventions", "#009999"));
-		sections.put(EncounterSection.TYPE_TICKLER, encounterTicklerService.getInitialSection(loggedInInfo, roleName, user, encounterSessionBean.demographicNo, appointmentNo,
+
+		List<String> sectionList = new ArrayList<>();
+
+		// XXX: get localized strings
+		sectionList.add(EncounterSection.TYPE_PREVENTIONS);
+		sectionList.add(EncounterSection.TYPE_TICKLER);
+		sectionList.add(EncounterSection.TYPE_DISEASE_REGISTRY);
+		sectionList.add(EncounterSection.TYPE_FORMS);
+		sectionList.add(EncounterSection.TYPE_EFORMS);
+		sectionList.add(EncounterSection.TYPE_DOCUMENTS);
+		sectionList.add(EncounterSection.TYPE_LAB_RESULTS);
+		sectionList.add(EncounterSection.TYPE_MESSENGER);
+		sectionList.add(EncounterSection.TYPE_MEASUREMENTS);
+		sectionList.add(EncounterSection.TYPE_CONSULTATIONS);
+		sectionList.add(EncounterSection.TYPE_ALLERGIES);
+		sectionList.add(EncounterSection.TYPE_MEDICATIONS);
+		sectionList.add(EncounterSection.TYPE_UNRESOLVED_ISSUES);
+		sectionList.add(EncounterSection.TYPE_RESOLVED_ISSUES);
+		sectionList.add(EncounterSection.TYPE_EPISODES);
+		sectionList.add(EncounterSection.TYPE_HEALTH_CARE_TEAM);
+		sectionList.add(encounterSocialHistoryService.getSectionId());
+		sectionList.add(encounterMedicalHistoryService.getSectionId());
+		sectionList.add(encounterOngoingConcernsService.getSectionId());
+		sectionList.add(encounterRemindersService.getSectionId());
+		sectionList.add(encounterOtherMedsService.getSectionId());
+		sectionList.add(encounterRiskFactorsService.getSectionId());
+		sectionList.add(encounterFamilyHistoryService.getSectionId());
+
+		EncounterSectionService.SectionParameters sectionParams =
+				new EncounterSectionService.SectionParameters();
+
+		sectionParams.setLoggedInInfo(loggedInInfo);
+		sectionParams.setLocale(locale);
+		sectionParams.setContextPath(contextPath);
+		sectionParams.setRoleName(roleName);
+		sectionParams.setProviderNo(user);
+		sectionParams.setDemographicNo(encounterSessionBean.demographicNo);
+		sectionParams.setPatientFirstName(encounterSessionBean.patientFirstName);
+		sectionParams.setPatientLastName(encounterSessionBean.patientLastName);
+		sectionParams.setFamilyDoctorNo(encounterSessionBean.familyDoctorNo);
+		sectionParams.setAppointmentNo(appointmentNo);
+		sectionParams.setChartNo(encounterSessionBean.chartNo);
+		sectionParams.setProgramId(programId);
+		sectionParams.setUserName(encounterSessionBean.userName);
+		// XXX: Make this work
+		sectionParams.seteChartUUID(UUID.randomUUID().toString());
+
+		for(String sectionName: sectionList)
+		{
+			EncounterSectionService sectionService =
+					encounterService.getEncounterSectionServiceByName(sectionName);
+
+			sections.put(sectionName, sectionService.getDefaultSection(sectionParams));
+		}
+
+		/*
+		sections.put(EncounterSection.TYPE_PREVENTIONS,
+				encounterPreventionNoteService.getInitialSection(
+						loggedInInfo,
+						contextPath,
+						roleName,
+						user,
+						encounterSessionBean.demographicNo,
+						appointmentNo,
+						programId,
+						"Preventions",
+						"#009999"
+				)
+		);
+
+		sections.put(EncounterSection.TYPE_TICKLER, encounterTicklerService.getInitialSection(loggedInInfo, contextPath, roleName, user, encounterSessionBean.demographicNo, appointmentNo,
 				programId, "Tickler", "#FF6600"));
-		sections.put(EncounterSection.TYPE_DISEASE_REGISTRY, encounterDiseaseRegistryService.getInitialSection(loggedInInfo, roleName, user, encounterSessionBean.demographicNo, appointmentNo,
-				programId, "Disease Registry", "#5A5A5A"));
-		sections.put(EncounterSection.TYPE_FORMS, encounterFormService.getInitialSection(loggedInInfo, roleName, user, encounterSessionBean.demographicNo, appointmentNo,
-				programId, "Forms", "#917611"));
-		sections.put(EncounterSection.TYPE_EFORMS, encounterEFormService.getInitialSection(loggedInInfo, roleName, user, encounterSessionBean.demographicNo, appointmentNo,
-				programId, "eForms", "#008000"));
-		sections.put(EncounterSection.TYPE_DOCUMENTS, encounterDocumentService.getInitialSection(loggedInInfo, roleName, user, encounterSessionBean.demographicNo, appointmentNo,
-				programId, "Documents", "#476BB3"));
-		sections.put(EncounterSection.TYPE_LAB_RESULTS, encounterLabResultService.getInitialSection(loggedInInfo, roleName, user, encounterSessionBean.demographicNo, appointmentNo,
-				programId, "Lab Result", "#A0509C"));
-		sections.put(EncounterSection.TYPE_MESSENGER, encounterMessengerService.getInitialSection(loggedInInfo, roleName, user, encounterSessionBean.demographicNo, appointmentNo,
-				programId, "Messenger", "#7F462C"));
-		sections.put(EncounterSection.TYPE_MEASUREMENTS, encounterMeasurementsService.getInitialSection(loggedInInfo, roleName, user, encounterSessionBean.demographicNo, appointmentNo,
-				programId, "Measurements", "#344887"));
-		sections.put(EncounterSection.TYPE_CONSULTATIONS, encounterConsultationService.getInitialSection(loggedInInfo, roleName, user, encounterSessionBean.demographicNo, appointmentNo,
-				programId, "Consultations", "#6C2DC7"));
+		sections.put(EncounterSection.TYPE_DISEASE_REGISTRY, encounterDiseaseRegistryService.getInitialSection(sectionParams,
+				"Disease Registry", "#5A5A5A"));
+		sections.put(EncounterSection.TYPE_FORMS, encounterFormService.getInitialSection(sectionParams,
+				"Forms", "#917611"));
+		sections.put(EncounterSection.TYPE_EFORMS, encounterEFormService.getInitialSection(sectionParams,
+				"eForms", "#008000"));
+		sections.put(EncounterSection.TYPE_DOCUMENTS, encounterDocumentService.getInitialSection(sectionParams,
+				"Documents", "#476BB3"));
+		sections.put(EncounterSection.TYPE_LAB_RESULTS, encounterLabResultService.getInitialSection(sectionParams,
+				"Lab Result", "#A0509C"));
+		sections.put(EncounterSection.TYPE_MESSENGER, encounterMessengerService.getInitialSection(sectionParams,
+				"Messenger", "#7F462C"));
+		sections.put(EncounterSection.TYPE_MEASUREMENTS, encounterMeasurementsService.getInitialSection(sectionParams,
+				"Measurements", "#344887"));
+		sections.put(EncounterSection.TYPE_CONSULTATIONS, encounterConsultationService.getInitialSection(sectionParams,
+				"Consultations", "#6C2DC7"));
 
 
-		sections.put(EncounterSection.TYPE_ALLERGIES, encounterAllergyService.getInitialSection(loggedInInfo, roleName, user,
-				encounterSessionBean.demographicNo, appointmentNo, programId, "Allergies",
+		sections.put(EncounterSection.TYPE_ALLERGIES, encounterAllergyService.getInitialSection(sectionParams,
+				"Allergies",
 				"#C85A17"));
 
-		sections.put(EncounterSection.TYPE_MEDICATIONS, encounterMedicationService.getInitialSection(loggedInInfo, roleName, user,
-				encounterSessionBean.demographicNo, appointmentNo, programId, "Medications",
+		sections.put(EncounterSection.TYPE_MEDICATIONS, encounterMedicationService.getInitialSection(sectionParams,
+				"Medications",
 				"#7D2252"));
+		*/
 
-		sections.put(EncounterSection.TYPE_OTHER_MEDS, encounterCPPNoteService.getInitialSection(contextPath, user,
+		/*
+		sections.put(EncounterSection.TYPE_OTHER_MEDS, encounterCPPSectionService.getInitialSection(contextPath, user,
 				encounterSessionBean.demographicNo, appointmentNo, identUrl, "Other Meds",
 				"#306754", EncounterSection.TYPE_OTHER_MEDS));
 
-		sections.put(EncounterSection.TYPE_RISK_FACTORS, encounterCPPNoteService.getInitialSection(contextPath, user,
+		sections.put(EncounterSection.TYPE_RISK_FACTORS, encounterCPPSectionService.getInitialSection(contextPath, user,
 				encounterSessionBean.demographicNo, appointmentNo, identUrl, "Risk Factors",
 				"#993333", EncounterSection.TYPE_RISK_FACTORS));
 
-		sections.put(EncounterSection.TYPE_FAMILY_HISTORY, encounterCPPNoteService.getInitialSection(contextPath, user,
+		sections.put(EncounterSection.TYPE_FAMILY_HISTORY, encounterCPPSectionService.getInitialSection(contextPath, user,
 				encounterSessionBean.demographicNo, appointmentNo, identUrl, "Family History",
 				"#006600", EncounterSection.TYPE_FAMILY_HISTORY));
 
-		sections.put(EncounterSection.TYPE_UNRESOLVED_ISSUES, encounterUnresolvedIssueService.getInitialSection(loggedInInfo, roleName, user,
-				encounterSessionBean.demographicNo, appointmentNo, programId,
+		 */
+
+		/*
+		sections.put(EncounterSection.TYPE_UNRESOLVED_ISSUES, encounterUnresolvedIssueService.getInitialSection(sectionParams,
 				"Unresolved Issues", "#CC9900"));
 
-		sections.put(EncounterSection.TYPE_RESOLVED_ISSUES, encounterResolvedIssueService.getInitialSection(loggedInInfo, roleName, user,
-				encounterSessionBean.demographicNo, appointmentNo, programId,
+		sections.put(EncounterSection.TYPE_RESOLVED_ISSUES, encounterResolvedIssueService.getInitialSection(sectionParams,
 				"Resolved Issues", "#151B8D"));
 
-		sections.put(EncounterSection.TYPE_EPISODES, encounterEpisodeService.getInitialSection(loggedInInfo, roleName, user,
-				encounterSessionBean.demographicNo, appointmentNo, programId,
+		sections.put(EncounterSection.TYPE_EPISODES, encounterEpisodeService.getInitialSection(sectionParams,
 				"Episodes", "#045228"));
 
-		sections.put(EncounterSection.TYPE_HEALTH_CARE_TEAM, encounterTeamService.getInitialSection(loggedInInfo, roleName, user,
-				encounterSessionBean.demographicNo, appointmentNo, programId,
+		sections.put(EncounterSection.TYPE_HEALTH_CARE_TEAM, encounterTeamService.getInitialSection(sectionParams,
 				"Health Care Team", "#6699CC"));
+		 */
 
 		junoEncounterForm.setSections(sections);
 
 
 		List<String> cppSections = new ArrayList<>();
 
+		/*
 		cppSections.add(CPP_TYPE_SOCIAL_HISTORY);
 		cppSections.add(CPP_TYPE_MEDICAL_HISTORY);
 		cppSections.add(CPP_TYPE_ONGOING_CONCERNS);
 		cppSections.add(CPP_TYPE_REMINDERS);
+		 */
+		cppSections.add(encounterSocialHistoryService.getSectionId());
+		cppSections.add(encounterMedicalHistoryService.getSectionId());
+		cppSections.add(encounterOngoingConcernsService.getSectionId());
+		cppSections.add(encounterRemindersService.getSectionId());
 
 		junoEncounterForm.setCppNoteSections(cppSections);
 
@@ -334,9 +446,9 @@ public class JunoEncounterAction extends DispatchActionSupport
 		rightSections.add(EncounterSection.TYPE_ALLERGIES);
 		rightSections.add(EncounterSection.TYPE_MEDICATIONS);
 
-		rightSections.add(EncounterSection.TYPE_OTHER_MEDS);
-		rightSections.add(EncounterSection.TYPE_RISK_FACTORS);
-		rightSections.add(EncounterSection.TYPE_FAMILY_HISTORY);
+		rightSections.add(encounterOtherMedsService.getSectionId());
+		rightSections.add(encounterRiskFactorsService.getSectionId());
+		rightSections.add(encounterFamilyHistoryService.getSectionId());
 
 		rightSections.add(EncounterSection.TYPE_UNRESOLVED_ISSUES);
 		rightSections.add(EncounterSection.TYPE_RESOLVED_ISSUES);

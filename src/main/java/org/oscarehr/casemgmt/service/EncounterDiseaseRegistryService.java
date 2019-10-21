@@ -26,7 +26,6 @@ package org.oscarehr.casemgmt.service;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBean;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler;
@@ -40,98 +39,98 @@ import java.util.List;
 
 public class EncounterDiseaseRegistryService extends EncounterSectionService
 {
+	private static final String SECTION_ID = "Dx";
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.n";
+	protected static final String SECTION_TITLE_KEY = "oscarEncounter.LeftNavBar.DxRegistry";
+	protected static final String SECTION_TITLE_COLOUR = "#5A5A5A";
 
 	@Autowired
 	protected SecurityInfoManager securityInfoManager;
 
-	public EncounterNotes getNotes(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			Integer limit,
-			Integer offset
-	)
+	@Override
+	public String getSectionId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getSectionTitleKey()
+	{
+		return SECTION_TITLE_KEY;
+	}
+
+	@Override
+	protected String getSectionTitleColour()
+	{
+		return SECTION_TITLE_COLOUR;
+	}
+
+	@Override
+	protected String getOnClickPlus(SectionParameters sectionParams)
+	{
+		return getOnClick(sectionParams);
+	}
+
+	@Override
+	protected String getOnClickTitle(SectionParameters sectionParams)
+	{
+		return getOnClick(sectionParams);
+	}
+
+	private String getOnClick(SectionParameters sectionParams)
+	{
+		String winName = "Disease" + sectionParams.getDemographicNo();
+		String url = sectionParams.getContextPath() + "/oscarResearch/oscarDxResearch/setupDxResearch.do" +
+				"?demographicNo=" + encodeUrlParam(sectionParams.getDemographicNo()) +
+				"&providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
+				"&quickList=";
+
+		return "popupPage(580,900,'" + winName + "','" + url + "');";
+	}
+
+	public EncounterNotes getNotes(SectionParameters sectionParams, Integer limit, Integer offset)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_dxresearch", "r", null))
+		if (!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(),
+				"_dxresearch", "r", null))
 		{
 			return EncounterNotes.noNotes();
 		}
 
-		////set lefthand module heading and link
-		//String winName = "Disease" + bean.demographicNo;
-		//String url = "popupPage(580,900,'" + winName + "','" + request.getContextPath() + "/oscarResearch/oscarDxResearch/setupDxResearch.do?demographicNo=" + bean.demographicNo + "&providerNo=" + bean.providerNo + "&quickList=')";
-		//Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.LeftNavBar.DxRegistry"));
-		//Dao.setLeftURL(url);
-
-		////set righthand link to same as left so we have visual consistency with other modules
-		//url += "; return false;";
-		//Dao.setRightURL(url);
-		//Dao.setRightHeadingID(cmd);  //no menu so set div id to unique id for this action
-
-		////grab all of the diseases associated with patient and add a list item for each
-		//String dbFormat = "yyyy-MM-dd";
-		//DateFormat formatter = new SimpleDateFormat(dbFormat);
-		//String serviceDateStr;
-		//Date date;
-		dxResearchBeanHandler hd = new dxResearchBeanHandler(demographicNo);
+		//grab all of the diseases associated with patient and add a list item for each
+		dxResearchBeanHandler hd = new dxResearchBeanHandler(sectionParams.getDemographicNo());
 		List<dxResearchBean> diseases = hd.getDxResearchBeans();
 
-		//for (int idx = 0; idx < diseases.size(); ++idx)
 		for(dxResearchBean dxBean: diseases)
 		{
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-			//NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
-			//dxResearchBean dxBean = (dxResearchBean) diseases.get(idx);
-
 			if (!dxBean.getStatus().equals("A"))
+			{
 				continue;
+			}
 
+			// Colour
 			if (dxBean.getStatus() != null && dxBean.getStatus().equalsIgnoreCase("C"))
 			{
 				sectionNote.setColour("000000");
 			}
 
+			// Date
 			String dateStr = dxBean.getEnd_date();
-
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
 			LocalDateTime date = LocalDateTime.parse(dateStr, formatter);
 			sectionNote.setUpdateDate(date);
 
-			//try
-			//{
-			//	date = formatter.parse(dateStr);
-			//	//Date sDate = formatter.parse(startDate);
-			//	//serviceDateStr = DateUtils.formatDate(sDate, request.getLocale());
-			//	item.setDate(date);
-			//}
-			//catch (ParseException ex)
-			//{
-			//	MiscUtils.getLogger().debug("EctDisplayDxAction: Error creating date " + ex.getMessage());
-			//	serviceDateStr = "Error";
-			//	//date = new Date(System.currentTimeMillis());
-			//	date = null;
-			//}
-
+			// Title
 			String strTitle = StringUtils.maxLenString(dxBean.getDescription(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-
 			sectionNote.setText(strTitle);
-			//item.setTitle(strTitle);
-			//item.setLinkTitle(dxBean.getDescription() + " " + serviceDateStr);
-			//item.setURL("return false;");
 
-			//Dao.addItem(item);
 			out.add(sectionNote);
 		}
 
 		Collections.sort(out, new EncounterSectionNote.SortChronologicAsc());
-
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}

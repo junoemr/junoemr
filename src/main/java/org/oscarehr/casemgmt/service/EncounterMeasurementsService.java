@@ -24,18 +24,19 @@
 package org.oscarehr.casemgmt.service;
 
 import org.oscarehr.casemgmt.dto.EncounterNotes;
+import org.oscarehr.casemgmt.dto.EncounterSectionMenuItem;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.dao.FlowsheetDao;
+import org.oscarehr.common.dao.MeasurementGroupStyleDao;
 import org.oscarehr.common.model.Flowsheet;
+import org.oscarehr.common.model.MeasurementGroupStyle;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.OscarProperties;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarEncounter.pageUtil.EctDisplayMeasurementsAction;
-import oscar.oscarEncounter.pageUtil.NavBarDisplayDAO;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler;
 import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
@@ -43,51 +44,121 @@ import oscar.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.Vector;
 
 public class EncounterMeasurementsService extends EncounterSectionService
 {
+	private static final String SECTION_ID = "measurements";
+	private static final String SECTION_TITLE_KEY = "oscarEncounter.Index.measurements";
+	private static final String SECTION_TITLE_COLOUR = "#344887";
+	private static final String SECTION_MENU_HEADER_KEY = "oscarEncounter.LeftNavBar.InputGrps";
+
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
 	FlowsheetDao flowsheetDao;
 
+	@Autowired
+	MeasurementGroupStyleDao groupDao;
+
+	@Override
+	public String getSectionId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getSectionTitleKey()
+	{
+		return SECTION_TITLE_KEY;
+	}
+
+	@Override
+	protected String getSectionTitleColour()
+	{
+		return SECTION_TITLE_COLOUR;
+	}
+
+	@Override
+	protected String getOnClickPlus(SectionParameters sectionParams)
+	{
+		return "";
+	}
+
+	@Override
+	protected String getOnClickTitle(SectionParameters sectionParams)
+	{
+		String winName = "measurements" + sectionParams.getDemographicNo();
+		String url = sectionParams.getContextPath() + "/oscarEncounter/oscarMeasurements/SetupHistoryIndex.do";
+		return "popupPage(600,1000,'" + winName + "', '" + url + "');";
+	}
+
+	@Override
+	protected String getMenuId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getMenuHeaderKey()
+	{
+		return SECTION_MENU_HEADER_KEY;
+	}
+
+	@Override
+	protected List<EncounterSectionMenuItem> getMenuItems(SectionParameters sectionParams)
+	{
+		List<MeasurementGroupStyle> groups = groupDao.findAll();
+
+		List<EncounterSectionMenuItem> menuItems = new ArrayList<>();
+
+		//now we grab measurement groups for popup menu
+		for (int j = 0; j < groups.size(); j++)
+		{
+
+			MeasurementGroupStyle group = groups.get(j);
+			String winName = group.getGroupName() + sectionParams.getDemographicNo();
+			int hash = Math.abs(winName.hashCode());
+			String url = sectionParams.getContextPath() + "/oscarEncounter/oscarMeasurements/SetupMeasurements.do" +
+					"?groupName=" + encodeUrlParam(group.getGroupName()) +
+					"&echartUUID=" + encodeUrlParam(sectionParams.geteChartUUID());
+
+			addMenuItem(
+					menuItems,
+					group.getGroupName(),
+					null,
+					"popupPage(500,1000, '" + hash + "new','" + url + "');measurementLoaded('" + hash + "');"
+			);
+		}
+
+		//if there are none, we tell user
+		if (menuItems.size() == 0)
+		{
+			addMenuItem(
+				menuItems,
+				"None",
+				null,
+				""
+			);
+		}
+
+		return menuItems;
+	}
+
 	public EncounterNotes getNotes(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			Integer limit,
+			SectionParameters sectionParams, Integer limit,
 			Integer offset
 	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_measurement", "r", null))
+		if (!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(),
+				"_measurement", "r", null))
 		{
 			return EncounterNotes.noNotes();
 		}
-
-		//String menuId = "3"; //div id for popup menu
-		//String roleName = request.getSession().getAttribute("userrole") + "," + request.getSession().getAttribute("user");
-		//String uuid="";
-		//String eChartUUID = request.getParameter("eChartUUID");
-
-		////set text for lefthand module title
-		//Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.Index.measurements"));
-
-		////set link for lefthand module title
-		//String winName = "measurements" + bean.demographicNo;
-		//String url = "popupPage(600,1000,'" + winName + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/SetupHistoryIndex.do')";
-		//Dao.setLeftURL(url.toString());
-
-		////we're going to display a pop up menu of measurement groups
-		//Dao.setRightHeadingID(menuId);
-		//Dao.setMenuHeader(messages.getMessage("oscarEncounter.LeftNavBar.InputGrps"));
-		//Dao.setRightURL("return !showMenu('" + menuId + "', event);");
 
 		com.quatro.service.security.SecurityManager securityMgr = new com.quatro.service.security.SecurityManager();
 
@@ -98,16 +169,11 @@ public class EncounterMeasurementsService extends EncounterSectionService
 			flowsheets.remove("diab3");
 		}
 
-		//int hash;
-		//for (int f = 0; f < flowsheets.size(); f++)
 		for (String flowsheetName: flowsheets)
 		{
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-			//NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
-			//String flowsheetName = flowsheets.get(f);
-
-			if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, roleName))
+			if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, sectionParams.getRoleName()))
 			{
 				Flowsheet fs = null;
 				if ((fs = flowsheetDao.findByName(flowsheetName)) != null)
@@ -120,17 +186,20 @@ public class EncounterMeasurementsService extends EncounterSectionService
 
 				String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
 
-				//winName = flowsheetName + bean.demographicNo;
-				//uuid = UUID.randomUUID().toString();
-				//hash = Math.abs(winName.hashCode());
-				//url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid + "&demographic_no="
-				//		+ bean.demographicNo + "&template=" + flowsheetName + "&echartUUID="+ eChartUUID + "');return false;";
-				//item.setLinkTitle(dispname);
+				String winName = flowsheetName + sectionParams.getDemographicNo();
+				String uuid = UUID.randomUUID().toString();
+				int hash = Math.abs(winName.hashCode());
+				String url = sectionParams.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp" +
+						"?uuid=" + uuid +
+						"&demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo())+
+						"&template=" + encodeUrlParam(flowsheetName) +
+						"&echartUUID=" + encodeUrlParam(sectionParams.geteChartUUID());
+				String onClickString = "popupPage(700,1000,'" + hash + "','" + url + "');";
+				sectionNote.setOnClick(onClickString);
+
 				dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 				sectionNote.setText(dispname);
 
-				//item.setTitle(dispname);
-				//item.setURL(url);
 
 				out.add(sectionNote);
 			}
@@ -156,14 +225,13 @@ public class EncounterMeasurementsService extends EncounterSectionService
 		*/
 
 		//next we add dx triggered flowsheets to the module items
-		dxResearchBeanHandler dxRes = new dxResearchBeanHandler(demographicNo);
+		dxResearchBeanHandler dxRes = new dxResearchBeanHandler(sectionParams.getDemographicNo());
 		Vector dxCodes = dxRes.getActiveCodeListWithCodingSystem();
 		flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetsFromDxCodes(dxCodes);
 		for (int f = 0; f < flowsheets.size(); f++)
 		{
-			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 			String flowsheetName = flowsheets.get(f);
-			if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, roleName))
+			if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, sectionParams.getRoleName()))
 			{
 				Flowsheet fs = null;
 				if ((fs = flowsheetDao.findByName(flowsheetName)) != null)
@@ -178,20 +246,22 @@ public class EncounterMeasurementsService extends EncounterSectionService
 
 				String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
 
-				//winName = flowsheetName + bean.demographicNo;
-				//uuid = UUID.randomUUID().toString();
-				//hash = Math.abs(winName.hashCode());
-				//url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid +
-				//		"&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "&echartUUID=" + eChartUUID + "');return false;";
-				//item.setLinkTitle(dispname);
-				dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
+				String winName = flowsheetName + sectionParams.getDemographicNo();
+				String uuid = UUID.randomUUID().toString();
+				int hash = Math.abs(winName.hashCode());
+				String url = sectionParams.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp" +
+						"?uuid=" + uuid +
+						"&demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo()) +
+						"&template=" + encodeUrlParam(flowsheetName) +
+						"&echartUUID=" + encodeUrlParam(sectionParams.geteChartUUID());
 
+				String onClickString = "popupPage(700,1000,'" + hash + "','" + url + "');";
+				sectionNote.setOnClick(onClickString);
+
+
+				dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 				sectionNote.setText(dispname);
 				out.add(sectionNote);
-
-				//item.setTitle(dispname);
-				//item.setURL(url);
-				//Dao.addItem(item);
 			}
 		}
 
@@ -244,62 +314,22 @@ public class EncounterMeasurementsService extends EncounterSectionService
 		}
 		 */
 
-		/*
-		MeasurementGroupStyleDao groupDao = SpringUtils.getBean(MeasurementGroupStyleDao.class);
-		List<MeasurementGroupStyle> groups = groupDao.findAll();
-		//now we grab measurement groups for popup menu
-		for (int j = 0; j < groups.size(); j++)
-		{
-
-			MeasurementGroupStyle group = groups.get(j);
-			winName = group.getGroupName() + bean.demographicNo;
-			hash = Math.abs(winName.hashCode());
-			url = "popupPage(500,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/SetupMeasurements.do?groupName=" + group.getGroupName() +
-					"&echartUUID=" + eChartUUID + "');measurementLoaded('" + hash + "')";
-			Dao.addPopUpUrl(url);
-			Dao.addPopUpText(group.getGroupName());
-		}
-
-		//if there are none, we tell user
-		if (bean.measurementGroupNames.size() == 0) {
-			Dao.addPopUpUrl("");
-			Dao.addPopUpText("None");
-		}
-		 */
-
 		//finally we add specific measurements to module item list
-		Integer demo = Integer.valueOf(demographicNo);
+		Integer demo = Integer.valueOf(sectionParams.getDemographicNo());
 		oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler hd =
 				new oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler(demo);
 		List<EctMeasurementsDataBean> measureTypes = hd.getMeasurementsData();
 
-		/*
-		if (loggedInInfo.getCurrentFacility().isIntegratorEnabled())
-		{
-			EctMeasurementsDataBeanHandler.addRemoteMeasurementsTypes(loggedInInfo,measureTypes,demo);
-		}
-		 */
-
 		//oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean data;
-		//for (int idx = 0; idx < measureTypes.size(); ++idx)
 		for(EctMeasurementsDataBean data:  measureTypes)
 		{
 			//data = (oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean) measureTypes.get(idx);
 			String title = data.getTypeDisplayName();
 			String type = data.getType();
 
-			//winName = type + bean.demographicNo;
-			//hash = Math.abs(winName.hashCode());
 
 			hd = new EctMeasurementsDataBeanHandler(demo, data.getType());
 			List<EctMeasurementsDataBean> measures = hd.getMeasurementsData();
-
-			/*
-			if (loggedInInfo.getCurrentFacility().isIntegratorEnabled())
-			{
-				EctMeasurementsDataBeanHandler.addRemoteMeasurements(loggedInInfo,measures,data.getType(),demo);
-			}
-			 */
 
 			if (measures.size() > 0)
 			{
@@ -329,22 +359,18 @@ public class EncounterMeasurementsService extends EncounterSectionService
 
 				sectionNote.setValue(data.getDataField());
 
-				//tmp += "<span class=\"measureCol2\">" + data.getDataField() + "&nbsp;</span>";
-				//item.setValue(data.getDataField());
-				//tmp += "<span class=\"measureCol3\">" + formattedDate + "</span><br style=\"clear:both\">";
-
-				//item.setTitle(tmp);
-				//item.setDate(date);
-
-				//item.setURL("popupPage(300,800,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?type=" + type + "'); return false;");
-				//Dao.addItem(item);
+				String winName = type + sectionParams.getDemographicNo();
+				int hash = Math.abs(winName.hashCode());
+				String url = sectionParams.getContextPath() + "/oscarEncounter/oscarMeasurements/SetupDisplayHistory.do" +
+						"?type=" + encodeUrlParam(type);
+				String onClickString = "popupPage(300,800,'" + hash + "','" + url + "');";
+				sectionNote.setOnClick(onClickString);
 
 
 				out.add(sectionNote);
 			}
 		}
 
-		//Dao.sortItems(NavBarDisplayDAO.DATESORT_ASC);
 		//Collections.sort(out, new EncounterSectionNote.SortAlphabetic());
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);

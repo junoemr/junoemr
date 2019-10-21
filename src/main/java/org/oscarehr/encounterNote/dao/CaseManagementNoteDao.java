@@ -23,8 +23,10 @@
 package org.oscarehr.encounterNote.dao;
 
 import org.oscarehr.casemgmt.dto.EncounterCPPNote;
+import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.ws.rest.to.model.NoteTo1;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +36,9 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
@@ -129,10 +133,10 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"    join provider p\n" +
 				"         on p.provider_no = note.provider_no\n" +
 				//"    where issue.issue_id = :issue_id \n" +
-				"where (" + String.join(" or ", issueClauses) + ")" +
+				"    where (" + String.join(" or ", issueClauses) + ")" +
 				"      and note.demographic_no = :demographic_no \n" +
-				"      and note.archived = 0\n" +
-				"      and note.locked = 0\n" +
+				//"      and note.archived = 0\n" +
+				//"      and note.locked = 0\n" +
 				"    group by note.uuid\n" +
 				") as note_filter\n" +
 				"    on note_filter.max_note_id = note.note_id\n" +
@@ -177,6 +181,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"    on ext_problemdescription.note_id = note.note_id\n" +
 				"        and ext_problemdescription.key_val = 'Problem Description'\n" +
 				"where (" + String.join(" or ", issueClauses) + ")\n" +
+				"    and note.archived = 0\n" +
+				"    and note.locked = 0\n" +
 				"order by note.position, note.observation_date desc";
 
 
@@ -284,5 +290,349 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		}
 
 		return out;
+	}
+
+
+	public List<NoteTo1> searchEncounterNotes(int demographicNo, Integer limit, Integer offset)
+	{
+		List<NoteTo1> noteList = new ArrayList<>();
+
+		String sql = "SELECT * FROM ((\n" +
+				"SELECT " +
+				"    cmn.note_id,\n" +
+				"    cmn.observation_date AS observation_date,\n" +
+				"    cmn.provider_no AS providerNo,\n" +
+				"    prog.name AS program_name,\n" +
+				//"  cmn.reporter_caisi_role as reporter_caisi_role,\n" +
+				"    cmn.uuid AS uuid,\n" +
+				"    cmn.update_date AS update_date,\n" +
+				"    doc.document_no,\n" +
+				//"    CAST(0 AS INTEGER) AS eform_data_id,\n" +
+				"    cmn.archived,\n" +
+				"    cmn.signed,\n" +
+				"    NOT cmn.signed OR NOT cmn.locked AS editable,\n" +
+				"    CAST(cmn_revision.count AS CHAR) AS revision,\n" +
+				"    CASE\n" +
+				"        WHEN prov.last_name IS NOT NULL AND prov.first_name IS NOT NULL\n" +
+				"            THEN " +
+				"CONCAT(prov.last_name, ', ', prov.first_name)\n" +
+				"        WHEN prov.last_name IS NOT NULL THEN prov.last_name\n" +
+				"        WHEN prov.first_name IS NOT NULL THEN prov.first_name\n" +
+				"        ELSE null\n" +
+				"        END AS provider_name,\n" +
+				"    CASE\n" +
+				"        WHEN cmn.password IS NOT NULL AND LENGTH(cmn.password) > 0\n" +
+				"            THEN IF(cmn.locked, 'Locked', 'Unlocked')\n" +
+				"        WHEN cmn.signed THEN 'Signed'\n" +
+				"        ELSE 'Unsigned'\n" +
+				"        END AS status,\n" +
+				"    'local' AS location,\n" +
+				"    role.role_name,\n" +
+				//"    0 AS remote_facility_id,\n" +
+				"    cmn.history LIKE '----------------History Record----------------' AS has_history,\n" +
+				"    cmn.locked,\n" +
+				"    cmn.note,\n" +
+				"    doc.document_no IS NOT NULL AS is_document,\n" +
+				"    doc.status = 'D' AS deleted,\n" +
+				"    cmn_link.table_name = '2' AS rx_annotation,\n" +
+				"    false AS eform_data,\n" +
+				"    false AS is_encounter_form,\n" +
+				"    false AS is_invoice,\n" +
+				"    tickler_note.is_tickler_note AS is_tickler_note,\n" +
+				"    cmn.encounter_type,\n" +
+				"    cmn_revision.editors_string,\n" +
+				"    cpp_note.issue_descriptions AS issue_descriptions,\n" +
+				"    false AS readonly ,\n" +
+				"    false AS is_group_note,\n" +
+				"    cpp_note.is_cpp_note,\n" +
+				"    CONCAT(\n" +
+				"            COALESCE(cmn.hourOfEncounterTime, ''),\n" +
+				"            IF(cmn.hourOfEncounterTime != null, ':', ''),\n" +
+				"            COALESCE(cmn.minuteOfEncounterTime)\n" +
+				"        ) AS encounter_time,\n" +
+				"    CONCAT(\n" +
+				"            COALESCE(cmn.hourOfEncTransportationTime, ''),\n" +
+				"   " +
+				"         IF(cmn.hourOfEncTransportationTime != null, ':', ''),\n" +
+				"            COAL" +
+				"ESCE(cmn.minuteOfEncTransportationTime" +
+				")\n" +
+				"        " +
+				") AS " +
+				"encounter_transportation_time\n" +
+
+				"FROM casemgmt_note AS cmn" +
+				"\n" +
+				"LEFT JOIN " +
+				"casemgmt_note AS cmn_filter ON cmn_filter.uuid = cmn.uuid\n" +
+				"  " +
+				"  AND (cmn.update_date < cmn_filter.update_date " +
+				"OR (cmn.update_date = cmn_filter.update_date AND cmn.note_id < cmn_filter.note_id))\n" +
+				"JOIN (\n" +
+				"    SELECT uuid, count(*) as count, GROUP_CONCAT(DISTINCT\n" +
+				"            CASE\n" +
+				"     " +
+				"           WHEN prov.last_name IS NOT NULL AND prov.first_name IS NOT NULL\n" +
+				"                    THEN CONCAT(prov.last_name, ', ', prov.first_name)\n" +
+				"                WHEN prov.last_name IS NOT NULL THEN prov.last_name\n" +
+				"                WHEN prov.first_name IS NOT NULL THEN prov.first_name\n" +
+				"                ELSE null\n" +
+				"            END,\n" +
+				"            ';'\n" +
+				"        ) AS editors_string\n" +
+				"    FROM casemgmt_note note\n" +
+				"    JOIN provider prov ON note.provider_no = prov.provider_no\n" +
+				"    WHERE demographic_no = :demographicNo\n" +
+				"    GROUP BY uuid\n" +
+				"    " +
+				") AS cmn_revision ON cmn.uuid = cmn_revision.uuid\n" +
+				"LEFT JOIN casemgmt_note_link AS cmn_link ON cmn.note_id = cmn_link.note_id\n" +
+				"LEFT JOIN casemgmt_note_link AS cmn_link_filter\n" +
+				"  ON cmn_link.note_id = cmn_link_filter.note_id\n" +
+				"  AND cmn_link.id < cmn_link_filter.id\n" +
+				"LEFT JOIN document doc ON cmn_link.table_name = :documentTableName AND " +
+				"doc.document_no = cmn_link.table_id\n" +
+				"LEFT JOIN program AS prog ON cmn.program_no = prog.id\n" +
+				"LEFT JOIN provider AS prov ON cmn.provider_no = prov.provider_no\n" +
+				"LEFT JOIN secRole " +
+				"AS role ON cmn.reporter_caisi_role = role.role_no\n" +
+				"LEFT JOIN (\n" +
+				"SELECT note.note_id, true as is_tickler_note\n" +
+				"  FROM casemgmt_note note\n" +
+				"           JOIN casemgmt_issue_notes cinotes on note.note_id = cinotes.note_id\n" +
+				"           JOIN casemgmt_issue ci on cinotes.id = ci.id\n" +
+				"           JOIN issue i ON ci.issue_id = i.issue_id\n" +
+				"  WHERE note.demographic_no = :demographicNo\n" +
+				"    AND i.code = 'TicklerNote'\n" +
+				"  GROUP BY note.note_id\n" +
+				") AS tickler_note ON tickler_note.note_id = cmn.note_id\n" +
+				"LEFT JOIN (\n" +
+				"  SELECT " +
+				"    note.note_id, \n" +
+				"    SUM(i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication','TicklerNote')) > 0 as is_cpp_note, \n" +
+				// This uses a non-character separator because it is is going to be separated
+				// below.  This is not ideal and is done for performance.
+				"    GROUP_CONCAT(i.description SEPARATOR 0x1D) AS issue_descriptions\n" +
+				"  FROM casemgmt_note note\n" +
+				"           JOIN casemgmt_issue_notes cinotes on note.note_id = cinotes.note_id\n" +
+				"           JOIN casemgmt_issue ci on cinotes.id = ci.id\n" +
+				"           JOIN issue i ON ci.issue_id = i.issue_id\n" +
+				"  WHERE note.demographic_no = :demographicNo\n" +
+				"    GROUP BY note.note_id\n" +
+				") AS cpp_note ON cpp_note.note_id = cmn.note_id\n" +
+				"WHERE cmn.demographic_no = :demographicNo \n" +
+				"AND cmn_filter.note_id IS NULL\n" +
+				"AND cmn_link_filter.id IS NULL\n" +
+				") UNION ALL (" +
+
+				"SELECT " +
+				"    ed.fdid AS note_id,\n" +
+				"    CAST(CONCAT(ed.form_date, ' ', ed.form_time) AS DATETIME) AS observation_date,\n" +
+				"    ed.form_provider AS providerNo,\n" +
+				"    '' AS program_name,\n" +
+				//"  cmn.reporter_caisi_role as reporter_caisi_role,\n" +
+				"    '' AS uuid,\n" +
+				"    CAST(CONCAT(ed.form_date, ' ', ed.form_time) AS DATETIME) AS update_date,\n" +
+				"    0 AS document_no,\n" +
+				//"    CAST(0 AS INTEGER) AS eform_data_id,\n" +
+				"    false AS archived,\n" +
+				"    false AS signed,\n" +
+				"    false AS editable,\n" +
+				"    '' AS revision,\n" +
+				"    '' AS provider_name,\n" +
+				"    '' AS status,\n" +
+				"    '' AS location,\n" +
+				"    '' AS role_name,\n" +
+				//"    0 AS remote_facility_id,\n" +
+				"    false AS has_history,\n" +
+				"    CAST('0' AS CHARACTER) AS locked,\n" +
+				"    CONCAT(ed.form_name, ' : ', ed.subject) AS note,\n" +
+				"    false AS is_document,\n" +
+				"    false AS deleted,\n" +
+				"    false AS rx_annotation,\n" +
+				"    true AS eform_data,\n" +
+				"    false AS is_encounter_form,\n" +
+				"    false AS is_invoice,\n" +
+				"    false AS is_tickler_note,\n" +
+				"    '' AS encounter_type,\n" +
+				"    '' AS editors_string,\n" +
+				"    '' AS issue_descriptions,\n" +
+				"    false AS readonly ,\n" +
+				"    false AS is_group_note,\n" +
+				"    false AS is_cpp_note,\n" +
+				"    '' AS encounter_time,\n" +
+				"    '' AS encounter_transportation_time\n" +
+			"FROM eform_data ed " +
+			"LEFT JOIN eform_instance ei ON ed.fid = ei.eform_id " +
+			"WHERE ed.demographic_no = :demographicNo " +
+			"AND ed.patient_independent = false " +
+			"AND ((ei.id IS NULL AND ed.status) OR NOT ei.deleted) " +
+		")) AS full_query\n" +
+		"ORDER BY observation_date DESC \n";
+
+
+				Query query = entityManager.createNativeQuery(sql);
+
+		int count = 0;
+
+		query.setParameter("documentTableName", CaseManagementNoteLink.DOCUMENT);
+		query.setParameter("demographicNo", demographicNo);
+
+		if(limit != null)
+		{
+			query.setMaxResults(limit);
+		}
+
+		if(offset != null)
+		{
+			query.setFirstResult(offset);
+		}
+
+		List<Object[]> results = query.getResultList();
+
+
+		for(Object[] row: results)
+		{
+			NoteTo1 note = new NoteTo1();
+
+			int column = 0;
+			note.setNoteId((int) row[column++]);
+			note.setObservationDate(getDateFromSql(row[column++]));
+			note.setProviderNo((String) row[column++]);
+			note.setProgramName((String) row[column++]);
+			note.setUuid((String) row[column++]);
+			note.setUpdateDate(getDateFromSql(row[column++]));
+			note.setDocumentId(getInteger(row[column++]));
+			note.setArchived(getBooleanFromInteger(row[column++]));
+			note.setIsSigned(getBooleanFromInteger(row[column++]));
+			note.setIsEditable(getBooleanFromInteger(row[column++]));
+			note.setRevision((String) row[column++]);
+			note.setProviderName((String) row[column++]);
+			note.setStatus((String) row[column++]);
+			note.setLocation((String) row[column++]);
+			note.setRoleName((String) row[column++]);
+			//note.setRemoteFacilityId((int) row[column++]);
+			note.setHasHistory(getBooleanFromInteger(row[column++]));
+			note.setLocked(getBooleanFromCharacter(row[column++]));
+			note.setNote((String) row[column++]);
+			note.setDocument(getBooleanFromInteger(row[column++]));
+			note.setDeleted(getBooleanFromInteger(row[column++]));
+			note.setRxAnnotation(getBooleanFromInteger(row[column++]));
+			note.setEformData(getBooleanFromInteger(row[column++]));
+			if(note.isEformData())
+			{
+				//TODO why is the note id fake and also the eform id???
+				note.setEformDataId(note.getNoteId());
+				note.setNoteId(null);
+			}
+			note.setEncounterForm(getBooleanFromInteger(row[column++]));
+			note.setInvoice(getBooleanFromInteger(row[column++]));
+			note.setTicklerNote(getBooleanFromInteger(row[column++]));
+			note.setEncounterType((String) row[column++]);
+			note.setEditorNames(new ArrayList<String>(
+					Arrays.asList(((String) row[column++]).split(";"))
+				)
+			);
+
+/*
+			ArrayList<String> issueDescriptions = new ArrayList<>();
+			issueDescriptions.add((String) row[column++]);
+*/
+
+			note.setIssueDescriptions(parseIssueDescriptions((String) row[column++]));
+			note.setReadOnly(getBooleanFromInteger(row[column++]));
+			note.setGroupNote(getBooleanFromInteger(row[column++]));
+			note.setCpp(getBooleanFromInteger(row[column++]));
+			note.setEncounterTime((String) row[column++]);
+			note.setEncounterTransportationTime((String) row[column++]);
+
+			noteList.add(note);
+		}
+
+		return noteList;
+	}
+
+	private ArrayList<String> parseIssueDescriptions(String issueDescriptionString)
+	{
+		if(issueDescriptionString == null)
+		{
+			return null;
+		}
+
+		// Split on non-character value as described in query above
+		String[] issueDescriptions = issueDescriptionString.split("\\x1d");
+
+		return new ArrayList<>(Arrays.asList(issueDescriptions));
+	}
+
+	private java.util.Date getDateFromSql(Object value)
+	{
+		if(value == null)
+		{
+			return null;
+		}
+
+		return Date.from(((Timestamp) value).toLocalDateTime().atZone(ZoneId.systemDefault()).toInstant());
+	}
+
+	private Integer getInteger(Object value)
+	{
+		if(value == null)
+		{
+			return null;
+		}
+
+		if(value instanceof Integer)
+		{
+			return ((Integer) value);
+		}
+		else if(value instanceof BigInteger)
+		{
+			return ((BigInteger) value).intValue();
+		}
+
+		throw new RuntimeException("Object is not a BigInteger or an Integer");
+	}
+
+	private boolean getBooleanFromInteger(Object value)
+	{
+		if(value == null)
+		{
+			return false;
+		}
+
+		if(value instanceof Boolean)
+		{
+			return ((Boolean) value).booleanValue();
+		}
+		else if(value instanceof Integer)
+		{
+			return (!((Integer) value).equals(0));
+		}
+		else if(value instanceof BigInteger)
+		{
+			return (!((BigInteger) value).equals(BigInteger.ZERO));
+		}
+
+		throw new RuntimeException("Object is not a BigInteger or an Integer");
+	}
+
+	private boolean getBooleanFromCharacter(Object value)
+	{
+		if(value == null)
+		{
+			return false;
+		}
+
+		if(value instanceof Character)
+		{
+			return (!((Character) value).equals('0'));
+		}
+		else if(value instanceof String)
+		{
+			return (!((String) value).equals("0"));
+		}
+
+		throw new RuntimeException("Object is not a Character or a String");
 	}
 }

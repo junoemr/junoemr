@@ -26,7 +26,16 @@ package org.oscarehr.casemgmt.service;
 import org.drools.FactException;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSection;
+import org.oscarehr.casemgmt.dto.EncounterSectionMenuItem;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.springframework.web.util.UriUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 
 public abstract class EncounterSectionService
@@ -45,103 +54,311 @@ public abstract class EncounterSectionService
 	public static final int INITIAL_ENTRIES_TO_SHOW = 6;
 	public static final int INITIAL_OFFSET = 0;
 
-	public abstract EncounterNotes getNotes(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			Integer limit,
-			Integer offset
-	) throws FactException;
+	private String sectionTitle;
+	private String sectionTitleColour;
 
-	/*
-	public int getNoteCount(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId
-	)
+	public abstract String getSectionId();
+
+	protected String getOnClickPlus(SectionParameters sectionParams)
 	{
-		return 0;
+		return "";
 	}
-	 */
+
+	protected String getOnClickTitle(SectionParameters sectionParams)
+	{
+		return "";
+	}
+
+	protected String getSectionTitle()
+	{
+		return this.sectionTitle;
+	}
+
+	protected String getSectionTitleColour()
+	{
+		return this.sectionTitleColour;
+	}
+
+	protected String getSectionTitleKey()
+	{
+		return null;
+	}
+
+	protected String getMenuId()
+	{
+		return null;
+	}
+
+	protected String getMenuHeaderKey()
+	{
+		return null;
+	}
+
+	protected List<EncounterSectionMenuItem> getMenuItems(SectionParameters sectionParams)
+	{
+		return new ArrayList<>();
+	}
 
 	public EncounterSection getInitialSection(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			String title,
+			SectionParameters sectionParams, String title,
 			String colour
 	) throws FactException
 	{
+		this.sectionTitle = title;
+		this.sectionTitleColour = colour;
 		return getSection(
-				loggedInInfo,
-				roleName,
-				providerNo,
-				demographicNo,
-				appointmentNo,
-				programId,
-				title,
-				colour,
+				sectionParams,
 				INITIAL_ENTRIES_TO_SHOW,
 				INITIAL_OFFSET
 		);
 	}
 
+	public EncounterSection getDefaultSection(SectionParameters params) throws FactException
+	{
+		return getSection(params, INITIAL_ENTRIES_TO_SHOW, INITIAL_OFFSET);
+	}
+
 	public EncounterSection getSection(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			String title,
-			String colour,
-			Integer limit,
+			SectionParameters sectionParams, Integer limit,
 			Integer offset
 	) throws FactException
 	{
 		EncounterSection section = new EncounterSection();
 
-		section.setTitle(title);
-		section.setColour(colour);
+		section.setTitle(getSectionTitle());
+		section.setTitleKey(getSectionTitleKey());
+		section.setColour(getSectionTitleColour());
 		section.setCppIssues("");
 		section.setAddUrl("");
 		section.setIdentUrl("");
+		section.setOnClickTitle(getOnClickTitle(sectionParams));
+		section.setOnClickPlus(getOnClickPlus(sectionParams));
+		section.setMenuId(getMenuId());
+		section.setMenuHeaderKey(getMenuHeaderKey());
+		section.setMenuItems(getMenuItems(sectionParams));
 
 		EncounterNotes notes = getNotes(
-				loggedInInfo,
-				roleName,
-				providerNo,
-				demographicNo,
-				appointmentNo,
-				programId,
+				sectionParams,
 				limit,
-				offset
-		);
+				offset);
 
 		section.setNotes(notes.getEncounterSectionNotes());
 
 		section.setRemainingNotes(notes.getNoteCount() - notes.getEncounterSectionNotes().size());
 
-		/*
-		// Ask for one more note than is required.  If the full amount is returned, show the
-		// controls to show all notes, and remove it from the results.
-		if(notes.size() > INITIAL_ENTRIES_TO_SHOW)
-		{
-			notes.remove(notes.size() - 1);
-			section.setShowingPartialNoteList(true);
-		}
-		 */
-
-
 		return section;
+	}
+
+	public EncounterNotes getNotes(
+			SectionParameters sectionParams, Integer limit,
+			Integer offset
+	) throws FactException
+	{
+		return EncounterNotes.noNotes();
+	}
+
+	public String encodeUrlParam(String param)
+	{
+		try
+		{
+			return UriUtils.encodeQueryParam(param, StandardCharsets.UTF_8.toString());
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			MiscUtils.getLogger().error("Unable to encode string using UTF-8", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected static void addMenuItem(List<EncounterSectionMenuItem> menuItems, String text,
+									  String textKey, String onClick)
+	{
+		EncounterSectionMenuItem menuItem = new EncounterSectionMenuItem();
+		menuItem.setOnClick(onClick);
+		menuItem.setText(text);
+		menuItem.setTextKey(textKey);
+		menuItems.add(menuItem);
+	}
+
+	public static class SectionParameters
+	{
+		private LoggedInInfo loggedInInfo;
+		private Locale locale;
+		private String contextPath;
+		private String roleName;
+		private String providerNo;
+		private String demographicNo;
+		private String patientFirstName;
+		private String patientLastName;
+		private String familyDoctorNo;
+		private String appointmentNo;
+		private String chartNo;
+		private String programId;
+		private String userName;
+		private String eChartUUID;
+
+		// XXX: do I remove these?
+		private String title;
+		private String colour;
+
+		public LoggedInInfo getLoggedInInfo()
+		{
+			return loggedInInfo;
+		}
+
+		public void setLoggedInInfo(LoggedInInfo loggedInInfo)
+		{
+			this.loggedInInfo = loggedInInfo;
+		}
+
+		public Locale getLocale()
+		{
+			return locale;
+		}
+
+		public void setLocale(Locale locale)
+		{
+			this.locale = locale;
+		}
+
+		public String getContextPath()
+		{
+			return contextPath;
+		}
+
+		public void setContextPath(String contextPath)
+		{
+			this.contextPath = contextPath;
+		}
+
+		public String getRoleName()
+		{
+			return roleName;
+		}
+
+		public void setRoleName(String roleName)
+		{
+			this.roleName = roleName;
+		}
+
+		public String getProviderNo()
+		{
+			return providerNo;
+		}
+
+		public void setProviderNo(String providerNo)
+		{
+			this.providerNo = providerNo;
+		}
+
+		public String getDemographicNo()
+		{
+			return demographicNo;
+		}
+
+		public void setDemographicNo(String demographicNo)
+		{
+			this.demographicNo = demographicNo;
+		}
+
+		public String getPatientFirstName()
+		{
+			return patientFirstName;
+		}
+
+		public void setPatientFirstName(String patientFirstName)
+		{
+			this.patientFirstName = patientFirstName;
+		}
+
+		public String getPatientLastName()
+		{
+			return patientLastName;
+		}
+
+		public void setPatientLastName(String patientLastName)
+		{
+			this.patientLastName = patientLastName;
+		}
+
+		public String getFamilyDoctorNo()
+		{
+			return familyDoctorNo;
+		}
+
+		public void setFamilyDoctorNo(String familyDoctorNo)
+		{
+			this.familyDoctorNo = familyDoctorNo;
+		}
+
+		public String getAppointmentNo()
+		{
+			return appointmentNo;
+		}
+
+		public void setAppointmentNo(String appointmentNo)
+		{
+			this.appointmentNo = appointmentNo;
+		}
+
+		public String getChartNo()
+		{
+			return chartNo;
+		}
+
+		public void setChartNo(String chartNo)
+		{
+			this.chartNo = chartNo;
+		}
+
+		public String getProgramId()
+		{
+			return programId;
+		}
+
+		public void setProgramId(String programId)
+		{
+			this.programId = programId;
+		}
+
+		public String getUserName()
+		{
+			return userName;
+		}
+
+		public void setUserName(String userName)
+		{
+			this.userName = userName;
+		}
+
+		public String geteChartUUID()
+		{
+			return eChartUUID;
+		}
+
+		public void seteChartUUID(String eChartUUID)
+		{
+			this.eChartUUID = eChartUUID;
+		}
+
+		public String getTitle()
+		{
+			return title;
+		}
+
+		public void setTitle(String title)
+		{
+			this.title = title;
+		}
+
+		public String getColour()
+		{
+			return colour;
+		}
+
+		public void setColour(String colour)
+		{
+			this.colour = colour;
+		}
 	}
 }

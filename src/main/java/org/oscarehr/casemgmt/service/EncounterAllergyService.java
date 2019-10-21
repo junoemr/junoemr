@@ -26,7 +26,6 @@ package org.oscarehr.casemgmt.service;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
-import org.oscarehr.util.LoggedInInfo;
 import oscar.oscarRx.data.RxPatientData;
 import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
@@ -38,24 +37,61 @@ import java.util.List;
 
 public class EncounterAllergyService extends EncounterSectionService
 {
+	private static final String SECTION_ID = "allergies";
+	protected static final String SECTION_TITLE_KEY = "oscarEncounter.NavBar.Allergy";
+	protected static final String SECTION_TITLE_COLOUR = "#C85A17";
+
+	@Override
+	public String getSectionId()
+	{
+		return SECTION_ID;
+	}
+
+	@Override
+	protected String getSectionTitleKey()
+	{
+		return SECTION_TITLE_KEY;
+	}
+
+	@Override
+	protected String getSectionTitleColour()
+	{
+		return SECTION_TITLE_COLOUR;
+	}
+
+	@Override
+	protected String getOnClickPlus(SectionParameters sectionParams)
+	{
+		return getOnClick(sectionParams);
+	}
+
+	@Override
+	protected String getOnClickTitle(SectionParameters sectionParams)
+	{
+		return getOnClick(sectionParams);
+	}
+
+	private String getOnClick(SectionParameters sectionParams)
+	{
+		String winName = "Allergy" + sectionParams.getDemographicNo();
+		String url = sectionParams.getContextPath() + "/oscarRx/showAllergy.do" +
+				"?demographicNo=" + encodeUrlParam(sectionParams.getDemographicNo());
+
+		return "popupPage(500,900,'" + winName + "', '" + url + "')";
+	}
+
 	public EncounterNotes getNotes(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			Integer limit,
+			SectionParameters sectionParams, Integer limit,
 			Integer offset
 	)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
 		// grab all of the diseases associated with patient and add a list item for each
-		Integer demographicId = Integer.parseInt(demographicNo);
+		Integer demographicId = Integer.parseInt(sectionParams.getDemographicNo());
 
 		Allergy[] allergies =
-				RxPatientData.getPatient(loggedInInfo, demographicId).getActiveAllergies();
+				RxPatientData.getPatient(sectionParams.getLoggedInInfo(), demographicId).getActiveAllergies();
 
 		// --- get local allergies ---
 		for (int idx = 0; idx < allergies.length; ++idx)

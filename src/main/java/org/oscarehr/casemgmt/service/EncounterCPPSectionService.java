@@ -23,21 +23,28 @@
 
 package org.oscarehr.casemgmt.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.oscarehr.casemgmt.dto.EncounterCPPNote;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.dao.IssueDao;
 import org.oscarehr.encounterNote.model.Issue;
+import org.oscarehr.ws.rest.NotesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 @Service
-public class EncounterCPPNoteService
+public abstract class EncounterCPPSectionService extends EncounterSectionService
 {
 	@Autowired
 	CaseManagementNoteDao caseManagementNoteDao;
@@ -45,80 +52,119 @@ public class EncounterCPPNoteService
 	@Autowired
 	private IssueDao issueDao;
 
-	public EncounterSection getInitialSection(
-			String contextPath,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String identUrl,
-			String title,
-			String colour,
-			String sectionName
-	)
+	public String getOnClickTitle(SectionParameters sectionParams, long issueId)
 	{
 
-		return getSection(
-			contextPath,
-			providerNo,
-			demographicNo,
-			appointmentNo,
-			identUrl,
-			title,
-			colour,
-			sectionName,
-			EncounterSectionService.INITIAL_ENTRIES_TO_SHOW,
-			EncounterSectionService.INITIAL_OFFSET
-		);
+		return "return showIssueHistory('" + sectionParams.getDemographicNo() + "','" + issueId + "');";
 	}
 
-	public EncounterSection getSection(
-			String contextPath,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String identUrl,
-			String title,
-			String colour,
-			String sectionName,
-			Integer limit,
-			Integer offset
-	)
+	public String getOnClickPlus(List<EncounterSectionNote> notes, SectionParameters sectionParams, String cppIssues)
 	{
+		// function showEdit(e, noteType, title, noteId, editors, date, revision, note, numNotes, position, noteIssues, noteExts, demoNo)
 
-		String addUrl = contextPath + "/CaseManagementEntry.do?method=issueNoteSave" +
-				"&providerNo=" + providerNo + "" +
-				"&demographicNo=" + demographicNo + "" +
-				"&appointmentNo=" + appointmentNo + "" +
-				"&noteId=";
+		return getShowEditJavascriptCallString(null, notes.size(), sectionParams, cppIssues);
 
+
+		/*
+		String onClickString = "return showEdit(" +
+			"event," +
+			"'" + StringEscapeUtils.escapeHtml(getSectionId()) + "'," +
+			"'" + StringEscapeUtils.escapeHtml(title) + "'," +
+			"''," +
+			"0," +
+			"''," +
+			"''," +
+			"''," +
+				StringEscapeUtils.escapeHtml(Integer.toString(notes.size())) + "," +
+			"0," +
+			"'" + StringEscapeUtils.escapeHtml(cppIssues) + "'," +
+			"''," +
+			"'" + StringEscapeUtils.escapeHtml(sectionParams.getDemographicNo()) + "'" +
+		");";
+
+		return onClickString;
+		 */
+	}
+
+	public String getSummaryCode()
+	{
+		return NotesService.getSummaryCodeFromSystemCode(getSectionId());
+	}
+
+	public EncounterSection getDefaultSection(SectionParameters sectionParams)
+	{
+		return getSection(sectionParams, EncounterSectionService.INITIAL_ENTRIES_TO_SHOW, EncounterSectionService.INITIAL_OFFSET);
+	}
+
+	public EncounterSection getSection(SectionParameters sectionParams, Integer limit, Integer offset)
+	{
 		// Get issue id from type
-		Issue issue = issueDao.findByCode(sectionName);
+		Issue issue = issueDao.findByCode(getSectionId());
 
-		String cppIssues = issue.getId() + ";" + issue.getCode() + ";" + issue.getDescription();
+		// XXX: don't include the cpp issue
+		//String cppIssues = issue.getId() + ";" + issue.getCode() + ";" + issue.getDescription();
+		String cppIssues = "";
 
 		EncounterSection section = new EncounterSection();
 
-		section.setTitle(title);
-		section.setColour(colour);
-		section.setCppIssues(cppIssues);
-		section.setAddUrl(addUrl);
-		section.setIdentUrl(identUrl);
-		section.setNotes(getCPPNotes(demographicNo, issue.getIssueId()));
+		section.setTitleKey(getSectionTitleKey());
+		section.setColour(getSectionTitleColour());
+		//section.setCppIssues(cppIssues);
+
+		List<EncounterSectionNote> notes = getNotes(sectionParams, issue.getIssueId(), cppIssues);
+
+		section.setOnClickPlus(getOnClickPlus(notes, sectionParams, cppIssues));
+		section.setOnClickTitle(getOnClickTitle(sectionParams, issue.getIssueId()));
+
+		section.setNotes(notes);
 
 		return section;
 	}
 
-	private List<EncounterSectionNote> getCPPNotes(String demographicNo, long issueId)
+	private String getShowEditJavascriptCallString(EncounterCPPNote note, int noteCount,
+												   SectionParameters sectionParams, String cppIssues)
+	{
+		ResourceBundle oscarR = ResourceBundle.getBundle("oscarResources", sectionParams.getLocale());
+		String title = oscarR.getString(getSectionTitleKey());
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new JavaTimeModule());
+		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+		String noteJsonString;
+		try
+		{
+			noteJsonString = mapper.writeValueAsString(note);
+		}
+		catch(JsonProcessingException e)
+		{
+			noteJsonString = "";
+		}
+
+		String onClickString = "return showEdit(" +
+				"event," +
+				"'" + StringEscapeUtils.escapeHtml(getSectionId()) + "'," +
+				"'" + StringEscapeUtils.escapeHtml(title) + "'," +
+				StringEscapeUtils.escapeHtml(Integer.toString(noteCount)) + "," +
+				"'" + StringEscapeUtils.escapeHtml(cppIssues) + "'," +
+				"'" + StringEscapeUtils.escapeHtml(sectionParams.getDemographicNo()) + "'," +
+				"'" + StringEscapeUtils.escapeHtml(StringEscapeUtils.escapeJavaScript(noteJsonString)) + "'" +
+				");";
+
+		return onClickString;
+	}
+
+	private List<EncounterSectionNote> getNotes(SectionParameters sectionParams, long issueId, String cppIssues)
 	{
 		// Get notes for that type
 		List<EncounterSectionNote> out = new ArrayList<>();
 
 		String[] issueIds = new String[1];
 		issueIds[0] = Long.toString(issueId);
-		List<EncounterCPPNote> notes = caseManagementNoteDao.getCPPNotes(demographicNo, issueIds);
+		List<EncounterCPPNote> notes = caseManagementNoteDao.getCPPNotes(sectionParams.getDemographicNo(), issueIds);
 
 		for(EncounterCPPNote note: notes)
 		{
+
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 			sectionNote.setText(note.getNote());
 			sectionNote.setEditors(note.getEditors());
@@ -127,6 +173,7 @@ public class EncounterCPPNoteService
 			sectionNote.setObservationDate(note.getObservationDate());
 			sectionNote.setNoteIssuesString(getNoteIssueString(note));
 			sectionNote.setNoteExtsString(getNoteExtString(note));
+			sectionNote.setOnClick(getShowEditJavascriptCallString(note, notes.size(), sectionParams, cppIssues));
 			out.add(sectionNote);
 		}
 

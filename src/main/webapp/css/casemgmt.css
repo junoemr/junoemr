@@ -72,6 +72,11 @@ TH {
 	text-align: left;
 }
 
+div.editNoteError {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
 .message {
 	color: #000000;
 	background-color: #EEEEFF;
@@ -468,4 +473,5 @@ div.encounterNavBar span.encounterNoteDate {
 	float:right;
 	text-align:right;
 }
+
 
