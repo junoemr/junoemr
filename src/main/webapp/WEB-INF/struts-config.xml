@@ -813,9 +813,6 @@
 		<action input="/oscarMessenger/CreateMessage.jsp" name="msgProceedForm" path="/oscarMessenger/Transfer/Proceed" scope="request" type="oscar.oscarMessenger.pageUtil.MsgProceedAction">
 			<forward name="success" path="/oscarMessenger/Transfer/SearchComplete.jsp" />
 		</action>
-		<action input="/oscarMessenger/CreateMessage.jsp" name="msgClearMessageForm" path="/oscarMessenger/ClearMessage" scope="request" type="oscar.oscarMessenger.pageUtil.MsgClearMessageAction">
-			<forward name="success" path="/oscarMessenger/CreateMessage.jsp" />
-		</action>
 		<action input="/oscarMessenger/ViewMessage.jsp" path="/oscarMessenger/WriteToEncounter" scope="request" type="oscar.oscarMessenger.pageUtil.MsgWriteToEncounterAction">
 			<forward name="success" path="/oscarEncounter/IncomingEncounter.do" />
 		</action>
@@ -2890,6 +2887,12 @@
 		</action>
 
 		<action path="/RxWatermark" name="FrmForm" type="org.oscarehr.rx.web.RxWatermarkAction" parameter="method">
+		</action>
+
+		<action path="/ClinicImage" name="FrmForm" type="org.oscarehr.clinic.web.ClinicImageAction" parameter="method">
+		</action>
+
+		<action path="/RxSettings" name="FrmForm" type="org.oscarehr.rx.web.RxSettingsAction" parameter="method">
 		</action>
 
      <action path="/consults/Consultations" type="org.oscarehr.consultations.ConsultationAction">

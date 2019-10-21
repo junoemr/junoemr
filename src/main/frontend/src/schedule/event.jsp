@@ -26,32 +26,12 @@
 	<modal-title>
 		<i class="icon icon-modal-header icon-calendar-add"></i>
 		<div class="align-baseline">
-			<h3 ng-hide="editMode">Add {{label}}</h3>
-			<h3 ng-show="editMode">Modify {{label}}</h3>
+			<h3 ng-hide="eventController.editMode">Add Appointment</h3>
+			<h3 ng-show="eventController.editMode">Modify Appointment</h3>
 			<h4>with {{eventController.providerModel.displayName}}</h4>
 		</div>
 	</modal-title>
 	<modal-ctl-buttons>
-		<div class="modal-patient-links"
-		     ng-show="isPatientSelected()">
-			<button type="button" class="btn btn-xs btn-default"
-			        ng-click="eventController.openEncounterPage()">
-				<span class="">E</span>
-			</button>
-			<button type="button" class="btn btn-xs btn-default"
-			        ng-disabled="!eventController.hasAppointmentId()"
-			        ng-click="eventController.openBillingPage()">
-				<span class="">B</span>
-			</button>
-			<button type="button" class="btn btn-xs btn-default"
-			        ng-click="eventController.openMasterRecord()">
-				<span class="">M</span>
-			</button>
-			<button type="button" class="btn btn-xs btn-default"
-			        ng-click="eventController.openRxWindow()">
-				<span class="">Rx</span>
-			</button>
-		</div>
 		<button type="button" class="btn btn-icon" aria-label="Close"
 		        ng-click="eventController.cancel()"
 		        title="Cancel">
@@ -66,11 +46,6 @@
 					<a class="round-top-left" data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointment);">
 						Appointment</a>
 				</li>
-				<!-- tab temporarily removed -->
-				<%--<li>--%>
-					<%--<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.reoccurring);">--%>
-						<%--Reoccurring</a>--%>
-				<%--</li>--%>
 				<li>
 					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.history);">
 						History
@@ -79,7 +54,7 @@
 			</ul>
 		</div>
 		<form class="tabs-body"
-		      ng-submit="save()" ng-init="eventController.init()">
+		      ng-submit="save()">
 			<div class="alert-container">
 				<div class="row">
 					<ca-info-messages
@@ -91,15 +66,14 @@
 			</div>
 
 			<div id="tabAppointmentEdit" class="tab-pane"
-			     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)
-						|| eventController.isTabActive(eventController.tabEnum.reoccurring)">
+			     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)">
 
-				<div ng-show="!isInitialized() || isWorking()" ng-include="'src/common/spinner.jsp'"></div>
-				<div ng-show="isInitialized() && !isWorking()" class="row">
-					<div class="tab-bar-inputs form-horizontal">
-						<div class="col-sm-5">
-						</div>
-						<div class="col-sm-7">
+				<div ng-show="!isInitialized() || isWorking()"
+				     ng-include="'src/common/spinner.jsp'">
+				</div>
+				<div ng-show="isInitialized() && !isWorking()">
+					<div class="tab-bar-inputs form-row">
+						<div class="col-sm-8 pull-right">
 							<juno-appointment-status-select
 									ca-name="event-appt-status"
 									ca-no-label="true"
@@ -111,226 +85,175 @@
 							</juno-appointment-status-select>
 						</div>
 					</div>
-					<div class="col-md-12 form-horizontal">
-						<div class="row">
-							<div class="col-md-6">
-								<!-- patient search -->
-								<div class="form-group" title="Patient"
-								     ng-hide="eventData.doNotBook">
-									<label for="input-patient" class="col-md-2">
-										Patient
-									</label>
-									<juno-patient-search-typeahead
-											id="input-patient"
-											class="col-md-10"
-											juno-model="eventController.patientTypeahead"
-									>
-									</juno-patient-search-typeahead>
-								</div>
-								<div class="form-group" title="Patient"
-								     ng-show="eventData.doNotBook">
-									<label for="input-patient-dnb" class="col-md-2">
-										Patient
-									</label>
-									<div class="col-md-10">
-										<input type="text"
-										       id="input-patient-dnb"
-										       ng-readonly="true"
-										       class="form-control"
-										       value="Do Not Book"
-										/>
+					<div>
+						<div class="form-row">
+							<!-- patient search -->
+							<div class="form-group col-md-6" title="Patient"
+							     ng-hide="eventData.doNotBook">
+								<div class="row">
+									<div ng-class="{'col-md-8': eventController.showPatientChartLinks(),
+									                'col-md-12': !eventController.showPatientChartLinks() }">
+										<label class="control-label"
+										       for="input-patient">
+											Patient
+										</label>
+										<juno-patient-search-typeahead
+												id="input-patient"
+												juno-icon-right="true"
+												juno-model="eventController.patientTypeahead"
+										>
+										</juno-patient-search-typeahead>
+									</div>
+									<div class="col-md-4 lower-content padding-left-0"
+									     ng-if="eventController.showPatientChartLinks()">
+										<div class="btn-group modal-patient-links pull-right">
+											<button type="button" class="btn btn-default"
+											        ng-click="eventController.openEncounterPage()">
+												<span>E</span>
+											</button>
+											<button type="button" class="btn btn-default"
+											        ng-click="eventController.openBillingPage()">
+												<span>B</span>
+											</button>
+											<button type="button" class="btn btn-default"
+											        ng-click="eventController.openMasterRecord()">
+												<span>M</span>
+											</button>
+											<button type="button" class="btn btn-default"
+											        ng-click="eventController.openRxWindow()">
+												<span>Rx</span>
+											</button>
+										</div>
 									</div>
 								</div>
 							</div>
+							<div class="form-group col-md-6" title="Patient"
+							     ng-show="eventData.doNotBook">
+								<label class="control-label"
+								       for="input-patient-dnb">
+									Patient
+								</label>
+								<div>
+									<input type="text"
+									       id="input-patient-dnb"
+									       ng-readonly="true"
+									       class="form-control"
+									       value="Do Not Book"
+									/>
+								</div>
+							</div>
+							<!-- patient type/critical -->
 							<div class="col-md-6">
-								<!-- patient type/critical -->
-								<div class="form-group">
-									<label class="col-md-2">Type</label>
-									<div class="col-md-10">
-										<div class="row">
-											<div class="col-md-8">
-												<ca-field-select
-														ca-name="type"
-														ca-template="label"
-														ca-no-label="true"
-														ca-input-size="col-md-12"
-														ca-model="eventData.type"
-														ca-options="eventController.appointmentTypeList"
-														ca-empty-option="true"
-												>
-												</ca-field-select>
-											</div>
-											<div class="col-md-4">
-												<ca-field-boolean
-														ca-name="check-critical"
-														ca-title="Critical"
-														ca-label-size="col-md-5"
-														ca-input-size="col-md-7"
-														ca-model="eventData.critical"
-														ca-template="juno"
-												>
-												</ca-field-boolean>
-											</div>
-										</div>
+								<div class="row">
+									<div class="col-md-8">
+										<ca-field-select
+												ca-name="type"
+												ca-title="Appointment Type"
+												ca-template="label"
+												ca-model="eventData.type"
+												ca-options="eventController.appointmentTypeList"
+												ca-empty-option="true"
+										>
+										</ca-field-select>
+									</div>
+									<div class="col-md-4 lower-content">
+										<ca-field-boolean
+												ca-form-group-class="vertical-align"
+												ca-name="check-critical"
+												ca-title="Critical"
+												ca-label-size="col-md-6"
+												ca-input-size="col-md-6"
+												ca-model="eventData.critical"
+												ca-template="juno"
+										>
+										</ca-field-boolean>
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="row">
-							<div class="col-md-6 info-frame-container"
-							     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)">
-								<!-- patient details display -->
-								<div class="form-group label-top"
-								     ng-show="isPatientSelected()">
-									<label class="col-md-2">Demographic</label>
-									<div class="col-md-10">
-										<demographic-card
-												demographic-model="eventController.demographicModel.data">
-										</demographic-card>
-									</div>
+						<div class="form-row">
+							<div class="form-group col-md-6 info-frame-container">
+								<div ng-show="isPatientSelected()">
+									<label class="control-label">Demographic</label>
+									<demographic-card
+											demographic-model="eventController.demographicModel.data">
+									</demographic-card>
 								</div>
 							</div>
-							<!-- repeat booking units/period -->
-							<div class="col-md-6"
-							     ng-show="eventController.isTabActive(eventController.tabEnum.reoccurring)">
-								<div class="form-group">
-									<label class="col-md-2">Repeat</label>
-									<div class="col-md-10">
-										<div class="row">
-											<div class="col-md-4">
-												<ca-field-text
-														ca-name="repeat-units"
-														ca-title="Repeat"
-														ca-no-label="true"
-														ca-input-size="col-md-12"
-														ca-model="eventController.repeatBookingData.units"
-														ca-error="{{displayMessages.field_errors()['repeatUnits']}}"
-														ca-rows="1"
-												>
-												</ca-field-text>
-											</div>
-											<div class="col-md-6">
-												<ca-field-select
-														ca-name="repeat-period"
-														ca-title="period"
-														ca-template="label"
-														ca-no-label="true"
-														ca-input-size="col-md-12"
-														ca-model="eventController.repeatBookingData.period"
-														ca-options="eventController.repeatBooking.periodOptions"
-												>
-												</ca-field-select>
-											</div>
-										</div>
+							<div class="col-md-6 lower-content">
+								<div class="row">
+									<div class="col-md-5">
+										<ca-field-date
+												ca-title="Date"
+												ca-date-picker-id="select-date"
+												ca-name="startDate"
+												ca-model="eventData.startDate"
+												ca-error="{{displayMessages.field_errors()['startDate']}}"
+												ca-orientation="auto"
+										></ca-field-date>
+									</div>
+									<div class="col-md-4 padding-left-0">
+										<ca-field-time
+												ca-title="Time"
+												ca-name="startTime"
+												ca-model="eventData.startTime"
+												ca-error="{{displayMessages.field_errors()['startTime']}}"
+												ca-template="no_button"
+												ca-disable-widget="true"
+												ca-minute-step="parentScope.timeIntervalMinutes()">
+										</ca-field-time>
+									</div>
+									<div class="col-md-3 padding-left-0">
+										<ca-field-text
+												ca-title="Duration"
+												ca-name="duration"
+												ca-model="eventData.duration"
+												ca-error="{{displayMessages.field_errors()['duration']}}"
+												ca-rows="1">
+										</ca-field-text>
 									</div>
 								</div>
-							</div>
-							<div class="col-md-6">
-								<!-- date and time info/options -->
-								<div class="form-group label-top">
-									<label class="col-md-2">Session Date</label>
-									<div class="col-md-10">
-										<div class="row">
-											<div class="col-md-12">
-												<ca-field-date
-														ca-input-size="col-md-12"
-														ca-no-label="true"
-														ca-date-picker-id="select-date"
-														ca-name="startDate"
-														ca-model="eventData.startDate"
-														ca-error="{{displayMessages.field_errors()['startDate']}}"
-														ca-orientation="auto"
-												></ca-field-date>
-											</div>
-										</div>
-										<div class="row">
-											<div class="col-md-6">
-												<ca-field-text
-														ca-label-size="col-md-4"
-														ca-input-size="col-md-8"
-														ca-title="Duration"
-														ca-name="duration"
-														ca-model="eventData.duration"
-														ca-error="{{displayMessages.field_errors()['duration']}}"
-														ca-rows="1">
-												</ca-field-text>
-											</div>
-
-											<div class="col-md-6">
-												<ca-field-time
-														ca-label-size="col-md-4"
-														ca-input-size="col-md-8"
-														ca-title="Time"
-														ca-name="startTime"
-														ca-model="eventData.startTime"
-														ca-error="{{displayMessages.field_errors()['startTime']}}"
-														ca-template="no_button"
-														ca-disable-widget="true"
-														ca-minute-step="parentScope.timeIntervalMinutes()">
-												</ca-field-time>
-											</div>
-										</div>
+								<div class="row">
+									<div class="col-md-6">
+										<!-- reason type -->
+										<ca-field-select
+												ca-template="label"
+												ca-name="reason-code"
+												ca-title="Reason Type"
+												ca-model="eventData.reasonCode"
+												ca-options="eventController.reasonCodeList"
+												ca-empty-option="false"
+										>
+										</ca-field-select>
+									</div>
+									<div class="col-md-6 padding-left-0">
+										<!-- location/site -->
+										<ca-field-select
+												ca-hide="!eventController.sitesEnabled"
+												ca-name="site"
+												ca-title="Site"
+												ca-template="label"
+												ca-model="eventData.site"
+												ca-error="{{displayMessages.field_errors()['site']}}"
+												ca-options="eventController.siteOptions"
+										>
+										</ca-field-select>
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="row"
-						     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)">
+						<div class="form-row">
 							<!-- show patient alerts -->
-							<div class="col-md-6">
-								<div class="form-group">
-									<label class="col-md-2">
-									</label>
-									<div class="col-md-10">
-										<span class="form-control-static alert-message">{{eventController.demographicModel.data.alert}}</span>
-									</div>
-								</div>
-							</div>
-							<!-- show additional alerts -->
-							<div class="col-md-6">
+							<div class="col-md-12">
+								<span class="form-control-static alert-message">{{eventController.demographicModel.data.alert}}</span>
 							</div>
 						</div>
-						<div class="row"
-						     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)">
-							<div class="col-md-6">
-								<!-- location/site -->
-								<ca-field-select
-										ca-hide="!eventController.sitesEnabled"
-										ca-name="site"
-										ca-title="Site"
-										ca-template="label"
-										ca-label-size="col-md-2"
-										ca-input-size="col-md-10"
-										ca-model="eventData.site"
-										ca-error="{{displayMessages.field_errors()['site']}}"
-										ca-options="eventController.siteOptions"
-								>
-								</ca-field-select>
-							</div>
-							<div class="col-md-6">
-								<!-- reason type -->
-								<ca-field-select
-										ca-template="label"
-										ca-label-size="col-md-2"
-										ca-input-size="col-md-10"
-										ca-name="reason-code"
-										ca-title="Reason Type"
-										ca-model="eventData.reasonCode"
-										ca-options="eventController.reasonCodeList"
-										ca-empty-option="false"
-								>
-								</ca-field-select>
-							</div>
-						</div>
-						<div class="row"
-						     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)">
+						<div class="form-row">
 							<div class="col-md-6">
 								<!-- notes selection-->
 								<ca-field-text
 										ca-name="notes"
 										ca-title="Notes"
-										ca-label-size="col-md-2"
-										ca-input-size="col-md-10"
 										ca-model="eventData.notes"
 										ca-rows="1"
 								>
@@ -339,34 +262,11 @@
 							<div class="col-md-6">
 								<!-- reason -->
 								<ca-field-text
-										ca-label-size="col-md-2"
-										ca-input-size="col-md-10"
 										ca-title="Reason"
 										ca-name="event_reason"
 										ca-model="eventData.reason"
 										ca-rows="1">
 								</ca-field-text>
-							</div>
-						</div>
-
-						<!-- repeat booking units/period -->
-						<div class="row"
-						     ng-show="eventController.isTabActive(eventController.tabEnum.reoccurring)">
-							<div class="col-md-6">
-								<div class="form-group">
-									<label class="col-md-2">Ends</label>
-									<div class="col-md-10">
-										<ca-field-date
-												ca-input-size="col-md-12"
-												ca-no-label="true"
-												ca-date-picker-id="repeat-select-end-date"
-												ca-name="endDate"
-												ca-model="eventController.repeatBookingData.endDate"
-												ca-error="{{displayMessages.field_errors()['repeatEndDate']}}"
-												ca-orientation="auto"
-										></ca-field-date>
-									</div>
-								</div>
 							</div>
 						</div>
 					</div>
@@ -424,7 +324,7 @@
 					class="btn btn-default"
 					tooltip-placement="top"
 					tooltip-append-to-body="true"
-					uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+					uib-tooltip="{{eventController.keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 					ng-click="eventController.saveAndPrint()"
 					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Print
 			</button>
@@ -434,8 +334,8 @@
 					class="btn btn-primary"
 					tooltip-placement="top"
 					tooltip-append-to-body="true"
-					uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
-					ng-show="!editMode"
+					uib-tooltip="{{eventController.keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+					ng-show="!eventController.editMode"
 					ng-click="eventController.save()"
 					ng-class="{
 						'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
@@ -448,8 +348,8 @@
 					class="btn btn-primary"
 					tooltip-placement="top"
 					tooltip-append-to-body="true"
-					uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
-					ng-show="editMode"
+					uib-tooltip="{{eventController.keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+					ng-show="eventController.editMode"
 					ng-click="eventController.save()"
 					ng-class="{
 						'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),

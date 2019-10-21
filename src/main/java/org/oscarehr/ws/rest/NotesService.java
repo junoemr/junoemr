@@ -236,6 +236,12 @@ public class NotesService extends AbstractServiceImpl
 				note.setEformDataId(nd.getNoteId());
 				note.setNoteId(null);
 			}
+			else if (nd.isEncounterForm())
+			{
+				//TODO why is the note id fake and also the encounter form id???
+				note.setEncounterFormId(nd.getNoteId());
+				note.setNoteId(null);
+			}
 
 			note.setArchived(nd.isArchived());
 			note.setIsSigned(nd.isSigned());

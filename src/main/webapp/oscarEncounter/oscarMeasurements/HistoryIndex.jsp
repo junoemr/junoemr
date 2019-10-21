@@ -36,14 +36,31 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
-<%@ page import="oscar.oscarEncounter.pageUtil.*"%>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.*"%>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.*"%>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.data.*"%>
-<%@ page import="java.util.Vector"%>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler" %>
+<%@ page import="oscar.oscarEncounter.pageUtil.EctSessionBean" %>
 <%
     EctSessionBean bean = (EctSessionBean)request.getSession().getAttribute("EctSessionBean");
-    MeasurementMapConfig measurementMapConfig = new MeasurementMapConfig();
+
+	String demographicNo = request.getParameter("demographicNo");
+	if (demographicNo == null)
+	{
+		demographicNo = (String)request.getAttribute("demographicNo");
+	}
+    // If this hasn't been loaded into the global session yet, read what we can
+    if (request.getSession().getAttribute("measurementsData") == null)
+	{
+		if (demographicNo != null && !demographicNo.isEmpty())
+		{
+			EctMeasurementsDataBeanHandler handler = new EctMeasurementsDataBeanHandler(Integer.parseInt(demographicNo));
+			request.setAttribute("measurementsData", handler);
+		}
+	}
+    else
+	{
+		// legacy behavior
+		demographicNo = bean.getDemographicNo();
+	}
+
 %>
 
 <html:html locale="true">
@@ -89,7 +106,7 @@
 						property="typeDescription" /></td>
 					<td width="50"><a href="#"
 						name='<bean:message key="oscarEncounter.Index.oldMeasurements"/>'
-						onClick="popupPage(300,800,'SetupDisplayHistory.do?type=<bean:write name="data" property="type" />'); return false;">more...</a></td>
+						onClick="popupPage(300,800,'SetupDisplayHistory.do?demographicNo=<%=demographicNo%>&type=<bean:write name="data" property="type" />'); return false;">more...</a></td>
 				</tr>
 			</logic:iterate>
 		</logic:present>
@@ -105,10 +122,10 @@
 		if (MyOscarUtils.isMyOscarEnabled((String) session.getAttribute("user")))
 		{
 			MyOscarLoggedInInfo myOscarLoggedInInfo=MyOscarLoggedInInfo.getLoggedInInfo(session);
-			boolean enabledMyOscarButton=MyOscarUtils.isMyOscarSendButtonEnabled(myOscarLoggedInInfo, Integer.valueOf(bean.getDemographicNo()));
+			boolean enabledMyOscarButton=MyOscarUtils.isMyOscarSendButtonEnabled(myOscarLoggedInInfo, Integer.valueOf(demographicNo));
 
 			String sendDataPath = request.getContextPath() + "/phr/send_medicaldata_to_myoscar.jsp?"
-					+ "demographicId=" + bean.getDemographicNo() + "&"
+					+ "demographicId=" + demographicNo + "&"
 					+ "medicalDataType=Measurements" + "&"
 					+ "parentPage=" + request.getRequestURI(); 
 			%>

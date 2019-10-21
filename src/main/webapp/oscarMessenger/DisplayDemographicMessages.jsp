@@ -66,22 +66,8 @@ if (request.getParameter("moreMessages") != null){
    moreMessages=request.getParameter("moreMessages");
    }
 final int INITIAL_DISPLAY=20;
-%>
 
-<logic:notPresent name="msgSessionBean" scope="session">
-	<logic:redirect href="index.jsp" />
-</logic:notPresent>
-<logic:present name="msgSessionBean" scope="session">
-	<bean:define id="bean"
-		type="oscar.oscarMessenger.pageUtil.MsgSessionBean"
-		name="msgSessionBean" scope="session" />
-	<logic:equal name="bean" property="valid" value="false">
-		<logic:redirect href="index.jsp" />
-	</logic:equal>
-</logic:present>
-<%
-oscar.oscarMessenger.pageUtil.MsgSessionBean bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)pageContext.findAttribute("msgSessionBean");
-String demographic_no = bean.getDemographic_no();
+String demographic_no = request.getParameter("demographic_no");
 
 String demographic_name = "";
 if ( stripToNull(demographic_no) != null ) {
@@ -93,8 +79,7 @@ if ( stripToNull(demographic_no) != null ) {
 %>
 <jsp:useBean id="DisplayMessagesBeanId" scope="session"
 	class="oscar.oscarMessenger.pageUtil.MsgDisplayMessagesBean" />
-<% DisplayMessagesBeanId.setProviderNo(bean.getProviderNo());
-bean.nullAttachment();%>
+<% DisplayMessagesBeanId.setProviderNo(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());%>
 <jsp:setProperty name="DisplayMessagesBeanId" property="*" />
 <jsp:useBean id="ViewMessageForm" scope="session"
 	class="oscar.oscarMessenger.pageUtil.MsgViewMessageForm" />

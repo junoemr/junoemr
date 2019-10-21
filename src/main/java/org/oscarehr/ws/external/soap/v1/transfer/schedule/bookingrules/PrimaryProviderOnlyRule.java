@@ -27,7 +27,6 @@ import org.json.simple.JSONObject;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.schedule.model.ScheduleSearchResult;
 import org.oscarehr.util.SpringUtils;
 
 /**
@@ -53,12 +52,6 @@ public class PrimaryProviderOnlyRule extends BookingRule
     public Boolean isViolated(Appointment appointment)
     {
         return !appointment.getProviderNo().equals(demographicMRP);
-    }
-
-    @Override
-    public Boolean isViolated(ScheduleSearchResult result)
-    {
-        return !result.providerNo.equals(demographicMRP);
     }
 
     @Override

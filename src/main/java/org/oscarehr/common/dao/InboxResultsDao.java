@@ -394,64 +394,6 @@ public class InboxResultsDao
 					+ "AND proLR.status != 'X' "
 					+ filterSql;
 
-
-			sql += " UNION ALL "
-
-
-					// This side of the union is for HRM documents.  This is entirely untested because we don't
-					// have any example records.  It is included in the query because it is expected to be used soon.
-					+ "SELECT "
-					+ "  'HRM' AS result_type, "
-					+ "  hrm.id, "
-					+ "  hrm.id AS document_no, "
-					+ "  null AS status, "
-					+ "  null AS provider_no, "
-					+ "  null AS doctype, "
-					+ "  CAST(CASE WHEN d.demographic_no IS NULL THEN 0 ELSE 1 END as int) as has_demographic, "
-					+ "  d.last_name AS last_name, "
-					+ "  d.first_name AS first_name, "
-					+ "  d.hin AS hin, "
-					+ "  d.sex AS sex, "
-					+ "  d.demographic_no AS demographic_no, "
-					+ "  hrm.timeReceived AS observationdate, "
-					+ "  null AS description, "
-					+ "  null as update_date_time, "
-					+ "  null AS uploadedBy, "
-					+ "  null AS label, "
-					+ "  null AS result_status, "
-					+ "  null AS priority, "
-					+ "  null AS requesting_client, "
-					+ "  null AS discipline, "
-					+ "  null AS report_status, "
-					+ "  null AS accessionNum, "
-					+ "  null AS final_result_count, "
-					+ "  reportFile AS report_file "
-					+ "FROM HRMDocument hrm "
-					+ "LEFT JOIN HRMDocumentToProvider hrmtp ON hrm.id = hrmtp.hrmDocumentId "
-					+ "LEFT JOIN HRMDocumentToDemographic hrmtd ON hrm.id = hrmtd.hrmDocumentId "
-					+ "LEFT JOIN demographic d ON d.demographic_no = hrmtd.demographicNo "
-					+ "WHERE TRUE ";
-
-			if (!"".equals(patientFirstName)) {
-				sql = sql + "AND d.first_name LIKE :first_name ";
-				qp_hrm_first_name = true;
-			}
-
-			if (!"".equals(patientLastName)) {
-				sql = sql + "AND d.demographic_no LIKE :last_name ";
-				qp_hrm_last_name = true;
-			}
-
-			if (!"".equals(patientHealthNumber)) {
-				sql = sql + "AND d.hin LIKE :hin ";
-				qp_hrm_hin = true;
-			}
-
-			if (demographicNo != null && !"".equals(demographicNo)) {
-				sql = sql + "AND (d.demographic_no = :demographic_no) ";
-				qp_hrm_demographic_no = true;
-			}
-
 			sql = sql + "  "
 					+ "ORDER BY observationdate desc, document_no desc ";
 
@@ -477,10 +419,6 @@ public class InboxResultsDao
 			if (qp_start_date) { q.setParameter("start_date", startDate, TemporalType.DATE); }
 			if (qp_end_date) { q.setParameter("end_date", endDate, TemporalType.DATE); }
 			if (qp_demographic_no) { q.setParameter("demographic_no", demographicNo); }
-			if (qp_hrm_first_name) { q.setParameter("first_name", "%" + patientFirstName + "%"); }
-			if (qp_hrm_last_name) { q.setParameter("last_name", "%" + patientLastName + "%"); }
-			if (qp_hrm_hin) { q.setParameter("hin", "%" + patientHealthNumber + "%"); }
-			if (qp_hrm_demographic_no) { q.setParameter("demographic_no", demographicNo); }
 			if (qp_page) {
 				q.setParameter("page_start", page * pageSize);
 				q.setParameter("page_size", pageSize);

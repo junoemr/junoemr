@@ -28,9 +28,11 @@ import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
 import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.dao.DemographicIntegrationDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.model.DemographicIntegration;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
@@ -38,6 +40,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
+import org.oscarehr.ws.external.soap.v1.transfer.DemographicIntegrationTransfer;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,6 +63,9 @@ public class DemographicService
 
 	@Autowired
 	private DemographicDao demographicDao;
+
+	@Autowired
+	private DemographicIntegrationDao demographicIntegrationDao;
 
 	@Autowired
 	private DemographicArchiveDao demographicArchiveDao;
@@ -366,5 +372,19 @@ public class DemographicService
 		archiveDemographicRecord(demo);
 		demographicDao.merge(demo);
 		return demo;
+	}
+
+	public void addDemographicIntegrationRecord(Integer demographicNo, DemographicIntegrationTransfer transfer)
+	{
+		DemographicIntegration integrationRecord = new DemographicIntegration();
+		integrationRecord.setDemographicNo(demographicNo);
+		integrationRecord.setIntegrationType(transfer.getIntegrationType());
+		integrationRecord.setCreatedBySource(transfer.getCreatedBySource());
+		integrationRecord.setCreatedByRemoteId(transfer.getCreatedByRemoteId());
+		integrationRecord.setRemoteId(transfer.getRemoteId());
+		integrationRecord.setCreatedAt(new Date());
+		integrationRecord.setUpdatedAt(new Date());
+
+		demographicIntegrationDao.persist(integrationRecord);
 	}
 }

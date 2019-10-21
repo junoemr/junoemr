@@ -33,10 +33,13 @@ import java.util.Locale;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.rx.service.RxWatermarkService;
 import org.oscarehr.util.LocaleUtils;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.oscarehr.web.PrescriptionQrCodeUIBean;
 
 import com.lowagie.text.Document;
@@ -251,7 +254,16 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 			this.patientDOB=patientDOB;
 			this.sigDoctorName = sigDoctorName;
 			this.rxDate = rxDate;
-			this.promoText = OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT");
+
+			UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
+			if (userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT) == null)
+			{
+				this.promoText = OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT");
+			}
+			else
+			{
+				this.promoText = userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT).getValue();
+			}
 			this.origPrintDate = origPrintDate;
 			this.numPrint = numPrint;
 			if (promoText == null) {

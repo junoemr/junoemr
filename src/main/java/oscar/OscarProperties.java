@@ -522,6 +522,11 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("ENABLE_EDIT_APPT_STATUS");
 	}
 
+	public boolean isMultisiteEnabled()
+	{
+		return isPropertyActive("multisites");
+	}
+
 	public boolean isScheduleEnabled()
 	{
 		return isPropertyActive("schedule.enabled");

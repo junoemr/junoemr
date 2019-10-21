@@ -44,20 +44,6 @@ if(!authed) {
 	return;
 }
 %>
-
-
-<logic:notPresent name="msgSessionBean" scope="session">
-	<logic:redirect href="index.jsp" />
-</logic:notPresent>
-<logic:present name="msgSessionBean" scope="session">
-	<bean:define id="bean"
-		type="oscar.oscarMessenger.pageUtil.MsgSessionBean"
-		name="msgSessionBean" scope="session" />
-	<logic:equal name="bean" property="valid" value="false">
-		<logic:redirect href="index.jsp" />
-	</logic:equal>
-</logic:present>
-
 <link rel="stylesheet" type="text/css" href="encounterStyles.css">
 <html>
 <head>

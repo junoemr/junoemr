@@ -48,6 +48,11 @@
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+
+	<!-- Helper scripts for submission -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+
 <title><bean:message key="oscarEncounter.formRourke1.title" /></title>
 <html:base />
 <link rel="stylesheet" type="text/css" media="screen"
@@ -81,10 +86,12 @@
 //            ret = confirm("<bean:message key="oscarEncounter.formRourke1.msgSavePrintPreview"/>");
 //        }
 //        return ret;
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         window.print();
     }
     function onSave() {
         document.forms[0].submit.value="save";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret==true)
         {
@@ -95,6 +102,7 @@
     
     function onSaveExit() {
         document.forms[0].submit.value="exit";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret == true)
         {

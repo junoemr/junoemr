@@ -48,6 +48,11 @@
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+
+	<!-- Helper scripts for submission -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+
 <title>Mini Mental State Exam</title>
 <html:base />
 <link rel="stylesheet" type="text/css" href="mmseStyle.css" />
@@ -71,6 +76,7 @@
     }
     function onSave() {
         document.forms[0].submit.value="save";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = confirm("Are you sure you want to save this form?");
         
         return ret;
@@ -78,6 +84,7 @@
     
     function onSaveExit() {
         document.forms[0].submit.value="exit";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = confirm("Are you sure you wish to save and close this window?");
         
         return ret;
