@@ -286,7 +286,7 @@
 					<div class="pane repeat-options-pane">
 						<ca-field-toggle
 								ca-name="repeatBookingEnabled"
-								ca-title="Additional Bookings"
+								ca-title="Enable Repeat Booking"
 								ca-model="eventController.repeatBookingData.enabled"
 								ca-true-text="On"
 								ca-false-text="Off"
@@ -386,7 +386,7 @@
 							</div>
 							<div class="col-md-4">
 								<div class="form-group">
-									<label class="control-label">Bookings</label>
+									<label class="control-label">Repeats</label>
 								</div>
 							</div>
 						</div>
