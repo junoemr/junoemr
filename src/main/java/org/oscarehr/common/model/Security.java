@@ -25,19 +25,14 @@
 package org.oscarehr.common.model;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.EncryptionUtils;
 import org.oscarehr.util.MiscUtils;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;

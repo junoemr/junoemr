@@ -26,7 +26,6 @@ package org.oscarehr.integration.dao;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.integration.model.Integration;
 import org.springframework.stereotype.Repository;
-import oscar.util.StringUtils;
 
 import javax.persistence.Query;
 import java.util.List;

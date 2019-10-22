@@ -28,7 +28,6 @@ import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.UserIntegrationAccess;
 import org.springframework.stereotype.Repository;
-import oscar.util.StringUtils;
 
 import javax.persistence.Query;
 
