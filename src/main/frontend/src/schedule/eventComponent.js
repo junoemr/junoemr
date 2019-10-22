@@ -90,6 +90,7 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.repeatBooking =
 				{
+					disabled: !securityService.getUser().superAdmin,
 					max_bookings_limit: 100,
 					toggleEnum: Object.freeze({
 						on: 'on',

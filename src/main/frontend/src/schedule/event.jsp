@@ -48,7 +48,7 @@
 					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointment);">
 						Appointment</a>
 				</li>
-				<li ng-if="!eventController.inEditMode()">
+				<li ng-if="!eventController.inEditMode() && !eventController.repeatBooking.disabled">
 					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.repeatBooking);">
 						Repeat Booking
 					</a>
@@ -286,7 +286,7 @@
 					<div class="pane repeat-options-pane">
 						<ca-field-toggle
 								ca-name="repeatBookingEnabled"
-								ca-title="Enable Repeat Booking"
+								ca-title="Additional Bookings"
 								ca-model="eventController.repeatBookingData.enabled"
 								ca-true-text="On"
 								ca-false-text="Off"
@@ -396,7 +396,7 @@
 					<div class="pane repeat-display-pane flex-column flex-grow">
 						<table ng-table="repeatBookingTable">
 							<tr ng-repeat="apptDate in eventController.repeatBookingDates">
-								<td data-title="'Appointment Date'">
+								<td data-title="'Additional Appointment Date(s)'">
 									{{ apptDate | date : eventController.formattedDate}}
 								</td>
 								<td class="action-column" header-class="'action-column'">
