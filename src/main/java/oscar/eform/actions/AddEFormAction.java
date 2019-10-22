@@ -32,15 +32,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.oscarehr.common.model.Demographic;
 import org.oscarehr.eform.exception.EFormMeasurementException;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.service.EFormDataService;
-import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.match.IMatchManager;
-import org.oscarehr.match.MatchManager;
-import org.oscarehr.match.MatchManagerException;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -252,18 +247,6 @@ public class AddEFormAction extends Action {
 				EForm curForm = new EForm(eForm);
 
 				EFormUtil.writeEformTemplate(LoggedInInfo.getLoggedInInfoFromSession(request), paramNames, paramValues, curForm, fdid, program_no, path);
-			}
-
-			IMatchManager matchManager = new MatchManager();
-			DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-			Demographic client = demographicManager.getDemographic(loggedInInfo, demographicNoStr);
-			try
-			{
-				matchManager.<Demographic>processEvent(client, IMatchManager.Event.CLIENT_CREATED);
-			}
-			catch(MatchManagerException e)
-			{
-				MiscUtils.getLogger().error("Error while processing MatchManager.processEvent(Client)", e);
 			}
 
 			// If there were unmapped measurements, we want to redirect back to the main eForm page
