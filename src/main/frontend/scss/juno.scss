@@ -29,6 +29,7 @@
 @import "directives/juno-checkbox";
 @import "directives/juno-select";
 @import "directives/juno-typeahead";
+@import "../src/common/directives/clinicaid/ca_field";
 @import "../src/common/components/junoLoadingIndicator";
 @import "../src/common/components/modal";
 @import "../src/common/components/zeroStateDisplay";
@@ -39,6 +40,7 @@
 @import "../src/schedule/schedule";
 @import "../src/dashboard/dashboard";
 @import "../src/patient/patient";
+@import "../src/patient/addDemographicModal/addDemographicModal";
 @import "../src/patient/demographicCard";
 @import "../src/report/reports";
 @import "../src/record/record";

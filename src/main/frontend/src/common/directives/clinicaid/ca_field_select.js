@@ -13,6 +13,7 @@ angular.module('Common').directive(
 		scope.options = '=caOptions';
 		scope.include_empty_option = '@caEmptyOption';
 		scope.no_label = '@caNoLabel';
+		scope.requiredField = '@caRequiredField';
 
 		var template_function = function template_function(element, attributes)
 		{
