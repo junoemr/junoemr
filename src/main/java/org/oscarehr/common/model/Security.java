@@ -56,7 +56,7 @@ public class Security extends AbstractModel<Integer> {
 	private String password;
 
 	@Column(name = "provider_no")
-	private Integer providerNo;
+	private String providerNo;
 
 	@Column(name = "pin")
 	private String pin;
@@ -143,11 +143,11 @@ public class Security extends AbstractModel<Integer> {
 	}
 
 	public String getProviderNo() {
-		return Integer.toString(providerNo);
+		return providerNo;
 	}
 
 	public void setProviderNo(String providerNo) {
-		this.providerNo = Integer.valueOf(providerNo);
+		this.providerNo = providerNo;
 	}
 
 	public String getPin() {

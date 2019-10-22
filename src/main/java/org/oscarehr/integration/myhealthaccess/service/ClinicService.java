@@ -98,7 +98,8 @@ public class ClinicService extends BaseService
 			String endpoint = formatEndpoint(ENDPOINT_LONG_TOKEN, clinicId);
 			accessToken = post(endpoint, apiKey, userLogin, ClinicUserTo1.class);
 		}
-		catch (BaseException e) {
+		catch (BaseException e)
+		{
 			ErrorHandler.handleError(e);
 		}
 

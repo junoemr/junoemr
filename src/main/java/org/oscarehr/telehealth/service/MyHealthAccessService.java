@@ -110,6 +110,7 @@ public class MyHealthAccessService
 
 	public IntegrationData createUserIntegration(IntegrationData integrationData, Security loggedInUser, ClinicUserLoginTo1 userLogin)
 	{
+
 		ClinicUserTo1 authUser = clinicService.getLongToken(integrationData, userLogin);
 
 		UserIntegrationAccess integrationAccess = new UserIntegrationAccess(

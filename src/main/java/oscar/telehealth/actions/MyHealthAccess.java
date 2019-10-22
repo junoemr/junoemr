@@ -99,7 +99,6 @@ public class MyHealthAccess extends DispatchAction
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		Security loggedInUser = loggedInInfo.getLoggedInSecurity();
-
 		String email = request.getParameter(Param.EMAIL);
 		String password = request.getParameter(Param.PASSWORD);
 
@@ -110,12 +109,19 @@ public class MyHealthAccess extends DispatchAction
 			if (!integrationData.userIntegrationExists())
 			{
 				Site site = integrationData.getIntegration().getSite();
-
-				String siteEmail = userSiteEmail(email, site);
 				String junoUserId = Integer.toString(loggedInUser.getId());
+				ClinicUserLoginTo1 userLogin = new ClinicUserLoginTo1(email, password, junoUserId);
 
-				ClinicUserLoginTo1 userLogin = new ClinicUserLoginTo1(siteEmail, password, junoUserId);
-				integrationData = myHealthAccessService.createUserIntegration(integrationData, loggedInUser, userLogin);
+				try
+				{
+					integrationData = myHealthAccessService.createUserIntegration(integrationData, loggedInUser, userLogin);
+				}
+				// Retry login with site shortname as email suffix if no login record is found
+				catch (RecordNotFoundException e)
+				{
+					userLogin.setEmail(userSiteEmail(email, site));
+					integrationData = myHealthAccessService.createUserIntegration(integrationData, loggedInUser, userLogin);
+				}
 			}
 
 			return getRemoteRedirect(integrationData, request);
