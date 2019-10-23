@@ -86,7 +86,7 @@
 									ca-template="label"
 									ca-name="hcType"
 									ca-title="HIN Type"
-									ca-model="$ctrl.newDemographicData.hinType"
+									ca-model="$ctrl.newDemographicData.hcType"
 									ca-options="$ctrl.provinces"
 									ca-empty-option="false"
 					>
@@ -126,7 +126,7 @@
 				<ca-field-text
 								ca-name="postal-code"
 								ca-title="Postal Code"
-								ca-model="$ctrl.newDemographicData.postalCode"
+								ca-model="$ctrl.newDemographicData.address.postal"
 								ca-rows="1"
 				>
 				</ca-field-text>

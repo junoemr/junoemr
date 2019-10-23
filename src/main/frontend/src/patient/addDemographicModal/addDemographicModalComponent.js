@@ -26,9 +26,9 @@ angular.module('Patient').component('addDemographicModal', {
 		ctrl.newDemographicData.address = {
 			address: "",
 			city: "",
-			province: ""
+			province: "BC",
+			postal: "",
 		};
-		ctrl.newDemographicData.postalCode = "";
 		ctrl.newDemographicData.email = "";
 		ctrl.newDemographicData.phone = "";
 

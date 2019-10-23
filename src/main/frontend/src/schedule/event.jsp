@@ -101,6 +101,8 @@
 												id="input-patient"
 												juno-icon-right="true"
 												juno-model="eventController.patientTypeahead"
+												juno-add-button-title="New Demographic"
+												juno-on-add-fn="newDemographic"
 										>
 										</juno-patient-search-typeahead>
 									</div>
