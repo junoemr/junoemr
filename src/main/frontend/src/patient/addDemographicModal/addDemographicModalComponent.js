@@ -110,8 +110,6 @@ angular.module('Patient').component('addDemographicModal', {
 		{
 			if (ctrl.validateDemographic())
 			{
-				console.log("SAVING");
-				console.log(ctrl.newDemographicData);
 				ctrl.newDemographicData.dateOfBirth += "T00:00:00-07:00";
 				demographicService.saveDemographic(ctrl.newDemographicData).then(
 					function success(results)

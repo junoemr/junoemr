@@ -240,7 +240,6 @@ module.exports = {
 			'./src/layout/leftAsideComponent.js',
 
 			'./src/patient/module.js',
-			'./src/patient/newPatientController.js',
 			'./src/patient/addDemographicModal/addDemographicModalComponent.js',
 			'./src/patient/demographicCardComponent.js',
 
