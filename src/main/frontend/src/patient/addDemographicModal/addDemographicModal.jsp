@@ -15,44 +15,52 @@
 		<div class="col-xs-6 flex flex-row justify-content-center">
 			<div class="left-column-container">
 				<!-- LAST NAME -->
-				<ca-field-text
-					ca-name="lastName"
-					ca-title="Last Name"
-					ca-model="$ctrl.newDemographicData.lastName"
-					ca-rows="1"
-					ca-required-field="true"
-				>
+				<div ng-class="{'invalid-field': $ctrl.invalidLastName}">
+					<ca-field-text
+						ca-name="lastName"
+						ca-title="Last Name"
+						ca-model="$ctrl.newDemographicData.lastName"
+						ca-rows="1"
+						ca-required-field="true"
+					>
+					</ca-field-text>
+				</div>
 				<!-- FIRST NAME -->
-				</ca-field-text>
-				<ca-field-text
-								ca-name="firstName"
-								ca-title="First Name"
-								ca-model="$ctrl.newDemographicData.firstName"
-								ca-rows="1"
-								ca-required-field="true"
-				>
-				</ca-field-text>
+				<div ng-class="{'invalid-field': $ctrl.invalidFirstName}">
+					<ca-field-text
+									ca-name="firstName"
+									ca-title="First Name"
+									ca-model="$ctrl.newDemographicData.firstName"
+									ca-rows="1"
+									ca-required-field="true"
+					>
+					</ca-field-text>
+				</div>
 				<!-- GENDER -->
-				<ca-field-select
-								ca-template="label"
-								ca-name="gender"
-								ca-title="Gender"
-								ca-model="$ctrl.newDemographicData.gender"
-								ca-options="$ctrl.genders"
-								ca-empty-option="false"
-								ca-required-field="true"
-				>
-				</ca-field-select>
+				<div ng-class="{'invalid-field': $ctrl.invalidSex}">
+					<ca-field-select
+									ca-template="label"
+									ca-name="gender"
+									ca-title="Gender"
+									ca-model="$ctrl.newDemographicData.sex"
+									ca-options="$ctrl.genders"
+									ca-empty-option="false"
+									ca-required-field="true"
+					>
+					</ca-field-select>
+				</div>
 				<!-- DOB -->
-				<ca-field-date
-								ca-title="Date of Birth"
-								ca-date-picker-id="dob"
-								ca-name="dob"
-								ca-model="$ctrl.newDemographicData.dob"
-								ca-orientation="auto"
-								ca-required-field="true"
-				>
-				</ca-field-date>
+				<div ng-class="{'invalid-field': $ctrl.invalidDob}">
+					<ca-field-date
+									ca-title="Date of Birth"
+									ca-date-picker-id="dob"
+									ca-name="dob"
+									ca-model="$ctrl.newDemographicData.dateOfBirth"
+									ca-orientation="auto"
+									ca-required-field="true"
+					>
+					</ca-field-date>
+				</div>
 				<!-- HIN -->
 				<div class="hin-fields">
 					<!-- HIN NUM-->
@@ -62,22 +70,21 @@
 									ca-title="Health Insurance Number"
 									ca-model="$ctrl.newDemographicData.hin"
 									ca-rows="1"
-									ca-required-field="true"
 					>
 					</ca-field-text>
 					<!-- HIN VER -->
 					<ca-field-text
 									class="ver"
-									ca-name="hinVer"
+									ca-name="ver"
 									ca-text-placeholder="Ver."
-									ca-model="$ctrl.newDemographicData.hinVer"
+									ca-model="$ctrl.newDemographicData.ver"
 									ca-rows="1"
 					>
 					</ca-field-text>
 					<!-- HIN TYPE -->
 					<ca-field-select
 									ca-template="label"
-									ca-name="hinType"
+									ca-name="hcType"
 									ca-title="HIN Type"
 									ca-model="$ctrl.newDemographicData.hinType"
 									ca-options="$ctrl.provinces"
@@ -93,7 +100,7 @@
 				<ca-field-text
 								ca-name="address"
 								ca-title="Address"
-								ca-model="$ctrl.newDemographicData.address"
+								ca-model="$ctrl.newDemographicData.address.address"
 								ca-rows="1"
 				>
 				</ca-field-text>
@@ -101,7 +108,7 @@
 				<ca-field-text
 								ca-name="city"
 								ca-title="City"
-								ca-model="$ctrl.newDemographicData.City"
+								ca-model="$ctrl.newDemographicData.address.city"
 								ca-rows="1"
 				>
 				</ca-field-text>
@@ -110,7 +117,7 @@
 								ca-template="label"
 								ca-name="province"
 								ca-title="Province"
-								ca-model="$ctrl.newDemographicData.province"
+								ca-model="$ctrl.newDemographicData.address.province"
 								ca-options="$ctrl.provincesCA"
 								ca-empty-option="false"
 				>

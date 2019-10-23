@@ -4,6 +4,12 @@
 	.add-demographic-content {
 		padding: 10px;
 
+		.invalid-field {
+			input, select{
+				border: 1px solid $color-red-base;
+			}
+		}
+
 		.right-column-container {
 			flex: 0 0 75%;
 		}
