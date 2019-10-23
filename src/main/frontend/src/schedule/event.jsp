@@ -22,7 +22,9 @@
 	Canada
 
 --%>
-<juno-modal id="schedule-modal">
+<juno-modal id="schedule-modal"
+            show-loading="eventController.isWorking()"
+>
 	<modal-title>
 		<i class="icon icon-modal-header icon-calendar-add"></i>
 		<div class="align-baseline">
@@ -43,10 +45,15 @@
 		<div class="tabs-heading">
 			<ul class="nav nav-tabs round-top">
 				<li class="active">
-					<a class="round-top-left" data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointment);">
+					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointment);">
 						Appointment</a>
 				</li>
-				<li>
+				<li ng-if="!eventController.inEditMode() && !eventController.repeatBooking.disabled">
+					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.repeatBooking);">
+						Repeat Booking
+					</a>
+				</li>
+				<li ng-if="eventController.inEditMode()">
 					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.history);">
 						History
 					</a>
@@ -153,6 +160,7 @@
 												ca-model="eventData.type"
 												ca-options="eventController.appointmentTypeList"
 												ca-empty-option="true"
+												ca-text-placeholder="Select an Appointment Type"
 										>
 										</ca-field-select>
 									</div>
@@ -173,12 +181,12 @@
 						</div>
 						<div class="form-row">
 							<div class="form-group col-md-6 info-frame-container">
-								<div ng-show="isPatientSelected()">
-									<label class="control-label">Demographic</label>
-									<demographic-card
-											demographic-model="eventController.demographicModel.data">
-									</demographic-card>
-								</div>
+								<label class="control-label">Demographic</label>
+								<demographic-card
+										demographic-model="eventController.demographicModel.data"
+										disabled="!isPatientSelected()"
+								>
+								</demographic-card>
 							</div>
 							<div class="col-md-6 lower-content">
 								<div class="row">
@@ -272,6 +280,137 @@
 					</div>
 				</div>
 			</div>
+			<div id="tabRepeatBooking" class="tab-pane"
+			     ng-show="eventController.isTabActive(eventController.tabEnum.repeatBooking)">
+				<div class="flex-row pane-container">
+					<div class="pane repeat-options-pane">
+						<ca-field-toggle
+								ca-name="repeatBookingEnabled"
+								ca-title="Enable Repeat Booking"
+								ca-model="eventController.repeatBookingData.enabled"
+								ca-true-text="On"
+								ca-false-text="Off"
+								ca-true-value="{{eventController.repeatBooking.toggleEnum.on}}"
+								ca-false-value="{{eventController.repeatBooking.toggleEnum.off}}"
+								ca-input-size="col-md-5"
+								ca-label-size="col-md-7"
+						>
+						</ca-field-toggle>
+
+						<div class="vertical-divider-sm"></div>
+						<div class="row">
+							<div class="col-md-8">
+								<ca-field-select
+										ca-name="repeatSelectInterval"
+										ca-title="Interval"
+										ca-template="label"
+										ca-model="eventController.repeatBookingData.interval"
+										ca-error="{{displayMessages.field_errors()['repeatSelectInterval']}}"
+										ca-options="eventController.repeatBooking.intervalOptions"
+										ca-disabled="!eventController.isRepeatBookingEnabled()"
+								>
+								</ca-field-select>
+							</div>
+							<div class="col-md-4">
+								<ca-field-select
+										ca-name="repeatSelectFrequency"
+										ca-title="Frequency"
+										ca-template="label"
+										ca-model="eventController.repeatBookingData.frequency"
+										ca-error="{{displayMessages.field_errors()['repeatSelectFrequency']}}"
+										ca-options="eventController.repeatBooking.frequencyOptions"
+										ca-disabled="!eventController.isRepeatBookingEnabled()"
+								>
+								</ca-field-select>
+							</div>
+						</div>
+						<div class="vertical-divider-md"></div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="form-group">
+									<label class="control-label">Ends</label>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-4">
+								<ca-field-radio
+										ca-form-group-class="vertical-align"
+										ca-name="repeat-radio-1"
+										ca-title="On"
+										ca-label-size="col-md-6"
+										ca-input-size="col-md-6"
+										ca-model="eventController.repeatBookingData.endType"
+										ca-value="{{eventController.repeatBooking.endTypeEnum.date}}"
+										ca-disabled="!eventController.isRepeatBookingEnabled()"
+								>
+								</ca-field-radio>
+							</div>
+							<div class="col-md-8">
+								<ca-field-date
+										ca-form-group-class="vertical-align"
+										ca-date-picker-id="repeat-end-on-date"
+										ca-name="repeatEndOnDate"
+										ca-model="eventController.repeatBookingData.endDate"
+										ca-error="{{displayMessages.field_errors()['repeatEndOnDate']}}"
+										ca-orientation="auto"
+										ca-disabled="!eventController.isRepeatBookingEnabled() || !eventController.isRepeatBookingEndTypeDate()"
+								></ca-field-date>
+							</div>
+						</div>
+						<div class="vertical-divider-lg"></div>
+						<div class="row">
+							<div class="col-md-4">
+								<ca-field-radio
+										ca-form-group-class="vertical-align"
+										ca-name="repeat-radio-2"
+										ca-title="After"
+										ca-label-size="col-md-6"
+										ca-input-size="col-md-6"
+										ca-model="eventController.repeatBookingData.endType"
+										ca-value="{{eventController.repeatBooking.endTypeEnum.after}}"
+										ca-disabled="!eventController.isRepeatBookingEnabled()"
+								>
+								</ca-field-radio>
+							</div>
+							<div class="col-md-4">
+								<ca-field-text
+										ca-form-group-class="vertical-align"
+										ca-name="repeatEndAfterNumber"
+										ca-model="eventController.repeatBookingData.endAfterNumber"
+										ca-error="{{displayMessages.field_errors()['repeatEndAfterNumber']}}"
+										ca-disabled="!eventController.isRepeatBookingEnabled() || !eventController.isRepeatBookingEndTypeAfter()"
+										<%--ca-max-characters="3"--%>
+								>
+								</ca-field-text>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<label class="control-label">Repeats</label>
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+					<div class="pane repeat-display-pane flex-column flex-grow">
+						<table ng-table="repeatBookingTable">
+							<tr ng-repeat="apptDate in eventController.repeatBookingDates">
+								<td data-title="'Additional Appointment Date(s)'">
+									{{ apptDate | date : eventController.formattedDate}}
+								</td>
+								<td class="action-column" header-class="'action-column'">
+									<button class="btn btn-xs btn-default"
+									        ng-click="eventController.removeRepeatBookingDate(apptDate)"
+									>
+										Remove
+									</button>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
 			<div id="tabAppointmentHistory" class="tab-pane"
 			     ng-show="eventController.isTabActive(eventController.tabEnum.history)">
 
@@ -316,7 +455,7 @@
 					type="button"
 					class="btn btn-default"
 					ng-click="eventController.saveAndReceipt()"
-					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Receipt
+					ng-disabled="isWorking() || eventController.isDoubleBookPrevented || !isPatientSelected()">Receipt
 			</button>
 
 			<button
@@ -326,7 +465,7 @@
 					tooltip-append-to-body="true"
 					uib-tooltip="{{eventController.keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 					ng-click="eventController.saveAndPrint()"
-					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Print
+					ng-disabled="isWorking() || eventController.isDoubleBookPrevented || !isPatientSelected()">Print
 			</button>
 
 			<button

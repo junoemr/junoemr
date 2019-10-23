@@ -1,4 +1,7 @@
 .fax-config {
+	.switch {
+		@include juno-toggle-switch(32px, 4px, .4s);
+	}
   .fax-config-header {
 	padding: 15px;
   }
@@ -42,6 +45,9 @@
   left: auto !important;
 }
 .faxEditModal {
+	.switch {
+		@include juno-toggle-switch(32px, 4px, .4s);
+	}
   .modal-content {
 	background-color: $color-primary-base;
   }

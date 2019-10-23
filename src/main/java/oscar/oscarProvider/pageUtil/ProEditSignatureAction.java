@@ -52,7 +52,11 @@ public class ProEditSignatureAction extends Action {
         
         ProSignatureData sigData = new ProSignatureData();
         String sig = frm.getSignature();
-        sigData.enterSignature(providerNo, sig);
+
+        synchronized (this)
+        {
+            sigData.enterSignature(providerNo, sig);
+        }
         
 
  
