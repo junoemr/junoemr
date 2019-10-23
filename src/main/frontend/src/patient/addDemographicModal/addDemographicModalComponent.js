@@ -5,7 +5,18 @@ angular.module('Patient').component('addDemographicModal', {
 		modalInstance: "<",
 		resolve: "<",
 	},
-	controller:[ '$scope', 'staticDataService', 'demographicService','programService', function ($scope, staticDataService, demographicService, programService)
+	controller:[
+		'$scope',
+		'staticDataService',
+		'demographicService',
+		'programService',
+		'providerService',
+		function (
+			$scope,
+			staticDataService,
+			demographicService,
+			programService,
+			providerService)
 	{
 		let ctrl = this;
 		ctrl.genders = staticDataService.getGenders();
@@ -52,6 +63,20 @@ angular.module('Patient').component('addDemographicModal', {
 			{
 				console.log(errors);
 			}
+		);
+
+		// set defaults based on provider settings
+		providerService.getSettings().then(
+				function success(result)
+				{
+					console.log(result);
+					ctrl.newDemographicData.hcType = result.defaultHcType;
+					ctrl.newDemographicData.sex = result.defaultSex;
+				},
+				function error(errors)
+				{
+					console.error("Failed to fetch Provider settings with error: " + errors);
+				}
 		);
 
 		ctrl.validateDemographic = function ()
@@ -110,7 +135,7 @@ angular.module('Patient').component('addDemographicModal', {
 		{
 			if (ctrl.validateDemographic())
 			{
-				ctrl.newDemographicData.dateOfBirth += "T00:00:00-07:00";
+				ctrl.newDemographicData.dateOfBirth += "T00:00:00" + Juno.Common.Util.getUserISOTimezoneOffset();
 				demographicService.saveDemographic(ctrl.newDemographicData).then(
 					function success(results)
 					{
