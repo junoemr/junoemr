@@ -22,11 +22,8 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
-import com.sun.xml.txw2.annotation.XmlElement;
-
 import java.io.Serializable;
 
-@XmlElement
 public class AdminNavItemTo1 implements Serializable
 {
 	private String name;
