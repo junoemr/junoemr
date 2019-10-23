@@ -21,26 +21,19 @@
  * Canada
  */
 
-package org.oscarehr.integration.myhealthaccess.dto;
+package org.oscarehr.integration.myhealthaccess.exception;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.io.Serializable;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ClinicUserAccessTokenTo1 implements Serializable
+public class InvalidIntegrationException extends Exception
 {
-	@JsonProperty("access_token")
-	private String token;
+	public final static String NO_INTEGRATION_MHA = "No active MyHealthAccess integration found";
 
-	public String getToken()
+	public InvalidIntegrationException()
 	{
-		return token;
+		super();
 	}
 
-	public void setToken(String token)
+	public InvalidIntegrationException(String s)
 	{
-		this.token = token;
+		super(s);
 	}
 }

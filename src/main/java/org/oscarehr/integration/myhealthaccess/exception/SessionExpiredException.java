@@ -21,23 +21,17 @@
  * Canada
  */
 
-package org.oscarehr.integration.myhealthaccess.dto;
+package org.oscarehr.integration.myhealthaccess.exception;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class ClinicUserCreateTo1 extends ClinicUserTo1
+public class SessionExpiredException extends IllegalArgumentException
 {
-
-	@JsonProperty(value="access_token")
-	String accessToken;
-
-	public String getAccessToken()
+	public SessionExpiredException()
 	{
-		return accessToken;
+		super();
 	}
 
-	public void setAccessToken(String accessToken)
+	public SessionExpiredException(String s)
 	{
-		this.accessToken = accessToken;
+		super(s);
 	}
 }
