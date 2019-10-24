@@ -129,10 +129,11 @@ public class CaseManagementPrint {
 		{
 			cpp = getIssueNotesToPrint(providerNo, demoNo);
 		}
-
+		String demographicNumber4Rx = null;
 		List<CaseManagementNote> othermeds = null;
 		if (printRx)
 		{
+			demographicNumber4Rx = demoNo;
 			// If we haven't already pulled out the OMeds issues, do so now
 			if (cpp == null)
 			{
@@ -164,7 +165,7 @@ public class CaseManagementPrint {
 			CaseManagementPrintPdf printer = new CaseManagementPrintPdf(request, out);
 			printer.printDocHeaderFooter();
 			printer.printCPP(cpp);
-			printer.printRx(demoNo, othermeds);
+			printer.printRx(demographicNumber4Rx, othermeds);
 			printer.printNotes(notes);
 
 			/* check extensions */
