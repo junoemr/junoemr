@@ -62,7 +62,15 @@ public class LabResultData implements Comparable<LabResultData> {
 	public static final String Spire = "Spire";
 	public static final String ALPHAHL7 = "ALPHA";
 	public static final String TRUENORTH = "TRUENORTH";
-	
+
+	public static final String STATUS_ABNORMAL = "Abnormal";
+	public static final String STATUS_CORRECTED = "Corrected";
+	public static final String STATUS_FINAL = "Final";
+	public static final String STATUS_CANCELLED = "Cancelled";
+	public static final String STATUS_PRELIMINARY = "Preliminary";
+	public static final String STATUS_UNKNOWN = "Unknown";
+	public static final String STATUS_DEFAULT = "Partial";
+
 	//HL7TEXT handles all messages types recieved as a hl7 formatted string
 	public static String HL7TEXT = "HL7";
 
@@ -166,6 +174,47 @@ public class LabResultData implements Comparable<LabResultData> {
 
 	}
 
+	/**
+	 * Check what status the report in question is and return the appropriate display string.
+	 * @return associated string with class's stored status, default one if we cannot match
+	 */
+	public String getDisplayStatus()
+	{
+		if (isAbnormal())
+		{
+			return STATUS_ABNORMAL;
+		}
+
+		// Doing this first to ensure that AHS pathologies still display Unknown as expected
+		if (isUnknown())
+		{
+			return STATUS_UNKNOWN;
+		}
+
+		if (isReportCancelled())
+		{
+			return STATUS_CANCELLED;
+		}
+
+		if (isCorrected())
+		{
+			return STATUS_CORRECTED;
+		}
+
+		if (isFinal())
+		{
+			return STATUS_FINAL;
+		}
+
+		if (isReportPreliminary())
+		{
+			return STATUS_PRELIMINARY;
+		}
+
+
+		return STATUS_DEFAULT;
+	}
+
 	// Relevant for Alberta Health Services as they are not currently sending any abnormal indications
 	// in their pathologies. We want to flag them all as "Unknown" so user notices and hopefully reads
 	public boolean isUnknown()
@@ -206,6 +255,11 @@ public class LabResultData implements Comparable<LabResultData> {
 	public boolean isReportCancelled()
 	{
 		return cancelledReport ;
+	}
+
+	public boolean isReportPreliminary()
+	{
+		return reportStatus.equals("P");
 	}
 
 	public boolean isMDS()
