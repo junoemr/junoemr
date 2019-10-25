@@ -1390,7 +1390,6 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                    	String obrName = handler.getOBRName(j);
                                    	b1 = !obrFlag && !obrName.equals("");
-                                   	b2 = !(obxName.contains(obrName));
 
                                    		if (isPDF)
 										{
