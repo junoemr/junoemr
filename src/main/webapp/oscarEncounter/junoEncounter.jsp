@@ -948,7 +948,7 @@
 
 			function notesIncrementAndLoadMore(demographicNo)
 			{
-				if (notesRetrieveOk && $("encMainDiv").scrollTop == 0)
+				if (notesRetrieveOk && $("encMainDiv").scrollTop <= 100)
 				{
 					notesRetrieveOk = false;
 					notesCurrentTop = $("encMainDiv").children[0].id;
@@ -959,7 +959,7 @@
 				}
 			}
 
-			function notesLoader(ctx, offset, numToReturn, demoNo, scrollToBottom)
+			function notesLoader(ctx, offset, numToReturn, demographicNo, scrollToBottom)
 			{
 				var deferred = jQuery.Deferred();
 				$("notesLoading").style.display = "inline";
@@ -968,12 +968,12 @@
 					type: "GET",
 					contentType: "application/json",
 					dataType: "json",
-					url: "../ws/rs/notes/" + demoNo + "/all?numToReturn=" + numToReturn+ "&offset=" + offset,
+					url: "../ws/rs/notes/" + demographicNo + "/all?numToReturn=" + numToReturn+ "&offset=" + offset,
 					success: function(response)
 					{
 
 						$("notesLoading").style.display = "none";
-						displayNotes(response.body.notelist, scrollToBottom, offset);
+						displayNotes(demographicNo, response.body.notelist, scrollToBottom, offset);
 
 
 						if(typeof response !== undefined && 'body' in response)
@@ -993,7 +993,7 @@
 				return deferred.promise();
 			}
 
-			function displayNotes(noteArray, scrollToBottom, offset)
+			function displayNotes(demographicNo, noteArray, scrollToBottom, offset)
 			{
 				if(!jQuery.isArray(noteArray) || noteArray.length == 0)
 				{
@@ -1013,7 +1013,7 @@
 					}
 					else
 					{
-						noteNode = buildNonNoteEntry(containerDiv, index + offset, note);
+						noteNode = buildNonNoteEntry(containerDiv, index + offset, note, demographicNo);
 					}
 
 					if(firstNoteNode === null)
@@ -1077,18 +1077,31 @@
 				return appointmentNo;
 			}
 
-			function buildNonNoteEntry(containerDiv, index, note)
+			function buildNonNoteEntry(containerDiv, index, note, demographicNo)
 			{
 				var appointmentNo = getAppointmentNo();
 
 				var date = moment(note.observationDate);
 
+				var winName="junoEncounterFormWindow";
+
 				var onClickString = "";
 				if(note.eformData)
 				{
-					onClickString = "popupPage(700,800,'1689724085','/eform/efmshowform_data.jsp" +
-						"?appointment=" + appointmentNo +
-						"&amp;fdid=" + note.eformDataId + "');";
+					onClickString = "popupPage(700,800,'" + winName + "','/eform/efmshowform_data.jsp" +
+						"?appointment=" + encodeURIComponent(appointmentNo) +
+						"&amp;fdid=" + encodeURIComponent(note.eformDataId) + "');";
+				}
+				else if(note.encounterForm)
+				{
+
+					var url = "../form/forwardshortcutname.jsp" +
+						"?formname=" + encodeURIComponent(note.note) +
+						"&demographic_no=" + encodeURIComponent(demographicNo) +
+						"&appointmentNo=" + encodeURIComponent(appointmentNo) +
+						"&formId=" + encodeURIComponent(note.noteId);
+
+					onClickString = "popupPage(700,800,'" + winName + "','" + url + "');";
 				}
 
 				var templateParameters = {
@@ -1141,11 +1154,21 @@
 			function buildNoteEntry(containerDiv, index, note)
 			{
 				var date = moment(note.observationDate);
+				var hideBeforeMoment = moment('${junoEncounterForm.header.encounterNoteHideBeforeDate}');
+				var observationMoment = moment(note.observationDate);
+
+				if(hideBeforeMoment.isAfter(observationMoment))
+				{
+					var minimizeStyles = 'overflow: hidden; height: 1.1em;';
+					minimizeStyles: minimizeStyles
+				}
+
 				var templateParameters = {
 					index: index,
 					note: note,
 					noteLineArray: note.note.split("\n"),
-					formattedObservationDate: date.format('DD-MMM-YYYY H:mm')
+					formattedObservationDate: date.format('DD-MMM-YYYY H:mm'),
+					collapseNote: hideBeforeMoment.isAfter(observationMoment)
 				};
 
 				var newNode = jQuery('#encounterNoteTemplate').tmpl(templateParameters);
@@ -1379,6 +1402,41 @@
 				$("issueChange").value = true;
 			}
 
+			function minView(e, nodeId)
+			{
+				toggleShrunkNote(e, nodeId, true);
+			}
+
+			function maxView(e, nodeId)
+			{
+				toggleShrunkNote(e, nodeId, false);
+			}
+
+			function toggleShrunkNote(e, nodeId, shrink)
+			{
+				//var txt = Event.element(e).parentNode.id;
+				var noteDivId = "n" + nodeId;
+				var noteTxtId = "txt" + nodeId;
+
+				if(shrink)
+				{
+					Element.remove("quitImg" + nodeId);
+
+					$(noteTxtId).addClassName("collapse");
+
+					var maximizeImageTag = "<img title='Maximize Display' alt='Maximize Display' id='xpImg" + nodeId + "' name='expandViewTrigger' onclick='maxView(event, \"" + nodeId + "\")' style='float:right; margin-right:5px; margin-top: 2px;' src='" + ctx + "/oscarEncounter/graphics/triangle_down.gif'>";
+					new Insertion.Top(noteDivId, maximizeImageTag);
+				}
+				else
+				{
+					Element.remove("xpImg" + nodeId);
+
+					$(noteTxtId).removeClassName("collapse");
+
+					var minimizeImageTag = "<img id='quitImg" + nodeId + "' onclick='minView(event, \"" + nodeId + "\")' style='float:right; margin-right:5px; margin-top: 2px;' src='" + ctx + "/oscarEncounter/graphics/triangle_up.gif'>";
+					new Insertion.Top(noteDivId, minimizeImageTag);
+				}
+			}
 
 			function init()
 			{
@@ -1464,7 +1522,7 @@
 					notesScrollCheckInterval = setInterval(function()
 					{
 						notesIncrementAndLoadMore(demographicNo)
-					}, 500);
+					}, 50);
 				});
 
 
@@ -1656,7 +1714,7 @@
 
 								<a style="color:#ddddff;" href="#" onclick="return showHistory('\${note.noteId}', event);">\${note.revision}</a>
 							{{/if}}
-							{{if note.eformData}}
+							{{if note.eformData || note.encounterForm}}
 								<a class="links" title="View eForm" id="viewEFORM122582" href="#"
 									onclick="\${onClickString};return false;"
 									style="float: right; margin-right: 5px; font-size: 10px;"> View </a>
@@ -1669,7 +1727,7 @@
 
 		<script id="encounterNoteTemplate" type="text/x-jquery-tmpl">
 
-			<div id="nc\${index}" style="display: block; padding-top: 0px; padding-bottom: 0px;" class="note noteRounded _nifty">
+			<div id="nc\${index}" style="display: block; padding-top: 0px; padding-bottom: 0px;" class="note noteRounded _nifty junoEncounterNote">
 				<b class="artop" style="background-color: transparent;">
 					<b class="re1" style="background-color: rgb(204, 204, 204); border-color: rgb(0, 0, 0);"></b>
 					<b class="re2" style="background-color: rgb(204, 204, 204); border-color: rgb(0, 0, 0);"></b>
@@ -1684,7 +1742,22 @@
 
 				<div id="n\${index}" style="border-left: 1px solid rgb(0, 0, 0); border-right: 1px solid rgb(0, 0, 0);">
 
-					<img title="Minimize Display" id="quitImg\${index}" alt="Minimize Display" onclick="minView(event)" style="float: right; margin-right: 5px; margin-bottom: 3px; margin-top: 2px;" src="/oscarEncounter/graphics/triangle_up.gif" />
+					{{if collapseNote}}
+						<img title="Maximize Display"
+							alt="Maximize Display"
+							id="xpImg\${index}"
+							name="expandViewTrigger"
+							onclick="maxView(event, '\${index}')"
+							style="float:right; margin-right:5px; margin-top: 2px;"
+							src="\${context}/oscarEncounter/graphics/triangle_down.gif">
+					{{else}}
+						<img title="Minimize Display"
+							id="quitImg\${index}"
+							alt="Minimize Display"
+							onclick="minView(event, '\${index}')"
+							style="float: right; margin-right: 5px; margin-bottom: 3px; margin-top: 2px;"
+							src="\${context}/oscarEncounter/graphics/triangle_up.gif" />
+					{{/if}}
 
 					<img title="Print" id="print\${index}" alt="Toggle Print Note" onclick="togglePrint('671920'   , event)" style="float: right; margin-right: 5px; margin-top: 2px;" src="/oscarEncounter/graphics/printer.png" />
 
@@ -1700,7 +1773,12 @@
 					<div id="wrapper\${index}" style="clear:right;">
 
 
-						<div id="txt\${index}" style="display:inline-block;overflow-wrap:break-word;word-wrap:break-word;max-width:100%;">
+						<div
+							id="txt\${index}"
+							{{if collapseNote}}
+								class="collapse"
+							{{/if}}
+							style="display:inline-block;overflow-wrap:break-word;word-wrap:break-word;max-width:100%;">
 							{{each noteLineArray}}
 								\${$value}<br>
 							{{/each}}
@@ -2530,19 +2608,9 @@
 			<input tabindex="18" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/document-new.png"/>" id="newNoteImg" onclick="newNote(event); return false;" title='<bean:message key="oscarEncounter.Index.btnNew"/>'>&nbsp;
 			<input tabindex="19" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/note-save.png"/>" id="signSaveImg" onclick="document.forms['caseManagementEntryForm'].sign.value='on';Event.stop(event);return savePage('saveAndExit', '');" title='<bean:message key="oscarEncounter.Index.btnSignSave"/>'>&nbsp;
 			<input tabindex="20" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/verify-sign.png"/>" id="signVerifyImg" onclick="document.forms['caseManagementEntryForm'].sign.value='on';document.forms['caseManagementEntryForm'].verify.value='on';Event.stop(event);return savePage('saveAndExit', '');" title='<bean:message key="oscarEncounter.Index.btnSign"/>'>&nbsp;
-			<%--
-			// TODO: make this work (parts missing)
-			<%
-				if(bean.source == null)  {
-			%>
-					<input tabindex="21" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>" onclick="signSaveBill(event);" title='<bean:message key="oscarEncounter.Index.btnBill"/>'>&nbsp;
-				<%
-					}
-				%>
-		--%>
-
-
-
+			<c:if test="${not empty junoEncounterForm.header.source}">
+				<input tabindex="21" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>" onclick="signSaveBill(event);" title='<bean:message key="oscarEncounter.Index.btnBill"/>'>&nbsp;
+			</c:if>
 	    	<input tabindex="23" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/system-log-out.png"/>" onclick='closeEnc(event);return false;' title='<bean:message key="global.btnExit"/>'>&nbsp;
 	    	<input tabindex="24" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/document-print.png"/>" onclick="return printSetup(event);" title='<bean:message key="oscarEncounter.Index.btnPrint"/>' id="imgPrintEncounter">
     	</span>

@@ -189,7 +189,9 @@ public class EncounterService
 			boolean rosterDateEnabled,
 			Date rosterDate,
 			String appointmentNo,
-			String contextPath
+			String contextPath,
+			String source,
+			Date encounterNoteHideBeforeDate
 	)
 			throws UnsupportedEncodingException
 	{
@@ -321,6 +323,8 @@ public class EncounterService
 		encounterHeader.setImageMissingPlaceholderUrl(contextPath + ClientImage.imageMissingPlaceholderUrl);
 
 		encounterHeader.setAppointmentNo(appointmentNo);
+		encounterHeader.setSource(source);
+		encounterHeader.setEncounterNoteHideBeforeDate(encounterNoteHideBeforeDate);
 
 		return encounterHeader;
 	}

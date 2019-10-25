@@ -124,7 +124,7 @@ int maxId = 0;
 		UserProperty uProp = (UserProperty) session.getAttribute(UserProperty.STALE_NOTEDATE);
 
 		Date dStaleDate;
-		int numToDisplay = 5;
+		int numToDisplay = 1;
 		int numDisplayed = 0;
 		Calendar cal = Calendar.getInstance();
 		if (uProp != null)
@@ -344,7 +344,7 @@ int maxId = 0;
 			 
 			<input type="hidden" id="signed<%=globalNoteId%>" value="<%=note.isSigned()%>" />
 			<input type="hidden" id="full<%=globalNoteId%>" value="<%=fulltxt || (note.getNoteId() !=null && note.getNoteId().equals(savedId))%>" />
-			<input type="hidden" id="bgColour<%=globalNoteId%>" value="<%=bgColour%>" /> 
+			<input type="hidden" id="bgColour<%=globalNoteId%>" value="<%=bgColour%>" />
 			<input type="hidden" id="editWarn<%=globalNoteId%>" value="<%=editWarn%>" />
 
 	  		<div id="n<%=globalNoteId%>">

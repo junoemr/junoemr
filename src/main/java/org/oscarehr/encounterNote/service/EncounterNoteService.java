@@ -87,20 +87,30 @@ public class EncounterNoteService
 	@Autowired
 	DemographicDao demographicDao;
 
+	public CaseManagementNote getLatestUnsignedNote(Integer demographicNo)
+	{
+		// Get the latest note being edited.
+		// If there are no notes being edited, get the latest unsigned note.
+		// If there are still no unsigned notes, add an empty editable note.
+	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note)
 	{
 		return saveChartNote(note, null);
 	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note, String providerNo, Integer demographicNo)
 	{
 		return saveChartNote(note, null, providerNo, demographicNo);
 	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note, List<Issue> issueList, String providerNo, Integer demographicNo)
 	{
 		note.setDemographic(demographicDao.find(demographicNo));
 		note.setProvider(providerDataDao.find(providerNo));
 		return saveChartNote(note, issueList);
 	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note, List<Issue> issueList)
 	{
 		note.setIncludeIssueInNote(true);

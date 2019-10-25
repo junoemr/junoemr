@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Entity(name = "model.CaseManagementNote")
+@Entity(name = "model_CaseManagementNote")
 @Table(name = "casemgmt_note")
 public class CaseManagementNote extends AbstractModel<Long>
 {

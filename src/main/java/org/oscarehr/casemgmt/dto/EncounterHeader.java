@@ -23,6 +23,8 @@
 
 package org.oscarehr.casemgmt.dto;
 
+import java.util.Date;
+
 public class EncounterHeader
 {
 	private String userColour;
@@ -53,6 +55,8 @@ public class EncounterHeader
 	private String imagePresentPlaceholderUrl;
 	private String imageMissingPlaceholderUrl;
 	private String appointmentNo;
+	private String source;
+	private Date encounterNoteHideBeforeDate;
 
 
 	public String getUserColour()
@@ -333,6 +337,26 @@ public class EncounterHeader
 	public void setAppointmentNo(String appointmentNo)
 	{
 		this.appointmentNo = appointmentNo;
+	}
+
+	public String getSource()
+	{
+		return source;
+	}
+
+	public void setSource(String source)
+	{
+		this.source = source;
+	}
+
+	public Date getEncounterNoteHideBeforeDate()
+	{
+		return encounterNoteHideBeforeDate;
+	}
+
+	public void setEncounterNoteHideBeforeDate(Date encounterNoteHideBeforeDate)
+	{
+		this.encounterNoteHideBeforeDate = encounterNoteHideBeforeDate;
 	}
 
 	//=============================================================================

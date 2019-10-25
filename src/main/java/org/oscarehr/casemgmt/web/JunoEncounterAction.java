@@ -56,6 +56,7 @@ import org.oscarehr.casemgmt.service.EncounterTicklerService;
 import org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService;
 import org.oscarehr.casemgmt.web.formbeans.CaseManagementEntryFormBean;
 import org.oscarehr.casemgmt.web.formbeans.JunoEncounterFormBean;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -238,6 +241,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 
 		Locale locale = request.getLocale();
 
+
 		// Get data for the header
 		junoEncounterForm.setHeader(
 				encounterService.getEncounterHeader(
@@ -256,7 +260,9 @@ public class JunoEncounterAction extends DispatchActionSupport
 						encounterSessionBean.hasRosterDate(),
 						encounterSessionBean.rosterDate,
 						appointmentNo,
-						contextPath
+						contextPath,
+						encounterSessionBean.source,
+						getEncounterNoteHideBeforeDate(session)
 				)
 		);
 
@@ -497,6 +503,35 @@ public class JunoEncounterAction extends DispatchActionSupport
 		 */
 
 		return (mapping.findForward(ACTION_FORWARD_VIEW));
+	}
+
+	// Calculate the date before which all encounter notes are displayed collapsed
+	private Date getEncounterNoteHideBeforeDate(HttpSession session)
+	{
+		UserProperty uProp = (UserProperty) session.getAttribute(UserProperty.STALE_NOTEDATE);
+
+		Calendar cal = Calendar.getInstance();
+		if (uProp != null)
+		{
+			String strStaleDate = uProp.getValue();
+			if (strStaleDate.equalsIgnoreCase("A"))
+			{
+				cal.set(0, 1, 1);
+			} else if (strStaleDate.equalsIgnoreCase("0"))
+			{
+				cal.add(Calendar.MONTH, 1);
+			} else
+			{
+				int pastMths = Integer.parseInt(strStaleDate);
+				cal.add(Calendar.MONTH, pastMths);
+			}
+
+		} else
+		{
+			cal.add(Calendar.YEAR, -1);
+		}
+
+		return cal.getTime();
 	}
 
 /*	private EncounterSection getPreventionSection(LoggedInInfo loggedInInfo, String demographicNo, String title) throws FactException

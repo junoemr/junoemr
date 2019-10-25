@@ -22,10 +22,14 @@
  */
 package org.oscarehr.encounterNote.dao;
 
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.casemgmt.dto.EncounterCPPNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.common.dao.EncounterFormDao;
+import org.oscarehr.common.model.EncounterForm;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.to.model.NoteTo1;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +43,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
@@ -54,7 +59,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 	public CaseManagementNote findLatestByUUID(String uuid)
 	{
 		// select model name must match specified @Entity name in model object
-		String queryString = "SELECT x FROM model.CaseManagementNote x " +
+		String queryString = "SELECT x FROM model_CaseManagementNote x " +
 				"WHERE x.uuid=:uuid " +
 				"ORDER BY x.noteId DESC";
 		Query query = entityManager.createQuery(queryString);
@@ -292,7 +297,31 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		return out;
 	}
 
+	/**
+	 * Gets the single note for a demographic that can be edited.
+	 * @param demographicNo
+	 * @return The note that can be edited.  Returns null if there isn't one.
+	 */
+	public NoteTo1 getLatestUnsignedNote(int demographicNo)
+	{
+		String jpql = "SELECT note\n" +
+				"FROM model_CaseManagementNote note\n" +
+				"WHERE note.noteId NOT IN (SELECT issue_note.id.caseManagementNote.noteId FROM model_CaseManagementIssueNote issue_note)\n" +
+				"AND note.demographic.demographicId = :demographicNo\n";
 
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("uuid", uuid);
+		query.setMaxResults(1);
+	}
+
+	/**
+	 * Gets a list of encounter notes to display on the encounter page.  Gets Case Management Notes,
+	 * eforms and forms.
+	 * @param demographicNo
+	 * @param limit
+	 * @param offset
+	 * @return A list of encounter notes.
+	 */
 	public List<NoteTo1> searchEncounterNotes(int demographicNo, Integer limit, Integer offset)
 	{
 		List<NoteTo1> noteList = new ArrayList<>();
@@ -301,7 +330,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"SELECT " +
 				"    cmn.note_id,\n" +
 				"    cmn.observation_date AS observation_date,\n" +
-				"    cmn.provider_no AS providerNo,\n" +
+				"    cmn.provider_no AS provider_no,\n" +
 				"    prog.name AS program_name,\n" +
 				//"  cmn.reporter_caisi_role as reporter_caisi_role,\n" +
 				"    cmn.uuid AS uuid,\n" +
@@ -428,7 +457,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"SELECT " +
 				"    ed.fdid AS note_id,\n" +
 				"    CAST(CONCAT(ed.form_date, ' ', ed.form_time) AS DATETIME) AS observation_date,\n" +
-				"    ed.form_provider AS providerNo,\n" +
+				"    ed.form_provider AS provider_no,\n" +
 				"    '' AS program_name,\n" +
 				//"  cmn.reporter_caisi_role as reporter_caisi_role,\n" +
 				"    '' AS uuid,\n" +
@@ -467,11 +496,15 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 			"WHERE ed.demographic_no = :demographicNo " +
 			"AND ed.patient_independent = false " +
 			"AND ((ei.id IS NULL AND ed.status) OR NOT ei.deleted) " +
+		") UNION ALL (" +
+		buildFormQuery() +
 		")) AS full_query\n" +
 		"ORDER BY observation_date DESC \n";
 
 
-				Query query = entityManager.createNativeQuery(sql);
+
+
+		Query query = entityManager.createNativeQuery(sql);
 
 		int count = 0;
 
@@ -488,6 +521,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 			query.setFirstResult(offset);
 		}
 
+
+
 		List<Object[]> results = query.getResultList();
 
 
@@ -496,7 +531,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 			NoteTo1 note = new NoteTo1();
 
 			int column = 0;
-			note.setNoteId((int) row[column++]);
+			note.setNoteId(getInteger(row[column++]));
 			note.setObservationDate(getDateFromSql(row[column++]));
 			note.setProviderNo((String) row[column++]);
 			note.setProgramName((String) row[column++]);
@@ -550,6 +585,92 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		}
 
 		return noteList;
+	}
+
+	private String buildFormQuery()
+	{
+
+		EncounterFormDao encounterFormDao = (EncounterFormDao) SpringUtils.getBean("encounterFormDao");
+		List<EncounterForm> encounterForms = encounterFormDao.findAll();
+		Collections.sort(encounterForms, EncounterForm.BC_FIRST_COMPARATOR);
+
+		// grab patient forms for all the above form types grouped by date of edit
+		List<String> formQueryArray = new ArrayList<>();
+		for (EncounterForm encounterForm : encounterForms) {
+			String table = StringUtils.trimToNull(encounterForm.getFormTable());
+			if (table != null)
+			{
+				if (!table.equals("form"))
+				{
+					String formSql = "SELECT " +
+							"    MAX(ed.ID) AS note_id,\n" +
+							"    COALESCE(MAX(ed.formEdited), MAX(ed.formCreated)) AS observation_date,\n" +
+							"    COALESCE(MAX(ed.formEdited), MAX(ed.formCreated)) AS update_date,\n" +
+							"    '" + encounterForm.getFormName() + "' AS note\n" +
+							"FROM " + table + " AS ed " +
+							"WHERE demographic_no = :demographicNo " +
+							"GROUP BY DATE(ed.formEdited)";
+
+					formQueryArray.add(formSql);
+				}
+				else
+				{
+					String formSql = "SELECT " +
+							"    form_no AS note_id,\n" +
+							"    ed.form_date AS observation_date,\n" +
+							"    ed.form_date AS update_date,\n" +
+							"    '" + encounterForm.getFormName() + "' AS note\n" +
+							"from " + table + " where demographic_no = :demographicNo ";
+
+					formQueryArray.add(formSql);
+				}
+			}
+		}
+
+		String sql = "SELECT " +
+				"    full_form_query.note_id,\n" +
+				"    full_form_query.observation_date,\n" +
+				"    '' AS provider_no,\n" +
+				"    '' AS program_name,\n" +
+				//"  cmn.reporter_caisi_role as reporter_caisi_role,\n" +
+				"    '' AS uuid,\n" +
+				"    full_form_query.update_date,\n" +
+				"    0 AS document_no,\n" +
+				//"    CAST(0 AS INTEGER) AS eform_data_id,\n" +
+				"    false AS archived,\n" +
+				"    false AS signed,\n" +
+				"    false AS editable,\n" +
+				"    '' AS revision,\n" +
+				"    '' AS provider_name,\n" +
+				"    '' AS status,\n" +
+				"    '' AS location,\n" +
+				"    '' AS role_name,\n" +
+				//"    0 AS remote_facility_id,\n" +
+				"    false AS has_history,\n" +
+				"    CAST('0' AS CHARACTER) AS locked,\n" +
+				"    full_form_query.note,\n" +
+				"    false AS is_document,\n" +
+				"    false AS deleted,\n" +
+				"    false AS rx_annotation,\n" +
+				"    false AS eform_data,\n" +
+				"    true AS is_encounter_form,\n" +
+				"    false AS is_invoice,\n" +
+				"    false AS is_tickler_note,\n" +
+				"    '' AS encounter_type,\n" +
+				"    '' AS editors_string,\n" +
+				"    '' AS issue_descriptions,\n" +
+				"    false AS readonly ,\n" +
+				"    false AS is_group_note,\n" +
+				"    false AS is_cpp_note,\n" +
+				"    '' AS encounter_time,\n" +
+				"    '' AS encounter_transportation_time\n" +
+				"FROM ((";
+
+		sql += String.join(") UNION ALL (", formQueryArray);
+
+		sql += ")) AS full_form_query ";
+
+		return sql;
 	}
 
 	private ArrayList<String> parseIssueDescriptions(String issueDescriptionString)

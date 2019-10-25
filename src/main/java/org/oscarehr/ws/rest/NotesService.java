@@ -883,7 +883,15 @@ public class NotesService extends AbstractServiceImpl
 		}
 		return null;
 	}
-	
+
+	@GET
+	@Path("/{demographicNo}/getNoteToEdit")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public NoteTo1 getNoteToEdit(@PathParam("demographicNo") Integer demographicNo)
+	{
+	}
+
 	@POST
 	@Path("/{demographicNo}/getCurrentNote")
 	@Consumes("application/json")
