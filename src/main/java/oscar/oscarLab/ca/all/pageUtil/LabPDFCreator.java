@@ -490,10 +490,10 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								{
 									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t","\u00a0\u00a0\u00a0\u00a0"), lineFont));
 									//if this PATHL7 result is from CDC/SG and is greater than 100 characters
+									cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 									if ((handler.getOBXResult(j, k).length() > 100) &&
 											(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")))
 									{
-										cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 										//if the Abn, Reference Range and Units are empty or equal to null, give the long result the use of those columns
 										if ((handler.getOBXAbnormalFlag(j, k) == null || handler.getOBXAbnormalFlag(j, k).isEmpty()) &&
 											(handler.getOBXReferenceRange(j, k) == null || handler.getOBXReferenceRange(j, k).isEmpty()) &&
@@ -515,7 +515,6 @@ public class LabPDFCreator extends PdfPageEventHelper {
 									}
 									else
 									{
-										cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 										table.addCell(cell);
 									}
 								}
