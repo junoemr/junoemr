@@ -409,6 +409,11 @@ public class StringUtils {
     	return text.contains(searchWord);
     }
 
+    public static String stripSpaces(String str)
+    {
+        return str.replaceAll("\\s+", "");
+    }
+
     static public String noNull(String maybeNullText) {
 		return filled(maybeNullText) ? maybeNullText : "";
     }

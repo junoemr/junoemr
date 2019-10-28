@@ -23,90 +23,24 @@
 
 package org.oscarehr.integration.myhealthaccess.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
-public class ClinicUserTo1 implements Serializable
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ClinicUserShortTokenTo1 implements Serializable
 {
-	@JsonProperty("first_name")
-	private String firstName;
-
-	@JsonProperty("last_name")
-	private String lastName;
-
-	@JsonProperty("id")
-	private String myhealthaccessId;
-
-	@JsonProperty("remote_id")
-	private String remoteId;
-
-	@JsonProperty("email")
-	private String email;
-
-	@JsonProperty("token")
+	@JsonProperty("short_token")
 	private String token;
 
-	public ClinicUserTo1()
+	public ClinicUserShortTokenTo1()
 	{
 	}
 
-	public ClinicUserTo1(String remoteId, String email, String firstName, String lastName)
+	public ClinicUserShortTokenTo1(String token)
 	{
-		setRemoteId(remoteId);
-		setEmail(email);
-		setFirstName(firstName);
-		setLastName(lastName);
-	}
-
-	public String getFirstName()
-	{
-		return firstName;
-	}
-
-	public void setFirstName(String firstName)
-	{
-		this.firstName = firstName;
-	}
-
-	public String getLastName()
-	{
-		return lastName;
-	}
-
-	public void setLastName(String lastName)
-	{
-		this.lastName = lastName;
-	}
-
-	public String getMyhealthaccessId()
-	{
-		return myhealthaccessId;
-	}
-
-	public void setMyhealthaccessId(String myhealthaccessId)
-	{
-		this.myhealthaccessId = myhealthaccessId;
-	}
-
-	public String getRemoteId()
-	{
-		return remoteId;
-	}
-
-	public void setRemoteId(String remoteId)
-	{
-		this.remoteId = remoteId;
-	}
-
-	public String getEmail()
-	{
-		return email;
-	}
-
-	public void setEmail(String email)
-	{
-		this.email = email;
+		this.token = token;
 	}
 
 	public String getToken()

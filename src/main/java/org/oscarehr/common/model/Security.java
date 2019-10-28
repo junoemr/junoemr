@@ -25,7 +25,6 @@
 package org.oscarehr.common.model;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
 import org.oscarehr.util.EncryptionUtils;
 import org.oscarehr.util.MiscUtils;
 
@@ -55,7 +54,7 @@ public class Security extends AbstractModel<Integer> {
 	
 	@Column(name = "password")
 	private String password;
-	
+
 	@Column(name = "provider_no")
 	private String providerNo;
 
@@ -77,9 +76,6 @@ public class Security extends AbstractModel<Integer> {
 
 	@Column(name="forcePasswordReset")
 	private Boolean forcePasswordReset = true;
-
-	@Column(name = "myhealthaccess_auth_token")
-	private String myHealthAccessLongToken;
 
 	/** default constructor */
 	public Security() {
@@ -107,7 +103,7 @@ public class Security extends AbstractModel<Integer> {
 	public Security(String userName, String password, String providerNo, String pin, Integer BRemotelockset, Integer BLocallockset, Date dateExpiredate, Integer BExpireset, Boolean forcePasswordReset) {
 		this.userName = userName;
 		this.password = password;
-		this.providerNo = providerNo;
+		this.setProviderNo(providerNo);
 		this.pin = pin;
 		this.BRemotelockset = BRemotelockset;
 		this.BLocallockset = BLocallockset;
@@ -201,25 +197,6 @@ public class Security extends AbstractModel<Integer> {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
-	public ClinicUserAccessTokenTo1 getMyHealthAccessLongToken()
-	{
-		if(this.myHealthAccessLongToken == null || this.myHealthAccessLongToken.isEmpty())
-		{
-			return null;
-		}
-
-		ClinicUserAccessTokenTo1 accessTokenTo = new ClinicUserAccessTokenTo1();
-		accessTokenTo.setToken(this.myHealthAccessLongToken);
-
-		return accessTokenTo;
-	}
-
-	public void setMyHealthAccessLongToken(String myHealthAccessAuthToken)
-	{
-		this.myHealthAccessLongToken = myHealthAccessAuthToken;
-	}
-
 
 	/**
 	 * @return true if inputed password equals password in the DB, false otherwise.
