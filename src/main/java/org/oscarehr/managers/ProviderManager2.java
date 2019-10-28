@@ -469,12 +469,17 @@ public class ProviderManager2 {
 		if(map.get("hide_old_echart_link_in_appointment") != null) {
 			settings.setHideOldEchartLinkInAppointment("Y".equals(map.get("hide_old_echart_link_in_appointment").getValue()));
 		}
-		/*
-		if(settings.getFavoriteFormGroup()==null) {
-			settings.setFavoriteFormGroup("");
+		if(map.get(UserProperty.APPOINTMENT_COUNT_INCLUDE_CANCELLED) != null){
+			settings.setAppointmentCountIncludeCancelled("true".equals(map.get(UserProperty.APPOINTMENT_COUNT_INCLUDE_CANCELLED).getValue()));
 		}
-		*/
-		
+		if(map.get(UserProperty.APPOINTMENT_COUNT_INCLUDE_NO_SHOW) != null){
+			settings.setAppointmentCountIncludeNoShow("true".equals(map.get(UserProperty.APPOINTMENT_COUNT_INCLUDE_NO_SHOW).getValue()));
+		}
+		if(map.get(UserProperty.APPOINTMENT_COUNT_INCLUDE_NO_DEMOGRAPHIC) != null){
+			settings.setAppointmentCountIncludeNoDemographic("true".equals(map.get(UserProperty.APPOINTMENT_COUNT_INCLUDE_NO_DEMOGRAPHIC).getValue()));
+		}
+
+
 		settings.setNewTicklerWarningWindow(pp.getNewTicklerWarningWindow());
 		
 		settings.setStartHour(pp.getStartHour());
@@ -753,6 +758,13 @@ public class ProviderManager2 {
 
 		p = getMappedOrNewProperty(map, UserProperty.INTAKE_FORM_ENABLED, providerNo);
 		p.setValue(settings.isIntakeFormEnabled()?"yes":"no");
+
+		p = getMappedOrNewProperty(map, UserProperty.APPOINTMENT_COUNT_INCLUDE_CANCELLED, providerNo);
+		p.setValue(Boolean.toString(settings.getAppointmentCountIncludeCancelled()));
+		p = getMappedOrNewProperty(map, UserProperty.APPOINTMENT_COUNT_INCLUDE_NO_SHOW, providerNo);
+		p.setValue(Boolean.toString(settings.getAppointmentCountIncludeNoShow()));
+		p = getMappedOrNewProperty(map, UserProperty.APPOINTMENT_COUNT_INCLUDE_NO_DEMOGRAPHIC, providerNo);
+		p.setValue(Boolean.toString(settings.getAppointmentCountIncludeNoDemographic()));
 
 		if(map.get("rx_use_rx3") != null) {
 			settings.setUseRx3("yes".equals(map.get("rx_use_rx3").getValue())?true:false);

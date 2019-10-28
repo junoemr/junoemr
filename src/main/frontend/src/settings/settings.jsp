@@ -273,6 +273,29 @@
 							<button class="btn-sm" ng-click="openQuickLinkModal()">Add</button>
 						</div>
 					</div>
+					<div class="form-group col-sm-6">
+						<label>Specify which appointment types are included by the appointment counter</label>
+						<div class="controls">
+							<div class="form-group">
+								<label for="radioc-0">
+									<input ng-model="settingsCtrl.pref.appointmentCountIncludeCancelled" ng-value="false" id="radioc-0" type="checkbox">
+									Include cancelled appointments
+								</label>
+							</div>
+							<div class="form-group">
+								<label for="radioc-1">
+									<input ng-model="settingsCtrl.pref.appointmentCountIncludeNoShow" ng-value="false" id="radioc-1" type="checkbox">
+									Include no-show appointments
+								</label>
+							</div>
+							<div class="form-group">
+								<label for="radioc-1">
+									<input ng-model="settingsCtrl.pref.appointmentCountIncludeNoDemographic" ng-value="false" id="radioc-2" type="checkbox">
+									Include appointments not associated with a patient
+								</label>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 
