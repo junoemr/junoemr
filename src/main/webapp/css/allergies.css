@@ -1,0 +1,749 @@
+ /*
+ * 
+ * Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved. *
+ * This software is published under the GPL GNU General Public License. 
+ * This program is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU General Public License 
+ * as published by the Free Software Foundation; either version 2 
+ * of the License, or (at your option) any later version. * 
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+ * GNU General Public License for more details. * * You should have received a copy of the GNU General Public License 
+ * along with this program; if not, write to the Free Software 
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. * 
+ * 
+ * <OSCAR TEAM>
+ * 
+ * This software was written for the 
+ * Department of Family Medicine 
+ * McMaster University 
+ * Hamilton 
+ * Ontario, Canada 
+ */
+--> /* styles.css -- Style sheet for the UI prototype.
+
+	Colours used:
+		#A9A9A9 = darkgray
+		#DCDCDC = gainsboro
+		#F5F5F5 = whitesmoke
+		#000000 = black
+		#FF8C00 = darkorange
+*/
+BODY {
+	margin:0;
+	padding: 0;
+	background-color:white;
+	font-family: Verdana, Tahoma, Arial, sans-serif;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table tr.lastRow td {
+	height:20px;
+	background-color:#F3F3F3;
+}
+
+tr#addAllergyInterface td table {
+	width: 100%;
+	margin-bottom: 2px;
+}
+
+table#AutoNumber1 {
+	position:relative;
+	margin: 3px auto 3px auto;
+	border:none;
+	font-size: x-small;
+}
+
+table#AutoNumber1 table table td * {
+	font-size: x-small;
+}
+
+tr.DivCCBreadCrumbs, tr.DivContentSectionHead, 
+tr#patientDataRow  {
+	display:none;
+}
+
+td.DivContentSectionHead span { 
+	display:inline-block;
+	margin-right:5px;
+}
+
+
+table.allergy_table, table#allergyListTable, table#allergyProfileTable {
+	width: 100%;
+}
+
+tr#addAllergyInterface td table,
+td.Step1Text {
+	vertical-align: top;
+	padding:3px;
+	border: 1px solid #dcdcdc;
+	background-color: #f5f5f5
+}
+
+table.allergy_legend td {
+	padding-right:6px;
+	font-size: small;
+	background-color: #DCDCDC;
+}
+
+table.colour_codes {
+	width:10px;
+	height:10px;
+}
+
+td#allergiesColumnOneRowTwo p.PropSheetLevel1CurrentItemRed {
+	display:none;
+}
+
+td#allergiesColumnTwoRowTwo {
+	width: 100%;
+	margin:0;
+	padding: 0 0 0 .5%;
+	vertical-align: top;
+} 
+
+td#allergiesColumnTwoRowTwo * {
+	font-size: x-small;
+}
+
+tr#addAllergyInterface td, tr#addAllergyInterface th {
+	text-align: left;
+}
+
+tr#addAllergyInterface td table {
+	margin-top: 5px;
+}
+
+tr#addAllergyInterface td table th {
+	background-color: #DCDCDC;
+}
+
+tr#addAllergyInterface td table tr td {
+	padding-top:5px;
+	padding-bottom:5px;
+}
+
+tr#allergySearchCriteriaRow td {
+	border:#dcdcdc inset thin;
+}
+
+.allergy_table tr:first-of-type td {
+	vertical-align: bottom;
+	padding: 3px;
+	border-top: #111 thin solid;
+	border-bottom: #111 thin solid;
+}
+
+.allergy_table td {
+	padding:3px 5px;
+	border-right: dotted thin white;
+	border-left: dotted thin white;
+	border-bottom: dotted thin white;
+	text-align: left;
+	vertical-align: top;
+}
+
+.allergy_table tr:last-of-type {
+	border-bottom: #111111 thin solid;
+}
+
+table#topLink td#topLinkLeftColumn, td#allergiesColumnOneRowTwo div  {
+	width:175px;
+	margin:0;
+	padding: 0;
+	text-align: left;
+	vertical-align: top;
+}
+
+td#allergiesColumnOneRowTwo {
+	text-align: left;
+	vertical-align: top;
+	margin:0;
+	padding:0;
+	font-size: small;
+}
+
+td#allergiesColumnOneRowTwo div p {
+	padding:0 7px;
+	margin:0;
+	text-indent: 0;
+	background-color: #F5F5F5;
+	border-bottom: thin dotted white;
+}
+
+td#allergiesColumnOneRowTwo div p.PropSheetLevel1CurrentItem,
+td#allergiesColumnOneRowTwo div p.PropSheetLevel1CurrentItemRed {
+	font-variant: small-caps;
+	padding:3px 5px;
+	border-bottom:none;
+	background-color: #E0E0E0;
+
+}
+
+td#allergiesColumnOneRowTwo div p a {
+	text-decoration: none;
+	display:block;
+}
+
+td#allergiesColumnOneRowTwo div p.PropSheetLevel1CurrentItem a,
+td#allergiesColumnOneRowTwo div p.PropSheetLevel1CurrentItemRed a {
+	display:table;
+	float:right;
+	margin-left: 5px;
+	text-align: center;
+	width:10%;
+}
+
+td#allergiesColumnOneRowTwo div p.PropSheetLevel1CurrentItemRed a {
+	width:10%;
+	text-align: center;
+}
+
+td#addAllergyDialogue, td#addAllergyDialogue table {
+	margin:0;
+	padding:0;
+	background-color: white;
+	border-collapse: collapse;
+}
+
+td#addAllergyDialogue form table,
+td#addAllergyDialogue form table tr td, 
+td#addAllergyDialogue form {
+	border:none;
+	margin:0;
+	padding: 0;
+	font-size: x-small;
+	font-weight: bold;
+	text-align: left;
+}
+
+td#addAllergyDialogue form table tr td {
+	padding-left: 10px;
+	vertical-align: top;
+	padding-bottom:2px;
+}
+
+td#addAllergyDialogue table td textarea {
+	font-family: Verdana,Tahoma,Arial,sans-serif;
+	padding:3px;
+}
+
+td#addAllergyDialogue table tr#addReactionSubheading td {
+	padding-bottom: 5px;
+	color:blue;
+}
+
+td#addAllergyDialogue table tr td span.label {
+	float:left;
+	padding-left:3px;
+	display:inline-block;
+	width:20%;
+}
+
+tr#allergyQuickButtonRow .highLightButton, 
+tr#allergySearchCriteriaRow .highLightButton {
+	color: blue;
+	font-weight:bold;
+	border:blue thin solid;
+}
+
+tr#allergySearchCriteriaRow td div#allergySearchSelectors {
+	border:darkgrey thin solid;
+	margin-left: 2px;
+	border-radius: 5px;
+	display:inline-block;
+	padding: 0 5px;
+}
+
+td#searchResultsContainer table td input[type='button'] {
+	display:none;
+}
+
+td#searchResultsContainer table, 
+td#searchResultsContainer table td,
+td#searchResultsContainer table div {
+	margin:0;
+	padding:0;
+	border-collapse: collapse;
+
+}
+
+td#searchResultsContainer table, 
+td#searchResultsContainer table div {
+	width:100%;
+}
+
+td#searchResultsContainer table div {
+	margin-top: 5px;
+}
+
+td#searchResultsContainer table div a {
+	display:inline-block;
+	padding: 1px 5px;
+}
+
+td#searchResultsContainer table tr td .DivContentSectionHead {
+	font-variant: small-caps;
+	font-size: x-small;
+}
+
+
+/* Centres Styles */
+.DivCurrentUser {
+	font-size: 80%;
+	margin-top: 5px;
+	margin-left: 5px;
+	margin-bottom: 10px;
+}
+
+.CurrentUser {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.NavBarGroupHead {
+	/* font-size: 80%; */
+	font-weight: bold
+}
+
+.DivNavBarHead {
+	border-bottom: 2px;
+	border-top: 0;
+	border-left: 0;
+	border-right: 0;
+	border-color: #A9A9A9;
+	border-style: solid;
+	width: 176px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	font-size: 80%;
+	font-weight: bold;
+	background: #DCDCDC;
+	color: #000000;
+}
+
+.NavBarHead {
+	margin: 2px 5px 2px 5px;
+}
+
+.DivNavBarItem {
+	font-size: 80%;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+.NavBarItemHead {
+	font-weight: bold;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.NavBarItem {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	margin-left: 20px;
+	text-indent: -20px;
+}
+
+.NavBarItemCurrent {
+	font-weight: bold
+}
+
+.TabText {
+	font-size: 90%;
+	font-weight: bold
+}
+
+.ViewSortControls {
+	font-size: 80%
+}
+
+.ViewSortCurrent {
+	font-weight: bold
+}
+
+/* Property Sheet Menu Styles
+      These styles build the property sheet navigation menus. */
+.PropSheetMenu {
+	font-size: 80%;
+	margin-left: 2px;
+	margin-top: 10px;
+}
+
+.PropSheetMenuItemLevel1 {
+	margin-left: 10px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.PropSheetMenuItemLevel2Head {
+	margin-left: 10px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	font-weight: bold
+}
+
+.PropSheetMenuItemLevel2 {
+	margin-left: 25px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.PropSheetLevel1CurrentItem {
+	margin-left: 10px;
+	text-indent: -10px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+.PropSheetLevel1CurrentItemRed {
+	color: Red;
+	margin-left: 10px;
+	text-indent: -10px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+.PropSheetLevel2CurrentItem {
+	margin-left: 25px;
+	text-indent: -10px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+/* Property Sheet Content Area Styles
+      These are used for all of the elements in the content area of the property sheet. */
+.DivContentTitle {
+	font-size: 140%;
+}
+
+.DivContentMainInstructionalText {
+	margin-top: 7px;
+	margin-bottom: 7px;
+}
+
+.DivContentSectionHead {
+	margin-left: -3px;
+	text-indent: 3px;
+	background: #DCDCDC;
+	color: #000000;
+	margin-top: 14px;
+	margin-bottom: 10px;
+	font-weight: bold;
+	height: 17px;
+	padding-right:10px;
+}
+
+.DivContentGeneric {
+	width: 100%
+}
+
+.DivContentGenericIndented {
+	margin-left: 20px;
+}
+
+.ContentGeneric {
+	margin-top: 4px;
+	margin-bottom: 4px;
+}
+
+.ContentGenericFirst {
+	margin-bottom: 4px;
+}
+
+.ContentGenericNewSection {
+	margin-top: 10px;
+	margin-bottom: 4px;
+}
+
+.DivAddRemoveButtons {
+	margin-top: 4px;
+	margin-bottom: 4px;
+	width: 100%;
+}
+
+.ControlLabelSpace {
+	margin-top: 7px;
+	margin-bottom: 0;
+}
+
+.ControlLabelNoSpace {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.Control {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.DivEnableAll {
+	margin-bottom: 4px;
+	width: 100%;
+	/* font-size: 80%; */
+}
+
+/* Button Bar Style */
+.DivButtonBar {
+	margin: 4px 4px 4px 4px;
+	/* font-size: 80%; */
+}
+
+/* String Data Table Styles
+ * 	   Styles with NA are for rows that contain no data.
+ * TODO: collapse most of these into the same class or classes - there's a lot of repetition
+ * most of these aren't even being used...
+ */
+.StrDataTableHeader1 {
+	font-weight: bold;
+	padding: 4px 5px 4px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 1px;
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-right-width: 0;
+	vertical-align: bottom;
+}
+
+.StrDataTableHeader2 {
+	font-weight: bold;
+	padding: 4px 5px 4px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 0;
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-right-width: 0;
+	vertical-align: bottom;
+}
+
+.StrDataTableHeader3 {
+	font-weight: bold;
+	padding: 4px 5px 4px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 0;
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-right-width: 1px;
+	vertical-align: bottom;
+}
+
+.StrDataTableItem1Odd {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 1px;
+	border-top-width: 0;
+	border-bottom-width: 0;
+	border-right-width: 0;
+}
+
+.StrDataTableItem1Even {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 1px;
+	border-top-width: 0;
+	border-bottom-width: 0;
+	border-right-width: 0;
+	background: #F5F5F5;
+	color: #000000;
+}
+
+.StrDataTableItem2Odd {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 0;
+	border-top-width: 0;
+	border-bottom-width: 0;
+	border-right-width: 0;
+}
+
+.StrDataTableItem2Even {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 0;
+	border-top-width: 0;
+	border-bottom-width: 0;
+	border-right-width: 0;
+	background: #F5F5F5;
+	color: #000000;
+}
+
+.StrDataTableItem1OddEnd {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 1px;
+	border-top-width: 0;
+	border-bottom-width: 1px;
+	border-right-width: 0;
+}
+
+.StrDataTableItem1EvenEnd {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 1px;
+	border-top-width: 0;
+	border-bottom-width: 1px;
+	border-right-width: 0;
+	background: #F5F5F5;
+	color: #000000;
+}
+
+.StrDataTableItem2OddEnd {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 0;
+	border-top-width: 0;
+	border-bottom-width: 1px;
+	border-right-width: 0;
+}
+
+.StrDataTableItem2EvenEnd {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 0;
+	border-top-width: 0;
+	border-bottom-width: 1px;
+	border-right-width: 0;
+	background: #F5F5F5;
+	color: #000000;
+}
+
+.DataTableScrollBarCell {
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 0;
+	border-top-width: 0;
+	border-right-width: 1px;
+	border-bottom-width: 3px;
+	height: 100%;
+}
+
+.StrDataTableItem1OddNA {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 1px;
+	border-top-width: 0;
+	border-bottom-width: 0;
+	border-right-width: 0;
+}
+
+.StrDataTableItem1EvenNA {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 1px;
+	border-top-width: 0;
+	border-bottom-width: 0;
+	border-right-width: 0;
+}
+
+.StrDataTableItem2OddNA {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 0;
+	border-top-width: 0;
+	border-bottom-width: 0;
+	border-right-width: 0;
+}
+
+.StrDataTableItem2EvenNA {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 0;
+	border-top-width: 0;
+	border-bottom-width: 0;
+	border-right-width: 0;
+}
+
+.StrDataTableItem1OddEndNA {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 1px;
+	border-top-width: 0;
+	border-bottom-width: 1px;
+	border-right-width: 0;
+}
+
+.StrDataTableItem1EvenEndNA {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 1px;
+	border-top-width: 0;
+	border-bottom-width: 1px;
+	border-right-width: 0;
+}
+
+.StrDataTableItem2OddEndNA {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 0;
+	border-top-width: 0;
+	border-bottom-width: 1px;
+	border-right-width: 0;
+}
+
+.StrDataTableItem2EvenEndNA {
+	padding: 2px 5px 2px 5px;
+	border-style: solid;
+	border-color: #A9A9A9;
+	border-left-width: 0;
+	border-top-width: 0;
+	border-bottom-width: 1px;
+	border-right-width: 0;
+}
+
+table.mhTable {
+    width: 360px;
+    border-width: 1px ;
+    border-spacing: 2px;
+    border-style: outset;
+    border-color: gray;
+    border-collapse: collapse;
+}
+table.mhTable th {
+    border-width: 1px;
+    padding: 1px;
+    border-style: inset;
+    border-color: gray;
+    font-size:10pt;
+}
+table.mhTable td{
+    border-width: 1px;
+    border-style: inset;
+    border-color: gray;
+    font-style:normal;
+    margin:0;
+    font-family:sans-serif;
+    font-size:10pt;
+}
+
+@media print { 
+.noPrint {
+	display:none; 
+	} 
+} 
+
