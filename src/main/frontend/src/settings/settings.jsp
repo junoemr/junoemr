@@ -289,7 +289,7 @@
 								</label>
 							</div>
 							<div class="form-group">
-								<label for="radioc-1">
+								<label for="radioc-2">
 									<input ng-model="settingsCtrl.pref.appointmentCountIncludeNoDemographic" ng-value="false" id="radioc-2" type="checkbox">
 									Include appointments not associated with a patient
 								</label>
