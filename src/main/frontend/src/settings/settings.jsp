@@ -224,14 +224,14 @@
 						<input ng-model="settingsCtrl.pref.appointmentScreenLinkNameDisplayLength" placeholder="Length" class="form-control" type="text">
 					</div>
 					<div class="form-group col-sm-6">
-						<label>Hide Old Echart Link in appointment</label>
+						<label>Use classic eChart</label>
 						<div class="controls">
 							<label class="checkbox-inline" for="radioh-0">
-								<input ng-model="settingsCtrl.pref.hideOldEchartLinkInAppointment" ng-value="true" id="radioh-0" type="radio">
+								<input ng-model="settingsCtrl.pref.hideOldEchartLinkInAppointment" ng-value="false" id="radioh-0" type="radio">
 								Enable
 							</label>
 							<label class="checkbox-inline" for="radioh-1">
-								<input ng-model="settingsCtrl.pref.hideOldEchartLinkInAppointment" ng-value="false" id="radioh-1" type="radio">
+								<input ng-model="settingsCtrl.pref.hideOldEchartLinkInAppointment" ng-value="true" id="radioh-1" type="radio">
 								Disable
 							</label>
 						</div>
