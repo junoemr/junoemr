@@ -43,6 +43,7 @@
 						onclick-add="summaryCtrl.onSummaryModAdd(module, successCallback, dismissCallback)"
 						onclick-title="summaryCtrl.onSummaryModClickTitle(module)"
 						clickable-title="summaryCtrl.isModTitleClickable(mod)"
+						hide-date="summaryCtrl.hideSummaryModuleDate(mod)"
 				>
 				</summary-module>
 			</div>
