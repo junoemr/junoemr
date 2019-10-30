@@ -51,6 +51,7 @@ if(!authed) {
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@page import="org.apache.commons.lang.StringUtils" %>
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao"%>
 <%@page import="org.oscarehr.PMmodule.model.Program"%>
 <%@page import="org.oscarehr.casemgmt.model.CaseManagementNote"%>
@@ -72,17 +73,19 @@ if(!authed) {
 <%@page import="org.oscarehr.util.EmailUtilsOld"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page import="org.oscarehr.util.MiscUtils"%>
-<%@page import="org.oscarehr.util.SpringUtils,org.oscarehr.util.WebUtilsOld"%>
+<%@page import="org.oscarehr.util.SpringUtils"%>
+<%@page import="org.oscarehr.util.WebUtilsOld"%>
 <%@page import="org.springframework.web.context.WebApplicationContext" %>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="oscar.OscarProperties"%>
 <%@page import="oscar.SxmlMisc"%>
 <%@page import="oscar.oscarClinic.ClinicData"%>
-<%@page import="oscar.oscarDemographic.data.DemographicData, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestForm" %>
-<%@page import="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestUtil, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctViewRequestAction"%>
+<%@page import="oscar.oscarDemographic.data.DemographicData"%>
+<%@page import="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestForm" %>
+<%@page import="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestUtil" %>
+<%@page import="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctViewRequestAction"%>
 <%@page import="oscar.oscarRx.data.RxProviderData" %>
 <%@page import="oscar.oscarRx.data.RxProviderData.Provider" %>
-<%@ page import="oscar.util.StringUtils" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Calendar" %>
@@ -579,7 +582,7 @@ function fillSpecialistSelect1( makeNbr )
 				"<%=consultUtil.specialist%>",false ,true );
 
 			//don't display if no consultant was saved
-			<%if(!(consultUtil.specialist == null) && !consultUtil.specialist.equals("null")){%>
+			<%if(!StringUtils.trimToEmpty(consultUtil.specialist).equals("null")){%>
 			document.getElementById("consult-disclaimer").style.display='inline';
 			<%}else{%>
 			//display so user knows why field is empty
@@ -946,9 +949,9 @@ function importFromEnct(reqInfo,txtArea)
 					}
 					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
-						value = StringUtils.lineBreaks(value);
+						value = StringUtils.trimToEmpty(value).replaceAll("\n", " ").replaceAll("\r", " ");
 					}
-					value = org.apache.commons.lang.StringEscapeUtils.escapeJavaScript(value);
+					value = StringEscapeUtils.escapeJavaScript(value);
 					out.println("info = '" + value + "'");
 				}%>
              break;
@@ -966,9 +969,9 @@ function importFromEnct(reqInfo,txtArea)
 				}
 				if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 				{
-					value = StringUtils.lineBreaks(value);
+					value = StringUtils.trimToEmpty(value).replaceAll("\n", " ").replaceAll("\r", " ");
 				}
-				value = org.apache.commons.lang.StringEscapeUtils.escapeJavaScript(value);
+				value = StringEscapeUtils.escapeJavaScript(value);
 				out.println("info = '" + value + "'");
 			}%>
 			break;
@@ -986,9 +989,9 @@ function importFromEnct(reqInfo,txtArea)
 					}
 					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
-						value = StringUtils.lineBreaks(value);
+						value = StringUtils.trimToEmpty(value).replaceAll("\n", " ").replaceAll("\r", " ");
 					}
-					value = org.apache.commons.lang.StringEscapeUtils.escapeJavaScript(value);
+					value = StringEscapeUtils.escapeJavaScript(value);
 					out.println("info = '" + value + "'");
 				}%>
              break;
@@ -1014,9 +1017,9 @@ function importFromEnct(reqInfo,txtArea)
 					}
 					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
-						value = StringUtils.lineBreaks(value);
+						value = StringUtils.trimToEmpty(value).replaceAll("\n", " ").replaceAll("\r", " ");
 					}
-					value = org.apache.commons.lang.StringEscapeUtils.escapeJavaScript(value);
+					value = StringEscapeUtils.escapeJavaScript(value);
 					out.println("info = '" + value + "'");
 				}%>
               break;
@@ -1042,9 +1045,9 @@ function importFromEnct(reqInfo,txtArea)
 					}
 					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
-						value = StringUtils.lineBreaks(value);
+						value = StringUtils.trimToEmpty(value).replaceAll("\n", " ").replaceAll("\r", " ");
 					}
-					value = org.apache.commons.lang.StringEscapeUtils.escapeJavaScript(value);
+					value = StringEscapeUtils.escapeJavaScript(value);
 					out.println("info = '" + value + "'");
 
 				}%>
@@ -1064,10 +1067,10 @@ function importFromEnct(reqInfo,txtArea)
 					//if( !value.equals("") ) {
 					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
-						value = StringUtils.lineBreaks(value);
+						value = StringUtils.trimToEmpty(value).replaceAll("\n", " ").replaceAll("\r", " ");
 					}
 
-					value = org.apache.commons.lang.StringEscapeUtils.escapeJavaScript(value);
+					value = StringEscapeUtils.escapeJavaScript(value);
 					out.println("info = '" + value + "'");
 					//}
 				}%>
@@ -1394,7 +1397,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 
 		int demographic_no = demographic.getDemographicNo();
 		DemographicExt demoExt = demographicExtDao.getLatestDemographicExt(demographic_no, "demo_cell");
-		String patientCPhone = (demoExt == null) ? "" : org.apache.commons.lang.StringUtils.trimToEmpty(demoExt.getValue());
+		String patientCPhone = (demoExt == null) ? "" : StringUtils.trimToEmpty(demoExt.getValue());
 		thisForm.setPatientCPhone(patientCPhone);
 
 
@@ -1698,7 +1701,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 								String rdohip = "";
 								if (!"".equals(demo))
 								{
-								 rdohip = SxmlMisc.getXmlContent(org.apache.commons.lang.StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
+								 rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
 								 rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(),"rdohip").trim();
 								}
 
