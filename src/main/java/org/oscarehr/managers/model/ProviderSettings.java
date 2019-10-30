@@ -146,8 +146,10 @@ public class ProviderSettings {
 	private Integer patientNameLength;
 
 	private boolean intakeFormEnabled;
-	
-	
+
+	private boolean appointmentCountIncludeCancelled;
+	private boolean appointmentCountIncludeNoShow;
+	private boolean appointmentCountIncludeNoDemographic;
 
 	public String getRecentPatients() {
 		return recentPatients;
@@ -704,4 +706,11 @@ public class ProviderSettings {
 	{
 		this.intakeFormEnabled = intakeFormEnabled;
 	}
+
+	public boolean getAppointmentCountIncludeCancelled()	{ return appointmentCountIncludeCancelled; }
+	public void setAppointmentCountIncludeCancelled(boolean appointmentCountIncludeCancelled) { this.appointmentCountIncludeCancelled = appointmentCountIncludeCancelled; }
+	public boolean getAppointmentCountIncludeNoShow() { return appointmentCountIncludeNoShow; }
+	public void setAppointmentCountIncludeNoShow(boolean appointmentCountIncludeNoShow) { this.appointmentCountIncludeNoShow = appointmentCountIncludeNoShow; }
+	public boolean getAppointmentCountIncludeNoDemographic()	{ return appointmentCountIncludeNoDemographic; }
+	public void setAppointmentCountIncludeNoDemographic(boolean appointmentCountIncludeNoDemographic) { this.appointmentCountIncludeNoDemographic = appointmentCountIncludeNoDemographic; }
 }

@@ -49,6 +49,7 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 	private Integer demographicNo;
 	private FaxOutbound.FileType fileType;
 	private FaxOutbound.Status status;
+	private FaxOutbound.NotificationStatus notificationStatus;
 	private Long faxAccountId;
 	private LocalDate startDate;
 	private LocalDate endDate;
@@ -227,6 +228,10 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 	{
 		this.status = status;
 	}
+
+	public FaxOutbound.NotificationStatus getNotificationStatus() { return notificationStatus; }
+
+	public void setNotificationStatus (FaxOutbound.NotificationStatus notificationStatus) { this.notificationStatus = notificationStatus; }
 
 	public Long getFaxAccountId()
 	{

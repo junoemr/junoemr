@@ -36,16 +36,12 @@ import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
-import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
-import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -68,12 +64,13 @@ public class FaxAccountService
 
 	/**
 	 * Test the connection to the fax service based on the configuration settings
+	 *
 	 * @return true if the connection succeeded, false otherwise
 	 */
 	public boolean testConnectionStatus(String accountId, String password)
 	{
 		// don't hit the api if username or password are empty/missing
-		if(StringUtils.trimToNull(accountId) == null || StringUtils.trimToNull(password) == null)
+		if (StringUtils.trimToNull(accountId) == null || StringUtils.trimToNull(password) == null)
 		{
 			return false;
 		}
@@ -87,7 +84,9 @@ public class FaxAccountService
 		return (result != null && result.isSuccess());
 	}
 
-	/** get the default fax account to be used. return null if none exists */
+	/**
+	 * get the default fax account to be used. return null if none exists
+	 */
 	public FaxAccount getDefaultFaxAccount()
 	{
 		//TODO provider specific logic etc?
@@ -101,29 +100,19 @@ public class FaxAccountService
 		return faxAccountList.isEmpty() ? null : faxAccountList.get(0);
 	}
 
-	public List<FaxOutboxTransferOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
+	public List<FaxAccount> listAccounts(FaxAccountCriteriaSearch criteriaSearch)
 	{
-		List<FaxOutbound> outboundList = faxOutboundDao.criteriaSearch(criteriaSearch);
-
-		ArrayList<FaxOutboxTransferOutbound> transferList = new ArrayList<>(outboundList.size());
-		for(FaxOutbound faxOutbound : outboundList)
-		{
-			transferList.add(FaxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound));
-		}
-		return transferList;
+		return faxAccountDao.criteriaSearch(criteriaSearch);
 	}
 
-	public List<FaxInboxTransferOutbound> getInboxResults(FaxInboundCriteriaSearch criteriaSearch)
+	public List<FaxOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
+	{
+		return faxOutboundDao.criteriaSearch(criteriaSearch);
+	}
+
+	public List<FaxInbound> getInboxResults(FaxInboundCriteriaSearch criteriaSearch)
 	{
 		// find the list of all inbound results based on the search criteria
-		List<FaxInbound> inboundList = faxInboundDao.criteriaSearch(criteriaSearch);
-
-		ArrayList<FaxInboxTransferOutbound> transferList = new ArrayList<>(inboundList.size());
-		for(FaxInbound faxInbound : inboundList)
-		{
-			transferList.add(FaxTransferConverter.getAsInboxTransferObject(faxInbound));
-		}
-
-		return transferList;
+		return faxInboundDao.criteriaSearch(criteriaSearch);
 	}
 }
