@@ -198,20 +198,20 @@ String login_input_style="login_txt_fields";
                             %>
                         
                         <br/>            
-                        <input type="text" name="username" value="" size="15" maxlength="15" autocomplete="off" class="<%=login_input_style %>"/>
+                        <input type="text" name="username" value="" size="15" maxlength="30" autocomplete="off" class="<%=login_input_style %>"/>
                         <br/>                
                         <bean:message key="loginApplication.formPwd"/><br/>
-                        <input type="password" name="password" value="" size="15" maxlength="32" autocomplete="off" class="<%=login_input_style %>"/><br/>
-                                <input type="submit" value="<bean:message key="index.btnSignIn"/>" />
+                        <input type="password" name="password" value="" size="15" maxlength="32" autocomplete="off" class="<%=login_input_style %>"/>
                         <br/>
                         <bean:message key="index.formPIN"/>: 
-                        <br/>
                         <input type="password" name="pin" value="" size="15" maxlength="15" autocomplete="off" class="<%=login_input_style %>"/><br/>
-                       
+
                         <span class="extrasmall">
                             <bean:message key="loginApplication.formCmt"/>
                         </span>
                         <input type=hidden name='propname' value='<bean:message key="loginApplication.propertyFile"/>' />
+                        <br/>
+                        <input type="submit" value="<bean:message key="index.btnSignIn"/>" />
                         </html:form>
                         
                         <%if (AcceptableUseAgreementManager.hasAUA()){ %>

@@ -51,7 +51,7 @@
 
 	boolean isSiteAccessPrivacy = false;
 	boolean authed = true;
-	boolean isSuperAdmin = currentProvider.getSuperAdmin();
+	boolean isCurrentLoginSuperAdmin = currentProvider.getSuperAdmin();
 
 %>
 
@@ -168,11 +168,11 @@
 			}
 		}
 
-		function updateProviderRoles(form, actionMethod, isProSuperAdmin)
+		function updateProviderRoles(form, actionMethod, isClickedAccountSuperAdmin)
 		{
-			var isSuperAdmin = <%=isSuperAdmin%>;
+			var isCurrentLoginSuperAdmin = <%=isCurrentLoginSuperAdmin%>;
 
-			if (isProSuperAdmin && !isSuperAdmin)
+			if (isClickedAccountSuperAdmin && !isCurrentLoginSuperAdmin)
 			{
 				alert("You are trying to modify a system user. This user cannot be modified.");
 				return false;
@@ -229,7 +229,7 @@
 		{
 			i++;
 			String providerNo = transfer.getProviderId();
-			boolean isProSuperAdmin = transfer.isSuperAdmin();
+			boolean isClickedAccountSuperAdmin = transfer.isSuperAdmin();
 
 			String roleIdStr = (transfer.getRoleId() == null)? "" : String.valueOf(transfer.getRoleId());
 	%>
@@ -267,13 +267,13 @@
 				<input type="hidden" name="roleId" value="<%= roleIdStr %>">
 				<input type="hidden" name="roleOld" value="<%= StringUtils.trimToEmpty(transfer.getRoleName())%>">
 				<input type="submit" name="submit" value="Add"
-				       onclick="return updateProviderRoles(this.form, 'addRole', <%=isProSuperAdmin%>);">
+				       onclick="return updateProviderRoles(this.form, 'addRole', <%=isClickedAccountSuperAdmin%>);">
 				-
 				<input type="submit" name="buttonUpdate" value="Update"
-				       onclick="return updateProviderRoles(this.form, 'updateRole', <%=isProSuperAdmin%>);" <%= transfer.hasRole()?"":"disabled"%>>
+				       onclick="return updateProviderRoles(this.form, 'updateRole', <%=isClickedAccountSuperAdmin%>);" <%= transfer.hasRole()?"":"disabled"%>>
 				-
 				<input type="submit" name="submit" value="Delete"
-				       onclick="return updateProviderRoles(this.form, 'deleteRole', <%=isProSuperAdmin%>);" <%= transfer.hasRole()?"":"disabled"%>>
+				       onclick="return updateProviderRoles(this.form, 'deleteRole', <%=isClickedAccountSuperAdmin%>);" <%= transfer.hasRole()?"":"disabled"%>>
 			</td>
 		</tr>
 	</form>

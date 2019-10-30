@@ -1,0 +1,123 @@
+
+/* schedule specific modal styling */
+#schedule-modal {
+
+	modal-body {
+		$tabs-height: $page-tabs-height;
+		@include juno-tab-lg($tabs-height);
+		@include juno-tab-color-scheme-white(2px);
+		@include juno-font-tab;
+
+		.form-group {
+			align-items: center;
+		}
+		.alert-message {
+			color: $color-red-base;
+			@include juno-font-label;
+		}
+		.info-frame-container {
+			height: 180px;
+		}
+		.lower-content {
+			margin-top: 32px; // lower a label-less column to align with other column content
+		}
+		.padding-left-0 {
+			padding-left: 0;
+		}
+		.control-label {
+			margin-top: 8px;
+		}
+		.modal-patient-links {
+			.btn {
+				width: 26px;
+				height: $form-input-height;
+				padding: 0;
+			}
+		}
+
+		.tabs-heading {
+			padding-left: 16px;
+			margin-bottom: 10px;
+			li a {
+				padding-bottom: 0;
+			}
+		}
+
+		.tab-pane {
+			overflow: auto;
+			height: calc(#{$modal-body-height} - #{$tabs-height});
+
+			.tab-bar-inputs {
+				position: absolute;
+				right: 0;
+				top: 0;
+				height: $tabs-height;
+				width: 50%;
+				.form-group {
+					margin-bottom: 0;
+				}
+
+				.directive-appt-status-select-wrapper {
+					margin-top: 16px;
+				}
+			}
+
+			.edit-history-header {
+				background-color: $color-neutral-lightest;
+				padding: 12px;
+			}
+
+			.directive-juno-typeahead {
+				@include juno-tab-lg(64px);
+				.icon {
+					color: $color-primary-base;
+				}
+			}
+
+			// TODO combine with appt search css
+			$repeat-options-pane-width: 272px;
+			.pane-container {
+				height: 100%;
+
+				.pane-header {
+					color: $color-primary-base;
+					font-weight: normal;
+					margin-bottom: 10px;
+				}
+				.pane {
+					height: 100%;
+					padding: 16px;
+
+					&.repeat-options-pane {
+						width: $repeat-options-pane-width;
+
+						.vertical-divider-lg {
+							height: 32px;
+							width: 100%;
+						}
+						.vertical-divider-md {
+							height: 24px;
+							width: 100%;
+						}
+						.vertical-divider-sm {
+							height: 16px;
+							width: 100%;
+						}
+					}
+					&.repeat-display-pane {
+						@include juno-table-default(6px);
+						overflow: auto;
+
+						.action-column {
+							width: 96px;
+							border-left: 0;
+						}
+					}
+				}
+			}
+		}
+	}
+	.form-control-static {
+		min-height: 10px;
+	}
+}

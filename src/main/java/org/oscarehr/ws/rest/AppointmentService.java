@@ -28,6 +28,7 @@ import org.oscarehr.appointment.dto.AppointmentEditRecord;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.schedule.dto.CalendarAppointment;
+import org.oscarehr.schedule.dto.CalendarAppointmentRepeating;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -37,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
+import oscar.util.ConversionUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -46,6 +48,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Path("/appointment")
@@ -90,6 +95,38 @@ public class AppointmentService extends AbstractServiceImpl
 		responseAppointment.setUserFirstName(calendarAppointment.getUserFirstName());
 		responseAppointment.setUserLastName(calendarAppointment.getUserLastName());
 
+		return RestResponse.successResponse(responseAppointment);
+	}
+	@POST
+	@Path("/repeating/")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public RestResponse<CalendarAppointment> addRepeatingAppointment(CalendarAppointmentRepeating calendarAppointmentContainer)
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		AppointmentConverter converter = new AppointmentConverter();
+		Appointment appointment = converter.getAsDomainObject(calendarAppointmentContainer.getAppointment());
+
+		List<Date> legacyDateList = new ArrayList<>();
+		for(LocalDate date : calendarAppointmentContainer.getDateList())
+		{
+			legacyDateList.add(ConversionUtils.toLegacyDate(date));
+		}
+
+		List<Appointment> savedAppointments = appointmentManager.addRepeatingAppointment(loggedInInfo, appointment, legacyDateList);
+		Appointment savedAppointment = savedAppointments.get(0);
+
+		// do some stuff for security logging
+		String[] idList = new String[savedAppointments.size()-1];
+		for(int i=1; i< savedAppointments.size(); i++)
+		{
+			idList[i-1] = String.valueOf(savedAppointments.get(i).getId());
+		}
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), savedAppointment.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_APPT,
+				LogConst.STATUS_SUCCESS, String.valueOf(savedAppointment.getId()), loggedInInfo.getIp(),
+				"Repeat booking ids: [" + String.join(",", idList) + "]");
+
+		CalendarAppointment responseAppointment = converter.getAsCalendarAppointment(savedAppointment);
 		return RestResponse.successResponse(responseAppointment);
 	}
 

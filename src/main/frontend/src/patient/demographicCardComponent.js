@@ -25,7 +25,8 @@
 
 angular.module('Patient').component('demographicCard', {
 	bindings: {
-		demographicModel: '<',
+		demographicModel: '<?',
+		disabled: '<?',
 	},
 	templateUrl: "src/patient/demographicCard.jsp",
 	controller: [function ()
@@ -48,6 +49,7 @@ angular.module('Patient').component('demographicCard', {
 		ctrl.$onInit = function()
 		{
 			ctrl.fillDisplayData(ctrl.demographicModel);
+			ctrl.disabled = ctrl.disabled || false;
 		};
 
 		ctrl.$onChanges = function(bindingHash)
@@ -56,6 +58,10 @@ angular.module('Patient').component('demographicCard', {
 			if(Juno.Common.Util.exists(bindingHash.demographicModel))
 			{
 				ctrl.fillDisplayData(bindingHash.demographicModel.currentValue);
+			}
+			if(Juno.Common.Util.exists(bindingHash.disabled))
+			{
+				ctrl.disabled = bindingHash.disabled.currentValue;
 			}
 		};
 

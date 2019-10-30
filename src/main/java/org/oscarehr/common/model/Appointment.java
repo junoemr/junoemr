@@ -137,6 +137,45 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	
 	private Integer reasonCode;
 
+	/** default constructor */
+	public Appointment()
+	{
+	}
+
+	/** copy constructor */
+	public Appointment(Appointment appointmentToCopy)
+	{
+		this.id = null;
+		this.providerNo = appointmentToCopy.providerNo;
+		this.appointmentDate = appointmentToCopy.appointmentDate;
+		this.startTime = appointmentToCopy.startTime;
+		this.endTime = appointmentToCopy.endTime;
+		this.name = appointmentToCopy.name;
+		this.demographicNo = appointmentToCopy.demographicNo;
+		this.programId = appointmentToCopy.programId;
+		this.notes = appointmentToCopy.notes;
+		this.reason = appointmentToCopy.reason;
+		this.location = appointmentToCopy.location;
+		this.resources = appointmentToCopy.resources;
+		this.type = appointmentToCopy.type;
+		this.style = appointmentToCopy.style;
+		this.billing = appointmentToCopy.billing;
+		this.status = appointmentToCopy.status;
+		this.importedStatus = appointmentToCopy.importedStatus;
+		this.createDateTime = appointmentToCopy.createDateTime;
+		this.updateDateTime = appointmentToCopy.updateDateTime;
+		this.creator = appointmentToCopy.creator;
+		this.lastUpdateUser = appointmentToCopy.lastUpdateUser;
+		this.lastUpdateUserRecord = appointmentToCopy.lastUpdateUserRecord;
+		this.remarks = appointmentToCopy.remarks;
+		this.urgency = appointmentToCopy.urgency;
+		this.isVirtual = appointmentToCopy.isVirtual;
+		this.creatorSecurityId = appointmentToCopy.creatorSecurityId;
+		this.bookingSource = appointmentToCopy.bookingSource;
+		this.reasonCode = appointmentToCopy.reasonCode;
+	}
+
+
 	public Integer getReasonCode() {
 		return reasonCode;
 	}
@@ -328,9 +367,6 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
-	}
-
-	public Appointment() {
 	}
 
 	public String getImportedStatus() {

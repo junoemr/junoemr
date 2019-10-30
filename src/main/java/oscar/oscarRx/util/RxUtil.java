@@ -1436,7 +1436,7 @@ public class RxUtil {
 	}
 
 	public static String getSpecialInstructions() {
-		String retStr = "";
+		StringBuilder retStr = new StringBuilder();
 		RxCodesData codesData = new RxCodesData();
 		String[] specArr = codesData.getSpecialInstructions();
 		List<String> specList = Arrays.asList(specArr);
@@ -1448,10 +1448,10 @@ public class RxUtil {
 		Set<String> specIntSet = new HashSet<String>(resultSpecInst);//remove duplicates
 		specArr = specIntSet.toArray(specArr);
 		for (int i = 0; i < specArr.length; i++) {
-			retStr += specArr[i];
-			if (i < specArr.length - 1) retStr += "*"; //use * as a delimiter
+			retStr.append(specArr[i]);
+			if (i < specArr.length - 1) retStr.append("*"); //use * as a delimiter
 		}
-		return retStr;
+		return retStr.toString();
 
 	}
 

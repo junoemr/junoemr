@@ -20,24 +20,15 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.ws.common.annotation;
 
-package org.oscarehr.integration.myhealthaccess.dto;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class ClinicUserCreateTo1 extends ClinicUserTo1
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface SkipAllLogging
 {
-
-	@JsonProperty(value="access_token")
-	String accessToken;
-
-	public String getAccessToken()
-	{
-		return accessToken;
-	}
-
-	public void setAccessToken(String accessToken)
-	{
-		this.accessToken = accessToken;
-	}
 }

@@ -25,7 +25,8 @@
 
 angular.module('Common.Components').component('junoModal', {
 	bindings: {
-		hideFooter: '<'
+		hideFooter: '<',
+		showLoading: '<',
 	},
 	templateUrl: "src/common/components/modalTemplate.jsp",
 	transclude: {
@@ -39,10 +40,16 @@ angular.module('Common.Components').component('junoModal', {
 		let ctrl = this;
 		ctrl.$onInit = function ()
 		{
-			if (ctrl.hideFooter === undefined)
-			{
-				ctrl.hideFooter = false;
-			}
+			ctrl.hideFooter = ctrl.hideFooter || false;
+			ctrl.showLoading = ctrl.showLoading || false;
 		};
+		ctrl.$onChanges = function onChanges(bindingHash)
+		{
+			// bindingsHash only has data for changed bindings, so check for object existance
+			if(Juno.Common.Util.exists(bindingHash.showLoading))
+			{
+				ctrl.showLoading = bindingHash.showLoading.currentValue;
+			}
+		}
 	}
 });

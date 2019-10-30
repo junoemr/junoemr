@@ -1,0 +1,45 @@
+#schedule-search-modal {
+
+	$search-pane-width: 272px;
+	@include juno-font-default-size(12px);
+
+	.modal-body {
+		@include modal-split-pane-colors($color-neutral-lighter, $search-pane-width, $color-neutral-white);
+
+		.pane-container {
+			height: 100%;
+			.pane-header {
+				color: $color-primary-base;
+				font-weight: normal;
+				margin-bottom: 10px;
+			}
+			.pane {
+				height: 100%;
+				padding: 16px;
+
+				&.search-pane {
+					width: $search-pane-width;
+					.divider {
+						height: 32px;
+					}
+				}
+				&.result-pane {
+					@include juno-table-default-selectable(6px);
+
+					.appt-code {
+						width: 16px;
+						border-left: 0;
+					}
+					.zero-state {
+						color: $color-neutral-darker;
+					}
+				}
+			}
+		}
+
+	}
+	.modal-footer {
+		text-align: left;
+		@include modal-split-pane-colors($color-neutral-lighter, $search-pane-width, $color-neutral-white);
+	}
+}

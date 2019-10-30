@@ -66,6 +66,11 @@
 	href="labReq07Style.css">
 <link rel="stylesheet" type="text/css" media="print" href="print.css">
 <script src="../share/javascript/prototype.js" type="text/javascript"></script>
+
+	<!-- Helper scripts for submission -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+
 <script src="<%=request.getContextPath()%>/js/jquery-1.7.1.min.js"></script>
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
 </head>
@@ -143,8 +148,8 @@ temp = "";
          
         var ret = checkAllDates();
         if(ret==true)
-        {            
-            
+        {
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             //ret = confirm("Do you wish to save this form and view the print preview?");
             //popupFixedPage(650,850,'../provider/notice.htm');
             temp=document.forms[0].action;         
@@ -158,6 +163,7 @@ temp = "";
         if (temp != "") { document.forms[0].action = temp; }
         document.forms[0].target="_self";        
         document.forms[0].submit.value="save";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         return ret;
     }
@@ -166,6 +172,7 @@ temp = "";
         if (temp != "") { document.forms[0].action = temp; }
         document.forms[0].target="_self";
         document.forms[0].submit.value="exit";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret == true)
         {

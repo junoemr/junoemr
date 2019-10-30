@@ -447,19 +447,28 @@ public class SRFaxApiConnector
 		ListWrapper<T> result = null;
 		try
 		{
-			JSONObject json = new JSONObject(response);
-			String status = json.getString("Status");
-			if(ListWrapper.STATUS_SUCCESS.equals(status))
-			{
-				ObjectMapper mapper = new ObjectMapper();
-				result = mapper.readValue(response, typeReference);
+			if (response.trim().isEmpty())
+			{// if the response is empty. SRFax has locked the account
+				logger.warn("API Response Error: Account is blocked at this IP");
+				result = new ListWrapper<>();
+				result.setStatus("Error");
+				result.setError("Account is Blocked at this IP");
 			}
 			else
 			{
-				logger.warn("API Response Failure: " + response);
-				result = new ListWrapper<>();
-				result.setStatus(status);
-				result.setError(json.getString("Result"));
+				JSONObject json = new JSONObject(response);
+				String status = json.getString("Status");
+				if (ListWrapper.STATUS_SUCCESS.equals(status))
+				{
+					ObjectMapper mapper = new ObjectMapper();
+					result = mapper.readValue(response, typeReference);
+				} else
+				{
+					logger.warn("API Response Failure: " + response);
+					result = new ListWrapper<>();
+					result.setStatus(status);
+					result.setError(json.getString("Result"));
+				}
 			}
 		}
 		catch(IOException e)
@@ -475,28 +484,35 @@ public class SRFaxApiConnector
 	}
 	private static <T> SingleWrapper processSingleResponse(String response, TypeReference typeReference)
 	{
-		JSONObject json = new JSONObject(response);
-		String status = json.getString("Status");
 		SingleWrapper<T> result = null;
-
-		try
-		{
-			if(SingleWrapper.STATUS_SUCCESS.equals(status))
-			{
-				ObjectMapper mapper = new ObjectMapper();
-				result = mapper.readValue(response, typeReference);
-			}
-			else
-			{
-				logger.warn("API Response Failure: " + response);
-				result = new SingleWrapper<>();
-				result.setStatus(status);
-				result.setError(json.getString("Result"));
-			}
+		if (response.trim().isEmpty())
+		{// if the response is empty. SRFax has locked the account
+			logger.warn("API Response Error: Account is blocked at this IP");
+			result = new SingleWrapper<>();
+			result.setStatus("Error");
+			result.setError("Account is Blocked at this IP");
 		}
-		catch(IOException e)
+		else
 		{
-			logger.error("Error", e);
+			JSONObject json = new JSONObject(response);
+			String status = json.getString("Status");
+			try
+			{
+				if (SingleWrapper.STATUS_SUCCESS.equals(status))
+				{
+					ObjectMapper mapper = new ObjectMapper();
+					result = mapper.readValue(response, typeReference);
+				} else
+				{
+					logger.warn("API Response Failure: " + response);
+					result = new SingleWrapper<>();
+					result.setStatus(status);
+					result.setError(json.getString("Result"));
+				}
+			} catch (IOException e)
+			{
+				logger.error("Error", e);
+			}
 		}
 		return result;
 	}

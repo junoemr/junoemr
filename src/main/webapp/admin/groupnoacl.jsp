@@ -106,7 +106,6 @@
 
 
 <body topmargin="0" leftmargin="0" rightmargin="0">
-
 <FORM id="myform" NAME="UPDATEPRE" METHOD="post" ACTION="groupnoacl.jsp">
 	<input type="hidden" id="method" name="method"/>
 	
@@ -195,7 +194,7 @@
 </FORM>
 
 <div align="center"><font size="1" face="Verdana" color="#0000FF"><B></B></font></div>
-
+<h5 style="font-family: 'Open Sans Condensed', serif; font-weight: normal;">Checked users will be restricted from viewing the selected schedule.</h5>
 </body>
 </html:html>
 <%!

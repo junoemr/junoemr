@@ -7,13 +7,15 @@
 	<div class="{{input_size}}">
 
 		<textarea id="input-{{name}}"
-							class="form-control"
-							rows="{{rows}}"
-							ng-model="model"
-							ng-focus="focus_fn()"
-							ng-change="change_fn()"
-							ng-disabled="disabled"
-							tabindex="{{tab_index}}"></textarea>
+		          placeholder="{{text_placeholder}}"
+		          class="form-control"
+		          rows="{{rows}}"
+		          ng-model="model"
+		          ng-focus="focus_fn()"
+		          ng-change="change_fn()"
+		          ng-disabled="disabled"
+		          tabindex="{{tab_index}}">
+		</textarea>
 	</div>
 
 </div>

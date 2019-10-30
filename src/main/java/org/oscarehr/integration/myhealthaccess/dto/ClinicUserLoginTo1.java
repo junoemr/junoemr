@@ -36,12 +36,19 @@ public class ClinicUserLoginTo1 implements Serializable
 	private String password;
 
 	@JsonProperty("remote_id")
-	private String remoteID;
+	private String remoteId;
 
 	public ClinicUserLoginTo1(String email, String password)
 	{
 		this.email = email;
 		this.password = password;
+	}
+
+	public ClinicUserLoginTo1(String email, String password, String remoteId)
+	{
+		this.email = email;
+		this.password = password;
+		this.remoteId = remoteId;
 	}
 
 	public String getEmail()
@@ -64,13 +71,13 @@ public class ClinicUserLoginTo1 implements Serializable
 		this.password = password;
 	}
 
-	public String getRemoteID()
+	public String getRemoteId()
 	{
-		return remoteID;
+		return remoteId;
 	}
 
-	public void setRemoteID(String remoteId)
+	public void setRemoteId(String remoteId)
 	{
-		this.remoteID = remoteId;
+		this.remoteId = remoteId;
 	}
 }

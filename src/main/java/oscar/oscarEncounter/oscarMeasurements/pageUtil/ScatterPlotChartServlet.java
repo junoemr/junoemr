@@ -282,17 +282,14 @@ public class ScatterPlotChartServlet extends HttpServlet {
 		String type = request.getParameter("type");
 		String mInstrc = request.getParameter("mInstrc");
 		EctSessionBean bean = (EctSessionBean) request.getSession().getAttribute("EctSessionBean");
-		String demographicNo = null;
+		String demographicNo = request.getParameter("demographicNo");
 
-		 if(request.getParameter("demographicNo") != null) {
-         	demographicNo = request.getParameter("demographicNo");
-         }
-         
-         if (demographicNo == null &&  bean != null){
-             demographicNo = bean.getDemographicNo();                    
-         }
-		
-		
+		// Fail safe for when the page hasn't formatted the request properly but the global session bean is available
+		if (demographicNo == null && bean != null)
+		{
+			demographicNo = bean.getDemographicNo();
+		}
+
 		try {
 			//addIAxisPlotDataSet(IAxisPlotDataSet 
 			DataAxisProperties xAxisProperties = new DataAxisProperties();
@@ -302,7 +299,7 @@ public class ScatterPlotChartServlet extends HttpServlet {
 			LegendProperties legendProperties = new LegendProperties();
 
 
-			if (type.compareTo("BP") == 0) {
+			if ("BP".equals(type)) {
 				AxisProperties axisProperties = new AxisProperties(false);
 				DataSeries dataSeries = this.createBloodPressureDataSeries(demographicNo, type, mInstrc);
 				AxisChart axisChart = new AxisChart(dataSeries, chartProperties, axisProperties, legendProperties, 550, 360);

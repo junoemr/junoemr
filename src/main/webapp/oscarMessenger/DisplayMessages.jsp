@@ -60,6 +60,7 @@ if (boxType == null || boxType.equals("")){
     pageType = 0;
 }   //messageid
 
+
 String demographic_no = request.getParameter("demographic_no");
 String demographic_name = "";
 if ( demographic_no != null ) {
@@ -85,23 +86,7 @@ String orderby = (String) session.getAttribute("orderby");
 
 int pageNum = request.getParameter("page")==null ? 1 : Integer.parseInt(request.getParameter("page"));
 %>
-
-<logic:notPresent name="msgSessionBean" scope="session">
-    <logic:redirect href="index.jsp" />
-</logic:notPresent>
-<logic:present name="msgSessionBean" scope="session">
-    <bean:define id="bean" type="oscar.oscarMessenger.pageUtil.MsgSessionBean" name="msgSessionBean" scope="session" />
-    <logic:equal name="bean" property="valid" value="false">
-        <logic:redirect href="index.jsp" />
-    </logic:equal>
-</logic:present>
-<%
-oscar.oscarMessenger.pageUtil.MsgSessionBean bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)pageContext.findAttribute("bean");
-%>
 <jsp:useBean id="DisplayMessagesBeanId" scope="session" class="oscar.oscarMessenger.pageUtil.MsgDisplayMessagesBean" />
-<% DisplayMessagesBeanId.setProviderNo(bean.getProviderNo());
-bean.nullAttachment();
-%>
 <jsp:setProperty name="DisplayMessagesBeanId" property="*" />
 <jsp:useBean id="ViewMessageForm" scope="session" class="oscar.oscarMessenger.pageUtil.MsgViewMessageForm"/>
 

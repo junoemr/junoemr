@@ -20,27 +20,34 @@
  * Victoria, British Columbia
  * Canada
  */
-
-package org.oscarehr.integration.myhealthaccess.dto;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+package org.oscarehr.schedule.dto;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ClinicUserAccessTokenTo1 implements Serializable
+public class CalendarAppointmentRepeating implements Serializable
 {
-	@JsonProperty("access_token")
-	private String token;
+	private CalendarAppointment appointment;
+	private List<LocalDate> dateList;
 
-	public String getToken()
+	public CalendarAppointment getAppointment()
 	{
-		return token;
+		return appointment;
 	}
 
-	public void setToken(String token)
+	public void setAppointment(CalendarAppointment appointment)
 	{
-		this.token = token;
+		this.appointment = appointment;
+	}
+
+	public List<LocalDate> getDateList()
+	{
+		return dateList;
+	}
+
+	public void setDateList(List<LocalDate> dateList)
+	{
+		this.dateList = dateList;
 	}
 }

@@ -1,9 +1,39 @@
+
+.loading-indicator {
+	display: flex;
+	width: 100%;
+	height: 100%;
+
+	&.vertical {
+		flex-direction: column;
+	}
+	&.horizontal {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.loading-message {
+		text-align: center;
+	}
+}
+
+
+
+/**
+ * ==============================================
+ * Spinner
+ * ==============================================
+ */
+
+.loading-spinner-container {
+	height: 100%;
+}
+
 /**
  * ==============================================
  * Dot Pulse
  * ==============================================
  */
-
 .loading-dot-container {
 	$dot-size: 20px;
 	$dot-half-size: calc(#{$dot-size}/2);

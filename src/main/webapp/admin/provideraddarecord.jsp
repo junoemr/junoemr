@@ -65,6 +65,16 @@
 <%@page import="org.oscarehr.common.model.ProviderSite"%>
 <%@page import="org.oscarehr.common.model.ProviderSitePK"%>
 <%@page import="org.oscarehr.common.dao.ProviderSiteDao"%>
+<%@ page import="org.springframework.beans.factory.annotation.Autowired" %>
+<%@ page import="org.oscarehr.PMmodule.service.ProgramManager" %>
+<%@ page import="org.oscarehr.PMmodule.model.ProgramProvider" %>
+<%@ page import="org.oscarehr.PMmodule.dao.ProgramProviderDAO" %>
+<%@ page import="org.oscarehr.common.dao.SecRoleDao" %>
+<%@ page import="org.oscarehr.common.model.SecRole" %>
+<%@ page import="static org.oscarehr.common.model.Provider.PROVIDER_TYPE_DOCTOR" %>
+<%@ page import="org.oscarehr.PMmodule.dao.SecUserRoleDao" %>
+<%@ page import="org.oscarehr.PMmodule.model.SecUserRole" %>
+<%@ page import="org.oscarehr.provider.service.ProviderRoleService" %>
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
 	ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
@@ -91,39 +101,39 @@ boolean isOk = false;
 int retry = 0;
 String curUser_no = (String)session.getAttribute("user");
 
-Provider p = new Provider();
-p.setProviderNo(request.getParameter("provider_no"));
-p.setLastName(request.getParameter("last_name"));
-p.setFirstName(request.getParameter("first_name"));
-p.setProviderType(request.getParameter("provider_type"));
-p.setSpecialty(request.getParameter("specialty"));
-p.setTeam(request.getParameter("team"));
-p.setSex(request.getParameter("sex"));
-p.setDob(MyDateFormat.getSysDate(request.getParameter("dob")));
-p.setAddress(request.getParameter("address"));
-p.setPhone(request.getParameter("phone"));
-p.setWorkPhone(request.getParameter("workphone"));
-p.setEmail(request.getParameter("email"));
-p.setOhipNo(request.getParameter("ohip_no"));
-p.setRmaNo(request.getParameter("rma_no"));
-p.setBillingNo(request.getParameter("billing_no"));
-p.setHsoNo(request.getParameter("hso_no"));
-p.setAlbertaTakNo(StringUtils.trimToNull(request.getParameter("alberta_tak_no")));
-p.setStatus(request.getParameter("status"));
-p.setComments(SxmlMisc.createXmlDataString(request,"xml_p"));
-p.setProviderActivity(request.getParameter("provider_activity"));
-p.setPractitionerNo(request.getParameter("practitionerNo"));
-p.setLastUpdateUser((String)session.getAttribute("user"));
-p.setLastUpdateDate(new java.util.Date());
-p.setSupervisor(StringUtils.trimToNull(request.getParameter("supervisor")));
-p.setSuperAdmin(false);
+Provider provider = new Provider();
+provider.setProviderNo(request.getParameter("provider_no"));
+provider.setLastName(request.getParameter("last_name"));
+provider.setFirstName(request.getParameter("first_name"));
+provider.setProviderType(request.getParameter("provider_type"));
+provider.setSpecialty(request.getParameter("specialty"));
+provider.setTeam(request.getParameter("team"));
+provider.setSex(request.getParameter("sex"));
+provider.setDob(MyDateFormat.getSysDate(request.getParameter("dob")));
+provider.setAddress(request.getParameter("address"));
+provider.setPhone(request.getParameter("phone"));
+provider.setWorkPhone(request.getParameter("workphone"));
+provider.setEmail(request.getParameter("email"));
+provider.setOhipNo(request.getParameter("ohip_no"));
+provider.setRmaNo(request.getParameter("rma_no"));
+provider.setBillingNo(request.getParameter("billing_no"));
+provider.setHsoNo(request.getParameter("hso_no"));
+provider.setAlbertaTakNo(StringUtils.trimToNull(request.getParameter("alberta_tak_no")));
+provider.setStatus(request.getParameter("status"));
+provider.setComments(SxmlMisc.createXmlDataString(request,"xml_p"));
+provider.setProviderActivity(request.getParameter("provider_activity"));
+provider.setPractitionerNo(request.getParameter("practitionerNo"));
+provider.setLastUpdateUser((String)session.getAttribute("user"));
+provider.setLastUpdateDate(new java.util.Date());
+provider.setSupervisor(StringUtils.trimToNull(request.getParameter("supervisor")));
+provider.setSuperAdmin(false);
 
 String albertaEDeliveryIds = StringUtils.trimToNull(request.getParameter("alberta_e_delivery_ids"));
 // Only strip non-numeric characters if we are on an Alberta instance
 if(albertaEDeliveryIds != null && OscarProperties.getInstance().getProperty("instance_type").equals("AB")) {
 	albertaEDeliveryIds = albertaEDeliveryIds.replaceAll("[^0-9.,]", ""); // strip non-numbers
 }
-p.setAlbertaEDeliveryIds(albertaEDeliveryIds);
+provider.setAlbertaEDeliveryIds(albertaEDeliveryIds);
 
 //multi-office provide id formalize check, can be turn off on properties multioffice.formalize.provider.id
 boolean isProviderFormalize = true;
@@ -187,32 +197,45 @@ if (!org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable() || isProvide
 
 DBPreparedHandler dbObj = new DBPreparedHandler();
 
-  // check if the provider no need to be auto generated
+boolean isDefaultRoleNameExist = true;
+
+	// check if the provider no need to be auto generated
   if (OscarProperties.getInstance().isProviderNoAuto())
   {
-  	p.setProviderNo(dbObj.getNewProviderNo());
+  	provider.setProviderNo(dbObj.getNewProviderNo());
   }
   
-  if(providerDao.providerExists(p.getProviderNo())) {
+  if(providerDao.providerExists(provider.getProviderNo())) {
 	  isOk=false;
 	  alreadyExists=true;
-  } else {
-  	providerDao.saveProvider(p);
- 	 isOk=true;
   }
+  	else
+	{
+		providerDao.saveProvider(provider);
+ 	 	isOk=true;
+
+ 	 	// make newly added provider by default a 'doctor' and 'primary' role
+ 	 	int providerNo = Integer.parseInt(provider.getProviderNo());
+
+		ProviderRoleService providerRoleService = SpringUtils.getBean(ProviderRoleService.class);
+
+		isDefaultRoleNameExist = providerRoleService.setDefaultRoleForNewProvider(providerNo);
+
+
+	}
 
 if (isOk && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 	String[] sites = request.getParameterValues("sites");
 	if (sites!=null)
 		for (int i=0; i<sites.length; i++) {
 			ProviderSite ps = new ProviderSite();
-        	ps.setId(new ProviderSitePK(p.getProviderNo(),Integer.parseInt(sites[i])));
+        	ps.setId(new ProviderSitePK(provider.getProviderNo(),Integer.parseInt(sites[i])));
         	providerSiteDao.persist(ps);
 		}
 }
 
 if (isOk) {
-	String proId = p.getPractitionerNo();
+	String proId = provider.getPractitionerNo();
 	String ip = request.getRemoteAddr();
 	LogAction.addLogEntry(curUser_no, LogConst.ACTION_ADD, LogConst.CON_PROVIDER, LogConst.STATUS_SUCCESS, proId, ip);
 
@@ -222,7 +245,21 @@ if (isOk) {
 %>
 <h1><bean:message key="admin.provideraddrecord.msgAdditionSuccess" />
 </h1>
-<%
+	<%
+		/*
+			if default role name 'doctor' not exist, add the record to provider table,
+		 	but let user know that they will need to assign role manually
+		 */
+	  if(!isDefaultRoleNameExist)
+	  {
+	%>
+		<h3 style="color:red">
+			<bean:message key="admin.provideraddrecord.msgNoDefaultRoleName" />
+		</h3>
+	<%
+	  }
+
+
   } else {
 %>
 <h1><bean:message key="admin.provideraddrecord.msgAdditionFailure" /></h1>
@@ -232,6 +269,7 @@ if (isOk) {
 	}
 
   }
+
 }
 else {
 		if 	(!isProviderFormalize) {

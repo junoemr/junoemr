@@ -1,0 +1,83 @@
+
+/**
+set the html structure up like this:
+<label class="switch">
+    <input type="checkbox"/>
+    <span class="slider [round]"></span>
+</label>
+ */
+
+/* The switch - the box around the slider */
+
+@mixin juno-toggle-switch($switch-height: 16px, $slider-padding: 4px, $transition-time: .4s) {
+	&.switch,.switch {
+
+		$switch-width: calc((#{$switch-height} * 2) - (2 * #{$slider-padding}));
+		$translate-px: calc(#{$switch-height} - (2 * #{$slider-padding}));
+
+		position: relative;
+		display: inline-block;
+		width: $switch-width;
+		min-width: $switch-width;
+		height: $switch-height;
+		min-heigh: $switch-height;
+
+		/* Hide default HTML checkbox */
+		input {
+			display: none;
+
+			&:checked + .slider {
+				background-color: $color-primary-base;
+			}
+			&:focus + .slider {
+				box-shadow: 0 0 1px $color-primary-dark;
+			}
+			&:checked + .slider:before {
+				-webkit-transform: translateX($translate-px);
+				-ms-transform: translateX($translate-px);
+				transform: translateX($translate-px);
+			}
+		}
+
+		/* The slider */
+		.slider {
+			position: absolute;
+			cursor: pointer;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: $color-neutral-grey;
+			-webkit-transition: $transition-time;
+			transition: $transition-time;
+
+			&:before {
+				position: absolute;
+				content: "";
+				height: $translate-px;
+				width: $translate-px;
+				left: $slider-padding;
+				bottom: $slider-padding;
+				background-color: $color-neutral-white;
+				-webkit-transition: $transition-time;
+				transition: $transition-time;
+			}
+			/* Rounded sliders */
+			&.round {
+				border-radius: $switch-height;
+				&:before {
+					border-radius: 50%;
+				}
+			}
+		}
+	}
+	.state-label {
+		padding-left: 4px;
+		padding-right: 4px;
+	}
+}
+
+.juno-toggle-switch {
+	@include juno-toggle-switch(16px, 2px, .3s);
+}
+
