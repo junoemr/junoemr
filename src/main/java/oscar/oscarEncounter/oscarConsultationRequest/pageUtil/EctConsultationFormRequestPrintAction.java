@@ -76,6 +76,7 @@ public class EctConsultationFormRequestPrintAction extends Action
 	    securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, demographicNo, "_con");
 
 		String error = "";
+		String friendlyReturnMessage = "";
 		Exception exception = null;
 	    List<InputStream> streamList = new ArrayList<>();
 
@@ -110,21 +111,25 @@ public class EctConsultationFormRequestPrintAction extends Action
 		catch(HtmlToPdfConversionException ce)
 		{
 			error = "HtmlToPdfConversionException";
+			friendlyReturnMessage = "Error when attempting to convert HTML to PDF, one or more of your eForms may be formatted incorrectly.";
 			exception = ce;
 		}
 		catch(DocumentException de)
 		{
 			error = "DocumentException";
+			friendlyReturnMessage = "Error when attempting to read one or more of the documents.";
 			exception = de;
 		}
 		catch(IOException ioe)
 		{
 			error = "IOException";
+			friendlyReturnMessage = "Error attempting to access an internal file.";
 			exception = ioe;
 		}
 	    catch (SizeLimitExceededException slee)
 		{
 			error = "SizeLimitExceededException";
+			friendlyReturnMessage = "The attached files included with this consultation request are too large. Please remove some of the attached files and try again.";
 			exception = slee;
 		}
 		finally
@@ -137,8 +142,10 @@ public class EctConsultationFormRequestPrintAction extends Action
 		}
 	    if(!error.isEmpty())
 	    {
-		    logger.error(error + " occurred inside ConsultationPrintAction", exception);
+		    logger.error(error + " occurred inside ConsultationPrintAction");
 		    request.setAttribute("printError", true);
+		    request.setAttribute("errorMessage", friendlyReturnMessage);
+		    request.setAttribute("demo", demographicNoStr);
 		    return mapping.findForward("error");
 	    }
 	    return null;

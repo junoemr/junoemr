@@ -187,7 +187,7 @@ public class EctConsultationFormFaxAction extends Action
 		catch(SizeLimitExceededException e)
 		{
 			// Error is known, don't need to log the error again. Just display something nice to the user
-			errorList.add("Document File Size is Too Large. Unable to Process Fax.");
+			errorList.add("The attached files included with this consultation request are too large. Please remove some of the attached files and try again.");
 		}
 		catch(Exception e)
 		{
