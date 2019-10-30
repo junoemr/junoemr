@@ -1764,8 +1764,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 											</tr>
 						   			<%
 										}
-                                    	else if(isUnstructuredDoc)
-                                    	{
+										else if(isUnstructuredDoc)
+										{
 											if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
 											{
 												String obxDocId = "";
@@ -1785,13 +1785,13 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										   else
 										   {
 											%>
-                                   			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>"><%
-                                   			if((obxCount>1) && k>0 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1))) {%>
-                                   				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"></a><%
-                                   				}
-                                   			else{
+													<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>"><%
+													if((obxCount>1) && k>0 && (handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (!handler.getMsgType().equals("CCLAB") || obxName.equals(handler.getOBXName(j, k-1))))) {%>
+														<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"></a><%
+														}
+													else{
 
-                                   				if (handler.getMsgType().equals("CCLAB"))
+														if (handler.getMsgType().equals("CCLAB"))
 												{
 													%>
 													<td valign="top" align="left" style="padding-top:20px"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a>
@@ -1805,7 +1805,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 														<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a>
 													<%
 												}
-                                   			}%>
+											}%>
 											<%if(isVIHARtf) {
 											    //create bytes from the rtf string
 										    	byte[] rtfBytes = handler.getOBXResult(j, k).getBytes();
@@ -1817,7 +1817,20 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										    	rtfParser.read(rtfStream, doc, 0);
 										    	String rtfText = doc.getText(0, doc.getLength()).replaceAll("\n", "<br>");
 										    	String disclaimer = "<br>IMPORTANT DISCLAIMER: You are viewing a PREVIEW of the original report. The rich text formatting contained in the original report may convey critical information that must be considered for clinical decision making. Please refer to the ORIGINAL report, by clicking 'Print', prior to making any decision on diagnosis or treatment.";%>
-										    	<td align="left"><%= rtfText + disclaimer %></td><%}
+										    	<td align="left"><%= rtfText + disclaimer %></td><%
+											}
+											else if (handler.getMsgType().equals("CCLAB") && handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.TEXT)
+											{
+												String abnormalFlag = handler.getOBXAbnormalFlag(j, k);
+												if (!"N".equals(abnormalFlag))
+												{
+													%> <td align="left"><%= handler.getOBXResult( j, k)  + "(" + abnormalFlag + ")" %></td> <%
+												}
+												else
+												{
+													%> <td align="left"><%= handler.getOBXResult( j, k) %></td><%
+												}
+											}
 											else {%>
                                            		<td align="left"><%= handler.getOBXResult( j, k) %></td><%
 											} %>

@@ -39,7 +39,7 @@ import java.util.List;
 
 public class ConnectCareLabHandler extends ConnectCareHandler
 {
-	private final List<String> unstructuredLabTypes = Arrays.asList("IDENTITY TESTING", "SURGICAL PATHOLOGY", "BLOOD CULTURE, ROUTINE");
+	private final List<String> unstructuredLabTypes = Arrays.asList("IDENTITY TESTING", "SURGICAL PATHOLOGY", "BLOOD CULTURE, ROUTINE", "NON-GYNECOLOGICAL CYTOLOGY");
 
 	public static boolean handlerTypeMatch(Message message)
 	{

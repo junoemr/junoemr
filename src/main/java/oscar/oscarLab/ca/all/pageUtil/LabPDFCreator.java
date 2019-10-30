@@ -464,7 +464,16 @@ public class LabPDFCreator extends PdfPageEventHelper {
 									cell.setPhrase(new Phrase((obrFlag ? "   " : "")+ obxName, lineFont));
 									table.addCell(cell);
 								}
-								cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t","\u00a0\u00a0\u00a0\u00a0"), lineFont));				
+
+								String abnormalFlag = handler.getOBXAbnormalFlag(j, k);
+								if (!abnormalFlag.equals("N") && handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.TEXT && handler.getMsgType().equals("CCLAB"))
+								{
+									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0") + "(" + abnormalFlag + ")", lineFont));
+								}
+								else
+								{
+									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0"), lineFont));
+								}
 								table.addCell(cell);
 								cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 								//if there are duplicate Times, display only the first 
