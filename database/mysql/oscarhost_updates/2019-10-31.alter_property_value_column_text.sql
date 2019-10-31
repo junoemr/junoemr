@@ -1,1 +1,2 @@
-ALTER TABLE property MODIFY value TEXT;
+
+ALTER TABLE `property` MODIFY `value` TEXT;
