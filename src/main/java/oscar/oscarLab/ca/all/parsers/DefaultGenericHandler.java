@@ -57,7 +57,6 @@ public class DefaultGenericHandler extends ORU_R01MessageHandler
     Logger logger = Logger.getLogger(DefaultGenericHandler.class);
 
     protected Message msg = null;
-    protected Terser terser;
     protected ArrayList<ArrayList<Segment>> obrGroups = null;
 
     /** Creates a new instance of CMLHandler */

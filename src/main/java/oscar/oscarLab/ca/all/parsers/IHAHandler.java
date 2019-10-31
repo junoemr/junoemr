@@ -44,7 +44,6 @@ public class IHAHandler extends ORU_R01MessageHandler
     
     Logger logger = Logger.getLogger(IHAHandler.class);
     protected Message msg = null;
-    protected Terser terser;
     protected ArrayList<ArrayList<Segment>> obrGroups = null;
     
     public IHAHandler(){
@@ -60,6 +59,7 @@ public class IHAHandler extends ORU_R01MessageHandler
         // force parsing as a generic message by changing the message structure
         hl7Body = hl7Body.replaceAll("R01", "O01");
         msg = p.parse(hl7Body.replaceAll( "\n", "\r\n"));
+        message = msg;
         
         terser = new Terser(msg);
         int obrCount = getOBRCount();

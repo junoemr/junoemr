@@ -496,6 +496,19 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 	public abstract String getNteForOBX(int i,int j);
 
 	/**
+	 * true if performing organization information is available
+	 * @param i - the order observation group to check
+	 * @param k - the obx rep to check
+	 * @return - true if the performing organization is available
+	 */
+	@Override
+	public boolean hasPerformingOrganization(int i, int k)
+	{
+		return isComponentPresent("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-23");
+	}
+
+
+	/**
 	 * get the long name of the lab responsible for the given OBX segment
 	 * @param i OBR rep
 	 * @param k OBX rep

@@ -856,6 +856,17 @@ public abstract class MessageHandler
 	}
 
 	/**
+	 * true if performing organization information is available
+	 * @param i - the order observation group to check
+	 * @param k - the obx rep to check
+	 * @return - true if the performing organization is available
+	 */
+	public boolean hasPerformingOrganization(int i, int k)
+	{
+		return false;
+	}
+
+	/**
 	 * return the number of specimen segments in the given order observation group
 	 * @param i the order observation group to check
 	 * @return count of specimen segments
@@ -992,6 +1003,24 @@ public abstract class MessageHandler
 		{
 			logger.warn("Unable to get field at " + path, e);
 			return null;
+		}
+	}
+
+	/**
+	 * Check if the specified component exists. true if it does, false otherwise
+	 * @param path - the terser path to check
+	 * @return - true if it exists, false otherwise
+	 */
+	protected boolean isComponentPresent(String path)
+	{
+		try
+		{
+			terser.get(path);
+			return true;
+		}
+		catch (HL7Exception e)
+		{
+			return false;
 		}
 	}
 

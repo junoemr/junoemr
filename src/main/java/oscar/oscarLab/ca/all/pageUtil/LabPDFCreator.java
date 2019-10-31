@@ -820,7 +820,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 						}
 					}
 
-					if (handler.getPerformingOrganizationName(j, 0) != null && handler.getPerformingOrganizationAddress(j, 0) != null &&
+					if (handler.hasPerformingOrganization(j, 0) && handler.getPerformingOrganizationName(j, 0) != null && handler.getPerformingOrganizationAddress(j, 0) != null &&
 							handler.getAssignedPatientLocation() != null)
 					{
 						int oldColSpan = cell.getColspan();

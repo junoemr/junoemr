@@ -1928,7 +1928,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                }
 
-                               if (obrHasContent)
+								 if (obrHasContent)
 							   {
 								   if (handler.hasSpecimenSegment(j))
 								   {
@@ -1957,7 +1957,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										}
 								   }
 
-								   if (handler.getPerformingOrganizationName(j, 0) != null && handler.getPerformingOrganizationAddress(j, 0) != null &&
+								   if (handler.hasPerformingOrganization(j, 0) && handler.getPerformingOrganizationName(j, 0) != null && handler.getPerformingOrganizationAddress(j, 0) != null &&
 										handler.getAssignedPatientLocation() != null)
 								   {
 								   %>

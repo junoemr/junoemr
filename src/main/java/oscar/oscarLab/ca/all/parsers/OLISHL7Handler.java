@@ -60,7 +60,6 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	protected boolean isFinal = true;
 	protected boolean isCorrected = false;
 	protected Message msg = null;
-	protected Terser terser;
 	protected ArrayList<ArrayList<Segment>> obrGroups = null;
 	private ArrayList<String> obrSpecimenSource;
 	private ArrayList<String> obrStatus;
