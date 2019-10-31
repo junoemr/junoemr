@@ -25,10 +25,12 @@
 package org.oscarehr.provider.web;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -2439,9 +2441,14 @@ public ActionForward viewEDocBrowserInDocumentReport(ActionMapping actionmapping
 		DynaActionForm frm = (DynaActionForm) actionform;
 		String provider = (String) request.getSession().getAttribute("user");
 
-		UserProperty includeCancelled = this.userPropertyDAO.getProp(provider, UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED);
-		UserProperty includeNoShow = this.userPropertyDAO.getProp(provider, UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW);
-		UserProperty includeNoDemographic = this.userPropertyDAO.getProp(provider, UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
+        List<String> propertyNames = Arrays.asList(
+                UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED,
+                UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW,
+                UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
+		Map<String, UserProperty> properties = this.userPropertyDAO.getProviderPropertiesAsMap(provider, propertyNames);
+		UserProperty includeCancelled = properties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED);
+		UserProperty includeNoShow = properties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW);
+		UserProperty includeNoDemographic = properties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
 
 		if (includeCancelled == null)
 		{

@@ -163,8 +163,8 @@ public class UserPropertyDAO extends AbstractDao<UserProperty> {
     	return map;
     }
 
-	public Map<String,String> getProviderPropertiesAsMap(String providerNo, List<String> names) {
-		Map<String,String> map = new HashMap<String,String>();
+	public Map<String, UserProperty> getProviderPropertiesAsMap(String providerNo, List<String> names) {
+		Map<String, UserProperty> map = new HashMap<String,UserProperty>();
 
 		Query query = entityManager.createQuery("SELECT p FROM UserProperty p WHERE p.providerNo = :providerNo AND p.name IN (:names)");
 		query.setParameter("providerNo", providerNo);
@@ -173,7 +173,7 @@ public class UserPropertyDAO extends AbstractDao<UserProperty> {
 		@SuppressWarnings("unchecked")
 		List<UserProperty> list = query.getResultList();
 		for(UserProperty property:list) {
-			map.put(property.getName(), property.getValue());
+			map.put(property.getName(), property);
 		}
 		return map;
 	}

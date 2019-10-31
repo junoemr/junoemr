@@ -1278,10 +1278,10 @@
 				UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED,
 				UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW,
 				UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
-		Map<String, String> countProperties = userPropertyDao.getProviderPropertiesAsMap(curUser_no, countPropertiesNames);
-		boolean countIncludeCancelled = "true".equals(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED));
-		boolean countIncludeNoShow = "true".equals(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW));
-		boolean countIncludeNoDemographic = "true".equals(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC));
+		Map<String, UserProperty> countProperties = userPropertyDao.getProviderPropertiesAsMap(curUser_no, countPropertiesNames);
+		boolean countIncludeCancelled = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && "true".equals(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED).getValue());
+		boolean countIncludeNoShow = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && "true".equals(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW).getValue());
+		boolean countIncludeNoDemographic = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && "true".equals(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC).getValue());
 	%>
 
 	<!-- START Schedule page -->
