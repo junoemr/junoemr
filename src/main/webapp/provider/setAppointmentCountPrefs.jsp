@@ -26,10 +26,11 @@
 
 <%@page contentType="text/html"%>
 <%@ include file="/casemgmt/taglibs.jsp"%>
-<%@page import="java.util.*" %>
 <%
 if(session.getValue("user") == null)
-    response.sendRedirect("../logout.htm");
+{
+	response.sendRedirect("../logout.htm");
+}
 %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
