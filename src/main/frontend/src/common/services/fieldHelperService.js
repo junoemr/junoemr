@@ -17,6 +17,7 @@ angular.module('Common.Services').factory(
 				label_size: '@caLabelSize',
 				input_size: '@caInputSize',
 				text_length: '@caTextLength',
+				text_placeholder: '@caTextPlaceholder',
 				hide_label_colon: '@caTitleNoColon',
 				template: '@caTemplate',
 

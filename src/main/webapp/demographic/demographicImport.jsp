@@ -45,6 +45,9 @@
 <%@page import="org.oscarehr.util.SpringUtils"%>
 <%@page import="oscar.oscarDemographic.pageUtil.Util"%>
 <%@page import="java.util.ArrayList,java.util.List"%>
+<%@ page import="org.oscarehr.common.model.Site" %>
+<%@ page import="org.oscarehr.common.dao.SiteDao" %>
+<%@ page import="oscar.OscarProperties" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
@@ -57,7 +60,14 @@
 			courses.add(p);
 		}
 	}
+	List<Site> sites = null;
 
+	boolean multisites = OscarProperties.getInstance().isMultisiteEnabled();
+	if (multisites)
+	{
+		SiteDao siteDao = SpringUtils.getBean(SiteDao.class);
+		sites = siteDao.getAllActiveSites();
+	}
 %>
 <html:html locale="true">
 
@@ -134,6 +144,7 @@ if (!Util.checkDir(op.getProperty("TMP_DIR"))) { %>
 		</html:select><br/>
 			Timeshift (in days +/-):&nbsp;<html:text property="timeshiftInDays" value="0" size="5"/></br/>
 			<%} %>
+
 			If patient's providers do not have OHIP numbers:<br>
 			<html:radio property="matchProviderNames" value="true">
 				Match providers in database by first and last names (Recommended)
@@ -141,6 +152,24 @@ if (!Util.checkDir(op.getProperty("TMP_DIR"))) { %>
 			<html:radio property="matchProviderNames" value="false">
 				Import as new - same provider may have multiple entries
 			</html:radio><br><br>
+			<%
+				if (multisites)
+				{
+			%>
+			<p>Select a site to assign appointments to.</p>
+			<html:select property="defaultSite">
+				<%
+					for (Site site : sites)
+					{
+				%>
+				<option value="<%=site.getName()%>"><%=site.getName()%></option>
+				<%
+					}
+				%>
+			</html:select>
+			<%
+				}
+			%>
 			<p><input class="btn btn-primary" type="submit" name="Submit" value="Import (CMS spec 4.0)"></p>
 		</html:form>
 

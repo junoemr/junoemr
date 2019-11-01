@@ -51,6 +51,7 @@ public class NoteTo1 implements Serializable{
 	private Integer remoteFacilityId;
 	private Integer documentId;
 	private Integer eformDataId;
+	private Integer encounterFormId;
 	private String uuid;
 	private Boolean hasHistory;
 	private Boolean locked;
@@ -415,7 +416,14 @@ public class NoteTo1 implements Serializable{
 	public void setPosition(Integer position) {
 		this.position = position;
 	}
-	
 
-	
+	public Integer getEncounterFormId()
+	{
+		return encounterFormId;
+	}
+
+	public void setEncounterFormId(Integer encounterFormId)
+	{
+		this.encounterFormId = encounterFormId;
+	}
 }

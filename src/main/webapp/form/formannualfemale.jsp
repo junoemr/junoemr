@@ -46,7 +46,9 @@
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title><bean:message key="oscarEncounter.formFemaleAnnual.title" /></title>
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+	<title><bean:message key="oscarEncounter.formFemaleAnnual.title" /></title>
 <link rel="stylesheet" type="text/css" href="annualStyle.css">
 <link rel="stylesheet" type="text/css" media="print" href="print.css">
 <html:base />
@@ -63,6 +65,7 @@
     }
     function onSave() {
         document.forms[0].submit.value="save";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret==true)
         {
@@ -73,6 +76,7 @@
     
     function onSaveExit() {
         document.forms[0].submit.value="exit";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret == true)
         {

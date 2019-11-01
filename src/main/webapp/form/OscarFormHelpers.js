@@ -119,6 +119,36 @@ Oscar.FormHelpers.createConfirmDirtyState = function createConfirmDirtyState()
     return defer.promise();
 };
 
+/**
+ * Any inputs used as checkboxes do not submit their "value" if they are unchecked
+ * To ensure that an unchecked checkbox is properly saved for future usage of the form,
+ * create a hidden input with a blank value for any unchecked checkbox input on the page.
+ *
+ * Call this as part of any onSubmit procedures as a last-ditch effort to get inputs to submit properly.
+ */
+
+Oscar.FormHelpers.forceSubmitUncheckedCheckboxes = function forceSubmitUncheckedCheckboxes()
+{
+    var checkboxes = $("input:checkbox");
+    if (checkboxes !== null)
+    {
+        for (var i = 0; i < checkboxes.length; i++)
+        {
+            if (!checkboxes[i].checked)
+            {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: checkboxes[i].name + '' + i,
+                    name: checkboxes[i].name,
+                    value: ''
+                }).appendTo('form');
+            }
+        }
+    }
+};
+
+
+
 Oscar.FormHelpers.DirtyStateConfirmMessage = 'Are you sure you want to navigate away from this page without saving your changes?';
 Oscar.FormHelpers.DirtyStateConfirmTitle = 'Unsaved Changes';
 

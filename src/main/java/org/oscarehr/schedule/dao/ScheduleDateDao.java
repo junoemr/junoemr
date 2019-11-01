@@ -185,7 +185,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 			}
 			queryString += " ) ";
 		}
-		queryString += "ORDER BY s.date, id ";
+		queryString += "ORDER BY s.date, s.providerNo, id ";
 		
 		Query query = entityManager.createQuery( queryString );
 		if(limit > 0) {

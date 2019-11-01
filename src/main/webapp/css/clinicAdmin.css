@@ -187,6 +187,28 @@ form {
     align-items: center;
 }
 
+#clinic-logos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#card-logo-form {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.clinic-logo-input-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
 @media only screen and (max-width: 1000px) {
     .address-fields {
         flex-direction: column;

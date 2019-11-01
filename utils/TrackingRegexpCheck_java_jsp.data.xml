@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TrackingRegexpCheck>
     <ViolationSet>
-        <ViolationKey>.*ArrayList\s*\(\).*|.*Vector\s*\(\).*|.*HashSet\s*\(\).*|.*HashMap\s*\(\).*|.*Hashtable\s*\(\).*|.*TreeSet\s*\(\).*|.*TreeMap\s*\(\).*|.*WeakHashMap\s*\(\).*</ViolationKey>
+        <ViolationKey>.*ArrayList\s*\(\).*|.*\s+Vector\s*\(\).*|.*HashSet\s*\(\).*|.*HashMap\s*\(\).*|.*Hashtable\s*\(\).*|.*TreeSet\s*\(\).*|.*TreeMap\s*\(\).*|.*WeakHashMap\s*\(\).*</ViolationKey>
         <ViolationValue>/src/main/java/com/quatro/service/security/RolesManager.java:ArrayList lstForDelete = new ArrayList();</ViolationValue>
         <ViolationValue>/src/main/java/com/quatro/service/security/UserAccessManager.java:Hashtable functionList = new Hashtable();</ViolationValue>
         <ViolationValue>/src/main/java/com/quatro/service/security/UserAccessManager.java:List orgList = new ArrayList();</ViolationValue>

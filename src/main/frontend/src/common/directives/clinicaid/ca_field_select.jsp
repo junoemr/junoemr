@@ -20,7 +20,7 @@
 						ng-change="change_fn()"
 						ng-disabled="disabled"
 						tabindex="{{tab_index}}">
-			<option ng-if="include_empty_option == 'true'" value=""></option>
+			<option ng-if="include_empty_option == 'true'" value="">{{text_placeholder}}</option>
 		</select>
 	</div>
 

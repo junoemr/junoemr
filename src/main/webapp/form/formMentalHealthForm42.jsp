@@ -51,6 +51,11 @@
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+
+	<!-- Helper scripts for submission -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+
 <title>Laboratory Requisition</title>
 <html:base />
 <link rel="stylesheet" type="text/css" media="screen"
@@ -102,40 +107,42 @@ temp = "";
 
 
     function onPrintPDF() {
-         
-        //var ret = checkAllDates();
-        //if(ret==true)
-        //{            
-            
-            //ret = confirm("Do you wish to save this form and view the print preview?");
-            //popupFixedPage(650,850,'../provider/notice.htm');
-            temp=document.forms[0].action;         
-            document.forms[0].action = "<rewrite:reWrite jspPage="formname.do?__title=MentalHealthForm42&__cfgfile=mentalHealthForm42Print&__cfgfile=mentalHealthForm42Print_2&__template=mentalHealthForm42"/>";
-            document.forms[0].submit.value="printall"; 
-            document.forms[0].target="_self";
-        //}
-        //return ret;
-        return true;
-    }
-    function onSave() {
-        if (temp != "") { document.forms[0].action = temp; }
-        document.forms[0].target="_self";        
-        document.forms[0].submit.value="save";
-        var ret = checkAllDates();
-        return ret;
-    }
-    
-    function onSaveExit() {
-        if (temp != "") { document.forms[0].action = temp; }
-        document.forms[0].target="_self";
-        document.forms[0].submit.value="exit";
-        var ret = checkAllDates();
-        if(ret == true)
-        {
-            ret = confirm("Are you sure you wish to save and close this window?");
-        }
-        return ret;
-    }
+		Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
+		//var ret = checkAllDates();
+		//if(ret==true)
+		//{
+
+			//ret = confirm("Do you wish to save this form and view the print preview?");
+			//popupFixedPage(650,850,'../provider/notice.htm');
+			temp=document.forms[0].action;
+			document.forms[0].action = "<rewrite:reWrite jspPage="formname.do?__title=MentalHealthForm42&__cfgfile=mentalHealthForm42Print&__cfgfile=mentalHealthForm42Print_2&__template=mentalHealthForm42"/>";
+			document.forms[0].submit.value="printall";
+			document.forms[0].target="_self";
+		//}
+		//return ret;
+		return true;
+	}
+	function onSave() {
+		if (temp != "") { document.forms[0].action = temp; }
+		document.forms[0].target="_self";
+		document.forms[0].submit.value="save";
+		Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
+		var ret = checkAllDates();
+		return ret;
+	}
+
+	function onSaveExit() {
+		if (temp != "") { document.forms[0].action = temp; }
+		document.forms[0].target="_self";
+		document.forms[0].submit.value="exit";
+		Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
+		var ret = checkAllDates();
+		if(ret == true)
+		{
+			ret = confirm("Are you sure you wish to save and close this window?");
+		}
+		return ret;
+	}
 function popupFixedPage(vheight,vwidth,varpage) { 
   var page = "" + varpage;
   windowprop = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=10,screenY=0,top=0,left=0";

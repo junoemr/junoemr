@@ -116,11 +116,7 @@ public class BillingSaveBillingAction extends Action {
             }
         }
 
-
         char billingAccountStatus = getBillingAccountStatus( bean);
-
-       
-
         ArrayList<oscar.oscarBilling.ca.bc.pageUtil.BillingBillingManager.BillingItem> billItem = bean.getBillItem();
 
         char paymentMode = (bean.getEncounter().equals("E") && !bean.getBillingType().equals("ICBC") && !bean.getBillingType().equals("Pri") && !bean.getBillingType().equals("WCB")) ? 'E' : '0';
