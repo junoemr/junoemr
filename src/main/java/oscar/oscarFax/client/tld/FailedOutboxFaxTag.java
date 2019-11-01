@@ -22,9 +22,9 @@
  */
 package oscar.oscarFax.client.tld;
 
+import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
-import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -39,14 +39,14 @@ public class FailedOutboxFaxTag extends TagSupport
 {
 	private int numFailures;
 
-	private final FaxAccountService faxService;
+	private final FaxAccountDao faxAccountDao;
 
 	private final OutgoingFaxService outgoingFaxService;
 
 	public FailedOutboxFaxTag()
 	{
 		numFailures = 0;
-		faxService = SpringUtils.getBean(FaxAccountService.class);
+		faxAccountDao = SpringUtils.getBean(FaxAccountDao.class);
 		outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
 	}
 
@@ -58,9 +58,8 @@ public class FailedOutboxFaxTag extends TagSupport
 
 			FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
 			criteriaSearch.setLimit(10);
-			criteriaSearch.setSortDirAscending();
 
-			List<FaxAccount> accounts = faxService.listAccounts(criteriaSearch);
+			List<FaxAccount> accounts = faxAccountDao.criteriaSearch(criteriaSearch);
 			for (FaxAccount account : accounts)
 			{
 				numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), null, null, FaxOutboxTransferOutbound.CombinedStatus.ERROR.toString(), null);

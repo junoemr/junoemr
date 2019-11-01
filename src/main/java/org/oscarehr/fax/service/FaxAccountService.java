@@ -31,11 +31,13 @@ import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.model.FaxInbound;
-import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
+import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
+import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,19 +102,19 @@ public class FaxAccountService
 		return faxAccountList.isEmpty() ? null : faxAccountList.get(0);
 	}
 
-	public List<FaxAccount> listAccounts(FaxAccountCriteriaSearch criteriaSearch)
+	public List<FaxAccountTransferOutbound> listAccounts(FaxAccountCriteriaSearch criteriaSearch)
 	{
-		return faxAccountDao.criteriaSearch(criteriaSearch);
+		return FaxTransferConverter.getAllAsOutboundTransferObject(faxAccountDao.criteriaSearch(criteriaSearch));
 	}
 
-	public List<FaxOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
+	public List<FaxOutboxTransferOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
 	{
-		return faxOutboundDao.criteriaSearch(criteriaSearch);
+		return FaxTransferConverter.getAllAsOutboxTransferObject(faxAccount, faxOutboundDao.criteriaSearch(criteriaSearch));
 	}
 
-	public List<FaxInbound> getInboxResults(FaxInboundCriteriaSearch criteriaSearch)
+	public List<FaxInboxTransferOutbound> getInboxResults(FaxInboundCriteriaSearch criteriaSearch)
 	{
 		// find the list of all inbound results based on the search criteria
-		return faxInboundDao.criteriaSearch(criteriaSearch);
+		return FaxTransferConverter.getAllAsInboxTransferObject(faxInboundDao.criteriaSearch(criteriaSearch));
 	}
 }

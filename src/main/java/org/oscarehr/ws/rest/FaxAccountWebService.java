@@ -56,7 +56,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
 import java.util.List;
 
 @Path("/faxAccount")
@@ -79,9 +78,6 @@ public class FaxAccountWebService extends AbstractServiceImpl
 
 	@Autowired
 	FaxAccountService faxAccountService;
-
-	@Autowired
-	FaxTransferConverter faxTransferConverter;
 
 	@GET
 	@Path("/search")
@@ -106,8 +102,8 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		criteriaSearch.setSortDirAscending();
 
 		int total = faxAccountDao.criteriaSearchCount(criteriaSearch);
-		List<FaxAccountTransferOutbound> transferList = faxTransferConverter.getAllAsOutboundTransferObject(faxAccountService.listAccounts(criteriaSearch));
-		return RestSearchResponse.successResponse(transferList, page, perPage, total);
+		List<FaxAccountTransferOutbound> accountList = faxAccountService.listAccounts(criteriaSearch);
+		return RestSearchResponse.successResponse(accountList, page, perPage, total);
 	}
 
 	@GET
@@ -130,7 +126,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		FaxAccountTransferOutbound accountSettingsTo1 = faxTransferConverter.getAsOutboundTransferObject(faxAccountDao.find(id));
+		FaxAccountTransferOutbound accountSettingsTo1 = FaxTransferConverter.getAsOutboundTransferObject(faxAccountDao.find(id));
 		return RestResponse.successResponse(accountSettingsTo1);
 	}
 
@@ -144,11 +140,11 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
 
-		FaxAccount faxAccount = faxTransferConverter.getAsDomainObject(accountSettingsTo1);
+		FaxAccount faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
 		faxAccount.setIntegrationType(FaxAccount.INTEGRATION_TYPE_SRFAX);// hardcoded until more than one type exists
 		faxAccountDao.persist(faxAccount);
 
-		return RestResponse.successResponse(faxTransferConverter.getAsOutboundTransferObject(faxAccount));
+		return RestResponse.successResponse(FaxTransferConverter.getAsOutboundTransferObject(faxAccount));
 	}
 
 	@PUT
@@ -173,12 +169,12 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		{
 			accountSettingsTo1.setPassword(faxAccount.getLoginPassword());
 		}
-		faxAccount = faxTransferConverter.getAsDomainObject(accountSettingsTo1);
+		faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
 		faxAccount.setIntegrationType(FaxAccount.INTEGRATION_TYPE_SRFAX);// hardcoded until more than one type exists
 		faxAccount.setId(id);
 		faxAccountDao.merge(faxAccount);
 
-		return RestResponse.successResponse(faxTransferConverter.getAsOutboundTransferObject(faxAccount));
+		return RestResponse.successResponse(FaxTransferConverter.getAsOutboundTransferObject(faxAccount));
 	}
 
 	@POST
@@ -251,7 +247,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		}
 
 		int total = faxInboundDao.criteriaSearchCount(criteriaSearch);
-		List<FaxInboxTransferOutbound> inboundList = faxTransferConverter.getAllAsInboxTransferObject(faxAccountService.getInboxResults(criteriaSearch));
+		List<FaxInboxTransferOutbound> inboundList = faxAccountService.getInboxResults(criteriaSearch);
 
 		return RestSearchResponse.successResponse(inboundList, page, perPage, total);
 	}
@@ -300,7 +296,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		int total = faxOutboundDao.criteriaSearchCount(criteriaSearch);
 
 		FaxAccount faxAccount = faxAccountDao.find(id);
-		ArrayList<FaxOutboxTransferOutbound> transferList = faxTransferConverter.getAllAsOutboxTransferObject(faxAccount, faxAccountService.getOutboxResults(faxAccount, criteriaSearch));
+		List<FaxOutboxTransferOutbound> transferList = faxAccountService.getOutboxResults(faxAccount, criteriaSearch);
 
 		return RestSearchResponse.successResponse(transferList, page, perPage, total);
 	}
