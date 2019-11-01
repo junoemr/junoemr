@@ -29,13 +29,13 @@
 <!-- Compatibility page to allow old admin pages to function in the new admin, until we convert all of them -->
 <html>
 <head>
-	<script type="text/javascript" src="/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery-1.9.1.js"></script>
 
-	<script type="text/javascript" src="/js/bootstrap.js"></script>
-	<script type="text/javascript" src="/js/bootstrap-datepicker.js"></script>
-	<script type="text/javascript" src="/js/jquery.validate.js"></script>
-	<script type="text/javascript" src="/js/jquery.dataTables.js"></script>
-	<script type="text/javascript" src="/js/DT_bootstrap.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath() %>/js/bootstrap.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath() %>/js/bootstrap-datepicker.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery.dataTables.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath() %>/js/DT_bootstrap.js"></script>
 
 	<link href="<%=request.getContextPath() %>/css/bootstrap.css" rel="stylesheet" type="text/css">
 	<link href="<%=request.getContextPath() %>/css/datepicker.css" rel="stylesheet" type="text/css">

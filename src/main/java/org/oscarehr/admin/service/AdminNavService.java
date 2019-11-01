@@ -214,7 +214,6 @@ public class AdminNavService
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.reconciliationReports"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/viewReconcileReports.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.AccountingRpts"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingAccountReports.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.editInvoices"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billStatus.jsp"));
-			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.settlePaidClaims"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/settleBG.jsp"));
 		}
 		else if (oscarProperties.isOntarioBillingType())
 		{
@@ -475,11 +474,6 @@ public class AdminNavService
 
 		systemManagementGroup.setName(resourcebundle.getString("admin.admin.SystemManagement"));
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.userAdmin"))
-		{
-			systemManagementItems.add(new AdminNavItemTo1(resourcebundle.getString("admin.admin.addRole"), "frame?frameUrl=" + contextPath + "/admin/providerAddRole.jsp"));
-		}
-
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.document"))
 		{
 			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("admin.admin.DocumentCategories"), "frame?frameUrl=" + contextPath + "/admin/displayDocumentCategories.jsp"));
@@ -493,7 +487,7 @@ public class AdminNavService
 			{
 				systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("admin.admin.sitesAdmin"), "frame?frameUrl=" + contextPath + "/admin/ManageSites.do"));
 			}
-			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("oscarEncounter.Index.btnCustomize") + resourcebundle.getString("oscar.admin.diseaseRegistryQuickList"),
+			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("oscarEncounter.Index.btnCustomize") + " " + resourcebundle.getString("oscar.admin.diseaseRegistryQuickList"),
 					"frame?frameUrl=" + contextPath + "/oscarResearch/oscarDxResearch/dxResearchCustomization.jsp"));
 		}
 
@@ -504,7 +498,7 @@ public class AdminNavService
 
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.measurements"))
 		{
-			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("oscarEncounter.Index.btnCustomize") + resourcebundle.getString("admin.admin.oscarMeasurements"),
+			systemManagementItems.add( new AdminNavItemTo1(resourcebundle.getString("oscarEncounter.Index.btnCustomize") + " " + resourcebundle.getString("admin.admin.oscarMeasurements"),
 					"frame?frameUrl=" + contextPath + "/oscarEncounter/oscarMeasurements/Customization.jsp"));
 		}
 
@@ -513,15 +507,8 @@ public class AdminNavService
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("oscarprevention.preventionlistmanager.title"), "frame?frameUrl=" + contextPath + "/oscarPrevention/PreventionListManager.jsp"));
 		}
 
-		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
-		{
-			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.btnBaseURLSetting"), "frame?frameUrl=" + contextPath + "/admin/resourcebaseurl.jsp"));
-		}
-
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.messenger"))
 		{
-			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.messages"),
-					"frame?frameUrl=" + URLEncoder.encode(contextPath + "/oscarMessenger/DisplayMessages.do?providerNo=" + providerNo)));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.btnMessengerAdmin"), "frame?frameUrl=" + contextPath + "/oscarMessenger/config/MessengerAdmin.jsp"));
 		}
 
