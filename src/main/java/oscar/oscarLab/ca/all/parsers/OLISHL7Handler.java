@@ -851,6 +851,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		
 		msg = p.parse(hl7Body.replaceAll("\n", "\r\n"));
 		headers = new ArrayList<String>();
+		this.message = msg;
 		terser = new Terser(msg);
 		int zbrNum = 1;
 		int obrCount = getOBRCount();

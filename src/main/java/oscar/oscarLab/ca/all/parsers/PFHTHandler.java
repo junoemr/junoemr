@@ -102,6 +102,8 @@ public class PFHTHandler extends ORU_R01MessageHandler
 
 	            }
 	        }
+	        this.message = msg;
+	        this.terser = new Terser(msg);
 	    }
 
 	@Override

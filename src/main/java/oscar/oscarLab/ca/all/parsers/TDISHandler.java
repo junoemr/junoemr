@@ -159,6 +159,8 @@ public class TDISHandler extends ORU_R01MessageHandler
 			}
 		} //end lab iteration
 
+		this.message = msg;
+		this.terser = new Terser(msg);
 	}
 
 	@Override

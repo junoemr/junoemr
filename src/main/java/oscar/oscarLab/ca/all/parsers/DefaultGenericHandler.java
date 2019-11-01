@@ -71,7 +71,7 @@ public class DefaultGenericHandler extends ORU_R01MessageHandler
         // force parsing as a generic message by changing the message structure
         hl7Body = hl7Body.replaceAll("R01", "");
         msg = p.parse(hl7Body.replaceAll( "\n", "\r\n"));
-
+        this.message = msg;
         terser = new Terser(msg);
 
         int obrCount = getOBRCount();

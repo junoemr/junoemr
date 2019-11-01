@@ -67,6 +67,7 @@ public class MDSHandler extends ORU_R01MessageHandler
     }
 
     public void init(String hl7Body) throws HL7Exception {
+    	this.legacyHandler = true;
     	hl7Body=StringUtils.trimToNull(hl7Body);
     	if (hl7Body==null)
     	{
@@ -75,7 +76,7 @@ public class MDSHandler extends ORU_R01MessageHandler
     	}
 
     	try {
-    	
+
 	        msg=DynamicHapiLoaderUtils.parseMdsMsg(hl7Body.replace( "\n", "\r\n"));
 	        terser = DynamicHapiLoaderUtils.getMdsTerser(msg);
 

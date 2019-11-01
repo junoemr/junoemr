@@ -60,6 +60,7 @@ public abstract class MessageHandler
 
 	protected Terser terser;
 	protected Message message;
+	protected boolean legacyHandler = false;
 
 
 	public enum OBX_CONTENT_TYPE {

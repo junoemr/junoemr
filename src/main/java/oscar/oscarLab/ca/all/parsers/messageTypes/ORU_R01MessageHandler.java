@@ -504,7 +504,7 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 	@Override
 	public boolean hasPerformingOrganization(int i, int k)
 	{
-		return isComponentPresent("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-23");
+		return !legacyHandler && isComponentPresent("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-23");
 	}
 
 
@@ -565,7 +565,7 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 	@Override
 	public boolean hasSpecimenSegment(int i )
 	{
-		if (getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		if (!legacyHandler && getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
 		{
 			return getSpecimenCount(i) != 0;
 		}
