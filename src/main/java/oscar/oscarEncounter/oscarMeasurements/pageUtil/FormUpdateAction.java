@@ -122,8 +122,8 @@ public class FormUpdateAction extends Action {
 					
 	               mFlowsheet.getMeasurementFlowSheetInfo(measure);
 	               EctMeasurementTypesBean mtypeBean = mFlowsheet.getFlowsheetMeasurement(measure);
-	               // the above can return null if the MeasurementFlowSheet didn't load the entries correctly
-	               if (mtypeBean == null)
+				   // the above can return null if the MeasurementFlowSheet didn't load the entries correctly
+				   if (mtypeBean == null)
 				   {
 					   mtypeBean = mType.getMeasurementType(measure);
 				   }
