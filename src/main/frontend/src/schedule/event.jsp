@@ -72,7 +72,7 @@
 				     ng-include="'src/common/spinner.jsp'">
 				</div>
 				<div ng-show="isInitialized() && !isWorking()">
-					<div class="tab-bar-inputs form-row">
+					<div class="tab-bar-inputs row">
 						<div class="col-sm-8 pull-right">
 							<juno-appointment-status-select
 									ca-name="event-appt-status"
@@ -85,8 +85,8 @@
 							</juno-appointment-status-select>
 						</div>
 					</div>
-					<div>
-						<div class="form-row">
+					<div class="col-xs-12">
+						<div class="row">
 							<!-- patient search -->
 							<div class="form-group col-md-6" title="Patient"
 							     ng-hide="eventData.doNotBook">
@@ -173,7 +173,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="form-row">
+						<div class="row">
 							<div class="form-group col-md-6 info-frame-container">
 								<div ng-show="isPatientSelected()">
 									<label class="control-label">Demographic</label>
@@ -244,13 +244,13 @@
 								</div>
 							</div>
 						</div>
-						<div class="form-row">
+						<div class="row">
 							<!-- show patient alerts -->
 							<div class="col-md-12">
 								<span class="form-control-static alert-message">{{eventController.demographicModel.data.alert}}</span>
 							</div>
 						</div>
-						<div class="form-row">
+						<div class="row">
 							<div class="col-md-6">
 								<!-- notes selection-->
 								<ca-field-text
