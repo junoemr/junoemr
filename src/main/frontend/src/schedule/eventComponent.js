@@ -1074,15 +1074,15 @@ angular.module('Schedule').component('eventComponent', {
 				controller.demographicModel.loadData(demographicNo); //TODO why?
 			};
 
-			$scope.newDemographic = function newDemographic(size)
+			$scope.newDemographic = function newDemographic()
 			{
 				var modalInstance = $uibModal.open(
 					{
-						templateUrl: 'src/patient/newPatient.jsp',
-						controller: 'Patient.NewPatientController as newPatientCtrl',
+						component: 'addDemographicModal',
 						backdrop: 'static',
-						size: size
-					});
+						windowClass: "juno-modal",
+					}
+				);
 
 				modalInstance.result.then(
 					function success(results)
@@ -1091,6 +1091,7 @@ angular.module('Schedule').component('eventComponent', {
 						console.log('patient #: ', results.demographicNo);
 
 						controller.demographicModel.loadData(results.demographicNo);
+						controller.patientTypeahead  = {isTypeaheadSearchQuery: true, searchQuery: results.lastName + ", " + results.firstName};
 					},
 					function error(errors)
 					{

@@ -10,6 +10,7 @@
 	       class="{{label_size}} control-label"
 	       title="{{hint}}">
 		{{title}}
+		<span ng-if="requiredField" class="required-field-marker">*</span>
 	</label>
 
 	<div class="{{input_size}} {{ date_picker_id }}-body">
