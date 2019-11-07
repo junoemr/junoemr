@@ -2107,9 +2107,11 @@
 	<databaseap>
 		<ap-name>healthcare_team_role</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(IF(dc.role = '25',
-				'INTERNAL', # Role 25 is not found in the specialty table
-				COALESCE(specialty.specialtydesc, dc.role, '-')) SEPARATOR ' | ') AS role
+			SELECT GROUP_CONCAT(COALESCE(
+				specialty.specialtydesc,
+				IF(dc.role = '25', 'INTERNAL', NULL), # Role 25 is not found in the specialty table
+				dc.role,
+				'-') SEPARATOR ' | ') AS role
 			FROM DemographicContact dc
 
 			LEFT JOIN specialty
