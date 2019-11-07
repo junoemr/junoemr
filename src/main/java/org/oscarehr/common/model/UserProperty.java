@@ -81,9 +81,9 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String SCHEDULE_PERIOD = "schedule.period";
     public static final String SCHEDULE_SITE = "schedule.site";
     public static final String SCHEDULE_VIEW = "schedule.view";
-    public static final String SCHEDULE_COUNT_INCLUDE_CANCELLED = "appointment_count_include_cancelled";
-    public static final String SCHEDULE_COUNT_INCLUDE_NO_SHOW = "appointment_count_include_noshow";
-    public static final String SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC = "appointment_count_include_no_demographic";
+    public static final String SCHEDULE_COUNT_INCLUDE_CANCELLED = "schedule_count_include_cancelled";
+    public static final String SCHEDULE_COUNT_INCLUDE_NO_SHOW = "schedule_count_include_noshow";
+    public static final String SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC = "schedule_count_include_no_demographic";
     public static final String MYGROUP_NO = "mygroup_no";
     public static final String NEW_CME = "new_cme";
     public static final String ENCOUNTER_FORM_LENGTH = "encounter.form_length";
