@@ -119,7 +119,7 @@ public class MedicationMapper extends AbstractMapper
 		String drugId = getRequestedGiveCodeId(rep);
 		Date drugStart = getAdministrationStartDate(rep);
 
-		if (drugStart != null && drugId != null)
+		if (drugStart != null && drugId != null && !"NONDRUG".equals(drugId))
 		{
 			for (int i = 0; i < getNumMedications(); i++)
 			{

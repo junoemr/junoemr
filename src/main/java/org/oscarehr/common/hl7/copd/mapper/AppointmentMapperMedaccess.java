@@ -60,7 +60,7 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 	}
 
 	/**
-	 * Medaccess does not have appointment reasons
+	 * Medaccess has a strange reason format. <???>:<appointment type>:<reason>
 	 * @param rep - the appointment you want
 	 * @return - the appointment reason
 	 * @throws HL7Exception - if there is an error parsing the hl7
@@ -68,6 +68,15 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 	@Override
 	public String getReason(int rep) throws HL7Exception
 	{
+		String appReason = StringUtils.trimToNull(message.getPATIENT().getSCH(rep).getSch29_zAppointmentReason().getValue());
+		if (appReason != null)
+		{
+			String[] reasonList = appReason.split(":");
+			if (reasonList.length > 2)
+			{
+				return reasonList[2];
+			}
+		}
 		return "";
 	}
 
