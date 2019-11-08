@@ -60,6 +60,7 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.rest.conversion.EncounterTemplateConverter;
 import org.oscarehr.ws.rest.conversion.summary.Summary;
 import org.oscarehr.ws.rest.to.EncounterTemplateResponse;
@@ -79,7 +80,7 @@ import oscar.oscarProvider.data.ProviderMyOscarIdData;
 @Path("/recordUX/")
 @Component("recordUxService")
 public class RecordUxService extends AbstractServiceImpl {
-	private static final Logger logger = MiscUtils.getLogger();
+	private static Logger logger = MiscUtils.getLogger();
 	
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
@@ -411,15 +412,15 @@ public class RecordUxService extends AbstractServiceImpl {
 	@GET
 	@Path("/{demographicNo}/print")
 	@Produces("application/pdf")
-	public StreamingOutput print(@PathParam("demographicNo") Integer demographicNo,  @QueryParam("printOps") String jsonString,@Context HttpServletRequest request){
-		
-		
-		logger.debug("jsonobject " +jsonString);
+	@SkipContentLoggingOutbound
+	public StreamingOutput print(@PathParam("demographicNo") Integer demographicNo,
+								 @QueryParam("printOps") String jsonString,
+								 @Context HttpServletRequest request)
+	{
+
 		JSONObject jsonobject = JSONObject.fromObject(jsonString);
-		//{"printType":"all","cpp":true,"rx":true,"selectedList":[]}
-		
+
 		final Integer demographicNof = demographicNo;
-		final HttpServletRequest requestf = request;
 		boolean printAllNotesType = "all".equalsIgnoreCase(getString(jsonobject,"printType"));
 		final boolean printDateRangeNotes = "dates".equalsIgnoreCase(getString(jsonobject,"printType"));
 		
@@ -455,15 +456,14 @@ public class RecordUxService extends AbstractServiceImpl {
 		for(int i = 0; i < keyArray.size(); i++) {
 			noteIds[i] = keyArray.getString(i);
 		}
-		
-		
+
 		return new StreamingOutput() {
 			@Override
 			public void write(java.io.OutputStream os)
 					throws IOException, WebApplicationException {
 				try{
 					CaseManagementPrint cmp = new CaseManagementPrint();
-					cmp.doPrint(loggedInInfo,demographicNof, printAllNotes,noteIds,printCPP,printRx,printLabs,startCalf,endCalf, requestf, os);
+					cmp.doPrint(loggedInInfo,demographicNof, printAllNotes,noteIds,printCPP,printRx,printLabs,startCalf,endCalf, request, os);
 		        }catch(Exception e){
 		        		logger.error("error streaming",e);
 		        }finally{

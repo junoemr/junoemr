@@ -199,7 +199,7 @@ public class GDMLHandler extends ORU_R01MessageHandler
             Segment obxSeg = (( obrSegMap.get(obrSegKeySet.get(i))).get(j));
             String ident = getString(getComponent(obxSeg, 3, 0, 1));
 
-            logger.info("returning obx identifier: "+ident);
+            logger.debug("returning obx identifier: "+ident);
             return(ident);
         }catch(Exception e){
             logger.error("error returning obx identifier", e);

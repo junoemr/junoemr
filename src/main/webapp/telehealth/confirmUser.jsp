@@ -44,7 +44,7 @@
                 <input type=hidden name="appt" value="<%=request.getParameter("appt")%>"/>
                 <input type=hidden name="remoteUser" value="<%=request.getParameter("remoteUser")%>"/>
                 <div class="mha-button-container">
-                    <button type="submit" class="primary">Continue to Telehealth</button>
+                    <button type="submit" class="primary">Continue to MyHealthAccess</button>
                 </div>
             </form>
         </div>

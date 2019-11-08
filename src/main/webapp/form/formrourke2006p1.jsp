@@ -91,6 +91,10 @@
 <!-- main calendar program -->
 <script type="text/javascript" src="../share/calendar/calendar.js"></script>
 
+	<!-- Helper scripts for submission -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+
 <!-- language for the calendar -->
 <script type="text/javascript"
 	src="../share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>
@@ -191,16 +195,16 @@
         document.forms[0].submit.value="print"; 
                 
         document.forms[0].action = "../form/createpdf?__title=Rourke+Baby+Report+Pg1&__cfgfile=rourke2006printCfgPg1&__template=rourke2006p1";
-        document.forms[0].target="_blank";            
-        
+        document.forms[0].target="_blank";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         return true;
     }
     function onPrintAll() {
         document.forms[0].submit.value="printAll"; 
                 
         document.forms[0].action = "../form/formname.do?__title=Rourke+Baby+Report&__cfgfile=rourke2006printCfgPg1&__cfgfile=rourke2006printCfgPg2&__cfgfile=rourke2006printCfgPg3&__cfgfile=rourke2006printCfgPg4&__template=rourke2006";
-        document.forms[0].target="_blank";            
-        
+        document.forms[0].target="_blank";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         return true;
     }
     
@@ -237,6 +241,7 @@
     function onSave() {
     
         if( checkMeasures() ) {
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             document.forms[0].submit.value="save";                
             reset();                
             return confirm("Are you sure you want to save this form?");
@@ -248,6 +253,7 @@
     function onSaveExit() {
     
         if( checkMeasures() ) {
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             document.forms[0].submit.value="exit";
             reset();
             return confirm("Are you sure you wish to save and close this window?");

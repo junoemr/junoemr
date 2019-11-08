@@ -174,7 +174,7 @@
 	<table>
 	<tr> <!-- first row is logo | prov info -->
 		<td style="padding-right: 10px">
-			<img src="../imageRenderingServlet?source=clinic_logo" width="200px"/>
+			<img src="../ClinicImage.do?method=getImage&image_type=CARD_LOGO" width="200px"/>
 		</td>
 		<td>
 		<%

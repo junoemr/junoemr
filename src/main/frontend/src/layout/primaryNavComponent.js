@@ -592,10 +592,9 @@ angular.module('Layout').component("primaryNavigation", {
 		{
 			var modalInstance = $uibModal.open(
 				{
-					templateUrl: 'src/patient/newPatient.jsp',
-					controller: 'Patient.NewPatientController as newPatientCtrl',
+					component: 'addDemographicModal',
 					backdrop: 'static',
-					size: size
+					windowClass: "juno-modal",
 				});
 
 			modalInstance.result.then(

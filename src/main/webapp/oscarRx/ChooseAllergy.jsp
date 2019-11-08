@@ -167,10 +167,10 @@ oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBea
 							general to specific)</i></td>
 						</tr>
 						<tr>
-							<td><html:checkbox property="type4" /> Drug Classes</td>
-							<td><html:checkbox property="type3" /> Ingredients</td>
-							<td><html:checkbox property="type2" /> Generic Names</td>
-							<td><html:checkbox property="type1" /> Brand Names</td>
+							<td><html:checkbox property="typeDrugClass" /> Drug Classes</td>
+							<td><html:checkbox property="typeIngredient" /> Ingredients</td>
+							<td><html:checkbox property="typeGenericName" /> Generic Names</td>
+							<td><html:checkbox property="typeBrandName" /> Brand Names</td>
 						</tr>
 						<tr>
 							<td colspan=4><script language=javascript>

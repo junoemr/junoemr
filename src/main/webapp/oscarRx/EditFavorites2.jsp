@@ -33,29 +33,30 @@
 <%@ page import="oscar.oscarRx.data.RxCodesData" %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
 
-<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<c:set var="context" value="${pageContext.request.contextPath}" />
 <html:html locale="true">
 <head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/prototype.js"/>"></script>
-<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/screen.js"/>"></script>
-<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/rx.js"/>"></script>
-<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/scriptaculous.js"/>"></script>
-<title>Edit Favorites</title>
-<html:base />
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/prototype.js"/>"></script>
+	<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/screen.js"/>"></script>
+	<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/rx.js"/>"></script>
+	<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/scriptaculous.js"/>"></script>
+	<title>Edit Favorites</title>
+	<html:base />
 
-<logic:notPresent name="RxSessionBean" scope="session">
-	<logic:redirect href="error.html" />
-</logic:notPresent>
-<logic:present name="RxSessionBean" scope="session">
-	<bean:define id="bean" type="oscar.oscarRx.pageUtil.RxSessionBean"
-		name="RxSessionBean" scope="session" />
-	<logic:equal name="bean" property="valid" value="false">
+	<logic:notPresent name="RxSessionBean" scope="session">
 		<logic:redirect href="error.html" />
-	</logic:equal>
-</logic:present>
+	</logic:notPresent>
+	<logic:present name="RxSessionBean" scope="session">
+		<bean:define id="bean" type="oscar.oscarRx.pageUtil.RxSessionBean"
+			name="RxSessionBean" scope="session" />
+		<logic:equal name="bean" property="valid" value="false">
+			<logic:redirect href="error.html" />
+		</logic:equal>
+	</logic:present>
 
-<link rel="stylesheet" type="text/css" href="styles.css">
+	<link rel="stylesheet" type="text/css" href="styles.css">
+	<link rel="stylesheet" type="text/css" href="../css/allergies.css">
 	<style type="text/css">
 		.drugForm {
 			background-color: #F5F5F5;
@@ -202,7 +203,7 @@
 
 		<td width="100%" style="border-left: 2px solid #A9A9A9;" height="100%"
 			valign="top">
-		<table style="border-collapse: collapse" bordercolor="#111111" width="100%" height="100%">
+		<table style="border-collapse: collapse" width="100%">
 			<tr>
 				<td width="0%" valign="top">
 				<div class="DivCCBreadCrumbs"><a href="SearchDrug3.jsp"> <bean:message
@@ -211,13 +212,12 @@
 				</td>
 			</tr>
 
-
 			<!----Start new rows here-->
 
 			<tr>
 				<td>
 					<div class=DivContentPadding>
-						<input type=button value="Back to Search For Drug" class="ControlPushButton" onClick="javascript:window.location.href='SearchDrug3.jsp';" />
+						<input type=button value="Back to Search For Drug" class="ControlPushButton" onClick="window.location.href='SearchDrug3.jsp';" />
 					</div>
 				</td>
 			</tr>

@@ -173,6 +173,12 @@ public class BillingReProcessBillAction extends Action {
       billingStatus = "S";
     }
 
+    // billing region is set to PP when insurer is Pay Patient
+    if ("PP".equals(oinInsurerCode))
+    {
+        hcType = oinInsurerCode;
+    }
+
     if (hcType.equals(billRegion)) { //if its bc go on
       //oinInsurerCode = "";
       oinRegistrationNo = "";

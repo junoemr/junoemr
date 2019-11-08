@@ -180,6 +180,8 @@ var rows = 0;
 var totalRows = 0;
 var page = 0;
 var pageSize = 35;
+// scroll 20px before end of doc
+var scrollOffset = 20;
 var sortAsc = true;
 var category = 0;
 var xhr;
@@ -191,7 +193,7 @@ var loading = false;
 
 function handleScroll(e) {
 	if (!canLoad || loading) { return false; }
-	if (jQuery(window).scrollTop() >= jQuery(document).height() - jQuery(window).height()){
+	if ((jQuery(window).scrollTop() + scrollOffset) >= jQuery(document).height() - jQuery(window).height()){
 		update(searchMethod);
 	}
 }

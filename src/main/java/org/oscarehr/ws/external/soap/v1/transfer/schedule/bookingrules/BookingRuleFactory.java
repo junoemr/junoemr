@@ -27,165 +27,222 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.oscarehr.util.MiscUtils;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class BookingRuleFactory
 {
-    private static final String PERIOD_TYPE_CUTOFF_DAY = "cuttoff_day";
-    private static final String PERIOD_TYPE_BLACKOUT_NOW_UNTIL_HOUR = "blackout_now_until_hour";
-    private static final String PERIOD_TYPE_BLACKOUT_NOW_UNTIL_DAY = "blackout_now_until_day";
-    private static final String PERIOD_TYPE_HOUR = "hour";
-    private static final String PERIOD_TYPE_DAY = "day";
-    private static final String PERIOD_TYPE_WEEK = "week";
-    private static final String PERIOD_TYPE_MONTH = "month";
-    private static final String PRIMARY_PROVIDER_ONLY = "primary_provider_only";    // TODO: Placeholder
-    private static final String APPOINTMENT_AVAILABLE = "appointment_is_available"; // TODO: Placeholder
 
-    // TODO: Class into component and autowire?
-    public static List<BookingRule> createBookingRuleList(Integer demographicNo, String jsonRuleString) throws ParseException
-    {
-        List<BookingRule> bookingRules = createNewBookingRulesList();
+	public static List<BookingRule> createBookingRuleList(Integer demographicNo, String jsonRuleString) throws ParseException
+	{
+		List<BookingRule> bookingRules = createNewBookingRulesList();
 
-        JSONArray json = (JSONArray) new JSONParser().parse(jsonRuleString);
+		JSONArray json = (JSONArray) new JSONParser().parse(jsonRuleString);
 
-        for (Object jsonRule : json)
-        {
-            BookingRule rule = createBookingRule(demographicNo, (JSONObject) jsonRule);
+		for (Object jsonRule : json)
+		{
+			BookingRule rule = createBookingRule(demographicNo, (JSONObject) jsonRule);
 
-            if (rule != null)
-            {
-                bookingRules.add(rule);
-            }
-        }
+			if (rule != null)
+			{
+				bookingRules.add(rule);
+			}
+		}
 
-        Collections.sort(bookingRules);
-        return bookingRules;
-    }
+		Collections.sort(bookingRules);
+		return bookingRules;
+	}
 
-    private static BookingRule createBookingRule(Integer demographicNo, JSONObject jsonRule)
-    {
-        BookingRule bookingRule;
-        String type = (String) jsonRule.get("type");
+	public static List<MultipleBookingsRule> buildMultipleBookingsRuleList(
+			String jsonRuleString) throws ParseException
+	{
+		List<MultipleBookingsRule> multipleBookingsRules = new ArrayList<>();
 
-        switch (type)
-        {
-            case (PERIOD_TYPE_BLACKOUT_NOW_UNTIL_HOUR):
-            case (PERIOD_TYPE_BLACKOUT_NOW_UNTIL_DAY):
-                bookingRule = createBlackOutRule(jsonRule);
-                break;
-            case (PERIOD_TYPE_CUTOFF_DAY):
-                bookingRule = createCutoffRule(jsonRule);
-                break;
-            case (PERIOD_TYPE_HOUR):
-            case (PERIOD_TYPE_DAY):
-            case (PERIOD_TYPE_WEEK):
-            case (PERIOD_TYPE_MONTH):
-                bookingRule = createMultipleBookingRule(jsonRule, demographicNo);
-                break;
-            case (PRIMARY_PROVIDER_ONLY):
-                bookingRule = createPrimaryProviderOnlyRule(jsonRule, demographicNo);
-                break;
-            case (APPOINTMENT_AVAILABLE):
-                bookingRule = createAvailableRule();
-                break;
-            default:
-                bookingRule = null;
-        }
+		JSONArray json = (JSONArray) new JSONParser().parse(jsonRuleString);
 
-        return bookingRule;
-    }
+		for (Object jsonRule : json)
+		{
+			String type = (String) ((JSONObject) jsonRule).get("type");
+			if (Arrays.asList(BookingRule.MULTIPLE_BOOKINGS_TYPES).contains(type))
+			{
+				MultipleBookingsRule rule = createMultipleBookingsRule((JSONObject) jsonRule);
+				multipleBookingsRules.add(rule);
+			}
+		}
+		Collections.sort(multipleBookingsRules);
+		return multipleBookingsRules;
+	}
 
-    private static MultipleBookingRule createMultipleBookingRule(JSONObject jsonRule, Integer demographicNo)
-    {
-        Integer timeAmount = jsonRule.get("period_of_time") != null ? ((Long) jsonRule.get("period_of_time")).intValue() : null;
-        Integer bookingAmount = jsonRule.get("bookings") != null ? ((Long) jsonRule.get("bookings")).intValue() : null;
-        String name = (String) jsonRule.get("type");
-        ChronoUnit timeUnit = getChronoUnit(name);
+	public static BlackoutRule buildBlackoutRule(String jsonRuleString) throws ParseException
+	{
+		JSONArray json = (JSONArray) new JSONParser().parse(jsonRuleString);
+		BlackoutRule blackoutRule = null;
+		for (Object jsonRule : json)
+		{
+			String type = (String) ((JSONObject) jsonRule).get("type");
+			if (Arrays.asList(BookingRule.BLACKOUT_TYPES).contains(type))
+			{
+				blackoutRule = createBlackOutRule( (JSONObject) jsonRule);
+				break;
+			}
+		}
+		if(blackoutRule == null)
+		{
+			blackoutRule = new BlackoutRule();
+		}
+		return blackoutRule;
+	}
 
-        if (bookingAmount != null && timeAmount != null && timeUnit != null)
-        {
-            return new MultipleBookingRule(name, demographicNo, bookingAmount, timeAmount, timeUnit);
-        }
+	public static CutoffRule buildCutoffRule(String jsonRuleString) throws ParseException
+	{
+		JSONArray json = (JSONArray) new JSONParser().parse(jsonRuleString);
+		CutoffRule cutoffRule = null;
+		for (Object jsonRule : json)
+		{
+			String type = (String) ((JSONObject) jsonRule).get("type");
 
-        return null;
-    }
+			MiscUtils.getLogger().warn("get cutoff rule TYPE: " + type);
+			if (BookingRule.PERIOD_TYPE_CUTOFF_DAY.equals(type))
+			{
+				cutoffRule = createCutoffRule( (JSONObject) jsonRule);
+				break;
+			}
+		}
+		if(cutoffRule == null)
+		{
+			cutoffRule = new CutoffRule();
+		}
+		return cutoffRule;
+	}
 
-    private static BookingCutoffRule createCutoffRule(JSONObject jsonRule)
-    {
-        Integer amount = jsonRule.get("period_of_time") != null ? ((Long) jsonRule.get("period_of_time")).intValue() : null;
-        String name = (String) jsonRule.get("type");
-        ChronoUnit timeUnit = getChronoUnit(name);
 
-        if (amount != null && timeUnit != null)
-        {
-            return new BookingCutoffRule(name, amount, timeUnit);
-        }
+	private static BookingRule createBookingRule(Integer demographicNo, JSONObject jsonRule)
+	{
+		BookingRule bookingRule;
+		String type = (String) jsonRule.get("type");
 
-        return null;
-    }
+		switch (type)
+		{
+			case (BookingRule.PERIOD_TYPE_BLACKOUT_NOW_UNTIL_HOUR):
+			case (BookingRule.PERIOD_TYPE_BLACKOUT_NOW_UNTIL_DAY):
+				bookingRule = createBlackOutRule(jsonRule);
+				break;
+			case (BookingRule.PERIOD_TYPE_CUTOFF_DAY):
+				bookingRule = createCutoffRule(jsonRule);
+				break;
+			case (BookingRule.PERIOD_TYPE_HOUR):
+			case (BookingRule.PERIOD_TYPE_DAY):
+			case (BookingRule.PERIOD_TYPE_WEEK):
+			case (BookingRule.PERIOD_TYPE_MONTH):
+				bookingRule = createMultipleBookingsRule(jsonRule);
+				break;
+			case (BookingRule.PRIMARY_PROVIDER_ONLY):
+				bookingRule = createPrimaryProviderOnlyRule(jsonRule, demographicNo);
+				break;
+			case (BookingRule.APPOINTMENT_AVAILABLE):
+				bookingRule = createAvailableRule();
+				break;
+			default:
+				bookingRule = null;
+		}
 
-    private static BlackoutRule createBlackOutRule(JSONObject jsonRule)
-    {
-        Integer amount = jsonRule.get("period_of_time") != null ? ((Long) jsonRule.get("period_of_time")).intValue() : null;
-        String name = (String) jsonRule.get("type");
-        ChronoUnit timeUnit = getChronoUnit(name);
+		return bookingRule;
+	}
 
-        if (amount != null && timeUnit != null)
-        {
-            return new BlackoutRule(name, amount, timeUnit);
-        }
+	private static MultipleBookingsRule createMultipleBookingsRule(JSONObject jsonRule)
+	{
+		Integer timeAmount = jsonRule.get("period_of_time") != null ?
+				((Long) jsonRule.get("period_of_time")).intValue() : null;
+		Integer bookingAmount = jsonRule.get("bookings") != null ?
+				((Long) jsonRule.get("bookings")).intValue() : null;
+		String name = (String) jsonRule.get("type");
+		ChronoUnit timeUnit = getChronoUnit(name);
 
-        return null;
-    }
+		if (bookingAmount != null && timeAmount != null && timeUnit != null)
+		{
+			return new MultipleBookingsRule(name, bookingAmount, timeAmount, timeUnit);
+		}
 
-    private static AvailableRule createAvailableRule()
-    {
-        // TODO:  Should this come in from MHA?
-        return new AvailableRule(APPOINTMENT_AVAILABLE);
-    }
+		return null;
+	}
 
-    private static PrimaryProviderOnlyRule createPrimaryProviderOnlyRule(JSONObject jsonRule, Integer demographicNo)
-    {
-        String name = (String) jsonRule.get("type");
-        return new PrimaryProviderOnlyRule(name, demographicNo);
-    }
+	private static CutoffRule createCutoffRule(JSONObject jsonRule)
+	{
+		Integer amount = jsonRule.get("period_of_time") != null ?
+				((Long) jsonRule.get("period_of_time")).intValue() : null;
+		String name = (String) jsonRule.get("type");
+		ChronoUnit timeUnit = getChronoUnit(name);
 
-    private static List<BookingRule> createNewBookingRulesList()
-    {
-        List<BookingRule> bookingRules = new ArrayList<>();
+		if (amount != null && timeUnit != null)
+		{
+			return new CutoffRule(name, amount, timeUnit);
+		}
 
-        // There is an implicit booking rule that the appointment must be unbooked for each set of booking rules.
-        bookingRules.add(createAvailableRule());
+		return null;
+	}
 
-        return bookingRules;
-    }
+	private static BlackoutRule createBlackOutRule(JSONObject jsonRule)
+	{
+		Integer amount = jsonRule.get("period_of_time") != null ?
+				((Long) jsonRule.get("period_of_time")).intValue() : null;
+		String name = (String) jsonRule.get("type");
+		ChronoUnit timeUnit = getChronoUnit(name);
 
-    private static ChronoUnit getChronoUnit(String bookingRuleName)
-    {
-        if (bookingRuleName == null)
-        {
-            return null;
-        }
+		if (amount != null && timeUnit != null)
+		{
+			return new BlackoutRule(name, amount, timeUnit);
+		}
 
-        switch (bookingRuleName)
-        {
-            case (PERIOD_TYPE_BLACKOUT_NOW_UNTIL_DAY):
-            case (PERIOD_TYPE_CUTOFF_DAY):
-            case (PERIOD_TYPE_DAY):
-                return ChronoUnit.DAYS;
-            case (PERIOD_TYPE_BLACKOUT_NOW_UNTIL_HOUR):
-            case (PERIOD_TYPE_HOUR):
-                return ChronoUnit.HOURS;
-            case (PERIOD_TYPE_WEEK):
-                return ChronoUnit.WEEKS;
-            case (PERIOD_TYPE_MONTH):
-                return ChronoUnit.MONTHS;
-            default:
-                return null;
-        }
-    }
+		return null;
+	}
+
+	private static AvailableRule createAvailableRule()
+	{
+		return new AvailableRule(BookingRule.APPOINTMENT_AVAILABLE);
+	}
+
+	private static PrimaryProviderOnlyRule createPrimaryProviderOnlyRule(
+			JSONObject jsonRule, Integer demographicNo)
+	{
+		String name = (String) jsonRule.get("type");
+		return new PrimaryProviderOnlyRule(name, demographicNo);
+	}
+
+	private static List<BookingRule> createNewBookingRulesList()
+	{
+		List<BookingRule> bookingRules = new ArrayList<>();
+		bookingRules.add(createAvailableRule());
+
+		return bookingRules;
+	}
+
+	private static ChronoUnit getChronoUnit(String bookingRuleName)
+	{
+		if (bookingRuleName == null)
+		{
+			return null;
+		}
+
+		switch (bookingRuleName)
+		{
+			case (BookingRule.PERIOD_TYPE_BLACKOUT_NOW_UNTIL_DAY):
+			case (BookingRule.PERIOD_TYPE_CUTOFF_DAY):
+			case (BookingRule.PERIOD_TYPE_DAY):
+				return ChronoUnit.DAYS;
+			case (BookingRule.PERIOD_TYPE_BLACKOUT_NOW_UNTIL_HOUR):
+			case (BookingRule.PERIOD_TYPE_HOUR):
+				return ChronoUnit.HOURS;
+			case (BookingRule.PERIOD_TYPE_WEEK):
+				return ChronoUnit.WEEKS;
+			case (BookingRule.PERIOD_TYPE_MONTH):
+				return ChronoUnit.MONTHS;
+			default:
+				return null;
+		}
+	}
 }

@@ -17,6 +17,7 @@ Juno.Common.Util.settings = {
 
 Juno.Common.Util.DisplaySettings = {
 	dateFormat: "yyyy-MM-dd",
+	timeFormat: "HH:mm a",
 };
 
 Juno.Common.Util.exists = function exists(object) {
@@ -111,6 +112,20 @@ Juno.Common.Util.getDatetimeNoTimezoneMoment = function getDatetimeNoTimezoneMom
 {
 	return moment.utc(datetime_string,
 		Juno.Common.Util.settings.datetime_no_timezone_format, true);
+};
+
+Juno.Common.Util.getUserISOTimezoneOffset = function ()
+{
+	let sign = "-";
+	let offsetRaw = (new Date()).getTimezoneOffset();
+	if (offsetRaw < 0)
+	{
+		sign = "+";
+		offsetRaw *= -1;
+	}
+	let offsetHour = offsetRaw / 60;
+	let offsetMin = offsetRaw % 60;
+	return sign + offsetHour.toString().padStart(2,"0") + ":" + offsetMin.toString().padStart(2, "0");
 };
 
 Juno.Common.Util.validateDateString = function validateDateString(

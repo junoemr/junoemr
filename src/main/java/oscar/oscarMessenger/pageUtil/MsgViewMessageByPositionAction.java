@@ -37,9 +37,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.common.dao.forms.FormsDao;
-import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -55,21 +53,6 @@ public class MsgViewMessageByPositionAction extends Action {
 
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_msg", "r", null)) {
 			throw new SecurityException("missing required security object (_msg)");
-		}
-		
-		// Extract attributes we will need
-		String provNo = (String) request.getSession().getAttribute("user");
-
-		if (request.getSession().getAttribute("msgSessionBean") == null) {
-			MsgSessionBean bean = new MsgSessionBean();
-			bean.setProviderNo(provNo);
-
-			ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
-			ProviderData pd = dao.findByProviderNo(provNo);
-			if (pd != null) {
-				bean.setUserName(pd.getFirstName() + " " + pd.getLastName());
-			}
-			request.getSession().setAttribute("msgSessionBean", bean);
 		}
 
 		String orderBy = request.getParameter("orderBy") == null ? "date" : request.getParameter("orderBy");

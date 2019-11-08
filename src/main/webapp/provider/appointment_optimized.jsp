@@ -77,6 +77,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="java.util.SortedMap" %>
+<%@ page import="org.oscarehr.common.model.Appointment" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 <jsp:useBean id="appointmentInfo" class="org.oscarehr.appointment.AppointmentDisplayController" scope="page" />
@@ -564,10 +565,6 @@ private long getAppointmentRowSpan(
 		allowWeek = "No";
 	}
 
-	boolean showOldEchartLink = true;
-	UserProperty oldEchartLink = propDao.getProp(curUser_no, UserProperty.HIDE_OLD_ECHART_LINK_IN_APPT);
-	if (oldEchartLink!=null && "Y".equals(oldEchartLink.getValue())) showOldEchartLink = false;
-
 	String caisiBillingPreferenceNotDelete = null;
 
 	String defaultServiceType = (String) session.getAttribute("default_servicetype");
@@ -669,10 +666,10 @@ private long getAppointmentRowSpan(
 			var programId = 0;
 			var programId_forCME = document.getElementById("bedprogram_no").value;
 
-			popupPage(10,10, "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&caisiBillingPreferenceNotDelete=<%=caisiBillingPreferenceNotDelete%>&new_tickler_warning_window=<%=newticklerwarningwindow%>&default_pmm=<%=default_pmm%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&default_servicetype=<%=defaultServiceType%>&prescriptionQrCodes=<%=prescriptionQrCodes%>&erx_enable=<%=erx_enable%>&erx_training_mode=<%=erx_training_mode%>&mygroup_no="+newGroupNo+"&programId_oscarView="+programId+"&case_program_id="+programId_forCME + "<%=eformIds.toString()%><%=ectFormNames.toString()%>");
+			popupPage(10,10, "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&caisiBillingPreferenceNotDelete=<%=caisiBillingPreferenceNotDelete%>&new_tickler_warning_window=<%=newticklerwarningwindow%>&default_pmm=<%=default_pmm%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&default_servicetype=<%=defaultServiceType%>&prescriptionQrCodes=<%=prescriptionQrCodes%>&erx_enable=<%=erx_enable%>&erx_training_mode=<%=erx_training_mode%>&mygroup_no="+encodeURIComponent(newGroupNo)+"&programId_oscarView="+programId+"&case_program_id="+programId_forCME + "<%=eformIds.toString()%><%=ectFormNames.toString()%>");
 			<%}else {%>
 			var programId=0;
-			popupPage(10,10, "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&default_servicetype=<%=defaultServiceType%>&prescriptionQrCodes=<%=prescriptionQrCodes%>&erx_enable=<%=erx_enable%>&erx_training_mode=<%=erx_training_mode%>&mygroup_no="+newGroupNo+"&programId_oscarView="+programId + "<%=eformIds.toString()%><%=ectFormNames.toString()%>");
+			popupPage(10,10, "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&default_servicetype=<%=defaultServiceType%>&prescriptionQrCodes=<%=prescriptionQrCodes%>&erx_enable=<%=erx_enable%>&erx_training_mode=<%=erx_training_mode%>&mygroup_no="+encodeURIComponent(newGroupNo)+"&programId_oscarView="+programId + "<%=eformIds.toString()%><%=ectFormNames.toString()%>");
 			<%}%>
 		}
 
@@ -769,7 +766,6 @@ private long getAppointmentRowSpan(
 // =================================================================================================
 // START OF MENU BAR
 // =================================================================================================
-
 %>
 
 <table BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%" id="firstTable" class="noprint">
@@ -900,7 +896,7 @@ private long getAppointmentRowSpan(
 				</c:if>
 				<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
 					<li id="admin2">
-						<a href="../telehealth/myhealthaccess.do?method=startTelehealth"
+						<a href="../telehealth/myhealthaccess.do?method=openTelehealth&siteName=<%= selectedSite != null ? selectedSite : "" %>"
 							 id="myhealthaccess"
 							 title='MyHealthAccess'
 							 target="_blank">MyHealthAccess</a>
@@ -1392,7 +1388,24 @@ private long getAppointmentRowSpan(
 									int appointmentCount = 0;
 									for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
 									{
-										appointmentCount += appointmentDetailsList.size();
+
+										for(AppointmentDetails appointmentDetails : appointmentDetailsList)
+										{
+
+											/*
+											 *.Do_Not_Book type appointments shall not been count for appointment total
+											 * on the top of the schedule page
+											 */
+
+											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName()) == 0)
+											{
+												continue;
+											}
+
+											appointmentCount++;
+
+										}
+
 									}
 								%>
 								<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>
@@ -1683,7 +1696,7 @@ private long getAppointmentRowSpan(
 													reasonCodesMap,
 													showDocumentLink,
 													showEncounterLink,
-													showOldEchartLink,
+													true,
 													enablePreventionAppointmentWarnings,
 													preventionWarnings,
 													record,
@@ -1792,7 +1805,7 @@ private long getAppointmentRowSpan(
 															{
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-														<% 	} 
+														<% 	}
 														} else
 														{%>
 															<!--Inline display of reason -->
@@ -1859,7 +1872,7 @@ private long getAppointmentRowSpan(
 														<c:if test="<%= appointmentInfo.isVirtual() && org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
 																<a href="#"
 																	 onClick='popupPage(800, 1280,
-																					 "../telehealth/myhealthaccess.do?method=startTelehealth" +
+																					 "../telehealth/myhealthaccess.do?method=openTelehealth" +
 																					 "&demographicNo=${appointmentInfo.demographicNo}" +
 																					 "&siteName=${appointmentInfo.siteName}" +
                                                                                      "&appt=${appointmentInfo.appointmentNo}");return false;'
@@ -2075,9 +2088,24 @@ private long getAppointmentRowSpan(
 								if (showApptCountForProvider)
 								{
 									int appointmentCount = 0;
+
 									for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
 									{
-										appointmentCount += appointmentDetailsList.size();
+										for(AppointmentDetails appointmentDetails : appointmentDetailsList)
+										{
+
+
+											/*
+											 *.Do_Not_Book type appointments shall not been count for appointment total
+											 * on the top of the schedule page
+											 */
+											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName()) == 0)
+											{
+												continue;
+											}
+
+											appointmentCount++;
+										}
 									}
 									%>
 									<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>

@@ -71,6 +71,9 @@
   <!-- calendar stylesheet -->
   <link rel="stylesheet" type="text/css" media="all" href="../share/calendar/calendar.css" title="win2k-cold-1" />
 
+	<!-- Helper scripts for submission logic -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
   <!-- main calendar program -->
   <script type="text/javascript" src="../share/calendar/calendar.js"></script>
 
@@ -249,6 +252,7 @@ function calcBMIMetric() {
 	}
     function onPrint() {
         document.forms[0].submit.value="print";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret==true)
         {
@@ -384,6 +388,7 @@ function calcBMIMetric() {
     }
     function onSave() {
         document.forms[0].submit.value="save";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         ret = checkAllNumber();
         if(ret==true) {
@@ -399,6 +404,7 @@ function calcBMIMetric() {
         return(false);
     }
     function onSaveExit() {
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         document.forms[0].submit.value="exit";
         var ret = checkAllDates();
         ret = checkAllNumber();

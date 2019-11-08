@@ -1,5 +1,7 @@
 
-@mixin juno-form-colour-scheme($background-color, $border-color, $text-color, $placeholder-color, $dirty-color) {
+@mixin juno-form-colour-scheme($background-color, $disabled-color, $border-color,
+            $text-color, $placeholder-color, $dirty-color)
+{
 	background-color: $background-color;
 	border-color: $border-color;
 	color: $text-color;
@@ -9,15 +11,22 @@
 	&::placeholder {
 		color: $placeholder-color;
 	}
+	&:disabled {
+		background-color: $disabled-color;
+		color: $placeholder-color;
+	}
 }
 @mixin juno-form-colour-scheme-light {
-	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-light, $color-neutral-dark, $color-neutral-grey, $color-neutral-white);
+	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-lightest, $color-neutral-light,
+			$color-neutral-darker, $color-neutral-grey, $color-neutral-white);
 }
 @mixin juno-form-colour-scheme-blue {
-	@include juno-form-colour-scheme($color-primary-dark, $color-primary-dark, $color-neutral-white, $color-neutral-light-grey, $color-primary-dark);
+	@include juno-form-colour-scheme($color-primary-dark, $color-primary-darker, $color-primary-dark,
+			$color-neutral-white, $color-neutral-light-grey, $color-primary-dark);
 }
 @mixin juno-form-colour-scheme-dark {
-	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-light, $color-neutral-darker, $color-neutral-darker, $color-neutral-white);
+	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-light, $color-neutral-light,
+			$color-neutral-darker, $color-neutral-dark, $color-neutral-white);
 }
 
 

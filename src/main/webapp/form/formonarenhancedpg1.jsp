@@ -86,6 +86,7 @@
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
 <title>Antenatal Record 1</title>
 <link rel="stylesheet" type="text/css" href="<%=bView?"arStyleView.css" : "arStyle.css"%>">
 <link rel="stylesheet" type="text/css" media="all" href="../share/calendar/calendar.css" title="win2k-cold-1" />
@@ -934,7 +935,8 @@ function updateGeneticD() {
         document.forms[0].action = "/<%=project_home%>/form/formname.do" ;
     }
     function onPrint() {
-        document.forms[0].submit.value="print"; 
+        document.forms[0].submit.value="print";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret==true)
         {
@@ -963,7 +965,8 @@ function updateGeneticD() {
     window.onunload=refreshOpener;
     function onSave() {
         document.forms[0].submit.value="save";
-        var ret1 = validate();
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
+		var ret1 = validate();
         var ret = checkAllDates();
         if(ret==true && ret1==true)
         {
@@ -983,6 +986,7 @@ function updateGeneticD() {
         var ret = checkAllDates();
         if(ret==true && ret1==true)
         {
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             reset();
             ret = confirm("Are you sure you want to save this form?");
             if(ret) {
@@ -990,9 +994,10 @@ function updateGeneticD() {
 	            adjustDynamicListTotals();
 	            jQuery.ajax({
 	            	url:'<%=request.getContextPath()%>/Pregnancy.do?method=saveFormAjax',
+					type: 'POST',
 	            	data: $("form").serialize(),
-	            	async:false, 
-	            	dataType:'json', 
+	            	async:false,
+	            	dataType:'json',
 	            	success:function(data) {
 	        			if(data.value == 'error') {
 	        				alert('Error saving form.');
@@ -1031,6 +1036,7 @@ function updateGeneticD() {
     }
     function onSaveExit() {
         document.forms[0].submit.value="exit";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret1 = validate();        
         var ret = checkAllDates();
         if(ret == true && ret1==true)
@@ -1990,7 +1996,7 @@ $(document).ready(function(){
 
 <div id="maincontent">
 <div id="content_bar" class="innertube" style="background-color: #c4e9f6">
-<html:form action="/form/formname">
+<html:form action="/form/formname" method="POST">
 	<input type="hidden" name="c_lastVisited"
 		value=<%=props.getProperty("c_lastVisited", "pg1")%> />
 	<input type="hidden" name="demographic_no"

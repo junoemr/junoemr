@@ -1,0 +1,81 @@
+
+@mixin juno-table($text-color, $header-color, $cell-color-even, $cell-color-odd, $border-color,
+$hover-color, $hover-border-color, $border-radius: 6px, $border-width: 1px)
+{
+	table {
+		width: 100%;
+		text-align: center;
+		border-collapse: separate;
+		color: $text-color;
+
+		th, td {
+			border-left: solid $border-color #{$border-width};
+			height: 32px;
+		}
+		th {
+			background-color: $header-color;
+			border-top: solid $border-color #{$border-width};
+			font-weight: normal;
+
+			&:first-child {
+				border-top-left-radius: #{$border-radius};
+			}
+			&:last-child {
+				border-top-right-radius: #{$border-radius};
+				border-right: solid $border-color #{$border-width};
+			}
+		}
+		td {
+			&:last-child {
+				border-right: solid $border-color #{$border-width};
+			}
+		}
+
+		tr {
+			&:last-child {
+				td {
+					border-bottom: solid $border-color #{$border-width};
+					&:first-child {
+						border-bottom-left-radius: #{$border-radius};
+					}
+					&:last-child {
+						border-bottom-right-radius: #{$border-radius};
+					}
+				}
+			}
+			&:nth-child(even) {
+				background-color: $cell-color-even;
+			}
+			&:nth-child(odd) {
+				background-color: $cell-color-odd;
+			}
+		}
+	}
+}
+@mixin juno-table-selectable($hover-color, $hover-border-color)
+{
+	table {
+		td {
+			cursor: pointer;
+		}
+		tr:hover {
+			background-color: $hover-color;
+			border-color: $hover-border-color;
+
+			td {
+				border-color: $hover-border-color;
+			}
+		}
+	}
+}
+
+@mixin juno-table-default($border-radius: 6px, $border-width: 1px)
+{
+	@include juno-table($color-neutral-darker, $color-neutral-lighter, $color-neutral-lightest,
+			$color-neutral-white, $color-neutral-light, $border-radius, $border-width);
+}
+@mixin juno-table-default-selectable($border-radius: 6px, $border-width: 1px)
+{
+	@include juno-table-default($border-radius, $border-width);
+	@include juno-table-selectable($color-primary-lightest, $color-primary-lighter);
+}

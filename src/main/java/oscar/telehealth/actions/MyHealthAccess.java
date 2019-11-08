@@ -29,84 +29,129 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.common.dao.SecurityDao;
-import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.common.model.Site;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
+import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.model.IntegrationData;
+import org.oscarehr.integration.model.UserIntegrationAccess;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
-import org.oscarehr.integration.myhealthaccess.exception.BaseException;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
 import org.oscarehr.integration.myhealthaccess.exception.DuplicateRecordException;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.model.MHAUserToken;
+import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.net.URLEncoder;
 
 public class MyHealthAccess extends DispatchAction
 {
 	private static MyHealthAccessService myHealthAccessService = SpringUtils.getBean(MyHealthAccessService.class);
-	private static SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
+	private static IntegrationService integrationService = SpringUtils.getBean(IntegrationService.class);
 	private static final Logger logger = MiscUtils.getLogger();
 
-	public ActionForward startTelehealth(ActionMapping mapping, ActionForm form,
+	public ActionForward openTelehealth(ActionMapping mapping, ActionForm form,
 	                                     HttpServletRequest request, HttpServletResponse response)
 	{
 		try
 		{
-			ClinicUserTo1 remoteUser = fetchRemoteUser(request);
-			String remoteUserID = remoteUser.getMyhealthaccesID();
+			IntegrationData integrationData = getIntegrationData(request);
 
-			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-			Security loggedInUser = loggedInInfo.getLoggedInSecurity();
+			if (!integrationData.userIntegrationExists())
+			{
+				throw new RecordNotFoundException();
+			}
 
-			MHAUserToken longToken = MHAUserToken.decodeToken(loggedInUser.getMyHealthAccessLongToken());
+			MHAUserToken longToken = MHAUserToken.decodeToken(integrationData.getUserAccessToken());
 
 			if (longToken == null || longToken.isExpired())
 			{
-				ActionRedirect loginAction = new ActionRedirect(mapping.findForward("mhaLogin"));
-				loginAction.addParameter("siteName", request.getParameter("siteName"));
-				loginAction.addParameter("appt", request.getParameter("appt"));
-				loginAction.addParameter("remoteUser", remoteUserID);
-
-				return loginAction;
+				return createActionRedirect(request, mapping, Action.LOGIN, Param.SITE_NAME, Param.APPOINTMENT);
 			}
 
-			Site site = getSite(request);
-			String appointmentNo = request.getParameter("appt");
-			String mhaRemoteID = remoteUser.getMyhealthaccesID();
-
-			if (longToken.expiresWithinDays(7))
+			if (longToken.shouldRenew())
 			{
-				MHAUserToken renewedToken = myHealthAccessService.renewLongToken(site, remoteUserID, loggedInUser);
-				persistToken(request.getSession(), loggedInUser, renewedToken.getToken());
+				myHealthAccessService.renewLongToken(integrationData);
 			}
 
-			String endpoint = myHealthAccessService.buildTeleHealthRedirectURL(mhaRemoteID, site, appointmentNo);
-
-			return pushToMyHealthAccess(endpoint, site, mhaRemoteID, loggedInUser);
+			return getRemoteRedirect(integrationData, request);
+		}
+		catch (InvalidIntegrationException e)
+		{
+			return redirectLogin(request, mapping, e.getMessage());
 		}
 		catch (RecordNotFoundException e)
 		{
-			ActionRedirect createUserAction = new ActionRedirect(mapping.findForward("createUser"));
-			createUserAction.addParameter("siteName", request.getParameter("siteName"));
-			createUserAction.addParameter("appt", request.getParameter("appt"));
+			return createActionRedirect(request, mapping, Action.LOGIN, Param.SITE_NAME, Param.APPOINTMENT);
+		}
+	}
 
-			return createUserAction;
+	public ActionForward login(ActionMapping mapping, ActionForm form,
+							   HttpServletRequest request, HttpServletResponse response)
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		Security loggedInUser = loggedInInfo.getLoggedInSecurity();
+		String email = request.getParameter(Param.EMAIL);
+		String password = request.getParameter(Param.PASSWORD);
+
+		try
+		{
+			IntegrationData integrationData = getIntegrationData(request);
+
+			if (!integrationData.userIntegrationExists())
+			{
+				Site site = integrationData.getIntegration().getSite();
+				String junoUserId = Integer.toString(loggedInUser.getId());
+				ClinicUserLoginTo1 userLogin = new ClinicUserLoginTo1(email, password, junoUserId);
+
+				try
+				{
+					integrationData = myHealthAccessService.createUserIntegration(integrationData, loggedInUser, userLogin);
+				}
+				// Retry login with site shortname as email suffix if no login record is found
+				catch (RecordNotFoundException e)
+				{
+					userLogin.setEmail(userSiteEmail(email, site));
+					integrationData = myHealthAccessService.createUserIntegration(integrationData, loggedInUser, userLogin);
+				}
+			}
+
+			return getRemoteRedirect(integrationData, request);
+		}
+		catch (InvalidIntegrationException e)
+		{
+			logger.info("MyHealthAccess attempt with no MyHealthAccess integration");
+			return redirectLogin(request, mapping, e.getMessage());
+		}
+		catch (RecordNotFoundException e)
+		{
+			ActionRedirect redirect = createActionRedirect(request, mapping, Action.CREATE_USER, Param.EMAIL, Param.SITE_NAME);
+			redirect.addParameter(Param.EMAIL, e.getMessage());
+			return redirect;
+		}
+		catch (InvalidAccessException e)
+		{
+			logger.info("Invalid credentials for MHA user: " + request.getParameter(Param.EMAIL));
+			return redirectLogin(request, mapping, e.getMessage());
+		}
+		catch (Exception e)
+		{
+			return redirectLogin(request, mapping, e.getMessage());
 		}
 	}
 
 	public ActionForward createUser(ActionMapping mapping, ActionForm form,
 	                                HttpServletRequest request, HttpServletResponse response)
 	{
-		String email = request.getParameter("email");
+		String email = request.getParameter(Param.EMAIL);
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		ProviderData loggedInProvider = loggedInInfo.getLoggedInProvider().getProvider();
@@ -114,108 +159,105 @@ public class MyHealthAccess extends DispatchAction
 
 		try
 		{
-			ClinicUserCreateTo1 remoteUser = myHealthAccessService.createUser(loggedInUser, loggedInProvider, email, getSite(request));
-			persistToken(request.getSession(), loggedInUser, remoteUser.getAccessToken());
+			IntegrationData integrationData = getIntegrationData(request);
+			Site site = integrationData.getIntegration().getSite();
 
-			ActionRedirect confirmUserAction = new ActionRedirect(mapping.findForward("confirmUser"));
-			confirmUserAction.addParameter("siteName", request.getParameter("siteName"));
-			confirmUserAction.addParameter("appt", request.getParameter("appt"));
-			confirmUserAction.addParameter("email", email);
-			confirmUserAction.addParameter("remoteUser", remoteUser.getMyhealthaccesID());
+			String siteEmail = userSiteEmail(email, site);
 
-			return confirmUserAction;
+			ClinicUserTo1 userInfo = new ClinicUserTo1(Integer.toString(loggedInUser.getSecurityNo()), siteEmail,
+														loggedInProvider.getFirstName(), loggedInProvider.getLastName());
+
+			UserIntegrationAccess integrationAccess = myHealthAccessService.createRemoteUser(integrationData, loggedInUser, userInfo);
+
+			ActionRedirect confirmRedirect = createActionRedirect(request, mapping, Action.CONFIRM_USER, Param.SITE_NAME, Param.APPOINTMENT);
+			confirmRedirect.addParameter(Param.EMAIL, email);
+			confirmRedirect.addParameter(Param.REMOTE_USER, integrationAccess.getRemoteUserId());
+
+			return confirmRedirect;
+		}
+		catch (InvalidIntegrationException e)
+		{
+			return redirectLogin(request, mapping, e.getMessage());
 		}
 		catch (DuplicateRecordException e)
 		{
-			ClinicUserTo1 remoteUser = myHealthAccessService.getUserByEmail(email, getSite(request));
-
-			ActionRedirect loginAction = new ActionRedirect(mapping.findForward("mhaLogin"));
-			loginAction.addParameter("siteName", request.getParameter("siteName"));
-			loginAction.addParameter("appt", request.getParameter("appt"));
-			loginAction.addParameter("email", email);
-			loginAction.addParameter("remoteUser", remoteUser.getMyhealthaccesID());
+			ActionRedirect loginAction = createActionRedirect(request, mapping, Action.LOGIN, Param.SITE_NAME, Param.APPOINTMENT);
+			loginAction.addParameter(Param.EMAIL, email);
 
 			return loginAction;
-		}
-		catch (RecordNotFoundException e)
-		{
-			ActionRedirect createUserAction = new ActionRedirect(mapping.findForward("createUser"));
-			createUserAction.addParameter("email", email);
-			createUserAction.addParameter("errorMessage", "Invalid API key.  Please contact support");
-			return createUserAction;
 		}
 	}
 
 	public ActionForward confirmUser(ActionMapping mapping, ActionForm form,
 	                                 HttpServletRequest request, HttpServletResponse response)
 	{
-		Site site = getSite(request);
-		String appointmentNo = request.getParameter("appt");
-		String remoteUser = request.getParameter("remoteUser");
-
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		Security loggedInUser = loggedInInfo.getLoggedInSecurity();
-
-		String endpoint = myHealthAccessService.buildTeleHealthRedirectURL(remoteUser, site, appointmentNo);
-
-		return pushToMyHealthAccess(endpoint, getSite(request), remoteUser, loggedInUser);
-	}
-
-	public ActionForward login(ActionMapping mapping, ActionForm form,
-	                           HttpServletRequest request, HttpServletResponse response)
-	{
-		String email = request.getParameter("email");
-		String password = request.getParameter("password");
-
-		Site site = getSite(request);
-
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		Security loggedInUser = loggedInInfo.getLoggedInSecurity();
-		String remoteUser = request.getParameter("remoteUser");
-
 		try
 		{
-			MHAUserToken longToken = myHealthAccessService.getLongToken(site, remoteUser, loggedInUser, email, password);
-			persistToken(request.getSession(), loggedInUser, longToken.getToken());
+			IntegrationData integrationData = getIntegrationData(request);
+			return getRemoteRedirect(integrationData, request);
 		}
-		catch (RecordNotFoundException e)
+		catch (InvalidIntegrationException e)
 		{
-			logger.info("Invalid MHA API key for loggedInUser: " + loggedInUser.getProviderNo());
-			ActionRedirect loginAction = new ActionRedirect(mapping.findForward("mhaLogin"));
-			return redoLoginActionWithError(loginAction, request, "Invalid API key.  Please contact support");
+			return redirectLogin(request, mapping, e.getMessage());
 		}
-		catch (BaseException e)
-		{
-			if (e.getErrorObject().hasAuthError())
-			{
-				logger.info("Invalid credentials for MHA user: " + request.getParameter("email"));
-				ActionRedirect loginAction = new ActionRedirect(mapping.findForward("mhaLogin"));
-				return redoLoginActionWithError(loginAction, request, "Failed to authenticate");
-			}
-
-			throw e;
-		}
-
-		String appointmentNo = request.getParameter("appt");
-		String endpoint = myHealthAccessService.buildTeleHealthRedirectURL(remoteUser, site, appointmentNo);
-
-		return pushToMyHealthAccess(endpoint, getSite(request), remoteUser, loggedInUser);
 	}
 
-	private ActionRedirect redoLoginActionWithError(ActionRedirect loginAction, HttpServletRequest request, String errorMessage)
+	/*
+	 * Helper Methods
+	 */
+	private IntegrationData getIntegrationData(HttpServletRequest request) throws InvalidIntegrationException
 	{
-		loginAction.addParameter("siteName", request.getParameter("siteName"));
-		loginAction.addParameter("email", request.getParameter("email"));
-		loginAction.addParameter("appt", request.getParameter("appt"));
-		loginAction.addParameter("errorMessage", errorMessage);
+		String siteName = request.getParameter(Param.SITE_NAME);
+
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		Security security = loggedInInfo.getLoggedInSecurity();
+
+		Integration integration = integrationService.findMhaIntegration(siteName);
+
+		if (integration == null)
+		{
+			String noIntegrationError = InvalidIntegrationException.NO_INTEGRATION_MHA;
+
+			if (!StringUtils.isNullOrEmpty(siteName))
+			{
+				noIntegrationError = String.format("%s for %s", noIntegrationError, siteName);
+			}
+			throw new InvalidIntegrationException(noIntegrationError);
+		}
+
+		IntegrationData integrationData = new IntegrationData(integration);
+
+		UserIntegrationAccess userIntegrationAccess = integrationService.findMhaUserAccessBySecurityAndSiteName(security, siteName);
+		integrationData.setUserIntegrationAccess(userIntegrationAccess);
+
+		return integrationData;
+	}
+
+	private ActionRedirect createActionRedirect(HttpServletRequest request, ActionMapping mapping, String action, String ...params)
+	{
+		ActionRedirect actionRedirect = new ActionRedirect(mapping.findForward(action));
+
+		for (String param : params)
+		{
+			actionRedirect.addParameter(param, request.getParameter(param));
+		}
+
+		return actionRedirect;
+	}
+
+	private ActionRedirect redirectLogin(HttpServletRequest request, ActionMapping mapping, String errorMessage)
+	{
+		ActionRedirect loginAction = createActionRedirect(request, mapping, Action.LOGIN,
+				Param.SITE_NAME, Param.EMAIL, Param.APPOINTMENT);
+		loginAction.addParameter(Param.ERROR, errorMessage);
+
 		return loginAction;
 	}
 
-	private ActionForward pushToMyHealthAccess(String myHealthAccessURL, Site site, String remoteUser, Security loggedInUser)
+	private ActionForward getRemoteRedirect(IntegrationData integrationData, HttpServletRequest request)
 	{
-		MHAUserToken shortToken = myHealthAccessService.getShortToken(site, remoteUser, loggedInUser);
-
-		myHealthAccessURL = myHealthAccessURL + "#token=" + URLEncoder.encode(shortToken.getToken());
+		String appointmentNo = request.getParameter(Param.APPOINTMENT);
+		String myHealthAccessURL = myHealthAccessService.getTelehealthURL(integrationData, appointmentNo);
 
 		ActionRedirect myHealthAccessRedirectAction = new ActionRedirect();
 		myHealthAccessRedirectAction.setPath(myHealthAccessURL);
@@ -223,51 +265,38 @@ public class MyHealthAccess extends DispatchAction
 		return myHealthAccessRedirectAction;
 	}
 
-	private Site getSite(HttpServletRequest request)
+	private String userSiteEmail(String email, Site site)
 	{
-		String siteName = request.getParameter("siteName");
-		if (siteName == null || siteName.isEmpty())
+		if (site == null)
 		{
-			return null;
+			return email;
 		}
 
-		SiteDao siteDao = SpringUtils.getBean(SiteDao.class);
-		return siteDao.findByName(siteName);
+		String siteIdentifier = StringUtils.stripSpaces(site.getShortName());
+
+		int separationIndex = email.lastIndexOf("@");
+		String emailStart = email.substring(0, separationIndex);
+		String emailEnd = email.substring(separationIndex);
+
+		email = String.format("%s+%s%s", emailStart, siteIdentifier, emailEnd).toLowerCase();
+
+		return email;
 	}
 
-	private ClinicUserTo1 fetchRemoteUser(HttpServletRequest request)
+	private final static class Param
 	{
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		Security loggedInUser = loggedInInfo.getLoggedInSecurity();
-
-		try
-		{
-			return myHealthAccessService.getLinkedUser(loggedInUser, getSite(request));
-		}
-
-		catch (RecordNotFoundException e)
-		{
-			String email = request.getParameter("email");
-
-			if (email != null && !email.isEmpty())
-			{
-				return myHealthAccessService.getUserByEmail(email, getSite(request));
-			}
-			else
-			{
-				throw e;
-			}
-		}
+		public static final String EMAIL = "email";
+		public static final String PASSWORD = "password";
+		public static final String SITE_NAME = "siteName";
+		public static final String REMOTE_USER = "remoteUser";
+		public static final String APPOINTMENT = "appt";
+		public static final String ERROR = "errorMessage";
 	}
 
-	private void persistToken(HttpSession session, Security loggedInUser, String token)
+	private final static class Action
 	{
-		Security securityRecord = securityDao.find(loggedInUser.getId());
-		securityRecord.setMyHealthAccessLongToken(token);
-		securityDao.merge(securityRecord);
-
-		LoggedInInfo currentUser = LoggedInInfo.getLoggedInInfoFromSession(session);
-		currentUser.getLoggedInSecurity().setMyHealthAccessLongToken(token);
-		LoggedInInfo.setLoggedInInfoIntoSession(session, currentUser);
+		public static final String LOGIN = "mhaLogin";
+		public static final String CREATE_USER = "createUser";
+		public static final String CONFIRM_USER = "confirmUser";
 	}
 }

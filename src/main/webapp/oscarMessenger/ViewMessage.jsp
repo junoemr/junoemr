@@ -88,7 +88,6 @@ height:100% !important;
 </style>
 
 <%
-//oscar.oscarMessenger.pageUtil.MsgSessionBean bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)pageContext.findAttribute("bean");
 oscar.oscarMessenger.util.MsgDemoMap msgDemoMap = new oscar.oscarMessenger.util.MsgDemoMap();
 java.util.HashMap<String, List<String> > demoMap = msgDemoMap.getDemoMap2((String) request.getAttribute("viewMessageId"));
 String boxType = request.getParameter("boxType");

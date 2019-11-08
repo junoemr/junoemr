@@ -10,7 +10,6 @@
 
 .schedule-page-header {
 	@extend %juno-page-header;
-	//@include juno-font-label;
 
 	select {
 		@include juno-select(16px);
@@ -369,95 +368,3 @@
 	}
 }
 
-/* schedule specific modal styling */
-#schedule-modal {
-	.modal-header {
-		.modal-patient-links {
-			margin-right: 20px;
-			.btn {
-				width: 28px;
-			}
-		}
-	}
-
-	modal-body {
-		$tabs-height: $page-tabs-height;
-		$alert-container-height: 40px;
-		@include juno-tab-lg($tabs-height);
-		@include juno-tab-color-scheme-light;
-		@include juno-font-tab;
-
-		.form-group {
-			display: flex;
-			align-items: center;
-
-			&.label-top {
-				align-items: flex-start;
-				& > label {
-					margin-top: 8px;
-				}
-			}
-		}
-		.alert-container {
-			height: $alert-container-height;
-		}
-		.alert-message {
-			color: $color-red-base;
-			@include juno-font-label;
-		}
-		.info-frame-container {
-			height: 160px;
-			//.demographic-info-frame {
-			//	height: 144px;
-			//	margin-bottom: 12px;
-			//	background-color: $color-neutral-lightest;
-			//	border: solid 1px $color-neutral-lighter;
-			//	border-radius: 8px;
-			//	padding: 14px;
-			//
-			//	.form-group {
-			//		margin: 0;
-			//
-			//		label {
-			//			font-size: 9px;
-			//			color: $color-neutral-dark;
-			//		}
-			//		span {
-			//			@include juno-font-label;
-			//			color: $color-neutral-darker;
-			//		}
-			//	}
-			//}
-		}
-		.tab-pane {
-			padding: 0 $modal-border-space $modal-border-space $modal-border-space;
-			overflow: auto;
-			height: calc(#{$modal-body-height} - #{$tabs-height} - #{$alert-container-height});
-
-			.tab-bar-inputs {
-				position: absolute;
-				right: 0;
-				top: 0;
-				height: $tabs-height;
-				width: 40%;
-				display: flex;
-				align-items: center;
-				.form-group {
-					margin-bottom: 0;
-				}
-			}
-
-			.edit-history-header {
-				background-color: $color-neutral-lightest;
-				padding: 12px;
-			}
-
-			.directive-juno-typeahead {
-				@include juno-tab-lg(64px);
-			}
-		}
-	}
-	.form-control-static {
-		min-height: 10px;
-	}
-}
