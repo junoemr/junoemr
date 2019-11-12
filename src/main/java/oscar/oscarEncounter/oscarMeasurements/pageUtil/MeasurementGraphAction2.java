@@ -490,12 +490,13 @@ public class MeasurementGraphAction2 extends Action {
 		TimeSeries timeSeries = new TimeSeries(typeLegendName);
 		for (EctMeasurementsDataBean mdb : list)
 		{
-			if (mdb.getDataField().isEmpty())
+			double[] measurementRange = getParameters(mdb.getDataField(), "");
+			if (measurementRange.length < 1)
 			{
 				log.debug("Error passing measurement value to chart. DataField is empty for ID: " + mdb.getId());
 				continue;
 			}
-			timeSeries.addOrUpdate(new Day(mdb.getDateObservedAsDate()), Double.parseDouble(mdb.getDataField()));
+			timeSeries.addOrUpdate(new Day(mdb.getDateObservedAsDate()), measurementRange[0]);
 		}
 		return timeSeries;
 	}
