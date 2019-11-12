@@ -49,6 +49,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import oscar.OscarProperties;
 
 import com.quatro.model.security.SecProvider;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
 
 @SuppressWarnings("unchecked")
 public class ProviderDao extends HibernateDaoSupport {
@@ -606,7 +607,7 @@ public class ProviderDao extends HibernateDaoSupport {
 			String sql = "FROM Provider p WHERE " + searchOn + " = ? ";
 			Object[] params = {docNo};
 			// Allow multiple route ids to be used for lab matching
-			if (labType.equals("CLS")) {
+			if (labType.equals("CLS") || ConnectCareHandler.getConnectCareLabTypes().contains(labType)) {
 				sql += " OR p.AlbertaEDeliveryIds = ? OR p.AlbertaEDeliveryIds like ? OR p.AlbertaEDeliveryIds like ? OR p.AlbertaEDeliveryIds like ? ";
 				params = new String[] {docNo, docNo, docNo + ",%", "%," + docNo + ",%", "%," + docNo};
 			}

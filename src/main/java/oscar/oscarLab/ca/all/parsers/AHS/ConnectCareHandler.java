@@ -33,7 +33,9 @@ import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class ConnectCareHandler extends ORU_R01MessageHandler
@@ -42,19 +44,21 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	 * map connect care status codes to internal status codes as per, IMG OUT – Status Table [3101] in
 	 * "HL7 Message Processing Guidelines Appendix.pdf"
 	 */
-	private static final Map<String, Hl7TextInfo.REPORT_STATUS> orderStatusMap = new HashMap<String,  Hl7TextInfo.REPORT_STATUS>();
+	private static final Map<String, Hl7TextInfo.REPORT_STATUS> orderStatusMap = new HashMap<String, Hl7TextInfo.REPORT_STATUS>();
+
 	static
 	{
-		orderStatusMap.put("P", 	Hl7TextInfo.REPORT_STATUS.E);
-		orderStatusMap.put("PA",	Hl7TextInfo.REPORT_STATUS.E);
-		orderStatusMap.put("A", 	Hl7TextInfo.REPORT_STATUS.F);
-		orderStatusMap.put("F", 	Hl7TextInfo.REPORT_STATUS.F);
-		orderStatusMap.put("C", 	Hl7TextInfo.REPORT_STATUS.C);
-		orderStatusMap.put("CA",	Hl7TextInfo.REPORT_STATUS.X);
+		orderStatusMap.put("P", Hl7TextInfo.REPORT_STATUS.E);
+		orderStatusMap.put("PA", Hl7TextInfo.REPORT_STATUS.E);
+		orderStatusMap.put("A", Hl7TextInfo.REPORT_STATUS.F);
+		orderStatusMap.put("F", Hl7TextInfo.REPORT_STATUS.F);
+		orderStatusMap.put("C", Hl7TextInfo.REPORT_STATUS.C);
+		orderStatusMap.put("CA", Hl7TextInfo.REPORT_STATUS.X);
 	}
 
 	/**
 	 * Check if a given message handler is a connect care message handler
+	 *
 	 * @param handler
 	 * @return - true if handler is connect care handler
 	 */
@@ -62,9 +66,18 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	{
 		String handlerType = handler.getMsgType();
 		return handlerType.equals("CCIMAGING") || handlerType.equals("CCCARDIOLOGY") ||
-				handlerType.equals("CCENDO") ||
-				handlerType.equals("CCLAB") ||
-				handlerType.equals("CCDOC");
+						handlerType.equals("CCENDO") ||
+						handlerType.equals("CCLAB") ||
+						handlerType.equals("CCDOC");
+	}
+
+	/**
+	 * Get a list of connect care lab types
+	 * @return - the list of connect care lab types
+	 */
+	public static List<String> getConnectCareLabTypes()
+	{
+		return Arrays.asList("CCLAB", "CCIMAGING", "CCCARDIOLOGY", "CCENDO", "CCDOC");
 	}
 
 	public ConnectCareHandler(Message msg) throws HL7Exception
