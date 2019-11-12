@@ -565,10 +565,6 @@ private long getAppointmentRowSpan(
 		allowWeek = "No";
 	}
 
-	boolean showOldEchartLink = true;
-	UserProperty oldEchartLink = propDao.getProp(curUser_no, UserProperty.HIDE_OLD_ECHART_LINK_IN_APPT);
-	if (oldEchartLink!=null && "Y".equals(oldEchartLink.getValue())) showOldEchartLink = false;
-
 	String caisiBillingPreferenceNotDelete = null;
 
 	String defaultServiceType = (String) session.getAttribute("default_servicetype");
@@ -1700,7 +1696,7 @@ private long getAppointmentRowSpan(
 													reasonCodesMap,
 													showDocumentLink,
 													showEncounterLink,
-													showOldEchartLink,
+													true,
 													enablePreventionAppointmentWarnings,
 													preventionWarnings,
 													record,

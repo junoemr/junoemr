@@ -132,6 +132,77 @@ angular.module("Common.Services").service("staticDataService", [
 			return titles;
 		};
 
+		service.getCanadaProvinces = function getCanadaProvinces()
+		{
+			var provinces = [];
+			provinces.push(
+			{
+				"value": "AB",
+				"label": "AB-Alberta"
+			});
+			provinces.push(
+			{
+				"value": "BC",
+				"label": "BC-British Columbia"
+			});
+			provinces.push(
+			{
+				"value": "MB",
+				"label": "MB-Manitoba"
+			});
+			provinces.push(
+			{
+				"value": "NB",
+				"label": "NB-New Brunswick"
+			});
+			provinces.push(
+			{
+				"value": "NL",
+				"label": "NL-Newfoundland Labrador"
+			});
+			provinces.push(
+			{
+				"value": "NT",
+				"label": "NT-Northwest Territory"
+			});
+			provinces.push(
+			{
+				"value": "NS",
+				"label": "NS-Nova Scotia"
+			});
+			provinces.push(
+			{
+				"value": "NU",
+				"label": "NU-Nunavut"
+			});
+			provinces.push(
+			{
+				"value": "ON",
+				"label": "ON-Ontario"
+			});
+			provinces.push(
+			{
+				"value": "PE",
+				"label": "PE-Prince Edward Island"
+			});
+			provinces.push(
+			{
+				"value": "QC",
+				"label": "QC-Quebec"
+			});
+			provinces.push(
+			{
+				"value": "SK",
+				"label": "SK-Saskatchewan"
+			});
+			provinces.push(
+			{
+				"value": "YT",
+				"label": "YT-Yukon"
+			});
+			return provinces;
+		};
+
 		service.getProvinces = function getProvinces()
 		{
 			var provinces = [];

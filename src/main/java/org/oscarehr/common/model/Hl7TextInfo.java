@@ -88,7 +88,22 @@ public class Hl7TextInfo extends AbstractModel<Integer> implements Serializable 
 	private String sendingFacility;
 
 	private String label;
-	
+
+	public enum REPORT_STATUS {
+		C, // corrected
+		F, // final
+		X, // cancelled
+		P, // Partial
+		E, // preliminary
+		A, // authenticated
+		D, // Dictated
+		O, // Documented
+		I, // Incomplete
+		N, // In Progress
+		L, // Legally authenticated
+		R  // Pre-authenticated
+	}
+
 	@Override
 	public Integer getId() {
 		return (id);
