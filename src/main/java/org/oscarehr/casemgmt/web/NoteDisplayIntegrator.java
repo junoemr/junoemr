@@ -211,6 +211,11 @@ public class NoteDisplayIntegrator implements NoteDisplay {
 		return false;
 	}
 
+	public boolean isTextNote()
+	{
+		return true;
+	}
+
 	public CaseManagementNoteLink getNoteLink() {
 		return null;
 	}
