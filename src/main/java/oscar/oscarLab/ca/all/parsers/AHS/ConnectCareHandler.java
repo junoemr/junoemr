@@ -65,10 +65,7 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	public static boolean isConnectCareHandler(MessageHandler handler)
 	{
 		String handlerType = handler.getMsgType();
-		return handlerType.equals("CCIMAGING") || handlerType.equals("CCCARDIOLOGY") ||
-						handlerType.equals("CCENDO") ||
-						handlerType.equals("CCLAB") ||
-						handlerType.equals("CCDOC");
+		return getConnectCareLabTypes().contains(handlerType);
 	}
 
 	/**
