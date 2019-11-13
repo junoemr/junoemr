@@ -9,6 +9,7 @@
 	       class="{{label_size}} control-label"
 	       title="{{hint}}">
 		{{title}}
+		<span ng-if="requiredField" class="required-field-marker">*</span>
 	</label>
 
 	<div class="{{input_size}}">
@@ -16,6 +17,7 @@
 		<input id="input-{{name}}"
 		       type="text"
 		       class="form-control"
+		       placeholder="{{text_placeholder}}"
 		       ng-class="{'no_scroll_bar': max_characters > 0}"
 		       ng-model="model"
 		       ng-focus="focus_fn()"

@@ -1184,6 +1184,31 @@
 		<ap-output>${c_EDD}</ap-output>
 	</databaseap>
 
+	<!-- The Billing Group of the CURRENTLY LOGGED IN provider-->
+	<databaseap>
+		<ap-name>current_user_group_billing_number</ap-name>
+		<ap-sql>
+			SELECT EXTRACTVALUE(provider.comments, '/xml_p_billinggroup_no') AS billing_group_no FROM provider
+			WHERE provider_no = ${loggedInProvider}
+		</ap-sql>
+		<ap-output>${billing_group_no}</ap-output>
+	</databaseap>
+
+	<!-- The Billing Group of the provider. (whoever is listed as the doctor in the Master Record) -->
+	<databaseap>
+		<ap-name>doctor_group_billing_number</ap-name>
+		<ap-sql>
+			SELECT EXTRACTVALUE(provider.comments, '/xml_p_billinggroup_no') AS billing_group_no
+			FROM provider
+
+			INNER JOIN demographic
+			ON demographic.provider_no=provider.provider_no
+
+			WHERE demographic.demographic_no=${demographic}
+		</ap-sql>
+		<ap-output>${billing_group_no}</ap-output>
+	</databaseap>
+
 	<!-- Doctor information -->
 	<databaseap>
 		<ap-name>doctor</ap-name>
@@ -2094,8 +2119,7 @@
 	<databaseap>
 		<ap-name>bc_family_doctor_address</ap-name>
 		<ap-sql>SELECT CONCAT( b.address1, IF( b.address1 ='', '', '\n' ),
-			b.address2, IF( b.address2 ='', '', '\n' ) , b.city, ' ', b.province,
-			' ', b.postal ) AS raddress
+			', ', b.city, ', ', b.province, ', ', b.postal ) AS raddress
 			FROM billingreferral b, demographic d
 			WHERE d.demographic_no=${demographic}
 			AND LENGTH(b.referral_no) > 0

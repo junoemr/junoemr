@@ -26,7 +26,9 @@ package org.oscarehr.casemgmt.service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,17 +57,13 @@ import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.util.ExtPrint;
 import org.oscarehr.casemgmt.web.NoteDisplay;
 import org.oscarehr.casemgmt.web.NoteDisplayLocal;
-import org.oscarehr.common.dao.Hl7TextInfoDao;
-import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.consultations.service.ConsultationPDFCreationService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
-import oscar.oscarLab.ca.all.pageUtil.LabPDFCreator;
-import oscar.oscarLab.ca.all.parsers.Factory;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConcatPDF;
@@ -75,12 +73,12 @@ import com.lowagie.text.DocumentException;
 import java.io.File;
 
 public class CaseManagementPrint {
-	
+
 	private static Logger logger = MiscUtils.getLogger();
 	
 	private CaseManagementManager caseManagementMgr = SpringUtils.getBean(CaseManagementManager.class);
-	private Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
 
+	private ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
 	private NoteService noteService = SpringUtils.getBean(NoteService.class);
 	
 	private ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
@@ -92,49 +90,172 @@ public class CaseManagementPrint {
 	 *This method was in CaseManagementEntryAction but has been moved out so that both the classic Echart and the flat echart can use the same printing method.
 	 * 
 	 */
-	public void doPrint(LoggedInInfo loggedInInfo,Integer demographicNo, boolean printAllNotes,String[] noteIds,boolean printCPP,boolean printRx,boolean printLabs, Calendar startDate, Calendar endDate,   HttpServletRequest request, OutputStream os) throws IOException, DocumentException {
+	public void doPrint(LoggedInInfo loggedInInfo,
+						Integer demographicNo,
+						boolean printAllNotes,
+						String[] noteIds,
+						boolean printCPP,
+						boolean printRx,
+						boolean printLabs,
+						Calendar startDate,
+						Calendar endDate,
+						HttpServletRequest request,
+						OutputStream os)
+			throws IOException, DocumentException
+	{
 		
-		String providerNo=loggedInInfo.getLoggedInProviderNo();
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+		String demoNo = "" + demographicNo;
 
-		
-		if (printAllNotes) {
-			noteIds = getAllNoteIds(loggedInInfo,request,""+demographicNo);
+		if (printAllNotes)
+		{
+			noteIds = getAllNoteIds(loggedInInfo, request, demoNo);
 		}
-		logger.debug("NOTES2PRINT: " + noteIds);
 
-		String demono = ""+demographicNo;
-		request.setAttribute("demoName", getDemoName(demono));
-		request.setAttribute("demoSex", getDemoSex(demono));
-		request.setAttribute("demoAge", getDemoAge(demono));
-		request.setAttribute("mrp", getMRP(request,demono));
-		request.setAttribute("hin", StringUtils.trimToEmpty(getDemoHIN(demono)));
-		String dob = getDemoDOB(demono);
+		request.setAttribute("demoName", getDemoName(demoNo));
+		request.setAttribute("demoSex", getDemoSex(demoNo));
+		request.setAttribute("demoAge", getDemoAge(demoNo));
+		request.setAttribute("mrp", getMRP(request, demoNo));
+		request.setAttribute("hin", StringUtils.trimToEmpty(getDemoHIN(demoNo)));
+		String dob = getDemoDOB(demoNo);
 		dob = convertDateFmt(dob, request);
 		request.setAttribute("demoDOB", dob);
 
-		
+		List<CaseManagementNote> notes = getNotesToPrint(noteIds, loggedInInfo, demoNo, startDate, endDate);
 
-		List<CaseManagementNote> notes = new ArrayList<CaseManagementNote>();
-		List<String> remoteNoteUUIDs = new ArrayList<String>();
+		HashMap<String, List<CaseManagementNote>> cpp = null;
+
+		if (printCPP)
+		{
+			cpp = getIssueNotesToPrint(providerNo, demoNo);
+		}
+
+		List<CaseManagementNote> othermeds = null;
+		if (printRx)
+		{
+			// If we haven't already pulled out the OMeds issues, do so now
+			if (cpp == null)
+			{
+				List<Issue> issues = caseManagementMgr.getIssueInfoByCode(providerNo, "OMeds");
+				String[] issueIds = getIssueIds(issues);
+				othermeds = caseManagementMgr.getNotes(demoNo, issueIds);
+			}
+			else
+			{
+				othermeds = cpp.get("OMeds");
+			}
+		}
+
+		SimpleDateFormat headerFormat = new SimpleDateFormat("yyyy-MM-dd.hh.mm.ss");
+		Date now = new Date();
+		String headerDate = headerFormat.format(now);
+		
+		// Create new file to save form to
+		String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+		String fileName = path + "EncounterForm-" + headerDate + ".pdf";
+		File file = null;
+		FileOutputStream out = null;
+
+		try
+		{
+			file= new File(fileName);
+			out = new FileOutputStream(file);
+
+			CaseManagementPrintPdf printer = new CaseManagementPrintPdf(request, out);
+			printer.printDocHeaderFooter();
+			printer.printCPP(cpp);
+			printer.printRx(demoNo, othermeds);
+			printer.printNotes(notes);
+
+			/* check extensions */
+			Enumeration requestParameterNames = request.getParameterNames();
+			while (requestParameterNames.hasMoreElements()) {
+				String name = (String)requestParameterNames.nextElement();
+				if (name.startsWith("extPrint")) {
+					if (request.getParameter(name).equals("true")) {
+						ExtPrint printBean = (ExtPrint) SpringUtils.getBean(name);
+						if (printBean != null) {
+							printBean.printExt(printer, request);
+						}
+					}
+				}
+			}
+			printer.finish();
+
+			List<Object> pdfDocs = new ArrayList<>();
+			pdfDocs.add(fileName);
+
+			if (printLabs)
+			{
+				List<LabResultData> labResults = getLabsForPrint(loggedInInfo, demoNo, startDate, endDate);
+				List<InputStream> labPrintouts = consultationPDFCreationService.toLabInputStreams(labResults);
+				pdfDocs.addAll(labPrintouts);
+
+			}
+			ConcatPDF.concat(pdfDocs, os);
+		}
+		catch (IOException e)
+		{
+			logger.error("Error ",e);
+		}
+		finally
+		{
+			if (out != null)
+			{
+				out.close();
+			}
+			if (file != null)
+			{
+				file.delete();
+			}
+		}
+	}
+
+	/**
+	 * Fetch all notes applicable for printing for the given demographic
+	 * @param noteIds a list of note IDs we want to print
+	 * @param loggedInInfo session information for the currently logged in user
+	 * @param demoNo demographic number to print notes for
+	 * @param startDate optional start date to print notes from
+	 * @param endDate optional end date to print notes until
+	 * @return a list of CaseManagementNote entries for the demographic that we can find and print
+	 */
+	public List<CaseManagementNote> getNotesToPrint(String[] noteIds, LoggedInInfo loggedInInfo, String demoNo, Calendar startDate, Calendar endDate)
+		throws MalformedURLException
+	{
+		List<CaseManagementNote> notes = new ArrayList<>();
+		List<String> remoteNoteUUIDs = new ArrayList<>();
 		String uuid;
-		for (int idx = 0; idx < noteIds.length; ++idx) {
-			if (noteIds[idx].startsWith("UUID")) {
-				uuid = noteIds[idx].substring(4);
+
+		// Get all local notes where available, and mark down any notes that are remote
+		for (String note : noteIds)
+		{
+			if (note.startsWith("UUID"))
+			{
+				uuid = note.substring(4);
 				remoteNoteUUIDs.add(uuid);
-			} else {
-				Long noteId = ConversionUtils.fromLongString(noteIds[idx]);
-				if (noteId > 0) {
-					notes.add(this.caseManagementMgr.getNote(noteId.toString()));
+			}
+			else
+			{
+				Long noteId = ConversionUtils.fromLongString(note);
+				if (noteId > 0)
+				{
+					notes.add(caseManagementMgr.getNote(noteId.toString()));
 				}
 			}
 		}
 
-		if (loggedInInfo.getCurrentFacility().isIntegratorEnabled() && remoteNoteUUIDs.size() > 0) {
+		// Check for any remote notes where available
+		if (loggedInInfo.getCurrentFacility().isIntegratorEnabled() && remoteNoteUUIDs.size() > 0)
+		{
 			DemographicWs demographicWs = CaisiIntegratorManager.getDemographicWs(loggedInInfo, loggedInInfo.getCurrentFacility());
-			List<CachedDemographicNote> remoteNotes = demographicWs.getLinkedCachedDemographicNotes(Integer.parseInt(demono));
-			for (CachedDemographicNote remoteNote : remoteNotes) {
-				for (String remoteUUID : remoteNoteUUIDs) {
-					if (remoteUUID.equals(remoteNote.getCachedDemographicNoteCompositePk().getUuid())) {
+			List<CachedDemographicNote> remoteNotes = demographicWs.getLinkedCachedDemographicNotes(Integer.parseInt(demoNo));
+			for (CachedDemographicNote remoteNote : remoteNotes)
+			{
+				for (String remoteUUID : remoteNoteUUIDs)
+				{
+					if (remoteUUID.equals(remoteNote.getCachedDemographicNoteCompositePk().getUuid()))
+					{
 						CaseManagementNote fakeNote = getFakedNote(remoteNote);
 						notes.add(fakeNote);
 						break;
@@ -143,211 +264,162 @@ public class CaseManagementPrint {
 			}
 		}
 
-		// we're not guaranteed any ordering of notes given to us, so sort by observation date
-		oscar.OscarProperties p = oscar.OscarProperties.getInstance();
-		String noteSort = p.getProperty("CMESort", "");
-		if (noteSort.trim().equalsIgnoreCase("UP")) {
-			Collections.sort(notes, CaseManagementNote.noteObservationDateComparator);
-			Collections.reverse(notes);
-		} else { 
-			Collections.sort(notes, CaseManagementNote.noteObservationDateComparator);
-		}
-		
-		//How should i filter out observation dates?
-		if(startDate != null && endDate != null){
-			List<CaseManagementNote> dateFilteredList = new ArrayList<CaseManagementNote>();
+		// Notes are unordered - sort by observation date
+		OscarProperties properties = OscarProperties.getInstance();
+		String noteSort = properties.getProperty("CMESort", "");
+		notes.sort(CaseManagementNote.noteObservationDateComparator);
 
-			for (CaseManagementNote cmn : notes){
-				logger.debug("cmn "+cmn.getId()+"  -- "+cmn.getObservation_date()+ " ? start date "+startDate.getTime().before(cmn.getObservation_date())+" end date "+endDate.getTime().after(cmn.getObservation_date()));
+		if (noteSort.trim().equalsIgnoreCase("UP"))
+		{
+			Collections.reverse(notes);
+		}
+
+		// Now that notes are ordered, filter out any notes that do not fit within our start and end date range
+		if (startDate != null && endDate != null)
+		{
+			List<CaseManagementNote> dateFilteredList = new ArrayList<>();
+			for (CaseManagementNote cmn : notes)
+			{
 				Date start = removeTime(startDate.getTime()); // Start date with hours/mins/secs set to 0
 				Date end = removeTime(endDate.getTime()); // End date with hours/mins/secs set to 0
 				Date observation = removeTime(cmn.getObservation_date()); // Observation date with hours/mins/secs set to 0
 				if ((start.before(observation) || start.equals(observation))
-						&& (end.after(observation) || end.equals(observation))
-						) {
+						&& (end.after(observation) || end.equals(observation)))
+				{
 					dateFilteredList.add(cmn);
 				}
 			}
 			notes = dateFilteredList;
 		}
+		return notes;
+	}
+
+	/**
+	 * Given a demographic and the currently logged in provider, grab all issue-related notes for printing.
+	 * @param providerNo logged in provider
+	 * @param demoNo demographic to pull CPP notes for
+	 * @return a map containing issues as keys and any associated notes with each issue
+	 */
+	public HashMap<String, List<CaseManagementNote>> getIssueNotesToPrint(String providerNo, String demoNo)
+	{
+		HashMap<String, List<CaseManagementNote>> cpp = new HashMap<>();
+		String[] issueCodes = {
+				"OMeds",
+				"SocHistory",
+				"MedHistory",
+				"Concerns",
+				"Reminders",
+				"FamHistory",
+				"RiskFactors"
+		};
 
 		List<CaseManagementNote> issueNotes;
 		List<CaseManagementNote> tmpNotes;
-		HashMap<String, List<CaseManagementNote>> cpp = null;
-		if (printCPP) {
-			cpp = new HashMap<String, List<CaseManagementNote>>();
-			String[] issueCodes = { "OMeds", "SocHistory", "MedHistory", "Concerns", "Reminders", "FamHistory", "RiskFactors" };
-			for (int j = 0; j < issueCodes.length; ++j) {
-				List<Issue> issues = caseManagementMgr.getIssueInfoByCode(providerNo, issueCodes[j]);
-				String[] issueIds = getIssueIds(issues);// = new String[issues.size()];
-				tmpNotes = caseManagementMgr.getNotes(demono, issueIds);
-				issueNotes = new ArrayList<CaseManagementNote>();
-				for (int k = 0; k < tmpNotes.size(); ++k) {
-					if (!tmpNotes.get(k).isLocked()) {
-						List<CaseManagementNoteExt> exts = caseManagementMgr.getExtByNote(tmpNotes.get(k).getId());
-						boolean exclude = false;
-						for (CaseManagementNoteExt ext : exts) {
-							if (ext.getKeyVal().equals("Hide Cpp")) {
-								if (ext.getValue().equals("1")) {
-									exclude = true;
-								}
+
+		for (String issueCode : issueCodes)
+		{
+			List<Issue> issues = caseManagementMgr.getIssueInfoByCode(providerNo, issueCode);
+			String[] issueIds = getIssueIds(issues);
+			tmpNotes = caseManagementMgr.getNotes(demoNo, issueIds);
+			issueNotes = new ArrayList<>();
+			for (CaseManagementNote tmpNote: tmpNotes)
+			{
+				if (!tmpNote.isLocked())
+				{
+					List<CaseManagementNoteExt> exts = caseManagementMgr.getExtByNote(tmpNote.getId());
+					boolean exclude = false;
+					for (CaseManagementNoteExt ext : exts)
+					{
+						if (ext.getKeyVal().equals("Hide Cpp"))
+						{
+							if (ext.getValue().equals("1"))
+							{
+								exclude = true;
+								break;
 							}
 						}
-						if (!exclude) {
-							issueNotes.add(tmpNotes.get(k));
-						}
 					}
-				}
-				cpp.put(issueCodes[j], issueNotes);
-			}
-		}
-		String demoNo = null;
-		List<CaseManagementNote> othermeds = null;
-		if (printRx) {
-			demoNo = demono;
-			if (cpp == null) {
-				List<Issue> issues = caseManagementMgr.getIssueInfoByCode(providerNo, "OMeds");
-				String[] issueIds = getIssueIds(issues);// new String[issues.size()];
-				othermeds = caseManagementMgr.getNotes(demono, issueIds);
-			} else {
-				othermeds = cpp.get("OMeds");
-			}
-		}
 
-		SimpleDateFormat headerFormat = new SimpleDateFormat("yyyy-MM-dd.hh.mm.ss");
-	    Date now = new Date();
-	    String headerDate = headerFormat.format(now);
-		
-		// Create new file to save form to
-		String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		String fileName = path + "EncounterForm-" + headerDate + ".pdf";
-                File file=null;
-                FileOutputStream out=null;
-                File file2=null;
-                FileOutputStream os2=null;
-                
-                try {
-                file= new File(fileName);
-		out = new FileOutputStream(file);
-
-		CaseManagementPrintPdf printer = new CaseManagementPrintPdf(request, out);
-		printer.printDocHeaderFooter();
-		printer.printCPP(cpp);
-		printer.printRx(demoNo, othermeds);
-		printer.printNotes(notes);
-
-		/* check extensions */
-		Enumeration<String> e = request.getParameterNames();
-		while (e.hasMoreElements()) {
-			String name = e.nextElement();
-			if (name.startsWith("extPrint")) {
-				if (request.getParameter(name).equals("true")) {
-					ExtPrint printBean = (ExtPrint) SpringUtils.getBean(name);
-					if (printBean != null) {
-						printBean.printExt(printer, request);
+					if (!exclude)
+					{
+						issueNotes.add(tmpNote);
 					}
 				}
 			}
+			cpp.put(issueCode, issueNotes);
 		}
-		printer.finish();
 
-		List<Object> pdfDocs = new ArrayList<Object>();
-		pdfDocs.add(fileName);
+		return cpp;
+	}
 
-		if (printLabs)
+	/**
+	 * Given a demographic and a date range, get a list of all labs for printing.
+	 * @param loggedInInfo current session info
+	 * @param demoNo demographic to get labs for
+	 * @param startDate optional start date to begin searching from
+	 * @param endDate optional end date to search until
+	 */
+	public List<LabResultData> getLabsForPrint(LoggedInInfo loggedInInfo, String demoNo, Calendar startDate, Calendar endDate)
+	{
+		CommonLabResultData commonLabs = new CommonLabResultData();
+		List<LabResultData> labs = commonLabs.populateLabsData(loggedInInfo,
+				"",
+				demoNo,
+				"",
+				"",
+				"",
+				"U",
+				"");
+		LinkedHashMap<String, LabResultData> accessionMap = new LinkedHashMap<>();
+
+		for (int i = 0; i < labs.size(); i++)
 		{
-			// get the labs which fall into the date range which are attached to this patient
-			CommonLabResultData comLab = new CommonLabResultData();
-			ArrayList<LabResultData> labs = comLab.populateLabResultsData(loggedInInfo, "", demono, "", "", "", "U");
-			LinkedHashMap<String, LabResultData> accessionMap = new LinkedHashMap<String, LabResultData>();
-			for (int i = 0; i < labs.size(); i++)
+			LabResultData result = labs.get(i);
+			if (result.isHL7TEXT())
 			{
-				LabResultData result = labs.get(i);
-				if (result.isHL7TEXT())
+				if (result.accessionNumber == null || result.accessionNumber.isEmpty())
 				{
-					if (result.accessionNumber == null || result.accessionNumber.equals(""))
-					{
-						accessionMap.put("noAccessionNum" + i + result.labType, result);
-					} else
-					{
-						if (!accessionMap.containsKey(result.accessionNumber + result.labType))
-							accessionMap.put(result.accessionNumber + result.labType, result);
-					}
-				}
-			}
-
-			ArrayList<LabResultData> labResults = new ArrayList<>(accessionMap.values());
-			//remove out of date range results
-			Iterator<LabResultData> labResultIterator = labResults.iterator();
-			while (labResultIterator.hasNext())
-			{
-				LabResultData lab = labResultIterator.next();
-				if (startDate != null && lab.getDateObj().getTime() - startDate.getTimeInMillis() < 0)
-				{// filter out lab results not in range.
-					labResultIterator.remove();
-				}
-				if (endDate != null && lab.getDateObj().getTime() - endDate.getTimeInMillis() > 0)
-				{// filter out lab results not in range
-					labResultIterator.remove();
-				}
-			}
-
-			//sort lab results.
-			Collections.sort(labResults,  new java.util.Comparator<LabResultData> ()
-			{
-				@Override
-				public int compare(LabResultData l1, LabResultData l2)
-				{
-					return -l1.getDateObj().compareTo(l2.getDateObj());
-				}
-			});
-
-
-			for (LabResultData result : labResults) {
-				String segmentId;
-
-				if (result.accessionNumber == null || result.accessionNumber.equals(""))
-				{
-					segmentId = result.segmentID;
+					accessionMap.put("noAccessionNum" + i + result.labType, result);
 				}
 				else
 				{
-					Hl7TextInfo textInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(result.accessionNumber);
-					segmentId = String.valueOf(textInfo.getLabNumber());
+					if (!accessionMap.containsKey(result.accessionNumber + result.labType))
+					{
+						accessionMap.put(result.accessionNumber + result.labType, result);
+					}
 				}
-
-				MessageHandler handler = Factory.getHandler(segmentId);
-				String fileName2 = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "//" + handler.getPatientName().replaceAll("\\s", "_") + "_" + handler.getMsgDate() + "_LabReport.pdf";
-                                file2= new File(fileName2);
-				os2 = new FileOutputStream(file2);
-				LabPDFCreator pdfCreator = new LabPDFCreator(os2, segmentId, loggedInInfo.getLoggedInProviderNo());
-				pdfCreator.printPdf();
-				pdfDocs.add(fileName2);
 			}
-
 		}
-		ConcatPDF.concat(pdfDocs, os);
-                } catch (IOException e)
-                {
-                    logger.error("Error ",e);
-                    
-                }
-                finally {
-                  if (out!=null) {
-                      out.close();
-                  }
-                  if (os2!=null) {
-                      os2.close();
-                  }
-                  if (file!=null) {
-                      file.delete();
-                  }
-                  if (file2!=null) {
-                      file2.delete();
-                  }
-                }
+
+		List<LabResultData> labResults = new ArrayList<>(accessionMap.values());
+		//remove out of date range results
+		Iterator<LabResultData> labResultIterator = labResults.iterator();
+		while (labResultIterator.hasNext())
+		{
+			LabResultData lab = labResultIterator.next();
+			if (startDate != null && lab.getDateObj().getTime() - startDate.getTimeInMillis() < 0)
+			{// filter out lab results not in range.
+				labResultIterator.remove();
+			}
+			if (endDate != null && lab.getDateObj().getTime() - endDate.getTimeInMillis() > 0)
+			{// filter out lab results not in range
+				labResultIterator.remove();
+			}
+		}
+
+		//sort lab results.
+		labResults.sort(new java.util.Comparator<LabResultData>()
+		{
+			@Override
+			public int compare(LabResultData l1, LabResultData l2)
+			{
+				return -l1.getDateObj().compareTo(l2.getDateObj());
+			}
+		});
+
+		return labResults;
 	}
-	
+
 	public String[] getIssueIds(List<Issue> issues) {
 		String[] issueIds = new String[issues.size()];
 		int idx = 0;

@@ -4,14 +4,35 @@
 $images-root: '../images/';
 
 $icon-logo: $images-root + 'logo.svg';
-$icon-down: $images-root + 'icon-16-arrow-down.svg';
-$icon-down-white: $images-root + 'icon-16-arrow-down-white.svg';
+$icon-down-blue: $images-root + 'icon-16-chevron-down-blue.png';
+$icon-down-white: $images-root + 'icon-16-chevron-down-white.png';
 
-.icon {
+$image-zero-state-background: $images-root + 'zero-state-background.svg';
+$image-zero-state-calendar: $images-root + 'zero-state-calendar.svg';
+
+$image-spinner: $images-root + 'spinner.gif';
+
+.bg-image {
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
 }
 .icon-logo {
 	background-image: url($icon-logo);
 }
 .icon-down {
-	background-image: url($icon-down);
+	background-image: url($icon-down-blue);
+}
+
+.image-zero-state-background {
+	background-image: url($image-zero-state-background);
+}
+.image-zero-state-calendar {
+	background-image: url($image-zero-state-calendar);
+}
+.image-spinner {
+	background-image: url($image-spinner);
 }

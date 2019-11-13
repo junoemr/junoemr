@@ -46,7 +46,7 @@
 					<%--<bean:message key="Appointment.msgTelephone"/>:--%>
 				<%--</span>--%>
 			</h5>
-			<i class="icon icon-phone-square"></i>
+			<i class="icon icon-tele-call"></i>
 			<h5 class="patient-header-info">
 				{{recordCtrl.demographic.phone}}
 			</h5>

@@ -31,12 +31,14 @@ import java.util.Comparator;
 import java.util.Date;
 
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.schedule.model.ScheduleTemplateCode;
 
 public class NextAppointmentSearchResult {
 	private String providerNo;
 	private Date date;
 	private int duration;
 	private Provider provider;
+	private ScheduleTemplateCode scheduleTemplateCode;
 	
 	
 	public String getProviderNo() {
@@ -64,7 +66,16 @@ public class NextAppointmentSearchResult {
 	public void setProvider(Provider provider) {
     	this.provider = provider;
     }
-	
+
+	public ScheduleTemplateCode getScheduleTemplateCode()
+	{
+		return scheduleTemplateCode;
+	}
+
+	public void setScheduleTemplateCode(ScheduleTemplateCode scheduleTemplateCode)
+	{
+		this.scheduleTemplateCode = scheduleTemplateCode;
+	}
 
 	public String getYear() {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy");

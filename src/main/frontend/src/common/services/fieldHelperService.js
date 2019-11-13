@@ -17,6 +17,7 @@ angular.module('Common.Services').factory(
 				label_size: '@caLabelSize',
 				input_size: '@caInputSize',
 				text_length: '@caTextLength',
+				text_placeholder: '@caTextPlaceholder',
 				hide_label_colon: '@caTitleNoColon',
 				template: '@caTemplate',
 
@@ -37,6 +38,7 @@ angular.module('Common.Services').factory(
 				disabled: '=caDisabled',
 				hide: '=caHide',
 				focus_field: '=caFocusField',
+				requiredField: '@caRequiredField',
 
 				on_focus_fn: '&caFocus',
 				change_fn: '&caChange',

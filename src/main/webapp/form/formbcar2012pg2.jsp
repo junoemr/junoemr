@@ -96,6 +96,11 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
 <% response.setHeader("Cache-Control","no-cache");%>
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+
+	<!-- Scripts to help with submission of forms -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+
     <title>Antenatal Record 2</title>
     <html:base/>
     <link rel="stylesheet" type="text/css" href="<%=bView?"bcArStyleView.css" : "bcAr2007Style.css"%>">
@@ -112,7 +117,8 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
 			}
 		  
 		   function onPrint() {
-		       document.forms[0].submit.value="print"; 
+		       document.forms[0].submit.value="print";
+		       Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
 		       var ret = checkAllDates();
 		       if(ret==true)
 		       {            
@@ -122,7 +128,8 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
 		      return ret;
 		   }
 		   function onPrintScores() {
-		       document.forms[0].submit.value="print"; 
+		       document.forms[0].submit.value="print";
+		       Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
 		       var ret = checkAllDates();
 		       if(ret==true)
 		       {            
@@ -132,16 +139,16 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
 		      return ret;
 		   }
 		   function onPrint12() {
-		       document.forms[0].submit.value="printAll"; 
-		               
+		       document.forms[0].submit.value="printAll";
+		       Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
 		       document.forms[0].action = "../form/formname.do?__title=British+Columbia+Antenatal+Record&__cfgfile=bcar1PrintCfgPg1_2012&__cfgfile=bcar2PrintCfgPg1_2012&__cfgGraphicFile=bcar2PrintGraphCfgPg1_2012&__cfgGraphicFile1=bcar2PrintGraphCfgPg1_2012&__graphicPage=2<%= props.getProperty("pg3_date1", "") == "" ? "&__template=bcarARs2_2012&__numPages=2" : "&__cfgGraphicFile2=bcar2PrintGraphCfgPg1_2012&__cfgfile=bcar2PrintCfgPg2_2012&__graphicPage=3&__template=bcarARs1_2012&__numPages=3" %>";
 		      document.forms[0].target="_blank";            
 		      
 		      return true;
 		  }
 		  function onPrintAll() {
-		      document.forms[0].submit.value="printAll"; 
-		              
+		      document.forms[0].submit.value="printAll";
+		      Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
 		      document.forms[0].action = "../form/formname.do?__title=British+Columbia+Antenatal+Record&__cfgfile=bcar1PrintCfgPg1_2012&__cfgfile=bcar2PrintCfgPg1_2012&__cfgGraphicFile=bcar2PrintGraphCfgPg1_2012&__cfgGraphicFile1=bcar2PrintGraphCfgPg1_2012&__graphicPage=2<%= props.getProperty("pg3_date1", "") == "" ? "&__cfgfile=bcar1PrintCfgPg2_2012&__cfgfile=bcar2PrintCfgScores_2012&__template=bcarAll2_2012&__numPages=2" : "&__cfgGraphicFile2=bcar2PrintGraphCfgPg1_2012&__cfgfile=bcar2PrintCfgPg2_2012&__graphicPage=3&__cfgfile=bcar1PrintCfgPg2_2012&__cfgfile=bcar2PrintCfgScores_2012&__template=bcarAll1_2012&__numPages=3" %>";
 		        document.forms[0].target="_blank";            
 		        
@@ -165,6 +172,7 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
 		    function onSave() {
 		
 		        document.forms[0].submit.value="save";
+		        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
 		        var ret = checkAllDates();
 		        ret = checkAllNumber();
 		        if(ret==true) {
@@ -180,6 +188,7 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
 		        return(false);
 		    }
 		    function onSaveExit() {
+		        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
 		        document.forms[0].submit.value="exit";
 		        var ret = checkAllDates();
 		        ret = checkAllNumber();

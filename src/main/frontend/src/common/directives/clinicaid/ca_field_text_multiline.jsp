@@ -14,14 +14,15 @@
 	<div class="{{input_size}}">
 
 		<textarea id="input-{{name}}"
-							class="form-control"
-							ng-class="{'no_scroll_bar': max_characters > 0}"
-							rows="{{rows}}"
-							ng-model="model"
-							ng-focus="focus_fn()"
-							ng-change="change_fn()"
-							ng-disabled="disabled"
-							tabindex="{{tab_index}}">
+		          class="form-control"
+		          placeholder="{{text_placeholder}}"
+		          ng-class="{'no_scroll_bar': max_characters > 0}"
+		          rows="{{rows}}"
+		          ng-model="model"
+		          ng-focus="focus_fn()"
+		          ng-change="change_fn()"
+		          ng-disabled="disabled"
+		          tabindex="{{tab_index}}">
 		</textarea>
 		<span class="label label-default textarea-char-counter"
 					ng-class="{'hidden': max_characters == null}">

@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import ca.uhn.hl7v2.model.Message;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -65,6 +66,44 @@ public final class DataTypeUtils {
 	public static final int NTE_COMMENT_MAX_SIZE = 65536;
 	public static final String ACTION_ROLE_SENDER = "SENDER";
 	public static final String ACTION_ROLE_RECEIVER = "RECEIVER";
+
+
+	public enum HL7_VERSION {
+		VERSION_UNKNOWN,
+
+		VERSION_251,
+		VERSION_231,
+		VERSION_26,
+		VERSION_25,
+		VERSION_24,
+		VERSION_23,
+		VERSION_22,
+		VERSION_21
+	}
+
+	public static HL7_VERSION getHL7Version(Message msg)
+	{
+		switch (msg.getVersion())
+		{
+			case "2.1":
+				return HL7_VERSION.VERSION_21;
+			case "2.2":
+				return HL7_VERSION.VERSION_22;
+			case "2.3":
+				return HL7_VERSION.VERSION_23;
+			case "2.4":
+				return HL7_VERSION.VERSION_24;
+			case "2.5":
+				return HL7_VERSION.VERSION_25;
+			case "2.6":
+				return HL7_VERSION.VERSION_26;
+			case "2.3.1":
+				return HL7_VERSION.VERSION_231;
+			case "2.5.1":
+				return HL7_VERSION.VERSION_251;
+		}
+		return HL7_VERSION.VERSION_UNKNOWN;
+	}
 
 	/**
 	 * Don't access this formatter directly, use the getAsFormattedString method, it provides synchronisation

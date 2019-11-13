@@ -80,7 +80,7 @@
 
 	<module name="org.oscarehr.util.checkstyle.TrackingRegexpCheck">
 		<property name="fileExtensions" value=".java,.jsp,.jspf,.jsf"/>
-		<property name="illegalRegex" value=".*ArrayList\s*\(\).*|.*Vector\s*\(\).*|.*HashSet\s*\(\).*|.*HashMap\s*\(\).*|.*Hashtable\s*\(\).*|.*TreeSet\s*\(\).*|.*TreeMap\s*\(\).*|.*WeakHashMap\s*\(\).*"/>
+		<property name="illegalRegex" value=".*ArrayList\s*\(\).*|.*\s+Vector\s*\(\).*|.*HashSet\s*\(\).*|.*HashMap\s*\(\).*|.*Hashtable\s*\(\).*|.*TreeSet\s*\(\).*|.*TreeMap\s*\(\).*|.*WeakHashMap\s*\(\).*"/>
 		<property name="violationDescription" value="use generics"/>
 		<property name="dataStoreFilename" value="utils/TrackingRegexpCheck_java_jsp.data.xml"/>
 	</module>

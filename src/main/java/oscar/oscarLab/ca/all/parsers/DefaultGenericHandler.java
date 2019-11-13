@@ -43,6 +43,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
 import java.util.ArrayList;
 
@@ -50,13 +51,12 @@ import java.util.ArrayList;
  *
  * @author wrighd
  */
-public class DefaultGenericHandler extends MessageHandler
+public class DefaultGenericHandler extends ORU_R01MessageHandler
 {
 
     Logger logger = Logger.getLogger(DefaultGenericHandler.class);
 
     protected Message msg = null;
-    protected Terser terser;
     protected ArrayList<ArrayList<Segment>> obrGroups = null;
 
     /** Creates a new instance of CMLHandler */
@@ -71,7 +71,7 @@ public class DefaultGenericHandler extends MessageHandler
         // force parsing as a generic message by changing the message structure
         hl7Body = hl7Body.replaceAll("R01", "");
         msg = p.parse(hl7Body.replaceAll( "\n", "\r\n"));
-
+        this.message = msg;
         terser = new Terser(msg);
 
         int obrCount = getOBRCount();

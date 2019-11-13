@@ -27,12 +27,12 @@ package oscar.oscarLab.ca.all.parsers.AHS;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import org.apache.log4j.Logger;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.ConversionUtils;
 
 import java.util.Date;
 
-public abstract class AHSHandler extends MessageHandler
+public abstract class AHSHandler extends ORU_R01MessageHandler
 {
 	private static Logger logger = Logger.getLogger(AHSHandler.class);
 

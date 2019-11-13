@@ -46,6 +46,10 @@
 <%@ page import="oscar.oscarLab.ca.all.parsers.Factory" %>
 <%@ page import="oscar.oscarLab.ca.all.parsers.MessageHandler" %>
 <%@ page import="oscar.oscarLab.ca.all.parsers.PATHL7Handler" %>
+<%@ page import="java.util.regex.Pattern" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler" %>
+<%@ page import="org.oscarehr.labs.service.Hl7TextInfoService" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -519,11 +523,42 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                                     </td>
                                                                     <td nowrap>
                                                                         <div class="FieldData" nowrap="nowrap">
-                                                                            <%=handler.getHealthNum()%>
+                                                                            <%
+                                                                                String hin = handler.getHealthNum();
+                                                                                if (ConnectCareHandler.isConnectCareHandler(handler))
+                                                                                {
+                                                                                    hin += " ABH";
+                                                                                }
+                                                                            %>
+                                                                            <%=hin%>
                                                                         </div>
                                                                     </td>
                                                                     <td colspan="2"></td>
                                                                 </tr>
+                                                                <%
+                                                                // insert extended description fields
+                                                                List<org.apache.commons.lang3.tuple.Pair<String, String>> extDesc = handler.getExtendedPatientDescriptionFields();
+                                                                for (org.apache.commons.lang3.tuple.Pair<String, String> extFeild : extDesc)
+                                                                {
+                                                                    %>
+                                                                    <tr>
+                                                                        <td nowrap>
+                                                                            <div class="FieldData">
+                                                                                <strong>
+                                                                                    <%=extFeild.getLeft()%>
+                                                                                </strong>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td nowrap>
+                                                                            <div class="FieldData" nowrap="nowrap">
+                                                                                <%=extFeild.getRight()%>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td colspan="2"></td>
+                                                                    </tr>
+                                                                    <%
+                                                                }
+                                                                %>
                                                             </table>
                                                         </td>
                                                         <td width="33%" valign="top">
@@ -604,7 +639,18 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                             </td>
                                             <td>
                                                 <div class="FieldData" nowrap="nowrap">
-                                                    <%= ( handler.getOrderStatus().equals("F") ? "Final" : handler.getOrderStatus().equals("C") ? "Corrected" : (handler.getMsgType().equals("PATHL7") && handler.getOrderStatus().equals("P")) ? "Preliminary": handler.getOrderStatus().equals("X") ? "DELETED": handler.getOrderStatus()) %>
+                                                    <%
+                                                    String orderStatus = "";
+                                                    if (ConnectCareHandler.isConnectCareHandler(handler))
+                                                    {
+                                                        orderStatus = Hl7TextInfoService.getReportStatusDisplayString(handler.getJunoOrderStatus());
+                                                    }
+                                                    else
+                                                    {
+                                                        orderStatus = (handler.getOrderStatus().equals("F") ? "Final" : handler.getOrderStatus().equals("C") ? "Corrected" : (handler.getMsgType().equals("PATHL7") && handler.getOrderStatus().equals("P")) ? "Preliminary" : handler.getOrderStatus().equals("X") ? "DELETED" : handler.getOrderStatus());
+                                                    }
+                                                    %>
+                                                    <%=orderStatus%>
 										</div>
                                             </td>
                                         </tr>
@@ -648,7 +694,32 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                 </div>
                                             </td>
                                         </tr>
-                                        <% } %>
+                                        <%
+                                        }
+
+										// insert extended description fields
+										List<org.apache.commons.lang3.tuple.Pair<String, String>> extResultDesc = handler.getExtendedResultDescriptionFields();
+										for (org.apache.commons.lang3.tuple.Pair<String, String> extFeild : extResultDesc)
+										{
+											%>
+                                            <tr>
+                                                <td nowrap>
+                                                    <div class="FieldData">
+                                                        <strong>
+                                                            <%=extFeild.getLeft()%>
+                                                        </strong>
+                                                    </div>
+                                                </td>
+                                                <td nowrap>
+                                                    <div class="FieldData" nowrap="nowrap">
+                                                        <%=extFeild.getRight()%>
+                                                    </div>
+                                                </td>
+                                                <td colspan="2"></td>
+                                            </tr>
+                                            <%
+										}
+										%>
                                     </table>
                                 </td>
                             </tr>
@@ -796,8 +867,8 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 
                         for(i=0;i<headers.size();i++){
                             linenum=0;
-    						boolean isUnstructuredDoc = false;
-    						boolean isPDF = false;
+    						boolean isUnstructuredDoc = handler.isUnstructured();
+                            boolean isPDF = false;
     						boolean	isVIHARtf = false;
     						boolean isSGorCDC = false;
 
@@ -830,7 +901,20 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 	                               <%--<td align="right" bgcolor="#FFCC00" width="100">&nbsp;</td>--%>
 	                               <td width="9">&nbsp;</td>
 	                               <td width="9">&nbsp;</td>
-	                               <td width="*">&nbsp;</td>
+                                   <%
+                                       if (handler.getMsgType().equals("CCIMAGING"))
+                                       {
+                                           %>
+                                           <td width="*" style="color: white;">Report Date: <%=handler.getReportDate(i)%></td>
+                                           <%
+                                       }
+                                       else
+                                       {
+                                           %>
+                                           <td width="*">&nbsp;</td>
+                                           <%
+                                       }
+                                   %>
 	                           </tr>
 	                       </table>
 
@@ -965,50 +1049,73 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                       } else  if (!handler.getOBXResultStatus(j, k).equals("TDIS") && !handler.getMsgType().equals("EPSILON")) {
                                           	%><tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>"><%
                                        		if(isUnstructuredDoc){
-	                                   			if(handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1)){%>
-	                                   				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(j, k)%>'))"></a><%
-	                                   				}
-	                                   			else{%> <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"><%=obxName %></a><%}%>
-												<%if(isVIHARtf){
-												    //create bytes from the rtf string
-											    	byte[] rtfBytes = handler.getOBXResult(j, k).getBytes();
-											    	ByteArrayInputStream rtfStream = new ByteArrayInputStream(rtfBytes);
+                                                if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+                                                {
+                                                    String obxDocId = "";
+                                                    java.util.regex.Matcher docIdMatcher = Pattern.compile("embedded_doc_id_(\\d+)").matcher(handler.getOBXResult(j, k));
+                                                    if (docIdMatcher.find())
+                                                    {
+                                                        obxDocId = docIdMatcher.group(1);
+                                                    }
 
-											    	//Use RTFEditor Kit to get plaintext from RTF
-											    	RTFEditorKit rtfParser = new RTFEditorKit();
-											    	javax.swing.text.Document doc = rtfParser.createDefaultDocument();
-											    	rtfParser.read(rtfStream, doc, 0);
-											    	String rtfText = doc.getText(0, doc.getLength()).replaceAll("\n", "<br>");
-											    	String disclaimer = "<br>IMPORTANT DISCLAIMER: You are viewing a PREVIEW of the original report. The rich text formatting contained in the original report may convey critical information that must be considered for clinical decision making. Please refer to the ORIGINAL report, by clicking 'Print', prior to making any decision on diagnosis or treatment.";%>
-											    	<td align="left"><%= rtfText + disclaimer %></td><%}
-												else{%>
-	                                           		<td align="left"><%= handler.getOBXResult( j, k) %></td><%} %>
-	                                           	<%if(handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1)) && (obxCount>1)){
-	                                        			%><td align="center"></td><%}
-	                                        		else{%> <td align="center"><%= handler.getTimeStamp(j, k) %></td><%}
+                                                    %>
+                                                        <tr>
+                                                            <td valign="top" align="left" class="NarrativeRes"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName%></a>
+                                                            <td class="NarrativeRes"> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display PDF</a> </td>
+                                                        </tr>
+                                                    <%
+                                                }
+                                                else
+                                                {
+                                                    if( (k != 0) && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1)){%>
+                                                        <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(j, k)%>'))"></a><%
+                                                        }
+                                                    else{%> <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"><%=obxName %></a><%}%>
+                                                    <%if(isVIHARtf){
+                                                        //create bytes from the rtf string
+                                                        byte[] rtfBytes = handler.getOBXResult(j, k).getBytes();
+                                                        ByteArrayInputStream rtfStream = new ByteArrayInputStream(rtfBytes);
+
+                                                        //Use RTFEditor Kit to get plaintext from RTF
+                                                        RTFEditorKit rtfParser = new RTFEditorKit();
+                                                        javax.swing.text.Document doc = rtfParser.createDefaultDocument();
+                                                        rtfParser.read(rtfStream, doc, 0);
+                                                        String rtfText = doc.getText(0, doc.getLength()).replaceAll("\n", "<br>");
+                                                        String disclaimer = "<br>IMPORTANT DISCLAIMER: You are viewing a PREVIEW of the original report. The rich text formatting contained in the original report may convey critical information that must be considered for clinical decision making. Please refer to the ORIGINAL report, by clicking 'Print', prior to making any decision on diagnosis or treatment.";%>
+                                                        <td align="left"><%= rtfText + disclaimer %></td><%} %><%
+                                                    else{%>
+                                                        <td align="left"><%= handler.getOBXResult( j, k) %></td><%} %>
+                                                    <%if(handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, Math.max(k-1, 0))) && (obxCount>1)){
+                                                            %><td align="center"></td><%}
+                                                        else{%> <td align="center"><%= handler.getTimeStamp(j, k) %></td><%}
+                                                }
                                    			}//end of isUnstructuredDoc
 
                                    			else{//if it isn't a PATHL7 doc
-                                   			    if (handler.getMsgType().equals("PATHL7") && isPDF)
+                                                if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
                                                 {
-                                                    int docId = documentLinks.get(j).getDocumentNo();
-                                                %>
-                                                    <td valign="top" align="middle">
-                                                        <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '<%=request.getContextPath()%>/dms/ManageDocument.do?method=display&doc_no=<%=docId%>');">Display PDF</a>
-                                                    </td>
-                                                <%
-                                                }
-                                   				//if there are duplicate FT/TX obxNames, only display the first (only if handler is PATHL7)
-	                                   			else if(handler.getMsgType().equals("PATHL7")&& !isAllowedDuplicate && (obxCount>1) && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (handler.getOBXValueType(j, k).equals("TX") || handler.getOBXValueType(j, k).equals("FT"))){%>
-	                                   				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"></a><%
-	                                   				}
-	                               				else{%>
-	                                            <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(j, k)%>'))"><%=obxName %></a></td><%}%>
-	                                            <%
+                                                    String obxDocId = "";
+                                                    java.util.regex.Matcher docIdMatcher = java.util.regex.Pattern.compile("embedded_doc_id_(\\d+)").matcher(handler.getOBXResult(j, k));
+                                                    if (docIdMatcher.find())
+                                                    {
+                                                        obxDocId = docIdMatcher.group(1);
+                                                    }
 
-                                                // Excelleris embedded PDFs only want a single link as the OBX result
-                                                if (!isPDF)
+                                                    %>
+                                                    <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%=  java.net.URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a>
+                                                    <td> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display PDF</a> </td>
+                                                    </tr>
+                                                    <%
+                                                }
+                                                else
                                                 {
+                                                    //if there are duplicate FT/TX obxNames, only display the first (only if handler is PATHL7)
+                                                    if(handler.getMsgType().equals("PATHL7")&& !isAllowedDuplicate && (obxCount>1) && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (handler.getOBXValueType(j, k).equals("TX") || handler.getOBXValueType(j, k).equals("FT"))){%>
+                                                        <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"></a><%
+                                                        }
+                                                    else{%>
+                                                    <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(j, k)%>'))"><%=obxName %></a></td><%}%>
+                                                    <%
                                                     //for pathl7, if it is an SG/CDC result greater than 100 characters, left justify it
                                                     if((handler.getOBXResult(j, k).length() > 100) && isSGorCDC){%>
                                                         <td align="left"><%= handler.getOBXResult( j, k) %></td><%
@@ -1021,8 +1128,8 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                     <td align="left"><%=handler.getOBXUnits( j, k) %></td>
                                                     <td align="center"><%= handler.getTimeStamp(j, k) %></td>
                                                     <td align="center"><%= handler.getOBXResultStatus( j, k) %></td><%
-												}
-                                            }//end of PATHL7 else %>
+                                                }
+                                   			}//end of PATHL7 else %>
                                         </tr>
 
                                         <%for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>

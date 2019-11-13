@@ -210,6 +210,7 @@ module.exports = {
 			'./src/common/directives/clinicaid/ca_field_date3.js',
 			'./src/common/directives/clinicaid/ca_field_date.js',
 			'./src/common/directives/clinicaid/ca_field_number.js',
+			'./src/common/directives/clinicaid/ca_field_radio.js',
 			'./src/common/directives/clinicaid/ca_field_select.js',
 			'./src/common/directives/clinicaid/ca_field_text.js',
 			'./src/common/directives/clinicaid/ca_field_time.js',
@@ -231,6 +232,8 @@ module.exports = {
 
 			'./src/common/components/module.js',
 			'./src/common/components/modalComponent.js',
+			'./src/common/components/loadingIndicatorComponent.js',
+			'./src/common/components/zeroStateDisplayComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
@@ -238,7 +241,7 @@ module.exports = {
 			'./src/layout/leftAsideComponent.js',
 
 			'./src/patient/module.js',
-			'./src/patient/newPatientController.js',
+			'./src/patient/addDemographicModal/addDemographicModalComponent.js',
 			'./src/patient/demographicCardComponent.js',
 
 			'./src/dashboard/module.js',
@@ -278,7 +281,8 @@ module.exports = {
 
 			'./src/schedule/module.js',
 			'./src/schedule/scheduleController.js',
-			'./src/schedule/eventController.js',
+			'./src/schedule/eventComponent.js',
+			'./src/schedule/scheduleSearchComponent.js',
 			'./src/schedule/scheduleService.js',
 
 			'./src/admin/module.js',

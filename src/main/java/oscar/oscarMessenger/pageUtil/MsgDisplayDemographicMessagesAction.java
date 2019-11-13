@@ -71,8 +71,7 @@ public class MsgDisplayDemographicMessagesAction extends Action {
         
             MiscUtils.getLogger().debug("this is displayDemographicMessages.Action");
             
-            // Setup variables            
-            oscar.oscarMessenger.pageUtil.MsgSessionBean bean = null;
+            // Setup variables
             String[] messageNo = ((MsgDisplayDemographicMessagesForm)form).getMessageNo();
             //String unlinkMsg = ((MsgDisplayDemographicMessagesForm)form).getUnlinkMsg();
             
@@ -80,17 +79,6 @@ public class MsgDisplayDemographicMessagesAction extends Action {
             String findForward = "success";
 
             //if(request.getParameter("providerNo")!=null & request.getParameter("userName")!=null)
-			bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)request.getSession().getAttribute("msgSessionBean");
-
-            if(bean == null)
-            {
-                bean = new oscar.oscarMessenger.pageUtil.MsgSessionBean();
-                request.getSession().setAttribute("msgSessionBean", bean);
-            }
-			bean.setProviderNo((String) request.getSession().getAttribute("user"));
-			bean.setUserName(request.getParameter("userName"));
-			bean.setDemographic_no(request.getParameter("demographic_no"));
-
             //Unlinked selected messages
 		if (messageNo != null)
 		{

@@ -24,7 +24,7 @@
 --%>
 
 <div class="demographic-card flex-column align-items-center justify-content-center">
-	<div class="form-horizontal">
+	<div class="demographic-card-form form-horizontal" ng-if="!$ctrl.disabled">
 		<!-- patient dob -->
 		<div class="form-group">
 			<label class="control-label col-sm-2">

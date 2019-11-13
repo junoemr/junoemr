@@ -601,7 +601,10 @@ Effect.Puff = function(element) {
    );
 }
 
-Effect.BlindUp = function(element) {
+// play blind up animation.
+// element - element to apply the animation to.
+// done_callback - callback called when the animation is finished.
+Effect.BlindUp = function(element, done_callback) {
   element = $(element);
   element.makeClipping();
   return new Effect.Scale(element, 0,
@@ -610,6 +613,10 @@ Effect.BlindUp = function(element) {
       restoreAfterFinish: true,
       afterFinishInternal: function(effect) {
         effect.element.hide().undoClipping();
+        if (done_callback !== undefined)
+        {
+          done_callback();
+        }
       } 
     }, arguments[1] || {})
   );

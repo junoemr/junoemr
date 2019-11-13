@@ -29,4 +29,12 @@
 	</div>
 	<div ng-transclude="body" class="modal-body" ng-class="$ctrl.hideFooter ? 'no-footer' : ''"></div>
 	<div ng-transclude="footer" class="modal-footer" ng-if="!$ctrl.hideFooter"></div>
+	<juno-loading-indicator
+			ng-if="$ctrl.showLoading"
+			class="loading-indicator-container"
+			message = "Loading"
+			message-alignment="horizontal"
+			indicator-type="spinner"
+	>
+	</juno-loading-indicator>
 </div>

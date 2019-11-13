@@ -23,79 +23,34 @@
 
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
 import org.oscarehr.integration.myhealthaccess.dto.BaseErrorTo1;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserShortTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 
 @Service
 public class ClinicService extends BaseService
 {
-	private final String clinicEndPoint = concatEndpointStrings(
-			BASE_END_POINT, "/clinic");
+	private final String clinicEndPoint = concatEndpointStrings(BASE_END_POINT, "/clinic");
 
-	// Get myhealthaccess user linked to the specified oscar user
-	public ClinicUserTo1 getLinkedUser(String clinicID, String oscarUserID)
+	public ClinicUserTo1 createUser(IntegrationData integrationData, ClinicUserTo1 newUser)
 	{
-		ClinicUserTo1 clinicUser = null;
-		try
-		{
-			String getUserAPI = concatEndpointStrings(clinicEndPoint, "/" + clinicID + "/user_from_remote_id/" + oscarUserID);
-			clinicUser = executeRequest(getUserAPI, HttpMethod.GET, ClinicUserTo1.class, BaseErrorTo1.class);
-		}
-		catch (BaseException e)
-		{
-			ErrorHandler.handleError(e);
-		}
-		return clinicUser;
-	}
+		final String ENDPOINT_CREATE_USER = "/%s/user/create";
 
-	public ClinicUserTo1 getUserByEmail(String clinicID, String email)
-	{
-		ClinicUserTo1 clinicUser = null;
+		ClinicUserTo1 response = null;
+		String apiKey = integrationData.getApiKey();
+		String clinicId = integrationData.getIntegration().getRemoteId();
 
 		try
 		{
-			String createUserAPI = concatEndpointStrings(clinicEndPoint, "/" + clinicID + "/user_from_email/" + URLEncoder.encode(email, "UTF-8"));
-			clinicUser = executeRequest(createUserAPI, HttpMethod.GET, ClinicUserTo1.class, BaseErrorTo1.class);
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			throw new IllegalArgumentException("Could not encode email address");
-		}
-		catch (BaseException e)
-		{
-			ErrorHandler.handleError(e);
-		}
-
-		return clinicUser;
-	}
-
-	public ClinicUserCreateTo1 createUser(String clinicID, String oscarUserID, String email, String firstName, String lastName)
-	{
-		ClinicUserCreateTo1 response = null;
-
-		try
-		{
-			String endPoint = concatEndpointStrings(clinicEndPoint, "/" + clinicID + "/user/create");
-
-			ClinicUserTo1 newUser = new ClinicUserTo1();
-			newUser.setEmail(email);
-			newUser.setRemoteID(oscarUserID);
-			newUser.setFirstName(firstName);
-			newUser.setLastName(lastName);
-
-
-			response = executeRequest(endPoint, HttpMethod.POST, newUser, ClinicUserCreateTo1.class, BaseErrorTo1.class);
+			String endpoint = formatEndpoint(ENDPOINT_CREATE_USER, clinicId);
+			response = post(endpoint, apiKey, newUser, ClinicUserTo1.class);
 		}
 		catch (BaseException e)
 		{
@@ -105,20 +60,24 @@ public class ClinicService extends BaseService
 		return response;
 	}
 
-	public ClinicUserAccessTokenTo1 getLoginToken(String clinicID, String myHealthAccessUserID, ClinicUserAccessTokenTo1 authToken)
+	public ClinicUserShortTokenTo1 getShortToken(IntegrationData integrationData) throws InvalidAccessException
 	{
-		ClinicUserAccessTokenTo1 loginToken = null;
+		final String ENDPOINT_SHORT_TOKEN = "/%s/user/%s/get_short_token";
+
+		String apiKey = integrationData.getApiKey();
+		String clinicId = integrationData.getIntegration().getRemoteId();
+		String accessToken = integrationData.getUserAccessToken();
+		String remoteUserId = integrationData.getRemoteUserId();
+
+		ClinicUserShortTokenTo1 loginToken = null;
 
 		try
 		{
-			String endPoint = concatEndpointStrings(clinicEndPoint, "/" + clinicID + "/user/" + myHealthAccessUserID + "/get_login_token");
-			String tokenString = authToken.getToken();
-			loginToken = executeRequestWithToken(endPoint, HttpMethod.POST, tokenString, null, ClinicUserAccessTokenTo1.class, BaseErrorTo1.class);
+			String endpoint = formatEndpoint(ENDPOINT_SHORT_TOKEN, clinicId, remoteUserId);
+			loginToken = postWithToken(endpoint, apiKey, null, ClinicUserShortTokenTo1.class, accessToken);
 		}
-
 		catch (BaseException e)
 		{
-			// TODO:  If the authToken is expired, fetch another one and redo the request
 			ErrorHandler.handleError(e);
 		}
 
@@ -126,35 +85,42 @@ public class ClinicService extends BaseService
 		return loginToken;
 	}
 
-	public ClinicUserAccessTokenTo1 getAuthToken(String clinicID, String myHealthAccessUserID, String remoteID, String email, String password)
+	public ClinicUserTo1 getLongToken(IntegrationData integrationData, ClinicUserLoginTo1 userLogin)
 	{
-		ClinicUserAccessTokenTo1 accessToken = null;
+		final String ENDPOINT_LONG_TOKEN = "/%s/get_long_token";
+
+		String apiKey = integrationData.getApiKey();
+		String clinicId = integrationData.getIntegration().getRemoteId();
+		ClinicUserTo1 accessToken = null;
+
 		try
 		{
-			String endpoint = concatEndpointStrings(clinicEndPoint, "/" + clinicID + "/user/" + myHealthAccessUserID + "/get_access_token");
-			ClinicUserLoginTo1 loginBody = new ClinicUserLoginTo1(email, password);
-			loginBody.setRemoteID(remoteID);
-
-			accessToken = executeRequest(endpoint, HttpMethod.POST, loginBody, ClinicUserAccessTokenTo1.class, BaseErrorTo1.class);
+			String endpoint = formatEndpoint(ENDPOINT_LONG_TOKEN, clinicId);
+			accessToken = post(endpoint, apiKey, userLogin, ClinicUserTo1.class);
 		}
-		catch (BaseException e) {
+		catch (BaseException e)
+		{
 			ErrorHandler.handleError(e);
 		}
 
 		return accessToken;
 	}
 
-	public ClinicUserAccessTokenTo1 renewAuthToken(String clinicID, String mhaUserID, ClinicUserAccessTokenTo1 authToken)
+	public ClinicUserTo1 renewLongToken(IntegrationData integrationData)
 	{
-		ClinicUserAccessTokenTo1 response = null;
+		final String ENDPOINT_RENEW = "/%s/user/%s/renew_long_token";
 
-		final String renewEndpointRaw = "/%s/user/%s/renew_access_token";
+		String apiKey = integrationData.getApiKey();
+		String clinicId = integrationData.getIntegration().getRemoteId();
+		String remoteUserId = integrationData.getRemoteUserId();
+		String token = integrationData.getUserIntegrationAccess().getAccessToken();
+
+		ClinicUserTo1 response = null;
+
 		try
 		{
-			String endpoint = concatEndpointStrings(clinicEndPoint, String.format(renewEndpointRaw, clinicID, mhaUserID));
-			String token = authToken.getToken();
-			response =  executeRequestWithToken(endpoint, HttpMethod.POST, token,
-			                                    null, ClinicUserAccessTokenTo1.class, BaseErrorTo1.class);
+			String endpoint = formatEndpoint(ENDPOINT_RENEW, clinicId, remoteUserId);
+			response =  postWithToken(endpoint, apiKey, null, ClinicUserTo1.class, token);
 		}
 		catch (BaseException e)
 		{
@@ -162,5 +128,33 @@ public class ClinicService extends BaseService
 		}
 
 		return response;
+	}
+
+	/*
+	 * Helper Methods
+	 */
+	private String formatEndpoint(String endpoint, Object... args)
+	{
+		return concatEndpointStrings(clinicEndPoint, String.format(endpoint, args));
+	}
+
+	private <S, T> T get(String endPoint, String apiKey, Class<T> responseClass)
+	{
+		return executeRequest(endPoint, apiKey, HttpMethod.GET, null, responseClass, BaseErrorTo1.class);
+	}
+
+	private <S, T> T getWithToken(String endPoint, String apiKey, S body, Class<T> responseClass, String token)
+	{
+		return executeRequestWithToken(endPoint, apiKey, HttpMethod.GET, token, body, responseClass, BaseErrorTo1.class);
+	}
+
+	private <S, T> T post(String endPoint, String apiKey, S body, Class<T> responseClass)
+	{
+		return executeRequest(endPoint, apiKey, HttpMethod.POST, body, responseClass, BaseErrorTo1.class);
+	}
+
+	private <S, T> T postWithToken(String endPoint, String apiKey, S body, Class<T> responseClass, String token)
+	{
+		return executeRequestWithToken(endPoint, apiKey, HttpMethod.POST, token, body, responseClass, BaseErrorTo1.class);
 	}
 }

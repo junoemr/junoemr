@@ -7,18 +7,24 @@
 	padding: 8px 0;
 	overflow: auto;
 
-	.form-group {
-		margin: 0;
-		align-items: baseline !important;
+	.demographic-card-form {
+		display: inline-block;
+		width: 100%;
 
-		label {
-			@include juno-font-label(10px);
-			color: $color-neutral-grey;
-			padding: 4px 2px;
-		}
-		span {
-			@include juno-font-input(12px);
-			color: $color-neutral-darker;
+		.form-group {
+			margin: 0;
+			align-items: baseline !important;
+
+			label {
+				@include juno-font-label(10px);
+				color: $color-neutral-grey;
+				padding: 4px 2px;
+				margin-top: 0 !important;
+			}
+			span {
+				@include juno-font-input(12px);
+				color: $color-neutral-darker;
+			}
 		}
 	}
 }

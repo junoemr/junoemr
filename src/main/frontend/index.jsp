@@ -61,29 +61,30 @@
       ng-init="bodyCtrl.init()"
       id="main-body">
 
-	<!-- main navigation bar -->
-	<primary-navigation></primary-navigation>
+	<div ng-if="bodyCtrl.userLoaded">
+		<!-- main navigation bar -->
+		<primary-navigation></primary-navigation>
 
-	<!-- main content pane -->
-	<div class="flex-column" id="index-content">
-		<div class="flex-row flex-grow">
-			<left-aside
-					id="content-left-pane"
-					ng-class="{
-							'expanded': bodyCtrl.showPatientList,
-							'collapsed': !bodyCtrl.showPatientList }"
-					expand-on="bodyCtrl.showPatientList">
-			</left-aside>
-			<div id="content-center-pane"
-			     class="flex-grow overflow-hidden"
-			     ui-view
-			     ng-cloak>
-			</div>
-			<div id="content-right-pane">
+		<!-- main content pane -->
+		<div class="flex-column" id="index-content">
+			<div class="flex-row flex-grow">
+				<left-aside
+						id="content-left-pane"
+						ng-class="{
+								'expanded': bodyCtrl.showPatientList,
+								'collapsed': !bodyCtrl.showPatientList }"
+						expand-on="bodyCtrl.showPatientList">
+				</left-aside>
+				<div id="content-center-pane"
+						 class="flex-grow overflow-hidden"
+						 ui-view
+						 ng-cloak>
+				</div>
+				<div id="content-right-pane">
+				</div>
 			</div>
 		</div>
 	</div>
-
 <script>
 
 	// Juno POJO namespace
