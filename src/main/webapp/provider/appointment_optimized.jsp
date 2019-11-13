@@ -1270,6 +1270,14 @@ private long getAppointmentRowSpan(
 	<%
 
 		boolean showApptCountForProvider = OscarProperties.getInstance().isPropertyActive("schedule.show_appointment_count");
+		List<String> countPropertiesNames = Arrays.asList(
+				UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED,
+				UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW,
+				UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
+		Map<String, UserProperty> countProperties = userPropertyDao.getProviderPropertiesAsMap(curUser_no, countPropertiesNames);
+		boolean countIncludeCancelled = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED).getValue());
+		boolean countIncludeNoShow = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW).getValue());
+		boolean countIncludeNoDemographic = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC).getValue());
 	%>
 
 
@@ -1390,24 +1398,17 @@ private long getAppointmentRowSpan(
 									for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
 									{
 
-										for(AppointmentDetails appointmentDetails : appointmentDetailsList)
-										{
-
-											/*
-											 *.Do_Not_Book type appointments shall not been count for appointment total
-											 * on the top of the schedule page
-											 */
-
-											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName()) == 0)
+											for(AppointmentDetails appointmentDetails : appointmentDetailsList)
 											{
-												continue;
+												if((!countIncludeCancelled && appointmentDetails.getStatus().contains(Appointment.CANCELLED))
+												    || (!countIncludeNoShow && appointmentDetails.getStatus().contains(Appointment.NO_SHOW))
+													|| (!countIncludeNoDemographic && appointmentDetails.getDemographicNo() == 0))
+												{
+													continue;
+												}
+												appointmentCount++;
 											}
-
-											appointmentCount++;
-
 										}
-
-									}
 								%>
 								<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>
 								<%

@@ -25,10 +25,12 @@
 package org.oscarehr.provider.web;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -2439,9 +2441,14 @@ public ActionForward viewEDocBrowserInDocumentReport(ActionMapping actionmapping
 		DynaActionForm frm = (DynaActionForm) actionform;
 		String provider = (String) request.getSession().getAttribute("user");
 
-		UserProperty includeCancelled = this.userPropertyDAO.getProp(provider, UserProperty.APPOINTMENT_COUNT_INCLUDE_CANCELLED);
-		UserProperty includeNoShow = this.userPropertyDAO.getProp(provider, UserProperty.APPOINTMENT_COUNT_INCLUDE_NO_SHOW);
-		UserProperty includeNoDemographic = this.userPropertyDAO.getProp(provider, UserProperty.APPOINTMENT_COUNT_INCLUDE_NO_DEMOGRAPHIC);
+        List<String> propertyNames = Arrays.asList(
+                UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED,
+                UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW,
+                UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
+		Map<String, UserProperty> properties = this.userPropertyDAO.getProviderPropertiesAsMap(provider, propertyNames);
+		UserProperty includeCancelled = properties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED);
+		UserProperty includeNoShow = properties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW);
+		UserProperty includeNoDemographic = properties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
 
 		if (includeCancelled == null)
 		{
@@ -2494,32 +2501,32 @@ public ActionForward viewEDocBrowserInDocumentReport(ActionMapping actionmapping
 
 		String provider = (String) request.getSession().getAttribute("user");
 
-		UserProperty wProperty = this.userPropertyDAO.getProp(provider, UserProperty.APPOINTMENT_COUNT_INCLUDE_CANCELLED);
+		UserProperty wProperty = this.userPropertyDAO.getProp(provider, UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED);
 		if (wProperty == null)
 		{
 			wProperty = new UserProperty();
 			wProperty.setProviderNo(provider);
-			wProperty.setName(UserProperty.APPOINTMENT_COUNT_INCLUDE_CANCELLED);
+			wProperty.setName(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED);
 		}
 		wProperty.setValue(Boolean.toString(includeCancelled));
 		userPropertyDAO.saveProp(wProperty);
 
-		UserProperty hProperty = this.userPropertyDAO.getProp(provider, UserProperty.APPOINTMENT_COUNT_INCLUDE_NO_SHOW);
+		UserProperty hProperty = this.userPropertyDAO.getProp(provider, UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW);
 		if (hProperty == null)
 		{
 			hProperty = new UserProperty();
 			hProperty.setProviderNo(provider);
-			hProperty.setName(UserProperty.APPOINTMENT_COUNT_INCLUDE_NO_SHOW);
+			hProperty.setName(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW);
 		}
 		hProperty.setValue(Boolean.toString(includeNoShow));
 		userPropertyDAO.saveProp(hProperty);
 
-		UserProperty mProperty = this.userPropertyDAO.getProp(provider, UserProperty.APPOINTMENT_COUNT_INCLUDE_NO_DEMOGRAPHIC);
+		UserProperty mProperty = this.userPropertyDAO.getProp(provider, UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
 		if (mProperty == null)
 		{
 			mProperty = new UserProperty();
 			mProperty.setProviderNo(provider);
-			mProperty.setName(UserProperty.APPOINTMENT_COUNT_INCLUDE_NO_DEMOGRAPHIC);
+			mProperty.setName(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
 		}
 		mProperty.setValue(Boolean.toString(includeNoDemographic));
 		userPropertyDAO.saveProp(mProperty);
