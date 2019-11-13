@@ -136,7 +136,6 @@ public class EctConEditSpecialistsAction extends Action {
 		request.setAttribute("upd", new Integer(updater));
 		EctConConstructSpecialistsScriptsFile constructSpecialistsScriptsFile = new EctConConstructSpecialistsScriptsFile();
 		constructSpecialistsScriptsFile.makeString(locale);
-		constructSpecialistsScriptsFile.makeString(request.getLocale());
 		return mapping.findForward("success");
 	}
 }
