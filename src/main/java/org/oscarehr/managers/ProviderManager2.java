@@ -213,9 +213,20 @@ public class ProviderManager2 {
 		if(map.get("rxInteractionWarningLevel") != null) {
 			settings.setRxInteractionWarningLevel(map.get("rxInteractionWarningLevel").getValue());
 		}
+
 		if(map.get("HC_Type") != null) {
 			settings.setDefaultHcType(map.get("HC_Type").getValue());
 		}
+		else
+		{
+			// if no user property use system property
+			String hcType = OscarProperties.getInstance().getProperty("hctype", "");
+			if (hcType != null)
+			{
+				settings.setDefaultHcType(hcType);
+			}
+		}
+
 		if(map.get("default_sex") != null) {
 			settings.setDefaultSex(map.get("default_sex").getValue());
 		}

@@ -29,6 +29,9 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
+
+import java.time.LocalDate;
 
 public class DemographicConverter extends AbstractConverter<Demographic, DemographicTo1> {
 	
@@ -56,9 +59,22 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		demographic.setProvince(transfer.getAddress().getProvince());
 		demographic.setVer(transfer.getVer());
 		demographic.setSex(transfer.getSex());
-		demographic.setDateOfBirth(transfer.getDobDay());
-		demographic.setMonthOfBirth(transfer.getDobMonth());
-		demographic.setYearOfBirth(transfer.getDobYear());
+
+		if (transfer.getDateOfBirth() != null)
+		{
+			LocalDate dateOfBirth = ConversionUtils.toNullableLocalDate(transfer.getDateOfBirth());
+			if (dateOfBirth != null)
+			{
+				demographic.setDateOfBirth(dateOfBirth);
+			}
+		}
+		else
+		{
+			demographic.setDateOfBirth(transfer.getDobDay());
+			demographic.setMonthOfBirth(transfer.getDobMonth());
+			demographic.setYearOfBirth(transfer.getDobYear());
+		}
+
 		demographic.setSexDesc(transfer.getSexDesc());
 		demographic.setDateJoined(transfer.getDateJoined());
 		demographic.setFamilyDoctor(transfer.getFamilyDoctor());

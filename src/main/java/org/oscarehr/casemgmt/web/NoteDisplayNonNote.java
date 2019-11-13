@@ -278,6 +278,11 @@ public class NoteDisplayNonNote implements NoteDisplay {
 
 	public boolean isArchived() { return false; }
 
+	public boolean isTextNote()
+	{
+		return true;
+	}
+
 	public boolean isEncounterForm() {
 		return isEncounterForm;
 	}

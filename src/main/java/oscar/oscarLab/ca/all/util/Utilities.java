@@ -34,6 +34,10 @@
 
 package oscar.oscarLab.ca.all.util;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
+import oscar.OscarProperties;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -45,22 +49,18 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.util.MiscUtils;
+public class Utilities
+{
+	private static final Logger logger = MiscUtils.getLogger();
 
-import oscar.OscarProperties;
+	private Utilities()
+	{
+		// utils shouldn't be instantiated
+	}
 
-public class Utilities {
-       
-	private static final Logger logger=MiscUtils.getLogger();
-	
-    private Utilities() {
-    	// utils shouldn't be instantiated
-    }
-    
-    public static ArrayList<String> separateMessages(String fileName) throws IOException {
-                
-        ArrayList<String> messages = new ArrayList<String>();
+	public static ArrayList<String> separateMessages(String fileName) throws IOException
+	{
+		ArrayList<String> messages = new ArrayList<>();
 		InputStream is = new FileInputStream(fileName);
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -68,48 +68,59 @@ public class Utilities {
 		String line = null;
 		boolean firstPIDflag = false; //true if the first PID segment has been processed false otherwise
 		boolean firstMSHflag = false; //true if the first MSH segment has been processed false otherwise
-		//String mshSeg = br.readLine();
-	    boolean skipMessage = false;
+		boolean skipMessage = false;
 
 		StringBuilder sb = new StringBuilder();
 		String mshSeg = "";
 
-		while ((line = br.readLine()) != null) {
-			if (line.length() > 3){
-				// ignore the batch header segment for now.
-				if (line.substring(0, 3).equals("BHS")) {
-					continue;
-				}
-				if(!line.substring(0, 3).equals("MSH") && skipMessage)
-					continue;
-				if (line.substring(0, 3).equals("MSH")){
-					if(line.contains("ORU") || line.contains("ORM^002"))
-					{
-						skipMessage = false;
-					}
-					else
-					{
-						// skip any messages that are not ORU^R01
-						skipMessage = true;
-						continue;
-					}
-					if (firstMSHflag){
-						messages.add(sb.toString());
-						sb.delete(0, sb.length());
-					}
-					mshSeg = line;
-					firstMSHflag = true;
-					firstPIDflag = false;
-				} else if (line.substring(0, 3).equals("PID")){
-					if (firstPIDflag){
-						messages.add(sb.toString());
-						sb.delete(0, sb.length());
-						sb.append(mshSeg + "\r\n");
-					}
-					firstPIDflag = true;
-				}
-				sb.append(line + "\r\n");
-			}
+		while((line = br.readLine()) != null)
+		{
+		    if(line.length() > 3)
+		    {
+			    String header = line.substring(0, 3);
+			    // ignore the batch header /file header segments for now.
+			    if(header.equals("BHS") || header.equals("FHS"))
+			    {
+				    continue;
+			    }
+			    if(!header.equals("MSH") && skipMessage)
+			    {
+				    continue;
+			    }
+			    if(header.equals("MSH"))
+			    {
+				    if(line.contains("ORU") || line.contains("ORM^002") || line.contains("ORM^O01") || line.contains("MDM^T08")
+						|| line.contains("MDM^T02") || line.contains("MDM^T11"))
+				    {
+					    skipMessage = false;
+				    }
+				    else
+				    {
+					    // skip any messages that are not ORU^R01
+					    skipMessage = true;
+					    continue;
+				    }
+				    if(firstMSHflag)
+				    {
+					    messages.add(sb.toString());
+					    sb.delete(0, sb.length());
+				    }
+				    mshSeg = line;
+				    firstMSHflag = true;
+				    firstPIDflag = false;
+			    }
+			    else if(header.equals("PID"))
+			    {
+				    if(firstPIDflag)
+				    {
+					    messages.add(sb.toString());
+					    sb.delete(0, sb.length());
+					    sb.append(mshSeg + "\r\n");
+				    }
+				    firstPIDflag = true;
+			    }
+			    sb.append(line + "\r\n");
+		    }
 		}
 
 		// add the last message
@@ -118,8 +129,8 @@ public class Utilities {
 		is.close();
 		br.close();
 
-        return(messages);
-    }
+		return messages;
+	}
     
     
     /**

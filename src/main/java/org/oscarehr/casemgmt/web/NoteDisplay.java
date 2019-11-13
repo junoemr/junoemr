@@ -121,6 +121,8 @@ public interface NoteDisplay {
 	public boolean isTicklerNote();
 
 	public boolean isArchived();
+
+	public boolean isTextNote();
 	
 	public CaseManagementNoteLink getNoteLink();
 

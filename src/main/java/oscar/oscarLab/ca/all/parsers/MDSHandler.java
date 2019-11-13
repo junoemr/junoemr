@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
 import org.oscarehr.util.MiscUtils;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
@@ -52,7 +53,7 @@ import java.util.HashMap;
  *
  * @author wrighd
  */
-public class MDSHandler extends MessageHandler
+public class MDSHandler extends ORU_R01MessageHandler
 {
 
     Object msg = null;
@@ -66,6 +67,7 @@ public class MDSHandler extends MessageHandler
     }
 
     public void init(String hl7Body) throws HL7Exception {
+    	this.legacyHandler = true;
     	hl7Body=StringUtils.trimToNull(hl7Body);
     	if (hl7Body==null)
     	{
@@ -74,7 +76,7 @@ public class MDSHandler extends MessageHandler
     	}
 
     	try {
-    	
+
 	        msg=DynamicHapiLoaderUtils.parseMdsMsg(hl7Body.replace( "\n", "\r\n"));
 	        terser = DynamicHapiLoaderUtils.getMdsTerser(msg);
 
