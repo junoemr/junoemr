@@ -43,8 +43,6 @@ import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
-import org.oscarehr.labs.dao.Hl7DocumentLinkDao;
-import org.oscarehr.util.SpringUtils;
 import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
@@ -64,8 +62,6 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 
     Logger logger = Logger.getLogger(PATHL7Handler.class);
     protected ORU_R01 msg;
-
-    private static Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
 
 	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","CYTO", "DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF", "BCCASMP", "BCCACSP", "CYTOGEN");
 	public static final String VIHARTF = "CELLPATHR";
