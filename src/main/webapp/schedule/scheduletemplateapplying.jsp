@@ -132,7 +132,7 @@
 		}
 
 		String today = UtilDateUtilities.DateToString(new java.util.Date(), "yyyy-MM-dd");
-		String lastYear = (Integer.parseInt(today.substring(0, today.indexOf('-'))) - 2) + today.substring(today.indexOf('-'));
+		String threeYearsBack = (Integer.parseInt(today.substring(0, today.indexOf('-'))) - 3) + today.substring(today.indexOf('-'));
 
 		if("1".equals(request.getParameter("delete")))
 		{
@@ -568,7 +568,7 @@ function submission()
 					name="select" onChange="selectrschedule(this)">
 					<%
 
-						List<RSchedule> rss = rScheduleDao.search_rschedule_future1(request.getParameter("provider_no"), ConversionUtils.fromDateString(lastYear));
+						List<RSchedule> rss = rScheduleDao.findByEdateAfter(request.getParameter("provider_no"), ConversionUtils.fromDateString(threeYearsBack));
 
 						for(RSchedule rs : rss)
 						{

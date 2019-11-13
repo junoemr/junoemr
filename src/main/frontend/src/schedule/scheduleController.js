@@ -1129,26 +1129,42 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.openEncounterPage = function openEncounterPage(calEvent)
 		{
-			if (calEvent.data.demographicNo !== 0)
+			if (loadedSettings.hideOldEchartLinkInAppointment)
 			{
-				var startMoment = Juno.Common.Util.getDatetimeNoTimezoneMoment(calEvent.data.startTime);
-				var params = {
-					providerNo: calEvent.resourceId,
-					curProviderNo: calEvent.data.userProviderNo,
-					demographicNo: calEvent.data.demographicNo,
-					userName: calEvent.data.userFirstName + " " + calEvent.data.userLastName,
-					reason: calEvent.data.reason,
-					curDate: Juno.Common.Util.formatMomentDate(moment()),
-					providerview: calEvent.resourceId,
+				if (calEvent.data.demographicNo !== 0)
+				{
+					let params = {
+						demographicNo: calEvent.data.demographicNo,
+						appointmentNo: calEvent.data.appointmentNo,
+						encType: "face to face encounter with client",
+					};
+					$state.go('record.summary', params);
+				}
+			}
+			else
+			{
+				if (calEvent.data.demographicNo !== 0)
+				{
+					var startMoment = Juno.Common.Util.getDatetimeNoTimezoneMoment(calEvent.data.startTime);
+					var params = {
+						providerNo: calEvent.resourceId,
+						curProviderNo: calEvent.data.userProviderNo,
+						demographicNo: calEvent.data.demographicNo,
+						userName: calEvent.data.userFirstName + " " + calEvent.data.userLastName,
+						reason: calEvent.data.reason,
+						curDate: Juno.Common.Util.formatMomentDate(moment()),
+						providerview: calEvent.resourceId,
 
-					appointmentNo: calEvent.data.appointmentNo,
-					appointmentDate: Juno.Common.Util.formatMomentDate(startMoment),
-					startTime: Juno.Common.Util.formatMomentTime(startMoment),
-					status: calEvent.data.eventStatusCode,
-					apptProvider_no: calEvent.resourceId,
-					encType: "face to face encounter with client",
-				};
-				window.open(scheduleService.getEncounterLink(params));
+						appointmentNo: calEvent.data.appointmentNo,
+						appointmentDate: Juno.Common.Util.formatMomentDate(startMoment),
+						startTime: Juno.Common.Util.formatMomentTime(startMoment),
+						status: calEvent.data.eventStatusCode,
+						apptProvider_no: calEvent.resourceId,
+						encType: "face to face encounter with client",
+					};
+					window.open(scheduleService.getEncounterLink(params), 'popupWindow',
+							'height=800,width=1000,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
+				}
 			}
 		};
 		controller.openBillingPage = function openBillingPage(calEvent)
@@ -1373,6 +1389,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					data: [function ()
 					{
 						return data;
+					}],
+					loadedSettings: [function ()
+					{
+						return loadedSettings;
 					}],
 					editMode: [function ()
 					{
@@ -1977,6 +1997,15 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 			return deferred.promise;
 		};
+
+		$scope.$on("$destroy", function ()
+		{
+			// clean up refresh timer.
+			if (controller.refreshSettings.timerVariable)
+			{
+				clearInterval(controller.refreshSettings.timerVariable);
+			}
+		});
 
 		// Any changes to this array need to be applied by calling applyUiConfig()
 		$scope.uiConfig = {

@@ -37,13 +37,13 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
-public class IHAHandler extends MessageHandler
+public class IHAHandler extends ORU_R01MessageHandler
 {
     
     Logger logger = Logger.getLogger(IHAHandler.class);
     protected Message msg = null;
-    protected Terser terser;
     protected ArrayList<ArrayList<Segment>> obrGroups = null;
     
     public IHAHandler(){
@@ -59,6 +59,7 @@ public class IHAHandler extends MessageHandler
         // force parsing as a generic message by changing the message structure
         hl7Body = hl7Body.replaceAll("R01", "O01");
         msg = p.parse(hl7Body.replaceAll( "\n", "\r\n"));
+        message = msg;
         
         terser = new Terser(msg);
         int obrCount = getOBRCount();

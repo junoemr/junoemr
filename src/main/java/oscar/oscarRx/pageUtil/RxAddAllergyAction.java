@@ -30,6 +30,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -39,6 +40,7 @@ import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarRx.data.RxDrugData;
 import oscar.oscarRx.data.RxPatientData;
+import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 public final class RxAddAllergyAction extends Action
 {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private AllergyService allergyService = (AllergyService)SpringUtils.getBean("allergy.service.AllergyService");
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -65,9 +68,17 @@ public final class RxAddAllergyAction extends Action
 		String onSetOfReaction = request.getParameter("onSetOfReaction");
 		String lifeStage = request.getParameter("lifeStage");
 
+		String allergyToArchive = request.getParameter("allergyToArchive");
 		RxPatientData.Patient patient = (RxPatientData.Patient) request.getSession().getAttribute("Patient");
 
+		int oldAllergyId = 0;
 		Allergy allergy = new Allergy();
+		if (allergyToArchive != null && !allergyToArchive.isEmpty())
+		{
+			oldAllergyId = Integer.parseInt(allergyToArchive);
+			allergy = patient.getAllergy(oldAllergyId);
+		}
+
 		allergy.setDrugrefId(String.valueOf(id));
 		allergy.setDescription(name);
 		allergy.setTypeCode(Integer.parseInt(type));
@@ -75,16 +86,16 @@ public final class RxAddAllergyAction extends Action
 
 		if(startDate.length() >= 8 && getCharOccur(startDate, '-') == 2)
 		{
-			allergy.setStartDate(oscar.oscarRx.util.RxUtil.StringToDate(startDate, "yyyy-MM-dd"));
+			allergy.setStartDate(ConversionUtils.fromDateString(startDate, "yyyy-MM-dd"));
 		}
 		else if(startDate.length() >= 6 && getCharOccur(startDate, '-') >= 1)
 		{
-			allergy.setStartDate(oscar.oscarRx.util.RxUtil.StringToDate(startDate, "yyyy-MM"));
+			allergy.setStartDate(ConversionUtils.fromDateString(startDate, "yyyy-MM"));
 			allergy.setStartDateFormat(PartialDate.YEARMONTH);
 		}
 		else if(startDate.length() >= 4)
 		{
-			allergy.setStartDate(oscar.oscarRx.util.RxUtil.StringToDate(startDate, "yyyy"));
+			allergy.setStartDate(ConversionUtils.fromDateString(startDate, "yyyy"));
 			allergy.setStartDateFormat(PartialDate.YEARONLY);
 		}
 		allergy.setAgeOfOnset(ageOfOnset);
@@ -92,7 +103,7 @@ public final class RxAddAllergyAction extends Action
 		allergy.setOnsetOfReaction(onSetOfReaction);
 		allergy.setLifeStage(lifeStage);
 
-		if(type != null && type.equals("13"))
+		if (type.equals("13"))
 		{
 			RxDrugData drugData = new RxDrugData();
 			try
@@ -109,11 +120,32 @@ public final class RxAddAllergyAction extends Action
 		allergy.setDemographicNo(patient.getDemographicNo());
 		allergy.setArchived(false);
 
-		Allergy allerg = patient.addAllergy(oscar.oscarRx.util.RxUtil.Today(), allergy);
-
 		String ip = request.getRemoteAddr();
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_ALLERGY, "" + allerg.getAllergyId(), ip, "" + patient.getDemographicNo(), allergy.getAuditString());
 
+		if (oldAllergyId > 0)
+		{
+			allergyService.update(allergy);
+			LogAction.addLog((String)request.getSession().getAttribute("user"),
+					LogConst.ACTION_UPDATE,
+					LogConst.CON_ALLERGY,
+					"" + oldAllergyId,
+					ip,
+					"" + allergy.getDemographicNo(),
+					patient.getAllergy(oldAllergyId).getAuditString());
+		}
+		else
+		{
+			allergy = allergyService.addNewAllergy(allergy);
+			LogAction.addLog((String)request.getSession().getAttribute("user"),
+					LogConst.ACTION_ADD,
+					LogConst.CON_ALLERGY,
+					"" + allergy.getAllergyId(),
+					ip,
+					"" + allergy.getDemographicNo(),
+					allergy.getAuditString());
+		}
+
+		request.setAttribute("demographicNo", allergy.getDemographicNo());
 		return (mapping.findForward("success"));
 	}
 

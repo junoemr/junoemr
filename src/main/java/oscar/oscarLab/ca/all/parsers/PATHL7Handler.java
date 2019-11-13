@@ -42,6 +42,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import org.oscarehr.labs.dao.Hl7DocumentLinkDao;
 import org.oscarehr.util.SpringUtils;
 import oscar.util.UtilDateUtilities;
@@ -58,7 +59,7 @@ import java.util.List;
  *
  * @author wrighd
  */
-public class PATHL7Handler extends MessageHandler
+public class PATHL7Handler extends ORU_R01MessageHandler
 {
 
     Logger logger = Logger.getLogger(PATHL7Handler.class);
@@ -71,7 +72,7 @@ public class PATHL7Handler extends MessageHandler
 
 	// Embedded PDF strings that show up in OBX messages
 	public static final String embeddedPdfPrefix = "JVBERi0xLj";
-	public static final String pdfReplacement = "embedded_doc_id";
+	public static final String pdfReplacement = "embedded_doc_id_";
 
     /** Creates a new instance of CMLHandler */
     public PATHL7Handler(){
@@ -108,6 +109,12 @@ public class PATHL7Handler extends MessageHandler
 
     public String getMsgType(){
         return("PATHL7");
+    }
+
+    @Override
+    public boolean isSupportEmbeddedPdf()
+    {
+        return true;
     }
 
     public String getMsgPriority(){

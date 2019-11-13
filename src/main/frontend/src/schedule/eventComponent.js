@@ -62,7 +62,7 @@ angular.module('Schedule').component('eventComponent', {
 			// Local scope variables
 			//=========================================================================/
 
-			controller.useOldEchart = true; //TODO load from a setting?
+			controller.useOldEchart = true;
 			controller.tabEnum = Object.freeze({
 				appointment: 0,
 				repeatBooking: 1,
@@ -249,6 +249,7 @@ angular.module('Schedule').component('eventComponent', {
 				}
 
 				// resolve data from opener
+				controller.loadedSettings = controller.resolve.loadedSettings;
 				controller.parentScope = controller.resolve.parentScope;
 				controller.keyBinding = controller.resolve.keyBinding;
 				controller.editMode = controller.resolve.editMode;
@@ -350,7 +351,6 @@ angular.module('Schedule').component('eventComponent', {
 			//=========================================================================
 			// Private methods
 			//=========================================================================/
-
 			controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 			{
 				var eventStatusCode = $scope.defaultEventStatus;
@@ -1074,15 +1074,15 @@ angular.module('Schedule').component('eventComponent', {
 				controller.demographicModel.loadData(demographicNo); //TODO why?
 			};
 
-			$scope.newDemographic = function newDemographic(size)
+			$scope.newDemographic = function newDemographic()
 			{
 				var modalInstance = $uibModal.open(
 					{
-						templateUrl: 'src/patient/newPatient.jsp',
-						controller: 'Patient.NewPatientController as newPatientCtrl',
+						component: 'addDemographicModal',
 						backdrop: 'static',
-						size: size
-					});
+						windowClass: "juno-modal",
+					}
+				);
 
 				modalInstance.result.then(
 					function success(results)
@@ -1091,6 +1091,7 @@ angular.module('Schedule').component('eventComponent', {
 						console.log('patient #: ', results.demographicNo);
 
 						controller.demographicModel.loadData(results.demographicNo);
+						controller.patientTypeahead  = {isTypeaheadSearchQuery: true, searchQuery: results.lastName + ", " + results.firstName};
 					},
 					function error(errors)
 					{
@@ -1105,7 +1106,19 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				if ($scope.isPatientSelected())
 				{
-					if (controller.useOldEchart)
+					if (controller.loadedSettings && controller.loadedSettings.hideOldEchartLinkInAppointment)
+					{
+						var params = {
+							demographicNo: controller.demographicModel.demographicNo,
+						};
+						if (angular.isDefined($scope.eventUuid))
+						{
+							params.appointmentNo = $scope.eventUuid;
+							params.encType = "face to face encounter with client";
+						}
+						$state.go('record.summary', params);
+					}
+					else
 					{
 						var params = {
 							providerNo: controller.providerModel.providerNo,
@@ -1123,19 +1136,8 @@ angular.module('Schedule').component('eventComponent', {
 							apptProvider_no: controller.providerModel.providerNo,
 							encType: "face to face encounter with client",
 						};
-						window.open(scheduleService.getEncounterLink(params));
-					}
-					else
-					{
-						var params = {
-							demographicNo: controller.demographicModel.demographicNo,
-						};
-						if (angular.isDefined($scope.eventUuid))
-						{
-							params.appointmentNo = $scope.eventUuid;
-							params.encType = "face to face encounter with client";
-						}
-						$state.go('record.summary', params);
+						window.open(scheduleService.getEncounterLink(params), 'popupWindow',
+								'height=800,width=1000,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
 					}
 					controller.cancel();
 				}
@@ -1189,7 +1191,6 @@ angular.module('Schedule').component('eventComponent', {
 				window.open(scheduleService.getRxLink(params));
 				controller.cancel();
 			};
-
 
 			//=========================================================================
 			//  Key Bindings

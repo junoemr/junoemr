@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.log.model.RestServiceLog;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.common.annotation.MaskParameter;
+import org.oscarehr.ws.common.annotation.SkipAllLogging;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import oscar.log.LogAction;
@@ -101,10 +102,15 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 			body = readEntityStream(request);
 
 			SkipContentLoggingInbound skipContentLoggingInbound = resourceInfo.getResourceMethod().getAnnotation(SkipContentLoggingInbound.class);
+			SkipAllLogging skipAllLogging = resourceInfo.getResourceMethod().getAnnotation(SkipAllLogging.class);
 			MaskParameter filterAnnotation = resourceInfo.getResourceMethod().getAnnotation(MaskParameter.class);
 
+			if (skipAllLogging != null)
+			{
+				request.setProperty(LoggingFilter.PROP_SKIP_LOGGING, true);
+			}
 			// if the skip logging inbound annotation exists on the target method, set the body to the dummy value
-			if(skipContentLoggingInbound != null)
+			else if(skipContentLoggingInbound != null)
 			{
 				body = SkipContentLoggingInbound.SKIP_CONTENT_LOGGING_INBOUND;
 			}

@@ -38,6 +38,7 @@ angular.module('Common.Services').factory(
 				disabled: '=caDisabled',
 				hide: '=caHide',
 				focus_field: '=caFocusField',
+				requiredField: '@caRequiredField',
 
 				on_focus_fn: '&caFocus',
 				change_fn: '&caChange',

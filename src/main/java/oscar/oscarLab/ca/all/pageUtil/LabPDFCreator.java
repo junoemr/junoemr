@@ -50,12 +50,15 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.rtf.RtfWriter2;
+import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
+import org.oscarehr.labs.service.Hl7TextInfoService;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
@@ -389,6 +392,8 @@ public class LabPDFCreator extends PdfPageEventHelper {
 		{
 			for (int j = 0; j < obrCount; j++)
 			{
+				// true if the obr contains at least one line of content
+				boolean obrHasContent = false;
 				boolean obrFlag = false;
 				int obxCount = handler.getOBXCount(j);
 				for (int k = 0; k < obxCount; k++)
@@ -414,18 +419,33 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								(handler.getMsgType().equals("EPSILON") && header.equals(handler.getOBXIdentifier(j,k)) && !obxName.equals("")) 
 								|| (handler.getMsgType().equals("PFHT") && !obxName.equals("") && header.equals(handler.getObservationHeader(j,k))))
 						{ // <<-- DNS only needed for MDS messages
+							obrHasContent = true;
 							String obrName = handler.getOBRName(j);
 							boolean obxCountBool = ((isTypeCLS && obxCount > 0 ) || obxCount > 1);
 
 							// add the obrname if necessary
 							if (!obrFlag && !obrName.equals("")
 									&& ((!(obxName.contains(obrName)) || obxCountBool)
-									&& !isUnstructuredDoc))
+									&& (!isUnstructuredDoc || handler.getMsgType().equals("CCIMAGING"))))
 							{
-								cell.setPhrase(new Phrase(obrName, boldFont));
-								cell.setColspan(7);
-								cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-								table.addCell(cell);
+								if (handler.getMsgType().equals("CCIMAGING"))
+								{
+									cell.setBackgroundColor(new Color(255, 204, 0));
+									cell.setPhrase(new Phrase(obrName + " - Report Date: " + handler.getReportDate(j), boldFont));
+									cell.setColspan(7);
+									cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+									table.addCell(cell);
+									cell.setBackgroundColor(new Color(255, 255, 255));
+
+								}
+								else
+								{
+									cell.setPhrase(new Phrase(obrName, boldFont));
+									cell.setColspan(7);
+									cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+									table.addCell(cell);
+								}
+
 								cell.setColspan(1);
 								obrFlag = true;
 							}
@@ -446,7 +466,16 @@ public class LabPDFCreator extends PdfPageEventHelper {
 									cell.setPhrase(new Phrase((obrFlag ? "   " : "")+ obxName, lineFont));
 									table.addCell(cell);
 								}
-								cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t","\u00a0\u00a0\u00a0\u00a0"), lineFont));				
+
+								String abnormalFlag = handler.getOBXAbnormalFlag(j, k);
+								if (!abnormalFlag.equals("N") && handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.TEXT && handler.getMsgType().equals("CCLAB"))
+								{
+									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0") + "(" + abnormalFlag + ")", lineFont));
+								}
+								else
+								{
+									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0"), lineFont));
+								}
 								table.addCell(cell);
 								cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 								//if there are duplicate Times, display only the first 
@@ -747,6 +776,72 @@ public class LabPDFCreator extends PdfPageEventHelper {
 						cell.setColspan(1);
 					}
 				}
+
+				if (obrHasContent)
+				{
+					// and specimen description
+					if (handler.hasSpecimenSegment(j))
+					{
+						for (int s = 0; s < handler.getSpecimenCount(j); s++)
+						{
+							int oldColSpan = cell.getColspan();
+							if (handler.hasExtendedSpecimenDescription(j, s))
+							{
+								cell.setColspan(1);
+								cell.setPhrase(new Phrase("Specimen: " + handler.getSpecimenType(j, s), font));
+								table.addCell(cell);
+
+								if (isUnstructuredDoc)
+								{
+									cell.setColspan(2);
+								} else
+								{
+									cell.setColspan(6);
+								}
+								cell.setPhrase(new Phrase(handler.getSpecimenExtendedDescription(j, s), font));
+								table.addCell(cell);
+							} else
+							{
+								cell.setColspan(1);
+								cell.setPhrase(new Phrase("Specimen: " + handler.getSpecimenType(j, s), font));
+								table.addCell(cell);
+
+								if (isUnstructuredDoc)
+								{
+									cell.setColspan(2);
+								} else
+								{
+									cell.setColspan(6);
+								}
+								cell.setPhrase(new Phrase(" " + handler.getSpecimenSite(j, s) + " Collected: " + handler.getSpecimenCollectionDateTime(j, s) +
+										" Received: " + handler.getSpecimenReceivedDateTime(j, s), font));
+								table.addCell(cell);
+							}
+							cell.setColspan(oldColSpan);
+						}
+					}
+
+					if (handler.hasPerformingOrganization(j, 0) && handler.getPerformingOrganizationName(j, 0) != null && handler.getPerformingOrganizationAddress(j, 0) != null &&
+							handler.getAssignedPatientLocation() != null)
+					{
+						int oldColSpan = cell.getColspan();
+						cell.setColspan(1);
+						cell.setPhrase(new Phrase("Location: " + handler.getAssignedPatientLocation(), font));
+						table.addCell(cell);
+
+						if (isUnstructuredDoc)
+						{
+							cell.setColspan(2);
+						} else
+						{
+							cell.setColspan(6);
+						}
+						cell.setPhrase(new Phrase(handler.getPerformingOrganizationName(j, 0) + " " + handler.getPerformingOrganizationAddress(j, 0), font));
+						table.addCell(cell);
+						cell.setColspan(oldColSpan);
+					}
+				}
+
 			} // for (j)
 
 		}// if (isMEDVUE)
@@ -811,12 +906,37 @@ public class LabPDFCreator extends PdfPageEventHelper {
         pInfoTable.addCell(cell);
         cell.setPhrase(new Phrase("Health #: ", boldFont));
         pInfoTable.addCell(cell);
-        cell.setPhrase(new Phrase(handler.getHealthNum(), font));
+        String hin = handler.getHealthNum();
+        if (ConnectCareHandler.isConnectCareHandler(handler))
+		{
+			hin += " ABH";
+		}
+		cell.setPhrase(new Phrase(hin, font));
         pInfoTable.addCell(cell);
         cell.setPhrase(new Phrase("Patient Location: ", boldFont));
         pInfoTable.addCell(cell);
         cell.setPhrase(new Phrase(handler.getPatientLocation(), font));
         pInfoTable.addCell(cell);
+
+        // add additional patient information
+		ArrayList<Pair<String, String>> patientFieldsEx = handler.getExtendedPatientDescriptionFields();
+		for (Pair<String, String> patientField : patientFieldsEx)
+		{
+			cell.setPhrase(new Phrase(patientField.getLeft(), boldFont));
+			pInfoTable.addCell(cell);
+			cell.setPhrase(new Phrase(patientField.getRight(), font));
+			pInfoTable.addCell(cell);
+		}
+
+		// if a row is not complete it will not display.
+		// add padding cells if row is incomplete
+		if (patientFieldsEx.size() % 2 != 0)
+		{
+			cell.setPhrase(new Phrase(" ", font));
+			pInfoTable.addCell(cell);
+			cell.setPhrase(new Phrase(" ", font));
+			pInfoTable.addCell(cell);
+		}
 
         //Create results info table
         PdfPTable rInfoTable = new PdfPTable(2);
@@ -835,6 +955,11 @@ public class LabPDFCreator extends PdfPageEventHelper {
         	cell.setPhrase(new Phrase((handler.getOrderStatus().equals("F") ? "Final" : (handler.getOrderStatus().equals("C") ? "Corrected" : "Preliminary")), font));
         	rInfoTable.addCell(cell);
         }
+        if (ConnectCareHandler.isConnectCareHandler(handler))
+		{
+			cell.setPhrase(new Phrase(Hl7TextInfoService.getReportStatusDisplayString(handler.getJunoOrderStatus()), font));
+			rInfoTable.addCell(cell);
+		}
         else
         {
 			cell.setPhrase(new Phrase((handler.getOrderStatus().equals("F") ? "Final" : (handler.getOrderStatus().equals("C") ? "Corrected" : "Partial")), font));
@@ -848,6 +973,16 @@ public class LabPDFCreator extends PdfPageEventHelper {
         rInfoTable.addCell(cell);
         cell.setPhrase(new Phrase(handler.getAccessionNum(), font));
         rInfoTable.addCell(cell);
+
+        // add additional result info fields
+		ArrayList<Pair<String, String>> resultFieldsEx = handler.getExtendedResultDescriptionFields();
+		for (Pair<String, String> resultFields : resultFieldsEx)
+		{
+			cell.setPhrase(new Phrase(resultFields.getLeft(), boldFont));
+			rInfoTable.addCell(cell);
+			cell.setPhrase(new Phrase(resultFields.getRight(), font));
+			rInfoTable.addCell(cell);
+		}
 
         // Create client table
         float[] clientWidths = {2f, 3f};
