@@ -74,8 +74,10 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 	public static final String pdfReplacement = "embedded_doc_id_";
 
     /**
-     * map connect care status codes to internal status codes as per, IMG OUT – Status Table [3101] in
-     * "HL7 Message Processing Guidelines Appendix.pdf"
+     * Map Excelleris status codes to ones that we want to display to the user.
+     * Applies only when uploading new labs.
+     * This is a WIP and is based upon data previously seen in labs.
+     * May be modified later if we get formal specifications.
      */
     private static final Map<String, Hl7TextInfo.REPORT_STATUS> orderStatusMap = new HashMap<String,  Hl7TextInfo.REPORT_STATUS>();
     static
