@@ -1,4 +1,4 @@
-<%--
+<%@ page import="oscar.OscarProperties" %><%--
 * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
 * This software is published under the GPL GNU General Public License.
 * This program is free software; you can redistribute it and/or
@@ -20,12 +20,22 @@
 * Victoria, British Columbia
 * Canada
 --%>
+
+<%-- Hack to get oscar context path. This is for legacy support only, and should not be duplicated --%>
+<%
+	String oscarContextPath = request.getContextPath();
+%>
+<script type="text/javascript">
+	adminLandingPage = {};
+	adminLandingPage.oscarContextPath = "<%=oscarContextPath%>"
+</script>
+
 <div id="admin-landing-page">
-	<icon-card card-size="'card-md-wide'" text="'Unlock Account'" icon="'icon-user'" on-click="$ctrl.goTo('admin/frame?frameUrl=%2Fadmin%2FunLock.jsp', 'User Management')"></icon-card>
-	<icon-card card-size="'card-md-wide'" text="'Add a Provider Record'" icon="'icon-user-add'" on-click="$ctrl.goTo('admin/frame?frameUrl=%2Fadmin%2Fprovideraddarecordhtm.jsp', 'User Management')"></icon-card>
-	<icon-card card-size="'card-md-wide'" text="'Add a Login Record'" icon="'icon-user-add'" on-click="$ctrl.goTo('admin/frame?frameUrl=%2Fadmin%2Fsecurityaddarecord.jsp', 'User Management')"></icon-card>
-	<icon-card card-size="'card-md-wide'" text="'Manage eForms'" icon="'icon-file'" on-click="$ctrl.goTo('admin/frame?frameUrl=%2Feform%2Fefmformmanager.jsp&useCompat=true', 'Forms/eForms')"></icon-card>
-	<icon-card card-size="'card-md-wide'" text="'Schedule Setting'" icon="'icon-calendar'" on-click="$ctrl.goTo('admin/frame?frameUrl=%2Fschedule%2Fscheduletemplatesetting.jsp', 'Schedule Management')"></icon-card>
-	<icon-card card-size="'card-md-wide'" text="'Manage Groups'" icon="'icon-user-group'" on-click="$ctrl.goTo('admin/frame?frameUrl=%2Fadmin%2Fadmindisplaymygroup.jsp', 'Schedule Management')"></icon-card>
-	<icon-card card-size="'card-md-wide'" text="'Insert a Template'" icon="'icon-briefcase'" on-click="$ctrl.goTo('admin/frame?frameUrl=%2Fadmin%2Fprovidertemplate.jsp', 'eChart')"></icon-card>
+	<icon-card card-size="'card-md-wide'" text="'Unlock Account'" icon="'icon-user'" on-click="$ctrl.goToFrame('%2Fadmin%2FunLock.jsp', 'User Management')"></icon-card>
+	<icon-card card-size="'card-md-wide'" text="'Add a Provider Record'" icon="'icon-user-add'" on-click="$ctrl.goToFrame('%2Fadmin%2Fprovideraddarecordhtm.jsp', 'User Management')"></icon-card>
+	<icon-card card-size="'card-md-wide'" text="'Add a Login Record'" icon="'icon-user-add'" on-click="$ctrl.goToFrame('%2Fadmin%2Fsecurityaddarecord.jsp', 'User Management')"></icon-card>
+	<icon-card card-size="'card-md-wide'" text="'Manage eForms'" icon="'icon-file'" on-click="$ctrl.goToFrame('%2Feform%2Fefmformmanager.jsp&useCompat=true', 'Forms/eForms')"></icon-card>
+	<icon-card card-size="'card-md-wide'" text="'Schedule Setting'" icon="'icon-calendar'" on-click="$ctrl.goToFrame('%2Fschedule%2Fscheduletemplatesetting.jsp', 'Schedule Management')"></icon-card>
+	<icon-card card-size="'card-md-wide'" text="'Manage Groups'" icon="'icon-user-group'" on-click="$ctrl.goToFrame('%2Fadmin%2Fadmindisplaymygroup.jsp', 'Schedule Management')"></icon-card>
+	<icon-card card-size="'card-md-wide'" text="'Insert a Template'" icon="'icon-briefcase'" on-click="$ctrl.goToFrame('%2Fadmin%2Fprovidertemplate.jsp', 'eChart')"></icon-card>
 </div>

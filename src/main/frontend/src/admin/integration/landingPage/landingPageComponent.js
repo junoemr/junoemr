@@ -27,12 +27,19 @@ angular.module('Admin.Integration').component('landingPage', {
 	templateUrl: 'src/admin/integration/landingPage/landingPage.jsp',
 	bindings: {
 	},
-	controller: ['$scope', '$location', function ($scope, $location) {
+	controller: ['$scope', '$location', '$window', function ($scope, $location, $window)
+	{
 		let ctrl = this;
-
 		ctrl.goTo = function (path, expandGroup)
 		{
 			$location.url(path);
+			$scope.$emit(ADMIN_PAGE_EVENTS.ADMIN_EXPAND_NAV_GROUP, expandGroup);
+		};
+
+		ctrl.goToFrame = function (frameUrl, expandGroup)
+		{
+			let context = $window.adminLandingPage.oscarContextPath;
+			$location.url('admin/frame?frameUrl=' + context + frameUrl);
 			$scope.$emit(ADMIN_PAGE_EVENTS.ADMIN_EXPAND_NAV_GROUP, expandGroup);
 		}
 	}]
