@@ -78,6 +78,7 @@
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="java.util.SortedMap" %>
 <%@ page import="org.oscarehr.common.model.Appointment" %>
+<%@ page import="java.util.Arrays" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 <jsp:useBean id="appointmentInfo" class="org.oscarehr.appointment.AppointmentDisplayController" scope="page" />
