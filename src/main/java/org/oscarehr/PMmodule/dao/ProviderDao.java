@@ -24,6 +24,7 @@
 package org.oscarehr.PMmodule.dao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -605,11 +606,17 @@ public class ProviderDao extends HibernateDaoSupport {
 			
 			HibernateTemplate template = getHibernateTemplate();
 			String sql = "FROM Provider p WHERE " + searchOn + " = ? ";
-			Object[] params = {docNo};
+			ArrayList<Object> params = new ArrayList<>();
+			params.add(docNo);
 			// Allow multiple route ids to be used for lab matching
 			if (labType.equals("CLS") || ConnectCareHandler.getConnectCareLabTypes().contains(labType)) {
 				sql += " OR p.AlbertaEDeliveryIds = ? OR p.AlbertaEDeliveryIds like ? OR p.AlbertaEDeliveryIds like ? OR p.AlbertaEDeliveryIds like ? ";
-				params = new String[] {docNo, docNo, docNo + ",%", "%," + docNo + ",%", "%," + docNo};
+				params.addAll(Arrays.asList(docNo, docNo + ",%", "%," + docNo + ",%", "%," + docNo));
+			}
+			if (ConnectCareHandler.getConnectCareLabTypes().contains(labType))
+			{
+				sql += "OR p.albertaConnectCareId = ?";
+				params.add(docNo);
 			}
 			if (orderByLength) {
 				sql += " order by length(p.FirstName)";
@@ -619,7 +626,7 @@ public class ProviderDao extends HibernateDaoSupport {
 			}
 			log.debug(sql);
 			
-			List<Provider> providerList = template.find(sql, params);
+			List<Provider> providerList = template.find(sql, params.toArray());
 			return providerList;
 		}
 		
