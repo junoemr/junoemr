@@ -142,7 +142,7 @@ public final class MessageUploader {
 			String priority = messageHandler.getMsgPriority();
 			String requestingClient = messageHandler.getDocName();
 			String reportStatus = "";
-			if (ConnectCareHandler.isConnectCareHandler(messageHandler))
+			if (ConnectCareHandler.isConnectCareHandler(messageHandler) || messageHandler instanceof PATHL7Handler)
 			{
 				Hl7TextInfo.REPORT_STATUS junoReportStatus = messageHandler.getJunoOrderStatus();
 				if (junoReportStatus == null)

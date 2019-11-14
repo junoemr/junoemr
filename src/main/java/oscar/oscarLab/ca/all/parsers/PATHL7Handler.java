@@ -42,6 +42,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.UtilDateUtilities;
 
@@ -50,7 +51,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -69,6 +72,19 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 	// Embedded PDF strings that show up in OBX messages
 	public static final String embeddedPdfPrefix = "JVBERi0xLj";
 	public static final String pdfReplacement = "embedded_doc_id_";
+
+    /**
+     * map connect care status codes to internal status codes as per, IMG OUT – Status Table [3101] in
+     * "HL7 Message Processing Guidelines Appendix.pdf"
+     */
+    private static final Map<String, Hl7TextInfo.REPORT_STATUS> orderStatusMap = new HashMap<String,  Hl7TextInfo.REPORT_STATUS>();
+    static
+    {
+        orderStatusMap.put("P", Hl7TextInfo.REPORT_STATUS.E);
+        orderStatusMap.put("F", Hl7TextInfo.REPORT_STATUS.F);
+        orderStatusMap.put("C", Hl7TextInfo.REPORT_STATUS.C);
+        orderStatusMap.put("X", Hl7TextInfo.REPORT_STATUS.X);
+    }
 
     /** Creates a new instance of CMLHandler */
     public PATHL7Handler(){
@@ -818,5 +834,15 @@ public class PATHL7Handler extends ORU_R01MessageHandler
         {
             return ("");
         }
+    }
+
+    /**
+     * map OBR order status to juno internal order status
+     * @return - juno internal report status
+     */
+    @Override
+    public Hl7TextInfo.REPORT_STATUS getJunoOrderStatus()
+    {
+        return orderStatusMap.get(getOrderStatus());
     }
 }
