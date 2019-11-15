@@ -66,7 +66,31 @@ public class PATHL7Handler extends ORU_R01MessageHandler
     Logger logger = Logger.getLogger(PATHL7Handler.class);
     protected ORU_R01 msg;
 
-	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","CYTO", "DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF", "BCCASMP", "BCCACSP", "CYTOGEN");
+	private static List<String> labDocuments = Arrays.asList(
+			"BCCASMP",
+			"BCCACSP",
+			"BLOODBANKT",
+			"CELLPATH",
+			"CELLPATHR",
+			"CYTO",
+			"CYTOGEN",
+			"DIAG IMAGE",
+			"MICRO3T",
+			"MICROGCMT",
+			"MICROGRT",
+			"MICROBCT",
+			"NOTIF",
+			"TRANSCRIP"
+	);
+
+	// any header in here needs to pull its label from a different place
+	private static List<String> customHeaderIdentifiers = Arrays.asList(
+			"CARDIOPDF",
+			"GENPDF1",
+			"NOTIFP",
+			"TRANSPDF"
+	);
+
 	public static final String VIHARTF = "CELLPATHR";
 
 	// Embedded PDF strings that show up in OBX messages
@@ -267,7 +291,13 @@ public class PATHL7Handler extends ORU_R01MessageHandler
     public String getObservationHeader(int i, int j){
         try
         {
-            return getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getDiagnosticServiceSectionID().getValue());
+            String header = getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getDiagnosticServiceSectionID().getValue());
+            // We have an internal list of headers that we need to get the user display string from somewhere else
+            if (customHeaderIdentifiers.contains(header))
+            {
+                return getCustomHeader(header, i , j);
+            }
+            return header;
         }
         catch(Exception e)
         {
@@ -477,7 +507,6 @@ public class PATHL7Handler extends ORU_R01MessageHandler
             if (count == 1)
             {
                 String test = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(0).getOBX().getObservationIdentifier().getText().getValue();
-                logger.info("OBX Name: " + test);
                 if (test == null)
                 {
                     count = 0;
@@ -720,6 +749,12 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 
                 currentHeader = getObservationHeader(i, 0);
                 arraySize = headers.size();
+
+                if (customHeaderIdentifiers.contains(currentHeader))
+                {
+                    currentHeader = getCustomHeader(currentHeader, i, 0);
+                }
+
                 if (arraySize == 0 || !currentHeader.equals(headers.get(arraySize-1)))
                 {
                     logger.info("Adding header: '"+currentHeader+"' to list");
@@ -839,12 +874,35 @@ public class PATHL7Handler extends ORU_R01MessageHandler
     }
 
     /**
-     * map OBR order status to juno internal order status
+     * Map OBR order status to Juno internal order status
      * @return - juno internal report status
      */
     @Override
     public Hl7TextInfo.REPORT_STATUS getJunoOrderStatus()
     {
         return orderStatusMap.get(getOrderStatus());
+    }
+
+    /** Sometimes the original header that we pull is nonsensical. For these labs
+     * we will want to pull the header from a different segment.
+     * Unfortunately this is a case-by-case basis.
+     * @param origHeader header that we were going to use
+     * @param i OBR record
+     * @param j OBX record
+     * @return the header that we want the user to see
+     */
+    private String getCustomHeader(String origHeader, int i, int j)
+    {
+        getPatientLocation();
+        // These ones are dumb. The following cases pull from OBX 3-2 only when they're from the matched locations
+        if ("TRANSPDF".equals(origHeader)
+                && (getPatientLocation().equals("VIHAMTM") || getPatientLocation().equals("TRANSCST")))
+        {
+            return msg.getRESPONSE().getORDER_OBSERVATION().getOBSERVATION(i).getOBX().getObservationIdentifier().getText().toString();
+        }
+        else // other custom matched headers pull from OBR 4-2
+        {
+            return msg.getRESPONSE().getORDER_OBSERVATION().getOBR().getUniversalServiceIdentifier().getText().toString();
+        }
     }
 }
