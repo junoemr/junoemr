@@ -519,10 +519,11 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								{
 									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t","\u00a0\u00a0\u00a0\u00a0"), lineFont));
 									//if this PATHL7 result is from CDC/SG and is greater than 100 characters
-									cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-									if ((handler.getOBXResult(j, k).length() > 100) &&
+									if (((handler.getOBXResult(j, k).length() > 100) &&
 											(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")))
+											|| handler.getPatientLocation().equals("VPP-PHC"))
 									{
+										cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 										//if the Abn, Reference Range and Units are empty or equal to null, give the long result the use of those columns
 										if ((handler.getOBXAbnormalFlag(j, k) == null || handler.getOBXAbnormalFlag(j, k).isEmpty()) &&
 											(handler.getOBXReferenceRange(j, k) == null || handler.getOBXReferenceRange(j, k).isEmpty()) &&
@@ -535,6 +536,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 										else
 										{//else use the 6 remaining columns, and add a new empty cell that takes the first two columns(Test & Results).
 										//This will allow the corresponding Abn, RR and Units to be printed beneath the long result in the appropriate columns
+											cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 											cell.setColspan(6);
 											table.addCell(cell);
 											cell.setPhrase(new Phrase("", lineFont));

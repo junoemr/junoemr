@@ -1334,6 +1334,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						boolean isPDF = false;
 						boolean	isVIHARtf = false;
 						boolean isSGorCDC = false;
+						boolean leftAlignedAndStructured = false;
 
 						List<Hl7DocumentLink> documentLinks = null;
 
@@ -1343,8 +1344,13 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 							isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(headers.get(i));
 							isPDF = ((PATHL7Handler)handler).hasEmbeddedPDF();
 							isVIHARtf = ((PATHL7Handler) handler).vihaRtfCheck(headers.get(i));
-							if(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")){
+							if(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC"))
+							{
 								isSGorCDC = true;
+							}
+							else if (handler.getPatientLocation().equals("VPP-PHC"))
+							{
+								leftAlignedAndStructured = true;
 							}
 						}
                         else {
@@ -1873,8 +1879,9 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                 	<%} %> </td><%}%>
                                            	<%
                                            	String align = "right";
-                                          	//for pathl7, if it is an SG/CDC result greater than 100 characters, left justify it
-                                           	if((handler.getOBXResult(j, k).length() > 100) && (isSGorCDC)){
+											// for pathl7, if it is an SG/CDC result greater than 100 characters, left justify it
+											// or if it's micro3
+											if(((handler.getOBXResult(j, k).length() > 100) && (isSGorCDC)) || leftAlignedAndStructured){
                                            		align="left";
                                            	}%>
 
