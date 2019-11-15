@@ -176,6 +176,9 @@ div.note {
 	margin: 3px 0px 3px 5px;
 	float: left;
 	width: 98%;
+	display: block;
+	padding-top: 0px;
+	padding-bottom: 0px;
 }
 
 div.note pre {
@@ -184,6 +187,10 @@ div.note pre {
 	margin: 0px 3px 0px 3px;
 	width: 100%;
 	clear: left;
+}
+
+div.note div.noteStatus {
+	text-align: center;
 }
 
 .sig {
@@ -474,7 +481,12 @@ div.encounterNavBar span.encounterNoteDate {
 	text-align:right;
 }
 
-
+div.encMainDiv input.observationDate {
+	border: none;
+	width: 140px;
+	color: #000000;
+	background-color: #CCCCFF;
+}
 
 .encounter_timer_container {
 	position: relative;

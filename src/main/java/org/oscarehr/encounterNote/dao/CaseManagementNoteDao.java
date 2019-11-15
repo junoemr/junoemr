@@ -29,11 +29,13 @@ import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.common.dao.EncounterFormDao;
 import org.oscarehr.common.model.EncounterForm;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.to.model.NoteTo1;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.math.BigInteger;
 import java.sql.Date;
@@ -302,16 +304,104 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 	 * @param demographicNo
 	 * @return The note that can be edited.  Returns null if there isn't one.
 	 */
-	public NoteTo1 getLatestUnsignedNote(int demographicNo)
+	public CaseManagementNote getLatestUnsignedNote(int demographicNo, int providerNo)
 	{
-		String jpql = "SELECT note\n" +
-				"FROM model_CaseManagementNote note\n" +
-				"WHERE note.noteId NOT IN (SELECT issue_note.id.caseManagementNote.noteId FROM model_CaseManagementIssueNote issue_note)\n" +
-				"AND note.demographic.demographicId = :demographicNo\n";
+		//language=MariaDB
+		String sql = "SELECT DISTINCT cmn.note_id\n" +
+				"FROM casemgmt_note cmn\n" +
+				"LEFT JOIN casemgmt_note AS cmn_filter \n" +
+				"  ON cmn_filter.uuid = cmn.uuid\n" +
+				"  AND NOT cmn.signed\n" +
+				"AND (cmn.update_date < cmn_filter.update_date " +
+				"OR (cmn.update_date = cmn_filter.update_date AND cmn.note_id < cmn_filter.note_id))\n" +
+				"LEFT JOIN casemgmt_issue_notes cmin ON cmin.note_id = cmn.note_id\n" +
+				"LEFT JOIN casemgmt_issue cmi ON cmin.id = cmi.id\n" +
+				"LEFT JOIN issue i\n" +
+				"  ON i.issue_id = cmi.issue_id\n" +
+				"  AND i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication','TicklerNote')\n" +
+				"LEFT JOIN casemgmt_note_link cnl ON cnl.note_id = cmn.note_id\n" +
+				"WHERE NOT cmn.signed\n" +
+				"AND cmn_filter.note_id IS NULL\n" +
+				"AND i.issue_id IS NULL\n" +
+				"AND cnl.id IS NULL\n" +
+				"AND cmn.demographic_no = :demographicNo\n" +
+				"AND cmn.provider_no = :providerNo\n" +
+				"ORDER BY cmn.update_date DESC\n";
 
-		Query query = entityManager.createQuery(queryString);
-		query.setParameter("uuid", uuid);
+		Query query = entityManager.createNativeQuery(sql);
+
+		query.setParameter("demographicNo", demographicNo);
+		query.setParameter("providerNo", providerNo);
+
 		query.setMaxResults(1);
+
+		Integer note_id;
+		try
+		{
+			note_id = (Integer)query.getSingleResult();
+		}
+		catch(NoResultException e)
+		{
+			// No unsigned notes, return nothing
+			return null;
+		}
+
+		return this.find(note_id.longValue());
+	}
+
+	/**
+	 * Get the revision of the specified note
+	 * @param uuid
+	 * @return The revision
+	 */
+	public Integer getRevision(String uuid)
+	{
+		String sql = "SELECT COUNT(cmn.uuid)\n" +
+				"FROM casemgmt_note cmn\n" +
+				"WHERE cmn.uuid = :uuid";
+
+		Query query = entityManager.createNativeQuery(sql);
+
+		query.setParameter("uuid", uuid);
+
+		return ((BigInteger)query.getSingleResult()).intValue();
+	}
+
+	/**
+	 * Get a list of providers who have edited the specified note.
+	 * @param uuid
+	 * @return A list of providers
+	 */
+	public List<ProviderData> getEditors(String uuid)
+	{
+		String jpql = "SELECT distinct p\n" +
+				"FROM ProviderData p, model_CaseManagementNote cmn\n" +
+				"WHERE p.id = cmn.provider.id\n" +
+				"AND cmn.uuid = :uuid";
+
+		Query query = entityManager.createQuery(jpql);
+		query.setParameter("uuid", uuid);
+
+		return query.getResultList();
+	}
+
+	/**
+	 * Get a list of the names of providers who edited the specified note.
+	 * @param uuid
+	 * @return A list of provider full names.
+	 */
+	public List<String> getEditorNames(String uuid)
+	{
+		List<ProviderData> editors = getEditors(uuid);
+
+		ArrayList<String> editorNames = new ArrayList<String>();
+
+		for (ProviderData editor: editors)
+		{
+			editorNames.add(editor.getDisplayName());
+		}
+
+		return (editorNames);
 	}
 
 	/**

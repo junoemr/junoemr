@@ -40,8 +40,11 @@ public class JunoEncounterFormBean extends ActionForm
 	private List<String> cppNoteSections = null;
 	private List<String> leftNoteSections = null;
 	private List<String> rightNoteSections = null;
-
 	private List<SummaryTo1> leftSummaries = null;
+
+	private String appointmentDate;
+	private String encType;
+	private String reason;
 
 	public EncounterHeader getHeader()
 	{
@@ -111,5 +114,35 @@ public class JunoEncounterFormBean extends ActionForm
 	public void setRightNoteSections(List<String> rightNoteSections)
 	{
 		this.rightNoteSections = rightNoteSections;
+	}
+
+	public String getAppointmentDate()
+	{
+		return appointmentDate;
+	}
+
+	public void setAppointmentDate(String appointmentDate)
+	{
+		this.appointmentDate = appointmentDate;
+	}
+
+	public String getEncType()
+	{
+		return encType;
+	}
+
+	public void setEncType(String encType)
+	{
+		this.encType = encType;
+	}
+
+	public String getReason()
+	{
+		return reason;
+	}
+
+	public void setReason(String reason)
+	{
+		this.reason = reason;
 	}
 }

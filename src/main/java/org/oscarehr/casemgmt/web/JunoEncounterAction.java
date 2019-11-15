@@ -177,7 +177,6 @@ public class JunoEncounterAction extends DispatchActionSupport
 	//@Autowired
 	//private PreventionsSummary preventionsSummary;
 
-
 	public ActionForward execute(
 		ActionMapping mapping,
 		ActionForm form,

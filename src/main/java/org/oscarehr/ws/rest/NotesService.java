@@ -51,7 +51,9 @@ import org.oscarehr.casemgmt.web.NoteDisplayLocal;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.EncounterUtil;
@@ -134,7 +136,7 @@ public class NotesService extends AbstractServiceImpl
 	
 	@Autowired
 	private CaseManagementManager caseManagementMgr;
-	
+
 	@Autowired
 	private ProviderManager providerMgr;
 	
@@ -146,6 +148,12 @@ public class NotesService extends AbstractServiceImpl
 
 	@Autowired
 	private DocumentDao documentDao;
+
+	@Autowired
+	private EncounterNoteService encounterNoteService;
+
+	@Autowired
+	CaseManagementTmpSaveDao caseManagementTmpSaveDao;
 
 	
 	@GET
@@ -334,8 +342,18 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/{demographicNo}/save")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<NoteTo1> saveNote(@PathParam("demographicNo") Integer demographicNo, NoteTo1 note) {
+	public RestResponse<NoteTo1> saveNote(
+			@PathParam("demographicNo") Integer demographicNo,
+			@QueryParam("deleteTmpSave") @DefaultValue("false") String deleteTmpSaveString,
+			NoteTo1 note)
+	{
 		logger.debug("saveNote "+note);
+
+		boolean deleteTmpSave = false;
+		if(deleteTmpSaveString.toLowerCase().equals("true"))
+		{
+			deleteTmpSave = true;
+		}
 
 		try {
 
@@ -441,11 +459,27 @@ public class NotesService extends AbstractServiceImpl
 			String saveStatus = (caseMangementNote.getId() != null) ? LogConst.STATUS_SUCCESS : LogConst.STATUS_FAILURE;
 			LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_CME_NOTE, saveStatus,
 					String.valueOf(caseMangementNote.getId()), getLoggedInInfo().getIp(), caseMangementNote.getAuditString());
+
+			if(deleteTmpSave)
+			{
+				try
+				{
+					String programId = getProgram(loggedInInfo, providerNo);
+					caseManagementMgr.deleteTmpSave(note.getProviderNo(), demographicNo.toString(), programId);
+				}
+				catch (Exception e)
+				{
+					logger.warn("Error deleting tmpSave", e);
+				}
+			}
 		}
-		catch(Exception e) {
+		catch(Exception e)
+		{
 			logger.error("Error saving Note", e);
 			return RestResponse.errorResponse("Failed to save Note");
 		}
+
+
 		return RestResponse.successResponse(note);
 	}
 
@@ -885,11 +919,52 @@ public class NotesService extends AbstractServiceImpl
 	}
 
 	@GET
-	@Path("/{demographicNo}/getNoteToEdit")
+	@Path("/{demographicNo}/noteToEdit/latest")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public NoteTo1 getNoteToEdit(@PathParam("demographicNo") Integer demographicNo)
+	public RestResponse<NoteIssueTo1> getLatestNoteToEdit(@PathParam("demographicNo") Integer demographicNo)
 	{
+		LoggedInInfo loggedInInfo =  getLoggedInInfo();
+
+		NoteIssueTo1 returnNote = encounterNoteService.getLatestUnsignedNote(
+				demographicNo,
+				Integer.parseInt(loggedInInfo.getLoggedInProviderNo())
+		);
+
+		return RestResponse.successResponse(returnNote);
+	}
+
+	@GET
+	@Path("/{demographicNo}/tmpSave")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public RestResponse<String> getTmpSave(@PathParam("demographicNo") Integer demographicNo)
+	{
+		LoggedInInfo loggedInInfo =  getLoggedInInfo();
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+		Integer programId = getProgramId(loggedInInfo, providerNo);
+
+		CaseManagementTmpSave tmpSave = caseManagementTmpSaveDao.find(providerNo, demographicNo, programId);
+
+		String note = null;
+		if(tmpSave != null)
+		{
+			note = tmpSave.getNote();
+		}
+
+		return RestResponse.successResponse(note);
+	}
+
+	@GET
+	@Path("/{demographicNo}/getNoteToEdit/{noteId}")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public RestResponse<NoteIssueTo1> getNoteToEdit(@PathParam("demographicNo") Integer demographicNo,
+											   @PathParam("noteId") Integer noteId)
+	{
+		NoteIssueTo1 returnNote = encounterNoteService.getNoteToEdit(demographicNo, noteId);
+
+		return RestResponse.successResponse(returnNote);
 	}
 
 	@POST
