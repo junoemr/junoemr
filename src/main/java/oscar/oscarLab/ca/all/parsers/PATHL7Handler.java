@@ -75,6 +75,7 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 			"CYTO",
 			"CYTOGEN",
 			"DIAG IMAGE",
+			"MICRO3",
 			"MICRO3T",
 			"MICROGCMT",
 			"MICROGRT",

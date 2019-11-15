@@ -950,12 +950,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
         rInfoTable.addCell(cell);
         cell.setPhrase(new Phrase("Report Status: ", boldFont));
         rInfoTable.addCell(cell);
-        if (handler.getMsgType().equals("PATHL7"))
-        {
-        	cell.setPhrase(new Phrase((handler.getOrderStatus().equals("F") ? "Final" : (handler.getOrderStatus().equals("C") ? "Corrected" : "Preliminary")), font));
-        	rInfoTable.addCell(cell);
-        }
-        if (ConnectCareHandler.isConnectCareHandler(handler))
+        if (ConnectCareHandler.isConnectCareHandler(handler) || handler.getMsgType().equals("PATHL7"))
 		{
 			cell.setPhrase(new Phrase(Hl7TextInfoService.getReportStatusDisplayString(handler.getJunoOrderStatus()), font));
 			rInfoTable.addCell(cell);
