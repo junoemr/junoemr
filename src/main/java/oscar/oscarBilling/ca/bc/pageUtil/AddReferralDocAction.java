@@ -61,6 +61,7 @@ public class AddReferralDocAction extends Action {
     		 billingReferral.setReferralNo(f.getReferral_no());
     		 billingReferral.setLastName(f.getLast_name());
     		 billingReferral.setFirstName(f.getFirst_name());
+    		 billingReferral.setSpecialty(f.getSpecialty());
     		 billingReferral.setAddress1(f.getAddress1());
     		 billingReferral.setAddress2(f.getAddress2());
     		 billingReferral.setCity(f.getCity());
@@ -80,6 +81,7 @@ public class AddReferralDocAction extends Action {
    		 billingReferral.setReferralNo(f.getReferral_no());
    		 billingReferral.setLastName(f.getLast_name());
    		 billingReferral.setFirstName(f.getFirst_name());
+   		 billingReferral.setSpecialty(f.getSpecialty());
    		 billingReferral.setAddress1(f.getAddress1());
    		 billingReferral.setAddress2(f.getAddress2());
    		 billingReferral.setCity(f.getCity());
