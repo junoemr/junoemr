@@ -100,6 +100,7 @@ public class CoPDPreProcessorService
 			message = fixDoubleBPMeasurements(message);
 			message = fixSlashBPMeasurements(message);
 			message = fixZATDateString(message);
+			message = timestampPad(message);
 
 			// should come last
 			message = ensureNumeric(message);
@@ -333,6 +334,28 @@ public class CoPDPreProcessorService
 		};
 
 		return foreachTag(message, "ZAT.2", fixZATDate);
+	}
+
+	/**
+	 * pad timestamp values (TS.1), insuring they have an even number of characters. If they are odd a '0' is appended
+	 * @param message - message on which the timestamps will be padded
+	 * @return - the modified message
+	 */
+	private String timestampPad(String message)
+	{
+		Function<String, String> padTimestamps = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				if (tagValue.length() % 2 != 0)
+				{
+					return tagValue + "0";
+				}
+				return tagValue;
+			}
+		};
+
+		return foreachTag(message,"TS.1", padTimestamps);
 	}
 
 	/**
