@@ -46,29 +46,29 @@ public class AddReferralDocAction extends Action {
 
 	private BillingreferralDao billingReferralDao = (BillingreferralDao)SpringUtils.getBean("BillingreferralDAO");
 
-  public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response) {
+  public ActionForward execute(ActionMapping mapping,ActionForm actionForm,HttpServletRequest request,HttpServletResponse response) {
      ActionForward af = mapping.findForward("success");
 
-     AddReferralDocForm f = (AddReferralDocForm) form;
+     AddReferralDocForm form = (AddReferralDocForm) actionForm;
 
      String id = request.getParameter("id");
      if (id == null ){
     	 
-    	 List<Billingreferral> billingReferrals = billingReferralDao.getBillingreferral(f.getReferral_no());
+    	 List<Billingreferral> billingReferrals = billingReferralDao.getBillingreferral(form.getReferral_no());
     	 
     	 if(billingReferrals.isEmpty()) {
     		 Billingreferral billingReferral = new Billingreferral();
-    		 billingReferral.setReferralNo(f.getReferral_no());
-    		 billingReferral.setLastName(f.getLast_name());
-    		 billingReferral.setFirstName(f.getFirst_name());
-    		 billingReferral.setSpecialty(f.getSpecialty());
-    		 billingReferral.setAddress1(f.getAddress1());
-    		 billingReferral.setAddress2(f.getAddress2());
-    		 billingReferral.setCity(f.getCity());
-    		 billingReferral.setProvince(f.getProvince());
-    		 billingReferral.setPostal(f.getPostal());
-    		 billingReferral.setPhone(f.getPhone());
-    		 billingReferral.setFax(f.getFax());
+    		 billingReferral.setReferralNo(form.getReferral_no());
+    		 billingReferral.setLastName(form.getLast_name());
+    		 billingReferral.setFirstName(form.getFirst_name());
+    		 billingReferral.setSpecialty(form.getSpecialty());
+    		 billingReferral.setAddress1(form.getAddress1());
+    		 billingReferral.setAddress2(form.getAddress2());
+    		 billingReferral.setCity(form.getCity());
+    		 billingReferral.setProvince(form.getProvince());
+    		 billingReferral.setPostal(form.getPostal());
+    		 billingReferral.setPhone(form.getPhone());
+    		 billingReferral.setFax(form.getFax());
     		 billingReferralDao.updateBillingreferral(billingReferral);
     	 } else {
     		 request.setAttribute("Error", "Billing # already in use");
@@ -78,17 +78,17 @@ public class AddReferralDocAction extends Action {
      }else{
     	Billingreferral billingReferral = billingReferralDao.getById(Integer.parseInt(id));
     	if(billingReferral!=null) {
-   		 billingReferral.setReferralNo(f.getReferral_no());
-   		 billingReferral.setLastName(f.getLast_name());
-   		 billingReferral.setFirstName(f.getFirst_name());
-   		 billingReferral.setSpecialty(f.getSpecialty());
-   		 billingReferral.setAddress1(f.getAddress1());
-   		 billingReferral.setAddress2(f.getAddress2());
-   		 billingReferral.setCity(f.getCity());
-   		 billingReferral.setProvince(f.getProvince());
-   		 billingReferral.setPostal(f.getPostal());
-   		 billingReferral.setPhone(f.getPhone());
-   		 billingReferral.setFax(f.getFax());
+   		 billingReferral.setReferralNo(form.getReferral_no());
+   		 billingReferral.setLastName(form.getLast_name());
+   		 billingReferral.setFirstName(form.getFirst_name());
+   		 billingReferral.setSpecialty(form.getSpecialty());
+   		 billingReferral.setAddress1(form.getAddress1());
+   		 billingReferral.setAddress2(form.getAddress2());
+   		 billingReferral.setCity(form.getCity());
+   		 billingReferral.setProvince(form.getProvince());
+   		 billingReferral.setPostal(form.getPostal());
+   		 billingReferral.setPhone(form.getPhone());
+   		 billingReferral.setFax(form.getFax());
    		 billingReferralDao.updateBillingreferral(billingReferral);
     	}
      }
