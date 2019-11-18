@@ -94,17 +94,15 @@ public class CopdCommandLineImporter
 		String importSourceStr = args[4];
 		CoPDImportService.IMPORT_SOURCE importSource = CoPDImportService.IMPORT_SOURCE.UNKNOWN;
 
-		if(importSourceStr.equalsIgnoreCase("WOLF"))
+		try
 		{
-			importSource = CoPDImportService.IMPORT_SOURCE.WOLF;
+			logger.info("Import source: " + importSourceStr);
+			importSource = CoPDImportService.IMPORT_SOURCE.valueOf(importSourceStr);
 		}
-		else if (importSourceStr.equalsIgnoreCase("MEDIPLAN"))
+		catch(IllegalArgumentException e)
 		{
-			importSource = CoPDImportService.IMPORT_SOURCE.MEDIPLAN;
-		}
-		else if (importSourceStr.equalsIgnoreCase("MEDACCESS"))
-		{
-			importSource = CoPDImportService.IMPORT_SOURCE.MEDACCESS;
+			logger.error("Unknown import source. Defaulting to UNKNOWN");
+			importSource = CoPDImportService.IMPORT_SOURCE.UNKNOWN;
 		}
 
 		// flag to allow importing demographics with missing document files by skipping those records.
