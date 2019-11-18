@@ -1005,7 +1005,7 @@ function tranbuttonb7_click() {
 	{
 		String ret = "";
 		ret += "str1 +=" + "\"<" + s + ">\"" + "+" + "document.schedule." + obj
-				+ "[" + "document.schedule." + obj + ".selectedIndex" + "].text" + "+" + "\"</" + s + ">\";";
+				+ "[" + "document.schedule." + obj + ".selectedIndex" + "].value" + "+" + "\"</" + s + ">\";";
 		return ret;
 	}
 	%>
