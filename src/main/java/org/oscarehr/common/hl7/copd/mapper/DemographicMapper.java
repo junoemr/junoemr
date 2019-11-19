@@ -224,6 +224,15 @@ public class DemographicMapper extends AbstractMapper
 		{
 			return getPhone(rep);
 		}
+		else
+		{
+			// cell phone can also be specified by the PERS telecom type.
+			rep = getCellPhoneRepByUsageType("PERS");
+			if(rep != null)
+			{
+				return getPhone(rep);
+			}
+		}
 		return null;
 	}
 
