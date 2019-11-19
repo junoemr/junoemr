@@ -35,6 +35,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
@@ -61,7 +63,7 @@ public class CoPDMessageStream
 		this.fileReader = new BufferedReader(new InputStreamReader(CoPDFileInputStream));
 	}
 
-	public void forEach(Consumer<? super String> action)
+	public void forEach(Consumer<? super String> action) throws Exception
 	{
 		String msg;
 		while (!(msg = getNextMessage()).isEmpty())
@@ -70,32 +72,25 @@ public class CoPDMessageStream
 		}
 	}
 
-	public synchronized String getNextMessage()
+	public synchronized String getNextMessage() throws Exception
 	{
 		logger.info("loading next message...");
-		try
+		StringBuffer sb = new StringBuffer();
+		int character;
+		while ((character = this.fileReader.read()) != -1)
 		{
-			StringBuffer sb = new StringBuffer();
-			int character;
-			while ((character = this.fileReader.read()) != -1)
+			sb.append((char)character);
+			if ((char)character == '>' && isCompleteMessage(sb))
 			{
-				sb.append((char)character);
-				if ((char)character == '>' && isCompleteMessage(sb))
-				{
-					return buildMessage(sb);
-				}
+				return buildMessage(sb);
 			}
-			return "";
 		}
-		catch (IOException e)
-		{
-			return "";
-		}
+		return "";
 	}
 
-	private String buildMessage(StringBuffer sb)
+	private String buildMessage(StringBuffer sb) throws Exception
 	{
-		return removeXmlStartTag(stripXmlNameSpace(extractMessage(sb.toString())));
+		return removeXmlStartTag(stripXmlNameSpace(extractMessage(stripInvalidCodePoints(sb.toString()))));
 	}
 
 	private String extractMessage(String xml)
@@ -123,64 +118,55 @@ public class CoPDMessageStream
 	 * @param xml - the xml to strip
 	 * @return - a new xml string with the namespaces stripped.
 	 */
-	private String stripXmlNameSpace(String xml)
+	private String stripXmlNameSpace(String xml) throws SAXException, TransformerConfigurationException, TransformerException
 	{
-		try
+		XMLReader xmlReader = new XMLFilterImpl(XMLReaderFactory.createXMLReader())
 		{
-			XMLReader xmlReader = new XMLFilterImpl(XMLReaderFactory.createXMLReader())
+			@Override
+			public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
 			{
-				@Override
-				public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
+				String cleanName = qName;
+				if(cleanName.contains(":"))
 				{
-					String cleanName = qName;
-					if(cleanName.contains(":"))
-					{
-						int sepIdx = cleanName.indexOf(":");
-						cleanName = cleanName.substring(sepIdx + 1);
-					}
-
-					AttributesImpl keepAttributes  = new AttributesImpl();
-					// keep only the xmlns="urn:hl7-org:v2xml" namespace attribute.
-					for (int i =0; i < atts.getLength(); i ++)
-					{
-						if ((!atts.getQName(i).startsWith("xmlns:") && !atts.getQName(i).equals("xmlns")) ||
-								(atts.getQName(i).equals("xmlns") && atts.getValue(i).equals("urn:hl7-org:v2xml")))
-						{
-							keepAttributes.addAttribute(atts.getURI(i), atts.getLocalName(i), atts.getQName(i), atts.getType(i), atts.getValue(i));
-						}
-					}
-
-
-					super.startElement(uri, localName, cleanName, keepAttributes);
+					int sepIdx = cleanName.indexOf(":");
+					cleanName = cleanName.substring(sepIdx + 1);
 				}
 
-				@Override
-				public void endElement(String uri, String localName, String qName) throws SAXException
+				AttributesImpl keepAttributes  = new AttributesImpl();
+				// keep only the xmlns="urn:hl7-org:v2xml" namespace attribute.
+				for (int i =0; i < atts.getLength(); i ++)
 				{
-					String cleanName = qName;
-					if(cleanName.contains(":"))
+					if ((!atts.getQName(i).startsWith("xmlns:") && !atts.getQName(i).equals("xmlns")) ||
+							(atts.getQName(i).equals("xmlns") && atts.getValue(i).equals("urn:hl7-org:v2xml")))
 					{
-						int sepIdx = cleanName.indexOf(":");
-						cleanName = cleanName.substring(sepIdx + 1);
+						keepAttributes.addAttribute(atts.getURI(i), atts.getLocalName(i), atts.getQName(i), atts.getType(i), atts.getValue(i));
 					}
-					super.endElement(uri, localName, cleanName);
 				}
-			};
-			xmlReader.setFeature("http://xml.org/sax/features/namespaces", false);
-			xmlReader.setFeature("http://xml.org/sax/features/namespace-prefixes", false);
-			Source src = new SAXSource(xmlReader, new InputSource(new StringReader(xml)));
-			StringWriter namespaceStrippedXml = new StringWriter();
-			Result res = new StreamResult(namespaceStrippedXml);
-			TransformerFactory.newInstance().newTransformer().transform(src, res);
 
-			return namespaceStrippedXml.toString();
-		}
-		catch (Exception e)
-		{
-			logger.error("Failed to strip xml namespace on message xml: " + xml, e);
-		}
 
-		return "";
+				super.startElement(uri, localName, cleanName, keepAttributes);
+			}
+
+			@Override
+			public void endElement(String uri, String localName, String qName) throws SAXException
+			{
+				String cleanName = qName;
+				if(cleanName.contains(":"))
+				{
+					int sepIdx = cleanName.indexOf(":");
+					cleanName = cleanName.substring(sepIdx + 1);
+				}
+				super.endElement(uri, localName, cleanName);
+			}
+		};
+		xmlReader.setFeature("http://xml.org/sax/features/namespaces", false);
+		xmlReader.setFeature("http://xml.org/sax/features/namespace-prefixes", false);
+		Source src = new SAXSource(xmlReader, new InputSource(new StringReader(xml)));
+		StringWriter namespaceStrippedXml = new StringWriter();
+		Result res = new StreamResult(namespaceStrippedXml);
+		TransformerFactory.newInstance().newTransformer().transform(src, res);
+
+		return namespaceStrippedXml.toString();
 	}
 
 	/**
@@ -196,5 +182,19 @@ public class CoPDMessageStream
 			return removeXmlTag.group(1);
 		}
 		return xml;
+	}
+
+	/**
+	 * Accuro has sent a CoPD file containing invalid code point escape sequences. delete them.
+	 * We cannot handle this in the preprocessor as the message stream will throw an error when trying
+	 * to get the message.
+	 * @param message - message on which to operate
+	 * @return - the message with invalid code points removed.
+	 */
+	private String stripInvalidCodePoints(String message)
+	{
+		message = message.replace("&#11", "");
+		message = message.replace("&#16", "");
+		return message;
 	}
 }

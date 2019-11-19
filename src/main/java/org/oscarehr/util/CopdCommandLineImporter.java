@@ -22,7 +22,6 @@
  */
 package org.oscarehr.util;
 
-import ca.uhn.hl7v2.HL7Exception;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -205,7 +204,7 @@ public class CopdCommandLineImporter
 
 
 	private static void importFileMessages(CoPDMessageStream messageStream, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource, boolean skipMissingDocs)
-			throws HL7Exception, IOException, InterruptedException
+			throws Exception
 	{
 		boolean hasFailure = false;
 		int failureCount = 0;

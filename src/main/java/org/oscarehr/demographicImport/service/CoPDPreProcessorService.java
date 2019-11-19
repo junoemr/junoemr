@@ -34,8 +34,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -104,11 +102,6 @@ public class CoPDPreProcessorService
 
 			// should come last
 			message = ensureNumeric(message);
-		}
-
-		if (CoPDImportService.IMPORT_SOURCE.ACCURO.equals(importSource))
-		{
-
 		}
 
 		return message;
