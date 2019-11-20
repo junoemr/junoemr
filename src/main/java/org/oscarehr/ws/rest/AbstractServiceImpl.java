@@ -73,6 +73,15 @@ public abstract class AbstractServiceImpl {
 	}
 
 	/**
+	 * Get the oscar resources bundle i.e. OscarResources_en.properties
+	 * @return - the oscar resources bundle for this local
+	 */
+	protected ResourceBundle getOscarResourcesBundle()
+	{
+		return ResourceBundle.getBundle("oscarResources", getLocale());
+	}
+
+	/**
 	 * Gets current provider.
 	 * 
 	 * @return
