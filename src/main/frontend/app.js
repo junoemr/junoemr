@@ -130,8 +130,31 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		.state('admin',
 		{
 			url: '/admin',
-			templateUrl: 'src/admin/admin_popup.jsp',
-			controller: 'AdminCtrl'
+			templateUrl: 'src/admin/admin.jsp',
+			controller: 'Admin.AdminController as AdminCtrl'
+		})
+		.state('admin.frame',
+		{
+			url: '/frame?frameUrl&useCompat',
+			templateUrl: 'src/admin/integration/frameContent/frameContent.jsp',
+			controller: 'Admin.Integration.FrameContentController as FrameCtrl'
+		})
+		.state('admin.faxConfig',
+		{
+			url: '/faxConfig',
+			templateUrl: 'src/admin/integration/fax/faxConfiguration.jsp',
+			controller: 'Admin.Integration.Fax.FaxConfigurationController as faxController'
+		})
+		.state('admin.faxSendReceive',
+		{
+			url: '/faxSendReceive',
+			templateUrl: 'src/admin/integration/fax/faxSendReceive.jsp',
+			controller: 'Admin.Integration.Fax.FaxSendReceiveController as faxSendReceiveController'
+		})
+		.state('admin.landingPage',
+		{
+			url: '/landingPage',
+			component: 'landingPage'
 		})
 		.state('ticklers',
 		{

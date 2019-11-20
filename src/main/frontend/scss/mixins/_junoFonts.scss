@@ -49,3 +49,20 @@
 {
 	@include juno-font-default-size($font-size);
 }
+
+//=== global font definitions ===
+
+@mixin juno-font-body()
+{
+	@include  juno-font-default-size(17px);
+}
+
+@mixin juno-font-body-small()
+{
+	@include  juno-font-default-size(14px);
+}
+
+@mixin juno-font-body-smallest()
+{
+	@include  juno-font-default-size(12px);
+}
