@@ -26,7 +26,7 @@
 		<!-- integrations -->
 		<div class="integration-item flex-row align-items-first-baseline " ng-repeat="integration in $ctrl.integrationList">
 			<label class="switch-label" for="enable-care-connect-integration">
-				{{ integration.name }}
+				<a ng-href="{{integration.configUrl}}">{{ integration.name }}</a>
 			</label>
 			<label class="switch">
 				<input id="enable-care-connect-integration" type="checkbox"

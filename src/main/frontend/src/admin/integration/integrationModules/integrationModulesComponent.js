@@ -35,12 +35,14 @@ angular.module('Admin.Integration').component('integrationModules',
 			{
 				name: "CareConnect",
 				enabled: false,
-				propertyName: "integration.CareConnect.enabled"
+				propertyName: "integration.CareConnect.enabled",
+				configUrl:""
 			},
 			{
 				name: "IceFall",
 				enabled: false,
-				propertyName: "integration.IceFall.enabled"
+				propertyName: "integration.IceFall.enabled",
+				configUrl: ""
 			},
 		];
 
