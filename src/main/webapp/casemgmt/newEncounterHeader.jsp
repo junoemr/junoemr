@@ -37,11 +37,14 @@
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="oscar.OscarProperties" %>
+<%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
 
- 
+
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%
+	SystemPreferenceService systemPreferenceService = (SystemPreferenceService) SpringUtils.getBean(SystemPreferenceService.class);
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 
     oscar.oscarEncounter.pageUtil.EctSessionBean bean = null;
@@ -184,8 +187,16 @@
 </td>
 <td align=right>
 	<span class="HelpAboutLogout">
-	<oscar:help keywords="&Title=Chart+Interface&portal_type%3Alist=Document" key="app.top1" style="font-size:10px;font-style:normal;"/>&nbsp;|
-	<a style="font-size:10px;font-style:normal;" href="<%=request.getContextPath()%>/oscarEncounter/About.jsp" target="_new"><bean:message key="global.about" /></a>
+		<%
+			if (systemPreferenceService.isPreferenceEnabled(UserProperty.CARE_CONNECT_ENABLED, false))
+			{
+		%>
+				<a style="font-size:10px;font-style:normal;"  href="https://www.google.com">CareConnect</a> |
+		<%
+			}
+		%>
+		<oscar:help keywords="&Title=Chart+Interface&portal_type%3Alist=Document" key="app.top1" style="font-size:10px;font-style:normal;"/>&nbsp;|
+		<a style="font-size:10px;font-style:normal;" href="<%=request.getContextPath()%>/oscarEncounter/About.jsp" target="_new"><bean:message key="global.about" /></a>
 	</span>
 </td>
 </tr>
