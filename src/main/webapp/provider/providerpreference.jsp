@@ -808,9 +808,12 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
     <tr>
     	<td align="center"><a href=# onClick ="popupPage(230,860,'../setProviderStaleDate.do?method=viewBornPrefs');return false;"><bean:message key="provider.btnViewBornPrefs"/></a></td>
     </tr>
-	<tr>
-          <td align="center"><a href=# onClick ="popupPage(230,860,'../setProviderStaleDate.do?method=viewAppointmentCardPrefs');return false;"><bean:message key="provider.btnEditSetAppointmentCardPrefs"/></a></td>
-      </tr>
+		<tr>
+			<td align="center"><a href=# onClick ="popupPage(230,860,'../setProviderStaleDate.do?method=viewAppointmentCardPrefs');return false;"><bean:message key="provider.btnEditSetAppointmentCardPrefs"/></a></td>
+		</tr>
+		<tr>
+			<td align="center"><a href=# onClick ="popupPage(230,860,'providerTicklerSettings.jsp');return false;"><bean:message key="provider.btnTicklerSettings"/></a></td>
+		</tr>
 
 	 <oscar:oscarPropertiesCheck property="util.erx.enabled" value="true">
 	 	<security:oscarSec roleName="<%=roleName$%>" objectName="_rx" rights="r">

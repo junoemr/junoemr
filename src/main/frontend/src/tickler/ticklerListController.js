@@ -40,7 +40,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		controller.lastResponse = ""; // Can be removed?
 		controller.providers = providers;
 
-
 		securityService.hasRights(
 		{
 			items: [
@@ -72,56 +71,25 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 						controller.search.serviceEndDate = moment().startOf('day').toDate();
 					}
 
-					controller.tableParams = new NgTableParams(
-					{
-						page: 1, // show first page
-						count: 10,// initial count per page
-						sorting: {
-							ServiceDate: "desc"
-						}
-					},
-					{
-						// total: 0, // length of data
-						getData: function(params)
+					providerService.getSettings().then(
+						function(settings)
 						{
-							// ajax request to api
-							controller.search.count = params.url().count;
-							controller.search.page = params.url().page;
-							controller.search.includeLinks = 'true';
-							controller.search.includeComments = 'true';
-							controller.search.includeUpdates = 'true';
-							controller.search.includeProgram = true;
-
-							// need to parse out the ng-tables sort column/direction values
-							// for use in our get parameters.
-							var myRegexp = /sorting\[(\w+)\]/g;
-							for(var key in params.url()) {
-								var match = myRegexp.exec(String(key));
-								if(match) {
-									controller.search.sortColumn = match[1];
-									controller.search.sortDirection = params.url()[String(key)];
-								}
-							}
-
-							if (angular.isDefined($stateParams.demographicNo))
+							if (settings.ticklerViewOnlyMine === "enabled")
 							{
-								controller.search.demographicNo = $stateParams.demographicNo;
+								providerService.getMe().then(
+										function(user)
+										{
+											controller.search.taskAssignedTo = user.providerNo;
+											controller.loadTable();
+										}
+								)
 							}
-
-							return ticklerAPI.get(controller.search).$promise.then(function(data)
+							else
 							{
-								params.total(data.total); // recal. page nav controls
-								var ticklerList = data.content;
-								// Grab URLs for tickler links
-								for (var i = 0; i < ticklerList.length; i++){
-									if (ticklerList[i].ticklerLinks.length > 0 )
-                                        ticklerList[i].ticklerLinkUrl = controller.getLinkUrl(ticklerList[i].ticklerLinks[0]);
-								}
-
-								return data.content;
-							});
+								controller.loadTable();
+							}
 						}
-					});
+					);
 				}
 			}
 			else
@@ -171,6 +139,60 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 				tickler.checked = false;
 			});
 		};
+
+		controller.loadTable = function()
+		{
+			controller.tableParams = new NgTableParams(
+					{
+						page: 1, // show first page
+						count: 10,// initial count per page
+						sorting: {
+							ServiceDate: "desc"
+						}
+					},
+					{
+						// total: 0, // length of data
+						getData: function(params)
+						{
+							// ajax request to api
+							controller.search.count = params.url().count;
+							controller.search.page = params.url().page;
+							controller.search.includeLinks = 'true';
+							controller.search.includeComments = 'true';
+							controller.search.includeUpdates = 'true';
+							controller.search.includeProgram = true;
+
+							// need to parse out the ng-tables sort column/direction values
+							// for use in our get parameters.
+							var myRegexp = /sorting\[(\w+)\]/g;
+							for(var key in params.url()) {
+								var match = myRegexp.exec(String(key));
+								if(match) {
+									controller.search.sortColumn = match[1];
+									controller.search.sortDirection = params.url()[String(key)];
+								}
+							}
+
+							if (angular.isDefined($stateParams.demographicNo))
+							{
+								controller.search.demographicNo = $stateParams.demographicNo;
+							}
+
+							return ticklerAPI.get(controller.search).$promise.then(function(data)
+							{
+								params.total(data.total); // recal. page nav controls
+								var ticklerList = data.content;
+								// Grab URLs for tickler links
+								for (var i = 0; i < ticklerList.length; i++){
+									if (ticklerList[i].ticklerLinks.length > 0 )
+										ticklerList[i].ticklerLinkUrl = controller.getLinkUrl(ticklerList[i].ticklerLinks[0]);
+								}
+
+								return data.content;
+							});
+						}
+					});
+		}
 
 		controller.completeTicklers = function()
 		{

@@ -254,6 +254,15 @@ public class ProviderManager2 {
 			settings.setCppSingleLine("yes".equals(map.get("cpp_single_line").getValue())?true:false);
 		}
 
+		if (map.get(UserProperty.TICKLER_VIEW_ONLY_MINE) != null)
+		{
+			settings.setTicklerViewOnlyMine(map.get(UserProperty.TICKLER_VIEW_ONLY_MINE).getValue());
+		}
+		else
+		{
+			settings.setTicklerViewOnlyMine("disabled");
+		}
+
 		if(map.get(UserProperty.SCHEDULE_SITE) != null)
 		{
 			settings.setSiteSelected(map.get(UserProperty.SCHEDULE_SITE).getValue());
@@ -658,6 +667,9 @@ public class ProviderManager2 {
 		
 		p = getMappedOrNewProperty(map, "cpp_single_line", providerNo);
 		p.setValue(settings.isCppSingleLine()?"yes":"no");
+
+		p = getMappedOrNewProperty(map, UserProperty.TICKLER_VIEW_ONLY_MINE, providerNo);
+		p.setValue(settings.getTicklerViewOnlyMine());
 		
 		p = getMappedOrNewProperty(map, PreferenceManager.CUSTOM_SUMMARY_ENABLE, providerNo);
 		p.setValue(settings.isSummaryItemCustomDisplay()?"on":"off"); 	

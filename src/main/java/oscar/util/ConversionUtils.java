@@ -45,6 +45,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -91,6 +92,29 @@ public class ConversionUtils {
 			result.add(fromIntString(str));
 		}
 		return result;
+	}
+
+	public static Boolean stringToBoolean(String str) throws ParseException
+	{
+		List<String> trueList = Arrays.asList("ON", "YES", "TRUE", "ENABLED");
+		List<String> falseList = Arrays.asList("OFF", "NO", "FALSE", "DISABLED");
+
+		if (str == null)
+		{
+			return false;
+		}
+		else if (trueList.contains(str.toUpperCase()))
+		{
+			return true;
+		}
+		else if (falseList.contains(str.toUpperCase()))
+		{
+			return false;
+		}
+		else
+		{
+			throw new ParseException("Cannot parse, \"" + str.toUpperCase() + "\" as boolean. It is not one of: " + trueList.toString() + ", " + falseList.toString(), 0);
+		}
 	}
 
 	/**
