@@ -1273,12 +1273,13 @@
 	<!-- ======================================================================================= -->
 
 	<%
-		boolean showApptCountForProvider = OscarProperties.getInstance().isPropertyActive("schedule.show_appointment_count");
 		List<String> countPropertiesNames = Arrays.asList(
+				UserProperty.SCHEDULE_COUNT_ENABLED,
 				UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED,
 				UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW,
 				UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
 		Map<String, UserProperty> countProperties = userPropertyDao.getProviderPropertiesAsMap(curUser_no, countPropertiesNames);
+		boolean showApptCountForProvider = countProperties.get(UserProperty.SCHEDULE_COUNT_ENABLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED).getValue());
 		boolean countIncludeCancelled = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED).getValue());
 		boolean countIncludeNoShow = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW).getValue());
 		boolean countIncludeNoDemographic = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC).getValue());
