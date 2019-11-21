@@ -504,9 +504,9 @@ function displayCloseWarning(){
                         <select onchange="javascript:updateLotNr(this);" id="lotDrop" name="lotItem" >
                              <%for(String lotnr:lotNrList) {
 							 %>
-                               <option value="<%=lotnr%>" <%= ( lotnr.equals(lot) ? " selected" : "" ) %>><%=lotnr%> </option>
+                               <option value="<%=lotnr%>" ><%=lotnr%> </option>
                              <%}%>
-                             <option value="-1"  >Other</option>
+                             <option value="-1" selected >Other</option>
                          </select><br/>
                          <label for="manufacture">Manufacture:</label> <input type="text" name="manufacture" id="manufacture"  value="<%=str((extraData.get("manufacture")),"")%>"/><br/>
                    </fieldset>
