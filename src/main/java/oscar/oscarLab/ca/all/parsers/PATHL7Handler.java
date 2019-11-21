@@ -466,7 +466,6 @@ public class PATHL7Handler extends ORU_R01MessageHandler
             if (count == 1)
             {
                 String test = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(0).getOBX().getObservationIdentifier().getText().getValue();
-                logger.info("OBX Name: " + test);
                 if (test == null)
                 {
                     count = 0;
