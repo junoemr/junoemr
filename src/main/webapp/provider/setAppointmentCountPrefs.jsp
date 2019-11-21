@@ -64,9 +64,11 @@ if(session.getValue("user") == null)
             <html:form action="/setAppointmentCountPrefs.do">
 				<input type="hidden" name="method" value="<c:out value="${method}"/>">
 				<br/>
-				Include cancelled appointments: <html:checkbox property="appointmentCountIncludeCancelled.value"/>
+				Enabled: <html:checkbox property="appointmentCountEnabled.value" />
 				<br/>
-				Include no-show appointments: <html:checkbox property="appointmentCountIncludeNoShow.value"/>
+				Include cancelled appointments: <html:checkbox property="appointmentCountIncludeCancelled.value" />
+				<br/>
+				Include no-show appointments: <html:checkbox property="appointmentCountIncludeNoShow.value" />
 				<br/>
 				Include appointments not associated with a patient: <html:checkbox property="appointmentCountIncludeNoPatient.value" />
                 <br/>
@@ -83,5 +85,18 @@ if(session.getValue("user") == null)
 		<td class="MainTableBottomRowRightColumn"></td>
 	</tr>
 </table>
+<script>
+
+	let setCheckboxesEnabled = function(){
+		let disabled = !document.getElementsByName('appointmentCountEnabled.value')[0].checked
+		document.getElementsByName('appointmentCountIncludeCancelled.value')[0].disabled = disabled
+		document.getElementsByName('appointmentCountIncludeNoShow.value')[0].disabled = disabled
+		document.getElementsByName('appointmentCountIncludeNoPatient.value')[0].disabled = disabled;
+	};
+
+	document.getElementsByName('appointmentCountEnabled.value')[0].addEventListener('change', setCheckboxesEnabled);
+	setCheckboxesEnabled();
+
+</script>
 </body>
 </html:html>

@@ -311,6 +311,7 @@
 			<form-property name="appointmentCardFax" type="org.oscarehr.common.model.UserProperty" />
 		</form-bean>
 		<form-bean name="setAppointmentCountPrefsForm" type="org.apache.struts.action.DynaActionForm">
+			<form-property name="appointmentCountEnabled" type="org.oscarehr.common.model.UserProperty" />
 			<form-property name="appointmentCountIncludeCancelled" type="org.oscarehr.common.model.UserProperty" />
 			<form-property name="appointmentCountIncludeNoShow" type="org.oscarehr.common.model.UserProperty" />
 			<form-property name="appointmentCountIncludeNoPatient" type="org.oscarehr.common.model.UserProperty" />
