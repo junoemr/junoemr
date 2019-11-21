@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.OscarProperties;
 
 import java.util.List;
 
@@ -106,5 +107,15 @@ public class SystemPreferenceService
 			propertyDao.persist(property);
 		}
 		return  property;
+	}
+
+	public String getPropertyValue(String key, String defaultValue)
+	{
+		return OscarProperties.getInstance().getProperty(key, defaultValue);
+	}
+
+	public Boolean isPropertyEnabled(String key)
+	{
+		return OscarProperties.getInstance().isPropertyActive(key);
 	}
 }
