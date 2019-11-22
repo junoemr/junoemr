@@ -50,19 +50,14 @@ import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.hl7.AHS.model.v23.message.ORM_002;
+import org.oscarehr.common.hl7.AHS.model.v251.message.ORU_R01;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.*;
+import oscar.oscarLab.ca.all.parsers.AHS.v251.ConnectCareLabHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v22.SpecimenGateHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIORMHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestORMHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.AITLHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.GLSHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.ProvlabHandler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 
 import java.io.FileInputStream;
@@ -74,7 +69,7 @@ public final class Factory {
 
 	private static Logger logger = MiscUtils.getLogger();
 
-	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS","CLS","CLSDI", JunoGenericLabHandler.LAB_TYPE_VALUE);
+	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS", "CCLAB", "CCENDO", "CCCARDIOLOGY", "CCIMAGING", "CCDOC","CLS","CLSDI", JunoGenericLabHandler.LAB_TYPE_VALUE);
 
 	private Factory() {
 		// static methods no need for instance
@@ -166,12 +161,68 @@ public final class Factory {
 			else if(CLSDIORMHandler.handlerTypeMatch(msg))
 				handler = new CLSDIORMHandler(msg);
 		}
+		else if (mshSplit[8].equals("ORM^O01"))
+		{
+			Message msg = p.parse(hl7Body);
+			if (ConnectCareDiagnosticImagingCancelHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareDiagnosticImagingCancelHandler(msg);
+			}
+			else if (ConnectCareEndoscopyCancelHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareEndoscopyCancelHandler(msg);
+			}
+			else if (ConnectCareCardiologyCancelHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareCardiologyCancelHandler(msg);
+			}
+			else if (ConnectCareLabCancelHandler.handlerTypeMatch(msg))
+			{
+				handler = new  ConnectCareLabCancelHandler(msg);
+			}
+		}
+		else if (mshSplit[8].equals("MDM^T02"))
+		{
+			Message msg = p.parse(hl7Body);
+			if (ConnectCareDocumentationAddHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareDocumentationAddHandler(msg);
+			}
+		}
+		else if(mshSplit[8].equals("MDM^T08"))
+		{
+			Message msg = p.parse(hl7Body);
+			if (ConnectCareDocumentationEditHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareDocumentationEditHandler(msg);
+			}
+		}
+		else if (mshSplit[8].equals("MDM^T11"))
+		{
+			Message msg = p.parse(hl7Body);
+			if (ConnectCareDocumentationCancelHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareDocumentationCancelHandler(msg);
+			}
+		}
 		else //handle default ORU^R01 messages
 		{
+			/* We need to use a custom HL7 message object because Connect Care Includes non standard segments */
+			// this package string needs to match the custom model location in the oscar source code.
+			ModelClassFactory modelClassFactory = new CustomModelClassFactory(ORU_R01.ROOT_PACKAGE);
+			context.setModelClassFactory(modelClassFactory);
 			Message msg = p.parse(hl7Body);
 
 			// attempt to read the msh header and determine lab type handler
-			if(CLSHandler.handlerTypeMatch(msg))
+			if(ConnectCareDiagnosticImagingHandler.handlerTypeMatch(msg))
+				handler = new ConnectCareDiagnosticImagingHandler(msg);
+			else if (ConnectCareEndoscopyHandler.handlerTypeMatch(msg))
+				handler = new ConnectCareEndoscopyHandler(msg);
+			else if (ConnectCareCardiologyHandler.handlerTypeMatch(msg))
+				handler = new ConnectCareCardiologyHandler(msg);
+			else if(ConnectCareLabHandler.handlerTypeMatch(msg))
+				handler = new ConnectCareLabHandler(msg);
+			else if(CLSHandler.handlerTypeMatch(msg))
 				handler = new CLSHandler(msg);
 			else if(CLSDIHandler.handlerTypeMatch(msg))
 				handler = new CLSDIHandler(msg);

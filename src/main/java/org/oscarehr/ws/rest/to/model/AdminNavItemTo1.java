@@ -20,24 +20,38 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.ws.rest.to.model;
 
-package org.oscarehr.integration.myhealthaccess.dto;
+import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class ClinicUserCreateTo1 extends ClinicUserTo1
+public class AdminNavItemTo1 implements Serializable
 {
+	private String name;
+	private String transitionState;
 
-	@JsonProperty(value="access_token")
-	String accessToken;
-
-	public String getAccessToken()
+	public AdminNavItemTo1(String name, String transition)
 	{
-		return accessToken;
+		this.name = name;
+		this.transitionState = transition;
 	}
 
-	public void setAccessToken(String accessToken)
+	public String getName()
 	{
-		this.accessToken = accessToken;
+		return name;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public String getTransitionState()
+	{
+		return transitionState;
+	}
+
+	public void setTransitionState(String transitionState)
+	{
+		this.transitionState = transitionState;
 	}
 }

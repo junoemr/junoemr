@@ -66,7 +66,7 @@ public class IPInWSS4JInterceptor extends WSS4JInInterceptor implements Callback
 
 		if(IPRestrictionFilter.isIpBlocked(ip))
 		{
-			String errorMessage = "Invalid IP Address (" + ip + ")";
+			String errorMessage = "Unauthorized IP Address (" + ip + ")";
 			logger.error(errorMessage);
 			OscarLog oscarLog=new OscarLog();
 			oscarLog.setAction("ACCESS_WS");

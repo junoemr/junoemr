@@ -38,7 +38,7 @@
 
 					<span>{{item.displayName | limitTo: $ctrl.maxItemNameLength }} {{(item.displayName.length > $ctrl.maxItemNameLength)? '...' : '' }}</span>
 					<small ng-show="item.classification">({{item.classification}})</small>
-					<span class="pull-right">{{item.date | date : $ctrl.displayDateFormat}}</span>
+					<span class="pull-right" ng-if="!$ctrl.hideDate">{{item.date | date : $ctrl.displayDateFormat}}</span>
 				</a>
 			</li>
 		</ul>

@@ -38,6 +38,7 @@ import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 
+import javax.naming.SizeLimitExceededException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -82,6 +83,9 @@ public class EctConsultationFormFaxAction extends Action
 		List<InputStream> streamList = new ArrayList<>();
 		List<String> errorList = new ArrayList<>();
 		File tempfile = null;
+
+		long excessBytes;
+
 		try
 		{
 			// ensure valid fax number formatting. Throw exception if invalid
@@ -133,7 +137,11 @@ public class EctConsultationFormFaxAction extends Action
 				try
 				{
 					fos = new FileOutputStream(faxPdf);
-					consultationPDFCreationService.combineStreams(streamList, fos);
+					excessBytes = consultationPDFCreationService.combineStreams(streamList, fos);
+					if (excessBytes > 0)
+					{
+						throw new SizeLimitExceededException();
+					}
 				}
 				finally
 				{
@@ -175,6 +183,11 @@ public class EctConsultationFormFaxAction extends Action
 		{
 			logger.error("Error occurred inside ConsultationPrintAction", e);
 			errorList.add(e.getUserFriendlyMessage(request.getLocale()));
+		}
+		catch(SizeLimitExceededException e)
+		{
+			// Error is known, don't need to log the error again. Just display something nice to the user
+			errorList.add("The attached files included with this consultation request are too large. Please remove some of the attached files and try again.");
 		}
 		catch(Exception e)
 		{

@@ -310,6 +310,11 @@
 			<form-property name="appointmentCardPhone" type="org.oscarehr.common.model.UserProperty" />
 			<form-property name="appointmentCardFax" type="org.oscarehr.common.model.UserProperty" />
 		</form-bean>
+		<form-bean name="setAppointmentCountPrefsForm" type="org.apache.struts.action.DynaActionForm">
+			<form-property name="appointmentCountIncludeCancelled" type="org.oscarehr.common.model.UserProperty" />
+			<form-property name="appointmentCountIncludeNoShow" type="org.oscarehr.common.model.UserProperty" />
+			<form-property name="appointmentCountIncludeNoPatient" type="org.oscarehr.common.model.UserProperty" />
+		</form-bean>
 		<form-bean name="setMyOscarIdForm" type="org.apache.struts.action.DynaActionForm">
 			<form-property name="myOscarLoginId" type="java.lang.String" />
 		</form-bean>
@@ -1639,8 +1644,11 @@
             <forward name="genCobalt"						path="/provider/setCobalt.jsp"/>
             <forward name="genHideOldEchartLinkInAppt"		path="/provider/setHideOldEchartLinkInAppt.jsp"/>
             <forward name="genBornPrefs"     path="/provider/setBornPrefs.jsp"/>
-             <forward name="genAppointmentCardPrefs"     path="/provider/setAppointmentCardPrefs.jsp"/>
+			<forward name="genAppointmentCardPrefs"     path="/provider/setAppointmentCardPrefs.jsp"/>
         </action>
+		<action path="/setAppointmentCountPrefs" type="org.springframework.web.struts.DelegatingActionProxy" parameter="method" scope="request" input="/provider/setNoteStaleDate.jsp" name="setAppointmentCountPrefsForm">
+			<forward name="genAppointmentCountPrefs"        path="/provider/setAppointmentCountPrefs.jsp"/>
+		</action>
 		<action input="/provider/providerIndivoIdSetter.jsp" name="setMyOscarIdForm" path="/setMyOscarId" scope="request" type="oscar.oscarProvider.pageUtil.ProEditMyOscarIdAction">
 			<forward name="success" path="/provider/providerIndivoIdSetter.jsp" />
 			<forward name="failure" path="/provider/providerIndivoIdSetter.jsp" />

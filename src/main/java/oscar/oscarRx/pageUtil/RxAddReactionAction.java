@@ -22,12 +22,8 @@
  * Ontario, Canada
  */
 
-
 package oscar.oscarRx.pageUtil;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,28 +31,43 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.allergy.dao.AllergyDao;
+import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 
 
-public final class RxAddReactionAction extends Action {
+public final class RxAddReactionAction extends Action
+{
+	private static AllergyDao allergyDao = SpringUtils.getBean(AllergyDao.class);
 
-    public ActionForward execute(ActionMapping mapping,
-				 ActionForm form,
-				 HttpServletRequest request,
-				 HttpServletResponse response)
-	throws IOException, ServletException {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+			// Setup variables
 
-            // Setup variables
-             
-            String id = request.getParameter("ID");
-            String name = request.getParameter("name");
-            String type = request.getParameter("type");
-            
-            
-            request.setAttribute("allergyId",id);
-            request.setAttribute("name",name);
-            request.setAttribute("type", type);
-            
+			String drugrefId = request.getParameter("ID");
+			String name = request.getParameter("name");
+			String type = request.getParameter("type");
+			String allergyToArchive = request.getParameter("allergyToArchive");
 
-            return (mapping.findForward("success"));
-    }
+			Allergy allergy = new Allergy();
+			if (allergyToArchive != null && !allergyToArchive.isEmpty())
+			{
+				try
+				{
+					allergy = allergyDao.find(Integer.parseInt(allergyToArchive));
+				}
+				catch (NumberFormatException ex)
+				{
+					MiscUtils.getLogger().warn("Allergy id " + allergyToArchive + " has no database entry");
+				}
+			}
+
+			request.setAttribute("allergyId", drugrefId);
+			request.setAttribute("name", name);
+			request.setAttribute("type", type);
+			request.setAttribute("allergyToArchive", allergy);
+
+			return (mapping.findForward("success"));
+	}
 }

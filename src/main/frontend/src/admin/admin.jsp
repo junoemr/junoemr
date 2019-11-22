@@ -1,4 +1,4 @@
-/**
+<%--
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -19,28 +19,15 @@
  * CloudPractice Inc.
  * Victoria, British Columbia
  * Canada
- */
-
-package org.oscarehr.integration.myhealthaccess.dto;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.io.Serializable;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ClinicUserAccessTokenTo1 implements Serializable
-{
-	@JsonProperty("access_token")
-	private String token;
-
-	public String getToken()
-	{
-		return token;
-	}
-
-	public void setToken(String token)
-	{
-		this.token = token;
-	}
-}
+--%>
+<div id="admin-page" class="height-100">
+	<div id="admin-page-header" class="row vertical-align">
+		<h3><a href="#!/admin/landingPage" ng-click="AdminCtrl.collapseAllNavGroups()">Administration</a></h3>
+	</div>
+	<div id="admin-page-body" class="row height-100">
+		<div class="admin-side-nav">
+			<accordion-list item-list="AdminCtrl.navList"></accordion-list>
+		</div>
+		<div class="admin-subpage-view height-100" ui-view></div>
+	</div>
+</div>

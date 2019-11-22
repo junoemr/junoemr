@@ -142,15 +142,22 @@ public class EctConConstructSpecialistsScriptsFile
 				ServiceSpecialists ser = (ServiceSpecialists) o[0];
 				ProfessionalSpecialist pro = (ProfessionalSpecialist) o[1];
 				
-				String name = pro.getLastName() + ", " + pro.getFirstName()  + (pro.getProfessionalLetters() == null ? "" : " " + pro.getProfessionalLetters());
-				name = this.escapeString(name);
-				String specId = "" + ser.getId().getSpecId();
-				String phone = pro.getPhoneNumber();
-				String address = pro.getStreetAddress();
-				address = this.escapeString(address);
-				String fax = pro.getFaxNumber();
-				String referralNo = pro.getReferralNo();
-				stringBuffer.append("D(" + servId + ",\"" + specId + "\",\"" + phone + "\",\"" + name + "\",\"" + fax + "\",\"" + address + "\",\"" + referralNo +"\");\n");
+				String name = StringEscapeUtils.escapeJavaScript(pro.getLastName() + ", " + pro.getFirstName()  + (pro.getProfessionalLetters() == null ? "" : " " + pro.getProfessionalLetters()));
+				String specId = ser.getId().getSpecId().toString();
+				String phone = StringEscapeUtils.escapeJavaScript(pro.getPhoneNumber());
+				String address = StringEscapeUtils.escapeJavaScript(pro.getStreetAddress());
+				String fax = StringEscapeUtils.escapeJavaScript(pro.getFaxNumber());
+				String referralNo = StringEscapeUtils.escapeJavaScript(pro.getReferralNo());
+
+				// Simply escaping the parameters isn't enough, need to escape the concatenation as well
+				String newBufferEntry = "D(" + servId + ","
+						+ specId + ","
+						+ "\"" + phone + "\","
+						+ "\"" + name + "\","
+						+ "\"" + fax + "\","
+						+ "\"" + address + "\","
+						+ referralNo + ");\n";
+				stringBuffer.append(newBufferEntry);
 			}
 
 			stringBuffer.append("\n");

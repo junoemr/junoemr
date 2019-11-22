@@ -78,7 +78,7 @@ public class IPRestrictionFilter implements ContainerRequestFilter
 			//don't log the request. This filter may execute before the rate limiting filter
 			request.setProperty(LoggingFilter.PROP_SKIP_LOGGING, true);
 			logger.warn("Request from unauthorized IP blocked: " + requestIp);
-			throw new SecurityException("Unauthorized IP Address");
+			throw new SecurityException("Unauthorized IP Address (" + requestIp + ")");
 		}
 	}
 

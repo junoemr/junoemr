@@ -121,6 +121,46 @@ public class SecurityInfoManager {
 		return hasPrivilege(loggedInInfo, objectName, privilege, String.valueOf(demographicNo));
 	}
 
+	/**
+	 * check if the user has all of the requested privileges
+	 * @param providerNo - provider to check
+	 * @param privilege - privilege to check
+	 * @param demographicNo - demographic on which the check should be preformed (can be null)
+	 * @param hasObjList - a list of security objects to check
+	 * @return - true or false indicating pass or fail of the privilege check.
+	 */
+	public boolean hasPrivileges(String providerNo, String privilege, Integer demographicNo, String... hasObjList)
+	{
+		for(String objectName:hasObjList)
+		{
+			if(!hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * check if the user has any one of the requested privileges
+	 * @param providerNo - provider to check
+	 * @param privilege - privilege to check
+	 * @param demographicNo - demographic on which the check should be preformed (can be null)
+	 * @param hasObjList - a list of security objects to check
+	 * @return - true or false indicating pass or fail of the privilege check.
+	 */
+	public boolean hasOnePrivileges(String providerNo, String privilege, Integer demographicNo, String... hasObjList)
+	{
+		for(String objectName:hasObjList)
+		{
+			if(hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public boolean hasPrivilege(String providerNo, String objectName, String privilege, String demographicNo)
 	{
 		try

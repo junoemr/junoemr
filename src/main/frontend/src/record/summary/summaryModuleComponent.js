@@ -29,6 +29,7 @@ angular.module('Record.Summary').component('summaryModule', {
 		module: '<',
 		itemDisplayCount: '<', // how many list items to display before requiring expansion
 		maxItemNameLength: '<',
+		hideDate: "<?",
 		onclickItem: '&', //callback function
 		onclickAdd: '&', //callback function
 		onclickTitle: '&?', //callback function, called when user clicks the title
@@ -58,6 +59,7 @@ angular.module('Record.Summary').component('summaryModule', {
 			ctrl.onclickItem = ctrl.onclickItem || null;
 			ctrl.onclickAdd = ctrl.onclickAdd || null;
 			ctrl.onclickTitle = ctrl.onclickTitle || null;
+			ctrl.hideDate = ctrl.hideDate || false;
 		};
 
 		ctrl.$onChanges = function(bindingHash)

@@ -1,4 +1,10 @@
 
+@mixin modal-split-pane-colors($color-left, $left-pane-width, $color-right)
+{
+	background: linear-gradient(90deg, $color-left $left-pane-width, $color-right 0), no-repeat 100% 100%;
+}
+
+
 .juno-modal {
 	.modal-dialog {
 		width: $modal-width;

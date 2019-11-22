@@ -154,6 +154,28 @@ public class AppointmentManager {
 		return appointment;
 	}
 
+	public List<Appointment> addRepeatingAppointment(LoggedInInfo loggedInInfo, Appointment appointment, List<Date> dateList)
+	{
+		if(!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null))
+		{
+			throw new RuntimeException("Access Denied");
+		}
+		ArrayList<Appointment> appointments = new ArrayList<>(dateList.size());
+
+		appointment = addAppointment(loggedInInfo, appointment);
+		appointments.add(appointment);
+
+		for(Date date : dateList)
+		{
+			Appointment appointmentCopy = new Appointment(appointment);
+			appointmentCopy.setAppointmentDate(date);
+			appointmentCopy = addAppointment(loggedInInfo, appointmentCopy);
+			appointments.add(appointmentCopy);
+		}
+
+		return appointments;
+	}
+
 	public Appointment updateAppointment(LoggedInInfo loggedInInfo, Appointment appointment) throws Throwable {
 		
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {

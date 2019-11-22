@@ -35,7 +35,6 @@ angular.module('Common.Components').component('junoLoadingIndicator', {
 		let ctrl = this;
 		ctrl.$onInit = function ()
 		{
-			console.info(ctrl.messageAlignment);
 			ctrl.message = ctrl.message || null;
 			ctrl.messageAlignment = ctrl.messageAlignment || 'vertical';
 			ctrl.indicatorType = ctrl.indicatorType || 'spinner';

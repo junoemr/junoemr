@@ -1425,6 +1425,7 @@
 						<exclude>src/main/webapp/popup/atividade.jsp</exclude>
 						<exclude>src/main/webapp/popup/cid.jsp</exclude>
 						<exclude>src/main/webapp/popup/procedimento.jsp</exclude>
+						<exclude>src/main/webapp/provider/setAppointmentCountPrefs.jsp</exclude>
 						<exclude>src/main/java/oscar/entities/S21.java</exclude>
 						<exclude>src/main/java/oscar/entities/S22.java</exclude>
 						<exclude>src/main/java/oscar/entities/S23.java</exclude>

@@ -350,7 +350,7 @@ int maxId = 0;
 	  		<div id="n<%=globalNoteId%>">
 			<%
 				//display last saved note for editing
-				if (note.getNoteId()!=null && !"".equals(note.getNoteId()) && note.getNoteId().intValue() == savedId )
+				if (note.getNoteId()!=null && !"".equals(note.getNoteId()) && note.getNoteId().intValue() == savedId && note.isTextNote())
 				{
 					found = true;
 					%>

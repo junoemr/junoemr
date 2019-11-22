@@ -57,7 +57,8 @@ public class MenuTo1 implements Serializable {
 		return this;
 	}
 	
-	public MenuTo1 addWithState(Integer id, String label, String extra, String state) {
+	public MenuTo1 addWithState(Integer id, String label, String extra, String state)
+	{
 		MenuItemTo1 item = new MenuItemTo1();
 		item.setId(id);
 		item.setLabel(label);
@@ -66,6 +67,19 @@ public class MenuTo1 implements Serializable {
 		
 		getItems().add(item);
 		
+		return this;
+	}
+
+	public MenuTo1 addWithStates(Integer id, String label, String extra, List<String> states)
+	{
+		MenuItemTo1 item = new MenuItemTo1();
+		item.setId(id);
+		item.setLabel(label);
+		item.setExtra(extra);
+		item.setState(states);
+
+		getItems().add(item);
+
 		return this;
 	}
 

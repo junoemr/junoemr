@@ -25,6 +25,7 @@ package org.oscarehr.consultations.service;
 import com.lowagie.text.DocumentException;
 import com.sun.xml.messaging.saaj.util.ByteInputStream;
 import com.sun.xml.messaging.saaj.util.ByteOutputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -45,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationPDFCreator;
 import oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ImagePDFCreator;
@@ -66,7 +66,8 @@ import java.util.List;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class ConsultationPDFCreationService
 {
-	private long maxMemoryUsage = OscarProperties.getInstance().getPDFMaxMemUsage();
+	// 256*1024*1024 (256MB)
+	private static final long maxMemoryUsage = 268435456L;
 
 	private static final Logger logger = MiscUtils.getLogger();
 	@Autowired
@@ -190,11 +191,32 @@ public class ConsultationPDFCreationService
 		return streamList;
 	}
 
-	public OutputStream combineStreams(List<InputStream> streams, OutputStream outputStream)
+	/**
+	 * Helper function to combine several InputStreams and combine into a single temporary PDF.
+	 * Used for previewing prints and for faxing purposes
+	 * @param streams list of streams we want to concatenate
+	 * @param outputStream the output stream to merge all the streams into
+	 * @throws IOException if any of the InputStreams can't be read
+	 * @return number of bytes over the limit, or 0 if we succeeded
+	 */
+	public long combineStreams(List<InputStream> streams, OutputStream outputStream)
+			throws IOException
 	{
-		//TODO this is dumb. make it not dumb
+		long totalSize = 0L;
+		for (InputStream inputStream : streams)
+		{
+			totalSize += inputStream.available();
+		}
+		if (totalSize > maxMemoryUsage)
+		{
+			long excessSize = totalSize - maxMemoryUsage;
+			String displaySize = FileUtils.byteCountToDisplaySize(excessSize);
+			MiscUtils.getLogger().error("Total size of the streams is too large, over limit by: " + displaySize);
+			return excessSize;
+		}
+
 		ConcatPDF.concat(new ArrayList<>(streams), outputStream);
-		return outputStream;
+		return 0L;
 	}
 
 	public InputStream getConsultationRequestAsStream(HttpServletRequest request, LoggedInInfo loggedInInfo) throws IOException, DocumentException

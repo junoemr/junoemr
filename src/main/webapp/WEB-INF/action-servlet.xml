@@ -172,7 +172,15 @@
 		<property name="userPropertyDAO" ref="UserPropertyDAO" />
 	</bean>
 
+<<<<<<< HEAD
 	<bean name="/saveWorkView" class="org.oscarehr.provider.web.ProviderViewAction" scope="singleton">
+=======
+	<bean name="/setAppointmentCountPrefs" class="org.oscarehr.provider.web.ProviderPropertyAction" singleton="false">
+		<property name="userPropertyDAO" ref="UserPropertyDAO" />
+	</bean>
+
+	<bean name="/saveWorkView" class="org.oscarehr.provider.web.ProviderViewAction" singleton="false">
+>>>>>>> origin/juno
 		<property name="userViewDAO" ref="viewDao" />
 	</bean>
 

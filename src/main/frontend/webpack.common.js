@@ -63,12 +63,12 @@ module.exports = {
 			filename: 'index.jsp'
 		}),
 		new HtmlWebpackPlugin({
-			template: 'raw-loader!./faxConfiguration.jsp',
-			filename: 'faxConfiguration.jsp'
+			template: 'raw-loader!./legacyFaxConfiguration.jsp',
+			filename: 'legacyFaxConfiguration.jsp'
 		}),
 		new HtmlWebpackPlugin({
-			template: 'raw-loader!./faxSendReceive.jsp',
-			filename: 'faxSendReceive.jsp'
+			template: 'raw-loader!./legacyFaxSendReceive.jsp',
+			filename: 'legacyFaxSendReceive.jsp'
 		}),
 		new HtmlWebpackPlugin({
 			template: 'raw-loader!./Know2actConfiguration.jsp',
@@ -210,6 +210,7 @@ module.exports = {
 			'./src/common/directives/clinicaid/ca_field_date3.js',
 			'./src/common/directives/clinicaid/ca_field_date.js',
 			'./src/common/directives/clinicaid/ca_field_number.js',
+			'./src/common/directives/clinicaid/ca_field_radio.js',
 			'./src/common/directives/clinicaid/ca_field_select.js',
 			'./src/common/directives/clinicaid/ca_field_text.js',
 			'./src/common/directives/clinicaid/ca_field_time.js',
@@ -233,6 +234,8 @@ module.exports = {
 			'./src/common/components/modalComponent.js',
 			'./src/common/components/loadingIndicatorComponent.js',
 			'./src/common/components/zeroStateDisplayComponent.js',
+			'./src/common/components/accordionList/accordionListComponent.js',
+			'./src/common/components/iconCard/iconCardComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
@@ -240,7 +243,7 @@ module.exports = {
 			'./src/layout/leftAsideComponent.js',
 
 			'./src/patient/module.js',
-			'./src/patient/newPatientController.js',
+			'./src/patient/addDemographicModal/addDemographicModalComponent.js',
 			'./src/patient/demographicCardComponent.js',
 
 			'./src/dashboard/module.js',
@@ -291,10 +294,12 @@ module.exports = {
 			'./src/admin/integration/fax/faxConfigurationController.js',
 			'./src/admin/integration/fax/faxConfigurationEditController.js',
 			'./src/admin/integration/fax/faxSendReceiveController.js',
+			'./src/admin/integration/landingPage/landingPageComponent.js',
 			'./src/admin/integration/know2act/module.js',
 			'./src/admin/integration/know2act/Know2actConfigController.js',
 			'./src/admin/integration/know2act/Know2actNotificationController.js',
 			'./src/admin/integration/know2act/Know2actTemplateController.js',
+			'./src/admin/integration/frameContent/frameContentController.js',
 
 			'./src/billing/billingController.js',
 
