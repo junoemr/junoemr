@@ -966,7 +966,7 @@
 
 
 		<td align="right" valign="bottom" >
-			<span>New!</span>
+
 			<a href="javascript: function myFunction() {return false; }" onClick="popup(700,1024,'../scratch/index.jsp','scratch')"><span id="oscar_scratch"></span></a>&nbsp;
 
 			<a href=# onClick="popupPage(700,1024,'<%=resourceBaseUrl%>')">
