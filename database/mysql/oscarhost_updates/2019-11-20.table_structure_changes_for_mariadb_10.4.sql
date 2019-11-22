@@ -37,9 +37,6 @@ ALTER TABLE formSelfAssessment ENGINE = MyISAM;
 ALTER TABLE formType2Diabetes ENGINE = MyISAM;
 ALTER TABLE formVTForm ENGINE = MyISAM;
 ALTER TABLE formfollowup ENGINE = MyISAM;
-ALTER TABLE formintakea ENGINE = MyISAM;
-ALTER TABLE formintakeb ENGINE = MyISAM;
-ALTER TABLE formintakec ENGINE = MyISAM;
 ALTER TABLE formovulation ENGINE = MyISAM;
 ALTER TABLE formreceptionassessment ENGINE = MyISAM;
 
