@@ -898,10 +898,10 @@ private long getAppointmentRowSpan(
 				</c:if>
 				<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
 					<li id="admin2">
-						<a href="../telehealth/myhealthaccess.do?method=startTelehealth"
-							 id="myhealthaccess"
-							 title='MyHealthAccess'
-							 target="_blank">MyHealthAccess</a>
+						<a href="../telehealth/myhealthaccess.do?method=openTelehealth&siteName=<%= selectedSite != null ? selectedSite : "" %>"
+						   id="myhealthaccess"
+						   title='MyHealthAccess'
+						   target="_blank">MyHealthAccess</a>
 					</li>
 				</c:if>
 
@@ -967,7 +967,7 @@ private long getAppointmentRowSpan(
 
 
 		<td align="right" valign="bottom" >
-			<span>New!</span>
+
 			<a href="javascript: function myFunction() {return false; }" onClick="popup(700,1024,'../scratch/index.jsp','scratch')"><span id="oscar_scratch"></span></a>&nbsp;
 
 			<a href=# onClick="popupPage(700,1024,'<%=resourceBaseUrl%>')">
@@ -1679,7 +1679,7 @@ private long getAppointmentRowSpan(
 												}
 
 
-												// Load appointmentInfo bean for this appointment
+													// Load appointmentInfo bean for this appointment
 												appointmentInfo.init(
 													appointment,
 													curUser_no,
@@ -1714,11 +1714,11 @@ private long getAppointmentRowSpan(
 													showEChart
 												);
 
-												// These are for the appointmentFormLinks.jspf
-												String demographic_no = appointment.getDemographicNo().toString();
-												String appointment_no = appointment.getAppointmentNo().toString();
+													// These are for the appointmentFormLinks.jspf
+													String demographic_no = appointment.getDemographicNo().toString();
+													String appointment_no = appointment.getAppointmentNo().toString();
 
-												String demo_alert = "";
+													String demo_alert = "";
 
 
 
@@ -1875,7 +1875,7 @@ private long getAppointmentRowSpan(
 														<c:if test="<%= appointmentInfo.isVirtual() && org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
 																<a href="#"
 																	 onClick='popupPage(800, 1280,
-																					 "../telehealth/myhealthaccess.do?method=startTelehealth" +
+																					 "../telehealth/myhealthaccess.do?method=openTelehealth" +
 																					 "&demographicNo=${appointmentInfo.demographicNo}" +
 																					 "&siteName=${appointmentInfo.siteName}" +
                                                                                      "&appt=${appointmentInfo.appointmentNo}");return false;'

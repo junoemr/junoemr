@@ -115,7 +115,7 @@ angular.module("Schedule").service("scheduleService", [
 					"&providerview=" +      encodeURIComponent(Juno.Common.Util.toTrimmedString(params.providerview)) +
 					"&user_no=" +           encodeURIComponent(Juno.Common.Util.toTrimmedString(params.user_no)) +
 					"&apptProvider_no=" +   encodeURIComponent(Juno.Common.Util.toTrimmedString(params.apptProvider_no)) +
-					"&appointment_date=" +  encodeURIComponent(Juno.Common.Util.toTrimmedString(params.appointment_date)) +
+					"&appointment_date=" +  encodeURIComponent(Juno.Common.Util.toTrimmedString(params.appointmentDate)) +
 					"&start_time=" +        encodeURIComponent(Juno.Common.Util.toTrimmedString(params.start_time)) +
 					"&bNewForm=" +          encodeURIComponent(Juno.Common.Util.toTrimmedString(params.bNewForm)) +
 					"&referral_no_1=" +     encodeURIComponent(Juno.Common.Util.toTrimmedString(params.referral_no_1))
