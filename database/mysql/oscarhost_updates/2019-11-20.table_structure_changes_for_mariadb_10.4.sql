@@ -1,6 +1,8 @@
+ALTER TABLE consultationRequests ROW_FORMAT = Dynamic;
 ALTER TABLE consultationResponse ROW_FORMAT = Dynamic;
 ALTER TABLE EyeformConsultationReport ROW_FORMAT = Dynamic;
 ALTER TABLE hl7_obr ROW_FORMAT = Dynamic;
+ALTER TABLE professionalSpecialists ROW_FORMAT = Dynamic;
 
 ALTER TABLE formAR ENGINE = MyISAM;
 ALTER TABLE formAdf ENGINE = MyISAM;
@@ -35,7 +37,11 @@ ALTER TABLE formSelfAssessment ENGINE = MyISAM;
 ALTER TABLE formType2Diabetes ENGINE = MyISAM;
 ALTER TABLE formVTForm ENGINE = MyISAM;
 ALTER TABLE formfollowup ENGINE = MyISAM;
+ALTER TABLE formintakea ENGINE = MyISAM;
 ALTER TABLE formintakeb ENGINE = MyISAM;
+ALTER TABLE formintakec ENGINE = MyISAM;
 ALTER TABLE formovulation ENGINE = MyISAM;
 ALTER TABLE formreceptionassessment ENGINE = MyISAM;
+
+
 
