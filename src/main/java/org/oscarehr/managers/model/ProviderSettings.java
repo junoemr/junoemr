@@ -39,7 +39,7 @@ public class ProviderSettings {
 	private String newTicklerWarningWindow;
 	private String workloadManagement;
 	private String ticklerWarningProvider;
-	private String ticklerViewOnlyMine;
+	private Boolean ticklerViewOnlyMine;
 	
 	private boolean useCobaltOnLogin;
 
@@ -706,12 +706,12 @@ public class ProviderSettings {
 		this.intakeFormEnabled = intakeFormEnabled;
 	}
 
-	public String getTicklerViewOnlyMine()
+	public Boolean getTicklerViewOnlyMine()
 	{
 		return ticklerViewOnlyMine;
 	}
 
-	public void setTicklerViewOnlyMine(String ticklerViewOnlyMine)
+	public void setTicklerViewOnlyMine(Boolean ticklerViewOnlyMine)
 	{
 		this.ticklerViewOnlyMine = ticklerViewOnlyMine;
 	}

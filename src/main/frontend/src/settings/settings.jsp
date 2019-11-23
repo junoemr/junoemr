@@ -179,13 +179,13 @@
 
 					<div class="form-group col-sm-6">
 						<label>Default Tickler View</label>
-						<div class="">
+						<div>
 							<label class="checkbox-inline" for="all-ticklers-radio">
-								<input ng-model="settingsCtrl.pref.ticklerViewOnlyMine" name="tickler-view-radios" id="all-ticklers-radio" value="disabled" type="radio">
+								<input ng-model="settingsCtrl.pref.ticklerViewOnlyMine" name="tickler-view-radios" id="all-ticklers-radio" ng-value="false" type="radio">
 								All ticklers
 							</label>
 							<label class="checkbox-inline" for="onlymine-ticklers-radio">
-								<input ng-model="settingsCtrl.pref.ticklerViewOnlyMine" name="tickler-view-radios" id="onlymine-ticklers-radio" value="enabled" type="radio">
+								<input ng-model="settingsCtrl.pref.ticklerViewOnlyMine" name="tickler-view-radios" id="onlymine-ticklers-radio" ng-value="true" type="radio">
 								View mine only
 							</label>
 						</div>

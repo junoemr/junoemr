@@ -43,7 +43,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 import oscar.log.LogAction;
+import oscar.util.ConversionUtils;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -256,11 +258,18 @@ public class ProviderManager2 {
 
 		if (map.get(UserProperty.TICKLER_VIEW_ONLY_MINE) != null)
 		{
-			settings.setTicklerViewOnlyMine(map.get(UserProperty.TICKLER_VIEW_ONLY_MINE).getValue());
+			try
+			{
+				settings.setTicklerViewOnlyMine(ConversionUtils.parseBoolean(map.get(UserProperty.TICKLER_VIEW_ONLY_MINE).getValue()));
+			}
+			catch (ParseException e)
+			{
+				settings.setTicklerViewOnlyMine(false);
+			}
 		}
 		else
 		{
-			settings.setTicklerViewOnlyMine("disabled");
+			settings.setTicklerViewOnlyMine(false);
 		}
 
 		if(map.get(UserProperty.SCHEDULE_SITE) != null)
@@ -669,7 +678,7 @@ public class ProviderManager2 {
 		p.setValue(settings.isCppSingleLine()?"yes":"no");
 
 		p = getMappedOrNewProperty(map, UserProperty.TICKLER_VIEW_ONLY_MINE, providerNo);
-		p.setValue(settings.getTicklerViewOnlyMine());
+		p.setValue(settings.getTicklerViewOnlyMine().toString());
 		
 		p = getMappedOrNewProperty(map, PreferenceManager.CUSTOM_SUMMARY_ENABLE, providerNo);
 		p.setValue(settings.isSummaryItemCustomDisplay()?"on":"off"); 	

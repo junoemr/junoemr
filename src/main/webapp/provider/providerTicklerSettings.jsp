@@ -82,9 +82,9 @@
 		<h3>Default Tickler View</h3>
 		<hr>
 		<label for="view-onlymine-off">View All</label>
-		<input id="view-onlymine-off" type="radio" name="ticklerViewOnlyMine" value="disabled" <%=!ticklerOnlyMine ? "checked" : ""%>/>
+		<input id="view-onlymine-off" type="radio" name="ticklerViewOnlyMine" value="false" <%=!ticklerOnlyMine ? "checked" : ""%>/>
 		<label for="view-onlymine-on">View Only Mine</label>
-		<input id="view-onlymine-on" type="radio" name="ticklerViewOnlyMine" value="enabled" <%=ticklerOnlyMine ? "checked" : ""%>/>
+		<input id="view-onlymine-on" type="radio" name="ticklerViewOnlyMine" value="true" <%=ticklerOnlyMine ? "checked" : ""%>/>
 		<br>
 		<input type="submit" value="save">
 	</form>

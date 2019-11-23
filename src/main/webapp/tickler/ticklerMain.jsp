@@ -915,8 +915,6 @@
 
 							function changeSite(sel)
 							{
-								console.log(_providers[sel.value]);
-								console.log('<%=assignedTo%>');
 								sel.form.assignedTo.innerHTML = sel.value == "none" ? "" : _providers[sel.value];
 							}
 						</script>

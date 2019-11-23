@@ -58,7 +58,7 @@ public class TicklerSettingsAction extends DispatchAction
 		{
 			userPropertyDAO.saveProp(provider.getProviderNo(),
 							UserProperty.TICKLER_VIEW_ONLY_MINE,
-							ticklerSettingsForm.getTicklerViewOnlyMine());
+							ticklerSettingsForm.getTicklerViewOnlyMine().toString());
 			return mapping.findForward("success");
 		}
 		catch (Exception e)

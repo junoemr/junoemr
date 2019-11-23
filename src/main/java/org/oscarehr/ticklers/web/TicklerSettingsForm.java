@@ -27,14 +27,14 @@ import org.apache.struts.action.ActionForm;
 
 public class TicklerSettingsForm extends ActionForm
 {
-	private String ticklerViewOnlyMine;
+	private Boolean ticklerViewOnlyMine;
 
-	public String getTicklerViewOnlyMine()
+	public Boolean getTicklerViewOnlyMine()
 	{
 		return ticklerViewOnlyMine;
 	}
 
-	public void setTicklerViewOnlyMine(String ticklerViewOnlyMine)
+	public void setTicklerViewOnlyMine(Boolean ticklerViewOnlyMine)
 	{
 		this.ticklerViewOnlyMine = ticklerViewOnlyMine;
 	}

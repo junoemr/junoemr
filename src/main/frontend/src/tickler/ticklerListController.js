@@ -74,7 +74,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 					providerService.getSettings().then(
 						function(settings)
 						{
-							if (settings.ticklerViewOnlyMine === "enabled")
+							if (settings.ticklerViewOnlyMine)
 							{
 								providerService.getMe().then(
 										function(user)
