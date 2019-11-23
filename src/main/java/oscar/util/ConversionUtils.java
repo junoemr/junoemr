@@ -94,20 +94,17 @@ public class ConversionUtils {
 		return result;
 	}
 
-	public static Boolean stringToBoolean(String str) throws ParseException
+	public static Boolean parseBoolean(String str) throws ParseException
 	{
 		List<String> trueList = Arrays.asList("ON", "YES", "TRUE", "ENABLED");
 		List<String> falseList = Arrays.asList("OFF", "NO", "FALSE", "DISABLED");
 
-		if (str == null)
-		{
-			return false;
-		}
-		else if (trueList.contains(str.toUpperCase()))
+
+		if (str != null && trueList.contains(str.toUpperCase()))
 		{
 			return true;
 		}
-		else if (falseList.contains(str.toUpperCase()))
+		else if (str == null || falseList.contains(str.toUpperCase()))
 		{
 			return false;
 		}
@@ -571,7 +568,7 @@ public class ConversionUtils {
 					.toFormatter();
 
 			LocalDateTime parsedDate = LocalDateTime.parse(dateString, customFormatter);
-			returnDate = Date.from(parsedDate.toInstant(OffsetDateTime.now(ZoneId.systemDefault()).getOffset()));
+			returnDate = Date.from(parsedDate.atZone(ZoneId.systemDefault()).toInstant());
 
 			logger.debug("Transform " + dateString + " to " + parsedDate.format(inFormatter));
 		}

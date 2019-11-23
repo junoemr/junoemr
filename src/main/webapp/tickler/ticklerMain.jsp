@@ -108,7 +108,7 @@
 	UserProperty ticklerOnlyMine = ((UserPropertyDAO) SpringUtils.getBean(UserPropertyDAO.class)).getProp(loggedInInfo.getLoggedInProvider().getProviderNo(),
 					UserProperty.TICKLER_VIEW_ONLY_MINE);
 
-	if (ticklerOnlyMine != null && ConversionUtils.stringToBoolean(ticklerOnlyMine.getValue()))
+	if (ticklerOnlyMine != null && ConversionUtils.parseBoolean(ticklerOnlyMine.getValue()))
 	{
 		if ("all".equals(assignedTo) && request.getParameter("assignedTo") == null)
 		{

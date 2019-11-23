@@ -33,9 +33,9 @@
 	UserProperty ticklerOnlyMineProp = ((UserPropertyDAO) SpringUtils.getBean(UserPropertyDAO.class)).getProp(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProvider().getProviderNo(),
 					UserProperty.TICKLER_VIEW_ONLY_MINE);
 	boolean ticklerOnlyMine = false;
-	boolean isError = ConversionUtils.stringToBoolean(request.getParameter("error"));
+	boolean isError = ConversionUtils.parseBoolean(request.getParameter("error"));
 
-	if (ticklerOnlyMineProp != null && ConversionUtils.stringToBoolean(ticklerOnlyMineProp.getValue()))
+	if (ticklerOnlyMineProp != null && ConversionUtils.parseBoolean(ticklerOnlyMineProp.getValue()))
 	{
 		ticklerOnlyMine = true;
 	}
