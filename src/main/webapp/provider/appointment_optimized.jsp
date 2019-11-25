@@ -771,8 +771,8 @@
 
 <table BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%" id="firstTable" class="noprint">
 	<tr>
-		<td align="center" >
-			<a href="../web/" title="OSCAR EMR"><img src="<%=request.getContextPath()%>/images/oscar_small.png" border="0"></a>
+		<td align="center" style="width: 50px">
+			<a href="../web/" title="OSCAR EMR"><img src="<%=request.getContextPath()%>/images/logo-primary.png" border="0"></a>
 		</td>
 		<td id="firstMenu">
 			<ul id="navlist">
