@@ -335,7 +335,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				return consultService.searchRequests(search1).then(
 					function success(result)
 					{
-						params.total(parseInt(result.meta.total[0]));
+						params.total(parseInt(result.meta.total));
 
 						for (var i = 0; i < result.data.length; i++)
 						{
