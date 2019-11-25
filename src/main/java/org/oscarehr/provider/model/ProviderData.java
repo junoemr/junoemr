@@ -116,6 +116,8 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	private String albertaTakNo = null;
 	@Column(name = "alberta_e_delivery_ids")
 	private String albertaEDeliveryIds = null;
+	@Column(name = "alberta_connect_care_id")
+	private String albertaConnectCareId;
 
 	public ProviderData() {
 	}
@@ -400,5 +402,14 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
         	return pd1.getId().compareTo(pd2.getId());
         }
     };
-	
+
+	public String getAlbertaConnectCareId()
+	{
+		return albertaConnectCareId;
+	}
+
+	public void setAlbertaConnectCareId(String albertaConnectCareId)
+	{
+		this.albertaConnectCareId = albertaConnectCareId;
+	}
 }
