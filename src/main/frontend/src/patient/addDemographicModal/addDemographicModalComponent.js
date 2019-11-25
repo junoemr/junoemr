@@ -1,3 +1,4 @@
+import {SystemPreferenceApi} from "../../../generated/api/SystemPreferenceApi";
 
 angular.module('Patient').component('addDemographicModal', {
 	templateUrl: 'src/patient/addDemographicModal/addDemographicModal.jsp',
@@ -7,12 +8,16 @@ angular.module('Patient').component('addDemographicModal', {
 	},
 	controller:[
 		'$scope',
+		'$http',
+		'$httpParamSerializer',
 		'staticDataService',
 		'demographicService',
 		'programService',
 		'providerService',
 		function (
 			$scope,
+			$http,
+			$httpParamSerializer,
 			staticDataService,
 			demographicService,
 			programService,
@@ -23,6 +28,9 @@ angular.module('Patient').component('addDemographicModal', {
 		ctrl.provinces = staticDataService.getProvinces();
 		ctrl.provincesCA = staticDataService.getCanadaProvinces();
 		ctrl.newDemographicData = {};
+
+		ctrl.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
+			'../ws/rs');
 
 		// personal data
 		ctrl.newDemographicData.lastName = "";
@@ -65,6 +73,45 @@ angular.module('Patient').component('addDemographicModal', {
 			}
 		);
 
+		// Pull phone prefix from Oscar Properties file
+		ctrl.systemPreferenceApi.getPropertyValue("phoneprefix", "").then(
+			function success(results)
+			{
+				ctrl.newDemographicData.phone = results.data.body;
+			},
+			function error(errors)
+			{
+				console.log("errors::" + errors);
+			}
+		);
+
+		// Pull default province, priority is user defined property then system-wide default HC if no property set
+		ctrl.systemPreferenceApi.getPreferenceValue("HC_Type", "").then(
+			function success(results)
+			{
+				if (results.data.body !== "")
+				{
+					ctrl.newDemographicData.address.province = results.data.body;
+				}
+				else
+				{
+					ctrl.systemPreferenceApi.getPropertyValue("hctype", "BC").then(
+						function success(results)
+						{
+							ctrl.newDemographicData.address.province = results.data.body;
+						},
+						function error(errors)
+						{
+							console.log("errors::" + errors);
+						}
+					)
+				}
+			},
+			function error(errors)
+			{
+				console.log("errors::" + errors);
+			}
+		);
 		// set defaults based on provider settings
 		providerService.getSettings().then(
 				function success(result)
