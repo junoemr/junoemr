@@ -72,7 +72,6 @@ if(!authed) {
 <%@page import="org.oscarehr.util.DigitalSignatureUtils"%>
 <%@page import="org.oscarehr.util.EmailUtilsOld"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="org.oscarehr.util.MiscUtils"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
 <%@page import="org.oscarehr.util.WebUtilsOld"%>
 <%@page import="org.springframework.web.context.WebApplicationContext" %>
@@ -94,6 +93,7 @@ if(!authed) {
 <%@ page import="java.util.List" %>
 <%@ page import="java.time.LocalDate" %>
 <%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="static org.caisi.comp.web.WebComponentUtil.getServletContext" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
@@ -129,7 +129,17 @@ if(!authed) {
 	}
 
 	String demo = request.getParameter("de");
+	if (demo == null)
+	{
+		demo = (String)request.getAttribute("demo");
+	}
+
 	String requestId = request.getParameter("requestId");
+	if (requestId == null || requestId.isEmpty() || requestId.equals("null"))
+	{
+		requestId = (String)request.getAttribute("reqId");
+	}
+
 	boolean isNewConsultation = (requestId == null);
 	// segmentId is != null when viewing a remote consultation request from an hl7 source
 	String segmentId = request.getParameter("segmentId");
@@ -141,13 +151,19 @@ if(!authed) {
 
 	RxProviderData rx = new RxProviderData();
 	List<Provider> prList = rx.getAllProviders();
-	Provider thisProvider = rx.getProvider(providerNo);
 	ClinicData clinic = new ClinicData();
 
 	EctConsultationFormRequestUtil consultUtil = new EctConsultationFormRequestUtil();
 
-	if(requestId != null) consultUtil.estRequestFromId(loggedInInfo, requestId);
-	if(demo == null) demo = consultUtil.demoNo;
+	if(requestId != null)
+	{
+		consultUtil.estRequestFromId(loggedInInfo, requestId);
+	}
+
+	if(demo == null)
+	{
+		demo = consultUtil.demoNo;
+	}
 
 	ArrayList<String> users = (ArrayList<String>) session.getServletContext().getAttribute("CaseMgmtUsers");
 	boolean useNewCmgmt = false;
@@ -163,10 +179,6 @@ if(!authed) {
 	UserProperty fmtProperty = userPropertyDAO.getProp(providerNo, UserProperty.CONSULTATION_REQ_PASTE_FMT);
 	String pasteFmt = fmtProperty != null ? fmtProperty.getValue() : null;
 
-	if (demo == null)
-	{
-		demo = (String)request.getAttribute("demo");
-	}
 
 	if(demo != null)
 	{
@@ -176,10 +188,7 @@ if(!authed) {
 
 		providerNoFromChart = demographic.getProviderNo();
 	}
-	else if(requestId == null && segmentId == null)
-	{
-		MiscUtils.getLogger().debug("Missing both requestId and segmentId.");
-	}
+
 	consultUtil.estActiveTeams();
 
 	boolean validPatientEmail = false;
@@ -194,6 +203,7 @@ if(!authed) {
 %>
 <script type="text/javascript">
 	alert("The form could not be printed due to the following error:\n<%=errorToDisplay%>");
+	window.location.replace("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp?de=<%=demo%>&requestId=<%=requestId%>");
 </script>
 <%
 	}
@@ -206,7 +216,7 @@ if(!authed) {
 <c:set var="ctx" value="${pageContext.request.contextPath}" scope="request"/>
 <script>
 	var ctx = '<%=request.getContextPath()%>';
-	var requestId = '<%=request.getParameter("requestId")%>';
+	var requestId = '<%=requestId%>';
 	var demographicNo = '<%=demo%>';
 	var demoNo = '<%=demo%>';
 	var appointmentNo = '<%=appNo%>';
