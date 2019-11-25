@@ -129,7 +129,6 @@ public class CaseManagementPrint {
 		{
 			cpp = getIssueNotesToPrint(providerNo, demoNo);
 		}
-
 		List<CaseManagementNote> othermeds = null;
 		if (printRx)
 		{
@@ -164,7 +163,10 @@ public class CaseManagementPrint {
 			CaseManagementPrintPdf printer = new CaseManagementPrintPdf(request, out);
 			printer.printDocHeaderFooter();
 			printer.printCPP(cpp);
-			printer.printRx(demoNo, othermeds);
+			if(printRx)
+			{
+				printer.printRx(demoNo, othermeds);
+			}
 			printer.printNotes(notes);
 
 			/* check extensions */
