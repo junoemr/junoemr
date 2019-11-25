@@ -859,7 +859,7 @@
 								<html:hidden property="demographicNo" value="<%=new Integer(patient.getDemographicNo()).toString()%>" />
 								<table border="0">
 									<tr valign="top">
-										<td style="width:330px">
+										<td style="width:330px;display:block">
 											<label for="searchString" ><bean:message key="SearchDrug.drugSearchTextBox"  /></label>
 											<!-- had autocomplete: off -->
 											<html:text styleId="searchString" property="searchString" onfocus="changeContainerHeight();" onblur="changeContainerHeight();" onclick="changeContainerHeight();" onkeydown="changeContainerHeight();" style="width:248px;"  />
