@@ -33,6 +33,20 @@
 		<ap-output>${appointment_date}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>appt_date2</ap-name>
+		<ap-sql>SELECT DATE_FORMAT(appointment_date, "%d-%m-%Y") AS appointment_date
+			FROM appointment
+			WHERE appointment_no=${appt_no}</ap-sql>
+		<ap-output>${appointment_date}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>appt_date3</ap-name>
+		<ap-sql>SELECT DATE_FORMAT(appointment_date, "%m-%d-%Y") AS appointment_date
+			FROM appointment
+			WHERE appointment_no=${appt_no}</ap-sql>
+		<ap-output>${appointment_date}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>appt_start_time</ap-name>
 		<ap-sql>
 			SELECT DATE_FORMAT(start_time, '%H:%i') AS start_time
