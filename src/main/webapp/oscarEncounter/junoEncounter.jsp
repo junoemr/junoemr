@@ -46,7 +46,7 @@
 			 type="org.oscarehr.casemgmt.web.formbeans.JunoEncounterFormBean"/>
 
 <fmt:parseDate value="${junoEncounterForm.header.encounterNoteHideBeforeDate}"
-			   pattern="EEE MMM dd HH:mm:ss z yyyy"
+			   pattern="EEE MMM dd HH:mm:ss z y"
 			   var="encounterNoteHideBeforeDateParsed"/>
 
 <fmt:formatDate value="${encounterNoteHideBeforeDateParsed}"
@@ -2094,6 +2094,88 @@
 				return foundIdx;
 			}
 
+			/*
+			XXX: just get the date range here, not the list of notes
+			 */
+			/*
+			function printDateRange()
+			{
+				var sdate = $F("printStartDate");
+				var edate = $F("printEndDate");
+				if (sdate.length == 0 || edate.length == 0)
+				{
+					alert("<bean:message key="oscarEncounter.printDate.msg"/>");
+					return false;
+				}
+
+				var tmp = sdate.split("-");
+				var formatdate = tmp[1] + " " + tmp[0] + ", " + tmp[2];
+				var msbeg = Date.parse(formatdate);
+
+				tmp = edate.split("-");
+				formatdate = tmp[1] + " " + tmp[0] + ", " + tmp[2];
+				var msend = Date.parse(formatdate);
+
+				if (msbeg > msend)
+				{
+					alert("<bean:message key="oscarEncounter.printDateOrder.msg"/>");
+					return false;
+				}
+
+				//cycle through container divs for each note
+				var idx;
+				var noteId;
+				var notesDiv;
+				var noteDate = null;
+				var msnote;
+				var pos;
+				var imgId;
+
+				for (idx = 1; idx <= maxNcId; ++idx)
+				{
+
+					if ($("nc" + idx) == null) continue;
+					noteDate = null;
+					notesDiv = $("nc" + idx).down('div');
+					noteId = notesDiv.id.substr(1);  //get note id
+					if (noteId == 0) continue;
+
+					imgId = "print" + noteId;
+					if ($(imgId) == null) continue;
+
+					if ($("obs" + noteId) != null)
+						noteDate = $("obs" + noteId).innerHTML;
+					else if ($("observationDate") != null)
+						noteDate = $F("observationDate");
+
+					//trim leading and trailing whitespace from date
+					noteDate = noteDate.replace(/^\s+|\s+$/g, "");
+
+					if (noteDate != null)
+					{
+						//grab date and splice off time and format for js date object
+						noteDate = noteDate.substr(0, noteDate.indexOf(" "));
+						tmp = noteDate.split("-");
+						formatdate = tmp[1] + " " + tmp[0] + ", " + tmp[2];
+						msnote = Date.parse(formatdate);
+						pos = noteIsQeued(noteId);
+
+						if (msnote >= msbeg && msnote <= msend)
+						{
+							if (pos == -1)
+								addPrintQueue(noteId);
+						}
+						else if (pos >= 0)
+						{
+							removePrintQueue(noteId, pos);
+						}
+					}
+				}
+
+				return true;
+			}
+			*/
+
 			function removePrintQueue(noteId, idx)
 			{
 				var unselected = ctx + "/oscarEncounter/graphics/printer.png";
@@ -2139,6 +2221,53 @@
 				$("printOps").style.right = (pageWidth() - Event.pointerX(e)) + "px";
 				$("printOps").style.bottom = (pageHeight() - Event.pointerY(e)) + "px";
 				$("printOps").style.display = "block";
+				return false;
+			}
+
+			function printNotes()
+			{
+
+				var printConfig = {
+					printType: null,
+					dates: {
+						start: null,
+						end: null
+					},
+					cpp: false,
+					rx: false,
+					labs: false,
+					selectedList: ["672338", "672337"]
+				};
+
+				console.log(printConfig);
+
+				/*
+				if ($("printopDates").checked && !printDateRange())
+				{
+					return false;
+				}
+				else if ($("printopAll").checked)
+				{
+					printAll();
+				}
+
+				if ($F("notes2print").length == 0 && $F("printCPP") == "false" && $F("printRx") == "false" && $F("printLabs") == "false")
+				{
+					var nothing2PrintMsg = '<bean:message key="oscarEncounter.nothingToPrint.msg"/>';
+					alert(nothing2PrintMsg);
+					return false;
+				}
+
+				var url = ctx + "/CaseManagementEntry.do";
+				var frm = document.forms["caseManagementEntryForm"];
+
+				frm.method.value = "print";
+
+				frm.pStartDate.value = $F("printStartDate");
+				frm.pEndDate.value = $F("printEndDate");
+				frm.submit();
+				*/
+
 				return false;
 			}
 

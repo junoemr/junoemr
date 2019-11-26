@@ -240,6 +240,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 
 		Locale locale = request.getLocale();
 
+		Date hideBeforeDate = getEncounterNoteHideBeforeDate(session);
 
 		// Get data for the header
 		junoEncounterForm.setHeader(
@@ -261,7 +262,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 						appointmentNo,
 						contextPath,
 						encounterSessionBean.source,
-						getEncounterNoteHideBeforeDate(session)
+						hideBeforeDate
 				)
 		);
 
@@ -515,7 +516,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 			String strStaleDate = uProp.getValue();
 			if (strStaleDate.equalsIgnoreCase("A"))
 			{
-				cal.set(0, 1, 1);
+				cal.set(1970, 1, 1);
 			} else if (strStaleDate.equalsIgnoreCase("0"))
 			{
 				cal.add(Calendar.MONTH, 1);
