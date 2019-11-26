@@ -2111,21 +2111,7 @@
 				specialty.specialtydesc,
 				IF(dc.role = '25', 'INTERNAL', NULL), # Role 25 is not found in the specialty table
 				dc.role,
-				'-') SEPARATOR ' | ') AS role
-			FROM DemographicContact dc
-
-			LEFT JOIN specialty
-			ON dc.role REGEXP '^[0-9]+$' # Only join on role when it's an int. If it's a string then take it 'as-is'
-			AND (dc.role = specialty.specialty OR CONCAT('0', dc.role) = specialty.specialty)
-
-			WHERE dc.demographicNo=${demographic};
-		</ap-sql>
-		<ap-output>${role}</ap-output>
-	</databaseap>
-	<databaseap>
-		<ap-name>healthcare_team_address</ap-name>
-		<ap-sql>
-			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.address, ''), NULLIF(Contact.address, ''), NULLIF(professionalSpecialists.address, ''), '-') SEPARATOR ' | ') AS address
+				'') SEPARATOR ' | ') AS role
 			FROM DemographicContact dc
 
 			LEFT JOIN provider
@@ -2140,7 +2126,37 @@
 			ON dc.contactId = professionalSpecialists.specId
 			AND dc.type = 3
 
-			WHERE demographicNo=${demographic};
+			LEFT JOIN specialty
+			ON dc.role REGEXP '^[0-9]+$' # Only join on role when it's an int. If it's a string then take it 'as-is'
+			AND (dc.role = specialty.specialty OR CONCAT('0', dc.role) = specialty.specialty)
+
+			WHERE dc.demographicNo=${demographic}
+
+			ORDER BY provider.last_name, Contact.lastName, professionalSpecialists.lName;
+		</ap-sql>
+		<ap-output>${role}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>healthcare_team_address</ap-name>
+		<ap-sql>
+			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.address, ''), NULLIF(Contact.address, ''), NULLIF(professionalSpecialists.address, ''), '') SEPARATOR ' | ') AS address
+			FROM DemographicContact dc
+
+			LEFT JOIN provider
+			ON dc.contactId = provider.provider_no
+			AND dc.type = 0
+
+			LEFT JOIN Contact
+			ON dc.contactId = Contact.id
+			AND dc.type = 2
+
+			LEFT JOIN professionalSpecialists
+			ON dc.contactId = professionalSpecialists.specId
+			AND dc.type = 3
+
+			WHERE demographicNo=${demographic}
+
+			ORDER BY provider.last_name, Contact.lastName, professionalSpecialists.lName;;
 		</ap-sql>
 		<ap-output>${address}</ap-output>
 	</databaseap>
