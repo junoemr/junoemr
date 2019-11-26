@@ -34,6 +34,7 @@ import oscar.oscarRx.data.RxPrescriptionData;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class MedicationMapper extends AbstractMapper
@@ -75,7 +76,13 @@ public class MedicationMapper extends AbstractMapper
 				endDate = getAdministrationStopDate(rep);
 				if(endDate == null)
 				{
-					endDate = startDate; //end date can't be null
+					// try to calculate from TQ1
+					endDate = getCalculatedEndDate(rep, startDate);
+					if (endDate == null)
+					{
+						//end date can't be null
+						endDate = startDate;
+					}
 				}
 				break;
 			}
@@ -232,15 +239,18 @@ public class MedicationMapper extends AbstractMapper
 
 	private Date getCalculatedEndDate(int rep, Date rxDate)
 	{
-		List<String> durationUnits = Arrays.asList("W","M","D");
-		Integer duration = getServiceDurationQuantity(rep, 0);
-		String durationUnit = getServiceDurationUnit(rep, 0);
-		int repeats = getNumberOfRefills(rep);
-
-		if(rxDate != null && duration > 0 && durationUnit != null && durationUnits.contains(durationUnit.substring(0, 1).toUpperCase()))
+		if (hasTimingQuantity(rep))
 		{
-			durationUnit = durationUnit.substring(0, 1).toUpperCase();
-			return RxPrescriptionData.Prescription.calcEndDate(rxDate, duration.toString(), durationUnit, repeats);
+			List<String> durationUnits = Arrays.asList("W", "M", "D", "Y");
+			Integer duration = getServiceDurationQuantity(rep, 0);
+			String durationUnit = translateDurationUnits(getServiceDurationUnit(rep, 0));
+			int repeats = getNumberOfRefills(rep);
+
+			if (rxDate != null && duration > 0 && durationUnit != null && durationUnits.contains(durationUnit.substring(0, 1).toUpperCase()))
+			{
+				durationUnit = durationUnit.substring(0, 1).toUpperCase();
+				return RxPrescriptionData.Prescription.calcEndDate(rxDate, duration.toString(), durationUnit, repeats);
+			}
 		}
 		return null;
 	}
@@ -332,6 +342,11 @@ public class MedicationMapper extends AbstractMapper
 
 	// ---- TIMING_QUANTITY ----
 
+	private boolean hasTimingQuantity(int rep)
+	{
+		return provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1Reps() > 0;
+	}
+
 	public Integer getQuantity(int rep, int tq1Rep)
 	{
 		String quantityStr = StringUtils.trimToNull(provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(tq1Rep)
@@ -373,6 +388,33 @@ public class MedicationMapper extends AbstractMapper
 	{
 		return StringUtils.trimToNull(provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(tq1Rep)
 				.getTq16_ServiceDuration().getCq2_Units().getCe1_Identifier().getValue());
+	}
+
+	/**
+	 * translate duration unit in to standard form.
+	 * @param durationUnit - unit to translate
+	 * @return - the standard format of the duration unit
+	 */
+	private String translateDurationUnits(String durationUnit)
+	{
+		HashMap<String, String> durationHash = new HashMap<>();
+
+		durationHash.put("W", "W");
+		durationHash.put("D", "D");
+		durationHash.put("M", "M");
+		durationHash.put("Week", "W");
+		durationHash.put("Day", "D");
+		durationHash.put("MO30", "M");
+		durationHash.put("Year", "Y");
+
+		if (durationHash.containsKey(durationUnit))
+		{
+			return durationHash.get(durationUnit);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Duration [" + durationUnit + "] has no mapping");
+		}
 	}
 
 	// ---- RXE ----
