@@ -15,7 +15,7 @@ CREATE INDEX IF NOT EXISTS demo_last_first_hin_sex_Index ON demographic(demograp
 CREATE INDEX IF NOT EXISTS demo_script_pos_rxdate_Index ON drugs(demographic_no, script_no, position, rx_date, drugid);
 CREATE INDEX IF NOT EXISTS demo_status_dateIndex ON tickler(demographic_no, status, service_date);
 CREATE INDEX IF NOT EXISTS drugs_demographic_no ON drugs(demographic_no);
-CREATE INDEX IF NOT EXISTS eform_values_varname_varvalue ON eform_values(var_name, var_value);
+CREATE INDEX IF NOT EXISTS eform_values_varname_varvalue ON eform_values(var_name, var_value (30));
 CREATE INDEX IF NOT EXISTS icd9Index ON icd9(icd9);
 CREATE INDEX IF NOT EXISTS id_by_subject_Index ON messagetbl(messageid, sentby, thesubject);
 CREATE INDEX IF NOT EXISTS id_que_doc_status_Index ON queue_document_link(id, queue_id, document_id, status);
