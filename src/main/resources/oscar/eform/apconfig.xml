@@ -2018,6 +2018,99 @@
 		</ap-sql>
 		<ap-output>${list}</ap-output>
 	</databaseap>
+	<databaseap>
+		<ap-name>healthcare_team_nameF</ap-name>
+		<ap-sql>
+			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.first_name, ''), NULLIF(Contact.firstName, ''), NULLIF(professionalSpecialists.fName, ''), '-') SEPARATOR ' | ') AS fName
+			FROM DemographicContact
+
+			LEFT JOIN provider
+			ON DemographicContact.contactId = provider.provider_no
+			AND DemographicContact.type = 0
+
+			LEFT JOIN Contact
+			ON DemographicContact.contactId = Contact.id
+			AND DemographicContact.type = 2
+
+			LEFT JOIN professionalSpecialists
+			ON DemographicContact.contactId = professionalSpecialists.specId
+			AND DemographicContact.type = 3
+
+			WHERE demographicNo=${demographic};
+		</ap-sql>
+		<ap-output>${fName}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>healthcare_team_nameL</ap-name>
+		<ap-sql>
+			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.last_name, ''), NULLIF(Contact.lastName, ''), NULLIF(professionalSpecialists.lName, ''), '-') SEPARATOR ' | ') AS lName
+			FROM DemographicContact
+
+			LEFT JOIN provider
+			ON DemographicContact.contactId = provider.provider_no
+			AND DemographicContact.type = 0
+
+			LEFT JOIN Contact
+			ON DemographicContact.contactId = Contact.id
+			AND DemographicContact.type = 2
+
+			LEFT JOIN professionalSpecialists
+			ON DemographicContact.contactId = professionalSpecialists.specId
+			AND DemographicContact.type = 3
+
+			WHERE demographicNo=${demographic};
+		</ap-sql>
+		<ap-output>${lName}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>healthcare_team_fax</ap-name>
+		<ap-sql>
+			SELECT GROUP_CONCAT(COALESCE(NULLIF(property.value, ''), NULLIF(Contact.fax, ''),  NULLIF(professionalSpecialists.fax, ''), '-') SEPARATOR ' | ') AS faxNumber
+			FROM DemographicContact
+
+			LEFT JOIN provider
+			ON DemographicContact.contactId = provider.provider_no
+			AND DemographicContact.type = 0
+
+			LEFT JOIN property
+			ON property.provider_no = DemographicContact.contactId
+			AND DemographicContact.type = 0
+			AND property.name='faxnumber'
+
+			LEFT JOIN Contact
+			ON DemographicContact.contactId = Contact.id
+			AND DemographicContact.type = 2
+
+			LEFT JOIN professionalSpecialists
+			ON DemographicContact.contactId = professionalSpecialists.specId
+			AND DemographicContact.type = 3
+
+			WHERE demographicNo=${demographic};
+		</ap-sql>
+		<ap-output>${faxNumber}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>healthcare_team_phone</ap-name>
+		<ap-sql>
+			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.work_phone, ''), NULLIF(Contact.workPhone, ''), NULLIF(professionalSpecialists.phone, ''), '-') SEPARATOR ' | ') AS phone
+			FROM DemographicContact
+
+			LEFT JOIN provider
+			ON DemographicContact.contactId = provider.provider_no
+			AND DemographicContact.type = 0
+
+			LEFT JOIN Contact
+			ON DemographicContact.contactId = Contact.id
+			AND DemographicContact.type = 2
+
+			LEFT JOIN professionalSpecialists
+			ON DemographicContact.contactId = professionalSpecialists.specId
+			AND DemographicContact.type = 3
+
+			WHERE demographicNo=${demographic};
+		</ap-sql>
+		<ap-output>${phone}</ap-output>
+	</databaseap>
 
 	<!-- family doctor -->
 	<databaseap>
