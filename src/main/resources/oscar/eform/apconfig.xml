@@ -2021,7 +2021,9 @@
 	<databaseap>
 		<ap-name>healthcare_team_nameF</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.first_name, ''), NULLIF(Contact.firstName, ''), NULLIF(professionalSpecialists.fName, ''), '-') SEPARATOR ' | ') AS fName
+			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.first_name, ''), NULLIF(Contact.firstName, ''), NULLIF(professionalSpecialists.fName, ''), '')
+				ORDER BY COALESCE(NULLIF(provider.last_name, ''), NULLIF(Contact.lastName, ''), NULLIF(professionalSpecialists.lName, ''), '-') ASC
+				SEPARATOR ' | ') AS fName
 			FROM DemographicContact
 
 			LEFT JOIN provider
@@ -2043,7 +2045,9 @@
 	<databaseap>
 		<ap-name>healthcare_team_nameL</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.last_name, ''), NULLIF(Contact.lastName, ''), NULLIF(professionalSpecialists.lName, ''), '-') SEPARATOR ' | ') AS lName
+			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.last_name, ''), NULLIF(Contact.lastName, ''), NULLIF(professionalSpecialists.lName, ''), '')
+				ORDER BY COALESCE(NULLIF(provider.last_name, ''), NULLIF(Contact.lastName, ''), NULLIF(professionalSpecialists.lName, ''), '-') ASC
+				SEPARATOR ' | ') AS lName
 			FROM DemographicContact
 
 			LEFT JOIN provider
@@ -2065,7 +2069,9 @@
 	<databaseap>
 		<ap-name>healthcare_team_fax</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(COALESCE(NULLIF(property.value, ''), NULLIF(Contact.fax, ''),  NULLIF(professionalSpecialists.fax, ''), '-') SEPARATOR ' | ') AS faxNumber
+			SELECT GROUP_CONCAT(COALESCE(NULLIF(property.value, ''), NULLIF(Contact.fax, ''),  NULLIF(professionalSpecialists.fax, ''), '')
+				ORDER BY COALESCE(NULLIF(provider.last_name, ''), NULLIF(Contact.lastName, ''), NULLIF(professionalSpecialists.lName, ''), '-') ASC
+				SEPARATOR ' | ') AS faxNumber
 			FROM DemographicContact
 
 			LEFT JOIN provider
@@ -2092,7 +2098,9 @@
 	<databaseap>
 		<ap-name>healthcare_team_phone</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.work_phone, ''), NULLIF(Contact.workPhone, ''), NULLIF(professionalSpecialists.phone, ''), '-') SEPARATOR ' | ') AS phone
+			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.work_phone, ''), NULLIF(Contact.workPhone, ''), NULLIF(professionalSpecialists.phone, ''), '')
+				ORDER BY COALESCE(NULLIF(provider.last_name, ''), NULLIF(Contact.lastName, ''), NULLIF(professionalSpecialists.lName, ''), '-') ASC
+				SEPARATOR ' | ') AS phone
 			FROM DemographicContact
 
 			LEFT JOIN provider
@@ -2110,6 +2118,62 @@
 			WHERE demographicNo=${demographic};
 		</ap-sql>
 		<ap-output>${phone}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>healthcare_team_role</ap-name>
+		<ap-sql>
+			SELECT GROUP_CONCAT(COALESCE(
+					specialty.specialtydesc,
+					IF(dc.role = '25', 'INTERNAL', NULL), # Role 25 is not found in the specialty table
+					dc.role,
+					'')
+				ORDER BY COALESCE(NULLIF(provider.last_name, ''), NULLIF(Contact.lastName, ''), NULLIF(professionalSpecialists.lName, ''), '-') ASC
+				SEPARATOR ' | ') AS role
+			FROM DemographicContact dc
+
+			LEFT JOIN provider
+			ON dc.contactId = provider.provider_no
+			AND dc.type = 0
+
+			LEFT JOIN Contact
+			ON dc.contactId = Contact.id
+			AND dc.type = 2
+
+			LEFT JOIN professionalSpecialists
+			ON dc.contactId = professionalSpecialists.specId
+			AND dc.type = 3
+
+			LEFT JOIN specialty
+			ON dc.role REGEXP '^[0-9]+$' # Only join on role when it's an int. If it's a string then take it 'as-is'
+			AND (dc.role = specialty.specialty OR CONCAT('0', dc.role) = specialty.specialty)
+
+			WHERE dc.demographicNo=${demographic};
+		</ap-sql>
+		<ap-output>${role}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>healthcare_team_address</ap-name>
+		<ap-sql>
+			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.address, ''), NULLIF(Contact.address, ''), NULLIF(professionalSpecialists.address, ''), '')
+				ORDER BY COALESCE(NULLIF(provider.last_name, ''), NULLIF(Contact.lastName, ''), NULLIF(professionalSpecialists.lName, ''), '-') ASC
+				SEPARATOR ' | ') AS address
+			FROM DemographicContact dc
+
+			LEFT JOIN provider
+			ON dc.contactId = provider.provider_no
+			AND dc.type = 0
+
+			LEFT JOIN Contact
+			ON dc.contactId = Contact.id
+			AND dc.type = 2
+
+			LEFT JOIN professionalSpecialists
+			ON dc.contactId = professionalSpecialists.specId
+			AND dc.type = 3
+
+			WHERE demographicNo=${demographic};
+		</ap-sql>
+		<ap-output>${address}</ap-output>
 	</databaseap>
 
 	<!-- family doctor -->
@@ -2197,62 +2261,6 @@
 		<ap-output>${referralNo}</ap-output>
 	</databaseap>
 	<!-- end family doctor -->
-	<databaseap>
-		<ap-name>healthcare_team_role</ap-name>
-		<ap-sql>
-			SELECT GROUP_CONCAT(COALESCE(
-				specialty.specialtydesc,
-				IF(dc.role = '25', 'INTERNAL', NULL), # Role 25 is not found in the specialty table
-				dc.role,
-				'') SEPARATOR ' | ') AS role
-			FROM DemographicContact dc
-
-			LEFT JOIN provider
-			ON dc.contactId = provider.provider_no
-			AND dc.type = 0
-
-			LEFT JOIN Contact
-			ON dc.contactId = Contact.id
-			AND dc.type = 2
-
-			LEFT JOIN professionalSpecialists
-			ON dc.contactId = professionalSpecialists.specId
-			AND dc.type = 3
-
-			LEFT JOIN specialty
-			ON dc.role REGEXP '^[0-9]+$' # Only join on role when it's an int. If it's a string then take it 'as-is'
-			AND (dc.role = specialty.specialty OR CONCAT('0', dc.role) = specialty.specialty)
-
-			WHERE dc.demographicNo=${demographic}
-
-			ORDER BY provider.last_name, Contact.lastName, professionalSpecialists.lName;
-		</ap-sql>
-		<ap-output>${role}</ap-output>
-	</databaseap>
-	<databaseap>
-		<ap-name>healthcare_team_address</ap-name>
-		<ap-sql>
-			SELECT GROUP_CONCAT(COALESCE(NULLIF(provider.address, ''), NULLIF(Contact.address, ''), NULLIF(professionalSpecialists.address, ''), '') SEPARATOR ' | ') AS address
-			FROM DemographicContact dc
-
-			LEFT JOIN provider
-			ON dc.contactId = provider.provider_no
-			AND dc.type = 0
-
-			LEFT JOIN Contact
-			ON dc.contactId = Contact.id
-			AND dc.type = 2
-
-			LEFT JOIN professionalSpecialists
-			ON dc.contactId = professionalSpecialists.specId
-			AND dc.type = 3
-
-			WHERE demographicNo=${demographic}
-
-			ORDER BY provider.last_name, Contact.lastName, professionalSpecialists.lName;;
-		</ap-sql>
-		<ap-output>${address}</ap-output>
-	</databaseap>
 	<!-- BC family doctor -->
 	<databaseap>
 		<ap-name>bc_family_doctor_name</ap-name>
