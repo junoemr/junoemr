@@ -71,7 +71,7 @@ public class EctViewRequestAction extends Action {
 	
 	@Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse  response)	throws ServletException, IOException {
-		checkPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request));
+		securityInfoManager.requireOnePrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), "r", null, "_con");
 
 		EctViewRequestForm frm = (EctViewRequestForm) form;
 
@@ -79,7 +79,7 @@ public class EctViewRequestAction extends Action {
 
 		logger.debug("Id:"+frm.getRequestId());
 		logger.debug("SegmentId:"+request.getParameter("segmentId"));
-		
+
 		return mapping.findForward("success");
 	}
 	
@@ -120,7 +120,7 @@ public class EctViewRequestAction extends Action {
 
 
         public static void fillFormValues(LoggedInInfo loggedInInfo, EctConsultationFormRequestForm thisForm, Integer requestId) {
-        	checkPrivilege(loggedInInfo);
+			securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), "r", null, "_con");
         	
             ConsultationRequestDao consultDao = (ConsultationRequestDao)SpringUtils.getBean("consultationRequestDao");
             ConsultationRequest consult = consultDao.find(requestId);
@@ -292,10 +292,4 @@ public class EctViewRequestAction extends Action {
 
 	}
 	
-	
-	private static void checkPrivilege(LoggedInInfo loggedInInfo) {
-        if(!securityInfoManager.hasPrivilege(loggedInInfo, "_con", "r", null)) {
-			throw new SecurityException("missing required security object (_con)");
-		}
-	}
 }
