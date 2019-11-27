@@ -113,6 +113,7 @@ public class MedicationMapper extends AbstractMapper
 		drug.setSpecialInstruction(getPharmacyInstructions(rep));
 
 		drug.setSpecial(generateSpecial(drug));
+
 		return drug;
 	}
 
@@ -239,7 +240,7 @@ public class MedicationMapper extends AbstractMapper
 
 	private Date getCalculatedEndDate(int rep, Date rxDate)
 	{
-		if (hasTimingQuantity(rep))
+		if (hasTimingQuantity(rep) && getServiceDurationUnit(rep, 0) != null)
 		{
 			List<String> durationUnits = Arrays.asList("W", "M", "D", "Y");
 			Integer duration = getServiceDurationQuantity(rep, 0);
