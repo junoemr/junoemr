@@ -203,7 +203,7 @@ if(!authed) {
 %>
 <script type="text/javascript">
 	alert("The form could not be printed due to the following error:\n<%=errorToDisplay%>");
-	window.location.replace("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp?de=<%=demo%>&requestId=<%=requestId%>");
+	window.location.replace("<%=request.getContextPath()%>/oscarEncounter/ViewRequest.do?de=<%=demo%>&requestId=<%=requestId%>");
 </script>
 <%
 	}
