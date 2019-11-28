@@ -1471,7 +1471,7 @@ function updateDemoExtras(extKey, newVal, posExtras, oldExtras, newExtras)
 function buildDate(year, month, day)
 {
 	if (dateEmpty(year, month, day)) return "";
-	if (date3Valid(year, month, day)) return year + "-" + month + "-" + day;
+	if (date3Valid(year, month, day)) return year + "-" + month + "-" + day + "T00:00:00" + Juno.Common.Util.getUserISOTimezoneOffset();
 	return null;
 }
 
