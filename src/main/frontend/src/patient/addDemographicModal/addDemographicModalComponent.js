@@ -182,7 +182,6 @@ angular.module('Patient').component('addDemographicModal', {
 		{
 			if (ctrl.validateDemographic())
 			{
-				ctrl.newDemographicData.dateOfBirth += "T00:00:00" + Juno.Common.Util.getUserISOTimezoneOffset();
 				demographicService.saveDemographic(ctrl.newDemographicData).then(
 					function success(results)
 					{
