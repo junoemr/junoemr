@@ -79,16 +79,18 @@ public class Provider implements Serializable, Comparable<Provider>{
 	private String providerActivity;
 	private String firstName;
 	private String rmaNo;
-    private Date SignedConfidentiality;
-    private String practitionerNo;
-    private String email;
-    private String title;
-    private String lastUpdateUser;
-    private Date lastUpdateDate = new Date();
-    private String supervisor;
-    /* -- Province specific -- */
+	private Date SignedConfidentiality;
+	private String practitionerNo;
+	private String email;
+	private String title;
+	private String lastUpdateUser;
+	private Date lastUpdateDate = new Date();
+	private String supervisor;
+	/* -- Province specific (AB) -- */
 	private String albertaTakNo;
 	private String albertaEDeliveryIds;
+	private String albertaConnectCareId;
+	/* -- Province specific (AB) -- */
 	private Boolean superAdmin = false;
 
 	public String getPractitionerNo() {
@@ -428,6 +430,16 @@ public class Provider implements Serializable, Comparable<Provider>{
 
 	public void setAlbertaEDeliveryIds(String albertaEDeliveryIds) {
 		this.albertaEDeliveryIds = StringUtils.trimToNull(albertaEDeliveryIds);
+	}
+
+	public String getAlbertaConnectCareId()
+	{
+		return albertaConnectCareId;
+	}
+
+	public void setAlbertaConnectCareId(String albertaConnectCareId)
+	{
+		this.albertaConnectCareId = albertaConnectCareId;
 	}
 
 	/* -- other methods --*/

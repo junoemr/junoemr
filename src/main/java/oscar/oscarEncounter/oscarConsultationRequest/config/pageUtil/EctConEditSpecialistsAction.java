@@ -26,6 +26,7 @@
 package oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.servlet.ServletException;
@@ -101,6 +102,7 @@ public class EctConEditSpecialistsAction extends Action {
 		}
 
 		// not delete request, just update one entry
+		Locale locale = getLocale(request);
 		ProfessionalSpecialist professionalSpecialist=professionalSpecialistDao.find(Integer.parseInt(specId));
 
 		int updater = 0;
@@ -133,8 +135,7 @@ public class EctConEditSpecialistsAction extends Action {
         
 		request.setAttribute("upd", new Integer(updater));
 		EctConConstructSpecialistsScriptsFile constructSpecialistsScriptsFile = new EctConConstructSpecialistsScriptsFile();
-		request.setAttribute("verd", constructSpecialistsScriptsFile.makeFile());
-		constructSpecialistsScriptsFile.makeString(request.getLocale());
+		constructSpecialistsScriptsFile.makeString(locale);
 		return mapping.findForward("success");
 	}
 }

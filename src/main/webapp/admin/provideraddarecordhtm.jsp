@@ -366,6 +366,10 @@ for (int i=0; i<sites.size(); i++) {
 			<td><input type="text" name="alberta_e_delivery_ids"></td>
 		</tr>
 		<tr>
+			<td align="right"><bean:message key="admin.provider.formAlbertaConnectCareId" />:</td>
+			<td><input type="text" name="alberta_connect_care_provider_id"></td>
+		</tr>
+		<tr>
 			<td align="right"><bean:message key="admin.provider.formAlbertaTakNo" />:
 			</td>
 			<td><input type="text" name="alberta_tak_no" maxlength="20"></td>

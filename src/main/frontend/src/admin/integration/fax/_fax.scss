@@ -54,7 +54,6 @@
 	.switch {
 		@include juno-toggle-switch(32px, 4px, .4s);
 	}
-
 	.modal-content {
 		background-color: $color-primary-base;
 	}

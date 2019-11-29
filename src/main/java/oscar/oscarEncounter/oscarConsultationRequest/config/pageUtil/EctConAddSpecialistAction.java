@@ -60,13 +60,13 @@ public class EctConAddSpecialistAction extends Action {
 		}
 		
 		ProfessionalSpecialist professionalSpecialist=null;
-		EctConAddSpecialistForm addSpecailistForm = (EctConAddSpecialistForm)form;
+		EctConAddSpecialistForm addSpecialistForm = (EctConAddSpecialistForm)form;
 
-		int whichType = addSpecailistForm.getwhichType();
+		int whichType = addSpecialistForm.getwhichType();
 		if(whichType == 1) //create
 		{
 			professionalSpecialist=new ProfessionalSpecialist();
-			populateFields(professionalSpecialist, addSpecailistForm);
+			populateFields(professionalSpecialist, addSpecialistForm);
 			if (professionalSpecialist.getReferralNo() != null && professionalSpecialist.getReferralNo().length() > 0) {
 				if (referralNoValid(professionalSpecialist.getReferralNo())) {
 					if (referralNoInUse(professionalSpecialist.getReferralNo())) {
@@ -84,9 +84,9 @@ public class EctConAddSpecialistAction extends Action {
 		{
             request.setAttribute("upd", true);
 
-			Integer specId = Integer.parseInt(addSpecailistForm.getSpecId());
+			Integer specId = Integer.parseInt(addSpecialistForm.getSpecId());
 			professionalSpecialist=professionalSpecialistDao.find(specId);
-			populateFields(professionalSpecialist, addSpecailistForm);
+			populateFields(professionalSpecialist, addSpecialistForm);
 			if (professionalSpecialist.getReferralNo() != null && professionalSpecialist.getReferralNo().length() > 0) {
 				if (referralNoValid(professionalSpecialist.getReferralNo())) {
 					if (referralNoInUse(professionalSpecialist.getReferralNo(), specId)) {
@@ -105,10 +105,34 @@ public class EctConAddSpecialistAction extends Action {
 			logger.error("missed a case, whichType="+whichType);
 		}
 
-		addSpecailistForm.resetForm();
-
 		String added=""+professionalSpecialist.getFirstName()+" "+professionalSpecialist.getLastName();
 		request.setAttribute("Added", added);
+		request.setAttribute("specId", addSpecialistForm.getSpecId());
+		request.setAttribute("fName", addSpecialistForm.getFirstName());
+		request.setAttribute("lName", addSpecialistForm.getLastName());
+		request.setAttribute("proLetters", addSpecialistForm.getProLetters());
+		request.setAttribute("address", addSpecialistForm.getAddress());
+		request.setAttribute("phone", addSpecialistForm.getPhone());
+		request.setAttribute("fax", addSpecialistForm.getFax());
+		request.setAttribute("website", addSpecialistForm.getWebsite());
+		request.setAttribute("email", addSpecialistForm.getEmail());
+		request.setAttribute("specType", addSpecialistForm.getSpecType());
+		request.setAttribute("eDataUrl", addSpecialistForm.geteDataUrl());
+		request.setAttribute("eDataOscarKey", addSpecialistForm.geteDataOscarKey());
+		request.setAttribute("eDataServiceKey", addSpecialistForm.geteDataServiceKey());
+		request.setAttribute("eDataServiceName", addSpecialistForm.geteDataServiceName());
+		request.setAttribute("annotation", addSpecialistForm.getAnnotation());
+		request.setAttribute("referralNo", addSpecialistForm.getReferralNo());
+		request.setAttribute("institution", addSpecialistForm.getInstitution());
+		request.setAttribute("department", addSpecialistForm.getDepartment());
+		request.setAttribute("privatePhoneNumber", addSpecialistForm.getPrivatePhoneNumber());
+		request.setAttribute("cellPhoneNumber", addSpecialistForm.getCellPhoneNumber());
+		request.setAttribute("pagerNumber", addSpecialistForm.getPagerNumber());
+		request.setAttribute("salutation", addSpecialistForm.getSalutation());
+		request.setAttribute("hideFromView", addSpecialistForm.getHideFromView());
+		request.setAttribute("eformId", addSpecialistForm.getEformId());
+
+		addSpecialistForm.resetForm();
 		return mapping.findForward("success");
 	}
 

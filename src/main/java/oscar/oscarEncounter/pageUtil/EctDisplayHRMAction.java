@@ -35,6 +35,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
+import oscar.OscarProperties;
 import oscar.oscarLab.ca.on.HRMResultsData;
 import oscar.util.DateUtils;
 import oscar.util.StringUtils;
@@ -50,9 +51,13 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 	public boolean getInfo(EctSessionBean bean, HttpServletRequest request, NavBarDisplayDAO Dao, MessageResources messages) {
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		
-    	if(!securityInfoManager.hasPrivilege(loggedInInfo, "_hrm", "r", null)) {
-			return true; //Prevention link won't show up on new CME screen.
-		} else {
+		if(!securityInfoManager.hasPrivilege(loggedInInfo, "_hrm", "r", null)
+				|| !OscarProperties.getInstance().hasHRMDocuments())
+		{
+			return true; // HRM section does not show up at all
+		}
+		else
+		{
 
 			String winName = "docs" + bean.demographicNo;
 			String url = "popupPage(500,1115,'" + winName + "', '" + request.getContextPath() + "/hospitalReportManager/displayHRMDocList.jsp?demographic_no=" + bean.demographicNo + "')";
