@@ -53,7 +53,7 @@ public class EncounterDocumentService extends EncounterSectionService
 	}
 
 	@Override
-	protected String getSectionTitle()
+	protected String getSectionTitleKey()
 	{
 		if (getInboxFlag())
 		{

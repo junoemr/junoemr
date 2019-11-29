@@ -41,6 +41,7 @@
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="oscar.util.StringUtils" %>
 <%@ page import="org.oscarehr.sharingcenter.SharingCenterUtil" %>
+<%@ page import="java.util.UUID"%>
 
 <jsp:useBean id="junoEncounterForm" scope="request"
 			 type="org.oscarehr.casemgmt.web.formbeans.JunoEncounterFormBean"/>
@@ -167,6 +168,8 @@
 			var notesRetrieveOk = false;
 			var notesCurrentTop = null;
 			var notesScrollCheckInterval = null;
+			var measurementWindows = new Array();
+			var openWindows = new Object();
 
 			var cppIssues = new Array(7);
 			var cppNames = new Array(7);
@@ -221,6 +224,30 @@
 			exKeys[8] = "Life Stage";
 			exKeys[9] = "Hide Cpp";
 			exKeys[10] = "Problem Description";
+
+			var eChartUUID = "${junoEncounterForm.header.echartUuid}";
+
+			function getEChartUUID()
+			{
+				console.log(eChartUUID);
+				return eChartUUID;
+			}
+
+			function pasteToEncounterNote(txt)
+			{
+				var currentlyEditedNoteId = jQuery('input#editNoteId').val();
+				var currentTextAreaId = "caseNote_note" + currentlyEditedNoteId;
+
+				$(currentTextAreaId).value += "\n" + txt;
+				adjustCaseNote();
+				setCaretPosition($(currentTextAreaId), $(currentTextAreaId).value.length);
+
+			}
+
+			function measurementLoaded(name)
+			{
+				measurementWindows.push(openWindows[name]);
+			}
 
 			function prepareExtraFields(cpp, extObj)
 			{
@@ -1099,7 +1126,24 @@
 				clearTimeout(pageState.autoSaveTimer);
 			}
 
-			function saveEncounterNote(signNote, verifyNote, exitAfterSaving, async)
+			function signSaveBillEncounterNote(event)
+			{
+				document.forms['caseManagementEntryForm'].sign.value='on';
+				document.forms['caseManagementEntryForm'].toBill.value='true';
+
+				var saved = savePage('saveAndExit', '');
+
+				// savePage always returns false, but we can check note differences before redirecting
+				if (origCaseNote === $F(caseNote))
+				{
+					Event.stop(event);
+					maximizeWindow();
+				}
+
+				return saved;
+			}
+
+			function saveEncounterNote(signNote, verifyNote, exitAfterSaving, async, bill)
 			{
 				// Clear state
 				clearNoteError();
@@ -1109,9 +1153,9 @@
 				var demographicNo = getDemographicNo();
 				var noteId = jQuery("input#editNoteId").val();
 
-
 				// Prepare data
 				var noteData = getNoteDataById(noteId);
+				//
 				if(noteId == 0)
 				{
 					// New note, save accordingly
@@ -1123,7 +1167,6 @@
 					}
 					noteData.updateDate = noteData.observationDate;
 				}
-
 
 				if (signNote)
 				{
@@ -1169,8 +1212,7 @@
 
 								if (exitAfterSaving)
 								{
-									// Disabled for testing
-									//window.close();
+									window.close();
 								}
 
 								setNoteStatus("Note successfully saved");
@@ -1210,6 +1252,23 @@
 					adjustCaseNote();
 				}
 
+			}
+
+			function setCaretPosition(input, pos)
+			{
+				if (input.setSelectionRange)
+				{
+					input.focus();
+					input.setSelectionRange(pos, pos);
+				}
+				else if (input.createTextRange)
+				{
+					var range = input.createTextRange();
+					range.collapse(true);
+					range.moveEnd('character', pos);
+					range.moveStart('character', pos);
+					range.select();
+				}
 			}
 
 			//resize case note text area to contain all text
@@ -2094,87 +2153,62 @@
 				return foundIdx;
 			}
 
-			/*
-			XXX: just get the date range here, not the list of notes
-			 */
-			/*
-			function printDateRange()
+			function printToday(e)
 			{
-				var sdate = $F("printStartDate");
-				var edate = $F("printEndDate");
-				if (sdate.length == 0 || edate.length == 0)
+				clearAll(e);
+
+				var today = moment().format("DD-MMM-YYYY");
+				$("printStartDate").value = today;
+				$("printEndDate").value = $F("printStartDate");
+				$("printopDates").checked = true;
+			}
+
+			function printInfo(img, item)
+			{
+				var selected = ctx + "/oscarEncounter/graphics/printerGreen.png";
+				var unselected = ctx + "/oscarEncounter/graphics/printer.png";
+
+				if ($F(item) == "true")
+				{
+					$(img).src = unselected;
+					$(item).value = "false";
+				}
+				else
+				{
+					$(img).src = selected;
+					$(item).value = "true";
+				}
+
+				return false;
+			}
+
+			function getPrintDates()
+			{
+				var startDate = $F("printStartDate");
+				var endDate = $F("printEndDate");
+
+				if(startDate.length == 0 || endDate.length == 0)
 				{
 					alert("<bean:message key="oscarEncounter.printDate.msg"/>");
-					return false;
+					return null;
 				}
 
-				var tmp = sdate.split("-");
-				var formatdate = tmp[1] + " " + tmp[0] + ", " + tmp[2];
-				var msbeg = Date.parse(formatdate);
+				var startMoment = moment(startDate, "DD-MMM-YYYY");
+				var endMoment = moment(endDate, "DD-MMM-YYYY");
 
-				tmp = edate.split("-");
-				formatdate = tmp[1] + " " + tmp[0] + ", " + tmp[2];
-				var msend = Date.parse(formatdate);
-
-				if (msbeg > msend)
+				if(startMoment.isAfter(endMoment))
 				{
 					alert("<bean:message key="oscarEncounter.printDateOrder.msg"/>");
-					return false;
+					return null;
 				}
 
-				//cycle through container divs for each note
-				var idx;
-				var noteId;
-				var notesDiv;
-				var noteDate = null;
-				var msnote;
-				var pos;
-				var imgId;
+				var dateObject = {
+					start: startMoment.toDate(),
+					end: endMoment.toDate()
+				};
 
-				for (idx = 1; idx <= maxNcId; ++idx)
-				{
-
-					if ($("nc" + idx) == null) continue;
-					noteDate = null;
-					notesDiv = $("nc" + idx).down('div');
-					noteId = notesDiv.id.substr(1);  //get note id
-					if (noteId == 0) continue;
-
-					imgId = "print" + noteId;
-					if ($(imgId) == null) continue;
-
-					if ($("obs" + noteId) != null)
-						noteDate = $("obs" + noteId).innerHTML;
-					else if ($("observationDate") != null)
-						noteDate = $F("observationDate");
-
-					//trim leading and trailing whitespace from date
-					noteDate = noteDate.replace(/^\s+|\s+$/g, "");
-
-					if (noteDate != null)
-					{
-						//grab date and splice off time and format for js date object
-						noteDate = noteDate.substr(0, noteDate.indexOf(" "));
-						tmp = noteDate.split("-");
-						formatdate = tmp[1] + " " + tmp[0] + ", " + tmp[2];
-						msnote = Date.parse(formatdate);
-						pos = noteIsQeued(noteId);
-
-						if (msnote >= msbeg && msnote <= msend)
-						{
-							if (pos == -1)
-								addPrintQueue(noteId);
-						}
-						else if (pos >= 0)
-						{
-							removePrintQueue(noteId, pos);
-						}
-					}
-				}
-
-				return true;
+				return dateObject;
 			}
-			*/
 
 			function removePrintQueue(noteId, idx)
 			{
@@ -2214,59 +2248,64 @@
 			function printSetup(e)
 			{
 				if ($F("notes2print").length > 0)
+				{
 					$("printopSelected").checked = true;
+				}
 				else
+				{
 					$("printopAll").checked = true;
+				}
 
 				$("printOps").style.right = (pageWidth() - Event.pointerX(e)) + "px";
 				$("printOps").style.bottom = (pageHeight() - Event.pointerY(e)) + "px";
 				$("printOps").style.display = "block";
+
 				return false;
 			}
 
 			function printNotes()
 			{
+				var printType = null;
+				var dateObject = null;
+
+				if ($("printopAll").checked)
+				{
+					printType = "all";
+				}
+				else if ($("printopDates").checked)
+				{
+					dateObject = getPrintDates();
+
+					if(dateObject == null)
+					{
+						return false;
+					}
+
+					printType = "dates";
+				}
+
+				var selectedNoteCsv = $F("notes2print");
+
+				var noteArray = [];
+				if(selectedNoteCsv.length > 0)
+				{
+					noteArray = selectedNoteCsv.split(",");
+				}
 
 				var printConfig = {
-					printType: null,
-					dates: {
-						start: null,
-						end: null
-					},
-					cpp: false,
-					rx: false,
-					labs: false,
-					selectedList: ["672338", "672337"]
+					printType: printType,
+					dates: dateObject,
+					cpp: $F("printCPP"),
+					rx: $F("printRx"),
+					labs: $F("printLabs"),
+					selectedList: noteArray
 				};
 
-				console.log(printConfig);
+				var jsonString = JSON.stringify(printConfig);
 
-				/*
-				if ($("printopDates").checked && !printDateRange())
-				{
-					return false;
-				}
-				else if ($("printopAll").checked)
-				{
-					printAll();
-				}
+				var url = "../ws/rs/recordUX/" + getDemographicNo() + "/print?printOps=" + encodeURIComponent(jsonString);
 
-				if ($F("notes2print").length == 0 && $F("printCPP") == "false" && $F("printRx") == "false" && $F("printLabs") == "false")
-				{
-					var nothing2PrintMsg = '<bean:message key="oscarEncounter.nothingToPrint.msg"/>';
-					alert(nothing2PrintMsg);
-					return false;
-				}
-
-				var url = ctx + "/CaseManagementEntry.do";
-				var frm = document.forms["caseManagementEntryForm"];
-
-				frm.method.value = "print";
-
-				frm.pStartDate.value = $F("printStartDate");
-				frm.pEndDate.value = $F("printEndDate");
-				frm.submit();
-				*/
+				window.open(url, '_blank');
 
 				return false;
 			}
@@ -2284,7 +2323,7 @@
 				// Trim the notes because that happens when the note is saved
 				if(pageState.currentNoteData.note.trim() != noteData.note.trim())
 				{
-					saveEncounterNote(false, false, true, false);
+					saveEncounterNote(false, false, true, false, false);
 				}
 
 				/*
@@ -2427,17 +2466,6 @@
 				//bindCalculatorListener(calculatorMenu);
 				window.onbeforeunload = onClosing;
 			}
-
-			/*			$(document).ready(function()
-						{
-							init();
-						});
-
-						document.observe('dom:loaded', function(){
-							init();
-						});
-
-			 */
 
 			// XXX: this is here to allow the old notes display to run
 			var showIssue = false;
@@ -3815,7 +3843,7 @@
 			<input tabindex="17" type='image'
 				   src="<c:out value="${ctx}/oscarEncounter/graphics/media-floppy.png"/>"
 				   id="saveImg"
-				   onclick="Event.stop(event);return saveEncounterNote(false, false, false, true);"
+				   onclick="Event.stop(event);return saveEncounterNote(false, false, false, true, false);"
 				   title='<bean:message key="oscarEncounter.Index.btnSave"/>'>&nbsp;
 			<input tabindex="18" type='image'
 				   src="<c:out value="${ctx}/oscarEncounter/graphics/document-new.png"/>"
@@ -3824,17 +3852,17 @@
 			<input tabindex="19" type='image'
 				   src="<c:out value="${ctx}/oscarEncounter/graphics/note-save.png"/>"
 				   id="signSaveImg"
-				   onclick="Event.stop(event);return saveEncounterNote(true, false, true, true);"
+				   onclick="Event.stop(event);return saveEncounterNote(true, false, true, true, false);"
 				   title='<bean:message key="oscarEncounter.Index.btnSignSave"/>'>&nbsp;
 			<input tabindex="20" type='image'
 				   src="<c:out value="${ctx}/oscarEncounter/graphics/verify-sign.png"/>"
 				   id="signVerifyImg"
-				   onclick="Event.stop(event);return saveEncounterNote(true, true, true, true);"
+				   onclick="Event.stop(event);return saveEncounterNote(true, true, true, true, false);"
 				   title='<bean:message key="oscarEncounter.Index.btnSign"/>'>&nbsp;
-			<c:if test="${not empty junoEncounterForm.header.source}">
+			<c:if test="${junoEncounterForm.header.source == null}">
 				<input tabindex="21" type='image'
 					   src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>"
-					   onclick="signSaveBill(event);"
+					   onclick="Event.stop(event);return saveEncounterNote(true, false, true, true, true);"
 					   title='<bean:message key="oscarEncounter.Index.btnBill"/>'>&nbsp;
 			</c:if>
 	    	<input tabindex="23" type='image'
@@ -4246,82 +4274,6 @@
 							</form>
 						</div>
 
-							<%--	XXX: This is used for resident review ("resident_review" property)
-										<%
-										String apptNo = request.getParameter("appointmentNo");
-										if(
-												OscarProperties.getInstance().getProperty("resident_review", "false").equalsIgnoreCase("true") &&
-												loggedInInfo.getLoggedInProvider().getProviderType().equals("resident") &&
-												!"null".equalsIgnoreCase(apptNo) &&
-												!"".equalsIgnoreCase(apptNo)
-										)
-										{
-											ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
-											List<ProviderData> providerList = providerDao.findAllBilling("1");
-									%>
-									<div id="showResident" class="showResident">
-
-										<div class="showResidentBorder residentText">
-											Resident Check List
-
-											<form action="" id="resident" name="resident" onsubmit="return false;">
-												<input type="hidden" name="residentMethod" id="residentMethod" value="">
-												<input type="hidden" name="residentChain" id="residentChain" value="">
-												<table class="showResidentContent">
-													<tr>
-														<td>
-															Was this encounter reviewed?
-														</td>
-														<td>
-															Yes <input type="radio" value="true" name="reviewed">&nbsp;No <input type="radio" value="false" name="reviewed">
-														</td>
-													</tr>
-													<tr class="reviewer" style="display:none">
-														<td class="residentText">
-															Who did you review the encounter with?
-														</td>
-														<td>
-															<select id="reviewer" name="reviewer">
-																<option value="">Choose Reviewer</option>
-																<%
-																	for( ProviderData p : providerList ) {
-																%>
-																<option value="<%=p.getId()%>"><%=p.getLastName() + ", " + p.getFirstName()%></option>
-																<%
-																	}
-																%>
-															</select>
-														</td>
-													</tr>
-													<tr class="supervisor" style="display:none">
-														<td class="residentText">
-															Who is your Supervisor/Monitor for this encounter?
-														</td>
-														<td>
-															<select id="supervisor" name="supervisor">
-																<option value="">Choose Supervisor</option>
-																<%
-																	for( ProviderData p : providerList ) {
-																%>
-																<option value="<%=p.getId()%>"><%=p.getLastName() + ", " + p.getFirstName()%></option>
-																<%
-																	}
-																%>
-															</select>
-														</td>
-													</tr>
-													<tr>
-														<td colspan="2">
-															<input id="submitResident" value="Continue" name="submitResident" type="submit" onclick="return subResident();"/>
-															<input id="submitResident" value="Return to Chart" name="submitResident" type="submit" onclick="return cancelResident();"/>
-														</td>
-													</tr>
-												</table>
-											</form>
-										</div>
-
-									</div>
-									<%}%>--%>
 
 						<script type="text/javascript">
 							/*

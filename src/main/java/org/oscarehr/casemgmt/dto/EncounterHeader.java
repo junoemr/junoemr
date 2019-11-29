@@ -51,12 +51,14 @@ public class EncounterHeader
 	private String rosterDateString;
 	private boolean isIncomingRequestorSet;
 	private String diseaseListUrl;
+	private String echartUuid;
 	private String echartLinks;
 	private String imagePresentPlaceholderUrl;
 	private String imageMissingPlaceholderUrl;
 	private String appointmentNo;
 	private String source;
 	private Date encounterNoteHideBeforeDate;
+	private String billingUrl;
 
 
 	public String getUserColour()
@@ -299,6 +301,16 @@ public class EncounterHeader
 		this.diseaseListUrl = diseaseListUrl;
 	}
 
+	public String getEchartUuid()
+	{
+		return echartUuid;
+	}
+
+	public void setEchartUuid(String echartUuid)
+	{
+		this.echartUuid = echartUuid;
+	}
+
 	public String getEchartLinks()
 	{
 		return echartLinks;
@@ -357,6 +369,16 @@ public class EncounterHeader
 	public void setEncounterNoteHideBeforeDate(Date encounterNoteHideBeforeDate)
 	{
 		this.encounterNoteHideBeforeDate = encounterNoteHideBeforeDate;
+	}
+
+	public String getBillingUrl()
+	{
+		return billingUrl;
+	}
+
+	public void setBillingUrl(String billingUrl)
+	{
+		this.billingUrl = billingUrl;
 	}
 
 	//=============================================================================

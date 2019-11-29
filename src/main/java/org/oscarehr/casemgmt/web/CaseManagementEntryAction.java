@@ -41,6 +41,7 @@ import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.AdmissionManager;
 import org.oscarehr.PMmodule.service.ProgramManager;
+import org.oscarehr.billing.CA.service.BillingUrlService;
 import org.oscarehr.casemgmt.dao.CaseManagementIssueDAO;
 import org.oscarehr.casemgmt.dao.CaseManagementNoteDAO;
 import org.oscarehr.casemgmt.dao.CaseManagementNoteExtDAO;
@@ -56,17 +57,13 @@ import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.service.CaseManagementPrint;
 import org.oscarehr.casemgmt.web.CaseManagementViewAction.IssueDisplay;
 import org.oscarehr.casemgmt.web.formbeans.CaseManagementEntryFormBean;
-import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.ProviderDefaultProgramDao;
-import org.oscarehr.common.dao.ProviderPreferenceDao;
 import org.oscarehr.common.dao.ResidentOscarMsgDao;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderDefaultProgram;
-import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.common.model.ResidentOscarMsg;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.eyeform.web.FollowUpAction;
@@ -1856,13 +1853,34 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		}
 
 		String toBill = request.getParameter("toBill");
-		if (toBill != null && toBill.equalsIgnoreCase("true")) {
+		if (toBill != null && toBill.equalsIgnoreCase("true"))
+		{
+			BillingUrlService billingUrlService = SpringUtils.getBean(BillingUrlService.class);
+
 			String region = cform.getBillRegion();
 			String appointmentNo = cform.getAppointmentNo();
 			String name = caseManagementMgr.getDemoDisplayName(demoNo);
 			String date = cform.getAppointmentDate();
 			String start_time = cform.getStart_time();
 			String apptProvider = cform.getApptProvider();
+			CaseManagementNote caseNote = cform.getCaseNote();
+
+			String billingUrl = billingUrlService.buildUrl(
+					loggedInInfo.getLoggedInProviderNo(),
+					demoNo,
+					region,
+					appointmentNo,
+					name,
+					date,
+					start_time,
+					apptProvider,
+					reviewerNo,
+					caseNote
+			);
+
+
+
+			/*
 			String providerview = null;
 			if( reviewerNo != null ) {
 				Provider p = providerMgr.getProvider(reviewerNo);
@@ -1935,9 +1953,11 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 				url += "&referral_no_1=" + getRefNo(demographic.getFamilyDoctor());
 			}
 
-			logger.debug("BILLING URL " + url);
+			 */
+
+			logger.debug("BILLING URL " + billingUrl);
 			ActionForward forward = new ActionForward();
-			forward.setPath(url);
+			forward.setPath(billingUrl);
 			return forward;
 		}
 
@@ -2793,22 +2813,6 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		cmp.doPrint(loggedInInfo,demographicNo, printAllNotes,noteIds,printCPP,printRx,printLabs,cStartDate,cEndDate,request, response.getOutputStream());
 
 		return null;
-	}
-
-	public String getRefNo(String referal) {
-		if (referal == null) return "";
-		int start = referal.indexOf("<rdohip>");
-		int end = referal.indexOf("</rdohip>");
-		String ref = new String();
-
-		if (start >= 0 && end >= 0) {
-			String subreferal = referal.substring(start + 8, end);
-			if (!"".equalsIgnoreCase(subreferal.trim())) {
-				ref = subreferal;
-
-			}
-		}
-		return ref;
 	}
 
 	public String getMacroTicklerText(int appointmentNo) {

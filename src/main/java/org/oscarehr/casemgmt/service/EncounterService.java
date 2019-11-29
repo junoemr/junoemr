@@ -24,6 +24,7 @@
 package org.oscarehr.casemgmt.service;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.billing.CA.service.BillingUrlService;
 import org.oscarehr.casemgmt.dto.EncounterHeader;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.model.ClientImage;
@@ -122,6 +123,12 @@ public class EncounterService
 	@Autowired
 	private EncounterFamilyHistoryService encounterFamilyHistoryService;
 
+	@Autowired
+	private BillingUrlService billingUrlService;
+
+	@Autowired
+	private CaseManagementManager caseManagementManager;
+
 	public EncounterSectionService getEncounterSectionServiceByName(String serviceName)
 	{
 		switch(serviceName)
@@ -175,6 +182,7 @@ public class EncounterService
 
 	public EncounterHeader getEncounterHeader(
 			String providerNo,
+			String loggedInProviderNo,
 			String roleName,
 			String demographicNo,
 			String familyDoctorNo,
@@ -186,12 +194,14 @@ public class EncounterService
 			String phone,
 			String referringDoctorName,
 			String referringDoctorNumber,
+			String echartUuid,
 			boolean rosterDateEnabled,
 			Date rosterDate,
 			String appointmentNo,
 			String contextPath,
 			String source,
-			Date encounterNoteHideBeforeDate
+			Date encounterNoteHideBeforeDate,
+			String billingUrl
 	)
 			throws UnsupportedEncodingException
 	{
@@ -300,6 +310,8 @@ public class EncounterService
 
 		encounterHeader.setDemographicAdditionalInfoUrl(demographicAdditionalInfoUrl);
 
+		encounterHeader.setEchartUuid(echartUuid);
+
 		encounterHeader.setReferringDoctorName(referringDoctorName);
 		encounterHeader.setReferringDoctorNumber(referringDoctorNumber);
 		encounterHeader.setRosterDateEnabled(rosterDateEnabled);
@@ -326,31 +338,9 @@ public class EncounterService
 		encounterHeader.setSource(source);
 		encounterHeader.setEncounterNoteHideBeforeDate(encounterNoteHideBeforeDate);
 
+		encounterHeader.setBillingUrl(billingUrl);
+
 		return encounterHeader;
-	}
-
-	public String getEncounterNotes(
-
-	)
-	{
-		/*
-		EncounterNotes notes = new EncounterNotes();
-
-		Set<Provider> providers = (Set<Provider>)request.getAttribute("providers");
-
-		String providerNo;
-		Provider prov;
-		Iterator<Provider> iter = providers.iterator();
-		while (iter.hasNext())
-		{
-			prov = iter.next();
-			providerNo = prov.getProviderNo();
-			%>
-				<li><html:multibox property="filter_providers" value="<%=providerNo%>" onclick="filterCheckBox(this)"></html:multibox><%=prov.getFormattedName()%></li>
-			<%
-		}
-		 */
-		return null;
 	}
 
 	private String getEChartLinks()

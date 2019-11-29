@@ -264,10 +264,10 @@ public class EctIncomingEncounterAction extends Action {
 		}
 
 		if(
-				OscarProperties.getInstance().isJunoEncounterEnabled() && (
-						request.getParameter("old_encounter") == null ||
-								!request.getParameter("old_encounter").equals("1")
-				)
+			OscarProperties.getInstance().isJunoEncounterEnabled() && (
+				request.getParameter("old_encounter") == null ||
+				!request.getParameter("old_encounter").equals("1")
+			)
 		)
 		{
 			return (mapping.findForward("junoEncounter"));

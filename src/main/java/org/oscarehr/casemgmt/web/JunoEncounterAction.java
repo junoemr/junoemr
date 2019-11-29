@@ -57,6 +57,7 @@ import org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService;
 import org.oscarehr.casemgmt.web.formbeans.CaseManagementEntryFormBean;
 import org.oscarehr.casemgmt.web.formbeans.JunoEncounterFormBean;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,6 +175,9 @@ public class JunoEncounterAction extends DispatchActionSupport
 	@Autowired
 	private EncounterFamilyHistoryService encounterFamilyHistoryService;
 
+	@Autowired
+	private ProviderDataDao providerDataDao;
+
 	//@Autowired
 	//private PreventionsSummary preventionsSummary;
 
@@ -200,8 +204,6 @@ public class JunoEncounterAction extends DispatchActionSupport
 			logger.info("encounterSessionBean does not exist");
 			return (mapping.findForward(ACTION_FORWARD_ERROR));
 		}
-
-
 
 		String user = (String) session.getAttribute("user");
 
@@ -242,52 +244,68 @@ public class JunoEncounterAction extends DispatchActionSupport
 
 		Date hideBeforeDate = getEncounterNoteHideBeforeDate(session);
 
+		String echartUuid = UUID.randomUUID().toString();
+
+
+		String billingUrl = null;
+		/*
+		String region = cform.getBillRegion();
+		String name = caseManagementMgr.getDemoDisplayName(demoNo);
+
+		String appointmentNo = cform.getAppointmentNo();
+		String date = cform.getAppointmentDate();
+		String start_time = cform.getStart_time();
+		String apptProvider = cform.getApptProvider();
+
+		CaseManagementNote caseNote = cform.getCaseNote();
+
+		String billingUrl = billingUrlService.buildUrl(
+				loggedInProviderNo,
+				demographicNo,
+				region, // ??
+				appointmentNo,
+				caseManagementManager.getDemoDisplayName(demographicNo),
+				date, // ??
+				start_time, // ?? I think this is from the appointment, passed through the url
+				apptProvider, // ??
+				null, // We don't support reviewer in the juno encounter
+				caseNote
+		);
+
+		 */
+
 		// Get data for the header
 		junoEncounterForm.setHeader(
-				encounterService.getEncounterHeader(
-						user,
-						roleName,
-						encounterSessionBean.demographicNo,
-						encounterSessionBean.familyDoctorNo,
-						encounterSessionBean.patientFirstName,
-						encounterSessionBean.patientLastName,
-						encounterSessionBean.patientSex,
-						encounterSessionBean.patientAge,
-						encounterSessionBean.patientBirthdate,
-						encounterSessionBean.phone,
-						encounterSessionBean.referringDoctorName,
-						encounterSessionBean.referringDoctorNumber,
-						encounterSessionBean.hasRosterDate(),
-						encounterSessionBean.rosterDate,
-						appointmentNo,
-						contextPath,
-						encounterSessionBean.source,
-						hideBeforeDate
-				)
+			encounterService.getEncounterHeader(
+				user,
+				loggedInInfo.getLoggedInProviderNo(),
+				roleName,
+				encounterSessionBean.demographicNo,
+				encounterSessionBean.familyDoctorNo,
+				encounterSessionBean.patientFirstName,
+				encounterSessionBean.patientLastName,
+				encounterSessionBean.patientSex,
+				encounterSessionBean.patientAge,
+				encounterSessionBean.patientBirthdate,
+				encounterSessionBean.phone,
+				encounterSessionBean.referringDoctorName,
+				encounterSessionBean.referringDoctorNumber,
+				echartUuid,
+				encounterSessionBean.hasRosterDate(),
+				encounterSessionBean.rosterDate,
+				appointmentNo,
+				contextPath,
+				encounterSessionBean.source,
+				hideBeforeDate,
+				billingUrl
+			)
 		);
 
 		// Get data for each of the sections
 		Map<String, EncounterSection> sections = new HashMap<>();
 
-		/*
-		sections.put(CPP_TYPE_SOCIAL_HISTORY, encounterCPPSectionService.getInitialSection(contextPath, user, encounterSessionBean.demographicNo, appointmentNo,
-				identUrl, "Social History", "#996633", CPP_TYPE_SOCIAL_HISTORY));
-
-		sections.put(CPP_TYPE_MEDICAL_HISTORY, encounterCPPSectionService.getInitialSection(contextPath, user, encounterSessionBean.demographicNo, appointmentNo,
-				identUrl, "Medical History", "#996633", CPP_TYPE_MEDICAL_HISTORY));
-
-		sections.put(CPP_TYPE_ONGOING_CONCERNS, encounterCPPSectionService.getInitialSection(contextPath, user, encounterSessionBean.demographicNo, appointmentNo,
-				identUrl, "Ongoing Concerns", "#996633", CPP_TYPE_ONGOING_CONCERNS));
-
-		sections.put(CPP_TYPE_REMINDERS, encounterCPPSectionService.getInitialSection(contextPath, user, encounterSessionBean.demographicNo, appointmentNo,
-				identUrl, "Reminders", "#996633", CPP_TYPE_REMINDERS));
-
-		 */
-
-
 		List<String> sectionList = new ArrayList<>();
 
-		// XXX: get localized strings
 		sectionList.add(EncounterSection.TYPE_PREVENTIONS);
 		sectionList.add(EncounterSection.TYPE_TICKLER);
 		sectionList.add(EncounterSection.TYPE_DISEASE_REGISTRY);
@@ -328,8 +346,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		sectionParams.setChartNo(encounterSessionBean.chartNo);
 		sectionParams.setProgramId(programId);
 		sectionParams.setUserName(encounterSessionBean.userName);
-		// XXX: Make this work
-		sectionParams.seteChartUUID(UUID.randomUUID().toString());
+		sectionParams.seteChartUUID(echartUuid);
 
 		for(String sectionName: sectionList)
 		{
@@ -339,90 +356,12 @@ public class JunoEncounterAction extends DispatchActionSupport
 			sections.put(sectionName, sectionService.getDefaultSection(sectionParams));
 		}
 
-		/*
-		sections.put(EncounterSection.TYPE_PREVENTIONS,
-				encounterPreventionNoteService.getInitialSection(
-						loggedInInfo,
-						contextPath,
-						roleName,
-						user,
-						encounterSessionBean.demographicNo,
-						appointmentNo,
-						programId,
-						"Preventions",
-						"#009999"
-				)
-		);
-
-		sections.put(EncounterSection.TYPE_TICKLER, encounterTicklerService.getInitialSection(loggedInInfo, contextPath, roleName, user, encounterSessionBean.demographicNo, appointmentNo,
-				programId, "Tickler", "#FF6600"));
-		sections.put(EncounterSection.TYPE_DISEASE_REGISTRY, encounterDiseaseRegistryService.getInitialSection(sectionParams,
-				"Disease Registry", "#5A5A5A"));
-		sections.put(EncounterSection.TYPE_FORMS, encounterFormService.getInitialSection(sectionParams,
-				"Forms", "#917611"));
-		sections.put(EncounterSection.TYPE_EFORMS, encounterEFormService.getInitialSection(sectionParams,
-				"eForms", "#008000"));
-		sections.put(EncounterSection.TYPE_DOCUMENTS, encounterDocumentService.getInitialSection(sectionParams,
-				"Documents", "#476BB3"));
-		sections.put(EncounterSection.TYPE_LAB_RESULTS, encounterLabResultService.getInitialSection(sectionParams,
-				"Lab Result", "#A0509C"));
-		sections.put(EncounterSection.TYPE_MESSENGER, encounterMessengerService.getInitialSection(sectionParams,
-				"Messenger", "#7F462C"));
-		sections.put(EncounterSection.TYPE_MEASUREMENTS, encounterMeasurementsService.getInitialSection(sectionParams,
-				"Measurements", "#344887"));
-		sections.put(EncounterSection.TYPE_CONSULTATIONS, encounterConsultationService.getInitialSection(sectionParams,
-				"Consultations", "#6C2DC7"));
-
-
-		sections.put(EncounterSection.TYPE_ALLERGIES, encounterAllergyService.getInitialSection(sectionParams,
-				"Allergies",
-				"#C85A17"));
-
-		sections.put(EncounterSection.TYPE_MEDICATIONS, encounterMedicationService.getInitialSection(sectionParams,
-				"Medications",
-				"#7D2252"));
-		*/
-
-		/*
-		sections.put(EncounterSection.TYPE_OTHER_MEDS, encounterCPPSectionService.getInitialSection(contextPath, user,
-				encounterSessionBean.demographicNo, appointmentNo, identUrl, "Other Meds",
-				"#306754", EncounterSection.TYPE_OTHER_MEDS));
-
-		sections.put(EncounterSection.TYPE_RISK_FACTORS, encounterCPPSectionService.getInitialSection(contextPath, user,
-				encounterSessionBean.demographicNo, appointmentNo, identUrl, "Risk Factors",
-				"#993333", EncounterSection.TYPE_RISK_FACTORS));
-
-		sections.put(EncounterSection.TYPE_FAMILY_HISTORY, encounterCPPSectionService.getInitialSection(contextPath, user,
-				encounterSessionBean.demographicNo, appointmentNo, identUrl, "Family History",
-				"#006600", EncounterSection.TYPE_FAMILY_HISTORY));
-
-		 */
-
-		/*
-		sections.put(EncounterSection.TYPE_UNRESOLVED_ISSUES, encounterUnresolvedIssueService.getInitialSection(sectionParams,
-				"Unresolved Issues", "#CC9900"));
-
-		sections.put(EncounterSection.TYPE_RESOLVED_ISSUES, encounterResolvedIssueService.getInitialSection(sectionParams,
-				"Resolved Issues", "#151B8D"));
-
-		sections.put(EncounterSection.TYPE_EPISODES, encounterEpisodeService.getInitialSection(sectionParams,
-				"Episodes", "#045228"));
-
-		sections.put(EncounterSection.TYPE_HEALTH_CARE_TEAM, encounterTeamService.getInitialSection(sectionParams,
-				"Health Care Team", "#6699CC"));
-		 */
 
 		junoEncounterForm.setSections(sections);
 
 
 		List<String> cppSections = new ArrayList<>();
 
-		/*
-		cppSections.add(CPP_TYPE_SOCIAL_HISTORY);
-		cppSections.add(CPP_TYPE_MEDICAL_HISTORY);
-		cppSections.add(CPP_TYPE_ONGOING_CONCERNS);
-		cppSections.add(CPP_TYPE_REMINDERS);
-		 */
 		cppSections.add(encounterSocialHistoryService.getSectionId());
 		cppSections.add(encounterMedicalHistoryService.getSectionId());
 		cppSections.add(encounterOngoingConcernsService.getSectionId());
@@ -534,115 +473,4 @@ public class JunoEncounterAction extends DispatchActionSupport
 		return cal.getTime();
 	}
 
-/*	private EncounterSection getPreventionSection(LoggedInInfo loggedInInfo, String demographicNo, String title) throws FactException
-	{
-
-		EncounterSection section = new EncounterSection();
-
-		section.setTitle(title);
-		section.setCppIssues("");
-		section.setAddUrl("");
-		section.setIdentUrl("");
-
-		section.setNotes(encounterPreventionNoteService.getPreventionNotes(loggedInInfo, demographicNo));
-
-		return section;
-	}*/
-
-	//private EncounterSection getTicklerSection(LoggedInInfo loggedInInfo, String demographicNo, String title) throws FactException
-	//{
-
-	//	EncounterSection section = new EncounterSection();
-
-	//	section.setTitle(title);
-	//	section.setCppIssues("");
-	//	section.setAddUrl("");
-	//	section.setIdentUrl("");
-
-	//	section.setNotes(encounterTicklerService.getTicklers(loggedInInfo, demographicNo));
-
-	//	return section;
-	//}
-
-	/*
-	private EncounterSection getSection(
-			LoggedInInfo loggedInInfo,
-			String roleName,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String programId,
-			String title,
-			String colour,
-			EncounterSectionService encounterSectionService
-	) throws FactException
-	{
-		EncounterSection section = new EncounterSection();
-
-		section.setTitle(title);
-		section.setColour(colour);
-		section.setCppIssues("");
-		section.setAddUrl("");
-		section.setIdentUrl("");
-		section.setShowingPartialNoteList(false);
-
-		List<EncounterSectionNote> notes = encounterSectionService.getNotes(
-				loggedInInfo,
-				roleName,
-				providerNo,
-				demographicNo,
-				appointmentNo,
-				programId,
-				SIDEBAR_INITIAL_ENTRIES_TO_SHOW,
-				SIDEBAR_INITIAL_OFFSET
-		);
-
-		// Ask for one more note than is required.  If the full amount is returned, show the
-		// controls to show all notes, and remove it from the results.
-		if(notes.size() > SIDEBAR_INITIAL_ENTRIES_TO_SHOW)
-		{
-			notes.remove(notes.size() - 1);
-			section.setShowingPartialNoteList(true);
-		}
-
-		section.setNotes(notes);
-
-		return section;
-	}
-
-	private EncounterSection getCppSection(
-			String contextPath,
-			String providerNo,
-			String demographicNo,
-			String appointmentNo,
-			String identUrl,
-			String title,
-			String colour,
-			String sectionName
-	)
-	{
-
-		String addUrl = contextPath + "/CaseManagementEntry.do?method=issueNoteSave" +
-				"&providerNo=" + providerNo + "" +
-				"&demographicNo=" + demographicNo + "" +
-				"&appointmentNo=" + appointmentNo + "" +
-				"&noteId=";
-
-		// Get issue id from type
-		Issue issue = issueDao.findByCode(sectionName);
-
-		String cppIssues = issue.getId() + ";" + issue.getCode() + ";" + issue.getDescription();
-
-		EncounterSection section = new EncounterSection();
-
-		section.setTitle(title);
-		section.setColour(colour);
-		section.setCppIssues(cppIssues);
-		section.setAddUrl(addUrl);
-		section.setIdentUrl(identUrl);
-		section.setNotes(encounterCPPNoteService.getCPPNotes(demographicNo, issue.getIssueId()));
-
-		return section;
-	}
-	 */
 }
