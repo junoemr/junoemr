@@ -191,7 +191,7 @@
 			if (systemPreferenceService.isPreferenceEnabled(UserProperty.CARE_CONNECT_ENABLED, false))
 			{
 		%>
-				<a style="font-size:10px;font-style:normal;"  href="https://www.google.com">CareConnect</a> |
+				<a style="font-size:10px;font-style:normal;"  href="javascript:void(0)" onclick="window.open('../integration/careConnect/careConnectForm.jsp?demoNo=' + '<%=demoNo%>', 'CareConnectPopup', 'width=1200,height=800');">CareConnect</a> |
 		<%
 			}
 		%>
@@ -202,7 +202,6 @@
 </tr>
 </table>
 </div>
-
 <%!
 
 String getEChartLinks(){
