@@ -134,7 +134,7 @@ public class IntegrationAction extends DispatchAction
 		}
 		catch (InvalidIntegrationException e)
 		{
-			return new ActionRedirect(mapping.findForward(Action.ERROR));
+			return new ActionRedirect(mapping.findForward(Action.LIST_INTEGRATIONS));
 		}
 		catch (Exception e)
 		{

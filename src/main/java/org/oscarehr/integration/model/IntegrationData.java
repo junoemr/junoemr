@@ -34,6 +34,10 @@ public class IntegrationData
 		this.integration = integration;
 	}
 
+	public boolean isCloudMd() {
+		return (integration != null && integration.getIntegrationType().equals(Integration.INTEGRATION_TYPE_CLOUD_MD));
+	}
+
 	public boolean userIntegrationExists()
 	{
 		return userIntegrationAccess != null;

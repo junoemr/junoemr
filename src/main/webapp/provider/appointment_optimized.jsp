@@ -1872,7 +1872,7 @@
 											<c:if test="<%= appointmentInfo.isVirtual() && org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
 												<a href="#"
 												   onClick='popupPage(800, 1280,
-														   "../integrations/myhealthaccess.do?method=connectOrList" +
+														   "../integrations/myhealthaccess.do?method=connect" +
 														   "&demographicNo=${appointmentInfo.demographicNo}" +
 														   "&siteName=${appointmentInfo.siteName}" +
 														   "&appt=${appointmentInfo.appointmentNo}");return false;'

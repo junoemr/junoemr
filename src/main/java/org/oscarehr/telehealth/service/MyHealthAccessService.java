@@ -60,19 +60,25 @@ public class MyHealthAccessService
 
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
 	protected static final String MHA_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
+	protected static final String CLOUD_MD_DOMAIN = oscarProps.getProperty("cloudmd_domain");
 	protected static final String MHA_HOME_URL = "/clinic/home";
-	protected static final String MHA_BASE_TELEHEALTH_URL = "/provider/clinic/%s/telehealth/appointment/%s/";
+	protected static final String MHA_BASE_TELEHEALTH_URL = "/provider/clinic/%s/telehealth/appointment/%s";
 
+	// TODO: Refactor redirect from Juno to MyHealthAccess
 	public String getTelehealthUrl(IntegrationData integrationData, String appointmentNo)
 	{
+		boolean isCloudMd = integrationData.isCloudMd();
+		String hostDomain = isCloudMd ? CLOUD_MD_DOMAIN : MHA_DOMAIN;
+
 		String clinicId = integrationData.getIntegration().getRemoteId();
 		String clinicUserId = integrationData.getRemoteUserId();
 		String loginToken = integrationData.getLoginToken();
 
 		String redirectUrl = String.format(MHA_BASE_TELEHEALTH_URL, clinicId, appointmentNo);
-		String clinicUserPath = "clinic_users/push_token?";
-		String endpoint = ClinicService.concatEndpointStrings(MHA_DOMAIN, clinicUserPath);
-		endpoint = clinicService.buildUrl(endpoint) + "clinic_id=%s&user_id=%s&redirect_url=%s#token=%s";
+		String clinicUserPath = "/clinic_users/push_token?";
+
+		String endpoint = ClinicService.concatEndpointStrings(hostDomain, clinicUserPath);
+		endpoint = clinicService.buildUrl(endpoint) + "/clinic_id=%s&user_id=%s&redirect_url=%s#token=%s";
 
 		if (StringUtils.isNullOrEmpty(appointmentNo))
 		{

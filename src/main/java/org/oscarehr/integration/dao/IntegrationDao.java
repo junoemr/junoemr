@@ -50,19 +50,42 @@ public class IntegrationDao extends AbstractDao<Integration>
 
     public Integration findDefaultByIntegration(String integrationType)
     {
-        String sql = "SELECT i FROM Integration i WHERE i.integrationType = :integrationType AND i.site IS NULL";
+        String sql = "SELECT i FROM Integration i WHERE i.site IS NULL AND ";
+        Query query;
 
-        Query query = entityManager.createQuery(sql);
+        if (integrationType.equals(Integration.INTEGRATION_TYPE_MHA))
+        {
+            sql += "i.integrationType IN (:integrationType, :integrationTypeCloudMd)";
+            query = entityManager.createQuery(sql);
+            query.setParameter("integrationTypeCloudMd", Integration.INTEGRATION_TYPE_CLOUD_MD);
+        }
+        else
+        {
+            sql += "i.integrationType = :integrationType";
+            query = entityManager.createQuery(sql);
+        }
+
         query.setParameter("integrationType", integrationType);
-
         return this.getSingleResultOrNull(query);
     }
 
     public Integration findByIntegrationAndSiteName(String siteName, String integrationType)
     {
-        String sql = "SELECT i FROM Integration i WHERE i.integrationType = :integrationType AND i.site.name = :siteName";
+    	Query query;
+        String sql = "SELECT i FROM Integration i WHERE i.site.name = :siteName AND ";
 
-        Query query = entityManager.createQuery(sql);
+        if (integrationType.equals(Integration.INTEGRATION_TYPE_MHA))
+        {
+            sql += "i.integrationType IN (:integrationType, :integrationTypeCloudMd)";
+            query = entityManager.createQuery(sql);
+            query.setParameter("integrationTypeCloudMd", Integration.INTEGRATION_TYPE_CLOUD_MD);
+        }
+        else
+        {
+            sql += "i.integrationType = :integrationType";
+            query = entityManager.createQuery(sql);
+        }
+
         query.setParameter("siteName", siteName);
         query.setParameter("integrationType", integrationType);
 
@@ -72,8 +95,9 @@ public class IntegrationDao extends AbstractDao<Integration>
     public List<Integration> findMyHealthAccessIntegrations()
     {
         Query query = entityManager.createQuery(
-                "SELECT i FROM Integration i WHERE i.integrationType = :integrationType");
+                "SELECT i FROM Integration i WHERE i.integrationType IN (:integrationType, :integrationTypeCloudMd)");
         query.setParameter("integrationType", Integration.INTEGRATION_TYPE_MHA);
+        query.setParameter("integrationTypeCloudMd", Integration.INTEGRATION_TYPE_CLOUD_MD);
 
         @SuppressWarnings("unchecked")
         List<Integration> results = query.getResultList();

@@ -45,7 +45,8 @@ import javax.persistence.Table;
 @Table(name = "integration")
 public class Integration extends AbstractModel<Integer> implements Serializable
 {
-    public static final String INTEGRATION_TYPE_MHA = "MYHEALTHACCESS";
+    public static final String INTEGRATION_TYPE_MHA = "my_health_access";
+    public static final String INTEGRATION_TYPE_CLOUD_MD = "cloud_md";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
