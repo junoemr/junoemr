@@ -1,0 +1,71 @@
+.icon-card {
+	display: inline-block;
+
+	.icon-card-inner {
+		flex-wrap: nowrap;
+		border-radius: 6px;
+		border-style: solid;
+		border-width: 2px;
+		border-color: $color-neutral-lighter;
+		background-color: $color-neutral-lightest;
+		padding: 4px;
+		cursor: pointer;
+
+		&:hover {
+			border-color: $color-primary-lightest;
+		}
+
+		&.card-sm {
+			width: 90px;
+			height: 90px;
+
+			i {
+				font-size: 40px;
+			}
+		}
+
+		&.card-md {
+			width: 130px;
+			height: 130px;
+
+			i {
+				font-size: 80px;
+			}
+		}
+
+		&.card-md-wide {
+			width: 160px;
+			height: 130px;
+
+			i {
+				font-size: 80px;
+			}
+		}
+
+		&.card-lg {
+			width: 220px;
+			height: 220px;
+
+			i {
+				font-size: 120px;
+			}
+		}
+
+		.card-icon {
+			flex: 1 1 75%;
+			justify-content: center;
+			align-items: center;
+
+			color: $color-neutral-darker;
+		}
+
+		.card-text {
+			flex: 1 1 25%;
+			justify-content: center;
+			align-items: center;
+
+			@include juno-font-default;
+		}
+
+	}
+}

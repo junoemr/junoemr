@@ -72,6 +72,9 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 
 	// Embedded PDF strings that show up in OBX messages
 	public static final String embeddedPdfPrefix = "JVBERi0xLj";
+	// TEMPORARY: labs have been uploaded with both of these prefixes. Need to support both as it's in a diverging state
+	public static final List<String> pdfReplacements = Arrays.asList("embedded_doc_id_", "embedded_doc_id");
+
 	public static final String pdfReplacement = "embedded_doc_id_";
 
     /** Creates a new instance of CMLHandler */
@@ -463,7 +466,6 @@ public class PATHL7Handler extends ORU_R01MessageHandler
             if (count == 1)
             {
                 String test = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(0).getOBX().getObservationIdentifier().getText().getValue();
-                logger.info("OBX Name: " + test);
                 if (test == null)
                 {
                     count = 0;
@@ -777,10 +779,15 @@ public class PATHL7Handler extends ORU_R01MessageHandler
                 if (getOBXValueType(i, j).equals("ED")
                         && getOBXResult(i, j, 2).equals("TEXT")
                         && getOBXResult(i, j, 3).equals("PDF")
-                        && getOBXResult(i, j, 4).equals("Base64")
-                        && getOBXResult(i, j, 5).startsWith(pdfReplacement))
+                        && getOBXResult(i, j, 4).equals("Base64"))
                 {
-                    return true;
+                    for (String replacement : pdfReplacements)
+                    {
+                        if (getOBXResult(i, j, 5).contains(replacement))
+                        {
+                            return true;
+                        }
+                    }
                 }
             }
         }

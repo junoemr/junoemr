@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import oscar.util.Jackson.DateDeserializer;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -49,6 +51,7 @@ public class DemographicTo1 implements Serializable {
 	private String myOscarUserName;
 	private String hin;
 	private String ver;
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date dateOfBirth;
 	private String dobYear;
 	private String dobMonth;

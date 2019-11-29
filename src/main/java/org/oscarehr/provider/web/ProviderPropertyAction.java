@@ -25,10 +25,12 @@
 package org.oscarehr.provider.web;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -2433,7 +2435,114 @@ public ActionForward viewEDocBrowserInDocumentReport(ActionMapping actionmapping
 
 		return actionmapping.findForward("genAppointmentCardPrefs");
 	}
-    
+
+	public ActionForward viewAppointmentCountPrefs(ActionMapping actionmapping, ActionForm actionform, HttpServletRequest request, HttpServletResponse response)
+	{
+		DynaActionForm frm = (DynaActionForm) actionform;
+		String provider = (String) request.getSession().getAttribute("user");
+
+        List<String> propertyNames = Arrays.asList(
+                UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED,
+                UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW,
+                UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
+		Map<String, UserProperty> properties = this.userPropertyDAO.getProviderPropertiesAsMap(provider, propertyNames);
+		UserProperty includeCancelled = properties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED);
+		UserProperty includeNoShow = properties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW);
+		UserProperty includeNoDemographic = properties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
+
+		if (includeCancelled == null)
+		{
+			includeCancelled = new UserProperty();
+			includeCancelled.setValue("false");
+		}
+		if (includeNoShow == null)
+		{
+			includeNoShow = new UserProperty();
+			includeNoShow.setValue("false");
+		}
+		if (includeNoDemographic == null)
+		{
+			includeNoDemographic = new UserProperty();
+			includeNoDemographic.setValue("false");
+		}
+
+		request.setAttribute("appointmentCountIncludeCancelled", includeCancelled);
+		request.setAttribute("appointmentCountIncludeNoShow", includeNoShow);
+		request.setAttribute("appointmentCountIncludeNoPatient", includeNoDemographic);
+
+
+		request.setAttribute("providertitle", "provider.appointmentCountPrefs.title"); //=Set myDrugref ID
+		request.setAttribute("providermsgPrefs", "provider.appointmentCountPrefs.msgPrefs"); //=Preferences"); //
+		request.setAttribute("providermsgProvider", "provider.appointmentCountPrefs.msgProvider"); //=myDrugref ID
+		request.setAttribute("providermsgEdit", "provider.appointmentCountPrefs.msgEdit"); //=Enter your desired login for myDrugref
+		request.setAttribute("providerbtnSubmit", "provider.appointmentCountPrefs.btnSubmit"); //=Save
+		request.setAttribute("providermsgSuccess", "provider.appointmentCountPrefs.msgSuccess"); //=myDrugref Id saved
+		request.setAttribute("method", "saveAppointmentCountPrefs");
+
+
+		frm.set("appointmentCountIncludeCancelled", includeCancelled);
+		frm.set("appointmentCountIncludeNoShow", includeNoShow);
+		frm.set("appointmentCountIncludeNoPatient", includeNoDemographic);
+
+		return actionmapping.findForward("genAppointmentCountPrefs");
+	}
+
+	public ActionForward saveAppointmentCountPrefs(ActionMapping actionmapping, ActionForm actionform, HttpServletRequest request, HttpServletResponse response)
+	{
+
+		DynaActionForm frm = (DynaActionForm) actionform;
+		UserProperty includeCancelledProp = (UserProperty) frm.get("appointmentCountIncludeCancelled");
+		UserProperty includeNoShowProp = (UserProperty) frm.get("appointmentCountIncludeNoShow");
+		UserProperty includeNoDemographicProp = (UserProperty) frm.get("appointmentCountIncludeNoPatient");
+
+		boolean includeCancelled = includeCancelledProp != null && includeCancelledProp.getValue() != null;
+		boolean includeNoShow = includeNoShowProp != null && includeNoShowProp.getValue() != null;
+		boolean includeNoDemographic = includeNoDemographicProp != null && includeNoDemographicProp.getValue() != null;
+
+		String provider = (String) request.getSession().getAttribute("user");
+
+		UserProperty wProperty = this.userPropertyDAO.getProp(provider, UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED);
+		if (wProperty == null)
+		{
+			wProperty = new UserProperty();
+			wProperty.setProviderNo(provider);
+			wProperty.setName(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED);
+		}
+		wProperty.setValue(Boolean.toString(includeCancelled));
+		userPropertyDAO.saveProp(wProperty);
+
+		UserProperty hProperty = this.userPropertyDAO.getProp(provider, UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW);
+		if (hProperty == null)
+		{
+			hProperty = new UserProperty();
+			hProperty.setProviderNo(provider);
+			hProperty.setName(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW);
+		}
+		hProperty.setValue(Boolean.toString(includeNoShow));
+		userPropertyDAO.saveProp(hProperty);
+
+		UserProperty mProperty = this.userPropertyDAO.getProp(provider, UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
+		if (mProperty == null)
+		{
+			mProperty = new UserProperty();
+			mProperty.setProviderNo(provider);
+			mProperty.setName(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
+		}
+		mProperty.setValue(Boolean.toString(includeNoDemographic));
+		userPropertyDAO.saveProp(mProperty);
+
+		request.setAttribute("status", "success");
+		request.setAttribute("providertitle", "provider.appointmentCountPrefs.title"); //=Set myDrugref ID
+		request.setAttribute("providermsgPrefs", "provider.appointmentCountPrefs.msgPrefs"); //=Preferences"); //
+		request.setAttribute("providermsgProvider", "provider.appointmentCountPrefs.msgProvider"); //=myDrugref ID
+		request.setAttribute("providermsgEdit", "provider.appointmentCountPrefs.msgEdit"); //=Enter your desired login for myDrugref
+		request.setAttribute("providerbtnSubmit", "provider.appointmentCountPrefs.btnSubmit"); //=Save
+		request.setAttribute("providermsgSuccess", "provider.appointmentCountPrefs.msgSuccess"); //=myDrugref Id saved
+		request.setAttribute("method", "saveAppointmentCountPrefs");
+
+		return actionmapping.findForward("genAppointmentCountPrefs");
+	}
+
     /**
      * Creates a new instance of ProviderPropertyAction
      */

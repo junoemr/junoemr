@@ -36,6 +36,7 @@ import oscar.dms.EDoc;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.UtilDateUtilities;
 
+import javax.naming.SizeLimitExceededException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class EctConsultationFormRequestPrintAction extends Action
     @Override
     public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
     {
-    	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
 	    String demographicNoStr = request.getParameter("demographicNo");
 	    Integer demographicNo = Integer.parseInt(demographicNoStr);
@@ -75,8 +76,10 @@ public class EctConsultationFormRequestPrintAction extends Action
 	    securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, demographicNo, "_con");
 
 		String error = "";
-		Exception exception = null;
+		String friendlyReturnMessage = "";
 	    List<InputStream> streamList = new ArrayList<>();
+
+	    long excessBytes = 0L;
 
 	    try
 		{
@@ -90,7 +93,11 @@ public class EctConsultationFormRequestPrintAction extends Action
 			streamList.addAll(consultationPDFCreationService.toEFormInputStreams(request, attachedEForms));
 
 			ByteOutputStream bos = new ByteOutputStream();
-			consultationPDFCreationService.combineStreams(streamList, bos);
+			excessBytes = consultationPDFCreationService.combineStreams(streamList, bos);
+			if (excessBytes > 0)
+			{
+				throw new SizeLimitExceededException();
+			}
 
 			response.setContentType("application/pdf"); // octet-stream
 			response.setHeader(
@@ -103,17 +110,22 @@ public class EctConsultationFormRequestPrintAction extends Action
 		catch(HtmlToPdfConversionException ce)
 		{
 			error = "HtmlToPdfConversionException";
-			exception = ce;
+			friendlyReturnMessage = "Error when attempting to convert HTML to PDF, one or more of your eForms may be formatted incorrectly.";
 		}
 		catch(DocumentException de)
 		{
 			error = "DocumentException";
-			exception = de;
+			friendlyReturnMessage = "Error when attempting to read one or more of the documents.";
 		}
 		catch(IOException ioe)
 		{
 			error = "IOException";
-			exception = ioe;
+			friendlyReturnMessage = "Error attempting to access an internal file.";
+		}
+	    catch (SizeLimitExceededException slee)
+		{
+			error = "SizeLimitExceededException";
+			friendlyReturnMessage = "The attached files included with this consultation request are too large. Please remove some of the attached files and try again.";
 		}
 		finally
 		{
@@ -125,8 +137,10 @@ public class EctConsultationFormRequestPrintAction extends Action
 		}
 	    if(!error.isEmpty())
 	    {
-		    logger.error(error + " occurred inside ConsultationPrintAction", exception);
+		    logger.error(error + " occurred inside ConsultationPrintAction");
 		    request.setAttribute("printError", true);
+		    request.setAttribute("errorMessage", friendlyReturnMessage);
+		    request.setAttribute("demo", demographicNoStr);
 		    return mapping.findForward("error");
 	    }
 	    return null;

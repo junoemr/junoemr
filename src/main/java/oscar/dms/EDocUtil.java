@@ -557,6 +557,7 @@ public final class EDocUtil {
         currentdoc.setDocSubClass(d.getDocSubClass());
         currentdoc.setContentDateTime(d.getContentdatetime());
 		currentdoc.setHasEncodingError(d.hasEncodingError());
+		currentdoc.setNumberOfPages(d.getNumberofpages());
         if(d.isRestrictToProgram() != null && d.isRestrictToProgram()) {
         	currentdoc.setRestrictToProgram(true);
         }

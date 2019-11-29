@@ -524,6 +524,10 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("schedule.enabled");
 	}
 
+	public boolean hasHRMDocuments()
+	{
+		return isPropertyActive("has_hrm_documents");
+	}
 	// =========================================================================
 	// Static methods for getting specific property values
 	// =========================================================================
