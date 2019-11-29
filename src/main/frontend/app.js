@@ -161,6 +161,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/integrationModules',
 			component: 'integrationModules'
 		})
+		.state('admin.iceFall',
+		{
+			url: '/iceFall',
+			component: 'iceFallAdmin'
+		})
 		.state('ticklers',
 		{
 			url: '/ticklers',

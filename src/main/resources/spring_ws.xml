@@ -391,6 +391,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SystemPreferenceWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.TicklerWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.UserMetricsService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService"/>
 
 			<!--  Not yet implemented
 
