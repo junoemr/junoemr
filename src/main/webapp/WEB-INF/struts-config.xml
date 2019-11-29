@@ -1694,10 +1694,9 @@
 			<forward name="CLINICAID" path="/billing/billingClinicAid.jsp" redirect="true" />
 			<forward name="error" path="/billing/errorpage.jsp" redirect="true" />
 		</action>
-        <action parameter="method" path="/telehealth/myhealthaccess" type="oscar.telehealth.actions.MyHealthAccess">
-            <forward name="mhaLogin" path="/telehealth/login.jsp" />
-            <forward name="createUser" path="/telehealth/createUser.jsp" />
-            <forward name="confirmUser" path="/telehealth/confirmUser.jsp" />
+        <action parameter="method" path="/integrations/myhealthaccess" scope="request" type="oscar.myhealthaccess.IntegrationAction">
+            <forward name="listIntegrations" path="/integrations/myhealthaccess/listIntegrations.jsp" />
+            <forward name="error" path="/integrations/myhealthaccess/error.jsp" />
         </action>
 		<action input="/billing/CA/BC/billingBC.jsp" name="BillingCreateBillingForm" path="/billing/CA/BC/CreateBilling" scope="session" type="oscar.oscarBilling.ca.bc.pageUtil.BillingCreateBillingAction">
 			<forward name="success" path="/billing/CA/BC/billingCreated.jsp" />

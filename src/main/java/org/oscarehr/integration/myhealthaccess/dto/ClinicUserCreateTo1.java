@@ -27,11 +27,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
-public class ClinicUserTo1 implements Serializable
+public class ClinicUserCreateTo1 implements Serializable
 {
-
-	@JsonProperty("id")
-	private String myhealthaccessId;
 
 	@JsonProperty("first_name")
 	private String firstName;
@@ -42,17 +39,13 @@ public class ClinicUserTo1 implements Serializable
 	@JsonProperty("remote_id")
 	private String remoteId;
 
-	@JsonProperty("email")
-	private String email;
-
-	public ClinicUserTo1()
+	public ClinicUserCreateTo1()
 	{
 	}
 
-	public ClinicUserTo1(String remoteId, String email, String firstName, String lastName)
+	public ClinicUserCreateTo1(String remoteId, String firstName, String lastName)
 	{
 		setRemoteId(remoteId);
-		setEmail(email);
 		setFirstName(firstName);
 		setLastName(lastName);
 	}
@@ -77,16 +70,6 @@ public class ClinicUserTo1 implements Serializable
 		this.lastName = lastName;
 	}
 
-	public String getMyhealthaccessId()
-	{
-		return myhealthaccessId;
-	}
-
-	public void setMyhealthaccessId(String myhealthaccessId)
-	{
-		this.myhealthaccessId = myhealthaccessId;
-	}
-
 	public String getRemoteId()
 	{
 		return remoteId;
@@ -95,15 +78,5 @@ public class ClinicUserTo1 implements Serializable
 	public void setRemoteId(String remoteId)
 	{
 		this.remoteId = remoteId;
-	}
-
-	public String getEmail()
-	{
-		return email;
-	}
-
-	public void setEmail(String email)
-	{
-		this.email = email;
 	}
 }

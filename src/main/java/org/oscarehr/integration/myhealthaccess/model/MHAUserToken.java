@@ -25,7 +25,7 @@ package org.oscarehr.integration.myhealthaccess.model;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserShortTokenTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import oscar.util.StringUtils;
 
 import java.time.Duration;
@@ -47,7 +47,7 @@ public class MHAUserToken
 		ACCESS
 	}
 
-	private MHAUserToken(ClinicUserShortTokenTo1 transfer)
+	private MHAUserToken(ClinicUserLoginTokenTo1 transfer)
 	{
 		this.token = transfer.getToken();
 
@@ -65,7 +65,7 @@ public class MHAUserToken
 			return null;
 		}
 
-		ClinicUserShortTokenTo1 accessTokenTo1 = new ClinicUserShortTokenTo1(token);
+		ClinicUserLoginTokenTo1 accessTokenTo1 = new ClinicUserLoginTokenTo1(token);
 		return new MHAUserToken(accessTokenTo1);
 	}
 

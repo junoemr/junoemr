@@ -28,6 +28,7 @@ import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.UserIntegrationAccess;
 import org.springframework.stereotype.Repository;
+import oscar.util.StringUtils;
 
 import javax.persistence.Query;
 
@@ -88,12 +89,54 @@ public class UserIntegrationAccessDao extends AbstractDao<UserIntegrationAccess>
 		return this.getSingleResultOrNull(query);
 	}
 
+	public UserIntegrationAccess findUnique(Integer securityNo, String siteName, String integrationType)
+	{
+		Query query = null;
+
+		String sql = "SELECT i FROM UserIntegrationAccess i " +
+					 "WHERE " +
+					 "i.security.id = :securityNo AND " +
+					 "i.integration.integrationType = :integrationType AND ";
+
+		if (StringUtils.empty(siteName))
+		{
+			sql += "i.integration.site IS NULL";
+			query = entityManager.createQuery(sql);
+
+			query.setParameter("securityNo", securityNo);
+			query.setParameter("integrationType", integrationType);
+		}
+		else
+		{
+			sql += "i.integration.site.name = :siteName";
+			query = entityManager.createQuery(sql);
+
+			query.setParameter("securityNo", securityNo);
+			query.setParameter("siteName", siteName);
+			query.setParameter("integrationType", integrationType);
+		}
+
+		return this.getSingleResultOrNull(query);
+	}
+
 	public void save(UserIntegrationAccess userIntegrationAccess)
 	{
 		Integer id = userIntegrationAccess.getId();
+		String siteName = null;
 
-		if (id != null)
+		Integer securityNo = userIntegrationAccess.getSecurity().getSecurityNo();
+		String integrationType = userIntegrationAccess.getIntegration().getIntegrationType();
+
+		if (userIntegrationAccess.getIntegration().getSite() != null)
 		{
+			siteName = userIntegrationAccess.getIntegration().getSite().getName();
+		}
+
+		UserIntegrationAccess existingAccess = findUnique(securityNo, siteName, integrationType);
+
+		if (id != null || existingAccess != null)
+		{
+			userIntegrationAccess.setId(existingAccess.getId());
 			merge(userIntegrationAccess);
 		}
 		else

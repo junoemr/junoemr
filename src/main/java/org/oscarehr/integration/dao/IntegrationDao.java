@@ -72,7 +72,8 @@ public class IntegrationDao extends AbstractDao<Integration>
     public List<Integration> findMyHealthAccessIntegrations()
     {
         Query query = entityManager.createQuery(
-                "SELECT i FROM Integration i WHERE i.integrationType = i.INTEGRATION_TYPE_MHA");
+                "SELECT i FROM Integration i WHERE i.integrationType = :integrationType");
+        query.setParameter("integrationType", Integration.INTEGRATION_TYPE_MHA);
 
         @SuppressWarnings("unchecked")
         List<Integration> results = query.getResultList();
@@ -81,11 +82,14 @@ public class IntegrationDao extends AbstractDao<Integration>
 
     public void save(Integration integration)
     {
-        String remoteId = integration.getId();
+        String remoteId = integration.getRemoteId();
         String integrationType = integration.getIntegrationType();
 
-        if (integration.getId() != null && findByIntegrationAndRemoteId(remoteId, integrationType) != null)
+        Integration existingIntegration = findByIntegrationAndRemoteId(remoteId, integrationType);
+
+        if (integration.getId() != null || existingIntegration != null)
         {
+            integration.setId(existingIntegration.getId());
             merge(integration);
         }
         else

@@ -897,7 +897,7 @@
 				</c:if>
 				<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
 					<li id="admin2">
-						<a href="../telehealth/myhealthaccess.do?method=openTelehealth&siteName=<%= selectedSite != null ? selectedSite : "" %>"
+						<a href="../integrations/myhealthaccess.do?method=connectOrList"
 						   id="myhealthaccess"
 						   title='MyHealthAccess'
 						   target="_blank">MyHealthAccess</a>
@@ -1872,7 +1872,7 @@
 											<c:if test="<%= appointmentInfo.isVirtual() && org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
 												<a href="#"
 												   onClick='popupPage(800, 1280,
-														   "../telehealth/myhealthaccess.do?method=openTelehealth" +
+														   "../integrations/myhealthaccess.do?method=connectOrList" +
 														   "&demographicNo=${appointmentInfo.demographicNo}" +
 														   "&siteName=${appointmentInfo.siteName}" +
 														   "&appt=${appointmentInfo.appointmentNo}");return false;'

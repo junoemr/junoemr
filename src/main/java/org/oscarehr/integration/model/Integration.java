@@ -34,6 +34,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -41,11 +43,15 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "integration")
-public class Integration extends AbstractModel<String> implements Serializable
+public class Integration extends AbstractModel<Integer> implements Serializable
 {
     public static final String INTEGRATION_TYPE_MHA = "MYHEALTHACCESS";
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
+
     @Column(name = "remote_id")
     private String remoteId;
 
@@ -64,19 +70,24 @@ public class Integration extends AbstractModel<String> implements Serializable
     }
 
     @Override
-    public String getId()
+    public Integer getId()
     {
-        return remoteId;
+        return id;
+    }
+
+    public void setId(Integer id)
+    {
+        this.id = id;
     }
 
     public String getRemoteId()
     {
-        return this.remoteId;
+        return remoteId;
     }
 
-    public void setId(String id)
+    public void setRemoteId(String remoteId)
     {
-        this.remoteId = id;
+        this.remoteId = remoteId;
     }
 
     public String getApiKey()

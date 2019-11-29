@@ -36,6 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.util.StringUtils;
 
+import java.util.List;
+
 @Service
 public class IntegrationService
 {
@@ -53,6 +55,11 @@ public class IntegrationService
     public Integration findMhaIntegrationByClinicId(String clinicId)
     {
         return integrationDao.findByIntegrationAndRemoteId(clinicId, Integration.INTEGRATION_TYPE_MHA);
+    }
+
+    public List<Integration> getMyHealthAccessIntegrations()
+    {
+        return integrationDao.findMyHealthAccessIntegrations();
     }
 
     public Integration findMhaIntegration(String siteName)
@@ -84,5 +91,10 @@ public class IntegrationService
     public void updateUserIntegrationAccess(UserIntegrationAccess userIntegrationAccess)
     {
         userIntegrationAccessDao.save(userIntegrationAccess);
+    }
+
+    public void deleteUserIntegrationAccess(UserIntegrationAccess userIntegrationAccess)
+    {
+        userIntegrationAccessDao.remove(userIntegrationAccess);
     }
 }
