@@ -145,7 +145,7 @@ public class DisplayImageAction extends DownloadAction{
                     contentType = "application/octet-stream";
                 }
             }catch(Exception e){MiscUtils.getLogger().error("Error", e);
-                throw new Exception("Could not open file "+file.getName()+" wrong file extension, ",e);
+                contentType = "application/octet-stream";
             }
         
 
