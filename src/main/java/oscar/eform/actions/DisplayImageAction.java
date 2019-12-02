@@ -109,6 +109,8 @@ public class DisplayImageAction extends DownloadAction{
                     contentType = "image/tiff";
                 }else if(extension(file.getName()).equalsIgnoreCase("pbm")){ // for PBM
                     contentType = "image/x-portable-bitmap";
+                }else if(extension(file.getName()).equalsIgnoreCase("pdf")){ // for PDF
+                    contentType = "application/pdf";
                 }else if(extension(file.getName()).equalsIgnoreCase("pnm")){ // for PNM
                     contentType = "image/x-portable-anymap";
                 }else if(extension(file.getName()).equalsIgnoreCase("pgm")){ // for PGM
