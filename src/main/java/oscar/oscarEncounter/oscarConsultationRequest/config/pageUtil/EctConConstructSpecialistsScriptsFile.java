@@ -156,7 +156,7 @@ public class EctConConstructSpecialistsScriptsFile
 						+ "\"" + name + "\","
 						+ "\"" + fax + "\","
 						+ "\"" + address + "\","
-						+ referralNo + ");\n";
+						+ "\"" + referralNo + "\"" + ");\n";
 				stringBuffer.append(newBufferEntry);
 			}
 
