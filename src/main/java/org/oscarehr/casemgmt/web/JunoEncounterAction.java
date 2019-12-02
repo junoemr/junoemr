@@ -28,7 +28,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.drools.FactException;
+import org.oscarehr.billing.CA.service.BillingUrlService;
 import org.oscarehr.casemgmt.dto.EncounterSection;
+import org.oscarehr.casemgmt.model.CaseManagementNote;
+import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.casemgmt.service.EncounterAllergyService;
 import org.oscarehr.casemgmt.service.EncounterConsultationService;
 import org.oscarehr.casemgmt.service.EncounterDiseaseRegistryService;
@@ -62,6 +65,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.struts.DispatchActionSupport;
+import oscar.OscarProperties;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
 
@@ -178,6 +182,12 @@ public class JunoEncounterAction extends DispatchActionSupport
 	@Autowired
 	private ProviderDataDao providerDataDao;
 
+	@Autowired
+	private BillingUrlService billingUrlService;
+
+	@Autowired
+	private CaseManagementManager caseManagementManager;
+
 	//@Autowired
 	//private PreventionsSummary preventionsSummary;
 
@@ -247,32 +257,26 @@ public class JunoEncounterAction extends DispatchActionSupport
 		String echartUuid = UUID.randomUUID().toString();
 
 
-		String billingUrl = null;
-		/*
-		String region = cform.getBillRegion();
-		String name = caseManagementMgr.getDemoDisplayName(demoNo);
+		String date = request.getParameter("appointmentDate");
+		String startTime = request.getParameter("startTime");
+		String appointmentProvider = request.getParameter("apptProvider_no");
 
-		String appointmentNo = cform.getAppointmentNo();
-		String date = cform.getAppointmentDate();
-		String start_time = cform.getStart_time();
-		String apptProvider = cform.getApptProvider();
-
-		CaseManagementNote caseNote = cform.getCaseNote();
+		String region = OscarProperties.getInstance().getBillingTypeUpperCase();
+		//CaseManagementNote caseNote = cform.getCaseNote();
 
 		String billingUrl = billingUrlService.buildUrl(
-				loggedInProviderNo,
-				demographicNo,
+				loggedInInfo.getLoggedInProviderNo(),
+				encounterSessionBean.getDemographicNo(),
 				region, // ??
 				appointmentNo,
-				caseManagementManager.getDemoDisplayName(demographicNo),
+				caseManagementManager.getDemoDisplayName(encounterSessionBean.getDemographicNo()),
 				date, // ??
-				start_time, // ?? I think this is from the appointment, passed through the url
-				apptProvider, // ??
+				startTime, // ?? I think this is from the appointment, passed through the url
+				appointmentProvider, // ??
 				null, // We don't support reviewer in the juno encounter
-				caseNote
+				null
 		);
 
-		 */
 
 		// Get data for the header
 		junoEncounterForm.setHeader(

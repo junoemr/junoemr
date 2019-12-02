@@ -101,25 +101,31 @@ public class BillingUrlService
 			defaultView = providerPreference.getDefaultServiceType();
 		}
 
-		Set setIssues = caseNote.getIssues();
-		Iterator iter = setIssues.iterator();
 		StringBuilder dxCodes = new StringBuilder();
-		String strDxCode;
-		int dxNum = 0;
-		while (iter.hasNext()) {
-			CaseManagementIssue cIssue = (CaseManagementIssue) iter.next();
-			dxCodes.append("&dxCode");
-			strDxCode = String.valueOf(cIssue.getIssue().getCode());
-			if (strDxCode.length() > 3) {
-				strDxCode = strDxCode.substring(0, 3);
-			}
+		if(caseNote != null)
+		{
+			Set setIssues = caseNote.getIssues();
+			Iterator iter = setIssues.iterator();
+			String strDxCode;
+			int dxNum = 0;
+			while (iter.hasNext())
+			{
+				CaseManagementIssue cIssue = (CaseManagementIssue) iter.next();
+				dxCodes.append("&dxCode");
+				strDxCode = String.valueOf(cIssue.getIssue().getCode());
+				if (strDxCode.length() > 3)
+				{
+					strDxCode = strDxCode.substring(0, 3);
+				}
 
-			if (dxNum > 0) {
-				dxCodes.append(String.valueOf(dxNum));
-			}
+				if (dxNum > 0)
+				{
+					dxCodes.append(String.valueOf(dxNum));
+				}
 
-			dxCodes.append("=" + StringUtils.encodeUrlParam(strDxCode));
-			++dxNum;
+				dxCodes.append("=" + StringUtils.encodeUrlParam(strDxCode));
+				++dxNum;
+			}
 		}
 
 		// XXX: url encode everything

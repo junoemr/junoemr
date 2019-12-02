@@ -24,7 +24,6 @@
 package org.oscarehr.casemgmt.service;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.billing.CA.service.BillingUrlService;
 import org.oscarehr.casemgmt.dto.EncounterHeader;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.model.ClientImage;
@@ -122,12 +121,6 @@ public class EncounterService
 
 	@Autowired
 	private EncounterFamilyHistoryService encounterFamilyHistoryService;
-
-	@Autowired
-	private BillingUrlService billingUrlService;
-
-	@Autowired
-	private CaseManagementManager caseManagementManager;
 
 	public EncounterSectionService getEncounterSectionServiceByName(String serviceName)
 	{

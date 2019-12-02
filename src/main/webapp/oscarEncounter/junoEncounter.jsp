@@ -1126,24 +1126,7 @@
 				clearTimeout(pageState.autoSaveTimer);
 			}
 
-			function signSaveBillEncounterNote(event)
-			{
-				document.forms['caseManagementEntryForm'].sign.value='on';
-				document.forms['caseManagementEntryForm'].toBill.value='true';
-
-				var saved = savePage('saveAndExit', '');
-
-				// savePage always returns false, but we can check note differences before redirecting
-				if (origCaseNote === $F(caseNote))
-				{
-					Event.stop(event);
-					maximizeWindow();
-				}
-
-				return saved;
-			}
-
-			function saveEncounterNote(signNote, verifyNote, exitAfterSaving, async, bill)
+			function saveEncounterNote(signNote, verifyNote, exitAfterSaving, async, redirectToBilling)
 			{
 				// Clear state
 				clearNoteError();
@@ -1210,7 +1193,12 @@
 								pageState.lastTmpSaveNote = null;
 								checkNoteChanged();
 
-								if (exitAfterSaving)
+								if(redirectToBilling)
+								{
+									console.log(getBillingUrl());
+									window.location.replace(getBillingUrl());
+								}
+								else if (exitAfterSaving)
 								{
 									window.close();
 								}
@@ -1586,6 +1574,11 @@
 			function getAppointmentDate()
 			{
 				return '${junoEncounterForm.appointmentDate}'
+			}
+
+			function getBillingUrl()
+			{
+				return '<c:out value="${ctx}"/>${junoEncounterForm.header.billingUrl}';
 			}
 
 			function getEncounterTypeArray()
