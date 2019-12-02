@@ -71,7 +71,8 @@ public class DxMapper extends AbstractMapper
 			dxresearch.setCodingSystem("icd9");
 			dxresearch.setDxresearchCode(dxCodeId);
 			dxresearch.setStatus(getProblemStatus(rep));
-			dxresearch.setStartDate(getDiagnosisDate(rep));
+			Date date = getDiagnosisDate(rep) == null ? new Date() : getDiagnosisDate(rep);
+			dxresearch.setStartDate(date);
 			dxresearch.setUpdateDate(getDiagnosisDate(rep));
 		}
 		return dxresearch;
