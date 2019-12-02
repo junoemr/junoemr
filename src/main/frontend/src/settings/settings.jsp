@@ -273,6 +273,35 @@
 							<button class="btn-sm" ng-click="openQuickLinkModal()">Add</button>
 						</div>
 					</div>
+					<div class="form-group col-sm-6">
+						<label>Specify which appointment types are included by the appointment counter:</label>
+						<div class="controls">
+							<div class="form-group">
+								<ca-field-boolean
+										ca-name="checkApptCountCanceled"
+										ca-title="Include cancelled appointments"
+										ca-template="juno"
+										ca-model="settingsCtrl.pref.appointmentCountIncludeCancelled"
+										ca-value="false">
+							</div>
+							<div class="form-group">
+								<ca-field-boolean
+										ca-name="checkApptCountNoShow"
+										ca-title="Include no-show appointments"
+										ca-template="juno"
+										ca-model="settingsCtrl.pref.appointmentCountIncludeNoShow"
+										ca-value="false">
+							</div>
+							<div class="form-group">
+								<ca-field-boolean
+										ca-name="checkApptCountNoDemographic"
+										ca-title="Include appointments not associated with a patient"
+										ca-template="juno"
+										ca-model="settingsCtrl.pref.appointmentCountIncludeNoDemographic"
+										ca-value="false">
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 

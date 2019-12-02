@@ -75,6 +75,11 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     private String clinicDelimFax;
     @Column(name = "email")
     private String clinicEmail;
+    @Column(name = "alberta_connect_care_lab_id")
+    private String albertaConnectCareLabId;
+    @Column(name = "alberta_connect_care_department_id")
+    private String albertaConnectCareDepartmentId;
+
     // foreign key
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name = "clinic_billing_address_id", referencedColumnName = "id")
@@ -220,6 +225,26 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     public ClinicBillingAddress getClinicBillingAddress()
     {
         return clinicBillingAddress;
+    }
+
+    public String getAlbertaConnectCareLabId()
+    {
+        return albertaConnectCareLabId;
+    }
+
+    public void setAlbertaConnectCareLabId(String albertaConnectCareLabId)
+    {
+        this.albertaConnectCareLabId = albertaConnectCareLabId;
+    }
+
+    public String getAlbertaConnectCareDepartmentId()
+    {
+        return albertaConnectCareDepartmentId;
+    }
+
+    public void setAlbertaConnectCareDepartmentId(String albertaConnectCareDepartmentId)
+    {
+        this.albertaConnectCareDepartmentId = albertaConnectCareDepartmentId;
     }
 
     public void setClinicBillingAddress(ClinicBillingAddress clinicBillingAddress)

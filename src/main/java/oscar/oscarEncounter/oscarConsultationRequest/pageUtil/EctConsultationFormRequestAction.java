@@ -228,8 +228,6 @@ public class EctConsultationFormRequestAction extends Action {
 			requestId = frm.getRequestId();
 		}
 
-		frm.setRequestId("");
-
 		request.setAttribute("teamVar", sendTo);
 
 		ConsultationRequest consult = consultationRequestDao.find(Integer.parseInt(requestId));

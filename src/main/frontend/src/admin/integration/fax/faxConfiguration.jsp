@@ -22,39 +22,8 @@
     Canada
 
 --%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
-<%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
-<%
-	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-	boolean authorized = true;
-%>
-<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=true%>">
-	<%authorized = false; %>
-	<%response.sendRedirect("../securityError.jsp?type=_admin");%>
-</security:oscarSec>
-<%
-	if (!authorized) {
-		return;
-	}
-%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
-<html lang="en" ng-app="oscarProviderViewModule">
-<head></head>
-<body ng-controller="Admin.Integration.Fax.FaxConfigurationController as faxController">
-
-<!--
-<link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
-<link rel="stylesheet" href="<%=request.getContextPath() %>/css/font-awesome.min.css">
--->
-<!-- Hide the main program nav as a fix for having angular in an iframe -->
-<!--
-<link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
--->
-
-<title><bean:message bundle="ui" key="admin.fax.acct.window-title"/></title>
 
 <div class="fax-config">
 	<div class="fax-config-header">
@@ -134,8 +103,3 @@
 
 	</div>
 </div>
-
-
-</body>
-</html>
-

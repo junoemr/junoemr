@@ -27,6 +27,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.model.ProgramProvider;
+import org.oscarehr.admin.service.AdminNavService;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.Dashboard;
 import org.oscarehr.common.model.Provider;
@@ -46,12 +47,14 @@ import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.ProgramProviderConverter;
 import org.oscarehr.ws.rest.conversion.SecobjprivilegeConverter;
 import org.oscarehr.ws.rest.conversion.SecuserroleConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.DashboardPreferences;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.NavbarResponse;
 import org.oscarehr.ws.rest.to.PersonaResponse;
 import org.oscarehr.ws.rest.to.PersonaRightsResponse;
+import org.oscarehr.ws.rest.to.model.AdminNavGroupTo1;
 import org.oscarehr.ws.rest.to.model.MenuItemTo1;
 import org.oscarehr.ws.rest.to.model.MenuTo1;
 import org.oscarehr.ws.rest.to.model.NavBarMenuTo1;
@@ -67,6 +70,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -96,6 +100,9 @@ public class PersonaService extends AbstractServiceImpl {
 	
 	@Autowired
 	private DashboardManager dashboardManager;
+
+	@Autowired
+	private AdminNavService adminNavService;
 	
 	
 	@GET
@@ -269,7 +276,7 @@ public class PersonaService extends AbstractServiceImpl {
 		menu.addWithState(idCounter++,bundle.getString("navbar.menu.tickler"),null,"ticklers")
 			//.add(0,"K2A",null,"#/k2a")
 			.addWithState(idCounter++,bundle.getString("navbar.menu.billing"),null,"billing")
-			.addWithState(idCounter++,bundle.getString("navbar.menu.admin"),null,"admin")
+			.addWithStates(idCounter++,bundle.getString("navbar.menu.admin"),null, Arrays.asList("admin.landingPage", "admin.frame", "admin.faxConfig", "admin.faxSendReceive"))
 			.addWithState(idCounter++,bundle.getString("navbar.menu.reports"),null,"reports")
 			.addWithState(idCounter++,bundle.getString("navbar.menu.documents"),null,"documents");
 
@@ -512,7 +519,15 @@ public class PersonaService extends AbstractServiceImpl {
 		}
 		
 		return result;
-		
 	}
+
+	@GET
+	@Path("/adminNav")
+	@Produces("application/json")
+	public RestResponse<List<AdminNavGroupTo1>> getAdminNavItems()
+	{
+		return RestResponse.successResponse(adminNavService.getAdminNavGroups(getHttpServletRequest().getContextPath(), getOscarResourcesBundle(), getCurrentProvider().getProviderNo(), getHttpServletRequest().getSession()));
+	}
+
 }
 

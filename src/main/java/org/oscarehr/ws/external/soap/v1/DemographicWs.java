@@ -31,6 +31,7 @@ import org.oscarehr.billing.CA.service.EligibilityCheckService;
 import org.oscarehr.billing.CA.transfer.EligibilityCheckTransfer;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.model.DemographicCust;
@@ -276,6 +277,36 @@ public class DemographicWs extends AbstractWs {
 		demographicManager.updateDemographicExtras(loggedInInfo, demographic, demographicTransfer);
 		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
 
+	}
+
+	/**
+	 * SOAP endpoint to get demographic contacts. Searches are conducted based off contact type.
+	 * @param demographicNo primary key for the demographic we're trying to pull for
+	 * @param type identifier for the contact category we want to search.
+	 *             DemographicContact doesn't explicitly have to support the type, but
+	 *        	   we're treating a non-matched type as an error because we know it'll return nothing.
+	 */
+	public List<DemographicContact> getDemographicContact(int demographicNo, int type) throws Exception
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		if (demographicManager.getDemographic(loggedInInfo, demographicNo) == null)
+		{
+			throw new Exception("Demographic " + demographicNo + " doesn't exist.");
+		}
+
+		if (!(type == DemographicContact.TYPE_PROVIDER
+				|| type == DemographicContact.TYPE_DEMOGRAPHIC
+				|| type == DemographicContact.TYPE_CONTACT
+				|| type == DemographicContact.TYPE_PROFESSIONALSPECIALIST))
+		{
+			throw new Exception("Input type " + type + " doesn't match any of the expected types: " +
+					DemographicContact.TYPE_PROVIDER + " (" + DemographicContact.TYPE_PROVIDER_TEXT + "), " +
+					DemographicContact.TYPE_DEMOGRAPHIC + " (" + DemographicContact.TYPE_DEMOGRAPHIC_TEXT + "),  " +
+					DemographicContact.TYPE_CONTACT + " (" + DemographicContact.TYPE_CONTACT_TEXT + "), " +
+					DemographicContact.TYPE_PROFESSIONALSPECIALIST + " (" + DemographicContact.TYPE_PROFESSIONAL_SPECIALIST_TEXT + ")");
+		}
+
+		return demographicManager.getDemographicContactsByType(loggedInInfo, demographicNo, type);
 	}
 
 	public EligibilityCheckTransfer checkEligibility(DemographicTransfer demographicTransfer)
