@@ -102,19 +102,17 @@ public class UserIntegrationAccessDao extends AbstractDao<UserIntegrationAccess>
 		{
 			sql += "i.integration.site IS NULL";
 			query = entityManager.createQuery(sql);
-
-			query.setParameter("securityNo", securityNo);
-			query.setParameter("integrationType", integrationType);
 		}
 		else
 		{
 			sql += "i.integration.site.name = :siteName";
 			query = entityManager.createQuery(sql);
 
-			query.setParameter("securityNo", securityNo);
 			query.setParameter("siteName", siteName);
-			query.setParameter("integrationType", integrationType);
 		}
+
+		query.setParameter("securityNo", securityNo);
+		query.setParameter("integrationType", integrationType);
 
 		return this.getSingleResultOrNull(query);
 	}
