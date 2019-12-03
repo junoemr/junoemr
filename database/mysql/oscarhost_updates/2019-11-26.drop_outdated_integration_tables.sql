@@ -1,3 +1,4 @@
+SET FOREIGN_KEY_CHECKS=0;
 DROP PROCEDURE IF EXISTS DropAndCreateTables;
 
 DELIMITER $$
@@ -57,3 +58,5 @@ CALL DropCreateIfOutdated();
 
 DROP PROCEDURE DropCreateIfOutdated;
 DROP PROCEDURE DropAndCreateTables;
+
+SET FOREIGN_KEY_CHECKS=1;
