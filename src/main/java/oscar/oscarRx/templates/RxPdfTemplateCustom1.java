@@ -121,7 +121,11 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		if (RxWatermarkService.isWatermarkEnabled() && RxWatermarkService.isWatermarkBackground())
 		{
 			PdfContentByte cb = writer.getDirectContent();
-			cb.addImage(createWaterMarkImage(document));
+			Image image = createWaterMarkImage(document);
+			if (image != null)
+			{
+				cb.addImage(image);
+			}
 		}
 
 		addToTable(mainTable, buildClinicHeader(), true);
@@ -147,7 +151,11 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		if (RxWatermarkService.isWatermarkEnabled() && !RxWatermarkService.isWatermarkBackground())
 		{
 			PdfContentByte cb = writer.getDirectContent();
-			cb.addImage(createWaterMarkImage(document));
+			Image waterMark = createWaterMarkImage(document);
+			if (waterMark != null)
+			{
+				cb.addImage(waterMark);
+			}
 		}
 	}
 
