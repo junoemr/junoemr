@@ -300,7 +300,14 @@ public class BillingReProcessBillAction extends Action {
         billingmaster.setTimeCall(timeCall);
         billingmaster.setServiceStartTime(serviceStartTime);
         billingmaster.setServiceEndTime(serviceEndTime);
-        billingmaster.setBirthDate(birthDate);
+        if(oinInsurerCode.equalsIgnoreCase("pp"))
+        {
+            billingmaster.setBirthDate("00000000");
+        }
+        else
+        {
+            billingmaster.setBirthDate(birthDate);
+        }
         billingmaster.setCorrespondenceCode(correspondenceCode);
         billingmaster.setClaimComment(claimComment);
         billingmaster.setOriginalClaim(originalMSPNumber);
