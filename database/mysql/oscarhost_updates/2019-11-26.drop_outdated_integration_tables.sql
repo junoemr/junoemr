@@ -49,7 +49,7 @@ BEGIN
 
 	IF pri_col_i = 'remote_id' THEN
 		# Table is outdated. Drop & Create
-	CALL DropAndCreateTables();
+        CALL DropAndCreateTables();
 	END IF;
 END $$
 DELIMITER ;
