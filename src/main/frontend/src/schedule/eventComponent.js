@@ -62,10 +62,11 @@ angular.module('Schedule').component('eventComponent', {
 			// Local scope variables
 			//=========================================================================/
 
-			controller.useOldEchart = true; //TODO load from a setting?
+			controller.useOldEchart = true;
 			controller.tabEnum = Object.freeze({
 				appointment: 0,
-				history: 1,
+				repeatBooking: 1,
+				history: 2,
 			});
 			controller.activeTab = controller.tabEnum.appointment;
 
@@ -89,7 +90,18 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.repeatBooking =
 				{
-					periodOptions: [
+					disabled: !securityService.getUser().superAdmin,
+					max_bookings_limit: 100,
+					toggleEnum: Object.freeze({
+						on: 'on',
+						off: 'off',
+					}),
+					endTypeEnum: Object.freeze({
+						date: 'date',
+						after: 'after',
+					}),
+					intervalOptions: [
+						// interval values should match moment.js time units
 						{
 							label: 'days',
 							value: 'days'
@@ -102,13 +114,32 @@ angular.module('Schedule').component('eventComponent', {
 							label: 'months',
 							value: 'months'
 						},
-					]
+					],
+					frequencyOptions: [
+						{
+							label: '1x',
+							value: 1
+						},
+						{
+							label: '2x',
+							value: 2
+						},
+						{
+							label: '3x',
+							value: 3
+						},
+					],
 				};
 			controller.repeatBookingData = {
-				units: null,
-				period: controller.repeatBooking.periodOptions[0].value,
-				endDate: null
+				enabled: controller.repeatBooking.toggleEnum.off,
+				frequency: controller.repeatBooking.frequencyOptions[0].value,
+				interval: controller.repeatBooking.intervalOptions[0].value,
+				endDate: Juno.Common.Util.formatMomentDate(moment().add(1, 'days')),
+				endAfterNumber: 1,
+				endType: controller.repeatBooking.endTypeEnum.date,
 			};
+			controller.repeatBookingDates = null;
+
 			controller.eventHistory = [];
 
 			controller.patientTypeahead = {};
@@ -218,6 +249,7 @@ angular.module('Schedule').component('eventComponent', {
 				}
 
 				// resolve data from opener
+				controller.loadedSettings = controller.resolve.loadedSettings;
 				controller.parentScope = controller.resolve.parentScope;
 				controller.keyBinding = controller.resolve.keyBinding;
 				controller.editMode = controller.resolve.editMode;
@@ -319,7 +351,6 @@ angular.module('Schedule').component('eventComponent', {
 			//=========================================================================
 			// Private methods
 			//=========================================================================/
-
 			controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 			{
 				var eventStatusCode = $scope.defaultEventStatus;
@@ -519,18 +550,76 @@ angular.module('Schedule').component('eventComponent', {
 				Juno.Common.Util.validateIntegerString($scope.eventData.duration,
 					$scope.displayMessages, 'duration', 'Duration', true, true, true);
 
-				Juno.Common.Util.validateIntegerString(controller.repeatBookingData.units,
-					$scope.displayMessages, 'repeatUnits', 'Repeat Units', false, true, false);
-
-				Juno.Common.Util.validateDateString(controller.repeatBookingData.endDate,
-					$scope.displayMessages, 'repeatEndDate', 'Repeat End Date', false);
-
 				if (controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
 				{
 					$scope.displayMessages.add_field_error('site', "A valid site must be selected");
 				}
 
+				Juno.Common.Util.validateIntegerString(controller.repeatBookingData.endAfterNumber,
+					$scope.displayMessages, 'repeatEndAfterNumber', 'Repeat End After', false, true, false);
+
+				Juno.Common.Util.validateDateString(controller.repeatBookingData.endDate,
+					$scope.displayMessages, 'repeatEndOnDate', 'Repeat End Date', false);
+
 				return !$scope.displayMessages.has_errors();
+			};
+
+			controller.updateRepeatBookingDates = function updateRepeatBookingDates()
+			{
+				controller.repeatBookingDates = [];
+				if(controller.isRepeatBookingEnabled())
+				{
+					controller.repeatBookingDates = controller.generateRepeatBookingDateList(controller.repeatBooking.max_bookings_limit);
+				}
+			};
+			controller.removeRepeatBookingDate = function removeRepeatBookingDate(dataObj)
+			{
+				controller.repeatBookingDates = controller.repeatBookingDates.filter(function(e) { return e !== dataObj })
+			};
+
+			controller.generateRepeatBookingDateList = function generateRepeatBookingDateList(limit)
+			{
+				var dateList = [];
+				var startDate = moment($scope.eventData.startDate);
+				var endDate = moment(controller.repeatBookingData.endDate);
+				var maxRepeats = controller.repeatBookingData.endAfterNumber;
+
+				var interval = controller.repeatBookingData.interval;
+				var frequency = controller.repeatBookingData.frequency;
+
+				var bUseEndDate = controller.isRepeatBookingEndTypeDate();
+				var bUseMaxRepeat = controller.isRepeatBookingEndTypeAfter();
+				$scope.displayMessages.remove_field_error('repeatEndAfterNumber');
+				$scope.displayMessages.remove_field_error('repeatEndOnDate');
+
+				var count = 0;
+				var lastDate = startDate;
+				while(true)
+				{
+					var nextDate = lastDate.add(frequency, interval);
+					count += 1;
+
+					if((bUseMaxRepeat && count > maxRepeats) || (bUseEndDate && nextDate.isAfter(endDate, 'day')))
+					{
+						break;
+					}
+					if(count > limit)
+					{
+						if(bUseMaxRepeat)
+						{
+							$scope.displayMessages.add_field_error('repeatEndAfterNumber', "limit of " + limit);
+						}
+						if(bUseEndDate)
+						{
+							$scope.displayMessages.add_field_error('repeatEndOnDate', "limit of " + limit);
+						}
+						break;
+					}
+
+					dateList.push(Juno.Common.Util.formatMomentDate(nextDate));
+					lastDate = nextDate;
+				}
+				return dateList;
 			};
 
 			$scope.saveEvent = function saveEvent()
@@ -545,6 +634,12 @@ angular.module('Schedule').component('eventComponent', {
 				var demographicNo = ($scope.eventData.doNotBook) ? null : controller.demographicModel.demographicNo;
 				var appointmentName = (demographicNo == null && Juno.Common.Util.exists(controller.patientTypeahead.searchQuery)) ?
 					controller.patientTypeahead.searchQuery : null;
+
+				var repeatOnDates = null;
+				if(controller.isRepeatBookingEnabled())
+				{
+					repeatOnDates = controller.repeatBookingDates;
+				}
 
 				controller.parentScope.saveEvent(
 					controller.editMode,
@@ -564,7 +659,9 @@ angular.module('Schedule').component('eventComponent', {
 						site: $scope.eventData.site,
 						doNotBook: $scope.eventData.doNotBook,
 						urgency: (($scope.eventData.critical) ? 'critical' : null),
-					}
+					},
+					repeatOnDates,
+
 				).then(
 					function (results)
 					{
@@ -673,6 +770,21 @@ angular.module('Schedule').component('eventComponent', {
 						controller.autofillDataFromType(newValue);
 					}
 				});
+				$scope.$watch('[' +
+					'eventController.repeatBookingData.enabled,' +
+					'eventController.repeatBookingData.frequency,' +
+					'eventController.repeatBookingData.interval,' +
+					'eventController.repeatBookingData.endType, ' +
+					'eventController.repeatBookingData.endDate,' +
+					'eventController.repeatBookingData.endAfterNumber' +
+					']',
+					function (newValue, oldValue)
+					{
+						if (newValue !== oldValue)
+						{
+							controller.updateRepeatBookingDates();
+						}
+					});
 			};
 
 			//=========================================================================
@@ -696,6 +808,22 @@ angular.module('Schedule').component('eventComponent', {
 			controller.hasAppointmentId = function hasAppointmentId()
 			{
 				return Juno.Common.Util.exists($scope.eventUuid);
+			};
+			controller.inEditMode = function inEditMode()
+			{
+				return controller.editMode;
+			};
+			controller.isRepeatBookingEnabled = function isRepeatBookingEnabled()
+			{
+				return (!controller.inEditMode() && controller.repeatBookingData.enabled === controller.repeatBooking.toggleEnum.on);
+			};
+			controller.isRepeatBookingEndTypeDate = function isRepeatBookingEndTypeDate()
+			{
+				return controller.repeatBookingData.endType === controller.repeatBooking.endTypeEnum.date;
+			};
+			controller.isRepeatBookingEndTypeAfter = function isRepeatBookingEndTypeAfter()
+			{
+				return controller.repeatBookingData.endType === controller.repeatBooking.endTypeEnum.after;
 			};
 
 			$scope.hasSites = function hasSites()
@@ -946,15 +1074,15 @@ angular.module('Schedule').component('eventComponent', {
 				controller.demographicModel.loadData(demographicNo); //TODO why?
 			};
 
-			$scope.newDemographic = function newDemographic(size)
+			$scope.newDemographic = function newDemographic()
 			{
 				var modalInstance = $uibModal.open(
 					{
-						templateUrl: 'src/patient/newPatient.jsp',
-						controller: 'Patient.NewPatientController as newPatientCtrl',
+						component: 'addDemographicModal',
 						backdrop: 'static',
-						size: size
-					});
+						windowClass: "juno-modal",
+					}
+				);
 
 				modalInstance.result.then(
 					function success(results)
@@ -963,6 +1091,7 @@ angular.module('Schedule').component('eventComponent', {
 						console.log('patient #: ', results.demographicNo);
 
 						controller.demographicModel.loadData(results.demographicNo);
+						controller.patientTypeahead  = {isTypeaheadSearchQuery: true, searchQuery: results.lastName + ", " + results.firstName};
 					},
 					function error(errors)
 					{
@@ -977,27 +1106,7 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				if ($scope.isPatientSelected())
 				{
-					if (controller.useOldEchart)
-					{
-						var params = {
-							providerNo: controller.providerModel.providerNo,
-							curProviderNo: data.eventData.userProviderNo,
-							demographicNo: controller.demographicModel.demographicNo,
-							userName: "",
-							reason: $scope.eventData.reason,
-							curDate: Juno.Common.Util.formatMomentDate(moment()),
-							providerview: data.eventData.userProviderNo,
-
-							appointmentNo: $scope.eventUuid,
-							appointmentDate: $scope.eventData.startDate,
-							startTime: $scope.eventData.startTime,
-							status: controller.selectedEventStatus,
-							apptProvider_no: controller.providerModel.providerNo,
-							encType: "face to face encounter with client",
-						};
-						window.open(scheduleService.getEncounterLink(params));
-					}
-					else
+					if (controller.loadedSettings && controller.loadedSettings.hideOldEchartLinkInAppointment)
 					{
 						var params = {
 							demographicNo: controller.demographicModel.demographicNo,
@@ -1008,6 +1117,27 @@ angular.module('Schedule').component('eventComponent', {
 							params.encType = "face to face encounter with client";
 						}
 						$state.go('record.summary', params);
+					}
+					else
+					{
+						var params = {
+							providerNo: controller.providerModel.providerNo,
+							curProviderNo: controller.resolve.data.eventData.userProviderNo,
+							demographicNo: controller.demographicModel.demographicNo,
+							userName: "",
+							reason: $scope.eventData.reason,
+							curDate: Juno.Common.Util.formatMomentDate(moment()),
+							providerview: controller.resolve.data.eventData.userProviderNo,
+
+							appointmentNo: $scope.eventUuid,
+							appointmentDate: $scope.eventData.startDate,
+							startTime: $scope.eventData.startTime,
+							status: controller.selectedEventStatus,
+							apptProvider_no: controller.providerModel.providerNo,
+							encType: "face to face encounter with client",
+						};
+						window.open(scheduleService.getEncounterLink(params), 'popupWindow',
+								'height=800,width=1000,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
 					}
 					controller.cancel();
 				}
@@ -1021,10 +1151,10 @@ angular.module('Schedule').component('eventComponent', {
 						demographic_name: controller.demographicModel.fullName,
 						providerNo: controller.providerModel.providerNo,
 						providerview: controller.providerModel.providerNo,
-						user_no: data.eventData.userProviderNo,
+						user_no: controller.resolve.data.eventData.userProviderNo,
 
-						billRegion: data.eventData.billingRegion,
-						billForm: data.eventData.billingForm,
+						billRegion: controller.resolve.data.eventData.billingRegion,
+						billForm: controller.resolve.data.eventData.billingForm,
 						hotclick: "",
 						bNewForm: 1,
 
@@ -1061,7 +1191,6 @@ angular.module('Schedule').component('eventComponent', {
 				window.open(scheduleService.getRxLink(params));
 				controller.cancel();
 			};
-
 
 			//=========================================================================
 			//  Key Bindings

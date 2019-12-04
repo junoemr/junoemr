@@ -156,6 +156,7 @@ public class ClinicaidAPIService
 		else
 		{
 			PatientEligibilityDataTo1 eligibilityData = result.getData().getEligibilityData();
+			response.put("isEligible", String.valueOf(eligibilityData.isEligible()));
 			response.put("result", eligibilityData.isEligible() ? "Patient Eligible" : "Patient Not Eligible");
 			response.put("msg", oscarProperties.isOntarioInstanceType()
 							? formatEligibilityData(eligibilityData)

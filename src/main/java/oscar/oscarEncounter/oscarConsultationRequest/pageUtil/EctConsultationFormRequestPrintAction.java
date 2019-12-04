@@ -36,6 +36,7 @@ import oscar.dms.EDoc;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.UtilDateUtilities;
 
+import javax.naming.SizeLimitExceededException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -75,8 +76,11 @@ public class EctConsultationFormRequestPrintAction extends Action
 	    securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, demographicNo, "_con");
 
 		String error = "";
+		String friendlyReturnMessage = "";
 		Exception exception = null;
 	    List<InputStream> streamList = new ArrayList<>();
+
+	    long excessBytes = 0L;
 
 	    try
 		{
@@ -90,7 +94,11 @@ public class EctConsultationFormRequestPrintAction extends Action
 			streamList.addAll(consultationPDFCreationService.toEFormInputStreams(request, attachedEForms));
 
 			ByteOutputStream bos = new ByteOutputStream();
-			consultationPDFCreationService.combineStreams(streamList, bos);
+			excessBytes = consultationPDFCreationService.combineStreams(streamList, bos);
+			if (excessBytes > 0)
+			{
+				throw new SizeLimitExceededException();
+			}
 
 			response.setContentType("application/pdf"); // octet-stream
 			response.setHeader(
@@ -103,17 +111,26 @@ public class EctConsultationFormRequestPrintAction extends Action
 		catch(HtmlToPdfConversionException ce)
 		{
 			error = "HtmlToPdfConversionException";
+			friendlyReturnMessage = "Error when attempting to convert HTML to PDF, one or more of your eForms may be formatted incorrectly.";
 			exception = ce;
 		}
 		catch(DocumentException de)
 		{
 			error = "DocumentException";
+			friendlyReturnMessage = "Error when attempting to read one or more of the documents.";
 			exception = de;
 		}
 		catch(IOException ioe)
 		{
 			error = "IOException";
+			friendlyReturnMessage = "Error attempting to access an internal file.";
 			exception = ioe;
+		}
+	    catch (SizeLimitExceededException slee)
+		{
+			error = "SizeLimitExceededException";
+			friendlyReturnMessage = "The attached files included with this consultation request are too large. Please remove some of the attached files and try again.";
+			exception = slee;
 		}
 		finally
 		{
@@ -125,8 +142,10 @@ public class EctConsultationFormRequestPrintAction extends Action
 		}
 	    if(!error.isEmpty())
 	    {
-		    logger.error(error + " occurred inside ConsultationPrintAction", exception);
+		    logger.error(error + " occurred inside ConsultationPrintAction");
 		    request.setAttribute("printError", true);
+		    request.setAttribute("errorMessage", friendlyReturnMessage);
+		    request.setAttribute("demo", demographicNoStr);
 		    return mapping.findForward("error");
 	    }
 	    return null;

@@ -46,12 +46,16 @@ public class DemographicContact extends AbstractModel<Integer> {
 
 	//link to the provider table
 	public static final int TYPE_PROVIDER = 0;
+	public static final String TYPE_PROVIDER_TEXT = "Provider";
 	//link to the demographic table
 	public static final int TYPE_DEMOGRAPHIC = 1;
+	public static final String TYPE_DEMOGRAPHIC_TEXT = "Demographic";
 	//link to the contact table
 	public static final int TYPE_CONTACT = 2;
+	public static final String TYPE_CONTACT_TEXT = "Contact";
 	//link to the professional specialists table
 	public static final int TYPE_PROFESSIONALSPECIALIST = 3;
+	public static final String TYPE_PROFESSIONAL_SPECIALIST_TEXT = "Professional Specialist";
 
 	public static final String CATEGORY_PERSONAL = "personal";
 	public static final String CATEGORY_PROFESSIONAL = "professional";

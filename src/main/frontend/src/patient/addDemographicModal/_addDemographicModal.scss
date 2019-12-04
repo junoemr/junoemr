@@ -1,0 +1,36 @@
+#add-demographic-modal {
+	@include juno-font-default();
+
+	.add-demographic-content {
+		padding: 10px;
+
+		.invalid-field {
+			input, select{
+				border: 1px solid $color-red-base;
+			}
+		}
+
+		.right-column-container {
+			flex: 0 0 75%;
+		}
+
+		.left-column-container {
+			flex: 0 0 75%;
+
+			.hin-fields {
+				display: flex;
+				flex-wrap: wrap;
+				flex-direction: row;
+				align-items: end;
+
+				.hin {
+					flex: 0 0 80%;
+				}
+
+				.ver {
+					flex: 1 1 20%;
+				}
+			}
+		}
+	}
+}

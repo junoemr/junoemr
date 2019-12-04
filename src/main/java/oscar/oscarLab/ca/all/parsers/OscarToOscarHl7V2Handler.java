@@ -37,10 +37,11 @@ import org.oscarehr.util.MiscUtils;
 import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.ChainnedMessageAdapter;
 import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.OruR01Handler;
 import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.RefI12Handler;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
 import java.util.ArrayList;
 
-public final class OscarToOscarHl7V2Handler extends MessageHandler
+public final class OscarToOscarHl7V2Handler extends ORU_R01MessageHandler
 {
 	private static Logger logger = MiscUtils.getLogger();
 	

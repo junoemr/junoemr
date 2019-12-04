@@ -33,6 +33,7 @@ import org.oscarehr.olis.model.OLISRequestNomenclature;
 import org.oscarehr.olis.model.OLISResultNomenclature;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.UtilDateUtilities;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,14 +53,13 @@ import java.util.regex.Pattern;
 /**
  * @author Adam Balanga
  */
-public class OLISHL7Handler extends MessageHandler
+public class OLISHL7Handler extends ORU_R01MessageHandler
 {
 
 	Logger logger = Logger.getLogger(DefaultGenericHandler.class);
 	protected boolean isFinal = true;
 	protected boolean isCorrected = false;
 	protected Message msg = null;
-	protected Terser terser;
 	protected ArrayList<ArrayList<Segment>> obrGroups = null;
 	private ArrayList<String> obrSpecimenSource;
 	private ArrayList<String> obrStatus;
@@ -851,6 +851,7 @@ public class OLISHL7Handler extends MessageHandler
 		
 		msg = p.parse(hl7Body.replaceAll("\n", "\r\n"));
 		headers = new ArrayList<String>();
+		this.message = msg;
 		terser = new Terser(msg);
 		int zbrNum = 1;
 		int obrCount = getOBRCount();

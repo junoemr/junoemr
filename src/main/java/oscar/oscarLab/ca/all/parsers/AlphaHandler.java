@@ -68,9 +68,11 @@ public class AlphaHandler extends DefaultGenericHandler {
        // hl7Body = hl7Body.replaceAll("R01", "");
         version = p.parse(hl7Body.replaceAll( "\n", "\r\n")).getVersion();
         if (version.equals("2.2")) {
-        	msg22 = (ca.uhn.hl7v2.model.v22.message.ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ));	
+        	msg22 = (ca.uhn.hl7v2.model.v22.message.ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ));
+        	this.message = msg22;
         } else {
         	msg23 = (ca.uhn.hl7v2.model.v23.message.ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ));
+        	this.message = msg23;
         }
         
         if (version.equals("2.2")) {

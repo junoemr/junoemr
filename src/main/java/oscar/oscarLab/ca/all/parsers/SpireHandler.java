@@ -42,6 +42,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.oscarLab.ca.all.spireHapiExt.v23.message.ORU_R01;
 
 import java.util.ArrayList;
@@ -248,7 +249,7 @@ class Lines {
  *
  * @author j.chisholm
  */
-public class SpireHandler extends MessageHandler
+public class SpireHandler extends ORU_R01MessageHandler
 {
 
     ORU_R01 msg = null;

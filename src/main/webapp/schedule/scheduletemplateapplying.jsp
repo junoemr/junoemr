@@ -132,7 +132,7 @@
 		}
 
 		String today = UtilDateUtilities.DateToString(new java.util.Date(), "yyyy-MM-dd");
-		String lastYear = (Integer.parseInt(today.substring(0, today.indexOf('-'))) - 2) + today.substring(today.indexOf('-'));
+		String threeYearsBack = (Integer.parseInt(today.substring(0, today.indexOf('-'))) - 3) + today.substring(today.indexOf('-'));
 
 		if("1".equals(request.getParameter("delete")))
 		{
@@ -381,7 +381,25 @@ function addDataString1() {
             alert("<bean:message key="schedule.scheduletemplateapplying.msgDateOrder"/>");
             return false;
         }
+	return true;
 }
+
+function inputValidation()
+{
+	var isInputWeekDaysOK = addDataString();
+
+	var isInputDateRangeOK = addDataString1();
+
+	return isInputWeekDaysOK === true && isInputDateRangeOK === true;
+
+}
+
+
+function disableSubmitButton()
+{
+	document.getElementById("submitBTNID").disabled = true;
+}
+
 //-->
 </script>
 </head>
@@ -412,10 +430,34 @@ function addDataString1() {
 			}
 		}
 	%>
+
+	<script type="text/javascript">
+		function submission()
+		{
+
+			var isAlternateChecked = "<%=  bOrigAlt || bAlternate %>";
+			if(isAlternateChecked === "true" )
+			{
+				addDataStringB();
+			}
+
+			if(inputValidation() === true)
+			{
+				//prevent spam hitting submission, only allow one submission.
+				disableSubmitButton();
+				return true;
+			}
+
+			return false;
+
+		}
+	</script>
+
 <body bgcolor="ivory" bgproperties="fixed" onLoad="setfocus()"
 	topmargin="0" leftmargin="0" rightmargin="0">
+
 <form method="post" name="schedule" action="schedulecreatedate.jsp"
-	onSubmit="<%=bAlternate||bOrigAlt?"addDataStringB();":""%>addDataString();return(addDataString1())">
+	  onSubmit="submission()">
 
 <table border="0" width="100%">
 	<!-- <tr>
@@ -527,7 +569,7 @@ function addDataString1() {
 					name="select" onChange="selectrschedule(this)">
 					<%
 
-						List<RSchedule> rss = rScheduleDao.search_rschedule_future1(request.getParameter("provider_no"), ConversionUtils.fromDateString(lastYear));
+						List<RSchedule> rss = rScheduleDao.findByEdateAfter(request.getParameter("provider_no"), ConversionUtils.fromDateString(threeYearsBack));
 
 						for(RSchedule rs : rss)
 						{
@@ -898,7 +940,7 @@ function tranbuttonb7_click() {
 						<input type="hidden" name="provider_no" value="<%=request.getParameter("provider_no")%>">
 						<input type="hidden" name="available" value="<%=bAlternate||bOrigAlt?"A":"1"%>">
 						<input type="hidden" name="Submit" value=" Next ">
-						<input type="submit" value='<bean:message key="schedule.scheduletemplateapplying.btnNext"/>'>
+						<input type="submit" value='<bean:message key="schedule.scheduletemplateapplying.btnNext"/>' id ="submitBTNID">
 					<%}%>
 				</div>
 				</td>

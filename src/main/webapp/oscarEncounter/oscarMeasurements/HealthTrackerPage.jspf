@@ -24,29 +24,41 @@
 
 --%>
 <!DOCTYPE html>
-<%long startTime = System.currentTimeMillis();%>
 
-<%@ page import="oscar.oscarDemographic.data.*,oscar.oscarPrevention.*,oscar.oscarEncounter.oscarMeasurements.*,oscar.oscarEncounter.oscarMeasurements.bean.*,oscar.oscarEncounter.oscarMeasurements.pageUtil.*"%>
-<%@ page import="oscar.oscarResearch.oscarDxResearch.bean.*"%>
-<%@ page import="org.oscarehr.common.dao.FlowSheetCustomizationDao,org.oscarehr.common.model.FlowSheetCustomization"%>
-<%@ page import="org.oscarehr.common.dao.FlowSheetDrugDao,org.oscarehr.common.dao.FlowSheetDxDao,org.oscarehr.common.model.FlowSheetDrug,org.oscarehr.util.MiscUtils"%>
-<%@ page import="org.oscarehr.caisi_integrator.ws.CachedMeasurement,org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager,org.oscarehr.util.LoggedInInfo" %>
-<%@ page import="oscar.util.UtilDateUtilities,oscar.util.UtilMisc,oscar.log.*" %>
+<%@ page import="org.oscarehr.common.dao.FlowSheetCustomizationDao"%>
+<%@ page import="org.oscarehr.common.model.FlowSheetCustomization"%>
+<%@ page import="org.oscarehr.util.MiscUtils"%>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="oscar.util.UtilDateUtilities"%>
+<%@ page import="oscar.util.UtilMisc"%>
 <%@ page import="oscar.OscarProperties"%>
 <%@ page import="org.oscarehr.common.model.Validations" %>
 
-<%@ page import="oscar.oscarReport.reportByTemplate.*"%>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
 <%@ page import="org.oscarehr.common.model.Flowsheet" %>
-<%@ page import="org.oscarehr.common.dao.FlowsheetDao" %>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-
-<%@ page import="oscar.eform.data.*, oscar.eform.*"%>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementInfo" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
+<%@ page import="static org.caisi.comp.web.WebComponentUtil.getServletContext" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.FlowSheetItem" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean" %>
+<%@ page import="java.util.Hashtable" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="oscar.eform.EFormUtil" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.EctValidation" %>
+<%@ page import="java.util.Vector" %>
+<%@ page import="oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler" %>
+<%@ page import="oscar.oscarPrevention.PreventionData" %>
 
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
-
-<%@ page import="java.util.*,java.net.*" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -63,11 +75,6 @@
     String temp = request.getParameter("template");
         
     String ornPilot = OscarProperties.getInstance().getProperty("ORN_PILOT", "no");
-	 
-    String id = request.getParameter("id");
-    String measurement = request.getParameter("measurement");
-    id = "0";
-    measurement = "BP";
 
 %>
 <oscar:oscarPropertiesCheck property="SPEC3" value="yes">
@@ -107,17 +114,9 @@
         }catch(Exception e){edate = null;}
     }
 
-
-    long startTimeToGetP = System.currentTimeMillis();
-
-    boolean dsProblems = false;
-
-
     WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 
     FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
-    FlowSheetDrugDao flowSheetDrugDao = (FlowSheetDrugDao) ctx.getBean("flowSheetDrugDao");
-	FlowSheetDxDao flowSheetDxDao = (FlowSheetDxDao) ctx.getBean("flowSheetDxDao");
     List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
     
 
@@ -129,7 +128,6 @@
     MeasurementInfo mi = new MeasurementInfo(demographic_no);
     List<String> measurementLs = mFlowsheet.getMeasurementList();
     ArrayList<String> measurements = new ArrayList(measurementLs);
-    long startTimeToGetM = System.currentTimeMillis();
 
     Boolean isMeasurements=true;	
 	if(measurements.size()<=0){	
@@ -154,8 +152,6 @@
 
 
     String flowSheet = mFlowsheet.getDisplayName();
-    ArrayList<String> warnings = mi.getWarnings();
-    ArrayList<String> recomendations = mi.getRecommendations();
     ArrayList comments = new ArrayList();
 
 String[] demographicParam = new String[1];
@@ -685,18 +681,14 @@ function fsPopup(width,height,url,window) {
 
 <a href="?demographic_no=<%=demographic_no%>&template=tracker" class="btn btn-default <%if(temp.equals("tracker")){ out.print("btn-primary active");} %>"><span class="glyphicon glyphicon-home "></span></a>
 <%
-				boolean btnSelected=false;
-				String btnState = "btn";
 				String dxCodeQueryString="";
 				
 				ArrayList<String> diagnosed=new ArrayList<String>(); 
 				ArrayList<String> flowsheetList=new ArrayList<String>();
 								
-				FlowsheetDao flowsheetDao = (FlowsheetDao) SpringUtils.getBean("flowsheetDao");
-				ArrayList<String> flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getUniveralFlowsheets();
 				dxResearchBeanHandler dxRes = new dxResearchBeanHandler(demographic_no);
 				Vector dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-				flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetsFromDxCodes(dxCodes);
+				ArrayList<String> flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetsFromDxCodes(dxCodes);
 			
 				Hashtable<String, String> systemFlowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetDisplayNames();
 				
@@ -981,8 +973,7 @@ primaryMore="btn-primary";
 
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 
-    EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();  
-    long startTimeToLoopAndPrint = System.currentTimeMillis();
+    EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
     for (String measure:measurements){
         Map h2 = mFlowsheet.getMeasurementFlowSheetInfo(measure);
         FlowSheetItem item =  mFlowsheet.getFlowSheetItem(measure);
@@ -1001,7 +992,6 @@ primaryMore="btn-primary";
                 h.put("desc",mtypeBean.getTypeDesc());
             }
             
-            String prevName = (String) h.get("name");
             ArrayList<EctMeasurementsDataBean> alist = mi.getMeasurementData(measure);
             if (loggedInInfo.getCurrentFacility().isIntegratorEnabled()) {	
                 EctMeasurementsDataBeanHandler.addRemoteMeasurements(loggedInInfo, alist,measure,Integer.parseInt(demographic_no));
@@ -1013,7 +1003,6 @@ primaryMore="btn-primary";
                 warningColour = mFlowsheet.getWarningColour();
             }
 
-	   String warningIndicator = "style='float:left;padding:1px;width:4px;height:10px;background-color:"+warningColour+";'";
             //measurement_type="EDGI"
             //display_name="Autonomic Neuropathy"
             //guideline="Erectile Dysfunction, hastrointestinal disturbance"
@@ -1188,8 +1177,7 @@ iDate++;
 	           }else{
 	               com ="";
 	           }
-	           String hider = "";
-	
+
 	           String indColour = "";
 	           String indText = "";
 	           if ( mdb.getIndicationColour() != null ){
@@ -1261,7 +1249,7 @@ iDate++;
 	
 	<%if(setx<num){ out.print("</div> <!--end of items-->"); }%>
 	      
-	<!-- </div><!-- carousel-inner -->
+	<!-- </div>carousel-inner -->
 	
 	<%if(k>num){ %>
 	   <a class="left carousel-control" href="#myCarousel<%=measure%>" data-slide="prev" id="prev_<%=measure%>" style="margin-left:-25px;"><span class="glyphicon glyphicon-arrow-left text-success"></a>
@@ -1302,7 +1290,6 @@ $(document).ready(function(){ $(id).trigger('slid.bs.carousel'); });
 
     }else{
     String prevType = (String) h2.get("prevention_type");
-    long startPrevType = System.currentTimeMillis();
     ArrayList<Map<String,Object>> alist = PreventionData.getPreventionData(loggedInInfo, prevType, Integer.parseInt(demographic_no));
 %>	
 

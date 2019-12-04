@@ -80,6 +80,7 @@ import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarDemographic.data.DemographicMerged;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.HHSEmrDownloadHandler;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
@@ -140,7 +141,21 @@ public final class MessageUploader {
 			String resultStatus = "";
 			String priority = messageHandler.getMsgPriority();
 			String requestingClient = messageHandler.getDocName();
-			String reportStatus = messageHandler.getOrderStatus();
+			String reportStatus = "";
+			if (ConnectCareHandler.isConnectCareHandler(messageHandler))
+			{
+				Hl7TextInfo.REPORT_STATUS junoReportStatus = messageHandler.getJunoOrderStatus();
+				if (junoReportStatus == null)
+				{
+					MiscUtils.getLogger().error("Could not get Juno report status for message with order status: " + messageHandler.getOrderStatus() + " defaulting to Partial");
+					junoReportStatus = Hl7TextInfo.REPORT_STATUS.P;
+				}
+				reportStatus = junoReportStatus.name();
+			}
+			else
+			{
+				reportStatus = messageHandler.getOrderStatus();
+			}
 			String accessionNum = messageHandler.getAccessionNum();
 			String fillerOrderNum = messageHandler.getFillerOrderNumber();
 			String sendingFacility = messageHandler.getPatientLocation();
@@ -269,23 +284,21 @@ public final class MessageUploader {
 			boolean hasPDF = false;
 			List<String> embeddedPDFs = new ArrayList<>();
 
-			if (type.equals("PATHL7"))
+			if (messageHandler.isSupportEmbeddedPdf())
 			{
 				String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
 				// Every PDF should be prefixed with this due to b64 encoding of PDF header
-				final String pdfPrefix = "JVBERi0xLj";
 
 				for (i = 0; i < messageHandler.getOBRCount(); i++)
 				{
-					if (messageHandler.getOBXValueType(i, 0).equals("ED"))
+					for (int c =0; c < messageHandler.getOBXCount(i); c ++)
 					{
-						int obxCount = messageHandler.getOBXCount(i);
-						for (j = 0; j < obxCount; j++)
+						if (messageHandler.getOBXValueType(i, c).equals("ED"))
 						{
 							// Some embedded PDFs simply have the lab as-is, some have it split up like above
 							for (int k = 1; k <= referenceStrings.length; k++)
 							{
-								String embeddedPdf = messageHandler.getOBXResult(i, j, k);
+								String embeddedPdf = messageHandler.getOBXResult(i, c, k);
 								if (embeddedPdf.startsWith(PATHL7Handler.embeddedPdfPrefix))
 								{
 									MiscUtils.getLogger().info("Found embedded PDF in lab upload, pulling it out");
@@ -304,9 +317,10 @@ public final class MessageUploader {
 			{
 				if (hasPDF)
 				{
+					int count = 0;
 					for (String pdf : embeddedPDFs)
 					{
-						String fileName = "-" + accessionNum + ".pdf";
+						String fileName = "-" + accessionNum + "-" + fillerOrderNum + "-" + count + "-" + (int)(Math.random()*1000000000) + ".pdf";
 						// Replace original PDF string with meta info to prevent saving > 500k char strings in table
 						docId = createDocumentFromEmbeddedPDF(pdf, fileName);
 						hl7Body = hl7Body.replace(pdf, PATHL7Handler.pdfReplacement + docId);
@@ -314,6 +328,7 @@ public final class MessageUploader {
 						{
 							throw new ParseException("did not save embedded lab document correctly", 0);
 						}
+						count ++;
 					}
 				}
 

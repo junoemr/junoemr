@@ -175,6 +175,7 @@ if(!authed) {
 		  p.setBillingNo(request.getParameter("billing_no"));
 		  p.setHsoNo(request.getParameter("hso_no"));
 		  p.setAlbertaTakNo(StringUtils.trimToNull(request.getParameter("alberta_tak_no")));
+		  p.setAlbertaConnectCareId(StringUtils.trimToNull(request.getParameter("alberta_connect_care_provider_id")));
 		  p.setStatus(request.getParameter("status"));
 		  p.setComments(SxmlMisc.createXmlDataString(request,"xml_p"));
 		  p.setProviderActivity(request.getParameter("provider_activity"));

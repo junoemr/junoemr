@@ -459,11 +459,6 @@ angular.module('Layout').component("primaryNavigation", {
 					url = "../billing.do?billRegion=CLINICAID&action=invoice_reports";
 					wname = "billing";
 				}
-				else if (item.label === "Admin")
-				{
-					url = "../administration/";
-					wname = "admin";
-				}
 				else if (item.label === "eDocs")
 				{
 					url = "../dms/documentReport.jsp?function=provider&functionid=" +
@@ -592,10 +587,9 @@ angular.module('Layout').component("primaryNavigation", {
 		{
 			var modalInstance = $uibModal.open(
 				{
-					templateUrl: 'src/patient/newPatient.jsp',
-					controller: 'Patient.NewPatientController as newPatientCtrl',
+					component: 'addDemographicModal',
 					backdrop: 'static',
-					size: size
+					windowClass: "juno-modal",
 				});
 
 			modalInstance.result.then(
@@ -622,7 +616,7 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.isActive = function(tab)
 		{
-			return ($state.current.name === (tab.state != null ? tab.state[0] : null));
+			return tab.state != null ? tab.state.includes($state.current.name) : false;
 		};
 
 		ctrl.changeProgram = function changeProgram(programId)

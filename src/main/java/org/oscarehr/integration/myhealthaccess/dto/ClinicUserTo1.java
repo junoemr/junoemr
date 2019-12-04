@@ -36,16 +36,27 @@ public class ClinicUserTo1 implements Serializable
 	private String lastName;
 
 	@JsonProperty("id")
-	private String myhealthaccesID;
+	private String myhealthaccessId;
 
 	@JsonProperty("remote_id")
-	private String remoteID;
+	private String remoteId;
 
 	@JsonProperty("email")
 	private String email;
 
+	@JsonProperty("token")
+	private String token;
+
 	public ClinicUserTo1()
 	{
+	}
+
+	public ClinicUserTo1(String remoteId, String email, String firstName, String lastName)
+	{
+		setRemoteId(remoteId);
+		setEmail(email);
+		setFirstName(firstName);
+		setLastName(lastName);
 	}
 
 	public String getFirstName()
@@ -68,24 +79,24 @@ public class ClinicUserTo1 implements Serializable
 		this.lastName = lastName;
 	}
 
-	public String getMyhealthaccesID()
+	public String getMyhealthaccessId()
 	{
-		return myhealthaccesID;
+		return myhealthaccessId;
 	}
 
-	public void setMyhealthaccesID(String myhealthaccesID)
+	public void setMyhealthaccessId(String myhealthaccessId)
 	{
-		this.myhealthaccesID = myhealthaccesID;
+		this.myhealthaccessId = myhealthaccessId;
 	}
 
-	public String getRemoteID()
+	public String getRemoteId()
 	{
-		return remoteID;
+		return remoteId;
 	}
 
-	public void setRemoteID(String remoteID)
+	public void setRemoteId(String remoteId)
 	{
-		this.remoteID = remoteID;
+		this.remoteId = remoteId;
 	}
 
 	public String getEmail()
@@ -96,5 +107,15 @@ public class ClinicUserTo1 implements Serializable
 	public void setEmail(String email)
 	{
 		this.email = email;
+	}
+
+	public String getToken()
+	{
+		return token;
+	}
+
+	public void setToken(String token)
+	{
+		this.token = token;
 	}
 }

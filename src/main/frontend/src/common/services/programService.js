@@ -41,7 +41,6 @@ angular.module("Common.Services").service("programService", [
 				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
 				function success(results)
 				{
-					console.log(results.data);
 					deferred.resolve(results.data.content);
 				},
 				function error(errors)

@@ -114,6 +114,20 @@ Juno.Common.Util.getDatetimeNoTimezoneMoment = function getDatetimeNoTimezoneMom
 		Juno.Common.Util.settings.datetime_no_timezone_format, true);
 };
 
+Juno.Common.Util.getUserISOTimezoneOffset = function ()
+{
+	let sign = "-";
+	let offsetRaw = (new Date()).getTimezoneOffset();
+	if (offsetRaw < 0)
+	{
+		sign = "+";
+		offsetRaw *= -1;
+	}
+	let offsetHour = offsetRaw / 60;
+	let offsetMin = offsetRaw % 60;
+	return sign + offsetHour.toString().padStart(2,"0") + ":" + offsetMin.toString().padStart(2, "0");
+};
+
 Juno.Common.Util.validateDateString = function validateDateString(
 	dateString, displayErrors, field, fieldDisplayName, required)
 {

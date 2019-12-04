@@ -27,20 +27,26 @@ package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
+import org.oscarehr.billing.CA.service.EligibilityCheckService;
+import org.oscarehr.billing.CA.transfer.EligibilityCheckTransfer;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.external.soap.v1.transfer.DemographicIntegrationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.PhrVerificationTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
 
+import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -65,7 +71,13 @@ public class DemographicWs extends AbstractWs {
 	private DemographicManager demographicManager;
 
 	@Autowired
+	private DemographicService demographicService;
+
+	@Autowired
 	private DemographicCustDao demographicCustDao;
+
+	@Autowired
+	private EligibilityCheckService eligibilityCheckService;
 
 	public DemographicTransfer getDemographic(Integer demographicId)
 	{
@@ -149,7 +161,8 @@ public class DemographicWs extends AbstractWs {
 		return(results.toArray(new Integer[0]));
 	}
 	
-	public Integer[] getDemographicIdsWithMyOscarAccounts(@WebParam(name="startDemographicIdExclusive") Integer startDemographicIdExclusive, @WebParam(name="itemsToReturn") int itemsToReturn)
+	public Integer[] getDemographicIdsWithMyOscarAccounts(@WebParam(name="startDemographicIdExclusive") Integer startDemographicIdExclusive,
+	                                                      @WebParam(name="itemsToReturn") int itemsToReturn)
 	{
 		List<Integer> results=demographicManager.getDemographicIdsWithMyOscarAccounts(getLoggedInInfo(), startDemographicIdExclusive, itemsToReturn);
 		return(results.toArray(new Integer[0]));
@@ -212,7 +225,8 @@ public class DemographicWs extends AbstractWs {
 	/**
 	 * @return the ID of the demographic just added
 	 */
-	public Integer addDemographic(DemographicTransfer demographicTransfer) throws Exception
+	public Integer addDemographic(DemographicTransfer demographicTransfer,
+	                              @Nullable DemographicIntegrationTransfer integrationTransfer) throws Exception
 	{
 		MessageContext mc = wsContext.getMessageContext();
 		HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
@@ -231,6 +245,11 @@ public class DemographicWs extends AbstractWs {
 		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
 		demographicManager.addDemographicExtras(loggedInInfo, demographic, demographicTransfer);
 		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
+
+		if(integrationTransfer != null)
+		{
+			demographicService.addDemographicIntegrationRecord(demographic.getDemographicNo(), integrationTransfer);
+		}
 
 		return demographic.getDemographicNo();
 	}
@@ -258,5 +277,54 @@ public class DemographicWs extends AbstractWs {
 		demographicManager.updateDemographicExtras(loggedInInfo, demographic, demographicTransfer);
 		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
 
+	}
+
+	/**
+	 * SOAP endpoint to get demographic contacts. Searches are conducted based off contact type.
+	 * @param demographicNo primary key for the demographic we're trying to pull for
+	 * @param type identifier for the contact category we want to search.
+	 *             DemographicContact doesn't explicitly have to support the type, but
+	 *        	   we're treating a non-matched type as an error because we know it'll return nothing.
+	 */
+	public List<DemographicContact> getDemographicContact(int demographicNo, int type) throws Exception
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		if (demographicManager.getDemographic(loggedInInfo, demographicNo) == null)
+		{
+			throw new Exception("Demographic " + demographicNo + " doesn't exist.");
+		}
+
+		if (!(type == DemographicContact.TYPE_PROVIDER
+				|| type == DemographicContact.TYPE_DEMOGRAPHIC
+				|| type == DemographicContact.TYPE_CONTACT
+				|| type == DemographicContact.TYPE_PROFESSIONALSPECIALIST))
+		{
+			throw new Exception("Input type " + type + " doesn't match any of the expected types: " +
+					DemographicContact.TYPE_PROVIDER + " (" + DemographicContact.TYPE_PROVIDER_TEXT + "), " +
+					DemographicContact.TYPE_DEMOGRAPHIC + " (" + DemographicContact.TYPE_DEMOGRAPHIC_TEXT + "),  " +
+					DemographicContact.TYPE_CONTACT + " (" + DemographicContact.TYPE_CONTACT_TEXT + "), " +
+					DemographicContact.TYPE_PROFESSIONALSPECIALIST + " (" + DemographicContact.TYPE_PROFESSIONAL_SPECIALIST_TEXT + ")");
+		}
+
+		return demographicManager.getDemographicContactsByType(loggedInInfo, demographicNo, type);
+	}
+
+	public EligibilityCheckTransfer checkEligibility(DemographicTransfer demographicTransfer)
+	{
+		EligibilityCheckTransfer transfer;
+		try
+		{
+			Demographic demographic = new Demographic();
+			demographicTransfer.copyTo(demographic);
+
+			transfer = eligibilityCheckService.checkEligibility(demographic);
+		}
+		catch(Exception e)
+		{
+			logger.error("check eligibility error", e);
+			transfer = new EligibilityCheckTransfer();
+			transfer.setError(e.getMessage());
+		}
+		return transfer;
 	}
 }

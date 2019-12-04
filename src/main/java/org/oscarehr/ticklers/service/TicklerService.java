@@ -31,6 +31,7 @@ import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.PaginationQuery;
 import org.oscarehr.common.dao.TicklerCategoryDao;
 import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.dao.TicklersDao;
 import org.oscarehr.ticklers.web.TicklerQuery;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;

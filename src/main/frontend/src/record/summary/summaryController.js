@@ -531,6 +531,26 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return module.summaryCode === "forms";
 		};
 
+		// determine if the date should be show for a particular summary module
+		controller.hideSummaryModuleDate = function(module)
+		{
+			switch (module.summaryCode)
+			{
+				case "meds":
+				case "othermeds":
+				case "ongoingconcerns":
+				case "medhx":
+				case "sochx":
+				case "famhx":
+				case "reminders":
+				case "riskfactors":
+				case "allergies":
+					return true;
+				default:
+					return false;
+			}
+		};
+
 		// called when a child component is initialized. this allows the controller to call select child methods
 		controller.registerEncNoteListFunctions = function(refresh)
 		{

@@ -35,6 +35,7 @@ import org.oscarehr.common.model.HL7HandlerMSHMapping;
 import org.oscarehr.common.model.Hl7TextMessageInfo;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.pageUtil.ORUR01Manager;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.UtilDateUtilities;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ import java.util.List;
  * 
  * @author dritan
  */
-public class TDISHandler extends MessageHandler
+public class TDISHandler extends ORU_R01MessageHandler
 {
 
 	Logger logger = Logger.getLogger(TDISHandler.class);
@@ -158,6 +159,8 @@ public class TDISHandler extends MessageHandler
 			}
 		} //end lab iteration
 
+		this.message = msg;
+		this.terser = new Terser(msg);
 	}
 
 	@Override

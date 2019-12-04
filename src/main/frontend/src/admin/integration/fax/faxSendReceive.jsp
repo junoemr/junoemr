@@ -22,39 +22,8 @@
     Canada
 
 --%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
-<%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
-<%
-	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-	boolean authorized = true;
-%>
-<security:oscarSec roleName="<%=roleName$%>" objectName="_admin.fax" rights="r" reverse="<%=true%>">
-	<%authorized = false; %>
-	<%response.sendRedirect("../securityError.jsp?type=_admin");%>
-</security:oscarSec>
-<%
-	if (!authorized) {
-		return;
-	}
-%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
-<html lang="en" ng-app="oscarProviderViewModule">
-<head></head>
-<body ng-controller="Admin.Integration.Fax.FaxSendReceiveController as faxSendReceiveController">
-
-<!--
-<link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
-<link rel="stylesheet" href="<%=request.getContextPath() %>/css/font-awesome.min.css">
--->
-<!-- Hide the main program nav as a fix for having angular in an iframe -->
-<!--
-<link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
--->
-
-<title><bean:message bundle="ui" key="admin.fax.sr.window-title"/></title>
 
 <div class="fax-send_receive">
 	<div class="flex-row search-filters">
@@ -98,7 +67,7 @@
 
 				<div class="flex-row search-frame">
 					<div class="row search-filters">
-						<div class="col-lg-3 col-xs-6">
+						<div class="col-lg-4 col-xs-4">
 							<label for="inbox-datepicker-startdate-id"><bean:message bundle="ui" key="admin.fax.sr.search.startDate"/></label>
 							<juno-datepicker-popup id="inbox-datepicker-startdate-id"
 							                       juno-model="faxSendReceiveController.inbox.startDate"
@@ -106,7 +75,7 @@
 							                       type="Input">
 							</juno-datepicker-popup>
 						</div>
-						<div class="col-lg-3 col-xs-6">
+						<div class="col-lg-4 col-xs-4">
 							<label for="inbox-datepicker-enddate-id"><bean:message bundle="ui" key="admin.fax.sr.search.endDate"/></label>
 							<juno-datepicker-popup id="inbox-datepicker-enddate-id"
 							                       juno-model="faxSendReceiveController.inbox.endDate"
@@ -116,9 +85,11 @@
 						</div>
 					</div>
 					<div class="row search-buttons">
-						<button type="button" class="btn btn-primary"
-						        ng-click="faxSendReceiveController.loadInboxItems();">Search
-						</button>
+						<div class="col-lg-3 col-xs-6">
+							<button type="button" class="btn btn-primary"
+							        ng-click="faxSendReceiveController.loadInboxItems();"><bean:message bundle="ui" key="global.search"/>
+							</button>
+						</div>
 					</div>
 				</div>
 
@@ -126,8 +97,12 @@
 					<tbody>
 					<tr ng-repeat="item in faxSendReceiveController.inboxItemList">
 
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.inbox.tbl-hdr.systemDateReceived"/>'">{{item.systemDateReceived}}</td>
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.inbox.tbl-hdr.sentFrom"/>'">{{item.sentFrom}}</td>
+						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.inbox.tbl-hdr.systemDateReceived"/>'">
+							{{item.systemDateReceived}}
+						</td>
+						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.inbox.tbl-hdr.sentFrom"/>'">
+							{{item.sentFrom}}
+						</td>
 						<td>
 							<button class="btn btn-primary btn-xs"
 							ng-click="faxSendReceiveController.openDocument(item.documentId)">
@@ -153,7 +128,7 @@
 
 				<div class="flex-row search-frame">
 					<div class="row search-filters">
-						<div class="col-lg-3 col-xs-6">
+						<div class="col-lg-3 col-xs-3">
 							<label for="outbox-datepicker-startdate-id"><bean:message bundle="ui" key="admin.fax.sr.search.startDate"/></label>
 							<juno-datepicker-popup id="outbox-datepicker-startdate-id"
 							                       juno-model="faxSendReceiveController.outbox.startDate"
@@ -161,7 +136,7 @@
 							                       type="Input">
 							</juno-datepicker-popup>
 						</div>
-						<div class="col-lg-3 col-xs-6">
+						<div class="col-lg-3 col-xs-3">
 							<label for="outbox-datepicker-enddate-id"><bean:message bundle="ui" key="admin.fax.sr.search.endDate"/></label>
 							<juno-datepicker-popup id="outbox-datepicker-enddate-id"
 							                       juno-model="faxSendReceiveController.outbox.endDate"
@@ -169,41 +144,72 @@
 							                       type="Input">
 							</juno-datepicker-popup>
 						</div>
+						<div class="col-lg-2 col-sm-3 col-xs-6">
+							<label for="outbox-select-combinedStatus"><bean:message bundle="ui" key="admin.fax.sr.search.combinedStatus"/></label>
+							<select id="outbox-select-combinedStatus" class="form-control"
+							        ng-model="faxSendReceiveController.outbox.displayStatus"
+							        ng-options="statusOption.label for statusOption in faxSendReceiveController.displayStatus">
+							</select>
+						</div>
 					</div>
 					<div class="row search-buttons">
-						<button type="button" class="btn btn-primary"
-						        ng-click="faxSendReceiveController.loadOutboxItems();"><bean:message bundle="ui" key="global.search"/>
-						</button>
+						<div class="col-lg-3 col-xs-6">
+							<button type="button" class="btn btn-primary"
+							        ng-click="faxSendReceiveController.loadOutboxItems();"><bean:message bundle="ui" key="global.search"/>
+							</button>
+						</div>
 					</div>
 				</div>
 
 				<table ng-table="faxSendReceiveController.tableParamsOutbox" show-filter="false" class="table table-striped table-bordered">
 					<tbody>
 					<tr ng-repeat="item in faxSendReceiveController.outboxItemList">
-						<td>
-							<button class="btn"
-							        title="<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend-tooltip"/>"
-							        ng-disabled="item.systemStatus != faxSendReceiveController.systemStatusEnum.queued
-					                    && item.systemStatus != faxSendReceiveController.systemStatusEnum.error"
-							        ng-class="{'btn-success': item.systemStatus == faxSendReceiveController.systemStatusEnum.queued,
-					                    'btn-warning': item.systemStatus == faxSendReceiveController.systemStatusEnum.error}"
-							        ng-click="faxSendReceiveController.resendFax(item);">
-								<span class="glyphicon glyphicon-repeat"></span>
-							</button>
+						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.systemDateSent"/>'">
+							{{item.systemDateSent}}
 						</td>
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.systemDateSent"/>'">{{item.systemDateSent}}</td>
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.providerNo"/>'">{{item.providerNo}}</td>
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.fileType"/>'">{{item.fileType}}</td>
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.systemStatus"/>'">{{item.systemStatus}}</td>
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.toFaxNumber"/>'">{{item.toFaxNumber}}</td>
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateQueued"/>'">{{item.integrationDateQueued}}</td>
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateSent"/>'">{{item.integrationDateSent}}</td>
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationStatus"/>'">{{item.integrationStatus}}</td>
-						<td>
-							<button class="btn btn-primary btn-xs"
-							ng-click="faxSendReceiveController.viewDownloadFile(item.id);">
-							<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.download"/>
+						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.providerName"/>'">
+							{{item.providerName}} ({{item.providerNo}})
+						</td>
+						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.fileType"/>'">
+							{{item.fileType}}
+						</td>
+						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.toFaxNumber"/>'">
+							{{item.toFaxNumber}}
+						</td>
+						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.sentStatus"/>'">
+							<span title="{{item.systemStatusMessage}}">
+								{{faxSendReceiveController.getStatusDisplayLabel(item.combinedStatus)}}
+							</span>
+						</td>
+						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateSent"/>'">
+							{{item.integrationDateSent}}
+						</td>
+						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.actionButtons"/>'">
+							<div class="float-right">
+								<button class="btn btn-xs btn-success"
+								        title="<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend-tooltip"/>"
+								        ng-hide="item.archived
+								            || (item.combinedStatus != faxSendReceiveController.displayStatus.queued.value
+						                    && item.combinedStatus != faxSendReceiveController.displayStatus.error.value
+						                    && item.combinedStatus != faxSendReceiveController.displayStatus.integrationFailed.value)"
+								        ng-click="faxSendReceiveController.resendFax(item);">
+									<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend"/>
+								</button>
+								<button class="btn btn-primary btn-xs"
+								        ng-click="faxSendReceiveController.viewDownloadFile(item.id);">
+									<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.download"/>
+								</button>
+							</div>
+						</td>
+						<td ng-if="faxSendReceiveController.displayNotificationColumn == true">
+							<button class="btn btn-xs"
+							        ng-show="item.notificationStatus == faxSendReceiveController.notificationStatusEnum.notify"
+									ng-click="faxSendReceiveController.dismissNotification(item);">
+								<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.notification.dismiss"/>
 							</button>
+							<span ng-show="item.notificationStatus == faxSendReceiveController.notificationStatusEnum.dismissed">
+								<bean:message bundle="ui" key="admin.fax.sr.outbox.notification.dismissed"/>
+							</span>
 						</td>
 					</tr>
 					</tbody>
@@ -214,6 +220,3 @@
 		</div>
 	</div>
 </div>
-
-</body>
-</html>

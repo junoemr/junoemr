@@ -164,6 +164,10 @@
 		<property name="userPropertyDAO" ref="UserPropertyDAO" />
 	</bean>
 
+	<bean name="/setAppointmentCountPrefs" class="org.oscarehr.provider.web.ProviderPropertyAction" singleton="false">
+		<property name="userPropertyDAO" ref="UserPropertyDAO" />
+	</bean>
+
 	<bean name="/saveWorkView" class="org.oscarehr.provider.web.ProviderViewAction" singleton="false">
 		<property name="userViewDAO" ref="viewDao" />
 	</bean>
