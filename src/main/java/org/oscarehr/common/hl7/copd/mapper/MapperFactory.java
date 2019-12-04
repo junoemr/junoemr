@@ -45,6 +45,10 @@ public class MapperFactory
 			{
 				return new AppointmentMapperMedaccess(message, importSource);
 			}
+			case ACCURO:
+			{
+				return new AppointmentMapperAccuro(message, importSource);
+			}
 			default:
 			{
 				return new AppointmentMapper(message, importSource);
