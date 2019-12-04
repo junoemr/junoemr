@@ -101,6 +101,7 @@ public class CoPDImportService
 		WOLF,
 		MEDIPLAN,
 		MEDACCESS,
+		ACCURO,
 		UNKNOWN
 	}
 
