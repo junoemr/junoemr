@@ -25,15 +25,15 @@
 	<div class="integration-list flex flex-row justify-content-center">
 		<!-- integrations -->
 		<div class="integration-item flex-row align-items-first-baseline " ng-repeat="integration in $ctrl.integrationList">
-			<label class="switch-label" for="enable-care-connect-integration">
+			<label class="switch-label" for="{{ integration.name }}">
 				<a ng-href="{{integration.configUrl}}">{{ integration.name }}</a>
 			</label>
 			<label class="switch">
-				<input id="enable-care-connect-integration" type="checkbox"
+				<input id="{{integration.name}}" type="checkbox"
 							 ng-model="integration.enabled"
 							 ng-change="$ctrl.enableProperty(integration.propertyName, integration.enabled)"/>
 				<span class="slider"></span>
-		</label>
+			</label>
 			<i class="integration-check icon" ng-class="integration.enabled ? 'icon-check' : ''"></i>
 		</div>
 	</div>

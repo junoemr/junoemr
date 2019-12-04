@@ -24,14 +24,19 @@
 package org.oscarehr.ws.rest.integrations.iceFall;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.catalina.User;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.integration.iceFall.model.IceFallCredentials;
+import org.oscarehr.integration.iceFall.service.IceFallService;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -44,16 +49,38 @@ public class IceFallWebService extends AbstractServiceImpl
 	@Autowired
 	SystemPreferenceService systemPreferenceService;
 
+	@Autowired
+	IceFallService iceFallService;
+
 	@GET
-	@Path("/status")
+	@Path("/settings")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<IceFallStatusTo1> getIceFallStatus()
+	public RestResponse<IceFallSettingsTo1> getIceFallSettings()
 	{
-		return RestResponse.successResponse(new IceFallStatusTo1(
+		IceFallCredentials creds = iceFallService.getCredentials();
+
+		return RestResponse.successResponse(new IceFallSettingsTo1(
 						systemPreferenceService.isPreferenceEnabled(UserProperty.ICE_FALL_VISIBLE, false),
 						systemPreferenceService.isPreferenceEnabled(UserProperty.ICE_FALL_INTEGRATION_ENABLED, false),
-						1234,
-						"change me"
+						creds.getUsername(),
+						creds.getEmail()
 		));
+	}
+
+	@PUT
+	@Path("/settings")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public RestResponse<IceFallSettingsTo1> setIceFallSettings(IceFallSettingsTo1 iceFallSettingsTo1)
+	{
+		IceFallCredentials creds = iceFallService.getCredentials();
+
+		iceFallSettingsTo1.updateCredentials(creds);
+		iceFallService.updateCredentials(creds);
+
+		systemPreferenceService.setPreferenceValue(UserProperty.ICE_FALL_INTEGRATION_ENABLED, iceFallSettingsTo1.getEnabled().toString());
+		systemPreferenceService.setPreferenceValue(UserProperty.ICE_FALL_VISIBLE, iceFallSettingsTo1.getVisible().toString());
+
+		return RestResponse.successResponse(iceFallSettingsTo1);
 	}
 }

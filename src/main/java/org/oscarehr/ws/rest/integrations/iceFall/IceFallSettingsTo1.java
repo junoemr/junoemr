@@ -23,24 +23,47 @@
 
 package org.oscarehr.ws.rest.integrations.iceFall;
 
+import org.oscarehr.integration.iceFall.model.IceFallCredentials;
+
 import java.io.Serializable;
 
-public class IceFallStatusTo1 implements Serializable
+public class IceFallSettingsTo1 implements Serializable
 {
 	private Boolean enabled;
 	private Boolean visible;
 
 	// clinic info
-	private Integer clinicNo;
 	private String  clinicUserName;
-	// password intentionally omitted
+	private String  clinicEmail;
+	private String  clinicPassword;
 
-	public IceFallStatusTo1(Boolean visible, Boolean enabled, Integer clinicNo, String clinicUserName)
+	public IceFallSettingsTo1() {}
+
+	public IceFallSettingsTo1(Boolean visible, Boolean enabled, String clinicUserName, String clinicEmail)
 	{
 		setVisible(visible);
 		setEnabled(enabled);
-		setClinicNo(clinicNo);
 		setClinicUserName(clinicUserName);
+		setClinicEmail(clinicEmail);
+		// do not send password outgoing.
+		setClinicPassword("");
+	}
+
+	/**
+	 * copy values from this transfer object in to an iceFall credentials object for saving in the the DB.
+	 * @param iceFallCredentials - the credentials object to copy to.
+	 * @return - updated credentials object
+	 */
+	public IceFallCredentials updateCredentials(IceFallCredentials iceFallCredentials)
+	{
+		iceFallCredentials.setUsername(getClinicUserName());
+		iceFallCredentials.setEmail(getClinicEmail());
+		if (getClinicPassword() != null)
+		{
+			iceFallCredentials.setPassword(getClinicPassword());
+		}
+
+		return iceFallCredentials;
 	}
 
 	public Boolean getEnabled()
@@ -63,16 +86,6 @@ public class IceFallStatusTo1 implements Serializable
 		this.visible = visible;
 	}
 
-	public Integer getClinicNo()
-	{
-		return clinicNo;
-	}
-
-	public void setClinicNo(Integer clinicNo)
-	{
-		this.clinicNo = clinicNo;
-	}
-
 	public String getClinicUserName()
 	{
 		return clinicUserName;
@@ -81,5 +94,25 @@ public class IceFallStatusTo1 implements Serializable
 	public void setClinicUserName(String clinicUserName)
 	{
 		this.clinicUserName = clinicUserName;
+	}
+
+	public String getClinicPassword()
+	{
+		return clinicPassword;
+	}
+
+	public void setClinicPassword(String clinicPassword)
+	{
+		this.clinicPassword = clinicPassword;
+	}
+
+	public String getClinicEmail()
+	{
+		return clinicEmail;
+	}
+
+	public void setClinicEmail(String clinicEmail)
+	{
+		this.clinicEmail = clinicEmail;
 	}
 }

@@ -21,22 +21,12 @@
  * Canada
  */
 
-angular.module('Admin.Integration').component('iceFallAdmin',
+angular.module('Admin.Integration').component('iceFallAdminActivity',
 {
-	templateUrl: 'src/admin/integration/iceFall/iceFall.jsp',
+	templateUrl: 'src/admin/integration/iceFall/activity/iceFallAdminActivity.jsp',
 	bindings: {},
-	controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
+	controller: ['$scope', function ($scope)
 	{
-		let ctrl = this;
 
-		ctrl.changeTab = function (state)
-		{
-			$state.go(state);
-		};
-
-		ctrl.isTabActive = function(tabState)
-		{
-			return tabState === $state.current.name;
-		}
 	}]
 });

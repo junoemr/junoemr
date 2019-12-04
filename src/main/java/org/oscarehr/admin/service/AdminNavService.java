@@ -649,7 +649,7 @@ public class AdminNavService
 
 		if (systemPreferenceService.isPreferenceEnabled(UserProperty.ICE_FALL_INTEGRATION_ENABLED, false))
 		{
-			integrationItems.add(new AdminNavItemTo1("Ice Fall", "iceFall"));
+			integrationItems.add(new AdminNavItemTo1("Ice Fall", "iceFall/settings"));
 		}
 
 		integrationGroup.setItems(integrationItems);

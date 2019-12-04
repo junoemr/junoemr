@@ -21,22 +21,25 @@
  * Canada
  */
 
-angular.module('Admin.Integration').component('iceFallAdmin',
+package org.oscarehr.integration.iceFall.dao;
+
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.integration.iceFall.model.IceFallCredentials;
+import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+
+@Repository
+public class IceFallCredentialsDao extends AbstractDao<IceFallCredentials>
 {
-	templateUrl: 'src/admin/integration/iceFall/iceFall.jsp',
-	bindings: {},
-	controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
+	public IceFallCredentialsDao()
 	{
-		let ctrl = this;
+		super(IceFallCredentials.class);
+	}
 
-		ctrl.changeTab = function (state)
-		{
-			$state.go(state);
-		};
-
-		ctrl.isTabActive = function(tabState)
-		{
-			return tabState === $state.current.name;
-		}
-	}]
-});
+	public IceFallCredentials getCredentials()
+	{
+		Query query = entityManager.createQuery("FROM IceFallCredentials i");
+		return  getSingleResultOrNull(query);
+	}
+}

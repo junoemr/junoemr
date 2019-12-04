@@ -36,6 +36,9 @@ a {
 .align-items-first-baseline {
 	align-items: first baseline;
 }
+.justify-content-right {
+	justify-content: right;
+}
 .justify-content-center {
 	justify-content: center;
 }
@@ -46,6 +49,9 @@ a {
 	justify-content: space-between;
 }
 
+.d-flex {
+	display: flex;
+}
 .flex-row {
 	display: flex;
 	flex-direction: row;
@@ -78,6 +84,10 @@ a {
 
 .md-margin-top {
 	margin-top: $margin-md;
+}
+
+.sm-margin-top {
+	margin-top: $margin-sm;
 }
 
 .no-margin-bottom {

@@ -297,6 +297,8 @@ module.exports = {
 			'./src/admin/integration/landingPage/landingPageComponent.js',
 			'./src/admin/integration/integrationModules/integrationModulesComponent.js',
 			'./src/admin/integration/iceFall/iceFallAdminComponent.js',
+			'./src/admin/integration/iceFall/settings/iceFallAdminSettingsComponent.js',
+			'./src/admin/integration/iceFall/activity/iceFallAdminActivityComponent.js',
 			'./src/admin/integration/know2act/module.js',
 			'./src/admin/integration/know2act/Know2actConfigController.js',
 			'./src/admin/integration/know2act/Know2actNotificationController.js',

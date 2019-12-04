@@ -21,22 +21,40 @@
  * Canada
  */
 
-angular.module('Admin.Integration').component('iceFallAdmin',
+import {IceFallApi} from "../../../../../generated";
+
+angular.module('Admin.Integration').component('iceFallAdminSettings',
 {
-	templateUrl: 'src/admin/integration/iceFall/iceFall.jsp',
+	templateUrl: 'src/admin/integration/iceFall/settings/iceFallAdminSettings.jsp',
 	bindings: {},
-	controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
+	controller: ['$scope', '$http', '$httpParamSerializer', function ($scope, $http, $httpParamSerializer)
 	{
 		let ctrl = this;
+		let iceFallApi = new IceFallApi($http, $httpParamSerializer, '../ws/rs');
 
-		ctrl.changeTab = function (state)
+		ctrl.iceFallSettings = null;
+
+		iceFallApi.getIceFallSettings().then(
+				function success(result)
+				{
+					ctrl.iceFallSettings = result.data.body;
+				},
+				function error(result)
+				{
+					console.error("Failed to get ice fall status. With error: ");
+				}
+		);
+
+		ctrl.setIceFallVisible = function (visible)
 		{
-			$state.go(state);
+			ctrl.iceFallSettings.visible = visible;
+			ctrl.saveIceFallSettings();
 		};
 
-		ctrl.isTabActive = function(tabState)
+		ctrl.saveIceFallSettings = function ()
 		{
-			return tabState === $state.current.name;
-		}
+			iceFallApi.setIceFallSettings(ctrl.iceFallSettings);
+		};
+
 	}]
 });

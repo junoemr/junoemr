@@ -11,6 +11,7 @@ angular.module('Common').directive(
 	var scope = angular.copy(helper.default_scope);
 
 	scope.rows = '@caRows';
+	scope.hideText = '@caHideText';
 	scope.max_characters = '@caMaxCharacters';
 	scope.no_label = '@caNoLabel';
 

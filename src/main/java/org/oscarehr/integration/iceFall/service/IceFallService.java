@@ -21,22 +21,37 @@
  * Canada
  */
 
-angular.module('Admin.Integration').component('iceFallAdmin',
+package org.oscarehr.integration.iceFall.service;
+
+import org.oscarehr.integration.iceFall.dao.IceFallCredentialsDao;
+import org.oscarehr.integration.iceFall.model.IceFallCredentials;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class IceFallService
 {
-	templateUrl: 'src/admin/integration/iceFall/iceFall.jsp',
-	bindings: {},
-	controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
+	@Autowired
+	IceFallCredentialsDao iceFallCredentialsDao;
+
+	/**
+	 * get icefall credentials from DB
+	 * @return - the icefall credentials
+	 */
+	public IceFallCredentials getCredentials()
 	{
-		let ctrl = this;
+		return iceFallCredentialsDao.getCredentials();
+	}
 
-		ctrl.changeTab = function (state)
-		{
-			$state.go(state);
-		};
+	/**
+	 * save icefall credentials to the database
+	 * @param creds - the credentials to save
+	 * @return - the saved credentials object
+	 */
+	public IceFallCredentials updateCredentials(IceFallCredentials creds)
+	{
+		iceFallCredentialsDao.merge(creds);
+		return creds;
+	}
 
-		ctrl.isTabActive = function(tabState)
-		{
-			return tabState === $state.current.name;
-		}
-	}]
-});
+}
