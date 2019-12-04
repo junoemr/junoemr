@@ -87,7 +87,11 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	private Integer siteLogoId=null;
 	@Column(name="siteUrl", length=100)
 	private String siteUrl = "";
-	
+	@Column(name="alberta_connect_care_lab_id")
+	private String albertaConnectCareLabId;
+	@Column(name="alberta_connect_care_department_id")
+	private String albertaConnectCareDepartmentId;
+
 	public String getSiteUrl() {
 		return siteUrl;
 	}
@@ -276,7 +280,25 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 
 	public void setSiteLogoDesc(String siteLogoDesc) {
 		this.siteLogoDesc = siteLogoDesc;
-	} 
-	
-	
+	}
+
+	public String getAlbertaConnectCareLabId()
+	{
+		return albertaConnectCareLabId;
+	}
+
+	public void setAlbertaConnectCareLabId(String albertaConnectCareLabId)
+	{
+		this.albertaConnectCareLabId = albertaConnectCareLabId;
+	}
+
+	public String getAlbertaConnectCareDepartmentId()
+	{
+		return albertaConnectCareDepartmentId;
+	}
+
+	public void setAlbertaConnectCareDepartmentId(String albertaConnectCareDepartmentId)
+	{
+		this.albertaConnectCareDepartmentId = albertaConnectCareDepartmentId;
+	}
 }

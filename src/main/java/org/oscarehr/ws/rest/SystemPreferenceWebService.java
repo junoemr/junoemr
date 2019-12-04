@@ -22,6 +22,7 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.Property;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.preferences.service.SystemPreferenceService;
@@ -40,6 +41,7 @@ import javax.ws.rs.core.MediaType;
 
 @Path("/systemPreference")
 @Component("SystemPreferenceWebService")
+@Tag(name = "systemPreference")
 public class SystemPreferenceWebService extends AbstractServiceImpl
 {
 	@Autowired
@@ -98,5 +100,33 @@ public class SystemPreferenceWebService extends AbstractServiceImpl
 	                                                  @QueryParam("default") Boolean defaultValue)
 	{
 		return RestResponse.successResponse(systemPreferenceService.isPreferenceEnabled(key, defaultValue));
+	}
+
+	/**
+	 * get the given Oscar property value
+	 * @param key - the name of the Oscar property to get
+	 * @param defaultValue - the default value to return if the property is not set
+	 * @return - the value of the given Oscar property, or the default value if not defined in the properties file
+	 */
+	@GET
+	@Path("/property/{key}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<String> getPropertyValue(@PathParam("key") String key,
+												 @QueryParam("default") String defaultValue)
+	{
+		return RestResponse.successResponse(systemPreferenceService.getPropertyValue(key, defaultValue));
+	}
+
+	/**
+	 * check if the given Oscar property value is enabled/active
+	 * @param key - the name of the Oscar property to get
+	 * @return - true if it's enabled in the properties file, false otherwise
+	 */
+	@GET
+	@Path("/property/{key}/enabled")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> getPropertyEnabled(@PathParam("key") String key)
+	{
+		return RestResponse.successResponse(systemPreferenceService.isPropertyEnabled(key));
 	}
 }

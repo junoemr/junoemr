@@ -22,6 +22,7 @@
 <%-- This JSP is the multi-site admin site detail page --%>
 <%@ include file="/taglibs.jsp"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
+<%@ taglib uri="/oscarPropertiestag" prefix="oscarProps"%>
 <%
     String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	boolean authed=true;
@@ -101,6 +102,10 @@
 					<html:option value="YT" >YT-Yukon</html:option>	
 	</nested:select></td></tr>
 	<tr><td>Postal Code:</td><td><nested:text property="site.postal"></nested:text></td></tr>
+	<oscarProps:oscarPropertiesCheck property="instance_type" value="AB">
+		<tr><td>Connect Care Lab Id:</td><td><nested:text property="site.albertaConnectCareLabId"></nested:text></td></tr>
+		<tr><td>Connect Care Department Id:</td><td><nested:text property="site.albertaConnectCareDepartmentId"></nested:text></td></tr>
+	</oscarProps:oscarPropertiesCheck>
    <% if (org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable()) { %>  	
 		<tr><td>ProviderID From:</td><td><nested:text property="site.providerIdFrom"></nested:text></td></tr>
 		<tr><td>ProviderID To:</td><td><nested:text property="site.providerIdTo"></nested:text></td></tr>

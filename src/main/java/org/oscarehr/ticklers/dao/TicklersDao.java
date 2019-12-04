@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ticklers.service;
+package org.oscarehr.ticklers.dao;
 
 import java.util.List;
 
@@ -172,5 +172,19 @@ public class TicklersDao extends AbstractDao<Tickler> {
 			}
 		}
 		return sql;
+	}
+
+	/**
+	 * Deactivate the specified ticklers
+	 *
+	 * @param ticklerIDs tickler IDs to deactivate
+	 */
+	public void deactivateAllTicklers(List<Integer> ticklerIDs)
+	{
+		Query query = entityManager.createQuery("UPDATE Tickler t SET t.status = :deleteStatus WHERE t.id IN (:ticklerIDs)");
+		query.setParameter("deleteStatus", Tickler.STATUS.D);
+		query.setParameter("ticklerIDs", ticklerIDs);
+
+		query.executeUpdate();
 	}
 }
