@@ -48,6 +48,7 @@ import org.oscarehr.util.SpringUtils;
  */
 public class TeleplanCodesManager
 {
+	public static String CODE_PAY_PATIENT = "pp";
 
 	/**
 	 * Creates a new instance of TeleplanCodesManager
