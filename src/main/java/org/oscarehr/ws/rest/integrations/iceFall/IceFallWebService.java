@@ -29,10 +29,12 @@ import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
 import org.oscarehr.integration.iceFall.service.IceFallService;
 import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.util.RESTClient;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
