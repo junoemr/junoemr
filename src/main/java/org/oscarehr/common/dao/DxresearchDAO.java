@@ -84,12 +84,12 @@ public class DxresearchDAO extends AbstractDao<Dxresearch>{
                  }
                 }
 
-
+                String startDateString = dxres.getStartDate() == null? "" : dxres.getStartDate().toString();
                 if (isDoctorPatient && demo.getPatientStatus().equalsIgnoreCase("AC"))
                 	rList.add(new DxRegistedPTInfo(demo.getFirstName(),demo.getLastName(),demo.getSex(),
                                                 demo.getYearOfBirth()+"-"+demo.getMonthOfBirth()+"-"+demo.getDateOfBirth(),
                                                 demo.getPhone(),demo.getHin(),dxres.getCodingSystem(),dxres.getDxresearchCode(),
-                                                dxres.getStartDate().toString(),dxres.getUpdateDate().toString(),
+												startDateString, dxres.getUpdateDate().toString(),
                                                 dxres.getStatus().toString()));
             }
         }
