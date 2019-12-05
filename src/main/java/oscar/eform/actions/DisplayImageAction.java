@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DownloadAction;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.util.MiscUtils;
 
 import oscar.OscarProperties;
@@ -95,7 +96,7 @@ public class DisplayImageAction extends DownloadAction
 		String contentType;
 		try
 		{
-			contentType = Files.probeContentType(Paths.get(file.getPath()));
+			contentType = GenericFile.getContentType(file);
 		}
 		catch (Exception e)
 		{
