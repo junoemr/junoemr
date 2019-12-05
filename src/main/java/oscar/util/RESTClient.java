@@ -22,71 +22,108 @@
  */
 package oscar.util;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
+import org.oscarehr.integration.myhealthaccess.ErrorHandler;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
 public class RESTClient
 {
-	//https://ben.ohdev.ca/ben1/ws/rs/integrations/iceFall/settings
+	// https://api.canopygrowthweb.com/api-token-auth/
 
-
-	public static <T> T doGet(String URI, String media, Class to1Class)
+	// ---------------------------- HTTP POST ----------------------------------------- //
+	public static <U, T> T doPost(String url, HttpHeaders headers, Class<U> bodyClass, Class<T> responseClass)
 	{
-		return doGet(URI, null, null, media, to1Class);
+		return executeRequest(url, HttpMethod.POST, headers, null, bodyClass, responseClass, null);
 	}
 
-	public static <T> T doGet(String URI, Map<String, String> queryParams, Map<String, Object> headers, String media, Class to1Class)
+	public static <U, T> T doPost(String url, HttpHeaders headers, Map<String, Object> queryParams, Class<U> bodyClass, Class<T> responseClass)
 	{
-		Client client = ClientBuilder.newClient();
-		return (T) setHeaders(setQueryParams(client.target(URI), queryParams).request(media), headers).get(to1Class);
+		return executeRequest(url, HttpMethod.POST, headers, queryParams, bodyClass, responseClass, null);
 	}
 
-	public static <K,T> T doPost(String URI, Map<String, String> queryParams, String responseMedia, String requestMedia, K postObject)
+	public static <U, T, K> T doPost(String url, HttpHeaders headers, Map<String, Object> queryParams, Class<U> bodyClass, Class<T> responseClass, Class<K> errorClass)
 	{
-		Client client = ClientBuilder.newClient();
-		return (T)setQueryParams(client.target(URI), queryParams).request(responseMedia).post(Entity.entity(postObject, requestMedia));
+		return executeRequest(url, HttpMethod.POST, headers, queryParams, bodyClass, responseClass, errorClass);
+	}
+
+	// ---------------------------- HTTP GET ----------------------------------------- //
+	public static <T> T doGet(String url, HttpHeaders headers, Class<T> responseClass)
+	{
+		return executeRequest(url, HttpMethod.GET, headers, null, null, responseClass, null);
+	}
+
+	public static <T> T doGet(String url, HttpHeaders headers, Map<String, Object> queryParams, Class<T> responseClass)
+	{
+		return executeRequest(url, HttpMethod.GET, headers, queryParams, null, responseClass, null);
+	}
+
+	public static <T, K> T doGet(String url, HttpHeaders headers, Map<String, Object> queryParams, Class<T> responseClass, Class<K> errorClass)
+	{
+		return executeRequest(url, HttpMethod.GET, headers, queryParams, null, responseClass, errorClass);
 	}
 
 	/**
-	 * apply the query params in the map to the specified WebTarget
-	 * @param target - the target to set the query params on
-	 * @param queryParams - the params to set
-	 * @return - a new WebTarget with the query params set.
+	 * make a request to a rest endpoint
+	 * @param url - the url of the request
+	 * @param method - the method of the request
+	 * @param headers - the HTTP headers of the request
+	 * @param queryParams - the url query params of the request
+	 * @param body - the body of the request
+	 * @param responseClass - the object to deserialize in to for the request response
+	 * @param errorClass - the object to deserialize in to for the error response
+	 * @param <S> - body type
+	 * @param <T> - response type
+	 * @param <U> - error type
+	 * @return - request response object
 	 */
-	private static WebTarget setQueryParams(WebTarget target, Map<String, String> queryParams)
+	protected static <S, T, U> T executeRequest(
+					String url,
+					HttpMethod method,
+					HttpHeaders headers,
+					Map<String, Object> queryParams,
+					S body,
+					Class<T> responseClass,
+					Class<U> errorClass)
+	{
+		MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(messageConverter);
+		ResponseErrorHandler errorHandler = new ErrorHandler(errorClass);
+		restTemplate.setErrorHandler(errorHandler);
+		HttpEntity<S> request = new HttpEntity<S>(body, headers);
+
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url);
+		uriBuilder = setQueryParams(uriBuilder, queryParams);
+
+		ResponseEntity<T> response = restTemplate.exchange(uriBuilder.toString(), method, request, responseClass);
+		return response.getBody();
+	}
+
+	/**
+	 * set query params contained within map on to the uriBuilder.
+	 * @param uriBuilder - the uri builder on which the parameters are set
+	 * @param queryParams - the query parameters to set
+	 * @return - the uri builder with the query parameters set
+	 */
+	private static UriComponentsBuilder	setQueryParams(UriComponentsBuilder uriBuilder, Map<String, Object> queryParams)
 	{
 		if (queryParams != null)
 		{
-			for (Map.Entry<String, String> param : queryParams.entrySet())
+			for (Map.Entry<String, Object> param : queryParams.entrySet())
 			{
-				target = target.queryParam(param.getKey(), param.getValue());
+				uriBuilder.queryParam(param.getKey(), param.getValue());
 			}
 		}
-
-		return target;
-	}
-
-	/**
-	 * set the headers on the request
-	 * @param target - the request to have the headers set
-	 * @param headers - the headers to set
-	 * @return - a new Invocation Builder with the headers set
-	 */
-	private static Invocation.Builder setHeaders(Invocation.Builder target, Map<String, Object> headers)
-	{
-		if (headers != null)
-		{
-			for (Map.Entry<String, Object> param : headers.entrySet())
-			{
-				target = target.header(param.getKey(), param.getValue());
-			}
-		}
-
-		return target;
+		return uriBuilder;
 	}
 }

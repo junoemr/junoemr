@@ -1193,11 +1193,6 @@
 			<version>2.9.5</version>
 		</dependency>
 		<dependency>
-			<groupId>org.glassfish.jersey.core</groupId>
-			<artifactId>jersey-client</artifactId>
-			<version>2.25.1</version>
-		</dependency>
-		<dependency>
 			<!-- json support for java 8 localDate -->
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
