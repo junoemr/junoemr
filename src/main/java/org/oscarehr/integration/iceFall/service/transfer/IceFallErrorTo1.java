@@ -22,30 +22,49 @@
  */
 package org.oscarehr.integration.iceFall.service.transfer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import oscar.util.StringUtils;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class IceFallAuthenticationTo1 implements Serializable
+public class IceFallErrorTo1 implements Serializable
 {
-	private String username;
-	private String password;
+	@JsonProperty("non_field_errors")
+	private List<String> nonFieldErrors = new ArrayList<>();
 
-	public String getUsername()
+	@JsonIgnore
+	private boolean junoInternalError = false;
+
+	public List<String> getNonFieldErrors()
 	{
-		return username;
+		return nonFieldErrors;
 	}
 
-	public void setUsername(String username)
+	public void setNonFieldErrors(List<String> nonFieldErrors)
 	{
-		this.username = username;
+		this.nonFieldErrors = nonFieldErrors;
 	}
 
-	public String getPassword()
+	public boolean isJunoInternalError()
 	{
-		return password;
+		return junoInternalError;
 	}
 
-	public void setPassword(String password)
+	public void setJunoInternalError(boolean junoInternalError)
 	{
-		this.password = password;
+		this.junoInternalError = junoInternalError;
+	}
+
+	@Override
+	public String toString()
+	{
+		if (nonFieldErrors != null)
+		{
+			return StringUtils.join(nonFieldErrors, "\n");
+		}
+		return "";
 	}
 }

@@ -22,12 +22,15 @@
  */
 package oscar.util;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -37,38 +40,38 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 public class RESTClient
 {
-	// https://api.canopygrowthweb.com/api-token-auth/
+	private ResponseErrorHandler errorHandler = new DefaultResponseErrorHandler();
+
+	public RESTClient()
+	{
+
+	}
+
+	public RESTClient(ResponseErrorHandler errorHandler)
+	{
+		this.errorHandler = errorHandler;
+	}
 
 	// ---------------------------- HTTP POST ----------------------------------------- //
-	public static <U, T> T doPost(String url, HttpHeaders headers, Class<U> bodyClass, Class<T> responseClass)
+	public <U, T> T doPost(String url, HttpHeaders headers, U body, Class<T> responseClass)
 	{
-		return executeRequest(url, HttpMethod.POST, headers, null, bodyClass, responseClass, null);
+		return executeRequest(url, HttpMethod.POST, headers, null, body, responseClass);
 	}
 
-	public static <U, T> T doPost(String url, HttpHeaders headers, Map<String, Object> queryParams, Class<U> bodyClass, Class<T> responseClass)
+	public <U, T> T doPost(String url, HttpHeaders headers, Map<String, Object> queryParams, U body, Class<T> responseClass)
 	{
-		return executeRequest(url, HttpMethod.POST, headers, queryParams, bodyClass, responseClass, null);
-	}
-
-	public static <U, T, K> T doPost(String url, HttpHeaders headers, Map<String, Object> queryParams, Class<U> bodyClass, Class<T> responseClass, Class<K> errorClass)
-	{
-		return executeRequest(url, HttpMethod.POST, headers, queryParams, bodyClass, responseClass, errorClass);
+		return executeRequest(url, HttpMethod.POST, headers, queryParams, body, responseClass);
 	}
 
 	// ---------------------------- HTTP GET ----------------------------------------- //
-	public static <T> T doGet(String url, HttpHeaders headers, Class<T> responseClass)
+	public <T> T doGet(String url, HttpHeaders headers, Class<T> responseClass)
 	{
-		return executeRequest(url, HttpMethod.GET, headers, null, null, responseClass, null);
+		return executeRequest(url, HttpMethod.GET, headers, null, null, responseClass);
 	}
 
-	public static <T> T doGet(String url, HttpHeaders headers, Map<String, Object> queryParams, Class<T> responseClass)
+	public <T> T doGet(String url, HttpHeaders headers, Map<String, Object> queryParams, Class<T> responseClass)
 	{
-		return executeRequest(url, HttpMethod.GET, headers, queryParams, null, responseClass, null);
-	}
-
-	public static <T, K> T doGet(String url, HttpHeaders headers, Map<String, Object> queryParams, Class<T> responseClass, Class<K> errorClass)
-	{
-		return executeRequest(url, HttpMethod.GET, headers, queryParams, null, responseClass, errorClass);
+		return executeRequest(url, HttpMethod.GET, headers, queryParams, null, responseClass);
 	}
 
 	/**
@@ -79,34 +82,41 @@ public class RESTClient
 	 * @param queryParams - the url query params of the request
 	 * @param body - the body of the request
 	 * @param responseClass - the object to deserialize in to for the request response
-	 * @param errorClass - the object to deserialize in to for the error response
 	 * @param <S> - body type
 	 * @param <T> - response type
 	 * @param <U> - error type
 	 * @return - request response object
 	 */
-	protected static <S, T, U> T executeRequest(
+	protected <S, T, U> T executeRequest(
 					String url,
 					HttpMethod method,
 					HttpHeaders headers,
 					Map<String, Object> queryParams,
 					S body,
-					Class<T> responseClass,
-					Class<U> errorClass)
+					Class<T> responseClass)
 	{
 		MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
 
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(messageConverter);
-		ResponseErrorHandler errorHandler = new ErrorHandler(errorClass);
 		restTemplate.setErrorHandler(errorHandler);
 		HttpEntity<S> request = new HttpEntity<S>(body, headers);
 
-		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url);
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url);
 		uriBuilder = setQueryParams(uriBuilder, queryParams);
 
-		ResponseEntity<T> response = restTemplate.exchange(uriBuilder.toString(), method, request, responseClass);
+		ResponseEntity<T> response = restTemplate.exchange(uriBuilder.build().toUriString(), method, request, responseClass);
 		return response.getBody();
+	}
+
+	public ResponseErrorHandler getErrorHandler()
+	{
+		return errorHandler;
+	}
+
+	public void setErrorHandler(ResponseErrorHandler errorHandler)
+	{
+		this.errorHandler = errorHandler;
 	}
 
 	/**
@@ -115,7 +125,7 @@ public class RESTClient
 	 * @param queryParams - the query parameters to set
 	 * @return - the uri builder with the query parameters set
 	 */
-	private static UriComponentsBuilder	setQueryParams(UriComponentsBuilder uriBuilder, Map<String, Object> queryParams)
+	private UriComponentsBuilder	setQueryParams(UriComponentsBuilder uriBuilder, Map<String, Object> queryParams)
 	{
 		if (queryParams != null)
 		{

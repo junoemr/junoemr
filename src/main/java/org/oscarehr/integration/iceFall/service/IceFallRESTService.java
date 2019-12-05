@@ -25,7 +25,11 @@ package org.oscarehr.integration.iceFall.service;
 
 import org.oscarehr.integration.iceFall.dao.IceFallCredentialsDao;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
+import org.oscarehr.integration.iceFall.service.exceptions.IceFallRESTException;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallAuthenticationResponseTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallAuthenticationTo1;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.util.RESTClient;
@@ -38,6 +42,8 @@ public class IceFallRESTService
 	@Autowired
 	IceFallCredentialsDao iceFallCredentialsDao;
 
+	private RESTClient RESTClient = new RESTClient(new IceFallRESTErrorHandler());
+
 	/**
 	 * authenticate with the icefall api, updating the api token
 	 */
@@ -48,7 +54,8 @@ public class IceFallRESTService
 		credentials.setUsername(iceFallCredentials.getUsername());
 		credentials.setPassword(iceFallCredentials.getPassword());
 
-		RESTClient.doPost(getIceFallUrlBase() + "/api-token-auth/", null, credentials, )
+		IceFallAuthenticationResponseTo1 authResponse = RESTClient.doPost(getIceFallUrlBase() + "/api-token-auth/", null, credentials, IceFallAuthenticationResponseTo1.class);
+		MiscUtils.getLogger().info("TOKEN: " + authResponse.getApiToken());
 	}
 
 

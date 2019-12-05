@@ -20,32 +20,31 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.iceFall.service.transfer;
+package org.oscarehr.integration.iceFall.service.exceptions;
 
-import java.io.Serializable;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
 
-public class IceFallAuthenticationTo1 implements Serializable
+import javax.naming.AuthenticationException;
+
+public class IceFallAuthenticationException extends IceFallRESTException
 {
-	private String username;
-	private String password;
+	public static String AUTH_LOGIN_ERROR = "__INVALID_LOGIN_CREDENTIALS__";
 
-	public String getUsername()
+	public IceFallAuthenticationException(String msg)
 	{
-		return username;
+		super(msg);
 	}
 
-	public void setUsername(String username)
+	public IceFallAuthenticationException(String msg, IceFallErrorTo1 errorTo1)
 	{
-		this.username = username;
+		super(msg, errorTo1);
 	}
 
-	public String getPassword()
+	public static void throwIfAuthException(IceFallErrorTo1 errorTo1)
 	{
-		return password;
-	}
-
-	public void setPassword(String password)
-	{
-		this.password = password;
+		if (errorTo1.getNonFieldErrors().contains(AUTH_LOGIN_ERROR))
+		{
+			throw new IceFallAuthenticationException("Authentication Failure", errorTo1);
+		}
 	}
 }

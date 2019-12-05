@@ -20,32 +20,38 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.iceFall.service.transfer;
+package org.oscarehr.integration.iceFall.service.exceptions;
 
-import java.io.Serializable;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
+import org.springframework.web.client.RestClientException;
 
-public class IceFallAuthenticationTo1 implements Serializable
+public class IceFallRESTException extends RestClientException
 {
-	private String username;
-	private String password;
+	private IceFallErrorTo1 errorObject;
 
-	public String getUsername()
+	public IceFallRESTException(String msg)
 	{
-		return username;
+		super(msg);
 	}
 
-	public void setUsername(String username)
+	public IceFallRESTException(String msg, IceFallErrorTo1 errorObject)
 	{
-		this.username = username;
+		super(msg);
+		this.errorObject = errorObject;
 	}
 
-	public String getPassword()
+	public IceFallRESTException(String msg, Throwable ex)
 	{
-		return password;
+		super(msg, ex);
 	}
 
-	public void setPassword(String password)
+	public IceFallErrorTo1 getErrorObject()
 	{
-		this.password = password;
+		return errorObject;
+	}
+
+	public void setErrorObject(IceFallErrorTo1 errorObject)
+	{
+		this.errorObject = errorObject;
 	}
 }

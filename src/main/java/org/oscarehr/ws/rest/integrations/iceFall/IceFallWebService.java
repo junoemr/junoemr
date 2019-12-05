@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.catalina.User;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
+import org.oscarehr.integration.iceFall.service.IceFallRESTService;
 import org.oscarehr.integration.iceFall.service.IceFallService;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
@@ -53,6 +54,9 @@ public class IceFallWebService extends AbstractServiceImpl
 
 	@Autowired
 	IceFallService iceFallService;
+
+	@Autowired
+	IceFallRESTService iceFallRESTService;
 
 	@GET
 	@Path("/settings")
@@ -82,6 +86,8 @@ public class IceFallWebService extends AbstractServiceImpl
 
 		systemPreferenceService.setPreferenceValue(UserProperty.ICE_FALL_INTEGRATION_ENABLED, iceFallSettingsTo1.getEnabled().toString());
 		systemPreferenceService.setPreferenceValue(UserProperty.ICE_FALL_VISIBLE, iceFallSettingsTo1.getVisible().toString());
+
+		iceFallRESTService.authenticate();
 
 		return RestResponse.successResponse(iceFallSettingsTo1);
 	}

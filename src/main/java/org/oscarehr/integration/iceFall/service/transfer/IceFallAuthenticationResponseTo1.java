@@ -24,28 +24,17 @@ package org.oscarehr.integration.iceFall.service.transfer;
 
 import java.io.Serializable;
 
-public class IceFallAuthenticationTo1 implements Serializable
+public class IceFallAuthenticationResponseTo1 implements Serializable
 {
-	private String username;
-	private String password;
+	private String apiToken;
 
-	public String getUsername()
+	public String getApiToken()
 	{
-		return username;
+		return apiToken;
 	}
 
-	public void setUsername(String username)
+	public void setApiToken(String apiToken)
 	{
-		this.username = username;
-	}
-
-	public String getPassword()
-	{
-		return password;
-	}
-
-	public void setPassword(String password)
-	{
-		this.password = password;
+		this.apiToken = apiToken;
 	}
 }
