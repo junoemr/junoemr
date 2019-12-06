@@ -38,6 +38,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -151,7 +152,7 @@ public class MedicationMapper extends AbstractMapper
 		drug.setPosition(0); // this is display order. set to all zero so that medications are ordered by date.
 		drug.setSpecialInstruction(getPharmacyInstructions(rep));
 
-		drug.setSpecial(generateSpecial(drug));
+		drug.setSpecial(generateSpecial(drug, rep));
 
 		return drug;
 	}
@@ -189,23 +190,49 @@ public class MedicationMapper extends AbstractMapper
 		return prescription;
 	}
 
-	public String generateSpecial(Drug drug)
+	public String generateSpecial(Drug drug, int rep) throws HL7Exception
 	{
 		List<String> valueList = new ArrayList<>();
 		valueList.add(StringUtils.trimToEmpty(drug.getCustomName()));
-		if(drug.getDosage() != null)
+
+		for (int tq1Rep =0; tq1Rep < getNumTimingQuantity(rep); tq1Rep ++)
 		{
-			valueList.add(drug.getDosage());
+			if (getDosageString(rep, tq1Rep) != null)
+			{
+				valueList.add(getDosageString(rep, tq1Rep) + " ");
+			}
+			if (getRouteId(rep) != null)
+			{
+				valueList.add(getRouteId(rep));
+			}
+			if (getFrequencyCode(rep, tq1Rep) != null)
+			{
+				valueList.add(getFrequencyCode(rep, tq1Rep));
+			}
+			if (getTimingQuantityTextInstruction(rep, tq1Rep) != null)
+			{
+				valueList.add(getTimingQuantityTextInstruction(rep, tq1Rep));
+			}
+
+			if ((tq1Rep + 1) < getNumTimingQuantity(rep))
+			{
+				Date startDate = getTimingQuantityStartTime(rep, tq1Rep);
+				Date endDate = getTimingQuantityStartTime(rep, tq1Rep + 1);
+				if (startDate != null && endDate != null)
+				{
+					long dateDiff = endDate.getTime() - startDate.getTime();
+					valueList.add(" For: " + TimeUnit.DAYS.convert(dateDiff, TimeUnit.MILLISECONDS) + " days then, ");
+				}
+				else
+				{
+					valueList.add(" For unknown duration then, ");
+					MiscUtils.getLogger().warn("Failed to produce variable dosage duration." +
+									" One of the dates was null start [" + startDate + "] end [" + endDate + "] for drug: " + drug.getCustomName());
+				}
+			}
 		}
-		if(drug.getRoute() != null)
-		{
-			valueList.add(drug.getRoute());
-		}
-		if(drug.getFreqCode() != null)
-		{
-			valueList.add(drug.getFreqCode());
-		}
-		if(drug.getSpecialInstruction() != null)
+
+		if (drug.getSpecialInstruction() != null)
 		{
 			valueList.add(drug.getSpecialInstruction());
 		}
@@ -563,6 +590,11 @@ public class MedicationMapper extends AbstractMapper
 				.getTq13_RepeatPattern(0).getRpt1_RepeatPatternCode().getCwe1_Identifier().getValue());
 	}
 
+	public Date getTimingQuantityStartTime(int rep, int tq1Rep)
+	{
+		return getNullableDateTime(provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(tq1Rep).getStartDateTime().getTs1_Time().getValue());
+	}
+
 	public int getServiceDurationQuantity(int rep, int tq1Rep)
 	{
 		String durationUnitStr = StringUtils.trimToNull(provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(tq1Rep)
@@ -573,10 +605,16 @@ public class MedicationMapper extends AbstractMapper
 		}
 		return 0;
 	}
+
 	public String getServiceDurationUnit(int rep, int tq1Rep)
 	{
 		return StringUtils.trimToNull(provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(tq1Rep)
 				.getTq16_ServiceDuration().getCq2_Units().getCe1_Identifier().getValue());
+	}
+
+	public String getTimingQuantityTextInstruction(int rep, int tq1Rep)
+	{
+		return StringUtils.trimToNull(provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(tq1Rep).getTextInstruction().getValue());
 	}
 
 	/**
@@ -584,7 +622,7 @@ public class MedicationMapper extends AbstractMapper
 	 * @param durationUnit - unit to translate
 	 * @return - the standard format of the duration unit
 	 */
-	private String translateDurationUnits(String durationUnit)
+	protected String translateDurationUnits(String durationUnit)
 	{
 		HashMap<String, String> durationHash = new HashMap<>();
 
@@ -604,6 +642,11 @@ public class MedicationMapper extends AbstractMapper
 		{
 			throw new IllegalArgumentException("Duration [" + durationUnit + "] has no mapping");
 		}
+	}
+
+	protected int getNumTimingQuantity(int rep)
+	{
+		return provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1Reps();
 	}
 
 	// ---- RXE ----
