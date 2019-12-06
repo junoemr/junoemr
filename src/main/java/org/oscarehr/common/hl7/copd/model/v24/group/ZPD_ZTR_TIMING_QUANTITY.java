@@ -25,9 +25,9 @@ package org.oscarehr.common.hl7.copd.model.v24.group;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractGroup;
 import ca.uhn.hl7v2.model.Group;
-import ca.uhn.hl7v2.model.v25.segment.TQ1;
 import ca.uhn.hl7v2.model.v25.segment.TQ2;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.oscarehr.common.hl7.copd.model.v24.segment.TQ1;
 
 public class ZPD_ZTR_TIMING_QUANTITY extends AbstractGroup
 {

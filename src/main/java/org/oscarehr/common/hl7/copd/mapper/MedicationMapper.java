@@ -138,7 +138,7 @@ public class MedicationMapper extends AbstractMapper
 
 		drug.setQuantity(String.valueOf(getRequestedDispenseAmount(rep)));
 		drug.setUnitName(getRequestedDispenseUnits(rep));
-		drug.setDosage(getDosage(rep));
+		drug.setDosage(getDosageString(rep, 0));
 		drug.setRepeat(getNumberOfRefills(rep));
 		drug.setNoSubs(!allowSubstitutions(rep));
 
@@ -301,11 +301,20 @@ public class MedicationMapper extends AbstractMapper
 	 * @param rxDate - the rx start date
 	 * @return - the rx end date or null if end date cannot be determined
 	 */
-	private Date getCalculatedEndDateAlternate(int rep, Date rxDate)
+	private Date getCalculatedEndDateAlternate(int rep, Date rxDate) throws HL7Exception
 	{
 		try
 		{
-			Double dosage = Double.parseDouble(getDosage(rep));
+			Double dosage = Double.parseDouble(getDosage(rep, 0, 0));
+			if (isDosageRange(rep, 0))
+			{
+				Double secondDosage = Double.parseDouble(getDosage(rep, 0, 1));
+				if (secondDosage > dosage)
+				{
+					dosage = secondDosage;
+				}
+			}
+
 			Double frequencyScaler = frequencyCodeToScaler(getFrequencyCode(rep, 0));
 			Double amount = getRequestedDispenseAmount(rep);
 
@@ -478,13 +487,30 @@ public class MedicationMapper extends AbstractMapper
 		return dosageUnitStr;
 	}
 
-	public String getDosage(int rep)
+	public String getDosageString(int rep, int tq1Rep)
 	{
 		if (provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1Reps() > 0)
 		{
-			return StringUtils.trimToEmpty(provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(0).getQuantity().getCq1_Quantity().getValue());
+			if (provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(tq1Rep).getQuantityReps() <= 1)
+			{
+				return getDosage(rep, tq1Rep, 0);
+			}
+			else
+			{
+				return StringUtils.trimToEmpty(getDosage(rep, tq1Rep, 0) + "-" + getDosage(rep, tq1Rep, 1));
+			}
 		}
 		return "";
+	}
+
+	public String getDosage(int rep, int tq1Rep, int quantityRep)
+	{
+		return StringUtils.trimToEmpty(provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(tq1Rep).getQuantity(quantityRep).getCq1_Quantity().getValue());
+	}
+
+	public boolean isDosageRange(int rep, int tq1Rep)
+	{
+		return provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(tq1Rep).getQuantityReps() > 1;
 	}
 
 	public Integer getNumberOfRefills(int rep)
@@ -531,7 +557,7 @@ public class MedicationMapper extends AbstractMapper
 				.getTq12_Quantity().getCq2_Units().getCe2_Text().getValue());
 	}
 
-	public String getFrequencyCode(int rep, int tq1Rep)
+	public String getFrequencyCode(int rep, int tq1Rep) throws HL7Exception
 	{
 		return StringUtils.trimToNull(provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(tq1Rep)
 				.getTq13_RepeatPattern(0).getRpt1_RepeatPatternCode().getCwe1_Identifier().getValue());
