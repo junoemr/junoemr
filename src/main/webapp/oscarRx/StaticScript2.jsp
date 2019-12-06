@@ -44,6 +44,8 @@
 <%@page import="org.apache.commons.lang.StringEscapeUtils" %>
 
 <%@page import="java.util.ArrayList"%>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
@@ -134,7 +136,7 @@ oscar.oscarRx.pageUtil.RxSessionBean rxBean = null;
             favoriteName=encodeURIComponent(favoriteName);
             var data="drugId="+drugId+"&favoriteName="+favoriteName;
             new Ajax.Request(url, {method: 'get',parameters:data, onSuccess:function(transport){
-                    window.location.href="StaticScript2.jsp?regionalIdentifier="+'<%=regionalIdentifier%>'+"&cn="+'<%=cn%>';
+                    window.location.href="StaticScript2.jsp?regionalIdentifier="+'<%=regionalIdentifier%>'+"&cn="+'<%=URLEncoder.encode(StringUtils.trimToEmpty(cn))%>';
             }});
        }
     }

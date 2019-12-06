@@ -468,8 +468,15 @@ public class MedicationMapper extends AbstractMapper
 
 	public String getRequestedGiveCodeText(int rep)
 	{
-		return StringUtils.trimToNull(provider.getMEDS(rep).getRXO()
+		String text =  StringUtils.trimToNull(provider.getMEDS(rep).getRXO()
 				.getRxo1_RequestedGiveCode().getCwe2_Text().getValue());
+
+		if (text == null)
+		{// some times text is in CWE.9
+			text = StringUtils.trimToNull(provider.getMEDS(rep).getRXO().getRxo1_RequestedGiveCode().getCwe9_OriginalText().getValue());
+		}
+
+		return text;
 	}
 
 	public String getRequestedGiveCodeNameOfCodingSystem(int rep)
