@@ -156,6 +156,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/landingPage',
 			component: 'landingPage'
 		})
+		.state('admin.integrationModules',
+		{
+			url: '/integrationModules',
+			component: 'integrationModules'
+		})
 		.state('ticklers',
 		{
 			url: '/ticklers',

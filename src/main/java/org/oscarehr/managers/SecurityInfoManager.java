@@ -275,6 +275,17 @@ public class SecurityInfoManager {
 	}
 
 	/**
+	 * check if the provider is a super admin
+	 * @param providerNo -
+	 * @return true if super admin. false otherwise
+	 */
+	public boolean isSuperAdmin(String providerNo)
+	{
+		ProviderData provider = providerDataDao.find(providerNo);
+		return provider.isSuperAdmin();
+	}
+
+	/**
 	 * throws a security exception if the current non super-admin provider attempts to modify a super-admin provider
 	 * @param currentProviderNo - the providerId of the current user
 	 * @param providerNoToModify - the providerId of the user they are attempting to modify

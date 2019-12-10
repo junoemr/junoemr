@@ -54,9 +54,11 @@ import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.EncounterTemplateDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.EncounterTemplate;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.ConsultationManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -93,6 +95,9 @@ public class RecordUxService extends AbstractServiceImpl {
 	
 	@Autowired
 	private PreferenceManager preferenceManager;
+
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
 	
 	/**
 	$scope.recordtabs2 = [ 
@@ -200,6 +205,12 @@ public class RecordUxService extends AbstractServiceImpl {
 		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.documents", "r", null)) {
 			menulist.add(new MenuItemTo1(idCounter++, "Documents", "../dms/documentReport.jsp?function=demographic&doctype=lab&functionid="+demographicNo));
 		}
+
+		if (systemPreferenceService.isPreferenceEnabled(UserProperty.CARE_CONNECT_ENABLED, false))
+		{
+			menulist.add(new MenuItemTo1(idCounter++, "Care Connect", "../integration/careConnect/careConnectForm.jsp?demoNo=" + demographicNo));
+		}
+
 		// END OF MORE MENU
 
 		return menulist;
