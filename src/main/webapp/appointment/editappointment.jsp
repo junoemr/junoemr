@@ -926,7 +926,7 @@
 					<li class="weak row">
 						<div class="label">Virtual:</div>
 						<div class="input">
-								<input type="checkbox" name="isVirtual"
+								<input type="checkbox" name="isVirtual" disabled
 												<%= appt.getIsVirtual() ? "checked='checked'" : "" %>/>
 								<% if(appt.getIsVirtual()) { %>
 								&nbsp;
