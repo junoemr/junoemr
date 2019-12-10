@@ -598,6 +598,10 @@ public class ProviderManager2
 		{
 			settings.setHideOldEchartLinkInAppointment("Y".equals(map.get("hide_old_echart_link_in_appointment").getValue()));
 		}
+		if (map.get(UserProperty.SCHEDULE_COUNT_ENABLED) != null)
+		{
+			settings.setAppointmentCountEnabled("true".equals(map.get(UserProperty.SCHEDULE_COUNT_ENABLED).getValue()));
+		}
 		if (map.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null)
 		{
 			settings.setAppointmentCountIncludeCancelled("true".equals(map.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED).getValue()));
@@ -906,6 +910,8 @@ public class ProviderManager2
 		property = getMappedOrNewProperty(map, UserProperty.INTAKE_FORM_ENABLED, providerNo);
 		property.setValue(settings.isIntakeFormEnabled() ? "yes" : "no");
 
+		property = getMappedOrNewProperty(map, UserProperty.SCHEDULE_COUNT_ENABLED, providerNo);
+		property.setValue(Boolean.toString(settings.getAppointmentCountEnabled()));
 		property = getMappedOrNewProperty(map, UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED, providerNo);
 		property.setValue(Boolean.toString(settings.getAppointmentCountIncludeCancelled()));
 		property = getMappedOrNewProperty(map, UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW, providerNo);

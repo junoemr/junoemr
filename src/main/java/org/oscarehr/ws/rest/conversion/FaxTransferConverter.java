@@ -99,6 +99,16 @@ public class FaxTransferConverter
 		return transfer;
 	}
 
+	public static List<FaxOutboxTransferOutbound>  getAllAsOutboxTransferObject(FaxAccount faxAccount, List<FaxOutbound> faxOutbound)
+	{
+		List<FaxOutboxTransferOutbound> transferList = new ArrayList<>(faxOutbound.size());
+		for(FaxOutbound fax : faxOutbound)
+		{
+			transferList.add(getAsOutboxTransferObject(faxAccount, fax));
+		}
+		return transferList;
+	}
+
 	public static FaxInboxTransferOutbound getAsInboxTransferObject(FaxInbound faxInbound)
 	{
 		FaxInboxTransferOutbound transfer = new FaxInboxTransferOutbound();
@@ -110,6 +120,16 @@ public class FaxTransferConverter
 		transfer.setSentFrom(faxInbound.getSentFrom());
 
 		return transfer;
+	}
+
+	public static List<FaxInboxTransferOutbound>  getAllAsInboxTransferObject(List<FaxInbound> faxInbound)
+	{
+		ArrayList<FaxInboxTransferOutbound> transferList = new ArrayList<>(faxInbound.size());
+		for(FaxInbound fax : faxInbound)
+		{
+			transferList.add(getAsInboxTransferObject(fax));
+		}
+		return transferList;
 	}
 
 	private static FaxOutboxTransferOutbound.CombinedStatus toCombinedStatus(FaxOutbound.Status systemStatus, String remoteStatus)
