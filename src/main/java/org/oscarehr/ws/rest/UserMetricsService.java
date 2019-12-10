@@ -25,6 +25,9 @@
 package org.oscarehr.ws.rest;
 
 import io.prometheus.client.Histogram;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.common.annotation.SkipAllLogging;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.UserMetricsTo1;
@@ -38,6 +41,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 @Path("/user_metrics")
@@ -50,28 +55,39 @@ public class UserMetricsService extends AbstractServiceImpl
 			labelNames("page").
 			register();
 
+	private static final Logger logger = MiscUtils.getLogger();
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces({MediaType.APPLICATION_JSON , MediaType.APPLICATION_XML})
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@SkipAllLogging
 	public RestResponse<String> postMetrics(@Context HttpServletRequest request, ArrayList<UserMetricsTo1> data)
+			throws IOException
 	{
 		String page = "appointment";
-		for(UserMetricsTo1 metric : data)
+		if (data != null)
 		{
-			if(metric.getMetricName().equals("performance_timing_loadEventEnd"))
+			for (UserMetricsTo1 metric : data)
 			{
-				for(Double observedTime : metric.getObservations())
+				if (metric.getMetricName().equals("performance_timing_loadEventEnd"))
 				{
-					requestLatency.labels(page).observe(observedTime);
+					for (Double observedTime : metric.getObservations())
+					{
+						requestLatency.labels(page).observe(observedTime);
+					}
 				}
 			}
+		}
+		else
+		{
+			String payload = IOUtils.toString(request.getInputStream(), Charset.forName("UTF8"));
+			logger.warn("Could not parse request body into JSON. Is the following request body in Prometheus Exposition Format? https://jira.oh.ca/browse/OHSUPPORT-7250\n" + payload);
 		}
 		return RestResponse.successResponse("Success");
 	}
 
 	@GET
-	@Produces({MediaType.APPLICATION_JSON , MediaType.APPLICATION_XML})
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@SkipAllLogging
 	public RestResponse<String> test()
 	{
