@@ -502,11 +502,18 @@ function displayCloseWarning(){
                          <label for="dose">Dose:</label> <input type="text" name="dose"  value="<%=str((extraData.get("dose")),"")%>"/><br/>
                          <label for="lot">Lot:</label>  <input type="text" name="lot" id="lot" value="<%=str(lot,"")%>" />
                         <select onchange="javascript:updateLotNr(this);" id="lotDrop" name="lotItem" >
-                             <%for(String lotnr:lotNrList) {
-							 %>
-                               <option value="<%=lotnr%>" <%= ( lotnr.equals(lot) ? " selected" : "" ) %>><%=lotnr%> </option>
-                             <%}%>
-                             <option value="-1"  >Other</option>
+                            <%
+                                boolean isLotNumberACustomLot = false;
+                            %>
+                            <%for(String lotnr:lotNrList) {
+                                if(lotnr.equals(lot))
+                                {
+                                    isLotNumberACustomLot = true;
+                                }
+                            %>
+                            <option value="<%=lotnr%>" <%= ( lotnr.equals(lot) ? " selected" : "" ) %> ><%=lotnr%> </option>
+                            <%}%>
+                            <option value="-1" <%=isLotNumberACustomLot ? "" : "selected" %>selected >Other</option>
                          </select><br/>
                          <label for="manufacture">Manufacture:</label> <input type="text" name="manufacture" id="manufacture"  value="<%=str((extraData.get("manufacture")),"")%>"/><br/>
                    </fieldset>
