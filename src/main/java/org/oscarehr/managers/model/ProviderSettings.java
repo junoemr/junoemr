@@ -40,6 +40,7 @@ public class ProviderSettings
 	private String newTicklerWarningWindow;
 	private String workloadManagement;
 	private String ticklerWarningProvider;
+	private Boolean ticklerViewOnlyMine;
 
 	private boolean useCobaltOnLogin;
 
@@ -1043,6 +1044,16 @@ public class ProviderSettings
 	public void setAppointmentCountEnabled(boolean appointmentCountEnabled)
 	{
 		this.appointmentCountEnabled = appointmentCountEnabled;
+	}
+
+	public Boolean getTicklerViewOnlyMine()
+	{
+		return ticklerViewOnlyMine;
+	}
+
+	public void setTicklerViewOnlyMine(Boolean ticklerViewOnlyMine)
+	{
+		this.ticklerViewOnlyMine = ticklerViewOnlyMine;
 	}
 
 	public boolean getAppointmentCountIncludeCancelled()
