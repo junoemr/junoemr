@@ -95,7 +95,7 @@ public class LogReportAction extends Action
 			// if this flag is set, results need to be limited to providers within the site restrictions
 			if(restrictResultsBySite)
 			{
-				String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromRequest(request).getLoggedInProviderNo();
+				String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 				List<ProviderData> providerList = providerDao.findByProviderSite(loggedInProviderNo);
 				List<String> providerIdList = new ArrayList<>(providerList.size());
 				for(ProviderData provider : providerList)
