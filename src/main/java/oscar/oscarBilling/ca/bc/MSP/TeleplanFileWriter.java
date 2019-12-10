@@ -34,6 +34,7 @@ import org.oscarehr.util.SpringUtils;
 import oscar.Misc;
 import oscar.entities.Billingmaster;
 import oscar.entities.WCB;
+import oscar.oscarBilling.ca.bc.Teleplan.TeleplanCodesManager;
 import oscar.oscarBilling.ca.bc.Teleplan.TeleplanSequenceDAO;
 import oscar.oscarBilling.ca.bc.Teleplan.WCBTeleplanSubmission;
 import oscar.oscarBilling.ca.bc.data.BillingmasterDAO;
@@ -498,8 +499,16 @@ public class TeleplanFileWriter {
             dLine.append(Misc.forwardZero(bm.getFacilitySubNo(), 5));                   //p72   5
             dLine.append(Misc.space(58));                                               //p80  58
             dLine.append(Misc.backwardSpace(bm.getOinInsurerCode(),2));                 //p100  2
-            dLine.append(Misc.forwardZero(bm.getOinRegistrationNo(),12));               //p102 12
-            dLine.append(Misc.backwardSpace(bm.getOinBirthdate(),8));                   //p104  8
+            if(bm.getOinInsurerCode().equalsIgnoreCase(TeleplanCodesManager.CODE_PAY_PATIENT))
+            {
+                dLine.append(Misc.backwardZero(bm.getOinRegistrationNo(),12));               //p102 12
+            }
+            else
+            {
+                dLine.append(Misc.forwardZero(bm.getOinRegistrationNo(),12));               //p102 12
+            }
+
+        dLine.append(Misc.backwardSpace(bm.getOinBirthdate(),8));                   //p104  8
             dLine.append(Misc.backwardSpace(bm.getOinFirstName(),12));                  //p106 12
             dLine.append(Misc.backwardSpace(bm.getOinSecondName(),1));                  //p108  1
             dLine.append(Misc.backwardSpace(bm.getOinSurname(),18));                    //p110 18

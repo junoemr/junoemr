@@ -51,6 +51,7 @@ import oscar.OscarProperties;
 import oscar.entities.Billingmaster;
 import oscar.oscarBilling.ca.bc.MSP.MSPBillingNote;
 import oscar.oscarBilling.ca.bc.MSP.MSPReconcile;
+import oscar.oscarBilling.ca.bc.Teleplan.TeleplanCodesManager;
 import oscar.oscarBilling.ca.bc.data.BillingFormData;
 import oscar.oscarBilling.ca.bc.data.BillingHistoryDAO;
 import oscar.oscarBilling.ca.bc.data.BillingNote;
@@ -300,7 +301,14 @@ public class BillingReProcessBillAction extends Action {
         billingmaster.setTimeCall(timeCall);
         billingmaster.setServiceStartTime(serviceStartTime);
         billingmaster.setServiceEndTime(serviceEndTime);
-        billingmaster.setBirthDate(birthDate);
+        if(oinInsurerCode.equalsIgnoreCase(TeleplanCodesManager.CODE_PAY_PATIENT))
+        {
+            billingmaster.setBirthDate("00000000");
+        }
+        else
+        {
+            billingmaster.setBirthDate(birthDate);
+        }
         billingmaster.setCorrespondenceCode(correspondenceCode);
         billingmaster.setClaimComment(claimComment);
         billingmaster.setOriginalClaim(originalMSPNumber);
