@@ -250,7 +250,8 @@
 	<bean id="clinicaidSessionManager" class="org.oscarehr.integration.clinicaid.service.ClinicaidSessionManager" autowire="byName"/>
 
     <!-- TELEHEALTH -->
-    <bean id="myHealthClinicService" class="org.oscarehr.integration.myhealthaccess.service.ClinicService" autowire="byName"/>
+	<bean id="myHealthAppointmentService" class="org.oscarehr.integration.myhealthaccess.service.AppointmentService" autowire="byName"/>
+	<bean id="myHealthClinicService" class="org.oscarehr.integration.myhealthaccess.service.ClinicService" autowire="byName"/>
     <bean id="myHealthAccessService" class="org.oscarehr.telehealth.service.MyHealthAccessService" autowire="byName"/>
 
    <!--Email Support -->

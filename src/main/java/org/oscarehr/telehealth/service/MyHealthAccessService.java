@@ -23,14 +23,18 @@
 
 package org.oscarehr.telehealth.service;
 
+import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.model.UserIntegrationAccess;
+import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicStatusResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateResponseTo1;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
+import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.provider.dao.ProviderDataDao;
@@ -57,6 +61,9 @@ public class MyHealthAccessService
 
 	@Autowired
 	ClinicService clinicService;
+
+	@Autowired
+	AppointmentService appointmentService;
 
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
 	protected static final String MHA_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
@@ -135,5 +142,52 @@ public class MyHealthAccessService
 		integrationData.setLoginToken(loginTokenTo1.getToken());
 
 		return integrationData;
+	}
+
+	public boolean updateAppointmentCache(IntegrationData integrationData, AppointmentCacheTo1 appointmentTransfer)
+	{
+		return appointmentService.updateAppointmentCache(integrationData, appointmentTransfer);
+	}
+
+	public boolean updateAppointmentCache(Appointment appointment) throws InvalidIntegrationException
+	{
+		String siteName = appointment.getLocation();
+		Integration integration = integrationService.findMhaIntegration(siteName);
+
+		if (integration == null)
+		{
+			String noIntegrationError = InvalidIntegrationException.NO_INTEGRATION_MHA;
+
+			if (!StringUtils.isNullOrEmpty(siteName))
+			{
+				noIntegrationError = String.format("%s for %s", noIntegrationError, siteName);
+			}
+
+			throw new InvalidIntegrationException(noIntegrationError);
+		}
+
+		IntegrationData integrationData = new IntegrationData(integration);
+
+
+		AppointmentCacheTo1 transfer = new AppointmentCacheTo1();
+		transfer.setId(String.valueOf(appointment.getId()));
+		transfer.setCanceled(appointment.getAppointmentStatus().equals(Appointment.CANCELLED));
+		transfer.setVirtual(appointment.getIsVirtual());
+		transfer.setStartDateTime(appointment.getStartTimeAsFullDate());
+
+		return updateAppointmentCache(integrationData, transfer);
+	}
+
+	public void queueAppointmentCacheUpdate(Appointment appointment)
+	{
+		// TODO - implement asynchronus queue system similar to faxing
+		try
+		{
+			updateAppointmentCache(appointment);
+		}
+		catch(InvalidIntegrationException e)
+		{
+			MiscUtils.getLogger().error("MHA Update Error", e);
+		}
 	}
 }

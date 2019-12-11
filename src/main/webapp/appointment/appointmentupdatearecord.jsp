@@ -44,17 +44,19 @@ org.oscarehr.common.dao.AppointmentArchiveDao,
 org.oscarehr.common.dao.OscarAppointmentDao,
 org.oscarehr.common.model.Appointment,
 org.oscarehr.event.EventService"%>
-<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="org.oscarehr.telehealth.service.MyHealthAccessService"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
+<%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="oscar.MyDateFormat" %>
-<%@page import="oscar.util.ConversionUtils" %>
 <%@ page import="oscar.log.LogAction" %>
 <%@ page import="oscar.log.LogConst" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
-    String changedStatus = null;
+	MyHealthAccessService myHealthAccessService = SpringUtils.getBean(MyHealthAccessService.class);
+	String changedStatus = null;
 %>
 <html:html locale="true">
 <head>
@@ -69,38 +71,41 @@ org.oscarehr.event.EventService"%>
 		<bean:message key="appointment.appointmentupdatearecord.msgMainLabel" /></font></th>
 	</tr>
 </table>
-<%
-  String updateuser = (String) session.getAttribute("user");
+	<%
+		String updateuser = (String) session.getAttribute("user");
 
-  int rowsAffected = 0;
-  Appointment appt = appointmentDao.find(Integer.parseInt(request.getParameter("appointment_no")));
-  appointmentArchiveDao.archiveAppointment(appt);
-  
-  //Did the appt status change ?
-  if(appt.getStatus()!=null && !appt.getStatus().equals(request.getParameter("status"))){
-	  changedStatus = request.getParameter("status");
-  }
-  
-  if (request.getParameter("buttoncancel")!=null && (request.getParameter("buttoncancel").equals("Cancel Appt") || request.getParameter("buttoncancel").equals("No Show"))) {
-	  changedStatus = request.getParameter("buttoncancel").equals("Cancel Appt")?"C":"N"; 
-	  if(appt != null) {
-      	appt.setStatus(request.getParameter("buttoncancel").equals("Cancel Appt")?"C":"N");
-      	appt.setLastUpdateUser(updateuser);
-      	appointmentDao.merge(appt);
-      	rowsAffected=1;
+		int rowsAffected = 0;
+		Appointment appt = appointmentDao.find(Integer.parseInt(request.getParameter("appointment_no")));
+		appointmentArchiveDao.archiveAppointment(appt);
 
-		  LogAction.addLogEntry(updateuser, appt.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,
-				  LogConst.STATUS_SUCCESS, String.valueOf(appt.getId()), request.getRemoteAddr());
-      }
+		//Did the appt status change ?
+		if(appt.getStatus() != null && !appt.getStatus().equals(request.getParameter("status")))
+		{
+			changedStatus = request.getParameter("status");
+		}
 
-  } else {
+		if(request.getParameter("buttoncancel") != null && (request.getParameter("buttoncancel").equals("Cancel Appt") || request.getParameter("buttoncancel").equals("No Show")))
+		{
+			changedStatus = request.getParameter("buttoncancel").equals("Cancel Appt") ? "C" : "N";
+			appt.setStatus(request.getParameter("buttoncancel").equals("Cancel Appt") ? "C" : "N");
+			appt.setLastUpdateUser(updateuser);
+			appointmentDao.merge(appt);
+			rowsAffected = 1;
 
-	  if(appt != null) {
-		  	if (request.getParameter("demographic_no")!=null && !(request.getParameter("demographic_no").equals(""))) {
-		  		appt.setDemographicNo(Integer.parseInt(request.getParameter("demographic_no")));
-		 	} else {
-			 	appt.setDemographicNo(0);
-		 	}
+			LogAction.addLogEntry(updateuser, appt.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,
+					LogConst.STATUS_SUCCESS, String.valueOf(appt.getId()), request.getRemoteAddr());
+
+		}
+		else
+		{
+			if(request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals("")))
+			{
+				appt.setDemographicNo(Integer.parseInt(request.getParameter("demographic_no")));
+			}
+			else
+			{
+				appt.setDemographicNo(0);
+			}
 			appt.setAppointmentDate(ConversionUtils.fromDateString(request.getParameter("appointment_date")));
 			appt.setStartTime(ConversionUtils.fromTimeString(MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"))));
 			appt.setEndTime(ConversionUtils.fromTimeString(MyDateFormat.getTimeXX_XX_XX(request.getParameter("end_time"))));
@@ -109,7 +114,7 @@ org.oscarehr.event.EventService"%>
 			appt.setReason(request.getParameter("reason"));
 			appt.setLocation(request.getParameter("location"));
 			appt.setIsVirtual(request.getParameter("isVirtual") != null &&
-							request.getParameter("isVirtual").equals("on"));
+					request.getParameter("isVirtual").equals("on"));
 			appt.setResources(request.getParameter("resources"));
 			appt.setType(request.getParameter("type"));
 			appt.setStyle(request.getParameter("style"));
@@ -118,23 +123,27 @@ org.oscarehr.event.EventService"%>
 			appt.setLastUpdateUser(updateuser);
 			appt.setRemarks(request.getParameter("remarks"));
 			appt.setUpdateDateTime(new java.util.Date());
-			appt.setUrgency((request.getParameter("urgency")!=null)?request.getParameter("urgency"):"");
+			appt.setUrgency((request.getParameter("urgency") != null) ? request.getParameter("urgency") : "");
 
-			if (request.getParameter("reasonCode") != null)
+			if(request.getParameter("reasonCode") != null)
 			{
-			    appt.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
+				appt.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
 			}
-			
+
 			appointmentDao.merge(appt);
 
-		  LogAction.addLogEntry(updateuser, appt.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,
-				  LogConst.STATUS_SUCCESS, String.valueOf(appt.getId()), request.getRemoteAddr());
-			rowsAffected=1;
-	  }
-	  
-  }
-  if (rowsAffected == 1) {
-%>
+			LogAction.addLogEntry(updateuser, appt.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,
+					LogConst.STATUS_SUCCESS, String.valueOf(appt.getId()), request.getRemoteAddr());
+			rowsAffected = 1;
+
+			if(appt.getIsVirtual())
+			{
+				myHealthAccessService.queueAppointmentCacheUpdate(appt);
+			}
+		}
+		if(rowsAffected == 1)
+		{
+	%>
 <p>
 <h1><bean:message
 	key="appointment.appointmentupdatearecord.msgUpdateSuccess" /></h1>

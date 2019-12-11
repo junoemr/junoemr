@@ -20,32 +20,35 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.appointment.service;
+package org.oscarehr.integration.myhealthaccess.service;
 
-import org.oscarehr.appointment.dto.CalendarAppointmentStatus;
-import org.oscarehr.appointment.model.AppointmentStatusList;
-import org.oscarehr.managers.AppointmentManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.oscarehr.integration.model.IntegrationData;
+import org.oscarehr.integration.myhealthaccess.ErrorHandler;
+import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
+import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
-@Transactional
-public class AppointmentStatusService
+public class AppointmentService extends BaseService
 {
-	@Autowired
-	private AppointmentManager appointmentManager;
-
-	/**
-	 * Gets a list of appointment statuses for use in the calendar.
-	 * @return List of appointment statuses.
-	 */
-	public List<CalendarAppointmentStatus> getCalendarAppointmentStatusList()
+	public boolean updateAppointmentCache(IntegrationData integrationData, AppointmentCacheTo1 appointmentTransfer)
 	{
-		AppointmentStatusList appointmentStatusList = AppointmentStatusList.factory(appointmentManager);
+		String endpoint = "/clinic/%s/appointment/%s/cache";
 
-		return appointmentStatusList.getCalendarAppointmentStatusList();
+		Boolean response = false;
+		String apiKey = integrationData.getClinicApiKey();
+		String clinicId = integrationData.getIntegration().getRemoteId();
+		String appointmentId = appointmentTransfer.getId();
+
+		try
+		{
+			endpoint = formatEndpoint(endpoint, clinicId, appointmentId);
+			response = put(endpoint, apiKey, appointmentTransfer, Boolean.class);
+		}
+		catch (BaseException e)
+		{
+			ErrorHandler.handleError(e);
+		}
+		return response;
 	}
 }
