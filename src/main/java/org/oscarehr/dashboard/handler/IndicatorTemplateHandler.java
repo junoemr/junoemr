@@ -40,7 +40,6 @@ import javax.xml.validation.Validator;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.IndicatorTemplate;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.w3c.dom.Document;
 
