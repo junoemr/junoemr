@@ -70,7 +70,7 @@ public class IndicatorTemplateHandler{
 	private Schema schema;
 	private String validationMessage;
 	private boolean validXML;
-	private LoggedInInfo loggedInInfo;
+	private String providerNo;
 	
 	/**
 	 * Requires the proper IndicatorXMLTemplateSchema.xsd schema file to be set 
@@ -80,8 +80,8 @@ public class IndicatorTemplateHandler{
 		setSchema();
 	}
 	
-	public IndicatorTemplateHandler( LoggedInInfo loggedInInfo, byte[] bytearray ) {
-		this.loggedInInfo = loggedInInfo;
+	public IndicatorTemplateHandler( byte[] bytearray, String providerNo) {
+		this.providerNo = providerNo;
 		setSchema();
 		read( bytearray );
 	}
@@ -128,7 +128,7 @@ public class IndicatorTemplateHandler{
 		setIndicatorTemplateDocument( bytearray );
 		
 		if( isValidXML() ) {
-			IndicatorTemplateXML indicatorTemplateXML =  new IndicatorTemplateXML( loggedInInfo, getIndicatorTemplateDocument() );			
+			IndicatorTemplateXML indicatorTemplateXML =  new IndicatorTemplateXML(getIndicatorTemplateDocument(), providerNo);
 			setIndicatorTemplateXML( indicatorTemplateXML );			
 			setIndicatorTemplateEntity( indicatorTemplateEntityFromXML( getIndicatorTemplateXML() ) );
 		}

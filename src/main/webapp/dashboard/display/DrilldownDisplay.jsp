@@ -48,7 +48,10 @@
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/library/bootstrap2-datepicker/datepicker3.css" />
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/css/bootstrap-timepicker.min.css" />
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/dashboard/display/drillDownDisplay.css" />
-	<script>var ctx = "${pageContext.request.contextPath}"</script>
+	<script>
+		var ctx = "${pageContext.request.contextPath}"
+		var providerNo = "<%=request.getAttribute("providerNo")%>"
+	</script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/js/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/bootstrap/3.0.0/js/bootstrap.min.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/DataTables-1.10.12/media/js/dataTables.bootstrap.min.js" ></script>

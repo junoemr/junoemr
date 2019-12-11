@@ -1,0 +1,26 @@
+#admin-panel-management {
+	@include juno-font-body-small();
+
+	panel-body {
+
+		.report-select {
+			flex: 1 1 45%;
+		}
+
+		.flex-row {
+			align-items: last baseline;
+		}
+	}
+
+	iframe {
+		border: 0;
+		margin-left: 15px;
+		margin-right: 15px;
+	}
+
+	.required {
+		select {
+			border-color: $color-red-base;
+		}
+	}
+}

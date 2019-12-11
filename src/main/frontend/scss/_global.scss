@@ -14,6 +14,32 @@ a {
 	}
 }
 
+body {
+	h1 {
+		font-size: 32px;
+		font-weight: bold;
+	}
+	h2 {
+		font-size: 28px;
+		font-weight: bold;
+	}
+	h3 {
+		font-size: 24px;
+		font-weight: bold;
+	}
+	h4 {
+		font-size: 22px;
+		font-weight: bold;
+	}
+	h5 {
+		font-size: 20px;
+		font-weight: bold;
+	}
+	h6 {
+		font-size: 18px;
+		font-weight: bold;
+	}
+}
 
 .hand-hover {
 	cursor: pointer;
@@ -79,6 +105,31 @@ a {
 .md-margin-top {
 	margin-top: $margin-md;
 }
+
+.lg-margin-right {
+	margin-right: $margin-lg;
+}
+
+.md-margin-right {
+	margin-right: $margin-md;
+}
+
+.sm-margin-right {
+	margin-right: $margin-sm;
+}
+
+.lg-margin-left {
+	margin-left: $margin-lg;
+}
+
+.md-margin-left {
+	margin-left: $margin-md;
+}
+
+.sm-margin-left {
+	margin-left: $margin-sm;
+}
+
 
 .no-margin-bottom {
 	margin-bottom: 0;

@@ -62,7 +62,7 @@ public class DisplayIndicatorAction extends DispatchAction {
 			id = Integer.parseInt( indicatorId );
 		}
 		
-		IndicatorBean indicatorPanelBean = dashboardManager.getIndicatorPanel(loggedInInfo, id);
+		IndicatorBean indicatorPanelBean = dashboardManager.getIndicatorPanel(loggedInInfo, id,  request.getParameter("providerNo"));
 		
 		request.setAttribute("indicatorPanel", indicatorPanelBean);
 		
