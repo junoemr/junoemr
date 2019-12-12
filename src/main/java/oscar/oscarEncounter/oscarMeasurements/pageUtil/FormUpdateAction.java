@@ -73,6 +73,7 @@ public class FormUpdateAction extends Action {
 		String textOnEncounter = ""; // ********CDM Indicators Update******** \\n";
 		boolean valid = true;
 		boolean errorPage = false;
+		boolean addToNote = false;
 
 		HttpSession session = request.getSession();
 
@@ -144,6 +145,8 @@ public class FormUpdateAction extends Action {
 						
 							//create note text
 							if(request.getParameter(name + "_note") !=null && !request.getParameter(name + "_note").equals("")){
+								addToNote = true;
+
 								note = note + displayName + ": " + request.getParameter(name);
 								if(name.equals("BP")){
 									note = note + " " + mtypeBean.getMeasuringInstrc();
@@ -193,8 +196,11 @@ public class FormUpdateAction extends Action {
 		}
 		
 		session.setAttribute("textOnEncounter", textOnEncounter);
-		
-		addNote(demographic_no, providerNo, prog_no, note, apptNoInt, request);
+
+		if (addToNote)
+		{
+			addNote(demographic_no, providerNo, prog_no, note, apptNoInt, request);
+		}
 		
 		if (request.getParameter("submit").equals("Add") || request.getParameter("submit").equals("Save") || request.getParameter("submit").equals("Save All")) {
 			return mapping.findForward("reload");
