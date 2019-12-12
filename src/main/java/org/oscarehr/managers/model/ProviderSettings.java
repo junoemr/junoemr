@@ -51,7 +51,7 @@ public class ProviderSettings
 	private String siteSelected;
 	private String viewSelected;
 	private int appointmentScreenLinkNameDisplayLength = 3;
-	private boolean hideOldEchartLinkInAppointment = false;
+	private boolean hideOldEchartLinkInAppointment = true;
 
 	private Collection<String> appointmentScreenForms = new ArrayList<String>();
 	private Collection<Integer> appointmentScreenEforms = new ArrayList<Integer>();
