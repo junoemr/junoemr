@@ -140,7 +140,7 @@
 					<a ng-click="editTickler(tickler)" class="hand-hover"><bean:message key="global.view" bundle="ui"/></a> 		
 				</td>--%>
 				<td data-title="'<bean:message key="tickler.list.header.patientName" bundle="ui"/>'" sortable="'DemographicName'">
-					<a ng-href="{{'#!/record/' + tickler.demographicNo + '/summary'}}">{{tickler.demographicName}}</a>
+					<a ng-href="{{'#!/record/' + tickler.demographicNo + '/details'}}">{{tickler.demographicName}}</a>
 				</td>
 				<td data-title="'<bean:message key="tickler.list.header.creator"  bundle="ui"/>'" sortable="'Creator'">
 					{{tickler.creatorName}}
