@@ -30,7 +30,6 @@
 	<!-- TODO -->
 </div>
 <div ng-show="ticklerListCtrl.ticklerReadAccess" class="col-xs-12" id="tickler-list-page">
-
 	<form name="searchForm" id="search-form" class="noprint">
 		<div class="row search-filters">
 			<div class="col-lg-2 col-sm-4 col-xs-6">
@@ -141,7 +140,7 @@
 					<a ng-click="editTickler(tickler)" class="hand-hover"><bean:message key="global.view" bundle="ui"/></a> 		
 				</td>--%>
 				<td data-title="'<bean:message key="tickler.list.header.patientName" bundle="ui"/>'" sortable="'DemographicName'">
-					{{tickler.demographicName}}
+					<a ng-href="{{'#!/record/' + tickler.demographicNo + '/summary'}}">{{tickler.demographicName}}</a>
 				</td>
 				<td data-title="'<bean:message key="tickler.list.header.creator"  bundle="ui"/>'" sortable="'Creator'">
 					{{tickler.creatorName}}
