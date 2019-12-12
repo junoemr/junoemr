@@ -711,10 +711,17 @@ public class ProviderManager2
 			pp = new ProviderPreference();
 		}
 
-		ProviderExt providerExt = providerExtDao.find(providerNo);
-		if (providerExt == null)
+		if (settings.getSignature() != null)
 		{
-			providerExt = new ProviderExt();
+			ProviderExt providerExt = providerExtDao.find(providerNo);
+			if (providerExt == null)
+			{
+				providerExt = new ProviderExt();
+			}
+
+			providerExt.setProviderNo(providerNo);
+			providerExt.setSignature(settings.getSignature());
+			providerExtDao.merge(providerExt);
 		}
 
 		List<Property> props = propertyDao.findByProvider(providerNo);
@@ -971,12 +978,6 @@ public class ProviderManager2
 				propertyDao.merge(prop);
 			}
 		}
-
-		providerExt.setProviderNo(providerNo);
-		providerExt.setSignature(settings.getSignature());
-
-		providerExtDao.merge(providerExt);
-
 	}
 
 	/**
