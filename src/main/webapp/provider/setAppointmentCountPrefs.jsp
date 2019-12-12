@@ -85,12 +85,13 @@ if(session.getValue("user") == null)
 		<td class="MainTableBottomRowRightColumn"></td>
 	</tr>
 </table>
-<script>
+<script type="text/javascript">
 
-	let setCheckboxesEnabled = function(){
-		let disabled = !document.getElementsByName('appointmentCountEnabled.value')[0].checked
-		document.getElementsByName('appointmentCountIncludeCancelled.value')[0].disabled = disabled
-		document.getElementsByName('appointmentCountIncludeNoShow.value')[0].disabled = disabled
+	var setCheckboxesEnabled = function()
+	{
+		var disabled = !document.getElementsByName('appointmentCountEnabled.value')[0].checked;
+		document.getElementsByName('appointmentCountIncludeCancelled.value')[0].disabled = disabled;
+		document.getElementsByName('appointmentCountIncludeNoShow.value')[0].disabled = disabled;
 		document.getElementsByName('appointmentCountIncludeNoPatient.value')[0].disabled = disabled;
 	};
 
