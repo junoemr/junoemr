@@ -184,7 +184,6 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		controller.onModeChange = function (mode)
 		{
 			controller.viewState = mode;
-
 			switch (mode)
 			{
 				case FORM_CONTROLLER_STATES.ADD:

@@ -24,6 +24,7 @@
 
 package oscar.oscarRx.templates;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -312,13 +313,20 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				// render the watermark in the background
 				if (RxWatermarkService.isWatermarkEnabled() && RxWatermarkService.isWatermarkBackground())
 				{
-					Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
-					float scale = (pageWidth*0.8f)/watermarkImg.getWidth();
-					float x = pageWidth/2 - (watermarkImg.getWidth()*scale)/2;
-					float y = (page.getHeight() - (page.getHeight() - (endPara - 80))/2) - (watermarkImg.getHeight()*scale)/2;
+					try
+					{
+						Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
+						float scale = (pageWidth * 0.8f) / watermarkImg.getWidth();
+						float x = pageWidth / 2 - (watermarkImg.getWidth() * scale) / 2;
+						float y = (page.getHeight() - (page.getHeight() - (endPara - 80)) / 2) - (watermarkImg.getHeight() * scale) / 2;
 
-					PdfContentByte cbUnder = writer.getDirectContentUnder();
-					renderImageToPdf(watermarkImg, x, y, scale, cbUnder);
+						PdfContentByte cbUnder = writer.getDirectContentUnder();
+						renderImageToPdf(watermarkImg, x, y, scale, cbUnder);
+					}
+					catch(FileNotFoundException e)
+					{
+						MiscUtils.getLogger().error("Could not open RxWatermark when writing prescription");
+					}
 				}
 
 				//header table for patient's information.
@@ -470,11 +478,18 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				// render watermark in the foreground
 				if (RxWatermarkService.isWatermarkEnabled() && !RxWatermarkService.isWatermarkBackground())
 				{
-					Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
-					float scale = (pageWidth*0.8f)/watermarkImg.getWidth();
-					float x = pageWidth/2 - (watermarkImg.getWidth()*scale)/2;
-					float y = (page.getHeight() - (page.getHeight() - (endPara - 80))/2) - (watermarkImg.getHeight()*scale)/2;
-					renderImageToPdf(watermarkImg, x, y, scale, cb);
+					try
+					{
+						Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
+						float scale = (pageWidth * 0.8f) / watermarkImg.getWidth();
+						float x = pageWidth / 2 - (watermarkImg.getWidth() * scale) / 2;
+						float y = (page.getHeight() - (page.getHeight() - (endPara - 80)) / 2) - (watermarkImg.getHeight() * scale) / 2;
+						renderImageToPdf(watermarkImg, x, y, scale, cb);
+					}
+					catch(FileNotFoundException e)
+					{
+						MiscUtils.getLogger().error("Could not open RxWatermark when writing prescription");
+					}
 				}
 
 			} catch (Exception e) {

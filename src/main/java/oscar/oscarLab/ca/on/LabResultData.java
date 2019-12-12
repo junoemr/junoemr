@@ -62,7 +62,10 @@ public class LabResultData implements Comparable<LabResultData> {
 	public static final String Spire = "Spire";
 	public static final String ALPHAHL7 = "ALPHA";
 	public static final String TRUENORTH = "TRUENORTH";
-	
+
+	public static final String STATUS_ABNORMAL = "Abnormal";
+	public static final String STATUS_UNKNOWN = "Unknown";
+
 	//HL7TEXT handles all messages types recieved as a hl7 formatted string
 	public static String HL7TEXT = "HL7";
 
@@ -166,6 +169,26 @@ public class LabResultData implements Comparable<LabResultData> {
 
 	}
 
+	/**
+	 * Check what status the report in question is and return the appropriate display string.
+	 * @return associated string with class's stored status, empty string if we cannot match
+	 */
+	public String getDisplayStatus()
+	{
+		if (isAbnormal())
+		{
+			return STATUS_ABNORMAL;
+		}
+
+		// Doing this first to ensure that AHS pathologies still display Unknown as expected
+		if (isUnknown())
+		{
+			return STATUS_UNKNOWN;
+		}
+
+		return "";
+	}
+
 	// Relevant for Alberta Health Services as they are not currently sending any abnormal indications
 	// in their pathologies. We want to flag them all as "Unknown" so user notices and hopefully reads
 	public boolean isUnknown()
@@ -206,6 +229,11 @@ public class LabResultData implements Comparable<LabResultData> {
 	public boolean isReportCancelled()
 	{
 		return cancelledReport ;
+	}
+
+	public boolean isReportPreliminary()
+	{
+		return reportStatus.equals("P");
 	}
 
 	public boolean isMDS()

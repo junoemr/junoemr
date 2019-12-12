@@ -55,67 +55,93 @@
    	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 %>
 
+<%!
+	// create new tickler.
+	void AddTickler(String demographic_no, String docpriority, String docType, String docId, String docassigned, String doccreator, String docfilename, String docdate, LoggedInInfo loggedInInfo, TicklerManager ticklerManager)
+	{
+		Tickler tickler = new Tickler();
+		tickler.setDemographicNo(Integer.parseInt(demographic_no));
+		tickler.setUpdateDate(new java.util.Date());
+		if (docpriority != null && docpriority.equalsIgnoreCase("High"))
+		{
+			tickler.setPriority(Tickler.PRIORITY.High);
+		}
+		if (docpriority != null && docpriority.equalsIgnoreCase("Low"))
+		{
+			tickler.setPriority(Tickler.PRIORITY.Low);
+		}
+		tickler.setTaskAssignedTo(docassigned);
+		tickler.setCreator(doccreator);
+		tickler.setMessage(docfilename);
+		tickler.setServiceDate(UtilDateUtilities.StringToDate(docdate));
+
+
+		ticklerManager.addTickler(loggedInInfo, tickler);
+
+
+		if (docType != null && docId != null && !docType.trim().equals("") && !docId.trim().equals("") && !docId.equalsIgnoreCase("null"))
+		{
+
+			int ticklerNo = tickler.getId();
+			if (ticklerNo > 0)
+			{
+				try
+				{
+					TicklerLink tLink = new TicklerLink();
+					tLink.setTableId(Long.parseLong(docId));
+					tLink.setTableName(docType);
+					tLink.setTicklerNo(new Long(ticklerNo).intValue());
+					TicklerLinkDao ticklerLinkDao = (TicklerLinkDao) SpringUtils.getBean("ticklerLinkDao");
+					ticklerLinkDao.save(tLink);
+				} catch (Exception e)
+				{
+					MiscUtils.getLogger().error("No link with this tickler", e);
+				}
+			}
+		}
+	}
+%>
+
 <%
-	String module="", module_id="", doctype="", docdesc="", docxml="", doccreator="", docdate="", docfilename="", docpriority="", docassigned="";
-module_id = request.getParameter("demographic_no");
+	String module="", demographic_no ="", doctype="", docdesc="", docxml="", doccreator="", docdate="", docfilename="", docpriority="", docassigned="";
+demographic_no = request.getParameter("demographic_no");
 doccreator = request.getParameter("user_no");
 docdate = request.getParameter("xml_appointment_date");
 docfilename =request.getParameter("textarea");
 docpriority =request.getParameter("priority");
 docassigned =request.getParameter("task_assigned_to");
+boolean multiDemo = "true".equalsIgnoreCase(request.getParameter("multiple_demographics"));
 
 String docType =request.getParameter("docType");
+
 String docId = request.getParameter("docId");
+if (docId == null)
+{
+	docId = loggedInInfo.getLoggedInProvider().getProviderNo();
+}
 
-
-
-Tickler tickler = new Tickler();
-    tickler.setDemographicNo(Integer.parseInt(module_id));
-    tickler.setUpdateDate(new java.util.Date());
-    if(docpriority != null && docpriority.equalsIgnoreCase("High")) {
-   	 tickler.setPriority(Tickler.PRIORITY.High);
-    }
-    if(docpriority != null && docpriority.equalsIgnoreCase("Low")) {
-      	 tickler.setPriority(Tickler.PRIORITY.Low);
-    }
-    tickler.setTaskAssignedTo(docassigned);
-    tickler.setCreator(doccreator);
-    tickler.setMessage(docfilename);
-    tickler.setServiceDate(UtilDateUtilities.StringToDate(docdate));
-
-
-   ticklerManager.addTickler(loggedInInfo,tickler);
-
-
-   if (docType != null && docId != null && !docType.trim().equals("") && !docId.trim().equals("") && !docId.equalsIgnoreCase("null") ){
-
-      int ticklerNo = tickler.getId();
-      if (ticklerNo > 0){
-          try{
-             TicklerLink tLink = new TicklerLink();
-             tLink.setTableId(Long.parseLong(docId));
-             tLink.setTableName(docType);
-             tLink.setTicklerNo(new Long(ticklerNo).intValue());
-             TicklerLinkDao ticklerLinkDao = (TicklerLinkDao) SpringUtils.getBean("ticklerLinkDao");
-             ticklerLinkDao.save(tLink);
-             }catch(Exception e){
-            	 MiscUtils.getLogger().error("No link with this tickler", e);
-             }
-      }
-   }
-
-   boolean rowsAffected = true;
+if (multiDemo)
+{
+	String[] demographicNumbers = demographic_no.split("&");
+	for (String demoNo : demographicNumbers)
+	{
+		AddTickler(demoNo, docpriority, docType, docId, docassigned, doccreator, docfilename, docdate, loggedInInfo, ticklerManager);
+	}
+}
+else
+{
+	AddTickler(demographic_no, docpriority, docType, docId, docassigned, doccreator, docfilename, docdate, loggedInInfo, ticklerManager);
+}
 
 String parentAjaxId = request.getParameter("parentAjaxId");
 String updateParent = request.getParameter("updateParent");
 
-if (rowsAffected ){
 %>
 <script LANGUAGE="JavaScript">
 
       var parentId = "<%=parentAjaxId%>";
       var updateParent = <%=updateParent%>;
-      var demo = "<%=module_id%>";
+      var demo = "<%=demographic_no%>";
       var Url = window.opener.URLs;
 
       /*because the url for demomaintickler is truncated by the delete action, we need
@@ -139,4 +165,3 @@ if (rowsAffected ){
 
       self.close();
 </script>
-<%}%>

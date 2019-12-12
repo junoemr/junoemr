@@ -66,7 +66,7 @@ public class ManageEFormAction extends DispatchAction {
 		MiscUtils.getLogger().debug("fid: " + fid);
 		response.setContentType("application/zip");  //octet-stream
 		EForm eForm = new EForm(fid, "1");
-		response.setHeader("Content-Disposition", "attachment; filename=\"" + eForm.getFormName().replaceAll("\\s", fid) + ".zip\"");
+		response.setHeader("Content-Disposition", "attachment; filename=\"" + eForm.getFormName().replaceAll("\\s", "_") + ".zip\"");
 		EFormExportZip eFormExportZip = new EFormExportZip();
 		List<EForm> eForms = new ArrayList<EForm>();
 		eForms.add(eForm);

@@ -28,11 +28,19 @@ public class AdminNavItemTo1 implements Serializable
 {
 	private String name;
 	private String transitionState;
+	// if true perform a raw html transition with no angular magic
+	private boolean rawTransition;
 
 	public AdminNavItemTo1(String name, String transition)
 	{
+		this(name, transition, false);
+	}
+
+	public AdminNavItemTo1(String name, String transition, boolean rawTransition)
+	{
 		this.name = name;
 		this.transitionState = transition;
+		this.rawTransition = rawTransition;
 	}
 
 	public String getName()
@@ -53,5 +61,15 @@ public class AdminNavItemTo1 implements Serializable
 	public void setTransitionState(String transitionState)
 	{
 		this.transitionState = transitionState;
+	}
+
+	public boolean isRawTransition()
+	{
+		return rawTransition;
+	}
+
+	public void setRawTransition(boolean rawTransition)
+	{
+		this.rawTransition = rawTransition;
 	}
 }

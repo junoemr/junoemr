@@ -84,6 +84,32 @@ public class AbstractMapper
 		return ConversionUtils.fromDateString(segmentValue, "yyyyMMdd");
 	}
 
+	protected static Date getNullableDateTime(String segmentValue)
+	{
+		if(segmentValue==null || segmentValue.trim().isEmpty() || segmentValue.equals("00000000"))
+		{
+			return null;
+		}
+
+		//strip trailing time information, as we are only interested in the date + time
+		//if this is not done SimpleDateFormater will produce incorrect date strings WITHOUT throwing exceptions
+		if (segmentValue.length() > 16)
+		{
+			segmentValue = segmentValue.substring(0, 16);
+		}
+
+		Date newDate =  ConversionUtils.fromDateString(segmentValue, "yyyyMMddHHmmss");
+		if (newDate == null)
+		{
+			if (segmentValue.length() > 8)
+			{
+				segmentValue = segmentValue.substring(0, 8);
+			}
+			newDate =  ConversionUtils.fromDateString(segmentValue, "yyyyMMdd");
+		}
+		return newDate;
+	}
+
 	/** Wolf puts provider names for a note in the form of 'first|last' in the comment signature.
 	 *  Here we attempt to parse the names out and put them in a provider record */
 	protected ProviderData getWOLFParsedProviderInfo(String segmentToParse, String debugLocation)

@@ -101,7 +101,8 @@ public class Hl7TextInfo extends AbstractModel<Integer> implements Serializable 
 		I, // Incomplete
 		N, // In Progress
 		L, // Legally authenticated
-		R  // Pre-authenticated
+		R, // Pre-authenticated
+		S  // Signed
 	}
 
 	@Override

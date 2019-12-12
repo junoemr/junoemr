@@ -56,6 +56,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
@@ -65,7 +66,6 @@ import java.util.List;
 
 @Component("ProviderService")
 @Path("/providerService/")
-@Produces("application/xml")
 public class ProviderService extends AbstractServiceImpl {
 
 	private static Logger logger = MiscUtils.getLogger();
@@ -132,7 +132,7 @@ public class ProviderService extends AbstractServiceImpl {
 
     @GET
     @Path("/provider/{id}")
-    @Produces({"application/xml","application/json"})
+    @Produces(MediaType.APPLICATION_JSON)
     public ProviderTransfer getProvider(@PathParam("id") String id) {
         return ProviderTransfer.toTransfer(providerDao.getProvider(id));
     }

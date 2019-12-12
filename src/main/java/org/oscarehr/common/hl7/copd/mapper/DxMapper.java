@@ -27,6 +27,7 @@ import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Dxresearch;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -72,13 +73,13 @@ public class DxMapper extends AbstractMapper
 			dxresearch.setDxresearchCode(dxCodeId);
 			dxresearch.setStatus(getProblemStatus(rep));
 
-			Date date = getDiagnosisDate(rep);
-			if (date == null)
-			{
-				throw new RuntimeException("dxresearch cannot have a Null start_date");
+			Date diagnosisDate = getDiagnosisDate(rep);
+			if (diagnosisDate == null)
+			{// diagnostic date cannot be null, force to foobar.
+				diagnosisDate = new Date(1900, Calendar.JANUARY,1);
 			}
 
-			dxresearch.setStartDate(date);
+			dxresearch.setStartDate(diagnosisDate);
 			dxresearch.setUpdateDate(getDiagnosisDate(rep));
 		}
 		return dxresearch;

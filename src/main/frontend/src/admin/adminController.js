@@ -34,21 +34,28 @@ angular.module('Admin').controller('Admin.AdminController', [
 		let controller = this;
 		controller.navList = [];
 
-		function generateTransition(newState)
+		function generateTransition(newState, rawTransition)
 		{
 			return function()
 			{
-				angular.element(document.querySelector("html")).animate({scrollTop: 0}, 500);
-				$location.url("/admin/"+newState);
+				if (rawTransition)
+				{
+					window.open(newState, "_blank");
+				}
+				else
+				{
+					angular.element(document.querySelector("html")).animate({scrollTop: 0}, 500);
+					$location.url("/admin/" + newState);
+				}
 			}
-		}
+		};
 
 		// translate transitionState property of results in to transition function.
 		function processNavResults(results)
 		{
 			results.forEach(function (group) {
 				group.items.forEach(function (item) {
-					item.callback = generateTransition(item.transitionState);
+					item.callback = generateTransition(item.transitionState, item.rawTransition);
 
 					// restore accordion state on reload
 					if (
