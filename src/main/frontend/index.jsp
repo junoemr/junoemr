@@ -93,6 +93,5 @@
 	Juno.contextPath = '<%= request.getContextPath() %>';
 
 </script>
-
 </body>
 </html>
