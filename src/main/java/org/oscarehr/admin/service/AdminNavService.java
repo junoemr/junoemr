@@ -175,7 +175,7 @@ public class AdminNavService
 
 		if (oscarProperties.isClinicaidBillingType())
 		{// CLINICAID BILLING
-			billingItems.add(new AdminNavItemTo1("Manage Invoices", "frame?frameUrl=" + contextPath + "/billing.do?billRegion=CLINICAID&action=invoice_reports"));
+			billingItems.add(new AdminNavItemTo1("Manage Invoices", contextPath +"/billing.do?billRegion=CLINICAID&action=invoice_reports", true));
 
 			if (oscarProperties.isBritishColumbiaBillingType())
 			{
