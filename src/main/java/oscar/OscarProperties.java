@@ -532,6 +532,11 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("schedule.enabled");
 	}
 
+	public String getCmeJs()
+	{
+		return getProperty("cme_js");
+	}
+
 	// =========================================================================
 	// Static methods for getting specific property values
 	// =========================================================================

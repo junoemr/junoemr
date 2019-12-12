@@ -26,7 +26,7 @@ package org.oscarehr.casemgmt.service;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
-import org.oscarehr.util.CppUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import oscar.util.StringUtils;
 
 import java.util.ArrayList;
@@ -38,12 +38,8 @@ public class EncounterUnresolvedIssueService extends EncounterSectionService
 	protected static final String SECTION_TITLE_KEY = "oscarEncounter.NavBar.unresolvedIssues";
 	protected static final String SECTION_TITLE_COLOUR = "#CC9900";
 
-	private CaseManagementManager caseManagementMgr;
-
-	public void setCaseManagementManager(CaseManagementManager caseManagementMgr)
-	{
-		this.caseManagementMgr = caseManagementMgr;
-	}
+	@Autowired
+	private CaseManagementIssueService caseManagementIssueService;
 
 	@Override
 	public String getSectionId()
@@ -81,55 +77,21 @@ public class EncounterUnresolvedIssueService extends EncounterSectionService
 			Integer offset
 	)
 	{
-		List<EncounterSectionNote> out = new ArrayList<>();
-
-		// grab all of the diseases associated with patient and add a list item for each
-		List<CaseManagementIssue> issues = null;
-		int demographicId = Integer.parseInt(sectionParams.getDemographicNo());
-		issues = caseManagementMgr.getIssues(demographicId);
-		issues = caseManagementMgr.filterIssues(
+		List<CaseManagementIssue> issues = caseManagementIssueService.getUnresolvedIssues(
 				sectionParams.getLoggedInInfo(),
+				sectionParams.getDemographicNo(),
 				sectionParams.getProviderNo(),
-				issues,
 				sectionParams.getProgramId()
 		);
 
-		List<CaseManagementIssue> issues_unr = new ArrayList<CaseManagementIssue>();
+		List<EncounterSectionNote> out = new ArrayList<>();
 
-		//only list unresolved issues
-		for(CaseManagementIssue issue : issues)
-		{
-			if(containsIssue(CppUtils.cppCodes,issue.getIssue().getCode()))
-			{
-				continue;
-			}
-
-			if(!issue.isResolved())
-			{
-				boolean dup=false;
-				for(CaseManagementIssue tmp: issues_unr)
-				{
-					if(issue.getIssue_id() == tmp.getIssue_id())
-					{
-						dup=true;
-						break;
-					}
-				}
-
-				if(!dup)
-				{
-					issues_unr.add(issue);
-				}
-			}
-		}
-
-
-		for (int idx = 0; idx < issues_unr.size(); ++idx)
+		for (int idx = 0; idx < issues.size(); ++idx)
 		{
 			//NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-			CaseManagementIssue issue = issues_unr.get(idx);
+			CaseManagementIssue issue = issues.get(idx);
 			String tmp = issue.getIssue().getDescription();
 
 			String strTitle = StringUtils.maxLenString(tmp, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
@@ -143,18 +105,5 @@ public class EncounterUnresolvedIssueService extends EncounterSectionService
 		}
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
-	}
-
-	public static boolean containsIssue(String[]  issues, String issueCode)
-	{
-		for (String caseManagementIssue : issues)
-		{
-			if (caseManagementIssue.equals(issueCode))
-			{
-				return(true);
-			}
-		}
-
-		return false;
 	}
 }

@@ -535,3 +535,31 @@ div.junoEncounterNote .collapse {
 	height: 1.1em;
 	overflow: hidden;
 }
+
+table.setIssueList {
+	font-size: 11px;
+}
+
+table.setIssueList td {
+	width: 50%;
+	font-size: 11px;
+	background-color: #CCCCFF;
+}
+
+table.setIssueList div.setIssueListWidget {
+	margin-left: 20px;
+	display: none;
+}
+
+table.setIssueList div.setIssueListWidget div.setIssueListControl {
+	width: 50%;
+	float: left;
+	display: inline;
+}
+table.setIssueList div.setIssueListWidget div.setIssueListControlRight {
+	clear: right;
+}
+
+table.setIssueList div.setIssueListWidget div.setIssueListRole {
+	text-align: center;
+}

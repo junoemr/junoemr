@@ -176,8 +176,10 @@ public class EncounterFormService extends EncounterSectionService
 		return menuItems;
 	}
 
-	public EncounterNotes getNotes(List<EncounterForm> encounterForms,
-								   SectionParameters sectionParams, Integer limit,
+	public EncounterNotes getNotes(
+			List<EncounterForm> encounterForms,
+			SectionParameters sectionParams,
+			Integer limit,
 			Integer offset
 	)
 	{
@@ -188,173 +190,103 @@ public class EncounterFormService extends EncounterSectionService
 			return EncounterNotes.noNotes();
 		}
 
-		//try
-		//{
+		String dbFormat = "yy/MM/dd";
 
-			//String winName = "Forms" + bean.demographicNo;
-			//StringBuilder url = new StringBuilder("popupPage(600, 700, '" + winName + "', '" + request.getContextPath() + "/oscarEncounter/formlist.jsp?demographic_no=" + bean.demographicNo + "')");
+		for (EncounterForm encounterForm : encounterForms)
+		{
+			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-			//// set text for lefthand module title
-			//Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.Index.msgForms"));
-			//// set link for lefthand module title
-			//Dao.setLeftURL(url.toString());
-
-			//// we're going to display a pop up menu of forms so we set the menu title and id num of menu
-			//Dao.setRightHeadingID(menuId);
-			//Dao.setMenuHeader(messages.getMessage("oscarEncounter.LeftNavBar.AddFrm"));
-			//StringBuilder javascript = new StringBuilder("<script type=\"text/javascript\">");
-			//String js = "";
-			String dbFormat = "yy/MM/dd";
-			//String dbFormat = "yyyy-MM-dd";
-			//String serviceDateStr;
-			//StringBuilder strTitle;
-			//String fullTitle;
-			//Date date;
-			//String key;
-			//int hash;
-
-			// grab all of the forms
-			//EncounterFormDao encounterFormDao=(EncounterFormDao) SpringUtils.getBean("encounterFormDao");
-
-			//List<EncounterForm> encounterForms = encounterFormDao.findAll();
-			//Collections.sort(encounterForms, EncounterForm.BC_FIRST_COMPARATOR);
-
-			//String BGCOLOUR = request.getParameter("hC");
-
-			for (EncounterForm encounterForm : encounterForms)
+			if (encounterForm.getFormName().equalsIgnoreCase("Discharge Summary"))
 			{
-				EncounterSectionNote sectionNote = new EncounterSectionNote();
+				// This is a CAISI form, so ignore it
+				continue;
+			}
 
-				if (encounterForm.getFormName().equalsIgnoreCase("Discharge Summary"))
+			String table = encounterForm.getFormTable();
+			if (!table.equalsIgnoreCase(""))
+			{
+				new EctFormData();
+				EctFormData.PatientForm pfrm = EctFormData.getRecentPatientForm(sectionParams.getDemographicNo(), null, table);
+
+				// if a form has been started for the patient, create a module item for it
+				if (pfrm != null)
 				{
-					// This is a CAISI form, so ignore it
-					continue;
-				}
+					// Date
+					String dateString = pfrm.getCreated();
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dbFormat);
+					LocalDate date = LocalDate.parse(dateString, formatter);
 
-				//winName = encounterForm.getFormName() + bean.demographicNo;
+					sectionNote.setUpdateDate(date.atStartOfDay());
 
-				String table = encounterForm.getFormTable();
-				if (!table.equalsIgnoreCase(""))
-				{
-					new EctFormData();
-					EctFormData.PatientForm pfrm = EctFormData.getRecentPatientForm(sectionParams.getDemographicNo(), null, table);
+					// Title
+					String fullTitle = encounterForm.getFormName();
+					StringBuilder strTitle = new StringBuilder(StringUtils.maxLenString(fullTitle, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES));
 
-					// if a form has been started for the patient, create a module item for it
-					if (pfrm != null)
-					{
-						// Date
-						String dateString = pfrm.getCreated();
-						DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dbFormat);
-						LocalDate date = LocalDate.parse(dateString, formatter);
+					if(table.equals("formLabReq07")) {
+						Long reportId = null;
 
-						sectionNote.setUpdateDate(date.atStartOfDay());
+						HashMap<String,Object> res = LabRequestReportLink.getLinkByRequestId("formLabReq07",Long.valueOf(pfrm.getFormId()));
+						reportId = (Long)res.get("report_id");
 
-						// Title
-						String fullTitle = encounterForm.getFormName();
-						StringBuilder strTitle = new StringBuilder(StringUtils.maxLenString(fullTitle, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES));
-
-						if(table.equals("formLabReq07")) {
-							Long reportId = null;
-
-							HashMap<String,Object> res = LabRequestReportLink.getLinkByRequestId("formLabReq07",Long.valueOf(pfrm.getFormId()));
-							reportId = (Long)res.get("report_id");
-
-							if(reportId == null) {
-								strTitle.insert(0,"*");
-								strTitle.append("*");
-							}
-						}
-
-						sectionNote.setText(strTitle.toString());
-
-
-						// Popup Menu
-						//key = StringUtils.maxLenString(fullTitle, MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + "(" + serviceDateStr + ")";
-						//key = StringEscapeUtils.escapeJavaScript(key);
-
-						//// auto completion arrays and colour code are set
-						//js = "itemColours['" + key + "'] = '" + BGCOLOUR + "'; autoCompList.push('" + key + "'); autoCompleted['" + key + "'] = \"" + url + "\";";
-						//javascript.append(js);
-
-
-						// OnClick link
-						int hash = Math.abs(getWinName(sectionParams).hashCode());
-						String url = sectionParams.getContextPath() + "/form/forwardshortcutname.jsp" +
-								"?formname=" + encodeUrlParam(encounterForm.getFormName()) +
-								"&demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo());
-
-						if(pfrm.getRemoteFacilityId()!=null)
-						{
-							url += "&remoteFacilityId=" + encodeUrlParam(pfrm.getRemoteFacilityId().toString());
-						}
-
-						if(sectionParams.getAppointmentNo() != null)
-						{
-							url += "&appointmentNo=" + encodeUrlParam(sectionParams.getAppointmentNo());
-						}
-
-						url += "&formId=" + encodeUrlParam(pfrm.getFormId());
-
-
-						String onClickString = "popupPage(700,960,'" + hash + "started', '" + url + "');";
-
-						sectionNote.setOnClick(onClickString);
-
-						//sorry I have to do this, since the "hidden" field, doesn't mean hidden.
-						//this is a fix so that when they've migrated to the enhanced form, the
-						//regular one is hidden. It's still accessible from the list mode off
-						//the tab header though, if they really need to get to it.
-						boolean dontAdd=false;
-						if(table.equals("formONAR"))
-						{
-							//check to see if we have an enhanced one
-							EctFormData.PatientForm[] pf =
-									EctFormData.getPatientFormsFromLocalAndRemote(
-											sectionParams.getLoggedInInfo(),
-											sectionParams.getDemographicNo(),
-											"formONAREnhancedRecord");
-
-							if(pf.length > 0)
-							{
-								dontAdd=true;
-							}
-						}
-
-						if(!dontAdd)
-						{
-							//Dao.addItem(item);
-							out.add(sectionNote);
+						if(reportId == null) {
+							strTitle.insert(0,"*");
+							strTitle.append("*");
 						}
 					}
+
+					sectionNote.setText(strTitle.toString());
+
+					// OnClick link
+					int hash = Math.abs(getWinName(sectionParams).hashCode());
+					String url = sectionParams.getContextPath() + "/form/forwardshortcutname.jsp" +
+							"?formname=" + encodeUrlParam(encounterForm.getFormName()) +
+							"&demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo());
+
+					if(pfrm.getRemoteFacilityId()!=null)
+					{
+						url += "&remoteFacilityId=" + encodeUrlParam(pfrm.getRemoteFacilityId().toString());
+					}
+
+					if(sectionParams.getAppointmentNo() != null)
+					{
+						url += "&appointmentNo=" + encodeUrlParam(sectionParams.getAppointmentNo());
+					}
+
+					url += "&formId=" + encodeUrlParam(pfrm.getFormId());
+
+
+					String onClickString = "popupPage(700,960,'" + hash + "started', '" + url + "');";
+
+					sectionNote.setOnClick(onClickString);
+
+					//sorry I have to do this, since the "hidden" field, doesn't mean hidden.
+					//this is a fix so that when they've migrated to the enhanced form, the
+					//regular one is hidden. It's still accessible from the list mode off
+					//the tab header though, if they really need to get to it.
+					boolean dontAdd=false;
+					if(table.equals("formONAR"))
+					{
+						//check to see if we have an enhanced one
+						EctFormData.PatientForm[] pf =
+								EctFormData.getPatientFormsFromLocalAndRemote(
+										sectionParams.getLoggedInInfo(),
+										sectionParams.getDemographicNo(),
+										"formONAREnhancedRecord");
+
+						if(pf.length > 0)
+						{
+							dontAdd=true;
+						}
+					}
+
+					if(!dontAdd)
+					{
+						//Dao.addItem(item);
+						out.add(sectionNote);
+					}
 				}
-
-				// we add all unhidden forms to the pop up menu
-				//if (!encounterForm.isHidden())
-				//{
-				//	hash = Math.abs(winName.hashCode());
-				//	url = new StringBuilder("popupPage(700,960,'" + hash + "new', '" + encounterForm.getFormValue() + bean.demographicNo + "&formId=0&provNo=" + bean.providerNo + "&parentAjaxId=" + cmd + ((appointmentNo!=null)?"&appointmentNo="+ appointmentNo:"") +"')");
-				//	Dao.addPopUpUrl(url.toString());
-				//	key = StringUtils.maxLenString(encounterForm.getFormName(), MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + " (new)";
-				//	Dao.addPopUpText(encounterForm.getFormName());
-				//	key = StringEscapeUtils.escapeJavaScript(key);
-
-				//	// auto completion arrays and colour code are set
-				//	js = "itemColours['" + key + "'] = '" + BGCOLOUR + "'; autoCompList.push('" + key + "'); autoCompleted['" + key + "'] = \"" + url + ";\";";
-				//	javascript.append(js);
-				//}
 			}
-			//url = new StringBuilder("return !showMenu('" + menuId + "', event);");
-			//Dao.setRightURL(url.toString());
-
-			//javascript.append("</script>");
-			//Dao.setJavaScript(javascript.toString());
-
-			//// sort module items, i.e. forms, from most recently started to more distant
-			//Dao.sortItems(NavBarDisplayDAO.DATESORT_ASC);
-		//} catch (Exception e) {
-		//	logger.error("EctDisplayFormAction SQL ERROR:", e);
-		//	return false;
-		//}
+		}
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}

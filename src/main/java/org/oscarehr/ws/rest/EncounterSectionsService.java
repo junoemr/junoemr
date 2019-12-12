@@ -26,9 +26,16 @@ package org.oscarehr.ws.rest;
 import org.apache.log4j.Logger;
 import org.drools.FactException;
 import org.oscarehr.casemgmt.dto.EncounterSection;
+import org.oscarehr.casemgmt.dto.EncounterSectionNote;
+import org.oscarehr.casemgmt.service.EncounterDocumentService;
+import org.oscarehr.casemgmt.service.EncounterEFormService;
+import org.oscarehr.casemgmt.service.EncounterFormService;
 import org.oscarehr.casemgmt.service.EncounterSectionService;
 import org.oscarehr.casemgmt.service.EncounterService;
+import org.oscarehr.common.dao.EncounterTemplateDao;
+import org.oscarehr.common.model.EncounterTemplate;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,6 +52,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 @Path("/encounterSections")
@@ -62,8 +71,20 @@ public class EncounterSectionsService extends AbstractServiceImpl
 	@Autowired
 	private EncounterService encounterService;
 
+	@Autowired
+	private EncounterFormService encounterFormService;
+
+	@Autowired
+	private EncounterEFormService encounterEFormService;
+
+	@Autowired
+	private EncounterDocumentService encounterDocumentService;
+
+	@Autowired
+	private EncounterTemplateDao encounterTemplateDao;
+
 	@GET
-	@Path("/{demographicNo}/{sectionName}")
+	@Path("/{demographicNo}/section/{sectionName}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<EncounterSection> getEncounterSection(
 			@PathParam("demographicNo") Integer demographicNo,
@@ -74,6 +95,7 @@ public class EncounterSectionsService extends AbstractServiceImpl
 	)
 			throws FactException
 	{
+		/*
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		HttpSession session = loggedInInfo.getSession();
@@ -109,11 +131,115 @@ public class EncounterSectionsService extends AbstractServiceImpl
 		sectionParams.setChartNo(encounterSessionBean.chartNo);
 		sectionParams.setProgramId(programId);
 		sectionParams.setUserName(encounterSessionBean.userName);
+		 */
+
+		EncounterSectionService sectionService = encounterService.getEncounterSectionServiceByName(sectionName);
+
+		EncounterSectionService.SectionParameters sectionParams = getSectionParams(appointmentNo);
 
 		return RestResponse.successResponse(sectionService.getSection(
 				sectionParams,
 				limit,
 				offset
 		));
+	}
+
+	@GET
+	@Path("/{demographicNo}/autocomplete/{searchTerm}")
+	@Produces({MediaType.APPLICATION_JSON})
+	public RestResponse<List<EncounterSectionNote>> getAutocompleteResults(
+			@PathParam("demographicNo") Integer demographicNo,
+			@PathParam("searchTerm") String searchTerm,
+			@QueryParam("appointmentNo") String appointmentNo
+	)
+			throws FactException
+	{
+		EncounterSectionService.SectionParameters sectionParams = getSectionParams(appointmentNo);
+
+
+		// This might need to be faster.
+		// It gets all of the values for the sections being searched (documents, eforms, forms)
+		// then filters them.
+
+		// Get documents
+		EncounterSection documentSection = encounterDocumentService.getSection(sectionParams, null, null);
+
+		// Get eforms
+		EncounterSection eformSection = encounterEFormService.getSection(sectionParams, null, null);
+
+		// Get forms
+		EncounterSection formSection = encounterFormService.getSection(sectionParams, null, null);
+
+		// Get templates
+		EncounterTemplateDao ectDao = SpringUtils.getBean(EncounterTemplateDao.class);
+
+
+		List<EncounterSectionNote> results = new ArrayList<>();
+
+		for(EncounterTemplate template : encounterTemplateDao.findAll())
+		{
+			// XXX: Hack: put the templates in an EncounterSectionNote
+			EncounterSectionNote note = new EncounterSectionNote();
+			note.setText(template.getEncounterTemplateName());
+			note.setOnClick("ajaxInsertTemplate('" + template.getEncounterTemplateName() + "');");
+			results.add(note);
+		}
+
+		results.addAll(documentSection.getNotes());
+		results.addAll(eformSection.getNotes());
+		results.addAll(formSection.getNotes());
+
+		results.sort(new EncounterSectionNote.SortAlphabetic());
+
+		// Filter results based on the search term
+		List<EncounterSectionNote> filteredResults = new ArrayList<>();
+		for(EncounterSectionNote note: results)
+		{
+			if(note.getText().contains(searchTerm))
+			{
+				filteredResults.add(note);
+			}
+		}
+
+		return RestResponse.successResponse(filteredResults);
+	}
+
+	private EncounterSectionService.SectionParameters getSectionParams(String appointmentNo)
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		HttpSession session = loggedInInfo.getSession();
+
+		Locale locale = request.getLocale();
+
+		String contextPath = context.getContextPath();
+
+		EctProgram prgrmMgr = new EctProgram(session);
+		String programId = prgrmMgr.getProgram(loggedInProviderNo);
+
+		String roleName = session.getAttribute("userrole") + "," + session.getAttribute("user");
+
+		// XXX: Ew, don't like doing this
+		EctSessionBean encounterSessionBean =
+				(EctSessionBean) session.getAttribute("EctSessionBean");
+
+		EncounterSectionService.SectionParameters sectionParams =
+				new EncounterSectionService.SectionParameters();
+
+		sectionParams.setLoggedInInfo(loggedInInfo);
+		sectionParams.setLocale(locale);
+		sectionParams.setContextPath(contextPath);
+		sectionParams.setRoleName(roleName);
+		sectionParams.setProviderNo(loggedInProviderNo);
+		sectionParams.setDemographicNo(encounterSessionBean.demographicNo);
+		sectionParams.setPatientFirstName(encounterSessionBean.patientFirstName);
+		sectionParams.setPatientLastName(encounterSessionBean.patientLastName);
+		sectionParams.setFamilyDoctorNo(encounterSessionBean.familyDoctorNo);
+		sectionParams.setAppointmentNo(appointmentNo);
+		sectionParams.setChartNo(encounterSessionBean.chartNo);
+		sectionParams.setProgramId(programId);
+		sectionParams.setUserName(encounterSessionBean.userName);
+
+		return sectionParams;
 	}
 }

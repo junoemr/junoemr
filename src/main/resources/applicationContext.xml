@@ -50,6 +50,9 @@
 
 	<bean id="CaseManagementIssueDAO" class="org.oscarehr.casemgmt.dao.CaseManagementIssueDAO" autowire="byName" />
 	<bean id="caseManagementIssueDAO" class="org.oscarehr.casemgmt.dao.CaseManagementIssueDAO" autowire="byName" />
+	<bean id="caseManagementIssueService" class="org.oscarehr.casemgmt.service.CaseManagementIssueService" autowire="byName">
+		<property name="caseManagementManager" ref="caseManagementManager" />
+	</bean>
 	<bean id="CaseManagementNoteDAO" class="org.oscarehr.casemgmt.dao.CaseManagementNoteDAO" autowire="byName" />
 	<bean id="caseManagementNoteDAO" class="org.oscarehr.casemgmt.dao.CaseManagementNoteDAO" autowire="byName" />
 	<bean id="CaseManagementNoteExtDAO" class="org.oscarehr.casemgmt.dao.CaseManagementNoteExtDAO" autowire="byName" />
@@ -322,14 +325,10 @@
 	<bean id="encounterMedicationService" class="org.oscarehr.casemgmt.service.EncounterMedicationService" autowire="byName" />
 	<bean id="encounterMessengerService" class="org.oscarehr.casemgmt.service.EncounterMessengerService" autowire="byName" />
 	<bean id="encounterPreventionNoteService" class="org.oscarehr.casemgmt.service.EncounterPreventionNoteService" autowire="byName" />
-	<bean id="encounterResolvedIssueService" class="org.oscarehr.casemgmt.service.EncounterResolvedIssueService" autowire="byName">
-		<property name="caseManagementManager" ref="caseManagementManager" />
-	</bean>
+	<bean id="encounterResolvedIssueService" class="org.oscarehr.casemgmt.service.EncounterResolvedIssueService" autowire="byName" />
 	<bean id="encounterTeamService" class="org.oscarehr.casemgmt.service.EncounterTeamService" autowire="byName" />
 	<bean id="encounterTicklerService" class="org.oscarehr.casemgmt.service.EncounterTicklerService" autowire="byName" />
-	<bean id="encounterUnresolvedIssueService" class="org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService" autowire="byName">
-		<property name="caseManagementManager" ref="caseManagementManager" />
-	</bean>
+	<bean id="encounterUnresolvedIssueService" class="org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService" autowire="byName" />
 
 	<!-- This is from the applicationContextCaisi.xml, but there is a struts action that relies -->
 	<!-- on it existing. -->

@@ -63,8 +63,8 @@ public class EncounterDocumentService extends EncounterSectionService
 		return SECTION_DOC_TITLE_KEY;
 	}
 
-		@Override
-		protected String getSectionTitleColour()
+	@Override
+	protected String getSectionTitleColour()
 	{
 		return SECTION_TITLE_COLOUR;
 	}
@@ -100,13 +100,8 @@ public class EncounterDocumentService extends EncounterSectionService
 	{
 		String winName = "docs" + encodeUrlParam(sectionParams.getDemographicNo());
 
-		// XXX: set title later
-		//Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.Index.msgDocuments"));
 		if (getInboxFlag())
 		{
-			// XXX: set title later
-			//Dao.setLeftHeading(messages.getMessage("oscarEncounter.Index.inboxManager"));
-
 			String url = sectionParams.getContextPath() + "/mod/docmgmtComp/DocList.do" +
 					"?method=list" +
 					"&demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo());
@@ -141,33 +136,6 @@ public class EncounterDocumentService extends EncounterSectionService
 			return EncounterNotes.noNotes();
 		}
 
-		// add for inbox manager
-		//boolean inboxflag = oscar.util.plugin.IsPropertiesOn.propertiesOn("inboxmnger");
-
-		// set lefthand module heading and link
-		//String winName = "docs" + bean.demographicNo;
-		//String url = "popupPage(500,1115,'" + winName + "', '" + request.getContextPath() + "/dms/documentReport.jsp?" + "function=demographic&doctype=lab&functionid=" + bean.demographicNo + "&curUser=" + bean.providerNo + "')";
-
-		//Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.Index.msgDocuments"));
-		//if (inboxflag) {
-		//	url = "popupPage(600,1024,'" + winName + "', '" + request.getContextPath() + "/mod/docmgmtComp/DocList.do?method=list&&demographic_no=" + bean.demographicNo + "');";
-		//	Dao.setLeftHeading(messages.getMessage("oscarEncounter.Index.inboxManager"));
-		//}
-		//Dao.setLeftURL(url);
-
-		//// set the right hand heading link to call addDocument in index jsp
-		//winName = "addDoc" + bean.demographicNo;
-		//url = "popupPage(500,1115,'" + winName + "','" + request.getContextPath() + "/dms/documentReport.jsp?" + "function=demographic&doctype=lab&functionid=" + bean.demographicNo + "&curUser=" + bean.providerNo + "&mode=add" + "&parentAjaxId=" + cmd + "');return false;";
-
-		//if (inboxflag) {
-		//	url = "popupPage(300,600,'" + winName + "','" + request.getContextPath() + "/mod/docmgmtComp/FileUpload.do?method=newupload&demographic_no=" + bean.demographicNo + "');return false;";
-		//}
-		//Dao.setRightURL(url);
-		//Dao.setRightHeadingID(cmd); // no menu so set div id to unique id for this action
-
-		//StringBuilder javascript = new StringBuilder("<script type=\"text/javascript\">");
-		//String js = "";
-
 		ArrayList<EDoc> docList = EDocUtil.listDocs(
 				sectionParams.getLoggedInInfo(),
 				"demographic",
@@ -184,32 +152,7 @@ public class EncounterDocumentService extends EncounterSectionService
 		{
 			EDoc curDoc = docList.get(i);
 
-			//String dispFilename = org.apache.commons.lang.StringUtils.trimToEmpty(curDoc.getFileName());
-			//String dispStatus = String.valueOf(curDoc.getStatus());
-
-			//boolean skip = false;
-			//for (int x = 0; x < omitTypes.length; x++)
-			//{
-			//	if (omitTypes[x].equals(curDoc.getType()))
-			//	{
-			//		skip = true;
-			//		break;
-			//	}
-			//}
-			//if (skip)
-			//{
-			//	continue;
-			//}
-
-			//if (dispStatus.equals("A"))
-			//{
-			//	dispStatus = "active";
-			//}
-			//else if (dispStatus.equals("H"))
-			//{
-			//	dispStatus = "html";
-			//}
-
+			String dispFilename = org.apache.commons.lang.StringUtils.trimToEmpty(curDoc.getFileName());
 
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
@@ -221,67 +164,57 @@ public class EncounterDocumentService extends EncounterSectionService
 				title = StringUtils.maxLenString("!" + curDoc.getDescription(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 			}
 
-			/*
-			DateFormat formatter = new SimpleDateFormat(dbFormat);
-			String dateStr = curDoc.getObservationDate();
-			//NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
-			try {
-				date = formatter.parse(dateStr);
-				serviceDateStr = DateUtils.formatDate(date, request.getLocale());
-			} catch (ParseException ex) {
-				MiscUtils.getLogger().debug("EctDisplayDocsAction: Error creating date " + ex.getMessage());
-				serviceDateStr = "Error";
-				date = null;
-			}
-			 */
-
-			//String user = (String) request.getSession().getAttribute("user");
-			//item.setDate(date);
-
 			String dateString = curDoc.getObservationDate();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dbFormat);
 			LocalDate date = LocalDate.parse(dateString, formatter);
 
 			sectionNote.setUpdateDate(date.atStartOfDay());
 
-			//winName = curDoc.getFileName() + bean.demographicNo;
-			//hash = Math.abs(winName.hashCode());
-
-			//if (inboxflag) {
-			//	String path = oscar.util.plugin.IsPropertiesOn.getProperty("DOCUMENT_DIR");
-			//	url = "popupPage(700,800,'" + hash + "', '" + request.getContextPath() + "/mod/docmgmtComp/FillARForm.do?method=showInboxDocDetails&path=" + path + "&demoNo=" + bean.demographicNo + "&name=" + StringEscapeUtils.escapeHtml(dispFilename) + "'); return false;";
-			//	isURLjavaScript = true;
-			//}
-			//else if( curDoc.getRemoteFacilityId()==null && curDoc.isPDF() ) {
-			//	url = "popupPage(window.screen.width,window.screen.height,'" + hash + "','" + request.getContextPath() + "/dms/showDocument.jsp?segmentID=" + dispDocNo + "&searchProviderNo=" + user + "&status=A&inWindow=true&chartView'); return false;";
-			//	isURLjavaScript = true;
-			//}
-			//else {
-			//	url = "popupPage(700,800,'" + hash + "', '" +  request.getContextPath() + "/dms/ManageDocument.do?method=display&doc_no=" + dispDocNo + "&providerNo=" + user + (curDoc.getRemoteFacilityId()!=null?"&remoteFacilityId="+curDoc.getRemoteFacilityId():"") + "'); return false;";
-			//}
-
-			//item.setLinkTitle(title + serviceDateStr);
-			//item.setTitle(title);
 			sectionNote.setText(title);
 
-			//key = StringUtils.maxLenString(curDoc.getDescription(), MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + "(" + serviceDateStr + ")";
-			//key = StringEscapeUtils.escapeJavaScript(key);
+			String winName = curDoc.getFileName() + sectionParams.getDemographicNo();
+			int hash = Math.abs(winName.hashCode());
+
+
+			String url = sectionParams.getContextPath() + "/dms/ManageDocument.do" +
+					"?method=display" +
+					"&doc_no=" + encodeUrlParam(dispDocNo) +
+					"&providerNo=" + encodeUrlParam(sectionParams.getProviderNo());
+
+			if(curDoc.getRemoteFacilityId() != null)
+			{
+				url += "&remoteFacilityId=" + curDoc.getRemoteFacilityId().toString();
+			}
+
+			String onClickString = "popupPage( 700, 800, '" + hash + "', '" + url +"');";
 
 			if (getInboxFlag())
 			{
 				if (!EDocUtil.getDocReviewFlag(dispDocNo))
 				{
-					//item.setColour("FF0000");
 					sectionNote.setColour("FF0000");
 				}
+				String path = oscar.util.plugin.IsPropertiesOn.getProperty("DOCUMENT_DIR");
+				url = sectionParams.getContextPath() + "/mod/docmgmtComp/FillARForm.do" +
+						"?method=showInboxDocDetails" +
+						"&path=" + path +
+						"&demoNo=" + encodeUrlParam(sectionParams.getDemographicNo())+
+						"&name=" + encodeUrlParam(dispFilename);
+				onClickString = "popupPage( 700, 800, '" + hash + "', '" + url +"');";
+			}
+			else if(curDoc.getRemoteFacilityId() == null && curDoc.isPDF())
+			{
+				url = sectionParams.getContextPath() + "/dms/showDocument.jsp" +
+						"?segmentID=" + encodeUrlParam(dispDocNo) +
+						"&searchProviderNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
+						"&status=A" +
+						"&inWindow=true" +
+						"&chartView";
+				onClickString = "popupPage(window.screen.width,window.screen.height,'" + hash + "','" + url + "'); return false;";
 			}
 
-			//js = "itemColours['" + key + "'] = '" + BGCOLOUR + "'; autoCompleted['" + key + "'] = \"" + url + "\"; autoCompList.push('" + key + "');";
-			//javascript.append(js);
-			//item.setURL(url);
-			//item.setURLJavaScript(true);
+			sectionNote.setOnClick(onClickString);
 
-			//Dao.addItem(item);
 			out.add(sectionNote);
 		}
 

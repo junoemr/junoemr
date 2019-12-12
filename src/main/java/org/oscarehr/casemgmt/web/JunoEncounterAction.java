@@ -30,7 +30,6 @@ import org.apache.struts.action.ActionMapping;
 import org.drools.FactException;
 import org.oscarehr.billing.CA.service.BillingUrlService;
 import org.oscarehr.casemgmt.dto.EncounterSection;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.casemgmt.service.EncounterAllergyService;
 import org.oscarehr.casemgmt.service.EncounterConsultationService;
@@ -57,8 +56,9 @@ import org.oscarehr.casemgmt.service.EncounterSocialHistoryService;
 import org.oscarehr.casemgmt.service.EncounterTeamService;
 import org.oscarehr.casemgmt.service.EncounterTicklerService;
 import org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService;
-import org.oscarehr.casemgmt.web.formbeans.CaseManagementEntryFormBean;
 import org.oscarehr.casemgmt.web.formbeans.JunoEncounterFormBean;
+import org.oscarehr.common.dao.EncounterTemplateDao;
+import org.oscarehr.common.model.EncounterTemplate;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.LoggedInInfo;
@@ -68,6 +68,7 @@ import org.springframework.web.struts.DispatchActionSupport;
 import oscar.OscarProperties;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
+import oscar.util.UtilDateUtilities;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -188,8 +189,8 @@ public class JunoEncounterAction extends DispatchActionSupport
 	@Autowired
 	private CaseManagementManager caseManagementManager;
 
-	//@Autowired
-	//private PreventionsSummary preventionsSummary;
+	@Autowired
+	private EncounterTemplateDao encounterTemplateDao;
 
 	public ActionForward execute(
 		ActionMapping mapping,
@@ -247,12 +248,13 @@ public class JunoEncounterAction extends DispatchActionSupport
 		String beanName = "casemgmt_oscar_bean" + encounterSessionBean.demographicNo;
 		session.setAttribute(beanName, encounterSessionBean);
 
-		String frmName = "caseManagementEntryForm" + encounterSessionBean.demographicNo;
-		CaseManagementEntryFormBean cform = (CaseManagementEntryFormBean)session.getAttribute(frmName);
-
 		Locale locale = request.getLocale();
 
 		Date hideBeforeDate = getEncounterNoteHideBeforeDate(session);
+
+		// XXX: this should be generated better if this gets refactored to not use the
+		//      encounterSessionBean
+		String patientAgeInYears = getPatientAgeInYears(encounterSessionBean.patientBirthdate);
 
 		String echartUuid = UUID.randomUUID().toString();
 
@@ -278,6 +280,10 @@ public class JunoEncounterAction extends DispatchActionSupport
 		);
 
 
+		String cmeJs = OscarProperties.getInstance().getCmeJs();
+
+		List<EncounterTemplate> encounterTemplates = encounterTemplateDao.findAll();
+
 		// Get data for the header
 		junoEncounterForm.setHeader(
 			encounterService.getEncounterHeader(
@@ -290,6 +296,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 				encounterSessionBean.patientLastName,
 				encounterSessionBean.patientSex,
 				encounterSessionBean.patientAge,
+				patientAgeInYears,
 				encounterSessionBean.patientBirthdate,
 				encounterSessionBean.phone,
 				encounterSessionBean.referringDoctorName,
@@ -301,7 +308,9 @@ public class JunoEncounterAction extends DispatchActionSupport
 				contextPath,
 				encounterSessionBean.source,
 				hideBeforeDate,
-				billingUrl
+				billingUrl,
+				cmeJs,
+				encounterTemplates
 			)
 		);
 
@@ -409,42 +418,6 @@ public class JunoEncounterAction extends DispatchActionSupport
 
 		junoEncounterForm.setRightNoteSections(rightSections);
 
-
-
-		// =========================================================================================
-		// Summaries
-		// =========================================================================================
-
-		/*
-		result.put("preventions","preventionsSummary");
-		result.put("meds","rxSummary");
-		result.put("othermeds","issueNoteSummary");
-		result.put("ongoingconcerns","ongoingConcernDxRegSummary");
-		result.put("medhx","issueNoteSummary");
-		result.put("socfamhx","issueNoteSummary");
-		result.put("reminders","issueNoteSummary");
-		result.put("assessments","formsSummary");
-		result.put("outgoing","formsSummary");
-		result.put("sochx","issueNoteSummary");
-		result.put("famhx","issueNoteSummary");
-		result.put("incoming","labsDocsSummary");
-		result.put("dssupport","decisionSupportSummary");
-		result.put("allergies","allergiesSummary");
-		result.put("riskfactors","issueNoteSummary");
-		 */
-
-		/*
-		Integer demographicNo = Integer.parseInt(encounterSessionBean.demographicNo);
-
-		List<SummaryTo1> summaries = new ArrayList<>();
-
-		//Summary summaryInterface = (Summary) SpringUtils.getBean(MY_MAP.get(summaryCode));
-
-		summaries.add(preventionsSummary.getSummary(loggedInInfo, demographicNo, EncounterSection.TYPE_PREVENTIONS));
-
-		junoEncounterForm.setLeftSummaries(summaries);
-		 */
-
 		return (mapping.findForward(ACTION_FORWARD_VIEW));
 	}
 
@@ -477,4 +450,14 @@ public class JunoEncounterAction extends DispatchActionSupport
 		return cal.getTime();
 	}
 
+	private String getPatientAgeInYears(String birthdate)
+	{
+		String[] dateParts = birthdate.split("-", 3);
+
+		String year = dateParts[0];
+		String month = dateParts[1];
+		String day = dateParts[2];
+
+		return Integer.toString(UtilDateUtilities.calcAge(year, month, day));
+	}
 }

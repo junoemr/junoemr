@@ -23,7 +23,10 @@
 
 package org.oscarehr.casemgmt.dto;
 
+import org.oscarehr.common.model.EncounterTemplate;
+
 import java.util.Date;
+import java.util.List;
 
 public class EncounterHeader
 {
@@ -41,6 +44,7 @@ public class EncounterHeader
 	private String patientLastName;
 	private String patientSex;
 	private String patientAge;
+	private String patientAgeInYears;
 	private String patientBirthdate;
 	private String patientPhone;
 	private boolean isEchartAdditionalPatientInfoEnabled;
@@ -59,6 +63,8 @@ public class EncounterHeader
 	private String source;
 	private Date encounterNoteHideBeforeDate;
 	private String billingUrl;
+	private String cmeJs;
+	private List<EncounterTemplate> encounterTemplates;
 
 
 	public String getUserColour()
@@ -199,6 +205,16 @@ public class EncounterHeader
 	public void setPatientAge(String patientAge)
 	{
 		this.patientAge = patientAge;
+	}
+
+	public String getPatientAgeInYears()
+	{
+		return patientAgeInYears;
+	}
+
+	public void setPatientAgeInYears(String patientAgeInYears)
+	{
+		this.patientAgeInYears = patientAgeInYears;
 	}
 
 	public String getPatientBirthdate()
@@ -379,6 +395,26 @@ public class EncounterHeader
 	public void setBillingUrl(String billingUrl)
 	{
 		this.billingUrl = billingUrl;
+	}
+
+	public String getCmeJs()
+	{
+		return cmeJs;
+	}
+
+	public void setCmeJs(String cmeJs)
+	{
+		this.cmeJs = cmeJs;
+	}
+
+	public List<EncounterTemplate> getEncounterTemplates()
+	{
+		return encounterTemplates;
+	}
+
+	public void setEncounterTemplates(List<EncounterTemplate> encounterTemplates)
+	{
+		this.encounterTemplates = encounterTemplates;
 	}
 
 	//=============================================================================

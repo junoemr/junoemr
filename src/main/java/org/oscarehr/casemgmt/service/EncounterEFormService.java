@@ -105,29 +105,6 @@ public class EncounterEFormService extends EncounterSectionService
 			return EncounterNotes.noNotes();
 		}
 
-		// Popup menu
-		//StringBuilder javascript = new StringBuilder("<script type=\"text/javascript\">");
-		//String js = "";
-		//ArrayList<HashMap<String, ? extends Object>> eForms = EFormUtil.listEForms(EFormUtil.DATE, EFormUtil.CURRENT, roleName);//EFormUtil.listEForms(EFormUtil.DATE, EFormUtil.NAME, EFormUtil.CURRENT, roleName);
-		//String key;
-		//int hash;
-		//String BGCOLOUR = request.getParameter("hC");
-
-		//for(int i = 0; i < eForms.size(); ++i)
-		//{
-		//	HashMap<String, ? extends Object> curform = eForms.get(i);
-		//	winName = (String) curform.get("formName") + bean.demographicNo;
-		//	hash = Math.abs(winName.hashCode());
-		//	url = "popupPage(700,800,'" + hash + "','" + request.getContextPath() + "/eform/efmformadd_data.jsp?fid=" + curform.get("fid") + "&demographic_no=" + bean.demographicNo + "&appointment=" + bean.appointmentNo + "&parentAjaxId=" + cmd + "','" + curform.get("fid") + "_" + bean.demographicNo + "');";
-		//	logger.debug("SETTING EFORM URL " + url);
-		//	key = StringUtils.maxLenString((String) curform.get("formName"), MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + " (new)";
-		//	key = StringEscapeUtils.escapeJavaScript(key);
-		//	js = "itemColours['" + key + "'] = '" + BGCOLOUR + "'; autoCompleted['" + key + "'] = \"" + url + "\"; autoCompList.push('" + key + "');";
-		//	javascript.append(js);
-		//}
-
-		//eForms.clear();
-
 		//I've put in an arbitrary limit here of 100. Some people use a single eform/patient for
 		//logging calls, etc. This makes this result set huge. People can click on the eform tab and view the full
 		//history if they need to.
@@ -155,17 +132,8 @@ public class EncounterEFormService extends EncounterSectionService
 
 			sectionNote.setOnClick(onClickString);
 
-			//String formattedDate = DateUtils.formatDate(eFormData.getFormDate(),request.getLocale());
-			//key = StringUtils.maxLenString(eFormData.getFormName(), MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + "(" + formattedDate + ")";
-			//item.setLinkTitle(eFormData.getSubject());
-			//key = StringEscapeUtils.escapeJavaScript(key);
-
-			//js = "itemColours['" + key + "'] = '" + BGCOLOUR + "'; autoCompleted['" + key + "'] = \"" + url + "\"; autoCompList.push('" + key + "');";
-			//javascript.append(js);
-
 			String strTitle = StringUtils.maxLenString(eFormData.getFormName() + ": " + eFormData.getSubject(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 
-			//item.setTitle(strTitle);
 			sectionNote.setText(strTitle);
 
 			LocalDate date = ConversionUtils.toNullableLocalDate(eFormData.getFormDate());
@@ -173,10 +141,6 @@ public class EncounterEFormService extends EncounterSectionService
 
 			out.add(sectionNote);
 		}
-
-		//javascript.append("</script>");
-		//Dao.setJavaScript(javascript.toString());
-
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}

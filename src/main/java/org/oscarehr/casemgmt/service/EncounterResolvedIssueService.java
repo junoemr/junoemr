@@ -26,7 +26,7 @@ package org.oscarehr.casemgmt.service;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
-import org.oscarehr.util.CppUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import oscar.oscarEncounter.pageUtil.NavBarDisplayDAO;
 import oscar.util.StringUtils;
 
@@ -39,12 +39,8 @@ public class EncounterResolvedIssueService extends EncounterSectionService
 	protected static final String SECTION_TITLE_KEY = "oscarEncounter.NavBar.resolvedIssues";
 	protected static final String SECTION_TITLE_COLOUR = "#151B8D";
 
-	private CaseManagementManager caseManagementMgr;
-
-	public void setCaseManagementManager(CaseManagementManager caseManagementMgr)
-	{
-		this.caseManagementMgr = caseManagementMgr;
-	}
+	@Autowired
+	private CaseManagementIssueService caseManagementIssueService;
 
 	@Override
 	public String getSectionId()
@@ -82,41 +78,22 @@ public class EncounterResolvedIssueService extends EncounterSectionService
 			Integer offset
 	)
 	{
+		List<CaseManagementIssue> issues = caseManagementIssueService.getResolvedIssues(
+				sectionParams.getLoggedInInfo(),
+				sectionParams.getDemographicNo(),
+				sectionParams.getProviderNo(),
+				sectionParams.getProgramId()
+		);
+
 		List<EncounterSectionNote> out = new ArrayList<>();
 
-		//navBarDisplayDAO.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.NavBar.resolvedIssues"));
-		//navBarDisplayDAO.setRightHeadingID(cmd); // no menu so set div id to unique id for this action
-
-		// grab all of the diseases associated with patient and add a list item for each
-		List<CaseManagementIssue> issues = null;
-		int demographicId = Integer.parseInt(sectionParams.getDemographicNo());
-		issues = caseManagementMgr.getIssues(demographicId);
-		issues = caseManagementMgr.filterIssues(sectionParams.getLoggedInInfo(),
-				sectionParams.getProviderNo(), issues, sectionParams.getProgramId());
-
-		List<CaseManagementIssue> issues_unr = new ArrayList<CaseManagementIssue>();
-		//only list resolved issues
-		for(CaseManagementIssue issue : issues)
-		{
-			if(EncounterUnresolvedIssueService.containsIssue(CppUtils.cppCodes,issue.getIssue().getCode()))
-			{
-				continue;
-			}
-
-			if(issue.isResolved())
-			{
-				issues_unr.add(issue);
-			}
-		}
-
-
-		for (int idx = 0; idx < issues_unr.size(); ++idx)
+		for (int idx = 0; idx < issues.size(); ++idx)
 		{
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
 			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 
-			CaseManagementIssue issue = issues_unr.get(idx);
+			CaseManagementIssue issue = issues.get(idx);
 			String tmp = issue.getIssue().getDescription();
 
 			String strTitle = StringUtils.maxLenString(tmp, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);

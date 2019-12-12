@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.casemgmt.dto.EncounterHeader;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.model.ClientImage;
+import org.oscarehr.common.model.EncounterTemplate;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -183,6 +184,7 @@ public class EncounterService
 			String patientLastName,
 			String patientSex,
 			String patientAge,
+			String patientAgeInYears,
 			String patientBirthdate,
 			String phone,
 			String referringDoctorName,
@@ -194,7 +196,9 @@ public class EncounterService
 			String contextPath,
 			String source,
 			Date encounterNoteHideBeforeDate,
-			String billingUrl
+			String billingUrl,
+			String cmeJs,
+			List<EncounterTemplate> encounterTemplates
 	)
 			throws UnsupportedEncodingException
 	{
@@ -282,6 +286,7 @@ public class EncounterService
 		encounterHeader.setPatientLastName(patientLastName);
 		encounterHeader.setPatientSex(patientSex);
 		encounterHeader.setPatientAge(patientAge);
+		encounterHeader.setPatientAgeInYears(patientAgeInYears);
 		encounterHeader.setPatientBirthdate(patientBirthdate);
 		encounterHeader.setPatientPhone(phone);
 
@@ -332,6 +337,10 @@ public class EncounterService
 		encounterHeader.setEncounterNoteHideBeforeDate(encounterNoteHideBeforeDate);
 
 		encounterHeader.setBillingUrl(billingUrl);
+
+		encounterHeader.setCmeJs(cmeJs);
+
+		encounterHeader.setEncounterTemplates(encounterTemplates);
 
 		return encounterHeader;
 	}

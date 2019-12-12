@@ -231,7 +231,7 @@ public class EncounterSectionNote
 		}
 		else
 		{
-			return t1.compareTo(t2);
+			return t1.compareToIgnoreCase(t2);
 		}
 	}
 

@@ -28,15 +28,15 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page errorPage="/casemgmt/error.jsp" %>
 <%@ page import="java.util.Enumeration, org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page
-		import="org.oscarehr.casemgmt.web.formbeans.*, org.oscarehr.casemgmt.model.CaseManagementNote" %>
+<%@ page import="org.oscarehr.casemgmt.common.Colour" %>
+<%@ page import="org.oscarehr.casemgmt.web.formbeans.*, org.oscarehr.casemgmt.model.CaseManagementNote" %>
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO, oscar.OscarProperties" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.util.LoggedInInfo" %>
-<%@ page import="org.oscarehr.casemgmt.common.Colour" %>
+<%@ page import="org.oscarehr.eform.dao.EFormDao" %>
 <%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>
 <%@ page import="org.oscarehr.provider.model.ProviderData" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="oscar.util.StringUtils" %>
@@ -45,6 +45,8 @@
 
 <jsp:useBean id="junoEncounterForm" scope="request"
 			 type="org.oscarehr.casemgmt.web.formbeans.JunoEncounterFormBean"/>
+
+<c:set var="ctx" value="${pageContext.request.contextPath}" scope="request"/>
 
 <fmt:parseDate value="${junoEncounterForm.header.encounterNoteHideBeforeDate}"
 			   pattern="EEE MMM dd HH:mm:ss z y"
@@ -56,33 +58,17 @@
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
-<%
-	//oscar.oscarEncounter.pageUtil.EctSessionBean bean = null;
-	//String beanName = "casemgmt_oscar_bean" + (String) request.getAttribute("demographicNo");
-
-	//pageContext.setAttribute("providerNo",request.getParameter("providerNo"), PageContext.PAGE_SCOPE);
-	//pageContext.setAttribute("demographicNo",request.getParameter("demographicNo"), PageContext.PAGE_SCOPE);
-
-	//org.oscarehr.casemgmt.model.CaseManagementNoteExt cme = new org.oscarehr.casemgmt.model.CaseManagementNoteExt();
-
-	//String frmName = "caseManagementEntryForm" + request.getParameter("demographicNo");
-	//CaseManagementEntryFormBean cform = (CaseManagementEntryFormBean)session.getAttribute(frmName);
-
-	//String encTimeMandatoryValue = OscarProperties.getInstance().getProperty("ENCOUNTER_TIME_MANDATORY","false");
-
-%>
-
 <html:html locale="true">
 	<head>
-		<c:set var="ctx" value="${pageContext.request.contextPath}" scope="request"/>
-
 		<link rel="stylesheet" href="<c:out value="${ctx}"/>/css/casemgmt.css" type="text/css">
+		<link rel="stylesheet" href="<c:out value="${ctx}"/>/js/jquery_css/smoothness/jquery-ui-1.10.2.custom.min.css" type="text/css">
 		<link rel="stylesheet" href="<c:out value="${ctx}"/>/oscarEncounter/encounterStyles.css"
 			  type="text/css">
 		<link rel="stylesheet" type="text/css" href="<c:out value="${ctx}"/>/css/print.css"
 			  media="print">
 
 		<script src="<c:out value="${ctx}/js/jquery-1.7.1.min.js"/>"></script>
+		<script src="<c:out value="${ctx}/js/jquery-ui-1.10.2.custom.min.js"/>"></script>
 		<script src="<c:out value="${ctx}/share/documentUploader/jquery.tmpl.min.js"/>"></script>
 		<script language="javascript">
 			jQuery.noConflict();
@@ -150,8 +136,51 @@
 
 		<script type="text/javascript">
 
+
+
+			function getAppointmentNo()
+			{
+				<c:if test="${not empty junoEncounterForm.header.appointmentNo}">
+				var appointmentNo = <c:out value="${junoEncounterForm.header.appointmentNo}" />;
+				</c:if>
+				<c:if test="${empty junoEncounterForm.header.appointmentNo}">
+				var appointmentNo = null;
+				</c:if>
+
+				return appointmentNo;
+			}
+
+			function getEncounterTypeArray()
+			{
+				return [
+					'<bean:message key="oscarEncounter.faceToFaceEnc.title"/>',
+					'<bean:message key="oscarEncounter.telephoneEnc.title"/>',
+					'<bean:message key="oscarEncounter.emailEnc.title"/>',
+					'<bean:message key="oscarEncounter.noClientEnc.title"/>'
+				]
+			}
+
+			var ctx = '<c:out value="${ctx}"/>';
+
+			var pageData = {
+				contextPath: "<c:out value='${pageContext.request.contextPath}' />",
+				demographicNo: "<c:out value='${junoEncounterForm.header.demographicNo}' />",
+				providerNo: "<c:out value='${junoEncounterForm.header.providerNo}' />",
+				appointmentNo: getAppointmentNo(),
+				encounterNoteHideBeforeDate: "<c:out value='${encounterNoteHideBeforeDateFormatted}' />",
+				defaultEncounterType: "<c:out value='${junoEncounterForm.encType}' />",
+				reason: "<c:out value='${junoEncounterForm.reason}' />",
+				appointmentDate: "<c:out value='${junoEncounterForm.appointmentDate}' />",
+				cmeJs: "<c:out value='${junoEncounterForm.header.cmeJs}' />",
+				billingUrl: "<c:out value='${junoEncounterForm.header.billingUrl}' />",
+				encounterTypeArray: getEncounterTypeArray(),
+				imagePresentPlaceholderUrl: "<c:out value='${fn:escapeXml(junoEncounterForm.header.imagePresentPlaceholderUrl)}' />",
+			};
+
+			// XXX: move this into objects?
 			var pageState = {
 				currentNoteData: null,
+				currentNoteIssueData: null,
 				numChars: 0,
 				//flag for determining if we want to submit case management entry form with enter key pressed in auto completer text box
 				submitIssues: false,
@@ -159,7 +188,6 @@
 				autoSaveTimer: null,
 			};
 
-			var ctx = '<c:out value="${ctx}"/>';
 
 			var autoSaveDelay = 5000;
 
@@ -227,73 +255,34 @@
 
 			var eChartUUID = "${junoEncounterForm.header.echartUuid}";
 
+			<%@ include file="js/JunoEncounter.js" %>
+			var junoEncounter = Juno.OscarEncounter.JunoEncounter;
+
+			<%@ include file="js/JunoEncounter/CppNote.js" %>
+			var CppNote = Juno.OscarEncounter.JunoEncounter.CppNote;
+
+			<%@ include file="js/JunoEncounter/EncounterNote.js" %>
+			var EncounterNote = Juno.OscarEncounter.JunoEncounter.EncounterNote;
+
+			<%@ include file="js/JunoEncounter/CaseManagementIssue.js" %>
+			var caseManagementIssue = new Juno.OscarEncounter.JunoEncounter.CaseManagementIssue(pageData);
+
+
+			// This method is called by child windows.  Please don't move or rename it.
 			function getEChartUUID()
 			{
-				console.log(eChartUUID);
 				return eChartUUID;
 			}
 
-			function pasteToEncounterNote(txt)
-			{
-				var currentlyEditedNoteId = jQuery('input#editNoteId').val();
-				var currentTextAreaId = "caseNote_note" + currentlyEditedNoteId;
-
-				$(currentTextAreaId).value += "\n" + txt;
-				adjustCaseNote();
-				setCaretPosition($(currentTextAreaId), $(currentTextAreaId).value.length);
-
-			}
-
+			// This method is called by links in EncounterMeasurementService.
+			// XXX: figure out what this does
 			function measurementLoaded(name)
 			{
 				measurementWindows.push(openWindows[name]);
 			}
 
-			function prepareExtraFields(cpp, extObj)
-			{
-				var rowIDs = new Array(10);
-				for (var i = 2; i < exFields.length; i++)
-				{
-					rowIDs[i] = "Item" + exFields[i];
-					$(rowIDs[i]).hide();
-				}
-				if (cpp == cppNames[1]) $(rowIDs[2], rowIDs[4], rowIDs[8], rowIDs[9]).invoke("show");
-				if (cpp == cppNames[2]) $(rowIDs[3], rowIDs[4], rowIDs[7], rowIDs[8], rowIDs[9]).invoke("show");
-				if (cpp == cppNames[3]) $(rowIDs[5], rowIDs[8], rowIDs[9], rowIDs[10]).invoke("show");
-				if (cpp == cppNames[4]) $(rowIDs[3], rowIDs[6], rowIDs[8], rowIDs[9]).invoke("show");
 
-				for (var i = 0; i < exFields.length; i++)
-				{
-					$(exFields[i]).value = "";
-				}
 
-				for (var j = 0; j < exFields.length; j++)
-				{
-					if (extObj.hasOwnProperty(exFields[j]))
-					{
-						$(exFields[j]).value = extObj[exFields[j]];
-						continue;
-					}
-				}
-			}
-
-			// TODO: Put all of this somewhere else?  It seems like it might be duplicated all
-			//       over the place, but I don't know if I can do anytyhing about that.
-			function checkLengthofObject(o)
-			{
-				var c = 0;
-				for (var attr in o)
-				{
-					if (o.hasOwnProperty(attr))
-					{
-						++c;
-					}
-				}
-
-				return c;
-			}
-
-			//open a new popup window
 			function popupPage(vheight, vwidth, name, varpage)
 			{
 				var openWindows = {};
@@ -305,7 +294,7 @@
 				}
 				if (varpage.indexOf("..") == 0)
 				{
-					varpage = ctx + varpage.substr(2);
+					varpage = this.pageData.contextPath + varpage.substr(2);
 				}
 				var page = "" + varpage;
 				var windowprops = "height=" + vheight + ",width=" + vwidth + ",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=600,screenY=200,top=0,left=0";
@@ -323,8 +312,7 @@
 						updateDivTimer = setInterval(
 							function ()
 							{
-
-								if (checkLengthofObject(openWindows) > 0)
+								if (junoEncounter.checkLengthofObject(openWindows) > 0)
 								{
 									for (var name in openWindows)
 									{
@@ -344,7 +332,8 @@
 									}
 
 								}
-								if (checkLengthofObject(openWindows) == 0)
+
+								if (junoEncounter.checkLengthofObject(openWindows) == 0)
 								{
 									clearInterval(updateDivTimer);
 									updateDivTimer = null;
@@ -353,25 +342,12 @@
 							}, 1000);
 					}
 				}
-
 			}
 
-			//This object stores the key -> cmd value passed to action class and the id of the created div
-			// and the value -> URL of the action class
-
-			function popupUploadPage(varpage, dn)
-			{
-				var page = "" + varpage + "?demographicNo=" + dn;
-				windowprops = "height=500,width=500,location=no,"
-					+ "scrollbars=no,menubars=no,toolbars=no,resizable=yes,top=50,left=50";
-				var popup = window.open(page, "", windowprops);
-				popup.focus();
-
-			}
 
 			function delay(time)
 			{
-				string = "document.getElementById('ci').src='${fn:escapeXml(junoEncounterForm.header.imagePresentPlaceholderUrl)}'";
+				var string = "document.getElementById('ci').src='" + this.pageData.imagePresentPlaceholderUrl + "'";
 				setTimeout(string, time);
 			}
 
@@ -379,7 +355,7 @@
 			{
 				var atbname = document.getElementById('annotation_attrib').value;
 				var data = $A(arguments);
-				var addr = ctx + "/annotation/annotation.jsp?atbname=" + atbname + "&table_id=" + data[1] + "&display=" + data[2] + "&demo=" + data[3];
+				var addr = this.pageData.contextPath + "/annotation/annotation.jsp?atbname=" + atbname + "&table_id=" + data[1] + "&display=" + data[2] + "&demo=" + data[3];
 				window.open(addr, "anwin", "width=400,height=500");
 				Event.stop(data[0]);
 			}
@@ -389,7 +365,7 @@
 				Event.stop(event);
 				var rnd = Math.round(Math.random() * 1000);
 				win = "win" + rnd;
-				var url = ctx + "/CaseManagementEntry.do?method=notehistory&noteId=" + noteId;
+				var url = this.pageData.contextPath + "/CaseManagementEntry.do?method=notehistory&noteId=" + noteId;
 				window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
 				return false;
 			}
@@ -402,249 +378,6 @@
 				}
 
 				return moment(date).format("YYYY-MM-DD");
-			}
-
-
-			//function showEdit(e, summaryCode, title, noteId, uuid, editors, date, revision, note, numNotes, position, noteIssues, noteExts, demoNo)
-			function showEdit(e, summaryCode, title, numNotes, noteIssues, demoNo, noteJsonString)
-			{
-				// Gather data
-				var note = JSON.parse(noteJsonString);
-
-				if (note != null)
-				{
-					jQuery.ajax({
-						type: "GET",
-						contentType: "application/json",
-						dataType: "json",
-						url: "../ws/rs/notes/getIssueNote/" + note.noteId,
-						success: function (response)
-						{
-							return showEditBox(e, summaryCode, title, numNotes, response.body.assignedCMIssues, demoNo, note)
-						}
-					});
-				} else
-				{
-					return showEditBox(e, summaryCode, title, numNotes, [], demoNo, null)
-				}
-				return false;
-			}
-
-			function showEditBox(e, summaryCode, title, numNotes, assignedCMIssues, demoNo, note)
-			{
-				// Gather data
-				//var note = JSON.parse(noteJsonString);
-
-				var noteId, uuid, editors, date, revision, noteText, position, extraFields;
-				if (note != null)
-				{
-					noteId = note.noteId;
-					uuid = note.uuid;
-					editors = note.editors;
-					revision = note.revision;
-					noteText = note.note;
-					position = note.position;
-
-					// Fill extra field data
-					extraFields = {
-						startdate: getFormattedDate(note.extStartDate),
-						resolutiondate: getFormattedDate(note.extResolutionDate),
-						proceduredate: getFormattedDate(note.extProcedureDate),
-						ageatonset: note.extAgeAtOnset,
-						treatment: note.extTreatment,
-						problemstatus: note.extProblemStatus,
-						exposuredetail: note.extExposureDetail,
-						relationship: note.extRelationship,
-						lifestage: note.extLifeStage,
-						hidecpp: note.extHideCpp,
-						problemdescription: note.extProblemDescription
-					};
-				} else
-				{
-					// New note defaults
-					editors = null;
-					noteId = "";
-					noteText = "";
-					position = 1;
-					revision = "";
-					uuid = "";
-					extraFields = {};
-				}
-
-
-				var editElement = "showEditNote";
-
-				// Clear Errors
-				jQuery('#editNoteError').html("");
-
-
-				// Set hidden data values
-
-				$("noteUuid").value = uuid;
-				$("noteEditTxt").value = noteText;
-				$("noteSummaryCode").value = summaryCode;
-				$("noteEditId").value = noteId;
-				$("noteRevision").value = revision;
-
-
-				// Set editors
-				// XXX: Make this work better for new notes
-				var editorUl = "<ul style='list-style: none outside none; margin:0px;'>";
-				var editorSpan = "";
-
-				if (editors != null && editors.length > 0)
-				{
-					editorSpan = "<span style='float:left;'>Editors: </span>";
-
-					var editorArray = editors.split(";");
-					var idx;
-					for (idx = 0; idx < editorArray.length; ++idx)
-					{
-						if (idx % 2 == 0)
-							editorUl += "<li>" + editorArray[idx];
-						else
-							editorUl += "; " + editorArray[idx] + "</li>";
-					}
-
-					if (idx % 2 == 0)
-					{
-						editorUl += "</li>";
-					}
-				}
-				editorUl += "</ul>";
-
-
-				// Set issue list
-				var noteIssueUl = "<ul id='issueIdList' style='list-style: none outside none; margin:0px;'>";
-
-				if (Array.isArray(assignedCMIssues) && assignedCMIssues.length > 0)
-				{
-					//var issueArray = noteIssues.split(";");
-					var idx;
-					var cppDisplay = "";
-					for (idx = 0; idx < assignedCMIssues.length; idx++)
-					{
-						var assignedIssue = assignedCMIssues[idx];
-
-						if (idx % 2 == 0)
-						{
-							noteIssueUl += "<li>";
-						} else
-						{
-							noteIssueUl += "&nbsp;";
-						}
-
-						noteIssueUl += "<input type='checkbox' id='issueId' name='issue_id' checked value='" + assignedIssue.issue_id + "' \>" + assignedIssue.issue.description;
-
-						/* XXX: don't show CPP issues
-						if (cppDisplay == "")
-						{
-							cppDisplay = getCPP(issueArray[idx + 1]);
-						}
-						*/
-					}
-
-					if (idx % 2 == 0)
-					{
-						noteIssueUl += "</li>";
-					}
-				}
-				noteIssueUl += "</ul>";
-
-				var noteInfo = "<div style='float:right;'><i>Encounter Date:&nbsp;" + date + "&nbsp;rev<a href='#' onclick='return showHistory(\"" + noteId + "\",event);'>" + revision + "</a></i></div>" +
-					editorSpan + "<div>" + editorUl + noteIssueUl + "</div><br style='clear:both;'>";
-
-				$("issueNoteInfo").update(noteInfo);
-
-
-				//Prepare Annotation Window & Extra Fields
-				var now = new Date();
-				document.getElementById('annotation_attrib').value = "anno" + now.getTime();
-				var obj = {};
-				Element.observe('anno', 'click', openAnnotation.bindAsEventListener(obj, noteId, "issue", demoNo));
-
-				prepareExtraFields(cppDisplay, extraFields);
-
-
-				// Build position dropdown
-
-				var curElem;
-				var numOptions = $("position").length;
-				var max = numNotes > numOptions ? numNotes : numOptions;
-				var optId;
-				var option;
-				var opttxt;
-
-				for (curElem = 2; curElem <= max; ++curElem)
-				{
-					optId = "popt" + curElem;
-					if ($(optId) == null)
-					{
-						option = document.createElement("OPTION");
-						option.id = optId;
-						opttxt = curElem;
-						option.text = "" + opttxt;
-						option.value = curElem;
-						$("position").options.add(option, curElem);
-					}
-
-					if (position == curElem)
-					{
-						$(optId).selected = true;
-					}
-				}
-
-				// XXX: What does this do?
-				// XXX: also make sure adding the last note works
-				for (curElem = max; curElem > 0; --curElem)
-				{
-					optId = "popt" + curElem;
-					if (curElem > numNotes)
-					{
-						Element.remove(optId);
-					}
-				}
-
-
-				// Position the modal
-				var coords = null;
-				if (document.getElementById("measurements_div") == null)
-				{
-					coords = Position.page($("topContent"));
-				} else
-				{
-					coords = Position.positionedOffset($("cppBoxes"));
-				}
-
-				var top = Math.max(coords[1], 0);
-				var right = Math.round(coords[0] / 0.66);
-				var gutterMargin = 150;
-
-				if (right < gutterMargin)
-				{
-					right = gutterMargin;
-				}
-
-				$(editElement).style.right = right + "px";
-				$(editElement).style.top = top + "px";
-
-
-				// Display the modal
-				$("winTitle").update(title);
-
-				if (Prototype.Browser.IE)
-				{
-					//IE6 bug of showing select box
-					$("channel").style.visibility = "hidden";
-					$(editElement).style.display = "block";
-				} else
-				{
-					$(editElement).style.display = "table";
-				}
-
-				$("noteEditTxt").focus();
-
-				return false;
 			}
 
 			function getFormData($form)
@@ -709,7 +442,6 @@
 						};
 
 						assignedIssueArray.push(assignedIssue);
-						//assignedIssueArray.push(adjustedArray[j][0]);
 					}
 
 					deferred.resolve(assignedIssueArray);
@@ -791,7 +523,7 @@
 
 			function updateCPPNote(cppType)
 			{
-				var demographicNo = getDemographicNo();
+				var demographicNo = this.pageData.demographicNo;
 				var form = jQuery('#frmIssueNotes');
 				var formData = getFormData(form);
 
@@ -868,66 +600,14 @@
 				$("encMainDiv").scrollTop = $("encMainDiv").scrollHeight;
 			}
 
-			function viewFullChart(ctx, displayFullChart)
-			{
-
-				var url = ctx + "/CaseManagementEntry.do";
-				var params = assembleMainChartParams(displayFullChart);
-
-				if (displayFullChart)
-				{
-					fullChart = "true";
-				} else
-				{
-					fullChart = "false";
-				}
-
-				$("notCPP").update("Loading...");
-				var objAjax = new Ajax.Request(
-					url,
-					{
-						method: 'post',
-						postBody: params,
-						evalScripts: true,
-						onSuccess: function (request)
-						{
-							$("notCPP").update(request.responseText);
-							$("notCPP").style.height = "50%";
-							if (displayFullChart)
-							{
-								$("quickChart").innerHTML = quickChartMsg;
-								$("quickChart").onclick = function ()
-								{
-									return viewFullChart(ctx, false);
-								}
-								scrollDownInnerBar();
-
-							} else
-							{
-								$("quickChart").innerHTML = fullChartMsg;
-								$("quickChart").onclick = function ()
-								{
-									return viewFullChart(ctx, true);
-								}
-								scrollDownInnerBar();
-							}
-						},
-						onFailure: function (request)
-						{
-							$("notCPP").update("Error: " + request.status + request.responseText);
-						}
-					}
-				);
-				return false;
-			}
-
 			function editEncounterNote(event, noteId)
 			{
 				// Get the note to edit
 				//var note = getNoteDataById(noteId);
 
-				var demographicNo = getDemographicNo();
+				var demographicNo = this.pageData.demographicNo;
 
+				var me = this;
 				jQuery.ajax({
 					type: "GET",
 					contentType: "application/json",
@@ -939,7 +619,7 @@
 						var issues = result.body.assignedCMIssues;
 
 						// Show a warning if an unsigned note was created by a different provider
-						var editWarn = (!note.isSigned && note.providerNo != getProviderNo());
+						var editWarn = (!note.isSigned && note.providerNo != me.pageData.providerNo);
 						var editUnsignedMsg = "<bean:message key="oscarEncounter.editUnsignedNote.msg"/>";
 
 						if (editWarn && !confirm(editUnsignedMsg))
@@ -960,7 +640,7 @@
 						var noteDiv = jQuery('div#n' + noteId).parent();
 
 						replaceNoteEntry(noteDiv, note, issues, demographicNo, true);
-						pageState.currentNoteData = Object.clone(note);
+						EncounterNote.updateNoteInPageState(note, issues);
 
 						adjustCaseNote();
 						observeTextArea();
@@ -1053,7 +733,7 @@
 			function saveTmpSave()
 			{
 				// Gather information to save the note
-				var demographicNo = getDemographicNo();
+				var demographicNo = this.pageData.demographicNo;
 				var noteId = jQuery("input#editNoteId").val();
 
 
@@ -1126,6 +806,26 @@
 				clearTimeout(pageState.autoSaveTimer);
 			}
 
+			function buildBillingUrl(assignedIssueArray)
+			{
+				var billingUrl = this.pageData.billingUrl;
+
+				// Add dx codes to it from the issue array
+				for(var i = 0; i < assignedIssueArray.length; i++)
+				{
+					var dxCode = assignedIssueArray[i].issue.code;
+					var codeNumber = i;
+					if(codeNumber == 0)
+					{
+						codeNumber = "";
+					}
+
+					billingUrl += "&dxCode" + codeNumber + "=" + encodeURIComponent(dxCode.substring(0,3));
+				}
+
+				return this.pageData.contextPath + billingUrl
+			}
+
 			function saveEncounterNote(signNote, verifyNote, exitAfterSaving, async, redirectToBilling)
 			{
 				// Clear state
@@ -1133,7 +833,7 @@
 				clearNoteStatus();
 
 				// Gather information to save the note
-				var demographicNo = getDemographicNo();
+				var demographicNo = this.pageData.demographicNo;
 				var noteId = jQuery("input#editNoteId").val();
 
 				// Prepare data
@@ -1162,8 +862,11 @@
 				}
 
 				var issueIdArray = [];
-				jQuery("#noteIssueIdList input:checkbox[name=issue_id]:checked").each(function ()
+				jQuery(
+					"#noteIssueIdList input:checkbox[name=issue_id]:checked, #noteIssues input:checkbox[name=issue_id]:checked"
+				).each(function()
 				{
+					console.log(jQuery(this).val());
 					issueIdArray.push(jQuery(this).val());
 				});
 
@@ -1173,6 +876,7 @@
 				{
 					noteData.assignedIssues = assignedIssueArray;
 
+					var me = this;
 					jQuery.ajax({
 						async: async,
 						type: "POST",
@@ -1189,14 +893,13 @@
 							else
 							{
 								// Set the saved note as the current note
-								pageState.currentNoteData = Object.clone(noteData);
+								EncounterNote.updateNoteInPageState(noteData, assignedIssueArray);
 								pageState.lastTmpSaveNote = null;
 								checkNoteChanged();
 
 								if(redirectToBilling)
 								{
-									console.log(getBillingUrl());
-									window.location.replace(getBillingUrl());
+									window.location.replace(me.pageData.billingUrl);
 								}
 								else if (exitAfterSaving)
 								{
@@ -1208,8 +911,8 @@
 						},
 						error: function (response)
 						{
-							console.log(response);
 							setNoteError("Error saving note");
+							console.log(response);
 						}
 					});
 				});
@@ -1327,7 +1030,13 @@
 				{
 					notesRetrieveOk = false;
 					notesCurrentTop = $("encMainDiv").children[0].id;
-					notesLoader(ctx, notesOffset, notesIncrement, demographicNo, false).then(function ()
+					notesLoader(
+						this.pageData.contextPath,
+						notesOffset,
+						notesIncrement,
+						demographicNo,
+						false
+					).then(function ()
 					{
 						notesOffset += notesIncrement;
 					});
@@ -1360,6 +1069,7 @@
 					url: "../ws/rs/notes/" + demographicNo + "/tmpSave",
 				});
 
+				var me = this;
 				jQuery.when(noteListDeferred, noteToEditDeferred, tmpSaveDeferred).done(
 					function (noteListResponse, noteToEditResponse, tmpSaveResponse)
 					{
@@ -1374,7 +1084,7 @@
 						}
 
 						var noteToEdit = null;
-						var issues = null;
+						var issues = [];
 						if (
 							noteToEditResponse[1] == "success" &&
 							noteToEditResponse[0].body
@@ -1385,7 +1095,7 @@
 						}
 						else
 						{
-							noteToEdit = getEmptyNote(getProviderNo(), getAppointmentNo());
+							noteToEdit = getEmptyNote(me.pageData.providerNo, me.pageData.appointmentNo);
 							noteToEdit.note = getFormattedReason();
 						}
 
@@ -1394,7 +1104,7 @@
 							noteToEdit.note = tmpSave;
 						}
 
-						pageState.currentNoteData = Object.clone(noteToEdit);
+						EncounterNote.updateNoteInPageState(noteToEdit, issues);
 
 						$("notesLoading").style.display = "none";
 						displayNotes(demographicNo, response.body.notelist, noteToEdit, issues,
@@ -1424,8 +1134,8 @@
 			function getFormattedReason()
 			{
 				var formattedReason = "";
-				var reason = getReason();
-				var appointmentDate = getAppointmentDate();
+				var reason = this.pageData.reason;
+				var appointmentDate = this.pageData.appointmentDate;
 
 				if(reason == null)
 				{
@@ -1524,77 +1234,10 @@
 				}
 			}
 
-			function getAppointmentNo()
-			{
-				<c:if test="${not empty junoEncounterForm.header.appointmentNo}">
-				var appointmentNo = <c:out value="${junoEncounterForm.header.appointmentNo}" />;
-				</c:if>
-				<c:if test="${empty junoEncounterForm.header.appointmentNo}">
-				var appointmentNo = null;
-				</c:if>
-
-				return appointmentNo;
-			}
-
-			function getContextPath()
-			{
-				return "${pageContext.request.contextPath}";
-			}
-
-			function getDemographicNo()
-			{
-				var demographicNo = ${junoEncounterForm.header.demographicNo};
-
-				return demographicNo;
-			}
-
-			function getProviderNo()
-			{
-				var providerNo = ${junoEncounterForm.header.providerNo};
-
-				return providerNo;
-			}
-
-			function getEncounterNoteHideBeforeDate()
-			{
-
-				return '${encounterNoteHideBeforeDateFormatted}';
-			}
-
-			function getDefaultEncounterType()
-			{
-				return '${junoEncounterForm.encType}';
-			}
-
-			function getReason()
-			{
-				return '${junoEncounterForm.reason}';
-			}
-
-			function getAppointmentDate()
-			{
-				return '${junoEncounterForm.appointmentDate}'
-			}
-
-			function getBillingUrl()
-			{
-				return '<c:out value="${ctx}"/>${junoEncounterForm.header.billingUrl}';
-			}
-
-			function getEncounterTypeArray()
-			{
-				return [
-					'<bean:message key="oscarEncounter.faceToFaceEnc.title"/>',
-					'<bean:message key="oscarEncounter.telephoneEnc.title"/>',
-					'<bean:message key="oscarEncounter.emailEnc.title"/>',
-					'<bean:message key="oscarEncounter.noClientEnc.title"/>'
-				]
-			}
-
 
 			function buildNonNoteEntry(containerDiv, index, note, demographicNo)
 			{
-				var appointmentNo = getAppointmentNo();
+				var appointmentNo = this.pageData.appointmentNo;
 
 				var date = moment(note.observationDate);
 
@@ -1642,7 +1285,7 @@
 				{
 					formattedDate = date.format('DD-MMM-YYYY H:mm');
 				}
-				var hideBeforeMoment = moment(getEncounterNoteHideBeforeDate());
+				var hideBeforeMoment = moment(this.pageData.encounterNoteHideBeforeDate);
 				var observationMoment = moment(note.observationDate);
 
 				if (hideBeforeMoment.isAfter(observationMoment))
@@ -1653,7 +1296,7 @@
 
 				// Make annotation url
 				var annotationLabel = "anno" + moment().unix();
-				var annotationUrl = getContextPath() + "/annotation/annotation.jsp" +
+				var annotationUrl = this.pageData.contextPath + "/annotation/annotation.jsp" +
 					"?atbname=" + encodeURIComponent(annotationLabel) +
 					"&table_id=" + encodeURIComponent(note.noteId) +
 					"&display=EChartNote" +
@@ -1661,7 +1304,7 @@
 
 				var encounterTypeArray = getEncounterTypeArray();
 
-				var selectedEncounterType = getDefaultEncounterType();
+				var selectedEncounterType = this.pageData.defaultEncounterType;
 				if(note.encounterType)
 				{
 					selectedEncounterType = note.encounterType;
@@ -1669,7 +1312,7 @@
 
 				var templateParameters = {
 					index: index,
-					contextPath: getContextPath(),
+					contextPath: this.pageData.contextPath,
 					note: note,
 					issues: (issues == null ? [] : issues),
 					noteLineArray: note.note.split("\n"),
@@ -1810,7 +1453,7 @@
 					offsetString = "&offset=" + offset;
 				}
 
-				return "../ws/rs/encounterSections/" + demographicNo + "/" + sectionName + "/?appointmentNo=" +
+				return "../ws/rs/encounterSections/" + demographicNo + "/section/" + sectionName + "/?appointmentNo=" +
 					appointmentNo + limitString + offsetString;
 			}
 
@@ -1826,8 +1469,8 @@
 
 			function getSectionRemote(sectionName, getAll, disableExpand)
 			{
-				var appointmentNo = getAppointmentNo();
-				var demographicNo = getDemographicNo();
+				var appointmentNo = this.pageData.appointmentNo;
+				var demographicNo = this.pageData.demographicNo;
 
 				var limit = null;
 				var offset = null;
@@ -1930,6 +1573,7 @@
 				$("issueChange").value = true;
 			}
 
+
 			function addIssueToCurrentNote(event)
 			{
 				var nodeId = jQuery('input#issueSearchSelectedId').val();
@@ -1951,13 +1595,19 @@
 
 				var size = 0;
 				var found = false;
-				var curItems = document.forms[formName].elements["issueId"];
+				var form = document.forms[formName]
+				var curItems = null;
 
-				if (curItems && typeof curItems.length != "undefined")
+				if(form)
+				{
+					curItems = form.elements["issueId"];
+				}
+
+				if(curItems && typeof curItems.length != "undefined")
 				{
 					size = curItems.length;
 
-					for (var idx = 0; idx < size; ++idx)
+					for(var idx = 0; idx < size; ++idx)
 					{
 						if (curItems[idx].value == nodeId)
 						{
@@ -1966,12 +1616,12 @@
 						}
 					}
 				}
-				else if (curItems && typeof curItems.value != "undefined")
+				else if(curItems && typeof curItems.value != "undefined")
 				{
 					found = curItems.value == nodeId;
 				}
 
-				if (!found)
+				if(!found)
 				{
 					var node = document.createElement("LI");
 
@@ -2005,7 +1655,7 @@
 
 					$(noteTxtId).addClassName("collapse");
 
-					var maximizeImageTag = "<img title='Maximize Display' alt='Maximize Display' id='xpImg" + nodeId + "' name='expandViewTrigger' onclick='maxView(event, \"" + nodeId + "\")' style='float:right; margin-right:5px; margin-top: 2px;' src='" + ctx + "/oscarEncounter/graphics/triangle_down.gif'>";
+					var maximizeImageTag = "<img title='Maximize Display' alt='Maximize Display' id='xpImg" + nodeId + "' name='expandViewTrigger' onclick='maxView(event, \"" + nodeId + "\")' style='float:right; margin-right:5px; margin-top: 2px;' src='" + this.pageData.contextPath + "/oscarEncounter/graphics/triangle_down.gif'>";
 					new Insertion.Top(noteDivId, maximizeImageTag);
 				} else
 				{
@@ -2013,7 +1663,7 @@
 
 					$(noteTxtId).removeClassName("collapse");
 
-					var minimizeImageTag = "<img id='quitImg" + nodeId + "' onclick='minView(event, \"" + nodeId + "\")' style='float:right; margin-right:5px; margin-top: 2px;' src='" + ctx + "/oscarEncounter/graphics/triangle_up.gif'>";
+					var minimizeImageTag = "<img id='quitImg" + nodeId + "' onclick='minView(event, \"" + nodeId + "\")' style='float:right; margin-right:5px; margin-top: 2px;' src='" + this.pageData.contextPath + "/oscarEncounter/graphics/triangle_up.gif'>";
 					new Insertion.Top(noteDivId, minimizeImageTag);
 				}
 			}
@@ -2034,8 +1684,8 @@
 
 			function togglePrint(noteId, e)
 			{
-				var selected = ctx + "/oscarEncounter/graphics/printerGreen.png";
-				var unselected = ctx + "/oscarEncounter/graphics/printer.png";
+				var selected = this.pageData.contextPath + "/oscarEncounter/graphics/printerGreen.png";
+				var unselected = this.pageData.contextPath + "/oscarEncounter/graphics/printer.png";
 				var imgId = "print" + noteId;
 				var idx;
 				var idx2;
@@ -2158,7 +1808,7 @@
 
 			function printInfo(img, item)
 			{
-				var selected = ctx + "/oscarEncounter/graphics/printerGreen.png";
+				var selected = this.pageData + "/oscarEncounter/graphics/printerGreen.png";
 				var unselected = ctx + "/oscarEncounter/graphics/printer.png";
 
 				if ($F(item) == "true")
@@ -2296,7 +1946,7 @@
 
 				var jsonString = JSON.stringify(printConfig);
 
-				var url = "../ws/rs/recordUX/" + getDemographicNo() + "/print?printOps=" + encodeURIComponent(jsonString);
+				var url = "../ws/rs/recordUX/" + this.pageData.demographicNo + "/print?printOps=" + encodeURIComponent(jsonString);
 
 				window.open(url, '_blank');
 
@@ -2333,8 +1983,100 @@
 				return null;
 			}
 
+			function showOceanToolbar()
+			{
+				return (this.pageData.cmeJs == 'ocean_toolbar');
+			}
+
+			function writeToEncounterNote(request)
+			{
+
+				var text = request.responseText;
+				text = text.replace(/\\u000A/g, "\u000A");
+				text = text.replace(/\\u000D/g, "");
+				text = text.replace(/\\u003E/g, "\u003E");
+				text = text.replace(/\\u003C/g, "\u003C");
+				text = text.replace(/\\u005C/g, "\u005C");
+				text = text.replace(/\\u0022/g, "\u0022");
+				text = text.replace(/\\u0027/g, "\u0027");
+
+
+				EncounterNote.pasteToEncounterNote(text);
+			}
+
+			function ajaxInsertTemplate(varpage)
+			{
+				//fetch template
+
+				if (varpage != 'null')
+				{
+					var page = ctx + "/oscarEncounter/InsertTemplate.do";
+					var params = "templateName=" + varpage + "&version=2";
+					new Ajax.Request(page, {
+						method: 'post',
+						postBody: params,
+						evalScripts: true,
+						onSuccess: writeToEncounterNote,
+						onFailure: function()
+						{
+							alert(insertTemplateError);
+							}
+						}
+					);
+				}
+
+			}
+
+			function channelSearch()
+			{
+				var url = $('channel').options[$('channel').selectedIndex].value +
+					encodeURIComponent($F('keyword'));
+
+				popupPage(600,800,'<bean:message key="oscarEncounter.Index.popupSearchPageWindow"/>', url);
+
+				return false;
+			}
+
+			/**
+			 * Allows calculators to be opened by clicking on them in a select menu.  This is needed for cross-platform
+			 * functionality to achieve an effect similar to onClick for a select option element.
+			 * (onClick on the option element doesn't work in Chrome (or IE), and onClick on the select doesn't work in FireFox)
+			 *
+			 * @param calculatorMenu jQuery element referencing a select with urls as option values
+			 */
+			function bindCalculatorListener(calculatorMenu)
+			{
+				calculatorMenu.change(
+					function() {
+						var x_size = calculatorMenu.attr('x_size'),
+							y_size = calculatorMenu.attr('y_size');
+
+						popperup(x_size, y_size, calculatorMenu.val(), calculatorMenu.text());
+						// Since we are listening for the change event, we need to account for the same calculator
+						// selected twice in a row.  A side effect is that the UI will be updated when we reset the
+						// value of the select menu to the default.  Here we're using the value "none" over a -1 index
+						// because this is the key to a disabled "title" element, whereas -1 will display an empty
+						// select menu.
+						calculatorMenu.val("none");
+					});
+			}
+
+			function popperup(vheight, vwidth, varpage, pageName)
+			{
+				//open a new popup window
+				var windowprops = "height=" + vheight + ",width=" + vwidth + ",status=yes,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=100,left=100";
+				var popup = window.open(varpage, pageName, windowprops);
+				popup.pastewin = opener;
+				popup.focus();
+			}
+
 			function init()
 			{
+				if(showOceanToolbar())
+				{
+					jQuery.ajax({ url: "../eform/displayImage.do?imagefile=oceanToolbar.js", cache: true, dataType: "script" });
+				}
+
 				// This was messing up the serialization of arrays to JSON so I removed it.
 				delete Array.prototype.toJSON;
 
@@ -2363,21 +2105,6 @@
 				{
 					return moment(this).format();
 				}
-
-				// XXX: This is required to set some session state to make saving a note work.
-				//      I feel like this is a terrible idea and should be removed with predjudice.
-				//viewFullChart(ctx, false);
-
-				/*
-				showIssueNotes();
-
-				var navBars = new navBarLoader();
-				navBars.load();
-
-				monitorNavBars(null);
-
-				Element.observe(window, "resize", monitorNavBars);
-				*/
 
 				if (!NiftyCheck())
 				{
@@ -2414,6 +2141,21 @@
 				alert("<nested:write name="DateError"/>");
 				</nested:notEmpty>
 
+				var calculatorMenu = jQuery('#calculators_menu');
+				bindCalculatorListener(calculatorMenu);
+
+				// Click handlers for the resolved/unresolved issue buttons.  They pass in the
+				// jQuery object from this context because it wouldn't work with the local context
+				// inside the handler.  I don't know why, but this made it work.
+				jQuery('#displayResolvedIssuesButton').click({jQuery: jQuery}, function(event)
+				{
+					caseManagementIssue.displayResolvedIssues(event.data);
+				});
+				jQuery('#displayUnresolvedIssuesButton').click({jQuery: jQuery}, function(event)
+				{
+					caseManagementIssue.displayUnresolvedIssues(event.data);
+				});
+
 				var issueAutoCompleterCPP = new Ajax.Autocompleter(
 					"issueAutocompleteCPP",
 					"issueAutocompleteListCPP",
@@ -2429,8 +2171,8 @@
 
 				var issueURL = ctx + "/CaseManagementEntry.do" +
 					"?method=issueList" +
-					"&demographicNo=" + getDemographicNo() +
-					"&providerNo=" + getProviderNo();
+					"&demographicNo=" + this.pageData.demographicNo +
+					"&providerNo=" + this.pageData.providerNo;
 				issueAutoCompleter = new Ajax.Autocompleter("issueAutocomplete", "issueAutocompleteList", issueURL, {
 					minChars: 3,
 					indicator: 'busy',
@@ -2443,7 +2185,7 @@
 
 				//notesIncrement = parseInt("<%=OscarProperties.getInstance().getProperty("num_loaded_notes", "20") %>");
 
-				var demographicNo = getDemographicNo();
+				var demographicNo = this.pageData.demographicNo;
 
 				// Load a few extra notes initially, hopefully fill up the page
 				notesLoader(ctx, 0, notesIncrement * 2, demographicNo, true).then(function ()
@@ -2455,8 +2197,31 @@
 					}, 50);
 				});
 
+				// Multi-search autocomplete
+				var searchAutocompleteUrl = "../ws/rs/encounterSections/" + this.pageData.demographicNo + "/autocomplete/";
+				jQuery("#enTemplate").autocomplete({
+					source: function(request, response)
+					{
+						jQuery.getJSON(searchAutocompleteUrl + request.term, function(data)
+						{
+							response(jQuery.map(data.body, function(section, index)
+							{
+								return {
+									label: section.text,
+									value: section.onClick
+								};
+							}));
+						});
+					},
+					select: function(event, ui)
+					{
+						new Function(ui.item.value)();
+						event.preventDefault();
+					},
+					minLength: 2,
+					delay: 100
+				});
 
-				//bindCalculatorListener(calculatorMenu);
 				window.onbeforeunload = onClosing;
 			}
 
@@ -2631,6 +2396,10 @@
 				</span>
 			</li>
 
+		</script>
+
+		<script id="existingIssueTemplate" type="text/x-jquery-tmpl">
+			<%@include file="templates/junoEncounter/existingIssueTemplate.html"%>
 		</script>
 
 		<script id="encounterNonNoteTemplate" type="text/x-jquery-tmpl">
@@ -2837,23 +2606,23 @@
 							{{if edit}}
 								<div style="margin: 0px 0px 0px 3px; font-size: 11px;">
 									<span style="float: left;"><bean:message key="oscarEncounter.assignedIssues.title"/></span>
-									<ul id='noteIssueIdList' style='float: left; list-style: circle inside; margin: 0px;'></ul>
+									<ul id='noteIssueIdList' style='float: left; list-style: circle inside; margin: 0px;'>
 									{{each issues}}
 										<li>
-
 											<input type='checkbox' id='issueId' name='issue_id' checked value='\${$value.issue_id}'>
 											\${$value.issue.description}
 										</li>
 									{{/each}}
-									<%--
-									XXX: load notes on page load
-									<nested:iterate id="noteIssue" property="caseNote.issues"
-													name="caseManagementEntryForm">
-										<li><c:out value="${noteIssue.issue.description}" /></li>
-									</nested:iterate>
-									--%>
 									</ul>
 									<br style="clear: both;">
+								</div>
+								<div id="noteIssues">
+									<div id="noteIssues-resolved" style="margin: 0px; background-color: #CCCCFF; font-size: 11px; display: none;">
+										<b><bean:message key="oscarEncounter.referenceResolvedIssues.title"/></b>
+									</div>
+									<div id="noteIssues-unresolved" style="margin: 0px; background-color: #CCCCFF; font-size: 11px; display: none;">
+										<b><bean:message key="oscarEncounter.referenceUnresolvedIssues.title"/></b>
+									</div>
 								</div>
 								<div class="noteStatus" id="noteSaveStatusMessage"></div>
 							{{else}}
@@ -2906,23 +2675,17 @@
 
 								%>
 								<a href="#"
-								   onClick="popupPage(700,1000,'<bean:write name="junoEncounterForm"
-																			property="header.windowName"/>','
-									   <c:out value="${ctx}"/>
-									   <bean:write name="junoEncounterForm"
-												   property="header.demographicUrl"/>'); return false;"
-								   title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>"><bean:write
-										name="junoEncounterForm"
-										property="header.formattedPatientName"/></a> <bean:write
-								name="junoEncounterForm" property="header.formattedPatientInfo"/>
+								   onClick="popupPage(700,1000,
+										   '${junoEncounterForm.header.windowName}',
+										   '${ctx}${junoEncounterForm.header.demographicUrl}'
+										   ); return false;"
+								   title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>"
+								>
+									${junoEncounterForm.header.formattedPatientName}
+								</a> ${junoEncounterForm.header.formattedPatientInfo}
 								<c:if test="${junoEncounterForm.header.echartAdditionalPatientInfoEnabled}">
-									<bean:write name="junoEncounterForm"
-												property="header.patientBirthdate"/>
+									<bean:write name="junoEncounterForm" property="header.patientBirthdate"/>
 								</c:if>
-
-								<% //if (oscar.OscarProperties.getInstance().isEChartAdditionalPatientInfoEnabled())
-									//{%>
-								<%//}%>
 
 								&nbsp;<oscar:phrverification
 								demographicNo="${junoEncounterForm.header.demographicNo}"><bean:message
@@ -3011,16 +2774,15 @@
 							 src="${fn:escapeXml(junoEncounterForm.header.imagePresentPlaceholderUrl)}"
 							 alt="id_photo" height="100" title="Click to upload new photo."
 							 OnMouseOver="document.getElementById('ci').src='../imageRenderingServlet?source=local_client&clientId=${fn:escapeXml(junoEncounterForm.header.demographicNo)}'"
-							 OnMouseOut="delay(5000)" window.status='Click to upload new photo' ;
-							 return true;"
-						onClick="popupUploadPage('uploadimage.jsp',${fn:escapeXml(junoEncounterForm.header.demographicNo)});return false;" />
+							 OnMouseOut="delay(5000); window.status='Click to upload new photo'; return true;"
+							 onClick="junoEncounter.popupUploadPage('uploadimage.jsp',${fn:escapeXml(junoEncounterForm.header.demographicNo)});return false;" />
 					</c:when>
 					<c:otherwise>
 						<img style="cursor: pointer;"
 							 src="${fn:escapeXml(junoEncounterForm.header.imageMissingPlaceholderUrl)}"
 							 alt="No_Id_Photo" height="100" title="Click to upload new photo."
 							 OnMouseOver="window.status='Click to upload new photo';return true"
-							 onClick="popupUploadPage('../casemgmt/uploadimage.jsp',${fn:escapeXml(junoEncounterForm.header.demographicNo)});return false;"/>
+							 onClick="junoEncounter.popupUploadPage('../casemgmt/uploadimage.jsp',${fn:escapeXml(junoEncounterForm.header.demographicNo)});return false;"/>
 					</c:otherwise>
 				</c:choose>
 			</security:oscarSec>
@@ -3050,11 +2812,6 @@
 						   value="${junoEncounterForm.sections[sectionName]}"/>
 
 					<div class="leftBox" id="${sectionName}" style="display: block;">
-
-						<form style="display: none;" name="dummyForm" action="">
-							<input type="hidden" id="reloadDiv" name="reloadDiv" value="none"
-								   onchange="updateDiv();">
-						</form>
 
 						<div id='menuTitle${sectionName}'
 							 style="width: 10%; float: right; text-align: center;">
@@ -3563,8 +3320,10 @@
 												<img alt="<bean:message key="oscarEncounter.msgFind"/>"
 													 src="<c:out value="${ctx}/oscarEncounter/graphics/edit-find.png"/>">
 												<input id="enTemplate" tabindex="6" size="16"
-													   type="text" value=""
-													   onkeypress="return grabEnterGetTemplate(event)">
+													   type="text" value="">
+												<%--
+												onkeypress="encounterMultiSearch(event); return false;">
+												--%>
 
 												<div class="enTemplate_name_auto_complete"
 													 id="enTemplate_list"
@@ -3579,8 +3338,7 @@
 													   onkeypress="return grabEnter('searchButton',event)">
 												<input type="button" id="searchButton" name="button"
 													   value="<bean:message key="oscarEncounter.Index.btnSearch"/>"
-													   onClick="popupPage(600,800,'<bean:message
-															   key="oscarEncounter.Index.popupSearchPageWindow"/>',$('channel').options[$('channel').selectedIndex].value+urlencode($F('keyword')) ); return false;">
+													   onClick="channelSearch(); return false;">
 
 												<div style="display:inline-block; text-align: left;">
 													<%
@@ -3614,45 +3372,38 @@
 
 											</div>
 											&nbsp;&nbsp;
-											<div style="display:inline-block;text-align: left;"
-												 id="toolbar">
+											<div style="display:inline-block;text-align: left;" id="toolbar">
 												<input type="button"
 													   value="<bean:message key="oscarEncounter.Filter.title"/>"
 													   onclick="showFilter();"/>
-												<%
-													// TODO: make this work (parts missing)
-									/*
-									String roleName = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-									String pAge = Integer.toString(UtilDateUtilities.calcAge(bean.yearOfBirth,bean.monthOfBirth,bean.dateOfBirth));
-									 */
-													// TODO: make this work (parts missing)
-												%>
-													<%--<%@include file="calculatorsSelectList.jspf" %>--%>
-													<%--<security:oscarSec roleName="<%=roleName%>" objectName="_admin.templates" rights="r"> --%>
-													<%--
-													<security:oscarSec roleName="<%=roleName%>" objectName="_newCasemgmt.templates" rights="r">
-														<select style="width:100px;" onchange="javascript:popupPage(700,700,'Templates',this.value);">
-															<option value="-1"><bean:message key="oscarEncounter.Header.Templates"/></option>
+
+												<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.calculators" rights="r" reverse="false">
+													<%
+														String patientAge = junoEncounterForm.getHeader().getPatientAgeInYears();
+														String patientSex = junoEncounterForm.getHeader().getPatientSex();
+													%>
+													<%@include file="../casemgmt/calculatorsSelectList.jspf" %>
+												</security:oscarSec>
+
+												<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.templates" rights="r">
+													<select style="width:100px;" onchange="javascript:popupPage(700,700,'Templates',this.value);">
+														<option value="-1"><bean:message key="oscarEncounter.Header.Templates"/></option>
+														<option value="-1">------------------</option>
+														<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.templates" rights="w">
+															<option value="${ctx}/admin/providertemplate.jsp">New / Edit Template</option>
 															<option value="-1">------------------</option>
-															<security:oscarSec roleName="<%=roleName%>" objectName="_newCasemgmt.templates" rights="w">
-																<option value="<%=request.getContextPath()%>/admin/providertemplate.jsp">New / Edit Template</option>
-																<option value="-1">------------------</option>
-															</security:oscarSec>
-															<%
-																EncounterTemplateDao encounterTemplateDao=(EncounterTemplateDao)SpringUtils.getBean("encounterTemplateDao");
-																List<EncounterTemplate> allTemplates=encounterTemplateDao.findAll();
+														</security:oscarSec>
+														<c:forEach items="${junoEncounterForm.header.encounterTemplates}" var="encounterTemplate">
+															<option value="${ctx}/admin/providertemplate.jsp?dboperation=Edit&name=${encounterTemplate.encounterTemplateName}">
+																	${encounterTemplate.encounterTemplateName}
+															</option>
+														</c:forEach>
+													</select>
+												</security:oscarSec>
 
-																for (EncounterTemplate encounterTemplate : allTemplates)
-																{
-																	String templateName=StringEscapeUtils.escapeHtml(encounterTemplate.getEncounterTemplateName());
-															%>
-															<option value="<%=request.getContextPath()+"/admin/providertemplate.jsp?dboperation=Edit&name="+templateName%>"><%=templateName%></option>
-															<%
-																}
-															%>
-														</select>
-													</security:oscarSec>
 
+
+													<%--
 													<script>
 														function updateMYOSCAR(){
 															jQuery.getScript('phrLinks.jsp?demographicNo=<%=demographicNo%>');
@@ -3893,13 +3644,17 @@
 	    	</span>
 		</div>
 		<div style="padding-top: 3px;">
-			<button type="button"
-					onclick="return showHideIssues(event, 'noteIssues-resolved');">
+			<button type="button" id="displayResolvedIssuesButton"/>
+<%--
+					onclick="return showHideIssues(event, true);">
+--%>
 				<bean:message
 						key="oscarEncounter.Index.btnDisplayResolvedIssues"/></button>
 			&nbsp;
-			<button type="button"
-					onclick="return showHideIssues(event, 'noteIssues-unresolved');">
+			<button type="button" id="displayUnresolvedIssuesButton"/>
+<%--
+					onclick="return showHideIssues(event, false);">
+--%>
 				<bean:message
 						key="oscarEncounter.Index.btnDisplayUnresolvedIssues"/></button>
 			&nbsp;
