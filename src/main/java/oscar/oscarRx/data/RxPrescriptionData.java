@@ -1015,6 +1015,10 @@ public class RxPrescriptionData {
 						{
 							days = i * 30;
 						}
+						if(durationUnit != null && durationUnit.equalsIgnoreCase("Y"))
+						{
+							days = i * 360;
+						}
 
 						if(repeat > 0)
 						{

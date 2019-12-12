@@ -35,6 +35,7 @@
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page import="java.util.ArrayList,oscar.util.*,java.util.*,org.oscarehr.rx.model.Drug,org.oscarehr.common.dao.*"%>
 <%@ page import="org.oscarehr.rx.dao.DrugDao" %>
+<%@ page import="java.net.URLEncoder" %>
 <logic:notPresent name="RxSessionBean" scope="session">
     <logic:redirect href="error.html" />
 </logic:notPresent>
@@ -182,10 +183,10 @@ String userlastname = (String) session.getAttribute("userlastname");
                                                 %>
                                                 <tr>
                                                     <td width=20% valign="top">
-                                                        <a <%= styleColor%> href="StaticScript2.jsp?regionalIdentifier=<%=drug.getRegionalIdentifier()%>&cn=<%=response.encodeURL(drug.getCustomName())%>&bn=<%=response.encodeURL(drug.getBrandName())%>"><%=drug.getRxDate()%> </a>
+                                                        <a <%= styleColor%> href="StaticScript2.jsp?regionalIdentifier=<%=drug.getRegionalIdentifier()%>&cn=<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(drug.getCustomName()))%>&bn=<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(drug.getBrandName()))%>"><%=drug.getRxDate()%> </a>
                                                     </td>
                                                     <td width=100%>
-                                                        <a <%= styleColor%> href="StaticScript2.jsp?regionalIdentifier=<%= drug.getRegionalIdentifier()%>&cn=<%= response.encodeURL(drug.getCustomName())%>&bn=<%=response.encodeURL(drug.getBrandName())%>"><%= drug.getFullOutLine().replaceAll(";", " ")%> </a>
+                                                        <a <%= styleColor%> href="StaticScript2.jsp?regionalIdentifier=<%= drug.getRegionalIdentifier()%>&cn=<%= URLEncoder.encode(StringUtils.transformNullInEmptyString(drug.getCustomName()))%>&bn=<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(drug.getBrandName()))%>"><%= drug.getFullOutLine().replaceAll(";", " ")%> </a>
                                                     </td>
                                                 </tr>
                                                 <%

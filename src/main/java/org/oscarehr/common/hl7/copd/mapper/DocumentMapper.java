@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.util.MiscUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,7 +61,15 @@ public class DocumentMapper extends AbstractMapper
 		Document document = new Document();
 
 		document.setObservationdate(getObservationDate(rep));
-		document.setDocdesc(getDescription(rep));
+
+
+		String docDescription = getDescription(rep);
+		if (docDescription.trim().isEmpty())
+		{
+			docDescription = "No Name";
+			MiscUtils.getLogger().warn("document, " + getFileName(rep) + " has no document description, setting to \"No Name\"");
+		}
+		document.setDocdesc(docDescription);
 
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{// Mediplan file names can include HTML escape sequences!
@@ -72,7 +81,8 @@ public class DocumentMapper extends AbstractMapper
 		}
 
 		document.setContenttype(getContentType(rep));
-		document.setStatus(Document.STATUS_ACTIVE);
+		document.setStatus(Document.STATUS_ACTIVE);;
+		document.setDoctype(getDocType(rep));
 
 		return document;
 	}
@@ -99,5 +109,15 @@ public class DocumentMapper extends AbstractMapper
 	{
 		//TODO map to application/contenttype correctly
 		return "application/" + StringUtils.lowerCase(provider.getZAT(rep).getZat4_Attachment().getSubtype().getValue());
+	}
+
+	/**
+	 * get, Juno document type. things like, Consult, Lab, Procedure, ect.
+	 * @param rep - the document you wish to get the type for.
+	 * @return - the document type, if not overriden returns the string "N/A"
+	 */
+	public String getDocType(int rep)
+	{
+		return "N/A";
 	}
 }

@@ -74,7 +74,7 @@ public class EncounterNoteMapper extends AbstractMapper
 		return note;
 	}
 
-	private String getEncounterNoteText(int rep) throws HL7Exception
+	protected String getEncounterNoteText(int rep) throws HL7Exception
 	{
 		String reasonText = StringUtils.trimToEmpty(getEncounterNoteReason(rep));
 		String commentText = StringUtils.trimToEmpty(getEncounterNoteComment(rep));
@@ -118,7 +118,7 @@ public class EncounterNoteMapper extends AbstractMapper
 
 	public Date getEncounterNoteContactDate(int rep) throws HL7Exception
 	{
-		return getNullableDate(provider.getZPV(rep)
+		return getNullableDateTime(provider.getZPV(rep)
 				.getZpv2_contactDate().getTs1_TimeOfAnEvent().getValue());
 	}
 
