@@ -43,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -168,12 +169,11 @@ public class MyHealthAccessService
 
 		IntegrationData integrationData = new IntegrationData(integration);
 
-
 		AppointmentCacheTo1 transfer = new AppointmentCacheTo1();
 		transfer.setId(String.valueOf(appointment.getId()));
 		transfer.setCanceled(appointment.getAppointmentStatus().equals(Appointment.CANCELLED));
 		transfer.setVirtual(appointment.getIsVirtual());
-		transfer.setStartDateTime(appointment.getStartTimeAsFullDate());
+		transfer.setStartDateTime(ConversionUtils.toLocalDateTime(appointment.getStartTimeAsFullDate()));
 
 		return updateAppointmentCache(integrationData, transfer);
 	}

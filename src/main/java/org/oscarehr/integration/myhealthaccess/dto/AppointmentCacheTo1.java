@@ -22,14 +22,15 @@
  */
 package org.oscarehr.integration.myhealthaccess.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import oscar.util.Jackson.LocalDateTimeStringSerializer;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
@@ -44,9 +45,9 @@ public class AppointmentCacheTo1 implements Serializable
 	@JsonProperty("is_canceled")
 	private Boolean isCanceled;
 
-	@JsonProperty("start_date_time")
-	@JsonFormat(shape=JsonFormat.Shape.STRING)
-	private Date startDateTime;
+	@JsonProperty("start_datetime")
+	@JsonSerialize(using = LocalDateTimeStringSerializer.class)
+	private LocalDateTime startDateTime;
 
 	public String getId()
 	{
@@ -78,12 +79,12 @@ public class AppointmentCacheTo1 implements Serializable
 		isCanceled = canceled;
 	}
 
-	public Date getStartDateTime()
+	public LocalDateTime getStartDateTime()
 	{
 		return startDateTime;
 	}
 
-	public void setStartDateTime(Date startDateTime)
+	public void setStartDateTime(LocalDateTime startDateTime)
 	{
 		this.startDateTime = startDateTime;
 	}
