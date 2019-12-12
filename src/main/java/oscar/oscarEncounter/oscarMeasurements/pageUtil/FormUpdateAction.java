@@ -65,7 +65,8 @@ public class FormUpdateAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String date = request.getParameter("date");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_measurement", "w", null)) {
+		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_measurement", "w", null))
+		{
 			throw new SecurityException("missing required security object (_measurement)");
 		}
 		
@@ -117,7 +118,8 @@ public class FormUpdateAction extends Action {
 				if (child.children == null && child.flowSheetItem != null) {*/
 		
 			
-		for (String measure:measurements){
+		for (String measure:measurements)
+		{
 			Map<String, String> h2 = mFlowsheet.getMeasurementFlowSheetInfo(measure);
 	        FlowSheetItem item =  mFlowsheet.getFlowSheetItem(measure);
 					
@@ -131,20 +133,24 @@ public class FormUpdateAction extends Action {
 					String name = h2.get("display_name").toString().replaceAll("\\W","");
 					String displayName=h2.get("display_name").toString();
 							
-					if (request.getParameter(name) != null && !request.getParameter(name).equals("")) {
+					if (request.getParameter(name) != null && !request.getParameter(name).equals(""))
+					{
 
 						String comment = "";
-						if (request.getParameter(name + "_comments") != null && !request.getParameter(name + "_comments").equals("")) {
+						if (request.getParameter(name + "_comments") != null && !request.getParameter(name + "_comments").equals(""))
+						{
 							comment = request.getParameter(name + "_comments");
 						}
 						
-						if(request.getParameter(name + "_date") !=null && !request.getParameter(name + "_date").equals("")){
+						if(request.getParameter(name + "_date") !=null && !request.getParameter(name + "_date").equals(""))
+						{
 							date=request.getParameter(name + "_date");
 						}
 						
 						
 							//create note text
-							if(request.getParameter(name + "_note") !=null && !request.getParameter(name + "_note").equals("")){
+							if(request.getParameter(name + "_note") !=null && !request.getParameter(name + "_note").equals(""))
+							{
 								addToNote = true;
 
 								note = note + displayName + ": " + request.getParameter(name);
@@ -153,7 +159,8 @@ public class FormUpdateAction extends Action {
 								}
 										
 								note = note + "\n Date Observed: " + date;
-								if (request.getParameter(name + "_comments") != null && !request.getParameter(name + "_comments").equals("")) {
+								if (request.getParameter(name + "_comments") != null && !request.getParameter(name + "_comments").equals(""))
+								{
 									note = note + "\n comment: " + comment;
 								}
 								note=note +"\n\n ";
@@ -164,11 +171,14 @@ public class FormUpdateAction extends Action {
 						valid = doInput(item, mtypeBean, mFlowsheet, mtypeBean.getType(), StringUtils.trimToEmpty(mtypeBean.getMeasuringInstrc()), request.getParameter(name), comment, date, apptNo, request);
 						
 												
-						if (!valid) {
+						if (!valid)
+						{
 							testOutput += name + ": " + request.getParameter(name) + "\n";
 							errorPage = true;
 							log.error("ERROR: " + testOutput);
-						} else {
+						}
+						else
+						{
 							textOnEncounter += name + " " + request.getParameter(name) + "\\n";
 						}
 
@@ -190,7 +200,8 @@ public class FormUpdateAction extends Action {
 		//	request.setAttribute("ycoord", request.getParameter("ycoord"));
 		//}
 
-		if (errorPage) {
+		if (errorPage)
+		{
 			request.setAttribute("testOutput", testOutput);
 			return mapping.findForward("failure");
 		}
@@ -202,9 +213,12 @@ public class FormUpdateAction extends Action {
 			addNote(demographic_no, providerNo, prog_no, note, apptNoInt, request);
 		}
 		
-		if (request.getParameter("submit").equals("Add") || request.getParameter("submit").equals("Save") || request.getParameter("submit").equals("Save All")) {
+		if (request.getParameter("submit").equals("Add") || request.getParameter("submit").equals("Save") || request.getParameter("submit").equals("Save All"))
+		{
 			return mapping.findForward("reload");
-		} else {
+		}
+		else
+		{
 			return mapping.findForward("success");
 		}
 	}
