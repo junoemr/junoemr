@@ -176,11 +176,6 @@ public class AdminNavService
 		if (oscarProperties.isClinicaidBillingType())
 		{// CLINICAID BILLING
 			billingItems.add(new AdminNavItemTo1("Manage Invoices", contextPath +"/billing.do?billRegion=CLINICAID&action=invoice_reports", true));
-
-			if (oscarProperties.isBritishColumbiaBillingType())
-			{
-				billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp&useCompat=true"));
-			}
 		}
 		else if (oscarProperties.isBritishColumbiaBillingType())
 		{// BC BILLING
@@ -258,6 +253,11 @@ public class AdminNavService
 
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.paymentReceived"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingONPayment.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.managePaymentType"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/managePaymentType.do"));
+		}
+
+		if (oscarProperties.isBritishColumbiaInstanceType())
+		{
+			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp&useCompat=true"));
 		}
 
 		billing.setItems(billingItems);
