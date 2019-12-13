@@ -7,6 +7,7 @@
 
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
+import {SitesApi} from "../../generated";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
@@ -53,6 +54,7 @@ angular.module('Schedule').component('eventComponent', {
 			$scope.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 				'../ws/rs');
 
+			let sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
 			//=========================================================================
 			// Access Control
 			//=========================================================================/
@@ -166,6 +168,7 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.isDoubleBook = false;
 			controller.isDoubleBookPrevented = false;
+			controller.siteOptions = [];
 
 			controller.providerModel = {
 				providerNo: null,
@@ -259,12 +262,6 @@ angular.module('Schedule').component('eventComponent', {
 				$scope.events = data.events;
 				$scope.scheduleId = data.scheduleId;
 
-				// filter site options to only include valid sites.
-				controller.siteOptions = controller.parentScope.siteOptions.filter(function (value, index, arr)
-				{
-					return (value.uuid != null);
-				});
-
 				controller.sitesEnabled = controller.parentScope.hasSites();
 
 				controller.keyBinding.bindKeyGlobal("ctrl+enter", $scope.keyBindSettings["ctrl+enter"]);
@@ -332,11 +329,6 @@ angular.module('Schedule').component('eventComponent', {
 					// clear the patient model
 					controller.demographicModel.clear();
 					$scope.eventData.site = controller.parentScope.selectedSiteName;
-					// set the default site selection if the current one is invalid
-					if (controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
-					{
-						$scope.eventData.site = controller.siteOptions[0].value;
-					}
 
 					focus.element("#input-patient");
 					controller.checkEventConflicts(); // uses the eventData
@@ -346,6 +338,34 @@ angular.module('Schedule').component('eventComponent', {
 				}
 
 				controller.changeTab(controller.tabEnum.appointment);
+
+				sitesApi.getSitesByProvider(controller.providerModel.providerNo).then(
+						function success(results)
+						{
+							controller.siteOptions = [];
+							for(let site of results.data.body)
+							{
+								if (site.siteId != null)
+								{
+									controller.siteOptions.push({
+										label: site.name,
+										value: site.name,
+										uuid: site.siteId,
+										color: site.bgColor,
+									});
+								}
+							}
+
+							if (controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
+							{
+								$scope.eventData.site = controller.siteOptions[0].value;
+							}
+						},
+						function error(results)
+						{
+							console.error("Failed to get provider Site assignment with error: " + results);
+						}
+				);
 			};
 
 			//=========================================================================
