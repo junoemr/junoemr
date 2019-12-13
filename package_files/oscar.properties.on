@@ -120,6 +120,7 @@ HOME_DIR = /var/lib/OscarDocument/{oscar_practice_id}/billing/download/
 
 # Documents directory
 DOCUMENT_DIR = /var/lib/OscarDocument/{oscar_practice_id}/document/
+EFORM_IMAGE_DIR = /var/lib/OscarDocument/{oscar_practice_id}/eform/images
 DOCUMENT_DOWNLOAD_METHOD = stream
 DOC_FORWARD: /dms/complete.jsp
 RA_FORWORD: /billing/CA/ON/genRA.jsp

@@ -54,6 +54,18 @@ public class FileFactory
 	}
 
 	/**
+	 * save and load a new eform image with the given name and input stream
+	 * @param fileInputStream - input stream of the new file
+	 * @param fileName - name of the file to be saved and opened
+	 * @return - the file
+	 * @throws FileNotFoundException - if the given file is invalid for use as a GenericFile
+	 */
+	public static GenericFile createEformImageFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
+	{
+		return createNewFormattedFile(fileInputStream, fileName, GenericFile.EFORM_IMAGE_DIR, true);
+	}
+
+	/**
 	 * save and load a new document with the given name and input stream
 	 * @param fileInputStream - input stream of the new file
 	 * @param fileName - name of the file to be saved and opened
@@ -124,6 +136,16 @@ public class FileFactory
 	public static GenericFile getDocumentFile(String fileName) throws IOException
 	{
 		return getExistingFile(GenericFile.DOCUMENT_BASE_DIR, fileName);
+	}
+
+	/**
+	 * load an existing eform image with the given name
+	 * @param fileName - name of the file to load
+	 * @return - the file
+	 */
+	public static GenericFile getEformImageFile(String fileName) throws IOException
+	{
+		return getExistingFile(GenericFile.EFORM_IMAGE_DIR, fileName);
 	}
 
 	/**
