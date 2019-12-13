@@ -62,6 +62,11 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			if (Juno.Common.Util.exists($stateParams.term))
 			{
 				controller.search.term = $stateParams.term;
+
+				if (!isNaN(controller.search.term))
+				{	// if looks like HIN search by hin auto-magically
+					controller.search.type = demographicsService.SEARCH_MODE.Hin
+				}
 			}
 			controller.search.status = controller.defaultStatus;
 
