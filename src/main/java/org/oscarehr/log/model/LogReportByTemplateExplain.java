@@ -69,7 +69,7 @@ public class LogReportByTemplateExplain extends AbstractModel<Integer>
 	@Column(name="ref")
 	private String ref;
 
-	@Column(name="rows")
+	@Column(name="\"rows\"")
 	private Integer rows;
 
 	@Column(name="extra")
