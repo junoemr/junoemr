@@ -45,6 +45,10 @@ public class MapperFactory
 			{
 				return new AppointmentMapperMedaccess(message, importSource);
 			}
+			case ACCURO:
+			{
+				return new AppointmentMapperAccuro(message, importSource);
+			}
 			default:
 			{
 				return new AppointmentMapper(message, importSource);
@@ -96,7 +100,13 @@ public class MapperFactory
 	 */
 	public static DocumentMapper newDocumentMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		return new DocumentMapper(message, providerRep, importSource);
+		switch (importSource)
+		{
+			case MEDACCESS:
+				return new DocumentMapperMedaccess(message, providerRep, importSource);
+			default:
+				return new DocumentMapper(message, providerRep, importSource);
+		}
 	}
 
 	/**
@@ -119,7 +129,13 @@ public class MapperFactory
 	 */
 	public static EncounterNoteMapper newEncounterNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		return new EncounterNoteMapper(message, providerRep, importSource);
+		switch(importSource)
+		{
+			case MEDACCESS:
+				return new EncounterNoteMapperMedAccess(message, providerRep, importSource);
+			default:
+				return new EncounterNoteMapper(message, providerRep, importSource);
+		}
 	}
 
 	/**

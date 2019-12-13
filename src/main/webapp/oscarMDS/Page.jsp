@@ -345,7 +345,7 @@ String curUser_no = (String) session.getAttribute("user");
                                     <center><%=result.getSex() %></center>
                                 </td>
                                 <td nowrap>
-                                    <%= (result.isAbnormal() ? "Abnormal" : (result.isUnknown() ? "Unknown" : "" )) %>
+                                    <%= result.getDisplayStatus() %>
                                 </td>
                                 <td nowrap>
                                     <%=result.getDateTime() + (result.isDocument() ? " / " + result.lastUpdateDate : "")%>

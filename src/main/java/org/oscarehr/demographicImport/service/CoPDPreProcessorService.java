@@ -34,8 +34,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,27 +69,6 @@ public class CoPDPreProcessorService
 	}
 
 	/**
-	 * TODO  -- make this more efficient for larger files
-	 * @param messageStr the whole file as a string
-	 * @return - list of message strings
-	 */
-	public List<String> separateMessages(String messageStr)
-	{
-		List<String> messageList = new LinkedList<>();
-
-		Pattern messagePattern = Pattern.compile("<ZPD_ZTR\\.MESSAGE>(.*?)<\\/ZPD_ZTR\\.MESSAGE>", Pattern.DOTALL);
-		Matcher messagePatternMatcher = messagePattern.matcher(messageStr);
-		while(messagePatternMatcher.find())
-		{
-			// split messages by each MESSAGE group segment in the file
-			String message = "<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\">" + messagePatternMatcher.group(1) + "</ZPD_ZTR>";
-			messageList.add(message);
-		}
-		return messageList;
-	}
-
-
-	/**
 	 * Attempt to repair and format the hl7 message for the COPD Parser
 	 * @param message the original message string
 	 * @return the formatted and fixed message string
@@ -121,6 +98,7 @@ public class CoPDPreProcessorService
 			message = fixDoubleBPMeasurements(message);
 			message = fixSlashBPMeasurements(message);
 			message = fixZATDateString(message);
+			message = timestampPad(message);
 
 			// should come last
 			message = ensureNumeric(message);
@@ -352,6 +330,28 @@ public class CoPDPreProcessorService
 	}
 
 	/**
+	 * pad timestamp values (TS.1), insuring they have an even number of characters. If they are odd a '0' is appended
+	 * @param message - message on which the timestamps will be padded
+	 * @return - the modified message
+	 */
+	private String timestampPad(String message)
+	{
+		Function<String, String> padTimestamps = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				if (tagValue.length() % 2 != 0)
+				{
+					return tagValue + "0";
+				}
+				return tagValue;
+			}
+		};
+
+		return foreachTag(message,"TS.1", padTimestamps);
+	}
+
+	/**
 	 * CoPD requires hl7V2.4, but often the value is not correctly set. this enforces the version
 	 */
 	private String setHl7Version(String message)
@@ -377,31 +377,27 @@ public class CoPDPreProcessorService
 	 */
 	private String fixPhoneNumbers(String message)
 	{
-		Pattern phonePattern = Pattern.compile("<XTN\\.6>(.*?)<\\/XTN\\.6>");
-		Matcher phonePatternMatcher = phonePattern.matcher(message);
-
-		StringBuffer sb = new StringBuffer(message.length());
-		while(phonePatternMatcher.find())
+		Function<String, String> fixPhoneNumbersOnlyNum = new Function<String, String>()
 		{
-			// strip non numeric characters from phone numbers
-			String replacement = "<XTN\\.6>" + phonePatternMatcher.group(1).replaceAll("[^\\d.]", "") + "</XTN\\.6>";
-			phonePatternMatcher.appendReplacement(sb, replacement);
-		}
-		phonePatternMatcher.appendTail(sb);
-		message = sb.toString();
+			@Override
+			public String apply(String tagValue)
+			{
+				return tagValue.replaceAll("[^\\d.]", "");
+			}
+		};
 
-		phonePattern = Pattern.compile("<XTN\\.7>(.*?)<\\/XTN\\.7>");
-		phonePatternMatcher = phonePattern.matcher(message);
-
-		sb = new StringBuffer(message.length());
-		while(phonePatternMatcher.find())
+		Function<String, String> fixPhoneNumbersNoSpace = new Function<String, String>()
 		{
-			// strip non numeric characters from phone numbers
-			String replacement = "<XTN\\.7>" + phonePatternMatcher.group(1).replaceAll("[^\\d.]", "") + "</XTN\\.7>";
-			phonePatternMatcher.appendReplacement(sb, replacement);
-		}
-		phonePatternMatcher.appendTail(sb);
-		message = sb.toString();
+			@Override
+			public String apply(String tagValue)
+			{
+				return tagValue.replaceAll("\\s", "");
+			}
+		};
+
+		message = foreachTag(message, "XTN.1", fixPhoneNumbersNoSpace);
+		message = foreachTag(message, "XTN.6", fixPhoneNumbersOnlyNum);
+		message = foreachTag(message, "XTN.7", fixPhoneNumbersOnlyNum);
 
 		return message;
 	}
