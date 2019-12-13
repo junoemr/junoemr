@@ -8,31 +8,27 @@ a {
 
 body {
 	h1 {
-		@include juno-font-default-size(32px);
+		@include juno-font-default-size(32px, bold);
 	}
 
 	h2 {
-		@include juno-font-default-size(28px);
+		@include juno-font-default-size(28px, bold);
 	}
 
 	h3 {
-		@include juno-font-default-size(24px);
+		@include juno-font-default-size(24px, bold);
 	}
 
 	h4 {
-		@include juno-font-default-size(22px);
+		@include juno-font-default-size(22px, bold);
 	}
 
 	h5 {
-		@include juno-font-default-size(20px);
+		@include juno-font-default-size(20px, bold);
 	}
 
 	h6 {
-		@include juno-font-default-size(18px);
-	}
-
-	h1, h2, h3, h4, h5, h6 {
-		font-weight: bold;
+		@include juno-font-default-size(18px, bold);
 	}
 }
 
