@@ -173,7 +173,8 @@ public class MyHealthAccessService
 		transfer.setId(String.valueOf(appointment.getId()));
 		transfer.setCanceled(appointment.getAppointmentStatus().equals(Appointment.CANCELLED));
 		transfer.setVirtual(appointment.getIsVirtual());
-		transfer.setStartDateTime(ConversionUtils.toLocalDateTime(appointment.getStartTimeAsFullDate()));
+		transfer.setStartDateTime(ConversionUtils.toZonedDateTime(appointment.getStartTimeAsFullDate()));
+		transfer.setEndDateTime(ConversionUtils.toZonedDateTime(appointment.getEndTimeAsFullDate()));
 
 		return updateAppointmentCache(integrationData, transfer);
 	}

@@ -27,10 +27,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import oscar.util.Jackson.LocalDateTimeStringSerializer;
+import oscar.util.Jackson.ZonedLocalDateTimeStringSerializer;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
@@ -46,8 +46,12 @@ public class AppointmentCacheTo1 implements Serializable
 	private Boolean isCanceled;
 
 	@JsonProperty("start_datetime")
-	@JsonSerialize(using = LocalDateTimeStringSerializer.class)
-	private LocalDateTime startDateTime;
+	@JsonSerialize(using = ZonedLocalDateTimeStringSerializer.class)
+	private ZonedDateTime startDateTime;
+
+	@JsonProperty("end_datetime")
+	@JsonSerialize(using = ZonedLocalDateTimeStringSerializer.class)
+	private ZonedDateTime endDateTime;
 
 	public String getId()
 	{
@@ -79,14 +83,24 @@ public class AppointmentCacheTo1 implements Serializable
 		isCanceled = canceled;
 	}
 
-	public LocalDateTime getStartDateTime()
+	public ZonedDateTime getStartDateTime()
 	{
 		return startDateTime;
 	}
 
-	public void setStartDateTime(LocalDateTime startDateTime)
+	public void setStartDateTime(ZonedDateTime startDateTime)
 	{
 		this.startDateTime = startDateTime;
+	}
+
+	public ZonedDateTime getEndDateTime()
+	{
+		return endDateTime;
+	}
+
+	public void setEndDateTime(ZonedDateTime endDateTime)
+	{
+		this.endDateTime = endDateTime;
 	}
 
 	@Override
