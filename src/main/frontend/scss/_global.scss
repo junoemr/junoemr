@@ -1,12 +1,4 @@
 // global styles
-
-h1,h2,h3,h4,h5,h6 {
-	@include juno-font-default;
-}
-h1,h2,h3 {
-	font-weight: bold;
-}
-
 a {
 	color: $color-neutral-darker;
 	&:hover {
@@ -16,29 +8,47 @@ a {
 
 body {
 	h1 {
-		font-size: 32px;
-		font-weight: bold;
+		@include juno-font-default-size(32px);
 	}
+
 	h2 {
-		font-size: 28px;
-		font-weight: bold;
+		@include juno-font-default-size(28px);
 	}
+
 	h3 {
-		font-size: 24px;
-		font-weight: bold;
+		@include juno-font-default-size(24px);
 	}
+
 	h4 {
-		font-size: 22px;
-		font-weight: bold;
+		@include juno-font-default-size(22px);
 	}
+
 	h5 {
-		font-size: 20px;
-		font-weight: bold;
+		@include juno-font-default-size(20px);
 	}
+
 	h6 {
-		font-size: 18px;
+		@include juno-font-default-size(18px);
+	}
+
+	h1, h2, h3, h4, h5, h6 {
 		font-weight: bold;
 	}
+}
+
+.body-bold {
+	@include juno-font-body;
+	font-weight: bold;
+}
+
+.body-small-bold {
+	@include juno-font-body-small();
+	font-weight: bold;
+}
+
+.body-extra-small-bold {
+	@include juno-font-body-smallest();
+	font-weight: bold;
 }
 
 .hand-hover {
