@@ -409,7 +409,7 @@ for (int i=0; i<sites.size(); i++) {
 				<bean:message key="admin.provider.fromOntarioLifeLabsId" />:
 			</td>
 			<td>
-				<input type="text" name="ontario_lifelabs_id" value="<%= provider.getOntarioLifeLabsId()==null ? "" : provider.getOntarioLifeLabsId()%>">
+				<input type="text" name="ontario_lifelabs_id" maxlength="128" value="<%= provider.getOntarioLifeLabsId()==null ? "" : provider.getOntarioLifeLabsId()%>">
 			</td>
 		</tr>
 		<% } %>
