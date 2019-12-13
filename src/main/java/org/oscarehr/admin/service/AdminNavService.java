@@ -189,7 +189,6 @@ public class AdminNavService
 
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageServiceDiagnosticCodeAssoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/showServiceCodeAssocs.do"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageProcedureFeeCodeAssoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/supServiceCodeAssocAction.do"));
-			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp&useCompat=true"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.bcQuickBilling"), "frame?frameUrl=" + contextPath + "/quickBillingBC.do"));
 
 			if (oscarProperties.isPropertyActive("NEW_BC_TELEPLAN"))
