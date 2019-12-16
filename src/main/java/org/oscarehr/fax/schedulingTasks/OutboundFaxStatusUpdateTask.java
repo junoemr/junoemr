@@ -29,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 @Component
 public class OutboundFaxStatusUpdateTask
 {
@@ -37,6 +39,12 @@ public class OutboundFaxStatusUpdateTask
 
 	@Autowired
 	private OutgoingFaxService outgoingFaxService;
+
+	@PostConstruct
+	public void init()
+	{
+		logger.info("Fax integration status scheduling task initialized.");
+	}
 
 	@Scheduled(cron = cronSchedule)
 	public void updateFaxStatuses()

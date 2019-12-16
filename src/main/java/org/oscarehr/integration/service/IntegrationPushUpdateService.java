@@ -25,6 +25,7 @@ package org.oscarehr.integration.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.server.ServerStateHandler;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.dao.IntegrationPushUpdateDao;
 import org.oscarehr.integration.model.Integration;
@@ -57,6 +58,9 @@ public class IntegrationPushUpdateService
 	@Autowired
 	private IntegrationPushUpdateDao integrationPushUpdateDao;
 
+	@Autowired
+	private ServerStateHandler serverStateHandler;
+
 	public void queueAppointmentCacheUpdate(Integration integration, AppointmentCacheTo1 appointment) throws JsonProcessingException
 	{
 		ObjectMapper mapper = new ObjectMapper();
@@ -78,31 +82,34 @@ public class IntegrationPushUpdateService
 		List<IntegrationPushUpdate> queuedUpdates = integrationPushUpdateDao.findQueued(INTEGRATION_TYPE_MHA);
 		ArrayList<String> failedIdList = new ArrayList<>();
 
-		logger.info("pushing " + queuedUpdates.size() + " integration updates");
-		for(IntegrationPushUpdate update : queuedUpdates)
+		if(!queuedUpdates.isEmpty() && serverStateHandler.isThisServerMaster())
 		{
-			// skip sending subsequent updates for appointments that have failed
-			if(failedIdList.contains(update.getAppointmentId()))
+			logger.info("pushing " + queuedUpdates.size() + " integration updates");
+			for(IntegrationPushUpdate update : queuedUpdates)
 			{
-				continue;
-			}
+				// skip sending subsequent updates for appointments that have failed
+				if(failedIdList.contains(update.getAppointmentId()))
+				{
+					continue;
+				}
 
-			try
-			{
-				sendQueuedUpdate(mapper, update);
+				try
+				{
+					sendQueuedUpdate(mapper, update);
 
-				update.setStatusSent();
-				update.setSentAt(new Date());
-			}
-			catch(Exception e)
-			{
-				logger.error("Error sending integration update for appointment " + update.getAppointmentId(), e);
-				failedIdList.add(update.getAppointmentId());
-			}
-			finally
-			{
-				update.incrementSendCount();
-				integrationPushUpdateDao.merge(update);
+					update.setStatusSent();
+					update.setSentAt(new Date());
+				}
+				catch(Exception e)
+				{
+					logger.error("Error sending integration update for appointment " + update.getAppointmentId(), e);
+					failedIdList.add(update.getAppointmentId());
+				}
+				finally
+				{
+					update.incrementSendCount();
+					integrationPushUpdateDao.merge(update);
+				}
 			}
 		}
 	}

@@ -175,7 +175,6 @@ public class MyHealthAccessService
 		transfer.setEndDateTime(ConversionUtils.toZonedDateTime(appointment.getEndTimeAsFullDate()));
 
 		integrationPushUpdateService.queueAppointmentCacheUpdate(integration, transfer);
-		integrationPushUpdateService.sendQueuedUpdates();
 	}
 
 	public void queueAppointmentCacheUpdate(Appointment appointment)

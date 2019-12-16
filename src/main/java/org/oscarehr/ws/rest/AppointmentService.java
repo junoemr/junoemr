@@ -29,6 +29,7 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarAppointmentRepeating;
+import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -60,6 +61,9 @@ public class AppointmentService extends AbstractServiceImpl
 {
 	@Autowired
 	private AppointmentManager appointmentManager;
+
+	@Autowired
+	private MyHealthAccessService myHealthAccessService;
 
 	@GET
 	@Path("/{appointmentNo}")
@@ -140,6 +144,10 @@ public class AppointmentService extends AbstractServiceImpl
 		Appointment appointment = converter.getAsDomainObject(calendarAppointment);
 
 		Appointment savedAppointment = appointmentManager.updateAppointment(getLoggedInInfo(), appointment);
+		if(appointment.getIsVirtual())
+		{
+			myHealthAccessService.queueAppointmentCacheUpdate(appointment);
+		}
 
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), savedAppointment.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,
