@@ -26,7 +26,6 @@
 package oscar.eform.actions;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,14 +67,8 @@ public class DisplayImageAction extends DownloadAction
 		//if (fileName.indexOf('/') != -1) return null;  //prevents navigating away from the page.
 		response.setHeader("Content-disposition", "inline; filename=" + fileName);
 
-		GenericFile file = FileFactory.getEformImageFile(fileName);
+		GenericFile file = FileFactory.getEformImage(fileName);
 		//String canonicalPath = file.getParentFile().getCanonicalPath(); //absolute path of the retrieved file
-
-		if(!new File(GenericFile.EFORM_IMAGE_DIR).equals(file.getFileObject().getParentFile()))
-		{
-			MiscUtils.getLogger().debug("SECURITY WARNING: Illegal file path detected, client attempted to navigate away from the file directory");
-			throw new FileNotFoundException("Could not open file " + fileName + ".  Check the file path");
-		}
 
 		String contentType;
 		try

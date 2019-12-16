@@ -66,7 +66,7 @@ public class GenericFile
 	public static final String DOCUMENT_BASE_DIR = props.getProperty("DOCUMENT_DIR");
 	public static final String DOCUMENT_ORIGINAL_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_ORIGINAL_DIR")).getPath();
 	public static final String DOCUMENT_CORRUPT_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_CORRUPT_DIR")).getPath();
-	public static final String EFORM_IMAGE_DIR = props.getProperty("EFORM_IMAGE_FOLDER");
+	public static final String EFORM_IMAGE_DIR = props.getProperty("eform_image");
 	public static final String OUTBOUND_FAX_DIR_PENDING = props.getProperty("fax_file_location");
 	public static final String OUTBOUND_FAX_DIR_SENT = new File(OUTBOUND_FAX_DIR_PENDING, "sent").getPath();
 	public static final String OUTBOUND_FAX_DIR_UNSENT = new File(OUTBOUND_FAX_DIR_PENDING, "unsent").getPath();
@@ -85,6 +85,7 @@ public class GenericFile
 	// validation info
 	protected boolean hasBeenValidated;
 	protected boolean isValid;
+	protected boolean 	restrictContentType = true;
 	protected String reasonInvalid;
 	protected String invalidContentType;
 
@@ -180,11 +181,6 @@ public class GenericFile
 		}
 	}
 
-	public boolean exists() throws IOException
-	{
-		return javaFile.exists();
-	}
-
 	/**
 	 * replace the contents of the file with those of the new file.
 	 * This performs a move operation
@@ -234,6 +230,14 @@ public class GenericFile
 	public String getInvalidContentType()
 	{
 		return this.invalidContentType;
+	}
+	public boolean getRestrictContentType()
+	{
+		return this.restrictContentType;
+	}
+	public void setRestrictContentType(boolean restrictContentType)
+	{
+		this.restrictContentType = restrictContentType;
 	}
 
 	/**
