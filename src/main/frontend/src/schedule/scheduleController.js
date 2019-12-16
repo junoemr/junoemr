@@ -1137,7 +1137,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 			else if ($target.is(".onclick-event-telehealth"))
 			{
-				console.log("initiate telehealth appt (schedule)");
 				controller.openTelehealthLink(calEvent);
 			}
 			else
@@ -1405,8 +1404,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				events: $scope.events,
 				eventData: calEventData
 			};
-
-			console.log(data.eventData);
 
 			$scope.dialog = $uibModal.open({
 				animation: false,
