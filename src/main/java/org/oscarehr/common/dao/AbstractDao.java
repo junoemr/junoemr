@@ -430,7 +430,19 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 			explain.setKey((String) result[5]);
 			explain.setKeyLen((String) result[6]);
 			explain.setRef((String) result[7]);
-			explain.setRows((BigInteger) result[8]);
+
+			// MariaDB 10.1 and 10.4 return the rows column of the explain result as different
+			// data types.  This detects the type and sets the value appropriately.
+			Object rows = result[8];
+			if(rows.getClass().equals(String.class))
+			{
+				explain.setRows(new BigInteger((String) rows));
+			}
+			else if(rows.getClass().equals(BigInteger.class))
+			{
+				explain.setRows((BigInteger)rows);
+			}
+
 			explain.setExtra((String) result[9]);
 
 			results.add(explain);
