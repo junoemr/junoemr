@@ -27,38 +27,25 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
-// Deserialize dates in format yyyy-MM-dd without time zone.
-public class DateDeserializer extends StdDeserializer<Date>
+public class ZonedLocalDateTimeStringDeserializer extends StdDeserializer<ZonedDateTime>
 {
-	private SimpleDateFormat formatter =
-					new SimpleDateFormat("yyyy-MM-dd");
-
-	public DateDeserializer()
+	protected ZonedLocalDateTimeStringDeserializer()
 	{
 		this(null);
 	}
 
-	public DateDeserializer(Class<?> vc)
+	protected ZonedLocalDateTimeStringDeserializer(Class<ZonedDateTime> t)
 	{
-		super(vc);
+		super(t);
 	}
 
 	@Override
-	public Date deserialize(JsonParser jsonparser, DeserializationContext context)
-					throws IOException
+	public ZonedDateTime deserialize(JsonParser jsonparser, DeserializationContext context)
+			throws IOException
 	{
-		String date = jsonparser.getText();
-		try
-		{
-			return formatter.parse(date);
-		}
-		catch(ParseException e)
-		{
-			throw new RuntimeException(e);
-		}
+		return ZonedDateTime.parse(jsonparser.getText(), DateTimeFormatter.ISO_DATE_TIME);
 	}
 }

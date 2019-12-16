@@ -31,11 +31,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppointmentService extends BaseService
 {
-	public boolean updateAppointmentCache(IntegrationData integrationData, AppointmentCacheTo1 appointmentTransfer)
+	public void updateAppointmentCache(IntegrationData integrationData, AppointmentCacheTo1 appointmentTransfer)
 	{
 		String endpoint = "/clinic/%s/appointment/%s/cache";
 
-		Boolean response = false;
 		String apiKey = integrationData.getClinicApiKey();
 		String clinicId = integrationData.getIntegration().getRemoteId();
 		String appointmentId = appointmentTransfer.getId();
@@ -43,12 +42,15 @@ public class AppointmentService extends BaseService
 		try
 		{
 			endpoint = formatEndpoint(endpoint, clinicId, appointmentId);
-			response = put(endpoint, apiKey, appointmentTransfer, Boolean.class);
+			Boolean response = put(endpoint, apiKey, appointmentTransfer, Boolean.class);
+			if(!response)
+			{
+				throw new RuntimeException("Got bad response status: " + response);
+			}
 		}
 		catch (BaseException e)
 		{
 			ErrorHandler.handleError(e);
 		}
-		return response;
 	}
 }

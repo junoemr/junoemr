@@ -25,8 +25,10 @@ package org.oscarehr.integration.myhealthaccess.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import oscar.util.Jackson.ZonedLocalDateTimeStringDeserializer;
 import oscar.util.Jackson.ZonedLocalDateTimeStringSerializer;
 
 import java.io.Serializable;
@@ -47,10 +49,12 @@ public class AppointmentCacheTo1 implements Serializable
 
 	@JsonProperty("start_datetime")
 	@JsonSerialize(using = ZonedLocalDateTimeStringSerializer.class)
+	@JsonDeserialize(using = ZonedLocalDateTimeStringDeserializer.class)
 	private ZonedDateTime startDateTime;
 
 	@JsonProperty("end_datetime")
 	@JsonSerialize(using = ZonedLocalDateTimeStringSerializer.class)
+	@JsonDeserialize(using = ZonedLocalDateTimeStringDeserializer.class)
 	private ZonedDateTime endDateTime;
 
 	public String getId()

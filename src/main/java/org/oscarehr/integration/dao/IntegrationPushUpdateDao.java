@@ -20,45 +20,34 @@
  * Victoria, British Columbia
  * Canada
  */
-package oscar.util.Jackson;
+package org.oscarehr.integration.dao;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.integration.model.IntegrationPushUpdate;
+import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import javax.persistence.Query;
+import java.util.List;
 
-// Deserialize dates in format yyyy-MM-dd without time zone.
-public class DateDeserializer extends StdDeserializer<Date>
+@Repository
+public class IntegrationPushUpdateDao extends AbstractDao<IntegrationPushUpdate>
 {
-	private SimpleDateFormat formatter =
-					new SimpleDateFormat("yyyy-MM-dd");
-
-	public DateDeserializer()
+	protected IntegrationPushUpdateDao()
 	{
-		this(null);
+		super(IntegrationPushUpdate.class);
 	}
 
-	public DateDeserializer(Class<?> vc)
+	public List<IntegrationPushUpdate> findQueued(String integrationType)
 	{
-		super(vc);
-	}
+		Query query = entityManager.createQuery(
+				"SELECT x FROM IntegrationPushUpdate x " +
+						"WHERE x.status = :status " +
+						"AND x.integrationType = :integrationType " +
+						"ORDER BY x.id");
 
-	@Override
-	public Date deserialize(JsonParser jsonparser, DeserializationContext context)
-					throws IOException
-	{
-		String date = jsonparser.getText();
-		try
-		{
-			return formatter.parse(date);
-		}
-		catch(ParseException e)
-		{
-			throw new RuntimeException(e);
-		}
+		query.setParameter("status", IntegrationPushUpdate.PUSH_STATUS.QUEUED);
+		query.setParameter("integrationType", integrationType);
+
+		return query.getResultList();
 	}
 }

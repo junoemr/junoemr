@@ -23,6 +23,7 @@
 
 package org.oscarehr.telehealth.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.model.Integration;
@@ -36,6 +37,7 @@ import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
+import org.oscarehr.integration.service.IntegrationPushUpdateService;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.MiscUtils;
@@ -65,6 +67,9 @@ public class MyHealthAccessService
 
 	@Autowired
 	AppointmentService appointmentService;
+
+	@Autowired
+	IntegrationPushUpdateService integrationPushUpdateService;
 
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
 	protected static final String MHA_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
@@ -145,14 +150,9 @@ public class MyHealthAccessService
 		return integrationData;
 	}
 
-	public boolean updateAppointmentCache(IntegrationData integrationData, AppointmentCacheTo1 appointmentTransfer)
+	public void updateAppointmentCache(Appointment appointment) throws InvalidIntegrationException, JsonProcessingException
 	{
-		return appointmentService.updateAppointmentCache(integrationData, appointmentTransfer);
-	}
-
-	public boolean updateAppointmentCache(Appointment appointment) throws InvalidIntegrationException
-	{
-		String siteName = appointment.getLocation();
+		String siteName = (oscarProps.isMultisiteEnabled()) ? appointment.getLocation() : null;
 		Integration integration = integrationService.findMhaIntegration(siteName);
 
 		if (integration == null)
@@ -167,8 +167,6 @@ public class MyHealthAccessService
 			throw new InvalidIntegrationException(noIntegrationError);
 		}
 
-		IntegrationData integrationData = new IntegrationData(integration);
-
 		AppointmentCacheTo1 transfer = new AppointmentCacheTo1();
 		transfer.setId(String.valueOf(appointment.getId()));
 		transfer.setCanceled(appointment.getAppointmentStatus().equals(Appointment.CANCELLED));
@@ -176,17 +174,17 @@ public class MyHealthAccessService
 		transfer.setStartDateTime(ConversionUtils.toZonedDateTime(appointment.getStartTimeAsFullDate()));
 		transfer.setEndDateTime(ConversionUtils.toZonedDateTime(appointment.getEndTimeAsFullDate()));
 
-		return updateAppointmentCache(integrationData, transfer);
+		integrationPushUpdateService.queueAppointmentCacheUpdate(integration, transfer);
+		integrationPushUpdateService.sendQueuedUpdates();
 	}
 
 	public void queueAppointmentCacheUpdate(Appointment appointment)
 	{
-		// TODO - implement asynchronus queue system similar to faxing
 		try
 		{
 			updateAppointmentCache(appointment);
 		}
-		catch(InvalidIntegrationException e)
+		catch(Exception e)
 		{
 			MiscUtils.getLogger().error("MHA Update Error", e);
 		}
