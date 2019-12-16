@@ -36,6 +36,7 @@ import org.oscarehr.util.MiscUtils;
 import oscar.oscarDemographic.data.DemographicData;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
+import oscar.oscarEncounter.oscarMeasurements.pageUtil.MeasurementGraphAction2;
 
 /**
  *
@@ -125,7 +126,15 @@ public class MeasurementDSHelper {
         log.debug("dataAsDouble");
         double ret = -1;
         try{
-           ret = Double.parseDouble(mdb.getDataField());
+            double[] mdbDataFieldRange = MeasurementGraphAction2.getParameters(mdb.getDataField(), "");
+            if (mdbDataFieldRange == null || mdbDataFieldRange.length < 1)
+            {
+                log.debug("Error passing measurement value to chart. DataField is empty for ID: " + mdb.getId());
+            }
+            else
+            {
+                ret = mdbDataFieldRange[0];
+            }
         }catch(Exception e){
             MiscUtils.getLogger().error("Error", e);
             problem =true;
