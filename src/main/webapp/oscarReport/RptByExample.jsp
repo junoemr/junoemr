@@ -140,6 +140,7 @@ function write2TextArea()
 	</script>
 	<head>
 		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+		<script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
 		<title><bean:message
 				key="oscarReport.RptByExample.MsgQueryByExamples"/></title>
 		<link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"/>
@@ -178,6 +179,15 @@ function write2TextArea()
 				padding: 8px;
 			}
 		</style>
+		<script type="text/javascript">
+			// disable submit button, display please wait, and submit form.
+			function onSubmit(event)
+			{
+				event.target.disabled='true';
+				$('#results-area').html('<h2>Please Wait...</h2>');
+				return true;
+			}
+		</script>
 	</head>
 
 <body vlink="#0000FF" class="BodyStyle">
@@ -248,12 +258,12 @@ function write2TextArea()
 						onClick="write2TextArea(); return false;"></td>
 				</tr>
 				<tr>
-					<td><input type="button" value="Query" onclick="submit();" />
+					<td><input type="submit" value="Query" onclick="onSubmit(event);" />
 					</td>
 				</tr>
 				<tr></tr>
 				<tr>
-					<td><logic:present name="results">
+					<td id="results-area"><logic:present name="results">
 						<bean:write name="results" filter="false" />
 					</logic:present></td>
 				</tr>
