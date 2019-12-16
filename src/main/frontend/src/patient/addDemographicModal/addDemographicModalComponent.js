@@ -29,7 +29,7 @@ angular.module('Patient').component('addDemographicModal', {
 		ctrl.provincesCA = staticDataService.getCanadaProvinces();
 		ctrl.newDemographicData = {};
 
-		$scope.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
+		ctrl.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
 			'../ws/rs');
 
 		// personal data
@@ -74,7 +74,7 @@ angular.module('Patient').component('addDemographicModal', {
 		);
 
 		// Pull phone prefix from Oscar Properties file
-		$scope.systemPreferenceApi.getPropertyValue("phoneprefix", "").then(
+		ctrl.systemPreferenceApi.getPropertyValue("phoneprefix", "").then(
 			function success(results)
 			{
 				ctrl.newDemographicData.phone = results.data.body;
@@ -86,7 +86,7 @@ angular.module('Patient').component('addDemographicModal', {
 		);
 
 		// Pull default province, priority is user defined property then system-wide default HC if no property set
-		$scope.systemPreferenceApi.getPreferenceValue("HC_Type", "").then(
+		ctrl.systemPreferenceApi.getPreferenceValue("HC_Type", "").then(
 			function success(results)
 			{
 				if (results.data.body !== "")
@@ -95,7 +95,7 @@ angular.module('Patient').component('addDemographicModal', {
 				}
 				else
 				{
-					$scope.systemPreferenceApi.getPropertyValue("hctype", "BC").then(
+					ctrl.systemPreferenceApi.getPropertyValue("hctype", "BC").then(
 						function success(results)
 						{
 							ctrl.newDemographicData.address.province = results.data.body;
@@ -182,7 +182,6 @@ angular.module('Patient').component('addDemographicModal', {
 		{
 			if (ctrl.validateDemographic())
 			{
-				ctrl.newDemographicData.dateOfBirth += "T00:00:00" + Juno.Common.Util.getUserISOTimezoneOffset();
 				demographicService.saveDemographic(ctrl.newDemographicData).then(
 					function success(results)
 					{

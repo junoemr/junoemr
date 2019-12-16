@@ -1241,7 +1241,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			if (calEvent.data.demographicNo !== 0 && calEvent.data.virtual)
 			{
-				window.open("../telehealth/myhealthaccess.do?method=openTelehealth"
+				window.open("../integrations/myhealthaccess.do?method=connect"
 					+ "&demographicNo=" + encodeURIComponent(calEvent.data.demographicNo)
 					+ "&siteName=" + encodeURIComponent(calEvent.data.site)
 					+ "&appt=" + encodeURIComponent(calEvent.data.appointmentNo), "_blank");

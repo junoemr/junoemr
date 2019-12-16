@@ -30,6 +30,26 @@ Juno.Common.Util.isBlank = function isBlank(object) {
 	return !Juno.Common.Util.exists(object) || object === "";
 };
 
+// convert a string in to a boolean
+Juno.Common.Util.parseBoolean = function (str)
+{
+	let trueValues = ["on", "yes", "true", "enabled"];
+	let falseValues = ["off", "no", "false", "disabled"];
+
+	if (str !== null && trueValues.includes(str))
+	{
+		return true
+	}
+	else if (str === null || falseValues.includes(str))
+	{
+		return false
+	}
+	else
+	{
+		throw "Invalid Argument, [" + str + "] not one of, " + trueValues + ", " + falseValues;
+	}
+};
+
 Juno.Common.Util.toArray = function toArray(obj) { //convert single object to array
 	if (obj instanceof Array) return obj;
 	else if (obj == null) return [];
@@ -314,4 +334,20 @@ Juno.Common.Util.trimToLength = function trimToLength(string, maxLength)
 		shortString = shortString.substring(0, maxLength);
 	}
 	return shortString;
+};
+
+// create a promise that resolves when the provided window is closed
+Juno.Common.Util.windowClosedPromise = function (popup)
+{
+	return new Promise(function (resolve, reject)
+	{
+		let interId = window.setInterval(function()
+		{
+			if (popup.closed)
+			{
+				resolve(true);
+				window.clearInterval(interId);
+			}
+		}, 500);
+	});
 };

@@ -37,11 +37,14 @@
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="oscar.OscarProperties" %>
+<%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
 
- 
+
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%
+	SystemPreferenceService systemPreferenceService = (SystemPreferenceService) SpringUtils.getBean(SystemPreferenceService.class);
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 
     oscar.oscarEncounter.pageUtil.EctSessionBean bean = null;
@@ -121,7 +124,7 @@
 		{%>
             <%=bean.patientBirthdate%>
         <%}%>
-        &nbsp;<oscar:phrverification demographicNo="<%=demoNo%>"><bean:message key="phr.verification.link"/></oscar:phrverification> &nbsp;<%=bean.phone%> 
+        &nbsp;<oscar:phrverification demographicNo="<%=demoNo%>"><bean:message key="phr.verification.link"/></oscar:phrverification> &nbsp;<%=StringUtils.trimToEmpty(bean.phone)%>
 		<span id="encounterHeaderExt"></span>
 		<security:oscarSec roleName="<%=roleName$%>" objectName="_newCasemgmt.apptHistory" rights="r">
 		<a href="javascript:popupPage(400,850,'ApptHist','<c:out value="${ctx}"/>/demographic/demographiccontrol.jsp?demographic_no=<%=bean.demographicNo%>&amp;last_name=<%=bean.patientLastName.replaceAll("'", "\\\\'")%>&amp;first_name=<%=bean.patientFirstName.replaceAll("'", "\\\\'")%>&amp;orderby=appointment_date&amp;displaymode=appt_history&amp;dboperation=appt_history&amp;limit1=0&amp;limit2=25')" style="font-size: 11px;text-decoration:none;" title="<bean:message key="oscarEncounter.Header.nextApptMsg"/>"><span style="margin-left:20px;"><bean:message key="oscarEncounter.Header.nextAppt"/>: <oscar:nextAppt demographicNo="<%=bean.demographicNo%>"/></span></a>
@@ -184,14 +187,21 @@
 </td>
 <td align=right>
 	<span class="HelpAboutLogout">
-	<oscar:help keywords="&Title=Chart+Interface&portal_type%3Alist=Document" key="app.top1" style="font-size:10px;font-style:normal;"/>&nbsp;|
-	<a style="font-size:10px;font-style:normal;" href="<%=request.getContextPath()%>/oscarEncounter/About.jsp" target="_new"><bean:message key="global.about" /></a>
+		<%
+			if (systemPreferenceService.isPreferenceEnabled(UserProperty.CARE_CONNECT_ENABLED, false))
+			{
+		%>
+				<a style="font-size:10px;font-style:normal;"  href="javascript:void(0)" onclick="window.open('../integration/careConnect/careConnectForm.jsp?demoNo=' + '<%=demoNo%>', 'CareConnectPopup', 'width=1200,height=800');">CareConnect</a> |
+		<%
+			}
+		%>
+		<oscar:help keywords="&Title=Chart+Interface&portal_type%3Alist=Document" key="app.top1" style="font-size:10px;font-style:normal;"/>&nbsp;|
+		<a style="font-size:10px;font-style:normal;" href="<%=request.getContextPath()%>/oscarEncounter/About.jsp" target="_new"><bean:message key="global.about" /></a>
 	</span>
 </td>
 </tr>
 </table>
 </div>
-
 <%!
 
 String getEChartLinks(){

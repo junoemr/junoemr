@@ -34,6 +34,8 @@
 <%@page	import="org.oscarehr.common.model.UserProperty,org.oscarehr.util.EncounterUtil,org.oscarehr.util.MiscUtils,oscar.OscarProperties,oscar.dms.EDoc,oscar.dms.EDocUtil,oscar.oscarRx.data.RxPrescriptionData,oscar.util.DateUtils,java.text.ParseException,java.text.SimpleDateFormat,java.util.ArrayList,java.util.Calendar"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.util.Enumeration,java.util.Iterator "%>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <%
     String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -481,7 +483,10 @@ int maxId = 0;
 
 		                    if(rx!=null)
 	       		            {
-	               		        String url="popupPage(700,800,'" + hash + "', '" + request.getContextPath() + "/oscarRx/StaticScript2.jsp?demographicNo=" + rx.getDemographicNo() + "&regionalIdentifier="+rx.getRegionalIdentifier()+"&cn="+response.encodeURL(rx.getCustomName())+"');";
+	               		        String url="popupPage(700,800,'" + hash + "', '" +
+																		request.getContextPath() + "/oscarRx/StaticScript2.jsp?demographicNo=" +
+																		rx.getDemographicNo() + "&regionalIdentifier="+rx.getRegionalIdentifier()+
+																		"&cn="+ URLEncoder.encode(StringUtils.trimToEmpty(rx.getCustomName()))+"');";
 		                        %>
 		                        	<a class="links" title="<%=rx.getSpecial()%>" id="view<%=globalNoteId%>" href="javascript:void(0);" onclick="<%=url%>" style="float: right; margin-right: 5px; font-size: 10px;"> <bean:message key="oscarEncounter.view.rxView" /> </a>
 		                        <%

@@ -326,12 +326,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					}
 
 					// refresh the main note list
-					if(angular.isFunction(controller.noteListComponentRefreshFunction))
-					{
-						controller.noteListComponentRefreshFunction();
-					}
-					getLeftItems();
-					getRightItems();
+					controller.refreshModel();
 				},
 				function dismiss(reason)
 				{
@@ -342,6 +337,26 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				}
 			);
 		};
+
+		// refresh the data model for the page
+		controller.refreshModel = function()
+		{
+			// refresh the main note list
+			if(angular.isFunction(controller.noteListComponentRefreshFunction))
+			{
+				controller.noteListComponentRefreshFunction();
+			}
+			getLeftItems();
+			getRightItems();
+		};
+
+		$scope.$on('summary_page_refresh', function (refresh)
+		{
+			if (refresh)
+			{
+				controller.refreshModel();
+			}
+		});
 
 		//TODO I would really like to refactor this out
 		controller.gotoState = function gotoState(item, mod, successCallback, dismissCallback)
@@ -384,7 +399,17 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 			else if (item.type === 'eform')
 			{
-				formService.openEFormInstancePopup($stateParams.demographicNo, item.id);
+				formService.openEFormInstancePopup($stateParams.demographicNo, item.id).then(function (val)
+				{
+					controller.refreshModel();
+				});
+			}
+			else if (item.type === 'form')
+			{
+				formService.openFormInstancePopup(item.displayName, $stateParams.demographicNo, null, item.id).then(function (val)
+				{
+					controller.refreshModel();
+				});
 			}
 			else if (item.action == 'action')
 			{

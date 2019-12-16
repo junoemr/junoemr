@@ -93,116 +93,116 @@
 <%!
 
 
-	private boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
-	private HashMap<String,String> siteBgColor = new HashMap<String,String>();
-	private boolean isClinicaid = OscarProperties.getInstance().isClinicaidBillingType();
-	private static final String SCHEDULE_VIEW = "0";
-	private static final String ALL_VIEW = "1";
+private boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
+private HashMap<String,String> siteBgColor = new HashMap<String,String>();
+private boolean isClinicaid = OscarProperties.getInstance().isClinicaidBillingType();
+private static final String SCHEDULE_VIEW = "0";
+private static final String ALL_VIEW = "1";
 
-	public boolean isWeekView(ServletRequest request)
-	{
-		String provNum = request.getParameter("provider_no");
+public boolean isWeekView(ServletRequest request)
+{
+	String provNum = request.getParameter("provider_no");
 
-		if (provNum == null) {
-			return false;
-		}
-
-		return true;
-	}
-
-	public boolean checkRestriction(List<MyGroupAccessRestriction> restrictions, String name)
-	{
-		for(MyGroupAccessRestriction restriction:restrictions)
-		{
-			if(restriction.getMyGroupNo().equals(name))
-			{
-				return true;
-			}
-		}
+	if (provNum == null) {
 		return false;
 	}
 
-	private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, String currentProvider,
-								  String currentProviderName, String providerNo, String viewAll) throws UnsupportedEncodingException
+	return true;
+}
+
+public boolean checkRestriction(List<MyGroupAccessRestriction> restrictions, String name)
+{
+	for(MyGroupAccessRestriction restriction:restrictions)
 	{
-		String viewString = "0";
-		if(view != 0)
+		if(restriction.getMyGroupNo().equals(name))
 		{
-			viewString = "1&curProvider=" + currentProvider + "&curProviderName="+URLEncoder.encode(currentProviderName,"UTF-8");
+			return true;
 		}
+	}
+	return false;
+}
 
-		String providerString = "";
-		if(isWeekView)
-		{
-			providerString = "&provider_no=" + providerNo;
-		}
-
-		return "providercontrol.jsp?" +
-				"year=" + date.getYear() +
-				"&month=" + date.getMonthValue() +
-				"&day=" + date.getDayOfMonth() +
-				"&view=" + viewString +
-				"&displaymode=day" +
-				"&dboperation=searchappointmentday" +
-				providerString +
-				"&viewall=" + viewAll;
+private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, String currentProvider,
+		String currentProviderName, String providerNo, String viewAll) throws UnsupportedEncodingException
+{
+	String viewString = "0";
+	if(view != 0)
+	{
+		viewString = "1&curProvider=" + currentProvider + "&curProviderName="+URLEncoder.encode(currentProviderName,"UTF-8");
 	}
 
-	private LocalTime cleanLocalTime(int hour)
+	String providerString = "";
+	if(isWeekView)
 	{
-		if(hour < 0)
-		{
-			return LocalTime.of(0, 0);
-		}
-
-		if(hour >= 24)
-		{
-			return LocalTime.MAX;
-		}
-
-		return LocalTime.of(hour, 0);
+		providerString = "&provider_no=" + providerNo;
 	}
 
-	private LocalTime plusNoWrap(LocalTime time, int slotLengthInMinutes)
+	return "providercontrol.jsp?" +
+			"year=" + date.getYear() +
+			"&month=" + date.getMonthValue() +
+			"&day=" + date.getDayOfMonth() +
+			"&view=" + viewString +
+			"&displaymode=day" +
+			"&dboperation=searchappointmentday" +
+			providerString +
+			"&viewall=" + viewAll;
+}
+
+private LocalTime cleanLocalTime(int hour)
+{
+	if(hour < 0)
 	{
-		LocalTime outTime = time.plusMinutes(slotLengthInMinutes);
-
-		if(outTime.compareTo(time) == -1 || slotLengthInMinutes >= (24*60))
-		{
-			return LocalTime.MAX;
-		}
-
-		return outTime;
+		return LocalTime.of(0, 0);
 	}
 
-	private long getAppointmentRowSpan(
-			LocalTime appointmentEndTime,
-			LocalTime slotEndTime,
-			int slotLengthInMinutes,
-			LocalTime scheduleEndTime
-	)
+	if(hour >= 24)
 	{
-		// Always going to be at least one slot
-		long appointmentRowSpan = 1;
-
-		// If the schedule ends before the appointment, chop off the appointment
-		LocalTime endTime = appointmentEndTime;
-		if(scheduleEndTime.isBefore(endTime))
-		{
-			endTime = scheduleEndTime;
-		}
-
-		if(endTime.isAfter(slotEndTime))
-		{
-			// Get the amount of time remaining after the first slot
-			long additionalMinutes = slotEndTime.until(endTime, ChronoUnit.MINUTES);
-
-			// count the number of additional slots that takes up
-			appointmentRowSpan += (long) Math.ceil((double) additionalMinutes / slotLengthInMinutes);
-		}
-
-		return appointmentRowSpan;
+		return LocalTime.MAX;
 	}
+
+	return LocalTime.of(hour, 0);
+}
+
+private LocalTime plusNoWrap(LocalTime time, int slotLengthInMinutes)
+{
+	LocalTime outTime = time.plusMinutes(slotLengthInMinutes);
+
+	if(outTime.compareTo(time) == -1 || slotLengthInMinutes >= (24*60))
+	{
+		return LocalTime.MAX;
+	}
+
+	return outTime;
+}
+
+private long getAppointmentRowSpan(
+	LocalTime appointmentEndTime,
+	LocalTime slotEndTime,
+	int slotLengthInMinutes,
+	LocalTime scheduleEndTime
+)
+{
+	// Always going to be at least one slot
+	long appointmentRowSpan = 1;
+
+	// If the schedule ends before the appointment, chop off the appointment
+	LocalTime endTime = appointmentEndTime;
+	if(scheduleEndTime.isBefore(endTime))
+	{
+		endTime = scheduleEndTime;
+	}
+
+	if(endTime.isAfter(slotEndTime))
+	{
+		// Get the amount of time remaining after the first slot
+		long additionalMinutes = slotEndTime.until(endTime, ChronoUnit.MINUTES);
+
+		// count the number of additional slots that takes up
+		appointmentRowSpan += (long) Math.ceil((double) additionalMinutes / slotLengthInMinutes);
+	}
+
+	return appointmentRowSpan;
+}
 
 
 
@@ -235,19 +235,19 @@
 	String selectedSite = null;
 
 	// XXX: convert these to java queries
-%>
-<security:oscarSec objectName="_site_access_privacy" roleName="<%=roleName$%>" rights="r" reverse="false">
+	%>
+	<security:oscarSec objectName="_site_access_privacy" roleName="<%=roleName$%>" rights="r" reverse="false">
 	<%
 		isSiteAccessPrivacy=true;
 	%>
-</security:oscarSec>
+	</security:oscarSec>
 
-<security:oscarSec objectName="_team_access_privacy" roleName="<%=roleName$%>" rights="r" reverse="false">
+	<security:oscarSec objectName="_team_access_privacy" roleName="<%=roleName$%>" rights="r" reverse="false">
 	<%
 		isTeamAccessPrivacy=true;
 	%>
-</security:oscarSec>
-<%
+	</security:oscarSec>
+	<%
 
 	if (bMultisites)
 	{
@@ -376,7 +376,7 @@
 	providerBean.clear();
 	for (Provider p : providerDao.getActiveProviders())
 	{
-		providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
+	    providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
 	}
 
 	ProviderPreference providerPreference2=(ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
@@ -388,19 +388,19 @@
 	}
 
 
-	int startHour = providerPreference2.getStartHour();
+		int startHour = providerPreference2.getStartHour();
 	int endHour = providerPreference2.getEndHour();
 	int everyMin = providerPreference2.getEveryMin();
 
 	boolean isTeamScheduleOnly = false;
-%>
-<security:oscarSec roleName="<%=roleName$%>" objectName="_team_schedule_only" rights="r"
-				   reverse="false">
+	%>
+	<security:oscarSec roleName="<%=roleName$%>" objectName="_team_schedule_only" rights="r"
+		reverse="false">
 	<%
 		isTeamScheduleOnly = true;
 	%>
-</security:oscarSec>
-<%
+	</security:oscarSec>
+	<%
 
 	int lenLimitedL=11; //L - long
 	if(OscarProperties.getInstance().getProperty("APPT_SHOW_FULL_NAME","").equalsIgnoreCase("true")) {
@@ -603,11 +603,11 @@
 		// copied from Google Analytics Snippet, adapted for Prometheus Aggregator
 		(function(i,s,o,g,r,a,m){i['PrometheusAggregatorObjectName']=r;i[r]=i[r]||function(){
 			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-				m=s.getElementsByTagName(o)[0];a.async=1;a.src=(
-				"<%=request.getContextPath()%>/js/userMetrics.js");m.parentNode.insertBefore(a,m);
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=(
+			"<%=request.getContextPath()%>/js/userMetrics.js");m.parentNode.insertBefore(a,m);
 			i[r].aggregatorServerRoot = g;
 		})(window,document,'script',
-				"<%=request.getContextPath()%>/ws/rs/user_metrics",'prometheusAggregator');
+			"<%=request.getContextPath()%>/ws/rs/user_metrics",'prometheusAggregator');
 
 		prometheusAggregator('increment', 'app_load_succeeded', { app: 'student'}, 1);
 
@@ -764,15 +764,16 @@
 
 <%
 
-	// =================================================================================================
+// =================================================================================================
 // START OF MENU BAR
 // =================================================================================================
+
 %>
 
 <table BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%" id="firstTable" class="noprint">
 	<tr>
-		<td align="center" >
-			<a href="../web/" title="OSCAR EMR"><img src="<%=request.getContextPath()%>/images/oscar_small.png" border="0"></a>
+		<td align="center" style="width: 50px">
+			<a href="../web/" title="OSCAR EMR"><img src="<%=request.getContextPath()%>/images/logo-primary.png" border="0" title="Go to Juno UI"></a>
 		</td>
 		<td id="firstMenu">
 			<ul id="navlist">
@@ -874,22 +875,22 @@
 						<script type="text/javascript">
 							function getK2AStatus(){
 								jQuery.get("../ws/rs/resources/notifications/number",
-										function (data) {
-											var returnVal = JSON.parse(data).body;
-											if (returnVal === "-") { //If user is not logged in
-												jQuery("#K2ALink").click(function () {
-													var win = window.open('../apps/oauth1.jsp?id=K2A', 'appAuth', 'width=700,height=450,scrollbars=1');
-													win.focus();
-												});
-											} else {
-												jQuery("#k2a_new_notifications").text(returnVal);
-												jQuery("#K2ALink").click(function () {
-													var win = window.open("<%=request.getContextPath()%>/web/Know2actNotifications.jsp",
-															'appAuth', 'width=450,height=700,scrollbars=1');
-													win.focus();
-												});
-											}
-										}, "json");
+									function (data) {
+										var returnVal = JSON.parse(data).body;
+										if (returnVal === "-") { //If user is not logged in
+											jQuery("#K2ALink").click(function () {
+												var win = window.open('../apps/oauth1.jsp?id=K2A', 'appAuth', 'width=700,height=450,scrollbars=1');
+												win.focus();
+											});
+										} else {
+											jQuery("#k2a_new_notifications").text(returnVal);
+											jQuery("#K2ALink").click(function () {
+												var win = window.open("<%=request.getContextPath()%>/web/Know2actNotifications.jsp",
+													'appAuth', 'width=450,height=700,scrollbars=1');
+												win.focus();
+											});
+										}
+									}, "json");
 							}
 							getK2AStatus();
 						</script>
@@ -897,7 +898,7 @@
 				</c:if>
 				<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
 					<li id="admin2">
-						<a href="../telehealth/myhealthaccess.do?method=openTelehealth&siteName=<%= selectedSite != null ? selectedSite : "" %>"
+						<a href="../integrations/myhealthaccess.do?method=connectOrList"
 						   id="myhealthaccess"
 						   title='MyHealthAccess'
 						   target="_blank">MyHealthAccess</a>
@@ -912,20 +913,20 @@
 
 					<security:oscarSec roleName="<%=roleName$%>" objectName="_dashboardDisplay" rights="r">
 						<oscar:oscarPropertiesCheck property="enable_dashboards" value="true">
-							<oscar:oscarPropertiesCheck property="instance_type" value="BC">
-								<li id="dashboardList">
-									<div class="dropdown">
-										<a href="#" class="dashboardBtn">Dashboard</a>
-										<div class="dashboardDropdown">
-											<c:forEach items="${ menuBarController.dashboards }" var="dashboard" >
-												<a href="javascript:void(0)" onclick="newWindow('<%=request.getContextPath()%>/web/dashboard/display/DashboardDisplay.do?method=getDashboard&dashboardId=${ dashboard.id }','admin')">
-													<c:out value="${ dashboard.name }" />
-												</a>
-											</c:forEach>
-										</div>
+						<oscar:oscarPropertiesCheck property="instance_type" value="BC">
+							<li id="dashboardList">
+								<div class="dropdown">
+									<a href="#" class="dashboardBtn">Dashboard</a>
+									<div class="dashboardDropdown">
+										<c:forEach items="${ menuBarController.dashboards }" var="dashboard" >
+											<a href="javascript:void(0)" onclick="newWindow('<%=request.getContextPath()%>/web/dashboard/display/DashboardDisplay.do?method=getDashboard&dashboardId=${ dashboard.id }','admin')">
+												<c:out value="${ dashboard.name }" />
+											</a>
+										</c:forEach>
 									</div>
-								</li>
-							</oscar:oscarPropertiesCheck>
+								</div>
+							</li>
+						</oscar:oscarPropertiesCheck>
 						</oscar:oscarPropertiesCheck>
 					</security:oscarSec>
 
@@ -966,7 +967,7 @@
 
 
 		<td align="right" valign="bottom" >
-			<span>New!</span>
+
 			<a href="javascript: function myFunction() {return false; }" onClick="popup(700,1024,'../scratch/index.jsp','scratch')"><span id="oscar_scratch"></span></a>&nbsp;
 
 			<a href=# onClick="popupPage(700,1024,'<%=resourceBaseUrl%>')">
@@ -984,7 +985,7 @@
 
 <%
 
-	// =================================================================================================
+// =================================================================================================
 // END OF MENU BAR
 // =================================================================================================
 
@@ -1038,15 +1039,15 @@
 				&nbsp;&nbsp;<img src="../images/previous.gif" WIDTH="10" HEIGHT="9" BORDER="0" class="noprint" ALT="<bean:message key="provider.appointmentProviderAdminDay.viewPrevDay"/>" vspace="2"></a>
 			<b><span class="dateAppointment">
 				<%
-					if (isWeekView(request))
-					{
-				%><bean:message key="provider.appointmentProviderAdminDay.week"/> <%=week%><%
-			}
-			else
-			{
-			%><%=formatDate%><%
+				if (isWeekView(request))
+				{
+					%><bean:message key="provider.appointmentProviderAdminDay.week"/> <%=week%><%
 				}
-			%>
+				else
+				{
+					%><%=formatDate%><%
+				}
+				%>
 			</span></b>
 			<a class="redArrow" href="<%= nextScheduleUrl %>">
 				<img src="../images/next.gif" WIDTH="10" HEIGHT="9" BORDER="0" class="noprint" ALT="<bean:message key="provider.appointmentProviderAdminDay.viewNextDay"/>" vspace="2">&nbsp;&nbsp;</a>
@@ -1105,7 +1106,7 @@
 			%>
 			<bean:message key="provider.appointmentProviderAdminDay.weekView"/>: <%=curProviderName[provIndex]%>
 			<%
-					} } } else { if (view==1) {
+				} } } else { if (view==1) {
 			%>
 			<a href='providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>'><bean:message key="provider.appointmentProviderAdminDay.grpView"/></a>
 			<% } else { %>
@@ -1124,7 +1125,7 @@
 			</caisi:isModuleLoad>
 
 			<form name="appointmentForm" style="display:inline;margin:0px;padding:0px;">
-					<%
+				<%
 					if (isWeekView(request))
 					{
 				%>
@@ -1148,111 +1149,111 @@
 
 				<!-- caisi infirmary view extension add ffffffffffff-->
 
-				<caisi:isModuleLoad moduleName="oscarClinic">
+					<caisi:isModuleLoad moduleName="oscarClinic">
 						<%
 							session.setAttribute("infirmaryView_isOscar", "true");
 						%>
-				</caisi:isModuleLoad>
-				<!-- caisi infirmary view extension add end ffffffffffffff-->
+					</caisi:isModuleLoad>
+					<!-- caisi infirmary view extension add end ffffffffffffff-->
 
 
-				<logic:notEqual name="infirmaryView_isOscar" value="false">
+					<logic:notEqual name="infirmaryView_isOscar" value="false">
 
 						<%
 							//session.setAttribute("case_program_id", null);
 						%>
-				<!--  multi-site , add site dropdown list -->
+						<!--  multi-site , add site dropdown list -->
 						<%
 							if (bMultisites) {
 						%>
-				<script>
-					function changeSite(sel) {
-						sel.style.backgroundColor=sel.options[sel.selectedIndex].style.backgroundColor;
-						var siteName = sel.options[sel.selectedIndex].value;
+						<script>
+							function changeSite(sel) {
+								sel.style.backgroundColor=sel.options[sel.selectedIndex].style.backgroundColor;
+								var siteName = sel.options[sel.selectedIndex].value;
 
-						jQuery.ajax({
-							url: 'updateSite.jsp?site=' + siteName,
-							success: function(result)
-							{
-								location.reload();
+								jQuery.ajax({
+									url: 'updateSite.jsp?site=' + siteName,
+									success: function(result)
+									{
+										location.reload();
+									}
+								});
 							}
-						});
-					}
-				</script>
+						</script>
 
-				<select id="site" name="site" onchange="changeSite(this)" style="background-color: <%=( selectedSite == null || siteBgColor.get(selectedSite) == null ? "#FFFFFF" : siteBgColor.get(selectedSite))%>">
-					<option value="none" style="background-color:white">---all clinic---</option>
-					<%
-						for (int i=0; i<curUserSites.size(); i++) {
-					%>
-					<option value="<%=curUserSites.get(i).getName()%>" style="background-color:<%=curUserSites.get(i).getBgColor()%>"
-							<%=(curUserSites.get(i).getName().equals(selectedSite)) ? " selected " : ""%> >
-						<%=curUserSites.get(i).getName()%>
-					</option>
-					<%
-						}
-					%>
-				</select>
+						<select id="site" name="site" onchange="changeSite(this)" style="background-color: <%=( selectedSite == null || siteBgColor.get(selectedSite) == null ? "#FFFFFF" : siteBgColor.get(selectedSite))%>">
+							<option value="none" style="background-color:white">---all clinic---</option>
+							<%
+								for (int i=0; i<curUserSites.size(); i++) {
+							%>
+							<option value="<%=curUserSites.get(i).getName()%>" style="background-color:<%=curUserSites.get(i).getBgColor()%>"
+									<%=(curUserSites.get(i).getName().equals(selectedSite)) ? " selected " : ""%> >
+								<%=curUserSites.get(i).getName()%>
+							</option>
+							<%
+								}
+							%>
+						</select>
 						<%
 							}
 						%>
-				<span><bean:message key="global.group"/>:</span>
+						<span><bean:message key="global.group"/>:</span>
 
 						<%
 							List<MyGroupAccessRestriction> restrictions = myGroupAccessRestrictionDao.findByProviderNo(curUser_no);
 						%>
-				<select id="mygroup_no" name="mygroup_no" onChange="changeGroup(this)">
-					<option value=".<bean:message key="global.default"/>">.<bean:message key="global.default"/></option>
+						<select id="mygroup_no" name="mygroup_no" onChange="changeGroup(this)">
+							<option value=".<bean:message key="global.default"/>">.<bean:message key="global.default"/></option>
 
 
-					<security:oscarSec roleName="<%=roleName$%>" objectName="_team_schedule_only" rights="r" reverse="false">
-						<%
-							String provider_no = curUser_no;
-							for(Provider p : providerDao.getActiveProviders()) {
-								boolean skip = checkRestriction(restrictions,p.getProviderNo());
-								if(!skip) {
-						%>
-						<option value="<%=p.getProviderNo()%>" <%=mygroupno.equals(p.getProviderNo())?"selected":""%>>
-							<%=p.getFormattedName()%></option>
-						<%
-								} }
-						%>
+							<security:oscarSec roleName="<%=roleName$%>" objectName="_team_schedule_only" rights="r" reverse="false">
+								<%
+									String provider_no = curUser_no;
+									for(Provider p : providerDao.getActiveProviders()) {
+										boolean skip = checkRestriction(restrictions,p.getProviderNo());
+										if(!skip) {
+								%>
+								<option value="<%=p.getProviderNo()%>" <%=mygroupno.equals(p.getProviderNo())?"selected":""%>>
+									<%=p.getFormattedName()%></option>
+								<%
+										} }
+								%>
 
-					</security:oscarSec>
-					<security:oscarSec roleName="<%=roleName$%>" objectName="_team_schedule_only" rights="r" reverse="true">
-						<%
-							request.getSession().setAttribute("archiveView","false");
-							for(MyGroup g : myGroupDao.searchmygroupno()) {
+							</security:oscarSec>
+							<security:oscarSec roleName="<%=roleName$%>" objectName="_team_schedule_only" rights="r" reverse="true">
+								<%
+									request.getSession().setAttribute("archiveView","false");
+									for(MyGroup g : myGroupDao.searchmygroupno()) {
 
-								boolean skip = checkRestriction(restrictions,g.getId().getMyGroupNo());
+										boolean skip = checkRestriction(restrictions,g.getId().getMyGroupNo());
 
-								if (!skip && (!bMultisites || siteGroups == null || siteGroups.size() == 0 || siteGroups.contains(g.getId().getMyGroupNo()))) {
-						%>
-						<option value="<%="_grp_"+g.getId().getMyGroupNo()%>"
-								<%=mygroupno.equals(g.getId().getMyGroupNo())?"selected":""%>><%=g.getId().getMyGroupNo()%></option>
-						<%
-								}
-							}
+										if (!skip && (!bMultisites || siteGroups == null || siteGroups.size() == 0 || siteGroups.contains(g.getId().getMyGroupNo()))) {
+								%>
+								<option value="<%="_grp_"+g.getId().getMyGroupNo()%>"
+										<%=mygroupno.equals(g.getId().getMyGroupNo())?"selected":""%>><%=g.getId().getMyGroupNo()%></option>
+								<%
+										}
+									}
 
-							for(Provider p : providerDao.getActiveProvidersByType("doctor")) {
-								boolean skip = checkRestriction(restrictions,p.getProviderNo());
+									for(Provider p : providerDao.getActiveProvidersByType("doctor")) {
+										boolean skip = checkRestriction(restrictions,p.getProviderNo());
 
-								if (!skip && (!bMultisites || siteProviderNos  == null || siteProviderNos.size() == 0 || siteProviderNos.contains(p.getProviderNo()))) {
-						%>
-						<option value="<%=p.getProviderNo()%>" <%=mygroupno.equals(p.getProviderNo())?"selected":""%>>
-							<%=p.getFormattedName()%></option>
-						<%
-								}
-							}
-						%>
-					</security:oscarSec>
-				</select>
+										if (!skip && (!bMultisites || siteProviderNos  == null || siteProviderNos.size() == 0 || siteProviderNos.contains(p.getProviderNo()))) {
+								%>
+								<option value="<%=p.getProviderNo()%>" <%=mygroupno.equals(p.getProviderNo())?"selected":""%>>
+									<%=p.getFormattedName()%></option>
+								<%
+										}
+									}
+								%>
+							</security:oscarSec>
+						</select>
 
-				</logic:notEqual>
+					</logic:notEqual>
 
-				<logic:equal name="infirmaryView_isOscar" value="false">
-				&nbsp;&nbsp;&nbsp;&nbsp;
-				</logic:equal>
+					<logic:equal name="infirmaryView_isOscar" value="false">
+						&nbsp;&nbsp;&nbsp;&nbsp;
+					</logic:equal>
 
 					<%
 						}
@@ -1268,16 +1269,18 @@
 	<!-- ======================================================================================= -->
 
 	<%
-		boolean showApptCountForProvider = OscarProperties.getInstance().isPropertyActive("schedule.show_appointment_count");
 		List<String> countPropertiesNames = Arrays.asList(
+				UserProperty.SCHEDULE_COUNT_ENABLED,
 				UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED,
 				UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW,
 				UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
 		Map<String, UserProperty> countProperties = userPropertyDao.getProviderPropertiesAsMap(curUser_no, countPropertiesNames);
+		boolean showApptCountForProvider = countProperties.get(UserProperty.SCHEDULE_COUNT_ENABLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_ENABLED).getValue());
 		boolean countIncludeCancelled = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED).getValue());
 		boolean countIncludeNoShow = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW).getValue());
 		boolean countIncludeNoDemographic = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC).getValue());
 	%>
+
 
 	<!-- START Schedule page -->
 	<tr>
@@ -1297,10 +1300,10 @@
 
 						// Show the prevention stop signs in appointments
 						boolean enablePreventionAppointmentWarnings = (
-								!ProviderPreventionManager.isDisabled() && (
-										ProviderPreventionManager.isCreated() ||
-												OscarProperties.getInstance().isPropertyActive("SHOW_PREVENTION_STOP_SIGNS")
-								)
+							!ProviderPreventionManager.isDisabled() && (
+								ProviderPreventionManager.isCreated() ||
+								OscarProperties.getInstance().isPropertyActive("SHOW_PREVENTION_STOP_SIGNS")
+							)
 						);
 
 						ResourceSchedule resourceScheduleDTO;
@@ -1326,7 +1329,7 @@
 						if(isWeekView(request))
 						{
 							resourceScheduleDTO = scheduleService
-									.getWeekScheduleByProvider(provNum, selectedDate, selectedSite);
+								.getWeekScheduleByProvider(provNum, selectedDate, selectedSite);
 						}
 						else if(view == 1 && !StringUtils.isEmpty(curProviderNo))
 						{
@@ -1335,8 +1338,8 @@
 									(viewAllBoolean || curProviderNo.equals(curUser_no));
 
 							resourceScheduleDTO = scheduleService
-									.getResourceScheduleByProvider(curProviderNo, selectedDate,
-											selectedSite, showForSure);
+								.getResourceScheduleByProvider(curProviderNo, selectedDate,
+									selectedSite, showForSure);
 						}
 						else if(mygroupno != null && providerBean.get(mygroupno) != null)
 						{
@@ -1344,24 +1347,24 @@
 							String actuallyProviderNo = mygroupno;
 
 							boolean showForSure =
-									(viewAllBoolean || actuallyProviderNo.equals(curUser_no));
+								(viewAllBoolean || actuallyProviderNo.equals(curUser_no));
 
 							resourceScheduleDTO = scheduleService
-									.getResourceScheduleByProvider(mygroupno, selectedDate,
-											selectedSite, showForSure);
+								.getResourceScheduleByProvider(mygroupno, selectedDate,
+									selectedSite, showForSure);
 						}
 						else if(("."+ResourceBundle.getBundle("oscarResources", request.getLocale()).getString("global.default")).equals(mygroupno))
 						{
 							// Always show the schedule because it will
 							resourceScheduleDTO = scheduleService
-									.getResourceScheduleByProvider(curUser_no, selectedDate,
-											selectedSite, true);
+								.getResourceScheduleByProvider(curUser_no, selectedDate,
+									selectedSite, true);
 						}
 						else
 						{
 							resourceScheduleDTO = scheduleService
-									.getResourceScheduleByGroup(mygroupno, selectedDate, selectedSite,
-											viewAllBoolean, Integer.parseInt(curUser_no));
+								.getResourceScheduleByGroup(mygroupno, selectedDate, selectedSite,
+									viewAllBoolean, Integer.parseInt(curUser_no));
 						}
 
 						AppointmentManager appointmentManager = SpringUtils.getBean(AppointmentManager.class);
@@ -1391,10 +1394,10 @@
 							<tr><td class="infirmaryView" NOWRAP ALIGN="center" BGCOLOR="<%=headerColor?"#bfefff":"silver"%>">
 								<!-- caisi infirmary view extension modify ffffffffffff-->
 								<%
-									if (showApptCountForProvider) {
-										int appointmentCount = 0;
-										for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
-										{
+								if (showApptCountForProvider) {
+									int appointmentCount = 0;
+									for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
+									{
 
 											for(AppointmentDetails appointmentDetails : appointmentDetailsList)
 											{
@@ -1410,155 +1413,155 @@
 								%>
 								<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>
 								<%
-									}
+								}
 								%>
 								<logic:notEqual name="infirmaryView_isOscar" value="false">
 
 								<%
-									if (isWeekView(request))
-									{
-										String dayUrl = "providercontrol.jsp" +
-												"?year=" + schedule.getScheduleDate().getYear() +
-												"&month=" + schedule.getScheduleDate().getMonthValue() +
-												"&day=" + schedule.getScheduleDate().getDayOfMonth() +
-												"&view=0" +
-												"&displaymode=day" +
-												"&dboperation=searchappointmentday" +
-												"&viewall=" + viewall;
-								%>
-								<b><a href="<%= dayUrl %>">
-									<%=schedule.getScheduleDate().format(DateTimeFormatter.ofPattern("EEE, yyyy-MM-dd"))%>
-								</a></b>
-								<%
+								if (isWeekView(request))
+								{
+									String dayUrl = "providercontrol.jsp" +
+											"?year=" + schedule.getScheduleDate().getYear() +
+											"&month=" + schedule.getScheduleDate().getMonthValue() +
+											"&day=" + schedule.getScheduleDate().getDayOfMonth() +
+											"&view=0" +
+											"&displaymode=day" +
+											"&dboperation=searchappointmentday" +
+											"&viewall=" + viewall;
+									%>
+									<b><a href="<%= dayUrl %>">
+										<%=schedule.getScheduleDate().format(DateTimeFormatter.ofPattern("EEE, yyyy-MM-dd"))%>
+									</a></b>
+									<%
 								}
 								else
 								{
-								%>
-								<b style="padding: 0 5px 0 5px;">
-									<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
-									<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.searchLetter"/>" name='searchview' onClick=goSearchView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.searchView"/>" style="color:black" class="noprint">
-									<b><input type='radio' name='flipview' class="noprint" onClick="goFilpView('<%= scheduleProviderNo %>')" title="Flip view"  >
-										<a href=# onClick="goZoomView('<%= scheduleProviderNo %>','<%=StringEscapeUtils.escapeJavaScript(schedule.getFullName())%>')" onDblClick="goFilpView('<%= scheduleProviderNo %>')" title="<bean:message key="provider.appointmentProviderAdminDay.zoomView"/>" >
-											<%=schedule.getFullName()%></a>
-										<oscar:oscarPropertiesCheck value="yes" property="TOGGLE_REASON_BY_PROVIDER" defaultVal="true">
-											<a id="expandReason" href="#" onclick="return toggleReason('<%=scheduleProviderNo%>');"
-											   title="<bean:message key="provider.appointmentProviderAdminDay.expandreason"/>">*</a>
-											<%-- Default is to hide inline reasons. --%>
-										</oscar:oscarPropertiesCheck>
-									</b>
-									<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.daysheetLetter"/>" name='daysheetview' onClick=goDaysheetView('<%= scheduleProviderNo %>','<%= formattedScheduleDate %>') title="<bean:message key="provider.appointmentProviderAdminDay.daysheetView"/>" style="color:black" class="noprint">
-											<%
+									%>
+									<b style="padding: 0 5px 0 5px;">
+										<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
+										<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.searchLetter"/>" name='searchview' onClick=goSearchView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.searchView"/>" style="color:black" class="noprint">
+										<b><input type='radio' name='flipview' class="noprint" onClick="goFilpView('<%= scheduleProviderNo %>')" title="Flip view"  >
+											<a href=# onClick="goZoomView('<%= scheduleProviderNo %>','<%=StringEscapeUtils.escapeJavaScript(schedule.getFullName())%>')" onDblClick="goFilpView('<%= scheduleProviderNo %>')" title="<bean:message key="provider.appointmentProviderAdminDay.zoomView"/>" >
+												<%=schedule.getFullName()%></a>
+											<oscar:oscarPropertiesCheck value="yes" property="TOGGLE_REASON_BY_PROVIDER" defaultVal="true">
+												<a id="expandReason" href="#" onclick="return toggleReason('<%=scheduleProviderNo%>');"
+												   title="<bean:message key="provider.appointmentProviderAdminDay.expandreason"/>">*</a>
+												<%-- Default is to hide inline reasons. --%>
+											</oscar:oscarPropertiesCheck>
+										</b>
+										<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.daysheetLetter"/>" name='daysheetview' onClick=goDaysheetView('<%= scheduleProviderNo %>','<%= formattedScheduleDate %>') title="<bean:message key="provider.appointmentProviderAdminDay.daysheetView"/>" style="color:black" class="noprint">
+									<%
 								}
 								%>
 
-											<%
+								<%
           						if (notOnSchedule) {
           						%>
 									[<bean:message key="provider.appointmentProviderAdminDay.msgNotOnSched"/>]
-											<%
+								<%
           						}
           						%>
 									</logic:notEqual>
 									<logic:equal name="infirmaryView_isOscar" value="false">
-											<%
+								<%
 								String prID="1";
 								%>
-									<logic:present name="infirmaryView_programId">
-											<%
+								<logic:present name="infirmaryView_programId">
+								<%
 								prID=(String)session.getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
 								%>
-									</logic:present>
-									<logic:iterate id="pb" name="infirmaryView_programBeans" type="org.apache.struts.util.LabelValueBean">
-											<%
+								</logic:present>
+								<logic:iterate id="pb" name="infirmaryView_programBeans" type="org.apache.struts.util.LabelValueBean">
+								<%
 						  		if (pb.getValue().equals(prID)) {
 	  							%>
 									<b><label><%=pb.getLabel()%></label></b>
-											<%
+								<%
 								}
 								%>
-									</logic:iterate>
-									</logic:equal>
-									<!-- caisi infirmary view extension modify end ffffffffffffffff-->
+								</logic:iterate>
+								</logic:equal>
+								<!-- caisi infirmary view extension modify end ffffffffffffffff-->
 							</td></tr>
 							<tr><td valign="top">
 								<table id="providerSchedule" border="0" cellpadding="0" bgcolor="<%=notOnSchedule?"silver":"#486ebd"%>" cellspacing="0" width="100%">
-									<%
+								<%
 
-										int slotLengthInMinutes = everyMin;
-										int numScheduleSlots = schedule.getScheduleSlots().asMapOfRanges().size();
+								int slotLengthInMinutes = everyMin;
+								int numScheduleSlots = schedule.getScheduleSlots().asMapOfRanges().size();
 
-										if(bDispTemplatePeriod && numScheduleSlots > 0)
+								if(bDispTemplatePeriod && numScheduleSlots > 0)
+								{
+									slotLengthInMinutes = (MINUTES_IN_DAY/numScheduleSlots);
+								}
+
+								LocalTime startTime = cleanLocalTime(startHour);
+								LocalTime endTime = cleanLocalTime(endHour + 1);
+
+								DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+								DateTimeFormatter titleFormatter = DateTimeFormatter.ofPattern("h:mm a");
+
+								for(LocalTime slotTime = startTime; slotTime.isBefore(endTime); slotTime = plusNoWrap(slotTime, slotLengthInMinutes))
+								{
+									LocalTime slotEndTime = plusNoWrap(slotTime, slotLengthInMinutes);
+
+									boolean isExactHour = false;
+									if(slotTime.getMinute() == 0)
+									{
+										isExactHour = true;
+									}
+
+									ScheduleSlot slot = schedule.getScheduleSlots().get(slotTime);
+									String durationString = "";
+									String fontColor = "white";
+									String bgColorString = "";
+									String confirmString = "";
+									String descriptionString = "";
+									String codeString = "";
+									if(slot != null)
+									{
+										if(slot.getDurationMinutes() != null)
 										{
-											slotLengthInMinutes = (MINUTES_IN_DAY/numScheduleSlots);
+											durationString = slot.getDurationMinutes().toString();
 										}
 
-										LocalTime startTime = cleanLocalTime(startHour);
-										LocalTime endTime = cleanLocalTime(endHour + 1);
-
-										DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-										DateTimeFormatter titleFormatter = DateTimeFormatter.ofPattern("h:mm a");
-
-										for(LocalTime slotTime = startTime; slotTime.isBefore(endTime); slotTime = plusNoWrap(slotTime, slotLengthInMinutes))
+										if(slot.getColor() != null)
 										{
-											LocalTime slotEndTime = plusNoWrap(slotTime, slotLengthInMinutes);
+											bgColorString = "bgcolor=\"" + slot.getColor() + "\"";
+										}
 
-											boolean isExactHour = false;
-											if(slotTime.getMinute() == 0)
-											{
-												isExactHour = true;
-											}
+										if(slot.getColor() != null && !slot.getColor().equals(bgcolordef))
+										{
+											fontColor = "black";
+										}
 
-											ScheduleSlot slot = schedule.getScheduleSlots().get(slotTime);
-											String durationString = "";
-											String fontColor = "white";
-											String bgColorString = "";
-											String confirmString = "";
-											String descriptionString = "";
-											String codeString = "";
-											if(slot != null)
-											{
-												if(slot.getDurationMinutes() != null)
-												{
-													durationString = slot.getDurationMinutes().toString();
-												}
+										if(slot.getConfirm() != null)
+										{
+											confirmString = slot.getConfirm();
+										}
 
-												if(slot.getColor() != null)
-												{
-													bgColorString = "bgcolor=\"" + slot.getColor() + "\"";
-												}
+										if(slot.getDescription() != null)
+										{
+											descriptionString = slot.getDescription();
+										}
 
-												if(slot.getColor() != null && !slot.getColor().equals(bgcolordef))
-												{
-													fontColor = "black";
-												}
+										if(slot.getCode() != null)
+										{
+											codeString = slot.getCode();
+										}
+									}
 
-												if(slot.getConfirm() != null)
-												{
-													confirmString = slot.getConfirm();
-												}
+									String url = "../appointment/addappointment.jsp" +
+											"?provider_no=" + scheduleProviderNo +
+											"&bFirstDisp=true" +
+											"&year=" + schedule.getScheduleDate().getYear() +
+											"&month=" + schedule.getScheduleDate().getMonthValue() +
+											"&day=" + schedule.getScheduleDate().getDayOfMonth() +
+											"&start_time=" + slotTime.format(formatter) +
+											"&end_time=" + slotTime.plusMinutes(slotLengthInMinutes - 1) +
+											"&duration=" + durationString;
 
-												if(slot.getDescription() != null)
-												{
-													descriptionString = slot.getDescription();
-												}
-
-												if(slot.getCode() != null)
-												{
-													codeString = slot.getCode();
-												}
-											}
-
-											String url = "../appointment/addappointment.jsp" +
-													"?provider_no=" + scheduleProviderNo +
-													"&bFirstDisp=true" +
-													"&year=" + schedule.getScheduleDate().getYear() +
-													"&month=" + schedule.getScheduleDate().getMonthValue() +
-													"&day=" + schedule.getScheduleDate().getDayOfMonth() +
-													"&start_time=" + slotTime.format(formatter) +
-													"&end_time=" + slotTime.plusMinutes(slotLengthInMinutes - 1) +
-													"&duration=" + durationString;
-
-											String timeTitle = slotTime.format(titleFormatter) + " - " + slotEndTime.format(titleFormatter);
+									String timeTitle = slotTime.format(titleFormatter) + " - " + slotEndTime.format(titleFormatter);
 
 
 									%>
@@ -1567,9 +1570,9 @@
 
 
 										<%
-											// ----------------------------------------------------------------------------------
-											// Build time slot
-											// ----------------------------------------------------------------------------------
+										// ----------------------------------------------------------------------------------
+										// Build time slot
+										// ----------------------------------------------------------------------------------
 										%>
 
 										<td align="RIGHT" class="<%=isExactHour?"scheduleTime00":"scheduleTimeNot00"%>" NOWRAP>
@@ -1592,48 +1595,48 @@
 
 
 										<%
-											// ----------------------------------------------------------------------------------
-											// Build appointments
-											// ----------------------------------------------------------------------------------
-											SortedMap<LocalTime, List<AppointmentDetails>> appointmentLists =
-													schedule.getAppointments().subMap(slotTime, slotEndTime);
+										// ----------------------------------------------------------------------------------
+										// Build appointments
+										// ----------------------------------------------------------------------------------
+										SortedMap<LocalTime, List<AppointmentDetails>> appointmentLists =
+											schedule.getAppointments().subMap(slotTime, slotEndTime);
 
-											List<List<AppointmentDetails>> allAppointments = new ArrayList(appointmentLists.values());
-											List<AppointmentDetails> appointmentsBeforeList = new ArrayList<AppointmentDetails>();
+										List<List<AppointmentDetails>> allAppointments = new ArrayList(appointmentLists.values());
+										List<AppointmentDetails> appointmentsBeforeList = new ArrayList<AppointmentDetails>();
 
-											//If we're looking at the first slot of the day, get all appointments that occur before this time
-											if (slotTime.equals(startTime))
+										//If we're looking at the first slot of the day, get all appointments that occur before this time
+										if (slotTime.equals(startTime))
+										{
+											SortedMap<LocalTime, List<AppointmentDetails>> appointmentsBeforeStartTime = schedule.getAppointments().headMap(slotTime);
+
+											//Only show the appointments that occur before the first slot of the day and the end time is after the first slot of the day
+											for(List<AppointmentDetails> appointments: appointmentsBeforeStartTime.values())
 											{
-												SortedMap<LocalTime, List<AppointmentDetails>> appointmentsBeforeStartTime = schedule.getAppointments().headMap(slotTime);
-
-												//Only show the appointments that occur before the first slot of the day and the end time is after the first slot of the day
-												for(List<AppointmentDetails> appointments: appointmentsBeforeStartTime.values())
+												for (AppointmentDetails appointment : appointments)
 												{
-													for (AppointmentDetails appointment : appointments)
+													if (appointment.getEndTime().isAfter(slotTime))
 													{
-														if (appointment.getEndTime().isAfter(slotTime))
-														{
-															appointmentsBeforeList.add(appointment);
-														}
+														appointmentsBeforeList.add(appointment);
 													}
 												}
-
-												//Add all these appointments to the list with all the other appointments
-												allAppointments.add(appointmentsBeforeList);
 											}
 
-											boolean isFirstAppointmentInSlot = true;
-											for(List<AppointmentDetails> appointments: allAppointments)
+											//Add all these appointments to the list with all the other appointments
+											allAppointments.add(appointmentsBeforeList);
+										}
+
+										boolean isFirstAppointmentInSlot = true;
+										for(List<AppointmentDetails> appointments: allAppointments)
+										{
+											Collections.reverse(appointments);
+											for(AppointmentDetails appointment: appointments)
 											{
-												Collections.reverse(appointments);
-												for(AppointmentDetails appointment: appointments)
-												{
-													long appointmentRowSpan = getAppointmentRowSpan(
-															appointment.getEndTime().plus(1, ChronoUnit.MINUTES),
-															slotEndTime,
-															slotLengthInMinutes,
-															endTime
-													);
+												long appointmentRowSpan = getAppointmentRowSpan(
+													appointment.getEndTime().plus(1, ChronoUnit.MINUTES),
+													slotEndTime,
+													slotLengthInMinutes,
+													endTime
+												);
 												/*
 												long appointmentLengthInMinutes = Duration
 														.between(appointment.getStartTime(),
@@ -1644,72 +1647,72 @@
 														.ceil((double) appointmentLengthInMinutes / slotLengthInMinutes);
 														*/
 
-													// Preventions are very complicated.  To keep from running a query per appointment it
-													// would require a complicated query.
-													// XXX: if fixing, probably run one query for all appointments and create one prevention
-													//      object per demographic.
-													String preventionWarnings = "";
-													if(enablePreventionAppointmentWarnings)
-													{
-														preventionWarnings = prevMgr.getWarnings(loggedInInfo1, appointment.getDemographicNo().toString());
-														preventionWarnings = ProviderPreventionManager.checkNames(preventionWarnings);
-													}
+												// Preventions are very complicated.  To keep from running a query per appointment it
+												// would require a complicated query.
+												// XXX: if fixing, probably run one query for all appointments and create one prevention
+												//      object per demographic.
+												String preventionWarnings = "";
+												if(enablePreventionAppointmentWarnings)
+												{
+													preventionWarnings = prevMgr.getWarnings(loggedInInfo1, appointment.getDemographicNo().toString());
+													preventionWarnings = ProviderPreventionManager.checkNames(preventionWarnings);
+												}
 
-													String record = "";
-													String module = "";
+												String record = "";
+												String module = "";
 
-													if(request.getParameter("record") != null)
-													{
-														record = request.getParameter("record");
-													}
+												if(request.getParameter("record") != null)
+												{
+													record = request.getParameter("record");
+												}
 
-													if(request.getParameter("module") != null)
-													{
-														module = request.getParameter("module");
-													}
+												if(request.getParameter("module") != null)
+												{
+													module = request.getParameter("module");
+												}
 
-													// Shorten names for second+ appointments in a slot
-													int nameLength = len;
-													if(!isFirstAppointmentInSlot)
-													{
-														nameLength = lenLimitedS;
-													}
+												// Shorten names for second+ appointments in a slot
+												int nameLength = len;
+												if(!isFirstAppointmentInSlot)
+												{
+													nameLength = lenLimitedS;
+												}
 
 
 													// Load appointmentInfo bean for this appointment
-													appointmentInfo.init(
-															appointment,
-															curUser_no,
-															scheduleProviderNo,
-															request.getParameter("curProvider"),
-															request.getParameter("curProviderName"),
-															bMultisites,
-															siteBgColor,
-															appointmentStatusList,
-															request.getLocale(),
-															isWeekView(request),
-															view,
-															numAvailProvider,
-															nameLength,
-															lenLimitedL,
-															request.getParameter("viewall"),
-															reasonCodesMap,
-															showDocumentLink,
-															showEncounterLink,
-															true,
-															enablePreventionAppointmentWarnings,
-															preventionWarnings,
-															record,
-															module,
-															userFirstName,
-															userLastName,
-															curUser_no,
-															showTicklers,
-															showDoctorLink,
-															showMasterLink,
-															showBilling,
-															showEChart
-													);
+												appointmentInfo.init(
+													appointment,
+													curUser_no,
+													scheduleProviderNo,
+													request.getParameter("curProvider"),
+													request.getParameter("curProviderName"),
+													bMultisites,
+													siteBgColor,
+													appointmentStatusList,
+													request.getLocale(),
+													isWeekView(request),
+													view,
+													numAvailProvider,
+													nameLength,
+													lenLimitedL,
+													request.getParameter("viewall"),
+													reasonCodesMap,
+													showDocumentLink,
+													showEncounterLink,
+													true,
+													enablePreventionAppointmentWarnings,
+													preventionWarnings,
+													record,
+													module,
+													userFirstName,
+													userLastName,
+													curUser_no,
+													showTicklers,
+													showDoctorLink,
+													showMasterLink,
+													showBilling,
+													showEChart
+												);
 
 													// These are for the appointmentFormLinks.jspf
 													String demographic_no = appointment.getDemographicNo().toString();
@@ -1719,353 +1722,353 @@
 
 
 
-										%>
+											%>
 
-										<td class="appt <%=appointment.getColor()==null?"noStatus":""%>" bgcolor='<%= appointment.getColor() %>' rowspan="<%= appointmentRowSpan %>" nowrap>
+											<td class="appt <%=appointment.getColor()==null?"noStatus":""%>" bgcolor='<%= appointment.getColor() %>' rowspan="<%= appointmentRowSpan %>" nowrap>
 
-											<!-- Self booking notice -->
-											<c:if test="${appointmentInfo.selfBooked}">
-												<bean:message key="provider.appointmentProviderAdminDay.SelfBookedMarker"/>
-											</c:if>
-
-
-											<!-- multisites : add colour-coded to the "location" value of that appointment. -->
-											<c:if test="${appointmentInfo.multisitesEnabled}">
-												<span title="${appointmentInfo.siteName}" style="background-color:${appointmentInfo.siteColour};">&nbsp;</span>|
-											</c:if>
+												<!-- Self booking notice -->
+												<c:if test="${appointmentInfo.selfBooked}">
+													<bean:message key="provider.appointmentProviderAdminDay.SelfBookedMarker"/>
+												</c:if>
 
 
-											<!-- Short letters -->
-											<a
+												<!-- multisites : add colour-coded to the "location" value of that appointment. -->
+												<c:if test="${appointmentInfo.multisitesEnabled}">
+													<span title="${appointmentInfo.siteName}" style="background-color:${appointmentInfo.siteColour};">&nbsp;</span>|
+												</c:if>
+
+
+												<!-- Short letters -->
+												<a
 													class="apptStatus"
 													href=#
 													onclick="refreshSameLoc('${appointmentInfo.refreshURL}');"
 													title="${appointmentInfo.appointmentTitle} " >
 
-												<c:choose>
-													<c:when test="${appointmentInfo.showShortLetters}">
-														<!-- Appointment status image -->
-														<span
+													<c:choose>
+														<c:when test="${appointmentInfo.showShortLetters}">
+															<!-- Appointment status image -->
+															<span
 																class='short_letters'
 																style='color:${appointmentInfo.shortLetterColour};border:0;height:10'>
 																[${appointmentInfo.shortLetters}]
 															</span>
-													</c:when>
-													<c:otherwise>
-														<img src="../images/${appointmentInfo.iconImage}" border="0" height="10" title="${appointmentInfo.statusTitle}" />
-													</c:otherwise>
-												</c:choose>
+														</c:when>
+														<c:otherwise>
+															<img src="../images/${appointmentInfo.iconImage}" border="0" height="10" title="${appointmentInfo.statusTitle}" />
+														</c:otherwise>
+													</c:choose>
 
-											</a>
-
-
-											<c:if test="${appointmentInfo.criticalUrgency}">
-												<img src="../images/warning-icon.png" border="0" width="14" height="14" title="Critical Appointment"/>
-											</c:if>
-
-											<%--|--%>
-											<c:choose>
-											<c:when test="${appointmentInfo.emptyDemographic}">
-
-											<!--  caisi  -->
-											<c:if test="${appointmentInfo.showTickler}">
-												<a href="#" onClick="popupPage(700,1024, '../tickler/ticklerMain.jsp?demoview=0');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: ${appointmentInfo.ticklerNote}"><font color="red">!</font></a>
-											</c:if>
-
-											<!--  alerts -->
-											<c:if test="${appointmentInfo.displayAlerts}">
-												<a href="#" onClick="return false;" title="${appointmentInfo.alert}">A</a>
-											</c:if>
-
-											<!--  notes -->
-											<c:if test="${appointmentInfo.displayNotes}">
-												<a href="#" onClick="return false;" title="${appointmentInfo.notes}">N</a>
-											</c:if>
+												</a>
 
 
-											<a href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;" ${appointmentInfo.appointmentLinkTitle} >
-												.${appointmentInfo.truncatedUpperName}
-											</a>
-											<%
-												Boolean doNotBook = ("DO_NOT_BOOK").equalsIgnoreCase(appointment.getName());
+												<c:if test="${appointmentInfo.criticalUrgency}">
+													<img src="../images/warning-icon.png" border="0" width="14" height="14" title="Critical Appointment"/>
+												</c:if>
 
-												if ((oscarProperties.isPropertyActive("APPT_MULTILINE") || oscarProperties.getProperty("APPT_THREE_LINE", "true").equals("true")) && !doNotBook)
-												{
-													if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
-													{
-											%>
-											<%=StringEscapeUtils.escapeHtml(appointment.getType())%>&nbsp;|&nbsp;<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-											<% 	}
-												if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() == null || appointmentInfo.getReason().length() == 0))
-												{
-											%>
-											<%=StringEscapeUtils.escapeHtml(appointment.getType())%>
-											<% 	}
-												if ((appointment.getType() == null || appointment.getType().length() == 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
-												{
-											%>
-											<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-											<% 	}
-											} else
-											{%>
-											<!--Inline display of reason -->
-											<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
+												<%--|--%>
+												<c:choose>
+													<c:when test="${appointmentInfo.emptyDemographic}">
+
+														<!--  caisi  -->
+														<c:if test="${appointmentInfo.showTickler}">
+															<a href="#" onClick="popupPage(700,1024, '../tickler/ticklerMain.jsp?demoview=0');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: ${appointmentInfo.ticklerNote}"><font color="red">!</font></a>
+														</c:if>
+
+														<!--  alerts -->
+														<c:if test="${appointmentInfo.displayAlerts}">
+															<a href="#" onClick="return false;" title="${appointmentInfo.alert}">A</a>
+														</c:if>
+
+														<!--  notes -->
+														<c:if test="${appointmentInfo.displayNotes}">
+															<a href="#" onClick="return false;" title="${appointmentInfo.notes}">N</a>
+														</c:if>
+
+
+														<a href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;" ${appointmentInfo.appointmentLinkTitle} >
+															.${appointmentInfo.truncatedUpperName}
+														</a>
+														<%
+														Boolean doNotBook = ("DO_NOT_BOOK").equalsIgnoreCase(appointment.getName());
+
+														if ((oscarProperties.isPropertyActive("APPT_MULTILINE") || oscarProperties.getProperty("APPT_THREE_LINE", "true").equals("true")) && !doNotBook)
+														{
+															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
+															{
+														%>
+																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>&nbsp;|&nbsp;<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
+														<% 	}
+															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() == null || appointmentInfo.getReason().length() == 0))
+															{
+														%>
+																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>
+														<% 	}
+															if ((appointment.getType() == null || appointment.getType().length() == 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
+															{
+														%>
+																<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
+														<% 	}
+														} else
+														{%>
+															<!--Inline display of reason -->
+															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
 																<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
 																	<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
 																</span>
-											</oscar:oscarPropertiesCheck></td>
-										<%}%>
+															</oscar:oscarPropertiesCheck></td>
+														<%}%>
 
-										</c:when>
-										<c:otherwise>
+													</c:when>
+													<c:otherwise>
 
-											<c:if test="${appointmentInfo.showTickler}">
-												<a href="#" onClick="popupPage(700,1024, '../tickler/ticklerMain.jsp?demoview=${appointmentInfo.demographicNo}');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: ${appointmentInfo.ticklerNote}"><font color="red">!</font></a>
-											</c:if>
-
-											<!--  alerts -->
-											<c:if test="${appointmentInfo.displayAlerts}">
-												<a href="#" onClick="return false;" title="${appointmentInfo.alert}">A</a>
-											</c:if>
-
-											<!--  notes -->
-											<c:if test="${appointmentInfo.displayNotes}">
-												<a href="#" onClick="return false;" title="${appointmentInfo.notes}">N</a>
-											</c:if>
-
-											<!-- doctor code block 1 -->
-											<c:if test="${appointmentInfo.showDocumentLink}">
-
-												<c:if test="${appointmentInfo.showVerLink}">
-													<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.versionMsg"/> ${appointmentInfo.ver}">
-														<font color="red">*</font>
-													</a>
-												</c:if>
-
-												<c:if test="${appointmentInfo.showFSRosterLink}">
-													<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
-														<font color="red">$</font>
-													</a>
-												</c:if>
-
-												<c:if test="${appointmentInfo.showRORosterLink}">
-													<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
-														<font color="red">^</font>
-													</a>
-												</c:if>
-
-												<c:if test="${appointmentInfo.showNRorPLRosterLink}">
-													<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
-														<font color="red">#</font>
-													</a>
-												</c:if>
-
-											</c:if>
-
-											<!-- doctor code block 2 -->
-
-											<c:if test="${not empty appointmentInfo.preventionWarnings}">
-												<img src="../images/stop_sign.png" height="14" width="14" title="${appointmentInfo.preventionWarnings}" />&nbsp;
-
-											</c:if>
-
-											<c:if test="<%= appointmentInfo.isVirtual() && org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
-												<a href="#"
-												   onClick='popupPage(800, 1280,
-														   "../telehealth/myhealthaccess.do?method=openTelehealth" +
-														   "&demographicNo=${appointmentInfo.demographicNo}" +
-														   "&siteName=${appointmentInfo.siteName}" +
-														   "&appt=${appointmentInfo.appointmentNo}");return false;'
-												   title="Telehealth">
-													<img
-															style="vertical-align: bottom"
-															src="../images/icons/telehealth.svg"
-															border="0"
-															height="14px"
-															title="Telehealth Appointment"
-															alt="Tel"
-													/>
-												</a>
-											</c:if>
-
-											<a class="apptLink" href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;"
-
-													<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true">
-														${appointmentInfo.appointmentLinkTitle}
-													</oscar:oscarPropertiesCheck>
-											>
-
-												<oscar:oscarPropertiesCheck property="show_demographic_alert_flag" value="true" defaultVal="false">
-													<%
-														if (!appointmentInfo.getAlert().equals(""))
-														{
-													%>
-													<img height="14px" src="../images/icons/071.png" alt="${appointmentInfo.alert}" title="${appointmentInfo.alert}" />
-													<%
-														}
-													%>
-
-												</oscar:oscarPropertiesCheck>
-
-												<oscar:oscarPropertiesCheck property="show_hc_eligibility" value="true" defaultVal="false">
-													<c:if test="${appointmentInfo.activeMedicalCoverage}">+&nbsp</c:if>
-												</oscar:oscarPropertiesCheck>
-
-													${appointmentInfo.truncatedName}
-											</a>
-
-
-											<c:if test="${appointmentInfo.showAppointmentLinks}">
-
-												<c:if test="${appointmentInfo.showEChart}">
-													<oscar:oscarPropertiesCheck property="eform_in_appointment" value="yes">
-														&#124;<b><a href="#" onclick="popupPage(500,1024,'${appointmentInfo.eformURL}'); return false;" title="eForms">e</a></b>
-													</oscar:oscarPropertiesCheck>
-												</c:if>
-
-												<!-- doctor code block 3 -->
-												<c:if test="${appointmentInfo.showEncounterLink}">
-
-													<c:if test="${appointmentInfo.singlePageChart}">
-														&#124; <a href="${appointmentInfo.singlePageChartURL}" ${appointmentInfo.singlePageChartStyle}>
-														<bean:message key="provider.appointmentProviderAdminDay.btnE"/>2</a>
-													</c:if>
-
-													<c:if test="${appointmentInfo.showOldEchartLink}">
-														&#124; <a href=# class="encounterBtn" onClick="popupWithApptNo(710, 1024,'${appointmentInfo.incomingEncounterURL}','encounter',${appointmentInfo.appointmentNo});return false;" title="<bean:message key="global.encounter"/>">
-														<bean:message key="provider.appointmentProviderAdminDay.btnE"/></a>
-													</c:if>
-												</c:if>
-
-												<c:if test="${appointmentInfo.showIntakeFormLink}">
-													&#124; <a href='#' onClick='popupPage(700, 1024, "formIntake.jsp?demographic_no=${appointmentInfo.demographicNo}")' title='Intake Form'>In</a>
-												</c:if>
-
-												<!--  eyeform open link -->
-												<c:if test="${appointmentInfo.showEyeformLink}">
-													&#124; <a href="#" onClick='popupPage(800, 1280, "../eyeform/eyeform.jsp?demographic_no=${appointmentInfo.demographicNo}&appointment_no=${appointmentInfo.appointmentNo}");return false;' title="EyeForm">EF</a>
-												</c:if>
-
-												<!-- billing code block -->
-												<c:if test="${!appointmentInfo.weekView}">
-													<c:if test="${appointmentInfo.showBilling}">
-														<c:choose>
-															<c:when test="${appointmentInfo.billed && !isClinicaid}">
-																&#124; <a
-																	href=#
-																	onClick='onUnbilled("${appointmentInfo.unbillURL}");return false;'
-																	title="<bean:message key="global.billingtag"/>"
-															>
-																-<bean:message key="provider.appointmentProviderAdminDay.btnB"/>
-															</a>
-															</c:when>
-															<c:otherwise>
-																&#124; <a
-																	id="billingLink"
-																	href="${appointmentInfo.billLink}"
-																	target="_blank"
-																	title="<bean:message key="global.billingtag"/>"
-															>
-																<bean:message key="provider.appointmentProviderAdminDay.btnB"/>
-															</a>
-															</c:otherwise>
-														</c:choose>
-													</c:if>
-												</c:if>
-												<!-- billing code block -->
-
-												<c:if test="${appointmentInfo.showMasterLink}">
-													&#124; <a class="masterBtn" href="javascript: function myFunction() {return false; }" onClick="popupWithApptNo(700,1024,'../demographic/demographiccontrol.jsp?demographic_no=${appointmentInfo.demographicNo}&apptProvider=${appointmentInfo.scheduleProviderNo}&appointment=${appointmentInfo.appointmentNo}&displaymode=edit&dboperation=search_detail','master',${appointmentInfo.appointmentNo})"
-															  title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>"><bean:message key="provider.appointmentProviderAdminDay.btnM"/></a>
-												</c:if>
-
-												<c:if test="${!appointmentInfo.weekView}">
-
-													<!-- doctor code block 4 -->
-													<c:if test="${appointmentInfo.showDoctorLink}">
-														&#124; <a href=# onClick="popupWithApptNo(700,1027,'../oscarRx/choosePatient.do?providerNo=${appointmentInfo.sessionProviderNo}&demographicNo=${appointmentInfo.demographicNo}','rx',${appointmentInfo.appointmentNo})" title="<bean:message key="global.prescriptions"/>">
-														<bean:message key="global.rx"/>
-													</a>
-
-
-														<!-- doctor color -->
-														<oscar:oscarPropertiesCheck property="ENABLE_APPT_DOC_COLOR" value="yes">
-															<c:if test="${appointmentInfo.hasProviderColor}">
-																<span style="background-color:${appointmentInfo.providerColor};width:5px">&nbsp;</span>
-															</c:if>
-														</oscar:oscarPropertiesCheck>
-
-														<c:if test="${appointmentInfo.showDollarSign}">
-															&#124;<b style="color:#FF0000">$</b>
+														<c:if test="${appointmentInfo.showTickler}">
+															<a href="#" onClick="popupPage(700,1024, '../tickler/ticklerMain.jsp?demoview=${appointmentInfo.demographicNo}');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: ${appointmentInfo.ticklerNote}"><font color="red">!</font></a>
 														</c:if>
-														<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
+
+														<!--  alerts -->
+														<c:if test="${appointmentInfo.displayAlerts}">
+															<a href="#" onClick="return false;" title="${appointmentInfo.alert}">A</a>
+														</c:if>
+
+														<!--  notes -->
+														<c:if test="${appointmentInfo.displayNotes}">
+															<a href="#" onClick="return false;" title="${appointmentInfo.notes}">N</a>
+														</c:if>
+
+														<!-- doctor code block 1 -->
+														<c:if test="${appointmentInfo.showDocumentLink}">
+
+															<c:if test="${appointmentInfo.showVerLink}">
+																<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.versionMsg"/> ${appointmentInfo.ver}">
+																	<font color="red">*</font>
+																</a>
+															</c:if>
+
+															<c:if test="${appointmentInfo.showFSRosterLink}">
+																<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
+																	<font color="red">$</font>
+																</a>
+															</c:if>
+
+															<c:if test="${appointmentInfo.showRORosterLink}">
+																<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
+																	<font color="red">^</font>
+																</a>
+															</c:if>
+
+															<c:if test="${appointmentInfo.showNRorPLRosterLink}">
+																<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
+																	<font color="red">#</font>
+																</a>
+															</c:if>
+
+														</c:if>
+
+														<!-- doctor code block 2 -->
+
+														<c:if test="${not empty appointmentInfo.preventionWarnings}">
+															<img src="../images/stop_sign.png" height="14" width="14" title="${appointmentInfo.preventionWarnings}" />&nbsp;
+
+														</c:if>
+
+														<c:if test="<%= appointmentInfo.isVirtual() && org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
+																<a href="#"
+																	 onClick='popupPage(800, 1280,
+																					 "../integrations/myhealthaccess.do?method=connect" +
+																					 "&demographicNo=${appointmentInfo.demographicNo}" +
+																					 "&siteName=${appointmentInfo.siteName}" +
+                                                                                     "&appt=${appointmentInfo.appointmentNo}");return false;'
+																	 title="Telehealth">
+																		<img
+																						style="vertical-align: bottom"
+																						src="../images/icons/telehealth.svg"
+																						border="0"
+																						height="14px"
+																						title="Telehealth Appointment"
+																						alt="Tel"
+																		/>
+																</a>
+														</c:if>
+
+															<a class="apptLink" href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;"
+
+															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true">
+																${appointmentInfo.appointmentLinkTitle}
+															</oscar:oscarPropertiesCheck>
+														>
+
+															<oscar:oscarPropertiesCheck property="show_demographic_alert_flag" value="true" defaultVal="false">
+																<%
+																	if (!appointmentInfo.getAlert().equals(""))
+																	{
+																%>
+																		<img height="14px" src="../images/icons/071.png" alt="${appointmentInfo.alert}" title="${appointmentInfo.alert}" />
+																<%
+																	}
+																%>
+
+															</oscar:oscarPropertiesCheck>
+
+															<oscar:oscarPropertiesCheck property="show_hc_eligibility" value="true" defaultVal="false">
+																<c:if test="${appointmentInfo.activeMedicalCoverage}">+&nbsp</c:if>
+															</oscar:oscarPropertiesCheck>
+
+															${appointmentInfo.truncatedName}
+														</a>
+
+
+														<c:if test="${appointmentInfo.showAppointmentLinks}">
+
+															<c:if test="${appointmentInfo.showEChart}">
+																<oscar:oscarPropertiesCheck property="eform_in_appointment" value="yes">
+																	&#124;<b><a href="#" onclick="popupPage(500,1024,'${appointmentInfo.eformURL}'); return false;" title="eForms">e</a></b>
+																</oscar:oscarPropertiesCheck>
+															</c:if>
+
+															<!-- doctor code block 3 -->
+															<c:if test="${appointmentInfo.showEncounterLink}">
+
+																<c:if test="${appointmentInfo.singlePageChart}">
+																	&#124; <a href="${appointmentInfo.singlePageChartURL}" ${appointmentInfo.singlePageChartStyle}>
+																		<bean:message key="provider.appointmentProviderAdminDay.btnE"/>2</a>
+																</c:if>
+
+																<c:if test="${appointmentInfo.showOldEchartLink}">
+																	&#124; <a href=# class="encounterBtn" onClick="popupWithApptNo(710, 1024,'${appointmentInfo.incomingEncounterURL}','encounter',${appointmentInfo.appointmentNo});return false;" title="<bean:message key="global.encounter"/>">
+																		<bean:message key="provider.appointmentProviderAdminDay.btnE"/></a>
+																</c:if>
+															</c:if>
+
+															<c:if test="${appointmentInfo.showIntakeFormLink}">
+																&#124; <a href='#' onClick='popupPage(700, 1024, "formIntake.jsp?demographic_no=${appointmentInfo.demographicNo}")' title='Intake Form'>In</a>
+															</c:if>
+
+															<!--  eyeform open link -->
+															<c:if test="${appointmentInfo.showEyeformLink}">
+																&#124; <a href="#" onClick='popupPage(800, 1280, "../eyeform/eyeform.jsp?demographic_no=${appointmentInfo.demographicNo}&appointment_no=${appointmentInfo.appointmentNo}");return false;' title="EyeForm">EF</a>
+															</c:if>
+
+															<!-- billing code block -->
+															<c:if test="${!appointmentInfo.weekView}">
+																<c:if test="${appointmentInfo.showBilling}">
+																	<c:choose>
+																		<c:when test="${appointmentInfo.billed && !isClinicaid}">
+																			&#124; <a
+																				href=#
+																				onClick='onUnbilled("${appointmentInfo.unbillURL}");return false;'
+																				title="<bean:message key="global.billingtag"/>"
+																			>
+																				-<bean:message key="provider.appointmentProviderAdminDay.btnB"/>
+																			</a>
+																		</c:when>
+																		<c:otherwise>
+																			&#124; <a
+																				id="billingLink"
+																				href="${appointmentInfo.billLink}"
+																				target="_blank"
+																				title="<bean:message key="global.billingtag"/>"
+																			>
+																				<bean:message key="provider.appointmentProviderAdminDay.btnB"/>
+																			</a>
+																		</c:otherwise>
+																	</c:choose>
+																</c:if>
+															</c:if>
+															<!-- billing code block -->
+
+															<c:if test="${appointmentInfo.showMasterLink}">
+																&#124; <a class="masterBtn" href="javascript: function myFunction() {return false; }" onClick="popupWithApptNo(700,1024,'../demographic/demographiccontrol.jsp?demographic_no=${appointmentInfo.demographicNo}&apptProvider=${appointmentInfo.scheduleProviderNo}&appointment=${appointmentInfo.appointmentNo}&displaymode=edit&dboperation=search_detail','master',${appointmentInfo.appointmentNo})"
+																		  title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>"><bean:message key="provider.appointmentProviderAdminDay.btnM"/></a>
+															</c:if>
+
+															<c:if test="${!appointmentInfo.weekView}">
+
+																<!-- doctor code block 4 -->
+																<c:if test="${appointmentInfo.showDoctorLink}">
+																	&#124; <a href=# onClick="popupWithApptNo(700,1027,'../oscarRx/choosePatient.do?providerNo=${appointmentInfo.sessionProviderNo}&demographicNo=${appointmentInfo.demographicNo}','rx',${appointmentInfo.appointmentNo})" title="<bean:message key="global.prescriptions"/>">
+																		<bean:message key="global.rx"/>
+																	</a>
+
+
+																	<!-- doctor color -->
+																	<oscar:oscarPropertiesCheck property="ENABLE_APPT_DOC_COLOR" value="yes">
+																		<c:if test="${appointmentInfo.hasProviderColor}">
+																			<span style="background-color:${appointmentInfo.providerColor};width:5px">&nbsp;</span>
+																		</c:if>
+																	</oscar:oscarPropertiesCheck>
+
+																	<c:if test="${appointmentInfo.showDollarSign}">
+																		&#124;<b style="color:#FF0000">$</b>
+																	</c:if>
+																	<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
 																		<span class="toggleable reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
 																			<strong>&#124;${appointmentInfo.formattedReason}</strong>
 																		</span>
-														</oscar:oscarPropertiesCheck>
+																	</oscar:oscarPropertiesCheck>
 
-													</c:if>
+																</c:if>
 
-													<oscar:oscarPropertiesCheck property="SHOW_PATIENT_APPOINTMENT_PHN_CHART" value="true" defaultVal="false">
-														<c:if test="${appointmentInfo.demographicNo != null }">
-															&#124;
-															<c:choose>
-																<c:when test="${not empty appointmentInfo.demographicHin}">
-																	${appointmentInfo.demographicHin}
-																</c:when>
-																<c:otherwise>
-																	-
-																</c:otherwise>
-															</c:choose>
-															&#124;
-															<c:choose>
-																<c:when test="${not empty appointmentInfo.demographicChartNo}">
-																	${appointmentInfo.demographicChartNo}
-																</c:when>
-																<c:otherwise>
-																	-
-																</c:otherwise>
-															</c:choose>
+																<oscar:oscarPropertiesCheck property="SHOW_PATIENT_APPOINTMENT_PHN_CHART" value="true" defaultVal="false">
+																	<c:if test="${appointmentInfo.demographicNo != null }">
+																		&#124;
+																		<c:choose>
+																			<c:when test="${not empty appointmentInfo.demographicHin}">
+																				${appointmentInfo.demographicHin}
+																			</c:when>
+																			<c:otherwise>
+																				-
+																			</c:otherwise>
+																		</c:choose>
+																		&#124;
+																		<c:choose>
+																			<c:when test="${not empty appointmentInfo.demographicChartNo}">
+																				${appointmentInfo.demographicChartNo}
+																			</c:when>
+																			<c:otherwise>
+																				-
+																			</c:otherwise>
+																		</c:choose>
+																	</c:if>
+																</oscar:oscarPropertiesCheck>
+
+																<!-- add one link to caisi Program Management Module -->
+																<c:if test="${appointmentInfo.birthday}">
+																	&#124; <img src="../images/cake.gif" height="20" alt="Happy Birthday"/>
+																</c:if>
+
+																<%@include file="appointmentFormsLinks.jspf" %>
+
+																<oscar:oscarPropertiesCheck property="appt_pregnancy" value="true" defaultVal="false">
+
+																	<c:set var="demographicNo" value="${appointmentInfo.demographicNo}" />
+																	<jsp:include page="appointmentPregnancy.jspf" >
+																		<jsp:param value="${appointmentInfo.demographicNo}" name="demographicNo"/>
+																	</jsp:include>
+
+																</oscar:oscarPropertiesCheck>
+
+
+															</c:if>
 														</c:if>
-													</oscar:oscarPropertiesCheck>
-
-													<!-- add one link to caisi Program Management Module -->
-													<c:if test="${appointmentInfo.birthday}">
-														&#124; <img src="../images/cake.gif" height="20" alt="Happy Birthday"/>
-													</c:if>
-
-													<%@include file="appointmentFormsLinks.jspf" %>
-
-													<oscar:oscarPropertiesCheck property="appt_pregnancy" value="true" defaultVal="false">
-
-														<c:set var="demographicNo" value="${appointmentInfo.demographicNo}" />
-														<jsp:include page="appointmentPregnancy.jspf" >
-															<jsp:param value="${appointmentInfo.demographicNo}" name="demographicNo"/>
-														</jsp:include>
-
-													</oscar:oscarPropertiesCheck>
+														</font></td>
+													</c:otherwise>
+												</c:choose>
 
 
-												</c:if>
-											</c:if>
-											</font></td>
-										</c:otherwise>
-										</c:choose>
-
-
-										</td>
+											</td>
 
 
 
-										<%
-													isFirstAppointmentInSlot = false;
-												}
+											<%
+												isFirstAppointmentInSlot = false;
 											}
+										}
 
 
-											// ----------------------------------------------------------------------------------
-											// End Build appointments
-											// ----------------------------------------------------------------------------------
+										// ----------------------------------------------------------------------------------
+										// End Build appointments
+										// ----------------------------------------------------------------------------------
 										%>
 
 
@@ -2076,8 +2079,8 @@
 										</td>
 									</tr>
 									<%
-										}
-									%>
+								}
+								%>
 								</table>
 							</td></tr>
 
@@ -2085,36 +2088,36 @@
 							<tr><td class="infirmaryView" NOWRAP ALIGN="center" BGCOLOR="<%=headerColor?"#bfefff":"silver"%>">
 								<!-- caisi infirmary view extension modify ffffffffffff-->
 								<%
-									if (showApptCountForProvider)
+								if (showApptCountForProvider)
+								{
+									int appointmentCount = 0;
+
+									for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
 									{
-										int appointmentCount = 0;
-
-										for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
+										for(AppointmentDetails appointmentDetails : appointmentDetailsList)
 										{
-											for(AppointmentDetails appointmentDetails : appointmentDetailsList)
+
+
+											/*
+											 *.Do_Not_Book type appointments shall not been count for appointment total
+											 * on the top of the schedule page
+											 */
+											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName()) == 0)
 											{
-
-
-												/*
-												 *.Do_Not_Book type appointments shall not been count for appointment total
-												 * on the top of the schedule page
-												 */
-												if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName()) == 0)
-												{
-													continue;
-												}
-
-												appointmentCount++;
+												continue;
 											}
+
+											appointmentCount++;
 										}
-								%>
-								<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>
-								<%
 									}
+									%>
+									<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>
+									<%
+								}
 								%>
 								<logic:notEqual name="infirmaryView_isOscar" value="false">
 
-								<%
+									<%
 									if (isWeekView(request))
 									{
 										String dayUrl = "providercontrol.jsp" +
@@ -2124,62 +2127,62 @@
 												"&view=0" +
 												"&displaymode=day" +
 												"&dboperation=searchappointmentday";
-								%>
-								<b><a href="<%= dayUrl %>">
-									<%=schedule.getScheduleDate().format(DateTimeFormatter.ISO_LOCAL_DATE)%>
-								</a></b>
-								<%
-								}
-								else
-								{
-								%>
-								<b style="padding: 0 5px 0 5px;">
-									<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
-									<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.searchLetter"/>" name='searchview' onClick=goSearchView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.searchView"/>" style="color:black" class="noprint">
-									<b><input type='radio' name='flipview' class="noprint" onClick="goFilpView('<%= scheduleProviderNo %>')" title="Flip view"  >
-										<a href=# onClick="goZoomView('<%= scheduleProviderNo %>','<%=StringEscapeUtils.escapeJavaScript(schedule.getFullName())%>')" onDblClick="goFilpView('<%= scheduleProviderNo %>')" title="<bean:message key="provider.appointmentProviderAdminDay.zoomView"/>" >
-											<%=schedule.getFullName()%></a>
-									</b>
-									<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.daysheetLetter"/>" name='daysheetview' onClick=goDaysheetView('<%= scheduleProviderNo %>','<%= formattedScheduleDate %>') title="<bean:message key="provider.appointmentProviderAdminDay.daysheetView"/>" style="color:black" class="noprint">
-											<%
+										%>
+										<b><a href="<%= dayUrl %>">
+											<%=schedule.getScheduleDate().format(DateTimeFormatter.ISO_LOCAL_DATE)%>
+										</a></b>
+										<%
+									}
+									else
+									{
+										%>
+										<b style="padding: 0 5px 0 5px;">
+											<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
+											<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.searchLetter"/>" name='searchview' onClick=goSearchView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.searchView"/>" style="color:black" class="noprint">
+											<b><input type='radio' name='flipview' class="noprint" onClick="goFilpView('<%= scheduleProviderNo %>')" title="Flip view"  >
+												<a href=# onClick="goZoomView('<%= scheduleProviderNo %>','<%=StringEscapeUtils.escapeJavaScript(schedule.getFullName())%>')" onDblClick="goFilpView('<%= scheduleProviderNo %>')" title="<bean:message key="provider.appointmentProviderAdminDay.zoomView"/>" >
+													<%=schedule.getFullName()%></a>
+											</b>
+											<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.daysheetLetter"/>" name='daysheetview' onClick=goDaysheetView('<%= scheduleProviderNo %>','<%= formattedScheduleDate %>') title="<bean:message key="provider.appointmentProviderAdminDay.daysheetView"/>" style="color:black" class="noprint">
+										<%
 									}
 									%>
 
-											<%
+									<%
 									if (notOnSchedule) {
 									%>
-									[<bean:message key="provider.appointmentProviderAdminDay.msgNotOnSched"/>]
-											<%
+										[<bean:message key="provider.appointmentProviderAdminDay.msgNotOnSched"/>]
+										<%
 									}
 									%>
-									</logic:notEqual>
-									<logic:equal name="infirmaryView_isOscar" value="false">
-											<%
+								</logic:notEqual>
+								<logic:equal name="infirmaryView_isOscar" value="false">
+									<%
 									String prID="1";
 									%>
 									<logic:present name="infirmaryView_programId">
-											<%
+										<%
 										prID=(String)session.getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
 										%>
 									</logic:present>
 									<logic:iterate id="pb" name="infirmaryView_programBeans" type="org.apache.struts.util.LabelValueBean">
-											<%
+										<%
 										if (pb.getValue().equals(prID))
 										{
 											%>
-									<b><label><%=pb.getLabel()%></label></b>
+											<b><label><%=pb.getLabel()%></label></b>
 											<%
 										}
 										%>
 									</logic:iterate>
-									</logic:equal>
-									<!-- caisi infirmary view extension modify end ffffffffffffffff-->
+								</logic:equal>
+								<!-- caisi infirmary view extension modify end ffffffffffffffff-->
 							</td></tr>
 						</table>
 					</td>
-					<%
+						<%
 						}
-					%>
+						%>
 				</tr>
 			</table>
 		</td>

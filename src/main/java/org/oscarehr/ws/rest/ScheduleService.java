@@ -79,6 +79,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -358,7 +359,7 @@ public class ScheduleService extends AbstractServiceImpl {
 
 	@GET
 	@Path("/calendar")
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<CalendarSchedule> getCalendarSchedule(
 			@QueryParam("scheduleId") String scheduleId,
 			@QueryParam("scheduleIdType") String scheduleIdType,

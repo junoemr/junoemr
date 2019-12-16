@@ -194,7 +194,7 @@ angular.module('Layout').component('leftAside', {
 		{
 			if (patient.isVirtual)
 			{
-				window.open("../telehealth/myhealthaccess.do?method=openTelehealth"
+				window.open("../integrations/myhealthaccess.do?method=connect"
 					+ "&demographicNo=" + encodeURIComponent(patient.demographicNo)
 					+ "&siteName=" + encodeURIComponent(patient.location)
 					+ "&appt=" + encodeURIComponent(patient.appointmentNo), "_blank");

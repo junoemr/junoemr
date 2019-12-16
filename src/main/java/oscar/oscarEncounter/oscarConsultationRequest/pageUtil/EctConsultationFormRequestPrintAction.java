@@ -62,7 +62,7 @@ public class EctConsultationFormRequestPrintAction extends Action
     @Override
     public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
     {
-    	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
 	    String demographicNoStr = request.getParameter("demographicNo");
 	    Integer demographicNo = Integer.parseInt(demographicNoStr);
@@ -77,7 +77,6 @@ public class EctConsultationFormRequestPrintAction extends Action
 
 		String error = "";
 		String friendlyReturnMessage = "";
-		Exception exception = null;
 	    List<InputStream> streamList = new ArrayList<>();
 
 	    long excessBytes = 0L;
@@ -112,25 +111,21 @@ public class EctConsultationFormRequestPrintAction extends Action
 		{
 			error = "HtmlToPdfConversionException";
 			friendlyReturnMessage = "Error when attempting to convert HTML to PDF, one or more of your eForms may be formatted incorrectly.";
-			exception = ce;
 		}
 		catch(DocumentException de)
 		{
 			error = "DocumentException";
 			friendlyReturnMessage = "Error when attempting to read one or more of the documents.";
-			exception = de;
 		}
 		catch(IOException ioe)
 		{
 			error = "IOException";
 			friendlyReturnMessage = "Error attempting to access an internal file.";
-			exception = ioe;
 		}
 	    catch (SizeLimitExceededException slee)
 		{
 			error = "SizeLimitExceededException";
 			friendlyReturnMessage = "The attached files included with this consultation request are too large. Please remove some of the attached files and try again.";
-			exception = slee;
 		}
 		finally
 		{

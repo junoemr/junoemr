@@ -1,0 +1,43 @@
+.row {
+    text-align: center;
+}
+
+.jumbotron {
+    padding-top: 16px;
+    padding-bottom: 0px;
+    background-color: white;
+}
+
+.jumbotron h1 {
+    font-size: 40px;
+    font-weight: bold;
+    color: #486dae;
+    text-align: center;
+}
+
+.row.header {
+    font-weight: bold;
+    padding: 10px 15px;
+}
+
+.row .status {
+    color: dimgrey;
+}
+
+.row.list-group-item {
+   color: #555;
+}
+
+.row.disconnected {
+    color: #777;
+    cursor: not-allowed;
+    background-color: #eee;
+}
+
+.row.disconnected .status {
+    color: red;
+}
+
+.row.connected .status {
+    color: forestgreen;
+}

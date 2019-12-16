@@ -55,30 +55,25 @@ public class UserIntegrationAccess extends AbstractModel<Integer> implements Ser
 	private Security security;
 
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-	@JoinColumn(name = "integration_remote_id", referencedColumnName = "remote_id")
+	@JoinColumn(name = "integration_id", referencedColumnName = "id")
 	private Integration integration;
 
 	@Column(name = "remote_user_id")
 	private String remoteUserId;
 
-	@Column(name = "access_email")
-	private String accessEmail;
-
-	@Column(name = "access_token")
-	private String accessToken;
+	@Column(name = "api_key")
+	private String apiKey;
 
 	public UserIntegrationAccess()
 	{
 	}
 
-	public UserIntegrationAccess(Integration integration, Security security, String remoteUserId,
-								 String accessEmail, String accessToken)
+	public UserIntegrationAccess(Integration integration, Security security, String remoteUserId, String apiKey)
 	{
 		setIntegration(integration);
 		setSecurity(security);
 		setRemoteUserId(remoteUserId);
-		setAccessEmail(accessEmail);
-		setAccessToken(accessToken);
+		setApiKey(apiKey);
 	}
 
 	@Override
@@ -122,23 +117,13 @@ public class UserIntegrationAccess extends AbstractModel<Integer> implements Ser
 		this.remoteUserId = remoteUserId;
 	}
 
-	public String getAccessEmail()
+	public String getApiKey()
 	{
-		return accessEmail;
+		return (apiKey == null) ? null : StringEncryptor.decrypt(apiKey);
 	}
 
-	public void setAccessEmail(String accessEmail)
+	public void setApiKey(String accessToken)
 	{
-		this.accessEmail = accessEmail;
-	}
-
-	public String getAccessToken()
-	{
-		return (accessToken == null) ? null : StringEncryptor.decrypt(accessToken);
-	}
-
-	public void setAccessToken(String accessToken)
-	{
-		this.accessToken = (accessToken == null) ? null : StringEncryptor.encrypt(accessToken);
+		this.apiKey = (accessToken == null) ? null : StringEncryptor.encrypt(accessToken);
 	}
 }

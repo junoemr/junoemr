@@ -23,7 +23,7 @@
 
 export enum FORM_CONTROLLER_STATES
 {
-		ADD0,
+		ADD,
 		COMPLETED,
 		REVISION,
 		DELETED,

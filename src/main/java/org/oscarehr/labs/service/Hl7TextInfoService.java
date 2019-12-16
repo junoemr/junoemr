@@ -50,6 +50,7 @@ public class Hl7TextInfoService
 		REPORT_STATUS_DISPLAY_STRING.put(Hl7TextInfo.REPORT_STATUS.N, "In Progress");
 		REPORT_STATUS_DISPLAY_STRING.put(Hl7TextInfo.REPORT_STATUS.L, "Legally Authenticated");
 		REPORT_STATUS_DISPLAY_STRING.put(Hl7TextInfo.REPORT_STATUS.R, "Pre-authenticated");
+		REPORT_STATUS_DISPLAY_STRING.put(Hl7TextInfo.REPORT_STATUS.S, "Signed");
 	}
 
 	/**

@@ -68,7 +68,7 @@ public class PreventionsLotNrsDao extends AbstractDao<PreventionsLotNrs> {
 		StringBuilder sb=new StringBuilder();
 		sb.append("select x.lotNr from PreventionsLotNrs x where x.preventionType=?1");
 		if (bDeleted!=null) sb.append(" and x.deleted=?2");
-		sb.append(" order by x.lotNr");
+		sb.append(" order by x.lastUpdateDate desc");
 		Query query = entityManager.createQuery(sb.toString());
 		query.setParameter(1, prevention);
 		if (bDeleted!=null) query.setParameter(2, bDeleted);

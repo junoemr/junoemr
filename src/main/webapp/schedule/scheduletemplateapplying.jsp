@@ -400,28 +400,6 @@ function disableSubmitButton()
 	document.getElementById("submitBTNID").disabled = true;
 }
 
-function submission()
-{
-
-	var isAlternateChecked = "<%=  bAlternate %>";
-
-	if(isAlternateChecked === "true" )
-	{
-		addDataStringB();
-	}
-
-	if(inputValidation() === true)
-	{
-		//prevent spam hitting submission, only allow one submission.
-		disableSubmitButton();
-		return true;
-	}
-
-	return false;
-
-}
-
-
 //-->
 </script>
 </head>
@@ -452,6 +430,29 @@ function submission()
 			}
 		}
 	%>
+
+	<script type="text/javascript">
+		function submission()
+		{
+
+			var isAlternateChecked = "<%=  bOrigAlt || bAlternate %>";
+			if(isAlternateChecked === "true" )
+			{
+				addDataStringB();
+			}
+
+			if(inputValidation() === true)
+			{
+				//prevent spam hitting submission, only allow one submission.
+				disableSubmitButton();
+				return true;
+			}
+
+			return false;
+
+		}
+	</script>
+
 <body bgcolor="ivory" bgproperties="fixed" onLoad="setfocus()"
 	topmargin="0" leftmargin="0" rightmargin="0">
 
@@ -1005,7 +1006,7 @@ function tranbuttonb7_click() {
 	{
 		String ret = "";
 		ret += "str1 +=" + "\"<" + s + ">\"" + "+" + "document.schedule." + obj
-				+ "[" + "document.schedule." + obj + ".selectedIndex" + "].text" + "+" + "\"</" + s + ">\";";
+				+ "[" + "document.schedule." + obj + ".selectedIndex" + "].value" + "+" + "\"</" + s + ">\";";
 		return ret;
 	}
 	%>

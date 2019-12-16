@@ -47,19 +47,23 @@
 		<div class="col-md-12">
 			<form-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.ADD" form-list="displayFormList"
 								 provider-no="formCtrl.providerNo" filter-forms="onFilterForms(form, index, array)"
-								 view-state="FORM_CONTROLLER_STATES.ADD" instanced-forms="false"></form-view-component>
+								 view-state="FORM_CONTROLLER_STATES.ADD" instanced-forms="false"
+			  					 reload-forms="formCtrl.onModeChange(FORM_CONTROLLER_STATES.ADD)"></form-view-component>
 
 			<form-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.COMPLETED" form-list="displayFormList"
 								 provider-no="formCtrl.providerNo" filter-forms="onFilterForms(form, index, array)"
-								 view-state="FORM_CONTROLLER_STATES.COMPLETED" instanced-forms="true"></form-view-component>
+								 view-state="FORM_CONTROLLER_STATES.COMPLETED" instanced-forms="true"
+								 reload-forms="formCtrl.onModeChange(FORM_CONTROLLER_STATES.COMPLETED)"></form-view-component>
 
 			<form-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.REVISION" form-list="displayFormList"
 								 provider-no="formCtrl.providerNo" filter-forms="onFilterForms(form, index, array)"
-								 view-state="FORM_CONTROLLER_STATES.REVISION" instanced-forms="true"></form-view-component>
+								 view-state="FORM_CONTROLLER_STATES.REVISION" instanced-forms="true"
+								 reload-forms="formCtrl.onModeChange(FORM_CONTROLLER_STATES.REVISION)"></form-view-component>
 
 			<form-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.DELETED" form-list="displayFormList"
 								 provider-no="formCtrl.providerNo" filter-forms="onFilterForms(form, index, array)"
-								 view-state="FORM_CONTROLLER_STATES.DELETED" instanced-forms="true"></form-view-component>
+								 view-state="FORM_CONTROLLER_STATES.DELETED" instanced-forms="true"
+								 reload-forms="formCtrl.onModeChange(FORM_CONTROLLER_STATES.DELETED)"></form-view-component>
 		</div>
 	</div>
 </div>

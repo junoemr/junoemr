@@ -23,12 +23,14 @@
 
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
 import org.oscarehr.integration.myhealthaccess.dto.BaseErrorTo1;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserShortTokenTo1;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTo1;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicStatusResponseTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateResponseTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
 import org.springframework.http.HttpMethod;
@@ -37,20 +39,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class ClinicService extends BaseService
 {
-	private final String clinicEndPoint = concatEndpointStrings(BASE_END_POINT, "/clinic");
-
-	public ClinicUserTo1 createUser(IntegrationData integrationData, ClinicUserTo1 newUser)
+	// Clinic API calls
+	public ClinicUserCreateResponseTo1 createClinicUser(IntegrationData integrationData, ClinicUserCreateTo1 newUser)
 	{
-		final String ENDPOINT_CREATE_USER = "/%s/user/create";
+		String endpoint = "/clinic/%s/clinic_user/create";
 
-		ClinicUserTo1 response = null;
-		String apiKey = integrationData.getApiKey();
+		ClinicUserCreateResponseTo1 response = null;
+		String apiKey = integrationData.getClinicApiKey();
 		String clinicId = integrationData.getIntegration().getRemoteId();
 
 		try
 		{
-			String endpoint = formatEndpoint(ENDPOINT_CREATE_USER, clinicId);
-			response = post(endpoint, apiKey, newUser, ClinicUserTo1.class);
+			endpoint = formatEndpoint(endpoint, clinicId);
+			response = post(endpoint, apiKey, newUser, ClinicUserCreateResponseTo1.class);
 		}
 		catch (BaseException e)
 		{
@@ -60,67 +61,41 @@ public class ClinicService extends BaseService
 		return response;
 	}
 
-	public ClinicUserShortTokenTo1 getShortToken(IntegrationData integrationData) throws InvalidAccessException
+	public ClinicUserLoginTokenTo1 clinicUserLogin(IntegrationData integrationData) throws InvalidAccessException
 	{
-		final String ENDPOINT_SHORT_TOKEN = "/%s/user/%s/get_short_token";
+		String endpoint = "/clinic_user/%s/api_key_login";
 
-		String apiKey = integrationData.getApiKey();
-		String clinicId = integrationData.getIntegration().getRemoteId();
-		String accessToken = integrationData.getUserAccessToken();
+		String apiKey = integrationData.getUserApiKey();
 		String remoteUserId = integrationData.getRemoteUserId();
 
-		ClinicUserShortTokenTo1 loginToken = null;
+		ClinicUserLoginTokenTo1 loginToken = null;
 
 		try
 		{
-			String endpoint = formatEndpoint(ENDPOINT_SHORT_TOKEN, clinicId, remoteUserId);
-			loginToken = postWithToken(endpoint, apiKey, null, ClinicUserShortTokenTo1.class, accessToken);
+			endpoint = formatEndpoint(endpoint, remoteUserId);
+			loginToken = post(endpoint, apiKey, null, ClinicUserLoginTokenTo1.class);
 		}
 		catch (BaseException e)
 		{
 			ErrorHandler.handleError(e);
 		}
-
 
 		return loginToken;
 	}
 
-	public ClinicUserTo1 getLongToken(IntegrationData integrationData, ClinicUserLoginTo1 userLogin)
+	public ClinicStatusResponseTo1 testConnection(Integration integration)
 	{
-		final String ENDPOINT_LONG_TOKEN = "/%s/get_long_token";
+		String endpoint = "/clinic/%s/test_connection";
 
-		String apiKey = integrationData.getApiKey();
-		String clinicId = integrationData.getIntegration().getRemoteId();
-		ClinicUserTo1 accessToken = null;
+		String apiKey = integration.getApiKey();
+		String clinicId = integration.getRemoteId();
+
+		ClinicStatusResponseTo1 response = null;
 
 		try
 		{
-			String endpoint = formatEndpoint(ENDPOINT_LONG_TOKEN, clinicId);
-			accessToken = post(endpoint, apiKey, userLogin, ClinicUserTo1.class);
-		}
-		catch (BaseException e)
-		{
-			ErrorHandler.handleError(e);
-		}
-
-		return accessToken;
-	}
-
-	public ClinicUserTo1 renewLongToken(IntegrationData integrationData)
-	{
-		final String ENDPOINT_RENEW = "/%s/user/%s/renew_long_token";
-
-		String apiKey = integrationData.getApiKey();
-		String clinicId = integrationData.getIntegration().getRemoteId();
-		String remoteUserId = integrationData.getRemoteUserId();
-		String token = integrationData.getUserIntegrationAccess().getAccessToken();
-
-		ClinicUserTo1 response = null;
-
-		try
-		{
-			String endpoint = formatEndpoint(ENDPOINT_RENEW, clinicId, remoteUserId);
-			response =  postWithToken(endpoint, apiKey, null, ClinicUserTo1.class, token);
+			endpoint = formatEndpoint(endpoint, clinicId);
+			response = get(endpoint, apiKey, ClinicStatusResponseTo1.class);
 		}
 		catch (BaseException e)
 		{
@@ -135,7 +110,7 @@ public class ClinicService extends BaseService
 	 */
 	private String formatEndpoint(String endpoint, Object... args)
 	{
-		return concatEndpointStrings(clinicEndPoint, String.format(endpoint, args));
+		return concatEndpointStrings(BASE_END_POINT, String.format(endpoint, args));
 	}
 
 	private <S, T> T get(String endPoint, String apiKey, Class<T> responseClass)

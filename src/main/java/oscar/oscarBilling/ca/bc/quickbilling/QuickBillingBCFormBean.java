@@ -176,17 +176,13 @@ public class QuickBillingBCFormBean extends ActionForm {
 	
 	@Override
 	public String toString() {
-		return (
-				" PROVIDER="+billingProvider+
-				" PROVIDER NUMBER="+billingProviderNo+
-				" SERVICE DATE="+serviceDate+
-				" VISIT LOCATION="+visitLocation+ 
-				" IS HEADER SET="+isHeaderSet+
-				" CREATOR="+creator+
-				" BILL DATA="+billingData.size()+" ENTRY(S)"
-		);
+		String string = " PROVIDER=" + billingProvider +
+				" PROVIDER NUMBER=" + billingProviderNo +
+				" SERVICE DATE=" + serviceDate +
+				" VISIT LOCATION=" + visitLocation +
+				" IS HEADER SET=" + isHeaderSet +
+				" CREATOR=" + creator +
+				" BILL DATA=" + (billingData != null ? billingData.size() : 0) + " ENTRY(S)";
+		return string;
 	}
-
-	
-
 }

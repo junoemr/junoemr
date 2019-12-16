@@ -51,6 +51,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
 
 <%
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -100,6 +102,18 @@
 	} else
 	{
 		assignedTo = request.getParameter("assignedTo");
+	}
+
+	// Check for property to default assigned provider and if present - default to user logged in
+	UserProperty ticklerOnlyMine = ((UserPropertyDAO) SpringUtils.getBean(UserPropertyDAO.class)).getProp(loggedInInfo.getLoggedInProvider().getProviderNo(),
+					UserProperty.TICKLER_VIEW_ONLY_MINE);
+
+	if (ticklerOnlyMine != null && ConversionUtils.parseBoolean(ticklerOnlyMine.getValue()))
+	{
+		if ("all".equals(assignedTo) && request.getParameter("assignedTo") == null)
+		{
+			assignedTo = user_no;
+		}
 	}
 
 	if (request.getParameter("mrpview") == null)
@@ -893,7 +907,10 @@
 							_providers["<%=sites.get(i).getSiteId()%>"] = "<%Iterator<Provider> iter = sites.get(i).getProviders().iterator();
 	while (iter.hasNext()) {
 		Provider p=iter.next();
-		if ("1".equals(p.getStatus())) {%><option value='<%=p.getProviderNo()%>'><%=p.getLastName()%>, <%=p.getFirstName()%></option><%}}%>";
+		if ("1".equals(p.getStatus())) {
+			%><option value='<%=p.getProviderNo()%>' <%=p.getProviderNo().equals(assignedTo) ? "selected" : ""%>><%=p.getLastName()%>, <%=p.getFirstName()%></option><%
+		}
+	}%>";
 							<%}%>
 
 							function changeSite(sel)
@@ -926,17 +943,6 @@
 } else {
 %>
 						<select id="assignedTo" name="assignedTo">
-							<%
-								// Check for property to default assigned provider and if present - default to user logged in
-								boolean ticklerDefaultAssignedProvier = OscarProperties.getInstance().isPropertyActive("tickler_default_assigned_provider");
-								if (ticklerDefaultAssignedProvier)
-								{
-									if ("all".equals(assignedTo))
-									{
-										assignedTo = user_no;
-									}
-								}
-							%>
 							<option value="all" <%=assignedTo.equals("all") ? "selected" : ""%>>
 								<bean:message key="tickler.ticklerMain.formAllProviders"/></option>
 							<%

@@ -23,29 +23,29 @@
 
 package org.oscarehr.integration.myhealthaccess.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ClinicUserTo1 implements Serializable
 {
+
+	@JsonProperty("id")
+	private String myhealthaccessId;
+
 	@JsonProperty("first_name")
 	private String firstName;
 
 	@JsonProperty("last_name")
 	private String lastName;
 
-	@JsonProperty("id")
-	private String myhealthaccessId;
-
 	@JsonProperty("remote_id")
 	private String remoteId;
 
 	@JsonProperty("email")
 	private String email;
-
-	@JsonProperty("token")
-	private String token;
 
 	public ClinicUserTo1()
 	{
@@ -107,15 +107,5 @@ public class ClinicUserTo1 implements Serializable
 	public void setEmail(String email)
 	{
 		this.email = email;
-	}
-
-	public String getToken()
-	{
-		return token;
-	}
-
-	public void setToken(String token)
-	{
-		this.token = token;
 	}
 }

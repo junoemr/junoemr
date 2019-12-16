@@ -23,61 +23,33 @@
 
 package org.oscarehr.integration.myhealthaccess.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
-public class ClinicUserLoginTo1 implements Serializable
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ClinicUserLoginTokenTo1 implements Serializable
 {
-	@JsonProperty(value="email", required=true)
-	private String email;
+	@JsonProperty("login_token")
+	private String token;
 
-	@JsonProperty(value="password", required=true)
-	private String password;
-
-	@JsonProperty("remote_id")
-	private String remoteId;
-
-	public ClinicUserLoginTo1(String email, String password)
+	public ClinicUserLoginTokenTo1()
 	{
-		this.email = email;
-		this.password = password;
 	}
 
-	public ClinicUserLoginTo1(String email, String password, String remoteId)
+	public ClinicUserLoginTokenTo1(String token)
 	{
-		this.email = email;
-		this.password = password;
-		this.remoteId = remoteId;
+		this.token = token;
 	}
 
-	public String getEmail()
+	public String getToken()
 	{
-		return email;
+		return token;
 	}
 
-	public void setEmail(String email)
+	public void setToken(String token)
 	{
-		this.email = email;
-	}
-
-	public String getPassword()
-	{
-		return password;
-	}
-
-	public void setPassword(String password)
-	{
-		this.password = password;
-	}
-
-	public String getRemoteId()
-	{
-		return remoteId;
-	}
-
-	public void setRemoteId(String remoteId)
-	{
-		this.remoteId = remoteId;
+		this.token = token;
 	}
 }

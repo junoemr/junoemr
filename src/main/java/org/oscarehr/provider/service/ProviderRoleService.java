@@ -63,7 +63,7 @@ public class ProviderRoleService
 
 
 	/**
-	 * @param providerID, of the newly added provider's
+	 * @param providerID - of the newly added provider's
 	 */
 
 	public boolean setDefaultRoleForNewProvider(Integer providerID)

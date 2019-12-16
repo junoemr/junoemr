@@ -21,35 +21,38 @@
  * Canada
  */
 
-package org.oscarehr.integration.myhealthaccess.dto;
+package org.oscarehr.integration.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicStatusResponseTo1;
 
-import java.io.Serializable;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ClinicUserShortTokenTo1 implements Serializable
+public class IntegrationStatus
 {
-	@JsonProperty("short_token")
-	private String token;
+	private Integration integration;
+	private ClinicStatusResponseTo1 connectionStatus;
 
-	public ClinicUserShortTokenTo1()
+	public IntegrationStatus(Integration integration, ClinicStatusResponseTo1 connectionStatus)
 	{
+		this.integration = integration;
+		this.connectionStatus = connectionStatus;
 	}
 
-	public ClinicUserShortTokenTo1(String token)
+	public Integration getIntegration()
 	{
-		this.token = token;
+		return integration;
 	}
 
-	public String getToken()
+	public void setIntegration(Integration integration)
 	{
-		return token;
+		this.integration = integration;
 	}
 
-	public void setToken(String token)
+	public ClinicStatusResponseTo1 getConnectionStatus()
 	{
-		this.token = token;
+		return connectionStatus;
+	}
+
+	public void setConnectionStatus(ClinicStatusResponseTo1 connectionStatus)
+	{
+		this.connectionStatus = connectionStatus;
 	}
 }

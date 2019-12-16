@@ -52,6 +52,7 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import oscar.Misc;
 import oscar.OscarProperties;
 import oscar.entities.PaymentType;
 import oscar.entities.WCB;
@@ -112,6 +113,7 @@ public class BillingCreateBillingAction extends Action {
     if (frm.isOinPayPatient())
     {
       bean.setPatientHCType(Demographic.HC_TYPE.PP.name());
+      bean.setPatientPHN(Misc.backwardZero(bean.getPatientPHN(),12));
     }
     else
     {

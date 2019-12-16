@@ -231,10 +231,6 @@ public class FrmONAREnhancedRecord extends FrmRecord {
 				else if(type.equals("INT") || type.equals("TINYINT"))
 				{
 					String value = props.getProperty(theName);
-					if (value != null && value.isEmpty())
-					{
-						MiscUtils.getLogger().info("empty value for "+ theName);
-					}
 					if (value == null || value.isEmpty())
 					{
 						value = "0";
