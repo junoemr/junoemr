@@ -72,6 +72,7 @@ $(document).ready(function()
 		var data = new Object();
 		data.indicatorTemplateId = (this.id).split("_")[1];
 		data.method = (this.id).split("_")[0];
+		data.providerNo = providerNo;
 
 		sendData(url, data, null);
 	});
@@ -81,7 +82,7 @@ $(document).ready(function()
 	{
 		event.preventDefault();
 		var url = "/web/dashboard/admin/DashboardManager.do";
-		var data = "dashboardId=" + this.id;
+		var data = "dashboardId=" + this.id + "&providerNo=" + providerNo;
 		sendData(url, data, null);
 	});
 
@@ -93,6 +94,7 @@ $(document).ready(function()
 		var data = new Object();
 		data.dashboardId = (this.id).split("_")[1];
 		data.method = (this.id).split("_")[0];
+		data.providerNo = providerNo;
 
 		sendData(url, data, null);
 	});
@@ -102,6 +104,7 @@ $(document).ready(function()
 		var data = new Object();
 		data.method = "getIndicator";
 		data.indicatorId = this.id.split("_")[1];
+		data.providerNo = providerNo;
 
 		sendData("/web/dashboard/display/DisplayIndicator.do", data, this.id.split("_")[0]);
 	});

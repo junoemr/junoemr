@@ -286,7 +286,8 @@ $(document).ready( function() {
     	var url = "/web/dashboard/display/DashboardDisplay.do";
     	var data = new Object();
     	data.dashboardId = (this.id).split("_")[1];
-    	data.method = (this.id).split("_")[0];  
+    	data.method = (this.id).split("_")[0];
+    	data.providerNo = providerNo;
 
     	sendData(url, data, "reload");
     });
@@ -328,6 +329,7 @@ $(document).ready( function() {
     	var url = "/web/dashboard/display/ExportResults.do";
     	var data = new Object();
     	data.indicatorId = (this.id).split("_")[1];
+    	data.providerNo = providerNo;
      
     	sendData(url, data, null)
 	})

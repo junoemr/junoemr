@@ -60,10 +60,17 @@ public class DisplayDashboardAction extends DispatchAction {
 		if( dashboardId != null && ! dashboardId.isEmpty() ) {
 			id = Integer.parseInt( dashboardId );
 		}
+
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+		if (request.getParameter("providerNo") != null)
+		{
+			providerNo = request.getParameter("providerNo");
+		}
 		
 		DashboardBean dashboard = dashboardManager.getDashboard(loggedInInfo, id);
 
 		request.setAttribute("dashboard", dashboard);
+		request.setAttribute("providerNo", providerNo);
 
 		return mapping.findForward("success");
 	}

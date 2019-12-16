@@ -20,22 +20,7 @@
 * Victoria, British Columbia
 * Canada
 --%>
-<div id="group-selector-component">
-	<h6 class="section-heading">Form Groups</h6>
-	<nav>
-		<ul>
-			<li class="group-list-item">
-				<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL, null)"
-				   ng-class="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL ? 'selected' : ''">Show All</a>
-			</li>
-			<li class="container-fluid user-groups-section">
-				<ul class="row group-list-item" ng-repeat="group in $ctrl.groups">
-					<li >
-						<a href="javascript:" ng-click="$ctrl.onGroupChange(group.id, group.summaryItem)"
-						   ng-class="$ctrl.groupSelection === group.id ? 'selected' : ''">{{group.displayName}}</a>
-					</li>
-				</ul>
-			</li>
-		</ul>
-	</nav>
+<div class="panel-component">
+	<div class="panel-header" ng-transclude="header"></div>
+	<div class="panel-body" ng-transclude="body"></div>
 </div>
