@@ -42,7 +42,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
@@ -63,28 +62,28 @@ public class UserMetricsService extends AbstractServiceImpl
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@SkipAllLogging
 	public RestResponse<String> postMetrics(@Context HttpServletRequest request, ArrayList<UserMetricsTo1> data)
-			throws IOException
+			throws IllegalArgumentException, IOException
 	{
-		String page = "appointment";
-		if (data != null)
-		{
-			for (UserMetricsTo1 metric : data)
-			{
-				if (metric.getMetricName().equals("performance_timing_loadEventEnd"))
-				{
-					for (Double observedTime : metric.getObservations())
-					{
-						requestLatency.labels(page).observe(observedTime);
-					}
-				}
-			}
-		}
-		else
+		if (data == null)
 		{
 			String payload = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
 			logger.warn("Could not parse request body into JSON. Is the following request body in Prometheus Exposition Format?\n" + payload);
 			throw new IllegalArgumentException("Could not parse request body into JSON");
 		}
+
+
+		for (UserMetricsTo1 metric : data)
+		{
+			if (metric.getMetricName().equals("performance_timing_loadEventEnd"))
+			{
+				for (Double observedTime : metric.getObservations())
+				{
+					String page = "appointment";
+					requestLatency.labels(page).observe(observedTime);
+				}
+			}
+		}
+
 		return RestResponse.successResponse("Success");
 	}
 
