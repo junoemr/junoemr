@@ -138,6 +138,9 @@
 
 
 
+			<%-- ============================================================================== --%>
+			<%-- Transfer data from Java to Javascript                                          --%>
+			<%-- ============================================================================== --%>
 			function getAppointmentNo()
 			{
 				<c:if test="${not empty junoEncounterForm.header.appointmentNo}">
@@ -175,9 +178,15 @@
 				billingUrl: "<c:out value='${junoEncounterForm.header.billingUrl}' />",
 				encounterTypeArray: getEncounterTypeArray(),
 				imagePresentPlaceholderUrl: "<c:out value='${fn:escapeXml(junoEncounterForm.header.imagePresentPlaceholderUrl)}' />",
+				editUnsignedMsg: "<bean:message key="oscarEncounter.editUnsignedNote.msg"/>",
+				printDateMsg: "<bean:message key="oscarEncounter.printDate.msg"/>",
+				printDateOrderMsg: "<bean:message key="oscarEncounter.printDateOrder.msg"/>",
 			};
 
+			<%-- ============================================================================== --%>
+			<%-- Page State                                                                     --%>
 			// XXX: move this into objects?
+			<%-- ============================================================================== --%>
 			var pageState = {
 				currentNoteData: null,
 				currentNoteIssueData: null,
@@ -189,8 +198,8 @@
 			};
 
 
+			// XXX: put these somewhere better?
 			var autoSaveDelay = 5000;
-
 			var notesOffset = 0;
 			var notesIncrement = <%= OscarProperties.getNumLoadedNotes(20) %>;
 			var notesRetrieveOk = false;
@@ -199,74 +208,30 @@
 			var measurementWindows = new Array();
 			var openWindows = new Object();
 
-			var cppIssues = new Array(7);
-			var cppNames = new Array(7);
-			cppIssues[0] = "SocHistory";
-			cppIssues[1] = "MedHistory";
-			cppIssues[2] = "FamHistory";
-			cppIssues[3] = "Concerns";
-			cppIssues[4] = "RiskFactors";
-			cppIssues[5] = "Reminders";
-			cppIssues[6] = "OMeds";
-			cppNames[0] = "Social History";
-			cppNames[1] = "Medical History";
-			cppNames[2] = "Family History";
-			cppNames[3] = "Ongoing Concerns";
-			cppNames[4] = "Risk Factors";
-			cppNames[5] = "Reminders";
-			cppNames[6] = "Other Meds";
-
-			function getCPP(issueCode)
-			{
-				for (var i = 0; i < cppIssues.length; i++)
-				{
-					if (issueCode == cppIssues[i])
-					{
-						return cppNames[i];
-					}
-				}
-				return "";
-			}
-
-			var exFields = new Array(11);
-			var exKeys = new Array(11);
-			exFields[0] = "startdate";
-			exFields[1] = "resolutiondate";
-			exFields[2] = "proceduredate";
-			exFields[3] = "ageatonset";
-			exFields[4] = "treatment";
-			exFields[5] = "problemstatus";
-			exFields[6] = "exposuredetail";
-			exFields[7] = "relationship";
-			exFields[8] = "lifestage";
-			exFields[9] = "hidecpp";
-			exFields[10] = "problemdescription";
-			exKeys[0] = "Start Date";
-			exKeys[1] = "Resolution Date";
-			exKeys[2] = "Procedure Date";
-			exKeys[3] = "Age at Onset";
-			exKeys[4] = "Treatment";
-			exKeys[5] = "Problem Status";
-			exKeys[6] = "Exposure Details";
-			exKeys[7] = "Relationship";
-			exKeys[8] = "Life Stage";
-			exKeys[9] = "Hide Cpp";
-			exKeys[10] = "Problem Description";
 
 			var eChartUUID = "${junoEncounterForm.header.echartUuid}";
 
 			<%@ include file="js/JunoEncounter.js" %>
-			var junoEncounter = Juno.OscarEncounter.JunoEncounter;
+			var junoEncounter = new Juno.OscarEncounter.JunoEncounter(pageData);
 
 			<%@ include file="js/JunoEncounter/CppNote.js" %>
-			var CppNote = Juno.OscarEncounter.JunoEncounter.CppNote;
+			var cppNote = new Juno.OscarEncounter.JunoEncounter.CppNote(pageData, junoEncounter);
 
 			<%@ include file="js/JunoEncounter/EncounterNote.js" %>
-			var EncounterNote = Juno.OscarEncounter.JunoEncounter.EncounterNote;
+			var encounterNote = new Juno.OscarEncounter.JunoEncounter.EncounterNote(pageData);
 
 			<%@ include file="js/JunoEncounter/CaseManagementIssue.js" %>
 			var caseManagementIssue = new Juno.OscarEncounter.JunoEncounter.CaseManagementIssue(pageData);
 
+			<%@ include file="js/JunoEncounter/PrintNotes.js" %>
+			var printNotes = new Juno.OscarEncounter.JunoEncounter.PrintNotes(pageData);
+
+
+			<%-- ============================================================================== --%>
+			<%-- API Functions                                                                  --%>
+			<%-- ============================================================================== --%>
+
+			// These methods are used by external pages so they shouldn't be changed.
 
 			// This method is called by child windows.  Please don't move or rename it.
 			function getEChartUUID()
@@ -283,1275 +248,25 @@
 
 
 
+			<%-- ============================================================================== --%>
+			<%-- Local functions                                                                --%>
+			<%-- ============================================================================== --%>
+
+			// This is being left here becuase it is used in a lot of generated links and I don't
+			// want to find them all and update them.
 			function popupPage(vheight, vwidth, name, varpage)
 			{
-				var openWindows = {};
-				var reloadWindows = {};
-				var updateDivTimer = null;
-				if (varpage == null || varpage == -1)
-				{
-					return false;
-				}
-				if (varpage.indexOf("..") == 0)
-				{
-					varpage = this.pageData.contextPath + varpage.substr(2);
-				}
-				var page = "" + varpage;
-				var windowprops = "height=" + vheight + ",width=" + vwidth + ",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=600,screenY=200,top=0,left=0";
-				openWindows[name] = window.open(page, name, windowprops);
-
-				if (openWindows[name] != null)
-				{
-					if (openWindows[name].opener == null)
-					{
-						openWindows[name].opener = self;
-					}
-					openWindows[name].focus();
-					if (updateDivTimer == null)
-					{
-						updateDivTimer = setInterval(
-							function ()
-							{
-								if (junoEncounter.checkLengthofObject(openWindows) > 0)
-								{
-									for (var name in openWindows)
-									{
-										if (openWindows[name].closed && reloadWindows[name] != undefined)
-										{
-											var reloadDivUrl = reloadWindows[name];
-											var reloadDiv = reloadWindows[name + "div"];
-
-											loadDiv(reloadDiv, reloadDivUrl, 0);
-
-											delete reloadWindows[name];
-											var divName = name + "div";
-											delete reloadWindows[divName];
-											delete openWindows[name];
-										}
-
-									}
-
-								}
-
-								if (junoEncounter.checkLengthofObject(openWindows) == 0)
-								{
-									clearInterval(updateDivTimer);
-									updateDivTimer = null;
-								}
-
-							}, 1000);
-					}
-				}
+				return junoEncounter.popupPage(vheight, vwidth, name, varpage);
 			}
 
 
-			function delay(time)
-			{
-				var string = "document.getElementById('ci').src='" + this.pageData.imagePresentPlaceholderUrl + "'";
-				setTimeout(string, time);
-			}
 
-			function openAnnotation()
-			{
-				var atbname = document.getElementById('annotation_attrib').value;
-				var data = $A(arguments);
-				var addr = this.pageData.contextPath + "/annotation/annotation.jsp?atbname=" + atbname + "&table_id=" + data[1] + "&display=" + data[2] + "&demo=" + data[3];
-				window.open(addr, "anwin", "width=400,height=500");
-				Event.stop(data[0]);
-			}
 
-			function showHistory(noteId, event)
-			{
-				Event.stop(event);
-				var rnd = Math.round(Math.random() * 1000);
-				win = "win" + rnd;
-				var url = this.pageData.contextPath + "/CaseManagementEntry.do?method=notehistory&noteId=" + noteId;
-				window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
-				return false;
-			}
 
-			function getFormattedDate(date)
-			{
-				if (date == null || date == "")
-				{
-					return null;
-				}
 
-				return moment(date).format("YYYY-MM-DD");
-			}
 
-			function getFormData($form)
-			{
-				var unindexed_array = $form.serializeArray();
-				var indexed_array = {};
 
-				jQuery.map(unindexed_array, function (n, i)
-				{
-					indexed_array[n['name']] = n['value'];
-				});
-
-				return indexed_array;
-			}
-
-			function getAssignedIssueArray(issueIdArray)
-			{
-				var deferred = jQuery.Deferred();
-
-				var deferredArray = [];
-
-				for (var i = 0; i < issueIdArray.length; i++)
-				{
-					var issueId = issueIdArray[i];
-
-					var ajaxPromise = jQuery.ajax({
-						type: "POST",
-						url: "../ws/rs/notes/getIssueById/" + issueId
-					});
-
-					deferredArray.push(ajaxPromise);
-				}
-
-				jQuery.when.all(deferredArray).then(function (response)
-				{
-					var adjustedArray = response;
-					if (deferredArray.length == 1)
-					{
-						adjustedArray = [response];
-					}
-
-					var assignedIssueArray = [];
-
-					for (var j = 0; j < adjustedArray.length; j++)
-					{
-						var result = adjustedArray[j][0];
-
-						var assignedIssue = {
-							acute: false,
-							certain: false,
-							demographic_no: null,
-							id: null,
-							issue: result,
-							issue_id: result.id,
-							major: false,
-							program_id: null,
-							resolved: false,
-							type: null,
-							unchecked: false,
-							unsaved: true,
-							update_date: new Date()
-						};
-
-						assignedIssueArray.push(assignedIssue);
-					}
-
-					deferred.resolve(assignedIssueArray);
-				});
-
-				return deferred.promise();
-			}
-
-			function getCPPObjectFromForm(form, issueIdArray)
-			{
-				var deferred = jQuery.Deferred();
-
-				var noteId = 0;
-				if (form.noteEditId)
-				{
-					noteId = form.noteEditId;
-				}
-
-				getAssignedIssueArray(issueIdArray).then(function (assignedIssueArray)
-				{
-					var result = {
-						"assignedCMIssues": assignedIssueArray,
-						"encounterNote": {
-							"noteId": noteId,
-							"uuid": form.noteUuid,
-							"position": form.position,
-							"note": form.value,
-							"archived": form.archived,
-							"cpp": true,
-							"editable": true,
-							"isSigned": true,
-							"observationDate": new Date(),
-							//"observationDate":"2019-10-08T21:23:49.441Z",
-							"encounterType": "",
-							"encounterTime": "",
-							"assignedIssues": assignedIssueArray,
-							"summaryCode": form.noteSummaryCode,
-							"revision": form.noteRevision
-						},
-						"annotation_attrib": form.annotation_attrib,
-						"groupNoteExt": {
-							"noteId": noteId,
-							"hideCpp": form.hidecpp,
-							"startDate": getUTCDateFromString(form.startdate),
-							"resolutionDate": getUTCDateFromString(form.resolutiondate),
-							"procedureDate": getUTCDateFromString(form.proceduredate),
-							"ageAtOnset": form.ageatonset,
-							"treatment": form.treatment,
-							"problemStatus": form.problemstatus,
-							"exposureDetail": form.exposuredetail,
-							"relationship": form.relationship,
-							"lifeStage": form.lifestage,
-							"problemDesc": form.problemdescription
-						}
-					};
-
-					deferred.resolve(result);
-				});
-
-				return deferred.promise();
-			}
-
-			function getUTCDateFromString(dateString)
-			{
-				if (dateString == null || dateString == "")
-				{
-					return null;
-				}
-
-				var dateMoment = moment(dateString);
-
-				if (!dateMoment.isValid())
-				{
-					return null;
-				}
-
-				return dateMoment.toDate();
-			}
-
-			function updateCPPNote(cppType)
-			{
-				var demographicNo = this.pageData.demographicNo;
-				var form = jQuery('#frmIssueNotes');
-				var formData = getFormData(form);
-
-				var issueIdArray = [];
-				jQuery("#issueIdList input:checkbox[name=issue_id]:checked").each(function ()
-				{
-					issueIdArray.push(jQuery(this).val());
-				});
-
-				getCPPObjectFromForm(formData, issueIdArray).then(function (restData)
-				{
-					var jsonString = JSON.stringify(restData);
-
-					jQuery.ajax({
-						type: "POST",
-						contentType: "application/json",
-						dataType: "json",
-						url: getSaveCPPNoteUrl(demographicNo),
-						data: jsonString,
-						success: function (response)
-						{
-							if (response.status == "SUCCESS")
-							{
-								// Close window
-								hideEdit();
-
-								// Reload note list
-								getSectionRemote(formData.noteSummaryCode, true, true);
-
-								return false;
-							} else
-							{
-								// Show error
-								jQuery('#editNoteError').html(response.error.message);
-							}
-						}
-					});
-				});
-
-				return false;
-			}
-
-			function hideEdit()
-			{
-				$('showEditNote').style.display = 'none';
-			}
-
-			function assembleMainChartParams(displayFullChart)
-			{
-
-				var params = "method=edit&ajaxview=ajaxView&fullChart=" + displayFullChart;
-				<%
-				  Enumeration<String>enumerator = request.getParameterNames();
-				  String paramName, paramValue;
-				  while( enumerator.hasMoreElements() ) {
-					 paramName = enumerator.nextElement();
-					 if( paramName.equals("method") || paramName.equals("fullChart") ) {
-						 continue;
-					 }
-
-					 paramValue = request.getParameter(paramName);
-
-				 %>
-				params += "&<%=paramName%>=<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(paramValue), "UTF-8")%>";
-				<%
-				 }
-			   %>
-
-				return params;
-			}
-
-			function scrollDownInnerBar()
-			{
-				$("encMainDiv").scrollTop = $("encMainDiv").scrollHeight;
-			}
-
-			function editEncounterNote(event, noteId)
-			{
-				// Get the note to edit
-				//var note = getNoteDataById(noteId);
-
-				var demographicNo = this.pageData.demographicNo;
-
-				var me = this;
-				jQuery.ajax({
-					type: "GET",
-					contentType: "application/json",
-					dataType: "json",
-					url: "../ws/rs/notes/" + demographicNo + "/getNoteToEdit/" + noteId,
-					success: function (result)
-					{
-						var note = result.body.encounterNote;
-						var issues = result.body.assignedCMIssues;
-
-						// Show a warning if an unsigned note was created by a different provider
-						var editWarn = (!note.isSigned && note.providerNo != me.pageData.providerNo);
-						var editUnsignedMsg = "<bean:message key="oscarEncounter.editUnsignedNote.msg"/>";
-
-						if (editWarn && !confirm(editUnsignedMsg))
-						{
-							return false;
-						}
-
-						// Disable any notes currently being edited
-						var currentlyEditedNoteId = jQuery('input#editNoteId').val();
-						var currentlyEditedNoteDiv = jQuery('div#n' + currentlyEditedNoteId).parent();
-
-						unobserveTextArea();
-
-						replaceNoteEntry(currentlyEditedNoteDiv, pageState.currentNoteData, null, demographicNo, false);
-
-
-						// Make the note editable
-						var noteDiv = jQuery('div#n' + noteId).parent();
-
-						replaceNoteEntry(noteDiv, note, issues, demographicNo, true);
-						EncounterNote.updateNoteInPageState(note, issues);
-
-						adjustCaseNote();
-						observeTextArea();
-						setSaveButtonVisibility();
-					}
-				});
-
-				return false;
-			}
-
-			function observeTextArea()
-			{
-				var textAreaName = getEditTextAreaName();
-
-				if(textAreaName != null)
-				{
-					Element.observe(textAreaName, 'keyup', monitorCaseNote);
-				}
-			}
-
-			function unobserveTextArea()
-			{
-				var textAreaName = getEditTextAreaName();
-
-				if(textAreaName != null)
-				{
-					Element.stopObserving(textAreaName, 'keyup', monitorCaseNote);
-				}
-			}
-
-			function getEditTextAreaName()
-			{
-				if(!pageState.currentNoteData || pageState.currentNoteData.noteId == null)
-				{
-					return null;
-				}
-
-				return 'caseNote_note' + pageState.currentNoteData.noteId;
-			}
-
-			function getNoteDataById(noteId)
-			{
-				var uuid = jQuery("input#uuid" + noteId).val();
-				var providerNo = jQuery("input#providerNo" + noteId).val();
-				var observationDate = jQuery("input#observationDateInput" + noteId).val();
-				var encounterType = jQuery("select#encounterTypeSelect" + noteId).val();
-				var isSigned = jQuery("input#isSigned" + noteId).val();
-				var isVerified = jQuery("input#isVerified" + noteId).val();
-				var appointmentNo = jQuery("input#appointmentNo" + noteId).val();
-				var noteText = jQuery("textarea#caseNote_note" + noteId).val();
-
-				var observationMoment = moment();
-				if(observationDate)
-				{
-					observationMoment = moment(observationDate, "DD-MMM-YYYY HH:mm");
-				}
-
-				var noteData = {
-					noteId: noteId,
-					uuid: uuid,
-					observationDate: observationMoment.toDate(),
-					providerNo: providerNo,
-					encounterType: encounterType,
-					isSigned: isSigned,
-					isVerified: isVerified,
-					appointmentNo: appointmentNo,
-					note: noteText
-				};
-
-				return noteData;
-			}
-
-			function getEmptyNote(providerNo, appointmentNo)
-			{
-				var noteData = {
-					noteId: 0,
-					uuid: null,
-					observationDate: null,
-					providerNo: providerNo,
-					encounterType: null,
-					isSigned: false,
-					isVerified: false,
-					appointmentNo: appointmentNo,
-					note: ""
-				};
-
-				return noteData;
-			}
-
-			function saveTmpSave()
-			{
-				// Gather information to save the note
-				var demographicNo = this.pageData.demographicNo;
-				var noteId = jQuery("input#editNoteId").val();
-
-
-				// Prepare data
-				var noteData = getNoteDataById(noteId);
-				if(noteId == 0)
-				{
-					// New note, save accordingly
-					noteData.noteId = null;
-					noteData.uuid = null;
-					if(!noteData.observationDate)
-					{
-						noteData.observationDate = new Date();
-					}
-					noteData.updateDate = noteData.observationDate;
-				}
-
-				jQuery.ajax({
-					type: "POST",
-					contentType: "application/json",
-					dataType: "json",
-					url: "../ws/rs/notes/" + demographicNo + "/tmpSave",
-					data: JSON.stringify(noteData),
-					success: function (response)
-					{
-						setNoteStatus("Draft saved " + moment().format("DD-MMM-YYYY HH:mm:ss"));
-					},
-					error: function (response)
-					{
-						setNoteError("Error saving note");
-					}
-				});
-			}
-
-			function checkNoteChanged()
-			{
-				if(pageState.lastTmpSaveNote == null)
-				{
-					if(pageState.currentNoteData && pageState.currentNoteData.note)
-					{
-						pageState.lastTmpSaveNote = pageState.currentNoteData.note;
-					}
-					else
-					{
-						pageState.lastTmpSaveNote = "";
-					}
-				}
-
-				// Prepare data
-				var noteId = jQuery("input#editNoteId").val();
-				var noteData = getNoteDataById(noteId);
-
-				// Trim the notes because that happens when the note is saved
-				if(noteData.note.trim() != pageState.lastTmpSaveNote.trim())
-				{
-					saveTmpSave();
-					pageState.lastTmpSaveNote = noteData.note;
-				}
-
-				setTmpSaveTimer();
-			}
-
-			function setTmpSaveTimer()
-			{
-				pageState.autoSaveTimer = setTimeout(checkNoteChanged, autoSaveDelay);
-			}
-
-			function clearTmpSaveTimer()
-			{
-				clearTimeout(pageState.autoSaveTimer);
-			}
-
-			function buildBillingUrl(assignedIssueArray)
-			{
-				var billingUrl = this.pageData.billingUrl;
-
-				// Add dx codes to it from the issue array
-				for(var i = 0; i < assignedIssueArray.length; i++)
-				{
-					var dxCode = assignedIssueArray[i].issue.code;
-					var codeNumber = i;
-					if(codeNumber == 0)
-					{
-						codeNumber = "";
-					}
-
-					billingUrl += "&dxCode" + codeNumber + "=" + encodeURIComponent(dxCode.substring(0,3));
-				}
-
-				return this.pageData.contextPath + billingUrl
-			}
-
-			function saveEncounterNote(signNote, verifyNote, exitAfterSaving, async, redirectToBilling)
-			{
-				// Clear state
-				clearNoteError();
-				clearNoteStatus();
-
-				// Gather information to save the note
-				var demographicNo = this.pageData.demographicNo;
-				var noteId = jQuery("input#editNoteId").val();
-
-				// Prepare data
-				var noteData = getNoteDataById(noteId);
-				//
-				if(noteId == 0)
-				{
-					// New note, save accordingly
-					noteData.noteId = null;
-					noteData.uuid = null;
-					if(!noteData.observationDate)
-					{
-						noteData.observationDate = new Date();
-					}
-					noteData.updateDate = noteData.observationDate;
-				}
-
-				if (signNote)
-				{
-					noteData.isSigned = true;
-				}
-
-				if (verifyNote)
-				{
-					noteData.isVerified = true;
-				}
-
-				var issueIdArray = [];
-				jQuery(
-					"#noteIssueIdList input:checkbox[name=issue_id]:checked, #noteIssues input:checkbox[name=issue_id]:checked"
-				).each(function()
-				{
-					console.log(jQuery(this).val());
-					issueIdArray.push(jQuery(this).val());
-				});
-
-				// XXX: position, issues flag
-
-				getAssignedIssueArray(issueIdArray).then(function(assignedIssueArray)
-				{
-					noteData.assignedIssues = assignedIssueArray;
-
-					var me = this;
-					jQuery.ajax({
-						async: async,
-						type: "POST",
-						contentType: "application/json",
-						dataType: "json",
-						url: "../ws/rs/notes/" + demographicNo + "/save?deleteTmpSave=true",
-						data: JSON.stringify(noteData),
-						success: function (response)
-						{
-							if (response.status != "SUCCESS")
-							{
-								setNoteError(response.error.message);
-							}
-							else
-							{
-								// Set the saved note as the current note
-								EncounterNote.updateNoteInPageState(noteData, assignedIssueArray);
-								pageState.lastTmpSaveNote = null;
-								checkNoteChanged();
-
-								if(redirectToBilling)
-								{
-									window.location.replace(me.pageData.billingUrl);
-								}
-								else if (exitAfterSaving)
-								{
-									window.close();
-								}
-
-								setNoteStatus("Note successfully saved");
-							}
-						},
-						error: function (response)
-						{
-							setNoteError("Error saving note");
-							console.log(response);
-						}
-					});
-				});
-			}
-
-			function monitorCaseNote(e)
-			{
-				var caseNote = 'caseNote_note' + pageState.currentNoteData.noteId;
-
-				var MAXCHARS = 78;
-				var MINCHARS = -10;
-				var newChars = $(caseNote).value.length - pageState.numChars;
-				var newline = false;
-
-				if (e.keyCode == 13)
-					newline = true;
-
-				if (newline)
-				{
-					adjustCaseNote();
-				}
-				else if (newChars >= MAXCHARS)
-				{
-					adjustCaseNote();
-				}
-				else if (newChars <= MINCHARS)
-				{
-					adjustCaseNote();
-				}
-
-			}
-
-			function setCaretPosition(input, pos)
-			{
-				if (input.setSelectionRange)
-				{
-					input.focus();
-					input.setSelectionRange(pos, pos);
-				}
-				else if (input.createTextRange)
-				{
-					var range = input.createTextRange();
-					range.collapse(true);
-					range.moveEnd('character', pos);
-					range.moveStart('character', pos);
-					range.select();
-				}
-			}
-
-			//resize case note text area to contain all text
-			function adjustCaseNote()
-			{
-				var caseNote = 'caseNote_note' + pageState.currentNoteData.noteId;
-
-				if($(caseNote) == null)
-				{
-					return;
-				}
-
-
-				var MAXCHARS = 78;
-				var payload = $(caseNote).value;
-				var numLines = 0;
-				var spacing = Prototype.Browser.IE == true ? 1.08 : Prototype.Browser.Gecko == true ? 1.11 : 1.2;
-				var fontSize = $(caseNote).getStyle('font-size');
-				var lHeight = $(caseNote).getStyle('line-height');
-				var lineHeight = lHeight.substr(0, lHeight.indexOf('e'));
-				var arrLines = payload.split("\n");
-
-				//we count each new line char and add a line for lines longer than max length
-				for (var idx = 0; idx < arrLines.length; ++idx)
-				{
-
-					if (arrLines[idx].length >= MAXCHARS)
-					{
-						numLines += Math.ceil(arrLines[idx].length / MAXCHARS);
-					}
-					else
-						++numLines;
-
-				}
-
-				//add a buffer
-				numLines += 2;
-				var noteHeight = Math.ceil(lineHeight * numLines);
-				noteHeight += 'em';
-				$(caseNote).style.height = noteHeight;
-
-				pageState.numChars = $(caseNote).value.length;
-			}
-
-			function setNoteError(errorMessage)
-			{
-				jQuery("div#noteSaveErrorMessage").text(errorMessage);
-			}
-
-			function clearNoteError()
-			{
-				setNoteError("");
-			}
-
-			function setNoteStatus(message)
-			{
-				jQuery("div#noteSaveStatusMessage").text(message);
-			}
-
-			function clearNoteStatus()
-			{
-				setNoteStatus("");
-			}
-
-			function notesIncrementAndLoadMore(demographicNo)
-			{
-				if (notesRetrieveOk && $("encMainDiv").scrollTop <= 100)
-				{
-					notesRetrieveOk = false;
-					notesCurrentTop = $("encMainDiv").children[0].id;
-					notesLoader(
-						this.pageData.contextPath,
-						notesOffset,
-						notesIncrement,
-						demographicNo,
-						false
-					).then(function ()
-					{
-						notesOffset += notesIncrement;
-					});
-				}
-			}
-
-			function notesLoader(ctx, offset, numToReturn, demographicNo, scrollToBottom)
-			{
-				var deferred = jQuery.Deferred();
-				$("notesLoading").style.display = "inline";
-
-				var noteToEditDeferred = jQuery.ajax({
-					type: "GET",
-					contentType: "application/json",
-					dataType: "json",
-					url: "../ws/rs/notes/" + demographicNo + "/noteToEdit/latest"
-				});
-
-				var noteListDeferred = jQuery.ajax({
-					type: "GET",
-					contentType: "application/json",
-					dataType: "json",
-					url: "../ws/rs/notes/" + demographicNo + "/all?numToReturn=" + numToReturn + "&offset=" + offset,
-				});
-
-				var tmpSaveDeferred = jQuery.ajax({
-					type: "GET",
-					contentType: "application/json",
-					dataType: "json",
-					url: "../ws/rs/notes/" + demographicNo + "/tmpSave",
-				});
-
-				var me = this;
-				jQuery.when(noteListDeferred, noteToEditDeferred, tmpSaveDeferred).done(
-					function (noteListResponse, noteToEditResponse, tmpSaveResponse)
-					{
-						// XXX: handle error (check response[1] = 'success')
-
-						var response = noteListResponse[0];
-
-						var tmpSave = "";
-						if(tmpSaveResponse[1] == "success")
-						{
-							tmpSave = tmpSaveResponse[0].body;
-						}
-
-						var noteToEdit = null;
-						var issues = [];
-						if (
-							noteToEditResponse[1] == "success" &&
-							noteToEditResponse[0].body
-						)
-						{
-							noteToEdit = noteToEditResponse[0].body.encounterNote;
-							issues = noteToEditResponse[0].body.assignedCMIssues;
-						}
-						else
-						{
-							noteToEdit = getEmptyNote(me.pageData.providerNo, me.pageData.appointmentNo);
-							noteToEdit.note = getFormattedReason();
-						}
-
-						if(tmpSave)
-						{
-							noteToEdit.note = tmpSave;
-						}
-
-						EncounterNote.updateNoteInPageState(noteToEdit, issues);
-
-						$("notesLoading").style.display = "none";
-						displayNotes(demographicNo, response.body.notelist, noteToEdit, issues,
-							scrollToBottom, offset);
-
-						adjustCaseNote();
-						observeTextArea();
-						setSaveButtonVisibility();
-						setTmpSaveTimer();
-
-						if (typeof response !== undefined && 'body' in response)
-						{
-							notesRetrieveOk = response.body.moreNotes;
-						}
-
-						if (!notesRetrieveOk)
-						{
-							clearInterval(notesScrollCheckInterval);
-						}
-
-						deferred.resolve();
-					});
-
-				return deferred.promise();
-			}
-
-			function getFormattedReason()
-			{
-				var formattedReason = "";
-				var reason = this.pageData.reason;
-				var appointmentDate = this.pageData.appointmentDate;
-
-				if(reason == null)
-				{
-					reason = "";
-				}
-
-				if( appointmentDate == null || appointmentDate == "" || appointmentDate.toLowerCase() == "null")
-				{
-					formattedReason = "\n[" + moment().format("DD-MMM-YYYY") + " .: " + reason + "] \n";
-				}
-				else
-				{
-					var appointmentMoment = moment(appointmentDate);
-					formattedReason = "\n[" + appointmentMoment.format("DD-MMM-YYYY") + " .: " + reason + "]\n";
-				}
-
-				return formattedReason;
-			}
-
-			function setSaveButtonVisibility()
-			{
-				var note = pageState.currentNoteData;
-
-				if (note != null && note.isSigned)
-				{
-					$("saveImg").style.visibility = "hidden";
-				}
-				else
-				{
-					$("saveImg").style.visibility = "visible";
-				}
-			}
-
-			function displayNotes(demographicNo, noteArray, noteToEdit, issues, scrollToBottom, offset)
-			{
-				var containerDiv = jQuery('div#encMainDiv');
-
-				var noteToEditUuid = null;
-				if (noteToEdit != null)
-				{
-					noteToEditUuid = noteToEdit.uuid;
-				}
-
-				var firstNoteNode = null;
-				var foundNoteToEdit = false;
-				jQuery.each(noteArray, function (index, note)
-				{
-					var noteNode = null;
-
-					if (isEncounterNote(note))
-					{
-						var noteData = note;
-						var noteIssues = null;
-						var editThisNote = (offset == 0 && note.uuid == noteToEditUuid);
-						if (editThisNote)
-						{
-							foundNoteToEdit = true;
-							noteData = noteToEdit;
-							noteIssues = issues;
-						}
-						noteNode = prependNoteEntry(containerDiv, index + offset + 1, noteData, noteIssues, demographicNo, editThisNote);
-					}
-					else
-					{
-						noteNode = buildNonNoteEntry(containerDiv, index + offset, note, null, demographicNo, editThisNote);
-					}
-
-					if (firstNoteNode === null)
-					{
-						firstNoteNode = noteNode;
-					}
-				});
-
-				// If this is the first page, possibly show an extra note to edit
-				if (offset == 0)
-				{
-					if (!foundNoteToEdit)
-					{
-						// Add an extra, editable note to the end
-						var noteNode = appendNoteEntry(containerDiv, noteToEdit.noteId, noteToEdit, issues, demographicNo, true);
-					}
-
-					if (firstNoteNode === null)
-					{
-						firstNoteNode = noteNode;
-					}
-				}
-
-				if (scrollToBottom)
-				{
-					containerDiv.scrollTop(containerDiv.prop("scrollHeight"));
-				}
-				else
-				{
-					firstNoteNode[0].scrollIntoView();
-				}
-			}
-
-
-			function buildNonNoteEntry(containerDiv, index, note, demographicNo)
-			{
-				var appointmentNo = this.pageData.appointmentNo;
-
-				var date = moment(note.observationDate);
-
-				var winName = "junoEncounterFormWindow";
-
-				var onClickString = "";
-				if (note.eformData)
-				{
-					onClickString = "popupPage(700,800,'" + winName + "','/eform/efmshowform_data.jsp" +
-						"?appointment=" + encodeURIComponent(appointmentNo) +
-						"&amp;fdid=" + encodeURIComponent(note.eformDataId) + "');";
-				} else if (note.encounterForm)
-				{
-
-					var url = "../form/forwardshortcutname.jsp" +
-						"?formname=" + encodeURIComponent(note.note) +
-						"&demographic_no=" + encodeURIComponent(demographicNo) +
-						"&appointmentNo=" + encodeURIComponent(appointmentNo) +
-						"&formId=" + encodeURIComponent(note.noteId);
-
-					onClickString = "popupPage(700,800,'" + winName + "','" + url + "');";
-				}
-
-				var templateParameters = {
-					index: index,
-					note: note,
-					colour: getNoteColor(note),
-					noteLineArray: note.note.split("\n"),
-					formattedObservationDate: date.format('DD-MMM-YYYY H:mm'),
-					onClickString: onClickString
-				};
-
-
-				var newNode = jQuery('#encounterNonNoteTemplate').tmpl(templateParameters);
-
-				return newNode.prependTo(containerDiv);
-			}
-
-
-			function buildNoteEntry(index, note, issues, demographicNo, enableEdit)
-			{
-				var date = moment(note.observationDate);
-				var formattedDate = "";
-				if (date.isValid())
-				{
-					formattedDate = date.format('DD-MMM-YYYY H:mm');
-				}
-				var hideBeforeMoment = moment(this.pageData.encounterNoteHideBeforeDate);
-				var observationMoment = moment(note.observationDate);
-
-				if (hideBeforeMoment.isAfter(observationMoment))
-				{
-					var minimizeStyles = 'overflow: hidden; height: 1.1em;';
-					minimizeStyles: minimizeStyles
-				}
-
-				// Make annotation url
-				var annotationLabel = "anno" + moment().unix();
-				var annotationUrl = this.pageData.contextPath + "/annotation/annotation.jsp" +
-					"?atbname=" + encodeURIComponent(annotationLabel) +
-					"&table_id=" + encodeURIComponent(note.noteId) +
-					"&display=EChartNote" +
-					"&demo=" + encodeURIComponent(URL);
-
-				var encounterTypeArray = getEncounterTypeArray();
-
-				var selectedEncounterType = this.pageData.defaultEncounterType;
-				if(note.encounterType)
-				{
-					selectedEncounterType = note.encounterType;
-				}
-
-				var templateParameters = {
-					index: index,
-					contextPath: this.pageData.contextPath,
-					note: note,
-					issues: (issues == null ? [] : issues),
-					noteLineArray: note.note.split("\n"),
-					escapedNote: note.note.escapeHTML(),
-					formattedObservationDate: formattedDate,
-					collapseNote: hideBeforeMoment.isAfter(observationMoment),
-					edit: enableEdit,
-					annotationLabel: annotationLabel,
-					annotationUrl: annotationUrl,
-					encounterTypeArray: encounterTypeArray,
-					selectedEncounterType: selectedEncounterType
-				};
-
-				return jQuery('#encounterNoteTemplate').tmpl(templateParameters);
-			}
-
-			function enableCalendar(noteId)
-			{
-				Calendar.setup({
-					inputField : "observationDateInput" + noteId,
-					ifFormat : "%d-%b-%Y %H:%M ",
-					showsTime :true,
-					button : "observationDate_cal",
-					singleClick : true,
-					step : 1
-				});
-			}
-
-			function prependNoteEntry(containerDiv, index, note, issues, demographicNo, enableEdit)
-			{
-				var newNode = buildNoteEntry(index, note, issues, demographicNo, enableEdit);
-				var returnNode = newNode.prependTo(containerDiv);
-
-				if(enableEdit)
-				{
-					enableCalendar(note.noteId);
-				}
-
-				return returnNode;
-			}
-
-			function appendNoteEntry(containerDiv, index, note, issues, demographicNo, enableEdit)
-			{
-				var newNode = buildNoteEntry(index, note, issues, demographicNo, enableEdit);
-				var returnNode = newNode.appendTo(containerDiv);
-
-				if(enableEdit)
-				{
-					enableCalendar(note.noteId);
-				}
-
-				return returnNode;
-			}
-
-			function replaceNoteEntry(nodeToReplace, note, issues, demographicNo, enableEdit)
-			{
-				// Make sure the node being replaced has the right id format
-				var elementId = nodeToReplace.attr('id');
-				if (/^n\d*$/.test(elementId))
-				{
-					return null;
-				}
-
-				var index = elementId.substring(1);
-				var newNode = buildNoteEntry(index, note, issues, demographicNo, enableEdit);
-				var returnNode = nodeToReplace.replaceWith(newNode);
-
-				if(enableEdit)
-				{
-					enableCalendar(note.noteId);
-				}
-
-				return returnNode;
-			}
-
-			function isEncounterNote(note)
-			{
-				if (note.document || note.rxAnnotation || note.eformData || note.encounterForm ||
-					note.invoice || note.ticklerNote || note.cpp)
-				{
-					return false;
-				}
-
-				return true;
-			}
-
-			function getNoteColor(note)
-			{
-				if (note.eformData)
-				{
-					return '#008000';
-				} else if (note.document)
-				{
-					return '#476BB3';
-				} else if (note.rxAnnotation)
-				{
-					return '#7D2252';
-				} else if (note.encounterForm)
-				{
-					return '#917611';
-				} else if (note.invoice)
-				{
-					return '#254117';
-				} else if (note.ticklerNote)
-				{
-					return '#FF6600';
-				} else if (note.cpp)
-				{
-					if (note.issueDescriptions.indexOf('Family History as part of cpp') > -1)
-					{
-						return '#006600';
-					} else if (note.issueDescriptions.indexOf('Other Meds as part of cpp') > -1)
-					{
-						return '#306754';
-					} else if (note.issueDescriptions.indexOf('Risk Factors as part of cpp') > -1)
-					{
-						return '#993333';
-					}
-
-					return '#996633';
-				}
-
-				return '#000000';
-			}
-
-			function getEncounterSectionUrl(sectionName, demographicNo, appointmentNo, limit, offset)
-			{
-				var limitString = "";
-				var offsetString = "";
-
-				if (limit !== null)
-				{
-					limitString = "&limit=" + limit;
-				}
-
-				if (offset !== null)
-				{
-					offsetString = "&offset=" + offset;
-				}
-
-				return "../ws/rs/encounterSections/" + demographicNo + "/section/" + sectionName + "/?appointmentNo=" +
-					appointmentNo + limitString + offsetString;
-			}
-
-			function getSaveCPPNoteUrl(demographicNo)
-			{
-				return "../ws/rs/notes/" + demographicNo + "/saveIssueNote";
-			}
-
-			function isCppSection(sectionName)
-			{
-				return ["SocHistory", "MedHistory", "Concerns", "Reminders"].indexOf(sectionName) != -1;
-			}
-
-			function getSectionRemote(sectionName, getAll, disableExpand)
-			{
-				var appointmentNo = this.pageData.appointmentNo;
-				var demographicNo = this.pageData.demographicNo;
-
-				var limit = null;
-				var offset = null;
-				if (!getAll)
-				{
-					limit = 6;
-					offset = 0;
-				}
-
-				jQuery.ajax({
-					type: "GET",
-					contentType: "application/json",
-					dataType: "json",
-					url: getEncounterSectionUrl(sectionName, demographicNo, appointmentNo, limit, offset),
-					success: function (response)
-					{
-						var containerDiv = jQuery('#' + sectionName + 'list');
-
-						containerDiv.empty();
-
-						jQuery.each(response.body.notes, function (index, note)
-						{
-							note.sectionName = sectionName;
-							note.index = index;
-							note.updateDateFormatted = "";
-							if (note.updateDate !== null)
-							{
-								var updateMoment = moment(note.updateDate);
-								note.updateDateFormatted = updateMoment.format("DD-MMM-YYYY");
-							}
-
-							note.rowClass = "encounterNoteOdd";
-							if (index % 2 == 0)
-							{
-								note.rowClass = "encounterNoteEven";
-							}
-
-							// Show the close arrow on the first and last row
-							if (!disableExpand && getAll && (index == 0 || index == response.body.notes.length - 1))
-							{
-								note.showCollapse = true;
-							} else if (!disableExpand && !getAll && index == response.body.notes.length - 1)
-							{
-								note.showExpand = true;
-							}
-
-							var newNode;
-							if (isCppSection(sectionName))
-							{
-								newNode = jQuery('#sectionCppNoteTemplate').tmpl(note);
-							} else
-							{
-								newNode = jQuery('#sectionNoteTemplate').tmpl(note);
-							}
-
-							return newNode.appendTo(containerDiv);
-						});
-					}
-				});
-
-
-			}
-
-			function showMenu(menuNumber, eventObj)
-			{
-				var menuId = 'menu' + menuNumber;
-				return showPopup(menuId, eventObj);
-			}
-
-			function autoCompleteShowMenuCPP(element, update)
-			{
-				Effect.Appear($("issueListCPP"), {duration: 0.15});
-				Effect.Appear(update, {duration: 0.15});
-			}
-
-			function autoCompleteHideMenuCPP(element, update)
-			{
-				new Effect.Fade(update, {duration: 0.15});
-				new Effect.Fade($("issueListCPP"), {duration: 0.15});
-			}
-
+			// XXX: make this work
 			function copyCppToCurrentNote()
 			{
 				// Enable this when encounter notes work
@@ -1564,401 +279,16 @@
 				*/
 			}
 
-			function addIssueToCPP(txtField, listItem)
-			{
-				var nodeId = listItem.id;
-				var issueDescription = listItem.innerHTML;
-				addIssue("frmIssueNotes", "issueIdList", "issueAutocompleteCPP", nodeId, issueDescription);
 
-				$("issueChange").value = true;
-			}
 
 
-			function addIssueToCurrentNote(event)
-			{
-				var nodeId = jQuery('input#issueSearchSelectedId').val();
-				var issueDescription = jQuery('input#issueSearchSelected').val();
-
-				if(!nodeId)
-				{
-					return false;
-				}
-
-				addIssue("caseManagementEntryForm", "noteIssueIdList", "issueAutocomplete", nodeId, issueDescription);
-
-				jQuery('input#issueSearchSelectedId').val("");
-				jQuery('input#issueSearchSelected').val("");
-			}
-
-			function addIssue(formName, parentNodeId, autocompleteId, nodeId, issueDescription)
-			{
-
-				var size = 0;
-				var found = false;
-				var form = document.forms[formName]
-				var curItems = null;
-
-				if(form)
-				{
-					curItems = form.elements["issueId"];
-				}
-
-				if(curItems && typeof curItems.length != "undefined")
-				{
-					size = curItems.length;
-
-					for(var idx = 0; idx < size; ++idx)
-					{
-						if (curItems[idx].value == nodeId)
-						{
-							found = true;
-							break;
-						}
-					}
-				}
-				else if(curItems && typeof curItems.value != "undefined")
-				{
-					found = curItems.value == nodeId;
-				}
-
-				if(!found)
-				{
-					var node = document.createElement("LI");
-
-					var html = "<input type='checkbox' id='issueId' name='issue_id' checked value='" + nodeId + "'>" + issueDescription;
-					new Insertion.Top(node, html);
-
-					$(parentNodeId).appendChild(node);
-					$(autocompleteId).value = "";
-				}
-			}
-
-			function minView(e, nodeId)
-			{
-				toggleShrunkNote(e, nodeId, true);
-			}
-
-			function maxView(e, nodeId)
-			{
-				toggleShrunkNote(e, nodeId, false);
-			}
-
-			function toggleShrunkNote(e, nodeId, shrink)
-			{
-				//var txt = Event.element(e).parentNode.id;
-				var noteDivId = "n" + nodeId;
-				var noteTxtId = "txt" + nodeId;
-
-				if (shrink)
-				{
-					Element.remove("quitImg" + nodeId);
-
-					$(noteTxtId).addClassName("collapse");
-
-					var maximizeImageTag = "<img title='Maximize Display' alt='Maximize Display' id='xpImg" + nodeId + "' name='expandViewTrigger' onclick='maxView(event, \"" + nodeId + "\")' style='float:right; margin-right:5px; margin-top: 2px;' src='" + this.pageData.contextPath + "/oscarEncounter/graphics/triangle_down.gif'>";
-					new Insertion.Top(noteDivId, maximizeImageTag);
-				} else
-				{
-					Element.remove("xpImg" + nodeId);
-
-					$(noteTxtId).removeClassName("collapse");
-
-					var minimizeImageTag = "<img id='quitImg" + nodeId + "' onclick='minView(event, \"" + nodeId + "\")' style='float:right; margin-right:5px; margin-top: 2px;' src='" + this.pageData.contextPath + "/oscarEncounter/graphics/triangle_up.gif'>";
-					new Insertion.Top(noteDivId, minimizeImageTag);
-				}
-			}
-
-			function submitIssue(event)
-			{
-				var keyCode = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
-				if (keyCode == 13)
-				{
-					if (pageState.submitIssues)
-					{
-						$("asgnIssues").click();
-					}
-
-					return false;
-				}
-			}
-
-			function togglePrint(noteId, e)
-			{
-				var selected = this.pageData.contextPath + "/oscarEncounter/graphics/printerGreen.png";
-				var unselected = this.pageData.contextPath + "/oscarEncounter/graphics/printer.png";
-				var imgId = "print" + noteId;
-				var idx;
-				var idx2;
-				var tmp = "";
-
-				//see whether we're called in a click event or not
-				if (e != null)
-					Event.stop(e);
-
-				//if selected note has been inserted into print queue, remove it and update image src
-				//else insert note into print queue
-				idx = noteIsQeued(noteId);
-				if (idx >= 0)
-				{
-					$(imgId).src = unselected;
-
-					//if we're slicing first note off list
-					if (idx == 0)
-					{
-						idx2 = $F("notes2print").indexOf(",");
-						if (idx2 > 0)
-							tmp = $F("notes2print").substring(idx2 + 1);
-					}
-					//or we're slicing after first element
-					else
-					{
-						idx2 = $F("notes2print").indexOf(",", idx);
-						//are we in the middle of the list?
-						if (idx2 > 0)
-						{
-							tmp = $F("notes2print").substring(0, idx);
-							tmp += $F("notes2print").substring(idx2 + 1);
-						}
-						//or are we at the end of the list; don't copy comma
-						else
-							tmp = $F("notes2print").substring(0, idx - 1);
-
-					}
-
-					$("notes2print").value = tmp;
-				}
-				else
-				{
-					$(imgId).src = selected;
-					if ($F("notes2print").length > 0)
-						$("notes2print").value += "," + noteId;
-					else
-						$("notes2print").value = noteId;
-				}
-
-				return false;
-			}
-
-			function clearAll(e)
-			{
-				var idx;
-				var noteId;
-				var notesDiv;
-				var pos;
-				var imgId;
-
-				Event.stop(e);
-
-				//cycle through container divs for each note
-				for (idx = 1; idx <= notesOffset; ++idx)
-				{
-					if ($("nc" + idx) == null) continue;
-
-					notesDiv = $("nc" + idx).down('div');
-					noteId = notesDiv.id.substr(1);  //get note id
-					imgId = "print" + noteId;
-
-					//if print img present, add note to print queue if not already there
-					if ($(imgId) != null)
-					{
-						pos = noteIsQeued(noteId);
-						if (pos >= 0)
-							removePrintQueue(noteId, pos);
-					}
-				}
-
-				if ($F("printCPP") == "true")
-					printInfo("imgPrintCPP", "printCPP");
-
-				if ($F("printRx") == "true")
-					printInfo("imgPrintRx", "printRx");
-
-				return false;
-			}
-
-			function noteIsQeued(noteId)
-			{
-				var foundIdx = -1;
-				var curpos = 0;
-				var arrNoteIds = $F("notes2print").split(",");
-
-				for (var idx = 0; idx < arrNoteIds.length; ++idx)
-				{
-					if (arrNoteIds[idx] == noteId)
-					{
-						foundIdx = curpos;
-						break;
-					}
-					curpos += arrNoteIds[idx].length + 1;
-				}
-
-
-				return foundIdx;
-			}
-
-			function printToday(e)
-			{
-				clearAll(e);
-
-				var today = moment().format("DD-MMM-YYYY");
-				$("printStartDate").value = today;
-				$("printEndDate").value = $F("printStartDate");
-				$("printopDates").checked = true;
-			}
-
-			function printInfo(img, item)
-			{
-				var selected = this.pageData + "/oscarEncounter/graphics/printerGreen.png";
-				var unselected = ctx + "/oscarEncounter/graphics/printer.png";
-
-				if ($F(item) == "true")
-				{
-					$(img).src = unselected;
-					$(item).value = "false";
-				}
-				else
-				{
-					$(img).src = selected;
-					$(item).value = "true";
-				}
-
-				return false;
-			}
-
-			function getPrintDates()
-			{
-				var startDate = $F("printStartDate");
-				var endDate = $F("printEndDate");
-
-				if(startDate.length == 0 || endDate.length == 0)
-				{
-					alert("<bean:message key="oscarEncounter.printDate.msg"/>");
-					return null;
-				}
-
-				var startMoment = moment(startDate, "DD-MMM-YYYY");
-				var endMoment = moment(endDate, "DD-MMM-YYYY");
-
-				if(startMoment.isAfter(endMoment))
-				{
-					alert("<bean:message key="oscarEncounter.printDateOrder.msg"/>");
-					return null;
-				}
-
-				var dateObject = {
-					start: startMoment.toDate(),
-					end: endMoment.toDate()
-				};
-
-				return dateObject;
-			}
-
-			function removePrintQueue(noteId, idx)
-			{
-				var unselected = ctx + "/oscarEncounter/graphics/printer.png";
-				var imgId = "print" + noteId;
-				var tmp = "";
-				var idx2;
-
-				$(imgId).src = unselected; //imgPrintgrey.src;
-
-				//if we're slicing first note off list
-				if (idx == 0)
-				{
-					idx2 = $F("notes2print").indexOf(",");
-					if (idx2 > 0)
-						tmp = $F("notes2print").substring(idx2 + 1);
-				}
-				//or we're slicing after first element
-				else
-				{
-					idx2 = $F("notes2print").indexOf(",", idx);
-					//are we in the middle of the list?
-					if (idx2 > 0)
-					{
-						tmp = $F("notes2print").substring(0, idx);
-						tmp += $F("notes2print").substring(idx2 + 1);
-					}
-					//or are we at the end of the list; don't copy comma
-					else
-						tmp = $F("notes2print").substring(0, idx - 1);
-
-				}
-
-				$("notes2print").value = tmp;
-			}
-
-			function printSetup(e)
-			{
-				if ($F("notes2print").length > 0)
-				{
-					$("printopSelected").checked = true;
-				}
-				else
-				{
-					$("printopAll").checked = true;
-				}
-
-				$("printOps").style.right = (pageWidth() - Event.pointerX(e)) + "px";
-				$("printOps").style.bottom = (pageHeight() - Event.pointerY(e)) + "px";
-				$("printOps").style.display = "block";
-
-				return false;
-			}
-
-			function printNotes()
-			{
-				var printType = null;
-				var dateObject = null;
-
-				if ($("printopAll").checked)
-				{
-					printType = "all";
-				}
-				else if ($("printopDates").checked)
-				{
-					dateObject = getPrintDates();
-
-					if(dateObject == null)
-					{
-						return false;
-					}
-
-					printType = "dates";
-				}
-
-				var selectedNoteCsv = $F("notes2print");
-
-				var noteArray = [];
-				if(selectedNoteCsv.length > 0)
-				{
-					noteArray = selectedNoteCsv.split(",");
-				}
-
-				var printConfig = {
-					printType: printType,
-					dates: dateObject,
-					cpp: $F("printCPP"),
-					rx: $F("printRx"),
-					labs: $F("printLabs"),
-					selectedList: noteArray
-				};
-
-				var jsonString = JSON.stringify(printConfig);
-
-				var url = "../ws/rs/recordUX/" + this.pageData.demographicNo + "/print?printOps=" + encodeURIComponent(jsonString);
-
-				window.open(url, '_blank');
-
-				return false;
-			}
 
 			function onClosing()
 			{
 				var noteId = jQuery("input#editNoteId").val();
 
 				// Prepare data
-				var noteData = getNoteDataById(noteId);
+				var noteData = encounterNote.getNoteDataById(noteId);
 
 				// Save unfinished note on exit. The temp save stuff added in Oscar15 is too fragile
 				// to depend on
@@ -1966,7 +296,7 @@
 				// Trim the notes because that happens when the note is saved
 				if(pageState.currentNoteData.note.trim() != noteData.note.trim())
 				{
-					saveEncounterNote(false, false, true, false, false);
+					encounterNote.saveEncounterNote(false, false, true, false, false);
 				}
 
 				/*
@@ -2001,7 +331,7 @@
 				text = text.replace(/\\u0027/g, "\u0027");
 
 
-				EncounterNote.pasteToEncounterNote(text);
+				encounterNote.pasteToEncounterNote(text);
 			}
 
 			function ajaxInsertTemplate(varpage)
@@ -2068,6 +398,62 @@
 				var popup = window.open(varpage, pageName, windowprops);
 				popup.pastewin = opener;
 				popup.focus();
+			}
+
+			function showMenu(menuNumber, eventObj)
+			{
+				var menuId = 'menu' + menuNumber;
+				return showPopup(menuId, eventObj);
+			}
+
+
+			<%-- ============================================================================== --%>
+			<%-- Autocomplete helper functions                                                  --%>
+			<%-- ============================================================================== --%>
+
+			function saveIssueId(txtField, listItem)
+			{
+				jQuery('input#issueSearchSelectedId').val(listItem.id);
+				jQuery('input#issueSearchSelected').val(listItem.innerHTML);
+			}
+
+			function addIssueToCPP(txtField, listItem)
+			{
+				var nodeId = listItem.id;
+				var issueDescription = listItem.innerHTML;
+				caseManagementIssue.addIssue("frmIssueNotes", "issueIdList", "issueAutocompleteCPP", nodeId, issueDescription);
+
+				$("issueChange").value = true;
+			}
+
+			function autoCompleteShowMenuCPP(element, update)
+			{
+				Effect.Appear($("issueListCPP"), {duration: 0.15});
+				Effect.Appear(update, {duration: 0.15});
+			}
+
+			function autoCompleteHideMenuCPP(element, update)
+			{
+				new Effect.Fade(update, {duration: 0.15});
+				new Effect.Fade($("issueListCPP"), {duration: 0.15});
+			}
+
+			function autoCompleteShowMenu(element, update)
+			{
+				$("issueList").style.left = $("mainContent").style.left;
+				$("issueList").style.top = $("mainContent").style.top;
+				$("issueList").style.width = $("issueAutocompleteList").style.width;
+
+				Effect.Appear($("issueList"), {duration: 0.15});
+				Effect.Appear($("issueTable"), {duration: 0.15});
+				Effect.Appear(update, {duration: 0.15});
+			}
+
+			function autoCompleteHideMenu(element, update)
+			{
+				new Effect.Fade(update, {duration: 0.15});
+				new Effect.Fade($("issueTable"), {duration: 0.15});
+				new Effect.Fade($("issueList"), {duration: 0.15});
 			}
 
 			function init()
@@ -2188,12 +574,12 @@
 				var demographicNo = this.pageData.demographicNo;
 
 				// Load a few extra notes initially, hopefully fill up the page
-				notesLoader(ctx, 0, notesIncrement * 2, demographicNo, true).then(function ()
+				encounterNote.notesLoader(ctx, 0, notesIncrement * 2, demographicNo, true).then(function ()
 				{
 					notesOffset += (notesIncrement * 2);
 					notesScrollCheckInterval = setInterval(function ()
 					{
-						notesIncrementAndLoadMore(demographicNo)
+						encounterNote.notesIncrementAndLoadMore(demographicNo)
 					}, 50);
 				});
 
@@ -2224,58 +610,6 @@
 
 				window.onbeforeunload = onClosing;
 			}
-
-			// XXX: this is here to allow the old notes display to run
-			var showIssue = false;
-			var autoCompleted = new Object();
-			var autoCompList = new Array();
-			var itemColours = new Object();
-			var changeIssueFunc;
-
-			function setupNotes()
-			{
-			}
-
-			function getActiveText(e)
-			{
-			}
-
-			function fullView(e)
-			{
-			}
-
-			function saveIssueId(txtField, listItem)
-			{
-				jQuery('input#issueSearchSelectedId').val(listItem.id);
-				jQuery('input#issueSearchSelected').val(listItem.innerHTML);
-			}
-
-			function autoCompleteShowMenu(element, update)
-			{
-				$("issueList").style.left = $("mainContent").style.left;
-				$("issueList").style.top = $("mainContent").style.top;
-				$("issueList").style.width = $("issueAutocompleteList").style.width;
-
-				Effect.Appear($("issueList"), {duration: 0.15});
-				Effect.Appear($("issueTable"), {duration: 0.15});
-				Effect.Appear(update, {duration: 0.15});
-			}
-
-			function autoCompleteHideMenu(element, update)
-			{
-				new Effect.Fade(update, {duration: 0.15});
-				new Effect.Fade($("issueTable"), {duration: 0.15});
-				new Effect.Fade($("issueList"), {duration: 0.15});
-			}
-
-			function updateIssues(e)
-			{
-			}
-
-			function menuAction()
-			{
-			}
-
 
 		</script>
 
@@ -2336,11 +670,11 @@
 
 			<li class="encounterNote \${rowClass}">
 				{{if showExpand }}
-				<a href="#" class="expandCasemgmtSidebar" onclick="getSectionRemote('\${sectionName}', true, false); return false;" title="\${remainingNotes} more items">
+				<a href="#" class="expandCasemgmtSidebar" onclick="junoEncounter.getSectionRemote('\${sectionName}', true, false); return false;" title="\${remainingNotes} more items">
 					<img id="imgpreventions5" src="graphics/expand.gif" />&nbsp;&nbsp;
 				</a>
 				{{else showCollapse }}
-				<a href="#" class="expandCasemgmtSidebar" onclick="getSectionRemote('\${sectionName}', false, false); return false;" title="\${remainingNotes} more items">
+				<a href="#" class="expandCasemgmtSidebar" onclick="junoEncounter.getSectionRemote('\${sectionName}', false, false); return false;" title="\${remainingNotes} more items">
 					<img id="imgpreventions5" src="../oscarMessenger/img/collapse.gif" />&nbsp;&nbsp;
 				</a>
 				{{else}}
@@ -2419,7 +753,7 @@
 							{{if note.revision}}
 								 Rev
 
-								<a style="color:#ddddff;" href="#" onclick="return showHistory('\${note.noteId}', event);">\${note.revision}</a>
+								<a style="color:#ddddff;" href="#" onclick="return junoEncounter.showHistory('\${note.noteId}', event);">\${note.revision}</a>
 							{{/if}}
 							{{if note.eformData || note.encounterForm}}
 								<a class="links" title="View eForm" id="viewEFORM122582" href="#"
@@ -2459,14 +793,14 @@
 								alt="Maximize Display"
 								id="xpImg\${note.noteId}"
 								name="expandViewTrigger"
-								onclick="maxView(event, '\${note.noteId}')"
+								onclick="encounterNote.maxView(event, '\${note.noteId}')"
 								style="float:right; margin-right:5px; margin-top: 2px;"
 								src="\${context}/oscarEncounter/graphics/triangle_down.gif" />
 						{{else}}
 							<img title="Minimize Display"
 								id="quitImg\${note.noteId}"
 								alt="Minimize Display"
-								onclick="minView(event, '\${note.noteId}')"
+								onclick="encounterNote.minView(event, '\${note.noteId}')"
 								style="float: right; margin-right: 5px; margin-bottom: 3px; margin-top: 2px;"
 								src="\${context}/oscarEncounter/graphics/triangle_up.gif" />
 						{{/if}}
@@ -2475,7 +809,7 @@
 							title="Print"
 							id="print\${note.noteId}"
 							alt="Toggle Print Note"
-							onclick="togglePrint('\${note.noteId}', event)"
+							onclick="printNotes.togglePrint('\${note.noteId}', event)"
 							style="float: right; margin-right: 5px; margin-top: 2px;"
 							src="\${context}/oscarEncounter/graphics/printer.png" />
 					{{/if}}
@@ -2511,7 +845,7 @@
 							title="Edit"
 							id="edit\${note.noteId}"
 							href="#"
-							onclick="editEncounterNote(event, '\${note.noteId}');return false;"
+							onclick="encounterNote.editEncounterNote(event, '\${note.noteId}');return false;"
 							style="float: right; margin-right: 5px; font-size: 10px;">
 
 							Edit
@@ -2568,7 +902,7 @@
 								{{/if}}
 								Rev
 
-								<a href="#" onclick="return showHistory('\${note.noteId}', event);">\${note.revision}</a>
+								<a href="#" onclick="return junoEncounter.showHistory('\${note.noteId}', event);">\${note.revision}</a>
 
 							</div>
 
@@ -2774,7 +1108,7 @@
 							 src="${fn:escapeXml(junoEncounterForm.header.imagePresentPlaceholderUrl)}"
 							 alt="id_photo" height="100" title="Click to upload new photo."
 							 OnMouseOver="document.getElementById('ci').src='../imageRenderingServlet?source=local_client&clientId=${fn:escapeXml(junoEncounterForm.header.demographicNo)}'"
-							 OnMouseOut="delay(5000); window.status='Click to upload new photo'; return true;"
+							 OnMouseOut="junoEncounter.delay(5000); window.status='Click to upload new photo'; return true;"
 							 onClick="junoEncounter.popupUploadPage('uploadimage.jsp',${fn:escapeXml(junoEncounterForm.header.demographicNo)});return false;" />
 					</c:when>
 					<c:otherwise>
@@ -2882,7 +1216,7 @@
 										<c:when test="${ section.remainingNotes > 0 && loop.last }">
 											<a href="#"
 											   class="expandCasemgmtSidebar encounterNoteTitle"
-											   onclick="getSectionRemote('${sectionName}', true, false); return false;"
+											   onclick="junoEncounter.getSectionRemote('${sectionName}', true, false); return false;"
 											   title="${section.remainingNotes} more items">
 												<img id="img${sectionName}5"
 													 src="graphics/expand.gif"/>&nbsp;&nbsp;
@@ -3036,22 +1370,6 @@
 												   id="listNote${note.id}"
 												   href="#"
 												   onclick="${note.onClick}"
-													<%--
-													onclick="showEdit(
-															event,
-															'<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${section.title}</spring:escapeBody>',
-															'<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.id}</spring:escapeBody>',
-															'<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.editors}</spring:escapeBody>',
-															'${observationDate}',
-															'<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.revision}</spring:escapeBody>',
-															'<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.text}</spring:escapeBody>',
-															${fn:length(section.notes)},
-															${noteLoop.index},
-															'<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.noteIssuesString}</spring:escapeBody>',
-															'<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.noteExtsString}</spring:escapeBody>',
-															'<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${param.demographicNo}</spring:escapeBody>',
-															);return false;"
-													 --%>
 												   style="width:100%;overflow:scroll;">
 														${fn:escapeXml(note.text)}
 												</a>
@@ -3587,7 +1905,7 @@
 			<input tabindex="17" type='image'
 				   src="<c:out value="${ctx}/oscarEncounter/graphics/media-floppy.png"/>"
 				   id="saveImg"
-				   onclick="Event.stop(event);return saveEncounterNote(false, false, false, true, false);"
+				   onclick="Event.stop(event);return encounterNote.saveEncounterNote(false, false, false, true, false);"
 				   title='<bean:message key="oscarEncounter.Index.btnSave"/>'>&nbsp;
 			<input tabindex="18" type='image'
 				   src="<c:out value="${ctx}/oscarEncounter/graphics/document-new.png"/>"
@@ -3596,17 +1914,17 @@
 			<input tabindex="19" type='image'
 				   src="<c:out value="${ctx}/oscarEncounter/graphics/note-save.png"/>"
 				   id="signSaveImg"
-				   onclick="Event.stop(event);return saveEncounterNote(true, false, true, true, false);"
+				   onclick="Event.stop(event);return encounterNote.saveEncounterNote(true, false, true, true, false);"
 				   title='<bean:message key="oscarEncounter.Index.btnSignSave"/>'>&nbsp;
 			<input tabindex="20" type='image'
 				   src="<c:out value="${ctx}/oscarEncounter/graphics/verify-sign.png"/>"
 				   id="signVerifyImg"
-				   onclick="Event.stop(event);return saveEncounterNote(true, true, true, true, false);"
+				   onclick="Event.stop(event);return encounterNote.saveEncounterNote(true, true, true, true, false);"
 				   title='<bean:message key="oscarEncounter.Index.btnSign"/>'>&nbsp;
 			<c:if test="${junoEncounterForm.header.source == null}">
 				<input tabindex="21" type='image'
 					   src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>"
-					   onclick="Event.stop(event);return saveEncounterNote(true, false, true, true, true);"
+					   onclick="Event.stop(event);return encounterNote.saveEncounterNote(true, false, true, true, true);"
 					   title='<bean:message key="oscarEncounter.Index.btnBill"/>'>&nbsp;
 			</c:if>
 	    	<input tabindex="23" type='image'
@@ -3615,7 +1933,7 @@
 				   title='<bean:message key="global.btnExit"/>'>&nbsp;
 	    	<input tabindex="24" type='image'
 				   src="<c:out value="${ctx}/oscarEncounter/graphics/document-print.png"/>"
-				   onclick="return printSetup(event);"
+				   onclick="return printNotes.printSetup(event);"
 				   title='<bean:message key="oscarEncounter.Index.btnPrint"/>'
 				   id="imgPrintEncounter">
     	</span>
@@ -3624,7 +1942,7 @@
 			<input tabindex="8" type="text"
 				   id="issueAutocomplete" name="issueSearch"
 				   style="z-index: 2;"
-				   onkeypress="return submitIssue(event);"
+				   onkeypress="return caseManagementIssue.submitIssue(event);"
 				   size="30">&nbsp;
 			<input type="hidden"
 				   id="issueSearchSelectedId"
@@ -3635,7 +1953,7 @@
 			<input tabindex="9"
 				type="button"
 				id="asgnIssues"
-				onclick="addIssueToCurrentNote(event); return false;"
+				onclick="caseManagementIssue.addIssueToCurrentNote(event); return false;"
 				value="<bean:message key="oscarEncounter.assign.title"/>">
 			<span id="busy" style="display: none">
 	    		<img style="position: absolute;"
@@ -3694,7 +2012,7 @@
 									id="frmIssueNotes"
 									action=""
 									method="post"
-									onsubmit="return updateCPPNote();">
+									onsubmit="return cppNote.updateCPPNote();">
 
 									<%--
 									<input type="hidden" id="reloadUrl" name="reloadUrl" value="">
@@ -3839,7 +2157,7 @@
 					<input type="image"
 						   src="<c:out value="${ctx}/oscarEncounter/graphics/system-log-out.png"/>"
 						   title='<bean:message key="global.btnExit"/>'
-						   onclick="this.focus();hideEdit();return false;">
+						   onclick="this.focus();cppNote.hideEdit();return false;">
 						   <%--onclick="this.focus();$('channel').style.visibility ='visible';$('showEditNote').style.display='none';return false;">--%>
 				</span>
 								<bean:message key="oscarEncounter.Index.btnPosition"/>
@@ -3887,7 +2205,7 @@
 												 title="<bean:message key="oscarEncounter.print.title"/>"
 												 id='imgPrintCPP'
 												 alt="<bean:message key="oscarEncounter.togglePrintCPP.title"/>"
-												 onclick="return printInfo(this,'printCPP');"
+												 onclick="return printNotes.printInfo(this,'printCPP');"
 												 src='<c:out value="${ctx}"/>/oscarEncounter/graphics/printer.png'>&nbsp;<bean:message
 												key="oscarEncounter.cpp.title"/>
 										</security:oscarSec>
@@ -3901,7 +2219,7 @@
 												 title="<bean:message key="oscarEncounter.print.title"/>"
 												 id='imgPrintRx'
 												 alt="<bean:message key="oscarEncounter.togglePrintRx.title"/>"
-												 onclick="return printInfo(this, 'printRx');"
+												 onclick="return printNotes.printInfo(this, 'printRx');"
 												 src='<c:out value="${ctx}"/>/oscarEncounter/graphics/printer.png'>&nbsp;<bean:message
 												key="oscarEncounter.Rx.title"/></td>
 									</tr>
@@ -3911,7 +2229,7 @@
 												 title="<bean:message key="oscarEncounter.print.title"/>"
 												 id='imgPrintLabs'
 												 alt="<bean:message key="oscarEncounter.togglePrintLabs.title"/>"
-												 onclick="return printInfo(this, 'printLabs');"
+												 onclick="return printNotes.printInfo(this, 'printLabs');"
 												 src='<c:out value="${ctx}"/>/oscarEncounter/graphics/printer.png'>&nbsp;<bean:message
 												key="oscarEncounter.Labs.title"/></td>
 									</tr>
@@ -3921,7 +2239,7 @@
 												   value="dates">
 											<bean:message key="oscarEncounter.Index.PrintDates"/>&nbsp;<a
 													style="font-variant: small-caps;" href="#"
-													onclick="return printToday(event);"><bean:message
+													onclick="return printNotes.printToday(event);"><bean:message
 													key="oscarEncounter.Index.PrintToday"/></a></td>
 										<td></td>
 									</tr>
@@ -3952,7 +2270,7 @@
 								<div style="margin-top: 5px; text-align: center">
 									<input type="submit" id="printOp"
 										   style="border: 1px solid #7682b1;"
-										   value="Print" onclick="return printNotes();">
+										   value="Print" onclick="return printNotes.printNotes();">
 
 									<indivo:indivoRegistered
 											demographic="<%=(String) request.getAttribute(\"demographicNo\")%>"
@@ -3968,7 +2286,7 @@
 										type="submit" id="clearprintOp"
 										style="border: 1px solid #7682b1;"
 										value="Clear"
-										onclick="$('printOps').style.display='none'; return clearAll(event);">
+										onclick="$('printOps').style.display='none'; return printNotes.clearAll(event);">
 								</div>
 
 								<%

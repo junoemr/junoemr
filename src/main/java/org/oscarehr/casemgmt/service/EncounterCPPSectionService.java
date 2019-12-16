@@ -60,30 +60,7 @@ public abstract class EncounterCPPSectionService extends EncounterSectionService
 
 	public String getOnClickPlus(List<EncounterSectionNote> notes, SectionParameters sectionParams, String cppIssues)
 	{
-		// function showEdit(e, noteType, title, noteId, editors, date, revision, note, numNotes, position, noteIssues, noteExts, demoNo)
-
 		return getShowEditJavascriptCallString(null, notes.size(), sectionParams, cppIssues);
-
-
-		/*
-		String onClickString = "return showEdit(" +
-			"event," +
-			"'" + StringEscapeUtils.escapeHtml(getSectionId()) + "'," +
-			"'" + StringEscapeUtils.escapeHtml(title) + "'," +
-			"''," +
-			"0," +
-			"''," +
-			"''," +
-			"''," +
-				StringEscapeUtils.escapeHtml(Integer.toString(notes.size())) + "," +
-			"0," +
-			"'" + StringEscapeUtils.escapeHtml(cppIssues) + "'," +
-			"''," +
-			"'" + StringEscapeUtils.escapeHtml(sectionParams.getDemographicNo()) + "'" +
-		");";
-
-		return onClickString;
-		 */
 	}
 
 	public String getSummaryCode()
@@ -140,7 +117,7 @@ public abstract class EncounterCPPSectionService extends EncounterSectionService
 			noteJsonString = "";
 		}
 
-		String onClickString = "return showEdit(" +
+		String onClickString = "return cppNote.showEdit(" +
 				"event," +
 				"'" + StringEscapeUtils.escapeHtml(getSectionId()) + "'," +
 				"'" + StringEscapeUtils.escapeHtml(title) + "'," +
