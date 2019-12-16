@@ -212,12 +212,14 @@ public class ScheduleService extends AbstractServiceImpl {
 				}
 			}
 
+			item.setLocation(appt.getLocation());
 			item.setStartTime(timeFormatter.format(appt.getStartTime()));
 			item.setReason(appt.getReason());
 			item.setStatus(status);
 			item.setStatusModifier(statusModifier);
 			item.setAppointmentNo(appt.getId());
 			item.setDate(appt.getStartTimeAsFullDate());
+			item.setIsVirtual(appt.getIsVirtual());
 			response.add(item);
 		}
 		return RestSearchResponse.successResponseOnePage(response);

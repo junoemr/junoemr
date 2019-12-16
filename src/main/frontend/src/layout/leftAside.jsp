@@ -108,10 +108,15 @@
 
 						<div ng-if="$ctrl.isAppointmentPatientView()"
 								class="flex-row vertical-align justify-content-between">
-							<div class="col-md-6 list-group-clickable"
+							<div class="col-md-4 list-group-clickable"
 								ng-click="$ctrl.goToRecord(patient)">
 								<h6>{{patient.name}}</h6>
 								<span>{{patient.startTime}} {{patient.reason}}</span>
+							</div>
+							<div class="col-md-2"
+									ng-if="$ctrl.telehealthEnabled && patient.isVirtual">
+								<i class="icon icon-video icon-video-2 event-telehealth onclick-event-telehealth"
+								ng-click="$ctrl.openTelehealthLink(patient)"></i>
 							</div>
 							<div class="col-md-6">
 								<juno-appointment-status-select

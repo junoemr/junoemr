@@ -927,7 +927,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let eventReason = "";
 				let eventNotes = "";
 
-				if (!event.data.virtual)
+				if (!(controller.telehealthEnabled && event.data.virtual))
 				{
 					telehealthElem.hide();
 				}
@@ -1137,12 +1137,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 			else if ($target.is(".onclick-event-telehealth"))
 			{
-				console.log("initiate telehealth appt");
+				console.log("initiate telehealth appt (schedule)");
 				controller.openTelehealthLink(calEvent);
-				//"../telehealth/myhealthaccess.do?method=openTelehealth" +
-				//"&demographicNo=${appointmentInfo.demographicNo}" +
-				//"&siteName=${appointmentInfo.siteName}" +
-				//"&appt=${appointmentInfo.appointmentNo}")
 			}
 			else
 			{
@@ -1245,7 +1241,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			if (calEvent.data.demographicNo !== 0 && calEvent.data.virtual)
 			{
-				console.log(calEvent.data);
 				window.open("../telehealth/myhealthaccess.do?method=openTelehealth"
 					+ "&demographicNo=" + encodeURIComponent(calEvent.data.demographicNo)
 					+ "&siteName=" + encodeURIComponent(calEvent.data.site)
@@ -1781,7 +1776,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				function success(rawResults)
 				{
 					var enabled = rawResults.data.body;
-					$scope.telehealthEnabled = enabled;
+					controller.telehealthEnabled = enabled;
 					deferred.resolve(enabled);
 				},
 				function failure(results)
