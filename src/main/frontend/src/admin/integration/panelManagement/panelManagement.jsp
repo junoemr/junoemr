@@ -27,8 +27,7 @@
 				<h4>Panel Management</h4>
 			</panel-header>
 			<panel-body>
-				<div class="col-sm-2"></div>
-				<div class="col-sm-8 flex-row flex-wrap">
+				<div class="col-sm-12 flex-row flex-wrap">
 					<div class="report-select" ng-class="{'required': $ctrl.missingRequiredFeildProvider}">
 						<ca-field-select
 										class="juno-modal no-padding md-margin-right"
@@ -57,9 +56,8 @@
 						>
 						</ca-field-select>
 					</div>
-					<button class="btn btn-primary lg-margin-left" ng-click="$ctrl.runReport()">Run Report</button>
+					<button class="btn btn-primary xl-margin-left" ng-click="$ctrl.runReport()">Run Report</button>
 				</div>
-				<div class="col-sm-2"></div>
 			</panel-body>
 		</panel>
 	</div>
