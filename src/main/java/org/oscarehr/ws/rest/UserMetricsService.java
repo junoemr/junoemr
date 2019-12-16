@@ -43,6 +43,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 @Path("/user_metrics")
@@ -80,8 +81,9 @@ public class UserMetricsService extends AbstractServiceImpl
 		}
 		else
 		{
-			String payload = IOUtils.toString(request.getInputStream(), Charset.forName("UTF8"));
-			logger.warn("Could not parse request body into JSON. Is the following request body in Prometheus Exposition Format? https://jira.oh.ca/browse/OHSUPPORT-7250\n" + payload);
+			String payload = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
+			logger.warn("Could not parse request body into JSON. Is the following request body in Prometheus Exposition Format?\n" + payload);
+			throw new IllegalArgumentException("Could not parse request body into JSON");
 		}
 		return RestResponse.successResponse("Success");
 	}
