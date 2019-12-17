@@ -1,0 +1,13 @@
+#edit-provider-admin {
+	@include juno-font-default();
+
+	h1 {
+		margin-top: 0;
+	}
+
+	.edit-provider-fields {
+		panel {
+			margin-top: $margin-xl;
+		}
+	}
+}

@@ -297,6 +297,7 @@ module.exports = {
 			'./src/admin/integration/fax/faxSendReceiveController.js',
 			'./src/admin/integration/landingPage/landingPageComponent.js',
 			'./src/admin/integration/panelManagement/panelManagementAdminComponent.js',
+			'./src/admin/integration/editProviderPage/editProviderAdminComponent.js',
 			'./src/admin/integration/integrationModules/integrationModulesComponent.js',
 			'./src/admin/integration/know2act/module.js',
 			'./src/admin/integration/know2act/Know2actConfigController.js',

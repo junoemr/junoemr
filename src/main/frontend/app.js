@@ -26,8 +26,9 @@ require('ngstorage');
 require('pym.js');
 require('./scss/juno.scss');
 require('font-awesome/css/font-awesome.min.css');
-import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
 
+import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
+import {EDIT_PROVIDER_MODE} from "./src/admin/integration/editProviderPage/editProviderAdminConstants";
 
 var oscarApp = angular.module('oscarProviderViewModule', [
 	'ui.router',
@@ -165,6 +166,24 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		{
 			url: '/panelManagement',
 			component: 'panelManagementAdmin'
+		})
+		.state('admin.addUser',
+		{
+			url: '/addUser',
+			component: 'editProviderAdmin',
+			params:
+			{
+				mode: EDIT_PROVIDER_MODE.ADD
+			}
+		})
+		.state('admin.editUser',
+		{
+			url: '/editUser',
+			component: 'editProviderAdmin',
+			params:
+					{
+						mode: EDIT_PROVIDER_MODE.EDIT
+					}
 		})
 		.state('ticklers',
 		{
