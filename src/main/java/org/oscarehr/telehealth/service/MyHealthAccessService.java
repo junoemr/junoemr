@@ -150,9 +150,36 @@ public class MyHealthAccessService
 		return integrationData;
 	}
 
-	public void updateAppointmentCache(Appointment appointment) throws InvalidIntegrationException, JsonProcessingException
+	public void queueAppointmentCacheUpdate(Appointment appointment)
 	{
-		String siteName = (oscarProps.isMultisiteEnabled()) ? appointment.getLocation() : null;
+		try
+		{
+			String siteName = (oscarProps.isMultisiteEnabled()) ? appointment.getLocation() : null;
+			addCacheEntry(getCacheTransfer(appointment), siteName);
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("MHA Update Error", e);
+		}
+	}
+	public void queueAppointmentCacheDelete(Appointment appointment)
+	{
+		try
+		{
+			// deleted appointments are treated as canceled when sent to MHA
+			String siteName = (oscarProps.isMultisiteEnabled()) ? appointment.getLocation() : null;
+			AppointmentCacheTo1 transfer = getCacheTransfer(appointment);
+			transfer.setCanceled(true);
+			addCacheEntry(transfer, siteName);
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("MHA Update Error", e);
+		}
+	}
+
+	private void addCacheEntry(AppointmentCacheTo1 transfer, String siteName) throws InvalidIntegrationException, JsonProcessingException
+	{
 		Integration integration = integrationService.findMhaIntegration(siteName);
 
 		if (integration == null)
@@ -167,6 +194,11 @@ public class MyHealthAccessService
 			throw new InvalidIntegrationException(noIntegrationError);
 		}
 
+		integrationPushUpdateService.queueAppointmentCacheUpdate(integration, transfer);
+	}
+
+	private AppointmentCacheTo1 getCacheTransfer(Appointment appointment)
+	{
 		AppointmentCacheTo1 transfer = new AppointmentCacheTo1();
 		transfer.setId(String.valueOf(appointment.getId()));
 		transfer.setCanceled(appointment.getAppointmentStatus().equals(Appointment.CANCELLED));
@@ -174,18 +206,6 @@ public class MyHealthAccessService
 		transfer.setStartDateTime(ConversionUtils.toZonedDateTime(appointment.getStartTimeAsFullDate()));
 		transfer.setEndDateTime(ConversionUtils.toZonedDateTime(appointment.getEndTimeAsFullDate()));
 
-		integrationPushUpdateService.queueAppointmentCacheUpdate(integration, transfer);
-	}
-
-	public void queueAppointmentCacheUpdate(Appointment appointment)
-	{
-		try
-		{
-			updateAppointmentCache(appointment);
-		}
-		catch(Exception e)
-		{
-			MiscUtils.getLogger().error("MHA Update Error", e);
-		}
+		return transfer;
 	}
 }

@@ -84,13 +84,19 @@ org.oscarehr.event.EventService"%>
 			changedStatus = request.getParameter("status");
 		}
 
-		if(request.getParameter("buttoncancel") != null && (request.getParameter("buttoncancel").equals("Cancel Appt") || request.getParameter("buttoncancel").equals("No Show")))
+		if(request.getParameter("buttoncancel") != null &&
+				(request.getParameter("buttoncancel").equals("Cancel Appt") || request.getParameter("buttoncancel").equals("No Show")))
 		{
 			changedStatus = request.getParameter("buttoncancel").equals("Cancel Appt") ? "C" : "N";
 			appt.setStatus(request.getParameter("buttoncancel").equals("Cancel Appt") ? "C" : "N");
 			appt.setLastUpdateUser(updateuser);
 			appointmentDao.merge(appt);
 			rowsAffected = 1;
+
+			if(appt.getIsVirtual())
+			{
+				myHealthAccessService.queueAppointmentCacheUpdate(appt);
+			}
 
 			LogAction.addLogEntry(updateuser, appt.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,
 					LogConst.STATUS_SUCCESS, String.valueOf(appt.getId()), request.getRemoteAddr());
