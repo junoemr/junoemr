@@ -27,18 +27,75 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 {
 	templateUrl: 'src/admin/integration/editProviderPage/editProviderAdmin.jsp',
 	bindings: {},
-	controller: ['$scope', '$stateParams', function ($scope, $stateParams)
+	controller: ['$scope', '$stateParams', 'staticDataService', 'providersService', function ($scope, $stateParams, staticDataService, providersService)
 	{
 		let ctrl = this;
 
 		ctrl.modes = EDIT_PROVIDER_MODE;
 		ctrl.mode = $stateParams.mode;
 
-		ctrl.provider = {
-			first_name: null,
-			last_name: null,
-			type: null
+		ctrl.sexes = staticDataService.getGenders();
 
-		}
+		ctrl.roleOptions = ['fizbang', 'foobar'];
+		ctrl.currentRoleSelection = null;
+
+		ctrl.provider = {
+			// User Info
+			firstName: null,
+			lastName: null,
+			type: null,
+			speciality: null,
+			team: null,
+			sex: null,
+			dateOfBirth: null,
+
+			// Login Info
+			email: null,
+			userName: null,
+			password: null,
+			passwordVerify: null,
+			secondLevelPasscode: null,
+			secondLevelPasscodeVerify: null,
+
+			// Access Roles
+			userRoles: [],
+		};
+
+		ctrl.$onInit = function()
+		{
+			providersService.getAllProviderRoles().then(
+					function success(result)
+					{
+						ctrl.roleOptions = [];
+						for (let role of result)
+						{
+							ctrl.roleOptions.push(role.roleName)
+						}
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch provider roles with error: " + error);
+					}
+			);
+
+		};
+
+
+		ctrl.addUserRole = function(role)
+		{
+			if (role && !ctrl.provider.userRoles.includes(role))
+			{
+				ctrl.provider.userRoles.push(role);
+			}
+		};
+
+		ctrl.removeUserRole = function(role)
+		{
+			if (role)
+			{
+				let idx = ctrl.provider.userRoles.findIndex(el => el === role);
+				ctrl.provider.userRoles.splice(idx, idx);
+			}
+		};
 	}]
 });

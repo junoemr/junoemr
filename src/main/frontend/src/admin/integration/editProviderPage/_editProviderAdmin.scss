@@ -1,5 +1,7 @@
 #edit-provider-admin {
 	@include juno-font-default();
+	@include juno-tab-md(16px);
+	@include juno-tab-color-scheme-white;
 
 	h1 {
 		margin-top: 0;

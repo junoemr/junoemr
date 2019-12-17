@@ -235,6 +235,7 @@ module.exports = {
 			'./src/common/components/loadingIndicatorComponent.js',
 			'./src/common/components/zeroStateDisplayComponent.js',
 			'./src/common/components/accordionList/accordionListComponent.js',
+			'./src/common/components/junoTypeahead/junoTypeaheadComponent.js',
 			'./src/common/components/iconCard/iconCardComponent.js',
 			'./src/common/components/panel/panelComponent.js',
 

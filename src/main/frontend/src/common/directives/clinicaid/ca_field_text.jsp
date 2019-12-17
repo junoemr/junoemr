@@ -15,7 +15,7 @@
 	<div class="{{input_size}}">
 
 		<input id="input-{{name}}"
-		       type="text"
+		       type="{{hide_input ? 'password' : 'text'}}"
 		       class="form-control"
 		       placeholder="{{text_placeholder}}"
 		       ng-class="{'no_scroll_bar': max_characters > 0}"

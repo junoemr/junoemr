@@ -26,29 +26,33 @@
 
 	<div class="edit-provider-fields">
 		<div class="col-sm-6">
+			<!-- User Information -->
 			<panel id="edit-provider-user-information">
 				<panel-header>
 					<h6>User Information</h6>
 				</panel-header>
 				<panel-body>
+					<!-- Last Name -->
 					<ca-field-text
 									ca-name="lastName"
 									ca-title="Last Name"
-									ca-model="$ctrl.provider.last_name"
+									ca-model="$ctrl.provider.lastName"
 									ca-rows="1"
 									ca-text-placeholder="Last Name"
 									ca-required-field="true"
 					>
 					</ca-field-text>
+					<!-- First Name -->
 					<ca-field-text
 									ca-name="firstName"
 									ca-title="First Name"
-									ca-model="$ctrl.provider.first_name"
+									ca-model="$ctrl.provider.firstName"
 									ca-rows="1"
 									ca-text-placeholder="First Name"
 									ca-required-field="true"
 					>
 					</ca-field-text>
+					<!-- Type -->
 					<ca-field-select
 									class="juno-modal no-padding"
 									ca-template="label"
@@ -58,8 +62,48 @@
 									ca-options="TODO"
 									ca-text-placeholder="Provider Type"
 									ca-empty-option="true"
+									ca-required-field="true"
 					>
 					</ca-field-select>
+					<!-- Speciality -->
+					<ca-field-text
+									ca-name="speciality"
+									ca-title="Speciality"
+									ca-model="$ctrl.provider.speciality"
+									ca-rows="1"
+									ca-text-placeholder="Speciality"
+					>
+					</ca-field-text>
+					<!-- Team -->
+					<ca-field-text
+									ca-name="team"
+									ca-title="Team"
+									ca-model="$ctrl.provider.team"
+									ca-rows="1"
+									ca-text-placeholder="Team"
+					>
+					</ca-field-text>
+					<!-- Sex -->
+					<ca-field-select
+									class="juno-modal no-padding"
+									ca-template="label"
+									ca-name="sex"
+									ca-title="Sex"
+									ca-model="$ctrl.provider.sex"
+									ca-options="$ctrl.sexes"
+									ca-text-placeholder="Sex"
+									ca-empty-option="true"
+					>
+					</ca-field-select>
+					<!-- DOB -->
+					<ca-field-date
+									ca-title="Date of Birth"
+									ca-date-picker-id="dob"
+									ca-name="dob"
+									ca-model="$ctrl.provider.dateOfBirth"
+									ca-orientation="auto"
+					>
+					</ca-field-date>
 				</panel-body>
 			</panel>
 			<panel id="edit-provider-access-roles">
@@ -67,7 +111,23 @@
 					<h6>Access Roles</h6>
 				</panel-header>
 				<panel-body>
-
+					<div class="flex-row flex-wrap">
+						<juno-typeahead
+										class="flex-grow lg-margin-right"
+										model="$ctrl.currentRoleSelection"
+										options="$ctrl.roleOptions"
+										placeholder="'Search Roles...'"
+						>
+						</juno-typeahead>
+						<button class="btn btn-success" ng-click="$ctrl.addUserRole($ctrl.currentRoleSelection)">Add</button>
+					</div>
+					<div class="col-sm-12 md-margin-top">
+						<ul class="no-padding">
+							<li ng-repeat="userRole in $ctrl.provider.userRoles" class="group-list-item">
+								{{userRole}}
+							</li>
+						</ul>
+					</div>
 				</panel-body>
 			</panel>
 			<panel id="edit-provider-billing-information">
@@ -80,11 +140,77 @@
 			</panel>
 		</div>
 		<div class="col-sm-6">
+			<!-- Login Information -->
 			<panel id="edit-provider-login-information">
 				<panel-header>
 					<h6>Login Information</h6>
 				</panel-header>
 				<panel-body>
+					<div class="edit-provider-or-group">
+						<!-- Email -->
+						<ca-field-text
+										ca-name="email"
+										ca-title="Email"
+										ca-model="$ctrl.provider.email"
+										ca-rows="1"
+										ca-text-placeholder="Email"
+						>
+						</ca-field-text>
+						<!-- User Name -->
+						<ca-field-text
+										ca-name="username"
+										ca-title="User Name"
+										ca-model="$ctrl.provider.userName"
+										ca-rows="1"
+										ca-text-placeholder="User Name"
+						>
+						</ca-field-text>
+					</div>
+					<!-- Password -->
+					<ca-field-text
+									ca-name="password"
+									ca-title="Password"
+									ca-model="$ctrl.provider.password"
+									ca-rows="1"
+									ca-text-placeholder="Password"
+									ca-hide-input="true"
+									ca-required-field="true"
+					>
+					</ca-field-text>
+					<!-- Confirm Password -->
+					<ca-field-text
+									ca-name="confirm_password"
+									ca-title="Confirm Password"
+									ca-model="$ctrl.provider.passwordVerify"
+									ca-rows="1"
+									ca-text-placeholder="Retype Password"
+									ca-hide-input="true"
+									ca-required-field="true"
+					>
+					</ca-field-text>
+					<!-- Second Level Passcode -->
+					<ca-field-text
+									ca-name="passcode"
+									ca-title="Second Level Passcode"
+									ca-model="$ctrl.provider.secondLevelPasscode"
+									ca-rows="1"
+									ca-text-placeholder="Passcode"
+									ca-hide-input="true"
+									ca-required-field="true"
+					>
+					</ca-field-text>
+					<!-- Confirm Second Level Passcode -->
+					<ca-field-text
+									ca-name="confirm_passcode"
+									ca-title="Retype Second Level Passcode"
+									ca-model="$ctrl.provider.secondLevelPasscodeVerify"
+									ca-rows="1"
+									ca-text-placeholder="Passcode"
+									ca-hide-input="true"
+									ca-required-field="true"
+					>
+					</ca-field-text>
+
 
 				</panel-body>
 			</panel>
