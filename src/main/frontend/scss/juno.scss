@@ -36,6 +36,7 @@
 @import "../src/common/components/zeroStateDisplay";
 @import "../src/common/components/accordionList/accordionList";
 @import "../src/common/components/iconCard/iconCard";
+@import "../src/common/components/panel/_panel.scss";
 // Section-specific things
 @import "../src/layout/primaryNav";
 @import "../src/layout/leftAside";
@@ -61,6 +62,7 @@
 @import "../src/admin/integration/fax/fax";
 @import "../src/admin/integration/landingPage/landingPage";
 @import "../src/admin/integration/integrationModules/integrationModules";
+@import "../src/admin/integration/panelManagement/panelManagement";
 @import "../src/admin/admin";
 @import "../src/admin/integration/frameContent/frameContent";
 @import "../src/record/forms/forms";

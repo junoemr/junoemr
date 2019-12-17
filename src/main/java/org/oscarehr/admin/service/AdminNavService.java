@@ -376,6 +376,13 @@ public class AdminNavService
 			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.eformReportTool"), "frame?frameUrl=" + contextPath + "/admin/eformReportTool/eformReportTool.jsp"));
 		}
 
+		// /panelManagement
+		if (securityInfoManager.hasPrivilege(providerNo, "_admin.panelManagement", SecurityInfoManager.READ, null) &&
+				oscarProperties.isBritishColumbiaInstanceType())
+		{
+			reportItems.add(new AdminNavItemTo1("Panel Management", "panelManagement"));
+		}
+
 		reportGroup.setItems(reportItems);
 		return reportGroup;
 	}

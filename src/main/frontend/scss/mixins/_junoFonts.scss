@@ -31,10 +31,11 @@
     }
 }
 
-@mixin juno-font-default-size($font-size)
+@mixin juno-font-default-size($font-size, $font-weight: normal)
 {
 	@include juno-font-default;
-    font-size: $font-size;
+	font-size: $font-size;
+	font-weight: $font-weight;
 }
 
 @mixin juno-font-tab($font-size : 12px)

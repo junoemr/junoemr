@@ -50,8 +50,10 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.casemgmt.service.CaseManagementPrint;
+import org.oscarehr.common.dao.DashboardDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.EncounterTemplateDao;
+import org.oscarehr.common.model.Dashboard;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.EncounterTemplate;
 import org.oscarehr.common.model.UserProperty;
@@ -65,10 +67,12 @@ import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.rest.conversion.EncounterTemplateConverter;
 import org.oscarehr.ws.rest.conversion.summary.Summary;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.EncounterTemplateResponse;
 import org.oscarehr.ws.rest.to.model.EncounterTemplateTo1;
 import org.oscarehr.ws.rest.to.model.MenuItemTo1;
 import org.oscarehr.ws.rest.to.model.SummaryTo1;
+import org.oscarehr.ws.rest.transfer.DashboardTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -98,6 +102,9 @@ public class RecordUxService extends AbstractServiceImpl {
 
 	@Autowired
 	private SystemPreferenceService systemPreferenceService;
+
+	@Autowired
+	private DashboardDao dashboardDao;
 	
 	/**
 	$scope.recordtabs2 = [ 
@@ -532,6 +539,19 @@ public class RecordUxService extends AbstractServiceImpl {
 
 		response.put("demographic_family_doctor", oscarProperties.isPropertyActive("demographic_family_doctor"));
 		return response;
+	}
+
+	@GET
+	@Path("/dashboards")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<DashboardTo1>> getDashboardList() {
+    	ArrayList<DashboardTo1> dashboardTo1s = new ArrayList<>();
+    	List<Dashboard> dashboards = dashboardDao.getDashboards();
+    	for (Dashboard dashboard : dashboards)
+			{
+				dashboardTo1s.add(new DashboardTo1(dashboard));
+			}
+    	return RestResponse.successResponse(dashboardTo1s);
 	}
 	
 }
