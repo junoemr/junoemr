@@ -27,7 +27,7 @@
 						<div class="form-group">
 							<button class="btn btn-icon btn-visible"
 							        title="<bean:message key="navbar.searchPatients" bundle="ui"/>"
-							ng-click="$ctrl.onPatientSearch(null)">
+							ng-click="$ctrl.onPatientSearch($ctrl.demographicSearch)">
 							<i class="icon icon-user-search"></i>
 							</button>
 						</div>
