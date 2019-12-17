@@ -86,6 +86,7 @@ angular.module('Schedule').component('eventComponent', {
 				doNotBook: false,
 				critical: false,
 				site: null,
+				virtual: false,
 			};
 
 			controller.repeatBooking =
@@ -303,6 +304,7 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.eventData.doNotBook = data.eventData.doNotBook;
 					$scope.eventData.critical = data.eventData.urgency === 'critical';
 					$scope.eventData.site = data.eventData.site;
+					$scope.eventData.virtual = data.eventData.virtual;
 
 					controller.checkEventConflicts(); // uses the eventData
 
@@ -640,7 +642,6 @@ angular.module('Schedule').component('eventComponent', {
 				{
 					repeatOnDates = controller.repeatBookingDates;
 				}
-
 				controller.parentScope.saveEvent(
 					controller.editMode,
 					{
@@ -659,6 +660,7 @@ angular.module('Schedule').component('eventComponent', {
 						site: $scope.eventData.site,
 						doNotBook: $scope.eventData.doNotBook,
 						urgency: (($scope.eventData.critical) ? 'critical' : null),
+						virtual: $scope.eventData.virtual,
 					},
 					repeatOnDates,
 
@@ -1190,6 +1192,17 @@ angular.module('Schedule').component('eventComponent', {
 				};
 				window.open(scheduleService.getRxLink(params));
 				controller.cancel();
+			};
+
+			controller.openTelehealthWindow = function openTelehealthWindow()
+			{
+				if (controller.demographicModel.demographicNo !== 0 && $scope.eventData.virtual)
+				{
+					window.open("../telehealth/myhealthaccess.do?method=openTelehealth"
+						+ "&demographicNo=" + encodeURIComponent(controller.demographicModel.demographicNo)
+						+ "&siteName=" + encodeURIComponent($scope.eventData.site)
+						+ "&appt=" + encodeURIComponent($scope.eventUuid), "_blank");
+				}
 			};
 
 			//=========================================================================
