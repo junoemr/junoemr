@@ -118,7 +118,7 @@
 										on-enter-key="$ctrl.addUserRole($ctrl.currentRoleSelection.value)"
 						>
 						</juno-typeahead>
-						<button class="btn btn-success" title="Add role" ng-click="$ctrl.addUserRole($ctrl.currentRoleSelection.value)">Add</button>
+						<button class="btn btn-primary lg-padding-left lg-padding-right" title="Add role" ng-click="$ctrl.addUserRole($ctrl.currentRoleSelection.value)">Add</button>
 					</div>
 					<div class="user-role-list col-sm-12 md-margin-top">
 						<ul class="no-padding">

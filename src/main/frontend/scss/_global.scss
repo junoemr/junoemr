@@ -104,59 +104,76 @@ body {
 	display: inline-block;
 }
 
-.no-margin-top {
-	margin-top: 0;
+// more specific to override bootstrap 
+body {
+	.no-margin-top {
+		margin-top: 0;
+	}
+
+	.md-margin-top {
+		margin-top: $margin-md;
+	}
+
+	.xl-margin-right {
+		margin-right: $margin-xl;
+	}
+
+	.lg-margin-right {
+		margin-right: $margin-lg;
+	}
+
+	.md-margin-right {
+		margin-right: $margin-md;
+	}
+
+	.sm-margin-right {
+		margin-right: $margin-sm;
+	}
+
+	.xl-margin-left {
+		margin-left: $margin-xl;
+	}
+
+	.lg-margin-left {
+		margin-left: $margin-lg;
+	}
+
+	.md-margin-left {
+		margin-left: $margin-md;
+	}
+
+	.sm-margin-left {
+		margin-left: $margin-sm;
+	}
+
+	.no-margin-bottom {
+		margin-bottom: 0;
+	}
+
+	.lg-padding-left {
+		padding-left: $padding-lg;
+	}
+
+	.lg-padding-right {
+		padding-right: $padding-lg;
+	}
+
+	.md-padding-left {
+		padding-left: $padding-md;
+	}
+
+	.md-padding-right {
+		padding-right: $padding-md;
+	}
+
+	.no-padding {
+		padding: 0;
+	}
+
+	.no-margin {
+		margin: 0;
+	}
 }
-
-.md-margin-top {
-	margin-top: $margin-md;
-}
-
-.xl-margin-right {
-	margin-right: $margin-xl;
-}
-
-.lg-margin-right {
-	margin-right: $margin-lg;
-}
-
-.md-margin-right {
-	margin-right: $margin-md;
-}
-
-.sm-margin-right {
-	margin-right: $margin-sm;
-}
-
-.xl-margin-left {
-	margin-left: $margin-xl;
-}
-
-.lg-margin-left {
-	margin-left: $margin-lg;
-}
-
-.md-margin-left {
-	margin-left: $margin-md;
-}
-
-.sm-margin-left {
-	margin-left: $margin-sm;
-}
-
-
-.no-margin-bottom {
-	margin-bottom: 0;
-}
-
-.no-padding {
-	padding: 0;
-}
-
-.no-margin {
-	margin: 0;
-}
-
 // Makes checkbox flush with input (as long as checkbox margin is 0)
 .big-checkbox {
 	height: 34px;
