@@ -39,11 +39,14 @@ angular.module('Common.Components').component('junoTypeahead',
 
 		};
 
-		ctrl.onEnter = function ()
+		ctrl.onKeyPress = function (event)
 		{
-			if (ctrl.onEnterKey)
-			{
-				ctrl.onEnterKey({})
+			if (event.keyCode === 13)
+			{// Enter key
+				if (ctrl.onEnterKey)
+				{
+					ctrl.onEnterKey({})
+				}
 			}
 		}
 

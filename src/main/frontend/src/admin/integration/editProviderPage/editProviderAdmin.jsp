@@ -59,9 +59,7 @@
 									ca-name="type"
 									ca-title="Type"
 									ca-model="$ctrl.provider.type"
-									ca-options="TODO"
-									ca-text-placeholder="Provider Type"
-									ca-empty-option="true"
+									ca-options="$ctrl.providerTypes"
 									ca-required-field="true"
 					>
 					</ca-field-select>
@@ -117,14 +115,21 @@
 										model="$ctrl.currentRoleSelection"
 										options="$ctrl.roleOptions"
 										placeholder="'Search Roles...'"
+										on-enter-key="$ctrl.addUserRole($ctrl.currentRoleSelection.value)"
 						>
 						</juno-typeahead>
-						<button class="btn btn-success" ng-click="$ctrl.addUserRole($ctrl.currentRoleSelection)">Add</button>
+						<button class="btn btn-success" title="Add role" ng-click="$ctrl.addUserRole($ctrl.currentRoleSelection.value)">Add</button>
 					</div>
-					<div class="col-sm-12 md-margin-top">
+					<div class="user-role-list col-sm-12 md-margin-top">
 						<ul class="no-padding">
-							<li ng-repeat="userRole in $ctrl.provider.userRoles" class="group-list-item">
-								{{userRole}}
+							<li ng-repeat="userRoleId in $ctrl.provider.userRoles" class="group-list-item">
+								<div class="flex-row align-items-center">
+									{{$ctrl.getUserRoleName(userRoleId)}}
+									<div class="flex-grow text-right">
+										<i class="icon icon-delete hand-hover" title="Remove role" ng-click="$ctrl.removeUserRole(userRoleId)"></i>
+									</div>
+								</div>
+								<hr>
 							</li>
 						</ul>
 					</div>

@@ -61,6 +61,36 @@ angular.module("Common.Services").service("staticDataService", [
 			return genders;
 		};
 
+		service.getProviderTypes = function ()
+		{
+			var types = [];
+			types.push({
+				"label": "receptionist",
+				"value": "receptionist",
+			});
+			types.push({
+				"label": "doctor",
+				"value": "doctor",
+			});
+			types.push({
+				"label": "nurse",
+				"value": "nurse",
+			});
+			types.push({
+				"label": "resident",
+				"value": "resident",
+			});
+			types.push({
+				"label": "midwife",
+				"value": "midwife",
+			});
+			types.push({
+				"label": "admin",
+				"value": "admin",
+			});
+			return types;
+		};
+
 		service.getTitles = function getTitles()
 		{
 			var titles = [];

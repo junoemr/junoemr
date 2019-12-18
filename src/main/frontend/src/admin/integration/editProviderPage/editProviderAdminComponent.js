@@ -35,6 +35,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		ctrl.mode = $stateParams.mode;
 
 		ctrl.sexes = staticDataService.getGenders();
+		ctrl.providerTypes = staticDataService.getProviderTypes();
 
 		ctrl.roleOptions = ['fizbang', 'foobar'];
 		ctrl.currentRoleSelection = null;
@@ -43,7 +44,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			// User Info
 			firstName: null,
 			lastName: null,
-			type: null,
+			type: 'doctor',
 			speciality: null,
 			team: null,
 			sex: null,
@@ -69,7 +70,10 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 						ctrl.roleOptions = [];
 						for (let role of result)
 						{
-							ctrl.roleOptions.push(role.roleName)
+							ctrl.roleOptions.push({
+								label: role.roleName,
+								value: role.roleId,
+							});
 						}
 					},
 					function error(result)
@@ -81,21 +85,26 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		};
 
 
-		ctrl.addUserRole = function(role)
+		ctrl.addUserRole = function(roleId)
 		{
-			if (role && !ctrl.provider.userRoles.includes(role))
+			if (roleId && !ctrl.provider.userRoles.includes(roleId))
 			{
-				ctrl.provider.userRoles.push(role);
+				ctrl.provider.userRoles.push(roleId);
 			}
 		};
 
-		ctrl.removeUserRole = function(role)
+		ctrl.removeUserRole = function(roleId)
 		{
-			if (role)
+			if (roleId)
 			{
-				let idx = ctrl.provider.userRoles.findIndex(el => el === role);
-				ctrl.provider.userRoles.splice(idx, idx);
+				let idx = ctrl.provider.userRoles.findIndex(el => el === roleId);
+				ctrl.provider.userRoles.splice(idx, 1);
 			}
 		};
+
+		ctrl.getUserRoleName = function(roleId)
+		{
+			return ctrl.roleOptions.find(el => el.value === roleId).label;
+		}
 	}]
 });

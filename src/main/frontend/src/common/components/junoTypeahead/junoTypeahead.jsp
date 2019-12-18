@@ -25,7 +25,7 @@
 					class="form-control"
 					type="text"
 					ng-model="$ctrl.model"
-					uib-typeahead="option for option in $ctrl.options | filter:$viewValue"
-					ng-keypress=""
+					uib-typeahead="option as option.label for option in $ctrl.options | filter:$viewValue"
+					ng-keypress="$ctrl.onKeyPress($event)"
 					placeholder="{{$ctrl.placeholder}}">
 </div>

@@ -7,6 +7,23 @@
 		margin-top: 0;
 	}
 
+	.user-role-list {
+		padding-right: 0;
+
+		ul {
+			list-style-type: none;
+
+			hr {
+				margin-top: $margin-sm;
+				margin-bottom: $margin-sm;
+			}
+
+			i {
+				color: $color-red-base;
+			}
+		}
+	}
+
 	.edit-provider-fields {
 		panel {
 			margin-top: $margin-xl;
