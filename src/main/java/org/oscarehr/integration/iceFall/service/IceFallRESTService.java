@@ -25,19 +25,26 @@ package org.oscarehr.integration.iceFall.service;
 
 import org.oscarehr.integration.iceFall.dao.IceFallCredentialsDao;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
-import org.oscarehr.integration.iceFall.service.exceptions.IceFallRESTException;
+import org.oscarehr.integration.iceFall.service.exceptions.IceFallAuthorizationException;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallAuthenticationResponseTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallAuthenticationTo1;
-import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
-import org.oscarehr.util.MiscUtils;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorListTo1;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import oscar.util.RESTClient;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class IceFallRESTService
 {
-	public static final String API_BASE = "api/";
+	public static final String API_BASE = "/api";
+
+	// API endpoints
+	public static final String API_AUTH_TOKEN = "/api-token-auth/";
+	public static final String DOCTOR_LIST = API_BASE + "/partner/doctors/";
 
 	@Autowired
 	IceFallCredentialsDao iceFallCredentialsDao;
@@ -46,22 +53,40 @@ public class IceFallRESTService
 
 	/**
 	 * authenticate with the icefall api, updating the api token
+	 * @return new api token
 	 */
-	public void authenticate()
+	public String authenticate()
 	{
 		IceFallCredentials iceFallCredentials = iceFallCredentialsDao.getCredentials();
 		IceFallAuthenticationTo1 credentials = new IceFallAuthenticationTo1();;
 		credentials.setUsername(iceFallCredentials.getUsername());
 		credentials.setPassword(iceFallCredentials.getPassword());
 
-		IceFallAuthenticationResponseTo1 authResponse = RESTClient.doPost(getIceFallUrlBase() + "/api-token-auth/", null, credentials, IceFallAuthenticationResponseTo1.class);
-		MiscUtils.getLogger().info("TOKEN: " + authResponse.getApiToken());
+		IceFallAuthenticationResponseTo1 authResponse = RESTClient.doPost(getIceFallUrlBase() + API_AUTH_TOKEN, null, credentials, IceFallAuthenticationResponseTo1.class);
+		iceFallCredentials.setApiToken(authResponse.getApiToken());
+		iceFallCredentialsDao.merge(iceFallCredentials);
+
+		return authResponse.getApiToken();
 	}
 
+	public IceFallDoctorListTo1 getDoctorList()
+	{
+		return RESTClient.doGet(getIceFallUrlBase() + DOCTOR_LIST, getApiAuthenticationHeaders(), IceFallDoctorListTo1.class);
+	}
+
+	protected HttpHeaders getApiAuthenticationHeaders()
+	{
+		IceFallCredentials iceFallCredentials = iceFallCredentialsDao.getCredentials();
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("AUTHORIZATION", "JWT " + iceFallCredentials.getApiToken());
+
+		return headers;
+	}
 
 	private String getIceFallUrlBase()
 	{
 		//TODO property setting. or perhaps option
-		return "https://api.canopygrowthweb.com/";
+		return "https://api-qa.canopygrowthweb.com";
 	}
 }

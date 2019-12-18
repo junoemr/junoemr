@@ -25,19 +25,53 @@ package org.oscarehr.integration.iceFall.service.transfer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
+import java.util.List;
 
-public class IceFallAuthenticationResponseTo1 implements Serializable
+
+public class IceFallDoctorListTo1 implements Serializable
 {
-	@JsonProperty("token")
-	private String apiToken;
+	private Integer count;
+	private String  next;
+	private String  previous;
+	private List<IceFallDoctorTo1> results;
 
-	public String getApiToken()
+	public Integer getCount()
 	{
-		return apiToken;
+		return count;
 	}
 
-	public void setApiToken(String apiToken)
+	public void setCount(Integer count)
 	{
-		this.apiToken = apiToken;
+		this.count = count;
+	}
+
+	public String getNext()
+	{
+		return next;
+	}
+
+	public void setNext(String next)
+	{
+		this.next = next;
+	}
+
+	public String getPrevious()
+	{
+		return previous;
+	}
+
+	public void setPrevious(String previous)
+	{
+		this.previous = previous;
+	}
+
+	public List<IceFallDoctorTo1> getResults()
+	{
+		return results;
+	}
+
+	public void setResults(List<IceFallDoctorTo1> results)
+	{
+		this.results = results;
 	}
 }

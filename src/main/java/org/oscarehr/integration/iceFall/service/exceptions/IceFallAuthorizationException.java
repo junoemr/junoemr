@@ -20,24 +20,29 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.iceFall.service.transfer;
+package org.oscarehr.integration.iceFall.service.exceptions;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
 
-import java.io.Serializable;
-
-public class IceFallAuthenticationResponseTo1 implements Serializable
+public class IceFallAuthorizationException extends IceFallRESTException
 {
-	@JsonProperty("token")
-	private String apiToken;
+	public static final String MISSING_AUTH_CREDENTIALS = "__MISSING_AUTH_CREDENTIALS__";
 
-	public String getApiToken()
+	public IceFallAuthorizationException(String msg)
 	{
-		return apiToken;
+		super(msg);
 	}
 
-	public void setApiToken(String apiToken)
+	public IceFallAuthorizationException(String msg, IceFallErrorTo1 errorTo1)
 	{
-		this.apiToken = apiToken;
+		super(msg, errorTo1);
+	}
+
+	public static void throwIfAuthorizationException(IceFallErrorTo1 errorTo1)
+	{
+		if (MISSING_AUTH_CREDENTIALS.equals(errorTo1.getErrorDetail()))
+		{
+			throw new IceFallAuthorizationException("Authorization Failure", errorTo1);
+		}
 	}
 }

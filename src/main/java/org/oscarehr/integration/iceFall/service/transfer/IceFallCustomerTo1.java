@@ -22,22 +22,9 @@
  */
 package org.oscarehr.integration.iceFall.service.transfer;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
 
-public class IceFallAuthenticationResponseTo1 implements Serializable
+public class IceFallCustomerTo1 implements Serializable
 {
-	@JsonProperty("token")
-	private String apiToken;
-
-	public String getApiToken()
-	{
-		return apiToken;
-	}
-
-	public void setApiToken(String apiToken)
-	{
-		this.apiToken = apiToken;
-	}
+	private Integer 
 }

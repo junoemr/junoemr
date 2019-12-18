@@ -20,24 +20,32 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.iceFall.service.transfer;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package org.oscarehr.ws.rest.integrations.iceFall.transfer;
 
 import java.io.Serializable;
 
-public class IceFallAuthenticationResponseTo1 implements Serializable
+public class IceFallSendFormTo1 implements Serializable
 {
-	@JsonProperty("token")
-	private String apiToken;
+	private Integer fdid;
+	private Integer demographicNo;
 
-	public String getApiToken()
+	public Integer getFdid()
 	{
-		return apiToken;
+		return fdid;
 	}
 
-	public void setApiToken(String apiToken)
+	public void setFdid(Integer fdid)
 	{
-		this.apiToken = apiToken;
+		this.fdid = fdid;
+	}
+
+	public Integer getDemographicNo()
+	{
+		return demographicNo;
+	}
+
+	public void setDemographicNo(Integer demographicNo)
+	{
+		this.demographicNo = demographicNo;
 	}
 }

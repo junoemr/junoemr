@@ -26,6 +26,7 @@ package org.oscarehr.integration.iceFall.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallAuthenticationException;
+import org.oscarehr.integration.iceFall.service.exceptions.IceFallAuthorizationException;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallRESTException;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
 import org.oscarehr.util.MiscUtils;
@@ -49,6 +50,7 @@ public class IceFallRESTErrorHandler extends DefaultResponseErrorHandler
 
 			// throw exception based on response type
 			IceFallAuthenticationException.throwIfAuthException(iceFallError);
+			IceFallAuthorizationException.throwIfAuthorizationException((iceFallError));
 
 			// if no other exception thrown, throw default
 			throw new IceFallRESTException(body, iceFallError);

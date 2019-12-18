@@ -35,6 +35,9 @@ public class IceFallErrorTo1 implements Serializable
 	@JsonProperty("non_field_errors")
 	private List<String> nonFieldErrors = new ArrayList<>();
 
+	@JsonProperty("detail")
+	private String errorDetail;
+
 	@JsonIgnore
 	private boolean junoInternalError = false;
 
@@ -51,6 +54,16 @@ public class IceFallErrorTo1 implements Serializable
 	public boolean isJunoInternalError()
 	{
 		return junoInternalError;
+	}
+
+	public String getErrorDetail()
+	{
+		return errorDetail;
+	}
+
+	public void setErrorDetail(String errorDetail)
+	{
+		this.errorDetail = errorDetail;
 	}
 
 	public void setJunoInternalError(boolean junoInternalError)

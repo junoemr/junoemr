@@ -24,25 +24,32 @@
 package org.oscarehr.ws.rest.integrations.iceFall;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.catalina.User;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
 import org.oscarehr.integration.iceFall.service.IceFallRESTService;
 import org.oscarehr.integration.iceFall.service.IceFallService;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorListTo1;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorTo1;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
+import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallSendFormTo1;
+import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallSettingsTo1;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.util.RESTClient;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 @Path("/integrations/iceFall")
 @Component("IceFallWebService")
@@ -57,6 +64,9 @@ public class IceFallWebService extends AbstractServiceImpl
 
 	@Autowired
 	IceFallRESTService iceFallRESTService;
+
+	@Autowired
+	DemographicDao demographicDao;
 
 	@GET
 	@Path("/settings")
@@ -87,8 +97,30 @@ public class IceFallWebService extends AbstractServiceImpl
 		systemPreferenceService.setPreferenceValue(UserProperty.ICE_FALL_INTEGRATION_ENABLED, iceFallSettingsTo1.getEnabled().toString());
 		systemPreferenceService.setPreferenceValue(UserProperty.ICE_FALL_VISIBLE, iceFallSettingsTo1.getVisible().toString());
 
-		iceFallRESTService.authenticate();
-
 		return RestResponse.successResponse(iceFallSettingsTo1);
 	}
+
+	@POST
+	@Path("/authenticate")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> authenticateWithIceFallApi()
+	{
+		return RestResponse.successResponse(true);
+	}
+
+	@POST
+	@Path("/sendForm")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> sendFormToIceFall(IceFallSendFormTo1 iceFallSendFormTo1)
+	{
+		Provider provider = getCurrentProvider();
+		Demographic demo = demographicDao.find(iceFallSendFormTo1.getDemographicNo());
+
+		iceFallService.sendIceFallForm(provider, demo, iceFallSendFormTo1.getFdid());
+
+		//TODO change me.
+		return RestResponse.successResponse(true);
+	}
+
 }

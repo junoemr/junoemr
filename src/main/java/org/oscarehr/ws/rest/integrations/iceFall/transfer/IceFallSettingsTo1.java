@@ -21,7 +21,7 @@
  * Canada
  */
 
-package org.oscarehr.ws.rest.integrations.iceFall;
+package org.oscarehr.ws.rest.integrations.iceFall.transfer;
 
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
 
@@ -58,7 +58,7 @@ public class IceFallSettingsTo1 implements Serializable
 	{
 		iceFallCredentials.setUsername(getClinicUserName());
 		iceFallCredentials.setEmail(getClinicEmail());
-		if (getClinicPassword() != null)
+		if (getClinicPassword() != null && !getClinicPassword().isEmpty())
 		{
 			iceFallCredentials.setPassword(getClinicPassword());
 		}

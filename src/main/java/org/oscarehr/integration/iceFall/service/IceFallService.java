@@ -23,8 +23,14 @@
 
 package org.oscarehr.integration.iceFall.service;
 
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.demographic.dao.DemographicExtDao;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.integration.iceFall.dao.IceFallCredentialsDao;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorListTo1;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +39,14 @@ public class IceFallService
 {
 	@Autowired
 	IceFallCredentialsDao iceFallCredentialsDao;
+
+	@Autowired
+	IceFallRESTService iceFallRESTService;
+
+	@Autowired
+	DemographicExtDao demographicExtDao;
+
+	public static final String CANOPY_CUSTOMER_ID_KEY = "canopy_customer_id";
 
 	/**
 	 * get icefall credentials from DB
@@ -52,6 +66,61 @@ public class IceFallService
 	{
 		iceFallCredentialsDao.merge(creds);
 		return creds;
+	}
+
+
+	/**
+	 * submit eform to icefall for processing
+	 * @param provider - the provider who is submitting the eform
+	 * @param fdid - the fdid of the eform to submit.
+	 */
+	public void sendIceFallForm(Provider provider, Demographic demo, Integer fdid)
+	{
+		//login to api
+		iceFallRESTService.authenticate();
+
+		//get doctor id
+		Integer iceFallDocId = findDoctorId(provider, iceFallRESTService.getDoctorList());
+
+		//get customer id
+		Integer demoCanopyId = getDemoCanopyId(demo);
+	}
+
+	protected void getDemoCanopyInfo(Demographic demo)
+	{
+		DemographicExt demoExt = demographicExtDao.getDemographicExt(demo.getId(), CANOPY_CUSTOMER_ID_KEY);
+		if (demoExt != null && !demoExt.getValue().isEmpty())
+		{
+			importCanopyCustomer(demoExt.getValue());
+		}
+	}
+
+	protected void importCanopyCustomer(String canopyCustomerId)
+	{
+		//TODO
+	}
+
+	/**
+	 * locate the ice fall doctor id of the current provider
+	 * @param doctorListTo1 - the list of ids to search
+	 * @return - the id of the currently logged in provider
+	 */
+	protected Integer findDoctorId(Provider provider, IceFallDoctorListTo1 doctorListTo1)
+	{
+		for (IceFallDoctorTo1 doc : doctorListTo1.getResults())
+		{
+			if (
+							doc.getFirstName().trim().equals(provider.getFirstName().trim()) &&
+											doc.getLastName().trim().equals(provider.getLastName().trim()) &&
+											doc.getEmail().trim().equals(provider.getEmail())
+			)
+			{
+				return doc.getId();
+			}
+		}
+
+		//TODO figure out the "authorize_bodystream@tweed.com" doctor thing.
+		throw new RuntimeException("Could not find doctor! And authorize doctor is not configured");
 	}
 
 }
