@@ -894,6 +894,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let detailElem = eventElement.find('.event-details');
 				let selfBookElem = eventElement.find('.self-book-indicator');
 				let telehealthElem = eventElement.find('.event-telehealth');
+				// By default this element is hidden
+				telehealthElem.hide();
 				// var eventSite = $scope.sites[event.data.site];
 
 				/* set up status icon + color/hover etc. */
@@ -927,9 +929,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let eventReason = "";
 				let eventNotes = "";
 
-				if (!(controller.telehealthEnabled && event.data.virtual))
+				// Only show telehealth icon if it's both on for the instance and the appointment has the virtual flag
+				if (controller.telehealthEnabled && event.data.virtual)
 				{
-					telehealthElem.hide();
+					telehealthElem.show();
 				}
 
 				if (event.data.doNotBook)

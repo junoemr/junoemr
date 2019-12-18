@@ -22,6 +22,26 @@
 		}
 	}
 
+	.icon-video {
+		font-size: 32px;
+		object-fit: contain;
+		padding-bottom: 6px;
+	}
+
+	.span {
+		.span-appointment {
+			font-size: 12px;
+			font-family: Cabin, sans-serif;
+			color: $color-neutral-dark-grey
+		}
+
+		.span-appointment {
+			font-size: 12px;
+			font-family: Cabin, sans-serif;
+			color: $color-neutral-grey
+		}
+	}
+
 	.patient-list-header {
 		@extend %juno-page-header;
 		border-right: $color-primary-dark 8px solid;
