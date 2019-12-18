@@ -129,7 +129,7 @@ public class MeasurementDSHelper {
             double[] mdbDataFieldRange = MeasurementGraphAction2.getParameters(mdb.getDataField(), "");
             if (mdbDataFieldRange == null || mdbDataFieldRange.length < 1)
             {
-                log.debug("Error passing measurement value to chart. DataField is empty for ID: " + mdb.getId());
+                log.error("Error passing measurement value to chart. DataField is empty for ID: " + mdb.getId());
             }
             else
             {
