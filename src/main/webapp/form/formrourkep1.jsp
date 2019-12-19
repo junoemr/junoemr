@@ -521,7 +521,7 @@ var maxYear=3100;
 			<table cellpadding="0" cellspacing="0" width="100%" height="100%">
 				<tr align="center">
 					<td colspan="2"><textarea name="p1_nutrition1m" cols="25"
-						class="wide"><%= props.getProperty("p1_nutrition2m", "") %></textarea></td>
+						class="wide"><%= props.getProperty("p1_nutrition1m", "") %></textarea></td>
 				</tr>
 				<tr>
 					<td valign="top"><input type="checkbox" class="chk"
