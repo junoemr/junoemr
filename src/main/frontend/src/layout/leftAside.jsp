@@ -102,16 +102,27 @@
 
 			<!-- the displayed list of patients -->
 			<div class="content-display flex-grow overflow-scroll">
-				<div class="list-group">
+				<div class="list-group"
+					ng-if="$ctrl.isRecentPatientView()">
 					<a ng-repeat="patient in $ctrl.activePatientList | filter:query"
-						class="list-group-item">
+					class="list-group-item">
+						<div ng-click="$ctrl.goToRecord(patient)"
+							class="list-group-clickable">
+							<h6>{{patient.name}}</h6>
+						</div>
 
-						<div ng-if="$ctrl.isAppointmentPatientView()"
-								class="flex-row vertical-align justify-content-between">
+					</a>
+
+				</div>
+				<div class="list-group"
+					ng-if="$ctrl.isAppointmentPatientView()">
+					<a ng-repeat="patient in $ctrl.activeAppointmentList | filter:query"
+					class="list-group-item">
+						<div class="flex-row vertical-align justify-content-between">
 							<div class="col-md-4 list-group-clickable"
 								ng-click="$ctrl.goToRecord(patient)">
 								<span class="span span-appointment-time">{{patient.startTime}}</span>
-								<h6>{{patient.name}}</h6>
+								<h4>{{patient.name}}</h4>
 								<span class="span span-appointment-reason">{{patient.reason}}</span>
 							</div>
 							<div class="col-md-2">
@@ -131,11 +142,6 @@
 								>
 								</juno-appointment-status-select>
 							</div>
-						</div>
-						<div ng-if="$ctrl.isRecentPatientView()"
-						     ng-click="$ctrl.goToRecord(patient)"
-						     class="list-group-clickable">
-							<h6>{{patient.name}}</h6>
 						</div>
 					</a>
 				</div>

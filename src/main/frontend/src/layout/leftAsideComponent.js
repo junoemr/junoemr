@@ -73,6 +73,7 @@ angular.module('Layout').component('leftAside', {
 		});
 		ctrl.activeTab = ctrl.tabEnum.appointments;
 		ctrl.activePatientList = [];
+		ctrl.activeAppointmentList = [];
 
 		//for filter box
 		ctrl.query = '';
@@ -172,22 +173,17 @@ angular.module('Layout').component('leftAside', {
 
 		ctrl.loadTelehealthEnabled = function loadTelehealthEnabled()
 		{
-			let deferred = $q.defer();
 			ctrl.systemPreferenceApi.getPropertyEnabled("myhealthaccess_telehealth_enabled").then(
 				function success(rawResults)
 				{
-					let enabled = rawResults.data.body;
-					ctrl.telehealthEnabled = enabled;
-					deferred.resolve(enabled);
+					ctrl.telehealthEnabled = rawResults.data.body;
 				},
-				function failure(results)
+				function failure()
 				{
-					$scope.displayMessages.add_standard_error("Failed to load telehealth enabled");
-					deferred.reject(results.data.body);
+					$scope.displayMessages.add_standard_error("Failed to load telehealth enabled, defaulting to false");
+					ctrl.telehealthEnabled = false;
 				}
 			);
-
-			return deferred.promise;
 		};
 
 		ctrl.openTelehealthLink = function openTelehealthLink(patient)
@@ -246,8 +242,8 @@ angular.module('Layout').component('leftAside', {
 			ctrl.scheduleApi.getAppointmentsForDay(ctrl.datepickerSelectedDate).then(
 				function success(results)
 				{
-					ctrl.activePatientList = results.data.body;
-					deferred.resolve(ctrl.activePatientList);
+					ctrl.activeAppointmentList = results.data.body;
+					deferred.resolve(ctrl.activeAppointmentList);
 				},
 				function error(errors)
 				{
