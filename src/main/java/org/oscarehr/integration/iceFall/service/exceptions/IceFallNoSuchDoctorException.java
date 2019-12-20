@@ -25,15 +25,20 @@ package org.oscarehr.integration.iceFall.service.exceptions;
 /**
  * thrown when there is not remote doctor in ice fall.
  */
-public class IceFallNoSuchDoctorException extends RuntimeException
+public class IceFallNoSuchDoctorException extends IceFallException
 {
-	public IceFallNoSuchDoctorException(String msg)
+	public IceFallNoSuchDoctorException(String msg, IceFallException.USER_ERROR_MESSAGE errorMessage)
 	{
-		super(msg);
+		super(msg, errorMessage);
 	}
 
 	public IceFallNoSuchDoctorException(String msg, Exception e)
 	{
 		super(msg, e);
+	}
+
+	public IceFallNoSuchDoctorException(String msg, Exception e, IceFallException.USER_ERROR_MESSAGE errorMessage)
+	{
+		super(msg, e, errorMessage);
 	}
 }

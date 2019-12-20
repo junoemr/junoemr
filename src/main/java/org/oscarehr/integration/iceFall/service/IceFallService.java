@@ -24,7 +24,6 @@
 package org.oscarehr.integration.iceFall.service;
 
 import org.apache.commons.io.IOUtils;
-import org.castor.core.util.Base64Encoder;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
@@ -36,11 +35,17 @@ import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.integration.iceFall.dao.IceFallCredentialsDao;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
-import org.oscarehr.integration.iceFall.service.exceptions.IceFallNoSuchCustomerException;
+import org.oscarehr.integration.iceFall.service.exceptions.IceFallCustomerLookupException;
+import org.oscarehr.integration.iceFall.service.exceptions.IceFallEmailExistsException;
+import org.oscarehr.integration.iceFall.service.exceptions.IceFallException;
+import org.oscarehr.integration.iceFall.service.exceptions.IceFallNoSuchDoctorException;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallPdfGenerationException;
+import org.oscarehr.integration.iceFall.service.exceptions.IceFallPrescriptionException;
+import org.oscarehr.integration.iceFall.service.exceptions.IceFallRESTException;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallCreateCustomerResponseTo1;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallCreateCustomerTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallCreatePrescriptionResponseTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallCreatePrescriptionTo1;
-import org.oscarehr.integration.iceFall.service.transfer.IceFallCustomerTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorListTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorTo1;
 import org.oscarehr.util.MiscUtils;
@@ -125,19 +130,18 @@ public class IceFallService
 		Integer iceFallDocId = findDoctorId(provider, iceFallRESTService.getDoctorList());
 
 		//get customer id
-		IceFallCustomerTo1 canopyCustomer = null;
+		Integer canopyCustomerId = null;
 		try
 		{
-			canopyCustomer = getDemoCanopyInfo(demo);
+			canopyCustomerId = getDemoCanopyInfo(demo);
 		}
-		catch(IceFallNoSuchCustomerException e)
+		catch(IceFallCustomerLookupException e)
 		{// remote customer does not exist create one.
-			//TODO create canopy customer
-			throw new IceFallNoSuchCustomerException("Add Canopy Customer not implemented!");
+			canopyCustomerId = createIceFallCustomerForDemographic(demo);
 		}
 
 		IceFallCreatePrescriptionTo1 iceFallCreatePrescriptionTo1 = new IceFallCreatePrescriptionTo1();
-		iceFallCreatePrescriptionTo1.setCustomerId(canopyCustomer.getCustomerId());
+		iceFallCreatePrescriptionTo1.setCustomerId(canopyCustomerId);
 
 		//TMP VALUES CHANGE
 		iceFallCreatePrescriptionTo1.setDosage(2.5f);
@@ -145,24 +149,74 @@ public class IceFallService
 		iceFallCreatePrescriptionTo1.setType("DRIED_CANNABIS");
 		iceFallCreatePrescriptionTo1.setThcLimit(50);
 		iceFallCreatePrescriptionTo1.setDiagnosis("TEST_1");
-		iceFallCreatePrescriptionTo1.setClinicId(42);
+		iceFallCreatePrescriptionTo1.setClinicId(1);
 		iceFallCreatePrescriptionTo1.setPages(1);
 		iceFallCreatePrescriptionTo1.setDocumentData(getEformPDFDateForSubmission(provider, demo, templateId, eformValues, httpSchema, contextPath, isInstance));
 		iceFallCreatePrescriptionTo1.setDoctorId(iceFallDocId);
 		//TMP VALUES CHANGE
 
-		IceFallCreatePrescriptionResponseTo1 responseTo1 = iceFallRESTService.sendPrescription(iceFallCreatePrescriptionTo1);
+		try
+		{
+			IceFallCreatePrescriptionResponseTo1 responseTo1 = iceFallRESTService.sendPrescription(iceFallCreatePrescriptionTo1);
+		}
+		catch(IceFallRESTException e)
+		{
+			throw new IceFallPrescriptionException("Failed to create ice fall prescription", e);
+		}
 	}
 
-	protected IceFallCustomerTo1 getDemoCanopyInfo(Demographic demo)
+	protected Integer getDemoCanopyInfo(Demographic demo)
 	{
 		DemographicExt demoExt = demographicExtDao.getDemographicExt(demo.getId(), CANOPY_CUSTOMER_ID_KEY);
 		if (demoExt != null && !demoExt.getValue().isEmpty())
 		{
-			return iceFallRESTService.getCustomerInformation(Integer.parseInt(demoExt.getValue()));
+			return iceFallRESTService.getCustomerInformation(Integer.parseInt(demoExt.getValue())).getCustomerId();
 		}
 
-		throw new IceFallNoSuchCustomerException("No Canopy Id for demographic [" + demo.getDemographicId() + "]");
+		throw new IceFallCustomerLookupException("No Canopy Id for demographic [" + demo.getDemographicId() + "]",
+						IceFallException.USER_ERROR_MESSAGE.NO_CUST_ID_OR_EMAIL);
+	}
+
+	protected Integer createIceFallCustomerForDemographic(Demographic demo)
+	{
+		if (demo.getEmail() != null && !demo.getEmail().isEmpty())
+		{
+			IceFallCreateCustomerTo1 iceFallCreateCustomerTo1 = new IceFallCreateCustomerTo1();
+
+			iceFallCreateCustomerTo1.setFirstName(demo.getFirstName());
+			iceFallCreateCustomerTo1.setLastName(demo.getLastName());
+			iceFallCreateCustomerTo1.setEmail(demo.getEmail());
+			iceFallCreateCustomerTo1.setDateOfBirth(demo.getDateOfBirth());
+			iceFallCreateCustomerTo1.setGender(demo.getSex());
+			iceFallCreateCustomerTo1.setPhone(demo.getPhone());
+
+			Integer customerId = null;
+			try
+			{
+				customerId = iceFallRESTService.createIceFallCustomer(iceFallCreateCustomerTo1).getCustomerId();
+			}
+			catch(IceFallEmailExistsException e)
+			{
+				throw new IceFallCustomerLookupException("Customer email for demographic [" + demo.getId() + "] already exists in icefall system",
+								IceFallException.USER_ERROR_MESSAGE.CUST_EMAIL_ALREADY_EXISTS);
+			}
+
+			if (customerId != null)
+			{
+				demographicExtDao.saveDemographicExt(demo.getId(), CANOPY_CUSTOMER_ID_KEY, customerId.toString());
+				return customerId;
+			}
+			else
+			{
+				throw new IceFallCustomerLookupException("Customer Id not returned by api when creating customer for demographic, [" + demo.getId() + "]",
+								IceFallException.USER_ERROR_MESSAGE.USER_CREATION_ERROR);
+			}
+		}
+		else
+		{
+			throw new IceFallCustomerLookupException("Cannot create new icefall customer for demographic [" + demo.getId() + "]. email is null or blank",
+							IceFallException.USER_ERROR_MESSAGE.NO_CUST_ID_OR_EMAIL);
+		}
 	}
 
 
@@ -185,8 +239,7 @@ public class IceFallService
 			}
 		}
 
-		//TODO figure out the "authorize_bodystream@tweed.com" doctor thing.
-		throw new RuntimeException("Could not find doctor! And authorize doctor is not configured");
+		throw new IceFallNoSuchDoctorException("Provider [" + provider.getProviderNo() + "] Not in ice fall doctors list", IceFallException.USER_ERROR_MESSAGE.DOCTOR_LOOKUP_ERROR);
 	}
 
 	/**

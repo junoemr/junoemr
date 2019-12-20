@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallAuthenticationException;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallAuthorizationException;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallDoctorPrivilegeException;
+import org.oscarehr.integration.iceFall.service.exceptions.IceFallEmailExistsException;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallRESTException;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
 import org.oscarehr.util.MiscUtils;
@@ -50,9 +51,10 @@ public class IceFallRESTErrorHandler extends DefaultResponseErrorHandler
 			IceFallErrorTo1 iceFallError = new ObjectMapper().readValue(body, IceFallErrorTo1.class);
 
 			// throw exception based on response type
-			IceFallAuthenticationException.throwIfAuthException(iceFallError);
+			IceFallAuthenticationException.throwIfAuthenticationException(iceFallError);
 			IceFallAuthorizationException.throwIfAuthorizationException((iceFallError));
 			IceFallDoctorPrivilegeException.throwIfPermissionError((iceFallError));
+			IceFallEmailExistsException.throwIfEmailExistsException(iceFallError);
 
 			// if no other exception thrown, throw default
 			throw new IceFallRESTException(body, iceFallError);

@@ -20,27 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
-package oscar.util.Jackson;
+package org.oscarehr.integration.iceFall.service.exceptions;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import oscar.util.ConversionUtils;
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
-// Serialize LocalDates to DEFAULT_DATE_PATTERN format
-public class LocalDateYYYY_MM_ddSerializer extends StdSerializer<LocalDate>
+/**
+ * throw when an error occurs with the ice fall customer. i.e. demographic.
+ */
+public class IceFallCustomerLookupException extends IceFallException
 {
-	public LocalDateYYYY_MM_ddSerializer()
+	public IceFallCustomerLookupException(String msg)
 	{
-		super(LocalDate.class);
+		super(msg);
 	}
-	@Override
-	public void serialize(LocalDate localDate, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException
+
+	public IceFallCustomerLookupException(String msg, IceFallException.USER_ERROR_MESSAGE errorMessage)
 	{
-		jsonGenerator.writeString(localDate.format(DateTimeFormatter.ofPattern(ConversionUtils.DEFAULT_DATE_PATTERN)));
+		super(msg, errorMessage);
+	}
+
+	public IceFallCustomerLookupException(String msg, Exception e)
+	{
+		super(msg, e);
 	}
 }

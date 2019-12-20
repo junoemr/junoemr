@@ -23,11 +23,14 @@
 
 package org.oscarehr.integration.iceFall.service;
 
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.iceFall.dao.IceFallCredentialsDao;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallAuthorizationException;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallAuthenticationResponseTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallAuthenticationTo1;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallCreateCustomerResponseTo1;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallCreateCustomerTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallCreatePrescriptionResponseTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallCreatePrescriptionTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallCustomerTo1;
@@ -49,6 +52,7 @@ public class IceFallRESTService
 	public static final String API_AUTH_TOKEN = "/api-token-auth/";
 	public static final String DOCTOR_LIST = API_BASE + "/partner/doctors/";
 	public static final String CUSTOMER_DETAILS = API_BASE + "/partner/customers/";
+	public static final String CREATE_CUSTOMER = API_BASE + "/partner/customers/";
 	public static final String ADD_PRESCRIPTION = API_BASE + "/partner/prescriptions/";
 
 	@Autowired
@@ -82,6 +86,11 @@ public class IceFallRESTService
 	public IceFallCustomerTo1 getCustomerInformation(Integer canopyCustomerId)
 	{
 		return RESTClient.doGet(getIceFallUrlBase() + CUSTOMER_DETAILS + canopyCustomerId + "/", getApiAuthenticationHeaders(), IceFallCustomerTo1.class);
+	}
+
+	public IceFallCreateCustomerResponseTo1 createIceFallCustomer(IceFallCreateCustomerTo1 createCustomerTo1)
+	{
+		return RESTClient.doPost(getIceFallUrlBase() + CREATE_CUSTOMER, getApiAuthenticationHeaders(), createCustomerTo1, IceFallCreateCustomerResponseTo1.class);
 	}
 
 	public IceFallCreatePrescriptionResponseTo1 sendPrescription(IceFallCreatePrescriptionTo1 iceFallCreatePrescriptionTo1)

@@ -22,18 +22,10 @@
  */
 package org.oscarehr.integration.iceFall.service.exceptions;
 
-/**
- * throw when an error occurs with the ice fall customer. i.e. demographic.
- */
-public class IceFallNoSuchCustomerException extends RuntimeException
+public class IceFallPrescriptionException  extends IceFallException
 {
-	public IceFallNoSuchCustomerException(String msg)
+	public IceFallPrescriptionException (String msg, Exception e)
 	{
-		super(msg);
-	}
-
-	public IceFallNoSuchCustomerException(String msg, Exception e)
-	{
-		super(msg, e);
+		super(msg, e, USER_ERROR_MESSAGE.PRESCRIPTION_CREATION_ERROR);
 	}
 }

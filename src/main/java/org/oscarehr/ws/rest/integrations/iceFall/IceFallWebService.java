@@ -31,8 +31,8 @@ import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
 import org.oscarehr.integration.iceFall.service.IceFallRESTService;
 import org.oscarehr.integration.iceFall.service.IceFallService;
-import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorListTo1;
-import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorTo1;
+import org.oscarehr.integration.iceFall.service.exceptions.IceFallException;
+import org.oscarehr.integration.iceFall.service.exceptions.IceFallRESTException;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
@@ -50,7 +50,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Path("/integrations/iceFall")
@@ -136,7 +135,20 @@ public class IceFallWebService extends AbstractServiceImpl
 			eformId = iceFallSendFormTo1.getFdid();
 		}
 
-		iceFallService.sendIceFallForm(provider, demo, eformId, isInstance, eformValues, getHttpServletRequest());
+		try
+		{
+			iceFallService.sendIceFallForm(provider, demo, eformId, isInstance, eformValues, getHttpServletRequest());
+		}
+		catch (IceFallException e)
+		{
+			MiscUtils.getLogger().error("Failed to send IceFall Prescription due to exception", e);
+			return RestResponse.errorResponse(e.getUserErrorMessage(provider));
+		}
+		catch (IceFallRESTException e)
+		{
+			MiscUtils.getLogger().error("Failed to send IceFall Prescription due to REST exception", e);
+			return RestResponse.errorResponse(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider));
+		}
 
 		//TODO change me.
 		return RestResponse.successResponse(true);

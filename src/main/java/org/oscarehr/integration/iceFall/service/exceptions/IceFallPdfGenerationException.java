@@ -22,7 +22,7 @@
  */
 package org.oscarehr.integration.iceFall.service.exceptions;
 
-public class IceFallPdfGenerationException extends RuntimeException
+public class IceFallPdfGenerationException extends IceFallException
 {
 	public IceFallPdfGenerationException(String msg)
 	{
@@ -32,5 +32,10 @@ public class IceFallPdfGenerationException extends RuntimeException
 	public IceFallPdfGenerationException(String msg, Exception e)
 	{
 		super(msg, e);
+	}
+
+	public IceFallPdfGenerationException(String msg, Exception e, IceFallException.USER_ERROR_MESSAGE errorMessage)
+	{
+		super(msg, e, errorMessage);
 	}
 }

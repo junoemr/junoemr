@@ -15,6 +15,11 @@ IceFall =
 			})
 					.done(function (response)
 					{
+						if (response.error)
+						{
+							console.log(response);
+							reject(response.error.message);
+						}
 						resolve(response);
 					})
 					.fail(function (response)

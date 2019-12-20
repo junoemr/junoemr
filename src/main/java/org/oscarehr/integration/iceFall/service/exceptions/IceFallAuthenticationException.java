@@ -40,7 +40,7 @@ public class IceFallAuthenticationException extends IceFallRESTException
 		super(msg, errorTo1);
 	}
 
-	public static void throwIfAuthException(IceFallErrorTo1 errorTo1)
+	public static void throwIfAuthenticationException(IceFallErrorTo1 errorTo1)
 	{
 		if (errorTo1.getNonFieldErrors().contains(AUTH_LOGIN_ERROR))
 		{

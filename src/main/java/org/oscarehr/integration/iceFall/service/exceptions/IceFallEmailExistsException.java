@@ -20,27 +20,31 @@
  * Victoria, British Columbia
  * Canada
  */
-package oscar.util.Jackson;
+package org.oscarehr.integration.iceFall.service.exceptions;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import oscar.util.ConversionUtils;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import javax.naming.AuthenticationException;
 
-// Serialize LocalDates to DEFAULT_DATE_PATTERN format
-public class LocalDateYYYY_MM_ddSerializer extends StdSerializer<LocalDate>
+public class IceFallEmailExistsException extends IceFallRESTException
 {
-	public LocalDateYYYY_MM_ddSerializer()
+	public static String EMAIL_EXISTS = "__CUSTOMER_EMAIL_EXISTS__";
+
+	public IceFallEmailExistsException(String msg)
 	{
-		super(LocalDate.class);
+		super(msg);
 	}
-	@Override
-	public void serialize(LocalDate localDate, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException
+
+	public IceFallEmailExistsException(String msg, IceFallErrorTo1 errorTo1)
 	{
-		jsonGenerator.writeString(localDate.format(DateTimeFormatter.ofPattern(ConversionUtils.DEFAULT_DATE_PATTERN)));
+		super(msg, errorTo1);
+	}
+
+	public static void throwIfEmailExistsException(IceFallErrorTo1 errorTo1)
+	{
+		if (errorTo1.getNonFieldErrors().contains(EMAIL_EXISTS))
+		{
+			throw new IceFallEmailExistsException("Email already exists", errorTo1);
+		}
 	}
 }
