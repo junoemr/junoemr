@@ -20,35 +20,20 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.iceFall.service.transfer;
+package org.oscarehr.integration.iceFall.service.exceptions;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import java.io.Serializable;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class IceFallAuthenticationTo1 implements Serializable
+/**
+ * thrown when there is not remote doctor in ice fall.
+ */
+public class IceFallNoSuchDoctorException extends RuntimeException
 {
-	private String username;
-	private String password;
-
-	public String getUsername()
+	public IceFallNoSuchDoctorException(String msg)
 	{
-		return username;
+		super(msg);
 	}
 
-	public void setUsername(String username)
+	public IceFallNoSuchDoctorException(String msg, Exception e)
 	{
-		this.username = username;
-	}
-
-	public String getPassword()
-	{
-		return password;
-	}
-
-	public void setPassword(String password)
-	{
-		this.password = password;
+		super(msg, e);
 	}
 }

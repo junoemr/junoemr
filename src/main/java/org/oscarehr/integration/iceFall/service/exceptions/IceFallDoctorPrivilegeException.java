@@ -20,35 +20,31 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.iceFall.service.transfer;
+package org.oscarehr.integration.iceFall.service.exceptions;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
 
-import java.io.Serializable;
+import javax.naming.AuthenticationException;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class IceFallAuthenticationTo1 implements Serializable
+public class IceFallDoctorPrivilegeException extends IceFallRESTException
 {
-	private String username;
-	private String password;
+	public static String PRESCRIBE_PERMISSION_ERROR = "__DOCTOR_CANNOT_PRESCRIBE__";
 
-	public String getUsername()
+	public IceFallDoctorPrivilegeException(String msg)
 	{
-		return username;
+		super(msg);
 	}
 
-	public void setUsername(String username)
+	public IceFallDoctorPrivilegeException(String msg, IceFallErrorTo1 errorTo1)
 	{
-		this.username = username;
+		super(msg, errorTo1);
 	}
 
-	public String getPassword()
+	public static void throwIfPermissionError(IceFallErrorTo1 errorTo1)
 	{
-		return password;
-	}
-
-	public void setPassword(String password)
-	{
-		this.password = password;
+		if (errorTo1.getNonFieldErrors().contains(PRESCRIBE_PERMISSION_ERROR))
+		{
+			throw new IceFallDoctorPrivilegeException("Doctor Cannot Prescribe", errorTo1);
+		}
 	}
 }

@@ -22,9 +22,6 @@
  */
 package oscar.util;
 
-import org.apache.http.client.utils.URIBuilder;
-import org.oscarehr.integration.myhealthaccess.ErrorHandler;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;

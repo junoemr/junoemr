@@ -23,6 +23,7 @@
 package org.oscarehr.integration.iceFall.service.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import oscar.util.StringUtils;
 
@@ -30,6 +31,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IceFallErrorTo1 implements Serializable
 {
 	@JsonProperty("non_field_errors")

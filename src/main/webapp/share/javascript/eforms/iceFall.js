@@ -8,7 +8,6 @@ IceFall =
 	{
 		return new Promise(function (resolve, reject)
 		{
-			console.log(JSON.stringify(postData));
 			$.post({
 				url: IceFall.ICE_FALL_WS_BASE + endpoint,
 				data: JSON.stringify(postData),
@@ -30,9 +29,22 @@ IceFall =
 		return IceFall.doPost(IceFall.ICE_FALL_WS_AUTH, null);
 	},
 
-	sendForm: function (formId, demoNo)
+	sendForm: function (fdid, fid, demoNo)
 	{
-		return IceFall.doPost(IceFall.ICE_FALL_WS_SEND_FORM, {fdid: formId, demographicNo: demoNo});
+		let submitObj = IceFall.formToJSON(document.forms[0]);
+		submitObj.fdid = fdid;
+		submitObj.fid = fid;
+		submitObj.demographicNo = demoNo;
+		return IceFall.doPost(IceFall.ICE_FALL_WS_SEND_FORM, submitObj);
+	},
+
+	formToJSON: function (formElements)
+	{
+		return [].reduce.call(formElements, (data, element) =>
+		{
+			data[element.name] = element.value;
+			return data;
+		}, {});
 	},
 
 };

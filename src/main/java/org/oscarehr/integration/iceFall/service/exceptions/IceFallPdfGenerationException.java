@@ -20,35 +20,17 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.iceFall.service.transfer;
+package org.oscarehr.integration.iceFall.service.exceptions;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import java.io.Serializable;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class IceFallAuthenticationTo1 implements Serializable
+public class IceFallPdfGenerationException extends RuntimeException
 {
-	private String username;
-	private String password;
-
-	public String getUsername()
+	public IceFallPdfGenerationException(String msg)
 	{
-		return username;
+		super(msg);
 	}
 
-	public void setUsername(String username)
+	public IceFallPdfGenerationException(String msg, Exception e)
 	{
-		this.username = username;
-	}
-
-	public String getPassword()
-	{
-		return password;
-	}
-
-	public void setPassword(String password)
-	{
-		this.password = password;
+		super(msg, e);
 	}
 }

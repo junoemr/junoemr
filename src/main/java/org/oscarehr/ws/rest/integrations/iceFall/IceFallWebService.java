@@ -49,7 +49,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Path("/integrations/iceFall")
 @Component("IceFallWebService")
@@ -117,7 +119,24 @@ public class IceFallWebService extends AbstractServiceImpl
 		Provider provider = getCurrentProvider();
 		Demographic demo = demographicDao.find(iceFallSendFormTo1.getDemographicNo());
 
-		iceFallService.sendIceFallForm(provider, demo, iceFallSendFormTo1.getFdid());
+		HashMap<String, String> eformValues = new HashMap<>();
+		for(Map.Entry<String, String> entry : iceFallSendFormTo1.getEformValues().entrySet())
+		{
+			if (entry.getValue() != null && !entry.getValue().isEmpty())
+			{
+				eformValues.put(entry.getKey(), entry.getValue());
+			}
+		}
+
+		Integer eformId = iceFallSendFormTo1.getFid();
+		boolean isInstance = false;
+		if (iceFallSendFormTo1.getFdid() != null)
+		{
+			isInstance = true;
+			eformId = iceFallSendFormTo1.getFdid();
+		}
+
+		iceFallService.sendIceFallForm(provider, demo, eformId, isInstance, eformValues, getHttpServletRequest());
 
 		//TODO change me.
 		return RestResponse.successResponse(true);

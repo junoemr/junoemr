@@ -28,6 +28,9 @@ import org.oscarehr.integration.iceFall.model.IceFallCredentials;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallAuthorizationException;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallAuthenticationResponseTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallAuthenticationTo1;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallCreatePrescriptionResponseTo1;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallCreatePrescriptionTo1;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallCustomerTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorListTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -45,6 +48,8 @@ public class IceFallRESTService
 	// API endpoints
 	public static final String API_AUTH_TOKEN = "/api-token-auth/";
 	public static final String DOCTOR_LIST = API_BASE + "/partner/doctors/";
+	public static final String CUSTOMER_DETAILS = API_BASE + "/partner/customers/";
+	public static final String ADD_PRESCRIPTION = API_BASE + "/partner/prescriptions/";
 
 	@Autowired
 	IceFallCredentialsDao iceFallCredentialsDao;
@@ -73,6 +78,17 @@ public class IceFallRESTService
 	{
 		return RESTClient.doGet(getIceFallUrlBase() + DOCTOR_LIST, getApiAuthenticationHeaders(), IceFallDoctorListTo1.class);
 	}
+
+	public IceFallCustomerTo1 getCustomerInformation(Integer canopyCustomerId)
+	{
+		return RESTClient.doGet(getIceFallUrlBase() + CUSTOMER_DETAILS + canopyCustomerId + "/", getApiAuthenticationHeaders(), IceFallCustomerTo1.class);
+	}
+
+	public IceFallCreatePrescriptionResponseTo1 sendPrescription(IceFallCreatePrescriptionTo1 iceFallCreatePrescriptionTo1)
+	{
+		return RESTClient.doPost(getIceFallUrlBase() + ADD_PRESCRIPTION, getApiAuthenticationHeaders(), iceFallCreatePrescriptionTo1, IceFallCreatePrescriptionResponseTo1.class);
+	}
+
 
 	protected HttpHeaders getApiAuthenticationHeaders()
 	{

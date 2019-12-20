@@ -22,10 +22,12 @@
  */
 package org.oscarehr.integration.iceFall.service.transfer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IceFallDoctorTo1 implements Serializable
 {
 	private Integer id;

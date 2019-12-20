@@ -22,12 +22,33 @@
  */
 package org.oscarehr.ws.rest.integrations.iceFall.transfer;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IceFallSendFormTo1 implements Serializable
 {
+	private Integer fid;
 	private Integer fdid;
 	private Integer demographicNo;
+	// any other values sent in the request
+	private Map<String, String> eformValues = new HashMap<>();
+
+	// Capture all other fields that Jackson do not match other members
+	@JsonAnyGetter
+	public Map<String, String> otherFields() {
+		return eformValues;
+	}
+
+	@JsonAnySetter
+	public void setOtherField(String name, String value) {
+		eformValues.put(name, value);
+	}
 
 	public Integer getFdid()
 	{
@@ -47,5 +68,25 @@ public class IceFallSendFormTo1 implements Serializable
 	public void setDemographicNo(Integer demographicNo)
 	{
 		this.demographicNo = demographicNo;
+	}
+
+	public Integer getFid()
+	{
+		return fid;
+	}
+
+	public void setFid(Integer fid)
+	{
+		this.fid = fid;
+	}
+
+	public Map<String, String> getEformValues()
+	{
+		return eformValues;
+	}
+
+	public void setEformValues(Map<String, String> eformValues)
+	{
+		this.eformValues = eformValues;
 	}
 }
