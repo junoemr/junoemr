@@ -125,20 +125,15 @@ public class MeasurementDSHelper {
     public double getDataAsDouble() {
         log.debug("dataAsDouble");
         double ret = -1;
-        try{
-            double[] mdbDataFieldRange = MeasurementGraphAction2.getParameters(mdb.getDataField(), "");
-            if (mdbDataFieldRange == null || mdbDataFieldRange.length < 1)
-            {
-                log.error("Error passing measurement value to chart. DataField is empty for ID: " + mdb.getId());
-            }
-            else
-            {
-                ret = mdbDataFieldRange[0];
-            }
-        }catch(Exception e){
-            MiscUtils.getLogger().error("Error", e);
-            problem =true;
-        }  
+
+        double[] mdbDataFieldRange = MeasurementGraphAction2.getParameters(mdb.getDataField(), "");
+        if (mdbDataFieldRange == null || mdbDataFieldRange.length < 1)
+        {
+            log.error("Error passing measurement value to chart. DataField is empty for ID: " + mdb.getId());
+            return ret;
+        }
+
+        ret = mdbDataFieldRange[0];
         log.debug("DOUBLE val : "+ret);
         return ret;
     }       
