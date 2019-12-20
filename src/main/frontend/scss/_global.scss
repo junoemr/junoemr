@@ -1,12 +1,4 @@
 // global styles
-
-h1,h2,h3,h4,h5,h6 {
-	@include juno-font-default;
-}
-h1,h2,h3 {
-	font-weight: bold;
-}
-
 a {
 	color: $color-neutral-darker;
 	&:hover {
@@ -14,6 +6,46 @@ a {
 	}
 }
 
+body {
+	h1 {
+		@include juno-font-default-size(32px, bold);
+	}
+
+	h2 {
+		@include juno-font-default-size(28px, bold);
+	}
+
+	h3 {
+		@include juno-font-default-size(24px, bold);
+	}
+
+	h4 {
+		@include juno-font-default-size(22px, bold);
+	}
+
+	h5 {
+		@include juno-font-default-size(20px, bold);
+	}
+
+	h6 {
+		@include juno-font-default-size(18px, bold);
+	}
+}
+
+.body-bold {
+	@include juno-font-body;
+	font-weight: bold;
+}
+
+.body-small-bold {
+	@include juno-font-body-small();
+	font-weight: bold;
+}
+
+.body-extra-small-bold {
+	@include juno-font-body-smallest();
+	font-weight: bold;
+}
 
 .hand-hover {
 	cursor: pointer;
@@ -79,6 +111,39 @@ a {
 .md-margin-top {
 	margin-top: $margin-md;
 }
+
+.xl-margin-right {
+	margin-right: $margin-xl;
+}
+
+.lg-margin-right {
+	margin-right: $margin-lg;
+}
+
+.md-margin-right {
+	margin-right: $margin-md;
+}
+
+.sm-margin-right {
+	margin-right: $margin-sm;
+}
+
+.xl-margin-left {
+	margin-left: $margin-xl;
+}
+
+.lg-margin-left {
+	margin-left: $margin-lg;
+}
+
+.md-margin-left {
+	margin-left: $margin-md;
+}
+
+.sm-margin-left {
+	margin-left: $margin-sm;
+}
+
 
 .no-margin-bottom {
 	margin-bottom: 0;

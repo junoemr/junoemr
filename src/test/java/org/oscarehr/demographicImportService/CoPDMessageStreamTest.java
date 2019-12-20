@@ -103,7 +103,7 @@ public class CoPDMessageStreamTest
 	}
 
 	@Test
-	public void testGetCoPDMessageForEach()
+	public void testGetCoPDMessageForEach() throws Exception
 	{
 		InputStream xmlInputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 		CoPDMessageStream messageStream = new CoPDMessageStream(xmlInputStream);
@@ -122,7 +122,7 @@ public class CoPDMessageStreamTest
 	}
 
 	@Test
-	public void testGetCoPDMessageNextMessage()
+	public void testGetCoPDMessageNextMessage() throws Exception
 	{
 		InputStream xmlInputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 		CoPDMessageStream messageStream = new CoPDMessageStream(xmlInputStream);

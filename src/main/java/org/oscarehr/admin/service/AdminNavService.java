@@ -152,7 +152,7 @@ public class AdminNavService
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAddProvider"), "frame?frameUrl=" + contextPath + "/admin/provideraddarecordhtm.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSearchProvider"), "frame?frameUrl=" + contextPath + "/admin/providersearchrecordshtm.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAddLogin"), "frame?frameUrl=" + contextPath + "/admin/securityaddarecord.jsp"));
-		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSearchLogin"), "frame?frameUrl=" + contextPath + "/admin/providersearchrecordshtm.jsp"));
+		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSearchLogin"), "frame?frameUrl=" + contextPath + "/admin/securitysearchrecordshtm.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.assignRole"), "frame?frameUrl=" + contextPath + "/admin/providerRole.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.unlockAcct"), "frame?frameUrl=" + contextPath + "/admin/unLock.jsp"));
 
@@ -175,12 +175,7 @@ public class AdminNavService
 
 		if (oscarProperties.isClinicaidBillingType())
 		{// CLINICAID BILLING
-			billingItems.add(new AdminNavItemTo1("Manage Invoices", "frame?frameUrl=" + contextPath + "/billing.do?billRegion=CLINICAID&action=invoice_reports"));
-
-			if (oscarProperties.isBritishColumbiaBillingType())
-			{
-				billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp&useCompat=true"));
-			}
+			billingItems.add(new AdminNavItemTo1("Manage Invoices", contextPath +"/billing.do?billRegion=CLINICAID&action=invoice_reports", true));
 		}
 		else if (oscarProperties.isBritishColumbiaBillingType())
 		{// BC BILLING
@@ -194,7 +189,6 @@ public class AdminNavService
 
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageServiceDiagnosticCodeAssoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/showServiceCodeAssocs.do"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageProcedureFeeCodeAssoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/supServiceCodeAssocAction.do"));
-			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp&useCompat=true"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.bcQuickBilling"), "frame?frameUrl=" + contextPath + "/quickBillingBC.do"));
 
 			if (oscarProperties.isPropertyActive("NEW_BC_TELEPLAN"))
@@ -258,6 +252,11 @@ public class AdminNavService
 
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.paymentReceived"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingONPayment.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.managePaymentType"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/managePaymentType.do"));
+		}
+
+		if (oscarProperties.isBritishColumbiaInstanceType())
+		{
+			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp&useCompat=true"));
 		}
 
 		billing.setItems(billingItems);
@@ -375,6 +374,13 @@ public class AdminNavService
 		if (securityInfoManager.hasPrivilege(providerNo, "_admin.eformreporttool", SecurityInfoManager.READ, null))
 		{
 			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.eformReportTool"), "frame?frameUrl=" + contextPath + "/admin/eformReportTool/eformReportTool.jsp"));
+		}
+
+		// /panelManagement
+		if (securityInfoManager.hasPrivilege(providerNo, "_admin.panelManagement", SecurityInfoManager.READ, null) &&
+				oscarProperties.isBritishColumbiaInstanceType())
+		{
+			reportItems.add(new AdminNavItemTo1("Panel Management", "panelManagement"));
 		}
 
 		reportGroup.setItems(reportItems);

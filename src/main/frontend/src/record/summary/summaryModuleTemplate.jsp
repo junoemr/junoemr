@@ -3,8 +3,8 @@
 	<div class="summary-module-header">
 		<div class="flex-row align-items-center">
 			<div ng-switch="$ctrl.clickableTitle" class="flex-grow title">
-				<h5 class="flex-grow title" ng-switch-when="false">{{$ctrl.module.displayName}}</h5>
-				<h5 class="flex-grow title" ng-switch-when="true"><a href="javascript:" ng-click="$ctrl.clickTitleCallback()">{{$ctrl.module.displayName}}</a></h5>
+				<div class="body-small-bold flex-grow title" ng-switch-when="false">{{$ctrl.module.displayName}}</div>
+				<div class="body-small-bold flex-grow title" ng-switch-when="true"><a href="javascript:" ng-click="$ctrl.clickTitleCallback()">{{$ctrl.module.displayName}}</a></div>
 			</div>
 			<button ng-if="$ctrl.enableAddButton"
 					class="btn btn-xs btn-primary-inverted btn-add"

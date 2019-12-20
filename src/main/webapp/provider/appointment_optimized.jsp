@@ -772,8 +772,8 @@ private long getAppointmentRowSpan(
 
 <table BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%" id="firstTable" class="noprint">
 	<tr>
-		<td align="center" >
-			<a href="../web/" title="OSCAR EMR"><img src="<%=request.getContextPath()%>/images/oscar_small.png" border="0"></a>
+		<td align="center" style="width: 50px">
+			<a href="../web/" title="OSCAR EMR"><img src="<%=request.getContextPath()%>/images/logo-primary.png" border="0" title="Go to Juno UI"></a>
 		</td>
 		<td id="firstMenu">
 			<ul id="navlist">
@@ -1275,7 +1275,7 @@ private long getAppointmentRowSpan(
 				UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW,
 				UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC);
 		Map<String, UserProperty> countProperties = userPropertyDao.getProviderPropertiesAsMap(curUser_no, countPropertiesNames);
-		boolean showApptCountForProvider = countProperties.get(UserProperty.SCHEDULE_COUNT_ENABLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED).getValue());
+		boolean showApptCountForProvider = countProperties.get(UserProperty.SCHEDULE_COUNT_ENABLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_ENABLED).getValue());
 		boolean countIncludeCancelled = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED).getValue());
 		boolean countIncludeNoShow = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_SHOW).getValue());
 		boolean countIncludeNoDemographic = countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_CANCELLED) != null && new Boolean(countProperties.get(UserProperty.SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC).getValue());

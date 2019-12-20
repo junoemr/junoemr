@@ -93,8 +93,12 @@ public class AllergyMapper extends AbstractMapper
 			String description = getDescription(rep);
 			if (description == null)
 			{
-				description = "INVALID/MISSING DESCRIPTION";
-				logger.warn("Missing allergy description. values set to:" + description);
+				description = getGroupDescription(rep);
+				if (description == null)
+				{
+					description = "INVALID/MISSING DESCRIPTION";
+					logger.warn("Missing allergy description. values set to:" + description);
+				}
 			}
 			allergy.setStartDate(getStartDate(rep));
 			allergy.setEntryDate(getStartDate(rep));
@@ -195,6 +199,11 @@ public class AllergyMapper extends AbstractMapper
 	public String getDescription(int rep)
 	{
 		return StringUtils.trimToNull(provider.getALLERGY(rep).getIAM().getIam3_AllergenCodeMnemonicDescription().getCwe9_OriginalText().getValue());
+	}
+
+	public String getGroupDescription(int rep)
+	{
+		return StringUtils.trimToNull(provider.getALLERGY(rep).getIAM().getIam10_AllergenGroupCodeMnemonicDescription().getCe2_Text().getValue());
 	}
 
 	public String getReaction(int rep) throws HL7Exception

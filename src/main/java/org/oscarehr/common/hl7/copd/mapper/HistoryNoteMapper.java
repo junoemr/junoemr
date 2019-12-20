@@ -30,6 +30,7 @@ import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.oscarehr.util.MiscUtils;
+import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -311,7 +312,7 @@ public class HistoryNoteMapper extends AbstractMapper
 				noteText += StringUtils.trimToEmpty(leisureActivities + "\n");
 			}
 
-			note.setNote(StringUtils.trim(noteText.replaceAll("~crlf~", "\n")));
+			note.setNote(StringUtils.trim(noteText.replaceAll("~crlf~", "\n")) + " - " + ConversionUtils.toDateString(date));
 		}
 		return note;
 	}
@@ -350,7 +351,6 @@ public class HistoryNoteMapper extends AbstractMapper
 		{
 			noteText += StringUtils.trimToEmpty(comments + "\n");
 		}
-		note.setNote(StringUtils.trim(noteText.replaceAll("~crlf~", "\n")));
 
 		Date diagnosisDate = getFamHistDiagnosisDate(rep);
 		if(diagnosisDate == null)
@@ -364,6 +364,8 @@ public class HistoryNoteMapper extends AbstractMapper
 			}
 			diagnosisDate = oldestEncounterNoteDate;
 		}
+
+		note.setNote(StringUtils.trim(noteText.replaceAll("~crlf~", "\n")) + " - " + ConversionUtils.toDateString(diagnosisDate));
 		note.setObservationDate(diagnosisDate);
 		note.setUpdateDate(diagnosisDate);
 
@@ -409,7 +411,7 @@ public class HistoryNoteMapper extends AbstractMapper
 		{
 			noteText += " - " + resultText;
 		}
-		note.setNote(noteText);
+		note.setNote(noteText + " - " + ConversionUtils.toDateString(procedureDate));
 
 		return note;
 	}

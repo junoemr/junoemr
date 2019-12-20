@@ -67,10 +67,11 @@ public class IndicatorTemplateXML {
 	private String template;	
 	private String author;
 	private LoggedInInfo loggedInInfo;
+	private String providerNo;
 
-	public IndicatorTemplateXML( LoggedInInfo loggedInInfo, Document xmlDocument ) {
+	public IndicatorTemplateXML(Document xmlDocument, String providerNo) {
 		this( xmlDocument );
-		this.loggedInInfo = loggedInInfo;
+		this.providerNo = providerNo;
 	}
 	
 	public IndicatorTemplateXML( Document xmlDocument ) {
@@ -541,8 +542,8 @@ public class IndicatorTemplateXML {
 	public String getLoggedInProvider() {
 		String providerNo = "";
 		
-		if( this.loggedInInfo != null ) {
-			providerNo = this.loggedInInfo.getLoggedInProviderNo(); 
+		if( this.providerNo != null ) {
+			providerNo = this.providerNo;
 		}
 		
 		return providerNo;

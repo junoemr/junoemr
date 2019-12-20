@@ -40,7 +40,6 @@ import javax.xml.validation.Validator;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.IndicatorTemplate;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.w3c.dom.Document;
 
@@ -70,7 +69,7 @@ public class IndicatorTemplateHandler{
 	private Schema schema;
 	private String validationMessage;
 	private boolean validXML;
-	private LoggedInInfo loggedInInfo;
+	private String providerNo;
 	
 	/**
 	 * Requires the proper IndicatorXMLTemplateSchema.xsd schema file to be set 
@@ -80,8 +79,8 @@ public class IndicatorTemplateHandler{
 		setSchema();
 	}
 	
-	public IndicatorTemplateHandler( LoggedInInfo loggedInInfo, byte[] bytearray ) {
-		this.loggedInInfo = loggedInInfo;
+	public IndicatorTemplateHandler( byte[] bytearray, String providerNo) {
+		this.providerNo = providerNo;
 		setSchema();
 		read( bytearray );
 	}
@@ -128,7 +127,7 @@ public class IndicatorTemplateHandler{
 		setIndicatorTemplateDocument( bytearray );
 		
 		if( isValidXML() ) {
-			IndicatorTemplateXML indicatorTemplateXML =  new IndicatorTemplateXML( loggedInInfo, getIndicatorTemplateDocument() );			
+			IndicatorTemplateXML indicatorTemplateXML =  new IndicatorTemplateXML(getIndicatorTemplateDocument(), providerNo);
 			setIndicatorTemplateXML( indicatorTemplateXML );			
 			setIndicatorTemplateEntity( indicatorTemplateEntityFromXML( getIndicatorTemplateXML() ) );
 		}
