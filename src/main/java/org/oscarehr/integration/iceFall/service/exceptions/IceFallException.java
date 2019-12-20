@@ -96,4 +96,9 @@ public class IceFallException extends RuntimeException
 	{
 		return IceFallException.getUserErrorMessage(userErrorMessage, provider);
 	}
+
+	public USER_ERROR_MESSAGE getUserErrorMessageEnum()
+	{
+		return userErrorMessage;
+	}
 }

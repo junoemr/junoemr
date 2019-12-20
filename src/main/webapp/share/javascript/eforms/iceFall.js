@@ -34,12 +34,17 @@ IceFall =
 		return IceFall.doPost(IceFall.ICE_FALL_WS_AUTH, null);
 	},
 
-	sendForm: function (fdid, fid, demoNo)
+	sendForm: function (fdid, fid, demoNo, dosage, expiryDate, type, thcLimit, diagnosis)
 	{
 		let submitObj = IceFall.formToJSON(document.forms[0]);
 		submitObj.fdid = fdid;
 		submitObj.fid = fid;
 		submitObj.demographicNo = demoNo;
+		submitObj.dosage = dosage;
+		submitObj.expiryDate = expiryDate;
+		submitObj.type = type;
+		submitObj.thcLimit = thcLimit;
+		submitObj.diagnosis = diagnosis;
 		return IceFall.doPost(IceFall.ICE_FALL_WS_SEND_FORM, submitObj);
 	},
 

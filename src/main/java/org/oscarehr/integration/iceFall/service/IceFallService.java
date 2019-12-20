@@ -50,6 +50,7 @@ import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorListTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallDoctorTo1;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
+import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallSendFormTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -105,10 +106,17 @@ public class IceFallService
 	 * @param isInstance - set to true if the templateId is an eform instance id (fdid);
 	 * @param eformValues - the eform values map (oscardb=)
 	 * @param request - httpservlet request
+	 * @param prescriptionInformation - the prescription information to be submitted to icefall.
 	 */
-	public void sendIceFallForm(Provider provider, Demographic demo, Integer templateId, boolean isInstance, Map<String, String> eformValues, HttpServletRequest request)
+	public void sendIceFallForm(Provider provider,
+															Demographic demo,
+															Integer templateId,
+															boolean isInstance,
+															Map<String, String> eformValues,
+															HttpServletRequest request,
+															IceFallSendFormTo1 prescriptionInformation)
 	{
-		sendIceFallForm(provider, demo, templateId, isInstance, eformValues, request.getScheme(), request.getContextPath());
+		sendIceFallForm(provider, demo, templateId, isInstance, eformValues, request.getScheme(), request.getContextPath(), prescriptionInformation);
 	}
 
 	/**
@@ -120,8 +128,16 @@ public class IceFallService
 	 * @param eformValues - the eform values map (oscardb=)
 	 * @param httpSchema - the http schema of the server
 	 * @param contextPath - the context path of the server
+	 * @param prescriptionInformation - the prescription information to be submitted to icefall.
 	 */
-	public void sendIceFallForm(Provider provider, Demographic demo, Integer templateId, boolean isInstance, Map<String, String> eformValues, String httpSchema, String contextPath)
+	public void sendIceFallForm(Provider provider,
+															Demographic demo,
+															Integer templateId,
+															boolean isInstance,
+															Map<String, String> eformValues,
+															String httpSchema,
+															String contextPath,
+															IceFallSendFormTo1 prescriptionInformation)
 	{
 		//login to api
 		iceFallRESTService.authenticate();
@@ -140,20 +156,28 @@ public class IceFallService
 			canopyCustomerId = createIceFallCustomerForDemographic(demo);
 		}
 
-		IceFallCreatePrescriptionTo1 iceFallCreatePrescriptionTo1 = new IceFallCreatePrescriptionTo1();
-		iceFallCreatePrescriptionTo1.setCustomerId(canopyCustomerId);
+		sendPrescriptionToIceFall(
+						iceFallDocId,
+						canopyCustomerId,
+						prescriptionInformation,
+						getEformPDFDateForSubmission(provider, demo, templateId, eformValues, httpSchema, contextPath, isInstance));
+	}
 
-		//TMP VALUES CHANGE
-		iceFallCreatePrescriptionTo1.setDosage(2.5f);
-		iceFallCreatePrescriptionTo1.setRegistrationExpiry(LocalDate.of(2020,1,1));
-		iceFallCreatePrescriptionTo1.setType("DRIED_CANNABIS");
-		iceFallCreatePrescriptionTo1.setThcLimit(50);
-		iceFallCreatePrescriptionTo1.setDiagnosis("TEST_1");
+	protected void sendPrescriptionToIceFall(Integer iceFallDocId, Integer canopyCustomerId, IceFallSendFormTo1 prescriptionInformation, String pdfData)
+	{
+		IceFallCreatePrescriptionTo1 iceFallCreatePrescriptionTo1 = new IceFallCreatePrescriptionTo1();
+
+		// configure prescription submission to ice fall.
+		iceFallCreatePrescriptionTo1.setCustomerId(canopyCustomerId);
+		iceFallCreatePrescriptionTo1.setDosage(prescriptionInformation.getDosage());
+		iceFallCreatePrescriptionTo1.setRegistrationExpiry(prescriptionInformation.getExpiryDate());
+		iceFallCreatePrescriptionTo1.setType(prescriptionInformation.getType());
+		iceFallCreatePrescriptionTo1.setThcLimit(prescriptionInformation.getThcLimit());
+		iceFallCreatePrescriptionTo1.setDiagnosis(prescriptionInformation.getDiagnosis());
 		iceFallCreatePrescriptionTo1.setClinicId(1);
-		iceFallCreatePrescriptionTo1.setPages(1);
-		iceFallCreatePrescriptionTo1.setDocumentData(getEformPDFDateForSubmission(provider, demo, templateId, eformValues, httpSchema, contextPath, isInstance));
+		iceFallCreatePrescriptionTo1.setPages(1);// TODO figure out, how to calc pages.
+		iceFallCreatePrescriptionTo1.setDocumentData(pdfData);
 		iceFallCreatePrescriptionTo1.setDoctorId(iceFallDocId);
-		//TMP VALUES CHANGE
 
 		try
 		{
@@ -227,12 +251,13 @@ public class IceFallService
 	 */
 	protected Integer findDoctorId(Provider provider, IceFallDoctorListTo1 doctorListTo1)
 	{
+		IceFallCredentials credentials = iceFallCredentialsDao.getCredentials();
 		for (IceFallDoctorTo1 doc : doctorListTo1.getResults())
 		{
 			if (
 							doc.getFirstName().trim().equals(provider.getFirstName().trim()) &&
 											doc.getLastName().trim().equals(provider.getLastName().trim()) &&
-											doc.getEmail().trim().equals(provider.getEmail())
+											doc.getEmail().trim().equals(credentials.getEmail())
 			)
 			{
 				return doc.getId();

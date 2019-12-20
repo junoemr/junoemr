@@ -118,6 +118,7 @@ public class IceFallWebService extends AbstractServiceImpl
 		Provider provider = getCurrentProvider();
 		Demographic demo = demographicDao.find(iceFallSendFormTo1.getDemographicNo());
 
+		// filter eform values for pdf generation
 		HashMap<String, String> eformValues = new HashMap<>();
 		for(Map.Entry<String, String> entry : iceFallSendFormTo1.getEformValues().entrySet())
 		{
@@ -127,6 +128,7 @@ public class IceFallWebService extends AbstractServiceImpl
 			}
 		}
 
+		// determine if submitting new or existing eform.
 		Integer eformId = iceFallSendFormTo1.getFid();
 		boolean isInstance = false;
 		if (iceFallSendFormTo1.getFdid() != null)
@@ -137,7 +139,7 @@ public class IceFallWebService extends AbstractServiceImpl
 
 		try
 		{
-			iceFallService.sendIceFallForm(provider, demo, eformId, isInstance, eformValues, getHttpServletRequest());
+			iceFallService.sendIceFallForm(provider, demo, eformId, isInstance, eformValues, getHttpServletRequest(), iceFallSendFormTo1);
 		}
 		catch (IceFallException e)
 		{

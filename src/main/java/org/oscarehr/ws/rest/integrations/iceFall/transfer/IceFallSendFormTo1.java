@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,14 @@ public class IceFallSendFormTo1 implements Serializable
 	private Integer fid;
 	private Integer fdid;
 	private Integer demographicNo;
+
+	// prescription information fields. to be submitted to ice fall.
+	private Float dosage;
+	private LocalDate expiryDate;
+	private String type;
+	private Integer thcLimit;
+	private String diagnosis;
+
 	// any other values sent in the request
 	private Map<String, String> eformValues = new HashMap<>();
 
@@ -88,5 +97,55 @@ public class IceFallSendFormTo1 implements Serializable
 	public void setEformValues(Map<String, String> eformValues)
 	{
 		this.eformValues = eformValues;
+	}
+
+	public Float getDosage()
+	{
+		return dosage;
+	}
+
+	public void setDosage(Float dosage)
+	{
+		this.dosage = dosage;
+	}
+
+	public LocalDate getExpiryDate()
+	{
+		return expiryDate;
+	}
+
+	public void setExpiryDate(LocalDate expiryDate)
+	{
+		this.expiryDate = expiryDate;
+	}
+
+	public String getType()
+	{
+		return type;
+	}
+
+	public void setType(String type)
+	{
+		this.type = type;
+	}
+
+	public Integer getThcLimit()
+	{
+		return thcLimit;
+	}
+
+	public void setThcLimit(Integer thcLimit)
+	{
+		this.thcLimit = thcLimit;
+	}
+
+	public String getDiagnosis()
+	{
+		return diagnosis;
+	}
+
+	public void setDiagnosis(String diagnosis)
+	{
+		this.diagnosis = diagnosis;
 	}
 }
