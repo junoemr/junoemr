@@ -53,6 +53,11 @@ import java.util.List;
 @Repository("encounterNote.dao.CaseManagementNoteDao")
 public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 {
+	public static final String SORT_DATE_ASC = "observation_date_asc";
+	public static final String SORT_DATE_DESC = "observation_date_desc";
+	public static final String SORT_PROVIDER= "providerName";
+
+
 	public CaseManagementNoteDao()
 	{
 		super(CaseManagementNote.class);
@@ -412,9 +417,66 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 	 * @param offset
 	 * @return A list of encounter notes.
 	 */
-	public List<NoteTo1> searchEncounterNotes(int demographicNo, Integer limit, Integer offset)
+	public List<NoteTo1> searchEncounterNotes(
+			int demographicNo,
+			List<String> providers,
+			List<String> roles,
+			List<String> issues,
+			String sortType,
+			Integer limit,
+			Integer offset
+	)
 	{
 		List<NoteTo1> noteList = new ArrayList<>();
+
+		String providerFilterCmn = "";
+		String providerFilterCmnFilter = "";
+		if(providers != null && providers.size() > 0)
+		{
+			List<String> parameterList = new ArrayList<>();
+			for(String providerNo: providers)
+			{
+				parameterList.add(":providerNo" + providerNo);
+			}
+
+			providerFilterCmn = " AND cmn.provider_no IN (" + String.join(",", parameterList) + ") ";
+			providerFilterCmnFilter = " AND cmn_filter.provider_no IN (" + String.join(",", parameterList) + ") ";
+		}
+
+		String roleFilter = "";
+		if(roles != null && roles.size() > 0)
+		{
+			List<String> parameterList = new ArrayList<>();
+			for(String roleNo: roles)
+			{
+				parameterList.add(":roleNo" + roleNo);
+			}
+
+			roleFilter = " AND role.role_no IN(" + String.join(",", parameterList) + ") ";
+		}
+
+		String issueFilter = "";
+		if(issues != null && issues.size() > 0)
+		{
+			List<String> parameterList = new ArrayList<>();
+			for(String issueId: issues)
+			{
+				parameterList.add(":issueId" + issueId);
+			}
+
+			issueFilter = " JOIN (" +
+					"  SELECT " +
+					"    note.note_id, " +
+					"    GROUP_CONCAT(i.description SEPARATOR 0x1D) AS issue_description" +
+					"  FROM casemgmt_note note\n" +
+					"  JOIN casemgmt_issue_notes cinotes on note.note_id = cinotes.note_id\n" +
+					"  JOIN casemgmt_issue ci on cinotes.id = ci.id\n" +
+					"  JOIN issue i ON ci.issue_id = i.issue_id\n" +
+					"  WHERE note.demographic_no = :demographicNo\n" +
+					"  AND i.issue_id IN (" + String.join(",", parameterList) + ") " +
+					"  GROUP BY note.note_id\n" +
+					") AS issue_filter ON issue_filter.note_id = cmn.note_id\n";
+		}
 
 		String sql = "SELECT * FROM ((\n" +
 				"SELECT " +
@@ -483,7 +545,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"FROM casemgmt_note AS cmn" +
 				"\n" +
 				"LEFT JOIN " +
-				"casemgmt_note AS cmn_filter ON cmn_filter.uuid = cmn.uuid\n" +
+				"casemgmt_note AS cmn_filter ON cmn_filter.uuid = cmn.uuid " +
+				providerFilterCmnFilter +
 				"  " +
 				"  AND (cmn.update_date < cmn_filter.update_date " +
 				"OR (cmn.update_date = cmn_filter.update_date AND cmn.note_id < cmn_filter.note_id))\n" +
@@ -539,59 +602,81 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"  WHERE note.demographic_no = :demographicNo\n" +
 				"    GROUP BY note.note_id\n" +
 				") AS cpp_note ON cpp_note.note_id = cmn.note_id\n" +
+				issueFilter +
 				"WHERE cmn.demographic_no = :demographicNo \n" +
 				"AND cmn_filter.note_id IS NULL\n" +
 				"AND cmn_link_filter.id IS NULL\n" +
-				") UNION ALL (" +
+				providerFilterCmn +
+				roleFilter;
 
-				"SELECT " +
-				"    ed.fdid AS note_id,\n" +
-				"    CAST(CONCAT(ed.form_date, ' ', ed.form_time) AS DATETIME) AS observation_date,\n" +
-				"    ed.form_provider AS provider_no,\n" +
-				"    '' AS program_name,\n" +
-				//"  cmn.reporter_caisi_role as reporter_caisi_role,\n" +
-				"    '' AS uuid,\n" +
-				"    CAST(CONCAT(ed.form_date, ' ', ed.form_time) AS DATETIME) AS update_date,\n" +
-				"    0 AS document_no,\n" +
-				//"    CAST(0 AS INTEGER) AS eform_data_id,\n" +
-				"    false AS archived,\n" +
-				"    false AS signed,\n" +
-				"    false AS editable,\n" +
-				"    '' AS revision,\n" +
-				"    '' AS provider_name,\n" +
-				"    '' AS status,\n" +
-				"    '' AS location,\n" +
-				"    '' AS role_name,\n" +
-				//"    0 AS remote_facility_id,\n" +
-				"    false AS has_history,\n" +
-				"    CAST('0' AS CHARACTER) AS locked,\n" +
-				"    CONCAT(ed.form_name, ' : ', ed.subject) AS note,\n" +
-				"    false AS is_document,\n" +
-				"    false AS deleted,\n" +
-				"    false AS rx_annotation,\n" +
-				"    true AS eform_data,\n" +
-				"    false AS is_encounter_form,\n" +
-				"    false AS is_invoice,\n" +
-				"    false AS is_tickler_note,\n" +
-				"    '' AS encounter_type,\n" +
-				"    '' AS editors_string,\n" +
-				"    '' AS issue_descriptions,\n" +
-				"    false AS readonly ,\n" +
-				"    false AS is_group_note,\n" +
-				"    false AS is_cpp_note,\n" +
-				"    '' AS encounter_time,\n" +
-				"    '' AS encounter_transportation_time\n" +
-			"FROM eform_data ed " +
-			"LEFT JOIN eform_instance ei ON ed.fid = ei.eform_id " +
-			"WHERE ed.demographic_no = :demographicNo " +
-			"AND ed.patient_independent = false " +
-			"AND ((ei.id IS NULL AND ed.status) OR NOT ei.deleted) " +
-		") UNION ALL (" +
-		buildFormQuery() +
-		")) AS full_query\n" +
-		"ORDER BY observation_date DESC \n";
+		if(
+			(providers == null || providers.size() == 0) &&
+			(roles == null || roles.size() == 0) &&
+			(issues == null || issues.size() == 0)
+		)
+		{
+			sql += ") UNION ALL (" +
+
+					"SELECT " +
+					"    ed.fdid AS note_id,\n" +
+					"    CAST(CONCAT(ed.form_date, ' ', ed.form_time) AS DATETIME) AS observation_date,\n" +
+					"    ed.form_provider AS provider_no,\n" +
+					"    '' AS program_name,\n" +
+					//"  cmn.reporter_caisi_role as reporter_caisi_role,\n" +
+					"    '' AS uuid,\n" +
+					"    CAST(CONCAT(ed.form_date, ' ', ed.form_time) AS DATETIME) AS update_date,\n" +
+					"    0 AS document_no,\n" +
+					//"    CAST(0 AS INTEGER) AS eform_data_id,\n" +
+					"    false AS archived,\n" +
+					"    false AS signed,\n" +
+					"    false AS editable,\n" +
+					"    '' AS revision,\n" +
+					"    '' AS provider_name,\n" +
+					"    '' AS status,\n" +
+					"    '' AS location,\n" +
+					"    '' AS role_name,\n" +
+					//"    0 AS remote_facility_id,\n" +
+					"    false AS has_history,\n" +
+					"    CAST('0' AS CHARACTER) AS locked,\n" +
+					"    CONCAT(ed.form_name, ' : ', ed.subject) AS note,\n" +
+					"    false AS is_document,\n" +
+					"    false AS deleted,\n" +
+					"    false AS rx_annotation,\n" +
+					"    true AS eform_data,\n" +
+					"    false AS is_encounter_form,\n" +
+					"    false AS is_invoice,\n" +
+					"    false AS is_tickler_note,\n" +
+					"    '' AS encounter_type,\n" +
+					"    '' AS editors_string,\n" +
+					"    '' AS issue_descriptions,\n" +
+					"    false AS readonly ,\n" +
+					"    false AS is_group_note,\n" +
+					"    false AS is_cpp_note,\n" +
+					"    '' AS encounter_time,\n" +
+					"    '' AS encounter_transportation_time\n" +
+					"FROM eform_data ed " +
+					"LEFT JOIN eform_instance ei ON ed.fid = ei.eform_id " +
+					"WHERE ed.demographic_no = :demographicNo " +
+					"AND ed.patient_independent = false " +
+					"AND ((ei.id IS NULL AND ed.status) OR NOT ei.deleted) " +
+			") UNION ALL (" +
+				buildFormQuery();
+		}
+		sql += ")) AS full_query\n";
 
 
+		if(SORT_PROVIDER.equals(sortType))
+		{
+			sql += "ORDER BY full_query.editors_string DESC\n";
+		}
+		else if(SORT_DATE_DESC.equals(sortType))
+		{
+			sql += "ORDER BY full_query.observation_date ASC\n";
+		}
+		else
+		{
+			sql += "ORDER BY full_query.observation_date DESC\n";
+		}
 
 
 		Query query = entityManager.createNativeQuery(sql);
@@ -600,6 +685,30 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 
 		query.setParameter("documentTableName", CaseManagementNoteLink.DOCUMENT);
 		query.setParameter("demographicNo", demographicNo);
+
+		if(providers != null && providers.size() > 0)
+		{
+			for(String providerNo: providers)
+			{
+				query.setParameter("providerNo" + providerNo, providerNo);
+			}
+		}
+
+		if(roles != null && roles.size() > 0)
+		{
+			for(String roleNo: roles)
+			{
+				query.setParameter("roleNo" + roleNo, roleNo);
+			}
+		}
+
+		if(issues != null && issues.size() > 0)
+		{
+			for(String issueId: issues)
+			{
+				query.setParameter("issueId" + issueId, issueId);
+			}
+		}
 
 		if(limit != null)
 		{

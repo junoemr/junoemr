@@ -181,7 +181,7 @@ public class EncounterSectionsService extends AbstractServiceImpl
 			// XXX: Hack: put the templates in an EncounterSectionNote
 			EncounterSectionNote note = new EncounterSectionNote();
 			note.setText(template.getEncounterTemplateName());
-			note.setOnClick("ajaxInsertTemplate('" + template.getEncounterTemplateName() + "');");
+			note.setOnClick("junoEncounter.ajaxInsertTemplate('" + template.getEncounterTemplateName() + "');");
 			results.add(note);
 		}
 

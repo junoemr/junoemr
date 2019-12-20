@@ -23,7 +23,10 @@
 
 package org.oscarehr.casemgmt.dto;
 
+import com.quatro.model.security.Secrole;
 import org.oscarehr.common.model.EncounterTemplate;
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 
 import java.util.Date;
 import java.util.List;
@@ -65,6 +68,9 @@ public class EncounterHeader
 	private String billingUrl;
 	private String cmeJs;
 	private List<EncounterTemplate> encounterTemplates;
+	private List<CaseManagementIssueTo1> caseManagementIssues;
+	private List<Provider> providers;
+	private List<Secrole> roles;
 
 
 	public String getUserColour()
@@ -415,6 +421,36 @@ public class EncounterHeader
 	public void setEncounterTemplates(List<EncounterTemplate> encounterTemplates)
 	{
 		this.encounterTemplates = encounterTemplates;
+	}
+
+	public List<CaseManagementIssueTo1> getCaseManagementIssues()
+	{
+		return caseManagementIssues;
+	}
+
+	public void setCaseManagementIssues(List<CaseManagementIssueTo1> caseManagementIssues)
+	{
+		this.caseManagementIssues = caseManagementIssues;
+	}
+
+	public List<Provider> getProviders()
+	{
+		return providers;
+	}
+
+	public void setProviders(List<Provider> providers)
+	{
+		this.providers = providers;
+	}
+
+	public List<Secrole> getRoles()
+	{
+		return roles;
+	}
+
+	public void setRoles(List<Secrole> roles)
+	{
+		this.roles = roles;
 	}
 
 	//=============================================================================

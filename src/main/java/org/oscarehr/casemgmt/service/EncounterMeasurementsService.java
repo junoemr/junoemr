@@ -129,7 +129,7 @@ public class EncounterMeasurementsService extends EncounterSectionService
 					menuItems,
 					group.getGroupName(),
 					null,
-					"popupPage(500,1000, '" + hash + "new','" + url + "');measurementLoaded('" + hash + "');"
+					"popupPage(500,1000, '" + hash + "','" + url + "');junoEncounter.measurementLoaded('" + hash + "');"
 			);
 		}
 

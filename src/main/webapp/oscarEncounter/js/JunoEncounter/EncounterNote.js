@@ -4,9 +4,16 @@ if (!window.Juno) window.Juno = {};
 if (!Juno.OscarEncounter) Juno.OscarEncounter = {};
 if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = {};
 
-if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEncounter.EncounterNote = function EncounterNote(pageData)
+if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEncounter.EncounterNote = function EncounterNote(pageData, pageState)
 {
 	this.pageData = pageData;
+
+	var AUTO_SAVE_DELAY = 5000;
+
+	var numChars = 0;
+	var lastTmpSaveNote = null;
+	var autoSaveTimer = null;
+	var notesRetrieveOk = false;
 
 	this.pasteToEncounterNote = function pasteToEncounterNote(txt)
 	{
@@ -78,7 +85,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 		if(textAreaName != null)
 		{
-			Element.observe(textAreaName, 'keyup', this.monitorCaseNote);
+			Element.observe(textAreaName, 'keyup', this.adjustCaseNote);
 		}
 	};
 
@@ -88,7 +95,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 		if(textAreaName != null)
 		{
-			Element.stopObserving(textAreaName, 'keyup', this.monitorCaseNote);
+			Element.stopObserving(textAreaName, 'keyup', this.adjustCaseNote);
 		}
 	};
 
@@ -152,8 +159,6 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		var MAXCHARS = 78;
 		var payload = $(caseNote).value;
 		var numLines = 0;
-		var spacing = Prototype.Browser.IE == true ? 1.08 : Prototype.Browser.Gecko == true ? 1.11 : 1.2;
-		var fontSize = $(caseNote).getStyle('font-size');
 		var lHeight = $(caseNote).getStyle('line-height');
 		var lineHeight = lHeight.substr(0, lHeight.indexOf('e'));
 		var arrLines = payload.split("\n");
@@ -177,7 +182,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		noteHeight += 'em';
 		$(caseNote).style.height = noteHeight;
 
-		pageState.numChars = $(caseNote).value.length;
+		numChars = $(caseNote).value.length;
 	};
 
 	this.isEncounterNote = function isEncounterNote(note)
@@ -400,7 +405,10 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			annotationLabel: annotationLabel,
 			annotationUrl: annotationUrl,
 			encounterTypeArray: encounterTypeArray,
-			selectedEncounterType: selectedEncounterType
+			selectedEncounterType: selectedEncounterType,
+			assignedIssuesTitle: this.pageData.assignedIssuesTitle,
+			referenceResolvedIssuesTitle: this.pageData.referenceResolvedIssuesTitle,
+			referenceUnresolvedIssuesTitle: this.pageData.referenceUnresolvedIssuesTitle,
 		};
 
 		return jQuery('#encounterNoteTemplate').tmpl(templateParameters);
@@ -502,15 +510,15 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.checkNoteChanged = function checkNoteChanged()
 	{
-		if(pageState.lastTmpSaveNote == null)
+		if(lastTmpSaveNote == null)
 		{
 			if(pageState.currentNoteData && pageState.currentNoteData.note)
 			{
-				pageState.lastTmpSaveNote = pageState.currentNoteData.note;
+				lastTmpSaveNote = pageState.currentNoteData.note;
 			}
 			else
 			{
-				pageState.lastTmpSaveNote = "";
+				lastTmpSaveNote = "";
 			}
 		}
 
@@ -519,10 +527,10 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		var noteData = this.getNoteDataById(noteId);
 
 		// Trim the notes because that happens when the note is saved
-		if(noteData.note.trim() !== pageState.lastTmpSaveNote.trim())
+		if(noteData.note.trim() !== lastTmpSaveNote.trim())
 		{
 			this.saveTmpSave();
-			pageState.lastTmpSaveNote = noteData.note;
+			lastTmpSaveNote = noteData.note;
 		}
 
 		this.setTmpSaveTimer();
@@ -536,15 +544,15 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			me.checkNoteChanged();
 		};
 
-		pageState.autoSaveTimer = setTimeout(timeoutFunction, autoSaveDelay);
+		autoSaveTimer = setTimeout(timeoutFunction, AUTO_SAVE_DELAY);
+	};
+
+	this.clearTmpSaveTimer = function clearTmpSaveTimer()
+	{
+		clearTimeout(autoSaveTimer);
 	};
 
 	/*
-	this.clearTmpSaveTimer = function clearTmpSaveTimer()
-	{
-		clearTimeout(pageState.autoSaveTimer);
-	};
-
 	this.buildBillingUrl = function buildBillingUrl(assignedIssueArray)
 	{
 		var billingUrl = this.pageData.billingUrl;
@@ -612,11 +620,11 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 		// XXX: position, issues flag
 
+		var me = this;
 		junoEncounter.getAssignedIssueArray(issueIdArray).then(function(assignedIssueArray)
 		{
 			noteData.assignedIssues = assignedIssueArray;
 
-			var me = this;
 			jQuery.ajax({
 				async: async,
 				type: "POST",
@@ -634,7 +642,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 					{
 						// Set the saved note as the current note
 						me.updateNoteInPageState(noteData, assignedIssueArray);
-						pageState.lastTmpSaveNote = null;
+						lastTmpSaveNote = null;
 						me.checkNoteChanged();
 
 						if(redirectToBilling)
@@ -658,13 +666,14 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		});
 	};
 
+	/*
 	this.monitorCaseNote = function monitorCaseNote(e)
 	{
 		var caseNote = 'caseNote_note' + pageState.currentNoteData.noteId;
 
 		var MAXCHARS = 78;
 		var MINCHARS = -10;
-		var newChars = $(caseNote).value.length - pageState.numChars;
+		var newChars = $(caseNote).value.length - numChars;
 		var newline = false;
 
 		if (e.keyCode === 13)
@@ -684,6 +693,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		}
 
 	};
+	 */
 
 	this.setCaretPosition = function setCaretPosition(input, pos)
 	{
@@ -729,18 +739,64 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		if (notesRetrieveOk && mainDiv.scrollTop <= 100)
 		{
 			notesRetrieveOk = false;
-			notesCurrentTop = mainDiv.children[0].id;
+
+			var me = this;
 			this.notesLoader(
 				this.pageData.contextPath,
-				notesOffset,
-				notesIncrement,
+				pageState.notesOffset,
+				this.pageData.notesIncrement,
 				demographicNo,
 				false
 			).then(function ()
 			{
-				notesOffset += notesIncrement;
+				pageState.notesOffset += me.pageData.notesIncrement;
 			});
 		}
+	};
+
+	this.buildNoteLoaderUrl = function buildNoteLoaderUrl(demographicNo, numToReturn, offset)
+	{
+
+		var url = "../ws/rs/notes/" + demographicNo + "/all?numToReturn=" + numToReturn +
+		"&offset=" + offset;
+
+		if(jQuery.isArray(pageState.filteredProviders))
+		{
+			//for(var i = 0; i < filteredProviders.length; i++)
+			jQuery.each(pageState.filteredProviders, function(index, value)
+			{
+				url += "&providerNoFilter=" + encodeURIComponent(value);
+			});
+		}
+
+		if(jQuery.isArray(pageState.filteredRoles))
+		{
+			jQuery.each(pageState.filteredRoles, function(index, value)
+			{
+				url += "&roleNoFilter=" + encodeURIComponent(value);
+			});
+		}
+
+		if(jQuery.isArray(pageState.filteredIssues))
+		{
+			//for(var i = 0; i < filteredIssues.length; i++)
+			jQuery.each(pageState.filteredIssues, function(index, value)
+			{
+				url += "&issueFilter=" + encodeURIComponent(value);
+			});
+		}
+
+		if(pageState.filterSort)
+		{
+			url += "&sortType=" + encodeURIComponent(pageState.filterSort);
+		}
+
+		return url;
+	};
+
+	this.clearNotes = function clearNotes()
+	{
+		jQuery('div#encMainDiv').empty();
 	};
 
 	this.notesLoader = function notesLoader(ctx, offset, numToReturn, demographicNo, scrollToBottom)
@@ -759,7 +815,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			type: "GET",
 			contentType: "application/json",
 			dataType: "json",
-			url: "../ws/rs/notes/" + demographicNo + "/all?numToReturn=" + numToReturn + "&offset=" + offset,
+			url: this.buildNoteLoaderUrl(demographicNo, numToReturn, offset),
 		});
 
 		var tmpSaveDeferred = jQuery.ajax({
@@ -822,7 +878,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 				if (!notesRetrieveOk)
 				{
-					clearInterval(notesScrollCheckInterval);
+					clearInterval(pageState.notesScrollCheckInterval);
 				}
 
 				deferred.resolve();
@@ -915,5 +971,18 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			var minimizeImageTag = "<img id='quitImg" + nodeId + "' onclick='encounterNote.minView(event, \"" + nodeId + "\")' style='float:right; margin-right:5px; margin-top: 2px;' src='" + this.pageData.contextPath + "/oscarEncounter/graphics/triangle_up.gif'>";
 			new Insertion.Top(noteDivId, minimizeImageTag);
 		}
+	};
+
+	this.copyCppToCurrentNote = function copyCppToCurrentNote()
+	{
+		var noteId = jQuery("input#editNoteId").val();
+		var noteData = this.getNoteDataById(noteId);
+
+		var currentNoteText = noteData.note;
+
+		currentNoteText += "\n";
+		currentNoteText += jQuery("#noteEditTxt").val();
+
+		jQuery("#caseNote_note" + noteId).val(currentNoteText);
 	};
 };

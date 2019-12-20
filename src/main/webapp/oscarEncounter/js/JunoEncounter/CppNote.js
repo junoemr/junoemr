@@ -199,7 +199,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		return false;
 	};
 
-	this.showEditBox = function showEditBox(e, summaryCode, title, numNotes, assignedCMIssues, demoNo, note)
+	this.showEditBox = function showEditBox(e, summaryCode, title, numNotes_remove, assignedCMIssues, demoNo, note)
 	{
 		var noteId, uuid, editors, date, revision, noteText, position, extraFields;
 		if (note != null)
@@ -338,40 +338,27 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 
 		// Build position dropdown
 
-		var curElem;
+		// Remove any existing options
 		var numOptions = $("position").length;
-		var max = numNotes > numOptions ? numNotes : numOptions;
-		var optId;
-		var option;
-		var opttxt;
-
-		for (curElem = 2; curElem <= max; ++curElem)
+		for(var i = 1; i <= numOptions; i++)
 		{
-			optId = "popt" + curElem;
-			if ($(optId) == null)
-			{
-				option = document.createElement("OPTION");
-				option.id = optId;
-				opttxt = curElem;
-				option.text = "" + opttxt;
-				option.value = curElem;
-				$("position").options.add(option, curElem);
-			}
-
-			if (position === curElem)
-			{
-				$(optId).selected = true;
-			}
+			Element.remove("popt" + i)
 		}
 
-		// XXX: What does this do?
-		// XXX: also make sure adding the last note works
-		for (curElem = max; curElem > 0; --curElem)
+		// Add options for this list
+		var numNotes = jQuery("#" + summaryCode + "list li").length;
+		for(var j = 1; j <= numNotes + 1; j++)
 		{
-			optId = "popt" + curElem;
-			if (curElem > numNotes)
+			var optId = "popt" + j;
+			if ($(optId) == null)
 			{
-				Element.remove(optId);
+				var opttxt = j;
+
+				var option = document.createElement("OPTION");
+				option.id = optId;
+				option.text = "" + opttxt;
+				option.value = j;
+				$("position").options.add(option, j);
 			}
 		}
 
@@ -447,6 +434,21 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 	this.getSaveCPPNoteUrl = function getSaveCPPNoteUrl(demographicNo)
 	{
 		return "../ws/rs/notes/" + demographicNo + "/saveIssueNote";
+	};
+
+	this.showIssueHistory = function showIssueHistory(demoNo, issueIds)
+	{
+		var rnd = Math.round(Math.random() * 1000);
+		win = "win" + rnd;
+
+		var url = this.pageData.contextPath + "/CaseManagementEntry.do" +
+			"?method=issuehistory" +
+			"&demographicNo=" + encodeURIComponent(this.pageData.demographicNo) +
+			"&issueIds=" + issueIds;
+
+		window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
+
+		return false;
 	};
 };
 

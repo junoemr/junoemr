@@ -23,6 +23,8 @@
 
 package org.oscarehr.casemgmt.web;
 
+import com.quatro.model.security.Secrole;
+import com.quatro.service.security.RolesManager;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -30,6 +32,8 @@ import org.apache.struts.action.ActionMapping;
 import org.drools.FactException;
 import org.oscarehr.billing.CA.service.BillingUrlService;
 import org.oscarehr.casemgmt.dto.EncounterSection;
+import org.oscarehr.casemgmt.model.CaseManagementIssue;
+import org.oscarehr.casemgmt.service.CaseManagementIssueService;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.casemgmt.service.EncounterAllergyService;
 import org.oscarehr.casemgmt.service.EncounterConsultationService;
@@ -59,10 +63,13 @@ import org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService;
 import org.oscarehr.casemgmt.web.formbeans.JunoEncounterFormBean;
 import org.oscarehr.common.dao.EncounterTemplateDao;
 import org.oscarehr.common.model.EncounterTemplate;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.conversion.CaseManagementIssueConverter;
+import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.struts.DispatchActionSupport;
 import oscar.OscarProperties;
@@ -77,6 +84,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -192,6 +200,12 @@ public class JunoEncounterAction extends DispatchActionSupport
 	@Autowired
 	private EncounterTemplateDao encounterTemplateDao;
 
+	@Autowired
+	private CaseManagementIssueService caseManagementIssueService;
+
+	@Autowired
+	private RolesManager rolesManager;
+
 	public ActionForward execute(
 		ActionMapping mapping,
 		ActionForm form,
@@ -284,6 +298,30 @@ public class JunoEncounterAction extends DispatchActionSupport
 
 		List<EncounterTemplate> encounterTemplates = encounterTemplateDao.findAll();
 
+		List<CaseManagementIssue> issues = caseManagementIssueService.getIssues(
+				loggedInInfo,
+				encounterSessionBean.demographicNo,
+				loggedInInfo.getLoggedInProviderNo(),
+				programId,
+				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_ALL
+		);
+
+		CaseManagementIssueConverter converter = new CaseManagementIssueConverter();
+
+		List<CaseManagementIssueTo1> issueTo1s = new ArrayList<>();
+		for(CaseManagementIssue issue: issues)
+		{
+			issueTo1s.add(converter.getAsTransferObject(loggedInInfo, issue));
+		}
+
+		Collections.sort(issueTo1s, CaseManagementIssueTo1.COMPARATOR_ALPHABETICAL);
+
+		List<Provider> providers = caseManagementManager.getAllEditors(encounterSessionBean.getDemographicNo());
+		Collections.sort(providers,(new Provider()).ComparatorName());
+
+		List<Secrole> roles = rolesManager.getRoles();
+
+
 		// Get data for the header
 		junoEncounterForm.setHeader(
 			encounterService.getEncounterHeader(
@@ -310,7 +348,10 @@ public class JunoEncounterAction extends DispatchActionSupport
 				hideBeforeDate,
 				billingUrl,
 				cmeJs,
-				encounterTemplates
+				encounterTemplates,
+				issueTo1s,
+				providers,
+				roles
 			)
 		);
 

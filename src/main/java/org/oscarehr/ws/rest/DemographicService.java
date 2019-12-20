@@ -466,6 +466,38 @@ public class DemographicService extends AbstractServiceImpl {
 		return RestResponse.successResponse(issue);
 	}
 
+	@POST
+	@Path("/{demographicNo}/caseManagementIssue/{issueId}/updateIssue")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces("application/json")
+	public RestResponse<CaseManagementIssueTo1> setCaseManagementIssue(
+			@PathParam("demographicNo") int demographicNo,
+			@PathParam("issueId") int issueId,
+			IssueData issueData
+	)
+	{
+		CaseManagementIssueTo1 issue = caseManagementIssueService.updateIssue(
+				demographicNo,
+				issueId,
+				issueData.getNewIssueId()
+		);
+
+		return RestResponse.successResponse(issue);
+	}
+
+	@GET
+	@Path("/{demographicNo}/issues")
+	@Produces("application/json")
+	public RestResponse<List<CaseManagementIssueTo1>> getAllIssues(
+			@Context HttpServletRequest request,
+			@PathParam("demographicNo") int demographicNo
+	)
+	{
+		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
+				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_ALL);
+		return RestResponse.successResponse(issues);
+	}
+
 	@GET
 	@Path("/{demographicNo}/resolvedIssues")
 	@Produces("application/json")
@@ -474,7 +506,8 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("demographicNo") int demographicNo
 	)
 	{
-		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo, true);
+		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
+				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_RESOLVED);
 		return RestResponse.successResponse(issues);
 	}
 
@@ -486,11 +519,13 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("demographicNo") int demographicNo
 	)
 	{
-		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo, false);
+		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
+				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_UNRESOLVED);
+
 		return RestResponse.successResponse(issues);
 	}
 
-	private List<CaseManagementIssueTo1> getIssues(HttpServletRequest request, int demographicNo, boolean getResolved)
+	private List<CaseManagementIssueTo1> getIssues(HttpServletRequest request, int demographicNo, String filter)
 	{
 		HttpSession session = request.getSession();
 
@@ -501,16 +536,8 @@ public class DemographicService extends AbstractServiceImpl {
 		String programId = prgrmMgr.getProgram(providerNo);
 
 		List<CaseManagementIssue> issues;
-		if(getResolved)
-		{
-			issues = caseManagementIssueService.getResolvedIssues(
-					loggedInInfo, Integer.toString(demographicNo), providerNo, programId);
-		}
-		else
-		{
-			issues = caseManagementIssueService.getUnresolvedIssues(
-					loggedInInfo, Integer.toString(demographicNo), providerNo, programId);
-		}
+		issues = caseManagementIssueService.getIssues(
+				loggedInInfo, Integer.toString(demographicNo), providerNo, programId, filter);
 
 		List<CaseManagementIssueTo1> issuesOutput = new ArrayList<>();
 		CaseManagementIssueConverter convertor = new CaseManagementIssueConverter();
@@ -546,6 +573,21 @@ public class DemographicService extends AbstractServiceImpl {
 		public void setPropertyValue(boolean propertyValue)
 		{
 			this.propertyValue = propertyValue;
+		}
+	}
+
+	private static class IssueData
+	{
+		private int newIssueId;
+
+		public int getNewIssueId()
+		{
+			return newIssueId;
+		}
+
+		public void setNewIssueId(int newIssueId)
+		{
+			this.newIssueId = newIssueId;
 		}
 	}
 }

@@ -55,7 +55,7 @@ public abstract class EncounterCPPSectionService extends EncounterSectionService
 	public String getOnClickTitle(SectionParameters sectionParams, long issueId)
 	{
 
-		return "return showIssueHistory('" + sectionParams.getDemographicNo() + "','" + issueId + "');";
+		return "return cppNote.showIssueHistory('" + sectionParams.getDemographicNo() + "','" + issueId + "');";
 	}
 
 	public String getOnClickPlus(List<EncounterSectionNote> notes, SectionParameters sectionParams, String cppIssues)

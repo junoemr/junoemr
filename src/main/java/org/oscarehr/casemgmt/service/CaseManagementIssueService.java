@@ -25,6 +25,8 @@ package org.oscarehr.casemgmt.service;
 
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
+import org.oscarehr.encounterNote.dao.IssueDao;
+import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.util.CppUtils;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.conversion.CaseManagementIssueConverter;
@@ -48,6 +50,9 @@ public class CaseManagementIssueService
 
 	@Autowired
 	private CaseManagementIssueDao caseManagementIssueDao;
+
+	@Autowired
+	private IssueDao issueDao;
 
 	private CaseManagementManager caseManagementMgr;
 
@@ -104,11 +109,31 @@ public class CaseManagementIssueService
 		return converter.getAsTransferObject(issue);
 	}
 
-	public List<CaseManagementIssue> getResolvedIssues(
+	public CaseManagementIssueTo1 updateIssue(
+			int demographicNo,
+			int issueId,
+			int newIssueId
+	)
+	{
+		org.oscarehr.encounterNote.model.CaseManagementIssue caseManagementIssue =
+				caseManagementIssueDao.findByIssueId(demographicNo, new Long(issueId));
+
+		Issue newIssue = issueDao.find(new Long(newIssueId));
+
+		caseManagementIssue.setIssue(newIssue);
+
+		caseManagementIssueDao.persist(caseManagementIssue);
+
+		CaseManagementIssueConverter converter = new CaseManagementIssueConverter();
+		return converter.getAsTransferObject(caseManagementIssue);
+	}
+
+	public List<CaseManagementIssue> getIssues(
 			LoggedInInfo loggedInInfo,
 			String demographicNo,
 			String providerNo,
-			String programId
+			String programId,
+			String type
 	)
 	{
 		// grab all of the diseases associated with patient and add a list item for each
@@ -117,7 +142,7 @@ public class CaseManagementIssueService
 		issues = caseManagementMgr.getIssues(Integer.parseInt(demographicNo));
 		issues = caseManagementMgr.filterIssues(loggedInInfo, providerNo, issues, programId);
 
-		List<CaseManagementIssue> resolvedIssues = new ArrayList<CaseManagementIssue>();
+		List<CaseManagementIssue> filteredIssues = new ArrayList<CaseManagementIssue>();
 
 		//only list resolved issues
 		for(CaseManagementIssue issue : issues)
@@ -127,13 +152,51 @@ public class CaseManagementIssueService
 				continue;
 			}
 
-			if(issue.isResolved())
+			if(org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_RESOLVED.equals(type))
 			{
-				resolvedIssues.add(issue);
+				if(!issue.isResolved())
+				{
+					continue;
+				}
 			}
+			else if(org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_UNRESOLVED.equals(type))
+			{
+				if(issue.isResolved())
+				{
+					continue;
+				}
+			}
+
+			boolean dup = false;
+			for (CaseManagementIssue tmp : filteredIssues)
+			{
+				if (issue.getIssue_id() == tmp.getIssue_id())
+				{
+					dup = true;
+					break;
+				}
+			}
+
+			if (dup)
+			{
+				continue;
+			}
+
+			filteredIssues.add(issue);
 		}
 
-		return resolvedIssues;
+		return filteredIssues;
+	}
+
+	public List<CaseManagementIssue> getResolvedIssues(
+			LoggedInInfo loggedInInfo,
+			String demographicNo,
+			String providerNo,
+			String programId
+	)
+	{
+		return getIssues(loggedInInfo, demographicNo, providerNo, programId,
+				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_RESOLVED);
 	}
 
 	public List<CaseManagementIssue> getUnresolvedIssues(
@@ -143,42 +206,8 @@ public class CaseManagementIssueService
 			String programId
 	)
 	{
-		// grab all of the diseases associated with patient and add a list item for each
-		List<CaseManagementIssue> issues = null;
-
-		issues = caseManagementMgr.getIssues(Integer.parseInt(demographicNo));
-		issues = caseManagementMgr.filterIssues(loggedInInfo, providerNo, issues, programId);
-
-		List<CaseManagementIssue> unresolvedIssues = new ArrayList<CaseManagementIssue>();
-
-		//only list unresolved issues
-		for(CaseManagementIssue issue : issues)
-		{
-			if(containsIssue(CppUtils.cppCodes,issue.getIssue().getCode()))
-			{
-				continue;
-			}
-
-			if(!issue.isResolved())
-			{
-				boolean dup = false;
-				for(CaseManagementIssue tmp: unresolvedIssues)
-				{
-					if(issue.getIssue_id() == tmp.getIssue_id())
-					{
-						dup = true;
-						break;
-					}
-				}
-
-				if(!dup)
-				{
-					unresolvedIssues.add(issue);
-				}
-			}
-		}
-
-		return unresolvedIssues;
+		return getIssues(loggedInInfo, demographicNo, providerNo, programId,
+				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_UNRESOLVED);
 	}
 
 	public static boolean containsIssue(String[]  issues, String issueCode)

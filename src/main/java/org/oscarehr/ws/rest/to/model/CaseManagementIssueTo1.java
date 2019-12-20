@@ -23,9 +23,14 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
+
+import java.util.Comparator;
 import java.util.Date;
 
-public class CaseManagementIssueTo1 {
+public class CaseManagementIssueTo1
+{
+	public static final Comparator<CaseManagementIssueTo1> COMPARATOR_ALPHABETICAL =
+			Comparator.comparing(l->l.getIssue().getDescription());
 
 	protected Long id;
 	protected String demographic_no;

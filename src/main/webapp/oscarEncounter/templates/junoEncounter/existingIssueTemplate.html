@@ -19,8 +19,8 @@
             <a href="#" onclick="caseManagementIssue.toggleIssueWidget('\${cmIssue.issue.id}'); return false;">
                 \${cmIssue.issue.description}
             </a>
-            <a href="#" onclick="">Delete</a>
-            <a href="#" onclick="">Change</a>
+            <!-- <a href="#" onclick="">Delete</a> -->
+            <a href="#" onclick="caseManagementIssue.enableChangeMode('\${cmIssue.issue.id}', \${resolved}); return false;">Change</a>
             <div class="setIssueListWidget" id="setIssueListWidget\${cmIssue.issue.id}"><div>
                 {{each(j, property) propertyArray}}
                     <div class="setIssueListControl \${cmIssue.class}">

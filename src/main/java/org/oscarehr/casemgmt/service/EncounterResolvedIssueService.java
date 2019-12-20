@@ -69,8 +69,7 @@ public class EncounterResolvedIssueService extends EncounterSectionService
 	@Override
 	protected String getOnClickTitle(SectionParameters sectionParams)
 	{
-		// XXX: I feel like this won't work
-		return "$('check_issue').value='';document.caseManagementViewForm.submit();";
+		return "";
 	}
 
 	public EncounterNotes getNotes(
@@ -100,7 +99,7 @@ public class EncounterResolvedIssueService extends EncounterSectionService
 
 			sectionNote.setText(strTitle);
 
-			String onClickString = "setIssueCheckbox('" + issue.getId() + "');return filter(false);";
+			String onClickString = "noteFilter.selectIssueFilterValue('" + issue.getIssue().getId() + "');return noteFilter.filter(false);";
 			sectionNote.setOnClick(onClickString);
 
 			out.add(sectionNote);

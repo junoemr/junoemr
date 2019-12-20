@@ -89,10 +89,7 @@
 		<link rel="stylesheet" type="text/css"
 			  href="<c:out value="${ctx}"/>/js/messenger/messenger-theme-future.css"></link>
 
-			<%--		XXX: Removed this because I want to avoid stuff like this if I can--%>
-			<%--		<script type="text/javascript" src="newEncounterLayout.js.jsp"> </script>--%>
-
-			<%-- for popup menu of forms --%>
+		<%-- for popup menu of forms --%>
 		<script src="<c:out value="${ctx}"/>/share/javascript/popupmenu.js"
 				type="text/javascript"></script>
 		<script src="<c:out value="${ctx}"/>/share/javascript/menutility.js"
@@ -141,6 +138,7 @@
 			<%-- ============================================================================== --%>
 			<%-- Transfer data from Java to Javascript                                          --%>
 			<%-- ============================================================================== --%>
+
 			function getAppointmentNo()
 			{
 				<c:if test="${not empty junoEncounterForm.header.appointmentNo}">
@@ -156,14 +154,12 @@
 			function getEncounterTypeArray()
 			{
 				return [
-					'<bean:message key="oscarEncounter.faceToFaceEnc.title"/>',
-					'<bean:message key="oscarEncounter.telephoneEnc.title"/>',
-					'<bean:message key="oscarEncounter.emailEnc.title"/>',
-					'<bean:message key="oscarEncounter.noClientEnc.title"/>'
+					"<bean:message key="oscarEncounter.faceToFaceEnc.title"/>",
+					"<bean:message key="oscarEncounter.telephoneEnc.title"/>",
+					"<bean:message key="oscarEncounter.emailEnc.title"/>",
+					"<bean:message key="oscarEncounter.noClientEnc.title"/>"
 				]
 			}
-
-			var ctx = '<c:out value="${ctx}"/>';
 
 			var pageData = {
 				contextPath: "<c:out value='${pageContext.request.contextPath}' />",
@@ -181,32 +177,25 @@
 				editUnsignedMsg: "<bean:message key="oscarEncounter.editUnsignedNote.msg"/>",
 				printDateMsg: "<bean:message key="oscarEncounter.printDate.msg"/>",
 				printDateOrderMsg: "<bean:message key="oscarEncounter.printDateOrder.msg"/>",
+				notesIncrement: <%= OscarProperties.getNumLoadedNotes(20) %>,
+				assignedIssuesTitle: "<bean:message key="oscarEncounter.assignedIssues.title"/>",
+				referenceResolvedIssuesTitle: "<bean:message key="oscarEncounter.referenceResolvedIssues.title"/>",
+				referenceUnresolvedIssuesTitle: "<bean:message key="oscarEncounter.referenceUnresolvedIssues.title"/>",
 			};
+
 
 			<%-- ============================================================================== --%>
 			<%-- Page State                                                                     --%>
-			// XXX: move this into objects?
 			<%-- ============================================================================== --%>
+
+			// These values are for state shared between the different javascript modules
 			var pageState = {
 				currentNoteData: null,
-				currentNoteIssueData: null,
-				numChars: 0,
-				//flag for determining if we want to submit case management entry form with enter key pressed in auto completer text box
-				submitIssues: false,
-				lastTmpSaveNote: null,
-				autoSaveTimer: null,
+				notesOffset: 0,
+				notesScrollCheckInterval: null,
+				currentAssignedCMIssues: [],
+				openWindows: new Object(),
 			};
-
-
-			// XXX: put these somewhere better?
-			var autoSaveDelay = 5000;
-			var notesOffset = 0;
-			var notesIncrement = <%= OscarProperties.getNumLoadedNotes(20) %>;
-			var notesRetrieveOk = false;
-			var notesCurrentTop = null;
-			var notesScrollCheckInterval = null;
-			var measurementWindows = new Array();
-			var openWindows = new Object();
 
 
 			var eChartUUID = "${junoEncounterForm.header.echartUuid}";
@@ -218,13 +207,16 @@
 			var cppNote = new Juno.OscarEncounter.JunoEncounter.CppNote(pageData, junoEncounter);
 
 			<%@ include file="js/JunoEncounter/EncounterNote.js" %>
-			var encounterNote = new Juno.OscarEncounter.JunoEncounter.EncounterNote(pageData);
+			var encounterNote = new Juno.OscarEncounter.JunoEncounter.EncounterNote(pageData, pageState);
 
 			<%@ include file="js/JunoEncounter/CaseManagementIssue.js" %>
-			var caseManagementIssue = new Juno.OscarEncounter.JunoEncounter.CaseManagementIssue(pageData);
+			var caseManagementIssue = new Juno.OscarEncounter.JunoEncounter.CaseManagementIssue(pageData, pageState);
 
 			<%@ include file="js/JunoEncounter/PrintNotes.js" %>
 			var printNotes = new Juno.OscarEncounter.JunoEncounter.PrintNotes(pageData);
+
+			<%@ include file="js/JunoEncounter/NoteFilter.js" %>
+			var noteFilter = new Juno.OscarEncounter.JunoEncounter.NoteFilter(pageData, pageState, encounterNote);
 
 
 			<%-- ============================================================================== --%>
@@ -239,14 +231,6 @@
 				return eChartUUID;
 			}
 
-			// This method is called by links in EncounterMeasurementService.
-			// XXX: figure out what this does
-			function measurementLoaded(name)
-			{
-				measurementWindows.push(openWindows[name]);
-			}
-
-
 
 			<%-- ============================================================================== --%>
 			<%-- Local functions                                                                --%>
@@ -258,30 +242,6 @@
 			{
 				return junoEncounter.popupPage(vheight, vwidth, name, varpage);
 			}
-
-
-
-
-
-
-
-
-			// XXX: make this work
-			function copyCppToCurrentNote()
-			{
-				// Enable this when encounter notes work
-				/*
-				var currentNoteId = jQuery("input[name='noteId']").val();
-				var currentNoteText = jQuery("#caseNote_note" + currentNoteId).val();
-				currentNoteText += "\n";
-				currentNoteText += jQuery("#noteEditTxt").val();
-				jQuery("#caseNote_note" + currentNoteId).val(currentNoteText);
-				*/
-			}
-
-
-
-
 
 			function onClosing()
 			{
@@ -299,111 +259,10 @@
 					encounterNote.saveEncounterNote(false, false, true, false, false);
 				}
 
-				/*
-				// XXX: make this work, whatever it is
-				for (var idx = 0; idx < measurementWindows.length; ++idx)
-				{
-					if (!measurementWindows[idx].closed)
-					{
-						measurementWindows[idx].parentChanged = true;
-					}
-				}
-				*/
+				// Tell child measurement windows that we're leaving
+				junoEncounter.cleanUpWindows();
 
 				return null;
-			}
-
-			function showOceanToolbar()
-			{
-				return (this.pageData.cmeJs == 'ocean_toolbar');
-			}
-
-			function writeToEncounterNote(request)
-			{
-
-				var text = request.responseText;
-				text = text.replace(/\\u000A/g, "\u000A");
-				text = text.replace(/\\u000D/g, "");
-				text = text.replace(/\\u003E/g, "\u003E");
-				text = text.replace(/\\u003C/g, "\u003C");
-				text = text.replace(/\\u005C/g, "\u005C");
-				text = text.replace(/\\u0022/g, "\u0022");
-				text = text.replace(/\\u0027/g, "\u0027");
-
-
-				encounterNote.pasteToEncounterNote(text);
-			}
-
-			function ajaxInsertTemplate(varpage)
-			{
-				//fetch template
-
-				if (varpage != 'null')
-				{
-					var page = ctx + "/oscarEncounter/InsertTemplate.do";
-					var params = "templateName=" + varpage + "&version=2";
-					new Ajax.Request(page, {
-						method: 'post',
-						postBody: params,
-						evalScripts: true,
-						onSuccess: writeToEncounterNote,
-						onFailure: function()
-						{
-							alert(insertTemplateError);
-							}
-						}
-					);
-				}
-
-			}
-
-			function channelSearch()
-			{
-				var url = $('channel').options[$('channel').selectedIndex].value +
-					encodeURIComponent($F('keyword'));
-
-				popupPage(600,800,'<bean:message key="oscarEncounter.Index.popupSearchPageWindow"/>', url);
-
-				return false;
-			}
-
-			/**
-			 * Allows calculators to be opened by clicking on them in a select menu.  This is needed for cross-platform
-			 * functionality to achieve an effect similar to onClick for a select option element.
-			 * (onClick on the option element doesn't work in Chrome (or IE), and onClick on the select doesn't work in FireFox)
-			 *
-			 * @param calculatorMenu jQuery element referencing a select with urls as option values
-			 */
-			function bindCalculatorListener(calculatorMenu)
-			{
-				calculatorMenu.change(
-					function() {
-						var x_size = calculatorMenu.attr('x_size'),
-							y_size = calculatorMenu.attr('y_size');
-
-						popperup(x_size, y_size, calculatorMenu.val(), calculatorMenu.text());
-						// Since we are listening for the change event, we need to account for the same calculator
-						// selected twice in a row.  A side effect is that the UI will be updated when we reset the
-						// value of the select menu to the default.  Here we're using the value "none" over a -1 index
-						// because this is the key to a disabled "title" element, whereas -1 will display an empty
-						// select menu.
-						calculatorMenu.val("none");
-					});
-			}
-
-			function popperup(vheight, vwidth, varpage, pageName)
-			{
-				//open a new popup window
-				var windowprops = "height=" + vheight + ",width=" + vwidth + ",status=yes,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=100,left=100";
-				var popup = window.open(varpage, pageName, windowprops);
-				popup.pastewin = opener;
-				popup.focus();
-			}
-
-			function showMenu(menuNumber, eventObj)
-			{
-				var menuId = 'menu' + menuNumber;
-				return showPopup(menuId, eventObj);
 			}
 
 
@@ -456,11 +315,36 @@
 				new Effect.Fade($("issueList"), {duration: 0.15});
 			}
 
+
+
+			<%-- ============================================================================== --%>
+			<%-- init                                                                           --%>
+			<%-- ============================================================================== --%>
+
 			function init()
 			{
-				if(showOceanToolbar())
+				var oceanHeight = 0;
+				if(junoEncounter.showOceanToolbar())
 				{
 					jQuery.ajax({ url: "../eform/displayImage.do?imagefile=oceanToolbar.js", cache: true, dataType: "script" });
+					oceanHeight = 28;
+				}
+
+				if (parseInt(navigator.appVersion) > 3)
+				{
+					var windowHeight = 750;
+					if (navigator.appName == "Netscape")
+					{
+						windowHeight = window.innerHeight;
+					}
+					if (navigator.appName.indexOf("Microsoft") != -1)
+					{
+						windowHeight = document.body.offsetHeight;
+					}
+
+					// XXX: this seems like it generally won't work (ocean, etc.)
+					var divHeight = windowHeight - (320 + oceanHeight);
+					$("encMainDiv").style.height = divHeight + 'px';
 				}
 
 				// This was messing up the serialization of arrays to JSON so I removed it.
@@ -528,7 +412,7 @@
 				</nested:notEmpty>
 
 				var calculatorMenu = jQuery('#calculators_menu');
-				bindCalculatorListener(calculatorMenu);
+				junoEncounter.bindCalculatorListener(calculatorMenu);
 
 				// Click handlers for the resolved/unresolved issue buttons.  They pass in the
 				// jQuery object from this context because it wouldn't work with the local context
@@ -555,7 +439,7 @@
 					}
 				);
 
-				var issueURL = ctx + "/CaseManagementEntry.do" +
+				var issueURL = pageData.contextPath + "/CaseManagementEntry.do" +
 					"?method=issueList" +
 					"&demographicNo=" + this.pageData.demographicNo +
 					"&providerNo=" + this.pageData.providerNo;
@@ -574,10 +458,10 @@
 				var demographicNo = this.pageData.demographicNo;
 
 				// Load a few extra notes initially, hopefully fill up the page
-				encounterNote.notesLoader(ctx, 0, notesIncrement * 2, demographicNo, true).then(function ()
+				encounterNote.notesLoader(pageData.contextPath, 0, pageData.notesIncrement * 2, demographicNo, true).then(function ()
 				{
-					notesOffset += (notesIncrement * 2);
-					notesScrollCheckInterval = setInterval(function ()
+					pageState.notesOffset += (pageData.notesIncrement * 2);
+					pageState.notesScrollCheckInterval = setInterval(function ()
 					{
 						encounterNote.notesIncrementAndLoadMore(demographicNo)
 					}, 50);
@@ -615,12 +499,6 @@
 
 
 		<link rel="stylesheet" type="text/css" href="<c:out value="${ctx}/css/oscarRx.css" />">
-
-			<%--
-
-					XXX: Not sure what this is
-					<oscar:customInterface section="cme" />
-			--%>
 
 		<style type="text/css">
 
@@ -667,68 +545,12 @@
 
 
 		<script id="sectionNoteTemplate" type="text/x-jquery-tmpl">
-
-			<li class="encounterNote \${rowClass}">
-				{{if showExpand }}
-				<a href="#" class="expandCasemgmtSidebar" onclick="junoEncounter.getSectionRemote('\${sectionName}', true, false); return false;" title="\${remainingNotes} more items">
-					<img id="imgpreventions5" src="graphics/expand.gif" />&nbsp;&nbsp;
-				</a>
-				{{else showCollapse }}
-				<a href="#" class="expandCasemgmtSidebar" onclick="junoEncounter.getSectionRemote('\${sectionName}', false, false); return false;" title="\${remainingNotes} more items">
-					<img id="imgpreventions5" src="../oscarMessenger/img/collapse.gif" />&nbsp;&nbsp;
-				</a>
-				{{else}}
-				<a border="0" class="expandCasemgmtSidebar">
-					<img id="img\${sectionName}1" src="/images/clear.gif" />&nbsp;&nbsp;
-				</a>
-				{{/if}}
-				<span class="encounterNoteTitle">
-					<a
-						class="links"
-						style="color: \${colour};"
-						onmouseover="this.className='linkhover'"
-						onmouseout="this.className='links'"
-						href="#"
-						onclick="\${onClick};return false;"
-						title="Flu=Influenza vaccine"
-					>
-						\${text}
-					</a>
-				</span>
-				<span class="encounterNoteDate">
-					{{if updateDateFormatted}}...{{/if}}<a
-						class="links"
-						style="margin-right: 2px; color: \${colour};"
-						onmouseover="this.className='linkhover'"
-						onmouseout="this.className='links'"
-						href="#"
-						onclick="\${onClick};return false;"
-						title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
-					>
-						\${value}
-						\${updateDateFormatted}
-					</a>
-				</span>
-			</li>
-
+			<%@include file="templates/junoEncounter/sectionNoteTemplate.html"%>
 		</script>
 
 
 		<script id="sectionCppNoteTemplate" type="text/x-jquery-tmpl">
-			<li class="\${rowClass}">
-				<span id="spanListNote\${index}">
-					<a class="topLinks"
-					   onmouseover="this.className='topLinkhover'"
-					   onmouseout="this.className='topLinks'"
-					   title="Rev:\${revision} - Last update:\${updateDateFormatted}"
-					   id="listNote\${noteId}"
-					   href="#"
-					   onclick="\${onClick};return false;"
-					   style="width:100%;overflow:scroll;" >
-							\${text}
-					</a>
-				</span>
-			</li>
+			<%@include file="templates/junoEncounter/sectionCppNoteTemplate.html"%>
 
 		</script>
 
@@ -737,251 +559,11 @@
 		</script>
 
 		<script id="encounterNonNoteTemplate" type="text/x-jquery-tmpl">
-			<div id="nc\${index}" style="display:block;" class="note">
-
-				<div id="n\${note.noteId}">
-
-					<div id="wrapper\${note.noteId}" style="color:#FFFFFF;background-color:\${colour};color:white;font-size:10px;">
-
-						<div id="txt\${note.noteId}" style="display:inline-block;overflow-wrap:break-word;word-wrap:break-word;max-width:60%;">
-							\${note.note}
-						</div>
-						<div id="observation671898" style="display:inline-block;font-size: 11px; float: right; margin-right: 3px;">
-							Encounter Date:&nbsp;
-							<span id="obs">\${formattedObservationDate}</span>
-							&nbsp;
-							{{if note.revision}}
-								 Rev
-
-								<a style="color:#ddddff;" href="#" onclick="return junoEncounter.showHistory('\${note.noteId}', event);">\${note.revision}</a>
-							{{/if}}
-							{{if note.eformData || note.encounterForm}}
-								<a class="links" title="View eForm" id="viewEFORM122582" href="#"
-									onclick="\${onClickString};return false;"
-									style="float: right; margin-right: 5px; font-size: 10px;"> View </a>
-							{{/if}}
-						</div>
-					</div>
-				</div>
-			</div>
-
+			<%@include file="templates/junoEncounter/encounterNonNoteTemplate.html"%>
 		</script>
 
 		<script id="encounterNoteTemplate" type="text/x-jquery-tmpl">
-
-			<div id="nc\${index}" style="" class="note noteRounded _nifty junoEncounterNote">
-				<b class="artop" style="background-color: transparent;">
-					<b class="re1" style="background-color: rgb(204, 204, 204); border-color: rgb(0, 0, 0);"></b>
-					<b class="re2" style="background-color: rgb(204, 204, 204); border-color: rgb(0, 0, 0);"></b>
-					<b class="re3" style="background-color: rgb(204, 204, 204); border-color: rgb(0, 0, 0);"></b>
-					<b class="re4" style="background-color: rgb(204, 204, 204); border-color: rgb(0, 0, 0);"></b>
-				</b>
-
-				<input type="hidden" id="signed\${note.noteId}" value="\${note.isSigned}" />
-				<%--
-				 XXX: I don't think this gets sent
-				<input type="hidden" id="full\${note.noteId}" value="\${note.}" />
-				<input type="hidden" id="bgColour\${note.noteId}" value="\${note.}" />
-				<input type="hidden" id="editWarn\${note.noteId}" value="\${note.}" />
-				--%>
-
-				<div id="n\${note.noteId}" style="border-left: 1px solid rgb(0, 0, 0); border-right: 1px solid rgb(0, 0, 0);">
-
-					{{if !edit}}
-						{{if collapseNote}}
-							<img title="Maximize Display"
-								alt="Maximize Display"
-								id="xpImg\${note.noteId}"
-								name="expandViewTrigger"
-								onclick="encounterNote.maxView(event, '\${note.noteId}')"
-								style="float:right; margin-right:5px; margin-top: 2px;"
-								src="\${context}/oscarEncounter/graphics/triangle_down.gif" />
-						{{else}}
-							<img title="Minimize Display"
-								id="quitImg\${note.noteId}"
-								alt="Minimize Display"
-								onclick="encounterNote.minView(event, '\${note.noteId}')"
-								style="float: right; margin-right: 5px; margin-bottom: 3px; margin-top: 2px;"
-								src="\${context}/oscarEncounter/graphics/triangle_up.gif" />
-						{{/if}}
-
-						<img
-							title="Print"
-							id="print\${note.noteId}"
-							alt="Toggle Print Note"
-							onclick="printNotes.togglePrint('\${note.noteId}', event)"
-							style="float: right; margin-right: 5px; margin-top: 2px;"
-							src="\${context}/oscarEncounter/graphics/printer.png" />
-					{{/if}}
-
-					<input type="hidden" id="uuid\${note.noteId}" value="\${note.uuid}" />
-					<input type="hidden" id="observationDate\${note.noteId}" value="\${note.observationDate}" />
-					<input type="hidden" id="providerNo\${note.noteId}" value="\${note.providerNo}" />
-					<input type="hidden" id="encounterType\${note.noteId}" value="\${note.encounterType}" />
-					<input type="hidden" id="isSigned\${note.noteId}" value="\${note.isSigned}" />
-					<input type="hidden" id="isVerified\${note.noteId}" value="\${note.isVerified}" />
-					<input type="hidden" id="appointmentNo\${note.noteId}" value="\${note.appointmentNo}" />
-					{{if edit}}
-						<input type="hidden" id="editNoteId" value="\${note.noteId}" />
-						<div class="error" id="noteSaveErrorMessage"></div>
-						<textarea
-							tabindex="7"
-							cols="84"
-							rows="10"
-							class="txtArea"
-							wrap="soft"
-							style="line-height: 1.1em;"
-							name="caseNote_note"
-							id="caseNote_note\${note.noteId}">
-{{html escapedNote}}</textarea>
-
-						<div class="sig" style="display:inline;" id="sig\${note.noteId}">
-							<%--
-							<%@ include file="../casemgmt/noteIssueList.jsp"%>
-							--%>
-						</div>
-					{{else}}
-						<a
-							title="Edit"
-							id="edit\${note.noteId}"
-							href="#"
-							onclick="encounterNote.editEncounterNote(event, '\${note.noteId}');return false;"
-							style="float: right; margin-right: 5px; font-size: 10px;">
-
-							Edit
-						</a>
-
-						<a
-							href=""
-							onclick="window.open('/lab/CA/ALL/sendOruR01.jsp?noteId=\${note.noteId}', 'eSend');return(false);"
-							title="Send Electronically" style="float: right; margin-right: 5px; font-size: 10px;">
-
-							eSend
-						</a>
-
-						<input
-							type="image"
-							id="anno\${note.noteId}"
-							src="/oscarEncounter/graphics/annotation.png"
-							title="Annotation"
-							style="float: right; margin-right: 5px; margin-bottom: 3px; height:10px;width:10px"
-							onclick="window.open('\${annotationUrl}','anwin','width=400,height=500');$('annotation_attribname').value='\${annotationLabel}'; return false;"
-						>
-
-						<div id="wrapper\${note.noteId}" style="clear:right;">
-
-							<div
-								id="txt\${note.noteId}"
-								{{if collapseNote}}
-									class="collapse"
-								{{/if}}
-								style="display:inline-block;overflow-wrap:break-word;word-wrap:break-word;max-width:100%;">
-
-								{{each noteLineArray}}
-									\${$value}<br>
-								{{/each}}
-							</div>
-						</div>
-					{{/if}}
-
-					<div id="sig\${note.noteId}" class="sig" style="clear:both;color:#000000;background-color:#CCCCFF;">
-						<div id="sumary\${note.noteId}">
-							<div id="observation\${note.noteId}" style="font-size: 11px; float: right; margin-right: 3px;">
-								Encounter Date:&nbsp;
-								{{if !edit}}
-									<span id="obs\${note.noteId}">\${formattedObservationDate}</span>&nbsp;
-								{{else}}
-									&nbsp;<img src="\${contextPath}/images/cal.gif" id="observationDate_cal" alt="calendar">&nbsp;
-									<input type="text"
-										id="observationDateInput\${note.noteId}"
-										name="observation_date"
-										ondblclick="this.value='';"
-										class="observationDate"
-										readonly="readonly"
-										value="\${formattedObservationDate}">
-								{{/if}}
-								Rev
-
-								<a href="#" onclick="return junoEncounter.showHistory('\${note.noteId}', event);">\${note.revision}</a>
-
-							</div>
-
-							<div style="font-size: 11px;">
-								<span style="float: left;">Editors:</span>
-								<ul style="list-style: none inside none; margin: 0px;">
-									{{each note.editorNames}}
-										<li>\${$value};</li>
-									{{/each}}
-								</ul>
-							</div>
-							<div style="font-size: 11px; clear: right; margin-right: 3px; float: right;">
-								Enc Type:&nbsp;
-								{{if !edit}}
-									<span id="encType\${note.noteId}">\${note.encounterType}</span>
-								{{else}}
-									<select
-										id="encounterTypeSelect\${note.noteId}"
-										class="encTypeCombo"
-										name="caseManagementEntryForm">
-
-										<option value=""></option>
-										{{each encounterTypeArray}}
-											<option
-												value="\${$value}"
-												{{if $value == selectedEncounterType}}
-													selected="selected"
-												{{/if}}
-											>\${$value}</option>
-										{{/each}}
-									</select>
-								{{/if}}
-							</div>
-
-							{{if edit}}
-								<div style="margin: 0px 0px 0px 3px; font-size: 11px;">
-									<span style="float: left;"><bean:message key="oscarEncounter.assignedIssues.title"/></span>
-									<ul id='noteIssueIdList' style='float: left; list-style: circle inside; margin: 0px;'>
-									{{each issues}}
-										<li>
-											<input type='checkbox' id='issueId' name='issue_id' checked value='\${$value.issue_id}'>
-											\${$value.issue.description}
-										</li>
-									{{/each}}
-									</ul>
-									<br style="clear: both;">
-								</div>
-								<div id="noteIssues">
-									<div id="noteIssues-resolved" style="margin: 0px; background-color: #CCCCFF; font-size: 11px; display: none;">
-										<b><bean:message key="oscarEncounter.referenceResolvedIssues.title"/></b>
-									</div>
-									<div id="noteIssues-unresolved" style="margin: 0px; background-color: #CCCCFF; font-size: 11px; display: none;">
-										<b><bean:message key="oscarEncounter.referenceUnresolvedIssues.title"/></b>
-									</div>
-								</div>
-								<div class="noteStatus" id="noteSaveStatusMessage"></div>
-							{{else}}
-								<div style="display: block; font-size: 11px;">
-									<span style="float: left;">Assigned Issues</span>
-									<ul style="float: left; list-style: circle inside none; margin: 0px;">
-										{{each note.issueDescriptions}}
-											<li>\${$value}</li>
-										{{/each}}
-									</ul>
-									<br style="clear: both;">
-								</div>
-							{{/if}}
-						</div>
-					</div>
-				</div>
-				<b class="artop" style="background-color: transparent;">
-					<b class="re4" style="background-color: rgb(204, 204, 204); border-color: rgb(0, 0, 0);"></b>
-					<b class="re3" style="background-color: rgb(204, 204, 204); border-color: rgb(0, 0, 0);"></b>
-					<b class="re2" style="background-color: rgb(204, 204, 204); border-color: rgb(0, 0, 0);"></b>
-					<b class="re1" style="background-color: rgb(204, 204, 204); border-color: rgb(0, 0, 0);"></b>
-				</b>
-			</div>
-
-
+			<%@include file="templates/junoEncounter/encounterNoteTemplate.html"%>
 		</script>
 
 
@@ -1094,7 +676,7 @@
 				String demo = request.getParameter("demographicNo");
 				String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 
-				// XXX: Do we want the sharing center?  If so put this in the action form.
+				// Do we want the sharing center?  If so put this in the action form.
 				// MARC-HI's Sharing Center
 				boolean isSharingCenterEnabled = SharingCenterUtil.isEnabled();
 
@@ -1138,7 +720,6 @@
 					// =================================================================================
 					// Sidebar display
 					// =================================================================================
-					// XXX: Maybe replace this with JSON/Javascript code
 				%>
 				<c:forEach items="${noteSections}" var="sectionName" varStatus="loop">
 
@@ -1152,14 +733,13 @@
 							<h3 style="padding:0px; background-color: ${section.colour};">
 								<a href="javascript:void(0);"
 								   onclick="${section.onClickPlus};return false;"
-								   onmouseover="return !showMenu('${section.menuId}', event);"
+								   onmouseover="return !junoEncounter.showMenu('${section.menuId}', event);"
 								>+</a>
 							</h3>
 						</div>
 
-							<%-- Popup Menu --%>
+						<%-- Popup Menu --%>
 						<c:if test="${not empty section.menuId}">
-							<%-- XXX: put the 40 + 125 in a constant --%>
 							<c:set var="useColumns" scope="page"
 								   value="${fn:length(section.menuItems) > 40}"/>
 							<c:set var="menuWidth" scope="page"
@@ -1186,22 +766,16 @@
 							</div>
 						</c:if>
 
-							<%-- Section title --%>
+						<%-- Section title --%>
 						<div style="clear: left; float: left; width: 90%;">
 							<h3 style="width:100%; background-color: ${section.colour}">
 								<a href="#" onclick="${section.onClickTitle};return false;">
-										<%-- XXX: Remove this once all titles are localized --%>
-									<c:if test="${not empty section.titleKey}">
-										<bean:message key="${section.titleKey}"/>
-									</c:if>
-									<c:if test="${empty section.titleKey}">
-										${section.title}
-									</c:if>
+									<bean:message key="${section.titleKey}"/>
 								</a>
 							</h3>
 						</div>
 
-							<%-- List of links in the section --%>
+						<%-- List of links in the section --%>
 						<ul id="${sectionName}list">
 
 							<c:set var="section" scope="page"
@@ -1211,7 +785,7 @@
 
 								<li class="encounterNote ${loop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
 
-										<%-- Expand arrows if neccessary --%>
+									<%-- Expand arrows if neccessary --%>
 									<c:choose>
 										<c:when test="${ section.remainingNotes > 0 && loop.last }">
 											<a href="#"
@@ -1398,10 +972,10 @@
 								// Case Notes form and border etc.
 								// =================================================================================
 							%>
-							<div id="notCPP"
-								 style="height: 70%; margin-left: 2px; background-color: #FFFFFF;">
+							<div id="notCPP" style="height: 70%; margin-left: 2px; background-color: #FFFFFF;">
 
 								<html:form action="/CaseManagementView" method="post">
+									<%--
 									<html:hidden property="demographicNo"
 												 value="${junoEncounterForm.header.demographicNo}"/>
 									<html:hidden property="providerNo"
@@ -1413,6 +987,7 @@
 									<input type="hidden" name="chain" value="list">
 									<input type="hidden" name="method" value="view">
 									<input type="hidden" id="check_issue" name="check_issue">
+									--%>
 									<%-- TODO: fix later
 									<input type="hidden" id="serverDate" value="<%=strToday%>">
 									--%>
@@ -1420,92 +995,127 @@
 										   value="false">
 									<div id="topContent"
 										 style="float: left; width: 100%; margin-right: -2px; padding-bottom: 1px; background-color: #CCCCFF; font-size: 10px;">
-										<nested:notEmpty name="caseManagementViewForm"
-														 property="filter_providers">
-											<div style="float: left; margin-left: 10px; margin-top: 0px;">
-												<u><bean:message
-														key="oscarEncounter.providers.title"/>:</u><br>
-												<nested:iterate type="String" id="filter_provider"
-																property="filter_providers">
-													<c:choose>
-														<c:when test="${filter_provider == 'a'}">All</c:when>
-														<c:otherwise>
-															<nested:iterate id="provider"
-																			name="providers">
-																<c:if test="${filter_provider==provider.providerNo}">
-																	<nested:write name="provider"
-																				  property="formattedName"/>
-																	<br>
-																</c:if>
-															</nested:iterate>
-														</c:otherwise>
-													</c:choose>
-												</nested:iterate>
-											</div>
-										</nested:notEmpty>
 
-										<nested:notEmpty name="caseManagementViewForm"
-														 property="filter_roles">
-											<div style="float: left; margin-left: 10px; margin-top: 0px;">
-												<u><bean:message
-														key="oscarEncounter.roles.title"/>:</u><br>
-												<nested:iterate type="String" id="filter_role"
-																property="filter_roles">
-													<c:choose>
-														<c:when test="${filter_role == 'a'}">All</c:when>
-														<c:otherwise>
-															<nested:iterate id="role" name="roles">
-																<c:if test="${filter_role==role.id}">
-																	<nested:write name="role"
-																				  property="name"/>
-																	<br>
-																</c:if>
-															</nested:iterate>
-														</c:otherwise>
-													</c:choose>
-												</nested:iterate>
-											</div>
-										</nested:notEmpty>
+										<div id="appliedFiltersProviders" style="float: left; margin-left: 10px; margin-top: 0px; display: none;">
+											<u><bean:message key="oscarEncounter.providers.title"/>:</u><br>
 
-										<nested:notEmpty name="caseManagementViewForm"
-														 property="note_sort">
-											<div style="float: left; margin-left: 10px; margin-top: 0px;">
-												<u><bean:message
-														key="oscarEncounter.sort.title"/>:</u><br>
-												<nested:write property="note_sort"/><br>
-											</div>
-										</nested:notEmpty>
+											<div id="appliedFiltersProvidersContent">
 
-										<nested:notEmpty name="caseManagementViewForm"
-														 property="issues">
-											<div style="float: left; margin-left: 10px; margin-top: 0px;">
-												<u><bean:message key="oscarEncounter.issues.title"/>:</u><br>
-												<nested:iterate type="String" id="filter_issue"
-																property="issues">
-													<c:choose>
-														<c:when test="${filter_issue == 'a'}">All</c:when>
-														<c:otherwise>
-															<nested:iterate id="issue"
-																			name="cme_issues">
-																<c:if test="${filter_issue==issue.issue.id}">
-																	<nested:write name="issue"
-																				  property="issueDisplay.description"/>
-																	<br>
-																</c:if>
-															</nested:iterate>
-														</c:otherwise>
-													</c:choose>
-												</nested:iterate>
 											</div>
-										</nested:notEmpty>
+										</div>
+
+										<div id="appliedFiltersRoles" style="float: left; margin-left: 10px; margin-top: 0px; display: none;">
+											<u><bean:message key="oscarEncounter.roles.title"/>:</u><br>
+
+											<div id="appliedFiltersRolesContent">
+
+											</div>
+										</div>
+
+										<div id="appliedFiltersSort" style="float: left; margin-left: 10px; margin-top: 0px; display: none;">
+											<u><bean:message key="oscarEncounter.sort.title"/>:</u><br>
+
+											<div id="appliedFiltersSortContent">
+
+											</div>
+										</div>
+										<div id="appliedFiltersIssues" style="float: left; margin-left: 10px; margin-top: 0px; display: none;">
+											<u><bean:message key="oscarEncounter.issues.title"/>:</u><br>
+
+											<div id="appliedFiltersIssuesContent">
+
+											</div>
+										</div>
+
+												<%--
+												<nested:notEmpty name="caseManagementViewForm"
+																 property="filter_providers">
+													<div style="float: left; margin-left: 10px; margin-top: 0px;">
+														<u><bean:message
+																key="oscarEncounter.providers.title"/>:</u><br>
+														<nested:iterate type="String" id="filter_provider"
+																		property="filter_providers">
+															<c:choose>
+																<c:when test="${filter_provider == 'a'}">All</c:when>
+																<c:otherwise>
+																	<nested:iterate id="provider" name="providers">
+																		<c:if test="${filter_provider==provider.providerNo}">
+																			<nested:write name="provider" property="formattedName"/>
+																			<br>
+																		</c:if>
+																	</nested:iterate>
+																</c:otherwise>
+															</c:choose>
+														</nested:iterate>
+													</div>
+												</nested:notEmpty>
+
+												<nested:notEmpty name="caseManagementViewForm"
+																 property="filter_roles">
+													<div style="float: left; margin-left: 10px; margin-top: 0px;">
+														<u><bean:message
+																key="oscarEncounter.roles.title"/>:</u><br>
+														<nested:iterate type="String" id="filter_role"
+																		property="filter_roles">
+															<c:choose>
+																<c:when test="${filter_role == 'a'}">All</c:when>
+																<c:otherwise>
+																	<nested:iterate id="role" name="roles">
+																		<c:if test="${filter_role==role.id}">
+																			<nested:write name="role"
+																						  property="name"/>
+																			<br>
+																		</c:if>
+																	</nested:iterate>
+																</c:otherwise>
+															</c:choose>
+														</nested:iterate>
+													</div>
+												</nested:notEmpty>
+
+												<nested:notEmpty name="caseManagementViewForm"
+																 property="note_sort">
+													<div style="float: left; margin-left: 10px; margin-top: 0px;">
+														<u><bean:message
+																key="oscarEncounter.sort.title"/>:</u><br>
+														<nested:write property="note_sort"/><br>
+													</div>
+												</nested:notEmpty>
+
+												<nested:notEmpty name="caseManagementViewForm"
+																 property="filter_issues">
+													<div style="float: left; margin-left: 10px; margin-top: 0px;">
+														<u><bean:message key="oscarEncounter.issues.title"/>:</u><br>
+														<nested:iterate type="String" id="filter_issue"
+																		property="filter_issues">
+															<c:choose>
+																<c:when test="${filter_issue == 'a'}">All</c:when>
+																<c:otherwise>
+																	<nested:iterate id="issue"
+																					name="cme_issues">
+																		<c:if test="${filter_issue==issue.issue.id}">
+																			<nested:write name="issue"
+																						  property="issueDisplay.description"/>
+																			<br>
+																		</c:if>
+																	</nested:iterate>
+																</c:otherwise>
+															</c:choose>
+														</nested:iterate>
+													</div>
+												</nested:notEmpty>
+												--%>
+
+
+
 										<div id="filter"
 											 style="display:none;background-color:#ddddff;padding:8px">
 											<input type="button"
 												   value="<bean:message key="oscarEncounter.showView.title" />"
-												   onclick="return filter(false);"/>
+												   onclick="return noteFilter.filter(false);"/>
 											<input type="button"
 												   value="<bean:message key="oscarEncounter.resetFilter.title" />"
-												   onclick="return filter(true);"/>
+												   onclick="return noteFilter.filter(true);"/>
 
 											<table style="border-collapse:collapse;width:100%;margin-left:auto;margin-right:auto">
 												<tr>
@@ -1529,50 +1139,56 @@
 													<td style="font-size:inherit;background-color:#ccccff">
 														<div style="height:150px;overflow:auto">
 															<ul style="padding:0px;margin:0px;list-style:none inside none">
-																<li><html:multibox
-																		property="filter_providers"
-																		value="a"
-																		onclick="filterCheckBox(this)"></html:multibox><bean:message
-																		key="oscarEncounter.sortAll.title"/></li>
-																<%
-																	/*
-																	// TODO: make this work (parts missing)
-																	@SuppressWarnings("unchecked")
-																	Set<Provider> providers = (Set<Provider>)request.getAttribute("providers");
+																<li>
+																	<input type="checkbox"
+																		   name="filter_providers"
+																		   value="a"
+																		   onclick="noteFilter.filterCheckBox(this);" />
+																	<bean:message key="oscarEncounter.sortAll.title"/>
+																</li>
 
-																	String providerNo;
-																	Provider prov;
-																	Iterator<Provider> iter = providers.iterator();
-																	while (iter.hasNext())
-																	{
-																		prov = iter.next();
-																		providerNo = prov.getProviderNo();
-																<li><html:multibox property="filter_providers" value="providerNo" onclick="filterCheckBox(this)"></html:multibox>prov.getFormattedName()</li>
-																	}
-																	*/
-																%>
+																<c:forEach items="${junoEncounterForm.header.providers}"
+																		   var="provider"
+																		   varStatus="loop">
+																	<li>
+																		<input type="checkbox"
+																			   name="filter_providers"
+																			   value="${provider.providerNo}"
+																			   onclick="noteFilter.filterCheckBox(this);" />
+																		<span id="filter_provider_name${provider.providerNo}">
+																			<c:out value="${provider.formattedName}" />
+																		</span>
+																	</li>
+
+																</c:forEach>
 															</ul>
 														</div>
 													</td>
 													<td style="font-size:inherit;background-color:#ccccff;border-left:solid #ddddff 4px;border-right:solid #ddddff 4px">
 														<div style="height:150px;overflow:auto">
 															<ul style="padding:0px;margin:0px;list-style:none inside none">
-																<li><html:multibox
-																		property="filter_roles"
-																		value="a"
-																		onclick="filterCheckBox(this)"></html:multibox><bean:message
-																		key="oscarEncounter.sortAll.title"/></li>
-																<%
-																	/*
-																	// TODO: make this work (parts missing)
-																	@SuppressWarnings("unchecked")
-																	List roles = (List)request.getAttribute("roles");
-																	for (int num = 0; num < roles.size(); ++num)
-																	{
-																		Secrole role = (Secrole)roles.get(num);
-																	}
-																	*/
-																%>
+																<li>
+																	<input type="checkbox"
+																		   name="filter_roles"
+																		   value="a"
+																		   onclick="noteFilter.filterCheckBox(this);">
+																	<bean:message key="oscarEncounter.sortAll.title"/>
+																</li>
+
+																<c:forEach items="${junoEncounterForm.header.roles}"
+																		   var="role"
+																		   varStatus="loop">
+																	<li>
+																		<input type="checkbox"
+																				name="filter_roles"
+																				value="${role.id}"
+																				onclick="noteFilter.filterCheckBox(this);" />
+																		<span id="filter_role_name${role.id}">
+																			<c:out value="${role.name}" />
+																		</span>
+																	</li>
+
+																</c:forEach>
 															</ul>
 														</div>
 													</td>
@@ -1581,19 +1197,27 @@
 															<ul style="padding:0px;margin:0px;list-style:none inside none">
 																<li><html:radio property="note_sort"
 																				value="observation_date_asc">
-																	<bean:message
+																	<span id="filter_sort_nameobservation_date_asc">
+																		<bean:message
 																			key="oscarEncounter.sortDateAsc.title"/>
+																	</span>
 																</html:radio></li>
-																<li><html:radio property="note_sort"
+																<li>
+																	<html:radio property="note_sort"
 																				value="observation_date_desc">
-																	<bean:message
+																	<span id="filter_sort_nameobservation_date_desc">
+																		<bean:message
 																			key="oscarEncounter.sortDateDesc.title"/>
+																	</span>
 																</html:radio></li>
 																<li><html:radio property="note_sort"
 																				value="providerName">
-																	<bean:message
+																	<span id="filter_sort_nameproviderName">
+																		<bean:message
 																			key="oscarEncounter.provider.title"/>
+																	</span>
 																</html:radio></li>
+																<%--
 																<li><html:radio property="note_sort"
 																				value="programName">
 																	<bean:message
@@ -1604,33 +1228,44 @@
 																	<bean:message
 																			key="oscarEncounter.role.title"/>
 																</html:radio></li>
+																--%>
 															</ul>
 														</div>
 													</td>
 													<td style="font-size:inherit;background-color:#ccccff;border-left:solid #ddddff 4px;border-right:solid #ddddff 4px">
 														<div style="height:150px;overflow:auto">
 															<ul style="padding:0px;margin:0px;list-style:none inside none">
-																<li><html:multibox property="issues"
-																				   value="a"
-																				   onclick="filterCheckBox(this)"></html:multibox><bean:message
-																		key="oscarEncounter.sortAll.title"/></li>
-																<%
-																	// TODO: make this work (parts missing)
-													/*
-													@SuppressWarnings("unchecked")
-													List issues = (List)request.getAttribute("cme_issues");
-													for (int num = 0; num < issues.size(); ++num)
-													{
-														CheckBoxBean issue_checkBoxBean = (CheckBoxBean)issues.get(num);
-													}
+																<li>
+																	<input type="checkbox"
+																		   name="filter_issues"
+																		   value="a"
+																		   onclick="noteFilter.filterCheckBox(this);" />
+																	<bean:message key="oscarEncounter.sortAll.title"/>
+																</li>
 
-													 */
-																%>
+																<c:forEach items="${junoEncounterForm.header.caseManagementIssues}"
+																		   var="issue"
+																		   varStatus="loop">
+																	<li>
+																		<input type="checkbox"
+																			   name="filter_issues"
+																			   value="${issue.issue.id}"
+																			   onclick="noteFilter.filterCheckBox(this);" />
+																		<span id="filter_issue_name${issue.issue.id}">
+																			<c:if test="${issue.resolved}">* </c:if> <c:out value="${issue.issue.description}" />
+																		</span>
+																	</li>
+
+																</c:forEach>
 															</ul>
 														</div>
 													</td>
 												</tr>
 											</table>
+
+
+
+
 										</div>
 
 										<div style="float: left; clear: both; margin-top: 5px; margin-bottom: 3px; width: 100%; text-align: center;">
@@ -1656,7 +1291,7 @@
 													   onkeypress="return grabEnter('searchButton',event)">
 												<input type="button" id="searchButton" name="button"
 													   value="<bean:message key="oscarEncounter.Index.btnSearch"/>"
-													   onClick="channelSearch(); return false;">
+													   onClick="junoEncounter.channelSearch(); return false;">
 
 												<div style="display:inline-block; text-align: left;">
 													<%
@@ -1693,7 +1328,7 @@
 											<div style="display:inline-block;text-align: left;" id="toolbar">
 												<input type="button"
 													   value="<bean:message key="oscarEncounter.Filter.title"/>"
-													   onclick="showFilter();"/>
+													   onclick="noteFilter.showFilter();"/>
 
 												<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.calculators" rights="r" reverse="false">
 													<%
@@ -1856,6 +1491,7 @@
 										</div>
 										<script type="text/javascript">
 
+											/*
 											if (parseInt(navigator.appVersion) > 3)
 											{
 												var windowHeight = 750;
@@ -1872,6 +1508,8 @@
 												var divHeight = windowHeight - 320;
 												$("encMainDiv").style.height = divHeight + 'px';
 											}
+
+											 */
 										</script>
 										<div id='save'
 											 style="width: 99%; background-color: #CCCCFF; padding-top: 5px; margin-left: 2px; border-left: thin solid #000000; border-right: thin solid #000000; border-bottom: thin solid #000000;">
@@ -1951,10 +1589,16 @@
 				   id="issueSearchSelected"
 				   name="issueSearchSelected">
 			<input tabindex="9"
-				type="button"
-				id="asgnIssues"
-				onclick="caseManagementIssue.addIssueToCurrentNote(event); return false;"
-				value="<bean:message key="oscarEncounter.assign.title"/>">
+				   type="button"
+				   id="asgnIssues"
+				   onclick="caseManagementIssue.addIssueToCurrentNote(event); return false;"
+				   value="<bean:message key="oscarEncounter.assign.title"/>">
+			<input tabindex="9"
+				   type="button"
+				   id="changeIssues"
+				   style="display: none;"
+				   onclick="caseManagementIssue.changeIssue({jQuery: jQuery}); return false;"
+				   value="<bean:message key="oscarEncounter.change.title"/>">
 			<span id="busy" style="display: none">
 	    		<img style="position: absolute;"
 					 src="<c:out value="${ctx}/oscarEncounter/graphics/busy.gif"/>"
@@ -1986,7 +1630,7 @@
 				<bean:message
 						key="Appointment.formNotes"/></button>
 			<button type="button"
-					onclick="javascript:popupPage(500,200,'noteBrowser<%//TODO: Fix; bean.demographicNo%>','noteBrowser.jsp?demographic_no=<% //TODO: fix; bean.demographicNo%>&FirstTime=1');">
+					onclick="javascript:popupPage(500,200,'noteBrowser${junoEncounterForm.header.demographicNo}','../casemgmt/noteBrowser.jsp?demographic_no=${junoEncounterForm.header.demographicNo}&FirstTime=1');">
 				<bean:message
 						key="oscarEncounter.Index.BrowseNotes"/></button>
 			&nbsp;
@@ -2137,32 +1781,33 @@
 										</select></td>
 									</tr>
 								</table>
-								<br> <span style="float: right; margin-right: 10px;"> <input
-									type="image"
-									src="<c:out value="${ctx}/oscarEncounter/graphics/copy.png"/>"
-									title='<bean:message key="oscarEncounter.Index.btnCopy"/>'
-									onclick="copyCppToCurrentNote(); return false;"> <input
-									type="image"
-									src="<c:out value="${ctx}/oscarEncounter/graphics/annotation.png"/>"
-									title='<bean:message key="oscarEncounter.Index.btnAnnotation"/>'
-									id="anno" style="padding-right: 10px;"> <input type="image"
-																				   src="<c:out value="${ctx}/oscarEncounter/graphics/edit-cut.png"/>"
-																				   title='<bean:message key="oscarEncounter.Index.btnArchive"/>'
-																				   onclick="$('archived').value='true';"
-																				   style="padding-right: 10px;">
-					<input type="image"
-						   src="<c:out value="${ctx}/oscarEncounter/graphics/note-save.png"/>"
-						   title='<bean:message key="oscarEncounter.Index.btnSignSave"/>'
-						   onclick="$('archived').value='false';" style="padding-right: 10px;">
-					<input type="image"
-						   src="<c:out value="${ctx}/oscarEncounter/graphics/system-log-out.png"/>"
-						   title='<bean:message key="global.btnExit"/>'
-						   onclick="this.focus();cppNote.hideEdit();return false;">
+								<br>
+								<span style="float: right; margin-right: 10px;">
+									<input type="image"
+										   src="<c:out value="${ctx}/oscarEncounter/graphics/copy.png"/>"
+										   title='<bean:message key="oscarEncounter.Index.btnCopy"/>'
+										   onclick="encounterNote.copyCppToCurrentNote(); return false;">
+									<input type="image"
+										   src="<c:out value="${ctx}/oscarEncounter/graphics/annotation.png"/>"
+										   title='<bean:message key="oscarEncounter.Index.btnAnnotation"/>'
+										   id="anno" style="padding-right: 10px;">
+									<input type="image"
+										   src="<c:out value="${ctx}/oscarEncounter/graphics/edit-cut.png"/>"
+										   title='<bean:message key="oscarEncounter.Index.btnArchive"/>'
+										   onclick="$('archived').value='true';"
+										   style="padding-right: 10px;">
+									<input type="image"
+										   src="<c:out value="${ctx}/oscarEncounter/graphics/note-save.png"/>"
+										   title='<bean:message key="oscarEncounter.Index.btnSignSave"/>'
+										   onclick="$('archived').value='false';" style="padding-right: 10px;">
+									<input type="image"
+										   src="<c:out value="${ctx}/oscarEncounter/graphics/system-log-out.png"/>"
+										   title='<bean:message key="global.btnExit"/>'
+										   onclick="this.focus();cppNote.hideEdit();return false;">
 						   <%--onclick="this.focus();$('channel').style.visibility ='visible';$('showEditNote').style.display='none';return false;">--%>
-				</span>
+								</span>
 								<bean:message key="oscarEncounter.Index.btnPosition"/>
 								<select id="position" name="position">
-									<option id="popt0" value="1">1</option>
 								</select>
 								<div id="issueNoteInfo"
 									 style="clear: both; text-align: left;"></div>

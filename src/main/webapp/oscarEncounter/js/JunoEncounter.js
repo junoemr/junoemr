@@ -2,9 +2,12 @@
 
 if (!window.Juno) window.Juno = {};
 if (!Juno.OscarEncounter) Juno.OscarEncounter = {};
-if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = function JunoEncounter(pageData)
+if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = function JunoEncounter(pageData, pageState)
 {
 	this.pageData = pageData;
+
+	var openWindows = {};
+	var measurementWindows = [];
 
 	this.checkLengthOfObject = function checkLengthOfObject(o)
 	{
@@ -51,7 +54,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 	{
 		var atbname = document.getElementById('annotation_attrib').value;
 		var data = $A(arguments);
-		var addr = ctx + "/annotation/annotation.jsp?atbname=" + atbname + "&table_id=" + data[1] + "&display=" + data[2] + "&demo=" + data[3];
+		var addr = this.pageData.contextPath + "/annotation/annotation.jsp?atbname=" + atbname + "&table_id=" + data[1] + "&display=" + data[2] + "&demo=" + data[3];
 		window.open(addr, "anwin", "width=400,height=500");
 		Event.stop(data[0]);
 	};
@@ -82,9 +85,24 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 		return false;
 	};
 
+	this.measurementLoaded = function measurementLoaded(name)
+	{
+		measurementWindows.push(openWindows[name]);
+	};
+
+	this.cleanUpWindows = function cleanUpWindows()
+	{
+		for (var idx = 0; idx < measurementWindows.length; ++idx)
+		{
+			if (!measurementWindows[idx].closed)
+			{
+				measurementWindows[idx].parentChanged = true;
+			}
+		}
+	};
+
 	this.popupPage = function popupPage(vheight, vwidth, name, varpage)
 	{
-		var openWindows = {};
 		var reloadWindows = {};
 		var updateDivTimer = null;
 		if (varpage == null || varpage === -1)
@@ -270,5 +288,103 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 				});
 			}
 		});
+	};
+
+
+	this.showOceanToolbar = function showOceanToolbar()
+	{
+		return (this.pageData.cmeJs == 'ocean_toolbar');
+	};
+
+	this.writeToEncounterNote = function writeToEncounterNote(request)
+	{
+		var text = request.responseText;
+
+		text = text.replace(/\\u000A/g, "\u000A");
+		text = text.replace(/\\u000D/g, "");
+		text = text.replace(/\\u003E/g, "\u003E");
+		text = text.replace(/\\u003C/g, "\u003C");
+		text = text.replace(/\\u005C/g, "\u005C");
+		text = text.replace(/\\u0022/g, "\u0022");
+		text = text.replace(/\\u0027/g, "\u0027");
+
+
+		encounterNote.pasteToEncounterNote(text);
+	};
+
+	this.ajaxInsertTemplate = function ajaxInsertTemplate(varpage)
+	{
+		//fetch template
+
+		if (varpage != 'null')
+		{
+			var me = this;
+			var page = this.pageData.contextPath + "/oscarEncounter/InsertTemplate.do";
+			var params = "templateName=" + varpage + "&version=2";
+			new Ajax.Request(page, {
+					method: 'post',
+					postBody: params,
+					evalScripts: true,
+					onSuccess: me.writeToEncounterNote,
+					onFailure: function()
+					{
+						alert(insertTemplateError);
+					}
+				}
+			);
+		}
+
+	};
+
+	this.channelSearch = function channelSearch()
+	{
+		var url = $('channel').options[$('channel').selectedIndex].value +
+			encodeURIComponent($F('keyword'));
+
+		popupPage(600,800,'<bean:message key="oscarEncounter.Index.popupSearchPageWindow"/>', url);
+
+		return false;
+	};
+
+	/**
+	 * Allows calculators to be opened by clicking on them in a select menu.  This is needed for cross-platform
+	 * functionality to achieve an effect similar to onClick for a select option element.
+	 * (onClick on the option element doesn't work in Chrome (or IE), and onClick on the select doesn't work in FireFox)
+	 *
+	 * @param calculatorMenu jQuery element referencing a select with urls as option values
+	 */
+	this.bindCalculatorListener = function bindCalculatorListener(calculatorMenu)
+	{
+		var me = this;
+		calculatorMenu.change(
+			function()
+			{
+				var x_size = calculatorMenu.attr('x_size'),
+					y_size = calculatorMenu.attr('y_size');
+
+				me.popperup(x_size, y_size, calculatorMenu.val(), calculatorMenu.text());
+
+				// Since we are listening for the change event, we need to account for the same calculator
+				// selected twice in a row.  A side effect is that the UI will be updated when we reset the
+				// value of the select menu to the default.  Here we're using the value "none" over a -1 index
+				// because this is the key to a disabled "title" element, whereas -1 will display an empty
+				// select menu.
+				calculatorMenu.val("none");
+			});
+	};
+
+	this.popperup = function popperup(vheight, vwidth, varpage, pageName)
+	{
+		//open a new popup window
+		var windowprops = "height=" + vheight + ",width=" + vwidth + ",status=yes,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=100,left=100";
+		var popup = window.open(varpage, pageName, windowprops);
+		popup.pastewin = opener;
+		popup.focus();
+	};
+
+	this.showMenu = function showMenu(menuNumber, eventObj)
+	{
+		var menuId = 'menu' + menuNumber;
+		return showPopup(menuId, eventObj);
 	};
 };

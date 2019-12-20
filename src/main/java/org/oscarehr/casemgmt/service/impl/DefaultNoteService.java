@@ -103,6 +103,10 @@ public class DefaultNoteService implements NoteService {
 		// Get one more result than needed to determine if there are more notes.
 		List<NoteTo1> noteList = cmeNotesDao.searchEncounterNotes(
 				criteria.getDemographicId(),
+				criteria.getProviders(),
+				criteria.getRoles(),
+				criteria.getIssues(),
+				criteria.getNoteSort(),
 				criteria.getMaxResults() + 1,
 				criteria.getFirstResult()
 		);

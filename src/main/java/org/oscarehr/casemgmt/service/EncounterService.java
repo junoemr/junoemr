@@ -23,12 +23,15 @@
 
 package org.oscarehr.casemgmt.service;
 
+import com.quatro.model.security.Secrole;
 import org.apache.log4j.Logger;
 import org.oscarehr.casemgmt.dto.EncounterHeader;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.model.ClientImage;
 import org.oscarehr.common.model.EncounterTemplate;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
@@ -198,7 +201,10 @@ public class EncounterService
 			Date encounterNoteHideBeforeDate,
 			String billingUrl,
 			String cmeJs,
-			List<EncounterTemplate> encounterTemplates
+			List<EncounterTemplate> encounterTemplates,
+			List<CaseManagementIssueTo1> issues,
+			List<Provider> providers,
+			List<Secrole> roles
 	)
 			throws UnsupportedEncodingException
 	{
@@ -341,6 +347,12 @@ public class EncounterService
 		encounterHeader.setCmeJs(cmeJs);
 
 		encounterHeader.setEncounterTemplates(encounterTemplates);
+
+		encounterHeader.setCaseManagementIssues(issues);
+
+		encounterHeader.setProviders(providers);
+
+		encounterHeader.setRoles(roles);
 
 		return encounterHeader;
 	}

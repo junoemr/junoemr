@@ -4,17 +4,21 @@ if (!window.Juno) window.Juno = {};
 if (!Juno.OscarEncounter) Juno.OscarEncounter = {};
 if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = {};
 if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.JunoEncounter.CaseManagementIssue =
-	function CaseManagementIssue(pageData)
+	function CaseManagementIssue(pageData, pageState)
 {
 	this.pageData = pageData;
 
-	this.displayResolvedIssues = function displayResolvedIssues(clickContext)
+	var issueIdToChange = null;
+	var changeModeResolved = null;
+
+		this.displayResolvedIssues = function displayResolvedIssues(clickContext)
 	{
 		this.showIssues(
 			clickContext,
 			'resolvedIssues',
 			'noteIssues-resolved',
-			'<bean:message key="oscarEncounter.referenceResolvedIssues.title"/>'
+			'<bean:message key="oscarEncounter.referenceResolvedIssues.title"/>',
+			true
 		);
 	};
 
@@ -24,11 +28,12 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 			clickContext,
 			'unresolvedIssues',
 			'noteIssues-unresolved',
-			'<bean:message key="oscarEncounter.referenceUnresolvedIssues.title"/>'
+			'<bean:message key="oscarEncounter.referenceUnresolvedIssues.title"/>',
+			false
 		);
 	};
 
-	this.showIssues = function showIssues(clickContext, method, divId, title)
+	this.showIssues = function showIssues(clickContext, method, divId, title, resolved)
 	{
 		var me = this;
 
@@ -45,7 +50,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 				}
 
 				jQuery('#' + divId).empty();
-				me.displayExistingIssueList(clickContext, response.body, divId, title);
+				me.displayExistingIssueList(clickContext, response.body, divId, title, resolved);
 			}
 		});
 	};
@@ -85,7 +90,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 		});
 	};
 
-	this.displayExistingIssueList = function displayExistingIssueList(clickContext, issueArray, divId, title)
+	this.displayExistingIssueList = function displayExistingIssueList(clickContext, issueArray, divId, title, resolved)
 	{
 		var assignedIssueIdArray = this.getIssueIdArray(pageState.currentAssignedCMIssues);
 
@@ -95,6 +100,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 			title: title,
 			issueArray: issueArray,
 			assignedIssueArray: assignedIssueIdArray,
+			resolved: (resolved ? 'true' : 'false'),
 			propertyArray: [
 				{
 					name: "acute",
@@ -313,12 +319,65 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 		var keyCode = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
 		if (keyCode === 13)
 		{
-			if (pageState.submitIssues)
-			{
-				$("asgnIssues").click();
-			}
-
 			return false;
 		}
+	};
+
+	this.getChangeIssueUrl = function getChangeIssueUrl(issueId, newIssueId)
+	{
+		return "../ws/rs/demographic" +
+			"/" + this.pageData.demographicNo +
+			"/caseManagementIssue" +
+			"/" + encodeURIComponent(issueId) +
+			"/updateIssue";
+	};
+
+	this.changeIssue = function changeIssue(clickContext)
+	{
+		var newIssueId = jQuery('input#issueSearchSelectedId').val();
+
+		if(!newIssueId)
+		{
+			return false;
+		}
+
+		var postData = {
+			newIssueId: newIssueId
+		};
+
+		var jsonString = JSON.stringify(postData);
+
+		var me = this;
+
+		jQuery.ajax({
+			type: "POST",
+			contentType: "application/json",
+			dataType: "json",
+			url: this.getChangeIssueUrl(issueIdToChange, newIssueId),
+			data: jsonString,
+			success: function (response)
+			{
+				if(changeModeResolved)
+				{
+					me.displayResolvedIssues(clickContext);
+				}
+				else
+				{
+					me.displayUnresolvedIssues(clickContext);
+				}
+
+				jQuery('input#issueSearchSelectedId').val("");
+				jQuery('input#issueSearchSelected').val("");
+			}
+		});
+	};
+
+	this.enableChangeMode = function enableChangeMode(issueId, resolved)
+	{
+		issueIdToChange = issueId;
+		changeModeResolved = resolved;
+
+		jQuery("#asgnIssues").hide();
+		jQuery("#changeIssues").show();
 	};
 };

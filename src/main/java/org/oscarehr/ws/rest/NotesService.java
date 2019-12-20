@@ -160,6 +160,10 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/{demographicNo}/all")
 	@Produces("application/json")
 	public RestResponse<NoteSelectionTo1> getNotesWithFilter(@PathParam("demographicNo") Integer demographicNo,
+	                                                         @QueryParam("providerNoFilter") List<String> providerNos,
+	                                                         @QueryParam("roleNoFilter") List<String> roleNos,
+															 @QueryParam("issueFilter") List<String> issues,
+															 @QueryParam("sortType") String sortType,
 	                                                         @QueryParam("numToReturn") @DefaultValue("20") Integer numToReturn,
 	                                                         @QueryParam("offset") @DefaultValue("0") Integer offset)
 	{
@@ -199,8 +203,12 @@ public class NotesService extends AbstractServiceImpl
 		criteria.setUserRole((String) se.getAttribute("userrole"));
 		criteria.setUserName((String) se.getAttribute("user"));
 
-		// Note order is not user selectable in this version yet
-		criteria.setNoteSort("observation_date_desc");
+		criteria.setProviders(providerNos);
+		criteria.setRoles(roleNos);
+		criteria.setIssues(issues);
+
+		criteria.setNoteSort(sortType);
+
 		criteria.setSliceFromEndOfList(false);
 
 		if(programId != null && !programId.trim().isEmpty())
