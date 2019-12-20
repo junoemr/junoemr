@@ -108,7 +108,7 @@
 					class="list-group-item">
 						<div ng-click="$ctrl.goToRecord(patient)"
 							class="list-group-clickable">
-							<h6>{{patient.name}}</h6>
+							<h5>{{patient.name}}</h5>
 						</div>
 
 					</a>
@@ -122,7 +122,7 @@
 							<div class="col-md-4 list-group-clickable"
 								ng-click="$ctrl.goToRecord(patient)">
 								<span class="span span-appointment-time">{{patient.startTime}}</span>
-								<h4>{{patient.name}}</h4>
+								<h5>{{patient.name}}</h5>
 								<span class="span span-appointment-reason">{{patient.reason}}</span>
 							</div>
 							<div class="col-md-2">

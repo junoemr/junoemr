@@ -28,12 +28,12 @@
 		padding-bottom: 6px;
 	}
 
+	h5 {
+		font-size: 17px;
+	}
+
 	.span {
-		@include juno-font-default();
 		@include juno-font-default-size(13px);
-		@include juno-font-body();
-		@include juno-font-body-small();
-		@include juno-font-body-smallest();
 		.span-appointment {
 			color: $color-neutral-dark-grey
 		}
