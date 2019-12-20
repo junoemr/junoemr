@@ -127,7 +127,7 @@ public class MeasurementDSHelper {
         double ret = -1;
 
         double[] mdbDataFieldRange = MeasurementGraphAction2.getParameters(mdb.getDataField(), "");
-        if (mdbDataFieldRange == null || mdbDataFieldRange.length < 1)
+        if (mdbDataFieldRange == null || mdbDataFieldRange.length == 0)
         {
             log.error("Error passing measurement value to chart. DataField is empty for ID: " + mdb.getId());
             return ret;
