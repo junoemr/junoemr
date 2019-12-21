@@ -34,7 +34,9 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.integration.iceFall.dao.IceFallCredentialsDao;
+import org.oscarehr.integration.iceFall.dao.IceFallLogDao;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
+import org.oscarehr.integration.iceFall.model.IceFallLog;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallCustomerLookupException;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallEmailExistsException;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallException;
@@ -42,7 +44,6 @@ import org.oscarehr.integration.iceFall.service.exceptions.IceFallNoSuchDoctorEx
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallPdfGenerationException;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallPrescriptionException;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallRESTException;
-import org.oscarehr.integration.iceFall.service.transfer.IceFallCreateCustomerResponseTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallCreateCustomerTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallCreatePrescriptionResponseTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallCreatePrescriptionTo1;
@@ -56,7 +57,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,6 +69,9 @@ public class IceFallService
 
 	@Autowired
 	IceFallRESTService iceFallRESTService;
+
+	@Autowired
+	IceFallLogDao iceFallLogDao;
 
 	@Autowired
 	DemographicExtDao demographicExtDao;
@@ -98,46 +101,37 @@ public class IceFallService
 		return creds;
 	}
 
-	/**
-	 * submit eform to ice fall
-	 * @param provider - the provider doing the submission
-	 * @param demo - the demographic to whom this eform pertains
-	 * @param templateId - the eform template id
-	 * @param isInstance - set to true if the templateId is an eform instance id (fdid);
-	 * @param eformValues - the eform values map (oscardb=)
-	 * @param request - httpservlet request
-	 * @param prescriptionInformation - the prescription information to be submitted to icefall.
-	 */
-	public void sendIceFallForm(Provider provider,
-															Demographic demo,
-															Integer templateId,
-															boolean isInstance,
-															Map<String, String> eformValues,
-															HttpServletRequest request,
-															IceFallSendFormTo1 prescriptionInformation)
+	public IceFallLog logIceFallError(String message, String sendingProviderNo, Integer formId, boolean formInstance)
 	{
-		sendIceFallForm(provider, demo, templateId, isInstance, eformValues, request.getScheme(), request.getContextPath(), prescriptionInformation);
+		return logIceFall(message, IceFallLog.STATUS.ERROR, sendingProviderNo, formId, formInstance);
+	}
+
+	public IceFallLog logIceFallSent(String message, String sendingProviderNo, Integer formId, boolean formInstance)
+	{
+		return logIceFall(message, IceFallLog.STATUS.SENT, sendingProviderNo, formId, formInstance);
+	}
+
+	public IceFallLog logIceFall(String message, IceFallLog.STATUS status, String sendingProviderNo, Integer formId, boolean formInstance)
+	{
+		IceFallLog iceFallLog = new IceFallLog();
+		iceFallLog.setMessage(message);
+		iceFallLog.setStatus(status);
+		iceFallLog.setSendingProviderNo(sendingProviderNo);
+		iceFallLog.setFormId(formId);
+		iceFallLog.setFormInstance(formInstance);
+
+		iceFallLogDao.persist(iceFallLog);
+		return iceFallLog;
 	}
 
 	/**
 	 * submit eform to ice fall
 	 * @param provider - the provider doing the submission
 	 * @param demo - the demographic to whom this eform pertains
-	 * @param templateId - the eform template id
-	 * @param isInstance - set to true if the templateId is an eform instance id (fdid);
-	 * @param eformValues - the eform values map (oscardb=)
-	 * @param httpSchema - the http schema of the server
-	 * @param contextPath - the context path of the server
+	 * @param pdfData - the pdf to send to iceFall (base64 encoded).
 	 * @param prescriptionInformation - the prescription information to be submitted to icefall.
 	 */
-	public void sendIceFallForm(Provider provider,
-															Demographic demo,
-															Integer templateId,
-															boolean isInstance,
-															Map<String, String> eformValues,
-															String httpSchema,
-															String contextPath,
-															IceFallSendFormTo1 prescriptionInformation)
+	public void sendIceFallForm(Provider provider, Demographic demo, String pdfData, IceFallSendFormTo1 prescriptionInformation)
 	{
 		//login to api
 		iceFallRESTService.authenticate();
@@ -156,11 +150,7 @@ public class IceFallService
 			canopyCustomerId = createIceFallCustomerForDemographic(demo);
 		}
 
-		sendPrescriptionToIceFall(
-						iceFallDocId,
-						canopyCustomerId,
-						prescriptionInformation,
-						getEformPDFDateForSubmission(provider, demo, templateId, eformValues, httpSchema, contextPath, isInstance));
+		sendPrescriptionToIceFall(iceFallDocId, canopyCustomerId, prescriptionInformation, pdfData);
 	}
 
 	protected void sendPrescriptionToIceFall(Integer iceFallDocId, Integer canopyCustomerId, IceFallSendFormTo1 prescriptionInformation, String pdfData)
@@ -271,28 +261,40 @@ public class IceFallService
 	 * get the eform as a base64 encoded pdf
 	 * @param provider - the provider to print the eform under
 	 * @param demographic - the demographic to whom the eform pertains
-	 * @param templateId - the eforms template id
+	 * @param formId - the eforms template id
 	 * @param eformValues - the eform values
 	 * @param httpSchema - the http schema to use
 	 * @param context - the context path to use
 	 * @return - a base64 encoded PDF
 	 */
-	protected String getEformPDFDateForSubmission(Provider provider, Demographic demographic, Integer templateId, Map<String, String> eformValues, String httpSchema, String context, boolean isInstance)
+	public String getEformPDFDateForPrescriptionSend(Provider provider, Demographic demographic, Integer formId, Map<String, String> eformValues, String httpSchema, String context, boolean isInstance)
+	{
+		EFormData eFormData = saveEFormForPrint(provider, demographic, formId, eformValues, isInstance);
+		return new String(printToPDF(eFormData.getId(), provider.getProviderNo(), httpSchema, context));
+	}
+
+	/**
+	 * save a new or update an existing eform. required before the form can be printed
+	 * @param provider - the provider to print the eform under
+	 * @param demographic - the demographic to whom the eform pertains
+	 * @param formId - the eforms template id
+	 * @param eformValues - the eform values
+	 * @param existingEForm - is this a new eform or not
+	 * @return
+	 */
+	public EFormData saveEFormForPrint(Provider provider, Demographic demographic, Integer formId, Map<String, String> eformValues, boolean existingEForm)
 	{
 		Map<String,String> formOpenerMap = new HashMap<>();
 		String subject = "Submitted to Ice Fall";
 		String eformLink = "";
-
-		EFormData eformData = null;
-		if (isInstance)
+		if (existingEForm)
 		{
-			eformData = eFormDataService.saveExistingEForm(templateId, demographic.getDemographicId(), Integer.parseInt(provider.getProviderNo()), subject, formOpenerMap, eformValues, eformLink);
+			return eFormDataService.saveExistingEForm(formId, demographic.getDemographicId(), Integer.parseInt(provider.getProviderNo()), subject, formOpenerMap, eformValues, eformLink);
 		}
 		else
 		{
-			eformData = eFormDataService.saveNewEForm(templateId, demographic.getDemographicId(), Integer.parseInt(provider.getProviderNo()), subject, formOpenerMap, eformValues, eformLink);
+			return eFormDataService.saveNewEForm(formId, demographic.getDemographicId(), Integer.parseInt(provider.getProviderNo()), subject, formOpenerMap, eformValues, eformLink);
 		}
-		return new String(printToPDF(eformData.getId(), provider.getProviderNo(), httpSchema, context));
 	}
 
 	/**
@@ -303,7 +305,7 @@ public class IceFallService
 	 * @param context - the context path of the oscar server.
 	 * @return - a byte array of the eform data.
 	 */
-	protected byte[] printToPDF(Integer fdid, String providerNo, String httpSchema, String context)
+	public byte[] printToPDF(Integer fdid, String providerNo, String httpSchema, String context)
 	{
 		String localUrl = WKHtmlToPdfUtils.getEformRequestUrl(providerNo,
 						"", httpSchema, context);

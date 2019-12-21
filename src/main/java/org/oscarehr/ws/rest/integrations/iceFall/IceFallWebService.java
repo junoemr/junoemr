@@ -28,6 +28,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
 import org.oscarehr.integration.iceFall.service.IceFallRESTService;
 import org.oscarehr.integration.iceFall.service.IceFallService;
@@ -137,18 +138,42 @@ public class IceFallWebService extends AbstractServiceImpl
 			eformId = iceFallSendFormTo1.getFdid();
 		}
 
+
+		EFormData saveEFormForPrint = null;
 		try
 		{
-			iceFallService.sendIceFallForm(provider, demo, eformId, isInstance, eformValues, getHttpServletRequest(), iceFallSendFormTo1);
+			// save eform & prepare pdf for submission
+			saveEFormForPrint = iceFallService.saveEFormForPrint(provider, demo, eformId, eformValues, isInstance);
+			String pdfData = new String(iceFallService.printToPDF(saveEFormForPrint.getId(), provider.getProviderNo(), getHttpServletRequest().getScheme(), getHttpServletRequest().getContextPath()));
+			// submit
+			iceFallService.sendIceFallForm(provider, demo, pdfData, iceFallSendFormTo1);
 		}
 		catch (IceFallException e)
 		{
 			MiscUtils.getLogger().error("Failed to send IceFall Prescription due to exception", e);
+			if (saveEFormForPrint != null)
+			{
+				iceFallService.logIceFallError(e.getUserErrorMessage(provider), provider.getProviderNo(), saveEFormForPrint.getId(), false);
+			}
+			else
+			{
+				iceFallService.logIceFallError(e.getUserErrorMessage(provider), provider.getProviderNo(), eformId, isInstance);
+			}
+
 			return RestResponse.errorResponse(e.getUserErrorMessage(provider));
 		}
 		catch (IceFallRESTException e)
 		{
 			MiscUtils.getLogger().error("Failed to send IceFall Prescription due to REST exception", e);
+			if (saveEFormForPrint != null)
+			{
+				iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider), provider.getProviderNo(), saveEFormForPrint.getId(), false);
+			}
+			else
+			{
+				iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider), provider.getProviderNo(), eformId, isInstance);
+			}
+
 			return RestResponse.errorResponse(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider));
 		}
 

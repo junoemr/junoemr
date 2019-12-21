@@ -24,30 +24,14 @@
 package org.oscarehr.integration.iceFall.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.integration.iceFall.model.IceFallCredentials;
+import org.oscarehr.integration.iceFall.model.IceFallLog;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.Query;
-
 @Repository
-public class IceFallCredentialsDao extends AbstractDao<IceFallCredentials>
+public class IceFallLogDao extends AbstractDao<IceFallLog>
 {
-	public IceFallCredentialsDao()
+	public IceFallLogDao()
 	{
-		super(IceFallCredentials.class);
-	}
-
-	public IceFallCredentials getCredentials()
-	{
-		Query query = entityManager.createQuery("FROM IceFallCredentials i");
-		IceFallCredentials creds = getSingleResultOrNull(query);
-		if (creds != null)
-		{
-			return creds;
-		}
-		else
-		{
-			return new IceFallCredentials();
-		}
+		super(IceFallLog.class);
 	}
 }
