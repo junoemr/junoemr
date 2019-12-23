@@ -4,9 +4,11 @@ if (!window.Juno) window.Juno = {};
 if (!Juno.OscarEncounter) Juno.OscarEncounter = {};
 if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = {};
 
-if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEncounter.EncounterNote = function EncounterNote(pageData, pageState)
+if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEncounter.EncounterNote =
+	function EncounterNote(pageData, pageState, junoEncounter)
 {
 	this.pageData = pageData;
+	this.junoEncounter = junoEncounter;
 
 	var AUTO_SAVE_DELAY = 5000;
 
@@ -14,6 +16,28 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	var lastTmpSaveNote = null;
 	var autoSaveTimer = null;
 	var notesRetrieveOk = false;
+
+	this.loadNotes = function loadNotes()
+	{
+		var demographicNo = this.pageData.demographicNo;
+
+		// Load a few extra notes initially, hopefully fill up the page
+		var me = this;
+		this.notesLoader(
+			this.pageData.contextPath,
+			0,
+			this.pageData.notesIncrement * 2,
+			demographicNo,
+			true
+		).then(function ()
+		{
+			pageState.notesOffset += (pageData.notesIncrement * 2);
+			pageState.notesScrollCheckInterval = setInterval(function ()
+			{
+				me.notesIncrementAndLoadMore(demographicNo)
+			}, 50);
+		});
+	};
 
 	this.pasteToEncounterNote = function pasteToEncounterNote(txt)
 	{
@@ -984,5 +1008,42 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		currentNoteText += jQuery("#noteEditTxt").val();
 
 		jQuery("#caseNote_note" + noteId).val(currentNoteText);
+	};
+
+	this.spellCheck = function spellCheck()
+	{
+		var noteId = jQuery("input#editNoteId").val();
+		var caseNote = "caseNote_note" + noteId;
+
+		// Build an array of form elements (not there values)
+		var elements = new Array(0);
+
+		// Your form elements that you want to have spell checked
+		elements[elements.length] = document.getElementById(caseNote);
+
+		// Start the spell checker
+		startSpellCheck(this.pageData.contextPath + '/jspspellcheck/',elements);
+	};
+
+	this.onClosing = function onClosing()
+	{
+		var noteId = jQuery("input#editNoteId").val();
+
+		// Prepare data
+		var noteData = this.getNoteDataById(noteId);
+
+		// Save unfinished note on exit. The temp save stuff added in Oscar15 is too fragile
+		// to depend on
+
+		// Trim the notes because that happens when the note is saved
+		if(pageState.currentNoteData.note.trim() != noteData.note.trim())
+		{
+			this.saveEncounterNote(false, false, true, false, false);
+		}
+
+		// Tell child measurement windows that we're leaving
+		this.junoEncounter.cleanUpWindows();
+
+		return null;
 	};
 };

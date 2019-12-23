@@ -62,6 +62,7 @@ import org.oscarehr.casemgmt.service.EncounterTicklerService;
 import org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService;
 import org.oscarehr.casemgmt.web.formbeans.JunoEncounterFormBean;
 import org.oscarehr.common.dao.EncounterTemplateDao;
+import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.EncounterTemplate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.UserProperty;
@@ -206,6 +207,9 @@ public class JunoEncounterAction extends DispatchActionSupport
 	@Autowired
 	private RolesManager rolesManager;
 
+	@Autowired
+	private UserPropertyDAO userPropertyDAO;
+
 	public ActionForward execute(
 		ActionMapping mapping,
 		ActionForm form,
@@ -220,6 +224,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		HttpSession session = request.getSession();
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String roleName = request.getSession().getAttribute("userrole") + "," + request.getSession().getAttribute("user");
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
 
 		EctSessionBean encounterSessionBean =
 				(EctSessionBean) session.getAttribute("EctSessionBean");
@@ -281,7 +286,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		//CaseManagementNote caseNote = cform.getCaseNote();
 
 		String billingUrl = billingUrlService.buildUrl(
-				loggedInInfo.getLoggedInProviderNo(),
+				providerNo,
 				encounterSessionBean.getDemographicNo(),
 				region, // ??
 				appointmentNo,
@@ -301,7 +306,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		List<CaseManagementIssue> issues = caseManagementIssueService.getIssues(
 				loggedInInfo,
 				encounterSessionBean.demographicNo,
-				loggedInInfo.getLoggedInProviderNo(),
+				providerNo,
 				programId,
 				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_ALL
 		);
@@ -321,12 +326,41 @@ public class JunoEncounterAction extends DispatchActionSupport
 
 		List<Secrole> roles = rolesManager.getRoles();
 
+		UserProperty userPropertyHeight = userPropertyDAO.getProp(providerNo, "encounterWindowHeight");
+		UserProperty userPropertyWidth = userPropertyDAO.getProp(providerNo, "encounterWindowWidth");
+		UserProperty userPropertyMaximize = userPropertyDAO.getProp(providerNo, "encounterWindowMaximize");
+
+		boolean encounterWindowCustomSize = false;
+		String encounterWindowHeight = "";
+		String encounterWindowWidth = "";
+
+		try
+		{
+			encounterWindowHeight = String.valueOf(Integer.parseInt(userPropertyHeight.getValue()));
+			encounterWindowWidth = String.valueOf(Integer.parseInt(userPropertyWidth.getValue()));
+
+			if(encounterWindowHeight != null && encounterWindowWidth != null)
+			{
+				encounterWindowCustomSize = true;
+			}
+		}
+		catch(NumberFormatException e)
+		{
+			// Do nothing, don't set the values
+		}
+
+		boolean encounterWindowMaximize = false;
+		if(UserProperty.BOOLEAN_TRUE.equals(userPropertyMaximize.getValue()))
+		{
+			encounterWindowMaximize = true;
+		}
+
 
 		// Get data for the header
 		junoEncounterForm.setHeader(
 			encounterService.getEncounterHeader(
 				user,
-				loggedInInfo.getLoggedInProviderNo(),
+				providerNo,
 				roleName,
 				encounterSessionBean.demographicNo,
 				encounterSessionBean.familyDoctorNo,
@@ -351,7 +385,11 @@ public class JunoEncounterAction extends DispatchActionSupport
 				encounterTemplates,
 				issueTo1s,
 				providers,
-				roles
+				roles,
+				encounterWindowCustomSize,
+				encounterWindowHeight,
+				encounterWindowWidth,
+				encounterWindowMaximize
 			)
 		);
 

@@ -9,6 +9,92 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 	var openWindows = {};
 	var measurementWindows = [];
 
+	this.monkeyPatches = function monkeyPatches()
+	{
+		// This was messing up the serialization of arrays to JSON so I removed it.
+		delete Array.prototype.toJSON;
+
+		// Monkey Patch from https://stackoverflow.com/a/16208232
+		if (typeof jQuery.when.all === 'undefined')
+		{
+			jQuery.when.all = function (deferreds)
+			{
+				return jQuery.Deferred(function (def)
+				{
+					jQuery.when.apply(jQuery, deferreds).then(
+						function ()
+						{
+							def.resolveWith(this, [Array.prototype.slice.call(arguments)]);
+						},
+						function ()
+						{
+							def.rejectWith(this, [Array.prototype.slice.call(arguments)]);
+						});
+				});
+			}
+		}
+
+		Date.prototype.toJSON = function ()
+		{
+			return moment(this).format();
+		};
+	};
+
+	this.resizeContent = function resizeContent()
+	{
+		// Resize the content to fit the window
+		if (parseInt(navigator.appVersion) > 3)
+		{
+			var windowHeight = 750;
+			if (navigator.appName == "Netscape")
+			{
+				windowHeight = window.innerHeight;
+			}
+			if (navigator.appName.indexOf("Microsoft") != -1)
+			{
+				windowHeight = document.body.offsetHeight;
+			}
+
+			var divHeight = windowHeight - 280;
+			$("encMainDiv").style.height = divHeight + 'px';
+		}
+	};
+
+	this.configureNifty = function configureNifty()
+	{
+		// Configure nifty
+		if (!NiftyCheck())
+		{
+			return false;
+		}
+
+		Rounded("div.showEdContent", "all", "transparent", "#CCCCCC", "big border #000000");
+		Rounded("div.printOps", "all", "transparent", "#CCCCCC", "big border #000000");
+
+		return true;
+	};
+
+	this.configureCalendar = function configureCalendar()
+	{
+		// Calendar configuration
+		Calendar.setup({
+			inputField: "printStartDate",
+			ifFormat: "%d-%b-%Y",
+			showsTime: false,
+			button: "printStartDate_cal",
+			singleClick: true,
+			step: 1
+		});
+		Calendar.setup({
+			inputField: "printEndDate",
+			ifFormat: "%d-%b-%Y",
+			showsTime: false,
+			button: "printEndDate_cal",
+			singleClick: true,
+			step: 1
+		});
+	};
+
 	this.checkLengthOfObject = function checkLengthOfObject(o)
 	{
 		var c = 0;
@@ -386,5 +472,52 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 	{
 		var menuId = 'menu' + menuNumber;
 		return showPopup(menuId, eventObj);
+	};
+
+	this.setWindowSize = function setWindowSize()
+	{
+		if(this.pageData.encounterWindowMaximize)
+		{
+			jQuery(document).ready(function(){window.resizeTo(screen.width,screen.height);});
+		}
+		else if(this.pageData.encounterWindowCustomSize)
+		{
+			window.resizeTo(pageData.encounterWindowWidth,pageData.encounterWindowHeight);
+		}
+	};
+
+	this.configureCalculator = function configureCalculator()
+	{
+		var calculatorMenu = jQuery('#calculators_menu');
+		junoEncounter.bindCalculatorListener(calculatorMenu);
+	};
+
+	this.configureMultiSearchAutocomplete = function configureMultiSearchAutocomplete()
+	{
+		// Multi-search autocomplete
+		var searchAutocompleteUrl = "../ws/rs/encounterSections/" + this.pageData.demographicNo + "/autocomplete/";
+
+		jQuery("#enTemplate").autocomplete({
+			source: function(request, response)
+			{
+				jQuery.getJSON(searchAutocompleteUrl + request.term, function(data)
+				{
+					response(jQuery.map(data.body, function(section, index)
+					{
+						return {
+							label: section.text,
+							value: section.onClick
+						};
+					}));
+				});
+			},
+			select: function(event, ui)
+			{
+				new Function(ui.item.value)();
+				event.preventDefault();
+			},
+			minLength: 2,
+			delay: 100
+		});
 	};
 };

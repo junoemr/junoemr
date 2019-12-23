@@ -4,9 +4,10 @@ if (!window.Juno) window.Juno = {};
 if (!Juno.OscarEncounter) Juno.OscarEncounter = {};
 if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = {};
 if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.JunoEncounter.CaseManagementIssue =
-	function CaseManagementIssue(pageData, pageState)
+	function CaseManagementIssue(pageData, pageState, encounterNote)
 {
 	this.pageData = pageData;
+	this.encounterNote = encounterNote;
 
 	var issueIdToChange = null;
 	var changeModeResolved = null;
@@ -379,5 +380,120 @@ if (!Juno.OscarEncounter.JunoEncounter.CaseManagementIssue) Juno.OscarEncounter.
 
 		jQuery("#asgnIssues").hide();
 		jQuery("#changeIssues").show();
+	};
+
+
+
+
+	this.saveIssueId = function saveIssueId(txtField, listItem)
+	{
+		jQuery('input#issueSearchSelectedId').val(listItem.id);
+		jQuery('input#issueSearchSelected').val(listItem.innerHTML);
+	};
+
+	this.addIssueToCPP = function addIssueToCPP(txtField, listItem)
+	{
+		var nodeId = listItem.id;
+		var issueDescription = listItem.innerHTML;
+		caseManagementIssue.addIssue(
+			"frmIssueNotes",
+			"issueIdList",
+			"issueAutocompleteCPP",
+			nodeId,
+			issueDescription
+		);
+
+		$("issueChange").value = true;
+	};
+
+	this.autoCompleteShowMenuCPP = function autoCompleteShowMenuCPP(element, update)
+	{
+		Effect.Appear($("issueListCPP"), {duration: 0.15});
+		Effect.Appear(update, {duration: 0.15});
+	};
+
+	this.autoCompleteHideMenuCPP = function autoCompleteHideMenuCPP(element, update)
+	{
+		new Effect.Fade(update, {duration: 0.15});
+		new Effect.Fade($("issueListCPP"), {duration: 0.15});
+	};
+
+	this.autoCompleteShowMenu = function autoCompleteShowMenu(element, update)
+	{
+		$("issueList").style.left = $("mainContent").style.left;
+		$("issueList").style.top = $("mainContent").style.top;
+		$("issueList").style.width = $("issueAutocompleteList").style.width;
+
+		Effect.Appear($("issueList"), {duration: 0.15});
+		Effect.Appear($("issueTable"), {duration: 0.15});
+		Effect.Appear(update, {duration: 0.15});
+	};
+
+	this.autoCompleteHideMenu = function autoCompleteHideMenu(element, update)
+	{
+		new Effect.Fade(update, {duration: 0.15});
+		new Effect.Fade($("issueTable"), {duration: 0.15});
+		new Effect.Fade($("issueList"), {duration: 0.15});
+	};
+
+	this.configureIssueAutocompleteCPP = function configureIssueAutocompleteCPP()
+	{
+		var issueURL = pageData.contextPath + "/CaseManagementEntry.do" +
+			"?method=issueList" +
+			"&demographicNo=" + this.pageData.demographicNo +
+			"&providerNo=" + this.pageData.providerNo +
+			"&all=true";
+
+		var issueAutoCompleterCPP = new Ajax.Autocompleter(
+			"issueAutocompleteCPP",
+			"issueAutocompleteListCPP",
+			issueURL,
+			{
+				minChars: 3,
+				indicator: 'busy2',
+				afterUpdateElement: this.addIssueToCPP,
+				onShow: this.autoCompleteShowMenuCPP,
+				onHide: this.autoCompleteHideMenuCPP
+			}
+		);
+	};
+
+	this.configureIssueAutocomplete = function configureIssueAutocomplete()
+	{
+		var issueURL = pageData.contextPath + "/CaseManagementEntry.do" +
+			"?method=issueList" +
+			"&demographicNo=" + this.pageData.demographicNo +
+			"&providerNo=" + this.pageData.providerNo;
+
+		issueAutoCompleter = new Ajax.Autocompleter(
+			"issueAutocomplete",
+			"issueAutocompleteList",
+			issueURL,
+			{
+				minChars: 3,
+				indicator: 'busy',
+				afterUpdateElement: this.saveIssueId,
+				onShow: this.autoCompleteShowMenu,
+				onHide: this.autoCompleteHideMenu
+			}
+		);
+	};
+
+	this.configureIssueButtons = function configureIssueButtons()
+	{
+		// Click handlers for the resolved/unresolved issue buttons.  They pass in the
+		// jQuery object from this context because it wouldn't work with the local context
+		// inside the handler.  I don't know why, but this made it work.
+
+		var me = this;
+		jQuery('#displayResolvedIssuesButton').click({jQuery: jQuery}, function(event)
+		{
+			me.displayResolvedIssues(event.data);
+		});
+
+		jQuery('#displayUnresolvedIssuesButton').click({jQuery: jQuery}, function(event)
+		{
+			me.displayUnresolvedIssues(event.data);
+		});
 	};
 };

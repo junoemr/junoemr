@@ -204,7 +204,11 @@ public class EncounterService
 			List<EncounterTemplate> encounterTemplates,
 			List<CaseManagementIssueTo1> issues,
 			List<Provider> providers,
-			List<Secrole> roles
+			List<Secrole> roles,
+			boolean encounterWindowCustomSize,
+			String encounterWindowHeight,
+			String encounterWindowWidth,
+			boolean encounterWindowMaximize
 	)
 			throws UnsupportedEncodingException
 	{
@@ -353,6 +357,11 @@ public class EncounterService
 		encounterHeader.setProviders(providers);
 
 		encounterHeader.setRoles(roles);
+
+		encounterHeader.setEncounterWindowCustomSize(encounterWindowCustomSize);
+		encounterHeader.setEncounterWindowHeight(encounterWindowHeight);
+		encounterHeader.setEncounterWindowWidth(encounterWindowWidth);
+		encounterHeader.setEncounterWindowMaximize(encounterWindowMaximize);
 
 		return encounterHeader;
 	}

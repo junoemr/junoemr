@@ -71,6 +71,10 @@ public class EncounterHeader
 	private List<CaseManagementIssueTo1> caseManagementIssues;
 	private List<Provider> providers;
 	private List<Secrole> roles;
+	private boolean encounterWindowCustomSize;
+	private String encounterWindowHeight;
+	private String encounterWindowWidth;
+	private boolean encounterWindowMaximize;
 
 
 	public String getUserColour()
@@ -451,6 +455,46 @@ public class EncounterHeader
 	public void setRoles(List<Secrole> roles)
 	{
 		this.roles = roles;
+	}
+
+	public boolean isEncounterWindowCustomSize()
+	{
+		return encounterWindowCustomSize;
+	}
+
+	public void setEncounterWindowCustomSize(boolean encounterWindowCustomSize)
+	{
+		this.encounterWindowCustomSize = encounterWindowCustomSize;
+	}
+
+	public String getEncounterWindowHeight()
+	{
+		return encounterWindowHeight;
+	}
+
+	public void setEncounterWindowHeight(String encounterWindowHeight)
+	{
+		this.encounterWindowHeight = encounterWindowHeight;
+	}
+
+	public String getEncounterWindowWidth()
+	{
+		return encounterWindowWidth;
+	}
+
+	public void setEncounterWindowWidth(String encounterWindowWidth)
+	{
+		this.encounterWindowWidth = encounterWindowWidth;
+	}
+
+	public boolean isEncounterWindowMaximize()
+	{
+		return encounterWindowMaximize;
+	}
+
+	public void setEncounterWindowMaximize(boolean encounterWindowMaximize)
+	{
+		this.encounterWindowMaximize = encounterWindowMaximize;
 	}
 
 	//=============================================================================

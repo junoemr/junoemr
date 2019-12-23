@@ -130,6 +130,7 @@
 
 		<script type="text/javascript"
 				src="<c:out value="${ctx}/casemgmt/EncounterTimer.js"/>"></script>
+		<script type="text/javascript" src="<c:out value="${ctx}"/>/jspspellcheck/spellcheck-caller.js"></script>
 
 		<script type="text/javascript">
 
@@ -172,8 +173,12 @@
 				appointmentDate: "<c:out value='${junoEncounterForm.appointmentDate}' />",
 				cmeJs: "<c:out value='${junoEncounterForm.header.cmeJs}' />",
 				billingUrl: "<c:out value='${junoEncounterForm.header.billingUrl}' />",
-				encounterTypeArray: getEncounterTypeArray(),
+				encounterWindowCustomSize: ("<c:out value="${junoEncounterForm.header.encounterWindowCustomSize}" />" == "true"),
+				encounterWindowHeight: "<c:out value="${junoEncounterForm.header.encounterWindowHeight}" />",
+				encounterWindowWidth: "<c:out value="${junoEncounterForm.header.encounterWindowWidth}" />",
+				encounterWindowMaximize: ("<c:out value="${junoEncounterForm.header.encounterWindowMaximize}" />" == "true"),
 				imagePresentPlaceholderUrl: "<c:out value='${fn:escapeXml(junoEncounterForm.header.imagePresentPlaceholderUrl)}' />",
+				encounterTypeArray: getEncounterTypeArray(),
 				editUnsignedMsg: "<bean:message key="oscarEncounter.editUnsignedNote.msg"/>",
 				printDateMsg: "<bean:message key="oscarEncounter.printDate.msg"/>",
 				printDateOrderMsg: "<bean:message key="oscarEncounter.printDateOrder.msg"/>",
@@ -207,7 +212,7 @@
 			var cppNote = new Juno.OscarEncounter.JunoEncounter.CppNote(pageData, junoEncounter);
 
 			<%@ include file="js/JunoEncounter/EncounterNote.js" %>
-			var encounterNote = new Juno.OscarEncounter.JunoEncounter.EncounterNote(pageData, pageState);
+			var encounterNote = new Juno.OscarEncounter.JunoEncounter.EncounterNote(pageData, pageState, junoEncounter);
 
 			<%@ include file="js/JunoEncounter/CaseManagementIssue.js" %>
 			var caseManagementIssue = new Juno.OscarEncounter.JunoEncounter.CaseManagementIssue(pageData, pageState);
@@ -243,256 +248,45 @@
 				return junoEncounter.popupPage(vheight, vwidth, name, varpage);
 			}
 
-			function onClosing()
-			{
-				var noteId = jQuery("input#editNoteId").val();
-
-				// Prepare data
-				var noteData = encounterNote.getNoteDataById(noteId);
-
-				// Save unfinished note on exit. The temp save stuff added in Oscar15 is too fragile
-				// to depend on
-
-				// Trim the notes because that happens when the note is saved
-				if(pageState.currentNoteData.note.trim() != noteData.note.trim())
-				{
-					encounterNote.saveEncounterNote(false, false, true, false, false);
-				}
-
-				// Tell child measurement windows that we're leaving
-				junoEncounter.cleanUpWindows();
-
-				return null;
-			}
-
-
-			<%-- ============================================================================== --%>
-			<%-- Autocomplete helper functions                                                  --%>
-			<%-- ============================================================================== --%>
-
-			function saveIssueId(txtField, listItem)
-			{
-				jQuery('input#issueSearchSelectedId').val(listItem.id);
-				jQuery('input#issueSearchSelected').val(listItem.innerHTML);
-			}
-
-			function addIssueToCPP(txtField, listItem)
-			{
-				var nodeId = listItem.id;
-				var issueDescription = listItem.innerHTML;
-				caseManagementIssue.addIssue("frmIssueNotes", "issueIdList", "issueAutocompleteCPP", nodeId, issueDescription);
-
-				$("issueChange").value = true;
-			}
-
-			function autoCompleteShowMenuCPP(element, update)
-			{
-				Effect.Appear($("issueListCPP"), {duration: 0.15});
-				Effect.Appear(update, {duration: 0.15});
-			}
-
-			function autoCompleteHideMenuCPP(element, update)
-			{
-				new Effect.Fade(update, {duration: 0.15});
-				new Effect.Fade($("issueListCPP"), {duration: 0.15});
-			}
-
-			function autoCompleteShowMenu(element, update)
-			{
-				$("issueList").style.left = $("mainContent").style.left;
-				$("issueList").style.top = $("mainContent").style.top;
-				$("issueList").style.width = $("issueAutocompleteList").style.width;
-
-				Effect.Appear($("issueList"), {duration: 0.15});
-				Effect.Appear($("issueTable"), {duration: 0.15});
-				Effect.Appear(update, {duration: 0.15});
-			}
-
-			function autoCompleteHideMenu(element, update)
-			{
-				new Effect.Fade(update, {duration: 0.15});
-				new Effect.Fade($("issueTable"), {duration: 0.15});
-				new Effect.Fade($("issueList"), {duration: 0.15});
-			}
-
 
 
 			<%-- ============================================================================== --%>
 			<%-- init                                                                           --%>
 			<%-- ============================================================================== --%>
 
+			<%-- this runs on $(document).ready() --%>
 			function init()
 			{
-				var oceanHeight = 0;
+				junoEncounter.monkeyPatches();
+
 				if(junoEncounter.showOceanToolbar())
 				{
 					jQuery.ajax({ url: "../eform/displayImage.do?imagefile=oceanToolbar.js", cache: true, dataType: "script" });
-					oceanHeight = 28;
 				}
 
-				if (parseInt(navigator.appVersion) > 3)
-				{
-					var windowHeight = 750;
-					if (navigator.appName == "Netscape")
-					{
-						windowHeight = window.innerHeight;
-					}
-					if (navigator.appName.indexOf("Microsoft") != -1)
-					{
-						windowHeight = document.body.offsetHeight;
-					}
+				junoEncounter.resizeContent();
 
-					// XXX: this seems like it generally won't work (ocean, etc.)
-					var divHeight = windowHeight - (320 + oceanHeight);
-					$("encMainDiv").style.height = divHeight + 'px';
-				}
-
-				// This was messing up the serialization of arrays to JSON so I removed it.
-				delete Array.prototype.toJSON;
-
-				// Monkey Patch from https://stackoverflow.com/a/16208232
-				if (typeof jQuery.when.all === 'undefined')
-				{
-					jQuery.when.all = function (deferreds)
-					{
-						return jQuery.Deferred(function (def)
-						{
-							jQuery.when.apply(jQuery, deferreds).then(
-								function ()
-								{
-									def.resolveWith(this, [Array.prototype.slice.call(arguments)]);
-								},
-								function ()
-								{
-									def.rejectWith(this, [Array.prototype.slice.call(arguments)]);
-								});
-						});
-					}
-				}
-
-
-				Date.prototype.toJSON = function ()
-				{
-					return moment(this).format();
-				}
-
-				if (!NiftyCheck())
+				if(!junoEncounter.configureNifty())
 				{
 					return;
 				}
 
-				Rounded("div.showEdContent", "all", "transparent", "#CCCCCC", "big border #000000");
-				Rounded("div.printOps", "all", "transparent", "#CCCCCC", "big border #000000");
-				Calendar.setup({
-					inputField: "printStartDate",
-					ifFormat: "%d-%b-%Y",
-					showsTime: false,
-					button: "printStartDate_cal",
-					singleClick: true,
-					step: 1
-				});
-				Calendar.setup({
-					inputField: "printEndDate",
-					ifFormat: "%d-%b-%Y",
-					showsTime: false,
-					button: "printEndDate_cal",
-					singleClick: true,
-					step: 1
-				});
+				junoEncounter.configureCalendar();
 
-				<c:url value="/CaseManagementEntry.do" var="issueURLCPP">
-				<c:param name="method" value="issueList"/>
-				<c:param name="demographicNo" value="${junoEncounterForm.header.demographicNo}" />
-				<c:param name="providerNo" value="${junoEncounterForm.header.providerNo}" />
-				<c:param name="all" value="true" />
-				</c:url>
+				junoEncounter.configureCalculator();
 
-				<nested:notEmpty name="DateError">
-				alert("<nested:write name="DateError"/>");
-				</nested:notEmpty>
+				caseManagementIssue.configureIssueButtons();
 
-				var calculatorMenu = jQuery('#calculators_menu');
-				junoEncounter.bindCalculatorListener(calculatorMenu);
+				caseManagementIssue.configureIssueAutocompleteCPP();
+				caseManagementIssue.configureIssueAutocomplete();
 
-				// Click handlers for the resolved/unresolved issue buttons.  They pass in the
-				// jQuery object from this context because it wouldn't work with the local context
-				// inside the handler.  I don't know why, but this made it work.
-				jQuery('#displayResolvedIssuesButton').click({jQuery: jQuery}, function(event)
-				{
-					caseManagementIssue.displayResolvedIssues(event.data);
-				});
-				jQuery('#displayUnresolvedIssuesButton').click({jQuery: jQuery}, function(event)
-				{
-					caseManagementIssue.displayUnresolvedIssues(event.data);
-				});
+				encounterNote.loadNotes();
 
-				var issueAutoCompleterCPP = new Ajax.Autocompleter(
-					"issueAutocompleteCPP",
-					"issueAutocompleteListCPP",
-					"<c:out value="${issueURLCPP}" />",
-					{
-						minChars: 3,
-						indicator: 'busy2',
-						afterUpdateElement: addIssueToCPP,
-						onShow: autoCompleteShowMenuCPP,
-						onHide: autoCompleteHideMenuCPP
-					}
-				);
+				junoEncounter.configureMultiSearchAutocomplete();
 
-				var issueURL = pageData.contextPath + "/CaseManagementEntry.do" +
-					"?method=issueList" +
-					"&demographicNo=" + this.pageData.demographicNo +
-					"&providerNo=" + this.pageData.providerNo;
-				issueAutoCompleter = new Ajax.Autocompleter("issueAutocomplete", "issueAutocompleteList", issueURL, {
-					minChars: 3,
-					indicator: 'busy',
-					afterUpdateElement: saveIssueId,
-					onShow: autoCompleteShowMenu,
-					onHide: autoCompleteHideMenu
-				});
+				window.onbeforeunload = junoEncounter.onClosing;
 
-				//var calculatorMenu = jQuery('#calculators_menu');
-
-				//notesIncrement = parseInt("<%=OscarProperties.getInstance().getProperty("num_loaded_notes", "20") %>");
-
-				var demographicNo = this.pageData.demographicNo;
-
-				// Load a few extra notes initially, hopefully fill up the page
-				encounterNote.notesLoader(pageData.contextPath, 0, pageData.notesIncrement * 2, demographicNo, true).then(function ()
-				{
-					pageState.notesOffset += (pageData.notesIncrement * 2);
-					pageState.notesScrollCheckInterval = setInterval(function ()
-					{
-						encounterNote.notesIncrementAndLoadMore(demographicNo)
-					}, 50);
-				});
-
-				// Multi-search autocomplete
-				var searchAutocompleteUrl = "../ws/rs/encounterSections/" + this.pageData.demographicNo + "/autocomplete/";
-				jQuery("#enTemplate").autocomplete({
-					source: function(request, response)
-					{
-						jQuery.getJSON(searchAutocompleteUrl + request.term, function(data)
-						{
-							response(jQuery.map(data.body, function(section, index)
-							{
-								return {
-									label: section.text,
-									value: section.onClick
-								};
-							}));
-						});
-					},
-					select: function(event, ui)
-					{
-						new Function(ui.item.value)();
-						event.preventDefault();
-					},
-					minLength: 2,
-					delay: 100
-				});
-
-				window.onbeforeunload = onClosing;
+				junoEncounter.setWindowSize();
 			}
 
 		</script>
@@ -853,1154 +647,821 @@
 		</div>
 		</c:forEach>
 
-		<div id="content"
-			 style="display: inline; float: left; width: 60%; background-color: #CCCCFF;">
+		<div id="content" style="display: inline; float: left; width: 60%; background-color: #CCCCFF;">
 
-					<%
+			<%
 			// =================================================================================
 			// CPP boxes (four boxes at the top)
 			// =================================================================================
 			%>
 			<div id="cppBoxes">
 
-				<c:forEach items="${junoEncounterForm.cppNoteSections}" var="sectionName"
-						   varStatus="loop">
+				<c:forEach items="${junoEncounterForm.cppNoteSections}" var="sectionName" varStatus="loop">
 
-					<c:set var="section" scope="page"
-						   value="${junoEncounterForm.sections[sectionName]}"/>
+					<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}"/>
 
-				<!-- show div on 1 -->
-				<c:if test="${loop.index == 0}">
-				<div id="divR1"
-					 style="width: 100%; height: 75px; margin: 0; background-color: #FFFFFF;">
+					<!-- show div on 1 -->
+					<c:if test="${loop.index == 0}">
+						<div id="divR1" style="width: 100%; height: 75px; margin: 0; background-color: #FFFFFF;">
 					</c:if>
 
 					<!-- show div on 3 -->
 					<c:if test="${loop.index == 2}">
-					<div id="divR2"
-						 style="width: 100%; height: 75px; margin-top: 0; background-color: #FFFFFF;">
-						</c:if>
+						<div id="divR2" style="width: 100%; height: 75px; margin-top: 0; background-color: #FFFFFF;">
+					</c:if>
+
+					<!--Ongoing Concerns cell -->
+					<c:if test="${loop.index == 0}">
+						<div id="divR1I1" class="topBox" style="float: left; width: 49%; margin-left: 3px; height: inherit;">
+					</c:if>
+
+					<c:if test="${loop.index == 1}">
+						<div id="divR1I2" class="topBox"
+							 style="float: right; width: 49%; margin-right: 3px; height: inherit;">
+					</c:if>
+
+					<c:if test="${loop.index == 2}">
+						<div id="divR2I1" class="topBox"
+							 style="clear: left; float: left; width: 49%; margin-left: 3px; height: inherit;">
+					</c:if>
+
+					<c:if test="${loop.index == 3}">
+						<div id="divR2I2" class="topBox"
+							 style="clear: right; float: right; width: 49%; margin-right: 3px; height: inherit;">
+					</c:if>
 
 
-						<!--Ongoing Concerns cell -->
-						<c:if test="${loop.index == 0}">
-						<div id="divR1I1" class="topBox"
-							 style="float: left; width: 49%; margin-left: 3px; height: inherit;">
-							</c:if>
+					<div style="width: 10%; float: right; text-align: center;">
+						<h3 style="padding:0px; background-color: ${section.colour}">
+							<a href="javascript:void(0);"
+							   onclick="${section.onClickPlus};return false;"
+							>+</a>
+						</h3>
+					</div>
+					<div style="clear: left; float: left; width: 90%;">
+						<h3 style="width:100%; background-color: ${section.colour}">
+							<a href="javascript:void(0);"
+							   onclick="${section.onClickTitle};return false;">
+								<bean:message key="${section.titleKey}"/>
+							</a>
+						</h3>
+					</div>
+					<div style="clear: both; height: calc(100% - 10px); overflow: auto;">
+						<ul id="${sectionName}list" style="margin-left: 5px;">
+							<c:forEach items="${section.notes}" var="note"
+									   varStatus="noteLoop">
+								<fmt:parseDate value="${note.updateDate}"
+											   pattern="yyyy-MM-dd'T'HH:mm"
+											   var="parsedUpdateDate"/>
+								<fmt:formatDate value="${parsedUpdateDate}"
+												pattern="dd-MMM-yyyy"
+												var="updateDate"/>
+								<fmt:parseDate value="${note.observationDate}"
+											   pattern="yyyy-MM-dd'T'HH:mm"
+											   var="parsedObservationDate"/>
+								<fmt:formatDate value="${parsedObservationDate}"
+												pattern="dd-MMM-yyyy"
+												var="observationDate"/>
+								<li class="${noteLoop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
+									<span id="spanListNote${fn:escapeXml(noteLoop.index)}">
+										<a class="topLinks"
+										   onmouseover="this.className='topLinkhover'"
+										   onmouseout="this.className='topLinks'"
+										   title="Rev:${note.revision} - Last update:${updateDate}"
+										   id="listNote${note.id}"
+										   href="#"
+										   onclick="${note.onClick}"
+										   style="width:100%;overflow:scroll;">
+												${fn:escapeXml(note.text)}
+										</a>
+									</span>
+								</li>
+							</c:forEach>
+						</ul>
+						<br />
+					</div>
 
-							<c:if test="${loop.index == 1}">
-							<div id="divR1I2" class="topBox"
-								 style="float: right; width: 49%; margin-right: 3px; height: inherit;">
-								</c:if>
+					</div>
 
-								<c:if test="${loop.index == 2}">
-								<div id="divR2I1" class="topBox"
-									 style="clear: left; float: left; width: 49%; margin-left: 3px; height: inherit;">
-									</c:if>
+					<!-- show end div on 1 and 3 -->
+					<c:if test="${loop.index == 1 or loop.index == 3}">
+						</div>
+					</c:if>
 
-									<c:if test="${loop.index == 3}">
-									<div id="divR2I2" class="topBox"
-										 style="clear: right; float: right; width: 49%; margin-right: 3px; height: inherit;">
-										</c:if>
+				</c:forEach>
+
+				<span style="visibility:hidden">test</span>
+			</div>
 
 
-										<div style="width: 10%; float: right; text-align: center;">
-											<h3 style="padding:0px; background-color: ${section.colour}">
-												<a href="javascript:void(0);"
-												   onclick="${section.onClickPlus};return false;"
-												>+</a>
-											</h3>
-										</div>
-										<div style="clear: left; float: left; width: 90%;">
-											<h3 style="width:100%; background-color: ${section.colour}">
-												<a href="javascript:void(0);"
-												   onclick="${section.onClickTitle};return false;">
-													<bean:message key="${section.titleKey}"/>
-												</a>
-											</h3>
-										</div>
-										<div style="clear: both; height: calc(100% - 10px); overflow: auto;">
-											<ul id="${sectionName}list" style="margin-left: 5px;">
-												<c:forEach items="${section.notes}" var="note"
-														   varStatus="noteLoop">
-													<fmt:parseDate value="${note.updateDate}"
-																   pattern="yyyy-MM-dd'T'HH:mm"
-																   var="parsedUpdateDate"/>
-													<fmt:formatDate value="${parsedUpdateDate}"
-																	pattern="dd-MMM-yyyy"
-																	var="updateDate"/>
-													<fmt:parseDate value="${note.observationDate}"
-																   pattern="yyyy-MM-dd'T'HH:mm"
-																   var="parsedObservationDate"/>
-													<fmt:formatDate value="${parsedObservationDate}"
-																	pattern="dd-MMM-yyyy"
-																	var="observationDate"/>
-													<li class="${noteLoop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
-											<span id="spanListNote${fn:escapeXml(noteLoop.index)}">
-												<a class="topLinks"
-												   onmouseover="this.className='topLinkhover'"
-												   onmouseout="this.className='topLinks'"
-												   title="Rev:${note.revision} - Last update:${updateDate}"
-												   id="listNote${note.id}"
-												   href="#"
-												   onclick="${note.onClick}"
-												   style="width:100%;overflow:scroll;">
-														${fn:escapeXml(note.text)}
-												</a>
-											</span>
+			<%
+				// =================================================================================
+				// Case Notes form and border etc.
+				// =================================================================================
+			%>
+			<div id="notCPP" style="height: 70%; margin-left: 2px; background-color: #FFFFFF;">
+
+				<html:form action="/CaseManagementView" method="post">
+					<div id="topContent"
+						 style="float: left; width: 100%; margin-right: -2px; padding-bottom: 1px; background-color: #CCCCFF; font-size: 10px;">
+
+						<div id="appliedFiltersProviders" style="float: left; margin-left: 10px; margin-top: 0px; display: none;">
+							<u><bean:message key="oscarEncounter.providers.title"/>:</u><br>
+
+							<div id="appliedFiltersProvidersContent">
+
+							</div>
+						</div>
+
+						<div id="appliedFiltersRoles" style="float: left; margin-left: 10px; margin-top: 0px; display: none;">
+							<u><bean:message key="oscarEncounter.roles.title"/>:</u><br>
+
+							<div id="appliedFiltersRolesContent">
+
+							</div>
+						</div>
+
+						<div id="appliedFiltersSort" style="float: left; margin-left: 10px; margin-top: 0px; display: none;">
+							<u><bean:message key="oscarEncounter.sort.title"/>:</u><br>
+
+							<div id="appliedFiltersSortContent">
+
+							</div>
+						</div>
+						<div id="appliedFiltersIssues" style="float: left; margin-left: 10px; margin-top: 0px; display: none;">
+							<u><bean:message key="oscarEncounter.issues.title"/>:</u><br>
+
+							<div id="appliedFiltersIssuesContent">
+
+							</div>
+						</div>
+
+						<div id="filter"
+							 style="display:none;background-color:#ddddff;padding:8px">
+							<input type="button"
+								   value="<bean:message key="oscarEncounter.showView.title" />"
+								   onclick="return noteFilter.filter(false);"/>
+							<input type="button"
+								   value="<bean:message key="oscarEncounter.resetFilter.title" />"
+								   onclick="return noteFilter.filter(true);"/>
+
+							<table style="border-collapse:collapse;width:100%;margin-left:auto;margin-right:auto">
+								<tr>
+									<td style="font-size:inherit;background-color:#bbbbff;font-weight:bold">
+										<bean:message
+												key="oscarEncounter.providers.title"/>
+									</td>
+									<td style="font-size:inherit;background-color:#bbbbff;border-left:solid #ddddff 4px;border-right:solid #ddddff 4px;font-weight:bold">
+										Role
+									</td>
+									<td style="font-size:inherit;background-color:#bbbbff;font-weight:bold">
+										<bean:message
+												key="oscarEncounter.sort.title"/>
+									</td>
+									<td style="font-size:inherit;background-color:#bbbbff;font-weight:bold">
+										<bean:message
+												key="oscarEncounter.issues.title"/>
+									</td>
+								</tr>
+								<tr>
+									<td style="font-size:inherit;background-color:#ccccff">
+										<div style="height:150px;overflow:auto">
+											<ul style="padding:0px;margin:0px;list-style:none inside none">
+												<li>
+													<input type="checkbox"
+														   name="filter_providers"
+														   value="a"
+														   onclick="noteFilter.filterCheckBox(this);" />
+													<bean:message key="oscarEncounter.sortAll.title"/>
+												</li>
+
+												<c:forEach items="${junoEncounterForm.header.providers}"
+														   var="provider"
+														   varStatus="loop">
+													<li>
+														<input type="checkbox"
+															   name="filter_providers"
+															   value="${provider.providerNo}"
+															   onclick="noteFilter.filterCheckBox(this);" />
+														<span id="filter_provider_name${provider.providerNo}">
+															<c:out value="${provider.formattedName}" />
+														</span>
 													</li>
+
 												</c:forEach>
 											</ul>
-											<br>
 										</div>
+									</td>
+									<td style="font-size:inherit;background-color:#ccccff;border-left:solid #ddddff 4px;border-right:solid #ddddff 4px">
+										<div style="height:150px;overflow:auto">
+											<ul style="padding:0px;margin:0px;list-style:none inside none">
+												<li>
+													<input type="checkbox"
+														   name="filter_roles"
+														   value="a"
+														   onclick="noteFilter.filterCheckBox(this);">
+													<bean:message key="oscarEncounter.sortAll.title"/>
+												</li>
 
-									</div>
+												<c:forEach items="${junoEncounterForm.header.roles}"
+														   var="role"
+														   varStatus="loop">
+													<li>
+														<input type="checkbox"
+																name="filter_roles"
+																value="${role.id}"
+																onclick="noteFilter.filterCheckBox(this);" />
+														<span id="filter_role_name${role.id}">
+															<c:out value="${role.name}" />
+														</span>
+													</li>
 
-									<!-- show div on 2 and 4 -->
-									<c:if test="${loop.index == 1 or loop.index == 3}">
+												</c:forEach>
+											</ul>
+										</div>
+									</td>
+									<td style="font-size:inherit;background-color:#ccccff">
+										<div style="height:150px;overflow:auto">
+											<ul style="padding:0px;margin:0px;list-style:none inside none">
+												<li><html:radio property="note_sort"
+																value="observation_date_asc">
+													<span id="filter_sort_nameobservation_date_asc">
+														<bean:message
+															key="oscarEncounter.sortDateAsc.title"/>
+													</span>
+												</html:radio></li>
+												<li>
+													<html:radio property="note_sort"
+																value="observation_date_desc">
+													<span id="filter_sort_nameobservation_date_desc">
+														<bean:message
+															key="oscarEncounter.sortDateDesc.title"/>
+													</span>
+												</html:radio></li>
+												<li><html:radio property="note_sort"
+																value="providerName">
+													<span id="filter_sort_nameproviderName">
+														<bean:message
+															key="oscarEncounter.provider.title"/>
+													</span>
+												</html:radio></li>
+												<%--
+												<li><html:radio property="note_sort"
+																value="programName">
+													<bean:message
+															key="oscarEncounter.program.title"/>
+												</html:radio></li>
+												<li><html:radio property="note_sort"
+																value="roleName">
+													<bean:message
+															key="oscarEncounter.role.title"/>
+												</html:radio></li>
+												--%>
+											</ul>
+										</div>
+									</td>
+									<td style="font-size:inherit;background-color:#ccccff;border-left:solid #ddddff 4px;border-right:solid #ddddff 4px">
+										<div style="height:150px;overflow:auto">
+											<ul style="padding:0px;margin:0px;list-style:none inside none">
+												<li>
+													<input type="checkbox"
+														   name="filter_issues"
+														   value="a"
+														   onclick="noteFilter.filterCheckBox(this);" />
+													<bean:message key="oscarEncounter.sortAll.title"/>
+												</li>
+
+												<c:forEach items="${junoEncounterForm.header.caseManagementIssues}"
+														   var="issue"
+														   varStatus="loop">
+													<li>
+														<input type="checkbox"
+															   name="filter_issues"
+															   value="${issue.issue.id}"
+															   onclick="noteFilter.filterCheckBox(this);" />
+														<span id="filter_issue_name${issue.issue.id}">
+															<c:if test="${issue.resolved}">* </c:if> <c:out value="${issue.issue.description}" />
+														</span>
+													</li>
+
+												</c:forEach>
+											</ul>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+
+						<div style="float: left; clear: both; margin-top: 5px; margin-bottom: 3px; width: 100%; text-align: center;">
+							<div style="display:inline-block">
+								<img alt="<bean:message key="oscarEncounter.msgFind"/>"
+									 src="<c:out value="${ctx}/oscarEncounter/graphics/edit-find.png"/>">
+								<input id="enTemplate" tabindex="6" size="16"
+									   type="text" value="">
+								<div class="enTemplate_name_auto_complete"
+									 id="enTemplate_list"
+									 style="z-index: 1; display: none">&nbsp;
 								</div>
-								</c:if>
+								<input type="text" id="keyword" name="keyword"
+									   value=""
+									   onkeypress="return grabEnter('searchButton',event)">
+								<input type="button" id="searchButton" name="button"
+									   value="<bean:message key="oscarEncounter.Index.btnSearch"/>"
+									   onClick="junoEncounter.channelSearch(); return false;">
 
-								</c:forEach>
+								<div style="display:inline-block; text-align: left;">
 
-								<span style="visibility:hidden">test</span>
+									<!-- channel -->
+									<select id="channel">
+										<option value="http://www.google.com/search?q=">
+											<bean:message
+													key="global.google"/></option>
+										<option value="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?SUBMIT=y&amp;CDM=Search&amp;DB=PubMed&amp;term=">
+											<bean:message
+													key="global.pubmed"/></option>
+										<option value="http://search.nlm.nih.gov/medlineplus/query?DISAMBIGUATION=true&amp;FUNCTION=search&amp;SERVER2=server2&amp;SERVER1=server1&amp;PARAMETER=">
+											<bean:message
+													key="global.medlineplus"/></option>
+										<option value="tripsearch.jsp?searchterm=">
+											Trip Database
+										</option>
+										<option value="macplussearch.jsp?searchterm=">
+											MacPlus Database
+										</option>
+									</select>
+								</div>
+
 							</div>
+							&nbsp;&nbsp;
+							<div style="display:inline-block;text-align: left;" id="toolbar">
+								<input type="button"
+									   value="<bean:message key="oscarEncounter.Filter.title"/>"
+									   onclick="noteFilter.showFilter();"/>
 
-
-							<%
-								// =================================================================================
-								// Case Notes form and border etc.
-								// =================================================================================
-							%>
-							<div id="notCPP" style="height: 70%; margin-left: 2px; background-color: #FFFFFF;">
-
-								<html:form action="/CaseManagementView" method="post">
-									<%--
-									<html:hidden property="demographicNo"
-												 value="${junoEncounterForm.header.demographicNo}"/>
-									<html:hidden property="providerNo"
-												 value="${junoEncounterForm.header.providerNo}"/>
-									<html:hidden property="tab" value="Current Issues"/>
-									<html:hidden property="hideActiveIssue"/>
-									<html:hidden property="ectWin.rowOneSize" styleId="rowOneSize"/>
-									<html:hidden property="ectWin.rowTwoSize" styleId="rowTwoSize"/>
-									<input type="hidden" name="chain" value="list">
-									<input type="hidden" name="method" value="view">
-									<input type="hidden" id="check_issue" name="check_issue">
-									--%>
-									<%-- TODO: fix later
-									<input type="hidden" id="serverDate" value="<%=strToday%>">
-									--%>
-									<input type="hidden" id="resetFilter" name="resetFilter"
-										   value="false">
-									<div id="topContent"
-										 style="float: left; width: 100%; margin-right: -2px; padding-bottom: 1px; background-color: #CCCCFF; font-size: 10px;">
-
-										<div id="appliedFiltersProviders" style="float: left; margin-left: 10px; margin-top: 0px; display: none;">
-											<u><bean:message key="oscarEncounter.providers.title"/>:</u><br>
-
-											<div id="appliedFiltersProvidersContent">
-
-											</div>
-										</div>
-
-										<div id="appliedFiltersRoles" style="float: left; margin-left: 10px; margin-top: 0px; display: none;">
-											<u><bean:message key="oscarEncounter.roles.title"/>:</u><br>
-
-											<div id="appliedFiltersRolesContent">
-
-											</div>
-										</div>
-
-										<div id="appliedFiltersSort" style="float: left; margin-left: 10px; margin-top: 0px; display: none;">
-											<u><bean:message key="oscarEncounter.sort.title"/>:</u><br>
-
-											<div id="appliedFiltersSortContent">
-
-											</div>
-										</div>
-										<div id="appliedFiltersIssues" style="float: left; margin-left: 10px; margin-top: 0px; display: none;">
-											<u><bean:message key="oscarEncounter.issues.title"/>:</u><br>
-
-											<div id="appliedFiltersIssuesContent">
-
-											</div>
-										</div>
-
-												<%--
-												<nested:notEmpty name="caseManagementViewForm"
-																 property="filter_providers">
-													<div style="float: left; margin-left: 10px; margin-top: 0px;">
-														<u><bean:message
-																key="oscarEncounter.providers.title"/>:</u><br>
-														<nested:iterate type="String" id="filter_provider"
-																		property="filter_providers">
-															<c:choose>
-																<c:when test="${filter_provider == 'a'}">All</c:when>
-																<c:otherwise>
-																	<nested:iterate id="provider" name="providers">
-																		<c:if test="${filter_provider==provider.providerNo}">
-																			<nested:write name="provider" property="formattedName"/>
-																			<br>
-																		</c:if>
-																	</nested:iterate>
-																</c:otherwise>
-															</c:choose>
-														</nested:iterate>
-													</div>
-												</nested:notEmpty>
-
-												<nested:notEmpty name="caseManagementViewForm"
-																 property="filter_roles">
-													<div style="float: left; margin-left: 10px; margin-top: 0px;">
-														<u><bean:message
-																key="oscarEncounter.roles.title"/>:</u><br>
-														<nested:iterate type="String" id="filter_role"
-																		property="filter_roles">
-															<c:choose>
-																<c:when test="${filter_role == 'a'}">All</c:when>
-																<c:otherwise>
-																	<nested:iterate id="role" name="roles">
-																		<c:if test="${filter_role==role.id}">
-																			<nested:write name="role"
-																						  property="name"/>
-																			<br>
-																		</c:if>
-																	</nested:iterate>
-																</c:otherwise>
-															</c:choose>
-														</nested:iterate>
-													</div>
-												</nested:notEmpty>
-
-												<nested:notEmpty name="caseManagementViewForm"
-																 property="note_sort">
-													<div style="float: left; margin-left: 10px; margin-top: 0px;">
-														<u><bean:message
-																key="oscarEncounter.sort.title"/>:</u><br>
-														<nested:write property="note_sort"/><br>
-													</div>
-												</nested:notEmpty>
-
-												<nested:notEmpty name="caseManagementViewForm"
-																 property="filter_issues">
-													<div style="float: left; margin-left: 10px; margin-top: 0px;">
-														<u><bean:message key="oscarEncounter.issues.title"/>:</u><br>
-														<nested:iterate type="String" id="filter_issue"
-																		property="filter_issues">
-															<c:choose>
-																<c:when test="${filter_issue == 'a'}">All</c:when>
-																<c:otherwise>
-																	<nested:iterate id="issue"
-																					name="cme_issues">
-																		<c:if test="${filter_issue==issue.issue.id}">
-																			<nested:write name="issue"
-																						  property="issueDisplay.description"/>
-																			<br>
-																		</c:if>
-																	</nested:iterate>
-																</c:otherwise>
-															</c:choose>
-														</nested:iterate>
-													</div>
-												</nested:notEmpty>
-												--%>
-
-
-
-										<div id="filter"
-											 style="display:none;background-color:#ddddff;padding:8px">
-											<input type="button"
-												   value="<bean:message key="oscarEncounter.showView.title" />"
-												   onclick="return noteFilter.filter(false);"/>
-											<input type="button"
-												   value="<bean:message key="oscarEncounter.resetFilter.title" />"
-												   onclick="return noteFilter.filter(true);"/>
-
-											<table style="border-collapse:collapse;width:100%;margin-left:auto;margin-right:auto">
-												<tr>
-													<td style="font-size:inherit;background-color:#bbbbff;font-weight:bold">
-														<bean:message
-																key="oscarEncounter.providers.title"/>
-													</td>
-													<td style="font-size:inherit;background-color:#bbbbff;border-left:solid #ddddff 4px;border-right:solid #ddddff 4px;font-weight:bold">
-														Role
-													</td>
-													<td style="font-size:inherit;background-color:#bbbbff;font-weight:bold">
-														<bean:message
-																key="oscarEncounter.sort.title"/>
-													</td>
-													<td style="font-size:inherit;background-color:#bbbbff;font-weight:bold">
-														<bean:message
-																key="oscarEncounter.issues.title"/>
-													</td>
-												</tr>
-												<tr>
-													<td style="font-size:inherit;background-color:#ccccff">
-														<div style="height:150px;overflow:auto">
-															<ul style="padding:0px;margin:0px;list-style:none inside none">
-																<li>
-																	<input type="checkbox"
-																		   name="filter_providers"
-																		   value="a"
-																		   onclick="noteFilter.filterCheckBox(this);" />
-																	<bean:message key="oscarEncounter.sortAll.title"/>
-																</li>
-
-																<c:forEach items="${junoEncounterForm.header.providers}"
-																		   var="provider"
-																		   varStatus="loop">
-																	<li>
-																		<input type="checkbox"
-																			   name="filter_providers"
-																			   value="${provider.providerNo}"
-																			   onclick="noteFilter.filterCheckBox(this);" />
-																		<span id="filter_provider_name${provider.providerNo}">
-																			<c:out value="${provider.formattedName}" />
-																		</span>
-																	</li>
-
-																</c:forEach>
-															</ul>
-														</div>
-													</td>
-													<td style="font-size:inherit;background-color:#ccccff;border-left:solid #ddddff 4px;border-right:solid #ddddff 4px">
-														<div style="height:150px;overflow:auto">
-															<ul style="padding:0px;margin:0px;list-style:none inside none">
-																<li>
-																	<input type="checkbox"
-																		   name="filter_roles"
-																		   value="a"
-																		   onclick="noteFilter.filterCheckBox(this);">
-																	<bean:message key="oscarEncounter.sortAll.title"/>
-																</li>
-
-																<c:forEach items="${junoEncounterForm.header.roles}"
-																		   var="role"
-																		   varStatus="loop">
-																	<li>
-																		<input type="checkbox"
-																				name="filter_roles"
-																				value="${role.id}"
-																				onclick="noteFilter.filterCheckBox(this);" />
-																		<span id="filter_role_name${role.id}">
-																			<c:out value="${role.name}" />
-																		</span>
-																	</li>
-
-																</c:forEach>
-															</ul>
-														</div>
-													</td>
-													<td style="font-size:inherit;background-color:#ccccff">
-														<div style="height:150px;overflow:auto">
-															<ul style="padding:0px;margin:0px;list-style:none inside none">
-																<li><html:radio property="note_sort"
-																				value="observation_date_asc">
-																	<span id="filter_sort_nameobservation_date_asc">
-																		<bean:message
-																			key="oscarEncounter.sortDateAsc.title"/>
-																	</span>
-																</html:radio></li>
-																<li>
-																	<html:radio property="note_sort"
-																				value="observation_date_desc">
-																	<span id="filter_sort_nameobservation_date_desc">
-																		<bean:message
-																			key="oscarEncounter.sortDateDesc.title"/>
-																	</span>
-																</html:radio></li>
-																<li><html:radio property="note_sort"
-																				value="providerName">
-																	<span id="filter_sort_nameproviderName">
-																		<bean:message
-																			key="oscarEncounter.provider.title"/>
-																	</span>
-																</html:radio></li>
-																<%--
-																<li><html:radio property="note_sort"
-																				value="programName">
-																	<bean:message
-																			key="oscarEncounter.program.title"/>
-																</html:radio></li>
-																<li><html:radio property="note_sort"
-																				value="roleName">
-																	<bean:message
-																			key="oscarEncounter.role.title"/>
-																</html:radio></li>
-																--%>
-															</ul>
-														</div>
-													</td>
-													<td style="font-size:inherit;background-color:#ccccff;border-left:solid #ddddff 4px;border-right:solid #ddddff 4px">
-														<div style="height:150px;overflow:auto">
-															<ul style="padding:0px;margin:0px;list-style:none inside none">
-																<li>
-																	<input type="checkbox"
-																		   name="filter_issues"
-																		   value="a"
-																		   onclick="noteFilter.filterCheckBox(this);" />
-																	<bean:message key="oscarEncounter.sortAll.title"/>
-																</li>
-
-																<c:forEach items="${junoEncounterForm.header.caseManagementIssues}"
-																		   var="issue"
-																		   varStatus="loop">
-																	<li>
-																		<input type="checkbox"
-																			   name="filter_issues"
-																			   value="${issue.issue.id}"
-																			   onclick="noteFilter.filterCheckBox(this);" />
-																		<span id="filter_issue_name${issue.issue.id}">
-																			<c:if test="${issue.resolved}">* </c:if> <c:out value="${issue.issue.description}" />
-																		</span>
-																	</li>
-
-																</c:forEach>
-															</ul>
-														</div>
-													</td>
-												</tr>
-											</table>
-
-
-
-
-										</div>
-
-										<div style="float: left; clear: both; margin-top: 5px; margin-bottom: 3px; width: 100%; text-align: center;">
-											<div style="display:inline-block">
-												<img alt="<bean:message key="oscarEncounter.msgFind"/>"
-													 src="<c:out value="${ctx}/oscarEncounter/graphics/edit-find.png"/>">
-												<input id="enTemplate" tabindex="6" size="16"
-													   type="text" value="">
-												<%--
-												onkeypress="encounterMultiSearch(event); return false;">
-												--%>
-
-												<div class="enTemplate_name_auto_complete"
-													 id="enTemplate_list"
-													 style="z-index: 1; display: none">&nbsp;
-												</div>
-
-												&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-
-												<input type="text" id="keyword" name="keyword"
-													   value=""
-													   onkeypress="return grabEnter('searchButton',event)">
-												<input type="button" id="searchButton" name="button"
-													   value="<bean:message key="oscarEncounter.Index.btnSearch"/>"
-													   onClick="junoEncounter.channelSearch(); return false;">
-
-												<div style="display:inline-block; text-align: left;">
-													<%
-														// TODO: make this work (parts missing)
-										/*
-										if (privateConsentEnabled && showPopup && showConsentsThisTime) {
-										}
-
-										 */
-													%>
-
-													<!-- channel -->
-													<select id="channel">
-														<option value="http://www.google.com/search?q=">
-															<bean:message
-																	key="global.google"/></option>
-														<option value="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?SUBMIT=y&amp;CDM=Search&amp;DB=PubMed&amp;term=">
-															<bean:message
-																	key="global.pubmed"/></option>
-														<option value="http://search.nlm.nih.gov/medlineplus/query?DISAMBIGUATION=true&amp;FUNCTION=search&amp;SERVER2=server2&amp;SERVER1=server1&amp;PARAMETER=">
-															<bean:message
-																	key="global.medlineplus"/></option>
-														<option value="tripsearch.jsp?searchterm=">
-															Trip Database
-														</option>
-														<option value="macplussearch.jsp?searchterm=">
-															MacPlus Database
-														</option>
-													</select>
-												</div>
-
-											</div>
-											&nbsp;&nbsp;
-											<div style="display:inline-block;text-align: left;" id="toolbar">
-												<input type="button"
-													   value="<bean:message key="oscarEncounter.Filter.title"/>"
-													   onclick="noteFilter.showFilter();"/>
-
-												<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.calculators" rights="r" reverse="false">
-													<%
-														String patientAge = junoEncounterForm.getHeader().getPatientAgeInYears();
-														String patientSex = junoEncounterForm.getHeader().getPatientSex();
-													%>
-													<%@include file="../casemgmt/calculatorsSelectList.jspf" %>
-												</security:oscarSec>
-
-												<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.templates" rights="r">
-													<select style="width:100px;" onchange="javascript:popupPage(700,700,'Templates',this.value);">
-														<option value="-1"><bean:message key="oscarEncounter.Header.Templates"/></option>
-														<option value="-1">------------------</option>
-														<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.templates" rights="w">
-															<option value="${ctx}/admin/providertemplate.jsp">New / Edit Template</option>
-															<option value="-1">------------------</option>
-														</security:oscarSec>
-														<c:forEach items="${junoEncounterForm.header.encounterTemplates}" var="encounterTemplate">
-															<option value="${ctx}/admin/providertemplate.jsp?dboperation=Edit&name=${encounterTemplate.encounterTemplateName}">
-																	${encounterTemplate.encounterTemplateName}
-															</option>
-														</c:forEach>
-													</select>
-												</security:oscarSec>
-
-
-
-													<%--
-													<script>
-														function updateMYOSCAR(){
-															jQuery.getScript('phrLinks.jsp?demographicNo=<%=demographicNo%>');
-														}
-														updateMYOSCAR();
-													</script>
-													--%>
-
-											</div>
-										</div>
-									</div>
-								</html:form>
-								<%
-									String oscarMsgType = (String) request.getParameter("msgType");
-									String OscarMsgTypeLink = (String) request.getParameter("OscarMsgTypeLink");
-								%>
-								<nested:form action="/CaseManagementEntry"
-											 style="display:inline; margin-top:0; margin-bottom:0; position: relative;">
-									<%--
-									// TODO: make this work (parts missing)
-									<html:hidden property="demographicNo" value="<%=demographicNo%>" />
-									--%>
-									<html:hidden property="includeIssue" value="off"/>
-									<input type="hidden" name="OscarMsgType"
-										   value="<%=oscarMsgType%>"/>
-									<input type="hidden" name="OscarMsgTypeLink"
-										   value="<%=OscarMsgTypeLink%>"/>
+								<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.calculators" rights="r" reverse="false">
 									<%
-										String apptNo = request.getParameter("appointmentNo");
-										if (apptNo == null || apptNo.equals("") || apptNo.equals("null"))
-										{
-											apptNo = "0";
-										}
-
-										String apptDate = request.getParameter("appointmentDate");
-										if (apptDate == null || apptDate.equals("") || apptDate.equals("null"))
-										{
-											apptDate = oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd");
-										}
-
-										String startTime = request.getParameter("start_time");
-										if (startTime == null || startTime.equals("") || startTime.equals("null"))
-										{
-											startTime = "00:00:00";
-										}
-
-										String apptProv = request.getParameter("apptProvider");
-										if (apptProv == null || apptProv.equals("") || apptProv.equals("null"))
-										{
-											apptProv = "none";
-										}
-
-										String provView = request.getParameter("providerview");
-										if (provView == null || provView.equals("") || provView.equals("null"))
-										{
-											// TODO: make this work (parts missing)
-											//provView = provNo;
-										}
+										String patientAge = junoEncounterForm.getHeader().getPatientAgeInYears();
+										String patientSex = junoEncounterForm.getHeader().getPatientSex();
 									%>
+									<%@include file="../casemgmt/calculatorsSelectList.jspf" %>
+								</security:oscarSec>
 
-									<html:hidden property="appointmentNo" value="<%=apptNo%>"/>
-									<html:hidden property="appointmentDate" value="<%=apptDate%>"/>
-									<html:hidden property="start_time" value="<%=startTime%>"/>
-									<html:hidden property="billRegion"
-												 value="<%=(OscarProperties.getInstance().getBillingType()).trim().toUpperCase()%>"/>
-									<html:hidden property="apptProvider" value="<%=apptProv%>"/>
-									<html:hidden property="providerview" value="<%=provView%>"/>
-									<input type="hidden" name="toBill" id="toBill" value="false">
-									<input type="hidden" name="deleteId" value="0">
-									<input type="hidden" name="lineId" value="0">
-									<input type="hidden" name="from" value="casemgmt">
-									<input type="hidden" name="method" value="save">
-									<input type="hidden" name="change_diagnosis"
-										   value="<c:out value="${change_diagnosis}"/>">
-									<input type="hidden" name="change_diagnosis_id"
-										   value="<c:out value="${change_diagnosis_id}"/>">
-									<input type="hidden" name="newIssueId" id="newIssueId">
-									<input type="hidden" name="newIssueName" id="newIssueName">
-									<input type="hidden" name="ajax" value="false">
-									<input type="hidden" name="chain" value="">
-									<%--
-									// TODO: make this work (parts missing)
-									<input type="hidden" name="caseNote.program_no" value="<%=pId%>">--%>
-									<input type="hidden" name="noteId" value="0">
-									<input type="hidden" name="note_edit" value="new">
-									<input type="hidden" name="sign" value="off">
-									<input type="hidden" name="verify" value="off">
-									<input type="hidden" name="forceNote" value="false">
-									<input type="hidden" name="newNoteIdx" value="">
-									<input type="hidden" name="notes2print" id="notes2print"
-										   value="">
-									<input type="hidden" name="printCPP" id="printCPP"
-										   value="false">
-									<input type="hidden" name="printRx" id="printRx" value="false">
-									<input type="hidden" name="printLabs" id="printLabs"
-										   value="false">
-									<input type="hidden" name="encType" id="encType" value="">
-									<input type="hidden" name="pStartDate" id="pStartDate" value="">
-									<input type="hidden" name="pEndDate" id="pEndDate" value="">
-									<input type="hidden" id="annotation_attribname"
-										   name="annotation_attribname" value="">
-									<%
-										if (OscarProperties.getInstance().getBooleanProperty("note_program_ui_enabled", "true"))
-										{
-									%>
-									<input type="hidden" name="_note_program_no" value=""/>
-									<input type="hidden" name="_note_role_id" value=""/>
-									<% } %>
+								<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.templates" rights="r">
+									<select style="width:100px;" onchange="javascript:popupPage(700,700,'Templates',this.value);">
+										<option value="-1"><bean:message key="oscarEncounter.Header.Templates"/></option>
+										<option value="-1">------------------</option>
+										<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.templates" rights="w">
+											<option value="${ctx}/admin/providertemplate.jsp">New / Edit Template</option>
+											<option value="-1">------------------</option>
+										</security:oscarSec>
+										<c:forEach items="${junoEncounterForm.header.encounterTemplates}" var="encounterTemplate">
+											<option value="${ctx}/admin/providertemplate.jsp?dboperation=Edit&name=${encounterTemplate.encounterTemplateName}">
+													${encounterTemplate.encounterTemplateName}
+											</option>
+										</c:forEach>
+									</select>
+								</security:oscarSec>
+							</div>
+						</div>
+					</div>
+				</html:form>
+				<nested:form action="/CaseManagementEntry"
+							 style="display:inline; margin-top:0; margin-bottom:0; position: relative;">
 
-									<span id="notesLoading">
+					<span id="notesLoading">
 						<img src="<c:out value="${ctx}/images/DMSLoader.gif" />">Loading Notes...
 					</span>
 
-									<div id="mainContent"
-										 style="background-color: #FFFFFF; width: 100%; margin-right: -2px; display: inline; float: left;">
-										<div id="issueList"
-											 style="background-color: #FFFFFF; height: 440px; width: 350px; position: absolute; z-index: 1; display: none; overflow: auto;">
-											<table id="issueTable"
-												   class="enTemplate_name_auto_complete"
-												   style="position: relative; left: 0px; display: none;">
-												<tr>
-													<td style="height: 430px; vertical-align: bottom;">
-														<div class="enTemplate_name_auto_complete"
-															 id="issueAutocompleteList"
-															 style="position: relative; left: 0px; display: none;"></div>
-													</td>
-												</tr>
-											</table>
-										</div>
-										<div id="encMainDiv" class="encMainDiv">
+					<div id="mainContent"
+						 style="background-color: #FFFFFF; width: 100%; margin-right: -2px; display: inline; float: left;">
+						<div id="issueList"
+							 style="background-color: #FFFFFF; height: 440px; width: 350px; position: absolute; z-index: 1; display: none; overflow: auto;">
+							<table id="issueTable"
+								   class="enTemplate_name_auto_complete"
+								   style="position: relative; left: 0px; display: none;">
+								<tr>
+									<td style="height: 430px; vertical-align: bottom;">
+										<div class="enTemplate_name_auto_complete"
+											 id="issueAutocompleteList"
+											 style="position: relative; left: 0px; display: none;"></div>
+									</td>
+								</tr>
+							</table>
+						</div>
 
-										</div>
-										<script type="text/javascript">
+						<div id="encMainDiv" class="encMainDiv">
 
-											/*
-											if (parseInt(navigator.appVersion) > 3)
-											{
-												var windowHeight = 750;
-												if (navigator.appName == "Netscape")
-												{
-													windowHeight = window.innerHeight;
-												}
-												if (navigator.appName.indexOf("Microsoft") != -1)
-												{
-													windowHeight = document.body.offsetHeight;
-												}
+						</div>
 
-												// XXX: this seems like it generally won't work (ocean, etc.)
-												var divHeight = windowHeight - 320;
-												$("encMainDiv").style.height = divHeight + 'px';
-											}
+						<div id='save' style="width: 99%; background-color: #CCCCFF; padding-top: 5px; margin-left: 2px; border-left: thin solid #000000; border-right: thin solid #000000; border-bottom: thin solid #000000;">
+							<span style="float: right; margin-right: 5px;">
 
-											 */
-										</script>
-										<div id='save'
-											 style="width: 99%; background-color: #CCCCFF; padding-top: 5px; margin-left: 2px; border-left: thin solid #000000; border-right: thin solid #000000; border-bottom: thin solid #000000;">
-		<span style="float: right; margin-right: 5px;">
+								<div class="encounter_timer_container">
+									<div style="display: inline-block; position:relative;">
+										<input id="encounter_timer" title="Paste timer data" type="button"
+											   onclick="encounterTimer.putEncounterTimeInNote()" value="00:00"/>
+									</div>
+									<input id="encounter_timer_pause" class="encounter_timer_control" type="button"
+										   onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"
+										   value="||"/>
+									<input id="encounter_timer_play" class="encounter_timer_control" type="button"
+										   onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"
+										   value="&gt;"/>
+								</div>
+								<input tabindex="17" type='image'
+									   src="<c:out value="${ctx}/oscarEncounter/graphics/media-floppy.png"/>"
+									   id="saveImg"
+									   onclick="Event.stop(event);return encounterNote.saveEncounterNote(false, false, false, true, false);"
+									   title='<bean:message key="oscarEncounter.Index.btnSave"/>'>&nbsp;
+								<input tabindex="18" type='image'
+									   src="<c:out value="${ctx}/oscarEncounter/graphics/document-new.png"/>"
+									   id="newNoteImg" onclick="newNote(event); return false;"
+									   title='<bean:message key="oscarEncounter.Index.btnNew"/>'>&nbsp;
+								<input tabindex="19" type='image'
+									   src="<c:out value="${ctx}/oscarEncounter/graphics/note-save.png"/>"
+									   id="signSaveImg"
+									   onclick="Event.stop(event);return encounterNote.saveEncounterNote(true, false, true, true, false);"
+									   title='<bean:message key="oscarEncounter.Index.btnSignSave"/>'>&nbsp;
+								<input tabindex="20" type='image'
+									   src="<c:out value="${ctx}/oscarEncounter/graphics/verify-sign.png"/>"
+									   id="signVerifyImg"
+									   onclick="Event.stop(event);return encounterNote.saveEncounterNote(true, true, true, true, false);"
+									   title='<bean:message key="oscarEncounter.Index.btnSign"/>'>&nbsp;
+								<c:if test="${junoEncounterForm.header.source == null}">
+									<input tabindex="21" type='image'
+										   src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>"
+										   onclick="Event.stop(event);return encounterNote.saveEncounterNote(true, false, true, true, true);"
+										   title='<bean:message key="oscarEncounter.Index.btnBill"/>'>&nbsp;
+								</c:if>
+								<input tabindex="23" type='image'
+									   src="<c:out value="${ctx}/oscarEncounter/graphics/system-log-out.png"/>"
+									   onclick='closeEnc(event);return false;'
+									   title='<bean:message key="global.btnExit"/>'>&nbsp;
+								<input tabindex="24" type='image'
+									   src="<c:out value="${ctx}/oscarEncounter/graphics/document-print.png"/>"
+									   onclick="return printNotes.printSetup(event);"
+									   title='<bean:message key="oscarEncounter.Index.btnPrint"/>'
+									   id="imgPrintEncounter">
+							</span>
+							<div id="assignIssueSection">
+								<!-- input type='image' id='toggleIssue' onclick="return showIssues(event);" src="<c:out value="${ctx}/oscarEncounter/graphics/issues.png"/>" title='<bean:message key="oscarEncounter.Index.btnDisplayIssues"/>'>&nbsp; -->
+								<input tabindex="8" type="text"
+									   id="issueAutocomplete" name="issueSearch"
+									   style="z-index: 2;"
+									   onkeypress="return caseManagementIssue.submitIssue(event);"
+									   size="24">&nbsp;
+								<input type="hidden"
+									   id="issueSearchSelectedId"
+									   name="issueSearchSelectedId">
+								<input type="hidden"
+									   id="issueSearchSelected"
+									   name="issueSearchSelected">
+								<input tabindex="9"
+									   type="button"
+									   id="asgnIssues"
+									   onclick="caseManagementIssue.addIssueToCurrentNote(event); return false;"
+									   value="<bean:message key="oscarEncounter.assign.title"/>">
+								<input tabindex="9"
+									   type="button"
+									   id="changeIssues"
+									   style="display: none;"
+									   onclick="caseManagementIssue.changeIssue({jQuery: jQuery}); return false;"
+									   value="<bean:message key="oscarEncounter.change.title"/>">
+								<span id="busy" style="display: none">
+									<img style="position: absolute;"
+										 src="<c:out value="${ctx}/oscarEncounter/graphics/busy.gif"/>"
+										 alt="<bean:message key="oscarEncounter.Index.btnWorking" />">
+								</span>
+							</div>
+							<div style="padding-top: 3px;">
+								<button type="button" id="displayResolvedIssuesButton">
+									<bean:message key="oscarEncounter.Index.btnDisplayResolvedIssues"/>
+								</button>
+								&nbsp;
+								<button type="button" id="displayUnresolvedIssuesButton">
+									<bean:message key="oscarEncounter.Index.btnDisplayUnresolvedIssues"/>
+								</button>
+								&nbsp;
+								<button type="button" onclick="encounterNote.spellCheck();">
+									Spell Check
+								</button> &nbsp;
+								<button type="button" onclick="javascript:toggleFullViewForAll(this.form);">
+									<bean:message key="eFormGenerator.expandAll"/>
+									<bean:message key="Appointment.formNotes"/>
+								</button>
+								<button type="button"
+										onclick="javascript:popupPage(500,200,'noteBrowser${junoEncounterForm.header.demographicNo}','../casemgmt/noteBrowser.jsp?demographic_no=${junoEncounterForm.header.demographicNo}&FirstTime=1');">
+									<bean:message key="oscarEncounter.Index.BrowseNotes"/>
+								</button>
+								&nbsp;
+							</div>
+						</div>
 
-		<div class="encounter_timer_container">
-			<div style="display: inline-block; position:relative;">
-				<input id="encounter_timer" title="Paste timer data" type="button"
-					   onclick="encounterTimer.putEncounterTimeInNote()" value="00:00"/>
-			</div>
-			<input id="encounter_timer_pause" class="encounter_timer_control" type="button"
-				   onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"
-				   value="||"/>
-			<input id="encounter_timer_play" class="encounter_timer_control" type="button"
-				   onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"
-				   value="&gt;"/>
+					</div>
+					</nested:form>
+				<%--
+				// =================================================================================
+				// End of Case Notes
+				// =================================================================================
+				--%>
+
 		</div>
-			<%--
-		<%
 
-			// TODO: make this work (parts missing)
-			if(facility.isEnableGroupNotes()) {
-		%>
-			<input tabindex="16" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/group-gnote.png"/>" id="groupNoteImg" onclick="Event.stop(event);return selectGroup(document.forms['caseManagementEntryForm'].elements['caseNote.program_no'].value,document.forms['caseManagementEntryForm'].elements['demographicNo'].value);" title='<bean:message key="oscarEncounter.Index.btnGroupNote"/>'>&nbsp;
-		<%  }
-			if(facility.isEnablePhoneEncounter()) {
-		%>
-			<input tabindex="25" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/attach.png"/>" id="attachNoteImg" onclick="Event.stop(event);return assign(document.forms['caseManagementEntryForm'].elements['caseNote.program_no'].value,document.forms['caseManagementEntryForm'].elements['demographicNo'].value);" title='<bean:message key="oscarEncounter.Index.btnAttachNote"/>'>&nbsp;
-		<%  } %>
-		--%>
-			<input tabindex="17" type='image'
-				   src="<c:out value="${ctx}/oscarEncounter/graphics/media-floppy.png"/>"
-				   id="saveImg"
-				   onclick="Event.stop(event);return encounterNote.saveEncounterNote(false, false, false, true, false);"
-				   title='<bean:message key="oscarEncounter.Index.btnSave"/>'>&nbsp;
-			<input tabindex="18" type='image'
-				   src="<c:out value="${ctx}/oscarEncounter/graphics/document-new.png"/>"
-				   id="newNoteImg" onclick="newNote(event); return false;"
-				   title='<bean:message key="oscarEncounter.Index.btnNew"/>'>&nbsp;
-			<input tabindex="19" type='image'
-				   src="<c:out value="${ctx}/oscarEncounter/graphics/note-save.png"/>"
-				   id="signSaveImg"
-				   onclick="Event.stop(event);return encounterNote.saveEncounterNote(true, false, true, true, false);"
-				   title='<bean:message key="oscarEncounter.Index.btnSignSave"/>'>&nbsp;
-			<input tabindex="20" type='image'
-				   src="<c:out value="${ctx}/oscarEncounter/graphics/verify-sign.png"/>"
-				   id="signVerifyImg"
-				   onclick="Event.stop(event);return encounterNote.saveEncounterNote(true, true, true, true, false);"
-				   title='<bean:message key="oscarEncounter.Index.btnSign"/>'>&nbsp;
-			<c:if test="${junoEncounterForm.header.source == null}">
-				<input tabindex="21" type='image'
-					   src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>"
-					   onclick="Event.stop(event);return encounterNote.saveEncounterNote(true, false, true, true, true);"
-					   title='<bean:message key="oscarEncounter.Index.btnBill"/>'>&nbsp;
-			</c:if>
-	    	<input tabindex="23" type='image'
-				   src="<c:out value="${ctx}/oscarEncounter/graphics/system-log-out.png"/>"
-				   onclick='closeEnc(event);return false;'
-				   title='<bean:message key="global.btnExit"/>'>&nbsp;
-	    	<input tabindex="24" type='image'
-				   src="<c:out value="${ctx}/oscarEncounter/graphics/document-print.png"/>"
-				   onclick="return printNotes.printSetup(event);"
-				   title='<bean:message key="oscarEncounter.Index.btnPrint"/>'
-				   id="imgPrintEncounter">
-    	</span>
-		<div id="assignIssueSection">
-			<!-- input type='image' id='toggleIssue' onclick="return showIssues(event);" src="<c:out value="${ctx}/oscarEncounter/graphics/issues.png"/>" title='<bean:message key="oscarEncounter.Index.btnDisplayIssues"/>'>&nbsp; -->
-			<input tabindex="8" type="text"
-				   id="issueAutocomplete" name="issueSearch"
-				   style="z-index: 2;"
-				   onkeypress="return caseManagementIssue.submitIssue(event);"
-				   size="30">&nbsp;
-			<input type="hidden"
-				   id="issueSearchSelectedId"
-				   name="issueSearchSelectedId">
-			<input type="hidden"
-				   id="issueSearchSelected"
-				   name="issueSearchSelected">
-			<input tabindex="9"
-				   type="button"
-				   id="asgnIssues"
-				   onclick="caseManagementIssue.addIssueToCurrentNote(event); return false;"
-				   value="<bean:message key="oscarEncounter.assign.title"/>">
-			<input tabindex="9"
-				   type="button"
-				   id="changeIssues"
-				   style="display: none;"
-				   onclick="caseManagementIssue.changeIssue({jQuery: jQuery}); return false;"
-				   value="<bean:message key="oscarEncounter.change.title"/>">
-			<span id="busy" style="display: none">
-	    		<img style="position: absolute;"
-					 src="<c:out value="${ctx}/oscarEncounter/graphics/busy.gif"/>"
-					 alt="<bean:message key="oscarEncounter.Index.btnWorking" />">
-	    	</span>
-		</div>
-		<div style="padding-top: 3px;">
-			<button type="button" id="displayResolvedIssuesButton"/>
-<%--
-					onclick="return showHideIssues(event, true);">
---%>
-				<bean:message
-						key="oscarEncounter.Index.btnDisplayResolvedIssues"/></button>
-			&nbsp;
-			<button type="button" id="displayUnresolvedIssuesButton"/>
-<%--
-					onclick="return showHideIssues(event, false);">
---%>
-				<bean:message
-						key="oscarEncounter.Index.btnDisplayUnresolvedIssues"/></button>
-			&nbsp;
-			<button type="button"
-					onclick="javascript:spellCheck();">Spell
-				Check
-			</button> &nbsp;
-			<button type="button"
-					onclick="javascript:toggleFullViewForAll(this.form);">
-				<bean:message key="eFormGenerator.expandAll"/>
-				<bean:message
-						key="Appointment.formNotes"/></button>
-			<button type="button"
-					onclick="javascript:popupPage(500,200,'noteBrowser${junoEncounterForm.header.demographicNo}','../casemgmt/noteBrowser.jsp?demographic_no=${junoEncounterForm.header.demographicNo}&FirstTime=1');">
-				<bean:message
-						key="oscarEncounter.Index.BrowseNotes"/></button>
-			&nbsp;
-		</div>
 	</div>
 
-</div>
-</nested:form>
-									<%--
-									// =================================================================================
-									// End of Case Notes
-									// =================================================================================
-									--%>
+	<!-- hovering divs -->
+	<div id="showEditNote" class="showEdContent">
+		<form
+				id="frmIssueNotes"
+				action=""
+				method="post"
+				onsubmit="return cppNote.updateCPPNote();">
+
+			<input type="hidden" id="noteUuid" name="noteUuid" value=""/>
+			<input type="hidden" id="noteSummaryCode" name="noteSummaryCode"
+				   value=""/>
+			<input type="hidden" id="noteEditId" name="noteEditId" value=""/>
+			<input type="hidden" id="noteRevision" name="noteRevision"
+				   value=""/>
+			<input type="hidden" id="issueChange" name="issueChange" value=""/>
+			<input type="hidden" id="archived" name="archived" value="false"/>
+			<input type="hidden" id="annotation_attrib" name="annotation_attrib"/>
+			<div id="winTitle"></div>
+			<div id="editNoteError" class="error editNoteError"></div>
+			<textarea style="margin: 10px;" cols="50" rows="15" id="noteEditTxt"
+					  name="value"></textarea>
+			<br>
+
+			<table>
+				<tr id="Itemproblemdescription">
+					<td><bean:message
+							key="oscarEncounter.problemdescription.title"/>:
+					</td>
+					<td><input type="text" id="problemdescription"
+							   name="problemdescription" value=""></td>
+				</tr>
+				<tr id="Itemstartdate">
+					<td><bean:message key="oscarEncounter.startdate.title"/>:
+					</td>
+					<td><input type="text" id="startdate" name="startdate"
+							   value="" size="12"> (YYYY-MM-DD)
+					</td>
+				</tr>
+				<tr id="Itemresolutiondate">
+					<td><bean:message
+							key="oscarEncounter.resolutionDate.title"/>:
+					</td>
+					<td><input type="text" id="resolutiondate"
+							   name="resolutiondate" value="" size="12">
+						(YYYY-MM-DD)
+					</td>
+				</tr>
+				<tr id="Itemageatonset">
+					<td><bean:message key="oscarEncounter.ageAtOnset.title"/>:
+					</td>
+					<td><input type="text" id="ageatonset" name="ageatonset"
+							   value="" size="2"></td>
+				</tr>
+
+				<tr id="Itemproceduredate">
+					<td><bean:message key="oscarEncounter.procedureDate.title"/>:
+					</td>
+					<td><input type="text" id="proceduredate"
+							   name="proceduredate"
+							   value="" size="12"> (YYYY-MM-DD)
+					</td>
+				</tr>
+				<tr id="Itemtreatment">
+					<td><bean:message key="oscarEncounter.treatment.title"/>:
+					</td>
+					<td><input type="text" id="treatment" name="treatment"
+							   value=""></td>
+				</tr>
+				<tr id="Itemproblemstatus">
+					<td><bean:message key="oscarEncounter.problemStatus.title"/>:
+					</td>
+					<td><input type="text" id="problemstatus"
+							   name="problemstatus"
+							   value="" size="8"> <bean:message
+							key="oscarEncounter.problemStatusExample.msg"/></td>
+				</tr>
+				<tr id="Itemexposuredetail">
+					<td><bean:message
+							key="oscarEncounter.exposureDetail.title"/>:
+					</td>
+					<td><input type="text" id="exposuredetail"
+							   name="exposuredetail" value=""></td>
+				</tr>
+				<tr id="Itemrelationship">
+					<td><bean:message key="oscarEncounter.relationship.title"/>:
+					</td>
+					<td><input type="text" id="relationship" name="relationship"
+							   value=""></td>
+				</tr>
+				<tr id="Itemlifestage">
+					<td><bean:message key="oscarEncounter.lifestage.title"/>:
+					</td>
+					<td><select name="lifestage" id="lifestage">
+						<option value="">
+							<bean:message
+									key="oscarEncounter.lifestage.opt.notset"/>
+						</option>
+						<option value="N">
+							<bean:message
+									key="oscarEncounter.lifestage.opt.newborn"/>
+						</option>
+						<option value="I">
+							<bean:message
+									key="oscarEncounter.lifestage.opt.infant"/>
+						</option>
+						<option value="C">
+							<bean:message
+									key="oscarEncounter.lifestage.opt.child"/>
+						</option>
+						<option value="T">
+							<bean:message
+									key="oscarEncounter.lifestage.opt.adolescent"/>
+						</option>
+						<option value="A">
+							<bean:message
+									key="oscarEncounter.lifestage.opt.adult"/>
+						</option>
+					</select></td>
+				</tr>
+				<tr id="Itemhidecpp">
+					<td><bean:message key="oscarEncounter.hidecpp.title"/>:</td>
+					<td><select id="hidecpp" name="hidecpp">
+						<option value="0">No</option>
+						<option value="1">Yes</option>
+					</select></td>
+				</tr>
+			</table>
+			<br>
+			<span style="float: right; margin-right: 10px;">
+				<input type="image"
+					   src="<c:out value="${ctx}/oscarEncounter/graphics/copy.png"/>"
+					   title='<bean:message key="oscarEncounter.Index.btnCopy"/>'
+					   onclick="encounterNote.copyCppToCurrentNote(); return false;">
+				<input type="image"
+					   src="<c:out value="${ctx}/oscarEncounter/graphics/annotation.png"/>"
+					   title='<bean:message key="oscarEncounter.Index.btnAnnotation"/>'
+					   id="anno" style="padding-right: 10px;">
+				<input type="image"
+					   src="<c:out value="${ctx}/oscarEncounter/graphics/edit-cut.png"/>"
+					   title='<bean:message key="oscarEncounter.Index.btnArchive"/>'
+					   onclick="$('archived').value='true';"
+					   style="padding-right: 10px;">
+				<input type="image"
+					   src="<c:out value="${ctx}/oscarEncounter/graphics/note-save.png"/>"
+					   title='<bean:message key="oscarEncounter.Index.btnSignSave"/>'
+					   onclick="$('archived').value='false';" style="padding-right: 10px;">
+				<input type="image"
+					   src="<c:out value="${ctx}/oscarEncounter/graphics/system-log-out.png"/>"
+					   title='<bean:message key="global.btnExit"/>'
+					   onclick="this.focus();cppNote.hideEdit();return false;">
+			</span>
+			<bean:message key="oscarEncounter.Index.btnPosition"/>
+			<select id="position" name="position">
+			</select>
+			<div id="issueNoteInfo"
+				 style="clear: both; text-align: left;"></div>
+			<div id="issueListCPP"
+				 style="background-color: #FFFFFF; height: 200px; width: 350px; position: absolute; z-index: 1; display: none; overflow: auto;">
+				<div class="enTemplate_name_auto_complete"
+					 id="issueAutocompleteListCPP"
+					 style="position: relative; left: 0px; display: none;"></div>
+			</div>
+			<bean:message key="oscarEncounter.Index.assnIssue"/>
+			&nbsp;<input tabindex="100" type="text" id="issueAutocompleteCPP"
+						 name="issueSearch" style="z-index: 2;" size="25">&nbsp;
+			<span
+					id="busy2" style="display: none"><img
+					style="position: absolute;"
+					src="<c:out value="${ctx}/oscarEncounter/graphics/busy.gif"/>"
+					alt="<bean:message key="oscarEncounter.Index.btnWorking"/>"></span>
+
+		</form>
+	</div>
+
+	<div id="printOps" class="printOps">
+		<h3 style="margin-bottom: 5px; text-align: center;">
+			<bean:message key="oscarEncounter.Index.PrintDialog"/>
+		</h3>
+		<form id="frmPrintOps" action="" onsubmit="return false;">
+			<table id="printElementsTable">
+				<tr>
+					<td><input type="radio" id="printopSelected" name="printop"
+							   value="selected">
+						<bean:message key="oscarEncounter.Index.PrintSelect"/>
+					</td>
+					<td>
+						<%
+							String roleName = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+						%> <security:oscarSec roleName="<%=roleName%>"
+											  objectName="_newCasemgmt.cpp"
+											  rights="r" reverse="false">
+						<img style="cursor: pointer;"
+							 title="<bean:message key="oscarEncounter.print.title"/>"
+							 id='imgPrintCPP'
+							 alt="<bean:message key="oscarEncounter.togglePrintCPP.title"/>"
+							 onclick="return printNotes.printInfo(this,'printCPP');"
+							 src='<c:out value="${ctx}"/>/oscarEncounter/graphics/printer.png'>&nbsp;<bean:message
+							key="oscarEncounter.cpp.title"/>
+					</security:oscarSec>
+					</td>
+				</tr>
+				<tr>
+					<td><input type="radio" id="printopAll" name="printop"
+							   value="all">
+						<bean:message key="oscarEncounter.Index.PrintAll"/></td>
+					<td><img style="cursor: pointer;"
+							 title="<bean:message key="oscarEncounter.print.title"/>"
+							 id='imgPrintRx'
+							 alt="<bean:message key="oscarEncounter.togglePrintRx.title"/>"
+							 onclick="return printNotes.printInfo(this, 'printRx');"
+							 src='<c:out value="${ctx}"/>/oscarEncounter/graphics/printer.png'>&nbsp;<bean:message
+							key="oscarEncounter.Rx.title"/></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><img style="cursor: pointer;"
+							 title="<bean:message key="oscarEncounter.print.title"/>"
+							 id='imgPrintLabs'
+							 alt="<bean:message key="oscarEncounter.togglePrintLabs.title"/>"
+							 onclick="return printNotes.printInfo(this, 'printLabs');"
+							 src='<c:out value="${ctx}"/>/oscarEncounter/graphics/printer.png'>&nbsp;<bean:message
+							key="oscarEncounter.Labs.title"/></td>
+				</tr>
+				<!--  extension point -->
+				<tr id="printDateRow">
+					<td><input type="radio" id="printopDates" name="printop"
+							   value="dates">
+						<bean:message key="oscarEncounter.Index.PrintDates"/>&nbsp;<a
+								style="font-variant: small-caps;" href="#"
+								onclick="return printNotes.printToday(event);"><bean:message
+								key="oscarEncounter.Index.PrintToday"/></a></td>
+					<td></td>
+				</tr>
+			</table>
+
+			<div style="float: left; margin-left: 5px; width: 30px;">
+				<bean:message key="oscarEncounter.Index.PrintFrom"/>
+				:
+			</div>
+			<img src="<c:out value="${ctx}/images/cal.gif" />"
+				 id="printStartDate_cal" alt="calendar">&nbsp;<input
+				type="text" id="printStartDate" name="printStartDate"
+				ondblclick="this.value='';"
+				style="font-style: italic; border: 1px solid #7682b1; width: 125px; background-color: #FFFFFF;"
+				readonly value=""><br>
+			<div style="float: left; margin-left: 5px; width: 30px;">
+				<bean:message key="oscarEncounter.Index.PrintTo"/>
+				:
+			</div>
+			<img src="<c:out value="${ctx}/images/cal.gif" />"
+				 id="printEndDate_cal" alt="calendar">&nbsp;<input type="text"
+																   id="printEndDate"
+																   name="printEndDate"
+																   ondblclick="this.value='';"
+																   style="font-style: italic; border: 1px solid #7682b1; width: 125px; background-color: #FFFFFF;"
+																   readonly
+																   value=""><br>
+			<div style="margin-top: 5px; text-align: center">
+				<input type="submit" id="printOp"
+					   style="border: 1px solid #7682b1;"
+					   value="Print" onclick="return printNotes.printNotes();">
+
+				<indivo:indivoRegistered
+						demographic="<%=(String) request.getAttribute(\"demographicNo\")%>"
+						provider="<%=(String) request.getSession().getAttribute(\"user\")%>">
+					<input type="submit" id="sendToPhr"
+						   style="border: 1px solid #7682b1;"
+						   value="Send To Phr"
+						   onclick="return sendToPhrr();">
+				</indivo:indivoRegistered>
+				<input type="submit" id="cancelprintOp"
+					   style="border: 1px solid #7682b1;" value="Cancel"
+					   onclick="$('printOps').style.display='none';"> <input
+					type="submit" id="clearprintOp"
+					style="border: 1px solid #7682b1;"
+					value="Clear"
+					onclick="$('printOps').style.display='none'; return printNotes.clearAll(event);">
+			</div>
+		</form>
+	</div>
 
 
-							</div>
+	<script type="text/javascript">
 
-						</div>
+		(function ($)
+		{
+			$(document).ready(function ()
+			{
+				init();
+			});
+		})(jQuery);
 
-						<!-- hovering divs -->
-						<div id="showEditNote" class="showEdContent">
-							<form
-									id="frmIssueNotes"
-									action=""
-									method="post"
-									onsubmit="return cppNote.updateCPPNote();">
+	</script>
 
-									<%--
-									<input type="hidden" id="reloadUrl" name="reloadUrl" value="">
-									<input type="hidden" id="containerDiv" name="containerDiv" value="">
-									--%>
-								<input type="hidden" id="noteUuid" name="noteUuid" value=""/>
-								<input type="hidden" id="noteSummaryCode" name="noteSummaryCode"
-									   value=""/>
-								<input type="hidden" id="noteEditId" name="noteEditId" value=""/>
-								<input type="hidden" id="noteRevision" name="noteRevision"
-									   value=""/>
-								<input type="hidden" id="issueChange" name="issueChange" value=""/>
-								<input type="hidden" id="archived" name="archived" value="false"/>
-								<input type="hidden" id="annotation_attrib" name="annotation_attrib"/>
-								<div id="winTitle"></div>
-								<div id="editNoteError" class="error editNoteError"></div>
-								<textarea style="margin: 10px;" cols="50" rows="15" id="noteEditTxt"
-										  name="value"></textarea>
-								<br>
-
-								<table>
-									<tr id="Itemproblemdescription">
-										<td><bean:message
-												key="oscarEncounter.problemdescription.title"/>:
-										</td>
-										<td><input type="text" id="problemdescription"
-												   name="problemdescription" value=""></td>
-									</tr>
-									<tr id="Itemstartdate">
-										<td><bean:message key="oscarEncounter.startdate.title"/>:
-										</td>
-										<td><input type="text" id="startdate" name="startdate"
-												   value="" size="12"> (YYYY-MM-DD)
-										</td>
-									</tr>
-									<tr id="Itemresolutiondate">
-										<td><bean:message
-												key="oscarEncounter.resolutionDate.title"/>:
-										</td>
-										<td><input type="text" id="resolutiondate"
-												   name="resolutiondate" value="" size="12">
-											(YYYY-MM-DD)
-										</td>
-									</tr>
-									<tr id="Itemageatonset">
-										<td><bean:message key="oscarEncounter.ageAtOnset.title"/>:
-										</td>
-										<td><input type="text" id="ageatonset" name="ageatonset"
-												   value="" size="2"></td>
-									</tr>
-
-									<tr id="Itemproceduredate">
-										<td><bean:message key="oscarEncounter.procedureDate.title"/>:
-										</td>
-										<td><input type="text" id="proceduredate"
-												   name="proceduredate"
-												   value="" size="12"> (YYYY-MM-DD)
-										</td>
-									</tr>
-									<tr id="Itemtreatment">
-										<td><bean:message key="oscarEncounter.treatment.title"/>:
-										</td>
-										<td><input type="text" id="treatment" name="treatment"
-												   value=""></td>
-									</tr>
-									<tr id="Itemproblemstatus">
-										<td><bean:message key="oscarEncounter.problemStatus.title"/>:
-										</td>
-										<td><input type="text" id="problemstatus"
-												   name="problemstatus"
-												   value="" size="8"> <bean:message
-												key="oscarEncounter.problemStatusExample.msg"/></td>
-									</tr>
-									<tr id="Itemexposuredetail">
-										<td><bean:message
-												key="oscarEncounter.exposureDetail.title"/>:
-										</td>
-										<td><input type="text" id="exposuredetail"
-												   name="exposuredetail" value=""></td>
-									</tr>
-									<tr id="Itemrelationship">
-										<td><bean:message key="oscarEncounter.relationship.title"/>:
-										</td>
-										<td><input type="text" id="relationship" name="relationship"
-												   value=""></td>
-									</tr>
-									<tr id="Itemlifestage">
-										<td><bean:message key="oscarEncounter.lifestage.title"/>:
-										</td>
-										<td><select name="lifestage" id="lifestage">
-											<option value="">
-												<bean:message
-														key="oscarEncounter.lifestage.opt.notset"/>
-											</option>
-											<option value="N">
-												<bean:message
-														key="oscarEncounter.lifestage.opt.newborn"/>
-											</option>
-											<option value="I">
-												<bean:message
-														key="oscarEncounter.lifestage.opt.infant"/>
-											</option>
-											<option value="C">
-												<bean:message
-														key="oscarEncounter.lifestage.opt.child"/>
-											</option>
-											<option value="T">
-												<bean:message
-														key="oscarEncounter.lifestage.opt.adolescent"/>
-											</option>
-											<option value="A">
-												<bean:message
-														key="oscarEncounter.lifestage.opt.adult"/>
-											</option>
-										</select></td>
-									</tr>
-									<tr id="Itemhidecpp">
-										<td><bean:message key="oscarEncounter.hidecpp.title"/>:</td>
-										<td><select id="hidecpp" name="hidecpp">
-											<option value="0">No</option>
-											<option value="1">Yes</option>
-										</select></td>
-									</tr>
-								</table>
-								<br>
-								<span style="float: right; margin-right: 10px;">
-									<input type="image"
-										   src="<c:out value="${ctx}/oscarEncounter/graphics/copy.png"/>"
-										   title='<bean:message key="oscarEncounter.Index.btnCopy"/>'
-										   onclick="encounterNote.copyCppToCurrentNote(); return false;">
-									<input type="image"
-										   src="<c:out value="${ctx}/oscarEncounter/graphics/annotation.png"/>"
-										   title='<bean:message key="oscarEncounter.Index.btnAnnotation"/>'
-										   id="anno" style="padding-right: 10px;">
-									<input type="image"
-										   src="<c:out value="${ctx}/oscarEncounter/graphics/edit-cut.png"/>"
-										   title='<bean:message key="oscarEncounter.Index.btnArchive"/>'
-										   onclick="$('archived').value='true';"
-										   style="padding-right: 10px;">
-									<input type="image"
-										   src="<c:out value="${ctx}/oscarEncounter/graphics/note-save.png"/>"
-										   title='<bean:message key="oscarEncounter.Index.btnSignSave"/>'
-										   onclick="$('archived').value='false';" style="padding-right: 10px;">
-									<input type="image"
-										   src="<c:out value="${ctx}/oscarEncounter/graphics/system-log-out.png"/>"
-										   title='<bean:message key="global.btnExit"/>'
-										   onclick="this.focus();cppNote.hideEdit();return false;">
-						   <%--onclick="this.focus();$('channel').style.visibility ='visible';$('showEditNote').style.display='none';return false;">--%>
-								</span>
-								<bean:message key="oscarEncounter.Index.btnPosition"/>
-								<select id="position" name="position">
-								</select>
-								<div id="issueNoteInfo"
-									 style="clear: both; text-align: left;"></div>
-								<div id="issueListCPP"
-									 style="background-color: #FFFFFF; height: 200px; width: 350px; position: absolute; z-index: 1; display: none; overflow: auto;">
-									<div class="enTemplate_name_auto_complete"
-										 id="issueAutocompleteListCPP"
-										 style="position: relative; left: 0px; display: none;"></div>
-								</div>
-								<bean:message key="oscarEncounter.Index.assnIssue"/>
-								&nbsp;<input tabindex="100" type="text" id="issueAutocompleteCPP"
-											 name="issueSearch" style="z-index: 2;" size="25">&nbsp;
-								<span
-										id="busy2" style="display: none"><img
-										style="position: absolute;"
-										src="<c:out value="${ctx}/oscarEncounter/graphics/busy.gif"/>"
-										alt="<bean:message key="oscarEncounter.Index.btnWorking"/>"></span>
-
-							</form>
-						</div>
-
-						<div id="printOps" class="printOps">
-							<h3 style="margin-bottom: 5px; text-align: center;">
-								<bean:message key="oscarEncounter.Index.PrintDialog"/>
-							</h3>
-							<form id="frmPrintOps" action="" onsubmit="return false;">
-								<table id="printElementsTable">
-									<tr>
-										<td><input type="radio" id="printopSelected" name="printop"
-												   value="selected">
-											<bean:message key="oscarEncounter.Index.PrintSelect"/>
-										</td>
-										<td>
-											<%
-												String roleName = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-											%> <security:oscarSec roleName="<%=roleName%>"
-																  objectName="_newCasemgmt.cpp"
-																  rights="r" reverse="false">
-											<img style="cursor: pointer;"
-												 title="<bean:message key="oscarEncounter.print.title"/>"
-												 id='imgPrintCPP'
-												 alt="<bean:message key="oscarEncounter.togglePrintCPP.title"/>"
-												 onclick="return printNotes.printInfo(this,'printCPP');"
-												 src='<c:out value="${ctx}"/>/oscarEncounter/graphics/printer.png'>&nbsp;<bean:message
-												key="oscarEncounter.cpp.title"/>
-										</security:oscarSec>
-										</td>
-									</tr>
-									<tr>
-										<td><input type="radio" id="printopAll" name="printop"
-												   value="all">
-											<bean:message key="oscarEncounter.Index.PrintAll"/></td>
-										<td><img style="cursor: pointer;"
-												 title="<bean:message key="oscarEncounter.print.title"/>"
-												 id='imgPrintRx'
-												 alt="<bean:message key="oscarEncounter.togglePrintRx.title"/>"
-												 onclick="return printNotes.printInfo(this, 'printRx');"
-												 src='<c:out value="${ctx}"/>/oscarEncounter/graphics/printer.png'>&nbsp;<bean:message
-												key="oscarEncounter.Rx.title"/></td>
-									</tr>
-									<tr>
-										<td></td>
-										<td><img style="cursor: pointer;"
-												 title="<bean:message key="oscarEncounter.print.title"/>"
-												 id='imgPrintLabs'
-												 alt="<bean:message key="oscarEncounter.togglePrintLabs.title"/>"
-												 onclick="return printNotes.printInfo(this, 'printLabs');"
-												 src='<c:out value="${ctx}"/>/oscarEncounter/graphics/printer.png'>&nbsp;<bean:message
-												key="oscarEncounter.Labs.title"/></td>
-									</tr>
-									<!--  extension point -->
-									<tr id="printDateRow">
-										<td><input type="radio" id="printopDates" name="printop"
-												   value="dates">
-											<bean:message key="oscarEncounter.Index.PrintDates"/>&nbsp;<a
-													style="font-variant: small-caps;" href="#"
-													onclick="return printNotes.printToday(event);"><bean:message
-													key="oscarEncounter.Index.PrintToday"/></a></td>
-										<td></td>
-									</tr>
-								</table>
-
-								<div style="float: left; margin-left: 5px; width: 30px;">
-									<bean:message key="oscarEncounter.Index.PrintFrom"/>
-									:
-								</div>
-								<img src="<c:out value="${ctx}/images/cal.gif" />"
-									 id="printStartDate_cal" alt="calendar">&nbsp;<input
-									type="text" id="printStartDate" name="printStartDate"
-									ondblclick="this.value='';"
-									style="font-style: italic; border: 1px solid #7682b1; width: 125px; background-color: #FFFFFF;"
-									readonly value=""><br>
-								<div style="float: left; margin-left: 5px; width: 30px;">
-									<bean:message key="oscarEncounter.Index.PrintTo"/>
-									:
-								</div>
-								<img src="<c:out value="${ctx}/images/cal.gif" />"
-									 id="printEndDate_cal" alt="calendar">&nbsp;<input type="text"
-																					   id="printEndDate"
-																					   name="printEndDate"
-																					   ondblclick="this.value='';"
-																					   style="font-style: italic; border: 1px solid #7682b1; width: 125px; background-color: #FFFFFF;"
-																					   readonly
-																					   value=""><br>
-								<div style="margin-top: 5px; text-align: center">
-									<input type="submit" id="printOp"
-										   style="border: 1px solid #7682b1;"
-										   value="Print" onclick="return printNotes.printNotes();">
-
-									<indivo:indivoRegistered
-											demographic="<%=(String) request.getAttribute(\"demographicNo\")%>"
-											provider="<%=(String) request.getSession().getAttribute(\"user\")%>">
-										<input type="submit" id="sendToPhr"
-											   style="border: 1px solid #7682b1;"
-											   value="Send To Phr"
-											   onclick="return sendToPhrr();">
-									</indivo:indivoRegistered>
-									<input type="submit" id="cancelprintOp"
-										   style="border: 1px solid #7682b1;" value="Cancel"
-										   onclick="$('printOps').style.display='none';"> <input
-										type="submit" id="clearprintOp"
-										style="border: 1px solid #7682b1;"
-										value="Clear"
-										onclick="$('printOps').style.display='none'; return printNotes.clearAll(event);">
-								</div>
-
-								<%
-									if (OscarProperties.getInstance().getBooleanProperty("note_program_ui_enabled", "true"))
-									{
-								%>
-								<span class="popup" style="display: none;" id="_program_popup">
-					<div class="arrow"></div>
-					<div class="contents">
-						<div class="selects">
-							<select class="selectProgram"></select> <select class="role"></select>
-						</div>
-						<div class="under">
-							<div class="errorMessage"></div>
-							<input type="button" class="scopeBtn" value="View Note Scope"/>
-							<input type="button" class="closeBtn" value="Close"/> <input
-								type="button" class="saveBtn" value="Save"/>
-						</div>
-					</div>
-				</span>
-
-								<div id="_program_scope" class="_program_screen"
-									 style="display: none;">
-									<div class="_scopeBox">
-										<div class="boxTitle">
-											<span class="text">Note Permission Summary</span><span
-												class="uiBigBarBtn"><span
-												class="text">x</span></span>
-										</div>
-										<table class="details">
-											<tr>
-												<th>Program Name (of this note)</th>
-												<td class="programName">...</td>
-											</tr>
-											<tr>
-												<th>Role Name (of this note)</th>
-												<td class="roleName">...</td>
-											</tr>
-										</table>
-										<div class="explanation">The following is a summary of what
-											kind of access providers in the above program have to
-											this note.
-										</div>
-										<div class="loading">Loading...</div>
-										<table class="permissions"></table>
-									</div>
-								</div>
-								<%
-									}
-								%>
-							</form>
-						</div>
-
-
-						<script type="text/javascript">
-							/*
-							document.observe('dom:loaded', function(){
-								init();
-							});
-							*/
-
-							(function ($)
-							{
-								$(document).ready(function ()
-								{
-									init();
-								});
-							})(jQuery);
-
-						</script>
-	</body>
+</body>
 </html:html>
