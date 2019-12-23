@@ -169,7 +169,7 @@ public class MyHealthAccessService
 			// deleted appointments are treated as canceled when sent to MHA
 			String siteName = (oscarProps.isMultisiteEnabled()) ? appointment.getLocation() : null;
 			AppointmentCacheTo1 transfer = getCacheTransfer(appointment);
-			transfer.setCanceled(true);
+			transfer.setCancelled(true);
 			addCacheEntry(transfer, siteName);
 		}
 		catch(Exception e)
@@ -201,7 +201,7 @@ public class MyHealthAccessService
 	{
 		AppointmentCacheTo1 transfer = new AppointmentCacheTo1();
 		transfer.setId(String.valueOf(appointment.getId()));
-		transfer.setCanceled(appointment.getAppointmentStatus().equals(Appointment.CANCELLED));
+		transfer.setCancelled(appointment.getAppointmentStatus().equals(Appointment.CANCELLED));
 		transfer.setVirtual(appointment.getIsVirtual());
 		transfer.setStartDateTime(ConversionUtils.toZonedDateTime(appointment.getStartTimeAsFullDate()));
 		transfer.setEndDateTime(ConversionUtils.toZonedDateTime(appointment.getEndTimeAsFullDate()));

@@ -35,7 +35,7 @@ import javax.annotation.PostConstruct;
 public class IntegrationPushUpdateSchedulingTask
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final String cronSchedule = "0 */1 * * * *";
+	private static final String cronSchedule = "0 */5 * * * *";
 
 	@Autowired
 	private IntegrationPushUpdateService integrationPushUpdateService;
@@ -47,7 +47,7 @@ public class IntegrationPushUpdateSchedulingTask
 	}
 
 	@Scheduled(cron = cronSchedule)
-	public void retrieveInboundFaxes()
+	public void scheduledPushIntegrationUpdates()
 	{
 		try
 		{

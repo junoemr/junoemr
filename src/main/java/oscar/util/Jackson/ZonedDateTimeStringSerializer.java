@@ -22,30 +22,30 @@
  */
 package oscar.util.Jackson;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class ZonedLocalDateTimeStringDeserializer extends StdDeserializer<ZonedDateTime>
+public class ZonedDateTimeStringSerializer extends StdSerializer<ZonedDateTime>
 {
-	protected ZonedLocalDateTimeStringDeserializer()
+	protected ZonedDateTimeStringSerializer()
 	{
 		this(null);
 	}
 
-	protected ZonedLocalDateTimeStringDeserializer(Class<ZonedDateTime> t)
+	protected ZonedDateTimeStringSerializer(Class<ZonedDateTime> t)
 	{
 		super(t);
 	}
 
 	@Override
-	public ZonedDateTime deserialize(JsonParser jsonparser, DeserializationContext context)
-			throws IOException
+	public void serialize(ZonedDateTime zonedDateTime, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException
 	{
-		return ZonedDateTime.parse(jsonparser.getText(), DateTimeFormatter.ISO_DATE_TIME);
+		String formattedString = zonedDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
+		jsonGenerator.writeString(formattedString);
 	}
 }

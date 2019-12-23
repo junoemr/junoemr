@@ -187,6 +187,11 @@ public class IntegrationPushUpdate extends AbstractModel<Integer>
 		this.setStatus(PUSH_STATUS.SENT);
 	}
 
+	public void setStatusError()
+	{
+		this.setStatus(PUSH_STATUS.ERROR);
+	}
+
 	public Integer getSendCount()
 	{
 		return sendCount;

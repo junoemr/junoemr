@@ -28,8 +28,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import oscar.util.Jackson.ZonedLocalDateTimeStringDeserializer;
-import oscar.util.Jackson.ZonedLocalDateTimeStringSerializer;
+import oscar.util.Jackson.ZonedDateTimeStringDeserializer;
+import oscar.util.Jackson.ZonedDateTimeStringSerializer;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -38,23 +38,23 @@ import java.time.ZonedDateTime;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class AppointmentCacheTo1 implements Serializable
 {
-	@JsonProperty("appointment_id")
+	@JsonProperty("remote_id")
 	private String id;
 
 	@JsonProperty("is_virtual")
 	private Boolean isVirtual;
 
-	@JsonProperty("is_canceled")
-	private Boolean isCanceled;
+	@JsonProperty("is_cancelled")
+	private Boolean isCancelled;
 
 	@JsonProperty("start_datetime")
-	@JsonSerialize(using = ZonedLocalDateTimeStringSerializer.class)
-	@JsonDeserialize(using = ZonedLocalDateTimeStringDeserializer.class)
+	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
+	@JsonDeserialize(using = ZonedDateTimeStringDeserializer.class)
 	private ZonedDateTime startDateTime;
 
 	@JsonProperty("end_datetime")
-	@JsonSerialize(using = ZonedLocalDateTimeStringSerializer.class)
-	@JsonDeserialize(using = ZonedLocalDateTimeStringDeserializer.class)
+	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
+	@JsonDeserialize(using = ZonedDateTimeStringDeserializer.class)
 	private ZonedDateTime endDateTime;
 
 	public String getId()
@@ -77,14 +77,14 @@ public class AppointmentCacheTo1 implements Serializable
 		isVirtual = virtual;
 	}
 
-	public Boolean getCanceled()
+	public Boolean getCancelled()
 	{
-		return isCanceled;
+		return isCancelled;
 	}
 
-	public void setCanceled(Boolean canceled)
+	public void setCancelled(Boolean canceled)
 	{
-		isCanceled = canceled;
+		isCancelled = canceled;
 	}
 
 	public ZonedDateTime getStartDateTime()

@@ -48,6 +48,7 @@ import static org.oscarehr.integration.model.Integration.INTEGRATION_TYPE_MHA;
 public class IntegrationPushUpdateService
 {
 	private static final Logger logger = MiscUtils.getLogger();
+	private static final Integer MAX_SEND_ATTEMPTS = 25;
 
 	@Autowired
 	private AppointmentService appointmentService;
@@ -79,14 +80,23 @@ public class IntegrationPushUpdateService
 	public void sendQueuedUpdates()
 	{
 		ObjectMapper mapper = new ObjectMapper();
-		List<IntegrationPushUpdate> queuedUpdates = integrationPushUpdateDao.findQueued(INTEGRATION_TYPE_MHA);
+		List<IntegrationPushUpdate> unsentUpdates = integrationPushUpdateDao.findUnsent(INTEGRATION_TYPE_MHA);
 		ArrayList<String> failedIdList = new ArrayList<>();
 
-		if(!queuedUpdates.isEmpty() && serverStateHandler.isThisServerMaster())
+		if(!unsentUpdates.isEmpty() && serverStateHandler.isThisServerMaster())
 		{
-			logger.info("pushing " + queuedUpdates.size() + " integration updates");
-			for(IntegrationPushUpdate update : queuedUpdates)
+			logger.info("pushing " + unsentUpdates.size() + " integration updates");
+			for(IntegrationPushUpdate update : unsentUpdates)
 			{
+				// if an error status found, skip it and all subsequent updates by id
+				if(update.getStatus() == IntegrationPushUpdate.PUSH_STATUS.ERROR)
+				{
+					failedIdList.add(update.getAppointmentId());
+					logger.error("Integration updates for appointment_id " + update.getAppointmentId() +
+							" are in an error state and cannot be pushed.");
+					continue;
+				}
+
 				// skip sending subsequent updates for appointments that have failed
 				if(failedIdList.contains(update.getAppointmentId()))
 				{
@@ -104,6 +114,12 @@ public class IntegrationPushUpdateService
 				{
 					logger.error("Error sending integration update for appointment " + update.getAppointmentId(), e);
 					failedIdList.add(update.getAppointmentId());
+
+					// +1 to account for increment that is not added yet
+					if(update.getSendCount() + 1 >= MAX_SEND_ATTEMPTS)
+					{
+						update.setStatusError();
+					}
 				}
 				finally
 				{

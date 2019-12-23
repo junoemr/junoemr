@@ -37,15 +37,15 @@ public class IntegrationPushUpdateDao extends AbstractDao<IntegrationPushUpdate>
 		super(IntegrationPushUpdate.class);
 	}
 
-	public List<IntegrationPushUpdate> findQueued(String integrationType)
+	public List<IntegrationPushUpdate> findUnsent(String integrationType)
 	{
 		Query query = entityManager.createQuery(
 				"SELECT x FROM IntegrationPushUpdate x " +
-						"WHERE x.status = :status " +
+						"WHERE x.status <> :status " +
 						"AND x.integrationType = :integrationType " +
-						"ORDER BY x.id");
+						"ORDER BY x.createdAt, x.id");
 
-		query.setParameter("status", IntegrationPushUpdate.PUSH_STATUS.QUEUED);
+		query.setParameter("status", IntegrationPushUpdate.PUSH_STATUS.SENT);
 		query.setParameter("integrationType", integrationType);
 
 		return query.getResultList();
