@@ -35,10 +35,12 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNull;
@@ -809,7 +811,7 @@ public class ConversionUtilsTest
 	{
 		String dateTimeString = "2019-04-03 09:30:5";
 
-		Calendar expectedCalendarDate = new GregorianCalendar();
+		Calendar expectedCalendarDate = Calendar.getInstance(TimeZone.getDefault());
 		expectedCalendarDate.set(Calendar.YEAR, 2019);
 		expectedCalendarDate.set(Calendar.MONTH, Calendar.APRIL);
 		expectedCalendarDate.set(Calendar.DAY_OF_MONTH, 3);
@@ -1154,5 +1156,39 @@ public class ConversionUtilsTest
 		LocalDateTime currTime = LocalDateTime.now();
 		Timestamp timestamp = ConversionUtils.toTimestamp(currTime);
 		Assert.assertEquals("expected timestamp to equal LocalDateTime",currTime, timestamp.toLocalDateTime());
+	}
+
+	@Test
+	public void parseBoolean_truthyValues_ExpectTrue()
+	{
+		List<String> trueStrings = Arrays.asList("true", "on", "yes", "enabled", "tRUE", "On", "YeS", "EnaBled");
+		for (String trueString : trueStrings)
+		{
+			try
+			{
+				Assert.assertTrue(ConversionUtils.parseBoolean(trueString));
+			}
+			catch(ParseException e)
+			{
+				Assert.fail(e.getMessage());
+			}
+		}
+	}
+
+	@Test
+	public void parseBoolean_falseValues_ExpectFalse()
+	{
+		List<String> falseStrings = Arrays.asList("off", "no", "false",  "disabled", "OfF", "No", "FalSE", "disABLED");
+		for (String falseString : falseStrings)
+		{
+			try
+			{
+				Assert.assertFalse(ConversionUtils.parseBoolean(falseString));
+			}
+			catch(ParseException e)
+			{
+				Assert.fail(e.getMessage());
+			}
+		}
 	}
 }

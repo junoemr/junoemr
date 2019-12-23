@@ -52,7 +52,6 @@ public class BaseService extends org.oscarehr.integration.BaseService
 	protected final String MYHEALTHACCESS_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
 	protected final String BASE_API_URI = oscarProps.getProperty("myhealthaccess_api_uri");
 	protected final String BASE_END_POINT = concatEndpointStrings(MYHEALTHACCESS_DOMAIN, BASE_API_URI);
-	protected final String CLINIC_API_KEY = oscarProps.getProperty("myhealthaccess_clinic_api_key");
 
 	public String buildUrl(String endPoint)
 	{

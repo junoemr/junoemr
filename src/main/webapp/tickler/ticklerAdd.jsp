@@ -43,25 +43,30 @@
 <%
 	String user_no = (String) session.getAttribute("user");
 	oscar.OscarProperties props = oscar.OscarProperties.getInstance();
+	// if true we are assigning tickers for multiple demographics
+	boolean multiDemo = "true".equalsIgnoreCase(request.getParameter("multiple_demographics"));
 	boolean bFirstDisp = true; //this is the first time to display the window
 	if(request.getParameter("bFirstDisp") != null)
 		bFirstDisp = (request.getParameter("bFirstDisp")).equals("true");
 	String ChartNo;
-	String demoNo = request.getParameter("demographic_no");
-	String demoName = request.getParameter("name");
+
+	// single demographic
+	String demoNo = StringUtils.trimToEmpty(request.getParameter("demographic_no"));
+	String demoName = StringUtils.trimToEmpty(request.getParameter("name"));
+
 	if(request.getAttribute("demographic_no") != null)
 	{
-		demoNo = (String) request.getAttribute("demographic_no");
-		demoName = (String) request.getAttribute("demoName");
+		demoNo = StringUtils.trimToEmpty((String) request.getAttribute("demographic_no"));
+		demoName = StringUtils.trimToEmpty((String) request.getAttribute("demoName"));
 		bFirstDisp = false;
 	}
-	if(demoName == null)
+
+	// multiple demographics
+	List<String> demoNos = null;
+
+	if (multiDemo)
 	{
-		demoName = "";
-	}
-	if(demoNo == null)
-	{
-		demoNo = "";
+		demoNos = Arrays.asList(demoNo.split("&"));
 	}
 
 	//Retrieve encounter id for updating encounter navbar if info this page changes anything
@@ -102,6 +107,8 @@
 <%@page import="java.util.GregorianCalendar" %>
 <%@page import="java.util.Iterator" %>
 <%@page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.util.Arrays" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -256,10 +263,26 @@
 						face="Verdana, Arial, Helvetica, sans-serif" size="2"><b><bean:message
 						key="tickler.ticklerAdd.formDemoName"/>: </b></font></font></td>
 				<td colspan="2" width="65%">
-					<div align="left"><INPUT TYPE="TEXT" NAME="keyword" size="25"
-											 VALUE="<%=bFirstDisp ? "" : demoName.equals("") ? session.getAttribute("appointmentname") == null ? "" : (String) session.getAttribute("appointmentname") : demoName%>">
-						<input type="submit" name="Submit"
-							   value="<bean:message key="tickler.ticklerAdd.btnSearch"/>">
+						<%
+						if (multiDemo)
+						{
+							%>
+							<div align="left"><INPUT TYPE="TEXT" NAME="keyword" size="25" disabled="true"
+																			 VALUE="<%=demoNos.size() + " Demographics"%>">
+								<input type="submit" name="Submit" disabled="true"
+											 value="<bean:message key="tickler.ticklerAdd.btnSearch"/>">
+							<%
+						}
+						else
+						{
+							%>
+								<div align="left"><INPUT TYPE="TEXT" NAME="keyword" size="25"
+																				 VALUE="<%=bFirstDisp ? "" : demoName.equals("") ? session.getAttribute("appointmentname") == null ? "" : (String) session.getAttribute("appointmentname") : demoName%>">
+								<input type="submit" name="Submit"
+											 value="<bean:message key="tickler.ticklerAdd.btnSearch"/>">
+							<%
+						}
+						%>
 					</div>
 				</td>
 			</tr>
@@ -313,6 +336,7 @@
 			  onsubmit="return validateForm()">
 			<input type="hidden" name="parentAjaxId" value="<%=parentAjaxId%>"/>
 			<input type="hidden" name="updateParent" value="<%=updateParent%>"/>
+			<input type="hidden" name="multiple_demographics" value="<%=multiDemo%>"/>
 			<tr>
 				<td width="35%">
 					<div align="left"><font color="#003366"><font

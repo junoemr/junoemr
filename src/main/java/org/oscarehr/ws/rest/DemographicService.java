@@ -177,7 +177,7 @@ public class DemographicService extends AbstractServiceImpl {
 	 */
 	@GET
 	@Path("/{dataId}")
-	@Produces({MediaType.APPLICATION_JSON , MediaType.APPLICATION_XML})
+	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<DemographicTo1> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException {
 		try
 		{
@@ -318,7 +318,7 @@ public class DemographicService extends AbstractServiceImpl {
 	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces({MediaType.APPLICATION_JSON , MediaType.APPLICATION_XML})
+	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<DemographicTo1> createDemographicData(DemographicTo1 data) {
 		try
 		{

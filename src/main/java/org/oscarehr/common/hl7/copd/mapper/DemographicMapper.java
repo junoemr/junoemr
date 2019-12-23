@@ -74,6 +74,7 @@ public class DemographicMapper extends AbstractMapper
 
 			demographic.setPhone(getHomePhone());
 			demographic.setPhone2(getBuisnessPhone());
+			demographic.setEmail(getEmail());
 
 			return demographic;
 		}
@@ -91,8 +92,13 @@ public class DemographicMapper extends AbstractMapper
 	{
 		List<DemographicExt> extensionList = new LinkedList<>();
 
-		// attach cell number
+		// there are two ways the cell gets specified, as personal or as cell.
 		String cellPhone = getPersonalPhone();
+		if (cellPhone == null)
+		{
+			cellPhone = getCellPhone();
+		}
+
 		if(cellPhone != null)
 		{
 			DemographicExt extension = new DemographicExt();
@@ -200,6 +206,7 @@ public class DemographicMapper extends AbstractMapper
 		}
 		return null;
 	}
+
 	public String getPersonalPhone() throws HL7Exception
 	{
 		Integer rep = getPhoneRepByUsageType("PERS");
@@ -210,12 +217,42 @@ public class DemographicMapper extends AbstractMapper
 		return null;
 	}
 
+	public String getCellPhone() throws HL7Exception
+	{
+		Integer rep = getCellPhoneRepByUsageType("RESD");
+		if(rep != null)
+		{
+			return getPhone(rep);
+		}
+		else
+		{
+			// cell phone can also be specified by the PERS telecom type.
+			rep = getCellPhoneRepByUsageType("PERS");
+			if(rep != null)
+			{
+				return getPhone(rep);
+			}
+		}
+		return null;
+	}
+
 	public String getPhone(int rep) throws HL7Exception
 	{
 		String areaCode = messagePID.getPid13_PhoneNumberHome(rep).getAreaCityCode().getValue();
 		String phoneNumber = messagePID.getPid13_PhoneNumberHome(rep).getPhoneNumber().getValue();
 
 		return StringUtils.trimToNull(StringUtils.trimToEmpty(areaCode) + StringUtils.trimToEmpty(phoneNumber));
+	}
+
+	private String getEmail() throws HL7Exception
+	{
+		Integer rep = getEmailRepByUsageType("PERS");
+		if (rep != null)
+		{
+			return messagePID.getPid13_PhoneNumberHome(rep).getEmailAddress().getValue();
+		}
+
+		return null;
 	}
 
 	public String getPHN() throws HL7Exception
@@ -282,14 +319,39 @@ public class DemographicMapper extends AbstractMapper
 		return null;
 	}
 
-	private Integer getPhoneRepByUsageType(String phoneType) throws HL7Exception
+	private Integer getPhoneRepByUsageType(String usageType) throws HL7Exception
+	{
+		return getPhoneRepByTypeAndUsageType(usageType, "PH");
+	}
+
+	private Integer getCellPhoneRepByUsageType(String usageType) throws HL7Exception
+	{
+		return getPhoneRepByTypeAndUsageType(usageType, "CP");
+	}
+
+	private Integer getPhoneRepByTypeAndUsageType(String usageType, String phoneType) throws HL7Exception
 	{
 		for(int rep=0; rep<messagePID.getPid13_PhoneNumberHomeReps(); rep++)
 		{
 			String telecomUsage = messagePID.getPid13_PhoneNumberHome(rep).getXtn2_TelecommunicationUseCode().getValue();
 			String telecomType = messagePID.getPid13_PhoneNumberHome(rep).getXtn3_TelecommunicationEquipmentType().getValue();
 
-			if("PH".equalsIgnoreCase(telecomType) && phoneType.equalsIgnoreCase(telecomUsage))
+			if(phoneType.equalsIgnoreCase(telecomType) && usageType.equalsIgnoreCase(telecomUsage))
+			{
+				return rep;
+			}
+		}
+		return null;
+	}
+
+	private Integer getEmailRepByUsageType(String emailType) throws HL7Exception
+	{
+		for(int rep=0; rep<messagePID.getPid13_PhoneNumberHomeReps(); rep++)
+		{
+			String telecomUsage = messagePID.getPid13_PhoneNumberHome(rep).getXtn2_TelecommunicationUseCode().getValue();
+			String telecomType = messagePID.getPid13_PhoneNumberHome(rep).getXtn3_TelecommunicationEquipmentType().getValue();
+
+			if("Internet".equalsIgnoreCase(telecomType) && emailType.equalsIgnoreCase(telecomUsage))
 			{
 				return rep;
 			}

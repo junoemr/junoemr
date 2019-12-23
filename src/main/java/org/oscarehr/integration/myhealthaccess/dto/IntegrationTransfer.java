@@ -79,7 +79,7 @@ public final class IntegrationTransfer
         SiteDao siteDao = SpringUtils.getBean(SiteDao.class);
         Integration integration = new Integration();
 
-        integration.setId(this.clinicId);
+        integration.setRemoteId(this.clinicId);
         integration.setApiKey(this.apiKey);
         integration.setIntegrationType(this.integrationType);
         integration.setSite(siteDao.findByName(this.siteName));

@@ -83,6 +83,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String SCHEDULE_PERIOD = "schedule.period";
     public static final String SCHEDULE_SITE = "schedule.site";
     public static final String SCHEDULE_VIEW = "schedule.view";
+    public static final String SCHEDULE_COUNT_ENABLED = "schedule_count_enabled";
     public static final String SCHEDULE_COUNT_INCLUDE_CANCELLED = "schedule_count_include_cancelled";
     public static final String SCHEDULE_COUNT_INCLUDE_NO_SHOW = "schedule_count_include_noshow";
     public static final String SCHEDULE_COUNT_INCLUDE_NO_DEMOGRAPHIC = "schedule_count_include_no_demographic";
@@ -123,6 +124,8 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String HIDE_OLD_ECHART_LINK_IN_APPT="hide_old_echart_link_in_appointment";
     public static final String DISABLE_BORN_PROMPTS = "disable_born_prompts";
     public static final String INTAKE_FORM_ENABLED = "intake_form_enabled";
+    public static final String TICKLER_VIEW_ONLY_MINE = "tickler_view_only_mine";
+    public static final String CARE_CONNECT_ENABLED = "integration.CareConnect.enabled";
 
     
     public static final String DEFAULT_PRINTER_PDF_LABEL="default_printer_pdf_label";

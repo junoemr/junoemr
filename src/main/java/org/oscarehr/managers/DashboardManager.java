@@ -321,7 +321,7 @@ public class DashboardManager {
 	/**
 	 *  Get an entire Dashboard, with all of its Indicators in a List parameter.
 	 */
-	public DashboardBean getDashboard( LoggedInInfo loggedInInfo, int dashboardId ) {
+	public DashboardBean getDashboard( LoggedInInfo loggedInInfo, int dashboardId) {
 		
 		DashboardBean dashboardBean = null;
 
@@ -340,7 +340,7 @@ public class DashboardManager {
 		
 		if( dashboardEntity != null ) {
 			// Add the indicators and panels.
-			dashboardBeanFactory = new DashboardBeanFactory( loggedInInfo, dashboardEntity );
+			dashboardBeanFactory = new DashboardBeanFactory( loggedInInfo, dashboardEntity);
 		}
 
 		if( dashboardBeanFactory != null ) {
@@ -369,7 +369,7 @@ public class DashboardManager {
 	/**
 	 * Get the XML template that contains all the data and meta data for an Indicator display. 
 	 */
-	public IndicatorTemplateXML getIndicatorTemplateXML( LoggedInInfo loggedInInfo, int indicatorTemplateId ) {
+	public IndicatorTemplateXML getIndicatorTemplateXML( LoggedInInfo loggedInInfo, int indicatorTemplateId, String providerNo) {
 		
 		IndicatorTemplateXML indicatorTemplateXML = null;
 		
@@ -378,7 +378,7 @@ public class DashboardManager {
 		}
 		
 		IndicatorTemplate indicatorTemplate = getIndicatorTemplate( loggedInInfo, indicatorTemplateId );
-		IndicatorTemplateHandler templateHandler = new IndicatorTemplateHandler( loggedInInfo, indicatorTemplate.getTemplate().getBytes() );
+		IndicatorTemplateHandler templateHandler = new IndicatorTemplateHandler(indicatorTemplate.getTemplate().getBytes(), providerNo);
 		indicatorTemplateXML = templateHandler.getIndicatorTemplateXML();
 		
 		return indicatorTemplateXML;
@@ -387,7 +387,7 @@ public class DashboardManager {
 	/**
 	 * Create a DrilldownBean that contains the query results requested from a specific Indicator by ID.
 	 */
-	public DrilldownBean getDrilldownData( LoggedInInfo loggedInInfo, int indicatorTemplateId ) {
+	public DrilldownBean getDrilldownData( LoggedInInfo loggedInInfo, int indicatorTemplateId, String providerNo ) {
 
 		DrilldownBean drilldownBean = null; 
 		DrilldownBeanFactory drilldownBeanFactory = null;
@@ -399,7 +399,7 @@ public class DashboardManager {
 		IndicatorTemplate indicatorTemplate = getIndicatorTemplate( loggedInInfo, indicatorTemplateId );
 		
 		if( indicatorTemplate != null ) {
-			drilldownBeanFactory = new DrilldownBeanFactory( loggedInInfo, indicatorTemplate ); 
+			drilldownBeanFactory = new DrilldownBeanFactory( loggedInInfo, indicatorTemplate, providerNo );
 		}
 		
 		if( drilldownBeanFactory != null ) {
@@ -410,13 +410,13 @@ public class DashboardManager {
 
 	}
 	
-	public String exportDrilldownQueryResultsToCSV( LoggedInInfo loggedInInfo, int indicatorId ) {
+	public String exportDrilldownQueryResultsToCSV( LoggedInInfo loggedInInfo, int indicatorId, String providerNo) {
 		
 		if(!securityCheck(loggedInInfo, "_dashboardDrilldown", SecurityInfoManager.READ)) {
 			return null;
 		}
 		
-		IndicatorTemplateXML templateXML = getIndicatorTemplateXML( loggedInInfo, indicatorId );
+		IndicatorTemplateXML templateXML = getIndicatorTemplateXML( loggedInInfo, indicatorId, providerNo);
 
 		ExportQueryHandler exportQueryHandler = SpringUtils.getBean( ExportQueryHandler.class );
 		exportQueryHandler.setLoggedInInfo( loggedInInfo );
@@ -433,7 +433,7 @@ public class DashboardManager {
 	/**
 	 * Get an Indicator Panel Bean with a fully executed query. 
 	 */
-	public IndicatorBean getIndicatorPanel( LoggedInInfo loggedInInfo, int indicatorId ) {
+	public IndicatorBean getIndicatorPanel( LoggedInInfo loggedInInfo, int indicatorId, String providerNo) {
 		
 		IndicatorBean indicatorBean = null;
 		IndicatorBeanFactory indicatorBeanFactory = null;
@@ -442,7 +442,7 @@ public class DashboardManager {
 			return indicatorBean;
 		}
 		
-		IndicatorTemplateXML indicatorTemplateXML = getIndicatorTemplateXML( loggedInInfo, indicatorId );
+		IndicatorTemplateXML indicatorTemplateXML = getIndicatorTemplateXML( loggedInInfo, indicatorId, providerNo);
 		
 		// The id needs to be force set.
 		if( indicatorTemplateXML != null ) {

@@ -532,6 +532,11 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("schedule.enabled");
 	}
 
+	public boolean hasHRMDocuments()
+	{
+		return isPropertyActive("has_hrm_documents");
+	}
+
 	public String getCmeJs()
 	{
 		return getProperty("cme_js");

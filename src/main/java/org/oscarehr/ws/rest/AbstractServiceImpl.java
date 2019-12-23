@@ -32,14 +32,15 @@ import org.oscarehr.util.LoggedInInfo;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
  * Base class for RESTful web services
  */
-@Produces({ "application/xml" })
-@Consumes({ "application/xml" })
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public abstract class AbstractServiceImpl {
 
 	private static final int MAX_PAGE_RESULTS = 100;

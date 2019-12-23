@@ -21,7 +21,7 @@
 * Canada
 --%>
 <div id="group-selector-component">
-	<h4 class="section-heading">Form Groups</h4>
+	<h6 class="section-heading">Form Groups</h6>
 	<nav>
 		<ul>
 			<li class="group-list-item">

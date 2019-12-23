@@ -51,6 +51,11 @@ public class DisplayIndicatorAction extends DispatchAction {
 			HttpServletRequest request, HttpServletResponse response) {
 		
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+		if (request.getParameter("providerNo") != null)
+		{
+			providerNo = request.getParameter("providerNo");
+		}
 		
 		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardDisplay", SecurityInfoManager.READ, null ) ) {	
 			return mapping.findForward("unauthorized");
@@ -62,7 +67,7 @@ public class DisplayIndicatorAction extends DispatchAction {
 			id = Integer.parseInt( indicatorId );
 		}
 		
-		IndicatorBean indicatorPanelBean = dashboardManager.getIndicatorPanel(loggedInInfo, id);
+		IndicatorBean indicatorPanelBean = dashboardManager.getIndicatorPanel(loggedInInfo, id,  providerNo);
 		
 		request.setAttribute("indicatorPanel", indicatorPanelBean);
 		

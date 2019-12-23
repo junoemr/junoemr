@@ -42,9 +42,8 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
-import org.oscarehr.labs.dao.Hl7DocumentLinkDao;
-import org.oscarehr.util.SpringUtils;
 import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
@@ -52,7 +51,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -65,9 +66,23 @@ public class PATHL7Handler extends ORU_R01MessageHandler
     Logger logger = Logger.getLogger(PATHL7Handler.class);
     protected ORU_R01 msg;
 
-    private static Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
+	private static List<String> labDocuments = Arrays.asList(
+			"BCCASMP",
+			"BCCACSP",
+			"BLOODBANKT",
+			"CELLPATH",
+			"CELLPATHR",
+			"CYTO",
+			"CYTOGEN",
+			"DIAG IMAGE",
+			"MICRO3T",
+			"MICROGCMT",
+			"MICROGRT",
+			"MICROBCT",
+			"NOTIF",
+			"TRANSCRIP"
+	);
 
-	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","CYTO", "DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF", "BCCASMP", "BCCACSP", "CYTOGEN");
 	public static final String VIHARTF = "CELLPATHR";
 
 	// Embedded PDF strings that show up in OBX messages
@@ -76,6 +91,21 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 	public static final List<String> pdfReplacements = Arrays.asList("embedded_doc_id_", "embedded_doc_id");
 
 	public static final String pdfReplacement = "embedded_doc_id_";
+
+    /**
+     * Map Excelleris status codes to ones that we want to display to the user.
+     * Applies only when uploading new labs.
+     * This is a WIP and is based upon data previously seen in labs.
+     * May be modified later if we get formal specifications.
+     */
+    private static final Map<String, Hl7TextInfo.REPORT_STATUS> orderStatusMap = new HashMap<String,  Hl7TextInfo.REPORT_STATUS>();
+    static
+    {
+        orderStatusMap.put("P", Hl7TextInfo.REPORT_STATUS.E);
+        orderStatusMap.put("F", Hl7TextInfo.REPORT_STATUS.F);
+        orderStatusMap.put("C", Hl7TextInfo.REPORT_STATUS.C);
+        orderStatusMap.put("X", Hl7TextInfo.REPORT_STATUS.X);
+    }
 
     /** Creates a new instance of CMLHandler */
     public PATHL7Handler(){
@@ -253,16 +283,17 @@ public class PATHL7Handler extends ORU_R01MessageHandler
         }
     }
 
-    public String getObservationHeader(int i, int j){
-        try
-        {
-            return getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getDiagnosticServiceSectionID().getValue());
-        }
-        catch(Exception e)
-        {
-            return "";
-        }
-    }
+	public String getObservationHeader(int i, int j)
+	{
+		try
+		{
+			return getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getDiagnosticServiceSectionID().getValue());
+		}
+		catch(Exception e)
+		{
+			return "";
+		}
+	}
 
     public int getOBRCommentCount(int i){
         try
@@ -690,38 +721,35 @@ public class PATHL7Handler extends ORU_R01MessageHandler
         }
     }
 
-    /**
-     *  Retrieve the possible segment headers from the OBX fields
-     */
-    public ArrayList<String> getHeaders(){
-        int i;
-        int arraySize;
-        int k = 0;
+	/**
+	 *  Retrieve the possible segment headers from the OBR fields
+	 */
+	public ArrayList<String> getHeaders()
+	{
+		ArrayList<String> headers = new ArrayList<String>();
+		String currentHeader;
 
-        ArrayList<String> headers = new ArrayList<String>();
-        String currentHeader;
+		try
+		{
+			for (int i = 0; i < msg.getRESPONSE().getORDER_OBSERVATIONReps(); i++)
+			{
+				currentHeader = getObservationHeader(i, 0);
+				int arraySize = headers.size();
 
-        try
-        {
-            for (i = 0; i < msg.getRESPONSE().getORDER_OBSERVATIONReps(); i++)
-            {
-
-                currentHeader = getObservationHeader(i, 0);
-                arraySize = headers.size();
-                if (arraySize == 0 || !currentHeader.equals(headers.get(arraySize-1)))
-                {
-                    logger.info("Adding header: '"+currentHeader+"' to list");
-                    headers.add(currentHeader);
-                }
-            }
-            return(headers);
-        }
-        catch(Exception e)
-        {
-            logger.error("Could not create header list", e);
-            return(null);
-        }
-    }
+				if (arraySize == 0 || !currentHeader.equals(headers.get(arraySize - 1)))
+				{
+					logger.info("Adding header: '" + currentHeader + "' to list");
+					headers.add(currentHeader);
+				}
+			}
+			return(headers);
+		}
+		catch(Exception e)
+		{
+			logger.error("Could not create header list", e);
+			return null;
+		}
+	}
 
     public String audit(){
         return "";
@@ -830,4 +858,15 @@ public class PATHL7Handler extends ORU_R01MessageHandler
             return ("");
         }
     }
+
+    /**
+     * Map OBR order status to Juno internal order status
+     * @return - juno internal report status
+     */
+    @Override
+    public Hl7TextInfo.REPORT_STATUS getJunoOrderStatus()
+    {
+        return orderStatusMap.get(getOrderStatus());
+    }
+
 }

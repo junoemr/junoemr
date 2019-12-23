@@ -33,7 +33,6 @@ import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -45,6 +44,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -91,6 +91,26 @@ public class ConversionUtils {
 			result.add(fromIntString(str));
 		}
 		return result;
+	}
+
+	public static Boolean parseBoolean(String str) throws ParseException
+	{
+		List<String> trueList = Arrays.asList("ON", "YES", "TRUE", "ENABLED");
+		List<String> falseList = Arrays.asList("OFF", "NO", "FALSE", "DISABLED");
+
+
+		if (str != null && trueList.contains(str.toUpperCase()))
+		{
+			return true;
+		}
+		else if (str == null || falseList.contains(str.toUpperCase()))
+		{
+			return false;
+		}
+		else
+		{
+			throw new ParseException("Cannot parse, \"" + str.toUpperCase() + "\" as boolean. It is not one of: " + trueList.toString() + ", " + falseList.toString(), 0);
+		}
 	}
 
 	/**
@@ -547,7 +567,7 @@ public class ConversionUtils {
 					.toFormatter();
 
 			LocalDateTime parsedDate = LocalDateTime.parse(dateString, customFormatter);
-			returnDate = Date.from(parsedDate.toInstant(OffsetDateTime.now(ZoneId.systemDefault()).getOffset()));
+			returnDate = Date.from(parsedDate.atZone(ZoneId.systemDefault()).toInstant());
 
 			logger.debug("Transform " + dateString + " to " + parsedDate.format(inFormatter));
 		}

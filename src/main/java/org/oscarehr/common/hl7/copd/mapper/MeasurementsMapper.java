@@ -80,12 +80,12 @@ public class MeasurementsMapper extends AbstractMapper
 				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "BP", systolicBP + "/" + diastolicBP, obsDate));
 			}
 
-			if (height != null)
+			if (height != null && !height.equals("0.0"))
 			{
 				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "HT", height, obsDate));
 			}
 
-			if (weight != null)
+			if (weight != null && !weight.equals("0.0"))
 			{
 				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "WT", weight, obsDate));
 			}

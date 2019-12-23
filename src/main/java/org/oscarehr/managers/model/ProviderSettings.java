@@ -40,6 +40,7 @@ public class ProviderSettings
 	private String newTicklerWarningWindow;
 	private String workloadManagement;
 	private String ticklerWarningProvider;
+	private Boolean ticklerViewOnlyMine;
 
 	private boolean useCobaltOnLogin;
 
@@ -50,7 +51,7 @@ public class ProviderSettings
 	private String siteSelected;
 	private String viewSelected;
 	private int appointmentScreenLinkNameDisplayLength = 3;
-	private boolean hideOldEchartLinkInAppointment = false;
+	private boolean hideOldEchartLinkInAppointment = true;
 
 	private Collection<String> appointmentScreenForms = new ArrayList<String>();
 	private Collection<Integer> appointmentScreenEforms = new ArrayList<Integer>();
@@ -148,6 +149,7 @@ public class ProviderSettings
 
 	private boolean intakeFormEnabled;
 
+	private boolean appointmentCountEnabled;
 	private boolean appointmentCountIncludeCancelled;
 	private boolean appointmentCountIncludeNoShow;
 	private boolean appointmentCountIncludeNoDemographic;
@@ -1032,6 +1034,26 @@ public class ProviderSettings
 	public void setIntakeFormEnabled(boolean intakeFormEnabled)
 	{
 		this.intakeFormEnabled = intakeFormEnabled;
+	}
+
+	public boolean getAppointmentCountEnabled()
+	{
+		return appointmentCountEnabled;
+	}
+
+	public void setAppointmentCountEnabled(boolean appointmentCountEnabled)
+	{
+		this.appointmentCountEnabled = appointmentCountEnabled;
+	}
+
+	public Boolean getTicklerViewOnlyMine()
+	{
+		return ticklerViewOnlyMine;
+	}
+
+	public void setTicklerViewOnlyMine(Boolean ticklerViewOnlyMine)
+	{
+		this.ticklerViewOnlyMine = ticklerViewOnlyMine;
 	}
 
 	public boolean getAppointmentCountIncludeCancelled()

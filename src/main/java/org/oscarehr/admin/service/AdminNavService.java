@@ -111,7 +111,7 @@ public class AdminNavService
 		}
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin"))
 		{
-			adminNavList.add(getAdminNavIntegration(contextPath, resourceBundle, session));
+			adminNavList.add(getAdminNavIntegration(contextPath, resourceBundle, session, providerNo));
 		}
 		if (securityInfoManager.hasOnePrivileges(providerNo, SecurityInfoManager.READ, null, "_admin", "_admin.backup"))
 		{
@@ -152,7 +152,7 @@ public class AdminNavService
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAddProvider"), "frame?frameUrl=" + contextPath + "/admin/provideraddarecordhtm.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSearchProvider"), "frame?frameUrl=" + contextPath + "/admin/providersearchrecordshtm.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAddLogin"), "frame?frameUrl=" + contextPath + "/admin/securityaddarecord.jsp"));
-		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSearchLogin"), "frame?frameUrl=" + contextPath + "/admin/providersearchrecordshtm.jsp"));
+		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSearchLogin"), "frame?frameUrl=" + contextPath + "/admin/securitysearchrecordshtm.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.assignRole"), "frame?frameUrl=" + contextPath + "/admin/providerRole.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.unlockAcct"), "frame?frameUrl=" + contextPath + "/admin/unLock.jsp"));
 
@@ -175,12 +175,7 @@ public class AdminNavService
 
 		if (oscarProperties.isClinicaidBillingType())
 		{// CLINICAID BILLING
-			billingItems.add(new AdminNavItemTo1("Manage Invoices", "frame?frameUrl=" + contextPath + "/billing.do?billRegion=CLINICAID&action=invoice_reports"));
-
-			if (oscarProperties.isBritishColumbiaBillingType())
-			{
-				billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp&useCompat=true"));
-			}
+			billingItems.add(new AdminNavItemTo1("Manage Invoices", contextPath +"/billing.do?billRegion=CLINICAID&action=invoice_reports", true));
 		}
 		else if (oscarProperties.isBritishColumbiaBillingType())
 		{// BC BILLING
@@ -194,7 +189,6 @@ public class AdminNavService
 
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageServiceDiagnosticCodeAssoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/showServiceCodeAssocs.do"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageProcedureFeeCodeAssoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/supServiceCodeAssocAction.do"));
-			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp&useCompat=true"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.bcQuickBilling"), "frame?frameUrl=" + contextPath + "/quickBillingBC.do"));
 
 			if (oscarProperties.isPropertyActive("NEW_BC_TELEPLAN"))
@@ -258,6 +252,11 @@ public class AdminNavService
 
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.paymentReceived"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingONPayment.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.managePaymentType"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/managePaymentType.do"));
+		}
+
+		if (oscarProperties.isBritishColumbiaInstanceType())
+		{
+			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.ManageReferralDoc"), "frame?frameUrl=" + contextPath + "/billing/CA/BC/billingManageReferralDoc.jsp&useCompat=true"));
 		}
 
 		billing.setItems(billingItems);
@@ -375,6 +374,13 @@ public class AdminNavService
 		if (securityInfoManager.hasPrivilege(providerNo, "_admin.eformreporttool", SecurityInfoManager.READ, null))
 		{
 			reportItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.eformReportTool"), "frame?frameUrl=" + contextPath + "/admin/eformReportTool/eformReportTool.jsp"));
+		}
+
+		// /panelManagement
+		if (securityInfoManager.hasPrivilege(providerNo, "_admin.panelManagement", SecurityInfoManager.READ, null) &&
+				oscarProperties.isBritishColumbiaInstanceType())
+		{
+			reportItems.add(new AdminNavItemTo1("Panel Management", "panelManagement"));
 		}
 
 		reportGroup.setItems(reportItems);
@@ -586,7 +592,7 @@ public class AdminNavService
 		return systemReportGroup;
 	}
 
-	private AdminNavGroupTo1 getAdminNavIntegration(String contextPath, ResourceBundle resourceBundle, HttpSession session)
+	private AdminNavGroupTo1 getAdminNavIntegration(String contextPath, ResourceBundle resourceBundle, HttpSession session, String providerNo)
 	{
 		AdminNavGroupTo1 integrationGroup = new AdminNavGroupTo1();
 		List<AdminNavItemTo1> integrationItems = new ArrayList<>();
@@ -635,6 +641,11 @@ public class AdminNavService
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.Know2ActConfig"), "frame?frameUrl=" + contextPath + "/web/Know2actConfiguration.jsp"));
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.integratorPush"), "frame?frameUrl=" + contextPath + "/admin/integratorPushStatus.jsp"));
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.born"), "frame?frameUrl=" + contextPath + "/admin/born.jsp"));
+
+		if (securityInfoManager.isSuperAdmin(providerNo))
+		{
+			integrationItems.add(new AdminNavItemTo1("Integration Modules", "integrationModules"));
+		}
 
 		integrationGroup.setItems(integrationItems);
 		return integrationGroup;

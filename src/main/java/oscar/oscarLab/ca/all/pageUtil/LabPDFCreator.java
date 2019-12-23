@@ -519,8 +519,9 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								{
 									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t","\u00a0\u00a0\u00a0\u00a0"), lineFont));
 									//if this PATHL7 result is from CDC/SG and is greater than 100 characters
-									if ((handler.getOBXResult(j, k).length() > 100) &&
+									if (((handler.getOBXResult(j, k).length() > 100) &&
 											(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")))
+											|| handler.getPatientLocation().equals("VPP-PHC"))
 									{
 										cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 										//if the Abn, Reference Range and Units are empty or equal to null, give the long result the use of those columns
@@ -535,6 +536,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 										else
 										{//else use the 6 remaining columns, and add a new empty cell that takes the first two columns(Test & Results).
 										//This will allow the corresponding Abn, RR and Units to be printed beneath the long result in the appropriate columns
+											cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 											cell.setColspan(6);
 											table.addCell(cell);
 											cell.setPhrase(new Phrase("", lineFont));
@@ -544,7 +546,6 @@ public class LabPDFCreator extends PdfPageEventHelper {
 									}
 									else
 									{
-										cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 										table.addCell(cell);
 									}
 								}
@@ -951,12 +952,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
         rInfoTable.addCell(cell);
         cell.setPhrase(new Phrase("Report Status: ", boldFont));
         rInfoTable.addCell(cell);
-        if (handler.getMsgType().equals("PATHL7"))
-        {
-        	cell.setPhrase(new Phrase((handler.getOrderStatus().equals("F") ? "Final" : (handler.getOrderStatus().equals("C") ? "Corrected" : "Preliminary")), font));
-        	rInfoTable.addCell(cell);
-        }
-        if (ConnectCareHandler.isConnectCareHandler(handler))
+        if (ConnectCareHandler.isConnectCareHandler(handler) || handler.getMsgType().equals("PATHL7"))
 		{
 			cell.setPhrase(new Phrase(Hl7TextInfoService.getReportStatusDisplayString(handler.getJunoOrderStatus()), font));
 			rInfoTable.addCell(cell);

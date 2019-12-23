@@ -56,6 +56,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
+<%@ taglib uri="/oscarPropertiestag" prefix="oscarprop" %>
 <html:html locale="true">
     <head>
     <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -155,6 +156,20 @@
                                 </label>
                                 <html:text property="clinic.clinicEmail"/>
                             </div>
+                            <oscarprop:oscarPropertiesCheck property="instance_type" value="AB">
+                                <div class="input-field">
+                                    <label for="clinic.albertaConnectCareLabId">
+                                        Connect Care Lab Id
+                                    </label>
+                                    <html:text property="clinic.albertaConnectCareLabId"/>
+                                </div>
+                                <div class="input-field">
+                                    <label for="clinic.albertaConnectCareDepartmentId">
+                                        Connect Care Department Id
+                                    </label>
+                                    <html:text property="clinic.albertaConnectCareDepartmentId"/>
+                                </div>
+                            </oscarprop:oscarPropertiesCheck>
                         </div>
                         <div class="address" id="billing-fields">
                             <div class="title">

@@ -106,6 +106,23 @@ angular.module("Common.Services").service("uxService", [
 			return deferred.promise;
 		};
 
+		service.getAllDashboards = function ()
+		{
+			var deferred = $q.defer();
+			$http.get(service.apiPath + '/dashboards').then(
+					function success(results)
+					{
+						deferred.resolve(results.data.body);
+					},
+					function error(errors)
+					{
+						console.log("uxService:getAllDashboards error", errors);
+						deferred.reject("An error occurred while fetching dashboard list.")
+					}
+			);
+			return deferred.promise;
+		};
+
 		return service;
 	}
 ]);

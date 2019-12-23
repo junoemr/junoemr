@@ -69,6 +69,14 @@ function sendData(path, param, target) {
 	});
 }
 
+function openTicklerPopup(demographics)
+{
+	window.open(
+			"../../../tickler/ticklerAdd.jsp?demographic_no=" + demographics.join("%26") +"&bFirstDisp=false&search_mode=search_name&orderby=last_name&updateParent=false&multiple_demographics=true",
+			'popUpWindow',
+			'height=700,width=1200,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
+}
+
 //--> Datatable Filter
 $.fn.dataTableExt.afnFiltering.push( function( oSettings, aData, iDataIndex ) {	
     var inputLow = $( '#datatableFilterConditionGreaterThan').val();
@@ -278,7 +286,8 @@ $(document).ready( function() {
     	var url = "/web/dashboard/display/DashboardDisplay.do";
     	var data = new Object();
     	data.dashboardId = (this.id).split("_")[1];
-    	data.method = (this.id).split("_")[0];  
+    	data.method = (this.id).split("_")[0];
+    	data.providerNo = providerNo;
 
     	sendData(url, data, "reload");
     });
@@ -308,7 +317,7 @@ $(document).ready( function() {
 		var param = "demographics=" + demographics;
 
 		if( demographics.length > 0 ) {
-    		sendData( $(this).attr('href'), param, "modal");
+			openTicklerPopup(demographics)
 		} else {
 			alert("Select at least 1 row to assign a Tickler.");
 		}
@@ -320,6 +329,7 @@ $(document).ready( function() {
     	var url = "/web/dashboard/display/ExportResults.do";
     	var data = new Object();
     	data.indicatorId = (this.id).split("_")[1];
+    	data.providerNo = providerNo;
      
     	sendData(url, data, null)
 	})

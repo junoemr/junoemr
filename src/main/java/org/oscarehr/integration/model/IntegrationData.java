@@ -23,16 +23,19 @@
 
 package org.oscarehr.integration.model;
 
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserShortTokenTo1;
-
 public class IntegrationData
 {
 	private Integration integration;
 	private UserIntegrationAccess userIntegrationAccess;
+	private String loginToken;
 
 	public IntegrationData(Integration integration)
 	{
 		this.integration = integration;
+	}
+
+	public boolean isCloudMd() {
+		return Integration.INTEGRATION_TYPE_CLOUD_MD.equals(integration.getIntegrationType());
 	}
 
 	public boolean userIntegrationExists()
@@ -60,7 +63,7 @@ public class IntegrationData
 		this.userIntegrationAccess = userIntegrationAccess;
 	}
 
-	public String getApiKey()
+	public String getClinicApiKey()
 	{
 		if (integration == null)
 		{
@@ -70,14 +73,14 @@ public class IntegrationData
 		return integration.getApiKey();
 	}
 
-	public String getUserAccessToken()
+	public String getUserApiKey()
 	{
 		if (userIntegrationAccess == null)
 		{
 			return null;
 		}
 
-		return userIntegrationAccess.getAccessToken();
+		return userIntegrationAccess.getApiKey();
 	}
 
 	public String getIntegrationRemoteId()
@@ -100,8 +103,13 @@ public class IntegrationData
 		return userIntegrationAccess.getRemoteUserId();
 	}
 
-	public ClinicUserShortTokenTo1 getUserAccessTokenTo1()
+	public String getLoginToken()
 	{
-		return new ClinicUserShortTokenTo1(getUserAccessToken());
+		return loginToken;
+	}
+
+	public void setLoginToken(String loginToken)
+	{
+		this.loginToken = loginToken;
 	}
 }

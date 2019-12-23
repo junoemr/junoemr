@@ -44,13 +44,13 @@ public class PanelBeanFactory {
 	private List<PanelBean> panelBeans;
 	private HashSet<String> categories;
 	
-	public PanelBeanFactory( List<IndicatorTemplate> indicatorTemplates ) {
+	public PanelBeanFactory( List<IndicatorTemplate> indicatorTemplates) {
 		
 		logger.info("Building Dashboard Panels");
 		
 		setIndicatorTemplates( indicatorTemplates );
 		setIndicatorTemplateHandler( new IndicatorTemplateHandler() );
-		setIndicatorTemplateXMLList( new ArrayList<IndicatorTemplateXML>() );
+		setIndicatorTemplateXMLList( new ArrayList<IndicatorTemplateXML>());
 		setIndicatorPanelBeans( new ArrayList<PanelBean>() );
 	}
 	
@@ -58,7 +58,7 @@ public class PanelBeanFactory {
 		return indicatorTemplateXMLList;
 	}
 
-	public void setIndicatorTemplateXMLList( List<IndicatorTemplateXML> indicatorTemplateXMLList ) {
+	public void setIndicatorTemplateXMLList( List<IndicatorTemplateXML> indicatorTemplateXMLList) {
 		
 		if( getIndicatorTemplateHandler() == null ) {
 			logger.error("The IndicatorTemplateHandler is not set. Cannot create IndicatorPanelBeans");
