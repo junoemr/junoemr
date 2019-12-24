@@ -25,7 +25,7 @@ package org.oscarehr.casemgmt.service;
 
 import com.quatro.model.security.Secrole;
 import org.apache.log4j.Logger;
-import org.oscarehr.casemgmt.dto.EncounterHeader;
+import org.oscarehr.casemgmt.dto.EncounterPageData;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.model.ClientImage;
 import org.oscarehr.common.model.EncounterTemplate;
@@ -177,7 +177,7 @@ public class EncounterService
 				"EncounterSectionService identified by %s doesn't exist.", serviceName));
 	}
 
-	public EncounterHeader getEncounterHeader(
+	public EncounterPageData getEncounterHeader(
 			String providerNo,
 			String loggedInProviderNo,
 			String roleName,
@@ -212,7 +212,7 @@ public class EncounterService
 	)
 			throws UnsupportedEncodingException
 	{
-		EncounterHeader encounterHeader = new EncounterHeader();
+		EncounterPageData encounterPageData = new EncounterPageData();
 
 
 		// User Colour
@@ -225,7 +225,7 @@ public class EncounterService
 			userColour = "#CCCCFF";   //default blue if no preference set
 		}
 
-		encounterHeader.setUserColour(userColour);
+		encounterPageData.setUserColour(userColour);
 
 
 		// Inverse user colour
@@ -238,9 +238,9 @@ public class EncounterService
 		//strip 2 leading digits as html colour codes are 24bits
 		String inverseUserColour = "#" + Integer.toHexString(inv).substring(2);
 
-		encounterHeader.setInverseUserColour(inverseUserColour);
+		encounterPageData.setInverseUserColour(inverseUserColour);
 
-		encounterHeader.setRoleName(roleName);
+		encounterPageData.setRoleName(roleName);
 
 
 		// Family Doctor information
@@ -271,14 +271,14 @@ public class EncounterService
 			}
 		}
 
-		encounterHeader.setFamilyDoctorFirstName(familyDoctorFirstName);
-		encounterHeader.setFamilyDoctorLastName(familyDoctorLastName);
-		encounterHeader.setFamilyDoctorColour(familyDoctorColour);
+		encounterPageData.setFamilyDoctorFirstName(familyDoctorFirstName);
+		encounterPageData.setFamilyDoctorLastName(familyDoctorLastName);
+		encounterPageData.setFamilyDoctorColour(familyDoctorColour);
 
 		// Demographic link dat
 		String windowName = "Master" + demographicNo;
 
-		encounterHeader.setWindowName(windowName);
+		encounterPageData.setWindowName(windowName);
 
 		String demographicUrl = contextPath + "/demographic/demographiccontrol.jsp" +
 				"?demographic_no=" + URLEncoder.encode(demographicNo, StandardCharsets.UTF_8.name()) +
@@ -286,21 +286,21 @@ public class EncounterService
 				"&dboperation=search_detail" +
 				"&appointment=" + URLEncoder.encode(appointmentNo, StandardCharsets.UTF_8.name());
 
-		encounterHeader.setDemographicUrl(demographicUrl);
+		encounterPageData.setDemographicUrl(demographicUrl);
 
-		encounterHeader.setDemographicNo(demographicNo);
+		encounterPageData.setDemographicNo(demographicNo);
 
-		encounterHeader.setProviderNo(providerNo);
+		encounterPageData.setProviderNo(providerNo);
 
-		encounterHeader.setPatientFirstName(patientFirstName);
-		encounterHeader.setPatientLastName(patientLastName);
-		encounterHeader.setPatientSex(patientSex);
-		encounterHeader.setPatientAge(patientAge);
-		encounterHeader.setPatientAgeInYears(patientAgeInYears);
-		encounterHeader.setPatientBirthdate(patientBirthdate);
-		encounterHeader.setPatientPhone(phone);
+		encounterPageData.setPatientFirstName(patientFirstName);
+		encounterPageData.setPatientLastName(patientLastName);
+		encounterPageData.setPatientSex(patientSex);
+		encounterPageData.setPatientAge(patientAge);
+		encounterPageData.setPatientAgeInYears(patientAgeInYears);
+		encounterPageData.setPatientBirthdate(patientBirthdate);
+		encounterPageData.setPatientPhone(phone);
 
-		encounterHeader.setEchartAdditionalPatientInfoEnabled(OscarProperties.getInstance().isEChartAdditionalPatientInfoEnabled());
+		encounterPageData.setEchartAdditionalPatientInfoEnabled(OscarProperties.getInstance().isEChartAdditionalPatientInfoEnabled());
 
 		String demographicAdditionalInfoUrl = contextPath + "/demographic/demographiccontrol.jsp" +
 				"?demographic_no=" + URLEncoder.encode(demographicNo, StandardCharsets.UTF_8.name()) +
@@ -316,54 +316,54 @@ public class EncounterService
 				"&limit1=0" +
 				"&limit2=25";
 
-		encounterHeader.setDemographicAdditionalInfoUrl(demographicAdditionalInfoUrl);
+		encounterPageData.setDemographicAdditionalInfoUrl(demographicAdditionalInfoUrl);
 
-		encounterHeader.setEchartUuid(echartUuid);
+		encounterPageData.setEchartUuid(echartUuid);
 
-		encounterHeader.setReferringDoctorName(referringDoctorName);
-		encounterHeader.setReferringDoctorNumber(referringDoctorNumber);
-		encounterHeader.setRosterDateEnabled(rosterDateEnabled);
+		encounterPageData.setReferringDoctorName(referringDoctorName);
+		encounterPageData.setReferringDoctorNumber(referringDoctorNumber);
+		encounterPageData.setRosterDateEnabled(rosterDateEnabled);
 		if(rosterDate != null)
 		{
-			encounterHeader.setRosterDateString(rosterDate.toString());
+			encounterPageData.setRosterDateString(rosterDate.toString());
 		}
 
-		encounterHeader.setIncomingRequestorSet(
+		encounterPageData.setIncomingRequestorSet(
 				oscar.OscarProperties.getInstance().hasProperty("ONTARIO_MD_INCOMINGREQUESTOR"));
 
 		String diseaseListUrl = contextPath + "/common/omdDiseaseList.jsp" +
 				"?sex=" + URLEncoder.encode(patientSex, StandardCharsets.UTF_8.name()) +
 				"&age=" + URLEncoder.encode(patientAge, StandardCharsets.UTF_8.name());
 
-		encounterHeader.setDiseaseListUrl(diseaseListUrl);
+		encounterPageData.setDiseaseListUrl(diseaseListUrl);
 
-		encounterHeader.setEchartLinks(getEChartLinks());
+		encounterPageData.setEchartLinks(getEChartLinks());
 
-		encounterHeader.setImagePresentPlaceholderUrl(contextPath + ClientImage.imagePresentPlaceholderUrl);
-		encounterHeader.setImageMissingPlaceholderUrl(contextPath + ClientImage.imageMissingPlaceholderUrl);
+		encounterPageData.setImagePresentPlaceholderUrl(contextPath + ClientImage.imagePresentPlaceholderUrl);
+		encounterPageData.setImageMissingPlaceholderUrl(contextPath + ClientImage.imageMissingPlaceholderUrl);
 
-		encounterHeader.setAppointmentNo(appointmentNo);
-		encounterHeader.setSource(source);
-		encounterHeader.setEncounterNoteHideBeforeDate(encounterNoteHideBeforeDate);
+		encounterPageData.setAppointmentNo(appointmentNo);
+		encounterPageData.setSource(source);
+		encounterPageData.setEncounterNoteHideBeforeDate(encounterNoteHideBeforeDate);
 
-		encounterHeader.setBillingUrl(billingUrl);
+		encounterPageData.setBillingUrl(billingUrl);
 
-		encounterHeader.setCmeJs(cmeJs);
+		encounterPageData.setCmeJs(cmeJs);
 
-		encounterHeader.setEncounterTemplates(encounterTemplates);
+		encounterPageData.setEncounterTemplates(encounterTemplates);
 
-		encounterHeader.setCaseManagementIssues(issues);
+		encounterPageData.setCaseManagementIssues(issues);
 
-		encounterHeader.setProviders(providers);
+		encounterPageData.setProviders(providers);
 
-		encounterHeader.setRoles(roles);
+		encounterPageData.setRoles(roles);
 
-		encounterHeader.setEncounterWindowCustomSize(encounterWindowCustomSize);
-		encounterHeader.setEncounterWindowHeight(encounterWindowHeight);
-		encounterHeader.setEncounterWindowWidth(encounterWindowWidth);
-		encounterHeader.setEncounterWindowMaximize(encounterWindowMaximize);
+		encounterPageData.setEncounterWindowCustomSize(encounterWindowCustomSize);
+		encounterPageData.setEncounterWindowHeight(encounterWindowHeight);
+		encounterPageData.setEncounterWindowWidth(encounterWindowWidth);
+		encounterPageData.setEncounterWindowMaximize(encounterWindowMaximize);
 
-		return encounterHeader;
+		return encounterPageData;
 	}
 
 	private String getEChartLinks()

@@ -130,7 +130,7 @@ public class EncounterDiseaseRegistryService extends EncounterSectionService
 			out.add(sectionNote);
 		}
 
-		Collections.sort(out, new EncounterSectionNote.SortChronologicAsc());
+		Collections.sort(out, new EncounterSectionNote.SortChronologic());
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}

@@ -92,14 +92,30 @@ public class TicklerDao extends AbstractDao<Tickler>{
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Tickler> findActiveByDemographicNo(Integer demographicNo, Integer limit, Integer offset) {
+	public List<Tickler> findActiveByDemographicNo(
+			Integer demographicNo,
+			Integer limit,
+			Integer offset,
+			String sortOrder)
+	{
 
 		String sql =
 			"select t " +
 				"from Tickler t " +
 				"where t.demographicNo = ?1 " +
 				"and t.status = 'A' " +
-				"order by t.serviceDate asc";
+				"order by t.serviceDate ";
+
+		if(AbstractDao.SORT_DESC.equals(sortOrder))
+		{
+			sql += "desc";
+		}
+		else
+		{
+			sql += "asc";
+		}
+
+		sql += ", t.message";
 
 		Query query = entityManager.createQuery(sql);
 

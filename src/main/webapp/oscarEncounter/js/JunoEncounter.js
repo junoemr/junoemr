@@ -377,9 +377,12 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 	};
 
 
-	this.showOceanToolbar = function showOceanToolbar()
+	this.initOceanToolbar = function initOceanToolbar()
 	{
-		return (this.pageData.cmeJs == 'ocean_toolbar');
+		if(this.pageData.cmeJs == 'ocean_toolbar')
+		{
+			jQuery.ajax({ url: "../eform/displayImage.do?imagefile=oceanToolbar.js", cache: true, dataType: "script" });
+		}
 	};
 
 	this.writeToEncounterNote = function writeToEncounterNote(request)

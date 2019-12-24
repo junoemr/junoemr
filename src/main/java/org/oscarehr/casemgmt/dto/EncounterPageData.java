@@ -31,7 +31,7 @@ import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import java.util.Date;
 import java.util.List;
 
-public class EncounterHeader
+public class EncounterPageData
 {
 	private String userColour;
 	private String inverseUserColour;

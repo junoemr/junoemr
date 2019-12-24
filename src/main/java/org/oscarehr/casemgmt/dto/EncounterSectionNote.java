@@ -42,6 +42,8 @@ public class EncounterSectionNote
 	private String colour;
 	private String[] titleClasses;
 
+
+
 	public Integer getId()
 	{
 		return id;
@@ -167,7 +169,7 @@ public class EncounterSectionNote
 		return (this.titleClasses != null && this.titleClasses.length > 0);
 	}
 
-	public static int compare(Object o1, Object o2, boolean asc, boolean truncateToDate )
+	public static int compare(Object o1, Object o2, boolean asc, boolean truncateToDate, boolean sortTextOpposite)
 	{
 		EncounterSectionNote i1 = (EncounterSectionNote)o1;
 		EncounterSectionNote i2 = (EncounterSectionNote)o2;
@@ -180,34 +182,40 @@ public class EncounterSectionNote
 			d2 = d2.truncatedTo(ChronoUnit.DAYS);
 		}
 
+		int result = 0;
 		if( d1 == null && d2 != null )
 		{
-			return -1;
+			result = -1;
 		}
 		else if( d1 != null && d2 == null )
 		{
-			return 1;
+			result = 1;
 		}
 		else if( d1 == null && d2 == null )
 		{
-			return 0;
+			result = 0;
 		}
 		else
 		{
-			int dateCompare = i1.getUpdateDate().compareTo(i2.getUpdateDate());
+			result = i1.getUpdateDate().compareTo(i2.getUpdateDate());
 
-			if(asc)
+			if(result == 0)
 			{
-				dateCompare = -dateCompare;
-			}
+				result = i1.getText().compareToIgnoreCase(i2.getText());
 
-			if(dateCompare == 0)
-			{
-				dateCompare = i1.getText().compareTo(i2.getText());
+				if(sortTextOpposite)
+				{
+					result = (result * -1);
+				}
 			}
-
-			return dateCompare;
 		}
+
+		if(!asc)
+		{
+			return (result * -1);
+		}
+
+		return result;
 	}
 
 	public static int compareText(Object o1, Object o2)
@@ -239,7 +247,7 @@ public class EncounterSectionNote
 	{
 		public int compare(Object o1, Object o2)
 		{
-			return EncounterSectionNote.compare(o1, o2, true, false);
+			return EncounterSectionNote.compare(o1, o2, true, false, false);
 		}
 	}
 
@@ -247,7 +255,15 @@ public class EncounterSectionNote
 	{
 		public int compare(Object o1, Object o2)
 		{
-			return EncounterSectionNote.compare(o1, o2, false, false);
+			return EncounterSectionNote.compare(o1, o2, false, false, false);
+		}
+	}
+
+	public static class SortChronologicDescTextAsc implements Comparator
+	{
+		public int compare(Object o1, Object o2)
+		{
+			return EncounterSectionNote.compare(o1, o2, false, false, true);
 		}
 	}
 
@@ -255,7 +271,7 @@ public class EncounterSectionNote
 	{
 		public int compare(Object o1, Object o2)
 		{
-			return EncounterSectionNote.compare(o1, o2, true, true);
+			return EncounterSectionNote.compare(o1, o2, true, true, false);
 		}
 	}
 

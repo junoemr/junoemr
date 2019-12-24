@@ -48,7 +48,7 @@
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" scope="request"/>
 
-<fmt:parseDate value="${junoEncounterForm.header.encounterNoteHideBeforeDate}"
+<fmt:parseDate value="${junoEncounterForm.pageData.encounterNoteHideBeforeDate}"
 			   pattern="EEE MMM dd HH:mm:ss z y"
 			   var="encounterNoteHideBeforeDateParsed"/>
 
@@ -142,10 +142,10 @@
 
 			function getAppointmentNo()
 			{
-				<c:if test="${not empty junoEncounterForm.header.appointmentNo}">
-				var appointmentNo = <c:out value="${junoEncounterForm.header.appointmentNo}" />;
+				<c:if test="${not empty junoEncounterForm.pageData.appointmentNo}">
+				var appointmentNo = <c:out value="${junoEncounterForm.pageData.appointmentNo}" />;
 				</c:if>
-				<c:if test="${empty junoEncounterForm.header.appointmentNo}">
+				<c:if test="${empty junoEncounterForm.pageData.appointmentNo}">
 				var appointmentNo = null;
 				</c:if>
 
@@ -164,20 +164,20 @@
 
 			var pageData = {
 				contextPath: "<c:out value='${pageContext.request.contextPath}' />",
-				demographicNo: "<c:out value='${junoEncounterForm.header.demographicNo}' />",
-				providerNo: "<c:out value='${junoEncounterForm.header.providerNo}' />",
+				demographicNo: "<c:out value='${junoEncounterForm.pageData.demographicNo}' />",
+				providerNo: "<c:out value='${junoEncounterForm.pageData.providerNo}' />",
 				appointmentNo: getAppointmentNo(),
 				encounterNoteHideBeforeDate: "<c:out value='${encounterNoteHideBeforeDateFormatted}' />",
 				defaultEncounterType: "<c:out value='${junoEncounterForm.encType}' />",
 				reason: "<c:out value='${junoEncounterForm.reason}' />",
 				appointmentDate: "<c:out value='${junoEncounterForm.appointmentDate}' />",
-				cmeJs: "<c:out value='${junoEncounterForm.header.cmeJs}' />",
-				billingUrl: "<c:out value='${junoEncounterForm.header.billingUrl}' />",
-				encounterWindowCustomSize: ("<c:out value="${junoEncounterForm.header.encounterWindowCustomSize}" />" == "true"),
-				encounterWindowHeight: "<c:out value="${junoEncounterForm.header.encounterWindowHeight}" />",
-				encounterWindowWidth: "<c:out value="${junoEncounterForm.header.encounterWindowWidth}" />",
-				encounterWindowMaximize: ("<c:out value="${junoEncounterForm.header.encounterWindowMaximize}" />" == "true"),
-				imagePresentPlaceholderUrl: "<c:out value='${fn:escapeXml(junoEncounterForm.header.imagePresentPlaceholderUrl)}' />",
+				cmeJs: "<c:out value='${junoEncounterForm.pageData.cmeJs}' />",
+				billingUrl: "<c:out value='${junoEncounterForm.pageData.billingUrl}' />",
+				encounterWindowCustomSize: ("<c:out value="${junoEncounterForm.pageData.encounterWindowCustomSize}" />" == "true"),
+				encounterWindowHeight: "<c:out value="${junoEncounterForm.pageData.encounterWindowHeight}" />",
+				encounterWindowWidth: "<c:out value="${junoEncounterForm.pageData.encounterWindowWidth}" />",
+				encounterWindowMaximize: ("<c:out value="${junoEncounterForm.pageData.encounterWindowMaximize}" />" == "true"),
+				imagePresentPlaceholderUrl: "<c:out value='${fn:escapeXml(junoEncounterForm.pageData.imagePresentPlaceholderUrl)}' />",
 				encounterTypeArray: getEncounterTypeArray(),
 				editUnsignedMsg: "<bean:message key="oscarEncounter.editUnsignedNote.msg"/>",
 				printDateMsg: "<bean:message key="oscarEncounter.printDate.msg"/>",
@@ -203,7 +203,7 @@
 			};
 
 
-			var eChartUUID = "${junoEncounterForm.header.echartUuid}";
+			var eChartUUID = "${junoEncounterForm.pageData.echartUuid}";
 
 			<%@ include file="js/JunoEncounter.js" %>
 			var junoEncounter = new Juno.OscarEncounter.JunoEncounter(pageData);
@@ -259,10 +259,7 @@
 			{
 				junoEncounter.monkeyPatches();
 
-				if(junoEncounter.showOceanToolbar())
-				{
-					jQuery.ajax({ url: "../eform/displayImage.do?imagefile=oceanToolbar.js", cache: true, dataType: "script" });
-				}
+				junoEncounter.initOceanToolbar();
 
 				junoEncounter.resizeContent();
 
@@ -322,17 +319,17 @@
 				padding-left: 2px;
 				text-align: left;
 				font-size: 12px;
-				color: ${fn:escapeXml(junoEncounterForm.header.inverseUserColour)};
-			<%--<bean:write name="junoEncounterForm" property="header.inverseUserColour" />;--%> background-color: <bean:write name="junoEncounterForm" property="header.userColour" />;
+				color: ${fn:escapeXml(junoEncounterForm.pageData.inverseUserColour)};
+			<%--<bean:write name="junoEncounterForm" property="header.inverseUserColour" />;--%> background-color: <bean:write name="junoEncounterForm" property="pageData.userColour" />;
 			}
 
 			div.encounterHeaderContainer span.Header {
-				color: <bean:write name="junoEncounterForm" property="header.inverseUserColour" />;
-				background-color: <bean:write name="junoEncounterForm" property="header.userColour" />;
+				color: <bean:write name="junoEncounterForm" property="pageData.inverseUserColour" />;
+				background-color: <bean:write name="junoEncounterForm" property="pageData.userColour" />;
 			}
 
 			div.encounterHeaderContainer span.familyDoctorInfo {
-				border-bottom: medium solid<bean:write name="junoEncounterForm" property="header.familyDoctorColour" />;
+				border-bottom: medium solid<bean:write name="junoEncounterForm" property="pageData.familyDoctorColour" />;
 			}
 
 		</style>
@@ -368,16 +365,16 @@
 	<body id="body" style="margin: 0px;">
 
 	<div id="header">
-		<div class="encounterHeaderContainer" id="encounterHeader">
+		<div class="encounterHeaderContainer" id="encounterPageData">
 			<table width="100%" border="0" cellspacing="0" cellpadding="0">
 				<tr>
 					<td>
-						<security:oscarSec roleName="${junoEncounterForm.header.roleName}"
+						<security:oscarSec roleName="${junoEncounterForm.pageData.roleName}"
 										   objectName="_newCasemgmt.doctorName" rights="r">
 								<span class="familyDoctorInfo">
 									<bean:message key="oscarEncounter.Index.msgMRP"/>
 									&nbsp;&nbsp;<bean:write name="junoEncounterForm"
-															property="header.formattedFamilyDoctorName"/>
+															property="pageData.formattedFamilyDoctorName"/>
 								</span>
 						</security:oscarSec>
 						<span class="Header">
@@ -386,52 +383,52 @@
 								%>
 								<a href="#"
 								   onClick="popupPage(700,1000,
-										   '${junoEncounterForm.header.windowName}',
-										   '${ctx}${junoEncounterForm.header.demographicUrl}'
+										   '${junoEncounterForm.pageData.windowName}',
+										   '${ctx}${junoEncounterForm.pageData.demographicUrl}'
 										   ); return false;"
 								   title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>"
 								>
-									${junoEncounterForm.header.formattedPatientName}
-								</a> ${junoEncounterForm.header.formattedPatientInfo}
-								<c:if test="${junoEncounterForm.header.echartAdditionalPatientInfoEnabled}">
-									<bean:write name="junoEncounterForm" property="header.patientBirthdate"/>
+									${junoEncounterForm.pageData.formattedPatientName}
+								</a> ${junoEncounterForm.pageData.formattedPatientInfo}
+								<c:if test="${junoEncounterForm.pageData.echartAdditionalPatientInfoEnabled}">
+									<bean:write name="junoEncounterForm" property="pageData.patientBirthdate"/>
 								</c:if>
 
 								&nbsp;<oscar:phrverification
-								demographicNo="${junoEncounterForm.header.demographicNo}"><bean:message
+								demographicNo="${junoEncounterForm.pageData.demographicNo}"><bean:message
 								key="phr.verification.link"/></oscar:phrverification> &nbsp;<bean:write
-								name="junoEncounterForm" property="header.patientPhone"/>
+								name="junoEncounterForm" property="pageData.patientPhone"/>
 								<span id="encounterHeaderExt"></span>
-								<security:oscarSec roleName="${junoEncounterForm.header.roleName}"
+								<security:oscarSec roleName="${junoEncounterForm.pageData.roleName}"
 												   objectName="_newCasemgmt.apptHistory" rights="r">
-									<a href="javascript:popupPage(400,850,'ApptHist','<c:out value="${ctx}"/><bean:write name="junoEncounterForm" property="header.demographicAdditionalInfoUrl" />')"
+									<a href="javascript:popupPage(400,850,'ApptHist','<c:out value="${ctx}"/><bean:write name="junoEncounterForm" property="pageData.demographicAdditionalInfoUrl" />')"
 									   style="font-size: 11px;text-decoration:none;"
 									   title="<bean:message key="oscarEncounter.Header.nextApptMsg"/>"><span
 											style="margin-left:20px;"><bean:message
 											key="oscarEncounter.Header.nextAppt"/>: <oscar:nextAppt
-											demographicNo="${junoEncounterForm.header.demographicNo}"/></span></a>
+											demographicNo="${junoEncounterForm.pageData.demographicNo}"/></span></a>
 								</security:oscarSec>
 								&nbsp;&nbsp;
 
-								<c:if test="${junoEncounterForm.header.echartAdditionalPatientInfoEnabled}">
+								<c:if test="${junoEncounterForm.pageData.echartAdditionalPatientInfoEnabled}">
 									<bean:write name="junoEncounterForm"
-												property="header.referringDoctorName"/>
+												property="pageData.referringDoctorName"/>
 									<bean:write name="junoEncounterForm"
-												property="header.referringDoctorNumber"/>
+												property="pageData.referringDoctorNumber"/>
 									&nbsp;&nbsp;
-									<c:if test="${junoEncounterForm.header.rosterDateEnabled}">
+									<c:if test="${junoEncounterForm.pageData.rosterDateEnabled}">
 										Referral date:
 										<bean:write name="junoEncounterForm"
-													property="header.rosterDateString"/>
+													property="pageData.rosterDateString"/>
 									</c:if>
 								</c:if>
 
-								<c:if test="${junoEncounterForm.header.incomingRequestorSet}">
+								<c:if test="${junoEncounterForm.pageData.incomingRequestorSet}">
 									<a href="javascript:void(0)"
-									   onClick="popupPage(600,175,'Calculators','${fn:escapeXml(junoEncounterForm.header.diseaseListUrl)}'); return false;"><bean:message
+									   onClick="popupPage(600,175,'Calculators','${fn:escapeXml(junoEncounterForm.pageData.diseaseListUrl)}'); return false;"><bean:message
 											key="oscarEncounter.Header.OntMD"/></a>
 								</c:if>
-								<c:out value="${junoEncounterForm.header.echartLinks}"/>
+								<c:out value="${junoEncounterForm.pageData.echartLinks}"/>
 								&nbsp;&nbsp;
 
 							</span>
@@ -481,18 +478,18 @@
 				<c:choose>
 					<c:when test="${not empty requestScope.image_exists}">
 						<img style="cursor: pointer;" id="ci"
-							 src="${fn:escapeXml(junoEncounterForm.header.imagePresentPlaceholderUrl)}"
+							 src="${fn:escapeXml(junoEncounterForm.pageData.imagePresentPlaceholderUrl)}"
 							 alt="id_photo" height="100" title="Click to upload new photo."
-							 OnMouseOver="document.getElementById('ci').src='../imageRenderingServlet?source=local_client&clientId=${fn:escapeXml(junoEncounterForm.header.demographicNo)}'"
+							 OnMouseOver="document.getElementById('ci').src='../imageRenderingServlet?source=local_client&clientId=${fn:escapeXml(junoEncounterForm.pageData.demographicNo)}'"
 							 OnMouseOut="junoEncounter.delay(5000); window.status='Click to upload new photo'; return true;"
-							 onClick="junoEncounter.popupUploadPage('uploadimage.jsp',${fn:escapeXml(junoEncounterForm.header.demographicNo)});return false;" />
+							 onClick="junoEncounter.popupUploadPage('uploadimage.jsp',${fn:escapeXml(junoEncounterForm.pageData.demographicNo)});return false;" />
 					</c:when>
 					<c:otherwise>
 						<img style="cursor: pointer;"
-							 src="${fn:escapeXml(junoEncounterForm.header.imageMissingPlaceholderUrl)}"
+							 src="${fn:escapeXml(junoEncounterForm.pageData.imageMissingPlaceholderUrl)}"
 							 alt="No_Id_Photo" height="100" title="Click to upload new photo."
 							 OnMouseOver="window.status='Click to upload new photo';return true"
-							 onClick="junoEncounter.popupUploadPage('../casemgmt/uploadimage.jsp',${fn:escapeXml(junoEncounterForm.header.demographicNo)});return false;"/>
+							 onClick="junoEncounter.popupUploadPage('../casemgmt/uploadimage.jsp',${fn:escapeXml(junoEncounterForm.pageData.demographicNo)});return false;"/>
 					</c:otherwise>
 				</c:choose>
 			</security:oscarSec>
@@ -571,6 +568,10 @@
 
 						<%-- List of links in the section --%>
 						<ul id="${sectionName}list">
+
+							<c:if test="${fn:length(section.notes) == 0}">
+								<li>&nbsp;</li>
+							</c:if>
 
 							<c:set var="section" scope="page"
 								   value="${junoEncounterForm.sections[sectionName]}"/>
@@ -835,7 +836,7 @@
 													<bean:message key="oscarEncounter.sortAll.title"/>
 												</li>
 
-												<c:forEach items="${junoEncounterForm.header.providers}"
+												<c:forEach items="${junoEncounterForm.pageData.providers}"
 														   var="provider"
 														   varStatus="loop">
 													<li>
@@ -863,7 +864,7 @@
 													<bean:message key="oscarEncounter.sortAll.title"/>
 												</li>
 
-												<c:forEach items="${junoEncounterForm.header.roles}"
+												<c:forEach items="${junoEncounterForm.pageData.roles}"
 														   var="role"
 														   varStatus="loop">
 													<li>
@@ -931,7 +932,7 @@
 													<bean:message key="oscarEncounter.sortAll.title"/>
 												</li>
 
-												<c:forEach items="${junoEncounterForm.header.caseManagementIssues}"
+												<c:forEach items="${junoEncounterForm.pageData.caseManagementIssues}"
 														   var="issue"
 														   varStatus="loop">
 													<li>
@@ -998,23 +999,23 @@
 									   value="<bean:message key="oscarEncounter.Filter.title"/>"
 									   onclick="noteFilter.showFilter();"/>
 
-								<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.calculators" rights="r" reverse="false">
+								<security:oscarSec roleName="${junoEncounterForm.pageData.roleName}" objectName="_newCasemgmt.calculators" rights="r" reverse="false">
 									<%
-										String patientAge = junoEncounterForm.getHeader().getPatientAgeInYears();
-										String patientSex = junoEncounterForm.getHeader().getPatientSex();
+										String patientAge = junoEncounterForm.getPageData().getPatientAgeInYears();
+										String patientSex = junoEncounterForm.getPageData().getPatientSex();
 									%>
 									<%@include file="../casemgmt/calculatorsSelectList.jspf" %>
 								</security:oscarSec>
 
-								<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.templates" rights="r">
+								<security:oscarSec roleName="${junoEncounterForm.pageData.roleName}" objectName="_newCasemgmt.templates" rights="r">
 									<select style="width:100px;" onchange="javascript:popupPage(700,700,'Templates',this.value);">
 										<option value="-1"><bean:message key="oscarEncounter.Header.Templates"/></option>
 										<option value="-1">------------------</option>
-										<security:oscarSec roleName="${junoEncounterForm.header.roleName}" objectName="_newCasemgmt.templates" rights="w">
+										<security:oscarSec roleName="${junoEncounterForm.pageData.roleName}" objectName="_newCasemgmt.templates" rights="w">
 											<option value="${ctx}/admin/providertemplate.jsp">New / Edit Template</option>
 											<option value="-1">------------------</option>
 										</security:oscarSec>
-										<c:forEach items="${junoEncounterForm.header.encounterTemplates}" var="encounterTemplate">
+										<c:forEach items="${junoEncounterForm.pageData.encounterTemplates}" var="encounterTemplate">
 											<option value="${ctx}/admin/providertemplate.jsp?dboperation=Edit&name=${encounterTemplate.encounterTemplateName}">
 													${encounterTemplate.encounterTemplateName}
 											</option>
@@ -1087,7 +1088,7 @@
 									   id="signVerifyImg"
 									   onclick="Event.stop(event);return encounterNote.saveEncounterNote(true, true, true, true, false);"
 									   title='<bean:message key="oscarEncounter.Index.btnSign"/>'>&nbsp;
-								<c:if test="${junoEncounterForm.header.source == null}">
+								<c:if test="${junoEncounterForm.pageData.source == null}">
 									<input tabindex="21" type='image'
 										   src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>"
 										   onclick="Event.stop(event);return encounterNote.saveEncounterNote(true, false, true, true, true);"
@@ -1150,7 +1151,7 @@
 									<bean:message key="Appointment.formNotes"/>
 								</button>
 								<button type="button"
-										onclick="javascript:popupPage(500,200,'noteBrowser${junoEncounterForm.header.demographicNo}','../casemgmt/noteBrowser.jsp?demographic_no=${junoEncounterForm.header.demographicNo}&FirstTime=1');">
+										onclick="javascript:popupPage(500,200,'noteBrowser${junoEncounterForm.pageData.demographicNo}','../casemgmt/noteBrowser.jsp?demographic_no=${junoEncounterForm.pageData.demographicNo}&FirstTime=1');">
 									<bean:message key="oscarEncounter.Index.BrowseNotes"/>
 								</button>
 								&nbsp;

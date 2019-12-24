@@ -357,7 +357,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 
 
 		// Get data for the header
-		junoEncounterForm.setHeader(
+		junoEncounterForm.setPageData(
 			encounterService.getEncounterHeader(
 				user,
 				providerNo,

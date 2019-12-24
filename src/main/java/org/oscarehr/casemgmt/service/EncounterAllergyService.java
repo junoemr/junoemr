@@ -106,7 +106,7 @@ public class EncounterAllergyService extends EncounterSectionService
 		}
 
 		// --- sort all results ---
-		Collections.sort(out, new EncounterSectionNote.SortChronologicDateAsc());
+		Collections.sort(out, new EncounterSectionNote.SortChronologicDescTextAsc());
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}

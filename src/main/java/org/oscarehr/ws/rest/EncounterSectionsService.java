@@ -95,44 +95,6 @@ public class EncounterSectionsService extends AbstractServiceImpl
 	)
 			throws FactException
 	{
-		/*
-		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		HttpSession session = loggedInInfo.getSession();
-
-		Locale locale = request.getLocale();
-
-		String contextPath = context.getContextPath();
-
-		EctProgram prgrmMgr = new EctProgram(session);
-		String programId = prgrmMgr.getProgram(loggedInProviderNo);
-
-		String roleName = session.getAttribute("userrole") + "," + session.getAttribute("user");
-
-		// XXX: Ew, don't like doing this
-		EctSessionBean encounterSessionBean =
-				(EctSessionBean) session.getAttribute("EctSessionBean");
-
-		EncounterSectionService sectionService = encounterService.getEncounterSectionServiceByName(sectionName);
-
-		EncounterSectionService.SectionParameters sectionParams =
-				new EncounterSectionService.SectionParameters();
-
-		sectionParams.setLoggedInInfo(loggedInInfo);
-		sectionParams.setLocale(locale);
-		sectionParams.setContextPath(contextPath);
-		sectionParams.setRoleName(roleName);
-		sectionParams.setProviderNo(loggedInProviderNo);
-		sectionParams.setDemographicNo(encounterSessionBean.demographicNo);
-		sectionParams.setPatientFirstName(encounterSessionBean.patientFirstName);
-		sectionParams.setPatientLastName(encounterSessionBean.patientLastName);
-		sectionParams.setFamilyDoctorNo(encounterSessionBean.familyDoctorNo);
-		sectionParams.setAppointmentNo(appointmentNo);
-		sectionParams.setChartNo(encounterSessionBean.chartNo);
-		sectionParams.setProgramId(programId);
-		sectionParams.setUserName(encounterSessionBean.userName);
-		 */
-
 		EncounterSectionService sectionService = encounterService.getEncounterSectionServiceByName(sectionName);
 
 		EncounterSectionService.SectionParameters sectionParams = getSectionParams(appointmentNo);

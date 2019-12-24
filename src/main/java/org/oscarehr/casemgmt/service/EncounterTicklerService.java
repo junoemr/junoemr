@@ -25,6 +25,7 @@ package org.oscarehr.casemgmt.service;
 
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
+import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.managers.TicklerManager;
@@ -122,46 +123,6 @@ public class EncounterTicklerService extends EncounterSectionService
 		return "popupPage(500,900,'" + winName + "','" + pathview + "');";
 	}
 
-	/*
-	@Override
-	public EncounterSection getSection(
-			SectionParameters sectionParams,
-			Integer limit,
-			Integer offset
-	) throws FactException
-	{
-		String onClickPlus = getOnClickPlus(sectionParams);
-		//		contextPath, demographicNo, patientFirstName,
-		//	patientLastName, familyDoctorNo, chartNo);
-
-		String onClickTitle = getOnClickTitle(sectionParams);
-		//contextPath, demographicNo, patientFirstName,
-		//	patientLastName);
-
-		EncounterSection section = new EncounterSection();
-
-		section.setTitle(SECTION_TITLE);
-		section.setColour(SECTION_TITLE_COLOUR);
-		section.setCppIssues("");
-		section.setAddUrl("");
-		section.setIdentUrl("");
-		section.setOnClickTitle(onClickTitle);
-		section.setOnClickPlus(onClickPlus);
-
-		EncounterNotes notes = getNotes(
-				sectionParams,
-				limit,
-				offset
-		);
-
-		section.setNotes(notes.getEncounterSectionNotes());
-
-		section.setRemainingNotes(notes.getNoteCount() - notes.getEncounterSectionNotes().size());
-
-		return section;
-	}
-	*/
-
 	@Override
 	public EncounterNotes getNotes(
 			SectionParameters sectionParams, Integer limit,
@@ -175,20 +136,14 @@ public class EncounterTicklerService extends EncounterSectionService
 			return EncounterNotes.noNotes();
 		}
 
-		//String dateBegin = "1900-01-01";
-		//String dateEnd = "8888-12-31";
-
 		List<Tickler> ticklers = ticklerManager.findActiveByDemographicNo(
 				sectionParams.getLoggedInInfo(),
 				Integer.parseInt(sectionParams.getDemographicNo()),
 				limit,
-				offset
+				offset,
+				AbstractDao.SORT_DESC
 		);
 
-		//Date serviceDate;
-		//Date today = new Date(System.currentTimeMillis());
-		//int hash;
-		//long days;
 		for (Tickler t : ticklers)
 		{
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
@@ -226,6 +181,8 @@ public class EncounterTicklerService extends EncounterSectionService
 
 			notes.add(sectionNote);
 		}
+
+		//Collections.sort(notes, new EncounterSectionNote.SortChronologic());
 
 		int noteCount = ticklerManager.getActiveByDemographicNoCount(
 				sectionParams.getLoggedInInfo(),

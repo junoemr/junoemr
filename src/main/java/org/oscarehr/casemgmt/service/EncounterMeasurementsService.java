@@ -42,6 +42,7 @@ import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -320,10 +321,10 @@ public class EncounterMeasurementsService extends EncounterSectionService
 				new oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler(demo);
 		List<EctMeasurementsDataBean> measureTypes = hd.getMeasurementsData();
 
-		//oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean data;
+
+		List<EncounterSectionNote> measurementTypeNotes = new ArrayList<>();
 		for(EctMeasurementsDataBean data:  measureTypes)
 		{
-			//data = (oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean) measureTypes.get(idx);
 			String title = data.getTypeDisplayName();
 			String type = data.getType();
 
@@ -335,7 +336,6 @@ public class EncounterMeasurementsService extends EncounterSectionService
 			{
 				EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-				//NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 				data = measures.get(0);
 				Date date = data.getDateObservedAsDate();
 				if (date == null)
@@ -344,16 +344,7 @@ public class EncounterMeasurementsService extends EncounterSectionService
 				}
 				sectionNote.setUpdateDate(ConversionUtils.toNullableLocalDate(date).atStartOfDay());
 
-				//Not sure what the standard should be for showing remote data in the left and right hand sides but im not sure this looks right.
-				//if(data.getRemoteFacility() != null){
-				//	item.setBgColour("#ffcccc");
-				//}
-
-				//String formattedDate = DateUtils.formatDate(date, request.getLocale());
-
-				//item.setLinkTitle(title + " " + data.getDataField() + " " + formattedDate);
 				title = EctDisplayMeasurementsAction.padd(title, data.getDataField());
-				//String tmp = "<span class=\"measureCol1\">" + title + "</span>";
 
 				sectionNote.setText(title);
 
@@ -366,12 +357,13 @@ public class EncounterMeasurementsService extends EncounterSectionService
 				String onClickString = "popupPage(300,800,'" + hash + "','" + url + "');";
 				sectionNote.setOnClick(onClickString);
 
-
-				out.add(sectionNote);
+				measurementTypeNotes.add(sectionNote);
 			}
 		}
 
-		//Collections.sort(out, new EncounterSectionNote.SortAlphabetic());
+		Collections.sort(measurementTypeNotes, new EncounterSectionNote.SortChronologicDescTextAsc());
+
+		out.addAll(measurementTypeNotes);
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
 	}
