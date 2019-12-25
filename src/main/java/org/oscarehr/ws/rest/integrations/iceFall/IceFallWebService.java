@@ -30,6 +30,7 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
+import org.oscarehr.integration.iceFall.model.IceFallLog;
 import org.oscarehr.integration.iceFall.service.IceFallRESTService;
 import org.oscarehr.integration.iceFall.service.IceFallService;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallException;
@@ -37,6 +38,9 @@ import org.oscarehr.integration.iceFall.service.exceptions.IceFallRESTException;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
+import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallLogEntryListTo1;
+import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallLogEntryTo1;
+import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallLogSearchTo1;
 import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallSendFormTo1;
 import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallSettingsTo1;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -50,7 +54,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Path("/integrations/iceFall")
@@ -111,6 +117,37 @@ public class IceFallWebService extends AbstractServiceImpl
 	}
 
 	@POST
+	@Path("/logs")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public RestResponse<IceFallLogEntryListTo1> getLogEntries(IceFallLogSearchTo1 iceFallLogSearchTo1)
+	{
+		ArrayList<IceFallLogEntryTo1> iceFallLogsTo1 = new ArrayList<>();
+
+		List<IceFallLog> logs = iceFallService.getIceFallLogs(
+						iceFallLogSearchTo1.getStartDate(),
+						iceFallLogSearchTo1.getEndDate(),
+						iceFallLogSearchTo1.getPage(),
+						iceFallLogSearchTo1.getPageSize(),
+						iceFallLogSearchTo1.getStatus());
+
+		for (IceFallLog log : logs)
+		{
+			iceFallLogsTo1.add(new IceFallLogEntryTo1(log));
+		}
+
+		IceFallLogEntryListTo1 iceFallLogEntryListTo1 = new IceFallLogEntryListTo1();
+		iceFallLogEntryListTo1.setLogEntries(iceFallLogsTo1);
+		iceFallLogEntryListTo1.setTotalLogEntries(iceFallService.getIceFallLogsCount(
+						iceFallLogSearchTo1.getStartDate(),
+						iceFallLogSearchTo1.getEndDate(),
+						iceFallLogSearchTo1.getPage(),
+						iceFallLogSearchTo1.getPageSize(),
+						iceFallLogSearchTo1.getStatus()));
+		return RestResponse.successResponse(iceFallLogEntryListTo1);
+	}
+
+	@POST
 	@Path("/sendForm")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -147,6 +184,9 @@ public class IceFallWebService extends AbstractServiceImpl
 			String pdfData = new String(iceFallService.printToPDF(saveEFormForPrint.getId(), provider.getProviderNo(), getHttpServletRequest().getScheme(), getHttpServletRequest().getContextPath()));
 			// submit
 			iceFallService.sendIceFallForm(provider, demo, pdfData, iceFallSendFormTo1);
+			iceFallService.logIceFallSent("Prescription Sent", provider.getProviderNo(), eformId, isInstance);
+
+			return RestResponse.successResponse(true);
 		}
 		catch (IceFallException e)
 		{
@@ -176,9 +216,6 @@ public class IceFallWebService extends AbstractServiceImpl
 
 			return RestResponse.errorResponse(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider));
 		}
-
-		//TODO change me.
-		return RestResponse.successResponse(true);
 	}
 
 }

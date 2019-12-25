@@ -36,6 +36,9 @@ a {
 .align-items-first-baseline {
 	align-items: first baseline;
 }
+.align-items-end {
+	align-items: end;
+}
 .justify-content-right {
 	justify-content: right;
 }
@@ -96,6 +99,10 @@ a {
 
 .no-padding {
 	padding: 0;
+}
+
+.no-padding-left {
+	padding-left: 0;
 }
 
 .no-margin {

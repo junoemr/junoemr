@@ -57,8 +57,10 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -122,6 +124,34 @@ public class IceFallService
 
 		iceFallLogDao.persist(iceFallLog);
 		return iceFallLog;
+	}
+
+	/**
+	 * get the ice fall log entries that fit the search criteria
+	 * @param startDate - the start date to return logs for (inclusive)
+	 * @param endDate - the end date to return logs for (inclusive)
+	 * @param page - the page to return
+	 * @param pageSize - the size of each page
+	 * @param status - the status type of the logs to return. can be '%' for all status types.
+	 * @return - a list of logs
+	 */
+	public List<IceFallLog> getIceFallLogs (LocalDateTime startDate, LocalDateTime endDate, Integer page, Integer pageSize, String status)
+	{
+		return iceFallLogDao.getLogsPaginated(startDate, endDate, page, pageSize, status);
+	}
+
+	/**
+	 * get the total record count of logs returned by the paginated query
+	 * @param startDate - the start date to return logs for (inclusive)
+	 * @param endDate - the end date to return logs for (inclusive)
+	 * @param page - the page to return
+	 * @param pageSize - the size of each page
+	 * @param status - the status type of the logs to return. can be '%' for all status types.
+	 * @return - a list of logs
+	 */
+	public Long getIceFallLogsCount (LocalDateTime startDate, LocalDateTime endDate, Integer page, Integer pageSize, String status)
+	{
+		return iceFallLogDao.getLogsPaginatedCount(startDate, endDate, page, pageSize, status);
 	}
 
 	/**

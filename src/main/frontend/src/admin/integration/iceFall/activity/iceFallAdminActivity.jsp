@@ -21,5 +21,64 @@
 * Canada
 --%>
 <div id="ice-fall-admin-activity">
-	<p>IceFall activity is working!</p>
+	<div class="col-sm-12 juno-modal flex flex-row align-items-end">
+		<ca-field-select
+						class="col-sm-3 no-padding-left"
+						ca-name="status"
+						ca-title="Status"
+						ca-template="label"
+						ca-model="$ctrl.statusFilter"
+						ca-options="$ctrl.filterStatuses"
+		>
+		</ca-field-select>
+
+		<ca-field-date
+						class="col-sm-3"
+						ca-title="Start Date"
+						ca-date-picker-id="startDate"
+						ca-name="startDate"
+						ca-model="$ctrl.startDate"
+						ca-orientation="auto"
+		>
+		</ca-field-date>
+
+		<ca-field-date
+						class="col-sm-3"
+						ca-title="End Date"
+						ca-date-picker-id="endDate"
+						ca-name="endDate"
+						ca-model="$ctrl.endDate"
+						ca-orientation="auto"
+		>
+		</ca-field-date>
+
+		<div class="flex-row flex-grow justify-content-right">
+			<button class="btn btn-primary" ng-click="$ctrl.tableParams.reload()">
+				Search
+			</button>
+		</div>
+	</div>
+	<div class="col-sm-12 md-margin-top">
+		<table ng-table="$ctrl.tableParams" show-filter="false" class="table table-striped table-bordered">
+			<tbody>
+				<tr ng-repeat="log in  $data | orderBy:$ctrl.sortMode">
+					<td data-title="'Date Sent'" sortable="'dateSent'">
+						{{log.dateSent}}
+					</td>
+					<td data-title="'Status'" sortable="'status'">
+						{{log.status}}
+					</td>
+					<td data-title="'Message'" sortable="'message'">
+						{{log.message}}
+					</td>
+					<td data-title="'Sent By'" sortable="'sentBy'">
+						{{log.sentBy}}
+					</td>
+					<td data-title="'Document'" sortable="'fdid'">
+						{{log.fdid}}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </div>

@@ -30,6 +30,7 @@ public class IceFallException extends RuntimeException
 		CUST_EMAIL_ALREADY_EXISTS,
 		USER_CREATION_ERROR,
 		DOCTOR_LOOKUP_ERROR,
+		PRESCRIPTION_SEND_ERROR,
 		PRESCRIPTION_CREATION_ERROR,
 	}
 
@@ -60,9 +61,11 @@ public class IceFallException extends RuntimeException
 			case DOCTOR_LOOKUP_ERROR:
 				return  provider.getDisplayName() + " does not have a valid doctor id and cannot send " +
 								"prescriptions electronically. Please fax the prescription.";
-			case PRESCRIPTION_CREATION_ERROR:
+			case PRESCRIPTION_SEND_ERROR:
 				return "An error occurred when attempting to send " +
 								"the customer’s prescription electronically. Please fax the prescription.";
+			case PRESCRIPTION_CREATION_ERROR:
+				return "An internal error occurred while preparing this form for submission. Please fax the prescription";
 		}
 
 		return "";

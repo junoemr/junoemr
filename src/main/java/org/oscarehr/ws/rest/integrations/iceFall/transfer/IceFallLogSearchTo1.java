@@ -20,12 +20,65 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.iceFall.service.exceptions;
+package org.oscarehr.ws.rest.integrations.iceFall.transfer;
 
-public class IceFallPrescriptionException  extends IceFallException
+import java.time.LocalDateTime;
+
+public class IceFallLogSearchTo1
 {
-	public IceFallPrescriptionException (String msg, Exception e)
+	private String status;
+	private LocalDateTime startDate;
+	private LocalDateTime endDate;
+	private Integer page;
+	private Integer pageSize;
+
+	public String getStatus()
 	{
-		super(msg, e, USER_ERROR_MESSAGE.PRESCRIPTION_SEND_ERROR);
+		return status;
+	}
+
+	public void setStatus(String status)
+	{
+		this.status = status;
+	}
+
+	public LocalDateTime getStartDate()
+	{
+		return startDate;
+	}
+
+	public void setStartDate(LocalDateTime startDate)
+	{
+		this.startDate = startDate;
+	}
+
+	public LocalDateTime getEndDate()
+	{
+		return endDate;
+	}
+
+	public void setEndDate(LocalDateTime endDate)
+	{
+		this.endDate = endDate;
+	}
+
+	public Integer getPage()
+	{
+		return page;
+	}
+
+	public void setPage(Integer page)
+	{
+		this.page = page;
+	}
+
+	public Integer getPageSize()
+	{
+		return pageSize;
+	}
+
+	public void setPageSize(Integer pageSize)
+	{
+		this.pageSize = pageSize;
 	}
 }

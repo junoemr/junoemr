@@ -20,12 +20,33 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.iceFall.service.exceptions;
+package org.oscarehr.ws.rest.integrations.iceFall.transfer;
 
-public class IceFallPrescriptionException  extends IceFallException
+import java.io.Serializable;
+import java.util.List;
+
+public class IceFallLogEntryListTo1 implements Serializable
 {
-	public IceFallPrescriptionException (String msg, Exception e)
+	private List<IceFallLogEntryTo1> logEntries;
+	private Long totalLogEntries;
+
+	public List<IceFallLogEntryTo1> getLogEntries()
 	{
-		super(msg, e, USER_ERROR_MESSAGE.PRESCRIPTION_SEND_ERROR);
+		return logEntries;
+	}
+
+	public void setLogEntries(List<IceFallLogEntryTo1> logEntries)
+	{
+		this.logEntries = logEntries;
+	}
+
+	public Long getTotalLogEntries()
+	{
+		return totalLogEntries;
+	}
+
+	public void setTotalLogEntries(Long totalLogEntries)
+	{
+		this.totalLogEntries = totalLogEntries;
 	}
 }

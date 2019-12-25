@@ -31,7 +31,7 @@ public class IceFallPdfGenerationException extends IceFallException
 
 	public IceFallPdfGenerationException(String msg, Exception e)
 	{
-		super(msg, e);
+		super(msg, e, IceFallException.USER_ERROR_MESSAGE.PRESCRIPTION_CREATION_ERROR);
 	}
 
 	public IceFallPdfGenerationException(String msg, Exception e, IceFallException.USER_ERROR_MESSAGE errorMessage)

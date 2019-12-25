@@ -26,6 +26,12 @@ package org.oscarehr.integration.iceFall.dao;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.integration.iceFall.model.IceFallLog;
 import org.springframework.stereotype.Repository;
+import oscar.util.ConversionUtils;
+
+import javax.persistence.Query;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public class IceFallLogDao extends AbstractDao<IceFallLog>
@@ -33,5 +39,31 @@ public class IceFallLogDao extends AbstractDao<IceFallLog>
 	public IceFallLogDao()
 	{
 		super(IceFallLog.class);
+	}
+
+	public List<IceFallLog> getLogsPaginated (LocalDateTime start, LocalDateTime end, Integer page, Integer pageSize, String status)
+	{
+		Query query = entityManager.createQuery("FROM IceFallLog l WHERE l.createdAt >= :startDateTime AND l.createdAt <= :endDateTime AND l.status LIKE :status");
+		query.setParameter("startDateTime", ConversionUtils.toLegacyDateTime(start));
+		query.setParameter("endDateTime", ConversionUtils.toLegacyDateTime(end));
+		query.setParameter("status", status);
+
+		if (page != null && pageSize != null)
+		{
+			query.setMaxResults(pageSize);
+			query.setFirstResult((page - 1) * pageSize);
+		}
+
+		return query.getResultList();
+	}
+
+	public Long getLogsPaginatedCount(LocalDateTime start, LocalDateTime end, Integer page, Integer pageSize, String status)
+	{
+		Query query = entityManager.createQuery("SELECT count(l.id) FROM IceFallLog l WHERE l.createdAt >= :startDateTime AND l.createdAt <= :endDateTime AND l.status LIKE :status");
+		query.setParameter("startDateTime", ConversionUtils.toLegacyDateTime(start));
+		query.setParameter("endDateTime", ConversionUtils.toLegacyDateTime(end));
+		query.setParameter("status", status);
+
+		return (Long)query.getSingleResult();
 	}
 }

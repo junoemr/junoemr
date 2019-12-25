@@ -1,3 +1,7 @@
 #ice-fall-admin-activity {
-	
+	@include juno-font-default();
+
+	.form-group {
+		margin: 0;
+	}
 }

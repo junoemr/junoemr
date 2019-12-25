@@ -15,5 +15,6 @@ CREATE TABLE IF NOT EXISTS icefall_log(
     form_id INT,
     is_form_instance BOOL,
     sending_provider_no VARCHAR(6),
+    created_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT `icefall_log_sending_provider_no_fk` FOREIGN KEY (sending_provider_no) REFERENCES `provider`(`provider_no`) ON DELETE SET NULL
 ) CHARACTER SET utf8;
