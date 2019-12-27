@@ -27,7 +27,7 @@ angular.module('Admin.Integration').component('iceFallAdminActivity',
 {
 	templateUrl: 'src/admin/integration/iceFall/activity/iceFallAdminActivity.jsp',
 	bindings: {},
-	controller: ['$scope', '$http', '$httpParamSerializer', 'NgTableParams', function ($scope, $http, $httpParamSerializer, NgTableParams)
+	controller: ['$scope', '$http', '$httpParamSerializer', 'NgTableParams', 'formService', function ($scope, $http, $httpParamSerializer, NgTableParams, formService)
 	{
 		let ctrl = this;
 
@@ -37,7 +37,6 @@ angular.module('Admin.Integration').component('iceFallAdminActivity',
 		ctrl.statusFilter = "%";
 		ctrl.startDate = Juno.Common.Util.formatMomentDate(moment());
 		ctrl.endDate = Juno.Common.Util.formatMomentDate(moment());
-		ctrl.sortMode = "dateSent";
 		ctrl.logEntries = [];
 
 		// search for log entries
@@ -54,23 +53,29 @@ angular.module('Admin.Integration').component('iceFallAdminActivity',
 						count: 100,
 						sorting:
 						{
-							dateSent: 'desc',
+							DATE_SENT: 'desc',
 						},
 						paginationMaxBlocks: 3,
 						paginationMinBlocks: 2,
 						dataset: ctrl.logEntries
 					},
 					{
-						// called when sort order changes
 						getData: function (params) {
-							ctrl.sortMode = params.orderBy();
+
+							if (!ctrl.startDate || !ctrl.endDate)
+							{//start date and end date are required
+								params.total(0);
+								return [];
+							}
 
 							return iceFallApi.getLogEntries({
 								status: ctrl.statusFilter,
 								startDate: ctrl.startDate +"T01:01:01",
 								endDate: ctrl.endDate +"T23:59:59",
 								page: params.page(),
-								pageSize: params.count()
+								pageSize: params.count(),
+								sortBy: ctrl.orderByToApiName(params.orderBy()),
+								sortDirection: ctrl.orderByGetDirection(params.orderBy())
 							}).then(
 									function success(result)
 									{
@@ -86,6 +91,35 @@ angular.module('Admin.Integration').component('iceFallAdminActivity',
 						}
 					}
 			);
+		};
+
+		ctrl.doEformPopup = function (log)
+		{
+			if (log.instance)
+			{
+				formService.openEFormInstancePopup(log.demographicNo, log.fdid);
+			}
+			else
+			{
+				formService.openEFormPopup(log.demographicNo, log.fdid);
+			}
+		};
+
+		ctrl.orderByToApiName = function(orderBy)
+		{
+			return orderBy[0].replace("-", "").replace("+", "");
+		};
+
+		ctrl.orderByGetDirection = function (orderBy)
+		{
+			if (orderBy[0].includes("-"))
+			{
+				return "DESC";
+			}
+			else
+			{
+				return "ASC";
+			}
 		};
 	}]
 });

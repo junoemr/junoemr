@@ -109,6 +109,18 @@ a {
 	margin: 0;
 }
 
+.icon-lg {
+	font-size: $icon-lg;
+}
+
+.icon-md {
+	font-size: $icon-md;
+}
+
+.icon-sm {
+	font-size: $icon-sm;
+}
+
 // Makes checkbox flush with input (as long as checkbox margin is 0)
 .big-checkbox {
 	height: 34px;

@@ -29,21 +29,41 @@ import org.springframework.stereotype.Repository;
 import oscar.util.ConversionUtils;
 
 import javax.persistence.Query;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public class IceFallLogDao extends AbstractDao<IceFallLog>
 {
+	public enum SORT_DIRECTION {
+		DESC,
+		ASC
+	}
+
+	public enum SORT_BY {
+		DATE_SENT,
+		PROVIDER_NO,
+		STATUS,
+		MESSAGE
+	}
+
+
+
 	public IceFallLogDao()
 	{
 		super(IceFallLog.class);
 	}
 
-	public List<IceFallLog> getLogsPaginated (LocalDateTime start, LocalDateTime end, Integer page, Integer pageSize, String status)
+	public List<IceFallLog> getLogsPaginated (LocalDateTime start, LocalDateTime end, Integer page, Integer pageSize, String status, SORT_BY sortBy, SORT_DIRECTION sortDirection)
 	{
-		Query query = entityManager.createQuery("FROM IceFallLog l WHERE l.createdAt >= :startDateTime AND l.createdAt <= :endDateTime AND l.status LIKE :status");
+		String hqlQuery = "FROM IceFallLog l WHERE l.createdAt >= :startDateTime AND l.createdAt <= :endDateTime AND l.status LIKE :status";
+
+		if (sortBy != null && sortDirection != null)
+		{
+			hqlQuery += " ORDER BY " + sortByToColName(sortBy) + " " + sortDirection.name();
+		}
+
+		Query query = entityManager.createQuery(hqlQuery);
 		query.setParameter("startDateTime", ConversionUtils.toLegacyDateTime(start));
 		query.setParameter("endDateTime", ConversionUtils.toLegacyDateTime(end));
 		query.setParameter("status", status);
@@ -65,5 +85,22 @@ public class IceFallLogDao extends AbstractDao<IceFallLog>
 		query.setParameter("status", status);
 
 		return (Long)query.getSingleResult();
+	}
+
+	protected String sortByToColName(SORT_BY sortBy)
+	{
+		switch(sortBy)
+		{
+			case DATE_SENT:
+				return "created_at";
+			case PROVIDER_NO:
+				return "sending_provider_no";
+			case STATUS:
+				return "status";
+			case MESSAGE:
+				return "message";
+		}
+
+		return "";
 	}
 }

@@ -36,6 +36,8 @@ public class IceFallLogEntryTo1 implements Serializable
 	private String message;
 	private String providerNo;
 	private Integer fdid;
+	private Boolean isInstance;
+	private Integer demographicNo;
 	private LocalDateTime dateSent;
 
 	public IceFallLogEntryTo1() {}
@@ -47,6 +49,8 @@ public class IceFallLogEntryTo1 implements Serializable
 		providerNo = iceFallLog.getSendingProviderNo();
 		fdid = iceFallLog.getFormId();
 		dateSent = ConversionUtils.toLocalDateTime(iceFallLog.getCreatedAt());
+		demographicNo = iceFallLog.getDemographicNo();
+		isInstance = iceFallLog.getFormInstance();
 	}
 
 	public String getStatus()
@@ -97,5 +101,25 @@ public class IceFallLogEntryTo1 implements Serializable
 	public void setDateSent(LocalDateTime dateSent)
 	{
 		this.dateSent = dateSent;
+	}
+
+	public Integer getDemographicNo()
+	{
+		return demographicNo;
+	}
+
+	public void setDemographicNo(Integer demographicNo)
+	{
+		this.demographicNo = demographicNo;
+	}
+
+	public Boolean getInstance()
+	{
+		return isInstance;
+	}
+
+	public void setInstance(Boolean instance)
+	{
+		isInstance = instance;
 	}
 }

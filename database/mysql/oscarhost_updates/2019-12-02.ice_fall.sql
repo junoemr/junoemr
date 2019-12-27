@@ -13,8 +13,10 @@ CREATE TABLE IF NOT EXISTS icefall_log(
     status VARCHAR(64),
     message TEXT,
     form_id INT,
+    demographic_no INT,
     is_form_instance BOOL,
     sending_provider_no VARCHAR(6),
     created_at TIMESTAMP DEFAULT NOW(),
-    CONSTRAINT `icefall_log_sending_provider_no_fk` FOREIGN KEY (sending_provider_no) REFERENCES `provider`(`provider_no`) ON DELETE SET NULL
+    CONSTRAINT `icefall_log_sending_provider_no_fk` FOREIGN KEY (sending_provider_no) REFERENCES `provider`(`provider_no`) ON DELETE SET NULL,
+    CONSTRAINT `icefall_log_demographic_no_fk` FOREIGN KEY (demographic_no) REFERENCES `demographic`(`demographic_no`) ON DELETE SET NULL
 ) CHARACTER SET utf8;

@@ -4,4 +4,11 @@
 	.form-group {
 		margin: 0;
 	}
+
+	.required {
+		input {
+			border-color: $color-red-base;
+		}
+	}
+
 }

@@ -23,10 +23,8 @@
 
 package org.oscarehr.integration.iceFall.service;
 
-import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.iceFall.dao.IceFallCredentialsDao;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
-import org.oscarehr.integration.iceFall.service.exceptions.IceFallAuthorizationException;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallAuthenticationResponseTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallAuthenticationTo1;
 import org.oscarehr.integration.iceFall.service.transfer.IceFallCreateCustomerResponseTo1;
@@ -39,9 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import oscar.util.RESTClient;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Service
 public class IceFallRESTService

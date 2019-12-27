@@ -29,8 +29,11 @@ public class IceFallLogSearchTo1
 	private String status;
 	private LocalDateTime startDate;
 	private LocalDateTime endDate;
+
 	private Integer page;
 	private Integer pageSize;
+	private String sortBy;
+	private String sortDirection;
 
 	public String getStatus()
 	{
@@ -80,5 +83,25 @@ public class IceFallLogSearchTo1
 	public void setPageSize(Integer pageSize)
 	{
 		this.pageSize = pageSize;
+	}
+
+	public String getSortBy()
+	{
+		return sortBy;
+	}
+
+	public void setSortBy(String sortBy)
+	{
+		this.sortBy = sortBy;
+	}
+
+	public String getSortDirection()
+	{
+		return sortDirection;
+	}
+
+	public void setSortDirection(String sortDirection)
+	{
+		this.sortDirection = sortDirection;
 	}
 }

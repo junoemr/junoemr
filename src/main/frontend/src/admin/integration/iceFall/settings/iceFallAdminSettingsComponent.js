@@ -22,6 +22,7 @@
  */
 
 import {IceFallApi} from "../../../../../generated";
+import {ADMIN_PAGE_EVENTS} from "../../../adminConstants";
 
 angular.module('Admin.Integration').component('iceFallAdminSettings',
 {

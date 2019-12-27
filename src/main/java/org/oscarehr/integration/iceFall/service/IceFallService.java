@@ -55,7 +55,6 @@ import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallSendFormTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -103,23 +102,24 @@ public class IceFallService
 		return creds;
 	}
 
-	public IceFallLog logIceFallError(String message, String sendingProviderNo, Integer formId, boolean formInstance)
+	public IceFallLog logIceFallError(String message, String sendingProviderNo, Integer formId, Integer demographicNo, boolean formInstance)
 	{
-		return logIceFall(message, IceFallLog.STATUS.ERROR, sendingProviderNo, formId, formInstance);
+		return logIceFall(message, IceFallLog.STATUS.ERROR, sendingProviderNo, formId, demographicNo, formInstance);
 	}
 
-	public IceFallLog logIceFallSent(String message, String sendingProviderNo, Integer formId, boolean formInstance)
+	public IceFallLog logIceFallSent(String message, String sendingProviderNo, Integer formId, Integer demographicNo, boolean formInstance)
 	{
-		return logIceFall(message, IceFallLog.STATUS.SENT, sendingProviderNo, formId, formInstance);
+		return logIceFall(message, IceFallLog.STATUS.SENT, sendingProviderNo, formId, demographicNo, formInstance);
 	}
 
-	public IceFallLog logIceFall(String message, IceFallLog.STATUS status, String sendingProviderNo, Integer formId, boolean formInstance)
+	public IceFallLog logIceFall(String message, IceFallLog.STATUS status, String sendingProviderNo, Integer formId, Integer demographicNo, boolean formInstance)
 	{
 		IceFallLog iceFallLog = new IceFallLog();
 		iceFallLog.setMessage(message);
 		iceFallLog.setStatus(status);
 		iceFallLog.setSendingProviderNo(sendingProviderNo);
 		iceFallLog.setFormId(formId);
+		iceFallLog.setDemographicNo(demographicNo);
 		iceFallLog.setFormInstance(formInstance);
 
 		iceFallLogDao.persist(iceFallLog);
@@ -135,9 +135,9 @@ public class IceFallService
 	 * @param status - the status type of the logs to return. can be '%' for all status types.
 	 * @return - a list of logs
 	 */
-	public List<IceFallLog> getIceFallLogs (LocalDateTime startDate, LocalDateTime endDate, Integer page, Integer pageSize, String status)
+	public List<IceFallLog> getIceFallLogs (LocalDateTime startDate, LocalDateTime endDate, Integer page, Integer pageSize, String status, IceFallLogDao.SORT_BY sortBy, IceFallLogDao.SORT_DIRECTION sortDirection)
 	{
-		return iceFallLogDao.getLogsPaginated(startDate, endDate, page, pageSize, status);
+		return iceFallLogDao.getLogsPaginated(startDate, endDate, page, pageSize, status, sortBy, sortDirection);
 	}
 
 	/**

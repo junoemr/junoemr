@@ -24,7 +24,6 @@
 package org.oscarehr.admin.service;
 
 import org.apache.commons.lang.StringUtils;
-import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
@@ -649,7 +648,14 @@ public class AdminNavService
 
 		if (systemPreferenceService.isPreferenceEnabled(UserProperty.ICE_FALL_INTEGRATION_ENABLED, false))
 		{
-			integrationItems.add(new AdminNavItemTo1("Ice Fall", "iceFall/settings"));
+			if (systemPreferenceService.isPreferenceEnabled(UserProperty.ICE_FALL_VISIBLE, false))
+			{
+				integrationItems.add(new AdminNavItemTo1("Ice Fall", "iceFall/activity"));
+			}
+			else
+			{
+				integrationItems.add(new AdminNavItemTo1("Ice Fall", "iceFall/settings"));
+			}
 		}
 
 		integrationGroup.setItems(integrationItems);

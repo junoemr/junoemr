@@ -24,8 +24,6 @@ package org.oscarehr.integration.iceFall.service.exceptions;
 
 import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
 
-import javax.naming.AuthenticationException;
-
 public class IceFallEmailExistsException extends IceFallRESTException
 {
 	public static String EMAIL_EXISTS = "__CUSTOMER_EMAIL_EXISTS__";

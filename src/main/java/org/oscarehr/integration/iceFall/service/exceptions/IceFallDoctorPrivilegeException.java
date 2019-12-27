@@ -24,8 +24,6 @@ package org.oscarehr.integration.iceFall.service.exceptions;
 
 import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
 
-import javax.naming.AuthenticationException;
-
 public class IceFallDoctorPrivilegeException extends IceFallRESTException
 {
 	public static String PRESCRIBE_PERMISSION_ERROR = "__DOCTOR_CANNOT_PRESCRIBE__";

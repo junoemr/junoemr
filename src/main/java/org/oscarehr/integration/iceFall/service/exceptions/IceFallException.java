@@ -32,6 +32,7 @@ public class IceFallException extends RuntimeException
 		DOCTOR_LOOKUP_ERROR,
 		PRESCRIPTION_SEND_ERROR,
 		PRESCRIPTION_CREATION_ERROR,
+		INTERNAL_SERVER_ERROR,
 	}
 
 	/**
@@ -66,6 +67,8 @@ public class IceFallException extends RuntimeException
 								"the customer’s prescription electronically. Please fax the prescription.";
 			case PRESCRIPTION_CREATION_ERROR:
 				return "An internal error occurred while preparing this form for submission. Please fax the prescription";
+			case INTERNAL_SERVER_ERROR:
+				return "An internal server error has occurred while trying to electronically submit this prescription. Please fax the prescription";
 		}
 
 		return "";

@@ -32,25 +32,29 @@
 		>
 		</ca-field-select>
 
-		<ca-field-date
-						class="col-sm-3"
-						ca-title="Start Date"
-						ca-date-picker-id="startDate"
-						ca-name="startDate"
-						ca-model="$ctrl.startDate"
-						ca-orientation="auto"
-		>
-		</ca-field-date>
+		<div class="col-sm-3" ng-class="{'required': !$ctrl.startDate}">
+			<ca-field-date
+							ca-title="Start Date"
+							ca-date-picker-id="startDate"
+							ca-name="startDate"
+							ca-model="$ctrl.startDate"
+							ca-orientation="auto"
+							ca-required-field="true"
+			>
+			</ca-field-date>
+		</div>
 
-		<ca-field-date
-						class="col-sm-3"
-						ca-title="End Date"
-						ca-date-picker-id="endDate"
-						ca-name="endDate"
-						ca-model="$ctrl.endDate"
-						ca-orientation="auto"
-		>
-		</ca-field-date>
+		<div class="col-sm-3" ng-class="{'required': !$ctrl.endDate}">
+			<ca-field-date
+							ca-title="End Date"
+							ca-date-picker-id="endDate"
+							ca-name="endDate"
+							ca-model="$ctrl.endDate"
+							ca-orientation="auto"
+							ca-required-field="true"
+			>
+			</ca-field-date>
+		</div>
 
 		<div class="flex-row flex-grow justify-content-right">
 			<button class="btn btn-primary" ng-click="$ctrl.tableParams.reload()">
@@ -61,21 +65,21 @@
 	<div class="col-sm-12 md-margin-top">
 		<table ng-table="$ctrl.tableParams" show-filter="false" class="table table-striped table-bordered">
 			<tbody>
-				<tr ng-repeat="log in  $data | orderBy:$ctrl.sortMode">
-					<td data-title="'Date Sent'" sortable="'dateSent'">
-						{{log.dateSent}}
+				<tr ng-repeat="log in  $data">
+					<td data-title="'Date Sent'" sortable="'DATE_SENT'">
+						{{log.dateSent | date:'yyyy-MM-dd'}}
 					</td>
-					<td data-title="'Status'" sortable="'status'">
+					<td data-title="'Status'" sortable="'STATUS'">
 						{{log.status}}
 					</td>
-					<td data-title="'Message'" sortable="'message'">
+					<td data-title="'Message'" sortable="'MESSAGE'">
 						{{log.message}}
 					</td>
-					<td data-title="'Sent By'" sortable="'sentBy'">
-						{{log.sentBy}}
+					<td data-title="'Sending Provider'" sortable="'PROVIDER_NO'">
+						{{log.providerNo}}
 					</td>
-					<td data-title="'Document'" sortable="'fdid'">
-						{{log.fdid}}
+					<td data-title="'Document'" sortable="'DATE_SENT'">
+						<div class="text-center" ng-click="$ctrl.doEformPopup(log)"><i class="icon icon-sm icon-file hand-hover"></i></div>
 					</td>
 				</tr>
 			</tbody>

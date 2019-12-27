@@ -29,6 +29,7 @@ import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.integration.iceFall.dao.IceFallLogDao;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;
 import org.oscarehr.integration.iceFall.model.IceFallLog;
 import org.oscarehr.integration.iceFall.service.IceFallRESTService;
@@ -124,27 +125,38 @@ public class IceFallWebService extends AbstractServiceImpl
 	{
 		ArrayList<IceFallLogEntryTo1> iceFallLogsTo1 = new ArrayList<>();
 
-		List<IceFallLog> logs = iceFallService.getIceFallLogs(
-						iceFallLogSearchTo1.getStartDate(),
-						iceFallLogSearchTo1.getEndDate(),
-						iceFallLogSearchTo1.getPage(),
-						iceFallLogSearchTo1.getPageSize(),
-						iceFallLogSearchTo1.getStatus());
-
-		for (IceFallLog log : logs)
+		try
 		{
-			iceFallLogsTo1.add(new IceFallLogEntryTo1(log));
-		}
+			List<IceFallLog> logs = iceFallService.getIceFallLogs(
+							iceFallLogSearchTo1.getStartDate(),
+							iceFallLogSearchTo1.getEndDate(),
+							iceFallLogSearchTo1.getPage(),
+							iceFallLogSearchTo1.getPageSize(),
+							iceFallLogSearchTo1.getStatus(),
+							IceFallLogDao.SORT_BY.valueOf(iceFallLogSearchTo1.getSortBy()),
+							IceFallLogDao.SORT_DIRECTION.valueOf(iceFallLogSearchTo1.getSortDirection())
+			);
 
-		IceFallLogEntryListTo1 iceFallLogEntryListTo1 = new IceFallLogEntryListTo1();
-		iceFallLogEntryListTo1.setLogEntries(iceFallLogsTo1);
-		iceFallLogEntryListTo1.setTotalLogEntries(iceFallService.getIceFallLogsCount(
-						iceFallLogSearchTo1.getStartDate(),
-						iceFallLogSearchTo1.getEndDate(),
-						iceFallLogSearchTo1.getPage(),
-						iceFallLogSearchTo1.getPageSize(),
-						iceFallLogSearchTo1.getStatus()));
-		return RestResponse.successResponse(iceFallLogEntryListTo1);
+			for (IceFallLog log : logs)
+			{
+				iceFallLogsTo1.add(new IceFallLogEntryTo1(log));
+			}
+
+			IceFallLogEntryListTo1 iceFallLogEntryListTo1 = new IceFallLogEntryListTo1();
+			iceFallLogEntryListTo1.setLogEntries(iceFallLogsTo1);
+			iceFallLogEntryListTo1.setTotalLogEntries(iceFallService.getIceFallLogsCount(
+							iceFallLogSearchTo1.getStartDate(),
+							iceFallLogSearchTo1.getEndDate(),
+							iceFallLogSearchTo1.getPage(),
+							iceFallLogSearchTo1.getPageSize(),
+							iceFallLogSearchTo1.getStatus()));
+			return RestResponse.successResponse(iceFallLogEntryListTo1);
+		}
+		catch (IllegalArgumentException e)
+		{
+			MiscUtils.getLogger().error("One or more arguments are invalid. Error: " + e.getMessage());
+			return RestResponse.errorResponse("One or more arguments are invalid. Error: " + e.getMessage());
+		}
 	}
 
 	@POST
@@ -184,37 +196,50 @@ public class IceFallWebService extends AbstractServiceImpl
 			String pdfData = new String(iceFallService.printToPDF(saveEFormForPrint.getId(), provider.getProviderNo(), getHttpServletRequest().getScheme(), getHttpServletRequest().getContextPath()));
 			// submit
 			iceFallService.sendIceFallForm(provider, demo, pdfData, iceFallSendFormTo1);
-			iceFallService.logIceFallSent("Prescription Sent", provider.getProviderNo(), eformId, isInstance);
+			iceFallService.logIceFallSent("Prescription Sent", provider.getProviderNo(), eformId, demo.getId(), isInstance);
 
 			return RestResponse.successResponse(true);
 		}
 		catch (IceFallException e)
-		{
+		{// IceFall Error
 			MiscUtils.getLogger().error("Failed to send IceFall Prescription due to exception", e);
 			if (saveEFormForPrint != null)
 			{
-				iceFallService.logIceFallError(e.getUserErrorMessage(provider), provider.getProviderNo(), saveEFormForPrint.getId(), false);
+				iceFallService.logIceFallError(e.getUserErrorMessage(provider), provider.getProviderNo(), saveEFormForPrint.getId(), demo.getId(),true);
 			}
 			else
 			{
-				iceFallService.logIceFallError(e.getUserErrorMessage(provider), provider.getProviderNo(), eformId, isInstance);
+				iceFallService.logIceFallError(e.getUserErrorMessage(provider), provider.getProviderNo(), eformId, demo.getId(), isInstance);
 			}
 
 			return RestResponse.errorResponse(e.getUserErrorMessage(provider));
 		}
 		catch (IceFallRESTException e)
-		{
+		{// REST Error
 			MiscUtils.getLogger().error("Failed to send IceFall Prescription due to REST exception", e);
 			if (saveEFormForPrint != null)
 			{
-				iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider), provider.getProviderNo(), saveEFormForPrint.getId(), false);
+				iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider), provider.getProviderNo(), saveEFormForPrint.getId(), demo.getId(), true);
 			}
 			else
 			{
-				iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider), provider.getProviderNo(), eformId, isInstance);
+				iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider), provider.getProviderNo(), eformId, demo.getId(), isInstance);
 			}
 
 			return RestResponse.errorResponse(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider));
+		}
+		catch (Exception e)
+		{// Any other type of error
+			MiscUtils.getLogger().error("Internal server error while trying to electronically submit prescription", e);
+			if (saveEFormForPrint != null)
+			{
+				iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.INTERNAL_SERVER_ERROR, provider), provider.getProviderNo(), saveEFormForPrint.getId(), demo.getId(), true);
+			}
+			else
+			{
+				iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.INTERNAL_SERVER_ERROR, provider), provider.getProviderNo(), eformId, demo.getId(), isInstance);
+			}
+			return RestResponse.errorResponse(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.INTERNAL_SERVER_ERROR, provider));
 		}
 	}
 

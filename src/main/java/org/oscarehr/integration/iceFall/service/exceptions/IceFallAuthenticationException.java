@@ -24,8 +24,6 @@ package org.oscarehr.integration.iceFall.service.exceptions;
 
 import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
 
-import javax.naming.AuthenticationException;
-
 public class IceFallAuthenticationException extends IceFallRESTException
 {
 	public static String AUTH_LOGIN_ERROR = "__INVALID_LOGIN_CREDENTIALS__";

@@ -31,9 +31,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.ws.rs.Consumes;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -55,6 +53,8 @@ public class IceFallLog extends AbstractModel<Integer> implements Serializable
 	private String message;
 	@Column(name = "form_id")
 	private Integer formId;
+	@Column(name = "demographic_no")
+	private Integer demographicNo;
 	@Column(name = "is_form_instance")
 	private Boolean formInstance;
 	@Column(name = "sending_provider_no")
@@ -136,5 +136,15 @@ public class IceFallLog extends AbstractModel<Integer> implements Serializable
 	public void setCreatedAt(Date createDate)
 	{
 		this.createdAt = createDate;
+	}
+
+	public Integer getDemographicNo()
+	{
+		return demographicNo;
+	}
+
+	public void setDemographicNo(Integer demographicNo)
+	{
+		this.demographicNo = demographicNo;
 	}
 }
