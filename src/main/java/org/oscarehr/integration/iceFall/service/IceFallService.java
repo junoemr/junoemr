@@ -24,6 +24,7 @@
 package org.oscarehr.integration.iceFall.service;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
@@ -61,6 +62,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class IceFallService
@@ -160,8 +162,9 @@ public class IceFallService
 	 * @param demo - the demographic to whom this eform pertains
 	 * @param pdfData - the pdf to send to iceFall (base64 encoded).
 	 * @param prescriptionInformation - the prescription information to be submitted to icefall.
+	 * @param pageCount - the number of pages in the prescription pdf.
 	 */
-	public void sendIceFallForm(Provider provider, Demographic demo, String pdfData, IceFallSendFormTo1 prescriptionInformation)
+	public void sendIceFallForm(Provider provider, Demographic demo, String pdfData, IceFallSendFormTo1 prescriptionInformation, Integer pageCount)
 	{
 		//login to api
 		iceFallRESTService.authenticate();
@@ -180,10 +183,10 @@ public class IceFallService
 			canopyCustomerId = createIceFallCustomerForDemographic(demo);
 		}
 
-		sendPrescriptionToIceFall(iceFallDocId, canopyCustomerId, prescriptionInformation, pdfData);
+		sendPrescriptionToIceFall(iceFallDocId, canopyCustomerId, prescriptionInformation, pdfData, pageCount);
 	}
 
-	protected void sendPrescriptionToIceFall(Integer iceFallDocId, Integer canopyCustomerId, IceFallSendFormTo1 prescriptionInformation, String pdfData)
+	protected void sendPrescriptionToIceFall(Integer iceFallDocId, Integer canopyCustomerId, IceFallSendFormTo1 prescriptionInformation, String pdfData, Integer pageCount)
 	{
 		IceFallCreatePrescriptionTo1 iceFallCreatePrescriptionTo1 = new IceFallCreatePrescriptionTo1();
 
@@ -195,7 +198,7 @@ public class IceFallService
 		iceFallCreatePrescriptionTo1.setThcLimit(prescriptionInformation.getThcLimit());
 		iceFallCreatePrescriptionTo1.setDiagnosis(prescriptionInformation.getDiagnosis());
 		iceFallCreatePrescriptionTo1.setClinicId(1);
-		iceFallCreatePrescriptionTo1.setPages(1);// TODO figure out, how to calc pages.
+		iceFallCreatePrescriptionTo1.setPages(pageCount);
 		iceFallCreatePrescriptionTo1.setDocumentData(pdfData);
 		iceFallCreatePrescriptionTo1.setDoctorId(iceFallDocId);
 
@@ -337,14 +340,34 @@ public class IceFallService
 	 */
 	public byte[] printToPDF(Integer fdid, String providerNo, String httpSchema, String context)
 	{
+		return printToPDF(fdid, providerNo, httpSchema, context, new AtomicInteger(0));
+	}
+
+	/**
+	 * print an eform to pdf
+	 * @param fdid - the instance id of the eform
+	 * @param providerNo - the provider number that the form should be printed under
+	 * @param httpSchema - the httpschema to use
+	 * @param context - the context path of the oscar server.
+	 * @param pageCount - an output variable that indicates the number of pages in the pdf.
+	 * @return - a byte array of the eform data.
+	 */
+	public byte[] printToPDF(Integer fdid, String providerNo, String httpSchema, String context, AtomicInteger pageCount)
+	{
 		String localUrl = WKHtmlToPdfUtils.getEformRequestUrl(providerNo,
 						"", httpSchema, context);
 
 		GenericFile tmpFile = null;
+		PDDocument pdDocument = null;
 		try
 		{
 			tmpFile = FileFactory.createTempFile("pdf");
+			//convert to pdf
 			WKHtmlToPdfUtils.convertToPdf(localUrl + fdid, tmpFile.getFileObject());
+			//get page count
+			pdDocument = PDDocument.load(tmpFile.getFileObject());
+			pageCount.set(pdDocument.getNumberOfPages());
+			// encode and return
 			return Base64.getEncoder().encode(IOUtils.toByteArray(tmpFile.asFileInputStream()));
 		}
 		catch (IOException | HtmlToPdfConversionException e)
@@ -353,6 +376,18 @@ public class IceFallService
 		}
 		finally
 		{
+			if (pdDocument != null)
+			{
+				try
+				{
+					pdDocument.close();
+				}
+				catch(IOException e)
+				{
+					MiscUtils.getLogger().error("Failed to close pdDocument file on pdf file [" + tmpFile.getName() + "]");
+				}
+			}
+
 			if (tmpFile != null)
 			{
 				try
