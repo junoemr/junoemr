@@ -23,17 +23,25 @@
  */
 package org.oscarehr.demographic.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Query;
 
 import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.common.dao.SecObjPrivilegeDao;
+import org.oscarehr.common.model.SecObjPrivilege;
+import org.oscarehr.common.model.SecObjPrivilegePrimaryKey;
 import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 {
+
+	private SecObjPrivilegeDao secObjPrivilegeDao = SpringUtils.getBean(SecObjPrivilegeDao.class);
 
 	public DemographicMergedDao() {
 		super(DemographicMerged.class);
@@ -76,4 +84,52 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 		q.setParameter("childId", childId);
 		return q.getResultList();
     }
+
+	/**
+	 * Procedure to merge demographic records. Checks possible error cases then adds a new entry
+	 * @param providerNo provider requesting the merge
+	 * @param demographicNo demographic whose content is being merged
+	 * @param head demographic being merged into
+	 * @return true if we successfully merged, false if we ran into an error state
+	 */
+	public boolean mergeDemographics(String providerNo, Integer demographicNo, Integer head)
+	{
+		if (demographicNo.equals(head))
+		{
+			MiscUtils.getLogger().error("Attempted to merge demographicNo " + demographicNo + " to itself");
+			return false;
+		}
+
+		// check if we have an active entry for this before setting up the merge
+		List<DemographicMerged> currentEntries = findByParentAndChildIds(head, demographicNo);
+		for (DemographicMerged entry : currentEntries)
+		{
+			if (entry.getDeleted() == 0)
+			{
+				MiscUtils.getLogger().error("Demographic has already been merged!");
+				return false;
+			}
+		}
+
+		DemographicMerged demographicMerged = new DemographicMerged();
+		demographicMerged.setDemographicNo(demographicNo);
+		demographicMerged.setMergedTo(head);
+		demographicMerged.setLastUpdateUser(providerNo);
+		demographicMerged.setLastUpdateDate(new Date());
+		persist(demographicMerged);
+
+		// Relic from the old merge method, unsure if this is needed at all
+		SecObjPrivilegePrimaryKey mergeKey = new SecObjPrivilegePrimaryKey("_all","_eChart$" + demographicNo);
+		if(secObjPrivilegeDao.find(mergeKey) == null)
+		{
+			SecObjPrivilege secObjPrivilege = new SecObjPrivilege();
+			secObjPrivilege.setId(mergeKey);
+			secObjPrivilege.setPrivilege("|or|");
+			secObjPrivilege.setPriority(0);
+			secObjPrivilege.setProviderNo("0");
+			secObjPrivilegeDao.persist(secObjPrivilege);
+		}
+
+		return true;
+	}
 }

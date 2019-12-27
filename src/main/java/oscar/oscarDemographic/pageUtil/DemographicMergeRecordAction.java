@@ -45,10 +45,12 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.demographic.dao.DemographicMergedDao;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
+import oscar.log.LogAction;
 import oscar.oscarDemographic.data.DemographicMerged;
 
 /**
@@ -59,6 +61,7 @@ public class DemographicMergeRecordAction  extends Action {
 
     Logger logger = Logger.getLogger(DemographicMergeRecordAction.class);
     private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+    private DemographicMergedDao demographicMergedDao = SpringUtils.getBean(DemographicMergedDao.class);
     
     public DemographicMergeRecordAction() {
 
@@ -79,14 +82,45 @@ public class DemographicMergeRecordAction  extends Action {
         String head = request.getParameter("head");
         String action = request.getParameter("mergeAction");
         String provider_no = request.getParameter("provider_no");
+        // Goal is to move away from this, all the DB operations should be on the actual DemographicMergedDao
         DemographicMerged dmDAO = new DemographicMerged();
 
         if (action.equals("merge") && head != null && records.size() > 1 && records.contains(head)){
 
             for (int i=0; i < records.size(); i++){
                 if (!( records.get(i)).equals(head))
-                     dmDAO.Merge( loggedInInfo, records.get(i), head);
-                    
+                {
+                    try
+                    {
+                        Integer demographicNo = Integer.parseInt(records.get(i));
+                        Integer headRecord = Integer.parseInt(head);
+                        String currProvider = loggedInInfo.getLoggedInProviderNo();
+                        boolean success = demographicMergedDao.mergeDemographics(currProvider, demographicNo, headRecord);
+                        if (success)
+                        {
+                            outcome = "success";
+
+                            LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+                                    headRecord,
+                                    "Add",
+                                    "Demographic Merge",
+                                    "success",
+                                    "demographicNo=" + demographicNo,
+                                    loggedInInfo.getIp(),
+                                    "mergedDemographic=" + demographicNo);
+                        }
+                        else
+                        {
+                            outcome = "alreadyMerged";
+                        }
+                    }
+                    catch (NumberFormatException e)
+                    {
+                        logger.error("Error occurred when trying to use parseInt", e);
+                        outcome = "failure";
+                    }
+                }
+
             }
 
         }else if(action.equals("unmerge") && records.size() > 0){

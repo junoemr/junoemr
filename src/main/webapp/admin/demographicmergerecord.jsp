@@ -94,7 +94,15 @@ if(!authed) {
 	alert("Failed to unmerge records");
 </script>
 <%
-	}
+		}
+		else if (outcome.equals("alreadyMerged"))
+		{
+%>
+<script type="text/javascript">
+	alert("This merge has already occurred!");
+</script>
+<%
+		}
 	}
 %>
 

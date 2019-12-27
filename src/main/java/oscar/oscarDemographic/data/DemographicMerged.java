@@ -55,6 +55,7 @@ import oscar.log.LogAction;
  *
  * @author wrighd
  */
+@Deprecated
 public class DemographicMerged {
 
     Logger logger = MiscUtils.getLogger();
