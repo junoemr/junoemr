@@ -122,7 +122,7 @@ public class RESTClient
 	 * @param queryParams - the query parameters to set
 	 * @return - the uri builder with the query parameters set
 	 */
-	private UriComponentsBuilder	setQueryParams(UriComponentsBuilder uriBuilder, Map<String, Object> queryParams)
+	private UriComponentsBuilder setQueryParams(UriComponentsBuilder uriBuilder, Map<String, Object> queryParams)
 	{
 		if (queryParams != null)
 		{
