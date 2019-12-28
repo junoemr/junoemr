@@ -37,6 +37,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'$window',
 	'$uibModal',
 	'$httpParamSerializer',
+	'$sce',
 	'demographicService',
 	'demographicsService',
 	'errorsService',
@@ -56,6 +57,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		$window,
 		$uibModal,
 		$httpParamSerializer,
+		$sce,
 		demographicService,
 		demographicsService,
 		messagesFactory,
@@ -97,7 +99,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
 				'../ws/rs');
 
-		controller.eligibilityMsg = "...";
+		controller.eligibilityMsg = $sce.trustAsHtml("...");
 		controller.showEligibility = false;
 		controller.properties = $scope.$parent.recordCtrl.properties;
 		controller.displayMessages = messagesFactory.factory();
@@ -577,7 +579,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			patientDetailStatusService.getEligibilityInfo(controller.page.demo.demographicNo).then(
 				function success(result)
 				{
-					controller.eligibilityMsg = result
+					controller.eligibilityMsg = $sce.trustAsHtml(result);
 				},
 				function error(result)
 				{
