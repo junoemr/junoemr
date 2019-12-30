@@ -27,10 +27,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.server.ServerStateHandler;
 import org.oscarehr.integration.dao.IntegrationDao;
-import org.oscarehr.integration.dao.IntegrationPushUpdateDao;
+import org.oscarehr.integration.dao.IntegrationPushAppointmentUpdateDao;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
-import org.oscarehr.integration.model.IntegrationPushUpdate;
+import org.oscarehr.integration.model.IntegrationPushAppointmentUpdate;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.util.MiscUtils;
@@ -57,7 +57,7 @@ public class IntegrationPushUpdateService
 	private IntegrationDao integrationDao;
 
 	@Autowired
-	private IntegrationPushUpdateDao integrationPushUpdateDao;
+	private IntegrationPushAppointmentUpdateDao integrationPushAppointmentUpdateDao;
 
 	@Autowired
 	private ServerStateHandler serverStateHandler;
@@ -67,29 +67,29 @@ public class IntegrationPushUpdateService
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonData = mapper.writeValueAsString(appointment);
 
-		IntegrationPushUpdate pushUpdate = new IntegrationPushUpdate();
+		IntegrationPushAppointmentUpdate pushUpdate = new IntegrationPushAppointmentUpdate();
 		pushUpdate.setAppointmentId(appointment.getId());
 		pushUpdate.setIntegrationType(INTEGRATION_TYPE_MHA);
 		pushUpdate.setIntegrationId(integration.getId());
 		pushUpdate.setStatusQueued();
 		pushUpdate.setJsonData(jsonData);
 
-		integrationPushUpdateDao.persist(pushUpdate);
+		integrationPushAppointmentUpdateDao.persist(pushUpdate);
 	}
 
 	public void sendQueuedUpdates()
 	{
 		ObjectMapper mapper = new ObjectMapper();
-		List<IntegrationPushUpdate> unsentUpdates = integrationPushUpdateDao.findUnsent(INTEGRATION_TYPE_MHA);
+		List<IntegrationPushAppointmentUpdate> unsentUpdates = integrationPushAppointmentUpdateDao.findUnsent(INTEGRATION_TYPE_MHA);
 		ArrayList<String> failedIdList = new ArrayList<>();
 
 		if(!unsentUpdates.isEmpty() && serverStateHandler.isThisServerMaster())
 		{
 			logger.info("pushing " + unsentUpdates.size() + " integration updates");
-			for(IntegrationPushUpdate update : unsentUpdates)
+			for(IntegrationPushAppointmentUpdate update : unsentUpdates)
 			{
 				// if an error status found, skip it and all subsequent updates by id
-				if(update.getStatus() == IntegrationPushUpdate.PUSH_STATUS.ERROR)
+				if(update.getStatus() == IntegrationPushAppointmentUpdate.PUSH_STATUS.ERROR)
 				{
 					failedIdList.add(update.getAppointmentId());
 					logger.error("Integration updates for appointment_id " + update.getAppointmentId() +
@@ -124,13 +124,13 @@ public class IntegrationPushUpdateService
 				finally
 				{
 					update.incrementSendCount();
-					integrationPushUpdateDao.merge(update);
+					integrationPushAppointmentUpdateDao.merge(update);
 				}
 			}
 		}
 	}
 
-	private void sendQueuedUpdate(ObjectMapper mapper, IntegrationPushUpdate update) throws IOException
+	private void sendQueuedUpdate(ObjectMapper mapper, IntegrationPushAppointmentUpdate update) throws IOException
 	{
 		AppointmentCacheTo1 appointmentTransfer = mapper.readValue(update.getJsonData(), AppointmentCacheTo1.class);
 

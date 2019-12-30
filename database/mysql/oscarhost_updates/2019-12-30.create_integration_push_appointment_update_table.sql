@@ -1,6 +1,6 @@
 
 
-CREATE TABLE integration_push_update(
+CREATE TABLE integration_push_appointment_update(
   id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
   integration_type VARCHAR(64) NOT NULL,
   integration_id int NOT NULL,

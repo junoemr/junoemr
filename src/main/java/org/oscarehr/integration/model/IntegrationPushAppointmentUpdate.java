@@ -40,9 +40,9 @@ import javax.persistence.TemporalType;
 import java.util.Date;
 
 @Entity
-@Table(name="integration_push_update")
+@Table(name="integration_push_appointment_update")
 @Where(clause="deleted_at IS NULL")
-public class IntegrationPushUpdate extends AbstractModel<Integer>
+public class IntegrationPushAppointmentUpdate extends AbstractModel<Integer>
 {
 	public enum PUSH_STATUS
 	{

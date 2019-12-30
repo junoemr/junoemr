@@ -23,29 +23,29 @@
 package org.oscarehr.integration.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.integration.model.IntegrationPushUpdate;
+import org.oscarehr.integration.model.IntegrationPushAppointmentUpdate;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
 import java.util.List;
 
 @Repository
-public class IntegrationPushUpdateDao extends AbstractDao<IntegrationPushUpdate>
+public class IntegrationPushAppointmentUpdateDao extends AbstractDao<IntegrationPushAppointmentUpdate>
 {
-	protected IntegrationPushUpdateDao()
+	protected IntegrationPushAppointmentUpdateDao()
 	{
-		super(IntegrationPushUpdate.class);
+		super(IntegrationPushAppointmentUpdate.class);
 	}
 
-	public List<IntegrationPushUpdate> findUnsent(String integrationType)
+	public List<IntegrationPushAppointmentUpdate> findUnsent(String integrationType)
 	{
 		Query query = entityManager.createQuery(
-				"SELECT x FROM IntegrationPushUpdate x " +
+				"SELECT x FROM IntegrationPushAppointmentUpdate x " +
 						"WHERE x.status <> :status " +
 						"AND x.integrationType = :integrationType " +
 						"ORDER BY x.createdAt, x.id");
 
-		query.setParameter("status", IntegrationPushUpdate.PUSH_STATUS.SENT);
+		query.setParameter("status", IntegrationPushAppointmentUpdate.PUSH_STATUS.SENT);
 		query.setParameter("integrationType", integrationType);
 
 		return query.getResultList();
