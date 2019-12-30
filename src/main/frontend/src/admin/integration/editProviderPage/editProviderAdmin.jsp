@@ -104,6 +104,7 @@
 					</ca-field-date>
 				</panel-body>
 			</panel>
+			<!-- Access Roles -->
 			<panel id="edit-provider-access-roles">
 				<panel-header>
 					<h6>Access Roles</h6>
@@ -111,6 +112,7 @@
 				<panel-body>
 					<div class="flex-row flex-wrap">
 						<juno-typeahead
+										name="access_roles"
 										class="flex-grow lg-margin-right"
 										model="$ctrl.currentRoleSelection"
 										options="$ctrl.roleOptions"
@@ -135,11 +137,84 @@
 					</div>
 				</panel-body>
 			</panel>
+			<!-- Billing -->
 			<panel id="edit-provider-billing-information">
 				<panel-header>
 					<h6>Billing Information</h6>
 				</panel-header>
 				<panel-body>
+					<!-- Billing Region Override -->
+					<juno-typeahead
+									name="billing_region_override"
+									title="Billing Region"
+									class="flex-grow lg-margin-right"
+									model="$ctrl.billingRegion"
+									options="$ctrl.billingRegionOptions"
+									enabled="$ctrl.billingRegionSelectEnabled">
+					</juno-typeahead>
+
+					<!-- BC Billing options -->
+					<div ng-if="$ctrl.billingRegion === 'BC'">
+						<!-- OHIP number -->
+						<ca-field-text
+										ca-name="billingNo"
+										ca-title="Billing Number"
+										ca-model="$ctrl.provider.ohipNo"
+										ca-rows="1"
+										ca-text-placeholder="OHIP Number"
+						>
+						</ca-field-text>
+
+						<!-- group number -->
+						<ca-field-text
+										ca-name="groupNumber"
+										ca-title="Group Number"
+										ca-model="$ctrl.provider.groupNumber"
+										ca-rows="1"
+						>
+						</ca-field-text>
+
+						<!-- rural Retention code -->
+						<ca-field-text
+										ca-name="ruralRetentionCode"
+										ca-title="Rural Retention Code"
+										ca-model="$ctrl.provider.ruralRetentionCode"
+										ca-rows="1"
+						>
+						</ca-field-text>
+
+						<!-- service location -->
+						<ca-field-text
+										ca-name="serviceLocation"
+										ca-title="Service Location"
+										ca-model="$ctrl.provider.serviceLocation"
+										ca-rows="1"
+						>
+						</ca-field-text>
+					</div>
+
+					<!-- common billing options -->
+
+					<!-- 3rd Party Billing No -->
+					<ca-field-text
+									ca-name="thirdPartyBillingNo"
+									ca-title="3'rd Party Billing #"
+									ca-model="$ctrl.provider.thirdPartyBillingNo"
+									ca-rows="1"
+									ca-text-placeholder=""
+					>
+					</ca-field-text>
+
+					<!-- Alternate Billing No -->
+					<ca-field-text
+									ca-name="alternateBillingNo"
+									ca-title="Alternate Billing #"
+									ca-model="$ctrl.provider.alternateBillingNo"
+									ca-rows="1"
+									ca-text-placeholder=""
+					>
+					</ca-field-text>
+
 
 				</panel-body>
 			</panel>
@@ -210,7 +285,7 @@
 									ca-title="Retype Second Level Passcode"
 									ca-model="$ctrl.provider.secondLevelPasscodeVerify"
 									ca-rows="1"
-									ca-text-placeholder="Passcode"
+									ca-text-placeholder="Retype Passcode"
 									ca-hide-input="true"
 									ca-required-field="true"
 					>
@@ -219,12 +294,77 @@
 
 				</panel-body>
 			</panel>
+			<!-- Contact Information -->
 			<panel id="edit-provider-contact-information">
 				<panel-header>
 					<h6>Contact Information</h6>
 				</panel-header>
 				<panel-body>
-
+					<!-- Address -->
+					<ca-field-text
+									ca-name="address"
+									ca-title="Address"
+									ca-model="$ctrl.provider.address"
+									ca-rows="1"
+									ca-text-placeholder="31 Bastion Square"
+					>
+					</ca-field-text>
+					<!-- Home phone -->
+					<ca-field-text
+									ca-name="homePhone"
+									ca-title="Home Phone"
+									ca-model="$ctrl.provider.homePhone"
+									ca-rows="1"
+					>
+					</ca-field-text>
+					<!-- Work phone -->
+					<ca-field-text
+									ca-name="workPhone"
+									ca-title="Work Phone"
+									ca-model="$ctrl.provider.workPhone"
+									ca-rows="1"
+					>
+					</ca-field-text>
+					<!-- Cell phone -->
+					<ca-field-text
+									ca-name="cellPhone"
+									ca-title="Cell Phone"
+									ca-model="$ctrl.provider.cellPhone"
+									ca-rows="1"
+					>
+					</ca-field-text>
+					<!-- Other phone -->
+					<ca-field-text
+									ca-name="otherPhone"
+									ca-title="Other Phone"
+									ca-model="$ctrl.provider.otherPhone"
+									ca-rows="1"
+					>
+					</ca-field-text>
+					<!-- Fax -->
+					<ca-field-text
+									ca-name="fax"
+									ca-title="Fax"
+									ca-model="$ctrl.provider.fax"
+									ca-rows="1"
+					>
+					</ca-field-text>
+					<!-- Email -->
+					<ca-field-text
+									ca-name="contactEmail"
+									ca-title="Contact Email"
+									ca-model="$ctrl.provider.contactEmail"
+									ca-rows="1"
+					>
+					</ca-field-text>
+					<!-- pager -->
+					<ca-field-text
+									ca-name="pager"
+									ca-title="Pager"
+									ca-model="$ctrl.provider.pager"
+									ca-rows="1"
+					>
+					</ca-field-text>
 				</panel-body>
 			</panel>
 		</div>

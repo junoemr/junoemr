@@ -21,11 +21,16 @@
  * Canada
 --%>
 <div class="juno-typeahead">
+	<label ng-if="$ctrl.title" for="name-{{$ctrl.name}}">
+		{{$ctrl.title}}
+	</label>
 	<input
+					id="name-{{$ctrl.name}}"
 					class="form-control"
 					type="text"
 					ng-model="$ctrl.model"
 					uib-typeahead="option as option.label for option in $ctrl.options | filter:$viewValue"
 					ng-keypress="$ctrl.onKeyPress($event)"
-					placeholder="{{$ctrl.placeholder}}">
+					placeholder="{{$ctrl.placeholder}}"
+					ng-disabled="$ctrl.enabled === undefined ? false : !$ctrl.enabled">
 </div>

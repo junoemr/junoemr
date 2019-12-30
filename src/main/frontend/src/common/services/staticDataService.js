@@ -61,6 +61,37 @@ angular.module("Common.Services").service("staticDataService", [
 			return genders;
 		};
 
+		service.getBillingRegions = function ()
+		{
+			let regions = [];
+			regions.push(
+			{
+				"value": "BC",
+				"label": "BC"
+			});
+			regions.push(
+			{
+				"value": "ON",
+				"label": "ON"
+			});
+			regions.push(
+			{
+				"value": "AB",
+				"label": "AB"
+			});
+			regions.push(
+			{
+				"value": "SK",
+				"label": "SK"
+			});
+			regions.push(
+			{
+				"value": "CLINICAID",
+				"label": "CLINICAID"
+			});
+			return regions;
+		};
+
 		service.getProviderTypes = function ()
 		{
 			var types = [];

@@ -25,10 +25,13 @@ angular.module('Common.Components').component('junoTypeahead',
 {
 	templateUrl: 'src/common/components/junoTypeahead/junoTypeahead.jsp',
 	bindings: {
+		title: '@?',
+		name: '@',
 		model: '=',
 		options: "<",
 		placeholder: "<?",
-		onEnterKey: '&?'
+		onEnterKey: '&?',
+		enabled: '<?'
 	},
 	controller: ['$scope', function ($scope)
 	{

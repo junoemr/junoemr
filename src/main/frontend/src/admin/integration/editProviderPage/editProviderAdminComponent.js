@@ -21,15 +21,34 @@
  * Canada
  */
 import {EDIT_PROVIDER_MODE} from "./editProviderAdminConstants";
+import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi";
 
 
 angular.module('Admin.Integration').component('editProviderAdmin',
 {
 	templateUrl: 'src/admin/integration/editProviderPage/editProviderAdmin.jsp',
 	bindings: {},
-	controller: ['$scope', '$stateParams', 'staticDataService', 'providersService', function ($scope, $stateParams, staticDataService, providersService)
+	controller: [
+		'$scope',
+		'$stateParams',
+		'$http',
+		'$httpParamSerializer',
+		'staticDataService',
+		'providersService',
+		'providerService',
+		function (
+				$scope,
+				$stateParams,
+				$http,
+				$httpParamSerializer,
+				staticDataService,
+				providersService,
+				providerService)
 	{
 		let ctrl = this;
+
+		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
+				'../ws/rs');
 
 		ctrl.modes = EDIT_PROVIDER_MODE;
 		ctrl.mode = $stateParams.mode;
@@ -37,8 +56,13 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		ctrl.sexes = staticDataService.getGenders();
 		ctrl.providerTypes = staticDataService.getProviderTypes();
 
-		ctrl.roleOptions = ['fizbang', 'foobar'];
+		ctrl.roleOptions = [];
 		ctrl.currentRoleSelection = null;
+
+		// billingRegion. determines what controls display
+		ctrl.billingRegionSelectEnabled = false;
+		ctrl.billingRegion = null;
+		ctrl.billingRegionOptions = staticDataService.getBillingRegions();
 
 		ctrl.provider = {
 			// User Info
@@ -58,8 +82,29 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			secondLevelPasscode: null,
 			secondLevelPasscodeVerify: null,
 
+			// Contact Information
+			address: null,
+			homePhone: null,
+			workPhone: null,
+			cellPhone: null,
+			otherPhone: null,
+			fax: null,
+			contactEmail: null,
+			pager: null,
+
 			// Access Roles
 			userRoles: [],
+
+			// BC Billing
+			ohipNo: null,
+			groupNumber: null,
+			ruralRetentionCode: null,
+			serviceLocation: null,
+
+			// Common Billing
+			thirdPartyBillingNo: null,
+			alternateBillingNo: null,
+
 		};
 
 		ctrl.$onInit = function()
@@ -74,6 +119,11 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 								label: role.roleName,
 								value: role.roleId,
 							});
+
+							if (role.roleName === 'doctor' && ctrl.mode === EDIT_PROVIDER_MODE.ADD)
+							{// if adding a new provider push the default doctor role.
+								ctrl.provider.userRoles.push(role.roleId);
+							}
 						}
 					},
 					function error(result)
@@ -81,6 +131,29 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 						console.error("Failed to fetch provider roles with error: " + error);
 					}
 			);
+
+			// check if this provider is super admin
+			providerService.getMe().then(
+					function success(result)
+					{
+						ctrl.billingRegionSelectEnabled = result.superAdmin;
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch provider data with Error: " + result);
+					}
+			);
+
+			systemPreferenceApi.getPropertyValue("billing_type", "BC").then(
+					function success(result)
+					{
+						ctrl.billingRegion = result.data.body;
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch instance billing type with error: " + error);
+					}
+			)
 
 		};
 
