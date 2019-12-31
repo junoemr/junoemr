@@ -439,7 +439,8 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 				if (rows.getClass().equals(String.class))
 				{
 					explain.setRows(new BigInteger((String) rows));
-				} else if (rows.getClass().equals(BigInteger.class))
+				}
+				else if (rows.getClass().equals(BigInteger.class))
 				{
 					explain.setRows((BigInteger) rows);
 				}
