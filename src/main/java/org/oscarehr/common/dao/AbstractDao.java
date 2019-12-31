@@ -434,13 +434,15 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 			// MariaDB 10.1 and 10.4 return the rows column of the explain result as different
 			// data types.  This detects the type and sets the value appropriately.
 			Object rows = result[8];
-			if(rows.getClass().equals(String.class))
+			if (rows != null)
 			{
-				explain.setRows(new BigInteger((String) rows));
-			}
-			else if(rows.getClass().equals(BigInteger.class))
-			{
-				explain.setRows((BigInteger)rows);
+				if (rows.getClass().equals(String.class))
+				{
+					explain.setRows(new BigInteger((String) rows));
+				} else if (rows.getClass().equals(BigInteger.class))
+				{
+					explain.setRows((BigInteger) rows);
+				}
 			}
 
 			explain.setExtra((String) result[9]);
