@@ -342,6 +342,7 @@ angular.module('Schedule').component('eventComponent', {
 				sitesApi.getSitesByProvider(controller.providerModel.providerNo).then(
 						function success(results)
 						{
+							// get all sites assigned to the provider on which the appointment is to be booked.
 							controller.siteOptions = [];
 							for(let site of results.data.body)
 							{
@@ -356,10 +357,46 @@ angular.module('Schedule').component('eventComponent', {
 								}
 							}
 
-							if (controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
-							{
-								$scope.eventData.site = controller.siteOptions[0].value;
-							}
+							sitesApi.getSitesByProvider(securityService.getUser().providerNo).then(
+									function success(userSites)
+									{
+										// filter out sites that the current user is not assigned to.
+										let filteredSites = [];
+										for(let site of controller.siteOptions)
+										{
+											if (userSites.data.body.find(el => el.name === site.value))
+											{
+												filteredSites.push(site);
+											}
+										}
+										controller.siteOptions = filteredSites;
+
+										if (controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
+										{
+											// set default site selection
+											if (controller.siteOptions[0])
+											{
+												$scope.eventData.site = controller.siteOptions[0].value;
+											}
+											else
+											{// no sites available
+												let noSitesSite = {
+													label: 	"No Sites Available",
+													value: 	"No Sites Available",
+													uuid: 	null,
+													color: 	null,
+												};
+												controller.siteOptions = [noSitesSite];
+												$scope.eventData.site =  "No Sites Available";
+											}
+										}
+									},
+									function error(result)
+									{
+										console.error("Failed to lookup sites for the current user, with error: " + result);
+									}
+							);
+
 						},
 						function error(results)
 						{
@@ -854,7 +891,7 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				for (var i = 0; i < controller.siteOptions.length; i++)
 				{
-					if (controller.siteOptions[i].value === valueToTest)
+					if (controller.siteOptions[i].value === valueToTest && controller.siteOptions[i].uuid !== null)
 					{
 						return true;
 					}
