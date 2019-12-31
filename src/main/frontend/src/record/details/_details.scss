@@ -75,8 +75,19 @@
 
 	.popover {
 		min-width: 400px;
+		border-color: $color-primary-light;
+		background-color: $color-primary-lighter;
+
 		.popover-content {
 			white-space: pre-wrap;
+			color: white;
+			background-color: $color-primary-lighter;
+		}
+		.arrow {
+			border-bottom-color: $color-primary-light;
+		}
+		.arrow:after {
+			border-bottom-color: $color-primary-lighter;
 		}
 	}
 }
