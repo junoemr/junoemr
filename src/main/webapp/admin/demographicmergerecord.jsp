@@ -72,25 +72,25 @@ if(!authed) {
 		if(outcome.equals("success"))
 		{
 %>
-<script language="JavaScript">
+<script type="text/javascript">
 	alert("Records merged successfully");
 </script>
 <%
 	}else if (outcome.equals("failure")){
 %>
-<script language="JavaScript">
+<script type="text/javascript">
 	alert("Failed to merge records");
 </script>
 <%
 	}else if (outcome.equals("successUnMerge")){
 %>
-<script language="JavaScript">
+<script type="text/javascript">
 	alert("Record(s) unmerged successfully");
 </script>
 <%
 	}else if (outcome.equals("failureUnMerge")){
 %>
-<script language="JavaScript">
+<script type="text/javascript">
 	alert("Failed to unmerge records");
 </script>
 <%
@@ -100,6 +100,14 @@ if(!authed) {
 %>
 <script type="text/javascript">
 	alert("This merge has already occurred!");
+</script>
+<%
+		}
+		else if (outcome.equals("alreadyUnMerged"))
+		{
+%>
+<script type="text/javascript">
+	alert("This demographic has already been un-merged!");
 </script>
 <%
 		}

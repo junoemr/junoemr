@@ -147,15 +147,12 @@ public class DemographicMerged {
     public Integer getHead(Integer demographic_no)  {
     	Integer head = null;
 
-    	List<org.oscarehr.demographic.model.DemographicMerged> dms = dao.findCurrentByDemographicNo(demographic_no);
-    	for(org.oscarehr.demographic.model.DemographicMerged dm:dms) {
-    		head = dm.getMergedTo();
-    	}
-        
-        if (head != null)
-            head = getHead(head);
-        else
-            head = demographic_no;
+		org.oscarehr.demographic.model.DemographicMerged dm = dao.findCurrentByDemographicNo(demographic_no);
+
+		if (dm != null)
+		{
+			head = getHead(dm.getMergedTo());
+		}
 
         return head;
     }

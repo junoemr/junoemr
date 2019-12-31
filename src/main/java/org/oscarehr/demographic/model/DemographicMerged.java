@@ -41,6 +41,9 @@ import javax.persistence.TemporalType;
 public class DemographicMerged extends AbstractModel<Integer>
 {
 
+	public static int MERGED = 0;
+	public static int DELETED = 1;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

@@ -1523,6 +1523,7 @@
 			<forward name="successUnMerge" path="/admin/demographicmergerecord.jsp?outcome=successUnMerge" />
 			<forward name="failureUnMerge" path="/admin/demographicmergerecord.jsp?outcome=failureUnMerge" />
 			<forward name="alreadyMerged" path="/admin/demographicmergerecord.jsp?outcome=alreadyMerged" />
+			<forward name="alreadyUnMerged" path="/admin/demographicmergerecord.jsp?outcome=alreadyUnMerged" />
 			<forward name="caisiSearch" path="/PMmodule/ClientSearch2.do" />
 		</action>
 		<action input="/oscarReport/RptViewAllQueryByExamples.jsp" name="RptViewAllQueryByExamplesForm" path="/oscarReport/RptViewAllQueryByExamples" scope="request" type="oscar.oscarReport.pageUtil.RptViewAllQueryByExamplesAction">

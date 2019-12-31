@@ -25,6 +25,7 @@ package org.oscarehr.demographic.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.persistence.Query;
 
@@ -36,8 +37,10 @@ import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
+@Transactional
 public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 {
 
@@ -57,14 +60,12 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 		return results;
 	}
 	
-	public List<DemographicMerged> findCurrentByDemographicNo(int demographicNo) {
+	public DemographicMerged findCurrentByDemographicNo(int demographicNo)
+	{
 		Query q = entityManager.createQuery("select d from DemographicMerged d where d.demographicNo=? and d.deleted=0");
 		q.setParameter(1, demographicNo);
 		
-		@SuppressWarnings("unchecked")
-		List<DemographicMerged> results = q.getResultList();
-		
-		return results;
+		return getSingleResultOrNull(q);
 	}
 	
 	public List<DemographicMerged> findByDemographicNo(int demographicNo) {
@@ -79,11 +80,28 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 
 	@SuppressWarnings("unchecked")
     public List<DemographicMerged> findByParentAndChildIds(Integer parentId, Integer childId) {
-		Query q = createQuery("d", "d.demographicNo = :childId AND d.mergedTo = :parentId");
+		Query q = createQuery("d", "d.demographicNo = :childId AND d.mergedTo = :parentId AND deleted=0");
 		q.setParameter("parentId", parentId);
 		q.setParameter("childId", childId);
 		return q.getResultList();
     }
+
+	/**
+	 * There should only ever be one active entry at a time for a demographic being merged into another.
+	 * Get the current active entry.
+	 * @param demographicNo demographic who we think maybe currently merged
+	 * @return corresponding entity if exists, null if not merged
+	 */
+	public DemographicMerged getCurrentHead(Integer demographicNo)
+	{
+		Query query = entityManager.createQuery("SELECT d " +
+				"FROM DemographicMerged d " +
+				"WHERE d.demographicNo = :demographicNo " +
+				"AND d.deleted=0");
+		query.setParameter("demographicNo", demographicNo);
+
+		return getSingleResultOrNull(query);
+	}
 
 	/**
 	 * Procedure to merge demographic records. Checks possible error cases then adds a new entry
@@ -102,18 +120,16 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 
 		// check if we have an active entry for this before setting up the merge
 		List<DemographicMerged> currentEntries = findByParentAndChildIds(head, demographicNo);
-		for (DemographicMerged entry : currentEntries)
+		if (currentEntries.size() > 0)
 		{
-			if (entry.getDeleted() == 0)
-			{
-				MiscUtils.getLogger().error("Demographic has already been merged!");
-				return false;
-			}
+			MiscUtils.getLogger().error("Demographic has already been merged!");
+			return false;
 		}
 
 		DemographicMerged demographicMerged = new DemographicMerged();
 		demographicMerged.setDemographicNo(demographicNo);
 		demographicMerged.setMergedTo(head);
+		demographicMerged.setDeleted(DemographicMerged.MERGED);
 		demographicMerged.setLastUpdateUser(providerNo);
 		demographicMerged.setLastUpdateDate(new Date());
 		persist(demographicMerged);
@@ -131,5 +147,27 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 		}
 
 		return true;
+	}
+
+	/**
+	 * Procedure to unmerge demographic records.
+	 * Only need the demographic number that's being un-merged, it should only ever be merged into
+	 * a single other demographic at any other time.
+	 * @param providerNo provider requesting the un-merge
+	 * @param demographicNo demographic who was previously merged that is being split off
+	 * @throws NoSuchElementException if we can't find an active merge for demographic
+	 */
+	public void unmergeDemographics(String providerNo, Integer demographicNo)
+		throws NoSuchElementException
+	{
+		DemographicMerged demographicMerged = findCurrentByDemographicNo(demographicNo);
+		if (demographicMerged == null)
+		{
+			throw new NoSuchElementException();
+		}
+		demographicMerged.setLastUpdateDate(new Date());
+		demographicMerged.setLastUpdateUser(providerNo);
+		demographicMerged.setDeleted(DemographicMerged.DELETED);
+		merge(demographicMerged);
 	}
 }

@@ -58,6 +58,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -424,22 +425,37 @@ public class DemographicManager {
 
 	}
 
-	public void unmergeDemographics(LoggedInInfo loggedInInfo, Integer parentId, List<Integer> children) {
-		checkPrivilege(loggedInInfo, securityInfoManager.WRITE);
-		for (Integer childId : children) {
-			List<DemographicMerged> dms = demographicMergedDao.findByParentAndChildIds(parentId, childId);
-			if (dms.isEmpty()) {
+	@Transactional
+	public void unmergeDemographics(LoggedInInfo loggedInInfo, Integer parentId, List<Integer> children)
+	{
+		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+		for (Integer childId : children)
+		{
+			List<DemographicMerged> demographicsMerged = demographicMergedDao.findByParentAndChildIds(parentId, childId);
+			if (demographicsMerged.isEmpty())
+			{
 				throw new IllegalArgumentException("Unable to find merge record for parent " + parentId + " and child " + childId);
 			}
-			for (DemographicMerged dm : demographicMergedDao.findByParentAndChildIds(parentId, childId)) {
-				dm.setDeleted(1);
+			for (DemographicMerged dm : demographicsMerged)
+			{
+				// Update the demographicMerged entry to be deleted
+				dm.setDeleted(DemographicMerged.DELETED);
 				demographicMergedDao.merge(dm);
+				// Add a log entry to indicate who did this
+				LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+						parentId,
+						LogConst.ACTION_DELETE,
+						LogConst.CON_DEMOGRAPHIC_MERGE,
+						LogConst.STATUS_SUCCESS,
+						"parentDemographic=" + parentId,
+						loggedInInfo.getIp(),
+						"mergedDemographic=" + childId);
 			}
 		}
 	}
 
 	public Long getActiveDemographicCount(LoggedInInfo loggedInInfo) {
-		checkPrivilege(loggedInInfo, securityInfoManager.READ);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		return demographicDao.getActiveDemographicCount();
 	}
 
@@ -457,7 +473,7 @@ public class DemographicManager {
 	 * 		Returns all merged demographic records for the specified parent id.
 	 */
 	public List<DemographicMerged> getMergedDemographics(LoggedInInfo loggedInInfo, Integer parentId) {
-		checkPrivilege(loggedInInfo, securityInfoManager.READ);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		return demographicMergedDao.findCurrentByMergedTo(parentId);
 	}
 
