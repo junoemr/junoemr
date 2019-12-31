@@ -154,22 +154,21 @@
 					</juno-typeahead>
 
 					<!-- BC Billing options -->
-					<div ng-if="$ctrl.billingRegion === 'BC'">
+					<div ng-if="$ctrl.billingRegion.value === 'BC'">
 						<!-- OHIP number -->
 						<ca-field-text
-										ca-name="billingNo"
+										ca-name="billingNoBC"
 										ca-title="Billing Number"
 										ca-model="$ctrl.provider.ohipNo"
 										ca-rows="1"
-										ca-text-placeholder="OHIP Number"
 						>
 						</ca-field-text>
 
-						<!-- group number -->
+						<!-- Payee number -->
 						<ca-field-text
-										ca-name="groupNumber"
-										ca-title="Group Number"
-										ca-model="$ctrl.provider.groupNumber"
+										ca-name="payeeNumber"
+										ca-title="Payee Number"
+										ca-model="$ctrl.provider.billingNo"
 										ca-rows="1"
 						>
 						</ca-field-text>
@@ -193,8 +192,67 @@
 						</ca-field-text>
 					</div>
 
-					<!-- common billing options -->
+					<!-- ON billing -->
+					<div ng-if="$ctrl.billingRegion.value === 'ON'">
+						<!-- OHIP number -->
+						<ca-field-text
+										ca-name="billingNoON"
+										ca-title="Billing Number"
+										ca-model="$ctrl.provider.ohipNo"
+										ca-rows="1"
+						>
+						</ca-field-text>
 
+						<!-- Group Number -->
+						<ca-field-text
+										ca-name="groupNumber"
+										ca-title="Group Number"
+										ca-model="$ctrl.provider.groupNumber"
+										ca-rows="1"
+						>
+						</ca-field-text>
+
+						<!-- Speciality Code -->
+						<ca-field-text
+										ca-name="specialityCode"
+										ca-title="Speciality Code"
+										ca-model="$ctrl.provider.specialityCode"
+										ca-rows="1"
+						>
+						</ca-field-text>
+
+						<!-- visit Location -->
+						<ca-field-text
+										ca-name="visitLocation"
+										ca-title="Visit Location"
+										ca-model="$ctrl.provider.visitLocation"
+										ca-rows="1"
+						>
+						</ca-field-text>
+
+						<!-- service location indicator -->
+						<ca-field-text
+										ca-name="serviceLocationIndicator"
+										ca-title="Service Location Indicator"
+										ca-model="$ctrl.provider.serviceLocationIndicator"
+										ca-rows="1"
+						>
+						</ca-field-text>
+					</div>
+
+					<!-- AB billing -->
+					<div ng-if="$ctrl.billingRegion.value === 'AB'">
+						<!-- OHIP number -->
+						<ca-field-text
+										ca-name="billingNoAB"
+										ca-title="Billing Number"
+										ca-model="$ctrl.provider.ohipNo"
+										ca-rows="1"
+						>
+						</ca-field-text>
+					</div>
+
+					<!-- common billing options -->
 					<!-- 3rd Party Billing No -->
 					<ca-field-text
 									ca-name="thirdPartyBillingNo"

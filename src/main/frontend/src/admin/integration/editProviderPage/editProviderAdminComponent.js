@@ -96,12 +96,30 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			userRoles: [],
 
 			// BC Billing
-			ohipNo: null,
-			groupNumber: null,
+			billingNo: null,
 			ruralRetentionCode: null,
 			serviceLocation: null,
 
+			// ON Billing
+			groupNumber: null,
+			specialityCode: null,
+			visitLocation: null,
+			serviceLocationIndicator: null,
+
+			// AB Billing
+			clinic: null,
+			sourceCode: null,
+			skillCode: null,
+			locationCode: null,
+			BANumber: null,
+			FacilityNumber: null,
+			functional: null,
+			roleModifier: null,
+
+
+
 			// Common Billing
+			ohipNo: null,
 			thirdPartyBillingNo: null,
 			alternateBillingNo: null,
 
@@ -147,7 +165,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			systemPreferenceApi.getPropertyValue("billing_type", "BC").then(
 					function success(result)
 					{
-						ctrl.billingRegion = result.data.body;
+						ctrl.billingRegion = {label: result.data.body, value: result.data.body};
 					},
 					function error(result)
 					{

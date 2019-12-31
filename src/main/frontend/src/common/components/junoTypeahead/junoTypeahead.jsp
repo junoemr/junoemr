@@ -30,6 +30,7 @@
 					type="text"
 					ng-model="$ctrl.model"
 					uib-typeahead="option as option.label for option in $ctrl.options | filter:$viewValue"
+					typeahead-select-on-exact="true"
 					ng-keypress="$ctrl.onKeyPress($event)"
 					placeholder="{{$ctrl.placeholder}}"
 					ng-disabled="$ctrl.enabled === undefined ? false : !$ctrl.enabled">
