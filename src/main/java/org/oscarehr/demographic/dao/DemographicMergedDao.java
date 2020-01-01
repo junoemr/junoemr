@@ -50,40 +50,55 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 		super(DemographicMerged.class);
 	}
 	
-	public List<DemographicMerged> findCurrentByMergedTo(int demographicNo) {
-		Query q = entityManager.createQuery("select d from DemographicMerged d where d.mergedTo=? and d.deleted=false");
-		q.setParameter(1, demographicNo);
+	public List<DemographicMerged> findCurrentByMergedTo(int demographicNo)
+	{
+		Query query = entityManager.createQuery("SELECT d " +
+				"FROM DemographicMerged d " +
+				"WHERE d.mergedTo=:mergedTo " +
+				"AND d.deleted=false");
+		query.setParameter("mergedTo", demographicNo);
 		
 		@SuppressWarnings("unchecked")
-		List<DemographicMerged> results = q.getResultList();
+		List<DemographicMerged> results = query.getResultList();
 		
 		return results;
 	}
 	
 	public DemographicMerged findCurrentByDemographicNo(int demographicNo)
 	{
-		Query q = entityManager.createQuery("select d from DemographicMerged d where d.demographicNo=? and d.deleted=false");
-		q.setParameter(1, demographicNo);
+		Query query = entityManager.createQuery("SELECT d " +
+				"FROM DemographicMerged d " +
+				"WHERE d.demographicNo=:demographicNo " +
+				"AND d.deleted=false");
+		query.setParameter("demographicNo", demographicNo);
 		
-		return getSingleResultOrNull(q);
+		return getSingleResultOrNull(query);
 	}
 	
-	public List<DemographicMerged> findByDemographicNo(int demographicNo) {
-		Query q = entityManager.createQuery("select d from DemographicMerged d where d.demographicNo=?");
-		q.setParameter(1, demographicNo);
+	public List<DemographicMerged> findByDemographicNo(int demographicNo)
+	{
+		Query query = entityManager.createQuery("SELECT d " +
+				"FROM DemographicMerged d " +
+				"WHERE d.demographicNo=:demographicNo");
+		query.setParameter("demographicNo", demographicNo);
 		
 		@SuppressWarnings("unchecked")
-		List<DemographicMerged> results = q.getResultList();
+		List<DemographicMerged> results = query.getResultList();
 		
 		return results;
 	}
 
 	@SuppressWarnings("unchecked")
-    public List<DemographicMerged> findByParentAndChildIds(Integer parentId, Integer childId) {
-		Query q = createQuery("d", "d.demographicNo = :childId AND d.mergedTo = :parentId AND deleted=false");
-		q.setParameter("parentId", parentId);
-		q.setParameter("childId", childId);
-		return q.getResultList();
+    public List<DemographicMerged> findByParentAndChildIds(Integer parentId, Integer childId)
+	{
+		Query query = entityManager.createQuery("SELECT d " +
+				"FROM DemographicMerged d " +
+				"WHERE d.demographicNo=:childId " +
+				"AND d.mergedTo=:parentId " +
+				"AND d.deleted=false");
+		query.setParameter("parentId", parentId);
+		query.setParameter("childId", childId);
+		return query.getResultList();
     }
 
 	/**
