@@ -439,7 +439,7 @@ public class DemographicManager {
 			for (DemographicMerged dm : demographicsMerged)
 			{
 				// Update the demographicMerged entry to be deleted
-				dm.setDeleted(DemographicMerged.DELETED);
+				dm.setDeleted(DemographicMerged.DELETED_TRUE);
 				demographicMergedDao.merge(dm);
 				// Add a log entry to indicate who did this
 				LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),

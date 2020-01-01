@@ -51,7 +51,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 	}
 	
 	public List<DemographicMerged> findCurrentByMergedTo(int demographicNo) {
-		Query q = entityManager.createQuery("select d from DemographicMerged d where d.mergedTo=? and d.deleted=0");
+		Query q = entityManager.createQuery("select d from DemographicMerged d where d.mergedTo=? and d.deleted=false");
 		q.setParameter(1, demographicNo);
 		
 		@SuppressWarnings("unchecked")
@@ -62,7 +62,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 	
 	public DemographicMerged findCurrentByDemographicNo(int demographicNo)
 	{
-		Query q = entityManager.createQuery("select d from DemographicMerged d where d.demographicNo=? and d.deleted=0");
+		Query q = entityManager.createQuery("select d from DemographicMerged d where d.demographicNo=? and d.deleted=false");
 		q.setParameter(1, demographicNo);
 		
 		return getSingleResultOrNull(q);
@@ -80,7 +80,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 
 	@SuppressWarnings("unchecked")
     public List<DemographicMerged> findByParentAndChildIds(Integer parentId, Integer childId) {
-		Query q = createQuery("d", "d.demographicNo = :childId AND d.mergedTo = :parentId AND deleted=0");
+		Query q = createQuery("d", "d.demographicNo = :childId AND d.mergedTo = :parentId AND deleted=false");
 		q.setParameter("parentId", parentId);
 		q.setParameter("childId", childId);
 		return q.getResultList();
@@ -97,7 +97,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 		Query query = entityManager.createQuery("SELECT d " +
 				"FROM DemographicMerged d " +
 				"WHERE d.demographicNo = :demographicNo " +
-				"AND d.deleted=0");
+				"AND d.deleted=false");
 		query.setParameter("demographicNo", demographicNo);
 
 		return getSingleResultOrNull(query);
@@ -129,7 +129,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 		DemographicMerged demographicMerged = new DemographicMerged();
 		demographicMerged.setDemographicNo(demographicNo);
 		demographicMerged.setMergedTo(head);
-		demographicMerged.setDeleted(DemographicMerged.MERGED);
+		demographicMerged.setDeleted(DemographicMerged.DELETED_FALSE);
 		demographicMerged.setLastUpdateUser(providerNo);
 		demographicMerged.setLastUpdateDate(new Date());
 		persist(demographicMerged);
@@ -167,7 +167,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 		}
 		demographicMerged.setLastUpdateDate(new Date());
 		demographicMerged.setLastUpdateUser(providerNo);
-		demographicMerged.setDeleted(DemographicMerged.DELETED);
+		demographicMerged.setDeleted(DemographicMerged.DELETED_TRUE);
 		merge(demographicMerged);
 	}
 }
