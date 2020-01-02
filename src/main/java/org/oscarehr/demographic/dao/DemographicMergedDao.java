@@ -144,7 +144,6 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 		DemographicMerged demographicMerged = new DemographicMerged();
 		demographicMerged.setDemographicNo(demographicNo);
 		demographicMerged.setMergedTo(head);
-		demographicMerged.setDeleted(DemographicMerged.DELETED_FALSE);
 		demographicMerged.setLastUpdateUser(providerNo);
 		demographicMerged.setLastUpdateDate(new Date());
 		persist(demographicMerged);
@@ -182,7 +181,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 		}
 		demographicMerged.setLastUpdateDate(new Date());
 		demographicMerged.setLastUpdateUser(providerNo);
-		demographicMerged.setDeleted(DemographicMerged.DELETED_TRUE);
+		demographicMerged.delete();
 		merge(demographicMerged);
 	}
 }

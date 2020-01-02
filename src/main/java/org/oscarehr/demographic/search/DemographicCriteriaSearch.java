@@ -30,7 +30,6 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
-import org.oscarehr.demographic.model.DemographicMerged;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -97,7 +96,7 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		criteria.createAlias(alias + ".mergedDemographicsList", "dm", Criteria.LEFT_JOIN);
 		criteria.add(Restrictions.or(
 				Restrictions.isNull("dm.id"),
-				Restrictions.eq("dm.deleted", DemographicMerged.DELETED_TRUE)
+				Restrictions.eq("dm.deleted", true)
 		));
 
 		// determine criteria join mode ('AND' filter criteria vs 'OR' filter criteria)

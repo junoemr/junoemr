@@ -65,25 +65,22 @@ public class DemographicMergedDaoTest extends DaoTestFixtures {
 		DemographicMerged demoMerged1 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged1);
 		demoMerged1.setMergedTo(mergedTo1);
-		demoMerged1.setDeleted(DemographicMerged.DELETED_FALSE);
 		dao.persist(demoMerged1);
 		
 		DemographicMerged demoMerged2 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged2);
 		demoMerged2.setMergedTo(mergedTo2);
-		demoMerged2.setDeleted(DemographicMerged.DELETED_FALSE);
 		dao.persist(demoMerged2);
 		
 		DemographicMerged demoMerged3 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged3);
 		demoMerged3.setMergedTo(mergedTo1);
-		demoMerged3.setDeleted(DemographicMerged.DELETED_FALSE);
 		dao.persist(demoMerged3);
 		
 		DemographicMerged demoMerged4 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged4);
 		demoMerged4.setMergedTo(mergedTo1);
-		demoMerged4.setDeleted(DemographicMerged.DELETED_TRUE);
+		demoMerged4.delete();
 		dao.persist(demoMerged4);
 		
 		List<DemographicMerged> expectedResult = new ArrayList<DemographicMerged>(Arrays.asList(demoMerged1, demoMerged3));		
@@ -112,25 +109,22 @@ public class DemographicMergedDaoTest extends DaoTestFixtures {
 		DemographicMerged demoMerged1 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged1);
 		demoMerged1.setDemographicNo(demographicNo1);
-		demoMerged1.setDeleted(DemographicMerged.DELETED_FALSE);
 		dao.persist(demoMerged1);
 		
 		DemographicMerged demoMerged2 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged2);
 		demoMerged2.setDemographicNo(demographicNo2);
-		demoMerged2.setDeleted(DemographicMerged.DELETED_FALSE);
 		dao.persist(demoMerged2);
 		
 		DemographicMerged demoMerged3 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged3);
 		demoMerged3.setDemographicNo(demographicNo1);
-		demoMerged3.setDeleted(DemographicMerged.DELETED_FALSE);
 		dao.persist(demoMerged3);
 		
 		DemographicMerged demoMerged4 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged4);
 		demoMerged4.setDemographicNo(demographicNo1);
-		demoMerged4.setDeleted(DemographicMerged.DELETED_TRUE);
+		demoMerged4.delete();
 		dao.persist(demoMerged4);
 		
 		List<DemographicMerged> expectedResult = new ArrayList<>(Arrays.asList(demoMerged1, demoMerged3));

@@ -109,7 +109,7 @@ public class DemographicMerged {
     	for(org.oscarehr.demographic.model.DemographicMerged dm:dms) {
     		dm.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
             dm.setLastUpdateDate(new Date());
-			dm.setDeleted(org.oscarehr.demographic.model.DemographicMerged.DELETED_TRUE);
+			dm.delete();
 			dao.merge(dm);
     	}
     	

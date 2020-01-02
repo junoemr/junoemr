@@ -41,9 +41,6 @@ import javax.persistence.TemporalType;
 public class DemographicMerged extends AbstractModel<Integer>
 {
 
-	public static boolean DELETED_FALSE = false;
-	public static boolean DELETED_TRUE = true;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -55,7 +52,7 @@ public class DemographicMerged extends AbstractModel<Integer>
 	private int mergedTo;
 
 	@Column(name = "deleted", nullable = false, columnDefinition = "INTEGER(1)")
-	private Boolean deleted;
+	private boolean deleted;
 	
 	private String lastUpdateUser;
 	
@@ -86,12 +83,14 @@ public class DemographicMerged extends AbstractModel<Integer>
 		this.mergedTo = mergedTo;
 	}
 
-	public Boolean getDeleted() {
+	public boolean getDeleted()
+	{
 		return deleted;
 	}
 
-	public void setDeleted(Boolean deleted) {
-		this.deleted = deleted;
+	public void delete()
+	{
+		this.deleted = true;
 	}
 
 	public String getLastUpdateUser() {
