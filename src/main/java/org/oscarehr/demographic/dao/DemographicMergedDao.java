@@ -125,7 +125,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 	 * @param head demographic being merged into
 	 * @return true if we successfully merged, false if we ran into an error state
 	 */
-	public boolean mergeDemographics(String providerNo, Integer demographicNo, Integer head)
+	public synchronized boolean mergeDemographics(String providerNo, Integer demographicNo, Integer head)
 	{
 		if (demographicNo.equals(head))
 		{
