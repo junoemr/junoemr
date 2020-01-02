@@ -27,21 +27,36 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
+import org.oscarehr.billing.CA.AB.dao.AlbertaFacilityDao;
+import org.oscarehr.billing.CA.AB.dao.AlbertaSkillCodeDao;
+import org.oscarehr.billing.CA.AB.model.AlbertaSkillCode;
 import org.oscarehr.managers.BillingManager;
 import org.oscarehr.ws.rest.conversion.ServiceTypeConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.model.ServiceTypeTo;
+import org.oscarehr.ws.rest.transfer.AlbertaFacilityTo1;
+import org.oscarehr.ws.rest.transfer.AlbertaSkillCodeTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import oscar.OscarProperties;
+
+import java.util.List;
 
 @Path("/billing")
 public class BillingService extends AbstractServiceImpl {
 
 	@Autowired
 	BillingManager billingManager;
+
+	@Autowired
+	AlbertaSkillCodeDao albertaSkillCodeDao;
+
+	@Autowired
+	AlbertaFacilityDao albertaFacilityDao;
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
 	
@@ -61,27 +76,43 @@ public class BillingService extends AbstractServiceImpl {
 
 	}
 
-    @GET
-    @Path("/billingRegion")
-    @Produces("application/json")
-    public GenericRESTResponse billingRegion() {
-        boolean billRegionSet = true;
-        String billRegion = oscarProperties.getBillingType().trim().toUpperCase();
-        if(billRegion.isEmpty()){
-            billRegionSet = false;
-        }
-        return new GenericRESTResponse(billRegionSet, billRegion);
-    }
-	
-    @GET
-    @Path("/defaultView")
-    @Produces("application/json")
-    public GenericRESTResponse defaultView() {
-        boolean defaultViewSet = true;
-        String defaultView = oscarProperties.getProperty("default_view", "").trim();
-        if(defaultView.isEmpty()){
-        	defaultViewSet = false;
-        }
-        return new GenericRESTResponse(defaultViewSet, defaultView);
-    }
+	@GET
+	@Path("/billingRegion")
+	@Produces("application/json")
+	public GenericRESTResponse billingRegion() {
+			boolean billRegionSet = true;
+			String billRegion = oscarProperties.getBillingType().trim().toUpperCase();
+			if(billRegion.isEmpty()){
+					billRegionSet = false;
+			}
+			return new GenericRESTResponse(billRegionSet, billRegion);
+	}
+
+	@GET
+	@Path("/defaultView")
+	@Produces("application/json")
+	public GenericRESTResponse defaultView() {
+			boolean defaultViewSet = true;
+			String defaultView = oscarProperties.getProperty("default_view", "").trim();
+			if(defaultView.isEmpty()){
+				defaultViewSet = false;
+			}
+			return new GenericRESTResponse(defaultViewSet, defaultView);
+	}
+
+	@GET
+	@Path("/alberta/skillCodes")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<AlbertaSkillCodeTo1>> getAlbertaSkillCodes()
+	{
+		return RestResponse.successResponse(AlbertaSkillCodeTo1.fromList(albertaSkillCodeDao.getAllSkillCodes()));
+	}
+
+	@GET
+	@Path("/alberta/facilities")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<AlbertaFacilityTo1>> getAlbertaActiveFacilities()
+	{
+		return RestResponse.successResponse(AlbertaFacilityTo1.fromList(albertaFacilityDao.getAllActiveFacilities()));
+	}
 }

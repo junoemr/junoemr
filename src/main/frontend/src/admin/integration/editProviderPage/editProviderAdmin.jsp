@@ -21,9 +21,6 @@
 * Canada
 --%>
 <div id="edit-provider-admin">
-	<h1 ng-if="$ctrl.mode === $ctrl.modes.EDIT">Edit User</h1>
-	<h1 ng-if="$ctrl.mode === $ctrl.modes.ADD">Add User</h1>
-
 	<div class="edit-provider-fields">
 		<div class="col-sm-6">
 			<!-- User Information -->
@@ -116,16 +113,17 @@
 										class="flex-grow lg-margin-right"
 										model="$ctrl.currentRoleSelection"
 										options="$ctrl.roleOptions"
-										placeholder="'Search Roles...'"
+										placeholder="Add Role Here"
 										on-enter-key="$ctrl.addUserRole($ctrl.currentRoleSelection.value)"
 						>
 						</juno-typeahead>
-						<button class="btn btn-primary lg-padding-left lg-padding-right" title="Add role" ng-click="$ctrl.addUserRole($ctrl.currentRoleSelection.value)">Add</button>
+						<button class="btn btn-primary lg-padding-left lg-padding-right add-role-button" title="Add role" ng-click="$ctrl.addUserRole($ctrl.currentRoleSelection.value)">Add</button>
 					</div>
 					<div class="user-role-list col-sm-12 md-margin-top">
+						<label class="body-smallest md-padding-bottom">Roles</label>
 						<ul class="no-padding">
 							<li ng-repeat="userRoleId in $ctrl.provider.userRoles" class="group-list-item">
-								<div class="flex-row align-items-center">
+								<div class="flex-row align-items-center body-small-bold">
 									{{$ctrl.getUserRoleName(userRoleId)}}
 									<div class="flex-grow text-right">
 										<i class="icon icon-delete hand-hover" title="Remove role" ng-click="$ctrl.removeUserRole(userRoleId)"></i>
@@ -262,6 +260,35 @@
 						>
 						</ca-field-text>
 
+						<!-- Skill Code -->
+						<juno-typeahead
+										title="Skill Code"
+										name="albertaSkillCode"
+										model="$ctrl.provider.skillCode"
+										options="$ctrl.skillCodeOptions"
+										placeholder="Provider Skill Code"
+						>
+						</juno-typeahead>
+
+						<!-- Location Code -->
+						<juno-typeahead
+										title="Location Code"
+										name="locationCode"
+										model="$ctrl.provider.locationCode"
+										options="$ctrl.locationCodeOptions"
+										placeholder="Location Code"
+						>
+						</juno-typeahead>
+
+						<!-- BA Number -->
+						<ca-field-text
+										class="col-sm-2 no-padding no-float"
+										ca-name="BANumber"
+										ca-title="BA Number"
+										ca-model="$ctrl.provider.BANumber"
+										ca-rows="1"
+						>
+						</ca-field-text>
 
 					</div>
 

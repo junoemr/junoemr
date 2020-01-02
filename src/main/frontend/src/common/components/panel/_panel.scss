@@ -4,9 +4,9 @@ panel {
 	display: block;
 
 	.panel-header {
-		background-color: $color-neutral-lightest;
-		border-color: $color-neutral-light;
-		border-width: 2px;
+		background-color: $color-neutral-lighter;
+		border-color: $color-neutral-lighter;
+		border-width: 4px;
 		border-radius: 8px;
 		border-style: solid;
 
@@ -20,8 +20,8 @@ panel {
 
 	.panel-body {
 		background-color: white;
-		border-color: $color-neutral-light;
-		border-width: 2px;
+		border-color: $color-neutral-lighter;
+		border-width: 4px;
 		border-radius: 8px;
 		border-style: solid;
 
@@ -30,7 +30,7 @@ panel {
 		border-top-left-radius: 0;
 		border-top-right-radius: 0;
 
-		padding: 8px;
+		padding: 16px;
 	}
 
 }

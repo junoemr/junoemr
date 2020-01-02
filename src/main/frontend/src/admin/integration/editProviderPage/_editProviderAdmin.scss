@@ -26,7 +26,17 @@
 
 	.edit-provider-fields {
 		panel {
-			margin-top: $margin-xl;
+			margin-bottom: $margin-lg;
 		}
+	}
+
+	.form-group {
+		padding-bottom: 4px;
+		padding-top: 4px;
+	}
+
+	.juno-typeahead {
+		padding-bottom: 4px;
+		padding-top: 4px;
 	}
 }

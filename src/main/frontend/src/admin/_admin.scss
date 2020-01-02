@@ -5,17 +5,25 @@
     @extend %juno-page-header;
     padding-left: 63px;
 
-    h3 {
+    h5 {
       color: $color-neutral-white;
     }
-    h3, p {
+    h5, p {
       margin: 0;
+    }
+
+    h6 {
+      display: inline-block;
     }
 
     a  {
       all: unset;
       cursor: pointer;
     }
+  }
+
+  .add-role-button {
+    height: 40px;
   }
 
   #admin-page-body {
@@ -27,7 +35,7 @@
     .admin-subpage-view {
       margin-left: 20px;
       margin-right: 20px;
-      margin-top: 10px;
+      margin-top: 0;
       flex: 1 1;
     }
 

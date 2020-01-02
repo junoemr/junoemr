@@ -47,6 +47,10 @@ body {
 	font-weight: bold;
 }
 
+.body-smallest {
+	@include juno-font-body-smallest();
+}
+
 .hand-hover {
 	cursor: pointer;
 }
@@ -142,6 +146,10 @@ body {
 		margin-left: $margin-md;
 	}
 
+	.md-margin-top {
+		margin-top: $margin-md;
+	}
+
 	.sm-margin-left {
 		margin-left: $margin-sm;
 	}
@@ -164,6 +172,10 @@ body {
 
 	.md-padding-right {
 		padding-right: $padding-md;
+	}
+
+	.md-padding-bottom {
+		padding-bottom: $padding-md;
 	}
 
 	.no-padding {

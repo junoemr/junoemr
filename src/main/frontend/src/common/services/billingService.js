@@ -90,6 +90,25 @@ angular.module("Common.Services").service("billingService", [
 			return deferred.promise;
 		};
 
+		service.getAlbertaSkillCodes = function ()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/alberta/skillCodes',
+					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+					function success(results)
+					{
+						deferred.resolve(results);
+					},
+					function error(errors)
+					{
+						console.error("Failed to fetch alberta skill codes with error: " + errors);
+						deferred.reject("Failed to fetch alberta skill codes with error: " + errors);
+					});
+
+			return deferred.promise;
+		};
+
 		return service;
 	}
 ]);

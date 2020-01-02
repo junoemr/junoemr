@@ -29,7 +29,7 @@ angular.module('Common.Components').component('junoTypeahead',
 		name: '@',
 		model: '=',
 		options: "<",
-		placeholder: "<?",
+		placeholder: "@?",
 		onEnterKey: '&?',
 		enabled: '<?'
 	},

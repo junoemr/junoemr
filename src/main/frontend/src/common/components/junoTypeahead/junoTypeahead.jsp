@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
 --%>
-<div class="juno-typeahead">
+<div class="juno-typeahead form-group">
 	<label ng-if="$ctrl.title" for="name-{{$ctrl.name}}">
 		{{$ctrl.title}}
 	</label>

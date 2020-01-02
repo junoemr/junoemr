@@ -36,14 +36,16 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		'staticDataService',
 		'providersService',
 		'providerService',
+		'billingService',
 		function (
-				$scope,
-				$stateParams,
-				$http,
-				$httpParamSerializer,
-				staticDataService,
-				providersService,
-				providerService)
+			$scope,
+			$stateParams,
+			$http,
+			$httpParamSerializer,
+			staticDataService,
+			providersService,
+			providerService,
+			billingService)
 	{
 		let ctrl = this;
 
@@ -63,6 +65,21 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		ctrl.billingRegionSelectEnabled = false;
 		ctrl.billingRegion = null;
 		ctrl.billingRegionOptions = staticDataService.getBillingRegions();
+
+		// options for the AB skill code field.
+		ctrl.skillCodeOptions = [];
+
+		// options for the AB location code field.
+		ctrl.locationCodeOptions = [
+			{
+				label: "Home (HOME)",
+				value: "HOME"
+			},
+			{
+				label: "Other (OTHR)",
+				value: "OTHR"
+			}
+		];
 
 		ctrl.provider = {
 			// User Info
@@ -164,15 +181,52 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					function success(result)
 					{
 						ctrl.billingRegion = {label: result.data.body, value: result.data.body};
+
+						if (ctrl.billingRegion === "AB")
+						{
+							ctrl.loadAlbertaBillingData();
+						}
 					},
 					function error(result)
 					{
 						console.error("Failed to fetch instance billing type with error: " + error);
 					}
-			)
+			);
 
+			// when we switch to AB bill region load additional data.
+			$scope.$watch('$ctrl.billingRegion', function(newVal, oldVal)
+			{
+				if (newVal && newVal.value === "AB")
+				{
+					ctrl.loadAlbertaBillingData();
+				}
+			});
 		};
 
+		// load alberta specific data for billing fields
+		ctrl.loadAlbertaBillingData = function()
+		{
+			// load skill codes
+			billingService.getAlbertaSkillCodes().then(
+					function success(result)
+					{
+						ctrl.skillCodeOptions = [];
+						for (let skillCode of result.data.body)
+						{
+							ctrl.skillCodeOptions.push(
+									{
+										label: skillCode.description + "(" + skillCode.skillCode + ")",
+										value: skillCode.skillCode
+									}
+							);
+						}
+					},
+					function error(result)
+					{
+						console.log(result);
+					}
+			);
+		};
 
 		ctrl.addUserRole = function(roleId)
 		{

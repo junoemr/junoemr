@@ -50,4 +50,29 @@ public class AlbertaSkillCode extends AbstractModel<Integer>
 	{
 		return id;
 	}
+
+	public void setId(Integer id)
+	{
+		this.id = id;
+	}
+
+	public String getSkillCode()
+	{
+		return skillCode;
+	}
+
+	public void setSkillCode(String skillCode)
+	{
+		this.skillCode = skillCode;
+	}
+
+	public String getDescription()
+	{
+		return description;
+	}
+
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
 }
