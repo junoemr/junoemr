@@ -250,6 +250,19 @@
 										ca-rows="1"
 						>
 						</ca-field-text>
+
+						<!-- Source Code -->
+						<ca-field-text
+										class="col-sm-2 no-padding no-float"
+										ca-name="sourceCode"
+										ca-title="Source Code"
+										ca-model="$ctrl.provider.sourceCode"
+										ca-rows="1"
+										ca-text-length="2"
+						>
+						</ca-field-text>
+
+
 					</div>
 
 					<!-- common billing options -->

@@ -173,6 +173,10 @@ body {
 	.no-margin {
 		margin: 0;
 	}
+
+	.no-float {
+		float: none;
+	}
 }
 // Makes checkbox flush with input (as long as checkbox margin is 0)
 .big-checkbox {

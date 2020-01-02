@@ -108,15 +108,13 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 			// AB Billing
 			clinic: null,
-			sourceCode: null,
+			sourceCode: "ab",
 			skillCode: null,
 			locationCode: null,
 			BANumber: null,
 			FacilityNumber: null,
 			functional: null,
 			roleModifier: null,
-
-
 
 			// Common Billing
 			ohipNo: null,
