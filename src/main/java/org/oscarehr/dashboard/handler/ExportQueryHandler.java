@@ -23,12 +23,18 @@
  */
 package org.oscarehr.dashboard.handler;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.util.MiscUtils;
 
 public class ExportQueryHandler extends AbstractQueryHandler {
@@ -36,7 +42,7 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 	private static Logger logger = MiscUtils.getLogger();
 	private static final char SEPARATOR = ',';
 	
-	private String csvFile;
+	private GenericFile csvFile;
 	
 	public ExportQueryHandler() {
 		// default
@@ -45,10 +51,10 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 	@Override
 	public List<?> execute() {
 		
-		logger.info("Executing Export Query");
+		logger.debug("Executing Export Query");
 	
 		List<?> results = super.execute();		
-		setCsvFile( results );	
+		generateCsvContent(results);
 		return results;
 	}
 	
@@ -58,13 +64,9 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 		super.setQuery( finalQuery );
 	}
 
-	public String getCsvFile() {
-		return csvFile;
-	}
-
 	@SuppressWarnings("unchecked")
-	private void setCsvFile( List<?> results ) {
-		
+	private void generateCsvContent(List<?> results)
+	{
 		StringBuilder stringBuilder = new StringBuilder();
 		
 		stringBuilder.append( writeHeadings( results ) );
@@ -79,7 +81,26 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 			stringBuilder.append( writeLine( resultArray ) );
 		}
 
-		this.csvFile = stringBuilder.toString();
+		try
+		{
+			String csvContent = stringBuilder.toString();
+			InputStream inputStream = new ByteArrayInputStream(csvContent.getBytes(StandardCharsets.UTF_8));
+			setCsvFile(FileFactory.createTempFile(inputStream, ".csv"));
+		}
+		catch (IOException | InterruptedException e)
+		{
+			logger.error("Could not build CSV due to following error:", e);
+		}
+	}
+
+	public GenericFile getCsvFile()
+	{
+		return csvFile;
+	}
+
+	public void setCsvFile(GenericFile csvFile)
+	{
+		this.csvFile = csvFile;
 	}
 	
 	@SuppressWarnings("unchecked")

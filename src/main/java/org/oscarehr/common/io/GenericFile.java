@@ -55,6 +55,7 @@ public class GenericFile
 			"application/doc",
 			"application/msword",
 			"application/octet-stream",
+			"text/csv",
 			"text/plain",
 			"image/tiff",
 			"image/jpeg",

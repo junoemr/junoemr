@@ -323,16 +323,15 @@ $(document).ready( function() {
 		}
 	});
 	
-	//--> Export the drilldown query results to csv
-	$(".exportResults").on('click', function(){
-
-    	var url = "/web/dashboard/display/ExportResults.do";
-    	var data = new Object();
-    	data.indicatorId = (this.id).split("_")[1];
-    	data.providerNo = providerNo;
-     
-    	sendData(url, data, null)
-	})
+	// Export the drilldown query results to csv
+	$(".exportResults").on('click', function()
+	{
+		var indicatorId = (this.id).split("_")[1];
+		var url = ctx
+			+ "/web/dashboard/display/ExportResults.do?indicatorId=" + indicatorId
+			+ "&providerNo=" + providerNo;
+		window.open(url);
+	});
 	
 	//--> Execute the tickler assignment - save
 	$("#saveTicklerBtn").on('click', function(event) {
