@@ -97,9 +97,8 @@
 <script type="text/javascript" language="Javascript">
 	
 
-    function onPrint2(method) {
-
-            document.getElementById("preview2Form").action = "../form/createcustomedpdf?__title=Rx&__method=" + method;
+    function onPrint2(method, useSC, scAddress) {
+            document.getElementById("preview2Form").action = "../form/createcustomedpdf?__title=Rx&__method=" + method + "&useSC=" + useSC + "&scAddress=" + scAddress;
             document.getElementById("preview2Form").target="_blank";
             document.getElementById("preview2Form").submit();
        return true;
