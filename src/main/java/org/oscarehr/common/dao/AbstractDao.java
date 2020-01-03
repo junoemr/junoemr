@@ -420,6 +420,7 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	private List<Explain> toExplainList(List<Object[]> list)
 	{
 		List<Explain> results = new ArrayList<>(list.size());
+		Pattern numberPattern = Pattern.compile("\\d+");
 
 		for(Object[] result : list)
 		{
@@ -430,7 +431,14 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 			explain.setType((String) result[3]);
 			explain.setPossibleKeys((String) result[4]);
 			explain.setKey((String) result[5]);
-			explain.setKeyLen((String) result[6]);
+			if (result[6] != null)
+			{
+				Matcher match = numberPattern.matcher((String) result[6]);
+				if (match.matches())
+				{
+					explain.setKeyLen(match.group(0));
+				}
+			}
 			explain.setRef((String) result[7]);
 
 			// MariaDB 10.1 and 10.4 return the rows column of the explain result as different
@@ -440,7 +448,7 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 			{
 				if (rows.getClass().equals(String.class))
 				{
-					Matcher match = Pattern.compile("\\d+").matcher((String) rows);
+					Matcher match = numberPattern.matcher((String) rows);
 					if (match.matches())
 					{
 						explain.setRows(new BigInteger(match.group(0)));
