@@ -74,7 +74,7 @@ public abstract class AbstractQueryHandler extends HibernateDaoSupport {
 		SQLQuery sqlQuery = session.createSQLQuery( query );
 		List<?> results = sqlQuery.setResultTransformer( Criteria.ALIAS_TO_ENTITY_MAP ).list();		
 
-		logger.info( "Thread " + Thread.currentThread().getName() +  "[" + Thread.currentThread().getId() 
+		logger.debug( "Thread " + Thread.currentThread().getName() +  "[" + Thread.currentThread().getId()
 				+ "] Query results " + results );
 
 		//TODO work on method to detect and exclude demographic files that are 
