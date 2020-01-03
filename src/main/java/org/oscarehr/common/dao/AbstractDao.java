@@ -40,6 +40,8 @@ import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Transactional(propagation = Propagation.REQUIRED)
 public abstract class AbstractDao<T extends AbstractModel<?>> {
@@ -438,7 +440,11 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 			{
 				if (rows.getClass().equals(String.class))
 				{
-					explain.setRows(new BigInteger((String) rows));
+					Matcher match = Pattern.compile("\\d+").matcher((String) rows);
+					if (match.matches())
+					{
+						explain.setRows(new BigInteger(match.group(0)));
+					}
 				}
 				else if (rows.getClass().equals(BigInteger.class))
 				{
