@@ -46,7 +46,6 @@
 	<c:out value="${ dashboard.name }" />
 </title>
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/library/bootstrap/3.0.0/css/bootstrap.min.css" />
-	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/web/css/dashboard.css" />
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/js/jqplot/jquery.jqplot2.min.css" />
 	<script>
 		var ctx = "${pageContext.request.contextPath}"
