@@ -77,7 +77,7 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 			Collection<?> resultCollection = result.values();
 			Object[] resultArray = new Object[ resultCollection.size() ];
 			resultCollection.toArray( resultArray );
-			
+
 			stringBuilder.append( writeLine( resultArray ) );
 		}
 
@@ -85,7 +85,7 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 		{
 			String csvContent = stringBuilder.toString();
 			InputStream inputStream = new ByteArrayInputStream(csvContent.getBytes(StandardCharsets.UTF_8));
-			setCsvFile(FileFactory.createTempFile(inputStream, ".csv"));
+			this.csvFile = FileFactory.createTempFile(inputStream, ".csv");
 		}
 		catch (IOException | InterruptedException e)
 		{
@@ -98,11 +98,6 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 		return csvFile;
 	}
 
-	public void setCsvFile(GenericFile csvFile)
-	{
-		this.csvFile = csvFile;
-	}
-	
 	@SuppressWarnings("unchecked")
 	private static String writeHeadings( List<?> results ) {
 		
@@ -120,9 +115,9 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 		
 		for( Object value : line ) {
 			
-			String stringValue = value + "";			
-			stringBuilder.append( filterQuotes( stringValue ) );
-			stringBuilder.append( SEPARATOR );			
+			String stringValue = '"' + value.toString() + '"';
+			stringBuilder.append(stringValue);
+			stringBuilder.append( SEPARATOR );
 		}
 		
 		stringBuilder.deleteCharAt( stringBuilder.length() - 1 );	
