@@ -1477,21 +1477,7 @@ public class RxUtil {
 		}
 		logger.debug("3acd=" + acd);
 
-		String[] str = new String[] { "warnings_byATC,bulletins_byATC,interactions_byATC,get_guidelines" }; //NEW more efficent way of sending multiple requests at the same time.
 		Vector allInteractions = new Vector();
-		for (String command : str) {
-			try {
-				Vector v = getMyDrugrefInfo(command, acd, myDrugrefId);
-				MiscUtils.getLogger().debug("2v in for loop: " + v);
-				if (v != null && v.size() > 0) {
-					allInteractions.addAll(v);
-				}
-				MiscUtils.getLogger().debug("3after all.addAll(v): " + allInteractions);
-			} catch (Exception e) {
-				log2.debug("3command :" + command + " " + e.getMessage());
-				MiscUtils.getLogger().error("Error", e);
-			}
-		}
 		String retStr = "";
 		HashMap rethm = new HashMap();
 		for (RxPrescriptionData.Prescription rxItem : rxs) {
