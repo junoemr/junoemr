@@ -75,6 +75,7 @@ import java.util.regex.Pattern;
  *
  */
 @Service
+@Transactional
 public class DemographicManager {
 	public static final String PHR_VERIFICATION_LEVEL_3 = "+3";
 	public static final String PHR_VERIFICATION_LEVEL_2 = "+2";
@@ -374,7 +375,6 @@ public class DemographicManager {
 	 * @param demographicArchiveId - id of the archived demographic record
 	 * @param extensions - list of objects to update/insert
 	 */
-	@Transactional
 	public void saveAndArchiveDemographicExt(Long demographicArchiveId, List<DemographicExt> extensions)
 	{
 		for(DemographicExt extension : extensions)
