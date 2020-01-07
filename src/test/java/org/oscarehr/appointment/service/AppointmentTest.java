@@ -417,6 +417,7 @@ public class AppointmentTest
 				false,
 				false,
 				false,
+				false,
 				null
 			)
 		));
