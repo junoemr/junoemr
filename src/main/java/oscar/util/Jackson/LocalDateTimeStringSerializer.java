@@ -22,44 +22,30 @@
  */
 package oscar.util.Jackson;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import oscar.util.ConversionUtils;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-// Deserialize dates in format yyyy-MM-dd without time zone.
-public class DateDeserializer extends StdDeserializer<Date>
+public class LocalDateTimeStringSerializer extends StdSerializer<LocalDateTime>
 {
-	private SimpleDateFormat formatter =
-					new SimpleDateFormat(ConversionUtils.DEFAULT_DATE_PATTERN);
-
-	public DateDeserializer()
+	protected LocalDateTimeStringSerializer()
 	{
 		this(null);
 	}
 
-	public DateDeserializer(Class<?> vc)
+	protected LocalDateTimeStringSerializer(Class<LocalDateTime> t)
 	{
-		super(vc);
+		super(t);
 	}
 
 	@Override
-	public Date deserialize(JsonParser jsonparser, DeserializationContext context)
-					throws IOException
+	public void serialize(LocalDateTime localDateTime, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException
 	{
-		String date = jsonparser.getText();
-		try
-		{
-			return formatter.parse(date);
-		}
-		catch(ParseException e)
-		{
-			throw new RuntimeException(e);
-		}
+		String formattedString = localDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
+		jsonGenerator.writeString(formattedString);
 	}
 }

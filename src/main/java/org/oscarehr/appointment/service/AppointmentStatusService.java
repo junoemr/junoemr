@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional
 public class AppointmentStatusService
 {
 	@Autowired
@@ -41,7 +42,6 @@ public class AppointmentStatusService
 	 * Gets a list of appointment statuses for use in the calendar.
 	 * @return List of appointment statuses.
 	 */
-	@Transactional
 	public List<CalendarAppointmentStatus> getCalendarAppointmentStatusList()
 	{
 		AppointmentStatusList appointmentStatusList = AppointmentStatusList.factory(appointmentManager);

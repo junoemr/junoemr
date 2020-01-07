@@ -2,6 +2,7 @@ import {AppointmentApi} from '../../generated/api/AppointmentApi';
 import {ScheduleApi} from '../../generated/api/ScheduleApi';
 import {SitesApi} from '../../generated/api/SitesApi';
 import {ProviderPreferenceApi} from '../../generated/api/ProviderPreferenceApi';
+import {SystemPreferenceApi} from "../../generated/api/SystemPreferenceApi";
 
 angular.module('Schedule').controller('Schedule.ScheduleController', [
 
@@ -56,6 +57,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			'../ws/rs');
 
 		$scope.providerPreferenceApi = new ProviderPreferenceApi($http, $httpParamSerializer,
+			'../ws/rs');
+
+		controller.systemPreferencesApi = new SystemPreferenceApi($http, $httpParamSerializer,
 			'../ws/rs');
 
 		controller.providerSettings = loadedSettings;
@@ -119,6 +123,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.siteOptions = [];
 		$scope.sitesEnabled = false;
 		$scope.selectedSiteName = null;
+		$scope.telehealthEnabled = false;
 
 		$scope.openingDialog = false;
 		$scope.dialog = null;
@@ -176,15 +181,18 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 							{
 								controller.loadExtraLinkData().then(function ()
 								{
-									$scope.loadDefaultSelections();
-									$scope.setEventSources();
+									controller.loadTelehealthEnabled().then(function()
+									{
+										$scope.loadDefaultSelections();
+										$scope.setEventSources();
 
-									controller.initEventsAutoRefresh();
+										controller.initEventsAutoRefresh();
 
-									$scope.applyUiConfig($scope.uiConfig);
+										$scope.applyUiConfig($scope.uiConfig);
 
-									controller.loadWatches();
-									$scope.initialized = true;
+										controller.loadWatches();
+										$scope.initialized = true;
+									});
 								});
 							});
 						});
@@ -885,6 +893,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let labelElem = eventElement.find('.event-label');
 				let detailElem = eventElement.find('.event-details');
 				let selfBookElem = eventElement.find('.self-book-indicator');
+				let telehealthElem = eventElement.find('.event-telehealth');
 				// var eventSite = $scope.sites[event.data.site];
 
 				/* set up status icon + color/hover etc. */
@@ -917,6 +926,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let eventName = "";
 				let eventReason = "";
 				let eventNotes = "";
+
+				if (!event.data.virtual)
+				{
+					telehealthElem.hide();
+				}
 
 				if (event.data.doNotBook)
 				{
@@ -1121,6 +1135,15 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				controller.openQuickLink($target.attr('data-id'), calEvent.data.demographicNo, calEvent.data.appointmentNo);
 			}
+			else if ($target.is(".onclick-event-telehealth"))
+			{
+				console.log("initiate telehealth appt");
+				controller.openTelehealthLink(calEvent);
+				//"../telehealth/myhealthaccess.do?method=openTelehealth" +
+				//"&demographicNo=${appointmentInfo.demographicNo}" +
+				//"&siteName=${appointmentInfo.siteName}" +
+				//"&appt=${appointmentInfo.appointmentNo}")
+			}
 			else
 			{
 				$scope.openEditEventDialog(calEvent);
@@ -1215,6 +1238,18 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					providerNo: calEvent.resourceId,
 				};
 				window.open(scheduleService.getRxLink(params));
+			}
+		};
+
+		controller.openTelehealthLink = function openTelehealthLink(calEvent)
+		{
+			if (calEvent.data.demographicNo !== 0 && calEvent.data.virtual)
+			{
+				console.log(calEvent.data);
+				window.open("../telehealth/myhealthaccess.do?method=openTelehealth"
+					+ "&demographicNo=" + encodeURIComponent(calEvent.data.demographicNo)
+					+ "&siteName=" + encodeURIComponent(calEvent.data.site)
+					+ "&appt=" + encodeURIComponent(calEvent.data.appointmentNo), "_blank");
 			}
 		};
 
@@ -1375,6 +1410,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				events: $scope.events,
 				eventData: calEventData
 			};
+
+			console.log(data.eventData);
 
 			$scope.dialog = $uibModal.open({
 				animation: false,
@@ -1734,6 +1771,26 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					}
 				}
 			);
+			return deferred.promise;
+		};
+
+		controller.loadTelehealthEnabled = function loadTelehealthEnabled()
+		{
+			let deferred = $q.defer();
+			controller.systemPreferencesApi.getPropertyEnabled("myhealthaccess_telehealth_enabled").then(
+				function success(rawResults)
+				{
+					var enabled = rawResults.data.body;
+					$scope.telehealthEnabled = enabled;
+					deferred.resolve(enabled);
+				},
+				function failure(results)
+				{
+					$scope.displayMessages.add_standard_error("Failed to load telehealth enabled");
+					deferred.reject(results.data.body);
+				}
+			);
+
 			return deferred.promise;
 		};
 
