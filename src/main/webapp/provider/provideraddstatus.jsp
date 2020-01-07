@@ -24,11 +24,12 @@
 
 --%>
 
-<%@ page import="java.sql.*, java.util.*, oscar.MyDateFormat,org.oscarehr.event.EventService"%>
+<%@ page import="org.oscarehr.common.dao.AppointmentArchiveDao,
+ org.oscarehr.common.dao.OscarAppointmentDao,
+ org.oscarehr.common.model.Appointment,
+ org.oscarehr.event.EventService"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-<%@page import="org.oscarehr.common.dao.AppointmentArchiveDao" %>
-<%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
-<%@page import="org.oscarehr.common.model.Appointment" %>
+<%@page import="org.oscarehr.telehealth.service.MyHealthAccessService" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
@@ -48,6 +49,12 @@
   	  appt.setLastUpdateUser((String)session.getAttribute("user"));
   	  appointmentDao.merge(appt);
   	  rowsAffected=1;
+
+	    if(appt.getIsVirtual())
+	    {
+		    MyHealthAccessService myHealthAccessService = SpringUtils.getBean(MyHealthAccessService.class);
+		    myHealthAccessService.queueAppointmentCacheUpdate(appt);
+	    }
     }
     
     EventService eventService = SpringUtils.getBean(EventService.class);//This is when the icon is clicked in the appt screen
