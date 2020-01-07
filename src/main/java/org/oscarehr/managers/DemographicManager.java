@@ -425,7 +425,6 @@ public class DemographicManager {
 
 	}
 
-	@Transactional
 	public void unmergeDemographics(LoggedInInfo loggedInInfo, Integer parentId, List<Integer> children)
 	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
