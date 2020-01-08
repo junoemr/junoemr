@@ -19,7 +19,7 @@
     Description:
         Define Periodic Health Visit flowsheet
 -->
-<flowsheet name="phv" display_name="Periodic Health Visit" warning_colour="#E00000" recommendation_colour="yellow" top_HTML="">
+<flowsheet name="phv" display_name="Periodic Health Visit" warning_colour="#E00000" recommendation_colour="yellow">
 	
 	<indicator key="HIGH" colour="orange" />
 	<indicator key="LOW" colour="#9999FF" />
