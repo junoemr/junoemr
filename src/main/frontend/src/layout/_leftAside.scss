@@ -23,24 +23,13 @@
 	}
 
 	.icon-video {
-		font-size: 32px;
+		font-size: 24px;
 		object-fit: contain;
 		padding-bottom: 6px;
 	}
 
-	h5 {
-		font-size: 17px;
-	}
-
-	.span {
-		@include juno-font-default-size(13px);
-		.span-appointment {
-			color: $color-neutral-dark-grey
-		}
-
-		.span-appointment {
-			color: $color-neutral-grey
-		}
+	.h4 {
+		font-weight: 700;
 	}
 
 	.patient-list-header {

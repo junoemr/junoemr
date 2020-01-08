@@ -108,7 +108,7 @@
 					class="list-group-item">
 						<div ng-click="$ctrl.goToRecord(patient)"
 							class="list-group-clickable">
-							<h5>{{patient.name}}</h5>
+							<h4>{{patient.name}}</h4>
 						</div>
 
 					</a>
@@ -119,13 +119,12 @@
 					<a ng-repeat="patient in $ctrl.activeAppointmentList | filter:query"
 					class="list-group-item">
 						<div class="flex-row vertical-align justify-content-between">
-							<div class="col-md-4 list-group-clickable"
+							<div class="col-md-5 list-group-clickable"
 								ng-click="$ctrl.goToRecord(patient)">
-								<span class="span span-appointment-time">{{patient.startTime}}</span>
-								<h5>{{patient.name}}</h5>
-								<span class="span span-appointment-reason">{{patient.reason}}</span>
+								<h4>{{patient.name}}</h4>
+								<span>{{patient.startTime}} {{patient.reason}}</span>
 							</div>
-							<div class="col-md-2">
+							<div class="col-md-1">
 								<button class="btn btn-icon"
 									ng-if="$ctrl.telehealthEnabled && patient.isVirtual">
 									<i class="icon icon-video onclick-event-telehealth"
