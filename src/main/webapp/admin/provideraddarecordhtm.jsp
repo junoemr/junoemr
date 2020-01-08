@@ -383,6 +383,12 @@ for (int i=0; i<sites.size(); i++) {
 			<td><input type="text" name="alberta_e_delivery_ids"></td>
 		</tr>
 		<%} %>
+		<% if (OscarProperties.getInstance().isOntarioInstanceType()) { %>
+		<tr>
+			<td align="right"><bean:message key="admin.provider.fromOntarioLifeLabsId" />:</td>
+			<td><input type="text" name="ontario_lifelabs_id" maxlength="128"></td>
+		</tr>
+		<% } %>
 		<tr>
 			<td align="right"><bean:message
 				key="admin.provider.formSpecialtyCode" />:</td>

@@ -90,7 +90,9 @@ public class Provider implements Serializable, Comparable<Provider>{
 	private String albertaTakNo;
 	private String albertaEDeliveryIds;
 	private String albertaConnectCareId;
-	/* -- Province specific (AB) -- */
+	/* -- Province specific (ON) -- */
+	private String ontarioLifeLabsId;
+
 	private Boolean superAdmin = false;
 
 	public String getPractitionerNo() {
@@ -440,6 +442,16 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public void setAlbertaConnectCareId(String albertaConnectCareId)
 	{
 		this.albertaConnectCareId = albertaConnectCareId;
+	}
+
+	public String getOntarioLifeLabsId()
+	{
+		return ontarioLifeLabsId;
+	}
+
+	public void setOntarioLifeLabsId(String ontarioLifeLabsId)
+	{
+		this.ontarioLifeLabsId = ontarioLifeLabsId;
 	}
 
 	/* -- other methods --*/
