@@ -77,10 +77,6 @@ public abstract class DSService {
         return allResultingConsequences;
     }
 
-    public void fetchGuidelinesFromServiceInBackground(LoggedInInfo loggedInInfo) {
-        DSServiceThread dsServiceThread = new DSServiceThread(this, loggedInInfo);
-        dsServiceThread.start();
-    }
     public abstract void fetchGuidelinesFromService(LoggedInInfo loggedInInfo);
 
     public List<DSGuideline> getDsGuidelinesByProvider(String provider) {

@@ -57,7 +57,6 @@ import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.common.model.ServiceRequestToken;
 import org.oscarehr.common.model.UserProperty;
-import org.oscarehr.decisionSupport.service.DSService;
 import org.oscarehr.managers.AppManager;
 import org.oscarehr.phr.util.MyOscarUtils;
 import org.oscarehr.util.LoggedInInfo;
@@ -352,14 +351,6 @@ public final class LoginAction extends DispatchAction {
 
             LoggedInInfo loggedInInfo = LoggedInUserFilter.generateLoggedInInfoFromSession(request);
             
-            if (where.equals("provider")) {
-                UserProperty drugrefProperty = propDao.getProp(UserProperty.MYDRUGREF_ID);
-                if (drugrefProperty != null || appManager.isK2AUser(loggedInInfo)) {
-                    DSService service =   SpringUtils.getBean(DSService.class);  
-                    service.fetchGuidelinesFromServiceInBackground(loggedInInfo);
-                }
-            }
-
 		    MyOscarUtils.attemptMyOscarAutoLoginIfNotAlreadyLoggedIn(loggedInInfo, true);
             
             List<Integer> facilityIds = providerDao.getFacilityIds(provider.getProviderNo());
