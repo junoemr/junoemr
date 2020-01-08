@@ -390,7 +390,7 @@
 
 			String dem_no = demo.getId().toString();
 			DemographicMerged headRecord = demographicMergedDao.getCurrentHead(demo.getId());
-			String head = "";
+			String head = dem_no;
 			if (headRecord != null)
 			{
 				head = Integer.toString(headRecord.getMergedTo());
