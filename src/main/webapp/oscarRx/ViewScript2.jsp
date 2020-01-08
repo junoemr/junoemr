@@ -397,8 +397,25 @@ function sendFax()
 
 	if (Oscar.Util.Fax.checkPhone(faxNumber))
 	{
+		var useSC = false;
+		var scAddress = false;
+		<% if(vecAddressName != null && !vecAddressName.isEmpty())
+		{
+		%>
+			useSC = true;
+			<%      for(int i=0; i<vecAddressName.size(); i++)
+			{%>
+				if (document.getElementById("addressSel").value == "<%=i%>")
+				{
+					scAddress = "<%=vecAddress.get(i)%>";
+				}
+		<%
+			}
+		}
+		%>
+
 		frames['preview'].document.getElementById('pdfId').value = '<%=signatureRequestId%>';
-		frames['preview'].onPrint2('oscarRxFax');
+		frames['preview'].onPrint2('oscarRxFax', useSC, scAddress);
 		window.onbeforeunload = null;
 	}
 	else
