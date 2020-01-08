@@ -41,6 +41,14 @@ function checkFields() {
 	return verified;
 }
 
+// Check if any patients exist on the page
+// Currently this isn't really a controller, so we don't actually have access to that information.
+// Cheating a bit here and instead checking for the presence of a div that indicates whether we have results or not
+function checkPatientsAvailable()
+{
+	return $(".dataTables_empty").length === 0;
+}
+
 //paint a red border around missing fields
 function paintErrorField( fieldobject ) {
 	fieldobject.css( "border", "medium solid red" );
@@ -326,11 +334,19 @@ $(document).ready( function() {
 	// Export the drilldown query results to csv
 	$(".exportResults").on('click', function()
 	{
-		var indicatorId = (this.id).split("_")[1];
-		var url = ctx
-			+ "/web/dashboard/display/ExportResults.do?indicatorId=" + indicatorId
-			+ "&providerNo=" + providerNo;
-		window.open(url);
+		if (checkPatientsAvailable())
+		{
+			var indicatorId = (this.id).split("_")[1];
+			var url = ctx
+				+ "/web/dashboard/display/ExportResults.do?indicatorId=" + indicatorId
+				+ "&providerNo=" + providerNo;
+			window.open(url);
+		}
+		else
+		{
+			alert("There is no data available to export. " +
+				"Please adjust your filters or use a different drilldown and try again.");
+		}
 	});
 	
 	//--> Execute the tickler assignment - save
@@ -341,4 +357,4 @@ $(document).ready( function() {
 		}
 	});
     
-})
+});

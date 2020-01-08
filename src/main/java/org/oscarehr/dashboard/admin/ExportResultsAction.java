@@ -78,6 +78,10 @@ public class ExportResultsAction extends Action  {
 		{
 			logger.error("Error when attempting to parse " + indicatorId, e);
 		}
+		catch (NullPointerException e)
+		{
+			logger.error("No results associated with the export request.");
+		}
 		finally
 		{
 			if (outputStream != null)

@@ -53,8 +53,11 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 		
 		logger.debug("Executing Export Query");
 	
-		List<?> results = super.execute();		
-		generateCsvContent(results);
+		List<?> results = super.execute();
+		if (results.size() > 0)
+		{
+			generateCsvContent(results);
+		}
 		return results;
 	}
 	
