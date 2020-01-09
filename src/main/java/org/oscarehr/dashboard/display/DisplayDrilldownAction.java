@@ -56,20 +56,26 @@ public class DisplayDrilldownAction extends DispatchAction  {
         }
 		
 		String indicatorTemplateId = request.getParameter("indicatorTemplateId");
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+		if (request.getParameter("providerNo") != null)
+		{
+			providerNo = request.getParameter("providerNo");
+		}
 
 		int id = 0;
 		if( indicatorTemplateId != null && ! indicatorTemplateId.isEmpty() ) {
 			id = Integer.parseInt( indicatorTemplateId );
 		}
 		
-		DrilldownBean drilldown = dashboardManager.getDrilldownData(loggedInInfo, id);
+		DrilldownBean drilldown = dashboardManager.getDrilldownData(loggedInInfo, id, providerNo);
 		
 		// something must be returned. If not then something is very wrong.
 		if ( drilldown == null ) {
 			return mapping.findForward("error");
 		}
 
-		request.setAttribute( "drilldown", drilldown );		
+		request.setAttribute( "drilldown", drilldown );
+		request.setAttribute("providerNo", providerNo);
 		return mapping.findForward("success");
 	}
 	

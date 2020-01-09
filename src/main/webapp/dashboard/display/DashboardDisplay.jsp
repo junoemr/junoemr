@@ -48,7 +48,10 @@
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/library/bootstrap/3.0.0/css/bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/web/css/dashboard.css" />
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/js/jqplot/jquery.jqplot2.min.css" />
-	<script>var ctx = "${pageContext.request.contextPath}"</script>
+	<script>
+		var ctx = "${pageContext.request.contextPath}"
+		var providerNo = "<%=request.getAttribute("providerNo")%>"
+	</script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/js/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/bootstrap/3.0.0/js/bootstrap.min.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/dashboard/display/dashboardDisplayController.js" ></script>
@@ -58,11 +61,9 @@
 </head>
 
 <body>
-
 <div class="container">
 <div class="row" id="dashboardPanel" >
 <div class="col-md-12" >
-
 	<!-- Dashboard Heading -->
 	<div class="row dashboardHeading" >
 		<h2>

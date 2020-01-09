@@ -47,9 +47,15 @@ public class ExportResultsAction extends Action  {
 	private static DashboardManager dashboardManager = SpringUtils.getBean(DashboardManager.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		
+			HttpServletRequest request, HttpServletResponse response)
+	{
+
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+		if (request.getParameter("providerNo") != null)
+		{
+			providerNo = request.getParameter("providerNo");
+		}
 		
 		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", SecurityInfoManager.WRITE, null ) ) {	
 			return mapping.findForward("unauthorized");
@@ -58,7 +64,7 @@ public class ExportResultsAction extends Action  {
 		String indicatorId = request.getParameter("indicatorId");
 		String indicatorName = request.getParameter("indicatorName");		
 		OutputStream outputStream = null;
-		String csvFile = dashboardManager.exportDrilldownQueryResultsToCSV( loggedInInfo, Integer.parseInt( indicatorId ) );
+		String csvFile = dashboardManager.exportDrilldownQueryResultsToCSV( loggedInInfo, Integer.parseInt( indicatorId ), providerNo );
 		
 		if( indicatorName == null || indicatorName.isEmpty() ) {
 			indicatorName = "indicator_data-" + System.currentTimeMillis() + ".csv";

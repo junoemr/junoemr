@@ -55,14 +55,14 @@ public class DashboardBeanFactory {
 	 * Parameters cannot be null or empty. This will work if the Indicator Templates are pre-set into the
 	 * DashboardEntity Object.
 	 */
-	public DashboardBeanFactory( LoggedInInfo loggedInInfo, Dashboard dashboardEntity ) {
+	public DashboardBeanFactory( LoggedInInfo loggedInInfo, Dashboard dashboardEntity) {
 		this( loggedInInfo, dashboardEntity, null);
 	}
 	
 	/**
 	 * Additional IndicatorTemplates parameter incase they are not preset in the Dashboard Entity.
 	 */
-	public DashboardBeanFactory( LoggedInInfo loggedInInfo, Dashboard dashboardEntity, List<IndicatorTemplate> indicatorTemplates ) {
+	public DashboardBeanFactory( LoggedInInfo loggedInInfo, Dashboard dashboardEntity, List<IndicatorTemplate> indicatorTemplates) {
 		
 		logger.info("Building Dashboard: " + dashboardEntity.getName() );
 		
@@ -74,7 +74,7 @@ public class DashboardBeanFactory {
 		
 		setIndicatorTemplates( indicatorTemplates );	
 		setDashboardBean( new DashboardBean() );	
-		setPanelBeans( getDashboardBean(), getIndicatorTemplates() );
+		setPanelBeans( getDashboardBean(), getIndicatorTemplates());
 		getDashboardBean().setLastChecked( new Date( System.currentTimeMillis() ) );
 	}
 	
@@ -112,9 +112,9 @@ public class DashboardBeanFactory {
 	 * The IndicatorPanelBeanFactory returns a sorted list of IndicatorPanelBeans that are set into
 	 * the DashboardBean. 
 	 */
-	private void setPanelBeans( DashboardBean dashboardBean, List<IndicatorTemplate> indicatorTemplates ) {
+	private void setPanelBeans( DashboardBean dashboardBean, List<IndicatorTemplate> indicatorTemplates) {
 		if( indicatorTemplates != null && ! indicatorTemplates.isEmpty()) {
-			PanelBeanFactory panelBeanFactory = new PanelBeanFactory( indicatorTemplates );
+			PanelBeanFactory panelBeanFactory = new PanelBeanFactory( indicatorTemplates);
 			List<PanelBean> panelBeans = panelBeanFactory.getPanelBeans();
 			dashboardBean.setPanelBeans(panelBeans);
 		} else {

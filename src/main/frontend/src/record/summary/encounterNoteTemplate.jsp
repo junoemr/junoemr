@@ -18,9 +18,9 @@
 		 ng-class="{'minimized': ($ctrl.minimized || !$ctrl.allowNoteExpansion())}">
 		<div class="flex-row vertical-align justify-content-between">
 			<div class="flex-row justify-content-evenly note-header-info">
-				<h6>{{$ctrl.note.observationDate | date : $ctrl.displayDateFormat }}
+				<div class="body-extra-small-bold">{{$ctrl.note.observationDate | date : $ctrl.displayDateFormat }}
 					<span class="note-header-title" style="word-break: break-all">{{$ctrl.getNoteHeader()}}</span>
-				</h6>
+				</div>
 			</div>
 			<div class="flex-row justify-content-evenly note-header-buttons">
 				<button class="btn btn-xs btn-warning-static"

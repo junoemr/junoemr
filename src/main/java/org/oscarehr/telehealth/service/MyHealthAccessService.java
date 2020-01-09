@@ -23,15 +23,21 @@
 
 package org.oscarehr.telehealth.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.model.UserIntegrationAccess;
+import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicStatusResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateResponseTo1;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
+import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
+import org.oscarehr.integration.service.IntegrationPushUpdateService;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.MiscUtils;
@@ -39,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -57,6 +64,12 @@ public class MyHealthAccessService
 
 	@Autowired
 	ClinicService clinicService;
+
+	@Autowired
+	AppointmentService appointmentService;
+
+	@Autowired
+	IntegrationPushUpdateService integrationPushUpdateService;
 
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
 	protected static final String MHA_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
@@ -135,5 +148,64 @@ public class MyHealthAccessService
 		integrationData.setLoginToken(loginTokenTo1.getToken());
 
 		return integrationData;
+	}
+
+	public void queueAppointmentCacheUpdate(Appointment appointment)
+	{
+		try
+		{
+			String siteName = (oscarProps.isMultisiteEnabled()) ? appointment.getLocation() : null;
+			addCacheEntry(getCacheTransfer(appointment), siteName);
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("MHA Update Error", e);
+		}
+	}
+	public void queueAppointmentCacheDelete(Appointment appointment)
+	{
+		try
+		{
+			// deleted appointments are treated as canceled when sent to MHA
+			String siteName = (oscarProps.isMultisiteEnabled()) ? appointment.getLocation() : null;
+			AppointmentCacheTo1 transfer = getCacheTransfer(appointment);
+			transfer.setCancelled(true);
+			addCacheEntry(transfer, siteName);
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("MHA Update Error", e);
+		}
+	}
+
+	private void addCacheEntry(AppointmentCacheTo1 transfer, String siteName) throws InvalidIntegrationException, JsonProcessingException
+	{
+		Integration integration = integrationService.findMhaIntegration(siteName);
+
+		if (integration == null)
+		{
+			String noIntegrationError = InvalidIntegrationException.NO_INTEGRATION_MHA;
+
+			if (!StringUtils.isNullOrEmpty(siteName))
+			{
+				noIntegrationError = String.format("%s for %s", noIntegrationError, siteName);
+			}
+
+			throw new InvalidIntegrationException(noIntegrationError);
+		}
+
+		integrationPushUpdateService.queueAppointmentCacheUpdate(integration, transfer);
+	}
+
+	private AppointmentCacheTo1 getCacheTransfer(Appointment appointment)
+	{
+		AppointmentCacheTo1 transfer = new AppointmentCacheTo1();
+		transfer.setId(String.valueOf(appointment.getId()));
+		transfer.setCancelled(appointment.getAppointmentStatus().equals(Appointment.CANCELLED));
+		transfer.setVirtual(appointment.getIsVirtual());
+		transfer.setStartDateTime(ConversionUtils.toZonedDateTime(appointment.getStartTimeAsFullDate()));
+		transfer.setEndDateTime(ConversionUtils.toZonedDateTime(appointment.getEndTimeAsFullDate()));
+
+		return transfer;
 	}
 }

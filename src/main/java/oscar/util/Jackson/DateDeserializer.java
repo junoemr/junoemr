@@ -23,9 +23,9 @@
 package oscar.util.Jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import oscar.util.ConversionUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -36,24 +36,29 @@ import java.util.Date;
 public class DateDeserializer extends StdDeserializer<Date>
 {
 	private SimpleDateFormat formatter =
-					new SimpleDateFormat("yyyy-MM-dd");
+					new SimpleDateFormat(ConversionUtils.DEFAULT_DATE_PATTERN);
 
-	public DateDeserializer() {
+	public DateDeserializer()
+	{
 		this(null);
 	}
 
-	public DateDeserializer(Class<?> vc) {
+	public DateDeserializer(Class<?> vc)
+	{
 		super(vc);
 	}
 
 	@Override
 	public Date deserialize(JsonParser jsonparser, DeserializationContext context)
-					throws IOException, JsonProcessingException
+					throws IOException
 	{
 		String date = jsonparser.getText();
-		try {
+		try
+		{
 			return formatter.parse(date);
-		} catch (ParseException e) {
+		}
+		catch(ParseException e)
+		{
 			throw new RuntimeException(e);
 		}
 	}

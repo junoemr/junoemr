@@ -1049,7 +1049,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                       } else  if (!handler.getOBXResultStatus(j, k).equals("TDIS") && !handler.getMsgType().equals("EPSILON")) {
                                           	%><tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>"><%
                                        		if(isUnstructuredDoc){
-                                                if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+                                                if (isPDF || handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
                                                 {
                                                     String obxDocId = "";
                                                     java.util.regex.Matcher docIdMatcher = Pattern.compile("embedded_doc_id_(\\d+)").matcher(handler.getOBXResult(j, k));
@@ -1058,12 +1058,31 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                         obxDocId = docIdMatcher.group(1);
                                                     }
 
-                                                    %>
+                                                    // Regex parsing doesn't seem to be working for some Excelleris labs
+                                                    // Use same method as on labDisplay.jsp (get document number from DB)
+                                                    if (isPDF)
+                                                    {
+                                                        int docId = documentLinks.get(j).getDocumentNo();
+                                                        %>
+                                                            <tr>
+                                                                <td valign="top" align="middle" class="NarrativeRes">
+                                                                    <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../dms/ManageDocument.do?method=display&doc_no=<%=docId%>');">Display PDF</a>
+                                                                </td>
+                                                            </tr>
+                                                        <%
+                                                    }
+                                                    else
+                                                    {
+
+                                                        %>
+
+
                                                         <tr>
                                                             <td valign="top" align="left" class="NarrativeRes"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName%></a>
                                                             <td class="NarrativeRes"> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display PDF</a> </td>
                                                         </tr>
                                                     <%
+                                                    }
                                                 }
                                                 else
                                                 {
@@ -1082,7 +1101,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                         rtfParser.read(rtfStream, doc, 0);
                                                         String rtfText = doc.getText(0, doc.getLength()).replaceAll("\n", "<br>");
                                                         String disclaimer = "<br>IMPORTANT DISCLAIMER: You are viewing a PREVIEW of the original report. The rich text formatting contained in the original report may convey critical information that must be considered for clinical decision making. Please refer to the ORIGINAL report, by clicking 'Print', prior to making any decision on diagnosis or treatment.";%>
-                                                        <td align="left"><%= rtfText + disclaimer %></td><%} %><%
+                                                        <td align="left"><%= rtfText + disclaimer %></td><%}
                                                     else{%>
                                                         <td align="left"><%= handler.getOBXResult( j, k) %></td><%} %>
                                                     <%if(handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, Math.max(k-1, 0))) && (obxCount>1)){
@@ -1092,7 +1111,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                    			}//end of isUnstructuredDoc
 
                                    			else{//if it isn't a PATHL7 doc
-                                                if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+                                                 if (isPDF || handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
                                                 {
                                                     String obxDocId = "";
                                                     java.util.regex.Matcher docIdMatcher = java.util.regex.Pattern.compile("embedded_doc_id_(\\d+)").matcher(handler.getOBXResult(j, k));
@@ -1101,11 +1120,29 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                         obxDocId = docIdMatcher.group(1);
                                                     }
 
+                                                    // Regex parsing doesn't seem to be working for some Excelleris labs
+                                                    // Use same method as on labDisplay.jsp (get document number from DB)
+                                                    if (isPDF)
+                                                    {
+                                                        int docId = documentLinks.get(j).getDocumentNo();
+
                                                     %>
-                                                    <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%=  java.net.URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a>
-                                                    <td> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display PDF</a> </td>
-                                                    </tr>
+                                                        <tr>
+                                                            <td valign="top" align="middle" class="NarrativeRes">
+                                                                <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../dms/ManageDocument.do?method=display&doc_no=<%=docId%>');">Display PDF</a>
+                                                            </td>
+                                                        </tr>
                                                     <%
+                                                    }
+                                                    else
+                                                    {
+                                                    %>
+                                                        <tr>
+                                                            <td valign="top" align="left" class="NarrativeRes"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName%></a>
+                                                            <td class="NarrativeRes"> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display PDF</a> </td>
+                                                        </tr>
+                                                    <%
+                                                    }
                                                 }
                                                 else
                                                 {
