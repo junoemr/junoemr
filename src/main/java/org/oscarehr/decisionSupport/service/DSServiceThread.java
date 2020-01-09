@@ -37,7 +37,9 @@ import org.oscarehr.util.MiscUtils;
 
 /**
  * @author apavel
+ * Don't use this, relies on periodically requesting guidelines from know2act.org
  */
+@Deprecated
 public class DSServiceThread extends Thread {
 	private static final Logger logger = MiscUtils.getLogger();
 

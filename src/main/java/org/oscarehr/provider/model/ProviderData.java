@@ -110,14 +110,19 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
     private String supervisor;
     @Column(name = "super_admin")
 	private boolean superAdmin = false;
-    
-    /* -- Province specific -- */
+
+
+	/* -- Province specific -- */
+	/* AB */
 	@Column(name = "alberta_tak_no")
 	private String albertaTakNo = null;
 	@Column(name = "alberta_e_delivery_ids")
 	private String albertaEDeliveryIds = null;
 	@Column(name = "alberta_connect_care_id")
 	private String albertaConnectCareId;
+	/* ON */
+	@Column(name = "ontario_lifelabs_id")
+	private String ontarioLifeLabsId;
 
 	public ProviderData() {
 	}
@@ -344,6 +349,16 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 
 	public void setSupervisor(String supervisor) {
 		this.supervisor = supervisor;
+	}
+
+	public String getOntarioLifeLabsId()
+	{
+		return ontarioLifeLabsId;
+	}
+
+	public void setOntarioLifeLabsId(String ontarioLifeLabsId)
+	{
+		this.ontarioLifeLabsId = ontarioLifeLabsId;
 	}
 
 	public boolean equals(Object object) {

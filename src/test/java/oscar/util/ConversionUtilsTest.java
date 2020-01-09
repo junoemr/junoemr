@@ -33,6 +33,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1007,6 +1009,24 @@ public class ConversionUtilsTest
 		expectedTime.set(Calendar.DAY_OF_MONTH, 30);
 		Date fixedDate = expectedTime.getTime();
 		assertThat(expectedLocalDate, is(ConversionUtils.toZonedLocalDate(fixedDate)));
+	}
+
+	@Test
+	public void toZonedDateTime_FixedDate_ExpectZonedDateTime()
+	{
+		LocalDateTime expectedDateTime = LocalDateTime.of(2019, 4, 30, 12, 30, 45);
+		ZonedDateTime expectedZonedDateTime = ZonedDateTime.of(expectedDateTime, ZoneId.of("America/Vancouver"));
+		Calendar expectedTime = new GregorianCalendar();
+		expectedTime.set(Calendar.YEAR, 2019);
+		expectedTime.set(Calendar.MONTH, Calendar.APRIL);
+		expectedTime.set(Calendar.DAY_OF_MONTH, 30);
+		expectedTime.set(Calendar.HOUR_OF_DAY, 12);
+		expectedTime.set(Calendar.MINUTE, 30);
+		expectedTime.set(Calendar.SECOND, 45);
+		expectedTime.set(Calendar.MILLISECOND, 0);
+		expectedTime.setTimeZone(TimeZone.getTimeZone(ZoneId.of("America/Vancouver")));
+		Date fixedDate = expectedTime.getTime();
+		assertThat(expectedZonedDateTime, is(ConversionUtils.toZonedDateTime(fixedDate)));
 	}
 
 	@Test

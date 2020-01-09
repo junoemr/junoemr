@@ -187,6 +187,7 @@ public class AppointmentTest
 				false,
 				false,
 				false,
+				false,
 				null
 			)
 		));
@@ -298,6 +299,7 @@ public class AppointmentTest
 						null,
 						false,
 						true,
+						false,
 						false,
 						null
 				)
@@ -417,6 +419,7 @@ public class AppointmentTest
 				false,
 				false,
 				false,
+				false,
 				null
 			)
 		));
@@ -531,6 +534,7 @@ public class AppointmentTest
 				null,
 				null,
 				null,
+				false,
 				false,
 				false,
 				false,

@@ -20,46 +20,34 @@
  * Victoria, British Columbia
  * Canada
  */
-package oscar.util.Jackson;
+package org.oscarehr.integration.dao;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import oscar.util.ConversionUtils;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.integration.model.IntegrationPushAppointmentUpdate;
+import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import javax.persistence.Query;
+import java.util.List;
 
-// Deserialize dates in format yyyy-MM-dd without time zone.
-public class DateDeserializer extends StdDeserializer<Date>
+@Repository
+public class IntegrationPushAppointmentUpdateDao extends AbstractDao<IntegrationPushAppointmentUpdate>
 {
-	private SimpleDateFormat formatter =
-					new SimpleDateFormat(ConversionUtils.DEFAULT_DATE_PATTERN);
-
-	public DateDeserializer()
+	protected IntegrationPushAppointmentUpdateDao()
 	{
-		this(null);
+		super(IntegrationPushAppointmentUpdate.class);
 	}
 
-	public DateDeserializer(Class<?> vc)
+	public List<IntegrationPushAppointmentUpdate> findUnsent(String integrationType)
 	{
-		super(vc);
-	}
+		Query query = entityManager.createQuery(
+				"SELECT x FROM IntegrationPushAppointmentUpdate x " +
+						"WHERE x.status <> :status " +
+						"AND x.integrationType = :integrationType " +
+						"ORDER BY x.createdAt, x.id");
 
-	@Override
-	public Date deserialize(JsonParser jsonparser, DeserializationContext context)
-					throws IOException
-	{
-		String date = jsonparser.getText();
-		try
-		{
-			return formatter.parse(date);
-		}
-		catch(ParseException e)
-		{
-			throw new RuntimeException(e);
-		}
+		query.setParameter("status", IntegrationPushAppointmentUpdate.PUSH_STATUS.SENT);
+		query.setParameter("integrationType", integrationType);
+
+		return query.getResultList();
 	}
 }

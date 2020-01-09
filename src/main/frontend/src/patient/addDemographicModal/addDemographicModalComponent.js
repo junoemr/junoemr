@@ -85,40 +85,31 @@ angular.module('Patient').component('addDemographicModal', {
 			}
 		);
 
-		// Pull default province, priority is user defined property then system-wide default HC if no property set
-		ctrl.systemPreferenceApi.getPreferenceValue("HC_Type", "").then(
-			function success(results)
-			{
-				if (results.data.body !== "")
-				{
-					ctrl.newDemographicData.address.province = results.data.body;
-				}
-				else
-				{
-					ctrl.systemPreferenceApi.getPropertyValue("hctype", "BC").then(
-						function success(results)
-						{
-							ctrl.newDemographicData.address.province = results.data.body;
-						},
-						function error(errors)
-						{
-							console.log("errors::" + errors);
-						}
-					)
-				}
-			},
-			function error(errors)
-			{
-				console.log("errors::" + errors);
-			}
-		);
 		// set defaults based on provider settings
 		providerService.getSettings().then(
 				function success(result)
 				{
-					console.log(result);
-					ctrl.newDemographicData.hcType = result.defaultHcType;
 					ctrl.newDemographicData.sex = result.defaultSex;
+
+					// If the user doesn't have a HC type pre-set, pull from system-wide setting
+					if (result.defaultHcType === "")
+					{
+						ctrl.systemPreferenceApi.getPropertyValue("hctype", "BC").then(
+							function success(results)
+							{
+								ctrl.newDemographicData.address.province = results.data.body;
+							},
+							function error(errors)
+							{
+								console.log("Failed to fetch system properties with error:" + errors);
+							}
+						)
+					}
+					else
+					{
+						ctrl.newDemographicData.hcType = result.defaultHcType;
+						ctrl.newDemographicData.address.province = result.defaultHcType;
+					}
 				},
 				function error(errors)
 				{

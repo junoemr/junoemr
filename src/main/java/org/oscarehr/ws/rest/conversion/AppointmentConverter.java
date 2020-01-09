@@ -119,6 +119,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		appointment.setStatus(status);
 		appointment.setResources(t.getResources());
 		appointment.setUrgency(t.getUrgency());
+		appointment.setIsVirtual(t.isVirtual());
 		appointment.setType(t.getType());
 
 		if(t.isDoNotBook())

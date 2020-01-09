@@ -20,66 +20,42 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.schedulingTasks;
+package org.oscarehr.integration.schedulingTasks;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.fax.FaxStatus;
-import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.integration.service.IntegrationPushUpdateService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Component;
-import oscar.util.ConversionUtils;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.TimeZone;
 
 @Component
-public class OutboundFaxSchedulingTask
+public class IntegrationPushUpdateSchedulingTask
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final String cronSchedule = "0 */5 * * * *";
-	private static CronSequenceGenerator cronTrigger;
 
 	@Autowired
-	private OutgoingFaxService outgoingFaxService;
-
-	@Autowired
-	private FaxStatus faxStatus;
+	private IntegrationPushUpdateService integrationPushUpdateService;
 
 	@PostConstruct
 	public void init()
 	{
-		cronTrigger = new CronSequenceGenerator(cronSchedule, TimeZone.getDefault());
-		logger.info("Fax integration outbound scheduling task initialized.");
+		logger.info("Integration update scheduling task initialized.");
 	}
 
 	@Scheduled(cron = cronSchedule)
-	public void sendOutboundFaxes()
+	public void scheduledPushIntegrationUpdates()
 	{
 		try
 		{
-			outgoingFaxService.sendQueuedFaxes();
-		}
-		catch(IllegalStateException e)
-		{
-			logger.warn(e.getMessage());
+			integrationPushUpdateService.sendQueuedUpdates();
 		}
 		catch(Exception e)
 		{
 			logger.error("Unexpected scheduling task error", e);
 		}
-	}
-
-	public LocalDateTime getNextRunTime()
-	{
-		if(faxStatus.canSendFaxes())
-		{
-			return ConversionUtils.toLocalDateTime(cronTrigger.next(new Date()));
-		}
-		return null;
 	}
 }

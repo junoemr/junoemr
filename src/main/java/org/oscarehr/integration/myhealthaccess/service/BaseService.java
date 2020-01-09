@@ -23,6 +23,7 @@
 
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.oscarehr.integration.myhealthaccess.dto.BaseErrorTo1;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
 import org.oscarehr.util.MiscUtils;
@@ -116,6 +117,39 @@ public class BaseService extends org.oscarehr.integration.BaseService
 								   Class<T> responseClass, Class<U> errorClass)
 	{
 		return executeRequest(endPoint, apiKey, method, null, responseClass, errorClass);
+	}
+
+	/*
+	 * Helper Methods
+	 */
+	protected String formatEndpoint(String endpoint, Object... args)
+	{
+		return concatEndpointStrings(BASE_END_POINT, String.format(endpoint, args));
+	}
+
+	protected <S, T> T get(String endPoint, String apiKey, Class<T> responseClass)
+	{
+		return executeRequest(endPoint, apiKey, HttpMethod.GET, null, responseClass, BaseErrorTo1.class);
+	}
+
+	protected <S, T> T getWithToken(String endPoint, String apiKey, S body, Class<T> responseClass, String token)
+	{
+		return executeRequestWithToken(endPoint, apiKey, HttpMethod.GET, token, body, responseClass, BaseErrorTo1.class);
+	}
+
+	protected <S, T> T post(String endPoint, String apiKey, S body, Class<T> responseClass)
+	{
+		return executeRequest(endPoint, apiKey, HttpMethod.POST, body, responseClass, BaseErrorTo1.class);
+	}
+
+	protected <S, T> T put(String endPoint, String apiKey, S body, Class<T> responseClass)
+	{
+		return executeRequest(endPoint, apiKey, HttpMethod.PUT, body, responseClass, BaseErrorTo1.class);
+	}
+
+	protected <S, T> T postWithToken(String endPoint, String apiKey, S body, Class<T> responseClass, String token)
+	{
+		return executeRequestWithToken(endPoint, apiKey, HttpMethod.POST, token, body, responseClass, BaseErrorTo1.class);
 	}
 
 	private void IgnoreSSLVerifyInDevMode()

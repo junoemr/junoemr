@@ -12,10 +12,13 @@
 	}
 	/* align icon */
 	&.left-addon {
+
 		.icon {
 			left: 0;
 		}
 		input {
+			border-bottom-right-radius: 4px !important;
+			border-top-right-radius: 4px !important;
 			padding-left: 30px;
 		}
 	}
@@ -24,6 +27,8 @@
 			right: 0;
 		}
 		input {
+			border-bottom-left-radius: 4px !important;
+			border-top-left-radius: 4px !important;
 			padding-right: 30px;
 		}
 	}
