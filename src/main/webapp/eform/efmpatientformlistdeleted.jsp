@@ -34,6 +34,9 @@ if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.
 %>
 
 <%@ page import="java.util.*, oscar.eform.*"%>
+<%@ page import="org.oscarehr.eform.service.EFormTemplateService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 
 <%
@@ -46,6 +49,12 @@ else if (orderByRequest.equals("form_name")) orderBy = EFormUtil.NAME;
 
 String appointment = request.getParameter("appointment");
 String parentAjaxId = request.getParameter("parentAjaxId");
+
+
+EFormTemplateService eFormTemplateService = (EFormTemplateService) SpringUtils.getBean(EFormTemplateService.class);
+Integer eformPopupWidth = eFormTemplateService.getEformPopupWidth(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
+Integer eformPopupHeight = eFormTemplateService.getEformPopupHeight(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
+
 %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -65,7 +74,7 @@ String parentAjaxId = request.getParameter("parentAjaxId");
 <script type="text/javascript" language="javascript">
 function popupPage(varpage, windowname) {
     var page = "" + varpage;
-    windowprops = "height=700,width=800,location=no,"
+    windowprops = "height=<%=eformPopupHeight%>,width=<%=eformPopupWidth%>,location=no,"
     + "scrollbars=yes,menubars=no,status=yes,toolbars=no,resizable=yes,top=10,left=200";
     var popup = window.open(page, windowname, windowprops);
     if (popup != null) {

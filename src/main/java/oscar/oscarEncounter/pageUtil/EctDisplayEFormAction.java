@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.util.MessageResources;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.eform.service.EFormTemplateService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -51,11 +52,15 @@ public class EctDisplayEFormAction extends EctDisplayAction {
     private String cmd = "eforms";
 
     private static EFormDataDao eFormDataDao = SpringUtils.getBean(EFormDataDao.class);
+    private static EFormTemplateService eFormTemplateService = SpringUtils.getBean(EFormTemplateService.class);
     
   public boolean getInfo(EctSessionBean bean, HttpServletRequest request, NavBarDisplayDAO Dao, MessageResources messages) {                                                                                                  
 	try
 	{
 		String roleName = (String)request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
+
+		Integer eformPopupWidth = eFormTemplateService.getEformPopupWidth(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
+		Integer eformPopupHeight = eFormTemplateService.getEformPopupHeight(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
 		
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "r", null)) {
 			 return true; //eforms link won't show up on new CME screen.
@@ -90,7 +95,7 @@ public class EctDisplayEFormAction extends EctDisplayAction {
 				HashMap<String, ? extends Object> curform = eForms.get(i);
 				winName = (String) curform.get("formName") + bean.demographicNo;
 				hash = Math.abs(winName.hashCode());
-				url = "popupPage(700,800,'" + hash + "','" + request.getContextPath() + "/eform/efmformadd_data.jsp?fid=" + curform.get("fid") + "&demographic_no=" + bean.demographicNo + "&appointment=" + bean.appointmentNo + "&parentAjaxId=" + cmd + "','" + curform.get("fid") + "_" + bean.demographicNo + "');";
+				url = "popupPage(" + eformPopupHeight.toString() + "," + eformPopupWidth.toString() + ",'" + hash + "','" + request.getContextPath() + "/eform/efmformadd_data.jsp?fid=" + curform.get("fid") + "&demographic_no=" + bean.demographicNo + "&appointment=" + bean.appointmentNo + "&parentAjaxId=" + cmd + "','" + curform.get("fid") + "_" + bean.demographicNo + "');";
 				logger.debug("SETTING EFORM URL " + url);
 				key = StringUtils.maxLenString((String) curform.get("formName"), MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + " (new)";
 				key = StringEscapeUtils.escapeJavaScript(key);
@@ -125,7 +130,7 @@ public class EctDisplayEFormAction extends EctDisplayAction {
 	            NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 	            winName = eFormData.getFormName() + bean.demographicNo;
 	            hash = Math.abs(winName.hashCode());
-	            url = "popupPage( 700, 800, '" + hash + "', '" + request.getContextPath() + "/eform/efmshowform_data.jsp?fdid="+eFormData.getId()+"&appointment="+bean.appointmentNo+"&parentAjaxId="+cmd+"');";
+	            url = "popupPage( " + eformPopupHeight.toString() + "," + eformPopupWidth.toString() + ", '" + hash + "', '" + request.getContextPath() + "/eform/efmshowform_data.jsp?fdid="+eFormData.getId()+"&appointment="+bean.appointmentNo+"&parentAjaxId="+cmd+"');";
 	            String formattedDate = DateUtils.formatDate(eFormData.getFormDate(),request.getLocale());
 	            key = StringUtils.maxLenString(eFormData.getFormName(), MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + "(" + formattedDate + ")";
 	            item.setLinkTitle(eFormData.getSubject());

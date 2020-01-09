@@ -26,13 +26,24 @@
 
  */
 angular.module("Common.Services").service("formService", [
-	'$http', '$q', 'junoHttp',
-	function($http, $q, junoHttp)
+	'$http', '$q', 'junoHttp', 'providerService',
+	function($http, $q, junoHttp, providerService)
 	{
 		var service = {};
 
 		service.apiPath = '../ws/rs/forms';
-		service.popupOptions = 'height=700,width=1200,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no';
+		service.popupOptions = 'left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no';
+		// load users preferred form popup size
+		providerService.getSettings().then(
+				function success(results)
+				{
+					service.popupOptions = "height=" + results.eformPopupHeight + ",width=" + results.eformPopupWidth + "," + service.popupOptions
+				},
+				function error(results)
+				{
+					console.error("Failed to load provider settings with error: " + results);
+				}
+		);
 
 		service.getAllFormsByHeading = function getAllFormsByHeading(demographicNo, heading)
 		{

@@ -135,6 +135,8 @@ public class ProviderSettings
 	private boolean encounterWindowMaximize;
 
 	private String favoriteFormGroup = "";
+	private Integer eformPopupWidth = 700;
+	private Integer eformPopupHeight = 800;
 
 	private boolean disableCommentOnAck;
 	private boolean defaultPmm;
@@ -1084,5 +1086,25 @@ public class ProviderSettings
 	public void setAppointmentCountIncludeNoDemographic(boolean appointmentCountIncludeNoDemographic)
 	{
 		this.appointmentCountIncludeNoDemographic = appointmentCountIncludeNoDemographic;
+	}
+
+	public Integer getEformPopupWidth()
+	{
+		return eformPopupWidth;
+	}
+
+	public void setEformPopupWidth(Integer eformPopupWidth)
+	{
+		this.eformPopupWidth = eformPopupWidth;
+	}
+
+	public Integer getEformPopupHeight()
+	{
+		return eformPopupHeight;
+	}
+
+	public void setEformPopupHeight(Integer eformPopupHeight)
+	{
+		this.eformPopupHeight = eformPopupHeight;
 	}
 }
