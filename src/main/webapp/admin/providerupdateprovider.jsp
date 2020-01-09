@@ -403,6 +403,16 @@ for (int i=0; i<sites.size(); i++) {
 			value="<%= provider.getAlbertaTakNo()==null ? "" : provider.getAlbertaTakNo() %>" maxlength="20"></td>
 		</tr>
 		<%} %>
+		<% if (OscarProperties.getInstance().isOntarioInstanceType()) { %>
+		<tr>
+			<td align="right">
+				<bean:message key="admin.provider.fromOntarioLifeLabsId" />:
+			</td>
+			<td>
+				<input type="text" name="ontario_lifelabs_id" maxlength="128" value="<%= provider.getOntarioLifeLabsId()==null ? "" : provider.getOntarioLifeLabsId()%>">
+			</td>
+		</tr>
+		<% } %>
 		<%
 			// We are using the albertaEDeliveryId column to store IHA provider mnemonics on BC instances.
 			if (OscarProperties.getInstance().getProperty("instance_type").equals("BC")) {

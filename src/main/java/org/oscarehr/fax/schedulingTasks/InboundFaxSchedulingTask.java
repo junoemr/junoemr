@@ -54,6 +54,7 @@ public class InboundFaxSchedulingTask
 	public void init()
 	{
 		cronTrigger = new CronSequenceGenerator(cronSchedule, TimeZone.getDefault());
+		logger.info("Fax integration inbound scheduling task initialized.");
 	}
 
 	@Scheduled(cron = cronSchedule)

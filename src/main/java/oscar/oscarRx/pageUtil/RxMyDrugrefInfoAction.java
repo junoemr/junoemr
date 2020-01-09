@@ -132,14 +132,7 @@ public final class RxMyDrugrefInfoAction extends DispatchAction {
 				dsPrefs = dsmessageDao.getHashofMessages(provider, UserDSMessagePrefs.MYDRUGREF);
 
 			}
-			UserProperty prop = propDAO.getProp(provider, UserProperty.MYDRUGREF_ID);
 			//get from system first
-			String myDrugrefId = OscarProperties.getInstance().getProperty("mydrugref_id");
-
-			//override with user pref
-			if (prop != null && prop.getValue().length() > 0) {
-				myDrugrefId = prop.getValue();
-			}
 
 			RxSessionBean bean = (RxSessionBean) request.getSession().getAttribute("RxSessionBean");
 			if (bean == null) {
@@ -160,8 +153,6 @@ public final class RxMyDrugrefInfoAction extends DispatchAction {
 				}
 				codes.addAll(d.getAllergyClasses(vec));
 			}
-			//String[] str = new String[]{"warnings_byATC","bulletins_byATC","interactions_byATC"};
-			String[] str = new String[]{"atcfetch/getWarnings", "atcfetch/getBulletins", "atcfetch/getInteractions"};   //NEW more efficent way of sending multiple requests at the same time.
 			MessageResources mr = getResources(request);
 			Locale locale = getLocale(request);
 
@@ -175,20 +166,6 @@ public final class RxMyDrugrefInfoAction extends DispatchAction {
 			log2.debug("Interaction, local + remote drug atc codes : " + codes);
 
 			Vector all = new Vector();
-			for (String command : str) {
-				try {
-					Vector v = getMyDrugrefInfo(loggedInInfo, command, codes, provider, myDrugrefId);
-
-					if (v != null && v.size() > 0) {
-						all.addAll(v);
-					}
-
-				}
-				catch (Exception e) {
-					log2.debug("command :" + command + " " + e.getMessage());
-					MiscUtils.getLogger().error("Error", e);
-				}
-			}
 
 			if (OscarProperties.getInstance().isPropertyActive("RX_INTERACTION_LOCAL_DRUGREF_REGIONAL_IDENTIFIER")) {
 				List regionalIdentifiers = bean.getRegionalIdentifier();
