@@ -69,18 +69,21 @@ public class ExportResultsAction extends Action  {
 		{
 			int indicator = Integer.parseInt(indicatorId);
 			csvFile = dashboardManager.exportDrilldownQueryResultsToCSV(loggedInInfo, indicator, providerNo);
-			response.setContentType("text/csv");
-			response.setHeader("Content-Disposition","attachment;filename=" + csvFile.getName());
-			outputStream = response.getOutputStream();
-			csvFile.writeToOutputStream(outputStream);
+			if (csvFile != null)
+			{
+				response.setContentType("text/csv");
+				response.setHeader("Content-Disposition","attachment;filename=" + csvFile.getName());
+				outputStream = response.getOutputStream();
+				csvFile.writeToOutputStream(outputStream);
+			}
+			else
+			{
+				logger.error("No results associated with the export request.");
+			}
 		}
 		catch (NumberFormatException e)
 		{
 			logger.error("Error when attempting to parse " + indicatorId, e);
-		}
-		catch (NullPointerException e)
-		{
-			logger.error("No results associated with the export request.");
 		}
 		finally
 		{
