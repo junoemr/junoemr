@@ -108,9 +108,8 @@
 					class="list-group-item">
 						<div ng-click="$ctrl.goToRecord(patient)"
 							class="list-group-clickable">
-							<h4>{{patient.name}}</h4>
+							<div class="patient-name-aside">{{patient.name}}</div>
 						</div>
-
 					</a>
 
 				</div>
@@ -118,20 +117,15 @@
 					ng-if="$ctrl.isAppointmentPatientView()">
 					<a ng-repeat="patient in $ctrl.activeAppointmentList | filter:query"
 					class="list-group-item">
-						<div class="flex-row vertical-align justify-content-between">
-							<div class="col-md-5 list-group-clickable"
-								ng-click="$ctrl.goToRecord(patient)">
-								<h4>{{patient.name}}</h4>
-								<span>{{patient.startTime}} {{patient.reason}}</span>
-							</div>
-							<div class="col-md-1">
+						<div class="flex-row vertical-align justify-content-between appt-aside-container">
+							<div class="container-telehealth">
 								<button class="btn btn-icon"
-									ng-if="$ctrl.telehealthEnabled && patient.isVirtual">
+								ng-if="$ctrl.telehealthEnabled && patient.isVirtual">
 									<i class="icon icon-video onclick-event-telehealth"
 									ng-click="$ctrl.openTelehealthLink(patient)"></i>
 								</button>
 							</div>
-							<div class="col-md-6">
+							<div class="col-md-3">
 								<juno-appointment-status-select
 								ca-name="aside-appt-status-{{patient.appointmentNo}}"
 								ca-no-label="true"
@@ -140,6 +134,19 @@
 								ca-change="$ctrl.updateAppointmentStatus(patient)"
 								>
 								</juno-appointment-status-select>
+							</div>
+							<div class="col-md-9">
+								<div class="flex-row patient-name-aside">
+									<div class="col-md-12" ng-click="$ctrl.goToRecord(patient)">
+										{{patient.name}}
+									</div>
+								</div>
+								<div class="flex-row appt-aside-row">
+									<div class="col-md-4">{{patient.startTime}}</div>
+									<div class="col-md-8 appt-reason-overflow">
+										{{patient.reason}}
+									</div>
+								</div>
 							</div>
 						</div>
 					</a>
