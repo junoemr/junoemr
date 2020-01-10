@@ -125,7 +125,11 @@
 									ng-click="$ctrl.openTelehealthLink(patient)"></i>
 								</button>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-6" ng-click="$ctrl.goToRecord(patient)">
+								<h6>{{patient.name}}</h6>
+								<span>{{patient.startTime}} {{patient.reason}}</span>
+							</div>
+							<div class="col-md-6">
 								<juno-appointment-status-select
 								ca-name="aside-appt-status-{{patient.appointmentNo}}"
 								ca-no-label="true"
@@ -134,19 +138,6 @@
 								ca-change="$ctrl.updateAppointmentStatus(patient)"
 								>
 								</juno-appointment-status-select>
-							</div>
-							<div class="col-md-9">
-								<div class="flex-row patient-name-aside">
-									<div class="col-md-12" ng-click="$ctrl.goToRecord(patient)">
-										{{patient.name}}
-									</div>
-								</div>
-								<div class="flex-row appt-aside-row">
-									<div class="col-md-4">{{patient.startTime}}</div>
-									<div class="col-md-8 appt-reason-overflow">
-										{{patient.reason}}
-									</div>
-								</div>
 							</div>
 						</div>
 					</a>
