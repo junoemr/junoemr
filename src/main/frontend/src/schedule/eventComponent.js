@@ -373,22 +373,25 @@ angular.module('Schedule').component('eventComponent', {
 
 										if (controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
 										{
-											// set default site selection
-											if (controller.siteOptions[0])
-											{
-												$scope.eventData.site = controller.siteOptions[0].value;
-											}
-											else
-											{// no sites available
-												let noSitesSite = {
-													label: 	"No Sites Available",
-													value: 	"No Sites Available",
-													uuid: 	null,
-													color: 	null,
-												};
-												controller.siteOptions = [noSitesSite];
-												$scope.eventData.site =  "No Sites Available";
-											}
+											// get site for the provider being booked on to.
+											sitesApi.getProviderSiteBySchedule(controller.providerModel.providerNo, $scope.eventData.startDate).then(
+													function success(result)
+													{// assign to schedule site that we are booking in to.
+														let site = controller.siteOptions.find(el => el.uuid === result.data.body.siteId);
+														if (site)
+														{
+															$scope.eventData.site = site.value;
+														}
+														else
+														{
+															controller.assignDefaultSite();
+														}
+													},
+													function error(result)
+													{
+														controller.assignDefaultSite();
+													}
+											);
 										}
 									},
 									function error(result)
@@ -408,6 +411,29 @@ angular.module('Schedule').component('eventComponent', {
 			//=========================================================================
 			// Private methods
 			//=========================================================================/
+
+			//assign a default site
+			controller.assignDefaultSite = function()
+			{
+				// set default site selection
+				if (controller.siteOptions[0])
+				{
+					$scope.eventData.site = controller.siteOptions[0].value;
+				}
+				else if (controller.siteOptions.length === 0)
+				{// no sites available
+					let noSitesSite = {
+						label: 	"No Sites Available",
+						value: 	"No Sites Available",
+						uuid: 	null,
+						color: 	null,
+					};
+					controller.siteOptions = [noSitesSite];
+					$scope.eventData.site =  "No Sites Available";
+				}
+			};
+
+
 			controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 			{
 				var eventStatusCode = $scope.defaultEventStatus;
