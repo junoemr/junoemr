@@ -30,7 +30,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.oscarehr.billing.CA.AB.dao.AlbertaFacilityDao;
+import org.oscarehr.billing.CA.AB.dao.AlbertaFunctionalCenterDao;
 import org.oscarehr.billing.CA.AB.dao.AlbertaSkillCodeDao;
+import org.oscarehr.billing.CA.AB.model.AlbertaFunctionalCenter;
 import org.oscarehr.billing.CA.AB.model.AlbertaSkillCode;
 import org.oscarehr.managers.BillingManager;
 import org.oscarehr.ws.rest.conversion.ServiceTypeConverter;
@@ -39,6 +41,7 @@ import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.model.ServiceTypeTo;
 import org.oscarehr.ws.rest.transfer.AlbertaFacilityTo1;
+import org.oscarehr.ws.rest.transfer.AlbertaFunctionalCenterTo1;
 import org.oscarehr.ws.rest.transfer.AlbertaSkillCodeTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -57,6 +60,9 @@ public class BillingService extends AbstractServiceImpl {
 
 	@Autowired
 	AlbertaFacilityDao albertaFacilityDao;
+
+	@Autowired
+	AlbertaFunctionalCenterDao albertaFunctionalCenterDao;
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
 	
@@ -114,5 +120,13 @@ public class BillingService extends AbstractServiceImpl {
 	public RestResponse<List<AlbertaFacilityTo1>> getAlbertaActiveFacilities()
 	{
 		return RestResponse.successResponse(AlbertaFacilityTo1.fromList(albertaFacilityDao.getAllActiveFacilities()));
+	}
+
+	@GET
+	@Path("/alberta/functional_centers")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<AlbertaFunctionalCenterTo1>> getAlbertaFunctionalCenters()
+	{
+		return RestResponse.successResponse(AlbertaFunctionalCenterTo1.fromList(albertaFunctionalCenterDao.getAllFunctionalCenters()));
 	}
 }

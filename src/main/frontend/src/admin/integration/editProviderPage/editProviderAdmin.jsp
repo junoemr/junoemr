@@ -290,6 +290,38 @@
 						>
 						</ca-field-text>
 
+						<!-- Facility Number -->
+						<juno-typeahead
+										title="Facility Number"
+										name="albertaFacilityNumber"
+										model="$ctrl.provider.facilityNumber"
+										options="$ctrl.albertaFacilityOptions"
+										placeholder="Search..."
+										typeahead-min-length="3"
+						>
+						</juno-typeahead>
+
+						<!-- Functional Centers -->
+						<juno-typeahead
+										title="Functional"
+										name="albertaFunctionalCenter"
+										model="$ctrl.provider.functionalCenter"
+										options="$ctrl.albertaFunctionalCenterOptions"
+										placeholder="Search..."
+						>
+						</juno-typeahead>
+
+						<!-- Default Time / Role  Modifier -->
+						<juno-typeahead
+										title="Default Time / Role Modifier"
+										name="albertaRoleModifier"
+										model="$ctrl.provider.roleModifier"
+										options="$ctrl.albertaDefaultTimeRoleOptions"
+										placeholder="Search..."
+										typeahead-min-length="0"
+						>
+						</juno-typeahead>
+
 					</div>
 
 					<!-- common billing options -->

@@ -109,6 +109,45 @@ angular.module("Common.Services").service("billingService", [
 			return deferred.promise;
 		};
 
+		service.getAlbertaFacilities = function ()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/alberta/facilities',
+					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+					function success(results)
+					{
+						deferred.resolve(results);
+					},
+					function error(errors)
+					{
+						console.error("Failed to fetch alberta facilities with error: " + errors);
+						deferred.reject("Failed to fetch alberta facilities codes with error: " + errors);
+					});
+
+			return deferred.promise;
+		};
+
+		service.getAlbertaFunctionalCenters = function ()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/alberta/functional_centers',
+					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+					function success(results)
+					{
+						deferred.resolve(results);
+					},
+					function error(errors)
+					{
+						console.error("Failed to fetch alberta functional centers with error: " + errors);
+						deferred.reject("Failed to fetch alberta functional centers codes with error: " + errors);
+					});
+
+			return deferred.promise;
+		};
+
+
 		return service;
 	}
 ]);

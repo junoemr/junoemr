@@ -81,6 +81,15 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			}
 		];
 
+		// options for the AB facilities field
+		ctrl.albertaFacilityOptions = [];
+
+		// options for the AB functional centers field
+		ctrl.albertaFunctionalCenterOptions = [];
+
+		// options for the AB default time/role modifier field
+		ctrl.albertaDefaultTimeRoleOptions = staticDataService.getAlbertaTimeRoleModifier();
+
 		ctrl.provider = {
 			// User Info
 			firstName: null,
@@ -129,8 +138,8 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			skillCode: null,
 			locationCode: null,
 			BANumber: null,
-			FacilityNumber: null,
-			functional: null,
+			facilityNumber: null,
+			functionalCenter: null,
 			roleModifier: null,
 
 			// Common Billing
@@ -226,6 +235,48 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 						console.log(result);
 					}
 			);
+
+			billingService.getAlbertaFacilities().then(
+					function success(result)
+					{
+						ctrl.albertaFacilityOptions = [];
+						for (let facility of result.data.body)
+						{
+							ctrl.albertaFacilityOptions.push(
+									{
+										label: facility.description + "(" + facility.code + ")",
+										value: facility.code
+									}
+							);
+						}
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch alberta facilities with error: " + result);
+					}
+			);
+
+
+			billingService.getAlbertaFunctionalCenters().then(
+					function success(result)
+					{
+						ctrl.albertaFunctionalCenterOptions = [];
+						for (let functionalCenter of result.data.body)
+						{
+							ctrl.albertaFunctionalCenterOptions.push(
+									{
+										label: functionalCenter.description + "(" + functionalCenter.code + ")",
+										value: functionalCenter.code
+									}
+							);
+						}
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch alberta functional centers list with error: " + result);
+					}
+			)
+
 		};
 
 		ctrl.addUserRole = function(roleId)

@@ -92,6 +92,78 @@ angular.module("Common.Services").service("staticDataService", [
 			return regions;
 		};
 
+		service.getAlbertaTimeRoleModifier = function ()
+		{
+			let modifiers = [];
+			modifiers.push(
+					{
+						value: "ANE",
+						label: "Anaesthetist"
+					}
+			);
+			modifiers.push(
+					{
+						value: "ANEST",
+						label: "Anaesthetist TRC"
+					}
+			);
+			modifiers.push(
+					{
+						value: "2ANES",
+						label: "Anaesthetist TRC2"
+					}
+			);
+			modifiers.push(
+					{
+						value: "SA",
+						label: "Surgical Assistant"
+					}
+			);
+			modifiers.push(
+					{
+						value: "SAQS",
+						label: "Surgical Assistant (Second) "
+					}
+			);
+			modifiers.push(
+					{
+						value: "SOSS",
+						label: "Second Oral Surgeon"
+					}
+			);
+			modifiers.push(
+					{
+						value: "SSOS",
+						label: "Second Orthopedic Surgeon "
+					}
+			);
+			modifiers.push(
+					{
+						value: "SSPS",
+						label: "Second Podiatric Surgeon"
+					}
+			);
+			modifiers.push(
+					{
+						value: "MSRGN",
+						label: "Second Neurosurgeon"
+					}
+			);
+			modifiers.push(
+					{
+						value: "MSRGP",
+						label: "Second Plastic Surgeon "
+					}
+			);
+			modifiers.push(
+					{
+						value: "MSURG2",
+						label: "Second Microsurgery"
+					}
+			);
+			return modifiers;
+		};
+
 		service.getProviderTypes = function ()
 		{
 			var types = [];
