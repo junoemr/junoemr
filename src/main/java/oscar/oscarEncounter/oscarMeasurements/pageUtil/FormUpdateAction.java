@@ -212,15 +212,14 @@ public class FormUpdateAction extends Action {
 		{
 			addNote(demographic_no, providerNo, prog_no, note, apptNoInt, request);
 		}
-		
-		if (request.getParameter("submit").equals("Add") || request.getParameter("submit").equals("Save") || request.getParameter("submit").equals("Save All"))
+
+		String submit = request.getParameter("submit");
+		if (submit == null || "Add".equals(submit) || "Save".equals(submit) || "Save All".equals(submit))
 		{
 			return mapping.findForward("reload");
 		}
-		else
-		{
-			return mapping.findForward("success");
-		}
+
+		return mapping.findForward("success");
 	}
 	
 	public void addNote(String demographic_no, String providerNo, String prog_no, String note, int apptNoInt, HttpServletRequest request){
