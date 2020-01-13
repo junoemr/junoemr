@@ -164,6 +164,139 @@ angular.module("Common.Services").service("staticDataService", [
 			return modifiers;
 		};
 
+		service.getSaskatchewanBillingModes =  function()
+		{
+			let billingModes = [];
+			billingModes.push({
+				label: "Physicians (1)",
+				value: 1
+			});
+			billingModes.push({
+				label: "Optometrists (6)",
+				value: 6
+			});
+			billingModes.push({
+				label: "Chiropractors (8)",
+				value: 8
+			});
+			billingModes.push({
+				label: "Alternate Payment Method (9)",
+				value: 9
+			});
+			billingModes.push({
+				label: "Global (0)",
+				value: 0
+			});
+			return billingModes;
+		};
+
+		service.getSaskatchewanLocationCodes = function ()
+		{
+			let locationCodes = [];
+			locationCodes.push({
+				label: "Office (1)",
+				value: "1"
+			});
+			locationCodes.push({
+				label: "In Patient (2)",
+				value: "2"
+			});
+			locationCodes.push({
+				label: "Out Patient (3)",
+				value: "3"
+			});
+			locationCodes.push({
+				label: "Home (4)",
+				value: "4"
+			});
+			locationCodes.push({
+				label: "Other (5)",
+				value: "5"
+			});
+			locationCodes.push({
+				label: "ER (9)",
+				value: "9"
+			});
+			locationCodes.push({
+				label: "10% Premium Office (F)",
+				value: "F"
+			});
+			locationCodes.push({
+				label: "50% Premium In Patient (B)",
+				value: "B"
+			});
+			locationCodes.push({
+				label: "50% Premium Out Patient (C)",
+				value: "C"
+			});
+			locationCodes.push({
+				label: "50% Premium Home (D)",
+				value: "D"
+			});
+			locationCodes.push({
+				label: "50% Premium Other (E)",
+				value: "E"
+			});
+			locationCodes.push({
+				label: "100% Premium In Patient (K)",
+				value: "K"
+			});
+			locationCodes.push({
+				label: "100% Premium Out Patient (M)",
+				value: "M"
+			});
+			locationCodes.push({
+				label: "100% Premium Home (P)",
+				value: "P"
+			});
+			locationCodes.push({
+				label: "100% Premium Other (T)",
+				value: "T"
+			});
+			return locationCodes;
+		};
+
+		service.getSaskatchewanSubmissionTypes = function()
+		{
+			let submissionTypes = [];
+			submissionTypes.push({
+				label: "Regular Submission (8)",
+				value: "8"
+			});
+			submissionTypes.push({
+				label: "Requesting EMR transaction fee(E)",
+				value: "E"
+			});
+			return submissionTypes;
+		};
+
+		service.getSaskatchewanCorporationIndicators = function()
+		{
+			let corporationIndicators = [];
+			corporationIndicators.push({
+				label: "Practitioner Billing",
+				value: "Practitioner Billing"
+			});
+			corporationIndicators.push({
+				label: "Physician Corporation 1",
+				value: "Physician Corporation 1"
+			});
+			corporationIndicators.push({
+				label: "Physician Corporation 2",
+				value: "Physician Corporation 2"
+			});
+			corporationIndicators.push({
+				label: "Physician Corporation 3",
+				value: "Physician Corporation 3"
+			});
+			corporationIndicators.push({
+				label: "Physician Corporation 4",
+				value: "Physician Corporation 4"
+			});
+
+			return corporationIndicators;
+		};
+
 		service.getProviderTypes = function ()
 		{
 			var types = [];

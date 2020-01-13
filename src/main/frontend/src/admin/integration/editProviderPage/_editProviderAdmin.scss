@@ -24,6 +24,15 @@
 		}
 	}
 
+	.edit-provider-banner {
+		background-color: $color-neutral-light-grey;
+		padding: $padding-lg;
+
+		.edit-button {
+			min-width: 60px;
+		}
+	}
+
 	.edit-provider-fields {
 		panel {
 			margin-bottom: $margin-lg;
@@ -38,5 +47,15 @@
 	.juno-typeahead {
 		padding-bottom: 4px;
 		padding-top: 4px;
+	}
+
+	.field-error {
+		input {
+			border-color: $color-red-base;
+		}
+	}
+
+	.error-message {
+		color: $color-red-base;
 	}
 }

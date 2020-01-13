@@ -33,6 +33,6 @@
 					typeahead-select-on-exact="true"
 					typeahead-min-length="$ctrl.typeaheadMinLength"
 					ng-keypress="$ctrl.onKeyPress($event)"
-					placeholder="{{$ctrl.placeholder}}"
+					placeholder="Search..."
 					ng-disabled="$ctrl.enabled === undefined ? false : !$ctrl.enabled">
 </div>

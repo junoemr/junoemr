@@ -41,7 +41,6 @@ angular.module('Common.Components').component('junoTypeahead',
 		ctrl.$onInit = function()
 		{
 			ctrl.typeaheadMinLength = ctrl.typeaheadMinLength ? ctrl.typeaheadMinLength : 1;
-			console.log(ctrl.typeaheadMinLength);
 		};
 
 		ctrl.onKeyPress = function (event)

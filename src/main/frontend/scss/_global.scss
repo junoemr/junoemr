@@ -32,6 +32,10 @@ body {
 	}
 }
 
+.body-normal {
+	@include juno-font-body;
+}
+
 .body-bold {
 	@include juno-font-body;
 	font-weight: bold;
@@ -74,6 +78,9 @@ body {
 }
 .justify-content-center {
 	justify-content: center;
+}
+.justify-content-end {
+	justify-content: end;
 }
 .justify-content-evenly {
 	justify-content: space-evenly;
@@ -122,10 +129,6 @@ body {
 		margin-right: $margin-xl;
 	}
 
-	.lg-margin-right {
-		margin-right: $margin-lg;
-	}
-
 	.md-margin-right {
 		margin-right: $margin-md;
 	}
@@ -138,8 +141,24 @@ body {
 		margin-left: $margin-xl;
 	}
 
+	.lg-margin {
+		margin: $margin-lg;
+	}
+
 	.lg-margin-left {
 		margin-left: $margin-lg;
+	}
+
+	.lg-margin-right {
+		margin-right: $margin-lg;
+	}
+
+	.lg-margin-top {
+		margin-top: $margin-lg;
+	}
+
+	.lg-margin-bottom {
+		margin-bottom: $margin-lg;
 	}
 
 	.md-margin-left {
@@ -164,6 +183,10 @@ body {
 
 	.lg-padding-right {
 		padding-right: $padding-lg;
+	}
+
+	.lg-padding-bottom {
+		padding-bottom: $padding-lg;
 	}
 
 	.md-padding-left {

@@ -21,6 +21,12 @@
 * Canada
 --%>
 <div id="edit-provider-admin">
+	<div class="col-sm-12 flex-row align-items-first-baseline lg-margin-top lg-margin-bottom" ng-if="$ctrl.mode === $ctrl.modes.VIEW">
+		<div class="col-sm-12 no-padding edit-provider-banner flex-row align-items-first-baseline body-bold">
+			<h4 class="col-sm-12">Read Only</h4>
+			<button class="btn btn-primary edit-button"> Edit </button>
+		</div>
+	</div>
 	<div class="edit-provider-fields">
 		<div class="col-sm-6">
 			<!-- User Information -->
@@ -30,25 +36,29 @@
 				</panel-header>
 				<panel-body>
 					<!-- Last Name -->
-					<ca-field-text
-									ca-name="lastName"
-									ca-title="Last Name"
-									ca-model="$ctrl.provider.lastName"
-									ca-rows="1"
-									ca-text-placeholder="Last Name"
-									ca-required-field="true"
-					>
-					</ca-field-text>
+					<div ng-class="{'field-error': !$ctrl.providerValidations.lastName()}">
+						<ca-field-text
+										ca-name="lastName"
+										ca-title="Last Name"
+										ca-model="$ctrl.provider.lastName"
+										ca-rows="1"
+										ca-text-placeholder="Last Name"
+										ca-required-field="true"
+						>
+						</ca-field-text>
+					</div>
 					<!-- First Name -->
-					<ca-field-text
-									ca-name="firstName"
-									ca-title="First Name"
-									ca-model="$ctrl.provider.firstName"
-									ca-rows="1"
-									ca-text-placeholder="First Name"
-									ca-required-field="true"
-					>
-					</ca-field-text>
+					<div ng-class="{'field-error': !$ctrl.providerValidations.firstName()}">
+						<ca-field-text
+										ca-name="firstName"
+										ca-title="First Name"
+										ca-model="$ctrl.provider.firstName"
+										ca-rows="1"
+										ca-text-placeholder="First Name"
+										ca-required-field="true"
+						>
+						</ca-field-text>
+					</div>
 					<!-- Type -->
 					<ca-field-select
 									class="juno-modal no-padding"
@@ -101,6 +111,42 @@
 					</ca-field-date>
 				</panel-body>
 			</panel>
+
+			<!-- Site Assignment -->
+			<panel id="edit-provider-site-assignment">
+				<panel-header>
+					<h6>Site Assignment</h6>
+				</panel-header>
+				<panel-body>
+					<div class="flex-row flex-wrap">
+						<juno-typeahead
+										name="siteSelection"
+										class="flex-grow lg-margin-right"
+										model="$ctrl.currentSiteSelection"
+										options="$ctrl.siteOptions"
+										placeholder="Assign sites to provider"
+										on-enter-key="$ctrl.addSiteAssignment($ctrl.currentSiteSelection.value)"
+						>
+						</juno-typeahead>
+						<button class="btn btn-primary lg-padding-left lg-padding-right add-role-button" title="Add role" ng-click="$ctrl.addSiteAssignment($ctrl.currentSiteSelection.value)">Add</button>
+					</div>
+					<div class="user-role-list col-sm-12 md-margin-top">
+						<label class="body-smallest md-padding-bottom">Sites</label>
+						<ul class="no-padding">
+							<li ng-repeat="siteId in $ctrl.provider.siteAssignments" class="group-list-item">
+								<div class="flex-row align-items-center body-small-bold">
+									{{$ctrl.getSiteName(siteId)}}
+									<div class="flex-grow text-right">
+										<i class="icon icon-delete hand-hover" title="Remove role" ng-click="$ctrl.removeSiteAssignment(siteId)"></i>
+									</div>
+								</div>
+								<hr>
+							</li>
+						</ul>
+					</div>
+				</panel-body>
+			</panel>
+
 			<!-- Access Roles -->
 			<panel id="edit-provider-access-roles">
 				<panel-header>
@@ -135,6 +181,171 @@
 					</div>
 				</panel-body>
 			</panel>
+
+			<!-- Contact Information -->
+			<panel id="edit-provider-contact-information">
+				<panel-header>
+					<h6>Contact Information</h6>
+				</panel-header>
+				<panel-body>
+					<!-- Address -->
+					<ca-field-text
+									ca-name="address"
+									ca-title="Address"
+									ca-model="$ctrl.provider.address"
+									ca-rows="1"
+									ca-text-placeholder="31 Bastion Square"
+					>
+					</ca-field-text>
+					<!-- Home phone -->
+					<ca-field-text
+									ca-name="homePhone"
+									ca-title="Home Phone"
+									ca-model="$ctrl.provider.homePhone"
+									ca-rows="1"
+					>
+					</ca-field-text>
+					<!-- Work phone -->
+					<ca-field-text
+									ca-name="workPhone"
+									ca-title="Work Phone"
+									ca-model="$ctrl.provider.workPhone"
+									ca-rows="1"
+					>
+					</ca-field-text>
+					<!-- Cell phone -->
+					<ca-field-text
+									ca-name="cellPhone"
+									ca-title="Cell Phone"
+									ca-model="$ctrl.provider.cellPhone"
+									ca-rows="1"
+					>
+					</ca-field-text>
+					<!-- Other phone -->
+					<ca-field-text
+									ca-name="otherPhone"
+									ca-title="Other Phone"
+									ca-model="$ctrl.provider.otherPhone"
+									ca-rows="1"
+					>
+					</ca-field-text>
+					<!-- Fax -->
+					<ca-field-text
+									ca-name="fax"
+									ca-title="Fax"
+									ca-model="$ctrl.provider.fax"
+									ca-rows="1"
+					>
+					</ca-field-text>
+					<!-- Email -->
+					<ca-field-text
+									ca-name="contactEmail"
+									ca-title="Contact Email"
+									ca-model="$ctrl.provider.contactEmail"
+									ca-rows="1"
+					>
+					</ca-field-text>
+					<!-- pager -->
+					<ca-field-text
+									ca-name="pager"
+									ca-title="Pager"
+									ca-model="$ctrl.provider.pager"
+									ca-rows="1"
+					>
+					</ca-field-text>
+				</panel-body>
+			</panel>
+		</div>
+		<div class="col-sm-6">
+			<!-- Login Information -->
+			<panel id="edit-provider-login-information">
+				<panel-header>
+					<h6>Login Information</h6>
+				</panel-header>
+				<panel-body>
+					<div class="edit-provider-or-group">
+						<!-- Email -->
+						<ca-field-text
+										ca-name="email"
+										ca-title="Email"
+										ca-model="$ctrl.provider.email"
+										ca-rows="1"
+										ca-text-placeholder="Email"
+						>
+						</ca-field-text>
+						<!-- User Name -->
+						<ca-field-text
+										ca-name="username"
+										ca-title="User Name"
+										ca-model="$ctrl.provider.userName"
+										ca-rows="1"
+										ca-text-placeholder="User Name"
+						>
+						</ca-field-text>
+					</div>
+					<!-- Password -->
+					<div ng-class="{'field-error': !$ctrl.providerValidations.password()}">
+						<ca-field-text
+										ca-name="password"
+										ca-title="Password"
+										ca-model="$ctrl.provider.password"
+										ca-rows="1"
+										ca-text-placeholder="Password"
+										ca-hide-input="true"
+										ca-required-field="true"
+						>
+						</ca-field-text>
+					</div>
+					<!-- Confirm Password -->
+					<div ng-class="{'field-error': !$ctrl.providerValidations.passwordVerify()}">
+						<ca-field-text
+										ca-name="confirm_password"
+										ca-title="Confirm Password"
+										ca-model="$ctrl.provider.passwordVerify"
+										ca-rows="1"
+										ca-text-placeholder="Retype Password"
+										ca-hide-input="true"
+										ca-required-field="true"
+						>
+						</ca-field-text>
+						<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.passwordVerify() && $ctrl.providerValidations.password()">
+							Passwords do not match.
+						</div>
+					</div>
+					<!-- Second Level Passcode -->
+					<div ng-class="{'field-error': !$ctrl.providerValidations.secondLevelPasscode()}">
+						<ca-field-text
+										ca-name="passcode"
+										ca-title="Second Level Passcode"
+										ca-model="$ctrl.provider.secondLevelPasscode"
+										ca-rows="1"
+										ca-text-placeholder="Passcode"
+										ca-hide-input="true"
+										ca-required-field="true"
+						>
+						</ca-field-text>
+					</div>
+					<!-- Confirm Second Level Passcode -->
+					<div ng-class="{'field-error': !$ctrl.providerValidations.secondLevelPasscodeVerify()}">
+						<ca-field-text
+										ca-name="confirm_passcode"
+										ca-title="Retype Second Level Passcode"
+										ca-model="$ctrl.provider.secondLevelPasscodeVerify"
+										ca-rows="1"
+										ca-text-placeholder="Retype Passcode"
+										ca-hide-input="true"
+										ca-required-field="true"
+						>
+						</ca-field-text>
+						<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.secondLevelPasscodeVerify() && $ctrl.providerValidations.secondLevelPasscode()">
+							Passcodes do not match.
+						</div>
+					</div>
+
+
+				</panel-body>
+			</panel>
+
 			<!-- Billing -->
 			<panel id="edit-provider-billing-information">
 				<panel-header>
@@ -254,7 +465,7 @@
 										class="col-sm-2 no-padding no-float"
 										ca-name="sourceCode"
 										ca-title="Source Code"
-										ca-model="$ctrl.provider.sourceCode"
+										ca-model="$ctrl.provider.abSourceCode"
 										ca-rows="1"
 										ca-text-length="2"
 						>
@@ -264,7 +475,7 @@
 						<juno-typeahead
 										title="Skill Code"
 										name="albertaSkillCode"
-										model="$ctrl.provider.skillCode"
+										model="$ctrl.provider.abSkillCode"
 										options="$ctrl.skillCodeOptions"
 										placeholder="Provider Skill Code"
 						>
@@ -274,7 +485,7 @@
 						<juno-typeahead
 										title="Location Code"
 										name="locationCode"
-										model="$ctrl.provider.locationCode"
+										model="$ctrl.provider.abLocationCode"
 										options="$ctrl.locationCodeOptions"
 										placeholder="Location Code"
 						>
@@ -285,7 +496,7 @@
 										class="col-sm-2 no-padding no-float"
 										ca-name="BANumber"
 										ca-title="BA Number"
-										ca-model="$ctrl.provider.BANumber"
+										ca-model="$ctrl.provider.abBANumber"
 										ca-rows="1"
 						>
 						</ca-field-text>
@@ -294,7 +505,7 @@
 						<juno-typeahead
 										title="Facility Number"
 										name="albertaFacilityNumber"
-										model="$ctrl.provider.facilityNumber"
+										model="$ctrl.provider.abFacilityNumber"
 										options="$ctrl.albertaFacilityOptions"
 										placeholder="Search..."
 										typeahead-min-length="3"
@@ -305,7 +516,7 @@
 						<juno-typeahead
 										title="Functional"
 										name="albertaFunctionalCenter"
-										model="$ctrl.provider.functionalCenter"
+										model="$ctrl.provider.abFunctionalCenter"
 										options="$ctrl.albertaFunctionalCenterOptions"
 										placeholder="Search..."
 						>
@@ -315,12 +526,76 @@
 						<juno-typeahead
 										title="Default Time / Role Modifier"
 										name="albertaRoleModifier"
-										model="$ctrl.provider.roleModifier"
+										model="$ctrl.provider.abRoleModifier"
 										options="$ctrl.albertaDefaultTimeRoleOptions"
 										placeholder="Search..."
 										typeahead-min-length="0"
 						>
 						</juno-typeahead>
+
+					</div>
+
+					<div ng-if="$ctrl.billingRegion.value === 'SK'">
+						<!-- OHIP number -->
+						<ca-field-text
+										ca-name="billingNoSK"
+										ca-title="Billing Number"
+										ca-model="$ctrl.provider.ohipNo"
+										ca-rows="1"
+						>
+						</ca-field-text>
+
+						<!-- Billing Mode -->
+						<ca-field-select
+										class="juno-modal no-padding"
+										ca-template="label"
+										ca-name="SKBillingMode"
+										ca-title="Mode"
+										ca-model="$ctrl.provider.skMode"
+										ca-options="$ctrl.saskatchewanBillingModeOptions"
+										ca-text-placeholder="Select Billing Mode"
+										ca-empty-option="true"
+						>
+						</ca-field-select>
+
+						<!-- Location Code -->
+						<ca-field-select
+										class="juno-modal no-padding"
+										ca-template="label"
+										ca-name="SKLocationCode"
+										ca-title="Location"
+										ca-model="$ctrl.provider.skLocationCode"
+										ca-options="$ctrl.saskatchewanLocationCodeOptions"
+										ca-text-placeholder="Select Location Code"
+										ca-empty-option="true"
+						>
+						</ca-field-select>
+
+						<!-- Submission Type -->
+						<ca-field-select
+										class="juno-modal no-padding"
+										ca-template="label"
+										ca-name="SKSubmissionType"
+										ca-title="Submission Type"
+										ca-model="$ctrl.provider.skSubmissionType"
+										ca-options="$ctrl.saskatchewanSubmissionTypeOptions"
+										ca-text-placeholder="Select Submission Type"
+										ca-empty-option="true"
+						>
+						</ca-field-select>
+
+						<!-- Corporation Indicators -->
+						<ca-field-select
+										class="juno-modal no-padding"
+										ca-template="label"
+										ca-name="SKCorporationIndicator"
+										ca-title="Corporation Indicator"
+										ca-model="$ctrl.provider.skCorporationIndicator"
+										ca-options="$ctrl.saskatchewanCorporationIndicatorOptions"
+										ca-text-placeholder="Select Corporation Indicator"
+										ca-empty-option="true"
+						>
+						</ca-field-select>
 
 					</div>
 
@@ -348,155 +623,69 @@
 
 				</panel-body>
 			</panel>
-		</div>
-		<div class="col-sm-6">
-			<!-- Login Information -->
-			<panel id="edit-provider-login-information">
+
+			<panel id="edit-provider-3rd-party-identifiers">
 				<panel-header>
-					<h6>Login Information</h6>
+					3rd Party Identifiers
 				</panel-header>
 				<panel-body>
-					<div class="edit-provider-or-group">
-						<!-- Email -->
+					<!-- 3rd Party Identifiers -->
+					<div ng-if="$ctrl.billingRegion.value === 'BC'">
 						<ca-field-text
-										ca-name="email"
-										ca-title="Email"
-										ca-model="$ctrl.provider.email"
+										ca-name="ihaProviderMnemonic"
+										ca-title="IHA Provider Mnemonic"
+										ca-model="$ctrl.provider.ihaProviderMnemonic"
 										ca-rows="1"
-										ca-text-placeholder="Email"
-						>
-						</ca-field-text>
-						<!-- User Name -->
-						<ca-field-text
-										ca-name="username"
-										ca-title="User Name"
-										ca-model="$ctrl.provider.userName"
-										ca-rows="1"
-										ca-text-placeholder="User Name"
 						>
 						</ca-field-text>
 					</div>
-					<!-- Password -->
-					<ca-field-text
-									ca-name="password"
-									ca-title="Password"
-									ca-model="$ctrl.provider.password"
-									ca-rows="1"
-									ca-text-placeholder="Password"
-									ca-hide-input="true"
-									ca-required-field="true"
-					>
-					</ca-field-text>
-					<!-- Confirm Password -->
-					<ca-field-text
-									ca-name="confirm_password"
-									ca-title="Confirm Password"
-									ca-model="$ctrl.provider.passwordVerify"
-									ca-rows="1"
-									ca-text-placeholder="Retype Password"
-									ca-hide-input="true"
-									ca-required-field="true"
-					>
-					</ca-field-text>
-					<!-- Second Level Passcode -->
-					<ca-field-text
-									ca-name="passcode"
-									ca-title="Second Level Passcode"
-									ca-model="$ctrl.provider.secondLevelPasscode"
-									ca-rows="1"
-									ca-text-placeholder="Passcode"
-									ca-hide-input="true"
-									ca-required-field="true"
-					>
-					</ca-field-text>
-					<!-- Confirm Second Level Passcode -->
-					<ca-field-text
-									ca-name="confirm_passcode"
-									ca-title="Retype Second Level Passcode"
-									ca-model="$ctrl.provider.secondLevelPasscodeVerify"
-									ca-rows="1"
-									ca-text-placeholder="Retype Passcode"
-									ca-hide-input="true"
-									ca-required-field="true"
-					>
-					</ca-field-text>
+					<div ng-if="$ctrl.billingRegion.value === 'ON'">
+						<ca-field-text
+										ca-name="cpsid"
+										ca-title="CPSID"
+										ca-model="$ctrl.provider.cpsid"
+										ca-rows="1"
+						>
+						</ca-field-text>
+						<ca-field-text
+										ca-name="lifeLabsClientId"
+										ca-title="Life Labs Client Id"
+										ca-model="$ctrl.provider.lifeLabsClientId"
+										ca-rows="1"
+						>
+						</ca-field-text>
+					</div>
 
+					<div ng-if="$ctrl.billingRegion.value === 'AB'">
+						<ca-field-text
+										ca-name="eDeliveryIds"
+										ca-title="E-Delivery Ids"
+										ca-model="$ctrl.provider.connectCareProviderId"
+										ca-rows="1"
+						>
+						</ca-field-text>
+						<ca-field-text
+										ca-name="TAKNumber"
+										ca-title="TAK #"
+										ca-model="$ctrl.provider.takNumber"
+										ca-rows="1"
+						>
+						</ca-field-text>
+						<ca-field-text
+										ca-name="connectCareId"
+										ca-title="Connect Care Provider Id"
+										ca-model="$ctrl.provider.eDeliveryIds"
+										ca-rows="1"
+						>
+						</ca-field-text>
+					</div>
 
-				</panel-body>
-			</panel>
-			<!-- Contact Information -->
-			<panel id="edit-provider-contact-information">
-				<panel-header>
-					<h6>Contact Information</h6>
-				</panel-header>
-				<panel-body>
-					<!-- Address -->
-					<ca-field-text
-									ca-name="address"
-									ca-title="Address"
-									ca-model="$ctrl.provider.address"
-									ca-rows="1"
-									ca-text-placeholder="31 Bastion Square"
-					>
-					</ca-field-text>
-					<!-- Home phone -->
-					<ca-field-text
-									ca-name="homePhone"
-									ca-title="Home Phone"
-									ca-model="$ctrl.provider.homePhone"
-									ca-rows="1"
-					>
-					</ca-field-text>
-					<!-- Work phone -->
-					<ca-field-text
-									ca-name="workPhone"
-									ca-title="Work Phone"
-									ca-model="$ctrl.provider.workPhone"
-									ca-rows="1"
-					>
-					</ca-field-text>
-					<!-- Cell phone -->
-					<ca-field-text
-									ca-name="cellPhone"
-									ca-title="Cell Phone"
-									ca-model="$ctrl.provider.cellPhone"
-									ca-rows="1"
-					>
-					</ca-field-text>
-					<!-- Other phone -->
-					<ca-field-text
-									ca-name="otherPhone"
-									ca-title="Other Phone"
-									ca-model="$ctrl.provider.otherPhone"
-									ca-rows="1"
-					>
-					</ca-field-text>
-					<!-- Fax -->
-					<ca-field-text
-									ca-name="fax"
-									ca-title="Fax"
-									ca-model="$ctrl.provider.fax"
-									ca-rows="1"
-					>
-					</ca-field-text>
-					<!-- Email -->
-					<ca-field-text
-									ca-name="contactEmail"
-									ca-title="Contact Email"
-									ca-model="$ctrl.provider.contactEmail"
-									ca-rows="1"
-					>
-					</ca-field-text>
-					<!-- pager -->
-					<ca-field-text
-									ca-name="pager"
-									ca-title="Pager"
-									ca-model="$ctrl.provider.pager"
-									ca-rows="1"
-					>
-					</ca-field-text>
 				</panel-body>
 			</panel>
 		</div>
+	</div>
+	<div class="col-sm-12 flex-row justify-content-end lg-margin">
+		<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.ADD" ng-click="$ctrl.submit()"><span class="body-normal">Add User</span></button>
+		<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.EDIT"><span class="body-normal">Update User</span></button>
 	</div>
 </div>

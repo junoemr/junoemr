@@ -22,6 +22,7 @@
  */
 import {EDIT_PROVIDER_MODE} from "./editProviderAdminConstants";
 import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi";
+import {SitesApi} from "../../../../generated";
 
 
 angular.module('Admin.Integration').component('editProviderAdmin',
@@ -49,8 +50,8 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 	{
 		let ctrl = this;
 
-		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
-				'../ws/rs');
+		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
+		let sitesApi =  new SitesApi($http, $httpParamSerializer, '../ws/rs');
 
 		ctrl.modes = EDIT_PROVIDER_MODE;
 		ctrl.mode = $stateParams.mode;
@@ -60,6 +61,9 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.roleOptions = [];
 		ctrl.currentRoleSelection = null;
+
+		ctrl.siteOptions = [];
+		ctrl.currentSiteSelection = null;
 
 		// billingRegion. determines what controls display
 		ctrl.billingRegionSelectEnabled = false;
@@ -89,6 +93,18 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		// options for the AB default time/role modifier field
 		ctrl.albertaDefaultTimeRoleOptions = staticDataService.getAlbertaTimeRoleModifier();
+
+		// options for the SK mode billing field
+		ctrl.saskatchewanBillingModeOptions = staticDataService.getSaskatchewanBillingModes();
+
+		// options for the SK location field
+		ctrl.saskatchewanLocationCodeOptions = staticDataService.getSaskatchewanLocationCodes();
+
+		// options for the SK submission type field
+		ctrl.saskatchewanSubmissionTypeOptions = staticDataService.getSaskatchewanSubmissionTypes();
+
+		// options for the SK Corporation Indicator field
+		ctrl.saskatchewanCorporationIndicatorOptions = staticDataService.getSaskatchewanCorporationIndicators();
 
 		ctrl.provider = {
 			// User Info
@@ -121,6 +137,9 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			// Access Roles
 			userRoles: [],
 
+			// site assignment
+			siteAssignments: [],
+
 			// BC Billing
 			billingNo: null,
 			ruralRetentionCode: null,
@@ -133,20 +152,55 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			serviceLocationIndicator: null,
 
 			// AB Billing
-			clinic: null,
-			sourceCode: "ab",
-			skillCode: null,
-			locationCode: null,
-			BANumber: null,
-			facilityNumber: null,
-			functionalCenter: null,
-			roleModifier: null,
+			abClinic: null,
+			abSourceCode: "ab",
+			abSkillCode: null,
+			abLocationCode: null,
+			abBANumber: null,
+			abFacilityNumber: null,
+			abFunctionalCenter: null,
+			abRoleModifier: null,
+
+			// SK Billing
+			skMode: null,
+			skLocationCode: null,
+			skSubmissionType: null,
+			skCorporationIndicator: null,
 
 			// Common Billing
 			ohipNo: null,
 			thirdPartyBillingNo: null,
 			alternateBillingNo: null,
 
+			//3rd Party Identifiers
+			cpsid: null,
+			ihaProviderMnemonic: null,
+			connectCareProviderId: null,
+			takNumber: null,
+			lifeLabsClientIds: null,
+			eDeliveryIds: null
+		};
+
+		// provider field validations built using, Expressive Validations TM.
+		ctrl.providerValidations = {
+			// User Info
+			firstName: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'firstName'),
+			lastName: Juno.Common.Util.validationFieldRequired(ctrl.provider,'lastName'),
+			type: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'type'),
+
+			// Login Info
+			email: Juno.Common.Util.validationFieldNop(),
+			userName: Juno.Common.Util.validationFieldNop(),
+			password: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'password'),
+			passwordVerify: Juno.Common.Util.validationFieldsEqual(
+					ctrl.provider,'password',
+					ctrl.provider, 'passwordVerify',
+					Juno.Common.Util.validationFieldRequired(ctrl.provider, 'passwordVerify')),
+			secondLevelPasscode: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'secondLevelPasscode'),
+			secondLevelPasscodeVerify: Juno.Common.Util.validationFieldsEqual(
+					ctrl.provider, "secondLevelPasscode",
+					ctrl.provider, "secondLevelPasscodeVerify",
+					Juno.Common.Util.validationFieldRequired(ctrl.provider, 'secondLevelPasscodeVerify')),
 		};
 
 		ctrl.$onInit = function()
@@ -202,6 +256,27 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					}
 			);
 
+			sitesApi.getSiteList().then(
+					function success(result)
+					{
+						ctrl.siteOptions = [];
+						for (let site of result.data.body)
+						{
+							ctrl.siteOptions.push(
+									{
+										label: site.name,
+										value: site.siteId,
+										bgColor: site.bgColor
+									}
+							)
+						}
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch site list with error: " + result);
+					}
+			);
+
 			// when we switch to AB bill region load additional data.
 			$scope.$watch('$ctrl.billingRegion', function(newVal, oldVal)
 			{
@@ -232,7 +307,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					},
 					function error(result)
 					{
-						console.log(result);
+						console.log("Failed to fetch alberta skill codes with error: " + result);
 					}
 			);
 
@@ -299,6 +374,55 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		ctrl.getUserRoleName = function(roleId)
 		{
 			return ctrl.roleOptions.find(el => el.value === roleId).label;
-		}
+		};
+
+		ctrl.addSiteAssignment = function(siteId)
+		{
+			if (siteId && !ctrl.provider.siteAssignments.includes(siteId))
+			{
+				ctrl.provider.siteAssignments.push(siteId);
+			}
+		};
+
+		ctrl.removeSiteAssignment = function(siteId)
+		{
+			if (siteId)
+			{
+				let idx = ctrl.provider.siteAssignments.findIndex(el => el === siteId);
+				ctrl.provider.siteAssignments.splice(idx, 1);
+			}
+		};
+
+		ctrl.getSiteName = function(roleId)
+		{
+			return ctrl.siteOptions.find(el => el.value === roleId).label;
+		};
+
+		ctrl.submit = function()
+		{
+			//validate fields
+			if (ctrl.allFieldsValid())
+			{// valid
+				alert("WINWWIWIWNIWIWNWIWNWI");
+			}
+			else
+			{//invalid
+				alert("FAIL :(");
+			}
+		};
+
+		ctrl.allFieldsValid = function ()
+		{
+			for(let validation in ctrl.providerValidations)
+			{
+				if (Object.prototype.hasOwnProperty.call(ctrl.providerValidations, validation)) {
+					if (!ctrl.providerValidations[validation]())
+					{
+						return false;
+					}
+				}
+			}
+			return true;
+		};
 	}]
 });

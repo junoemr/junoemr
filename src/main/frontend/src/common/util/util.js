@@ -351,3 +351,95 @@ Juno.Common.Util.windowClosedPromise = function (popup)
 		}, 500);
 	});
 };
+
+// generate a validation function. This is a nop validation and has no effect.
+// validationFunc, is a optional validation function that will be chained with this one.
+Juno.Common.Util.validationFieldNop = function(obj, field, validationFunc)
+{
+	return function validationFunction ()
+	{
+		if (validationFunc)
+		{
+			return validationFunc(obj[field]);
+		}
+		else
+		{
+			return true;
+		}
+	}
+};
+
+
+// generate a validation function that requires the field to be filled.
+// validationFunc, is a optional validation function that will be chained with this one.
+Juno.Common.Util.validationFieldRequired = function(obj, field, validationFunc)
+{
+	return function validationFunction ()
+	{
+		if (!obj[field])
+		{
+			return false;
+		}
+		if (typeof (obj[field]) === "string" && obj[field].length === 0)
+		{
+			return false;
+		}
+
+		if (validationFunc)
+		{
+			return validationFunc(obj[field]);
+		}
+		else
+		{
+			return true;
+		}
+	}
+};
+
+// generate a validation function that requires the field to be a number
+// validationFunc, is a optional validation function that will be chained with this one.
+Juno.Common.Util.validationFieldNumber = function(obj, field, validationFunc)
+{
+	return function validationFunction ()
+	{
+		if (!obj[field])
+		{
+			return false;
+		}
+		if (isNaN(obj[field]))
+		{
+			return false;
+		}
+
+		if (validationFunc)
+		{
+			return validationFunc(obj[field]);
+		}
+		else
+		{
+			return true;
+		}
+	}
+};
+
+// generate a validation function that requires the field to be the same as another
+// validationFunc, is a optional validation function that will be chained with this one.
+Juno.Common.Util.validationFieldsEqual = function(obj0, field0, obj1, field1, validationFunc)
+{
+	return function validationFunction ()
+	{
+		if (obj0[field0] !== obj1[field1])
+		{
+			return false;
+		}
+
+		if (validationFunc)
+		{
+			return validationFunc(obj0[field0]) && validationFunc(obj1[field1]);
+		}
+		else
+		{
+			return true;
+		}
+	}
+};
