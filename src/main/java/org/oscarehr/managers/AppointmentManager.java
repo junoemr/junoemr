@@ -36,6 +36,7 @@ import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -66,6 +67,8 @@ public class AppointmentManager {
 	private SecurityInfoManager securityInfoManager;
 	@Autowired
 	private AppointmentArchiveDao appointmentArchiveDao;
+	@Autowired
+	private MyHealthAccessService myHealthAccessService;
 	
 
 	public List<Appointment> getAppointmentHistoryWithoutDeleted(LoggedInInfo loggedInInfo, Integer demographicNo, Integer offset, Integer limit) {
@@ -201,6 +204,11 @@ public class AppointmentManager {
 		{
 			logger.info(appointment.toString());
 			appointmentDao.merge(appointment);
+
+			if(appointment.getIsVirtual())
+			{
+				myHealthAccessService.queueAppointmentCacheUpdate(appointment);
+			}
 		}
 		catch(TransactionSystemException exception)
 		{
@@ -218,7 +226,12 @@ public class AppointmentManager {
 		}
 		Appointment existing = appointmentDao.find(apptNo);
 		if(existing != null) {
-			appointmentArchiveDao.archiveAppointment(existing);	
+			appointmentArchiveDao.archiveAppointment(existing);
+
+			if(existing.getIsVirtual())
+			{
+				myHealthAccessService.queueAppointmentCacheDelete(existing);
+			}
 		}
 		
 		appointmentDao.remove(apptNo);
@@ -243,6 +256,10 @@ public class AppointmentManager {
 		appointment.setStatus(nextStatus);
 
 		appointmentDao.merge(appointment);
+		if(appointment.getIsVirtual())
+		{
+			myHealthAccessService.queueAppointmentCacheUpdate(appointment);
+		}
 
 		// return status without modifier
 		return appointment.getAppointmentStatus();
@@ -277,8 +294,13 @@ public class AppointmentManager {
 			status = status + statusModifier;
 
 			appt.setStatus(status);
+
+			appointmentDao.merge(appt);
+			if(appt.getIsVirtual())
+			{
+				myHealthAccessService.queueAppointmentCacheUpdate(appt);
+			}
 		}
-		appointmentDao.merge(appt);
 		return appt;
 	}
 
@@ -335,7 +357,10 @@ public class AppointmentManager {
 		);
 
 		ProviderData lastUpdateProvider = currentRecord.getLastUpdateUserRecord();
-		editRecord.setUpdateUserDisplayName(lastUpdateProvider.getDisplayName());
+		if (lastUpdateProvider != null)
+		{
+			editRecord.setUpdateUserDisplayName(lastUpdateProvider.getDisplayName());
+		}
 
 		editList.add(editRecord);
 

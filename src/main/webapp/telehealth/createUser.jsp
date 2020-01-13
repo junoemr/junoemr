@@ -45,7 +45,7 @@
             <h3>Create a MyHealthAccess account</h3>
             <p>
                 It looks like you don't have a MyHealthAccess account.
-                Lets create one and connect it with your Juno EMR provider
+                Let's create one and connect it with your Juno EMR provider
             </p>
             <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createUser" method="post">
                 <input type="hidden" name="siteName" value="<%=request.getParameter("siteName")%>"/>

@@ -171,6 +171,7 @@ public class Appointment
 						details.getName().equals(org.oscarehr.common.model.Appointment.DONOTBOOK),
 						isSelfBooked,
 						false,
+						details.isVirtual(),
 						null
 				);
 				// for the case where appointments are saved with a name but no demographic

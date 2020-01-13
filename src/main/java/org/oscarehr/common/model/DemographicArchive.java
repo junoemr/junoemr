@@ -25,7 +25,12 @@
 
 package org.oscarehr.common.model;
 
+import org.apache.commons.lang.StringUtils;
+import org.oscarehr.util.MiscUtils;
+
 import java.io.Serializable;
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -75,7 +80,7 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	@Column(name = "month_of_birth")
 	private String monthOfBirth = null;
 	@Column(name = "date_of_birth")
-	private String dateOfBirth = null;
+	private String dayOfBirth = null;
 	@Column(name = "hin")
 	private String hin = null;
 	@Column(name = "ver")
@@ -167,7 +172,9 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		this.city = demographic.getCity();
 		this.countryOfOrigin = demographic.getCountryOfOrigin();
 		this.dateJoined = demographic.getDateJoined();
-		this.dateOfBirth = demographic.getDateOfBirth();
+		this.dayOfBirth = demographic.getDateOfBirth();
+		this.monthOfBirth = demographic.getMonthOfBirth();
+		this.yearOfBirth = demographic.getYearOfBirth();
 		this.demographicNo = demographic.getDemographicNo();
 		this.effDate = demographic.getEffDate();
 		this.email = demographic.getEmail();
@@ -218,7 +225,7 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		this.city = demographic.getCity();
 		this.countryOfOrigin = demographic.getCountryOfOrigin();
 		this.dateJoined = demographic.getDateJoined();
-		this.dateOfBirth = demographic.getDateOfBirth().toString();
+		this.setDateOfBirth(demographic.getDateOfBirth());
 		this.demographicNo = demographic.getDemographicId();
 		this.effDate = demographic.getHcEffectiveDate();
 		this.email = demographic.getEmail();
@@ -377,14 +384,14 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		this.myOscarUserName = myOscarUserName;
 	}
 
-	public String getYearOfBirth()
+	public String getDayOfBirth()
 	{
-		return this.yearOfBirth;
+		return this.dayOfBirth;
 	}
 
-	public void setYearOfBirth(String s)
+	public void setDayOfBirth(String s)
 	{
-		this.yearOfBirth = s;
+		this.dayOfBirth = s;
 	}
 
 	public String getMonthOfBirth()
@@ -397,14 +404,34 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		this.monthOfBirth = s;
 	}
 
-	public String getDateOfBirth()
+	public String getYearOfBirth()
 	{
-		return this.dateOfBirth;
+		return this.yearOfBirth;
 	}
 
-	public void setDateOfBirth(String s)
+	public void setYearOfBirth(String s)
 	{
-		this.dateOfBirth = s;
+		this.yearOfBirth = s;
+	}
+
+	public LocalDate getDateOfBirth()
+	{
+		try
+		{
+			return LocalDate.of(Integer.parseInt(yearOfBirth), Integer.parseInt(monthOfBirth), Integer.parseInt(dayOfBirth));
+		}
+		catch (NumberFormatException | DateTimeException ex)
+		{
+			MiscUtils.getLogger().error("DemographicArchive [" + getId() + "] has invalid dob with error: " + ex.getMessage());
+		}
+		return null;
+	}
+
+	public void setDateOfBirth(LocalDate dateOfBirth)
+	{
+		setDayOfBirth(StringUtils.leftPad(String.valueOf(dateOfBirth.getDayOfMonth()), 2,"0"));
+		setMonthOfBirth(StringUtils.leftPad(String.valueOf(dateOfBirth.getMonthValue()), 2,"0"));
+		setYearOfBirth(StringUtils.leftPad(String.valueOf(dateOfBirth.getYear()), 4,"0"));
 	}
 
 	public String getHin()

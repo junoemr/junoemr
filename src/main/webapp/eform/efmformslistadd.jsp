@@ -68,10 +68,16 @@ if (groupView == null) {
         groupView = "";
     }
 }
+
+EFormTemplateService eFormTemplateService = (EFormTemplateService)SpringUtils.getBean(EFormTemplateService.class);
+Integer eformPopupWidth = eFormTemplateService.getEformPopupWidth(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
+Integer eformPopupHeight = eFormTemplateService.getEformPopupHeight(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
 %>
 
 
-<%@page import="java.util.HashMap"%><html:html locale="true">
+<%@page import="java.util.HashMap"%>
+<%@ page import="org.oscarehr.eform.service.EFormTemplateService" %>
+<html:html locale="true">
 
 <head>
 <title>
@@ -83,7 +89,7 @@ if (groupView == null) {
 <script type="text/javascript" language="JavaScript">
 function popupPage(varpage, windowname) {
     var page = "" + varpage;
-    windowprops = "height=700,width=800,location=no,"
+    windowprops = "height=<%=eformPopupHeight%>,width=<%=eformPopupWidth%>,location=no,"
     + "scrollbars=yes,menubars=no,status=yes,toolbars=no,resizable=yes,top=10,left=200";
     var popup = window.open(page, windowname, windowprops);
     if (popup != null) {

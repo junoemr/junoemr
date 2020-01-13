@@ -76,6 +76,7 @@
 					<ca-field-text
 									class="ver"
 									ca-name="ver"
+									ca-title="&nbsp;"
 									ca-text-placeholder="Ver."
 									ca-model="$ctrl.newDemographicData.ver"
 									ca-rows="1"

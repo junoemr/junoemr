@@ -95,8 +95,8 @@ public class FrmCustomedPDFServlet extends HttpServlet
 				for(String recipient : recipients) // only ever has one element
 				{
 					// write to file
-					String pdfFile = "prescription_" + pdfId + ".pdf";
 					GenericFile fileToFax = FileFactory.createTempFile(baosPDF, ".pdf");
+					String pdfFile = "prescription_" + pdfId + "-" + fileToFax.getName();
 					fileToFax.rename(pdfFile);
 					FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.PRESCRIPTION, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))

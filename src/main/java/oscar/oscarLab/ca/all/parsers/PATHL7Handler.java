@@ -83,14 +83,6 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 			"TRANSCRIP"
 	);
 
-	// any header in here needs to pull its label from a different place
-	private static List<String> customHeaderIdentifiers = Arrays.asList(
-			"CARDIOPDF",
-			"GENPDF1",
-			"NOTIFP",
-			"TRANSPDF"
-	);
-
 	public static final String VIHARTF = "CELLPATHR";
 
 	// Embedded PDF strings that show up in OBX messages
@@ -291,22 +283,17 @@ public class PATHL7Handler extends ORU_R01MessageHandler
         }
     }
 
-    public String getObservationHeader(int i, int j){
-        try
-        {
-            String header = getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getDiagnosticServiceSectionID().getValue());
-            // We have an internal list of headers that we need to get the user display string from somewhere else
-            if (customHeaderIdentifiers.contains(header))
-            {
-                return getCustomHeader(header, i , j);
-            }
-            return header;
-        }
-        catch(Exception e)
-        {
-            return "";
-        }
-    }
+	public String getObservationHeader(int i, int j)
+	{
+		try
+		{
+			return getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getDiagnosticServiceSectionID().getValue());
+		}
+		catch(Exception e)
+		{
+			return "";
+		}
+	}
 
     public int getOBRCommentCount(int i){
         try
@@ -734,44 +721,35 @@ public class PATHL7Handler extends ORU_R01MessageHandler
         }
     }
 
-    /**
-     *  Retrieve the possible segment headers from the OBX fields
-     */
-    public ArrayList<String> getHeaders(){
-        int i;
-        int arraySize;
-        int k = 0;
+	/**
+	 *  Retrieve the possible segment headers from the OBR fields
+	 */
+	public ArrayList<String> getHeaders()
+	{
+		ArrayList<String> headers = new ArrayList<String>();
+		String currentHeader;
 
-        ArrayList<String> headers = new ArrayList<String>();
-        String currentHeader;
+		try
+		{
+			for (int i = 0; i < msg.getRESPONSE().getORDER_OBSERVATIONReps(); i++)
+			{
+				currentHeader = getObservationHeader(i, 0);
+				int arraySize = headers.size();
 
-        try
-        {
-            for (i = 0; i < msg.getRESPONSE().getORDER_OBSERVATIONReps(); i++)
-            {
-
-                currentHeader = getObservationHeader(i, 0);
-                arraySize = headers.size();
-
-                if (customHeaderIdentifiers.contains(currentHeader))
-                {
-                    currentHeader = getCustomHeader(currentHeader, i, 0);
-                }
-
-                if (arraySize == 0 || !currentHeader.equals(headers.get(arraySize-1)))
-                {
-                    logger.info("Adding header: '"+currentHeader+"' to list");
-                    headers.add(currentHeader);
-                }
-            }
-            return(headers);
-        }
-        catch(Exception e)
-        {
-            logger.error("Could not create header list", e);
-            return(null);
-        }
-    }
+				if (arraySize == 0 || !currentHeader.equals(headers.get(arraySize - 1)))
+				{
+					logger.info("Adding header: '" + currentHeader + "' to list");
+					headers.add(currentHeader);
+				}
+			}
+			return(headers);
+		}
+		catch(Exception e)
+		{
+			logger.error("Could not create header list", e);
+			return null;
+		}
+	}
 
     public String audit(){
         return "";
@@ -891,26 +869,4 @@ public class PATHL7Handler extends ORU_R01MessageHandler
         return orderStatusMap.get(getOrderStatus());
     }
 
-    /** Sometimes the original header that we pull is nonsensical. For these labs
-     * we will want to pull the header from a different segment.
-     * Unfortunately this is a case-by-case basis.
-     * @param origHeader header that we were going to use
-     * @param i OBR record
-     * @param j OBX record
-     * @return the header that we want the user to see
-     */
-    private String getCustomHeader(String origHeader, int i, int j)
-    {
-        getPatientLocation();
-        // These ones are dumb. The following cases pull from OBX 3-2 only when they're from the matched locations
-        if ("TRANSPDF".equals(origHeader)
-                && (getPatientLocation().equals("VIHAMTM") || getPatientLocation().equals("TRANSCST")))
-        {
-            return msg.getRESPONSE().getORDER_OBSERVATION().getOBSERVATION(i).getOBX().getObservationIdentifier().getText().toString();
-        }
-        else // other custom matched headers pull from OBR 4-2
-        {
-            return msg.getRESPONSE().getORDER_OBSERVATION().getOBR().getUniversalServiceIdentifier().getText().toString();
-        }
-    }
 }

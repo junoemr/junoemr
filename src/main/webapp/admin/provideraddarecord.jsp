@@ -119,6 +119,8 @@ provider.setRmaNo(request.getParameter("rma_no"));
 provider.setBillingNo(request.getParameter("billing_no"));
 provider.setHsoNo(request.getParameter("hso_no"));
 provider.setAlbertaTakNo(StringUtils.trimToNull(request.getParameter("alberta_tak_no")));
+provider.setAlbertaConnectCareId(StringUtils.trimToNull(request.getParameter("alberta_connect_care_provider_id")));
+provider.setOntarioLifeLabsId(StringUtils.trimToNull(request.getParameter("ontario_lifelabs_id")));
 provider.setStatus(request.getParameter("status"));
 provider.setComments(SxmlMisc.createXmlDataString(request,"xml_p"));
 provider.setProviderActivity(request.getParameter("provider_activity"));

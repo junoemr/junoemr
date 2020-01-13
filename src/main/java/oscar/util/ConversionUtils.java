@@ -670,6 +670,11 @@ public class ConversionUtils {
 		return date;
 	}
 
+	public static ZonedDateTime toZonedDateTime(Date legacyDate)
+	{
+		return ZonedDateTime.ofInstant(legacyDate.toInstant(), ZoneId.systemDefault());
+	}
+
 	public static LocalDateTime toNullableLocalDateTime(Date legacyDate)
 	{
 		if(legacyDate == null) return null;
