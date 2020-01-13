@@ -1411,8 +1411,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				eventData: calEventData
 			};
 
-			console.log(data.eventData);
-
 			$scope.dialog = $uibModal.open({
 				animation: false,
 				backdrop: 'static',
