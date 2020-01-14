@@ -36,7 +36,7 @@
 				</panel-header>
 				<panel-body>
 					<!-- Last Name -->
-					<div ng-class="{'field-error': !$ctrl.providerValidations.lastName()}">
+					<div ng-class="{'field-error': !$ctrl.providerValidations.lastName() && $ctrl.hasSubmitted}">
 						<ca-field-text
 										ca-name="lastName"
 										ca-title="Last Name"
@@ -48,7 +48,7 @@
 						</ca-field-text>
 					</div>
 					<!-- First Name -->
-					<div ng-class="{'field-error': !$ctrl.providerValidations.firstName()}">
+					<div ng-class="{'field-error': !$ctrl.providerValidations.firstName() && $ctrl.hasSubmitted}">
 						<ca-field-text
 										ca-name="firstName"
 										ca-title="First Name"
@@ -249,7 +249,7 @@
 					<ca-field-text
 									ca-name="pager"
 									ca-title="Pager"
-									ca-model="$ctrl.provider.pager"
+									ca-model="$ctrl.provider.pagerNumber"
 									ca-rows="1"
 					>
 					</ca-field-text>
@@ -263,7 +263,7 @@
 					<h6>Login Information</h6>
 				</panel-header>
 				<panel-body>
-					<div class="edit-provider-or-group">
+					<div class="edit-provider-or-group" ng-class="{'field-error': !$ctrl.providerValidations.emailOrUserName() && $ctrl.hasSubmitted}">
 						<!-- Email -->
 						<ca-field-text
 										ca-name="email"
@@ -273,6 +273,9 @@
 										ca-text-placeholder="Email"
 						>
 						</ca-field-text>
+						<div class="error-message" ng-if="!$ctrl.providerValidations.emailOrUserName() && $ctrl.hasSubmitted">
+							Either a User Name or Email is required.
+						</div>
 						<!-- User Name -->
 						<ca-field-text
 										ca-name="username"
@@ -284,7 +287,7 @@
 						</ca-field-text>
 					</div>
 					<!-- Password -->
-					<div ng-class="{'field-error': !$ctrl.providerValidations.password()}">
+					<div ng-class="{'field-error': !$ctrl.providerValidations.password() && $ctrl.hasSubmitted}">
 						<ca-field-text
 										ca-name="password"
 										ca-title="Password"
@@ -297,7 +300,7 @@
 						</ca-field-text>
 					</div>
 					<!-- Confirm Password -->
-					<div ng-class="{'field-error': !$ctrl.providerValidations.passwordVerify()}">
+					<div ng-class="{'field-error': !$ctrl.providerValidations.passwordVerify() && $ctrl.hasSubmitted}">
 						<ca-field-text
 										ca-name="confirm_password"
 										ca-title="Confirm Password"
@@ -308,12 +311,12 @@
 										ca-required-field="true"
 						>
 						</ca-field-text>
-						<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.passwordVerify() && $ctrl.providerValidations.password()">
+						<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.passwordMatch() && $ctrl.hasSubmitted">
 							Passwords do not match.
 						</div>
 					</div>
 					<!-- Second Level Passcode -->
-					<div ng-class="{'field-error': !$ctrl.providerValidations.secondLevelPasscode()}">
+					<div ng-class="{'field-error': !$ctrl.providerValidations.secondLevelPasscode() && $ctrl.hasSubmitted}">
 						<ca-field-text
 										ca-name="passcode"
 										ca-title="Second Level Passcode"
@@ -326,7 +329,7 @@
 						</ca-field-text>
 					</div>
 					<!-- Confirm Second Level Passcode -->
-					<div ng-class="{'field-error': !$ctrl.providerValidations.secondLevelPasscodeVerify()}">
+					<div ng-class="{'field-error': !$ctrl.providerValidations.secondLevelPasscodeVerify() && $ctrl.hasSubmitted}">
 						<ca-field-text
 										ca-name="confirm_passcode"
 										ca-title="Retype Second Level Passcode"
@@ -337,7 +340,7 @@
 										ca-required-field="true"
 						>
 						</ca-field-text>
-						<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.secondLevelPasscodeVerify() && $ctrl.providerValidations.secondLevelPasscode()">
+						<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.secondLevelPasscodeMatch() && $ctrl.hasSubmitted">
 							Passcodes do not match.
 						</div>
 					</div>
@@ -377,7 +380,7 @@
 						<ca-field-text
 										ca-name="payeeNumber"
 										ca-title="Payee Number"
-										ca-model="$ctrl.provider.billingNo"
+										ca-model="$ctrl.provider.bcBillingNo"
 										ca-rows="1"
 						>
 						</ca-field-text>
@@ -386,7 +389,7 @@
 						<ca-field-text
 										ca-name="ruralRetentionCode"
 										ca-title="Rural Retention Code"
-										ca-model="$ctrl.provider.ruralRetentionCode"
+										ca-model="$ctrl.provider.bcRuralRetentionCode"
 										ca-rows="1"
 						>
 						</ca-field-text>
@@ -395,7 +398,7 @@
 						<ca-field-text
 										ca-name="serviceLocation"
 										ca-title="Service Location"
-										ca-model="$ctrl.provider.serviceLocation"
+										ca-model="$ctrl.provider.bcServiceLocation"
 										ca-rows="1"
 						>
 						</ca-field-text>
@@ -416,7 +419,7 @@
 						<ca-field-text
 										ca-name="groupNumber"
 										ca-title="Group Number"
-										ca-model="$ctrl.provider.groupNumber"
+										ca-model="$ctrl.provider.onGroupNumber"
 										ca-rows="1"
 						>
 						</ca-field-text>
@@ -425,7 +428,7 @@
 						<ca-field-text
 										ca-name="specialityCode"
 										ca-title="Speciality Code"
-										ca-model="$ctrl.provider.specialityCode"
+										ca-model="$ctrl.provider.onSpecialityCode"
 										ca-rows="1"
 						>
 						</ca-field-text>
@@ -434,7 +437,7 @@
 						<ca-field-text
 										ca-name="visitLocation"
 										ca-title="Visit Location"
-										ca-model="$ctrl.provider.visitLocation"
+										ca-model="$ctrl.provider.onVisitLocation"
 										ca-rows="1"
 						>
 						</ca-field-text>
@@ -443,7 +446,7 @@
 						<ca-field-text
 										ca-name="serviceLocationIndicator"
 										ca-title="Service Location Indicator"
-										ca-model="$ctrl.provider.serviceLocationIndicator"
+										ca-model="$ctrl.provider.onServiceLocationIndicator"
 										ca-rows="1"
 						>
 						</ca-field-text>
@@ -684,8 +687,10 @@
 			</panel>
 		</div>
 	</div>
-	<div class="col-sm-12 flex-row justify-content-end lg-margin">
-		<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.ADD" ng-click="$ctrl.submit()"><span class="body-normal">Add User</span></button>
-		<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.EDIT"><span class="body-normal">Update User</span></button>
+	<div class="bottom-options-bar">
+		<div class="col-sm-12 flex-row justify-content-center md-margin-top">
+			<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.ADD" ng-click="$ctrl.submit()"><span class="body-normal">Add User</span></button>
+			<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.EDIT"><span class="body-normal">Update User</span></button>
+		</div>
 	</div>
 </div>

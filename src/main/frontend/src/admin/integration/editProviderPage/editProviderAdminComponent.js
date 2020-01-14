@@ -55,6 +55,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.modes = EDIT_PROVIDER_MODE;
 		ctrl.mode = $stateParams.mode;
+		ctrl.hasSubmitted = false;
 
 		ctrl.sexes = staticDataService.getGenders();
 		ctrl.providerTypes = staticDataService.getProviderTypes();
@@ -132,7 +133,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			otherPhone: null,
 			fax: null,
 			contactEmail: null,
-			pager: null,
+			pagerNumber: null,
 
 			// Access Roles
 			userRoles: [],
@@ -141,15 +142,15 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			siteAssignments: [],
 
 			// BC Billing
-			billingNo: null,
-			ruralRetentionCode: null,
-			serviceLocation: null,
+			bcBillingNo: null,
+			bcRuralRetentionCode: null,
+			bcServiceLocation: null,
 
 			// ON Billing
-			groupNumber: null,
-			specialityCode: null,
-			visitLocation: null,
-			serviceLocationIndicator: null,
+			onGroupNumber: null,
+			onSpecialityCode: null,
+			onVisitLocation: null,
+			onServiceLocationIndicator: null,
 
 			// AB Billing
 			abClinic: null,
@@ -189,18 +190,20 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			type: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'type'),
 
 			// Login Info
-			email: Juno.Common.Util.validationFieldNop(),
-			userName: Juno.Common.Util.validationFieldNop(),
+			emailOrUserName: Juno.Common.Util.validationFieldOr(
+					Juno.Common.Util.validationFieldRequired(ctrl.provider, 'userName'),
+					Juno.Common.Util.validationFieldRequired(ctrl.provider, 'email')
+			),
 			password: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'password'),
-			passwordVerify: Juno.Common.Util.validationFieldsEqual(
+			passwordVerify: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'passwordVerify'),
+			passwordMatch: Juno.Common.Util.validationFieldsEqual(
 					ctrl.provider,'password',
-					ctrl.provider, 'passwordVerify',
-					Juno.Common.Util.validationFieldRequired(ctrl.provider, 'passwordVerify')),
+					ctrl.provider, 'passwordVerify'),
 			secondLevelPasscode: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'secondLevelPasscode'),
-			secondLevelPasscodeVerify: Juno.Common.Util.validationFieldsEqual(
-					ctrl.provider, "secondLevelPasscode",
-					ctrl.provider, "secondLevelPasscodeVerify",
-					Juno.Common.Util.validationFieldRequired(ctrl.provider, 'secondLevelPasscodeVerify')),
+			secondLevelPasscodeVerify: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'secondLevelPasscodeVerify'),
+			secondLevelPasscodeMatch: Juno.Common.Util.validationFieldsEqual(
+					ctrl.provider,'secondLevelPasscode',
+					ctrl.provider, 'secondLevelPasscodeVerify'),
 		};
 
 		ctrl.$onInit = function()
@@ -400,6 +403,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.submit = function()
 		{
+			ctrl.hasSubmitted = true;
 			//validate fields
 			if (ctrl.allFieldsValid())
 			{// valid

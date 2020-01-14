@@ -360,7 +360,7 @@ Juno.Common.Util.validationFieldNop = function(obj, field, validationFunc)
 	{
 		if (validationFunc)
 		{
-			return validationFunc(obj[field]);
+			return validationFunc();
 		}
 		else
 		{
@@ -369,10 +369,36 @@ Juno.Common.Util.validationFieldNop = function(obj, field, validationFunc)
 	}
 };
 
+// generate a validation function that returns true if either of the validation functions returns true
+Juno.Common.Util.validationFieldOr = function( validationFunc0, validationFunc1)
+{
+	return function validationFunction ()
+	{
+		return validationFunc0() || validationFunc1();
+	}
+};
+
+Juno.Common.Util.validationFieldsChain = function(...validationFunctions)
+{
+	if (validationFunctions)
+	{
+		let res = true;
+		for (let func of validationFunctions)
+		{
+			res = res && func();
+		}
+		return res;
+	}
+	else
+	{
+		return true;
+	}
+};
+
 
 // generate a validation function that requires the field to be filled.
 // validationFunc, is a optional validation function that will be chained with this one.
-Juno.Common.Util.validationFieldRequired = function(obj, field, validationFunc)
+Juno.Common.Util.validationFieldRequired = function(obj, field, ...validationFunc)
 {
 	return function validationFunction ()
 	{
@@ -385,20 +411,13 @@ Juno.Common.Util.validationFieldRequired = function(obj, field, validationFunc)
 			return false;
 		}
 
-		if (validationFunc)
-		{
-			return validationFunc(obj[field]);
-		}
-		else
-		{
-			return true;
-		}
+		return Juno.Common.Util.validationFieldsChain(...validationFunc);
 	}
 };
 
 // generate a validation function that requires the field to be a number
 // validationFunc, is a optional validation function that will be chained with this one.
-Juno.Common.Util.validationFieldNumber = function(obj, field, validationFunc)
+Juno.Common.Util.validationFieldNumber = function(obj, field, ...validationFunc)
 {
 	return function validationFunction ()
 	{
@@ -411,20 +430,13 @@ Juno.Common.Util.validationFieldNumber = function(obj, field, validationFunc)
 			return false;
 		}
 
-		if (validationFunc)
-		{
-			return validationFunc(obj[field]);
-		}
-		else
-		{
-			return true;
-		}
+		return Juno.Common.Util.validationFieldsChain(...validationFunc);
 	}
 };
 
 // generate a validation function that requires the field to be the same as another
-// validationFunc, is a optional validation function that will be chained with this one.
-Juno.Common.Util.validationFieldsEqual = function(obj0, field0, obj1, field1, validationFunc)
+// validationFunc, is a optional list of validation function that will be chained with this one.
+Juno.Common.Util.validationFieldsEqual = function(obj0, field0, obj1, field1, ...validationFunc)
 {
 	return function validationFunction ()
 	{
@@ -433,13 +445,6 @@ Juno.Common.Util.validationFieldsEqual = function(obj0, field0, obj1, field1, va
 			return false;
 		}
 
-		if (validationFunc)
-		{
-			return validationFunc(obj0[field0]) && validationFunc(obj1[field1]);
-		}
-		else
-		{
-			return true;
-		}
+		return Juno.Common.Util.validationFieldsChain(...validationFunc);
 	}
 };

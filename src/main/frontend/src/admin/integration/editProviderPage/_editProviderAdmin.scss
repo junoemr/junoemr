@@ -24,6 +24,10 @@
 		}
 	}
 
+	.add-role-button {
+		height: 30px;
+	}
+
 	.edit-provider-banner {
 		background-color: $color-neutral-light-grey;
 		padding: $padding-lg;
@@ -45,8 +49,8 @@
 	}
 
 	.juno-typeahead {
-		padding-bottom: 4px;
-		padding-top: 4px;
+		padding-bottom: 0;
+		padding-top: 0;
 	}
 
 	.field-error {
@@ -57,5 +61,15 @@
 
 	.error-message {
 		color: $color-red-base;
+	}
+
+	.bottom-options-bar {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 48px;
+
+		@include background-opacity($color-primary-lighter, 0.7);
 	}
 }
