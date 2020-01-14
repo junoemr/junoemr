@@ -56,7 +56,7 @@ public class RecentDemographicAccessService
 	 * @param providerNo set the provider who accessed the record
 	 * @param demographicNo demographic id of the record
 	 */
-	public void updateAccessRecord(Integer providerNo, Integer demographicNo)
+	public synchronized void updateAccessRecord(Integer providerNo, Integer demographicNo)
 	{
 		RecentDemographicAccessPK primaryKey = new RecentDemographicAccessPK(providerNo, demographicNo);
 		RecentDemographicAccess record = recentDemographicAccessDao.find(primaryKey);
