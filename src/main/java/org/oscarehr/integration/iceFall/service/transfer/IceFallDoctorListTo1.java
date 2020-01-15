@@ -52,6 +52,11 @@ public class IceFallDoctorListTo1 implements Serializable
 		this.next = next;
 	}
 
+	public boolean hasNext()
+	{
+		return this.next != null && !this.next.isEmpty();
+	}
+
 	public String getPrevious()
 	{
 		return previous;

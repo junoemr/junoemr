@@ -44,7 +44,7 @@ public class IceFallCreatePrescriptionTo1
 	private LocalDate registrationExpiry;
 	private String type;
 	@JsonProperty("thclimit")
-	private Integer thcLimit;
+	private Float thcLimit;
 	private String diagnosis;
 	@JsonProperty("clinic")
 	private Integer clinicId;
@@ -94,12 +94,12 @@ public class IceFallCreatePrescriptionTo1
 		this.type = type;
 	}
 
-	public Integer getThcLimit()
+	public Float getThcLimit()
 	{
 		return thcLimit;
 	}
 
-	public void setThcLimit(Integer thcLimit)
+	public void setThcLimit(Float thcLimit)
 	{
 		this.thcLimit = thcLimit;
 	}

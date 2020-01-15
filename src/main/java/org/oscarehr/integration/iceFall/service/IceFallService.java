@@ -82,6 +82,7 @@ public class IceFallService
 	@Autowired
 	EFormDataService eFormDataService;
 
+	public static final String PDF_DOCUMENT_HEADER = "data:application/pdf;base64,";
 	public static final String CANOPY_CUSTOMER_ID_KEY = "canopy_customer_id";
 
 	/**
@@ -303,7 +304,7 @@ public class IceFallService
 	public String getEformPDFDateForPrescriptionSend(Provider provider, Demographic demographic, Integer formId, Map<String, String> eformValues, String httpSchema, String context, boolean isInstance)
 	{
 		EFormData eFormData = saveEFormForPrint(provider, demographic, formId, eformValues, isInstance);
-		return new String(printToPDF(eFormData.getId(), provider.getProviderNo(), httpSchema, context));
+		return printToPDF(eFormData.getId(), provider.getProviderNo(), httpSchema, context);
 	}
 
 	/**
@@ -336,9 +337,9 @@ public class IceFallService
 	 * @param providerNo - the provider number that the form should be printed under
 	 * @param httpSchema - the httpschema to use
 	 * @param context - the context path of the oscar server.
-	 * @return - a byte array of the eform data.
+	 * @return - base64 String of the eform data.
 	 */
-	public byte[] printToPDF(Integer fdid, String providerNo, String httpSchema, String context)
+	public String printToPDF(Integer fdid, String providerNo, String httpSchema, String context)
 	{
 		return printToPDF(fdid, providerNo, httpSchema, context, new AtomicInteger(0));
 	}
@@ -350,9 +351,9 @@ public class IceFallService
 	 * @param httpSchema - the httpschema to use
 	 * @param context - the context path of the oscar server.
 	 * @param pageCount - an output variable that indicates the number of pages in the pdf.
-	 * @return - a byte array of the eform data.
+	 * @return - the base64 encoded string of the eform data.
 	 */
-	public byte[] printToPDF(Integer fdid, String providerNo, String httpSchema, String context, AtomicInteger pageCount)
+	public String printToPDF(Integer fdid, String providerNo, String httpSchema, String context, AtomicInteger pageCount)
 	{
 		String localUrl = WKHtmlToPdfUtils.getEformRequestUrl(providerNo,
 						"", httpSchema, context);
@@ -362,13 +363,16 @@ public class IceFallService
 		try
 		{
 			tmpFile = FileFactory.createTempFile("pdf");
+
 			//convert to pdf
 			WKHtmlToPdfUtils.convertToPdf(localUrl + fdid, tmpFile.getFileObject());
+
 			//get page count
 			pdDocument = PDDocument.load(tmpFile.getFileObject());
 			pageCount.set(pdDocument.getNumberOfPages());
-			// encode and return
-			return Base64.getEncoder().encode(IOUtils.toByteArray(tmpFile.asFileInputStream()));
+
+			// encode, and return
+			return PDF_DOCUMENT_HEADER + (new String(Base64.getEncoder().encode(IOUtils.toByteArray(tmpFile.asFileInputStream()))));
 		}
 		catch (IOException | HtmlToPdfConversionException e)
 		{

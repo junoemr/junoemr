@@ -42,7 +42,7 @@ public class IceFallSendFormTo1 implements Serializable
 	private Float dosage;
 	private LocalDate expiryDate;
 	private String type;
-	private Integer thcLimit;
+	private Float thcLimit;
 	private String diagnosis;
 
 	// any other values sent in the request
@@ -129,12 +129,12 @@ public class IceFallSendFormTo1 implements Serializable
 		this.type = type;
 	}
 
-	public Integer getThcLimit()
+	public Float getThcLimit()
 	{
 		return thcLimit;
 	}
 
-	public void setThcLimit(Integer thcLimit)
+	public void setThcLimit(Float thcLimit)
 	{
 		this.thcLimit = thcLimit;
 	}

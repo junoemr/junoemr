@@ -43,7 +43,7 @@ public class IceFallCreatePrescriptionResponseTo1
 	@JsonDeserialize(using = LocalDateDeserializer.class)
 	private LocalDate registrationExpiry;
 	@JsonProperty("thclimit")
-	private Integer thcLimit;
+	private Float thcLimit;
 	private String diagnosis;
 	@JsonProperty("clinic")
 	private Integer clinicId;
@@ -90,12 +90,12 @@ public class IceFallCreatePrescriptionResponseTo1
 		this.registrationExpiry = registrationExpiry;
 	}
 
-	public Integer getThcLimit()
+	public Float getThcLimit()
 	{
 		return thcLimit;
 	}
 
-	public void setThcLimit(Integer thcLimit)
+	public void setThcLimit(Float thcLimit)
 	{
 		this.thcLimit = thcLimit;
 	}

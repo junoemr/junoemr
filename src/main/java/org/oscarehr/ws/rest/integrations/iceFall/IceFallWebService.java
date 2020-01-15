@@ -188,14 +188,13 @@ public class IceFallWebService extends AbstractServiceImpl
 			eformId = iceFallSendFormTo1.getFdid();
 		}
 
-
 		EFormData saveEFormForPrint = null;
 		try
 		{
 			// save eform & prepare pdf for submission
 			saveEFormForPrint = iceFallService.saveEFormForPrint(provider, demo, eformId, eformValues, isInstance);
 			AtomicInteger pageCount = new AtomicInteger();
-			String pdfData = new String(iceFallService.printToPDF(saveEFormForPrint.getId(), provider.getProviderNo(), getHttpServletRequest().getScheme(), getHttpServletRequest().getContextPath(), pageCount));
+			String pdfData = iceFallService.printToPDF(saveEFormForPrint.getId(), provider.getProviderNo(), getHttpServletRequest().getScheme(), getHttpServletRequest().getContextPath(), pageCount);
 			// submit
 			iceFallService.sendIceFallForm(provider, demo, pdfData, iceFallSendFormTo1, pageCount.get());
 			iceFallService.logIceFallSent("Prescription Sent", provider.getProviderNo(), eformId, demo.getId(), isInstance);

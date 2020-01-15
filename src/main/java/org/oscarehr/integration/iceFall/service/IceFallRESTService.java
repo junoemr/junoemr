@@ -73,21 +73,55 @@ public class IceFallRESTService
 		return authResponse.getApiToken();
 	}
 
+	/**
+	 * get the full list of doctors in the icefall system
+	 * @return - list of doctors
+	 */
 	public IceFallDoctorListTo1 getDoctorList()
 	{
-		return RESTClient.doGet(getIceFallUrlBase() + DOCTOR_LIST, getApiAuthenticationHeaders(), IceFallDoctorListTo1.class);
+		return getDoctorList(getIceFallUrlBase() + DOCTOR_LIST);
 	}
 
+	/**
+	 * bottom half of, getDoctorList. takes a url which is used for pagenation
+	 * @param url - url to fetch doctor list from
+	 * @return - the full doctor list.
+	 */
+	public IceFallDoctorListTo1 getDoctorList(String url)
+	{
+		IceFallDoctorListTo1 iceFallDoctorListTo1 =  RESTClient.doGet(url, getApiAuthenticationHeaders(), IceFallDoctorListTo1.class);
+		if (iceFallDoctorListTo1.hasNext())
+		{
+			iceFallDoctorListTo1.getResults().addAll(getDoctorList(iceFallDoctorListTo1.getNext()).getResults());
+		}
+		return iceFallDoctorListTo1;
+	}
+
+	/**
+	 * get customer information
+	 * @param canopyCustomerId - customer remote id.
+	 * @return - customer info.
+	 */
 	public IceFallCustomerTo1 getCustomerInformation(Integer canopyCustomerId)
 	{
 		return RESTClient.doGet(getIceFallUrlBase() + CUSTOMER_DETAILS + canopyCustomerId + "/", getApiAuthenticationHeaders(), IceFallCustomerTo1.class);
 	}
 
+	/**
+	 * create a new ice fall customer
+	 * @param createCustomerTo1 - customer creation transfer object
+	 * @return - icefall response to customer creation.
+	 */
 	public IceFallCreateCustomerResponseTo1 createIceFallCustomer(IceFallCreateCustomerTo1 createCustomerTo1)
 	{
 		return RESTClient.doPost(getIceFallUrlBase() + CREATE_CUSTOMER, getApiAuthenticationHeaders(), createCustomerTo1, IceFallCreateCustomerResponseTo1.class);
 	}
 
+	/**
+	 * send a prescription to ice fall
+	 * @param iceFallCreatePrescriptionTo1 - prescription creation transfer object
+	 * @return
+	 */
 	public IceFallCreatePrescriptionResponseTo1 sendPrescription(IceFallCreatePrescriptionTo1 iceFallCreatePrescriptionTo1)
 	{
 		return RESTClient.doPost(getIceFallUrlBase() + ADD_PRESCRIPTION, getApiAuthenticationHeaders(), iceFallCreatePrescriptionTo1, IceFallCreatePrescriptionResponseTo1.class);
