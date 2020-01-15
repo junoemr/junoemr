@@ -378,6 +378,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"      WHERE sdate BETWEEN :startDate AND :endDateTime \n" +
 				"      AND provider_no = :providerNo\n" +
 				"      AND status = 'A'\n" +
+				"      AND available = :available\n" +
 				"    ) as sd\n" +
 				"    CROSS JOIN (SELECT * from seq_1_to_299) as num\n" +
 				"    JOIN scheduletemplate st ON (st.name = sd.hour \n " +
@@ -513,6 +514,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		query.setParameter("endDateTime", java.sql.Timestamp.valueOf(endDateTime), TemporalType.TIMESTAMP);
 		query.setParameter("startDate", java.sql.Date.valueOf(startDate), TemporalType.DATE);
 		query.setParameter("endDate", java.sql.Date.valueOf(endDate), TemporalType.DATE);
+		query.setParameter("available", 1);
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("appointmentTypes", appointmentTypeList);
 		query.setParameter("appointmentDuration", appointmentDuration);
