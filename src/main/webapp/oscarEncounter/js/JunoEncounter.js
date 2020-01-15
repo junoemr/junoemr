@@ -338,6 +338,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 				jQuery.each(response.body.notes, function (index, note)
 				{
 					note.sectionName = sectionName;
+					note.contextPath = me.pageData.contextPath;
 					note.index = index;
 					note.updateDateFormatted = "";
 					if (note.updateDate !== null)

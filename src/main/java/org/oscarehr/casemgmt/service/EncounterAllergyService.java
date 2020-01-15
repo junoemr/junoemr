@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -37,7 +37,7 @@ import java.util.List;
 
 public class EncounterAllergyService extends EncounterSectionService
 {
-	private static final String SECTION_ID = "allergies";
+	public static final String SECTION_ID = "allergies";
 	protected static final String SECTION_TITLE_KEY = "oscarEncounter.NavBar.Allergy";
 	protected static final String SECTION_TITLE_COLOUR = "#C85A17";
 

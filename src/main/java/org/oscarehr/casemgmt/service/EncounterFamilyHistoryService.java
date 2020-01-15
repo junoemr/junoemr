@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ package org.oscarehr.casemgmt.service;
 
 public class EncounterFamilyHistoryService extends EncounterCPPSectionService
 {
-	private static final String SECTION_ID = "famHistory";
+	public static final String SECTION_ID = "famHistory";
 	protected static final String SECTION_TITLE_KEY = "oscarEncounter.famHistory.title";
 	protected static final String SECTION_TITLE_COLOUR = "#006600";
 

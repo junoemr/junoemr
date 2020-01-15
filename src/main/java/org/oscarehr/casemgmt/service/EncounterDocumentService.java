@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -33,12 +33,13 @@ import oscar.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EncounterDocumentService extends EncounterSectionService
 {
-	private static final String SECTION_ID = "docs";
+	public static final String SECTION_ID = "docs";
 	protected static final String SECTION_DOC_TITLE_KEY = "oscarEncounter.Index.msgDocuments";
 	protected static final String SECTION_INBOX_TITLE_KEY = "oscarEncounter.Index.inboxManager";
 	protected static final String SECTION_TITLE_COLOUR = "#476BB3";
@@ -166,9 +167,13 @@ public class EncounterDocumentService extends EncounterSectionService
 
 			String dateString = curDoc.getObservationDate();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dbFormat);
-			LocalDate date = LocalDate.parse(dateString, formatter);
-
-			sectionNote.setUpdateDate(date.atStartOfDay());
+			LocalDate date;
+			try
+			{
+				date = LocalDate.parse(dateString, formatter);
+				sectionNote.setUpdateDate(date.atStartOfDay());
+			}
+			catch(DateTimeParseException ignored) {}
 
 			sectionNote.setText(title);
 

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -39,7 +39,7 @@ import java.util.List;
 
 public class EncounterDiseaseRegistryService extends EncounterSectionService
 {
-	private static final String SECTION_ID = "Dx";
+	public static final String SECTION_ID = "Dx";
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.n";
 	protected static final String SECTION_TITLE_KEY = "oscarEncounter.LeftNavBar.DxRegistry";
 	protected static final String SECTION_TITLE_COLOUR = "#5A5A5A";

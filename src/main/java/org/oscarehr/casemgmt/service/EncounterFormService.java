@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -38,6 +38,7 @@ import oscar.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,7 +46,7 @@ import java.util.List;
 
 public class EncounterFormService extends EncounterSectionService
 {
-	private static final String SECTION_ID = "forms";
+	public static final String SECTION_ID = "forms";
 	protected static final String SECTION_TITLE_KEY = "oscarEncounter.Index.msgForms";
 	protected static final String SECTION_TITLE_COLOUR = "#917611";
 	protected static final String SECTION_MENU_HEADER_KEY = "oscarEncounter.LeftNavBar.AddFrm";
@@ -214,9 +215,13 @@ public class EncounterFormService extends EncounterSectionService
 					// Date
 					String dateString = pfrm.getCreated();
 					DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dbFormat);
-					LocalDate date = LocalDate.parse(dateString, formatter);
-
-					sectionNote.setUpdateDate(date.atStartOfDay());
+					LocalDate date;
+					try
+					{
+						date = LocalDate.parse(dateString, formatter);
+						sectionNote.setUpdateDate(date.atStartOfDay());
+					}
+					catch(DateTimeParseException ignored) {}
 
 					// Title
 					String fullTitle = encounterForm.getFormName();

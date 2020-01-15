@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -33,8 +33,10 @@ import org.drools.FactException;
 import org.oscarehr.billing.CA.service.BillingUrlService;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
+import org.oscarehr.casemgmt.model.ClientImage;
 import org.oscarehr.casemgmt.service.CaseManagementIssueService;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
+import org.oscarehr.casemgmt.service.ClientImageManager;
 import org.oscarehr.casemgmt.service.EncounterAllergyService;
 import org.oscarehr.casemgmt.service.EncounterConsultationService;
 import org.oscarehr.casemgmt.service.EncounterDiseaseRegistryService;
@@ -199,6 +201,9 @@ public class JunoEncounterAction extends DispatchActionSupport
 	private CaseManagementManager caseManagementManager;
 
 	@Autowired
+	private ClientImageManager clientImageManager;
+
+	@Autowired
 	private EncounterTemplateDao encounterTemplateDao;
 
 	@Autowired
@@ -334,25 +339,34 @@ public class JunoEncounterAction extends DispatchActionSupport
 		String encounterWindowHeight = "";
 		String encounterWindowWidth = "";
 
-		try
+		if(userPropertyHeight != null && userPropertyWidth != null)
 		{
-			encounterWindowHeight = String.valueOf(Integer.parseInt(userPropertyHeight.getValue()));
-			encounterWindowWidth = String.valueOf(Integer.parseInt(userPropertyWidth.getValue()));
-
-			if(encounterWindowHeight != null && encounterWindowWidth != null)
+			try
 			{
-				encounterWindowCustomSize = true;
+				encounterWindowHeight = String.valueOf(Integer.parseInt(userPropertyHeight.getValue()));
+				encounterWindowWidth = String.valueOf(Integer.parseInt(userPropertyWidth.getValue()));
+
+				if (encounterWindowHeight != null && encounterWindowWidth != null)
+				{
+					encounterWindowCustomSize = true;
+				}
+			} catch (NumberFormatException e)
+			{
+				// Do nothing, don't set the values
 			}
-		}
-		catch(NumberFormatException e)
-		{
-			// Do nothing, don't set the values
 		}
 
 		boolean encounterWindowMaximize = false;
-		if(UserProperty.BOOLEAN_TRUE.equals(userPropertyMaximize.getValue()))
+		if(userPropertyMaximize != null && UserProperty.BOOLEAN_TRUE.equals(userPropertyMaximize.getValue()))
 		{
 			encounterWindowMaximize = true;
+		}
+
+		//get client image
+		ClientImage img = clientImageManager.getClientImage(Integer.parseInt(encounterSessionBean.demographicNo));
+		boolean clientImagePresent = false;
+		if (img != null) {
+			clientImagePresent = true;
 		}
 
 
@@ -389,7 +403,8 @@ public class JunoEncounterAction extends DispatchActionSupport
 				encounterWindowCustomSize,
 				encounterWindowHeight,
 				encounterWindowWidth,
-				encounterWindowMaximize
+				encounterWindowMaximize,
+				clientImagePresent
 			)
 		);
 
@@ -413,6 +428,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		sectionList.add(EncounterSection.TYPE_UNRESOLVED_ISSUES);
 		sectionList.add(EncounterSection.TYPE_RESOLVED_ISSUES);
 		sectionList.add(EncounterSection.TYPE_EPISODES);
+		sectionList.add(EncounterSection.TYPE_PREGNANCIES);
 		sectionList.add(EncounterSection.TYPE_HEALTH_CARE_TEAM);
 		sectionList.add(encounterSocialHistoryService.getSectionId());
 		sectionList.add(encounterMedicalHistoryService.getSectionId());
@@ -493,6 +509,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		//rightSections.add(EncounterSection.TYPE_DECISION_SUPPORT_ALERTS);
 
 		rightSections.add(EncounterSection.TYPE_EPISODES);
+		rightSections.add(EncounterSection.TYPE_PREGNANCIES);
 		rightSections.add(EncounterSection.TYPE_HEALTH_CARE_TEAM);
 
 		junoEncounterForm.setRightNoteSections(rightSections);

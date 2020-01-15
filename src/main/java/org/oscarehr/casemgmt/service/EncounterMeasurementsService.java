@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -50,7 +50,7 @@ import java.util.Vector;
 
 public class EncounterMeasurementsService extends EncounterSectionService
 {
-	private static final String SECTION_ID = "measurements";
+	public static final String SECTION_ID = "measurements";
 	private static final String SECTION_TITLE_KEY = "oscarEncounter.Index.measurements";
 	private static final String SECTION_TITLE_COLOUR = "#344887";
 	private static final String SECTION_MENU_HEADER_KEY = "oscarEncounter.LeftNavBar.InputGrps";

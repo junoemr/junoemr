@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ import java.util.List;
 
 public class EncounterConsultationService extends EncounterSectionService
 {
-	private static final String SECTION_ID = "consultation";
+	public static final String SECTION_ID = "consultation";
 	private static final String SECTION_TITLE_KEY = "oscarEncounter.LeftNavBar.Consult";
 	private static final String SECTION_TITLE_COLOUR = "#6C2DC7";
 
@@ -127,7 +127,6 @@ public class EncounterConsultationService extends EncounterSectionService
 		cal.add(Calendar.MONTH, countback);
 		Date cutoffDate = cal.getTime();
 
-		String red = "red";
 		String dbFormat = "yyyy-MM-dd";
 		for (int idx = theRequests.ids.size() - 1; idx >= 0; --idx )
 		{
@@ -147,7 +146,7 @@ public class EncounterConsultationService extends EncounterSectionService
 				//if we are after cut off date and not completed set to red
 				if( date.before(cutoffDate) && !status.equals("4") )
 				{
-					sectionNote.setColour(red);
+					sectionNote.setColour(COLOUR_RED);
 				}
 			}
 			catch(ParseException ex ) {

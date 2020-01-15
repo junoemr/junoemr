@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -103,6 +103,9 @@ public class EncounterService
 	private EncounterEpisodeService encounterEpisodeService;
 
 	@Autowired
+	private EncounterPregnancyService encounterPregnancyService;
+
+	@Autowired
 	private EncounterTeamService encounterTeamService;
 
 	@Autowired
@@ -145,6 +148,7 @@ public class EncounterService
 			case EncounterSection.TYPE_UNRESOLVED_ISSUES: return encounterUnresolvedIssueService;
 			case EncounterSection.TYPE_RESOLVED_ISSUES: return encounterResolvedIssueService;
 			case EncounterSection.TYPE_EPISODES: return encounterEpisodeService;
+			case EncounterSection.TYPE_PREGNANCIES: return encounterPregnancyService;
 			case EncounterSection.TYPE_HEALTH_CARE_TEAM: return encounterTeamService;
 			/*
 			case encounterSocialHistoryService.SECTION_ID: return encounterSocialHistoryService;
@@ -208,7 +212,8 @@ public class EncounterService
 			boolean encounterWindowCustomSize,
 			String encounterWindowHeight,
 			String encounterWindowWidth,
-			boolean encounterWindowMaximize
+			boolean encounterWindowMaximize,
+			boolean clientImagePresent
 	)
 			throws UnsupportedEncodingException
 	{
@@ -339,6 +344,7 @@ public class EncounterService
 
 		encounterPageData.setEchartLinks(getEChartLinks());
 
+		encounterPageData.setClientImagePresent(clientImagePresent);
 		encounterPageData.setImagePresentPlaceholderUrl(contextPath + ClientImage.imagePresentPlaceholderUrl);
 		encounterPageData.setImageMissingPlaceholderUrl(contextPath + ClientImage.imageMissingPlaceholderUrl);
 

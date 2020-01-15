@@ -1,25 +1,27 @@
 <%--
-  ~ Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.                
-  ~ This software is published under the GPL GNU General Public License.            
-  ~ This program is free software; you can redistribute it and/or                   
-  ~ modify it under the terms of the GNU General Public License                     
-  ~ as published by the Free Software Foundation; either version 2                  
-  ~ of the License, or (at your option) any later version.                          
-  ~                                                                                 
-  ~ This program is distributed in the hope that it will be useful,                 
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of                  
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                    
-  ~ GNU General Public License for more details.                                    
-  ~                                                                                 
-  ~ You should have received a copy of the GNU General Public License               
-  ~ along with this program; if not, write to the Free Software                     
-  ~ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.      
-  ~                                                                                 
-  ~ This software was written for                                                   
-  ~ CloudPractice Inc.                                                              
-  ~ Victoria, British Columbia                                                      
-  ~ Canada      
-  --%>
+
+    Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+    This software is published under the GPL GNU General Public License.
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+    This software was written for
+    CloudPractice Inc.
+    Victoria, British Columbia
+    Canada
+
+--%>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 
@@ -228,12 +230,20 @@
 			<%-- API Functions                                                                  --%>
 			<%-- ============================================================================== --%>
 
-			// These methods are used by external pages so they shouldn't be changed.
-
-			// This method is called by child windows.  Please don't move or rename it.
+			// These methods are called by child windows.  Please don't move or rename them.
 			function getEChartUUID()
 			{
 				return eChartUUID;
+			}
+
+			function pasteToEncounterNote(txt)
+			{
+				return encounterNote.pasteToEncounterNote(txt);
+			}
+
+			function reloadNav(sectionName)
+			{
+				junoEncounter.getSectionRemote(sectionName, false, false);
 			}
 
 
@@ -476,20 +486,20 @@
 			<!--dummmy div to force browser to allocate space -->
 			<security:oscarSec roleName="<%=roleName$%>" objectName="_newCasemgmt.photo" rights="r">
 				<c:choose>
-					<c:when test="${not empty requestScope.image_exists}">
+					<c:when test="${junoEncounterForm.pageData.clientImagePresent}">
 						<img style="cursor: pointer;" id="ci"
 							 src="${fn:escapeXml(junoEncounterForm.pageData.imagePresentPlaceholderUrl)}"
 							 alt="id_photo" height="100" title="Click to upload new photo."
 							 OnMouseOver="document.getElementById('ci').src='../imageRenderingServlet?source=local_client&clientId=${fn:escapeXml(junoEncounterForm.pageData.demographicNo)}'"
 							 OnMouseOut="junoEncounter.delay(5000); window.status='Click to upload new photo'; return true;"
-							 onClick="junoEncounter.popupUploadPage('uploadimage.jsp',${fn:escapeXml(junoEncounterForm.pageData.demographicNo)});return false;" />
+							 onClick="junoEncounter.popupUploadPage('${ctx}/casemgmt/uploadimage.jsp',${fn:escapeXml(junoEncounterForm.pageData.demographicNo)});return false;" />
 					</c:when>
 					<c:otherwise>
 						<img style="cursor: pointer;"
 							 src="${fn:escapeXml(junoEncounterForm.pageData.imageMissingPlaceholderUrl)}"
 							 alt="No_Id_Photo" height="100" title="Click to upload new photo."
 							 OnMouseOver="window.status='Click to upload new photo';return true"
-							 onClick="junoEncounter.popupUploadPage('../casemgmt/uploadimage.jsp',${fn:escapeXml(junoEncounterForm.pageData.demographicNo)});return false;"/>
+							 onClick="junoEncounter.popupUploadPage('${ctx}/casemgmt/uploadimage.jsp',${fn:escapeXml(junoEncounterForm.pageData.demographicNo)});return false;"/>
 					</c:otherwise>
 				</c:choose>
 			</security:oscarSec>
@@ -588,14 +598,14 @@
 											   onclick="junoEncounter.getSectionRemote('${sectionName}', true, false); return false;"
 											   title="${section.remainingNotes} more items">
 												<img id="img${sectionName}5"
-													 src="graphics/expand.gif"/>&nbsp;&nbsp;
+													 src="${ctx}/oscarEncounter/graphics/expand.gif"/>&nbsp;&nbsp;
 											</a>
 										</c:when>
 										<c:otherwise>
 											<a border="0"
 											   class="expandCasemgmtSidebar encounterNoteTitle">
 												<img id="img${sectionName}1"
-													 src="/images/clear.gif"/>&nbsp;&nbsp;
+													 src="${ctx}/images/clear.gif"/>&nbsp;&nbsp;
 											</a>
 										</c:otherwise>
 									</c:choose>
@@ -1366,7 +1376,7 @@
 							 id='imgPrintCPP'
 							 alt="<bean:message key="oscarEncounter.togglePrintCPP.title"/>"
 							 onclick="return printNotes.printInfo(this,'printCPP');"
-							 src='<c:out value="${ctx}"/>/oscarEncounter/graphics/printer.png'>&nbsp;<bean:message
+							 src='<c:out value="${ctx}/oscarEncounter/graphics/printer.png"/>'>&nbsp;<bean:message
 							key="oscarEncounter.cpp.title"/>
 					</security:oscarSec>
 					</td>
@@ -1380,7 +1390,7 @@
 							 id='imgPrintRx'
 							 alt="<bean:message key="oscarEncounter.togglePrintRx.title"/>"
 							 onclick="return printNotes.printInfo(this, 'printRx');"
-							 src='<c:out value="${ctx}"/>/oscarEncounter/graphics/printer.png'>&nbsp;<bean:message
+							 src='<c:out value="${ctx}/oscarEncounter/graphics/printer.png"/>'>&nbsp;<bean:message
 							key="oscarEncounter.Rx.title"/></td>
 				</tr>
 				<tr>
@@ -1390,7 +1400,7 @@
 							 id='imgPrintLabs'
 							 alt="<bean:message key="oscarEncounter.togglePrintLabs.title"/>"
 							 onclick="return printNotes.printInfo(this, 'printLabs');"
-							 src='<c:out value="${ctx}"/>/oscarEncounter/graphics/printer.png'>&nbsp;<bean:message
+							 src='<c:out value="${ctx}/oscarEncounter/graphics/printer.png"/>'>&nbsp;<bean:message
 							key="oscarEncounter.Labs.title"/></td>
 				</tr>
 				<!--  extension point -->

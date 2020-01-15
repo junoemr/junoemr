@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -35,7 +35,7 @@ import java.util.List;
 
 public class EncounterResolvedIssueService extends EncounterSectionService
 {
-	private static final String SECTION_ID = "resolvedIssues";
+	public static final String SECTION_ID = "resolvedIssues";
 	protected static final String SECTION_TITLE_KEY = "oscarEncounter.NavBar.resolvedIssues";
 	protected static final String SECTION_TITLE_COLOUR = "#151B8D";
 

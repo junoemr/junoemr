@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -47,7 +47,7 @@ import java.util.List;
 
 public class EncounterLabResultService extends EncounterSectionService
 {
-	private static final String SECTION_ID = "labs";
+	public static final String SECTION_ID = "labs";
 	protected static final String SECTION_TITLE_KEY = "oscarEncounter.LeftNavBar.Labs";
 	protected static final String SECTION_TITLE_COLOUR = "#A0509C";
 	protected static final String SECTION_MENU_HEADER_KEY = "oscarEncounter.LeftNavBar.LabMenuHeading";

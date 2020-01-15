@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -75,6 +75,7 @@ public class EncounterPageData
 	private String encounterWindowHeight;
 	private String encounterWindowWidth;
 	private boolean encounterWindowMaximize;
+	private boolean clientImagePresent;
 
 
 	public String getUserColour()
@@ -495,6 +496,16 @@ public class EncounterPageData
 	public void setEncounterWindowMaximize(boolean encounterWindowMaximize)
 	{
 		this.encounterWindowMaximize = encounterWindowMaximize;
+	}
+
+	public boolean isClientImagePresent()
+	{
+		return clientImagePresent;
+	}
+
+	public void setClientImagePresent(boolean clientImagePresent)
+	{
+		this.clientImagePresent = clientImagePresent;
 	}
 
 	//=============================================================================

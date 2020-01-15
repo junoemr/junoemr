@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -50,6 +50,7 @@ public abstract class EncounterSectionService
 	protected static final String COLOUR_INELLIGIBLE = "#FF6600";
 	protected static final String COLOUR_PENDING = "#FF00FF";
 	protected static final String COLOUR_WARNING = "#FFA500";
+	protected static final String COLOUR_RED = "red";
 
 	public static final int INITIAL_ENTRIES_TO_SHOW = 6;
 	public static final int INITIAL_OFFSET = 0;

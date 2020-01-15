@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -26,18 +26,14 @@ package org.oscarehr.casemgmt.dto;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.oscarehr.casemgmt.service.DefaultNoteServiceTest;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertNotNull;
 
 public class EncounterSectionNoteTest
 {
-	private static Logger logger = Logger.getLogger(DefaultNoteServiceTest.class);
+	private static Logger logger = Logger.getLogger(EncounterSectionNoteTest.class);
 
 	EncounterSectionNote sectionNote1;
 	EncounterSectionNote sectionNote2;
@@ -59,38 +55,38 @@ public class EncounterSectionNoteTest
 	@Test
 	public void testCompareAscGood()
 	{
-		int resultAscGood = EncounterSectionNote.compare(sectionNote1, sectionNote2, true, false);
+		int resultAscGood = EncounterSectionNote.compare(sectionNote1, sectionNote2, true, false, false);
 		assertEquals(resultAscGood, -1);
 	}
 
 	@Test
 	public void testCompareAscBad()
 	{
-		int resultAscBad = EncounterSectionNote.compare(sectionNote2, sectionNote1, true, false);
+		int resultAscBad = EncounterSectionNote.compare(sectionNote2, sectionNote1, true, false, false);
 		assertEquals(resultAscBad, 1);
 	}
 
 	@Test
 	public void testCompareDescGood()
 	{
-		int resultDescGood = EncounterSectionNote.compare(sectionNote2, sectionNote1, false, false);
+		int resultDescGood = EncounterSectionNote.compare(sectionNote2, sectionNote1, false, false, false);
 		assertEquals(resultDescGood, -1);
 	}
 
 	@Test
 	public void testCompareDescBad()
 	{
-		int resultDescBad = EncounterSectionNote.compare(sectionNote1, sectionNote2, false, false);
+		int resultDescBad = EncounterSectionNote.compare(sectionNote1, sectionNote2, false, false, false);
 		assertEquals(resultDescBad, 1);
 	}
 
 	@Test
 	public void testCompareSame()
 	{
-		int resultSame = EncounterSectionNote.compare(sectionNote2, sectionNote3, true, false);
+		int resultSame = EncounterSectionNote.compare(sectionNote2, sectionNote3, true, false, false);
 		assertEquals(resultSame, 0);
 
-		resultSame = EncounterSectionNote.compare(sectionNote2, sectionNote3, false, false);
+		resultSame = EncounterSectionNote.compare(sectionNote2, sectionNote3, false, false, false);
 		assertEquals(resultSame, 0);
 	}
 }

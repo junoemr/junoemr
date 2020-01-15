@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@ import java.util.List;
 @Service
 public class EncounterTicklerService extends EncounterSectionService
 {
-	private static final String SECTION_ID = "tickler";
+	public static final String SECTION_ID = "tickler";
 	protected static final String SECTION_TITLE_KEY = "global.viewTickler";
 	protected static final String SECTION_TITLE_COLOUR = "#FF6600";
 

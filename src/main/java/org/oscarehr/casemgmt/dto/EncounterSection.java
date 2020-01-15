@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -23,30 +23,52 @@
 
 package org.oscarehr.casemgmt.dto;
 
+import org.oscarehr.casemgmt.service.EncounterAllergyService;
+import org.oscarehr.casemgmt.service.EncounterConsultationService;
+import org.oscarehr.casemgmt.service.EncounterDiseaseRegistryService;
+import org.oscarehr.casemgmt.service.EncounterDocumentService;
+import org.oscarehr.casemgmt.service.EncounterEFormService;
+import org.oscarehr.casemgmt.service.EncounterEpisodeService;
+import org.oscarehr.casemgmt.service.EncounterFamilyHistoryService;
+import org.oscarehr.casemgmt.service.EncounterFormService;
+import org.oscarehr.casemgmt.service.EncounterLabResultService;
+import org.oscarehr.casemgmt.service.EncounterMeasurementsService;
+import org.oscarehr.casemgmt.service.EncounterMedicationService;
+import org.oscarehr.casemgmt.service.EncounterMessengerService;
+import org.oscarehr.casemgmt.service.EncounterOtherMedsService;
+import org.oscarehr.casemgmt.service.EncounterPregnancyService;
+import org.oscarehr.casemgmt.service.EncounterPreventionNoteService;
+import org.oscarehr.casemgmt.service.EncounterResolvedIssueService;
+import org.oscarehr.casemgmt.service.EncounterRiskFactorsService;
+import org.oscarehr.casemgmt.service.EncounterTeamService;
+import org.oscarehr.casemgmt.service.EncounterTicklerService;
+import org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService;
+
 import java.util.List;
 
 public class EncounterSection
 {
-	public static final String TYPE_PREVENTIONS = "Preventions";
-	public static final String TYPE_TICKLER = "Tickler";
-	public static final String TYPE_DISEASE_REGISTRY = "DiseaseRegistry";
-	public static final String TYPE_FORMS = "Forms";
-	public static final String TYPE_EFORMS = "eForms";
-	public static final String TYPE_DOCUMENTS = "Documents";
-	public static final String TYPE_LAB_RESULTS = "LabResults";
-	public static final String TYPE_MESSENGER = "Messenger";
-	public static final String TYPE_MEASUREMENTS = "Measurments";
-	public static final String TYPE_CONSULTATIONS = "Consultations";
-	public static final String TYPE_ALLERGIES = "Allergies";
-	public static final String TYPE_MEDICATIONS = "Medications";
-	public static final String TYPE_OTHER_MEDS = "OMeds";
-	public static final String TYPE_RISK_FACTORS = "RiskFactors";
-	public static final String TYPE_FAMILY_HISTORY = "FamHistory";
-	public static final String TYPE_UNRESOLVED_ISSUES = "UnresolvedIssues";
-	public static final String TYPE_RESOLVED_ISSUES = "ResolvedIssues";
-	public static final String TYPE_DECISION_SUPPORT_ALERTS = "DecisionSupportAlerts";
-	public static final String TYPE_EPISODES = "Episodes";
-	public static final String TYPE_HEALTH_CARE_TEAM = "HealthCareTeam";
+	public static final String TYPE_PREVENTIONS = EncounterPreventionNoteService.SECTION_ID;
+	public static final String TYPE_TICKLER = EncounterTicklerService.SECTION_ID;
+	public static final String TYPE_DISEASE_REGISTRY = EncounterDiseaseRegistryService.SECTION_ID;
+	public static final String TYPE_FORMS = EncounterFormService.SECTION_ID;
+	public static final String TYPE_EFORMS = EncounterEFormService.SECTION_ID;
+	public static final String TYPE_DOCUMENTS = EncounterDocumentService.SECTION_ID;
+	public static final String TYPE_LAB_RESULTS = EncounterLabResultService.SECTION_ID;
+	public static final String TYPE_MESSENGER = EncounterMessengerService.SECTION_ID;
+	public static final String TYPE_MEASUREMENTS = EncounterMeasurementsService.SECTION_ID;
+	public static final String TYPE_CONSULTATIONS = EncounterConsultationService.SECTION_ID;
+	public static final String TYPE_ALLERGIES = EncounterAllergyService.SECTION_ID;
+	public static final String TYPE_MEDICATIONS = EncounterMedicationService.SECTION_ID;
+	public static final String TYPE_OTHER_MEDS = EncounterOtherMedsService.SECTION_ID;
+	public static final String TYPE_RISK_FACTORS = EncounterRiskFactorsService.SECTION_ID;
+	public static final String TYPE_FAMILY_HISTORY = EncounterFamilyHistoryService.SECTION_ID;
+	public static final String TYPE_UNRESOLVED_ISSUES = EncounterUnresolvedIssueService.SECTION_ID;
+	public static final String TYPE_RESOLVED_ISSUES = EncounterResolvedIssueService.SECTION_ID;
+	//public static final String TYPE_DECISION_SUPPORT_ALERTS = "DecisionSupportAlerts";
+	public static final String TYPE_EPISODES = EncounterEpisodeService.SECTION_ID;
+	public static final String TYPE_PREGNANCIES = EncounterPregnancyService.SECTION_ID;
+	public static final String TYPE_HEALTH_CARE_TEAM = EncounterTeamService.SECTION_ID;
 
 	private String title;
 	private String titleKey;

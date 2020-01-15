@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -39,7 +39,7 @@ import java.util.List;
 
 public class EncounterMessengerService extends EncounterSectionService
 {
-	private static final String SECTION_ID = "msgs";
+	public static final String SECTION_ID = "msgs";
 	protected static final String SECTION_TITLE_KEY = "oscarEncounter.LeftNavBar.Messages";
 	protected static final String SECTION_TITLE_COLOUR = "#7F462C";
 

@@ -1,15 +1,15 @@
 <li class="encounterNote \${rowClass}">
     {{if showExpand }}
     <a href="#" class="expandCasemgmtSidebar" onclick="junoEncounter.getSectionRemote('\${sectionName}', true, false); return false;" title="\${remainingNotes} more items">
-        <img id="imgpreventions5" src="graphics/expand.gif" />&nbsp;&nbsp;
+        <img id="imgpreventions5" src="\${contextPath}/oscarEncounter/graphics/expand.gif" />&nbsp;&nbsp;
     </a>
     {{else showCollapse }}
     <a href="#" class="expandCasemgmtSidebar" onclick="junoEncounter.getSectionRemote('\${sectionName}', false, false); return false;" title="\${remainingNotes} more items">
-        <img id="imgpreventions5" src="../oscarMessenger/img/collapse.gif" />&nbsp;&nbsp;
+        <img id="imgpreventions5" src="\${contextPath}/oscarMessenger/img/collapse.gif" />&nbsp;&nbsp;
     </a>
     {{else}}
     <a border="0" class="expandCasemgmtSidebar">
-        <img id="img\${sectionName}1" src="/images/clear.gif" />&nbsp;&nbsp;
+        <img id="img\${sectionName}1" src="\${contextPath}/images/clear.gif" />&nbsp;&nbsp;
     </a>
     {{/if}}
     <span class="encounterNoteTitle">

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ import java.util.List;
 
 public class EncounterTeamService extends EncounterSectionService
 {
-	private static final String SECTION_ID = "contacts";
+	public static final String SECTION_ID = "contacts";
 	private static final String SECTION_TEAM_TITLE_KEY = "global.healthCareTeam";
 	private static final String SECTION_CONTACTS_TITLE_KEY = "global.contacts";
 	private static final String SECTION_TITLE_COLOUR = "#6699CC";

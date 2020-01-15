@@ -324,6 +324,7 @@
 	<bean id="encounterMeasurementsService" class="org.oscarehr.casemgmt.service.EncounterMeasurementsService" autowire="byName" />
 	<bean id="encounterMedicationService" class="org.oscarehr.casemgmt.service.EncounterMedicationService" autowire="byName" />
 	<bean id="encounterMessengerService" class="org.oscarehr.casemgmt.service.EncounterMessengerService" autowire="byName" />
+	<bean id="encounterPregnancyService" class="org.oscarehr.casemgmt.service.EncounterPregnancyService" autowire="byName" />
 	<bean id="encounterPreventionNoteService" class="org.oscarehr.casemgmt.service.EncounterPreventionNoteService" autowire="byName" />
 	<bean id="encounterResolvedIssueService" class="org.oscarehr.casemgmt.service.EncounterResolvedIssueService" autowire="byName" />
 	<bean id="encounterTeamService" class="org.oscarehr.casemgmt.service.EncounterTeamService" autowire="byName" />
