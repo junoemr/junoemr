@@ -52,25 +52,29 @@ public class PropertyDaoTest extends DaoTestFixtures {
 	@Test
 	public void testFindByName() throws Exception {
 		
-		String name1 = "alpha";
-		String name2 = "bravo";
+		String name1 = "alpha1";
+		String name2 = "bravo1";
+		String name3 = "charlie1";
 		
 		Property property1 = new Property();
 		EntityDataGenerator.generateTestDataForModelClass(property1);
 		property1.setName(name1);
+		property1.setProviderNo("111");
 		dao.persist(property1);
 		
 		Property property2 = new Property();
 		EntityDataGenerator.generateTestDataForModelClass(property2);
 		property2.setName(name2);
+		property2.setProviderNo("111");
 		dao.persist(property2);
 		
 		Property property3 = new Property();
 		EntityDataGenerator.generateTestDataForModelClass(property3);
-		property3.setName(name1);
+		property3.setName(name3);
+		property3.setProviderNo("111");
 		dao.persist(property3);
 		
-		List<Property> expectedResult = new ArrayList<Property>(Arrays.asList(property1, property3));
+		List<Property> expectedResult = new ArrayList<Property>(Arrays.asList(property1));
 		List<Property> result = dao.findByName(name1);
 
 		Logger logger = MiscUtils.getLogger();
@@ -91,8 +95,10 @@ public class PropertyDaoTest extends DaoTestFixtures {
 	@Test
 	public void testFindByNameAndProvider() throws Exception {
 		
-		String name1 = "alpha";
-		String name2 = "bravo";
+		String name1 = "alpha2";
+		String name2 = "bravo2";
+		String name3 = "charlie2";
+		String name4 = "delta2";
 		
 		String providerNo1 = "101";
 		String providerNo2 = "202";
@@ -111,18 +117,18 @@ public class PropertyDaoTest extends DaoTestFixtures {
 		
 		Property property3 = new Property();
 		EntityDataGenerator.generateTestDataForModelClass(property3);
-		property3.setName(name1);
+		property3.setName(name3);
 		property3.setProviderNo(providerNo1);
 		dao.persist(property3);
 		
 		Property property4 = new Property();
 		EntityDataGenerator.generateTestDataForModelClass(property4);
-		property4.setName(name2);
-		property4.setProviderNo(providerNo1);
+		property4.setName(name4);
+		property4.setProviderNo(providerNo2);
 		dao.persist(property4);
 		
 		List<Property> expectedResult = new ArrayList<Property>(Arrays.asList(property1, property3));
-		List<Property> result = dao.findByNameAndProvider(name1, providerNo1);
+		List<Property> result = dao.findByProvider(providerNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -142,23 +148,26 @@ public class PropertyDaoTest extends DaoTestFixtures {
 	@Test
 	public void testCheckByName() throws Exception {
 		
-		String name1 = "alpha";
-		String name2 = "bravo";
-		String name3 = "charlie";
+		String name1 = "alpha3";
+		String name2 = "bravo3";
+		String name3 = "charlie3";
 		
 		Property property1 = new Property();
 		EntityDataGenerator.generateTestDataForModelClass(property1);
 		property1.setName(name1);
+		property1.setProviderNo("111");
 		dao.persist(property1);
 		
 		Property property2 = new Property();
 		EntityDataGenerator.generateTestDataForModelClass(property2);
 		property2.setName(name2);
+		property2.setProviderNo("111");
 		dao.persist(property2);
 		
 		Property property3 = new Property();
 		EntityDataGenerator.generateTestDataForModelClass(property3);
 		property3.setName(name3);
+		property3.setProviderNo("111");
 		dao.persist(property3);
 		
 		Property expectedResult = property2;
@@ -170,8 +179,10 @@ public class PropertyDaoTest extends DaoTestFixtures {
 	@Test
 	public void testFindByNameAndValue() throws Exception {
 
-		String name1 = "alpha";
-		String name2 = "bravo";
+		String name1 = "alpha4";
+		String name2 = "bravo4";
+		String name3 = "charlie4";
+		String name4 = "delta4";
 		
 		String value1 = "111";
 		String value2 = "222";
@@ -180,27 +191,31 @@ public class PropertyDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(property1);
 		property1.setName(name1);
 		property1.setValue(value1);
+		property1.setProviderNo("111");
 		dao.persist(property1);
 		
 		Property property2 = new Property();
 		EntityDataGenerator.generateTestDataForModelClass(property2);
 		property2.setName(name2);
 		property2.setValue(value1);
+		property2.setProviderNo("111");
 		dao.persist(property2);
 		
 		Property property3 = new Property();
 		EntityDataGenerator.generateTestDataForModelClass(property3);
-		property3.setName(name1);
+		property3.setName(name3);
 		property3.setValue(value1);
+		property3.setProviderNo("111");
 		dao.persist(property3);
 		
 		Property property4 = new Property();
 		EntityDataGenerator.generateTestDataForModelClass(property4);
-		property4.setName(name1);
+		property4.setName(name4);
 		property4.setValue(value2);
+		property4.setProviderNo("111");
 		dao.persist(property4);
 		
-		List<Property> expectedResult = new ArrayList<Property>(Arrays.asList(property1, property3));
+		List<Property> expectedResult = new ArrayList<Property>(Arrays.asList(property1));
 		List<Property> result = dao.findByNameAndValue(name1, value1);
 
 		Logger logger = MiscUtils.getLogger();
