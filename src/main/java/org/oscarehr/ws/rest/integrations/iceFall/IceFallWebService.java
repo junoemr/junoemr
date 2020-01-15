@@ -54,7 +54,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,24 +120,32 @@ public class IceFallWebService extends AbstractServiceImpl
 		return RestResponse.successResponse(true);
 	}
 
-	@POST
+	@GET
 	@Path("/logs")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public RestResponse<IceFallLogEntryListTo1> getLogEntries(IceFallLogSearchTo1 iceFallLogSearchTo1)
+	public RestResponse<IceFallLogEntryListTo1> getLogEntries(@QueryParam("startDate") String startDateString,
+																														@QueryParam("endDate") String endDateString,
+																														@QueryParam("page") Integer page,
+																														@QueryParam("pageSize") Integer pageSize,
+																														@QueryParam("status") String status,
+																														@QueryParam("SortBy") String sortBy,
+																														@QueryParam("sortDirection") String sortDirection)
 	{
+		LocalDateTime startDate = LocalDateTime.parse(startDateString);
+		LocalDateTime endDate = LocalDateTime.parse(endDateString);
 		ArrayList<IceFallLogEntryTo1> iceFallLogsTo1 = new ArrayList<>();
 
 		try
 		{
 			List<IceFallLog> logs = iceFallService.getIceFallLogs(
-							iceFallLogSearchTo1.getStartDate(),
-							iceFallLogSearchTo1.getEndDate(),
-							iceFallLogSearchTo1.getPage(),
-							iceFallLogSearchTo1.getPageSize(),
-							iceFallLogSearchTo1.getStatus(),
-							IceFallLogDao.SORT_BY.valueOf(iceFallLogSearchTo1.getSortBy()),
-							IceFallLogDao.SORT_DIRECTION.valueOf(iceFallLogSearchTo1.getSortDirection())
+							startDate,
+							endDate,
+							page,
+							pageSize,
+							status,
+							IceFallLogDao.SORT_BY.valueOf(sortBy),
+							IceFallLogDao.SORT_DIRECTION.valueOf(sortDirection)
 			);
 
 			for (IceFallLog log : logs)
@@ -146,11 +156,11 @@ public class IceFallWebService extends AbstractServiceImpl
 			IceFallLogEntryListTo1 iceFallLogEntryListTo1 = new IceFallLogEntryListTo1();
 			iceFallLogEntryListTo1.setLogEntries(iceFallLogsTo1);
 			iceFallLogEntryListTo1.setTotalLogEntries(iceFallService.getIceFallLogsCount(
-							iceFallLogSearchTo1.getStartDate(),
-							iceFallLogSearchTo1.getEndDate(),
-							iceFallLogSearchTo1.getPage(),
-							iceFallLogSearchTo1.getPageSize(),
-							iceFallLogSearchTo1.getStatus()));
+							startDate,
+							endDate,
+							page,
+							pageSize,
+							status));
 			return RestResponse.successResponse(iceFallLogEntryListTo1);
 		}
 		catch (IllegalArgumentException e)

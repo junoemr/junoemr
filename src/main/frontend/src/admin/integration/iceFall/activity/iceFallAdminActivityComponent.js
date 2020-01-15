@@ -68,26 +68,26 @@ angular.module('Admin.Integration').component('iceFallAdminActivity',
 								return [];
 							}
 
-							return iceFallApi.getLogEntries({
-								status: ctrl.statusFilter,
-								startDate: ctrl.startDate +"T01:01:01",
-								endDate: ctrl.endDate +"T23:59:59",
-								page: params.page(),
-								pageSize: params.count(),
-								sortBy: ctrl.orderByToApiName(params.orderBy()),
-								sortDirection: ctrl.orderByGetDirection(params.orderBy())
-							}).then(
-									function success(result)
-									{
-										ctrl.logEntries = result.data.body.logEntries;
-										params.total(result.data.body.totalLogEntries);
-										return ctrl.logEntries;
-									},
-									function error(result)
-									{
-										console.error("Failed to retrieve IceFall log entries! error: " + result);
-									}
-							)
+							return iceFallApi.getLogEntries(
+									ctrl.startDate +"T01:01:01",
+									ctrl.endDate +"T23:59:59",
+									params.page(),
+									params.count(),
+									ctrl.statusFilter,
+									ctrl.orderByToApiName(params.orderBy()),
+									ctrl.orderByGetDirection(params.orderBy())
+									).then(
+										function success(result)
+										{
+											ctrl.logEntries = result.data.body.logEntries;
+											params.total(result.data.body.totalLogEntries);
+											return ctrl.logEntries;
+										},
+										function error(result)
+										{
+											console.error("Failed to retrieve IceFall log entries! error: " + result);
+										}
+									)
 						}
 					}
 			);
