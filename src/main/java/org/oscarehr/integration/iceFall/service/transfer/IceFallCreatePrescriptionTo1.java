@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import oscar.util.Jackson.LocalDateYYYY_MM_ddSerializer;
+import oscar.util.Jackson.LocalDateSerializer;
 
 import java.time.LocalDate;
 
@@ -40,7 +40,7 @@ public class IceFallCreatePrescriptionTo1
 	private Float dosage;
 	@JsonProperty("regexpiry")
 	@JsonDeserialize(using = LocalDateDeserializer.class)
-	@JsonSerialize(using = LocalDateYYYY_MM_ddSerializer.class)
+	@JsonSerialize(using = LocalDateSerializer.class)
 	private LocalDate registrationExpiry;
 	private String type;
 	@JsonProperty("thclimit")

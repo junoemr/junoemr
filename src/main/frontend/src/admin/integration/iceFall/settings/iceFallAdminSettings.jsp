@@ -57,16 +57,15 @@
 			>
 			</ca-field-text>
 
-			<ca-field-text
+			<ca-field-password
 							class="md-margin-top"
 							ca-name="password"
 							ca-title="Password"
-							ca-hide-text="true"
 							ca-text-placeholder ="*********"
 							ca-model="$ctrl.iceFallSettings.clinicPassword"
 							ca-rows="1"
 			>
-			</ca-field-text>
+			</ca-field-password>
 		</fieldset>
 
 		<div class="md-margin-top d-flex flex-row justify-content-right">

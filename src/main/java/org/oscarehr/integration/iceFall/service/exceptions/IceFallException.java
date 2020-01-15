@@ -26,6 +26,7 @@ public class IceFallException extends RuntimeException
 {
 	public enum USER_ERROR_MESSAGE {
 		UNKNOWN_ERROR,
+		INTEGRATION_DISABLED,
 		NO_CUST_ID_OR_EMAIL,
 		CUST_EMAIL_ALREADY_EXISTS,
 		USER_CREATION_ERROR,
@@ -49,6 +50,9 @@ public class IceFallException extends RuntimeException
 				return "An error occurred when attempting to connect " +
 								"to the remote system used in receiving " +
 								"the customer’s prescription electronically. Please fax the prescription.";
+			case INTEGRATION_DISABLED:
+				return "The Ice Fall Integration is not currently enabled. Please enable it on the Admin Page, " +
+								"admin privileges required. In the mean time, please fax the prescription";
 			case NO_CUST_ID_OR_EMAIL:
 				return "This patient does not have a valid email address or a canopy customerid and as " +
 								"a result their prescription cannot be sent electronically. Please fax " +

@@ -169,78 +169,82 @@ public class IceFallWebService extends AbstractServiceImpl
 		Provider provider = getCurrentProvider();
 		Demographic demo = demographicDao.find(iceFallSendFormTo1.getDemographicNo());
 
-		// filter eform values for pdf generation
-		HashMap<String, String> eformValues = new HashMap<>();
-		for(Map.Entry<String, String> entry : iceFallSendFormTo1.getEformValues().entrySet())
+		if (systemPreferenceService.isPreferenceEnabled(UserProperty.ICE_FALL_INTEGRATION_ENABLED, false) &&
+						systemPreferenceService.isPreferenceEnabled(UserProperty.ICE_FALL_VISIBLE, false))
 		{
-			if (entry.getValue() != null && !entry.getValue().isEmpty())
+			// filter eform values for pdf generation
+			HashMap<String, String> eformValues = new HashMap<>();
+			for (Map.Entry<String, String> entry : iceFallSendFormTo1.getEformValues().entrySet())
 			{
-				eformValues.put(entry.getKey(), entry.getValue());
-			}
-		}
-
-		// determine if submitting new or existing eform.
-		Integer eformId = iceFallSendFormTo1.getFid();
-		boolean isInstance = false;
-		if (iceFallSendFormTo1.getFdid() != null)
-		{
-			isInstance = true;
-			eformId = iceFallSendFormTo1.getFdid();
-		}
-
-		EFormData saveEFormForPrint = null;
-		try
-		{
-			// save eform & prepare pdf for submission
-			saveEFormForPrint = iceFallService.saveEFormForPrint(provider, demo, eformId, eformValues, isInstance);
-			AtomicInteger pageCount = new AtomicInteger();
-			String pdfData = iceFallService.printToPDF(saveEFormForPrint.getId(), provider.getProviderNo(), getHttpServletRequest().getScheme(), getHttpServletRequest().getContextPath(), pageCount);
-			// submit
-			iceFallService.sendIceFallForm(provider, demo, pdfData, iceFallSendFormTo1, pageCount.get());
-			iceFallService.logIceFallSent("Prescription Sent", provider.getProviderNo(), eformId, demo.getId(), isInstance);
-
-			return RestResponse.successResponse(true);
-		}
-		catch (IceFallException e)
-		{// IceFall Error
-			MiscUtils.getLogger().error("Failed to send IceFall Prescription due to exception", e);
-			if (saveEFormForPrint != null)
-			{
-				iceFallService.logIceFallError(e.getUserErrorMessage(provider), provider.getProviderNo(), saveEFormForPrint.getId(), demo.getId(),true);
-			}
-			else
-			{
-				iceFallService.logIceFallError(e.getUserErrorMessage(provider), provider.getProviderNo(), eformId, demo.getId(), isInstance);
+				if (entry.getValue() != null && !entry.getValue().isEmpty())
+				{
+					eformValues.put(entry.getKey(), entry.getValue());
+				}
 			}
 
-			return RestResponse.errorResponse(e.getUserErrorMessage(provider));
-		}
-		catch (IceFallRESTException e)
-		{// REST Error
-			MiscUtils.getLogger().error("Failed to send IceFall Prescription due to REST exception", e);
-			if (saveEFormForPrint != null)
+			// determine if submitting new or existing eform.
+			Integer eformId = iceFallSendFormTo1.getFid();
+			boolean isInstance = false;
+			if (iceFallSendFormTo1.getFdid() != null)
 			{
-				iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider), provider.getProviderNo(), saveEFormForPrint.getId(), demo.getId(), true);
-			}
-			else
-			{
-				iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider), provider.getProviderNo(), eformId, demo.getId(), isInstance);
+				isInstance = true;
+				eformId = iceFallSendFormTo1.getFdid();
 			}
 
-			return RestResponse.errorResponse(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider));
+			EFormData saveEFormForPrint = null;
+			try
+			{
+				// save eform & prepare pdf for submission
+				saveEFormForPrint = iceFallService.saveEFormForPrint(provider, demo, eformId, eformValues, isInstance);
+				AtomicInteger pageCount = new AtomicInteger();
+				String pdfData = iceFallService.printToPDF(saveEFormForPrint.getId(), provider.getProviderNo(), getHttpServletRequest().getScheme(), getHttpServletRequest().getContextPath(), pageCount);
+				// submit
+				iceFallService.sendIceFallForm(provider, demo, pdfData, iceFallSendFormTo1, pageCount.get());
+				iceFallService.logIceFallSent("Prescription Sent", provider.getProviderNo(), eformId, demo.getId(), isInstance);
+
+				return RestResponse.successResponse(true);
+			} catch (IceFallException e)
+			{// IceFall Error
+				MiscUtils.getLogger().error("Failed to send IceFall Prescription due to exception", e);
+				if (saveEFormForPrint != null)
+				{
+					iceFallService.logIceFallError(e.getUserErrorMessage(provider), provider.getProviderNo(), saveEFormForPrint.getId(), demo.getId(), true);
+				} else
+				{
+					iceFallService.logIceFallError(e.getUserErrorMessage(provider), provider.getProviderNo(), eformId, demo.getId(), isInstance);
+				}
+
+				return RestResponse.errorResponse(e.getUserErrorMessage(provider));
+			} catch (IceFallRESTException e)
+			{// REST Error
+				MiscUtils.getLogger().error("Failed to send IceFall Prescription due to REST exception", e);
+				if (saveEFormForPrint != null)
+				{
+					iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider), provider.getProviderNo(), saveEFormForPrint.getId(), demo.getId(), true);
+				} else
+				{
+					iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider), provider.getProviderNo(), eformId, demo.getId(), isInstance);
+				}
+
+				return RestResponse.errorResponse(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.UNKNOWN_ERROR, provider));
+			} catch (Exception e)
+			{// Any other type of error
+				MiscUtils.getLogger().error("Internal server error while trying to electronically submit prescription", e);
+				if (saveEFormForPrint != null)
+				{
+					iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.INTERNAL_SERVER_ERROR, provider), provider.getProviderNo(), saveEFormForPrint.getId(), demo.getId(), true);
+				} else
+				{
+					iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.INTERNAL_SERVER_ERROR, provider), provider.getProviderNo(), eformId, demo.getId(), isInstance);
+				}
+				return RestResponse.errorResponse(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.INTERNAL_SERVER_ERROR, provider));
+			}
 		}
-		catch (Exception e)
-		{// Any other type of error
-			MiscUtils.getLogger().error("Internal server error while trying to electronically submit prescription", e);
-			if (saveEFormForPrint != null)
-			{
-				iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.INTERNAL_SERVER_ERROR, provider), provider.getProviderNo(), saveEFormForPrint.getId(), demo.getId(), true);
-			}
-			else
-			{
-				iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.INTERNAL_SERVER_ERROR, provider), provider.getProviderNo(), eformId, demo.getId(), isInstance);
-			}
-			return RestResponse.errorResponse(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.INTERNAL_SERVER_ERROR, provider));
+		else
+		{//integration not enabled throw out error
+			MiscUtils.getLogger().error("Attempted to send IceFall Prescription without integration enabled");
+			iceFallService.logIceFallError(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.INTEGRATION_DISABLED, provider), provider.getProviderNo(), iceFallSendFormTo1.getFid(), demo.getId(), false);
+			return  RestResponse.errorResponse(IceFallException.getUserErrorMessage(IceFallException.USER_ERROR_MESSAGE.INTEGRATION_DISABLED, provider));
 		}
 	}
 

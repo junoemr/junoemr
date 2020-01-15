@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import oscar.util.Jackson.LocalDateYYYY_MM_ddSerializer;
+import oscar.util.Jackson.LocalDateSerializer;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -41,7 +41,7 @@ public class IceFallCreateCustomerTo1 implements Serializable
 	private String lastName;
 	private String email;
 	@JsonProperty("dobirth")
-	@JsonSerialize(using = LocalDateYYYY_MM_ddSerializer.class)
+	@JsonSerialize(using = LocalDateSerializer.class)
 	@JsonDeserialize(using = LocalDateDeserializer.class)
 	private LocalDate dateOfBirth;
 	private String gender;

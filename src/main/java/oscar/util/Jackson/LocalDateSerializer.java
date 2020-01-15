@@ -32,9 +32,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 // Serialize LocalDates to DEFAULT_DATE_PATTERN format
-public class LocalDateYYYY_MM_ddSerializer extends StdSerializer<LocalDate>
+public class LocalDateSerializer extends StdSerializer<LocalDate>
 {
-	public LocalDateYYYY_MM_ddSerializer()
+	public LocalDateSerializer()
 	{
 		super(LocalDate.class);
 	}

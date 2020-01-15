@@ -210,6 +210,7 @@ module.exports = {
 			'./src/common/directives/clinicaid/ca_field_date3.js',
 			'./src/common/directives/clinicaid/ca_field_date.js',
 			'./src/common/directives/clinicaid/ca_field_number.js',
+			'./src/common/directives/clinicaid/ca_field_password.js',
 			'./src/common/directives/clinicaid/ca_field_radio.js',
 			'./src/common/directives/clinicaid/ca_field_select.js',
 			'./src/common/directives/clinicaid/ca_field_text.js',
