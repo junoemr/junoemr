@@ -369,7 +369,7 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
         <%
             dxRes = new dxResearchBeanHandler(bean.demographicNo);
             dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-            flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getUniveralFlowsheets();
+            flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getUniversalFlowSheets();
             for (String flowsheet : flowsheets) {
                 MeasurementFlowSheet measurementFlowSheet = MeasurementTemplateFlowSheetConfig.getInstance().getFlowSheet(flowsheet);
                 if (MeasurementHelper.flowSheetRequiresWork(bean.demographicNo, measurementFlowSheet)) {

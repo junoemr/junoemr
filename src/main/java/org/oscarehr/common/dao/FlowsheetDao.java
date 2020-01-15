@@ -54,4 +54,19 @@ public class FlowsheetDao extends AbstractDao<Flowsheet>{
 		
 		return getSingleResultOrNull(query);
 	}
+
+	/**
+	 * Method to specifically pull flowsheet entries from the DB that are system-level ones.
+	 * These entries get inserted whenever someone hits enable or disable flowsheet.
+	 */
+	public Flowsheet findExternalByName(String name)
+	{
+		Query query = entityManager.createQuery("SELECT f " +
+				"FROM Flowsheet f " +
+				"WHERE f.name=:name " +
+				"AND f.external=true");
+		query.setParameter("name", name);
+
+		return getSingleResultOrNull(query);
+	}
 }

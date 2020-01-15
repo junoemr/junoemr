@@ -84,7 +84,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 
 			com.quatro.service.security.SecurityManager securityMgr = new com.quatro.service.security.SecurityManager();
 
-			ArrayList<String> flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getUniveralFlowsheets();
+			List<String> flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getUniversalFlowSheets();
 			
 			if (!OscarProperties.getInstance().getBooleanProperty("new_flowsheet_enabled", "true")) {
 				flowsheets.remove("diab3");
@@ -95,11 +95,10 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 				NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 				String flowsheetName = flowsheets.get(f);
 				if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, roleName$)) {
-					Flowsheet fs = null;
-					if ((fs = flowsheetDao.findByName(flowsheetName)) != null) {
-						if (!fs.isEnabled()) {
-							continue;
-						}
+					Flowsheet fs = flowsheetDao.findByName(flowsheetName);
+					if (fs != null && !fs.isEnabled())
+					{
+						continue;
 					}
 					String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
 
