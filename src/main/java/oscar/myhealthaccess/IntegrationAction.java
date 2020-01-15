@@ -66,7 +66,14 @@ public class IntegrationAction extends DispatchAction
 		if (integrations.size() == 1)
 		{
 			Integration integration = integrations.get(0);
-			return connectToClinic(request, mapping, integration.getSite().getName());
+			String siteName = null;
+
+			if (integration.getSite() != null)
+			{
+				siteName = integration.getSite().getName();
+			}
+
+			return connectToClinic(request, mapping, siteName);
 		}
 		else
 		{
