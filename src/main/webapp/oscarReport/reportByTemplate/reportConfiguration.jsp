@@ -85,6 +85,12 @@
         }
         return true;
     }
+
+    function onSubmit()
+		{
+			$("#query-submit-button").prop("disabled", true);
+			$('#please-wait-msg').css('visibility', 'visible');
+		}
 </script>
 </head>
 
@@ -151,7 +157,7 @@
 			style="color: red;" <%}%>><%=curreport.getTitle()%></div>
 		<div class="reportDescription"><%=curreport.getDescription()%></div>
 		<html:form action="/oscarReport/reportByTemplate/GenerateReportAction"
-			onsubmit="return checkform(this);">
+			onsubmit="onSubmit();return checkform(this);">
 			<input type="hidden" name="templateId"
 				value="<%=curreport.getTemplateId()%>">
 			<input type="hidden" name="type" value="<%=curreport.getType()%>">
@@ -235,7 +241,7 @@
 					<th>Step <%=step+1%>:</th>
 					<td>Generate Query</td>
 					<td>
-						<input type="submit" name="submitButton" value="Run Query" onclick="this.disabled='true';$('#please-wait-msg').css('visibility', 'visible');">
+						<input id="query-submit-button" type="submit" name="submitButton" value="Run Query">
 						<h4 id="please-wait-msg" style="display: inline-block; visibility: hidden;">Please Wait....</h4>
 					</td>
 					<td><input type="submit" name="getCSV" value="Export to CSV"></td>
