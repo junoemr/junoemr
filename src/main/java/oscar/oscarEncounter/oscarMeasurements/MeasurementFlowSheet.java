@@ -165,7 +165,8 @@ public class MeasurementFlowSheet {
         
         if (dxTriggers != null){
             for(String s:dxTriggers){
-                 if (!s.equals("OscarCode:CKDSCREEN")){
+                // I don't know how icd10 is being put into this dxTriggers but we don't support it currently
+                if (!s.equals("OscarCode:CKDSCREEN") && !s.contains("icd10")){
                 	 String[] type = s.split(":");
                  desc=dao.getCodeDescription(type[0], type[1]);
                  sb.append("<li><a href='javascript:void(0);' id='dxlink"+type[1]+"' rel='selectedCodingSystem="+type[0]+"&forward="+type[1]+"&demographicNo="+demo+"&providerNo="+provider+"'>"+s+ " " + desc +"</a></li>");
