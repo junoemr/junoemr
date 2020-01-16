@@ -52,8 +52,8 @@ public class EFormTemplateService
 	@Autowired
 	private UserPropertyDAO userPropertyDAO;
 
-	private static Integer EFORM_DEFAULT_WIDTH = 700;
-	private static Integer EFORM_DEFAULT_HEIGHT = 800;
+	public static Integer EFORM_DEFAULT_WIDTH = 700;
+	public static Integer EFORM_DEFAULT_HEIGHT = 800;
 
 	/**
 	 * Save a new EForm template
