@@ -139,12 +139,12 @@ public class ProviderService extends AbstractServiceImpl {
         return ProviderTransfer.toTransfer(providerDao.getProvider(id));
     }
 
-	/**
-	 * create a new provider.
-	 * @param createProviderTo1 - form data to create the provider from
-	 * @return - the new provider.
-	 */
-	@POST
+		/**
+		 * create a new provider.
+		 * @param createProviderTo1 - form data to create the provider from
+		 * @return - the new provider.
+		 */
+		@POST
 		@Path("/provider/new")
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)

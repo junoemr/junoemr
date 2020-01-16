@@ -407,11 +407,20 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			//validate fields
 			if (ctrl.allFieldsValid())
 			{// valid
-				alert("WINWWIWIWNIWIWNWIWNWI");
+				providerService.createProvider(ctrl.provider).then(
+						function success(result)
+						{
+							alert("WIN");
+						},
+						function error(result)
+						{
+							alert("API ERROR");
+						}
+				);
 			}
 			else
 			{//invalid
-				alert("FAIL :(");
+				alert("INVALID");
 			}
 		};
 

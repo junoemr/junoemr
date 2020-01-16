@@ -183,6 +183,31 @@ angular.module("Common.Services").service("providerService", [
 			return deferred.promise;
 		};
 
+		// create a new provider
+		service.createProvider = function createProvider(providerTo1)
+		{
+			var deferred = $q.defer();
+
+			$http(
+					{
+						url: service.apiPath + "/provider/new",
+						method: "POST",
+						data: JSON.stringify(providerTo1),
+						headers: Juno.Common.ServiceHelper.configHeaders()
+					}).then(
+					function success(results)
+					{
+						deferred.resolve(results.data);
+					},
+					function error(errors)
+					{
+						console.log("providerService::create error", errors);
+						deferred.reject("An error occurred while creating a new provider");
+					});
+
+			return deferred.promise;
+		};
+
 		return service;
 	}
 ]);
