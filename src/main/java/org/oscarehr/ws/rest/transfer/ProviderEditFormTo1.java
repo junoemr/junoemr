@@ -28,7 +28,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateProviderTo1 implements Serializable
+public class ProviderEditFormTo1 implements Serializable
 {
 	// user info
 	private String firstName;

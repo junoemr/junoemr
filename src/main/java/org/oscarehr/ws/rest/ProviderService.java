@@ -41,7 +41,7 @@ import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.transfer.CreateProviderTo1;
+import org.oscarehr.ws.rest.transfer.ProviderEditFormTo1;
 import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
@@ -141,14 +141,14 @@ public class ProviderService extends AbstractServiceImpl {
 
 		/**
 		 * create a new provider.
-		 * @param createProviderTo1 - form data to create the provider from
+		 * @param providerEditFormTo1 - form data to create the provider from
 		 * @return - the new provider.
 		 */
 		@POST
 		@Path("/provider/new")
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
-		public RestResponse<ProviderTo1> createProvider(CreateProviderTo1 createProviderTo1)
+		public RestResponse<ProviderTo1> createProvider(ProviderEditFormTo1 providerEditFormTo1)
 		{
 			return RestResponse.errorResponse("Not Implemented");
 		}
