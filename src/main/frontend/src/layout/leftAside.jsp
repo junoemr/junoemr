@@ -126,7 +126,7 @@
 								</button>
 							</div>
 							<div class="col-md-6" ng-click="$ctrl.goToRecord(patient)">
-								<h6>{{patient.name}}</h6>
+								<div class="patient-name-aside">{{patient.name}}</div>
 								<span>{{patient.startTime}} {{patient.reason}}</span>
 							</div>
 							<div class="col-md-6">

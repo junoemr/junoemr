@@ -1,6 +1,11 @@
 
 #patient-list-template {
 
+	.appt-aside-container {
+		padding-top: 8px;
+		padding-bottom: 8px;
+	}
+
 	.btn-aside-container {
 		position:absolute;
 		left: 0;
@@ -26,12 +31,12 @@
 		width: 100%;
 		height: 100%;
 		position: absolute;
-		top: 75%;
-		left: 90%;
+		top: 35%;
+		left: 48%;
 	}
 
 	.icon-video {
-		font-size: 14px;
+		font-size: 20px;
 		object-fit: contain;
 	}
 
@@ -109,6 +114,11 @@
 				}
 			}
 		}
+	}
+
+	.patient-name-aside {
+		font-size: 14px;
+		font-weight: bold;
 	}
 }
 
