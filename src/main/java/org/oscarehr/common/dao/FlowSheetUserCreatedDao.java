@@ -52,5 +52,25 @@ public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated> {
 
 		return getSingleResultOrNull(query);
 	}
+
+	/**
+	 * Given a user created flowsheet that's currently active, archive it.
+	 * @param flowSheetUserCreated user-created flowsheet to archive
+	 */
+	public void archive(FlowSheetUserCreated flowSheetUserCreated)
+	{
+		flowSheetUserCreated.setArchived(true);
+		merge(flowSheetUserCreated);
+	}
+
+	/**
+	 * Given a user created flowsheet that's been archived, unarchive it.
+	 * @param flowSheetUserCreated user-created flowsheet to unarchive
+	 */
+	public void unarchive(FlowSheetUserCreated flowSheetUserCreated)
+	{
+		flowSheetUserCreated.setArchived(false);
+		merge(flowSheetUserCreated);
+	}
 	
 }

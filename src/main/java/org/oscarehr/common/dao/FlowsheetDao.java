@@ -76,7 +76,6 @@ public class FlowsheetDao extends AbstractDao<Flowsheet>{
 	 * If no entry exists, an entry will be created for an "external" flowsheet
 	 * (flowsheet whose XML contents come from outside the database)
 	 * @param name name of the flowsheet to disable
-	 * @return Flowsheet object for the sheet we disabled
 	 */
 	public void disableFlowsheet(String name)
 	{
@@ -103,7 +102,6 @@ public class FlowsheetDao extends AbstractDao<Flowsheet>{
 	 * If no entry exists, an entry will be created for an "external" flowsheet
 	 * (flowsheet whose XML contents come from outside the database)
 	 * @param name name of the flowsheet to disable
-	 * @return Flowsheet object who was just enabled
 	 */
 	public void enableFlowsheet(String name)
 	{

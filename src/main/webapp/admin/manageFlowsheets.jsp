@@ -48,6 +48,7 @@
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
 <%@ page import="org.oscarehr.common.model.Flowsheet" %>
 <%@ page import="java.util.Hashtable" %>
+<%@ page import="org.oscarehr.common.model.FlowSheetUserCreated" %>
 
 <%
 	String method = request.getParameter("method");
@@ -196,24 +197,37 @@ br {
 					<td><b>Actions</b></td>
 				</tr>
 			<%
-			Hashtable<String, String> systemFlowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetDisplayNames();
+				MeasurementTemplateFlowSheetConfig measurementConfig = MeasurementTemplateFlowSheetConfig.getInstance();
+				Hashtable<String, String> systemFlowsheets = measurementConfig.getFlowsheetDisplayNames();
 				for(String name:systemFlowsheets.keySet()) {
-					MeasurementFlowSheet flowSheet = MeasurementTemplateFlowSheetConfig.getInstance().getFlowSheet(name);
+					MeasurementFlowSheet flowSheet = measurementConfig.getFlowSheet(name);
 					
 					//load from db to know if it's enabled or not.
-					Flowsheet fs = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetSettings().get(flowSheet.getName());
-					boolean enabled=true;
-					if(fs != null) {
-						enabled = fs.isEnabled();
-					}
-					String type="System";
-					if(fs!=null) {
-						type = (fs.isExternal())?"System":"Custom";
-					}
+					Flowsheet fs = measurementConfig.getFlowsheetSettings().get(flowSheet.getName());
+					boolean enabled = true;
+					String type = "System";
 
+					if (fs != null)
+					{
+						enabled = fs.isEnabled();
+						if (!fs.isExternal())
+						{
+							type = "Custom";
+						}
+					}
+					else
+					{
+						// check if this is a user-created flowsheet
+						FlowSheetUserCreated flowSheetUserCreated = measurementConfig.getUserCreatedFlowsheetSettings().get(flowSheet.getName());
+						if (flowSheetUserCreated != null)
+						{
+							enabled = !flowSheetUserCreated.getArchived();
+							type = "User Added";
+						}
+					}
 
 					if(!flowSheet.getDisplayName().equals("Health Tracker")){
-					%>
+			%>
 						
 						<tr>
 							<td><%=flowSheet.getDisplayName()%></td>
