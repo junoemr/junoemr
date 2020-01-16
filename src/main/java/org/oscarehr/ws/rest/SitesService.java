@@ -25,7 +25,6 @@ package org.oscarehr.ws.rest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Site;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.conversion.SiteConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
