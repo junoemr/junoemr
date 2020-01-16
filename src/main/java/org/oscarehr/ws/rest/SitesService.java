@@ -31,10 +31,13 @@ import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.transfer.SiteTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import java.time.LocalDate;
 import java.util.List;
 
 @Path("/sites")
@@ -63,4 +66,35 @@ public class SitesService extends AbstractServiceImpl
 	{
 		return RestResponse.successResponse(org.oscarehr.common.IsPropertiesOn.isMultisitesEnable());
 	}
+
+	@GET
+	@Path("/provider/{providerNo}")
+	public RestSearchResponse<SiteTransfer> getSitesByProvider(@PathParam("providerNo") String providerNo)
+	{
+		List<Site> sites = siteDao.getActiveSitesByProviderNo(providerNo);
+
+		SiteConverter converter = new SiteConverter();
+		List<SiteTransfer> transferList = converter.getAllAsTransferObjects(null, sites);
+
+		return RestSearchResponse.successResponseOnePage(transferList);
+	}
+
+	@GET
+	@Path("/provider/{providerNo}/{sdate}")
+	public RestResponse<SiteTransfer> getProviderSiteBySchedule(@PathParam("providerNo") String providerNo, @PathParam("sdate") String sdate)
+	{
+		LocalDate sdateLocalDate = ConversionUtils.toLocalDate(sdate);
+		Site site = siteDao.getProviderSiteByScheduleDate(providerNo, sdateLocalDate);
+
+		if (site != null)
+		{
+			SiteConverter converter = new SiteConverter();
+			return RestResponse.successResponse(converter.getAsTransferObject(null, site));
+		}
+		else
+		{
+			return RestResponse.errorResponse("No Site Assigned to provider: " + providerNo + " for day: " + sdate);
+		}
+	}
+
 }

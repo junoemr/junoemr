@@ -7,6 +7,7 @@
 
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
+import {SitesApi} from "../../generated";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
@@ -53,6 +54,7 @@ angular.module('Schedule').component('eventComponent', {
 			$scope.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 				'../ws/rs');
 
+			let sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
 			//=========================================================================
 			// Access Control
 			//=========================================================================/
@@ -167,6 +169,7 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.isDoubleBook = false;
 			controller.isDoubleBookPrevented = false;
+			controller.siteOptions = [];
 
 			controller.providerModel = {
 				providerNo: null,
@@ -260,12 +263,6 @@ angular.module('Schedule').component('eventComponent', {
 				$scope.events = data.events;
 				$scope.scheduleId = data.scheduleId;
 
-				// filter site options to only include valid sites.
-				controller.siteOptions = controller.parentScope.siteOptions.filter(function (value, index, arr)
-				{
-					return (value.uuid != null);
-				});
-
 				controller.sitesEnabled = controller.parentScope.hasSites();
 
 				controller.keyBinding.bindKeyGlobal("ctrl+enter", $scope.keyBindSettings["ctrl+enter"]);
@@ -334,11 +331,6 @@ angular.module('Schedule').component('eventComponent', {
 					// clear the patient model
 					controller.demographicModel.clear();
 					$scope.eventData.site = controller.parentScope.selectedSiteName;
-					// set the default site selection if the current one is invalid
-					if (controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
-					{
-						$scope.eventData.site = controller.siteOptions[0].value;
-					}
 
 					focus.element("#input-patient");
 					controller.checkEventConflicts(); // uses the eventData
@@ -348,11 +340,102 @@ angular.module('Schedule').component('eventComponent', {
 				}
 
 				controller.changeTab(controller.tabEnum.appointment);
+
+				sitesApi.getSitesByProvider(controller.providerModel.providerNo).then(
+						function success(results)
+						{
+							// get all sites assigned to the provider on which the appointment is to be booked.
+							controller.siteOptions = [];
+							for(let site of results.data.body)
+							{
+								if (site.siteId != null)
+								{
+									controller.siteOptions.push({
+										label: site.name,
+										value: site.name,
+										uuid: site.siteId,
+										color: site.bgColor,
+									});
+								}
+							}
+
+							sitesApi.getSitesByProvider(securityService.getUser().providerNo).then(
+									function success(userSites)
+									{
+										// filter out sites that the current user is not assigned to.
+										let filteredSites = [];
+										for(let site of controller.siteOptions)
+										{
+											if (userSites.data.body.find(el => el.name === site.value))
+											{
+												filteredSites.push(site);
+											}
+										}
+										controller.siteOptions = filteredSites;
+
+										if (controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
+										{
+											// get site for the provider being booked on to.
+											sitesApi.getProviderSiteBySchedule(controller.providerModel.providerNo, $scope.eventData.startDate).then(
+													function success(result)
+													{// assign to schedule site that we are booking in to.
+														let site = controller.siteOptions.find(el => el.uuid === result.data.body.siteId);
+														if (site)
+														{
+															$scope.eventData.site = site.value;
+														}
+														else
+														{
+															controller.assignDefaultSite();
+														}
+													},
+													function error(result)
+													{
+														controller.assignDefaultSite();
+													}
+											);
+										}
+									},
+									function error(result)
+									{
+										console.error("Failed to lookup sites for the current user, with error: " + result);
+									}
+							);
+
+						},
+						function error(results)
+						{
+							console.error("Failed to get provider Site assignment with error: " + results);
+						}
+				);
 			};
 
 			//=========================================================================
 			// Private methods
 			//=========================================================================/
+
+			//assign a default site
+			controller.assignDefaultSite = function()
+			{
+				// set default site selection
+				if (controller.siteOptions[0])
+				{
+					$scope.eventData.site = controller.siteOptions[0].value;
+				}
+				else if (controller.siteOptions.length === 0)
+				{// no sites available
+					let noSitesSite = {
+						label: 	"No Sites Available",
+						value: 	"No Sites Available",
+						uuid: 	null,
+						color: 	null,
+					};
+					controller.siteOptions = [noSitesSite];
+					$scope.eventData.site =  "No Sites Available";
+				}
+			};
+
+
 			controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 			{
 				var eventStatusCode = $scope.defaultEventStatus;
@@ -836,7 +919,7 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				for (var i = 0; i < controller.siteOptions.length; i++)
 				{
-					if (controller.siteOptions[i].value === valueToTest)
+					if (controller.siteOptions[i].value === valueToTest && controller.siteOptions[i].uuid !== null)
 					{
 						return true;
 					}
