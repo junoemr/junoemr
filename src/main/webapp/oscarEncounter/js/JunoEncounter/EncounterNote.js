@@ -358,7 +358,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		var onClickString = "";
 		if (note.eformData)
 		{
-			onClickString = "popupPage(700,800,'" + winName + "','/eform/efmshowform_data.jsp" +
+			onClickString = "popupPage(700,800,'" + winName + "','" + this.pageData.contextPath + "/eform/efmshowform_data.jsp" +
 				"?appointment=" + encodeURIComponent(appointmentNo) +
 				"&amp;fdid=" + encodeURIComponent(note.eformDataId) + "');";
 		} else if (note.encounterForm)
@@ -373,13 +373,26 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			onClickString = "popupPage(700,800,'" + winName + "','" + url + "');";
 		}
 
+		var documentWinName = "docs" + demographicNo;
+		var documentStatus = note.documentStatus;
+		if (documentStatus === 'A')
+		{
+			documentStatus = "active";
+		}
+		var documentUrl = this.pageData.contextPath + "/dms/documentGetFile.jsp" +
+			"?document=" + encodeURIComponent(note.documentFilename) +
+			"&type=" + encodeURIComponent(documentStatus) +
+			"&doc_no=" + encodeURIComponent(note.documentId);
+		var documentOnClickString = "popupPage(700,800,'" + documentWinName + "', '" + documentUrl + "'); return false;";
+
 		var templateParameters = {
 			index: index,
 			note: note,
 			colour: this.getNoteColor(note),
 			noteLineArray: note.note.split("\n"),
 			formattedObservationDate: date.format('DD-MMM-YYYY H:mm'),
-			onClickString: onClickString
+			onClickString: onClickString,
+			documentOnClickString: documentOnClickString
 		};
 
 

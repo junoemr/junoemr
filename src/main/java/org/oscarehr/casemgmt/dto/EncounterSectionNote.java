@@ -23,11 +23,13 @@
 
 package org.oscarehr.casemgmt.dto;
 
+import org.oscarehr.casemgmt.service.MultiSearchResult;
+
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 
-public class EncounterSectionNote
+public class EncounterSectionNote extends MultiSearchResult
 {
 	private Integer id;
 	private String text;
@@ -218,31 +220,6 @@ public class EncounterSectionNote
 		return result;
 	}
 
-	public static int compareText(Object o1, Object o2)
-	{
-		EncounterSectionNote i1 = (EncounterSectionNote)o1;
-		EncounterSectionNote i2 = (EncounterSectionNote)o2;
-		String t1 = i1.getText();
-		String t2 = i2.getText();
-
-		if( t1 == null && t2 != null )
-		{
-			return -1;
-		}
-		else if( t1 != null && t2 == null )
-		{
-			return 1;
-		}
-		else if( t1 == null && t2 == null )
-		{
-			return 0;
-		}
-		else
-		{
-			return t1.compareToIgnoreCase(t2);
-		}
-	}
-
 	public static class SortChronologicAsc implements Comparator
 	{
 		public int compare(Object o1, Object o2)
@@ -279,7 +256,7 @@ public class EncounterSectionNote
 	{
 		public int compare(Object o1, Object o2)
 		{
-			return EncounterSectionNote.compareText(o1, o2);
+			return MultiSearchResult.compareText(o1, o2);
 		}
 	}
 }

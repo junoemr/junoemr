@@ -501,10 +501,17 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 		// Multi-search autocomplete
 		var searchAutocompleteUrl = "../ws/rs/encounterSections/" + this.pageData.demographicNo + "/autocomplete/";
 
+		var appointmentQueryString = "";
+		if(this.pageData.appointmentNo)
+		{
+			appointmentQueryString = "?appointmentNo=" + this.pageData.appointmentNo;
+		}
+
+
 		jQuery("#enTemplate").autocomplete({
 			source: function(request, response)
 			{
-				jQuery.getJSON(searchAutocompleteUrl + request.term, function(data)
+				jQuery.getJSON(searchAutocompleteUrl + request.term + appointmentQueryString, function(data)
 				{
 					response(jQuery.map(data.body, function(section, index)
 					{
@@ -515,10 +522,15 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 					}));
 				});
 			},
+			focus: function(event, ui)
+			{
+				event.preventDefault();
+			},
 			select: function(event, ui)
 			{
-				new Function(ui.item.value)();
 				event.preventDefault();
+				new Function(ui.item.value)();
+				jQuery("#enTemplate").val(ui.item.label);
 			},
 			minLength: 2,
 			delay: 100

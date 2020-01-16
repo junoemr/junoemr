@@ -488,6 +488,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"    cmn.uuid AS uuid,\n" +
 				"    cmn.update_date AS update_date,\n" +
 				"    doc.document_no,\n" +
+				"    doc.docfilename AS document_filename,\n" +
+				"    doc.status as document_status,\n" +
 				//"    CAST(0 AS INTEGER) AS eform_data_id,\n" +
 				"    cmn.archived,\n" +
 				"    cmn.signed,\n" +
@@ -626,6 +628,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 					"    '' AS uuid,\n" +
 					"    CAST(CONCAT(ed.form_date, ' ', ed.form_time) AS DATETIME) AS update_date,\n" +
 					"    0 AS document_no,\n" +
+					"    '' AS document_filename,\n" +
+					"    '' AS document_status,\n" +
 					//"    CAST(0 AS INTEGER) AS eform_data_id,\n" +
 					"    false AS archived,\n" +
 					"    false AS signed,\n" +
@@ -737,6 +741,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 			note.setUuid((String) row[column++]);
 			note.setUpdateDate(getDateFromSql(row[column++]));
 			note.setDocumentId(getInteger(row[column++]));
+			note.setDocumentFilename((String) row[column++]);
+			note.setDocumentStatus((String) row[column++]);
 			note.setArchived(getBooleanFromInteger(row[column++]));
 			note.setIsSigned(getBooleanFromInteger(row[column++]));
 			note.setIsEditable(getBooleanFromInteger(row[column++]));
@@ -835,6 +841,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"    '' AS uuid,\n" +
 				"    full_form_query.update_date,\n" +
 				"    0 AS document_no,\n" +
+				"    '' AS document_filename,\n" +
+				"    '' AS document_status,\n" +
 				//"    CAST(0 AS INTEGER) AS eform_data_id,\n" +
 				"    false AS archived,\n" +
 				"    false AS signed,\n" +

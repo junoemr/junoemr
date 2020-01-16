@@ -28,11 +28,8 @@ import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.dto.EncounterSectionMenuItem;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.springframework.web.util.UriUtils;
+import org.oscarehr.util.UrlUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -160,15 +157,7 @@ public abstract class EncounterSectionService
 
 	public String encodeUrlParam(String param)
 	{
-		try
-		{
-			return UriUtils.encodeQueryParam(param, StandardCharsets.UTF_8.toString());
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			MiscUtils.getLogger().error("Unable to encode string using UTF-8", e);
-			throw new RuntimeException(e);
-		}
+		return UrlUtils.encodeUrlParam(param);
 	}
 
 	protected static void addMenuItem(List<EncounterSectionMenuItem> menuItems, String text,

@@ -23,6 +23,7 @@
 
 package org.oscarehr.ws.rest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.drools.FactException;
 import org.oscarehr.casemgmt.dto.EncounterSection;
@@ -32,12 +33,13 @@ import org.oscarehr.casemgmt.service.EncounterEFormService;
 import org.oscarehr.casemgmt.service.EncounterFormService;
 import org.oscarehr.casemgmt.service.EncounterSectionService;
 import org.oscarehr.casemgmt.service.EncounterService;
+import org.oscarehr.casemgmt.service.MultiSearchResult;
 import org.oscarehr.common.dao.EncounterTemplateDao;
 import org.oscarehr.common.model.EncounterTemplate;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
@@ -81,6 +83,14 @@ public class EncounterSectionsService extends AbstractServiceImpl
 	private EncounterDocumentService encounterDocumentService;
 
 	@Autowired
+	@Qualifier("service_EFormService")
+	private org.oscarehr.eform.service.EFormService eFormService;
+
+	@Autowired
+	@Qualifier("service_FormService")
+	private org.oscarehr.form.service.FormService formService;
+
+	@Autowired
 	private EncounterTemplateDao encounterTemplateDao;
 
 	@GET
@@ -109,7 +119,7 @@ public class EncounterSectionsService extends AbstractServiceImpl
 	@GET
 	@Path("/{demographicNo}/autocomplete/{searchTerm}")
 	@Produces({MediaType.APPLICATION_JSON})
-	public RestResponse<List<EncounterSectionNote>> getAutocompleteResults(
+	public RestResponse<List<MultiSearchResult>> getAutocompleteResults(
 			@PathParam("demographicNo") Integer demographicNo,
 			@PathParam("searchTerm") String searchTerm,
 			@QueryParam("appointmentNo") String appointmentNo
@@ -118,25 +128,29 @@ public class EncounterSectionsService extends AbstractServiceImpl
 	{
 		EncounterSectionService.SectionParameters sectionParams = getSectionParams(appointmentNo);
 
-
 		// This might need to be faster.
 		// It gets all of the values for the sections being searched (documents, eforms, forms)
 		// then filters them.
 
-		// Get documents
+		// Get patient's documents
 		EncounterSection documentSection = encounterDocumentService.getSection(sectionParams, null, null);
 
-		// Get eforms
+		// Get patient's eforms
 		EncounterSection eformSection = encounterEFormService.getSection(sectionParams, null, null);
 
-		// Get forms
+		// Get patient's forms
 		EncounterSection formSection = encounterFormService.getSection(sectionParams, null, null);
 
-		// Get templates
-		EncounterTemplateDao ectDao = SpringUtils.getBean(EncounterTemplateDao.class);
+		// Get eforms
+		List<MultiSearchResult> eforms = eFormService.getEFormsForSearch(
+				sectionParams.getContextPath(), demographicNo, appointmentNo);
 
+		// Get forms
+		List<MultiSearchResult> forms = formService.getFormsForSearch(
+				sectionParams.getContextPath(), demographicNo, appointmentNo,
+				sectionParams.getProviderNo());
 
-		List<EncounterSectionNote> results = new ArrayList<>();
+		List<MultiSearchResult> results = new ArrayList<>();
 
 		for(EncounterTemplate template : encounterTemplateDao.findAll())
 		{
@@ -150,16 +164,18 @@ public class EncounterSectionsService extends AbstractServiceImpl
 		results.addAll(documentSection.getNotes());
 		results.addAll(eformSection.getNotes());
 		results.addAll(formSection.getNotes());
+		results.addAll(eforms);
+		results.addAll(forms);
 
 		results.sort(new EncounterSectionNote.SortAlphabetic());
 
 		// Filter results based on the search term
-		List<EncounterSectionNote> filteredResults = new ArrayList<>();
-		for(EncounterSectionNote note: results)
+		List<MultiSearchResult> filteredResults = new ArrayList<>();
+		for(MultiSearchResult result: results)
 		{
-			if(note.getText().contains(searchTerm))
+			if(StringUtils.containsIgnoreCase(result.getText(), searchTerm))
 			{
-				filteredResults.add(note);
+				filteredResults.add(result);
 			}
 		}
 

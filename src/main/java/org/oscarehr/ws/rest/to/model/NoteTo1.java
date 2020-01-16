@@ -80,7 +80,10 @@ public class NoteTo1 implements Serializable{
 	private String encounterTransportationTime;
 	
 	private Integer position;
-	
+
+	private String documentStatus;
+	private String documentFilename;
+
 	private List<CaseManagementIssueTo1> assignedIssues = new ArrayList<CaseManagementIssueTo1>();
 	
 	public Integer getNoteId() {
@@ -425,5 +428,25 @@ public class NoteTo1 implements Serializable{
 	public void setEncounterFormId(Integer encounterFormId)
 	{
 		this.encounterFormId = encounterFormId;
+	}
+
+	public String getDocumentStatus()
+	{
+		return documentStatus;
+	}
+
+	public void setDocumentStatus(String documentStatus)
+	{
+		this.documentStatus = documentStatus;
+	}
+
+	public String getDocumentFilename()
+	{
+		return documentFilename;
+	}
+
+	public void setDocumentFilename(String documentFilename)
+	{
+		this.documentFilename = documentFilename;
 	}
 }
