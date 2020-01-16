@@ -25,6 +25,7 @@
 
 package org.oscarehr.common.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -68,5 +69,59 @@ public class FlowsheetDao extends AbstractDao<Flowsheet>{
 		query.setParameter("name", name);
 
 		return getSingleResultOrNull(query);
+	}
+
+	/**
+	 * Given the name of a flowsheet, find the corresponding DB entry and set it as disabled.
+	 * If no entry exists, an entry will be created for an "external" flowsheet
+	 * (flowsheet whose XML contents come from outside the database)
+	 * @param name name of the flowsheet to disable
+	 * @return Flowsheet object for the sheet we disabled
+	 */
+	public void disableFlowsheet(String name)
+	{
+		Flowsheet flowsheet = findByName(name);
+		if (flowsheet == null)
+		{
+			flowsheet = new Flowsheet();
+			flowsheet.setCreatedDate(new Date());
+			flowsheet.setEnabled(false);
+			flowsheet.setExternal(true);
+			flowsheet.setName(name);
+			persist(flowsheet);
+		}
+		else
+		{
+			flowsheet.setEnabled(false);
+			merge(flowsheet);
+		}
+
+	}
+
+	/**
+	 * Given the name of a flowsheet, find the corresponding DB entry and enable it.
+	 * If no entry exists, an entry will be created for an "external" flowsheet
+	 * (flowsheet whose XML contents come from outside the database)
+	 * @param name name of the flowsheet to disable
+	 * @return Flowsheet object who was just enabled
+	 */
+	public void enableFlowsheet(String name)
+	{
+		Flowsheet flowsheet = findByName(name);
+		if (flowsheet == null)
+		{
+			flowsheet = new Flowsheet();
+			flowsheet.setCreatedDate(new Date());
+			flowsheet.setEnabled(true);
+			flowsheet.setExternal(true);
+			flowsheet.setName(name);
+			persist(flowsheet);
+		}
+		else
+		{
+			flowsheet.setEnabled(true);
+			merge(flowsheet);
+		}
+
 	}
 }

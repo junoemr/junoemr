@@ -34,7 +34,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -200,39 +199,17 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         return m.getName();
     }
 
-    public void enableFlowsheet(String name)  {
-    	FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
-    	Flowsheet fs = flowsheetDao.findByName(name);
-    	if(fs != null) {
-    		fs.setEnabled(true);
-    		flowsheetDao.merge(fs);
-    	} else {
-    		fs = new Flowsheet();
-    		fs.setCreatedDate(new Date());
-    		fs.setEnabled(false);
-    		fs.setExternal(true);
-    		fs.setName(name);
-    		flowsheetDao.persist(fs);
-    	}
-    	reloadFlowsheets();
-    }
+	public void enableFlowsheet(String name)
+	{
+		flowsheetDao.enableFlowsheet(name);
+		reloadFlowsheets();
+	}
 
-    public void disableFlowsheet(String name)  {
-    	FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
-    	Flowsheet fs = flowsheetDao.findByName(name);
-    	if(fs != null) {
-    		fs.setEnabled(false);
-    		flowsheetDao.merge(fs);
-    	} else {
-    		fs = new Flowsheet();
-    		fs.setCreatedDate(new Date());
-    		fs.setEnabled(false);
-    		fs.setExternal(true);
-    		fs.setName(name);
-    		flowsheetDao.persist(fs);
-    	}
-    	reloadFlowsheets();
-    }
+	public void disableFlowsheet(String name)
+	{
+		flowsheetDao.disableFlowsheet(name);
+		reloadFlowsheets();
+	}
 
     public void reloadFlowsheets() {
         dxTriggers = new ArrayList<String>();
