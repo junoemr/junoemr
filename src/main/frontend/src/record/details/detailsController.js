@@ -23,6 +23,10 @@
     Ontario, Canada
 
 */
+
+import {INSTANCE_TYPE, SYSTEM_PROPERTIES, BILLING_TYPE} from "../../common/services/systemPreferenceServiceConstants";
+import {SystemPreferenceApi} from "../../../generated";
+
 angular.module('Record.Details').controller('Record.Details.DetailsController', [
 
 	'$scope',
@@ -32,6 +36,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'$state',
 	'$window',
 	'$uibModal',
+	'$httpParamSerializer',
+	'$sce',
 	'demographicService',
 	'demographicsService',
 	'errorsService',
@@ -50,6 +56,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		$state,
 		$window,
 		$uibModal,
+		$httpParamSerializer,
+		$sce,
 		demographicService,
 		demographicsService,
 		messagesFactory,
@@ -88,8 +96,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		var onWaitingListSinceDate0;
 		var paperChartArchivedDate0;
 
+		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
+				'../ws/rs');
+
+		controller.eligibilityMsg = $sce.trustAsHtml("...");
+		controller.showEligibility = false;
 		controller.properties = $scope.$parent.recordCtrl.properties;
 		controller.displayMessages = messagesFactory.factory();
+
 
 		controller.init = function init()
 		{
@@ -356,7 +370,37 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				}
 			);
 
-			// controller.page.demo = demo;
+			// show eligibility check button only if instance is BC OR (ON AND billing type CLINICAID)
+			systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.INSTANCE_TYPE, INSTANCE_TYPE.BC).then(
+					function success(result)
+					{
+						if (result.data.body === INSTANCE_TYPE.BC)
+						{
+							controller.showEligibility = true;
+						}
+						else if (result.data.body === INSTANCE_TYPE.ON)
+						{
+							systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.BILLING_TYPE, BILLING_TYPE.CLINICAID).then(
+									function success(result)
+									{
+										if (result.data.body === BILLING_TYPE.CLINICAID)
+										{
+											controller.showEligibility = true;
+										}
+									},
+									function error(result)
+									{
+										console.error("Failed to fetch instance billing type with error: " + result);
+									}
+							)
+						}
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch instance type with error: " + result);
+					}
+			);
+
 		};
 
 		controller.initDemographicVars = function initDemographicVars()
@@ -529,6 +573,21 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					// do nothing on dismissal
 				});
 		};
+
+		controller.checkEligibility = function ()
+		{
+			patientDetailStatusService.getEligibilityInfo(controller.page.demo.demographicNo).then(
+				function success(result)
+				{
+					controller.eligibilityMsg = $sce.trustAsHtml(result);
+				},
+				function error(result)
+				{
+					console.error("Failed to check eligibility with error: " + result);
+				}
+			);
+		};
+
 		controller.fillDataFromSwipecard = function fillDataFromSwipecard(cardData)
 		{
 			controller.displayMessages.clear();

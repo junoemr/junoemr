@@ -108,6 +108,9 @@
 							</div>
 
 						</div>
+						<button class="btn btn-primary" ng-if="detailsCtrl.showEligibility" uib-popover-html="detailsCtrl.eligibilityMsg" popover-placement="bottom" popover-trigger="'outsideClick'" ng-click="detailsCtrl.checkEligibility()">
+							Check Eligibility
+						</button>
 						<div class="btn-group">
 							<button type="button" class="btn btn-success"
 							        ng-click="detailsCtrl.openSwipecardModal()">
