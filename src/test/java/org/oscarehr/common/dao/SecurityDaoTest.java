@@ -216,22 +216,15 @@ public class SecurityDaoTest extends DaoTestFixtures {
 		security3.setUserName(userName3);
 		dao.persist(security3);
 		
-		List<Security> expectedResult = new ArrayList<Security>(Arrays.asList(security1));
-		List<Security> result = dao.findByUserName(userName1);
+		Security result = dao.findByUserName(userName1);
 
 		Logger logger = MiscUtils.getLogger();
 		
-		if (result.size() != expectedResult.size()) {
-			logger.warn("Array sizes do not match.");
-			fail("Array sizes do not match.");
+		if (result == null) {
+			fail("Did not find corresponding security entry.");
 		}
-		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
-				logger.warn("Items  do not match.");
-				fail("Items  do not match.");
-			}
-		}
-		assertTrue(true);
+
+		assertEquals(security1, result);
 	}
 	
 	@Test

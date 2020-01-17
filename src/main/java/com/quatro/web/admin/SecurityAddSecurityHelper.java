@@ -81,7 +81,7 @@ public class SecurityAddSecurityHelper {
 		//boolean isUserRecordAlreadyCreatedForProvider = !securityDao.findByProviderNo(request.getParameter("provider_no")).isEmpty();
 		//if (isUserRecordAlreadyCreatedForProvider) return "admin.securityaddsecurity.msgLoginAlreadyExistsForProvider";
 
-		boolean isUserAlreadyExists = securityDao.findByUserName(request.getParameter("user_name")).size() > 0;
+		boolean isUserAlreadyExists = securityDao.findByUserName(request.getParameter("user_name")) != null;
 		if (isUserAlreadyExists) return "admin.securityaddsecurity.msgAdditionFailureDuplicate";
 
 		Security s = new Security();

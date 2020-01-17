@@ -41,7 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.jws.WebService;
-import java.util.List;
 
 @WebService
 @Component
@@ -65,10 +64,7 @@ public class LoginWs extends AbstractWs {
 	public LoginResultTransfer login(String userName, String password) throws NotAuthorisedException {
 		logger.info("Login attempt : user=" + userName);
 
-		List<Security> securities = securityDao.findByUserName(userName);
-		Security security = null;
-
-		if (securities.size() > 0) security = securities.get(0);
+		Security security = securityDao.findByUserName(userName);
 
 		if (WsUtils.checkAuthenticationAndSetLoggedInInfo(getHttpServletRequest(), security, password)) {
 			LoginResultTransfer result = new LoginResultTransfer();
@@ -92,10 +88,7 @@ public class LoginWs extends AbstractWs {
 	public LoginResultTransfer2 login2(String userName, String password) throws NotAuthorisedException {
 		logger.info("Login attempt : user=" + userName);
 
-		List<Security> securities = securityDao.findByUserName(userName);
-		Security security = null;
-
-		if (securities.size() > 0) security = securities.get(0);
+		Security security = securityDao.findByUserName(userName);
 
 		if (WsUtils.checkAuthenticationAndSetLoggedInInfo(getHttpServletRequest(), security, password)) {
 			LoginResultTransfer2 result = new LoginResultTransfer2();

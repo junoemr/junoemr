@@ -78,8 +78,13 @@
 
     int rowsAffected =0;
 
+    String username = request.getParameter("user_name");
+
+	Security overlappingEntry = securityDao.findByUserName(username);
     Security s = securityDao.find(Integer.parseInt(request.getParameter("security_no")));
-    if(s != null) {
+
+    if(s != null && (overlappingEntry == null || s.equals(overlappingEntry)))
+    {
     	s.setUserName(request.getParameter("user_name"));
 	    s.setProviderNo(request.getParameter("provider_no"));
 	    s.setBExpireset(request.getParameter("b_ExpireSet")==null?0:Integer.parseInt(request.getParameter("b_ExpireSet")));
@@ -113,7 +118,15 @@
 <p>
 <h2><bean:message key="admin.securityupdate.msgUpdateSuccess" /> <%=request.getParameter("provider_no")%></h2>
 <%
-  } else {
+  }
+  else if (s != null && !s.equals(overlappingEntry))
+  {
+%>
+<h2><bean:message key="admin.securityupdate.msgUpdateUsernameConflict"/></h2>
+<%
+  }
+  else
+  {
 %>
 <h1><bean:message key="admin.securityupdate.msgUpdateFailure" /><%= request.getParameter("provider_no") %>.</h1>
 <%

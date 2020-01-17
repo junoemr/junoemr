@@ -146,9 +146,7 @@ public final class LoginCheckLoginBean {
 	private Security getUserID() {
 
 		SecurityDao securityDao = (SecurityDao) SpringUtils.getBean("securityDao");
-		List<Security> results = securityDao.findByUserName(username);
-		Security security = null;
-		if (results.size() > 0) security = results.get(0);
+		Security security = securityDao.findByUserName(username);
 
 		if (security == null) {
 			return null;
