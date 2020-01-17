@@ -1096,9 +1096,11 @@ iDate++;
 	<div class="form-group" style="width:160px;text-align:right;display:inline-block !important; margin:0px;padding:0px;">
 	<%
 		String validationName = "";
+		String measuringInstructions = "";
 		if (mtypeBean != null)
 		{
 			validationName = mtypeBean.getValidationName();
+			measuringInstructions = mtypeBean.getMeasuringInstrc();
 		}
 		if ("Yes/No".equals(validationName) || "Yes/No/NA".equals(validationName) || "Yes/No/X".equals(validationName))
 		{
@@ -1113,18 +1115,18 @@ iDate++;
 		NA
 	<%}%>				 		  
 	    </div> <!-- yes-no-options -->                      
-	 <%}else if( mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Review")){ %>
+	 <%}else if( !validationName.isEmpty() && validationName.equals("Review")){ %>
 		<label class="checkbox checkbox-inline">
 		<input type="checkbox" name="<%=name%>" id="<%=name%>-REVIEWED" value="Reviewed" onClick="toggle_visibility('add-box-<%=measure%>')">
 		Reviewed
 		</label>
 	 <%}else{ %>
-	 <input type="text" class="form-control" id="<%=name%>" name="<%=name%>" onClick="toggle_visibility('add-box-<%=measure%>')" title="<% if (name.equals("WarfarinWeeklyDose") || name.equals("Weightkg") || name.equals("Heightcm")){ %> Double click to convert<%}else if (name.equals("BP")) {%>00/00 or 000/00 <%}else{ %> <%=mtypeBean.getValidationName()%> <%}%>"
+	 <input type="text" class="form-control" id="<%=name%>" name="<%=name%>" onClick="toggle_visibility('add-box-<%=measure%>')" title="<% if (name.equals("WarfarinWeeklyDose") || name.equals("Weightkg") || name.equals("Heightcm")){ %> Double click to convert<%}else if (name.equals("BP")) {%>00/00 or 000/00 <%}else{ %> <%=validationName%> <%}%>"
 	                       	<% if ((name.equals("Weightkg") || name.equals("Heightcm")) ){ %> onchange="calcBMI();" onkeyup="calcBMI();"<%}%>
 	                       	<% if (name.equals("Weightkg")){ %> onDblClick="wtEnglish2Metric(this); calcBMI();"<%}%>
 	                       	<% if (name.equals("Heightcm")){ %> onDblClick="htEnglish2Metric(this); calcBMI();"<%}%>
 	                       	<% if (name.equals("BMI")){ %> onDblClick="calcBMI();"<%}%>
-	                       	<% if (name.equals("WarfarinWeeklyDose")){ %> onDblClick="calcWeeklyDose(this);"<%}%> placeholder="Enter Data" <%=getPattern(measure, mtypeBean.getMeasuringInstrc())%> autocomplete="off"> 
+							<% if (name.equals("WarfarinWeeklyDose")){ %> onDblClick="calcWeeklyDose(this);"<%}%> placeholder="Enter Data" <%=getPattern(measure, measuringInstructions)%> autocomplete="off">
 	 <%} %>
 	 </div><!-- form group -->
   
