@@ -37,8 +37,8 @@
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.util.MeasurementHelper" %>
 <%@ page import="oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Vector" %>
+<%@ page import="java.util.List" %>
 
 <% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
 <%
@@ -357,7 +357,7 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
 </caisi:isModuleLoad>
 <%
 	dxResearchBeanHandler dxRes;
-	ArrayList<String> flowsheets;
+    List<String> flowsheets;
 	Vector dxCodes;
 %>
 <caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">

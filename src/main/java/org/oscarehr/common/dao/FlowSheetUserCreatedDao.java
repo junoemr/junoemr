@@ -25,6 +25,7 @@
 
 package org.oscarehr.common.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.oscarehr.common.model.FlowSheetUserCreated;
@@ -38,19 +39,42 @@ public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated> {
 		super(FlowSheetUserCreated.class);
 	}
 	
-	public List<FlowSheetUserCreated> getAllUserCreatedFlowSheets(){
-        Query query = entityManager.createQuery("SELECT f FROM FlowSheetUserCreated f WHERE f.archived=?");
-        query.setParameter(1, false);
-        
-        //@SuppressWarnings("unchecked")
-        return query.getResultList();                
-     }
+	public List<FlowSheetUserCreated> getAllUserCreatedFlowSheets()
+	{
+		Query query = entityManager.createQuery("SELECT f FROM FlowSheetUserCreated f ");
+		return query.getResultList();
+	}
 
 	public FlowSheetUserCreated findByName(String name) {
 		Query query = entityManager.createQuery("select f from FlowSheetUserCreated f where f.name=?");
 		query.setParameter(1, name);
 
 		return getSingleResultOrNull(query);
+	}
+
+	/**
+	 * Create a custom flowsheet given all of the required parameters.
+	 * @param name Internal name for the flowsheet
+	 * @param dxCodeTriggers set of ICD9 codes of which any can trigger visibility for a demographic
+	 * @param displayName user-friendly name for the flowsheet
+	 * @param warningColour custom colour to set for warning
+	 * @param recommendationColour custom colour to set for recommendation
+	 * @return FlowSheetUserCreated object after a successful persist
+	 */
+	public FlowSheetUserCreated create(String name, String dxCodeTriggers, String displayName, String warningColour, String recommendationColour)
+	{
+		FlowSheetUserCreated flowSheetUserCreated = new FlowSheetUserCreated();
+		flowSheetUserCreated.setName(name);
+		flowSheetUserCreated.setDxcodeTriggers(dxCodeTriggers);
+		flowSheetUserCreated.setDisplayName(displayName);
+		flowSheetUserCreated.setWarningColour(warningColour);
+		flowSheetUserCreated.setRecommendationColour(recommendationColour);
+		flowSheetUserCreated.setCreatedDate(new Date());
+		flowSheetUserCreated.setArchived(false);
+
+		persist(flowSheetUserCreated);
+
+		return flowSheetUserCreated;
 	}
 
 	/**

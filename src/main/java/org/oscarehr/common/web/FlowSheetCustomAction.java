@@ -45,7 +45,6 @@ import org.jdom.output.XMLOutputter;
 import org.oscarehr.common.dao.FlowSheetCustomizationDao;
 import org.oscarehr.common.dao.FlowSheetUserCreatedDao;
 import org.oscarehr.common.model.FlowSheetCustomization;
-import org.oscarehr.common.model.FlowSheetUserCreated;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -378,51 +377,35 @@ public class FlowSheetCustomAction extends DispatchAction {
     }
 
 
-    /*first add it as a flowsheet into the current system.  The save it to the database so that it will be there on reboot */
-    public ActionForward createNewFlowSheet(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
-        logger.debug("IN create new flowsheet");
-        //String name let oscar create the name
-    	String dxcodeTriggers 		= request.getParameter("dxcodeTriggers");
-    	String displayName 			= request.getParameter("displayName");
-    	String warningColour 		= request.getParameter("warningColour");
-    	String recommendationColour = request.getParameter("recommendationColour");
-    	//String topHTML 				= request.getParameter("topHTML");  // Not supported yet
+	/*
+	 * Order of operations:
+	 * - add flowsheet to system
+	 * - persist flowsheet in database
+	 * - reload flowsheets in system to ensure system knows about new sheet
+	 */
+	public ActionForward createNewFlowSheet(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		String dxcodeTriggers 		= request.getParameter("dxcodeTriggers");
+		String displayName 			= request.getParameter("displayName");
+		String warningColour 		= request.getParameter("warningColour");
+		String recommendationColour = request.getParameter("recommendationColour");
 
+		MeasurementFlowSheet measurementFlowSheet = new MeasurementFlowSheet();
+		measurementFlowSheet.parseDxTriggers(dxcodeTriggers);
+		measurementFlowSheet.setDisplayName(displayName);
+		measurementFlowSheet.setWarningColour(warningColour);
+		measurementFlowSheet.setRecommendationColour(recommendationColour);
 
-    	/// NEW FLOWSHEET CODE
-    	MeasurementFlowSheet m = new MeasurementFlowSheet();
-        m.parseDxTriggers(dxcodeTriggers);
-        m.setDisplayName(displayName);
-        m.setWarningColour(warningColour);
-        m.setRecommendationColour(recommendationColour);
+		MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
+		String name =  templateConfig.addFlowsheet( measurementFlowSheet );
+		measurementFlowSheet.loadRuleBase();
 
-        //Im not sure if adding an initializing measurement is required yet
-        /*
-        Map<String,String> h = new HashMap<String,String>();
-        h.put("measurement_type","WT");
-        h.put("display_name","WT");
-        h.put("value_name","WT");
+		flowSheetUserCreatedDao.create(name, dxcodeTriggers, displayName, warningColour, recommendationColour);
+		// To ensure flowsheets don't overlap, we need to trigger a reload on all flowsheets in system
+		templateConfig.reloadFlowsheets();
 
-        FlowSheetItem fsi = new FlowSheetItem( h);
-        m.addListItem(fsi);
-*/
-        MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
-        String name =  templateConfig.addFlowsheet( m );
-        m.loadRuleBase();
-    	/// END FLOWSHEET CODE
-
-        FlowSheetUserCreated fsuc = new FlowSheetUserCreated();
-        fsuc.setName(name);
-        fsuc.setDisplayName(displayName);
-        fsuc.setDxcodeTriggers(dxcodeTriggers);
-        fsuc.setWarningColour(warningColour);
-        fsuc.setRecommendationColour(recommendationColour);
-        fsuc.setArchived(false);
-        fsuc.setCreatedDate(new Date());
-        flowSheetUserCreatedDao.persist(fsuc);
-
-        return mapping.findForward("newflowsheet");
-    }
+		return mapping.findForward("newflowsheet");
+	}
 
 
 

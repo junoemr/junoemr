@@ -80,12 +80,12 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 
     private SAXBuilder saxBuilder = new SAXBuilder();
 
-    ArrayList<String> dxTriggers = new ArrayList<String>();
-    ArrayList<String> programTriggers = new ArrayList<String>();
-    Hashtable<String, ArrayList<String>> dxTrigHash = new Hashtable<String, ArrayList<String>>();
-    HashMap<String, ArrayList<String>> programTrigHash = new HashMap<String, ArrayList<String>>();
-    Hashtable<String, String> flowsheetDisplayNames = new Hashtable<String, String>();
-    ArrayList<String> universalFlowSheets = new ArrayList<String>();
+	List<String> dxTriggers = new ArrayList<String>();
+	List<String> programTriggers = new ArrayList<String>();
+	Hashtable<String, List<String>> dxTrigHash = new Hashtable<String, List<String>>();
+	HashMap<String, List<String>> programTrigHash = new HashMap<String, List<String>>();
+	Hashtable<String, String> flowsheetDisplayNames = new Hashtable<String, String>();
+	List<String> universalFlowSheets = new ArrayList<String>();
 
     static MeasurementTemplateFlowSheetConfig measurementTemplateFlowSheetConfig;
 
@@ -131,7 +131,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
             log.debug("Checking dx " + dx);
             if (coll.contains(dx) && !alist.contains(dx)) {
                 log.debug("coll contains " + dx);
-                ArrayList<String> flowsheets = getFlowsheetForDxCode(dx);
+				List<String> flowsheets = getFlowsheetForDxCode(dx);
                 log.debug("Size of flowsheets for " + dx + " is " + flowsheets.size());
                 for (int j = 0; j < flowsheets.size(); j++) {
                     String flowsheet = flowsheets.get(j);
@@ -154,7 +154,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
             String programId = programTriggers.get(i);
             log.debug("Checking programId " + programId);
             if (coll.contains(programId) && !alist.contains(programId)) {
-                ArrayList<String> flowsheets = getFlowsheetForProgramId(programId);
+				List<String> flowsheets = getFlowsheetForProgramId(programId);
                 log.debug("Size of flowsheets for " + programId + " is " + flowsheets.size());
                 for (int j = 0; j < flowsheets.size(); j++) {
                     String flowsheet = flowsheets.get(j);
@@ -169,18 +169,20 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         return alist;
     }
 
-    public ArrayList<String> getUniversalFlowSheets()
+    public List<String> getUniversalFlowSheets()
     {
         return universalFlowSheets;
     }
 
-    public Hashtable<String, ArrayList<String>> getDxTrigHash() {
-        return dxTrigHash;
-    }
+	public Hashtable<String, List<String>> getDxTrigHash()
+	{
+		return dxTrigHash;
+	}
 
-    public HashMap<String, ArrayList<String>> getProgramTrigHash() {
-        return programTrigHash;
-    }
+	public HashMap<String, List<String>> getProgramTrigHash()
+	{
+		return programTrigHash;
+	}
 
     public String getDisplayName(String name) {
         return flowsheetDisplayNames.get(name);
@@ -191,16 +193,19 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
     }
     
   
-    public String addFlowsheet(MeasurementFlowSheet m ){
-        if( m.getName() == null || m.getName().equals("")){
-            m.setName("U"+(flowsheets.size()+1));
-        }
+	public String addFlowsheet(MeasurementFlowSheet measurementFlowSheet)
+	{
+		if(measurementFlowSheet.getName() == null || measurementFlowSheet.getName().isEmpty())
+		{
+			measurementFlowSheet.setName("U" + (flowsheets.size() + 1));
+		}
 
-        flowsheets.put(m.getName(),m);
-        flowsheetDisplayNames.put(m.getName(), m.getDisplayName());
-        addTriggers(m.getDxTriggers(),m.getName());
-        return m.getName();
-    }
+		flowsheets.put(measurementFlowSheet.getName(), measurementFlowSheet);
+		flowsheetDisplayNames.put(measurementFlowSheet.getName(), measurementFlowSheet.getDisplayName());
+
+		addTriggers(measurementFlowSheet.getDxTriggers(), measurementFlowSheet.getName());
+		return measurementFlowSheet.getName();
+	}
 
 	// Wrapper to handle deciding on whether we're enabling a user-created flowsheet or a system one
 	public void enableFlowsheet(String name)
@@ -209,12 +214,17 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 		if (flowSheetUserCreated != null)
 		{
 			flowSheetUserCreatedDao.unarchive(flowSheetUserCreated);
+			// After enabling it, instead of reloading all entries only refresh the affected entry
+			flowSheetUserCreated = flowSheetUserCreatedDao.findByName(name);
+			userCreatedFlowsheetSettings.replace(name, flowSheetUserCreated);
 		}
 		else
 		{
 			flowsheetDao.enableFlowsheet(name);
+			// After enabling it, instead of reloading all entries only refresh the affected entry
+			Flowsheet flowsheet = flowsheetDao.findByName(name);
+			flowsheetSettings.replace(name, flowsheet);
 		}
-		reloadFlowsheets();
 	}
 
 	// Wrapper to handle deciding on whether we're disabling a user-created flowsheet or a system one
@@ -224,14 +234,14 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 		if (flowSheetUserCreated != null)
 		{
 			flowSheetUserCreatedDao.archive(flowSheetUserCreated);
-            // After disabling it, instead of reloading all entries only reload the affected entry
+			// After disabling it, instead of reloading all entries only refresh the affected entry
 			flowSheetUserCreated = flowSheetUserCreatedDao.findByName(name);
 			userCreatedFlowsheetSettings.replace(name, flowSheetUserCreated);
 		}
 		else
 		{
 			flowsheetDao.disableFlowsheet(name);
-			// After disabling it, instead of reloading all entries only reload the affected entry
+			// After disabling it, instead of reloading all entries only refresh the affected entry
 			Flowsheet affectedFlowsheet = flowsheetDao.findByName(name);
 			flowsheetSettings.replace(name, affectedFlowsheet);
 		}
@@ -263,8 +273,8 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
     public void reloadFlowsheets() {
         dxTriggers = new ArrayList<String>();
         programTriggers = new ArrayList<String>();
-        dxTrigHash = new Hashtable<String, ArrayList<String>>();
-        programTrigHash = new HashMap<String, ArrayList<String>>();
+        dxTrigHash = new Hashtable<String, List<String>>();
+        programTrigHash = new HashMap<String, List<String>>();
         flowsheetDisplayNames = new Hashtable<String, String>();
         universalFlowSheets = new ArrayList<String>();
         flowsheets = null;
@@ -295,7 +305,6 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
                 setupFlowsheetTriggers(measurementFlowsheet);
 
                 Flowsheet flowsheetEntry = flowsheetDao.findByName(measurementFlowsheet.getName());
-                // FlowSheetUserCreated flowSheetUserCreated = flowSheetUserCreatedDao.findByName(measurementFlowsheet.getName());
                 // If no entry exists, insert an entry. This should only happen for system flowsheets and exactly once
                 if (flowsheetEntry == null)
                 {
@@ -375,13 +384,15 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         return userCreatedFlowsheetSettings;
     }
 
-    public ArrayList<String> getFlowsheetForDxCode(String code) {
-        return dxTrigHash.get(code);
-    }
+	public List<String> getFlowsheetForDxCode(String code)
+	{
+		return dxTrigHash.get(code);
+	}
 
-    public ArrayList<String> getFlowsheetForProgramId(String code) {
-        return programTrigHash.get(code);
-    }
+	public List<String> getFlowsheetForProgramId(String code)
+	{
+		return programTrigHash.get(code);
+	}
 
     private void addTriggers(String[] dxTrig, String name) {
         if (dxTrig != null) {
@@ -390,7 +401,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
                     dxTriggers.add(aDxTrig);
                 }
                 if (dxTrigHash.containsKey(aDxTrig)) {
-                    ArrayList<String> l = dxTrigHash.get(aDxTrig);
+                    List<String> l = dxTrigHash.get(aDxTrig);
                     if (!l.contains(name)) {
                         l.add(name);
                     }
@@ -410,7 +421,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
                     programTriggers.add(aProgramTrig);
                 }
                 if (programTrigHash.containsKey(aProgramTrig)) {
-                    ArrayList<String> l = programTrigHash.get(aProgramTrig);
+                    List<String> l = programTrigHash.get(aProgramTrig);
                     if (!l.contains(name)) {
                         l.add(name);
                     }
