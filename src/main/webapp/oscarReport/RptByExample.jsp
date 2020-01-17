@@ -181,9 +181,9 @@ function write2TextArea()
 		</style>
 		<script type="text/javascript">
 			// disable submit button, display please wait, and submit form.
-			function onSubmit(event)
+			function onSubmit()
 			{
-				event.target.disabled='true';
+				$("#report-by-example-submit").prop("disabled", true);
 				$('#results-area').html('<h2>Please Wait...</h2>');
 				return true;
 			}
@@ -204,7 +204,7 @@ function write2TextArea()
 </table>
 </div>
 <table class="MainTable" id="scrollNumber1" name="encounterTable">
-	<html:form action="/oscarReport/RptByExample.do">
+	<html:form action="/oscarReport/RptByExample.do" onsubmit="onSubmit();">
 		<tr class="MainTableTopRow">
 			<td class="MainTableTopRowLeftColumn"><bean:message
 				key="oscarReport.CDMReport.msgReport" /></td>
@@ -258,7 +258,7 @@ function write2TextArea()
 						onClick="write2TextArea(); return false;"></td>
 				</tr>
 				<tr>
-					<td><input type="submit" value="Query" onclick="onSubmit(event);" />
+					<td><input id="report-by-example-submit" type="submit" value="Query" />
 					</td>
 				</tr>
 				<tr></tr>

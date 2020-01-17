@@ -76,6 +76,7 @@
 	src="../../share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>
 <script type="text/javascript"
 	src="../../share/calendar/calendar-setup.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" language="JavaScript">
     function checkform(formobj) {
         if (!validDateFieldsByClass('datefield', formobj)) {
@@ -84,6 +85,12 @@
         }
         return true;
     }
+
+    function onSubmit()
+		{
+			$("#query-submit-button").prop("disabled", true);
+			$('#please-wait-msg').css('visibility', 'visible');
+		}
 </script>
 </head>
 
@@ -150,7 +157,7 @@
 			style="color: red;" <%}%>><%=curreport.getTitle()%></div>
 		<div class="reportDescription"><%=curreport.getDescription()%></div>
 		<html:form action="/oscarReport/reportByTemplate/GenerateReportAction"
-			onsubmit="return checkform(this);">
+			onsubmit="onSubmit();return checkform(this);">
 			<input type="hidden" name="templateId"
 				value="<%=curreport.getTemplateId()%>">
 			<input type="hidden" name="type" value="<%=curreport.getType()%>">
@@ -233,7 +240,10 @@
 				<tr>
 					<th>Step <%=step+1%>:</th>
 					<td>Generate Query</td>
-					<td><input type="submit" name="submitButton" value="Run Query"></td>
+					<td>
+						<input id="query-submit-button" type="submit" name="submitButton" value="Run Query">
+						<h4 id="please-wait-msg" style="display: inline-block; visibility: hidden;">Please Wait....</h4>
+					</td>
 					<td><input type="submit" name="getCSV" value="Export to CSV"></td>
 					<td><input type="submit" name="getXLS" value="Export to XLS"></td>
 				</tr>

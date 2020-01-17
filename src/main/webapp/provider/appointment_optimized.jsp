@@ -354,7 +354,9 @@ private long getAppointmentRowSpan(
 		formatDate = UtilDateUtilities.DateToString(inform.parse(strDate), "EEE, yyyy-MM-dd");
 	}
 
-	int week = cal.get(Calendar.WEEK_OF_YEAR);
+	// Base week off the week being viewed, not the current week
+	GregorianCalendar weekView = new GregorianCalendar(year, month - 1, day);
+	int week = weekView.get(Calendar.WEEK_OF_YEAR);
 
 	String strYear = "" + year;
 	String strMonth = month > 9 ? (""+month) : ("0"+month);

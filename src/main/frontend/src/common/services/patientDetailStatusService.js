@@ -91,6 +91,24 @@ angular.module("Common.Services").service("patientDetailStatusService", [
 			return deferred.promise;
 		};
 
+		// check the patients eligibility, returning a descriptive message about the result
+		service.getEligibilityInfo = function (demographicNo)
+		{
+			let deferred = $q.defer();
+			$http.get("../billing/CA/BC/ManageTeleplan.do?demographic=" + demographicNo + "&method=checkElig&rand=" + Math.random()).then(
+					function success(result)
+					{
+						deferred.resolve(result.data);
+					},
+					function error(result)
+					{
+						console.error("Failed to perform eligibility check on demographic, " + demographicNo + " With error: " + result);
+						deferred.reject("Failed to perform eligibility check on demographic, " + demographicNo + " With error: " + result);
+					}
+			);
+			return deferred.promise;
+		};
+
 		return service;
 	}
 ]);
