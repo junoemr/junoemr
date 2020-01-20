@@ -23,7 +23,9 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.measurements.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.io.Serializable;
 

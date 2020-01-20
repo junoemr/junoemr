@@ -48,7 +48,7 @@
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
 <%@ page import="org.oscarehr.measurements.model.Flowsheet" %>
 <%@ page import="java.util.Hashtable" %>
-<%@ page import="org.oscarehr.common.model.FlowSheetUserCreated" %>
+<%@ page import="org.oscarehr.measurements.model.FlowSheetUserCreated" %>
 
 <%
 	String method = request.getParameter("method");

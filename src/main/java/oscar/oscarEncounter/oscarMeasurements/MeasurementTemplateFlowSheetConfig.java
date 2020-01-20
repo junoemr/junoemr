@@ -51,7 +51,7 @@ import org.jdom.output.XMLOutputter;
 import org.oscarehr.measurements.dao.FlowSheetUserCreatedDao;
 import org.oscarehr.measurements.dao.FlowsheetDao;
 import org.oscarehr.common.model.FlowSheetCustomization;
-import org.oscarehr.common.model.FlowSheetUserCreated;
+import org.oscarehr.measurements.model.FlowSheetUserCreated;
 import org.oscarehr.measurements.model.Flowsheet;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;

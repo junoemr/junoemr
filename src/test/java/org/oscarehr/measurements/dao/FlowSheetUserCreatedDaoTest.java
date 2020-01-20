@@ -37,8 +37,7 @@ import org.junit.Test;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.FlowSheetUserCreated;
-import org.oscarehr.measurements.dao.FlowSheetUserCreatedDao;
+import org.oscarehr.measurements.model.FlowSheetUserCreated;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
