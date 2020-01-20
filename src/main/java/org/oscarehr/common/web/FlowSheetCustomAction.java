@@ -43,7 +43,7 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.oscarehr.common.dao.FlowSheetCustomizationDao;
-import org.oscarehr.common.dao.FlowSheetUserCreatedDao;
+import org.oscarehr.measurements.dao.FlowSheetUserCreatedDao;
 import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;

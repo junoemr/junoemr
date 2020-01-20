@@ -25,7 +25,7 @@
 --%>
 
 <%@page contentType="text/html"%>
-<%@page import="org.oscarehr.common.dao.FlowSheetUserCreatedDao"%>
+<%@page import="org.oscarehr.measurements.dao.FlowSheetUserCreatedDao"%>
 <%@page import="org.oscarehr.common.model.FlowSheetUserCreated"%>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="java.util.List" %>

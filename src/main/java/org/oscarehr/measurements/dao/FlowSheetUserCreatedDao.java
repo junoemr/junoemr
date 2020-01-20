@@ -23,17 +23,19 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.measurements.dao;
 
 import java.util.Date;
 import java.util.List;
 
+import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.common.model.FlowSheetUserCreated;
 import org.springframework.stereotype.Repository;
 import javax.persistence.Query;
 
 @Repository
-public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated> {
+public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated>
+{
 
 	public FlowSheetUserCreatedDao() {
 		super(FlowSheetUserCreated.class);
