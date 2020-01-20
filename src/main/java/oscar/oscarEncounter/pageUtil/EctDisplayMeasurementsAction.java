@@ -27,7 +27,7 @@ package oscar.oscarEncounter.pageUtil;
 import org.apache.log4j.Logger;
 import org.apache.struts.util.MessageResources;
 import org.oscarehr.common.dao.AdmissionDao;
-import org.oscarehr.common.dao.FlowsheetDao;
+import org.oscarehr.measurements.dao.FlowsheetDao;
 import org.oscarehr.common.dao.MeasurementGroupStyleDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.Flowsheet;
