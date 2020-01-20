@@ -44,11 +44,16 @@
 %>
 
 
-<%@ page import="java.sql.*, java.util.*,java.security.*,oscar.*,oscar.oscarDB.*" errorPage="errorpage.jsp"%>
-<%@ page import="oscar.log.LogAction,oscar.log.LogConst"%>
+<%@ page errorPage="errorpage.jsp"%>
+<%@ page import="oscar.log.LogAction"%>
+<%@ page import="oscar.log.LogConst"%>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.common.model.Security" %>
 <%@ page import="org.oscarehr.common.dao.SecurityDao" %>
+<%@ page import="java.security.MessageDigest" %>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="oscar.Misc" %>
+<%@ page import="oscar.MyDateFormat" %>
 <%
 	SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
 %>
@@ -68,50 +73,62 @@
 	</tr>
 </table>
 <%
-	StringBuffer sbTemp = new StringBuffer();
+	StringBuilder sbTemp = new StringBuilder();
     MessageDigest md = MessageDigest.getInstance("SHA");
     byte[] btNewPasswd= md.digest(request.getParameter("password").getBytes());
-    for(int i=0; i<btNewPasswd.length; i++) sbTemp = sbTemp.append(btNewPasswd[i]);
+	for (byte b : btNewPasswd)
+	{
+		sbTemp.append(b);
+	}
 
-    String sPin = request.getParameter("pin");
-    if (OscarProperties.getInstance().isPINEncripted()) sPin = Misc.encryptPIN(request.getParameter("pin"));
+	String sPin = request.getParameter("pin");
+	if (OscarProperties.getInstance().isPINEncripted())
+	{
+		sPin = Misc.encryptPIN(request.getParameter("pin"));
+	}
 
-    int rowsAffected =0;
+	int rowsAffected = 0;
 
-    String username = request.getParameter("user_name");
+	String username = request.getParameter("user_name");
 
 	Security overlappingEntry = securityDao.findByUserName(username);
-    Security s = securityDao.find(Integer.parseInt(request.getParameter("security_no")));
+	Security security = securityDao.find(Integer.parseInt(request.getParameter("security_no")));
 
-    if(s != null && (overlappingEntry == null || s.equals(overlappingEntry)))
-    {
-    	s.setUserName(request.getParameter("user_name"));
-	    s.setProviderNo(request.getParameter("provider_no"));
-	    s.setBExpireset(request.getParameter("b_ExpireSet")==null?0:Integer.parseInt(request.getParameter("b_ExpireSet")));
-	    s.setDateExpiredate(MyDateFormat.getSysDate(request.getParameter("date_ExpireDate")));
-	    s.setBLocallockset(request.getParameter("b_LocalLockSet")==null?0:Integer.parseInt(request.getParameter("b_LocalLockSet")));
-	    s.setBRemotelockset(request.getParameter("b_RemoteLockSet")==null?0:Integer.parseInt(request.getParameter("b_RemoteLockSet")));
+	if(security != null && (overlappingEntry == null || security.equals(overlappingEntry)))
+	{
+		security.setUserName(request.getParameter("user_name"));
+		security.setProviderNo(request.getParameter("provider_no"));
+		security.setBExpireset(request.getParameter("b_ExpireSet")==null?0:Integer.parseInt(request.getParameter("b_ExpireSet")));
+		security.setDateExpiredate(MyDateFormat.getSysDate(request.getParameter("date_ExpireDate")));
+		security.setBLocallockset(request.getParameter("b_LocalLockSet")==null?0:Integer.parseInt(request.getParameter("b_LocalLockSet")));
+		security.setBRemotelockset(request.getParameter("b_RemoteLockSet")==null?0:Integer.parseInt(request.getParameter("b_RemoteLockSet")));
 
-    	if(request.getParameter("password")==null || !"*********".equals(request.getParameter("password"))){
-    		s.setPassword(sbTemp.toString());
-    	}
+		if(request.getParameter("password") == null || !"*********".equals(request.getParameter("password")))
+		{
+			security.setPassword(sbTemp.toString());
+		}
 
-    	if(request.getParameter("pin")==null || !"****".equals(request.getParameter("pin"))) {
-    		s.setPin(sPin);
-    	}
-    	
-    	if (request.getParameter("forcePasswordReset") != null && request.getParameter("forcePasswordReset").equals("1")) {
-    	    s.setForcePasswordReset(Boolean.TRUE);
-    	} else {
-    		s.setForcePasswordReset(Boolean.FALSE);  
-        }
-    	
-    	securityDao.saveEntity(s);
-    	rowsAffected=1;
-    }
+		if(request.getParameter("pin") == null || !"****".equals(request.getParameter("pin")))
+		{
+			security.setPin(sPin);
+		}
+
+		if (request.getParameter("forcePasswordReset") != null && request.getParameter("forcePasswordReset").equals("1"))
+		{
+			security.setForcePasswordReset(Boolean.TRUE);
+		}
+		else
+		{
+			security.setForcePasswordReset(Boolean.FALSE);
+		}
+
+		securityDao.saveEntity(security);
+		rowsAffected = 1;
+	}
 
 
-  if (rowsAffected ==1) {
+  if (rowsAffected == 1)
+  {
       LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_SECURITY,
     		request.getParameter("security_no") + "->" + request.getParameter("user_name"), request.getRemoteAddr());
 %>
@@ -119,7 +136,7 @@
 <h2><bean:message key="admin.securityupdate.msgUpdateSuccess" /> <%=request.getParameter("provider_no")%></h2>
 <%
   }
-  else if (s != null && !s.equals(overlappingEntry))
+  else if (security != null && !security.equals(overlappingEntry))
   {
 %>
 <h2><bean:message key="admin.securityupdate.msgUpdateUsernameConflict"/></h2>
@@ -132,8 +149,6 @@
 <%
   }
 %>
-</p>
-<p></p>
 
 </center>
 </body>
