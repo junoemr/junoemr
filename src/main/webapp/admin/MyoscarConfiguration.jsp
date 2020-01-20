@@ -52,7 +52,7 @@
 
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
-<%@ page import="org.oscarehr.common.model.Flowsheet" %>
+<%@ page import="org.oscarehr.measurements.model.Flowsheet" %>
 <%@ page import="org.oscarehr.measurements.dao.FlowsheetDao" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 

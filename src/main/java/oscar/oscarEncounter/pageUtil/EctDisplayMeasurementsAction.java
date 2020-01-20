@@ -30,7 +30,7 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.measurements.dao.FlowsheetDao;
 import org.oscarehr.common.dao.MeasurementGroupStyleDao;
 import org.oscarehr.common.model.Admission;
-import org.oscarehr.common.model.Flowsheet;
+import org.oscarehr.measurements.model.Flowsheet;
 import org.oscarehr.common.model.MeasurementGroupStyle;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;

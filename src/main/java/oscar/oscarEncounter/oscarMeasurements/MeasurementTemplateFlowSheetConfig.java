@@ -52,7 +52,7 @@ import org.oscarehr.common.dao.FlowSheetUserCreatedDao;
 import org.oscarehr.measurements.dao.FlowsheetDao;
 import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.common.model.FlowSheetUserCreated;
-import org.oscarehr.common.model.Flowsheet;
+import org.oscarehr.measurements.model.Flowsheet;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.InitializingBean;
