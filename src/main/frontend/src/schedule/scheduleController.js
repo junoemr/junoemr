@@ -894,6 +894,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let detailElem = eventElement.find('.event-details');
 				let selfBookElem = eventElement.find('.self-book-indicator');
 				let telehealthElem = eventElement.find('.event-telehealth');
+				// By default this element is hidden
+				telehealthElem.hide();
 				// var eventSite = $scope.sites[event.data.site];
 
 				/* set up status icon + color/hover etc. */
@@ -927,9 +929,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let eventReason = "";
 				let eventNotes = "";
 
-				if (!event.data.virtual)
+				// Only show telehealth icon if it's both on for the instance and the appointment has the virtual flag
+				if (controller.telehealthEnabled && event.data.virtual)
 				{
-					telehealthElem.hide();
+					telehealthElem.show();
 				}
 
 				if (event.data.doNotBook)
@@ -1137,12 +1140,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 			else if ($target.is(".onclick-event-telehealth"))
 			{
-				console.log("initiate telehealth appt");
 				controller.openTelehealthLink(calEvent);
-				//"../telehealth/myhealthaccess.do?method=openTelehealth" +
-				//"&demographicNo=${appointmentInfo.demographicNo}" +
-				//"&siteName=${appointmentInfo.siteName}" +
-				//"&appt=${appointmentInfo.appointmentNo}")
 			}
 			else
 			{
@@ -1245,8 +1243,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			if (calEvent.data.demographicNo !== 0 && calEvent.data.virtual)
 			{
-				console.log(calEvent.data);
-				window.open("../telehealth/myhealthaccess.do?method=openTelehealth"
+				window.open("../integrations/myhealthaccess.do?method=connect"
 					+ "&demographicNo=" + encodeURIComponent(calEvent.data.demographicNo)
 					+ "&siteName=" + encodeURIComponent(calEvent.data.site)
 					+ "&appt=" + encodeURIComponent(calEvent.data.appointmentNo), "_blank");
@@ -1410,8 +1407,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				events: $scope.events,
 				eventData: calEventData
 			};
-
-			console.log(data.eventData);
 
 			$scope.dialog = $uibModal.open({
 				animation: false,
@@ -1781,7 +1776,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				function success(rawResults)
 				{
 					var enabled = rawResults.data.body;
-					$scope.telehealthEnabled = enabled;
+					controller.telehealthEnabled = enabled;
 					deferred.resolve(enabled);
 				},
 				function failure(results)
