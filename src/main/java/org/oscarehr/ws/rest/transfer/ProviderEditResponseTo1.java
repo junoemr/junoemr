@@ -1,4 +1,4 @@
-<%--
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -19,20 +19,40 @@
  * CloudPractice Inc.
  * Victoria, British Columbia
  * Canada
---%>
-<div class="juno-typeahead form-group">
-	<label ng-if="$ctrl.title" for="name-{{$ctrl.name}}">
-		{{$ctrl.title}}
-	</label>
-	<input
-					id="name-{{$ctrl.name}}"
-					class="form-control"
-					type="text"
-					ng-model="$ctrl.model"
-					uib-typeahead="option as option.label for option in $ctrl.options | filter:$viewValue"
-					typeahead-select-on-exact="true"
-					typeahead-min-length="$ctrl.typeaheadMinLength"
-					ng-keypress="$ctrl.onKeyPress($event)"
-					placeholder="{{$ctrl.placeholder}}"
-					ng-disabled="$ctrl.enabled === undefined ? false : !$ctrl.enabled">
-</div>
+ */
+package org.oscarehr.ws.rest.transfer;
+
+public class ProviderEditResponseTo1
+{
+	private String providerNo;
+	private String status;
+
+	public static final String STATUS_SUCCESS = "SUCCESS";
+	public static final String STATUS_SEC_RECORD_EXISTS = "SECURITY_RECORD_EXISTS";
+
+	public ProviderEditResponseTo1(String providerNo, String status)
+	{
+		this.providerNo = providerNo;
+		this.status = status;
+	}
+
+	public String getProviderNo()
+	{
+		return providerNo;
+	}
+
+	public void setProviderNo(String providerNo)
+	{
+		this.providerNo = providerNo;
+	}
+
+	public String getStatus()
+	{
+		return status;
+	}
+
+	public void setStatus(String status)
+	{
+		this.status = status;
+	}
+}

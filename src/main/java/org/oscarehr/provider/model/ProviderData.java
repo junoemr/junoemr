@@ -46,6 +46,12 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 
 	public static final String SYSTEM_PROVIDER_NO = "-1";
 
+	// tags used to extend the provider record in the comments field.
+	public static final String COMMENT_CELL_TAG 				= "xml_p_cell";
+	public static final String COMMENT_FAX_TAG 					= "xml_p_fax";
+	public static final String COMMENT_PAGER_TAG 				= "xml_p_pager";
+	public static final String COMMENT_OTHER_PHONE_TAG 	= "xml_p_phone2";
+
 	/**
 	 * default serial version id for serializable
 	 */
@@ -113,6 +119,13 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 
 
 	/* -- Province specific -- */
+	/* BC */
+	@Column(name = "bc_rural_retention_code")
+	private String bcRuralRetentionCode = "00";
+	@Column(name = "bc_rural_retention_name")
+	private String bcRuralRetentionName;
+	@Column(name = "bc_service_location_code")
+	private String bcServiceLocationCode = null;
 	/* AB */
 	@Column(name = "alberta_tak_no")
 	private String albertaTakNo = null;
@@ -426,5 +439,35 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public void setAlbertaConnectCareId(String albertaConnectCareId)
 	{
 		this.albertaConnectCareId = albertaConnectCareId;
+	}
+
+	public String getBcRuralRetentionCode()
+	{
+		return bcRuralRetentionCode;
+	}
+
+	public void setBcRuralRetentionCode(String bcRuralRetentionCode)
+	{
+		this.bcRuralRetentionCode = bcRuralRetentionCode;
+	}
+
+	public String getBcServiceLocationCode()
+	{
+		return bcServiceLocationCode;
+	}
+
+	public void setBcServiceLocationCode(String bcServiceLocationCode)
+	{
+		this.bcServiceLocationCode = bcServiceLocationCode;
+	}
+
+	public String getBcRuralRetentionName()
+	{
+		return bcRuralRetentionName;
+	}
+
+	public void setBcRuralRetentionName(String bcRuralRetentionName)
+	{
+		this.bcRuralRetentionName = bcRuralRetentionName;
 	}
 }

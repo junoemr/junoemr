@@ -31,15 +31,27 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.log4j.Logger;
+import org.chip.ping.xml.record.SecurityInfo;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.dao.ProviderSiteDao;
+import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.ProviderSite;
+import org.oscarehr.common.model.ProviderSitePK;
+import org.oscarehr.common.model.Security;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.ProviderManager2;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.model.RecentDemographicAccess;
+import org.oscarehr.provider.service.ProviderRoleService;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.ProviderEditFormTo1;
 import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
@@ -48,8 +60,13 @@ import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
+import org.oscarehr.ws.rest.transfer.ProviderEditResponseTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import sun.rmi.runtime.Log;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -61,6 +78,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -74,6 +92,9 @@ public class ProviderService extends AbstractServiceImpl {
 
 	@Autowired
 	ProviderDao providerDao;
+
+	@Autowired
+	org.oscarehr.provider.service.ProviderService providerService;
 	
 	@Autowired
 	ProviderManager2 providerManager;
@@ -86,6 +107,9 @@ public class ProviderService extends AbstractServiceImpl {
 
 	@Autowired
 	private PreferenceManager preferenceManager;
+
+	@Autowired
+	private SecurityInfoManager securityInfoManager;
 	
 	
 	protected SecurityContext getSecurityContext() {
@@ -148,9 +172,43 @@ public class ProviderService extends AbstractServiceImpl {
 		@Path("/provider/new")
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
-		public RestResponse<ProviderTo1> createProvider(ProviderEditFormTo1 providerEditFormTo1)
+		public synchronized RestResponse<ProviderEditResponseTo1> createProvider(ProviderEditFormTo1 providerEditFormTo1)
 		{
-			return RestResponse.errorResponse("Not Implemented");
+			securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
+			try
+			{
+				ProviderData providerData = providerService.createProvider(providerEditFormTo1, getLoggedInInfo());
+				return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
+			}
+			catch(SecurityRecordAlreadyExistsException secRecordExists)
+			{
+				return RestResponse.successResponse(new ProviderEditResponseTo1(null, ProviderEditResponseTo1.STATUS_SEC_RECORD_EXISTS));
+			}
+		}
+
+	/**
+	 * edit provider.
+	 * @param providerEditFormTo1 - form data to update the provider with
+	 * @return - the new provider.
+	 */
+	@POST
+	@Path("/provider/{id}/edit")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public synchronized RestResponse<ProviderEditResponseTo1> editProvider(@PathParam("id") Integer providerNo, ProviderEditFormTo1 providerEditFormTo1)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
+
+		ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo);
+		return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
+	}
+
+		@GET
+		@Path("/provider/{id}/edit_form")
+		@Produces(MediaType.APPLICATION_JSON)
+		public RestResponse<ProviderEditFormTo1> getProviderEditForm(@PathParam("id") Integer id)
+		{
+			return RestResponse.successResponse(providerService.getEditFormForProvider(id));
 		}
 
     @GET

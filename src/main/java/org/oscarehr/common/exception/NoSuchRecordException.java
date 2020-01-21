@@ -1,4 +1,4 @@
-<%--
+/**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -19,20 +19,19 @@
  * CloudPractice Inc.
  * Victoria, British Columbia
  * Canada
---%>
-<div class="juno-typeahead form-group">
-	<label ng-if="$ctrl.title" for="name-{{$ctrl.name}}">
-		{{$ctrl.title}}
-	</label>
-	<input
-					id="name-{{$ctrl.name}}"
-					class="form-control"
-					type="text"
-					ng-model="$ctrl.model"
-					uib-typeahead="option as option.label for option in $ctrl.options | filter:$viewValue"
-					typeahead-select-on-exact="true"
-					typeahead-min-length="$ctrl.typeaheadMinLength"
-					ng-keypress="$ctrl.onKeyPress($event)"
-					placeholder="{{$ctrl.placeholder}}"
-					ng-disabled="$ctrl.enabled === undefined ? false : !$ctrl.enabled">
-</div>
+ */
+package org.oscarehr.common.exception;
+
+// thrown when a database lookup returns no results.
+public class NoSuchRecordException extends RuntimeException
+{
+	public NoSuchRecordException(String msg)
+	{
+		super(msg);
+	}
+
+	public NoSuchRecordException(String msg, Exception e)
+	{
+		super(msg, e);
+	}
+}

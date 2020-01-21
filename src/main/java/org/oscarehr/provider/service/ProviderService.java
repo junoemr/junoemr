@@ -23,21 +23,62 @@
 package org.oscarehr.provider.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.PMmodule.dao.SecUserRoleDao;
+import org.oscarehr.PMmodule.model.SecUserRole;
+import org.oscarehr.common.dao.ProviderSiteDao;
+import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.common.dao.SecurityDao;
+import org.oscarehr.common.exception.NoSuchRecordException;
+import org.oscarehr.common.model.ProviderSite;
+import org.oscarehr.common.model.ProviderSitePK;
+import org.oscarehr.common.model.Security;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.site.service.SiteService;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
+import org.oscarehr.ws.rest.transfer.ProviderEditFormTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.oscarProvider.data.ProviderBillCenter;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 @Service("provider.service.ProviderService")
 @Transactional
 public class ProviderService
 {
 	@Autowired
+	ProviderDao providerDao;
+
+	@Autowired
 	ProviderDataDao providerDataDao;
+
+	@Autowired
+	SecurityDao securityDao;
+
+	@Autowired
+	private ProviderRoleService providerRoleService;
+
+	@Autowired
+	private SiteService siteService;
+
+	@Autowired
+	private SecUserRoleDao secUserRoleDao;
+
+	@Autowired
+	private SecRoleDao secRoleDao;
+
+
+	@Autowired
+	private ProviderSiteDao providerSiteDao;
 
 	public ProviderData addNewProvider(String creatingProviderNo, ProviderData provider, String billCenterCode)
 	{
@@ -100,5 +141,152 @@ public class ProviderService
 	public Integer getNextProviderNumberInSequence(int minThreshold, int ignoreThreshold)
 	{
 		return providerDataDao.getNextIdWithThreshold(minThreshold, ignoreThreshold);
+	}
+
+	/**
+	 * get the edit form transfer object for the given provider.
+	 * @param providerNo - the provider to get the form for.
+	 * @return - the edit provider form.
+	 */
+	public ProviderEditFormTo1 getEditFormForProvider(Integer providerNo)
+	{
+		ProviderData provider = providerDataDao.findByProviderNo(providerNo.toString());
+		ProviderEditFormTo1 providerEditFormTo1 = new ProviderEditFormTo1();
+
+		//set provider fields
+		providerEditFormTo1.setProviderData(provider);
+
+		//set security records
+		Security unameSec = securityDao.findProviderUserNameSecurityRecord(providerNo.toString());
+		if (unameSec != null)
+		{
+			providerEditFormTo1.setUserName(unameSec.getUserName());
+		}
+
+		Security emailSec = securityDao.findProviderEmailSecurityRecord(providerNo.toString());
+		if (emailSec != null)
+		{
+			providerEditFormTo1.setEmail(emailSec.getUserName());
+		}
+
+		//set sites
+		List<ProviderSite> providerSites = providerSiteDao.findByProviderNo(provider.getProviderNo().toString());
+		ArrayList<Integer> siteList = new ArrayList<>();
+		for(ProviderSite providerSite: providerSites)
+		{
+			siteList.add(providerSite.getId().getSiteId());
+		}
+		providerEditFormTo1.setSiteAssignments(siteList);
+
+		//set roles
+		List<SecUserRole> userRoles = secUserRoleDao.getUserRoles(provider.getProviderNo().toString());
+		List<Integer> roleIds = new ArrayList<>();
+		for (SecUserRole role : userRoles)
+		{
+			roleIds.add(secRoleDao.findByName(role.getRoleName()).getId());
+		}
+		providerEditFormTo1.setUserRoles(roleIds);
+
+		return providerEditFormTo1;
+	}
+
+	/**
+	 * create a new provider record
+	 * @param providerEditFormTo1 - provider creation form. contains info used to create the provider
+	 * @param loggedInInfo - logged in info
+	 * @return - the newly created provider object
+	 */
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+	public synchronized ProviderData createProvider(ProviderEditFormTo1 providerEditFormTo1, LoggedInInfo loggedInInfo)
+	{
+		// create provider record
+		ProviderData provider = this.addNewProvider(loggedInInfo.getLoggedInProviderNo(), providerEditFormTo1.getProviderData(), "");
+
+		updateProviderSiteSecRole(providerEditFormTo1, provider.getProviderNo());
+
+		return provider;
+	}
+
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+	public synchronized ProviderData editProvider(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
+	{
+		ProviderData providerData = providerDataDao.find(providerNo.toString());
+		if (providerData != null)
+		{
+			ProviderData newProviderData = providerEditFormTo1.getProviderData();
+
+			// edit provider
+			newProviderData.setProviderNo(providerNo);
+			providerDataDao.merge(newProviderData);
+
+			updateProviderSiteSecRole(providerEditFormTo1, newProviderData.getProviderNo());
+
+			return newProviderData;
+		}
+		else
+		{
+			throw new NoSuchRecordException("No provider record for ProviderNo:" + providerNo);
+		}
+	}
+
+	/**
+	 * assign / update provider security records, site records, and role records.
+	 * @param providerEditFormTo1 - provider edit from containing site, security, role info.
+	 * @param providerNo - provider no
+	 */
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+	public synchronized void updateProviderSiteSecRole(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
+	{
+		// edit security records
+		upsertProviderSecurityRecords(providerEditFormTo1, providerNo);
+
+		// assign provider sites
+		siteService.assignProviderSites(providerEditFormTo1.getSiteAssignments(), providerNo);
+		siteService.removeOtherSites(providerEditFormTo1.getSiteAssignments(), providerNo);
+
+		// assign provider roles
+		if (providerEditFormTo1.getUserRoles() != null)
+		{
+			providerRoleService.assignProviderRoles(providerEditFormTo1.getUserRoles(), providerNo);
+			providerRoleService.removeOtherProviderRoles(providerEditFormTo1.getUserRoles(), providerNo);
+			providerRoleService.setDefaultPrimaryRole(providerNo);
+		}
+	}
+
+	/**
+	 * create or update provider security records.
+	 * @param providerEditFormTo1 - the provider form to use to update / create recrods
+	 * @param providerNo - the provider no to create for.
+	 */
+	private synchronized void upsertProviderSecurityRecords(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
+	{
+		try
+		{
+			List<Security> securityList = providerEditFormTo1.getSecurityRecords(providerNo);
+			for (Security security : securityList)
+			{
+				List<Security> existingRecords = securityDao.findByUserName(security.getUserName());
+				if (existingRecords != null && existingRecords.size() == 1)
+				{
+					if (existingRecords.get(0).getProviderNo().equals(providerNo.toString()))
+					{// we "own" this record. update.
+						security.setSecurityNo(existingRecords.get(0).getSecurityNo());
+						securityDao.merge(security);
+					}
+					else
+					{
+						throw new SecurityRecordAlreadyExistsException("Security Record already exists");
+					}
+				}
+				else
+				{
+					securityDao.persist(security);
+				}
+			}
+		}
+		catch (NoSuchAlgorithmException nae)
+		{
+			throw new RuntimeException("Internal Server error " + nae.toString());
+		}
 	}
 }

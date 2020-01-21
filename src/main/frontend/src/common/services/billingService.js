@@ -147,6 +147,43 @@ angular.module("Common.Services").service("billingService", [
 			return deferred.promise;
 		};
 
+		service.getBCBillingVisitCodes = function ()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/bc/billing_visit_codes',
+					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+					function success(results)
+					{
+						deferred.resolve(results);
+					},
+					function error(errors)
+					{
+						console.error("Failed to fetch BC visit codes with error: " + errors);
+						deferred.reject("Failed to fetch BC visit codes codes with error: " + errors);
+					});
+
+			return deferred.promise;
+		};
+
+		service.getBCBillingLocations = function ()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/bc/billing_locations',
+					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+					function success(results)
+					{
+						deferred.resolve(results);
+					},
+					function error(errors)
+					{
+						console.error("Failed to fetch BC billing locations with error: " + errors);
+						deferred.reject("Failed to fetch BC billing locations with error: " + errors);
+					});
+
+			return deferred.promise;
+		};
 
 		return service;
 	}

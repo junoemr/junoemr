@@ -178,7 +178,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		})
 		.state('admin.editUser',
 		{
-			url: '/editUser',
+			url: '/editUser?providerNo',
 			component: 'editProviderAdmin',
 			params:
 					{

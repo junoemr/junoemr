@@ -86,6 +86,13 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			}
 		];
 
+
+		// options for the BC rural retention code field
+		ctrl.bcBillingLocationOptions = [];
+
+		// options for the BC service location field
+		ctrl.bcServiceLocationOptions = [];
+
 		// options for the AB facilities field
 		ctrl.albertaFacilityOptions = [];
 
@@ -252,6 +259,11 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 						{
 							ctrl.loadAlbertaBillingData();
 						}
+						else if (ctrl.billingRegion === "BC")
+						{
+							ctrl.loadBCBillingData();
+						}
+						ctrl.mapTypeaheadValues();
 					},
 					function error(result)
 					{
@@ -280,14 +292,26 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					}
 			);
 
-			// when we switch to AB bill region load additional data.
+			// when we switch bill region, load additional data.
 			$scope.$watch('$ctrl.billingRegion', function(newVal, oldVal)
 			{
 				if (newVal && newVal.value === "AB")
 				{
 					ctrl.loadAlbertaBillingData();
 				}
+				if (newVal && newVal.value === "BC")
+				{
+					ctrl.loadBCBillingData();
+				}
+				ctrl.mapTypeaheadValues();
 			});
+
+
+			// load the provider object if in view mode.
+			if (ctrl.mode === EDIT_PROVIDER_MODE.EDIT)
+			{
+				ctrl.loadProviderFrom($stateParams.providerNo);
+			}
 		};
 
 		// load alberta specific data for billing fields
@@ -357,6 +381,49 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		};
 
+		ctrl.loadBCBillingData = function()
+		{
+			billingService.getBCBillingVisitCodes().then(
+					function success(result)
+					{
+						ctrl.bcServiceLocationOptions = [];
+						for (let visitCode of result.data.body)
+						{
+							ctrl.bcServiceLocationOptions.push(
+									{
+										label: "(" + visitCode.visitType + ") " + visitCode.visitDescription,
+										value: visitCode.visitType
+									}
+							);
+						}
+
+						ctrl.mapTypeaheadValues();
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch BC Billing visit codes with error: " + result);
+					}
+			);
+
+			billingService.getBCBillingLocations().then(
+					function success(result)
+					{
+						ctrl.bcBillingLocationOptions = [];
+						for (let location of result.data.body)
+						{
+							ctrl.bcBillingLocationOptions.push({
+								label: "(" + location.billingLocation + ") " + location.description,
+								value: location.billingLocation,
+							});
+						}
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch BC Service Locations with error: " + result);
+					}
+			);
+		};
+
 		ctrl.addUserRole = function(roleId)
 		{
 			if (roleId && !ctrl.provider.userRoles.includes(roleId))
@@ -398,29 +465,87 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.getSiteName = function(roleId)
 		{
-			return ctrl.siteOptions.find(el => el.value === roleId).label;
+			if (ctrl.siteOptions&& ctrl.siteOptions.length > 0)
+			{
+				return ctrl.siteOptions.find(el => el.value === roleId).label;
+			}
+			else
+			{
+				return "loading...";
+			}
+		};
+
+		ctrl.loadProviderFrom = function(providerNo)
+		{
+			providerService.getProviderEditForm(providerNo).then(
+					function success(result)
+					{
+						ctrl.provider = result.body;
+						ctrl.mapTypeaheadValues();
+					},
+					function error(result)
+					{
+						console.error("Failed to load provider edit form with error: " + result);
+					}
+			);
+		};
+
+		// map typeahead values to labels. for typeahead does not auto fill label.
+		ctrl.mapTypeaheadValues = function()
+		{
+			// map bc service location.
+			for (let serviceLocation of ctrl.bcServiceLocationOptions)
+			{
+				if (serviceLocation.value === ctrl.provider.bcServiceLocation.value)
+				{
+					ctrl.provider.bcServiceLocation = serviceLocation;
+				}
+			}
 		};
 
 		ctrl.submit = function()
 		{
 			ctrl.hasSubmitted = true;
-			//validate fields
-			if (ctrl.allFieldsValid())
-			{// valid
-				providerService.createProvider(ctrl.provider).then(
+
+			if (ctrl.mode === EDIT_PROVIDER_MODE.ADD)
+			{// create new provider
+
+				//validate fields
+				if (ctrl.allFieldsValid())
+				{// valid
+					providerService.createProvider(ctrl.provider).then(
+							function success(result)
+							{
+								if (result.body.status === "SUCCESS")
+								{
+									alert("WIN");
+								} else if (result.body.status === "SECURITY_RECORD_EXISTS")
+								{
+									alert("User Name or Email already in use.")
+								}
+							},
+							function error(result)
+							{
+								alert("API ERROR");
+							}
+					);
+				} else
+				{//invalid
+					alert("INVALID");
+				}
+			}
+			else if (ctrl.mode === EDIT_PROVIDER_MODE.EDIT)
+			{ // update provider
+				providerService.editProvider($stateParams.providerNo, ctrl.provider).then(
 						function success(result)
 						{
-							alert("WIN");
+							alert("Provider Updated");
 						},
 						function error(result)
 						{
-							alert("API ERROR");
+							alert("Update Error");
 						}
 				);
-			}
-			else
-			{//invalid
-				alert("INVALID");
 			}
 		};
 

@@ -32,8 +32,8 @@ import javax.ws.rs.core.MediaType;
 import org.oscarehr.billing.CA.AB.dao.AlbertaFacilityDao;
 import org.oscarehr.billing.CA.AB.dao.AlbertaFunctionalCenterDao;
 import org.oscarehr.billing.CA.AB.dao.AlbertaSkillCodeDao;
-import org.oscarehr.billing.CA.AB.model.AlbertaFunctionalCenter;
-import org.oscarehr.billing.CA.AB.model.AlbertaSkillCode;
+import org.oscarehr.common.dao.BillingBCDao;
+import org.oscarehr.common.dao.BillingServiceDao;
 import org.oscarehr.managers.BillingManager;
 import org.oscarehr.ws.rest.conversion.ServiceTypeConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -43,10 +43,13 @@ import org.oscarehr.ws.rest.to.model.ServiceTypeTo;
 import org.oscarehr.ws.rest.transfer.AlbertaFacilityTo1;
 import org.oscarehr.ws.rest.transfer.AlbertaFunctionalCenterTo1;
 import org.oscarehr.ws.rest.transfer.AlbertaSkillCodeTo1;
+import org.oscarehr.ws.rest.transfer.BCBillingLocationTo1;
+import org.oscarehr.ws.rest.transfer.BCBillingVisitCodeTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import oscar.OscarProperties;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Path("/billing")
@@ -63,6 +66,9 @@ public class BillingService extends AbstractServiceImpl {
 
 	@Autowired
 	AlbertaFunctionalCenterDao albertaFunctionalCenterDao;
+
+	@Autowired
+	BillingBCDao billingBCDao;
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
 	
@@ -129,4 +135,21 @@ public class BillingService extends AbstractServiceImpl {
 	{
 		return RestResponse.successResponse(AlbertaFunctionalCenterTo1.fromList(albertaFunctionalCenterDao.getAllFunctionalCenters()));
 	}
+
+	@GET
+	@Path("/bc/billing_visit_codes")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<BCBillingVisitCodeTo1>> getBCBillingVisitCodes()
+	{
+		return RestResponse.successResponse(BCBillingVisitCodeTo1.fromList(billingBCDao.findBillingVisits(BillingServiceDao.BC)));
+	}
+
+	@GET
+	@Path("/bc/billing_locations")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<BCBillingLocationTo1>> getBCBillingLocations()
+	{
+		return RestResponse.successResponse(BCBillingLocationTo1.fromList(billingBCDao.findBillingLocations(BillingServiceDao.BC)));
+	}
+
 }

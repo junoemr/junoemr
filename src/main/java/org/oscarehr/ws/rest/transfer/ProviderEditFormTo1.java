@@ -22,14 +22,28 @@
  */
 package org.oscarehr.ws.rest.transfer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.oscarehr.common.model.Security;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.SpringUtils;
+import oscar.SxmlMisc;
+import oscar.util.ConversionUtils;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProviderEditFormTo1 implements Serializable
 {
+
+	private ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
+
 	// user info
 	private String firstName;
 	private String lastName;
@@ -56,15 +70,15 @@ public class ProviderEditFormTo1 implements Serializable
 	private String pagerNumber;
 
 	// access Roles
-	private String[] userRoles;
+	private List<Integer> userRoles;
 
 	// site assignments
-	private String[] siteAssignment;
+	private List<Integer> siteAssignments;
 
 	// BC billing
 	private String bcBillingNo;
-	private String bcRuralRetentionCode;
-	private String bcServiceLocation;
+	private JunoTypeaheadTo1 bcRuralRetentionCode;
+	private JunoTypeaheadTo1 bcServiceLocation;
 
 	// ON billing
 	private String onGroupNumber;
@@ -100,6 +114,163 @@ public class ProviderEditFormTo1 implements Serializable
 	private String takNumber;
 	private String lifeLabsClientIds;
 	private String eDeliveryIds;
+
+	/**
+	 * initialize this object using the provided provider data.
+	 * @param providerData - the provider data
+	 */
+	@JsonIgnore
+	public void setProviderData(ProviderData providerData)
+	{
+		// general
+		this.setLastName(providerData.getLastName());
+		this.setFirstName(providerData.getFirstName());
+		this.setType(providerData.getProviderType());
+		this.setSpeciality(providerData.getSpecialty());
+		this.setTeam(providerData.getTeam());
+		this.setSex(providerData.getSex());
+		this.setDateOfBirth(ConversionUtils.toNullableLocalDate(providerData.getDob()));
+
+		this.setAddress(providerData.getAddress());
+		this.setHomePhone(providerData.getPhone());
+		this.setWorkPhone(providerData.getWorkPhone());
+		this.setContactEmail(providerData.getEmail());
+		this.setFax(SxmlMisc.getXmlContent(providerData.getComments(), ProviderData.COMMENT_FAX_TAG));
+		this.setCellPhone(SxmlMisc.getXmlContent(providerData.getComments(), ProviderData.COMMENT_CELL_TAG));
+		this.setPagerNumber(SxmlMisc.getXmlContent(providerData.getComments(), ProviderData.COMMENT_PAGER_TAG));
+		this.setOtherPhone(SxmlMisc.getXmlContent(providerData.getComments(), ProviderData.COMMENT_OTHER_PHONE_TAG));
+
+		// fill out provider billing
+		this.setOhipNo(providerData.getOhipNo());
+		this.setThirdPartyBillingNo(providerData.getRmaNo());
+		this.setAlternateBillingNo(providerData.getHsoNo());
+
+		// bc
+		this.setBcBillingNo(providerData.getBillingNo());
+		JunoTypeaheadTo1 ruralRetentionCode = new JunoTypeaheadTo1();
+		ruralRetentionCode.setLabel(providerData.getBcRuralRetentionName());
+		ruralRetentionCode.setValue(providerData.getBcRuralRetentionCode());
+		this.setBcRuralRetentionCode(ruralRetentionCode);
+		JunoTypeaheadTo1 serviceLocation = new JunoTypeaheadTo1();
+		serviceLocation.setValue(providerData.getBcServiceLocationCode());
+		this.setBcServiceLocation(serviceLocation);
+
+	}
+
+	/**
+	 * extract the data in this transfer object in to a provider object for persisting to the database
+	 * @return - a providerData object filled out with data contained in this object.
+	 */
+	@JsonIgnore
+	public ProviderData getProviderData()
+	{
+		ProviderData providerData = new ProviderData();
+
+		// fill out general provider record
+		providerData.setProviderNo(providerDataDao.getNextIdWithThreshold(1, 9999));
+		providerData.setLastName(this.getLastName());
+		providerData.setFirstName(this.getFirstName());
+		providerData.setProviderType(this.getType());
+		providerData.setSpecialty(this.getSpeciality());
+		providerData.setTeam(this.getTeam());
+		providerData.setSex(this.getSex());
+		providerData.setDob(this.getDateOfBirth() != null ? ConversionUtils.toLegacyDate(this.getDateOfBirth()) : null);
+
+		providerData.setAddress(this.getAddress());
+		providerData.setPhone(this.getHomePhone());
+		providerData.setWorkPhone(this.getWorkPhone());
+		providerData.setEmail(this.getContactEmail());
+
+		// set provider extended settings. yes it is an xml string shoved in to the comments column *face palm*
+		String providerXmlSettingsString = "";
+		providerXmlSettingsString = SxmlMisc.addElement(providerXmlSettingsString, ProviderData.COMMENT_FAX_TAG, this.getFax());
+		providerXmlSettingsString = SxmlMisc.addElement(providerXmlSettingsString, ProviderData.COMMENT_CELL_TAG, this.getCellPhone());
+		providerXmlSettingsString = SxmlMisc.addElement(providerXmlSettingsString, ProviderData.COMMENT_PAGER_TAG, this.getPagerNumber());
+		providerXmlSettingsString = SxmlMisc.addElement(providerXmlSettingsString, ProviderData.COMMENT_OTHER_PHONE_TAG, this.getOtherPhone());
+		providerData.setComments(providerXmlSettingsString);
+
+		// fill out provider billing
+		providerData.setOhipNo(this.getOhipNo());
+		providerData.setRmaNo(this.getThirdPartyBillingNo());
+		providerData.setHsoNo(this.getAlternateBillingNo());
+
+		// bc
+		providerData.setBillingNo(this.getBcBillingNo());
+		if (this.getBcRuralRetentionCode() != null)
+		{
+			providerData.setBcRuralRetentionCode(this.getBcRuralRetentionCode().getValue());
+			providerData.setBcRuralRetentionName(this.getBcRuralRetentionCode().getLabel());
+		}
+		if (this.getBcServiceLocation() != null)
+		{
+			providerData.setBcServiceLocationCode(this.getBcServiceLocation().getValue());
+		}
+
+
+		return providerData;
+	}
+
+	/**
+	 * get security records. at least one of email or user_name or both security records.
+	 * @param providerNo - provider to create the records for
+	 * @return - a list of security records
+	 */
+	@JsonIgnore
+	public List<Security> getSecurityRecords(Integer providerNo) throws NoSuchAlgorithmException
+	{
+		ArrayList<Security> securityRecords = new ArrayList<>();
+
+		if (this.getPassword() != null && !this.getPassword().isEmpty() &&
+				this.getSecondLevelPasscode() != null && !this.getSecondLevelPasscode().isEmpty())
+		{
+			// username login
+			if (this.getUserName() != null && !this.getUserName().isEmpty())
+			{
+				Security userNameSec = new Security();
+				userNameSec.setUserName(this.getUserName());
+				userNameSec.setRecordType(Security.RECORD_TYPE_USER_NAME);
+				setSecurityRecordCommonFields(userNameSec, providerNo);
+				securityRecords.add(userNameSec);
+			}
+
+			// email login
+			if (this.getEmail() != null && !this.getEmail().isEmpty())
+			{
+				Security emailSec = new Security();
+				emailSec.setUserName(this.getEmail());
+				emailSec.setRecordType(Security.RECORD_TYPE_USER_EMAIL);
+				setSecurityRecordCommonFields(emailSec, providerNo);
+				securityRecords.add(emailSec);
+			}
+		}
+		return securityRecords;
+	}
+
+	/**
+	 * helper to reduce duplicate code in getSecurityRecords.
+	 * @param security - security record to set common fields on
+	 * @param providerNo - the provider to assign the record to.
+	 */
+	@JsonIgnore
+	private void setSecurityRecordCommonFields(Security security, Integer providerNo) throws NoSuchAlgorithmException
+	{
+		// hash password
+		MessageDigest md = MessageDigest.getInstance("SHA");
+		byte[] btNewPasswd= md.digest(this.getPassword().getBytes());
+		StringBuilder sbTemp = new StringBuilder();
+		for(int i=0; i<btNewPasswd.length; i++)
+		{
+			sbTemp.append(btNewPasswd[i]);
+		}
+
+		security.setPassword(sbTemp.toString());
+		security.setPin(this.getSecondLevelPasscode());
+		security.setProviderNo(providerNo.toString());
+		security.setBExpireset(0);
+		security.setBLocallockset(1);
+		security.setBRemotelockset(1);
+		security.setForcePasswordReset(false);
+	}
 
 	public String getFirstName()
 	{
@@ -291,24 +462,24 @@ public class ProviderEditFormTo1 implements Serializable
 		this.pagerNumber = pagerNumber;
 	}
 
-	public String[] getUserRoles()
+	public List<Integer> getUserRoles()
 	{
 		return userRoles;
 	}
 
-	public void setUserRoles(String[] userRoles)
+	public void setUserRoles(List<Integer> userRoles)
 	{
 		this.userRoles = userRoles;
 	}
 
-	public String[] getSiteAssignment()
+	public List<Integer> getSiteAssignments()
 	{
-		return siteAssignment;
+		return siteAssignments;
 	}
 
-	public void setSiteAssignment(String[] siteAssignment)
+	public void setSiteAssignments(List<Integer> siteAssignments)
 	{
-		this.siteAssignment = siteAssignment;
+		this.siteAssignments = siteAssignments;
 	}
 
 	public String getBcBillingNo()
@@ -321,22 +492,22 @@ public class ProviderEditFormTo1 implements Serializable
 		this.bcBillingNo = bcBillingNo;
 	}
 
-	public String getBcRuralRetentionCode()
+	public JunoTypeaheadTo1 getBcRuralRetentionCode()
 	{
 		return bcRuralRetentionCode;
 	}
 
-	public void setBcRuralRetentionCode(String bcRuralRetentionCode)
+	public void setBcRuralRetentionCode(JunoTypeaheadTo1 bcRuralRetentionCode)
 	{
 		this.bcRuralRetentionCode = bcRuralRetentionCode;
 	}
 
-	public String getBcServiceLocation()
+	public JunoTypeaheadTo1 getBcServiceLocation()
 	{
 		return bcServiceLocation;
 	}
 
-	public void setBcServiceLocation(String bcServiceLocation)
+	public void setBcServiceLocation(JunoTypeaheadTo1 bcServiceLocation)
 	{
 		this.bcServiceLocation = bcServiceLocation;
 	}

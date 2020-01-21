@@ -124,7 +124,7 @@
 										class="flex-grow lg-margin-right"
 										model="$ctrl.currentSiteSelection"
 										options="$ctrl.siteOptions"
-										placeholder="Assign sites to provider"
+										placeholder="Search..."
 										on-enter-key="$ctrl.addSiteAssignment($ctrl.currentSiteSelection.value)"
 						>
 						</juno-typeahead>
@@ -159,7 +159,7 @@
 										class="flex-grow lg-margin-right"
 										model="$ctrl.currentRoleSelection"
 										options="$ctrl.roleOptions"
-										placeholder="Add Role Here"
+										placeholder="Search..."
 										on-enter-key="$ctrl.addUserRole($ctrl.currentRoleSelection.value)"
 						>
 						</juno-typeahead>
@@ -362,7 +362,8 @@
 									class="flex-grow lg-margin-right"
 									model="$ctrl.billingRegion"
 									options="$ctrl.billingRegionOptions"
-									enabled="$ctrl.billingRegionSelectEnabled">
+									enabled="$ctrl.billingRegionSelectEnabled"
+									placeholder="Search...">
 					</juno-typeahead>
 
 					<!-- BC Billing options -->
@@ -386,22 +387,24 @@
 						</ca-field-text>
 
 						<!-- rural Retention code -->
-						<ca-field-text
-										ca-name="ruralRetentionCode"
-										ca-title="Rural Retention Code"
-										ca-model="$ctrl.provider.bcRuralRetentionCode"
-										ca-rows="1"
+						<juno-typeahead
+										title="Rural Retention Code"
+										name="ruralRetentionCode"
+										model="$ctrl.provider.bcRuralRetentionCode"
+										options="$ctrl.bcBillingLocationOptions"
+										placeholder="Search..."
 						>
-						</ca-field-text>
+						</juno-typeahead>
 
 						<!-- service location -->
-						<ca-field-text
-										ca-name="serviceLocation"
-										ca-title="Service Location"
-										ca-model="$ctrl.provider.bcServiceLocation"
-										ca-rows="1"
+						<juno-typeahead
+										title="Service Location"
+										name="serviceLocation"
+										model="$ctrl.provider.bcServiceLocation"
+										options="$ctrl.bcServiceLocationOptions"
+										placeholder="Search..."
 						>
-						</ca-field-text>
+						</juno-typeahead>
 					</div>
 
 					<!-- ON billing -->
@@ -480,7 +483,7 @@
 										name="albertaSkillCode"
 										model="$ctrl.provider.abSkillCode"
 										options="$ctrl.skillCodeOptions"
-										placeholder="Provider Skill Code"
+										placeholder="Search..."
 						>
 						</juno-typeahead>
 
@@ -490,7 +493,7 @@
 										name="locationCode"
 										model="$ctrl.provider.abLocationCode"
 										options="$ctrl.locationCodeOptions"
-										placeholder="Location Code"
+										placeholder="Search..."
 						>
 						</juno-typeahead>
 
@@ -690,7 +693,7 @@
 	<div class="bottom-options-bar">
 		<div class="col-sm-12 flex-row justify-content-center md-margin-top">
 			<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.ADD" ng-click="$ctrl.submit()"><span class="body-normal">Add User</span></button>
-			<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.EDIT"><span class="body-normal">Update User</span></button>
+			<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.EDIT" ng-click="$ctrl.submit()"><span class="body-normal">Update User</span></button>
 		</div>
 	</div>
 </div>

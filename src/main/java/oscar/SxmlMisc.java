@@ -45,6 +45,11 @@ public class SxmlMisc extends Properties {
     return content;
   }
 
+  public static String addElement(String xmlString, String tag, String value)
+	{
+		return xmlString + "<" + tag + ">" + value + "</" + tag + ">";
+	}
+
   //get a string 
   public static String createDataString(HttpServletRequest req, String strPrefix, String defaultValue, int maxsize) {
     String temp=null;//default is not null
