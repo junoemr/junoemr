@@ -43,9 +43,9 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.oscarehr.common.dao.FlowSheetCustomizationDao;
-import org.oscarehr.measurements.dao.FlowSheetUserCreatedDao;
 import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.measurements.service.FlowsheetService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -61,8 +61,8 @@ import oscar.oscarEncounter.oscarMeasurements.util.TargetCondition;
 public class FlowSheetCustomAction extends DispatchAction {
     private static final Logger logger = MiscUtils.getLogger();
 
-    private FlowSheetCustomizationDao flowSheetCustomizationDao =  (FlowSheetCustomizationDao) SpringUtils.getBean("flowSheetCustomizationDao");
-    private FlowSheetUserCreatedDao flowSheetUserCreatedDao = (FlowSheetUserCreatedDao) SpringUtils.getBean("flowSheetUserCreatedDao");
+    private FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
+    private FlowSheetCustomizationDao flowSheetCustomizationDao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
     private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
     
     public void setFlowSheetCustomizationDao(FlowSheetCustomizationDao flowSheetCustomizationDao) {
@@ -397,10 +397,10 @@ public class FlowSheetCustomAction extends DispatchAction {
 		measurementFlowSheet.setRecommendationColour(recommendationColour);
 
 		MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
-		String name =  templateConfig.addFlowsheet( measurementFlowSheet );
+		String name =  flowsheetService.addFlowsheet( measurementFlowSheet );
 		measurementFlowSheet.loadRuleBase();
 
-		flowSheetUserCreatedDao.create(name, dxcodeTriggers, displayName, warningColour, recommendationColour);
+		flowsheetService.createUserFlowSheet(name, dxcodeTriggers, displayName, warningColour, recommendationColour);
 		// To ensure flowsheets don't overlap, we need to trigger a reload on all flowsheets in system
 		templateConfig.reloadFlowsheets();
 

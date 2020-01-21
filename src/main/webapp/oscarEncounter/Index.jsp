@@ -162,6 +162,8 @@ if (request.getParameter("casetoEncounter")==null)
   if (splitChart == null || splitChart.size() == 0){
      sChart = false;
   }
+
+	FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 %>
 
 
@@ -169,6 +171,8 @@ if (request.getParameter("casetoEncounter")==null)
 
 <%@page import="org.oscarehr.util.MiscUtils"%>
 <%@ page import="org.oscarehr.allergy.model.Allergy" %>
+<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -1057,8 +1061,8 @@ function removeSaveFeedback()  {
 				<td>
 				<%
                         dxResearchBeanHandler dxRes = new dxResearchBeanHandler(bean.demographicNo);
-                        Vector dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-                        ArrayList flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetsFromDxCodes(dxCodes);
+                        List<String> dxCodes = dxRes.getActiveCodeListWithCodingSystem();
+						List<String> flowsheets = flowsheetService.getFlowsheetsFromDxCodes(dxCodes);
                         for (int f = 0; f < flowsheets.size();f++){
                             String flowsheetName = (String) flowsheets.get(f);
                         %> <a

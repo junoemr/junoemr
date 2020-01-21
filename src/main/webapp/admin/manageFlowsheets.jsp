@@ -44,22 +44,24 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
 <%@ page import="org.oscarehr.measurements.model.Flowsheet" %>
-<%@ page import="java.util.Hashtable" %>
 <%@ page import="org.oscarehr.measurements.model.FlowSheetUserCreated" %>
+<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="java.util.List" %>
 
 <%
+	FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 	String method = request.getParameter("method");
 	if(method != null ) {
 		if(method.equals("disable")) {
 			String name = request.getParameter("name");
-			MeasurementTemplateFlowSheetConfig.getInstance().disableFlowsheet(name);
+			flowsheetService.disableFlowsheet(name);
 		}
 		if(method.equals("enable")) {
 			String name = request.getParameter("name");
-			MeasurementTemplateFlowSheetConfig.getInstance().enableFlowsheet(name);
+			flowsheetService.enableFlowsheet(name);
 		}
 		response.sendRedirect("manageFlowsheets.jsp");
 	}
@@ -197,55 +199,60 @@ br {
 					<td><b>Actions</b></td>
 				</tr>
 			<%
-				MeasurementTemplateFlowSheetConfig measurementConfig = MeasurementTemplateFlowSheetConfig.getInstance();
-				Hashtable<String, String> systemFlowsheets = measurementConfig.getFlowsheetDisplayNames();
-				for(String name:systemFlowsheets.keySet()) {
-					MeasurementFlowSheet flowSheet = measurementConfig.getFlowSheet(name);
-					
-					//load from db to know if it's enabled or not.
-					Flowsheet fs = measurementConfig.getFlowsheetSettings().get(flowSheet.getName());
+				List<MeasurementFlowSheet> flowsheetTemplates = flowsheetService.getFlowsheetTemplates();
+				List<Flowsheet> systemFlowsheets = flowsheetService.getSystemFlowsheets();
+				List<FlowSheetUserCreated> userCreatedFlowSheets = flowsheetService.getUserCreatedFlowsheets();
+				for (MeasurementFlowSheet flowsheetTemplate : flowsheetTemplates)
+				{
+					String type = "Unknown";
 					boolean enabled = true;
-					String type = "System";
-
-					if (fs != null)
+					for (Flowsheet sheet : systemFlowsheets)
 					{
-						enabled = fs.isEnabled();
-						if (!fs.isExternal())
+						if (flowsheetTemplate.getName().equals(sheet.getName()))
 						{
-							type = "Custom";
-						}
-					}
-					else
-					{
-						// check if this is a user-created flowsheet
-						FlowSheetUserCreated flowSheetUserCreated = measurementConfig.getUserCreatedFlowsheetSettings().get(flowSheet.getName());
-						if (flowSheetUserCreated != null)
-						{
-							enabled = !flowSheetUserCreated.getArchived();
-							type = "User Added";
+							if (sheet.isExternal())
+							{
+								type = "System";
+							}
+							else
+							{
+								type = "Custom";
+							}
+							enabled = sheet.isEnabled();
+							break;
 						}
 					}
 
-					if(!flowSheet.getDisplayName().equals("Health Tracker")){
+					if (type.equals("Unknown"))
+					{
+						for (FlowSheetUserCreated userCreated : userCreatedFlowSheets)
+						{
+							if (flowsheetTemplate.getName().equals(userCreated.getName()))
+							{
+								type = "User Added";
+								enabled = !userCreated.getArchived();
+								break;
+							}
+						}
+					}
 			%>
 						
 						<tr>
-							<td><%=flowSheet.getDisplayName()%></td>
-							<td><%=flowSheet.isUniversal() %></td>
-							<td><%=flowSheet.getDxTriggersString() %></td>
-							<td><%=flowSheet.getProgramTriggersString() %></td>
+							<td><%=flowsheetTemplate.getDisplayName()%></td>
+							<td><%=flowsheetTemplate.isUniversal() %></td>
+							<td><%=flowsheetTemplate.getDxTriggersString() %></td>
+							<td><%=flowsheetTemplate.getProgramTriggersString() %></td>
 							<td><%=type %></td>
 							<td><%=enabled%></td>
 							<td>
 								<%if(enabled) { %>
-									<a href="manageFlowsheets.jsp?method=disable&name=<%=flowSheet.getName()%>">Disable</a>
+									<a href="manageFlowsheets.jsp?method=disable&name=<%=flowsheetTemplate.getName()%>">Disable</a>
 								<% } else { %>
-									<a href="manageFlowsheets.jsp?method=enable&name=<%=flowSheet.getName()%>">Enable</a>
+									<a href="manageFlowsheets.jsp?method=enable&name=<%=flowsheetTemplate.getName()%>">Enable</a>
 								<% } %>								
 							</td>
 						</tr>
 					<%
-					}
 				}
 			%>
 			</table>
@@ -254,7 +261,7 @@ br {
 			
 			<form enctype="multipart/form-data" method="POST" action="<%=request.getContextPath()%>/admin/manageFlowsheetsUpload.jsp">
 				<input type="file" name="flowsheet_file"/>
-				<span title="<bean:message key="global.uploadWarningBody"/>" style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer"><img border="0" src="../images/icon_alertsml.gif"/></span></span>
+				<span title="<bean:message key="global.uploadWarningBody"/>" style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer"><img border="0" src="../images/icon_alertsml.gif"/></span>
         
 				&nbsp;
 				<input type="submit" value="Upload" />

@@ -25,7 +25,6 @@
 
 package org.oscarehr.measurements.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import org.oscarehr.common.dao.AbstractDao;
@@ -54,49 +53,4 @@ public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated>
 		return getSingleResultOrNull(query);
 	}
 
-	/**
-	 * Create a custom flowsheet given all of the required parameters.
-	 * @param name Internal name for the flowsheet
-	 * @param dxCodeTriggers set of ICD9 codes of which any can trigger visibility for a demographic
-	 * @param displayName user-friendly name for the flowsheet
-	 * @param warningColour custom colour to set for warning
-	 * @param recommendationColour custom colour to set for recommendation
-	 * @return FlowSheetUserCreated object after a successful persist
-	 */
-	public FlowSheetUserCreated create(String name, String dxCodeTriggers, String displayName, String warningColour, String recommendationColour)
-	{
-		FlowSheetUserCreated flowSheetUserCreated = new FlowSheetUserCreated();
-		flowSheetUserCreated.setName(name);
-		flowSheetUserCreated.setDxcodeTriggers(dxCodeTriggers);
-		flowSheetUserCreated.setDisplayName(displayName);
-		flowSheetUserCreated.setWarningColour(warningColour);
-		flowSheetUserCreated.setRecommendationColour(recommendationColour);
-		flowSheetUserCreated.setCreatedDate(new Date());
-		flowSheetUserCreated.setArchived(false);
-
-		persist(flowSheetUserCreated);
-
-		return flowSheetUserCreated;
-	}
-
-	/**
-	 * Given a user created flowsheet that's currently active, archive it.
-	 * @param flowSheetUserCreated user-created flowsheet to archive
-	 */
-	public void archive(FlowSheetUserCreated flowSheetUserCreated)
-	{
-		flowSheetUserCreated.setArchived(true);
-		merge(flowSheetUserCreated);
-	}
-
-	/**
-	 * Given a user created flowsheet that's been archived, unarchive it.
-	 * @param flowSheetUserCreated user-created flowsheet to unarchive
-	 */
-	public void unarchive(FlowSheetUserCreated flowSheetUserCreated)
-	{
-		flowSheetUserCreated.setArchived(false);
-		merge(flowSheetUserCreated);
-	}
-	
 }

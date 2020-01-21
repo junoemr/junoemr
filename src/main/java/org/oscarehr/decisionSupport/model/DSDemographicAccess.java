@@ -51,6 +51,7 @@ import org.oscarehr.common.model.ProviderStudyPK;
 import org.oscarehr.common.model.Study;
 import org.oscarehr.common.model.StudyData;
 import org.oscarehr.decisionSupport.model.conditionValue.DSValue;
+import org.oscarehr.measurements.service.FlowsheetService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -72,7 +73,7 @@ import oscar.oscarRx.data.RxPrescriptionData.Prescription;
  */
 public class DSDemographicAccess {
     private static final Logger logger = MiscUtils.getLogger();
-
+    private FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
     //To add new modules/types, add to enum with the access method, add the appropriate
     //functions for all, any, not, notall, notany (see examples below), and add to
     //getDemogrpahicValues list, that's it.
@@ -511,7 +512,7 @@ public class DSDemographicAccess {
     	dxResearchBeanHandler dxRes = new dxResearchBeanHandler(demographicNo);
         List<String> dxCodes = dxRes.getActiveCodeListWithCodingSystem();
         MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
-        ArrayList<String> flowsheets = templateConfig.getFlowsheetsFromDxCodes(dxCodes);
+        List<String> flowsheets = flowsheetService.getFlowsheetsFromDxCodes(dxCodes);
 
         boolean hasFlowSheet = false;
         for( int idx = 0; idx < flowsheets.size(); ++idx ) {

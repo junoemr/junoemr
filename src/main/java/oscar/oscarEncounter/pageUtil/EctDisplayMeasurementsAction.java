@@ -32,6 +32,7 @@ import org.oscarehr.common.dao.MeasurementGroupStyleDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.measurements.model.Flowsheet;
 import org.oscarehr.common.model.MeasurementGroupStyle;
+import org.oscarehr.measurements.service.FlowsheetService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -54,6 +55,7 @@ import java.util.Vector;
 public class EctDisplayMeasurementsAction extends EctDisplayAction {
 	private static final String cmd = "measurements";
 	FlowsheetDao flowsheetDao = (FlowsheetDao) SpringUtils.getBean("flowsheetDao");
+	private FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 	Logger logger = MiscUtils.getLogger();
 
 	public boolean getInfo(EctSessionBean bean, HttpServletRequest request, NavBarDisplayDAO Dao, MessageResources messages) {
@@ -132,8 +134,8 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 			
 			//next we add dx triggered flowsheets to the module items
 			dxResearchBeanHandler dxRes = new dxResearchBeanHandler(bean.demographicNo);
-			Vector dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-			flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetsFromDxCodes(dxCodes);
+			List<String> dxCodes = dxRes.getActiveCodeListWithCodingSystem();
+			flowsheets = flowsheetService.getFlowsheetsFromDxCodes(dxCodes);
 			for (int f = 0; f < flowsheets.size(); f++) {
 				NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 				String flowsheetName = flowsheets.get(f);
@@ -166,7 +168,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 			for (Admission admission : admissions) {
 				programs.add(String.valueOf(admission.getProgramId()));
 			}
-			flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetsFromPrograms(programs);
+			flowsheets = flowsheetService.getFlowsheetsFromPrograms(programs);
 			for (int f = 0; f < flowsheets.size(); f++) {
 				NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 				String flowsheetName = flowsheets.get(f);

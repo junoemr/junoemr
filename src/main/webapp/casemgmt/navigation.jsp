@@ -37,11 +37,13 @@
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.util.MeasurementHelper" %>
 <%@ page import="oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler" %>
-<%@ page import="java.util.Vector" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 
 <% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
 <%
+    FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
     String province = oscarVariables.getBillingTypeUpperCase();
     oscar.oscarEncounter.pageUtil.EctSessionBean bean=null;
     if ("true".equalsIgnoreCase((String)session.getAttribute("casemgmt_bean_flag"))){
@@ -358,7 +360,7 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
 <%
 	dxResearchBeanHandler dxRes;
     List<String> flowsheets;
-	Vector dxCodes;
+	List<String> dxCodes;
 %>
 <caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
 <caisirole:SecurityAccess accessName="measurements" accessType="access" providerNo="<%=bean.providerNo%>" demoNo="<%=bean.demographicNo%>" programId="<%=pgId%>">
@@ -389,7 +391,7 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
         <%
             dxRes = new dxResearchBeanHandler(bean.demographicNo);
             dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-            flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetsFromDxCodes(dxCodes);
+            flowsheets = flowsheetService.getFlowsheetsFromDxCodes(dxCodes);
             for (String flowsheet : flowsheets) {
         %>
         <a href="javascript:void(0)"
