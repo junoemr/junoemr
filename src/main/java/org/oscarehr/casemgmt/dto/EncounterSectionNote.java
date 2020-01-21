@@ -33,6 +33,7 @@ public class EncounterSectionNote extends MultiSearchResult
 {
 	private Integer id;
 	private String text;
+	private String[] textLineArray;
 	private String value;
 	private String onClick;
 	private String editors;
@@ -64,6 +65,16 @@ public class EncounterSectionNote extends MultiSearchResult
 	public void setText(String text)
 	{
 		this.text = text;
+	}
+
+	public String[] getTextLineArray()
+	{
+		return textLineArray;
+	}
+
+	public void setTextLineArray(String[] textLineArray)
+	{
+		this.textLineArray = textLineArray;
 	}
 
 	public String getValue()
@@ -171,7 +182,7 @@ public class EncounterSectionNote extends MultiSearchResult
 		return (this.titleClasses != null && this.titleClasses.length > 0);
 	}
 
-	public static int compare(Object o1, Object o2, boolean asc, boolean truncateToDate, boolean sortTextOpposite)
+	public static int compare(Object o1, Object o2, boolean asc, boolean truncateToDate, boolean sortTextOpposite, boolean blankHighest)
 	{
 		EncounterSectionNote i1 = (EncounterSectionNote)o1;
 		EncounterSectionNote i2 = (EncounterSectionNote)o2;
@@ -187,11 +198,25 @@ public class EncounterSectionNote extends MultiSearchResult
 		int result = 0;
 		if( d1 == null && d2 != null )
 		{
-			result = -1;
+			if(blankHighest)
+			{
+				result = 1;
+			}
+			else
+			{
+				result = -1;
+			}
 		}
 		else if( d1 != null && d2 == null )
 		{
-			result = 1;
+			if(blankHighest)
+			{
+				result = -1;
+			}
+			else
+			{
+				result = 1;
+			}
 		}
 		else if( d1 == null && d2 == null )
 		{
@@ -224,7 +249,14 @@ public class EncounterSectionNote extends MultiSearchResult
 	{
 		public int compare(Object o1, Object o2)
 		{
-			return EncounterSectionNote.compare(o1, o2, true, false, false);
+			return EncounterSectionNote.compare(
+					o1,
+					o2,
+					true,
+					false,
+					false,
+					false
+			);
 		}
 	}
 
@@ -232,7 +264,29 @@ public class EncounterSectionNote extends MultiSearchResult
 	{
 		public int compare(Object o1, Object o2)
 		{
-			return EncounterSectionNote.compare(o1, o2, false, false, false);
+			return EncounterSectionNote.compare(
+					o1,
+					o2,
+					false,
+					false,
+					false,
+					false
+			);
+		}
+	}
+
+	public static class SortChronologicBlankDateFirst implements Comparator
+	{
+		public int compare(Object o1, Object o2)
+		{
+			return EncounterSectionNote.compare(
+					o1,
+					o2,
+					false,
+					false,
+					false,
+					true
+			);
 		}
 	}
 
@@ -240,7 +294,14 @@ public class EncounterSectionNote extends MultiSearchResult
 	{
 		public int compare(Object o1, Object o2)
 		{
-			return EncounterSectionNote.compare(o1, o2, false, false, true);
+			return EncounterSectionNote.compare(
+					o1,
+					o2,
+					false,
+					false,
+					true,
+					false
+			);
 		}
 	}
 
@@ -248,7 +309,14 @@ public class EncounterSectionNote extends MultiSearchResult
 	{
 		public int compare(Object o1, Object o2)
 		{
-			return EncounterSectionNote.compare(o1, o2, true, true, false);
+			return EncounterSectionNote.compare(
+					o1,
+					o2,
+					true,
+					true,
+					false,
+					false
+			);
 		}
 	}
 

@@ -229,9 +229,6 @@ public class EncounterPreventionNoteService extends EncounterSectionService
 				}
 
 				String title = StringUtils.maxLenString(h.get("name"),  MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-				//item.setTitle(title);
-				//item.setLinkTitle(h.get("desc"));
-				//item.setURL(url);
 				sectionNote.setText(title);
 				sectionNote.setOnClick(onClickString);
 
@@ -248,7 +245,7 @@ public class EncounterPreventionNoteService extends EncounterSectionService
 			}
 		}
 
-		Collections.sort(items, new EncounterSectionNote.SortChronologicAsc());
+		Collections.sort(items, new EncounterSectionNote.SortChronologicBlankDateFirst());
 
 		noteList.addAll(warnings);
 		noteList.addAll(items);

@@ -248,7 +248,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 		}
 	};
 
-	this.getAssignedIssueArray = function getAssignedIssueArray(issueIdArray)
+	this.getAssignedIssueArray = function getAssignedIssueArray(issueIdArray, async)
 	{
 		var deferred = jQuery.Deferred();
 
@@ -259,6 +259,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 			var issueId = issueIdArray[i];
 
 			var ajaxPromise = jQuery.ajax({
+				async: async,
 				type: "POST",
 				url: "../ws/rs/notes/getIssueById/" + issueId
 			});
@@ -360,6 +361,12 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 					} else if (!disableExpand && !getAll && index === response.body.notes.length - 1)
 					{
 						note.showExpand = true;
+					}
+
+					note.textLineArray = [];
+					if(note.text)
+					{
+						note.textLineArray = note.text.split(/\r?\n/);
 					}
 
 					var newNode;

@@ -234,6 +234,8 @@ public class PreventionDao extends AbstractDao<Prevention>
 				"from preventions p\n" +
 				"left join preventions p_filter\n" +
 				"    on binary p.prevention_type = binary p_filter.prevention_type\n" +
+				"    and p.demographic_no = p_filter.demographic_no\n" +
+				"    and p.deleted = p_filter.deleted\n" +
 				"    and (\n" +
 				"        p.prevention_date < p_filter.prevention_date\n" +
 				"        or (p.prevention_date = p_filter.prevention_date and p.id < p_filter.id)\n" +

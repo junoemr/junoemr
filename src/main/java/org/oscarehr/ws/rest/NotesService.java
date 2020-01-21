@@ -445,15 +445,26 @@ public class NotesService extends AbstractServiceImpl
 				cpp.setDemographic_no(demographicNoStr);
 			}
 
-			// Save annotation
+			// Load annotation if it exists
+			org.oscarehr.encounterNote.model.CaseManagementNote annotationNoteJPA =
+					encounterNoteService.getAnnotation(note.getNoteId());
+
 			CaseManagementNote annotationNote = null;
+			if(annotationNoteJPA != null)
+			{
+				// XXX: Loading the note using the Hibernate model to be compatible with the save
+				// method in caseManagementMgr.  Change this if replacing the save method.
+				annotationNote = caseManagementMgr.getNote(annotationNoteJPA.getId().toString());
+			}
 
 			//String ongoing = null; // figure out this
 			String ongoing = new String();
 			String lastSavedNoteString = null;
 			String remoteAddr = ""; // Not sure how to get this
-			caseMangementNote = caseManagementMgr.saveCaseManagementNote(loggedInInfo, caseMangementNote, issuelist,
-					cpp, ongoing, verify, loggedInInfo.getLocale(), now, annotationNote, userName, providerNo, remoteAddr, lastSavedNoteString);
+			caseMangementNote = caseManagementMgr.saveCaseManagementNote(
+					loggedInInfo, caseMangementNote, issuelist, cpp, ongoing, verify,
+					loggedInInfo.getLocale(), now, annotationNote, userName, providerNo,
+					remoteAddr, lastSavedNoteString);
 
 			caseManagementMgr.getEditors(caseMangementNote);
 

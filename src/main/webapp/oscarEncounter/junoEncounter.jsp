@@ -182,6 +182,7 @@
 				imagePresentPlaceholderUrl: "<c:out value='${fn:escapeXml(junoEncounterForm.pageData.imagePresentPlaceholderUrl)}' />",
 				encounterTypeArray: getEncounterTypeArray(),
 				editUnsignedMsg: "<bean:message key="oscarEncounter.editUnsignedNote.msg"/>",
+				unsavedNoteWarningMsg: "<bean:message key="oscarEncounter.unsavedNoteWarning.msg"/>",
 				printDateMsg: "<bean:message key="oscarEncounter.printDate.msg"/>",
 				printDateOrderMsg: "<bean:message key="oscarEncounter.printDateOrder.msg"/>",
 				notesIncrement: <%= OscarProperties.getNumLoadedNotes(20) %>,
@@ -220,7 +221,7 @@
 			var caseManagementIssue = new Juno.OscarEncounter.JunoEncounter.CaseManagementIssue(pageData, pageState);
 
 			<%@ include file="js/JunoEncounter/PrintNotes.js" %>
-			var printNotes = new Juno.OscarEncounter.JunoEncounter.PrintNotes(pageData);
+			var printNotes = new Juno.OscarEncounter.JunoEncounter.PrintNotes(pageData, pageState);
 
 			<%@ include file="js/JunoEncounter/NoteFilter.js" %>
 			var noteFilter = new Juno.OscarEncounter.JunoEncounter.NoteFilter(pageData, pageState, encounterNote);
@@ -394,7 +395,7 @@
 								<a href="#"
 								   onClick="popupPage(700,1000,
 										   '${junoEncounterForm.pageData.windowName}',
-										   '${ctx}${junoEncounterForm.pageData.demographicUrl}'
+										   '${junoEncounterForm.pageData.demographicUrl}'
 										   ); return false;"
 								   title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>"
 								>
@@ -411,7 +412,7 @@
 								<span id="encounterHeaderExt"></span>
 								<security:oscarSec roleName="${junoEncounterForm.pageData.roleName}"
 												   objectName="_newCasemgmt.apptHistory" rights="r">
-									<a href="javascript:popupPage(400,850,'ApptHist','<c:out value="${ctx}"/><bean:write name="junoEncounterForm" property="pageData.demographicAdditionalInfoUrl" />')"
+									<a href="javascript:popupPage(400,850,'ApptHist','<bean:write name="junoEncounterForm" property="pageData.demographicAdditionalInfoUrl" />')"
 									   style="font-size: 11px;text-decoration:none;"
 									   title="<bean:message key="oscarEncounter.Header.nextApptMsg"/>"><span
 											style="margin-left:20px;"><bean:message
@@ -733,7 +734,7 @@
 								<fmt:formatDate value="${parsedObservationDate}"
 												pattern="dd-MMM-yyyy"
 												var="observationDate"/>
-								<li class="${noteLoop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
+								<li class="cpp ${noteLoop.index % 2 == 0 ? 'encounterNoteEven' : 'encounterNoteOdd'}">
 									<span id="spanListNote${fn:escapeXml(noteLoop.index)}">
 										<a class="topLinks"
 										   onmouseover="this.className='topLinkhover'"
@@ -743,7 +744,9 @@
 										   href="#"
 										   onclick="${note.onClick}"
 										   style="width:100%;overflow:scroll;">
-												${fn:escapeXml(note.text)}
+											<c:forEach items="${note.textLineArray}" var="noteLine">
+												<c:out value="${noteLine}" /><br />
+											</c:forEach>
 										</a>
 									</span>
 								</li>
@@ -1066,6 +1069,10 @@
 
 						<div id='save' style="width: 99%; background-color: #CCCCFF; padding-top: 5px; margin-left: 2px; border-left: thin solid #000000; border-right: thin solid #000000; border-bottom: thin solid #000000;">
 							<span style="float: right; margin-right: 5px;">
+								<input type="hidden" name="notes2print" id="notes2print" value="">
+								<input type="hidden" name="printCPP" id="printCPP" value="false">
+								<input type="hidden" name="printRx" id="printRx" value="false">
+								<input type="hidden" name="printLabs" id="printLabs" value="false">
 
 								<div class="encounter_timer_container">
 									<div style="display: inline-block; position:relative;">

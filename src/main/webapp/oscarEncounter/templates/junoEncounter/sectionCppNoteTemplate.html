@@ -8,7 +8,9 @@
           href="#"
           onclick="\${onClick};return false;"
           style="width:100%;overflow:scroll;" >
-				\${text}
+            {{each textLineArray}}
+            \${$value}<br />
+            {{/each}}
 		</a>
 	</span>
 </li>

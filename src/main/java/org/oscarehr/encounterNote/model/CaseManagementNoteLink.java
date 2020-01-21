@@ -38,16 +38,16 @@ import javax.persistence.Table;
 @Table(name = "casemgmt_note_link")
 public class CaseManagementNoteLink extends AbstractModel<Long>
 {
-	private static final Integer CASEMGMTNOTE = 1;
-	private static final Integer DRUGS = 2;
-	private static final Integer ALLERGIES = 3;
-	private static final Integer HL7LAB = 4; //represents the hl7TextMessage table
-	private static final Integer DOCUMENT = 5;
-	private static final Integer EFORMDATA = 6;
-	private static final Integer DEMOGRAPHIC = 7;
-	private static final Integer PREVENTIONS = 8;
-	private static final Integer LABTEST2 = 9; //repesents the labPatientPhysicianInfo table
-	private static final Integer TICKLER = 10;
+	public static final Integer CASEMGMTNOTE = 1;
+	public static final Integer DRUGS = 2;
+	public static final Integer ALLERGIES = 3;
+	public static final Integer HL7LAB = 4; //represents the hl7TextMessage table
+	public static final Integer DOCUMENT = 5;
+	public static final Integer EFORMDATA = 6;
+	public static final Integer DEMOGRAPHIC = 7;
+	public static final Integer PREVENTIONS = 8;
+	public static final Integer LABTEST2 = 9; //repesents the labPatientPhysicianInfo table
+	public static final Integer TICKLER = 10;
 
 
 	@Id

@@ -77,7 +77,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		}
 
 		var me = this;
-		this.junoEncounter.getAssignedIssueArray(issueIdArray).then(function (assignedIssueArray)
+		this.junoEncounter.getAssignedIssueArray(issueIdArray, true).then(function (assignedIssueArray)
 		{
 			var result = {
 				"assignedCMIssues": assignedIssueArray,
@@ -359,6 +359,10 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 				option.text = "" + opttxt;
 				option.value = j;
 				$("position").options.add(option, j);
+				if(position === j)
+				{
+					option.selected = "selected";
+				}
 			}
 		}
 

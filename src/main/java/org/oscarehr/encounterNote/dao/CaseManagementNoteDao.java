@@ -518,6 +518,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"    doc.document_no IS NOT NULL AS is_document,\n" +
 				"    doc.status = 'D' AS deleted,\n" +
 				"    cmn_link.table_name = '2' AS rx_annotation,\n" +
+				"    drugs.regional_identifier AS regional_identifier,\n" +
+				"    drugs.customName AS custom_name,\n" +
 				"    false AS eform_data,\n" +
 				"    false AS is_encounter_form,\n" +
 				"    false AS is_invoice,\n" +
@@ -576,6 +578,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"  AND cmn_link.id < cmn_link_filter.id\n" +
 				"LEFT JOIN document doc ON cmn_link.table_name = :documentTableName AND " +
 				"doc.document_no = cmn_link.table_id\n" +
+				"LEFT JOIN drugs drugs ON cmn_link.table_name = :drugsTableName AND " +
+				"drugs.drugid = cmn_link.table_id\n" +
 				"LEFT JOIN program AS prog ON cmn.program_no = prog.id\n" +
 				"LEFT JOIN provider AS prov ON cmn.provider_no = prov.provider_no\n" +
 				"LEFT JOIN secRole " +
@@ -646,6 +650,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 					"    false AS is_document,\n" +
 					"    false AS deleted,\n" +
 					"    false AS rx_annotation,\n" +
+					"    false AS regional_identifier,\n" +
+					"    false AS custom_name,\n" +
 					"    true AS eform_data,\n" +
 					"    false AS is_encounter_form,\n" +
 					"    false AS is_invoice,\n" +
@@ -688,6 +694,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		int count = 0;
 
 		query.setParameter("documentTableName", CaseManagementNoteLink.DOCUMENT);
+		query.setParameter("drugsTableName", CaseManagementNoteLink.DRUGS);
 		query.setParameter("demographicNo", demographicNo);
 
 		if(providers != null && providers.size() > 0)
@@ -758,6 +765,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 			note.setDocument(getBooleanFromInteger(row[column++]));
 			note.setDeleted(getBooleanFromInteger(row[column++]));
 			note.setRxAnnotation(getBooleanFromInteger(row[column++]));
+			note.setRegionalIdentifier((String) row[column++]);
+			note.setCustomName((String) row[column++]);
 			note.setEformData(getBooleanFromInteger(row[column++]));
 			if(note.isEformData())
 			{
@@ -859,6 +868,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"    false AS is_document,\n" +
 				"    false AS deleted,\n" +
 				"    false AS rx_annotation,\n" +
+				"    false AS regional_identifier,\n" +
+				"    false AS custom_name,\n" +
 				"    false AS eform_data,\n" +
 				"    true AS is_encounter_form,\n" +
 				"    false AS is_invoice,\n" +

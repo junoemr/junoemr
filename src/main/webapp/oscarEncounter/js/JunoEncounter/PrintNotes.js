@@ -4,8 +4,10 @@ if (!window.Juno) window.Juno = {};
 if (!Juno.OscarEncounter) Juno.OscarEncounter = {};
 if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = {};
 
-if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncounter.PrintNotes = function PrintNotes(pageData)
+if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncounter.PrintNotes = function PrintNotes(pageData, pageState)
 {
+	this.pageData = pageData;
+
 	this.togglePrint = function togglePrint(noteId, e)
 	{
 		var selected = this.pageData.contextPath + "/oscarEncounter/graphics/printerGreen.png";
@@ -74,7 +76,7 @@ if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncou
 		Event.stop(e);
 
 		//cycle through container divs for each note
-		for (idx = 1; idx <= notesOffset; ++idx)
+		for (idx = 1; idx <= pageState.notesOffset; ++idx)
 		{
 			var ncIdx = $("nc" + idx);
 

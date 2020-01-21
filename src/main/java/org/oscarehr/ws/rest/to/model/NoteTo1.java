@@ -60,6 +60,8 @@ public class NoteTo1 implements Serializable{
 	private boolean isDocument;
 	private boolean isDeleted;
 	private boolean isRxAnnotation;
+	private String regionalIdentifier;
+	private String customName;
 	private boolean isEformData;
 	private boolean isEncounterForm;
 	private boolean isInvoice;
@@ -264,6 +266,26 @@ public class NoteTo1 implements Serializable{
 
 	public void setRxAnnotation(boolean isRxAnnotation) {
 		this.isRxAnnotation = isRxAnnotation;
+	}
+
+	public String getRegionalIdentifier()
+	{
+		return regionalIdentifier;
+	}
+
+	public void setRegionalIdentifier(String regionalIdentifier)
+	{
+		this.regionalIdentifier = regionalIdentifier;
+	}
+
+	public String getCustomName()
+	{
+		return customName;
+	}
+
+	public void setCustomName(String customName)
+	{
+		this.customName = customName;
 	}
 
 	public boolean isEformData() {

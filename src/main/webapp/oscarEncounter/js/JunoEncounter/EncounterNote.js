@@ -58,9 +58,57 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.editEncounterNote = function editEncounterNote(event, noteId)
 	{
+		var currentNoteId = jQuery("input#editNoteId").val();
+		var noteData = this.getNoteDataById(currentNoteId);
+
+		this.unobserveTextArea();
+
+		if(noteData.note.trim() !== pageState.currentNoteData.note.trim())
+		{
+			if(confirm(this.pageData.unsavedNoteWarningMsg))
+			{
+				// Save note and refresh note list
+				var me = this;
+				this.saveEncounterNote(
+					false,
+					false,
+					true,
+					false,
+					false
+				).then(
+					function(response)
+					{
+						// Set the current note data from the results of the saved note
+						pageState.currentNoteData = me.buildNote(
+							response.noteId,
+							response.uuid,
+							response.observationDate,
+							response.providerNo,
+							response.encounterType,
+							false,
+							false,
+							response.appointmentNo,
+							response.note
+						)
+					},
+					function(response)
+					{
+						console.log("Error saving encounter note when changing edited note.");
+					}
+				);
+			}
+			else
+			{
+				return;
+			}
+		}
+
+
+		// Show a warning and offer to save the note if
 		var demographicNo = this.pageData.demographicNo;
 
 		var me = this;
+
 		jQuery.ajax({
 			type: "GET",
 			contentType: "application/json",
@@ -71,6 +119,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 				var note = result.body.encounterNote;
 				var issues = result.body.assignedCMIssues;
 
+
 				// Show a warning if an unsigned note was created by a different provider
 				var editWarn = (!note.isSigned && note.providerNo !== me.pageData.providerNo);
 
@@ -79,28 +128,30 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 					return false;
 				}
 
-				// Disable any notes currently being edited
-				var currentlyEditedNoteId = jQuery('input#editNoteId').val();
-				var currentlyEditedNoteDiv = jQuery('div#n' + currentlyEditedNoteId).parent();
-
-				me.unobserveTextArea();
-
-				me.replaceNoteEntry(currentlyEditedNoteDiv, pageState.currentNoteData, null, demographicNo, false);
-
-
-				// Make the note editable
-				var noteDiv = jQuery('div#n' + noteId).parent();
-
-				me.replaceNoteEntry(noteDiv, note, issues, demographicNo, true);
-				me.updateNoteInPageState(note, issues);
-
-				me.adjustCaseNote();
-				me.observeTextArea();
-				me.setSaveButtonVisibility();
+				me.enableEditMode(noteId, demographicNo, note, issues);
 			}
 		});
 
 		return false;
+	};
+
+	this.enableEditMode = function enableEditMode(noteId, demographicNo, note, issues)
+	{
+		// Disable any notes currently being edited
+		var currentlyEditedNoteId = jQuery('input#editNoteId').val();
+		var currentlyEditedNoteDiv = jQuery('div#n' + currentlyEditedNoteId).parent();
+
+		this.replaceNoteEntry(currentlyEditedNoteDiv, pageState.currentNoteData, null, demographicNo, false);
+
+		// Make the note editable
+		var noteDiv = jQuery('div#n' + noteId).parent();
+
+		this.replaceNoteEntry(noteDiv, note, issues, demographicNo, true);
+		this.updateNoteInPageState(note, issues);
+
+		this.adjustCaseNote();
+		this.observeTextArea();
+		this.setSaveButtonVisibility();
 	};
 
 	this.observeTextArea = function observeTextArea()
@@ -355,6 +406,8 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 		var winName = "junoEncounterFormWindow";
 
+
+		// Eform link
 		var onClickString = "";
 		if (note.eformData)
 		{
@@ -373,6 +426,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			onClickString = "popupPage(700,800,'" + winName + "','" + url + "');";
 		}
 
+		// Document link
 		var documentWinName = "docs" + demographicNo;
 		var documentStatus = note.documentStatus;
 		if (documentStatus === 'A')
@@ -385,6 +439,27 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			"&doc_no=" + encodeURIComponent(note.documentId);
 		var documentOnClickString = "popupPage(700,800,'" + documentWinName + "', '" + documentUrl + "'); return false;";
 
+
+		// Prescription link
+		var prescriptionWinName = "rx" + demographicNo;
+		var regionalIdentifier = "";
+		if(note.regionalIdentifier !== null)
+		{
+			regionalIdentifier = note.regionalIdentifier;
+		}
+		var customName = "";
+		if(note.customName !== null)
+		{
+			customName = note.customName;
+		}
+		var prescriptionUrl = this.pageData.contextPath + "/oscarRx/StaticScript2.jsp" +
+			"?demographicNo=" + encodeURIComponent(demographicNo) +
+			"&regionalIdentifier=" + encodeURIComponent(regionalIdentifier) +
+			"&cn=" + encodeURIComponent(customName);
+		var prescriptionOnClickString = "popupPage(700,800,'" + prescriptionWinName + "', '" + prescriptionUrl + "'); return false;";
+
+
+		// Template fields
 		var templateParameters = {
 			index: index,
 			note: note,
@@ -392,7 +467,8 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			noteLineArray: note.note.split("\n"),
 			formattedObservationDate: date.format('DD-MMM-YYYY H:mm'),
 			onClickString: onClickString,
-			documentOnClickString: documentOnClickString
+			documentOnClickString: documentOnClickString,
+			prescriptionOnClickString: prescriptionOnClickString
 		};
 
 
@@ -482,6 +558,31 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			noteId: noteId,
 			uuid: uuid,
 			observationDate: observationMoment.toDate(),
+			providerNo: providerNo,
+			encounterType: encounterType,
+			isSigned: isSigned,
+			isVerified: isVerified,
+			appointmentNo: appointmentNo,
+			note: noteText
+		};
+	};
+
+	this.buildNote = function buildNote(
+		noteId,
+		uuid,
+		observationDate,
+		providerNo,
+		encounterType,
+		isSigned,
+		isVerified,
+		appointmentNo,
+		noteText
+	)
+	{
+		return {
+			noteId: noteId,
+			uuid: uuid,
+			observationDate: observationDate,
 			providerNo: providerNo,
 			encounterType: encounterType,
 			isSigned: isSigned,
@@ -613,6 +714,8 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.saveEncounterNote = function saveEncounterNote(signNote, verifyNote, exitAfterSaving, async, redirectToBilling)
 	{
+		var deferred = jQuery.Deferred();
+
 		// Clear state
 		this.clearNoteError();
 		this.clearNoteStatus();
@@ -658,7 +761,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		// XXX: position, issues flag
 
 		var me = this;
-		junoEncounter.getAssignedIssueArray(issueIdArray).then(function(assignedIssueArray)
+		junoEncounter.getAssignedIssueArray(issueIdArray, async).then(function(assignedIssueArray)
 		{
 			noteData.assignedIssues = assignedIssueArray;
 
@@ -692,15 +795,21 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 						}
 
 						me.setNoteStatus("Note successfully saved");
+
+						deferred.resolve(response.body);
 					}
 				},
 				error: function (response)
 				{
 					me.setNoteError("Error saving note");
 					console.log(response);
+
+					deferred.reject();
 				}
 			});
 		});
+
+		return deferred.promise();
 	};
 
 	/*
@@ -999,7 +1108,8 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 			var maximizeImageTag = "<img title='Maximize Display' alt='Maximize Display' id='xpImg" + nodeId + "' name='expandViewTrigger' onclick='encounterNote.maxView(event, \"" + nodeId + "\")' style='float:right; margin-right:5px; margin-top: 2px;' src='" + this.pageData.contextPath + "/oscarEncounter/graphics/triangle_down.gif'>";
 			new Insertion.Top(noteDivId, maximizeImageTag);
-		} else
+		}
+		else
 		{
 			Element.remove("xpImg" + nodeId);
 

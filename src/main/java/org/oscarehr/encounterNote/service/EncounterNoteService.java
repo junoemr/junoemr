@@ -117,6 +117,25 @@ public class EncounterNoteService
 		return getNoteTo1FromNote(note);
 	}
 
+	public CaseManagementNote getAnnotation(Integer parentNoteId)
+	{
+		if(parentNoteId == null)
+		{
+			return null;
+		}
+
+		CaseManagementNoteLink noteLink = caseManagementNoteLinkDao.getNoteLinkByTableIdAndTableName(
+				parentNoteId, CaseManagementNoteLink.CASEMGMTNOTE);
+
+		CaseManagementNote note = null;
+		if(noteLink != null)
+		{
+			note = caseManagementNoteDao.find(noteLink.getNote().getNoteId());
+		}
+
+		return note;
+	}
+
 	private NoteIssueTo1 getNoteTo1FromNote(CaseManagementNote note)
 	{
 		if(note == null)
