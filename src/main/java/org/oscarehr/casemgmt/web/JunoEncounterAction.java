@@ -274,7 +274,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 
 		Locale locale = request.getLocale();
 
-		Date hideBeforeDate = getEncounterNoteHideBeforeDate(session);
+		Date hideBeforeDate = getEncounterNoteHideBeforeDate(providerNo);
 
 		// XXX: this should be generated better if this gets refactored to not use the
 		//      encounterSessionBean
@@ -518,9 +518,9 @@ public class JunoEncounterAction extends DispatchActionSupport
 	}
 
 	// Calculate the date before which all encounter notes are displayed collapsed
-	private Date getEncounterNoteHideBeforeDate(HttpSession session)
+	private Date getEncounterNoteHideBeforeDate(String providerNo)
 	{
-		UserProperty uProp = (UserProperty) session.getAttribute(UserProperty.STALE_NOTEDATE);
+		UserProperty uProp = caseManagementManager.getUserProperty(providerNo, UserProperty.STALE_NOTEDATE);
 
 		Calendar cal = Calendar.getInstance();
 		if (uProp != null)
@@ -538,7 +538,8 @@ public class JunoEncounterAction extends DispatchActionSupport
 				cal.add(Calendar.MONTH, pastMths);
 			}
 
-		} else
+		}
+		else
 		{
 			cal.add(Calendar.YEAR, -1);
 		}

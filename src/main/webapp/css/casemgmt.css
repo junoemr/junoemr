@@ -536,6 +536,16 @@ div.junoEncounterNote .collapse {
 	overflow: hidden;
 }
 
+div.junoEncounterNote div.hideNote {
+	display: none;
+}
+
+div.junoEncounterNote div.minimizedNoteText {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 table.setIssueList {
 	font-size: 11px;
 }

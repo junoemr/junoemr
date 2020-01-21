@@ -482,12 +482,18 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	{
 		var date = moment(note.observationDate);
 		var formattedDate = "";
+		var formattedDateTime = "";
 		if (date.isValid())
 		{
-			formattedDate = date.format('DD-MMM-YYYY H:mm');
+			formattedDate = date.format('DD-MMM-YYYY');
+			formattedDateTime = date.format('DD-MMM-YYYY H:mm');
 		}
 		var hideBeforeMoment = moment(this.pageData.encounterNoteHideBeforeDate);
 		var observationMoment = moment(note.observationDate);
+		console.log(date);
+		console.log(observationMoment);
+		console.log(hideBeforeMoment);
+		console.log(hideBeforeMoment.isAfter(observationMoment));
 
 		// Make annotation url
 		var annotationLabel = "anno" + moment().unix();
@@ -513,6 +519,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			noteLineArray: note.note.split("\n"),
 			escapedNote: note.note.escapeHTML(),
 			formattedObservationDate: formattedDate,
+			formattedObservationDateTime: formattedDateTime,
 			collapseNote: hideBeforeMoment.isAfter(observationMoment),
 			edit: enableEdit,
 			annotationLabel: annotationLabel,
@@ -1097,26 +1104,18 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	this.toggleShrunkNote = function toggleShrunkNote(e, nodeId, shrink)
 	{
 		//var txt = Event.element(e).parentNode.id;
-		var noteDivId = "n" + nodeId;
-		var noteTxtId = "txt" + nodeId;
+		var noteDivId = "#n" + nodeId;
+		var minimizedNoteDivId = "#minimizedNote" + nodeId;
 
 		if (shrink)
 		{
-			Element.remove("quitImg" + nodeId);
-
-			$(noteTxtId).addClassName("collapse");
-
-			var maximizeImageTag = "<img title='Maximize Display' alt='Maximize Display' id='xpImg" + nodeId + "' name='expandViewTrigger' onclick='encounterNote.maxView(event, \"" + nodeId + "\")' style='float:right; margin-right:5px; margin-top: 2px;' src='" + this.pageData.contextPath + "/oscarEncounter/graphics/triangle_down.gif'>";
-			new Insertion.Top(noteDivId, maximizeImageTag);
+			jQuery(noteDivId).hide();
+			jQuery(minimizedNoteDivId).show();
 		}
 		else
 		{
-			Element.remove("xpImg" + nodeId);
-
-			$(noteTxtId).removeClassName("collapse");
-
-			var minimizeImageTag = "<img id='quitImg" + nodeId + "' onclick='encounterNote.minView(event, \"" + nodeId + "\")' style='float:right; margin-right:5px; margin-top: 2px;' src='" + this.pageData.contextPath + "/oscarEncounter/graphics/triangle_up.gif'>";
-			new Insertion.Top(noteDivId, minimizeImageTag);
+			jQuery(minimizedNoteDivId).hide();
+			jQuery(noteDivId).show();
 		}
 	};
 
