@@ -41,7 +41,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallLogEntryListTo1;
 import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallLogEntryTo1;
-import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallLogSearchTo1;
 import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallSendFormTo1;
 import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallSettingsTo1;
 import org.oscarehr.ws.rest.response.RestResponse;
