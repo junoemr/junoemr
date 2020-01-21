@@ -179,11 +179,7 @@ function sendData(path, param, target)
 		{
 			if (target === "indicatorId")
 			{
-				var panelList = buildIndicatorPanel(data, target, param.indicatorId);
-				if (panelList)
-				{
-					console.log(panelList);
-				}
+				buildIndicatorPanel(data, target, param.indicatorId);
 			}
 			else
 			{

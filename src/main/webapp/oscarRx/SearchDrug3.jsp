@@ -1499,7 +1499,6 @@
 			return false;
 		}
 
-
 		function deletePrescribe(randomId){
 			var data="randomId="+randomId;
 			var url="<c:out value="${ctx}"/>" + "/oscarRx/rxStashDelete.do?parameterValue=deletePrescribe";

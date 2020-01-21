@@ -1131,7 +1131,7 @@
 				<li class="weak row">
 						<div class="label">Virtual:</div>
 						<div class="input">
-						<input type="checkbox" name="isVirtual" />
+						<input type="checkbox" name="isVirtual" disabled/>
 					</div>
 					<div class="space">&nbsp;</div>
 					<div class="label"></div>

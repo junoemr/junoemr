@@ -57,6 +57,7 @@ public class CalendarAppointment implements Serializable
 	private boolean doNotBook;
 	private boolean tagSelfBooked;
 	private boolean tagSelfCancelled;
+	private boolean virtual;
 	private String tagSystemCodes;
 	private String appointmentName;
 
@@ -71,7 +72,7 @@ public class CalendarAppointment implements Serializable
 	                           String eventStatusModifier, Integer numInvoices, String reason, Integer reasonCode,
 	                           String notes, String tagNames, String site, String type,
 	                           String resources, String urgency, boolean doNotBook, boolean tagSelfBooked,
-	                           boolean tagSelfCancelled, String tagSystemCodes)
+	                           boolean tagSelfCancelled, boolean virtual, String tagSystemCodes)
 	{
 		this.appointmentNo = appointmentNo;
 		this.billingRegion = billingRegion;
@@ -102,6 +103,7 @@ public class CalendarAppointment implements Serializable
 		this.tagSelfBooked = tagSelfBooked;
 		this.tagSelfCancelled = tagSelfCancelled;
 		this.tagSystemCodes = tagSystemCodes;
+		this.virtual = virtual;
 	}
 
 	public Integer getAppointmentNo()
@@ -384,6 +386,16 @@ public class CalendarAppointment implements Serializable
 		this.tagSelfCancelled = tagSelfCancelled;
 	}
 
+	public boolean isVirtual()
+	{
+		return virtual;
+	}
+
+	public void setIsVirtual(boolean virtual)
+	{
+		this.virtual = virtual;
+	}
+
 	public String getTagSystemCodes()
 	{
 		return tagSystemCodes;
@@ -412,6 +424,7 @@ public class CalendarAppointment implements Serializable
 		CalendarAppointment that = (CalendarAppointment) o;
 		return tagSelfBooked == that.tagSelfBooked &&
 				tagSelfCancelled == that.tagSelfCancelled &&
+				virtual == that.virtual &&
 				Objects.equals(appointmentNo, that.appointmentNo) &&
 				Objects.equals(billingRegion, that.billingRegion) &&
 				Objects.equals(billingForm, that.billingForm) &&
@@ -476,6 +489,7 @@ public class CalendarAppointment implements Serializable
 				", urgency='" + urgency + '\'' +
 				", tagSelfBooked=" + tagSelfBooked +
 				", tagSelfCancelled=" + tagSelfCancelled +
+				", isVirtual=" + virtual +
 				", tagSystemCodes='" + tagSystemCodes + '\'' +
 				'}';
 	}

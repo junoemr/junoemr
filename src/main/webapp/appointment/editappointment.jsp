@@ -926,8 +926,10 @@
 					<li class="weak row">
 						<div class="label">Virtual:</div>
 						<div class="input">
-								<input type="checkbox" name="isVirtual"
-												<%= appt.getIsVirtual() ? "checked='checked'" : "" %>/>
+							<input type="checkbox" name="isVirtualDummy" disabled
+									<%= appt.getIsVirtual() ? "checked='checked'" : "" %>/>
+							<input type="hidden" name="isVirtual"
+									<%= appt.getIsVirtual() ? "value='on'" : "" %>/>
 								<% if(appt.getIsVirtual()) { %>
 								&nbsp;
 								&nbsp;
@@ -935,9 +937,10 @@
 								&nbsp;
 								<a href="#"
 									 onClick='popupPage(800, 1280,
-													 "../telehealth/myhealthaccess.do?method=startTelehealth&" +
-													 "demographicNo=<%=appt.getDemographicNo()%>&" +
-													 "siteName=<%=appt.getLocation()%>");return false;'
+													 "../integrations/myhealthaccess.do?method=connect" +
+													 "&demographicNo=<%=appt.getDemographicNo()%>" +
+													 "&siteName=<%=appt.getLocation()%>" +
+													 "&appt=<%=appt.getId()%>");return false;'
 									 title="Telehealth">Initiate Appt</a>
 
 								<% } %>

@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.DashboardDao;
 import org.oscarehr.common.dao.IndicatorTemplateDao;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Dashboard;
 import org.oscarehr.common.model.IndicatorTemplate;
 import org.oscarehr.dashboard.display.beans.DashboardBean;
@@ -410,7 +411,7 @@ public class DashboardManager {
 
 	}
 	
-	public String exportDrilldownQueryResultsToCSV( LoggedInInfo loggedInInfo, int indicatorId, String providerNo) {
+	public GenericFile exportDrilldownQueryResultsToCSV(LoggedInInfo loggedInInfo, int indicatorId, String providerNo) {
 		
 		if(!securityCheck(loggedInInfo, "_dashboardDrilldown", SecurityInfoManager.READ)) {
 			return null;
@@ -427,7 +428,6 @@ public class DashboardManager {
 		exportQueryHandler.execute();
 		
 		return exportQueryHandler.getCsvFile();
-
 	}
 	
 	/**

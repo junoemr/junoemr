@@ -26,14 +26,12 @@ package org.oscarehr.integration.myhealthaccess.service;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
-import org.oscarehr.integration.myhealthaccess.dto.BaseErrorTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicStatusResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateResponseTo1;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -103,33 +101,5 @@ public class ClinicService extends BaseService
 		}
 
 		return response;
-	}
-
-	/*
-	 * Helper Methods
-	 */
-	private String formatEndpoint(String endpoint, Object... args)
-	{
-		return concatEndpointStrings(BASE_END_POINT, String.format(endpoint, args));
-	}
-
-	private <S, T> T get(String endPoint, String apiKey, Class<T> responseClass)
-	{
-		return executeRequest(endPoint, apiKey, HttpMethod.GET, null, responseClass, BaseErrorTo1.class);
-	}
-
-	private <S, T> T getWithToken(String endPoint, String apiKey, S body, Class<T> responseClass, String token)
-	{
-		return executeRequestWithToken(endPoint, apiKey, HttpMethod.GET, token, body, responseClass, BaseErrorTo1.class);
-	}
-
-	private <S, T> T post(String endPoint, String apiKey, S body, Class<T> responseClass)
-	{
-		return executeRequest(endPoint, apiKey, HttpMethod.POST, body, responseClass, BaseErrorTo1.class);
-	}
-
-	private <S, T> T postWithToken(String endPoint, String apiKey, S body, Class<T> responseClass, String token)
-	{
-		return executeRequestWithToken(endPoint, apiKey, HttpMethod.POST, token, body, responseClass, BaseErrorTo1.class);
 	}
 }

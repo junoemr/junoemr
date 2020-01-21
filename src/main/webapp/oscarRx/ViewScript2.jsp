@@ -237,7 +237,7 @@ String userAgent = request.getHeader("User-Agent");
 	    }
 	    <%       }
 			  }%>
-	    var action = "../form/createcustomedpdf?__title=Rx&__method=" + method + "&useSC=" + useSC + "&scAddress=" + scAddress + "&clinicDoctorName=" + doctorName + "&rxPageSize=" + rxPageSize + "&scriptId=" + scriptId;
+	    var action = "../form/createcustomedpdf?__title=Rx&__method=" + method + "&useSC=" + useSC + "&scAddress=" + encodeURIComponent(scAddress) + "&clinicDoctorName=" + doctorName + "&rxPageSize=" + rxPageSize + "&scriptId=" + scriptId;
 	    document.getElementById("preview").contentWindow.document.getElementById("preview2Form").action = action;
 	    document.getElementById("preview").contentWindow.document.getElementById("preview2Form").target = "_blank";
 	    document.getElementById("preview").contentWindow.document.getElementById("preview2Form").submit();
@@ -397,8 +397,25 @@ function sendFax()
 
 	if (Oscar.Util.Fax.checkPhone(faxNumber))
 	{
+		var useSC = false;
+		var scAddress = false;
+		<% if(vecAddressName != null && !vecAddressName.isEmpty())
+		{
+		%>
+			useSC = true;
+			<%      for(int i=0; i<vecAddressName.size(); i++)
+			{%>
+				if (document.getElementById("addressSel").value == "<%=i%>")
+				{
+					scAddress = "<%=vecAddress.get(i)%>";
+				}
+		<%
+			}
+		}
+		%>
+
 		frames['preview'].document.getElementById('pdfId').value = '<%=signatureRequestId%>';
-		frames['preview'].onPrint2('oscarRxFax');
+		frames['preview'].onPrint2('oscarRxFax', useSC, encodeURIComponent(scAddress));
 		window.onbeforeunload = null;
 	}
 	else

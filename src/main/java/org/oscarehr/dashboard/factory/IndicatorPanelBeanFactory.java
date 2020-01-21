@@ -49,7 +49,7 @@ public class IndicatorPanelBeanFactory {
 
 	public IndicatorPanelBeanFactory( String category, List<IndicatorTemplateXML> indicatorTemplateXMLList ) {
 		
-		logger.info( "Building Indicator Panels for category " + category );
+		logger.debug( "Building Indicator Panels for category " + category );
 		
 		setCategory(category);
 		setIndicatorTemplateXMLList( indicatorTemplateXMLList );

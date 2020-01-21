@@ -26,6 +26,7 @@ package oscar.oscarReport.reportByTemplate;
 
 import com.Ostermiller.util.CSVPrinter;
 import org.apache.log4j.Logger;
+import org.hibernate.exception.SQLGrammarException;
 import org.oscarehr.common.model.Explain;
 import org.oscarehr.log.dao.LogReportByTemplateDao;
 import org.oscarehr.log.dao.LogReportByTemplateExplainDao;
@@ -81,7 +82,7 @@ public class SQLReporter implements Reporter
 		String templateIdStr = request.getParameter("templateId");
 		String providerNo = (String) request.getSession().getAttribute("user");
 
-		String rsHtml = "An SQL query error has occurred";
+		String rsHtml = "An exception has occurred. If this problem persists please contact support for assistance.";
 		String csv = "";
 		String nativeSQL = "";
 		ReportObject curReport = null;
@@ -149,13 +150,15 @@ public class SQLReporter implements Reporter
 			updateLog(logEntry, rowCount);
 		}
 		// since users can write custom queries this error is expected and should not generate an error in the log
-		catch(ReportByTemplateException | SQLException e)
+		catch(ReportByTemplateException | SQLException | SQLGrammarException | PersistenceException e)
 		{
 			logger.warn("An Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
+			rsHtml = "An SQL query error has occurred<br>" + e.getMessage();
 		}
 		catch(Exception sqe)
 		{
 			logger.error("Error", sqe);
+			rsHtml += "<br>" + sqe.getMessage();
 		}
 
 		request.getSession().setAttribute("csv", csv);

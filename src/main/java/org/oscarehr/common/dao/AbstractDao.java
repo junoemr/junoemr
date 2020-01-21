@@ -40,6 +40,8 @@ import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Transactional(propagation = Propagation.REQUIRED)
 public abstract class AbstractDao<T extends AbstractModel<?>> {
@@ -421,6 +423,7 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	private List<Explain> toExplainList(List<Object[]> list)
 	{
 		List<Explain> results = new ArrayList<>(list.size());
+		Pattern numberPattern = Pattern.compile("\\d+");
 
 		for(Object[] result : list)
 		{
@@ -431,19 +434,33 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 			explain.setType((String) result[3]);
 			explain.setPossibleKeys((String) result[4]);
 			explain.setKey((String) result[5]);
-			explain.setKeyLen((String) result[6]);
+			if (result[6] != null)
+			{
+				Matcher match = numberPattern.matcher((String) result[6]);
+				if (match.matches())
+				{
+					explain.setKeyLen(match.group(0));
+				}
+			}
 			explain.setRef((String) result[7]);
 
 			// MariaDB 10.1 and 10.4 return the rows column of the explain result as different
 			// data types.  This detects the type and sets the value appropriately.
 			Object rows = result[8];
-			if(rows.getClass().equals(String.class))
+			if (rows != null)
 			{
-				explain.setRows(new BigInteger((String) rows));
-			}
-			else if(rows.getClass().equals(BigInteger.class))
-			{
-				explain.setRows((BigInteger)rows);
+				if (rows.getClass().equals(String.class))
+				{
+					Matcher match = numberPattern.matcher((String) rows);
+					if (match.matches())
+					{
+						explain.setRows(new BigInteger(match.group(0)));
+					}
+				}
+				else if (rows.getClass().equals(BigInteger.class))
+				{
+					explain.setRows((BigInteger) rows);
+				}
 			}
 
 			explain.setExtra((String) result[9]);

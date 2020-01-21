@@ -36,11 +36,13 @@ public class PatientListItemTransfer implements Serializable
 	private Integer demographicNo;
 	private Integer appointmentNo;
 	private String name;
+	private String location;
 	private String status;
 	private String statusModifier;
 	private String startTime;
 	private String reason;
 	private Date date;
+	private boolean isVirtual;
 
 	public Integer getDemographicNo()
 	{
@@ -60,6 +62,16 @@ public class PatientListItemTransfer implements Serializable
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+
+	public String getLocation()
+	{
+		return location;
+	}
+
+	public void setLocation(String location)
+	{
+		this.location = location;
 	}
 
 	public String getStatus()
@@ -120,5 +132,15 @@ public class PatientListItemTransfer implements Serializable
 	public void setDate(Date date)
 	{
 		this.date = date;
+	}
+
+	public boolean getIsVirtual()
+	{
+		return isVirtual;
+	}
+
+	public void setIsVirtual(boolean isVirtual)
+	{
+		this.isVirtual = isVirtual;
 	}
 }
