@@ -48,6 +48,24 @@ public class ProviderBilling extends AbstractModel<Integer>
 	private String bcRuralRetentionName;
 	@Column(name = "bc_service_location_code")
 	private String bcServiceLocationCode;
+	@Column(name = "on_master_number")
+	private String onMasterNumber;
+	@Column(name = "on_service_location")
+	private String onServiceLocation;
+	@Column(name = "ab_source_code")
+	private String abSourceCode;
+	@Column(name = "ab_skill_code")
+	private String abSkillCode;
+	@Column(name = "ab_location_code")
+	private String abLocationCode;
+	@Column(name = "ab_BA_number")
+	private Integer abBANumber;
+	@Column(name = "ab_facility_number")
+	private Integer abFacilityNumber;
+	@Column(name = "ab_functional_center")
+	private String abFunctionalCenter;
+	@Column(name = "ab_time_role_modifier")
+	private String abTimeRoleModifier;
 
 	public Integer getId()
 	{
@@ -97,5 +115,95 @@ public class ProviderBilling extends AbstractModel<Integer>
 	public void setBcServiceLocationCode(String bcServiceLocationCode)
 	{
 		this.bcServiceLocationCode = bcServiceLocationCode;
+	}
+
+	public String getOnMasterNumber()
+	{
+		return onMasterNumber;
+	}
+
+	public void setOnMasterNumber(String onMasterNumber)
+	{
+		this.onMasterNumber = onMasterNumber;
+	}
+
+	public String getOnServiceLocation()
+	{
+		return onServiceLocation;
+	}
+
+	public void setOnServiceLocation(String onServiceLocation)
+	{
+		this.onServiceLocation = onServiceLocation;
+	}
+
+	public String getAbSourceCode()
+	{
+		return abSourceCode;
+	}
+
+	public void setAbSourceCode(String abSourceCode)
+	{
+		this.abSourceCode = abSourceCode;
+	}
+
+	public String getAbSkillCode()
+	{
+		return abSkillCode;
+	}
+
+	public void setAbSkillCode(String abSkillCode)
+	{
+		this.abSkillCode = abSkillCode;
+	}
+
+	public String getAbLocationCode()
+	{
+		return abLocationCode;
+	}
+
+	public void setAbLocationCode(String abLocationCode)
+	{
+		this.abLocationCode = abLocationCode;
+	}
+
+	public Integer getAbBANumber()
+	{
+		return abBANumber;
+	}
+
+	public void setAbBANumber(Integer abBANumber)
+	{
+		this.abBANumber = abBANumber;
+	}
+
+	public Integer getAbFacilityNumber()
+	{
+		return abFacilityNumber;
+	}
+
+	public void setAbFacilityNumber(Integer abFacilityNumber)
+	{
+		this.abFacilityNumber = abFacilityNumber;
+	}
+
+	public String getAbFunctionalCenter()
+	{
+		return abFunctionalCenter;
+	}
+
+	public void setAbFunctionalCenter(String abFunctionalCenter)
+	{
+		this.abFunctionalCenter = abFunctionalCenter;
+	}
+
+	public String getAbTimeRoleModifier()
+	{
+		return abTimeRoleModifier;
+	}
+
+	public void setAbTimeRoleModifier(String abTimeRoleModifier)
+	{
+		this.abTimeRoleModifier = abTimeRoleModifier;
 	}
 }

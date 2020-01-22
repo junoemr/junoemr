@@ -219,7 +219,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					ctrl.provider, 'secondLevelPasscodeVerify'),
 		};
 
-		ctrl.$onInit = function()
+		ctrl.$onInit = async function()
 		{
 			providersService.getAllProviderRoles().then(
 					function success(result)
@@ -243,6 +243,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 						console.error("Failed to fetch provider roles with error: " + error);
 					}
 			);
+
 
 			// check if this provider is super admin
 			providerService.getMe().then(
@@ -289,21 +290,21 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			);
 
 			// when we switch bill region, load additional data.
-			$scope.$watch('$ctrl.billingRegion', function(newVal, oldVal)
+			$scope.$watch('$ctrl.billingRegion', async function(newVal, oldVal)
 			{
 				if (newVal)
 				{
 					if (newVal.value === "AB")
 					{
-						ctrl.loadAlbertaBillingData();
+						await ctrl.loadAlbertaBillingData();
 					}
 					else if (newVal.value === "BC")
 					{
-						ctrl.loadBCBillingData();
+						await ctrl.loadBCBillingData();
 					}
 					else if (newVal.value === "ON")
 					{
-						ctrl.loadOntarioBillingData();
+						await ctrl.loadOntarioBillingData();
 					}
 				}
 				ctrl.mapTypeaheadValues();
@@ -318,136 +319,126 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		};
 
 		// load alberta specific data for billing fields
-		ctrl.loadAlbertaBillingData = function()
+		ctrl.loadAlbertaBillingData = async function()
 		{
 			// load skill codes
-			billingService.getAlbertaSkillCodes().then(
-					function success(result)
-					{
-						ctrl.skillCodeOptions = [];
-						for (let skillCode of result.data.body)
-						{
-							ctrl.skillCodeOptions.push(
-									{
-										label: skillCode.description + "(" + skillCode.skillCode + ")",
-										value: skillCode.skillCode
-									}
-							);
-						}
-					},
-					function error(result)
-					{
-						console.log("Failed to fetch alberta skill codes with error: " + result);
-					}
-			);
+			try
+			{
+				let result = await billingService.getAlbertaSkillCodes();
+				ctrl.skillCodeOptions = [];
+				for (let skillCode of result.data.body)
+				{
+					ctrl.skillCodeOptions.push(
+							{
+								label: skillCode.description + "(" + skillCode.skillCode + ")",
+								value: skillCode.skillCode
+							}
+					);
+				}
+			}
+			catch (e)
+			{
+				console.log("Failed to fetch alberta skill codes with error: " + e);
+			}
 
-			billingService.getAlbertaFacilities().then(
-					function success(result)
-					{
-						ctrl.albertaFacilityOptions = [];
-						for (let facility of result.data.body)
-						{
-							ctrl.albertaFacilityOptions.push(
-									{
-										label: facility.description + "(" + facility.code + ")",
-										value: facility.code
-									}
-							);
-						}
-					},
-					function error(result)
-					{
-						console.error("Failed to fetch alberta facilities with error: " + result);
-					}
-			);
+			try
+			{
+				let result = await billingService.getAlbertaFacilities();
+				ctrl.albertaFacilityOptions = [];
+				for (let facility of result.data.body)
+				{
+					ctrl.albertaFacilityOptions.push(
+							{
+								label: facility.description + "(" + facility.code + ")",
+								value: facility.code
+							}
+					);
+				}
+			}
+			catch (e)
+			{
+				console.error("Failed to fetch alberta facilities with error: " + e);
+			}
 
-
-			billingService.getAlbertaFunctionalCenters().then(
-					function success(result)
-					{
-						ctrl.albertaFunctionalCenterOptions = [];
-						for (let functionalCenter of result.data.body)
-						{
-							ctrl.albertaFunctionalCenterOptions.push(
-									{
-										label: functionalCenter.description + "(" + functionalCenter.code + ")",
-										value: functionalCenter.code
-									}
-							);
-						}
-					},
-					function error(result)
-					{
-						console.error("Failed to fetch alberta functional centers list with error: " + result);
-					}
-			)
-
+			try
+			{
+				let result = await billingService.getAlbertaFunctionalCenters();
+				ctrl.albertaFunctionalCenterOptions = [];
+				for (let functionalCenter of result.data.body)
+				{
+					ctrl.albertaFunctionalCenterOptions.push(
+							{
+								label: functionalCenter.description + "(" + functionalCenter.code + ")",
+								value: functionalCenter.code
+							}
+					);
+				}
+			}
+			catch (e)
+			{
+				console.error("Failed to fetch alberta functional centers list with error: " + result);
+			}
 		};
 
-		ctrl.loadBCBillingData = function()
+		ctrl.loadBCBillingData = async function()
 		{
-			billingService.getBCBillingVisitCodes().then(
-					function success(result)
-					{
-						ctrl.bcServiceLocationOptions = [];
-						for (let visitCode of result.data.body)
-						{
-							ctrl.bcServiceLocationOptions.push(
-									{
-										label: "(" + visitCode.visitType + ") " + visitCode.visitDescription,
-										value: visitCode.visitType
-									}
-							);
-						}
+			try
+			{
+				let result = await billingService.getBCBillingVisitCodes();
+				ctrl.bcServiceLocationOptions = [];
+				for (let visitCode of result.data.body)
+				{
+					ctrl.bcServiceLocationOptions.push(
+							{
+								label: "(" + visitCode.visitType + ") " + visitCode.visitDescription,
+								value: visitCode.visitType
+							}
+					);
+				}
+			}
+			catch (e)
+			{
+				console.error("Failed to fetch BC Billing visit codes with error: " + e);
+			}
 
-						ctrl.mapTypeaheadValues();
-					},
-					function error(result)
-					{
-						console.error("Failed to fetch BC Billing visit codes with error: " + result);
-					}
-			);
-
-			billingService.getBCBillingLocations().then(
-					function success(result)
-					{
-						ctrl.bcBillingLocationOptions = [];
-						for (let location of result.data.body)
-						{
-							ctrl.bcBillingLocationOptions.push({
-								label: "(" + location.billingLocation + ") " + location.description,
-								value: location.billingLocation,
-							});
-						}
-					},
-					function error(result)
-					{
-						console.error("Failed to fetch BC Service Locations with error: " + result);
-					}
-			);
+			try
+			{
+				let result = await billingService.getBCBillingLocations();
+				ctrl.bcBillingLocationOptions = [];
+				for (let location of result.data.body)
+				{
+					ctrl.bcBillingLocationOptions.push({
+						label: "(" + location.billingLocation + ") " + location.description,
+						value: location.billingLocation,
+					});
+				}
+			}
+			catch (e)
+			{
+				console.error("Failed to fetch BC Service Locations with error: " + e);
+			}
 		};
 
-		ctrl.loadOntarioBillingData = function()
+		ctrl.loadOntarioBillingData = async function()
 		{
-			billingService.getOntarioMasterNumbers().then(
-					function success(result)
-					{
-						ctrl.onVisitLocationOptions = [];
-						for (let masterNum of result.data.body)
-						{
-							ctrl.onVisitLocationOptions.push(
-									{
-										label: "[" + masterNum.type + "] " + masterNum.location + " (" + masterNum.masterNumber + ") " + masterNum.name,
-										value: masterNum.masterNumber
- 									}
-							)
-						}
-					},
-					function error(result)
-					{
-						console.error("Failed to fetch master number list with error: " + result);
-					}
-			);
+			try
+			{
+				let result = await billingService.getOntarioMasterNumbers();
+				ctrl.onVisitLocationOptions = [];
+				for (let masterNum of result.data.body)
+				{
+					ctrl.onVisitLocationOptions.push(
+							{
+								label: "[" + masterNum.type + "] " + masterNum.location + " (" + masterNum.masterNumber + ") " + masterNum.name,
+								value: masterNum.masterNumber
+							}
+					)
+				}
+			}
+			catch (e)
+			{
+				console.error("Failed to fetch master number list with error: " + e);
+			}
 		};
 
 		ctrl.addUserRole = function(roleId)
@@ -523,7 +514,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			);
 		};
 
-		// map typeahead values to labels. for typeahead does not auto fill label.
+		// map typeahead values to labels. because typeahead does not auto fill label.
 		ctrl.mapTypeaheadValues = function()
 		{
 			// map bc service location.
@@ -531,11 +522,19 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			{
 				for (let serviceLocation of ctrl.bcServiceLocationOptions)
 				{
-					if (serviceLocation.value === ctrl.provider.bcServiceLocation.value)
+					if (serviceLocation.value === ctrl.provider.bcServiceLocation)
 					{
 						ctrl.provider.bcServiceLocation = serviceLocation;
 					}
 				}
+			}
+
+			// map on visit location
+			if (ctrl.provider.onVisitLocation && ctrl.onVisitLocationOptions.length > 0)
+			{
+				console.log(ctrl.provider.onVisitLocation );
+				console.log(ctrl.onVisitLocationOptions);
+				ctrl.provider.onVisitLocation = ctrl.onVisitLocationOptions.find((el) => el.value === ctrl.provider.onVisitLocation);
 			}
 		};
 
@@ -549,7 +548,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 				//validate fields
 				if (ctrl.allFieldsValid())
 				{// valid
-					providerService.createProvider(ctrl.provider).then(
+					providerService.createProvider(ctrl.translateProviderObjForSubmit(ctrl.provider)).then(
 							function success(result)
 							{
 								if (result.body.status === "SUCCESS")
@@ -572,7 +571,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			}
 			else if (ctrl.mode === EDIT_PROVIDER_MODE.EDIT)
 			{ // update provider
-				providerService.editProvider($stateParams.providerNo, ctrl.provider).then(
+				providerService.editProvider($stateParams.providerNo, ctrl.translateProviderObjForSubmit(ctrl.provider)).then(
 						function success(result)
 						{
 							alert("Provider Updated");
@@ -583,6 +582,48 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 						}
 				);
 			}
+		};
+
+		ctrl.translateProviderObjForSubmit = function (providerObj)
+		{
+			// copy provider obj
+			let newProvider = {};
+			Object.assign(newProvider, providerObj);
+
+			//translate fields
+			// BC Billing
+			if (providerObj.bcServiceLocation)
+			{
+				newProvider.bcServiceLocation = providerObj.bcServiceLocation.value;
+			}
+			// ON Billing
+			if (providerObj.onVisitLocation)
+			{
+				newProvider.onVisitLocation = providerObj.onVisitLocation.value;
+			}
+			// AB Billing
+			if(providerObj.abSkillCode)
+			{
+				newProvider.abSkillCode = providerObj.abSkillCode.value;
+			}
+			if(providerObj.abLocationCode)
+			{
+				newProvider.abLocationCode = providerObj.abLocationCode.value;
+			}
+			if (providerObj.abFacilityNumber)
+			{
+				newProvider.abFacilityNumber = providerObj.abFacilityNumber.value;
+			}
+			if (providerObj.abFunctionalCenter)
+			{
+				newProvider.abFunctionalCenter = providerObj.abFunctionalCenter.value;
+			}
+			if (providerObj.abRoleModifier)
+			{
+				newProvider.abRoleModifier = providerObj.abRoleModifier.value;
+			}
+
+			return newProvider;
 		};
 
 		ctrl.allFieldsValid = function ()

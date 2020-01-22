@@ -245,7 +245,7 @@ public class ProviderRoleService
 
 				if (!contains)
 				{
-					secRoleDao.remove(userRole);
+					secUserRoleDao.delete(userRole);
 				}
 			}
 		}

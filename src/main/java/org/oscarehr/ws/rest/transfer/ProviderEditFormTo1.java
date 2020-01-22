@@ -79,7 +79,7 @@ public class ProviderEditFormTo1 implements Serializable
 	// BC billing
 	private String bcBillingNo;
 	private JunoTypeaheadTo1 bcRuralRetentionCode;
-	private JunoTypeaheadTo1 bcServiceLocation;
+	private String bcServiceLocation;
 
 	// ON billing
 	private String onGroupNumber;
@@ -92,8 +92,8 @@ public class ProviderEditFormTo1 implements Serializable
 	private String abSourceCode;
 	private String abSkillCode;
 	private String abLocationCode;
-	private String abBANumber;
-	private String abFacilityNumber;
+	private Integer abBANumber;
+	private Integer abFacilityNumber;
 	private String abFunctionalCenter;
 	private String abRoleModifier;
 
@@ -210,9 +210,11 @@ public class ProviderEditFormTo1 implements Serializable
 		ruralRetentionCode.setLabel(providerBilling.getBcRuralRetentionName());
 		ruralRetentionCode.setValue(providerBilling.getBcRuralRetentionCode());
 		this.setBcRuralRetentionCode(ruralRetentionCode);
-		JunoTypeaheadTo1 serviceLocation = new JunoTypeaheadTo1();
-		serviceLocation.setValue(providerBilling.getBcServiceLocationCode());
-		this.setBcServiceLocation(serviceLocation);
+		this.setBcServiceLocation(providerBilling.getBcServiceLocationCode());
+
+		//ON
+		this.setOnVisitLocation(providerBilling.getOnMasterNumber());
+		this.setOnServiceLocationIndicator(providerBilling.getOnServiceLocation());
 	}
 
 	/**
@@ -224,15 +226,17 @@ public class ProviderEditFormTo1 implements Serializable
 	{
 		ProviderBilling providerBilling = new ProviderBilling();
 
+		// BC
 		if (this.getBcRuralRetentionCode() != null)
 		{
 			providerBilling.setBcRuralRetentionCode(this.getBcRuralRetentionCode().getValue());
 			providerBilling.setBcRuralRetentionName(this.getBcRuralRetentionCode().getLabel());
 		}
-		if (this.getBcServiceLocation() != null)
-		{
-			providerBilling.setBcServiceLocationCode(this.getBcServiceLocation().getValue());
-		}
+		providerBilling.setBcServiceLocationCode(this.getBcServiceLocation());
+
+		// ON
+		providerBilling.setOnMasterNumber(this.getOnVisitLocation());
+		providerBilling.setOnServiceLocation(this.getOnServiceLocationIndicator());
 
 		return providerBilling;
 	}
@@ -529,12 +533,12 @@ public class ProviderEditFormTo1 implements Serializable
 		this.bcRuralRetentionCode = bcRuralRetentionCode;
 	}
 
-	public JunoTypeaheadTo1 getBcServiceLocation()
+	public String getBcServiceLocation()
 	{
 		return bcServiceLocation;
 	}
 
-	public void setBcServiceLocation(JunoTypeaheadTo1 bcServiceLocation)
+	public void setBcServiceLocation(String bcServiceLocation)
 	{
 		this.bcServiceLocation = bcServiceLocation;
 	}
@@ -619,22 +623,22 @@ public class ProviderEditFormTo1 implements Serializable
 		this.abLocationCode = abLocationCode;
 	}
 
-	public String getAbBANumber()
+	public Integer getAbBANumber()
 	{
 		return abBANumber;
 	}
 
-	public void setAbBANumber(String abBANumber)
+	public void setAbBANumber(Integer abBANumber)
 	{
 		this.abBANumber = abBANumber;
 	}
 
-	public String getAbFacilityNumber()
+	public Integer getAbFacilityNumber()
 	{
 		return abFacilityNumber;
 	}
 
-	public void setAbFacilityNumber(String abFacilityNumber)
+	public void setAbFacilityNumber(Integer abFacilityNumber)
 	{
 		this.abFacilityNumber = abFacilityNumber;
 	}

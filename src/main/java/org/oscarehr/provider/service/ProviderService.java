@@ -281,7 +281,7 @@ public class ProviderService
 
 	/**
 	 * create or update provider security records.
-	 * @param providerEditFormTo1 - the provider form to use to update / create recrods
+	 * @param providerEditFormTo1 - the provider form to use to update / create records
 	 * @param providerNo - the provider no to create for.
 	 */
 	private synchronized void upsertProviderSecurityRecords(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
