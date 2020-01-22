@@ -102,7 +102,7 @@ public class MeasurementFlowSheet {
            RuleBase rb = loadMeasurementRuleBase(dsRules);
            item.setRuleBase(rb);
         }else if(item.getTargetColour() != null && item.getTargetColour().size() > 0){
-           RuleBase rb = loadMeasuremntRuleBase(item.getTargetColour());
+           RuleBase rb = loadMeasurementRuleBase(item.getTargetColour());
            item.setRuleBase(rb);
         }
         itemList.put(item.getItemName(), item);
@@ -421,7 +421,7 @@ public class MeasurementFlowSheet {
         }
     }
 
-    public RuleBase loadMeasuremntRuleBase(List<TargetColour> targetColours){
+    public RuleBase loadMeasurementRuleBase(List<TargetColour> targetColours){
         RuleBase measurementRuleBase = null;
         List<Element> dsElements = new ArrayList<Element>();
          RuleBaseCreator rcb = new RuleBaseCreator();
@@ -446,6 +446,16 @@ public class MeasurementFlowSheet {
 
     }
 
+    public FlowSheetItem setMeasurementRuleBase(FlowSheetItem item)
+    {
+        List<TargetColour> targetColours = item.getTargetColour();
+        if (targetColours != null && targetColours.size() > 0)
+        {
+            RuleBase measurementRuleBase = loadMeasurementRuleBase(targetColours);
+            item.setRuleBase(measurementRuleBase);
+        }
+        return item;
+    }
 
 
     public RuleBase loadMeasurementRuleBase(String string) {

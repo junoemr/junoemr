@@ -26,20 +26,18 @@
 
 <%@page import="org.oscarehr.common.dao.FlowSheetCustomizationDao"%>
 <%@page import="org.oscarehr.common.model.FlowSheetCustomization"%>
-<%@page import="org.springframework.web.context.WebApplicationContext"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet"%>
-<%@page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler"%>
 <%@page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.EctMeasurementsForm"%>
-<%@page import="oscar.util.UtilDateUtilities"%>
 <%@page import="java.util.Hashtable"%>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="java.time.LocalDateTime" %>
+<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -56,15 +54,11 @@
 	String template = request.getParameter("template");
 	String uuid = request.getParameter("uuid");
 
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-	FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
-	MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
-
+	FlowSheetCustomizationDao flowSheetCustomizationDao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
+	FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 
 	List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations(template, (String) session.getAttribute("user"), Integer.parseInt(demographic_no));
-	MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(template, custList);
-
-	EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
+	MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(template, custList);
 
 	String provider = (String) session.getValue("user");
 	String prevDate = ConversionUtils.toDateTimeNoSecString(LocalDateTime.now());

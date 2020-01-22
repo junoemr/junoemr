@@ -22,15 +22,19 @@
  */
 package org.oscarehr.measurements.service;
 
+import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.measurements.dao.FlowSheetUserCreatedDao;
 import org.oscarehr.measurements.dao.FlowsheetDao;
 import org.oscarehr.measurements.model.FlowSheetUserCreated;
 import org.oscarehr.measurements.model.Flowsheet;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import oscar.oscarEncounter.oscarMeasurements.FlowSheetItem;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +47,19 @@ public class FlowsheetService
 	private FlowsheetDao flowsheetDao;
 	@Autowired
 	private FlowSheetUserCreatedDao flowSheetUserCreatedDao;
+
+	public MeasurementFlowSheet getFlowsheetTemplate(String name)
+	{
+		List<MeasurementFlowSheet> flowsheetTemplates = getFlowsheetTemplates();
+		for (MeasurementFlowSheet flowsheetTemplate : flowsheetTemplates)
+		{
+			if (flowsheetTemplate.getName().equals(name))
+			{
+				return flowsheetTemplate;
+			}
+		}
+		return null;
+	}
 
 	public List<MeasurementFlowSheet> getFlowsheetTemplates()
 	{
@@ -65,9 +82,9 @@ public class FlowsheetService
 	/**
 	 * Given a list of dxCodes, find the flowsheets that would be available for those codes.
 	 * @param dxCodes list of dxCodes we want to get flowsheets for
-	 * @return a list of flowsheets that are available for the given dxCodes
+	 * @return a list of flowsheets names that are available for the given dxCodes
 	 */
-	public List<String> getFlowsheetsFromDxCodes(List<String> dxCodes)
+	public List<String> getFlowsheetNamesFromDxCodes(List<String> dxCodes)
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
 
@@ -95,7 +112,7 @@ public class FlowsheetService
 	 * @param programs program names we want to get flowsheets for
 	 * @return a list of flowsheet names that would be available when using given programs
 	 */
-	public List<String> getFlowsheetsFromPrograms(List<String> programs)
+	public List<String> getFlowsheetNamesFromProgram(List<String> programs)
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
 		List<String> alist = new ArrayList<>();
@@ -116,6 +133,12 @@ public class FlowsheetService
 			}
 		}
 		return alist;
+	}
+
+	public List<String> getUniversalFlowsheetNames()
+	{
+		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		return config.getUniversalFlowSheets();
 	}
 
 	public String addFlowsheet(MeasurementFlowSheet measurementFlowSheet)
@@ -227,4 +250,41 @@ public class FlowsheetService
 		flowSheetUserCreatedDao.merge(flowSheetUserCreated);
 	}
 
+	public MeasurementFlowSheet getCustomizedFlowsheet(String name, List<FlowSheetCustomization> customizations)
+	{
+		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		MeasurementFlowSheet baseFlowsheet = getFlowsheetTemplate(name);
+		if (customizations.size() == 0)
+		{
+			return baseFlowsheet;
+		}
+
+		try
+		{
+			MeasurementFlowSheet personalizedFlowsheet =  config.makeNewFlowsheet(baseFlowsheet);
+
+			for (FlowSheetCustomization customization : customizations)
+			{
+				if (FlowSheetCustomization.ADD.equals(customization.getAction())
+						|| FlowSheetCustomization.UPDATE.equals(customization.getAction()))
+				{
+					FlowSheetItem item = config.getItemFromString(customization.getPayload());
+					item = personalizedFlowsheet.setMeasurementRuleBase(item);
+					personalizedFlowsheet.addAfter(customization.getMeasurement(), item);
+				}
+				else if(FlowSheetCustomization.DELETE.equals(customization.getAction()))
+				{
+					personalizedFlowsheet.setToHidden(customization.getMeasurement());
+				}
+			}
+			personalizedFlowsheet.loadRuleBase();
+			return personalizedFlowsheet;
+		}
+		catch (IOException e)
+		{
+			MiscUtils.getLogger().error("Error when attempting to customize flowsheet: ", e);
+		}
+
+		return baseFlowsheet;
+	}
 }

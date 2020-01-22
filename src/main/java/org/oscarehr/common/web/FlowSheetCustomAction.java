@@ -86,7 +86,7 @@ public class FlowSheetCustomAction extends DispatchAction {
         }
         
         MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
-        MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(flowsheet);
+        MeasurementFlowSheet mFlowsheet = flowsheetService.getFlowsheetTemplate(flowsheet);
 
         if (request.getParameter("measurement") != null) {
 

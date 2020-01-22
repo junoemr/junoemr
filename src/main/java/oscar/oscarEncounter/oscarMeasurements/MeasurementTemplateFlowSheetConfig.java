@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.drools.RuleBase;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -50,7 +49,6 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.oscarehr.measurements.dao.FlowSheetUserCreatedDao;
 import org.oscarehr.measurements.dao.FlowsheetDao;
-import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.measurements.model.FlowSheetUserCreated;
 import org.oscarehr.measurements.model.Flowsheet;
 import org.oscarehr.util.MiscUtils;
@@ -132,6 +130,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 	}
 
 	// Have to loop over both the system flowsheets and DB flowsheets
+	// The moment we get a match, we're done and can return
 	public void updateCache(String name, Flowsheet flowsheet)
 	{
 		for (Flowsheet cachedFlowsheet : systemFlowsheets)
@@ -139,7 +138,9 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 			if (cachedFlowsheet.getName() != null && cachedFlowsheet.getName().equals(name))
 			{
 				systemFlowsheets.remove(cachedFlowsheet);
+				flowsheet.setDisplayName(cachedFlowsheet.getDisplayName());
 				systemFlowsheets.add(flowsheet);
+				return;
 			}
 		}
 
@@ -148,7 +149,9 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 			if (cachedFlowsheet.getName() != null && cachedFlowsheet.getName().equals(name))
 			{
 				databaseFlowsheets.remove(cachedFlowsheet);
+				flowsheet.setDisplayName(cachedFlowsheet.getDisplayName());
 				databaseFlowsheets.add(flowsheet);
+				return;
 			}
 		}
 	}
@@ -161,7 +164,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 			{
 				userCreatedFlowsheets.remove(cachedFlowsheet);
 				userCreatedFlowsheets.add(flowSheetUserCreated);
-
+				return;
 			}
 		}
 	}
@@ -210,6 +213,16 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 		return programTrigHash.get(code);
 	}
 
+	public List<File> getSystemFlowsheetFiles()
+	{
+		return systemFlowsheetFiles;
+	}
+
+	public void setSystemFlowsheetFiles(List<File> systemFlowsheetFiles)
+	{
+		this.systemFlowsheetFiles = systemFlowsheetFiles;
+	}
+
 	/**
 	 * Given a flowsheet, determine whether it is universally available or whether it needs drug or program triggers.
 	 * @param measurementFlowSheet flowsheet to possibly set triggers for
@@ -233,15 +246,21 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 
 	}
 
-    public void reloadFlowsheets() {
-        dxTriggers = new ArrayList<String>();
-        programTriggers = new ArrayList<String>();
-        dxTrigHash = new Hashtable<String, List<String>>();
-        programTrigHash = new HashMap<String, List<String>>();
-        flowsheetDisplayNames = new Hashtable<String, String>();
-        universalFlowSheets = new ArrayList<String>();
-        loadFlowsheets();
-    }
+	// This call is expensive and we should try to avoid it where possible
+	public void reloadFlowsheets()
+	{
+		dxTriggers = new ArrayList<String>();
+		programTriggers = new ArrayList<String>();
+		dxTrigHash = new Hashtable<String, List<String>>();
+		programTrigHash = new HashMap<String, List<String>>();
+		flowsheetDisplayNames = new Hashtable<String, String>();
+		universalFlowSheets = new ArrayList<String>();
+		databaseFlowsheets = new ArrayList<>();
+		flowsheetTemplates = new ArrayList<>();
+		systemFlowsheets = new ArrayList<>();
+		userCreatedFlowsheets = new ArrayList<>();
+		loadFlowsheets();
+	}
 
 	// Wrapping like this for now until I decide whether I want this here or in the service layer
 	public void loadSystemFlowsheets()
@@ -266,7 +285,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 					flowsheetDao.enableFlowsheet(measurementFlowsheet.getName());
 					flowsheetEntry = flowsheetDao.findByName(measurementFlowsheet.getName());
 				}
-
+				flowsheetEntry.setDisplayName(measurementFlowsheet.getDisplayName());
 				//If the system flowsheet is not in the database, then load it normally. Otherwise, it has been overwritten, so only load it once from the database
 				systemFlowsheets.add(flowsheetEntry);
 
@@ -330,6 +349,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 			MeasurementFlowSheet measurementFlowSheet = createflowsheet(mType, is);
 			flowsheetTemplates.add(measurementFlowSheet);
 			flowsheetDisplayNames.put(measurementFlowSheet.getName(), measurementFlowSheet.getDisplayName());
+			flowsheet.setDisplayName(measurementFlowSheet.getDisplayName());
 			databaseFlowsheets.add(flowsheet);
 			setupFlowsheetTriggers(measurementFlowSheet);
 			try
@@ -754,94 +774,23 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         return ruleElement;
     }
 
+	//This could be used to create the custom on the file flowsheet
+	public MeasurementFlowSheet makeNewFlowsheet(MeasurementFlowSheet mFlowsheet) throws IOException
+	{
+		XMLOutputter outp = new XMLOutputter();
+		Element va = getExportFlowsheet( mFlowsheet);
 
+		ByteArrayOutputStream byteArrayout = new ByteArrayOutputStream();
+		outp.output(va, byteArrayout);
 
-    public MeasurementFlowSheet getFlowSheet(String flowsheetName,List<FlowSheetCustomization> list) {
-        log.debug("IN CUSTOMIZED FLOWSHEET ");
-        if (list.size() > 0){
-            log.debug("IN CUSTOMIZED FLOWSHEET "+list.size());
-            try{
-            MeasurementFlowSheet personalizedFlowsheet =  makeNewFlowsheet(getFlowSheet(flowsheetName) );
+		InputStream is = new ByteArrayInputStream(byteArrayout.toByteArray());
 
-            for (FlowSheetCustomization cust:list){
-                if (FlowSheetCustomization.ADD.equals(cust.getAction())){
-                    log.debug(" CUST ADDING");
-                    FlowSheetItem item =getItemFromString(cust.getPayload());
-                    if (item.getTargetColour() != null && item.getTargetColour().size()>0){
-                        RuleBase rb = personalizedFlowsheet.loadMeasuremntRuleBase(item.getTargetColour());
-                        item.setRuleBase(rb);
-                    }
-                    personalizedFlowsheet.addAfter(cust.getMeasurement(), item);
-                }else if(FlowSheetCustomization.UPDATE.equals(cust.getAction())){
-                    log.debug(" CUST UPDATING");
-                    FlowSheetItem item =getItemFromString(cust.getPayload());
-                    if (item.getTargetColour() != null && item.getTargetColour().size()>0){
-                        RuleBase rb = personalizedFlowsheet.loadMeasuremntRuleBase(item.getTargetColour());
-                        item.setRuleBase(rb);
-                    }
-                    personalizedFlowsheet.updateMeasurementFlowSheetInfo(cust.getMeasurement(),item);
+		EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
+		return createflowsheet(mType, is);
 
-
-                }else if(FlowSheetCustomization.DELETE.equals(cust.getAction())){
-                    personalizedFlowsheet.setToHidden(cust.getMeasurement());
-                    log.debug(" CUST DELETE");
-                }else{
-                    log.debug("ERR"+cust);
-                }
-            }
-            personalizedFlowsheet.loadRuleBase();
-            return personalizedFlowsheet;
-            }catch(Exception e){
-                MiscUtils.getLogger().error("Error", e);
-            }
-        }
-        log.debug("Returning normal flowsheet");
-        return getFlowSheet(flowsheetName);
-    }
-
-
-
-
-	public MeasurementFlowSheet getFlowSheet(String flowsheetName) {
-		for (MeasurementFlowSheet flowSheet : flowsheetTemplates)
-		{
-			if (flowsheetName.equals(flowSheet.getName()))
-			{
-				return flowSheet;
-			}
-		}
-		return null;
 	}
-
-	public List<File> getSystemFlowsheetFiles() {
-		return systemFlowsheetFiles;
-	}
-
-	public void setSystemFlowsheetFiles(List<File> systemFlowsheetFiles) {
-		this.systemFlowsheetFiles = systemFlowsheetFiles;
-	}
-
-
-
-    //This could be used to create the custom on the file flowsheet
-    public MeasurementFlowSheet makeNewFlowsheet(MeasurementFlowSheet mFlowsheet ) throws Exception{
-            XMLOutputter outp = new XMLOutputter();
-            Element va = getExportFlowsheet( mFlowsheet);
-
-            ByteArrayOutputStream byteArrayout = new ByteArrayOutputStream();
-            outp.output(va, byteArrayout);
-
-            InputStream is = new ByteArrayInputStream(byteArrayout.toByteArray());
-
-            EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
-            MeasurementFlowSheet d = createflowsheet(mType,is);
-
-            return d;
-
-    }
 
     public FlowSheetItem getItemFromString(String s){
-        log.debug("->>>"+s);
         FlowSheetItem item = null;
         try {
             Document doc = saxBuilder.build(new StringReader(s));

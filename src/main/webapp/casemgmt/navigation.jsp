@@ -371,9 +371,9 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
         <%
             dxRes = new dxResearchBeanHandler(bean.demographicNo);
             dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-            flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getUniversalFlowSheets();
+            flowsheets = flowsheetService.getUniversalFlowsheetNames();
             for (String flowsheet : flowsheets) {
-                MeasurementFlowSheet measurementFlowSheet = MeasurementTemplateFlowSheetConfig.getInstance().getFlowSheet(flowsheet);
+                MeasurementFlowSheet measurementFlowSheet = flowsheetService.getFlowsheetTemplate(flowsheet);
                 if (MeasurementHelper.flowSheetRequiresWork(bean.demographicNo, measurementFlowSheet)) {
                 %>* <% }         
         %>
@@ -391,7 +391,7 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
         <%
             dxRes = new dxResearchBeanHandler(bean.demographicNo);
             dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-            flowsheets = flowsheetService.getFlowsheetsFromDxCodes(dxCodes);
+            flowsheets = flowsheetService.getFlowsheetNamesFromDxCodes(dxCodes);
             for (String flowsheet : flowsheets) {
         %>
         <a href="javascript:void(0)"

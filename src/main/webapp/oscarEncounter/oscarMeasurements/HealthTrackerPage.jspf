@@ -114,16 +114,12 @@
         }catch(Exception e){edate = null;}
     }
 
-    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-
-    FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
+    FlowSheetCustomizationDao flowSheetCustomizationDao = SpringUtils.getBean(FlowSheetCustomizationDao.class);
     List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
-    
 
     ////Start
-    MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
 
-    MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
+    MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(temp,custList);
 
     MeasurementInfo mi = new MeasurementInfo(demographic_no);
     List<String> measurementLs = mFlowsheet.getMeasurementList();
@@ -681,115 +677,141 @@ function fsPopup(width,height,url,window) {
 
 <a href="?demographic_no=<%=demographic_no%>&template=tracker" class="btn btn-default <%if(temp.equals("tracker")){ out.print("btn-primary active");} %>"><span class="glyphicon glyphicon-home "></span></a>
 <%
-				String dxCodeQueryString="";
+	String dxCodeQueryString="";
 
-				List<String> diagnosed=new ArrayList<String>();
-				List<String> flowsheetList=new ArrayList<String>();
+	List<String> diagnosed=new ArrayList<String>();
+	List<String> flowsheetList=new ArrayList<String>();
 								
-				dxResearchBeanHandler dxRes = new dxResearchBeanHandler(demographic_no);
-				List<String> dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-				List<String> flowsheets = flowsheetService.getFlowsheetsFromDxCodes(dxCodes);
+	dxResearchBeanHandler dxRes = new dxResearchBeanHandler(demographic_no);
+	List<String> dxCodes = dxRes.getActiveCodeListWithCodingSystem();
+	List<String> flowsheets = flowsheetService.getFlowsheetNamesFromDxCodes(dxCodes);
 			
-				Hashtable<String, String> systemFlowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetDisplayNames();
-				
-				String displayName= "";
-				
-				for(String name:systemFlowsheets.keySet()) {
-					displayName = systemFlowsheets.get(name);
-					
-					MeasurementFlowSheet flowSheetGroups = MeasurementTemplateFlowSheetConfig.getInstance().getFlowSheet(name);
-					Flowsheet fs = MeasurementTemplateFlowSheetConfig.getInstance().getCachedSystemFlowsheets().get(flowSheetGroups.getName());
-					
-					boolean enabled=true;
-					if(fs != null) {
-						enabled = fs.isEnabled();
-					}
-					
-																
-					if(enabled && flowSheetGroups.isUniversal()!=true) { 
+	List<Flowsheet> systemFlowsheets = flowsheetService.getSystemFlowsheets();
+	List<MeasurementFlowSheet> flowsheetTemplates = flowsheetService.getFlowsheetTemplates();
 
-						//out.print(flowsheets.size());
-						for (int f = 0; f < flowsheets.size(); f++) {
-							String flowsheetName = flowsheets.get(f);
-							//out.print(flowsheetName);
-							if(flowsheetName.equals(flowSheetGroups.getName())){
-						
-								diagnosed.add(flowSheetGroups.getName());
-								break;		
-							}
-						}
-						
-						flowsheetList.add(flowSheetGroups.getName());
-						
-						if(displayName.equals(flowSheet)){
-							//current flowsheet							
-							try{	
-								dxCodeQueryString=flowSheetGroups.getDxTriggersQueryBuilder(demographic_no,providerNo);	
-							}catch(Exception e){	
-								MiscUtils.getLogger().error("Error getting DxTriggers - Health Tracker",e);	
-							}
-							
-						}						
-											
-					}// if enabled and universal 
+	String displayName = "";
+				
+	for(Flowsheet systemFlowsheet : systemFlowsheets)
+	{
+		displayName = systemFlowsheet.getDisplayName();
+
+		MeasurementFlowSheet flowSheetGroups = null;
+
+		for (MeasurementFlowSheet measurementFlowSheet : flowsheetTemplates)
+		{
+			if (measurementFlowSheet.getName() != null && measurementFlowSheet.getName().equals(systemFlowsheet.getName()))
+			{
+				flowSheetGroups = measurementFlowSheet;
+				break;
+			}
+		}
 					
+		boolean enabled = systemFlowsheet.isEnabled();
+
+		if(enabled && flowSheetGroups != null && !flowSheetGroups.isUniversal())
+		{
+			for (String flowsheetName : flowsheets)
+			{
+				if(flowsheetName.equals(flowSheetGroups.getName()))
+				{
+					diagnosed.add(flowSheetGroups.getName());
+					break;
 				}
+			}
+						
+			flowsheetList.add(flowSheetGroups.getName());
+						
+			if(displayName.equals(flowSheet))
+			{
+							//current flowsheet							
+				try
+				{
+					dxCodeQueryString=flowSheetGroups.getDxTriggersQueryBuilder(demographic_no,providerNo);
+				}
+				catch(Exception e)
+				{
+					MiscUtils.getLogger().error("Error getting DxTriggers - Health Tracker",e);
+				}
+			}
+											
+		}// if enabled and universal
+					
+	}
 
-     int idx=0;
-	 String btnLabel="";
-	 String fsSelected="btn-default";
+	int idx=0;
+	String btnLabel="";
+	String fsSelected="btn-default";
 
-     for(idx=0;idx<diagnosed.size();idx++)
-     {
-    	 
-    	if(temp.equals(diagnosed.get(idx).toString())){fsSelected="btn-primary active";} else { fsSelected="btn-default";}
-    	
-    	btnLabel=diagnosed.get(idx).toString().toUpperCase();
-    	if(btnLabel.equals("DIAB2")){btnLabel="DIAB";}
-    	
-      	out.print("<a href='"+request.getRequestURI()+"?demographic_no="+demographic_no+"&template="+diagnosed.get(idx).toString()+"' class='btn "+fsSelected+"' title='Diagnosed' id='group-btn-"+diagnosed.get(idx)+"'>"+btnLabel+"</a> ");
-      	fsSelected="";
-     }
+	for(idx=0;idx<diagnosed.size();idx++)
+	{
+		if(temp.equals(diagnosed.get(idx).toString()))
+		{
+			fsSelected="btn-primary active";
+		}
+		else
+		{
+			fsSelected="btn-default";
+		}
+
+		btnLabel=diagnosed.get(idx).toString().toUpperCase();
+		if(btnLabel.equals("DIAB2"))
+		{
+			btnLabel="DIAB";
+		}
+
+		out.print("<a href='"+request.getRequestURI()+"?demographic_no="+demographic_no+"&template="+diagnosed.get(idx).toString()+"' class='btn "+fsSelected+"' title='Diagnosed' id='group-btn-"+diagnosed.get(idx)+"'>"+btnLabel+"</a> ");
+		fsSelected="";
+	}
 
 	String undiagnosed="";
 	String unDxShow="";
-     int iUndx=0;
-     for(iUndx=0;iUndx<flowsheetList.size();iUndx++)
-     {
+	int iUndx = 0;
+	for(iUndx = 0; iUndx < flowsheetList.size() ; iUndx++)
+	{
+		btnLabel = flowsheetList.get(iUndx).toUpperCase();
 
-	btnLabel=flowsheetList.get(iUndx).toString().toUpperCase();
+		if (!diagnosed.contains(flowsheetList.get(iUndx)) && !btnLabel.equals("TRACKER"))
+		{
+			if(btnLabel.equals("PHV"))
+			{
+				if(temp.equals(flowsheetList.get(iUndx)))
+				{
+					fsSelected="btn-primary active";
+				}
+				else
+				{
+					fsSelected="btn-default";
+				}
 
-    	if (!diagnosed.contains(flowsheetList.get(iUndx)) && !btnLabel.equals("TRACKER")) {
-    		 
-    		 
+				out.print(" <a href='"+request.getRequestURI()+"?demographic_no="+demographic_no+"&template="+flowsheetList.get(iUndx).toString()+"' class='btn "+fsSelected+"' title='no diagnosis needed' id='group-btn-"+flowsheetList.get(iUndx)+"'>"+btnLabel+"</a> ");
+				fsSelected="btn-default";
 
-if(btnLabel.equals("PHV")){ 
-if(temp.equals(flowsheetList.get(iUndx).toString())){ fsSelected="btn-primary active";} else { fsSelected="btn-default";}
+			}
+			if(btnLabel.equals("DIAB2"))
+			{
+				btnLabel="DIAB";
+			}
 
-out.print(" <a href='"+request.getRequestURI()+"?demographic_no="+demographic_no+"&template="+flowsheetList.get(iUndx).toString()+"' class='btn "+fsSelected+"' title='no diagnosis needed' id='group-btn-"+flowsheetList.get(iUndx)+"'>"+btnLabel+"</a> ");
+			if(temp.equals(flowsheetList.get(iUndx)) && !temp.equals("phv") )
+			{
+				fsSelected="active";
+				unDxShow = btnLabel;
+			}
 
-fsSelected="btn-default";
-}
+			if(!btnLabel.equals("PHV"))
+			{
+				MeasurementFlowSheet findName = flowsheetService.getFlowsheetTemplate(flowsheetList.get(iUndx));
+				String templateDisplayName = "";
+				if (findName != null)
+				{
+					templateDisplayName = findName.getDisplayName();
+				}
+				undiagnosed = undiagnosed + "<li class='"+fsSelected+"'><a href='"+request.getRequestURI()+"?demographic_no="+demographic_no+"&template="+ flowsheetList.get(iUndx) +"'  title='Undiagnosed' id='group-btn-"+flowsheetList.get(iUndx)+"'>"+ templateDisplayName +"</a></li>";
+				fsSelected="";
+			}
+		}
+	 }
 
-if(btnLabel.equals("DIAB2")){btnLabel="DIAB";}
-
-if(temp.equals(flowsheetList.get(iUndx).toString()) && !temp.equals("phv") ){
-	 fsSelected="active";
-	 //unDxShow="<li class='"+fsSelected+"'><a href='"+request.getRequestURI()+"?demographic_no="+demographic_no+"&template="+flowsheetList.get(iUndx).toString()+"'  title='Undiagnosed' id='group-btn-"+flowsheetList.get(iUndx)+"'>"+btnLabel+"</a></li>";
-	 unDxShow = btnLabel;
-} 
-
-
-if(!btnLabel.equals("PHV")){     		 
-	MeasurementFlowSheet findName = MeasurementTemplateFlowSheetConfig.getInstance().getFlowSheet(flowsheetList.get(iUndx).toString());
-	
-	undiagnosed = undiagnosed + "<li class='"+fsSelected+"'><a href='"+request.getRequestURI()+"?demographic_no="+demographic_no+"&template="+flowsheetList.get(iUndx).toString()+"'  title='Undiagnosed' id='group-btn-"+flowsheetList.get(iUndx)+"'>"+ findName.getDisplayName() +"</a></li>";
-	fsSelected="";
-}
-      			
-    	 }
-     }
-     
 %>
 <span class="btn-divider" title="View undiagnosed flowsheets">| </span>			
 <%

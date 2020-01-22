@@ -82,7 +82,7 @@ try {
             fs = MeasurementTemplateFlowSheetConfig.getInstance().validateFlowsheet(contents);
 
             //Check if flowsheet is in the flowsheet table
-			FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
+			FlowsheetDao flowsheetDao = SpringUtils.getBean(FlowsheetDao.class);
 			Flowsheet existingFlowsheet = flowsheetDao.findByName(fs.getName());
             if(fs != null) {
 				if(existingFlowsheet == null)

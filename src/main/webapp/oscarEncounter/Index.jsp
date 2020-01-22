@@ -1062,7 +1062,7 @@ function removeSaveFeedback()  {
 				<%
                         dxResearchBeanHandler dxRes = new dxResearchBeanHandler(bean.demographicNo);
                         List<String> dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-						List<String> flowsheets = flowsheetService.getFlowsheetsFromDxCodes(dxCodes);
+						List<String> flowsheets = flowsheetService.getFlowsheetNamesFromDxCodes(dxCodes);
                         for (int f = 0; f < flowsheets.size();f++){
                             String flowsheetName = (String) flowsheets.get(f);
                         %> <a

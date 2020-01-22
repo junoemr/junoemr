@@ -61,7 +61,6 @@ import oscar.oscarBilling.ca.bc.MSP.ServiceCodeValidationLogic;
 import oscar.oscarDemographic.data.DemographicData;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
-import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBean;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler;
 import oscar.oscarRx.data.RxPrescriptionData;
@@ -511,8 +510,7 @@ public class DSDemographicAccess {
 
     	dxResearchBeanHandler dxRes = new dxResearchBeanHandler(demographicNo);
         List<String> dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-        MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
-        List<String> flowsheets = flowsheetService.getFlowsheetsFromDxCodes(dxCodes);
+        List<String> flowsheets = flowsheetService.getFlowsheetNamesFromDxCodes(dxCodes);
 
         boolean hasFlowSheet = false;
         for( int idx = 0; idx < flowsheets.size(); ++idx ) {
@@ -526,7 +524,7 @@ public class DSDemographicAccess {
 
 			List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( flowsheetId,providerNo,Integer.parseInt(demographicNo));
 
-	        MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(flowsheetId,custList);
+	        MeasurementFlowSheet mFlowsheet = flowsheetService.getCustomizedFlowsheet(flowsheetId, custList);
 
 	        MeasurementInfo mi = new MeasurementInfo(demographicNo);
 	        List<String> measurementLs = mFlowsheet.getMeasurementList();

@@ -205,6 +205,7 @@ br {
 				for (MeasurementFlowSheet flowsheetTemplate : flowsheetTemplates)
 				{
 					String type = "Unknown";
+					String displayName = flowsheetTemplate.getDisplayName();
 					boolean enabled = true;
 					for (Flowsheet sheet : systemFlowsheets)
 					{
@@ -219,6 +220,7 @@ br {
 								type = "Custom";
 							}
 							enabled = sheet.isEnabled();
+							displayName = sheet.getDisplayName();
 							break;
 						}
 					}
@@ -231,6 +233,7 @@ br {
 							{
 								type = "User Added";
 								enabled = !userCreated.getArchived();
+								displayName = userCreated.getDisplayName();
 								break;
 							}
 						}
@@ -238,7 +241,7 @@ br {
 			%>
 						
 						<tr>
-							<td><%=flowsheetTemplate.getDisplayName()%></td>
+							<td><%=displayName%></td>
 							<td><%=flowsheetTemplate.isUniversal() %></td>
 							<td><%=flowsheetTemplate.getDxTriggersString() %></td>
 							<td><%=flowsheetTemplate.getProgramTriggersString() %></td>

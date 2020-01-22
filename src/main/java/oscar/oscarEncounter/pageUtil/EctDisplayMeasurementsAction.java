@@ -86,7 +86,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 
 			com.quatro.service.security.SecurityManager securityMgr = new com.quatro.service.security.SecurityManager();
 
-			List<String> flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getUniversalFlowSheets();
+			List<String> flowsheets = flowsheetService.getUniversalFlowsheetNames();
 			
 			if (!OscarProperties.getInstance().getBooleanProperty("new_flowsheet_enabled", "true")) {
 				flowsheets.remove("diab3");
@@ -135,7 +135,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 			//next we add dx triggered flowsheets to the module items
 			dxResearchBeanHandler dxRes = new dxResearchBeanHandler(bean.demographicNo);
 			List<String> dxCodes = dxRes.getActiveCodeListWithCodingSystem();
-			flowsheets = flowsheetService.getFlowsheetsFromDxCodes(dxCodes);
+			flowsheets = flowsheetService.getFlowsheetNamesFromDxCodes(dxCodes);
 			for (int f = 0; f < flowsheets.size(); f++) {
 				NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 				String flowsheetName = flowsheets.get(f);
@@ -168,7 +168,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 			for (Admission admission : admissions) {
 				programs.add(String.valueOf(admission.getProgramId()));
 			}
-			flowsheets = flowsheetService.getFlowsheetsFromPrograms(programs);
+			flowsheets = flowsheetService.getFlowsheetNamesFromProgram(programs);
 			for (int f = 0; f < flowsheets.size(); f++) {
 				NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 				String flowsheetName = flowsheets.get(f);
