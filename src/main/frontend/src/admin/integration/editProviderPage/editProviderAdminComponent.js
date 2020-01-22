@@ -166,7 +166,6 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			onServiceLocationIndicator: null,
 
 			// AB Billing
-			abClinic: null,
 			abSourceCode: "ab",
 			abSkillCode: null,
 			abLocationCode: null,
@@ -518,24 +517,22 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		ctrl.mapTypeaheadValues = function()
 		{
 			// map bc service location.
-			if (ctrl.provider.bcServiceLocation)
-			{
-				for (let serviceLocation of ctrl.bcServiceLocationOptions)
-				{
-					if (serviceLocation.value === ctrl.provider.bcServiceLocation)
-					{
-						ctrl.provider.bcServiceLocation = serviceLocation;
-					}
-				}
-			}
+			ctrl.provider.bcServiceLocation = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.bcServiceLocation, ctrl.bcServiceLocationOptions);
 
 			// map on visit location
-			if (ctrl.provider.onVisitLocation && ctrl.onVisitLocationOptions.length > 0)
-			{
-				console.log(ctrl.provider.onVisitLocation );
-				console.log(ctrl.onVisitLocationOptions);
-				ctrl.provider.onVisitLocation = ctrl.onVisitLocationOptions.find((el) => el.value === ctrl.provider.onVisitLocation);
-			}
+			ctrl.provider.onVisitLocation = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.onVisitLocation, ctrl.onVisitLocationOptions);
+
+			// map ab billing fields
+			// skill code
+			ctrl.provider.abSkillCode = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.abSkillCode, ctrl.skillCodeOptions);
+			// location code
+			ctrl.provider.abLocationCode = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.abLocationCode, ctrl.locationCodeOptions);
+			// facility number
+			ctrl.provider.abFacilityNumber = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.abFacilityNumber, ctrl.albertaFacilityOptions);
+			// functional centers
+			ctrl.provider.abFunctionalCenter = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.abFunctionalCenter, ctrl.albertaFunctionalCenterOptions);
+			// time role modifier
+			ctrl.provider.abRoleModifier = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.abRoleModifier, ctrl.albertaDefaultTimeRoleOptions);
 		};
 
 		ctrl.submit = function()

@@ -88,7 +88,6 @@ public class ProviderEditFormTo1 implements Serializable
 	private String onServiceLocationIndicator;
 
 	// AB billing
-	private String abClinic;
 	private String abSourceCode;
 	private String abSkillCode;
 	private String abLocationCode;
@@ -98,7 +97,7 @@ public class ProviderEditFormTo1 implements Serializable
 	private String abRoleModifier;
 
 	// SK billing
-	private String skMode;
+	private Integer skMode;
 	private String skLocationCode;
 	private String skSubmissionType;
 	private String skCorporationIndicator;
@@ -111,9 +110,9 @@ public class ProviderEditFormTo1 implements Serializable
 	//3rd Party Identifiers
 	private String cpsid;
 	private String ihaProviderMnemonic;
-	private String connectCareId;
+	private String connectCareProviderId;
 	private String takNumber;
-	private String lifeLabsClientIds;
+	private String lifeLabsClientId;
 	private String eDeliveryIds;
 
 	/**
@@ -150,6 +149,14 @@ public class ProviderEditFormTo1 implements Serializable
 
 		// bc
 		this.setBcBillingNo(providerData.getBillingNo());
+
+		// 3rd party identifiers
+		this.setIhaProviderMnemonic(providerData.getAlbertaEDeliveryIds());
+		this.seteDeliveryIds(providerData.getAlbertaEDeliveryIds());
+		this.setTakNumber(providerData.getAlbertaTakNo());
+		this.setConnectCareProviderId(providerData.getAlbertaConnectCareId());
+		this.setCpsid(providerData.getPractitionerNo());
+		this.setLifeLabsClientId(providerData.getOntarioLifeLabsId());
 	}
 
 	/**
@@ -194,6 +201,19 @@ public class ProviderEditFormTo1 implements Serializable
 		// bc
 		providerData.setBillingNo(this.getBcBillingNo());
 
+		// 3rd party identifiers
+		if (this.getIhaProviderMnemonic() != null && !this.getIhaProviderMnemonic().isEmpty())
+		{// yes both IHA and alberta e-delivery ids use the same column.
+			providerData.setAlbertaEDeliveryIds(this.getIhaProviderMnemonic());
+		}
+		if (this.geteDeliveryIds() != null && !this.geteDeliveryIds().isEmpty())
+		{
+			providerData.setAlbertaEDeliveryIds(this.geteDeliveryIds());
+		}
+		providerData.setAlbertaTakNo(this.getTakNumber());
+		providerData.setAlbertaConnectCareId(this.getConnectCareProviderId());
+		providerData.setPractitionerNo(this.getCpsid());
+		providerData.setOntarioLifeLabsId(this.getLifeLabsClientId());
 
 		return providerData;
 	}
@@ -205,16 +225,31 @@ public class ProviderEditFormTo1 implements Serializable
 	@JsonIgnore
 	public void setProviderBilling(ProviderBilling providerBilling)
 	{
-		//BC
+		// BC
 		JunoTypeaheadTo1 ruralRetentionCode = new JunoTypeaheadTo1();
 		ruralRetentionCode.setLabel(providerBilling.getBcRuralRetentionName());
 		ruralRetentionCode.setValue(providerBilling.getBcRuralRetentionCode());
 		this.setBcRuralRetentionCode(ruralRetentionCode);
 		this.setBcServiceLocation(providerBilling.getBcServiceLocationCode());
 
-		//ON
+		// ON
 		this.setOnVisitLocation(providerBilling.getOnMasterNumber());
 		this.setOnServiceLocationIndicator(providerBilling.getOnServiceLocation());
+
+		// AB
+		this.setAbSourceCode(providerBilling.getAbSourceCode());
+		this.setAbSkillCode(providerBilling.getAbSkillCode());
+		this.setAbLocationCode(providerBilling.getAbLocationCode());
+		this.setAbBANumber(providerBilling.getAbBANumber());
+		this.setAbFacilityNumber(providerBilling.getAbFacilityNumber());
+		this.setAbFunctionalCenter(providerBilling.getAbFunctionalCenter());
+		this.setAbRoleModifier(providerBilling.getAbTimeRoleModifier());
+
+		// SK
+		this.setSkMode(providerBilling.getSkMode());
+		this.setSkLocationCode(providerBilling.getSkLocation());
+		this.setSkSubmissionType(providerBilling.getSkSubmissionType());
+		this.setSkCorporationIndicator(providerBilling.getSkCorporationIndicator());
 	}
 
 	/**
@@ -237,6 +272,21 @@ public class ProviderEditFormTo1 implements Serializable
 		// ON
 		providerBilling.setOnMasterNumber(this.getOnVisitLocation());
 		providerBilling.setOnServiceLocation(this.getOnServiceLocationIndicator());
+
+		// AB
+		providerBilling.setAbSourceCode(this.getAbSourceCode());
+		providerBilling.setAbSkillCode(this.getAbSkillCode());
+		providerBilling.setAbLocationCode(this.getAbLocationCode());
+		providerBilling.setAbBANumber(this.getAbBANumber());
+		providerBilling.setAbFacilityNumber(this.getAbFacilityNumber());
+		providerBilling.setAbFunctionalCenter(this.getAbFunctionalCenter());
+		providerBilling.setAbTimeRoleModifier(this.getAbRoleModifier());
+
+		// SK
+		providerBilling.setSkMode(this.getSkMode());
+		providerBilling.setSkLocation(this.getSkLocationCode());
+		providerBilling.setSkSubmissionType(this.getSkSubmissionType());
+		providerBilling.setSkCorporationIndicator(this.getSkCorporationIndicator());
 
 		return providerBilling;
 	}
@@ -583,16 +633,6 @@ public class ProviderEditFormTo1 implements Serializable
 		this.onServiceLocationIndicator = onServiceLocationIndicator;
 	}
 
-	public String getAbClinic()
-	{
-		return abClinic;
-	}
-
-	public void setAbClinic(String abClinic)
-	{
-		this.abClinic = abClinic;
-	}
-
 	public String getAbSourceCode()
 	{
 		return abSourceCode;
@@ -663,12 +703,12 @@ public class ProviderEditFormTo1 implements Serializable
 		this.abRoleModifier = abRoleModifier;
 	}
 
-	public String getSkMode()
+	public Integer getSkMode()
 	{
 		return skMode;
 	}
 
-	public void setSkMode(String skMode)
+	public void setSkMode(Integer skMode)
 	{
 		this.skMode = skMode;
 	}
@@ -753,14 +793,14 @@ public class ProviderEditFormTo1 implements Serializable
 		this.ihaProviderMnemonic = ihaProviderMnemonic;
 	}
 
-	public String getConnectCareId()
+	public String getConnectCareProviderId()
 	{
-		return connectCareId;
+		return connectCareProviderId;
 	}
 
-	public void setConnectCareId(String connectCareId)
+	public void setConnectCareProviderId(String connectCareProviderId)
 	{
-		this.connectCareId = connectCareId;
+		this.connectCareProviderId = connectCareProviderId;
 	}
 
 	public String getTakNumber()
@@ -773,14 +813,14 @@ public class ProviderEditFormTo1 implements Serializable
 		this.takNumber = takNumber;
 	}
 
-	public String getLifeLabsClientIds()
+	public String getLifeLabsClientId()
 	{
-		return lifeLabsClientIds;
+		return lifeLabsClientId;
 	}
 
-	public void setLifeLabsClientIds(String lifeLabsClientIds)
+	public void setLifeLabsClientId(String lifeLabsClientId)
 	{
-		this.lifeLabsClientIds = lifeLabsClientIds;
+		this.lifeLabsClientId = lifeLabsClientId;
 	}
 
 	public String geteDeliveryIds()

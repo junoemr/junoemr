@@ -352,6 +352,27 @@ Juno.Common.Util.windowClosedPromise = function (popup)
 	});
 };
 
+/**
+ * lookup typeahead object form options list based on value
+ * @param value - the value to look up
+ * @param options - the options list from which to lookup the object
+ * @returns - the matching typeahead object or the value if no match found.
+ */
+Juno.Common.Util.typeaheadValueLookup = function(value, options)
+{
+	if (value && options && options.length > 0)
+	{
+		let res = options.find((el) => el.value === value);
+		if (res)
+		{
+			return res;
+		}
+	}
+
+	return value;
+};
+
+
 // generate a validation function. This is a nop validation and has no effect.
 // validationFunc, is a optional validation function that will be chained with this one.
 Juno.Common.Util.validationFieldNop = function(obj, field, validationFunc)
@@ -448,3 +469,4 @@ Juno.Common.Util.validationFieldsEqual = function(obj0, field0, obj1, field1, ..
 		return Juno.Common.Util.validationFieldsChain(...validationFunc);
 	}
 };
+

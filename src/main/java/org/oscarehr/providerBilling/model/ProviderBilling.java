@@ -66,6 +66,14 @@ public class ProviderBilling extends AbstractModel<Integer>
 	private String abFunctionalCenter;
 	@Column(name = "ab_time_role_modifier")
 	private String abTimeRoleModifier;
+	@Column(name = "sk_mode")
+	private Integer skMode;
+	@Column(name = "sk_location")
+	private String  skLocation;
+	@Column(name = "sk_submission_type")
+	private String skSubmissionType;
+	@Column(name = "sk_corporation_indicator")
+	private String skCorporationIndicator;
 
 	public Integer getId()
 	{
@@ -205,5 +213,45 @@ public class ProviderBilling extends AbstractModel<Integer>
 	public void setAbTimeRoleModifier(String abTimeRoleModifier)
 	{
 		this.abTimeRoleModifier = abTimeRoleModifier;
+	}
+
+	public Integer getSkMode()
+	{
+		return skMode;
+	}
+
+	public void setSkMode(Integer skMode)
+	{
+		this.skMode = skMode;
+	}
+
+	public String getSkLocation()
+	{
+		return skLocation;
+	}
+
+	public void setSkLocation(String skLocation)
+	{
+		this.skLocation = skLocation;
+	}
+
+	public String getSkSubmissionType()
+	{
+		return skSubmissionType;
+	}
+
+	public void setSkSubmissionType(String skSubmissionType)
+	{
+		this.skSubmissionType = skSubmissionType;
+	}
+
+	public String getSkCorporationIndicator()
+	{
+		return skCorporationIndicator;
+	}
+
+	public void setSkCorporationIndicator(String skCorporationIndicator)
+	{
+		this.skCorporationIndicator = skCorporationIndicator;
 	}
 }

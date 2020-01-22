@@ -672,7 +672,7 @@
 						<ca-field-text
 										ca-name="eDeliveryIds"
 										ca-title="E-Delivery Ids"
-										ca-model="$ctrl.provider.connectCareProviderId"
+										ca-model="$ctrl.provider.eDeliveryIds"
 										ca-rows="1"
 						>
 						</ca-field-text>
@@ -686,7 +686,7 @@
 						<ca-field-text
 										ca-name="connectCareId"
 										ca-title="Connect Care Provider Id"
-										ca-model="$ctrl.provider.eDeliveryIds"
+										ca-model="$ctrl.provider.connectCareProviderId"
 										ca-rows="1"
 						>
 						</ca-field-text>

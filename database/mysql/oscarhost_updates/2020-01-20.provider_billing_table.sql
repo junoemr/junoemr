@@ -17,5 +17,10 @@ CREATE TABLE IF NOT EXISTS provider_billing (
   ab_facility_number INT,
   ab_functional_center VARCHAR(16),
   ab_time_role_modifier VARCHAR(16),
+  # SK
+  sk_mode INT,
+  sk_location VARCHAR(1),
+  sk_submission_type VARCHAR(1),
+  sk_corporation_indicator VARCHAR(256),
   CONSTRAINT idx_unique_provider_no UNIQUE (provider_no)
 );
