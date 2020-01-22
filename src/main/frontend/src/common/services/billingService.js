@@ -185,6 +185,26 @@ angular.module("Common.Services").service("billingService", [
 			return deferred.promise;
 		};
 
+		service.getOntarioMasterNumbers = function ()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/on/master_numbers',
+					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+					function success(results)
+					{
+						deferred.resolve(results);
+					},
+					function error(errors)
+					{
+						console.error("Failed to fetch ON master numbers with error: " + errors);
+						deferred.reject("Failed to fetch ON master numbers  with error: " + errors);
+					});
+
+			return deferred.promise;
+		};
+
+
 		return service;
 	}
 ]);

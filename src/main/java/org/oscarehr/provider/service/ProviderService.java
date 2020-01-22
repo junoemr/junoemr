@@ -35,6 +35,8 @@ import org.oscarehr.common.model.ProviderSitePK;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.providerBilling.dao.ProviderBillingDao;
+import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.oscarehr.site.service.SiteService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
@@ -76,9 +78,11 @@ public class ProviderService
 	@Autowired
 	private SecRoleDao secRoleDao;
 
-
 	@Autowired
 	private ProviderSiteDao providerSiteDao;
+
+	@Autowired
+	private ProviderBillingDao providerBillingDao;
 
 	public ProviderData addNewProvider(String creatingProviderNo, ProviderData provider, String billCenterCode)
 	{
@@ -156,6 +160,13 @@ public class ProviderService
 		//set provider fields
 		providerEditFormTo1.setProviderData(provider);
 
+		//set billing fields
+		ProviderBilling providerBilling = providerBillingDao.getByProvider(providerNo);
+		if (providerBilling != null)
+		{
+			providerEditFormTo1.setProviderBilling(providerBilling);
+		}
+
 		//set security records
 		Security unameSec = securityDao.findProviderUserNameSecurityRecord(providerNo.toString());
 		if (unameSec != null)
@@ -202,6 +213,11 @@ public class ProviderService
 		// create provider record
 		ProviderData provider = this.addNewProvider(loggedInInfo.getLoggedInProviderNo(), providerEditFormTo1.getProviderData(), "");
 
+		// save billing data
+		ProviderBilling providerBilling = providerEditFormTo1.getProviderBilling();
+		providerBilling.setProviderNo(provider.getProviderNo());
+		providerBillingDao.persist(providerBilling);
+
 		updateProviderSiteSecRole(providerEditFormTo1, provider.getProviderNo());
 
 		return provider;
@@ -218,6 +234,16 @@ public class ProviderService
 			// edit provider
 			newProviderData.setProviderNo(providerNo);
 			providerDataDao.merge(newProviderData);
+
+			// edit billing data
+			ProviderBilling providerBilling = providerEditFormTo1.getProviderBilling();
+			ProviderBilling existingBillingData = providerBillingDao.getByProvider(providerNo);
+			if (existingBillingData != null)
+			{
+				providerBilling.setId(existingBillingData.getId());
+			}
+			providerBilling.setProviderNo(newProviderData.getProviderNo());
+			providerBillingDao.merge(providerBilling);
 
 			updateProviderSiteSecRole(providerEditFormTo1, newProviderData.getProviderNo());
 

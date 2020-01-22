@@ -437,22 +437,28 @@
 						</ca-field-text>
 
 						<!-- visit Location -->
-						<ca-field-text
-										ca-name="visitLocation"
-										ca-title="Visit Location"
-										ca-model="$ctrl.provider.onVisitLocation"
-										ca-rows="1"
+						<juno-typeahead
+										title="Visit Location"
+										name="visitLocation"
+										model="$ctrl.provider.onVisitLocation"
+										options="$ctrl.onVisitLocationOptions"
+										placeholder="Search..."
+										typeahead-min-length="3"
 						>
-						</ca-field-text>
+						</juno-typeahead>
 
 						<!-- service location indicator -->
-						<ca-field-text
+						<ca-field-select
+										class="juno-modal no-padding"
+										ca-template="label"
 										ca-name="serviceLocationIndicator"
 										ca-title="Service Location Indicator"
 										ca-model="$ctrl.provider.onServiceLocationIndicator"
-										ca-rows="1"
+										ca-options="$ctrl.onServiceLocationIndicatorOptions"
+										ca-text-placeholder="Select Service Location Indicator"
+										ca-empty-option="true"
 						>
-						</ca-field-text>
+						</ca-field-select>
 					</div>
 
 					<!-- AB billing -->

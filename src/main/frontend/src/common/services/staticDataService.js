@@ -297,6 +297,56 @@ angular.module("Common.Services").service("staticDataService", [
 			return corporationIndicators;
 		};
 
+		service.getOntarioServiceLocationIndicators = function()
+		{
+			let serviceLocationIndicators = [];
+			serviceLocationIndicators.push({
+				label: "Not Applicable (3821)",
+				value: "3821"
+			});
+			serviceLocationIndicators.push({
+				label: "Hospital Day Surgery (HDS)",
+				value: "HDS"
+			});
+			serviceLocationIndicators.push({
+				label: "Hospital Emergency Department (HED)",
+				value: "HED"
+			});
+			serviceLocationIndicators.push({
+				label: "Hospital In-Patient (HIP)",
+				value: "HIP"
+			});
+			serviceLocationIndicators.push({
+				label: "Hospital Out-Patient (HOP)",
+				value: "HOP"
+			});
+			serviceLocationIndicators.push({
+				label: "Hospital Referred Patient (HRP)",
+				value: "HRP"
+			});
+			serviceLocationIndicators.push({
+				label: "Independent Health Facility (IHF)",
+				value: "IHF"
+			});
+			serviceLocationIndicators.push({
+				label: "Office of community physician (OFF)",
+				value: "OFF"
+			});
+			serviceLocationIndicators.push({
+				label: "Ontario Telemedicine Network (OTN)",
+				value: "OTN"
+			});
+			serviceLocationIndicators.push({
+				label: "Private Diagnostic Facility (PDF)",
+				value: "PDF"
+			});
+			serviceLocationIndicators.push({
+				label: "Rehabilitation Treatment Facility (RTF)",
+				value: "RTF"
+			});
+			return serviceLocationIndicators;
+		};
+
 		service.getProviderTypes = function ()
 		{
 			var types = [];

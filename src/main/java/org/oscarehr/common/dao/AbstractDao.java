@@ -25,6 +25,7 @@ package org.oscarehr.common.dao;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
+import org.oscarehr.billing.CA.ON.model.OntarioMasterNumber;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.common.model.Explain;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
@@ -89,6 +90,16 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 
 	public T find(Object id) {
 		return (entityManager.find(modelClass, id));
+	}
+
+	/**
+	 * fetch all instances of the persistent class handled by this DAO
+	 * @return - all records
+	 */
+	public List<T> findAll()
+	{
+		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName());
+		return query.getResultList();
 	}
 
 	/**

@@ -32,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import org.oscarehr.billing.CA.AB.dao.AlbertaFacilityDao;
 import org.oscarehr.billing.CA.AB.dao.AlbertaFunctionalCenterDao;
 import org.oscarehr.billing.CA.AB.dao.AlbertaSkillCodeDao;
+import org.oscarehr.billing.CA.ON.dao.OntarioMasterNumberDao;
 import org.oscarehr.common.dao.BillingBCDao;
 import org.oscarehr.common.dao.BillingServiceDao;
 import org.oscarehr.managers.BillingManager;
@@ -45,6 +46,7 @@ import org.oscarehr.ws.rest.transfer.AlbertaFunctionalCenterTo1;
 import org.oscarehr.ws.rest.transfer.AlbertaSkillCodeTo1;
 import org.oscarehr.ws.rest.transfer.BCBillingLocationTo1;
 import org.oscarehr.ws.rest.transfer.BCBillingVisitCodeTo1;
+import org.oscarehr.ws.rest.transfer.billing.OntarioMasterNumberTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import oscar.OscarProperties;
@@ -69,6 +71,9 @@ public class BillingService extends AbstractServiceImpl {
 
 	@Autowired
 	BillingBCDao billingBCDao;
+
+	@Autowired
+	OntarioMasterNumberDao ontarioMasterNumberDao;
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
 	
@@ -150,6 +155,14 @@ public class BillingService extends AbstractServiceImpl {
 	public RestResponse<List<BCBillingLocationTo1>> getBCBillingLocations()
 	{
 		return RestResponse.successResponse(BCBillingLocationTo1.fromList(billingBCDao.findBillingLocations(BillingServiceDao.BC)));
+	}
+
+	@GET
+	@Path("/on/master_numbers")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<OntarioMasterNumberTo1>> getOntarioMasterNumbers()
+	{
+		return RestResponse.successResponse(OntarioMasterNumberTo1.fromList(ontarioMasterNumberDao.findAll()));
 	}
 
 }

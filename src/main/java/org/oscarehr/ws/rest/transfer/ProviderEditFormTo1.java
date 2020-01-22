@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.oscarehr.util.SpringUtils;
 import oscar.SxmlMisc;
 import oscar.util.ConversionUtils;
@@ -139,22 +140,16 @@ public class ProviderEditFormTo1 implements Serializable
 		this.setCellPhone(SxmlMisc.getXmlContent(providerData.getComments(), ProviderData.COMMENT_CELL_TAG));
 		this.setPagerNumber(SxmlMisc.getXmlContent(providerData.getComments(), ProviderData.COMMENT_PAGER_TAG));
 		this.setOtherPhone(SxmlMisc.getXmlContent(providerData.getComments(), ProviderData.COMMENT_OTHER_PHONE_TAG));
+		this.setOnGroupNumber(SxmlMisc.getXmlContent(providerData.getComments(), ProviderData.COMMENT_ON_BILLING_GROUP_NO));
+		this.setOnSpecialityCode(SxmlMisc.getXmlContent(providerData.getComments(), ProviderData.COMMENT_ON_SPECIALITY_CODE));
 
-		// fill out provider billing
+		// fill out provider billing (old fields. new ones in setProviderBilling())
 		this.setOhipNo(providerData.getOhipNo());
 		this.setThirdPartyBillingNo(providerData.getRmaNo());
 		this.setAlternateBillingNo(providerData.getHsoNo());
 
 		// bc
 		this.setBcBillingNo(providerData.getBillingNo());
-		JunoTypeaheadTo1 ruralRetentionCode = new JunoTypeaheadTo1();
-		ruralRetentionCode.setLabel(providerData.getBcRuralRetentionName());
-		ruralRetentionCode.setValue(providerData.getBcRuralRetentionCode());
-		this.setBcRuralRetentionCode(ruralRetentionCode);
-		JunoTypeaheadTo1 serviceLocation = new JunoTypeaheadTo1();
-		serviceLocation.setValue(providerData.getBcServiceLocationCode());
-		this.setBcServiceLocation(serviceLocation);
-
 	}
 
 	/**
@@ -187,6 +182,8 @@ public class ProviderEditFormTo1 implements Serializable
 		providerXmlSettingsString = SxmlMisc.addElement(providerXmlSettingsString, ProviderData.COMMENT_CELL_TAG, this.getCellPhone());
 		providerXmlSettingsString = SxmlMisc.addElement(providerXmlSettingsString, ProviderData.COMMENT_PAGER_TAG, this.getPagerNumber());
 		providerXmlSettingsString = SxmlMisc.addElement(providerXmlSettingsString, ProviderData.COMMENT_OTHER_PHONE_TAG, this.getOtherPhone());
+		providerXmlSettingsString = SxmlMisc.addElement(providerXmlSettingsString, ProviderData.COMMENT_ON_SPECIALITY_CODE, this.getOnSpecialityCode());
+		providerXmlSettingsString = SxmlMisc.addElement(providerXmlSettingsString, ProviderData.COMMENT_ON_BILLING_GROUP_NO, this.getOnGroupNumber());
 		providerData.setComments(providerXmlSettingsString);
 
 		// fill out provider billing
@@ -196,18 +193,48 @@ public class ProviderEditFormTo1 implements Serializable
 
 		// bc
 		providerData.setBillingNo(this.getBcBillingNo());
-		if (this.getBcRuralRetentionCode() != null)
-		{
-			providerData.setBcRuralRetentionCode(this.getBcRuralRetentionCode().getValue());
-			providerData.setBcRuralRetentionName(this.getBcRuralRetentionCode().getLabel());
-		}
-		if (this.getBcServiceLocation() != null)
-		{
-			providerData.setBcServiceLocationCode(this.getBcServiceLocation().getValue());
-		}
 
 
 		return providerData;
+	}
+
+	/**
+	 * set fields in this form based on the providerBilling. this only does new billing fields. old ones should be migrated.
+	 * @param providerBilling - data to use to populate the form.
+	 */
+	@JsonIgnore
+	public void setProviderBilling(ProviderBilling providerBilling)
+	{
+		//BC
+		JunoTypeaheadTo1 ruralRetentionCode = new JunoTypeaheadTo1();
+		ruralRetentionCode.setLabel(providerBilling.getBcRuralRetentionName());
+		ruralRetentionCode.setValue(providerBilling.getBcRuralRetentionCode());
+		this.setBcRuralRetentionCode(ruralRetentionCode);
+		JunoTypeaheadTo1 serviceLocation = new JunoTypeaheadTo1();
+		serviceLocation.setValue(providerBilling.getBcServiceLocationCode());
+		this.setBcServiceLocation(serviceLocation);
+	}
+
+	/**
+	 * get provider billing fields. only covers new fields. old fields should be migrated here.
+	 * @return - provider billing data.
+	 */
+	@JsonIgnore
+	public ProviderBilling getProviderBilling()
+	{
+		ProviderBilling providerBilling = new ProviderBilling();
+
+		if (this.getBcRuralRetentionCode() != null)
+		{
+			providerBilling.setBcRuralRetentionCode(this.getBcRuralRetentionCode().getValue());
+			providerBilling.setBcRuralRetentionName(this.getBcRuralRetentionCode().getLabel());
+		}
+		if (this.getBcServiceLocation() != null)
+		{
+			providerBilling.setBcServiceLocationCode(this.getBcServiceLocation().getValue());
+		}
+
+		return providerBilling;
 	}
 
 	/**

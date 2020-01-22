@@ -90,6 +90,12 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		// options for the BC rural retention code field
 		ctrl.bcBillingLocationOptions = [];
 
+		// options for the ON visit location filed (internally, "ontario master number")
+		ctrl.onVisitLocationOptions = [];
+
+		// options for the ON service location indicator
+		ctrl.onServiceLocationIndicatorOptions = staticDataService.getOntarioServiceLocationIndicators();
+
 		// options for the BC service location field
 		ctrl.bcServiceLocationOptions = [];
 
@@ -254,16 +260,6 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					function success(result)
 					{
 						ctrl.billingRegion = {label: result.data.body, value: result.data.body};
-
-						if (ctrl.billingRegion === "AB")
-						{
-							ctrl.loadAlbertaBillingData();
-						}
-						else if (ctrl.billingRegion === "BC")
-						{
-							ctrl.loadBCBillingData();
-						}
-						ctrl.mapTypeaheadValues();
 					},
 					function error(result)
 					{
@@ -295,13 +291,20 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			// when we switch bill region, load additional data.
 			$scope.$watch('$ctrl.billingRegion', function(newVal, oldVal)
 			{
-				if (newVal && newVal.value === "AB")
+				if (newVal)
 				{
-					ctrl.loadAlbertaBillingData();
-				}
-				if (newVal && newVal.value === "BC")
-				{
-					ctrl.loadBCBillingData();
+					if (newVal.value === "AB")
+					{
+						ctrl.loadAlbertaBillingData();
+					}
+					else if (newVal.value === "BC")
+					{
+						ctrl.loadBCBillingData();
+					}
+					else if (newVal.value === "ON")
+					{
+						ctrl.loadOntarioBillingData();
+					}
 				}
 				ctrl.mapTypeaheadValues();
 			});
@@ -424,6 +427,29 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			);
 		};
 
+		ctrl.loadOntarioBillingData = function()
+		{
+			billingService.getOntarioMasterNumbers().then(
+					function success(result)
+					{
+						ctrl.onVisitLocationOptions = [];
+						for (let masterNum of result.data.body)
+						{
+							ctrl.onVisitLocationOptions.push(
+									{
+										label: "[" + masterNum.type + "] " + masterNum.location + " (" + masterNum.masterNumber + ") " + masterNum.name,
+										value: masterNum.masterNumber
+ 									}
+							)
+						}
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch master number list with error: " + result);
+					}
+			);
+		};
+
 		ctrl.addUserRole = function(roleId)
 		{
 			if (roleId && !ctrl.provider.userRoles.includes(roleId))
@@ -443,7 +469,14 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.getUserRoleName = function(roleId)
 		{
-			return ctrl.roleOptions.find(el => el.value === roleId).label;
+			if (ctrl.roleOptions)
+			{
+				return ctrl.roleOptions.find(el => el.value === roleId).label;
+			}
+			else
+			{
+				return "loading...";
+			}
 		};
 
 		ctrl.addSiteAssignment = function(siteId)
@@ -494,11 +527,14 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		ctrl.mapTypeaheadValues = function()
 		{
 			// map bc service location.
-			for (let serviceLocation of ctrl.bcServiceLocationOptions)
+			if (ctrl.provider.bcServiceLocation)
 			{
-				if (serviceLocation.value === ctrl.provider.bcServiceLocation.value)
+				for (let serviceLocation of ctrl.bcServiceLocationOptions)
 				{
-					ctrl.provider.bcServiceLocation = serviceLocation;
+					if (serviceLocation.value === ctrl.provider.bcServiceLocation.value)
+					{
+						ctrl.provider.bcServiceLocation = serviceLocation;
+					}
 				}
 			}
 		};

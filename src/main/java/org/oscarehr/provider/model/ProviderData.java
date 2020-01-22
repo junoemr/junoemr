@@ -47,10 +47,13 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public static final String SYSTEM_PROVIDER_NO = "-1";
 
 	// tags used to extend the provider record in the comments field.
-	public static final String COMMENT_CELL_TAG 				= "xml_p_cell";
-	public static final String COMMENT_FAX_TAG 					= "xml_p_fax";
-	public static final String COMMENT_PAGER_TAG 				= "xml_p_pager";
-	public static final String COMMENT_OTHER_PHONE_TAG 	= "xml_p_phone2";
+	public static final String COMMENT_CELL_TAG 					= "xml_p_cell";
+	public static final String COMMENT_FAX_TAG 						= "xml_p_fax";
+	public static final String COMMENT_PAGER_TAG 					= "xml_p_pager";
+	public static final String COMMENT_OTHER_PHONE_TAG 		= "xml_p_phone2";
+	public static final String COMMENT_ON_SPECIALITY_CODE = "xml_p_specialty_code";
+	public static final String COMMENT_ON_BILLING_GROUP_NO = "xml_p_billinggroup_no";
+
 
 	/**
 	 * default serial version id for serializable
