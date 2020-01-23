@@ -478,25 +478,29 @@ public class MeasurementGraphAction2 extends Action {
 
 	/**
 	 * Wrapper for creating and filling a TimeSeries object with measurement data.
-	 * @param typeLegendName
-	 * 		name of the types in the legend
-	 * @param list
-	 * 		list of measurement data to add to the time series
-	 * @return
-	 * 		a TimeSeries object containing all non-empty data fields
+	 * @param typeLegendName name of the types in the legend
+	 * @param list list of measurement data to add to the time series
+	 * @return a TimeSeries object containing all parseable data fields
 	 */
 	private TimeSeries fillTimeSeries(String typeLegendName, ArrayList<EctMeasurementsDataBean> list)
 	{
 		TimeSeries timeSeries = new TimeSeries(typeLegendName);
 		for (EctMeasurementsDataBean mdb : list)
 		{
-			double[] measurementRange = getParameters(mdb.getDataField(), "");
-			if (measurementRange.length < 1)
+			try
 			{
-				log.debug("Error passing measurement value to chart. DataField is empty for ID: " + mdb.getId());
-				continue;
+				timeSeries.addOrUpdate(new Day(mdb.getDateObservedAsDate()), Double.parseDouble(mdb.getDataField()));
 			}
-			timeSeries.addOrUpdate(new Day(mdb.getDateObservedAsDate()), measurementRange[0]);
+			catch (NumberFormatException e)
+			{
+				double[] measurementRange = getParameters(mdb.getDataField(), "");
+				if (measurementRange == null || measurementRange.length < 1)
+				{
+					log.warn("Error passing measurement value to chart. DataField can't be read for ID: " + mdb.getId());
+					continue;
+				}
+				timeSeries.addOrUpdate(new Day(mdb.getDateObservedAsDate()), measurementRange[0]);
+			}
 		}
 		return timeSeries;
 	}
