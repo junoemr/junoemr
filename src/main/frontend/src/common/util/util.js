@@ -375,18 +375,11 @@ Juno.Common.Util.typeaheadValueLookup = function(value, options)
 
 // generate a validation function. This is a nop validation and has no effect.
 // validationFunc, is a optional validation function that will be chained with this one.
-Juno.Common.Util.validationFieldNop = function(obj, field, validationFunc)
+Juno.Common.Util.validationFieldNop = function(...validationFunc)
 {
 	return function validationFunction ()
 	{
-		if (validationFunc)
-		{
-			return validationFunc();
-		}
-		else
-		{
-			return true;
-		}
+		return Juno.Common.Util.validationFieldsChain(...validationFunc);
 	}
 };
 
@@ -430,6 +423,30 @@ Juno.Common.Util.validationFieldRequired = function(obj, field, ...validationFun
 		if (typeof (obj[field]) === "string" && obj[field].length === 0)
 		{
 			return false;
+		}
+
+		return Juno.Common.Util.validationFieldsChain(...validationFunc);
+	}
+};
+
+/**
+ * valid if the field is (blank / undefined / null) or ( if validationFunction(s) is true)
+ * @param obj - object to check
+ * @param field - field to check
+ * @param validationFunc - additional validations functions
+ * @returns - true / false indicating validity
+ */
+Juno.Common.Util.validationFieldBlankOrOther = function(obj, field, ...validationFunc)
+{
+	return function validationFunction ()
+	{
+		if (!obj[field])
+		{
+			return true;
+		}
+		if (typeof (obj[field]) === "string" && obj[field].length === 0)
+		{
+			return true;
 		}
 
 		return Juno.Common.Util.validationFieldsChain(...validationFunc);

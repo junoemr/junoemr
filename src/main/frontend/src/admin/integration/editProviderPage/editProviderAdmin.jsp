@@ -21,13 +21,7 @@
 * Canada
 --%>
 <div id="edit-provider-admin">
-	<div class="col-sm-12 flex-row align-items-first-baseline lg-margin-top lg-margin-bottom" ng-if="$ctrl.mode === $ctrl.modes.VIEW">
-		<div class="col-sm-12 no-padding edit-provider-banner flex-row align-items-first-baseline body-bold">
-			<h4 class="col-sm-12">Read Only</h4>
-			<button class="btn btn-primary edit-button"> Edit </button>
-		</div>
-	</div>
-	<div class="edit-provider-fields">
+	<div class="edit-provider-fields" ng-class="{'fields-disabled': $ctrl.mode === $ctrl.modes.VIEW}">
 		<div class="col-sm-6">
 			<!-- User Information -->
 			<panel id="edit-provider-user-information">
@@ -44,6 +38,7 @@
 										ca-rows="1"
 										ca-text-placeholder="Last Name"
 										ca-required-field="true"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 					</div>
@@ -56,6 +51,7 @@
 										ca-rows="1"
 										ca-text-placeholder="First Name"
 										ca-required-field="true"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 					</div>
@@ -68,6 +64,7 @@
 									ca-model="$ctrl.provider.type"
 									ca-options="$ctrl.providerTypes"
 									ca-required-field="true"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-select>
 					<!-- Speciality -->
@@ -77,6 +74,7 @@
 									ca-model="$ctrl.provider.speciality"
 									ca-rows="1"
 									ca-text-placeholder="Speciality"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
 					<!-- Team -->
@@ -86,6 +84,7 @@
 									ca-model="$ctrl.provider.team"
 									ca-rows="1"
 									ca-text-placeholder="Team"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
 					<!-- Sex -->
@@ -98,6 +97,7 @@
 									ca-options="$ctrl.sexes"
 									ca-text-placeholder="Sex"
 									ca-empty-option="true"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-select>
 					<!-- DOB -->
@@ -107,6 +107,7 @@
 									ca-name="dob"
 									ca-model="$ctrl.provider.dateOfBirth"
 									ca-orientation="auto"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-date>
 				</panel-body>
@@ -126,6 +127,7 @@
 										options="$ctrl.siteOptions"
 										placeholder="Search..."
 										on-enter-key="$ctrl.addSiteAssignment($ctrl.currentSiteSelection.value)"
+										disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-typeahead>
 						<button class="btn btn-primary lg-padding-left lg-padding-right add-role-button" title="Add role" ng-click="$ctrl.addSiteAssignment($ctrl.currentSiteSelection.value)">Add</button>
@@ -161,6 +163,7 @@
 										options="$ctrl.roleOptions"
 										placeholder="Search..."
 										on-enter-key="$ctrl.addUserRole($ctrl.currentRoleSelection.value)"
+										disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-typeahead>
 						<button class="btn btn-primary lg-padding-left lg-padding-right add-role-button" title="Add role" ng-click="$ctrl.addUserRole($ctrl.currentRoleSelection.value)">Add</button>
@@ -194,7 +197,8 @@
 									ca-title="Address"
 									ca-model="$ctrl.provider.address"
 									ca-rows="1"
-									ca-text-placeholder="31 Bastion Square"
+									ca-text-placeholder="123 Health St"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
 					<!-- Home phone -->
@@ -203,6 +207,7 @@
 									ca-title="Home Phone"
 									ca-model="$ctrl.provider.homePhone"
 									ca-rows="1"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
 					<!-- Work phone -->
@@ -211,6 +216,7 @@
 									ca-title="Work Phone"
 									ca-model="$ctrl.provider.workPhone"
 									ca-rows="1"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
 					<!-- Cell phone -->
@@ -219,6 +225,7 @@
 									ca-title="Cell Phone"
 									ca-model="$ctrl.provider.cellPhone"
 									ca-rows="1"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
 					<!-- Other phone -->
@@ -227,6 +234,7 @@
 									ca-title="Other Phone"
 									ca-model="$ctrl.provider.otherPhone"
 									ca-rows="1"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
 					<!-- Fax -->
@@ -235,6 +243,7 @@
 									ca-title="Fax"
 									ca-model="$ctrl.provider.fax"
 									ca-rows="1"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
 					<!-- Email -->
@@ -243,6 +252,7 @@
 									ca-title="Contact Email"
 									ca-model="$ctrl.provider.contactEmail"
 									ca-rows="1"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
 					<!-- pager -->
@@ -251,6 +261,7 @@
 									ca-title="Pager"
 									ca-model="$ctrl.provider.pagerNumber"
 									ca-rows="1"
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
 				</panel-body>
@@ -271,6 +282,7 @@
 										ca-model="$ctrl.provider.email"
 										ca-rows="1"
 										ca-text-placeholder="Email"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 						<div class="error-message" ng-if="!$ctrl.providerValidations.emailOrUserName() && $ctrl.hasSubmitted">
@@ -283,11 +295,12 @@
 										ca-model="$ctrl.provider.userName"
 										ca-rows="1"
 										ca-text-placeholder="User Name"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 					</div>
 					<!-- Password -->
-					<div ng-class="{'field-error': !$ctrl.providerValidations.password() && $ctrl.hasSubmitted}">
+					<div ng-class="{'field-error': (!$ctrl.providerValidations.password() || !$ctrl.providerValidations.passwordMatch()) && $ctrl.hasSubmitted}">
 						<ca-field-text
 										ca-name="password"
 										ca-title="Password"
@@ -296,11 +309,12 @@
 										ca-text-placeholder="Password"
 										ca-hide-input="true"
 										ca-required-field="true"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 					</div>
 					<!-- Confirm Password -->
-					<div ng-class="{'field-error': !$ctrl.providerValidations.passwordVerify() && $ctrl.hasSubmitted}">
+					<div ng-class="{'field-error': (!$ctrl.providerValidations.passwordVerify() || !$ctrl.providerValidations.passwordMatch()) && $ctrl.hasSubmitted}">
 						<ca-field-text
 										ca-name="confirm_password"
 										ca-title="Confirm Password"
@@ -309,6 +323,7 @@
 										ca-text-placeholder="Retype Password"
 										ca-hide-input="true"
 										ca-required-field="true"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 						<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.passwordMatch() && $ctrl.hasSubmitted">
@@ -316,7 +331,7 @@
 						</div>
 					</div>
 					<!-- Second Level Passcode -->
-					<div ng-class="{'field-error': !$ctrl.providerValidations.secondLevelPasscode() && $ctrl.hasSubmitted}">
+					<div ng-class="{'field-error': (!$ctrl.providerValidations.secondLevelPasscode() || !$ctrl.providerValidations.secondLevelPasscodeMatch()) && $ctrl.hasSubmitted}">
 						<ca-field-text
 										ca-name="passcode"
 										ca-title="Second Level Passcode"
@@ -325,11 +340,12 @@
 										ca-text-placeholder="Passcode"
 										ca-hide-input="true"
 										ca-required-field="true"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 					</div>
 					<!-- Confirm Second Level Passcode -->
-					<div ng-class="{'field-error': !$ctrl.providerValidations.secondLevelPasscodeVerify() && $ctrl.hasSubmitted}">
+					<div ng-class="{'field-error': (!$ctrl.providerValidations.secondLevelPasscodeVerify() || !$ctrl.providerValidations.secondLevelPasscodeMatch()) && $ctrl.hasSubmitted}">
 						<ca-field-text
 										ca-name="confirm_passcode"
 										ca-title="Retype Second Level Passcode"
@@ -338,6 +354,7 @@
 										ca-text-placeholder="Retype Passcode"
 										ca-hide-input="true"
 										ca-required-field="true"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 						<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.secondLevelPasscodeMatch() && $ctrl.hasSubmitted">
@@ -363,7 +380,9 @@
 									model="$ctrl.billingRegion"
 									options="$ctrl.billingRegionOptions"
 									enabled="$ctrl.billingRegionSelectEnabled"
-									placeholder="Search...">
+									placeholder="Search..."
+									disabled="$ctrl.fieldsDisabled"
+					>
 					</juno-typeahead>
 
 					<!-- BC Billing options -->
@@ -374,6 +393,7 @@
 										ca-title="Billing Number"
 										ca-model="$ctrl.provider.ohipNo"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 
@@ -383,6 +403,7 @@
 										ca-title="Payee Number"
 										ca-model="$ctrl.provider.bcBillingNo"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 
@@ -393,6 +414,7 @@
 										model="$ctrl.provider.bcRuralRetentionCode"
 										options="$ctrl.bcBillingLocationOptions"
 										placeholder="Search..."
+										disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-typeahead>
 
@@ -403,6 +425,7 @@
 										model="$ctrl.provider.bcServiceLocation"
 										options="$ctrl.bcServiceLocationOptions"
 										placeholder="Search..."
+										disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-typeahead>
 					</div>
@@ -415,6 +438,7 @@
 										ca-title="Billing Number"
 										ca-model="$ctrl.provider.ohipNo"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 
@@ -424,6 +448,7 @@
 										ca-title="Group Number"
 										ca-model="$ctrl.provider.onGroupNumber"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 
@@ -433,6 +458,7 @@
 										ca-title="Speciality Code"
 										ca-model="$ctrl.provider.onSpecialityCode"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 
@@ -444,6 +470,7 @@
 										options="$ctrl.onVisitLocationOptions"
 										placeholder="Search..."
 										typeahead-min-length="3"
+										disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-typeahead>
 
@@ -457,6 +484,7 @@
 										ca-options="$ctrl.onServiceLocationIndicatorOptions"
 										ca-text-placeholder="Select Service Location Indicator"
 										ca-empty-option="true"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-select>
 					</div>
@@ -469,6 +497,7 @@
 										ca-title="Billing Number"
 										ca-model="$ctrl.provider.ohipNo"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 
@@ -480,6 +509,7 @@
 										ca-model="$ctrl.provider.abSourceCode"
 										ca-rows="1"
 										ca-text-length="2"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 
@@ -490,6 +520,7 @@
 										model="$ctrl.provider.abSkillCode"
 										options="$ctrl.skillCodeOptions"
 										placeholder="Search..."
+										disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-typeahead>
 
@@ -500,6 +531,7 @@
 										model="$ctrl.provider.abLocationCode"
 										options="$ctrl.locationCodeOptions"
 										placeholder="Search..."
+										disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-typeahead>
 
@@ -510,6 +542,7 @@
 										ca-title="BA Number"
 										ca-model="$ctrl.provider.abBANumber"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 
@@ -521,6 +554,7 @@
 										options="$ctrl.albertaFacilityOptions"
 										placeholder="Search..."
 										typeahead-min-length="3"
+										disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-typeahead>
 
@@ -531,6 +565,7 @@
 										model="$ctrl.provider.abFunctionalCenter"
 										options="$ctrl.albertaFunctionalCenterOptions"
 										placeholder="Search..."
+										disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-typeahead>
 
@@ -542,6 +577,7 @@
 										options="$ctrl.albertaDefaultTimeRoleOptions"
 										placeholder="Search..."
 										typeahead-min-length="0"
+										disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-typeahead>
 
@@ -554,6 +590,7 @@
 										ca-title="Billing Number"
 										ca-model="$ctrl.provider.ohipNo"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 
@@ -567,6 +604,7 @@
 										ca-options="$ctrl.saskatchewanBillingModeOptions"
 										ca-text-placeholder="Select Billing Mode"
 										ca-empty-option="true"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-select>
 
@@ -580,6 +618,7 @@
 										ca-options="$ctrl.saskatchewanLocationCodeOptions"
 										ca-text-placeholder="Select Location Code"
 										ca-empty-option="true"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-select>
 
@@ -593,6 +632,7 @@
 										ca-options="$ctrl.saskatchewanSubmissionTypeOptions"
 										ca-text-placeholder="Select Submission Type"
 										ca-empty-option="true"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-select>
 
@@ -606,6 +646,7 @@
 										ca-options="$ctrl.saskatchewanCorporationIndicatorOptions"
 										ca-text-placeholder="Select Corporation Indicator"
 										ca-empty-option="true"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-select>
 
@@ -619,6 +660,7 @@
 									ca-model="$ctrl.provider.thirdPartyBillingNo"
 									ca-rows="1"
 									ca-text-placeholder=""
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
 
@@ -629,6 +671,7 @@
 									ca-model="$ctrl.provider.alternateBillingNo"
 									ca-rows="1"
 									ca-text-placeholder=""
+									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-text>
 
@@ -648,6 +691,7 @@
 										ca-title="IHA Provider Mnemonic"
 										ca-model="$ctrl.provider.ihaProviderMnemonic"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 					</div>
@@ -657,6 +701,7 @@
 										ca-title="CPSID"
 										ca-model="$ctrl.provider.cpsid"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 						<ca-field-text
@@ -664,6 +709,7 @@
 										ca-title="Life Labs Client Id"
 										ca-model="$ctrl.provider.lifeLabsClientId"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 					</div>
@@ -674,6 +720,7 @@
 										ca-title="E-Delivery Ids"
 										ca-model="$ctrl.provider.eDeliveryIds"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 						<ca-field-text
@@ -681,6 +728,7 @@
 										ca-title="TAK #"
 										ca-model="$ctrl.provider.takNumber"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 						<ca-field-text
@@ -688,6 +736,7 @@
 										ca-title="Connect Care Provider Id"
 										ca-model="$ctrl.provider.connectCareProviderId"
 										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
 					</div>
@@ -698,8 +747,9 @@
 	</div>
 	<div class="bottom-options-bar">
 		<div class="col-sm-12 flex-row justify-content-center md-margin-top">
-			<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.ADD" ng-click="$ctrl.submit()"><span class="body-normal">Add User</span></button>
-			<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.EDIT" ng-click="$ctrl.submit()"><span class="body-normal">Update User</span></button>
+			<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.ADD" ng-click="$ctrl.submit()">Add User</button>
+			<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.EDIT" ng-click="$ctrl.submit()">Update User</button>
+			<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.VIEW" ng-click="$ctrl.goToEdit()">Edit User</button>
 		</div>
 	</div>
 </div>

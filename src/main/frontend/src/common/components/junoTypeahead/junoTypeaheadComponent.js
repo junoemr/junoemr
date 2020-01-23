@@ -31,7 +31,7 @@ angular.module('Common.Components').component('junoTypeahead',
 		options: "<",
 		placeholder: "@?",
 		onEnterKey: '&?',
-		enabled: '<?',
+		disabled: '<?',
 		typeaheadMinLength: "@?"
 	},
 	controller: ['$scope', function ($scope)

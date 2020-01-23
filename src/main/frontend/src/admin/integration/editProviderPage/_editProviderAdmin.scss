@@ -28,15 +28,6 @@
 		height: 30px;
 	}
 
-	.edit-provider-banner {
-		background-color: $color-neutral-light-grey;
-		padding: $padding-lg;
-
-		.edit-button {
-			min-width: 60px;
-		}
-	}
-
 	.edit-provider-fields {
 		panel {
 			margin-bottom: $margin-lg;
@@ -59,6 +50,12 @@
 		}
 	}
 
+	.fields-disabled {
+		input {
+			cursor: not-allowed;
+		}
+	}
+
 	.error-message {
 		color: $color-red-base;
 	}
@@ -70,6 +67,6 @@
 		right: 0;
 		height: 48px;
 
-		@include background-opacity($color-primary-lighter, 0.7);
+		@include background-opacity($color-neutral-white, 0.5);
 	}
 }

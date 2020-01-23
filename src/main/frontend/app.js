@@ -185,6 +185,15 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 						mode: EDIT_PROVIDER_MODE.EDIT
 					}
 		})
+		.state('admin.viewUser',
+				{
+					url: '/viewUser?providerNo',
+					component: 'editProviderAdmin',
+					params:
+							{
+								mode: EDIT_PROVIDER_MODE.VIEW
+							}
+				})
 		.state('ticklers',
 		{
 			url: '/ticklers',

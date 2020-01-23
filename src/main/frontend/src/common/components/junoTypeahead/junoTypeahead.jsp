@@ -34,5 +34,5 @@
 					typeahead-min-length="$ctrl.typeaheadMinLength"
 					ng-keypress="$ctrl.onKeyPress($event)"
 					placeholder="{{$ctrl.placeholder}}"
-					ng-disabled="$ctrl.enabled === undefined ? false : !$ctrl.enabled">
+					ng-disabled="$ctrl.disabled">
 </div>
