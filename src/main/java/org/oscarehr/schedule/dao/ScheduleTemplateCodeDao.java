@@ -70,7 +70,7 @@ public class ScheduleTemplateCodeDao extends AbstractDao<ScheduleTemplateCode>
 	}
 	
 	public ScheduleTemplateCode findByCode(String code) {
-		Query query = entityManager.createQuery("select s from ScheduleTemplateCode s where s.code like ?");
+		Query query = entityManager.createQuery("select s from ScheduleTemplateCode s where s.code = ?");
 		query.setParameter(1, code);
 		
 		@SuppressWarnings("unchecked")
