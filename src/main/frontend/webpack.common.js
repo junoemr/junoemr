@@ -119,6 +119,7 @@ module.exports = {
 			'../webapp/share/javascript/HealthCardParser.js',
 			'./src/common/displayMessages.js',
 			'./src/common/util/util.js',
+			'./src/common/util/validations.js',
 			'./src/common/util/serviceHelper.js',
 			'./src/consults/common.js',
 			'./app.js',
@@ -232,6 +233,7 @@ module.exports = {
 
 			'./src/common/components/module.js',
 			'./src/common/components/modalComponent.js',
+			'./src/common/components/junoAlert/junoAlertComponent.js',
 			'./src/common/components/loadingIndicatorComponent.js',
 			'./src/common/components/zeroStateDisplayComponent.js',
 			'./src/common/components/accordionList/accordionListComponent.js',

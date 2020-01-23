@@ -35,6 +35,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		'$http',
 		'$httpParamSerializer',
 		'$location',
+		'$uibModal',
 		'staticDataService',
 		'providersService',
 		'providerService',
@@ -45,6 +46,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			$http,
 			$httpParamSerializer,
 			$location,
+			$uibModal,
 			staticDataService,
 			providersService,
 			providerService,
@@ -205,14 +207,14 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			// generic validations
 			let commonValidations = {
 				// User Info
-				firstName: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'firstName'),
-				lastName: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'lastName'),
-				type: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'type'),
+				firstName: Juno.Validations.validationFieldRequired(ctrl.provider, 'firstName'),
+				lastName: Juno.Validations.validationFieldRequired(ctrl.provider, 'lastName'),
+				type: Juno.Validations.validationFieldRequired(ctrl.provider, 'type'),
 
 				// Login Info
-				emailOrUserName: Juno.Common.Util.validationFieldOr(
-						Juno.Common.Util.validationFieldRequired(ctrl.provider, 'userName'),
-						Juno.Common.Util.validationFieldRequired(ctrl.provider, 'email')
+				emailOrUserName: Juno.Validations.validationFieldOr(
+						Juno.Validations.validationFieldRequired(ctrl.provider, 'userName'),
+						Juno.Validations.validationFieldRequired(ctrl.provider, 'email')
 				),
 			};
 
@@ -221,16 +223,16 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			if (ctrl.mode === EDIT_PROVIDER_MODE.ADD)
 			{
 				passwordValidations = {
-					password: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'password'),
-					passwordVerify: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'passwordVerify'),
-					passwordMatch: Juno.Common.Util.validationFieldsEqual(
+					password: Juno.Validations.validationFieldRequired(ctrl.provider, 'password', Juno.Validations.validationPassword(ctrl.provider, 'password')),
+					passwordVerify: Juno.Validations.validationFieldRequired(ctrl.provider, 'passwordVerify'),
+					passwordMatch: Juno.Validations.validationFieldsEqual(
 							ctrl.provider, 'password',
 							ctrl.provider, 'passwordVerify'),
-					secondLevelPasscode: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'secondLevelPasscode',
-							Juno.Common.Util.validationFieldNumber(ctrl.provider, 'secondLevelPasscode')),
-					secondLevelPasscodeVerify: Juno.Common.Util.validationFieldRequired(ctrl.provider, 'secondLevelPasscodeVerify',
-							Juno.Common.Util.validationFieldNumber(ctrl.provider, 'secondLevelPasscodeVerify')),
-					secondLevelPasscodeMatch: Juno.Common.Util.validationFieldsEqual(
+					secondLevelPasscode: Juno.Validations.validationFieldRequired(ctrl.provider, 'secondLevelPasscode',
+							Juno.Validations.validationFieldNumber(ctrl.provider, 'secondLevelPasscode')),
+					secondLevelPasscodeVerify: Juno.Validations.validationFieldRequired(ctrl.provider, 'secondLevelPasscodeVerify',
+							Juno.Validations.validationFieldNumber(ctrl.provider, 'secondLevelPasscodeVerify')),
+					secondLevelPasscodeMatch: Juno.Validations.validationFieldsEqual(
 							ctrl.provider, 'secondLevelPasscode',
 							ctrl.provider, 'secondLevelPasscodeVerify'),
 				};
@@ -239,19 +241,19 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			{
 				passwordValidations = {
 					// password blank or password and validation must match
-					password: Juno.Common.Util.validationFieldNop(),
-					passwordVerify: Juno.Common.Util.validationFieldNop(),
-					passwordMatch: Juno.Common.Util.validationFieldBlankOrOther(ctrl.provider, 'password',
-							Juno.Common.Util.validationFieldsEqual(
+					password: Juno.Validations.validationFieldNop(),
+					passwordVerify: Juno.Validations.validationFieldNop(),
+					passwordMatch: Juno.Validations.validationFieldBlankOrOther(ctrl.provider, 'password',
+							Juno.Validations.validationFieldsEqual(
 									ctrl.provider, 'password',
 									ctrl.provider, 'passwordVerify')),
 					// pin blank or pin and validation must match
-					secondLevelPasscode: Juno.Common.Util.validationFieldBlankOrOther(ctrl.provider, 'secondLevelPasscode',
-							Juno.Common.Util.validationFieldNumber(ctrl.provider, 'secondLevelPasscode')),
-					secondLevelPasscodeVerify: Juno.Common.Util.validationFieldBlankOrOther(ctrl.provider, 'secondLevelPasscodeVerify',
-							Juno.Common.Util.validationFieldNumber(ctrl.provider, 'secondLevelPasscodeVerify')),
-					secondLevelPasscodeMatch: Juno.Common.Util.validationFieldBlankOrOther(ctrl.provider, 'secondLevelPasscode',
-							Juno.Common.Util.validationFieldsEqual(
+					secondLevelPasscode: Juno.Validations.validationFieldBlankOrOther(ctrl.provider, 'secondLevelPasscode',
+							Juno.Validations.validationFieldNumber(ctrl.provider, 'secondLevelPasscode')),
+					secondLevelPasscodeVerify: Juno.Validations.validationFieldBlankOrOther(ctrl.provider, 'secondLevelPasscodeVerify',
+							Juno.Validations.validationFieldNumber(ctrl.provider, 'secondLevelPasscodeVerify')),
+					secondLevelPasscodeMatch: Juno.Validations.validationFieldBlankOrOther(ctrl.provider, 'secondLevelPasscode',
+							Juno.Validations.validationFieldsEqual(
 									ctrl.provider, 'secondLevelPasscode',
 									ctrl.provider, 'secondLevelPasscodeVerify')),
 
@@ -384,7 +386,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			}
 			catch (e)
 			{
-				console.log("Failed to fetch alberta skill codes with error: " + e);
+				console.error("Failed to fetch alberta skill codes with error: " + e);
 			}
 
 			try
@@ -598,20 +600,21 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 							{
 								if (result.body.status === "SUCCESS")
 								{
-									alert("WIN");
-								} else if (result.body.status === "SECURITY_RECORD_EXISTS")
+									Juno.Common.Util.successAlert($uibModal, "Success","Provider successfully created");
+								}
+								else if (result.body.status === "SECURITY_RECORD_EXISTS")
 								{
-									alert("User Name or Email already in use.")
+									Juno.Common.Util.errorAlert($uibModal, "Validation Error", "User name or email already in use");
 								}
 							},
 							function error(result)
 							{
-								alert("API ERROR");
+								Juno.Common.Util.errorAlert($uibModal, "Error", "Internal Server Error. Provider not updated");
 							}
 					);
 				} else
 				{//invalid
-					alert("INVALID");
+					Juno.Common.Util.errorAlert($uibModal, "Validation Error", "Some fields are invalid please correct the highlighted fields");
 				}
 			}
 			else if (ctrl.mode === EDIT_PROVIDER_MODE.EDIT)
@@ -621,13 +624,17 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					providerService.editProvider($stateParams.providerNo, ctrl.translateProviderObjForSubmit(ctrl.provider)).then(
 							function success(result)
 							{
-								alert("Provider Updated");
+								Juno.Common.Util.successAlert($uibModal, "Success","Provider successfully updated");
 							},
 							function error(result)
 							{
-								alert("Update Error");
+								Juno.Common.Util.errorAlert($uibModal, "Error", "Internal Server Error. Provider not updated");
 							}
 					);
+				}
+				else
+				{
+					Juno.Common.Util.errorAlert($uibModal, "Validation Error", "Some fields are invalid please correct the highlighted fields");
 				}
 			}
 		};

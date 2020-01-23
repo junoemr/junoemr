@@ -1,5 +1,7 @@
 'use strict';
 
+import {JUNO_ALERT_MODES} from "../components/junoAlert/junoAlertConstants";
+
 if (!window.Juno) window.Juno = {};
 
 
@@ -352,6 +354,40 @@ Juno.Common.Util.windowClosedPromise = function (popup)
 	});
 };
 
+// show a success alert box similar to the browsers built in alert functionality
+Juno.Common.Util.successAlert = function(uibModal, title, message)
+{
+	uibModal.open(
+		{
+			component: 'junoAlertComponent',
+			backdrop: 'static',
+			windowClass: "juno-alert",
+			resolve: {
+				title: function(){return title},
+				message: function(){return message},
+				mode: function(){return JUNO_ALERT_MODES.SUCCESS}
+			}
+		}
+	);
+};
+
+// show a error alert box similar to the browsers built in alert functionality
+Juno.Common.Util.errorAlert = function(uibModal, title, message)
+{
+	uibModal.open(
+			{
+				component: 'junoAlertComponent',
+				backdrop: 'static',
+				windowClass: "juno-alert",
+				resolve: {
+					title: function(){return title},
+					message: function(){return message},
+					mode: function(){return JUNO_ALERT_MODES.ERROR}
+				}
+			}
+	);
+};
+
 /**
  * lookup typeahead object form options list based on value
  * @param value - the value to look up
@@ -371,119 +407,3 @@ Juno.Common.Util.typeaheadValueLookup = function(value, options)
 
 	return value;
 };
-
-
-// generate a validation function. This is a nop validation and has no effect.
-// validationFunc, is a optional validation function that will be chained with this one.
-Juno.Common.Util.validationFieldNop = function(...validationFunc)
-{
-	return function validationFunction ()
-	{
-		return Juno.Common.Util.validationFieldsChain(...validationFunc);
-	}
-};
-
-// generate a validation function that returns true if either of the validation functions returns true
-Juno.Common.Util.validationFieldOr = function( validationFunc0, validationFunc1)
-{
-	return function validationFunction ()
-	{
-		return validationFunc0() || validationFunc1();
-	}
-};
-
-Juno.Common.Util.validationFieldsChain = function(...validationFunctions)
-{
-	if (validationFunctions)
-	{
-		let res = true;
-		for (let func of validationFunctions)
-		{
-			res = res && func();
-		}
-		return res;
-	}
-	else
-	{
-		return true;
-	}
-};
-
-
-// generate a validation function that requires the field to be filled.
-// validationFunc, is a optional validation function that will be chained with this one.
-Juno.Common.Util.validationFieldRequired = function(obj, field, ...validationFunc)
-{
-	return function validationFunction ()
-	{
-		if (!obj[field])
-		{
-			return false;
-		}
-		if (typeof (obj[field]) === "string" && obj[field].length === 0)
-		{
-			return false;
-		}
-
-		return Juno.Common.Util.validationFieldsChain(...validationFunc);
-	}
-};
-
-/**
- * valid if the field is (blank / undefined / null) or ( if validationFunction(s) is true)
- * @param obj - object to check
- * @param field - field to check
- * @param validationFunc - additional validations functions
- * @returns - true / false indicating validity
- */
-Juno.Common.Util.validationFieldBlankOrOther = function(obj, field, ...validationFunc)
-{
-	return function validationFunction ()
-	{
-		if (!obj[field])
-		{
-			return true;
-		}
-		if (typeof (obj[field]) === "string" && obj[field].length === 0)
-		{
-			return true;
-		}
-
-		return Juno.Common.Util.validationFieldsChain(...validationFunc);
-	}
-};
-
-// generate a validation function that requires the field to be a number
-// validationFunc, is a optional validation function that will be chained with this one.
-Juno.Common.Util.validationFieldNumber = function(obj, field, ...validationFunc)
-{
-	return function validationFunction ()
-	{
-		if (!obj[field])
-		{
-			return false;
-		}
-		if (isNaN(obj[field]))
-		{
-			return false;
-		}
-
-		return Juno.Common.Util.validationFieldsChain(...validationFunc);
-	}
-};
-
-// generate a validation function that requires the field to be the same as another
-// validationFunc, is a optional list of validation function that will be chained with this one.
-Juno.Common.Util.validationFieldsEqual = function(obj0, field0, obj1, field1, ...validationFunc)
-{
-	return function validationFunction ()
-	{
-		if (obj0[field0] !== obj1[field1])
-		{
-			return false;
-		}
-
-		return Juno.Common.Util.validationFieldsChain(...validationFunc);
-	}
-};
-

@@ -312,6 +312,9 @@
 										ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
+						<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.password() && $ctrl.hasSubmitted">
+							Password must be atleast 8 characters long and include atleast one special character.
+						</div>
 					</div>
 					<!-- Confirm Password -->
 					<div ng-class="{'field-error': (!$ctrl.providerValidations.passwordVerify() || !$ctrl.providerValidations.passwordMatch()) && $ctrl.hasSubmitted}">
