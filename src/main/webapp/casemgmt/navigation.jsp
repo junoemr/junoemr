@@ -378,7 +378,7 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
                 %>* <% }         
         %>
         <a href="javascript:void(0)"
-           onClick="popupPage('<%=bsurl%>/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=<%=bean.demographicNo%>&template=<%=flowsheet%>','flowsheet')"><%=MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheet)%>
+           onClick="popupPage('<%=bsurl%>/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=<%=bean.demographicNo%>&template=<%=flowsheet%>','flowsheet')"><%=measurementFlowSheet.getDisplayName()%>
         </a><br/>
         <%}%>        
     </td></tr>
@@ -393,9 +393,10 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
             dxCodes = dxRes.getActiveCodeListWithCodingSystem();
             flowsheets = flowsheetService.getFlowsheetNamesFromDxCodes(dxCodes);
             for (String flowsheet : flowsheets) {
+                MeasurementFlowSheet measurementFlowSheet = flowsheetService.getFlowsheetTemplate(flowsheet);
         %>
         <a href="javascript:void(0)"
-           onClick="popupPage('<%=bsurl%>/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=<%=bean.demographicNo%>&template=<%=flowsheet%>','flowsheet')"><%=MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheet)%>
+           onClick="popupPage('<%=bsurl%>/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=<%=bean.demographicNo%>&template=<%=flowsheet%>','flowsheet')"><%=measurementFlowSheet.getDisplayName()%>
         </a>
         <%}%>
 

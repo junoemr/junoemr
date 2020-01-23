@@ -28,12 +28,10 @@ package oscar.oscarEncounter.oscarMeasurements;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -45,16 +43,14 @@ import org.apache.log4j.Logger;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-import org.oscarehr.measurements.dao.FlowSheetUserCreatedDao;
-import org.oscarehr.measurements.dao.FlowsheetDao;
 import org.oscarehr.measurements.model.FlowSheetUserCreated;
 import org.oscarehr.measurements.model.Flowsheet;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-import org.springframework.beans.factory.InitializingBean;
 
+import org.springframework.beans.factory.InitializingBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctValidationsBean;
@@ -68,11 +64,10 @@ import oscar.oscarEncounter.oscarMeasurements.util.TargetColour;
 /**
  * @author jay
  */
-public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
+public class MeasurementTemplateFlowSheetConfig implements InitializingBean
+{
 
 	private static Logger log = MiscUtils.getLogger();
-	private FlowsheetDao flowsheetDao = SpringUtils.getBean(FlowsheetDao.class);
-	private FlowSheetUserCreatedDao flowSheetUserCreatedDao = SpringUtils.getBean(FlowSheetUserCreatedDao.class);
 
 	private SAXBuilder saxBuilder = new SAXBuilder();
 
@@ -105,10 +100,6 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 
 	public static MeasurementTemplateFlowSheetConfig getInstance()
 	{
-		if (measurementTemplateFlowSheetConfig.flowsheetTemplates.size() == 0)
-		{
-			measurementTemplateFlowSheetConfig.loadFlowsheets();
-		}
 		return measurementTemplateFlowSheetConfig;
 	}
 
@@ -117,16 +108,46 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 		return flowsheetTemplates.size();
 	}
 
-	public List<MeasurementFlowSheet> getFlowsheetTemplates()
-	{
-		return flowsheetTemplates;
-	}
-
-	public void cacheFlowsheet(String name, MeasurementFlowSheet flowSheet)
+	public void cacheFlowsheetTemplate(String name, MeasurementFlowSheet flowSheet)
 	{
 		flowsheetTemplates.add(flowSheet);
 		flowsheetDisplayNames.put(name, flowSheet.getDisplayName());
 		addTriggers(flowSheet.getDxTriggers(), name);
+		setupFlowsheetTriggers(flowSheet);
+	}
+
+	public void cacheSystemFlowsheet(Flowsheet systemFlowsheet, MeasurementFlowSheet flowsheetTemplate)
+	{
+		cacheFlowsheetTemplate(flowsheetTemplate.getName(), flowsheetTemplate);
+		systemFlowsheet.setDisplayName(flowsheetTemplate.getDisplayName());
+		systemFlowsheets.add(systemFlowsheet);
+	}
+
+	public void cacheUserCreatedFlowsheet(FlowSheetUserCreated flowSheetUserCreated, MeasurementFlowSheet template)
+	{
+		cacheFlowsheetTemplate(template.getName(), template);
+		userCreatedFlowsheets.add(flowSheetUserCreated);
+	}
+
+	public void cacheDatabaseFlowsheet(Flowsheet databaseFlowsheet, MeasurementFlowSheet template)
+	{
+		cacheFlowsheetTemplate(template.getName(), template);
+		databaseFlowsheet.setDisplayName(template.getDisplayName());
+		databaseFlowsheets.add(databaseFlowsheet);
+	}
+
+	public void clearCache()
+	{
+		dxTriggers = new ArrayList<>();
+		programTriggers = new ArrayList<>();
+		dxTrigHash = new Hashtable<>();
+		programTrigHash = new HashMap<>();
+		flowsheetDisplayNames = new Hashtable<>();
+		universalFlowSheets = new ArrayList<>();
+		databaseFlowsheets = new ArrayList<>();
+		flowsheetTemplates = new ArrayList<>();
+		systemFlowsheets = new ArrayList<>();
+		userCreatedFlowsheets = new ArrayList<>();
 	}
 
 	// Have to loop over both the system flowsheets and DB flowsheets
@@ -169,6 +190,11 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 		}
 	}
 
+	public List<MeasurementFlowSheet> getFlowsheetTemplates()
+	{
+		return flowsheetTemplates;
+	}
+
 	public List<String> getUniversalFlowSheets()
 	{
 		return universalFlowSheets;
@@ -197,10 +223,14 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 		return systemFlowsheets;
 	}
 
-
 	public List<FlowSheetUserCreated> getUserCreatedFlowsheets()
 	{
 		return userCreatedFlowsheets;
+	}
+
+	public List<Flowsheet> getDatabaseFlowsheets()
+	{
+		return databaseFlowsheets;
 	}
 
 	public List<String> getFlowsheetForDxCode(String code)
@@ -244,130 +274,6 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 			addProgramTriggers(programTriggers, measurementFlowSheet.getName());
 		}
 
-	}
-
-	// This call is expensive and we should try to avoid it where possible
-	public void reloadFlowsheets()
-	{
-		dxTriggers = new ArrayList<String>();
-		programTriggers = new ArrayList<String>();
-		dxTrigHash = new Hashtable<String, List<String>>();
-		programTrigHash = new HashMap<String, List<String>>();
-		flowsheetDisplayNames = new Hashtable<String, String>();
-		universalFlowSheets = new ArrayList<String>();
-		databaseFlowsheets = new ArrayList<>();
-		flowsheetTemplates = new ArrayList<>();
-		systemFlowsheets = new ArrayList<>();
-		userCreatedFlowsheets = new ArrayList<>();
-		loadFlowsheets();
-	}
-
-	// Wrapping like this for now until I decide whether I want this here or in the service layer
-	public void loadSystemFlowsheets()
-	{
-		EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
-
-		for (File flowSheet : systemFlowsheetFiles)
-		{
-			InputStream is = null;
-			try
-			{
-				is = new FileInputStream(flowSheet);
-				MeasurementFlowSheet measurementFlowsheet = createflowsheet(mType, is);
-				flowsheetTemplates.add(measurementFlowsheet);
-				flowsheetDisplayNames.put(measurementFlowsheet.getName(), measurementFlowsheet.getDisplayName());
-				setupFlowsheetTriggers(measurementFlowsheet);
-
-				Flowsheet flowsheetEntry = flowsheetDao.findByName(measurementFlowsheet.getName());
-				// If no entry exists, insert an entry. This should only happen for system flowsheets and exactly once
-				if (flowsheetEntry == null)
-				{
-					flowsheetDao.enableFlowsheet(measurementFlowsheet.getName());
-					flowsheetEntry = flowsheetDao.findByName(measurementFlowsheet.getName());
-				}
-				flowsheetEntry.setDisplayName(measurementFlowsheet.getDisplayName());
-				//If the system flowsheet is not in the database, then load it normally. Otherwise, it has been overwritten, so only load it once from the database
-				systemFlowsheets.add(flowsheetEntry);
-
-			}
-			catch (Exception e)
-			{
-				MiscUtils.getLogger().error("Flowsheet error: ", e);
-			}
-			finally
-			{
-				if (is != null)
-				{
-					try
-					{
-						is.close();
-					}
-					catch (IOException e)
-					{
-						MiscUtils.getLogger().error("Error Closing the Input Stream: ", e);
-					}
-				}
-			}
-		}
-	}
-
-	// Wrapping this here until I decide whether I want this in the service layer or here
-	public void loadUserCreatedFlowsheets()
-	{
-		List<FlowSheetUserCreated> databaseFlowsheets = flowSheetUserCreatedDao.getAllUserCreatedFlowSheets();
-		for(FlowSheetUserCreated flowSheetUserCreated: databaseFlowsheets)
-		{
-			MeasurementFlowSheet measurementFlowSheet = new MeasurementFlowSheet();
-			measurementFlowSheet.setName(flowSheetUserCreated.getName());
-			measurementFlowSheet.parseDxTriggers(flowSheetUserCreated.getDxcodeTriggers());
-			measurementFlowSheet.setDisplayName(flowSheetUserCreated.getDisplayName());
-			measurementFlowSheet.setWarningColour(flowSheetUserCreated.getWarningColour());
-			measurementFlowSheet.setRecommendationColour(flowSheetUserCreated.getRecommendationColour());
-			flowsheetTemplates.add(measurementFlowSheet);
-			String[] dxTrig = measurementFlowSheet.getDxTriggers();
-			addTriggers(dxTrig, measurementFlowSheet.getName());
-			flowsheetDisplayNames.put(measurementFlowSheet.getName(), measurementFlowSheet.getDisplayName());
-			userCreatedFlowsheets.add(flowSheetUserCreated);
-		}
-	}
-
-	// Wrapping this here until I decide whether I want this in the service layer or here
-	public void loadDatabaseFlowsheets()
-	{
-		List<Flowsheet> dbFlowsheets = flowsheetDao.findAll();
-		EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
-
-		for(Flowsheet flowsheet : dbFlowsheets)
-		{
-			if(flowsheet.isExternal())
-			{
-				continue;
-			}
-			String data = flowsheet.getContent();
-
-			InputStream is = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
-			MeasurementFlowSheet measurementFlowSheet = createflowsheet(mType, is);
-			flowsheetTemplates.add(measurementFlowSheet);
-			flowsheetDisplayNames.put(measurementFlowSheet.getName(), measurementFlowSheet.getDisplayName());
-			flowsheet.setDisplayName(measurementFlowSheet.getDisplayName());
-			databaseFlowsheets.add(flowsheet);
-			setupFlowsheetTriggers(measurementFlowSheet);
-			try
-			{
-				is.close();
-			}
-			catch (IOException e)
-			{
-				log.error("Error closing input stream: ", e);
-			}
-		}
-	}
-
-	void loadFlowsheets()
-	{
-		loadSystemFlowsheets();
-		loadUserCreatedFlowsheets();
-		loadDatabaseFlowsheets();
 	}
 
     private void addTriggers(String[] dxTrig, String name) {
@@ -548,7 +454,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         }
     }
 
-    private MeasurementFlowSheet createflowsheet(final EctMeasurementTypeBeanHandler mType, InputStream is) {
+    public MeasurementFlowSheet createflowsheet(InputStream is) {
         MeasurementFlowSheet d = new MeasurementFlowSheet();
 
         try {
@@ -786,65 +692,66 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 		InputStream is = new ByteArrayInputStream(byteArrayout.toByteArray());
 
 		EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
-		return createflowsheet(mType, is);
+		return createflowsheet(is);
 
 	}
 
-    public FlowSheetItem getItemFromString(String s){
-        FlowSheetItem item = null;
-        try {
-            Document doc = saxBuilder.build(new StringReader(s));
-            Element root = doc.getRootElement();
+    public FlowSheetItem getItemFromString(String s)
+	{
+		FlowSheetItem item = null;
+		try
+		{
+			Document doc = saxBuilder.build(new StringReader(s));
+			Element root = doc.getRootElement();
 
-            List<Attribute> attr = root.getAttributes();
-                Hashtable<String, String> h = new Hashtable<String, String>();
-                for (Attribute att : attr) {
-                    h.put(att.getName(), att.getValue());
-                }
-                item = new FlowSheetItem(h);
+			List<Attribute> attr = root.getAttributes();
 
-                int ruleCount = 0;
-                    Element rules  = root.getChild("rules");
+			Map<String, String> h = new Hashtable<String, String>();
+			for (Attribute att : attr) {
+				h.put(att.getName(), att.getValue());
+			}
+			item = new FlowSheetItem(h);
 
-                    if (rules !=null){
-                       List<Element> recomends = rules.getChildren("recommendation");
-                       List<Recommendation> ds = new ArrayList<Recommendation>();
-                       for(Element reco: recomends){
-                           ruleCount++;
-                           ds.add(new Recommendation(reco,"" + h.get("measurement_type")+ruleCount,"" + h.get("measurement_type")));
-                       }
-                       log.debug(""+ h.get("measurement_type")+ " adding ds  "+ds);
-                       item.setRecommendations(ds);
-                    }
+			int ruleCount = 0;
+			Element rules  = root.getChild("rules");
 
+			if (rules !=null)
+			{
+				List<Element> recomends = rules.getChildren("recommendation");
+				List<Recommendation> ds = new ArrayList<Recommendation>();
+				for(Element reco: recomends)
+				{
+					ruleCount++;
+					ds.add(new Recommendation(reco,"" + h.get("measurement_type")+ruleCount,"" + h.get("measurement_type")));
+				}
+				item.setRecommendations(ds);
+			}
 
-                    Element rulesets = root.getChild("ruleset");
-                    List<TargetColour> rs = new ArrayList<TargetColour>();
-                    if (rulesets != null){
-                        List<Element> rulez = rulesets.getChildren("rule");
-                        if (rulez != null){
-                            for(Element r: rulez){
-                                rs.add(new TargetColour(r));
-                                //r.getAttributeValue("indicatorColour");
-                            }
-                        }
+			Element rulesets = root.getChild("ruleset");
+			List<TargetColour> rs = new ArrayList<>();
+			if (rulesets != null)
+			{
+				List<Element> rulez = rulesets.getChildren("rule");
+				if (rulez != null)
+				{
+					for(Element r: rulez)
+					{
+						rs.add(new TargetColour(r));
+					}
+				}
 
-                    }
+			}
+			if (rs.size() > 0)
+			{
+				item.setTargetColour(rs);
+			}
+		}
+		catch (JDOMException | IOException e)
+		{
+			MiscUtils.getLogger().error("Error when attempting to get item from string: ", e);
+		}
 
-                    log.debug(" meas "+h.get("measurement_type")+"  size "+rs.size());
-
-                    if (rs.size() > 0){
-                        item.setTargetColour(rs);
-
-                    }
-
-
-
-
-        }catch(Exception e){
-            MiscUtils.getLogger().error("Error", e);
-        }
-         return item;
+		return item;
     }
 
 

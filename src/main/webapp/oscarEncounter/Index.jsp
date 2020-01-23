@@ -1065,9 +1065,10 @@ function removeSaveFeedback()  {
 						List<String> flowsheets = flowsheetService.getFlowsheetNamesFromDxCodes(dxCodes);
                         for (int f = 0; f < flowsheets.size();f++){
                             String flowsheetName = (String) flowsheets.get(f);
+                            MeasurementFlowSheet measurementFlowSheet = flowsheetService.getFlowsheetTemplate(flowsheetName);
                         %> <a
 					href="javascript: function myFunction() {return false; }"
-					onClick="popup(700,1000,'oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=<%=bean.demographicNo%>&template=<%=flowsheetName%>','flowsheet')"><%=MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName)%></a>
+					onClick="popup(700,1000,'oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=<%=bean.demographicNo%>&template=<%=flowsheetName%>','flowsheet')"><%=measurementFlowSheet.getDisplayName()%></a>
 				<%}%>
 
 				<form name="measurementGroupForm"><caisi:isModuleLoad

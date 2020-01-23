@@ -22,6 +22,10 @@
  */
 package org.oscarehr.measurements.service;
 
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.oscarehr.common.dao.FlowSheetCustomizationDao;
 import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.measurements.dao.FlowSheetUserCreatedDao;
 import org.oscarehr.measurements.dao.FlowsheetDao;
@@ -34,7 +38,13 @@ import oscar.oscarEncounter.oscarMeasurements.FlowSheetItem;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,9 +57,21 @@ public class FlowsheetService
 	private FlowsheetDao flowsheetDao;
 	@Autowired
 	private FlowSheetUserCreatedDao flowSheetUserCreatedDao;
+	@Autowired
+	private FlowSheetCustomizationDao flowSheetCustomizationDao;
+
+	public void loadFlowsheets()
+	{
+		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		config.clearCache();
+		loadSystemFlowsheets();
+		loadUserCreatedFlowsheets();
+		loadDatabaseFlowsheets();
+	}
 
 	public MeasurementFlowSheet getFlowsheetTemplate(String name)
 	{
+		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
 		List<MeasurementFlowSheet> flowsheetTemplates = getFlowsheetTemplates();
 		for (MeasurementFlowSheet flowsheetTemplate : flowsheetTemplates)
 		{
@@ -64,12 +86,22 @@ public class FlowsheetService
 	public List<MeasurementFlowSheet> getFlowsheetTemplates()
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		List<MeasurementFlowSheet> flowsheetTemplates = config.getFlowsheetTemplates();
+		if (flowsheetTemplates == null || flowsheetTemplates.size() == 0)
+		{
+			loadFlowsheets();
+		}
 		return config.getFlowsheetTemplates();
 	}
 
 	public List<Flowsheet> getSystemFlowsheets()
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		List<Flowsheet> systemFlowsheets = config.getSystemFlowsheets();
+		if (systemFlowsheets == null || systemFlowsheets.size() == 0)
+		{
+			loadFlowsheets();
+		}
 		return config.getSystemFlowsheets();
 	}
 
@@ -77,6 +109,12 @@ public class FlowsheetService
 	{
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
 		return config.getUserCreatedFlowsheets();
+	}
+
+	public List<Flowsheet> getDatabaseFlowsheets()
+	{
+		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		return config.getDatabaseFlowsheets();
 	}
 
 	/**
@@ -137,8 +175,34 @@ public class FlowsheetService
 
 	public List<String> getUniversalFlowsheetNames()
 	{
+		// pre-check to ensure we have something loaded
 		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		List<String> universalFlowsheets = config.getUniversalFlowSheets();
+		if (universalFlowsheets == null || universalFlowsheets.size() == 0)
+		{
+			loadFlowsheets();
+		}
 		return config.getUniversalFlowSheets();
+	}
+
+	public void addFlowsheetCustomization(FlowSheetItem item, String action, String flowsheetName, String prevItem, String providerNo, String demographicNo)
+	{
+		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		Element va = config.getItemFromObject(item);
+
+		XMLOutputter outputter = new XMLOutputter();
+		outputter.setFormat(Format.getPrettyFormat());
+
+		FlowSheetCustomization customization = new FlowSheetCustomization();
+		customization.setAction(FlowSheetCustomization.ADD);
+		customization.setPayload(outputter.outputString(va));
+		customization.setFlowsheet(flowsheetName);
+		customization.setMeasurement(prevItem);
+		customization.setProviderNo(providerNo);
+		customization.setDemographicNo(demographicNo);
+		customization.setCreateDate(new Date());
+
+		flowSheetCustomizationDao.persist(customization);
 	}
 
 	public String addFlowsheet(MeasurementFlowSheet measurementFlowSheet)
@@ -149,7 +213,7 @@ public class FlowsheetService
 			measurementFlowSheet.setName("U" + (config.getNumCachedFlowsheets() + 1));
 		}
 
-		config.cacheFlowsheet(measurementFlowSheet.getName(), measurementFlowSheet);
+		config.cacheFlowsheetTemplate(measurementFlowSheet.getName(), measurementFlowSheet);
 		return measurementFlowSheet.getName();
 	}
 
@@ -203,6 +267,112 @@ public class FlowsheetService
 		}
 	}
 
+	public void loadSystemFlowsheets()
+	{
+		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		List<File> systemFlowsheetFiles = config.getSystemFlowsheetFiles();
+
+		for (File flowsheetFile : systemFlowsheetFiles)
+		{
+			InputStream is = null;
+			try
+			{
+				is = new FileInputStream(flowsheetFile);
+				MeasurementFlowSheet measurementFlowSheet = config.createflowsheet(is);
+				Flowsheet flowsheetEntry = flowsheetDao.findByName(measurementFlowSheet.getName());
+				if (flowsheetEntry == null)
+				{
+					flowsheetEntry = addSystemFlowsheet(measurementFlowSheet.getName());
+				}
+
+				config.cacheSystemFlowsheet(flowsheetEntry, measurementFlowSheet);
+			}
+			catch (FileNotFoundException e)
+			{
+				MiscUtils.getLogger().error("Error loading system flowsheet: ", e);
+			}
+			finally
+			{
+				try
+				{
+					if (is != null)
+					{
+						is.close();
+					}
+				}
+				catch (IOException e)
+				{
+					MiscUtils.getLogger().error("Error cleaning up InputStream when loading system flowsheets: ", e);
+				}
+			}
+		}
+	}
+
+	public void loadUserCreatedFlowsheets()
+	{
+		List<FlowSheetUserCreated> createdFlowsheets = flowSheetUserCreatedDao.getAllUserCreatedFlowSheets();
+		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		for (FlowSheetUserCreated flowSheetUserCreated : createdFlowsheets)
+		{
+			// Set up template
+			MeasurementFlowSheet measurementFlowSheet = new MeasurementFlowSheet();
+			measurementFlowSheet.setName(flowSheetUserCreated.getName());
+			measurementFlowSheet.parseDxTriggers(flowSheetUserCreated.getDxcodeTriggers());
+			measurementFlowSheet.setDisplayName(flowSheetUserCreated.getDisplayName());
+			measurementFlowSheet.setWarningColour(flowSheetUserCreated.getWarningColour());
+			measurementFlowSheet.setRecommendationColour(flowSheetUserCreated.getRecommendationColour());
+			// Cache
+			config.cacheUserCreatedFlowsheet(flowSheetUserCreated, measurementFlowSheet);
+		}
+
+	}
+
+	public void loadDatabaseFlowsheets()
+	{
+		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		List<Flowsheet> databaseFlowsheets = flowsheetDao.findAll();
+
+		for (Flowsheet databaseFlowsheet : databaseFlowsheets)
+		{
+			// external means "XML source not in DB", a.k.a. system flowsheets
+			if (databaseFlowsheet.isExternal())
+			{
+				continue;
+			}
+
+			String data = databaseFlowsheet.getContent();
+			InputStream is = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
+			MeasurementFlowSheet measurementFlowSheet = config.createflowsheet(is);
+			config.cacheDatabaseFlowsheet(databaseFlowsheet, measurementFlowSheet);
+
+			try
+			{
+				is.close();
+			}
+			catch (IOException e)
+			{
+				MiscUtils.getLogger().error("Error when closing input stream: ", e);
+			}
+
+		}
+	}
+
+	/**
+	 * Given the name of a flowsheet, add a new entry into the database for it and set it as external.
+	 * This allows us to properly update cached flowsheet entries for "external" flowsheets
+	 * (flowsheets whose XML contents come from outside the database)
+	 * @param name name of the flowsheet to add
+	 */
+	public Flowsheet addSystemFlowsheet(String name)
+	{
+		Flowsheet flowsheet = new Flowsheet();
+		flowsheet.setCreatedDate(new Date());
+		flowsheet.setEnabled(false);
+		flowsheet.setExternal(true);
+		flowsheet.setName(name);
+		flowsheetDao.persist(flowsheet);
+		return flowsheet;
+	}
 
 	/**
 	 * Create a custom flowsheet given all of the required parameters.
@@ -286,5 +456,19 @@ public class FlowsheetService
 		}
 
 		return baseFlowsheet;
+	}
+
+	// Wrapper for now
+	public FlowSheetItem getFlowsheetItemFromString(String itemName)
+	{
+		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		return config.getItemFromString(itemName);
+	}
+
+	// Wrapper for now
+	public MeasurementFlowSheet validateFlowsheetTemplate(String data)
+	{
+		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
+		return config.validateFlowsheet(data);
 	}
 }

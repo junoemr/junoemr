@@ -39,9 +39,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.oscarehr.common.dao.FlowSheetCustomizationDao;
 import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -52,7 +49,6 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarEncounter.oscarMeasurements.FlowSheetItem;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
-import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 import oscar.oscarEncounter.oscarMeasurements.util.Recommendation;
 import oscar.oscarEncounter.oscarMeasurements.util.RecommendationCondition;
 import oscar.oscarEncounter.oscarMeasurements.util.TargetColour;
@@ -85,7 +81,6 @@ public class FlowSheetCustomAction extends DispatchAction {
         	throw new SecurityException("missing required security object (_demographic)");
         }
         
-        MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
         MeasurementFlowSheet mFlowsheet = flowsheetService.getFlowsheetTemplate(flowsheet);
 
         if (request.getParameter("measurement") != null) {
@@ -130,24 +125,7 @@ public class FlowSheetCustomAction extends DispatchAction {
             if (h.get("measurement_type") != null) {
                 FlowSheetItem item = new FlowSheetItem(h);
                 item.setRecommendations(ds);
-                Element va = templateConfig.getItemFromObject(item);
-
-                XMLOutputter outp = new XMLOutputter();
-                outp.setFormat(Format.getPrettyFormat());
-
-                FlowSheetCustomization cust = new FlowSheetCustomization();
-                cust.setAction(FlowSheetCustomization.ADD);
-                cust.setPayload(outp.outputString(va));
-                cust.setFlowsheet(flowsheet);
-                cust.setMeasurement(prevItem);//THIS THE MEASUREMENT TO SET THIS AFTER!
-                cust.setProviderNo((String) request.getSession().getAttribute("user"));
-                cust.setDemographicNo(demographicNo);
-                cust.setCreateDate(new Date());
-
-                logger.debug("SAVE "+cust);
-
-                flowSheetCustomizationDao.persist(cust);
-
+                flowsheetService.addFlowsheetCustomization(item, FlowSheetCustomization.ADD, flowsheet, prevItem, (String) request.getSession().getAttribute("user"), demographicNo);
             }
         }
         request.setAttribute("demographic",demographicNo);
@@ -156,7 +134,6 @@ public class FlowSheetCustomAction extends DispatchAction {
     }
 
     public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
-        MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
 
         String flowsheet = request.getParameter("flowsheet");
         String demographicNo = "0";
@@ -220,24 +197,6 @@ public class FlowSheetCustomAction extends DispatchAction {
                         rec.setRecommendationCondition(conds);
                         recommendations.add(rec);
                     }
-                    //////
-                    /*  Strength:   <select name="strength<%=count%>">
-                        Text: <input type="text" name="text<%=count%>" length="100"  value="<%=e.getText()%>" />
-                        <select name="type<%=count%>c<%=condCount%>" >
-                        Param: <input type="text" name="param<%=count%>c<%=condCount%>" value="<%=s(cond.getParam())%>" />
-                        Value: <input type="text" name="value<%=count%>c<%=condCount%>" value="<%=cond.getValue()%>" />
-                    */
-                    //////
-
-                    
-                    
-                    
-//                    String mRange = request.getParameter("monthrange" + extrachar);
-//                    String strn = request.getParameter("strength" + extrachar);
-//                    String dsText = request.getParameter("text" + extrachar);
-//                    if (!mRange.trim().equals("")){
-//                       ds.add(new Recommendation("" + h.get("measurement_type"), mRange, strn, dsText));
-//                    }
                 }else if(s.startsWith("col")){
                     String extrachar = s.replaceAll("col", "").trim();
                     logger.debug("EXTRA CHA "+extrachar);
@@ -274,50 +233,7 @@ public class FlowSheetCustomAction extends DispatchAction {
             item.setTargetColour(targets);
             item.setRecommendations(recommendations);
 
-
-
-
-
-            //DEALING WITH TARGET DATA//////////
-
-          /*
-            <select name="type<%=targetCount%>c1">
-               <option value="-1">Not Set</option>
-                <option value="getDataAsDouble"       >Number Value</option>
-                <option value="isMale"              > Is Male </option>
-                <option value="isFemale"            > Is Female </option>
-                <option value="getNumberFromSplit"  > Number Split </option>
-                <option value="isDataEqualTo"       >  String </option>
-           </select>
-
-           Param: <input type="text" name="param<%=targetCount%>c1" value="" />
-           Value: <input type="text" name="value<%=targetCount%>c1" value="" />
-
-             */
-
-
-            ////////////
-
-
-
-            Element va = templateConfig.getItemFromObject(item);
-
-            XMLOutputter outp = new XMLOutputter();
-            outp.setFormat(Format.getPrettyFormat());
-
-            FlowSheetCustomization cust = new FlowSheetCustomization();
-            cust.setAction(FlowSheetCustomization.UPDATE);
-            cust.setPayload(outp.outputString(va));
-            cust.setFlowsheet(flowsheet);
-            if(demographicNo != null ){
-               cust.setDemographicNo(demographicNo);
-            }
-            cust.setMeasurement(item.getItemName());//THIS THE MEASUREMENT TO SET THIS AFTER!
-            cust.setProviderNo((String) request.getSession().getAttribute("user"));
-            logger.debug("UPDATE "+cust);
-
-            flowSheetCustomizationDao.persist(cust);
-
+            flowsheetService.addFlowsheetCustomization(item, FlowSheetCustomization.UPDATE, flowsheet, item.getItemName(), (String) request.getSession().getAttribute("user"), demographicNo);
         }
         request.setAttribute("demographic",demographicNo);
         request.setAttribute("flowsheet", flowsheet);
@@ -396,13 +312,10 @@ public class FlowSheetCustomAction extends DispatchAction {
 		measurementFlowSheet.setWarningColour(warningColour);
 		measurementFlowSheet.setRecommendationColour(recommendationColour);
 
-		MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
 		String name =  flowsheetService.addFlowsheet( measurementFlowSheet );
 		measurementFlowSheet.loadRuleBase();
 
 		flowsheetService.createUserFlowSheet(name, dxcodeTriggers, displayName, warningColour, recommendationColour);
-		// To ensure flowsheets don't overlap, we need to trigger a reload on all flowsheets in system
-		templateConfig.reloadFlowsheets();
 
 		return mapping.findForward("newflowsheet");
 	}

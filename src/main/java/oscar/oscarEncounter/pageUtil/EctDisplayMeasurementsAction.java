@@ -27,9 +27,9 @@ package oscar.oscarEncounter.pageUtil;
 import org.apache.log4j.Logger;
 import org.apache.struts.util.MessageResources;
 import org.oscarehr.common.dao.AdmissionDao;
-import org.oscarehr.measurements.dao.FlowsheetDao;
 import org.oscarehr.common.dao.MeasurementGroupStyleDao;
 import org.oscarehr.common.model.Admission;
+import org.oscarehr.measurements.model.FlowSheetUserCreated;
 import org.oscarehr.measurements.model.Flowsheet;
 import org.oscarehr.common.model.MeasurementGroupStyle;
 import org.oscarehr.measurements.service.FlowsheetService;
@@ -37,7 +37,6 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
-import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler;
 import oscar.util.DateUtils;
@@ -54,7 +53,6 @@ import java.util.Vector;
 
 public class EctDisplayMeasurementsAction extends EctDisplayAction {
 	private static final String cmd = "measurements";
-	FlowsheetDao flowsheetDao = (FlowsheetDao) SpringUtils.getBean("flowsheetDao");
 	private FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 	Logger logger = MiscUtils.getLogger();
 
@@ -87,36 +85,18 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 			com.quatro.service.security.SecurityManager securityMgr = new com.quatro.service.security.SecurityManager();
 
 			List<String> flowsheets = flowsheetService.getUniversalFlowsheetNames();
-			
+
 			if (!OscarProperties.getInstance().getBooleanProperty("new_flowsheet_enabled", "true")) {
 				flowsheets.remove("diab3");
 			}
 			
 			int hash;
-			for (int f = 0; f < flowsheets.size(); f++) {	
-				NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
-				String flowsheetName = flowsheets.get(f);
-				if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, roleName$)) {
-					Flowsheet fs = flowsheetDao.findByName(flowsheetName);
-					if (fs != null && !fs.isEnabled())
-					{
-						continue;
-					}
-					String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
-
-					winName = flowsheetName + bean.demographicNo;
-					uuid = UUID.randomUUID().toString();
-					hash = Math.abs(winName.hashCode());
-					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid + "&demographic_no="
-							+ bean.demographicNo + "&template=" + flowsheetName + "&echartUUID="+ eChartUUID + "');return false;";
-					item.setLinkTitle(dispname);
-					dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-					item.setTitle(dispname);
-					item.setURL(url);
-					Dao.addItem(item);
-				}
+			List<NavBarDisplayDAO.Item> universalItems = createDaoItems(flowsheets, roleName$, bean.demographicNo, eChartUUID, request.getContextPath());
+			for (NavBarDisplayDAO.Item item : universalItems)
+			{
+				Dao.addItem(item);
 			}
-			
+
 			if(OscarProperties.getInstance().getBooleanProperty("health_tracker", "true")) {
 			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 			//temp while testing
@@ -136,29 +116,10 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 			dxResearchBeanHandler dxRes = new dxResearchBeanHandler(bean.demographicNo);
 			List<String> dxCodes = dxRes.getActiveCodeListWithCodingSystem();
 			flowsheets = flowsheetService.getFlowsheetNamesFromDxCodes(dxCodes);
-			for (int f = 0; f < flowsheets.size(); f++) {
-				NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
-				String flowsheetName = flowsheets.get(f);
-				if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, roleName$)) {
-					Flowsheet fs = null;
-					if ((fs = flowsheetDao.findByName(flowsheetName)) != null) {
-						if (!fs.isEnabled()) {
-							continue;
-						}
-					}
-					String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
-
-					winName = flowsheetName + bean.demographicNo;
-					uuid = UUID.randomUUID().toString();
-					hash = Math.abs(winName.hashCode());
-					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid +
-							"&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "&echartUUID=" + eChartUUID + "');return false;";
-					item.setLinkTitle(dispname);
-					dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-					item.setTitle(dispname);
-					item.setURL(url);
-					Dao.addItem(item);
-				}
+			List<NavBarDisplayDAO.Item> dxItems = createDaoItems(flowsheets, roleName$, bean.demographicNo, eChartUUID, request.getContextPath());
+			for (NavBarDisplayDAO.Item item : dxItems)
+			{
+				Dao.addItem(item);
 			}
 
 			//next we add program based flowsheets
@@ -169,29 +130,10 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 				programs.add(String.valueOf(admission.getProgramId()));
 			}
 			flowsheets = flowsheetService.getFlowsheetNamesFromProgram(programs);
-			for (int f = 0; f < flowsheets.size(); f++) {
-				NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
-				String flowsheetName = flowsheets.get(f);
-				if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, roleName$)) {
-					Flowsheet fs = null;
-					if ((fs = flowsheetDao.findByName(flowsheetName)) != null) {
-						if (!fs.isEnabled()) {
-							continue;
-						}
-					}
-					String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
-
-					winName = flowsheetName + bean.demographicNo;
-					uuid = UUID.randomUUID().toString();
-					hash = Math.abs(winName.hashCode());
-					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid +
-							"&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "&echartUUID=" + eChartUUID + "');return false;";
-					item.setLinkTitle(dispname);
-					dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-					item.setTitle(dispname);
-					item.setURL(url);
-					Dao.addItem(item);
-				}
+			List<NavBarDisplayDAO.Item> programItems = createDaoItems(flowsheets, roleName$, bean.demographicNo, eChartUUID, request.getContextPath());
+			for (NavBarDisplayDAO.Item item : programItems)
+			{
+				Dao.addItem(item);
 			}
 
 			MeasurementGroupStyleDao groupDao = SpringUtils.getBean(MeasurementGroupStyleDao.class);
@@ -292,4 +234,87 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 		return tmp;
 	}
 
+	private Flowsheet getFlowsheetFromSystemCache(String flowsheetName)
+	{
+		List<Flowsheet> systemFlowsheets = flowsheetService.getSystemFlowsheets();
+		for (Flowsheet systemFlowsheet : systemFlowsheets)
+		{
+			if (systemFlowsheet.getName().equals(flowsheetName))
+			{
+				return systemFlowsheet;
+			}
+		}
+		return null;
+	}
+
+	private Flowsheet getFlowsheetFromDatabaseCache(String flowsheetName)
+	{
+		List<Flowsheet> databaseFlowsheets = flowsheetService.getDatabaseFlowsheets();
+		for (Flowsheet databaseFlowsheet : databaseFlowsheets)
+		{
+			if (databaseFlowsheet.getName().equals(flowsheetName))
+			{
+				return databaseFlowsheet;
+			}
+		}
+		return null;
+	}
+
+	private FlowSheetUserCreated getFlowsheetFromUserCreatedCache(String flowsheetName)
+	{
+		List<FlowSheetUserCreated> userCreatedFlowsheets = flowsheetService.getUserCreatedFlowsheets();
+		for (FlowSheetUserCreated userCreated : userCreatedFlowsheets)
+		{
+			if (userCreated.getName().equals(flowsheetName))
+			{
+				return userCreated;
+			}
+		}
+		return null;
+	}
+
+	private List<NavBarDisplayDAO.Item> createDaoItems(List<String> flowsheets, String roleName$, String demographicNo, String eChartUUID, String contextPath)
+	{
+		com.quatro.service.security.SecurityManager securityMgr = new com.quatro.service.security.SecurityManager();
+		List<NavBarDisplayDAO.Item> itemsToAdd = new ArrayList<>();
+		for (String flowsheetName : flowsheets)
+		{
+			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
+			if (securityMgr.hasReadAccess("_flowsheet." + flowsheetName, roleName$))
+			{
+				String displayName;
+				Flowsheet fs = getFlowsheetFromSystemCache(flowsheetName);
+				FlowSheetUserCreated userCreated = getFlowsheetFromUserCreatedCache(flowsheetName);
+				if (fs == null)
+				{
+					fs = getFlowsheetFromDatabaseCache(flowsheetName);
+				}
+
+				if (fs != null && fs.isEnabled())
+				{
+					displayName = fs.getDisplayName();
+				}
+				else if (userCreated != null)
+				{
+					displayName = userCreated.getDisplayName();
+				}
+				else
+				{
+					continue;
+				}
+
+				String winName = flowsheetName + demographicNo;
+				String uuid = UUID.randomUUID().toString();
+				int hash = Math.abs(winName.hashCode());
+				String url = "popupPage(700,1000,'" + hash + "','" + contextPath + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid +
+						"&demographic_no=" + demographicNo + "&template=" + flowsheetName + "&echartUUID=" + eChartUUID + "');return false;";
+				item.setLinkTitle(displayName);
+				displayName = StringUtils.maxLenString(displayName, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
+				item.setTitle(displayName);
+				item.setURL(url);
+				itemsToAdd.add(item);
+			}
+		}
+		return itemsToAdd;
+	}
 }

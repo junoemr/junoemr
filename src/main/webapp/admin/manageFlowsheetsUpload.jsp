@@ -43,7 +43,6 @@
 %>
 
 
-<%@ page import="java.util.*,oscar.oscarReport.reportByTemplate.*"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -51,23 +50,24 @@
 <%@ page import="org.apache.commons.fileupload.FileUpload" %>
 <%@ page import="org.apache.commons.fileupload.FileItem" %>
 <%@ page import="org.apache.commons.fileupload.FileUploadException" %>
-<%@ page import="java.io.File" %>
-<%@ page import="java.io.StringWriter" %>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
 <%@ page import="org.oscarehr.measurements.model.Flowsheet" %>
 <%@ page import="org.oscarehr.measurements.dao.FlowsheetDao" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Iterator" %>
 
 <%
+	FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 boolean isMultipart = FileUpload.isMultipartContent(request);
 DiskFileUpload upload = new DiskFileUpload();
 
 try {
     //           Parse the request
     @SuppressWarnings("unchecked")
-    List<FileItem> items = upload.parseRequest(request);
+	List<FileItem> items = upload.parseRequest(request);
     //Process the uploaded items
     Iterator<FileItem> iter = items.iterator();
     while (iter.hasNext()) {
@@ -78,8 +78,7 @@ try {
             String contents = item.getString();
             
             //validate the data
-            MeasurementFlowSheet fs = null;
-            fs = MeasurementTemplateFlowSheetConfig.getInstance().validateFlowsheet(contents);
+            MeasurementFlowSheet fs = flowsheetService.validateFlowsheetTemplate(contents);
 
             //Check if flowsheet is in the flowsheet table
 			FlowsheetDao flowsheetDao = SpringUtils.getBean(FlowsheetDao.class);
@@ -102,7 +101,7 @@ try {
 					flowsheetDao.merge(existingFlowsheet);
 				}
 
-				MeasurementTemplateFlowSheetConfig.getInstance().reloadFlowsheets();
+				// flowsheetService.reloadFlowsheets();
             } else {
 				MiscUtils.getLogger().error("Invalid Flowsheet XML Format");
             }

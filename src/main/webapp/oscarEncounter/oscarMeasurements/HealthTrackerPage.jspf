@@ -57,6 +57,7 @@
 <%@ page import="oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler" %>
 <%@ page import="oscar.oscarPrevention.PreventionData" %>
 <%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
+<%@ page import="org.oscarehr.measurements.model.FlowSheetUserCreated" %>
 
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 
@@ -694,7 +695,6 @@ function fsPopup(width,height,url,window) {
 	for(Flowsheet systemFlowsheet : systemFlowsheets)
 	{
 		displayName = systemFlowsheet.getDisplayName();
-
 		MeasurementFlowSheet flowSheetGroups = null;
 
 		for (MeasurementFlowSheet measurementFlowSheet : flowsheetTemplates)
@@ -723,7 +723,6 @@ function fsPopup(width,height,url,window) {
 						
 			if(displayName.equals(flowSheet))
 			{
-							//current flowsheet							
 				try
 				{
 					dxCodeQueryString=flowSheetGroups.getDxTriggersQueryBuilder(demographic_no,providerNo);
@@ -735,7 +734,51 @@ function fsPopup(width,height,url,window) {
 			}
 											
 		}// if enabled and universal
-					
+	}
+
+	List<FlowSheetUserCreated> userCreatedFlowsheets = flowsheetService.getUserCreatedFlowsheets();
+
+	for (FlowSheetUserCreated userCreatedFlowsheet : userCreatedFlowsheets)
+	{
+		displayName = userCreatedFlowsheet.getDisplayName();
+		MeasurementFlowSheet flowSheetGroups = null;
+
+		for (MeasurementFlowSheet measurementFlowSheet : flowsheetTemplates)
+		{
+			if (measurementFlowSheet.getName() != null && measurementFlowSheet.getName().equals(userCreatedFlowsheet.getName()))
+			{
+				flowSheetGroups = measurementFlowSheet;
+				break;
+			}
+		}
+
+		if(!userCreatedFlowsheet.getArchived())
+		{
+			for (String flowsheetName : flowsheets)
+			{
+				if(flowsheetName.equals(flowSheetGroups.getName()))
+				{
+					diagnosed.add(flowSheetGroups.getName());
+					break;
+				}
+			}
+
+			flowsheetList.add(flowSheetGroups.getName());
+
+			if(displayName.equals(flowSheet))
+			{
+				try
+				{
+					dxCodeQueryString = flowSheetGroups.getDxTriggersQueryBuilder(demographic_no, providerNo);
+				}
+				catch(Exception e)
+				{
+					MiscUtils.getLogger().error("Error getting DxTriggers - Health Tracker",e);
+				}
+			}
+
+		}// if enabled and universal
+
 	}
 
 	int idx=0;
