@@ -76,6 +76,9 @@ body {
 .align-items-first-baseline {
 	align-items: first baseline;
 }
+.align-items-end {
+	align-items: end;
+}
 .justify-content-center {
 	justify-content: center;
 }
@@ -115,18 +118,22 @@ body {
 	display: inline-block;
 }
 
+.d-inline-block {
+	display: inline-block;
+}
+
 // more specific to override bootstrap 
 body {
 	.no-margin-top {
 		margin-top: 0;
 	}
 
-	.md-margin-top {
-		margin-top: $margin-md;
-	}
-
 	.xl-margin-right {
 		margin-right: $margin-xl;
+	}
+
+	.md-margin-top {
+		margin-top: $margin-md;
 	}
 
 	.md-margin-right {
@@ -135,6 +142,10 @@ body {
 
 	.sm-margin-right {
 		margin-right: $margin-sm;
+	}
+
+	.sm-margin-top {
+		margin-top: $margin-sm;
 	}
 
 	.xl-margin-left {
@@ -180,6 +191,10 @@ body {
 		margin-bottom: 0;
 	}
 
+	.lg-padding {
+		padding: $padding-lg;
+	}
+
 	.lg-padding-left {
 		padding-left: $padding-lg;
 	}
@@ -214,6 +229,14 @@ body {
 
 	.no-float {
 		float: none;
+	}
+
+	.float-left {
+		float: left;
+	}
+
+	.float-right {
+		float: right;
 	}
 }
 // Makes checkbox flush with input (as long as checkbox margin is 0)
@@ -300,6 +323,30 @@ a,.clickable {
 	height: 100%;
 }
 
+.height-50 {
+	height: 50%;
+}
+
+.height-33 {
+	height: 33%;
+}
+
+.height-25 {
+	height: 25%;
+}
+
 .width-100 {
 	width: 100%;
+}
+
+.width-50 {
+	width: 50%;
+}
+
+.width-33 {
+	width: 33%;
+}
+
+.width-25 {
+	width: 25%;
 }

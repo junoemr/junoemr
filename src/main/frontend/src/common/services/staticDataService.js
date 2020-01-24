@@ -377,6 +377,25 @@ angular.module("Common.Services").service("staticDataService", [
 			return types;
 		};
 
+		service.getProviderStatuses = function ()
+		{
+			let statuses = [];
+			statuses.push({
+				label: "Active",
+				value: true,
+			});
+			statuses.push({
+				label: "Deleted",
+				value: false,
+			});
+			statuses.push({
+				label: "All",
+				value: null,
+			});
+
+			return statuses;
+		};
+
 		service.getTitles = function getTitles()
 		{
 			var titles = [];

@@ -149,8 +149,7 @@ public class AdminNavService
 
 		userManagement.setName(resourceBundle.getString("admin.admin.UserManagement"));
 
-		userManagementItems.add(new AdminNavItemTo1("Add User", "addUser"));
-		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSearchProvider"), "frame?frameUrl=" + contextPath + "/admin/providersearchrecordshtm.jsp"));
+		userManagementItems.add(new AdminNavItemTo1("Manage Users", "manageUsers"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAddLogin"), "frame?frameUrl=" + contextPath + "/admin/securityaddarecord.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSearchLogin"), "frame?frameUrl=" + contextPath + "/admin/securitysearchrecordshtm.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.assignRole"), "frame?frameUrl=" + contextPath + "/admin/providerRole.jsp"));

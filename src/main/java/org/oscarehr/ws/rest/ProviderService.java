@@ -248,14 +248,26 @@ public class ProviderService extends AbstractServiceImpl {
 		
 		int startIndexVal = startIndex==null?0:startIndex.intValue();
 		int itemsToReturnVal = itemsToReturn==null?5000:startIndex.intValue();
-		boolean active = Boolean.valueOf(json.getString("active"));
+
+		String status = "%";// all provider statuses
+		if (json.containsKey("active"))
+		{
+			if(Boolean.valueOf(json.getString("active")))
+			{
+				status = ProviderData.PROVIDER_STATUS_ACTIVE;
+			}
+			else
+			{
+				status = ProviderData.PROVIDER_STATUS_INACTIVE;
+			}
+		}
 		
 		String term = null;
 		if(json.containsKey("searchTerm")) {
 			term = json.getString("searchTerm");
 		}
 		
-		List<Provider> results = providerManager.search(getLoggedInInfo(),term, active,startIndexVal, itemsToReturnVal);
+		List<Provider> results = providerManager.search(getLoggedInInfo(),term, status,startIndexVal, itemsToReturnVal);
 		
 		
 		ProviderConverter converter = new ProviderConverter();

@@ -54,6 +54,8 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public static final String COMMENT_ON_SPECIALITY_CODE = "xml_p_specialty_code";
 	public static final String COMMENT_ON_BILLING_GROUP_NO = "xml_p_billinggroup_no";
 
+	public static final String PROVIDER_STATUS_ACTIVE		= "1";
+	public static final String PROVIDER_STATUS_INACTIVE = "0";
 
 	/**
 	 * default serial version id for serializable

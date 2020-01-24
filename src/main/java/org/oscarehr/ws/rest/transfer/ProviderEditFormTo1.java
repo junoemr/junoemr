@@ -215,6 +215,9 @@ public class ProviderEditFormTo1 implements Serializable
 		providerData.setPractitionerNo(this.getCpsid());
 		providerData.setOntarioLifeLabsId(this.getLifeLabsClientId());
 
+		//TODO add status select to add / edit user page. TMP.
+		providerData.setStatus("1");
+
 		return providerData;
 	}
 
