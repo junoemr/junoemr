@@ -28,6 +28,25 @@ if (!Juno)
 }
 Juno.Validations = {};
 
+/**
+ * check if all validations in this validation object are valid
+ * @param validationObj - the validation object to check
+ * @returns {boolean} - true / false indicating weather all validations are valid.
+ */
+Juno.Validations.allValidationsValid = function(validationObj)
+{
+	for(let validation in validationObj)
+	{
+		if (Object.prototype.hasOwnProperty.call(validationObj, validation)) {
+			if (!validationObj[validation]())
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+};
+
 // generate a validation function. This is a nop validation and has no effect.
 // validationFunc, is a optional validation function that will be chained with this one.
 Juno.Validations.validationFieldNop = function(...validationFunc)

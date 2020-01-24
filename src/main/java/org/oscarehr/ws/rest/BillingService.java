@@ -41,17 +41,16 @@ import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.model.ServiceTypeTo;
-import org.oscarehr.ws.rest.transfer.AlbertaFacilityTo1;
-import org.oscarehr.ws.rest.transfer.AlbertaFunctionalCenterTo1;
-import org.oscarehr.ws.rest.transfer.AlbertaSkillCodeTo1;
-import org.oscarehr.ws.rest.transfer.BCBillingLocationTo1;
-import org.oscarehr.ws.rest.transfer.BCBillingVisitCodeTo1;
+import org.oscarehr.ws.rest.transfer.billing.AlbertaFacilityTo1;
+import org.oscarehr.ws.rest.transfer.billing.AlbertaFunctionalCenterTo1;
+import org.oscarehr.ws.rest.transfer.billing.AlbertaSkillCodeTo1;
+import org.oscarehr.ws.rest.transfer.billing.BCBillingLocationTo1;
+import org.oscarehr.ws.rest.transfer.billing.BCBillingVisitCodeTo1;
 import org.oscarehr.ws.rest.transfer.billing.OntarioMasterNumberTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import oscar.OscarProperties;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Path("/billing")

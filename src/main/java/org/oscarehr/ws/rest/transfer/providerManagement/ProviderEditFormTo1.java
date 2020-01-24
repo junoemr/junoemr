@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.transfer;
+package org.oscarehr.ws.rest.transfer.providerManagement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -56,6 +56,8 @@ public class ProviderEditFormTo1 implements Serializable
 	private String status;
 
 	// login info
+	private List<SecurityRecordTo1> securityRecords;
+	private Integer currentSecurityRecord;
 	private String email;
 	private String userName;
 	private String password;
@@ -300,34 +302,24 @@ public class ProviderEditFormTo1 implements Serializable
 	 * @return - a list of security records
 	 */
 	@JsonIgnore
-	public List<Security> getSecurityRecords(Integer providerNo) throws NoSuchAlgorithmException
+	public List<Security> getSecurityRecords(Integer providerNo, boolean edit) throws NoSuchAlgorithmException
 	{
-		ArrayList<Security> securityRecords = new ArrayList<>();
+		ArrayList<Security> newSecurityRecords = new ArrayList<>();
 
-		if (this.getPassword() != null && !this.getPassword().isEmpty() &&
-				this.getSecondLevelPasscode() != null && !this.getSecondLevelPasscode().isEmpty())
+		for (SecurityRecordTo1 securityRecordTo1 : this.getSecurityRecords())
 		{
-			// username login
-			if (this.getUserName() != null && !this.getUserName().isEmpty())
+			Security newSecurityRecord = new Security();
+			if (edit)
 			{
-				Security userNameSec = new Security();
-				userNameSec.setUserName(this.getUserName());
-				userNameSec.setRecordType(Security.RECORD_TYPE_USER_NAME);
-				setSecurityRecordCommonFields(userNameSec, providerNo);
-				securityRecords.add(userNameSec);
+				newSecurityRecord.setSecurityNo(securityRecordTo1.getSecurityNo());
 			}
-
-			// email login
-			if (this.getEmail() != null && !this.getEmail().isEmpty())
-			{
-				Security emailSec = new Security();
-				emailSec.setUserName(this.getEmail());
-				emailSec.setRecordType(Security.RECORD_TYPE_USER_EMAIL);
-				setSecurityRecordCommonFields(emailSec, providerNo);
-				securityRecords.add(emailSec);
-			}
+			newSecurityRecord.setUserName(securityRecordTo1.getUserName());
+			newSecurityRecord.setEmail(securityRecordTo1.getEmail());
+			setSecurityRecordCommonFields(newSecurityRecord, securityRecordTo1, providerNo);
+			newSecurityRecords.add(newSecurityRecord);
 		}
-		return securityRecords;
+
+		return newSecurityRecords;
 	}
 
 	/**
@@ -336,19 +328,25 @@ public class ProviderEditFormTo1 implements Serializable
 	 * @param providerNo - the provider to assign the record to.
 	 */
 	@JsonIgnore
-	private void setSecurityRecordCommonFields(Security security, Integer providerNo) throws NoSuchAlgorithmException
+	private void setSecurityRecordCommonFields(Security security, SecurityRecordTo1 securityRecordTo1, Integer providerNo) throws NoSuchAlgorithmException
 	{
-		// hash password
-		MessageDigest md = MessageDigest.getInstance("SHA");
-		byte[] btNewPasswd= md.digest(this.getPassword().getBytes());
-		StringBuilder sbTemp = new StringBuilder();
-		for(int i=0; i<btNewPasswd.length; i++)
+		if (securityRecordTo1.getPassword() != null && !securityRecordTo1.getPassword().isEmpty())
 		{
-			sbTemp.append(btNewPasswd[i]);
+			// hash password
+			MessageDigest md = MessageDigest.getInstance("SHA");
+			byte[] btNewPasswd = md.digest(securityRecordTo1.getPassword().getBytes());
+			StringBuilder sbTemp = new StringBuilder();
+			for (int i = 0; i < btNewPasswd.length; i++)
+			{
+				sbTemp.append(btNewPasswd[i]);
+			}
+			security.setPassword(sbTemp.toString());
 		}
 
-		security.setPassword(sbTemp.toString());
-		security.setPin(this.getSecondLevelPasscode());
+		if (securityRecordTo1.getPin() != null && !securityRecordTo1.getPin().isEmpty())
+		{
+			security.setPin(securityRecordTo1.getPin());
+		}
 		security.setProviderNo(providerNo.toString());
 		security.setBExpireset(0);
 		security.setBLocallockset(1);
@@ -844,5 +842,25 @@ public class ProviderEditFormTo1 implements Serializable
 	public void setStatus(String status)
 	{
 		this.status = status;
+	}
+
+	public List<SecurityRecordTo1> getSecurityRecords()
+	{
+		return securityRecords;
+	}
+
+	public void setSecurityRecords(List<SecurityRecordTo1> securityRecords)
+	{
+		this.securityRecords = securityRecords;
+	}
+
+	public Integer getCurrentSecurityRecord()
+	{
+		return currentSecurityRecord;
+	}
+
+	public void setCurrentSecurityRecord(Integer currentSecurityRecord)
+	{
+		this.currentSecurityRecord = currentSecurityRecord;
 	}
 }

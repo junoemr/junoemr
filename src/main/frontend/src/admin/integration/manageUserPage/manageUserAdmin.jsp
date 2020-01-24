@@ -115,12 +115,12 @@
 							<i class="icon icon-delete"></i>
 						</button>
 						<button
-										class="btn btn-danger  btn-active-hover sm-margin-left sm-margin-right"
+										class="btn btn-success  btn-active-hover sm-margin-left sm-margin-right"
 										title="Delete Provider"
 										ng-click="$ctrl.changeProviderStatus(provider.providerNo, '1')"
 										ng-if="!provider.enabled"
 						>
-							<i class="icon icon-delete"></i>
+							<i class="icon icon-check"></i>
 						</button>
 					</td>
 				</tr>

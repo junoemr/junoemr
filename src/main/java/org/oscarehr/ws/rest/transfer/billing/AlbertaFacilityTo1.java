@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.transfer;
+package org.oscarehr.ws.rest.transfer.billing;
 
 import org.oscarehr.billing.CA.AB.model.AlbertaFacility;
 import oscar.util.ConversionUtils;

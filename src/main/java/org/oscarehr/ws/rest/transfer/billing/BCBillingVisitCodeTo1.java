@@ -20,51 +20,48 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.transfer;
-
-import org.oscarehr.billing.CA.AB.model.AlbertaSkillCode;
-
+package org.oscarehr.ws.rest.transfer.billing;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlbertaSkillCodeTo1
+public class BCBillingVisitCodeTo1
 {
-	private String skillCode;
-	private String description;
+	private String visitType;
+	private String visitDescription;
 
-	public static List<AlbertaSkillCodeTo1> fromList(List<AlbertaSkillCode> albertaSkillCodes)
+	public static List<BCBillingVisitCodeTo1> fromList(List<Object[]> billingVisitList)
 	{
-		ArrayList<AlbertaSkillCodeTo1> albertaSkillCodeTo1s = new ArrayList<>();
-		for (AlbertaSkillCode albertaSkillCode : albertaSkillCodes)
+		ArrayList<BCBillingVisitCodeTo1> bcBillingVisitCodeTo1s = new ArrayList<>();
+		for (Object[] billingVisit : billingVisitList)
 		{
-			albertaSkillCodeTo1s.add(new AlbertaSkillCodeTo1(albertaSkillCode));
+			bcBillingVisitCodeTo1s.add(new BCBillingVisitCodeTo1(billingVisit));
 		}
-		return albertaSkillCodeTo1s;
+		return bcBillingVisitCodeTo1s;
 	}
 
-	public AlbertaSkillCodeTo1(AlbertaSkillCode albertaSkillCode)
+	public BCBillingVisitCodeTo1(Object[] billingVisit)
 	{
-		this.skillCode = albertaSkillCode.getSkillCode();
-		this.description = albertaSkillCode.getDescription();
+		this.visitType = (String)billingVisit[0];
+		this.visitDescription = (String)billingVisit[1];
 	}
 
-	public String getSkillCode()
+	public String getVisitType()
 	{
-		return skillCode;
+		return visitType;
 	}
 
-	public void setSkillCode(String skillCode)
+	public void setVisitType(String visitType)
 	{
-		this.skillCode = skillCode;
+		this.visitType = visitType;
 	}
 
-	public String getDescription()
+	public String getVisitDescription()
 	{
-		return description;
+		return visitDescription;
 	}
 
-	public void setDescription(String description)
+	public void setVisitDescription(String visitDescription)
 	{
-		this.description = description;
+		this.visitDescription = visitDescription;
 	}
 }

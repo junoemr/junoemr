@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.transfer;
+package org.oscarehr.ws.rest.transfer.providerManagement;
 
 public class ProviderEditResponseTo1
 {

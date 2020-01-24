@@ -44,10 +44,6 @@ import java.util.Date;
 public class Security extends AbstractModel<Integer> {
 	private static Logger logger = MiscUtils.getLogger();
 
-	public static final String RECORD_TYPE_CUSTOM			= "CUSTOM";
-	public static final String RECORD_TYPE_USER_NAME 	= "USER_NAME";
-	public static final String RECORD_TYPE_USER_EMAIL = "USER_EMAIL";
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "security_no")
@@ -55,6 +51,9 @@ public class Security extends AbstractModel<Integer> {
 	
 	@Column(name = "user_name")
 	private String userName;
+
+	@Column(name = "email")
+	private String email;
 	
 	@Column(name = "password")
 	private String password;
@@ -80,9 +79,6 @@ public class Security extends AbstractModel<Integer> {
 
 	@Column(name="forcePasswordReset")
 	private Boolean forcePasswordReset = true;
-
-	@Column(name="record_type")
-	private String recordType = Security.RECORD_TYPE_CUSTOM;
 
 	/** default constructor */
 	public Security() {
@@ -205,14 +201,14 @@ public class Security extends AbstractModel<Integer> {
 		this.id = id;
 	}
 
-	public String getRecordType()
+	public String getEmail()
 	{
-		return recordType;
+		return email;
 	}
 
-	public void setRecordType(String recordType)
+	public void setEmail(String email)
 	{
-		this.recordType = recordType;
+		this.email = email;
 	}
 
 	/**

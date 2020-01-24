@@ -20,48 +20,40 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.transfer;
+package org.oscarehr.ws.rest.transfer.billing;
 
-import org.oscarehr.billing.CA.AB.model.AlbertaFunctionalCenter;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlbertaFunctionalCenterTo1 implements Serializable
+public class BCBillingLocationTo1
 {
-	private String code;
+	private String billingLocation;
 	private String description;
 
-	/**
-	 * Create a list of alberta functional center transfer objects from a list of alberta functional centers
-	 * @param albertaFunctionalCenters - the functional centers to convert
-	 * @return - a new list of functional center transfer objects
-	 */
-	public static List<AlbertaFunctionalCenterTo1> fromList(List<AlbertaFunctionalCenter> albertaFunctionalCenters)
+	public static List<BCBillingLocationTo1> fromList(List<Object[]> billingLocationList)
 	{
-		ArrayList<AlbertaFunctionalCenterTo1> albertaFunctionalCenterTo1s = new ArrayList<>();
-		for (AlbertaFunctionalCenter functionalCenter : albertaFunctionalCenters)
+		ArrayList<BCBillingLocationTo1> bcBillingLocationTo1s = new ArrayList<>();
+		for (Object[] billingLocation : billingLocationList)
 		{
-			albertaFunctionalCenterTo1s.add(new AlbertaFunctionalCenterTo1(functionalCenter));
+			bcBillingLocationTo1s.add(new BCBillingLocationTo1(billingLocation));
 		}
-		return albertaFunctionalCenterTo1s;
+		return bcBillingLocationTo1s;
 	}
 
-	public AlbertaFunctionalCenterTo1 (AlbertaFunctionalCenter albertaFunctionalCenter)
+	public BCBillingLocationTo1(Object[] billingLocation)
 	{
-		this.code = albertaFunctionalCenter.getCode();
-		this.description = albertaFunctionalCenter.getDescription();
+		this.billingLocation = (String)billingLocation[0];
+		this.description = (String)billingLocation[1];
 	}
 
-	public String getCode()
+	public String getBillingLocation()
 	{
-		return code;
+		return billingLocation;
 	}
 
-	public void setCode(String code)
+	public void setBillingLocation(String billingLocation)
 	{
-		this.code = code;
+		this.billingLocation = billingLocation;
 	}
 
 	public String getDescription()

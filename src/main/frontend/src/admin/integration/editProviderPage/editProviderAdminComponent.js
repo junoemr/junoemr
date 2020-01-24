@@ -103,6 +103,9 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			}
 		];
 
+		// security records that can be edited.
+		ctrl.securityRecordOptions = [];
+
 		// options for the BC rural retention code field
 		ctrl.bcBillingLocationOptions = [];
 
@@ -148,6 +151,8 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			status: "1",// active by default
 
 			// Login Info
+			securityRecords: [],
+			currentSecurityRecord: null,
 			email: null,
 			userName: null,
 			password: null,
@@ -213,66 +218,69 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.setupFormValidations = function()
 		{
-			// provider field validations built using, Expressive Validations TM.
-			ctrl.providerValidations = {};
-
 			// generic validations
-			let commonValidations = {
+			ctrl.providerValidations = {
 				// User Info
 				firstName: Juno.Validations.validationFieldRequired(ctrl.provider, 'firstName'),
 				lastName: Juno.Validations.validationFieldRequired(ctrl.provider, 'lastName'),
-				type: Juno.Validations.validationFieldRequired(ctrl.provider, 'type'),
-
-				// Login Info
-				emailOrUserName: Juno.Validations.validationFieldOr(
-						Juno.Validations.validationFieldRequired(ctrl.provider, 'userName'),
-						Juno.Validations.validationFieldRequired(ctrl.provider, 'email')
-				),
+				type: Juno.Validations.validationFieldRequired(ctrl.provider, 'type')
 			};
 
 			// password field validations
-			let passwordValidations = {};
 			if (ctrl.mode === EDIT_PROVIDER_MODE.ADD)
 			{
-				passwordValidations = {
-					password: Juno.Validations.validationFieldRequired(ctrl.provider, 'password', Juno.Validations.validationPassword(ctrl.provider, 'password')),
-					passwordVerify: Juno.Validations.validationFieldRequired(ctrl.provider, 'passwordVerify'),
-					passwordMatch: Juno.Validations.validationFieldsEqual(
-							ctrl.provider, 'password',
-							ctrl.provider, 'passwordVerify'),
-					secondLevelPasscode: Juno.Validations.validationFieldRequired(ctrl.provider, 'secondLevelPasscode',
-							Juno.Validations.validationFieldNumber(ctrl.provider, 'secondLevelPasscode')),
-					secondLevelPasscodeVerify: Juno.Validations.validationFieldRequired(ctrl.provider, 'secondLevelPasscodeVerify',
-							Juno.Validations.validationFieldNumber(ctrl.provider, 'secondLevelPasscodeVerify')),
-					secondLevelPasscodeMatch: Juno.Validations.validationFieldsEqual(
-							ctrl.provider, 'secondLevelPasscode',
-							ctrl.provider, 'secondLevelPasscodeVerify'),
-				};
+				for (let secRecord of ctrl.provider.securityRecords)
+				{
+					secRecord.validations = {
+						password: Juno.Validations.validationFieldRequired(secRecord, 'password',
+								Juno.Validations.validationPassword(secRecord, 'password')),
+						passwordVerify: Juno.Validations.validationFieldRequired(secRecord, 'passwordVerify'),
+						passwordMatch: Juno.Validations.validationFieldsEqual(
+								secRecord, 'password',
+								secRecord, 'passwordVerify'),
+						secondLevelPasscode: Juno.Validations.validationFieldRequired(secRecord, 'pin',
+								Juno.Validations.validationFieldNumber(secRecord, 'pin')),
+						secondLevelPasscodeVerify: Juno.Validations.validationFieldRequired(secRecord, 'pinVerify',
+								Juno.Validations.validationFieldNumber(secRecord, 'pinVerify')),
+						secondLevelPasscodeMatch: Juno.Validations.validationFieldsEqual(
+								secRecord, 'pin',
+								secRecord, 'pinVerify'),
+						// user name / email
+						emailOrUserName: Juno.Validations.validationFieldOr(
+								Juno.Validations.validationFieldRequired(secRecord, 'userName'),
+								Juno.Validations.validationFieldRequired(secRecord, 'email'))
+					};
+				}
 			}
 			else if (ctrl.mode === EDIT_PROVIDER_MODE.EDIT)
 			{
-				passwordValidations = {
-					// password blank or password and validation must match
-					password: Juno.Validations.validationFieldNop(),
-					passwordVerify: Juno.Validations.validationFieldNop(),
-					passwordMatch: Juno.Validations.validationFieldBlankOrOther(ctrl.provider, 'password',
-							Juno.Validations.validationFieldsEqual(
-									ctrl.provider, 'password',
-									ctrl.provider, 'passwordVerify')),
-					// pin blank or pin and validation must match
-					secondLevelPasscode: Juno.Validations.validationFieldBlankOrOther(ctrl.provider, 'secondLevelPasscode',
-							Juno.Validations.validationFieldNumber(ctrl.provider, 'secondLevelPasscode')),
-					secondLevelPasscodeVerify: Juno.Validations.validationFieldBlankOrOther(ctrl.provider, 'secondLevelPasscodeVerify',
-							Juno.Validations.validationFieldNumber(ctrl.provider, 'secondLevelPasscodeVerify')),
-					secondLevelPasscodeMatch: Juno.Validations.validationFieldBlankOrOther(ctrl.provider, 'secondLevelPasscode',
-							Juno.Validations.validationFieldsEqual(
-									ctrl.provider, 'secondLevelPasscode',
-									ctrl.provider, 'secondLevelPasscodeVerify')),
-
-				};
+				for (let secRecord of ctrl.provider.securityRecords)
+				{
+					secRecord.validations = {
+						// password blank or password and validation must match
+						password: Juno.Validations.validationFieldBlankOrOther(secRecord, 'password',
+								Juno.Validations.validationPassword(secRecord, 'password')),
+						passwordVerify: Juno.Validations.validationFieldNop(),
+						passwordMatch: Juno.Validations.validationFieldBlankOrOther(secRecord, 'password',
+								Juno.Validations.validationFieldsEqual(
+										secRecord, 'password',
+										secRecord, 'passwordVerify')),
+						// pin blank or pin and validation must match
+						secondLevelPasscode: Juno.Validations.validationFieldBlankOrOther(secRecord, 'pin',
+								Juno.Validations.validationFieldNumber(secRecord, 'pin')),
+						secondLevelPasscodeVerify: Juno.Validations.validationFieldBlankOrOther(secRecord, 'pinVerify',
+								Juno.Validations.validationFieldNumber(secRecord, 'pinVerify')),
+						secondLevelPasscodeMatch: Juno.Validations.validationFieldBlankOrOther(secRecord, 'pin',
+								Juno.Validations.validationFieldsEqual(
+										secRecord, 'pin',
+										secRecord, 'pinVerify')),
+						// user name / email
+						emailOrUserName: Juno.Validations.validationFieldOr(
+								Juno.Validations.validationFieldRequired(secRecord, 'userName'),
+								Juno.Validations.validationFieldRequired(secRecord, 'email'))
+					};
+				}
 			}
-
-			Object.assign(ctrl.providerValidations, commonValidations, passwordValidations);
 		};
 
 		ctrl.$onInit = async function()
@@ -374,6 +382,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			}
 			else
 			{
+				ctrl.setupSecurityRecords();
 				ctrl.setupFormValidations();
 			}
 		};
@@ -566,6 +575,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					{
 						ctrl.provider = result.body;
 						ctrl.mapTypeaheadValues();
+						ctrl.setupSecurityRecords();
 						ctrl.setupFormValidations();
 					},
 					function error(result)
@@ -595,6 +605,61 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			ctrl.provider.abFunctionalCenter = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.abFunctionalCenter, ctrl.albertaFunctionalCenterOptions);
 			// time role modifier
 			ctrl.provider.abRoleModifier = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.abRoleModifier, ctrl.albertaDefaultTimeRoleOptions);
+		};
+
+		ctrl.setupSecurityRecords = function ()
+		{
+			// in add mode add one "new" security record.
+			if (ctrl.mode === EDIT_PROVIDER_MODE.ADD)
+			{
+				ctrl.provider.securityRecords = [];
+				ctrl.provider.securityRecords.push({
+					securityNo: -1,
+					userName: "",
+					email: "",
+					password: "",
+					providerNo: null,
+					pin: ""
+				});
+				ctrl.provider.currentSecurityRecord = -1;
+			}
+			else if (ctrl.mode === EDIT_PROVIDER_MODE.EDIT || ctrl.mode === EDIT_PROVIDER_MODE.VIEW)
+			{
+				// convert security record transfers in to option list for user selection.
+				ctrl.securityRecordOptions = [];
+				for (let securityRecord of ctrl.provider.securityRecords)
+				{
+					let label = securityRecord.userName;
+					if (securityRecord.email)
+					{
+						label += " - " + securityRecord.email;
+					}
+					if (securityRecord.securityNo === -1)
+					{
+						label = "New Record"
+					}
+					ctrl.securityRecordOptions.push(
+							{
+								label: label,
+								value: securityRecord.securityNo
+							}
+					)
+				}
+
+				// if current securityNo is not in the list set to no selection.
+				if (!ctrl.securityRecordOptions.find((sec) => sec.value === ctrl.provider.currentSecurityRecord))
+				{
+					ctrl.provider.currentSecurityRecord = null;
+				}
+			}
+
+			// add additional password / pin / validations fields to security objects
+			for (let securityRecord of ctrl.provider.securityRecords)
+			{
+				securityRecord.passwordVerify = "";
+				securityRecord.pinVerify = "";
+				securityRecord.validations = null;
+			}
 		};
 
 		ctrl.submit = function()
@@ -707,16 +772,15 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.allFieldsValid = function ()
 		{
-			for(let validation in ctrl.providerValidations)
+			for (let securityRecord of ctrl.provider.securityRecords)
 			{
-				if (Object.prototype.hasOwnProperty.call(ctrl.providerValidations, validation)) {
-					if (!ctrl.providerValidations[validation]())
-					{
-						return false;
-					}
+				if (!Juno.Validations.allValidationsValid(securityRecord.validations))
+				{
+					return false;
 				}
 			}
-			return true;
+
+			return Juno.Validations.allValidationsValid(ctrl.providerValidations);
 		};
 
 		// transition to edit mode.

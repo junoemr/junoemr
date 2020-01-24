@@ -20,48 +20,51 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.transfer;
+package org.oscarehr.ws.rest.transfer.billing;
+
+import org.oscarehr.billing.CA.AB.model.AlbertaSkillCode;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class BCBillingVisitCodeTo1
+public class AlbertaSkillCodeTo1
 {
-	private String visitType;
-	private String visitDescription;
+	private String skillCode;
+	private String description;
 
-	public static List<BCBillingVisitCodeTo1> fromList(List<Object[]> billingVisitList)
+	public static List<AlbertaSkillCodeTo1> fromList(List<AlbertaSkillCode> albertaSkillCodes)
 	{
-		ArrayList<BCBillingVisitCodeTo1> bcBillingVisitCodeTo1s = new ArrayList<>();
-		for (Object[] billingVisit : billingVisitList)
+		ArrayList<AlbertaSkillCodeTo1> albertaSkillCodeTo1s = new ArrayList<>();
+		for (AlbertaSkillCode albertaSkillCode : albertaSkillCodes)
 		{
-			bcBillingVisitCodeTo1s.add(new BCBillingVisitCodeTo1(billingVisit));
+			albertaSkillCodeTo1s.add(new AlbertaSkillCodeTo1(albertaSkillCode));
 		}
-		return bcBillingVisitCodeTo1s;
+		return albertaSkillCodeTo1s;
 	}
 
-	public BCBillingVisitCodeTo1(Object[] billingVisit)
+	public AlbertaSkillCodeTo1(AlbertaSkillCode albertaSkillCode)
 	{
-		this.visitType = (String)billingVisit[0];
-		this.visitDescription = (String)billingVisit[1];
+		this.skillCode = albertaSkillCode.getSkillCode();
+		this.description = albertaSkillCode.getDescription();
 	}
 
-	public String getVisitType()
+	public String getSkillCode()
 	{
-		return visitType;
+		return skillCode;
 	}
 
-	public void setVisitType(String visitType)
+	public void setSkillCode(String skillCode)
 	{
-		this.visitType = visitType;
+		this.skillCode = skillCode;
 	}
 
-	public String getVisitDescription()
+	public String getDescription()
 	{
-		return visitDescription;
+		return description;
 	}
 
-	public void setVisitDescription(String visitDescription)
+	public void setDescription(String description)
 	{
-		this.visitDescription = visitDescription;
+		this.description = description;
 	}
 }

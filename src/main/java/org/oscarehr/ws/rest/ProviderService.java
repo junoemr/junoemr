@@ -31,42 +31,29 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.log4j.Logger;
-import org.chip.ping.xml.record.SecurityInfo;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.dao.ProviderSiteDao;
-import org.oscarehr.common.dao.SecRoleDao;
-import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.ProviderSite;
-import org.oscarehr.common.model.ProviderSitePK;
-import org.oscarehr.common.model.Security;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.model.RecentDemographicAccess;
-import org.oscarehr.provider.service.ProviderRoleService;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.transfer.ProviderEditFormTo1;
+import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
 import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
-import org.oscarehr.ws.rest.transfer.ProviderEditResponseTo1;
+import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditResponseTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import sun.rmi.runtime.Log;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -78,7 +65,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -215,7 +201,7 @@ public class ProviderService extends AbstractServiceImpl {
 		@Produces(MediaType.APPLICATION_JSON)
 		public RestResponse<ProviderEditFormTo1> getProviderEditForm(@PathParam("id") Integer id)
 		{
-			return RestResponse.successResponse(providerService.getEditFormForProvider(id));
+			return RestResponse.successResponse(providerService.getEditFormForProvider(id, getLoggedInInfo().getLoggedInSecurity()));
 		}
 
     @GET

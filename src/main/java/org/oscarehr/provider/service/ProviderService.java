@@ -31,7 +31,6 @@ import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.common.model.ProviderSite;
-import org.oscarehr.common.model.ProviderSitePK;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
@@ -40,16 +39,15 @@ import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.oscarehr.site.service.SiteService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
-import org.oscarehr.ws.rest.transfer.ProviderEditFormTo1;
+import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
+import org.oscarehr.ws.rest.transfer.providerManagement.SecurityRecordTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.oscarProvider.data.ProviderBillCenter;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -152,7 +150,7 @@ public class ProviderService
 	 * @param providerNo - the provider to get the form for.
 	 * @return - the edit provider form.
 	 */
-	public ProviderEditFormTo1 getEditFormForProvider(Integer providerNo)
+	public ProviderEditFormTo1 getEditFormForProvider(Integer providerNo, Security loggedInSecurity)
 	{
 		ProviderData provider = providerDataDao.findByProviderNo(providerNo.toString());
 		ProviderEditFormTo1 providerEditFormTo1 = new ProviderEditFormTo1();
@@ -168,17 +166,9 @@ public class ProviderService
 		}
 
 		//set security records
-		Security unameSec = securityDao.findProviderUserNameSecurityRecord(providerNo.toString());
-		if (unameSec != null)
-		{
-			providerEditFormTo1.setUserName(unameSec.getUserName());
-		}
-
-		Security emailSec = securityDao.findProviderEmailSecurityRecord(providerNo.toString());
-		if (emailSec != null)
-		{
-			providerEditFormTo1.setEmail(emailSec.getUserName());
-		}
+		//Security unameSec = securityDao.findProviderUserNameSecurityRecord(providerNo.toString());
+		providerEditFormTo1.setSecurityRecords(SecurityRecordTo1.fromList(securityDao.findByProviderNo(providerNo.toString())));
+		providerEditFormTo1.setCurrentSecurityRecord(loggedInSecurity.getSecurityNo());
 
 		//set sites
 		List<ProviderSite> providerSites = providerSiteDao.findByProviderNo(provider.getProviderNo().toString());
@@ -217,7 +207,9 @@ public class ProviderService
 		providerBilling.setProviderNo(provider.getProviderNo());
 		providerBillingDao.persist(providerBilling);
 
-		updateProviderSiteSecRole(providerEditFormTo1, provider.getProviderNo());
+		updateProviderSiteAndRole(providerEditFormTo1, provider.getProviderNo());
+
+		createProviderSecurityRecords(providerEditFormTo1, provider.getProviderNo());
 
 		return provider;
 	}
@@ -243,7 +235,9 @@ public class ProviderService
 			providerBilling.setProviderNo(newProviderData.getProviderNo());
 			providerBillingDao.merge(providerBilling);
 
-			updateProviderSiteSecRole(providerEditFormTo1, newProviderData.getProviderNo());
+			updateProviderSiteAndRole(providerEditFormTo1, newProviderData.getProviderNo());
+
+			editProviderSecurityRecords(providerEditFormTo1, newProviderData.getProviderNo());
 
 			return newProviderData;
 		}
@@ -258,11 +252,8 @@ public class ProviderService
 	 * @param providerEditFormTo1 - provider edit from containing site, security, role info.
 	 * @param providerNo - provider no
 	 */
-	public synchronized void updateProviderSiteSecRole(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
+	public synchronized void updateProviderSiteAndRole(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
 	{
-		// edit security records
-		upsertProviderSecurityRecords(providerEditFormTo1, providerNo);
-
 		// assign provider sites
 		siteService.assignProviderSites(providerEditFormTo1.getSiteAssignments(), providerNo);
 		siteService.removeOtherSites(providerEditFormTo1.getSiteAssignments(), providerNo);
@@ -277,33 +268,25 @@ public class ProviderService
 	}
 
 	/**
-	 * create or update provider security records.
-	 * @param providerEditFormTo1 - the provider form to use to update / create records
-	 * @param providerNo - the provider no to create for.
+	 * create new provider security records
+	 * @param providerEditFormTo1 - the provider edit form containing the records to create
+	 * @param providerNo - the provider to create the records for.
 	 */
-	private synchronized void upsertProviderSecurityRecords(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
+	private synchronized void createProviderSecurityRecords(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
 	{
 		try
 		{
-			List<Security> securityList = providerEditFormTo1.getSecurityRecords(providerNo);
+			List<Security> securityList = providerEditFormTo1.getSecurityRecords(providerNo, false);
 			for (Security security : securityList)
 			{
 				List<Security> existingRecords = securityDao.findByUserName(security.getUserName());
-				if (existingRecords != null && existingRecords.size() == 1)
+				if (existingRecords.size() == 0)
 				{
-					if (existingRecords.get(0).getProviderNo().equals(providerNo.toString()))
-					{// we "own" this record. update.
-						security.setSecurityNo(existingRecords.get(0).getSecurityNo());
-						securityDao.merge(security);
-					}
-					else
-					{
-						throw new SecurityRecordAlreadyExistsException("Security Record already exists");
-					}
+					securityDao.persist(security);
 				}
 				else
 				{
-					securityDao.persist(security);
+					throw new SecurityRecordAlreadyExistsException("Security Record already exists");
 				}
 			}
 		}
@@ -311,5 +294,65 @@ public class ProviderService
 		{
 			throw new RuntimeException("Internal Server error " + nae.toString());
 		}
+	}
+
+	/**
+	 * edit provider security records
+	 * @param providerEditFormTo1 - the provider edit form containing security record update info
+	 * @param providerNo - the provider number to edit records for.
+	 */
+	private synchronized void editProviderSecurityRecords(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
+	{
+		try
+		{
+			List<Security> securityList = providerEditFormTo1.getSecurityRecords(providerNo, true);
+			for (Security newSecurityRecord : securityList)
+			{
+				List<Security> existingRecords = securityDao.findByUserName(newSecurityRecord.getUserName());
+
+				// check for collision with record other than self.
+				boolean collision = false;
+				for (Security existingRecord : existingRecords)
+				{
+					if (!existingRecord.getSecurityNo().equals(newSecurityRecord.getSecurityNo()))
+					{
+						collision = true;
+						break;
+					}
+				}
+
+				if (collision)
+				{
+					throw new SecurityRecordAlreadyExistsException("Security Record already exists");
+				}
+				else
+				{
+					Security recordToEdit = securityDao.find(newSecurityRecord.getSecurityNo());
+					if (recordToEdit != null)
+					{
+						updateSecurityRecord(recordToEdit, newSecurityRecord);
+						securityDao.merge(recordToEdit);
+					}
+				}
+			}
+		}
+		catch (NoSuchAlgorithmException nae)
+		{
+			throw new RuntimeException("Internal Server error " + nae.toString());
+		}
+	}
+
+	private void updateSecurityRecord(Security existingRecord, Security source)
+	{
+		if (source.getPassword() != null)
+		{
+			existingRecord.setPassword(source.getPassword());
+		}
+		if (source.getPin() != null)
+		{
+			existingRecord.setPin(source.getPin());
+		}
+		existingRecord.setUserName(source.getUserName());
+		existingRecord.setEmail(source.getEmail());
 	}
 }

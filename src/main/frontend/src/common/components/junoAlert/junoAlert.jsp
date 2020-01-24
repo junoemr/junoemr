@@ -41,9 +41,9 @@
 					Ok
 				</button>
 			</div>
-			<div class="width-100" ng-if="$ctrl.resolve.mode === $ctrl.alertModes.CONFIRM">
-				<button class="btn btn-danger width-33 float-left" ng-click="$ctrl.onSelection(false)">Cancel</button>
-				<button class="btn btn-primary width-33 float-right" ng-click="$ctrl.onSelection(true)">Ok</button>
+			<div class="width-100 flex-row justify-content-center" ng-if="$ctrl.resolve.mode === $ctrl.alertModes.CONFIRM">
+				<button class="btn btn-danger confirm-btn flex-grow sm-margin-right" ng-click="$ctrl.onSelection(false)">Cancel</button>
+				<button class="btn btn-primary confirm-btn flex-grow sm-margin-left" ng-click="$ctrl.onSelection(true)">Ok</button>
 			</div>
 		</div>
 	</div>
