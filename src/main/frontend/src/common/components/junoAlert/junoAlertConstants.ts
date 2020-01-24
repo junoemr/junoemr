@@ -24,5 +24,6 @@
 export enum JUNO_ALERT_MODES
 {
     SUCCESS,
-    ERROR
+    ERROR,
+    CONFIRM
 }

@@ -207,7 +207,6 @@ public class ProviderService
 	 * @param loggedInInfo - logged in info
 	 * @return - the newly created provider object
 	 */
-	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public synchronized ProviderData createProvider(ProviderEditFormTo1 providerEditFormTo1, LoggedInInfo loggedInInfo)
 	{
 		// create provider record
@@ -223,7 +222,6 @@ public class ProviderService
 		return provider;
 	}
 
-	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public synchronized ProviderData editProvider(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
 	{
 		ProviderData providerData = providerDataDao.find(providerNo.toString());
@@ -260,7 +258,6 @@ public class ProviderService
 	 * @param providerEditFormTo1 - provider edit from containing site, security, role info.
 	 * @param providerNo - provider no
 	 */
-	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public synchronized void updateProviderSiteSecRole(ProviderEditFormTo1 providerEditFormTo1, Integer providerNo)
 	{
 		// edit security records

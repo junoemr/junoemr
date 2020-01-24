@@ -53,6 +53,7 @@ public class ProviderEditFormTo1 implements Serializable
 	private String team;
 	private String sex;
 	private LocalDate dateOfBirth;
+	private String status;
 
 	// login info
 	private String email;
@@ -130,6 +131,7 @@ public class ProviderEditFormTo1 implements Serializable
 		this.setTeam(providerData.getTeam());
 		this.setSex(providerData.getSex());
 		this.setDateOfBirth(ConversionUtils.toNullableLocalDate(providerData.getDob()));
+		this.setStatus(providerData.getStatus());
 
 		this.setAddress(providerData.getAddress());
 		this.setHomePhone(providerData.getPhone());
@@ -177,6 +179,7 @@ public class ProviderEditFormTo1 implements Serializable
 		providerData.setTeam(this.getTeam());
 		providerData.setSex(this.getSex());
 		providerData.setDob(this.getDateOfBirth() != null ? ConversionUtils.toLegacyDate(this.getDateOfBirth()) : null);
+		providerData.setStatus(this.getStatus());
 
 		providerData.setAddress(this.getAddress());
 		providerData.setPhone(this.getHomePhone());
@@ -214,9 +217,6 @@ public class ProviderEditFormTo1 implements Serializable
 		providerData.setAlbertaConnectCareId(this.getConnectCareProviderId());
 		providerData.setPractitionerNo(this.getCpsid());
 		providerData.setOntarioLifeLabsId(this.getLifeLabsClientId());
-
-		//TODO add status select to add / edit user page. TMP.
-		providerData.setStatus("1");
 
 		return providerData;
 	}
@@ -834,5 +834,15 @@ public class ProviderEditFormTo1 implements Serializable
 	public void seteDeliveryIds(String eDeliveryIds)
 	{
 		this.eDeliveryIds = eDeliveryIds;
+	}
+
+	public String getStatus()
+	{
+		return status;
+	}
+
+	public void setStatus(String status)
+	{
+		this.status = status;
 	}
 }

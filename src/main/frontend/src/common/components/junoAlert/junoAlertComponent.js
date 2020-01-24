@@ -37,6 +37,11 @@ angular.module('Common.Components').component('junoAlertComponent',
 		ctrl.close = function()
 		{
 			ctrl.modalInstance.close();
+		};
+
+		ctrl.onSelection = function(userOk)
+		{
+			ctrl.modalInstance.close(userOk);
 		}
 	}]
 });

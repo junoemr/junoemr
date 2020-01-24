@@ -28,12 +28,14 @@ angular.module('Admin.Integration').component('manageUsersAdmin',
 	controller: [
 			'$scope',
 			'$location',
+			'$uibModal',
 			'staticDataService',
 			'NgTableParams',
 			'providerService',
 		function (
 				$scope,
 				$location,
+				$uibModal,
 				staticDataService,
 				NgTableParams,
 				providerService,
@@ -153,9 +155,55 @@ angular.module('Admin.Integration').component('manageUsersAdmin',
 			$location.url("/admin/editUser?providerNo=" + providerNo);
 		};
 
-		ctrl.inactivateProvider = function (providerNo)
+		ctrl.changeProviderStatus = async function (providerNo, status)
 		{
-			console.log("DELETE OR SOME THING");
+			try
+			{
+				let title = "";
+				let message = "Are you sure you want to";
+				if (status === "1")
+				{
+					title = "Enable Provider?";
+					message += " enable this provider?";
+				}
+				else
+				{
+					title = "Disable Provider?";
+					message += " delete this provider?"
+				}
+
+				let choice = await Juno.Common.Util.confirmationDialog($uibModal, title, message);
+				if (choice)
+				{
+					// load the provider edit form
+					providerService.getProviderEditForm(providerNo).then(
+							function success(result)
+							{
+								let provider = result.body;
+								provider.status = status;
+								providerService.editProvider(providerNo, provider).then(
+										function success(result)
+										{
+											// reload provider list
+											ctrl.loadProviderList();
+										},
+										function error(result)
+										{
+											console.error("Error inactivating provider, error: " + result);
+										}
+								);
+							},
+							function error(result)
+							{
+								console.error("Failed to load provider edit form with error: " + result);
+							}
+					);
+				}
+			}
+			catch (e)
+			{
+				console.error("An error occurred while presenting inactivate provider dialog. error: " + e);
+			}
 		}
 	}]
 });

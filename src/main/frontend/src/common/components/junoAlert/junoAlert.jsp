@@ -30,9 +30,9 @@
 			<p>{{$ctrl.resolve.message}}</p>
 		</div>
 		<div class="col-xs-12 no-padding md-margin-top">
-			<div class="width-100">
+			<div class="width-100" ng-if="$ctrl.resolve.mode === $ctrl.alertModes.ERROR || $ctrl.resolve.mode === $ctrl.alertModes.SUCCESS">
 				<button
-								class="btn ok-button width-100"
+								class="btn width-100"
 								ng-click="$ctrl.close()"
 								ng-class="{
 									'btn-danger': $ctrl.resolve.mode === $ctrl.alertModes.ERROR,
@@ -40,6 +40,10 @@
 								}">
 					Ok
 				</button>
+			</div>
+			<div class="width-100" ng-if="$ctrl.resolve.mode === $ctrl.alertModes.CONFIRM">
+				<button class="btn btn-danger width-33 float-left" ng-click="$ctrl.onSelection(false)">Cancel</button>
+				<button class="btn btn-primary width-33 float-right" ng-click="$ctrl.onSelection(true)">Ok</button>
 			</div>
 		</div>
 	</div>

@@ -388,6 +388,23 @@ Juno.Common.Util.errorAlert = function(uibModal, title, message)
 	);
 };
 
+// show a confirmation box. returns a promise that will resolve to true / false based on user selection.
+Juno.Common.Util.confirmationDialog = function(uibModal, title, message)
+{
+	return uibModal.open(
+			{
+				component: 'junoAlertComponent',
+				backdrop: 'static',
+				windowClass: "juno-alert",
+				resolve: {
+					title: function(){return title},
+					message: function(){return message},
+					mode: function(){return JUNO_ALERT_MODES.CONFIRM}
+				}
+			}
+	).result;
+};
+
 /**
  * lookup typeahead object form options list based on value
  * @param value - the value to look up

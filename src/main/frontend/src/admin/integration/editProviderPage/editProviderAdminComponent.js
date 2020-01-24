@@ -91,6 +91,17 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			}
 		];
 
+		// options for the provider status
+		ctrl.providerStatusOptions = [
+			{
+				label: "Active",
+				value: "1"
+			},
+			{
+				label: "Inactive",
+				value: "0"
+			}
+		];
 
 		// options for the BC rural retention code field
 		ctrl.bcBillingLocationOptions = [];
@@ -134,6 +145,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			team: null,
 			sex: null,
 			dateOfBirth: null,
+			status: "1",// active by default
 
 			// Login Info
 			email: null,
@@ -598,18 +610,11 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					providerService.createProvider(ctrl.translateProviderObjForSubmit(ctrl.provider)).then(
 							function success(result)
 							{
-								if (result.body.status === "SUCCESS")
-								{
-									Juno.Common.Util.successAlert($uibModal, "Success","Provider successfully created");
-								}
-								else if (result.body.status === "SECURITY_RECORD_EXISTS")
-								{
-									Juno.Common.Util.errorAlert($uibModal, "Validation Error", "User name or email already in use");
-								}
+								ctrl.handleApiResponse(result, "created");
 							},
 							function error(result)
 							{
-								Juno.Common.Util.errorAlert($uibModal, "Error", "Internal Server Error. Provider not updated");
+								Juno.Common.Util.errorAlert($uibModal, "Error", "Internal Server Error. Provider not created");
 							}
 					);
 				} else
@@ -624,7 +629,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					providerService.editProvider($stateParams.providerNo, ctrl.translateProviderObjForSubmit(ctrl.provider)).then(
 							function success(result)
 							{
-								Juno.Common.Util.successAlert($uibModal, "Success","Provider successfully updated");
+								ctrl.handleApiResponse(result, "updated");
 							},
 							function error(result)
 							{
@@ -635,6 +640,25 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 				else
 				{
 					Juno.Common.Util.errorAlert($uibModal, "Validation Error", "Some fields are invalid please correct the highlighted fields");
+				}
+			}
+		};
+
+		ctrl.handleApiResponse = function(result, actionString)
+		{
+			if (result.status === "SUCCESS")
+			{
+				Juno.Common.Util.successAlert($uibModal, "Success", "Provider successfully " + actionString);
+			}
+			else if (result.status === "ERROR")
+			{
+				if (result.error.message === "SECURITY_RECORD_EXISTS")
+				{
+					Juno.Common.Util.errorAlert($uibModal, "Validation Error", "User name or email already in use");
+				}
+				else
+				{
+					Juno.Common.Util.errorAlert($uibModal, "Error", "Unknown error: " + result.error.message);
 				}
 			}
 		};

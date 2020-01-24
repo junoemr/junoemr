@@ -182,7 +182,7 @@ public class ProviderService extends AbstractServiceImpl {
 			}
 			catch(SecurityRecordAlreadyExistsException secRecordExists)
 			{
-				return RestResponse.successResponse(new ProviderEditResponseTo1(null, ProviderEditResponseTo1.STATUS_SEC_RECORD_EXISTS));
+				return RestResponse.errorResponse(ProviderEditResponseTo1.STATUS_SEC_RECORD_EXISTS);
 			}
 		}
 
@@ -199,8 +199,15 @@ public class ProviderService extends AbstractServiceImpl {
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
 
-		ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo);
-		return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
+		try
+		{
+			ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo);
+			return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
+		}
+		catch(SecurityRecordAlreadyExistsException secRecordExists)
+		{
+			return RestResponse.errorResponse(ProviderEditResponseTo1.STATUS_SEC_RECORD_EXISTS);
+		}
 	}
 
 		@GET

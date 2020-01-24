@@ -93,23 +93,32 @@
 						<div ng-if="!provider.enabled">Inactive</div>
 					</td>
 					<td class="provider-button-column flex-row justify-content-center">
-						<button class="btn btn-primary btn-active-hover flex-grow sm-margin-left sm-margin-right"
+						<button class="btn btn-primary btn-active-hover sm-margin-left sm-margin-right"
 										title="View Provider"
 										ng-click="$ctrl.toViewUser(provider.providerNo)"
 						>
 							<i class="icon icon-view"></i>
 						</button>
 						<button
-										class="btn btn-warning btn-active-hover flex-grow sm-margin-left sm-margin-right"
+										class="btn btn-warning btn-active-hover sm-margin-left sm-margin-right"
 										title="Edit Provider"
 										ng-click="$ctrl.toEditUser(provider.providerNo)"
 						>
 							<i class="icon icon-write"></i>
 						</button>
 						<button
-										class="btn btn-danger  btn-active-hover flex-grow sm-margin-left sm-margin-right"
+										class="btn btn-danger  btn-active-hover sm-margin-left sm-margin-right"
 										title="Delete Provider"
-										ng-click="$ctrl.inactivateProvider(provider.providerNo)"
+										ng-click="$ctrl.changeProviderStatus(provider.providerNo, '0')"
+										ng-if="provider.enabled"
+						>
+							<i class="icon icon-delete"></i>
+						</button>
+						<button
+										class="btn btn-danger  btn-active-hover sm-margin-left sm-margin-right"
+										title="Delete Provider"
+										ng-click="$ctrl.changeProviderStatus(provider.providerNo, '1')"
+										ng-if="!provider.enabled"
 						>
 							<i class="icon icon-delete"></i>
 						</button>

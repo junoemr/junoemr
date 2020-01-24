@@ -110,6 +110,18 @@
 									ca-disabled="$ctrl.fieldsDisabled"
 					>
 					</ca-field-date>
+
+					<!-- Provider Status -->
+					<ca-field-select
+									class="juno-modal no-padding"
+									ca-template="label"
+									ca-name="providerStatus"
+									ca-title="Status"
+									ca-model="$ctrl.provider.status"
+									ca-options="$ctrl.providerStatusOptions"
+									ca-disabled="$ctrl.fieldsDisabled"
+					>
+					</ca-field-select>
 				</panel-body>
 			</panel>
 
