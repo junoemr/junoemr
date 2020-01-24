@@ -157,6 +157,7 @@ public class FileFactory
 		}
 		GenericFile file = getExistingFile(GenericFile.EFORM_IMAGE_DIR, fileName);
 		file.restrictContentType = false;
+		file.forceSetValidation(true);
 		return file;
 	}
 
