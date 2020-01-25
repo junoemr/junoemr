@@ -258,6 +258,30 @@ angular.module("Common.Services").service("providerService", [
 			return deferred.promise;
 		};
 
+		service.enableProvider = function(providerNo, enable)
+		{
+			var deferred = $q.defer();
+
+			$http(
+					{
+						url: service.apiPath + "/provider/" + providerNo + "/update_status",
+						method: "POST",
+						data: JSON.stringify(enable),
+						headers: Juno.Common.ServiceHelper.configHeaders()
+					}).then(
+					function success(results)
+					{
+						deferred.resolve(results.data);
+					},
+					function error(errors)
+					{
+						console.log("providerService::enableProvider error", errors);
+						deferred.reject("An error occurred while enabling provider: " + providerNo);
+					});
+
+			return deferred.promise;
+		};
+
 		return service;
 	}
 ]);

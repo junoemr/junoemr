@@ -540,6 +540,14 @@ public final class LoginAction extends DispatchAction {
 		List<Security> results = securityDao.findByUserName(username);
 		Security security = null;
 		if (results.size() > 0) security = results.get(0);
+		else
+		{// attempt lookup by email
+			results = securityDao.findByEmail(username);
+			if (results.size() > 0)
+			{
+				security = results.get(0);
+			}
+		}
 
 		if (security == null) {
 			return null;

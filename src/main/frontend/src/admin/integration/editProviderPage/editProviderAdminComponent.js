@@ -60,6 +60,8 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 		ctrl.modes = EDIT_PROVIDER_MODE;
 		ctrl.mode = $stateParams.mode;
 		ctrl.hasSubmitted = false;
+		ctrl.allowSubmit = false; // if false submit is blocked.
+		ctrl.loadingError = false; // if true submit is blocked. if any async function returns error set this.
 		ctrl.fieldsDisabled = ctrl.mode === EDIT_PROVIDER_MODE.VIEW;
 
 		ctrl.sexes = staticDataService.getGenders();
@@ -305,6 +307,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					function error(result)
 					{
 						console.error("Failed to fetch provider roles with error: " + error);
+						ctrl.loadingError = true;
 					}
 			);
 
@@ -318,6 +321,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					function error(result)
 					{
 						console.error("Failed to fetch provider data with Error: " + result);
+						ctrl.loadingError = true;
 					}
 			);
 
@@ -329,6 +333,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					function error(result)
 					{
 						console.error("Failed to fetch instance billing type with error: " + error);
+						ctrl.loadingError = true;
 					}
 			);
 
@@ -350,6 +355,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					function error(result)
 					{
 						console.error("Failed to fetch site list with error: " + result);
+						ctrl.loadingError = true;
 					}
 			);
 
@@ -408,6 +414,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			catch (e)
 			{
 				console.error("Failed to fetch alberta skill codes with error: " + e);
+				ctrl.loadingError = true;
 			}
 
 			try
@@ -427,6 +434,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			catch (e)
 			{
 				console.error("Failed to fetch alberta facilities with error: " + e);
+				ctrl.loadingError = true;
 			}
 
 			try
@@ -446,6 +454,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			catch (e)
 			{
 				console.error("Failed to fetch alberta functional centers list with error: " + result);
+				ctrl.loadingError = true;
 			}
 		};
 
@@ -468,6 +477,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			catch (e)
 			{
 				console.error("Failed to fetch BC Billing visit codes with error: " + e);
+				ctrl.loadingError = true;
 			}
 
 			try
@@ -485,6 +495,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			catch (e)
 			{
 				console.error("Failed to fetch BC Service Locations with error: " + e);
+				ctrl.loadingError = true;
 			}
 		};
 
@@ -507,6 +518,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			catch (e)
 			{
 				console.error("Failed to fetch master number list with error: " + e);
+				ctrl.loadingError = true;
 			}
 		};
 
@@ -577,10 +589,13 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 						ctrl.mapTypeaheadValues();
 						ctrl.setupSecurityRecords();
 						ctrl.setupFormValidations();
+						ctrl.allowSubmit = true;
+
 					},
 					function error(result)
 					{
 						console.error("Failed to load provider edit form with error: " + result);
+						ctrl.loadingError = true;
 					}
 			);
 		};
@@ -664,48 +679,52 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.submit = function()
 		{
-			ctrl.hasSubmitted = true;
+			if (ctrl.allowSubmit && !ctrl.loadingError)
+			{
+				ctrl.hasSubmitted = true;
 
-			if (ctrl.mode === EDIT_PROVIDER_MODE.ADD)
-			{// create new provider
+				if (ctrl.mode === EDIT_PROVIDER_MODE.ADD)
+				{// create new provider
 
-				//validate fields
-				if (ctrl.allFieldsValid())
-				{// valid
-					providerService.createProvider(ctrl.translateProviderObjForSubmit(ctrl.provider)).then(
-							function success(result)
-							{
-								ctrl.handleApiResponse(result, "created");
-							},
-							function error(result)
-							{
-								Juno.Common.Util.errorAlert($uibModal, "Error", "Internal Server Error. Provider not created");
-							}
-					);
-				} else
-				{//invalid
-					Juno.Common.Util.errorAlert($uibModal, "Validation Error", "Some fields are invalid please correct the highlighted fields");
+					//validate fields
+					if (ctrl.allFieldsValid())
+					{// valid
+						providerService.createProvider(ctrl.translateProviderObjForSubmit(ctrl.provider)).then(
+								function success(result)
+								{
+									ctrl.handleApiResponse(result, "created");
+								},
+								function error(result)
+								{
+									Juno.Common.Util.errorAlert($uibModal, "Error", "Internal Server Error. Provider not created");
+								}
+						);
+					} else
+					{//invalid
+						Juno.Common.Util.errorAlert($uibModal, "Validation Error", "Some fields are invalid please correct the highlighted fields");
+					}
+				} else if (ctrl.mode === EDIT_PROVIDER_MODE.EDIT)
+				{ // update provider
+					if (ctrl.allFieldsValid())
+					{
+						providerService.editProvider($stateParams.providerNo, ctrl.translateProviderObjForSubmit(ctrl.provider)).then(
+								function success(result)
+								{
+									ctrl.handleApiResponse(result, "updated");
+								},
+								function error(result)
+								{
+									Juno.Common.Util.errorAlert($uibModal, "Error", "Internal Server Error. Provider not updated");
+								}
+						);
+					} else
+					{
+						Juno.Common.Util.errorAlert($uibModal, "Validation Error", "Some fields are invalid please correct the highlighted fields");
+					}
 				}
 			}
-			else if (ctrl.mode === EDIT_PROVIDER_MODE.EDIT)
-			{ // update provider
-				if (ctrl.allFieldsValid())
-				{
-					providerService.editProvider($stateParams.providerNo, ctrl.translateProviderObjForSubmit(ctrl.provider)).then(
-							function success(result)
-							{
-								ctrl.handleApiResponse(result, "updated");
-							},
-							function error(result)
-							{
-								Juno.Common.Util.errorAlert($uibModal, "Error", "Internal Server Error. Provider not updated");
-							}
-					);
-				}
-				else
-				{
-					Juno.Common.Util.errorAlert($uibModal, "Validation Error", "Some fields are invalid please correct the highlighted fields");
-				}
+			else {
+				Juno.Common.Util.errorAlert($uibModal, "Page Not Loaded", "Some of the page assets have failed to load. To protect your data you cannot submit");
 			}
 		};
 

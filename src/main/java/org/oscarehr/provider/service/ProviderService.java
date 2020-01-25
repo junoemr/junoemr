@@ -146,6 +146,31 @@ public class ProviderService
 	}
 
 	/**
+	 * enable or disable a provider
+	 * @param providerNo - the provider to enable / disable
+	 * @param enable - if true enable. if false disable.
+	 */
+	public void enableProvider(Integer providerNo, Boolean enable)
+	{
+		ProviderData provider = providerDataDao.find(providerNo.toString());
+		if (provider != null)
+		{
+			if (enable)
+			{
+				provider.setStatus(ProviderData.PROVIDER_STATUS_ACTIVE);
+			}
+			else
+			{
+				provider.setStatus(ProviderData.PROVIDER_STATUS_INACTIVE);
+			}
+		}
+		else
+		{
+			throw new NoSuchRecordException("No provider with id: " + providerNo);
+		}
+	}
+
+	/**
 	 * get the edit form transfer object for the given provider.
 	 * @param providerNo - the provider to get the form for.
 	 * @return - the edit provider form.

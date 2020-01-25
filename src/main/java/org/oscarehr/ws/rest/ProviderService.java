@@ -32,6 +32,7 @@ import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.managers.DemographicManager;
@@ -148,6 +149,28 @@ public class ProviderService extends AbstractServiceImpl {
     public ProviderTransfer getProvider(@PathParam("id") String id) {
         return ProviderTransfer.toTransfer(providerDao.getProvider(id));
     }
+
+	/**
+	 * enable or disable the provider
+	 * @param id - the providerNo of the provider to enable or disable
+	 * @param enable - true to enable false to disable
+	 * @return - true on success. errorResponse on bad provider.
+	 */
+	@POST
+		@Path("/provider/{id}/update_status")
+		@Produces(MediaType.APPLICATION_JSON)
+		public RestResponse<Boolean> enableProvider(@PathParam("id") Integer id, Boolean enable)
+		{
+			try
+			{
+				providerService.enableProvider(id, enable);
+				return RestResponse.successResponse(true);
+			}
+			catch (NoSuchRecordException nsre)
+			{
+				return RestResponse.errorResponse("Cannot find provider, with id: " + id);
+			}
+		}
 
 		/**
 		 * create a new provider.

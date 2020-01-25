@@ -109,7 +109,7 @@
 						<button
 										class="btn btn-danger  btn-active-hover sm-margin-left sm-margin-right"
 										title="Delete Provider"
-										ng-click="$ctrl.changeProviderStatus(provider.providerNo, '0')"
+										ng-click="$ctrl.changeProviderStatus(provider.providerNo, false)"
 										ng-if="provider.enabled"
 						>
 							<i class="icon icon-delete"></i>
@@ -117,7 +117,7 @@
 						<button
 										class="btn btn-success  btn-active-hover sm-margin-left sm-margin-right"
 										title="Delete Provider"
-										ng-click="$ctrl.changeProviderStatus(provider.providerNo, '1')"
+										ng-click="$ctrl.changeProviderStatus(provider.providerNo, true)"
 										ng-if="!provider.enabled"
 						>
 							<i class="icon icon-check"></i>
