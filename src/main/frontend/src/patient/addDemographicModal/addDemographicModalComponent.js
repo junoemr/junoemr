@@ -158,7 +158,8 @@ angular.module('Patient').component('addDemographicModal', {
 			}
 			else
 			{
-				ctrl.invalidDob = false;
+				ctrl.invalidDob = !Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth).isValid();
+				valid = valid && Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth).isValid();
 			}
 
 			return valid;
