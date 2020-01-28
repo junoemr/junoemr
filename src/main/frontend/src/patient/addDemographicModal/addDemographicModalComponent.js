@@ -119,48 +119,17 @@ angular.module('Patient').component('addDemographicModal', {
 
 		ctrl.validateDemographic = function ()
 		{
-			let valid = true;
+			let dateOfBirthValidity = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth).isValid();
 
-			if (!ctrl.newDemographicData.lastName)
-			{
-				valid = false;
-				ctrl.invalidLastName = true;
-			}
-			else
-			{
-				ctrl.invalidLastName = false;
-			}
+			let valid = !!ctrl.newDemographicData.lastName
+				&& !!ctrl.newDemographicData.firstName
+				&& !!ctrl.newDemographicData.sex
+				&& dateOfBirthValidity;
 
-			if (!ctrl.newDemographicData.firstName )
-			{
-				valid = false;
-				ctrl.invalidFirstName = true;
-			}
-			else
-			{
-				ctrl.invalidFirstName = false;
-			}
-
-			if (!ctrl.newDemographicData.sex)
-			{
-				valid = false;
-				ctrl.invalidSex = true;
-			}
-			else
-			{
-				ctrl.invalidSex = false;
-			}
-
-			if (!ctrl.newDemographicData.dateOfBirth)
-			{
-				valid = false;
-				ctrl.invalidDob = true;
-			}
-			else
-			{
-				ctrl.invalidDob = !Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth).isValid();
-				valid = valid && Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth).isValid();
-			}
+			ctrl.invalidLastName = !ctrl.newDemographicData.lastName;
+			ctrl.invalidFirstName = !ctrl.newDemographicData.firstName;
+			ctrl.invalidSex = !ctrl.newDemographicData.sex;
+			ctrl.invalidDob = !dateOfBirthValidity;
 
 			return valid;
 		};
