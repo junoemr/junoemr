@@ -72,19 +72,24 @@ public class SearchProviderAutoCompleteAction extends DispatchAction{
     
     public ActionForward labSearch(ActionMapping mapping, ActionForm form,HttpServletRequest request,HttpServletResponse response) throws Exception{
     	
-    	String searchStr = request.getParameter("term");
-    	String firstName, lastName;
-    	
-    	if( searchStr.indexOf(",") != -1 ) {
-    		String[] searchParams = searchStr.split(",");
-    		lastName = searchParams[0].trim();
-    		firstName = searchParams[1].trim();
-    	}
-    	else {
-    		lastName = searchStr;
-    		firstName = null;
-    	}
-    	
+		String searchStr = request.getParameter("term");
+		String firstName = null;
+		String lastName;
+
+		if(searchStr.contains(","))
+		{
+			String[] searchParams = searchStr.split(",");
+			lastName = searchParams[0].trim();
+			if (searchParams.length > 1)
+			{
+				firstName = searchParams[1].trim();
+			}
+		}
+		else
+			{
+			lastName = searchStr;
+		}
+
     	ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
     	List<org.oscarehr.provider.model.ProviderData> provList = providerDataDao.findByName(firstName, lastName, true);
     	StringBuilder searchResults = new StringBuilder("[");
