@@ -76,7 +76,7 @@ public class SearchProviderAutoCompleteAction extends DispatchAction{
 		String firstName = null;
 		String lastName;
 
-		if(searchStr.contains(","))
+		if(searchStr != null && searchStr.contains(","))
 		{
 			String[] searchParams = searchStr.split(",");
 			lastName = searchParams[0].trim();
@@ -86,7 +86,7 @@ public class SearchProviderAutoCompleteAction extends DispatchAction{
 			}
 		}
 		else
-			{
+		{
 			lastName = searchStr;
 		}
 
