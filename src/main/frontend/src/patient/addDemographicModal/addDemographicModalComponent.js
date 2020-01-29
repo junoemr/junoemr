@@ -121,17 +121,12 @@ angular.module('Patient').component('addDemographicModal', {
 		{
 			let dateOfBirthValidity = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth).isValid();
 
-			let valid = !!ctrl.newDemographicData.lastName
-				&& !!ctrl.newDemographicData.firstName
-				&& !!ctrl.newDemographicData.sex
-				&& dateOfBirthValidity;
-
 			ctrl.invalidLastName = !ctrl.newDemographicData.lastName;
 			ctrl.invalidFirstName = !ctrl.newDemographicData.firstName;
 			ctrl.invalidSex = !ctrl.newDemographicData.sex;
 			ctrl.invalidDob = !dateOfBirthValidity;
 
-			return valid;
+			return !(ctrl.invalidLastName || ctrl.invalidFirstName || ctrl.invalidSex || ctrl.invalidDob);
 		};
 
 		ctrl.onCancel = function()
