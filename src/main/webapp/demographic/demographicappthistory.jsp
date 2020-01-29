@@ -41,14 +41,14 @@
 
 <%@page import="org.springframework.beans.BeanUtils"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="org.springframework.web.context.WebApplicationContext"%>
-<%@page import="org.oscarehr.caisi_integrator.ws.DemographicWs"%>
 <%@page import="org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager" %>
 <%@page import="org.apache.commons.lang.StringEscapeUtils" %>
 
-<%@ page import="java.util.*, java.sql.*, java.net.*, oscar.*, oscar.oscarDB.*" errorPage="errorpage.jsp"%>
-<%@ page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager, org.oscarehr.caisi_integrator.ws.CachedAppointment, org.oscarehr.caisi_integrator.ws.CachedProvider, org.oscarehr.util.LoggedInInfo" %>
-<%@ page import="org.oscarehr.caisi_integrator.ws.*"%>
+<%@ page errorPage="errorpage.jsp"%>
+<%@ page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager" %>
+<%@ page import="org.oscarehr.caisi_integrator.ws.CachedAppointment" %>
+<%@ page import="org.oscarehr.caisi_integrator.ws.CachedProvider" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="org.oscarehr.common.model.CachedAppointmentComparator" %>
 
 <%@page import="oscar.util.DateUtils"%>
@@ -59,7 +59,6 @@
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.oscarehr.common.model.Site"%>
 
-<%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.model.Appointment" %>
 <%@page import="org.oscarehr.common.model.AppointmentArchive" %>
 <%@page import="org.oscarehr.appointment.dao.AppointmentStatusDao" %>
@@ -68,7 +67,13 @@
 
 <%@ page import="org.oscarehr.provider.model.ProviderData"%>
 <%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
-
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="org.oscarehr.caisi_integrator.ws.FacilityIdStringCompositePk" %>
+<%@ page import="java.net.URLEncoder" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -79,25 +84,15 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 
-
-<%!
-	private List<Site> sites = new java.util.ArrayList<Site>();
-%>
-
 <%
+	List<Site> sites = new ArrayList<Site>();
 LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
 ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 AppointmentStatusDao appointmentStatusDao = SpringUtils.getBean(AppointmentStatusDao.class);
-
-
 
 if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 	SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
 	sites = siteDao.getAllSites();
-	//get all sites bgColors
-	for (Site st : sites) {
-	}
 }
 
   String curProvider_no = (String) session.getAttribute("user");
