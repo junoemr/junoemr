@@ -82,7 +82,6 @@
 
 <%!
 	private List<Site> sites = new java.util.ArrayList<Site>();
-	private HashMap<String,String[]> siteBgColor = new HashMap<String,String[]>();
 %>
 
 <%
@@ -95,10 +94,9 @@ AppointmentStatusDao appointmentStatusDao = SpringUtils.getBean(AppointmentStatu
 
 if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 	SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
-	sites = siteDao.getAllActiveSites(); 
+	sites = siteDao.getAllSites();
 	//get all sites bgColors
 	for (Site st : sites) {
-		siteBgColor.put(st.getName(), new String[]{st.getBgColor(), st.getShortName()});
 	}
 }
 
@@ -387,9 +385,17 @@ if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 	{
 		if(appointment.getLocation() != null)
 		{
-			String[] sbc = siteBgColor.get(appointment.getLocation());
-%>      
-			<td style='background-color:<%= sbc[0] %>'><%= sbc[1] %></td>
+			for (Site site : sites)
+			{
+				if (site.getName().equals(appointment.getLocation()))
+				{
+%>
+	<td style='background-color:<%= site.getBgColor() %>'><%= site.getShortName() %></td>
+	<%
+					break;
+				}
+			}
+	%>
 <%
 		}
 		else
