@@ -921,11 +921,29 @@ public class DemographicManager {
 			has_error = true;
 		}
 
-		Demographic possibleConflict = demographicDao.getDemographicByHealthNumber(demographic.getHin());
-		if (possibleConflict != null)
+		// Ensure that demographics being added do not have duplicate health #s
+		// If we're in BC, also ensure that either version code being added is 66
+		// or that the codes in the system are currently 66
+		List<Demographic> possibleConflicts = demographicDao.getDemographicsByHealthNum(demographic.getHin());
+		// if not in BC, this is just an immediate error
+		if (possibleConflicts.size() > 0
+				&& !org.oscarehr.demographic.model.Demographic.HC_TYPE.BC.toString().equals(demographic.getHcType()))
 		{
-			logger.error("Found a matching demographic with HIN: " + possibleConflict.getHin());
+			error_string += "Found a demographic with HIN matching the one we're trying to add: ";
+			error_string += demographic.getHin();
 			has_error = true;
+		}
+
+		for (Demographic conflictingEntry : possibleConflicts)
+		{
+			if (!(org.oscarehr.demographic.model.Demographic.BC_NEWBORN_BILLING_CODE.equals(conflictingEntry.getVer())
+					|| org.oscarehr.demographic.model.Demographic.BC_NEWBORN_BILLING_CODE.equals(demographic.getVer())))
+			{
+				error_string += "Found a demographic with HIN matching the one we're trying to add: ";
+				error_string += demographic.getHin();
+				has_error = true;
+				break;
+			}
 		}
 
 		if (has_error)
