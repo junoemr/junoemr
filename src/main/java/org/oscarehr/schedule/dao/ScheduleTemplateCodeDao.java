@@ -29,18 +29,22 @@ import java.util.List;
 
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class ScheduleTemplateCodeDao extends AbstractDao<ScheduleTemplateCode>
 {
-	
+
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ScheduleTemplateCodeDao() {
 		super(ScheduleTemplateCode.class);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<ScheduleTemplateCode> findAll() {
 		Query query = createQuery("x", null);
@@ -48,15 +52,7 @@ public class ScheduleTemplateCodeDao extends AbstractDao<ScheduleTemplateCode>
 	}
 		
 	public ScheduleTemplateCode getByCode(char code) {
-		Query query = entityManager.createQuery("select s from ScheduleTemplateCode s where s.code=?");
-		query.setParameter(1, code);
-		
-		@SuppressWarnings("unchecked")
-		List<ScheduleTemplateCode> results = query.getResultList();
-		if(!results.isEmpty()) {
-			return results.get(0);
-		}
-		return null;
+		return findByCode(Character.toString(code));
 	}
 	
 	//"select code, duration from scheduletemplatecode where bookinglimit > 0 and duration != ''"
@@ -68,17 +64,27 @@ public class ScheduleTemplateCodeDao extends AbstractDao<ScheduleTemplateCode>
 		
 		return results;
 	}
-	
+
 	public ScheduleTemplateCode findByCode(String code) {
-		Query query = entityManager.createQuery("select s from ScheduleTemplateCode s where s.code = ?");
-		query.setParameter(1, code);
-		
+		Query query = entityManager.createNativeQuery("select * from scheduletemplatecode s where BINARY s.code = :code", modelClass);
+		query.setParameter("code", code);
+
 		@SuppressWarnings("unchecked")
 		List<ScheduleTemplateCode> results = query.getResultList();
-		if(!results.isEmpty()) {
-			return results.get(0);
+
+		if (results.isEmpty())
+		{
+			return null;
 		}
-		return null;
+		else
+		{
+			if (results.size() > 1)
+			{
+				logger.warn(String.format("ScheduleTemplateCode code %s is not unique", code));
+			}
+
+			return (ScheduleTemplateCode)(results.get(0));
+		}
 	}
 
 }
