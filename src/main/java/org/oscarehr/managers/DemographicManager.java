@@ -56,6 +56,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.log.LogAction;
 
@@ -74,6 +75,7 @@ import java.util.regex.Pattern;
  *
  */
 @Service
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class DemographicManager {
 	public static final String PHR_VERIFICATION_LEVEL_3 = "+3";
 	public static final String PHR_VERIFICATION_LEVEL_2 = "+2";
@@ -373,7 +375,6 @@ public class DemographicManager {
 	 * @param demographicArchiveId - id of the archived demographic record
 	 * @param extensions - list of objects to update/insert
 	 */
-	@Transactional
 	public void saveAndArchiveDemographicExt(Long demographicArchiveId, List<DemographicExt> extensions)
 	{
 		for(DemographicExt extension : extensions)
@@ -917,6 +918,13 @@ public class DemographicManager {
 		{
 			error_string += "No html tags and no quotes, line breaks ";
 			error_string += "or semicolons are allowed.";
+			has_error = true;
+		}
+
+		Demographic possibleConflict = demographicDao.getDemographicByHealthNumber(demographic.getHin());
+		if (possibleConflict != null)
+		{
+			logger.error("Found a matching demographic with HIN: " + possibleConflict.getHin());
 			has_error = true;
 		}
 
