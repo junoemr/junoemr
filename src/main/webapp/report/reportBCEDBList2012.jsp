@@ -93,12 +93,11 @@
 		</title>
 
 		<link rel="stylesheet" href="../css/receptionistapptstyle.css">
+		<link rel="stylesheet" href="../css/reportBCAR.css">
 
 		<script type="text/javascript">
 			function onResultLimitChange()
 			{
-				var targetUrl = '<%=request.getContextPath()%>';
-				console.log(targetUrl);
 				var resultLimit = document.getElementById("resultLimit");
 				var startDate = '<%=startDate%>';
 				var endDate = '<%=endDate%>';
@@ -112,14 +111,14 @@
 		</script>
 
 	</head>
-	<body>
-	<table>
-		<tr>
+	<body class="edd-body">
+	<table class="edd-table">
+		<tr class="edd-table-header">
 			<th colspan="2">
 				<bean:message key="report.reportnewdblist.msgEDDList" />
 			</th>
 		</tr>
-		<tr>
+		<tr class="page-limiter-controls">
 			<td>
 				<div class="pageLimiter">
 					<label for="resultLimit">
@@ -132,7 +131,7 @@
 					</select>
 				</div>
 			</td>
-			<td>
+			<td class="control-align">
 				<input type="button"
 					   name="buttonPrint"
 					   value="<bean:message key="global.btnPrint"/>"
@@ -145,8 +144,8 @@
 		</tr>
 	</table>
 
-	<table>
-		<tr>
+	<table class="edd-table main-results-table">
+		<tr class="edd-row result-table-header">
 			<th>
 				<bean:message key="report.reportnewdblist.msgEDD" />
 			</th>
@@ -157,7 +156,7 @@
 				<bean:message key="report.reportnewdblist.msgDOB" />
 			</th>
 			<th>
-				Gravida
+				G<span class="minimized-header">ravida</span>
 			</th>
 			<th>
 				<bean:message key="report.reportnewdblist.msgTerm" />
@@ -179,7 +178,7 @@
 			</th>
 		</tr>
 		<c:forEach items="${entries}" var="formEntry">
-			<tr>
+			<tr class="edd-row result-row">
 				<td>${formEntry.eddAsString}</td>
 				<td>${formEntry.fullName}</td>
 				<td>${formEntry.dateOfBirthAsString}</td>
