@@ -96,6 +96,30 @@ public class FormsDao {
 		
 		return query.getResultList();
 	}
+
+	@NativeSql("formBCAR2012")
+	public List<Object[]> selectBCAR2012(String beginEdd, String endEdd, int limit, int offset)
+	{
+		String sql = "SELECT demographic_no, c_EDD, c_surname, c_givenName, pg1_dateOfBirth, pg1_gravida, pg1_term, c_phone, pg1_langPref, c_phn, pg2_doula, pg2_doulaNo " +
+				"FROM formBCAR2012 f1 " +
+				"WHERE f1.c_EDD >= ? " +
+				"AND f1.c_EDD <= ? " +
+				"AND f1.formEdited = " +
+				"( " +
+				"	SELECT MAX(formEdited)" +
+				"	FROM formBCAR2012 f2 " +
+				"	WHERE f1.demographic_no=f2.demographic_no" +
+				") " +
+				"ORDER BY c_EDD DESC, ID DESC";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter(1, beginEdd);
+		query.setParameter(2, endEdd);
+		query.setMaxResults(limit);
+		query.setFirstResult(offset);
+
+		return query.getResultList();
+	}
+
 	
 	@NativeSql("formONAR")
 	public Object select_maxformar_id(String dateStart, String dateEnd) {
