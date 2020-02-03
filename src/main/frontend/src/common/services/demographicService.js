@@ -97,6 +97,10 @@ angular.module("Common.Services").service("demographicService", [
                 function error(errors)
                 {
                     console.log("demographicServices::updateDemographic error", errors);
+                    if (errors.data === "HIN")
+                    {
+                        deferred.reject("HIN");
+                    }
                     deferred.reject("An error occurred while saving demographic");
                 });
 

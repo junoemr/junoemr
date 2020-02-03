@@ -40,6 +40,7 @@ import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
+import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
@@ -58,6 +59,7 @@ import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarWaitingList.util.WLWaitingListUtil;
 
+import javax.validation.ValidationException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -103,7 +105,10 @@ public class DemographicService extends AbstractServiceImpl {
 	private ProfessionalSpecialistDao specialistDao;
 
 	@Autowired
-	RecentDemographicAccessService recentDemographicAccessService;
+	private RecentDemographicAccessService recentDemographicAccessService;
+
+	@Autowired
+	private HinValidationService hinValidationService;
 
 	private DemographicConverter demoConverter = new DemographicConverter();
 	private DemographicContactFewConverter demoContactFewConverter = new DemographicContactFewConverter();
@@ -299,6 +304,7 @@ public class DemographicService extends AbstractServiceImpl {
 		try
 		{
 			Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
+			hinValidationService.validateNoDuplication(demographic.getHin(), demographic.getVer(), demographic.getHcType());
 			demographicManager.createDemographic(getLoggedInInfo(), demographic, data.getAdmissionProgramId());
 
 			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
@@ -308,6 +314,11 @@ public class DemographicService extends AbstractServiceImpl {
 			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
 
 			return RestResponse.successResponse(demoConverter.getAsTransferObject(getLoggedInInfo(), demographic));
+		}
+		catch (ValidationException ve)
+		{
+			logger.error("Duplicate or invalid HIN attempting to be entered", ve);
+			return RestResponse.errorResponse("HIN");
 		}
 		catch (Exception e)
 		{
