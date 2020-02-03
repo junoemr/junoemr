@@ -55,7 +55,7 @@
 			
 			pageContext.forward("formbcar2012pg1.jsp?demographic_no=" + demoNo + "&formId=" + formId) ; 
  		} else {
-			FrmRecord rec = (new FrmRecordFactory()).factory("BCAR");
+			FrmRecord rec = (new FrmRecordFactory()).factory("BCAR2012");
 			java.util.Properties props = rec.getFormRecord(LoggedInInfo.getLoggedInInfoFromSession(request),demoNo, formId);
 
 			pageContext.forward("formbcar2012" + props.getProperty("c_lastVisited", "pg1") 
