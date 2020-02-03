@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -154,7 +155,7 @@ public class MeasurementGraphAction2 extends Action {
 		return null;
 	}
 
-	private ArrayList<EctMeasurementsDataBean> getList(Integer demographicNo, String typeIdName) {
+	private List<EctMeasurementsDataBean> getList(Integer demographicNo, String typeIdName) {
 		EctMeasurementsDataBeanHandler ectMeasure = new EctMeasurementsDataBeanHandler(demographicNo, typeIdName);
 		Collection<EctMeasurementsDataBean> dataVector = ectMeasure.getMeasurementsDataVector();
 		return new ArrayList<>(dataVector);
@@ -186,7 +187,7 @@ public class MeasurementGraphAction2 extends Action {
 	}
 
 	private static String[] getDrugSymbol(Integer demographic,String[] dins){
-		ArrayList<String> list = new ArrayList<>();
+		List<String> list = new ArrayList<>();
 		RxPrescriptionData prescriptData = new RxPrescriptionData();
 
 		for (String din : dins)
@@ -324,7 +325,7 @@ public class MeasurementGraphAction2 extends Action {
 	private JFreeChart actualLabChartRef(Integer demographicNo, String labType, String identifier,String testName, String chartTitle, String[] drugs) {
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 
-		ArrayList<Map<String,Serializable>> list;
+		List<Map<String,Serializable>> list;
 		if (labType.equals("loinc"))
 		{
 			list = CommonLabTestValues.findValuesByLoinc2(demographicNo.toString(), identifier, null);
@@ -334,7 +335,7 @@ public class MeasurementGraphAction2 extends Action {
 			list = CommonLabTestValues.findValuesForTest(labType, demographicNo, testName, identifier);
 		}
 
-		ArrayList<OHLCDataItem> dataItems = new ArrayList<>();
+		List<OHLCDataItem> dataItems = new ArrayList<>();
 
 		String typeLegendName = "Lab Value";
 		String typeYAxisName = "type Y";
@@ -482,16 +483,16 @@ public class MeasurementGraphAction2 extends Action {
 	 * @param list list of measurement data to add to the time series
 	 * @return a TimeSeries object containing all parseable data fields
 	 */
-	private TimeSeries fillTimeSeries(String typeLegendName, ArrayList<EctMeasurementsDataBean> list)
+	private TimeSeries fillTimeSeries(String typeLegendName, List<EctMeasurementsDataBean> list)
 	{
 		TimeSeries timeSeries = new TimeSeries(typeLegendName);
 		for (EctMeasurementsDataBean mdb : list)
 		{
-			try
+			if (org.apache.commons.lang3.math.NumberUtils.isCreatable(mdb.getDataField()))
 			{
 				timeSeries.addOrUpdate(new Day(mdb.getDateObservedAsDate()), Double.parseDouble(mdb.getDataField()));
 			}
-			catch (NumberFormatException e)
+			else
 			{
 				double[] measurementRange = getParameters(mdb.getDataField(), "");
 				if (measurementRange == null || measurementRange.length < 1)
@@ -508,7 +509,7 @@ public class MeasurementGraphAction2 extends Action {
 	private JFreeChart defaultChart(Integer demographicNo, String typeIdName, String typeIdName2, String chartTitle) {
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 
-		ArrayList<EctMeasurementsDataBean> list = getList(demographicNo, typeIdName);
+		List<EctMeasurementsDataBean> list = getList(demographicNo, typeIdName);
 		String typeYAxisName;
 
 		if (typeIdName.equals("BP"))
@@ -553,7 +554,7 @@ public class MeasurementGraphAction2 extends Action {
 		{
 			log.debug("type id name 2" + typeIdName2);
 
-			ArrayList<EctMeasurementsDataBean> list2 = getList(demographicNo, typeIdName2);
+			List<EctMeasurementsDataBean> list2 = getList(demographicNo, typeIdName2);
 			TimeSeriesCollection dataset2 = new TimeSeriesCollection();
 
 			log.debug("list2 " + list2);
@@ -584,8 +585,8 @@ public class MeasurementGraphAction2 extends Action {
             renderer.setBaseToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
             plot.setRenderer(1, renderer2);
 
-            }
-            return chart;
+		}
+		return chart;
 	}
 
 	/*
