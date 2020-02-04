@@ -180,10 +180,7 @@ angular.module('Patient').component('addDemographicModal', {
 					},
 					function error(errors)
 					{
-						if (errors === "HIN")
-						{
-							alert("HIN may exist in the system already or is not valid for the specified province.");
-						}
+						alert(errors);
 						console.error(errors);
 					}
 				);

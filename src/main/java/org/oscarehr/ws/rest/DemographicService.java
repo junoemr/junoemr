@@ -59,7 +59,6 @@ import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarWaitingList.util.WLWaitingListUtil;
 
-import javax.validation.ValidationException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -300,31 +299,19 @@ public class DemographicService extends AbstractServiceImpl {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> createDemographicData(DemographicTo1 data) {
-		try
-		{
-			Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
-			hinValidationService.validateNoDuplication(demographic.getHin(), demographic.getVer(), demographic.getHcType());
-			demographicManager.createDemographic(getLoggedInInfo(), demographic, data.getAdmissionProgramId());
+	public RestResponse<DemographicTo1> createDemographicData(DemographicTo1 data)
+	{
+		Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
+		hinValidationService.validateNoDuplication(demographic.getHin(), demographic.getVer(), demographic.getHcType());
+		demographicManager.createDemographic(getLoggedInInfo(), demographic, data.getAdmissionProgramId());
 
-			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
-			int providerNo = Integer.parseInt(providerNoStr);
+		String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
+		int providerNo = Integer.parseInt(providerNoStr);
 
-			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,getLoggedInInfo().getIp());
-			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
+		LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,getLoggedInInfo().getIp());
+		recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
 
-			return RestResponse.successResponse(demoConverter.getAsTransferObject(getLoggedInInfo(), demographic));
-		}
-		catch (ValidationException ve)
-		{
-			logger.error("Duplicate or invalid HIN attempting to be entered", ve);
-			return RestResponse.errorResponse("HIN");
-		}
-		catch (Exception e)
-		{
-			logger.error("Error",e);
-		}
-		return RestResponse.errorResponse("Error");
+		return RestResponse.successResponse(demoConverter.getAsTransferObject(getLoggedInInfo(), demographic));
 	}
 
 	/**
