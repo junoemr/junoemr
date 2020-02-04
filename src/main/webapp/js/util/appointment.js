@@ -49,12 +49,16 @@ Oscar.Util.Appointment.setEndTime = function setEndTime(endElem, start, duration
 	var startTime = moment(start, this.TimeFormats);
 	var endTime = startTime.clone();
 
-	endTime.add(Math.abs(durationTime) - 1, 'minutes');
-	if (endTime.diff(startTime, 'days') !== 0)
+	endTime.add(Math.abs(durationTime), 'minutes');
+	// Moment gets weird if it's < 24h time difference
+	// All we really care about is whether the expected end time is tomorrow or beyond
+	if (endTime.startOf('day').diff(startTime.startOf('day'), 'days') !== 0)
 	{
 		return false;
 	}
 
+	// Add this after we've verified the appointment won't leak into the next day
+	endTime.add(-1, 'minutes');
 	endElem.value = endTime.format(this.TimeFormatDisplay);
 	return true;
 };
