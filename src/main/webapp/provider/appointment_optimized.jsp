@@ -1400,16 +1400,20 @@ private long getAppointmentRowSpan(
 									int appointmentCount = 0;
 									for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
 									{
-
 											for(AppointmentDetails appointmentDetails : appointmentDetailsList)
 											{
-												if((!countIncludeCancelled && appointmentDetails.getStatus().contains(Appointment.CANCELLED))
-												    || (!countIncludeNoShow && appointmentDetails.getStatus().contains(Appointment.NO_SHOW))
-													|| (!countIncludeNoDemographic && appointmentDetails.getDemographicNo() == 0))
-												{
-													continue;
-												}
-												appointmentCount++;
+												String status = appointmentDetails.getStatus();
+
+												if (status == null)
+                                                {
+                                                	appointmentCount++;
+                                                }
+                                                else if (countIncludeCancelled && status.contains(Appointment.CANCELLED) ||
+                                                        (countIncludeNoShow && status.contains(Appointment.NO_SHOW)) ||
+                                                        (countIncludeNoDemographic && appointmentDetails.getDemographicNo() == 0))
+                                                {
+                                                	appointmentCount++;
+                                                }
 											}
 										}
 								%>
