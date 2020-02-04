@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Service("measurements.service.FlowsheetService")
+@Service()
 public class FlowsheetService
 {
 
