@@ -79,9 +79,18 @@ public class DemographicWs extends AbstractWs {
 	@Autowired
 	private EligibilityCheckService eligibilityCheckService;
 
+	/**
+	 * get demographic by ID if available
+	 * @param demographicId demographic ID that we think there is an entry for
+	 * @return transfer object if exists, null otherwise
+	 */
 	public DemographicTransfer getDemographic(Integer demographicId)
 	{
 		Demographic demographic = demographicManager.getDemographic(getLoggedInInfo(), demographicId);
+		if (demographic == null)
+		{
+			return null;
+		}
 		DemographicCust custResult = demographicCustDao.find(demographic.getDemographicNo());
 
 		DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
