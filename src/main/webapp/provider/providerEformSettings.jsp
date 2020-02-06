@@ -1,8 +1,4 @@
-<%@ page import="org.oscarehr.common.model.UserProperty" %>
-<%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.util.LoggedInInfo" %>
-<%@ page import="oscar.util.ConversionUtils" %><%--
+<%--
 
     Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -27,24 +23,35 @@
 
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%
-	UserPropertyDAO userPropertyDAO = (UserPropertyDAO) SpringUtils.getBean(UserPropertyDAO.class);
-	UserProperty eformPopupWidthProp = userPropertyDAO.getProp(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProvider().getProviderNo(),
-					UserProperty.EFORM_POPUP_WIDTH);
-	UserProperty eformPopupHeightProp = userPropertyDAO.getProp(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProvider().getProviderNo(),
-					UserProperty.EFORM_POPUP_HEIGHT);
+	String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProvider().getProviderNo();
+	UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
+	UserProperty eformPopupWidthProp = userPropertyDAO.getProp(providerNo, UserProperty.EFORM_POPUP_WIDTH);
+	UserProperty eformPopupHeightProp = userPropertyDAO.getProp(providerNo, UserProperty.EFORM_POPUP_HEIGHT);
 
 	boolean isError = ConversionUtils.parseBoolean(request.getParameter("error"));
 
 	String eformPopupWidth = "700";
-	String eformPopupHeight = "800";
-
-	if (eformPopupWidthProp != null)
+	if (request.getParameter("eformPopupWidth") != null)
+	{
+		eformPopupWidth = request.getParameter("eformPopupWidth");
+	}
+	else if (eformPopupWidthProp != null)
 	{
 		eformPopupWidth = eformPopupWidthProp.getValue();
 	}
 
-	if (eformPopupHeightProp != null)
+	String eformPopupHeight = "800";
+	if (request.getParameter("eformPopupHeight") != null)
+	{
+		eformPopupHeight = request.getParameter("eformPopupHeight");
+	}
+	else if (eformPopupHeightProp != null)
 	{
 		eformPopupHeight = eformPopupHeightProp.getValue();
 	}
@@ -74,6 +81,30 @@
 			margin-bottom: 8px;
 		}
 	</style>
+
+	<script type="text/javascript">
+		function validateWidthHeight()
+		{
+			var width = document.getElementById("eform_width").value;
+			var height = document.getElementById("eform_height").value;
+
+			var isValid = true;
+
+			if (isNaN(width))
+			{
+				alert("Width of '" + width + "' is not valid (was expecting a number).");
+				isValid = false;
+			}
+
+			if (isNaN(height))
+			{
+				alert("Height of '" + height + "' is not valid (was expecting a number).");
+				isValid = false;
+			}
+
+			return isValid;
+		}
+	</script>
 </head>
 <body>
 	<h2 class="page-header">Eform Settings</h2>
@@ -92,7 +123,7 @@
 			<label for="eform_height">Popup Height:</label>
 			<input id="eform_height" name="eformPopupHeight" type="text" value="<%=eformPopupHeight%>" maxlength="10">
 		</div>
-		<input type="submit" value="Save">
+		<input type="submit" value="Save" onclick="return validateWidthHeight()">
 	</form>
 </body>
 </html>
