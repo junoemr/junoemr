@@ -246,7 +246,7 @@ INSERT INTO `measurementTypeTEMP` (`type`, `typeDisplayName`, `typeDescription`,
 ( 'SUAB', 'Substance Use', 'Substance Use', 'Yes/No', '7', '2013-02-01 00:00:00'),
 ( 'SUO2', 'Need for supplemental oxygen', 'Need for supplemental oxygen', 'Yes/No', '7', '2013-02-01 00:00:00'),
 ( 'TCHD', 'TC/HDL', 'LIPIDS TD/HDL', 'monitor every 1-3 year', '3', '2013-02-01 00:00:00'),
-( 'TCHL', 'Total Cholesterol', 'Total Cholesterol', 'in mmol/L (nn.n) Range:2.0-12.0', '2', '2013-02-01 00:00:00'),
+( 'TCHL', 'Total Cholestorol', 'Total Cholestorol', 'in mmol/L (nn.n) Range:2.0-12.0', '2', '2013-02-01 00:00:00'),
 ( 'TEMP', 'Temp', 'Temperature', 'degrees celcius', '3', '2013-02-01 00:00:00'),
 ( 'TG', 'TG', 'LIPIDS TG', 'monitor every 1-3 year', '3', '2013-02-01 00:00:00'),
 ( 'TOXP', 'Toxoplasma IgG', 'Toxoplasma IgG', 'Positive', '7', '2013-02-01 00:00:00'),
@@ -809,7 +809,7 @@ INSERT INTO `measurementType` (`type`, `typeDisplayName`, `typeDescription`, `me
 INSERT INTO `measurementType` (`type`, `typeDisplayName`, `typeDescription`, `measuringInstruction`, `validation`, `createDate`) VALUES
 ( 'TCHD', 'TC/HDL', 'LIPIDS TD/HDL', 'monitor every 1-3 year', '3', '2013-02-01 00:00:00') ON DUPLICATE KEY UPDATE `validation`=3;
 INSERT INTO `measurementType` (`type`, `typeDisplayName`, `typeDescription`, `measuringInstruction`, `validation`, `createDate`) VALUES
-( 'TCHL', 'Total Cholesterol', 'Total Cholesterol', 'in mmol/L (nn.n) Range:2.0-12.0', '2', '2013-02-01 00:00:00') ON DUPLICATE KEY UPDATE `validation`=2;
+( 'TCHL', 'Total Cholestorol', 'Total Cholestorol', 'in mmol/L (nn.n) Range:2.0-12.0', '2', '2013-02-01 00:00:00') ON DUPLICATE KEY UPDATE `validation`=2;
 INSERT INTO `measurementType` (`type`, `typeDisplayName`, `typeDescription`, `measuringInstruction`, `validation`, `createDate`) VALUES
 ( 'TEMP', 'Temp', 'Temperature', 'degrees celcius', '3', '2013-02-01 00:00:00') ON DUPLICATE KEY UPDATE `validation`=3;
 INSERT INTO `measurementType` (`type`, `typeDisplayName`, `typeDescription`, `measuringInstruction`, `validation`, `createDate`) VALUES

@@ -1467,7 +1467,7 @@ INSERT INTO `measurementType` (`type`, `typeDisplayName`, `typeDescription`, `me
 ( 'SUNP', 'Sun protection', 'NULL', 'Yes/No', '7', '2013-10-25 13:00:00'),
 ( 'SUO2', 'Need for supplemental oxygen', 'Need for supplemental oxygen', 'Yes/No', '7', '2013-02-01 00:00:00'),
 ( 'TCHD', 'TC/HDL', 'LIPIDS TD/HDL', 'monitor every 1-3 year', '3', '2013-02-01 00:00:00'),
-( 'TCHL', 'Total Cholesterol', 'Total Cholesterol', 'in mmol/L (nn.n) Range:2.0-12.0', '2', '2013-02-01 00:00:00'),
+( 'TCHL', 'Total Cholestorol', 'Total Cholestorol', 'in mmol/L (nn.n) Range:2.0-12.0', '2', '2013-02-01 00:00:00'),
 ( 'TEMP', 'Temp', 'Temperature', 'degrees celcius', '3', '2013-02-01 00:00:00'),
 ( 'TG', 'TG', 'LIPIDS TG', 'monitor every 1-3 year', '3', '2013-02-01 00:00:00'),
 ( 'TOXP', 'Toxoplasma IgG', 'Toxoplasma IgG', 'Positive', '7', '2013-02-01 00:00:00'),

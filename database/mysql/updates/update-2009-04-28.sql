@@ -13,7 +13,7 @@ insert into measurementMap (loinc_code,ident_code,name,lab_type) values ('X50060
 insert into measurementMap (loinc_code,ident_code,name,lab_type) values ('5196-1','HSG','Hep BS Ag','ICL'); 
 insert into measurementMap (loinc_code,ident_code,name,lab_type) values ('5193-8','HAS','Hep BS Ab','ICL'); 
 insert into measurementMap (loinc_code,ident_code,name,lab_type) values ('1742-6','ALT','ALT','ICL'); 
-insert into measurementMap (loinc_code,ident_code,name,lab_type) values ('14647-2','CHO','Total Cholesterol','ICL');
+insert into measurementMap (loinc_code,ident_code,name,lab_type) values ('14647-2','CHO','Total Cholestorol','ICL'); 
 insert into measurementMap (loinc_code,ident_code,name,lab_type) values ('6301-6','PT','INR','ICL'); 
 insert into measurementMap (loinc_code,ident_code,name,lab_type) values ('6301-6','445','INR','GDML');
 insert into measurementMap (loinc_code,ident_code,name,lab_type) values ('6301-6','INR','INR','FLOWSHEET');
