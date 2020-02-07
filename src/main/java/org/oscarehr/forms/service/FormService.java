@@ -24,12 +24,10 @@
 package org.oscarehr.forms.service;
 
 import org.oscarehr.common.dao.forms.FormsDao;
-import org.oscarehr.forms.transfer.FormBCAR2012Transfer;
+import org.oscarehr.forms.converter.FormBCAR2012Converter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -38,50 +36,17 @@ public class FormService
 	@Autowired
 	private FormsDao formsDao;
 
-	public List<FormBCAR2012Transfer> getBCAR2012(String beginEdd, String endEdd, int limit, int offset)
-	{
-		List<Object[]> rawResults = formsDao.selectBCAR2012(beginEdd, endEdd, limit, offset);
-		List<FormBCAR2012Transfer> transfers = new ArrayList<>();
-
-		for (Object[] result : rawResults)
-		{
-			FormBCAR2012Transfer bcarTransfer = new FormBCAR2012Transfer();
-
-			bcarTransfer.setDemographicNo(Integer.parseInt(result[0].toString()));
-			bcarTransfer.setEdd((Date)result[1]);
-			bcarTransfer.setLastName(getNullableStringFromObject(result[2]));
-			bcarTransfer.setFirstName(getNullableStringFromObject(result[3]));
-			bcarTransfer.setDateOfBirth((Date)result[4]);
-			bcarTransfer.setGravida(getNullableStringFromObject(result[5]));
-			bcarTransfer.setTerm(getNullableStringFromObject(result[6]));
-			bcarTransfer.setPhone(getNullableStringFromObject(result[7]));
-			bcarTransfer.setLangPreferred(getNullableStringFromObject(result[8]));
-			bcarTransfer.setPhn(getNullableStringFromObject(result[9]));
-			bcarTransfer.setDoula(getNullableStringFromObject(result[10]));
-			bcarTransfer.setDoulaNo(getNullableStringFromObject(result[11]));
-
-			transfers.add(bcarTransfer);
-		}
-
-		return transfers;
-	}
-
-
 	/**
-	 * Helper method to safely cast from a possibly null Object to a String.
-	 * Needed because forms are dumb and we are currently querying them via native queries, and
-	 * not all of the fields may be filled out properly.
-	 * @param object possibly null object we're getting
-	 * @return String corresponding to object's .getString() if not null, "null" otherwise
+	 * For now, thin wrapper to avoid having to directly call the Dao at the application layer.
+	 * @param beginEdd string representation of beginning expected delivery date
+	 * @param endEdd string representation of end expected delivery date
+	 * @param limit number of results we want
+	 * @param offset where we want to start querying results from
+	 * @return list of BC AR 2012 form entries that fall within [beginEdd, endEdd] range
 	 */
-	private String getNullableStringFromObject(Object object)
+	public List<FormBCAR2012Converter> getBCAR2012(String beginEdd, String endEdd, int limit, int offset)
 	{
-		if (object == null)
-		{
-			return "null";
-		}
-
-		return object.toString();
+		return formsDao.selectBCAR2012(beginEdd, endEdd, limit, offset);
 	}
 
 }

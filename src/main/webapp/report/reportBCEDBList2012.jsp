@@ -45,7 +45,7 @@
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.oscarehr.forms.service.FormService" %>
-<%@ page import="org.oscarehr.forms.transfer.FormBCAR2012Transfer" %>
+<%@ page import="org.oscarehr.forms.converter.FormBCAR2012Converter" %>
 <%@ page import="java.util.LinkedHashSet" %>
 <%@ page import="java.util.Set" %>
 
@@ -73,7 +73,7 @@
 	int prevOffset = offset - limit;
 
 	FormService formService = SpringUtils.getBean(FormService.class);
-	List<FormBCAR2012Transfer> arEntries = formService.getBCAR2012(startDate, endDate, limit, offset);
+	List<FormBCAR2012Converter> arEntries = formService.getBCAR2012(startDate, endDate, limit, offset);
 	request.setAttribute("entries", arEntries);
 
 	Set<Integer> limitOptions = new LinkedHashSet<Integer>();

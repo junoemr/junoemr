@@ -21,14 +21,14 @@
  * Canada
  */
 
-package org.oscarehr.forms.transfer;
+package org.oscarehr.forms.converter;
 
 import oscar.util.ConversionUtils;
 
 import java.util.Date;
 
 // Corresponds to formBCAR2012 table, however we don't want to instantiate a full model for it
-public class FormBCAR2012Transfer
+public class FormBCAR2012Converter
 {
 
 	private Integer demographicNo;

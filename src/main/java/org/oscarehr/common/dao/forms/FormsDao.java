@@ -24,6 +24,7 @@
 package org.oscarehr.common.dao.forms;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -31,6 +32,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.oscarehr.common.NativeSql;
+import org.oscarehr.forms.converter.FormBCAR2012Converter;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,7 +100,7 @@ public class FormsDao {
 	}
 
 	@NativeSql("formBCAR2012")
-	public List<Object[]> selectBCAR2012(String beginEdd, String endEdd, int limit, int offset)
+	public List<FormBCAR2012Converter> selectBCAR2012(String beginEdd, String endEdd, int limit, int offset)
 	{
 		String sql = "SELECT demographic_no, c_EDD, c_surname, c_givenName, pg1_dateOfBirth, pg1_gravida, pg1_term, c_phone, pg1_langPref, c_phn, pg2_doula, pg2_doulaNo " +
 				"FROM formBCAR2012 f1 " +
@@ -117,7 +119,29 @@ public class FormsDao {
 		query.setMaxResults(limit);
 		query.setFirstResult(offset);
 
-		return query.getResultList();
+		List<Object[]> rawResults = query.getResultList();
+		List<FormBCAR2012Converter> convertedResults = new ArrayList<>();
+		for (Object[] result : rawResults)
+		{
+			FormBCAR2012Converter bcar2012Converter = new FormBCAR2012Converter();
+
+			bcar2012Converter.setDemographicNo(Integer.parseInt(result[0].toString()));
+			bcar2012Converter.setEdd((Date)result[1]);
+			bcar2012Converter.setLastName(getNullableStringFromObject(result[2]));
+			bcar2012Converter.setFirstName(getNullableStringFromObject(result[3]));
+			bcar2012Converter.setDateOfBirth((Date)result[4]);
+			bcar2012Converter.setGravida(getNullableStringFromObject(result[5]));
+			bcar2012Converter.setTerm(getNullableStringFromObject(result[6]));
+			bcar2012Converter.setPhone(getNullableStringFromObject(result[7]));
+			bcar2012Converter.setLangPreferred(getNullableStringFromObject(result[8]));
+			bcar2012Converter.setPhn(getNullableStringFromObject(result[9]));
+			bcar2012Converter.setDoula(getNullableStringFromObject(result[10]));
+			bcar2012Converter.setDoulaNo(getNullableStringFromObject(result[11]));
+
+			convertedResults.add(bcar2012Converter);
+		}
+
+		return convertedResults;
 	}
 
 	
@@ -223,5 +247,22 @@ public class FormsDao {
 		query.setMaxResults(1);
 		return query.getSingleResult();
     }
+
+	/**
+	 * Helper method to safely cast from a possibly null Object to a String.
+	 * Needed because forms are dumb and we are currently querying them via native queries, and
+	 * not all of the fields may be filled out properly.
+	 * @param object possibly null object we're getting
+	 * @return String corresponding to object's .getString() if not null, "null" otherwise
+	 */
+	private String getNullableStringFromObject(Object object)
+	{
+		if (object == null)
+		{
+			return "null";
+		}
+
+		return object.toString();
+	}
 
 }
