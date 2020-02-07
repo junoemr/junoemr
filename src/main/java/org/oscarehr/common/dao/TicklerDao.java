@@ -23,6 +23,7 @@
  */
 package org.oscarehr.common.dao;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,6 +39,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
+import oscar.util.ConversionUtils;
 
 @Repository
 public class TicklerDao extends AbstractDao<Tickler>{
@@ -169,7 +171,175 @@ public class TicklerDao extends AbstractDao<Tickler>{
 		
 		return results;
 	}
-	
+
+	// For now I am redoing this
+	// Partially because I don't understand the other one is doing
+	// but also because I think it is legitimately flawed and we should keep the query building + parameter assignment together
+	// This is going to get redone as a proper Criteria Search like demographic but will be here in interim form
+	public List<Tickler> getSpecifiedTicklers(CustomFilter filter, int offset, int limit)
+	{
+		// hack for now to just get this working.
+		// probably more elegant way later
+		String sql = "SELECT t FROM Tickler t WHERE t.id IS NOT null ";
+
+		if (filter.getStartDate() != null)
+		{
+			sql += "AND t.serviceDate >= :startDate ";
+		}
+
+		if (filter.getEndDate() != null)
+		{
+			sql += 	"AND t.serviceDate <= :endDate ";
+		}
+
+		if (filter.getProviderNo() != null)
+		{
+			sql += "AND t.creator = :providerNo ";
+		}
+
+		if (filter.getAssignee() != null)
+		{
+			sql += "AND t.taskAssignedTo = :taskAssignedTo ";
+		}
+
+		if (filter.getProgramId() != null)
+		{
+			sql += "AND t.programId = :programId ";
+		}
+
+		if (filter.getStatus() != null)
+		{
+			sql += "AND t.status = :status ";
+		}
+
+		if (filter.getPriority() != null)
+		{
+			sql += "AND t.priority = :priority ";
+		}
+
+		if (filter.getDemographicNo() != null)
+		{
+			sql += "AND t.demographicNo = :demographicNo ";
+		}
+
+		if (filter.getMessage() != null)
+		{
+			sql += "AND t.message = :message ";
+		}
+
+		sql += getTicklerSortingClause(filter.getSortDir(), filter.getSortColumn());
+		MiscUtils.getLogger().info(sql);
+
+		Query query = entityManager.createQuery(sql);
+
+		if (filter.getStartDate() != null)
+		{
+			query.setParameter("startDate", filter.getStartDate());
+		}
+
+		if (filter.getEndDate() != null)
+		{
+			// Treat as an end-of-day tickler so it shows up in search results
+			LocalDateTime endDate = ConversionUtils.toLocalDateTime(filter.getEndDate())
+					.withHour(23)
+					.withMinute(59)
+					.withSecond(59);
+			Date legacyDate = ConversionUtils.toLegacyDateTime(endDate);
+
+			query.setParameter("endDate", legacyDate);
+		}
+
+		if (filter.getProviderNo() != null)
+		{
+			query.setParameter("providerNo", filter.getProviderNo());
+		}
+
+		if (filter.getAssignee() != null)
+		{
+			query.setParameter("taskAssignedTo", filter.getAssignee());
+		}
+
+		if (filter.getProgramId() != null)
+		{
+			query.setParameter("programId", filter.getProgramId());
+		}
+
+		if (filter.getStatus() != null)
+		{
+			query.setParameter("status", convertStatus(filter.getStatus()));
+		}
+
+		if (filter.getPriority() != null)
+		{
+			query.setParameter("priority", convertPriority(filter.getPriority()));
+		}
+
+		if (filter.getDemographicNo() != null)
+		{
+			query.setParameter("demographicNo", filter.getDemographicNo());
+		}
+
+		if (filter.getMessage() != null)
+		{
+			query.setParameter("message", filter.getMessage());
+		}
+
+		query.setFirstResult(offset);
+		setLimit(query, limit);
+		MiscUtils.getLogger().info(query.toString());
+
+		@SuppressWarnings("unchecked")
+		List<Tickler> matchingTicklers = query.getResultList();
+
+		return matchingTicklers;
+	}
+
+	// wrapper for portion deciding asc/desc order + what we want to order by
+	private String getTicklerSortingClause(SORTDIR sortDirection, SORTCOLUMN sortColumn)
+	{
+		String orderDir = "DESC";
+		if (SORTDIR.asc.equals(sortDirection))
+		{
+			orderDir = "ASC";
+		}
+
+		String orderBy = "t.updateDate " + orderDir;
+
+		if (SORTCOLUMN.DemographicName.equals(sortColumn))
+		{
+			orderBy = "d.LastName " + orderDir + ", d.FirstName " + orderDir;
+		}
+		else if (SORTCOLUMN.Creator.equals(sortColumn))
+		{
+			orderBy = "t.creator " + orderDir;
+		}
+		else if (SORTCOLUMN.ServiceDate.equals(sortColumn))
+		{
+			orderBy = "t.serviceDate " + orderDir;
+		}
+		else if (SORTCOLUMN.UpdateDate.equals(sortColumn))
+		{
+			orderBy = "t.updateDate " + orderDir;
+		}
+		else if (SORTCOLUMN.Priority.equals(sortColumn))
+		{
+			orderBy = "t.priority " + orderDir;
+		}
+		else if (SORTCOLUMN.TaskAssignedTo.equals(sortColumn))
+		{
+			orderBy = "t.taskAssignedTo " + orderDir;
+		}
+		else if (SORTCOLUMN.Status.equals(sortColumn))
+		{
+			orderBy = "t.status " + orderDir;
+		}
+		else if (SORTCOLUMN.Message.equals(sortColumn))
+		{
+			orderBy = "t.message " + orderDir;
+		}
+
+		return "ORDER BY " + orderBy;
+	}
 	
 	/**
 	 * @deprecated
