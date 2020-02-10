@@ -37,10 +37,10 @@
 <html:html locale="true">
 <head>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-	<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/prototype.js"/>"></script>
-	<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/screen.js"/>"></script>
-	<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/rx.js"/>"></script>
-	<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/scriptaculous.js"/>"></script>
+	<script type="text/javascript" src="<c:out value="${context}/share/javascript/prototype.js"/>"></script>
+	<script type="text/javascript" src="<c:out value="${context}/share/javascript/screen.js"/>"></script>
+	<script type="text/javascript" src="<c:out value="${context}/share/javascript/rx.js"/>"></script>
+	<script type="text/javascript" src="<c:out value="${context}/share/javascript/scriptaculous.js"/>"></script>
 	<title>Edit Favorites</title>
 	<html:base />
 
@@ -81,7 +81,7 @@
         var endpoint = '/oscarRx/deleteFavorite2.do';
 
         if (confirm('Are you sure you want to delete favorite: \n' + favoriteName + '?')) {
-            new Ajax.Request('<c:out value="${ctx}"/>' + endpoint,
+            new Ajax.Request('<c:out value="${context}"/>' + endpoint,
                 {
                     method: 'delete',
                     parameters: deleteObj,
