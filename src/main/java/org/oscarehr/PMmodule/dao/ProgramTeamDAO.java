@@ -110,7 +110,7 @@ public class ProgramTeamDAO extends HibernateDaoSupport {
             throw new IllegalArgumentException();
         }
 
-        List<ProgramTeam> results = this.getHibernateTemplate().find("from ProgramTeam tp where tp.programId = ?", programId);
+        List<ProgramTeam> results = (List<ProgramTeam>) this.getHibernateTemplate().find("from ProgramTeam tp where tp.programId = ?", programId);
 
         if (log.isDebugEnabled()) {
             log.debug("getProgramTeams: programId=" + programId + ",# of results=" + results.size());

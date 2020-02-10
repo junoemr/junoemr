@@ -37,7 +37,7 @@ public class ProviderDAO extends HibernateDaoSupport {
 
     @SuppressWarnings("unchecked")
     public List<Provider> getProviders() {
-        return getHibernateTemplate().find("from Provider p order by p.lastName");
+        return (List<Provider>) getHibernateTemplate().find("from Provider p order by p.lastName");
     }
 
     public Provider getProvider(String provider_no) {

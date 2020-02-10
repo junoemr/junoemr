@@ -150,7 +150,7 @@ public class SQLReporter implements Reporter
 			updateLog(logEntry, rowCount);
 		}
 		// since users can write custom queries this error is expected and should not generate an error in the log
-		catch(ReportByTemplateException | SQLException | SQLGrammarException | PersistenceException e)
+		catch(ReportByTemplateException | SQLException | PersistenceException e)
 		{
 			logger.warn("An Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
 			rsHtml = "An SQL query error has occurred<br>" + e.getMessage();

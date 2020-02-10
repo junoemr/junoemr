@@ -28,7 +28,7 @@ import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("mha_AppointmentService")
 public class AppointmentService extends BaseService
 {
 	public void updateAppointmentCache(IntegrationData integrationData, AppointmentCacheTo1 appointmentTransfer)

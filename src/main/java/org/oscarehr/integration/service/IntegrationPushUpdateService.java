@@ -35,6 +35,7 @@ import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -51,6 +52,7 @@ public class IntegrationPushUpdateService
 	private static final Integer MAX_SEND_ATTEMPTS = 25;
 
 	@Autowired
+	@Qualifier("mha_AppointmentService")
 	private AppointmentService appointmentService;
 
 	@Autowired

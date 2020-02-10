@@ -36,7 +36,11 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Security;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
+@Component
+@Order(1)
 public class LoggedInUserFilter implements javax.servlet.Filter {
 	private static final Logger logger = MiscUtils.getLogger();
 

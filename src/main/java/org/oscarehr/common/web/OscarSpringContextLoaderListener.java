@@ -33,7 +33,7 @@ public class OscarSpringContextLoaderListener extends ContextLoaderListener {
 
 	private static Logger logger = MiscUtils.getLogger();
 
-	@Override
+	//@Override
     protected ContextLoader createContextLoader() {
 		try {
 			logger.info("Creating OscarContextLoader");

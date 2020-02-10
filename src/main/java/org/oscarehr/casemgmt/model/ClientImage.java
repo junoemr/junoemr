@@ -28,10 +28,14 @@ import java.io.InputStream;
 import java.sql.Blob;
 import java.util.Date;
 
+import net.sf.ehcache.hibernate.HibernateUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.caisi.model.BaseObject;
 import org.hibernate.Hibernate;
+import org.hibernate.SessionFactory;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 public class ClientImage extends BaseObject {
 	public static final String imageMissingPlaceholderUrl="/images/defaultR_img.jpg";
@@ -42,6 +46,10 @@ public class ClientImage extends BaseObject {
 	private String image_type;
 	private byte[] image_data;
 	private Date update_date;
+
+	@Autowired
+	@Qualifier("sessionFactory")
+	private SessionFactory sessionFactory;
 	
 	public ClientImage() {
 		update_date = new Date();
@@ -91,7 +99,10 @@ public class ClientImage extends BaseObject {
 		if(image_data == null) {
 			return null;
 		}
-		return Hibernate.createBlob(Base64.encodeBase64(getImage_data()));
+
+		// TODO: SPRINGUPGRADE: does this work?
+		//return Hibernate.createBlob(Base64.encodeBase64(getImage_data()));
+		return Hibernate.getLobCreator(sessionFactory.getCurrentSession()).createBlob(Base64.encodeBase64(getImage_data()));
 	}
 
 	public void setImage_contents(Blob image_contents) {

@@ -57,8 +57,10 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.ReportStatistic;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Component
 @Transactional
 public class GenericIntakeManager {
 

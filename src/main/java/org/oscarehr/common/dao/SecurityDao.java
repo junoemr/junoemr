@@ -52,7 +52,7 @@ public class SecurityDao  extends AbstractDao<Security> {
 
 
     public List<Security> findByProviderNo(String providerNo) {
-    	Query query = entityManager.createQuery("select x from Security x where x.providerNo=?");
+    	Query query = entityManager.createQuery("select x from Security x where x.providerNo=?1");
     	query.setParameter(1, providerNo);
     	
     	@SuppressWarnings("unchecked")
@@ -62,7 +62,7 @@ public class SecurityDao  extends AbstractDao<Security> {
     }
 
     public List<Security> findByLikeProviderNo(String providerNo) {
-    	Query query = entityManager.createQuery("select x from Security x where x.providerNo like ?");
+    	Query query = entityManager.createQuery("select x from Security x where x.providerNo like ?1");
     	query.setParameter(1, providerNo);
     	
     	@SuppressWarnings("unchecked")
@@ -72,7 +72,7 @@ public class SecurityDao  extends AbstractDao<Security> {
     }
 
     public List<Security> findByUserName(String userName) {
-    	Query query = entityManager.createQuery("select x from Security x where x.userName=?");
+    	Query query = entityManager.createQuery("select x from Security x where x.userName=?1");
     	query.setParameter(1, userName);
     	
     	@SuppressWarnings("unchecked")
@@ -82,7 +82,7 @@ public class SecurityDao  extends AbstractDao<Security> {
     }
 	
     public List<Security> findByLikeUserName(String userName) {
-    	Query query = entityManager.createQuery("select x from Security x where x.userName like ?");
+    	Query query = entityManager.createQuery("select x from Security x where x.userName like ?1");
     	query.setParameter(1, userName);
     	
     	@SuppressWarnings("unchecked")
@@ -110,7 +110,7 @@ public class SecurityDao  extends AbstractDao<Security> {
     public List<Security> findByProviderSite(String providerNo) {
     	
     	String queryStr = "select * from security s inner join providersite p on s.provider_no = p.provider_no " +
-    						"where p.site_id in(select site_id from providersite where provider_no=?)";
+    						"where p.site_id in(select site_id from providersite where provider_no=?1)";
     	
         Query query = entityManager.createNativeQuery(queryStr, modelClass);
         query.setParameter(1, providerNo);

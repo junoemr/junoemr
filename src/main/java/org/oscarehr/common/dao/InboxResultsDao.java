@@ -39,7 +39,7 @@ public class InboxResultsDao
 
 	Logger logger = Logger.getLogger(InboxResultsDao.class);
 
-	@PersistenceContext(unitName = "persistenceUnit")
+	@PersistenceContext
 	protected EntityManager entityManager = null;
 
 	/** Creates a new instance of Hl7textResultsData */

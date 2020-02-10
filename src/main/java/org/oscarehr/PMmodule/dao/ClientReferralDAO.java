@@ -42,7 +42,7 @@ public class ClientReferralDAO extends HibernateDaoSupport {
 
     public List<ClientReferral> getReferrals() {
         @SuppressWarnings("unchecked")
-    	List<ClientReferral> results = this.getHibernateTemplate().find("from ClientReferral");
+    	List<ClientReferral> results = (List<ClientReferral>) this.getHibernateTemplate().find("from ClientReferral");
 
         if (log.isDebugEnabled()) {
             log.debug("getReferrals: # of results=" + results.size());
@@ -58,7 +58,7 @@ public class ClientReferralDAO extends HibernateDaoSupport {
             throw new IllegalArgumentException();
         }
 
-        List<ClientReferral> results = this.getHibernateTemplate().find("from ClientReferral cr where cr.ClientId = ?", clientId);
+        List<ClientReferral> results = (List<ClientReferral>) this.getHibernateTemplate().find("from ClientReferral cr where cr.ClientId = ?", clientId);
 
         if (log.isDebugEnabled()) {
             log.debug("getReferrals: clientId=" + clientId + ",# of results=" + results.size());
@@ -83,7 +83,7 @@ public class ClientReferralDAO extends HibernateDaoSupport {
 
         String sSQL="from ClientReferral cr where cr.ClientId = ? " +
                     " and ( (cr.FacilityId=?) or (cr.ProgramId in (select s.id from Program s where s.facilityId=? or s.facilityId is null)))";
-        List<ClientReferral> results = this.getHibernateTemplate().find(sSQL, new Object[] { clientId, facilityId, facilityId });
+        List<ClientReferral> results = (List<ClientReferral>) this.getHibernateTemplate().find(sSQL, new Object[] { clientId, facilityId, facilityId });
 //        		"from ClientReferral cr where cr.ClientId = ?", clientId);
 
         if (log.isDebugEnabled()) {
@@ -105,7 +105,7 @@ public class ClientReferralDAO extends HibernateDaoSupport {
 
             ClientReferral result = null;
             @SuppressWarnings("unchecked")
-            List<ClientReferral> results = this.getHibernateTemplate().find("from ClientReferral r where r.ClientId = ? and r.Id < ? order by r.Id desc", new Object[] {cr.getClientId(), cr.getId()});
+            List<ClientReferral> results = (List<ClientReferral>) this.getHibernateTemplate().find("from ClientReferral r where r.ClientId = ? and r.Id < ? order by r.Id desc", new Object[] {cr.getClientId(), cr.getId()});
 
             // temp - completionNotes/Referring program/agency, notes/External
         	String completionNotes = "";
@@ -141,7 +141,7 @@ public class ClientReferralDAO extends HibernateDaoSupport {
 
 		String queryStr = "FROM Program p WHERE p.id = ? AND p.type = 'external'";
 		@SuppressWarnings("unchecked")
-        List<Program> rs = getHibernateTemplate().find(queryStr, programId);
+        List<Program> rs = (List<Program>) getHibernateTemplate().find(queryStr, programId);
 
 		if (!rs.isEmpty()) {
 			result = true;
@@ -161,7 +161,7 @@ public class ClientReferralDAO extends HibernateDaoSupport {
 
         String queryStr = "FROM Admission a WHERE a.clientId=? ORDER BY a.admissionDate DESC";
         @SuppressWarnings("unchecked")
-        List<Admission> rs = getHibernateTemplate().find(queryStr, new Object[] { demographicNo });
+        List<Admission> rs = (List<Admission>) getHibernateTemplate().find(queryStr, new Object[] { demographicNo });
         return rs;
     }
     // end of change
@@ -174,7 +174,7 @@ public class ClientReferralDAO extends HibernateDaoSupport {
 
         List<ClientReferral> results;
         if(facilityId==null){
-          results = this.getHibernateTemplate().find("from ClientReferral cr where cr.ClientId = ? and (cr.Status = '"+ClientReferral.STATUS_ACTIVE+"' or cr.Status = '"+ClientReferral.STATUS_PENDING+"' or cr.Status = '"+ClientReferral.STATUS_UNKNOWN+"')", clientId);
+          results = (List<ClientReferral>) this.getHibernateTemplate().find("from ClientReferral cr where cr.ClientId = ? and (cr.Status = '"+ClientReferral.STATUS_ACTIVE+"' or cr.Status = '"+ClientReferral.STATUS_PENDING+"' or cr.Status = '"+ClientReferral.STATUS_UNKNOWN+"')", clientId);
         }else{
           ArrayList<Object> paramList = new ArrayList<Object>();
           String sSQL="from ClientReferral cr where cr.ClientId = ? and (cr.Status = '" + ClientReferral.STATUS_ACTIVE+"' or cr.Status = '" +
@@ -184,7 +184,7 @@ public class ClientReferralDAO extends HibernateDaoSupport {
           paramList.add(facilityId);
           paramList.add(facilityId);
           Object params[] = paramList.toArray(new Object[paramList.size()]);
-          results = getHibernateTemplate().find(sSQL, params);
+          results = (List<ClientReferral>) getHibernateTemplate().find(sSQL, params);
         }
 
         if (log.isDebugEnabled()) {
@@ -212,7 +212,7 @@ public class ClientReferralDAO extends HibernateDaoSupport {
         paramList.add(programId);
           
         Object params[] = paramList.toArray(new Object[paramList.size()]);
-        results = getHibernateTemplate().find(sSQL, params);        
+        results = (List<ClientReferral>) getHibernateTemplate().find(sSQL, params);
 
         if (log.isDebugEnabled()) {
             log.debug("getActiveReferralsByClientAndProgram: clientId=" + clientId + "programId " + programId +", # of results=" + results.size());
@@ -266,7 +266,7 @@ public class ClientReferralDAO extends HibernateDaoSupport {
     
     public List<ClientReferral> getClientReferralsByProgram(int programId) {
     	@SuppressWarnings("unchecked")
-        List<ClientReferral> results = this.getHibernateTemplate().find("from ClientReferral cr where cr.ProgramId = ?", new Long(programId));
+        List<ClientReferral> results = (List<ClientReferral>) this.getHibernateTemplate().find("from ClientReferral cr where cr.ProgramId = ?", new Long(programId));
 
        return results;
     }

@@ -52,7 +52,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class WaitlistDao {
 
-	@PersistenceContext(unitName = "persistenceUnit")
+	@PersistenceContext
 	protected EntityManager entityManager = null;
 	
 	private List<MatchBO> constructMatchBOList(List<Object[]> results) {

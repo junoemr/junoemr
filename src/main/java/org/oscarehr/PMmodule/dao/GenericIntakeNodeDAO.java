@@ -76,7 +76,7 @@ public class GenericIntakeNodeDAO extends HibernateDaoSupport {
 	public List<IntakeNode> getIntakeNodes() {
 		// List l =
 		// getHibernateTemplate().find("from IntakeNode i, IntakeNodeType iType, IntakeNodeTemplate iTemplate  where iType.type = 'intake'  and iType.intake_node_type_id = iTemplate.intake_node_type_id and i.intake_node_template_id = iTemplate.intake_node_template_id");
-		List<IntakeNode> l = getHibernateTemplate()
+		List<IntakeNode> l = (List<IntakeNode>) getHibernateTemplate()
 				.find(
 						"select i from IntakeNode i, IntakeNodeType iType, IntakeNodeTemplate iTemplate  where iType.type = 'intake'  and iType.id = iTemplate.type and i.nodeTemplate = iTemplate.id");
 
@@ -90,7 +90,7 @@ public class GenericIntakeNodeDAO extends HibernateDaoSupport {
 	public List<IntakeNode> getPublishedIntakeNodesByName(String name) {
 		// List l =
 		// getHibernateTemplate().find("from IntakeNode i, IntakeNodeType iType, IntakeNodeTemplate iTemplate  where iType.type = 'intake'  and iType.intake_node_type_id = iTemplate.intake_node_type_id and i.intake_node_template_id = iTemplate.intake_node_template_id");
-		List<IntakeNode> l = getHibernateTemplate()
+		List<IntakeNode> l = (List<IntakeNode>) getHibernateTemplate()
 				.find(
 						"select i from IntakeNode i, IntakeNodeType iType, IntakeNodeTemplate iTemplate, IntakeNodeLabel iLabel  where iType.type = 'intake'  and iType.id = iTemplate.type and i.nodeTemplate = iTemplate.id and i.label = iLabel.id and i.publish_date != null and iLabel.label = ? order by i.form_version desc",
 						new Object[] { name });
@@ -256,7 +256,7 @@ public class GenericIntakeNodeDAO extends HibernateDaoSupport {
 	}
 
 	public List<IntakeNodeJavascript> getIntakeNodeJavascriptLocation(String questionId) {
-		List<IntakeNodeJavascript> js = getHibernateTemplate().find("FROM IntakeNodeJavascript j where j.questionId=?",questionId);
+		List<IntakeNodeJavascript> js = (List<IntakeNodeJavascript>) getHibernateTemplate().find("FROM IntakeNodeJavascript j where j.questionId=?",questionId);
 		return js;
 	}
 }

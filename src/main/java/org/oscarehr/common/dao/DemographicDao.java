@@ -50,7 +50,6 @@ import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import oscar.MyDateFormat;
 import oscar.OscarProperties;
@@ -138,7 +137,26 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	}
 	
 	@SuppressWarnings("unchecked")
-    public List<Demographic> getActiveDemographics(final int offset, final int limit) {
+    public List<Demographic> getActiveDemographics(final int offset, final int limit)
+	{
+		Session session = getSession();
+
+		Query query = session.createQuery("FROM Demographic d WHERE d.PatientStatus = 'AC'");
+		if (offset > 0) {
+			query.setFirstResult(offset);
+		}
+		int aLimit = limit;
+		if (aLimit <= 0) {
+			aLimit = MAX_SELECT_SIZE;
+		}
+		if (aLimit > MAX_SELECT_SIZE) {
+			throw new MaxSelectLimitExceededException(MAX_SELECT_SIZE, aLimit);
+		}
+		query.setMaxResults(aLimit);
+
+		return query.list();
+
+		/*
 		return getHibernateTemplate().executeFind(new HibernateCallback<List<Demographic>>() {
 			@Override
             public List<Demographic> doInHibernate(Session session) throws HibernateException, SQLException {
@@ -158,6 +176,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	            return query.list();
             }
 		});
+		 */
 	}
 	
 
@@ -178,13 +197,13 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		if (onlyActive) {
 			q = "From Demographic d where d.ProviderNo = ? and d.PatientStatus = 'AC' ";
 		}
-		List<Demographic> rs = getHibernateTemplate().find(q, new Object[] { providerNo });
+		List<Demographic> rs = (List<Demographic>) getHibernateTemplate().find(q, new Object[] { providerNo });
 		return rs;
 	}
 
 	public Demographic getDemographicByMyOscarUserName(String myOscarUserName) {
 		String q = "From Demographic d where d.myOscarUserName = ? ";
-		List<Demographic> rs = getHibernateTemplate().find(q, new Object[] { myOscarUserName });
+		List<Demographic> rs = (List<Demographic>) getHibernateTemplate().find(q, new Object[] { myOscarUserName });
 		if (rs.size() > 0) return (rs.get(0));
 		else return (null);
 	}
@@ -1093,31 +1112,31 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 
 	@SuppressWarnings("unchecked")
 	public List<String> getRosterStatuses() {
-		List<String> results = getHibernateTemplate().find("SELECT DISTINCT d.RosterStatus FROM Demographic d where d.RosterStatus != '' and d.RosterStatus != 'RO' and d.RosterStatus != 'NR' and d.RosterStatus != 'TE' and d.RosterStatus != 'FS'");
+		List<String> results = (List<String>) getHibernateTemplate().find("SELECT DISTINCT d.RosterStatus FROM Demographic d where d.RosterStatus != '' and d.RosterStatus != 'RO' and d.RosterStatus != 'NR' and d.RosterStatus != 'TE' and d.RosterStatus != 'FS'");
 		return results;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<String> getAllRosterStatuses() {
-		List<String> results = getHibernateTemplate().find("SELECT DISTINCT d.RosterStatus FROM Demographic d where d.RosterStatus is not null order by d.RosterStatus");
+		List<String> results = (List<String>) getHibernateTemplate().find("SELECT DISTINCT d.RosterStatus FROM Demographic d where d.RosterStatus is not null order by d.RosterStatus");
 		return results;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<String> getAllPatientStatuses() {
-		List<String> results = getHibernateTemplate().find("SELECT DISTINCT d.PatientStatus FROM Demographic d where d.PatientStatus is not null order by d.PatientStatus");
+		List<String> results = (List<String>) getHibernateTemplate().find("SELECT DISTINCT d.PatientStatus FROM Demographic d where d.PatientStatus is not null order by d.PatientStatus");
 		return results;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<String> search_ptstatus() {
-		List<String> results = getHibernateTemplate().find("SELECT DISTINCT d.PatientStatus FROM Demographic d where d.PatientStatus is not null and d.PatientStatus <> '' and d.PatientStatus <> 'AC' and d.PatientStatus <> 'IN' and d.PatientStatus <> 'DE' and d.PatientStatus <> 'MO' and d.PatientStatus <> 'FI' order by d.PatientStatus");
+		List<String> results = (List<String>) getHibernateTemplate().find("SELECT DISTINCT d.PatientStatus FROM Demographic d where d.PatientStatus is not null and d.PatientStatus <> '' and d.PatientStatus <> 'AC' and d.PatientStatus <> 'IN' and d.PatientStatus <> 'DE' and d.PatientStatus <> 'MO' and d.PatientStatus <> 'FI' order by d.PatientStatus");
 		return results;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<String> getAllProviderNumbers() {
-		List<String> results = getHibernateTemplate().find("SELECT DISTINCT d.ProviderNo FROM Demographic d order by d.ProviderNo");
+		List<String> results = (List<String>) getHibernateTemplate().find("SELECT DISTINCT d.ProviderNo FROM Demographic d order by d.ProviderNo");
 		return results;
 	}
 
@@ -1176,7 +1195,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 
 		String queryStr = " FROM Demographic";
 		@SuppressWarnings("unchecked")
-		List<Demographic> rs = getHibernateTemplate().find(queryStr);
+		List<Demographic> rs = (List<Demographic>) getHibernateTemplate().find(queryStr);
 
 		if (log.isDebugEnabled()) {
 			log.debug("getClients: # of results=" + rs.size());
@@ -1634,7 +1653,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	public List<Demographic> getClientsByChartNo(String chartNo) {
 		String queryStr = " FROM Demographic d where d.ChartNo=?";
 		@SuppressWarnings("unchecked")
-		List<Demographic> rs = getHibernateTemplate().find(queryStr, new Object[] { chartNo });
+		List<Demographic> rs = (List<Demographic>) getHibernateTemplate().find(queryStr, new Object[] { chartNo });
 
 		if (log.isDebugEnabled()) {
 			log.debug("getClientsByChartNo: # of results=" + rs.size());
@@ -1646,7 +1665,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	public List<Demographic> getClientsByHealthCard(String num, String type) {
 		String queryStr = " FROM Demographic d where d.Hin=? and d.HcType=?";
 		@SuppressWarnings("unchecked")
-		List<Demographic> rs = getHibernateTemplate().find(queryStr, new Object[] { num, type });
+		List<Demographic> rs = (List<Demographic>) getHibernateTemplate().find(queryStr, new Object[] { num, type });
 
 		if (log.isDebugEnabled()) {
 			log.debug("getClientsByHealthCard: # of results=" + rs.size());
@@ -1704,7 +1723,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		String sql = "FROM Demographic WHERE " + whereClause;
 
 		@SuppressWarnings("unchecked")
-		List<Demographic> demographics = this.getHibernateTemplate().find(sql, params.toArray(new String[params.size()]));
+		List<Demographic> demographics = (List<Demographic>) this.getHibernateTemplate().find(sql, params.toArray(new String[params.size()]));
 
 		if (!demographics.isEmpty()) {
 			return demographics.get(0);
@@ -1716,7 +1735,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	public List<Demographic> searchByHealthCard(String hin) {
 		String queryStr = " FROM Demographic d where d.Hin=?";
 		@SuppressWarnings("unchecked")
-		List<Demographic> rs = getHibernateTemplate().find(queryStr, new Object[] { hin });
+		List<Demographic> rs = (List<Demographic>) getHibernateTemplate().find(queryStr, new Object[] { hin });
 
 		return rs;
 	}
@@ -1741,7 +1760,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 			params.add(date_of_birth);
 		}
 
-		return this.getHibernateTemplate().find(sql, params.toArray(new String[params.size()]));
+		return (List<Demographic>) this.getHibernateTemplate().find(sql, params.toArray(new String[params.size()]));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1764,27 +1783,27 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 			params.add(date_of_birth);
 		}
 
-		return this.getHibernateTemplate().find(sql, params.toArray(new String[params.size()]));
+		return (List<Demographic>) this.getHibernateTemplate().find(sql, params.toArray(new String[params.size()]));
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Demographic> getDemographicsByHealthNum(String hin) {
-		return this.getHibernateTemplate().find("from Demographic d where d.Hin=?", new Object[] { hin });
+		return (List<Demographic>) this.getHibernateTemplate().find("from Demographic d where d.Hin=?", new Object[] { hin });
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getActiveDemographicIds() {
-		return this.getHibernateTemplate().find("select d.DemographicNo from Demographic d where d.PatientStatus=?", new Object[] { "AC" });
+		return (List<Integer>) this.getHibernateTemplate().find("select d.DemographicNo from Demographic d where d.PatientStatus=?", new Object[] { "AC" });
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getDemographicIds() {
-		return this.getHibernateTemplate().find("select d.DemographicNo from Demographic d");
+		return (List<Integer>) this.getHibernateTemplate().find("select d.DemographicNo from Demographic d");
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Demographic> getDemographicWithGreaterThanYearOfBirth(int yearOfBirth) {
-		return this.getHibernateTemplate().find("from Demographic d where d.YearOfBirth > ?", new Object[] { String.valueOf(yearOfBirth) });
+		return (List<Demographic>) this.getHibernateTemplate().find("from Demographic d where d.YearOfBirth > ?", new Object[] { String.valueOf(yearOfBirth) });
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1837,10 +1856,10 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	@SuppressWarnings("unchecked")
 	public List<Demographic> findByCriterion(DemographicCriterion c) {
 		if (c.getHealthNumber() == null || c.getHealthNumber().trim().isEmpty()) {
-			return this.getHibernateTemplate().find("FROM Demographic d " + "WHERE d.LastName like ?" + "AND d.FirstName like ? " + "AND d.YearOfBirth = ? " + "AND d.MonthOfBirth = ? " + "AND d.DateOfBirth = ? " + "AND d.Sex like ? " + "AND d.PatientStatus = ?", c.getAll(false));
+			return (List<Demographic>) this.getHibernateTemplate().find("FROM Demographic d " + "WHERE d.LastName like ?" + "AND d.FirstName like ? " + "AND d.YearOfBirth = ? " + "AND d.MonthOfBirth = ? " + "AND d.DateOfBirth = ? " + "AND d.Sex like ? " + "AND d.PatientStatus = ?", c.getAll(false));
 		}
 
-		return this.getHibernateTemplate().find("FROM Demographic d " + "WHERE d.Hin = ? " + "AND d.LastName like ?" + "AND d.FirstName like ? " + "AND d.YearOfBirth = ? " + "AND d.MonthOfBirth = ? " + "AND d.DateOfBirth = ? " + "AND d.Sex like ? " + "AND d.PatientStatus = ?", c.getAll(true));
+		return (List<Demographic>) this.getHibernateTemplate().find("FROM Demographic d " + "WHERE d.Hin = ? " + "AND d.LastName like ?" + "AND d.FirstName like ? " + "AND d.YearOfBirth = ? " + "AND d.MonthOfBirth = ? " + "AND d.DateOfBirth = ? " + "AND d.Sex like ? " + "AND d.PatientStatus = ?", c.getAll(true));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1867,7 +1886,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		Calendar c = Calendar.getInstance();
 		c.set(Calendar.YEAR, Integer.parseInt(String.valueOf("-" + (age + 1))));
 
-		List<Object[]> demographics = getHibernateTemplate().find("SELECT d.DemographicNo,d.YearOfBirth,d.MonthOfBirth,d.DateOfBirth FROM Demographic d WHERE d.PatientStatus = 'AC'");
+		List<Object[]> demographics = (List<Object[]>) getHibernateTemplate().find("SELECT d.DemographicNo,d.YearOfBirth,d.MonthOfBirth,d.DateOfBirth FROM Demographic d WHERE d.PatientStatus = 'AC'");
 		for (Object[] tm : demographics) {
 			Demographic d = new Demographic();
 			d.setDemographicNo((Integer) tm[0]);
@@ -2001,7 +2020,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
     }
     
     public List<Integer> getDemographicIdsAddedSince(Date value) {	
-    	return this.getHibernateTemplate().find("select d.DemographicNo from Demographic d where d.lastUpdateDate >?", value);
+    	return (List<Integer>) this.getHibernateTemplate().find("select d.DemographicNo from Demographic d where d.lastUpdateDate >?", value);
     }
     
 
@@ -2051,7 +2070,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 
 		String q = "FROM Demographic d WHERE d.DemographicNo in (:ids)";
 		@SuppressWarnings("unchecked")
-		List<Demographic> results = getHibernateTemplate().findByNamedParam(q, "ids", demographicIds);
+		List<Demographic> results = (List<Demographic>) getHibernateTemplate().findByNamedParam(q, "ids", demographicIds);
 		return (results);
 
 	}

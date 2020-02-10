@@ -74,6 +74,9 @@ public class HsfoQuartzServlet implements Servlet
 
 		scheduler.start();
 
+		// TODO: SPRINGUPGRADE: make this do something
+
+/*
 		JobDetail job = scheduler.getJobDetail(RESUBMIT_JOB,
 				Scheduler.DEFAULT_GROUP);
 		if (job != null)
@@ -87,6 +90,7 @@ public class HsfoQuartzServlet implements Servlet
 		JobDetail jobDetail = new JobDetail(RESUBMIT_JOB,
 				Scheduler.DEFAULT_GROUP, ResubmitJob.class);
 		scheduler.scheduleJob(jobDetail, trigger);
+*/
 
 	}
 

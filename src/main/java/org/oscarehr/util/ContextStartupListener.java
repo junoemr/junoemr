@@ -39,10 +39,19 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import com.quatro.dao.security.SecroleDao;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
 
-public class ContextStartupListener implements javax.servlet.ServletContextListener {
+@Component
+public class ContextStartupListener implements javax.servlet.ServletContextListener
+{
 	private static final Logger logger = MiscUtils.getLogger();
+
+	// XXX: This is not used in this file, but it seems like autowiring it like this triggers the
+	//      constructor that is required to use the static SpringUtils.getBean() method.
+	@Autowired
+	private SpringUtils springUtils;
 
 	@Override
 	public void contextInitialized(javax.servlet.ServletContextEvent sce) {

@@ -49,10 +49,10 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 
 	protected Class<T> modelClass;
 
-	@PersistenceContext(unitName = "persistenceUnit")
+	@PersistenceContext
 	protected EntityManager entityManager = null;
 
-	@PersistenceContext(unitName = "readOnlyPersistenceUnit")
+	@PersistenceContext
 	protected EntityManager readOnlyEntityManager = null;
 
 	protected AbstractDao(Class<T> modelClass) {

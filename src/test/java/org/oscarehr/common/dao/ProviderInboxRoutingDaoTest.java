@@ -65,8 +65,6 @@ public class ProviderInboxRoutingDaoTest extends DaoTestFixtures {
 			dao.addToProviderInbox("1", 1, LabResultData.DOCUMENT);
 		} catch (PersistenceException e) {
 			fail("Error related to JPA configuration");
-		} catch (HibernateException e) {
-			fail("Error related to Hibernate configuration");
 		} catch (Exception e) {
 			// TODO add proper pre-initialization populate lab routing rules, result data, provider data and make sure that the routing works   
 			// just swallow for now

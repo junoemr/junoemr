@@ -1,7 +1,14 @@
 <project
 		xmlns="http://maven.apache.org/POM/4.0.0"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.2.4.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
 	<groupId>org.oscarehr</groupId>
 	<artifactId>oscar</artifactId>
 	<packaging>war</packaging>
@@ -43,9 +50,9 @@
 		<tag>master</tag>
 	</scm>
 	<properties>
+		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
-		<tomcat.version>7.0.76</tomcat.version>
 		<webpack.env>prod</webpack.env>
 		<antrun.skip.jspc>false</antrun.skip.jspc>
 		<oscar.use.integration.prop>false</oscar.use.integration.prop>
@@ -53,17 +60,87 @@
 	</properties>
 	<repositories>
 		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+		</repository>
+		<repository>
 			<id>local_repo</id>
 			<url>file://${basedir}/local_repo</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+		</pluginRepository>
+		<pluginRepository>
 			<id>local_repo</id>
 			<url>file://${basedir}/local_repo</url>
 		</pluginRepository>
 	</pluginRepositories>
 	<dependencies>
+		<!-- Spring Boot -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-integration</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-file</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-sftp</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+			<version>1.5.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<!-- general libraries -->
 		<dependency>
 			<groupId>net.bull.javamelody</groupId>
@@ -80,6 +157,8 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
 		</dependency>
+		<!-- TODO: SPRINGUPGRADE: should I explicitly include a newer version? -->
+<!--
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -90,6 +169,7 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.5.6</version>
 		</dependency>
+-->
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
@@ -104,6 +184,11 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>3.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-fileupload</groupId>
@@ -228,6 +313,7 @@
 			<version>2.1.8</version>
 		</dependency>
 		<!-- spring -->
+<!--
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
@@ -254,6 +340,11 @@
 			<version>3.2.18.RELEASE</version>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>3.2.18.RELEASE</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-ftp</artifactId>
 			<version>3.0.8.RELEASE</version>
@@ -263,22 +354,21 @@
 			<artifactId>spring-integration-sftp</artifactId>
 			<version>3.0.8.RELEASE</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-aspects</artifactId>
-			<version>3.2.18.RELEASE</version>
-		</dependency>
+-->
 		<!-- hibernate / sql -->
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
 			<version>1.4</version>
 		</dependency>
+<!--
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.39</version>
 		</dependency>
+-->
+<!--
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
@@ -290,6 +380,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+-->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
@@ -479,11 +570,13 @@
 			<version>1.5-beta1</version>
 		</dependency>
 		<!-- joda time -->
+<!--
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>1.4</version>
 		</dependency>
+-->
 		<!-- caisi integrator -->
 		<dependency>
 			<groupId>org.oscarehr.caisi_integrator</groupId>
@@ -653,7 +746,7 @@
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
-			<version>1.8.5</version>
+			<version>2.3.2</version>
 		</dependency>
 		<!-- cookie revolver -->
 		<dependency>
@@ -776,6 +869,12 @@
 			<groupId>displaytag</groupId>
 			<artifactId>displaytag</artifactId>
 			<version>1.1.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.google.zxing/core -->
 		<dependency>
@@ -938,12 +1037,14 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+<!--
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-catalina</artifactId>
 			<version>7.0.76</version>
 			<scope>provided</scope>
 		</dependency>
+-->
 		<!-- CXF -->
 		<dependency>
 			<groupId>com.sun.xml.messaging.saaj</groupId>
@@ -1180,23 +1281,23 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.9.5</version>
+			<version>2.10.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
-			<version>2.9.5</version>
+			<version>2.10.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
-			<version>2.9.5</version>
+			<version>2.10.2</version>
 		</dependency>
 		<dependency>
 			<!-- json support for java 8 localDate -->
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>2.9.5</version>
+			<version>2.10.2</version>
 		</dependency>
         <dependency>
             <groupId>io.prometheus</groupId>
@@ -1276,6 +1377,17 @@
 			<version>3.141.59</version>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+<!--
 	<build>
 		<resources>
 			<resource>
@@ -1523,8 +1635,8 @@
 						</webResource>
 					</webResources>
 
-					<!-- do not package unneeded files from JunoUI into WAR -->
-					<!-- TODO: exclude everything but dist JS and CSS and the JSPs -->
+					&lt;!&ndash; do not package unneeded files from JunoUI into WAR &ndash;&gt;
+					&lt;!&ndash; TODO: exclude everything but dist JS and CSS and the JSPs &ndash;&gt;
 					<packagingExcludes>
 						web/*.sh,
 						web/bower.json,
@@ -1543,18 +1655,20 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
+&lt;!&ndash;
 					<compilerArgs>
-						<arg>--add-modules</arg>
+						<arg>&#45;&#45;add-modules</arg>
 						<arg>java.se.ee</arg>
-						<arg>--add-modules</arg>
+						<arg>&#45;&#45;add-modules</arg>
 						<arg>jdk.xml.ws</arg>
-						<arg>--add-modules</arg>
+						<arg>&#45;&#45;add-modules</arg>
 						<arg>jdk.xml.bind</arg>
 					</compilerArgs>
-<!--					<compilerArguments>
+&ndash;&gt;
+&lt;!&ndash;					<compilerArguments>
 						<compilerArgument>&#45;&#45;add-modules</compilerArgument>
 						<compilerArgument>java.se.ee</compilerArgument>
-					</compilerArguments>-->
+					</compilerArguments>&ndash;&gt;
 				</configuration>
 			</plugin>
 			<plugin>
@@ -1665,20 +1779,22 @@
 							<goal>native2ascii</goal>
 						</goals>
 						<configuration>
+&lt;!&ndash;
 							<dest>src/main/resources</dest>
 							<src>src/main/resources/native-bundles</src>
 							<encoding>UTF8</encoding>
 							<include>uiResources_*.properties</include>
+&ndash;&gt;
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 
-			<!-- This plugin creates the openapi.json file for the internal REST api.  It is used -->
-			<!-- below to generate code.  This must be run before the generate-typescpipt-api -->
-			<!-- execution. -->
-			<!-- TODO: This plugin should be replaced with swagger-maven-plugin once that plugin -->
-			<!-- TODO: supports openapi V3 -->
+			&lt;!&ndash; This plugin creates the openapi.json file for the internal REST api.  It is used &ndash;&gt;
+			&lt;!&ndash; below to generate code.  This must be run before the generate-typescpipt-api &ndash;&gt;
+			&lt;!&ndash; execution. &ndash;&gt;
+			&lt;!&ndash; TODO: This plugin should be replaced with swagger-maven-plugin once that plugin &ndash;&gt;
+			&lt;!&ndash; TODO: supports openapi V3 &ndash;&gt;
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -1708,9 +1824,9 @@
 				</configuration>
 			</plugin>
 
-			<!-- This plugin generates typescript models from the openapi.json file generated -->
-			<!-- above.  This must be run after the generate-openapi-spec execution -->
-			<!-- This script must also be run before gulp so the files are available to compile -->
+			&lt;!&ndash; This plugin generates typescript models from the openapi.json file generated &ndash;&gt;
+			&lt;!&ndash; above.  This must be run after the generate-openapi-spec execution &ndash;&gt;
+			&lt;!&ndash; This script must also be run before gulp so the files are available to compile &ndash;&gt;
 			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
@@ -1731,16 +1847,16 @@
 				</executions>
 			</plugin>
 
-			<!-- This is a terrible hack to counteract a bug in the openapi-generator library.  -->
-			<!-- There is an open issue at the time of writing to prove they are aware of the -->
-			<!-- issue at https://github.com/OpenAPITools/openapi-generator/issues/189 -->
-			<!-- This plugin runs a script that replaces the string "models.models." in the -->
-			<!-- generated api with "models.".  It is being run using antrun because all plugins -->
-			<!-- of the same type in a pom.xml file are bundled together and run where the first -->
-			<!-- one is defined.  Since exec-maven-plugin needs to be run before the -->
-			<!-- openapi-generator-maven-plugin and this needs to be run after, they can't use -->
-			<!-- the same plugin. -->
-			<!-- TODO: scrap this once openapi-generator is fixed -->
+			&lt;!&ndash; This is a terrible hack to counteract a bug in the openapi-generator library.  &ndash;&gt;
+			&lt;!&ndash; There is an open issue at the time of writing to prove they are aware of the &ndash;&gt;
+			&lt;!&ndash; issue at https://github.com/OpenAPITools/openapi-generator/issues/189 &ndash;&gt;
+			&lt;!&ndash; This plugin runs a script that replaces the string "models.models." in the &ndash;&gt;
+			&lt;!&ndash; generated api with "models.".  It is being run using antrun because all plugins &ndash;&gt;
+			&lt;!&ndash; of the same type in a pom.xml file are bundled together and run where the first &ndash;&gt;
+			&lt;!&ndash; one is defined.  Since exec-maven-plugin needs to be run before the &ndash;&gt;
+			&lt;!&ndash; openapi-generator-maven-plugin and this needs to be run after, they can't use &ndash;&gt;
+			&lt;!&ndash; the same plugin. &ndash;&gt;
+			&lt;!&ndash; TODO: scrap this once openapi-generator is fixed &ndash;&gt;
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.8</version>
@@ -1759,7 +1875,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- show maven clean how to clean up files generated by open-api generator above -->
+			&lt;!&ndash; show maven clean how to clean up files generated by open-api generator above &ndash;&gt;
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>3.1.0</version>
@@ -1802,7 +1918,7 @@
 						</configuration>
 					</execution>
 					<execution>
-						<!-- We're doing jspc this way because the codehaus jspc seems to be abandonded, it doesn't go beyond jdk 1.5 and the documentation is sparse, and the source code links to a broken page and I can't find the goals it supports. -->
+						&lt;!&ndash; We're doing jspc this way because the codehaus jspc seems to be abandonded, it doesn't go beyond jdk 1.5 and the documentation is sparse, and the source code links to a broken page and I can't find the goals it supports. &ndash;&gt;
 						<id>jspc</id>
 						<phase>verify</phase>
 						<goals>
@@ -1851,7 +1967,7 @@
 			</plugin>
 
 
-			<!-- JunoUI -->
+			&lt;!&ndash; JunoUI &ndash;&gt;
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
@@ -1859,14 +1975,14 @@
 
 				<configuration>
 					<workingDirectory>${basedir}/src/main/frontend</workingDirectory>
-					<!-- TODO switch to JUNO directory -->
-					<!-- <workingDirectory>${basedir}/src/main/webapp/juno</workingDirectory> -->
+					&lt;!&ndash; TODO switch to JUNO directory &ndash;&gt;
+					&lt;!&ndash; <workingDirectory>${basedir}/src/main/webapp/juno</workingDirectory> &ndash;&gt;
 					<installDirectory>target</installDirectory>
 					<nodeVersion>v6.10.3</nodeVersion>
 				</configuration>
 
 				<executions>
-					<!-- installs node and npm locally into target/node -->
+					&lt;!&ndash; installs node and npm locally into target/node &ndash;&gt;
 					<execution>
 						<id>install node and npm</id>
 						<phase>process-classes</phase>
@@ -1874,7 +1990,7 @@
 							<goal>install-node-and-npm</goal>
 						</goals>
 					</execution>
-					<!-- runs npm install on working directory -->
+					&lt;!&ndash; runs npm install on working directory &ndash;&gt;
 					<execution>
 						<id>npm install</id>
 						<phase>process-classes</phase>
@@ -1890,7 +2006,7 @@
 						</goals>
 
 						<configuration>
-							<arguments>--config webpack.${webpack.env}.js</arguments>
+							<arguments>&#45;&#45;config webpack.${webpack.env}.js</arguments>
 						</configuration>
 					</execution>
 				</executions>
@@ -1898,7 +2014,7 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				&lt;!&ndash;This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.&ndash;&gt;
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -1966,6 +2082,7 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+-->
 	<profiles>
 		<profile>
 			<id>jdk6</id>

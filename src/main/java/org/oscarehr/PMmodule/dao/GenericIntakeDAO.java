@@ -64,7 +64,7 @@ public class GenericIntakeDAO extends HibernateDaoSupport {
 
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getOcanIntakesAfterDate(Calendar after) {
-		return getHibernateTemplate().find("from Intake i, IntakeNode n, IntakeNodeLabel l where " +
+		return (List<Object[]>) getHibernateTemplate().find("from Intake i, IntakeNode n, IntakeNodeLabel l where " +
 			"i.createdOn > ? and i.node.id = n.id and n.label.id = l.id and " +
 			"(l.label like '%OCAN Staff Assessment%' or l.label like '%OCAN Client Self Assessment%') order by i.createdOn desc",
 			new Object[] { after });
@@ -100,7 +100,7 @@ public class GenericIntakeDAO extends HibernateDaoSupport {
 			throw new IllegalArgumentException("Parameter facilityId must be non-null");
 		}
 
-		List<Integer> clientIds = getHibernateTemplate().find("select distinct i.clientId from Intake i where i.facilityId = ? order by i.clientId",
+		List<Integer> clientIds = (List<Integer>) getHibernateTemplate().find("select distinct i.clientId from Intake i where i.facilityId = ? order by i.clientId",
 				new Object[] { facilityId });
 
 		return clientIds;
@@ -108,7 +108,7 @@ public class GenericIntakeDAO extends HibernateDaoSupport {
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getIntakeFacilityIds() {
-		List<Integer> facilityIds = getHibernateTemplate().find("select distinct i.facilityId from Intake i ");
+		List<Integer> facilityIds = (List<Integer>) getHibernateTemplate().find("select distinct i.facilityId from Intake i ");
 
 		return facilityIds;
 	}
@@ -472,6 +472,6 @@ public class GenericIntakeDAO extends HibernateDaoSupport {
 
 
 	public List<IntakeNode> getIntakeNodesByType(Integer formType) {
-		return this.getHibernateTemplate().find("From IntakeNode n where n.formType = ? and n.publish_by is not null", new Object[] {formType});
+		return (List<IntakeNode>) this.getHibernateTemplate().find("From IntakeNode n where n.formType = ? and n.publish_by is not null", new Object[] {formType});
 	}
 }

@@ -77,8 +77,11 @@ public class HsfoQuartzServlet implements Servlet
 		//this is just for testing every 5 minutes: 
 		//String cronExpression = "0 0,5,10,15,20,25,30,35,40,45,50,55 " + hour + "-23 * * ?";
 		
-		logger.info("quartz schedule cron expression:" + cronExpression);		
-		
+		logger.info("quartz schedule cron expression:" + cronExpression);
+
+		// TODO: SPRINGUPGRADE: make this do something
+
+/*
 		CronTrigger trigger = new CronTrigger(RESUBMIT_TRIGGER, Scheduler.DEFAULT_GROUP, cronExpression);
 		
 		//trigger.setCronExpression("0 42 10 * * ?"); //Build a trigger that will fire daily at 10:42 am
@@ -97,7 +100,8 @@ public class HsfoQuartzServlet implements Servlet
 			//Start new job.			
 			scheduler.scheduleJob(jobDetail, trigger);
 		}
-		
+*/
+
 	}
 
 	public ServletConfig getServletConfig()

@@ -53,7 +53,7 @@ import oscar.util.ConversionUtils;
 public class BillingmasterDAO {
 	private static Logger log = MiscUtils.getLogger();
 
-	@PersistenceContext(unitName = "persistenceUnit")
+	@PersistenceContext
 	protected EntityManager entityManager = null;
 
 	/** Creates a new instance of BillingmasterDAO */

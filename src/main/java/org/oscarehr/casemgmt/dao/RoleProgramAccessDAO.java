@@ -33,13 +33,13 @@ public class RoleProgramAccessDAO extends HibernateDaoSupport {
     @SuppressWarnings("unchecked")
     public List<DefaultRoleAccess> getDefaultAccessRightByRole(Long roleId) {
         String q = "from DefaultRoleAccess da where da.caisi_role.id=?";
-        return getHibernateTemplate().find(q, roleId);
+        return (List<DefaultRoleAccess>) getHibernateTemplate().find(q, roleId);
     }
 
     @SuppressWarnings("unchecked")
 	public List<DefaultRoleAccess> getDefaultSpecificAccessRightByRole(Long roleId, String accessType) {
 		String q = "from DefaultRoleAccess da where da.caisi_role.id=? and da.access_type.Name like ?";
-		return getHibernateTemplate().find(q, new Object[] { roleId, accessType });
+		return (List<DefaultRoleAccess>) getHibernateTemplate().find(q, new Object[] { roleId, accessType });
 	}
 
     public boolean hasAccess(String accessName, Long roleId) {

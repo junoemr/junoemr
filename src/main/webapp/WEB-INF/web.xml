@@ -296,8 +296,8 @@
     </servlet-mapping>
 
 	<servlet>
-		<servlet-name>action</servlet-name>
-		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+		<servlet-name>org.oscarehr.config.BootActionServlet</servlet-name>
+		<servlet-class>org.oscarehr.config.BootActionServlet</servlet-class>
 		<init-param>
 			<param-name>debug</param-name>
 			<param-value>2</param-value>
@@ -500,7 +500,7 @@
 	</servlet-mapping>
 
 	<servlet-mapping>
-		<servlet-name>action</servlet-name>
+		<servlet-name>org.oscarehr.config.BootActionServlet</servlet-name>
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>

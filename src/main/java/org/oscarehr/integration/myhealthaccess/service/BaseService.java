@@ -42,7 +42,7 @@ import oscar.OscarProperties;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
-@Service
+@Service("mha_BaseService")
 public class BaseService extends org.oscarehr.integration.BaseService
 {
 	@Autowired

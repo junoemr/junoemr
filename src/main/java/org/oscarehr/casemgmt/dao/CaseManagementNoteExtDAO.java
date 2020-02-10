@@ -44,7 +44,7 @@ public class CaseManagementNoteExtDAO extends HibernateDaoSupport {
 	@SuppressWarnings("unchecked")
     public List<CaseManagementNoteExt> getExtByNote(Long noteId) {
 	    String hql = "from CaseManagementNoteExt cExt where cExt.noteId = ? order by cExt.id desc";
-	    return this.getHibernateTemplate().find(hql, noteId);
+	    return (List<CaseManagementNoteExt>) this.getHibernateTemplate().find(hql, noteId);
 	}
 
 	public List getExtByKeyVal(String keyVal) {

@@ -565,7 +565,7 @@ public class LookupDao extends HibernateDaoSupport {
 		if (!newCd.isActive()) {
 			String oldCsv = oldCd.getCodecsv();
 
-			List<LstOrgcd> o = this.getHibernateTemplate().find("FROM LstOrgcd o WHERE o.codecsv like ?", oldCsv + "_%");
+			List<LstOrgcd> o = (List<LstOrgcd>) this.getHibernateTemplate().find("FROM LstOrgcd o WHERE o.codecsv like ?", oldCsv + "_%");
 			for (LstOrgcd l : o) {
 				l.setActiveyn(0);
 				this.getHibernateTemplate().update(l);

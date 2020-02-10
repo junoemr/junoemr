@@ -175,7 +175,7 @@ public class SecobjprivilegeDao extends HibernateDaoSupport {
 		List<Secobjprivilege> results = new ArrayList<Secobjprivilege>();
 		
 		@SuppressWarnings("unchecked")
-		List<Secobjprivilege> lst = getHibernateTemplate().find(queryString);
+		List<Secobjprivilege> lst = (List<Secobjprivilege>) getHibernateTemplate().find(queryString);
 		
 		for(Secobjprivilege p:lst) {
 			if(roles.contains(p.getRoleusergroup())) {

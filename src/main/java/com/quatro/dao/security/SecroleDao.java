@@ -38,7 +38,7 @@ public class SecroleDao extends HibernateDaoSupport {
 
     public List<Secrole> getRoles() {
         @SuppressWarnings("unchecked")
-        List<Secrole> results = this.getHibernateTemplate().find("from Secrole r order by roleName");
+        List<Secrole> results = (List<Secrole>) this.getHibernateTemplate().find("from Secrole r order by roleName");
 
         logger.debug("getRoles: # of results=" + results.size());
 
