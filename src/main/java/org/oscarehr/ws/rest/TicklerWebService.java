@@ -26,7 +26,6 @@ package org.oscarehr.ws.rest;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -199,14 +198,14 @@ public class TicklerWebService extends AbstractServiceImpl {
 		ticklerCriteriaSearch.setStartDate(ConversionUtils.fromDateString(serviceStartDate));
 		ticklerCriteriaSearch.setEndDate(ConversionUtils.fromDateString(serviceEndDate));
 
-		Tickler.STATUS ticklerStatus = Tickler.STATUS.A;
+		Tickler.STATUS ticklerStatus = Tickler.STATUS.ACTIVE;
 		switch(status)
 		{
 			case Tickler.COMPLETED:
-				ticklerStatus = Tickler.STATUS.C;
+				ticklerStatus = Tickler.STATUS.COMPLETED;
 				break;
 			case Tickler.DELETED:
-				ticklerStatus = Tickler.STATUS.D;
+				ticklerStatus = Tickler.STATUS.DELETED;
 				break;
 			case Tickler.ACTIVE:
 			default:

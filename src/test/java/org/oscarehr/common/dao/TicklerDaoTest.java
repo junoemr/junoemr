@@ -111,9 +111,9 @@ public class TicklerDaoTest extends DaoTestFixtures {
 
 	@Test 
 	public void testFindSomeStuff() {
-		dao.persist(this.createTickler(1, "hello there", 10015, today(), Tickler.STATUS.A, "1"));
-		dao.persist(this.createTickler(1, "I am coding", 10015, yesterday(), Tickler.STATUS.C, "2"));
-		dao.persist(this.createTickler(2, "this today", 10015, tomorrow(), Tickler.STATUS.A, "1"));
+		dao.persist(this.createTickler(1, "hello there", 10015, today(), Tickler.STATUS.ACTIVE, "1"));
+		dao.persist(this.createTickler(1, "I am coding", 10015, yesterday(), Tickler.STATUS.COMPLETED, "2"));
+		dao.persist(this.createTickler(2, "this today", 10015, tomorrow(), Tickler.STATUS.ACTIVE, "1"));
 		
 		assertTrue(1 == dao.findActiveByMessageForPatients(Arrays.asList(new Integer[] {1}), "hello").size());
 		assertTrue(1 == dao.findActiveByDemographicNoAndMessage(1, "hello there").size());
@@ -166,7 +166,7 @@ public class TicklerDaoTest extends DaoTestFixtures {
 		tu.setPriority("Normal");
 		tu.setProviderNo("999998");
 		tu.setServiceDate(new Date());
-		tu.setStatus(Tickler.STATUS.A);
+		tu.setStatus(Tickler.STATUS.ACTIVE);
 		tu.setUpdateDate(new Date());
 		
 		TicklerComment tc = new TicklerComment();

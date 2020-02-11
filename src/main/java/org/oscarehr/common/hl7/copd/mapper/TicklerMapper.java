@@ -120,9 +120,9 @@ public class TicklerMapper extends AbstractMapper
 		String status = StringUtils.trimToEmpty(provider.getZFU(rep).getZfu6_done().getValue());
 		switch(status)
 		{
-			case "Y": return Tickler.STATUS.C; // completed
+			case "Y": return Tickler.STATUS.COMPLETED; // completed
 			default:
-			case "N": return Tickler.STATUS.A; // active
+			case "N": return Tickler.STATUS.ACTIVE; // active
 		}
 	}
 

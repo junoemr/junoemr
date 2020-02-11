@@ -80,13 +80,13 @@ if (temp == null){
 
         Tickler t = ticklerManager.getTickler(loggedInInfo, Integer.parseInt(temp[i]));
         if(t != null) {
-        	Tickler.STATUS status = Tickler.STATUS.A;
+        	Tickler.STATUS status = Tickler.STATUS.ACTIVE;
         	char tmp = request.getParameter("submit_form").toCharArray()[0];
         	if(tmp == 'C' || tmp == 'c') {
-        		status = Tickler.STATUS.C;
+        		status = Tickler.STATUS.COMPLETED;
         	}
         	if(tmp == 'D' || tmp == 'd') {
-        		status = Tickler.STATUS.D;
+        		status = Tickler.STATUS.DELETED;
         	}
         	ticklerManager.updateStatus(loggedInInfo, t.getId(),loggedInInfo.getLoggedInProviderNo(),status);
         }

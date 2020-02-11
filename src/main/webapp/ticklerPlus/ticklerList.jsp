@@ -398,10 +398,10 @@ int curMonth = now.get(Calendar.MONTH) + 1;
 					}
 					
 					status = "Active";
-					if(temp.getStatus().equals(Tickler.STATUS.C)) {
+					if(temp.getStatus().equals(Tickler.STATUS.COMPLETED)) {
 						status = "Completed";
 					}
-					if(temp.getStatus().equals(Tickler.STATUS.D)) {
+					if(temp.getStatus().equals(Tickler.STATUS.DELETED)) {
 						status = "Deleted";
 					}
 

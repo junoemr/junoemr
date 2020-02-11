@@ -55,7 +55,7 @@ public class TicklerUpdate extends AbstractModel<Integer> {
 	
 	@Column(length=1, nullable=false)
 	@Enumerated(EnumType.STRING)
-	private Tickler.STATUS status = Tickler.STATUS.A;
+	private Tickler.STATUS status = Tickler.STATUS.ACTIVE;
 	
 	@Column(length=6)
 	private String assignedTo;
@@ -157,11 +157,11 @@ public class TicklerUpdate extends AbstractModel<Integer> {
 	
     public void setStatusAsChar(char s) {
     	if(s == 'A' || s == 'a')
-    		setStatus(Tickler.STATUS.A);
+    		setStatus(Tickler.STATUS.ACTIVE);
     	else if(s == 'C' || s == 'c')
-    		setStatus(Tickler.STATUS.C);
+    		setStatus(Tickler.STATUS.COMPLETED);
     	else if(s == 'D' || s == 'd')
-    		setStatus(Tickler.STATUS.D);
+    		setStatus(Tickler.STATUS.DELETED);
     	else
     		throw new IllegalArgumentException("Invalid status");
     }

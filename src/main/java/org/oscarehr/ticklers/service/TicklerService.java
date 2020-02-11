@@ -132,7 +132,7 @@ public class TicklerService {
 		}
 		if (tickler.getStatus() == null)
 		{
-			tickler.setStatus(Tickler.STATUS.A);
+			tickler.setStatus(Tickler.STATUS.ACTIVE);
 		}
 		if (tickler.getUpdateDate() == null)
 		{

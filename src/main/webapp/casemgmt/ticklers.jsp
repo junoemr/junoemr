@@ -89,9 +89,9 @@ org.oscarehr.PMmodule.model.*,org.springframework.context.*,org.springframework.
 									assignee_name = assignee.getLastName() + "," + assignee.getFirstName();
 								}
 								status = "Active";
-								if(temp.getStatus().equals(Tickler.STATUS.C))
+								if(temp.getStatus().equals(Tickler.STATUS.COMPLETED))
 									status="Completed";
-								if(temp.getStatus().equals(Tickler.STATUS.D))
+								if(temp.getStatus().equals(Tickler.STATUS.DELETED))
 									status="Deleted";
 								
 								// add by PINE_SOFT
