@@ -99,6 +99,7 @@ public class CoPDPreProcessorService
 			message = fixSlashBPMeasurements(message);
 			message = fixZATDateString(message);
 			message = timestampPad(message);
+			message = fixReferralPractitionerNo(message);
 
 			// should come last
 			message = ensureNumeric(message);
@@ -210,6 +211,7 @@ public class CoPDPreProcessorService
 			}
 		};
 
+		message = foreachTag(message, "ZBA.31", trimValueCallback);
 		message = foreachTag(message, "ZQO.4", trimValueCallback);
 		message = foreachTag(message, "ZQO.5", trimValueCallback);
 		message = foreachTag(message, "ZQO.6", trimValueCallback);
@@ -241,6 +243,7 @@ public class CoPDPreProcessorService
 			}
 		};
 
+		message = foreachTag(message, "ZBA.31", ensureNumeric);
 		message = foreachTag(message, "ZQO.4", ensureNumeric);
 		message = foreachTag(message, "ZQO.5", ensureNumeric);
 		message = foreachTag(message, "ZQO.6", ensureNumeric);
@@ -465,6 +468,22 @@ public class CoPDPreProcessorService
 			xmlPRD = sb.toString();
 		}
 		return xmlPRD;
+	}
+
+	/**
+	 * Referral practitioner numbers in Alberta have extra non-numeric characters.
+	 * Juno treats it as a single number.
+	 * @param message message on which referral number will be stripped of non-numeric characters
+	 * @return modified message
+	 */
+	private String fixReferralPractitionerNo(String message)
+	{
+		Function<String, String> fixReferralProvider = tagValue -> tagValue.replaceAll("-", "");
+
+		message = foreachTag(message, "XCN.1", fixReferralProvider);
+		message = foreachTag(message, "ZBA.29", fixReferralProvider);
+
+		return message;
 	}
 
 //	private String formatWolfZPV5SegmentNames(String message)
