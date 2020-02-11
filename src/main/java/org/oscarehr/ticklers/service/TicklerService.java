@@ -24,6 +24,7 @@
 
 package org.oscarehr.ticklers.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,7 +32,9 @@ import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.PaginationQuery;
 import org.oscarehr.common.dao.TicklerCategoryDao;
 import org.oscarehr.common.model.Tickler;
+import org.oscarehr.common.search.AbstractCriteriaSearch;
 import org.oscarehr.ticklers.dao.TicklersDao;
+import org.oscarehr.ticklers.search.TicklerCriteriaSearch;
 import org.oscarehr.ticklers.web.TicklerQuery;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,15 +60,15 @@ public class TicklerService {
 	 * @param paginationQuery
 	 * @return int count of ticklers
 	 */
-    public int getTicklersCount(PaginationQuery paginationQuery) {
-	    return this.TicklerDao.getTicklersCount(paginationQuery);
-    }
+	public int getTicklersCount(PaginationQuery paginationQuery) {
+		return this.TicklerDao.getTicklersCount(paginationQuery);
+	}
 	
-    /**
-     * List ticklers
-     * @param paginationQuery
-     * @return List of type Tickler
-     */
+	/**
+	 * List ticklers
+	 * @param paginationQuery
+	 * @return List of type Tickler
+	 */
 	public List<Tickler> getTicklers(LoggedInInfo loggedInInfo, PaginationQuery paginationQuery) {
 		TicklerQuery query = (TicklerQuery) paginationQuery;
 
@@ -155,5 +158,36 @@ public class TicklerService {
 		return tickler;
 	}
 
+	public List<Tickler> getSearchResponse(TicklerCriteriaSearch criteriaSearch, int page, int limit)
+	{
+		int offset = (page - 1) * limit;
+
+		criteriaSearch.setOffset(offset);
+		criteriaSearch.setLimit(limit);
+
+		int total = TicklerDao.criteriaSearchCount(criteriaSearch);
+
+		List<Tickler> resultList = new ArrayList<>();
+		if (total > 0)
+		{
+			resultList = TicklerDao.criteriaSearch(criteriaSearch);
+		}
+		return resultList;
+	}
+
+	/**
+	 * Builds a tickler criteria search.
+	 * @param sortDir direction we want to sort (asc/desc)
+	 * @param orderBy column to order by
+	 * @return criteria search object configured to search with the above
+	 */
+	public TicklerCriteriaSearch buildTicklerSearch(AbstractCriteriaSearch.SORTDIR sortDir, TicklerCriteriaSearch.SORT_MODE orderBy)
+	{
+		TicklerCriteriaSearch ticklerCriteriaSearch = new TicklerCriteriaSearch();
+		ticklerCriteriaSearch.setSortDir(sortDir);
+		ticklerCriteriaSearch.setSortMode(orderBy);
+
+		return ticklerCriteriaSearch;
+	}
 
 }
