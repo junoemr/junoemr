@@ -94,7 +94,10 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 
 		// left join demographic merged and only return the result if it isn't merged
 		criteria.createAlias(alias + ".mergedDemographicsList", "dm", Criteria.LEFT_JOIN);
-		criteria.add(Restrictions.or(Restrictions.isNull("dm.id"), Restrictions.ne("dm.deleted", 0)));
+		criteria.add(Restrictions.or(
+				Restrictions.isNull("dm.id"),
+				Restrictions.eq("dm.deleted", true)
+		));
 
 		// determine criteria join mode ('AND' filter criteria vs 'OR' filter criteria)
 		Junction junction = getEmptyJunction();

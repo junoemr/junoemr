@@ -24,6 +24,8 @@
 package org.oscarehr.eform.service;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.model.EForm;
 import org.oscarehr.util.MiscUtils;
@@ -46,6 +48,12 @@ public class EFormTemplateService
 
 	@Autowired
 	private EFormDao eFormTemplateDao;
+
+	@Autowired
+	private UserPropertyDAO userPropertyDAO;
+
+	public static Integer EFORM_DEFAULT_WIDTH = 700;
+	public static Integer EFORM_DEFAULT_HEIGHT = 800;
 
 	/**
 	 * Save a new EForm template
@@ -142,5 +150,51 @@ public class EFormTemplateService
 		eFormTemplate.setCurrent(!isDeleted);
 		eFormTemplateDao.merge(eFormTemplate);
 		return eFormTemplate;
+	}
+
+	/**
+	 * get the users configured eform popup width
+	 * @param providerNo - the user to get the width for
+	 * @return - the width. default 700.
+	 */
+	public Integer getEformPopupWidth(String providerNo)
+	{
+		try
+		{
+			UserProperty eformPopupWidthProp = userPropertyDAO.getProp(providerNo, UserProperty.EFORM_POPUP_WIDTH);
+
+			if (eformPopupWidthProp != null)
+			{
+				return Integer.parseInt(eformPopupWidthProp.getValue());
+			}
+		}
+		catch (NumberFormatException ne)
+		{
+			MiscUtils.getLogger().error("Failed to parse eform popup width with error: " + ne.getMessage() + " defaulting to " + EFORM_DEFAULT_WIDTH, ne);
+		}
+		return EFORM_DEFAULT_WIDTH;
+	}
+
+	/**
+	 * get the users configured eform popup height
+	 * @param providerNo - the user to get the height for
+	 * @return - the height. default 800.
+	 */
+	public Integer getEformPopupHeight(String providerNo)
+	{
+		try
+		{
+			UserProperty eformPopupHeightProp = userPropertyDAO.getProp(providerNo, UserProperty.EFORM_POPUP_HEIGHT);
+
+			if (eformPopupHeightProp != null)
+			{
+				return Integer.parseInt(eformPopupHeightProp.getValue());
+			}
+		}
+		catch (NumberFormatException ne)
+		{
+			MiscUtils.getLogger().error("Failed to parse eform popup height with error: " + ne.getMessage() + " defaulting to " + EFORM_DEFAULT_HEIGHT, ne);
+		}
+		return EFORM_DEFAULT_HEIGHT;
 	}
 }

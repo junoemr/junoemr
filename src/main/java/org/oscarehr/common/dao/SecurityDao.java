@@ -71,15 +71,18 @@ public class SecurityDao  extends AbstractDao<Security> {
     	return secList;
     }
 
-    public List<Security> findByUserName(String userName) {
-    	Query query = entityManager.createQuery("select x from Security x where x.userName=?");
-    	query.setParameter(1, userName);
-    	
-    	@SuppressWarnings("unchecked")
-        List<Security> secList = query.getResultList();
-    	
-    	return secList;
-    }
+	/**
+	 * Given a username, find the corresponding security entry.
+	 * userName is unique so we should get exactly one result if an entry exists.
+	 * @param userName username that we want to get the security entry for
+	 * @return entry if one exists, null otherwise
+	 */
+	public Security findByUserName(String userName)
+	{
+		Query query = entityManager.createQuery("SELECT x FROM Security x WHERE x.userName=:userName");
+		query.setParameter("userName", userName);
+		return getSingleResultOrNull(query);
+	}
 	
     public List<Security> findByLikeUserName(String userName) {
     	Query query = entityManager.createQuery("select x from Security x where x.userName like ?");

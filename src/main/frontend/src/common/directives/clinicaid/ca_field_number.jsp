@@ -11,11 +11,10 @@
 	</label>
 
 	<div class="{{input_size}}">
-		<input type="text"
+		<input type="number"
 					 id="input-{{name}}"
 					 class="form-control"
 					 ng-model="model"
-					 ca-zero-pad="{{pad_length}}"
 					 ng-focus="focus_fn()"
 					 ng-change="change_fn()"
 					 ng-disabled="disabled"
