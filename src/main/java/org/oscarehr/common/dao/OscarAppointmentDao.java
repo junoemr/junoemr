@@ -66,14 +66,18 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 	 * @return true if a conflict is detected.
 	 */
 	public boolean checkForConflict(Appointment appointment) {
-		String sb = "select a from Appointment a where a.appointmentDate = ? and a.startTime >= ? and a.endTime <= ? and a.providerNo = ? and a.status != 'N' and a.status != 'C'";
+		String sb = "select a from Appointment a where a.appointmentDate = :appDate and " +
+						"((a.startTime >= :startTime and a.startTime <= :endTime) or" +
+						" (a.endTime >= :startTime and a.endTime <= :endTime) or " +
+						" (a.startTime <= :startTime and a.endTime >= :endTime)) and" +
+						" a.providerNo = :providerNo and a.status != 'N' and a.status != 'C'";
 
 		Query query = entityManager.createQuery(sb);
 
-		query.setParameter(1, appointment.getAppointmentDate());
-		query.setParameter(2, appointment.getStartTime());
-		query.setParameter(3, appointment.getEndTime());
-		query.setParameter(4, appointment.getProviderNo());
+		query.setParameter("appDate", appointment.getAppointmentDate());
+		query.setParameter("startTime", appointment.getStartTime());
+		query.setParameter("endTime", appointment.getEndTime());
+		query.setParameter("providerNo", appointment.getProviderNo());
 
 		List<Facility> results = query.getResultList();
 
