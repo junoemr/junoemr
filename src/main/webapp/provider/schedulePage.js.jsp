@@ -1,4 +1,6 @@
-<%--
+<%@ page import="org.oscarehr.eform.service.EFormTemplateService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %><%--
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -40,6 +42,9 @@ if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.Is
     cbiReminderWindow = (String)session.getAttribute("cbiReminderWindow");
 }
 
+	EFormTemplateService eFormTemplateService = (EFormTemplateService) SpringUtils.getBean(EFormTemplateService.class);
+	Integer eformPopupWidth = eFormTemplateService.getEformPopupWidth(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
+	Integer eformPopupHeight = eFormTemplateService.getEformPopupHeight(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
 %>
 function storeApptNo(apptNo) {
 	var url = "storeApptInSession.jsp?appointment_no="+apptNo;
@@ -166,6 +171,11 @@ function popupInboxManager(varpage){
         }
         popup.focus();
     }
+}
+
+function eformPopup(varpage, windowname)
+{
+	popupPage2(varpage, windowname, <%=eformPopupHeight%>, <%=eformPopupWidth%>);
 }
 
 function popupPage2(varpage) {
