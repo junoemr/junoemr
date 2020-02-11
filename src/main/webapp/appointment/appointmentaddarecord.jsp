@@ -52,11 +52,12 @@
 <%@page import="oscar.log.LogAction" %>
 <%@page import="oscar.log.LogConst" %>
 <%@page import="oscar.oscarDemographic.data.DemographicData"%>
-<%@ page import="oscar.oscarDemographic.data.DemographicMerged"%>
 <%@page import="oscar.util.ConversionUtils" %>
 <%@ page import="oscar.util.UtilDateUtilities" %>
 <%@ page import="javax.validation.ConstraintViolationException" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
+<%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <html:html locale="true">
@@ -76,8 +77,19 @@
 LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
 OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
+	DemographicMergedDao demographicMergedDao = SpringUtils.getBean(DemographicMergedDao.class);
 WaitingListDao waitingListDao = SpringUtils.getBean(WaitingListDao.class);
 Integer appointmentNo = null;
+	int demographicNo = Integer.parseInt(request.getParameter("demographic_no"));
+	String headRecord = request.getParameter("demographic_no");
+
+	DemographicMerged demographicMerged = demographicMergedDao.getCurrentHead(demographicNo);
+	// Use parent record if the requested demographic has been merged to someone else
+	if (demographicMerged != null)
+	{
+		demographicNo = demographicMerged.getDemographicNo();
+		headRecord = Integer.toString(demographicNo);
+	}
 
 String createDateTime = UtilDateUtilities.DateToString(new java.util.Date(),"yyyy-MM-dd HH:mm:ss");
 
@@ -86,18 +98,15 @@ param[0]=request.getParameter("provider_no");
 param[1]=request.getParameter("appointment_date");
 param[2]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"));
 param[3]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("end_time"));
- 
+param[16] = headRecord;
 //the keyword(name) must match the demographic_no if it has been changed
  org.oscarehr.common.model.Demographic demo = null;
    if (request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals(""))) {
- DemographicMerged dmDAO = new DemographicMerged();
- param[16] = dmDAO.getHead(request.getParameter("demographic_no"));
- 
+
         DemographicData demData = new DemographicData();
         demo = demData.getDemographic(loggedInInfo,param[16]);
         param[4] = demo.getLastName()+","+demo.getFirstName();
     } else {
- param[16] = "0";
         param[4] = request.getParameter("keyword");
     }
 
@@ -137,10 +146,8 @@ param[19]=request.getParameter("reasonCode");
 	a.setRemarks(request.getParameter("remarks"));
 	a.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
 	//the keyword(name) must match the demographic_no if it has been changed
-    demo = null;
 if (request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals(""))) {
-    DemographicMerged dmDAO = new DemographicMerged();
-    a.setDemographicNo(Integer.parseInt(dmDAO.getHead(request.getParameter("demographic_no"))));
+    a.setDemographicNo(demographicNo);
 
 	DemographicData demData = new DemographicData();
 	demo = demData.getDemographic(loggedInInfo,String.valueOf(a.getDemographicNo()));
@@ -199,10 +206,10 @@ if (request.getParameter("demographic_no") != null && !(request.getParameter("de
 		} else {
 			oscar.oscarWaitingList.WaitingList wL = oscar.oscarWaitingList.WaitingList.getInstance();
 			if (wL.getFound()) {
-			   String demographicNo = request.getParameter("demographic_no");
-			   if( demographicNo != null && !"".equals(demographicNo)) {
+			   // String demographicNo = request.getParameter("demographic_no");
+			   if( headRecord != null && !"".equals(headRecord)) {
 			    
-					List<WaitingList> wl = waitingListDao.findByDemographic(Integer.parseInt(demographicNo));
+					List<WaitingList> wl = waitingListDao.findByDemographic(Integer.parseInt(headRecord));
 					if(wl.size() > 0) {
 						WaitingList wl1 = wl.get(0);
 						WaitingListName wln = wl1.getWaitingListName();

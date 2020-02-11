@@ -50,8 +50,9 @@ public class DemographicMerged extends AbstractModel<Integer>
 	
 	@Column(name="merged_to")
 	private int mergedTo;
-	
-	private int deleted;
+
+	@Column(name = "deleted", nullable = false, columnDefinition = "INTEGER(1)")
+	private boolean deleted;
 	
 	private String lastUpdateUser;
 	
@@ -82,12 +83,14 @@ public class DemographicMerged extends AbstractModel<Integer>
 		this.mergedTo = mergedTo;
 	}
 
-	public int getDeleted() {
+	public boolean getDeleted()
+	{
 		return deleted;
 	}
 
-	public void setDeleted(int deleted) {
-		this.deleted = deleted;
+	public void delete()
+	{
+		this.deleted = true;
 	}
 
 	public String getLastUpdateUser() {
