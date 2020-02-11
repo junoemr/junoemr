@@ -56,6 +56,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
@@ -75,7 +76,7 @@ import java.util.regex.Pattern;
  *
  */
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class DemographicManager {
 	public static final String PHR_VERIFICATION_LEVEL_3 = "+3";
 	public static final String PHR_VERIFICATION_LEVEL_2 = "+2";
