@@ -48,11 +48,16 @@ Oscar.Util.Appointment.setEndTime = function setEndTime(endElem, start, duration
 	var durationTime = parseInt(duration) || 1;
 	var startTime = moment(start, this.TimeFormats);
 	var endTime = startTime.clone();
-
 	endTime.add(Math.abs(durationTime), 'minutes');
+
 	// Moment gets weird if it's < 24h time difference
 	// All we really care about is whether the expected end time is tomorrow or beyond
-	if (endTime.startOf('day').diff(startTime.startOf('day'), 'days') !== 0)
+	// Note that moment.startOf() mutates the original objects, so to do date comparison we operate on copies
+	var expectedStartDate = moment(start, this.TimeFormats).startOf('day');
+	var expectedEndDate = startTime.clone();
+	expectedEndDate.add(Math.abs(durationTime), 'minutes');
+	expectedEndDate.startOf('day');
+	if (expectedEndDate.diff(expectedStartDate, 'days') !== 0)
 	{
 		return false;
 	}
