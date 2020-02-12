@@ -74,7 +74,7 @@
 	RxCodesData.FrequencyCode[] frequencies = new oscar.oscarRx.data.RxCodesData().getFrequencyCodes();
 %>
 
-<script language=javascript>
+<script type="text/javascript">
 
     function deleteRow(favoriteID, favoriteName) {
         var deleteObj = {favoriteId: favoriteID};
@@ -91,20 +91,20 @@
                     },
                     onFailure:function(err)
                     {
-                        alert("An error occured while deleting");
+                        alert("An error occurred while deleting");
                     }
                 });
         }
     }
 
     function ajaxUpdateRow(formID, saveNotificationID) {
-        var form = document.getElementById(formID)
+        var form = document.getElementById(formID);
         var formObj = formToObject(form);
         var endpoint =  '/oscarRx/updateFavorite2.do?method=ajaxEditFavorite';
 
         if (validateUpdate(formObj))
 		{
-            new Ajax.Request('<c:out value="${ctx}"/>' + endpoint,
+            new Ajax.Request('<c:out value="${context}"/>' + endpoint,
                 {
                     method: 'post',
                     parameters: formObj,
@@ -116,7 +116,7 @@
                     },
                     onFailure:function(err)
                     {
-                        alert("An error occured while saving");
+                        alert("An error occurred while saving");
                     }
                 });
 		}
@@ -237,6 +237,7 @@
 					for (RxPrescriptionData.Favorite fav : favorites)
 					{
 						boolean isCustom = fav.getGCN_SEQNO() == 0;
+						String encodedFavName = fav.getFavoriteName().replace("'", "\\'");
                 %>
 					<form name="DispForm" id="DispForm_<%=fav.getFavoriteId()%>">
 					<!-- Record line 1 -->
@@ -249,7 +250,7 @@
 						</td>
 						<td colspan=5>
 							<a href="javascript:void(0);" onclick='ajaxUpdateRow("DispForm_<%=fav.getFavoriteId()%>", "SaveSuccess_<%=fav.getFavoriteId()%>")'>Save Changes</a>&nbsp;&nbsp;&nbsp;
-							<a href="javascript:deleteRow('<%=fav.getFavoriteId()%>', '<%=fav.getFavoriteName()%>');">Delete Favorite</a>
+							<a href="javascript:deleteRow('<%=fav.getFavoriteId()%>', '<%=encodedFavName%>');">Delete Favorite</a>
                         </td>
 					</tr>
 					<% if(!isCustom) { %>
