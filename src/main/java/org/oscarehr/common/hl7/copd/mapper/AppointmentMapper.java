@@ -143,8 +143,24 @@ public class AppointmentMapper extends AbstractMapper
 	{
 		SCH sch = message.getPATIENT().getSCH(rep);
 		Date appointmentDate = getAppointmentDate(rep);
-		Integer apptDuration = Integer.parseInt(sch.getSch9_AppointmentDuration().getValue());
+		String apptDurationRawValue = sch.getSch9_AppointmentDuration().getValue();
 		String apptDurationUnit = sch.getSch10_AppointmentDurationUnits().getCe1_Identifier().getValue();
+		int apptDuration;
+		// If they don't send us an appt time, use either 15m or 1h depending on units
+		if (apptDurationRawValue == null || apptDurationRawValue.isEmpty())
+		{
+			if ("HR".equals(apptDurationUnit.toUpperCase()))
+			{
+				logger.error("Bad appointment duration value, defaulting to 1 hr:"  + apptDurationRawValue);
+				apptDurationRawValue = "1";
+			}
+			else
+			{
+				logger.error("Bad appointment duration value, defaulting to 15 min: " + apptDurationRawValue);
+				apptDurationRawValue = "15";
+			}
+		}
+		apptDuration = Integer.parseInt(apptDurationRawValue);
 
 		if (appointmentDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{// if no appointment date, use creation date instead.
