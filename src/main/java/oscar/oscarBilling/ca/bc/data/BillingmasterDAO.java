@@ -263,7 +263,7 @@ public class BillingmasterDAO {
 				"w.w_diagnosis, w.w_icd9,w.w_bp,w.w_side,w.w_noi,w.w_work,w.w_workdate,w.w_clinicinfo,w.w_capability,w.w_capreason,w.w_estimate,w.w_rehab,"+
 				"w.w_rehabtype,w.w_estimatedate,w.w_tofollow,w.w_wcbadvisor,w.w_feeitem,w.w_extrafeeitem,b.billingstatus,w.formNeeded,w.provider_no,w.w_payeeno, w.w_pracno "+
 				" FROM billingmaster b LEFT JOIN teleplanC12  t ON t.t_officefolioclaimno=b.billingmaster_no, demographic d , wcb w "+
-				"WHERE b.demographic_no=d.demographic_no AND b.billing_no=w.billing_no AND b.billingmaster_no=?");
+				"WHERE b.demographic_no=d.demographic_no AND b.billing_no=w.billing_no AND b.billingmaster_no=?1");
 		
 		q.setParameter(1, billingMasterNo);
 		
@@ -274,7 +274,7 @@ public class BillingmasterDAO {
 	}
 	
 	public List<Billing> search_teleplanbill(Integer billingmasterNo) {
-		Query q = entityManager.createQuery("select b from Billing b, Billingmaster bm where b.id= bm.billingNo and bm.billingmasterNo=?");
+		Query q = entityManager.createQuery("select b from Billing b, Billingmaster bm where b.id= bm.billingNo and bm.billingmasterNo=?1");
 		q.setParameter(1, billingmasterNo);
 		
 		@SuppressWarnings("unchecked")

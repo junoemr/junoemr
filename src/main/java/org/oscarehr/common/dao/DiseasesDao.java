@@ -40,7 +40,7 @@ public class DiseasesDao extends AbstractDao<Diseases>{
 	}
 
 	public List<Diseases> findByDemographicNo(int demographicNo) {
-		String sql = "select x from Diseases x where x.demographicNo=?";
+		String sql = "select x from Diseases x where x.demographicNo=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demographicNo);
 		@SuppressWarnings("unchecked")
@@ -49,7 +49,7 @@ public class DiseasesDao extends AbstractDao<Diseases>{
 	}
 
 	public List<Diseases> findByIcd9(String icd9) {
-		String sql = "select x from Diseases x where x.icd9Entry=?";
+		String sql = "select x from Diseases x where x.icd9Entry=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, icd9);
 		@SuppressWarnings("unchecked")

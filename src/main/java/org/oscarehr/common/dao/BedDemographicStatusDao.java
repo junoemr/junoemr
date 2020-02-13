@@ -43,7 +43,7 @@ public class BedDemographicStatusDao extends AbstractDao<BedDemographicStatus>{
 	
   
 	public boolean bedDemographicStatusExists(Integer bedDemographicStatusId) {			   
-		Query query = entityManager.createQuery("select count(*) from BedDemographicStatus b where b.id = ?");
+		Query query = entityManager.createQuery("select count(*) from BedDemographicStatus b where b.id = ?1");
 		query.setParameter(1, bedDemographicStatusId);
 	
 		Long result = (Long)query.getSingleResult();

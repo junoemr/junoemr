@@ -25,7 +25,7 @@ public class HRMDocumentToDemographicDao extends AbstractDao<HRMDocumentToDemogr
 	}
 	
 	public List<HRMDocumentToDemographic> findByDemographicNo(String demographicNo) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=?";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, demographicNo);
 		@SuppressWarnings("unchecked")
@@ -34,7 +34,7 @@ public class HRMDocumentToDemographicDao extends AbstractDao<HRMDocumentToDemogr
 	}
 
 	public List<HRMDocumentToDemographic> findByHrmDocumentId(String hrmDocumentId) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hrmDocumentId);
 		@SuppressWarnings("unchecked")

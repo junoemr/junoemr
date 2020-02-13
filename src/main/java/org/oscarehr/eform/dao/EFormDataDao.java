@@ -264,7 +264,7 @@ public class EFormDataDao extends AbstractDao<EFormData>
 		int counter = 2;
 
 		if (current != null) {
-			sb.append(" and x.current=?");
+			sb.append(" and x.current=?1");
 			sb.append(counter);
 			counter++;
 		}
@@ -558,7 +558,7 @@ public class EFormDataDao extends AbstractDao<EFormData>
 	}
 
 	public Integer getLatestFdid(Integer fid, Integer demographicNo) {
-		Query query = entityManager.createQuery("select max(x.id) from " + modelClass.getSimpleName() + " x where x.current=1 and x.formId = ? and x.demographicId = ?");
+		Query query = entityManager.createQuery("select max(x.id) from " + modelClass.getSimpleName() + " x where x.current=1 and x.formId = ?1 and x.demographicId = ?2");
 		query.setParameter(1, fid);
 		query.setParameter(2, demographicNo);
 
@@ -582,7 +582,7 @@ public class EFormDataDao extends AbstractDao<EFormData>
 	 */
 	public List<Integer> getDemographicNosMissingVarName(int fid, String varName) {
 
-		Query query = entityManager.createNativeQuery("select distinct d.demographic_no from eform e,eform_data d,eform_values v where e.fid = ? and e.fid = d.fid and d.fdid = v.fdid and d.fdid not in (select distinct d.fdid from eform e,eform_data d,eform_values v where e.fid = d.fid and d.fdid = v.fdid and e.fid=? and v.var_name=?)");
+		Query query = entityManager.createNativeQuery("select distinct d.demographic_no from eform e,eform_data d,eform_values v where e.fid = ?1 and e.fid = d.fid and d.fdid = v.fdid and d.fdid not in (select distinct d.fdid from eform e,eform_data d,eform_values v where e.fid = d.fid and d.fdid = v.fdid and e.fid=?2 and v.var_name=?3)");
 		query.setParameter(1, fid);
 		query.setParameter(2, fid);
 		query.setParameter(3, varName);

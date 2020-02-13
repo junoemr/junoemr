@@ -93,7 +93,7 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
 
         public List<PHRDocument> getDocumentsReceived(String docType,String providerNo) {
             // for messages 'urn:org:indivo:document:classification:message'
-            String sql ="from PHRDocument d where d.phrClassification = ? and d.receiverOscar = ? and d.status <= 7 ORDER BY d.dateSent DESC";
+            String sql ="from PHRDocument d where d.phrClassification = ?0 and d.receiverOscar = ?1 and d.status <= 7 ORDER BY d.dateSent DESC";
             String[] f = new String[2];
             f[0] = docType;
             f[1] = providerNo;
@@ -103,7 +103,7 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
 
         public List<PHRDocument> getDocumentsSent(String docType,String providerNo) {
             // for messages 'urn:org:indivo:document:classification:message'
-            String sql ="from PHRDocument d where d.phrClassification = ? and d.senderOscar = ? ORDER BY d.dateSent DESC";
+            String sql ="from PHRDocument d where d.phrClassification = ?0 and d.senderOscar = ?1 ORDER BY d.dateSent DESC";
             String[] f = new String[2];
             f[0] = docType;
             f[1] = providerNo;
@@ -113,7 +113,7 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
 
         public List<PHRDocument> getDocumentsArchived(String docType,String providerNo) {
             // for messages 'urn:org:indivo:document:classification:message'
-            String sql ="from PHRDocument d where d.phrClassification = ? and d.receiverOscar = ? and d.status > 7 ORDER BY d.dateSent DESC";
+            String sql ="from PHRDocument d where d.phrClassification = ?0 and d.receiverOscar = ?1 and d.status > 7 ORDER BY d.dateSent DESC";
             String[] f = new String[2];
             f[0] = docType;
             f[1] = providerNo;
@@ -122,7 +122,7 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
         }
         public List<PHRDocument> getDocumentsByReceiverSenderStatusClassification(Integer receiverType, Integer senderType, String phrClassification, String receiverOscar,Integer status){
 
-            String sql="from PHRDocument d where d.phrClassification=? and d.receiverOscar=? and d.status=? and d.senderType=? and d.receiverType=? order by d.dateSent desc";
+            String sql="from PHRDocument d where d.phrClassification=?0 and d.receiverOscar=?1 and d.status=?2 and d.senderType=?3 and d.receiverType=?4 order by d.dateSent desc";
             Object[] f={phrClassification,receiverOscar,status,senderType,receiverType};
 
             List<PHRDocument> ret= (List<PHRDocument>) getHibernateTemplate().find(sql,f);
@@ -130,7 +130,7 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
         }
         public PHRDocument getDocumentById(String id){
             // for messages 'urn:org:indivo:document:classification:message'
-            String sql ="from PHRDocument d where d.id = ? ";
+            String sql ="from PHRDocument d where d.id = ?0 ";
 
             List<PHRDocument> list = (List<PHRDocument>) getHibernateTemplate().find(sql,new Integer(id));
 
@@ -143,7 +143,7 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
 
         public PHRDocument getDocumentByIndex(String idx){
             // for messages 'urn:org:indivo:document:classification:message'
-            String sql ="from PHRDocument d where d.phrIndex = ? ";
+            String sql ="from PHRDocument d where d.phrIndex = ?0 ";
 
             List<PHRDocument> list = (List<PHRDocument>) getHibernateTemplate().find(sql,idx);
 
@@ -164,7 +164,7 @@ public class PHRDocumentDAOHibernate extends HibernateDaoSupport
         }
 
         public PHRMessage getMessageById(String idx){
-            String sql ="from PHRDocument d where d.phrIndex = ? ";
+            String sql ="from PHRDocument d where d.phrIndex = ?0 ";
             List<PHRMessage> list = (List<PHRMessage>) getHibernateTemplate().find(sql,idx);
             if (list == null || list.size() == 0){
                 return null;

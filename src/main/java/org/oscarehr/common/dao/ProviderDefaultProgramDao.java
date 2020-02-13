@@ -43,7 +43,7 @@ public class ProviderDefaultProgramDao extends AbstractDao<ProviderDefaultProgra
 	}
 
     public List<ProviderDefaultProgram> getProgramByProviderNo(String providerNo) {
-        String q = "SELECT pdp FROM ProviderDefaultProgram pdp WHERE pdp.providerNo=?";
+        String q = "SELECT pdp FROM ProviderDefaultProgram pdp WHERE pdp.providerNo=?1";
         Query query = entityManager.createQuery(q);
         query.setParameter(1, providerNo);
         @SuppressWarnings("unchecked")
@@ -101,7 +101,7 @@ public class ProviderDefaultProgramDao extends AbstractDao<ProviderDefaultProgra
     }
 	
 	public List<Program> findProgramsByFacilityId(Integer facilityId) {
-		String sql = "from Program p where p.id in (select distinct pg.id from Program pg ,ProgramProvider pp where pp.ProgramId=pg.id and pg.facilityId=?)";
+		String sql = "from Program p where p.id in (select distinct pg.id from Program pg ,ProgramProvider pp where pp.ProgramId=pg.id and pg.facilityId=?1)";
 		Query query;
 		try {
 			query = entityManager.createQuery(sql);

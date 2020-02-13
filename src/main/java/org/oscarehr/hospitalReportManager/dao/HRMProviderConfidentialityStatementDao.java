@@ -23,7 +23,7 @@ public class HRMProviderConfidentialityStatementDao extends AbstractDao<HRMProvi
 	}
 
 	public String getConfidentialityStatementForProvider(String providerNo) {
-		String sql = "select x.statement from " + this.modelClass.getName() + " x where x.providerNo=?";
+		String sql = "select x.statement from " + this.modelClass.getName() + " x where x.providerNo=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, providerNo);
 		try {

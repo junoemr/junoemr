@@ -48,7 +48,7 @@ public class DemographicStudyDao extends AbstractDao<DemographicStudy>{
 	}
 	
 	public int removeByDemographicNo(Integer demographicNo) {
-		Query query = entityManager.createQuery("delete from DemographicStudy x where x.id.demographicNo=?");
+		Query query = entityManager.createQuery("delete from DemographicStudy x where x.id.demographicNo=?1");
 		query.setParameter(1, demographicNo);
 		return query.executeUpdate();
 	}
@@ -64,13 +64,13 @@ public class DemographicStudyDao extends AbstractDao<DemographicStudy>{
 	@SuppressWarnings("unchecked")
 
 	public List<DemographicStudy> findByStudyNo(int studyNo) {
-		Query query = entityManager.createQuery("select x from DemographicStudy x where x.id.studyNo=?");
+		Query query = entityManager.createQuery("select x from DemographicStudy x where x.id.studyNo=?1");
 		query.setParameter(1, studyNo);
 		return query.getResultList();
 	}
 
 	public List<DemographicStudy> findByDemographicNo(int demographicNo) {
-		Query query = entityManager.createQuery("select x from DemographicStudy x where x.id.demographicNo=?");
+		Query query = entityManager.createQuery("select x from DemographicStudy x where x.id.demographicNo=?1");
 		query.setParameter(1, demographicNo);
 		return query.getResultList();
 	}

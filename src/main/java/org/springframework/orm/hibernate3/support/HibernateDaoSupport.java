@@ -23,13 +23,13 @@
 
 package org.springframework.orm.hibernate3.support;
 
-//import com.junoemr.juno.legacy.DetunedHibernateTemplate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.orm.hibernate5.HibernateTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class HibernateDaoSupport extends org.springframework.orm.hibernate5.support.HibernateDaoSupport
 {
 

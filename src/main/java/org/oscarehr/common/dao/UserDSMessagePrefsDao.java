@@ -49,7 +49,7 @@ public class UserDSMessagePrefsDao extends AbstractDao<UserDSMessagePrefs> {
 	}
 
 	public UserDSMessagePrefs getMessagePrefsOnType(String prov, String name) {
-		Query query = entityManager.createQuery("SELECT p FROM UserDSMessagePrefs p WHERE p.providerNo=? and p.resourceType=? and p.archived=true");
+		Query query = entityManager.createQuery("SELECT p FROM UserDSMessagePrefs p WHERE p.providerNo=?1 and p.resourceType=?2 and p.archived=true");
 		query.setParameter(1, prov);
 		query.setParameter(2, name);
 
@@ -61,7 +61,7 @@ public class UserDSMessagePrefsDao extends AbstractDao<UserDSMessagePrefs> {
 	}
 
 	public Hashtable<String, Long> getHashofMessages(String providerNo, String name) {
-		Query query = entityManager.createQuery("SELECT p FROM UserDSMessagePrefs p WHERE p.providerNo=? and p.resourceType=? and p.archived=true");
+		Query query = entityManager.createQuery("SELECT p FROM UserDSMessagePrefs p WHERE p.providerNo=?1 and p.resourceType=?2 and p.archived=true");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, name);
 
@@ -87,7 +87,7 @@ public class UserDSMessagePrefsDao extends AbstractDao<UserDSMessagePrefs> {
 	}
 	
 	public UserDSMessagePrefs getDsMessage(String providerNo, String resourceType, String resourceId, boolean archived) {
-		Query query = entityManager.createQuery("SELECT p FROM UserDSMessagePrefs p WHERE p.providerNo=? and p.resourceType=? and p.resourceId=? and p.archived = ? order by p.id DESC");
+		Query query = entityManager.createQuery("SELECT p FROM UserDSMessagePrefs p WHERE p.providerNo=?1 and p.resourceType=?2 and p.resourceId=?3 and p.archived = ?4 order by p.id DESC");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, resourceType);
 		query.setParameter(3, resourceId);

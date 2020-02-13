@@ -38,7 +38,7 @@ public class FavoritesDao extends AbstractDao<Favorites>{
 	}
 	
 	public List<Favorites> findByProviderNo(String providerNo) {
-		Query query = entityManager.createQuery("select x from Favorites x where x.providerNo=?");
+		Query query = entityManager.createQuery("select x from Favorites x where x.providerNo=?1");
 		query.setParameter(1, providerNo);
 		
 		@SuppressWarnings("unchecked")

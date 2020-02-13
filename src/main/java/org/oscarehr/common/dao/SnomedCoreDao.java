@@ -39,7 +39,7 @@ public class SnomedCoreDao extends AbstractCodeSystemDao<SnomedCore> {
 	}
 
 	public List<SnomedCore> getSnomedCoreCode(String snomedCoreCode){
-		Query query = entityManager.createQuery("select i from SnomedCore i where i.snomedCore=?");
+		Query query = entityManager.createQuery("select i from SnomedCore i where i.snomedCore=?1");
 		query.setParameter(1, snomedCoreCode);
 
 		@SuppressWarnings("unchecked")
@@ -50,7 +50,7 @@ public class SnomedCoreDao extends AbstractCodeSystemDao<SnomedCore> {
 
 
     public List<SnomedCore> getSnomedCore(String query) {
-		Query q = entityManager.createQuery("select i from SnomedCore i where i.snomedCore like ? or i.description like ? order by i.description");
+		Query q = entityManager.createQuery("select i from SnomedCore i where i.snomedCore like ?1 or i.description like ?2 order by i.description");
 		q.setParameter(1, "%"+query+"%");
 		q.setParameter(2, "%"+query+"%");
 

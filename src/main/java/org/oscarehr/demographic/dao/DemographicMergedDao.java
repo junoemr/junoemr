@@ -40,7 +40,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 	}
 	
 	public List<DemographicMerged> findCurrentByMergedTo(int demographicNo) {
-		Query q = entityManager.createQuery("select d from DemographicMerged d where d.mergedTo=? and d.deleted=0");
+		Query q = entityManager.createQuery("select d from DemographicMerged d where d.mergedTo=?1 and d.deleted=0");
 		q.setParameter(1, demographicNo);
 		
 		@SuppressWarnings("unchecked")
@@ -50,7 +50,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 	}
 	
 	public List<DemographicMerged> findCurrentByDemographicNo(int demographicNo) {
-		Query q = entityManager.createQuery("select d from DemographicMerged d where d.demographicNo=? and d.deleted=0");
+		Query q = entityManager.createQuery("select d from DemographicMerged d where d.demographicNo=?1 and d.deleted=0");
 		q.setParameter(1, demographicNo);
 		
 		@SuppressWarnings("unchecked")
@@ -60,7 +60,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 	}
 	
 	public List<DemographicMerged> findByDemographicNo(int demographicNo) {
-		Query q = entityManager.createQuery("select d from DemographicMerged d where d.demographicNo=?");
+		Query q = entityManager.createQuery("select d from DemographicMerged d where d.demographicNo=?1");
 		q.setParameter(1, demographicNo);
 		
 		@SuppressWarnings("unchecked")

@@ -41,7 +41,7 @@ public class FormDao extends AbstractDao<Form>{
 	
 	@SuppressWarnings("unchecked")
 	public List<Form> findByDemographicNo(Integer demographicNo) {
-		Query q = entityManager.createQuery("select f from Form f where f.demographicNo = ? order by f.formDate desc, f.formTime desc, f.id desc");
+		Query q = entityManager.createQuery("select f from Form f where f.demographicNo = ?1 order by f.formDate desc, f.formTime desc, f.id desc");
 		q.setParameter(1, demographicNo);
 		
 		return q.getResultList();
@@ -50,7 +50,7 @@ public class FormDao extends AbstractDao<Form>{
 	
 	@SuppressWarnings("unchecked")
 	public Form search_form_no(Integer demographicNo, String formName) {
-		Query q = entityManager.createQuery("select f from Form f where f.demographicNo = ? and f.formName like ? order by f.formDate desc, f.formTime desc, f.id ");
+		Query q = entityManager.createQuery("select f from Form f where f.demographicNo = ?1 and f.formName like ?2 order by f.formDate desc, f.formTime desc, f.id ");
 		q.setParameter(1, demographicNo);
 		q.setParameter(2, formName);
 		q.setMaxResults(1);

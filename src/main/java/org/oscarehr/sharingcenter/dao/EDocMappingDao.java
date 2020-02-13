@@ -54,7 +54,7 @@ public class EDocMappingDao extends AbstractDao<EDocMapping> {
     }
 
     public List<EDocMapping> findByAffinityDomainId(int affinityDomain) {
-        String sql = "FROM EDocMapping e where e.affinityDomain = ?";
+        String sql = "FROM EDocMapping e where e.affinityDomain = ?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, affinityDomain);
 
@@ -62,7 +62,7 @@ public class EDocMappingDao extends AbstractDao<EDocMapping> {
     }
 
     public EDocMapping findEDocMapping(int affinityDomain, String docType, String source) {
-        String sql = "FROM EDocMapping e where e.affinityDomain = ? and e.docType = ? and e.source = ?";
+        String sql = "FROM EDocMapping e where e.affinityDomain = ?1 and e.docType = ?2 and e.source = ?3";
 
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, affinityDomain);
@@ -75,7 +75,7 @@ public class EDocMappingDao extends AbstractDao<EDocMapping> {
     }
 
     public EDocMapping findEDocMapping(int affinityDomain, String docType) {
-        String sql = "FROM EDocMapping e where e.affinityDomain = ? and e.docType = ?";
+        String sql = "FROM EDocMapping e where e.affinityDomain = ?1 and e.docType = ?2";
 
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, affinityDomain);

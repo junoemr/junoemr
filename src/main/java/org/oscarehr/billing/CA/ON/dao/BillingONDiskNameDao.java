@@ -40,7 +40,7 @@ public class BillingONDiskNameDao extends AbstractDao<BillingONDiskName>{
 	}
 	
 	public BillingONDiskName getLatestSoloMonthCodeBatchNum(String providerOhipNo) {
-		String q = "select d from BillingONDiskName d, BillingONFilename f where f.providerOhipNo=? and d.groupNo='' and d.id=f.diskId order by d.id desc";
+		String q = "select d from BillingONDiskName d, BillingONFilename f where f.providerOhipNo=?1 and d.groupNo='' and d.id=f.diskId order by d.id desc";
 		Query query = entityManager.createQuery(q);
 		query.setParameter(1, providerOhipNo);
 		query.setMaxResults(1);
@@ -51,7 +51,7 @@ public class BillingONDiskNameDao extends AbstractDao<BillingONDiskName>{
 	}
 	
 	public BillingONDiskName findByGroupNo(String groupNo) {
-		String q = "SELECT b FROM BillingONDiskName b WHERE b.groupNo=? order by b.createDateTime DESC";
+		String q = "SELECT b FROM BillingONDiskName b WHERE b.groupNo=?1 order by b.createDateTime DESC";
 		Query query = entityManager.createQuery(q);
 		query.setParameter(1, groupNo);
 		query.setMaxResults(1);
@@ -62,7 +62,7 @@ public class BillingONDiskNameDao extends AbstractDao<BillingONDiskName>{
 	}
 	
 	public BillingONDiskName getPrevDiskCreateDate(Date date, String groupNo) {
-		String q = "SELECT b FROM BillingONDiskName b WHERE  b.createDateTime<? and groupno=? order by createdatetime DESC";
+		String q = "SELECT b FROM BillingONDiskName b WHERE  b.createDateTime<?1 and groupno=?2 order by createdatetime DESC";
 		Query query = entityManager.createQuery(q);
 		query.setParameter(1, date);
 		query.setParameter(2, groupNo);

@@ -51,7 +51,7 @@ public class BillingONPremiumDao extends AbstractDao<BillingONPremium>{
     }  
     
     public List<BillingONPremium> getActiveRAPremiumsByPayDate(Date startDate, Date endDate, Locale locale) {
-        String sql = "select bPrem from BillingONPremium bPrem where payDate >= ? and payDate < ? and status=?";
+        String sql = "select bPrem from BillingONPremium bPrem where payDate >= ?1 and payDate < ?2 and status=?3";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, startDate);  
         query.setParameter(2, endDate);  
@@ -63,7 +63,7 @@ public class BillingONPremiumDao extends AbstractDao<BillingONPremium>{
     }
     
     public List<BillingONPremium> getActiveRAPremiumsByProvider(Provider p, Date startDate, Date endDate, Locale locale) {
-        String sql = "select bPrem from BillingONPremium bPrem where payDate >= ? and payDate < ? and status=? and providerNo=?";
+        String sql = "select bPrem from BillingONPremium bPrem where payDate >= ?1 and payDate < ?2 and status=?3 and providerNo=?4";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, startDate);  
         query.setParameter(2, endDate);  
@@ -76,7 +76,7 @@ public class BillingONPremiumDao extends AbstractDao<BillingONPremium>{
     }
     
     public List<BillingONPremium> getRAPremiumsByRaHeaderNo(Integer raHeaderNo) {
-        String sql = "select bPrem from BillingONPremium bPrem where raHeaderNo=?";
+        String sql = "select bPrem from BillingONPremium bPrem where raHeaderNo=?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, raHeaderNo);    
                  

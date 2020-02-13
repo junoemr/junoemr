@@ -49,7 +49,7 @@ public class CriteriaTypeDao extends AbstractDao<CriteriaType> {
 	}
 
 	public CriteriaType findByName(String fieldName) {		
-		Query query = entityManager.createQuery("select x from CriteriaType x where x.fieldName=?");
+		Query query = entityManager.createQuery("select x from CriteriaType x where x.fieldName=?1");
 		query.setParameter(1, fieldName);	
 		
 		@SuppressWarnings("unchecked")
@@ -62,7 +62,7 @@ public class CriteriaTypeDao extends AbstractDao<CriteriaType> {
 	}
 	
 	public List<CriteriaType> getAllCriteriaTypes() {
-		Query query = entityManager.createQuery("select x from CriteriaType x where x.wlProgramId=? order by x.fieldType DESC");
+		Query query = entityManager.createQuery("select x from CriteriaType x where x.wlProgramId=?1 order by x.fieldType DESC");
 		query.setParameter(1, 1);
 		
 		@SuppressWarnings("unchecked")
@@ -72,7 +72,7 @@ public class CriteriaTypeDao extends AbstractDao<CriteriaType> {
 	}
 	
 	public List<CriteriaType> getAllCriteriaTypesByWlProgramId(Integer wlProgramId) {
-		Query query = entityManager.createQuery("select x from CriteriaType x where x.wlProgramId=? order by x.fieldType DESC");
+		Query query = entityManager.createQuery("select x from CriteriaType x where x.wlProgramId=?1 order by x.fieldType DESC");
 		query.setParameter(1, wlProgramId);
 		
 		@SuppressWarnings("unchecked")

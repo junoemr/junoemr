@@ -146,7 +146,7 @@ public class SiteDao extends AbstractDao<Site> {
 	}
 
 	public Site getByLocation(String location) {
-		Query query = this.entityManager.createQuery("select s from Site s where s.name=?");
+		Query query = this.entityManager.createQuery("select s from Site s where s.name=?1");
 		query.setParameter(1, location);
 
 		@SuppressWarnings("unchecked")

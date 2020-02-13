@@ -157,7 +157,7 @@ public class OcanStaffFormDao extends AbstractDao<OcanStaffForm> {
 	public List<OcanStaffForm> getLatestCbiFormsByGroupOfAdmissionId() {
 			//Get latest CBI form for each group of admissionId
 			
-			String sqlCommand = "select x1 from OcanStaffForm x1 where x1.id = (select max(x2.id) from OcanStaffForm x2 where x2.admissionId!=null and x2.admissionId=x1.admissionId and x2.ocanType=?) ";
+			String sqlCommand = "select x1 from OcanStaffForm x1 where x1.id = (select max(x2.id) from OcanStaffForm x2 where x2.admissionId!=null and x2.admissionId=x1.admissionId and x2.ocanType=?1) ";
 			
 			Query query = entityManager.createQuery(sqlCommand);		
 			query.setParameter(1, "CBI");			

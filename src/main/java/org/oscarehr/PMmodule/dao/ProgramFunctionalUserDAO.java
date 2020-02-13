@@ -90,7 +90,7 @@ public class ProgramFunctionalUserDAO extends HibernateDaoSupport {
             throw new IllegalArgumentException();
         }
 
-        List<FunctionalUserType> results = (List<FunctionalUserType>) this.getHibernateTemplate().find("from ProgramFunctionalUser pfu where pfu.ProgramId = ?", programId);
+        List<FunctionalUserType> results = (List<FunctionalUserType>) this.getHibernateTemplate().find("from ProgramFunctionalUser pfu where pfu.ProgramId = ?0", programId);
 
         if (log.isDebugEnabled()) {
             log.debug("getFunctionalUsers: programId=" + programId + ",# of results=" + results.size());

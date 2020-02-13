@@ -64,7 +64,7 @@ public class WaitingListNameDao extends AbstractDao<WaitingListName> {
 
 	public List<WaitingListName> findCurrentByNameAndGroup(String name, String group) {
 
-		String sql = "SELECT x FROM WaitingListName x WHERE x.name = ? AND x.groupNo = ? AND x.isHistory='N'";
+		String sql = "SELECT x FROM WaitingListName x WHERE x.name = ?1 AND x.groupNo = ?2 AND x.isHistory='N'";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, name);
 		query.setParameter(2, group);

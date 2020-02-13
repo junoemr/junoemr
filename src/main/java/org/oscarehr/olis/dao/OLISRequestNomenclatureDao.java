@@ -25,7 +25,7 @@ public class OLISRequestNomenclatureDao extends AbstractDao<OLISRequestNomenclat
     }
 
 	public OLISRequestNomenclature findByNameId(String id) {
-		String sql = "select x from "+ this.modelClass.getName() + " x where x.nameId=?";
+		String sql = "select x from "+ this.modelClass.getName() + " x where x.nameId=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, id);		
 		return (OLISRequestNomenclature)query.getSingleResult();

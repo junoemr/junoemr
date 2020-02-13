@@ -42,7 +42,7 @@ public class ViewDao extends AbstractDao<View>{
 	}
 
     public Map<String, View> getView(String view, String role) {
-    	Query query = entityManager.createQuery("select v from View v where v.view_name=? and v.role=?");
+    	Query query = entityManager.createQuery("select v from View v where v.view_name=?1 and v.role=?2");
     	query.setParameter(1, view);
     	query.setParameter(2, role);
 

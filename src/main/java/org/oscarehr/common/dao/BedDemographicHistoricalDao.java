@@ -45,7 +45,7 @@ public class BedDemographicHistoricalDao extends AbstractDao<BedDemographicHisto
 	   
 	@SuppressWarnings("unchecked")    
 	public BedDemographicHistorical[] getBedDemographicHistoricals(Date since) {
-		Query query = entityManager.createQuery("select bdh from BedDemographicHistorical bdh where bdh.usageEnd >= ?");
+		Query query = entityManager.createQuery("select bdh from BedDemographicHistorical bdh where bdh.usageEnd >= ?1");
 		query.setParameter(1, DateTimeFormatUtils.getDateFromDate(since));
 		
 		List<BedDemographicHistorical> bedDemographicHistoricals = query.getResultList();

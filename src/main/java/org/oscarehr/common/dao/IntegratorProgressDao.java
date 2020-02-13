@@ -38,7 +38,7 @@ public class IntegratorProgressDao extends AbstractDao<IntegratorProgress> {
 	}
 
 	public List<IntegratorProgress> findCompleted() {
-		Query query = entityManager.createQuery("select f from IntegratorProgress f where f.status = ? order by f.dateCreated DESC");
+		Query query = entityManager.createQuery("select f from IntegratorProgress f where f.status = ?1 order by f.dateCreated DESC");
 		query.setParameter(1,IntegratorProgress.STATUS_COMPLETED);
 		@SuppressWarnings("unchecked")
 		List<IntegratorProgress> results = query.getResultList();
@@ -52,7 +52,7 @@ public class IntegratorProgressDao extends AbstractDao<IntegratorProgress> {
 	 * 
 	 */
 	public List<IntegratorProgress> findRunning() {
-		Query query = entityManager.createQuery("select f from IntegratorProgress f where f.status = ?");
+		Query query = entityManager.createQuery("select f from IntegratorProgress f where f.status = ?1");
 		query.setParameter(1,IntegratorProgress.STATUS_RUNNING);
 		@SuppressWarnings("unchecked")
 		List<IntegratorProgress> results = query.getResultList();

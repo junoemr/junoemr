@@ -58,7 +58,7 @@ public class MeasurementMapDao extends AbstractDao<MeasurementMap> {
 
        
 	public List<MeasurementMap> getMapsByIdent(String identCode) {   
-		String queryStr = "select m FROM MeasurementMap m WHERE m.identCode=? ORDER BY m.id";
+		String queryStr = "select m FROM MeasurementMap m WHERE m.identCode=?1 ORDER BY m.id";
 		Query q = entityManager.createQuery(queryStr);
 		q.setParameter(1, identCode);
             
@@ -73,7 +73,7 @@ public class MeasurementMapDao extends AbstractDao<MeasurementMap> {
 	}
 
 	public List<MeasurementMap> getMapsByLoinc(String loinc) {   
-		String queryStr = "select m FROM MeasurementMap m WHERE m.loincCode=?";
+		String queryStr = "select m FROM MeasurementMap m WHERE m.loincCode=?1";
 		Query q = entityManager.createQuery(queryStr);
 		q.setParameter(1, loinc);
             
@@ -84,7 +84,7 @@ public class MeasurementMapDao extends AbstractDao<MeasurementMap> {
 	}
 	
 	public List<MeasurementMap> findByLoincCodeAndLabType(String loincCode,String labType) {   
-		String queryStr = "select m FROM MeasurementMap m WHERE m.loincCode=? and m.labType=?";
+		String queryStr = "select m FROM MeasurementMap m WHERE m.loincCode=?1 and m.labType=?2";
 		Query q = entityManager.createQuery(queryStr);
 		q.setParameter(1, loincCode);
 		q.setParameter(2, labType);

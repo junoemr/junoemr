@@ -46,7 +46,7 @@ public class PatientDocumentDao extends AbstractDao<PatientDocument> {
      * @return list of all Patient Documents
      */
     public List<PatientDocument> findPatientDocuments(int demographicId) {
-        String sql = "FROM PatientDocument e where e.demographic_no = ?";
+        String sql = "FROM PatientDocument e where e.demographic_no = ?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, demographicId);
 
@@ -64,7 +64,7 @@ public class PatientDocumentDao extends AbstractDao<PatientDocument> {
      * @return boolean whether or not the document exists
      */
     public boolean documentExists(String documentUniqueId, String repositoryUniqueId) {
-        String sql = "SELECT count(*) FROM PatientDocument e where e.uniqueDocumentId = ? AND e.repositoryUniqueId = ?";
+        String sql = "SELECT count(*) FROM PatientDocument e where e.uniqueDocumentId = ?1 AND e.repositoryUniqueId = ?2";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, documentUniqueId);
         query.setParameter(2, repositoryUniqueId);
@@ -74,7 +74,7 @@ public class PatientDocumentDao extends AbstractDao<PatientDocument> {
     }
 
     public PatientDocument getDocument(String documentUniqueId, String repositoryUniqueId) {
-        String sql = "FROM PatientDocument e where e.uniqueDocumentId = ? AND e.repositoryUniqueId = ?";
+        String sql = "FROM PatientDocument e where e.uniqueDocumentId = ?1 AND e.repositoryUniqueId = ?2";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, documentUniqueId);
         query.setParameter(2, repositoryUniqueId);
@@ -91,7 +91,7 @@ public class PatientDocumentDao extends AbstractDao<PatientDocument> {
      * @return a count of the documents.
      */
     public int getDocumentCount(int demographicId) {
-        String sql = "SELECT count(*) FROM PatientDocument e where e.demographic_no = ?";
+        String sql = "SELECT count(*) FROM PatientDocument e where e.demographic_no = ?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, demographicId);
 
@@ -109,7 +109,7 @@ public class PatientDocumentDao extends AbstractDao<PatientDocument> {
      * @return a list of PatientDocument objects
      */
     public List<PatientDocument> findPatientDocumentsWithPagination(int demographicId, int offset, int elements) {
-        String sql = "FROM PatientDocument e where e.demographic_no = ?";
+        String sql = "FROM PatientDocument e where e.demographic_no = ?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, demographicId);
         query.setFirstResult(offset);

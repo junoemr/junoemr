@@ -39,7 +39,7 @@ public class BillingONFilenameDao extends AbstractDao<BillingONFilename>{
 	}
 	
 	public List<BillingONFilename> findByDiskIdAndStatus(Integer diskId, String status) {
-		String q = "SELECT b FROM BillingONFilename b WHERE b.diskId = ?  AND b.status = ? ORDER BY b.id DESC";
+		String q = "SELECT b FROM BillingONFilename b WHERE b.diskId = ?1  AND b.status = ?2 ORDER BY b.id DESC";
 		Query query = entityManager.createQuery(q);
 		query.setParameter(1, diskId);
 		query.setParameter(2, status);
@@ -51,7 +51,7 @@ public class BillingONFilenameDao extends AbstractDao<BillingONFilename>{
 	}
 	
 	public List<BillingONFilename> findByDiskIdAndProvider(Integer diskId, String provider) {
-		String q = "SELECT b FROM BillingONFilename b WHERE b.diskId = ?  AND b.providerNo = ? ORDER BY b.id DESC";
+		String q = "SELECT b FROM BillingONFilename b WHERE b.diskId = ?1  AND b.providerNo = ?2 ORDER BY b.id DESC";
 		Query query = entityManager.createQuery(q);
 		query.setParameter(1, diskId);
 		query.setParameter(2, provider);
@@ -63,7 +63,7 @@ public class BillingONFilenameDao extends AbstractDao<BillingONFilename>{
 	}
 	
 	public List<BillingONFilename> findByDiskId(Integer diskId) {
-		String q = "SELECT b FROM BillingONFilename b WHERE b.diskId = ?";
+		String q = "SELECT b FROM BillingONFilename b WHERE b.diskId = ?1";
 		Query query = entityManager.createQuery(q);
 		query.setParameter(1, diskId);
 		
@@ -74,7 +74,7 @@ public class BillingONFilenameDao extends AbstractDao<BillingONFilename>{
 	}
 	
 	public List<BillingONFilename> findCurrentByDiskId(Integer diskId) {
-		String q = "SELECT b FROM BillingONFilename b WHERE b.diskId = ?  AND b.status != ? ORDER BY b.id DESC";
+		String q = "SELECT b FROM BillingONFilename b WHERE b.diskId = ?1  AND b.status != ?2 ORDER BY b.id DESC";
 		Query query = entityManager.createQuery(q);
 		query.setParameter(1, diskId);
 		query.setParameter(2, "D");

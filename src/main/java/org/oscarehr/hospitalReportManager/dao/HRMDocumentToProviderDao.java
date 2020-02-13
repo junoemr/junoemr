@@ -36,7 +36,7 @@ public class HRMDocumentToProviderDao extends AbstractDao<HRMDocumentToProvider>
 	}
 
 	public List<HRMDocumentToProvider> findByProviderNo(String providerNo, Integer page, Integer pageSize) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.providerNo=?";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.providerNo=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, providerNo);
 		query.setMaxResults(pageSize);
@@ -47,7 +47,7 @@ public class HRMDocumentToProviderDao extends AbstractDao<HRMDocumentToProvider>
 	}
 
 	public List<HRMDocumentToProvider> findByProviderNoLimit(String providerNo, Date newestDate, Date oldestDate, Integer viewed, Integer signedOff) {
-		String sql = "select x from " + this.modelClass.getName() + " x, HRMDocument h where x.hrmDocumentId=h.id and x.providerNo like ?";
+		String sql = "select x from " + this.modelClass.getName() + " x, HRMDocument h where x.hrmDocumentId=h.id and x.providerNo like ?1";
 		if (newestDate != null)
 			sql += " and h.reportDate <= :newest";
 		if (oldestDate != null)
@@ -78,7 +78,7 @@ public class HRMDocumentToProviderDao extends AbstractDao<HRMDocumentToProvider>
 
 
 	public List<HRMDocumentToProvider> findByHrmDocumentId(String hrmDocumentId) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hrmDocumentId);
 		@SuppressWarnings("unchecked")
@@ -87,7 +87,7 @@ public class HRMDocumentToProviderDao extends AbstractDao<HRMDocumentToProvider>
 	}
 
 	public List<HRMDocumentToProvider> findByHrmDocumentIdNoSystemUser(String hrmDocumentId) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=? and x.providerNo != '-1'";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?1 and x.providerNo != '-1'";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hrmDocumentId);
 		@SuppressWarnings("unchecked")
@@ -96,7 +96,7 @@ public class HRMDocumentToProviderDao extends AbstractDao<HRMDocumentToProvider>
 	}
 
 	public HRMDocumentToProvider findByHrmDocumentIdAndProviderNo(String hrmDocumentId, String providerNo) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=? and x.providerNo=?";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?1 and x.providerNo=?2";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hrmDocumentId);
 		query.setParameter(2, providerNo);
@@ -108,7 +108,7 @@ public class HRMDocumentToProviderDao extends AbstractDao<HRMDocumentToProvider>
 	}
 	
 	public List<HRMDocumentToProvider> findByHrmDocumentIdAndProviderNoList(String hrmDocumentId, String providerNo) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=? and x.providerNo=?";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.hrmDocumentId=?1 and x.providerNo=?2";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hrmDocumentId);
 		query.setParameter(2, providerNo);

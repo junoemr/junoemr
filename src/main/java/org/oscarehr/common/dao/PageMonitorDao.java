@@ -40,7 +40,7 @@ public class PageMonitorDao extends AbstractDao<PageMonitor>{
 	}
 	
 	public List<PageMonitor> findByPage(String pageName, String pageId) {
-		Query query = entityManager.createQuery("SELECT e FROM PageMonitor e WHERE e.pageName=? and e.pageId=? order by e.updateDate desc");
+		Query query = entityManager.createQuery("SELECT e FROM PageMonitor e WHERE e.pageName=?1 and e.pageId=?2 order by e.updateDate desc");
 		query.setParameter(1,pageName);
                 query.setParameter(2,pageId);
 		@SuppressWarnings("unchecked")
@@ -49,7 +49,7 @@ public class PageMonitorDao extends AbstractDao<PageMonitor>{
 	}
         
         public List<PageMonitor> findByPageName(String pageName) {
-		Query query = entityManager.createQuery("SELECT e FROM PageMonitor e WHERE e.pageName=? order by e.updateDate desc");
+		Query query = entityManager.createQuery("SELECT e FROM PageMonitor e WHERE e.pageName=?1 order by e.updateDate desc");
 		query.setParameter(1,pageName);
                 
 		@SuppressWarnings("unchecked")
@@ -60,7 +60,7 @@ public class PageMonitorDao extends AbstractDao<PageMonitor>{
         
 	public void updatePage(String pageName, String pageId) {
             
-            Query query = entityManager.createQuery("SELECT e FROM PageMonitor e WHERE e.pageName=? and e.pageId=? order by e.updateDate desc");
+            Query query = entityManager.createQuery("SELECT e FROM PageMonitor e WHERE e.pageName=?1 and e.pageId=?2 order by e.updateDate desc");
             query.setParameter(1,pageName);
             query.setParameter(2,pageId);
                 
@@ -79,7 +79,7 @@ public class PageMonitorDao extends AbstractDao<PageMonitor>{
 	}
         
         public void removePageNameKeepPageIdForProvider(String pageName, String excludePageId, String providerNo) {
-            Query query = entityManager.createQuery("SELECT e FROM PageMonitor e WHERE e.pageName=? and e.pageId!=? and e.providerNo=?");
+            Query query = entityManager.createQuery("SELECT e FROM PageMonitor e WHERE e.pageName=?1 and e.pageId!=?2 and e.providerNo=?3");
             query.setParameter(1,pageName);
             query.setParameter(2,excludePageId);
             query.setParameter(3,providerNo);
@@ -93,7 +93,7 @@ public class PageMonitorDao extends AbstractDao<PageMonitor>{
         }
         
         public void cancelPageIdForProvider (String pageName, String cancelPageId, String providerNo) {
-            Query query = entityManager.createQuery("SELECT e FROM PageMonitor e WHERE e.pageName=? and e.pageId=? and  e.providerNo=?");
+            Query query = entityManager.createQuery("SELECT e FROM PageMonitor e WHERE e.pageName=?1 and e.pageId=?2 and  e.providerNo=?3");
             query.setParameter(1,pageName);
             query.setParameter(2,cancelPageId);
             query.setParameter(3,providerNo);

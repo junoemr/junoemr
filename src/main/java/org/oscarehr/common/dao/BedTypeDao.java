@@ -48,7 +48,7 @@ public class BedTypeDao extends AbstractDao<BedType>{
 	 * @return boolean
 	 */
 	public boolean bedTypeExists(Integer bedTypeId) {
-		Query query = entityManager.createQuery("select count(*) from BedType b where b.id = ?");
+		Query query = entityManager.createQuery("select count(*) from BedType b where b.id = ?1");
 		query.setParameter(1, bedTypeId);
 		
 		Long result = (Long)query.getSingleResult();

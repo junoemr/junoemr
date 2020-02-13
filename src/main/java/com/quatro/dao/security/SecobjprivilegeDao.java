@@ -96,7 +96,7 @@ public class SecobjprivilegeDao extends HibernateDaoSupport {
 		logger.debug("deleting Secobjprivilege by roleName");
 		try {
 			
-			return getHibernateTemplate().bulkUpdate("delete Secobjprivilege as model where model.roleusergroup =?", roleName);
+			return getHibernateTemplate().bulkUpdate("delete Secobjprivilege as model where model.roleusergroup =?0", roleName);
 			
 		} catch (RuntimeException re) {
 			logger.error("delete failed", re);

@@ -76,7 +76,7 @@ public class DemographicCustDao extends AbstractDao<DemographicCust>
     }
     
     public List<DemographicCust> findByResident(String resident) {
-    	String sql = "select x from DemographicCust x where x.resident like ?";
+    	String sql = "select x from DemographicCust x where x.resident like ?1";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,resident);
     	
@@ -86,7 +86,7 @@ public class DemographicCustDao extends AbstractDao<DemographicCust>
     }
     
     public Integer select_demoname(String resident, String lastNameRegExp) {
-    	String sql = "select d.demographic_no from demographic d, demographiccust c where c.cust2=? and d.demographic_no=c.demographic_no and d.last_name REGEXP ?";
+    	String sql = "select d.demographic_no from demographic d, demographiccust c where c.cust2=?1 and d.demographic_no=c.demographic_no and d.last_name REGEXP ?2";
     	Query query = entityManager.createNativeQuery(sql);
     	query.setParameter(1,resident);
     	query.setParameter(2,lastNameRegExp);
@@ -100,7 +100,7 @@ public class DemographicCustDao extends AbstractDao<DemographicCust>
     }
     
     public Integer select_demoname1(String nurse, String lastNameRegExp) {
-    	String sql = "select d.demographic_no from demographic d, demographiccust c where c.cust2=? and d.demographic_no=c.demographic_no and d.last_name REGEXP ?";
+    	String sql = "select d.demographic_no from demographic d, demographiccust c where c.cust2=?1 and d.demographic_no=c.demographic_no and d.last_name REGEXP ?2";
     	Query query = entityManager.createNativeQuery(sql);
     	query.setParameter(1,nurse);
     	query.setParameter(2,lastNameRegExp);
@@ -114,7 +114,7 @@ public class DemographicCustDao extends AbstractDao<DemographicCust>
     }
     
     public Integer select_demoname2(String midwife, String lastNameRegExp) {
-    	String sql = "select d.demographic_no from demographic d, demographiccust c where c.cust2=? and d.demographic_no=c.demographic_no and d.last_name REGEXP ?";
+    	String sql = "select d.demographic_no from demographic d, demographiccust c where c.cust2=?1 and d.demographic_no=c.demographic_no and d.last_name REGEXP ?2";
     	Query query = entityManager.createNativeQuery(sql);
     	query.setParameter(1,midwife);
     	query.setParameter(2,lastNameRegExp);
@@ -128,7 +128,7 @@ public class DemographicCustDao extends AbstractDao<DemographicCust>
     }
     
     public List<DemographicCust> findAllByDemographicNumber(int demographic_no) {
-    	String sql = "select x from DemographicCust x where x.id = ?";
+    	String sql = "select x from DemographicCust x where x.id = ?1";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,demographic_no);
     	

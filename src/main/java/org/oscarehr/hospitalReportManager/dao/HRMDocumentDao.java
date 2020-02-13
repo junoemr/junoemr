@@ -26,7 +26,7 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
     }
 	
 	public List<HRMDocument> findById(int id) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.id=?";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.id=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, id);
 		@SuppressWarnings("unchecked")
@@ -47,7 +47,7 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 	
 	
 	public List<Integer> findByHash(String hash) {
-		String sql = "select distinct id from " + this.modelClass.getName() + " x where x.reportHash=?";
+		String sql = "select distinct id from " + this.modelClass.getName() + " x where x.reportHash=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hash);
 		@SuppressWarnings("unchecked")
@@ -56,7 +56,7 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 	}
 	
 	public List<HRMDocument> findByNoTransactionInfoHash(String hash) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.reportLessTransactionInfoHash=?";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.reportLessTransactionInfoHash=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hash);
 		@SuppressWarnings("unchecked")
@@ -66,13 +66,13 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 	
 	@SuppressWarnings("unchecked")
     public List<Integer> findAllWithSameNoDemographicInfoHash(String hash) {
-		String sql = "select distinct parentReport from " + this.modelClass.getName() + " x where x.reportLessDemographicInfoHash=?";
+		String sql = "select distinct parentReport from " + this.modelClass.getName() + " x where x.reportLessDemographicInfoHash=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, hash);
 		List<Integer> matches = query.getResultList();
 		
 		if (matches != null && matches.size() == 1 && matches.get(0) == null) {
-			sql = "select distinct id from " + this.modelClass.getName() + " x where x.reportLessDemographicInfoHash=?";
+			sql = "select distinct id from " + this.modelClass.getName() + " x where x.reportLessDemographicInfoHash=?1";
 			query = entityManager.createQuery(sql);
 			query.setParameter(1, hash);
 			matches = query.getResultList();
@@ -90,12 +90,12 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 			Query query = null;
 			if (firstDocument.getParentReport() != null) {
 				// This is a child report; get the parent and all siblings of this report
-				sql = "select x from " + this.modelClass.getName() + " x where x.id = ? order by x.id asc";
+				sql = "select x from " + this.modelClass.getName() + " x where x.id = ?1 order by x.id asc";
 				query = entityManager.createQuery(sql);
 				query.setParameter(1, firstDocument.getParentReport());
 				documentsWithRelationship.addAll(query.getResultList());
 				
-				sql = "select x from " + this.modelClass.getName() + " x where x.parentReport = ? order by x.id asc";
+				sql = "select x from " + this.modelClass.getName() + " x where x.parentReport = ?1 order by x.id asc";
 				query = entityManager.createQuery(sql);
 				query.setParameter(1, firstDocument.getParentReport());
 				documentsWithRelationship.addAll(query.getResultList());
@@ -103,7 +103,7 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 				
 			} else {
 				// This is a parent report
-				sql = "select x from " + this.modelClass.getName() + " x where x.parentReport = ? order by x.id asc";
+				sql = "select x from " + this.modelClass.getName() + " x where x.parentReport = ?1 order by x.id asc";
 				query = entityManager.createQuery(sql);
 				query.setParameter(1, firstDocument.getId());
 				documentsWithRelationship = query.getResultList();
@@ -116,7 +116,7 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 	}
 	
 	public List<HRMDocument> getAllChildrenOf(Integer docId) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.parentReport=? order by id asc";
+		String sql = "select x from " + this.modelClass.getName() + " x where x.parentReport=?1 order by id asc";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, docId);
 		@SuppressWarnings("unchecked")

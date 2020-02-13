@@ -59,7 +59,7 @@ public class ConsultationServiceDao extends AbstractDao<ConsultationServices> {
     }
 
     public List<ConsultationServices> findActive() {
-    	String sql = "select x from ConsultationServices x where x.active=? order by x.serviceDesc";
+    	String sql = "select x from ConsultationServices x where x.active=?1 order by x.serviceDesc";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,"1");
 
@@ -69,7 +69,7 @@ public class ConsultationServiceDao extends AbstractDao<ConsultationServices> {
     }
     
     public List<ConsultationServices> findActiveNames() {
-    	String sql = "select x.serviceId,x.serviceDesc from ConsultationServices x where x.active=? order by x.serviceDesc";
+    	String sql = "select x.serviceId,x.serviceDesc from ConsultationServices x where x.active=?1 order by x.serviceDesc";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,"1");
 
@@ -80,7 +80,7 @@ public class ConsultationServiceDao extends AbstractDao<ConsultationServices> {
     
     
     public ConsultationServices findByDescription(String description) {
-    	String sql = "select x from ConsultationServices x where x.active=? and x.serviceDesc = ?";
+    	String sql = "select x from ConsultationServices x where x.active=?1 and x.serviceDesc = ?2";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,"1");
     	query.setParameter(2, description);

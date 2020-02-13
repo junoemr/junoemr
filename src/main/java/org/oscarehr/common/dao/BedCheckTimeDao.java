@@ -45,7 +45,7 @@ public class BedCheckTimeDao extends AbstractDao<BedCheckTime>{
 	
     
     public boolean bedCheckTimeExists(Integer programId, Date time) {
-    	Query query = entityManager.createQuery("select b from BedCheckTime b where b.programId = ? and b.time = ?");
+    	Query query = entityManager.createQuery("select b from BedCheckTime b where b.programId = ?1 and b.time = ?2");
     	query.setParameter(1, programId);
     	query.setParameter(2, time);
     	
@@ -105,7 +105,7 @@ public class BedCheckTimeDao extends AbstractDao<BedCheckTime>{
         }
 
         if (programId != null) {
-            queryBuilder.append("bct.programId = ?");
+            queryBuilder.append("bct.programId = ?1");
         }
 
         queryBuilder.append(" order by bct.time asc");

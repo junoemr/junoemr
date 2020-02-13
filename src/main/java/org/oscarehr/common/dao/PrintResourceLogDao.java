@@ -38,7 +38,7 @@ public class PrintResourceLogDao extends AbstractDao<PrintResourceLog>{
 	}
 	
 	public List<PrintResourceLog> findByResource(String resourceName, String resourceId) {
-		Query query = entityManager.createQuery("select x from " + modelClass.getName() + " x WHERE x.resourceName=? and x.resourceId = ? order by x.dateTime DESC");
+		Query query = entityManager.createQuery("select x from " + modelClass.getName() + " x WHERE x.resourceName=?1 and x.resourceId = ?2 order by x.dateTime DESC");
 		query.setParameter(1, resourceName);
 		query.setParameter(2, resourceId);
 
