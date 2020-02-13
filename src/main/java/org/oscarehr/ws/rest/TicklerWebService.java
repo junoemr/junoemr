@@ -199,37 +199,9 @@ public class TicklerWebService extends AbstractServiceImpl {
 		ticklerCriteriaSearch.setEndDate(ConversionUtils.fromDateString(serviceEndDate));
 
 		Tickler.STATUS ticklerStatus = Tickler.STATUS.valueOf(status);
-		/*
-		switch(status)
-		{
-			case Tickler.COMPLETED:
-				ticklerStatus = Tickler.STATUS.COMPLETED;
-				break;
-			case Tickler.DELETED:
-				ticklerStatus = Tickler.STATUS.DELETED;
-				break;
-			case Tickler.ACTIVE:
-			default:
-				break;
-		}
-		 */
 		ticklerCriteriaSearch.setStatus(ticklerStatus);
 
 		Tickler.PRIORITY ticklerPriority = Tickler.PRIORITY.valueOf(priority);
-		/*
-		switch(priority)
-		{
-			case Tickler.HIGH:
-				ticklerPriority = Tickler.PRIORITY.High;
-				break;
-			case Tickler.LOW:
-				ticklerPriority = Tickler.PRIORITY.Low;
-				break;
-			case Tickler.NORMAL:
-			default:
-				break;
-		}
-		 */
 		ticklerCriteriaSearch.setPriority(ticklerPriority);
 		ticklerCriteriaSearch.setTaskAssignedTo(taskAssignedTo);
 		ticklerCriteriaSearch.setCreator(creator);
