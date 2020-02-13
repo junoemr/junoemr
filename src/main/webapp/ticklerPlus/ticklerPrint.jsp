@@ -111,9 +111,9 @@
 									+ assignee.getFirstName();
 						}
 						status = "Active";
-						if(temp.getStatus().equals(Tickler.STATUS.COMPLETED))
+						if(temp.getStatus().equals(Tickler.STATUS.C))
 							status="Completed";
-						if(temp.getStatus().equals(Tickler.STATUS.DELETED))
+						if(temp.getStatus().equals(Tickler.STATUS.D))
 							status="Deleted";
 						
 						

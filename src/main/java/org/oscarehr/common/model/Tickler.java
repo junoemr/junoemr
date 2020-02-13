@@ -66,45 +66,20 @@ public class Tickler extends AbstractModel<Integer> {
 	public static final String NORMAL = "Normal";
 	public static final String LOW = "Low";
         
-        public static final String NOT_APPLICABLE = "N/A";
+	public static final String NOT_APPLICABLE = "N/A";
 	
 	public enum STATUS
 	{
-		ACTIVE("A"),
-		COMPLETED("C"),
-		DELETED("D");
-
-		private String text;
-
-		STATUS(String text)
-		{
-			this.text = text;
-		}
-
-		public String getText()
-		{
-			return text;
-		}
-
+		A,
+		C,
+		D
 	}
 	
 	public enum PRIORITY
 	{
-		High("High"),
-		Normal("Normal"),
-		Low("Low");
-
-		private String text;
-
-		PRIORITY(String text)
-		{
-			this.text = text;
-		}
-
-		public String getText()
-		{
-			return text;
-		}
+		High,
+		Normal,
+		Low
 	}
 	
 	public static final String DATE_FORMAT = "MM-dd-yyyy";
@@ -125,7 +100,7 @@ public class Tickler extends AbstractModel<Integer> {
 	
 	@Column(length=1, nullable=false)
 	@Enumerated(EnumType.STRING)
-	private STATUS status = STATUS.ACTIVE;
+	private STATUS status = STATUS.A;
 	
 	@Column(name="update_date")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -195,7 +170,7 @@ public class Tickler extends AbstractModel<Integer> {
 	public Tickler() {
 		setUpdateDate(new Date());
 		setServiceDate(new Date());
-		setStatus(STATUS.ACTIVE);
+		setStatus(STATUS.A);
 		setPriority(PRIORITY.Normal);
 	}
 	
@@ -331,13 +306,13 @@ public class Tickler extends AbstractModel<Integer> {
 
     public String getStatusDesc(Locale locale) {
         String statusStr = "";            
-        if (status.equals(Tickler.STATUS.ACTIVE)){
+        if (status.equals(Tickler.STATUS.A)){
             statusStr = LocaleUtils.getMessage(locale,"tickler.ticklerMain.stActive");
         }
-        else if (status.equals(Tickler.STATUS.COMPLETED)) {
+        else if (status.equals(Tickler.STATUS.C)) {
             statusStr = LocaleUtils.getMessage(locale,"tickler.ticklerMain.stComplete");
         }
-        else if (status.equals(Tickler.STATUS.DELETED)) {
+        else if (status.equals(Tickler.STATUS.D)) {
             statusStr = LocaleUtils.getMessage(locale,"tickler.ticklerMain.stDeleted");
         }
         return statusStr;
@@ -345,11 +320,11 @@ public class Tickler extends AbstractModel<Integer> {
     
     public void setStatusAsChar(char s) {
     	if(s == 'A' || s == 'a')
-    		setStatus(Tickler.STATUS.ACTIVE);
+    		setStatus(Tickler.STATUS.A);
     	else if(s == 'C' || s == 'c')
-    		setStatus(Tickler.STATUS.COMPLETED);
+    		setStatus(Tickler.STATUS.C);
     	else if(s == 'D' || s == 'd')
-    		setStatus(Tickler.STATUS.DELETED);
+    		setStatus(Tickler.STATUS.D);
     	else
     		throw new IllegalArgumentException("Invalid status");
     }
@@ -397,11 +372,11 @@ public class Tickler extends AbstractModel<Integer> {
 
 	public void setStatusWeb(String s) {
 		if(s != null && s.equals("C")) {
-			setStatus(Tickler.STATUS.COMPLETED);
+			setStatus(Tickler.STATUS.C);
 		} else if(s != null && s.equals("D")) {
-			setStatus(Tickler.STATUS.DELETED);
+			setStatus(Tickler.STATUS.D);
 		} else if(s != null && s.equals("A")){
-			setStatus(Tickler.STATUS.ACTIVE);
+			setStatus(Tickler.STATUS.A);
 		}
 	}
 	

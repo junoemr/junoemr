@@ -47,7 +47,6 @@ import org.oscarehr.util.SpringUtils;
 public class TicklerDaoTest extends DaoTestFixtures {
 
 	protected TicklerDao dao = SpringUtils.getBean(TicklerDao.class);
-	//protected TicklerUpdate1Dao updateDao = SpringUtils.getBean(TicklerUpdate1Dao.class);
 	private DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	private ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
@@ -109,11 +108,11 @@ public class TicklerDaoTest extends DaoTestFixtures {
 		return cal.getTime();
 	}
 
-	@Test 
+	@Test
 	public void testFindSomeStuff() {
-		dao.persist(this.createTickler(1, "hello there", 10015, today(), Tickler.STATUS.ACTIVE, "1"));
-		dao.persist(this.createTickler(1, "I am coding", 10015, yesterday(), Tickler.STATUS.COMPLETED, "2"));
-		dao.persist(this.createTickler(2, "this today", 10015, tomorrow(), Tickler.STATUS.ACTIVE, "1"));
+		dao.persist(this.createTickler(1, "hello there", 10015, today(), Tickler.STATUS.A, "1"));
+		dao.persist(this.createTickler(1, "I am coding", 10015, yesterday(), Tickler.STATUS.C, "2"));
+		dao.persist(this.createTickler(2, "this today", 10015, tomorrow(), Tickler.STATUS.A, "1"));
 		
 		assertTrue(1 == dao.findActiveByMessageForPatients(Arrays.asList(new Integer[] {1}), "hello").size());
 		assertTrue(1 == dao.findActiveByDemographicNoAndMessage(1, "hello there").size());
@@ -166,7 +165,7 @@ public class TicklerDaoTest extends DaoTestFixtures {
 		tu.setPriority("Normal");
 		tu.setProviderNo("999998");
 		tu.setServiceDate(new Date());
-		tu.setStatus(Tickler.STATUS.ACTIVE);
+		tu.setStatus(Tickler.STATUS.A);
 		tu.setUpdateDate(new Date());
 		
 		TicklerComment tc = new TicklerComment();
@@ -176,7 +175,6 @@ public class TicklerDaoTest extends DaoTestFixtures {
 		
 		dao.persist(entity);
 		assertNotNull(entity.getId());
-		
 		
 		tu.setTicklerNo(entity.getId());
 		dao.persist(tu);

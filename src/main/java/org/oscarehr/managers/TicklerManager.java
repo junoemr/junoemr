@@ -493,19 +493,19 @@ public class TicklerManager {
 	public void completeTickler(LoggedInInfo loggedInInfo, Integer tickler_id, String provider) {
     	checkPrivilege(loggedInInfo, PRIVILEGE_UPDATE);
     	
-		updateStatus(loggedInInfo, tickler_id, provider, Tickler.STATUS.COMPLETED);
+		updateStatus(loggedInInfo, tickler_id, provider, Tickler.STATUS.C);
 	}
 
 	public void deleteTickler(LoggedInInfo loggedInInfo, Integer tickler_id, String provider) {
     	checkPrivilege(loggedInInfo, PRIVILEGE_UPDATE);
 
-		updateStatus(loggedInInfo, tickler_id, provider, Tickler.STATUS.DELETED);
+		updateStatus(loggedInInfo, tickler_id, provider, Tickler.STATUS.D);
 	}
 
 	public void activateTickler(LoggedInInfo loggedInInfo, Integer tickler_id, String provider) {
     	checkPrivilege(loggedInInfo, PRIVILEGE_UPDATE);
     	
-		updateStatus(loggedInInfo, tickler_id, provider, Tickler.STATUS.ACTIVE);
+		updateStatus(loggedInInfo, tickler_id, provider, Tickler.STATUS.A);
 	}
 	
 	public void resolveTicklersBySubstring(LoggedInInfo loggedInInfo, String providerNo, List<String> demographicIds, String remString) {

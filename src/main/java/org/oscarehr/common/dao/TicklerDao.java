@@ -418,11 +418,11 @@ public class TicklerDao extends AbstractDao<Tickler>{
 	}
 
 	private Tickler.STATUS convertStatus(String status) {
-		Tickler.STATUS result = Tickler.STATUS.ACTIVE;
+		Tickler.STATUS result = Tickler.STATUS.A;
 		if(status != null && status.startsWith("C"))
-			result = Tickler.STATUS.COMPLETED;
+			result = Tickler.STATUS.C;
 		if(status != null && status.startsWith("D"))
-			result = Tickler.STATUS.DELETED;
+			result = Tickler.STATUS.D;
 		return result;
 	}
 	

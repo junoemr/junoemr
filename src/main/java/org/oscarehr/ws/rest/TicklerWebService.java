@@ -198,7 +198,8 @@ public class TicklerWebService extends AbstractServiceImpl {
 		ticklerCriteriaSearch.setStartDate(ConversionUtils.fromDateString(serviceStartDate));
 		ticklerCriteriaSearch.setEndDate(ConversionUtils.fromDateString(serviceEndDate));
 
-		Tickler.STATUS ticklerStatus = Tickler.STATUS.ACTIVE;
+		Tickler.STATUS ticklerStatus = Tickler.STATUS.valueOf(status);
+		/*
 		switch(status)
 		{
 			case Tickler.COMPLETED:
@@ -211,9 +212,11 @@ public class TicklerWebService extends AbstractServiceImpl {
 			default:
 				break;
 		}
+		 */
 		ticklerCriteriaSearch.setStatus(ticklerStatus);
 
-		Tickler.PRIORITY ticklerPriority = Tickler.PRIORITY.Normal;
+		Tickler.PRIORITY ticklerPriority = Tickler.PRIORITY.valueOf(priority);
+		/*
 		switch(priority)
 		{
 			case Tickler.HIGH:
@@ -226,6 +229,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 			default:
 				break;
 		}
+		 */
 		ticklerCriteriaSearch.setPriority(ticklerPriority);
 		ticklerCriteriaSearch.setTaskAssignedTo(taskAssignedTo);
 		ticklerCriteriaSearch.setCreator(creator);
@@ -368,7 +372,8 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Path("/add")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public GenericRESTResponse addTickler(Tickler tickler){
+	public GenericRESTResponse addTickler(Tickler tickler)
+	{
 		GenericRESTResponse response = new GenericRESTResponse();
 		
 		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "w", null)) {

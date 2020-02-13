@@ -87,7 +87,7 @@ public class TicklerHandler {
 		tickler.setServiceDate( serviceDate );
 		tickler.setTaskAssignedTo( ( (String[]) ticklerParameters.get( "taskAssignedTo" ) )[0] );
 		tickler.setCategoryId( ticklerCategoryId );
-		tickler.setStatus( Tickler.STATUS.ACTIVE); // this method creates only new Active Ticklers.
+		tickler.setStatus( Tickler.STATUS.A); // this method creates only new Active Ticklers.
 		tickler.setCreator( getLoggedinInfo().getLoggedInProviderNo() );
 
 		setMasterTickler( tickler );

@@ -98,13 +98,13 @@ public class TicklerConverter extends AbstractConverter<Tickler, TicklerTo1> {
 		d.setTaskAssignedToName(providerDao.getProviderName(t.getTaskAssignedTo()));
 		d.setCreatorName(providerDao.getProviderName(t.getCreator()));
 		
-		if(d.getStatus() == STATUS.ACTIVE) {
+		if(d.getStatus() == STATUS.A) {
 			d.setStatusName("Active");
 		}
-		if(d.getStatus() == STATUS.COMPLETED) {
+		if(d.getStatus() == STATUS.C) {
 			d.setStatusName("Completed");
 		}
-		if(d.getStatus() == STATUS.DELETED) {
+		if(d.getStatus() == STATUS.D) {
 			d.setStatusName("Deleted");
 		}
 		

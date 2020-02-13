@@ -182,7 +182,7 @@ public class TicklersDao extends AbstractDao<Tickler> {
 	public void deactivateAllTicklers(List<Integer> ticklerIDs)
 	{
 		Query query = entityManager.createQuery("UPDATE Tickler t SET t.status = :deleteStatus WHERE t.id IN (:ticklerIDs)");
-		query.setParameter("deleteStatus", Tickler.STATUS.DELETED);
+		query.setParameter("deleteStatus", Tickler.STATUS.D);
 		query.setParameter("ticklerIDs", ticklerIDs);
 
 		query.executeUpdate();

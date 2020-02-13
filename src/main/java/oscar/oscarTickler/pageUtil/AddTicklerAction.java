@@ -70,12 +70,12 @@ public class AddTicklerAction extends Action {
       if (priority == null) { priority = TicklerData.NORMAL;}
       if (task_assigned_to == null){ task_assigned_to = creator; }
             
-      Tickler.STATUS tStatus = Tickler.STATUS.ACTIVE;
+      Tickler.STATUS tStatus = Tickler.STATUS.A;
       if(status.equals(TicklerData.COMPLETED)) {
-    	  tStatus = Tickler.STATUS.COMPLETED;
+    	  tStatus = Tickler.STATUS.C;
       }
       if(status.equals(TicklerData.DELETED)) {
-    	  tStatus = Tickler.STATUS.DELETED;
+    	  tStatus = Tickler.STATUS.D;
       }
       
       Tickler.PRIORITY tPriority = Tickler.PRIORITY.Normal;
