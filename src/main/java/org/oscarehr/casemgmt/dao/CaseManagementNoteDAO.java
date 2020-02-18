@@ -333,16 +333,13 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 		String sqlCommand="select distinct casemgmt_note.note_id from issue,casemgmt_issue,casemgmt_issue_notes,casemgmt_note where casemgmt_issue.issue_id=issue.issue_id and casemgmt_issue.demographic_no='"+demographic_no+"' "+(issueCodeList!=null?"and issue.code in "+issueCodeList:"")+" and casemgmt_issue_notes.id=casemgmt_issue.id and casemgmt_issue_notes.note_id=casemgmt_note.note_id";
 		Session session=getSession();
 		List<CaseManagementNote> notes=new ArrayList<CaseManagementNote>();
-		try
+
+		SQLQuery query=session.createSQLQuery(sqlCommand);
+		@SuppressWarnings("unchecked")
+		List<Integer> ids=query.list();
+		for (Integer id : ids)
 		{
-			SQLQuery query=session.createSQLQuery(sqlCommand);
-			@SuppressWarnings("unchecked")
-			List<Integer> ids=query.list();
-			for (Integer id : ids) notes.add(getNote(id.longValue()));
-		}
-		finally
-		{
-			session.close();
+			notes.add(getNote(id.longValue()));
 		}
 
 		// make unique for uuid
@@ -506,16 +503,16 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 
 	public boolean haveIssue(String issueCode, Integer demographicId) {
 		Session session=getSession();
-		try
+
+		SQLQuery query = session.createSQLQuery("select casemgmt_issue.id from casemgmt_issue_notes,casemgmt_issue,issue   where issue.issue_id=casemgmt_issue.issue_id and casemgmt_issue.id=casemgmt_issue_notes.id and demographic_no="+demographicId+" and issue.code='"+issueCode+"'");
+		List results = query.list();
+		// log.info("haveIssue - DAO - # of results = " + results.size());
+		if (results.size() > 0)
 		{
-			SQLQuery query = session.createSQLQuery("select casemgmt_issue.id from casemgmt_issue_notes,casemgmt_issue,issue   where issue.issue_id=casemgmt_issue.issue_id and casemgmt_issue.id=casemgmt_issue_notes.id and demographic_no="+demographicId+" and issue.code='"+issueCode+"'");
-			List results = query.list();
-			// log.info("haveIssue - DAO - # of results = " + results.size());
-			if (results.size() > 0) return true;
-			return false;
-		} finally {
-			session.close();
+			return true;
 		}
+
+		return false;
 	}
 
 	public static class EncounterCounts {

@@ -23,7 +23,7 @@
 
 package org.oscarehr.config;
 
-import org.hibernate.dialect.MariaDBDialect;
+import org.oscarehr.util.persistence.OscarMySQL5Dialect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,7 +75,8 @@ public class HibernateConfig
 	private Properties hibernateProperties()
 	{
 		Properties properties = new Properties();
-		properties.put("hibernate.dialect", MariaDBDialect.class.getName());
+		properties.put("hibernate.dialect", OscarMySQL5Dialect.class.getName());
+		//properties.put("hibernate.dialect", MariaDBDialect.class.getName());
 		//properties.put("hibernate.show_sql", "hibernate.show_sql");
 		//properties.put("hibernate.format_sql", "hibernate.format_sql");
 		//properties.put("hibernate.hbm2ddl.auto", "hibernate.hbm2ddl.auto");

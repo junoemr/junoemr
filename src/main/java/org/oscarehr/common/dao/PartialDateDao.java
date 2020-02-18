@@ -43,11 +43,12 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 	
 	public PartialDate getPartialDate(Integer tableName, Integer tableId, Integer fieldName) {
 
-		String sqlCommand = "select x from PartialDate x where x.tableName=?1 and x.tableId=?2 and x.fieldName=?3 order by x.id desc limit 1";
+		String sqlCommand = "select x from PartialDate x where x.tableName=?1 and x.tableId=?2 and x.fieldName=?3 order by x.id desc";
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter(1, tableName);
 		query.setParameter(2, tableId);
 		query.setParameter(3, fieldName);
+		query.setMaxResults(1);
 
 		@SuppressWarnings("unchecked")
 		PartialDate result = null;

@@ -63,7 +63,7 @@ public class MsgNewMessageTag extends TagSupport {
             try {
                 c = DbConnectionFilter.getThreadLocalDbConnection();
                 						//String sql = new String("select count(*) from messagelisttbl where provider_no ='"+ providerNo +"' and status = 'new' ");
-                String sql = "select count(*) from messagelisttbl m LEFT JOIN oscarcommlocations o ON m.remoteLocation = o.locationId where m.provider_no = ?1 and m.status = 'new' and o.current1=1" ;
+                String sql = "select count(*) from messagelisttbl m LEFT JOIN oscarcommlocations o ON m.remoteLocation = o.locationId where m.provider_no = ? and m.status = 'new' and o.current1=1" ;
                 ps = c.prepareStatement(sql);
                 ps.setString(1,providerNo);
                 rs = ps.executeQuery();                
@@ -71,7 +71,7 @@ public class MsgNewMessageTag extends TagSupport {
                    numNewMessages = (rs.getInt(1));
                 }
                 
-                String sqlCommand="select count(*) from messagelisttbl,msgDemoMap where provider_no =?1 and status = 'new' and messageID = message" ;
+                String sqlCommand="select count(*) from messagelisttbl,msgDemoMap where provider_no =? and status = 'new' and messageID = message" ;
                 ps = c.prepareStatement(sqlCommand);
                 ps.setString(1,providerNo);
                 rs = ps.executeQuery();

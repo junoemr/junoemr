@@ -35,24 +35,50 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * This ContextListener is used to Initialize classes at startup - Initialize the DBConnection Pool.
  * 
  * @author Jay Gallagher
  */
-public class Startup implements ServletContextListener {
+@Component
+public class Startup implements ServletContextListener
+{
 	private static Logger logger = MiscUtils.getLogger();
 	private oscar.OscarProperties p = oscar.OscarProperties.getInstance();
 
-	public void contextInitialized(ServletContextEvent sc) {
-		try {
+	@Value("#{junoProperties.properties.filename}")
+	private String propertiesFilename;
+
+	public void contextInitialized(ServletContextEvent sc)
+	{
+		try
+		{
+			// Load properties file from system property
+			//String propertyFileLocation = System.getProperty("juno.properties-file.location");
+
+			try
+			{
+				//propertiesFilename = "/usr/share/tomcat/juno.properties";
+
+				// load property file
+				logger.info("looking up " + propertiesFilename);
+				p.readFromFile(propertiesFilename);
+				logger.info("loading properties from " + propertiesFilename);
+			}
+			catch (java.io.FileNotFoundException ex)
+			{
+				logger.info(propertiesFilename + " not found");
+			}
+
 			logger.debug("contextInit");
 
 			String contextPath = "";
-			String propFileName = "";
 
-			try {
+			try
+			{
 				// Anyone know a better way to do this?
 				String url = sc.getServletContext().getResource("/").getPath();
 				logger.debug(url);
@@ -66,10 +92,14 @@ public class Startup implements ServletContextListener {
 				if (idx > 0) url = url.substring(0, idx);
 
 				contextPath = url;
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				logger.error("Error", e);
 			}
 
+			/*
+			String propFileName = "";
 			String propName = contextPath + ".properties";
 			propFileName = "";
 
@@ -95,7 +125,7 @@ public class Startup implements ServletContextListener {
 			}
 
 			if (p.isEmpty()) {
-				/* if the file not found in the user root, look in the WEB-INF directory */
+				// if the file not found in the user root, look in the WEB-INF directory
 				try {
 					logger.info("looking up  /WEB-INF/" + propName);
 					p.readFromFile("/WEB-INF/" + propName);
@@ -108,6 +138,7 @@ public class Startup implements ServletContextListener {
 					return;
 				}
 			}
+			*/
 			try {
 				// Specify who will see new casemanagement screen
 				ArrayList<String> listUsers;
@@ -140,14 +171,17 @@ public class Startup implements ServletContextListener {
 				logger.info("DB PROPS: Username :" + p.getProperty("db_username", "NOTSET") + " db name: " + p.getProperty("db_name", "NOTSET"));
 				p.setProperty("OSCAR_START_TIME", "" + System.currentTimeMillis());
 
-			} catch (Exception e) {
-				String s="Property file not found at:"+propFileName;
+			}
+			catch (Exception e)
+			{
+				String s="Error initializing properties";
 				logger.error(s, e);
 			}
 
 			// CHECK FOR DEFAULT PROPERTIES
 			String baseDocumentDir = p.getProperty("BASE_DOCUMENT_DIR");
-			if (baseDocumentDir != null) {
+			if (baseDocumentDir != null)
+			{
 				logger.info("Found Base Document Dir: " + baseDocumentDir);
 				checkAndSetProperty(baseDocumentDir, contextPath, "HOME_DIR", "/billing/download/");
 				checkAndSetProperty(baseDocumentDir, contextPath, "DOCUMENT_DIR", "/document/");
@@ -163,8 +197,6 @@ public class Startup implements ServletContextListener {
 				checkAndSetProperty(baseDocumentDir, contextPath,"OMD_log_directory" , "/hrm/logs/");
 				checkAndSetProperty(baseDocumentDir, contextPath,"OMD_stored", "/hrm/stored/");
 				checkAndSetProperty(baseDocumentDir, contextPath,"OMD_downloads","/hrm/sftp_downloads/");
-				
-
 			}
 			
 			logger.debug("LAST LINE IN contextInitialized");

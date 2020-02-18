@@ -191,7 +191,10 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		// value to split it into rows so it can be joined.
 		// It uses the STRAIGHT_JOIN planner hint because the scheduletemplatecode table was being
 		// joined too soon by default.
-		String sql = "SELECT STRAIGHT_JOIN\n" +
+
+		// TODO: SPRINGUPGRADE: removed this for performance on canadian_cann_db.  It was real slow for some reason.
+		//String sql = "SELECT STRAIGHT_JOIN\n" +
+		String sql = "SELECT \n" +
 				"  (n3.i + (10 * n2.i) + (100 * n1.i))+1 AS position, \n" +
 				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
 				"  sd.sdate AS appt_date,\n" +

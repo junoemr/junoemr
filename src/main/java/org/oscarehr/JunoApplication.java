@@ -27,6 +27,8 @@ import org.oscarehr.util.ContextStartupListener;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
@@ -38,6 +40,7 @@ import javax.servlet.ServletException;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"oscar", "org.oscarehr", "com.quatro"})
+@ConfigurationPropertiesScan("org.oscarehr.config")
 @ServletComponentScan(basePackages = {"com.junoemr", "org.oscarehr"})
 @ImportResource({"classpath*:applicationContext.xml"})
 public class JunoApplication extends SpringBootServletInitializer

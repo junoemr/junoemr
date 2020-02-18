@@ -67,13 +67,14 @@ public class Log4JGmailErrorAppender extends AppenderSkeleton implements ThreadF
 	private String smtpSslPort="465";
 	private String subject="Server Error";
 	private String recipientEmailAddress=null;
-	
+
+	/*
 	@Override
 	protected void append(LoggingEvent event)
 	{
 		try
 		{
-			int level=event.getLevel().toInt();
+			int level = event.getLevel().toInt();
 			if (level>=Priority.ERROR_INT && level<=Priority.FATAL_INT)
 			{
 				StringBuilder sb=new StringBuilder();
@@ -119,6 +120,8 @@ public class Log4JGmailErrorAppender extends AppenderSkeleton implements ThreadF
 	{
 		return false;
 	}
+
+	 */
 
 //	@Override
 	public Thread newThread(Runnable runnable)
