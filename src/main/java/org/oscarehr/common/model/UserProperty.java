@@ -127,6 +127,8 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String EFORM_POPUP_WIDTH = "eform.popup.width";
     public static final String EFORM_POPUP_HEIGHT = "eform.popup.height";
 
+    public static final String ICE_FALL_VISIBLE = "icefall_visible";
+    public static final String ICE_FALL_INTEGRATION_ENABLED = "icefall_enabled";
 
     
     public static final String DEFAULT_PRINTER_PDF_LABEL="default_printer_pdf_label";

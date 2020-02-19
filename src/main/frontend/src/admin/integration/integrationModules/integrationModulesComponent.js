@@ -21,6 +21,8 @@
 * Canada
 */
 
+import {ADMIN_PAGE_EVENTS} from "../../adminConstants";
+
 angular.module('Admin.Integration').component('integrationModules',
 {
 	templateUrl: 'src/admin/integration/integrationModules/integrationModules.jsp',
@@ -41,7 +43,7 @@ angular.module('Admin.Integration').component('integrationModules',
 			{
 				name: "IceFall",
 				enabled: false,
-				propertyName: "integration.IceFall.enabled",
+				propertyName: "icefall_enabled",
 				configUrl: ""
 			},
 		];
@@ -66,7 +68,8 @@ angular.module('Admin.Integration').component('integrationModules',
 
 		ctrl.enableProperty = function(propertyName, enable)
 		{
-			systemPreferenceService.setPreference(propertyName, enable.toString())
+			systemPreferenceService.setPreference(propertyName, enable.toString());
+			$scope.$emit(ADMIN_PAGE_EVENTS.ADMIN_RELOAD_NAV);
 		}
 
 	}]
