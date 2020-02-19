@@ -20,21 +20,19 @@
 * Victoria, British Columbia
 * Canada
 --%>
-<div id="integration-modules-page">
-	<h1 class="page-header text-center">Manage Integrations</h1>
-	<div class="integration-list flex flex-row justify-content-center">
-		<!-- integrations -->
-		<div class="integration-item flex-row align-items-first-baseline " ng-repeat="integration in $ctrl.integrationList">
-			<label class="switch-label" for="{{ integration.name }}">
-				<a ng-href="{{integration.configUrl}}">{{ integration.name }}</a>
-			</label>
-			<label class="switch">
-				<input id="{{integration.name}}" type="checkbox"
-							 ng-model="integration.enabled"
-							 ng-change="$ctrl.enableProperty(integration.propertyName, integration.enabled)"/>
-				<span class="slider"></span>
-			</label>
-			<i class="integration-check icon" ng-class="integration.enabled ? 'icon-check' : ''"></i>
-		</div>
+<div id="ice-fall-admin">
+	<div class="ice-fall-nav navbar">
+		<ul class="nav navbar-nav">
+			<li ng-class="{'active': $ctrl.isTabActive('admin.iceFall.settings')}">
+				<a href="javascript:void(0)" ng-click="$ctrl.changeTab('admin.iceFall.settings')">Settings</a>
+			</li>
+			<li ng-class="{'active': $ctrl.isTabActive('admin.iceFall.activity')}">
+				<a href="javascript:void(0)" ng-click="$ctrl.changeTab('admin.iceFall.activity')">Activity</a>
+			</li>
+		</ul>
+	</div>
+	<hr>
+	<div class="ice-fall-content">
+		<ui-view></ui-view>
 	</div>
 </div>
