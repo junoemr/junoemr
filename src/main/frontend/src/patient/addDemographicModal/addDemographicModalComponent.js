@@ -180,6 +180,7 @@ angular.module('Patient').component('addDemographicModal', {
 					},
 					function error(errors)
 					{
+						alert(errors);
 						console.error(errors);
 					}
 				);
