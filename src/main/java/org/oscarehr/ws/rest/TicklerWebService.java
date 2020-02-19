@@ -186,27 +186,23 @@ public class TicklerWebService extends AbstractServiceImpl {
 		String providerNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(providerNo, "r", null, "_tickler");
 
-		AbstractCriteriaSearch.SORTDIR sortDir = AbstractCriteriaSearch.SORTDIR.asc;
-		if ("desc".equals(sortDirection))
-		{
-			sortDir = AbstractCriteriaSearch.SORTDIR.desc;
-		}
-
+		AbstractCriteriaSearch.SORTDIR sortDir = AbstractCriteriaSearch.SORTDIR.valueOf(sortDirection);
 		TicklerCriteriaSearch.SORT_MODE sortMode = TicklerCriteriaSearch.SORT_MODE.valueOf(sortColumn);
 
 		TicklerCriteriaSearch ticklerCriteriaSearch = ticklerService.buildTicklerSearch(sortDir, sortMode);
+
 		ticklerCriteriaSearch.setStartDate(ConversionUtils.fromDateString(serviceStartDate));
 		ticklerCriteriaSearch.setEndDate(ConversionUtils.fromDateString(serviceEndDate));
+		ticklerCriteriaSearch.setTaskAssignedTo(taskAssignedTo);
+		ticklerCriteriaSearch.setCreator(creator);
+		ticklerCriteriaSearch.setMrp(mrp);
+		ticklerCriteriaSearch.setDemographicNo(demographicNo);
 
 		Tickler.STATUS ticklerStatus = Tickler.STATUS.valueOf(status);
 		ticklerCriteriaSearch.setStatus(ticklerStatus);
 
 		Tickler.PRIORITY ticklerPriority = Tickler.PRIORITY.valueOf(priority);
 		ticklerCriteriaSearch.setPriority(ticklerPriority);
-		ticklerCriteriaSearch.setTaskAssignedTo(taskAssignedTo);
-		ticklerCriteriaSearch.setCreator(creator);
-		ticklerCriteriaSearch.setMrp(mrp);
-		ticklerCriteriaSearch.setDemographicNo(demographicNo);
 
 		TicklerResponse result = new TicklerResponse();
 		List<Tickler> comparisonSearch = ticklerService.getSearchResponse(ticklerCriteriaSearch, page, count);
