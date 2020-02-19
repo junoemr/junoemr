@@ -817,6 +817,9 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
 		<tr>
 			<td align="center"><a href=# onClick ="popupPage(230,860,'../setAppointmentCountPrefs.do?method=viewAppointmentCountPrefs');return false;"><bean:message key="provider.btnEditSetAppointmentCountPrefs"/></a></td>
 		</tr>
+		<tr>
+			<td align="center"><a href=# onClick ="popupPage(230,860,'providerEformSettings.jsp');return false;"><bean:message key="provider.btnEformSettings"/></a></td>
+		</tr>
 
 	<oscar:oscarPropertiesCheck property="util.erx.enabled" value="true">
 	 	<security:oscarSec roleName="<%=roleName$%>" objectName="_rx" rights="r">

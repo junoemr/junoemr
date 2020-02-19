@@ -107,16 +107,21 @@ if (isFirefox > 0) {
 
         function setDropList()
         {
-            if(document.getElementById('destinationDrop').options[document.getElementById('destinationDrop').selectedIndex].value=="incomingDocs")
-                    {
-                        document.getElementById('providerDropDiv').style.display = 'none';
-                        document.getElementById('destFolderDiv').style.display = 'block';
-                    }
-                    else
-                    {
-                        document.getElementById('providerDropDiv').style.display = 'block';
-                        document.getElementById('destFolderDiv').style.display = 'none';
-                    }
+			document.getElementById('providerDropDiv').style.display = 'block';
+			document.getElementById('destFolderDiv').style.display = 'none';
+			/*
+			 * Section intentionally commented out until we revisit what the Incoming Docs queue is
+			if(document.getElementById('destinationDrop').options[document.getElementById('destinationDrop').selectedIndex].value === "incomingDocs")
+			{
+				document.getElementById('providerDropDiv').style.display = 'none';
+				document.getElementById('destFolderDiv').style.display = 'block';
+			}
+			else
+			{
+				document.getElementById('providerDropDiv').style.display = 'block';
+				document.getElementById('destFolderDiv').style.display = 'none';
+			}
+			*/
         }
 	</script>
 	<style type="text/css">
@@ -144,7 +149,7 @@ if (isFirefox > 0) {
                                 <label style="font-family:Arial; font-weight:normal; font-size:12px" for="destinationDrop" class="fields"><bean:message key="dms.documentUploader.destination" />:</label>
                                 <select onchange="javascript:setDestination(this);"  id="destinationDrop"  name="destinationDrop">
                                     <option value="pendingDocs" <%=( destination.equals("pendingDocs") ? " selected" : "")%> ><bean:message key="inboxmanager.document.pendingDocs" /></option>
-                                    <option value="incomingDocs" <%=( destination.equals("incomingDocs") ? " selected" : "")%> ><bean:message key="inboxmanager.document.incomingDocs" /></option>
+                                    <!-- <option value="incomingDocs" < %=( destination.equals("incomingDocs") ? " selected" : "")%> ><bean :message key="inboxmanager.document.incomingDocs" /></option> -->
                                 </select><br>
 
                                 <div id="providerDropDiv">

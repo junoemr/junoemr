@@ -36,6 +36,7 @@ package oscar.oscarDemographic.pageUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,11 +46,15 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.demographic.dao.DemographicMergedDao;
+import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.oscarDemographic.data.DemographicMerged;
+import org.springframework.transaction.annotation.Transactional;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 /**
  *
@@ -59,53 +64,114 @@ public class DemographicMergeRecordAction  extends Action {
 
     Logger logger = Logger.getLogger(DemographicMergeRecordAction.class);
     private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+    private DemographicMergedDao demographicMergedDao = SpringUtils.getBean(DemographicMergedDao.class);
     
     public DemographicMergeRecordAction() {
 
     }
-    public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response) {
 
-    	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+    @Transactional
+    public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
+    {
 
-    	securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), securityInfoManager.WRITE, null, "_demographic");
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-        if (request.getParameterValues("records")==null)
-        {
-            return mapping.findForward("failure");
-        }
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_demographic");
 
-        String outcome = "success";
-        ArrayList<String> records = new ArrayList<String>(Arrays.asList(request.getParameterValues("records")));
-        String head = request.getParameter("head");
-        String action = request.getParameter("mergeAction");
-        String provider_no = request.getParameter("provider_no");
-        DemographicMerged dmDAO = new DemographicMerged();
+		if (request.getParameterValues("records") == null)
+		{
+			return mapping.findForward("failure");
+		}
 
-        if (action.equals("merge") && head != null && records.size() > 1 && records.contains(head)){
+		String outcome = "success";
+		ArrayList<String> records = new ArrayList<String>(Arrays.asList(request.getParameterValues("records")));
+		String head = request.getParameter("head");
+		String action = request.getParameter("mergeAction");
+		String providerNo = request.getParameter("provider_no");
 
-            for (int i=0; i < records.size(); i++){
-                if (!( records.get(i)).equals(head))
-                     dmDAO.Merge( loggedInInfo, records.get(i), head);
-                    
-            }
+		if (action.equals("merge") && head != null && records.size() > 1 && records.contains(head))
+		{
+			for (String record : records)
+			{
+				if (!record.equals(head))
+				{
+					try
+					{
+						int demographicNo = Integer.parseInt(record);
+						int headRecord = Integer.parseInt(head);
+						// Before merging demographics, check if demographicNo has already been merged
+						// If it has, we need to get the parent ID for whatever demographic it's merged to (legacy behaviour)
+						DemographicMerged currentMerged = demographicMergedDao.getCurrentHead(demographicNo);
+						if (currentMerged != null)
+						{
+							demographicNo = currentMerged.getMergedTo();
+						}
+						boolean success = demographicMergedDao.mergeDemographics(providerNo, demographicNo, headRecord);
+						if (success)
+						{
+							outcome = "success";
+							LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+									headRecord,
+									LogConst.ACTION_ADD,
+									LogConst.CON_DEMOGRAPHIC_MERGE,
+									LogConst.STATUS_SUCCESS,
+									"parentDemographic=" + demographicNo,
+									loggedInInfo.getIp(),
+									"mergedDemographic=" + demographicNo);
+						}
+						else
+						{
+							outcome = "alreadyMerged";
+						}
+					}
+					catch (NumberFormatException e)
+					{
+						logger.error("Error occurred when trying to use parseInt", e);
+						outcome = "failure";
+					}
+				}
+			}
+		}
+		else if(action.equals("unmerge") && records.size() > 0)
+		{
+			outcome = "successUnMerge";
+			for (String record : records)
+			{
+				try
+				{
+					int mergedDemographicNo = Integer.parseInt(record);
+					demographicMergedDao.unmergeDemographics(providerNo, mergedDemographicNo);
+					LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+							mergedDemographicNo,
+							LogConst.ACTION_DELETE,
+							LogConst.CON_DEMOGRAPHIC_MERGE,
+							LogConst.STATUS_SUCCESS,
+							"",
+							loggedInInfo.getIp(),
+							"mergedDemographic=" + mergedDemographicNo);
+				}
+				catch (NumberFormatException e)
+				{
+					logger.error("Error occurred when trying to unmerge demographicNo " + record, e);
+					outcome = "failureUnMerge";
+				}
+				catch (NoSuchElementException e)
+				{
+					logger.error("Couldn't find active merge record for demographicNo: " + record + ", has this already been unmerged?");
+					outcome = "alreadyUnMerged";
+				}
+			}
+		}
+		else
+		{
+			outcome = "failure";
+		}
+		request.setAttribute("mergeoutcome", outcome);
 
-        }else if(action.equals("unmerge") && records.size() > 0){
-            outcome = "successUnMerge";
-            for (int i=0; i < records.size(); i++){
-                String demographic_no = records.get(i);
-                dmDAO.UnMerge(loggedInInfo, demographic_no, provider_no);
-               
-            }
+		if (request.getParameter("caisiSearch") != null && request.getParameter("caisiSearch").equalsIgnoreCase("yes")){
+			outcome = "caisiSearch";
+		}
 
-        }else{
-            outcome = "failure";
-        }
-        request.setAttribute("mergeoutcome",outcome);
-
-        if (request.getParameter("caisiSearch") != null && request.getParameter("caisiSearch").equalsIgnoreCase("yes")){
-            outcome = "caisiSearch";
-        }
-
-        return mapping.findForward(outcome);
-    }
+		return mapping.findForward(outcome);
+	}
 }
