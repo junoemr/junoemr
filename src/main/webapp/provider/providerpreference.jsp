@@ -110,7 +110,11 @@ function checkTypeInAll() {
   var s=0;
   var e=0;
   var i=0;
-  if(isNumeric(document.UPDATEPRE.start_hour.value) && isNumeric(document.UPDATEPRE.end_hour.value) && isNumeric(document.UPDATEPRE.every_min.value)) {
+  if (isNumeric(document.UPDATEPRE.start_hour.value)
+	  && isNumeric(document.UPDATEPRE.end_hour.value)
+	  && isNumeric(document.UPDATEPRE.every_min.value)
+	  && isPositiveInteger(document.UPDATEPRE.appointmentScreenFormsNameDisplayLength.value))
+  {
     s=eval(document.UPDATEPRE.start_hour.value);
     e=eval(document.UPDATEPRE.end_hour.value);
     i=eval(document.UPDATEPRE.every_min.value);
@@ -164,6 +168,19 @@ function isNumeric(strString) {
 	}
     }
     return retval;
+}
+
+/**
+ * Validation function for integer settings.
+ * Checks that the given input is a number and that it's an integer > 0.
+ */
+function isPositiveInteger(num)
+{
+	if (isNumeric(num))
+	{
+		var intVal = parseInt(num);
+		return !isNaN(intVal) && intVal > 0;
+	}
 }
 
 function showHideBillPref() {
