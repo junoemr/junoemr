@@ -80,8 +80,12 @@ OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("o
 	DemographicMergedDao demographicMergedDao = SpringUtils.getBean(DemographicMergedDao.class);
 WaitingListDao waitingListDao = SpringUtils.getBean(WaitingListDao.class);
 Integer appointmentNo = null;
-	int demographicNo = Integer.parseInt(request.getParameter("demographic_no"));
 	String headRecord = request.getParameter("demographic_no");
+	if (headRecord == null || headRecord.isEmpty())
+	{
+		headRecord = "0";
+	}
+	int demographicNo = Integer.parseInt(headRecord);
 
 	DemographicMerged demographicMerged = demographicMergedDao.getCurrentHead(demographicNo);
 	// Use parent record if the requested demographic has been merged to someone else
@@ -101,7 +105,7 @@ param[3]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("end_time"));
 param[16] = headRecord;
 //the keyword(name) must match the demographic_no if it has been changed
  org.oscarehr.common.model.Demographic demo = null;
-   if (request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals(""))) {
+   if (!"0".equals(headRecord)) {
 
         DemographicData demData = new DemographicData();
         demo = demData.getDemographic(loggedInInfo,param[16]);
@@ -145,18 +149,18 @@ param[19]=request.getParameter("reasonCode");
 	a.setCreator(request.getParameter("creator"));
 	a.setRemarks(request.getParameter("remarks"));
 	a.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
+	String appointmentName = request.getParameter("keyword");
+	a.setDemographicNo(demographicNo);
 	//the keyword(name) must match the demographic_no if it has been changed
-if (request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals(""))) {
-    a.setDemographicNo(demographicNo);
-
+if (!"0".equals(headRecord)) {
 	DemographicData demData = new DemographicData();
-	demo = demData.getDemographic(loggedInInfo,String.valueOf(a.getDemographicNo()));
-	a.setName(demo.getLastName()+","+demo.getFirstName());
-} else {
-    a.setDemographicNo(0);
-	a.setName(request.getParameter("keyword"));
+	demo = demData.getDemographic(loggedInInfo, headRecord);
+	appointmentName = demo.getLastName() + "," + demo.getFirstName();
 }
-	
+
+	// Appointment name column only contains 50 chars
+	appointmentName = org.apache.commons.lang3.StringUtils.left(appointmentName, 50);
+	a.setName(appointmentName);
 	a.setProgramId(Integer.parseInt((String)request.getSession().getAttribute("programId_oscarView")));
 	a.setUrgency((request.getParameter("urgency")!=null)?request.getParameter("urgency"):"");
 	
@@ -206,7 +210,6 @@ if (request.getParameter("demographic_no") != null && !(request.getParameter("de
 		} else {
 			oscar.oscarWaitingList.WaitingList wL = oscar.oscarWaitingList.WaitingList.getInstance();
 			if (wL.getFound()) {
-			   // String demographicNo = request.getParameter("demographic_no");
 			   if( headRecord != null && !"".equals(headRecord)) {
 			    
 					List<WaitingList> wl = waitingListDao.findByDemographic(Integer.parseInt(headRecord));
