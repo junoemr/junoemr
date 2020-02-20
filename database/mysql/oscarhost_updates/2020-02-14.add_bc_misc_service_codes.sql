@@ -1,4 +1,4 @@
-insert into billingservice (service_code, description, value, billingservice_date, region, anaesthesia) values
+INSERT INTO billingservice (service_code, description, value, billingservice_date, region, anaesthesia) VALUES
 ('00099', 'MISCELLANEOUS SERVICE - GENERAL SERVICES', '0.00', NOW(),'BC', '00'),
 ('00199', 'MISCELLANEOUS SERVICE - GENERAL PRACTICE', '0.00', NOW(),'BC', '00'),
 ('00299', 'MISCELLANEOUS SERVICE - DERMATOLOGY', '0.00', NOW(), 'BC', '00'),
