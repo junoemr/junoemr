@@ -1,8 +1,6 @@
 UPDATE measurementMap
 SET name="Total Cholesterol"
-WHERE name="Total Cholestorol"
-AND loinc_code="14647-2"
-AND ident_code="CHO";
+WHERE name="Total Cholestorol";
 
 UPDATE measurementType
 SET typeDisplayName="Total Cholesterol", typeDescription="Total Cholesterol"
