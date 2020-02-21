@@ -69,6 +69,13 @@ public class DocumentMapper extends AbstractMapper
 			docDescription = "No Name";
 			MiscUtils.getLogger().warn("document, " + getFileName(rep) + " has no document description, setting to \"No Name\"");
 		}
+
+		if (docDescription.length() > 255)
+		{
+			logger.warn("document " + getFileName(rep) + " has too long of a document description, truncating");
+			docDescription = StringUtils.left(docDescription, 255);
+		}
+
 		document.setDocdesc(docDescription);
 
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))

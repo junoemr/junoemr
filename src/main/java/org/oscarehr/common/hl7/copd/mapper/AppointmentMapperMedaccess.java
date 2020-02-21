@@ -60,7 +60,8 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 	}
 
 	/**
-	 * Medaccess has a strange reason format. <???>:<appointment type>:<reason>
+	 * Medaccess SOMETIMES has a strange reason format. <???>:<appointment type>:<reason>
+	 * They've given us that as well as <appointment type>:<reason> so we have to check both.
 	 * @param rep - the appointment you want
 	 * @return - the appointment reason
 	 * @throws HL7Exception - if there is an error parsing the hl7
@@ -71,16 +72,19 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 		String appReason = StringUtils.trimToNull(message.getPATIENT().getSCH(rep).getSch29_zAppointmentReason().getValue());
 		if (appReason != null)
 		{
+			int numColons = StringUtils.countMatches(appReason, ":");
 			String[] reasonList = appReason.split(":");
-			if (reasonList.length > 2)
+			if (reasonList.length > 2 && numColons > 0)
 			{
-				return reasonList[2];
+				return reasonList[numColons];
 			}
 		}
 		return "";
 	}
 
 	/**
+	 * Medaccess SOMETIMES has a strange reason format. <???>:<appointment type>:<reason>
+	 * They've given us that as well as <appointment type>:<reason> so we have to check both.
 	 * get the appointment type from the beginning of the reason string
 	 * @param rep - the rep that you want the type for
 	 * @return - the type string
@@ -92,10 +96,11 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 		String apptType = StringUtils.trimToNull(message.getPATIENT().getSCH(rep).getSch29_zAppointmentReason().getValue());
 		if (apptType != null)
 		{
+			int numColons = StringUtils.countMatches(apptType, ":");
 			String[] typeList = apptType.split(":");
-			if (typeList.length > 1)
+			if (typeList.length > 1 && numColons > 0)
 			{
-				return typeList[1];
+				return typeList[numColons - 1];
 			}
 		}
 		return apptType;

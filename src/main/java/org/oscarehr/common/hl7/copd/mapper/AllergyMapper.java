@@ -100,6 +100,13 @@ public class AllergyMapper extends AbstractMapper
 					logger.warn("Missing allergy description. values set to:" + description);
 				}
 			}
+
+			if (description.length() > 50)
+			{
+				logger.warn("Description '" + description + "' is too long, truncating to 50 chars");
+				description = StringUtils.left(description, 50);
+			}
+
 			allergy.setStartDate(getStartDate(rep));
 			allergy.setEntryDate(getStartDate(rep));
 			allergy.setDescription(description);

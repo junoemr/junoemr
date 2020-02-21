@@ -78,10 +78,25 @@ public class AppointmentMapper extends AbstractMapper
 
 		// hopefully one day appointments will handle null values correctly. until then, trim to empty
 		appointment.setNotes(StringUtils.trimToEmpty(getNotes(rep)));
-		appointment.setReason(StringUtils.trimToEmpty(getReason(rep)));
 		appointment.setCreateDateTime(getCreationDate(rep));
 		appointment.setStatus(getStatus(rep, importSource));
-		appointment.setType(getType(rep));
+		// Some appointment types exceed character length of column and may get truncated
+		String type = getType(rep);
+		if (type != null && type.length() > 50)
+		{
+			logger.warn("Appointment has a type that is getting truncated: '" + type + "'");
+			type = StringUtils.left(type, 50);
+		}
+
+		String reason = getReason(rep);
+		if (reason != null && reason.length() > 80)
+		{
+			logger.warn("Appointment has a reason that is getting truncated: '" + reason + "'");
+			reason = StringUtils.left(reason, 80);
+		}
+
+		appointment.setReason(reason);
+		appointment.setType(type);
 		appointment.setLocation("");
 		appointment.setResources("");
 		appointment.setReasonCode(17); // TODO look this up somewhere

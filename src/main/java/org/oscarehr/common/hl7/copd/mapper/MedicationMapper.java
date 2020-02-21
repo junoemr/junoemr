@@ -134,7 +134,13 @@ public class MedicationMapper extends AbstractMapper
 		drug.setLongTerm(isLongTerm(rep));
 
 		// import drugs as custom
-		drug.setCustomName(getRequestedGiveCodeText(rep));
+		String drugName = getRequestedGiveCodeText(rep);
+		if (drugName != null && drugName.length() > 60)
+		{
+			logger.warn("Name of custom drug is too long and will be truncated: '" + drugName + "'");
+			drugName = StringUtils.left(drugName, 60);
+		}
+		drug.setCustomName(drugName);
 		drug.setCustomInstructions(false);
 
 		drug.setQuantity(String.valueOf(getRequestedDispenseAmount(rep)));
