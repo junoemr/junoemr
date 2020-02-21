@@ -23,7 +23,6 @@
 package org.oscarehr.ticklers.search;
 
 import org.hibernate.Criteria;
-import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
@@ -44,8 +43,6 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 		Message
 	}
 
-	// private MatchMode matchMode = MatchMode.START;
-
 	// fields here
 	private Date startDate;
 	private Date endDate;
@@ -63,65 +60,62 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 	@Override
 	public Criteria setCriteriaProperties(Criteria criteria)
 	{
-		Junction junction = getEmptyJunction();
-
 		// set search filters
 		if (getDemographicNo() != null)
 		{
-			junction.add(Restrictions.eq("demographicNo", getDemographicNo()));
+			criteria.add(Restrictions.eq("demographicNo", getDemographicNo()));
 		}
 
 		if (getCreator() != null)
 		{
-			junction.add(Restrictions.eq("creator", getCreator()));
+			criteria.add(Restrictions.eq("creator", getCreator()));
 		}
 
 		if (getTaskAssignedTo() != null)
 		{
-			junction.add(Restrictions.eq("taskAssignedTo", getTaskAssignedTo()));
+			criteria.add(Restrictions.eq("taskAssignedTo", getTaskAssignedTo()));
 		}
 
 		if (getPriority() != null)
 		{
-			junction.add(Restrictions.eq("priority", getPriority()));
+			criteria.add(Restrictions.eq("priority", getPriority()));
 		}
 
 		if (getMessage() != null)
 		{
-			junction.add(Restrictions.eq("message", getMessage()));
+			criteria.add(Restrictions.eq("message", getMessage()));
 		}
 
 		if (getProgramId() != null)
 		{
-			junction.add(Restrictions.eq("programId", getProgramId()));
+			criteria.add(Restrictions.eq("programId", getProgramId()));
 		}
 
 		if (getStatus() != null)
 		{
-			junction.add(Restrictions.eq("status", getStatus()));
+			criteria.add(Restrictions.eq("status", getStatus()));
 		}
 
 		if (getMrp() != null)
 		{
-			junction.add(Restrictions.eq("mrp", getMrp()));
+			criteria.add(Restrictions.eq("mrp", getMrp()));
 		}
 
 		// date searching
 		if (getStartDate() != null && getEndDate() != null)
 		{
-			junction.add(Restrictions.between("serviceDate", getStartDate(), getEndDate()));
+			criteria.add(Restrictions.between("serviceDate", getStartDate(), getEndDate()));
 		}
 		else if (getStartDate() != null)
 		{
-			junction.add(Restrictions.ge("serviceDate", getStartDate()));
+			criteria.add(Restrictions.ge("serviceDate", getStartDate()));
 		}
 		else if (getEndDate() != null)
 		{
-			junction.add(Restrictions.le("serviceDate", getEndDate()));
+			criteria.add(Restrictions.le("serviceDate", getEndDate()));
 		}
 
 		setOrderByCriteria(criteria);
-		criteria.add(junction);
 
 		return criteria;
 	}
@@ -131,8 +125,6 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 		switch(sortMode)
 		{
 			case DemographicName:
-				// this is not what it was before. need to address this
-				// join on demographic?
 				criteria.addOrder(getOrder("demographicNo"));
 				break;
 			case Creator:

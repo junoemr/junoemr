@@ -32,11 +32,11 @@ import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.PaginationQuery;
 import org.oscarehr.common.dao.TicklerCategoryDao;
 import org.oscarehr.common.model.Tickler;
-import org.oscarehr.common.search.AbstractCriteriaSearch;
 import org.oscarehr.ticklers.dao.TicklersDao;
 import org.oscarehr.ticklers.search.TicklerCriteriaSearch;
 import org.oscarehr.ticklers.web.TicklerQuery;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +45,8 @@ import oscar.log.LogAction;
 import javax.validation.ValidationException;
 
 @Component
-public class TicklerService {
+public class TicklerService extends AbstractServiceImpl
+{
 	@Autowired
 	private TicklersDao TicklerDao;
 
@@ -158,12 +159,14 @@ public class TicklerService {
 		return tickler;
 	}
 
-	public List<Tickler> getSearchResponse(TicklerCriteriaSearch criteriaSearch, int page, int limit)
+	public List<Tickler> getSearchResponse(TicklerCriteriaSearch criteriaSearch, int page, int perPage)
 	{
-		int offset = (page - 1) * limit;
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
 
+		criteriaSearch.setLimit(perPage);
 		criteriaSearch.setOffset(offset);
-		criteriaSearch.setLimit(limit);
 
 		int total = TicklerDao.criteriaSearchCount(criteriaSearch);
 
@@ -173,21 +176,6 @@ public class TicklerService {
 			resultList = TicklerDao.criteriaSearch(criteriaSearch);
 		}
 		return resultList;
-	}
-
-	/**
-	 * Builds a tickler criteria search.
-	 * @param sortDir direction we want to sort (asc/desc)
-	 * @param orderBy column to order by
-	 * @return criteria search object configured to search with the above
-	 */
-	public TicklerCriteriaSearch buildTicklerSearch(AbstractCriteriaSearch.SORTDIR sortDir, TicklerCriteriaSearch.SORT_MODE orderBy)
-	{
-		TicklerCriteriaSearch ticklerCriteriaSearch = new TicklerCriteriaSearch();
-		ticklerCriteriaSearch.setSortDir(sortDir);
-		ticklerCriteriaSearch.setSortMode(orderBy);
-
-		return ticklerCriteriaSearch;
 	}
 
 }

@@ -189,8 +189,9 @@ public class TicklerWebService extends AbstractServiceImpl {
 		AbstractCriteriaSearch.SORTDIR sortDir = AbstractCriteriaSearch.SORTDIR.valueOf(sortDirection);
 		TicklerCriteriaSearch.SORT_MODE sortMode = TicklerCriteriaSearch.SORT_MODE.valueOf(sortColumn);
 
-		TicklerCriteriaSearch ticklerCriteriaSearch = ticklerService.buildTicklerSearch(sortDir, sortMode);
-
+		TicklerCriteriaSearch ticklerCriteriaSearch = new TicklerCriteriaSearch();
+		ticklerCriteriaSearch.setSortDir(sortDir);
+		ticklerCriteriaSearch.setSortMode(sortMode);
 		ticklerCriteriaSearch.setStartDate(ConversionUtils.fromDateString(serviceStartDate));
 		ticklerCriteriaSearch.setEndDate(ConversionUtils.fromDateString(serviceEndDate));
 		ticklerCriteriaSearch.setTaskAssignedTo(taskAssignedTo);
