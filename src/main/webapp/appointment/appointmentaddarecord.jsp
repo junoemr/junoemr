@@ -40,20 +40,20 @@
 %>
 
 <%@page import="org.oscarehr.common.OtherIdManager"%>
-<%@ page
-	import="org.oscarehr.common.dao.OscarAppointmentDao, org.oscarehr.common.dao.WaitingListDao, org.oscarehr.common.model.Appointment,
-	org.oscarehr.common.model.Demographic, org.oscarehr.common.model.WaitingList, org.oscarehr.common.model.WaitingListName"
-	errorPage="errorpage.jsp"%>
-<%@ page import="org.oscarehr.event.EventService,org.oscarehr.managers.DemographicManager, org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
+<%@ page import="org.oscarehr.common.dao.WaitingListDao" %>
+<%@ page import="org.oscarehr.common.model.Appointment"%>
+<%@ page import="org.oscarehr.common.model.Demographic"%>
+<%@ page import="org.oscarehr.common.model.WaitingList"%>
+<%@ page import="org.oscarehr.common.model.WaitingListName" errorPage="errorpage.jsp"%>
+<%@ page import="org.oscarehr.event.EventService,org.oscarehr.managers.DemographicManager" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@page import="org.oscarehr.util.MiscUtils" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="oscar.MyDateFormat" %>
 <%@page import="oscar.appt.AppointmentMailer" %>
 <%@page import="oscar.log.LogAction" %>
 <%@page import="oscar.log.LogConst" %>
-<%@page import="oscar.oscarDemographic.data.DemographicData"%>
 <%@page import="oscar.util.ConversionUtils" %>
-<%@ page import="oscar.util.UtilDateUtilities" %>
 <%@ page import="javax.validation.ConstraintViolationException" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
@@ -74,31 +74,20 @@
 	</tr>
 </table>
 <%
-
-LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-
-OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
+	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+	OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 	DemographicMergedDao demographicMergedDao = SpringUtils.getBean(DemographicMergedDao.class);
-WaitingListDao waitingListDao = SpringUtils.getBean(WaitingListDao.class);
-Integer appointmentNo = null;
+	WaitingListDao waitingListDao = SpringUtils.getBean(WaitingListDao.class);
 
-	String[] param = new String[20];
-
+	Integer appointmentNo = null;
 	String headRecord = request.getParameter("demographic_no");
-	Demographic demo;
 
 	if (headRecord == null || headRecord.isEmpty())
 	{
 		headRecord = "0";
 		//the keyword(name) must match the demographic_no if it has been changed
-		param[4] = request.getParameter("keyword");
 	}
-	else
-	{
-		DemographicData demData = new DemographicData();
-		demo = demData.getDemographic(loggedInInfo, headRecord);
-		param[4] = demo.getLastName() + "," + demo.getFirstName();
-	}
+
 	int demographicNo = Integer.parseInt(headRecord);
 
 	DemographicMerged demographicMerged = demographicMergedDao.getCurrentHead(demographicNo);
@@ -110,82 +99,68 @@ Integer appointmentNo = null;
 	}
 
 	String createDateTime = ConversionUtils.toDateString(new Date(), ConversionUtils.DEFAULT_TS_PATTERN);
+	String providerNo = request.getParameter("provider_no");
 
-param[0]=request.getParameter("provider_no");
-param[1]=request.getParameter("appointment_date");
-param[2]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"));
-param[3]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("end_time"));
-param[16] = headRecord;
-
-param[5]=request.getParameter("notes");
-param[6]=request.getParameter("reason");
-param[7]=request.getParameter("location");
-param[8]=request.getParameter("resources");
-param[9]=request.getParameter("type");
-param[10]=request.getParameter("style");
-param[11]=request.getParameter("billing");
-param[12]=request.getParameter("status");
-param[13]=createDateTime;
-param[14]=request.getParameter("creator");
-param[15]=request.getParameter("remarks");
-param[17]=(String)request.getSession().getAttribute("programId_oscarView");
-param[18]=(request.getParameter("urgency")!=null)?request.getParameter("urgency"):"";
-param[19]=request.getParameter("reasonCode");
-
-	Appointment a = new Appointment();
-	a.setProviderNo(request.getParameter("provider_no"));
-	a.setAppointmentDate(ConversionUtils.fromDateString(request.getParameter("appointment_date")));
-	a.setStartTime(ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time")));
-	a.setEndTime(ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")));
-	a.setName(request.getParameter("keyword"));
-	a.setNotes(request.getParameter("notes"));
-	a.setReason(request.getParameter("reason"));
-	a.setLocation(request.getParameter("location"));
-	a.setIsVirtual(request.getParameter("isVirtual") != null &&
-			request.getParameter("isVirtual").equals("on"));
-	a.setResources(request.getParameter("resources"));
-	a.setType(request.getParameter("type"));
-	a.setStyle(request.getParameter("style"));
-	a.setBilling(request.getParameter("billing"));
-	a.setStatus(request.getParameter("status"));
-	a.setCreateDateTime(ConversionUtils.fromTimestampString(createDateTime));
-	a.setCreator(request.getParameter("creator"));
-	a.setRemarks(request.getParameter("remarks"));
-	a.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
+	Appointment appointment = new Appointment();
+	appointment.setProviderNo(request.getParameter("provider_no"));
+	appointment.setAppointmentDate(ConversionUtils.fromDateString(request.getParameter("appointment_date")));
+	appointment.setStartTime(ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time")));
+	appointment.setEndTime(ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")));
+	appointment.setName(request.getParameter("keyword"));
+	appointment.setNotes(request.getParameter("notes"));
+	appointment.setReason(request.getParameter("reason"));
+	appointment.setLocation(request.getParameter("location"));
+	appointment.setIsVirtual(request.getParameter("isVirtual") != null
+			&& request.getParameter("isVirtual").equals("on"));
+	appointment.setResources(request.getParameter("resources"));
+	appointment.setType(request.getParameter("type"));
+	appointment.setStyle(request.getParameter("style"));
+	appointment.setBilling(request.getParameter("billing"));
+	appointment.setStatus(request.getParameter("status"));
+	appointment.setCreateDateTime(ConversionUtils.fromTimestampString(createDateTime));
+	appointment.setCreator(request.getParameter("creator"));
+	appointment.setRemarks(request.getParameter("remarks"));
+	appointment.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
+	appointment.setDemographicNo(demographicNo);
 	String appointmentName = request.getParameter("keyword");
-	a.setDemographicNo(demographicNo);
-	//the keyword(name) must match the demographic_no if it has been changed
 
 	// Appointment name column only contains 50 chars
 	appointmentName = org.apache.commons.lang3.StringUtils.left(appointmentName, 50);
-	a.setName(appointmentName);
-	a.setProgramId(Integer.parseInt((String)request.getSession().getAttribute("programId_oscarView")));
-	a.setUrgency((request.getParameter("urgency")!=null)?request.getParameter("urgency"):"");
+	appointment.setName(appointmentName);
+	appointment.setProgramId(Integer.parseInt((String)request.getSession().getAttribute("programId_oscarView")));
+	appointment.setUrgency((request.getParameter("urgency")!=null)?request.getParameter("urgency"):"");
 	
-	try{
-		appointmentDao.persist(a);
-		appointmentNo = a.getId();
+	try
+	{
+		appointmentDao.persist(appointment);
+		appointmentNo = appointment.getId();
 
-		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), a.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_APPT,
-				LogConst.STATUS_SUCCESS, String.valueOf(a.getId()), request.getRemoteAddr());
-	} catch (ConstraintViolationException e)
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				appointment.getDemographicNo(),
+				LogConst.ACTION_ADD,
+				LogConst.CON_APPT,
+				LogConst.STATUS_SUCCESS,
+				String.valueOf(appointment.getId()),
+				request.getRemoteAddr());
+	}
+	catch (ConstraintViolationException e)
 	{
 		MiscUtils.getLogger().error("ConstraintViolation", e);
 	}
 
-	if (appointmentNo != null) {
-
+	if (appointmentNo != null)
+	{
              //email patient appointment record
             if (request.getParameter("emailPt")!= null) {
                 try{
                    
                    Appointment aa =  appointmentDao.search_appt_no(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("appointment_date")), ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time")),
-                    			ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")), ConversionUtils.fromTimestampString(createDateTime), request.getParameter("creator"), Integer.parseInt(param[16]));
+                    			ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")), ConversionUtils.fromTimestampString(createDateTime), request.getParameter("creator"), demographicNo);
 		   
                     if (aa != null) {
 						Integer apptNo = aa.getId();
                         DemographicManager demographicManager =  SpringUtils.getBean(DemographicManager.class);
-                        Demographic demographic = demographicManager.getDemographic(loggedInInfo,param[16]);
+                        Demographic demographic = demographicManager.getDemographic(loggedInInfo, headRecord);
 
                         if ((demographic != null) && (apptNo > 0)) {
                             AppointmentMailer emailer = new AppointmentMailer(apptNo,demographic);
@@ -208,7 +183,8 @@ param[19]=request.getParameter("reasonCode");
 		} else {
 			oscar.oscarWaitingList.WaitingList wL = oscar.oscarWaitingList.WaitingList.getInstance();
 			if (wL.getFound()) {
-			   if( headRecord != null && !"".equals(headRecord)) {
+			   if(!headRecord.isEmpty())
+			   {
 			    
 					List<WaitingList> wl = waitingListDao.findByDemographic(Integer.parseInt(headRecord));
 					if(wl.size() > 0) {
@@ -253,7 +229,7 @@ param[19]=request.getParameter("reasonCode");
         int apptId=0;
         if(!(request.getParameter("printReceipt")==null) && request.getParameter("printReceipt").equals("1")) { 
             Appointment aa =  appointmentDao.search_appt_no(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("appointment_date")), ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time")),
-     			ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")),ConversionUtils.fromTimestampString(createDateTime),  request.getParameter("creator"), Integer.parseInt(param[16]));
+     			ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")),ConversionUtils.fromTimestampString(createDateTime),  request.getParameter("creator"), demographicNo);
             if (aa != null) {
                 apptId = aa.getId();
             }%>
@@ -266,7 +242,7 @@ param[19]=request.getParameter("reasonCode");
 <%
 		}
 		 Appointment aa =  appointmentDao.search_appt_no(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("appointment_date")), ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time")),
-     			ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")), ConversionUtils.fromTimestampString(createDateTime), request.getParameter("creator"), Integer.parseInt(param[16]));
+     			ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")), ConversionUtils.fromTimestampString(createDateTime), request.getParameter("creator"), demographicNo);
 
 		
 		
@@ -276,7 +252,7 @@ param[19]=request.getParameter("reasonCode");
 			OtherIdManager.saveIdAppointment(apptNo, "appt_mc_number", mcNumber);
 			
 			EventService eventService = SpringUtils.getBean(EventService.class);
-			eventService.appointmentCreated(this,apptNo.toString(), param[0]); // called when adding an appointment
+			eventService.appointmentCreated(this,apptNo.toString(), providerNo); // called when adding an appointment
 			
 		}
 
