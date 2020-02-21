@@ -58,6 +58,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
 <%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
+<%@ page import="java.util.Date" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <html:html locale="true">
@@ -80,10 +81,23 @@ OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("o
 	DemographicMergedDao demographicMergedDao = SpringUtils.getBean(DemographicMergedDao.class);
 WaitingListDao waitingListDao = SpringUtils.getBean(WaitingListDao.class);
 Integer appointmentNo = null;
+
+	String[] param = new String[20];
+
 	String headRecord = request.getParameter("demographic_no");
+	Demographic demo;
+
 	if (headRecord == null || headRecord.isEmpty())
 	{
 		headRecord = "0";
+		//the keyword(name) must match the demographic_no if it has been changed
+		param[4] = request.getParameter("keyword");
+	}
+	else
+	{
+		DemographicData demData = new DemographicData();
+		demo = demData.getDemographic(loggedInInfo, headRecord);
+		param[4] = demo.getLastName() + "," + demo.getFirstName();
 	}
 	int demographicNo = Integer.parseInt(headRecord);
 
@@ -95,24 +109,13 @@ Integer appointmentNo = null;
 		headRecord = Integer.toString(demographicNo);
 	}
 
-String createDateTime = UtilDateUtilities.DateToString(new java.util.Date(),"yyyy-MM-dd HH:mm:ss");
+	String createDateTime = ConversionUtils.toDateString(new Date(), ConversionUtils.DEFAULT_TS_PATTERN);
 
-String[] param = new String[20];
 param[0]=request.getParameter("provider_no");
 param[1]=request.getParameter("appointment_date");
 param[2]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"));
 param[3]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("end_time"));
 param[16] = headRecord;
-//the keyword(name) must match the demographic_no if it has been changed
- org.oscarehr.common.model.Demographic demo = null;
-   if (!"0".equals(headRecord)) {
-
-        DemographicData demData = new DemographicData();
-        demo = demData.getDemographic(loggedInInfo,param[16]);
-        param[4] = demo.getLastName()+","+demo.getFirstName();
-    } else {
-        param[4] = request.getParameter("keyword");
-    }
 
 param[5]=request.getParameter("notes");
 param[6]=request.getParameter("reason");
@@ -152,11 +155,6 @@ param[19]=request.getParameter("reasonCode");
 	String appointmentName = request.getParameter("keyword");
 	a.setDemographicNo(demographicNo);
 	//the keyword(name) must match the demographic_no if it has been changed
-if (!"0".equals(headRecord)) {
-	DemographicData demData = new DemographicData();
-	demo = demData.getDemographic(loggedInInfo, headRecord);
-	appointmentName = demo.getLastName() + "," + demo.getFirstName();
-}
 
 	// Appointment name column only contains 50 chars
 	appointmentName = org.apache.commons.lang3.StringUtils.left(appointmentName, 50);
