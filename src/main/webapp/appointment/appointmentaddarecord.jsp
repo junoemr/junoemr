@@ -98,14 +98,19 @@
 		headRecord = Integer.toString(demographicNo);
 	}
 
-	String createDateTime = ConversionUtils.toDateString(new Date(), ConversionUtils.DEFAULT_TS_PATTERN);
+	// Pulling out and parsing request parameters that are used more than once on this page
 	String providerNo = request.getParameter("provider_no");
+	String creator = request.getParameter("creator");
+	Date appointmentDate = ConversionUtils.fromDateString(request.getParameter("appointment_date"));
+	Date startTime = ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time"));
+	Date endTime = ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time"));
+	Date createDateTime = new Date();
 
 	Appointment appointment = new Appointment();
-	appointment.setProviderNo(request.getParameter("provider_no"));
-	appointment.setAppointmentDate(ConversionUtils.fromDateString(request.getParameter("appointment_date")));
-	appointment.setStartTime(ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time")));
-	appointment.setEndTime(ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")));
+	appointment.setProviderNo(providerNo);
+	appointment.setAppointmentDate(appointmentDate);
+	appointment.setStartTime(startTime);
+	appointment.setEndTime(endTime);
 	appointment.setName(request.getParameter("keyword"));
 	appointment.setNotes(request.getParameter("notes"));
 	appointment.setReason(request.getParameter("reason"));
@@ -117,8 +122,8 @@
 	appointment.setStyle(request.getParameter("style"));
 	appointment.setBilling(request.getParameter("billing"));
 	appointment.setStatus(request.getParameter("status"));
-	appointment.setCreateDateTime(ConversionUtils.fromTimestampString(createDateTime));
-	appointment.setCreator(request.getParameter("creator"));
+	appointment.setCreateDateTime(createDateTime);
+	appointment.setCreator(creator);
 	appointment.setRemarks(request.getParameter("remarks"));
 	appointment.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
 	appointment.setDemographicNo(demographicNo);
@@ -150,67 +155,72 @@
 
 	if (appointmentNo != null)
 	{
-             //email patient appointment record
-            if (request.getParameter("emailPt")!= null) {
-                try{
-                   
-                   Appointment aa =  appointmentDao.search_appt_no(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("appointment_date")), ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time")),
-                    			ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")), ConversionUtils.fromTimestampString(createDateTime), request.getParameter("creator"), demographicNo);
+		//email patient appointment record
+		if (request.getParameter("emailPt")!= null)
+		{
+			try
+			{
+				Appointment aa =  appointmentDao.search_appt_no(providerNo,
+						appointmentDate,
+						startTime,
+						endTime,
+						createDateTime,
+						creator,
+						demographicNo);
 		   
-                    if (aa != null) {
-						Integer apptNo = aa.getId();
-                        DemographicManager demographicManager =  SpringUtils.getBean(DemographicManager.class);
-                        Demographic demographic = demographicManager.getDemographic(loggedInInfo, headRecord);
+				if (aa != null)
+				{
+					Integer apptNo = aa.getId();
+					DemographicManager demographicManager =  SpringUtils.getBean(DemographicManager.class);
+					Demographic demographic = demographicManager.getDemographic(loggedInInfo, headRecord);
 
-                        if ((demographic != null) && (apptNo > 0)) {
-                            AppointmentMailer emailer = new AppointmentMailer(apptNo,demographic);
-                            emailer.prepareMessage();
-                            emailer.send();
-                        }
-                    }
+					if ((demographic != null) && (apptNo > 0))
+					{
+						AppointmentMailer emailer = new AppointmentMailer(apptNo,demographic);
+						emailer.prepareMessage();
+						emailer.send();
+					}
+				}
 
-                }catch(Exception e) {
-                    out.print(e.getMessage());
-                }
-            }
-
+			}catch(Exception e) {
+				out.print(e.getMessage());
+			}
+		}
 
 		// turn off reminder of "remove patient from the waiting list"
 		oscar.OscarProperties pros = oscar.OscarProperties.getInstance();
 		String strMWL = pros.getProperty("MANUALLY_CLEANUP_WL");
-		if (strMWL != null && strMWL.equalsIgnoreCase("yes")){
-			;
-		} else {
+		if (!(strMWL != null && strMWL.equalsIgnoreCase("yes")))
+		{
 			oscar.oscarWaitingList.WaitingList wL = oscar.oscarWaitingList.WaitingList.getInstance();
-			if (wL.getFound()) {
+			if (wL.getFound())
+			{
 			   if(!headRecord.isEmpty())
 			   {
-			    
 					List<WaitingList> wl = waitingListDao.findByDemographic(Integer.parseInt(headRecord));
-					if(wl.size() > 0) {
+					if(wl.size() > 0)
+					{
 						WaitingList wl1 = wl.get(0);
 						WaitingListName wln = wl1.getWaitingListName();
-					
-				%>
-				<form name="updateWLFrm"
-					action="../oscarWaitingList/RemoveFromWaitingList.jsp"><input
-					type="hidden" name="listId"
-					value="<%=wl1.getListId()%>" /><input
-					type="hidden" name="demographicNo"
-					value="<%=request.getParameter("demographic_no")%>" /><script
-					LANGUAGE="JavaScript">
+
+	%>
+				<form name="updateWLFrm" action="../oscarWaitingList/RemoveFromWaitingList.jsp">
+					<input type="hidden" name="listId" value="<%=wl1.getListId()%>" />
+					<input type="hidden" name="demographicNo" value="<%=request.getParameter("demographic_no")%>" />
+					<script type="text/javascript">
 						var removeList = confirm("Click OK to remove patient from the waiting list: <%=wln.getName()%>");
 						if (removeList) {
 							document.forms[0].action = "../oscarWaitingList/RemoveFromWaitingList.jsp?demographicNo=<%=request.getParameter("demographic_no")%>&listID=<%=wl1.getListId()%>";
 							document.forms[0].submit();
 						}
-				</script></form>
-				<%
-				}
+					</script>
+				</form>
+	<%
+					}
+			   }
 			}
 		}
-	}
-%>
+	%>
 <p>
 <h1><bean:message key="appointment.addappointment.msgAddSuccess" /></h1>
 	<%
@@ -225,11 +235,10 @@
 	%>
 
 <script LANGUAGE="JavaScript">
-    <% 
+    <%
         int apptId=0;
         if(!(request.getParameter("printReceipt")==null) && request.getParameter("printReceipt").equals("1")) { 
-            Appointment aa =  appointmentDao.search_appt_no(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("appointment_date")), ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time")),
-     			ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")),ConversionUtils.fromTimestampString(createDateTime),  request.getParameter("creator"), demographicNo);
+            Appointment aa =  appointmentDao.search_appt_no(providerNo, appointmentDate, startTime, endTime, createDateTime, creator, demographicNo);
             if (aa != null) {
                 apptId = aa.getId();
             }%>
@@ -241,19 +250,22 @@
 
 <%
 		}
-		 Appointment aa =  appointmentDao.search_appt_no(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("appointment_date")), ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time")),
-     			ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")), ConversionUtils.fromTimestampString(createDateTime), request.getParameter("creator"), demographicNo);
-
+		Appointment aa = appointmentDao.search_appt_no(providerNo,
+				appointmentDate,
+				startTime,
+				endTime,
+				createDateTime,
+				creator,
+				demographicNo);
 		
-		
-		if (aa != null) {
+		if (aa != null)
+		{
 			Integer apptNo = aa.getId();
 			String mcNumber = request.getParameter("appt_mc_number");
 			OtherIdManager.saveIdAppointment(apptNo, "appt_mc_number", mcNumber);
 			
 			EventService eventService = SpringUtils.getBean(EventService.class);
 			eventService.appointmentCreated(this,apptNo.toString(), providerNo); // called when adding an appointment
-			
 		}
 
 	} else {
