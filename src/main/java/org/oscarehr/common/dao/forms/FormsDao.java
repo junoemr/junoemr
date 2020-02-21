@@ -127,16 +127,16 @@ public class FormsDao {
 
 			bcar2012Converter.setDemographicNo(Integer.parseInt(result[0].toString()));
 			bcar2012Converter.setEdd((Date)result[1]);
-			bcar2012Converter.setLastName(getNullableStringFromObject(result[2]));
-			bcar2012Converter.setFirstName(getNullableStringFromObject(result[3]));
+			bcar2012Converter.setLastName(String.valueOf(result[2]));
+			bcar2012Converter.setFirstName(String.valueOf(result[3]));
 			bcar2012Converter.setDateOfBirth((Date)result[4]);
-			bcar2012Converter.setGravida(getNullableStringFromObject(result[5]));
-			bcar2012Converter.setTerm(getNullableStringFromObject(result[6]));
-			bcar2012Converter.setPhone(getNullableStringFromObject(result[7]));
-			bcar2012Converter.setLangPreferred(getNullableStringFromObject(result[8]));
-			bcar2012Converter.setPhn(getNullableStringFromObject(result[9]));
-			bcar2012Converter.setDoula(getNullableStringFromObject(result[10]));
-			bcar2012Converter.setDoulaNo(getNullableStringFromObject(result[11]));
+			bcar2012Converter.setGravida(String.valueOf(result[5]));
+			bcar2012Converter.setTerm(String.valueOf(result[6]));
+			bcar2012Converter.setPhone(String.valueOf(result[7]));
+			bcar2012Converter.setLangPreferred(String.valueOf(result[8]));
+			bcar2012Converter.setPhn(String.valueOf(result[9]));
+			bcar2012Converter.setDoula(String.valueOf(result[10]));
+			bcar2012Converter.setDoulaNo(String.valueOf(result[11]));
 
 			convertedResults.add(bcar2012Converter);
 		}
@@ -247,22 +247,5 @@ public class FormsDao {
 		query.setMaxResults(1);
 		return query.getSingleResult();
     }
-
-	/**
-	 * Helper method to safely cast from a possibly null Object to a String.
-	 * Needed because forms are dumb and we are currently querying them via native queries, and
-	 * not all of the fields may be filled out properly.
-	 * @param object possibly null object we're getting
-	 * @return String corresponding to object's .getString() if not null, "null" otherwise
-	 */
-	private String getNullableStringFromObject(Object object)
-	{
-		if (object == null)
-		{
-			return "null";
-		}
-
-		return object.toString();
-	}
 
 }
