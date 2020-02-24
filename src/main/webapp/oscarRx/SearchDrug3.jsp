@@ -60,7 +60,6 @@
 	if (rx_enhance!=null && rx_enhance.equals("true")) {
 		if (request.getParameter("ID") != null) { %>
 <script>
-	window.opener.location = window.opener.location;
 	window.close();
 </script>
 <%
