@@ -181,6 +181,8 @@ function isPositiveInteger(num)
 		var intVal = parseInt(num);
 		return !isNaN(intVal) && intVal > 0;
 	}
+
+	return false;
 }
 
 function showHideBillPref() {
