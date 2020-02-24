@@ -28,9 +28,7 @@ import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.common.model.Security;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 
