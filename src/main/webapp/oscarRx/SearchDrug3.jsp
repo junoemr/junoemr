@@ -425,12 +425,10 @@
 			}
 
 			function ts_makeSortable(table) {
-				oscarLog('making '+table+' sortable');
 				if (table.rows && table.rows.length > 0) {
 					var firstRow = table.rows[0];
 				}
 				if (!firstRow) return;
-				oscarLog('Gets past here');
 
 				// We have a first row: assume it's the header, and make its contents clickable links
 				for (var i=0;i<firstRow.cells.length;i++) {
