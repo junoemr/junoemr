@@ -119,49 +119,14 @@ angular.module('Patient').component('addDemographicModal', {
 
 		ctrl.validateDemographic = function ()
 		{
-			let valid = true;
+			let dateOfBirthValid = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth).isValid();
 
-			if (!ctrl.newDemographicData.lastName)
-			{
-				valid = false;
-				ctrl.invalidLastName = true;
-			}
-			else
-			{
-				ctrl.invalidLastName = false;
-			}
+			ctrl.invalidLastName = !ctrl.newDemographicData.lastName;
+			ctrl.invalidFirstName = !ctrl.newDemographicData.firstName;
+			ctrl.invalidSex = !ctrl.newDemographicData.sex;
+			ctrl.invalidDob = !dateOfBirthValid;
 
-			if (!ctrl.newDemographicData.firstName )
-			{
-				valid = false;
-				ctrl.invalidFirstName = true;
-			}
-			else
-			{
-				ctrl.invalidFirstName = false;
-			}
-
-			if (!ctrl.newDemographicData.sex)
-			{
-				valid = false;
-				ctrl.invalidSex = true;
-			}
-			else
-			{
-				ctrl.invalidSex = false;
-			}
-
-			if (!ctrl.newDemographicData.dateOfBirth)
-			{
-				valid = false;
-				ctrl.invalidDob = true;
-			}
-			else
-			{
-				ctrl.invalidDob = false;
-			}
-
-			return valid;
+			return !(ctrl.invalidLastName || ctrl.invalidFirstName || ctrl.invalidSex || ctrl.invalidDob);
 		};
 
 		ctrl.onCancel = function()
@@ -180,6 +145,7 @@ angular.module('Patient').component('addDemographicModal', {
 					},
 					function error(errors)
 					{
+						alert(errors);
 						console.error(errors);
 					}
 				);

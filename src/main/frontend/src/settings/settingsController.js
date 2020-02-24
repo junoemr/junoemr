@@ -519,19 +519,32 @@ angular.module('Settings').controller('Settings.SettingsController', [
 				if (controller.pref.appointmentScreenQuickLinks[i].checked == null || controller.pref.appointmentScreenQuickLinks[i].checked == false)
 				{
 					newList.push(
-					{
-						name: controller.pref.appointmentScreenQuickLinks[i].name,
-						url: controller.pref.appointmentScreenQuickLinks[i].url
-					});
+							{
+								name: controller.pref.appointmentScreenQuickLinks[i].name,
+								url: controller.pref.appointmentScreenQuickLinks[i].url
+							});
 				}
 			}
 			controller.pref.appointmentScreenQuickLinks = newList;
 
-			providerService.saveSettings(controller.user.providerNo, controller.pref).then(function(data)
+			if (controller.validateSettings())
 			{
-				alert('saved');
-			});
+				providerService.saveSettings(controller.user.providerNo, controller.pref).then(function (data)
+				{
+					alert('saved');
+				});
+			}
+		};
 
+		controller.validateSettings = function()
+		{
+			// check eform fields are valid
+			if (!controller.pref.eformPopupWidth || !controller.pref.eformPopupHeight)
+			{
+				return false;
+			}
+
+			return true;
 		};
 
 		controller.cancel = function()

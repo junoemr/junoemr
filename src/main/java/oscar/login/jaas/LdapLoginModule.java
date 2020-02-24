@@ -138,15 +138,10 @@ public final class LdapLoginModule extends BaseLoginModule {
 	 */
 	protected final OscarPrincipal loadPrincipal(String loginName) throws LoginException {
 		// find unique security record for the validated login
-		List<Security> securities = getSecurityDao().findByUserName(loginName);
-		if (securities.size() < 1) {
+		Security security = getSecurityDao().findByUserName(loginName);
+		if (security == null) {
 			throw new LoginException("OSCAR Security record is not found for " + loginName);
 		}
-		if (securities.size() > 1) {
-			throw new LoginException("Multiple OSCAR Security records found for " + loginName);
-		}
-
-		Security security = securities.get(0);
 		// now find provider info for the security record
 		Provider provider = getProviderDao().getProvider(security.getProviderNo());
 		OscarPrincipal result = new OscarPrincipal(provider);

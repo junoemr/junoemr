@@ -54,7 +54,10 @@ import oscar.log.LogAction;
 /**
  *
  * @author wrighd
+ * NOTE: please don't use this class. It's attempting to be a DAO without the underlying class structure.
+ * Use DemographicMergedDao instead.
  */
+@Deprecated
 public class DemographicMerged {
 
     Logger logger = MiscUtils.getLogger();
@@ -106,8 +109,8 @@ public class DemographicMerged {
     	for(org.oscarehr.demographic.model.DemographicMerged dm:dms) {
     		dm.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
             dm.setLastUpdateDate(new Date());
-    		dm.setDeleted(1);
-    		dao.merge(dm);
+			dm.delete();
+			dao.merge(dm);
     	}
     	
     	 String privilege = "";
@@ -146,15 +149,12 @@ public class DemographicMerged {
     public Integer getHead(Integer demographic_no)  {
     	Integer head = null;
 
-    	List<org.oscarehr.demographic.model.DemographicMerged> dms = dao.findCurrentByDemographicNo(demographic_no);
-    	for(org.oscarehr.demographic.model.DemographicMerged dm:dms) {
-    		head = dm.getMergedTo();
-    	}
-        
-        if (head != null)
-            head = getHead(head);
-        else
-            head = demographic_no;
+		org.oscarehr.demographic.model.DemographicMerged dm = dao.findCurrentByDemographicNo(demographic_no);
+
+		if (dm != null)
+		{
+			head = getHead(dm.getMergedTo());
+		}
 
         return head;
     }

@@ -52,7 +52,7 @@
                 <h1>MyHealthAccess Integrations</h1>
             </div>
             <%
-                if (integrationStatusList.size() == 0)
+                if (integrationStatusList == null || integrationStatusList.size() == 0)
                 {
             %>
                     <p class="lead">
