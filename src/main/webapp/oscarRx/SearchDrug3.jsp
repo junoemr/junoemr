@@ -1720,7 +1720,7 @@
 				//call another function to bring up prescribe.jsp
 				var randomId=Math.round(Math.random()*1000000);
 				var searchString = $("searchString").value;
-				var url="<c:out value="${ctx}"/>"+ "/oscarRx/WriteScript.do?parameterValue=newCustomDrug&name=" + searchString;
+				var url="<c:out value="${ctx}"/>"+ "/oscarRx/WriteScript.do?parameterValue=newCustomDrug&name=" + encodeURIComponent(searchString);
 				var data="randomId="+randomId;
 				new Ajax.Updater('rxText',url,{method:'get',parameters:data,asynchronous:true,evalScripts:true,
 					insertion: Insertion.Bottom, onComplete:function(transport){
@@ -1730,7 +1730,8 @@
 			}
 
 		}
-		function saveCustomName(element){
+		function saveCustomName(element)
+		{
 			var elemId=element.id;
 			var ar=elemId.split("_");
 			var rand=ar[1];
@@ -1739,10 +1740,14 @@
 			var instruction="instructions_"+rand;
 			var quantity="quantity_"+rand;
 			var repeat="repeats_"+rand;
-			new Ajax.Request(url, {method: 'get',parameters:data, onSuccess:function(transport){
-
-				}});
+			new Ajax.Request(url,
+				{
+					method: 'get',
+					parameters:data,
+					onSuccess:function(transport) {}
+				});
 		}
+
 		function updateDeleteOnCloseRxBox(){
 			$('deleteOnCloseRxBox').value='true';
 		}

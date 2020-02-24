@@ -32,6 +32,7 @@
 <%@ page import="oscar.oscarRx.data.RxPrescriptionData" %>
 <%@ page import="oscar.oscarRx.data.RxCodesData" %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 
 <c:set var="context" value="${pageContext.request.contextPath}" />
 <html:html locale="true">
@@ -64,8 +65,6 @@
 	</style>
 </head>
 
-
-
 <%
 	RxSessionBean rxSessionBean = (RxSessionBean) pageContext.getAttribute("bean");
 
@@ -92,6 +91,7 @@
                     onFailure:function(err)
                     {
                         alert("An error occurred while deleting");
+                        console.log(err);
                     }
                 });
         }
@@ -117,6 +117,7 @@
                     onFailure:function(err)
                     {
                         alert("An error occurred while saving");
+                        console.log(err);
                     }
                 });
 		}
@@ -191,9 +192,6 @@
     document.onload = function() {document.forms['DispForm'].reset()}
 </script>
 
-
-
-
 <body topmargin="0" leftmargin="0" vlink="#0000FF">
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; position: absolute; left: 0; top:0;" bordercolor="#111111" width="100%" id="AutoNumber1" height="100%">
 	<%@ include file="TopLinks.jsp"%><!-- Row One included here-->
@@ -237,7 +235,7 @@
 					for (RxPrescriptionData.Favorite fav : favorites)
 					{
 						boolean isCustom = fav.getGCN_SEQNO() == 0;
-						String encodedFavName = fav.getFavoriteName().replace("'", "\\'");
+						String encodedFavName = StringEscapeUtils.escapeJavaScript(fav.getFavoriteName());
                 %>
 					<form name="DispForm" id="DispForm_<%=fav.getFavoriteId()%>">
 					<!-- Record line 1 -->
