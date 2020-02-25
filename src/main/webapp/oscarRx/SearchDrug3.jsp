@@ -1737,8 +1737,7 @@
 			new Ajax.Request(url,
 				{
 					method: 'get',
-					parameters:data,
-					onSuccess:function(transport) {}
+					parameters: data
 				});
 		}
 
