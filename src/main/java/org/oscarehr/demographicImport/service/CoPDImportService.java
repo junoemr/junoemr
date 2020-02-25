@@ -50,6 +50,7 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
@@ -68,12 +69,15 @@ import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.rx.dao.PrescriptionDao;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.rx.model.Prescription;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
@@ -158,7 +162,7 @@ public class CoPDImportService
 
 	private static long missingDocumentCount = 0;
 
-	public void importFromHl7Message(String message, String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs) throws HL7Exception, IOException, InterruptedException
+	public void importFromHl7Message(String message, String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs, boolean mergeDemographics) throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Initialize HL7 parser");
 		HapiContext context = new DefaultHapiContext();
@@ -177,18 +181,18 @@ public class CoPDImportService
 		ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(message);
 
 		missingDocumentCount = 0;
-		importRecordData(zpdZtrMessage, documentLocation, importSource, skipMissingDocs);
+		importRecordData(zpdZtrMessage, documentLocation, importSource, skipMissingDocs, mergeDemographics);
 	}
 	public long getMissingDocumentCount()
 	{
 		return missingDocumentCount;
 	}
 
-	private void importRecordData(ZPD_ZTR zpdZtrMessage, String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
+	private void importRecordData(ZPD_ZTR zpdZtrMessage, String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs, boolean mergeDemographics)
 			throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Creating Demographic Record ...");
-		Demographic demographic = importDemographicData(zpdZtrMessage, importSource);
+		Demographic demographic = importDemographicData(zpdZtrMessage, importSource, mergeDemographics);
 		if (demographic != null)
 		{
 			logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
@@ -328,10 +332,33 @@ public class CoPDImportService
 		return provider;
 	}
 
-	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage, IMPORT_SOURCE importSource) throws HL7Exception
+	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage, IMPORT_SOURCE importSource, boolean mergeDemographics) throws HL7Exception
 	{
 		DemographicMapper demographicMapper = MapperFactory.newDemographicMapper(zpdZtrMessage, importSource);
 		Demographic demographic = demographicMapper.getDemographic();
+
+		// Optional flag you can run the importer with.
+		if (mergeDemographics && demographic.getHin() != null && !demographic.getHin().trim().isEmpty())
+		{
+			DemographicCriteriaSearch searchQuery = new DemographicCriteriaSearch();
+			searchQuery.setHin(demographic.getHin());
+			searchQuery.setDateOfBirth(demographic.getDateOfBirth());
+
+			List<Demographic> possibleMatches = demographicDao.criteriaSearch(searchQuery);
+			if (possibleMatches.size() == 1)
+			{
+				demographic = possibleMatches.get(0);
+				LogAction.addLogEntry(LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo(),
+						demographic.getId(),
+						LogConst.ACTION_ADD,
+						LogConst.CON_DEMOGRAPHIC,
+						LogConst.STATUS_SUCCESS,
+						"Merged patient information from " + importSource.toString());
+				logger.warn("Merging into demographic record " + demographic.getId() + " with HIN: " + demographic.getHin());
+				return demographic;
+			}
+		}
+
 		if (demographic != null)
 		{
 			DemographicCust demographicCust = demographicMapper.getDemographicCust();
