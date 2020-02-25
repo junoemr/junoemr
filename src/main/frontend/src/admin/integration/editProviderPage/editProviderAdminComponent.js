@@ -390,6 +390,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			{
 				ctrl.setupSecurityRecords();
 				ctrl.setupFormValidations();
+				ctrl.allowSubmit = true;
 			}
 		};
 
