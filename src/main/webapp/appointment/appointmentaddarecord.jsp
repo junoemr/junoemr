@@ -80,15 +80,21 @@
 	WaitingListDao waitingListDao = SpringUtils.getBean(WaitingListDao.class);
 
 	Integer appointmentNo = null;
-	String headRecord = request.getParameter("demographic_no");
+	String headRecord = ConversionUtils.getStringOrDefaultValue(request.getParameter("demographic_no"), "0");
 
-	if (headRecord == null || headRecord.isEmpty())
+	int demographicNo = 0;
+	int reasonCode = 0;
+	int programId = 0;
+	try
 	{
-		headRecord = "0";
-		//the keyword(name) must match the demographic_no if it has been changed
+		demographicNo = Integer.parseInt(headRecord);
+		reasonCode = Integer.parseInt(request.getParameter("reasonCode"));
+		programId = Integer.parseInt((String)request.getSession().getAttribute("programId_oscarView"));
 	}
-
-	int demographicNo = Integer.parseInt(headRecord);
+	catch (NumberFormatException e)
+	{
+		MiscUtils.getLogger().error("Error attempting to parse a number when saving appointment", e);
+	}
 
 	DemographicMerged demographicMerged = demographicMergedDao.getCurrentHead(demographicNo);
 	// Use parent record if the requested demographic has been merged to someone else
@@ -98,9 +104,22 @@
 		headRecord = Integer.toString(demographicNo);
 	}
 
-	// Pulling out and parsing request parameters that are used more than once on this page
-	String providerNo = request.getParameter("provider_no");
-	String creator = request.getParameter("creator");
+	// Try to read all of the request parameters and assign default values if we can't read parameters
+	String providerNo = ConversionUtils.getStringOrDefaultValue(request.getParameter("provider_no"), loggedInInfo.getLoggedInProviderNo());
+	String creator = ConversionUtils.getStringOrDefaultValue(request.getParameter("creator"), loggedInInfo.getLoggedInProviderNo());
+	String appointmentName = ConversionUtils.getStringOrDefaultValue(request.getParameter("keyword"), "");
+	String notes = ConversionUtils.getStringOrDefaultValue(request.getParameter("notes"), "");
+	String reason = ConversionUtils.getStringOrDefaultValue(request.getParameter("reason"), "");
+	String location = ConversionUtils.getStringOrDefaultValue(request.getParameter("location"), "");
+	String isVirtual = ConversionUtils.getStringOrDefaultValue(request.getParameter("isVirtual"), "off");
+	String resources = ConversionUtils.getStringOrDefaultValue(request.getParameter("resources"), "");
+	String type = ConversionUtils.getStringOrDefaultValue(request.getParameter("type"), "");
+	String style = ConversionUtils.getStringOrDefaultValue(request.getParameter("style"), null);
+	String billing = ConversionUtils.getStringOrDefaultValue(request.getParameter("billing"), null);
+	String status = ConversionUtils.getStringOrDefaultValue(request.getParameter("status"), "t");
+	String remarks = ConversionUtils.getStringOrDefaultValue(request.getParameter("remarks"), "");
+	String urgency = ConversionUtils.getStringOrDefaultValue(request.getParameter("urgency"), "");
+
 	Date appointmentDate = ConversionUtils.fromDateString(request.getParameter("appointment_date"));
 	Date startTime = ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time"));
 	Date endTime = ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time"));
@@ -111,29 +130,26 @@
 	appointment.setAppointmentDate(appointmentDate);
 	appointment.setStartTime(startTime);
 	appointment.setEndTime(endTime);
-	appointment.setName(request.getParameter("keyword"));
-	appointment.setNotes(request.getParameter("notes"));
-	appointment.setReason(request.getParameter("reason"));
-	appointment.setLocation(request.getParameter("location"));
-	appointment.setIsVirtual(request.getParameter("isVirtual") != null
-			&& request.getParameter("isVirtual").equals("on"));
-	appointment.setResources(request.getParameter("resources"));
-	appointment.setType(request.getParameter("type"));
-	appointment.setStyle(request.getParameter("style"));
-	appointment.setBilling(request.getParameter("billing"));
-	appointment.setStatus(request.getParameter("status"));
+	appointment.setNotes(notes);
+	appointment.setReason(reason);
+	appointment.setLocation(location);
+	appointment.setIsVirtual(isVirtual.equals("on"));
+	appointment.setResources(resources);
+	appointment.setType(type);
+	appointment.setStyle(style);
+	appointment.setBilling(billing);
+	appointment.setStatus(status);
 	appointment.setCreateDateTime(createDateTime);
 	appointment.setCreator(creator);
-	appointment.setRemarks(request.getParameter("remarks"));
-	appointment.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
+	appointment.setRemarks(remarks);
+	appointment.setReasonCode(reasonCode);
 	appointment.setDemographicNo(demographicNo);
-	String appointmentName = request.getParameter("keyword");
 
 	// Appointment name column only contains 50 chars
 	appointmentName = org.apache.commons.lang3.StringUtils.left(appointmentName, 50);
 	appointment.setName(appointmentName);
-	appointment.setProgramId(Integer.parseInt((String)request.getSession().getAttribute("programId_oscarView")));
-	appointment.setUrgency((request.getParameter("urgency")!=null)?request.getParameter("urgency"):"");
+	appointment.setProgramId(programId);
+	appointment.setUrgency(urgency);
 	
 	try
 	{
@@ -197,7 +213,7 @@
 			{
 			   if(!headRecord.isEmpty())
 			   {
-					List<WaitingList> wl = waitingListDao.findByDemographic(Integer.parseInt(headRecord));
+					List<WaitingList> wl = waitingListDao.findByDemographic(demographicNo);
 					if(wl.size() > 0)
 					{
 						WaitingList wl1 = wl.get(0);
@@ -206,11 +222,11 @@
 	%>
 				<form name="updateWLFrm" action="../oscarWaitingList/RemoveFromWaitingList.jsp">
 					<input type="hidden" name="listId" value="<%=wl1.getListId()%>" />
-					<input type="hidden" name="demographicNo" value="<%=request.getParameter("demographic_no")%>" />
+					<input type="hidden" name="demographicNo" value="<%=headRecord%>" />
 					<script type="text/javascript">
 						var removeList = confirm("Click OK to remove patient from the waiting list: <%=wln.getName()%>");
 						if (removeList) {
-							document.forms[0].action = "../oscarWaitingList/RemoveFromWaitingList.jsp?demographicNo=<%=request.getParameter("demographic_no")%>&listID=<%=wl1.getListId()%>";
+							document.forms[0].action = "../oscarWaitingList/RemoveFromWaitingList.jsp?demographicNo=<%=headRecord%>&listID=<%=wl1.getListId()%>";
 							document.forms[0].submit();
 						}
 					</script>
