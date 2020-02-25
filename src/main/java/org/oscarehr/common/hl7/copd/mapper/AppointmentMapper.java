@@ -41,6 +41,12 @@ import java.util.regex.Pattern;
 
 public class AppointmentMapper extends AbstractMapper
 {
+
+	public static final int APPOINTMENT_TYPE_LENGTH = 50;
+	public static final int APPOINTMENT_REASON_LENGTH = 80;
+	public static final String DEFAULT_APPOINTMENT_DURATION_HR = "1";
+	public static final String DEFAULT_APPOINTMENT_DURATION_MIN = "15";
+
 	public AppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
 	{
 		super(message, importSource);
@@ -82,17 +88,17 @@ public class AppointmentMapper extends AbstractMapper
 		appointment.setStatus(getStatus(rep, importSource));
 		// Some appointment types exceed character length of column and may get truncated
 		String type = getType(rep);
-		if (type != null && type.length() > 50)
+		if (type != null && type.length() > APPOINTMENT_TYPE_LENGTH)
 		{
 			logger.warn("Appointment has a type that is getting truncated: '" + type + "'");
-			type = StringUtils.left(type, 50);
+			type = StringUtils.left(type, APPOINTMENT_TYPE_LENGTH);
 		}
 
 		String reason = getReason(rep);
-		if (reason != null && reason.length() > 80)
+		if (reason != null && reason.length() > APPOINTMENT_REASON_LENGTH)
 		{
 			logger.warn("Appointment has a reason that is getting truncated: '" + reason + "'");
-			reason = StringUtils.left(reason, 80);
+			reason = StringUtils.left(reason, APPOINTMENT_REASON_LENGTH);
 		}
 
 		appointment.setReason(reason);
@@ -167,12 +173,12 @@ public class AppointmentMapper extends AbstractMapper
 			if ("HR".equals(apptDurationUnit.toUpperCase()))
 			{
 				logger.error("Bad appointment duration value, defaulting to 1 hr:"  + apptDurationRawValue);
-				apptDurationRawValue = "1";
+				apptDurationRawValue = DEFAULT_APPOINTMENT_DURATION_HR;
 			}
 			else
 			{
 				logger.error("Bad appointment duration value, defaulting to 15 min: " + apptDurationRawValue);
-				apptDurationRawValue = "15";
+				apptDurationRawValue = DEFAULT_APPOINTMENT_DURATION_MIN;
 			}
 		}
 		apptDuration = Integer.parseInt(apptDurationRawValue);

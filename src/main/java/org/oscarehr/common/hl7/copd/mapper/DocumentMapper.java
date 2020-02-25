@@ -35,6 +35,9 @@ import java.util.List;
 
 public class DocumentMapper extends AbstractMapper
 {
+
+	public static final int DOCUMENT_DESCRIPTION_LENGTH = 255;
+
 	public DocumentMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
 		super(message, providerRep, importSource);
@@ -70,10 +73,10 @@ public class DocumentMapper extends AbstractMapper
 			MiscUtils.getLogger().warn("document, " + getFileName(rep) + " has no document description, setting to \"No Name\"");
 		}
 
-		if (docDescription.length() > 255)
+		if (docDescription.length() > DOCUMENT_DESCRIPTION_LENGTH)
 		{
 			logger.warn("document " + getFileName(rep) + " has too long of a document description, truncating");
-			docDescription = StringUtils.left(docDescription, 255);
+			docDescription = StringUtils.left(docDescription, DOCUMENT_DESCRIPTION_LENGTH);
 		}
 
 		document.setDocdesc(docDescription);

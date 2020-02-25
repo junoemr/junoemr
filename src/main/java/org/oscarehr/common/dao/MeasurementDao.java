@@ -95,11 +95,11 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 				if (result.equals("") || result.equals("DNR") || messageHandler.getOBXName(i, j).equals("") || messageHandler.getOBXResultStatus(i, j).equals("DNS")) continue;
 				logger.debug("obx(" + j + ") should be added");
 
-				if (result.length() > 500)
+				if (result.length() > Measurement.RESULT_LENGTH)
 				{
 					logger.warn("Following result is going to be truncated:");
 					logger.warn(result);
-					result = org.apache.commons.lang3.StringUtils.left(result, 500);
+					result = org.apache.commons.lang3.StringUtils.left(result, Measurement.RESULT_LENGTH);
 				}
 				String identifier = messageHandler.getOBXIdentifier(i, j);
 				String name = messageHandler.getOBXName(i, j);
