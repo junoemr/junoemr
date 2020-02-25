@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.hl7.Hl7Const;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Service;
@@ -170,7 +171,7 @@ public class CoPDPreProcessorService
 			}
 		};
 
-		return foreachTag(message, "TS.1", callback);
+		return foreachTag(message, Hl7Const.HL7_SEGMENT_TS_1, callback);
 	}
 
 	/**
@@ -192,7 +193,7 @@ public class CoPDPreProcessorService
 			}
 		};
 
-		return foreachTag(message, "ZAT.2", callback);
+		return foreachTag(message, Hl7Const.HL7_SEGMENT_ZAT_2, callback);
 	}
 
 	/**
@@ -211,11 +212,11 @@ public class CoPDPreProcessorService
 			}
 		};
 
-		message = foreachTag(message, "ZBA.31", trimValueCallback);
-		message = foreachTag(message, "ZQO.4", trimValueCallback);
-		message = foreachTag(message, "ZQO.5", trimValueCallback);
-		message = foreachTag(message, "ZQO.6", trimValueCallback);
-		message = foreachTag(message, "ZQO.7", trimValueCallback);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZBA_31, trimValueCallback);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_4, trimValueCallback);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_5, trimValueCallback);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_6, trimValueCallback);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_7, trimValueCallback);
 		return message;
 	}
 
@@ -243,11 +244,11 @@ public class CoPDPreProcessorService
 			}
 		};
 
-		message = foreachTag(message, "ZBA.31", ensureNumeric);
-		message = foreachTag(message, "ZQO.4", ensureNumeric);
-		message = foreachTag(message, "ZQO.5", ensureNumeric);
-		message = foreachTag(message, "ZQO.6", ensureNumeric);
-		message = foreachTag(message, "ZQO.7", ensureNumeric);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZBA_31, ensureNumeric);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_4, ensureNumeric);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_5, ensureNumeric);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_6, ensureNumeric);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_7, ensureNumeric);
 		return message;
 	}
 
@@ -276,8 +277,9 @@ public class CoPDPreProcessorService
 			}
 		};
 
-		message = foreachTag(message, "ZQO.4", deleteDoubleValue);
-		return foreachTag(message, "ZQO.5", deleteDoubleValue);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_4, deleteDoubleValue);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_5, deleteDoubleValue);
+		return message;
 	}
 
 	/**
@@ -302,15 +304,16 @@ public class CoPDPreProcessorService
 			}
 		};
 
-		message = foreachTag(message, "ZQO.4", fixBPSlash);
-		return foreachTag(message, "ZQO.5", fixBPSlash);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_4, fixBPSlash);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_5, fixBPSlash);
+		return message;
 	}
 
 	/**
 	 * Some ZAT.2 date strings do not follow the spec and include a timestamp instead of a date. This causes parsing errors.
 	 * If there is a timestamp in ZAT.2 simply strip the timestamp information.
-	 * @param message
-	 * @return
+	 * @param message message to operate on
+	 * @return fixed date string
 	 */
 	private String fixZATDateString(String message)
 	{
@@ -329,7 +332,7 @@ public class CoPDPreProcessorService
 			}
 		};
 
-		return foreachTag(message, "ZAT.2", fixZATDate);
+		return foreachTag(message, Hl7Const.HL7_SEGMENT_ZAT_2, fixZATDate);
 	}
 
 	/**
@@ -351,7 +354,7 @@ public class CoPDPreProcessorService
 			}
 		};
 
-		return foreachTag(message,"TS.1", padTimestamps);
+		return foreachTag(message,Hl7Const.HL7_SEGMENT_TS_1, padTimestamps);
 	}
 
 	/**
@@ -398,9 +401,9 @@ public class CoPDPreProcessorService
 			}
 		};
 
-		message = foreachTag(message, "XTN.1", fixPhoneNumbersNoSpace);
-		message = foreachTag(message, "XTN.6", fixPhoneNumbersOnlyNum);
-		message = foreachTag(message, "XTN.7", fixPhoneNumbersOnlyNum);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_XTN_1, fixPhoneNumbersNoSpace);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_XTN_6, fixPhoneNumbersOnlyNum);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_XTN_7, fixPhoneNumbersOnlyNum);
 
 		return message;
 	}
@@ -480,8 +483,8 @@ public class CoPDPreProcessorService
 	{
 		Function<String, String> fixReferralProvider = tagValue -> tagValue.replaceAll("-", "");
 
-		message = foreachTag(message, "XCN.1", fixReferralProvider);
-		message = foreachTag(message, "ZBA.29", fixReferralProvider);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_XCN_1, fixReferralProvider);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZBA_29, fixReferralProvider);
 
 		return message;
 	}
