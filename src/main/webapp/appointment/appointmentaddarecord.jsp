@@ -160,7 +160,7 @@
 		{
 			try
 			{
-				Appointment aa =  appointmentDao.search_appt_no(providerNo,
+				Appointment alternateAppointment =  appointmentDao.search_appt_no(providerNo,
 						appointmentDate,
 						startTime,
 						endTime,
@@ -168,9 +168,9 @@
 						creator,
 						demographicNo);
 		   
-				if (aa != null)
+				if (alternateAppointment != null)
 				{
-					Integer apptNo = aa.getId();
+					Integer apptNo = alternateAppointment.getId();
 					DemographicManager demographicManager =  SpringUtils.getBean(DemographicManager.class);
 					Demographic demographic = demographicManager.getDemographic(loggedInInfo, headRecord);
 
@@ -250,7 +250,7 @@
 
 <%
 		}
-		Appointment aa = appointmentDao.search_appt_no(providerNo,
+		Appointment alternateAppointment = appointmentDao.search_appt_no(providerNo,
 				appointmentDate,
 				startTime,
 				endTime,
@@ -258,9 +258,9 @@
 				creator,
 				demographicNo);
 		
-		if (aa != null)
+		if (alternateAppointment != null)
 		{
-			Integer apptNo = aa.getId();
+			Integer apptNo = alternateAppointment.getId();
 			String mcNumber = request.getParameter("appt_mc_number");
 			OtherIdManager.saveIdAppointment(apptNo, "appt_mc_number", mcNumber);
 			
