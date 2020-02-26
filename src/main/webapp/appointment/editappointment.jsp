@@ -61,13 +61,23 @@
 		bFirstDisp = (request.getParameter("bFirstDisp")).equals("true");
 %>
 
-<%@page import="org.oscarehr.PMmodule.model.Program, org.oscarehr.PMmodule.service.ProgramManager, org.oscarehr.PMmodule.service.ProviderManager, org.oscarehr.common.OtherIdManager, org.oscarehr.common.dao.BillingONCHeader1Dao, org.oscarehr.common.dao.BillingONExtDao, org.oscarehr.common.dao.EncounterFormDao, org.oscarehr.common.dao.OscarAppointmentDao, org.oscarehr.common.dao.SiteDao" %>
+<%@ page import="org.oscarehr.PMmodule.model.Program"%>
+<%@ page import="org.oscarehr.PMmodule.service.ProgramManager"%>
+<%@ page import="org.oscarehr.PMmodule.service.ProviderManager"%>
+<%@ page import="org.oscarehr.common.OtherIdManager"%>
+<%@ page import="org.oscarehr.common.dao.BillingONCHeader1Dao"%>
+<%@ page import="org.oscarehr.common.dao.BillingONExtDao" %>
+<%@ page import="org.oscarehr.common.dao.EncounterFormDao" %>
+<%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
+<%@ page import="org.oscarehr.common.dao.SiteDao" %>
 <%@ page import="org.oscarehr.common.model.Appointment" %>
 <%@ page import="org.oscarehr.common.model.AppointmentStatus" %>
-<%@page import="org.oscarehr.common.model.BillingONCHeader1" %>
-<%@page import="org.oscarehr.common.model.Demographic" %>
-<%@ page
-		import="org.oscarehr.common.model.EncounterForm, org.oscarehr.common.model.Facility, org.oscarehr.common.model.LookupList, org.oscarehr.common.model.LookupListItem" %>
+<%@ page import="org.oscarehr.common.model.BillingONCHeader1" %>
+<%@ page import="org.oscarehr.common.model.Demographic" %>
+<%@ page import="org.oscarehr.common.model.EncounterForm" %>
+<%@ page import="org.oscarehr.common.model.Facility" %>
+<%@ page import="org.oscarehr.common.model.LookupList" %>
+<%@ page import="org.oscarehr.common.model.LookupListItem" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
