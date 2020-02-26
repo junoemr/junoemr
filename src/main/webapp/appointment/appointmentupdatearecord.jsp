@@ -52,6 +52,7 @@ org.oscarehr.event.EventService"%>
 <%@ page import="oscar.log.LogAction" %>
 <%@ page import="oscar.log.LogConst" %>
 <%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
@@ -136,6 +137,7 @@ org.oscarehr.event.EventService"%>
 				appt.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
 			}
 
+			MiscUtils.getLogger().info(appt.getNotes().length());
 			appointmentDao.merge(appt);
 
 			LogAction.addLogEntry(updateuser, appt.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,

@@ -206,9 +206,16 @@
 		<script type="text/javascript">
 			function validateForm()
 			{
+				document.ADDAPPT.notes.value = document.ADDAPPT.notes.value.replace(/(\r\n|\n|\r)/g,"  ");
 				if (document.ADDAPPT.notes.value.length > 255)
 				{
 					window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
+					return false;
+				}
+				document.ADDAPPT.reason.value = document.ADDAPPT.reason.value.replace(/(\r\n|\n|\r)/g,"  ");
+				if (document.ADDAPPT.reason.value.length > 80)
+				{
+					window.alert("<bean:message key="appointment.editappointment.msgReasonTooBig"/>");
 					return false;
 				}
 				// set no-show status if no demographic selected and "Last Name" starts with '.'
@@ -1051,7 +1058,7 @@
 					<div class="space">&nbsp;</div>
 					<div class="label"><bean:message key="Appointment.formNotes"/>:</div>
 					<div class="input">
-						<textarea name="notes" tabindex="3" rows="2" wrap="virtual"
+						<textarea name="notes" tabindex="3" rows="2" wrap="virtual" maxlength="255"
 								  cols="18"><%=bFirstDisp ? "" : request.getParameter("notes").equals("") ? "" : request.getParameter("notes")%></textarea>
 					</div>
 				</li>

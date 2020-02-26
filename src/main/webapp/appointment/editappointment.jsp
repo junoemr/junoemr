@@ -294,9 +294,16 @@
 				}
 				if (saveTemp == 2)
 				{
+					document.EDITAPPT.notes.value = document.EDITAPPT.notes.value.replace(/(\r\n|\n|\r)/g,"  ");
 					if (document.EDITAPPT.notes.value.length > 255)
 					{
 						window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
+						return false;
+					}
+					document.EDITAPPT.reason.value = document.EDITAPPT.reason.value.replace(/(\r\n|\n|\r)/g,"  ");
+					if (document.EDITAPPT.reason.value.length > 80)
+					{
+						window.alert("<bean:message key="appointment.editappointment.msgReasonTooBig"/>");
 						return false;
 					}
 					if (!handleDateChange(document.EDITAPPT.appointment_date))
@@ -834,7 +841,7 @@
 						<div class="space">&nbsp;</div>
 						<div class="label"><bean:message key="Appointment.formNotes"/>:</div>
 						<div class="input">
-				<textarea name="notes" tabindex="3" rows="2" wrap="virtual"
+				<textarea name="notes" tabindex="3" rows="2" wrap="virtual" maxlength="255"
 						  cols="18"><%=bFirstDisp ? appt.getNotes() : request.getParameter("notes")%></textarea>
 						</div>
 					</li>

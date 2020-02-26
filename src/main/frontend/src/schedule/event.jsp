@@ -266,6 +266,8 @@
 										ca-title="Notes"
 										ca-model="eventData.notes"
 										ca-rows="1"
+										ca-error="{{displayMessages.field_errors()['notes']}}"
+										ng-maxlength="255"
 								>
 								</ca-field-text>
 							</div>
@@ -275,7 +277,9 @@
 										ca-title="Reason"
 										ca-name="event_reason"
 										ca-model="eventData.reason"
-										ca-rows="1">
+										ca-rows="1"
+										ca-error="{{displayMessages.field_errors()['event_reason']}}"
+										ng-maxlength="80">
 								</ca-field-text>
 							</div>
 						</div>
