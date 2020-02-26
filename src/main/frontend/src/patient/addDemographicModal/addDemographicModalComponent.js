@@ -136,6 +136,12 @@ angular.module('Patient').component('addDemographicModal', {
 
 		ctrl.onAdd = function ()
 		{
+
+		    if (ctrl.newDemographicData.hin)
+            {
+                ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
+            }
+
 			if (ctrl.validateDemographic())
 			{
 				demographicService.saveDemographic(ctrl.newDemographicData).then(

@@ -475,16 +475,16 @@
 				</div>
 				<div class="form-group">
 					<label class="col-md-2 control-label">
-						HIN
-						<span ng-show="detailsCtrl.page.HCValidation=='valid'" title="HIN Valid" style="font-size:large; color:#009900">&#10004;</span>
+						Health Insurance Number
+						<%--<span ng-show="detailsCtrl.page.HCValidation=='valid'" title="HIN Valid" style="font-size:large; color:#009900">&#10004;</span>
 						<span ng-show="detailsCtrl.page.HCValidation=='invalid'" title="HIN Invalid" style="font-size:large; color:red">&#10008;</span>
 						<span ng-show="detailsCtrl.page.HCValidation=='n/a'" title="Online Health Card Validation unavailable" style="font-size:large; color:#ff5500">?</span>
-						<button class="btn" title="Validate HIN #" 
-							ng-click="detailsCtrl.validateHC()" 
-							ng-hide="detailsCtrl.page.demo.hin==null || detailsCtrl.page.demo.hin=='' || detailsCtrl.page.demo.hcType!='ON'" 
+						<button class="btn" title="Validate HIN #"
+							ng-click="detailsCtrl.validateHC()"
+							ng-hide="detailsCtrl.page.demo.hin || detailsCtrl.page.demo.hcType!='ON'"
 							style="padding: 0px 5px; font-size: small">
 							Validate
-						</button>
+						</button>--%>
 					</label>
 					<div class="col-md-4">
 						<div class="input-group">
