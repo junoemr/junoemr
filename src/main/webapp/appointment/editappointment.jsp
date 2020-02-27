@@ -304,13 +304,11 @@
 				}
 				if (saveTemp == 2)
 				{
-					document.EDITAPPT.notes.value = document.EDITAPPT.notes.value.replace(/(\r\n|\n|\r)/g,"  ");
 					if (document.EDITAPPT.notes.value.length > 255)
 					{
 						window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
 						return false;
 					}
-					document.EDITAPPT.reason.value = document.EDITAPPT.reason.value.replace(/(\r\n|\n|\r)/g,"  ");
 					if (document.EDITAPPT.reason.value.length > 80)
 					{
 						window.alert("<bean:message key="appointment.editappointment.msgReasonTooBig"/>");
