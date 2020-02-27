@@ -27,7 +27,6 @@
 // c_lastVisited, formId - if the form has multiple pages
 package oscar.form;
 
-import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -42,6 +41,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.log.LogAction;
@@ -49,29 +49,40 @@ import oscar.log.LogConst;
 
 public final class FrmAction extends Action {
     
-    Logger log = Logger.getLogger(FrmAction.class);
+    private Logger logger = MiscUtils.getLogger();
     private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
     
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
+            HttpServletResponse response) throws ServletException
+    {
     	
     	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_form", "w", null)) {
 			throw new SecurityException("missing required security object (_form)");
 		}
-    	
-    	
+
     	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
         int newID = 0;
         FrmRecord rec = null;
         String where = "";
         boolean save = false;
+        int demographicNo = 0;
+        int formId = 0;
+        try
+        {
+            demographicNo = Integer.parseInt(request.getParameter("demographic_no"));
+            formId = Integer.parseInt(request.getParameter("formId"));
+        }
+        catch (NumberFormatException e)
+        {
+            logger.error("Ran into a problem treating formId or demographicNo as an integer: ", e);
+        }
 
         try {
             FrmRecordFactory recorder = new FrmRecordFactory();
             rec = recorder.factory(request.getParameter("form_class"));
             Properties props = new Properties();
                
-            log.info("SUBMIT " + String.valueOf(request.getParameter("submit") == null));
+            logger.info("SUBMIT " + (request.getParameter("submit") == null));
             //if we are graphing, we need to grab info from db and add it to request object
             if( request.getParameter("submit").equals("graph") )
             {
@@ -81,8 +92,7 @@ public final class FrmAction extends Action {
             		rec.setGraphType(graphType);
             	}
             	
-               props = rec.getGraph(Integer.parseInt(request.getParameter("demographic_no")), 
-                       Integer.parseInt(request.getParameter("formId")));
+               props = rec.getGraph(demographicNo, formId);
                
                for( Enumeration e = props.propertyNames(); e.hasMoreElements(); ) {
                    String name = (String)e.nextElement();                   
@@ -91,8 +101,7 @@ public final class FrmAction extends Action {
             }
             //if we are printing all pages of form, grab info from db and merge with current page info
             else if( request.getParameter("submit").equals("printAll") ) {
-                props = rec.getFormRecord(loggedInInfo, Integer.parseInt(request.getParameter("demographic_no")),
-                        Integer.parseInt(request.getParameter("formId")));
+                props = rec.getFormRecord(loggedInInfo, demographicNo, formId);
                 
                 String name;
                 for( Enumeration e = props.propertyNames(); e.hasMoreElements();) {
@@ -123,8 +132,7 @@ public final class FrmAction extends Action {
                     curPageNum = curPageNum.length() > 3 ? ("" + curPageNum.charAt(0)) : curPageNum;
 
                     //copy an old record
-                    props = rec.getFormRecord(loggedInInfo, Integer.parseInt(request.getParameter("demographic_no")), Integer
-                            .parseInt(request.getParameter("formId")));
+                    props = rec.getFormRecord(loggedInInfo, demographicNo, formId);
 
                     //empty the current page
                     Properties currentParam = new Properties();
@@ -151,9 +159,14 @@ public final class FrmAction extends Action {
                 props.setProperty("provider_no", (String) request.getSession().getAttribute("user"));
                 newID = rec.saveFormRecord(props);
                 String ip = request.getRemoteAddr();
-                LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, request
-                        .getParameter("form_class"), "" + newID, ip,request.getParameter("demographic_no"));
-
+                LogAction.addLogEntry((String) request.getSession().getAttribute("user"),
+                        demographicNo,
+                        LogConst.ACTION_ADD,
+                        LogConst.CON_FORM,
+                        LogConst.STATUS_SUCCESS,
+                        "Old ID: " + formId + " | New ID: " + newID,
+                        ip,
+                        request.getParameter("form_class"));
             }
             String strAction = rec.findActionValue(request.getParameter("submit"));            
             ActionForward af = mapping.findForward(strAction);
