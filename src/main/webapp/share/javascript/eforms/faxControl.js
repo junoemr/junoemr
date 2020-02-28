@@ -1,4 +1,4 @@
-if (typeof $ == "undefined")
+if (typeof $ === "undefined")
 {
     alert("The faxControl library requires jQuery. Please ensure that it is loaded first");
 }
@@ -95,7 +95,7 @@ var faxControl = {
             }
             else
             {
-                alert("Missing placeholder please ensure a div with the id 'faxControl' or a div with class 'DoNotPrint' exists on the page.");
+                alert("Missing placeholder element! Please ensure a div with the id 'faxControl' or a div with class 'DoNotPrint' exists on the page.");
                 return false;
             }
         }
