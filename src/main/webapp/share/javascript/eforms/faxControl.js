@@ -17,9 +17,7 @@ var faxControl = {
 
     initialize: function ()
     {
-        var containerPrepared = this._prepareFaxControlContainer();
-
-        if (containerPrepared)
+        if (this._prepareFaxControlContainer())
         {
             var demoNo = this._parseDemographicNumber("demographic_no", window.location.href) ||
                 this._parseDemographicNumber("efmdemographic_no", $("form").first().attr('action'));
@@ -42,11 +40,51 @@ var faxControl = {
         }
     },
 
+    submitFax: function submitFax(save)
+    {
+        document.getElementById('fax').value = true;
+        var form = $("form").first();
+
+        var saveHolder = $("#saveHolder");
+
+        if (!saveHolder.length)
+        {
+            form.append($(faxControl._elements.faxControlSaveHolder));
+        }
+
+        saveHolder = $("#saveHolder");
+        saveHolder.val(!save);
+
+        // unfortunately this variable is declared by the eform itself
+        // so we can't completely encapsulate this module
+        if (typeof(window.needToConfirm) !== "undefined")
+        {
+            window.needToConfirm = false;
+        }
+
+        if (!$("#Letter").length)
+        {
+            form.submit();
+        }
+        else
+        {
+            form = $("form[name='RichTextLetter']");
+            document.getElementById('Letter').value = editControlContents('edit');
+            form.submit();
+        }
+
+        document.getElementById('fax').value = false;
+    },
+
     _prepareFaxControlContainer: function injectFaxControlForm()
     {
-        this._faxControlContainer = $("#faxControl");
+        var faxControlContainer = $("#faxControl");
 
-        if (!this._faxControlContainer.length)
+        if (faxControlContainer.length)
+        {
+            this._faxControlContainer = $("#faxControl");
+        }
+        else
         {
             var alternateSite = $(".DoNotPrint");
 
@@ -57,7 +95,7 @@ var faxControl = {
             }
             else
             {
-                alert("Missing placeholder please ensure a div with the id faxControl or a div with class DoNotPrint exists on the page.");
+                alert("Missing placeholder please ensure a div with the id 'faxControl' or a div with class 'DoNotPrint' exists on the page.");
                 return false;
             }
         }
@@ -110,42 +148,6 @@ var faxControl = {
     _announceDone: function announceDone()
     {
         $(document).trigger("faxControlLoaded");
-    },
-
-    submitFax: function submitFax(save)
-    {
-        document.getElementById('fax').value = true;
-        var form = $("form").first();
-
-        var saveHolder = $("#saveHolder");
-
-        if (!saveHolder.length)
-        {
-            form.append($(faxControlSaveHolder));
-        }
-
-        saveHolder = $("#saveHolder");
-        saveHolder.val(!save);
-
-        // unfortunately this variable is declared by the eform itself
-        // so we can't completely encapsulate this module
-        if (typeof(window.needToConfirm) !== "undefined")
-        {
-            window.needToConfirm = false;
-        }
-
-        if (!$("#Letter").length)
-        {
-            form.submit();
-        }
-        else
-        {
-            form = $("form[name='RichTextLetter']");
-            document.getElementById('Letter').value = editControlContents('edit');
-            form.submit();
-        }
-
-        document.getElementById('fax').value = false;
     },
 
     _parseDemographicNumber: function parseDemographicNumber(name, url)
