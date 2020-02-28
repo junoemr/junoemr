@@ -82,11 +82,11 @@ var faxControl = {
 
         if (faxControlContainer.length)
         {
-            this._faxControlContainer = $("#faxControl");
+            this._faxControlContainer = $("div#faxControl");
         }
         else
         {
-            var alternateSite = $(".DoNotPrint");
+            var alternateSite = $("div.DoNotPrint");
 
             if (alternateSite.length)
             {
@@ -121,7 +121,7 @@ var faxControl = {
         }
         else
         {
-            var doNotPrintArea = $(".DoNotPrint");
+            var doNotPrintArea = $("div.DoNotPrint");
             var form = $("form").first();
 
             var alternateSite = doNotPrintArea || form;
