@@ -164,7 +164,7 @@ public final class FrmAction extends Action {
                         LogConst.ACTION_ADD,
                         LogConst.CON_FORM,
                         LogConst.STATUS_SUCCESS,
-                        "Old ID: " + formId + " | New ID: " + newID,
+                        "Form ID edited: " + formId + " | Form ID saved: " + newID,
                         ip,
                         request.getParameter("form_class"));
             }
