@@ -476,7 +476,7 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
         <input type="hidden" name="demo_name" value="<%=DemoName%>">
     </td>
     <td width="46%"  class="bCellData">Health# :
-      <% if (HCTYPE != null && HCTYPE.equals("BC")){ %>
+      <% if (HCTYPE != null && HCTYPE.equals("BC") && !allFields.getProperty("oinInsurerCode").equals("PP")){ %>
       <%=allFields.getProperty("phn")%>
       <%}else{%>
       <%=allFields.getProperty("oinRegistrationNo")%>

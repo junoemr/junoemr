@@ -144,8 +144,9 @@ public class BillingReProcessBillAction extends Action {
 
     String originalMSPNumber = Misc.forwardZero("", 20);
 
-    String oinInsurerCode = frm.getInsurerCode(); //f
-    String oinRegistrationNo = demo.getHin()+demo.getVer(); //d
+    String oinInsurerCode = frm.getInsurerCode(); //fy
+    String oinRegistrationNo = Misc.backwardZero
+		    (demo.getHin() + org.apache.commons.lang.StringUtils.trimToEmpty(demo.getVer()), 12); //d
     String oinBirthdate = DemographicData.getDob(demo); //d
     String oinFirstName = demo.getFirstName(); //d
     String oinSecondName = ""; //d
