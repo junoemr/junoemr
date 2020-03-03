@@ -1338,6 +1338,31 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return docNo + doc;
 		};
 
+		/**
+		 * Slightly different from formatDocInput as internally the two expect different wrapping HTML tags.
+		 * @param name name of the doctor
+		 * @param number doctor's referral #
+		 * @return string name and referral # for the doctor wrapped in the appropriate <fd / > & <fname /> tags
+		 */
+		controller.formatFamilyDocInput = function formatFamilyDocInput(name, number)
+		{
+			let docNo = "<fd></fd>";
+			let doc = "<fdname></fdname>";
+
+			if (number != null && number !== "")
+			{
+				docNo = "<fd>" + number + "</fd>";
+			}
+
+			if (name != null && name !== "")
+			{
+				doc = "<fdname>" + name + "</fdname>";
+			}
+
+			return docNo + doc;
+
+		};
+
 		//HCValidation on open & save
 		controller.validateHCSave = function validateHCSave(doSave)
 		{
@@ -1441,7 +1466,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.demo.familyDoctor = controller.formatDocInput(controller.page.demo.scrReferralDoc, controller.page.demo.scrReferralDocNo);
 
 			//save family doctor (familyDoctor2)
-			controller.page.demo.familyDoctor2 = controller.formatDocInput(controller.page.demo.scrFamilyDoc, controller.page.demo.scrFamilyDocNo);
+			controller.page.demo.familyDoctor2 = controller.formatFamilyDocInput(controller.page.demo.scrFamilyDoc, controller.page.demo.scrFamilyDocNo);
 
 			//save phone numbers
 			controller.page.demo.scrDemoCell = controller.page.demo.scrCellPhone;
