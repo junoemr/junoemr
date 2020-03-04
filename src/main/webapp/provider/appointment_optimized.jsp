@@ -1408,9 +1408,15 @@ private long getAppointmentRowSpan(
                                                 {
                                                 	appointmentCount++;
                                                 }
-                                                else if (countIncludeCancelled && status.contains(Appointment.CANCELLED) ||
-                                                        (countIncludeNoShow && status.contains(Appointment.NO_SHOW)) ||
-                                                        (countIncludeNoDemographic && appointmentDetails.getDemographicNo() == 0))
+                                                else if ((status.contains(Appointment.CANCELLED) && countIncludeCancelled) ||
+                                                        (status.contains(Appointment.NO_SHOW) && countIncludeNoShow) ||
+                                                        (appointmentDetails.getDemographicNo() == 0) && countIncludeNoDemographic)
+                                                {
+                                                	appointmentCount++;
+                                                }
+                                                else if (!status.contains(Appointment.CANCELLED) &&
+                                                        !status.contains(Appointment.NO_SHOW) &&
+                                                        appointmentDetails.getDemographicNo() != 0)
                                                 {
                                                 	appointmentCount++;
                                                 }
