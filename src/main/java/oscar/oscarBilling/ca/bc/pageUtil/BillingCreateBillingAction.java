@@ -52,7 +52,6 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import oscar.Misc;
 import oscar.OscarProperties;
 import oscar.entities.PaymentType;
 import oscar.entities.WCB;
@@ -109,16 +108,22 @@ public class BillingCreateBillingAction extends Action {
     bean.setPatientPostal(demo.getPostal());
     bean.setPatientSex(demo.getSex());
 
-    bean.setPatientPHN(demo.getHin()+ StringUtils.trimToEmpty(demo.getVer()));
     if (frm.isOinPayPatient())
     {
       bean.setPatientHCType(Demographic.HC_TYPE.PP.name());
-      bean.setPatientPHN(Misc.backwardZero(bean.getPatientPHN(),12));
+      bean.setPatientPHN(StringUtils.leftPad(demo.getHin() + StringUtils.trimToEmpty(demo.getVer()),12, '0'));
+    }
+    else if (!StringUtils.equals(demo.getHcType(), request.getParameter("billRegion")))
+    {
+	    bean.setPatientHCType(demo.getHcType());
+	    bean.setPatientPHN(StringUtils.leftPad(demo.getHin() + StringUtils.trimToEmpty(demo.getVer()),12, '0'));
     }
     else
     {
-      bean.setPatientHCType(demo.getHcType());
+	  bean.setPatientHCType(demo.getHcType());
+	  bean.setPatientPHN(demo.getHin()+ StringUtils.trimToEmpty(demo.getVer()));
     }
+
     bean.setPatientAge(demo.getAge());
     bean.setBillingType(frm.getXml_billtype());
     bean.setPaymentType(payMeth);

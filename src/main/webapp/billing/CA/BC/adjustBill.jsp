@@ -45,8 +45,8 @@ if(!authed) {
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@page import="oscar.oscarBilling.ca.bc.data.*,oscar.*,org.oscarehr.common.model.*"%>
-<%@page import="java.math.*, java.util.*, java.sql.*, oscar.*, java.net.*,oscar.oscarBilling.ca.bc.MSP.*" %>
-<%@page import="org.springframework.web.context.WebApplicationContext,org.springframework.web.context.support.WebApplicationContextUtils, oscar.entities.*" %>
+<%@page import="java.util.*, oscar.*, oscar.oscarBilling.ca.bc.MSP.*" %>
+<%@page import="oscar.entities.*" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="org.oscarehr.common.model.Demographic" %>
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
@@ -431,7 +431,7 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
     visittype = bill.getVisitType();
 
  BillType = allFields.getProperty("billingstatus");
- Demographic d = demographicDao.getDemographic(DemoNo);
+ org.oscarehr.common.model.Demographic d = demographicDao.getDemographic(DemoNo);
  if(d != null){
      DemoName = d.getFormattedName();
      DemoSex = d.getSex();
@@ -476,7 +476,7 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
         <input type="hidden" name="demo_name" value="<%=DemoName%>">
     </td>
     <td width="46%"  class="bCellData">Health# :
-      <% if (HCTYPE != null && HCTYPE.equals("BC") && !allFields.getProperty("oinInsurerCode").equals("PP")){ %>
+      <% if (HCTYPE != null && HCTYPE.equals("BC") && !allFields.getProperty("oinInsurerCode").equals(org.oscarehr.demographic.model.Demographic.HC_TYPE.PP.name())){ %>
       <%=allFields.getProperty("phn")%>
       <%}else{%>
       <%=allFields.getProperty("oinRegistrationNo")%>
