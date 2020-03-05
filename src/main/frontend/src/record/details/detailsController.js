@@ -1431,7 +1431,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
 
-			if (!Juno.Common.Util.exists(controller.page.demo.hin))
+			if (Juno.Common.Util.exists(controller.page.demo.hin))
             {
                 controller.page.demo.hin = controller.page.demo.hin.replace(/[\W_]/gi, '');
             }
