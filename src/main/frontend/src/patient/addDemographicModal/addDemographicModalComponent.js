@@ -137,7 +137,7 @@ angular.module('Patient').component('addDemographicModal', {
 		ctrl.onAdd = function ()
 		{
 
-		    if (ctrl.newDemographicData.hin)
+		    if (Juno.Common.Util.exists(ctrl.newDemographicData.hin))
             {
                 ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
             }
