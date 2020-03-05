@@ -1,25 +1,25 @@
 <%--
 
-    Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
-    This software is published under the GPL GNU General Public License.
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
+	Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+	This software is published under the GPL GNU General Public License.
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-    This software was written for
-    CloudPractice Inc.
-    Victoria, British Columbia
-    Canada
+	This software was written for
+	CloudPractice Inc.
+	Victoria, British Columbia
+	Canada
 
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -378,7 +378,7 @@ private long getAppointmentRowSpan(
 	providerBean.clear();
 	for (Provider p : providerDao.getActiveProviders())
 	{
-	    providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
+		providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
 	}
 
 	ProviderPreference providerPreference2=(ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
@@ -1405,21 +1405,21 @@ private long getAppointmentRowSpan(
 												String status = appointmentDetails.getStatus();
 
 												if (status == null)
-                                                {
-                                                	appointmentCount++;
-                                                }
-                                                else if ((status.contains(Appointment.CANCELLED) && countIncludeCancelled) ||
-                                                        (status.contains(Appointment.NO_SHOW) && countIncludeNoShow) ||
-                                                        (appointmentDetails.getDemographicNo() == 0) && countIncludeNoDemographic)
-                                                {
-                                                	appointmentCount++;
-                                                }
-                                                else if (!status.contains(Appointment.CANCELLED) &&
-                                                        !status.contains(Appointment.NO_SHOW) &&
-                                                        appointmentDetails.getDemographicNo() != 0)
-                                                {
-                                                	appointmentCount++;
-                                                }
+												{
+													appointmentCount++;
+												}
+												else if ((status.contains(Appointment.CANCELLED) && countIncludeCancelled) ||
+														(status.contains(Appointment.NO_SHOW) && countIncludeNoShow) ||
+														(appointmentDetails.getDemographicNo() == 0) && countIncludeNoDemographic)
+												{
+													appointmentCount++;
+												}
+												else if (!status.contains(Appointment.CANCELLED) &&
+														!status.contains(Appointment.NO_SHOW) &&
+														appointmentDetails.getDemographicNo() != 0)
+												{
+													appointmentCount++;
+												}
 											}
 										}
 								%>
@@ -1467,12 +1467,12 @@ private long getAppointmentRowSpan(
 								%>
 
 								<%
-          						if (notOnSchedule) {
-          						%>
+								if (notOnSchedule) {
+								%>
 									[<bean:message key="provider.appointmentProviderAdminDay.msgNotOnSched"/>]
 								<%
-          						}
-          						%>
+								}
+								%>
 									</logic:notEqual>
 									<logic:equal name="infirmaryView_isOscar" value="false">
 								<%
@@ -1485,8 +1485,8 @@ private long getAppointmentRowSpan(
 								</logic:present>
 								<logic:iterate id="pb" name="infirmaryView_programBeans" type="org.apache.struts.util.LabelValueBean">
 								<%
-						  		if (pb.getValue().equals(prID)) {
-	  							%>
+								if (pb.getValue().equals(prID)) {
+								%>
 									<b><label><%=pb.getLabel()%></label></b>
 								<%
 								}
@@ -1890,7 +1890,7 @@ private long getAppointmentRowSpan(
 																					 "../integrations/myhealthaccess.do?method=connect" +
 																					 "&demographicNo=${appointmentInfo.demographicNo}" +
 																					 "&siteName=${appointmentInfo.siteName}" +
-                                                                                     "&appt=${appointmentInfo.appointmentNo}");return false;'
+																					 "&appt=${appointmentInfo.appointmentNo}");return false;'
 																	 title="Telehealth">
 																		<img
 																						style="vertical-align: bottom"
