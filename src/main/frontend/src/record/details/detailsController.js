@@ -1323,15 +1323,21 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return {"number": number, "name": name};
 		};
 
+		/**
+		 * Wrap the familyDoctor field in required HTML tags.
+		 * @param name name of the referral doctor
+		 * @param number referral doctor #
+		 * @return {string} name and referral # wrapped appropriately
+		 */
 		controller.formatDocInput = function formatDocInput(name, number)
 		{
-			var docNo = "<rdohip></rdohip>";
-			var doc = "<rd></rd>";
-			if (number != null && number !== "")
+			let docNo = "<rdohip></rdohip>";
+			let doc = "<rd></rd>";
+			if (Juno.Common.Util.exists(number))
 			{
 				docNo = "<rdohip>" + number + "</rdohip>";
 			}
-			if (name != null && name !== "")
+			if (Juno.Common.Util.exists(name))
 			{
 				doc = "<rd>" + name + "</rd>";
 			}
@@ -1342,19 +1348,19 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		 * Slightly different from formatDocInput as internally the two expect different wrapping HTML tags.
 		 * @param name name of the doctor
 		 * @param number doctor's referral #
-		 * @return string name and referral # for the doctor wrapped in the appropriate <fd / > & <fname /> tags
+		 * @return {string} name and referral # for the doctor wrapped in the appropriate <fd / > & <fname /> tags
 		 */
 		controller.formatFamilyDocInput = function formatFamilyDocInput(name, number)
 		{
 			let docNo = "<fd></fd>";
 			let doc = "<fdname></fdname>";
 
-			if (number != null && number !== "")
+			if (Juno.Common.Util.exists(number))
 			{
 				docNo = "<fd>" + number + "</fd>";
 			}
 
-			if (name != null && name !== "")
+			if (Juno.Common.Util.exists(name))
 			{
 				doc = "<fdname>" + name + "</fdname>";
 			}
