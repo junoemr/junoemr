@@ -55,27 +55,25 @@ public final class FrmAction extends Action {
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws ServletException
     {
-    	
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_form", "w", null)) {
-			throw new SecurityException("missing required security object (_form)");
-		}
+		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 
-    	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-        int newID = 0;
-        FrmRecord rec = null;
-        String where = "";
-        boolean save = false;
-        int demographicNo = 0;
-        int formId = 0;
-        try
-        {
-            demographicNo = Integer.parseInt(request.getParameter("demographic_no"));
-            formId = Integer.parseInt(request.getParameter("formId"));
-        }
-        catch (NumberFormatException e)
-        {
-            logger.error("Ran into a problem treating formId or demographicNo as an integer: ", e);
-        }
+		securityInfoManager.requireOnePrivilege(providerNo, "w", null, "_form");
+
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		int newID = 0;
+		FrmRecord rec = null;
+		String where = "";
+		boolean save = false;
+		int demographicNo = Integer.parseInt(request.getParameter("demographic_no"));
+		int formId = 0;
+		try
+		{
+			formId = Integer.parseInt(request.getParameter("formId"));
+		}
+		catch (NumberFormatException e)
+		{
+			logger.error("Ran into a problem treating formId as an integer: ", e);
+		}
 
         try {
             FrmRecordFactory recorder = new FrmRecordFactory();
@@ -159,7 +157,7 @@ public final class FrmAction extends Action {
                 props.setProperty("provider_no", (String) request.getSession().getAttribute("user"));
                 newID = rec.saveFormRecord(props);
                 String ip = request.getRemoteAddr();
-                LogAction.addLogEntry((String) request.getSession().getAttribute("user"),
+                LogAction.addLogEntry(providerNo,
                         demographicNo,
                         LogConst.ACTION_ADD,
                         LogConst.CON_FORM,
