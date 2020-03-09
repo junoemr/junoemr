@@ -534,28 +534,26 @@ angular.module('Settings').controller('Settings.SettingsController', [
 					alert('saved');
 				});
 			}
-			else
-			{
-				alert("Some settings may not be correct, please check all settings meet criteria specified in title.");
-			}
-
 		};
 
 		controller.validateSettings = function()
 		{
+			let isValid = true;
 			// check eform fields are valid
 			if (!controller.pref.eformPopupWidth || !controller.pref.eformPopupHeight)
 			{
-				return false;
+				alert("Eform width and height fields must be filled in.");
+				isValid = false;
 			}
 
 			if (isNaN(controller.pref.appointmentScreenLinkNameDisplayLength)
 				|| controller.pref.appointmentScreenLinkNameDisplayLength < 1)
 			{
-				return false;
+				alert("The length of link and form names displayed on appointment screen must be at least 1.");
+				isValid = false;
 			}
 
-			return true;
+			return isValid;
 		};
 
 		controller.cancel = function()

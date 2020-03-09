@@ -105,41 +105,61 @@ function checkTypeIn(obj) {
 	}
 }
 
-function checkTypeInAll() {
-  var checkin = false;
-  var s=0;
-  var e=0;
-  var i=0;
-  if (isNumeric(document.UPDATEPRE.start_hour.value)
-	  && isNumeric(document.UPDATEPRE.end_hour.value)
-	  && isNumeric(document.UPDATEPRE.every_min.value)
-	  && isPositiveInteger(document.UPDATEPRE.appointmentScreenFormsNameDisplayLength.value))
-  {
-    s=eval(document.UPDATEPRE.start_hour.value);
-    e=eval(document.UPDATEPRE.end_hour.value);
-    i=eval(document.UPDATEPRE.every_min.value);
-    if(e < 24){
-      if(s < e){
-        if(i <= (e - s)*60 && i > 0){
-          checkin = true;
-        }else{
-          alert ("<bean:message key="provider.providerpreference.msgPositivePeriod"/>");
-          this.focus();
-          document.UPDATEPRE.every_min.focus();
-         }
-      }else{
-        alert ("<bean:message key="provider.providerpreference.msgStartHourErlierEndHour"/>");
-        this.focus();
-        document.UPDATEPRE.start_hour.focus();
-       }
-    }else{
-      alert ("<bean:message key="provider.providerpreference.msgHourLess24"/>");
-      this.focus();
-      document.UPDATEPRE.end_hour.focus();
-     }
-  } else {
-     alert ("<bean:message key="provider.providerpreference.msgTypeNumbers"/>");
-  }
+function checkTypeInAll()
+{
+	var checkin = false;
+	var startHour = 0;
+	var endHour = 0;
+	var interval = 0;
+	if (isNumeric(document.UPDATEPRE.start_hour.value)
+		&& isNumeric(document.UPDATEPRE.end_hour.value)
+		&& isNumeric(document.UPDATEPRE.every_min.value))
+	{
+		startHour = eval(document.UPDATEPRE.start_hour.value);
+		endHour = eval(document.UPDATEPRE.end_hour.value);
+		interval = eval(document.UPDATEPRE.every_min.value);
+		if(endHour < 24)
+		{
+			if(startHour < endHour)
+			{
+				if(interval <= (endHour - startHour)*60 && interval > 0)
+				{
+					checkin = true;
+				}
+				else
+				{
+					alert ("<bean:message key="provider.providerpreference.msgPositivePeriod"/>");
+					this.focus();
+					document.UPDATEPRE.every_min.focus();
+				}
+			}
+			else
+			{
+				alert ("<bean:message key="provider.providerpreference.msgStartHourErlierEndHour"/>");
+				this.focus();
+				document.UPDATEPRE.start_hour.focus();
+			}
+
+		}
+		else
+		{
+			alert ("<bean:message key="provider.providerpreference.msgHourLess24"/>");
+			this.focus();
+			document.UPDATEPRE.end_hour.focus();
+		}
+	}
+	else
+	{
+		alert ("<bean:message key="provider.providerpreference.msgTypeNumbers"/>");
+	}
+
+	if (!isPositiveInteger(document.UPDATEPRE.appointmentScreenFormsNameDisplayLength.value))
+	{
+		checkin = false;
+		this.focus();
+		alert("<bean:message key="provider.providerpreference.msgLinkLength"/>");
+	}
+
 	return checkin;
 }
 
