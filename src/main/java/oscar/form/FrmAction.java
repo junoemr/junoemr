@@ -64,8 +64,18 @@ public final class FrmAction extends Action {
 		FrmRecord rec = null;
 		String where = "";
 		boolean save = false;
-		int demographicNo = Integer.parseInt(request.getParameter("demographic_no"));
+		int demographicNo;
 		int formId = 0;
+
+		try
+		{
+			demographicNo = Integer.parseInt(request.getParameter("demographic_no"));
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalStateException("Form entries require a valid demographicNo to save against.");
+		}
+
 		try
 		{
 			formId = Integer.parseInt(request.getParameter("formId"));
