@@ -378,7 +378,7 @@ private long getAppointmentRowSpan(
 	providerBean.clear();
 	for (Provider p : providerDao.getActiveProviders())
 	{
-	    providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
+		providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
 	}
 
 	ProviderPreference providerPreference2=(ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
@@ -1405,15 +1405,21 @@ private long getAppointmentRowSpan(
 												String status = appointmentDetails.getStatus();
 
 												if (status == null)
-                                                {
-                                                	appointmentCount++;
-                                                }
-                                                else if (countIncludeCancelled && status.contains(Appointment.CANCELLED) ||
-                                                        (countIncludeNoShow && status.contains(Appointment.NO_SHOW)) ||
-                                                        (countIncludeNoDemographic && appointmentDetails.getDemographicNo() == 0))
-                                                {
-                                                	appointmentCount++;
-                                                }
+												{
+													appointmentCount++;
+												}
+												else if ((status.contains(Appointment.CANCELLED) && countIncludeCancelled) ||
+														(status.contains(Appointment.NO_SHOW) && countIncludeNoShow) ||
+														(appointmentDetails.getDemographicNo() == 0) && countIncludeNoDemographic)
+												{
+													appointmentCount++;
+												}
+												else if (!status.contains(Appointment.CANCELLED) &&
+														!status.contains(Appointment.NO_SHOW) &&
+														appointmentDetails.getDemographicNo() != 0)
+												{
+													appointmentCount++;
+												}
 											}
 										}
 								%>
@@ -1461,12 +1467,12 @@ private long getAppointmentRowSpan(
 								%>
 
 								<%
-          						if (notOnSchedule) {
-          						%>
+								if (notOnSchedule) {
+								%>
 									[<bean:message key="provider.appointmentProviderAdminDay.msgNotOnSched"/>]
 								<%
-          						}
-          						%>
+								}
+								%>
 									</logic:notEqual>
 									<logic:equal name="infirmaryView_isOscar" value="false">
 								<%
@@ -1479,8 +1485,8 @@ private long getAppointmentRowSpan(
 								</logic:present>
 								<logic:iterate id="pb" name="infirmaryView_programBeans" type="org.apache.struts.util.LabelValueBean">
 								<%
-						  		if (pb.getValue().equals(prID)) {
-	  							%>
+								if (pb.getValue().equals(prID)) {
+								%>
 									<b><label><%=pb.getLabel()%></label></b>
 								<%
 								}
@@ -1884,7 +1890,7 @@ private long getAppointmentRowSpan(
 																					 "../integrations/myhealthaccess.do?method=connect" +
 																					 "&demographicNo=${appointmentInfo.demographicNo}" +
 																					 "&siteName=${appointmentInfo.siteName}" +
-                                                                                     "&appt=${appointmentInfo.appointmentNo}");return false;'
+																					 "&appt=${appointmentInfo.appointmentNo}");return false;'
 																	 title="Telehealth">
 																		<img
 																						style="vertical-align: bottom"
