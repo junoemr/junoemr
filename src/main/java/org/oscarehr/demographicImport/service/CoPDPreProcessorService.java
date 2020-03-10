@@ -522,11 +522,6 @@ public class CoPDPreProcessorService
 		message = message.replaceAll("&#xA0;", "");
 		message = message.replaceAll("&#13", "");
 
-		// HTML-encoded chars
-		message = message.replaceAll("&lt;", "");
-		message = message.replaceAll("&gt;", "");
-		message = message.replaceAll("&amp;", "");
-
 		return message;
 	}
 
