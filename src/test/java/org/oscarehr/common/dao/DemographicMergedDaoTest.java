@@ -57,90 +57,45 @@ public class DemographicMergedDaoTest extends DaoTestFixtures {
 	}
 	
 	@Test 
-	public void testFindCurrentByMergedTo() throws Exception {
-	
-		int mergedTo1 = 111;
-		int mergedTo2 = 222;
-
+	public void testFindCurrentByMergedTo()
+	{
 		DemographicMerged demoMerged1 = new DemographicMerged();
-		EntityDataGenerator.generateTestDataForModelClass(demoMerged1);
-		demoMerged1.setMergedTo(mergedTo1);
+		demoMerged1.setDemographicNo(12);
 		dao.persist(demoMerged1);
-		
-		DemographicMerged demoMerged2 = new DemographicMerged();
-		EntityDataGenerator.generateTestDataForModelClass(demoMerged2);
-		demoMerged2.setMergedTo(mergedTo2);
-		dao.persist(demoMerged2);
-		
-		DemographicMerged demoMerged3 = new DemographicMerged();
-		EntityDataGenerator.generateTestDataForModelClass(demoMerged3);
-		demoMerged3.setMergedTo(mergedTo1);
-		dao.persist(demoMerged3);
-		
-		DemographicMerged demoMerged4 = new DemographicMerged();
-		EntityDataGenerator.generateTestDataForModelClass(demoMerged4);
-		demoMerged4.setMergedTo(mergedTo1);
-		demoMerged4.delete();
-		dao.persist(demoMerged4);
-		
-		List<DemographicMerged> expectedResult = new ArrayList<DemographicMerged>(Arrays.asList(demoMerged1, demoMerged3));		
-		List<DemographicMerged> result = dao.findCurrentByMergedTo(mergedTo1);
-		Logger logger = MiscUtils.getLogger();
-		if (result.size() != expectedResult.size()) {
-			logger.warn("Array sizes do not match.");
-			fail("Array sizes do not match.");
-		}
 
-		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
-				logger.warn("Items do not match.");
-				fail("Items do not match.");
-			}
-		}
-		assertTrue(true);
+		DemographicMerged demoMerged2 = new DemographicMerged();
+		demoMerged2.setDemographicNo(22);
+		dao.persist(demoMerged2);
+
+		DemographicMerged demoMerged3 = new DemographicMerged();
+		demoMerged3.setDemographicNo(32);
+		demoMerged3.setMergedTo(demoMerged1.getDemographicNo());
+		dao.persist(demoMerged3);
+
+		List<DemographicMerged> result = dao.findCurrentByMergedTo(demoMerged3.getMergedTo());
+
+		assertEquals(1, result.size());
+		assertEquals(demoMerged1.getDemographicNo(), result.get(0).getMergedTo());
 	}
 	
 	@Test
-	public void testFindCurrentByDemographicNo() throws Exception {
-		
-		int demographicNo1 = 111;
-		int demographicNo2 = 222;
-
+	public void testFindCurrentByDemographicNo()
+	{
 		DemographicMerged demoMerged1 = new DemographicMerged();
-		EntityDataGenerator.generateTestDataForModelClass(demoMerged1);
-		demoMerged1.setDemographicNo(demographicNo1);
+		demoMerged1.setDemographicNo(333);
 		dao.persist(demoMerged1);
 		
 		DemographicMerged demoMerged2 = new DemographicMerged();
-		EntityDataGenerator.generateTestDataForModelClass(demoMerged2);
-		demoMerged2.setDemographicNo(demographicNo2);
+		demoMerged2.setDemographicNo(222);
 		dao.persist(demoMerged2);
 		
 		DemographicMerged demoMerged3 = new DemographicMerged();
-		EntityDataGenerator.generateTestDataForModelClass(demoMerged3);
-		demoMerged3.setDemographicNo(demographicNo1);
+		demoMerged3.setDemographicNo(322);
+		demoMerged3.setMergedTo(333);
 		dao.persist(demoMerged3);
-		
-		DemographicMerged demoMerged4 = new DemographicMerged();
-		EntityDataGenerator.generateTestDataForModelClass(demoMerged4);
-		demoMerged4.setDemographicNo(demographicNo1);
-		demoMerged4.delete();
-		dao.persist(demoMerged4);
-		
-		List<DemographicMerged> expectedResult = new ArrayList<>(Arrays.asList(demoMerged1, demoMerged3));
-		DemographicMerged result = dao.findCurrentByDemographicNo(demographicNo1);
-		assertNotNull(result);
 
-		boolean foundMatch = false;
-		for (DemographicMerged demographicMerged : expectedResult)
-		{
-			if (demographicMerged.equals(result))
-			{
-				foundMatch = true;
-				break;
-			}
-		}
-		assertTrue(foundMatch);
+		DemographicMerged result = dao.getCurrentHead(demoMerged3.getDemographicNo());
+		assertEquals(demoMerged1.getDemographicNo(), result.getMergedTo());
 	}
 	
 	@Test
