@@ -35,7 +35,7 @@ import org.oscarehr.common.model.SecObjPrivilege;
 import org.oscarehr.common.model.SecObjPrivilegePrimaryKey;
 import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,8 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 {
-
-	private SecObjPrivilegeDao secObjPrivilegeDao = SpringUtils.getBean(SecObjPrivilegeDao.class);
+	@Autowired
+	private SecObjPrivilegeDao secObjPrivilegeDao;
 
 	public DemographicMergedDao() {
 		super(DemographicMerged.class);
