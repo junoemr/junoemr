@@ -39,6 +39,26 @@ public class CtlDocType extends AbstractModel<Integer>{
 	public static final String MODULE_DEMOGRAPHIC = "demographic";
 	public static final String MODULE_PROVIDER = "provider";
 
+	public enum Status
+	{
+		Active ("A"),
+		Inactive ("I"),
+		WhatIsThis ("H");
+
+		private String shortName;
+
+		private Status(String shortName)
+		{
+			this.shortName = shortName;
+		}
+
+		@Override
+		public String toString()
+		{
+			return this.shortName;
+		}
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

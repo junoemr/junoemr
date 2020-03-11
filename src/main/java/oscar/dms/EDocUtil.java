@@ -182,11 +182,17 @@ public final class EDocUtil {
 	}
 	
 	public static ArrayList<String> getDoctypes(String module) {
-		return getDoctypesByStatus(module,new String[]{ "A", "H", "I" });
+		return getDoctypesByStatus(module, new String[]{
+				CtlDocType.Status.Active.toString(),
+				CtlDocType.Status.Inactive.toString(),
+				CtlDocType.Status.WhatIsThis.toString(),
+				});
 	}
 
 	public static ArrayList<String> getActiveDocTypes(String module) {
-		return getDoctypesByStatus(module,new String[]{"A"});
+		return getDoctypesByStatus(module, new String[]{
+				CtlDocType.Status.Active.toString()
+		});
 	}
 
 	public static String getDocStatus(String module, String doctype) {
@@ -255,7 +261,7 @@ public final class EDocUtil {
 	}
 
 	public static void changeDocTypeStatusSQL(String docType, String module, String status) {
-		ctldoctypedao.changeDocType(docType, module, status);
+		ctldoctypedao.updateDocTypeStatus(docType, module, status);
 	}
 
 	/** new method to let the user add a new DocumentType into the database */
@@ -678,11 +684,6 @@ public final class EDocUtil {
 		}
 
 		return resultDocs;
-	}
-
-	public static List<String> listModules() {
-		CtlDocTypeDao dao = SpringUtils.getBean(CtlDocTypeDao.class);
-		return dao.findModules();
 	}
 
 	public static EDoc getDoc(String documentNo, String module) {
