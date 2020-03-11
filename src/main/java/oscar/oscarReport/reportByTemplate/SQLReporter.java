@@ -26,7 +26,6 @@ package oscar.oscarReport.reportByTemplate;
 
 import com.Ostermiller.util.CSVPrinter;
 import org.apache.log4j.Logger;
-import org.hibernate.exception.SQLGrammarException;
 import org.oscarehr.common.model.Explain;
 import org.oscarehr.log.dao.LogReportByTemplateDao;
 import org.oscarehr.log.dao.LogReportByTemplateExplainDao;

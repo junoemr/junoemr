@@ -25,7 +25,6 @@ package org.caisi.dao;
 
 import java.util.List;
 
-import org.hibernate.Hibernate;
 import org.hibernate.SQLQuery;
 import org.hibernate.type.StringType;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;

@@ -23,24 +23,17 @@
 
 package org.oscarehr;
 
-import org.oscarehr.util.ContextStartupListener;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
-import oscar.login.Startup;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"oscar", "org.oscarehr", "com.quatro"})
-@ConfigurationPropertiesScan("org.oscarehr.config")
 @ServletComponentScan(basePackages = {"com.junoemr", "org.oscarehr"})
 @ImportResource({"classpath*:applicationContext.xml"})
 public class JunoApplication extends SpringBootServletInitializer
@@ -51,17 +44,37 @@ public class JunoApplication extends SpringBootServletInitializer
 		return application.sources(JunoApplication.class);
 	}
 
-	@Override
-	public void onStartup(ServletContext servletContext) throws ServletException
-	{
-		super.onStartup(servletContext);
-		servletContext.addListener(new Startup());
-		servletContext.addListener(new ContextStartupListener());
-	}
-
 	public static void main(String[] args)
 	{
 		SpringApplication.run(JunoApplication.class, args);
 	}
 
+
+/*
+	@Bean
+	public ConfigurableServletWebServerFactory configurableServletWebServerFactory()
+	{
+		return new TomcatServletWebServerFactory()
+		{
+			@Override
+			protected void postProcessContext(Context context)
+			{
+				super.postProcessContext();
+			}
+		};
+	}
+*/
+
+
+	// TODO: SPRINGUPGRADE: This doesn't seem necessary
+	/*
+	@Override
+	public void onStartup(ServletContext servletContext) throws ServletException
+	{
+		super.onStartup(servletContext);
+
+		servletContext.addListener(new Startup());
+		servletContext.addListener(new ContextStartupListener());
+	}
+	 */
 }

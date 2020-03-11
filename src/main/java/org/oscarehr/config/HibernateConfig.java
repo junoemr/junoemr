@@ -56,20 +56,10 @@ public class HibernateConfig
 		return sessionFactoryBean;
 	}
 
-	private Resource[] loadResources()
+	private Resource[] loadResources() throws IOException
 	{
-		Resource[] resources = null;
-		try
-		{
-			resources = ResourcePatternUtils.getResourcePatternResolver(resourceLoader)
-					.getResources("classpath:/**/*.hbm.xml");
-		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return resources;
+		return ResourcePatternUtils.getResourcePatternResolver(resourceLoader)
+					.getResources("classpath*:/**/*.hbm.xml");
 	}
 
 	private Properties hibernateProperties()

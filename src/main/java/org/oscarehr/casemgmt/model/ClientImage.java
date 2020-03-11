@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.sql.Blob;
 import java.util.Date;
 
-import net.sf.ehcache.hibernate.HibernateUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.caisi.model.BaseObject;
 import org.hibernate.Hibernate;

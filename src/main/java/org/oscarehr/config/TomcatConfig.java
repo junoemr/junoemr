@@ -25,15 +25,16 @@ package org.oscarehr.config;
 
 import org.apache.catalina.Context;
 import org.apache.tomcat.util.scan.StandardJarScanner;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
 @Configuration
+@ConfigurationPropertiesScan("org.oscarehr.config")
 public class TomcatConfig
 {
-	// This turns off the manifest jar scanner to get rid of exceptions during boot, as per
-	// https://stackoverflow.com/a/52229296
 	@Bean
 	public TomcatServletWebServerFactory tomcatServletWebServerFactory()
 	{
@@ -42,7 +43,16 @@ public class TomcatConfig
 			@Override
 			protected void postProcessContext(Context context)
 			{
+				super.postProcessContext(context);
+
+				// This turns off the manifest jar scanner to get rid of exceptions during boot, as per
+				// https://stackoverflow.com/a/52229296
 				((StandardJarScanner) context.getJarScanner()).setScanManifest(false);
+
+				// Add filetypes to compile as jsp files.  Formerly configured in web.xml
+				context.addServletMappingDecoded("*.jsp", "jsp");
+				context.addServletMappingDecoded("*.jspf", "jsp");
+				context.addServletMappingDecoded("*.json", "jsp");
 			}
 		};
 	}

@@ -22,15 +22,11 @@
  */
 package org.oscarehr.util;
 
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Priority;
-import org.apache.log4j.helpers.LogLog;
-import org.apache.log4j.spi.LoggingEvent;
 
 /**
  * This appender is very specific in that it is meant

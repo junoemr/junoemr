@@ -95,6 +95,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -226,12 +227,14 @@
 			<artifactId>javassist</artifactId>
 			<version>3.21.0-GA</version>
 		</dependency>
+<!--
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.4</version>
 			<scope>test</scope>
 		</dependency>
+-->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
@@ -382,13 +385,11 @@
 			<artifactId>commons-dbcp</artifactId>
 			<version>1.4</version>
 		</dependency>
-<!--
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.39</version>
 		</dependency>
--->
 <!--
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -1428,16 +1429,6 @@
 	</dependencies>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
-
-<!--
-	<build>
 		<resources>
 			<resource>
 				<directory>${basedir}/src/main/resources</directory>
@@ -1445,6 +1436,10 @@
 			</resource>
 		</resources>
 		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
@@ -1684,8 +1679,8 @@
 						</webResource>
 					</webResources>
 
-					&lt;!&ndash; do not package unneeded files from JunoUI into WAR &ndash;&gt;
-					&lt;!&ndash; TODO: exclude everything but dist JS and CSS and the JSPs &ndash;&gt;
+					<!-- do not package unneeded files from JunoUI into WAR -->
+					<!-- TODO: exclude everything but dist JS and CSS and the JSPs -->
 					<packagingExcludes>
 						web/*.sh,
 						web/bower.json,
@@ -1704,7 +1699,7 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
-&lt;!&ndash;
+<!--
 					<compilerArgs>
 						<arg>&#45;&#45;add-modules</arg>
 						<arg>java.se.ee</arg>
@@ -1713,11 +1708,13 @@
 						<arg>&#45;&#45;add-modules</arg>
 						<arg>jdk.xml.bind</arg>
 					</compilerArgs>
-&ndash;&gt;
-&lt;!&ndash;					<compilerArguments>
+-->
+<!--
+					<compilerArguments>
 						<compilerArgument>&#45;&#45;add-modules</compilerArgument>
 						<compilerArgument>java.se.ee</compilerArgument>
-					</compilerArguments>&ndash;&gt;
+					</compilerArguments>
+-->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -1828,22 +1825,22 @@
 							<goal>native2ascii</goal>
 						</goals>
 						<configuration>
-&lt;!&ndash;
+<!--
 							<dest>src/main/resources</dest>
 							<src>src/main/resources/native-bundles</src>
 							<encoding>UTF8</encoding>
 							<include>uiResources_*.properties</include>
-&ndash;&gt;
+-->
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 
-			&lt;!&ndash; This plugin creates the openapi.json file for the internal REST api.  It is used &ndash;&gt;
-			&lt;!&ndash; below to generate code.  This must be run before the generate-typescpipt-api &ndash;&gt;
-			&lt;!&ndash; execution. &ndash;&gt;
-			&lt;!&ndash; TODO: This plugin should be replaced with swagger-maven-plugin once that plugin &ndash;&gt;
-			&lt;!&ndash; TODO: supports openapi V3 &ndash;&gt;
+			<!-- This plugin creates the openapi.json file for the internal REST api.  It is used -->
+			<!-- below to generate code.  This must be run before the generate-typescpipt-api -->
+			<!-- execution. -->
+			<!-- TODO: This plugin should be replaced with swagger-maven-plugin once that plugin -->
+			<!-- TODO: supports openapi V3 -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -1873,9 +1870,9 @@
 				</configuration>
 			</plugin>
 
-			&lt;!&ndash; This plugin generates typescript models from the openapi.json file generated &ndash;&gt;
-			&lt;!&ndash; above.  This must be run after the generate-openapi-spec execution &ndash;&gt;
-			&lt;!&ndash; This script must also be run before gulp so the files are available to compile &ndash;&gt;
+			<!-- This plugin generates typescript models from the openapi.json file generated -->
+			<!-- above.  This must be run after the generate-openapi-spec execution -->
+			<!-- This script must also be run before gulp so the files are available to compile -->
 			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
@@ -1896,16 +1893,16 @@
 				</executions>
 			</plugin>
 
-			&lt;!&ndash; This is a terrible hack to counteract a bug in the openapi-generator library.  &ndash;&gt;
-			&lt;!&ndash; There is an open issue at the time of writing to prove they are aware of the &ndash;&gt;
-			&lt;!&ndash; issue at https://github.com/OpenAPITools/openapi-generator/issues/189 &ndash;&gt;
-			&lt;!&ndash; This plugin runs a script that replaces the string "models.models." in the &ndash;&gt;
-			&lt;!&ndash; generated api with "models.".  It is being run using antrun because all plugins &ndash;&gt;
-			&lt;!&ndash; of the same type in a pom.xml file are bundled together and run where the first &ndash;&gt;
-			&lt;!&ndash; one is defined.  Since exec-maven-plugin needs to be run before the &ndash;&gt;
-			&lt;!&ndash; openapi-generator-maven-plugin and this needs to be run after, they can't use &ndash;&gt;
-			&lt;!&ndash; the same plugin. &ndash;&gt;
-			&lt;!&ndash; TODO: scrap this once openapi-generator is fixed &ndash;&gt;
+			<!-- This is a terrible hack to counteract a bug in the openapi-generator library.  -->
+			<!-- There is an open issue at the time of writing to prove they are aware of the -->
+			<!-- issue at https://github.com/OpenAPITools/openapi-generator/issues/189 -->
+			<!-- This plugin runs a script that replaces the string "models.models." in the -->
+			<!-- generated api with "models.".  It is being run using antrun because all plugins -->
+			<!-- of the same type in a pom.xml file are bundled together and run where the first -->
+			<!-- one is defined.  Since exec-maven-plugin needs to be run before the -->
+			<!-- openapi-generator-maven-plugin and this needs to be run after, they can't use -->
+			<!-- the same plugin. -->
+			<!-- TODO: scrap this once openapi-generator is fixed -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.8</version>
@@ -1924,7 +1921,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			&lt;!&ndash; show maven clean how to clean up files generated by open-api generator above &ndash;&gt;
+			<!-- show maven clean how to clean up files generated by open-api generator above -->
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>3.1.0</version>
@@ -1967,7 +1964,7 @@
 						</configuration>
 					</execution>
 					<execution>
-						&lt;!&ndash; We're doing jspc this way because the codehaus jspc seems to be abandonded, it doesn't go beyond jdk 1.5 and the documentation is sparse, and the source code links to a broken page and I can't find the goals it supports. &ndash;&gt;
+						<!-- We're doing jspc this way because the codehaus jspc seems to be abandonded, it doesn't go beyond jdk 1.5 and the documentation is sparse, and the source code links to a broken page and I can't find the goals it supports. -->
 						<id>jspc</id>
 						<phase>verify</phase>
 						<goals>
@@ -2016,7 +2013,7 @@
 			</plugin>
 
 
-			&lt;!&ndash; JunoUI &ndash;&gt;
+			<!-- JunoUI -->
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
@@ -2024,14 +2021,14 @@
 
 				<configuration>
 					<workingDirectory>${basedir}/src/main/frontend</workingDirectory>
-					&lt;!&ndash; TODO switch to JUNO directory &ndash;&gt;
-					&lt;!&ndash; <workingDirectory>${basedir}/src/main/webapp/juno</workingDirectory> &ndash;&gt;
+					<!-- TODO switch to JUNO directory -->
+					<!-- <workingDirectory>${basedir}/src/main/webapp/juno</workingDirectory> -->
 					<installDirectory>target</installDirectory>
 					<nodeVersion>v6.10.3</nodeVersion>
 				</configuration>
 
 				<executions>
-					&lt;!&ndash; installs node and npm locally into target/node &ndash;&gt;
+					<!-- installs node and npm locally into target/node -->
 					<execution>
 						<id>install node and npm</id>
 						<phase>process-classes</phase>
@@ -2039,7 +2036,7 @@
 							<goal>install-node-and-npm</goal>
 						</goals>
 					</execution>
-					&lt;!&ndash; runs npm install on working directory &ndash;&gt;
+					<!-- runs npm install on working directory -->
 					<execution>
 						<id>npm install</id>
 						<phase>process-classes</phase>
@@ -2055,7 +2052,7 @@
 						</goals>
 
 						<configuration>
-							<arguments>&#45;&#45;config webpack.${webpack.env}.js</arguments>
+							<arguments>--config webpack.${webpack.env}.js</arguments>
 						</configuration>
 					</execution>
 				</executions>
@@ -2063,7 +2060,7 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				&lt;!&ndash;This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.&ndash;&gt;
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -2131,7 +2128,6 @@
 			</plugins>
 		</pluginManagement>
 	</build>
--->
 	<profiles>
 		<profile>
 			<id>jdk6</id>

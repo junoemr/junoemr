@@ -30,12 +30,9 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hsfo2RecommitScheduleDao;
 import org.oscarehr.common.model.Hsfo2RecommitSchedule;
 import org.oscarehr.util.SpringUtils;
-import org.quartz.CronTrigger;
-import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import oscar.OscarProperties;
 
-import oscar.form.study.hsfo2.pageUtil.RecommitHSFOAction.ResubmitJob;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;

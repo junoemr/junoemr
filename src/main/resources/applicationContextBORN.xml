@@ -19,13 +19,14 @@
 	</bean>
 
 
+<!--
 	<bean id="bornScheduledTask" class="org.springframework.scheduling.timer.ScheduledTimerTask">
 		<property name="timerTask">
 			<bean class="org.oscarehr.common.service.BORNSchedulerJob">
 			</bean>
 		</property>
 		<property name="delay" value="480000" />
-		<property name="period" value="3600000" />		<!--  every 60 mins-->
+		<property name="period" value="3600000" />		&lt;!&ndash;  every 60 mins&ndash;&gt;
 	</bean>
 
 	<bean id="schedulerBorn" class="org.springframework.scheduling.timer.TimerFactoryBean">
@@ -35,4 +36,5 @@
 			</list>
 		</property>
 	</bean>
+-->
 </beans>
