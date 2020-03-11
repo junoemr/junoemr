@@ -90,8 +90,8 @@
 		Date endDate = ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time"));
 
 		String appointmentName = ConversionUtils.getStringOrDefaultValue(request.getParameter("keyword"), appt.getName());
-		String notes = ConversionUtils.getStringOrDefaultValue(request.getParameter("notes"), appt.getNotes()).replace("\r", "");
-		String reason = ConversionUtils.getStringOrDefaultValue(request.getParameter("reason"), appt.getReason()).replace("\r", "");
+		String notes = ConversionUtils.getStringOrDefaultValue(request.getParameter("notes"), appt.getNotes());
+		String reason = ConversionUtils.getStringOrDefaultValue(request.getParameter("reason"), appt.getReason());
 		String location = ConversionUtils.getStringOrDefaultValue(request.getParameter("location"), appt.getLocation());
 		String isVirtual = ConversionUtils.getStringOrDefaultValue(request.getParameter("isVirtual"), "off");
 		String resources = ConversionUtils.getStringOrDefaultValue(request.getParameter("resources"), appt.getResources());

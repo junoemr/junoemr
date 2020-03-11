@@ -206,12 +206,12 @@
 		<script type="text/javascript">
 			function validateForm()
 			{
-				if (document.ADDAPPT.notes.value.length > 255)
+				if (Oscar.Util.Common.getLengthWithLineBreaks(document.ADDAPPT.notes) > 255)
 				{
 					window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
 					return false;
 				}
-				if (document.ADDAPPT.reason.value.length > 80)
+				if (Oscar.Util.Common.getLengthWithLineBreaks(document.ADDAPPT.reason) > 80)
 				{
 					window.alert("<bean:message key="appointment.editappointment.msgReasonTooBig"/>");
 					return false;

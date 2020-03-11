@@ -290,10 +290,10 @@
 
 			function validateForm()
 			{
-				if (saveTemp == 1)
+				if (saveTemp === 1)
 				{
 					var aptStat = document.EDITAPPT.status.value;
-					if (aptStat.indexOf('B') == 0)
+					if (aptStat.indexOf('B') === 0)
 					{
 						return (confirm("<bean:message key="appointment.editappointment.msgDeleteBilledConfirmation"/>"));
 					}
@@ -302,14 +302,14 @@
 						return (confirm("<bean:message key="appointment.editappointment.msgDeleteConfirmation"/>"));
 					}
 				}
-				if (saveTemp == 2)
+				if (saveTemp === 2)
 				{
-					if (document.EDITAPPT.notes.value.length > 255)
+					if (Oscar.Util.Common.getLengthWithLineBreaks(document.EDITAPPT.notes) > 255)
 					{
 						window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
 						return false;
 					}
-					if (document.EDITAPPT.reason.value.length > 80)
+					if (Oscar.Util.Common.getLengthWithLineBreaks(document.EDITAPPT.reason) > 80)
 					{
 						window.alert("<bean:message key="appointment.editappointment.msgReasonTooBig"/>");
 						return false;

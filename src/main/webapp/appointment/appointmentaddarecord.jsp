@@ -108,8 +108,8 @@
 	String providerNo = ConversionUtils.getStringOrDefaultValue(request.getParameter("provider_no"), loggedInInfo.getLoggedInProviderNo());
 	String creator = ConversionUtils.getStringOrDefaultValue(request.getParameter("creator"), loggedInInfo.getLoggedInProviderNo());
 	String appointmentName = ConversionUtils.getStringOrDefaultValue(request.getParameter("keyword"), "");
-	String notes = ConversionUtils.getStringOrDefaultValue(request.getParameter("notes"), "").replace("\r", "");
-	String reason = ConversionUtils.getStringOrDefaultValue(request.getParameter("reason"), "").replace("\r", "");
+	String notes = ConversionUtils.getStringOrDefaultValue(request.getParameter("notes"), "");
+	String reason = ConversionUtils.getStringOrDefaultValue(request.getParameter("reason"), "");
 	String location = ConversionUtils.getStringOrDefaultValue(request.getParameter("location"), "");
 	String isVirtual = ConversionUtils.getStringOrDefaultValue(request.getParameter("isVirtual"), "off");
 	String resources = ConversionUtils.getStringOrDefaultValue(request.getParameter("resources"), "");
