@@ -42,8 +42,7 @@ public class CtlDocType extends AbstractModel<Integer>{
 	public enum Status
 	{
 		Active ("A"),
-		Inactive ("I"),
-		WhatIsThis ("H");
+		Inactive ("I");
 
 		private String shortName;
 

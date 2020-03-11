@@ -34,12 +34,10 @@ import org.junit.Test;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlDocType;
 import org.oscarehr.util.SpringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class CtlDocTypeDaoTest extends DaoTestFixtures {
 
-	@Autowired
-	protected CtlDocTypeDao dao = (CtlDocTypeDao)SpringUtils.getBean("ctlDocTypeDao");
+	protected CtlDocTypeDao dao = (CtlDocTypeDao)SpringUtils.getBean(CtlDocTypeDao.class);
 
 	private final String lower = "mydocuments";
 	private final String upper = "MyDocuments";
@@ -108,36 +106,19 @@ public class CtlDocTypeDaoTest extends DaoTestFixtures {
 	public void changeDocTypeStatusDifferentModule()
 	{
 		assertNotNull(dao.addDocType(lower, CtlDocType.MODULE_DEMOGRAPHIC));
-		assertEquals((Integer) 0, dao.updateDocTypeStatus(lower, CtlDocType.Status.WhatIsThis.toString(), CtlDocType.MODULE_PROVIDER));
+		assertEquals(new Integer(0), dao.updateDocTypeStatus(lower, CtlDocType.Status.Inactive.toString(), CtlDocType.MODULE_PROVIDER));
 	}
 
 
 	@Test
 	public void findByStatusAndModule()
 	{
-		final String docTypeName = "testDao1Test";
-
-		CtlDocType tmp = new CtlDocType();
-		tmp.setModule(CtlDocType.MODULE_PROVIDER);
-		tmp.setDocType(docTypeName);
-		tmp.setStatus(CtlDocType.Status.WhatIsThis.toString());
-
-		dao.persist(tmp);
-		assertNotNull(tmp.getId());
-
-
 		List<CtlDocType> result = dao.findByStatusAndModule(new String[]{
-				CtlDocType.Status.WhatIsThis.toString()
-		}, CtlDocType.MODULE_PROVIDER);
+				CtlDocType.Status.Active.toString()
+		}, CtlDocType.MODULE_DEMOGRAPHIC);
 
 		assertNotNull(result);
-		assertEquals(result.size(), 1);
-
-		CtlDocType docType = result.get(0);
-
-		assertEquals(docTypeName, docType.getDocType());
-		assertEquals(CtlDocType.MODULE_PROVIDER, docType.getModule());
-		assertEquals(CtlDocType.Status.WhatIsThis.toString(), docType.getStatus());
+		assertEquals(9, result.size());
 	}
 
 	@Test
@@ -146,7 +127,7 @@ public class CtlDocTypeDaoTest extends DaoTestFixtures {
 		CtlDocType tmp = new CtlDocType();
 		tmp.setModule(CtlDocType.MODULE_PROVIDER);
 		tmp.setDocType("testDao1Test");
-		tmp.setStatus(CtlDocType.Status.WhatIsThis.toString());
+		tmp.setStatus(CtlDocType.Status.Inactive.toString());
 		dao.persist(tmp);
 		assertNotNull(tmp.getId());
 
@@ -168,17 +149,8 @@ public class CtlDocTypeDaoTest extends DaoTestFixtures {
 
 		result = dao.findByStatusAndModule(new String[] {
 				CtlDocType.Status.Active.toString(),
-				CtlDocType.Status.WhatIsThis.toString()
-		        }, CtlDocType.MODULE_PROVIDER);
-
-		assertNotNull(result);
-		assertEquals(expectedProviderDocTypes + 1, result.size());
-
-		result = dao.findByStatusAndModule(new String[] {
-				CtlDocType.Status.Active.toString(),
-				CtlDocType.Status.WhatIsThis.toString(),
 				CtlDocType.Status.Inactive.toString()
-		}, CtlDocType.MODULE_PROVIDER);
+		        }, CtlDocType.MODULE_PROVIDER);
 
 		assertNotNull(result);
 		assertEquals(expectedProviderDocTypes + 2, result.size());
@@ -192,7 +164,7 @@ public class CtlDocTypeDaoTest extends DaoTestFixtures {
 		CtlDocType tmp = new CtlDocType();
 		tmp.setModule(CtlDocType.MODULE_PROVIDER);
 		tmp.setDocType(docTypeName);
-		tmp.setStatus(CtlDocType.Status.WhatIsThis.toString());
+		tmp.setStatus(CtlDocType.Status.Active.toString());
 		dao.persist(tmp);
 		assertNotNull(tmp.getId());
 
@@ -203,7 +175,7 @@ public class CtlDocTypeDaoTest extends DaoTestFixtures {
 
 		assertEquals(docTypeName, docType.getDocType());
 		assertEquals(CtlDocType.MODULE_PROVIDER, docType.getModule());
-		assertEquals(CtlDocType.Status.WhatIsThis.toString(), docType.getStatus());
+		assertEquals(CtlDocType.Status.Active.toString(), docType.getStatus());
 	}
 
 	@Test

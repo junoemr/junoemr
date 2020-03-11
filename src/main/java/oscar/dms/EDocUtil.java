@@ -185,7 +185,6 @@ public final class EDocUtil {
 		return getDoctypesByStatus(module, new String[]{
 				CtlDocType.Status.Active.toString(),
 				CtlDocType.Status.Inactive.toString(),
-				CtlDocType.Status.WhatIsThis.toString(),
 				});
 	}
 
