@@ -23,35 +23,36 @@
  */
 package org.oscarehr.common.dao;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.demographic.dao.DemographicMergedDao;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-public class DemographicMergedDaoTest extends DaoTestFixtures {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class DemographicMergedDaoTest extends DaoTestFixtures
+{
 
 	protected DemographicMergedDao dao = SpringUtils.getBean(DemographicMergedDao.class);
 
 	@Before
-	public void before() throws Exception {
+	public void before() throws Exception
+	{
 		SchemaUtils.restoreTable("demographic_merged");
 	}
 
 	@Test
-	public void testCreate() throws Exception {
+	public void testCreate() throws Exception
+	{
 		DemographicMerged entity = new DemographicMerged();
-		EntityDataGenerator.generateTestDataForModelClass(entity);
 		dao.persist(entity);
 		assertNotNull(entity.getId());
 	}
@@ -59,81 +60,106 @@ public class DemographicMergedDaoTest extends DaoTestFixtures {
 	@Test 
 	public void testFindCurrentByMergedTo()
 	{
-		DemographicMerged demoMerged1 = new DemographicMerged();
-		demoMerged1.setDemographicNo(12);
-		dao.persist(demoMerged1);
+		final int demographicMergedTo = 12;
+		final int demographicBeingMerged = 33;
 
-		DemographicMerged demoMerged2 = new DemographicMerged();
-		demoMerged2.setDemographicNo(22);
-		dao.persist(demoMerged2);
+		DemographicMerged demoMerged = new DemographicMerged();
+		demoMerged.setDemographicNo(demographicBeingMerged);
+		demoMerged.setMergedTo(demographicMergedTo);
+		dao.persist(demoMerged);
 
-		DemographicMerged demoMerged3 = new DemographicMerged();
-		demoMerged3.setDemographicNo(32);
-		demoMerged3.setMergedTo(demoMerged1.getDemographicNo());
-		dao.persist(demoMerged3);
-
-		List<DemographicMerged> result = dao.findCurrentByMergedTo(demoMerged3.getMergedTo());
-
+		List<DemographicMerged> result = dao.findCurrentByMergedTo(demoMerged.getMergedTo());
 		assertEquals(1, result.size());
-		assertEquals(demoMerged1.getDemographicNo(), result.get(0).getMergedTo());
+		assertEquals(demographicMergedTo, result.get(0).getMergedTo());
 	}
 	
 	@Test
-	public void testFindCurrentByDemographicNo()
+	public void testGetCurrentHead()
 	{
-		DemographicMerged demoMerged1 = new DemographicMerged();
-		demoMerged1.setDemographicNo(333);
-		dao.persist(demoMerged1);
-		
-		DemographicMerged demoMerged2 = new DemographicMerged();
-		demoMerged2.setDemographicNo(222);
-		dao.persist(demoMerged2);
-		
-		DemographicMerged demoMerged3 = new DemographicMerged();
-		demoMerged3.setDemographicNo(322);
-		demoMerged3.setMergedTo(333);
-		dao.persist(demoMerged3);
+		final int demographicMergedTo = 333;
+		final int myDemographicNo = 322;
 
-		DemographicMerged result = dao.getCurrentHead(demoMerged3.getDemographicNo());
-		assertEquals(demoMerged1.getDemographicNo(), result.getMergedTo());
+		DemographicMerged demoMerged = new DemographicMerged();
+		demoMerged.setDemographicNo(myDemographicNo);
+		demoMerged.setMergedTo(demographicMergedTo);
+		dao.persist(demoMerged);
+
+		DemographicMerged result = dao.getCurrentHead(demoMerged.getDemographicNo());
+		assertEquals(demographicMergedTo, result.getMergedTo());
 	}
-	
-	@Test
-	public void testFindByDemographicNo() throws Exception {
-		
-		int demographicNo1 = 111;
-		int demographicNo2 = 222;
-				
-		DemographicMerged demoMerged1 = new DemographicMerged();
-		EntityDataGenerator.generateTestDataForModelClass(demoMerged1);
-		demoMerged1.setDemographicNo(demographicNo1);
-		dao.persist(demoMerged1);
-		
-		DemographicMerged demoMerged2 = new DemographicMerged();
-		EntityDataGenerator.generateTestDataForModelClass(demoMerged2);
-		demoMerged2.setDemographicNo(demographicNo2);
-		dao.persist(demoMerged2);
-		
-		DemographicMerged demoMerged3 = new DemographicMerged();
-		EntityDataGenerator.generateTestDataForModelClass(demoMerged3);
-		demoMerged3.setDemographicNo(demographicNo2);
-		dao.persist(demoMerged3);
-		
-		List<DemographicMerged> expectedResult = new ArrayList<DemographicMerged>(Arrays.asList(demoMerged1));		
-		List<DemographicMerged> result = dao.findByDemographicNo(demographicNo1);
-		
-		Logger logger = MiscUtils.getLogger();
-		if (result.size() != expectedResult.size()) {
-			logger.warn("Array sizes do not match.");
-			fail("Array sizes do not match.");
-		}
 
-		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
-				logger.warn("Items do not match.");
-				fail("Items do not match.");
-			}
-		}
-		assertTrue(true);
+	@Test
+	public void testFindByParentAndChildIds()
+	{
+		final int parentId = 1234;
+		final int childId = 5678;
+
+		DemographicMerged demographicMerged = new DemographicMerged();
+		demographicMerged.setDemographicNo(childId);
+		demographicMerged.setMergedTo(parentId);
+		dao.persist(demographicMerged);
+
+		List<DemographicMerged> foundEntities = dao.findByParentAndChildIds(parentId, childId);
+		assertEquals(1, foundEntities.size());
+		assertEquals(demographicMerged, foundEntities.get(0));
+	}
+
+	// Slightly different context than the other find methods, as this will get any entry
+	// regardless of whether it's been deleted.
+	@Test
+	public void testFindByDemographicNo()
+	{
+		final int demographicNo = 222;
+				
+		DemographicMerged demoMerged = new DemographicMerged();
+		demoMerged.setDemographicNo(demographicNo);
+		demoMerged.delete();
+		dao.persist(demoMerged);
+		
+		List<DemographicMerged> result = dao.findByDemographicNo(demographicNo);
+		assertEquals(1, result.size());
+		assertEquals(demoMerged, result.get(0));
+	}
+
+	@Test
+	public void testMergeDemographics_success()
+	{
+		assertTrue(dao.mergeDemographics("", 1, 2));
+	}
+
+	// Slightly different from the failure case, as we outright do not want the ability to merge a demographic to itself
+	@Test
+	public void testMergeDemographic_mergeToSelf()
+	{
+		assertFalse(dao.mergeDemographics("", 1, 1));
+	}
+
+	@Test
+	public void testMergeDemographic_repeatedMerge()
+	{
+		assertTrue(dao.mergeDemographics("", 1, 2));
+		assertFalse(dao.mergeDemographics("", 1, 2));
+	}
+
+	@Test
+	public void testUnmergeDemographics_success()
+	{
+		DemographicMerged demographicMerged = new DemographicMerged();
+		demographicMerged.setDemographicNo(1);
+		demographicMerged.setMergedTo(2);
+		dao.persist(demographicMerged);
+
+		dao.unmergeDemographics("", 1);
+
+		// Only way for us to be sure this worked is finding the original entry and asserting its deleted flag is set
+		List<DemographicMerged> expectedUnmerged = dao.findByDemographicNo(1);
+		assertEquals(1, expectedUnmerged.size());
+		assertTrue(expectedUnmerged.get(0).getDeleted());
+	}
+
+	@Test(expected = NoSuchElementException.class)
+	public void testUnmergeDemographics_noEntry()
+	{
+		dao.unmergeDemographics("test", 0);
 	}
 }
