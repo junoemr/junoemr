@@ -280,6 +280,7 @@
 	<context:component-scan base-package="org.oscarehr.ws.rest"/>
 	<context:component-scan base-package="org.oscarehr.ws.rest.util"/>
 	<context:component-scan base-package="org.oscarehr.ws.rest.conversion"/>
+	<context:component-scan base-package="org.oscarehr.ws.rest.myHealthAccess"/>
 	<aop:aspectj-autoproxy/>
 
 	<!-- Also used by applicationContextREST.xml -->
@@ -367,6 +368,9 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.InboxService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.MessagingService"/>
+			<!-- MHA -->
+			<bean autowire="byName" class="org.oscarehr.ws.rest.myHealthAccess.PatientWebService"/>
+			<!-- MHA -->
 			<bean autowire="byName" class="org.oscarehr.ws.rest.NotesService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.OscarJobService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.PatientDetailStatusService"/>

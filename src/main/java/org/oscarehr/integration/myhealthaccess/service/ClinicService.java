@@ -23,8 +23,10 @@
 
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
+import org.oscarehr.integration.model.UserIntegrationAccess;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicStatusResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateResponseTo1;
@@ -32,7 +34,10 @@ import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
+import org.oscarehr.util.LoggedInInfo;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 public class ClinicService extends BaseService
@@ -57,6 +62,19 @@ public class ClinicService extends BaseService
 		}
 
 		return response;
+	}
+
+	public ClinicUserLoginTokenTo1 clinicUserLogin(HttpServletRequest request, String siteName)
+	{
+		Security security = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInSecurity();
+
+		Integration integration = integrationService.findMhaIntegration(siteName);
+		IntegrationData integrationData = new IntegrationData(integration);
+
+		UserIntegrationAccess userIntegrationAccess = integrationService.findMhaUserAccessBySecurityAndSiteName(security, siteName);
+		integrationData.setUserIntegrationAccess(userIntegrationAccess);
+
+		return clinicUserLogin(integrationData);
 	}
 
 	public ClinicUserLoginTokenTo1 clinicUserLogin(IntegrationData integrationData) throws InvalidAccessException

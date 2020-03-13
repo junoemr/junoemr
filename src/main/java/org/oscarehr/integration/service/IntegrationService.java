@@ -31,6 +31,7 @@ import org.oscarehr.integration.dao.UserIntegrationAccessDao;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.UserIntegrationAccess;
 import org.oscarehr.integration.myhealthaccess.dto.IntegrationTransfer;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,16 @@ public class IntegrationService
     public Integration findMhaIntegrationByClinicId(String clinicId)
     {
         return integrationDao.findByIntegrationAndRemoteId(clinicId, Integration.INTEGRATION_TYPE_MHA);
+    }
+
+    public Integration findIntegrationBySiteName(String siteName) throws InvalidIntegrationException
+    {
+        Integration integration =  integrationDao.findBySiteName(siteName);
+        if (integration == null)
+        {
+            throw new InvalidIntegrationException("no integrations for siteName [" + siteName + "]");
+        }
+        return integration;
     }
 
     public List<Integration> getMyHealthAccessIntegrations()

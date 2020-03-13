@@ -1129,9 +1129,10 @@
 				<% if(org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() ) { %>
 
 				<li class="weak row">
-						<div class="label">Virtual:</div>
-						<div class="input">
-						<input type="checkbox" name="isVirtual" disabled/>
+					<div class="label">Virtual:</div>
+					<div class="input" style="display: flex; flex-direction: row; align-items: center; width: calc(100% - 1px);">
+						<input id="telehealth-checkbox" type="checkbox" name="isVirtual" disabled/>
+						<div id="telehealth-message" style="visibility: hidden; display: inline-block; border: none; font-size: 12px;"></div>
 					</div>
 					<div class="space">&nbsp;</div>
 					<div class="label"></div>
@@ -1487,5 +1488,56 @@
 	<script type="text/javascript">
 		var loc = document.forms['ADDAPPT'].location;
 		if (loc.nodeName.toUpperCase() == 'SELECT') loc.style.backgroundColor = loc.options[loc.selectedIndex].style.backgroundColor;
+
+
+		// ask MHA (proxied through the juno server ofc) if the demographic is confirmed with this clinic
+		function checkDemographicConfirmed(demographicNo)
+		{
+			return new Promise((resolve, reject) =>
+			{
+				// OMFG DONT FORGET TO CHANGE THE SITE TO BE DYNAMIC "site1" IS BAD TMTPTTMPTTMPTMPTT CHANGE!
+				jQuery.get("<%=request.getContextPath()%>/ws/rs/myhealthaccess/patient/" + demographicNo + "/site1/confirmed", null,
+					(result) =>
+					{
+						resolve(result);
+					},
+					(error) =>
+					{
+						reject(error);
+					});
+			});
+		}
+
+		function updateTelehealthControlls()
+		{
+			let demographicNo = '<%=request.getParameter("demographic_no")%>';
+			if (demographicNo !== 'null')
+			{
+				checkDemographicConfirmed(demographicNo).then((res) =>
+				{
+					res = JSON.parse(res);
+					if (res.body)
+					{
+						jQuery("#telehealth-checkbox").attr("disabled", false);
+						let msg = jQuery("#telehealth-message");
+						msg.css("visibility", "visible");
+						msg.css("color", "green");
+						msg.html("Patient connected to MyHealthAccess");
+
+					}
+					else
+					{
+						let msg = jQuery("#telehealth-message");
+						msg.css("visibility", "visible");
+						msg.css("color", "orange");
+						msg.html("Patient not connected to MyHealthAccess");
+					}
+				}).catch((error) =>
+				{
+					console.error(error);
+				});
+			}
+		}
+		updateTelehealthControlls();
 	</script>
 </html:html>
