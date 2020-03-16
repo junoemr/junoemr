@@ -46,17 +46,14 @@ public class PatientService extends BaseService
 		{
 			String apiKey = getApiKey(siteName);
 			String clinicId = getClinicId(siteName);
-			return get(buildPatientConfirmedURL(clinicId, demographicNo), apiKey, PatientConfirmedTo1.class).getConfirmed();
+			return get(formatEndpoint("/clinic/" + clinicId + "/patients/" + demographicNo + "/confirmed"), apiKey, PatientConfirmedTo1.class).getConfirmed();
 		}
 		catch(InvalidIntegrationException e)
 		{
-			MiscUtils.getLogger().error(e.getMessage(), e);
+			MiscUtils.getLogger().warn("Cannot check patient confirmation status for demographic: " +
+							demographicNo + " at site: " + siteName + " with error: " + e.getMessage(), e);
 		}
 		return false;
 	}
 
-	protected String buildPatientConfirmedURL(String clinicId, Integer demographicNo)
-	{
-		return BASE_END_POINT + "/clinic/" + clinicId + "/patients/" + demographicNo + "/confirmed";
-	}
 }

@@ -23,16 +23,16 @@
 
 package org.oscarehr.integration.myhealthaccess.exception;
 
-public class InvalidIntegrationException extends RuntimeException
+public class InvalidUserIntegrationException extends RuntimeException
 {
-	public final static String NO_INTEGRATION_MHA = "No active MyHealthAccess integration found";
+	public final static String NO_USER_INTEGRATION_MSG = "No active remote user for MyHealthAccess integration found";
 
-	public InvalidIntegrationException()
+	public InvalidUserIntegrationException()
 	{
 		super();
 	}
 
-	public InvalidIntegrationException(String s)
+	public InvalidUserIntegrationException(String s)
 	{
 		super(s);
 	}

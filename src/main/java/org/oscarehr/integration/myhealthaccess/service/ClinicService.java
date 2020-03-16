@@ -34,10 +34,11 @@ import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidUserIntegrationException;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletRequest;
+import org.oscarehr.common.model.Provider;
 
 @Service
 public class ClinicService extends BaseService
@@ -64,14 +65,39 @@ public class ClinicService extends BaseService
 		return response;
 	}
 
-	public ClinicUserLoginTokenTo1 clinicUserLogin(HttpServletRequest request, String siteName)
+	/**
+	 * login to or create a new clinic user
+	 * @param loggedInInfo - oscar logged in info
+	 * @param siteName - the site to which registration should happen.
+	 * @return - the new / existing clinic user's login token.
+	 * @throws InvalidIntegrationException - when no MHA integration exists for the system.
+	 */
+	public ClinicUserLoginTokenTo1 loginOrCreateClinicUser(LoggedInInfo loggedInInfo, String siteName) throws InvalidIntegrationException
 	{
-		Security security = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInSecurity();
+		try
+		{
+			return clinicUserLogin(loggedInInfo, siteName);
+		}
+		catch(InvalidUserIntegrationException e)
+		{
+			IntegrationData integrationData = getIntegrationData(siteName);
+			Provider provider = loggedInInfo.getLoggedInProvider();
+			ClinicUserCreateResponseTo1 createResponse = createClinicUser(integrationData, new ClinicUserCreateTo1(provider.getProviderNo(), provider.getFirstName(), provider.getLastName()));
+			return new ClinicUserLoginTokenTo1(createResponse.getToken());
+		}
+	}
 
-		Integration integration = integrationService.findMhaIntegration(siteName);
-		IntegrationData integrationData = new IntegrationData(integration);
+	public ClinicUserLoginTokenTo1 clinicUserLogin(LoggedInInfo loggedInInfo, String siteName) throws InvalidIntegrationException, InvalidUserIntegrationException
+	{
+		Security security =  loggedInInfo.getLoggedInSecurity();
+
+		IntegrationData integrationData = getIntegrationData(siteName);
 
 		UserIntegrationAccess userIntegrationAccess = integrationService.findMhaUserAccessBySecurityAndSiteName(security, siteName);
+		if (userIntegrationAccess == null)
+		{
+			throw new InvalidUserIntegrationException("no user integration record for security record: [" + security + "] ");
+		}
 		integrationData.setUserIntegrationAccess(userIntegrationAccess);
 
 		return clinicUserLogin(integrationData);
@@ -119,5 +145,15 @@ public class ClinicService extends BaseService
 		}
 
 		return response;
+	}
+
+	protected IntegrationData getIntegrationData(String siteName) throws InvalidIntegrationException
+	{
+		Integration integration = integrationService.findMhaIntegration(siteName);
+		if (integration == null)
+		{
+			throw new InvalidIntegrationException("no integration record for site: [" + siteName + "]");
+		}
+		return new IntegrationData(integration);
 	}
 }

@@ -25,9 +25,12 @@ package org.oscarehr.appointment.service;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,6 +92,23 @@ public class Appointment
 		}
 
 		return null;
+	}
+
+	/**
+	 * save an appointment in to the database. updating the MHA integration if applicable.
+	 * @param appointment - the appointment to save
+	 * @param loggedInInfo - logged in info.
+	 */
+	public void saveNewAppointment(org.oscarehr.common.model.Appointment appointment, LoggedInInfo loggedInInfo)
+	{
+		oscarAppointmentDao.persist(appointment);
+
+		// book telehealth appointment in MHA
+		if (appointment.getIsVirtual())
+		{
+			AppointmentService appointmentService = (AppointmentService) SpringUtils.getBean("myHealthAppointmentService");
+			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
+		}
 	}
 
 	public List<CalendarEvent> getCalendarEvents(HttpSession session,

@@ -1074,7 +1074,7 @@
 						<% // multisites start ==================
 							if (bMultisites)
 							{ %>
-						<select tabindex="4" name="location" style="background-color: <%=colo%>"
+						<select id="site-select" tabindex="4" name="location" style="background-color: <%=colo%>"
 								onchange='this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor'>
 							<% for (Site s : sites)
 							{ %>
@@ -1491,12 +1491,11 @@
 
 
 		// ask MHA (proxied through the juno server ofc) if the demographic is confirmed with this clinic
-		function checkDemographicConfirmed(demographicNo)
+		function checkDemographicConfirmed(demographicNo, site)
 		{
 			return new Promise((resolve, reject) =>
 			{
-				// OMFG DONT FORGET TO CHANGE THE SITE TO BE DYNAMIC "site1" IS BAD TMTPTTMPTTMPTMPTT CHANGE!
-				jQuery.get("<%=request.getContextPath()%>/ws/rs/myhealthaccess/patient/" + demographicNo + "/site1/confirmed", null,
+				jQuery.get("<%=request.getContextPath()%>/ws/rs/myhealthaccess/patient/" + demographicNo + "/" + site + "/confirmed", null,
 					(result) =>
 					{
 						resolve(result);
@@ -1510,10 +1509,11 @@
 
 		function updateTelehealthControlls()
 		{
+			let siteSelect = jQuery("#site-select");
 			let demographicNo = '<%=request.getParameter("demographic_no")%>';
 			if (demographicNo !== 'null')
 			{
-				checkDemographicConfirmed(demographicNo).then((res) =>
+				checkDemographicConfirmed(demographicNo, siteSelect.val()).then((res) =>
 				{
 					res = JSON.parse(res);
 					if (res.body)
@@ -1527,6 +1527,8 @@
 					}
 					else
 					{
+						jQuery("#telehealth-checkbox").attr("checked", false);
+						jQuery("#telehealth-checkbox").attr("disabled", true);
 						let msg = jQuery("#telehealth-message");
 						msg.css("visibility", "visible");
 						msg.css("color", "orange");
@@ -1539,5 +1541,9 @@
 			}
 		}
 		updateTelehealthControlls();
+
+		jQuery("#site-select").change(() => {
+			updateTelehealthControlls();
+		});
 	</script>
 </html:html>
