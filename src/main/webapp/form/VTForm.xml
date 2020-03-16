@@ -154,8 +154,8 @@
      </measurement>
      <measurement>
         <type>TCHL</type>
-        <typeDesc>Total Cholestorol</typeDesc>
-        <typeDisplayName>Total Cholestorol</typeDisplayName>
+        <typeDesc>Total Cholesterol</typeDesc>
+        <typeDisplayName>Total Cholesterol</typeDisplayName>
         <measuringInstrc>in mmol/L (nn.n) Range:2.0-12.0</measuringInstrc>
         <validationRule>
            <name>Numeric Value: 2.0 to 12.0</name>
