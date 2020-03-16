@@ -424,7 +424,8 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 
 		// actually an insert. done this way to prevent Hibernate session error
 		note.setId(null);
-		this.getHibernateTemplate().merge(note);
+		CaseManagementNote mergedNote = this.getHibernateTemplate().merge(note);
+		note.setId(mergedNote.getId());
 	}
 
 	public Object saveAndReturn(CaseManagementNote note) {

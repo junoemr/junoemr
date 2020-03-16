@@ -30,12 +30,18 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class Hl7TextInfoDaoTest extends DaoTestFixtures {
-
-	protected Hl7TextInfoDao dao = SpringUtils.getBean(Hl7TextInfoDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class Hl7TextInfoDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected Hl7TextInfoDao hl7TextInfoDao;
 
 	@Before
 	public void before() throws Exception {
@@ -44,27 +50,27 @@ public class Hl7TextInfoDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testCreateUpdateLabelByLabNumber() {
-		dao.createUpdateLabelByLabNumber("10", 10);
+		hl7TextInfoDao.createUpdateLabelByLabNumber("10", 10);
 	}
 
 	@Test
 	public void testFindByDemographicId() {
-		dao.findByDemographicId(10);
+		hl7TextInfoDao.findByDemographicId(10);
 	}
 
 	@Test
 	public void testFindByHealthCardNo() {
-		dao.findByHealthCardNo("HIN");
+		hl7TextInfoDao.findByHealthCardNo("HIN");
 	}
 
 	@Test
 	public void testFindByLabId() {
-		dao.findByLabId(10);
+		hl7TextInfoDao.findByLabId(10);
 	}
 
 	@Test
 	public void testfindByLabIdViaMagic() {
-		dao.findByLabIdViaMagic(10);
+		hl7TextInfoDao.findByLabIdViaMagic(10);
 	}
 
 	@Test
@@ -115,54 +121,54 @@ public class Hl7TextInfoDaoTest extends DaoTestFixtures {
 			searchProvider = truthTable[i + 3];
 			patientSearch = truthTable[i + 4];
 
-			dao.findLabAndDocsViaMagic("PROVIDER", "DEMOGRAPHIC", "FNAME", "LNAME", "HIN", "STATUS", isPaged, page, pageSize, mixLabsAndDocs, isAbnormal, searchProvider, patientSearch);
-			dao.findLabAndDocsViaMagic("0", "0", "", "", "", "", isPaged, page, pageSize, mixLabsAndDocs, isAbnormal, searchProvider, patientSearch);
+			hl7TextInfoDao.findLabAndDocsViaMagic("PROVIDER", "DEMOGRAPHIC", "FNAME", "LNAME", "HIN", "STATUS", isPaged, page, pageSize, mixLabsAndDocs, isAbnormal, searchProvider, patientSearch);
+			hl7TextInfoDao.findLabAndDocsViaMagic("0", "0", "", "", "", "", isPaged, page, pageSize, mixLabsAndDocs, isAbnormal, searchProvider, patientSearch);
 		}
 	}
 
 	@Test
 	public void testfindLabId() {
-		dao.findLabId(0);
+		hl7TextInfoDao.findLabId(0);
 	}
 
 	@Test
 	public void testfindLabsViaMagic() {
-		dao.findLabsViaMagic("GVNO", "GVNO", "GVNO", "GVNO", "GVNO");
+		hl7TextInfoDao.findLabsViaMagic("GVNO", "GVNO", "GVNO", "GVNO", "GVNO");
 	}
 
 	@Test
 	public void testgetAllLabsByLabNumberResultStatus() {
-		dao.getAllLabsByLabNumberResultStatus();
+		hl7TextInfoDao.getAllLabsByLabNumberResultStatus();
 	}
 
 	@Test
 	public void testgetMatchingLabs() {
-		dao.getMatchingLabs("BLYA");
+		hl7TextInfoDao.getMatchingLabs("BLYA");
 	}
 
 	@Test
 	public void testsearchByAccessionNumber() {
-		dao.searchByAccessionNumber("PZDTS");
+		hl7TextInfoDao.searchByAccessionNumber("PZDTS");
 	}
 
 	@Test
 	public void testsearchByFillerOrderNumber() {
-		dao.searchByFillerOrderNumber("PRSHA", "ZHPA");
+		hl7TextInfoDao.searchByFillerOrderNumber("PRSHA", "ZHPA");
 	}
 
 	@Test
 	public void testupdateReportStatusByLabId() {
-		dao.updateReportStatusByLabId("STR", 0);
+		hl7TextInfoDao.updateReportStatusByLabId("STR", 0);
 	}
 
 	@Test
 	public void testupdateResultStatusByLabId() {
-		dao.updateResultStatusByLabId("STS", 0);
+		hl7TextInfoDao.updateResultStatusByLabId("STS", 0);
 	}
 
     @Test
     public void test() {
-	    assertNotNull(dao.findDisciplines(100));
+	    assertNotNull(hl7TextInfoDao.findDisciplines(100));
     }
 
 }

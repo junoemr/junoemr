@@ -25,13 +25,20 @@ package org.oscarehr.billing.CA.BC.dao;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingNotesDaoTest extends DaoTestFixtures {
-
-	public BillingNoteDao dao = SpringUtils.getBean(BillingNoteDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingNotesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public BillingNoteDao dao;
 
 	@Before
 	public void before() throws Exception {

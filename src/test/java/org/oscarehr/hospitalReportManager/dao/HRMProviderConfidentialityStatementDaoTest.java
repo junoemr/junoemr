@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.hospitalReportManager.model.HRMProviderConfidentialityStatement;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class HRMProviderConfidentialityStatementDaoTest extends DaoTestFixtures {
-
-	public HRMProviderConfidentialityStatementDao dao = SpringUtils.getBean(HRMProviderConfidentialityStatementDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class HRMProviderConfidentialityStatementDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public HRMProviderConfidentialityStatementDao hrmProviderConfidentialityStatementDao;
 
 
 	@Before
@@ -48,7 +54,7 @@ public class HRMProviderConfidentialityStatementDaoTest extends DaoTestFixtures 
 		HRMProviderConfidentialityStatement entity = new HRMProviderConfidentialityStatement();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setId("999998");
-		dao.persist(entity);
+		hrmProviderConfidentialityStatementDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

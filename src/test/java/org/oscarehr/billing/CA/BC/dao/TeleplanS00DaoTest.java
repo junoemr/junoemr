@@ -29,15 +29,21 @@ import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.TeleplanS00;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class TeleplanS00DaoTest extends DaoTestFixtures {
-
-	public TeleplanS00Dao dao = SpringUtils.getBean(TeleplanS00Dao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class TeleplanS00DaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public TeleplanS00Dao teleplanS00Dao;
 
 	public TeleplanS00DaoTest() {
 	}
@@ -51,23 +57,23 @@ public class TeleplanS00DaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		TeleplanS00 entity = new TeleplanS00();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		teleplanS00Dao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testFindByBillingNo() {
-		dao.findByBillingNo("101");
+		teleplanS00Dao.findByBillingNo("101");
 	}
 
 	@Test
 	public void testFindByOfficeNumbers() {
-		assertNotNull(dao.findByOfficeNumbers(Arrays.asList(new String[] {})));
-		assertNotNull(dao.findByOfficeNumbers(Arrays.asList(new String[] { "10", "20" })));
+		assertNotNull(teleplanS00Dao.findByOfficeNumbers(Arrays.asList(new String[] {})));
+		assertNotNull(teleplanS00Dao.findByOfficeNumbers(Arrays.asList(new String[] { "10", "20" })));
 	}
 	
 	@Test
 	public void testFindBgs() {
-		assertNotNull(dao.findBgs());
+		assertNotNull(teleplanS00Dao.findBgs());
 	}
 }

@@ -30,13 +30,19 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlDocType;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlDocTypeDaoTest extends DaoTestFixtures {
-
-	protected CtlDocTypeDao dao = (CtlDocTypeDao)SpringUtils.getBean("ctlDocTypeDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlDocTypeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlDocTypeDao ctlDocTypeDao;
 
 	public CtlDocTypeDaoTest() {
 	}
@@ -52,26 +58,26 @@ public class CtlDocTypeDaoTest extends DaoTestFixtures {
 		tmp.setModule("provider");
 		tmp.setDocType("test1");
 		tmp.setStatus("H");
-		dao.persist(tmp);
+		ctlDocTypeDao.persist(tmp);
 		assertNotNull(tmp.getId());
 
 		tmp = new CtlDocType();
 		tmp.setModule("provider");
 		tmp.setDocType("test2");
 		tmp.setStatus("I");
-		dao.persist(tmp);
+		ctlDocTypeDao.persist(tmp);
 		assertNotNull(tmp.getId());
 
 		int aCount=0;
-		List<CtlDocType> result = dao.findByStatusAndModule(new String[]{"A"}, "provider");
+		List<CtlDocType> result = ctlDocTypeDao.findByStatusAndModule(new String[]{"A"}, "provider");
 		assertNotNull(result);
 		aCount = result.size();
 
-		result = dao.findByStatusAndModule(new String[]{"A","H"}, "provider");
+		result = ctlDocTypeDao.findByStatusAndModule(new String[]{"A","H"}, "provider");
 		assertNotNull(result);
 		assertEquals(aCount+1,result.size());
 
-		result = dao.findByStatusAndModule(new String[]{"A","H","I"}, "provider");
+		result = ctlDocTypeDao.findByStatusAndModule(new String[]{"A","H","I"}, "provider");
 		assertNotNull(result);
 		assertEquals(aCount+2,result.size());
 	}
@@ -82,10 +88,10 @@ public class CtlDocTypeDaoTest extends DaoTestFixtures {
 		tmp.setModule("provider");
 		tmp.setDocType("test1");
 		tmp.setStatus("H");
-		dao.persist(tmp);
+		ctlDocTypeDao.persist(tmp);
 		assertNotNull(tmp.getId());
 
-		assertEquals(dao.findByDocTypeAndModule("test1", "provider").size(),1);
-		assertEquals(dao.findByDocTypeAndModule("test1", "demographic").size(),0);
+		assertEquals(ctlDocTypeDao.findByDocTypeAndModule("test1", "provider").size(),1);
+		assertEquals(ctlDocTypeDao.findByDocTypeAndModule("test1", "demographic").size(),0);
 	}
 }

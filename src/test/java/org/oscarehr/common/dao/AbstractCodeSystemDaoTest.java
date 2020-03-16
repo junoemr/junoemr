@@ -28,8 +28,14 @@ import static org.oscarehr.common.dao.AbstractCodeSystemDao.getDaoName;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class AbstractCodeSystemDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class AbstractCodeSystemDaoTest extends DaoTestFixtures
+{
 	
 	@Before
 	public void setUp() {

@@ -35,16 +35,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.FavoritesPrivilege;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class FavoritesPrivilegeDaoTest extends DaoTestFixtures {
-
-	protected FavoritesPrivilegeDao dao = SpringUtils.getBean(FavoritesPrivilegeDao.class);
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class FavoritesPrivilegeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected FavoritesPrivilegeDao favoritesPrivilegeDao;
 
 	@Before
 	public void before() throws Exception {
@@ -55,7 +60,7 @@ public class FavoritesPrivilegeDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 FavoritesPrivilege entity = new FavoritesPrivilege();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                favoritesPrivilegeDao.persist(entity);
                 assertNotNull(entity.getId());
         }
 
@@ -72,22 +77,22 @@ public class FavoritesPrivilegeDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(favoritesPrivilege1);
 		favoritesPrivilege1.setOpenToPublic(isOpenToPublic);
 		favoritesPrivilege1.setProviderNo(provideNo1);
-		dao.persist(favoritesPrivilege1);
+		favoritesPrivilegeDao.persist(favoritesPrivilege1);
 		
 		FavoritesPrivilege favoritesPrivilege2 = new FavoritesPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(favoritesPrivilege2);
 		favoritesPrivilege2.setOpenToPublic(!isOpenToPublic);
 		favoritesPrivilege2.setProviderNo(providerNo2);
-		dao.persist(favoritesPrivilege2);
+		favoritesPrivilegeDao.persist(favoritesPrivilege2);
 		
 		FavoritesPrivilege favoritesPrivilege3 = new FavoritesPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(favoritesPrivilege3);
 		favoritesPrivilege3.setOpenToPublic(isOpenToPublic);
 		favoritesPrivilege3.setProviderNo(providerNo3);
-		dao.persist(favoritesPrivilege3);
+		favoritesPrivilegeDao.persist(favoritesPrivilege3);
 		
 		List<String> expectedResult = new ArrayList<String>(Arrays.asList(provideNo1, providerNo3));
-		List<String> result = dao.getProviders();
+		List<String> result = favoritesPrivilegeDao.getProviders();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -114,20 +119,20 @@ public class FavoritesPrivilegeDaoTest extends DaoTestFixtures {
 		FavoritesPrivilege favoritesPrivilege1 = new FavoritesPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(favoritesPrivilege1);
 		favoritesPrivilege1.setProviderNo(provideNo1);
-		dao.persist(favoritesPrivilege1);
+		favoritesPrivilegeDao.persist(favoritesPrivilege1);
 		
 		FavoritesPrivilege favoritesPrivilege2 = new FavoritesPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(favoritesPrivilege2);
 		favoritesPrivilege2.setProviderNo(providerNo2);
-		dao.persist(favoritesPrivilege2);
+		favoritesPrivilegeDao.persist(favoritesPrivilege2);
 		
 		FavoritesPrivilege favoritesPrivilege3 = new FavoritesPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(favoritesPrivilege3);
 		favoritesPrivilege3.setProviderNo(providerNo3);
-		dao.persist(favoritesPrivilege3);
+		favoritesPrivilegeDao.persist(favoritesPrivilege3);
 		
 		FavoritesPrivilege expectedResult = favoritesPrivilege2;
-		FavoritesPrivilege result = dao.findByProviderNo(providerNo2);
+		FavoritesPrivilege result = favoritesPrivilegeDao.findByProviderNo(providerNo2);
 		
 		assertEquals(expectedResult, result);
 	}

@@ -29,14 +29,20 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BornTransmissionLog;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BornTransmissionLogDaoTest extends DaoTestFixtures {
-
-	protected BornTransmissionLogDao dao = SpringUtils.getBean(BornTransmissionLogDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BornTransmissionLogDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BornTransmissionLogDao bornTransmissionLogDao;
 
 	public BornTransmissionLogDaoTest() {
 	}
@@ -54,11 +60,11 @@ public class BornTransmissionLogDaoTest extends DaoTestFixtures {
 		entity.setFilename("test01.xml");
 		entity.setSubmitDateTime(new Date());
 		entity.setSuccess(true);
-		dao.persist(entity);
+		bornTransmissionLogDao.persist(entity);
 		
 		Long expected = 2L;
-		assertEquals(expected, dao.getSeqNoToday("test", 2));
+		assertEquals(expected, bornTransmissionLogDao.getSeqNoToday("test", 2));
 		expected = 1L;
-		assertEquals(expected, dao.getSeqNoToday("noname", 2));
+		assertEquals(expected, bornTransmissionLogDao.getSeqNoToday("noname", 2));
 	}
 }

@@ -31,15 +31,21 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ConsultationRequest;
-import org.oscarehr.util.SpringUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.util.ConversionUtils;
 
-public class ConsultationRequestDaoTest extends DaoTestFixtures {
-
-	protected ConsultationRequestDao dao = SpringUtils.getBean(ConsultationRequestDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ConsultationRequestDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ConsultationRequestDao consultationRequestDao;
 
 	@Before
 	public void before() throws Exception {
@@ -53,27 +59,27 @@ public class ConsultationRequestDaoTest extends DaoTestFixtures {
 		ConsultationRequest cr = new ConsultationRequest();
 		cr.setProviderNo("0");
 		cr.setReferralDate(past);
-		dao.persist(cr);
+		consultationRequestDao.persist(cr);
 		
 		cr = new ConsultationRequest();
 		cr.setProviderNo("0");
 		cr.setReferralDate(ConversionUtils.fromDateString("1891-05-15"));
-		dao.persist(cr);
+		consultationRequestDao.persist(cr);
 		
 		
 
 		// should include both - cutoff is in the future
-		List<ConsultationRequest> crs = dao.getReferrals("1", new Date());
+		List<ConsultationRequest> crs = consultationRequestDao.getReferrals("1", new Date());
 		assertNotNull(crs);
 		assertTrue(crs.isEmpty());
 
 		// should include both - cutoff is in the future
-		crs = dao.getReferrals("0", new Date());
+		crs = consultationRequestDao.getReferrals("0", new Date());
 		assertNotNull(crs);
 		assertTrue(crs.size() == 2);
 
 		// should include only one - current referral should not be included
-		crs = dao.getReferrals("0", ConversionUtils.fromDateString("1800-01-01"));
+		crs = consultationRequestDao.getReferrals("0", ConversionUtils.fromDateString("1800-01-01"));
 
 		assertNotNull(crs);
 		assertTrue(crs.size() == 1);
@@ -81,7 +87,7 @@ public class ConsultationRequestDaoTest extends DaoTestFixtures {
 
     @Test
     public void testFindRequestsByDemoNo() {
-	    assertNotNull(dao.findRequestsByDemoNo(100, new Date()));
+	    assertNotNull(consultationRequestDao.findRequestsByDemoNo(100, new Date()));
     }
 	
 }

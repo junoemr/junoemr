@@ -39,7 +39,7 @@ public class BillingONItem extends AbstractModel<Integer> implements Serializabl
     public static final String DELETED = "D";
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
     @Column(name = "ch1_id")

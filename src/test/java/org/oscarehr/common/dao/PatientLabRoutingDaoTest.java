@@ -27,12 +27,18 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class PatientLabRoutingDaoTest extends DaoTestFixtures {
-
-	protected PatientLabRoutingDao dao = SpringUtils.getBean(PatientLabRoutingDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PatientLabRoutingDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected PatientLabRoutingDao patientLabRoutingDao;
 
 	@Before
 	public void before() throws Exception {
@@ -43,43 +49,43 @@ public class PatientLabRoutingDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindDemographicByLabId() {
-		dao.findDemographicByLabId(1);
+		patientLabRoutingDao.findDemographicByLabId(1);
 	}
 
 	@Test
 	public void testFindDemographic() {
-		dao.findDemographics("TYPE", 10);
+		patientLabRoutingDao.findDemographics("TYPE", 10);
 	}
 
 	@Test
 	public void testFindUniqueTestNames() {
-		assertNotNull(dao.findUniqueTestNames(100, "MDS"));
+		assertNotNull(patientLabRoutingDao.findUniqueTestNames(100, "MDS"));
 	}
 
 	@Test
 	public void testFindUniqueTestNamesForPatientExcelleris() {
-		assertNotNull(dao.findUniqueTestNamesForPatientExcelleris(100, "MDS"));
+		assertNotNull(patientLabRoutingDao.findUniqueTestNamesForPatientExcelleris(100, "MDS"));
 	}
 
 	@Test
 	public void testFindByDemographicAndLabType() {
-		assertNotNull(dao.findByDemographicAndLabType(100, "MDS"));
+		assertNotNull(patientLabRoutingDao.findByDemographicAndLabType(100, "MDS"));
 	}
 	
 	@Test
 	public void testFindRoutingsAndTests() {
-		assertNotNull(dao.findRoutingsAndTests(100, "MDS"));
-		assertNotNull(dao.findRoutingsAndTests(100, "MDS", "TEST"));
+		assertNotNull(patientLabRoutingDao.findRoutingsAndTests(100, "MDS"));
+		assertNotNull(patientLabRoutingDao.findRoutingsAndTests(100, "MDS", "TEST"));
 	}
 	
 	@Test
 	public void testFindHl7InfoForRoutingsAndTests() {
-		assertNotNull(dao.findHl7InfoForRoutingsAndTests(100, "MDS", "TEST"));
+		assertNotNull(patientLabRoutingDao.findHl7InfoForRoutingsAndTests(100, "MDS", "TEST"));
 	}
 
 	@Test
 	public void testFindRoutingsAndConsultDocsByRequestId() {
-		assertNotNull(dao.findRoutingsAndConsultDocsByRequestId(100, "L"));
+		assertNotNull(patientLabRoutingDao.findRoutingsAndConsultDocsByRequestId(100, "L"));
 	}
 	
 }

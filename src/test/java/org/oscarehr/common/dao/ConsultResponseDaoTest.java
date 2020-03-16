@@ -31,6 +31,7 @@ import java.util.List;
 import org.apache.commons.lang.time.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ConsultationResponse;
@@ -39,12 +40,22 @@ import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.consultations.ConsultationResponseSearchFilter;
 import org.oscarehr.consultations.dao.ConsultResponseDao;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ConsultResponseDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ConsultResponseDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ConsultResponseDao consultDao;
 
-	protected ConsultResponseDao consultDao = (ConsultResponseDao)SpringUtils.getBean(ConsultResponseDao.class);
-	protected ProfessionalSpecialistDao specialistDao = (ProfessionalSpecialistDao)SpringUtils.getBean(ProfessionalSpecialistDao.class);
-	protected DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean(DemographicDao.class);
+	@Autowired
+	protected ProfessionalSpecialistDao specialistDao;
+
+	@Autowired
+	protected DemographicDao demographicDao;
 
 	@Before
 	public void before() throws Exception {

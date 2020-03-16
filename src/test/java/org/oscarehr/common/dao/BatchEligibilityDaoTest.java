@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BatchEligibility;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BatchEligibilityDaoTest extends DaoTestFixtures {
-
-	protected BatchEligibilityDao dao = (BatchEligibilityDao)SpringUtils.getBean("batchEligibilityDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BatchEligibilityDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BatchEligibilityDao batchEligibilityDao;
 
 	@Before
 	public void before() throws Exception {
@@ -46,7 +52,7 @@ public class BatchEligibilityDaoTest extends DaoTestFixtures {
 		BatchEligibility entity = new BatchEligibility();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setId(1000);
-		dao.persist(entity);
+		batchEligibilityDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

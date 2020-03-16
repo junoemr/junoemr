@@ -34,16 +34,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.model.OcanSubmissionLog;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class OcanSubmissionLogDaoTest extends DaoTestFixtures {
-
-	public OcanSubmissionLogDao dao = SpringUtils.getBean(OcanSubmissionLogDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class OcanSubmissionLogDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public OcanSubmissionLogDao ocanSubmissionLogDao;
 
 
 	@Before
@@ -55,7 +61,7 @@ public class OcanSubmissionLogDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		OcanSubmissionLog entity = new OcanSubmissionLog();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		ocanSubmissionLogDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -65,25 +71,25 @@ public class OcanSubmissionLogDaoTest extends DaoTestFixtures {
 		OcanSubmissionLog oSL1 = new OcanSubmissionLog();
 		EntityDataGenerator.generateTestDataForModelClass(oSL1);
 		oSL1.setSubmissionType(type);
-		dao.persist(oSL1);
+		ocanSubmissionLogDao.persist(oSL1);
 		
 		OcanSubmissionLog oSL2 = new OcanSubmissionLog();
 		EntityDataGenerator.generateTestDataForModelClass(oSL2);
 		oSL2.setSubmissionType(type);
-		dao.persist(oSL2);
+		ocanSubmissionLogDao.persist(oSL2);
 		
 		OcanSubmissionLog oSL3 = new OcanSubmissionLog();
 		EntityDataGenerator.generateTestDataForModelClass(oSL3);
 		oSL3.setSubmissionType(type);
-		dao.persist(oSL3);
+		ocanSubmissionLogDao.persist(oSL3);
 		
 		OcanSubmissionLog oSL4 = new OcanSubmissionLog();
 		EntityDataGenerator.generateTestDataForModelClass(oSL4);
 		oSL4.setSubmissionType(type);
-		dao.persist(oSL4);
+		ocanSubmissionLogDao.persist(oSL4);
 		
 		List<OcanSubmissionLog> expectedResult = new ArrayList<OcanSubmissionLog>(Arrays.asList(oSL1, oSL2, oSL3, oSL4));
-		List<OcanSubmissionLog> result = dao.findAllByType(type);
+		List<OcanSubmissionLog> result = ocanSubmissionLogDao.findAllByType(type);
 		
 		Logger logger = MiscUtils.getLogger();
 		

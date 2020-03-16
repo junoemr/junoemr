@@ -35,16 +35,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.model.CriteriaType;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CriteriaTypeDaoTest extends DaoTestFixtures {
-
-	public CriteriaTypeDao dao = SpringUtils.getBean(CriteriaTypeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CriteriaTypeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public CriteriaTypeDao criteriaTypeDao;
 
 
 	@Before
@@ -56,7 +62,7 @@ public class CriteriaTypeDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		CriteriaType entity = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		criteriaTypeDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -65,22 +71,22 @@ public class CriteriaTypeDaoTest extends DaoTestFixtures {
 		
 		CriteriaType cT1 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT1);
-		dao.persist(cT1);
+		criteriaTypeDao.persist(cT1);
 		
 		CriteriaType cT2 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT2);
-		dao.persist(cT2);
+		criteriaTypeDao.persist(cT2);
 		
 		CriteriaType cT3 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT3);
-		dao.persist(cT3);
+		criteriaTypeDao.persist(cT3);
 		
 		CriteriaType cT4 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT4);
-		dao.persist(cT4);
+		criteriaTypeDao.persist(cT4);
 		
 		List<CriteriaType> expectedResult = new ArrayList<CriteriaType>(Arrays.asList(cT1, cT2, cT3, cT4));
-		List<CriteriaType> result = dao.findAll();
+		List<CriteriaType> result = criteriaTypeDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -105,20 +111,20 @@ public class CriteriaTypeDaoTest extends DaoTestFixtures {
 		CriteriaType cT1 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT1);
 		cT1.setFieldName(fieldName1);
-		dao.persist(cT1);
+		criteriaTypeDao.persist(cT1);
 		
 		CriteriaType cT2 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT2);
 		cT2.setFieldName(fieldName2);
-		dao.persist(cT2);
+		criteriaTypeDao.persist(cT2);
 		
 		CriteriaType cT3 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT3);
 		cT3.setFieldName(fieldName3);
-		dao.persist(cT3);
+		criteriaTypeDao.persist(cT3);
 		
 		CriteriaType expectedResult = cT2;
-		CriteriaType result = dao.findByName(fieldName2);
+		CriteriaType result = criteriaTypeDao.findByName(fieldName2);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -133,34 +139,34 @@ public class CriteriaTypeDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(cT1);
 		cT1.setFieldType(fieldName2);
 		cT1.setWlProgramId(wlProgramId1);
-		dao.persist(cT1);
+		criteriaTypeDao.persist(cT1);
 		
 		CriteriaType cT2 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT2);
 		cT2.setFieldType(fieldName4);
 		cT2.setWlProgramId(wlProgramId2);
-		dao.persist(cT2);
+		criteriaTypeDao.persist(cT2);
 		
 		CriteriaType cT3 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT3);
 		cT3.setFieldType(fieldName5);
 		cT3.setWlProgramId(wlProgramId1);
-		dao.persist(cT3);
+		criteriaTypeDao.persist(cT3);
 		
 		CriteriaType cT4 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT4);
 		cT4.setFieldType(fieldName1);
 		cT4.setWlProgramId(wlProgramId1);
-		dao.persist(cT4);
+		criteriaTypeDao.persist(cT4);
 		
 		CriteriaType cT5 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT5);
 		cT5.setFieldType(fieldName3);
 		cT5.setWlProgramId(wlProgramId1);
-		dao.persist(cT5);
+		criteriaTypeDao.persist(cT5);
 		
 		List<CriteriaType> expectedResult = new ArrayList<CriteriaType>(Arrays.asList(cT3, cT5, cT1, cT4));
-		List<CriteriaType> result = dao.getAllCriteriaTypes();
+		List<CriteriaType> result = criteriaTypeDao.getAllCriteriaTypes();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -187,34 +193,34 @@ public class CriteriaTypeDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(cT1);
 		cT1.setFieldType(fieldName2);
 		cT1.setWlProgramId(wlProgramId1);
-		dao.persist(cT1);
+		criteriaTypeDao.persist(cT1);
 		
 		CriteriaType cT2 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT2);
 		cT2.setFieldType(fieldName4);
 		cT2.setWlProgramId(wlProgramId2);
-		dao.persist(cT2);
+		criteriaTypeDao.persist(cT2);
 		
 		CriteriaType cT3 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT3);
 		cT3.setFieldType(fieldName5);
 		cT3.setWlProgramId(wlProgramId1);
-		dao.persist(cT3);
+		criteriaTypeDao.persist(cT3);
 		
 		CriteriaType cT4 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT4);
 		cT4.setFieldType(fieldName1);
 		cT4.setWlProgramId(wlProgramId1);
-		dao.persist(cT4);
+		criteriaTypeDao.persist(cT4);
 		
 		CriteriaType cT5 = new CriteriaType();
 		EntityDataGenerator.generateTestDataForModelClass(cT5);
 		cT5.setFieldName(fieldName3);
 		cT5.setWlProgramId(wlProgramId1);
-		dao.persist(cT5);
+		criteriaTypeDao.persist(cT5);
 		
 		List<CriteriaType> expectedResult = new ArrayList<CriteriaType>(Arrays.asList(cT3, cT5, cT1, cT4));
-		List<CriteriaType> result = dao.getAllCriteriaTypesByWlProgramId(wlProgramId1);
+		List<CriteriaType> result = criteriaTypeDao.getAllCriteriaTypesByWlProgramId(wlProgramId1);
 
 		Logger logger = MiscUtils.getLogger();
 

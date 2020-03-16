@@ -35,15 +35,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlDocClass;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlDocClassDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlDocClassDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlDocClassDao ctlDocClassDao;
 
-	protected CtlDocClassDao dao = (CtlDocClassDao)SpringUtils.getBean(CtlDocClassDao.class);
 	Logger logger = MiscUtils.getLogger();
 
 	@Before
@@ -84,12 +91,12 @@ public class CtlDocClassDaoTest extends DaoTestFixtures {
 		class4.setSubClass("subD");
 		class4.setId(163);
 
-		dao.persist(class1);
-		dao.persist(class2);
-		dao.persist(class3);
-		dao.persist(class4);
+		ctlDocClassDao.persist(class1);
+		ctlDocClassDao.persist(class2);
+		ctlDocClassDao.persist(class3);
+		ctlDocClassDao.persist(class4);
 
-		List<String> result = dao.findSubClassesByReportClass(reportClass);
+		List<String> result = ctlDocClassDao.findSubClassesByReportClass(reportClass);
 		List<String> expectedResult = new ArrayList<String>(Arrays.asList("subA", "subB"));
 
 		assertEquals(result.size(), expectedResult.size());
@@ -137,12 +144,12 @@ public class CtlDocClassDaoTest extends DaoTestFixtures {
 		class4.setReportClass("classC");
 		class4.setId(164);
 
-		dao.persist(class1);
-		dao.persist(class2);
-		dao.persist(class3);
-		dao.persist(class4);
+		ctlDocClassDao.persist(class1);
+		ctlDocClassDao.persist(class2);
+		ctlDocClassDao.persist(class3);
+		ctlDocClassDao.persist(class4);
 
-		List<String> result = dao.findUniqueReportClasses();
+		List<String> result = ctlDocClassDao.findUniqueReportClasses();
 		List<String> expectedResult = new ArrayList<String>(Arrays.asList("classA","classB", "classC"));
 		assertTrue(result.containsAll(expectedResult));
 
@@ -155,7 +162,7 @@ public class CtlDocClassDaoTest extends DaoTestFixtures {
 	            uniqueClasses.add(reportClass);
 	        }
 	    }
-		assertEquals(uniqueClasses.size(), dao.findUniqueReportClasses().size());
+		assertEquals(uniqueClasses.size(), ctlDocClassDao.findUniqueReportClasses().size());
 
 		// ensure that all persisted items are in the table
 		// ordered by reportClass lexicographically

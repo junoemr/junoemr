@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.HashAudit;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class HashAuditDaoTest extends DaoTestFixtures {
-
-	protected HashAuditDao dao = SpringUtils.getBean(HashAuditDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class HashAuditDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected HashAuditDao hashAuditDao;
 
 
 	@Before
@@ -46,7 +52,7 @@ public class HashAuditDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		HashAudit entity = new HashAudit();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		hashAuditDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

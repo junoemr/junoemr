@@ -34,15 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ConfigImmunization;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ConfigImmunizationDaoTest extends DaoTestFixtures {
-
-	protected ConfigImmunizationDao dao = (ConfigImmunizationDao)SpringUtils.getBean(ConfigImmunizationDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ConfigImmunizationDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ConfigImmunizationDao configImmunizationDao;
 
 	@Before
 	public void before() throws Exception {
@@ -53,7 +59,7 @@ public class ConfigImmunizationDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		ConfigImmunization entity = new ConfigImmunization();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		configImmunizationDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -72,28 +78,28 @@ public class ConfigImmunizationDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(configImmunization1);
 		configImmunization1.setArchived(archived1);
 		configImmunization1.setName(name1);
-		dao.persist(configImmunization1);
+		configImmunizationDao.persist(configImmunization1);
 		
 		ConfigImmunization configImmunization2 = new ConfigImmunization();
 		EntityDataGenerator.generateTestDataForModelClass(configImmunization2);
 		configImmunization2.setArchived(archived1);
 		configImmunization2.setName(name2);
-		dao.persist(configImmunization2);
+		configImmunizationDao.persist(configImmunization2);
 		
 		ConfigImmunization configImmunization3 = new ConfigImmunization();
 		EntityDataGenerator.generateTestDataForModelClass(configImmunization3);
 		configImmunization3.setArchived(archived2);
 		configImmunization3.setName(name3);
-		dao.persist(configImmunization3);
+		configImmunizationDao.persist(configImmunization3);
 		
 		ConfigImmunization configImmunization4 = new ConfigImmunization();
 		EntityDataGenerator.generateTestDataForModelClass(configImmunization4);
 		configImmunization4.setArchived(archived1);
 		configImmunization4.setName(name4);
-		dao.persist(configImmunization4);
+		configImmunizationDao.persist(configImmunization4);
 		
 		List<ConfigImmunization> expectedResult = new ArrayList<ConfigImmunization>(Arrays.asList(configImmunization2, configImmunization4, configImmunization1));
-		List<ConfigImmunization> result = dao.findAll();
+		List<ConfigImmunization> result = configImmunizationDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -125,28 +131,28 @@ public class ConfigImmunizationDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(configImmunization1);
 		configImmunization1.setArchived(archived1);
 		configImmunization1.setName(name1);
-		dao.persist(configImmunization1);
+		configImmunizationDao.persist(configImmunization1);
 		
 		ConfigImmunization configImmunization2 = new ConfigImmunization();
 		EntityDataGenerator.generateTestDataForModelClass(configImmunization2);
 		configImmunization2.setArchived(archived1);
 		configImmunization2.setName(name2);
-		dao.persist(configImmunization2);
+		configImmunizationDao.persist(configImmunization2);
 		
 		ConfigImmunization configImmunization3 = new ConfigImmunization();
 		EntityDataGenerator.generateTestDataForModelClass(configImmunization3);
 		configImmunization3.setArchived(archived2);
 		configImmunization3.setName(name3);
-		dao.persist(configImmunization3);
+		configImmunizationDao.persist(configImmunization3);
 		
 		ConfigImmunization configImmunization4 = new ConfigImmunization();
 		EntityDataGenerator.generateTestDataForModelClass(configImmunization4);
 		configImmunization4.setArchived(archived1);
 		configImmunization4.setName(name4);
-		dao.persist(configImmunization4);
+		configImmunizationDao.persist(configImmunization4);
 		
 		List<ConfigImmunization> expectedResult = new ArrayList<ConfigImmunization>(Arrays.asList(configImmunization2, configImmunization4, configImmunization1));
-		List<ConfigImmunization> result = dao.findByArchived(archived1, true);
+		List<ConfigImmunization> result = configImmunizationDao.findByArchived(archived1, true);
 
 		Logger logger = MiscUtils.getLogger();
 		

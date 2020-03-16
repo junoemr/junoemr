@@ -63,6 +63,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.dao.ProgramDao;
 import org.oscarehr.PMmodule.dao.ProgramProviderDAO;
 import org.oscarehr.PMmodule.dao.ProviderDao;
@@ -108,11 +109,19 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.form.FrmLabReq07Record;
 
 
-public class OntarioMDSpec4DataTest extends DaoTestFixtures {
-	protected AdmissionDao admissionDao = (AdmissionDao) SpringUtils.getBean("admissionDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class OntarioMDSpec4DataTest extends DaoTestFixtures
+{
+	@Autowired
+	protected AdmissionDao admissionDao;
+
 	protected Integer oscarProgramID;
 	
 	@Before

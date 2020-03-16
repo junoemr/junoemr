@@ -31,14 +31,20 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.SentToPHRTracking;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SentToPHRTrackingDaoTest extends DaoTestFixtures {
-
-	protected SentToPHRTrackingDao dao = SpringUtils.getBean(SentToPHRTrackingDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SentToPHRTrackingDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SentToPHRTrackingDao sentToPHRTrackingDao;
 
 	@Before
 	public void before() throws Exception {
@@ -49,7 +55,7 @@ public class SentToPHRTrackingDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		SentToPHRTracking entity = new SentToPHRTracking();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		sentToPHRTrackingDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -69,17 +75,17 @@ public class SentToPHRTrackingDaoTest extends DaoTestFixtures {
 		PHRTracking1.setDemographicNo(demoNo1);
 		PHRTracking1.setObjectName(objName1);
 		PHRTracking1.setSentToServer(server1);
-		dao.persist(PHRTracking1);
+		sentToPHRTrackingDao.persist(PHRTracking1);
 		
 		SentToPHRTracking PHRTracking2 = new SentToPHRTracking();
 		EntityDataGenerator.generateTestDataForModelClass(PHRTracking2);
 		PHRTracking2.setDemographicNo(demoNo2);
 		PHRTracking2.setObjectName(objName2);
 		PHRTracking2.setSentToServer(server2);
-		dao.persist(PHRTracking2);
+		sentToPHRTrackingDao.persist(PHRTracking2);
 		
 		SentToPHRTracking expcetedResult = PHRTracking1;
-		SentToPHRTracking result = dao.findByDemographicObjectServer(demoNo1, objName1, server1);
+		SentToPHRTracking result = sentToPHRTrackingDao.findByDemographicObjectServer(demoNo1, objName1, server1);
 		
 		assertEquals(expcetedResult, result);		
 	}

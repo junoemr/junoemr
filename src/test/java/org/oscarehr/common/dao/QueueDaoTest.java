@@ -35,14 +35,21 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Queue;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class QueueDaoTest extends DaoTestFixtures {
-	protected QueueDao dao = (QueueDao)SpringUtils.getBean(QueueDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class QueueDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected QueueDao queueDao;
 	
 	@Override
 	@Test
@@ -60,11 +67,11 @@ public class QueueDaoTest extends DaoTestFixtures {
 		Queue queue1 = new Queue();
 		EntityDataGenerator.generateTestDataForModelClass(queue1);
 		queue1.setName("alpha");
-		dao.persist(queue1);
+		queueDao.persist(queue1);
 		
 		HashMap<Integer,String> expectedResult = new HashMap<Integer,String>();
 		expectedResult.put(queue1.getId(), "alpha");
-		HashMap<Integer,String> result = dao.getHashMapOfQueues();
+		HashMap<Integer,String> result = queueDao.getHashMapOfQueues();
 		
 		assertEquals(expectedResult, result);
 	}
@@ -74,11 +81,11 @@ public class QueueDaoTest extends DaoTestFixtures {
 		
 		Queue queue1 = new Queue();
 		EntityDataGenerator.generateTestDataForModelClass(queue1);
-		dao.persist(queue1);
+		queueDao.persist(queue1);
 		
 		Queue queue2 = new Queue();
 		EntityDataGenerator.generateTestDataForModelClass(queue2);
-		dao.persist(queue2);
+		queueDao.persist(queue2);
 		
 		//Hashtable htQueue1=new Hashtable();
        // htQueue1.put("id", queue1.getId());
@@ -88,7 +95,7 @@ public class QueueDaoTest extends DaoTestFixtures {
       //  htQueue2.put("id", queue2.getId());
       //  htQueue2.put("queue", queue2.getName());
 		
-		List<Hashtable> result = dao.getQueues();
+		List<Hashtable> result = queueDao.getQueues();
 		//List<Hashtable> expectedResult = new ArrayList<Hashtable>(Arrays.asList(htQueue1, htQueue2));
 		
 		assertEquals(2, result.size());
@@ -99,15 +106,15 @@ public class QueueDaoTest extends DaoTestFixtures {
 		
 		Queue queue1 = new Queue();
 		EntityDataGenerator.generateTestDataForModelClass(queue1);
-		dao.persist(queue1);
+		queueDao.persist(queue1);
 		
 		Queue queue2 = new Queue();
 		EntityDataGenerator.generateTestDataForModelClass(queue2);
-		dao.persist(queue2);
+		queueDao.persist(queue2);
 		
 		Queue queue3 = new Queue();
 		EntityDataGenerator.generateTestDataForModelClass(queue3);
-		dao.persist(queue3);
+		queueDao.persist(queue3);
 		
 		int latestId = 0;
 		int id1 =queue1.getId();
@@ -120,7 +127,7 @@ public class QueueDaoTest extends DaoTestFixtures {
 	      else if ( id3 > id1 && id3 > id2 )
 	    	  latestId = id3;  
 	         
-		String result = dao.getLastId();
+		String result = queueDao.getLastId();
 		String expectedResult = String.valueOf(latestId);
 		
 		assertEquals(expectedResult, result);
@@ -136,20 +143,20 @@ public class QueueDaoTest extends DaoTestFixtures {
 		Queue queue1 = new Queue();
 		EntityDataGenerator.generateTestDataForModelClass(queue1);
 		queue1.setName(name1);
-		dao.persist(queue1);
+		queueDao.persist(queue1);
 		
 		Queue queue2 = new Queue();
 		EntityDataGenerator.generateTestDataForModelClass(queue2);
 		queue2.setName(name2);
-		dao.persist(queue2);
+		queueDao.persist(queue2);
 		
 		Queue queue3 = new Queue();
 		EntityDataGenerator.generateTestDataForModelClass(queue3);
 		queue3.setName(name3);
-		dao.persist(queue3);
+		queueDao.persist(queue3);
 		
 		String expectedResult = name2;
-		String result = dao.getQueueName(queue2.getId());
+		String result = queueDao.getQueueName(queue2.getId());
 		
 		assertEquals(expectedResult, result);
 	}
@@ -164,20 +171,20 @@ public class QueueDaoTest extends DaoTestFixtures {
 		Queue queue1 = new Queue();
 		EntityDataGenerator.generateTestDataForModelClass(queue1);
 		queue1.setName(name1);
-		dao.persist(queue1);
+		queueDao.persist(queue1);
 		
 		Queue queue2 = new Queue();
 		EntityDataGenerator.generateTestDataForModelClass(queue2);
 		queue2.setName(name2);
-		dao.persist(queue2);
+		queueDao.persist(queue2);
 		
 		Queue queue3 = new Queue();
 		EntityDataGenerator.generateTestDataForModelClass(queue3);
 		queue3.setName(name3);
-		dao.persist(queue3);
+		queueDao.persist(queue3);
 		
 		String expectedResult = queue2.getId().toString();
-		String result = dao.getQueueid(name2);
+		String result = queueDao.getQueueid(name2);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -188,7 +195,7 @@ public class QueueDaoTest extends DaoTestFixtures {
 		String name1 = "Sigma";
 		
 		boolean expectedResult = true;
-		boolean result = dao.addNewQueue(name1);
+		boolean result = queueDao.addNewQueue(name1);
 		
 		assertEquals(expectedResult, result);
 	}

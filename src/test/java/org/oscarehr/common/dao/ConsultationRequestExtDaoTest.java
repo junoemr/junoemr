@@ -33,15 +33,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ConsultationRequestExt;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ConsultationRequestExtDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ConsultationRequestExtDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ConsultationRequestExtDao consultationRequestExtDao;
 
-	protected ConsultationRequestExtDao dao = (ConsultationRequestExtDao)SpringUtils.getBean(ConsultationRequestExtDao.class);
 	Logger logger = MiscUtils.getLogger();
 	
 	@Before
@@ -71,11 +78,11 @@ public class ConsultationRequestExtDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(conReqExt3);
 		conReqExt3.setRequestId(requestId);
 		
-		dao.persist(conReqExt1);
-		dao.persist(conReqExt2);
-		dao.persist(conReqExt3);
+		consultationRequestExtDao.persist(conReqExt1);
+		consultationRequestExtDao.persist(conReqExt2);
+		consultationRequestExtDao.persist(conReqExt3);
 		
-		List<ConsultationRequestExt> result = dao.getConsultationRequestExts(requestId); 
+		List<ConsultationRequestExt> result = consultationRequestExtDao.getConsultationRequestExts(requestId);
 		List<ConsultationRequestExt> expectedResult = new ArrayList<ConsultationRequestExt>(Arrays.asList(
 				conReqExt1,
 				conReqExt3
@@ -121,13 +128,13 @@ public class ConsultationRequestExtDaoTest extends DaoTestFixtures {
 		conReqExt4.setKey(key);
 		conReqExt4.setValue("value4");
 		
-		dao.persist(conReqExt1);
-		dao.persist(conReqExt2);
-		dao.persist(conReqExt3);
-		dao.persist(conReqExt4);
+		consultationRequestExtDao.persist(conReqExt1);
+		consultationRequestExtDao.persist(conReqExt2);
+		consultationRequestExtDao.persist(conReqExt3);
+		consultationRequestExtDao.persist(conReqExt4);
 		
 		String expectedResult = "value1";
-		String result = dao.getConsultationRequestExtsByKey(requestId, key);
+		String result = consultationRequestExtDao.getConsultationRequestExtsByKey(requestId, key);
 		
 		assertEquals(expectedResult, result);
 	}

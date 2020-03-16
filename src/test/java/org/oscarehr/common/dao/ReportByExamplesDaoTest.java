@@ -29,14 +29,20 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ReportByExamples;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ReportByExamplesDaoTest extends DaoTestFixtures {
-
-	protected ReportByExamplesDao dao = SpringUtils.getBean(ReportByExamplesDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ReportByExamplesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ReportByExamplesDao reportByExamplesDao;
 
 	@Before
 	public void before() throws Exception {
@@ -47,13 +53,13 @@ public class ReportByExamplesDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		ReportByExamples entity = new ReportByExamples();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		reportByExamplesDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testFindReportsAndProviders() {
-		assertNotNull(dao.findReportsAndProviders());
-		assertNotNull(dao.findReportsAndProviders(new Date(), new Date()));
+		assertNotNull(reportByExamplesDao.findReportsAndProviders());
+		assertNotNull(reportByExamplesDao.findReportsAndProviders(new Date(), new Date()));
 	}
 }

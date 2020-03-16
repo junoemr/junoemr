@@ -32,16 +32,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.demographic.dao.DemographicMergedDao;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DemographicMergedDaoTest extends DaoTestFixtures {
-
-	protected DemographicMergedDao dao = SpringUtils.getBean(DemographicMergedDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DemographicMergedDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DemographicMergedDao demographicMergedDao;
 
 	@Before
 	public void before() throws Exception {
@@ -52,7 +58,7 @@ public class DemographicMergedDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		DemographicMerged entity = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		demographicMergedDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -69,28 +75,28 @@ public class DemographicMergedDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged1);
 		demoMerged1.setMergedTo(mergedTo1);
 		demoMerged1.setDeleted(isNotDeleted);
-		dao.persist(demoMerged1);
+		demographicMergedDao.persist(demoMerged1);
 		
 		DemographicMerged demoMerged2 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged2);
 		demoMerged2.setMergedTo(mergedTo2);
 		demoMerged2.setDeleted(isNotDeleted);
-		dao.persist(demoMerged2);
+		demographicMergedDao.persist(demoMerged2);
 		
 		DemographicMerged demoMerged3 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged3);
 		demoMerged3.setMergedTo(mergedTo1);
 		demoMerged3.setDeleted(isNotDeleted);
-		dao.persist(demoMerged3);
+		demographicMergedDao.persist(demoMerged3);
 		
 		DemographicMerged demoMerged4 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged4);
 		demoMerged4.setMergedTo(mergedTo1);
 		demoMerged4.setDeleted(isDeleted);
-		dao.persist(demoMerged4);
+		demographicMergedDao.persist(demoMerged4);
 		
 		List<DemographicMerged> expectedResult = new ArrayList<DemographicMerged>(Arrays.asList(demoMerged1, demoMerged3));		
-		List<DemographicMerged> result = dao.findCurrentByMergedTo(mergedTo1);
+		List<DemographicMerged> result = demographicMergedDao.findCurrentByMergedTo(mergedTo1);
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {
 			logger.warn("Array sizes do not match.");
@@ -119,28 +125,28 @@ public class DemographicMergedDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged1);
 		demoMerged1.setDemographicNo(demographicNo1);
 		demoMerged1.setDeleted(isNotDeleted);
-		dao.persist(demoMerged1);
+		demographicMergedDao.persist(demoMerged1);
 		
 		DemographicMerged demoMerged2 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged2);
 		demoMerged2.setDemographicNo(demographicNo2);
 		demoMerged2.setDeleted(isNotDeleted);
-		dao.persist(demoMerged2);
+		demographicMergedDao.persist(demoMerged2);
 		
 		DemographicMerged demoMerged3 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged3);
 		demoMerged3.setDemographicNo(demographicNo1);
 		demoMerged3.setDeleted(isNotDeleted);
-		dao.persist(demoMerged3);
+		demographicMergedDao.persist(demoMerged3);
 		
 		DemographicMerged demoMerged4 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged4);
 		demoMerged4.setDemographicNo(demographicNo1);
 		demoMerged4.setDeleted(isDeleted);
-		dao.persist(demoMerged4);
+		demographicMergedDao.persist(demoMerged4);
 		
 		List<DemographicMerged> expectedResult = new ArrayList<DemographicMerged>(Arrays.asList(demoMerged1, demoMerged3));		
-		List<DemographicMerged> result = dao.findCurrentByDemographicNo(demographicNo1);
+		List<DemographicMerged> result = demographicMergedDao.findCurrentByDemographicNo(demographicNo1);
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {
 			logger.warn("Array sizes do not match. Result: "+result.size());
@@ -165,20 +171,20 @@ public class DemographicMergedDaoTest extends DaoTestFixtures {
 		DemographicMerged demoMerged1 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged1);
 		demoMerged1.setDemographicNo(demographicNo1);
-		dao.persist(demoMerged1);
+		demographicMergedDao.persist(demoMerged1);
 		
 		DemographicMerged demoMerged2 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged2);
 		demoMerged2.setDemographicNo(demographicNo2);
-		dao.persist(demoMerged2);
+		demographicMergedDao.persist(demoMerged2);
 		
 		DemographicMerged demoMerged3 = new DemographicMerged();
 		EntityDataGenerator.generateTestDataForModelClass(demoMerged3);
 		demoMerged3.setDemographicNo(demographicNo2);
-		dao.persist(demoMerged3);
+		demographicMergedDao.persist(demoMerged3);
 		
 		List<DemographicMerged> expectedResult = new ArrayList<DemographicMerged>(Arrays.asList(demoMerged1));		
-		List<DemographicMerged> result = dao.findByDemographicNo(demographicNo1);
+		List<DemographicMerged> result = demographicMergedDao.findByDemographicNo(demographicNo1);
 		
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {

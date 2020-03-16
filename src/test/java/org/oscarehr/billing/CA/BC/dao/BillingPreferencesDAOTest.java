@@ -28,17 +28,23 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.oscarBilling.ca.bc.data.BillingPreference;
 import oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO;
 
-public class BillingPreferencesDAOTest extends DaoTestFixtures {
-
-	public BillingPreferencesDAO dao = SpringUtils.getBean(BillingPreferencesDAO.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingPreferencesDAOTest extends DaoTestFixtures
+{
+	@Autowired
+	public BillingPreferencesDAO billingPreferencesDAO;
 
 	@Before
 	public void before() throws Exception {
@@ -49,10 +55,10 @@ public class BillingPreferencesDAOTest extends DaoTestFixtures {
 	public void testAllAtOnce() throws Exception {
 		BillingPreference pref = new BillingPreference();
 		EntityDataGenerator.generateTestDataForModelClass(pref);
-		dao.saveEntity(pref);
+		billingPreferencesDAO.saveEntity(pref);
 		assertTrue(pref.isPersistent());
 		
-		BillingPreference prefCheck = dao.getUserBillingPreference(String.valueOf(pref.getProviderNo()));
+		BillingPreference prefCheck = billingPreferencesDAO.getUserBillingPreference(String.valueOf(pref.getProviderNo()));
 		assertNotNull(prefCheck);
 	}
 }

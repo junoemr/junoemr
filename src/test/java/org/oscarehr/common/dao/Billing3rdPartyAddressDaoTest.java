@@ -34,15 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.ON.model.Billing3rdPartyAddress;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class Billing3rdPartyAddressDaoTest extends DaoTestFixtures{
-
-	protected Billing3rdPartyAddressDao dao = SpringUtils.getBean(Billing3rdPartyAddressDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class Billing3rdPartyAddressDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected Billing3rdPartyAddressDao billing3rdPartyAddressDao;
 
 	public Billing3rdPartyAddressDaoTest() {
 	}
@@ -56,7 +62,7 @@ public class Billing3rdPartyAddressDaoTest extends DaoTestFixtures{
 	public void testCreate() throws Exception {
 		Billing3rdPartyAddress entity = new Billing3rdPartyAddress();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		billing3rdPartyAddressDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -69,30 +75,30 @@ public class Billing3rdPartyAddressDaoTest extends DaoTestFixtures{
 		Billing3rdPartyAddress billing3rdPartyAddress1 = new Billing3rdPartyAddress();
 		EntityDataGenerator.generateTestDataForModelClass(billing3rdPartyAddress1);
 		billing3rdPartyAddress1.setCompanyName(companyName1);
-		dao.persist(billing3rdPartyAddress1);
+		billing3rdPartyAddressDao.persist(billing3rdPartyAddress1);
 		
 		Billing3rdPartyAddress billing3rdPartyAddress2 = new Billing3rdPartyAddress();
 		EntityDataGenerator.generateTestDataForModelClass(billing3rdPartyAddress2);
 		billing3rdPartyAddress2.setCompanyName(companyName2);
-		dao.persist(billing3rdPartyAddress2);
+		billing3rdPartyAddressDao.persist(billing3rdPartyAddress2);
 		
 		Billing3rdPartyAddress billing3rdPartyAddress3 = new Billing3rdPartyAddress();
 		EntityDataGenerator.generateTestDataForModelClass(billing3rdPartyAddress3);
 		billing3rdPartyAddress3.setCompanyName(companyName2);
-		dao.persist(billing3rdPartyAddress3);
+		billing3rdPartyAddressDao.persist(billing3rdPartyAddress3);
 		
 		Billing3rdPartyAddress billing3rdPartyAddress4 = new Billing3rdPartyAddress();
 		EntityDataGenerator.generateTestDataForModelClass(billing3rdPartyAddress4);
 		billing3rdPartyAddress4.setCompanyName(companyName1);
-		dao.persist(billing3rdPartyAddress4);
+		billing3rdPartyAddressDao.persist(billing3rdPartyAddress4);
 		
 		Billing3rdPartyAddress billing3rdPartyAddress5 = new Billing3rdPartyAddress();
 		EntityDataGenerator.generateTestDataForModelClass(billing3rdPartyAddress5);
 		billing3rdPartyAddress5.setCompanyName(companyName1);
-		dao.persist(billing3rdPartyAddress5);
+		billing3rdPartyAddressDao.persist(billing3rdPartyAddress5);
 		
 		List<Billing3rdPartyAddress> expectedResult = new ArrayList<Billing3rdPartyAddress>(Arrays.asList(billing3rdPartyAddress1, billing3rdPartyAddress4, billing3rdPartyAddress5));
-		List<Billing3rdPartyAddress> result = dao.findByCompanyName(companyName1);
+		List<Billing3rdPartyAddress> result = billing3rdPartyAddressDao.findByCompanyName(companyName1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -111,7 +117,7 @@ public class Billing3rdPartyAddressDaoTest extends DaoTestFixtures{
 
     @Test
     public void testFindAddresses() {
-    	assertNotNull(dao.findAddresses(null, null, null, null, null));
+    	assertNotNull(billing3rdPartyAddressDao.findAddresses(null, null, null, null, null));
     }
 
 	@Override

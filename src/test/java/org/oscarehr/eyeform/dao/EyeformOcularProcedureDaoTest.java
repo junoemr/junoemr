@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.eyeform.model.EyeformOcularProcedure;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class EyeformOcularProcedureDaoTest extends DaoTestFixtures {
-
-	public EyeformOcularProcedureDao dao = SpringUtils.getBean(EyeformOcularProcedureDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EyeformOcularProcedureDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public EyeformOcularProcedureDao eyeformOcularProcedureDao;
 
 
 	@Before
@@ -47,7 +53,7 @@ public class EyeformOcularProcedureDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		EyeformOcularProcedure entity = new EyeformOcularProcedure();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		eyeformOcularProcedureDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

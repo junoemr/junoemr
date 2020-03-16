@@ -36,15 +36,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ProviderLabRoutingFavorite;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ProviderLabRoutingFavoritesDaoTest extends DaoTestFixtures {
-	
-	protected ProviderLabRoutingFavoritesDao dao = (ProviderLabRoutingFavoritesDao)SpringUtils.getBean(ProviderLabRoutingFavoritesDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProviderLabRoutingFavoritesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProviderLabRoutingFavoritesDao providerLabRoutingFavoritesDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -60,20 +66,20 @@ public class ProviderLabRoutingFavoritesDaoTest extends DaoTestFixtures {
 		ProviderLabRoutingFavorite providerLabRoutingFav1 = new ProviderLabRoutingFavorite();
 		EntityDataGenerator.generateTestDataForModelClass(providerLabRoutingFav1);
 		providerLabRoutingFav1.setProvider_no(providerNo1);
-		dao.persist(providerLabRoutingFav1);
+		providerLabRoutingFavoritesDao.persist(providerLabRoutingFav1);
 		
 		ProviderLabRoutingFavorite providerLabRoutingFav2 = new ProviderLabRoutingFavorite();
 		EntityDataGenerator.generateTestDataForModelClass(providerLabRoutingFav2);
 		providerLabRoutingFav2.setProvider_no(providerNo2);
-		dao.persist(providerLabRoutingFav2);
+		providerLabRoutingFavoritesDao.persist(providerLabRoutingFav2);
 		
 		ProviderLabRoutingFavorite providerLabRoutingFav3 = new ProviderLabRoutingFavorite();
 		EntityDataGenerator.generateTestDataForModelClass(providerLabRoutingFav3);
 		providerLabRoutingFav3.setProvider_no(providerNo1);
-		dao.persist(providerLabRoutingFav3);
+		providerLabRoutingFavoritesDao.persist(providerLabRoutingFav3);
 		
 		List<ProviderLabRoutingFavorite> expectedResult = new ArrayList<ProviderLabRoutingFavorite>(Arrays.asList(providerLabRoutingFav1, providerLabRoutingFav3));
-		List<ProviderLabRoutingFavorite> result = dao.findFavorites(providerNo1);
+		List<ProviderLabRoutingFavorite> result = providerLabRoutingFavoritesDao.findFavorites(providerNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		

@@ -37,15 +37,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ProfessionalSpecialistDaoTest extends DaoTestFixtures {
-	
-	protected ProfessionalSpecialistDao dao = (ProfessionalSpecialistDao)SpringUtils.getBean(ProfessionalSpecialistDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProfessionalSpecialistDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProfessionalSpecialistDao professionalSpecialistDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -68,24 +74,24 @@ public class ProfessionalSpecialistDaoTest extends DaoTestFixtures {
 		professionalSpecialist1.setFirstName(fName2);
 		professionalSpecialist1.setLastName(lName2);
 		professionalSpecialist1.setHideFromView(false);
-		dao.persist(professionalSpecialist1);
+		professionalSpecialistDao.persist(professionalSpecialist1);
 		
 		ProfessionalSpecialist professionalSpecialist2 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist2);
 		professionalSpecialist2.setFirstName(fName3);
 		professionalSpecialist2.setLastName(lName3);
 		professionalSpecialist2.setHideFromView(false);
-		dao.persist(professionalSpecialist2);
+		professionalSpecialistDao.persist(professionalSpecialist2);
 		
 		ProfessionalSpecialist professionalSpecialist3 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist3);
 		professionalSpecialist3.setFirstName(fName1);
 		professionalSpecialist3.setLastName(lName1);
 		professionalSpecialist3.setHideFromView(false);
-		dao.persist(professionalSpecialist3);
+		professionalSpecialistDao.persist(professionalSpecialist3);
 		
 		List<ProfessionalSpecialist> expectedResult = new ArrayList<ProfessionalSpecialist>(Arrays.asList(professionalSpecialist3, professionalSpecialist1, professionalSpecialist2));
-		List<ProfessionalSpecialist> result = dao.findAll();
+		List<ProfessionalSpecialist> result = professionalSpecialistDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -126,7 +132,7 @@ public class ProfessionalSpecialistDaoTest extends DaoTestFixtures {
 		professionalSpecialist1.setLastName(lName2);
 		professionalSpecialist1.seteDataUrl(eDataUrl1);
 		professionalSpecialist1.setHideFromView(false);
-		dao.persist(professionalSpecialist1);
+		professionalSpecialistDao.persist(professionalSpecialist1);
 		
 		ProfessionalSpecialist professionalSpecialist2 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist2);
@@ -134,7 +140,7 @@ public class ProfessionalSpecialistDaoTest extends DaoTestFixtures {
 		professionalSpecialist2.setLastName(lName3);
 		professionalSpecialist2.seteDataUrl(eDataUrl2);
 		professionalSpecialist2.setHideFromView(false);
-		dao.persist(professionalSpecialist2);
+		professionalSpecialistDao.persist(professionalSpecialist2);
 		
 		ProfessionalSpecialist professionalSpecialist3 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist3);
@@ -142,7 +148,7 @@ public class ProfessionalSpecialistDaoTest extends DaoTestFixtures {
 		professionalSpecialist3.setLastName(lName1);
 		professionalSpecialist3.seteDataUrl(eDataUrl3);
 		professionalSpecialist3.setHideFromView(false);
-		dao.persist(professionalSpecialist3);
+		professionalSpecialistDao.persist(professionalSpecialist3);
 		
 		ProfessionalSpecialist professionalSpecialist4 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist4);
@@ -150,10 +156,10 @@ public class ProfessionalSpecialistDaoTest extends DaoTestFixtures {
 		professionalSpecialist4.setLastName(lName4);
 		professionalSpecialist4.seteDataUrl(eDataUrl4);
 		professionalSpecialist4.setHideFromView(false);
-		dao.persist(professionalSpecialist4);
+		professionalSpecialistDao.persist(professionalSpecialist4);
 		
 		List<ProfessionalSpecialist> expectedResult = new ArrayList<ProfessionalSpecialist>(Arrays.asList(professionalSpecialist3, professionalSpecialist1, professionalSpecialist2));
-		List<ProfessionalSpecialist> result = dao.findByEDataUrlNotNull();
+		List<ProfessionalSpecialist> result = professionalSpecialistDao.findByEDataUrlNotNull();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -185,24 +191,24 @@ public class ProfessionalSpecialistDaoTest extends DaoTestFixtures {
 		professionalSpecialist1.setFirstName(fName1);
 		professionalSpecialist1.setLastName(lName1);
 		professionalSpecialist1.setHideFromView(false);
-		dao.persist(professionalSpecialist1);
+		professionalSpecialistDao.persist(professionalSpecialist1);
 		
 		ProfessionalSpecialist professionalSpecialist2 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist2);
 		professionalSpecialist2.setFirstName(fName2);
 		professionalSpecialist2.setLastName(lName2);
 		professionalSpecialist2.setHideFromView(false);
-		dao.persist(professionalSpecialist2);
+		professionalSpecialistDao.persist(professionalSpecialist2);
 		
 		ProfessionalSpecialist professionalSpecialist3 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist3);
 		professionalSpecialist3.setFirstName(fName1);
 		professionalSpecialist3.setLastName(lName1);
 		professionalSpecialist3.setHideFromView(false);
-		dao.persist(professionalSpecialist3);
+		professionalSpecialistDao.persist(professionalSpecialist3);
 		
 		List<ProfessionalSpecialist> expectedResult = new ArrayList<ProfessionalSpecialist>(Arrays.asList(professionalSpecialist1, professionalSpecialist3));
-		List<ProfessionalSpecialist> result = dao.findByFullName(lName1, fName1);
+		List<ProfessionalSpecialist> result = professionalSpecialistDao.findByFullName(lName1, fName1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -233,24 +239,24 @@ public class ProfessionalSpecialistDaoTest extends DaoTestFixtures {
 		professionalSpecialist1.setFirstName(fName1);
 		professionalSpecialist1.setLastName(lName1);
 		professionalSpecialist1.setHideFromView(false);
-		dao.persist(professionalSpecialist1);
+		professionalSpecialistDao.persist(professionalSpecialist1);
 		
 		ProfessionalSpecialist professionalSpecialist2 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist2);
 		professionalSpecialist2.setFirstName(fName2);
 		professionalSpecialist2.setLastName(lName2);
 		professionalSpecialist2.setHideFromView(false);
-		dao.persist(professionalSpecialist2);
+		professionalSpecialistDao.persist(professionalSpecialist2);
 		
 		ProfessionalSpecialist professionalSpecialist3 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist3);
 		professionalSpecialist3.setFirstName(fName1);
 		professionalSpecialist3.setLastName(lName1);
 		professionalSpecialist3.setHideFromView(false);
-		dao.persist(professionalSpecialist3);
+		professionalSpecialistDao.persist(professionalSpecialist3);
 		
 		List<ProfessionalSpecialist> expectedResult = new ArrayList<ProfessionalSpecialist>(Arrays.asList(professionalSpecialist1, professionalSpecialist3));
-		List<ProfessionalSpecialist> result = dao.findByLastName(lName1);
+		List<ProfessionalSpecialist> result = professionalSpecialistDao.findByLastName(lName1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -282,24 +288,24 @@ public class ProfessionalSpecialistDaoTest extends DaoTestFixtures {
 		professionalSpecialist1.setSpecialtyType(specialty1);
 		professionalSpecialist1.setLastName(lName2);
 		professionalSpecialist1.setHideFromView(false);
-		dao.persist(professionalSpecialist1);
+		professionalSpecialistDao.persist(professionalSpecialist1);
 		
 		ProfessionalSpecialist professionalSpecialist2 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist2);
 		professionalSpecialist2.setSpecialtyType(specialty2);
 		professionalSpecialist2.setLastName(lName3);
 		professionalSpecialist2.setHideFromView(false);
-		dao.persist(professionalSpecialist2);
+		professionalSpecialistDao.persist(professionalSpecialist2);
 		
 		ProfessionalSpecialist professionalSpecialist3 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist3);
 		professionalSpecialist3.setSpecialtyType(specialty1);
 		professionalSpecialist3.setLastName(lName1);
 		professionalSpecialist3.setHideFromView(false);
-		dao.persist(professionalSpecialist3);
+		professionalSpecialistDao.persist(professionalSpecialist3);
 		
 		List<ProfessionalSpecialist> expectedResult = new ArrayList<ProfessionalSpecialist>(Arrays.asList(professionalSpecialist3, professionalSpecialist1));
-		List<ProfessionalSpecialist> result = dao.findBySpecialty(specialty1);
+		List<ProfessionalSpecialist> result = professionalSpecialistDao.findBySpecialty(specialty1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -331,24 +337,24 @@ public class ProfessionalSpecialistDaoTest extends DaoTestFixtures {
 		professionalSpecialist1.setReferralNo(referralNo1);
 		professionalSpecialist1.setLastName(lName2);
 		professionalSpecialist1.setHideFromView(false);
-		dao.persist(professionalSpecialist1);
+		professionalSpecialistDao.persist(professionalSpecialist1);
 		
 		ProfessionalSpecialist professionalSpecialist2 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist2);
 		professionalSpecialist2.setReferralNo(referralNo2);
 		professionalSpecialist2.setLastName(lName3);
 		professionalSpecialist2.setHideFromView(false);
-		dao.persist(professionalSpecialist2);
+		professionalSpecialistDao.persist(professionalSpecialist2);
 		
 		ProfessionalSpecialist professionalSpecialist3 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist3);
 		professionalSpecialist3.setReferralNo(referralNo1);
 		professionalSpecialist3.setLastName(lName1);
 		professionalSpecialist3.setHideFromView(false);
-		dao.persist(professionalSpecialist3);
+		professionalSpecialistDao.persist(professionalSpecialist3);
 
 		List<ProfessionalSpecialist> expectedResult = new ArrayList<ProfessionalSpecialist>(Arrays.asList(professionalSpecialist3, professionalSpecialist1));
-		List<ProfessionalSpecialist> result = dao.findByReferralNo(referralNo1);
+		List<ProfessionalSpecialist> result = professionalSpecialistDao.findByReferralNo(referralNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -381,24 +387,24 @@ public class ProfessionalSpecialistDaoTest extends DaoTestFixtures {
 		professionalSpecialist1.setReferralNo(referralNo1);
 		professionalSpecialist1.setLastName(lName2);
 		professionalSpecialist1.setHideFromView(false);
-		dao.persist(professionalSpecialist1);
+		professionalSpecialistDao.persist(professionalSpecialist1);
 		
 		ProfessionalSpecialist professionalSpecialist2 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist2);
 		professionalSpecialist2.setSpecialtyType(referralNo2);
 		professionalSpecialist2.setLastName(lName3);
 		professionalSpecialist2.setHideFromView(false);
-		dao.persist(professionalSpecialist2);
+		professionalSpecialistDao.persist(professionalSpecialist2);
 		
 		ProfessionalSpecialist professionalSpecialist3 = new ProfessionalSpecialist();
 		EntityDataGenerator.generateTestDataForModelClass(professionalSpecialist3);
 		professionalSpecialist3.setSpecialtyType(referralNo3);
 		professionalSpecialist3.setLastName(lName1);
 		professionalSpecialist3.setHideFromView(false);
-		dao.persist(professionalSpecialist3);
+		professionalSpecialistDao.persist(professionalSpecialist3);
 		
 		ProfessionalSpecialist expectedResult = professionalSpecialist1;
-		ProfessionalSpecialist result = dao.getByReferralNo(referralNo1);
+		ProfessionalSpecialist result = professionalSpecialistDao.getByReferralNo(referralNo1);
 		
 		assertEquals(expectedResult, result);
 	}

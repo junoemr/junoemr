@@ -28,15 +28,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.eyeform.dao.EyeFormDao;
 import org.oscarehr.eyeform.model.EyeForm;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class EyeFormDaoTest extends DaoTestFixtures {
-
-	protected EyeFormDao dao = SpringUtils.getBean(EyeFormDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EyeFormDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected EyeFormDao eyeFormDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -47,7 +53,7 @@ public class EyeFormDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 EyeForm entity = new EyeForm();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                eyeFormDao.persist(entity);
                 assertNotNull(entity.getId());
         }
 
@@ -62,20 +68,20 @@ public class EyeFormDaoTest extends DaoTestFixtures {
 		EyeForm eyeform1 = new EyeForm();
 		EntityDataGenerator.generateTestDataForModelClass(eyeform1);
 		eyeform1.setAppointmentNo(appointmentNo1);
-		dao.persist(eyeform1);
+		eyeFormDao.persist(eyeform1);
 		
 		EyeForm eyeform2 = new EyeForm();
 		EntityDataGenerator.generateTestDataForModelClass(eyeform2);
 		eyeform2.setAppointmentNo(appointmentNo2);
-		dao.persist(eyeform2);
+		eyeFormDao.persist(eyeform2);
 		
 		EyeForm eyeform3 = new EyeForm();
 		EntityDataGenerator.generateTestDataForModelClass(eyeform3);
 		eyeform3.setAppointmentNo(appointmentNo3);
-		dao.persist(eyeform3);
+		eyeFormDao.persist(eyeform3);
 		
 		EyeForm expectedResult = eyeform2;
-		EyeForm result = dao.getByAppointmentNo(appointmentNo2);
+		EyeForm result = eyeFormDao.getByAppointmentNo(appointmentNo2);
 		
 		assertEquals(expectedResult, result);
 	}

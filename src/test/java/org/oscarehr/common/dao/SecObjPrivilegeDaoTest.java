@@ -38,16 +38,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.SecObjPrivilege;
 import org.oscarehr.common.model.SecObjPrivilegePrimaryKey;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
-
-	protected SecObjPrivilegeDao dao = (SecObjPrivilegeDao) SpringUtils.getBean(SecObjPrivilegeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SecObjPrivilegeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SecObjPrivilegeDao secObjPrivilegeDao;
 
 	@Before
 	public void before() throws Exception {
@@ -68,7 +74,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey1.setObjectName(objectName1);
 		secObjPrivilegePrimaryKey1.setRoleUserGroup(roleUserGroup1);
 		secObjPrivilege1.setId(secObjPrivilegePrimaryKey1);
-		dao.persist(secObjPrivilege1);
+		secObjPrivilegeDao.persist(secObjPrivilege1);
 
 		SecObjPrivilege secObjPrivilege2 = new SecObjPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege2);
@@ -76,7 +82,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey2.setObjectName(objectName2);
 		secObjPrivilegePrimaryKey2.setRoleUserGroup(roleUserGroup2);
 		secObjPrivilege2.setId(secObjPrivilegePrimaryKey2);
-		dao.persist(secObjPrivilege2);
+		secObjPrivilegeDao.persist(secObjPrivilege2);
 
 		SecObjPrivilege secObjPrivilege3 = new SecObjPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege3);
@@ -84,7 +90,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey3.setObjectName(objectName1);
 		secObjPrivilegePrimaryKey3.setRoleUserGroup(roleUserGroup2);
 		secObjPrivilege3.setId(secObjPrivilegePrimaryKey3);
-		dao.persist(secObjPrivilege3);
+		secObjPrivilegeDao.persist(secObjPrivilege3);
 
 		SecObjPrivilege secObjPrivilege4 = new SecObjPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege4);
@@ -92,10 +98,10 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey4.setObjectName(objectName2);
 		secObjPrivilegePrimaryKey4.setRoleUserGroup(roleUserGroup1);
 		secObjPrivilege4.setId(secObjPrivilegePrimaryKey4);
-		dao.persist(secObjPrivilege4);
+		secObjPrivilegeDao.persist(secObjPrivilege4);
 
 		List<SecObjPrivilege> expectedResult = new ArrayList<SecObjPrivilege>(Arrays.asList(secObjPrivilege1));
-		List<SecObjPrivilege> result = dao.findByRoleUserGroupAndObjectName(roleUserGroup1, objectName1);
+		List<SecObjPrivilege> result = secObjPrivilegeDao.findByRoleUserGroupAndObjectName(roleUserGroup1, objectName1);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -128,7 +134,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey1.setObjectName(objectName1);
 		secObjPrivilegePrimaryKey1.setRoleUserGroup(roleUserGroup1);
 		secObjPrivilege1.setId(secObjPrivilegePrimaryKey1);
-		dao.persist(secObjPrivilege1);
+		secObjPrivilegeDao.persist(secObjPrivilege1);
 
 		SecObjPrivilege secObjPrivilege2 = new SecObjPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege2);
@@ -136,7 +142,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey2.setObjectName(objectName2);
 		secObjPrivilegePrimaryKey2.setRoleUserGroup(roleUserGroup1);
 		secObjPrivilege2.setId(secObjPrivilegePrimaryKey2);
-		dao.persist(secObjPrivilege2);
+		secObjPrivilegeDao.persist(secObjPrivilege2);
 
 		SecObjPrivilege secObjPrivilege3 = new SecObjPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege3);
@@ -144,12 +150,12 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey3.setObjectName(objectName3);
 		secObjPrivilegePrimaryKey3.setRoleUserGroup(roleUserGroup2);
 		secObjPrivilege3.setId(secObjPrivilegePrimaryKey3);
-		dao.persist(secObjPrivilege3);
+		secObjPrivilegeDao.persist(secObjPrivilege3);
 
 		Collection<String> objectNames = new ArrayList<String>(Arrays.asList(objectName1, objectName2));
 
 		List<SecObjPrivilege> expectedResult = new ArrayList<SecObjPrivilege>(Arrays.asList(secObjPrivilege1, secObjPrivilege2));
-		List<SecObjPrivilege> result = dao.findByObjectNames(objectNames);
+		List<SecObjPrivilege> result = secObjPrivilegeDao.findByObjectNames(objectNames);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -180,7 +186,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey1.setObjectName(objectName1);
 		secObjPrivilegePrimaryKey1.setRoleUserGroup(roleUserGroup1);
 		secObjPrivilege1.setId(secObjPrivilegePrimaryKey1);
-		dao.persist(secObjPrivilege1);
+		secObjPrivilegeDao.persist(secObjPrivilege1);
 
 		SecObjPrivilege secObjPrivilege2 = new SecObjPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege2);
@@ -188,7 +194,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey2.setObjectName(objectName2);
 		secObjPrivilegePrimaryKey2.setRoleUserGroup(roleUserGroup2);
 		secObjPrivilege2.setId(secObjPrivilegePrimaryKey2);
-		dao.persist(secObjPrivilege2);
+		secObjPrivilegeDao.persist(secObjPrivilege2);
 
 		SecObjPrivilege secObjPrivilege3 = new SecObjPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege3);
@@ -196,7 +202,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey3.setObjectName(objectName1);
 		secObjPrivilegePrimaryKey3.setRoleUserGroup(roleUserGroup2);
 		secObjPrivilege3.setId(secObjPrivilegePrimaryKey3);
-		dao.persist(secObjPrivilege3);
+		secObjPrivilegeDao.persist(secObjPrivilege3);
 
 		SecObjPrivilege secObjPrivilege4 = new SecObjPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege4);
@@ -204,10 +210,10 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey4.setObjectName(objectName2);
 		secObjPrivilegePrimaryKey4.setRoleUserGroup(roleUserGroup1);
 		secObjPrivilege4.setId(secObjPrivilegePrimaryKey4);
-		dao.persist(secObjPrivilege4);
+		secObjPrivilegeDao.persist(secObjPrivilege4);
 
 		List<SecObjPrivilege> expectedResult = new ArrayList<SecObjPrivilege>(Arrays.asList(secObjPrivilege1, secObjPrivilege4));
-		List<SecObjPrivilege> result = dao.findByRoleUserGroup(roleUserGroup1);
+		List<SecObjPrivilege> result = secObjPrivilegeDao.findByRoleUserGroup(roleUserGroup1);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -238,7 +244,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey1.setObjectName(objectName1);
 		secObjPrivilegePrimaryKey1.setRoleUserGroup(roleUserGroup1);
 		secObjPrivilege1.setId(secObjPrivilegePrimaryKey1);
-		dao.persist(secObjPrivilege1);
+		secObjPrivilegeDao.persist(secObjPrivilege1);
 
 		SecObjPrivilege secObjPrivilege2 = new SecObjPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege2);
@@ -246,7 +252,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey2.setObjectName(objectName2);
 		secObjPrivilegePrimaryKey2.setRoleUserGroup(roleUserGroup1);
 		secObjPrivilege2.setId(secObjPrivilegePrimaryKey2);
-		dao.persist(secObjPrivilege2);
+		secObjPrivilegeDao.persist(secObjPrivilege2);
 
 		SecObjPrivilege secObjPrivilege3 = new SecObjPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege3);
@@ -254,7 +260,7 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey3.setObjectName(objectName1);
 		secObjPrivilegePrimaryKey3.setRoleUserGroup(roleUserGroup2);
 		secObjPrivilege3.setId(secObjPrivilegePrimaryKey3);
-		dao.persist(secObjPrivilege3);
+		secObjPrivilegeDao.persist(secObjPrivilege3);
 
 		SecObjPrivilege secObjPrivilege4 = new SecObjPrivilege();
 		EntityDataGenerator.generateTestDataForModelClass(secObjPrivilege4);
@@ -262,10 +268,10 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 		secObjPrivilegePrimaryKey4.setObjectName(objectName2);
 		secObjPrivilegePrimaryKey4.setRoleUserGroup(roleUserGroup2);
 		secObjPrivilege4.setId(secObjPrivilegePrimaryKey4);
-		dao.persist(secObjPrivilege4);
+		secObjPrivilegeDao.persist(secObjPrivilege4);
 
 		List<SecObjPrivilege> expectedResult = new ArrayList<SecObjPrivilege>(Arrays.asList(secObjPrivilege1, secObjPrivilege3));
-		List<SecObjPrivilege> result = dao.findByObjectName(objectName1);
+		List<SecObjPrivilege> result = secObjPrivilegeDao.findByObjectName(objectName1);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -284,12 +290,12 @@ public class SecObjPrivilegeDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testCountObjectsByName() {
-		dao.countObjectsByName("OBJ NAME");
+		secObjPrivilegeDao.countObjectsByName("OBJ NAME");
 	}
 
 	@Test
 	public void testFindByFormNamePrivilegeAndProviderNo() {
-		assertNotNull(dao.findByFormNamePrivilegeAndProviderNo("frm", "priv", "prov"));
+		assertNotNull(secObjPrivilegeDao.findByFormNamePrivilegeAndProviderNo("frm", "priv", "prov"));
 	}
 
 }

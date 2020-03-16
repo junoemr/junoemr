@@ -24,11 +24,16 @@
 package org.oscarehr.e2e.constant;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.e2e.constant.BodyConstants;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.constant.Mappings;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class ConstantsTest extends DaoTestFixtures
 {
 	@SuppressWarnings("unused")

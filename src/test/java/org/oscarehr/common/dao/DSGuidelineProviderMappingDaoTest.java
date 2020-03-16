@@ -32,15 +32,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.decisionSupport.model.DSGuidelineProviderMapping;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DSGuidelineProviderMappingDaoTest extends DaoTestFixtures {
-	
-	protected DSGuidelineProviderMappingDao dao = SpringUtils.getBean(DSGuidelineProviderMappingDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DSGuidelineProviderMappingDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DSGuidelineProviderMappingDao dsGuidelineProviderMappingDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -52,7 +58,7 @@ public class DSGuidelineProviderMappingDaoTest extends DaoTestFixtures {
 		
 		DSGuidelineProviderMapping dsGPM = new DSGuidelineProviderMapping();
 		EntityDataGenerator.generateTestDataForModelClass(dsGPM);
-		dao.persist(dsGPM);
+		dsGuidelineProviderMappingDao.persist(dsGPM);
 		assertNotNull(dsGPM.getId());
 	}
 	
@@ -65,20 +71,20 @@ public class DSGuidelineProviderMappingDaoTest extends DaoTestFixtures {
 		DSGuidelineProviderMapping dsGPM1 = new DSGuidelineProviderMapping();
 		EntityDataGenerator.generateTestDataForModelClass(dsGPM1);
 		dsGPM1.setProviderNo(providerNo1);
-		dao.persist(dsGPM1);
+		dsGuidelineProviderMappingDao.persist(dsGPM1);
 		
 		DSGuidelineProviderMapping dsGPM2 = new DSGuidelineProviderMapping();
 		EntityDataGenerator.generateTestDataForModelClass(dsGPM2);
 		dsGPM2.setProviderNo(providerNo2);
-		dao.persist(dsGPM2);
+		dsGuidelineProviderMappingDao.persist(dsGPM2);
 		
 		DSGuidelineProviderMapping dsGPM3 = new DSGuidelineProviderMapping();
 		EntityDataGenerator.generateTestDataForModelClass(dsGPM3);
 		dsGPM3.setProviderNo(providerNo1);
-		dao.persist(dsGPM3);
+		dsGuidelineProviderMappingDao.persist(dsGPM3);
 		
 		List<DSGuidelineProviderMapping> expectedResult = new ArrayList<DSGuidelineProviderMapping>(Arrays.asList(dsGPM1, dsGPM3));		
-		List<DSGuidelineProviderMapping> result = dao.getMappingsByProvider(providerNo1);
+		List<DSGuidelineProviderMapping> result = dsGuidelineProviderMappingDao.getMappingsByProvider(providerNo1);
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {
 			logger.warn("Array sizes do not match.");
@@ -107,22 +113,22 @@ public class DSGuidelineProviderMappingDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(dsGPM1);
 		dsGPM1.setProviderNo(providerNo1);
 		dsGPM1.setGuidelineUUID(guidelineUUID1);
-		dao.persist(dsGPM1);
+		dsGuidelineProviderMappingDao.persist(dsGPM1);
 		
 		DSGuidelineProviderMapping dsGPM2 = new DSGuidelineProviderMapping();
 		EntityDataGenerator.generateTestDataForModelClass(dsGPM2);
 		dsGPM2.setProviderNo(providerNo2);
 		dsGPM2.setGuidelineUUID(guidelineUUID2);
-		dao.persist(dsGPM2);
+		dsGuidelineProviderMappingDao.persist(dsGPM2);
 		
 		DSGuidelineProviderMapping dsGPM3 = new DSGuidelineProviderMapping();
 		EntityDataGenerator.generateTestDataForModelClass(dsGPM3);
 		dsGPM3.setProviderNo(providerNo1);
 		dsGPM3.setGuidelineUUID(guidelineUUID2);
-		dao.persist(dsGPM3);
+		dsGuidelineProviderMappingDao.persist(dsGPM3);
 		
 		boolean expectedResult = true;
-		boolean result = dao.mappingExists(dsGPM1);
+		boolean result = dsGuidelineProviderMappingDao.mappingExists(dsGPM1);
 		
 		assertEquals(expectedResult, result);
 	}

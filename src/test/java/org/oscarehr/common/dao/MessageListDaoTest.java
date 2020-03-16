@@ -33,15 +33,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.MessageList;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MessageListDaoTest extends DaoTestFixtures {
-
-	protected MessageListDao dao = SpringUtils.getBean(MessageListDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MessageListDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MessageListDao messageListDao;
 
 	@Before
 	public void before() throws Exception {
@@ -61,28 +67,28 @@ public class MessageListDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(messageList1);
 		messageList1.setProviderNo(providerNo1);
 		messageList1.setMessage(message1);
-		dao.persist(messageList1);
+		messageListDao.persist(messageList1);
 		
 		MessageList messageList2 = new MessageList();
 		EntityDataGenerator.generateTestDataForModelClass(messageList2);
 		messageList2.setProviderNo(providerNo2);
 		messageList2.setMessage(message1);
-		dao.persist(messageList2);
+		messageListDao.persist(messageList2);
 		
 		MessageList messageList3 = new MessageList();
 		EntityDataGenerator.generateTestDataForModelClass(messageList3);
 		messageList3.setProviderNo(providerNo1);
 		messageList3.setMessage(message1);
-		dao.persist(messageList3);
+		messageListDao.persist(messageList3);
 		
 		MessageList messageList4 = new MessageList();
 		EntityDataGenerator.generateTestDataForModelClass(messageList4);
 		messageList4.setProviderNo(providerNo1);
 		messageList4.setMessage(message2);
-		dao.persist(messageList4);
+		messageListDao.persist(messageList4);
 		
 		List<MessageList> expectedResult = new ArrayList<MessageList>(Arrays.asList(messageList1, messageList3));
-		List<MessageList> result = dao.findByProviderNoAndMessageNo(providerNo1, message1);
+		List<MessageList> result = messageListDao.findByProviderNoAndMessageNo(providerNo1, message1);
 
 		Logger logger = MiscUtils.getLogger();
 		

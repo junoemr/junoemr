@@ -27,15 +27,22 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.IntegratorControl;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 
-public class IntegratorControlDaoTest extends DaoTestFixtures {
-
-	protected IntegratorControlDao dao = SpringUtils.getBean(IntegratorControlDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class IntegratorControlDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected IntegratorControlDao dao;
 
 	public IntegratorControlDaoTest() {
 	}

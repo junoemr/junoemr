@@ -35,16 +35,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.model.CriteriaTypeOption;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CriteriaTypeOptionDaoTest extends DaoTestFixtures {
-
-	public CriteriaTypeOptionDao dao = SpringUtils.getBean(CriteriaTypeOptionDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CriteriaTypeOptionDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public CriteriaTypeOptionDao criteriaTypeOptionDao;
 
 
 	@Before
@@ -56,7 +62,7 @@ public class CriteriaTypeOptionDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		CriteriaTypeOption entity = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		criteriaTypeOptionDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -65,22 +71,22 @@ public class CriteriaTypeOptionDaoTest extends DaoTestFixtures {
 		
 		CriteriaTypeOption cTO1 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO1);
-		dao.persist(cTO1);
+		criteriaTypeOptionDao.persist(cTO1);
 		
 		CriteriaTypeOption cTO2 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO2);
-		dao.persist(cTO2);
+		criteriaTypeOptionDao.persist(cTO2);
 		
 		CriteriaTypeOption cTO3 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO3);
-		dao.persist(cTO3);
+		criteriaTypeOptionDao.persist(cTO3);
 		
 		CriteriaTypeOption cTO4 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO4);
-		dao.persist(cTO4);
+		criteriaTypeOptionDao.persist(cTO4);
 		
 		List<CriteriaTypeOption> expectedResult = new ArrayList<CriteriaTypeOption>(Arrays.asList(cTO1, cTO2, cTO3, cTO4));
-		List<CriteriaTypeOption> result = dao.findAll();
+		List<CriteriaTypeOption> result = criteriaTypeOptionDao.findAll();
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -105,30 +111,30 @@ public class CriteriaTypeOptionDaoTest extends DaoTestFixtures {
 		CriteriaTypeOption cTO1 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO1);
 		cTO1.setCriteriaTypeId(criteriaTypeId1);
-		dao.persist(cTO1);
+		criteriaTypeOptionDao.persist(cTO1);
 		
 		CriteriaTypeOption cTO2 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO2);
 		cTO2.setCriteriaTypeId(criteriaTypeId2);
-		dao.persist(cTO2);
+		criteriaTypeOptionDao.persist(cTO2);
 		
 		CriteriaTypeOption cTO3 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO3);
 		cTO3.setCriteriaTypeId(criteriaTypeId2);
-		dao.persist(cTO3);
+		criteriaTypeOptionDao.persist(cTO3);
 		
 		CriteriaTypeOption cTO4 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO4);
 		cTO4.setCriteriaTypeId(criteriaTypeId1);
-		dao.persist(cTO4);
+		criteriaTypeOptionDao.persist(cTO4);
 		
 		CriteriaTypeOption cTO5 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO5);
 		cTO5.setCriteriaTypeId(criteriaTypeId1);
-		dao.persist(cTO5);
+		criteriaTypeOptionDao.persist(cTO5);
 		
 		List<CriteriaTypeOption> expectedResult = new ArrayList<CriteriaTypeOption>(Arrays.asList(cTO1, cTO4, cTO5));
-		List<CriteriaTypeOption> result = dao.getCriteriaTypeOptionByTypeId(criteriaTypeId1);
+		List<CriteriaTypeOption> result = criteriaTypeOptionDao.getCriteriaTypeOptionByTypeId(criteriaTypeId1);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -153,20 +159,20 @@ public class CriteriaTypeOptionDaoTest extends DaoTestFixtures {
 		CriteriaTypeOption cTO1 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO1);
 		cTO1.setOptionValue(optionValue1);
-		dao.persist(cTO1);
+		criteriaTypeOptionDao.persist(cTO1);
 		
 		CriteriaTypeOption cTO2 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO2);
 		cTO2.setOptionValue(optionValue2);
-		dao.persist(cTO2);
+		criteriaTypeOptionDao.persist(cTO2);
 		
 		CriteriaTypeOption cTO3 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO3);
 		cTO3.setOptionValue(optionValue3);
-		dao.persist(cTO3);
+		criteriaTypeOptionDao.persist(cTO3);
 		
 		CriteriaTypeOption expectedResult = cTO2;
-		CriteriaTypeOption result = dao.getByValue(optionValue2);
+		CriteriaTypeOption result = criteriaTypeOptionDao.getByValue(optionValue2);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -181,28 +187,28 @@ public class CriteriaTypeOptionDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(cTO1);
 		cTO1.setCriteriaTypeId(criteriaTypeId1);
 		cTO1.setOptionValue(optionValue1);
-		dao.persist(cTO1);
+		criteriaTypeOptionDao.persist(cTO1);
 		
 		CriteriaTypeOption cTO2 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO2);
 		cTO2.setCriteriaTypeId(criteriaTypeId1);
 		cTO2.setOptionValue(optionValue2);
-		dao.persist(cTO2);
+		criteriaTypeOptionDao.persist(cTO2);
 		
 		CriteriaTypeOption cTO3 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO3);
 		cTO3.setCriteriaTypeId(criteriaTypeId2);
 		cTO3.setOptionValue(optionValue1);
-		dao.persist(cTO3);
+		criteriaTypeOptionDao.persist(cTO3);
 		
 		CriteriaTypeOption cTO4 = new CriteriaTypeOption();
 		EntityDataGenerator.generateTestDataForModelClass(cTO4);
 		cTO4.setCriteriaTypeId(criteriaTypeId2);
 		cTO4.setOptionValue(optionValue2);
-		dao.persist(cTO4);
+		criteriaTypeOptionDao.persist(cTO4);
 		
 		CriteriaTypeOption expectedResult = cTO4;
-		CriteriaTypeOption result = dao.getByValueAndTypeId(optionValue2, criteriaTypeId2);
+		CriteriaTypeOption result = criteriaTypeOptionDao.getByValueAndTypeId(optionValue2, criteriaTypeId2);
 		
 		assertEquals(expectedResult, result);		
 	}

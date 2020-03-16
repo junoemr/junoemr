@@ -33,15 +33,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CaisiFormData;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CaisiFormDataDaoTest extends DaoTestFixtures {
-	
-	public CaisiFormDataDao dao = SpringUtils.getBean(CaisiFormDataDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CaisiFormDataDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public CaisiFormDataDao caisiFormDataDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -57,20 +63,20 @@ public class CaisiFormDataDaoTest extends DaoTestFixtures {
 		CaisiFormData caisiFormData1 = new CaisiFormData();
 		EntityDataGenerator.generateTestDataForModelClass(caisiFormData1);
 		caisiFormData1.setInstanceId(instanceId1);
-		dao.persist(caisiFormData1);
+		caisiFormDataDao.persist(caisiFormData1);
 		
 		CaisiFormData caisiFormData2 = new CaisiFormData();
 		EntityDataGenerator.generateTestDataForModelClass(caisiFormData2);
 		caisiFormData2.setInstanceId(instanceId2);
-		dao.persist(caisiFormData2);
+		caisiFormDataDao.persist(caisiFormData2);
 		
 		CaisiFormData caisiFormData3 = new CaisiFormData();
 		EntityDataGenerator.generateTestDataForModelClass(caisiFormData3);
 		caisiFormData3.setInstanceId(instanceId1);
-		dao.persist(caisiFormData3);
+		caisiFormDataDao.persist(caisiFormData3);
 		
 		List<CaisiFormData> expectedResult = new ArrayList<CaisiFormData>(Arrays.asList(caisiFormData1, caisiFormData3));
-		List<CaisiFormData> result = dao.findByInstanceId(instanceId1);
+		List<CaisiFormData> result = caisiFormDataDao.findByInstanceId(instanceId1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -101,7 +107,7 @@ public class CaisiFormDataDaoTest extends DaoTestFixtures {
 		caisiFormData1.setPageNumber(pageNumber1);
 		caisiFormData1.setSectionId(sectionId1);
 		caisiFormData1.setQuestionId(questionId1);
-		dao.persist(caisiFormData1);
+		caisiFormDataDao.persist(caisiFormData1);
 		
 		CaisiFormData caisiFormData2 = new CaisiFormData();
 		EntityDataGenerator.generateTestDataForModelClass(caisiFormData2);
@@ -109,7 +115,7 @@ public class CaisiFormDataDaoTest extends DaoTestFixtures {
 		caisiFormData2.setPageNumber(pageNumber1);
 		caisiFormData2.setSectionId(sectionId1);
 		caisiFormData2.setQuestionId(questionId1);
-		dao.persist(caisiFormData2);
+		caisiFormDataDao.persist(caisiFormData2);
 		
 		CaisiFormData caisiFormData3 = new CaisiFormData();
 		EntityDataGenerator.generateTestDataForModelClass(caisiFormData3);
@@ -117,7 +123,7 @@ public class CaisiFormDataDaoTest extends DaoTestFixtures {
 		caisiFormData3.setPageNumber(pageNumber2);
 		caisiFormData3.setSectionId(sectionId1);
 		caisiFormData3.setQuestionId(questionId1);
-		dao.persist(caisiFormData3);
+		caisiFormDataDao.persist(caisiFormData3);
 		
 		CaisiFormData caisiFormData4 = new CaisiFormData();
 		EntityDataGenerator.generateTestDataForModelClass(caisiFormData4);
@@ -125,7 +131,7 @@ public class CaisiFormDataDaoTest extends DaoTestFixtures {
 		caisiFormData4.setPageNumber(pageNumber2);
 		caisiFormData4.setSectionId(sectionId2);
 		caisiFormData4.setQuestionId(questionId1);
-		dao.persist(caisiFormData4);
+		caisiFormDataDao.persist(caisiFormData4);
 		
 		CaisiFormData caisiFormData5 = new CaisiFormData();
 		EntityDataGenerator.generateTestDataForModelClass(caisiFormData5);
@@ -133,7 +139,7 @@ public class CaisiFormDataDaoTest extends DaoTestFixtures {
 		caisiFormData5.setPageNumber(pageNumber1);
 		caisiFormData5.setSectionId(sectionId1);
 		caisiFormData5.setQuestionId(questionId1);
-		dao.persist(caisiFormData5);
+		caisiFormDataDao.persist(caisiFormData5);
 
 		CaisiFormData caisiFormData6 = new CaisiFormData();
 		EntityDataGenerator.generateTestDataForModelClass(caisiFormData6);
@@ -141,10 +147,10 @@ public class CaisiFormDataDaoTest extends DaoTestFixtures {
 		caisiFormData6.setPageNumber(pageNumber1);
 		caisiFormData6.setSectionId(sectionId1);
 		caisiFormData6.setQuestionId(questionId2);
-		dao.persist(caisiFormData6);
+		caisiFormDataDao.persist(caisiFormData6);
 		
 		List<CaisiFormData> expectedResult = new ArrayList<CaisiFormData>(Arrays.asList(caisiFormData1, caisiFormData5));
-		List<CaisiFormData> result = dao.find(instanceId1, pageNumber1, sectionId1, questionId1);
+		List<CaisiFormData> result = caisiFormDataDao.find(instanceId1, pageNumber1, sectionId1, questionId1);
 
 		Logger logger = MiscUtils.getLogger();
 		

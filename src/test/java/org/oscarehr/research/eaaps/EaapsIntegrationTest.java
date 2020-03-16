@@ -32,13 +32,18 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.SendingUtils;
 import org.oscarehr.common.model.Demographic;
 
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.util.ConversionUtils;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class EaapsIntegrationTest extends DaoTestFixtures {
 
 	private static Logger logger = Logger.getLogger(EaapsIntegrationTest.class);

@@ -32,16 +32,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlBillingServiceAgeRules;
 import org.oscarehr.common.model.CtlBillingServiceSexRules;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlBillingServiceAgeRulesDaoTest extends DaoTestFixtures {
-
-	protected CtlBillingServiceAgeRulesDao dao = SpringUtils.getBean(CtlBillingServiceAgeRulesDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlBillingServiceAgeRulesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlBillingServiceAgeRulesDao ctlBillingServiceAgeRulesDao;
 
 	@Before
 	public void before() throws Exception {
@@ -53,7 +59,7 @@ public class CtlBillingServiceAgeRulesDaoTest extends DaoTestFixtures {
 		CtlBillingServiceSexRules entity = new CtlBillingServiceSexRules();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setId(null);
-		dao.persist(entity);
+		ctlBillingServiceAgeRulesDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -65,25 +71,25 @@ public class CtlBillingServiceAgeRulesDaoTest extends DaoTestFixtures {
 		CtlBillingServiceAgeRules cBSAR1 = new CtlBillingServiceAgeRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSAR1);
 		cBSAR1.setServiceCode(serviceCode1);
-		dao.persist(cBSAR1);
+		ctlBillingServiceAgeRulesDao.persist(cBSAR1);
 		
 		CtlBillingServiceAgeRules cBSAR2 = new CtlBillingServiceAgeRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSAR2);
 		cBSAR2.setServiceCode(serviceCode1);
-		dao.persist(cBSAR2);
+		ctlBillingServiceAgeRulesDao.persist(cBSAR2);
 		
 		CtlBillingServiceAgeRules cBSAR3 = new CtlBillingServiceAgeRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSAR3);
 		cBSAR3.setServiceCode(serviceCode2);
-		dao.persist(cBSAR3);
+		ctlBillingServiceAgeRulesDao.persist(cBSAR3);
 		
 		CtlBillingServiceAgeRules cBSAR4 = new CtlBillingServiceAgeRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSAR4);
 		cBSAR4.setServiceCode(serviceCode1);
-		dao.persist(cBSAR4);
+		ctlBillingServiceAgeRulesDao.persist(cBSAR4);
 		
 		List<CtlBillingServiceAgeRules> expectedResult = new ArrayList<CtlBillingServiceAgeRules>(Arrays.asList(cBSAR1, cBSAR2, cBSAR4));
-		List<CtlBillingServiceAgeRules> result = dao.findByServiceCode(serviceCode1);
+		List<CtlBillingServiceAgeRules> result = ctlBillingServiceAgeRulesDao.findByServiceCode(serviceCode1);
 
 		Logger logger = MiscUtils.getLogger();
 		

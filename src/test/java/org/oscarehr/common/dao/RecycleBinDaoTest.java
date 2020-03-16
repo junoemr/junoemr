@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.RecycleBin;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class RecycleBinDaoTest extends DaoTestFixtures{
-
-	protected RecycleBinDao dao = SpringUtils.getBean(RecycleBinDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class RecycleBinDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected RecycleBinDao recycleBinDao;
 
 	public RecycleBinDaoTest() {
 	}
@@ -48,7 +54,7 @@ public class RecycleBinDaoTest extends DaoTestFixtures{
 	public void testCreate() throws Exception {
 		RecycleBin ql = new RecycleBin();
 		 EntityDataGenerator.generateTestDataForModelClass(ql);
-		 dao.persist(ql);
+		 recycleBinDao.persist(ql);
 		 assertNotNull(ql.getId());
 	}
 

@@ -33,15 +33,22 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class AppointmentArchiveDaoTest extends DaoTestFixtures {
-
-	protected AppointmentArchiveDao dao = (AppointmentArchiveDao) SpringUtils.getBean("appointmentArchiveDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class AppointmentArchiveDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected AppointmentArchiveDao appointmentArchiveDao;
 
 	public AppointmentArchiveDaoTest() {
 	}
@@ -55,16 +62,16 @@ public class AppointmentArchiveDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		AppointmentArchive entity = new AppointmentArchive();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		appointmentArchiveDao.persist(entity);
 		assertNotNull(entity.getId());
 		
 		Calendar cal=new GregorianCalendar();
 		cal.add(Calendar.DAY_OF_YEAR, -1);
-		List<AppointmentArchive> results=dao.findByUpdateDate(cal.getTime(), 99);
+		List<AppointmentArchive> results= appointmentArchiveDao.findByUpdateDate(cal.getTime(), 99);
 		assertTrue(results.size()>0);
 
 		cal.add(Calendar.DAY_OF_YEAR, 2);
-		results=dao.findByUpdateDate(cal.getTime(), 99);
+		results= appointmentArchiveDao.findByUpdateDate(cal.getTime(), 99);
 		assertEquals(0, results.size());
 	}
 
@@ -75,7 +82,7 @@ public class AppointmentArchiveDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(appt);
 		appointmentDao.persist(appt);
 
-		AppointmentArchive archive = dao.archiveAppointment(appt);
+		AppointmentArchive archive = appointmentArchiveDao.archiveAppointment(appt);
 
 		assertNotNull(archive.getId());
 	}

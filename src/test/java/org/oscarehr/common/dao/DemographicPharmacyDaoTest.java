@@ -34,14 +34,21 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.DemographicPharmacy;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DemographicPharmacyDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DemographicPharmacyDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DemographicPharmacyDao demographicPharmacyDao;
 
-	protected DemographicPharmacyDao dao = SpringUtils.getBean(DemographicPharmacyDao.class);
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	public DemographicPharmacyDaoTest() {
@@ -56,14 +63,14 @@ public class DemographicPharmacyDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		DemographicPharmacy entity = new DemographicPharmacy();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		demographicPharmacyDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testDataMethods() {		
-		dao.addPharmacyToDemographic(1, 100, 1);
-		java.util.List<DemographicPharmacy> dps = dao.findByDemographicId(100);
+		demographicPharmacyDao.addPharmacyToDemographic(1, 100, 1);
+		java.util.List<DemographicPharmacy> dps = demographicPharmacyDao.findByDemographicId(100);
 		assertFalse(dps.isEmpty());
 		assertEquals(1, dps.get(0).getPharmacyId());
 	}
@@ -87,31 +94,31 @@ public class DemographicPharmacyDaoTest extends DaoTestFixtures {
 		demoPhramacy1.setStatus(status1);
 		demoPhramacy1.setDemographicNo(demographicNo1);
 		demoPhramacy1.setAddDate(addDate1);
-		dao.persist(demoPhramacy1);
+		demographicPharmacyDao.persist(demoPhramacy1);
 
 		DemographicPharmacy demoPhramacy2 = new DemographicPharmacy();
 		EntityDataGenerator.generateTestDataForModelClass(demoPhramacy2);
 		demoPhramacy2.setStatus(status2);
 		demoPhramacy2.setDemographicNo(demographicNo1);
 		demoPhramacy2.setAddDate(addDate2);
-		dao.persist(demoPhramacy2);
+		demographicPharmacyDao.persist(demoPhramacy2);
 
 		DemographicPharmacy demoPhramacy3 = new DemographicPharmacy();
 		EntityDataGenerator.generateTestDataForModelClass(demoPhramacy3);
 		demoPhramacy3.setStatus(status1);
 		demoPhramacy3.setDemographicNo(demographicNo1);
 		demoPhramacy3.setAddDate(addDate3);
-		dao.persist(demoPhramacy3);
+		demographicPharmacyDao.persist(demoPhramacy3);
 
 		DemographicPharmacy demoPhramacy4 = new DemographicPharmacy();
 		EntityDataGenerator.generateTestDataForModelClass(demoPhramacy4);
 		demoPhramacy4.setStatus(status1);
 		demoPhramacy4.setDemographicNo(demographicNo2);
 		demoPhramacy4.setAddDate(addDate3);
-		dao.persist(demoPhramacy4);
+		demographicPharmacyDao.persist(demoPhramacy4);
 
 		DemographicPharmacy expectedResult = demoPhramacy1;
-		java.util.List<DemographicPharmacy> dps = dao.findByDemographicId(demographicNo1);
+		java.util.List<DemographicPharmacy> dps = demographicPharmacyDao.findByDemographicId(demographicNo1);
 		
 		assertFalse(dps.isEmpty());
 		assertEquals(expectedResult, dps.get(0));

@@ -35,16 +35,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.schedule.dao.ScheduleTemplateCodeDao;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ScheduleTemplateCodeDaoTest extends DaoTestFixtures {
-
-	protected ScheduleTemplateCodeDao dao = SpringUtils.getBean(ScheduleTemplateCodeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ScheduleTemplateCodeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ScheduleTemplateCodeDao scheduleTemplateCodeDao;
 
 	public ScheduleTemplateCodeDaoTest() {
 	}
@@ -59,7 +65,7 @@ public class ScheduleTemplateCodeDaoTest extends DaoTestFixtures {
 		ScheduleTemplateCode entity = new ScheduleTemplateCode();
         EntityDataGenerator.generateTestDataForModelClass(entity);
         entity.setCode('A');
-        dao.persist(entity);
+        scheduleTemplateCodeDao.persist(entity);
         assertNotNull(entity.getId());
 	}
 	
@@ -68,18 +74,18 @@ public class ScheduleTemplateCodeDaoTest extends DaoTestFixtures {
 		
 		ScheduleTemplateCode scheduleTempCode1 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode1);
-		dao.persist(scheduleTempCode1);
+		scheduleTemplateCodeDao.persist(scheduleTempCode1);
 		
 		ScheduleTemplateCode scheduleTempCode2 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode2);
-		dao.persist(scheduleTempCode2);
+		scheduleTemplateCodeDao.persist(scheduleTempCode2);
 		
 		ScheduleTemplateCode scheduleTempCode3 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode3);
-		dao.persist(scheduleTempCode3);
+		scheduleTemplateCodeDao.persist(scheduleTempCode3);
 		
 		List<ScheduleTemplateCode> expectedResult = new ArrayList<ScheduleTemplateCode>(Arrays.asList(scheduleTempCode1, scheduleTempCode2, scheduleTempCode3));
-		List<ScheduleTemplateCode> result = dao.findAll();
+		List<ScheduleTemplateCode> result = scheduleTemplateCodeDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -106,20 +112,20 @@ public class ScheduleTemplateCodeDaoTest extends DaoTestFixtures {
 		ScheduleTemplateCode scheduleTempCode1 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode1);
 		scheduleTempCode1.setCode(code1);
-		dao.persist(scheduleTempCode1);
+		scheduleTemplateCodeDao.persist(scheduleTempCode1);
 		
 		ScheduleTemplateCode scheduleTempCode2 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode2);
 		scheduleTempCode2.setCode(code2);
-		dao.persist(scheduleTempCode2);
+		scheduleTemplateCodeDao.persist(scheduleTempCode2);
 		
 		ScheduleTemplateCode scheduleTempCode3 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode3);
 		scheduleTempCode3.setCode(code3);
-		dao.persist(scheduleTempCode3);
+		scheduleTemplateCodeDao.persist(scheduleTempCode3);
 		
 		ScheduleTemplateCode expectedResult = scheduleTempCode2;
-		ScheduleTemplateCode result = dao.getByCode(code2);
+		ScheduleTemplateCode result = scheduleTemplateCodeDao.getByCode(code2);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -133,20 +139,20 @@ public class ScheduleTemplateCodeDaoTest extends DaoTestFixtures {
 		ScheduleTemplateCode scheduleTempCode1 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode1);
 		scheduleTempCode1.setCode(code1);
-		dao.persist(scheduleTempCode1);
+		scheduleTemplateCodeDao.persist(scheduleTempCode1);
 		
 		ScheduleTemplateCode scheduleTempCode2 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode2);
 		scheduleTempCode2.setCode(code2);
-		dao.persist(scheduleTempCode2);
+		scheduleTemplateCodeDao.persist(scheduleTempCode2);
 		
 		ScheduleTemplateCode scheduleTempCode3 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode3);
 		scheduleTempCode3.setCode(code3);
-		dao.persist(scheduleTempCode3);
+		scheduleTemplateCodeDao.persist(scheduleTempCode3);
 		
 		ScheduleTemplateCode expectedResult = scheduleTempCode2;
-		ScheduleTemplateCode result = dao.findByCode(code);
+		ScheduleTemplateCode result = scheduleTemplateCodeDao.findByCode(code);
 		
 		assertEquals(expectedResult, result);	
 	}	

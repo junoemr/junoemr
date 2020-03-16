@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.Wcb;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class WcbDaoTest extends DaoTestFixtures {
-
-	public WcbDao dao = SpringUtils.getBean(WcbDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class WcbDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public WcbDao wcbDao;
 
 
 	@Before
@@ -47,12 +53,12 @@ public class WcbDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Wcb entity = new Wcb();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		wcbDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
         
         @Test
         public void testFindByDemographic() {
-            assertNotNull(dao.findByDemographic(100));
+            assertNotNull(wcbDao.findByDemographic(100));
         }
 }

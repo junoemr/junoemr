@@ -31,14 +31,14 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="msgDemoMap")
-public class MsgDemoMap extends AbstractModel<Long> {
-
+public class MsgDemoMap extends AbstractModel<Long>
+{
 	@Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-        
-        private Integer messageID;
-        private Integer demographic_no;
+
+	private Integer messageID;
+	private Integer demographic_no;
         
 
 	public Long getId() {

@@ -31,15 +31,21 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DrugDaoTest extends DaoTestFixtures {
-
-	protected DrugDao dao = SpringUtils.getBean(DrugDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DrugDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DrugDao drugDao;
 
 	@Override
 	@Test
@@ -56,7 +62,7 @@ public class DrugDaoTest extends DaoTestFixtures {
 	public void testFindDrugsAndPrescriptions() {
 		// EntityDataGenerator.generateTestDataForModelClass(entity);
 
-		List<Object[]> results = dao.findDrugsAndPrescriptions(99);
+		List<Object[]> results = drugDao.findDrugsAndPrescriptions(99);
 		assertNotNull(results);
 		assertTrue(true);
 		assertFalse(false);
@@ -65,54 +71,54 @@ public class DrugDaoTest extends DaoTestFixtures {
 	@Test
 	public void testAll() {
 		List<Drug> drugs = null;
-		drugs = dao.findByDemographicIdAndAtc(999, "");
+		drugs = drugDao.findByDemographicIdAndAtc(999, "");
 		assertNotNull(drugs);
 
-		drugs = dao.findByDemographicIdAndRegion(999, "");
+		drugs = drugDao.findByDemographicIdAndRegion(999, "");
 		assertNotNull(drugs);
 
-		drugs = dao.findByDemographicIdAndDrugId(999, 0);
+		drugs = drugDao.findByDemographicIdAndDrugId(999, 0);
 		assertNotNull(drugs);
 
-		dao.findByEverything(null, 0, null, null, null, null, 0, null, 0, 0, null, null, null, null, null, 0, null, false, false, null, null, null, false, false, false, false, null, null, null, false);
-		dao.getMaxPosition(999);
+		drugDao.findByEverything(null, 0, null, null, null, null, 0, null, 0, 0, null, null, null, null, null, 0, null, false, false, null, null, null, false, false, false, false, null, null, null, false);
+		drugDao.getMaxPosition(999);
 	}
 
 	@Test
 	public void testFindByParameter() {
-		List<Object[]> drugs = dao.findByParameter("BN", "1");
+		List<Object[]> drugs = drugDao.findByParameter("BN", "1");
 		assertNotNull(drugs);
 	}
 
 	@Test
 	public void testFindByRegionBrandDemographicAndProvider() {
-		List<Drug> drugs = dao.findByRegionBrandDemographicAndProvider("RI", "BN", 1, "1");
+		List<Drug> drugs = drugDao.findByRegionBrandDemographicAndProvider("RI", "BN", 1, "1");
 		assertNotNull(drugs);
 	}
 
 	@Test
 	public void testFindByBrandNameDemographicAndProvider() {
-		dao.findByBrandNameDemographicAndProvider("BN", 1, "1");
+		drugDao.findByBrandNameDemographicAndProvider("BN", 1, "1");
 	}
 
 	@Test
 	public void testFindByCustomNameDemographicIdAndProviderNo() {
-		dao.findByCustomNameDemographicIdAndProviderNo("BN", 1, "1");
+		drugDao.findByCustomNameDemographicIdAndProviderNo("BN", 1, "1");
 	}
 
 	@Test
 	public void testFindId() {
-		dao.findLastNotArchivedId("BN", "GN", 1);
+		drugDao.findLastNotArchivedId("BN", "GN", 1);
 	}
 
 	@Test
 	public void testFindByDemographicIdRegionalIdentifierAndAtcCode() {
-		dao.findByDemographicIdRegionalIdentifierAndAtcCode("ATC", "RI", 1);
+		drugDao.findByDemographicIdRegionalIdentifierAndAtcCode("ATC", "RI", 1);
 	}
 	
 	@Test
 	public void testFindSpecialInstructions() {
-		List<String> sis = dao.findSpecialInstructions();
+		List<String> sis = drugDao.findSpecialInstructions();
 		assertNotNull(sis);
 	}
 	

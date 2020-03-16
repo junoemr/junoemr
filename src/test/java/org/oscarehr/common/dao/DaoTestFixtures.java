@@ -56,9 +56,6 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.lang.reflect.Field;

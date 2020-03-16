@@ -32,15 +32,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CdsHospitalisationDays;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CdsHospitalisationDaysDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CdsHospitalisationDaysDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CdsHospitalisationDaysDao cdsHospitalisationDaysDao;
 
-	protected CdsHospitalisationDaysDao dao = (CdsHospitalisationDaysDao)SpringUtils.getBean(CdsHospitalisationDaysDao.class);
 	Logger logger = MiscUtils.getLogger(); 
 	
 	@Before
@@ -65,11 +72,11 @@ public class CdsHospitalisationDaysDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(hospitalisationDays3);
 		hospitalisationDays3.setClientId(clientId);
 		
-		dao.persist(hospitalisationDays1);
-		dao.persist(hospitalisationDays2);
-		dao.persist(hospitalisationDays3);
+		cdsHospitalisationDaysDao.persist(hospitalisationDays1);
+		cdsHospitalisationDaysDao.persist(hospitalisationDays2);
+		cdsHospitalisationDaysDao.persist(hospitalisationDays3);
 		
-		List<CdsHospitalisationDays> result = dao.findByClientId(clientId);
+		List<CdsHospitalisationDays> result = cdsHospitalisationDaysDao.findByClientId(clientId);
 		List<CdsHospitalisationDays> expectedResult = new ArrayList<CdsHospitalisationDays>(Arrays.asList(
 				hospitalisationDays1,
 				hospitalisationDays3

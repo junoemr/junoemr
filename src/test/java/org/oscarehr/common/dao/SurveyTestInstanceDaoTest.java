@@ -30,15 +30,22 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.SurveyTestInstance;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SurveyTestInstanceDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SurveyTestInstanceDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SurveyTestInstanceDao surveyTestInstanceDao;
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
-	protected SurveyTestInstanceDao dao = SpringUtils.getBean(SurveyTestInstanceDao.class);
 
 	@Before
 	public void before() throws Exception {
@@ -49,7 +56,7 @@ public class SurveyTestInstanceDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		SurveyTestInstance entity = new SurveyTestInstance();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		surveyTestInstanceDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -72,31 +79,31 @@ public class SurveyTestInstanceDaoTest extends DaoTestFixtures {
 		surveyTestInstance1.setClientId(clientId2);
 		surveyTestInstance1.setSurveyId(surveyId1);
 		surveyTestInstance1.setDateCreated(dateCreated1);
-		dao.persist(surveyTestInstance1);
+		surveyTestInstanceDao.persist(surveyTestInstance1);
 		
 		SurveyTestInstance surveyTestInstance2 = new SurveyTestInstance();
 		EntityDataGenerator.generateTestDataForModelClass(surveyTestInstance2);
 		surveyTestInstance2.setClientId(clientId1);
 		surveyTestInstance2.setSurveyId(surveyId1);
 		surveyTestInstance2.setDateCreated(dateCreated2);
-		dao.persist(surveyTestInstance2);
+		surveyTestInstanceDao.persist(surveyTestInstance2);
 		
 		SurveyTestInstance surveyTestInstance3 = new SurveyTestInstance();
 		EntityDataGenerator.generateTestDataForModelClass(surveyTestInstance3);
 		surveyTestInstance3.setClientId(clientId1);
 		surveyTestInstance3.setSurveyId(surveyId2);
 		surveyTestInstance3.setDateCreated(dateCreated3);
-		dao.persist(surveyTestInstance3);
+		surveyTestInstanceDao.persist(surveyTestInstance3);
 		
 		SurveyTestInstance surveyTestInstance4 = new SurveyTestInstance();
 		EntityDataGenerator.generateTestDataForModelClass(surveyTestInstance4);
 		surveyTestInstance4.setClientId(clientId1);
 		surveyTestInstance4.setSurveyId(surveyId1);
 		surveyTestInstance4.setDateCreated(dateCreated4);
-		dao.persist(surveyTestInstance4);
+		surveyTestInstanceDao.persist(surveyTestInstance4);
 		
 		SurveyTestInstance expectedResult = surveyTestInstance2;
-		SurveyTestInstance result = dao.getSurveyInstance(surveyId1, clientId1);
+		SurveyTestInstance result = surveyTestInstanceDao.getSurveyInstance(surveyId1, clientId1);
 		
 		assertEquals(expectedResult, result);
 	}

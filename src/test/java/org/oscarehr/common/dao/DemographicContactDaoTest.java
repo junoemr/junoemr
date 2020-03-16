@@ -35,16 +35,22 @@ import org.apache.log4j.Logger;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DemographicContactDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DemographicContactDao demographicContactDao;
 
-public class DemographicContactDaoTest extends DaoTestFixtures {
-
-	protected DemographicContactDao dao = SpringUtils.getBean(DemographicContactDao.class);
 	Logger logger = MiscUtils.getLogger();
 
 	@Before
@@ -82,12 +88,12 @@ public class DemographicContactDaoTest extends DaoTestFixtures {
 		contact4.setDemographicNo(5);
 		contact4.setDeleted(false);
 
-		dao.persist(contact1);
-		dao.persist(contact2);
-		dao.persist(contact3);
-		dao.persist(contact4);
+		demographicContactDao.persist(contact1);
+		demographicContactDao.persist(contact2);
+		demographicContactDao.persist(contact3);
+		demographicContactDao.persist(contact4);
 
-		List<DemographicContact> result = dao.findByDemographicNo(demographicNo);
+		List<DemographicContact> result = demographicContactDao.findByDemographicNo(demographicNo);
 		List<DemographicContact> expectedResult = new ArrayList<DemographicContact>(Arrays.asList(
 				contact1,
 				contact3
@@ -139,13 +145,13 @@ public class DemographicContactDaoTest extends DaoTestFixtures {
 		contact5.setDeleted(false);
 		contact5.setCategory(category);
 
-		dao.persist(contact1);
-		dao.persist(contact2);
-		dao.persist(contact3);
-		dao.persist(contact4);
-		dao.persist(contact5);
+		demographicContactDao.persist(contact1);
+		demographicContactDao.persist(contact2);
+		demographicContactDao.persist(contact3);
+		demographicContactDao.persist(contact4);
+		demographicContactDao.persist(contact5);
 
-		List<DemographicContact> result = dao.findByDemographicNoAndCategory(demographicNo, category);
+		List<DemographicContact> result = demographicContactDao.findByDemographicNoAndCategory(demographicNo, category);
 		List<DemographicContact> expectedResult = new ArrayList<DemographicContact>(Arrays.asList(
 				contact1,
 				contact5
@@ -210,14 +216,14 @@ public class DemographicContactDaoTest extends DaoTestFixtures {
 		contact6.setCategory(category);
 		contact6.setContactId(contactId);
 		
-		dao.persist(contact1);
-		dao.persist(contact2);
-		dao.persist(contact3);
-		dao.persist(contact4);
-		dao.persist(contact5);
-		dao.persist(contact6);
+		demographicContactDao.persist(contact1);
+		demographicContactDao.persist(contact2);
+		demographicContactDao.persist(contact3);
+		demographicContactDao.persist(contact4);
+		demographicContactDao.persist(contact5);
+		demographicContactDao.persist(contact6);
 		
-		List<DemographicContact> result = dao.find(demographicNo, 101);
+		List<DemographicContact> result = demographicContactDao.find(demographicNo, 101);
 		List<DemographicContact> expectedResult = new ArrayList<DemographicContact>(Arrays.asList(
 				contact1,
 				contact3,
@@ -231,7 +237,7 @@ public class DemographicContactDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		DemographicContact entity = new DemographicContact();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		demographicContactDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

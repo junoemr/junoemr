@@ -25,12 +25,18 @@ package org.oscarehr.common.dao;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MdsZMNDaoTest extends DaoTestFixtures {
-
-	protected MdsZMNDao dao = SpringUtils.getBean(MdsZMNDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MdsZMNDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MdsZMNDao mdsZMNDao;
 
 	@Before
 	public void before() throws Exception {
@@ -39,12 +45,12 @@ public class MdsZMNDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindBySegmentIdAndReportName() {
-		dao.findBySegmentIdAndReportName(100, "CDE");
+		mdsZMNDao.findBySegmentIdAndReportName(100, "CDE");
 	}
 
 	@Test
 	public void testFindBySegmentIdAndResultMnemonic() {
-		dao.findBySegmentIdAndResultMnemonic(100, "CDE");
+		mdsZMNDao.findBySegmentIdAndResultMnemonic(100, "CDE");
 	}
 
 }

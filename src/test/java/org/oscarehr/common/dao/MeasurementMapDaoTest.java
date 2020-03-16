@@ -34,15 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.MeasurementMap;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MeasurementMapDaoTest extends DaoTestFixtures{
-
-	protected MeasurementMapDao dao = SpringUtils.getBean(MeasurementMapDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MeasurementMapDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MeasurementMapDao measurementMapDao;
 
 	public MeasurementMapDaoTest() {
 	}
@@ -58,7 +64,7 @@ public class MeasurementMapDaoTest extends DaoTestFixtures{
         public void testCreate() throws Exception {
                 MeasurementMap entity = new MeasurementMap();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                measurementMapDao.persist(entity);
 
                 assertNotNull(entity.getId());
         }
@@ -68,22 +74,22 @@ public class MeasurementMapDaoTest extends DaoTestFixtures{
 		
 		MeasurementMap measurementMap1 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap1);
-		dao.persist(measurementMap1);
+		measurementMapDao.persist(measurementMap1);
 		
 		MeasurementMap measurementMap2 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap2);
-		dao.persist(measurementMap2);
+		measurementMapDao.persist(measurementMap2);
 		
 		MeasurementMap measurementMap3 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap3);
-		dao.persist(measurementMap3);
+		measurementMapDao.persist(measurementMap3);
 		
 		MeasurementMap measurementMap4 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap4);
-		dao.persist(measurementMap4);
+		measurementMapDao.persist(measurementMap4);
 		
 		List<MeasurementMap> expectedResult = new ArrayList<MeasurementMap>(Arrays.asList(measurementMap1, measurementMap2, measurementMap3, measurementMap4));
-		List<MeasurementMap> result = dao.getAllMaps();
+		List<MeasurementMap> result = measurementMapDao.getAllMaps();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -109,20 +115,20 @@ public class MeasurementMapDaoTest extends DaoTestFixtures{
 		MeasurementMap measurementMap1 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap1);
 		measurementMap1.setIdentCode(identCode1);
-		dao.persist(measurementMap1);
+		measurementMapDao.persist(measurementMap1);
 		
 		MeasurementMap measurementMap2 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap2);
 		measurementMap2.setIdentCode(identCode2);
-		dao.persist(measurementMap2);
+		measurementMapDao.persist(measurementMap2);
 		
 		MeasurementMap measurementMap3 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap3);
 		measurementMap3.setIdentCode(identCode1);
-		dao.persist(measurementMap3);
+		measurementMapDao.persist(measurementMap3);
 		
 		List<MeasurementMap> expectedResult = new ArrayList<MeasurementMap>(Arrays.asList(measurementMap1, measurementMap3));
-		List<MeasurementMap> result = dao.getMapsByIdent(identCode1);
+		List<MeasurementMap> result = measurementMapDao.getMapsByIdent(identCode1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -148,20 +154,20 @@ public class MeasurementMapDaoTest extends DaoTestFixtures{
 		MeasurementMap measurementMap1 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap1);
 		measurementMap1.setLoincCode(loincCode1);
-		dao.persist(measurementMap1);
+		measurementMapDao.persist(measurementMap1);
 		
 		MeasurementMap measurementMap2 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap2);
 		measurementMap2.setLoincCode(loincCode2);
-		dao.persist(measurementMap2);
+		measurementMapDao.persist(measurementMap2);
 		
 		MeasurementMap measurementMap3 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap3);
 		measurementMap3.setLoincCode(loincCode1);
-		dao.persist(measurementMap3);
+		measurementMapDao.persist(measurementMap3);
 		
 		List<MeasurementMap> expectedResult = new ArrayList<MeasurementMap>(Arrays.asList(measurementMap1, measurementMap3));
-		List<MeasurementMap> result = dao.findByLoincCode(loincCode1);
+		List<MeasurementMap> result = measurementMapDao.findByLoincCode(loincCode1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -191,28 +197,28 @@ public class MeasurementMapDaoTest extends DaoTestFixtures{
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap1);
 		measurementMap1.setLoincCode(loincCode1);
 		measurementMap1.setLabType(labType1);
-		dao.persist(measurementMap1);
+		measurementMapDao.persist(measurementMap1);
 		
 		MeasurementMap measurementMap2 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap2);
 		measurementMap2.setLoincCode(loincCode2);
 		measurementMap2.setLabType(labType1);
-		dao.persist(measurementMap2);
+		measurementMapDao.persist(measurementMap2);
 		
 		MeasurementMap measurementMap3 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap3);
 		measurementMap3.setLoincCode(loincCode1);
 		measurementMap3.setLabType(labType1);
-		dao.persist(measurementMap3);
+		measurementMapDao.persist(measurementMap3);
 		
 		MeasurementMap measurementMap4 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap4);
 		measurementMap4.setLoincCode(loincCode1);
 		measurementMap4.setLabType(labType2);
-		dao.persist(measurementMap4);
+		measurementMapDao.persist(measurementMap4);
 		
 		List<MeasurementMap> expectedResult = new ArrayList<MeasurementMap>(Arrays.asList(measurementMap1, measurementMap3));
-		List<MeasurementMap> result = dao.findByLoincCodeAndLabType(loincCode1, labType1);
+		List<MeasurementMap> result = measurementMapDao.findByLoincCodeAndLabType(loincCode1, labType1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -239,25 +245,25 @@ public class MeasurementMapDaoTest extends DaoTestFixtures{
 		MeasurementMap measurementMap1 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap1);
 		measurementMap1.setLabType(labType1);
-		dao.persist(measurementMap1);
+		measurementMapDao.persist(measurementMap1);
 		
 		MeasurementMap measurementMap2 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap2);
 		measurementMap2.setLabType(labType1);
-		dao.persist(measurementMap2);
+		measurementMapDao.persist(measurementMap2);
 		
 		MeasurementMap measurementMap3 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap3);
 		measurementMap3.setLabType(labType3);
-		dao.persist(measurementMap3);
+		measurementMapDao.persist(measurementMap3);
 		
 		MeasurementMap measurementMap4 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap4);
 		measurementMap4.setLabType(labType2);
-		dao.persist(measurementMap4);
+		measurementMapDao.persist(measurementMap4);
 		
 		List<String> expectedResult = new ArrayList<String>(Arrays.asList(labType1, labType3, labType2));
-		List<String> result = dao.findDistinctLabTypes();
+		List<String> result = measurementMapDao.findDistinctLabTypes();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -283,20 +289,20 @@ public class MeasurementMapDaoTest extends DaoTestFixtures{
 		MeasurementMap measurementMap1 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap1);
 		measurementMap1.setLoincCode(loincCode1);
-		dao.persist(measurementMap1);
+		measurementMapDao.persist(measurementMap1);
 		
 		MeasurementMap measurementMap2 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap2);
 		measurementMap2.setLoincCode(loincCode2);
-		dao.persist(measurementMap2);
+		measurementMapDao.persist(measurementMap2);
 		
 		MeasurementMap measurementMap3 = new MeasurementMap();
 		EntityDataGenerator.generateTestDataForModelClass(measurementMap3);
 		measurementMap3.setLoincCode(loincCode1);
-		dao.persist(measurementMap3);
+		measurementMapDao.persist(measurementMap3);
 		
 		List<String> expectedResult = new ArrayList<String>(Arrays.asList(loincCode1, loincCode2));
-		List<String> result = dao.findDistinctLoincCodes();
+		List<String> result = measurementMapDao.findDistinctLoincCodes();
 
 		Logger logger = MiscUtils.getLogger();
 		

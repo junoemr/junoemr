@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.MeasurementGroup;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MeasurementGroupDaoTest extends DaoTestFixtures {
-
-	protected MeasurementGroupDao dao = SpringUtils.getBean(MeasurementGroupDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MeasurementGroupDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MeasurementGroupDao measurementGroupDao;
 
 
 	@Before
@@ -46,7 +52,7 @@ public class MeasurementGroupDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		MeasurementGroup entity = new MeasurementGroup();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		measurementGroupDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

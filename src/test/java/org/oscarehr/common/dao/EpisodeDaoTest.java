@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Episode;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class EpisodeDaoTest extends DaoTestFixtures {
-
-	protected EpisodeDao dao = SpringUtils.getBean(EpisodeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EpisodeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected EpisodeDao episodeDao;
 
 
 	@Before
@@ -46,7 +52,7 @@ public class EpisodeDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Episode entity = new Episode();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		episodeDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

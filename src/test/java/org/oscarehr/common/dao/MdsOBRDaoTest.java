@@ -30,12 +30,18 @@ import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MdsOBRDaoTest extends DaoTestFixtures {
-
-	protected MdsOBRDao dao = SpringUtils.getBean(MdsOBRDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MdsOBRDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MdsOBRDao mdsOBRDao;
 
 	@Before
 	public void before() throws Exception {
@@ -44,7 +50,7 @@ public class MdsOBRDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindByIdAndResultCodes() {
-		assertNotNull(dao.findByIdAndResultCodes(10, new ArrayList<String>()));
-		assertNotNull(dao.findByIdAndResultCodes(10, Arrays.asList(new String[] { "10", "20", "30" })));
+		assertNotNull(mdsOBRDao.findByIdAndResultCodes(10, new ArrayList<String>()));
+		assertNotNull(mdsOBRDao.findByIdAndResultCodes(10, Arrays.asList(new String[] { "10", "20", "30" })));
 	}
 }

@@ -33,15 +33,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.PreventionsLotNrs;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
-	
-	protected PreventionsLotNrsDao dao = (PreventionsLotNrsDao)SpringUtils.getBean(PreventionsLotNrsDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PreventionsLotNrsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected PreventionsLotNrsDao preventionsLotNrsDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -61,7 +67,7 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		p1.setProviderNo("unit_tester");
 		p1.setCreationDate(new java.util.Date());
 		p1.setDeleted(false);
-		dao.persist(p1);
+		preventionsLotNrsDao.persist(p1);
 		
 		PreventionsLotNrs p2 = new PreventionsLotNrs();
 		EntityDataGenerator.generateTestDataForModelClass(p2);
@@ -70,10 +76,10 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		p2.setProviderNo("unit_tester");
 		p2.setCreationDate(new java.util.Date());
 		p2.setDeleted(false);
-		dao.persist(p2);
+		preventionsLotNrsDao.persist(p2);
 		
 		List<PreventionsLotNrs> expectedResult = new ArrayList<PreventionsLotNrs>(Arrays.asList(p1, p2));
-		List<PreventionsLotNrs> result = dao.findLotNrData(false);
+		List<PreventionsLotNrs> result = preventionsLotNrsDao.findLotNrData(false);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -88,7 +94,7 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 			}
 		}
 		
-		List<PreventionsLotNrs> result2 = dao.findLotNrData(true);
+		List<PreventionsLotNrs> result2 = preventionsLotNrsDao.findLotNrData(true);
 		
 		if (result2.size() != 0) {
 			logger.warn("Deleted items found but do not exist in test setup.");
@@ -112,7 +118,7 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		p1.setProviderNo("unit_tester");
 		p1.setCreationDate(new java.util.Date());
 		p1.setDeleted(false);
-		dao.persist(p1);
+		preventionsLotNrsDao.persist(p1);
 		
 		PreventionsLotNrs p2 = new PreventionsLotNrs();
 		EntityDataGenerator.generateTestDataForModelClass(p2);
@@ -121,7 +127,7 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		p2.setProviderNo("unit_tester");
 		p2.setCreationDate(new java.util.Date());
 		p2.setDeleted(false);
-		dao.persist(p2);
+		preventionsLotNrsDao.persist(p2);
 		
 		PreventionsLotNrs p3 = new PreventionsLotNrs();
 		EntityDataGenerator.generateTestDataForModelClass(p3);
@@ -130,9 +136,9 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		p3.setProviderNo("unit_tester");
 		p3.setCreationDate(new java.util.Date());
 		p3.setDeleted(true);
-		dao.persist(p3);
+		preventionsLotNrsDao.persist(p3);
 		
-		PreventionsLotNrs singlePrevLotNr = dao.findByName(prevention, lotNr3, true);
+		PreventionsLotNrs singlePrevLotNr = preventionsLotNrsDao.findByName(prevention, lotNr3, true);
 		
 		Logger logger = MiscUtils.getLogger();
 		if (!singlePrevLotNr.equals(p3))
@@ -157,7 +163,7 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		p1.setProviderNo("unit_tester");
 		p1.setCreationDate(new java.util.Date());
 		p1.setDeleted(false);
-		dao.persist(p1);
+		preventionsLotNrsDao.persist(p1);
 		
 		PreventionsLotNrs p2 = new PreventionsLotNrs();
 		EntityDataGenerator.generateTestDataForModelClass(p2);
@@ -166,7 +172,7 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		p2.setProviderNo("unit_tester");
 		p2.setCreationDate(new java.util.Date());
 		p2.setDeleted(false);
-		dao.persist(p2);
+		preventionsLotNrsDao.persist(p2);
 		
 		PreventionsLotNrs p3 = new PreventionsLotNrs();
 		EntityDataGenerator.generateTestDataForModelClass(p3);
@@ -175,10 +181,10 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		p3.setProviderNo("unit_tester");
 		p3.setCreationDate(new java.util.Date());
 		p3.setDeleted(true);
-		dao.persist(p3);
+		preventionsLotNrsDao.persist(p3);
 		
 		List<String> expectedResult = new ArrayList<String>(Arrays.asList(lotNr1, lotNr2, lotNr3));
-		List<String> result = dao.findLotNrs(prevention, null);
+		List<String> result = preventionsLotNrsDao.findLotNrs(prevention, null);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -212,7 +218,7 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		p1.setProviderNo("unit_tester");
 		p1.setCreationDate(new java.util.Date());
 		p1.setDeleted(false);
-		dao.persist(p1);
+		preventionsLotNrsDao.persist(p1);
 		
 		PreventionsLotNrs p2 = new PreventionsLotNrs();
 		EntityDataGenerator.generateTestDataForModelClass(p2);
@@ -221,7 +227,7 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		p2.setProviderNo("unit_tester");
 		p2.setCreationDate(new java.util.Date());
 		p2.setDeleted(false);
-		dao.persist(p2);
+		preventionsLotNrsDao.persist(p2);
 		
 		PreventionsLotNrs p3 = new PreventionsLotNrs();
 		EntityDataGenerator.generateTestDataForModelClass(p3);
@@ -230,9 +236,9 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		p3.setProviderNo("unit_tester");
 		p3.setCreationDate(new java.util.Date());
 		p3.setDeleted(true);
-		dao.persist(p3);
+		preventionsLotNrsDao.persist(p3);
 		
-		List<PreventionsLotNrs> result = dao.findPagedData(prevention, null, 0, 10);
+		List<PreventionsLotNrs> result = preventionsLotNrsDao.findPagedData(prevention, null, 0, 10);
 		
 		Logger logger = MiscUtils.getLogger();
 		

@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.OscarCommLocations;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class OscarCommLocationsDaoTest extends DaoTestFixtures {
-
-	protected OscarCommLocationsDao dao = SpringUtils.getBean(OscarCommLocationsDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class OscarCommLocationsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected OscarCommLocationsDao oscarCommLocationsDao;
 
 
 	@Before
@@ -47,7 +53,7 @@ public class OscarCommLocationsDaoTest extends DaoTestFixtures {
 		OscarCommLocations entity = new OscarCommLocations();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setId(1);
-		dao.persist(entity);
+		oscarCommLocationsDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

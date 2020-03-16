@@ -41,14 +41,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BatchBilling;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BatchBillingDAOTest extends DaoTestFixtures{
-	protected BatchBillingDAO dao = (BatchBillingDAO)SpringUtils.getBean(BatchBillingDAO.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BatchBillingDAOTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BatchBillingDAO batchBillingDAO;
+
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 	Timestamp currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
 	
@@ -70,24 +78,24 @@ public class BatchBillingDAOTest extends DaoTestFixtures{
 		bBilling1.setCreateDate(currentTimestamp);
 		bBilling1.setDemographicNo(demoNo1);	
 		bBilling1.setServiceCode(serviceCode1);
-		dao.persist(bBilling1);
+		batchBillingDAO.persist(bBilling1);
 		
 		BatchBilling bBilling2 = new BatchBilling();
 		EntityDataGenerator.generateTestDataForModelClass(bBilling2);
 		bBilling2.setCreateDate(currentTimestamp);
 		bBilling2.setDemographicNo(demoNo2);
 		bBilling2.setServiceCode(serviceCode2);
-		dao.persist(bBilling2);
+		batchBillingDAO.persist(bBilling2);
 		
 		BatchBilling bBilling3 = new BatchBilling();
 		EntityDataGenerator.generateTestDataForModelClass(bBilling3);
 		bBilling3.setCreateDate(currentTimestamp);
 		bBilling3.setDemographicNo(demoNo1);	
 		bBilling3.setServiceCode(serviceCode1);
-		dao.persist(bBilling3);
+		batchBillingDAO.persist(bBilling3);
 		
 		List<BatchBilling> expectedResult = new ArrayList<BatchBilling>(Arrays.asList(bBilling1, bBilling3));
-		List<BatchBilling> result = dao.find(demoNo1, serviceCode1);
+		List<BatchBilling> result = batchBillingDAO.find(demoNo1, serviceCode1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -114,22 +122,22 @@ public class BatchBillingDAOTest extends DaoTestFixtures{
 		EntityDataGenerator.generateTestDataForModelClass(bBilling1);
 		bBilling1.setCreateDate(currentTimestamp);
 		bBilling1.setBillingProviderNo(providerNo1);
-		dao.persist(bBilling1);
+		batchBillingDAO.persist(bBilling1);
 		
 		BatchBilling bBilling2 = new BatchBilling();
 		EntityDataGenerator.generateTestDataForModelClass(bBilling2);
 		bBilling2.setCreateDate(currentTimestamp);
 		bBilling2.setBillingProviderNo(providerNo2);
-		dao.persist(bBilling2);
+		batchBillingDAO.persist(bBilling2);
 		
 		BatchBilling bBilling3 = new BatchBilling();
 		EntityDataGenerator.generateTestDataForModelClass(bBilling3);
 		bBilling3.setCreateDate(currentTimestamp);
 		bBilling3.setBillingProviderNo(providerNo1);
-		dao.persist(bBilling3);
+		batchBillingDAO.persist(bBilling3);
 		
 		List<BatchBilling> expectedResult = new ArrayList<BatchBilling>(Arrays.asList(bBilling1, bBilling3));
-		List<BatchBilling> result = dao.findByProvider(providerNo1);
+		List<BatchBilling> result = batchBillingDAO.findByProvider(providerNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -158,24 +166,24 @@ public class BatchBillingDAOTest extends DaoTestFixtures{
 		bBilling1.setCreateDate(currentTimestamp);
 		bBilling1.setBillingProviderNo(providerNo1);
 		bBilling1.setServiceCode(serviceCode1);
-		dao.persist(bBilling1);
+		batchBillingDAO.persist(bBilling1);
 		
 		BatchBilling bBilling2 = new BatchBilling();
 		EntityDataGenerator.generateTestDataForModelClass(bBilling2);
 		bBilling2.setCreateDate(currentTimestamp);
 		bBilling2.setBillingProviderNo(providerNo2);
 		bBilling2.setServiceCode(serviceCode2);
-		dao.persist(bBilling2);
+		batchBillingDAO.persist(bBilling2);
 		
 		BatchBilling bBilling3 = new BatchBilling();
 		EntityDataGenerator.generateTestDataForModelClass(bBilling3);
 		bBilling3.setCreateDate(currentTimestamp);
 		bBilling3.setBillingProviderNo(providerNo1);
 		bBilling3.setServiceCode(serviceCode1);
-		dao.persist(bBilling3);
+		batchBillingDAO.persist(bBilling3);
 		
 		List<BatchBilling> expectedResult = new ArrayList<BatchBilling>(Arrays.asList(bBilling1, bBilling3));		
-		List<BatchBilling> result = dao.findByProvider(providerNo1, serviceCode1);
+		List<BatchBilling> result = batchBillingDAO.findByProvider(providerNo1, serviceCode1);
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -201,16 +209,16 @@ public class BatchBillingDAOTest extends DaoTestFixtures{
 		EntityDataGenerator.generateTestDataForModelClass(bBilling1);
 		bBilling1.setCreateDate(currentTimestamp);
 		bBilling1.setServiceCode(serviceCode1);
-		dao.persist(bBilling1);
+		batchBillingDAO.persist(bBilling1);
 		
 		BatchBilling bBilling2 = new BatchBilling();
 		EntityDataGenerator.generateTestDataForModelClass(bBilling2);
 		bBilling2.setCreateDate(currentTimestamp);
 		bBilling2.setServiceCode(serviceCode2);
-		dao.persist(bBilling2);
+		batchBillingDAO.persist(bBilling2);
 		
 		List<BatchBilling> expectedResult = new ArrayList<BatchBilling>(Arrays.asList(bBilling1));		
-		List<BatchBilling> result = dao.findByServiceCode(serviceCode1);
+		List<BatchBilling> result = batchBillingDAO.findByServiceCode(serviceCode1);
 		
 		assertEquals(expectedResult.get(0), result.get(0));
 		
@@ -225,22 +233,22 @@ public class BatchBillingDAOTest extends DaoTestFixtures{
 		EntityDataGenerator.generateTestDataForModelClass(bBilling1);
 		bBilling1.setCreateDate(currentTimestamp);
 		bBilling1.setServiceCode(serviceCode1);
-		dao.persist(bBilling1);
+		batchBillingDAO.persist(bBilling1);
 		
 		BatchBilling bBilling2 = new BatchBilling();
 		EntityDataGenerator.generateTestDataForModelClass(bBilling2);
 		bBilling2.setCreateDate(currentTimestamp);
 		bBilling2.setServiceCode(serviceCode2);
-		dao.persist(bBilling2);
+		batchBillingDAO.persist(bBilling2);
 		
 		BatchBilling bBilling3 = new BatchBilling();
 		EntityDataGenerator.generateTestDataForModelClass(bBilling3);
 		bBilling3.setCreateDate(currentTimestamp);
 		bBilling3.setServiceCode(serviceCode2);
-		dao.persist(bBilling3);
+		batchBillingDAO.persist(bBilling3);
 		
 		List<BatchBilling> expectedResult = new ArrayList<BatchBilling>(Arrays.asList(bBilling1, bBilling2, bBilling3));		
-		List<BatchBilling> result = dao.findAll();
+		List<BatchBilling> result = batchBillingDAO.findAll();
 		
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {
@@ -266,22 +274,22 @@ public class BatchBillingDAOTest extends DaoTestFixtures{
 		EntityDataGenerator.generateTestDataForModelClass(bBilling1);
 		bBilling1.setCreateDate(currentTimestamp);
 		bBilling1.setServiceCode(serviceCode1);
-		dao.persist(bBilling1);
+		batchBillingDAO.persist(bBilling1);
 		
 		BatchBilling bBilling2 = new BatchBilling();
 		EntityDataGenerator.generateTestDataForModelClass(bBilling2);
 		bBilling2.setCreateDate(currentTimestamp);
 		bBilling2.setServiceCode(serviceCode1);
-		dao.persist(bBilling2);
+		batchBillingDAO.persist(bBilling2);
 		
 		BatchBilling bBilling3 = new BatchBilling();
 		EntityDataGenerator.generateTestDataForModelClass(bBilling3);
 		bBilling3.setCreateDate(currentTimestamp);
 		bBilling3.setServiceCode(serviceCode2);
-		dao.persist(bBilling3);
+		batchBillingDAO.persist(bBilling3);
 		
 		List<String> expectedResult = new ArrayList<String>(Arrays.asList(serviceCode1,serviceCode2));		
-		List<String> result = dao.findDistinctServiceCodes();
+		List<String> result = batchBillingDAO.findDistinctServiceCodes();
 	
 		
 		Logger logger = MiscUtils.getLogger();

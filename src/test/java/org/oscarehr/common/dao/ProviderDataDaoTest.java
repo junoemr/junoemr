@@ -31,15 +31,21 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ProviderDataDaoTest extends DaoTestFixtures {
-
-	protected ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProviderDataDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProviderDataDao providerDataDao;
 
 	@Before
 	public void before() throws Exception {
@@ -48,64 +54,64 @@ public class ProviderDataDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindByTypeAndOhip() {
-		List<ProviderData> data = dao.findByTypeAndOhip("doctor", "OHIP NO");
+		List<ProviderData> data = providerDataDao.findByTypeAndOhip("doctor", "OHIP NO");
 		assertNotNull(data);
 	}
 	
 	@Test
 	public void testFindByType() {
-		List<ProviderData> data = dao.findByType("doctor");
+		List<ProviderData> data = providerDataDao.findByType("doctor");
 		assertNotNull(data);
 	}
 	
 	@Test
 	public void testFindByName() {
-		List<ProviderData> data = dao.findByName(null, null, false);
+		List<ProviderData> data = providerDataDao.findByName(null, null, false);
 		assertNotNull(data);
 		
-		data = dao.findByName(null, null, true);
+		data = providerDataDao.findByName(null, null, true);
 		assertNotNull(data);
 		
-		data = dao.findByName(null, "FIRST", true);
+		data = providerDataDao.findByName(null, "FIRST", true);
 		assertNotNull(data);
 		
-		data = dao.findByName(null, "FIRST", false);
+		data = providerDataDao.findByName(null, "FIRST", false);
 		assertNotNull(data);
 		
-		data = dao.findByName("LAST", null, false);
+		data = providerDataDao.findByName("LAST", null, false);
 		assertNotNull(data);
 		
-		data = dao.findByName("LAST", null, true);
+		data = providerDataDao.findByName("LAST", null, true);
 		assertNotNull(data);
 		
-		data = dao.findByName("LAST", "FIRST", true);
+		data = providerDataDao.findByName("LAST", "FIRST", true);
 		assertNotNull(data);
 		
-		data = dao.findByName("LAST", "FIRST", false);
+		data = providerDataDao.findByName("LAST", "FIRST", false);
 		assertNotNull(data);
 	}
 	
 	@Test
 	public void testFindAll() {
-		List<ProviderData> data = dao.findAll(true);
+		List<ProviderData> data = providerDataDao.findAll(true);
 		assertNotNull(data);
 		
-		data = dao.findAll(false);
+		data = providerDataDao.findAll(false);
 		assertNotNull(data);
 	}
 	
 	@Test
 	public void testGetLastId() {
 		ProviderData pd = newProvider("-1001");
-		dao.persist(pd);
+		providerDataDao.persist(pd);
 		
 		pd = newProvider("-2");
-		dao.persist(pd);
+		providerDataDao.persist(pd);
 		
 		pd = newProvider("1");
-		dao.persist(pd);
+		providerDataDao.persist(pd);
 		
-		Integer id = dao.getLastId();
+		Integer id = providerDataDao.getLastId();
 		assertEquals(new Integer(-1001), id);
 	}
 
