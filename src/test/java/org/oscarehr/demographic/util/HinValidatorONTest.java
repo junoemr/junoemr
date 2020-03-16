@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic;
+package org.oscarehr.demographic.util;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,12 +33,12 @@ import java.util.Collection;
 import static junit.framework.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class HinValidatorTestON
+public class HinValidatorONTest
 {
 	private String hin;
 	private boolean expectedResult;
 
-	public HinValidatorTestON(String hin, boolean result)
+	public HinValidatorONTest(String hin, boolean result)
 	{
 		this.hin = hin;
 		this.expectedResult = result;
@@ -55,6 +55,7 @@ public class HinValidatorTestON
 						{"9663096511", false},
 						{"9663096512", false},
 						{"9663096510", true},
+						{"9876543217", true}
 				});
 	}
 

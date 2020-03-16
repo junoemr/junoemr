@@ -20,12 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic;
+package org.oscarehr.demographic.util;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.oscarehr.demographic.util.HinValidator;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,12 +32,12 @@ import java.util.Collection;
 import static junit.framework.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class HinValidatorTestBC
+public class HinValidatorBCTest
 {
 	private String hin;
 	private boolean expectedResult;
 
-	public HinValidatorTestBC(String hin, boolean result)
+	public HinValidatorBCTest(String hin, boolean result)
 	{
 		this.hin = hin;
 		this.expectedResult = result;
@@ -56,7 +55,14 @@ public class HinValidatorTestBC
 						{"123456789", false},
 						// valid phn
 						{"9012372173", true},
+						// invalid phn with leading 9
+						{"9999999999", false},
+						// valid phns from test teleplan submissions file
+						{"9151247483", true},
+						{"9151210417", true},
+						{"9151274799", true},
 						// Valid Correctional
+						// Legacy format for prisoners that had temporary/replacement PHNs assigned
 						{"618622658", true},
 						{"12345674", true},
 				});

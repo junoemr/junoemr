@@ -32,15 +32,16 @@
 <%@ page import="oscar.oscarRx.data.RxPrescriptionData" %>
 <%@ page import="oscar.oscarRx.data.RxCodesData" %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 
 <c:set var="context" value="${pageContext.request.contextPath}" />
 <html:html locale="true">
 <head>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-	<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/prototype.js"/>"></script>
-	<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/screen.js"/>"></script>
-	<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/rx.js"/>"></script>
-	<script type="text/javascript" src="<c:out value="${ctx}/share/javascript/scriptaculous.js"/>"></script>
+	<script type="text/javascript" src="<c:out value="${context}/share/javascript/prototype.js"/>"></script>
+	<script type="text/javascript" src="<c:out value="${context}/share/javascript/screen.js"/>"></script>
+	<script type="text/javascript" src="<c:out value="${context}/share/javascript/rx.js"/>"></script>
+	<script type="text/javascript" src="<c:out value="${context}/share/javascript/scriptaculous.js"/>"></script>
 	<title>Edit Favorites</title>
 	<html:base />
 
@@ -64,8 +65,6 @@
 	</style>
 </head>
 
-
-
 <%
 	RxSessionBean rxSessionBean = (RxSessionBean) pageContext.getAttribute("bean");
 
@@ -74,14 +73,14 @@
 	RxCodesData.FrequencyCode[] frequencies = new oscar.oscarRx.data.RxCodesData().getFrequencyCodes();
 %>
 
-<script language=javascript>
+<script type="text/javascript">
 
     function deleteRow(favoriteID, favoriteName) {
         var deleteObj = {favoriteId: favoriteID};
         var endpoint = '/oscarRx/deleteFavorite2.do';
 
         if (confirm('Are you sure you want to delete favorite: \n' + favoriteName + '?')) {
-            new Ajax.Request('<c:out value="${ctx}"/>' + endpoint,
+            new Ajax.Request('<c:out value="${context}"/>' + endpoint,
                 {
                     method: 'delete',
                     parameters: deleteObj,
@@ -91,20 +90,21 @@
                     },
                     onFailure:function(err)
                     {
-                        alert("An error occured while deleting");
+                        alert("An error occurred while deleting");
+                        console.log(err);
                     }
                 });
         }
     }
 
     function ajaxUpdateRow(formID, saveNotificationID) {
-        var form = document.getElementById(formID)
+        var form = document.getElementById(formID);
         var formObj = formToObject(form);
         var endpoint =  '/oscarRx/updateFavorite2.do?method=ajaxEditFavorite';
 
         if (validateUpdate(formObj))
 		{
-            new Ajax.Request('<c:out value="${ctx}"/>' + endpoint,
+            new Ajax.Request('<c:out value="${context}"/>' + endpoint,
                 {
                     method: 'post',
                     parameters: formObj,
@@ -116,7 +116,8 @@
                     },
                     onFailure:function(err)
                     {
-                        alert("An error occured while saving");
+                        alert("An error occurred while saving");
+                        console.log(err);
                     }
                 });
 		}
@@ -191,9 +192,6 @@
     document.onload = function() {document.forms['DispForm'].reset()}
 </script>
 
-
-
-
 <body topmargin="0" leftmargin="0" vlink="#0000FF">
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; position: absolute; left: 0; top:0;" bordercolor="#111111" width="100%" id="AutoNumber1" height="100%">
 	<%@ include file="TopLinks.jsp"%><!-- Row One included here-->
@@ -237,6 +235,7 @@
 					for (RxPrescriptionData.Favorite fav : favorites)
 					{
 						boolean isCustom = fav.getGCN_SEQNO() == 0;
+						String encodedFavName = StringEscapeUtils.escapeJavaScript(fav.getFavoriteName());
                 %>
 					<form name="DispForm" id="DispForm_<%=fav.getFavoriteId()%>">
 					<!-- Record line 1 -->
@@ -249,7 +248,7 @@
 						</td>
 						<td colspan=5>
 							<a href="javascript:void(0);" onclick='ajaxUpdateRow("DispForm_<%=fav.getFavoriteId()%>", "SaveSuccess_<%=fav.getFavoriteId()%>")'>Save Changes</a>&nbsp;&nbsp;&nbsp;
-							<a href="javascript:deleteRow('<%=fav.getFavoriteId()%>', '<%=fav.getFavoriteName()%>');">Delete Favorite</a>
+							<a href="javascript:deleteRow('<%=fav.getFavoriteId()%>', '<%=encodedFavName%>');">Delete Favorite</a>
                         </td>
 					</tr>
 					<% if(!isCustom) { %>
