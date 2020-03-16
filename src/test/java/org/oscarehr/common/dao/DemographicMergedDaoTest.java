@@ -124,21 +124,41 @@ public class DemographicMergedDaoTest extends DaoTestFixtures
 	@Test
 	public void testMergeDemographics_success()
 	{
-		assertTrue(dao.mergeDemographics("", 1, 2));
+		final int demographicNo = 1;
+		final int mergedTo = 2;
+
+		assertTrue(dao.mergeDemographics("", demographicNo, mergedTo));
+		List<DemographicMerged> demographicMerged = dao.findByDemographicNo(demographicNo);
+
+		assertEquals(1, demographicMerged.size());
+		assertEquals(mergedTo, demographicMerged.get(0).getMergedTo());
+
 	}
 
 	// Slightly different from the failure case, as we outright do not want the ability to merge a demographic to itself
 	@Test
 	public void testMergeDemographic_mergeToSelf()
 	{
-		assertFalse(dao.mergeDemographics("", 1, 1));
+		final int demographicNo = 1;
+
+		assertFalse(dao.mergeDemographics("", demographicNo, demographicNo));
+
+		List<DemographicMerged> noResults = dao.findByDemographicNo(1);
+		assertEquals(0, noResults.size());
 	}
 
 	@Test
 	public void testMergeDemographic_repeatedMerge()
 	{
-		assertTrue(dao.mergeDemographics("", 1, 2));
-		assertFalse(dao.mergeDemographics("", 1, 2));
+		final int demographicNo = 1;
+		final int mergedTo = 2;
+
+		assertTrue(dao.mergeDemographics("", demographicNo, mergedTo));
+		assertFalse(dao.mergeDemographics("", demographicNo, mergedTo));
+
+		List<DemographicMerged> demographicMerged = dao.findByDemographicNo(demographicNo);
+		assertEquals(1, demographicMerged.size());
+		assertEquals(mergedTo, demographicMerged.get(0).getMergedTo());
 	}
 
 	@Test
