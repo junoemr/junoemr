@@ -20,35 +20,29 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.myHealthAccess;
+package org.oscarehr.ws.rest.exceptionMapping;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.integration.myhealthaccess.service.PatientService;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
+import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-@Path("myhealthaccess/patient")
-@Component("PatientWebService")
-@Tag(name = "mhaPatient")
-public class PatientWebService extends AbstractServiceImpl
+@Provider
+public class MhaBaseExceptionMapper implements ExceptionMapper<BaseException>
 {
-	@Autowired
-	PatientService patientService;
-
-	@GET
-	@Path("/{demographic_no}/{site}/confirmed")
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> is_patient_confirmed(@PathParam("demographic_no") String demographicNo, @PathParam("site") String siteName)
+	public MhaBaseExceptionMapper()
 	{
-		return RestResponse.successResponse(patientService.isPatientConfirmed(Integer.parseInt(demographicNo), siteName));
 	}
 
+	@Override
+	public Response toResponse(BaseException exception)
+	{
+		RestResponse<String> response = RestResponse.errorResponse("MyHealthAccess Integration Error");
+
+		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(response)
+						.type(MediaType.APPLICATION_JSON).build();
+	}
 }
