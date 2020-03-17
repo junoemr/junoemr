@@ -180,7 +180,7 @@ public class BaseService extends org.oscarehr.integration.BaseService
 	 */
 	protected String getApiKey(String siteName) throws InvalidIntegrationException
 	{
-		return integrationService.findIntegrationBySiteName(siteName).getApiKey();
+		return integrationService.findMhaIntegration(siteName).getApiKey();
 	}
 
 	/**
@@ -191,6 +191,6 @@ public class BaseService extends org.oscarehr.integration.BaseService
 	 */
 	protected String getClinicId(String siteName) throws InvalidIntegrationException
 	{
-		return integrationService.findIntegrationBySiteName(siteName).getRemoteId();
+		return integrationService.findMhaIntegration(siteName).getRemoteId();
 	}
 }

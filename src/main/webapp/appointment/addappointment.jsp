@@ -1495,7 +1495,13 @@
 		{
 			return new Promise((resolve, reject) =>
 			{
-				jQuery.get("<%=request.getContextPath()%>/ws/rs/myhealthaccess/patient/" + demographicNo + "/" + site + "/confirmed", null,
+				let siteParam = "";
+				if (site)
+				{
+					siteParam = "?site=" + site;
+				}
+
+				jQuery.get("<%=request.getContextPath()%>/ws/rs/myhealthaccess/patient/" + demographicNo + "/confirmed" + siteParam, null,
 					(result) =>
 					{
 						resolve(result);

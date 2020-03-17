@@ -36,13 +36,18 @@ import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidUserIntegrationException;
+import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.oscarehr.common.model.Provider;
 
 @Service
 public class ClinicService extends BaseService
 {
+	@Autowired
+	MyHealthAccessService myHealthAccessService;
+
 	// Clinic API calls
 	public ClinicUserCreateResponseTo1 createClinicUser(IntegrationData integrationData, ClinicUserCreateTo1 newUser)
 	{
@@ -82,14 +87,15 @@ public class ClinicService extends BaseService
 		{
 			IntegrationData integrationData = getIntegrationData(siteName);
 			Provider provider = loggedInInfo.getLoggedInProvider();
-			ClinicUserCreateResponseTo1 createResponse = createClinicUser(integrationData, new ClinicUserCreateTo1(provider.getProviderNo(), provider.getFirstName(), provider.getLastName()));
-			return new ClinicUserLoginTokenTo1(createResponse.getToken());
+			integrationData = myHealthAccessService.createClinicUser(integrationData,loggedInInfo.getLoggedInSecurity(),
+							new ClinicUserCreateTo1(Integer.toString(loggedInInfo.getLoggedInSecurity().getSecurityNo()), provider.getFirstName(), provider.getLastName()));
+			return new ClinicUserLoginTokenTo1(integrationData.getLoginToken());
 		}
 	}
 
 	public ClinicUserLoginTokenTo1 clinicUserLogin(LoggedInInfo loggedInInfo, String siteName) throws InvalidIntegrationException, InvalidUserIntegrationException
 	{
-		Security security =  loggedInInfo.getLoggedInSecurity();
+		Security security = loggedInInfo.getLoggedInSecurity();
 
 		IntegrationData integrationData = getIntegrationData(siteName);
 

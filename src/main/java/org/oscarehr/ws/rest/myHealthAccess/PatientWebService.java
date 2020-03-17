@@ -29,10 +29,7 @@ import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 @Path("myhealthaccess/patient")
@@ -44,11 +41,10 @@ public class PatientWebService extends AbstractServiceImpl
 	PatientService patientService;
 
 	@GET
-	@Path("/{demographic_no}/{site}/confirmed")
+	@Path("/{demographic_no}/confirmed")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> is_patient_confirmed(@PathParam("demographic_no") String demographicNo, @PathParam("site") String siteName)
+	public RestResponse<Boolean> isPatientConfirmed(@PathParam("demographic_no") String demographicNo, @QueryParam("site") String siteName)
 	{
 		return RestResponse.successResponse(patientService.isPatientConfirmed(Integer.parseInt(demographicNo), siteName));
 	}
-
 }

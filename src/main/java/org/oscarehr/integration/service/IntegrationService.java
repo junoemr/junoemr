@@ -58,16 +58,6 @@ public class IntegrationService
         return integrationDao.findByIntegrationAndRemoteId(clinicId, Integration.INTEGRATION_TYPE_MHA);
     }
 
-    public Integration findIntegrationBySiteName(String siteName) throws InvalidIntegrationException
-    {
-        Integration integration =  integrationDao.findBySiteName(siteName);
-        if (integration == null)
-        {
-            throw new InvalidIntegrationException("no integrations for siteName [" + siteName + "]");
-        }
-        return integration;
-    }
-
     public List<Integration> getMyHealthAccessIntegrations()
     {
         return integrationDao.findMyHealthAccessIntegrations();
