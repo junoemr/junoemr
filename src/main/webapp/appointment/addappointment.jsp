@@ -1495,7 +1495,7 @@
 		{
 			return new Promise((resolve, reject) =>
 			{
-				let siteParam = "";
+				var siteParam = "";
 				if (site)
 				{
 					siteParam = "?site=" + site;
@@ -1515,8 +1515,8 @@
 
 		function updateTelehealthControlls()
 		{
-			let siteSelect = jQuery("#site-select");
-			let demographicNo = '<%=request.getParameter("demographic_no")%>';
+			var siteSelect = jQuery("#site-select");
+			var demographicNo = '<%=request.getParameter("demographic_no")%>';
 			if (demographicNo !== 'null')
 			{
 				checkDemographicConfirmed(demographicNo, siteSelect.val()).then((res) =>
@@ -1525,7 +1525,7 @@
 					if (res.body)
 					{
 						jQuery("#telehealth-checkbox").attr("disabled", false);
-						let msg = jQuery("#telehealth-message");
+						var msg = jQuery("#telehealth-message");
 						msg.css("visibility", "visible");
 						msg.css("color", "green");
 						msg.html("Patient connected to MyHealthAccess");
@@ -1535,7 +1535,7 @@
 					{
 						jQuery("#telehealth-checkbox").attr("checked", false);
 						jQuery("#telehealth-checkbox").attr("disabled", true);
-						let msg = jQuery("#telehealth-message");
+						var msg = jQuery("#telehealth-message");
 						msg.css("visibility", "visible");
 						msg.css("color", "orange");
 						msg.html("Patient not connected to MyHealthAccess");

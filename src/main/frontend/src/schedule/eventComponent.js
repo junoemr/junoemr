@@ -444,7 +444,7 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.updateDemographicTelehealthEligibility = () =>
 			{
-				if (controller.demographicModel.demographicNo)
+				if (controller.demographicModel.demographicNo && !controller.editMode)
 				{
 					$scope.MhaPatientApi.isPatientConfirmed(controller.demographicModel.demographicNo, $scope.eventData.site).then((result) =>
 					{
@@ -455,6 +455,11 @@ angular.module('Schedule').component('eventComponent', {
 						}
 					});
 				}
+				else
+				{
+					$scope.eligibleForTelehealth = false;
+				}
+
 			};
 
 			controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)

@@ -31,7 +31,6 @@ import org.oscarehr.integration.dao.UserIntegrationAccessDao;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.UserIntegrationAccess;
 import org.oscarehr.integration.myhealthaccess.dto.IntegrationTransfer;
-import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

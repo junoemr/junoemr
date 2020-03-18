@@ -70,7 +70,8 @@ public class AppointmentManager {
 	private AppointmentArchiveDao appointmentArchiveDao;
 	@Autowired
 	private MyHealthAccessService myHealthAccessService;
-	
+	@Autowired
+	private AppointmentService appointmentService;
 
 	public List<Appointment> getAppointmentHistoryWithoutDeleted(LoggedInInfo loggedInInfo, Integer demographicNo, Integer offset, Integer limit) {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "r", null)) {
@@ -159,7 +160,6 @@ public class AppointmentManager {
 		// book telehealth appointment in MHA
 		if (appointment.getIsVirtual())
 		{
-			AppointmentService appointmentService = (AppointmentService) SpringUtils.getBean("myHealthAppointmentService");
 			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
 		}
 

@@ -64,6 +64,12 @@ public class AppointmentService extends BaseService
 		}
 	}
 
+	/**
+	 * book a telehealth appointment in MHA.
+	 * @param loggedInInfo - logged in ino
+	 * @param appointment - the appointment to book.
+	 * @throws InvalidIntegrationException
+	 */
 	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment) throws InvalidIntegrationException
 	{
 		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointment.getLocation()).getToken();
