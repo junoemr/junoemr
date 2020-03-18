@@ -30,7 +30,6 @@ import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +50,9 @@ public class Appointment
 {
 	@Autowired
 	OscarAppointmentDao oscarAppointmentDao;
+
+	@Autowired
+	AppointmentService appointmentService;
 
 	private String formatName(String upperFirstName, String upperLastName)
 	{
@@ -106,7 +108,6 @@ public class Appointment
 		// book telehealth appointment in MHA
 		if (appointment.getIsVirtual())
 		{
-			AppointmentService appointmentService = (AppointmentService) SpringUtils.getBean("myHealthAppointmentService");
 			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
 		}
 	}
