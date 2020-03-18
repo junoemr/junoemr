@@ -69,18 +69,6 @@ public class IntegrationDao extends AbstractDao<Integration>
         return this.getSingleResultOrNull(query);
     }
 
-    /**
-     * get integration by site name
-     * @param siteName - the site to get the integration for
-     * @return - the integration.
-     */
-    public Integration findBySiteName(String siteName)
-    {
-        Query query = entityManager.createQuery("SELECT i FROM Integration i WHERE i.site.name = :siteName");
-        query.setParameter("siteName", siteName);
-        return getSingleResultOrNull(query);
-    }
-
     public Integration findByIntegrationAndSiteName(String siteName, String integrationType)
     {
     	Query query;
