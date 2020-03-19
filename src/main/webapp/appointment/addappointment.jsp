@@ -1074,7 +1074,7 @@
 						<% // multisites start ==================
 							if (bMultisites)
 							{ %>
-						<select tabindex="4" name="location" style="background-color: <%=colo%>"
+						<select id="site-select" tabindex="4" name="location" style="background-color: <%=colo%>"
 								onchange='this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor'>
 							<% for (Site s : sites)
 							{ %>
@@ -1129,9 +1129,10 @@
 				<% if(org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() ) { %>
 
 				<li class="weak row">
-						<div class="label">Virtual:</div>
-						<div class="input">
-						<input type="checkbox" name="isVirtual" disabled/>
+					<div class="label">Virtual:</div>
+					<div class="input" style="display: flex; flex-direction: row; align-items: center; width: calc(100% - 1px);">
+						<input id="telehealth-checkbox" type="checkbox" name="isVirtual" disabled/>
+						<div id="telehealth-message" style="visibility: hidden; display: inline-block; border: none; font-size: 12px;"></div>
 					</div>
 					<div class="space">&nbsp;</div>
 					<div class="label"></div>
@@ -1487,5 +1488,68 @@
 	<script type="text/javascript">
 		var loc = document.forms['ADDAPPT'].location;
 		if (loc.nodeName.toUpperCase() == 'SELECT') loc.style.backgroundColor = loc.options[loc.selectedIndex].style.backgroundColor;
+
+
+		// ask MHA (proxied through the juno server ofc) if the demographic is confirmed with this clinic
+		function checkDemographicConfirmed(demographicNo, site)
+		{
+			return new Promise((resolve, reject) =>
+			{
+				var siteParam = "";
+				if (site)
+				{
+					siteParam = "?site=" + site;
+				}
+
+				jQuery.get("<%=request.getContextPath()%>/ws/rs/myhealthaccess/patient/" + demographicNo + "/confirmed" + siteParam, null,
+					(result) =>
+					{
+						resolve(result);
+					},
+					(error) =>
+					{
+						reject(error);
+					});
+			});
+		}
+
+		function updateTelehealthControlls()
+		{
+			var siteSelect = jQuery("#site-select");
+			var demographicNo = '<%=request.getParameter("demographic_no")%>';
+			if (demographicNo !== 'null')
+			{
+				checkDemographicConfirmed(demographicNo, siteSelect.val()).then((res) =>
+				{
+					res = JSON.parse(res);
+					if (res.body)
+					{
+						jQuery("#telehealth-checkbox").attr("disabled", false);
+						var msg = jQuery("#telehealth-message");
+						msg.css("visibility", "visible");
+						msg.css("color", "green");
+						msg.html("Patient connected to MyHealthAccess");
+
+					}
+					else
+					{
+						jQuery("#telehealth-checkbox").attr("checked", false);
+						jQuery("#telehealth-checkbox").attr("disabled", true);
+						var msg = jQuery("#telehealth-message");
+						msg.css("visibility", "visible");
+						msg.css("color", "orange");
+						msg.html("Patient not connected to MyHealthAccess");
+					}
+				}).catch((error) =>
+				{
+					console.error(error);
+				});
+			}
+		}
+		updateTelehealthControlls();
+
+		jQuery("#site-select").change(() => {
+			updateTelehealthControlls();
+		});
 	</script>
 </html:html>

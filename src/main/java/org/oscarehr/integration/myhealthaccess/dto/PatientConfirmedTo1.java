@@ -20,20 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.integration.myhealthaccess.dto;
 
-package org.oscarehr.integration.myhealthaccess.exception;
-
-public class InvalidIntegrationException extends RuntimeException
+public class PatientConfirmedTo1
 {
-	public final static String NO_INTEGRATION_MHA = "No active MyHealthAccess integration found";
+	Boolean confirmed;
 
-	public InvalidIntegrationException()
+	public Boolean getConfirmed()
 	{
-		super();
+		return confirmed;
 	}
 
-	public InvalidIntegrationException(String s)
+	public void setConfirmed(Boolean confirmed)
 	{
-		super(s);
+		this.confirmed = confirmed;
 	}
 }
