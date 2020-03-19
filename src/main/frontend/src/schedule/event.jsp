@@ -166,7 +166,7 @@
 										>
 										</ca-field-select>
 									</div>
-									<div class="col-md-4 lower-content">
+									<div class="col-md-4 top-checkbox-container">
 										<ca-field-boolean
 												ca-form-group-class="vertical-align"
 												ca-name="check-critical"
@@ -175,6 +175,17 @@
 												ca-input-size="col-md-6"
 												ca-model="eventData.critical"
 												ca-template="juno"
+										>
+										</ca-field-boolean>
+										<ca-field-boolean
+														ca-form-group-class="vertical-align"
+														ca-name="check-telehealth"
+														ca-title="Telehealth"
+														ca-label-size="col-md-6"
+														ca-input-size="col-md-6"
+														ca-model="eventData.virtual"
+														ca-template="juno"
+														ca-disabled="!eligibleForTelehealth"
 										>
 										</ca-field-boolean>
 									</div>

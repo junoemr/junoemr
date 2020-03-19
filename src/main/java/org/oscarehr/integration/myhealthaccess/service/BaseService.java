@@ -24,6 +24,7 @@
 package org.oscarehr.integration.myhealthaccess.service;
 
 import org.oscarehr.integration.myhealthaccess.dto.BaseErrorTo1;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
 import org.oscarehr.util.MiscUtils;
@@ -169,5 +170,27 @@ public class BaseService extends org.oscarehr.integration.BaseService
 				MiscUtils.getLogger().debug("+++++++++++++++++++++++++++++++");
 			}
 		}
+	}
+
+	/**
+	 * get the api key for the site.
+	 * @param siteName - site to get the api key for
+	 * @return - the sites api key
+	 * @throws InvalidIntegrationException - if no integration records found
+	 */
+	protected String getApiKey(String siteName) throws InvalidIntegrationException
+	{
+		return integrationService.findMhaIntegration(siteName).getApiKey();
+	}
+
+	/**
+	 * get the clinic id for the site.
+	 * @param siteName - site to get the clinic id for
+	 * @return - the clinic id
+	 * @throws InvalidIntegrationException - if no integration records found
+	 */
+	protected String getClinicId(String siteName) throws InvalidIntegrationException
+	{
+		return integrationService.findMhaIntegration(siteName).getRemoteId();
 	}
 }

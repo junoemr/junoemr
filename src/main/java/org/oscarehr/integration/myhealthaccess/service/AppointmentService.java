@@ -22,15 +22,25 @@
  */
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.oscarehr.common.model.Appointment;
 import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
+import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookResponseTo1;
+import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
+import org.oscarehr.integration.myhealthaccess.exception.BookingException;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
+import org.oscarehr.util.LoggedInInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AppointmentService extends BaseService
 {
+	@Autowired
+	ClinicService clinicService;
+
 	public void updateAppointmentCache(IntegrationData integrationData, AppointmentCacheTo1 appointmentTransfer)
 	{
 		String endpoint = "/clinic/%s/appointment/%s/cache";
@@ -51,6 +61,23 @@ public class AppointmentService extends BaseService
 		catch (BaseException e)
 		{
 			ErrorHandler.handleError(e);
+		}
+	}
+
+	/**
+	 * book a telehealth appointment in MHA.
+	 * @param loggedInInfo - logged in ino
+	 * @param appointment - the appointment to book.
+	 * @throws InvalidIntegrationException
+	 */
+	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment) throws InvalidIntegrationException
+	{
+		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointment.getLocation()).getToken();
+		String apiKey = getApiKey(appointment.getLocation());
+		AppointmentBookResponseTo1 appointmentBookResponseTo1 = postWithToken(formatEndpoint("/clinic_user/appointment/book"), apiKey, new AppointmentBookTo1(appointment), AppointmentBookResponseTo1.class, loginToken);
+		if (!appointmentBookResponseTo1.isSuccess())
+		{
+			throw new BookingException(appointmentBookResponseTo1.getMessage());
 		}
 	}
 }

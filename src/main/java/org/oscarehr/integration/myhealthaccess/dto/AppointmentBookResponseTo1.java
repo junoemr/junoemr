@@ -20,20 +20,44 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.integration.myhealthaccess.dto;
 
-package org.oscarehr.integration.myhealthaccess.exception;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class InvalidIntegrationException extends RuntimeException
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class AppointmentBookResponseTo1
 {
-	public final static String NO_INTEGRATION_MHA = "No active MyHealthAccess integration found";
+	private static final String SUCCESS_STATUS = "success";
 
-	public InvalidIntegrationException()
+	@JsonProperty("message")
+	private String message;
+
+	@JsonProperty("status")
+	private String status;
+
+	public String getMessage()
 	{
-		super();
+		return message;
 	}
 
-	public InvalidIntegrationException(String s)
+	public void setMessage(String message)
 	{
-		super(s);
+		this.message = message;
+	}
+
+	public String getStatus()
+	{
+		return status;
+	}
+
+	public void setStatus(String status)
+	{
+		this.status = status;
+	}
+
+	public boolean isSuccess()
+	{
+		return this.status.equals(SUCCESS_STATUS);
 	}
 }

@@ -19,6 +19,7 @@
 					 ng-model="model"
 					 ng-focus="focus_fn()"
 					 ng-change="change_fn()"
+					 ng-disabled="disabled"
 					 tabindex="{{tab_index}}"/>
 		<label for="input-{{name}}" class="form-control checkmark">
 			<i class="icon icon-check"></i>

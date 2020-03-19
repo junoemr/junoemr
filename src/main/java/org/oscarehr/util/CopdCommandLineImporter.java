@@ -54,7 +54,7 @@ public class CopdCommandLineImporter
 	 */
 	public static void main (String [] args)
 	{
-		if(args == null || args.length != 6)
+		if(args == null || args.length != 7)
 		{
 			BasicConfigurator.configure();
 			logger.error("Invalid argument count");
@@ -105,7 +105,8 @@ public class CopdCommandLineImporter
 		}
 
 		// flag to allow importing demographics with missing document files by skipping those records.
-		boolean skipMissingDocs= Boolean.parseBoolean(args[5]);
+		boolean skipMissingDocs = Boolean.parseBoolean(args[5]);
+		boolean mergeDemographics = Boolean.parseBoolean(args[6]);
 
 		ClassPathXmlApplicationContext ctx = null;
 		long importCount = 0;
@@ -144,7 +145,7 @@ public class CopdCommandLineImporter
 
 						try
 						{
-							importFileMessages(new CoPDMessageStream(copdFile), copdDocumentLocation, importSource, skipMissingDocs);
+							importFileMessages(new CoPDMessageStream(copdFile), copdDocumentLocation, importSource, skipMissingDocs, mergeDemographics);
 							importCount++;
 							moveToCompleted(copdFile, copdDirectory);
 						}
@@ -203,7 +204,7 @@ public class CopdCommandLineImporter
 	}
 
 
-	private static void importFileMessages(CoPDMessageStream messageStream, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource, boolean skipMissingDocs)
+	private static void importFileMessages(CoPDMessageStream messageStream, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource, boolean skipMissingDocs, boolean mergeDemographics)
 			throws Exception
 	{
 		boolean hasFailure = false;
@@ -214,7 +215,7 @@ public class CopdCommandLineImporter
 			try
 			{
 				message = coPDPreProcessorService.preProcessMessage(message, importSource);
-				coPDImportService.importFromHl7Message(message, documentDirectory, importSource, skipMissingDocs);
+				coPDImportService.importFromHl7Message(message, documentDirectory, importSource, skipMissingDocs, mergeDemographics);
 			}
 			catch (Exception e)
 			{

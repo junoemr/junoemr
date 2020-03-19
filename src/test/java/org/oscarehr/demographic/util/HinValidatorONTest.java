@@ -20,20 +20,49 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.demographic.util;
 
-package org.oscarehr.integration.myhealthaccess.exception;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.oscarehr.demographic.util.HinValidator;
 
-public class InvalidIntegrationException extends RuntimeException
+import java.util.Arrays;
+import java.util.Collection;
+
+import static junit.framework.Assert.assertEquals;
+
+@RunWith(Parameterized.class)
+public class HinValidatorONTest
 {
-	public final static String NO_INTEGRATION_MHA = "No active MyHealthAccess integration found";
+	private String hin;
+	private boolean expectedResult;
 
-	public InvalidIntegrationException()
+	public HinValidatorONTest(String hin, boolean result)
 	{
-		super();
+		this.hin = hin;
+		this.expectedResult = result;
 	}
 
-	public InvalidIntegrationException(String s)
+	@Parameterized.Parameters
+	public static Collection testData()
 	{
-		super(s);
+		return Arrays.asList(new Object[][]
+				{
+						{null, false},
+						{"", false},
+						{"bubbles", false},
+						{"9663096511", false},
+						{"9663096512", false},
+						{"9663096510", true},
+						{"9876543217", true}
+				});
+	}
+
+	@Test
+	public void testHinOntario()
+	{
+		boolean actualResult = HinValidator.isValid(hin,"ON");
+		assertEquals(expectedResult, actualResult);
 	}
 }

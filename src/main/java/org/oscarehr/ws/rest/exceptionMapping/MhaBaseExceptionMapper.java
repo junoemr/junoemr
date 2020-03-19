@@ -20,20 +20,29 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.ws.rest.exceptionMapping;
 
-package org.oscarehr.integration.myhealthaccess.exception;
+import org.oscarehr.integration.myhealthaccess.exception.BaseException;
+import org.oscarehr.ws.rest.response.RestResponse;
 
-public class InvalidIntegrationException extends RuntimeException
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+
+@Provider
+public class MhaBaseExceptionMapper implements ExceptionMapper<BaseException>
 {
-	public final static String NO_INTEGRATION_MHA = "No active MyHealthAccess integration found";
-
-	public InvalidIntegrationException()
+	public MhaBaseExceptionMapper()
 	{
-		super();
 	}
 
-	public InvalidIntegrationException(String s)
+	@Override
+	public Response toResponse(BaseException exception)
 	{
-		super(s);
+		RestResponse<String> response = RestResponse.errorResponse("MyHealthAccess Integration Error");
+
+		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(response)
+						.type(MediaType.APPLICATION_JSON).build();
 	}
 }

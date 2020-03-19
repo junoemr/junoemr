@@ -59,6 +59,8 @@
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
 <%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="org.oscarehr.integration.myhealthaccess.service.AppointmentService" %>
+<%@ page import="javax.persistence.EntityTransaction" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <html:html locale="true">
@@ -78,6 +80,7 @@
 	OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 	DemographicMergedDao demographicMergedDao = SpringUtils.getBean(DemographicMergedDao.class);
 	WaitingListDao waitingListDao = SpringUtils.getBean(WaitingListDao.class);
+	org.oscarehr.appointment.service.Appointment appointmentService = SpringUtils.getBean(org.oscarehr.appointment.service.Appointment.class);
 
 	Integer appointmentNo = null;
 	String headRecord = ConversionUtils.getStringOrDefaultValue(request.getParameter("demographic_no"), "0");
@@ -150,10 +153,10 @@
 	appointment.setName(appointmentName);
 	appointment.setProgramId(programId);
 	appointment.setUrgency(urgency);
-	
+
 	try
 	{
-		appointmentDao.persist(appointment);
+		appointmentService.saveNewAppointment(appointment, loggedInInfo);
 		appointmentNo = appointment.getId();
 
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),

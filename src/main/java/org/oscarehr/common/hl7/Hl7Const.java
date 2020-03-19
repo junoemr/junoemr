@@ -20,48 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic;
+package org.oscarehr.common.hl7;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.oscarehr.demographic.util.HinValidator;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import static junit.framework.Assert.assertEquals;
-
-@RunWith(Parameterized.class)
-public class HinValidatorTestON
+public class Hl7Const
 {
-	private String hin;
-	private boolean expectedResult;
+	public static final String HL7_SEGMENT_TS_1 = "TS.1";
 
-	public HinValidatorTestON(String hin, boolean result)
-	{
-		this.hin = hin;
-		this.expectedResult = result;
-	}
+	public static final String HL7_SEGMENT_XCN_1 = "XCN.1";
 
-	@Parameterized.Parameters
-	public static Collection testData()
-	{
-		return Arrays.asList(new Object[][]
-				{
-						{null, false},
-						{"", false},
-						{"bubbles", false},
-						{"9663096511", false},
-						{"9663096512", false},
-						{"9663096510", true},
-				});
-	}
+	public static final String HL7_SEGMENT_XTN_1 = "XTN.1";
+	public static final String HL7_SEGMENT_XTN_6 = "XTN.6";
+	public static final String HL7_SEGMENT_XTN_7 = "XTN.7";
 
-	@Test
-	public void testHinOntario()
-	{
-		boolean actualResult = HinValidator.isValid(hin,"ON");
-		assertEquals(expectedResult, actualResult);
-	}
+	public static final String HL7_SEGMENT_ZAT_2 = "ZAT.2";
+
+	public static final String HL7_SEGMENT_ZBA_29 = "ZBA.29";
+	public static final String HL7_SEGMENT_ZBA_31 = "ZBA.31";
+
+	public static final String HL7_SEGMENT_ZQO_4 = "ZQO.4";
+	public static final String HL7_SEGMENT_ZQO_5 = "ZQO.5";
+	public static final String HL7_SEGMENT_ZQO_6 = "ZQO.6";
+	public static final String HL7_SEGMENT_ZQO_7 = "ZQO.7";
 }
