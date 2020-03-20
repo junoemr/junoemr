@@ -507,16 +507,9 @@ angular.module('Schedule').component('eventComponent', {
 						// set the default selected option
 						if (!Juno.Common.Util.exists($scope.eventData.reasonCode))
 						{
-							//do by position?
-							let defaultReasonPosition = controller.reasonCodeList.indexOf(defaultAppointmentReason);
-							if (defaultReasonPosition === -1)
-							{
-								$scope.eventData.reasonCode = controller.reasonCodeList[0].value;
-							}
-							else
-							{
-								$scope.eventData.reasonCode = controller.reasonCodeList[defaultReasonPosition].value;
-							}
+
+							$scope.eventData.reasonCode = controller.findDefaultAppointmentType(controller.reasonCodeList, defaultAppointmentReason);
+
 						}
 						deferred.resolve(controller.reasonCodeList);
 					});
@@ -867,6 +860,18 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.eventData.reason = typeData.reason;
 				}
 			};
+
+			controller.findDefaultAppointmentType = function(reasonCodeList, defaultAppointmentReason)
+			{
+				for (var i = 0; i < reasonCodeList.length; i++ )
+				{
+					if (reasonCodeList[i].label === defaultAppointmentReason)
+					{
+						return reasonCodeList[i].value;
+					}
+				}
+				return reasonCodeList[0].value;
+			}
 
 			//=========================================================================
 			// Watches
