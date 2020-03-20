@@ -1109,4 +1109,39 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 
     	return query.getResultList();
     }
+
+    public HashMap<String, Integer> getAppointmentCountMapForProviderAndDateRange(
+    		String providerNo, LocalDate startDate, LocalDate endDate)
+	{
+	    HashMap<String, Integer> appointmentCountMap = new HashMap<>();
+
+	    LocalDate iterDate = startDate;
+
+	    while (!iterDate.isAfter(endDate))
+		{
+			appointmentCountMap.put(iterDate.toString(), 0);
+			iterDate = iterDate.plusDays(1);
+		}
+
+		String sql = "SELECT a.appointmentDate, count(a.appointmentDate) " +
+					 "FROM Appointment a " +
+					 "WHERE a.appointmentDate BETWEEN :startDate AND :endDate " +
+                	 "AND a.providerNo = :providerNo " +
+					 "AND a.status != :cancelledStatus GROUP BY a.appointmentDate";
+
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("startDate", java.sql.Date.valueOf(startDate));
+		query.setParameter("endDate", java.sql.Date.valueOf(endDate));
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("cancelledStatus", Appointment.CANCELLED);
+
+		List<Object[]> results = query.getResultList();
+
+		for (Object[] result : results)
+		{
+			appointmentCountMap.put((String) result[0], (Integer) result[1]);
+		}
+
+		return appointmentCountMap;
+	}
 }
