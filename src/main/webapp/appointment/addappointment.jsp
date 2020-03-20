@@ -1501,15 +1501,21 @@
 					siteParam = "?site=" + site;
 				}
 
-				jQuery.get("<%=request.getContextPath()%>/ws/rs/myhealthaccess/patient/" + demographicNo + "/confirmed" + siteParam, null,
-					(result) =>
+				jQuery.ajax(
+				{
+					url: "<%=request.getContextPath()%>/ws/rs/myhealthaccess/patient/" + demographicNo + "/confirmed" + siteParam,
+					method: "GET",
+					success: (result) =>
 					{
+						console.log("SUCCESS");
 						resolve(result);
 					},
-					(error) =>
+					error: (error) =>
 					{
+						console.log("ERROR");
 						reject(error);
-					});
+					}
+				});
 			});
 		}
 
@@ -1542,6 +1548,12 @@
 					}
 				}).catch((error) =>
 				{
+					jQuery("#telehealth-checkbox").attr("checked", false);
+					jQuery("#telehealth-checkbox").attr("disabled", true);
+					var msg = jQuery("#telehealth-message");
+					msg.css("visibility", "visible");
+					msg.css("color", "red");
+					msg.html("Error connecting to MyHealthAccess");
 					console.error(error);
 				});
 			}

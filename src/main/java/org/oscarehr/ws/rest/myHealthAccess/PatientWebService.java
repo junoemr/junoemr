@@ -23,6 +23,7 @@
 package org.oscarehr.ws.rest.myHealthAccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
