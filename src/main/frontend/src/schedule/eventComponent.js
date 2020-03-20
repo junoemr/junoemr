@@ -485,6 +485,8 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				var deferred = $q.defer();
 
+				let defaultAppointmentReason = "Others";
+
 				$scope.scheduleApi.getAppointmentReasons().then(
 					function success(rawResults)
 					{
@@ -505,7 +507,16 @@ angular.module('Schedule').component('eventComponent', {
 						// set the default selected option
 						if (!Juno.Common.Util.exists($scope.eventData.reasonCode))
 						{
-							$scope.eventData.reasonCode = controller.reasonCodeList[0].value;
+							//do by position?
+							let defaultReasonPosition = controller.reasonCodeList.indexOf(defaultAppointmentReason);
+							if (defaultReasonPosition === -1)
+							{
+								$scope.eventData.reasonCode = controller.reasonCodeList[0].value;
+							}
+							else
+							{
+								$scope.eventData.reasonCode = controller.reasonCodeList[defaultReasonPosition].value;
+							}
 						}
 						deferred.resolve(controller.reasonCodeList);
 					});
