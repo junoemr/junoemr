@@ -509,6 +509,8 @@ function calcAgeAtEDD(){
 }
 
 
+
+
 </script>
 
 <title>Antenatal Record 1</title>
@@ -556,6 +558,30 @@ function calcAgeAtEDD(){
         -->
     </style>
 </head>
+
+<script type="text/javascript" language="JavaScript">
+
+	// $(document).ready(function()
+	// {
+	// 	var $form = $('#bcar2012pg1');
+	// 	$form.juno_trackIsChanged();
+	//
+	// 	var $links = $('a:not([href^="javascript:"])');
+	// 	$.each($links, function()
+	// 	{
+	// 		var $link = $(this);
+	// 		Oscar.FormHelpers.alertDirtyBeforeLink($link, $form);
+	// 	});
+	//
+	// 	var $exitButtons = $('input[name="exitButton"]')
+	// 	$.each($exitButtons, function()
+	// 	{
+	// 		var $exitButton = $(this);
+	// 		Oscar.FormHelpers.alertDirtyBeforeClose($exitButton, $form);
+	// 	});
+	// });
+
+</script>
 
 <body bgproperties="fixed" topmargin="0" leftmargin="1" rightmargin="1">
 <div ID="Langdiv" class="demo">
@@ -892,7 +918,7 @@ function calcAgeAtEDD(){
 @oscar.formDB Field="formEdited" Type="timestamp"  
 @oscar.formDB Field="c_lastVisited" Type="char(3)" 
 -->
-<html:form action="/form/formname">
+<html:form action="/form/formname" styleId="bcar2012pg1">
 
 	<input type="hidden" name="commonField" value="ar2_" />
 	<input type="hidden" name="c_lastVisited" value="pg1" />

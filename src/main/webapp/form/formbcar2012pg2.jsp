@@ -827,9 +827,11 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
 			if ( val != 'null' ){
 			    val = 3 - val;
 			    document.forms[0].ar2_EPDS10[val].checked = true;
-			}
-		}   
-    
+                }
+        }
+
+
+
     </script>
 
     
@@ -874,6 +876,31 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
         -->
     </style>
 </head>
+
+
+    <script type="text/javascript" language="JavaScript">
+
+        $(document).ready(function()
+        {
+            var $form = $('#bcar2012pg2');
+            $form.juno_trackIsChanged();
+
+            var $links = $('a:not([href^="javascript:"])');
+            $.each($links, function()
+            {
+                var $link = $(this);
+                Oscar.FormHelpers.alertDirtyBeforeLink($link, $form);
+            });
+
+            var $exitButtons = $('input[name="exitButton"]')
+            $.each($exitButtons, function()
+            {
+                var $exitButton = $(this);
+                Oscar.FormHelpers.alertDirtyBeforeClose($exitButton, $form);
+            });
+        });
+
+    </script>
 
 
 <body bgproperties="fixed" topmargin="0" leftmargin="0" rightmargin="0" onload="setEPDSscores();">
@@ -948,7 +975,7 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
     <center><i>At 36 weeks copy to patient / to hospital</i></center>
 </div>
 
-<html:form action="/form/formname">
+<html:form action="/form/formname" styleId="bcar2012pg2">
 
 <input type="hidden" name="commonField" value="ar2_" />
 <input type="hidden" name="c_lastVisited" value="pg2" />
