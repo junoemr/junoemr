@@ -23,6 +23,9 @@
 package org.oscarehr.schedule.service;
 
 import com.google.common.collect.RangeMap;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.appointment.service.Appointment;
 import org.oscarehr.common.dao.MyGroupDao;
@@ -46,6 +49,13 @@ import org.oscarehr.schedule.model.RSchedule;
 import org.oscarehr.schedule.model.ScheduleDate;
 import org.oscarehr.schedule.model.ScheduleHoliday;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BlackoutRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.CutoffRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.MultipleBookingsRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +69,7 @@ import javax.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
@@ -67,10 +78,16 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -779,6 +796,87 @@ public class Schedule
 		calendarSchedule.setHiddenDaysList(new ArrayList<>(0)); // always empty in group view
 
 		return calendarSchedule;
+	}
+
+	// TODO: Rework schedule availability dto
+	public HashMap<String, DayTimeSlots[]> getProviderAvailability(String[] providerNos,
+																   LocalDate startDate,
+																   LocalDate endDate,
+																   String templateDurations,
+																   String demographicNo,
+																   String jsonRules)
+	{
+		HashMap<String, List<DayTimeSlots>> scheduleTransfer = new HashMap<>();
+		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = new ArrayList<>();
+
+		try
+		{
+			JSONArray templateDurationJsonArr = (JSONArray) new JSONParser().parse(templateDurations);
+
+			for (Object templateDurationObj : templateDurationJsonArr)
+			{
+				JSONObject templateDurationJson = (JSONObject) templateDurationObj;
+				String templateCode = (String) templateDurationJson.get("schedule_template_id");
+				Long duration = (Long) templateDurationJson.get("appointment_duration");
+
+				ScheduleCodeDurationTransfer scheduleDurationTransfer =
+						new ScheduleCodeDurationTransfer(templateCode, duration.intValue());
+				scheduleDurationTransfers.add(scheduleDurationTransfer);
+			}
+
+			List<MultipleBookingsRule> multipleBookingsRules = BookingRuleFactory.buildMultipleBookingsRuleList(jsonRules);
+			BlackoutRule blackoutRule = BookingRuleFactory.buildBlackoutRule(jsonRules);
+			CutoffRule cutoffRule = BookingRuleFactory.buildCutoffRule(jsonRules);
+
+			ExecutorService pool = Executors.newFixedThreadPool(4);
+			for (String providerNo : providerNos)
+			{
+				pool.execute(() -> {
+					ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(
+							providerNo,
+							startDate,
+							endDate,
+							scheduleDurationTransfers,
+							demographicNo,
+							multipleBookingsRules,
+							blackoutRule,
+							cutoffRule
+					);
+
+					providerScheduleTransfer.getProviderScheduleResponse().forEach((k, v) -> {
+						scheduleTransfer.merge(k, v, (curArr, newArr) -> new ArrayList<>(
+								Stream.of(curArr, newArr)
+										.flatMap(List::stream)
+										.collect(Collectors.toMap(DayTimeSlots::getTimeSlotEntry, s -> s,
+												(DayTimeSlots x, DayTimeSlots y) -> x == null ? y : x)).values())
+						);
+					});
+				});
+			}
+
+			pool.shutdown();
+
+			try
+			{
+				pool.awaitTermination(1, TimeUnit.MINUTES);
+			}
+			catch (InterruptedException e)
+			{
+				MiscUtils.getLogger().error("Starting interrupted");
+			}
+		}
+		catch(org.json.simple.parser.ParseException e)
+		{
+			MiscUtils.getLogger().error("Exception: " + e);
+		}
+		MiscUtils.getLogger().info("End Get Provider Schedule Service: " + LocalDateTime.now().toString());
+
+		HashMap<String, DayTimeSlots[]> results = new HashMap<>();
+
+		scheduleTransfer.forEach((k, v) -> results.put(k, v.toArray(new DayTimeSlots[0])));
+		return results;
+
+
 	}
 
 	private boolean isProviderAssignedToSite(String siteName, String providerId)

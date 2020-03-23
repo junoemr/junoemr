@@ -41,6 +41,7 @@ import org.oscarehr.managers.DayWorkSchedule;
 import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
+import org.oscarehr.schedule.service.Schedule;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
@@ -72,18 +73,16 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @WebService
 @Component
 @GZIP(threshold = AbstractWs.GZIP_THRESHOLD)
 public class ScheduleWs extends AbstractWs {
 	private static final Logger logger=MiscUtils.getLogger();
-	
+
+	@Autowired
+	private Schedule scheduleService;
+
 	@Autowired
 	private ScheduleManager scheduleManager;
 
@@ -148,83 +147,15 @@ public class ScheduleWs extends AbstractWs {
 	}
 
 	@SkipContentLoggingOutbound
-	public HashMap<String, DayTimeSlots[]> getUniqueSlotsForProviders(String[] providerNos,
+	public HashMap<String, DayTimeSlots[]> getProviderAvailability(String[] providerNos,
 																	  @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate startDate,
 																	  @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate endDate,
 																	  String templateDurations,
 																	  String demographicNo,
 																	  String jsonRules)
 	{
-		HashMap<String, List<DayTimeSlots>> scheduleTransfer = new HashMap<>();
-		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = new ArrayList<>();
-
-		try
-		{
-			JSONArray templateDurationJsonArr = (JSONArray) new JSONParser().parse(templateDurations);
-
-			for (Object templateDurationObj : templateDurationJsonArr)
-			{
-				JSONObject templateDurationJson = (JSONObject) templateDurationObj;
-				String templateCode = (String) templateDurationJson.get("schedule_template_id");
-				Long duration = (Long) templateDurationJson.get("appointment_duration");
-
-				ScheduleCodeDurationTransfer scheduleDurationTransfer =
-						new ScheduleCodeDurationTransfer(templateCode, duration.intValue());
-				scheduleDurationTransfers.add(scheduleDurationTransfer);
-			}
-
-			List<MultipleBookingsRule> multipleBookingsRules = BookingRuleFactory.buildMultipleBookingsRuleList(jsonRules);
-			BlackoutRule blackoutRule = BookingRuleFactory.buildBlackoutRule(jsonRules);
-			CutoffRule cutoffRule = BookingRuleFactory.buildCutoffRule(jsonRules);
-
-			ExecutorService pool = Executors.newFixedThreadPool(4);
-			for (String providerNo : providerNos)
-			{
-				pool.execute(() -> {
-					ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(
-							providerNo,
-							startDate,
-							endDate,
-							scheduleDurationTransfers,
-							demographicNo,
-							multipleBookingsRules,
-							blackoutRule,
-							cutoffRule
-					);
-
-					providerScheduleTransfer.getProviderScheduleResponse().forEach((k, v) -> {
-						scheduleTransfer.merge(k, v, (curArr, newArr) -> new ArrayList<>(
-								Stream.of(curArr, newArr)
-										.flatMap(List::stream)
-										.collect(Collectors.toMap(DayTimeSlots::getTimeSlotEntry, s -> s,
-												(DayTimeSlots x, DayTimeSlots y) -> x == null ? y : x)).values())
-						);
-					});
-				});
-			}
-
-			pool.shutdown();
-
-			try
-			{
-				pool.awaitTermination(1, TimeUnit.MINUTES);
-			}
-			catch (InterruptedException e)
-			{
-				MiscUtils.getLogger().error("Starting interrupted");
-			}
-		}
-		catch(ParseException e)
-		{
-			MiscUtils.getLogger().error("Exception: " + e);
-		}
-		MiscUtils.getLogger().info("End Get Provider Schedule Service: " + LocalDateTime.now().toString());
-
-		HashMap<String, DayTimeSlots[]> results = new HashMap<>();
-
-		scheduleTransfer.forEach((k, v) -> results.put(k, v.toArray(new DayTimeSlots[0])));
-		return results;
-
+		return scheduleService.getProviderAvailability(
+				providerNos, startDate, endDate, templateDurations, demographicNo, jsonRules);
 	}
 
 	@SkipContentLoggingOutbound
