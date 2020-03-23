@@ -97,9 +97,11 @@ if (request.getParameter("view") != null && request.getParameter("view").equals(
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 
 	<!-- Scripts to help with submission of forms -->
-	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script type="text/javascript" src="./OscarFormHelpers.js"></script>
 	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
-
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath() %>/js/juno-jquery-plugin.js"></script>
+	<link href= "<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0/themes/smoothness/jquery-ui.min.css" rel="stylesheet">
 	<script type="text/javascript" >
 
 
@@ -561,25 +563,26 @@ function calcAgeAtEDD(){
 
 <script type="text/javascript" language="JavaScript">
 
-	// $(document).ready(function()
-	// {
-	// 	var $form = $('#bcar2012pg1');
-	// 	$form.juno_trackIsChanged();
-	//
-	// 	var $links = $('a:not([href^="javascript:"])');
-	// 	$.each($links, function()
-	// 	{
-	// 		var $link = $(this);
-	// 		Oscar.FormHelpers.alertDirtyBeforeLink($link, $form);
-	// 	});
-	//
-	// 	var $exitButtons = $('input[name="exitButton"]')
-	// 	$.each($exitButtons, function()
-	// 	{
-	// 		var $exitButton = $(this);
-	// 		Oscar.FormHelpers.alertDirtyBeforeClose($exitButton, $form);
-	// 	});
-	// });
+	$(document).ready(function()
+	{
+		var $form = $('#bcar2012pg1');
+		console.log("before form add listener");
+		$form.juno_trackIsChanged();
+		console.log("add listener");
+		var $links = $('a:not([href^="javascript:"])');
+		$.each($links, function()
+		{
+			var $link = $(this);
+			Oscar.FormHelpers.alertDirtyBeforeLink($link, $form);
+		});
+
+		var $exitButtons = $('input[name="exitButton"]')
+		$.each($exitButtons, function()
+		{
+			var $exitButton = $(this);
+			Oscar.FormHelpers.alertDirtyBeforeClose($exitButton, $form);
+		});
+	});
 
 </script>
 
@@ -929,7 +932,7 @@ function calcAgeAtEDD(){
 	<input type="hidden" name="formId" value="<%=formId%>" />
 	<input type="hidden" name="provider_no" value=<%=request.getParameter("provNo")%> />
 	<input type="hidden" name="provNo" value="<%= request.getParameter("provNo") %>" />
-	<input type="hidden" name="submit" value="exit" />
+	<input type="hidden" name="submit" value="exit"  name="exitButton"   />
 
 	<table class="Head" class="hidePrint">
 		<tr>
@@ -942,11 +945,9 @@ function calcAgeAtEDD(){
 				onclick="javascript:return onSave();" /> 
 				
 				<input type="submit"
-				value="Save and Exit" 
-				onclick="javascript:return onSaveExit();" /> <%
+				value="Save and Exit" onclick="javascript:return onSaveExit();" /> <%
             }
-            %> <input type="submit" style="width: 40px;" value="Exit"
-				onclick="javascript:return onExit();" /> 
+            %> <input type="submit" style="width: 40px;" value="Exit"  name="exitButton" />
 				
 				<input type="submit"
 				style="width: 50px;" value="Print"
@@ -2554,7 +2555,7 @@ function calcAgeAtEDD(){
             <%
             }
             %>
-            <input type="submit" style="width:40px;" value="Exit" onclick="javascript:return onExit();"/>
+            <input type="submit" style="width:40px;" value="Exit"  name="exitButton" />
             <input type="submit" style="width:50px;" value="Print" onclick="javascript:return onPrint();"/>
             <input type="submit" style="width:75px;" value="Print Risk" onclick="javascript:return onPrintRisk();"/>
             <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
