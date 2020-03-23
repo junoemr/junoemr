@@ -23,6 +23,7 @@
 
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.dto.BaseErrorTo1;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.service.IntegrationService;
@@ -180,7 +181,7 @@ public class BaseService extends org.oscarehr.integration.BaseService
 	 */
 	protected String getApiKey(String siteName) throws InvalidIntegrationException
 	{
-		return integrationService.findMhaIntegration(siteName).getApiKey();
+		return integrationOrException(integrationService.findMhaIntegration(siteName)).getApiKey();
 	}
 
 	/**
@@ -191,6 +192,23 @@ public class BaseService extends org.oscarehr.integration.BaseService
 	 */
 	protected String getClinicId(String siteName) throws InvalidIntegrationException
 	{
-		return integrationService.findMhaIntegration(siteName).getRemoteId();
+		return integrationOrException(integrationService.findMhaIntegration(siteName)).getRemoteId();
+	}
+
+	/**
+	 * return the passed in integration if not null. If null throw InvalidIntegrationException.
+	 * @param integration - integration
+	 * @return - the same integration you passed in.
+	 */
+	private Integration integrationOrException(Integration integration)
+	{
+		if (integration == null)
+		{
+			throw new InvalidIntegrationException();
+		}
+		else
+		{
+			return integration;
+		}
 	}
 }

@@ -884,6 +884,10 @@ angular.module('Schedule').component('eventComponent', {
 						controller.autofillDataFromType(newValue);
 					}
 				});
+				$scope.$watch("eventData.site", (newVal, oldVal) =>
+				{
+					controller.updateDemographicTelehealthEligibility();
+				});
 				$scope.$watch('[' +
 					'eventController.repeatBookingData.enabled,' +
 					'eventController.repeatBookingData.frequency,' +
