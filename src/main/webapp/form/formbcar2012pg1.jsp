@@ -566,9 +566,7 @@ function calcAgeAtEDD(){
 	$(document).ready(function()
 	{
 		var $form = $('#bcar2012pg1');
-		console.log("before form add listener");
 		$form.juno_trackIsChanged();
-		console.log("add listener");
 		var $links = $('a:not([href^="javascript:"])');
 		$.each($links, function()
 		{
