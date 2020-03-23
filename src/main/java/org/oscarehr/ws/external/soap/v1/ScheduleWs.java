@@ -158,6 +158,41 @@ public class ScheduleWs extends AbstractWs {
 				providerNos, startDate, endDate, templateDurations, demographicNo, jsonRules);
 	}
 
+	public ValidatedAppointmentBookingTransfer addAppointmentToAvailableProvider(String[] providerNos,
+																				 AppointmentTransfer appointmentTransfer,
+																				 String jsonRules) throws ParseException
+	{
+		Appointment appointment = new Appointment();
+
+		if (appointmentTransfer.getLastUpdateUser() == null)
+		{
+			appointmentTransfer.setLastUpdateUser(getLoggedInInfo().getLoggedInProviderNo());
+		}
+
+		appointmentTransfer.copyTo(appointment);
+
+		List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(appointment.getDemographicNo(), jsonRules);
+		List<BookingRule> violatedRules = new ArrayList<>();
+		for (BookingRule rule : bookingRules)
+		{
+			if (rule.isViolated(appointment))
+			{
+				violatedRules.add(rule);
+			}
+		}
+
+		if (violatedRules.isEmpty())
+		{
+			scheduleManager.addAppointment(getLoggedInInfo(), getLoggedInSecurity(), appointment);
+		}
+
+		AppointmentTransfer apptTransfer = AppointmentTransfer.toTransfer(appointment, false);
+		ValidatedAppointmentBookingTransfer response =
+				new ValidatedAppointmentBookingTransfer(apptTransfer, violatedRules);
+		return response;
+
+	}
+
 	@SkipContentLoggingOutbound
 	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (String providerNo,
 																		  @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate startDate,
