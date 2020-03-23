@@ -739,7 +739,7 @@ function calToday(field) {
 }
 
 
-    $(docu           dy(function()
+    $(document).ready(function()
     {
         var $form = $('#bcar2012pg3');
         $form.juno_trackIsChanged();
