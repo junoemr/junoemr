@@ -1507,12 +1507,10 @@
 					method: "GET",
 					success: (result) =>
 					{
-						console.log("SUCCESS");
 						resolve(result);
 					},
 					error: (error) =>
 					{
-						console.log("ERROR");
 						reject(error);
 					}
 				});
