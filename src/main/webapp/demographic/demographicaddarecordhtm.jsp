@@ -160,6 +160,7 @@
      jQuery.noConflict();
    </script>
 	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+	<script src="<%= request.getContextPath() %>/js/demographic.js"></script>
 
    <script type="text/javascript">
 	   function aSubmit()
@@ -180,35 +181,6 @@
 	   window.onload = function(){
 		   jQuery('body').on("blur", '.phone-class', validatePhoneNumber);
 	   };
-
-	   function validatePhoneNumber(event)
-	   {
-		   event.stopPropagation();
-		   let userInput = jQuery("#"+event.target.id).val();
-		   let lengthBeforeProcess = userInput.length;
-
-		   if (lengthBeforeProcess > 0)
-		   {
-			   let array = userInput.split('');
-			   array = removeUnicodeControlCharacters(array);
-			   let validatedInput = array.join('');
-
-			   jQuery("#"+event.target.id).val(validatedInput);
-			   if (lengthBeforeProcess !== validatedInput.length)
-			   {
-				   alert("Invalid character for phone numbers has been removed!");
-			   }
-		   }
-	   }
-
-	   function removeUnicodeControlCharacters(array)
-	   {
-			return array.filter(
-		   		x =>
-					(34 <= x.charCodeAt(0) && x.charCodeAt(0) <=124) ||
-					x.charCodeAt(0) > 159
-			);
-	   }
    </script>
 
 
@@ -319,22 +291,6 @@ function newStatus1() {
         document.adddemographic.roster_status.options[document.adddemographic.roster_status.length-1].selected = true;
     } else {
         alert("Invalid entry");
-    }
-}
-
-function formatPhoneNum() {
-    if (document.adddemographic.phone.value.length == 10) {
-        document.adddemographic.phone.value = document.adddemographic.phone.value.substring(0,3) + "-" + document.adddemographic.phone.value.substring(3,6) + "-" + document.adddemographic.phone.value.substring(6);
-        }
-    if (document.adddemographic.phone.value.length == 11 && document.adddemographic.phone.value.charAt(3) == '-') {
-        document.adddemographic.phone.value = document.adddemographic.phone.value.substring(0,3) + "-" + document.adddemographic.phone.value.substring(4,7) + "-" + document.adddemographic.phone.value.substring(7);
-    }
-
-    if (document.adddemographic.phone2.value.length == 10) {
-        document.adddemographic.phone2.value = document.adddemographic.phone2.value.substring(0,3) + "-" + document.adddemographic.phone2.value.substring(3,6) + "-" + document.adddemographic.phone2.value.substring(6);
-        }
-    if (document.adddemographic.phone2.value.length == 11 && document.adddemographic.phone2.value.charAt(3) == '-') {
-        document.adddemographic.phone2.value = document.adddemographic.phone2.value.substring(0,3) + "-" + document.adddemographic.phone2.value.substring(4,7) + "-" + document.adddemographic.phone2.value.substring(7);
     }
 }
 
