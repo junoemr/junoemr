@@ -159,6 +159,7 @@
    <script>
      jQuery.noConflict();
    </script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
 
    <script type="text/javascript">
 	   function aSubmit()
@@ -175,6 +176,38 @@
 		   }
 
 		   return true;
+	   }
+	   window.onload = function(){
+		   jQuery('body').on("blur", '.phone-class', validatePhoneNumber);
+	   };
+
+	   function validatePhoneNumber(event)
+	   {
+		   event.stopPropagation();
+		   let userInput = jQuery("#"+event.target.id).val();
+		   let lengthBeforeProcess = userInput.length;
+
+		   if (lengthBeforeProcess > 0)
+		   {
+			   let array = userInput.split('');
+			   array = removeUnicodeControlCharacters(array);
+			   let validatedInput = array.join('');
+
+			   jQuery("#"+event.target.id).val(validatedInput);
+			   if (lengthBeforeProcess !== validatedInput.length)
+			   {
+				   alert("Invalid character for phone numbers has been removed!");
+			   }
+		   }
+	   }
+
+	   function removeUnicodeControlCharacters(array)
+	   {
+			return array.filter(
+		   		x =>
+					(34 <= x.charCodeAt(0) && x.charCodeAt(0) <=124) ||
+					x.charCodeAt(0) > 159
+			);
 	   }
    </script>
 
@@ -218,6 +251,8 @@
 
 <!--link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  /-->
 <script language="JavaScript">
+
+
 function upCaseCtrl(ctrl) {
 	ctrl.value = ctrl.value.toUpperCase();
 }
@@ -302,6 +337,7 @@ function formatPhoneNum() {
         document.adddemographic.phone2.value = document.adddemographic.phone2.value.substring(0,3) + "-" + document.adddemographic.phone2.value.substring(4,7) + "-" + document.adddemographic.phone2.value.substring(7);
     }
 }
+
 function rs(n,u,w,h,x) {
   args="width="+w+",height="+h+",resizable=yes,scrollbars=yes,status=0,top=60,left=30";
   remote=window.open(u,n,args);
@@ -561,8 +597,6 @@ function ignoreDuplicates() {
 
 	return ret;
 }
-
-
 </script>
 </head>
 <!-- Databases have alias for today. It is not necessary give the current date -->
@@ -819,27 +853,27 @@ function ignoreDuplicates() {
 			<tr valign="top">
 				<td id="phoneLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPhoneHome" />: </b></td>
-				<td id="phoneCell" align="left"><input type="text" id="phone" name="phone"
-					onBlur="formatPhoneNum()"
+				<td id="phoneCell" align="left"><input type="text" class="phone-class" id="phone" name="phone"
+
 					value="<%=props.getProperty("phoneprefix", "905-")%>"> <bean:message
 					key="demographic.demographicaddrecordhtm.Ext" />:<input
-					type="text" id="hPhoneExt" name="hPhoneExt" value="" size="4" /></td>
+					type="text" id="hPhoneExt" class="phone-class"  name="hPhoneExt" value="" size="4" /></td>
 				<td id="phoneWorkLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPhoneWork" />:</b></td>
-				<td id="phoneWorkCell" align="left"><input type="text" name="phone2"
-					onBlur="formatPhoneNum()" value=""> <bean:message
+				<td id="phoneWorkCell" align="left"><input type="text" name="phone2" id="phone2" class="phone-class"
+				   	value=""> <bean:message
 					key="demographic.demographicaddrecordhtm.Ext" />:<input type="text"
-					name="wPhoneExt" value="" style="display: inline" size="4" /></td>
+					name="wPhoneExt" value="" style="display: inline" size="4" id="phone2Ext" class="phone-class"    /></td>
 			</tr>
 			<tr valign="top">
 				<td id="phoneCellLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPhoneCell" />: </b></td>
-				<td id="phoneCellCell" align="left"><input type="text" name="demo_cell"
-					onBlur="formatPhoneNum()"></td>
+				<td id="phoneCellCell" align="left"><input type="text" name="demo_cell" id="phone_cell"
+					class="phone-class"  ></td>
 				<td align="right"><b><bean:message
 						key="demographic.demographicaddrecordhtm.formPhoneComment" />: </b></td>
 				<td align="left" colspan="3">
-						<textarea rows="2" cols="30" name="phoneComment"></textarea>
+						<textarea rows="2" cols="30" name="phoneComment" id="phoneComment" class="phone-class"  ></textarea>
 				</td>
 			</tr>
 			<tr valign="top">
