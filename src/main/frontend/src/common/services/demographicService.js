@@ -121,6 +121,8 @@ angular.module("Common.Services").service("demographicService", [
             return deferred.promise;
         };
 
+        service.validatePhoneNumber = function validatePhoneNumber(event)
+
         return service;
     }
 ]);

@@ -157,4 +157,4 @@
 			<button class="btn btn-primary" ng-click="$ctrl.onAdd()">Add</button>
 		</div>
 	</modal-footer>
-</juno-modal>
+</juno-modal>S

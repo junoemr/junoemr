@@ -125,8 +125,30 @@ angular.module('Patient').component('addDemographicModal', {
 			ctrl.invalidFirstName = !ctrl.newDemographicData.firstName;
 			ctrl.invalidSex = !ctrl.newDemographicData.sex;
 			ctrl.invalidDob = !dateOfBirthValid;
+			console.log(ctrl.validatePhoneNumber(ctrl.newDemographicData.phone));
+			ctrl.newDemographicData.phone = ctrl.validatePhoneNumber(ctrl.newDemographicData.phone);
 
 			return !(ctrl.invalidLastName || ctrl.invalidFirstName || ctrl.invalidSex || ctrl.invalidDob);
+		};
+
+		ctrl.validatePhoneNumber = function (phoneInput)
+		{
+			let lengthBeforeProcess = phoneInput.length;
+			console.log("length "+ lengthBeforeProcess);
+			let validatedInput = "";
+			if (lengthBeforeProcess > 0)
+			{
+				let array = phoneInput.split('');
+				//remove unicode control characters
+				array = array.filter(
+							x =>
+							(34 <= x.charCodeAt(0) && x.charCodeAt(0) <=124) ||
+							x.charCodeAt(0) > 159
+						);
+				validatedInput = array.join('');
+			}
+			console.log("length "+ validatedInput.length);
+			return validatedInput;
 		};
 
 		ctrl.onCancel = function()
