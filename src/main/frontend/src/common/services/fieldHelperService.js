@@ -80,6 +80,7 @@ angular.module('Common.Services').factory(
 			helper.default_link_function = function default_link_function(
 				$scope, element, attribute, controller)
 			{
+				console.log("create modal helper");
 				helper.merge_title_messages($scope);
 				$scope.focus_fn = function on_focus()
 				{
@@ -99,6 +100,36 @@ angular.module('Common.Services').factory(
 							}
 						});
 					}
+				};
+
+				// if(angular.isFunction($scope.keypress_enter_fn))
+				// {
+				// 	element.bind("keydown keypress", function(event)
+				// 	{
+				// 		if(event.which === 13)
+				// 		{
+				// 			$scope.$apply(function ()
+				// 			{
+				// 				$scope.$eval($scope.keypress_enter_fn);
+				// 			});
+				// 			event.preventDefault();
+				// 		}
+				// 	});
+				// }
+
+				$scope.on_blur_fn = function on_blur_fn()
+				{
+					// if(angular.isFunction($scope.blur_fn))
+					// {
+						// if(($(element).is("input:enabled, textarea:enabled")
+							// $(element).is(':focus')) ||
+							// $(element).find(" input:enabled, select:enabled, textarea:enabled ").is(':focus'))
+					console.log("triggered");
+					if(($(element).is("input:enabled, textarea:enabled")))
+					{
+						console.log($(element).val());
+					}
+					// }
 				};
 
 				// watch the focus field: when it matches the name, focus the element

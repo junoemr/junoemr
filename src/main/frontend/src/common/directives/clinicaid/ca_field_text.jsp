@@ -23,6 +23,7 @@
 		       ng-focus="focus_fn()"
 		       ng-change="change_fn()"
 		       ng-disabled="disabled"
+			   ng-blur="on_blur_fn()"
 		       tabindex="{{tab_index}}">
 		</input>
 		<span class="label label-default textarea-char-counter"

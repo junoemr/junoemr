@@ -8,7 +8,7 @@
 	</modal-ctl-buttons>
 
 	<modal-title>
-		<h3>Add Demographic</h3>
+		<h3>Adddddd Demographic</h3>
 	</modal-title>
 
 	<modal-body class="add-demographic-content">

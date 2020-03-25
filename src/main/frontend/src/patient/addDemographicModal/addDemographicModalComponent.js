@@ -23,6 +23,7 @@ angular.module('Patient').component('addDemographicModal', {
 			programService,
 			providerService)
 	{
+		console.log("get adddemographicmodalcomponent.js ");
 		let ctrl = this;
 		ctrl.genders = staticDataService.getGenders();
 		ctrl.provinces = staticDataService.getProvinces();
