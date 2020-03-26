@@ -117,18 +117,31 @@ angular.module('Common.Services').factory(
 				// 	});
 				// }
 
-				$scope.on_blur_fn = function on_blur_fn()
+				$scope.on_blur_fn = function on_blur_fn(event)
 				{
 					// if(angular.isFunction($scope.blur_fn))
 					// {
 						// if(($(element).is("input:enabled, textarea:enabled")
 							// $(element).is(':focus')) ||
 							// $(element).find(" input:enabled, select:enabled, textarea:enabled ").is(':focus'))
-					console.log("triggered");
-					if(($(element).is("input:enabled, textarea:enabled")))
-					{
-						console.log($(element).val());
-					}
+					console.log("triggered55");
+					console.log(event);
+					console.log(event.currentTarget);
+					let current_t = event.currentTarget;
+					console.log(current_t.id);
+					console.log(current_t.value);
+					// current_t.value = "666";
+					// console.log(current_t.value);
+					event.currentTarget.value = helper.validateUserInput(event.currentTarget.value);
+
+					// console.log(event.currentTarget.value());
+
+
+					// if(($(element).is("input:enabled, textarea:enabled")))
+					// {
+					// 	console.log("gets here");
+					// 	console.log($(element).val());
+					// }
 					// }
 				};
 
@@ -242,6 +255,27 @@ angular.module('Common.Services').factory(
 					link: link_function,
 					controller: helper.default_controller
 				};
+			};
+
+			//remove control characters
+			helper.validateUserInput = function (input)
+			{
+				let lengthBeforeProcess = input.length;
+				console.log("length "+ lengthBeforeProcess);
+				let validatedInput = "";
+				if (lengthBeforeProcess > 0)
+				{
+					let array = input.split('');
+					//remove unicode control characters
+					array = array.filter(
+						x =>
+						(34 <= x.charCodeAt(0) && x.charCodeAt(0) <=124) ||
+						x.charCodeAt(0) > 159
+					);
+					validatedInput = array.join('');
+				}
+				console.log("length "+ validatedInput.length);
+				return validatedInput;
 			};
 
 			return helper;

@@ -47,6 +47,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'staticDataService',
 	'referralDoctorsService',
 	'user',
+	'fieldHelperService',
 
 	function(
 		$scope,
@@ -66,7 +67,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		securityService,
 		staticDataService,
 		referralDoctorsService,
-		user)
+		user,
+		helper)
 	{
 
 		var controller = this;
@@ -722,6 +724,13 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				controller.page.demo.ver = controller.page.demo.ver.toUpperCase();
 			}
 			ver0 = controller.page.demo.ver;
+		};
+
+		controller.detail_on_blur=function detail_on_blur(event)
+		{
+			console.log("get here");
+			console.log(event.currentTarget.value);
+			event.currentTarget.value = helper.validateUserInput(event.currentTarget.value);
 		};
 
 		//manage date entries
