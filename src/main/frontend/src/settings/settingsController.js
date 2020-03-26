@@ -546,11 +546,19 @@ angular.module('Settings').controller('Settings.SettingsController', [
 				isValid = false;
 			}
 
-			if (isNaN(controller.pref.appointmentScreenLinkNameDisplayLength)
-				|| controller.pref.appointmentScreenLinkNameDisplayLength < 1)
+			if (isNaN(controller.pref.appointmentScreenLinkNameDisplayLength))
 			{
-				alert("The length of link and form names displayed on appointment screen must be at least 1.");
+				alert("The value of link and form names displayed on appointment screen must be a positive number.");
 				isValid = false;
+			}
+			else
+			{
+				let intVal = parseInt(controller.pref.appointmentScreenLinkNameDisplayLength);
+				if (intVal < 1)
+				{
+					alert("The value of link and form names displayed on appointment screen must be a positive number.");
+					isValid = false;
+				}
 			}
 
 			return isValid;
