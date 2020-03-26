@@ -80,7 +80,6 @@ angular.module('Common.Services').factory(
 			helper.default_link_function = function default_link_function(
 				$scope, element, attribute, controller)
 			{
-				console.log("create modal helper");
 				helper.merge_title_messages($scope);
 				$scope.focus_fn = function on_focus()
 				{
