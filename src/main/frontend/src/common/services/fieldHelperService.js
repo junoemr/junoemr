@@ -227,11 +227,10 @@ angular.module('Common.Services').factory(
 				if (lengthBeforeProcess > 0)
 				{
 					let array = input.split('');
-					//remove unicode control characters
 					array = array.filter(
 						x =>
-						(34 <= x.charCodeAt(0) && x.charCodeAt(0) <=124) ||
-						x.charCodeAt(0) > 159
+						(32 <= x.charCodeAt(0) && x.charCodeAt(0) <=126) ||
+						x.charCodeAt(0) > 160
 					);
 					validatedInput = array.join('');
 				}

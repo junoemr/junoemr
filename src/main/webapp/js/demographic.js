@@ -8,18 +8,17 @@ function validatePhoneNumber(event)
 
 	if (lengthBeforeProcess > 0)
 	{
-		let array = userInput.split('');
-		array = removeUnicodeControlCharacters(array);
+		let array = removeUnicodeControlCharacters(userInput);
 		let validatedInput = array.join('');
 		let lengthAfterProcess = validatedInput.length;
 
 		if (event.target.id === "phone" || event.target.id === "phone2" )
 		{
-			if (validatedInput.length == 10)
+			if (validatedInput.length === 10)
 			{
 				validatedInput = validatedInput.substring(0,3) + "-" + validatedInput.substring(3,6) + "-" + validatedInput.substring(6);
 			}
-			else if (validatedInput.length == 11)
+			else if (validatedInput.length === 11)
 			{
 				validatedInput = validatedInput.substring(0,3) + "-" + validatedInput.substring(4,7) + "-" + validatedInput.substring(7);
 			}
@@ -32,11 +31,12 @@ function validatePhoneNumber(event)
 	}
 }
 
-function removeUnicodeControlCharacters(array)
+function removeUnicodeControlCharacters(stringInput)
 {
+	let array = stringInput.split('');
 	return array.filter(
 		x =>
-		(34 <= x.charCodeAt(0) && x.charCodeAt(0) <=124) ||
-		x.charCodeAt(0) > 159
+		(32 <= x.charCodeAt(0) && x.charCodeAt(0) <=126) ||
+		x.charCodeAt(0) > 160
 	);
 }
