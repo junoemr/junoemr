@@ -102,47 +102,10 @@ angular.module('Common.Services').factory(
 					}
 				};
 
-				// if(angular.isFunction($scope.keypress_enter_fn))
-				// {
-				// 	element.bind("keydown keypress", function(event)
-				// 	{
-				// 		if(event.which === 13)
-				// 		{
-				// 			$scope.$apply(function ()
-				// 			{
-				// 				$scope.$eval($scope.keypress_enter_fn);
-				// 			});
-				// 			event.preventDefault();
-				// 		}
-				// 	});
-				// }
-
 				$scope.on_blur_fn = function on_blur_fn(event)
 				{
-					// if(angular.isFunction($scope.blur_fn))
-					// {
-						// if(($(element).is("input:enabled, textarea:enabled")
-							// $(element).is(':focus')) ||
-							// $(element).find(" input:enabled, select:enabled, textarea:enabled ").is(':focus'))
-					console.log("triggered55");
-					console.log(event);
-					console.log(event.currentTarget);
-					let current_t = event.currentTarget;
-					console.log(current_t.id);
-					console.log(current_t.value);
-					// current_t.value = "666";
-					// console.log(current_t.value);
 					event.currentTarget.value = helper.validateUserInput(event.currentTarget.value);
 
-					// console.log(event.currentTarget.value());
-
-
-					// if(($(element).is("input:enabled, textarea:enabled")))
-					// {
-					// 	console.log("gets here");
-					// 	console.log($(element).val());
-					// }
-					// }
 				};
 
 				// watch the focus field: when it matches the name, focus the element
@@ -261,7 +224,6 @@ angular.module('Common.Services').factory(
 			helper.validateUserInput = function (input)
 			{
 				let lengthBeforeProcess = input.length;
-				console.log("length "+ lengthBeforeProcess);
 				let validatedInput = "";
 				if (lengthBeforeProcess > 0)
 				{
@@ -274,7 +236,6 @@ angular.module('Common.Services').factory(
 					);
 					validatedInput = array.join('');
 				}
-				console.log("length "+ validatedInput.length);
 				return validatedInput;
 			};
 

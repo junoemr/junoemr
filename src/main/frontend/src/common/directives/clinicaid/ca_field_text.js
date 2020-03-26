@@ -8,7 +8,6 @@ angular.module('Common').directive(
 		helper
 	)
 {
-	console.log("create modal caFieldText");
 	return helper.textInputDirective(false);
 }]);
 
