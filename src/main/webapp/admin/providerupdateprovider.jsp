@@ -196,17 +196,29 @@ jQuery(document).ready( function() {
 		<div align="right"><bean:message key="admin.provider.sitesAssigned" /><font color="red">:</font></div>
 		</td>
 		<td>
-<%
-SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
-List<Site> psites = siteDao.getActiveSitesByProviderNo(provider_no);
-List<Site> sites = siteDao.getAllActiveSites();
-for (int i=0; i<sites.size(); i++) {
-%>
-	<input type="checkbox" name="sites" value="<%= sites.get(i).getSiteId() %>" <%= psites.contains(sites.get(i))?"checked='checked'":"" %> <%=((!isSiteAccessPrivacy) || siteIDs.contains(sites.get(i).getSiteId()) ? "" : " disabled ") %>>
-	<%= sites.get(i).getName() %><br />
-<%
-}
-%>
+            <table>
+            <%  SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
+                List<Site> psites = siteDao.getActiveSitesByProviderNo(provider_no);
+                List<Site> sites = siteDao.getAllActiveSites();
+                for (Site site : sites) {
+                	boolean isAllowed = !isSiteAccessPrivacy || siteIDs.contains(site.getSiteId());
+                	boolean isChecked = psites.contains(site);
+            %>
+                <tr>
+                    <td>
+                        <input type="checkbox" name="sites" value="<%= site.getSiteId() %>" <%= isChecked ? " checked" : "" %> <%= isAllowed? "" : " disabled"%>>
+                        <%= site.getName() %>
+                    </td>
+                    <td>
+                        <% if (site.getProvince().equals("BC")) {%>
+                        <input type="checkbox" name="sitesBCP" value="<%= site.getSiteId()%>" <%= isAllowed ? "" : " disabled" %>> Apply BCP
+                        <% } %>
+                    </td>
+                </tr>
+
+
+            <% } %>
+            </table>
 		</td>
 	</tr>
 <% } %>

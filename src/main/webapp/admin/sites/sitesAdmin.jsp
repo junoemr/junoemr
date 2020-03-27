@@ -42,16 +42,13 @@
 <%@page import="org.oscarehr.common.model.Site" %>
 <html:html locale="true">
     <head>
-        <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
         <title>Clinic</title>
-        <link rel="stylesheet" type="text/css"
-              href="../share/css/OscarStandardLayout.css">
-
-        <script type="text/javascript" language="JavaScript"
-                src="../share/javascript/prototype.js"></script>
-        <script type="text/javascript" language="JavaScript"
-                src="../share/javascript/Oscar.js"></script>
-        <link href="<html:rewrite page='/css/displaytag.css'/>" rel="stylesheet"></link>
+<%--        <script type="text/javascript" src="../../share/javascript/prototype.js"></script>
+        <script type="text/javascript" src="../../share/javascript/Oscar.js"></script>--%>
+        <%--<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>--%>
+        <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../share/css/OscarStandardLayout.css">
+        <link href="<html:rewrite page='/css/displaytag.css'/>" rel="stylesheet">
     </head>
 
     <body vlink="#0000FF" class="BodyStyle">
@@ -102,8 +99,6 @@
                     <display-el:column property="providerIdTo" title="ProviderID To"/>
                     <% } %>
                 </display-el:table>
-
-
             </td>
         </tr>
         <tr>
