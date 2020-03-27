@@ -485,7 +485,7 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				var deferred = $q.defer();
 
-				var defaultAppointmentReason = "Others";
+				const defaultAppointmentReason = "Others";
 
 				$scope.scheduleApi.getAppointmentReasons().then(
 					function success(rawResults)
