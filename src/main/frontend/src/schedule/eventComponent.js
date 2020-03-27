@@ -485,7 +485,7 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				var deferred = $q.defer();
 
-				let defaultAppointmentReason = "Others";
+				var defaultAppointmentReason = "Others";
 
 				$scope.scheduleApi.getAppointmentReasons().then(
 					function success(rawResults)
@@ -863,15 +863,8 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.findDefaultAppointmentType = function(reasonCodeList, defaultAppointmentReason)
 			{
-				for (var i = 0; i < reasonCodeList.length; i++ )
-				{
-					if (reasonCodeList[i].label === defaultAppointmentReason)
-					{
-						return reasonCodeList[i].value;
-					}
-				}
-				return reasonCodeList[0].value;
-			}
+				return (reasonCodeList.find((code) => code.label === defaultAppointmentReason).value) || reasonCodeList[0].value;
+			};
 
 			//=========================================================================
 			// Watches
