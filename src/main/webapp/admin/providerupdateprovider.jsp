@@ -429,6 +429,14 @@ jQuery(document).ready( function() {
 			// We are using the albertaEDeliveryId column to store IHA provider mnemonics on BC instances.
 			if (OscarProperties.getInstance().getProperty("instance_type").equals("BC")) {
 		%>
+        <tr>
+            <td align="right">BCP Eligible?</td>
+            <td>
+                <select name="bc_bcp_eligible">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+        </tr>
 		<tr>
 			<td align="right"><bean:message key="admin.provider.formIHAMnemonic" />:</td>
 			<td><input type="text" name="alberta_e_delivery_ids"
