@@ -46,7 +46,7 @@
 	</tr>
 </table>
 <%
-	ApptUtil.copyAppointmentIntoSession(request);
+	ApptUtil.copyAppointmentIntoSession(request, ApptUtil.APPOINTMENT_OP_TYPE.COPY);
 	if (true) {
 %>
 <p>

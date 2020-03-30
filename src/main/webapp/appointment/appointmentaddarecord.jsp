@@ -59,8 +59,7 @@
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
 <%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
 <%@ page import="java.util.Date" %>
-<%@ page import="org.oscarehr.integration.myhealthaccess.service.AppointmentService" %>
-<%@ page import="javax.persistence.EntityTransaction" %>
+<%@ page import="oscar.appt.ApptUtil" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <html:html locale="true">
@@ -108,6 +107,8 @@
 	}
 
 	// Try to read all of the request parameters and assign default values if we can't read parameters
+	ApptUtil.APPOINTMENT_OP_TYPE operationType = ApptUtil.stringToOperationType(request.getParameter("operationType"));
+	String pastedAppointmentNo = ConversionUtils.getStringOrDefaultValue(request.getParameter("appointmentNo"), null);
 	String providerNo = ConversionUtils.getStringOrDefaultValue(request.getParameter("provider_no"), loggedInInfo.getLoggedInProviderNo());
 	String creator = ConversionUtils.getStringOrDefaultValue(request.getParameter("creator"), loggedInInfo.getLoggedInProviderNo());
 	String appointmentName = ConversionUtils.getStringOrDefaultValue(request.getParameter("keyword"), "");
@@ -129,6 +130,10 @@
 	Date createDateTime = new Date();
 
 	Appointment appointment = new Appointment();
+	if (operationType == ApptUtil.APPOINTMENT_OP_TYPE.CUT)
+	{
+		appointment.setId(pastedAppointmentNo != null ? Integer.parseInt(pastedAppointmentNo) : null);
+	}
 	appointment.setProviderNo(providerNo);
 	appointment.setAppointmentDate(appointmentDate);
 	appointment.setStartTime(startTime);
@@ -156,7 +161,14 @@
 
 	try
 	{
-		appointmentService.saveNewAppointment(appointment, loggedInInfo);
+		if (operationType == ApptUtil.APPOINTMENT_OP_TYPE.CUT)
+		{
+			appointmentService.updateAppointment(appointment);
+		}
+		else
+		{
+			appointmentService.saveNewAppointment(appointment, loggedInInfo);
+		}
 		appointmentNo = appointment.getId();
 
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),

@@ -29,6 +29,7 @@ import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,9 @@ public class Appointment
 
 	@Autowired
 	AppointmentService appointmentService;
+
+	@Autowired
+	MyHealthAccessService myHealthAccessService;
 
 	private String formatName(String upperFirstName, String upperLastName)
 	{
@@ -109,6 +113,20 @@ public class Appointment
 		if (appointment.getIsVirtual())
 		{
 			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
+		}
+	}
+
+	/**
+	 * update appointment. notifying MHA of update if applicable.
+	 * @param appointment - appointment to update
+	 */
+	public void updateAppointment(org.oscarehr.common.model.Appointment appointment)
+	{
+		oscarAppointmentDao.merge(appointment);
+
+		if (appointment.getIsVirtual())
+		{
+			myHealthAccessService.queueAppointmentCacheUpdate(appointment);
 		}
 	}
 
