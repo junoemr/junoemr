@@ -23,9 +23,6 @@
 package org.oscarehr.schedule.service;
 
 import com.google.common.collect.RangeMap;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.appointment.service.Appointment;
 import org.oscarehr.common.dao.MyGroupDao;
@@ -50,13 +47,8 @@ import org.oscarehr.schedule.model.ScheduleDate;
 import org.oscarehr.schedule.model.ScheduleHoliday;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ScheduleSlotDto;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BlackoutRule;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.CutoffRule;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.MultipleBookingsRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,10 +60,8 @@ import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -89,7 +79,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 @Service
@@ -800,84 +789,92 @@ public class Schedule
 		return calendarSchedule;
 	}
 
-	public List<ScheduleSlotDto> getProviderAvailability(String[] providerNos,
-												   LocalDate startDate,
-												   LocalDate endDate,
-												   String templateDurations,
-												   String demographicNo,
-												   String jsonRules)
+	// TODO: Generic provider schedule availability lookup shouldn't require booking rules and schedule template transfer
+	public List<ScheduleSlotDto> getProviderAvailability(
+			String[] providerNos, LocalDate startDate, LocalDate endDate,
+			String demographicNo, String jsonTemplateDurations, String jsonRules) throws org.json.simple.parser.ParseException
 	{
+		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = ScheduleCodeDurationTransfer.parse(jsonTemplateDurations);
+		BookingRules bookingRules = new BookingRules(jsonRules);
+
 		List<List<ScheduleSlotDto>> allAvailableSlots = new ArrayList<>();
 
-		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = new ArrayList<>();
+		ExecutorService pool = Executors.newFixedThreadPool(4);
+
+		for (String providerNo : providerNos)
+		{
+			pool.execute(() -> {
+				List<ScheduleSlotDto> scheduleSlots = scheduleTemplateDao.getScheduleSlotsForProvider(
+						providerNo, startDate, endDate, scheduleDurationTransfers, demographicNo, bookingRules);
+
+				allAvailableSlots.add(scheduleSlots);
+			});
+		}
+
+		pool.shutdown();
 
 		try
 		{
-			JSONArray templateDurationJsonArr = (JSONArray) new JSONParser().parse(templateDurations);
-
-			for (Object templateDurationObj : templateDurationJsonArr)
-			{
-				JSONObject templateDurationJson = (JSONObject) templateDurationObj;
-				String templateCode = (String) templateDurationJson.get("schedule_template_id");
-				Long duration = (Long) templateDurationJson.get("appointment_duration");
-
-				ScheduleCodeDurationTransfer scheduleDurationTransfer =
-						new ScheduleCodeDurationTransfer(templateCode, duration.intValue());
-				scheduleDurationTransfers.add(scheduleDurationTransfer);
-			}
-
-			List<MultipleBookingsRule> multipleBookingsRules = BookingRuleFactory.buildMultipleBookingsRuleList(jsonRules);
-			BlackoutRule blackoutRule = BookingRuleFactory.buildBlackoutRule(jsonRules);
-			CutoffRule cutoffRule = BookingRuleFactory.buildCutoffRule(jsonRules);
-
-			ExecutorService pool = Executors.newFixedThreadPool(4);
-			for (String providerNo : providerNos)
-			{
-				pool.execute(() -> {
-					List<ScheduleSlotDto> scheduleSlots = scheduleTemplateDao.getScheduleSlotsForProvider(
-							providerNo,
-							startDate,
-							endDate,
-							scheduleDurationTransfers,
-							demographicNo,
-							multipleBookingsRules,
-							blackoutRule,
-							cutoffRule
-					);
-
-					allAvailableSlots.add(scheduleSlots);
-
-//					providerScheduleTransfer.getProviderScheduleResponse().forEach((k, v) -> {
-//						scheduleTransfer.merge(k, v, (curArr, newArr) -> new ArrayList<>(
-//								Stream.of(curArr, newArr)
-//										.flatMap(List::stream)
-//										.collect(Collectors.toMap(DayTimeSlots::getTimeSlotEntry, s -> s,
-//												(DayTimeSlots x, DayTimeSlots y) -> x == null ? y : x)).values())
-//						);
-//					});
-				});
-			}
-
-			pool.shutdown();
-
-			try
-			{
-				pool.awaitTermination(1, TimeUnit.MINUTES);
-			}
-			catch (InterruptedException e)
-			{
-				MiscUtils.getLogger().error("Starting interrupted");
-			}
+			pool.awaitTermination(1, TimeUnit.MINUTES);
 		}
-		catch(org.json.simple.parser.ParseException e)
+		catch (InterruptedException e)
 		{
-			MiscUtils.getLogger().error("Exception: " + e);
+			MiscUtils.getLogger().error("Starting interrupted");
 		}
 
+		// Return unique list of provider availability schedule slots
 		return allAvailableSlots.stream()
 					.flatMap(Collection::stream)
 					.distinct()
 					.collect(Collectors.toList());
+	}
+
+	// TODO: See: getProviderAvailability
+	public HashMap<String, List<ScheduleSlotDto>> getProviderSlotsInThreshold(
+			String[] providerNos, org.oscarehr.common.model.Appointment appointment,
+			String jsonTemplateDurations, String jsonRules) throws org.json.simple.parser.ParseException
+	{
+		HashMap<String, List<ScheduleSlotDto>> providerSlotMap = new HashMap<>();
+
+		final long MINUTE_THRESHOLD = 60;
+
+		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = ScheduleCodeDurationTransfer.parse(jsonTemplateDurations);
+		BookingRules bookingRules = new BookingRules(jsonRules);
+
+		LocalDateTime apptDateTime = appointment.getStartDateTime();
+		LocalDate appointmentDate = apptDateTime.toLocalDate();
+
+		ExecutorService pool = Executors.newFixedThreadPool(4);
+		for (String providerNo : providerNos)
+		{
+			pool.execute(() -> {
+				List<ScheduleSlotDto> availableSlots = scheduleTemplateDao.getScheduleSlotsForProvider(
+						providerNo, appointmentDate, appointmentDate, scheduleDurationTransfers,
+						String.valueOf(appointment.getDemographicNo()), bookingRules);
+
+				List<ScheduleSlotDto> slotsInThreshold = ScheduleSlotDto.getSlotsInThreshold(
+						availableSlots, apptDateTime, MINUTE_THRESHOLD, ChronoUnit.MINUTES
+				);
+
+				if (!slotsInThreshold.isEmpty())
+				{
+					providerSlotMap.put(providerNo, slotsInThreshold);
+				}
+			});
+		}
+
+		pool.shutdown();
+
+		try
+		{
+			pool.awaitTermination(1, TimeUnit.MINUTES);
+		}
+		catch (InterruptedException e)
+		{
+			MiscUtils.getLogger().error(e);
+		}
+
+		return providerSlotMap;
 	}
 
 	private boolean isProviderAssignedToSite(String siteName, String providerId)
@@ -892,4 +889,5 @@ public class Schedule
 		}
 		return false;
 	}
+
 }

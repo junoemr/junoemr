@@ -1,5 +1,10 @@
 package org.oscarehr.ws.external.soap.v1.transfer.schedule;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ScheduleSlotDto
 {
 	String date;
@@ -41,5 +46,45 @@ public class ScheduleSlotDto
 	public void setStartTime(String startTime)
 	{
 		this.startTime = startTime;
+	}
+
+	public LocalDateTime getDateTime()
+	{
+		return LocalDateTime.parse(String.format("%sT%s", date, startTime));
+	}
+
+	public static List<ScheduleSlotDto> getSlotsInThreshold(List<ScheduleSlotDto> scheduleSlots, LocalDateTime dateTimePivot,
+	                                                        long threshold, ChronoUnit granularity)
+	{
+		boolean slotIsAvailable = false;
+
+		List<ScheduleSlotDto> slotsInThreshold = new ArrayList<>();
+
+		for (ScheduleSlotDto slot : scheduleSlots)
+		{
+			LocalDateTime slotDateTime = slot.getDateTime();
+			long nGranBetween = granularity.between(slotDateTime, dateTimePivot);
+
+			if (nGranBetween < -threshold)
+			{
+				break;
+			}
+			else if (Math.abs(nGranBetween) <= threshold)
+			{
+				if (!slotIsAvailable)
+				{
+					slotIsAvailable = dateTimePivot.equals(slotDateTime);
+				}
+
+				slotsInThreshold.add(slot);
+			}
+		}
+
+		if (!slotIsAvailable)
+		{
+			slotsInThreshold.clear();
+		}
+
+		return slotsInThreshold;
 	}
 }

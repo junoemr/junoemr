@@ -44,6 +44,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -485,5 +487,12 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 		{
 			return null;
 		}
+	}
+
+	public LocalDateTime getStartDateTime()
+	{
+		return this.getStartTime().toInstant()
+					.atZone(ZoneId.systemDefault())
+					.toLocalDateTime();
 	}
 }

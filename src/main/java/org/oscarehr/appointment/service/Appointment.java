@@ -27,10 +27,13 @@ import org.apache.commons.lang.WordUtils;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
+import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.schedule.service.Schedule;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.ScheduleSlotDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +45,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -53,7 +57,13 @@ public class Appointment
 	OscarAppointmentDao oscarAppointmentDao;
 
 	@Autowired
+	ScheduleTemplateDao scheduleTemplateDao;
+
+	@Autowired
 	AppointmentService appointmentService;
+
+	@Autowired
+	Schedule scheduleService;
 
 	private String formatName(String upperFirstName, String upperLastName)
 	{
@@ -233,6 +243,7 @@ public class Appointment
 		for (String providerNo : providerNos)
 		{
 			appointment.setProviderNo(providerNo);
+
 
 			if (!oscarAppointmentDao.checkForConflict(appointment))
 			{
