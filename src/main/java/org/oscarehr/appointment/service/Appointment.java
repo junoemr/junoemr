@@ -42,7 +42,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -229,7 +228,7 @@ public class Appointment
 		appointment.setCreator(security.getUserName());
 
 		String bookingProviderNo;
-		Integer apptCountForProviderNo;
+		Integer apptCountForProvider = -1;
 
 		for (String providerNo : providerNos)
 		{

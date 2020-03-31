@@ -52,6 +52,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.ScheduleSlotDto;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BlackoutRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.CutoffRule;
@@ -76,6 +77,7 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -798,15 +800,15 @@ public class Schedule
 		return calendarSchedule;
 	}
 
-	// TODO: Rework schedule availability dto
-	public HashMap<String, DayTimeSlots[]> getProviderAvailability(String[] providerNos,
-																   LocalDate startDate,
-																   LocalDate endDate,
-																   String templateDurations,
-																   String demographicNo,
-																   String jsonRules)
+	public List<ScheduleSlotDto> getProviderAvailability(String[] providerNos,
+												   LocalDate startDate,
+												   LocalDate endDate,
+												   String templateDurations,
+												   String demographicNo,
+												   String jsonRules)
 	{
-		HashMap<String, List<DayTimeSlots>> scheduleTransfer = new HashMap<>();
+		List<List<ScheduleSlotDto>> allAvailableSlots = new ArrayList<>();
+
 		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = new ArrayList<>();
 
 		try
@@ -832,7 +834,7 @@ public class Schedule
 			for (String providerNo : providerNos)
 			{
 				pool.execute(() -> {
-					ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(
+					List<ScheduleSlotDto> scheduleSlots = scheduleTemplateDao.getScheduleSlotsForProvider(
 							providerNo,
 							startDate,
 							endDate,
@@ -843,14 +845,16 @@ public class Schedule
 							cutoffRule
 					);
 
-					providerScheduleTransfer.getProviderScheduleResponse().forEach((k, v) -> {
-						scheduleTransfer.merge(k, v, (curArr, newArr) -> new ArrayList<>(
-								Stream.of(curArr, newArr)
-										.flatMap(List::stream)
-										.collect(Collectors.toMap(DayTimeSlots::getTimeSlotEntry, s -> s,
-												(DayTimeSlots x, DayTimeSlots y) -> x == null ? y : x)).values())
-						);
-					});
+					allAvailableSlots.add(scheduleSlots);
+
+//					providerScheduleTransfer.getProviderScheduleResponse().forEach((k, v) -> {
+//						scheduleTransfer.merge(k, v, (curArr, newArr) -> new ArrayList<>(
+//								Stream.of(curArr, newArr)
+//										.flatMap(List::stream)
+//										.collect(Collectors.toMap(DayTimeSlots::getTimeSlotEntry, s -> s,
+//												(DayTimeSlots x, DayTimeSlots y) -> x == null ? y : x)).values())
+//						);
+//					});
 				});
 			}
 
@@ -869,14 +873,11 @@ public class Schedule
 		{
 			MiscUtils.getLogger().error("Exception: " + e);
 		}
-		MiscUtils.getLogger().info("End Get Provider Schedule Service: " + LocalDateTime.now().toString());
 
-		HashMap<String, DayTimeSlots[]> results = new HashMap<>();
-
-		scheduleTransfer.forEach((k, v) -> results.put(k, v.toArray(new DayTimeSlots[0])));
-		return results;
-
-
+		return allAvailableSlots.stream()
+					.flatMap(Collection::stream)
+					.distinct()
+					.collect(Collectors.toList());
 	}
 
 	private boolean isProviderAssignedToSite(String siteName, String providerId)

@@ -55,6 +55,7 @@ import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleTemplateCodeTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.ScheduleSlotDto;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BlackoutRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
@@ -147,15 +148,15 @@ public class ScheduleWs extends AbstractWs {
 	}
 
 	@SkipContentLoggingOutbound
-	public HashMap<String, DayTimeSlots[]> getProviderAvailability(String[] providerNos,
-																	  @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate startDate,
-																	  @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate endDate,
-																	  String templateDurations,
-																	  String demographicNo,
-																	  String jsonRules)
+	public ScheduleSlotDto[] getProviderAvailability(String[] providerNos,
+													 @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate startDate,
+													 @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate endDate,
+													 String templateDurations,
+													 String demographicNo,
+													 String jsonRules)
 	{
 		return scheduleService.getProviderAvailability(
-				providerNos, startDate, endDate, templateDurations, demographicNo, jsonRules);
+				providerNos, startDate, endDate, templateDurations, demographicNo, jsonRules).toArray(new ScheduleSlotDto[0]);
 	}
 
 	public ValidatedAppointmentBookingTransfer addAppointmentToAvailableProvider(String[] providerNos,

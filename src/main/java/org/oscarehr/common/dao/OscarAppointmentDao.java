@@ -1110,7 +1110,23 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
     	return query.getResultList();
     }
 
-    public HashMap<String, Integer> getAppointmentCountMapForProviderAndDateRange(
+    public Integer getAppointmentCountForProvider(String providerNo, LocalDate appointmentDate)
+	{
+		String sql = "SELECT COUNT(a) " +
+					 "FROM Appointment a " +
+					 "WHERE a.appointmentDate = :appointmentDate " +
+					 "AND a.providerNo = :providerNo " +
+					 "AND a.status != :cancelledStatus";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("appointmentDate", appointmentDate);
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("cancelledStatus", Appointment.CANCELLED);
+
+		Long result = (Long) query.getSingleResult();
+		return result.intValue();
+	}
+
+	public HashMap<String, Integer> getAppointmentCountMapForProviderAndDateRange(
     		String providerNo, LocalDate startDate, LocalDate endDate)
 	{
 	    HashMap<String, Integer> appointmentCountMap = new HashMap<>();
