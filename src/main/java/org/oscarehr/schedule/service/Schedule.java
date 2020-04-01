@@ -791,8 +791,8 @@ public class Schedule
 
 	// TODO: Generic provider schedule availability lookup shouldn't require booking rules and schedule template transfer
 	public List<ScheduleSlotDto> getProviderAvailability(
-			String[] providerNos, LocalDate startDate, LocalDate endDate,
-			String demographicNo, String jsonTemplateDurations, String jsonRules) throws org.json.simple.parser.ParseException
+			String[] providerNos, LocalDate startDate, LocalDate endDate, String demographicNo,
+			String jsonTemplateDurations, String jsonRules) throws org.json.simple.parser.ParseException
 	{
 		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = ScheduleCodeDurationTransfer.parse(jsonTemplateDurations);
 		BookingRules bookingRules = new BookingRules(jsonRules);
@@ -805,7 +805,7 @@ public class Schedule
 		{
 			pool.execute(() -> {
 				List<ScheduleSlotDto> scheduleSlots = scheduleTemplateDao.getScheduleSlotsForProvider(
-						providerNo, startDate, endDate, scheduleDurationTransfers, demographicNo, bookingRules);
+						providerNo, startDate, endDate, demographicNo, scheduleDurationTransfers, bookingRules);
 
 				allAvailableSlots.add(scheduleSlots);
 			});
@@ -849,12 +849,11 @@ public class Schedule
 		{
 			pool.execute(() -> {
 				List<ScheduleSlotDto> availableSlots = scheduleTemplateDao.getScheduleSlotsForProvider(
-						providerNo, appointmentDate, appointmentDate, scheduleDurationTransfers,
-						String.valueOf(appointment.getDemographicNo()), bookingRules);
+						providerNo, appointmentDate, appointmentDate, String.valueOf(appointment.getDemographicNo()),
+						scheduleDurationTransfers, bookingRules);
 
 				List<ScheduleSlotDto> slotsInThreshold = ScheduleSlotDto.getSlotsInThreshold(
-						availableSlots, apptDateTime, MINUTE_THRESHOLD, ChronoUnit.MINUTES
-				);
+						availableSlots, apptDateTime, MINUTE_THRESHOLD, ChronoUnit.MINUTES);
 
 				if (!slotsInThreshold.isEmpty())
 				{
@@ -871,7 +870,8 @@ public class Schedule
 		}
 		catch (InterruptedException e)
 		{
-			MiscUtils.getLogger().error(e);
+			MiscUtils.getLogger().error(
+					"Thread execution interrupted while getting provider slots threshold", e);
 		}
 
 		return providerSlotMap;

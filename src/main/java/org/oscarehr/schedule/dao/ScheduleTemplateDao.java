@@ -286,9 +286,8 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
 	public List<ScheduleSlotDto> getScheduleSlotsForProvider(
-			String providerNo, LocalDate startDate, LocalDate endDate,
-			List<ScheduleCodeDurationTransfer> scheduleCodeDurationTransfer,
-			String demographicNo, BookingRules bookingRules) {
+			String providerNo, LocalDate startDate, LocalDate endDate, String demographicNo,
+			List<ScheduleCodeDurationTransfer> scheduleCodeDurationTransfer, BookingRules bookingRules) {
 
 		List<String> appointmentTypeList = ScheduleCodeDurationTransfer.getAllTemplateCodes(scheduleCodeDurationTransfer);
 		int appointmentDuration = scheduleCodeDurationTransfer.get(0).getDurationMinutes();

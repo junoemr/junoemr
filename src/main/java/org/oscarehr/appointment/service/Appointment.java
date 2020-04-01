@@ -33,7 +33,6 @@ import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
 import org.oscarehr.schedule.service.Schedule;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.ScheduleSlotDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +44,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -227,28 +225,5 @@ public class Appointment
 		}
 
 		return calendarEvents;
-	}
-
-	public void addAppointmentForAvailableProvider(LoggedInInfo loggedInInfo,
-												   Security security,
-												   String[] providerNos,
-												   org.oscarehr.common.model.Appointment appointment)
-	{
-		appointment.setCreatorSecurityId(security.getSecurityNo());
-		appointment.setCreator(security.getUserName());
-
-		String bookingProviderNo;
-		Integer apptCountForProvider = -1;
-
-		for (String providerNo : providerNos)
-		{
-			appointment.setProviderNo(providerNo);
-
-
-			if (!oscarAppointmentDao.checkForConflict(appointment))
-			{
-				bookingProviderNo = providerNo;
-			}
-		}
 	}
 }
