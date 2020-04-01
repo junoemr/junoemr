@@ -53,6 +53,15 @@ public class ScheduleSlotDto
 		return LocalDateTime.parse(String.format("%sT%s", date, startTime));
 	}
 
+	/**
+	 *
+	 * @param scheduleSlots - A provider's schedule availability
+	 * @param dateTimePivot - dateTime of slot to get surrounding slots for
+	 * @param threshold - n Granularity
+	 * @param granularity - Time unit to define the slot time threshold before and after dateTimePivot
+	 * @return - Return all slots before and after dateTimePivot within the specified threshold.
+	 *           Returns an empty list if dateTimePivot doesn't exist as a slot itself.
+	 */
 	public static List<ScheduleSlotDto> getSlotsInThreshold(List<ScheduleSlotDto> scheduleSlots, LocalDateTime dateTimePivot,
 	                                                        long threshold, ChronoUnit granularity)
 	{
