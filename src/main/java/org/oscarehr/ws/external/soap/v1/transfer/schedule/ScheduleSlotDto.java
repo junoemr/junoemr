@@ -80,43 +80,42 @@ public class ScheduleSlotDto
 	 *
 	 * @param scheduleSlots - A provider's schedule availability
 	 * @param dateTimePivot - dateTime of slot to get surrounding slots for
-	 * @param threshold - n Granularity
-	 * @param granularity - Time unit to define the slot time threshold before and after dateTimePivot
-	 * @return - Return all slots before and after dateTimePivot within the specified threshold.
-	 *           Returns an empty list if dateTimePivot doesn't exist as a slot itself.
+	 * @param range - n Granularity
+	 * @param granularity - Time unit to define the slot time range before and after dateTimePivot
+	 * @return - Return all slots before and after dateTimePivot within the specified range.
 	 */
-	public static List<ScheduleSlotDto> getSlotsInThreshold(List<ScheduleSlotDto> scheduleSlots, LocalDateTime dateTimePivot,
-	                                                        long threshold, ChronoUnit granularity)
+	public static List<ScheduleSlotDto> slotsInRange(List<ScheduleSlotDto> scheduleSlots, LocalDateTime dateTimePivot,
+	                                                    long range, ChronoUnit granularity)
 	{
-		boolean slotIsAvailable = false;
-
 		List<ScheduleSlotDto> slotsInThreshold = new ArrayList<>();
 
 		for (ScheduleSlotDto slot : scheduleSlots)
 		{
 			LocalDateTime slotDateTime = slot.getDateTime();
-			long nGranBetween = granularity.between(slotDateTime, dateTimePivot);
+			long timeBetween = Math.abs(granularity.between(slotDateTime, dateTimePivot));
 
-			if (nGranBetween < -threshold)
+			if (timeBetween <= range)
 			{
-				break;
-			}
-			else if (Math.abs(nGranBetween) <= threshold)
-			{
-				if (!slotIsAvailable)
-				{
-					slotIsAvailable = dateTimePivot.equals(slotDateTime);
-				}
-
 				slotsInThreshold.add(slot);
 			}
 		}
 
-		if (!slotIsAvailable)
+		return slotsInThreshold;
+	}
+
+	/**
+	 * @return - Returns the slots within the specified range only if a slot matching availableTime exists as well
+	 */
+	public static List<ScheduleSlotDto> slotsInRangeOfAvailableTime(List<ScheduleSlotDto> scheduleSlots, LocalDateTime availableTime,
+	                                                                   long range, ChronoUnit granularity)
+	{
+		List<ScheduleSlotDto> slotsInRange = ScheduleSlotDto.slotsInRange(scheduleSlots, availableTime, range, granularity);
+
+		if (slotsInRange.stream().noneMatch(slot -> slot.getDateTime().equals(availableTime)))
 		{
-			slotsInThreshold.clear();
+			slotsInRange.clear();
 		}
 
-		return slotsInThreshold;
+		return slotsInRange;
 	}
 }

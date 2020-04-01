@@ -50,7 +50,8 @@ import org.oscarehr.ws.external.soap.v1.transfer.Appointment.ValidatedAppointmen
 import org.oscarehr.ws.external.soap.v1.transfer.DayWorkScheduleTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleTemplateCodeTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ScheduleSlotDto;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.*;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +59,7 @@ import javax.jws.WebService;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @WebService
@@ -164,8 +166,8 @@ public class ScheduleWs extends AbstractWs {
 		appointmentTransfer.copyTo(appointment);
 		appointment.setLastUpdateUser(getLoggedInInfo().getLoggedInProviderNo());
 
-		HashMap<String, List<ScheduleSlotDto>> providerSlotMap =
-				scheduleService.getProviderSlotsInThreshold(providerNos, appointment, templateDurations, jsonRules);
+		ConcurrentHashMap<String, List<ScheduleSlotDto>> providerSlotMap =
+				scheduleService.getProviderSlotsInRange(providerNos, appointment, templateDurations, jsonRules);
 
 		// Provider with the most availability +/- 1 hour from the appointment start time is selected
 		Map.Entry<String, List<ScheduleSlotDto>> mostAvailable = null;

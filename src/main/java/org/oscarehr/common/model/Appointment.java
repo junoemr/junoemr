@@ -26,6 +26,7 @@ package org.oscarehr.common.model;
 import org.oscarehr.common.annotation.SiteLocation;
 import org.oscarehr.common.listeners.BeanValidationEventListener;
 import org.oscarehr.provider.model.ProviderData;
+import oscar.util.ConversionUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -491,8 +492,6 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	public LocalDateTime getStartDateTime()
 	{
-		return this.getStartTime().toInstant()
-					.atZone(ZoneId.systemDefault())
-					.toLocalDateTime();
+		return ConversionUtils.toLocalDateTime(this.getStartTime());
 	}
 }

@@ -48,7 +48,7 @@ import org.oscarehr.schedule.model.ScheduleHoliday;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ScheduleSlotDto;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.*;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRules;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +60,10 @@ import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
@@ -68,13 +71,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -797,7 +801,7 @@ public class Schedule
 		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = ScheduleCodeDurationTransfer.parse(jsonTemplateDurations);
 		BookingRules bookingRules = new BookingRules(jsonRules);
 
-		List<List<ScheduleSlotDto>> allAvailableSlots = new ArrayList<>();
+		List<List<ScheduleSlotDto>> allAvailableSlots = Collections.synchronizedList(new ArrayList<>());
 
 		ExecutorService pool = Executors.newFixedThreadPool(4);
 
@@ -830,13 +834,13 @@ public class Schedule
 	}
 
 	// TODO: See: getProviderAvailability
-	public HashMap<String, List<ScheduleSlotDto>> getProviderSlotsInThreshold(
+	public ConcurrentHashMap<String, List<ScheduleSlotDto>> getProviderSlotsInRange(
 			String[] providerNos, org.oscarehr.common.model.Appointment appointment,
 			String jsonTemplateDurations, String jsonRules) throws org.json.simple.parser.ParseException
 	{
-		HashMap<String, List<ScheduleSlotDto>> providerSlotMap = new HashMap<>();
+		ConcurrentHashMap<String, List<ScheduleSlotDto>> providerSlotMap = new ConcurrentHashMap<>();
 
-		final long MINUTE_THRESHOLD = 60;
+		final long MINUTE_RANGE = 60;
 
 		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = ScheduleCodeDurationTransfer.parse(jsonTemplateDurations);
 		BookingRules bookingRules = new BookingRules(jsonRules);
@@ -852,12 +856,12 @@ public class Schedule
 						providerNo, appointmentDate, appointmentDate, String.valueOf(appointment.getDemographicNo()),
 						scheduleDurationTransfers, bookingRules);
 
-				List<ScheduleSlotDto> slotsInThreshold = ScheduleSlotDto.getSlotsInThreshold(
-						availableSlots, apptDateTime, MINUTE_THRESHOLD, ChronoUnit.MINUTES);
+				List<ScheduleSlotDto> slotsInRange = ScheduleSlotDto.slotsInRangeOfAvailableTime(
+						availableSlots, apptDateTime, MINUTE_RANGE, ChronoUnit.MINUTES);
 
-				if (!slotsInThreshold.isEmpty())
+				if (!slotsInRange.isEmpty())
 				{
-					providerSlotMap.put(providerNo, slotsInThreshold);
+					providerSlotMap.put(providerNo, slotsInRange);
 				}
 			});
 		}
