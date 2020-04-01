@@ -335,7 +335,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			multiBookingJoinTags.put(multiBookingMaxAllowedTag,
 					multipleBookingsRule.getBookingAmount());
 			multiBookingsRulesWhereSql += "" +
-					"  count_" + joinTag + " < :" + multiBookingMaxAllowedTag + " AND \n";
+				"  count_" + joinTag + " < :" + multiBookingMaxAllowedTag + " AND \n";
 
 			multiBookingsRulesCount++;
 		}
@@ -412,7 +412,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"\n" +
 
 				" ) AS appointment_slots_multi_book_applied " +
-				"WHERE " + multiBookingsRulesWhereSql + " TRUE";
+						"WHERE " + multiBookingsRulesWhereSql + " TRUE";
 
 		String addStartEndSlotSQL = "" +
 				"SELECT \n" +
@@ -427,13 +427,13 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"end_slot_filter.start_datetime IS NULL AS is_end_slot \n" +
 				"FROM \n" +
 				"(\n" +
-				getSlotsSql +
+					getSlotsSql +
 				") AS slots \n" +
 
 				// self join to get first slot in a series of slots
 				"LEFT JOIN \n" +
 				"(\n" +
-				getSlotsSql +
+					getSlotsSql +
 				") AS start_slot_filter " +
 				"  ON start_slot_filter.slot_date = slots.slot_date " +
 				"  AND start_slot_filter.start_time = slots.start_time - " +
@@ -443,7 +443,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				// self join to get last slot in a series of slots
 				"LEFT JOIN \n" +
 				"(\n" +
-				getSlotsSql +
+					getSlotsSql +
 				") AS end_slot_filter " +
 				"  ON end_slot_filter.slot_date = slots.slot_date " +
 				"  AND end_slot_filter.start_time = slots.start_time + " +
@@ -464,14 +464,14 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"  INTERVAL possible_slots.duration MINUTE <= MIN(end_slots.end_time) AS slot_fits \n" +
 				"FROM \n" +
 				"(\n" +
-				addStartEndSlotSQL +
+					addStartEndSlotSQL +
 				") AS possible_slots " +
 				"\n" +
 
 				// self join to get distance from nearest end slot in the future
 				"LEFT JOIN \n" +
 				"(\n" +
-				addStartEndSlotSQL +
+					addStartEndSlotSQL +
 				") AS end_slots " +
 				"  ON end_slots.is_end_slot " +
 				"  AND end_slots.slot_date = possible_slots.slot_date " +
@@ -482,7 +482,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		String availableSlots = "" +
 				"SELECT * FROM \n" +
 				"(\n" +
-				addSlotFitsSQL +
+					addSlotFitsSQL +
 				"\n) AS slots_with_end_slots \n " +
 				"WHERE \n" +
 				" slots_with_end_slots.slot_fits\n";
