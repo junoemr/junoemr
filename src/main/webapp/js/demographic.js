@@ -1,16 +1,16 @@
 
 
-function validatePhoneNumber(event)
+Oscar.demographic.validatePhoneNumber = function validatePhoneNumber(event)
 {
 	event.stopPropagation();
-	let userInput = jQuery("#"+event.target.id).val();
-	let lengthBeforeProcess = userInput.length;
+	var userInput = jQuery("#"+event.target.id).val();
+	var lengthBeforeProcess = userInput.length;
 
 	if (lengthBeforeProcess > 0)
 	{
-		let array = removeUnicodeControlCharacters(userInput);
-		let validatedInput = array.join('');
-		let lengthAfterProcess = validatedInput.length;
+		var array = Oscar.demographic.removeUnicodeControlCharacters(userInput);
+		var validatedInput = array.join('');
+		var lengthAfterProcess = validatedInput.length;
 
 		if (event.target.id === "phone" || event.target.id === "phone2" )
 		{
@@ -31,9 +31,9 @@ function validatePhoneNumber(event)
 	}
 }
 
-function removeUnicodeControlCharacters(stringInput)
+Oscar.demographic.removeUnicodeControlCharacters = function removeUnicodeControlCharacters(stringInput)
 {
-	let array = stringInput.split('');
+	var array = stringInput.split('');
 	return array.filter(
 		x =>
 		(32 <= x.charCodeAt(0) && x.charCodeAt(0) <=126) ||

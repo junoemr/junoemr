@@ -179,7 +179,7 @@
 		   return true;
 	   }
 	   window.onload = function(){
-		   jQuery('body').on("blur", '.phone-class', validatePhoneNumber);
+		   jQuery('body').on("blur", '.phone-class', Oscar.demographic.validatePhoneNumber);
 	   };
    </script>
 

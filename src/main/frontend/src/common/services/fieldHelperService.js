@@ -101,10 +101,9 @@ angular.module('Common.Services').factory(
 					}
 				};
 
-				$scope.on_blur_fn = function on_blur_fn(event)
+				$scope.on_blur_fn = function (event)
 				{
-					event.currentTarget.value = helper.validateUserInput(event.currentTarget.value);
-
+					helper.elementOnBlur(event);
 				};
 
 				// watch the focus field: when it matches the name, focus the element
@@ -219,22 +218,12 @@ angular.module('Common.Services').factory(
 				};
 			};
 
-			//remove control characters
-			helper.validateUserInput = function (input)
+			helper.elementOnBlur = function (event)
 			{
-				let lengthBeforeProcess = input.length;
-				let validatedInput = "";
-				if (lengthBeforeProcess > 0)
+				if($(event.currentTarget).is("input[type='text'], textarea"))
 				{
-					let array = input.split('');
-					array = array.filter(
-						x =>
-						(32 <= x.charCodeAt(0) && x.charCodeAt(0) <=126) ||
-						x.charCodeAt(0) > 160
-					);
-					validatedInput = array.join('');
+					event.currentTarget.value = Juno.Common.Util.removeControlCharacters(event.currentTarget.value);
 				}
-				return validatedInput;
 			};
 
 			return helper;

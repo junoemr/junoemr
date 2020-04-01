@@ -752,7 +752,7 @@ jQuery(document).ready(function($) {
 		return false;
 	});
 
-	jQuery('body').on("blur", '.phone-class', validatePhoneNumber);
+	jQuery('body').on("blur", '.phone-class', Oscar.demographic.validatePhoneNumber);
 });
 
 

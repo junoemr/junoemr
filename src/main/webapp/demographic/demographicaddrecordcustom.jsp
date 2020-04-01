@@ -1730,7 +1730,7 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 				});
 			});
 
-			$('body').on("blur", '.phone-class', validatePhoneNumber);
+			$('body').on("blur", '.phone-class', Oscar.demographic.validatePhoneNumber);
 		});
 	</script>
 	</body>
