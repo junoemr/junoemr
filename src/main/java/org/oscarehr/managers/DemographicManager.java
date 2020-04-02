@@ -813,6 +813,16 @@ public class DemographicManager {
 			demographic.setProviderNo(null);
 		}
 
+		if (demographic.getDateOfBirth().length() == 1)
+		{
+			demographic.setDateOfBirth("0" + demographic.getDateOfBirth());
+		}
+
+		if (demographic.getMonthOfBirth().length() == 1)
+		{
+			demographic.setMonthOfBirth("0" + demographic.getMonthOfBirth());
+		}
+
 	}
 
 	private void validateDemographic(Demographic demographic)
