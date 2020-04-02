@@ -813,15 +813,9 @@ public class DemographicManager {
 			demographic.setProviderNo(null);
 		}
 
-		if (demographic.getDateOfBirth().length() == 1)
-		{
-			demographic.setDateOfBirth("0" + demographic.getDateOfBirth());
-		}
-
-		if (demographic.getMonthOfBirth().length() == 1)
-		{
-			demographic.setMonthOfBirth("0" + demographic.getMonthOfBirth());
-		}
+		// Oscar expects date and month of birth to always be 2 character strings
+		demographic.setDateOfBirth(StringUtils.leftPad(demographic.getDateOfBirth(), 2, "0"));
+		demographic.setMonthOfBirth(StringUtils.leftPad(demographic.getMonthOfBirth(), 2, "0"));
 
 	}
 
