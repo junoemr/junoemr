@@ -42,6 +42,7 @@ import org.oscarehr.util.MiscUtils;
 
 public class StringUtils {
 
+    private static Pattern HTML_TAG_PATTERN = Pattern.compile(".*\\<.*?>.*");
     private static Logger logger = MiscUtils.getLogger();
     public final static String ELLIPSIS = "...";
 
@@ -450,14 +451,6 @@ public class StringUtils {
             return true;
         }
 
-        Pattern p = Pattern.compile(".*\\<.*?>.*");
-        Matcher m = p.matcher(testValue);
-
-        if (m.matches())
-        {
-            return false;
-        }
-
         if (
                 testValue.matches("(?s).*;.*") ||
                         testValue.matches("(?s).*\".*") ||
@@ -467,7 +460,8 @@ public class StringUtils {
                         testValue.matches("(?s).*\\r.*") ||
                         testValue.matches("(?s).*\\\\.*") ||
                         testValue.matches("(?s).*\\x00.*") ||
-                        testValue.matches("(?s).*\\x1a.*")
+                        testValue.matches("(?s).*\\x1a.*") ||
+                        HTML_TAG_PATTERN.matcher(testValue).matches()
         )
         {
             return false;

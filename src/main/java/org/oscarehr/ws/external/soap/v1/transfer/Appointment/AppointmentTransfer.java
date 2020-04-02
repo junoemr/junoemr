@@ -357,7 +357,7 @@ public final class AppointmentTransfer {
 	}
 
 	/**
-	 * insure that this appointment transfer contains valid data
+	 * ensure that this appointment transfer contains valid data
 	 * (mostly that it does not contain dangerous characters).
 	 * @return - true if valid false otherwise
 	 */
