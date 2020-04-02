@@ -436,4 +436,43 @@ public class StringUtils {
     {
         return str.replaceAll("[\\\\/:*?\"<>|]", "-");
     }
+
+    /**
+     * checks that a string is safe for use in Juno.
+     * This is primarily intended to prevent XSS in Juno.
+     * @param testValue - string to test
+     * @return - true if safe, false otherwise.
+     */
+    public static boolean isStringSafe(String testValue)
+    {
+        if (testValue == null)
+        {
+            return true;
+        }
+
+        Pattern p = Pattern.compile(".*\\<.*?>.*");
+        Matcher m = p.matcher(testValue);
+
+        if (m.matches())
+        {
+            return false;
+        }
+
+        if (
+                testValue.matches("(?s).*;.*") ||
+                        testValue.matches("(?s).*\".*") ||
+                        testValue.matches("(?s).*'.*") ||
+                        testValue.matches("(?s).*--.*") ||
+                        testValue.matches("(?s).*\\n.*") ||
+                        testValue.matches("(?s).*\\r.*") ||
+                        testValue.matches("(?s).*\\\\.*") ||
+                        testValue.matches("(?s).*\\x00.*") ||
+                        testValue.matches("(?s).*\\x1a.*")
+        )
+        {
+            return false;
+        }
+
+        return true;
+    }
 }

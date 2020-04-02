@@ -199,6 +199,12 @@ public class ScheduleWs extends AbstractWs {
 	{
 		Appointment appointment = new Appointment();
 
+		if (!appointmentTransfer.isValid())
+		{
+			throw new IllegalArgumentException("One or more appointment fields contain illegal characters." +
+							"No html tags, quotes, line breaks, or semicolons are allowed.");
+		}
+
 		if (appointmentTransfer.getLastUpdateUser() == null)
 		{
 			appointmentTransfer.setLastUpdateUser(getLoggedInInfo().getLoggedInProviderNo());

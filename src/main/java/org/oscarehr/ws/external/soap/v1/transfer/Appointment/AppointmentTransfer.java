@@ -39,6 +39,7 @@ import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.BeanUtils;
 
 import oscar.util.DateUtils;
+import oscar.util.StringUtils;
 
 public final class AppointmentTransfer {
 	
@@ -353,5 +354,18 @@ public final class AppointmentTransfer {
 		}
 
 		return (result);
+	}
+
+	/**
+	 * insure that this appointment transfer contains valid data
+	 * (mostly that it does not contain dangerous characters).
+	 * @return - true if valid false otherwise
+	 */
+	public boolean isValid()
+	{
+		return StringUtils.isStringSafe(this.name) &&
+						StringUtils.isStringSafe(this.notes) &&
+						StringUtils.isStringSafe(this.reason) &&
+						StringUtils.isStringSafe(this.type);
 	}
 }

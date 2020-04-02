@@ -887,48 +887,48 @@ public class DemographicManager {
 		}
 
 		if (
-				!validateString(demographic.getPhone()) ||
-						!validateString(demographic.getPatientStatus()) ||
-						!validateString(demographic.getRosterStatus()) ||
-						!validateString(demographic.getProviderNo()) ||
-						!validateString(demographic.getMyOscarUserName()) ||
-						!validateString(demographic.getHin()) ||
-						!validateString(demographic.getAddress()) ||
-						!validateString(demographic.getProvince()) ||
-						!validateString(demographic.getMonthOfBirth()) ||
-						!validateString(demographic.getVer()) ||
-						!validateString(demographic.getDateOfBirth()) ||
-						!validateString(demographic.getSex()) ||
-						!validateString(demographic.getSexDesc()) ||
-						!validateString(demographic.getCity()) ||
-						!validateString(demographic.getFirstName()) ||
-						!validateString(demographic.getPostal()) ||
-						!validateString(demographic.getPhone2()) ||
-						!validateString(demographic.getPcnIndicator()) ||
-						!validateString(demographic.getLastName()) ||
-						!validateString(demographic.getHcType()) ||
-						!validateString(demographic.getChartNo()) ||
-						!validateString(demographic.getEmail()) ||
-						!validateString(demographic.getYearOfBirth()) ||
-						!validateString(demographic.getRosterTerminationReason()) ||
-						!validateString(demographic.getLinks()) ||
-						!validateString(demographic.getAlias()) ||
-						!validateString(demographic.getPreviousAddress()) ||
-						!validateString(demographic.getChildren()) ||
-						!validateString(demographic.getSourceOfIncome()) ||
-						!validateString(demographic.getCitizenship()) ||
-						!validateString(demographic.getSin()) ||
-						!validateString(demographic.getAnonymous()) ||
-						!validateString(demographic.getSpokenLanguage()) ||
-						!validateString(demographic.getDisplayName()) ||
-						!validateString(demographic.getLastUpdateUser()) ||
-						!validateString(demographic.getTitle()) ||
-						!validateString(demographic.getOfficialLanguage()) ||
-						!validateString(demographic.getCountryOfOrigin()) ||
-						!validateString(demographic.getNewsletter()) ||
-						!validateString(demographic.getVeteranNo()) ||
-						!validateString(demographic.getNameOfFather()) ||
-						!validateString(demographic.getNameOfMother())
+				!oscar.util.StringUtils.isStringSafe(demographic.getPhone()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getPatientStatus()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getRosterStatus()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getProviderNo()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getMyOscarUserName()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getHin()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getAddress()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getProvince()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getMonthOfBirth()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getVer()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getDateOfBirth()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getSex()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getSexDesc()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getCity()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getFirstName()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getPostal()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getPhone2()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getPcnIndicator()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getLastName()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getHcType()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getChartNo()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getEmail()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getYearOfBirth()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getRosterTerminationReason()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getLinks()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getAlias()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getPreviousAddress()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getChildren()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getSourceOfIncome()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getCitizenship()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getSin()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getAnonymous()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getSpokenLanguage()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getDisplayName()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getLastUpdateUser()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getTitle()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getOfficialLanguage()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getCountryOfOrigin()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getNewsletter()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getVeteranNo()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getNameOfFather()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getNameOfMother())
 				)
 		{
 			error_string += "No html tags and no quotes, line breaks ";
@@ -962,43 +962,10 @@ public class DemographicManager {
 		int numGroups = m.groupCount();
 		for (int group = 1; group <= numGroups; group++)
 		{
-			if (!validateString(m.group(group)))
+			if (!oscar.util.StringUtils.isStringSafe(m.group(group)))
 			{
 				return false;
 			}
-		}
-
-		return true;
-	}
-
-	private boolean validateString(String testValue)
-	{
-		if (testValue == null)
-		{
-			return true;
-		}
-
-		Pattern p = Pattern.compile(".*\\<.*?>.*");
-		Matcher m = p.matcher(testValue);
-
-		if (m.matches())
-		{
-			return false;
-		}
-
-		if (
-				testValue.matches("(?s).*;.*") ||
-						testValue.matches("(?s).*\".*") ||
-						testValue.matches("(?s).*'.*") ||
-						testValue.matches("(?s).*--.*") ||
-						testValue.matches("(?s).*\\n.*") ||
-						testValue.matches("(?s).*\\r.*") ||
-						testValue.matches("(?s).*\\\\.*") ||
-						testValue.matches("(?s).*\\x00.*") ||
-						testValue.matches("(?s).*\\x1a.*")
-				)
-		{
-			return false;
 		}
 
 		return true;
