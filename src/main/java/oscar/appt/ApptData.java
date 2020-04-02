@@ -48,7 +48,7 @@ public class ApptData implements Serializable {
 	String providerFirstName;
 	String ohipNo;
 	String urgency;
-	String isVirtual;
+	Boolean isVirtual;
 
 	public String getAppointment_date() {
 		return appointment_date;
@@ -262,12 +262,12 @@ public class ApptData implements Serializable {
     	this.urgency = urgency;
     }
 
-	public String isVirtual()
+	public Boolean isVirtual()
 	{
 		return isVirtual;
 	}
 
-	public void setVirtual(String virtual)
+	public void setVirtual(Boolean virtual)
 	{
 		isVirtual = virtual;
 	}

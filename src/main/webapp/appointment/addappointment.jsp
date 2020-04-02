@@ -356,7 +356,7 @@
 				{
 					document.forms[0].urgency.checked = "checked";
 				}
-				if ("<%=apptObj.isVirtual()%>" === "on")
+				if ("<%=apptObj.isVirtual()%>" === "true")
 				{
 					document.forms[0].isVirtual.checked = "checked";
 					updateTelehealthControlls();

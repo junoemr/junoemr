@@ -163,21 +163,13 @@
 	{
 		if (operationType == ApptUtil.APPOINTMENT_OP_TYPE.CUT)
 		{
-			appointmentService.updateAppointment(appointment);
+			appointmentService.updateAppointment(appointment, loggedInInfo, request);
 		}
 		else
 		{
-			appointmentService.saveNewAppointment(appointment, loggedInInfo);
+			appointmentService.saveNewAppointment(appointment, loggedInInfo, request);
 		}
 		appointmentNo = appointment.getId();
-
-		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
-				appointment.getDemographicNo(),
-				LogConst.ACTION_ADD,
-				LogConst.CON_APPT,
-				LogConst.STATUS_SUCCESS,
-				String.valueOf(appointment.getId()),
-				request.getRemoteAddr());
 	}
 	catch (ConstraintViolationException e)
 	{

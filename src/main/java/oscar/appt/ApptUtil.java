@@ -23,11 +23,13 @@
 
 package oscar.appt;
 
+import java.text.ParseException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.oscarehr.common.model.Site;
+import oscar.util.ConversionUtils;
 
 /**
  * This class contains Appointment related presentation layer helper methods.
@@ -47,6 +49,7 @@ public class ApptUtil {
 	}
 
 	public static void copyAppointmentIntoSession(HttpServletRequest request, APPOINTMENT_OP_TYPE opType)
+					throws ParseException
 	{
 		ApptData obj = new ApptData();
 		obj.setAppointmentNo(request.getParameter("appointment_no"));
@@ -67,7 +70,8 @@ public class ApptUtil {
 		obj.setDuration(request.getParameter("duration"));
 		obj.setChart_no(request.getParameter("chart_no"));
 		obj.setUrgency(request.getParameter("urgency"));
-		obj.setVirtual(request.getParameter("isVirtual"));
+		obj.setVirtual(ConversionUtils.parseBoolean(
+						ConversionUtils.getStringOrDefaultValue(request.getParameter("isVirtual"), "false")));
 		// set up session bean
 		request.getSession().setAttribute(SESSION_APPT_BEAN, obj);
 		request.getSession().setAttribute(APPOINTMENT_OP_TYPE_ID, opType);
