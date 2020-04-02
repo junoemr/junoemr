@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -114,7 +115,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
     @Column(name = "super_admin")
 	private boolean superAdmin = false;
 
-
 	/* -- Province specific -- */
 	/* AB */
 	@Column(name = "alberta_tak_no")
@@ -127,7 +127,7 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	@Column(name = "ontario_lifelabs_id")
 	private String ontarioLifeLabsId;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name="provider_billing_id")
 	private ProviderBilling billingOpts;
 

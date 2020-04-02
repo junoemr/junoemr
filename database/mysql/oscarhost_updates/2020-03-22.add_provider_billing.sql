@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS provider_billing (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  provider_no VARCHAR(6),
   # BC
   bc_rural_retention_code VARCHAR(10) DEFAULT '00',
   bc_rural_retention_name VARCHAR(256),
   bc_service_location_code VARCHAR(10),
+  bc_bcp_eligible BOOLEAN DEFAULT 0,
   # ON
   on_master_number VARCHAR(4),
   on_service_location VARCHAR(16),
@@ -20,6 +20,25 @@ CREATE TABLE IF NOT EXISTS provider_billing (
   sk_mode INT,
   sk_location VARCHAR(1),
   sk_submission_type VARCHAR(1),
-  sk_corporation_indicator VARCHAR(256),
-  CONSTRAINT idx_unique_provider_no UNIQUE (provider_no)
+  sk_corporation_indicator VARCHAR(256)
 );
+
+ALTER TABLE provider ADD COLUMN IF NOT EXISTS provider_billing_id INT;
+ALTER TABLE provider ADD CONSTRAINT provider_billing_id_fk FOREIGN KEY IF NOT EXISTS (provider_billing_id) REFERENCES provider_billing(id);
+
+
+# Single site config (BCP eligibility is stored in provider billing)
+ALTER TABLE clinic
+  ADD COLUMN IF NOT EXISTS bc_facility_number
+    VARCHAR(128);
+
+# Multisite config (BCP eligibiliy is now on a per site basis)
+
+ALTER TABLE site
+  ADD COLUMN IF NOT EXISTS bc_facility_number
+    VARCHAR(128);
+
+ALTER TABLE providersite
+  ADD COLUMN IF NOT EXISTS bc_bcp_eligible
+    BOOLEAN
+    DEFAULT 0;

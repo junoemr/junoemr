@@ -55,6 +55,9 @@ public class ProviderBilling extends AbstractModel<Integer>
 	@Column(name = "bc_service_location_code")
 	private String bcServiceLocationCode;
 
+	@Column(name = "bc_bcp_eligible")
+	private Boolean bcBCPEligible = false;
+
 	@Column(name = "on_master_number")
 	private String onMasterNumber;
 
@@ -143,6 +146,16 @@ public class ProviderBilling extends AbstractModel<Integer>
 	public void setBcServiceLocationCode(String bcServiceLocationCode)
 	{
 		this.bcServiceLocationCode = bcServiceLocationCode;
+	}
+
+	public Boolean getBcBCPEligible()
+	{
+		return bcBCPEligible;
+	}
+
+	public void setBcBCPEligible(Boolean bcBCPEligible)
+	{
+		this.bcBCPEligible = bcBCPEligible;
 	}
 
 	public String getOnMasterNumber()

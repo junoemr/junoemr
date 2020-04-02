@@ -39,6 +39,27 @@ public class ProviderService
 	@Autowired
 	ProviderDataDao providerDataDao;
 
+	public ProviderData getProvider(String providerNo)
+	{
+		return providerDataDao.findByProviderNo(providerNo);
+	}
+
+	public void saveProvider(ProviderData provider) { providerDataDao.merge(provider);}
+
+	@Transactional
+	public ProviderData getExperiment(String providerNo)
+	{
+			ProviderData providerData = providerDataDao.findByProviderNo(providerNo);
+			Boolean thing = providerData.getBillingOpts().getBcBCPEligible();
+
+			return providerData;
+	}
+
+	public ProviderData getProviderEager(String providerNo)
+	{
+		return providerDataDao.eagerFindByProviderNo(providerNo);
+	}
+
 	public ProviderData addNewProvider(String creatingProviderNo, ProviderData provider, String billCenterCode)
 	{
 		provider.setLastUpdateDate(new Date());

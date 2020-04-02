@@ -26,12 +26,13 @@ package org.oscarehr.providerBilling.dao;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
 
 @Repository
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class ProviderBillingDao  extends AbstractDao<ProviderBilling>
 {
 	public ProviderBillingDao() {

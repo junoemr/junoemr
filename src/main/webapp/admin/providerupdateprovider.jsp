@@ -61,6 +61,7 @@
 <%
   java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
   ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
+  ProviderService providerService = SpringUtils.getBean(ProviderService.class);
 %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 
@@ -72,9 +73,12 @@
 <%@page import="org.oscarehr.common.model.ProviderSite"%>
 <%@page import="org.oscarehr.common.model.ProviderSitePK"%>
 <%@page import="org.oscarehr.common.dao.ProviderSiteDao"%>
+    <%@ page import="org.oscarehr.providerBilling.model.ProviderBilling" %>
+    <%@ page import="org.hibernate.Hibernate" %>
+    <%@ page import="org.oscarehr.provider.service.ProviderService" %>
 
 
-<head>
+    <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
 <title><bean:message key="admin.providerupdateprovider.title" /></title>
@@ -145,9 +149,9 @@ jQuery(document).ready( function() {
 <form method="post" action="providerupdate.jsp" name="updatearecord">
 
 <%
-	String keyword = request.getParameter("keyword");
-	ProviderData provider = providerDao.findByProviderNo(keyword);
-	
+	String providerNo = request.getParameter("keyword");
+	ProviderData provider = providerService.getProviderEager(providerNo);
+
 	SecurityDao securityDao = (SecurityDao) SpringUtils.getBean("securityDao");
 	List<Security>  results = securityDao.findByProviderNo(provider.getId());
 	Security security = null;
@@ -430,12 +434,15 @@ jQuery(document).ready( function() {
 			if (OscarProperties.getInstance().getProperty("instance_type").equals("BC")) {
 		%>
         <tr>
+            <% if (!org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
+            %>
             <td align="right">BCP Eligible?</td>
             <td>
                 <select name="bc_bcp_eligible">
                     <option value="0">No</option>
-                    <option value="1">Yes</option>
+                    <option value="1" <%= provider.getBillingOpts().getBcBCPEligible() ? "selected" : ""  %>>Yes</option>
                 </select>
+            <% } %>
         </tr>
 		<tr>
 			<td align="right"><bean:message key="admin.provider.formIHAMnemonic" />:</td>
