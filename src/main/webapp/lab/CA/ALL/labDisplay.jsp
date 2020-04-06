@@ -694,7 +694,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 							labStatus = reportStatus.getStatus();
 							if (labStatus.equals("A"))
 							{
-								ackFlag = true;//lab has been ack by this provider.=
+								ackFlag = true;//lab has been ack by this provider.
 							}
 						}
 
