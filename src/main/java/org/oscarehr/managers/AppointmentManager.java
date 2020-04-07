@@ -374,7 +374,6 @@ public class AppointmentManager {
 		if (currentRecord.getUpdateDateTime() ==null)
 		{
 			appointmentDao.updateUpdateTime(currentRecord.getId());
-			logger.info("time updated");
 		}
 		editRecord.setUpdateDateTime(ConversionUtils.toLocalDateTime(currentRecord.getUpdateDateTime()));
 		editRecord.setAppointmentDate(
