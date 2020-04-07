@@ -1109,4 +1109,16 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 
     	return query.getResultList();
     }
+
+    public void updateCreateTime(Integer appointmentNumber)
+	{
+		Appointment appointment = entityManager.find(Appointment.class, appointmentNumber);
+		appointment.setCreateDateTime(new Date());
+	}
+
+	public void updateUpdateTime(Integer appointmentNumber)
+	{
+		Appointment appointment = entityManager.find(Appointment.class, appointmentNumber);
+		appointment.setUpdateDateTime(new Date());
+	}
 }

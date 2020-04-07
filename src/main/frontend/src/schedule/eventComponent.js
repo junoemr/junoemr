@@ -250,6 +250,7 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.$onInit = function init()
 			{
+				console.log("test hitting eventComponent.js");
 				if (!securityService.hasPermission('scheduling_create'))
 				{
 					$timeout(function ()
@@ -626,6 +627,7 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				var deferred = $q.defer();
 
+				console.log("appointment number is "+appointmentId);
 				$scope.appointmentApi.getEditHistory(appointmentId).then(
 					function success(results)
 					{

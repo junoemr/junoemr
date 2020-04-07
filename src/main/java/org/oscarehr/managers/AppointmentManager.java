@@ -328,7 +328,15 @@ public class AppointmentManager {
 			editRecord.setCreator(archive.getCreator());
 			editRecord.setProviderNo(archive.getProviderNo());
 			editRecord.setLastUpdateUser(archive.getLastUpdateUser());
+			if (archive.getCreateDateTime() == null)
+			{
+				appointmentArchiveDao.updateCreateTime(archive.getId());
+			}
 			editRecord.setCreateDateTime(ConversionUtils.toLocalDateTime(archive.getCreateDateTime()));
+			if (archive.getUpdateDateTime() == null)
+			{
+				appointmentArchiveDao.updateUpdateTime(archive.getId());
+			}
 			editRecord.setUpdateDateTime(ConversionUtils.toLocalDateTime(archive.getUpdateDateTime()));
 			editRecord.setAppointmentDate(
 					LocalDateTime.of(ConversionUtils.toLocalDateTime(archive.getAppointmentDate()).toLocalDate(),
@@ -358,7 +366,16 @@ public class AppointmentManager {
 		editRecord.setCreator(currentRecord.getCreator());
 		editRecord.setProviderNo(currentRecord.getProviderNo());
 		editRecord.setLastUpdateUser(currentRecord.getLastUpdateUser());
+		if (currentRecord.getCreateDateTime() == null)
+		{
+			appointmentDao.updateCreateTime(currentRecord.getId());
+		}
 		editRecord.setCreateDateTime(ConversionUtils.toLocalDateTime(currentRecord.getCreateDateTime()));
+		if (currentRecord.getUpdateDateTime() ==null)
+		{
+			appointmentDao.updateUpdateTime(currentRecord.getId());
+			logger.info("time updated");
+		}
 		editRecord.setUpdateDateTime(ConversionUtils.toLocalDateTime(currentRecord.getUpdateDateTime()));
 		editRecord.setAppointmentDate(
 				LocalDateTime.of(ConversionUtils.toLocalDateTime(currentRecord.getAppointmentDate()).toLocalDate(),

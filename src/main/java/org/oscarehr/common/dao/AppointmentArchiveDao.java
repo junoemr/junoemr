@@ -80,4 +80,24 @@ public class AppointmentArchiveDao extends AbstractDao<AppointmentArchive>
 		List<AppointmentArchive> results = query.getResultList();
 		return (results);
 	}
+
+	public AppointmentArchive findById(Integer id)
+	{
+		String sqlCommand = "select x from " + modelClass.getSimpleName() + " x where x.id =:id ";
+		Query query = entityManager.createQuery(sqlCommand);
+		query.setParameter("id", id);
+		return (AppointmentArchive) query.getSingleResult();
+	}
+
+	public void updateCreateTime(Integer id)
+	{
+		AppointmentArchive aa = entityManager.find(AppointmentArchive.class, id);
+		aa.setCreateDateTime(new Date());
+	}
+
+	public void updateUpdateTime(Integer id)
+	{
+		AppointmentArchive aa = entityManager.find(AppointmentArchive.class, id);
+		aa.setUpdateDateTime(new Date());
+	}
 }
