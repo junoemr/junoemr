@@ -72,6 +72,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
@@ -829,6 +830,7 @@ public class Schedule
 		// Return unique list of provider availability schedule slots
 		return allAvailableSlots.stream()
 					.flatMap(Collection::stream)
+					.sorted(Comparator.comparing(ScheduleSlotDto::getDateTime))
 					.distinct()
 					.collect(Collectors.toList());
 	}
