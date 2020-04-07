@@ -34,11 +34,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.dao.ClinicDAO;
+import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidApiLimitInfoTo1;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidResultTo1;
 import org.oscarehr.integration.clinicaid.dto.PatientEligibilityDataTo1;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.util.LoggedInInfo;
 
 import org.oscarehr.util.MiscUtils;
@@ -68,6 +72,12 @@ public class ClinicaidAPIService
 	{
 		this.sessionManager = sessionManager;
 	}
+
+	@Autowired
+	private ProviderService providerService;
+
+	@Autowired
+	private ClinicDAO clinicDAO;
 
 	private String formatEligibilityData(PatientEligibilityDataTo1 data)
 	{
@@ -339,6 +349,28 @@ public class ClinicaidAPIService
 				{
 					data.remove("service_recipient_ver");
 					data.put("guardian_health_number", data.remove("service_recipient_uli"));
+				}
+
+				ProviderData providerData = providerService.getProviderEager(provider_no);
+
+				if (providerData.getBillingOpts().getBcBCPEligible())
+				{
+					String facilityNumber = null;
+
+					if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
+					{
+						// TODO check if the provider is eligible for BCP for that site, if so, get the facility number for that site
+					}
+					else
+					{
+						Clinic clinic = clinicDAO.getClinic();
+						facilityNumber = clinic.getBcFacilityNumber();
+					}
+
+					if (facilityNumber != null)
+					{
+						data.put("facility_number", StringUtils.trimToEmpty(facilityNumber));
+					}
 				}
 			}
 

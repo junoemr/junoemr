@@ -46,7 +46,7 @@ public class ProviderBillingDao  extends AbstractDao<ProviderBilling>
 	 */
 	public ProviderBilling getByProvider(Integer providerNo)
 	{
-		Query query = entityManager.createQuery("SELECT pb FROM ProviderBilling pb WHERE pb.providerNo = :providerNo");
+		Query query = entityManager.createQuery("SELECT pb FROM ProviderBilling pb JOIN ProviderData p WHERE p.id = :providerNo");
 		query.setParameter("providerNo", providerNo);
 		return getSingleResultOrNull(query);
 	}

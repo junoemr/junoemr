@@ -231,10 +231,54 @@ if(!authed) {
 
     jQuery.noConflict();
 
+    function checkBCPForProvider() {
+        var providerSelect = jQuery('#billing-provider-select');
+        jQuery.get("<%=request.getContextPath()%>/ws/rs/providerService/provider/" + providerSelect.val() + "/billing")
+            .done(applyBCP)
+            .fail(logError);
+    }
+
+    function applyBCP(provider)
+    {
+        if (provider.bcBCPEligible)
+        {
+            jQuery.get("<%=request.getContextPath()%>/ws/rs/clinic/")
+                .done(function(clinic)
+                {
+                    updateFacilityNumber(clinic.bcFacilityNumber);
+                })
+                .fail(logError);
+        }
+        else
+        {
+            updateFacilityNumber("");
+        }
+    }
+
+    function updateFacilityNumber(facilityNumber)
+    {
+        var element = jQuery('#facility-number');
+
+        if (facilityNumber)
+        {
+            element.val(facilityNumber);
+        }
+        else
+        {
+            element.val("");
+        }
+    }
+
+    function logError(error)
+    {
+        alert("Cannot determing BCP eligibility");
+        console.error(error);
+    }
+
     // Autocompletion of referral doctors
     jQuery(document).ready(function(){
-        var xml_refer1 = jQuery('input[name=xml_refer1]'),
-            xml_refer2 = jQuery('input[name=xml_refer2]');
+        var xml_refer1 = jQuery('input[name=xml_refer1]');
+        var xml_refer2 = jQuery('input[name=xml_refer2]');
 
         xml_refer1.removeAttr('onkeypress');
         xml_refer2.removeAttr('onkeypress');
@@ -270,6 +314,11 @@ if(!authed) {
                 }
             });
         });
+
+        var providerSelect = jQuery('#billing-provider-select');
+        providerSelect.change(checkBCPForProvider);
+
+        checkBCPForProvider();
     });
 
 //creates a javaspt array of associated dx codes
@@ -479,14 +528,6 @@ function correspondenceNote(){
 	  ShowElementById('CORRESPONDENCENOTE');
 	}else {(document.BillingCreateBillingForm.correspondenceCode.value == "B" )
      ShowElementById('CORRESPONDENCENOTE');
-	}
-}
-
-function checkFACILITY(){
-	if (document.getElementById('FACILITY').style.display == 'none'){
-		ShowElementById('FACILITY');
-	}else{
-		HideElementById('FACILITY');
 	}
 }
 
@@ -1031,7 +1072,7 @@ if(wcbneeds != null){%>
                   <b><bean:message key="billing.provider.billProvider"/></b>
             </td>
             <td width="29%">
-                <html:select property="xml_provider" value="<%=sxml_provider%>">
+                <html:select property="xml_provider" value="<%=sxml_provider%>" styleId="billing-provider-select">
                   <html:option value="000000">
                     <b>Select Provider</b>
                   </html:option>
@@ -1196,10 +1237,13 @@ if(wcbneeds != null){%>
               </html:select>
             </td>
             <td nowrap>
-              <a href="javascript: function myFunction() {return false; }" onClick="checkFACILITY();">
-                  <strong>Facility</strong>
-              </a>
-              <span style="display: none;" id="FACILITY">  <table>  <tr>   <td title="Facilty Num">  Fac Num <html:text property="facilityNum" size="5" maxlength="5"/>  </td>   <td title="Facilty Sub Num">  Fac Sub Num <html:text property="facilitySubNum" size="5" maxlength="5"/>  </td>  </tr>  </table>  </span>
+              <strong>Facility</strong>
+                <table>
+                    <tr>
+                        <td title="Facilty Number">No. <html:text property="facilityNum" size="7" maxlength="7" styleId="facility-number"/></td>
+                        <td title="Facilty Sub Number">Sub <html:text property="facilitySubNum" size="5" maxlength="5"/></td>
+                      </tr>
+                </table>
             </td>
           </tr>
         </table>

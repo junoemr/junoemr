@@ -435,12 +435,13 @@ jQuery(document).ready( function() {
 		%>
         <tr>
             <% if (!org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
+                boolean isBCPEnabled = provider.getBillingOpts() != null && provider.getBillingOpts().getBcBCPEligible();
             %>
             <td align="right">BCP Eligible?</td>
             <td>
                 <select name="bc_bcp_eligible">
                     <option value="0">No</option>
-                    <option value="1" <%= provider.getBillingOpts().getBcBCPEligible() ? "selected" : ""  %>>Yes</option>
+                    <option value="1" <%= isBCPEnabled ? "selected" : ""  %>>Yes</option>
                 </select>
             <% } %>
         </tr>

@@ -25,6 +25,8 @@ package org.oscarehr.provider.service;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.providerBilling.model.ProviderBilling;
+import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,15 +47,6 @@ public class ProviderService
 	}
 
 	public void saveProvider(ProviderData provider) { providerDataDao.merge(provider);}
-
-	@Transactional
-	public ProviderData getExperiment(String providerNo)
-	{
-			ProviderData providerData = providerDataDao.findByProviderNo(providerNo);
-			Boolean thing = providerData.getBillingOpts().getBcBCPEligible();
-
-			return providerData;
-	}
 
 	public ProviderData getProviderEager(String providerNo)
 	{
@@ -121,5 +114,20 @@ public class ProviderService
 	public Integer getNextProviderNumberInSequence(int minThreshold, int ignoreThreshold)
 	{
 		return providerDataDao.getNextIdWithThreshold(minThreshold, ignoreThreshold);
+	}
+
+	/**
+	 * Get provincial billing options for the specified provider
+	 * @param providerNo provider
+	 * @return provincial billing options
+	 */
+	public ProviderBillingTransfer getProviderBillingAsTransfer(String providerNo)
+	{
+		return ProviderBillingTransfer.toTransferObj(providerDataDao.findByProviderNo(providerNo).getBillingOpts());
+	}
+
+	public ProviderBilling getProviderBilling(String providerNo)
+	{
+		return providerDataDao.findByProviderNo(providerNo).getBillingOpts();
 	}
 }
