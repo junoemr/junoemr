@@ -60,6 +60,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
+import oscar.util.ConversionUtils;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -856,16 +857,39 @@ public class DemographicManager {
 			error_string += "yearOfBirth is a required field.  ";
 			has_error = true;
 		}
+		else if (ConversionUtils.fromIntString(demographic.getYearOfBirth()) == 0)
+		{
+			error_string += "yearOfBirth should be should be a numeric value. ";
+		}
 
 		if (demographic.getMonthOfBirth() == null)
 		{
 			error_string += "monthOfBirth is a required field.  ";
 			has_error = true;
 		}
+		else if (ConversionUtils.fromIntString(demographic.getMonthOfBirth()) <= 0 || ConversionUtils.fromIntString(demographic.getMonthOfBirth()) > 12)
+		{
+			error_string += "monthOfBirth should be a number between 1 and 12. ";
+		}
 
 		if (demographic.getDateOfBirth() == null)
 		{
 			error_string += "dateOfBirth is a required field.  ";
+			has_error = true;
+		}
+		else if (ConversionUtils.fromIntString(demographic.getDateOfBirth()) <= 0)
+		{
+			error_string += "dateOfBirth should be a numeric value. ";
+		}
+
+		// Ensure that the proposed date is actually a valid date
+		String possibleBirthday = ConversionUtils.fromIntString(demographic.getYearOfBirth()).toString() + "-"
+				+ ConversionUtils.fromIntString(demographic.getMonthOfBirth()).toString() + "-"
+				+ ConversionUtils.fromIntString(demographic.getDateOfBirth());
+		Date validDate = ConversionUtils.fromDateString(possibleBirthday);
+		if (validDate == null)
+		{
+			error_string += "Need a valid birth date.";
 			has_error = true;
 		}
 
