@@ -430,22 +430,22 @@ jQuery(document).ready( function() {
 		</tr>
 		<% } %>
 		<%
-			// We are using the albertaEDeliveryId column to store IHA provider mnemonics on BC instances.
 			if (OscarProperties.getInstance().getProperty("instance_type").equals("BC")) {
 		%>
-        <tr>
             <% if (!org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
                 boolean isBCPEnabled = provider.getBillingOpts() != null && provider.getBillingOpts().getBcBCPEligible();
             %>
+        <tr>
             <td align="right">BCP Eligible?</td>
             <td>
                 <select name="bc_bcp_eligible">
                     <option value="0">No</option>
                     <option value="1" <%= isBCPEnabled ? "selected" : ""  %>>Yes</option>
                 </select>
-            <% } %>
         </tr>
+            <% } %>
 		<tr>
+            <% // We are using the albertaEDeliveryId column to store IHA provider mnemonics on BC instances. %>
 			<td align="right"><bean:message key="admin.provider.formIHAMnemonic" />:</td>
 			<td><input type="text" name="alberta_e_delivery_ids"
 			value="<%= provider.getAlbertaEDeliveryIds()==null ? "" : provider.getAlbertaEDeliveryIds() %>"></td>

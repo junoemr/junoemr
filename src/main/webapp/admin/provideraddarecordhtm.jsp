@@ -378,6 +378,16 @@ for (int i=0; i<sites.size(); i++) {
 		<%
 			if (OscarProperties.getInstance().getProperty("instance_type").equals("BC")) {
 		%>
+        <% if (!org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) { %>
+        <tr>
+            <td align="right">BCP Eligible?</td>
+            <td>
+                <select name="bc_bcp_eligible">
+                    <option value="0" selected>No</option>
+                    <option value="1">Yes</option>
+                </select>
+        </tr>
+        <% } %>
 		<tr>
 			<td align="right"><bean:message key="admin.provider.formIHAMnemonic" />:</td>
 			<td><input type="text" name="alberta_e_delivery_ids"></td>

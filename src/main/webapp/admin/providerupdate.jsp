@@ -199,12 +199,19 @@ if(!authed) {
             provider.setAlbertaEDeliveryIds(albertaEDeliveryIds);
             provider.setSupervisor(StringUtils.trimToNull(supervisor));
 
+
             if (provider.getBillingOpts() == null || provider.getBillingOpts().getId() == null)     // todo check if it's null if there's nothing there
             {
                 provider.setBillingOpts(new ProviderBilling());
             }
 
-            provider.getBillingOpts().setBcBCPEligible(Integer.parseInt(request.getParameter("bc_bcp_eligible")) == 1);
+            // Since each provincial billing option is only presented to the user if the appropriate province is selected
+            // we should check that each parameter is present before writing, otherwise we'll overwrite existing data
+
+            if (request.getParameter("bc_bcp_eligible") != null)
+            {
+                provider.getBillingOpts().setBcBCPEligible(Integer.parseInt(request.getParameter("bc_bcp_eligible")) == 1);
+            }
 
             UserPropertyDAO userPropertyDAO = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
 

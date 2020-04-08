@@ -203,8 +203,9 @@ if(!authed) {
 <script type="text/javascript" src="../../../share/javascript/prototype.js"></script>
 <script type="text/javascript" src="../../../share/javascript/Oscar.js"></script>
 <script type="text/javascript" src="../../../share/javascript/boxover.js"></script>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
+<script type="text/javascript" src="./js/junoBillingHelper.js"></script>
 <style type="text/css">
   <!--
     A, BODY, INPUT, OPTION ,SELECT , TABLE, TEXTAREA, TD, TR {font-family:tahoma,Verdana, Arial, Helvetica,sans-serif; font-size:10px;}
@@ -231,8 +232,11 @@ if(!authed) {
 
     jQuery.noConflict();
 
-    function checkBCPForProvider() {
+   /* function checkBCPForProvider() {
         var providerSelect = jQuery('#billing-provider-select');
+
+        console.log("<%=request.getContextPath()%>/ws/rs/providerService/provider/" + providerSelect.val() + "/billing");
+
         jQuery.get("<%=request.getContextPath()%>/ws/rs/providerService/provider/" + providerSelect.val() + "/billing")
             .done(applyBCP)
             .fail(logError);
@@ -273,7 +277,7 @@ if(!authed) {
     {
         alert("Cannot determing BCP eligibility");
         console.error(error);
-    }
+    }*/
 
     // Autocompletion of referral doctors
     jQuery(document).ready(function(){
@@ -315,10 +319,10 @@ if(!authed) {
             });
         });
 
-        var providerSelect = jQuery('#billing-provider-select');
-        providerSelect.change(checkBCPForProvider);
+        var $providerSelect = jQuery('#billing-provider-select');
+        var $facilityNumber = jQuery('#facility-number');
 
-        checkBCPForProvider();
+        Juno.BillingHelper.BC.initAutoApplyBCP("<%=request.getContextPath() %>", $providerSelect, $facilityNumber);
     });
 
 //creates a javaspt array of associated dx codes

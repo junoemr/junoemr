@@ -48,35 +48,29 @@
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@ page import="java.sql.*, java.util.*, oscar.*" errorPage="errorpage.jsp"%>
+<%@ page import="oscar.*" errorPage="errorpage.jsp"%>
 <%@ page import="oscar.log.LogAction,oscar.log.LogConst"%>
-<%@ page import="oscar.log.*, oscar.oscarDB.*"%>
+<%@ page import="oscar.oscarDB.*"%>
 
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.oscarehr.common.model.Site"%>
 
-<%@ page import="org.apache.commons.lang.StringEscapeUtils,oscar.oscarProvider.data.ProviderBillCenter"%>
+<%@page import="oscar.oscarProvider.data.ProviderBillCenter"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 
 <%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@page import="org.oscarehr.common.model.ProviderSite"%>
 <%@page import="org.oscarehr.common.model.ProviderSitePK"%>
 <%@page import="org.oscarehr.common.dao.ProviderSiteDao"%>
-<%@ page import="org.springframework.beans.factory.annotation.Autowired" %>
-<%@ page import="org.oscarehr.PMmodule.service.ProgramManager" %>
-<%@ page import="org.oscarehr.PMmodule.model.ProgramProvider" %>
-<%@ page import="org.oscarehr.PMmodule.dao.ProgramProviderDAO" %>
-<%@ page import="org.oscarehr.common.dao.SecRoleDao" %>
-<%@ page import="org.oscarehr.common.model.SecRole" %>
-<%@ page import="static org.oscarehr.common.model.Provider.PROVIDER_TYPE_DOCTOR" %>
-<%@ page import="org.oscarehr.PMmodule.dao.SecUserRoleDao" %>
-<%@ page import="org.oscarehr.PMmodule.model.SecUserRole" %>
 <%@ page import="org.oscarehr.provider.service.ProviderRoleService" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
+<%@ page import="org.oscarehr.provider.service.ProviderService" %>
+<%@ page import="org.oscarehr.providerBilling.model.ProviderBilling" %>
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
+    ProviderService providerService = SpringUtils.getBean(ProviderService.class);
 	ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
 	boolean alreadyExists=false;
 %>
@@ -101,8 +95,13 @@ boolean isOk = false;
 int retry = 0;
 String curUser_no = (String)session.getAttribute("user");
 
-Provider provider = new Provider();
-provider.setProviderNo(request.getParameter("provider_no"));
+//Provider provider = new Provider();
+
+ProviderData provider = new ProviderData();
+
+//provider.setProviderNo(request.getParameter("provider_no"));
+
+provider.set(request.getParameter("provider_no"));
 provider.setLastName(request.getParameter("last_name"));
 provider.setFirstName(request.getParameter("first_name"));
 provider.setProviderType(request.getParameter("provider_type"));
@@ -129,6 +128,16 @@ provider.setLastUpdateUser((String)session.getAttribute("user"));
 provider.setLastUpdateDate(new java.util.Date());
 provider.setSupervisor(StringUtils.trimToNull(request.getParameter("supervisor")));
 provider.setSuperAdmin(false);
+
+
+ProviderBilling providerBilling = new ProviderBilling();
+
+if (request.getParameter("bc_bcp_eligible") != null)
+{
+    providerBilling.setBcBCPEligible(request.getParameter("bc_bcp_eligible").equals("1"));
+}
+
+provider.setBillingOpts(providerBilling);
 
 String albertaEDeliveryIds = StringUtils.trimToNull(request.getParameter("alberta_e_delivery_ids"));
 // Only strip non-numeric characters if we are on an Alberta instance
@@ -204,26 +213,22 @@ boolean isDefaultRoleNameExist = true;
 	// check if the provider no need to be auto generated
   if (OscarProperties.getInstance().isProviderNoAuto())
   {
-  	provider.setProviderNo(dbObj.getNewProviderNo());
+  	provider.setProviderNo(Integer.parseInt(dbObj.getNewProviderNo()));
   }
   
-  if(providerDao.providerExists(provider.getProviderNo())) {
+  if(providerDao.providerExists(provider.getId())) {
 	  isOk=false;
 	  alreadyExists=true;
   }
   	else
 	{
-		providerDao.saveProvider(provider);
+		providerService.saveProvider(provider);
  	 	isOk=true;
 
  	 	// make newly added provider by default a 'doctor' and 'primary' role
- 	 	int providerNo = Integer.parseInt(provider.getProviderNo());
-
 		ProviderRoleService providerRoleService = SpringUtils.getBean(ProviderRoleService.class);
 
-		isDefaultRoleNameExist = providerRoleService.setDefaultRoleForNewProvider(providerNo);
-
-
+		isDefaultRoleNameExist = providerRoleService.setDefaultRoleForNewProvider(provider.getProviderNo());
 	}
 
 if (isOk && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
@@ -231,7 +236,7 @@ if (isOk && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 	if (sites!=null)
 		for (int i=0; i<sites.length; i++) {
 			ProviderSite ps = new ProviderSite();
-        	ps.setId(new ProviderSitePK(provider.getProviderNo(),Integer.parseInt(sites[i])));
+        	ps.setId(new ProviderSitePK(provider.getId(),Integer.parseInt(sites[i])));
         	providerSiteDao.persist(ps);
 		}
 }
