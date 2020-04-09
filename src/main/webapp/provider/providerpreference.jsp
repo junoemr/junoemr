@@ -174,20 +174,33 @@ function popupPage(vheight,vwidth,varpage) { //open a new popup window
   }
 }
 
-function isNumeric(strString) {
-    var validNums = "0123456789";
-    var strChar;
-    var retval = true;
-    if(strString.length == 0){
-    retval = false;
-    }
-    for (i = 0; i < strString.length && retval == true; i++){
-	strChar = strString.charAt(i);
-	if (validNums.indexOf(strChar) == -1){
-	    retval = false;
+/**
+ * Validation for strings intended to be numbers.
+ * Gist: loop over character-by-character and ensure all components of the string are numeric.
+ * Note: Would do it like the following, but regex support is not universally available:
+ * 		string.match(/^[0-9]+$/) !== null;
+ * @input numericString string to check for numeric characters
+ * @return boolean if all characters in input string are in [0-9], false otherwise
+ */
+function isNumeric(numericString)
+{
+	if (numericString.length === 0)
+	{
+		return false;
 	}
-    }
-    return retval;
+
+	numericString = numericString.trim();
+
+	var numericCharacters = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+	for (var i = 0; i < numericString.length; i++)
+	{
+		if (numericCharacters.indexOf(numericString.charAt(i)) === -1)
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 /**
