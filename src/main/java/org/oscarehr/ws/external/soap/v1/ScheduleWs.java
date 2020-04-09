@@ -192,19 +192,18 @@ public class ScheduleWs extends AbstractWs {
 		if (mostAvailable != null)
 		{
 			appointment.setProviderNo(mostAvailable.getKey());
-
-			List<BookingRule> violatedRules = this.getViolatedBookingRules(appointment, jsonRules);
-
-			if (violatedRules.isEmpty())
-			{
-				scheduleManager.addAppointment(getLoggedInInfo(), getLoggedInSecurity(), appointment);
-			}
-
-			AppointmentTransfer apptTransfer = AppointmentTransfer.toTransfer(appointment, false);
-			return new ValidatedAppointmentBookingTransfer(apptTransfer, violatedRules);
 		}
 
-		return null;
+		List<BookingRule> violatedRules = this.getViolatedBookingRules(appointment, jsonRules);
+
+		if (violatedRules.isEmpty())
+		{
+			scheduleManager.addAppointment(getLoggedInInfo(), getLoggedInSecurity(), appointment);
+		}
+
+		AppointmentTransfer apptTransfer = AppointmentTransfer.toTransfer(appointment, false);
+		return new ValidatedAppointmentBookingTransfer(apptTransfer, violatedRules);
+
 	}
 
 	// TODO: Temporary for backwards compatibility. Remove once released to all Juno instances
