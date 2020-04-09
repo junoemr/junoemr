@@ -232,53 +232,6 @@ if(!authed) {
 
     jQuery.noConflict();
 
-   /* function checkBCPForProvider() {
-        var providerSelect = jQuery('#billing-provider-select');
-
-        console.log("<%=request.getContextPath()%>/ws/rs/providerService/provider/" + providerSelect.val() + "/billing");
-
-        jQuery.get("<%=request.getContextPath()%>/ws/rs/providerService/provider/" + providerSelect.val() + "/billing")
-            .done(applyBCP)
-            .fail(logError);
-    }
-
-    function applyBCP(provider)
-    {
-        if (provider.bcBCPEligible)
-        {
-            jQuery.get("<%=request.getContextPath()%>/ws/rs/clinic/")
-                .done(function(clinic)
-                {
-                    updateFacilityNumber(clinic.bcFacilityNumber);
-                })
-                .fail(logError);
-        }
-        else
-        {
-            updateFacilityNumber("");
-        }
-    }
-
-    function updateFacilityNumber(facilityNumber)
-    {
-        var element = jQuery('#facility-number');
-
-        if (facilityNumber)
-        {
-            element.val(facilityNumber);
-        }
-        else
-        {
-            element.val("");
-        }
-    }
-
-    function logError(error)
-    {
-        alert("Cannot determing BCP eligibility");
-        console.error(error);
-    }*/
-
     // Autocompletion of referral doctors
     jQuery(document).ready(function(){
         var xml_refer1 = jQuery('input[name=xml_refer1]');
