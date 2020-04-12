@@ -33,6 +33,8 @@ import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1569,4 +1571,12 @@ public class Demographic implements Serializable
 		return org.oscarehr.demographic.model.Demographic.isNewBorn(birthday, getVer());
 	}
 
+
+	@PrePersist
+	@PreUpdate
+	private void removeControlCharacter()
+	{
+		setPhone(oscar.util.StringUtils.filteroutControlCharacters(getPhone()));
+		setPhone2(oscar.util.StringUtils.filteroutControlCharacters(getPhone2()));
+	}
 }

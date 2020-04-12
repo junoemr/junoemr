@@ -343,21 +343,3 @@ Juno.Common.Util.windowClosedPromise = function (popup)
 		}, 500);
 	});
 };
-
-//remove control characters
-Juno.Common.Util.removeControlCharacters = function (input)
-{
-	var lengthBeforeProcess = input.length;
-	var validatedInput = "";
-	if (lengthBeforeProcess > 0)
-	{
-		var array = input.split('');
-		array = array.filter(
-			x =>
-			(32 <= x.charCodeAt(0) && x.charCodeAt(0) <=126) ||
-			x.charCodeAt(0) > 160
-	);
-		validatedInput = array.join('');
-	}
-	return validatedInput;
-};

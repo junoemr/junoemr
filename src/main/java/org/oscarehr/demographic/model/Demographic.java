@@ -38,6 +38,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -839,5 +841,13 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public boolean isNewBorn()
 	{
 		return Demographic.isNewBorn(getDateOfBirth(), getVer());
+	}
+
+	@PrePersist
+	@PreUpdate
+	private void removeControlCharacter()
+	{
+		setPhone(oscar.util.StringUtils.filteroutControlCharacters(getPhone()));
+		setPhone2(oscar.util.StringUtils.filteroutControlCharacters(getPhone2()));
 	}
 }

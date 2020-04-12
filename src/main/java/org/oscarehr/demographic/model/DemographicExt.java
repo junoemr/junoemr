@@ -66,6 +66,7 @@ public class DemographicExt extends AbstractModel<Integer> implements Serializab
 	@PreUpdate
 	protected void prePersist() {
 		this.dateCreated = new Date();
+		setValue(oscar.util.StringUtils.filteroutControlCharacters(getValue()));
 	}
 	
     // constructors
