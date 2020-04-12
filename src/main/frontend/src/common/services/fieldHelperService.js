@@ -101,7 +101,6 @@ angular.module('Common.Services').factory(
 					}
 				};
 
-
 				// watch the focus field: when it matches the name, focus the element
 				$scope.$watch('focus_field', function()
 				{

@@ -724,7 +724,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			ver0 = controller.page.demo.ver;
 		};
 
-
 		//manage date entries
 		controller.checkDate = function checkDate(id)
 		{

@@ -357,6 +357,7 @@ if(!authed) {
 <script type="text/javascript" src="<%=request.getContextPath() %>/demographic/demographiceditdemographic.js.jsp"></script>
 
 <script language="JavaScript" type="text/javascript">
+
 function checkTypeIn() {
   var dob = document.titlesearch.keyword; typeInOK = false;
 
@@ -754,8 +755,7 @@ jQuery(document).ready(function($) {
 
 });
 
-
-
+s
 function showCbiReminder()
 {
   alert('<bean:message key="demographic.demographiceditdemographic.updateCBIReminder"/>');
@@ -2590,7 +2590,6 @@ if ( Dead.equals(PatStat) ) {%>
 									key="demographic.demographiceditdemographic.formPhoneW" />:</b></td>
 								<td align="left"><input type="text" name="phone2" <%=getDisabled("phone2")%>
 									onblur="formatPhoneNum();"
-
 									style="display: inline; width: auto;"
 									value="<%=StringUtils.trimToEmpty(demographic.getPhone2())%>"> <bean:message key="demographic.demographiceditdemographic.msgExt"/>:<input
 									type="text" name="wPhoneExt" <%=getDisabled("wPhoneExt")%>
@@ -2606,8 +2605,6 @@ if ( Dead.equals(PatStat) ) {%>
 								<td align="left">
 								<input type="text" name="demo_cell" onblur="formatPhoneNum();"
 									style="display: inline; width: auto;" <%=getDisabled("demo_cell")%>
-									id="phone_cell"
-									class="phone-class"
 									value="<%=StringUtils.trimToEmpty(demoExt.get("demo_cell"))%>">
 								<input type="hidden" name="demo_cellOrig"
 									value="<%=StringUtils.trimToEmpty(demoExt.get("demo_cell"))%>" />

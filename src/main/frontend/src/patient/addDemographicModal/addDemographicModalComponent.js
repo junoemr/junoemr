@@ -129,7 +129,6 @@ angular.module('Patient').component('addDemographicModal', {
 			return !(ctrl.invalidLastName || ctrl.invalidFirstName || ctrl.invalidSex || ctrl.invalidDob);
 		};
 
-
 		ctrl.onCancel = function()
 		{
 			ctrl.modalInstance.dismiss("cancel");
