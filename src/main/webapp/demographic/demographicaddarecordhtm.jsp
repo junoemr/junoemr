@@ -159,8 +159,6 @@
    <script>
      jQuery.noConflict();
    </script>
-	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
-	<script src="<%= request.getContextPath() %>/js/demographic.js"></script>
 
    <script type="text/javascript">
 	   function aSubmit()
@@ -178,9 +176,6 @@
 
 		   return true;
 	   }
-	   window.onload = function(){
-		   jQuery('body').on("blur", '.phone-class', Oscar.demographic.validatePhoneNumber);
-	   };
    </script>
 
 
@@ -294,6 +289,22 @@ function newStatus1() {
     }
 }
 
+function formatPhoneNum()
+{
+	if (document.adddemographic.phone.value.length == 10) {
+			document.adddemographic.phone.value = document.adddemographic.phone.value.substring(0,3) + "-" + document.adddemographic.phone.value.substring(3,6) + "-" + document.adddemographic.phone.value.substring(6);
+			}
+	if (document.adddemographic.phone.value.length == 11 && document.adddemographic.phone.value.charAt(3) == '-') {
+			document.adddemographic.phone.value = document.adddemographic.phone.value.substring(0,3) + "-" + document.adddemographic.phone.value.substring(4,7) + "-" + document.adddemographic.phone.value.substring(7);
+		}
+
+		if (document.adddemographic.phone2.value.length == 10) {
+			document.adddemographic.phone2.value = document.adddemographic.phone2.value.substring(0,3) + "-" + document.adddemographic.phone2.value.substring(3,6) + "-" + document.adddemographic.phone2.value.substring(6);
+			}
+	if (document.adddemographic.phone2.value.length == 11 && document.adddemographic.phone2.value.charAt(3) == '-') {
+			document.adddemographic.phone2.value = document.adddemographic.phone2.value.substring(0,3) + "-" + document.adddemographic.phone2.value.substring(4,7) + "-" + document.adddemographic.phone2.value.substring(7);
+		}
+}
 function rs(n,u,w,h,x) {
   args="width="+w+",height="+h+",resizable=yes,scrollbars=yes,status=0,top=60,left=30";
   remote=window.open(u,n,args);
@@ -809,27 +820,27 @@ function ignoreDuplicates() {
 			<tr valign="top">
 				<td id="phoneLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPhoneHome" />: </b></td>
-				<td id="phoneCell" align="left"><input type="text" class="phone-class" id="phone" name="phone"
-
+				<td id="phoneCell" align="left"><input type="text" id="phone" name="phone"
+				   	onBlur="formatPhoneNum()"
 					value="<%=props.getProperty("phoneprefix", "905-")%>"> <bean:message
 					key="demographic.demographicaddrecordhtm.Ext" />:<input
-					type="text" id="hPhoneExt" class="phone-class"  name="hPhoneExt" value="" size="4" /></td>
+					type="text" id="hPhoneExt" name="hPhoneExt" value="" size="4" /></td>
 				<td id="phoneWorkLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPhoneWork" />:</b></td>
-				<td id="phoneWorkCell" align="left"><input type="text" name="phone2" id="phone2" class="phone-class"
-				   	value=""> <bean:message
+				<td id="phoneWorkCell" align="left"><input type="text" name="phone2"
+				   	onBlur="formatPhoneNum()" value=""> <bean:message
 					key="demographic.demographicaddrecordhtm.Ext" />:<input type="text"
-					name="wPhoneExt" value="" style="display: inline" size="4" id="phone2Ext" class="phone-class"    /></td>
+					name="wPhoneExt" value="" style="display: inline" size="4" /></td>
 			</tr>
 			<tr valign="top">
 				<td id="phoneCellLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPhoneCell" />: </b></td>
-				<td id="phoneCellCell" align="left"><input type="text" name="demo_cell" id="phone_cell"
-					class="phone-class"  ></td>
+				<td id="phoneCellCell" align="left"><input type="text" name="demo_cell"
+				   	onBlur="formatPhoneNum()"></td>
 				<td align="right"><b><bean:message
 						key="demographic.demographicaddrecordhtm.formPhoneComment" />: </b></td>
 				<td align="left" colspan="3">
-						<textarea rows="2" cols="30" name="phoneComment" id="phoneComment" class="phone-class"  ></textarea>
+						<textarea rows="2" cols="30" name="phoneComment"></textarea>
 				</td>
 			</tr>
 			<tr valign="top">

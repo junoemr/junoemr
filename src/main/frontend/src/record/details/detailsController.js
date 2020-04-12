@@ -47,7 +47,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'staticDataService',
 	'referralDoctorsService',
 	'user',
-	'fieldHelperService',
 
 	function(
 		$scope,
@@ -67,8 +66,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		securityService,
 		staticDataService,
 		referralDoctorsService,
-		user,
-		helper)
+		user)
 	{
 
 		var controller = this;
@@ -726,10 +724,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			ver0 = controller.page.demo.ver;
 		};
 
-		controller.detail_on_blur = function (event)
-		{
-			helper.elementOnBlur(event);
-		};
 
 		//manage date entries
 		controller.checkDate = function checkDate(id)

@@ -316,7 +316,7 @@ if(!authed) {
 
 <!-- main calendar program -->
 <script type="text/javascript" src="../share/calendar/calendar.js"></script>
-	<script type="text/javascript" src="<%= request.getContextPath() %>/js/demographic.js"></script>
+
 <!-- language for the calendar -->
 <script type="text/javascript"
 	src="../share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>
@@ -752,7 +752,6 @@ jQuery(document).ready(function($) {
 		return false;
 	});
 
-	jQuery('body').on("blur", '.phone-class', Oscar.demographic.validatePhoneNumber);
 });
 
 
@@ -2579,21 +2578,22 @@ if ( Dead.equals(PatStat) ) {%>
 								<td align="right"><b><bean:message
 									key="demographic.demographiceditdemographic.formPhoneH" />: </b></td>
 								<td align="left">
-								<input type="text" name="phone" id="phone" class="phone-class" <%=getDisabled("phone")%>
+								<input type="text" name="phone" onblur="formatPhoneNum();" <%=getDisabled("phone")%>
 									style="display: inline; width: auto;"
 									value="<%=StringUtils.trimToEmpty(StringUtils.trimToEmpty(demographic.getPhone()))%>"> <bean:message key="demographic.demographiceditdemographic.msgExt"/>:<input
-									type="text" name="hPhoneExt" id="phone1Ext" class="phone-class"  <%=getDisabled("hPhoneExt")%>
+									type="text" name="hPhoneExt" <%=getDisabled("hPhoneExt")%>
 									value="<%=StringUtils.trimToEmpty(StringUtils.trimToEmpty(demoExt.get("hPhoneExt")))%>"
 									size="4" /> <input type="hidden" name="hPhoneExtOrig"
 									value="<%=StringUtils.trimToEmpty(StringUtils.trimToEmpty(demoExt.get("hPhoneExt")))%>" />
 								</td>
 								<td align="right"><b><bean:message
 									key="demographic.demographiceditdemographic.formPhoneW" />:</b></td>
-								<td align="left"><input type="text" name="phone2" id="phone2" class="phone-class"  <%=getDisabled("phone2")%>
+								<td align="left"><input type="text" name="phone2" <%=getDisabled("phone2")%>
+									onblur="formatPhoneNum();"
 
 									style="display: inline; width: auto;"
 									value="<%=StringUtils.trimToEmpty(demographic.getPhone2())%>"> <bean:message key="demographic.demographiceditdemographic.msgExt"/>:<input
-									type="text" name="wPhoneExt" id="phone2Ext" class="phone-class"  <%=getDisabled("wPhoneExt")%>
+									type="text" name="wPhoneExt" <%=getDisabled("wPhoneExt")%>
 									value="<%=StringUtils.trimToEmpty(StringUtils.trimToEmpty(demoExt.get("wPhoneExt")))%>"
 									style="display: inline" size="4" /> <input type="hidden"
 									name="wPhoneExtOrig"
@@ -2604,7 +2604,7 @@ if ( Dead.equals(PatStat) ) {%>
 								<td align="right"><b><bean:message
 									key="demographic.demographiceditdemographic.formPhoneC" />: </b></td>
 								<td align="left">
-								<input type="text" name="demo_cell" "
+								<input type="text" name="demo_cell" onblur="formatPhoneNum();"
 									style="display: inline; width: auto;" <%=getDisabled("demo_cell")%>
 									id="phone_cell"
 									class="phone-class"
@@ -2617,7 +2617,7 @@ if ( Dead.equals(PatStat) ) {%>
 								<td align="left" colspan="3">
 								<input type="hidden" name="phoneCommentOrig"
 									value="<%=StringUtils.trimToEmpty(demoExt.get("phoneComment"))%>" />
-										<textarea rows="2" cols="30" id="phoneComment" class="phone-class"  name="phoneComment"><%=StringUtils.trimToEmpty(demoExt.get("phoneComment"))%></textarea>
+										<textarea rows="2" cols="30" name="phoneComment"><%=StringUtils.trimToEmpty(demoExt.get("phoneComment"))%></textarea>
 								</td>
 							</tr>							
 							<tr valign="top">

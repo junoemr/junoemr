@@ -445,7 +445,6 @@
 							placeholder="<bean:message key="demographic.demographicaddrecordhtm.formPhoneComment"/>" 
 							title="<bean:message key="demographic.demographicaddrecordhtm.formPhoneComment"/>" 
 							ng-model="detailsCtrl.page.demo.scrPhoneComment"
-						    ng-blur="detailsCtrl.detail_on_blur($event)"
 						/>
 					</div>
 				</div>

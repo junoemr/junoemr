@@ -101,10 +101,6 @@ angular.module('Common.Services').factory(
 					}
 				};
 
-				$scope.on_blur_fn = function (event)
-				{
-					helper.elementOnBlur(event);
-				};
 
 				// watch the focus field: when it matches the name, focus the element
 				$scope.$watch('focus_field', function()
@@ -216,14 +212,6 @@ angular.module('Common.Services').factory(
 					link: link_function,
 					controller: helper.default_controller
 				};
-			};
-
-			helper.elementOnBlur = function (event)
-			{
-				if($(event.currentTarget).is("input[type='text'], textarea"))
-				{
-					event.currentTarget.value = Juno.Common.Util.removeControlCharacters(event.currentTarget.value);
-				}
 			};
 
 			return helper;
