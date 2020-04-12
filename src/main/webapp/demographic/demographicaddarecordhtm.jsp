@@ -289,8 +289,7 @@ function newStatus1() {
     }
 }
 
-function formatPhoneNum()
-{
+function formatPhoneNum() {
 	if (document.adddemographic.phone.value.length == 10) {
 		document.adddemographic.phone.value = document.adddemographic.phone.value.substring(0,3) + "-" + document.adddemographic.phone.value.substring(3,6) + "-" + document.adddemographic.phone.value.substring(6);
 		}

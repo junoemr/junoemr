@@ -755,7 +755,7 @@ jQuery(document).ready(function($) {
 
 });
 
-s
+
 function showCbiReminder()
 {
   alert('<bean:message key="demographic.demographiceditdemographic.updateCBIReminder"/>');
