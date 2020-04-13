@@ -76,7 +76,11 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 		@SuppressWarnings("unchecked")
 		List<ProviderData> results = query.getResultList();
 
-		if (results.size() > 0) return results.get(0);
+		if (results.size() > 0)
+		{
+			return results.get(0);
+		}
+
 		return null;
 	}
 
@@ -90,7 +94,11 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 		@SuppressWarnings("unchecked")
 		List<ProviderData> results = query.getResultList();
 
-		if (results.size() > 0) return results.get(0);
+		if (results.size() > 0)
+		{
+			return results.get(0);
+		}
+
 		return null;
 	}
 

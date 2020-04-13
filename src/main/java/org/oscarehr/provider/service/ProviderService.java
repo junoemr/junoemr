@@ -46,8 +46,18 @@ public class ProviderService
 		return providerDataDao.findByProviderNo(providerNo);
 	}
 
-	public void saveProvider(ProviderData provider) { providerDataDao.merge(provider);}
+	public void saveProvider(ProviderData provider)
+	{
+		providerDataDao.merge(provider);
+	}
 
+	/**
+	 * Fetch a provider including with all associations preloaded.  Use this get method if you are in a layer which
+	 * doesn't support transactions and you need to read or write to lazily loaded entities.
+	 *
+	 * @param providerNo id of Provider to fetch
+	 * @return Fully instantiated provider object
+	 */
 	public ProviderData getProviderEager(String providerNo)
 	{
 		return providerDataDao.eagerFindByProviderNo(providerNo);

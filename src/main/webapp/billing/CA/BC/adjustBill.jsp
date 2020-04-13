@@ -346,8 +346,10 @@ function calculateFee(){
 
 
 $(document).ready(function()
-{   var $providerSelect = jQuery('#provider-number');
+{
+    var $providerSelect = jQuery('#provider-number');
     var $facilityNumber = jQuery('#facility-number');
+
     Juno.BillingHelper.BC.initAutoApplyBCP("<%=request.getContextPath() %>", $providerSelect, $facilityNumber);
 })
 

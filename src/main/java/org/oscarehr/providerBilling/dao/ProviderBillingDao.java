@@ -41,7 +41,7 @@ public class ProviderBillingDao  extends AbstractDao<ProviderBilling>
 
 	/**
 	 * get the billing record for the specified provider
-	 * @param providerNo - the provider how's billing record you want to look up.
+	 * @param providerNo - id of the Provider linked to the billing record.
 	 * @return - the billing record.
 	 */
 	public ProviderBilling getByProvider(Integer providerNo)

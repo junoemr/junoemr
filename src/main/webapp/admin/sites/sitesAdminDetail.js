@@ -23,7 +23,7 @@ Juno.Admin.Sites.SiteDetails.onChooseProvince = function onChooseProvince(prov)
     var provClass = "province-specific " + prov.toLowerCase();
     var provElements = document.getElementsByClassName(provClass);
 
-    for (let element of provElements)
+    for (var element of provElements)
     {
         element.style.display = "table-row";
     }

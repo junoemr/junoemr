@@ -5,12 +5,14 @@ Juno.BillingHelper.BC = Juno.BillingHelper.BC || {};
 
 // Requires jQuery
 
-Juno.BillingHelper.BC._applyBCP = function applyBCP() {
-    if ($providerSelect.val() === "000000") {
+Juno.BillingHelper.BC._applyBCP = function applyBCP($providerSelect, $facNumInput) {
+    if ($providerSelect.val() === "000000")
+    {
         Juno.BillingHelper.BC._updateFacilityNumber($facNumInput, "");
         return;
     }
-    else {
+    else
+    {
         Juno.BillingHelper.BC._applyProviderBCP($providerSelect, $facNumInput)
     }
 };

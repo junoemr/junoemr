@@ -48,26 +48,30 @@
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@ page import="oscar.*" errorPage="errorpage.jsp"%>
+<%@ page errorPage="errorpage.jsp"%>
 <%@ page import="oscar.log.LogAction,oscar.log.LogConst"%>
-<%@ page import="oscar.oscarDB.*"%>
 
-<%@page import="org.oscarehr.common.dao.SiteDao"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="org.oscarehr.common.model.Site"%>
+<%@ page import="org.oscarehr.common.dao.SiteDao"%>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@ page import="org.oscarehr.common.model.Site"%>
 
-<%@page import="oscar.oscarProvider.data.ProviderBillCenter"%>
-<%@page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="oscar.oscarProvider.data.ProviderBillCenter"%>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
 
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@page import="org.oscarehr.common.model.ProviderSite"%>
-<%@page import="org.oscarehr.common.model.ProviderSitePK"%>
-<%@page import="org.oscarehr.common.dao.ProviderSiteDao"%>
+<%@ page import="org.oscarehr.common.model.ProviderSite"%>
+<%@ page import="org.oscarehr.common.model.ProviderSitePK"%>
+<%@ page import="org.oscarehr.common.dao.ProviderSiteDao"%>
 <%@ page import="org.oscarehr.provider.service.ProviderRoleService" %>
 <%@ page import="org.oscarehr.provider.model.ProviderData" %>
 <%@ page import="org.oscarehr.provider.service.ProviderService" %>
 <%@ page import="org.oscarehr.providerBilling.model.ProviderBilling" %>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="oscar.MyDateFormat" %>
+<%@ page import="oscar.SxmlMisc" %>
+<%@ page import="oscar.oscarDB.*" %>
+
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
     ProviderService providerService = SpringUtils.getBean(ProviderService.class);
@@ -95,11 +99,7 @@ boolean isOk = false;
 int retry = 0;
 String curUser_no = (String)session.getAttribute("user");
 
-//Provider provider = new Provider();
-
 ProviderData provider = new ProviderData();
-
-//provider.setProviderNo(request.getParameter("provider_no"));
 
 provider.set(request.getParameter("provider_no"));
 provider.setLastName(request.getParameter("last_name"));
@@ -121,7 +121,7 @@ provider.setAlbertaTakNo(StringUtils.trimToNull(request.getParameter("alberta_ta
 provider.setAlbertaConnectCareId(StringUtils.trimToNull(request.getParameter("alberta_connect_care_provider_id")));
 provider.setOntarioLifeLabsId(StringUtils.trimToNull(request.getParameter("ontario_lifelabs_id")));
 provider.setStatus(request.getParameter("status"));
-provider.setComments(SxmlMisc.createXmlDataString(request,"xml_p"));
+provider.setComments(SxmlMisc.createXmlDataString(request, "xml_p"));
 provider.setProviderActivity(request.getParameter("provider_activity"));
 provider.setPractitionerNo(request.getParameter("practitionerNo"));
 provider.setLastUpdateUser((String)session.getAttribute("user"));
