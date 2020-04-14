@@ -71,6 +71,9 @@
 <%@ page import="oscar.MyDateFormat" %>
 <%@ page import="oscar.SxmlMisc" %>
 <%@ page import="oscar.oscarDB.*" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Arrays" %>
 
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
@@ -231,15 +234,34 @@ boolean isDefaultRoleNameExist = true;
 		isDefaultRoleNameExist = providerRoleService.setDefaultRoleForNewProvider(provider.getProviderNo());
 	}
 
-if (isOk && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
-	String[] sites = request.getParameterValues("sites");
-	if (sites!=null)
-		for (int i=0; i<sites.length; i++) {
-			ProviderSite ps = new ProviderSite();
-        	ps.setId(new ProviderSitePK(provider.getId(),Integer.parseInt(sites[i])));
-        	providerSiteDao.persist(ps);
-		}
-}
+    if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable() && isOk)
+    {
+        List<String> sites = new ArrayList<String>();
+        List<String> bcpSites = new ArrayList<String>();
+
+        if (request.getParameterValues("sites") != null)
+        {
+            sites.addAll(Arrays.asList(request.getParameterValues("sites")));
+        }
+
+        if (request.getParameterValues("sitesBCP") != null)
+        {
+            bcpSites.addAll(Arrays.asList(request.getParameterValues("sitesBCP")));
+        }
+
+        for (String siteString : sites)
+        {
+            Integer siteId = Integer.parseInt(siteString);
+
+            ProviderSite provSite = new ProviderSite();
+            provSite.setId(new ProviderSitePK(provider.getId(), siteId));
+
+
+            provSite.setBcBCPEligible(bcpSites.contains(siteString));
+
+            providerSiteDao.persist(provSite);
+        }
+    }
 
 if (isOk) {
 	String proId = provider.getPractitionerNo();

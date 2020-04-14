@@ -41,10 +41,8 @@
 	}
 %>
 
-
-<%@ page
-	import="java.sql.*, java.util.*, oscar.SxmlMisc, oscar.oscarProvider.data.ProviderBillCenter"
-	errorPage="errorpage.jsp"%>
+<%@ page errorPage="errorpage.jsp"%>
+<%@ page import="oscar.SxmlMisc, oscar.oscarProvider.data.ProviderBillCenter"%>
 <%@ page import="oscar.log.LogAction,oscar.log.LogConst"%>
 <%@ page import="org.oscarehr.common.model.ClinicNbr"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
@@ -53,10 +51,10 @@
 <%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
 <%@ page import="org.oscarehr.common.dao.SecurityDao" %>
 <%@ page import="org.oscarehr.common.model.Security" %>
-<%@page import="org.oscarehr.common.dao.UserPropertyDAO"%>
-<%@page import="org.oscarehr.common.model.UserProperty"%>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO"%>
+<%@ page import="org.oscarehr.common.model.UserProperty"%>
 <%@ page import="oscar.OscarProperties"%>
-<%@page import="org.oscarehr.common.Gender" %>
+<%@ page import="org.oscarehr.common.Gender" %>
 
 <%
   java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
@@ -65,32 +63,39 @@
 %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 
-<%@page import="org.oscarehr.common.dao.SiteDao"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="org.oscarehr.common.model.Site"%>
-<%@page import="oscar.login.*,org.apache.commons.lang.StringUtils"%>
-<%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%><html:html locale="true">
-<%@page import="org.oscarehr.common.model.ProviderSite"%>
-<%@page import="org.oscarehr.common.model.ProviderSitePK"%>
-<%@page import="org.oscarehr.common.dao.ProviderSiteDao"%>
-    <%@ page import="org.oscarehr.providerBilling.model.ProviderBilling" %>
-    <%@ page import="org.hibernate.Hibernate" %>
-    <%@ page import="org.oscarehr.provider.service.ProviderService" %>
+<%@ page import="org.oscarehr.common.dao.SiteDao"%>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@ page import="org.oscarehr.common.model.Site"%>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.oscarehr.common.model.ProviderSite"%>
+<%@ page import="org.oscarehr.common.dao.ProviderSiteDao"%>
+<%@ page import="org.oscarehr.provider.service.ProviderService" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.Enumeration" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
+<html:html locale="true">
 
 
     <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="./provider/providerProfile.js"></script>
 <title><bean:message key="admin.providerupdateprovider.title" /></title>
 <link rel="stylesheet" href="../web.css">
+
 <script LANGUAGE="JavaScript">
-<!--
 function setfocus() {
   document.updatearecord.last_name.focus();
   document.updatearecord.last_name.select();
 }
 
 jQuery(document).ready( function() {
+
+        Juno.Admin.Provider.Profile.initSiteSelectHandler();
+
         jQuery("#provider_type").change(function() {
             
             if( jQuery("#provider_type").val() == "resident") {                
@@ -106,13 +111,10 @@ jQuery(document).ready( function() {
             }
         }
         )
-        
     }
         
         
- ); 
-
-//-->
+ );
 </script>
 </head>
 
@@ -201,9 +203,22 @@ jQuery(document).ready( function() {
 		</td>
 		<td>
             <table>
-            <%  SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
+            <%
+                SiteDao siteDao = (SiteDao) SpringUtils.getBean("siteDao");
+                ProviderSiteDao providerSiteDao = (ProviderSiteDao) SpringUtils.getBean("providerSiteDao");
+
                 List<Site> psites = siteDao.getActiveSitesByProviderNo(provider_no);
                 List<Site> sites = siteDao.getAllActiveSites();
+
+
+                List<ProviderSite> providerSites = providerSiteDao.findByProviderNo(provider_no);
+                Map<Integer, Boolean> providerSiteMap= new HashMap<Integer, Boolean>();
+                for (ProviderSite providerSite : providerSites)
+                {
+                    providerSiteMap.put(providerSite.getId().getSiteId(), providerSite.isBcBCPEligible());
+                }
+
+
                 for (Site site : sites) {
                 	boolean isAllowed = !isSiteAccessPrivacy || siteIDs.contains(site.getSiteId());
                 	boolean isChecked = psites.contains(site);
@@ -213,9 +228,12 @@ jQuery(document).ready( function() {
                         <input type="checkbox" name="sites" value="<%= site.getSiteId() %>" <%= isChecked ? " checked" : "" %> <%= isAllowed? "" : " disabled"%>>
                         <%= site.getName() %>
                     </td>
-                    <td>
-                        <% if (site.getProvince().equals("BC")) {%>
-                        <input type="checkbox" name="sitesBCP" value="<%= site.getSiteId()%>" <%= isAllowed ? "" : " disabled" %>> Apply BCP
+                    <td style="display:none">
+                        <% if (site.getProvince().equals("BC")) {
+                        	boolean bcpChecked = providerSiteMap.get(site.getId()) != null && providerSiteMap.get(site.getId());
+                        %>
+                        <input type="checkbox" name="sitesBCP" id="bcp-site-<%= site.getSiteId()%>" <%= bcpChecked ? " checked" : "" %> value="<%= site.getSiteId()%>" <%= isAllowed ? "" : " disabled" %>>
+                        Apply BCP
                         <% } %>
                     </td>
                 </tr>

@@ -228,29 +228,45 @@ if(!authed) {
 
             if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
             {
-                String[] sites = request.getParameterValues("sites");
-                DBPreparedHandler dbObj = new DBPreparedHandler();
                 String provider_no = request.getParameter("provider_no");
                 List<ProviderSite> pss = providerSiteDao.findByProviderNo(provider_no);
+
                 for (ProviderSite ps : pss)
                 {
                     providerSiteDao.remove(ps.getId());
                 }
-                if (sites != null)
+
+            	List<String> sites = new ArrayList<String>();
+            	List<String> bcpSites = new ArrayList<String>();
+
+            	if (request.getParameterValues("sites") != null)
                 {
-                    for (int i = 0; i < sites.length; i++)
-                    {
-                        ProviderSite ps = new ProviderSite();
-                        ps.setId(new ProviderSitePK(provider_no, Integer.parseInt(sites[i])));
-                        providerSiteDao.persist(ps);
-                    }
+                	sites.addAll(Arrays.asList(request.getParameterValues("sites")));
+                }
+
+                if (request.getParameterValues("sitesBCP") != null)
+                {
+                    bcpSites.addAll(Arrays.asList(request.getParameterValues("sitesBCP")));
+                }
+
+                for (String siteString : sites)
+                {
+                	Integer siteId = Integer.parseInt(siteString);
+
+                	ProviderSite provSite = new ProviderSite();
+                	provSite.setId(new ProviderSitePK(provider_no, siteId));
+
+
+                	provSite.setBcBCPEligible(bcpSites.contains(siteString));
+
+                	providerSiteDao.persist(provSite);
                 }
             }
 
             ProviderArchiveDao providerArchiveDao = (ProviderArchiveDao) SpringUtils.getBean("providerArchiveDao");
             ProviderArchive pa = new ProviderArchive();
-            // unfortunately the providerData provider_no is keyed on id, which conflicts with the id field (provider_no)
-            // of the provider object.  We have to ignore the field and set it manually.
+            // unfortunately the providerData provider_no is keyed on 'id' (aka provider_no), which conflicts with the id field
+            // of the providerArchive object.  We have to ignore the field and set it manually.
             BeanUtils.copyProperties(provider, pa, "id");
             pa.setProviderNo(provider.getId());
 

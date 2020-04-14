@@ -1,6 +1,9 @@
 "use strict";
 
-// dependencies: JQuery
+// requires jQuery
+
+// The following runs inside an iFrame, Do not use jQuery after the onReady function
+// because you will lose reference to $(document) after it renders in the frame.
 
 var Juno = window.Juno || {};
 Juno.Admin = Juno.Admin || {};
