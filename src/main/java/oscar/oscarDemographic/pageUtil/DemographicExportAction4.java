@@ -201,7 +201,6 @@ public class DemographicExportAction4 extends Action {
 		DemographicExportForm defrm = (DemographicExportForm) form;
 		String demographicNo = defrm.getDemographicNo();
 		String setName = defrm.getPatientSet();
-		String pgpReady = defrm.getPgpReady();
 		String templateOption = defrm.getTemplate();
 		boolean exPersonalHistory = WebUtils.isChecked(request, "exPersonalHistory");
 		boolean exFamilyHistory = WebUtils.isChecked(request, "exFamilyHistory");
@@ -2329,11 +2328,9 @@ public class DemographicExportAction4 extends Action {
 	 * @param filesToZip
 	 * @return true if download was successful, false otherwise
 	 */
-	private boolean exportPatientFilesZip(ArrayList<File> filesToZip) {
-		
-		DemographicExportForm defrm = (DemographicExportForm) demoExportForm;
-		String setName = defrm.getPatientSet();
-		String pgpReady = defrm.getPgpReady();
+	private boolean exportPatientFilesZip(ArrayList<File> filesToZip)
+	{
+		String setName = demoExportForm.getPatientSet();
 		String tmpDir = oscarProperties.getProperty("TMP_DIR");
 		
 		boolean downloadSuccess = false;
@@ -2348,27 +2345,17 @@ public class DemographicExportAction4 extends Action {
 				logger.debug("Error! Failed to zip export files");
 			}
 			
-			
-			// Apply PGP if installed
-			if (pgpReady.equals("Yes")) {
-				// PGP encrypt zip file
-				PGPEncrypt pgp = new PGPEncrypt();
-				if (pgp.encrypt(zipName, tmpDir)) {
-					downloadSuccess = Util.downloadFile(zipName + ".pgp", tmpDir, response);
-					if (downloadSuccess) Util.cleanFile(zipName + ".pgp", tmpDir);
-				}
-				else {
-					request.getSession().setAttribute("pgp_ready", "No");
-				}
-			}
-			else {
-				logger.warn("PGP Encryption NOT available - unencrypted file exported!");
-				downloadSuccess = Util.downloadFile(zipName, tmpDir, response);
+
+			downloadSuccess = Util.downloadFile(zipName, tmpDir, response);
+			if(downloadSuccess)
+			{
 				// remove zip file if it was downloaded. Otherwise leave it in the temp directory for OSP
-				if(downloadSuccess) Util.cleanFile(zipName, tmpDir);
+				Util.cleanFile(zipName, tmpDir);
 			}
-			
-			if(!downloadSuccess) logger.error("Demographic Export Files were not downloaded properly. Zip file not removed from temp directory.");
+			else
+			{
+				logger.error("Demographic Export Files were not downloaded properly. Zip file not removed from temp directory.");
+			}
 			// remove temp files
 			Util.cleanFiles(filesToZip);
 		}
@@ -2381,16 +2368,13 @@ public class DemographicExportAction4 extends Action {
 	/*
 	 * translated to its own method during refactor.
 	 */
-	private int exportPatientFilesAffinity(ArrayList<File> filesToZip) {
-		
-		DemographicExportForm defrm = (DemographicExportForm) demoExportForm;
-		String setName = defrm.getPatientSet();
-		String pgpReady = defrm.getPgpReady();
-		String demographicNo = defrm.getDemographicNo();
+	private int exportPatientFilesAffinity(ArrayList<File> filesToZip)
+	{
+		String setName = demoExportForm.getPatientSet();
+		String demographicNo = demoExportForm.getDemographicNo();
 		String tmpDir = oscarProperties.getProperty("TMP_DIR");
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		
-		boolean success = false;
+
 		int documentExportId = 0;
 		
 		try {
@@ -2402,45 +2386,28 @@ public class DemographicExportAction4 extends Action {
 			if (!Util.zipFiles(filesToZip, zipName, tmpDir)) {
 				logger.debug("Error! Failed to zip export files");
 			}
-			
-			// Apply PGP if installed
-			if (pgpReady.equals("Yes")) {
-				// PGP encrypt zip file
-				PGPEncrypt pgp = new PGPEncrypt();
-				if (pgp.encrypt(zipName, tmpDir)) {
-					success = true;
-				}
-				else {
-					request.getSession().setAttribute("pgp_ready", "No");
-				}
-			}
-			else {
-				logger.warn("PGP Encryption NOT available - unencrypted file exported!");
-				success = true;
-			}
-			if(success) {
-				Util.cleanFiles(filesToZip);
+
+			Util.cleanFiles(filesToZip);
 				
-				String exportFile = Util.fixDirName(tmpDir) + zipName;
+			String exportFile = Util.fixDirName(tmpDir) + zipName;
 
-				DemographicExportDao demographicExportDao = SpringUtils.getBean(DemographicExportDao.class);
-				DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+			DemographicExportDao demographicExportDao = SpringUtils.getBean(DemographicExportDao.class);
+			DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
 
-				DemographicExport demographicExport = new DemographicExport();
-				byte[] data = FileUtils.readFileToByteArray(new File(exportFile));
-				demographicExport.setDocument(data);
-				demographicExport.setDemographic(demographicManager.getDemographic(loggedInInfo, demographicNo));
-				demographicExport.setDocumentType(DocumentType.CDS.name());
+			DemographicExport demographicExport = new DemographicExport();
+			byte[] data = FileUtils.readFileToByteArray(new File(exportFile));
+			demographicExport.setDocument(data);
+			demographicExport.setDemographic(demographicManager.getDemographic(loggedInInfo, demographicNo));
+			demographicExport.setDocumentType(DocumentType.CDS.name());
 
-				DemographicExport export = demographicExportDao.saveEntity(demographicExport);
-				documentExportId = export.getId();
-			}
+			DemographicExport export = demographicExportDao.saveEntity(demographicExport);
+			documentExportId = export.getId();
+
 			Util.cleanFile(zipName, tmpDir);
 			Util.cleanFiles(filesToZip);
 		}
 		catch(Exception e) {
 			logger.error("Error Exporting Demographic zip file Affinity", e);
-			success = false;
 		}
 		return documentExportId;
 	}
