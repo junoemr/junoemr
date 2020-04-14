@@ -280,9 +280,13 @@ public class DemographicManager {
 		{
 			demographic.setPatientStatus(PatientStatus.AC.name());
 		}
-		if(demographic.getFamilyDoctor() == null)
+		if(demographic.getFamilyDoctor().isEmpty())
 		{
 			demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
+		}
+		if (demographic.getFamilyDoctor2() == null)
+		{
+			demographic.setFamilyDoctor2("<fd></fd><fdname></fdname>");
 		}
 		demographic.setLastUpdateUser(providerNo);
 		demographicDao.save(demographic);
