@@ -64,6 +64,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -204,7 +205,8 @@ public class ScheduleWs extends AbstractWs {
 			return new ValidatedAppointmentBookingTransfer(apptTransfer, violatedRules);
 		}
 
-		return null;
+		return new ValidatedAppointmentBookingTransfer(null,
+						Collections.singletonList(BookingRuleFactory.createAvailableRule()));
 	}
 
 	// TODO: Temporary for backwards compatibility. Remove once released to all Juno instances
