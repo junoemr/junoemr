@@ -26,6 +26,7 @@ package org.oscarehr.ws.rest;
 import org.oscarehr.clinic.transfer.ClinicTransfer;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.model.Clinic;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,9 +42,9 @@ public class ClinicService extends AbstractServiceImpl
 
 	@GET
 	@Path("/")
-	public ClinicTransfer getClinic()
+	public RestResponse<ClinicTransfer> getClinic()
 	{
 		Clinic clinic = clinicDao.getClinic();
-		return ClinicTransfer.toTransferObj(clinic);
+		return RestResponse.successResponse(ClinicTransfer.toTransferObj(clinic));
 	}
 }

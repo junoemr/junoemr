@@ -61,6 +61,12 @@ if(!authed) {
 <%@ page import="oscar.oscarBilling.ca.bc.data.BillingPreference" %>
 <%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
 <%@ page import="org.oscarehr.common.model.ProviderPreference" %>
+<%@ page import="org.oscarehr.common.dao.SiteDao" %>
+<%@ page import="org.oscarehr.common.model.Site" %>
+<%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
+<%@ page import="org.oscarehr.common.model.Appointment" %>
+<%@ page import="org.oscarehr.common.model.ProviderSite" %>
+<%@ page import="org.oscarehr.managers.AppointmentManager" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -274,8 +280,18 @@ if(!authed) {
 
         var $providerSelect = jQuery('#billing-provider-select');
         var $facilityNumber = jQuery('#facility-number');
+        var $siteSelect = jQuery('#site-select');
 
-        Juno.BillingHelper.BC.initAutoApplyBCP("<%=request.getContextPath() %>", $providerSelect, $facilityNumber);
+        if ($siteSelect.length > 0)
+        {
+            console.log("apply multisite");
+            Juno.BillingHelper.BC.initAutoApplyBCPMultiSite("<%=request.getContextPath() %>", $providerSelect, $facilityNumber, $siteSelect);
+        }
+        else
+        {
+            console.log("apply single site");
+            Juno.BillingHelper.BC.initAutoApplyBCP("<%=request.getContextPath() %>", $providerSelect, $facilityNumber);
+        }
     });
 
 //creates a javaspt array of associated dx codes
@@ -1039,6 +1055,45 @@ if(wcbneeds != null){%>
                 </html:select>
             </td>
           </tr>
+
+          <% if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
+          {
+          	    SiteDao siteDao = (SiteDao) SpringUtils.getBean(SiteDao.class);
+          	    List<Site> sites = siteDao.getAllActiveSites();
+          	    List<Site> providerSites = siteDao.getActiveSitesByProviderNo(sxml_provider);
+          	    List<Integer> siteIds = new ArrayList<Integer>();
+
+          	    for (Site site : providerSites)
+                {
+                	siteIds.add(site.getId());
+                }
+
+                LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromSession(request);
+
+              AppointmentManager apptManager = SpringUtils.getBean(AppointmentManager.class);
+                Appointment appt = apptManager.getAppointment(info, Integer.parseInt(bean.getApptNo()));
+
+                //OscarAppointmentDao apptDao = SpringUtils.getBean(OscarAppointmentDao.class);
+                //Appointment appt = apptDao.find(Integer.parseInt(bean.getApptNo()));
+          %>
+          <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td><b>Site</b></td>
+              <td>
+                  <select name="site" id="site-select">
+                      <option value="-1">Select site</option>
+                  <% for (Site site : sites) {
+                  	    boolean isSelected = appt.getLocation().equals(site.getName());
+                  	    boolean isDisabled = !isSelected && !siteIds.contains(site.getId());
+                  %>
+                      <option value="<%= site.getId()%>" <%=isSelected ? " selected" : ""%> <%=isDisabled ? " disabled" : ""%>><%=site.getName()%></option>
+                  <% } %>
+                  </select>
+              </td>
+          </tr>
+          <% } %>
           <tr>
             <td>
                   <bean:message key="billing.billingtype"/>

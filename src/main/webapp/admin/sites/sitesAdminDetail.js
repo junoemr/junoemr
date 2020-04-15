@@ -59,7 +59,6 @@ Juno.Admin.Sites.SiteDetails.onReady = function onReady()
         Juno.Admin.Sites.SiteDetails.onChooseProvince(provinceSelect.value);
     });
 
-    var saveButton = document.getElementById('save-button');
 };
 
 /**

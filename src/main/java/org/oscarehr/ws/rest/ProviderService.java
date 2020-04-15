@@ -42,6 +42,7 @@ import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
@@ -161,13 +162,13 @@ public class ProviderService extends AbstractServiceImpl {
 	@GET
 	@Path("/provider/{id}/billing")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ProviderBillingTransfer getProviderBilling(@PathParam("id") String providerNo)
+	public RestResponse<ProviderBillingTransfer> getProviderBilling(@PathParam("id") String providerNo)
 	{
 		ProviderBillingTransfer transfer = providerService.getProviderBillingAsTransfer(providerNo);
 
 		ProviderBilling billing = providerService.getProviderBilling(providerNo);
 		ProviderBillingTransfer transfer2 = ProviderBillingTransfer.toTransferObj(billing);
-		return transfer2;        // TEST null and non-null billings
+		return RestResponse.successResponse(transfer2);        // TEST null and non-null billings
 	}
 
     @GET

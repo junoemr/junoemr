@@ -24,11 +24,13 @@
 package org.oscarehr.providerBilling.transfer;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProviderBillingTransfer implements Serializable
 {
 	private String providerNo;
