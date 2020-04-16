@@ -35,9 +35,16 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.dao.ClinicDAO;
+import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.ProviderSiteDao;
+import org.oscarehr.common.dao.SiteDao;
+import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.ProviderSite;
+import org.oscarehr.common.model.ProviderSitePK;
+import org.oscarehr.common.model.Site;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidApiLimitInfoTo1;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidResultTo1;
 import org.oscarehr.integration.clinicaid.dto.PatientEligibilityDataTo1;
@@ -78,6 +85,15 @@ public class ClinicaidAPIService
 
 	@Autowired
 	private ClinicDAO clinicDAO;
+
+	@Autowired
+	private OscarAppointmentDao appointmentDao;
+
+	@Autowired
+	private SiteDao siteDao;
+
+	@Autowired
+	private ProviderSiteDao provSiteDao;
 
 	private String formatEligibilityData(PatientEligibilityDataTo1 data)
 	{
@@ -353,24 +369,35 @@ public class ClinicaidAPIService
 
 				ProviderData providerData = providerService.getProviderEager(provider_no);
 
-				if (providerData.getBillingOpts().getBcBCPEligible())
-				{
-					String facilityNumber = null;
+				String facilityNumber = null;
 
-					if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
+				if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
+				{
+					Integer appointmentNo = Integer.parseInt(request.getParameter("appointment_no"));
+					Appointment appointment = appointmentDao.find(appointmentNo);
+
+					Site site = siteDao.findByName(appointment.getLocation());
+
+					ProviderSitePK key = new ProviderSitePK(provider_no, site.getId());
+					ProviderSite provSite = provSiteDao.find(key);
+
+					if (provSite != null && provSite.isBcBCPEligible())
 					{
-						// TODO check if the provider is eligible for BCP for that site, if so, get the facility number for that site
+						facilityNumber = site.getBcFacilityNumber();
 					}
-					else
+				}
+				else
+				{
+					if (providerData.getBillingOpts().getBcBCPEligible())
 					{
 						Clinic clinic = clinicDAO.getClinic();
 						facilityNumber = clinic.getBcFacilityNumber();
 					}
+				}
 
-					if (facilityNumber != null)
-					{
-						data.put("facility_number", StringUtils.trimToEmpty(facilityNumber));
-					}
+				if (facilityNumber != null)
+				{
+					data.put("facility_number", StringUtils.trimToEmpty(facilityNumber));
 				}
 			}
 
