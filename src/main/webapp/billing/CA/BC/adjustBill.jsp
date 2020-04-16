@@ -52,6 +52,9 @@ if(!authed) {
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@page import="org.oscarehr.common.model.Provider" %>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
+<%@ page import="org.oscarehr.common.dao.SiteDao" %>
+<%@ page import="org.oscarehr.managers.AppointmentManager" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 
 
@@ -349,8 +352,18 @@ $(document).ready(function()
 {
     var $providerSelect = jQuery('#provider-number');
     var $facilityNumber = jQuery('#facility-number');
+    var $siteSelect = jQuery('#site-select');
 
-    Juno.BillingHelper.BC.initAutoApplyBCP("<%=request.getContextPath() %>", $providerSelect, $facilityNumber);
+    if ($siteSelect.length > 0)
+    {
+        console.log("apply multisite");
+        Juno.BillingHelper.BC.initAutoApplyBCPMultiSite("<%=request.getContextPath() %>", $providerSelect, $facilityNumber, $siteSelect);
+    }
+    else
+    {
+        console.log("apply single site");
+        Juno.BillingHelper.BC.initAutoApplyBCP("<%=request.getContextPath() %>", $providerSelect, $facilityNumber);
+    }
 })
 
 </script>
@@ -594,6 +607,39 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
             <input type="hidden" name="xml_provider_no" value="<%=Provider%>">
     </td>
   </tr>
+  <% if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
+
+  	SiteDao siteDao = SpringUtils.getBean(SiteDao.class);
+  	List<Site> sites = siteDao.getAllActiveSites();
+
+  	List<Site> providerSites = siteDao.getActiveSitesByProviderNo(Provider);
+  	List<Integer> siteIds = new ArrayList<Integer>();
+
+  	for (Site site : providerSites)
+  	{
+  		siteIds.add(site.getId());
+  	}
+
+  	LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromSession(request);
+  	AppointmentManager apptManager = SpringUtils.getBean(AppointmentManager.class);
+  	Appointment appt = apptManager.getAppointment(info, bill.getAppointmentNo());
+  %>
+  <tr bgcolor="#EEEEFF">
+        <td></td>
+        <td class="bCellData">
+            Site:
+            <select id="site-select">
+                <option value="-1">Select Site</option>
+                <% for (Site site : sites) {
+                    boolean isSelected = allFields.getProperty("facilityNo").equals(site.getBcFacilityNumber());
+                    boolean isDisabled = !isSelected && !siteIds.contains(site.getId());
+                %>
+                <option value="<%=site.getId()%>" <%=isSelected ? " selected" : ""%> <%=isDisabled ? " disabled" : ""%>><%=site.getName()%></option>
+                <% } %>
+            </select>
+        </td>
+  </tr>
+  <% }%>
   <tr>
    <%visittype = allFields.getProperty("serviceLocation");%>
     <td width="54%"  class="bCellData">

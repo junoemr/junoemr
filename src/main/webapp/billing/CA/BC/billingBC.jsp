@@ -63,9 +63,7 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.model.ProviderPreference" %>
 <%@ page import="org.oscarehr.common.dao.SiteDao" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
-<%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@ page import="org.oscarehr.common.model.Appointment" %>
-<%@ page import="org.oscarehr.common.model.ProviderSite" %>
 <%@ page import="org.oscarehr.managers.AppointmentManager" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
@@ -1071,7 +1069,7 @@ if(wcbneeds != null){%>
                 LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromSession(request);
 
               AppointmentManager apptManager = SpringUtils.getBean(AppointmentManager.class);
-                Appointment appt = apptManager.getAppointment(info, Integer.parseInt(bean.getApptNo()));
+              Appointment appt = apptManager.getAppointment(info, Integer.parseInt(bean.getApptNo()));
 
                 //OscarAppointmentDao apptDao = SpringUtils.getBean(OscarAppointmentDao.class);
                 //Appointment appt = apptDao.find(Integer.parseInt(bean.getApptNo()));
@@ -1083,7 +1081,7 @@ if(wcbneeds != null){%>
               <td><b>Site</b></td>
               <td>
                   <select name="site" id="site-select">
-                      <option value="-1">Select site</option>
+                      <option value="-1">Select Site</option>
                   <% for (Site site : sites) {
                   	    boolean isSelected = appt.getLocation().equals(site.getName());
                   	    boolean isDisabled = !isSelected && !siteIds.contains(site.getId());

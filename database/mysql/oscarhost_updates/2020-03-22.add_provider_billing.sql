@@ -40,6 +40,5 @@ ALTER TABLE site
 
 ALTER TABLE providersite
   ADD COLUMN IF NOT EXISTS bc_bcp_eligible
-    BOOLEAN
-    NOT NULL,
+    BOOLEAN NOT NULL,
     DEFAULT 0;
