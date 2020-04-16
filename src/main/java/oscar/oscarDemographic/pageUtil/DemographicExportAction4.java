@@ -505,7 +505,7 @@ public class DemographicExportAction4 extends Action {
 							address.setLine1(demographic.getAddress());
 							if (StringUtils.filled(demographic.getCity()) || StringUtils.filled(demographic.getProvince()) || StringUtils.filled(demographic.getPostal())) {
 								address.setCity(StringUtils.noNull(demographic.getCity()));
-								address.setCountrySubdivisionCode(Util.setCountrySubDivCode(demographic.getProvince()));
+								address.setCountrySubdivisionCode(Util.setCountrySubDivCode(StringUtils.noNull(demographic.getProvince())));
 								address.addNewPostalZipCode().setPostalCode(StringUtils.noNull(demographic.getPostal()).replace(" ", ""));
 							}
 						}
@@ -1961,8 +1961,15 @@ public class DemographicExportAction4 extends Action {
 										exportError.add("Error! No Date for Blood Pressure (id=" + meas.getId() + ") for Patient " + demoNo);
 									}
 									String[] sdbp = meas.getDataField().split("/");
-									bloodp.setSystolicBP(sdbp[0]);
-									bloodp.setDiastolicBP(sdbp[1]);
+									if (sdbp.length == 2)
+									{
+										bloodp.setSystolicBP(sdbp[0]);
+										bloodp.setDiastolicBP(sdbp[1]);
+									}
+									else
+									{
+										 exportError.add("Error! No Data for Blood Pressure (id=" + meas.getId() + ") for Patient " + demoNo);
+									}
 									bloodp.setBPUnit(cdsDt.BloodPressure.BPUnit.MM_HG);
 									addOneEntry(CAREELEMENTS);
 								}

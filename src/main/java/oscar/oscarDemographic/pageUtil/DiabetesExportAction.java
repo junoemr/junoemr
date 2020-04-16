@@ -318,8 +318,15 @@ public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServlet
                 CareElements careElements = patientRecord.addNewCareElements();
 		cdsDt.BloodPressure bloodp = careElements.addNewBloodPressure();
 		String[] sdbp = meas.getDataField().split("/");
-		bloodp.setSystolicBP(sdbp[0]);
-		bloodp.setDiastolicBP(sdbp[1]);
+		if (sdbp.length == 2)
+		{
+			bloodp.setSystolicBP(sdbp[0]);
+			bloodp.setDiastolicBP(sdbp[1]);
+		}
+		else
+		{
+			errors.add("Error! No Data for Blood Pressure (id=" + meas.getId() + ") for Patient " + demoNo);
+		}
 		bloodp.setBPUnit(cdsDt.BloodPressure.BPUnit.MM_HG);
 		bloodp.setDate(Util.calDate(dateObserved));
                 if (dateObserved==null) {
@@ -538,7 +545,7 @@ public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServlet
             address.setLine1(demographic.getAddress());
 	    if (StringUtils.filled(demographic.getCity()) || StringUtils.filled(demographic.getProvince()) || StringUtils.filled(demographic.getPostal())) {
 		address.setCity(StringUtils.noNull(demographic.getCity()));
-		address.setCountrySubdivisionCode(Util.setCountrySubDivCode(demographic.getProvince()));
+		address.setCountrySubdivisionCode(Util.setCountrySubDivCode(StringUtils.noNull(demographic.getProvince())));
 		address.addNewPostalZipCode().setPostalCode(StringUtils.noNull(demographic.getPostal()).replace(" ",""));
 	    }
         }
