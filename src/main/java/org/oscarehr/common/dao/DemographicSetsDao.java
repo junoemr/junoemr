@@ -41,7 +41,7 @@ public class DemographicSetsDao extends AbstractDao<DemographicSets>{
 	}
 
 	public List<DemographicSets> findBySetName(String setName) {
-		String sql = "SELECT x FROM DemographicSets x Join x.demographic d WHERE x.archive != :archive AND x.name = :setName ORDER BY d.DemographicNo";
+		String sql = "SELECT x FROM DemographicSets x WHERE x.archive != :archive AND x.name = :setName ORDER BY x.demographic_no";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("archive", "1");
 		query.setParameter("setName", setName);
