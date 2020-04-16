@@ -105,19 +105,16 @@ Juno.BillingHelper.BC._tryAutoApplySite = function tryAutoApplySite($siteSelect)
     // Length === 2 accounts for the placeholder itself being an option
     if ($enabledOpts.length === 2)
     {
-        console.log("auto apply site");
         var $defaultSite = $enabledOpts.filter(":not([value='-1'])");
 
         $defaultSite.prop("selected", true);
     }
     else
     {
-        console.log("auto apply placeholder");
         var $placeHolder = $enabledOpts.filter("[value='-1']");
         $placeHolder.prop("selected", true);
     }
 
-    console.log("triggering site select change event");
     // Both outcomes have changed the site select, so trigger the event
     $siteSelect.trigger("change");
 };
@@ -152,14 +149,12 @@ Juno.BillingHelper.BC._applyProviderSites = function applyProviderSites($provide
 
 Juno.BillingHelper.BC._applyBCPMultiSite = function applyBCPMultiSite($providerSelect, $siteSelect, $facNoInput)
 {
-    console.log("site changed");
     var siteId = $siteSelect.val();
 
     if (siteId && siteId !== Juno.BillingHelper.BC._noSiteSelected) {
 
         var providerNo = $providerSelect.val();
         if (providerNo && providerNo !== Juno.BillingHelper.BC._noProviderSelected) {
-            console.log("provider and site are selected, going to check up on the the site now");
             var siteBillingEndpoint = Juno.BillingHelper.BC._localJunoInstance
                 + '/ws/rs/sites/' + siteId + '/provider/' + $providerSelect.val() + '/billing';
 

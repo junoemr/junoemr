@@ -111,7 +111,7 @@
                         </tr>
                         <tr>
                             <td>Theme Color:<sup style="color:red">*</sup></td>
-                            <td><nested:text styleId="colorField" property="site.bgColor" onclick="popupPage(350,450,'../colorpicker/colorpicker.htm','colorpicker');return false;"></nested:text>
+                            <td><nested:text styleId="colorField" property="site.bgColor" onclick="popup(350,450,'../colorpicker/colorpicker.htm','colorpicker');return false;"></nested:text>
                             </td>
                         </tr>
                         <tr>
