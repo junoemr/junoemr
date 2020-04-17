@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS provider_billing (
   bc_rural_retention_code VARCHAR(10) DEFAULT '00',
   bc_rural_retention_name VARCHAR(256),
   bc_service_location_code VARCHAR(10),
-  bc_bcp_eligible BOOLEAN DEFAULT 0,
+  bc_bcp_eligible BOOLEAN DEFAULT 0 NOT NULL,
   # ON
   on_master_number VARCHAR(4),
   on_service_location VARCHAR(16),
@@ -40,5 +40,4 @@ ALTER TABLE site
 
 ALTER TABLE providersite
   ADD COLUMN IF NOT EXISTS bc_bcp_eligible
-    BOOLEAN NOT NULL,
-    DEFAULT 0;
+    BOOLEAN DEFAULT 0 NOT NULL;

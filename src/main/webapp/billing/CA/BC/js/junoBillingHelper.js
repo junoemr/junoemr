@@ -8,6 +8,16 @@ Juno.BillingHelper.BC._noProviderSelected = "000000";
 Juno.BillingHelper.BC._noSiteSelected = "-1";
 Juno.BillingHelper.BC._localJunoInstance = "";
 
+Juno.BillingHelper.BC._isProviderSelected = function isProviderNotSelected(providerNo)
+{
+    return (providerNo && providerNo !== Juno.BillingHelper.BC._noProviderSelected);
+};
+
+Juno.BillingHelper.BC._isSiteSelected = function isSiteNotSelected(siteNo)
+{
+    return (siteNo && siteNo !== Juno.BillingHelper.BC._noSiteSelected);
+};
+
 Juno.BillingHelper.BC._alertError = function alertError(error)
 {
     alert("Cannot determine BCP eligibility");
@@ -15,14 +25,13 @@ Juno.BillingHelper.BC._alertError = function alertError(error)
 };
 
 Juno.BillingHelper.BC._applyBCP = function applyBCP($providerSelect, $facNumInput) {
-    if ($facNumInput.val() === Juno.BillingHelper.BC._noProviderSelected)
+    if (Juno.BillingHelper.BC._isProviderSelected($providerSelect.val()))
     {
-        Juno.BillingHelper.BC._updateFacilityNumber($facNumInput, "");
-        return;
+        Juno.BillingHelper.BC._applyProviderBCP($providerSelect, $facNumInput);
     }
     else
     {
-        Juno.BillingHelper.BC._applyProviderBCP($providerSelect, $facNumInput)
+        Juno.BillingHelper.BC._updateFacilityNumber($facNumInput, "");
     }
 };
 
@@ -121,13 +130,7 @@ Juno.BillingHelper.BC._tryAutoApplySite = function tryAutoApplySite($siteSelect)
 
 Juno.BillingHelper.BC._applyProviderSites = function applyProviderSites($providerSelect, $siteSelect, $facNumInput)
 {
-    if ($facNumInput.val() === Juno.BillingHelper.BC._noProviderSelected)
-    {
-        Juno.BillingHelper.BC._updateFacilityNumber($facNumInput, "");
-        Juno.BillingHelper.BC._filterSiteSelectOptions($siteSelect);
-        Juno.BillingHelper.BC._tryAutoApplySite($siteSelect);
-    }
-    else
+    if (Juno.BillingHelper.BC._isProviderSelected($providerSelect.val()))
     {
         var siteEndpoint =  Juno.BillingHelper.BC._localJunoInstance
             + "/ws/rs/sites/provider/" + $providerSelect.val();
@@ -144,15 +147,20 @@ Juno.BillingHelper.BC._applyProviderSites = function applyProviderSites($provide
             })
             .fail(Juno.BillingHelper.BC._alertError);
     }
-
+    else
+    {
+        Juno.BillingHelper.BC._updateFacilityNumber($facNumInput, "");
+        Juno.BillingHelper.BC._filterSiteSelectOptions($siteSelect);
+        Juno.BillingHelper.BC._tryAutoApplySite($siteSelect);
+    }
 };
 
 Juno.BillingHelper.BC._applyBCPMultiSite = function applyBCPMultiSite($providerSelect, $siteSelect, $facNoInput)
 {
     var siteId = $siteSelect.val();
 
-    if (siteId && siteId !== Juno.BillingHelper.BC._noSiteSelected) {
-
+    if (Juno.BillingHelper.BC._isSiteSelected(siteId))
+    {
         var providerNo = $providerSelect.val();
         if (providerNo && providerNo !== Juno.BillingHelper.BC._noProviderSelected) {
             var siteBillingEndpoint = Juno.BillingHelper.BC._localJunoInstance
@@ -176,6 +184,10 @@ Juno.BillingHelper.BC._applyBCPMultiSite = function applyBCPMultiSite($providerS
 
                             })
                             .fail(Juno.BillingHelper.BC._alertError)
+                    }
+                    else
+                    {
+                        Juno.BillingHelper.BC._updateFacilityNumber($facNoInput, "");
                     }
                 })
                 .fail(Juno.BillingHelper.BC._alertError)

@@ -26,7 +26,6 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.providerBilling.model.ProviderBilling;
-import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,18 +125,15 @@ public class ProviderService
 		return providerDataDao.getNextIdWithThreshold(minThreshold, ignoreThreshold);
 	}
 
-	/**
-	 * Get provincial billing options for the specified provider
-	 * @param providerNo provider
-	 * @return provincial billing options
-	 */
-	public ProviderBillingTransfer getProviderBillingAsTransfer(String providerNo)
-	{
-		return ProviderBillingTransfer.toTransferObj(providerDataDao.findByProviderNo(providerNo).getBillingOpts());
-	}
-
 	public ProviderBilling getProviderBilling(String providerNo)
 	{
-		return providerDataDao.findByProviderNo(providerNo).getBillingOpts();
+		ProviderData provider = providerDataDao.findByProviderNo(providerNo);
+
+		if (provider == null)
+		{
+			return null;
+		}
+
+		return provider.getBillingOpts();
 	}
 }

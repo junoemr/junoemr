@@ -164,11 +164,9 @@ public class ProviderService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ProviderBillingTransfer> getProviderBilling(@PathParam("id") String providerNo)
 	{
-		ProviderBillingTransfer transfer = providerService.getProviderBillingAsTransfer(providerNo);
-
 		ProviderBilling billing = providerService.getProviderBilling(providerNo);
-		ProviderBillingTransfer transfer2 = ProviderBillingTransfer.toTransferObj(billing);
-		return RestResponse.successResponse(transfer2);        // TEST null and non-null billings
+		ProviderBillingTransfer transfer = ProviderBillingTransfer.toTransferObj(billing);
+		return RestResponse.successResponse(transfer);
 	}
 
     @GET

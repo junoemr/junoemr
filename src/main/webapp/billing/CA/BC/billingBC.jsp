@@ -1081,7 +1081,7 @@ if(wcbneeds != null){%>
                   <select name="site" id="site-select">
                       <option value="-1">Select Site</option>
                   <% for (Site site : sites) {
-                  	    boolean isSelected = appt.getLocation().equals(site.getName());
+                  	    boolean isSelected = appt != null && appt.getLocation().equals(site.getName());
                   	    boolean isDisabled = !isSelected && !siteIds.contains(site.getId());
                   %>
                       <option value="<%= site.getId()%>" <%=isSelected ? " selected" : ""%> <%=isDisabled ? " disabled" : ""%>><%=site.getName()%></option>

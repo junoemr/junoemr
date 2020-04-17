@@ -376,14 +376,19 @@ public class ClinicaidAPIService
 					Integer appointmentNo = Integer.parseInt(request.getParameter("appointment_no"));
 					Appointment appointment = appointmentDao.find(appointmentNo);
 
-					Site site = siteDao.findByName(appointment.getLocation());
-
-					ProviderSitePK key = new ProviderSitePK(provider_no, site.getId());
-					ProviderSite provSite = provSiteDao.find(key);
-
-					if (provSite != null && provSite.isBcBCPEligible())
+					// If billed from the master file, appointmentNo = 0
+					// So we just can't check for the present of the query parameter
+					if (appointment != null)
 					{
-						facilityNumber = site.getBcFacilityNumber();
+						Site site = siteDao.findByName(appointment.getLocation());
+
+						ProviderSitePK key = new ProviderSitePK(provider_no, site.getId());
+						ProviderSite provSite = provSiteDao.find(key);
+
+						if (provSite != null && provSite.isBcBCPEligible())
+						{
+							facilityNumber = site.getBcFacilityNumber();
+						}
 					}
 				}
 				else

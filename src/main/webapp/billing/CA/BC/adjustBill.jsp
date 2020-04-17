@@ -361,12 +361,10 @@ $(document).ready(function()
 
     if ($siteSelect.length > 0)
     {
-        console.log("apply multisite");
         Juno.BillingHelper.BC.initAutoApplyBCPMultiSite("<%=request.getContextPath() %>", $providerSelect, $facilityNumber, $siteSelect);
     }
     else
     {
-        console.log("apply single site");
         Juno.BillingHelper.BC.initAutoApplyBCP("<%=request.getContextPath() %>", $providerSelect, $facilityNumber);
     }
 })
