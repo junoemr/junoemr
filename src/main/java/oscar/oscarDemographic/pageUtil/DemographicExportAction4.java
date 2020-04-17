@@ -168,12 +168,12 @@ public class DemographicExportAction4 extends Action {
 	public static final int E2E = 1;
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
+
 	Integer exportNo = 0;
 	ArrayList<String> exportError = null;
 	HashMap<String, Integer> entries = new HashMap<String, Integer>();
 	OscarProperties oscarProperties = OscarProperties.getInstance();
-	
+
 	private HttpServletRequest request = null;
 	private HttpServletResponse response = null;
 	private DemographicExportForm demoExportForm = null;
@@ -283,7 +283,7 @@ public class DemographicExportAction4 extends Action {
 						org.oscarehr.common.model.Demographic demographic = d.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demoNo);
 
 						if (demographic.getPatientStatus() != null && demographic.getPatientStatus().equals("Contact-only")) continue;
-						
+
 						logger.info("EXPORT Demographic #" + demoNo);
 
 						HashMap<String, String> demoExt = new HashMap<String, String>();
@@ -1449,7 +1449,7 @@ public class DemographicExportAction4 extends Action {
 								 * medi.setNonAuthoritativeIndicator(data);
 								 * mSummary = Util.addSummary(mSummary,
 								 * "Non-Authoritative", data);
-								 * 
+								 *
 								 * /* no need:
 								 * medi.setPrescriptionIdentifier(String.valueOf
 								 * (arr[p].getDrugId())); mSummary =
@@ -1535,7 +1535,7 @@ public class DemographicExportAction4 extends Action {
 							 * labMeaList) { LaboratoryResults labResults =
 							 * patientRec.addNewLaboratoryResults();
 							 * exportLabResult(labMea, labResults, demoNo);
-							 * 
+							 *
 							 * String lab_no = labMea.getExtVal("lab_no"); if
 							 * (StringUtils.filled(lab_no)) { Hl7TextMessage
 							 * hl7TextMessage =
@@ -1548,16 +1548,16 @@ public class DemographicExportAction4 extends Action {
 							 * for (int j=0; j<h.getOBXCount(i); j++) { if
 							 * (StringUtils.filled(h.getOBXResult(i, j)))
 							 * continue; //skip entries with result
-							 * 
+							 *
 							 * String commentAsResult = null; for (int k=0;
 							 * k<h.getOBXCommentCount(i, j); k++) {
 							 * commentAsResult = Util.addLine(commentAsResult,
 							 * h.getOBXComment(i, j, k)); }
-							 * 
+							 *
 							 * if (StringUtils.filled(commentAsResult)) {
 							 * HashMap<String,String> labMeaValues = new
 							 * HashMap<String,String>();
-							 * 
+							 *
 							 * labMeaValues.put("identifier",
 							 * h.getOBXIdentifier(i, j));
 							 * labMeaValues.put("name", h.getOBXName(i, j));
@@ -1577,7 +1577,7 @@ public class DemographicExportAction4 extends Action {
 							 * h.getOBXResultStatus(i, j));
 							 * labMeaValues.put("lab_no", lab_no);
 							 * labMeaValues.put("other_id", i+"-"+j);
-							 * 
+							 *
 							 * LaboratoryResults labResults2 =
 							 * patientRec.addNewLaboratoryResults();
 							 * exportLabResult(labMeaValues, labResults2,
@@ -1961,15 +1961,8 @@ public class DemographicExportAction4 extends Action {
 										exportError.add("Error! No Date for Blood Pressure (id=" + measurement.getId() + ") for Patient " + demoNo);
 									}
 									String[] systolicDiastolicBloodPressure = measurement.getDataField().split("/");
-									if (systolicDiastolicBloodPressure.length == 2)
-									{
-										bloodPressure.setSystolicBP(systolicDiastolicBloodPressure[0]);
-										bloodPressure.setDiastolicBP(systolicDiastolicBloodPressure[1]);
-									}
-									else
-									{
-										 exportError.add("Error! No Data for Blood Pressure (id=" + measurement.getId() + ") for Patient " + demoNo);
-									}
+									bloodPressure.setSystolicBP(systolicDiastolicBloodPressure[0]);
+									bloodPressure.setDiastolicBP(systolicDiastolicBloodPressure[1]);
 									bloodPressure.setBPUnit(cdsDt.BloodPressure.BPUnit.MM_HG);
 									addOneEntry(CAREELEMENTS);
 								}
@@ -2183,7 +2176,7 @@ public class DemographicExportAction4 extends Action {
 							if (!directory.exists()) {
 								throw new Exception("Temporary Export Directory does not exist!");
 							}
-							
+
 							// remove all spaces from xml file names
 							String first_name = (demographic.getFirstName() != null) ? demographic.getFirstName().trim().replace(' ', '-') : "";
 							String last_name = (demographic.getLastName() != null) ? demographic.getLastName().trim().replace(' ', '-') : "";
@@ -2319,7 +2312,7 @@ public class DemographicExportAction4 extends Action {
 				break;
 		}
 		logger.info("DEMOGRAPHIC EXPORT COMPLETE");
-		
+
 		if (ffwd.equalsIgnoreCase("sendToAffinityDomain")) {
 			return new ActionForward(mapping.findForward("sendToAffinityDomain").getPath() + "?affinityDomain=" + request.getParameter("affinityDomain") + "&demoId="
 					+ demographicNo + "&docNo=" + documentExportId + "&type=" + DocumentType.CDS.name(), false);
@@ -2328,7 +2321,7 @@ public class DemographicExportAction4 extends Action {
 			return mapping.findForward(ffwd);
 		}
 	}
-	
+
 	/**
 	 * zips files in file list to zip file and attempts download request.
 	 * does not clean zip files in failure case
@@ -2339,9 +2332,9 @@ public class DemographicExportAction4 extends Action {
 	{
 		String setName = demoExportForm.getPatientSet();
 		String tmpDir = oscarProperties.getProperty("TMP_DIR");
-		
+
 		boolean downloadSuccess = false;
-		
+
 		try {
 			// Zip all export files
 			String zipName = filesToZip.get(0).getName().replace(".xml", ".zip");
@@ -2351,7 +2344,7 @@ public class DemographicExportAction4 extends Action {
 			if (!Util.zipFiles(filesToZip, zipName, tmpDir)) {
 				logger.debug("Error! Failed to zip export files");
 			}
-			
+
 
 			downloadSuccess = Util.downloadFile(zipName, tmpDir, response);
 			if(downloadSuccess)
@@ -2383,7 +2376,7 @@ public class DemographicExportAction4 extends Action {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
 		int documentExportId = 0;
-		
+
 		try {
 			// Zip all export files
 			String zipName = filesToZip.get(0).getName().replace(".xml", ".zip");
@@ -2395,7 +2388,7 @@ public class DemographicExportAction4 extends Action {
 			}
 
 			Util.cleanFiles(filesToZip);
-				
+
 			String exportFile = Util.fixDirName(tmpDir) + zipName;
 
 			DemographicExportDao demographicExportDao = SpringUtils.getBean(DemographicExportDao.class);
@@ -2841,7 +2834,7 @@ public class DemographicExportAction4 extends Action {
 		exportLabResult(labMeaValues, labResults, demoNo);
 	}
 	*/
-	
+
 	private void exportLabResult(HashMap<String,String> labMea, LaboratoryResults labResults, String demoNo) {
 
 		//lab test code, test name, test name reported by lab
@@ -2909,7 +2902,7 @@ public class DemographicExportAction4 extends Action {
 		}
 
 		//lab requisition datetime
-		
+
 		String reqDate = labMea.get("request_datetime");
 		if (StringUtils.filled(reqDate)) labResults.addNewLabRequisitionDateTime().setFullDateTime(Util.calDate(reqDate));
 
@@ -2956,7 +2949,7 @@ public class DemographicExportAction4 extends Action {
 			}
 		}
 	}
-	
+
 	private Float getDosageValue(String dosage) {
 		String[] dosageBreak = getDosageMultiple1st(dosage).split(" ");
 
