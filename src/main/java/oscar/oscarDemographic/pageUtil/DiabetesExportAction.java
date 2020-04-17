@@ -318,15 +318,8 @@ public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServlet
                 CareElements careElements = patientRecord.addNewCareElements();
 		cdsDt.BloodPressure bloodp = careElements.addNewBloodPressure();
 		String[] sdbp = meas.getDataField().split("/");
-		if (sdbp.length == 2)
-		{
-			bloodp.setSystolicBP(sdbp[0]);
-			bloodp.setDiastolicBP(sdbp[1]);
-		}
-		else
-		{
-			errors.add("Error! No Data for Blood Pressure (id=" + meas.getId() + ") for Patient " + demoNo);
-		}
+		bloodp.setSystolicBP(sdbp[0]);
+		bloodp.setDiastolicBP(sdbp[1]);
 		bloodp.setBPUnit(cdsDt.BloodPressure.BPUnit.MM_HG);
 		bloodp.setDate(Util.calDate(dateObserved));
                 if (dateObserved==null) {
