@@ -39,7 +39,10 @@ import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
+import org.oscarehr.providerBilling.model.ProviderBilling;
+import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
@@ -48,6 +51,7 @@ import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -66,6 +70,7 @@ import java.util.List;
 
 @Component("ProviderService")
 @Path("/providerService/")
+@Transactional
 public class ProviderService extends AbstractServiceImpl {
 
 	private static Logger logger = MiscUtils.getLogger();
@@ -84,7 +89,9 @@ public class ProviderService extends AbstractServiceImpl {
 
 	@Autowired
 	private PreferenceManager preferenceManager;
-	
+
+	@Autowired
+	private org.oscarehr.provider.service.ProviderService providerService;
 	
 	protected SecurityContext getSecurityContext() {
 		Message m = PhaseInterceptorChain.getCurrentMessage();
@@ -131,13 +138,6 @@ public class ProviderService extends AbstractServiceImpl {
     }
 
     @GET
-    @Path("/provider/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public ProviderTransfer getProvider(@PathParam("id") String id) {
-        return ProviderTransfer.toTransfer(providerDao.getProvider(id));
-    }
-    
-    @GET
     @Path("/provider/me")
     @Produces("application/json")
     public String getLoggedInProvider() {
@@ -150,7 +150,25 @@ public class ProviderService extends AbstractServiceImpl {
     	}
     	return null;
     }
-    
+
+	@GET
+	@Path("/provider/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ProviderTransfer getProvider(@PathParam("id") String id) {
+		return ProviderTransfer.toTransfer(providerDao.getProvider(id));
+	}
+
+
+	@GET
+	@Path("/provider/{id}/billing")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<ProviderBillingTransfer> getProviderBilling(@PathParam("id") String providerNo)
+	{
+		ProviderBilling billing = providerService.getProviderBilling(providerNo);
+		ProviderBillingTransfer transfer = ProviderBillingTransfer.toTransferObj(billing);
+		return RestResponse.successResponse(transfer);
+	}
+
     @GET
     @Path("/providerjson/{id}")
     public String getProviderAsJSON(@PathParam("id") String id) {

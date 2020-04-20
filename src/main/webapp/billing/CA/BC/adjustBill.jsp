@@ -45,13 +45,21 @@ if(!authed) {
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@page import="oscar.oscarBilling.ca.bc.data.*,oscar.*,org.oscarehr.common.model.*"%>
-<%@page import="java.math.*, java.util.*, java.sql.*, oscar.*, java.net.*,oscar.oscarBilling.ca.bc.MSP.*" %>
-<%@page import="org.springframework.web.context.WebApplicationContext,org.springframework.web.context.support.WebApplicationContextUtils, oscar.entities.*" %>
+<%@page import="oscar.oscarBilling.ca.bc.MSP.*" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="org.oscarehr.common.model.Demographic" %>
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@page import="org.oscarehr.common.model.Provider" %>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
+<%@ page import="org.oscarehr.common.dao.SiteDao" %>
+<%@ page import="org.oscarehr.managers.AppointmentManager" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="java.util.Properties" %>
+<%@ page import="oscar.entities.Billingmaster" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.Calendar" %>
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 
 
@@ -147,6 +155,8 @@ if(!authed) {
    <script type="text/javascript" src="../../../share/calendar/calendar-setup.js"></script>
    <script type="text/javascript" src="../../../share/javascript/prototype.js"></script>
    <script type="text/javascript" src="../../../share/javascript/Oscar.js"></script>
+   <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
+   <script type="text/javascript" src="./js/junoBillingHelper.js"></script>
         <script language="JavaScript">
         if('<%=request.getAttribute("close")%>' == 'true'){
           window.close();
@@ -341,6 +351,23 @@ function calculateFee(){
  var roundedValue = Math.round(billValue * billUnit * 100)/100;
  document.getElementById("billingAmount").value = roundedValue.toFixed(2);
 }
+
+
+$(document).ready(function()
+{
+    var $providerSelect = jQuery('#provider-number');
+    var $facilityNumber = jQuery('#facility-number');
+    var $siteSelect = jQuery('#site-select');
+
+    if ($siteSelect.length > 0)
+    {
+        Juno.BillingHelper.BC.initAutoApplyBCPMultiSite("<%=request.getContextPath() %>", $providerSelect, $facilityNumber, $siteSelect);
+    }
+    else
+    {
+        Juno.BillingHelper.BC.initAutoApplyBCP("<%=request.getContextPath() %>", $providerSelect, $facilityNumber);
+    }
+})
 
 </script>
 <style type="text/css">
@@ -565,7 +592,7 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
     </td>
     <td width="46%"  class="bCellData">
         Billing Physician#:
-        <select style="font-size:80%;" name="providerNo">
+        <select style="font-size:80%;" name="providerNo" id="provider-number">
             <option value="">--- Select Provider ---</option>
             <% 
                // Retrieving Provider
@@ -583,6 +610,39 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
             <input type="hidden" name="xml_provider_no" value="<%=Provider%>">
     </td>
   </tr>
+  <% if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
+
+  	SiteDao siteDao = SpringUtils.getBean(SiteDao.class);
+  	List<Site> sites = siteDao.getAllActiveSites();
+
+  	List<Site> providerSites = siteDao.getActiveSitesByProviderNo(Provider);
+  	List<Integer> siteIds = new ArrayList<Integer>();
+
+  	for (Site site : providerSites)
+  	{
+  		siteIds.add(site.getId());
+  	}
+
+  	LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromSession(request);
+  	AppointmentManager apptManager = SpringUtils.getBean(AppointmentManager.class);
+  	Appointment appt = apptManager.getAppointment(info, bill.getAppointmentNo());
+  %>
+  <tr bgcolor="#EEEEFF">
+        <td></td>
+        <td class="bCellData">
+            Site:
+            <select id="site-select">
+                <option value="-1">Select Site</option>
+                <% for (Site site : sites) {
+                    boolean isSelected = allFields.getProperty("facilityNo").equals(site.getBcFacilityNumber());
+                    boolean isDisabled = !isSelected && !siteIds.contains(site.getId());
+                %>
+                <option value="<%=site.getId()%>" <%=isSelected ? " selected" : ""%> <%=isDisabled ? " disabled" : ""%>><%=site.getName()%></option>
+                <% } %>
+            </select>
+        </td>
+  </tr>
+  <% }%>
   <tr>
    <%visittype = allFields.getProperty("serviceLocation");%>
     <td width="54%"  class="bCellData">
@@ -658,10 +718,8 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
        </tr>
        <tr>
 
-
-
             <td class="bCellData">Facility Number
-            <input type="text" name="facilityNum" value="<%=allFields.getProperty("facilityNo")%>" size="5" maxlength="5"/></td>
+            <input type="text" name="facilityNum" id= facility-number value="<%=allFields.getProperty("facilityNo")%>" size="5" maxlength="5"/></td>
 
             <td class="bCellData">Facility Sub Number
             <input type="text" name="facilitySubNum" value="<%=allFields.getProperty("facilitySubNo")%>" size="5" maxlength="5"/></td>
@@ -944,63 +1002,7 @@ if(billService != null){
   </script>
   <div id="wcbForms"></div>
 
-
-
-
-
-       <!--<tr>
-            <td>Facility Num</td><%! /*FACILITY-NUM*/ %>
-            <td><input type="text" name="facilityNum" value="<%=allFields.getProperty("facilityNo")%>" size="5"/></td>
-            <td>Facility Sub Num</td><%! /*FACILITY-SUB-NUM*/%>
-            <td><input type="text" name="facilitySubNum" value="<%=allFields.getProperty("facilitySubNo")%>" size="5"/></td>
-       </tr>-->
-
-       <!--<tr>
-
-
-            <td>Registration Num</td><%!/*OIN-REGISTRATION-NUM*/%>
-            <td><input type="text" name="registrationNum" value="<%=allFields.getProperty("oinRegistrationNo")%>" size="12"/></td>
-       </tr>-->
-       <!--
-       <tr>
-            <td>First Name</td><%/*OIN-FIRST-NAME*/%>
-            <td><input type="text" name="firstName" value="<%=allFields.getProperty("oinFirstName")%>" size="12"/></td>
-
-            <td>Surname</td><%/*OIN-SURNAME*/%>
-            <td><input type="text" name="surname" value="<%=allFields.getProperty("oinSurname")%>" size="18"/></td>
-       </tr>
-       <tr>
-            <td>SEX</td>
-            <td><input type="text" name="sex" value="<%=allFields.getProperty("oinSexCode")%>" size="1"/></td>
-            <td>Birth date</td><%/*OIN-BIRTHDATE*/%>
-            <td><input type="text" name="birthdate" value="<%=allFields.getProperty("oinBirthdate")%>" size="8"/></td>
-       </tr>
-       <tr>
-
-            <td>Address 1 WCB Date Of Injury</td><%/*OIN-ADDRESS-1		WCB DATE OF INJURY*/%>
-            <td colspan="3"><input type="text" name="address1" value="<%=allFields.getProperty("oinAddress")%>" size="25"/></td>
-       </tr>
-       <tr>
-            <td>Address 2 WCB AREA OF INJURY</td><%/*OIN-ADDRESS-2 WCB AREA OF INJURY ANATOMICAL-POSITION*/%>
-            <td colspan="3"><input type="text" name="address2" value="<%=allFields.getProperty("oinAddress2")%>" size="25"/></td>
-       </tr>
-       <tr>
-            <Td>Address 3 WCB NATURE OF INJURY</td><%/*OIN-ADDRESS-3 WCB NATURE OF INJURY*/%>
-            <td colspan="3"><input type="text" name="address3" value="<%=allFields.getProperty("oinAddress3")%>" size="25" /></td>
-       </tr>
-       <tr>
-            <td>Address 4 WCB Claim Number</td><%/*OIN-ADDRESS-4 WCB CLAIM NUMBER*/%>
-            <td colspan="3"><input type="text" name="address4" value="<%=allFields.getProperty("oinAddress4")%>" size="25" /></td>
-       </tr>
-       <tr>
-            <td>Postal Code</td><%/*OIN-POSTAL-CODE*/%>
-            <td colspan="3"><input type="text" name="postalCode" value="<%=allFields.getProperty("oinPostalcode")%>" size="6"/></td>
-        </tr>
--->
-
-
-
-<input type="hidden" value="0" name="saveandclose"/>
+    <input type="hidden" value="0" name="saveandclose"/>
 
  <%
  if(!BillType.equals("S")){
