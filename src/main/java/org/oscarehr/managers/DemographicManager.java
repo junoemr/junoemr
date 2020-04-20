@@ -860,6 +860,12 @@ public class DemographicManager {
 		else if (ConversionUtils.fromIntString(demographic.getYearOfBirth()) == 0)
 		{
 			error_string += "yearOfBirth should be should be a numeric value. ";
+			has_error = true;
+		}
+		else if (demographic.getYearOfBirth().length() != 4)
+		{
+			error_string += "yearOfBirth is expected to be a 4-digit number.";
+			has_error = true;
 		}
 
 		if (demographic.getMonthOfBirth() == null)
@@ -867,9 +873,11 @@ public class DemographicManager {
 			error_string += "monthOfBirth is a required field.  ";
 			has_error = true;
 		}
-		else if (ConversionUtils.fromIntString(demographic.getMonthOfBirth()) <= 0 || ConversionUtils.fromIntString(demographic.getMonthOfBirth()) > 12)
+		else if (ConversionUtils.fromIntString(demographic.getMonthOfBirth()) <= 0
+				|| ConversionUtils.fromIntString(demographic.getMonthOfBirth()) > 12)
 		{
 			error_string += "monthOfBirth should be a number between 1 and 12. ";
+			has_error = true;
 		}
 
 		if (demographic.getDateOfBirth() == null)
@@ -880,6 +888,13 @@ public class DemographicManager {
 		else if (ConversionUtils.fromIntString(demographic.getDateOfBirth()) <= 0)
 		{
 			error_string += "dateOfBirth should be a numeric value. ";
+			has_error = true;
+		}
+		else if (ConversionUtils.fromIntString(demographic.getDateOfBirth()) <= 1
+		|| ConversionUtils.fromIntString(demographic.getDateOfBirth()) >= 31)
+		{
+			error_string += "dateOfBirth should be a number between 1 and 31 (depending on month).";
+			has_error = true;
 		}
 
 		// Ensure that the proposed date is actually a valid date
