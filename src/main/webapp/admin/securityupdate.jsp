@@ -30,6 +30,7 @@
 <%
     String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
     boolean authed=true;
+    String providerNo = (String)request.getAttribute("provider_no");
 %>
 <security:oscarSec roleName="<%=roleName$%>"
         objectName="_admin,_admin.userAdmin" rights="r"
@@ -54,8 +55,10 @@
 <%@ page import="oscar.OscarProperties" %>
 <%@ page import="oscar.Misc" %>
 <%@ page import="oscar.MyDateFormat" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
 <%
 	SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
+	SecurityInfoManager securityInfoManager =SpringUtils.getBean(SecurityInfoManager.class);
 %>
 
 <html:html locale="true">
@@ -93,6 +96,10 @@
 
 	Security overlappingEntry = securityDao.findByUserName(username);
 	Security security = securityDao.find(Integer.parseInt(request.getParameter("security_no")));
+
+	try
+	{
+		securityInfoManager.superAdminModificationCheck((String)session.getAttribute("user"), request.getParameter("provider_no"));
 
 	if(security != null && (overlappingEntry == null || security.equals(overlappingEntry)))
 	{
@@ -148,6 +155,13 @@
 <h1><bean:message key="admin.securityupdate.msgUpdateFailure" /><%= request.getParameter("provider_no") %>.</h1>
 <%
   }
+	}
+	catch (Exception e)
+	{
+	%>
+		<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization" /></h1>
+	<%
+	}
 %>
 
 </center>

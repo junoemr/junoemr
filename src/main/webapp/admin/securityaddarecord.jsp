@@ -322,6 +322,7 @@
 		</div>
 		</td>
 	</tr>
+	<input type="hidden" name="current_user" id="current_user" value="<%=curProvider_no%>"/>
 </table>
 </form>
 

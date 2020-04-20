@@ -59,6 +59,7 @@ public class ProgramProviderRoleAction extends DispatchAction
 		{
 			logger.error("Error", e);
 			request.setAttribute("message", "Failed to assign provider role");
+			request.setAttribute("messageNotAuthorized", "true");
 			return mapping.findForward("failure");
 		}
 		return mapping.findForward("success");

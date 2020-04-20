@@ -69,7 +69,7 @@
 
 <%
 	String msg = StringUtils.trimToEmpty((String)request.getAttribute("message"));
-
+	boolean unauthorizedMSG = "true".equals(request.getAttribute("messageNotAuthorized"));
 	// get role from database
 	List<SecRole> secRoles;
 	String[] omitList = null;
@@ -105,13 +105,23 @@
 <html>
 <head>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/admin.js"></script>
 	<title>
 		PROVIDER
 	</title>
 	<link rel="stylesheet" href="../css/receptionistapptstyle.css">
 	<script src="../js/jquery-1.7.1.min.js"></script>
 
-	<script>
+	<script defer>
+	 	<%
+		if(unauthorizedMSG)
+		{
+		%>
+			showUnauthorizedUserMSG();
+	 	<%
+		}
+		%>
+
 		function setfocus()
 		{
 			this.focus();
@@ -168,17 +178,15 @@
 			}
 		}
 
-		function updateProviderRoles(form, actionMethod, isClickedAccountSuperAdmin)
+		function updateProviderRoles(form, actionMethod, isClickedProviderSuperAdmin)
 		{
-			var isCurrentLoginSuperAdmin = <%=isCurrentLoginSuperAdmin%>;
-
-			if (isClickedAccountSuperAdmin && !isCurrentLoginSuperAdmin)
+			var isLoginUserSuperAdmin = <%=isCurrentLoginSuperAdmin%>;
+			var result = adminUpdateProviderSetting(isLoginUserSuperAdmin, isClickedProviderSuperAdmin);
+			if (result)
 			{
-				alert("You are trying to modify a system user. This user cannot be modified.");
-				return false;
+				form.action = "providerRole.do?method=" + actionMethod;
 			}
-			form.action = "providerRole.do?method=" + actionMethod;
-			return true;
+			return result;
 		}
 	</script>
 

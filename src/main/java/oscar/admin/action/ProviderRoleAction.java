@@ -81,6 +81,7 @@ public class ProviderRoleAction extends DispatchAction
 			LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_FAILURE,
 					null, ip, providerId + "|" + roleNew);
 			request.setAttribute("message", "Role " + roleNew + " <font color='red'>NOT</font> added!!! (" + providerId + ")");
+			request.setAttribute("messageNotAuthorized", "true");
 			return mapping.findForward("failure");
 		}
 		return mapping.findForward("success");
@@ -116,6 +117,7 @@ public class ProviderRoleAction extends DispatchAction
 			LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_FAILURE,
 					roleId, ip, providerId + "|" + roleOld);
 			request.setAttribute("message", "Role " + roleOld + " is <font color='red'>NOT</font> updated!!! (" + providerId + ")");
+			request.setAttribute("messageNotAuthorized", "true");
 			return mapping.findForward("failure");
 		}
 
@@ -153,6 +155,7 @@ public class ProviderRoleAction extends DispatchAction
 			LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_FAILURE,
 					roleId, ip, providerId + "|" + roleOld);
 			request.setAttribute("message", "Role " + roleOld + " is <font color='red'>NOT</font> deleted!!! (" + providerId + ")");
+			request.setAttribute("messageNotAuthorized", "true");
 			return mapping.findForward("failure");
 		}
 		return mapping.findForward("success");

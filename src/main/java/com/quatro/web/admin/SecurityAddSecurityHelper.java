@@ -31,6 +31,7 @@ import javax.servlet.jsp.PageContext;
 
 import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.model.Security;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -45,7 +46,7 @@ import oscar.log.LogConst;
 public class SecurityAddSecurityHelper {
 
 	private SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
-
+	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	/**
 	 * Adds a security record (i.e. user login information) for the provider.
 	 * <p/>
@@ -83,6 +84,14 @@ public class SecurityAddSecurityHelper {
 
 		boolean isUserAlreadyExists = securityDao.findByUserName(request.getParameter("user_name")) != null;
 		if (isUserAlreadyExists) return "admin.securityaddsecurity.msgAdditionFailureDuplicate";
+		try
+		{
+			securityInfoManager.superAdminModificationCheck(request.getParameter("current_user"),request.getParameter("provider_no"));
+		}
+		catch (Exception e)
+		{
+			return "admin.securityaddsecurity.msgProviderNoAuthorization";
+		}
 
 		Security s = new Security();
 		s.setUserName(request.getParameter("user_name"));

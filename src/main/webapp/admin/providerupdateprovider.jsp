@@ -77,6 +77,7 @@
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/admin.js"></script>
 <title><bean:message key="admin.providerupdateprovider.title" /></title>
 <link rel="stylesheet" href="../web.css">
 <script LANGUAGE="JavaScript">
@@ -107,13 +108,13 @@ jQuery(document).ready( function() {
         
         
  ); 
-
 //-->
 </script>
 </head>
 
 <%
     String curProvider_no = (String) session.getAttribute("user");
+    ProviderData currentProvider = providerDao.findByProviderNo(curProvider_no);
     List<Integer> siteIDs = new ArrayList<Integer>();
     boolean isSiteAccessPrivacy=false;
 %>
@@ -147,7 +148,6 @@ jQuery(document).ready( function() {
 <%
 	String keyword = request.getParameter("keyword");
 	ProviderData provider = providerDao.findByProviderNo(keyword);
-	
 	SecurityDao securityDao = (SecurityDao) SpringUtils.getBean("securityDao");
 	List<Security>  results = securityDao.findByProviderNo(provider.getId());
 	Security security = null;
@@ -564,7 +564,10 @@ for (int i=0; i<sites.size(); i++) {
 		<td colspan="2">
 		<div align="center"><input type="submit"
 			name="subbutton"
-			value="<bean:message key="admin.providerupdateprovider.btnSubmit"/>">
+			value="<bean:message key="admin.providerupdateprovider.btnSubmit"/>"
+			onclick="return adminUpdateProviderSetting(<%= currentProvider.isSuperAdmin()%>,<%= provider.isSuperAdmin()%>);"
+		>
+			<input type="hidden" name="current_user" value="<%=curProvider_no%>">
 		</div>
 		</td>
 	</tr>

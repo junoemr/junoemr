@@ -59,6 +59,7 @@ if(!authed) {
 <%@page import="org.oscarehr.common.model.UserProperty"%>
 <%@page import="org.apache.commons.beanutils.BeanUtils"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
 	ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
@@ -90,6 +91,8 @@ if(!authed) {
   String  errMsgProviderFormalize = "admin.provideraddrecord.msgAdditionFailure";
   Integer min_value = 0;
   Integer max_value = 0;
+
+	SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
   if (org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable()) {
 
@@ -147,6 +150,11 @@ if(!authed) {
   	}
 
   }
+
+	try
+	{
+		securityInfoManager.superAdminModificationCheck(request.getParameter("current_user"),request.getParameter("provider_no"));
+
 
   if (!org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable() || isProviderFormalize) {
     ProviderArchiveDao providerArchiveDao = (ProviderArchiveDao)SpringUtils.getBean("providerArchiveDao");
@@ -249,6 +257,15 @@ else {
 	<%
 	}
 }
+
+		}
+		catch (Exception e)
+		{
+			%>
+
+			<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization" /><%= request.getParameter("provider_no") %>.</h1>
+			<%
+		}
 %>
 <p></p>
 
