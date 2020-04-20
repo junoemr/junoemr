@@ -1030,7 +1030,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                                         <font color="red"><%= ackStatus %></font>
                                                                         <% if ( ackStatus.equals("Acknowledged") ) { %>
                                                                             <%= report.getTimestamp() %>,
-                                                                            <%= ( report.getComment().equals("") ? "no comment" : "comment : "+report.getComment() ) %>
+                                                                            <%= ( report.getComment() == null || report.getComment().isEmpty() ? "no comment" : "comment : " + report.getComment() ) %>
                                                                         <% } %>
                                                                         <br>
                                                                     <% }
