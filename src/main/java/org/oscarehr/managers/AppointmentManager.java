@@ -328,8 +328,8 @@ public class AppointmentManager {
 			editRecord.setCreator(archive.getCreator());
 			editRecord.setProviderNo(archive.getProviderNo());
 			editRecord.setLastUpdateUser(archive.getLastUpdateUser());
-			editRecord.setCreateDateTime(archive.getCreateDateTime()==null ? null : ConversionUtils.toLocalDateTime(archive.getCreateDateTime()));
-			editRecord.setUpdateDateTime(archive.getUpdateDateTime()==null ? null : ConversionUtils.toLocalDateTime(archive.getUpdateDateTime()));
+			editRecord.setCreateDateTime(ConversionUtils.toNullableLocalDateTime(archive.getCreateDateTime()));
+			editRecord.setUpdateDateTime(ConversionUtils.toNullableLocalDateTime(archive.getUpdateDateTime()));
 			editRecord.setAppointmentDate(
 					LocalDateTime.of(ConversionUtils.toLocalDateTime(archive.getAppointmentDate()).toLocalDate(),
 							ConversionUtils.toLocalDateTime(archive.getStartTime()).toLocalTime())
@@ -358,8 +358,8 @@ public class AppointmentManager {
 		editRecord.setCreator(currentRecord.getCreator());
 		editRecord.setProviderNo(currentRecord.getProviderNo());
 		editRecord.setLastUpdateUser(currentRecord.getLastUpdateUser());
-		editRecord.setCreateDateTime(currentRecord.getCreateDateTime()==null ? null : ConversionUtils.toLocalDateTime(currentRecord.getCreateDateTime()));
-		editRecord.setUpdateDateTime(currentRecord.getUpdateDateTime()==null ? null : ConversionUtils.toLocalDateTime(currentRecord.getUpdateDateTime()));
+		editRecord.setCreateDateTime(ConversionUtils.toNullableLocalDateTime(currentRecord.getCreateDateTime()));
+		editRecord.setUpdateDateTime(ConversionUtils.toNullableLocalDateTime(currentRecord.getUpdateDateTime()));
 		editRecord.setAppointmentDate(
 				LocalDateTime.of(ConversionUtils.toLocalDateTime(currentRecord.getAppointmentDate()).toLocalDate(),
 						ConversionUtils.toLocalDateTime(currentRecord.getStartTime()).toLocalTime())
