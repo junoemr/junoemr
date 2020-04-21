@@ -369,7 +369,8 @@ public class ClinicaidAPIService
 
 				ProviderData providerData = providerService.getProviderEager(provider_no);
 
-				String facilityNumber = null;
+				// Default facility number
+				String facilityNumber = "00000";
 
 				if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
 				{
@@ -393,17 +394,14 @@ public class ClinicaidAPIService
 				}
 				else
 				{
-					if (providerData.getBillingOpts().getBcBCPEligible())
+					if (providerData.getBillingOpts() != null && providerData.getBillingOpts().getBcBCPEligible())
 					{
 						Clinic clinic = clinicDAO.getClinic();
 						facilityNumber = clinic.getBcFacilityNumber();
 					}
 				}
 
-				if (facilityNumber != null)
-				{
-					data.put("facility_number", StringUtils.trimToEmpty(facilityNumber));
-				}
+				data.put("facility_number", StringUtils.trimToEmpty(facilityNumber));
 			}
 
 			clinicaidLink = clinicaidLink + "/?nonce=" + nonce +
