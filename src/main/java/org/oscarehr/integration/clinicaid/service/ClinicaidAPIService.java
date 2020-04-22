@@ -369,6 +369,7 @@ public class ClinicaidAPIService
 
 				ProviderData providerData = providerService.getProviderEager(provider_no);
 
+				// Default facility number
 				String facilityNumber = null;
 
 				if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
@@ -393,7 +394,7 @@ public class ClinicaidAPIService
 				}
 				else
 				{
-					if (providerData.getBillingOpts().getBcBCPEligible())
+					if (providerData.getBillingOpts() != null && providerData.getBillingOpts().getBcBCPEligible())
 					{
 						Clinic clinic = clinicDAO.getClinic();
 						facilityNumber = clinic.getBcFacilityNumber();

@@ -73,15 +73,7 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter("providerNo", providerNo);
 
-		@SuppressWarnings("unchecked")
-		List<ProviderData> results = query.getResultList();
-
-		if (results.size() > 0)
-		{
-			return results.get(0);
-		}
-
-		return null;
+		return getSingleResultOrNull(query);
 	}
 
 	public ProviderData eagerFindByProviderNo(String providerNo) {
@@ -91,15 +83,7 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter("providerNo", providerNo);
 
-		@SuppressWarnings("unchecked")
-		List<ProviderData> results = query.getResultList();
-
-		if (results.size() > 0)
-		{
-			return results.get(0);
-		}
-
-		return null;
+		return getSingleResultOrNull(query);
 	}
 
 	public List<ProviderData> findByProviderNo(String providerNo, String status, int limit, int offset) {
