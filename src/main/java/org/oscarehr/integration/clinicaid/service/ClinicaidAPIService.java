@@ -370,7 +370,7 @@ public class ClinicaidAPIService
 				ProviderData providerData = providerService.getProviderEager(provider_no);
 
 				// Default facility number
-				String facilityNumber = "00000";
+				String facilityNumber = null;
 
 				if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
 				{
