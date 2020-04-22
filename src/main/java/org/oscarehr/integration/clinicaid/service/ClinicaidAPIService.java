@@ -401,7 +401,10 @@ public class ClinicaidAPIService
 					}
 				}
 
-				data.put("facility_number", StringUtils.trimToEmpty(facilityNumber));
+				if (facilityNumber != null)
+				{
+					data.put("facility_number", StringUtils.trimToEmpty(facilityNumber));
+				}
 			}
 
 			clinicaidLink = clinicaidLink + "/?nonce=" + nonce +
