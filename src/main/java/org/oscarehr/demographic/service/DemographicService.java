@@ -55,8 +55,10 @@ import oscar.util.ConversionUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service("demographic.service.DemographicService")
 @Transactional
@@ -304,6 +306,15 @@ public class DemographicService
 		}
 
 		return result;
+	}
+
+	public List<String> getInactiveDemographicStatuses()
+	{
+		String inactiveStatusString = OscarProperties.getInstance().getProperty("inactive_statuses");
+		List<String> inactiveStatuses = Arrays.asList(inactiveStatusString.split(","));
+		return inactiveStatuses.stream()
+						.map((status) -> status.trim().substring(1, status.length() -1))
+						.collect(Collectors.toList());
 	}
 
 	public Demographic addNewDemographicRecord(String providerNoStr, DemographicTransferInbound demographicTransferInbound)

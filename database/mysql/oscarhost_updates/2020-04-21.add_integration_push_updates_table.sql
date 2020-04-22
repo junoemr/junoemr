@@ -14,5 +14,5 @@ CREATE TABLE IF NOT EXISTS integration_push_update(
   sent_at datetime,
   json_data text NOT NULL,
 
-  CHECK (JSON_VALID(json_data)));
-
+  CHECK (JSON_VALID(json_data)),
+  INDEX idx_status (status));
