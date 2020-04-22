@@ -99,6 +99,11 @@ public class IntegrationPushUpdateService
 
 	public void queuePatientConnectionUpdate(Integer securityNo, Integer demographicId, Boolean rejected) throws JsonProcessingException
 	{
+		if (!integrationService.hasMyHealthAccessIntegration())
+		{// no mha integrations configured
+			return;
+		}
+
 		ObjectMapper mapper = new ObjectMapper();
 		PatientConnectionTo1 patientConnectionTo1 = new PatientConnectionTo1(securityNo, demographicId, rejected);
 

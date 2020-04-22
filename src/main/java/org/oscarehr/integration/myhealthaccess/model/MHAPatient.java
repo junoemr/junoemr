@@ -92,7 +92,7 @@ public class MHAPatient
 	{
 		BeanUtils.copyProperties(patientTo1, this, "addressProvinceCode", "healthCareProvinceCode");
 		this.healthCareProvinceCode = PROVINCE_CODES.valueOf(patientTo1.getHealthCareProvinceCode());
-		this.addressProvinceCode 		= PROVINCE_CODES.valueOf(patientTo1.getAddressProvinceCode());
+		this.addressProvinceCode = PROVINCE_CODES.valueOf(patientTo1.getAddressProvinceCode());
 	}
 
 	public String getId()

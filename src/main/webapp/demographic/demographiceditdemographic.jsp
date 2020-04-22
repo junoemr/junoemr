@@ -288,8 +288,6 @@ if(!authed) {
 <%@ page import="java.sql.ResultSet" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
 <%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
-<%@ page import="org.oscarehr.integration.myhealthaccess.service.PatientService" %>
-<%@ page import="org.oscarehr.integration.myhealthaccess.model.MHAPatient" %>
 <html:html locale="true">
 
 <head>
