@@ -44,8 +44,10 @@ import javax.persistence.TemporalType;
 import java.io.Serializable;
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -839,5 +841,24 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public boolean isNewBorn()
 	{
 		return Demographic.isNewBorn(getDateOfBirth(), getVer());
+	}
+
+	/**
+	 * checks if the demographic is active
+	 * @return - true if active, false otherwise
+	 */
+	public boolean isActive()
+	{
+		String inactiveStatusString = OscarProperties.getInstance().getProperty("inactive_statuses", "IN, DE, IC, ID, MO, FI");
+		if (inactiveStatusString != null)
+		{
+			List<String> inactiveStatuses = Arrays.asList(inactiveStatusString.split(","));
+			inactiveStatuses = inactiveStatuses.stream()
+							.map((status) -> status.trim().substring(1, status.length() -1))
+							.collect(Collectors.toList());
+			return !inactiveStatuses.contains(this.getPatientStatus());
+		}
+
+		return !this.getPatientStatus().equals("IN");
 	}
 }

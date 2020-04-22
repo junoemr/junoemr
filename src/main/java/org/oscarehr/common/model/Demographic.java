@@ -37,13 +37,16 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * This is the object class that relates to the demographic table. Any customizations belong here.
@@ -1570,4 +1573,23 @@ public class Demographic implements Serializable
 		return org.oscarehr.demographic.model.Demographic.isNewBorn(birthday, getVer());
 	}
 
+	/**
+	 * checks if the demographic is active. Not to be confused with "isActive"
+	 * which is completely different.
+	 * @return - true if active false otherwise.
+	 */
+	public boolean isPatientActive()
+	{
+		String inactiveStatusString = OscarProperties.getInstance().getProperty("inactive_statuses", "IN, DE, IC, ID, MO, FI");
+		if (inactiveStatusString != null)
+		{
+			List<String> inactiveStatuses = Arrays.asList(inactiveStatusString.split(","));
+			inactiveStatuses = inactiveStatuses.stream()
+							.map((status) -> status.trim().substring(1, status.length() -1))
+							.collect(Collectors.toList());
+			return !inactiveStatuses.contains(this.getPatientStatus());
+		}
+
+		return !this.getPatientStatus().equals("IN");
+	}
 }

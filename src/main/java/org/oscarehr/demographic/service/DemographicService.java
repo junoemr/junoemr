@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographic.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
@@ -34,8 +35,11 @@ import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.model.DemographicIntegration;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
+
+import org.oscarehr.integration.service.IntegrationPushUpdateService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
@@ -64,6 +68,10 @@ public class DemographicService
 	@Autowired
 	private DemographicDao demographicDao;
 
+	// ONLY FOR LEGACY SUPPORT. DO NOT USE
+	@Autowired
+	private org.oscarehr.common.dao.DemographicDao legacyDemographicDoa;
+
 	@Autowired
 	private DemographicIntegrationDao demographicIntegrationDao;
 
@@ -75,6 +83,9 @@ public class DemographicService
 
 	@Autowired
 	private AdmissionDao admissionDao;
+
+	@Autowired
+	private IntegrationPushUpdateService integrationPushUpdateService;
 
 	public enum SEARCH_MODE
 	{
@@ -365,13 +376,38 @@ public class DemographicService
 	/**
 	 * Apply a demographic update (save changes to demo + create a demographic archive record)
 	 * @param demo - the demographic to update.
+	 * @param loggedInInfo - logged in info
 	 * @return - the updated demographic (un changed object, save that it has been persisted to the database)
 	 */
-	public Demographic updateDemographicRecord(Demographic demo)
+	public Demographic updateDemographicRecord(Demographic demo, LoggedInInfo loggedInInfo)
 	{
 		archiveDemographicRecord(demo);
 		demographicDao.merge(demo);
+
+		updateMHAPatientConnectionStatus(demo.getId(), loggedInInfo, !demo.isActive());
+
 		return demo;
+	}
+
+	/**
+	 * DO NOT USE IN NEW CODE.
+	 * Provides legacy saving support for old demographic objects
+	 * @param demographic - legacy demographic to save
+	 * @param extensions - extension entries to archive.
+	 * @param loggedInInfo - logged in info
+	 * @return - the save demographic
+	 */
+	public org.oscarehr.common.model.Demographic updateLegacyDemographicRecord(org.oscarehr.common.model.Demographic demographic,
+																																						 List<DemographicExt> extensions,
+																																						 LoggedInInfo loggedInInfo)
+	{
+		Long archiveId = demographicArchiveDao.archiveRecord(demographic);
+		legacyDemographicDoa.save(demographic);
+		demographicManager.saveAndArchiveDemographicExt(archiveId, extensions);
+
+		updateMHAPatientConnectionStatus(demographic.getDemographicNo(), loggedInInfo, !demographic.isPatientActive());
+
+		return demographic;
 	}
 
 	public void addDemographicIntegrationRecord(Integer demographicNo, DemographicIntegrationTransfer transfer)
@@ -386,5 +422,24 @@ public class DemographicService
 		integrationRecord.setUpdatedAt(new Date());
 
 		demographicIntegrationDao.persist(integrationRecord);
+	}
+
+	/**
+	 * Update MHA patient connection status with clinic.
+	 * @param demographicId - the demographic to update
+	 * @param loggedInInfo - logged in info
+	 * @param rejected - whether or not to reject / un-reject the patient's connection
+	 */
+	public void updateMHAPatientConnectionStatus(Integer demographicId, LoggedInInfo loggedInInfo, Boolean rejected)
+	{
+		try
+		{
+			integrationPushUpdateService.queuePatientConnectionUpdate(loggedInInfo.getLoggedInSecurity().getSecurityNo(),
+							demographicId, rejected);
+		}
+		catch (JsonProcessingException e)
+		{
+			MiscUtils.getLogger().error("Error queuing MHA patient connection update, " + e.getMessage(), e);
+		}
 	}
 }
