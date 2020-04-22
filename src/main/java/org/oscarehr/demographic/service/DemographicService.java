@@ -46,6 +46,7 @@ import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransfer
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicIntegrationTransfer;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -317,6 +318,23 @@ public class DemographicService
 						.collect(Collectors.toList());
 	}
 
+	/**
+	 * Create a modern demographic object from a legacy demographic object.
+	 * @param legacyDemographic - legacy demographic object to convert
+	 * @return - modern demographic object
+	 */
+	public Demographic demographicFromLegacyDemographic(org.oscarehr.common.model.Demographic legacyDemographic)
+	{
+		Demographic demographic = new Demographic();
+		String[] ignoreList = {"demographicNo", "dateOfBirth"};
+
+		BeanUtils.copyProperties(legacyDemographic, demographic, ignoreList);
+		demographic.setDemographicId(legacyDemographic.getDemographicNo());
+		demographic.setDayOfBirth(legacyDemographic.getDateOfBirth());
+
+		return demographic;
+	}
+
 	public Demographic addNewDemographicRecord(String providerNoStr, DemographicTransferInbound demographicTransferInbound)
 	{
 		Demographic demographic = DemographicConverter.getAsDomainObject(demographicTransferInbound);
@@ -347,6 +365,7 @@ public class DemographicService
 		}
 		return demographic;
 	}
+
 	private void addNewDemographicRecord(String providerNoStr, Demographic demographic)
 	{
 		addNewDemographicRecord(providerNoStr, demographic, programManager.getDefaultProgramId());
@@ -386,18 +405,19 @@ public class DemographicService
 
 	/**
 	 * Apply a demographic update (save changes to demo + create a demographic archive record)
-	 * @param demo - the demographic to update.
+	 * @param demographic - the demographic to update.
 	 * @param loggedInInfo - logged in info
 	 * @return - the updated demographic (un changed object, save that it has been persisted to the database)
 	 */
-	public Demographic updateDemographicRecord(Demographic demo, LoggedInInfo loggedInInfo)
+	public Demographic updateDemographicRecord(Demographic demographic, LoggedInInfo loggedInInfo)
 	{
-		archiveDemographicRecord(demo);
-		demographicDao.merge(demo);
+		Demographic oldDemographic = demographicDao.find(demographic.getId());
+		archiveDemographicRecord(oldDemographic);
 
-		updateMHAPatientConnectionStatus(demo.getId(), loggedInInfo, !demo.isActive());
+		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
 
-		return demo;
+		demographicDao.merge(demographic);
+		return demographic;
 	}
 
 	/**
@@ -412,11 +432,12 @@ public class DemographicService
 																																						 List<DemographicExt> extensions,
 																																						 LoggedInInfo loggedInInfo)
 	{
-		Long archiveId = demographicArchiveDao.archiveRecord(demographic);
+		org.oscarehr.common.model.Demographic oldDemographic = legacyDemographicDoa.getDemographicById(demographic.getDemographicNo());
+		Long archiveId = demographicArchiveDao.archiveRecord(oldDemographic);
 		legacyDemographicDoa.save(demographic);
 		demographicManager.saveAndArchiveDemographicExt(archiveId, extensions);
 
-		updateMHAPatientConnectionStatus(demographic.getDemographicNo(), loggedInInfo, !demographic.isPatientActive());
+		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
 
 		return demographic;
 	}
@@ -433,6 +454,32 @@ public class DemographicService
 		integrationRecord.setUpdatedAt(new Date());
 
 		demographicIntegrationDao.persist(integrationRecord);
+	}
+
+	/**
+	 * compatibility wrapper for queueMHAPatientUpdates that converts legacy demographics.
+	 * @see #queueMHAPatientUpdates
+	 */
+	public void queueMHAPatientUpdates(org.oscarehr.common.model.Demographic updatedDemographic,
+																		 org.oscarehr.common.model.Demographic oldDemographic,
+																		 LoggedInInfo loggedInInfo)
+	{
+		queueMHAPatientUpdates(demographicFromLegacyDemographic(updatedDemographic),
+						demographicFromLegacyDemographic(oldDemographic), loggedInInfo);
+	}
+
+	/**
+	 * queue any necessary MHA push updates based on the change of the demographic record.
+	 * @param updatedDemographic - the updated demographic record
+	 * @param oldDemographic - the old demographic record
+	 * @param loggedInInfo - logged in info
+	 */
+	public void queueMHAPatientUpdates(Demographic updatedDemographic, Demographic oldDemographic, LoggedInInfo loggedInInfo)
+	{
+		if (!updatedDemographic.getPatientStatus().equals(oldDemographic.getPatientStatus()))
+		{// patient status change
+			updateMHAPatientConnectionStatus(updatedDemographic.getId(), loggedInInfo, !updatedDemographic.isActive());
+		}
 	}
 
 	/**

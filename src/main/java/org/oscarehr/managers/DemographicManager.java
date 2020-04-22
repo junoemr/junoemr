@@ -332,7 +332,7 @@ public class DemographicManager {
 		demographicDao.save(demographic);
 
 		// update MyHealthAccess connection status.
-		demographicService.updateMHAPatientConnectionStatus(demographic.getDemographicNo(), loggedInInfo, !demographic.isPatientActive());
+		demographicService.queueMHAPatientUpdates(demographic, prevDemo, loggedInInfo);
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
