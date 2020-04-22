@@ -70,6 +70,19 @@ public class MHAPatient
 		NU
 	}
 
+	public static boolean isValidProvinceCode(String provinceCode)
+	{
+		for (PROVINCE_CODES validProvinceCode : PROVINCE_CODES.values())
+		{
+			if (validProvinceCode.name().equals(provinceCode))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public MHAPatient()
 	{
 
