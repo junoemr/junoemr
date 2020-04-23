@@ -847,7 +847,7 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@PreUpdate
 	private void removeControlCharacter()
 	{
-		setPhone(oscar.util.StringUtils.filteroutControlCharacters(getPhone()));
-		setPhone2(oscar.util.StringUtils.filteroutControlCharacters(getPhone2()));
+		setPhone(oscar.util.StringUtils.filterControlCharacters(getPhone()));
+		setPhone2(oscar.util.StringUtils.filterControlCharacters(getPhone2()));
 	}
 }
