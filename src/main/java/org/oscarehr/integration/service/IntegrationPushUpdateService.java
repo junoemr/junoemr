@@ -177,8 +177,10 @@ public class IntegrationPushUpdateService
 		{
 			case APPOINTMENT_CACHE:
 				handleAppointmentUpdate(mapper, update);
+				break;
 			case PATIENT_CONNECTION:
 				handlePatientConnectionUpdate(mapper, update);
+				break;
 		}
 	}
 
