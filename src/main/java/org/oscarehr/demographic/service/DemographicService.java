@@ -73,7 +73,7 @@ public class DemographicService
 
 	// ONLY FOR LEGACY SUPPORT. DO NOT USE
 	@Autowired
-	private org.oscarehr.common.dao.DemographicDao legacyDemographicDoa;
+	private org.oscarehr.common.dao.DemographicDao legacyDemographicDao;
 
 	@Autowired
 	private DemographicIntegrationDao demographicIntegrationDao;
@@ -429,12 +429,12 @@ public class DemographicService
 	 * @return - the save demographic
 	 */
 	public org.oscarehr.common.model.Demographic updateLegacyDemographicRecord(org.oscarehr.common.model.Demographic demographic,
-																																						 List<DemographicExt> extensions,
-																																						 LoggedInInfo loggedInInfo)
+																			   List<DemographicExt> extensions,
+																			   LoggedInInfo loggedInInfo)
 	{
-		org.oscarehr.common.model.Demographic oldDemographic = legacyDemographicDoa.getDemographicById(demographic.getDemographicNo());
+		org.oscarehr.common.model.Demographic oldDemographic = legacyDemographicDao.getDemographicById(demographic.getDemographicNo());
 		Long archiveId = demographicArchiveDao.archiveRecord(oldDemographic);
-		legacyDemographicDoa.save(demographic);
+		legacyDemographicDao.save(demographic);
 		demographicManager.saveAndArchiveDemographicExt(archiveId, extensions);
 
 		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
@@ -461,8 +461,8 @@ public class DemographicService
 	 * @see #queueMHAPatientUpdates
 	 */
 	public void queueMHAPatientUpdates(org.oscarehr.common.model.Demographic updatedDemographic,
-																		 org.oscarehr.common.model.Demographic oldDemographic,
-																		 LoggedInInfo loggedInInfo)
+									   org.oscarehr.common.model.Demographic oldDemographic,
+									   LoggedInInfo loggedInInfo)
 	{
 		queueMHAPatientUpdates(demographicFromLegacyDemographic(updatedDemographic),
 						demographicFromLegacyDemographic(oldDemographic), loggedInInfo);
