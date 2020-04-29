@@ -135,8 +135,6 @@ public class ProviderService extends AbstractServiceImpl {
     @Produces("application/json")
     public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON()
     {
-    	JsonConfig config = ProviderService.createJSONConfig();
-
     	List<ProviderTo1> providers = new ProviderConverter().getAllAsTransferObjects(getLoggedInInfo(), providerDao.getActiveProviders());
     	
     	AbstractSearchResponse<ProviderTo1> response = new AbstractSearchResponse<ProviderTo1>();
