@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
@@ -179,6 +180,7 @@ public class Provider implements Serializable, Comparable<Provider>{
 		return providerNo;
 	}
 
+	@JsonIgnore
 	public ProviderData getProvider()
 	{
 		ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
