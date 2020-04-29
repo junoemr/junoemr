@@ -67,7 +67,7 @@ public class AppointmentService extends BaseService
 
 	/**
 	 * book a telehealth appointment in MHA.
-	 * @param loggedInInfo - logged in ino
+	 * @param loggedInInfo - logged in info
 	 * @param appointment - the appointment to book.
 	 * @throws InvalidIntegrationException
 	 */
@@ -81,7 +81,33 @@ public class AppointmentService extends BaseService
 
 		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointmentSite).getToken();
 		String apiKey = getApiKey(appointmentSite);
-		AppointmentBookResponseTo1 appointmentBookResponseTo1 = postWithToken(formatEndpoint("/clinic_user/appointment/book"), apiKey, new AppointmentBookTo1(appointment), AppointmentBookResponseTo1.class, loginToken);
+		AppointmentBookResponseTo1 appointmentBookResponseTo1 = postWithToken(formatEndpoint("/clinic_user/appointment/book"),
+				apiKey, new AppointmentBookTo1(appointment), AppointmentBookResponseTo1.class, loginToken);
+		if (!appointmentBookResponseTo1.isSuccess())
+		{
+			throw new BookingException(appointmentBookResponseTo1.getMessage());
+		}
+	}
+
+	/**
+	 * book a one time telehealth appointment in MHA
+	 * @param loggedInInfo - logged in info
+	 * @param appointment - the appointment to book.
+	 * @param sendNotification - If true MHA will send a notification to the user. This notification will include the one time link.
+	 * @throws InvalidIntegrationException
+	 */
+	public void bookOneTimeTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, Boolean sendNotification) throws InvalidIntegrationException
+	{
+		String appointmentSite = null;
+		if (IsPropertiesOn.isMultisitesEnable())
+		{
+			appointmentSite = appointment.getLocation();
+		}
+
+		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointmentSite).getToken();
+		String apiKey = getApiKey(appointmentSite);
+		AppointmentBookResponseTo1 appointmentBookResponseTo1 = postWithToken(formatEndpoint("/clinic_user/appointment/book"),
+				apiKey, new AppointmentBookTo1(appointment, true, sendNotification), AppointmentBookResponseTo1.class, loginToken);
 		if (!appointmentBookResponseTo1.isSuccess())
 		{
 			throw new BookingException(appointmentBookResponseTo1.getMessage());

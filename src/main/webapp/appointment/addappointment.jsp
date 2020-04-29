@@ -873,6 +873,7 @@
 		<input type="hidden" name="fromAppt" value="1">
 		<input type="hidden" name="appointmentNo" value="">
 		<input type="hidden" name="operationType" value="<%=ApptUtil.APPOINTMENT_OP_TYPE.NONE%>">
+		<input type="hidden" name="sendBookingNotification" value="true">
 
 		<div class="header deep">
 			<div class="title">
@@ -1546,12 +1547,23 @@
 					}
 					else
 					{
-						jQuery("#telehealth-checkbox").attr("checked", false);
-						jQuery("#telehealth-checkbox").attr("disabled", true);
-						var msg = jQuery("#telehealth-message");
-						msg.css("visibility", "visible");
-						msg.css("color", "orange");
-						msg.html("Patient not connected to MyHealthAccess");
+						if ("<%=StringUtils.trimToEmpty(email)%>" != "")
+						{
+							jQuery("#telehealth-checkbox").attr("disabled", false);
+							var msg = jQuery("#telehealth-message");
+							msg.css("visibility", "visible");
+							msg.css("color", "green");
+							msg.html("One time telehealth avaialbe for this patient");
+						}
+						else
+						{
+							jQuery("#telehealth-checkbox").attr("checked", false);
+							jQuery("#telehealth-checkbox").attr("disabled", true);
+							var msg = jQuery("#telehealth-message");
+							msg.css("visibility", "visible");
+							msg.css("color", "orange");
+							msg.html("Patient not connected to MyHealthAccess");
+						}
 					}
 				}).catch((error) =>
 				{

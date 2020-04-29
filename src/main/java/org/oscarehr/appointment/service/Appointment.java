@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
+import org.oscarehr.integration.myhealthaccess.service.PatientService;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
@@ -57,6 +58,9 @@ public class Appointment
 
 	@Autowired
 	AppointmentService appointmentService;
+
+	@Autowired
+	PatientService patientService;
 
 	@Autowired
 	MyHealthAccessService myHealthAccessService;
@@ -109,15 +113,9 @@ public class Appointment
 	 * @param loggedInInfo - logged in info.
 	 */
 	public void saveNewAppointment(org.oscarehr.common.model.Appointment appointment,
-																 LoggedInInfo loggedInInfo, HttpServletRequest request)
+								 	LoggedInInfo loggedInInfo, HttpServletRequest request)
 	{
 		oscarAppointmentDao.persist(appointment);
-
-		// book telehealth appointment in MHA
-		if (appointment.getIsVirtual())
-		{
-			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
-		}
 
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
 						appointment.getDemographicNo(),
@@ -126,6 +124,47 @@ public class Appointment
 						LogConst.STATUS_SUCCESS,
 						String.valueOf(appointment.getId()),
 						request.getRemoteAddr());
+	}
+
+	/**
+	 * save a new telehealth appointment
+	 * @param appointment - the appointment to save
+	 * @param loggedInInfo - logged in info.
+	 * @param sendNotification - Whether to send notification of appointment booking to user or not.
+	 */
+	public void saveNewTelehealthAppointment(org.oscarehr.common.model.Appointment appointment,
+								   LoggedInInfo loggedInInfo, HttpServletRequest request, boolean sendNotification)
+	{
+		if (!appointment.getIsVirtual())
+		{
+			throw new IllegalArgumentException("Could not save telehealth appointment. Appointment is not virtual");
+		}
+
+		oscarAppointmentDao.persist(appointment);
+
+		// book telehealth appointment in MHA
+		String siteName = null;
+		if (OscarProperties.getInstance().isMultisiteEnabled())
+		{
+			siteName = appointment.getLocation();
+		}
+
+		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), siteName))
+		{
+			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
+		}
+		else
+		{
+			appointmentService.bookOneTimeTelehealthAppointment(loggedInInfo, appointment, sendNotification);
+		}
+
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				appointment.getDemographicNo(),
+				LogConst.ACTION_ADD,
+				LogConst.CON_APPT,
+				LogConst.STATUS_SUCCESS,
+				String.valueOf(appointment.getId()),
+				request.getRemoteAddr());
 	}
 
 	/**
