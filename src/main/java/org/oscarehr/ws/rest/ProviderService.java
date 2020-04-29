@@ -24,8 +24,6 @@
 package org.oscarehr.ws.rest;
 
 import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
-import net.sf.json.processors.JsDateJsonBeanProcessor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
@@ -93,14 +91,6 @@ public class ProviderService extends AbstractServiceImpl {
 	@Autowired
 	private org.oscarehr.provider.service.ProviderService providerService;
 
-	private static JsonConfig createJSONConfig()
-	{
-		JsonConfig config = new JsonConfig();
-		config.registerJsonBeanProcessor(java.sql.Date.class, new JsDateJsonBeanProcessor());
-
-		return config;
-	}
-	
 	protected SecurityContext getSecurityContext() {
 		Message m = PhaseInterceptorChain.getCurrentMessage();
     	org.apache.cxf.security.SecurityContext sc = m.getContent(org.apache.cxf.security.SecurityContext.class);
@@ -146,15 +136,14 @@ public class ProviderService extends AbstractServiceImpl {
     @GET
     @Path("/provider/me")
     @Produces("application/json")
-    public String getLoggedInProvider()
+    public ProviderTo1 getLoggedInProvider()
     {
     	Provider provider = getLoggedInInfo().getLoggedInProvider();
 
     	if(provider != null)
     	{
 		    ProviderTo1 transfer = new ProviderConverter().getAsTransferObject(getLoggedInInfo(), provider);
-    		JsonConfig config = ProviderService.createJSONConfig();
-            return JSONObject.fromObject(transfer,config).toString();
+		    return transfer;
     	}
 
     	return null;
@@ -180,13 +169,12 @@ public class ProviderService extends AbstractServiceImpl {
 
     @GET
     @Path("/providerjson/{id}")
-    public String getProviderAsJSON(@PathParam("id") String id)
+    public ProviderTo1 getProviderAsJSON(@PathParam("id") String id)
     {
 	    Provider provider = providerDao.getProvider(id);
 	    ProviderTo1 transfer = new ProviderConverter().getAsTransferObject(getLoggedInInfo(), provider);
-    	JsonConfig config = ProviderService.createJSONConfig();
 
-    	return JSONObject.fromObject(transfer,config).toString();
+    	return transfer;
     }
 
     @GET
