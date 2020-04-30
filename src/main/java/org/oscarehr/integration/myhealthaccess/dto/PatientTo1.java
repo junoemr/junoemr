@@ -70,6 +70,8 @@ public class PatientTo1
 	private String workPhone;
 	@JsonProperty("primary_fax")
 	private String primaryFax;
+	@JsonProperty("link_status")
+	private String linkStatus;
 
 	public String getId()
 	{
@@ -269,5 +271,15 @@ public class PatientTo1
 	public void setPrimaryFax(String primaryFax)
 	{
 		this.primaryFax = primaryFax;
+	}
+
+	public String getLinkStatus()
+	{
+		return linkStatus;
+	}
+
+	public void setLinkStatus(String link_status)
+	{
+		this.linkStatus = link_status;
 	}
 }

@@ -53,6 +53,8 @@ public class MHAPatient
 	private String workPhone;
 	private String primaryFax;
 
+	private LINK_STATUS linkStatus;
+
 	public enum PROVINCE_CODES
 	{
 		NL,
@@ -68,6 +70,16 @@ public class MHAPatient
 		YT,
 		NT,
 		NU
+	}
+
+	public enum LINK_STATUS
+	{
+		NO_LINK,
+		PATIENT_REJECTED,
+		CLINIC_REJECTED,
+		PENDING_CLINIC_CONFIRM,
+		PENDING_PATIENT_CONFIRM,
+		ACTIVE
 	}
 
 	public static boolean isValidProvinceCode(String provinceCode)
@@ -90,9 +102,10 @@ public class MHAPatient
 
 	public MHAPatient(PatientTo1 patientTo1)
 	{
-		BeanUtils.copyProperties(patientTo1, this, "addressProvinceCode", "healthCareProvinceCode");
+		BeanUtils.copyProperties(patientTo1, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus");
 		this.healthCareProvinceCode = PROVINCE_CODES.valueOf(patientTo1.getHealthCareProvinceCode());
 		this.addressProvinceCode = PROVINCE_CODES.valueOf(patientTo1.getAddressProvinceCode());
+		this.linkStatus = LINK_STATUS.valueOf(patientTo1.getLinkStatus().toUpperCase());
 	}
 
 	public String getId()
@@ -293,5 +306,15 @@ public class MHAPatient
 	public void setPrimaryFax(String primaryFax)
 	{
 		this.primaryFax = primaryFax;
+	}
+
+	public LINK_STATUS getLinkStatus()
+	{
+		return linkStatus;
+	}
+
+	public void setLinkStatus(LINK_STATUS linkStatus)
+	{
+		this.linkStatus = linkStatus;
 	}
 }
