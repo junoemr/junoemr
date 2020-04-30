@@ -873,7 +873,7 @@
 		<input type="hidden" name="fromAppt" value="1">
 		<input type="hidden" name="appointmentNo" value="">
 		<input type="hidden" name="operationType" value="<%=ApptUtil.APPOINTMENT_OP_TYPE.NONE%>">
-		<input type="hidden" name="sendBookingNotification" value="true">
+		<input type="hidden" name="sendBookingNotification" value="false">
 
 		<div class="header deep">
 			<div class="title">
@@ -1292,6 +1292,18 @@
 					<% } %>
 				</TD>
 			</tr>
+			<tr>
+				<td>
+					<input id="add-appt-and-send-confirmation"
+									type="submit"
+									value="Add & Confirm"
+									title="Add a new appointent and send a confirmation email to the patient"
+									onclick="document.forms.ADDAPPT.sendBookingNotification.value='true';
+													 document.forms.ADDAPPT.displaymode.value='Add Appointment';"
+									style="display: none"
+					>
+				</td>
+			</tr>
 		</table>
 	</FORM>
 
@@ -1499,6 +1511,7 @@
 		var loc = document.forms['ADDAPPT'].location;
 		if (loc.nodeName.toUpperCase() == 'SELECT') loc.style.backgroundColor = loc.options[loc.selectedIndex].style.backgroundColor;
 
+		var virtualBookingState = 'none';
 
 		// ask MHA (proxied through the juno server ofc) if the demographic is confirmed with this clinic
 		function checkDemographicConfirmed(demographicNo, site)
@@ -1527,6 +1540,28 @@
 			});
 		}
 
+		// get the mha integration for the specified site
+		function getMHAIntegration(site)
+		{
+			return new Promise((resolve, reject) =>
+			{
+				var siteParam = "?site=" + site;
+				jQuery.ajax(
+						{
+							url: "<%=request.getContextPath()%>/ws/rs/myhealthaccess/integration/" + siteParam,
+							method: "GET",
+							success: (result) =>
+							{
+								resolve(result);
+							},
+							error: (error) =>
+							{
+								reject(error);
+							}
+						});
+			});
+		}
+
 		function updateTelehealthControlls()
 		{
 			var siteSelect = jQuery("#site-select");
@@ -1538,49 +1573,97 @@
 					res = JSON.parse(res);
 					if (res.body)
 					{
-						jQuery("#telehealth-checkbox").attr("disabled", false);
-						var msg = jQuery("#telehealth-message");
-						msg.css("visibility", "visible");
-						msg.css("color", "green");
-						msg.html("Patient connected to MyHealthAccess");
-
+						setTelehealthConfirmed();
 					}
 					else
 					{
 						if ("<%=StringUtils.trimToEmpty(email)%>" != "")
 						{
-							jQuery("#telehealth-checkbox").attr("disabled", false);
-							var msg = jQuery("#telehealth-message");
-							msg.css("visibility", "visible");
-							msg.css("color", "green");
-							msg.html("One time telehealth avaialbe for this patient");
+							getMHAIntegration(siteSelect.val()).then((res) =>
+							{
+								res = JSON.parse(res);
+								if (res.body)
+								{
+									setTelehealthOneTime();
+								}
+								else
+								{
+									setTelehealthNotAvaiable();
+								}
+							});
 						}
 						else
 						{
-							jQuery("#telehealth-checkbox").attr("checked", false);
-							jQuery("#telehealth-checkbox").attr("disabled", true);
-							var msg = jQuery("#telehealth-message");
-							msg.css("visibility", "visible");
-							msg.css("color", "orange");
-							msg.html("Patient not connected to MyHealthAccess");
+							setTelehealthNotAvaiable();
 						}
 					}
 				}).catch((error) =>
 				{
-					jQuery("#telehealth-checkbox").attr("checked", false);
-					jQuery("#telehealth-checkbox").attr("disabled", true);
-					var msg = jQuery("#telehealth-message");
-					msg.css("visibility", "visible");
-					msg.css("color", "red");
-					msg.html("Error connecting to MyHealthAccess");
+					setTelehealthError();
 					console.error(error);
 				});
 			}
 		}
 		updateTelehealthControlls();
 
+		function setTelehealthConfirmed()
+		{
+			jQuery("#telehealth-checkbox").attr("disabled", false);
+			var msg = jQuery("#telehealth-message");
+			msg.css("visibility", "visible");
+			msg.css("color", "green");
+			msg.html("Patient connected to MyHealthAccess");
+			virtualBookingState = 'confirmed';
+		}
+
+		function setTelehealthOneTime()
+		{
+			jQuery("#telehealth-checkbox").attr("disabled", false);
+			var msg = jQuery("#telehealth-message");
+			msg.css("visibility", "visible");
+			msg.css("color", "green");
+			msg.html("One time telehealth avaialbe for this patient");
+			virtualBookingState = 'oneTime';
+		}
+
+		function setTelehealthNotAvaiable()
+		{
+			jQuery("#telehealth-checkbox").attr("checked", false);
+			jQuery("#telehealth-checkbox").attr("disabled", true);
+			var msg = jQuery("#telehealth-message");
+			msg.css("visibility", "visible");
+			msg.css("color", "orange");
+			msg.html("Patient not connected to MyHealthAccess");
+			jQuery("#add-appt-and-send-confirmation").css("display", "none");
+			virtualBookingState = 'none';
+		}
+
+		function setTelehealthError()
+		{
+			jQuery("#telehealth-checkbox").attr("checked", false);
+			jQuery("#telehealth-checkbox").attr("disabled", true);
+			var msg = jQuery("#telehealth-message");
+			msg.css("visibility", "visible");
+			msg.css("color", "red");
+			msg.html("Error connecting to MyHealthAccess");
+			jQuery("#add-appt-and-send-confirmation").css("display", "none");
+			virtualBookingState = 'none';
+		}
+
 		jQuery("#site-select").change(() => {
 			updateTelehealthControlls();
 		});
+
+		jQuery("#telehealth-checkbox").change((event) => {
+
+			if (virtualBookingState === "oneTime" && event.target.checked)
+			{
+				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
+			}
+			else
+			{
+				jQuery("#add-appt-and-send-confirmation").css("display", "none");
+			}
+		})
 	</script>
 </html:html>
