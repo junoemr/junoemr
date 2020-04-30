@@ -25,8 +25,10 @@ package org.oscarehr.demographic.model;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 
 import javax.persistence.Column;
@@ -210,7 +212,6 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		YT,
 		PP
 	}
-
 
 	/**
 	 * Determine if demographic is a newborn.  A demographic is a newborn if the HIN version code is 66 in BC, or
@@ -839,5 +840,15 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public boolean isNewBorn()
 	{
 		return Demographic.isNewBorn(getDateOfBirth(), getVer());
+	}
+
+	/**
+	 * checks if the demographic is active
+	 * @return - true if active, false otherwise
+	 */
+	public boolean isActive()
+	{
+		DemographicService demographicService = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
+		return !demographicService.getInactiveDemographicStatuses().contains(this.getPatientStatus());
 	}
 }

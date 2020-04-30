@@ -29,7 +29,9 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
 import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 
@@ -1570,4 +1572,14 @@ public class Demographic implements Serializable
 		return org.oscarehr.demographic.model.Demographic.isNewBorn(birthday, getVer());
 	}
 
+	/**
+	 * checks if the demographic is active. Not to be confused with "isActive"
+	 * which is completely different.
+	 * @return - true if active false otherwise.
+	 */
+	public boolean isPatientActive()
+	{
+		DemographicService demographicService = (DemographicService)SpringUtils.getBean("demographic.service.DemographicService");
+		return !demographicService.getInactiveDemographicStatuses().contains(this.getPatientStatus());
+	}
 }

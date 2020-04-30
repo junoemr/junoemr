@@ -22,8 +22,16 @@
  */
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.dto.PatientConfirmedTo1;
+import org.oscarehr.integration.myhealthaccess.dto.PatientSingleSearchResponseTo1;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
+import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
+import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueException;
+import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
+import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +41,12 @@ public class PatientService extends BaseService
 {
 	@Autowired
 	ClinicService clinicService;
+
+	@Autowired
+	DemographicDao demographicDao;
+
+	@Autowired
+	IntegrationService integrationService;
 
 	/**
 	 * check if the provided demographic is confirmed ("confirmed and liked to this Juno EMR instance")
@@ -44,16 +58,132 @@ public class PatientService extends BaseService
 	{
 		try
 		{
-			String apiKey = getApiKey(siteName);
-			String clinicId = getClinicId(siteName);
-			return get(formatEndpoint("/clinic/" + clinicId + "/patients/" + demographicNo + "/confirmed"), apiKey, PatientConfirmedTo1.class).getConfirmed();
+			Integration integration = integrationService.findMhaIntegration(siteName);
+			if (integration != null)
+			{
+				try
+				{
+					MHAPatient patient = getConfirmedPatientByDemographicNo(integration, demographicNo);
+					if (patient != null)
+					{
+						return patient.getLinkStatus() == MHAPatient.LINK_STATUS.ACTIVE;
+					}
+				}
+				catch(RecordNotFoundException | RecordNotUniqueException e)
+				{
+					return false;
+				}
+			}
 		}
 		catch(InvalidIntegrationException e)
 		{
-			MiscUtils.getLogger().warn("Cannot check patient confirmation status for demographic: " +
-							demographicNo + " at site: " + siteName + " with error: " + e.getMessage(), e);
+			logInvalidIntegrationWarn(e);
 		}
 		return false;
+	}
+
+	/**
+	 * get a mha patient via hin lookup
+	 * @param integration - the mha integration to look in
+	 * @param hin - the health number to search
+	 * @param hinProvince - the province of the health number
+	 * @return an MHA patient object.
+	 */
+	public MHAPatient getPatientByHin(Integration integration, String hin, MHAPatient.PROVINCE_CODES hinProvince)
+	{
+		if (hin == null || hin.isEmpty())
+		{
+			throw new IllegalArgumentException("hin cannot be null or empty");
+		}
+
+		try
+		{
+			String url = formatEndpoint("/clinic/" + integration.getRemoteId() +
+											"/patients?search_by=hin&health_number=%s&health_care_province=%s", hin, hinProvince);
+			PatientSingleSearchResponseTo1 response = get(url, integration.getApiKey(), PatientSingleSearchResponseTo1.class);
+
+			if (response.isSuccess())
+			{
+				return new MHAPatient(response.getPatientTo1());
+			}
+			else if (response.isNotFound())
+			{
+				throw new RecordNotFoundException("Could not find MHA patient with hin: " + hin + " province: " + hinProvince.toString());
+			}
+			else if (response.isNotUnique())
+			{
+				throw new RecordNotUniqueException("Multiple patients with hin: " + hin + " province: " + hinProvince.toString());
+			}
+		}
+		catch(InvalidIntegrationException e)
+		{
+			logInvalidIntegrationWarn(e);
+		}
+
+		return null;
+	}
+
+	/**
+	 * get a confirmed MHA patient by demographic number
+	 * @param integration - the integration to search
+	 * @param demographicNo - the demographic number to look up.
+	 * @return mha patient object
+	 */
+	public MHAPatient getConfirmedPatientByDemographicNo(Integration integration, Integer demographicNo)
+	{
+		try
+		{
+			String url = formatEndpoint("/clinic/" + integration.getRemoteId() +
+					"/patients?search_by=demographic_no&remote_id=%s", demographicNo);
+			PatientSingleSearchResponseTo1 response = get(url, integration.getApiKey(), PatientSingleSearchResponseTo1.class);
+
+			if (response.isSuccess())
+			{
+				return new MHAPatient(response.getPatientTo1());
+			}
+			else if (response.isNotFound())
+			{
+				throw new RecordNotFoundException("Could not find MHA patient with demographicNo: " + demographicNo.toString());
+			}
+			else if (response.isNotUnique())
+			{
+				throw new RecordNotUniqueException("Multiple patients with demographicNo: " + demographicNo.toString());
+			}
+		}
+		catch(InvalidIntegrationException e)
+		{
+			logInvalidIntegrationWarn(e);
+		}
+
+		return null;
+	}
+
+	public boolean updatePatientConnection(Integration integration, String loginToken, Demographic demographic, Boolean rejected)
+	{
+		try
+		{
+			MHAPatient patient = getPatientByHin(integration, demographic.getHin(), MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()));
+
+			String action = rejected ? "reject_connection" : "un_reject_connection";
+			return postWithToken(
+							formatEndpoint("/clinic_user/clinic/patient/" + patient.getId() + "/" + action),
+							integration.getApiKey(), null, Boolean.class, loginToken);
+		}
+		catch(InvalidIntegrationException e)
+		{
+			logInvalidIntegrationWarn(e);
+		}
+		catch(RecordNotFoundException e)
+		{
+			// no MHA patient with hin. suppress.
+		}
+
+		return false;
+	}
+
+	private void logInvalidIntegrationWarn(InvalidIntegrationException e)
+	{
+		MiscUtils.getLogger().warn("Could not reject patient connection. Invalid integration. " + e.getMessage());
 	}
 
 }
