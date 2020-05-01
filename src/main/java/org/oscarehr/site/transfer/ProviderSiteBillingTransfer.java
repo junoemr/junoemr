@@ -20,28 +20,39 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.conversion;
 
-import org.oscarehr.common.model.Site;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.site.transfer.SiteTransfer;
-import org.springframework.beans.BeanUtils;
+package org.oscarehr.site.transfer;
 
-public class SiteConverter extends AbstractConverter<Site, SiteTransfer> {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.oscarehr.common.model.ProviderSite;
 
-	@Override
-    public Site getAsDomainObject(LoggedInInfo loggedInInfo, SiteTransfer transfer) throws ConversionException {
-		Site site = new Site();
-		BeanUtils.copyProperties(transfer, site);
-		return site;
-    }
+import java.io.Serializable;
 
-	@Override
-    public SiteTransfer getAsTransferObject(LoggedInInfo loggedInInfo, Site site) throws ConversionException {
-		SiteTransfer transfer = new SiteTransfer();
-		BeanUtils.copyProperties(site, transfer);
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ProviderSiteBillingTransfer implements Serializable
+{
+	private boolean bcBCPEligible;
+
+	public static ProviderSiteBillingTransfer toTransferObj(ProviderSite domObj)
+	{
+		if (domObj == null)
+		{
+			return null;
+		}
+
+		ProviderSiteBillingTransfer transfer = new ProviderSiteBillingTransfer();
+		transfer.setBcBCPEligible(domObj.isBcBCPEligible());
+
 		return transfer;
-    }
+	}
 
-	
+	public boolean isBcBCPEligible()
+	{
+		return bcBCPEligible;
+	}
+
+	public void setBcBCPEligible(Boolean bcBCPEligible)
+	{
+		this.bcBCPEligible = bcBCPEligible;
+	}
 }

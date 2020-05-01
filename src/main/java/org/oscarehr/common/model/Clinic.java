@@ -79,6 +79,8 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     private String albertaConnectCareLabId;
     @Column(name = "alberta_connect_care_department_id")
     private String albertaConnectCareDepartmentId;
+    @Column(name = "bc_facility_number")
+    private String bcFacilityNumber;
 
     // foreign key
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
@@ -247,11 +249,22 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
         this.albertaConnectCareDepartmentId = albertaConnectCareDepartmentId;
     }
 
+	public String getBcFacilityNumber()
+	{
+		return bcFacilityNumber;
+	}
+
+	public void setBcFacilityNumber(String bcFacilityNumber)
+	{
+		this.bcFacilityNumber = bcFacilityNumber;
+	}
+
     public void setClinicBillingAddress(ClinicBillingAddress clinicBillingAddress)
     {
         this.clinicBillingAddress = clinicBillingAddress;
     }
 
+    @Override
     public String toString()
     {
         return "clinicName " + clinicName +
@@ -268,5 +281,4 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
                 " clinicBillingAddress " + clinicBillingAddress;
 
     }
-
 }

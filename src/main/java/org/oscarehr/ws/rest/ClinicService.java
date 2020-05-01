@@ -20,28 +20,31 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.conversion;
 
-import org.oscarehr.common.model.Site;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.site.transfer.SiteTransfer;
-import org.springframework.beans.BeanUtils;
+package org.oscarehr.ws.rest;
 
-public class SiteConverter extends AbstractConverter<Site, SiteTransfer> {
+import org.oscarehr.clinic.transfer.ClinicTransfer;
+import org.oscarehr.common.dao.ClinicDAO;
+import org.oscarehr.common.model.Clinic;
+import org.oscarehr.ws.rest.response.RestResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-	@Override
-    public Site getAsDomainObject(LoggedInInfo loggedInInfo, SiteTransfer transfer) throws ConversionException {
-		Site site = new Site();
-		BeanUtils.copyProperties(transfer, site);
-		return site;
-    }
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
-	@Override
-    public SiteTransfer getAsTransferObject(LoggedInInfo loggedInInfo, Site site) throws ConversionException {
-		SiteTransfer transfer = new SiteTransfer();
-		BeanUtils.copyProperties(site, transfer);
-		return transfer;
-    }
+@Path("/clinic")
+@Component("ClinicService")
+public class ClinicService extends AbstractServiceImpl
+{
+	@Autowired
+	ClinicDAO clinicDao;
 
-	
+	@GET
+	@Path("/")
+	public RestResponse<ClinicTransfer> getClinic()
+	{
+		Clinic clinic = clinicDao.getClinic();
+		return RestResponse.successResponse(ClinicTransfer.toTransferObj(clinic));
+	}
 }
