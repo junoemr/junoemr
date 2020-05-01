@@ -37,6 +37,7 @@
 <%@ page import="java.util.HashSet" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 
 <%
 	SecRoleDao secRoleDao = SpringUtils.getBean(SecRoleDao.class);
@@ -69,7 +70,7 @@
 
 <%
 	String msg = StringUtils.trimToEmpty((String)request.getAttribute("message"));
-	boolean unauthorizedMSG = "true".equals(request.getAttribute("messageNotAuthorized"));
+	boolean unauthorizedMSG = ConversionUtils.parseBoolean((String) request.getAttribute("messageNotAuthorized"));
 	// get role from database
 	List<SecRole> secRoles;
 	String[] omitList = null;
@@ -112,15 +113,18 @@
 	<link rel="stylesheet" href="../css/receptionistapptstyle.css">
 	<script src="../js/jquery-1.7.1.min.js"></script>
 
-	<script defer>
-	 	<%
-		if(unauthorizedMSG)
+	<script>
+		$(document).ready(function()
 		{
-		%>
+			<%
+			if(unauthorizedMSG)
+			{
+			%>
 			showUnauthorizedUserMSG();
-	 	<%
-		}
-		%>
+			<%
+			}
+			%>
+		});
 
 		function setfocus()
 		{
