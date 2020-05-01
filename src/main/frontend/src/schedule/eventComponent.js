@@ -8,7 +8,7 @@
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {SitesApi} from "../../generated";
-import {MhaPatientApi} from "../../generated";
+import {MhaDemographicApi} from "../../generated";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
@@ -57,7 +57,7 @@ angular.module('Schedule').component('eventComponent', {
 			$scope.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 				'../ws/rs');
 
-			$scope.MhaPatientApi = new MhaPatientApi($http, $httpParamSerializer,
+			$scope.MhaDemographicApi = new MhaDemographicApi($http, $httpParamSerializer,
 					'../ws/rs');
 
 			let sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
@@ -446,7 +446,7 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				if (controller.demographicModel.demographicNo && !controller.editMode)
 				{
-					$scope.MhaPatientApi.isPatientConfirmed(controller.demographicModel.demographicNo, $scope.eventData.site).then((result) =>
+					$scope.MhaDemographicApi.isPatientConfirmed(controller.demographicModel.demographicNo, $scope.eventData.site).then((result) =>
 					{
 						$scope.eligibleForTelehealth = result.data.body;
 						if (!$scope.eligibleForTelehealth)

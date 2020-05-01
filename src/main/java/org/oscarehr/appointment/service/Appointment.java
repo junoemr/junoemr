@@ -27,6 +27,7 @@ import org.apache.commons.lang.WordUtils;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
+import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
@@ -64,6 +65,9 @@ public class Appointment
 
 	@Autowired
 	MyHealthAccessService myHealthAccessService;
+
+	@Autowired
+	IntegrationService integrationService;
 
 	private String formatName(String upperFirstName, String upperLastName)
 	{
@@ -149,7 +153,7 @@ public class Appointment
 			siteName = appointment.getLocation();
 		}
 
-		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), siteName))
+		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), integrationService.findMhaIntegration(siteName)))
 		{
 			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
 		}

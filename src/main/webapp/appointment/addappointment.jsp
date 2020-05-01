@@ -167,11 +167,13 @@
 %>
 <%@page import="org.oscarehr.common.dao.SiteDao" %>
 <%@page import="org.oscarehr.common.model.Site" %>
+<%@ page import="org.oscarehr.common.IsPropertiesOn" %>
 <html:html locale="true">
 	<head>
 		<script type="text/javascript" src="../js/jquery-1.7.1.min.js"></script>
 		<script src="<%=request.getContextPath()%>/js/jquery-ui-1.8.18.custom.min.js"></script>
 		<script src="<%=request.getContextPath()%>/js/fg.menu.js"></script>
+		<script src="<%=request.getContextPath()%>/js/myhealthaccess.js"></script>
 
 
 		<link rel="stylesheet"
@@ -1513,62 +1515,13 @@
 
 		var virtualBookingState = 'none';
 
-		// ask MHA (proxied through the juno server ofc) if the demographic is confirmed with this clinic
-		function checkDemographicConfirmed(demographicNo, site)
-		{
-			return new Promise((resolve, reject) =>
-			{
-				var siteParam = "";
-				if (site)
-				{
-					siteParam = "?site=" + site;
-				}
-
-				jQuery.ajax(
-				{
-					url: "<%=request.getContextPath()%>/ws/rs/myhealthaccess/patient/" + demographicNo + "/confirmed" + siteParam,
-					method: "GET",
-					success: (result) =>
-					{
-						resolve(result);
-					},
-					error: (error) =>
-					{
-						reject(error);
-					}
-				});
-			});
-		}
-
-		// get the mha integration for the specified site
-		function getMHAIntegration(site)
-		{
-			return new Promise((resolve, reject) =>
-			{
-				var siteParam = "?site=" + site;
-				jQuery.ajax(
-						{
-							url: "<%=request.getContextPath()%>/ws/rs/myhealthaccess/integration/" + siteParam,
-							method: "GET",
-							success: (result) =>
-							{
-								resolve(result);
-							},
-							error: (error) =>
-							{
-								reject(error);
-							}
-						});
-			});
-		}
-
 		function updateTelehealthControlls()
 		{
 			var siteSelect = jQuery("#site-select");
 			var demographicNo = document.forms[0].demographic_no.value;
 			if (demographicNo !== '')
 			{
-				checkDemographicConfirmed(demographicNo, siteSelect.val()).then((res) =>
+				myhealthaccess.checkDemographicConfirmed("<%=request.getContextPath()%>", demographicNo, siteSelect.val()).then((res) =>
 				{
 					res = JSON.parse(res);
 					if (res.body)
@@ -1579,7 +1532,7 @@
 					{
 						if ("<%=StringUtils.trimToEmpty(email)%>" != "")
 						{
-							getMHAIntegration(siteSelect.val()).then((res) =>
+							myhealthaccess.getIntegration("<%=request.getContextPath()%>", siteSelect.val()).then((res) =>
 							{
 								res = JSON.parse(res);
 								if (res.body)
@@ -1599,12 +1552,18 @@
 					}
 				}).catch((error) =>
 				{
-					setTelehealthError();
-					console.error(error);
+					if (error === myhealthaccess.ERROR_NO_INTEGRATION)
+					{
+						setTelehealthNotAvaiable();
+					}
+					else
+					{
+						setTelehealthError();
+						console.error(error);
+					}
 				});
 			}
 		}
-		updateTelehealthControlls();
 
 		function setTelehealthConfirmed()
 		{
@@ -1613,6 +1572,7 @@
 			msg.css("visibility", "visible");
 			msg.css("color", "green");
 			msg.html("Patient connected to MyHealthAccess");
+			jQuery("#add-appt-and-send-confirmation").css("display", "none");
 			virtualBookingState = 'confirmed';
 		}
 
@@ -1623,6 +1583,10 @@
 			msg.css("visibility", "visible");
 			msg.css("color", "green");
 			msg.html("One time telehealth avaialbe for this patient");
+			if (jQuery("#telehealth-checkbox").attr("checked"))
+			{
+				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
+			}
 			virtualBookingState = 'oneTime';
 		}
 
@@ -1650,11 +1614,22 @@
 			virtualBookingState = 'none';
 		}
 
-		jQuery("#site-select").change(() => {
+		<%
+		if (IsPropertiesOn.isTelehealthEnabled())
+		{
+		%>
+		jQuery(document).ready(() =>
+		{
 			updateTelehealthControlls();
 		});
 
-		jQuery("#telehealth-checkbox").change((event) => {
+		jQuery("#site-select").change(() =>
+		{
+			updateTelehealthControlls();
+		});
+
+		jQuery("#telehealth-checkbox").change((event) =>
+		{
 
 			if (virtualBookingState === "oneTime" && event.target.checked)
 			{
@@ -1664,6 +1639,10 @@
 			{
 				jQuery("#add-appt-and-send-confirmation").css("display", "none");
 			}
-		})
+		});
+
+		<%
+		}
+		%>
 	</script>
 </html:html>

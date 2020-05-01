@@ -23,6 +23,8 @@
 package org.oscarehr.ws.rest.myhealthaccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.integration.dao.IntegrationDao;
+import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -35,19 +37,23 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-@Path("myhealthaccess/patient")
+@Path("myhealthaccess/integration/{integrationId}/")
 @Component("PatientWebService")
-@Tag(name = "mhaPatient")
-public class PatientWebService extends AbstractServiceImpl
+@Tag(name = "mhaDemographic")
+public class DemographicWebService extends AbstractServiceImpl
 {
 	@Autowired
 	PatientService patientService;
 
+	@Autowired
+	IntegrationDao integrationDao;
+
 	@GET
-	@Path("/{demographic_no}/confirmed")
+	@Path("demographic/{demographic_no}/confirmed")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> isPatientConfirmed(@PathParam("demographic_no") String demographicNo, @QueryParam("site") String siteName)
+	public RestResponse<Boolean> isPatientConfirmed(@PathParam("demographic_no") String demographicNo, @PathParam("integrationId") Integer integrationId)
 	{
-		return RestResponse.successResponse(patientService.isPatientConfirmed(Integer.parseInt(demographicNo), siteName));
+		Integration integration = integrationDao.find(integrationId);
+		return RestResponse.successResponse(patientService.isPatientConfirmed(Integer.parseInt(demographicNo), integration));
 	}
 }

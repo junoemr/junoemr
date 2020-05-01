@@ -51,14 +51,13 @@ public class PatientService extends BaseService
 	/**
 	 * check if the provided demographic is confirmed ("confirmed and liked to this Juno EMR instance")
 	 * @param demographicNo - the demographic to check
-	 * @param siteName - the site to look the demographic up in.
+	 * @param integration - the integration to look the demographic up in.
 	 * @return - true if confirmed, false otherwise (including if there is not MHA patient for this demographic)
 	 */
-	public boolean isPatientConfirmed(Integer demographicNo, String siteName)
+	public boolean isPatientConfirmed(Integer demographicNo, Integration integration)
 	{
 		try
 		{
-			Integration integration = integrationService.findMhaIntegration(siteName);
 			if (integration != null)
 			{
 				try
