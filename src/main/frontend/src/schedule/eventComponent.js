@@ -8,7 +8,7 @@
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {SitesApi} from "../../generated";
-import {MhaDemographicApi} from "../../generated";
+import {MhaDemographicApi, MhaIntegrationApi, MhaAppointmentApi} from "../../generated";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
@@ -49,15 +49,19 @@ angular.module('Schedule').component('eventComponent', {
 
 			let controller = this;
 
-			$scope.eligibleForTelehealth = false;
-
 			$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
 				'../ws/rs');
 
 			$scope.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 				'../ws/rs');
 
-			$scope.MhaDemographicApi = new MhaDemographicApi($http, $httpParamSerializer,
+			let mhaDemographicApi = new MhaDemographicApi($http, $httpParamSerializer,
+					'../ws/rs');
+
+			let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
+					'../ws/rs');
+
+			let mhaAppointmentApi = new MhaAppointmentApi($http, $httpParamSerializer,
 					'../ws/rs');
 
 			let sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
@@ -150,6 +154,23 @@ angular.module('Schedule').component('eventComponent', {
 			controller.repeatBookingDates = null;
 
 			controller.eventHistory = [];
+
+			controller.mhaAppointment = null;
+
+			controller.SENDING_NOTIFICATION_STATES = {
+				NONE: "none",
+				SENDING: "sending",
+				SENT: "sent",
+				FAILED: "failed",
+			};
+			controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.NONE;
+
+			$scope.TELEHEALTH_MODES = {
+				NONE: "none",
+				TELEHEALTH: "telehalth",
+				ONE_TIME_TELEHEALTH: "oneTimeTelehealth"
+			};
+			$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;
 
 			controller.patientTypeahead = {};
 			$scope.autocompleteValues = {};
@@ -332,6 +353,11 @@ angular.module('Schedule').component('eventComponent', {
 							$scope.initialized = true;
 						});
 					controller.loadAppointmentHistory($scope.eventUuid);
+
+					if ($scope.eventData.virtual)
+					{
+						controller.fetchMhaAppointment();
+					}
 				}
 				else //create new
 				{
@@ -442,22 +468,34 @@ angular.module('Schedule').component('eventComponent', {
 				}
 			};
 
-			controller.updateDemographicTelehealthEligibility = () =>
+			controller.updateDemographicTelehealthEligibility = async () =>
 			{
 				if (controller.demographicModel.demographicNo && !controller.editMode)
 				{
-					$scope.MhaDemographicApi.isPatientConfirmed(controller.demographicModel.demographicNo, $scope.eventData.site).then((result) =>
+					let integration = (await mhaIntegrationApi.searchIntegrations($scope.eventData.site)).data.body;
+					if (integration)
 					{
-						$scope.eligibleForTelehealth = result.data.body;
-						if (!$scope.eligibleForTelehealth)
+						mhaDemographicApi.isPatientConfirmed(integration.id, controller.demographicModel.demographicNo, $scope.eventData.site).then((result) =>
 						{
-							$scope.eventData.virtual = false;
-						}
-					});
+							if (result.data.body)
+							{
+								$scope.telehealthMode = $scope.TELEHEALTH_MODES.TELEHEALTH;
+							}
+							else if(integration && controller.demographicModel.data.email)
+							{
+								$scope.telehealthMode = $scope.TELEHEALTH_MODES.ONE_TIME_TELEHEALTH;
+							}
+							else
+							{
+								$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;
+								$scope.eventData.virtual = false;
+							}
+						});
+					}
 				}
 				else
 				{
-					$scope.eligibleForTelehealth = false;
+					$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;
 				}
 
 			};
@@ -737,7 +775,7 @@ angular.module('Schedule').component('eventComponent', {
 				return dateList;
 			};
 
-			$scope.saveEvent = function saveEvent()
+			$scope.saveEvent = function saveEvent(sendNotification= false)
 			{
 				var deferred = $q.defer();
 
@@ -774,6 +812,7 @@ angular.module('Schedule').component('eventComponent', {
 						doNotBook: $scope.eventData.doNotBook,
 						urgency: (($scope.eventData.critical) ? 'critical' : null),
 						virtual: $scope.eventData.virtual,
+						sendNotification: sendNotification,
 					},
 					repeatOnDates,
 
@@ -988,7 +1027,7 @@ angular.module('Schedule').component('eventComponent', {
 				controller.demographicModel.clear();
 			};
 
-			controller.save = function save()
+			controller.save = function save(sendNotification = false)
 			{
 				if (!$scope.validateForm())
 				{
@@ -996,7 +1035,7 @@ angular.module('Schedule').component('eventComponent', {
 				}
 
 				$scope.working = true;
-				$scope.saveEvent().then(function ()
+				$scope.saveEvent(sendNotification).then(function ()
 				{
 					controller.parentScope.refetchEvents();
 					controller.modalInstance.close();
@@ -1336,6 +1375,80 @@ angular.module('Schedule').component('eventComponent', {
 						+ "&siteName=" + encodeURIComponent($scope.eventData.site)
 						+ "&appt=" + encodeURIComponent($scope.eventUuid), "_blank");
 				}
+			};
+
+			controller.sendOnTimeTelehealthNotification = async () =>
+			{
+				controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.SENDING;
+				try
+				{
+					let result = controller.SENDING_NOTIFICATION_STATES.FAILED;
+					let integration = (await mhaIntegrationApi.searchIntegrations($scope.eventData.site)).data.body;
+					if (integration)
+					{
+						if (controller.mhaAppointment)
+						{
+							await mhaAppointmentApi.sendOneTimeTelehealthLink(integration.id, controller.mhaAppointment.id)
+						}
+						result = controller.SENDING_NOTIFICATION_STATES.SENT
+					}
+
+					window.setTimeout(() =>
+					{
+						controller.sendingNotificationState = result;
+						$scope.$digest()
+						window.setTimeout(() =>
+						{
+							controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.NONE;
+							$scope.$digest()
+						}, 5000);
+					}, 1000);
+				}
+				catch (err)
+				{
+					controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.FAILED;
+					window.setTimeout(() =>
+					{
+						controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.NONE;
+						$scope.$digest()
+					}, 5000);
+					console.error(err);
+				}
+			};
+
+			// get the text to display on the send one time link button
+			controller.getSendNotificationText = () =>
+			{
+				if (controller.sendingNotificationState === controller.SENDING_NOTIFICATION_STATES.SENDING)
+				{
+					return "Sending..."
+				}
+				else if (controller.sendingNotificationState === controller.SENDING_NOTIFICATION_STATES.SENT)
+				{
+					return "Sent!"
+				}
+				else if (controller.sendingNotificationState === controller.SENDING_NOTIFICATION_STATES.FAILED)
+				{
+					return "Failed"
+				}
+				else
+				{
+					return "Send Notification"
+				}
+			};
+
+			controller.fetchMhaAppointment = async () =>
+			{
+				try
+				{
+					let integration = (await mhaIntegrationApi.searchIntegrations($scope.eventData.site)).data.body;
+					controller.mhaAppointment = (await mhaAppointmentApi.searchAppointments(integration.id, $scope.eventUuid)).data.body;
+				}
+				catch(err)
+				{
+					console.error(err);
+				}
+
 			};
 
 			//=========================================================================

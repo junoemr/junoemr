@@ -25,7 +25,6 @@ package org.oscarehr.integration.myhealthaccess.service;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.model.Integration;
-import org.oscarehr.integration.myhealthaccess.dto.PatientConfirmedTo1;
 import org.oscarehr.integration.myhealthaccess.dto.PatientSingleSearchResponseTo1;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
@@ -35,6 +34,10 @@ import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class PatientService extends BaseService
@@ -48,13 +51,19 @@ public class PatientService extends BaseService
 	@Autowired
 	IntegrationService integrationService;
 
+	public boolean isPatientConfirmed(Integer demographicNo, Integration integration)
+	{
+		return isPatientConfirmed(demographicNo, integration, Collections.singletonList(MHAPatient.LINK_STATUS.ACTIVE));
+	}
+
 	/**
 	 * check if the provided demographic is confirmed ("confirmed and liked to this Juno EMR instance")
 	 * @param demographicNo - the demographic to check
 	 * @param integration - the integration to look the demographic up in.
+	 * @param confirmedStatuses - the statuses to be considered confirmed. Should be left default in almost all situations
 	 * @return - true if confirmed, false otherwise (including if there is not MHA patient for this demographic)
 	 */
-	public boolean isPatientConfirmed(Integer demographicNo, Integration integration)
+	public boolean isPatientConfirmed(Integer demographicNo, Integration integration, List<MHAPatient.LINK_STATUS> confirmedStatuses)
 	{
 		try
 		{
@@ -65,7 +74,7 @@ public class PatientService extends BaseService
 					MHAPatient patient = getConfirmedPatientByDemographicNo(integration, demographicNo);
 					if (patient != null)
 					{
-						return patient.getLinkStatus() == MHAPatient.LINK_STATUS.ACTIVE;
+						return confirmedStatuses.contains(patient.getLinkStatus());
 					}
 				}
 				catch(RecordNotFoundException | RecordNotUniqueException e)
@@ -157,11 +166,38 @@ public class PatientService extends BaseService
 		return null;
 	}
 
+	/**
+	 * get a remote MHA patient
+	 * @param demographic - the demographic who's remote MHA patient will be fetched
+	 * @return - the remote MHA patient.
+	 */
+	public MHAPatient getPatient(Integration integration, Demographic demographic)
+	{
+		if (isPatientConfirmed(demographic.getId(), integration))
+		{
+			return getConfirmedPatientByDemographicNo(integration, demographic.getId());
+		}
+		else
+		{
+			return getPatientByHin(integration, demographic.getHin(), MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()));
+		}
+	}
+
 	public boolean updatePatientConnection(Integration integration, String loginToken, Demographic demographic, Boolean rejected)
 	{
 		try
 		{
-			MHAPatient patient = getPatientByHin(integration, demographic.getHin(), MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()));
+			// lookup MHA patient
+			MHAPatient patient = null;
+			// we must consider CLINIC_REJECTED as confirmed to deal with edge case around un_rejecting confirmed patient who's HIN does not match in MHA.
+			if (isPatientConfirmed(demographic.getId(), integration, Arrays.asList(MHAPatient.LINK_STATUS.ACTIVE, MHAPatient.LINK_STATUS.CLINIC_REJECTED)))
+			{
+				patient = getConfirmedPatientByDemographicNo(integration, demographic.getId());
+			}
+			else
+			{
+				patient = getPatientByHin(integration, demographic.getHin(), MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()));
+			}
 
 			String action = rejected ? "reject_connection" : "un_reject_connection";
 			return postWithToken(
@@ -171,10 +207,6 @@ public class PatientService extends BaseService
 		catch(InvalidIntegrationException e)
 		{
 			logInvalidIntegrationWarn(e);
-		}
-		catch(RecordNotFoundException e)
-		{
-			// no MHA patient with hin. suppress.
 		}
 
 		return false;

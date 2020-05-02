@@ -34,7 +34,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 @Path("myhealthaccess/integration/{integrationId}/")
@@ -51,7 +50,7 @@ public class DemographicWebService extends AbstractServiceImpl
 	@GET
 	@Path("demographic/{demographic_no}/confirmed")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> isPatientConfirmed(@PathParam("demographic_no") String demographicNo, @PathParam("integrationId") Integer integrationId)
+	public RestResponse<Boolean> isPatientConfirmed(@PathParam("integrationId") Integer integrationId, @PathParam("demographic_no") String demographicNo)
 	{
 		Integration integration = integrationDao.find(integrationId);
 		return RestResponse.successResponse(patientService.isPatientConfirmed(Integer.parseInt(demographicNo), integration));

@@ -1698,7 +1698,7 @@
 					<systemProperties>
 						<systemProperty>
 							<key>openApiSpecBuilder.resourceClassCsv</key>
-							<value>org.oscarehr.ws.rest.SystemPreferenceWebService,org.oscarehr.ws.rest.ScheduleService,org.oscarehr.ws.rest.SitesService,org.oscarehr.ws.rest.AppointmentService,org.oscarehr.ws.rest.ProviderPreferenceWebService,org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService,org.oscarehr.ws.rest.myhealthaccess.DemographicWebService</value>
+							<value>org.oscarehr.ws.rest.SystemPreferenceWebService,org.oscarehr.ws.rest.ScheduleService,org.oscarehr.ws.rest.SitesService,org.oscarehr.ws.rest.AppointmentService,org.oscarehr.ws.rest.ProviderPreferenceWebService,org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService,org.oscarehr.ws.rest.myhealthaccess.DemographicWebService,org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService,org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService</value>
 						</systemProperty>
 						<systemProperty>
 							<key>openApiSpecBuilder.outputDirectory</key>

@@ -36,6 +36,8 @@ import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
+import org.oscarehr.integration.myhealthaccess.service.PatientService;
+import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
@@ -45,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
@@ -72,6 +75,10 @@ public class AppointmentManager {
 	private MyHealthAccessService myHealthAccessService;
 	@Autowired
 	private AppointmentService appointmentService;
+	@Autowired
+	private IntegrationService integrationService;
+	@Autowired
+	private PatientService patientService;
 
 	public List<Appointment> getAppointmentHistoryWithoutDeleted(LoggedInInfo loggedInInfo, Integer demographicNo, Integer offset, Integer limit) {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "r", null)) {
@@ -157,10 +164,51 @@ public class AppointmentManager {
 
 		appointmentDao.persist(appointment);
 
+		return appointment;
+	}
+
+	/**
+	 * add a new telehealth appointment.
+	 * @param loggedInInfo - logged in info
+	 * @param appointment - the appointment to add
+	 * @param sendNotification - if true notification of appointment will be sent to patient
+	 * @return
+	 */
+	public Appointment addTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, Boolean sendNotification) {
+		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
+			throw new RuntimeException("Access Denied");
+		}
+
+		if (!appointment.getIsVirtual())
+		{
+			throw new IllegalArgumentException("Cannot book telehealth appointment. Appointment is not virtual");
+		}
+
+		// Set automatic information
+		appointment.setCreator(loggedInInfo.getLoggedInProviderNo());
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		appointment.setCreateDateTime(new Date());
+		appointment.setUpdateDateTime(new Date());
+		appointment.setReasonCode(Appointment.DEFAULT_REASON_CODE);
+
+		// Subtract a minute
+
+		appointmentDao.persist(appointment);
+
 		// book telehealth appointment in MHA
-		if (appointment.getIsVirtual())
+		String siteName = null;
+		if (OscarProperties.getInstance().isMultisiteEnabled())
+		{
+			siteName = appointment.getLocation();
+		}
+
+		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), integrationService.findMhaIntegration(siteName)))
 		{
 			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
+		}
+		else
+		{
+			appointmentService.bookOneTimeTelehealthAppointment(loggedInInfo, appointment, sendNotification);
 		}
 
 		return appointment;

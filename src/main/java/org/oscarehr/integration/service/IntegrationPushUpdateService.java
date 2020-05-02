@@ -209,7 +209,14 @@ public class IntegrationPushUpdateService
 
 			if (demographic.getHin() != null && !demographic.getHin().isEmpty() && MHAPatient.isValidProvinceCode(demographic.getHcType()))
 			{
-				patientService.updatePatientConnection(integration, loginTokenTo1.getToken(), demographic, patientConnectionTo1.getRejected());
+				try
+				{
+					patientService.updatePatientConnection(integration, loginTokenTo1.getToken(), demographic, patientConnectionTo1.getRejected());
+				}
+				catch(RecordNotFoundException e)
+				{
+					// No MHA patient for this demographic. suppress.
+				}
 			}
 		}
 	}

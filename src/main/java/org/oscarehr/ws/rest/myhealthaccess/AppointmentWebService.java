@@ -30,7 +30,6 @@ import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException
 import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
-import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.myhealthaccess.AppointmentTo1;
