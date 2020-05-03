@@ -38,8 +38,8 @@ public class IntegrationTo1
 		this.id = integration.getId();
 		this.remoteId = integration.getRemoteId();
 		this.apiKey = integration.getApiKey();
-		this.siteName = integration.getSite().getName();
-		this.siteId = integration.getSite().getId();
+		this.siteName = integration.getSite() != null ? integration.getSite().getName() : null;
+		this.siteId = integration.getSite() != null ? integration.getSite().getId() : null;
 		this.integrationType = integration.getIntegrationType();
 	}
 

@@ -45,6 +45,7 @@ myhealthaccess = {
 	{
 		return new Promise((resolve, reject) =>
 		{
+			var siteParam = "";
 			if (site)
 			{
 				var siteParam = "?site=" + site;

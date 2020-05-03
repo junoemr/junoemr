@@ -106,7 +106,8 @@ public class ClinicService extends BaseService
 		ProviderData provider = providerDataDao.find(security.getProviderNo());
 		if (security != null && provider != null)
 		{
-			return loginOrCreateClinicUser(security, provider.getFirstName(), provider.getLastName(), integration.getSite().getName());
+			return loginOrCreateClinicUser(security, provider.getFirstName(), provider.getLastName(),
+					integration.getSite() != null ? integration.getSite().getName() : null);
 		}
 		else
 		{
@@ -116,7 +117,7 @@ public class ClinicService extends BaseService
 	}
 
 	public ClinicUserLoginTokenTo1 loginOrCreateClinicUser(Security security, String firstName,
-																												 String lastName, String siteName) throws InvalidIntegrationException
+														   String lastName, String siteName) throws InvalidIntegrationException
 	{
 		try
 		{
