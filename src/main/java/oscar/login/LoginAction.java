@@ -539,14 +539,10 @@ public final class LoginAction extends DispatchAction {
 		SecurityDao securityDao = (SecurityDao) SpringUtils.getBean("securityDao");
 		Security security = securityDao.findByUserName(username);
 
-		// attempt email lookup. TODO change to single result after merge complete.
+		// attempt email lookup.
 		if (security == null)
 		{
-			List<Security> results = securityDao.findByEmail(username);
-			if (results.size() > 0)
-			{
-				security = results.get(0);
-			}
+			security = securityDao.findByEmail(username);
 		}
 
 		if (security == null) {

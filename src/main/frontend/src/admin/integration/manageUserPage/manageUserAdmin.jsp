@@ -116,7 +116,7 @@
 						</button>
 						<button
 										class="btn btn-success  btn-active-hover sm-margin-left sm-margin-right"
-										title="Delete Provider"
+										title="Enable Provider"
 										ng-click="$ctrl.changeProviderStatus(provider.providerNo, true)"
 										ng-if="!provider.enabled"
 						>
