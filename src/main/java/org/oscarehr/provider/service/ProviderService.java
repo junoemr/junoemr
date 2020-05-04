@@ -375,22 +375,11 @@ public class ProviderService
 			List<Security> securityList = providerEditFormTo1.getSecurityRecords(providerNo, true);
 			for (Security newSecurityRecord : securityList)
 			{
-				Security existingRecord = securityDao.findByUserName(newSecurityRecord.getUserName());
-
-				// check for collision with record other than self.
-				boolean collision = false;
-				if (!existingRecord.getSecurityNo().equals(newSecurityRecord.getSecurityNo()))
+				Security recordToEdit = securityDao.find(newSecurityRecord.getSecurityNo());
+				if (recordToEdit != null)
 				{
-					throw new SecurityRecordAlreadyExistsException("Security Record already exists");
-				}
-				else
-				{
-					Security recordToEdit = securityDao.find(newSecurityRecord.getSecurityNo());
-					if (recordToEdit != null)
-					{
-						updateSecurityRecord(recordToEdit, newSecurityRecord);
-						securityDao.merge(recordToEdit);
-					}
+					updateSecurityRecord(recordToEdit, newSecurityRecord);
+					securityDao.merge(recordToEdit);
 				}
 			}
 		}

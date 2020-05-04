@@ -745,17 +745,23 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 								function success(result)
 								{
 									ctrl.handleApiResponse(result, "created");
+									if (result.status === "SUCCESS")
+									{
+										$location.url(`/admin/editUser?providerNo=${result.body.providerNo}`);
+									}
 								},
 								function error(result)
 								{
 									Juno.Common.Util.errorAlert($uibModal, "Error", "Internal Server Error. Provider not created");
 								}
 						);
-					} else
+					}
+					else
 					{//invalid
 						Juno.Common.Util.errorAlert($uibModal, "Validation Error", "Some fields are invalid please correct the highlighted fields");
 					}
-				} else if (ctrl.mode === EDIT_PROVIDER_MODE.EDIT)
+				}
+				else if (ctrl.mode === EDIT_PROVIDER_MODE.EDIT)
 				{ // update provider
 					if (ctrl.allFieldsValid())
 					{
