@@ -83,6 +83,7 @@ public class ProviderEditFormTo1 implements Serializable
 	private String bcBillingNo;
 	private JunoTypeaheadTo1 bcRuralRetentionCode;
 	private String bcServiceLocation;
+	private List<Integer> bcpSites;
 
 	// ON billing
 	private String onGroupNumber;
@@ -862,5 +863,15 @@ public class ProviderEditFormTo1 implements Serializable
 	public void setCurrentSecurityRecord(Integer currentSecurityRecord)
 	{
 		this.currentSecurityRecord = currentSecurityRecord;
+	}
+
+	public List<Integer> getBcpSites()
+	{
+		return bcpSites;
+	}
+
+	public void setBcpSites(List<Integer> bcpSites)
+	{
+		this.bcpSites = bcpSites;
 	}
 }

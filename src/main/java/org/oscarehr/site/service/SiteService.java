@@ -60,6 +60,22 @@ public class SiteService
 	}
 
 	/**
+	 * update a sites bcp status
+	 * @param bcpSiteId - the site id to update
+	 * @param providerNo - the provider assigned to the site
+	 * @param bcpEnabled - enable or disable bcp
+	 */
+	public synchronized void setSiteAsBCP(Integer bcpSiteId, Integer providerNo, boolean bcpEnabled)
+	{
+		ProviderSite providerSite = providerSiteDao.find(new ProviderSitePK(providerNo.toString(), bcpSiteId));
+		if (providerSite != null)
+		{
+			providerSite.setBcBCPEligible(bcpEnabled);
+			providerSiteDao.merge(providerSite);
+		}
+	}
+
+	/**
 	 * remove any site from the provider that is not in the site list
 	 * @param siteIds - site ids to keep
 	 * @param providerNo - the provider on which to perform the operation.

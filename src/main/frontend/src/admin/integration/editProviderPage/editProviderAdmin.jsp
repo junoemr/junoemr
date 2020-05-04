@@ -799,6 +799,42 @@
 				</panel-body>
 			</panel>
 
+			<panel ng-if="$ctrl.billingRegion.value === 'BC'" id="edit-provider-bcp-sites">
+				<panel-header>
+					<h6>BCP Sites</h6>
+				</panel-header>
+				<panel-body>
+					<div class="flex-row flex-wrap">
+						<juno-typeahead
+										name="bcp-site-selection"
+										class="flex-grow lg-margin-right"
+										model="$ctrl.currentBcpSiteSelection"
+										options="$ctrl.bcpSiteOptions"
+										placeholder="Search..."
+										on-enter-key="$ctrl.addBCPSiteAssignment($ctrl.currentBcpSiteSelection.value)"
+										disabled="$ctrl.fieldsDisabled"
+						>
+						</juno-typeahead>
+						<button class="btn btn-primary lg-padding-left lg-padding-right add-role-button" title="Add role"
+										ng-click="$ctrl.addBCPSiteAssignment($ctrl.currentBcpSiteSelection.value)">Add</button>
+					</div>
+					<div class="user-role-list col-sm-12 md-margin-top">
+						<label class="body-smallest md-padding-bottom">Sites</label>
+						<ul class="no-padding">
+							<li ng-repeat="siteId in $ctrl.provider.bcpSites" class="group-list-item">
+								<div class="flex-row align-items-center body-small-bold">
+									{{$ctrl.getSiteName(siteId)}}
+									<div class="flex-grow text-right">
+										<i class="icon icon-delete hand-hover" title="Remove role" ng-click="$ctrl.removeBCPSiteAssignment(siteId)"></i>
+									</div>
+								</div>
+								<hr>
+							</li>
+						</ul>
+					</div>
+				</panel-body>
+			</panel>
+
 			<panel id="edit-provider-3rd-party-identifiers">
 				<panel-header>
 					3rd Party Identifiers
@@ -863,6 +899,7 @@
 
 				</panel-body>
 			</panel>
+
 		</div>
 	</div>
 	<div class="bottom-options-bar">

@@ -43,7 +43,6 @@ import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
 import org.oscarehr.ws.rest.transfer.providerManagement.SecurityRecordTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.oscarProvider.data.ProviderBillCenter;
 
@@ -53,7 +52,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service("provider.service.ProviderService")
-@Transactional(propagation = Propagation.REQUIRED)
+@Transactional
 public class ProviderService
 {
 	@Autowired
@@ -233,11 +232,17 @@ public class ProviderService
 		//set sites
 		List<ProviderSite> providerSites = providerSiteDao.findByProviderNo(provider.getProviderNo().toString());
 		ArrayList<Integer> siteList = new ArrayList<>();
+		ArrayList<Integer> bcpSites = new ArrayList<>();
 		for(ProviderSite providerSite: providerSites)
 		{
 			siteList.add(providerSite.getId().getSiteId());
+			if (providerSite.isBcBCPEligible())
+			{
+				bcpSites.add(providerSite.getId().getSiteId());
+			}
 		}
 		providerEditFormTo1.setSiteAssignments(siteList);
+		providerEditFormTo1.setBcpSites(bcpSites);
 
 		//set roles
 		List<SecUserRole> userRoles = secUserRoleDao.getUserRoles(provider.getProviderNo().toString());
@@ -265,7 +270,7 @@ public class ProviderService
 		// save billing data
 		ProviderBilling providerBilling = providerEditFormTo1.getProviderBilling();
 		provider.setBillingOpts(providerBilling);
-		providerDataDao.merge(provider);
+		providerDataDao.persist(provider);
 
 		updateProviderSiteAndRole(providerEditFormTo1, provider.getProviderNo());
 
@@ -316,6 +321,9 @@ public class ProviderService
 		// assign provider sites
 		siteService.assignProviderSites(providerEditFormTo1.getSiteAssignments(), providerNo);
 		siteService.removeOtherSites(providerEditFormTo1.getSiteAssignments(), providerNo);
+
+		// update bcp sites
+		updateBCPSiteAssignment(providerNo, providerEditFormTo1.getBcpSites());
 
 		// assign provider roles
 		if (providerEditFormTo1.getUserRoles() != null)
@@ -389,6 +397,29 @@ public class ProviderService
 		catch (NoSuchAlgorithmException nae)
 		{
 			throw new RuntimeException("Internal Server error " + nae.toString());
+		}
+	}
+
+	/**
+	 * add bcp to sites in "bcpSites" and remove it from all others for this provider
+	 * @param providerNo - the provider to apply the update to.
+	 * @param bcpSites - a list of sites to enable bcp on.
+	 */
+	private synchronized void updateBCPSiteAssignment(Integer providerNo, List<Integer> bcpSites)
+	{
+		if (bcpSites != null)
+		{
+			List<ProviderSite> providerSites = providerSiteDao.findByProviderNo(providerNo.toString());
+			for (ProviderSite providerSite : providerSites)
+			{
+				if (bcpSites.contains(providerSite.getId().getSiteId()))
+				{
+					siteService.setSiteAsBCP(providerSite.getId().getSiteId(), providerNo, true);
+				} else
+				{
+					siteService.setSiteAsBCP(providerSite.getId().getSiteId(), providerNo, false);
+				}
+			}
 		}
 	}
 

@@ -72,6 +72,8 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.siteOptions = [];
 		ctrl.currentSiteSelection = null;
+		ctrl.bcpSiteOptions = [];
+		ctrl.currentBcpSiteSelection = null;
 
 		// billingRegion. determines what controls display
 		ctrl.billingRegionSelectEnabled = false;
@@ -182,6 +184,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			bcBillingNo: null,
 			bcRuralRetentionCode: null,
 			bcServiceLocation: null,
+			bcpSites: [],
 
 			// ON Billing
 			onGroupNumber: null,
@@ -337,28 +340,6 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					}
 			);
 
-			sitesApi.getSiteList().then(
-					function success(result)
-					{
-						ctrl.siteOptions = [];
-						for (let site of result.data.body)
-						{
-							ctrl.siteOptions.push(
-									{
-										label: site.name,
-										value: site.siteId,
-										bgColor: site.bgColor
-									}
-							)
-						}
-					},
-					function error(result)
-					{
-						console.error("Failed to fetch site list with error: " + result);
-						ctrl.loadingError = true;
-					}
-			);
-
 			// when we switch bill region, load additional data.
 			$scope.$watch('$ctrl.billingRegion', async function(newVal, oldVal)
 			{
@@ -392,6 +373,31 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 				ctrl.setupFormValidations();
 				ctrl.allowSubmit = true;
 			}
+
+			sitesApi.getSiteList().then(
+					function success(result)
+					{
+						ctrl.siteOptions = [];
+						for (let site of result.data.body)
+						{
+							let option = 	{
+								label: site.name,
+								value: site.siteId,
+								bgColor: site.bgColor,
+								province: site.province,
+							};
+
+							ctrl.siteOptions.push(option);
+						}
+
+						ctrl.updateBCPSiteList();
+					},
+					function error(result)
+					{
+						console.error("Failed to fetch site list with error: " + result);
+						ctrl.loadingError = true;
+					}
+			);
 		};
 
 		// load alberta specific data for billing fields
@@ -558,6 +564,8 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			{
 				ctrl.provider.siteAssignments.push(siteId);
 			}
+
+			ctrl.updateBCPSiteList();
 		};
 
 		ctrl.removeSiteAssignment = function(siteId)
@@ -567,6 +575,36 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 				let idx = ctrl.provider.siteAssignments.findIndex(el => el === siteId);
 				ctrl.provider.siteAssignments.splice(idx, 1);
 			}
+
+			ctrl.updateBCPSiteList();
+		};
+
+		ctrl.addBCPSiteAssignment = function (siteId)
+		{
+			if (siteId && !ctrl.provider.bcpSites.includes(siteId))
+			{
+				ctrl.provider.bcpSites.push(siteId);
+			}
+		};
+
+		ctrl.removeBCPSiteAssignment = function(siteId)
+		{
+			if (siteId)
+			{
+				let idx = ctrl.provider.bcpSites.findIndex(el => el === siteId);
+				ctrl.provider.bcpSites.splice(idx, 1);
+			}
+		};
+
+		// only sites assigned to the provider can have bcp disabled / enabled.
+		ctrl.updateBCPSiteList = function()
+		{
+			ctrl.bcpSiteOptions = ctrl.siteOptions.filter((site) =>
+			{
+				return site.province === "BC" && ctrl.provider.siteAssignments.includes(site.value);
+			});
+
+			ctrl.provider.bcpSites = ctrl.provider.bcpSites.filter((bcpSite) => ctrl.provider.siteAssignments.includes(bcpSite));
 		};
 
 		ctrl.getSiteName = function(roleId)
@@ -581,6 +619,18 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			}
 		};
 
+		ctrl.isBCPAvailableForSite = function(roleId)
+		{
+			if (ctrl.siteOptions&& ctrl.siteOptions.length > 0)
+			{
+				return ctrl.siteOptions.find(el => el.value === roleId).province === "BC";
+			}
+			else
+			{
+				return false;
+			}
+		};
+
 		ctrl.loadProviderFrom = function(providerNo)
 		{
 			providerService.getProviderEditForm(providerNo).then(
@@ -590,6 +640,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 						ctrl.mapTypeaheadValues();
 						ctrl.setupSecurityRecords();
 						ctrl.setupFormValidations();
+						ctrl.updateBCPSiteList();
 						ctrl.allowSubmit = true;
 
 					},
