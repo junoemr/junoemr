@@ -20,48 +20,38 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic;
+package org.oscarehr.integration.iceFall.service.exceptions;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.oscarehr.demographic.util.HinValidator;
+import org.oscarehr.integration.iceFall.service.transfer.IceFallErrorTo1;
+import org.springframework.web.client.RestClientException;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import static junit.framework.Assert.assertEquals;
-
-@RunWith(Parameterized.class)
-public class HinValidatorTestON
+public class IceFallRESTException extends RestClientException
 {
-	private String hin;
-	private boolean expectedResult;
+	private IceFallErrorTo1 errorObject;
 
-	public HinValidatorTestON(String hin, boolean result)
+	public IceFallRESTException(String msg)
 	{
-		this.hin = hin;
-		this.expectedResult = result;
+		super(msg);
 	}
 
-	@Parameterized.Parameters
-	public static Collection testData()
+	public IceFallRESTException(String msg, IceFallErrorTo1 errorObject)
 	{
-		return Arrays.asList(new Object[][]
-				{
-						{null, false},
-						{"", false},
-						{"bubbles", false},
-						{"9663096511", false},
-						{"9663096512", false},
-						{"9663096510", true},
-				});
+		super(msg);
+		this.errorObject = errorObject;
 	}
 
-	@Test
-	public void testHinOntario()
+	public IceFallRESTException(String msg, Throwable ex)
 	{
-		boolean actualResult = HinValidator.isValid(hin,"ON");
-		assertEquals(expectedResult, actualResult);
+		super(msg, ex);
+	}
+
+	public IceFallErrorTo1 getErrorObject()
+	{
+		return errorObject;
+	}
+
+	public void setErrorObject(IceFallErrorTo1 errorObject)
+	{
+		this.errorObject = errorObject;
 	}
 }

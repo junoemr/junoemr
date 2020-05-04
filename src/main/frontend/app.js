@@ -167,6 +167,21 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/panelManagement',
 			component: 'panelManagementAdmin'
 		})
+		.state('admin.iceFall',
+		{
+			url: '/iceFall',
+			component: 'iceFallAdmin'
+		})
+		.state('admin.iceFall.settings',
+		{
+			url: '/settings',
+			component: 'iceFallAdminSettings'
+		})
+		.state('admin.iceFall.activity',
+		{
+			url: '/activity',
+			component: 'iceFallAdminActivity'
+		})
 		.state('admin.addUser',
 		{
 			url: '/addUser',

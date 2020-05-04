@@ -531,18 +531,18 @@ public final class LoginAction extends DispatchAction {
     
     /**
      * get the security record based on the username
-     * @param username
-     * @return
+     * @param username username to get security record for
+     * @return null if no entry found, otherwise corresponding security entry
      */
     private Security getSecurity(String username) {
 
 		SecurityDao securityDao = (SecurityDao) SpringUtils.getBean("securityDao");
-		List<Security> results = securityDao.findByUserName(username);
-		Security security = null;
-		if (results.size() > 0) security = results.get(0);
-		else
-		{// attempt lookup by email
-			results = securityDao.findByEmail(username);
+		Security security = securityDao.findByUserName(username);
+
+		// attempt email lookup. TODO change to single result after merge complete.
+		if (security == null)
+		{
+			List<Security> results = securityDao.findByEmail(username);
 			if (results.size() > 0)
 			{
 				security = results.get(0);

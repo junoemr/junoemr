@@ -66,7 +66,14 @@ public class IntegrationAction extends DispatchAction
 		if (integrations.size() == 1)
 		{
 			Integration integration = integrations.get(0);
-			return connectToClinic(request, mapping, integration.getSite().getName());
+			String siteName = null;
+
+			if (integration.getSite() != null)
+			{
+				siteName = integration.getSite().getName();
+			}
+
+			return connectToClinic(request, mapping, siteName);
 		}
 		else
 		{
@@ -157,7 +164,7 @@ public class IntegrationAction extends DispatchAction
 	private IntegrationData createClinicUser(HttpServletRequest request, IntegrationData integrationData)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		ProviderData loggedInProvider = loggedInInfo.getLoggedInProvider().getProvider();
+		ProviderData loggedInProvider = loggedInInfo.getLoggedInProvider().convertToProviderData();
 		Security loggedInUser = loggedInInfo.getLoggedInSecurity();
 
 		ClinicUserCreateTo1 clinicUser = new ClinicUserCreateTo1(

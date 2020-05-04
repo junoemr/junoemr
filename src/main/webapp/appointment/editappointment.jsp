@@ -937,9 +937,10 @@
 								&nbsp;
 								<a href="#"
 									 onClick='popupPage(800, 1280,
-													 "../telehealth/myhealthaccess.do?method=startTelehealth&" +
-													 "demographicNo=<%=appt.getDemographicNo()%>&" +
-													 "siteName=<%=appt.getLocation()%>");return false;'
+													 "../integrations/myhealthaccess.do?method=connect" +
+													 "&demographicNo=<%=appt.getDemographicNo()%>" +
+													 "&siteName=<%=appt.getLocation()%>" +
+													 "&appt=<%=appt.getId()%>");return false;'
 									 title="Telehealth">Initiate Appt</a>
 
 								<% } %>

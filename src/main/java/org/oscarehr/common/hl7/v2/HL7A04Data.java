@@ -378,7 +378,7 @@ public class HL7A04Data
 			pv1.getAttendingDoctor(0).getFamilyName().setValue( (familyDoctorFirstName==null? " " : familyDoctorFirstName) );	// family doc last name
 			pv1.getAttendingDoctor(0).getGivenName().setValue( (familyDoctorLastName==null? " " : familyDoctorLastName) );		// family doc first name
 			
-			pv1.getVisitNumber().getID().setValue("oscar"+demoData[0]+"-"+ appData.getAppointment_no());
+			pv1.getVisitNumber().getID().setValue("oscar"+demoData[0]+"-"+ appData.getAppointmentNo());
 			
 			String dateTime = appData.getAppointment_date().replace("-", "") + "" + appData.getStart_time().substring(0, 5).replace(":", "");
 			

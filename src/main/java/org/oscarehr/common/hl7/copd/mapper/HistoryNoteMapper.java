@@ -118,6 +118,16 @@ public class HistoryNoteMapper extends AbstractMapper
 
 	public int getNumMedicalHistoryNotes()
 	{
+		return getNumMedicalProblemsNotes() + getNumMedicalSurgicalNotes();
+	}
+
+	public int getNumMedicalProblemsNotes()
+	{
+		return provider.getZPBReps();
+	}
+
+	public int getNumMedicalSurgicalNotes()
+	{
 		return provider.getZPRReps();
 	}
 
@@ -215,8 +225,10 @@ public class HistoryNoteMapper extends AbstractMapper
 		else
 		{
 			int numNotes = getNumMedicalHistoryNotes();
+			int numSurgical = getNumMedicalSurgicalNotes();
+			int numProblems = getNumMedicalProblemsNotes();
 			List<CaseManagementNote> noteList = new ArrayList<>(numNotes);
-			for (int i = 0; i < numNotes; i++)
+			for (int i = 0; i < numSurgical; i++)
 			{
 				CaseManagementNote note = getMedicalHistoryNote(i);
 				if (note != null)
@@ -224,6 +236,16 @@ public class HistoryNoteMapper extends AbstractMapper
 					noteList.add(note);
 				}
 			}
+
+			for (int i = 0; i < numProblems; i++)
+			{
+				CaseManagementNote note = getMedicalProblemNote(i);
+				if (note != null)
+				{
+					noteList.add(note);
+				}
+			}
+
 			return noteList;
 		}
 	}
@@ -381,6 +403,49 @@ public class HistoryNoteMapper extends AbstractMapper
 		return note;
 	}
 
+	/**
+	 * Gets medical history information from any available ZPB segments.
+	 * Information in this segment pertains to medical diagnosis (both unconfirmed and confirmed).
+	 * This is slightly different from our other medical history fetching.
+	 * @param rep rep to get ZPB information from
+	 * @return base note object for medical history
+	 * @throws HL7Exception
+	 */
+	public CaseManagementNote getMedicalProblemNote(int rep) throws HL7Exception
+	{
+		CaseManagementNote note = new CaseManagementNote();
+		Date diagnosisDate = getMedProblemDiagnosisDate(rep);
+		if (diagnosisDate == null)
+		{
+			diagnosisDate = oldestEncounterNoteDate;
+		}
+		else
+		{
+			// if the procedure date was actually valid, set the extended property
+			CaseManagementNoteExt ext = new CaseManagementNoteExt();
+			ext.setNote(note);
+			ext.setKey(CaseManagementNoteExt.PROCEDUREDATE);
+			ext.setDateValue(diagnosisDate);
+
+			note.addExtension(ext);
+		}
+
+		note.setObservationDate(diagnosisDate);
+		note.setUpdateDate(diagnosisDate);
+
+		String noteText = StringUtils.trimToEmpty(getMedProblemNoteText(rep)).replaceAll("~crlf~", "\n");
+		note.setNote(noteText + " - " + ConversionUtils.toDateString(diagnosisDate));
+
+		return note;
+	}
+
+	/**
+	 * Gets medical history information from any available ZPR segments.
+	 * Information in this section pertains to medical surgeries.
+	 * @param rep rep to get ZPR information from
+	 * @return base note object for medical history
+	 * @throws HL7Exception
+	 */
 	public CaseManagementNote getMedicalHistoryNote(int rep) throws HL7Exception
 	{
 		CaseManagementNote note = new CaseManagementNote();
@@ -414,6 +479,30 @@ public class HistoryNoteMapper extends AbstractMapper
 		note.setNote(noteText + " - " + ConversionUtils.toDateString(procedureDate));
 
 		return note;
+	}
+
+	public Date getMedProblemDiagnosisDate(int rep) throws HL7Exception
+	{
+		return getNullableDate(provider.getZPB(rep).getZpb2_diagnosisDate().getTs1_TimeOfAnEvent().getValue());
+	}
+
+	public String getMedProblemDiagnosisDescription(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToEmpty(provider.getZPB(rep).getZpb3_diagnosisDescription().getValue());
+	}
+
+	public String getMedProblemDiagnosisCode(int rep) throws HL7Exception
+	{
+		// 3 parts here, unsure which to include:
+		// 1 - identifier
+		// 2 - text
+		// 3 - name of coding system
+		return StringUtils.trimToEmpty(provider.getZPB(rep).getZpb4_diagnosisCode().getCe2_Text().getValue());
+	}
+
+	public String getMedProblemNoteText(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToEmpty(provider.getZPB(rep).getZpb10_noteText().getValue());
 	}
 
 	public Date getMedHistProcedureDate(int rep) throws HL7Exception

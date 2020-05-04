@@ -24,8 +24,6 @@
 package org.oscarehr.ws.rest;
 
 import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
-import net.sf.json.processors.JsDateJsonBeanProcessor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
@@ -42,6 +40,8 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
+import org.oscarehr.providerBilling.model.ProviderBilling;
+import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -55,6 +55,7 @@ import org.oscarehr.ws.rest.to.model.ProviderTo1;
 import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditResponseTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -73,6 +74,7 @@ import java.util.List;
 
 @Component("ProviderService")
 @Path("/providerService/")
+@Transactional
 public class ProviderService extends AbstractServiceImpl {
 
 	private static Logger logger = MiscUtils.getLogger();
@@ -82,7 +84,7 @@ public class ProviderService extends AbstractServiceImpl {
 
 	@Autowired
 	org.oscarehr.provider.service.ProviderService providerService;
-	
+
 	@Autowired
 	ProviderManager2 providerManager;
 	
@@ -97,8 +99,7 @@ public class ProviderService extends AbstractServiceImpl {
 
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
-	
-	
+
 	protected SecurityContext getSecurityContext() {
 		Message m = PhaseInterceptorChain.getCurrentMessage();
     	org.apache.cxf.security.SecurityContext sc = m.getContent(org.apache.cxf.security.SecurityContext.class);
@@ -131,10 +132,8 @@ public class ProviderService extends AbstractServiceImpl {
     @GET
     @Path("/providers_json")
     @Produces("application/json")
-    public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON() {
-    	JsonConfig config = new JsonConfig();
-    	config.registerJsonBeanProcessor(java.sql.Date.class, new JsDateJsonBeanProcessor());
-    	
+    public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON()
+    {
     	List<ProviderTo1> providers = new ProviderConverter().getAllAsTransferObjects(getLoggedInInfo(), providerDao.getActiveProviders());
     	
     	AbstractSearchResponse<ProviderTo1> response = new AbstractSearchResponse<ProviderTo1>();
@@ -144,11 +143,28 @@ public class ProviderService extends AbstractServiceImpl {
     }
 
     @GET
-    @Path("/provider/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public ProviderTransfer getProvider(@PathParam("id") String id) {
-        return ProviderTransfer.toTransfer(providerDao.getProvider(id));
+    @Path("/provider/me")
+    @Produces("application/json")
+    public ProviderTo1 getLoggedInProvider()
+    {
+    	Provider provider = getLoggedInInfo().getLoggedInProvider();
+
+    	if(provider != null)
+    	{
+		    ProviderTo1 transfer = new ProviderConverter().getAsTransferObject(getLoggedInInfo(), provider);
+		    return transfer;
+    	}
+
+    	return null;
     }
+
+	@GET
+	@Path("/provider/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ProviderTransfer getProvider(@PathParam("id") String id) {
+		return ProviderTransfer.toTransfer(providerDao.getProvider(id));
+	}
+
 
 	/**
 	 * enable or disable the provider
@@ -157,43 +173,43 @@ public class ProviderService extends AbstractServiceImpl {
 	 * @return - true on success. errorResponse on bad provider.
 	 */
 	@POST
-		@Path("/provider/{id}/update_status")
-		@Produces(MediaType.APPLICATION_JSON)
-		public RestResponse<Boolean> enableProvider(@PathParam("id") Integer id, Boolean enable)
+	@Path("/provider/{id}/update_status")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> enableProvider(@PathParam("id") Integer id, Boolean enable)
+	{
+		try
 		{
-			try
-			{
-				providerService.enableProvider(id, enable);
-				return RestResponse.successResponse(true);
-			}
-			catch (NoSuchRecordException nsre)
-			{
-				return RestResponse.errorResponse("Cannot find provider, with id: " + id);
-			}
+			providerService.enableProvider(id, enable);
+			return RestResponse.successResponse(true);
 		}
+		catch (NoSuchRecordException nsre)
+		{
+			return RestResponse.errorResponse("Cannot find provider, with id: " + id);
+		}
+	}
 
-		/**
-		 * create a new provider.
-		 * @param providerEditFormTo1 - form data to create the provider from
-		 * @return - the new provider.
-		 */
-		@POST
-		@Path("/provider/new")
-		@Consumes(MediaType.APPLICATION_JSON)
-		@Produces(MediaType.APPLICATION_JSON)
-		public synchronized RestResponse<ProviderEditResponseTo1> createProvider(ProviderEditFormTo1 providerEditFormTo1)
+	/**
+	 * create a new provider.
+	 * @param providerEditFormTo1 - form data to create the provider from
+	 * @return - the new provider.
+	 */
+	@POST
+	@Path("/provider/new")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public synchronized RestResponse<ProviderEditResponseTo1> createProvider(ProviderEditFormTo1 providerEditFormTo1)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
+		try
 		{
-			securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
-			try
-			{
-				ProviderData providerData = providerService.createProvider(providerEditFormTo1, getLoggedInInfo());
-				return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
-			}
-			catch(SecurityRecordAlreadyExistsException secRecordExists)
-			{
-				return RestResponse.errorResponse(ProviderEditResponseTo1.STATUS_SEC_RECORD_EXISTS);
-			}
+			ProviderData providerData = providerService.createProvider(providerEditFormTo1, getLoggedInInfo());
+			return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
 		}
+		catch(SecurityRecordAlreadyExistsException secRecordExists)
+		{
+			return RestResponse.errorResponse(ProviderEditResponseTo1.STATUS_SEC_RECORD_EXISTS);
+		}
+	}
 
 	/**
 	 * edit provider.
@@ -219,34 +235,31 @@ public class ProviderService extends AbstractServiceImpl {
 		}
 	}
 
-		@GET
-		@Path("/provider/{id}/edit_form")
-		@Produces(MediaType.APPLICATION_JSON)
-		public RestResponse<ProviderEditFormTo1> getProviderEditForm(@PathParam("id") Integer id)
-		{
-			return RestResponse.successResponse(providerService.getEditFormForProvider(id, getLoggedInInfo().getLoggedInSecurity()));
-		}
+	@GET
+	@Path("/provider/{id}/edit_form")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<ProviderEditFormTo1> getProviderEditForm(@PathParam("id") Integer id)
+	{
+		return RestResponse.successResponse(providerService.getEditFormForProvider(id, getLoggedInInfo().getLoggedInSecurity()));
+	}
 
     @GET
-    @Path("/provider/me")
-    @Produces("application/json")
-    public String getLoggedInProvider() {
-    	Provider provider = getLoggedInInfo().getLoggedInProvider();
-    	
-    	if(provider != null) {
-    		JsonConfig config = new JsonConfig();
-        	config.registerJsonBeanProcessor(java.sql.Date.class, new JsDateJsonBeanProcessor());
-            return JSONObject.fromObject(provider,config).toString();
-    	}
-    	return null;
-    }
-    
+    @Path("/provider/{id}/billing")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<ProviderBillingTransfer> getProviderBilling(@PathParam("id") String providerNo)
+	{
+		ProviderBilling billing = providerService.getProviderBilling(providerNo);
+		ProviderBillingTransfer transfer = ProviderBillingTransfer.toTransferObj(billing);
+		return RestResponse.successResponse(transfer);
+	}
     @GET
     @Path("/providerjson/{id}")
-    public String getProviderAsJSON(@PathParam("id") String id) {
-    	JsonConfig config = new JsonConfig();
-    	config.registerJsonBeanProcessor(java.sql.Date.class, new JsDateJsonBeanProcessor());
-        return JSONObject.fromObject(providerDao.getProvider(id),config).toString();
+    public ProviderTo1 getProviderAsJSON(@PathParam("id") String id)
+    {
+	    Provider provider = providerDao.getProvider(id);
+	    ProviderTo1 transfer = new ProviderConverter().getAsTransferObject(getLoggedInInfo(), provider);
+
+    	return transfer;
     }
 
     @GET

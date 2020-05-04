@@ -1,6 +1,11 @@
 
 #patient-list-template {
 
+	.appt-aside-container {
+		padding-top: 8px;
+		padding-bottom: 8px;
+	}
+
 	.btn-aside-container {
 		position:absolute;
 		left: 0;
@@ -20,6 +25,18 @@
 				color: $color-neutral-white;
 			}
 		}
+	}
+
+	.container-telehealth {
+		position: absolute;
+		top: 35%;
+		left: 48%;
+		z-index: 2000;
+	}
+
+	.icon-video {
+		font-size: 20px;
+		object-fit: contain;
 	}
 
 	.patient-list-header {
@@ -96,6 +113,11 @@
 				}
 			}
 		}
+	}
+
+	.patient-name-aside {
+		font-size: 14px;
+		font-weight: bold;
 	}
 }
 

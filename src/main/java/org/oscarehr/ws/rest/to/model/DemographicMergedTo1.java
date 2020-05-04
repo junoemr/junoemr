@@ -39,7 +39,7 @@ public class DemographicMergedTo1 implements Serializable {
 
 	private int mergedTo;
 
-	private int deleted;
+	private Boolean deleted;
 
 	private String lastUpdateUser;
 
@@ -69,11 +69,11 @@ public class DemographicMergedTo1 implements Serializable {
 		this.mergedTo = mergedTo;
 	}
 
-	public int getDeleted() {
+	public Boolean getDeleted() {
 		return deleted;
 	}
 
-	public void setDeleted(int deleted) {
+	public void setDeleted(Boolean deleted) {
 		this.deleted = deleted;
 	}
 

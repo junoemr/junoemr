@@ -79,6 +79,9 @@ body {
 .align-items-end {
 	align-items: end;
 }
+.justify-content-right {
+	justify-content: right;
+}
 .justify-content-center {
 	justify-content: center;
 }
@@ -91,7 +94,6 @@ body {
 .justify-content-between {
 	justify-content: space-between;
 }
-
 .flex-row {
 	display: flex;
 	flex-direction: row;
@@ -122,7 +124,7 @@ body {
 	display: inline-block;
 }
 
-// more specific to override bootstrap 
+// more specific to override bootstrap
 body {
 	.no-margin-top {
 		margin-top: 0;
@@ -187,7 +189,9 @@ body {
 		margin-left: $margin-sm;
 	}
 
-	.no-margin-bottom {
+	.sm-margin-top {
+	margin-top: $margin-sm;
+}.no-margin-bottom {
 		margin-bottom: 0;
 	}
 
@@ -223,6 +227,10 @@ body {
 		padding: 0;
 	}
 
+	.no-padding-left {
+	padding-left: 0;
+	}
+
 	.no-margin {
 		margin: 0;
 	}
@@ -238,7 +246,20 @@ body {
 	.float-right {
 		float: right;
 	}
+
+	.icon-lg {
+		font-size: $icon-lg;
+	}
+
+	.icon-md {
+		font-size: $icon-md;
+	}
+
+	.icon-sm {
+		font-size: $icon-sm;
+	}
 }
+
 // Makes checkbox flush with input (as long as checkbox margin is 0)
 .big-checkbox {
 	height: 34px;

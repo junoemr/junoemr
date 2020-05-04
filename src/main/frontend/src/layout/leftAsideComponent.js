@@ -26,6 +26,7 @@
 
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
+import {SystemPreferenceApi} from "../../generated/api/SystemPreferenceApi";
 
 angular.module('Layout').component('leftAside', {
 	bindings: {
@@ -63,6 +64,8 @@ angular.module('Layout').component('leftAside', {
 			'../ws/rs');
 		ctrl.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 			'../ws/rs');
+		ctrl.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
+			'../ws/rs');
 
 		ctrl.tabEnum = Object.freeze({
 			appointments: 0,
@@ -70,6 +73,7 @@ angular.module('Layout').component('leftAside', {
 		});
 		ctrl.activeTab = ctrl.tabEnum.appointments;
 		ctrl.activePatientList = [];
+		ctrl.activeAppointmentList = [];
 
 		//for filter box
 		ctrl.query = '';
@@ -99,6 +103,7 @@ angular.module('Layout').component('leftAside', {
 			);
 
 			ctrl.provider = securityService.getUser();
+			ctrl.telehealthEnabled = ctrl.loadTelehealthEnabled();
 			ctrl.loadProviderSettings();
 		};
 
@@ -124,7 +129,7 @@ angular.module('Layout').component('leftAside', {
 
 		ctrl.goToRecord = function goToRecord(patient)
 		{
-			if (patient.demographicNo != 0)
+			if (patient.demographicNo !== 0)
 			{
 				if (ctrl.loadedSettings.hideOldEchartLinkInAppointment)
 				{
@@ -142,7 +147,8 @@ angular.module('Layout').component('leftAside', {
 						}
 					}
 					$state.go('record.summary', params);
-				} else
+				}
+				else
 				{
 					let startMoment = Juno.Common.Util.getDatetimeNoTimezoneMoment(new Date(patient.date));
 					let params = {
@@ -162,6 +168,32 @@ angular.module('Layout').component('leftAside', {
 					window.open(scheduleService.getEncounterLink(params), 'popupWindow',
 							'height=800,width=1000,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
 				}
+			}
+		};
+
+		ctrl.loadTelehealthEnabled = function loadTelehealthEnabled()
+		{
+			ctrl.systemPreferenceApi.getPropertyEnabled("myhealthaccess_telehealth_enabled").then(
+				function success(rawResults)
+				{
+					ctrl.telehealthEnabled = rawResults.data.body;
+				},
+				function failure()
+				{
+					$scope.displayMessages.add_standard_error("Failed to load telehealth enabled, defaulting to false");
+					ctrl.telehealthEnabled = false;
+				}
+			);
+		};
+
+		ctrl.openTelehealthLink = function openTelehealthLink(patient)
+		{
+			if (patient.isVirtual)
+			{
+				window.open("../integrations/myhealthaccess.do?method=connect"
+					+ "&demographicNo=" + encodeURIComponent(patient.demographicNo)
+					+ "&siteName=" + encodeURIComponent(patient.location)
+					+ "&appt=" + encodeURIComponent(patient.appointmentNo), "_blank");
 			}
 		};
 
@@ -210,8 +242,8 @@ angular.module('Layout').component('leftAside', {
 			ctrl.scheduleApi.getAppointmentsForDay(ctrl.datepickerSelectedDate).then(
 				function success(results)
 				{
-					ctrl.activePatientList = results.data.body;
-					deferred.resolve(ctrl.activePatientList);
+					ctrl.activeAppointmentList = results.data.body;
+					deferred.resolve(ctrl.activeAppointmentList);
 				},
 				function error(errors)
 				{

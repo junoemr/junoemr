@@ -1,0 +1,14 @@
+#ice-fall-admin-activity {
+	@include juno-font-default();
+
+	.form-group {
+		margin: 0;
+	}
+
+	.required {
+		input {
+			border-color: $color-red-base;
+		}
+	}
+
+}

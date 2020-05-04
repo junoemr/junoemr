@@ -19,6 +19,7 @@
 package org.oscarehr.common.dao;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,6 +36,7 @@ import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.stereotype.Repository;
+import oscar.util.ConversionUtils;
 
 /**
  *
@@ -203,6 +205,20 @@ public class SiteDao extends AbstractDao<Site> {
         List<String> pList = query.getResultList();
 
 		return pList;
+	}
+
+	/**
+	 * Get the site that the provider is assigned to on the specific schedule date.
+	 * @param providerNo - provider in question
+	 * @param sdate - date in question
+	 * @return - the assigned site.
+	 */
+	public Site getProviderSiteByScheduleDate(String providerNo, LocalDate sdate)
+	{
+		Query query = entityManager.createQuery("SELECT sd.site FROM ScheduleDate sd WHERE sd.date = :sdate AND sd.providerNo = :providerNo AND sd.status = 'A'");
+		query.setParameter("sdate", ConversionUtils.toLegacyDate(sdate));
+		query.setParameter("providerNo", providerNo);
+		return getSingleResultOrNull(query);
 	}
 
 	public List<String> getGroupBySiteManagerProviderNo(String providerNo) {

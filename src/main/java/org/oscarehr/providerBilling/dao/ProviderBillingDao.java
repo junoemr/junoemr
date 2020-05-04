@@ -26,12 +26,13 @@ package org.oscarehr.providerBilling.dao;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
 
 @Repository
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class ProviderBillingDao  extends AbstractDao<ProviderBilling>
 {
 	public ProviderBillingDao() {
@@ -40,13 +41,13 @@ public class ProviderBillingDao  extends AbstractDao<ProviderBilling>
 
 	/**
 	 * get the billing record for the specified provider
-	 * @param providerNo - the provider how's billing record you want to look up.
+	 * @param providerNo - id of the Provider linked to the billing record.
 	 * @return - the billing record.
 	 */
 	public ProviderBilling getByProvider(Integer providerNo)
 	{
-		Query query = entityManager.createQuery("SELECT pb FROM ProviderBilling pb WHERE pb.providerNo = :providerNo");
-		query.setParameter("providerNo", providerNo);
+		Query query = entityManager.createQuery("SELECT p.billingOpts FROM ProviderData p WHERE p.id = :providerNo");
+		query.setParameter("providerNo", providerNo.toString());
 		return getSingleResultOrNull(query);
 	}
 }

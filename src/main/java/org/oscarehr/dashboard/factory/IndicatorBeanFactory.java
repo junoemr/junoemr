@@ -54,7 +54,7 @@ public class IndicatorBeanFactory {
 
 	public IndicatorBeanFactory( IndicatorTemplateXML indicatorTemplateXML ) {
 
-		logger.info("Thread " + Thread.currentThread().getName() +  "[" + Thread.currentThread().getId() 
+		logger.debug("Thread " + Thread.currentThread().getName() +  "[" + Thread.currentThread().getId()
 				+ "] Building Indicator ID: " + indicatorTemplateXML.getId()  + " - " + indicatorTemplateXML.getName() );
 		
 		setIndicatorTemplateXML( indicatorTemplateXML );
@@ -138,7 +138,7 @@ public class IndicatorBeanFactory {
 
 		Integer indicatorId = indicatorTemplateXML.getId();
 		
-		logger.info("Thread " + Thread.currentThread().getName() +  "[" + Thread.currentThread().getId() 
+		logger.debug("Thread " + Thread.currentThread().getName() +  "[" + Thread.currentThread().getId()
 				+ "] Setting Indicator Bean heading info for ID " + indicatorId );
 		
 		indicatorBean.setId( indicatorId );

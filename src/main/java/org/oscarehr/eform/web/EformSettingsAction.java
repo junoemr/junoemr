@@ -55,7 +55,7 @@ public class EformSettingsAction extends DispatchAction
 
 		try
 		{
-			if (eformSettingsForm.getEformPopupHeight() != 0 && eformSettingsForm.getEformPopupWidth() != 0)
+			if (eformSettingsForm.getEformPopupHeight() > 0 && eformSettingsForm.getEformPopupWidth() > 0)
 			{
 				userPropertyDAO.saveProp(provider.getProviderNo(), UserProperty.EFORM_POPUP_WIDTH, eformSettingsForm.getEformPopupWidth().toString());
 				userPropertyDAO.saveProp(provider.getProviderNo(), UserProperty.EFORM_POPUP_HEIGHT, eformSettingsForm.getEformPopupHeight().toString());

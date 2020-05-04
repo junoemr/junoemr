@@ -24,12 +24,14 @@ package org.oscarehr.providerBilling.model;
 
 
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.provider.model.ProviderData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -40,38 +42,58 @@ public class ProviderBilling extends AbstractModel<Integer>
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id = null;
-	@Column(name = "provider_no")
-	private Integer providerNo;
+
+	@OneToOne(mappedBy="billingOpts")
+	private ProviderData provider;
+
 	@Column(name = "bc_rural_retention_code")
 	private String bcRuralRetentionCode;
+
 	@Column(name = "bc_rural_retention_name")
 	private String bcRuralRetentionName;
+
 	@Column(name = "bc_service_location_code")
 	private String bcServiceLocationCode;
+
+	@Column(name = "bc_bcp_eligible")
+	private Boolean bcBCPEligible = false;
+
 	@Column(name = "on_master_number")
 	private String onMasterNumber;
+
 	@Column(name = "on_service_location")
 	private String onServiceLocation;
+
 	@Column(name = "ab_source_code")
 	private String abSourceCode;
+
 	@Column(name = "ab_skill_code")
 	private String abSkillCode;
+
 	@Column(name = "ab_location_code")
 	private String abLocationCode;
+
 	@Column(name = "ab_BA_number")
 	private Integer abBANumber;
+
 	@Column(name = "ab_facility_number")
 	private Integer abFacilityNumber;
+
 	@Column(name = "ab_functional_center")
 	private String abFunctionalCenter;
+
 	@Column(name = "ab_time_role_modifier")
 	private String abTimeRoleModifier;
+
 	@Column(name = "sk_mode")
 	private Integer skMode;
+
 	@Column(name = "sk_location")
 	private String  skLocation;
+
 	@Column(name = "sk_submission_type")
 	private String skSubmissionType;
+
 	@Column(name = "sk_corporation_indicator")
 	private String skCorporationIndicator;
 
@@ -87,13 +109,19 @@ public class ProviderBilling extends AbstractModel<Integer>
 
 	public Integer getProviderNo()
 	{
-		return providerNo;
+		return this.provider.getProviderNo();
 	}
 
-	public void setProviderNo(Integer providerNo)
+	public ProviderData getProvider()
 	{
-		this.providerNo = providerNo;
+		return provider;
 	}
+
+	public void setProvider(ProviderData provider)
+	{
+		this.provider = provider;
+	}
+
 
 	public String getBcRuralRetentionCode()
 	{
@@ -123,6 +151,16 @@ public class ProviderBilling extends AbstractModel<Integer>
 	public void setBcServiceLocationCode(String bcServiceLocationCode)
 	{
 		this.bcServiceLocationCode = bcServiceLocationCode;
+	}
+
+	public Boolean getBcBCPEligible()
+	{
+		return bcBCPEligible;
+	}
+
+	public void setBcBCPEligible(Boolean bcBCPEligible)
+	{
+		this.bcBCPEligible = bcBCPEligible;
 	}
 
 	public String getOnMasterNumber()

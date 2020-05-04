@@ -1,0 +1,25 @@
+#ice-fall-admin {
+	@include juno-font-default();
+
+	hr {
+		margin-top: 0;
+	}
+
+	.ice-fall-nav {
+		font-size: 24px;
+		margin: 0;
+
+		.active {
+			border-style: solid;
+			border-width: 0 0 4px 0;
+			border-color: $color-primary-base;
+			a {
+				color: $color-primary-base;
+			}
+		}
+	}
+
+	.ice-fall-content {
+		padding-left: 15px;
+	}
+}

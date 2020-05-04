@@ -54,7 +54,7 @@ public class IndicatorQueryHandler extends AbstractQueryHandler {
 	@Override
 	public List<?> execute( String query ) {
 
-		logger.info("Executing Indicator Query Thread " + Thread.currentThread().getName() 
+		logger.debug("Executing Indicator Query Thread " + Thread.currentThread().getName()
 				+  "[" + Thread.currentThread().getId() + "]" );
 		
 		List<?> results = null;

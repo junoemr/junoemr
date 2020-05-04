@@ -21,7 +21,7 @@
  * Canada
  */
 
-package org.oscarehr.ws.rest.transfer;
+package org.oscarehr.site.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -49,6 +49,7 @@ public class SiteTransfer implements Serializable
 	private Integer siteLogoId = null;
 	private String siteUrl = "";
 
+	private String bcFacilityNumber;
 
 	public Integer getSiteId()
 	{
@@ -198,5 +199,15 @@ public class SiteTransfer implements Serializable
 	public void setSiteUrl(String siteUrl)
 	{
 		this.siteUrl = siteUrl;
+	}
+
+	public String getBcFacilityNumber()
+	{
+		return bcFacilityNumber;
+	}
+
+	public void setBcFacilityNumber(String bcFacilityNumber)
+	{
+		this.bcFacilityNumber = bcFacilityNumber;
 	}
 }

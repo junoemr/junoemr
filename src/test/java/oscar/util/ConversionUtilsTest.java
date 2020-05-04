@@ -45,11 +45,36 @@ import java.util.List;
 import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 public class ConversionUtilsTest
 {
+	@Test
+	public void getStringOrDefaultValue_DesiredIsNull()
+	{
+		String desiredValue = null;
+		String defaultValue = "Works as expected";
+		assertEquals("Did not get defaultValue back", defaultValue, ConversionUtils.getStringOrDefaultValue(desiredValue, defaultValue));
+	}
+
+	@Test
+	public void getStringOrDefaultValue_DesiredIsEmpty()
+	{
+		String desiredValue = "";
+		String defaultValue = "Works as expected";
+		assertEquals("Did not get defaultValue back", defaultValue, ConversionUtils.getStringOrDefaultValue(desiredValue, defaultValue));
+	}
+
+	@Test
+	public void getStringOrDefaultValue_OkDesiredValue()
+	{
+		String desiredValue = "Some other string";
+		String defaultValue = "Works as expected";
+		assertEquals("Did not get desiredValue back", desiredValue, ConversionUtils.getStringOrDefaultValue(desiredValue, defaultValue));
+	}
+
 	@Test
 	public void toIntList_ValidIntegersAsStrings_ExpectConversion()
 	{

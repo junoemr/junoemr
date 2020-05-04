@@ -39,6 +39,15 @@
 			background-color: $color-neutral-lightest;
 			border-color: $color-neutral-grey;
 		}
+
+		/*Make check mark light grey when disabled & checked.*/
+		&:disabled {
+			&:checked + .checkmark {
+				.icon {
+					color: $color-neutral-light-grey;
+				}
+			}
+		}
 	}
 	/* style a custom checkbox */
 	.checkmark {

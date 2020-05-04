@@ -146,12 +146,12 @@ public final class LoginCheckLoginBean {
 	private Security getUserID() {
 
 		SecurityDao securityDao = (SecurityDao) SpringUtils.getBean("securityDao");
-		List<Security> results = securityDao.findByUserName(username);
-		Security security = null;
-		if (results.size() > 0) security = results.get(0);
-		else
-		{// attempt lookup by email
-			results = securityDao.findByEmail(username);
+		Security security = securityDao.findByUserName(username);
+
+		// attempt lookup by email. TODO refactor to single object after merge
+		if (security == null)
+		{
+			List<Security> results = securityDao.findByEmail(username);
 			if (results.size() > 0)
 			{
 				security = results.get(0);

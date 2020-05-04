@@ -43,6 +43,7 @@ import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
 import org.oscarehr.ws.rest.transfer.providerManagement.SecurityRecordTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.oscarProvider.data.ProviderBillCenter;
 
@@ -52,7 +53,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service("provider.service.ProviderService")
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED)
 public class ProviderService
 {
 	@Autowired
@@ -81,6 +82,28 @@ public class ProviderService
 
 	@Autowired
 	private ProviderBillingDao providerBillingDao;
+
+	public ProviderData getProvider(String providerNo)
+	{
+		return providerDataDao.findByProviderNo(providerNo);
+	}
+
+	public void saveProvider(ProviderData provider)
+	{
+		providerDataDao.merge(provider);
+	}
+
+	/**
+	 * Fetch a provider including with all associations preloaded.  Use this get method if you are in a layer which
+	 * doesn't support transactions and you need to read or write to lazily loaded entities.
+	 *
+	 * @param providerNo id of Provider to fetch
+	 * @return Fully instantiated provider object
+	 */
+	public ProviderData getProviderEager(String providerNo)
+	{
+		return providerDataDao.eagerFindByProviderNo(providerNo);
+	}
 
 	public ProviderData addNewProvider(String creatingProviderNo, ProviderData provider, String billCenterCode)
 	{
@@ -143,6 +166,18 @@ public class ProviderService
 	public Integer getNextProviderNumberInSequence(int minThreshold, int ignoreThreshold)
 	{
 		return providerDataDao.getNextIdWithThreshold(minThreshold, ignoreThreshold);
+	}
+
+	public ProviderBilling getProviderBilling(String providerNo)
+	{
+		ProviderData provider = providerDataDao.findByProviderNo(providerNo);
+
+		if (provider == null)
+		{
+			return null;
+		}
+
+		return provider.getBillingOpts();
 	}
 
 	/**
@@ -229,8 +264,8 @@ public class ProviderService
 
 		// save billing data
 		ProviderBilling providerBilling = providerEditFormTo1.getProviderBilling();
-		providerBilling.setProviderNo(provider.getProviderNo());
-		providerBillingDao.persist(providerBilling);
+		provider.setBillingOpts(providerBilling);
+		providerDataDao.merge(provider);
 
 		updateProviderSiteAndRole(providerEditFormTo1, provider.getProviderNo());
 
@@ -248,17 +283,16 @@ public class ProviderService
 
 			// edit provider
 			newProviderData.setProviderNo(providerNo);
-			providerDataDao.merge(newProviderData);
 
 			// edit billing data
 			ProviderBilling providerBilling = providerEditFormTo1.getProviderBilling();
-			ProviderBilling existingBillingData = providerBillingDao.getByProvider(providerNo);
-			if (existingBillingData != null)
+			if (providerData.getBillingOpts() != null)
 			{
-				providerBilling.setId(existingBillingData.getId());
+				providerBilling.setId(providerData.getBillingOpts().getId());
 			}
-			providerBilling.setProviderNo(newProviderData.getProviderNo());
-			providerBillingDao.merge(providerBilling);
+			newProviderData.setBillingOpts(providerBilling);
+
+			providerDataDao.merge(newProviderData);
 
 			updateProviderSiteAndRole(providerEditFormTo1, newProviderData.getProviderNo());
 
@@ -304,8 +338,8 @@ public class ProviderService
 			List<Security> securityList = providerEditFormTo1.getSecurityRecords(providerNo, false);
 			for (Security security : securityList)
 			{
-				List<Security> existingRecords = securityDao.findByUserName(security.getUserName());
-				if (existingRecords.size() == 0)
+				Security existingRecord = securityDao.findByUserName(security.getUserName());
+				if (existingRecord == null)
 				{
 					securityDao.persist(security);
 				}
@@ -333,20 +367,11 @@ public class ProviderService
 			List<Security> securityList = providerEditFormTo1.getSecurityRecords(providerNo, true);
 			for (Security newSecurityRecord : securityList)
 			{
-				List<Security> existingRecords = securityDao.findByUserName(newSecurityRecord.getUserName());
+				Security existingRecord = securityDao.findByUserName(newSecurityRecord.getUserName());
 
 				// check for collision with record other than self.
 				boolean collision = false;
-				for (Security existingRecord : existingRecords)
-				{
-					if (!existingRecord.getSecurityNo().equals(newSecurityRecord.getSecurityNo()))
-					{
-						collision = true;
-						break;
-					}
-				}
-
-				if (collision)
+				if (!existingRecord.getSecurityNo().equals(newSecurityRecord.getSecurityNo()))
 				{
 					throw new SecurityRecordAlreadyExistsException("Security Record already exists");
 				}

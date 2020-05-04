@@ -34,6 +34,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.managers.DashboardManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -47,7 +48,7 @@ public class ExportResultsAction extends Action  {
 	private static DashboardManager dashboardManager = SpringUtils.getBean(DashboardManager.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
+			HttpServletRequest request, HttpServletResponse response) throws IOException, InterruptedException
 	{
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -62,38 +63,42 @@ public class ExportResultsAction extends Action  {
 		}
 		
 		String indicatorId = request.getParameter("indicatorId");
-		String indicatorName = request.getParameter("indicatorName");		
 		OutputStream outputStream = null;
-		String csvFile = dashboardManager.exportDrilldownQueryResultsToCSV( loggedInInfo, Integer.parseInt( indicatorId ), providerNo );
-		
-		if( indicatorName == null || indicatorName.isEmpty() ) {
-			indicatorName = "indicator_data-" + System.currentTimeMillis() + ".csv";
-		} else {
-			indicatorName = indicatorName + System.currentTimeMillis() + ".csv";
-		}
-		
-		if( csvFile != null ) {
-			
-			response.setContentType("text/csv");
-			response.setHeader("Content-Disposition","attachment;filename=" + indicatorName );
-	
-			try {
+		GenericFile csvFile = null;
+		try
+		{
+			int indicator = Integer.parseInt(indicatorId);
+			csvFile = dashboardManager.exportDrilldownQueryResultsToCSV(loggedInInfo, indicator, providerNo);
+			if (csvFile != null)
+			{
+				response.setContentType("text/csv");
+				response.setHeader("Content-Disposition","attachment;filename=" + csvFile.getName());
 				outputStream = response.getOutputStream();
-				outputStream.write( csvFile.getBytes() );
-			} catch (IOException e) {
-				logger.error("Failed to export CSV file: " + indicatorName, e );
-			} finally {
-				if( outputStream != null ) {
-					try {
-						outputStream.flush();
-						outputStream.close();
-					} catch (IOException e) {
-						logger.error("Failed to close output stream", e );
-					}
-				}
+				csvFile.writeToOutputStream(outputStream);
+			}
+			else
+			{
+				logger.error("No results associated with the export request.");
 			}
 		}
-		
+		catch (NumberFormatException e)
+		{
+			logger.error("Error when attempting to parse " + indicatorId, e);
+		}
+		finally
+		{
+			if (outputStream != null)
+			{
+				outputStream.flush();
+				outputStream.close();
+			}
+
+			if (csvFile != null)
+			{
+				csvFile.deleteFile();
+			}
+		}
+
 		return null;
 	}
 

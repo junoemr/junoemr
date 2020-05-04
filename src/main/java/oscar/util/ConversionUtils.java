@@ -85,6 +85,22 @@ public class ConversionUtils {
 	private ConversionUtils() {
 	}
 
+	/**
+	 * Wrapper for places where we're reading a String that may contain bad values.
+	 * Generally in these cases we have some default value but it depends on the situation.
+	 * @param desiredString String value we want to use
+	 * @param defaultValue fallback in case the desired value is not good
+	 * @return desiredString if it's not null or empty, desiredValue otherwise
+	 */
+	public static String getStringOrDefaultValue(String desiredString, String defaultValue)
+	{
+		if (desiredString == null || desiredString.isEmpty())
+		{
+			desiredString = defaultValue;
+		}
+		return desiredString;
+	}
+
 	public static List<Integer> toIntList(List<String> list) {
 		List<Integer> result = new ArrayList<Integer>();
 		for (String str : list) {

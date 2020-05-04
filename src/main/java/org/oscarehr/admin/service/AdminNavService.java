@@ -24,8 +24,10 @@
 package org.oscarehr.admin.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.ws.rest.to.model.AdminNavGroupTo1;
 import org.oscarehr.ws.rest.to.model.AdminNavItemTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public class AdminNavService
 {
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
+
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
 
@@ -644,6 +649,18 @@ public class AdminNavService
 		if (securityInfoManager.isSuperAdmin(providerNo))
 		{
 			integrationItems.add(new AdminNavItemTo1("Integration Modules", "integrationModules"));
+		}
+
+		if (systemPreferenceService.isPreferenceEnabled(UserProperty.ICE_FALL_INTEGRATION_ENABLED, false))
+		{
+			if (systemPreferenceService.isPreferenceEnabled(UserProperty.ICE_FALL_VISIBLE, false))
+			{
+				integrationItems.add(new AdminNavItemTo1("Ice Fall", "iceFall/activity"));
+			}
+			else
+			{
+				integrationItems.add(new AdminNavItemTo1("Ice Fall", "iceFall/settings"));
+			}
 		}
 
 		integrationGroup.setItems(integrationItems);

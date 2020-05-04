@@ -72,6 +72,7 @@ public class LogConst {
 	public static final String CON_EFORM_DATA = "eForm";
 	public static final String CON_DEMOGRAPHIC = "demographic";
 	public static final String CON_DEMOGRAPHIC_RELATION = "demographic_relations";
+	public static final String CON_DEMOGRAPHIC_MERGE = "demographic_merge";
 	public static final String CON_DISEASE_REG = "DX";
 	public static final String CON_ROLE = "role";
 	public static final String CON_PROVIDER = "provider";

@@ -327,68 +327,64 @@
 							</div>
 							<!-- Password -->
 							<div ng-class="{'field-error': (!securityRecord.validations.password() || !securityRecord.validations.passwordMatch()) && $ctrl.hasSubmitted}">
-								<ca-field-text
+								<ca-field-password
 												ca-name="password"
 												ca-title="Password"
 												ca-model="securityRecord.password"
 												ca-rows="1"
 												ca-text-placeholder="Password"
-												ca-hide-input="true"
 												ca-required-field="true"
 												ca-disabled="$ctrl.fieldsDisabled"
 								>
-								</ca-field-text>
+								</ca-field-password>
 								<div class="body-smallest error-message" ng-if="!securityRecord.validations.password() && $ctrl.hasSubmitted">
 									Password must be atleast 8 characters long and include atleast one special character.
 								</div>
 							</div>
 							<!-- Confirm Password -->
 							<div ng-class="{'field-error': (!securityRecord.validations.passwordVerify() || !securityRecord.validations.passwordMatch()) && $ctrl.hasSubmitted}">
-								<ca-field-text
+								<ca-field-password
 												ca-name="confirm_password"
 												ca-title="Confirm Password"
 												ca-model="securityRecord.passwordVerify"
 												ca-rows="1"
 												ca-text-placeholder="Retype Password"
-												ca-hide-input="true"
 												ca-required-field="true"
 												ca-disabled="$ctrl.fieldsDisabled"
 								>
-								</ca-field-text>
+								</ca-field-password>
 								<div class="body-smallest error-message" ng-if="!securityRecord.validations.passwordMatch() && $ctrl.hasSubmitted">
 									Passwords do not match.
 								</div>
 							</div>
 							<!-- Second Level Passcode -->
 							<div ng-class="{'field-error': (!securityRecord.validations.secondLevelPasscode() || !securityRecord.validations.secondLevelPasscodeMatch()) && $ctrl.hasSubmitted}">
-								<ca-field-text
+								<ca-field-password
 												ca-name="passcode"
 												ca-title="Second Level Passcode"
 												ca-model="securityRecord.pin"
 												ca-rows="1"
 												ca-text-placeholder="Passcode"
-												ca-hide-input="true"
 												ca-required-field="true"
 												ca-disabled="$ctrl.fieldsDisabled"
 								>
-								</ca-field-text>
+								</ca-field-password>
 							</div>
 							<div class="body-smallest error-message" ng-if="!securityRecord.validations.secondLevelPasscode() && $ctrl.hasSubmitted">
 								Second Level passcode must be a number.
 							</div>
 							<!-- Confirm Second Level Passcode -->
 							<div ng-class="{'field-error': (!securityRecord.validations.secondLevelPasscodeVerify() || !securityRecord.validations.secondLevelPasscodeMatch()) && $ctrl.hasSubmitted}">
-								<ca-field-text
+								<ca-field-password
 												ca-name="confirm_passcode"
 												ca-title="Retype Second Level Passcode"
 												ca-model="securityRecord.pinVerify"
 												ca-rows="1"
 												ca-text-placeholder="Retype Passcode"
-												ca-hide-input="true"
 												ca-required-field="true"
 												ca-disabled="$ctrl.fieldsDisabled"
 								>
-								</ca-field-text>
+								</ca-field-password>
 								<div class="body-smallest error-message" ng-if="!securityRecord.validations.secondLevelPasscodeMatch() && $ctrl.hasSubmitted">
 									Passcodes do not match.
 								</div>

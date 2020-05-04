@@ -1,0 +1,23 @@
+#ice-fall-admin-settings {
+	.switch {
+		display: inline-block;
+		@include juno-toggle-switch(32px, 4px, .4s);
+	}
+
+	.switch-label {
+		padding-right: 12px;
+		@include juno-font-default-size(20px);
+	}
+
+	.integration-check {
+		margin-left: 12px;
+		color: $color-primary-dark;
+		font-size: 30px;
+		min-width: 30px;
+	}
+
+	.ice-fall-setting-left-col {
+	}
+
+
+}

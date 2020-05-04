@@ -23,12 +23,18 @@
  */
 package org.oscarehr.dashboard.handler;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.util.MiscUtils;
 
 public class ExportQueryHandler extends AbstractQueryHandler {
@@ -36,7 +42,7 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 	private static Logger logger = MiscUtils.getLogger();
 	private static final char SEPARATOR = ',';
 	
-	private String csvFile;
+	private GenericFile csvFile;
 	
 	public ExportQueryHandler() {
 		// default
@@ -45,10 +51,13 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 	@Override
 	public List<?> execute() {
 		
-		logger.info("Executing Export Query");
+		logger.debug("Executing Export Query");
 	
-		List<?> results = super.execute();		
-		setCsvFile( results );	
+		List<?> results = super.execute();
+		if (results.size() > 0)
+		{
+			generateCsvContent(results);
+		}
 		return results;
 	}
 	
@@ -58,13 +67,9 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 		super.setQuery( finalQuery );
 	}
 
-	public String getCsvFile() {
-		return csvFile;
-	}
-
 	@SuppressWarnings("unchecked")
-	private void setCsvFile( List<?> results ) {
-		
+	private void generateCsvContent(List<?> results)
+	{
 		StringBuilder stringBuilder = new StringBuilder();
 		
 		stringBuilder.append( writeHeadings( results ) );
@@ -75,13 +80,27 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 			Collection<?> resultCollection = result.values();
 			Object[] resultArray = new Object[ resultCollection.size() ];
 			resultCollection.toArray( resultArray );
-			
+
 			stringBuilder.append( writeLine( resultArray ) );
 		}
 
-		this.csvFile = stringBuilder.toString();
+		try
+		{
+			String csvContent = stringBuilder.toString();
+			InputStream inputStream = new ByteArrayInputStream(csvContent.getBytes(StandardCharsets.UTF_8));
+			this.csvFile = FileFactory.createTempFile(inputStream, ".csv");
+		}
+		catch (IOException | InterruptedException e)
+		{
+			logger.error("Could not build CSV due to following error:", e);
+		}
 	}
-	
+
+	public GenericFile getCsvFile()
+	{
+		return csvFile;
+	}
+
 	@SuppressWarnings("unchecked")
 	private static String writeHeadings( List<?> results ) {
 		
@@ -99,9 +118,9 @@ public class ExportQueryHandler extends AbstractQueryHandler {
 		
 		for( Object value : line ) {
 			
-			String stringValue = value + "";			
-			stringBuilder.append( filterQuotes( stringValue ) );
-			stringBuilder.append( SEPARATOR );			
+			String stringValue = '"' + value.toString() + '"';
+			stringBuilder.append(stringValue);
+			stringBuilder.append( SEPARATOR );
 		}
 		
 		stringBuilder.deleteCharAt( stringBuilder.length() - 1 );	
