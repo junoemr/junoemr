@@ -551,6 +551,11 @@ angular.module('Settings').controller('Settings.SettingsController', [
 				alert("The value of link and form names displayed on appointment screen must be a positive number.");
 				isValid = false;
 			}
+			else if (controller.pref.appointmentScreenLinkNameDisplayLength.length > 3)
+			{
+				alert("Please reduce the length of the link and form names that you want to display to a value under 999.");
+				isValid = false;
+			}
 			else
 			{
 				let intVal = parseInt(controller.pref.appointmentScreenLinkNameDisplayLength);

@@ -160,6 +160,13 @@ function checkTypeInAll()
 		alert("<bean:message key="provider.providerpreference.msgLinkLength"/>");
 	}
 
+	if (document.UPDATEPRE.appointmentScreenFormsNameDisplayLength.value.length > 3)
+	{
+		checkin = false;
+		this.focus();
+		alert("<bean:message key="provider.providerpreference.msgCharLength"/>");
+	}
+
 	return checkin;
 }
 
