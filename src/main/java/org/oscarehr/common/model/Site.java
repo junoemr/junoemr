@@ -219,7 +219,11 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	}
 
 	public void setBgColor(String bgColor) {
-		this.bgColor = bgColor;
+		// Only allow valid characters associated with HTML colors, to prevent code injection
+		// eg:  "dodgerblue", "FFA4G8"
+
+		String cleaned = bgColor.replaceAll("[^A-Za-z0-9#]", "");
+		this.bgColor = cleaned;
 	}
 
 	public String getAddress() {
