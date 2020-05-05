@@ -157,6 +157,7 @@
 
 	try
 	{
+		SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 		securityInfoManager.superAdminModificationCheck(request.getParameter("current_user"),request.getParameter("provider_no"));
 
 
