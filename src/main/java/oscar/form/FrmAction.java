@@ -167,14 +167,29 @@ public final class FrmAction extends Action {
                 props.setProperty("provider_no", (String) request.getSession().getAttribute("user"));
                 newID = rec.saveFormRecord(props);
                 String ip = request.getRemoteAddr();
-                LogAction.addLogEntry(providerNo,
-                        demographicNo,
-                        LogConst.ACTION_ADD,
-                        LogConst.CON_FORM,
-                        LogConst.STATUS_SUCCESS,
-                        "Form ID edited: " + formId + " | Form ID saved: " + newID,
-                        ip,
-                        request.getParameter("form_class"));
+                if (formId > 0)
+                {
+                    LogAction.addLogEntry(providerNo,
+                            demographicNo,
+                            LogConst.ACTION_EDIT,
+                            LogConst.CON_FORM,
+                            LogConst.STATUS_SUCCESS,
+                            "Form ID edited: " + formId + " | Form ID saved: " + newID,
+                            ip,
+                            request.getParameter("form_class"));
+
+                }
+                else
+                {
+                    LogAction.addLogEntry(providerNo,
+                            demographicNo,
+                            LogConst.ACTION_ADD,
+                            LogConst.CON_FORM,
+                            LogConst.STATUS_SUCCESS,
+                            "New form saved with id: " + newID,
+                            ip,
+                            request.getParameter("form_class"));
+                }
             }
             String strAction = rec.findActionValue(request.getParameter("submit"));            
             ActionForward af = mapping.findForward(strAction);
