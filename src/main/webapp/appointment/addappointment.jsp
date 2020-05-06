@@ -173,6 +173,7 @@
 		<script type="text/javascript" src="../js/jquery-1.7.1.min.js"></script>
 		<script src="<%=request.getContextPath()%>/js/jquery-ui-1.8.18.custom.min.js"></script>
 		<script src="<%=request.getContextPath()%>/js/fg.menu.js"></script>
+		<script src="<%=request.getContextPath()%>/js/promisePolyfill.js"></script>
 		<script src="<%=request.getContextPath()%>/js/myhealthaccess.js"></script>
 
 

@@ -191,6 +191,7 @@
 				src="<%= request.getContextPath() %>/js/util/date.js"></script>
 		<script type="text/javascript"
 				src="<%= request.getContextPath() %>/js/util/appointment.js"></script>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/promisePolyfill.js"></script>
 		<script type="text/javascript" src="<%= request.getContextPath() %>/js/myhealthaccess.js"></script>
 		<title><bean:message key="appointment.editappointment.title"/></title>
 		<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
