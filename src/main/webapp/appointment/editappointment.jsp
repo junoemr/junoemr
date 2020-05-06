@@ -1109,7 +1109,7 @@
 											type="button"
 											style="display:none;"
 											value="Send Appointment Notification"
-											title="Send a notifcation containing the link needed to join the telehealth session to the patient"
+											title="Send a notification containing the link needed to join the telehealth session to the patient"
 							>
 							<p id="send-telehealth-link-msg-sent"
 								 style="color: green; display: inline; opacity: 0.0; font-size:13px; margin-left: 10px; transition: opacity 1s;"

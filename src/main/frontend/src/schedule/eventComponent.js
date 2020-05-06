@@ -167,7 +167,7 @@ angular.module('Schedule').component('eventComponent', {
 
 			$scope.TELEHEALTH_MODES = {
 				NONE: "none",
-				TELEHEALTH: "telehalth",
+				TELEHEALTH: "telehealth",
 				ONE_TIME_TELEHEALTH: "oneTimeTelehealth"
 			};
 			$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;

@@ -38,7 +38,6 @@ import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueException;
 import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -128,9 +127,8 @@ public class AppointmentService extends BaseService
 	 */
 	public void sendOneTimeTelehealthNotification(Integration integration, String loginToken, String remote_id)
 	{
-		Boolean response = postWithToken(formatEndpoint("/clinic_user/clinic/appointment/%s/send_one_time_link", remote_id),
+		postWithToken(formatEndpoint("/clinic_user/clinic/appointment/%s/send_one_time_link", remote_id),
 				integration.getApiKey(), null, Boolean.class, loginToken);
-		MiscUtils.getLogger().info(">>>>>>>>>>>>>>>>>>>>>" + response.toString());
 	}
 
 	/**

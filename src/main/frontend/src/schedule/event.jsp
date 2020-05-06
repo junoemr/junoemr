@@ -489,7 +489,7 @@
 							tooltip-append-to-body="true"
 							ng-click="eventController.save(true);"
 							ng-disabled="isWorking() || eventController.isDoubleBookPrevented"
-							title="Create the appointment and send a notifcation email to the user">
+							title="Create the appointment and send a notification email to the user">
 				Create & Notify
 			</button>
 

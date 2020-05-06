@@ -175,9 +175,7 @@ public class AppointmentManager {
 	 * @return
 	 */
 	public Appointment addTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, Boolean sendNotification) {
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
-			throw new RuntimeException("Access Denied");
-		}
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_appointment");
 
 		if (!appointment.getIsVirtual())
 		{

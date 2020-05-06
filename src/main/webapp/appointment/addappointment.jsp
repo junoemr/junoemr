@@ -1299,7 +1299,7 @@
 					<input id="add-appt-and-send-confirmation"
 									type="submit"
 									value="Add & Confirm"
-									title="Add a new appointent and send a confirmation email to the patient"
+									title="Add a new appointment and send a confirmation email to the patient"
 									onclick="document.forms.ADDAPPT.sendBookingNotification.value='true';
 													 document.forms.ADDAPPT.displaymode.value='Add Appointment';"
 									style="display: none"
