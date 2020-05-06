@@ -32,26 +32,22 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import com.lowagie.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.*;
 import org.oscarehr.rx.service.RxWatermarkService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.PrescriptionQrCodeUIBean;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Element;
-import com.lowagie.text.Font;
-import com.lowagie.text.FontFactory;
-import com.lowagie.text.Image;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Phrase;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.PdfPCell;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
 
 import oscar.OscarProperties;
 
@@ -137,7 +133,7 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		PdfPCell cell = new PdfPCell(buildPageFooter());
 		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
 		cell.setBorder(0);
-		cell.setFixedHeight(document.getPageSize().getHeight() - mainTable.getTotalHeight() - 36);//last cell will try to fill the page
+		cell.setFixedHeight(document.getPageSize().getHeight() - mainTable.getTotalHeight() - 80); //last cell will try to fill the page
 		mainTable.addCell(cell);
 
 		/*PdfPCell borderCell = new PdfPCell(mainTable);
