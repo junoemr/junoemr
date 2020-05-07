@@ -132,11 +132,18 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		document.add(mainTable);
 	}
 
-	protected Image createWaterMarkImage()
+	protected Image createWaterMarkImage(float maxHeight)
 	{
 		try
 		{
-			return Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
+
+			Image image = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
+			// Scale image down if greater than the max height
+			if (image.getHeight() > maxHeight) {
+				float scaleFactor = maxHeight/image.getHeight();
+				image.scalePercent(scaleFactor*100f);
+			}
+			return image;
 		}
 		catch(Exception e)
 		{
@@ -351,14 +358,16 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		PdfPCell cell = new PdfPCell();
 		cell.setBorder(0);
 		cell.setPaddingTop(50f);
+		float height = document.getPageSize().getHeight()*0.35f; // Set a maximum height for the watermark
 		if (RxWatermarkService.isWatermarkEnabled())
 		{
-			Image image = createWaterMarkImage();
+			Image image = createWaterMarkImage(height);
 			cell.setImage(image);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setVerticalAlignment(Element.ALIGN_CENTER);
+			height = image.getScaledHeight(); // Overwrite fixed height if smaller
 		}
-		cell.setFixedHeight(document.getPageSize().getHeight()*0.35f);
+		cell.setFixedHeight(height);
 		table.addCell(cell);
 		return table;
 	}
