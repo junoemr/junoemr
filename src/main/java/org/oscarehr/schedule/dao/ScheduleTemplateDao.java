@@ -30,6 +30,8 @@ import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.schedule.model.ScheduleSearchResult;
 import org.oscarehr.schedule.model.ScheduleTemplate;
@@ -42,6 +44,7 @@ import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BlackoutR
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRules;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.CutoffRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.MultipleBookingsRule;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
@@ -65,6 +68,9 @@ import static org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey.DODGY_FAKE_
 @SuppressWarnings("unchecked")
 public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 {
+	@Autowired
+	public UserPropertyDAO userPropertyDao;
+
 	public ScheduleTemplateDao() {
 		super(ScheduleTemplate.class);
 	}
@@ -189,13 +195,25 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			siteFilter = "AND (sd.site_id = :siteId OR sd.site_id IS NULL)\n";
 		}
 
+		UserProperty optimizeSmallSchedulesProp = userPropertyDao.getProp(UserProperty.SCHEDULE_OPTIMIZE_SMALL_SCHEDULES);
+		boolean optimizeSmallSchedules = optimizeSmallSchedulesProp != null && new Boolean(optimizeSmallSchedulesProp.getValue());
+
 		// This query is a bit hard to read.  The mess with all of the UNION ALLs is a way to make a
 		// sequence of numbers.  This is then used to find the position in the scheduletemplate.timecode
 		// value to split it into rows so it can be joined.
-		// It uses the STRAIGHT_JOIN planner hint because the scheduletemplatecode table was being
+		// It uses the STRAIGHT_JOIN planner hint for large schedules because the scheduletemplatecode table was being
 		// joined too soon by default.
-		String sql = "SELECT STRAIGHT_JOIN\n" +
-				"  (n3.i + (10 * n2.i) + (100 * n1.i))+1 AS position, \n" +
+		String sql;
+		if(optimizeSmallSchedules)
+		{
+			sql = "SELECT\n";
+		}
+		else
+		{
+			sql = "SELECT STRAIGHT_JOIN\n";
+		}
+
+		sql +=  "  (n3.i + (10 * n2.i) + (100 * n1.i))+1 AS position, \n" +
 				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
 				"  sd.sdate AS appt_date,\n" +
 				"  SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode))) AS appt_time,\n" +
