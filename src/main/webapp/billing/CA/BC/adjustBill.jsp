@@ -158,6 +158,8 @@ if(!authed) {
    <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
    <script type="text/javascript" src="./js/junoBillingHelper.js"></script>
         <script language="JavaScript">
+        jQuery.noConflict();
+
         if('<%=request.getAttribute("close")%>' == 'true'){
           window.close();
         }
@@ -353,7 +355,7 @@ function calculateFee(){
 }
 
 
-$(document).ready(function()
+jQuery(document).ready(function()
 {
     var $providerSelect = jQuery('#provider-number');
     var $facilityNumber = jQuery('#facility-number');
