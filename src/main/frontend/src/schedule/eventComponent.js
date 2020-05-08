@@ -500,6 +500,22 @@ angular.module('Schedule').component('eventComponent', {
 
 			};
 
+			controller.getTelehealthToolTip = () =>
+			{
+				if ($scope.telehealthMode === $scope.TELEHEALTH_MODES.ONE_TIME_TELEHEALTH)
+				{
+					return "Book a one time telehealth appointment for this patient";
+				}
+				else if ($scope.telehealthMode === $scope.TELEHEALTH_MODES.TELEHEALTH)
+				{
+					return "Book a telehealth appointment for this patient";
+				}
+				else
+				{
+					return "Telehealth appointment unavailable";
+				}
+			};
+
 			controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 			{
 				var eventStatusCode = $scope.defaultEventStatus;

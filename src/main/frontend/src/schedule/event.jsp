@@ -186,6 +186,7 @@
 														ca-model="eventData.virtual"
 														ca-template="juno"
 														ca-disabled="telehealthMode === TELEHEALTH_MODES.NONE"
+														title="{{ eventController.getTelehealthToolTip() }}"
 										>
 										</ca-field-boolean>
 									</div>
