@@ -68,8 +68,7 @@ import static org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey.DODGY_FAKE_
 public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static OscarProperties oscarProps = OscarProperties.getInstance();
-	private final boolean optimizeSmallSchedules = oscarProps.isPropertyActive("optimize_small_schedules");
+	private final boolean optimizeSmallSchedules = OscarProperties.getInstance().isOptimizeSmallSchedulesEnabled();
 
 	public ScheduleTemplateDao() {
 		super(ScheduleTemplate.class);
