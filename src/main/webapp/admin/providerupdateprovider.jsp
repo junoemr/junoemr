@@ -182,7 +182,6 @@ jQuery(document).ready( function() {
 		<% String provider_no = provider.getId(); %>
 		<%= provider_no %>
 		<input type="hidden" name="provider_no" value="<%= provider_no %>">
-		<input type="hidden" id="no_authorization_error_msg" value="<bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization" />">
 	</tr>
 	<tr>
 		<td>
@@ -617,7 +616,6 @@ jQuery(document).ready( function() {
 		<div align="center"><input type="submit"
 			name="subbutton"
 			value="<bean:message key="admin.providerupdateprovider.btnSubmit"/>"
-			onclick="return JS.SetUserPermissionControl.checkProviderPermission(<%= currentProvider.isSuperAdmin()%>,<%= provider.isSuperAdmin()%>, document.getElementById('no_authorization_error_msg').value);"
 		>
 			<input type="hidden" name="current_user" value="<%=curProvider_no%>">
 		</div>

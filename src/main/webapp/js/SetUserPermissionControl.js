@@ -1,25 +1,25 @@
 "use strict"
 
-var JS = JS || {};
 
-if (!JS.SetUserPermissionControl) {
-	JS.SetUserPermissionControl = {};
+var Juno = window.Juno || {};
+Juno.Admin = Juno.Admin || {};
+Juno.Admin.UserPermissionCtrl = Juno.Admin.UserPermissionCtrl || {};
+
+if (!Juno.Admin.UserPermissionCtrl)
+{
+	Juno.Admin.UserPermissionCtrl = {};
 }
 
-
-JS.SetUserPermissionControl.checkProviderPermission = function checkProviderPermission (isLoginUserSuperAdmin, isProviderSuperAdmin, unauthorizedUserMSG)
+Juno.Admin.UserPermissionCtrl.checkProviderPermission = function checkProviderPermission (isLoginUserSuperAdmin, isProviderSuperAdmin)
 {
-	console.log(typeof isLoginUserSuperAdmin);
-	console.log(typeof isProviderSuperAdmin);
 	if (!isLoginUserSuperAdmin && isProviderSuperAdmin)
 	{
-		JS.SetUserPermissionControl.showUnauthorizedUserMSG(unauthorizedUserMSG);
 		return false;
 	}
 	return true;
 };
 
-JS.SetUserPermissionControl.showUnauthorizedUserMSG = function showUnauthorizedUserMSG(unauthorizedUserMSG)
+Juno.Admin.UserPermissionCtrl.showErrorMSG = function showErrorMSG(errMSG)
 {
-	alert(unauthorizedUserMSG);
+	alert(errMSG);
 };

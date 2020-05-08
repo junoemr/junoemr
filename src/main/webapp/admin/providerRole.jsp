@@ -117,14 +117,14 @@
 	<script>
 		$(document).ready(function()
 		{
-			<%
+				<%
 			if(unauthorizedMSG)
 			{
-			%>
-			JS.SetUserPermissionControl.showUnauthorizedUserMSG(document.getElementById("no_authorization_error_msg").value);
-			<%
+				%>
+				Juno.Admin.UserPermissionCtrl.showErrorMSG(document.getElementById("no_authorization_error_msg").value);
+				<%
 			}
-			%>
+				%>
 		});
 
 		function setfocus()
@@ -186,7 +186,7 @@
 		function updateProviderRoles(form, actionMethod, isClickedProviderSuperAdmin)
 		{
 			var isLoginUserSuperAdmin = <%=isCurrentLoginSuperAdmin%>;
-			var result = JS.SetUserPermissionControl.checkProviderPermission(isLoginUserSuperAdmin, isClickedProviderSuperAdmin,document.getElementById("no_authorization_error_msg").value);
+			var result = Juno.Admin.UserPermissionCtrl.checkProviderPermission(isLoginUserSuperAdmin, isClickedProviderSuperAdmin,document.getElementById("no_authorization_error_msg").value);
 			if (result)
 			{
 				form.action = "providerRole.do?method=" + actionMethod;

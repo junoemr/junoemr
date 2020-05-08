@@ -157,163 +157,167 @@
 
   }
 
-	try
+try
+{
+	SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	securityInfoManager.superAdminModificationCheck(request.getParameter("current_user"),request.getParameter("provider_no"));
+
+
+
+	if (!org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable() || isProviderFormalize)
 	{
-		SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-		securityInfoManager.superAdminModificationCheck(request.getParameter("current_user"),request.getParameter("provider_no"));
+		ProviderService providerService = SpringUtils.getBean(ProviderService.class);
+		ProviderData provider = providerService.getProviderEager(request.getParameter("provider_no"));
+
+		if (provider != null)
+		{
+			provider.setLastName(request.getParameter("last_name"));
+			provider.setFirstName(request.getParameter("first_name"));
+			provider.setProviderType(request.getParameter("provider_type"));
+			provider.setSpecialty(request.getParameter("specialty"));
+			provider.setTeam(request.getParameter("team"));
+			provider.setSex(request.getParameter("sex"));
+			provider.setDob(MyDateFormat.getSysDate(request.getParameter("dob")));
+			provider.setAddress(request.getParameter("address"));
+			provider.setPhone(request.getParameter("phone"));
+			provider.setWorkPhone(request.getParameter("workphone"));
+			provider.setEmail(request.getParameter("email"));
+			provider.setOhipNo(request.getParameter("ohip_no"));
+			provider.setRmaNo(request.getParameter("rma_no"));
+			provider.setBillingNo(request.getParameter("billing_no"));
+			provider.setHsoNo(request.getParameter("hso_no"));
+			provider.setAlbertaTakNo(StringUtils.trimToNull(request.getParameter("alberta_tak_no")));
+			provider.setAlbertaConnectCareId(StringUtils.trimToNull(request.getParameter("alberta_connect_care_provider_id")));
+			provider.setOntarioLifeLabsId(StringUtils.trimToNull(request.getParameter("ontario_lifelabs_id")));
+			provider.setStatus(request.getParameter("status"));
+			provider.setComments(SxmlMisc.createXmlDataString(request, "xml_p"));
+			provider.setProviderActivity(request.getParameter("provider_activity"));
+			provider.setPractitionerNo(request.getParameter("practitionerNo"));
+			provider.setLastUpdateUser((String) session.getAttribute("user"));
+			provider.setLastUpdateDate(new Date());
+
+			String supervisor = request.getParameter("supervisor");
+			if (supervisor.equalsIgnoreCase("null"))
+			{
+				supervisor = null;
+			}
+			String albertaEDeliveryIds = StringUtils.trimToNull(request.getParameter("alberta_e_delivery_ids"));
+			// Only strip non-numeric characters if we are on an Alberta instance
+			if (albertaEDeliveryIds != null && OscarProperties.getInstance().getProperty("instance_type").equals("AB"))
+			{
+				albertaEDeliveryIds = albertaEDeliveryIds.replaceAll("[^0-9.,]", ""); // strip non-numbers
+			}
+			provider.setAlbertaEDeliveryIds(albertaEDeliveryIds);
+			provider.setSupervisor(StringUtils.trimToNull(supervisor));
 
 
+			if (provider.getBillingOpts() == null || provider.getBillingOpts().getId() == null)     // todo check if it's null if there's nothing there
+			{
+				provider.setBillingOpts(new ProviderBilling());
+			}
 
-		if (!org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable() || isProviderFormalize)
-    	{
-        ProviderService providerService = SpringUtils.getBean(ProviderService.class);
-        ProviderData provider = providerService.getProviderEager(request.getParameter("provider_no"));
+			// Since each provincial billing option is only presented to the user if the appropriate province is selected
+			// we should check that each parameter is present before writing, otherwise we'll overwrite existing data
 
-        if (provider != null)
-        {
-            provider.setLastName(request.getParameter("last_name"));
-            provider.setFirstName(request.getParameter("first_name"));
-            provider.setProviderType(request.getParameter("provider_type"));
-            provider.setSpecialty(request.getParameter("specialty"));
-            provider.setTeam(request.getParameter("team"));
-            provider.setSex(request.getParameter("sex"));
-            provider.setDob(MyDateFormat.getSysDate(request.getParameter("dob")));
-            provider.setAddress(request.getParameter("address"));
-            provider.setPhone(request.getParameter("phone"));
-            provider.setWorkPhone(request.getParameter("workphone"));
-            provider.setEmail(request.getParameter("email"));
-            provider.setOhipNo(request.getParameter("ohip_no"));
-            provider.setRmaNo(request.getParameter("rma_no"));
-            provider.setBillingNo(request.getParameter("billing_no"));
-            provider.setHsoNo(request.getParameter("hso_no"));
-            provider.setAlbertaTakNo(StringUtils.trimToNull(request.getParameter("alberta_tak_no")));
-            provider.setAlbertaConnectCareId(StringUtils.trimToNull(request.getParameter("alberta_connect_care_provider_id")));
-            provider.setOntarioLifeLabsId(StringUtils.trimToNull(request.getParameter("ontario_lifelabs_id")));
-            provider.setStatus(request.getParameter("status"));
-            provider.setComments(SxmlMisc.createXmlDataString(request, "xml_p"));
-            provider.setProviderActivity(request.getParameter("provider_activity"));
-            provider.setPractitionerNo(request.getParameter("practitionerNo"));
-            provider.setLastUpdateUser((String) session.getAttribute("user"));
-            provider.setLastUpdateDate(new Date());
+			if (request.getParameter("bc_bcp_eligible") != null)
+			{
+				provider.getBillingOpts().setBcBCPEligible(Integer.parseInt(request.getParameter("bc_bcp_eligible")) == 1);
+			}
 
-            String supervisor = request.getParameter("supervisor");
-            if (supervisor.equalsIgnoreCase("null"))
-            {
-                supervisor = null;
-            }
-            String albertaEDeliveryIds = StringUtils.trimToNull(request.getParameter("alberta_e_delivery_ids"));
-            // Only strip non-numeric characters if we are on an Alberta instance
-            if (albertaEDeliveryIds != null && OscarProperties.getInstance().getProperty("instance_type").equals("AB"))
-            {
-                albertaEDeliveryIds = albertaEDeliveryIds.replaceAll("[^0-9.,]", ""); // strip non-numbers
-            }
-            provider.setAlbertaEDeliveryIds(albertaEDeliveryIds);
-            provider.setSupervisor(StringUtils.trimToNull(supervisor));
+			UserPropertyDAO userPropertyDAO = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
+
+			String officialFirstName = request.getParameter("officialFirstName");
+			String officialSecondName = request.getParameter("officialSecondName");
+			String officialLastName = request.getParameter("officialLastName");
+			String officialOlisIdtype = request.getParameter("officialOlisIdtype");
+
+			userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_FIRST_NAME, officialFirstName);
+			userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_SECOND_NAME, officialSecondName);
+			userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_LAST_NAME, officialLastName);
+			userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE, officialOlisIdtype);
 
 
-            if (provider.getBillingOpts() == null || provider.getBillingOpts().getId() == null)     // todo check if it's null if there's nothing there
-            {
-                provider.setBillingOpts(new ProviderBilling());
-            }
+			if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
+			{
+				String provider_no = request.getParameter("provider_no");
+				List<ProviderSite> pss = providerSiteDao.findByProviderNo(provider_no);
 
-            // Since each provincial billing option is only presented to the user if the appropriate province is selected
-            // we should check that each parameter is present before writing, otherwise we'll overwrite existing data
+				for (ProviderSite ps : pss)
+				{
+					providerSiteDao.remove(ps.getId());
+				}
 
-            if (request.getParameter("bc_bcp_eligible") != null)
-            {
-                provider.getBillingOpts().setBcBCPEligible(Integer.parseInt(request.getParameter("bc_bcp_eligible")) == 1);
-            }
+				List<String> sites = new ArrayList<String>();
+				List<String> bcpSites = new ArrayList<String>();
 
-            UserPropertyDAO userPropertyDAO = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
+				if (request.getParameterValues("sites") != null)
+				{
+					sites.addAll(Arrays.asList(request.getParameterValues("sites")));
+				}
 
-            String officialFirstName = request.getParameter("officialFirstName");
-            String officialSecondName = request.getParameter("officialSecondName");
-            String officialLastName = request.getParameter("officialLastName");
-            String officialOlisIdtype = request.getParameter("officialOlisIdtype");
+				if (request.getParameterValues("sitesBCP") != null)
+				{
+					bcpSites.addAll(Arrays.asList(request.getParameterValues("sitesBCP")));
+				}
 
-            userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_FIRST_NAME, officialFirstName);
-            userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_SECOND_NAME, officialSecondName);
-            userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_LAST_NAME, officialLastName);
-            userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE, officialOlisIdtype);
+				for (String siteString : sites)
+				{
+					Integer siteId = Integer.parseInt(siteString);
 
-
-            if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
-            {
-                String provider_no = request.getParameter("provider_no");
-                List<ProviderSite> pss = providerSiteDao.findByProviderNo(provider_no);
-
-                for (ProviderSite ps : pss)
-                {
-                    providerSiteDao.remove(ps.getId());
-                }
-
-            	List<String> sites = new ArrayList<String>();
-            	List<String> bcpSites = new ArrayList<String>();
-
-            	if (request.getParameterValues("sites") != null)
-                {
-                	sites.addAll(Arrays.asList(request.getParameterValues("sites")));
-                }
-
-                if (request.getParameterValues("sitesBCP") != null)
-                {
-                    bcpSites.addAll(Arrays.asList(request.getParameterValues("sitesBCP")));
-                }
-
-                for (String siteString : sites)
-                {
-                	Integer siteId = Integer.parseInt(siteString);
-
-                	ProviderSite provSite = new ProviderSite();
-                	provSite.setId(new ProviderSitePK(provider_no, siteId));
+					ProviderSite provSite = new ProviderSite();
+					provSite.setId(new ProviderSitePK(provider_no, siteId));
 
 
-                	provSite.setBcBCPEligible(bcpSites.contains(siteString));
+					provSite.setBcBCPEligible(bcpSites.contains(siteString));
 
-                	providerSiteDao.persist(provSite);
-                }
-            }
+					providerSiteDao.persist(provSite);
+				}
+			}
 
-            ProviderArchiveDao providerArchiveDao = (ProviderArchiveDao) SpringUtils.getBean("providerArchiveDao");
-            ProviderArchive pa = new ProviderArchive();
-            // unfortunately the providerData provider_no is keyed on 'id' (aka provider_no), which conflicts with the id field
-            // of the providerArchive object.  We have to ignore the field and set it manually.
-            BeanUtils.copyProperties(provider, pa, "id");
-            pa.setProviderNo(provider.getId());
+			ProviderArchiveDao providerArchiveDao = (ProviderArchiveDao) SpringUtils.getBean("providerArchiveDao");
+			ProviderArchive pa = new ProviderArchive();
+			// unfortunately the providerData provider_no is keyed on 'id' (aka provider_no), which conflicts with the id field
+			// of the providerArchive object.  We have to ignore the field and set it manually.
+			BeanUtils.copyProperties(provider, pa, "id");
+			pa.setProviderNo(provider.getId());
 
-            providerArchiveDao.persist(pa);
+			providerArchiveDao.persist(pa);
 
-            providerService.saveProvider(provider);
-%>
-<p>
-<h2><bean:message key="admin.providerupdate.msgUpdateSuccess" />
-<a href="providerupdateprovider.jsp?keyword=<%=request.getParameter("provider_no")%>"><%= request.getParameter("provider_no") %></a>
-</h2>
-<%
-  } else {
-%>
-<h1><bean:message key="admin.providerupdate.msgUpdateFailure" /><%= request.getParameter("provider_no") %>.</h1>
-<%
-  }
-}
-else {
-	if (!isProviderFormalize) {
-		//output ProviderFormalize error message
-	%>
-		<h1><bean:message key="<%=errMsgProviderFormalize%>" />  </h1>
-		Provider # range from : <%=min_value %> To : <%=max_value %>
-	<%
+			providerService.saveProvider(provider);
+			%>
+			<p>
+			<h2><bean:message key="admin.providerupdate.msgUpdateSuccess" />
+			<a href="providerupdateprovider.jsp?keyword=<%=request.getParameter("provider_no")%>"><%= request.getParameter("provider_no") %></a>
+			</h2>
+			<%
+		}
+		else
+		{
+			%>
+			<h1><bean:message key="admin.providerupdate.msgUpdateFailure" /><%= request.getParameter("provider_no") %>.</h1>
+			<%
+		}
 	}
-}
+	else
+	{
+		if (!isProviderFormalize)
+		{
+				//output ProviderFormalize error message
+			%>
+				<h1><bean:message key="<%=errMsgProviderFormalize%>" />  </h1>
+				Provider # range from : <%=min_value %> To : <%=max_value %>
+			<%
+		}
+	}
 
 }
 catch (SecurityException e)
 {
-%>
+	%>
 
-<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization" /> <%= request.getParameter("provider_no") %></h1>
-<%
-	}
+	<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization" /> <%= request.getParameter("provider_no") %></h1>
+	<%
+}
 %>
 <p></p>
 

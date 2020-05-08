@@ -428,7 +428,6 @@ public class Schedule
 		for(MyGroup result: userGroupMappings)
 		{
 			UserDateSchedule userSchedule;
-			MiscUtils.getLogger().info("userSchedule result: "+ result.getId().getProviderNo());
 			if (viewAll)
 			{
 				//in view all we filter by site assigned to provider
@@ -439,7 +438,6 @@ public class Schedule
 						continue;
 					}
 				}
-				MiscUtils.getLogger().info("first getUserDateSchedule method");
 				userSchedule = getUserDateSchedule(
 						date,
 						new Integer(result.getId().getProviderNo()),
@@ -450,7 +448,6 @@ public class Schedule
 			}
 			else
 			{
-				MiscUtils.getLogger().info("second getUserDateSchedule method");
 				userSchedule = getUserDateSchedule(
 						date,
 						new Integer(result.getId().getProviderNo()),
@@ -475,7 +472,6 @@ public class Schedule
 
 			userDateSchedules.add(userSchedule);
 		}
-		MiscUtils.getLogger().info("length of userDateSchedules in getResourceScheduleByGroup before return: "+ userDateSchedules.size());
 		// Create transfer object
 		return new ResourceSchedule(userDateSchedules);
 	}
@@ -560,7 +556,6 @@ public class Schedule
 		{
 			isAvailable = scheduleDate.isAvailable();
 		}
-		MiscUtils.getLogger().info("size of list of appointmentdetails before added to a new userDateSchedule under getUserDateSchedule before return: "+ appointments.size());
 
 		return new UserDateSchedule(
 			providerNo,
