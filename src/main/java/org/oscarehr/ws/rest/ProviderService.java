@@ -55,6 +55,7 @@ import org.oscarehr.ws.rest.to.model.ProviderTo1;
 import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditResponseTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.Consumes;
@@ -197,6 +198,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@Path("/provider/new")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public synchronized RestResponse<ProviderEditResponseTo1> createProvider(ProviderEditFormTo1 providerEditFormTo1)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
@@ -220,6 +222,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@Path("/provider/{id}/edit")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public synchronized RestResponse<ProviderEditResponseTo1> editProvider(@PathParam("id") Integer providerNo, ProviderEditFormTo1 providerEditFormTo1)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");

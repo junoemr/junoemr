@@ -272,9 +272,9 @@ public class ProviderService
 		provider.setBillingOpts(providerBilling);
 		providerDataDao.persist(provider);
 
-		updateProviderSiteAndRole(providerEditFormTo1, provider.getProviderNo());
-
 		createProviderSecurityRecords(providerEditFormTo1, provider.getProviderNo());
+
+		updateProviderSiteAndRole(providerEditFormTo1, provider.getProviderNo());
 
 		return provider;
 	}
@@ -299,9 +299,9 @@ public class ProviderService
 
 			providerDataDao.merge(newProviderData);
 
-			updateProviderSiteAndRole(providerEditFormTo1, newProviderData.getProviderNo());
-
 			editProviderSecurityRecords(providerEditFormTo1, newProviderData.getProviderNo());
+
+			updateProviderSiteAndRole(providerEditFormTo1, newProviderData.getProviderNo());
 
 			return newProviderData;
 		}
@@ -346,15 +346,23 @@ public class ProviderService
 			List<Security> securityList = providerEditFormTo1.getSecurityRecords(providerNo, false);
 			for (Security security : securityList)
 			{
-				Security existingRecord = securityDao.findByUserName(security.getUserName());
-				if (existingRecord == null)
+				if (security.getUserName() != null)
 				{
-					securityDao.persist(security);
+					if (securityDao.findByUserName(security.getUserName()) != null)
+					{
+						throw new SecurityRecordAlreadyExistsException("Security Record already exists");
+					}
 				}
-				else
+
+				if (security.getEmail() != null)
 				{
-					throw new SecurityRecordAlreadyExistsException("Security Record already exists");
+					if (securityDao.findByEmail(security.getEmail()) != null)
+					{
+						throw new SecurityRecordAlreadyExistsException("Security Record already exists");
+					}
 				}
+
+				securityDao.persist(security);
 			}
 		}
 		catch (NoSuchAlgorithmException nae)
@@ -376,8 +384,27 @@ public class ProviderService
 			for (Security newSecurityRecord : securityList)
 			{
 				Security recordToEdit = securityDao.find(newSecurityRecord.getSecurityNo());
+
 				if (recordToEdit != null)
 				{
+					if (newSecurityRecord.getUserName() != null)
+					{
+						Security userNameSecurity = securityDao.findByUserName(newSecurityRecord.getUserName());
+						if (userNameSecurity != null && !userNameSecurity.getSecurityNo().equals(recordToEdit.getSecurityNo()))
+						{
+							throw new SecurityRecordAlreadyExistsException("Security Record already exists");
+						}
+					}
+
+					if (newSecurityRecord.getEmail() != null)
+					{
+						Security emailSecurity = securityDao.findByEmail(newSecurityRecord.getEmail());
+						if (emailSecurity != null && !emailSecurity.getSecurityNo().equals(recordToEdit.getSecurityNo()))
+						{
+							throw new SecurityRecordAlreadyExistsException("Security Record already exists");
+						}
+					}
+
 					updateSecurityRecord(recordToEdit, newSecurityRecord);
 					securityDao.merge(recordToEdit);
 				}
