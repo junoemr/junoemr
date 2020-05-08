@@ -25,6 +25,7 @@
 --%>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ page errorPage="../errorpage.jsp" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.oscarehr.common.dao.SecRoleDao" %>
@@ -106,7 +107,7 @@
 <html>
 <head>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-	<script type="text/javascript" src="<%= request.getContextPath() %>/js/admin.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/SetUserPermissionControl.js"></script>
 	<title>
 		PROVIDER
 	</title>
@@ -120,7 +121,7 @@
 			if(unauthorizedMSG)
 			{
 			%>
-			showUnauthorizedUserMSG();
+			JS.SetUserPermissionControl.showUnauthorizedUserMSG(document.getElementById("no_authorization_error_msg").value);
 			<%
 			}
 			%>
@@ -185,7 +186,7 @@
 		function updateProviderRoles(form, actionMethod, isClickedProviderSuperAdmin)
 		{
 			var isLoginUserSuperAdmin = <%=isCurrentLoginSuperAdmin%>;
-			var result = adminUpdateProviderSetting(isLoginUserSuperAdmin, isClickedProviderSuperAdmin);
+			var result = JS.SetUserPermissionControl.checkProviderPermission(isLoginUserSuperAdmin, isClickedProviderSuperAdmin,document.getElementById("no_authorization_error_msg").value);
 			if (result)
 			{
 				form.action = "providerRole.do?method=" + actionMethod;
@@ -196,6 +197,7 @@
 
 </head>
 <body bgproperties="fixed" bgcolor="ivory" onLoad="setfocus()" topmargin="0" leftmargin="0" rightmargin="0">
+<input type="hidden" id="no_authorization_error_msg" value="<bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization" />">
 <form name="myform" action="providerRole.jsp" method="POST">
 	<table border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr bgcolor="#486ebd">

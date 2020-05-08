@@ -55,11 +55,15 @@ public class ProgramProviderRoleAction extends DispatchAction
 
 			providerRoleService.setPrimaryRole(Integer.parseInt(providerNoStr), roleName);
 		}
+		catch (SecurityException se)
+		{
+			request.setAttribute("messageNotAuthorized", "true");
+			return mapping.findForward("failure");
+		}
 		catch(Exception e)
 		{
 			logger.error("Error", e);
 			request.setAttribute("message", "Failed to assign provider role");
-			request.setAttribute("messageNotAuthorized", "true");
 			return mapping.findForward("failure");
 		}
 		return mapping.findForward("success");

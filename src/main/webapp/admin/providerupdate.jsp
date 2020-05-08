@@ -40,10 +40,7 @@
 		return;
 	}
 %>
-<%@ page
-		import="java.sql.*, oscar.login.*, java.util.*,oscar.*,oscar.oscarDB.*,oscar.oscarProvider.data.ProviderBillCenter"
-		errorPage="errorpage.jsp"%>
-
+<%@page import="oscar.oscarProvider.data.ProviderBillCenter" errorPage="errorpage.jsp"%>
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.oscarehr.common.model.Site"%>
@@ -59,12 +56,17 @@
 <%@page import="org.oscarehr.common.model.UserProperty"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
-<%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>
 <%@ page import="org.oscarehr.provider.model.ProviderData" %>
 <%@ page import="org.oscarehr.providerBilling.model.ProviderBilling" %>
-<%@ page import="org.hibernate.Hibernate" %>
 <%@ page import="org.oscarehr.provider.service.ProviderService" %>
 <%@ page import="org.springframework.beans.BeanUtils" %>
+<%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="oscar.MyDateFormat" %>
+<%@ page import="oscar.SxmlMisc" %>
+<%@ page import="oscar.OscarProperties" %>
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
 	ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
@@ -163,7 +165,7 @@
 
 
 		if (!org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable() || isProviderFormalize)
-    {
+    	{
         ProviderService providerService = SpringUtils.getBean(ProviderService.class);
         ProviderData provider = providerService.getProviderEager(request.getParameter("provider_no"));
 
@@ -192,7 +194,7 @@
             provider.setProviderActivity(request.getParameter("provider_activity"));
             provider.setPractitionerNo(request.getParameter("practitionerNo"));
             provider.setLastUpdateUser((String) session.getAttribute("user"));
-            provider.setLastUpdateDate(new java.util.Date());
+            provider.setLastUpdateDate(new Date());
 
             String supervisor = request.getParameter("supervisor");
             if (supervisor.equalsIgnoreCase("null"))
@@ -309,7 +311,7 @@ catch (SecurityException e)
 {
 %>
 
-<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization" /><%= request.getParameter("provider_no") %>.</h1>
+<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization" /> <%= request.getParameter("provider_no") %></h1>
 <%
 	}
 %>

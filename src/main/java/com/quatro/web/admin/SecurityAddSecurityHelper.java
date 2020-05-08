@@ -88,7 +88,7 @@ public class SecurityAddSecurityHelper {
 		{
 			securityInfoManager.superAdminModificationCheck(request.getParameter("current_user"),request.getParameter("provider_no"));
 		}
-		catch (Exception e)
+		catch (SecurityException e)
 		{
 			return "admin.securityaddsecurity.msgProviderNoAuthorization";
 		}

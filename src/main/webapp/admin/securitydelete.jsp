@@ -92,10 +92,10 @@ if(!authed) {
 <%
   }
 }
-	catch (Exception e)
+	catch (SecurityException e)
 	{
 	%>
-		<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization"/><%=request.getParameter("provider_number")%></h1>
+		<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization"/> <%=request.getParameter("provider_number")%></h1>
 	<%
 	}
 %>
