@@ -318,9 +318,6 @@
 			<form-property name="appointmentCountIncludeNoShow" type="org.oscarehr.common.model.UserProperty" />
 			<form-property name="appointmentCountIncludeNoPatient" type="org.oscarehr.common.model.UserProperty" />
 		</form-bean>
-		<form-bean name="setScheduleLoadingPrefsForm" type="org.apache.struts.action.DynaActionForm">
-			<form-property name="scheduleOptimizeSmallSchedules" type="org.oscarehr.common.model.UserProperty" />
-		</form-bean>
 		<form-bean name="setMyOscarIdForm" type="org.apache.struts.action.DynaActionForm">
 			<form-property name="myOscarLoginId" type="java.lang.String" />
 		</form-bean>
@@ -1641,9 +1638,6 @@
         </action>
 		<action path="/setAppointmentCountPrefs" type="org.springframework.web.struts.DelegatingActionProxy" parameter="method" scope="request" input="/provider/setNoteStaleDate.jsp" name="setAppointmentCountPrefsForm">
 			<forward name="genAppointmentCountPrefs"        path="/provider/setAppointmentCountPrefs.jsp"/>
-		</action>
-		<action path="/setScheduleLoadingPrefs" type="org.springframework.web.struts.DelegatingActionProxy" parameter="method" scope="request" input="/provider/setNoteStaleDate.jsp" name="setScheduleLoadingPrefsForm">
-			<forward name="genScheduleLoadingPrefs"        path="/provider/setScheduleLoadingPrefs.jsp"/>
 		</action>
 		<action input="/provider/providerIndivoIdSetter.jsp" name="setMyOscarIdForm" path="/setMyOscarId" scope="request" type="oscar.oscarProvider.pageUtil.ProEditMyOscarIdAction">
 			<forward name="success" path="/provider/providerIndivoIdSetter.jsp" />

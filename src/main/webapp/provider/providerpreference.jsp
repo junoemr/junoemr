@@ -815,9 +815,6 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
 			<td align="center"><a href=# onClick ="popupPage(230,860,'../setAppointmentCountPrefs.do?method=viewAppointmentCountPrefs');return false;"><bean:message key="provider.btnEditSetAppointmentCountPrefs"/></a></td>
 		</tr>
 		<tr>
-			<td align="center"><a href=# onClick ="popupPage(230,860,'../setScheduleLoadingPrefs.do?method=viewScheduleLoadingPrefs');return false;"><bean:message key="provider.btnEditSetScheduleLoadingPrefs"/></a></td>
-		</tr>
-		<tr>
 			<td align="center"><a href=# onClick ="popupPage(230,860,'providerTicklerSettings.jsp');return false;"><bean:message key="provider.btnTicklerSettings"/></a></td>
 		</tr>
 		<tr>

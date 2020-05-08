@@ -2563,62 +2563,6 @@ public ActionForward viewEDocBrowserInDocumentReport(ActionMapping actionmapping
 		return actionmapping.findForward("genAppointmentCountPrefs");
 	}
 
-    public ActionForward viewScheduleLoadingPrefs(ActionMapping actionmapping, ActionForm actionform, HttpServletRequest request, HttpServletResponse response)
-    {
-        DynaActionForm frm = (DynaActionForm) actionform;
-
-        UserProperty optimizeSmallSchedules = this.userPropertyDAO.getProp(UserProperty.SCHEDULE_OPTIMIZE_SMALL_SCHEDULES);
-
-        if (optimizeSmallSchedules == null)
-        {
-            optimizeSmallSchedules = new UserProperty();
-            optimizeSmallSchedules.setValue("false");
-        }
-
-        request.setAttribute("scheduleOptimizeSmallSchedules", optimizeSmallSchedules);
-
-        request.setAttribute("providertitle", "provider.scheduleLoadingPrefs.title"); //=Set myDrugref ID
-        request.setAttribute("providermsgPrefs", "provider.scheduleLoadingPrefs.msgPrefs"); //=Preferences"); //
-        request.setAttribute("providermsgProvider", "provider.scheduleLoadingPrefs.msgProvider"); //=myDrugref ID
-        request.setAttribute("providerbtnSubmit", "provider.scheduleLoadingPrefs.btnSubmit"); //=Save
-        request.setAttribute("providermsgSuccess", "provider.scheduleLoadingPrefs.msgSuccess"); //=myDrugref Id saved
-        request.setAttribute("method", "saveScheduleLoadingPrefs");
-
-
-        frm.set("scheduleOptimizeSmallSchedules", optimizeSmallSchedules);
-
-        return actionmapping.findForward("genScheduleLoadingPrefs");
-    }
-
-    public ActionForward saveScheduleLoadingPrefs(ActionMapping actionmapping, ActionForm actionform, HttpServletRequest request, HttpServletResponse response)
-    {
-
-        DynaActionForm frm = (DynaActionForm) actionform;
-        UserProperty optimizeSmallSchedulesProp = (UserProperty) frm.get("scheduleOptimizeSmallSchedules");
-
-        boolean optimizeSmallSchedules = optimizeSmallSchedulesProp != null && optimizeSmallSchedulesProp.getValue() != null;
-
-        UserProperty optimizeSmallSchedulesProperty = this.userPropertyDAO.getProp(UserProperty.SCHEDULE_OPTIMIZE_SMALL_SCHEDULES);
-        if (optimizeSmallSchedulesProperty == null)
-        {
-            optimizeSmallSchedulesProperty = new UserProperty();
-            optimizeSmallSchedulesProperty.setName(UserProperty.SCHEDULE_OPTIMIZE_SMALL_SCHEDULES);
-        }
-        optimizeSmallSchedulesProperty.setValue(Boolean.toString(optimizeSmallSchedules));
-        userPropertyDAO.saveProp(optimizeSmallSchedulesProperty);
-
-
-        request.setAttribute("status", "success");
-        request.setAttribute("providertitle", "provider.scheduleLoadingPrefs.title"); //=Set myDrugref ID
-        request.setAttribute("providermsgPrefs", "provider.scheduleLoadingPrefs.msgPrefs"); //=Preferences"); //
-        request.setAttribute("providermsgProvider", "provider.scheduleLoadingPrefs.msgProvider"); //=myDrugref ID
-        request.setAttribute("providerbtnSubmit", "provider.scheduleLoadingPrefs.btnSubmit"); //=Save
-        request.setAttribute("providermsgSuccess", "provider.scheduleLoadingPrefs.msgSuccess"); //=myDrugref Id saved
-        request.setAttribute("method", "saveScheduleLoadingPrefs");
-
-        return actionmapping.findForward("genScheduleLoadingPrefs");
-    }
-
     /**
      * Creates a new instance of ProviderPropertyAction
      */
