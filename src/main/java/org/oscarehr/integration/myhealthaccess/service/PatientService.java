@@ -199,9 +199,9 @@ public class PatientService extends BaseService
 				patient = getPatientByHin(integration, demographic.getHin(), MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()));
 			}
 
-			String action = rejected ? "reject_connection" : "un_reject_connection";
+			String action = rejected ? "reject_connection" : "cancel_reject_connection";
 			return postWithToken(
-							formatEndpoint("/clinic_user/clinic/patient/" + patient.getId() + "/" + action),
+							formatEndpoint("/clinic_user/self/clinic/patient/" + patient.getId() + "/" + action),
 							integration.getApiKey(), null, Boolean.class, loginToken);
 		}
 		catch(InvalidIntegrationException e)

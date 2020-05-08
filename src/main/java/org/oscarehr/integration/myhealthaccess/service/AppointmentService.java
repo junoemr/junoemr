@@ -127,7 +127,7 @@ public class AppointmentService extends BaseService
 	 */
 	public void sendOneTimeTelehealthNotification(Integration integration, String loginToken, String remote_id)
 	{
-		postWithToken(formatEndpoint("/clinic_user/clinic/appointment/%s/send_one_time_link", remote_id),
+		postWithToken(formatEndpoint("/clinic_user/self/clinic/appointment/%s/send_one_time_link", remote_id),
 				integration.getApiKey(), null, Boolean.class, loginToken);
 	}
 
