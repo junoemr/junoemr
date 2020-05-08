@@ -48,6 +48,8 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfLayer;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -120,9 +122,23 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 		return cell;
 	}
 
-	protected void createRxPdf(Document document, PdfWriter writer) throws DocumentException
+	protected void createRxPdf(Document document, PdfWriter writer) throws DocumentException, IOException
 	{
+		PdfLayer pdflayer = new PdfLayer("Main layer", writer);
+		PdfLayer watermarkLayer = new PdfLayer("Watermark layer", writer);
+		PdfContentByte cb = writer.getDirectContent();
 
+		if (RxWatermarkService.isWatermarkEnabled() && RxWatermarkService.isWatermarkBackground())
+		{
+			Image image = createWaterMarkImage(document);
+			watermarkLayer.setOn(true);
+			cb.beginLayer(watermarkLayer);
+			cb.addImage(image);
+			cb.endLayer();
+		}
+
+		pdflayer.setOn(true);
+		cb.beginLayer(pdflayer);
 		PdfPTable mainTable = new PdfPTable(1);
 		mainTable.setExtendLastRow(true);
 		mainTable.setTotalWidth(document.getPageSize().getWidth());
@@ -133,8 +149,6 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 
 		addToTable(mainTable, buildPrescriptionBody(), false);
 
-		addToTable(mainTable, buildWatermark(document), false);
-
 		// Align the footer to the bottom
 		PdfPCell cell = new PdfPCell(buildPageFooter());
 		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
@@ -142,21 +156,29 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 		mainTable.addCell(cell);
 
 		document.add(mainTable);
+		cb.endLayer();
+
+		if (RxWatermarkService.isWatermarkEnabled() && !RxWatermarkService.isWatermarkBackground())
+		{
+			Image image = createWaterMarkImage(document);
+			watermarkLayer.setOn(true);
+			cb.beginLayer(watermarkLayer);
+			cb.addImage(image);
+			cb.endLayer();
+		}
 	}
 
-	protected Image createWaterMarkImage(float maxHeight)
+	protected Image createWaterMarkImage(Document document)
 	{
 		try
 		{
 
-			Image image = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
-			// Scale image down if greater than the max height
-			if (image.getHeight() > maxHeight)
-			{
-				float scaleFactor = maxHeight / image.getHeight();
-				image.scalePercent(scaleFactor * 100f);
-			}
-			return image;
+			Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
+			float scaleFactor = (document.getPageSize().getWidth()*0.8f)/watermarkImg.getWidth();
+			watermarkImg.scalePercent(scaleFactor*100f);
+			watermarkImg.setAbsolutePosition(document.getPageSize().getWidth()/2 - (watermarkImg.getWidth()*scaleFactor) / 2,
+					document.getPageSize().getHeight()/2 - (watermarkImg.getHeight()*scaleFactor) / 2);
+			return watermarkImg;
 		}
 		catch (Exception e)
 		{
@@ -386,29 +408,6 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 				logger.error("Failed to load QR Code image", e);
 			}
 		}
-		return table;
-	}
-
-	protected PdfPTable buildWatermark(Document document)
-	{
-		PdfPTable table = new PdfPTable(1);
-
-		// Render Watermark (doesn't matter if background or foreground, as it will take all the space in the center or
-		// a blank cell will be rendered)
-		PdfPCell cell = new PdfPCell();
-		cell.setBorder(0);
-		cell.setPaddingTop(50f);
-		float height = document.getPageSize().getHeight() * 0.35f; // Set a maximum height for the watermark
-		if (RxWatermarkService.isWatermarkEnabled())
-		{
-			Image image = createWaterMarkImage(height);
-			cell.setImage(image);
-			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setVerticalAlignment(Element.ALIGN_CENTER);
-			height = image.getScaledHeight(); // Overwrite fixed height if smaller
-		}
-		cell.setFixedHeight(height);
-		table.addCell(cell);
 		return table;
 	}
 
