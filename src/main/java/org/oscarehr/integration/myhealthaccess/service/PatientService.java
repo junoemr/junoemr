@@ -214,7 +214,7 @@ public class PatientService extends BaseService
 
 	private void logInvalidIntegrationWarn(InvalidIntegrationException e)
 	{
-		MiscUtils.getLogger().warn("Could not reject patient connection. Invalid integration. " + e.getMessage());
+		MiscUtils.getLogger().warn("Could connect to MHA. Invalid integration. " + e.getMessage());
 	}
 
 }
