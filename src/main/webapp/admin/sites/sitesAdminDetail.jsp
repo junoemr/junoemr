@@ -54,6 +54,7 @@
                 src="../../share/javascript/Oscar.js"></script>
         <script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
         <script type="text/javascript" src="./sites/sitesAdminDetail.js"></script>
+        <script type="text/javascript" src="../share/javascript/picker.js"></script>
 
         <link rel="stylesheet" type="text/css" href="../../share/css/OscarStandardLayout.css">
         <link href="<html:rewrite page='/css/displaytag.css'/>" rel="stylesheet">
@@ -111,7 +112,12 @@
                         </tr>
                         <tr>
                             <td>Theme Color:<sup style="color:red">*</sup></td>
-                            <td><nested:text styleId="colorField" property="site.bgColor" onclick="popup(350,450,'../colorpicker/colorpicker.htm','colorpicker');return false;"></nested:text>
+                            <td>
+                                <nested:text property="site.bgColor"></nested:text>
+                                <a href="javascript:TCP.popup(document.forms['siteForm'].elements['site.bgColor']);">
+                                    <img width="15" height="13" border="0" src="../images/sel.gif">
+                                </a>
+                                <bean:message key="schedule.scheduletemplatecodesetting.msgColorExample"/>
                             </td>
                         </tr>
                         <tr>
