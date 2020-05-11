@@ -28,6 +28,7 @@ package org.oscarehr.schedule.dao;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.schedule.dto.ScheduleSlot;
@@ -43,6 +44,7 @@ import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRu
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.CutoffRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.MultipleBookingsRule;
 import org.springframework.stereotype.Repository;
+import oscar.OscarProperties;
 
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
@@ -65,6 +67,9 @@ import static org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey.DODGY_FAKE_
 @SuppressWarnings("unchecked")
 public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 {
+	private static final Logger logger = MiscUtils.getLogger();
+	private final boolean optimizeSmallSchedules = OscarProperties.getInstance().isOptimizeSmallSchedulesEnabled();
+
 	public ScheduleTemplateDao() {
 		super(ScheduleTemplate.class);
 	}
@@ -175,7 +180,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			result = results.get(0).intValue();
 			if(results.size() > 1)
 			{
-				MiscUtils.getLogger().warn("Multiple values found for provider schedule slot length");
+				logger.warn("Multiple values found for provider schedule slot length");
 			}
 		}
 		return result;
@@ -192,10 +197,20 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		// This query is a bit hard to read.  The mess with all of the UNION ALLs is a way to make a
 		// sequence of numbers.  This is then used to find the position in the scheduletemplate.timecode
 		// value to split it into rows so it can be joined.
-		// It uses the STRAIGHT_JOIN planner hint because the scheduletemplatecode table was being
+		// It uses the STRAIGHT_JOIN planner hint for large schedules because the scheduletemplatecode table was being
 		// joined too soon by default.
-		String sql = "SELECT STRAIGHT_JOIN\n" +
-				"  (n3.i + (10 * n2.i) + (100 * n1.i))+1 AS position, \n" +
+		String sql;
+		if(optimizeSmallSchedules)
+		{
+			sql = "SELECT\n";
+			logger.info("Querying schedule and not using STRAIGHT_JOIN optimizer hint.");
+		}
+		else
+		{
+			sql = "SELECT STRAIGHT_JOIN\n";
+		}
+
+		sql +=  "  (n3.i + (10 * n2.i) + (100 * n1.i))+1 AS position, \n" +
 				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
 				"  sd.sdate AS appt_date,\n" +
 				"  SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode))) AS appt_time,\n" +
@@ -508,7 +523,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 //				") AND slots_with_end_slots.slot_fits\n";
 
 
-		MiscUtils.getLogger().info("Query Start: " + LocalDateTime.now().toString());
+		logger.info("Query Start: " + LocalDateTime.now().toString());
 		Query query = entityManager.createNativeQuery(availableSlots);
 		query.setParameter("startDateTime", java.sql.Timestamp.valueOf(startDateTime), TemporalType.TIMESTAMP);
 		query.setParameter("endDateTime", java.sql.Timestamp.valueOf(endDateTime), TemporalType.TIMESTAMP);
@@ -772,7 +787,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 
 
-		MiscUtils.getLogger().info("Query Start: " + LocalDateTime.now().toString());
+		logger.info("Query Start: " + LocalDateTime.now().toString());
 		Query query = entityManager.createNativeQuery(availableSlots);
 		query.setParameter("startDateTime", java.sql.Timestamp.valueOf(startDateTime), TemporalType.TIMESTAMP);
 		query.setParameter("endDateTime", java.sql.Timestamp.valueOf(endDateTime), TemporalType.TIMESTAMP);
@@ -806,7 +821,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		}
 
 		List<Object[]> results = query.getResultList();
-		MiscUtils.getLogger().info("Query End: " + LocalDateTime.now().toString());
+		logger.info("Query End: " + LocalDateTime.now().toString());
 
 		HashMap<String, List<DayTimeSlots>> providerSchedule = new HashMap<>();
 		ProviderScheduleTransfer providerScheduleTransfer = new ProviderScheduleTransfer();
