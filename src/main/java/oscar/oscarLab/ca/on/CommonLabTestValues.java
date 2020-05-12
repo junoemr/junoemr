@@ -300,29 +300,28 @@ public class CommonLabTestValues {
 					String result = ltr.getResult();
 					String range = getReferenceRange(ltr.getMinimum(), ltr.getMaximum());
 					String units = ltr.getUnits();
-					String collDate = lfp.getCollectionDate();
+					String collectionDateString = lfp.getCollectionDate();
 					String lab_no = String.valueOf(p.getLabNo());
 					String accessionNum = lfp.getAccessionNum();
 
 					Date dateA = (Date) accessionMap.get(accessionNum);
-					Date dateB = UtilDateUtilities.getDateFromString(collDate, "dd-MMM-yy");
-					if (dateA == null || dateA.before(dateB)) {
+					Date collectionDate = ConversionUtils.fromDateString(collectionDateString, "yyyy-mm-dd");
+					if (dateA == null || dateA.before(collectionDate)) {
 						int monthsBetween = 0;
 						if (dateA != null) {
-							monthsBetween = UtilDateUtilities.getNumMonths(dateA, dateB);
+							monthsBetween = UtilDateUtilities.getNumMonths(dateA, collectionDate);
 						}
 						if (monthsBetween < 4) {
-							accessionMap.put(accessionNum, dateB);
-							Hashtable<String, Serializable> h = new Hashtable<String, Serializable>();
+							accessionMap.put(accessionNum, collectionDate);
+							Hashtable<String, Serializable> h = new Hashtable<>();
 							h.put("testName", testNam);
 							h.put("abn", abn);
 							h.put("result", result);
 							h.put("range", range);
 							h.put("units", units);
 							h.put("lab_no", lab_no);
-							h.put("collDate", collDate);
-							h.put("collDateDate", dateB);
-							//labList.add(h);
+							h.put("collDate", collectionDateString);
+							h.put("collDateDate", collectionDate);
 							labMap.put(accessionNum, h);
 						}
 					}
