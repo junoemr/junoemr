@@ -29,9 +29,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
 import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.demographic.model.DemographicExt;
-import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 
@@ -1579,7 +1577,6 @@ public class Demographic implements Serializable
 	 */
 	public boolean isPatientActive()
 	{
-		DemographicService demographicService = (DemographicService)SpringUtils.getBean("demographic.service.DemographicService");
-		return !demographicService.getInactiveDemographicStatuses().contains(this.getPatientStatus());
+		return !org.oscarehr.demographic.model.Demographic.getInactiveDemographicStatuses().contains(this.getPatientStatus());
 	}
 }

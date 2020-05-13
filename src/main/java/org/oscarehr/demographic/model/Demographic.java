@@ -25,10 +25,8 @@ package org.oscarehr.demographic.model;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 
 import javax.persistence.Column;
@@ -46,8 +44,10 @@ import javax.persistence.TemporalType;
 import java.io.Serializable;
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -211,6 +211,19 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		SK,
 		YT,
 		PP
+	}
+
+	/**
+	 * get the list of inactive statuses as dictated by the properties file.
+	 * @return - list of inactive status strings
+	 */
+	public static List<String> getInactiveDemographicStatuses()
+	{
+		String inactiveStatusString = OscarProperties.getInstance().getProperty("inactive_statuses");
+		List<String> inactiveStatuses = Arrays.asList(inactiveStatusString.split(","));
+		return inactiveStatuses.stream()
+				.map((status) -> status.trim().substring(1, status.length() -1))
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -848,7 +861,6 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	 */
 	public boolean isActive()
 	{
-		DemographicService demographicService = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
-		return !demographicService.getInactiveDemographicStatuses().contains(this.getPatientStatus());
+		return !getInactiveDemographicStatuses().contains(this.getPatientStatus());
 	}
 }
