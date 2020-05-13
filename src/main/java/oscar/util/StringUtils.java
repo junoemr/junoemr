@@ -442,7 +442,7 @@ public class StringUtils {
      */
     public static String filterControlCharacters(String input)
     {
-        if (input.trim().length() > 0)
+        if (input != null && input.trim().length() > 0)
         {
            Matcher matcher = UtilMisc.controlCharPattern.matcher(input);
            if (matcher.find())
