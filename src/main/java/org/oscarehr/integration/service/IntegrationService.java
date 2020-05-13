@@ -64,12 +64,23 @@ public class IntegrationService
 
     public Integration findMhaIntegration(String siteName)
     {
+        Integration integration;
+
         if (StringUtils.isNullOrEmpty(siteName))
         {
-            return integrationDao.findDefaultByIntegration(Integration.INTEGRATION_TYPE_MHA);
+            integration = integrationDao.findDefaultByIntegration(Integration.INTEGRATION_TYPE_MHA);
+
+            if (integration == null)
+            {
+                integration = integrationDao.findDefaultByIntegration(Integration.INTEGRATION_TYPE_CLOUD_MD);
+            }
+        }
+        else
+        {
+            integration = integrationDao.findByIntegrationAndSiteName(siteName, Integration.INTEGRATION_TYPE_MHA);
         }
 
-        return integrationDao.findByIntegrationAndSiteName(siteName, Integration.INTEGRATION_TYPE_MHA);
+        return integration;
     }
 
     public UserIntegrationAccess findMhaUserAccessBySecurityAndSiteName(Security security, String siteName)

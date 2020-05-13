@@ -42,6 +42,7 @@ import org.oscarehr.util.MiscUtils;
 
 public class StringUtils {
 
+    private static Pattern HTML_TAG_PATTERN = Pattern.compile(".*\\<.*?>.*");
     private static Logger logger = MiscUtils.getLogger();
     public final static String ELLIPSIS = "...";
 
@@ -444,12 +445,44 @@ public class StringUtils {
     {
         if (input != null && input.trim().length() > 0)
         {
-           Matcher matcher = UtilMisc.controlCharPattern.matcher(input);
-           if (matcher.find())
-           {
-              input = matcher.replaceAll("");
-           }
+            Matcher matcher = UtilMisc.controlCharPattern.matcher(input);
+            if (matcher.find())
+            {
+                input = matcher.replaceAll("");
+            }
         }
         return input;
+    }
+
+    /*
+     * checks that a string is safe for use in Juno.
+     * This is primarily intended to prevent XSS in Juno.
+     * @param testValue - string to test
+     * @return - true if safe, false otherwise.
+     */
+    public static boolean isStringSafe(String testValue)
+    {
+        if (testValue == null)
+        {
+            return true;
+        }
+
+        if (
+                testValue.matches("(?s).*;.*") ||
+                        testValue.matches("(?s).*\".*") ||
+                        testValue.matches("(?s).*'.*") ||
+                        testValue.matches("(?s).*--.*") ||
+                        testValue.matches("(?s).*\\n.*") ||
+                        testValue.matches("(?s).*\\r.*") ||
+                        testValue.matches("(?s).*\\\\.*") ||
+                        testValue.matches("(?s).*\\x00.*") ||
+                        testValue.matches("(?s).*\\x1a.*") ||
+                        HTML_TAG_PATTERN.matcher(testValue).matches()
+        )
+        {
+            return false;
+        }
+
+        return true;
     }
 }

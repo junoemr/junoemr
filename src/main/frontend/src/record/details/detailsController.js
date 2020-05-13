@@ -1323,19 +1323,50 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return {"number": number, "name": name};
 		};
 
+		/**
+		 * Wrap the familyDoctor field in required HTML tags.
+		 * @param name name of the referral doctor
+		 * @param number referral doctor #
+		 * @return {string} name and referral # wrapped appropriately
+		 */
 		controller.formatDocInput = function formatDocInput(name, number)
 		{
-			var docNo = "<rdohip></rdohip>";
-			var doc = "<rd></rd>";
-			if (number != null && number !== "")
+			let docNo = "<rdohip></rdohip>";
+			let doc = "<rd></rd>";
+			if (Juno.Common.Util.exists(number))
 			{
 				docNo = "<rdohip>" + number + "</rdohip>";
 			}
-			if (name != null && name !== "")
+			if (Juno.Common.Util.exists(name))
 			{
 				doc = "<rd>" + name + "</rd>";
 			}
 			return docNo + doc;
+		};
+
+		/**
+		 * Slightly different from formatDocInput as internally the two expect different wrapping HTML tags.
+		 * @param name name of the doctor
+		 * @param number doctor's referral #
+		 * @return {string} name and referral # for the doctor wrapped in the appropriate <fd / > & <fname /> tags
+		 */
+		controller.formatFamilyDocInput = function formatFamilyDocInput(name, number)
+		{
+			let docNo = "<fd></fd>";
+			let doc = "<fdname></fdname>";
+
+			if (Juno.Common.Util.exists(number))
+			{
+				docNo = "<fd>" + number + "</fd>";
+			}
+
+			if (Juno.Common.Util.exists(name))
+			{
+				doc = "<fdname>" + name + "</fdname>";
+			}
+
+			return docNo + doc;
+
 		};
 
 		//HCValidation on open & save
@@ -1441,7 +1472,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.demo.familyDoctor = controller.formatDocInput(controller.page.demo.scrReferralDoc, controller.page.demo.scrReferralDocNo);
 
 			//save family doctor (familyDoctor2)
-			controller.page.demo.familyDoctor2 = controller.formatDocInput(controller.page.demo.scrFamilyDoc, controller.page.demo.scrFamilyDocNo);
+			controller.page.demo.familyDoctor2 = controller.formatFamilyDocInput(controller.page.demo.scrFamilyDoc, controller.page.demo.scrFamilyDocNo);
 
 			//save phone numbers
 			controller.page.demo.scrDemoCell = controller.page.demo.scrCellPhone;

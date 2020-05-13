@@ -22,6 +22,7 @@
  */
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.oscarehr.common.IsPropertiesOn;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
@@ -72,8 +73,14 @@ public class AppointmentService extends BaseService
 	 */
 	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment) throws InvalidIntegrationException
 	{
-		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointment.getLocation()).getToken();
-		String apiKey = getApiKey(appointment.getLocation());
+		String appointmentSite = null;
+		if (IsPropertiesOn.isMultisitesEnable())
+		{
+			appointmentSite = appointment.getLocation();
+		}
+
+		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointmentSite).getToken();
+		String apiKey = getApiKey(appointmentSite);
 		AppointmentBookResponseTo1 appointmentBookResponseTo1 = postWithToken(formatEndpoint("/clinic_user/appointment/book"), apiKey, new AppointmentBookTo1(appointment), AppointmentBookResponseTo1.class, loginToken);
 		if (!appointmentBookResponseTo1.isSuccess())
 		{

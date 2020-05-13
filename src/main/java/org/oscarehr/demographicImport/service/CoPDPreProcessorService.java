@@ -95,6 +95,7 @@ public class CoPDPreProcessorService
 
 		if (CoPDImportService.IMPORT_SOURCE.MEDACCESS.equals(importSource))
 		{
+			message = formatMedAccessSegments(message);
 			message = stripTagWhiteSpace(message);
 			message = fixDoubleBPMeasurements(message);
 			message = fixSlashBPMeasurements(message);
@@ -504,6 +505,25 @@ public class CoPDPreProcessorService
 //		m.appendTail(sb);
 //		return sb.toString();
 //	}
+
+	/**
+	 * Largely here to replace any bad characters present in the import data.
+	 * "Bad" characters in context of this importer are ones that conflict with the usual HL7 reserved characters:
+	 * '|', '&', '~', '\', '^'
+	 * The presence of any of these characters (usually via some HTML or XML encoding) breaks the HAPI parser.
+	 * @param message message to clean
+	 * @return message stripped of problematic encoded segments
+	 */
+	private String formatMedAccessSegments(String message)
+	{
+		// XML-encoded chars
+		message = message.replaceAll("&#xD;", "");
+		message = message.replaceAll("&#x2022;", "");
+		message = message.replaceAll("&#xA0;", "");
+		message = message.replaceAll("&#13", "");
+
+		return message;
+	}
 
 	private String formatWolfFollowupSegments(String message)
 	{

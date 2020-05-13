@@ -29,13 +29,17 @@ import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 import oscar.SxmlMisc;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,6 +57,9 @@ public class Appointment
 
 	@Autowired
 	AppointmentService appointmentService;
+
+	@Autowired
+	MyHealthAccessService myHealthAccessService;
 
 	private String formatName(String upperFirstName, String upperLastName)
 	{
@@ -101,7 +108,8 @@ public class Appointment
 	 * @param appointment - the appointment to save
 	 * @param loggedInInfo - logged in info.
 	 */
-	public void saveNewAppointment(org.oscarehr.common.model.Appointment appointment, LoggedInInfo loggedInInfo)
+	public void saveNewAppointment(org.oscarehr.common.model.Appointment appointment,
+																 LoggedInInfo loggedInInfo, HttpServletRequest request)
 	{
 		oscarAppointmentDao.persist(appointment);
 
@@ -110,6 +118,37 @@ public class Appointment
 		{
 			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
 		}
+
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+						appointment.getDemographicNo(),
+						LogConst.ACTION_ADD,
+						LogConst.CON_APPT,
+						LogConst.STATUS_SUCCESS,
+						String.valueOf(appointment.getId()),
+						request.getRemoteAddr());
+	}
+
+	/**
+	 * update appointment. notifying MHA of update if applicable.
+	 * @param appointment - appointment to update
+	 */
+	public void updateAppointment(org.oscarehr.common.model.Appointment appointment,
+																LoggedInInfo loggedInInfo, HttpServletRequest request)
+	{
+		oscarAppointmentDao.merge(appointment);
+
+		if (appointment.getIsVirtual())
+		{
+			myHealthAccessService.queueAppointmentCacheUpdate(appointment);
+		}
+
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+						appointment.getDemographicNo(),
+						LogConst.ACTION_UPDATE,
+						LogConst.CON_APPT,
+						LogConst.STATUS_SUCCESS,
+						String.valueOf(appointment.getId()),
+						request.getRemoteAddr());
 	}
 
 	public List<CalendarEvent> getCalendarEvents(HttpSession session,

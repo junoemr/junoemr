@@ -148,18 +148,6 @@ ADD_IMPORT_NOTES_REPORTS = true
 #IMPORT_DEFAULT_PROVIDER_FIRST_NAME = doctor
 #IMPORT_DEFAULT_PROVIDER_LAST_NAME = oscardoc
 
-#PGP BINary executable (with full path) for export files encryption
-PGP_BIN: /usr/bin/pgpgpg
-
-#PGP encryption CoMmanD
-PGP_CMD: -e
-
-#PGP encryption KEY
-PGP_KEY: Name (Company) <email@address>
-
-#PGP ENVironment variable - location of PGP key and config files
-PGP_ENV: GNUPGHOME=/usr/local/gnupg/
-
 #### for IBD clinic
 #meditech_id = yes
 #mc_number = yes

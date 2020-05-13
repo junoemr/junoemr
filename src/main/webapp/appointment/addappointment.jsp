@@ -149,6 +149,7 @@
 	int iPageSize = 5;
 
 	ApptData apptObj = ApptUtil.getAppointmentFromSession(request);
+	ApptUtil.APPOINTMENT_OP_TYPE operationType = ApptUtil.getOperationTypeFromSession(request);
 
 	oscar.OscarProperties pros = oscar.OscarProperties.getInstance();
 	String strEditable = pros.getProperty("ENABLE_EDIT_APPT_STATUS");
@@ -339,6 +340,8 @@
 				{
 					warnMsgId.style.display = "none";
 				}
+				document.forms[0].appointmentNo.value = "<%=apptObj.getAppointmentNo()%>";
+				document.forms[0].operationType.value = "<%=operationType%>";
 				//document.forms[0].status.value = "<%=apptObj.getStatus()%>";
 				document.forms[0].duration.value = "<%=apptObj.getDuration()%>";
 				//document.forms[0].chart_no.value = "<%=apptObj.getChart_no()%>";
@@ -353,7 +356,11 @@
 				{
 					document.forms[0].urgency.checked = "checked";
 				}
-
+				if ("<%=apptObj.isVirtual()%>" === "true")
+				{
+					document.forms[0].isVirtual.checked = "checked";
+					updateTelehealthControlls();
+				}
 			}
 
 			<% } %>
@@ -864,6 +871,8 @@
 		<input type="hidden" name="month" value="<%=request.getParameter("month") %>">
 		<input type="hidden" name="day" value="<%=request.getParameter("day") %>">
 		<input type="hidden" name="fromAppt" value="1">
+		<input type="hidden" name="appointmentNo" value="">
+		<input type="hidden" name="operationType" value="<%=ApptUtil.APPOINTMENT_OP_TYPE.NONE%>">
 
 		<div class="header deep">
 			<div class="title">
@@ -1501,23 +1510,27 @@
 					siteParam = "?site=" + site;
 				}
 
-				jQuery.get("<%=request.getContextPath()%>/ws/rs/myhealthaccess/patient/" + demographicNo + "/confirmed" + siteParam, null,
-					(result) =>
+				jQuery.ajax(
+				{
+					url: "<%=request.getContextPath()%>/ws/rs/myhealthaccess/patient/" + demographicNo + "/confirmed" + siteParam,
+					method: "GET",
+					success: (result) =>
 					{
 						resolve(result);
 					},
-					(error) =>
+					error: (error) =>
 					{
 						reject(error);
-					});
+					}
+				});
 			});
 		}
 
 		function updateTelehealthControlls()
 		{
 			var siteSelect = jQuery("#site-select");
-			var demographicNo = '<%=request.getParameter("demographic_no")%>';
-			if (demographicNo !== 'null')
+			var demographicNo = document.forms[0].demographic_no.value;
+			if (demographicNo !== '')
 			{
 				checkDemographicConfirmed(demographicNo, siteSelect.val()).then((res) =>
 				{
@@ -1542,6 +1555,12 @@
 					}
 				}).catch((error) =>
 				{
+					jQuery("#telehealth-checkbox").attr("checked", false);
+					jQuery("#telehealth-checkbox").attr("disabled", true);
+					var msg = jQuery("#telehealth-message");
+					msg.css("visibility", "visible");
+					msg.css("color", "red");
+					msg.html("Error connecting to MyHealthAccess");
 					console.error(error);
 				});
 			}

@@ -588,6 +588,7 @@ public class Demographic implements Serializable
 
 	/**
 	 * Return the value associated with the column: family_doctor
+	 * @return family doctor field if available, empty string otherwise
 	 */
 	public String getFamilyDoctor()
 	{
