@@ -171,6 +171,8 @@
 <html:html locale="true">
 	<head>
 		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/UserInputDemoControl.js"></script>
+
 		<title><bean:message
 				key="demographic.demographicaddrecordhtm.title" /></title>
 		<meta http-equiv="Expires" content="Monday, 8 Aug 88 18:18:18 GMT">
@@ -294,21 +296,7 @@
 					alert("Invalid entry");
 				}
 			}
-			function formatPhoneNum() {
-				if (document.adddemographic.phone.value.length == 10) {
-					document.adddemographic.phone.value = document.adddemographic.phone.value.substring(0,3) + "-" + document.adddemographic.phone.value.substring(3,6) + "-" + document.adddemographic.phone.value.substring(6);
-				}
-				if (document.adddemographic.phone.value.length == 11 && document.adddemographic.phone.value.charAt(3) == '-') {
-					document.adddemographic.phone.value = document.adddemographic.phone.value.substring(0,3) + "-" + document.adddemographic.phone.value.substring(4,7) + "-" + document.adddemographic.phone.value.substring(7);
-				}
 
-				if (document.adddemographic.phone2.value.length == 10) {
-					document.adddemographic.phone2.value = document.adddemographic.phone2.value.substring(0,3) + "-" + document.adddemographic.phone2.value.substring(3,6) + "-" + document.adddemographic.phone2.value.substring(6);
-				}
-				if (document.adddemographic.phone2.value.length == 11 && document.adddemographic.phone2.value.charAt(3) == '-') {
-					document.adddemographic.phone2.value = document.adddemographic.phone2.value.substring(0,3) + "-" + document.adddemographic.phone2.value.substring(4,7) + "-" + document.adddemographic.phone2.value.substring(7);
-				}
-			}
 			function rs(n,u,w,h,x) {
 				args="width="+w+",height="+h+",resizable=yes,scrollbars=yes,status=0,top=60,left=30";
 				remote=window.open(u,n,args);
@@ -705,7 +693,7 @@
 		%>
 		<div>
 			<label><b><bean:message key="demographic.demographicaddrecordhtm.formPhoneHome" />: </b></label>
-			<input type="text" name="phone" onBlur="formatPhoneNum()" value="<%=props.getProperty("phoneprefix", "905-")%>">
+			<input type="text" name="phone" onBlur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.adddemographic.phone)" value="<%=props.getProperty("phoneprefix", "905-")%>">
 			<bean:message key="demographic.demographicaddrecordhtm.Ext" />:
 			<input type="text" name="hPhoneExt" value="" size="4" />
 		</div>
@@ -715,7 +703,7 @@
 		%>
 		<div>
 			<label><b><bean:message key="demographic.demographicaddrecordhtm.formPhoneWork" />:</b></label>
-			<input type="text" name="phone2" onBlur="formatPhoneNum()" value="">
+			<input type="text" name="phone2" onBlur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.adddemographic.phone2)" value="">
 			<bean:message key="demographic.demographicaddrecordhtm.Ext" />:
 			<input type="text" name="wPhoneExt" value="" style="display: inline" size="4" />
 		</div>
@@ -724,7 +712,7 @@
 		%>
 		<div>
 			<label><b><bean:message key="demographic.demographicaddrecordhtm.formPhoneCell" />: </b></label>
-			<input type="text" name="demo_cell" onBlur="formatPhoneNum()">
+			<input type="text" name="demo_cell" onBlur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.adddemographic.demo_cell)">
 		</div>
 		<%
 		}else if(custom_demographic_fields.get(i).equals("newsletter")){

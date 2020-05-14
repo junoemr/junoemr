@@ -74,7 +74,7 @@ function checkTypeIn() {
 				      typeInOK = true;
 			    }
 		    if(dob.value.length != 10) {
-			      alert("You have a wrong DOB input!!!");
+			      alert("You have a wrong DOB input! It has to be yyyy-mm-dd");
 			      typeInOK = false;
 			    }
 
@@ -114,20 +114,7 @@ function checkTypeNum(typeIn) {
 		       } else typeInOK = false;
 	       return typeInOK;
 	}
-function formatPhoneNum() {
-	    if (document.updatedelete.phone.value.length == 10) {
-		        document.updatedelete.phone.value = document.updatedelete.phone.value.substring(0,3) + "-" + document.updatedelete.phone.value.substring(3,6) + "-" + document.updatedelete.phone.value.substring(6);
-		        }
-	    if (document.updatedelete.phone.value.length == 11 && document.updatedelete.phone.value.charAt(3) == '-') {
-		        document.updatedelete.phone.value = document.updatedelete.phone.value.substring(0,3) + "-" + document.updatedelete.phone.value.substring(4,7) + "-" + document.updatedelete.phone.value.substring(7);
-		    }
-	    if (document.updatedelete.phone2.value.length == 10) {
-		        document.updatedelete.phone2.value = document.updatedelete.phone2.value.substring(0,3) + "-" + document.updatedelete.phone2.value.substring(3,6) + "-" + document.updatedelete.phone2.value.substring(6);
-		        }
-	    if (document.updatedelete.phone2.value.length == 11 && document.updatedelete.phone2.value.charAt(3) == '-') {
-		        document.updatedelete.phone2.value = document.updatedelete.phone2.value.substring(0,3) + "-" + document.updatedelete.phone2.value.substring(4,7) + "-" + document.updatedelete.phone2.value.substring(7);
-		    }
-	}
+
 function checkONReferralNo() {
 	  var referralNo = document.updatedelete.r_doctor_ohip.value ;
 	  if (document.updatedelete.hc_type.value == 'ON' && referralNo.length > 0 && referralNo.length != 6) {
