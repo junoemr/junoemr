@@ -28,7 +28,9 @@ import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class AppointmentMapperMedaccess extends AppointmentMapper
 {
@@ -60,7 +62,8 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 	}
 
 	/**
-	 * Medaccess has a strange reason format. <???>:<appointment type>:<reason>
+	 * MedAccess SOMETIMES has a strange reason format. <???>:<appointment type>:<reason>
+	 * They've given us that as well as <appointment type>:<reason> so we have to check both.
 	 * @param rep - the appointment you want
 	 * @return - the appointment reason
 	 * @throws HL7Exception - if there is an error parsing the hl7
@@ -71,16 +74,18 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 		String appReason = StringUtils.trimToNull(message.getPATIENT().getSCH(rep).getSch29_zAppointmentReason().getValue());
 		if (appReason != null)
 		{
-			String[] reasonList = appReason.split(":");
-			if (reasonList.length > 2)
+			List<String> reasonList = Arrays.asList(appReason.split(":"));
+			if (reasonList.size() > 0)
 			{
-				return reasonList[2];
+				return reasonList.get(reasonList.size() - 1);
 			}
 		}
 		return "";
 	}
 
 	/**
+	 * MedAccess SOMETIMES has a strange type format. <???>:<appointment type>:<reason>
+	 * They've given us that as well as <appointment type>:<reason> so we have to check both.
 	 * get the appointment type from the beginning of the reason string
 	 * @param rep - the rep that you want the type for
 	 * @return - the type string
@@ -92,13 +97,13 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 		String apptType = StringUtils.trimToNull(message.getPATIENT().getSCH(rep).getSch29_zAppointmentReason().getValue());
 		if (apptType != null)
 		{
-			String[] typeList = apptType.split(":");
-			if (typeList.length > 1)
+			List<String> typeList = Arrays.asList(apptType.split(":"));
+			if (typeList.size() >= 2)
 			{
-				return typeList[1];
+				return typeList.get(typeList.size() - 2);
 			}
 		}
-		return apptType;
+		return "";
 	}
 
 	/**

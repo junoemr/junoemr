@@ -205,6 +205,8 @@ public class MyHealthAccessService
 		transfer.setVirtual(appointment.getIsVirtual());
 		transfer.setStartDateTime(ConversionUtils.toZonedDateTime(appointment.getStartTimeAsFullDate()));
 		transfer.setEndDateTime(ConversionUtils.toZonedDateTime(appointment.getEndTimeAsFullDate()));
+		transfer.setProviderNo(appointment.getProviderNo());
+		transfer.setDemographicNo(String.valueOf(appointment.getDemographicNo()));
 
 		return transfer;
 	}

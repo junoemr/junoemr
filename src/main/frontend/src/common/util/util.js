@@ -210,8 +210,9 @@ Juno.Common.Util.addNewLine = function addNewLine(line, mssg) {
 
 Juno.Common.Util.calcAge = function calcAge(dobYear, dobMonth, dobDay)
 {
-	let dateOfBirth = moment({year: dobYear, month: dobMonth, day: dobDay});
-	let currDate = moment();
+	//the month of this moment method is 0 indexed
+	var dateOfBirth = moment({year: dobYear, month: dobMonth - 1, day: dobDay});
+	var currDate = moment();
 	return currDate.diff(dateOfBirth, 'years');
 
 };

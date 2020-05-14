@@ -24,7 +24,7 @@ package org.oscarehr.ws.rest.conversion;
 
 import org.oscarehr.common.model.Site;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.ws.rest.transfer.SiteTransfer;
+import org.oscarehr.site.transfer.SiteTransfer;
 import org.springframework.beans.BeanUtils;
 
 public class SiteConverter extends AbstractConverter<Site, SiteTransfer> {

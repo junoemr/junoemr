@@ -28,7 +28,6 @@
 <%@page import="org.oscarehr.util.WebUtilsOld"%>
 <%@page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo"%>
 <%@ page import="org.oscarehr.common.model.PharmacyInfo"%>
-<%@page import="org.oscarehr.util.WebUtils"%>
 <%@page import="org.oscarehr.phr.util.MyOscarUtils"%>
 <%@page import="org.oscarehr.util.LocaleUtils"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -37,25 +36,21 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%@ taglib uri="/WEB-INF/indivo-tag.tld" prefix="indivo" %>
-<%@ page import="oscar.oscarRx.data.*,oscar.oscarProvider.data.ProviderMyOscarIdData,oscar.oscarDemographic.data.DemographicData,oscar.OscarProperties,oscar.log.*"%>
+<%@ page import="oscar.OscarProperties"%>
 <%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
-<%@page import="java.text.SimpleDateFormat" %>
-<%@page import="java.util.*" %>
-<%@page import="java.util.Enumeration"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.util.SessionConstants"%>
 <%@page import="java.util.List"%>
-<%@page import="org.oscarehr.casemgmt.web.PrescriptDrug"%>
-<%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="java.util.ArrayList,oscar.oscarRx.data.RxPrescriptionData"%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
-<%@page import="org.oscarehr.study.StudyFactory, org.oscarehr.study.Study, org.oscarehr.study.types.MyMedsStudy" %>
+<%@page import="org.oscarehr.study.StudyFactory"%>
+<%@ page import="org.oscarehr.study.Study" %>
 <bean:define id="patient" type="oscar.oscarRx.data.RxPatientData.Patient" name="Patient" />
 <%@page import="org.oscarehr.casemgmt.service.CaseManagementManager" %>
 <%@page import="org.oscarehr.casemgmt.model.CaseManagementNote" %>
 <%@page import="org.oscarehr.casemgmt.model.Issue" %>
+<%@ page import="java.util.HashMap" %>
 
 <%
 	String rx_enhance = OscarProperties.getInstance().getProperty("rx_enhance");
@@ -65,7 +60,6 @@
 	if (rx_enhance!=null && rx_enhance.equals("true")) {
 		if (request.getParameter("ID") != null) { %>
 <script>
-	window.opener.location = window.opener.location;
 	window.close();
 </script>
 <%
@@ -425,12 +419,10 @@
 			}
 
 			function ts_makeSortable(table) {
-				oscarLog('making '+table+' sortable');
 				if (table.rows && table.rows.length > 0) {
 					var firstRow = table.rows[0];
 				}
 				if (!firstRow) return;
-				oscarLog('Gets past here');
 
 				// We have a first row: assume it's the header, and make its contents clickable links
 				for (var i=0;i<firstRow.cells.length;i++) {
@@ -1722,7 +1714,7 @@
 				//call another function to bring up prescribe.jsp
 				var randomId=Math.round(Math.random()*1000000);
 				var searchString = $("searchString").value;
-				var url="<c:out value="${ctx}"/>"+ "/oscarRx/WriteScript.do?parameterValue=newCustomDrug&name=" + searchString;
+				var url="<c:out value="${ctx}"/>"+ "/oscarRx/WriteScript.do?parameterValue=newCustomDrug&name=" + encodeURIComponent(searchString);
 				var data="randomId="+randomId;
 				new Ajax.Updater('rxText',url,{method:'get',parameters:data,asynchronous:true,evalScripts:true,
 					insertion: Insertion.Bottom, onComplete:function(transport){
@@ -1732,7 +1724,8 @@
 			}
 
 		}
-		function saveCustomName(element){
+		function saveCustomName(element)
+		{
 			var elemId=element.id;
 			var ar=elemId.split("_");
 			var rand=ar[1];
@@ -1741,10 +1734,13 @@
 			var instruction="instructions_"+rand;
 			var quantity="quantity_"+rand;
 			var repeat="repeats_"+rand;
-			new Ajax.Request(url, {method: 'get',parameters:data, onSuccess:function(transport){
-
-				}});
+			new Ajax.Request(url,
+				{
+					method: 'get',
+					parameters: data
+				});
 		}
+
 		function updateDeleteOnCloseRxBox(){
 			$('deleteOnCloseRxBox').value='true';
 		}

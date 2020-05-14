@@ -35,6 +35,7 @@ import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
@@ -69,7 +70,8 @@ public class AppointmentManager {
 	private AppointmentArchiveDao appointmentArchiveDao;
 	@Autowired
 	private MyHealthAccessService myHealthAccessService;
-	
+	@Autowired
+	private AppointmentService appointmentService;
 
 	public List<Appointment> getAppointmentHistoryWithoutDeleted(LoggedInInfo loggedInInfo, Integer demographicNo, Integer offset, Integer limit) {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "r", null)) {
@@ -154,6 +156,13 @@ public class AppointmentManager {
 		// Subtract a minute
 
 		appointmentDao.persist(appointment);
+
+		// book telehealth appointment in MHA
+		if (appointment.getIsVirtual())
+		{
+			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
+		}
+
 		return appointment;
 	}
 

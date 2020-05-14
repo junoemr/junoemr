@@ -98,8 +98,11 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 
 	<!-- Scripts to help with submission of forms -->
-	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script type="text/javascript" src="./OscarFormHelpers.js"></script>
 	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+    <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
+    <script type="text/javascript" src="<%=request.getContextPath() %>/js/juno-jquery-plugin.js"></script>
+	<link href= "<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0/themes/smoothness/jquery-ui.min.css" rel="stylesheet">
 
     <title>Antenatal Record 2</title>
     <html:base/>
@@ -827,9 +830,11 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
 			if ( val != 'null' ){
 			    val = 3 - val;
 			    document.forms[0].ar2_EPDS10[val].checked = true;
-			}
-		}   
-    
+                }
+        }
+
+
+
     </script>
 
     
@@ -874,6 +879,31 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
         -->
     </style>
 </head>
+
+
+    <script type="text/javascript" language="JavaScript">
+
+        $(document).ready(function()
+        {
+            var $form = $('#bcar2012pg2');
+            $form.juno_trackIsChanged();
+
+            var $links = $('a:not([href^="javascript:"])');
+            $.each($links, function()
+            {
+                var $link = $(this);
+                Oscar.FormHelpers.alertDirtyBeforeLink($link, $form);
+            });
+
+            var $exitButtons = $('input[name="exitButton"]')
+            $.each($exitButtons, function()
+            {
+                var $exitButton = $(this);
+                Oscar.FormHelpers.alertDirtyBeforeClose($exitButton, $form);
+            });
+        });
+
+    </script>
 
 
 <body bgproperties="fixed" topmargin="0" leftmargin="0" rightmargin="0" onload="setEPDSscores();">
@@ -948,7 +978,7 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
     <center><i>At 36 weeks copy to patient / to hospital</i></center>
 </div>
 
-<html:form action="/form/formname">
+<html:form action="/form/formname" styleId="bcar2012pg2">
 
 <input type="hidden" name="commonField" value="ar2_" />
 <input type="hidden" name="c_lastVisited" value="pg2" />
@@ -1007,7 +1037,7 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
             <%
             }
             %>
-            <input type="submit" style="width:40px;" value="Exit" onclick="javascript:return onExit();"/>
+            <input type="submit" style="width:40px;" value="Exit"  name="exitButton" />
             <input type="submit" style="width:50px;" value="Print" onclick="javascript:return onPrint();"/>
             <input type="submit" style="width:125px;" value="Print EPDS/TWEAK" onclick="javascript:return onPrintScores();"/>
             <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
@@ -2707,7 +2737,7 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
             <%
             }
             %>
-            <input type="submit" style="width:40px;" value="Exit" onclick="javascript:return onExit();"/>
+            <input type="submit" style="width:40px;" value="Exit"  name="exitButton" />
             <input type="submit" style="width:50px;" value="Print" onclick="javascript:return onPrint();"/>
             <input type="submit" style="width:125px;" value="Print EPDS/TWEAK" onclick="javascript:return onPrintScores();"/>
             <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>

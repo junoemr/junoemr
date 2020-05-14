@@ -68,16 +68,22 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 
 	public ProviderData findByProviderNo(String providerNo) {
 
-		String sqlCommand = "select x from ProviderData x where x.id=?1";
+		String sqlCommand = "select x from ProviderData x where x.id = :providerNo";
 
 		Query query = entityManager.createQuery(sqlCommand);
-		query.setParameter(1, providerNo);
+		query.setParameter("providerNo", providerNo);
 
-		@SuppressWarnings("unchecked")
-		List<ProviderData> results = query.getResultList();
+		return getSingleResultOrNull(query);
+	}
 
-		if (results.size() > 0) return results.get(0);
-		return null;
+	public ProviderData eagerFindByProviderNo(String providerNo) {
+
+		String sqlCommand = "select x from ProviderData x left join fetch x.billingOpts b where x.id = :providerNo";
+
+		Query query = entityManager.createQuery(sqlCommand);
+		query.setParameter("providerNo", providerNo);
+
+		return getSingleResultOrNull(query);
 	}
 
 	public List<ProviderData> findByProviderNo(String providerNo, String status, int limit, int offset) {
