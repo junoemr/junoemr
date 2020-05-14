@@ -236,16 +236,17 @@ public class BillingSaveBillingAction extends Action {
     }
 
     private char getBillingAccountStatus(oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean bean){
-        char billingAccountStatus = 'O';
-        if (bean.getBillingType().equals("DONOTBILL")) {
-            //bean.setBillingType("MSP"); //RESET this to MSP to get processed
-            billingAccountStatus = 'N';
-        } else if (bean.getBillingType().equals("WCB")) {
-            billingAccountStatus = 'O';
-        } else if (MSPReconcile.BILLTYPE_PRI.equals(bean.getBillingType())) {
-            billingAccountStatus = 'P';
+        switch (bean.getBillingType())
+        {
+	        case "DONOTBILL":
+	        	return 'N';  //RESET this to MSP to get processed
+	        case MSPReconcile.BILLTYPE_WCB:
+	        	return 'W';
+	        case MSPReconcile.BILLTYPE_PRI:
+	        	return 'P';
+	        default:
+	        	return 'O';
         }
-        return billingAccountStatus;
     }
 
     public String convertDate8Char(String s) {
