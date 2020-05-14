@@ -592,20 +592,12 @@ public class SFTPConnector {
 			logger.info("SFTPConnector, remoteDir:"+remoteDir);
 			
 			try {
-				logger.debug("Instantiating a new SFTP connection.");
-				SFTPConnector sftp = new SFTPConnector();
-				logger.debug("new SFTP connection established");
 
 				String[] files = ls(remoteDir);
 				
 				String[] localFilePaths =null;
 				
-				try {
-			            localFilePaths=sftp.downloadDirectoryContents(remoteDir);
-				} finally {
-		    		    sftp.close();
-				}
-				
+
 				String[] paths = null;
 				if(doDecrypt()) {
 					paths = decryptFiles(localFilePaths);
@@ -625,12 +617,9 @@ public class SFTPConnector {
 				}
 			
 
-				logger.debug("Closed SFTP connection");
-				logger.debug("Clearing doNotSend list");
 				doNotSentMsgForOuttage.clear();
 			} catch (Exception e) {
-				logger.error("Couldn't perform SFTP fetch for HRM - notifying user of failure", e);
-				notifyHrmError(loggedInInfo, e.getMessage());
+				logger.error("Couldn't perform SFTP fetch for HRM", e);
 			}
 
 			SFTPConnector.isAutoFetchRunning = false;
@@ -651,7 +640,6 @@ public class SFTPConnector {
 					results.add(new File(destDir,new File(f).getName()).getAbsolutePath());
 				}catch(IOException e) {
 					logger.error("Error copying HRM file. Will not be viewable from Inbox!",e);
-					notifyHrmError(loggedInInfo, "Failed to copy HRM file to DOCUMENT_DIR. Please contact admin ("+ f +")");
 				}
 			}
 		}

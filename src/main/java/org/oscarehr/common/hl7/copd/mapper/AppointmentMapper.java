@@ -41,6 +41,12 @@ import java.util.regex.Pattern;
 
 public class AppointmentMapper extends AbstractMapper
 {
+
+	public static final int APPOINTMENT_TYPE_LENGTH = 50;
+	public static final int APPOINTMENT_REASON_LENGTH = 80;
+	public static final String DEFAULT_APPOINTMENT_DURATION_HR = "1";
+	public static final String DEFAULT_APPOINTMENT_DURATION_MIN = "15";
+
 	public AppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
 	{
 		super(message, importSource);
@@ -78,10 +84,25 @@ public class AppointmentMapper extends AbstractMapper
 
 		// hopefully one day appointments will handle null values correctly. until then, trim to empty
 		appointment.setNotes(StringUtils.trimToEmpty(getNotes(rep)));
-		appointment.setReason(StringUtils.trimToEmpty(getReason(rep)));
 		appointment.setCreateDateTime(getCreationDate(rep));
 		appointment.setStatus(getStatus(rep, importSource));
-		appointment.setType(getType(rep));
+		// Some appointment types exceed character length of column and may get truncated
+		String type = getType(rep);
+		if (type != null && type.length() > APPOINTMENT_TYPE_LENGTH)
+		{
+			logger.warn("Appointment has a type that is getting truncated: '" + type + "'");
+			type = StringUtils.left(type, APPOINTMENT_TYPE_LENGTH);
+		}
+
+		String reason = getReason(rep);
+		if (reason != null && reason.length() > APPOINTMENT_REASON_LENGTH)
+		{
+			logger.warn("Appointment has a reason that is getting truncated: '" + reason + "'");
+			reason = StringUtils.left(reason, APPOINTMENT_REASON_LENGTH);
+		}
+
+		appointment.setReason(reason);
+		appointment.setType(type);
 		appointment.setLocation("");
 		appointment.setResources("");
 		appointment.setReasonCode(17); // TODO look this up somewhere
@@ -143,8 +164,24 @@ public class AppointmentMapper extends AbstractMapper
 	{
 		SCH sch = message.getPATIENT().getSCH(rep);
 		Date appointmentDate = getAppointmentDate(rep);
-		Integer apptDuration = Integer.parseInt(sch.getSch9_AppointmentDuration().getValue());
+		String apptDurationRawValue = sch.getSch9_AppointmentDuration().getValue();
 		String apptDurationUnit = sch.getSch10_AppointmentDurationUnits().getCe1_Identifier().getValue();
+		int apptDuration;
+		// If they don't send us an appt time, use either 15m or 1h depending on units
+		if (apptDurationRawValue == null || apptDurationRawValue.isEmpty())
+		{
+			if ("HR".equals(apptDurationUnit.toUpperCase()))
+			{
+				logger.error("Bad appointment duration value, defaulting to 1 hr:"  + apptDurationRawValue);
+				apptDurationRawValue = DEFAULT_APPOINTMENT_DURATION_HR;
+			}
+			else
+			{
+				logger.error("Bad appointment duration value, defaulting to 15 min: " + apptDurationRawValue);
+				apptDurationRawValue = DEFAULT_APPOINTMENT_DURATION_MIN;
+			}
+		}
+		apptDuration = Integer.parseInt(apptDurationRawValue);
 
 		if (appointmentDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{// if no appointment date, use creation date instead.

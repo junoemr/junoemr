@@ -23,11 +23,13 @@
 
 package oscar.appt;
 
+import java.text.ParseException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.oscarehr.common.model.Site;
+import oscar.util.ConversionUtils;
 
 /**
  * This class contains Appointment related presentation layer helper methods.
@@ -39,8 +41,18 @@ public class ApptUtil {
 
 	private static final String SESSION_APPT_BEAN = "apptBean";
 
-	public static void copyAppointmentIntoSession(HttpServletRequest request) {
+	public static final String APPOINTMENT_OP_TYPE_ID = "APPOINTMENT_OP_TYPE";
+	public enum APPOINTMENT_OP_TYPE {
+		NONE,
+		COPY,
+		CUT
+	}
+
+	public static void copyAppointmentIntoSession(HttpServletRequest request, APPOINTMENT_OP_TYPE opType)
+					throws ParseException
+	{
 		ApptData obj = new ApptData();
+		obj.setAppointmentNo(request.getParameter("appointment_no"));
 		obj.setAppointment_date(request.getParameter("appointment_date"));
 		obj.setStart_time(request.getParameter("start_time"));
 		obj.setEnd_time(request.getParameter("end_time"));
@@ -58,12 +70,42 @@ public class ApptUtil {
 		obj.setDuration(request.getParameter("duration"));
 		obj.setChart_no(request.getParameter("chart_no"));
 		obj.setUrgency(request.getParameter("urgency"));
+		obj.setVirtual(ConversionUtils.parseBoolean(
+						ConversionUtils.getStringOrDefaultValue(request.getParameter("isVirtual"), "false")));
 		// set up session bean
 		request.getSession().setAttribute(SESSION_APPT_BEAN, obj);
+		request.getSession().setAttribute(APPOINTMENT_OP_TYPE_ID, opType);
 	}
 
 	public static ApptData getAppointmentFromSession(HttpServletRequest request) {
 		return (ApptData) request.getSession().getAttribute(SESSION_APPT_BEAN);
+	}
+
+	/**
+	 * pull the current operation type from the session
+	 * @param request - session
+	 * @return - current operation type
+	 */
+	public static APPOINTMENT_OP_TYPE getOperationTypeFromSession(HttpServletRequest request)
+	{
+		return (APPOINTMENT_OP_TYPE) request.getSession().getAttribute(APPOINTMENT_OP_TYPE_ID);
+	}
+
+	/**
+	 * get APPOINTMENT_OP_TYPE from string. If the string does not match a known type then op type, NONE is returned.
+	 * @param opType - the string to decode
+	 * @return - the operation type
+	 */
+	public static APPOINTMENT_OP_TYPE stringToOperationType(String opType)
+	{
+		try
+		{
+			return APPOINTMENT_OP_TYPE.valueOf(opType);
+		}
+		catch(IllegalArgumentException e)
+		{
+			return APPOINTMENT_OP_TYPE.NONE;
+		}
 	}
 
 	public static String getColorFromLocation(String site, String colo, String loca) {

@@ -120,6 +120,11 @@ public class BookingRuleFactory
 		return cutoffRule;
 	}
 
+	public static AvailableRule createAvailableRule()
+	{
+		return new AvailableRule(BookingRule.APPOINTMENT_AVAILABLE);
+	}
+
 
 	private static BookingRule createBookingRule(Integer demographicNo, JSONObject jsonRule)
 	{
@@ -199,11 +204,6 @@ public class BookingRuleFactory
 		}
 
 		return null;
-	}
-
-	private static AvailableRule createAvailableRule()
-	{
-		return new AvailableRule(BookingRule.APPOINTMENT_AVAILABLE);
 	}
 
 	private static PrimaryProviderOnlyRule createPrimaryProviderOnlyRule(

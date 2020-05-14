@@ -35,7 +35,7 @@ import org.oscarehr.common.model.SecObjPrivilege;
 import org.oscarehr.common.model.SecObjPrivilegePrimaryKey;
 import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,8 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 {
-
-	private SecObjPrivilegeDao secObjPrivilegeDao = SpringUtils.getBean(SecObjPrivilegeDao.class);
+	@Autowired
+	private SecObjPrivilegeDao secObjPrivilegeDao;
 
 	public DemographicMergedDao() {
 		super(DemographicMerged.class);
@@ -63,18 +63,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 		
 		return results;
 	}
-	
-	public DemographicMerged findCurrentByDemographicNo(int demographicNo)
-	{
-		Query query = entityManager.createQuery("SELECT d " +
-				"FROM DemographicMerged d " +
-				"WHERE d.demographicNo=:demographicNo " +
-				"AND d.deleted=false");
-		query.setParameter("demographicNo", demographicNo);
-		
-		return getSingleResultOrNull(query);
-	}
-	
+
 	public List<DemographicMerged> findByDemographicNo(int demographicNo)
 	{
 		Query query = entityManager.createQuery("SELECT d " +
@@ -174,7 +163,7 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 	public void unmergeDemographics(String providerNo, Integer demographicNo)
 		throws NoSuchElementException
 	{
-		DemographicMerged demographicMerged = findCurrentByDemographicNo(demographicNo);
+		DemographicMerged demographicMerged = getCurrentHead(demographicNo);
 		if (demographicMerged == null)
 		{
 			throw new NoSuchElementException();

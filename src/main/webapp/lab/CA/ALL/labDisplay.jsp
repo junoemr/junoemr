@@ -670,6 +670,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
     <body onLoad="javascript:matchMe();">
 		<!-- form forwarding of the lab -->
 		<%
+			String labComment = "";
+
 			for (int idx = 0; idx < segmentIDs.length; ++idx)
 			{
 				if (remoteFacilityIdString == null)
@@ -693,8 +695,12 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 							if (labStatus.equals("A"))
 							{
 								ackFlag = true;//lab has been ack by this provider.
-								break;
 							}
+						}
+
+						if(providerNo.equals(reportStatus.getOscarProviderNo()))
+						{
+							labComment = reportStatus.getComment();
 						}
 					}
 				}
@@ -773,7 +779,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                     <input type="hidden" name="multiID" value="<%= multiLabId %>" />
                                     <input type="hidden" name="providerNo" id="providerNo" value="<%= providerNo %>"/>
                                     <input type="hidden" name="status" value="<%=labStatus%>" id="labStatus_<%=segmentID%>"/>
-                                    <input type="hidden" name="comment" value=""/>
+                                    <input type="hidden" name="comment" value="<%=labComment%>"/>
                                     <input type="hidden" name="labType" value="HL7"/>
                                     <%
                                     if ( !ackFlag ) {

@@ -113,6 +113,7 @@ if(demographicID != null && !demographicID.equals("")&& !demographicID.equals("0
 }
 
 boolean ackFlag = false;
+String labComment = "";
 ArrayList ackList = AcknowledgementData.getAcknowledgements(segmentID);
 String labStatus = "";
 if (ackList != null){
@@ -122,8 +123,12 @@ if (ackList != null){
             labStatus = reportStatus.getStatus();
             if(labStatus.equals("A") ){
             	ackFlag = true;
-            	break;
             }
+        }
+
+        if(providerNo.equals(reportStatus.getOscarProviderNo()))
+        {
+            labComment = reportStatus.getComment();
         }
     }
 }
@@ -363,8 +368,8 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                     <input type="hidden" name="segmentID" value="<%= segmentID %>"/>
                                     <input type="hidden" name="multiID" value="<%= multiLabId %>" />
                                     <input type="hidden" name="providerNo" value="<%= providerNo %>"/>
-                                    <input type="hidden" name="status" value="<%=labStatus%>"/ id="status_<%=segmentID%>">
-                                    <input type="hidden" name="comment" value=""/ id="comment_<%=segmentID%>">
+                                    <input type="hidden" name="status" value="<%=labStatus%>" id="status_<%=segmentID%>"/>
+                                    <input type="hidden" name="comment" value="<%=labComment%>" id="comment_<%=segmentID%>"/>
                                     <input type="hidden" name="labType" value="HL7"/>
                                     <input type="hidden" name="ajaxcall" value="yes"/>
                                     <input type="hidden" id="demoName<%=segmentID%>" value="<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>"/>

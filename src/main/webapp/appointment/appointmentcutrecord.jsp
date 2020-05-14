@@ -56,39 +56,18 @@
 	</tr>
 </table>
 <%
-	ApptUtil.copyAppointmentIntoSession(request);
+	ApptUtil.copyAppointmentIntoSession(request, ApptUtil.APPOINTMENT_OP_TYPE.CUT);
 	Appointment appt = appointmentDao.find(Integer.parseInt(request.getParameter("appointment_no")));
 	appointmentArchiveDao.archiveAppointment(appt);
-	int rowsAffected=0;
-	if(appt != null)
-	{
-		LogAction.addLogEntry(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
-				appt.getDemographicNo(), LogConst.ACTION_DELETE, LogConst.CON_APPT,
-				LogConst.STATUS_SUCCESS, String.valueOf(appt.getId()), request.getRemoteAddr());
-		appointmentDao.remove(appt.getId());
-		rowsAffected = 1;
-
-	}
-	if (rowsAffected == 1) {
 %>
 <p>
 <h1><bean:message
 	key="appointment.appointmentupdatearecord.msgUpdateSuccess" /></h1>
-
+</p>
 <script LANGUAGE="JavaScript">
 	self.opener.refresh();
 	self.close();
-</script> <%
-	} else {
-%>
-<p>
-<h1><bean:message
-	key="appointment.appointmentupdatearecord.msgUpdateFailure" /></h1>
-
-<%
-	}
-%>
-<p></p>
+</script>
 <hr width="90%"/>
 <form>
 <input type="button" value="<bean:message key="global.btnClose"/>" onClick="closeit()">

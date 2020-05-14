@@ -27,11 +27,9 @@ package org.oscarehr.ws.external.soap.v1;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.oscarehr.common.dao.DemographicDao;
+import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.common.model.AppointmentType;
@@ -40,6 +38,7 @@ import org.oscarehr.managers.DayWorkSchedule;
 import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
+import org.oscarehr.schedule.service.Schedule;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
@@ -53,11 +52,10 @@ import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleTemplateCodeTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BlackoutRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.ScheduleSlotDto;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.CutoffRule;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.MultipleBookingsRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRules;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -65,24 +63,33 @@ import javax.jws.WebService;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @WebService
 @Component
 @GZIP(threshold = AbstractWs.GZIP_THRESHOLD)
 public class ScheduleWs extends AbstractWs {
 	private static final Logger logger=MiscUtils.getLogger();
-	
+
+	@Autowired
+	private Schedule scheduleService;
+
 	@Autowired
 	private ScheduleManager scheduleManager;
 
 	@Autowired
 	private ScheduleTemplateDao scheduleTemplateDao;
+
+	@Autowired
+	private OscarAppointmentDao oscarAppointmentDao;
 
 	public ScheduleTemplateCodeTransfer[] getScheduleTemplateCodes() {
 		List<ScheduleTemplateCode> scheduleTemplateCodes = scheduleManager.getScheduleTemplateCodes();
@@ -139,37 +146,87 @@ public class ScheduleWs extends AbstractWs {
 	}
 
 	@SkipContentLoggingOutbound
+	public ScheduleSlotDto[] getProviderAvailability(String[] providerNos,
+													 @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate startDate,
+													 @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate endDate,
+													 String demographicNo,
+													 String jsonTemplateDurations,
+													 String jsonRules) throws ParseException
+	{
+		List<ScheduleSlotDto> availableSlots = scheduleService.getProviderAvailability(
+				providerNos, startDate, endDate, demographicNo, jsonTemplateDurations, jsonRules);
+		return availableSlots.toArray(new ScheduleSlotDto[0]);
+	}
+
+	/**
+	 *
+	 * @param providerNos - List of providers whose schedules' will be booked into
+	 * @param appointmentTransfer - Appointment DTO to be booked
+	 * @param templateDurations - JSON string representing schedule template code and appointment duration
+	 * @param jsonRules - JSON string representing self-booking rules (Multi, Blackout, Cutoff)
+	 * @return - Transfer object containing the booked appointment and validation data
+	 * @throws ParseException
+	 */
+	@SkipContentLoggingOutbound
+	public ValidatedAppointmentBookingTransfer addAvailableProviderAppointment(String[] providerNos,
+	                                                                           AppointmentTransfer appointmentTransfer,
+	                                                                           String templateDurations,
+	                                                                           String jsonRules) throws ParseException
+	{
+		Appointment appointment = new Appointment();
+		appointmentTransfer.copyTo(appointment);
+		appointment.setLastUpdateUser(getLoggedInInfo().getLoggedInProviderNo());
+
+		ConcurrentHashMap<String, List<ScheduleSlotDto>> providerSlotMap =
+				scheduleService.getProviderSlotsInRange(providerNos, appointment, templateDurations, jsonRules);
+
+		// Provider with the most availability +/- 1 hour from the appointment start time is selected
+		Map.Entry<String, List<ScheduleSlotDto>> mostAvailable = null;
+		for (Map.Entry<String, List<ScheduleSlotDto>> entry : providerSlotMap.entrySet())
+		{
+			if (mostAvailable == null || entry.getValue().size() > mostAvailable.getValue().size())
+			{
+				mostAvailable = entry;
+			}
+		}
+
+		if (mostAvailable != null)
+		{
+			appointment.setProviderNo(mostAvailable.getKey());
+
+			List<BookingRule> violatedRules = this.getViolatedBookingRules(appointment, jsonRules);
+
+			if (violatedRules.isEmpty())
+			{
+				scheduleManager.addAppointment(getLoggedInInfo(), getLoggedInSecurity(), appointment);
+			}
+
+			AppointmentTransfer apptTransfer = AppointmentTransfer.toTransfer(appointment, false);
+			return new ValidatedAppointmentBookingTransfer(apptTransfer, violatedRules);
+		}
+
+		return new ValidatedAppointmentBookingTransfer(null,
+						Collections.singletonList(BookingRuleFactory.createAvailableRule()));
+	}
+
+	// TODO: Temporary for backwards compatibility. Remove once released to all Juno instances
+	@SkipContentLoggingOutbound
 	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (String providerNo,
-																		  @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate startDate,
-																		  @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate endDate,
-																		  String templateDurations,
-																		  String demographicNo,
-																		  String jsonRules)
+	                                                                      @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate startDate,
+	                                                                      @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate endDate,
+	                                                                      String templateDurations,
+	                                                                      String demographicNo,
+	                                                                      String jsonRules)
 	{
 		MiscUtils.getLogger().info("Start Get Provider Schedule Service: " + LocalDateTime.now().toString());
 		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
-		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = new ArrayList<>();
+
 
 		try
 		{
-			JSONArray templateDurationJsonArr = (JSONArray) new JSONParser().parse(templateDurations);
+			List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = ScheduleCodeDurationTransfer.parse(templateDurations);
+			BookingRules bookingRules = new BookingRules(jsonRules);
 
-			for (Object templateDurationObj : templateDurationJsonArr)
-			{
-				JSONObject templateDurationJson = (JSONObject) templateDurationObj;
-				String templateCode = (String) templateDurationJson.get("schedule_template_id");
-				Long duration = (Long) templateDurationJson.get("appointment_duration");
-
-				ScheduleCodeDurationTransfer scheduleDurationTransfer =
-						new ScheduleCodeDurationTransfer(templateCode, duration.intValue());
-				scheduleDurationTransfers.add(scheduleDurationTransfer);
-			}
-
-			List<MultipleBookingsRule> multipleBookingsRules =
-					BookingRuleFactory.buildMultipleBookingsRuleList(jsonRules);
-
-			BlackoutRule blackoutRule = BookingRuleFactory.buildBlackoutRule(jsonRules);
-			CutoffRule cutoffRule = BookingRuleFactory.buildCutoffRule(jsonRules);
 
 			ProviderScheduleTransfer providerScheduleTransfer =
 					scheduleTemplateDao.getValidProviderScheduleSlots(
@@ -178,9 +235,9 @@ public class ScheduleWs extends AbstractWs {
 							endDate,
 							scheduleDurationTransfers,
 							demographicNo,
-							multipleBookingsRules,
-							blackoutRule,
-							cutoffRule
+							bookingRules.getMultipleBookingsRule(),
+							bookingRules.getBlackoutRule(),
+							bookingRules.getCutoffRule()
 					);
 
 			scheduleTransfer = providerScheduleTransfer.toTransfer();
@@ -199,6 +256,12 @@ public class ScheduleWs extends AbstractWs {
 	{
 		Appointment appointment = new Appointment();
 
+		if (!appointmentTransfer.isValid())
+		{
+			throw new IllegalArgumentException("One or more appointment fields contain illegal characters." +
+							"No html tags, quotes, line breaks, or semicolons are allowed.");
+		}
+
 		if (appointmentTransfer.getLastUpdateUser() == null)
 		{
 			appointmentTransfer.setLastUpdateUser(getLoggedInInfo().getLoggedInProviderNo());
@@ -206,15 +269,7 @@ public class ScheduleWs extends AbstractWs {
 
 		appointmentTransfer.copyTo(appointment);
 
-		List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(appointment.getDemographicNo(), jsonRules);
-		List<BookingRule> violatedRules = new ArrayList<>();
-		for (BookingRule rule : bookingRules)
-		{
-			if (rule.isViolated(appointment))
-			{
-				violatedRules.add(rule);
-			}
-		}
+		List<BookingRule> violatedRules = this.getViolatedBookingRules(appointment, jsonRules);
 
 		if (violatedRules.isEmpty())
 		{
@@ -222,9 +277,7 @@ public class ScheduleWs extends AbstractWs {
 		}
 
 		AppointmentTransfer apptTransfer = AppointmentTransfer.toTransfer(appointment, false);
-		ValidatedAppointmentBookingTransfer response =
-				new ValidatedAppointmentBookingTransfer(apptTransfer, violatedRules);
-		return response;
+		return new ValidatedAppointmentBookingTransfer(apptTransfer, violatedRules);
 	}
 
 	public AppointmentTypeTransfer[] getAppointmentTypes() {
@@ -336,5 +389,11 @@ public class ScheduleWs extends AbstractWs {
 	public Integer[] getAllDemographicIdByProgramProvider(Integer programId, String providerNo) {
 		List<Integer> results=scheduleManager.getAllDemographicIdByProgramProvider(getLoggedInInfo(), programId, providerNo);
 		return(results.toArray(new Integer[0]));
+	}
+
+	private List<BookingRule> getViolatedBookingRules(Appointment appointment, String jsonRules) throws ParseException
+	{
+		List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(appointment.getDemographicNo(), jsonRules);
+		return bookingRules.stream().filter(rule -> rule.isViolated(appointment)).collect(Collectors.toList());
 	}
 }

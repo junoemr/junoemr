@@ -113,6 +113,11 @@ public class AppointmentArchive extends AbstractModel<Integer>  {
 
 	@Enumerated(EnumType.STRING)
 	private BookingSource bookingSource;
+
+	private boolean isVirtual;
+
+	@Column(name= "reasonCode")
+	private Integer reasonCode;
 		
 	public String getProviderNo() {
 		return providerNo;
@@ -329,6 +334,23 @@ public class AppointmentArchive extends AbstractModel<Integer>  {
     	this.bookingSource = bookingSource;
     }
 
+	public boolean getIsVirtual()
+	{
+		return isVirtual;
+	}
 
+	public void setIsVirtual(boolean isVirtual)
+	{
+		this.isVirtual = isVirtual;
+	}
 
+	public Integer getReasonCode()
+	{
+		return reasonCode;
+	}
+
+	public void setReasonCode(Integer reasonCode)
+	{
+		this.reasonCode = reasonCode;
+	}
 }

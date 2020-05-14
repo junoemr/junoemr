@@ -179,7 +179,7 @@ public class Provider implements Serializable, Comparable<Provider>{
 		return providerNo;
 	}
 
-	public ProviderData getProvider()
+	public ProviderData convertToProviderData()
 	{
 		ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
 		return providerDataDao.findByProviderNo(this.providerNo);

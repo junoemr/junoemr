@@ -8,6 +8,7 @@
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {SitesApi} from "../../generated";
+import {MhaPatientApi} from "../../generated";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
@@ -48,11 +49,16 @@ angular.module('Schedule').component('eventComponent', {
 
 			let controller = this;
 
+			$scope.eligibleForTelehealth = false;
+
 			$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
 				'../ws/rs');
 
 			$scope.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 				'../ws/rs');
+
+			$scope.MhaPatientApi = new MhaPatientApi($http, $httpParamSerializer,
+					'../ws/rs');
 
 			let sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
 			//=========================================================================
@@ -313,6 +319,7 @@ angular.module('Schedule').component('eventComponent', {
 							if ($scope.isPatientSelected())
 							{
 								controller.patientTypeahead = controller.demographicModel.data;
+								controller.updateDemographicTelehealthEligibility();
 							}
 							else
 							{
@@ -435,6 +442,25 @@ angular.module('Schedule').component('eventComponent', {
 				}
 			};
 
+			controller.updateDemographicTelehealthEligibility = () =>
+			{
+				if (controller.demographicModel.demographicNo && !controller.editMode)
+				{
+					$scope.MhaPatientApi.isPatientConfirmed(controller.demographicModel.demographicNo, $scope.eventData.site).then((result) =>
+					{
+						$scope.eligibleForTelehealth = result.data.body;
+						if (!$scope.eligibleForTelehealth)
+						{
+							$scope.eventData.virtual = false;
+						}
+					});
+				}
+				else
+				{
+					$scope.eligibleForTelehealth = false;
+				}
+
+			};
 
 			controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 			{
@@ -459,6 +485,8 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				var deferred = $q.defer();
 
+				const defaultAppointmentReason = "Others";
+
 				$scope.scheduleApi.getAppointmentReasons().then(
 					function success(rawResults)
 					{
@@ -479,7 +507,9 @@ angular.module('Schedule').component('eventComponent', {
 						// set the default selected option
 						if (!Juno.Common.Util.exists($scope.eventData.reasonCode))
 						{
-							$scope.eventData.reasonCode = controller.reasonCodeList[0].value;
+
+							$scope.eventData.reasonCode = controller.findDefaultAppointmentType(controller.reasonCodeList, defaultAppointmentReason);
+
 						}
 						deferred.resolve(controller.reasonCodeList);
 					});
@@ -762,7 +792,7 @@ angular.module('Schedule').component('eventComponent', {
 					function (results)
 					{
 						controller.parentScope.processSaveResults(results, $scope.displayMessages);
-						deferred.reject();
+						deferred.reject(results);
 					});
 
 				return deferred.promise;
@@ -799,7 +829,10 @@ angular.module('Schedule').component('eventComponent', {
 
 			$scope.loadPatientFromTypeahead = function loadPatientFromTypeahead(patientTypeahead)
 			{
-				controller.demographicModel.loadData(patientTypeahead.demographicNo);
+				controller.demographicModel.loadData(patientTypeahead.demographicNo).finally(() =>
+				{
+					controller.updateDemographicTelehealthEligibility();
+				})
 			};
 
 			controller.autofillDataFromType = function (typeValue)
@@ -828,6 +861,11 @@ angular.module('Schedule').component('eventComponent', {
 				}
 			};
 
+			controller.findDefaultAppointmentType = function(reasonCodeList, defaultAppointmentReason)
+			{
+				return (reasonCodeList.find((code) => code.label === defaultAppointmentReason).value) || reasonCodeList[0].value;
+			};
+
 			//=========================================================================
 			// Watches
 			//=========================================================================/
@@ -854,6 +892,10 @@ angular.module('Schedule').component('eventComponent', {
 					{
 						controller.autofillDataFromType(newValue);
 					}
+				});
+				$scope.$watch("eventData.site", (newVal, oldVal) =>
+				{
+					controller.updateDemographicTelehealthEligibility();
 				});
 				$scope.$watch('[' +
 					'eventController.repeatBookingData.enabled,' +
@@ -959,12 +1001,20 @@ angular.module('Schedule').component('eventComponent', {
 					controller.parentScope.refetchEvents();
 					controller.modalInstance.close();
 					$scope.working = false;
-				}, function ()
+				}, function (result)
 				{
 					console.log($scope.displayMessages.field_errors()['location']);
 					if (!$scope.displayMessages.has_standard_errors())
 					{
-						$scope.displayMessages.add_generic_fatal_error();
+						console.log(result);
+						if (result.error.message)
+						{
+							$scope.displayMessages.add_standard_error(result.error.message);
+						}
+						else
+						{
+							$scope.displayMessages.add_generic_fatal_error();
+						}
 					}
 					$scope.working = false;
 				});

@@ -25,6 +25,7 @@
 
 package org.oscarehr.common.model;
 
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -36,6 +37,9 @@ public class ProviderSite extends AbstractModel<ProviderSitePK> {
 	@EmbeddedId
 	private ProviderSitePK id;
 
+	@Column(name="bc_bcp_eligible", nullable=false)
+	private boolean bcBCPEligible; // BC Business Cost Premium
+
 	public ProviderSitePK getId() {
     	return id;
     }
@@ -43,4 +47,14 @@ public class ProviderSite extends AbstractModel<ProviderSitePK> {
 	public void setId(ProviderSitePK id) {
     	this.id = id;
     }
+
+	public boolean isBcBCPEligible()
+	{
+		return bcBCPEligible;
+	}
+
+	public void setBcBCPEligible(boolean bcBCPEligible)
+	{
+		this.bcBCPEligible = bcBCPEligible;
+	}
 }
