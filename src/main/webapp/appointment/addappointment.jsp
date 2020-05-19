@@ -1531,7 +1531,7 @@
 					}
 					else
 					{
-						if ("<%=StringUtils.trimToEmpty(email)%>" != "" && "<%=StringUtils.trimToEmpty(hin)%>" != "")
+						if ("<%=StringUtils.trimToEmpty(email)%>" != "")
 						{
 							myhealthaccess.getIntegration("<%=request.getContextPath()%>", siteSelect.val()).then((res) =>
 							{

@@ -481,7 +481,7 @@ angular.module('Schedule').component('eventComponent', {
 							{
 								$scope.telehealthMode = $scope.TELEHEALTH_MODES.TELEHEALTH;
 							}
-							else if(integration && controller.demographicModel.data.email && controller.demographicModel.data.hin)
+							else if(integration && controller.demographicModel.data.email)
 							{
 								$scope.telehealthMode = $scope.TELEHEALTH_MODES.ONE_TIME_TELEHEALTH;
 							}
