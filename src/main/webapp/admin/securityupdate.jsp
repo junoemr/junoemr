@@ -97,10 +97,8 @@
 	Security overlappingEntry = securityDao.findByUserName(username);
 	Security security = securityDao.find(Integer.parseInt(request.getParameter("security_no")));
 
-	try
+	if (securityInfoManager.superAdminModificationCheck((String)session.getAttribute("user"), request.getParameter("provider_no")))
 	{
-		securityInfoManager.superAdminModificationCheck((String)session.getAttribute("user"), request.getParameter("provider_no"));
-
 		if(security != null && (overlappingEntry == null || security.equals(overlappingEntry)))
 		{
 			security.setUserName(request.getParameter("user_name"));
@@ -156,7 +154,7 @@
 			<%
 		}
 	}
-	catch (SecurityException e)
+	else
 	{
 	%>
 		<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization" /></h1>

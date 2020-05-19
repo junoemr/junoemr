@@ -121,7 +121,7 @@
 			if(unauthorizedMSG)
 			{
 				%>
-				Juno.Admin.UserPermissionCtrl.showErrorMSG(document.getElementById("no_authorization_error_msg").value);
+				alert(document.getElementById("no_authorization_error_msg").value);
 				<%
 			}
 				%>

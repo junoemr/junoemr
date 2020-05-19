@@ -91,7 +91,7 @@
 <%
   ProviderBillCenter billCenter = new ProviderBillCenter();
   billCenter.updateBillCenter(request.getParameter("provider_no"),request.getParameter("billcenter"));
-
+  SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
 
 //multi-office provide id formalize check, can be turn off on properties multioffice.formalize.provider.id
@@ -157,13 +157,9 @@
 
   }
 
-try
+
+if (securityInfoManager.superAdminModificationCheck(request.getParameter("current_user"),request.getParameter("provider_no")))
 {
-	SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	securityInfoManager.superAdminModificationCheck(request.getParameter("current_user"),request.getParameter("provider_no"));
-
-
-
 	if (!org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable() || isProviderFormalize)
 	{
 		ProviderService providerService = SpringUtils.getBean(ProviderService.class);
@@ -311,7 +307,7 @@ try
 	}
 
 }
-catch (SecurityException e)
+else
 {
 	%>
 

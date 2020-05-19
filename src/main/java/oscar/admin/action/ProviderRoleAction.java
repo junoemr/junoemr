@@ -55,7 +55,11 @@ public class ProviderRoleAction extends DispatchAction
 		{
 			logger.info("ADD ROLE");
 			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.WRITE, null, "_admin", "_admin.userAdmin");
-			securityInfoManager.superAdminModificationCheck(currentProviderNo, String.valueOf(providerId));
+			if(!securityInfoManager.superAdminModificationCheck(currentProviderNo, String.valueOf(providerId)))
+			{
+				request.setAttribute("messageNotAuthorized", "true");
+				return mapping.findForward("failure");
+			}
 
 			if(!providerRoleService.validRoleName(roleNew))
 			{
@@ -74,11 +78,6 @@ public class ProviderRoleAction extends DispatchAction
 				request.setAttribute("message", "Role " + roleNew + " already exists (" + providerId + ")");
 			}
 
-		}
-		catch (SecurityException se)
-		{
-			request.setAttribute("messageNotAuthorized", "true");
-			return mapping.findForward("failure");
 		}
 		catch(Exception e)
 		{
@@ -104,8 +103,11 @@ public class ProviderRoleAction extends DispatchAction
 		{
 			logger.info("UPDATE ROLE");
 			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.UPDATE, null, "_admin", "_admin.userAdmin");
-			securityInfoManager.superAdminModificationCheck(currentProviderNo, providerId);
-
+			if (!securityInfoManager.superAdminModificationCheck(currentProviderNo, providerId))
+			{
+				request.setAttribute("messageNotAuthorized", "true");
+				return mapping.findForward("failure");
+			}
 			if(!providerRoleService.validRoleName(roleNew))
 			{
 				return mapping.findForward("failure");
@@ -114,11 +116,6 @@ public class ProviderRoleAction extends DispatchAction
 
 			LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_UPDATE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS,
 					roleId, ip, providerId + "|" + roleOld + ">" + roleNew);
-		}
-		catch (SecurityException se)
-		{
-			request.setAttribute("messageNotAuthorized", "true");
-			return mapping.findForward("failure");
 		}
 		catch(Exception e)
 		{
@@ -145,7 +142,11 @@ public class ProviderRoleAction extends DispatchAction
 		{
 			logger.info("DELETE ROLE");
 			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.DELETE, null, "_admin", "_admin.userAdmin");
-			securityInfoManager.superAdminModificationCheck(currentProviderNo, providerId);
+			if(!securityInfoManager.superAdminModificationCheck(currentProviderNo, providerId))
+			{
+				request.setAttribute("messageNotAuthorized", "true");
+				return mapping.findForward("failure");
+			}
 
 			if(!providerRoleService.validRoleName(roleNew))
 			{
@@ -156,11 +157,6 @@ public class ProviderRoleAction extends DispatchAction
 			LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS,
 					roleId, ip, providerId + "|" + roleOld);
 			request.setAttribute("message", "Role " + roleOld + " is deleted. (" + providerId + ")");
-		}
-		catch (SecurityException se)
-		{
-			request.setAttribute("messageNotAuthorized", "true");
-			return mapping.findForward("failure");
 		}
 		catch(Exception e)
 		{

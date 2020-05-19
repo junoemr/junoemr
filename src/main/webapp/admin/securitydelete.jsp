@@ -66,10 +66,8 @@ if(!authed) {
 	</tr>
 </table>
 <%
-	try
-	{
-		securityInfoManager.superAdminModificationCheck((String)session.getAttribute("user"), request.getParameter("provider_number"));
-
+if (securityInfoManager.superAdminModificationCheck((String)session.getAttribute("user"), request.getParameter("provider_number")))
+{
 	int rowsAffected=0;
 	Security s = securityDao.find(Integer.parseInt(request.getParameter("security_no")));
 	if(s != null) {
@@ -92,12 +90,12 @@ if(!authed) {
 <%
   }
 }
-	catch (SecurityException e)
-	{
-	%>
-		<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization"/> <%=request.getParameter("provider_number")%></h1>
-	<%
-	}
+else
+{
+%>
+	<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization"/> <%=request.getParameter("provider_number")%></h1>
+<%
+}
 %>
 <p></p>
 

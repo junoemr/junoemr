@@ -18,8 +18,3 @@ Juno.Admin.UserPermissionCtrl.checkProviderPermission = function checkProviderPe
 	}
 	return true;
 };
-
-Juno.Admin.UserPermissionCtrl.showErrorMSG = function showErrorMSG(errMSG)
-{
-	alert(errMSG);
-};

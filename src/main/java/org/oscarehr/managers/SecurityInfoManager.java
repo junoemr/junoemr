@@ -286,18 +286,16 @@ public class SecurityInfoManager {
 	}
 
 	/**
-	 * throws a security exception if the current non super-admin provider attempts to modify a super-admin provider
+	 * check if it's a non super-admin provider attempts to modify a super-admin provider
 	 * @param currentProviderNo - the providerId of the current user
 	 * @param providerNoToModify - the providerId of the user they are attempting to modify
+	 * @return  true if current user has priviledge to set a provider
 	 */
-	public void superAdminModificationCheck(String currentProviderNo, String providerNoToModify)
+	public boolean superAdminModificationCheck(String currentProviderNo, String providerNoToModify)
 	{
 		ProviderData providerToModify = providerDataDao.find(providerNoToModify);
 		ProviderData currentProvider = providerDataDao.find(currentProviderNo);
 
-		if(!currentProvider.isSuperAdmin() && providerToModify.isSuperAdmin())
-		{
-			throw new SecurityException("Super Admin privileges are required");
-		}
+		return currentProvider.isSuperAdmin() || !providerToModify.isSuperAdmin();
 	}
 }
