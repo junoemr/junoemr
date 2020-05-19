@@ -71,7 +71,6 @@ public class SecurityAddSecurityHelper {
         	MiscUtils.getLogger().error("Unable to get SHA message digest", e);
         	return "admin.securityaddsecurity.msgAdditionFailure";
         }
-        
 		byte[] btNewPasswd = md.digest(request.getParameter("password").getBytes());
 		for (int i = 0; i < btNewPasswd.length; i++)
 			sbTemp = sbTemp.append(btNewPasswd[i]);
@@ -88,7 +87,6 @@ public class SecurityAddSecurityHelper {
 		{
 			return "admin.securityaddsecurity.msgProviderNoAuthorization";
 		}
-
 		Security s = new Security();
 		s.setUserName(request.getParameter("user_name"));
 		s.setPassword(sbTemp.toString());
@@ -98,7 +96,7 @@ public class SecurityAddSecurityHelper {
 		s.setDateExpiredate(MyDateFormat.getSysDate(request.getParameter("date_ExpireDate")));
 		s.setBLocallockset(request.getParameter("b_LocalLockSet") == null ? 0 : Integer.parseInt(request.getParameter("b_LocalLockSet")));
 		s.setBRemotelockset(request.getParameter("b_RemoteLockSet") == null ? 0 : Integer.parseInt(request.getParameter("b_RemoteLockSet")));
-		
+
     	if (request.getParameter("forcePasswordReset") != null && request.getParameter("forcePasswordReset").equals("1")) {
     	    s.setForcePasswordReset(Boolean.TRUE);
     	} else {
