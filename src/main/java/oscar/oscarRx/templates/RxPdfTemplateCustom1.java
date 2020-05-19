@@ -118,6 +118,9 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 		{
 			cell.setBorder(0);
 		}
+		// SRFax has issues if there is not some amount of padding between nested tables, adding this to fix issue with
+		// buildClinicHeader nested table causing font issues when they overlap the image and the cell
+		cell.setPadding(5f);
 		main.addCell(cell);
 		return cell;
 	}
@@ -174,10 +177,10 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 		{
 
 			Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
-			float scaleFactor = (document.getPageSize().getWidth()*0.8f)/watermarkImg.getWidth();
-			watermarkImg.scalePercent(scaleFactor*100f);
-			watermarkImg.setAbsolutePosition(document.getPageSize().getWidth()/2 - (watermarkImg.getWidth()*scaleFactor) / 2,
-					document.getPageSize().getHeight()/2 - (watermarkImg.getHeight()*scaleFactor) / 2);
+			float scaleFactor = (document.getPageSize().getWidth() * 0.8f) / watermarkImg.getWidth();
+			watermarkImg.scalePercent(scaleFactor * 100f);
+			watermarkImg.setAbsolutePosition(document.getPageSize().getWidth() / 2 - (watermarkImg.getWidth() * scaleFactor) / 2,
+					document.getPageSize().getHeight() / 2 - (watermarkImg.getHeight() * scaleFactor) / 2);
 			return watermarkImg;
 		}
 		catch (Exception e)
@@ -283,8 +286,8 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 		Image logo = buildLogoImage();
 		if (logo != null)
 		{
-			logo.setBorder(0);
 			logo.setAlignment(Element.ALIGN_CENTER);
+			headerTable.getDefaultCell().setBorder(Rectangle.RIGHT);
 			headerTable.addCell(logo);
 		}
 
