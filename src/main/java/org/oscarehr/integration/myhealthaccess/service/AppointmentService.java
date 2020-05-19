@@ -139,7 +139,7 @@ public class AppointmentService extends BaseService
 	 */
 	public MHAAppointment getAppointment(Integration integration, Integer appointmentNo)
 	{
-		String url = formatEndpoint("/clinic/%s/appointments?search_by=appointment_no&appointment_no=%s",
+		String url = formatEndpoint("/clinic/%s/appointments?search_by=remote_id&remote_id=%s",
 				integration.getRemoteId(), appointmentNo);
 		AppointmentSearchTo1 result = get(url,
 				integration.getApiKey(), AppointmentSearchTo1.class);

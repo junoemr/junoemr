@@ -142,7 +142,7 @@ public class PatientService extends BaseService
 		try
 		{
 			String url = formatEndpoint("/clinic/" + integration.getRemoteId() +
-					"/patients?search_by=demographic_no&remote_id=%s", demographicNo);
+					"/patients?search_by=remote_id&remote_id=%s", demographicNo);
 			PatientSingleSearchResponseTo1 response = get(url, integration.getApiKey(), PatientSingleSearchResponseTo1.class);
 
 			if (response.isSuccess())
