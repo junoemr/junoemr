@@ -1701,6 +1701,7 @@ public class MSPReconcile {
 		MiscUtils.getLogger().debug(new java.util.Date() + ":MSPReconcile.getMSPRemittanceQuery(payeeNo, s21Id)");
 		String qry =
 				"SELECT " +
+					"s00_id," +
 					"billing_code," +
 					"provider.first_name," +
 					"provider.last_name," +
