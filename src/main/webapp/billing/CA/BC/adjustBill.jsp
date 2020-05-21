@@ -720,6 +720,8 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
        </tr>
        <tr>
 
+
+
             <td class="bCellData">Facility Number
             <input type="text" name="facilityNum" id= facility-number value="<%=allFields.getProperty("facilityNo")%>" size="5" maxlength="5"/></td>
 
