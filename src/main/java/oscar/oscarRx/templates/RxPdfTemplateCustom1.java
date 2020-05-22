@@ -92,13 +92,13 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 	protected void buildPdfLayout(Document document, PdfWriter writer) throws DocumentException, IOException
 	{
 
-		headerFont = FontFactory.getFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+		headerFont = FontFactory.getFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 		headerFont.setSize(18);
 
-		baseFont = FontFactory.getFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+		baseFont = FontFactory.getFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 		baseFont.setSize(12);
 
-		smallFont = FontFactory.getFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+		smallFont = FontFactory.getFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 		smallFont.setSize(8);
 
 		createRxPdf(document, writer);
@@ -118,9 +118,6 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 		{
 			cell.setBorder(0);
 		}
-		// SRFax has issues if there is not some amount of padding between nested tables, adding this to fix issue with
-		// buildClinicHeader nested table causing font issues when they overlap the image and the cell
-		cell.setPadding(5f);
 		main.addCell(cell);
 		return cell;
 	}
