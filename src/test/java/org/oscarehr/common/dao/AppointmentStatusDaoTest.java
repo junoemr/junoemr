@@ -58,6 +58,7 @@ public class AppointmentStatusDaoTest extends DaoTestFixtures
 	public void testCreate() throws Exception {
 		AppointmentStatus entity = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setJunoColor("#000000");
 		appointmentStatusDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
@@ -67,18 +68,22 @@ public class AppointmentStatusDaoTest extends DaoTestFixtures
 		
 		AppointmentStatus apptStatus1 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus1);
+		apptStatus1.setJunoColor("#000000");
 		appointmentStatusDao.persist(apptStatus1);
 		
 		AppointmentStatus apptStatus2 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus2);
+		apptStatus2.setJunoColor("#000000");
 		appointmentStatusDao.persist(apptStatus2);
 		
 		AppointmentStatus apptStatus3 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus3);
+		apptStatus3.setJunoColor("#000000");
 		appointmentStatusDao.persist(apptStatus3);
 		
 		AppointmentStatus apptStatus4 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus4);
+		apptStatus4.setJunoColor("#000000");
 		appointmentStatusDao.persist(apptStatus4);
 		
 		List<AppointmentStatus> expectedResult = new ArrayList<AppointmentStatus>(Arrays.asList(apptStatus1, apptStatus2, apptStatus3, apptStatus4));
@@ -107,21 +112,25 @@ public class AppointmentStatusDaoTest extends DaoTestFixtures
 		AppointmentStatus apptStatus1 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus1);
 		apptStatus1.setActive(active1);
+		apptStatus1.setJunoColor("#000000");
 		appointmentStatusDao.persist(apptStatus1);
 		
 		AppointmentStatus apptStatus2 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus2);
 		apptStatus2.setActive(active2);
+		apptStatus2.setJunoColor("#000000");
 		appointmentStatusDao.persist(apptStatus2);
 		
 		AppointmentStatus apptStatus3 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus3);
 		apptStatus3.setActive(active1);
+		apptStatus3.setJunoColor("#000000");
 		appointmentStatusDao.persist(apptStatus3);
 		
 		AppointmentStatus apptStatus4 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus4);
 		apptStatus4.setActive(active1);
+		apptStatus4.setJunoColor("#000000");
 		appointmentStatusDao.persist(apptStatus4);
 		
 		List<AppointmentStatus> expectedResult = new ArrayList<AppointmentStatus>(Arrays.asList(apptStatus1, apptStatus3, apptStatus4));
@@ -150,16 +159,19 @@ public class AppointmentStatusDaoTest extends DaoTestFixtures
 		AppointmentStatus apptStatus1 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus1);
 		apptStatus1.setStatus(status1);
+		apptStatus1.setJunoColor("#000000");
 		appointmentStatusDao.persist(apptStatus1);
 		
 		AppointmentStatus apptStatus2 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus2);
 		apptStatus2.setStatus(status2);
+		apptStatus2.setJunoColor("#000000");
 		appointmentStatusDao.persist(apptStatus2);
 		
 		AppointmentStatus apptStatus3 = new AppointmentStatus();
 		EntityDataGenerator.generateTestDataForModelClass(apptStatus3);
 		apptStatus3.setStatus(status3);
+		apptStatus3.setJunoColor("#000000");
 		appointmentStatusDao.persist(apptStatus3);
 		
 		AppointmentStatus expectedResult = apptStatus2;
@@ -173,6 +185,7 @@ public class AppointmentStatusDaoTest extends DaoTestFixtures
 		List<AppointmentStatus> statuses = new ArrayList<AppointmentStatus>();
 		AppointmentStatus a = new AppointmentStatus();
 		a.setStatus("test");
+		a.setJunoColor("#000000");
 		statuses.add(a);
 		appointmentStatusDao.checkStatusUsuage(statuses);
 	}

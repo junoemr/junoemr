@@ -33,6 +33,8 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -46,10 +48,16 @@ public class SeleniumTestBase
 	protected static WebDriver driver;
 	protected static Logger logger= MiscUtils.getLogger();
 
+	@Autowired
+	Environment environment;
+
+	protected String tomcatPort;
+
 	@BeforeClass
 	public static void buildWebDriver() throws SQLException, InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException
 	{
+
 		//load database (during the integration-test phase this will only populate table creation maps)
 		SchemaUtils.createDatabaseAndTables();
 
@@ -76,6 +84,12 @@ public class SeleniumTestBase
 		ffo.setBinary(ffb);
 		driver = new FirefoxDriver(ffo);
 		driver.manage().timeouts().implicitlyWait(WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+	}
+
+	@Before
+	public void before()
+	{
+		tomcatPort = environment.getProperty("local.server.port");
 	}
 
 	protected static void loadSpringBeans()

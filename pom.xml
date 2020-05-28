@@ -227,6 +227,11 @@
 			<artifactId>javassist</artifactId>
 			<version>3.21.0-GA</version>
 		</dependency>
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.el</artifactId>
+			<version>3.0.1-b08</version>
+		</dependency>
 <!--
 		<dependency>
 			<groupId>junit</groupId>
@@ -253,6 +258,7 @@
 			<version>1.7.1</version>
 			<scope>test</scope>
 		</dependency>
+<!--
 		<dependency>
 			<groupId>javax.el</groupId>
 			<artifactId>el-api</artifactId>
@@ -265,12 +271,15 @@
 			<version>2.2</version>
 			<scope>test</scope>
 		</dependency>
+-->
+<!--
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
+-->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -483,7 +492,10 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
-			<version>1.1.2</version>
+<!--
+			<scope>provided</scope>
+-->
+			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>taglibs</groupId>
@@ -758,11 +770,13 @@
 			<version>2.4.0</version>
 		</dependency>
 		<!-- HttpClient -->
+<!-- Provided by CXF
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.2.6</version>
 		</dependency>
+-->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
@@ -1028,6 +1042,10 @@
 				<exclusion>
 					<groupId>org.apache.neethi</groupId>
 					<artifactId>neethi</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -2319,6 +2337,7 @@
 			</properties>
 			<build>
 				<plugins>
+					<!--
 					<plugin>
 						<groupId>org.apache.tomcat.maven</groupId>
 						<artifactId>tomcat7-maven-plugin</artifactId>
@@ -2352,10 +2371,12 @@
 							</execution>
 						</executions>
 					</plugin>
+					-->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<executions>
+							<!--
 							<execution>
 								<id>default-test</id>
 								<goals>
@@ -2372,6 +2393,7 @@
 									</systemPropertyVariables>
 								</configuration>
 							</execution>
+							-->
 							<execution>
 								<id>integration-test</id>
 								<goals>

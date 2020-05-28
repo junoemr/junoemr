@@ -23,13 +23,20 @@
  */
 package org.oscarehr.e2e.populator.body;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.e2e.constant.BodyConstants.OrdersAndRequests;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class OrdersAndRequestsPopulatorTest extends AbstractBodyPopulatorTest {
-	@BeforeClass
-	public static void beforeClass() {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class OrdersAndRequestsPopulatorTest extends AbstractBodyPopulatorTest
+{
+	@Before
+	public void beforeClass() {
 		setupClass(OrdersAndRequests.getConstants());
 	}
 

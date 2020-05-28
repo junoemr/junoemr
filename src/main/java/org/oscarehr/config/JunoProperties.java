@@ -26,6 +26,7 @@ package org.oscarehr.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+// TODO: SPRINGUPGRADE: Remove this?  Current plan is to put Juno-specific settings in the old-style properties file.
 @Configuration
 @ConfigurationProperties(prefix = "juno")
 public class JunoProperties

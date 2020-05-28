@@ -225,7 +225,8 @@ public abstract class DaoTestFixtures
 	{
 	    String[] excludes = {"notify","notifyAll","remove","persist","merge","refresh","saveEntity","wait","equals",
 				"toString","hashCode","getClass","getModelClass","find","getCountAll","findAll",
-			    "runNativeQuery","getExplainResultList", "save","removeAll", "criteriaSearch", "criteriaSearchCount"
+			    "runNativeQuery","getExplainResultList", "save","removeAll", "criteriaSearch", "criteriaSearchCount",
+				"removeProgram", "afterPropertiesSet"
 	    };
 	    return new ArrayList<>(Arrays.asList(excludes));
     }

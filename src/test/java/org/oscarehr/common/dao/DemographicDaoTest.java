@@ -52,7 +52,7 @@ public class DemographicDaoTest extends DaoTestFixtures
 	protected DemographicDao demographicDao;
 
 	@Autowired
-	protected ProviderDataDao providerDataDao = (ProviderDataDao) SpringUtils.getBean("providerDataDao");
+	protected ProviderDataDao providerDataDao;
 
 	@Before
 	public void before() throws Exception {

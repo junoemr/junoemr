@@ -69,9 +69,22 @@ public class ScheduleTemplateCodeDao extends AbstractDao<ScheduleTemplateCode>
 		return results;
 	}
 	
-	public ScheduleTemplateCode findByCode(String code) {
+	public ScheduleTemplateCode findByCode(String code)
+	{
+		Character codeCharacter = null;
+		if(code != null)
+		{
+			// If the code is not a single character, it can't match
+			if (code.length() != 1) {
+				return null;
+			}
+
+			codeCharacter = code.toCharArray()[0];
+		}
+
 		Query query = entityManager.createQuery("select s from ScheduleTemplateCode s where s.code like ?1");
-		query.setParameter(1, code);
+
+		query.setParameter(1, codeCharacter);
 		
 		@SuppressWarnings("unchecked")
 		List<ScheduleTemplateCode> results = query.getResultList();

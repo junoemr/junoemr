@@ -66,7 +66,7 @@ public class CriteriaTypeOptionDao extends AbstractDao<CriteriaTypeOption> {
 	}
 	
 	public CriteriaTypeOption getByValueAndTypeId(String optionValue, Integer typeId) {
-		Query query = entityManager.createQuery("select x from CriteriaTypeOption x where x.optionValue=?1 and x.criteriaTypeId=?1");
+		Query query = entityManager.createQuery("select x from CriteriaTypeOption x where x.optionValue=?1 and x.criteriaTypeId=?2");
 		query.setParameter(1, optionValue);
 		query.setParameter(2, typeId);
 

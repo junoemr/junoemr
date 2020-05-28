@@ -32,7 +32,7 @@ import org.oscarehr.util.MiscUtils;
 
 public class Navigation
 {
-	public static final String OSCAR_URL="http://localhost:9090";
+	public static final String OSCAR_URL="http://localhost";
 
 
 	private static Logger logger= MiscUtils.getLogger();
@@ -75,5 +75,10 @@ public class Navigation
 	{
 		Cookie session = driver.manage().getCookieNamed("JSESSIONID");
 		return session != null;
+	}
+
+	public static String getOscarUrl(String serverPort)
+	{
+		return OSCAR_URL + ":" + serverPort;
 	}
 }

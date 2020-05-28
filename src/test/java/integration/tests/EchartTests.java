@@ -22,31 +22,36 @@
  */
 package integration.tests;
 
-import integration.tests.sql.SqlFiles;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EchartTests extends SeleniumTestBase
 {
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 
-	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	@Before
+	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "demographic",
 				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
@@ -61,12 +66,16 @@ public class EchartTests extends SeleniumTestBase
 	public void testWritingNote() throws InterruptedException
 	{
 		// login
-		if (!Navigation.isLoggedIn(driver))
-		{
-			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
-		}
+		//if (!Navigation.isLoggedIn(driver))
+		//{
+			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN,
+					Navigation.getOscarUrl(tomcatPort), driver);
+			Thread.sleep(10000);
+		//}
 
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(tomcatPort) + ECHART_URL);
+
+		Thread.sleep(10000);
 
 		// create new encounter note
 		String noteId = null;
@@ -112,7 +121,7 @@ public class EchartTests extends SeleniumTestBase
 		String currentUrl = driver.getCurrentUrl();
 		driver.findElement(By.id("signSaveImg")).click();
 		Thread.sleep(2000);
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(tomcatPort) + ECHART_URL);
 		Thread.sleep(5000);
 		Assert.assertTrue("Sign and save note. FAILED",
 				PageUtil.isExistsBy(By.xpath("//*[contains(., '" + myUUID + "') and contains(., 'Signed on') and contains(@id, 'txt')]"), driver));

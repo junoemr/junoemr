@@ -897,7 +897,7 @@ CREATE TABLE formONAR(
   pg2_labExtra3Value varchar(20),
   
   PRIMARY KEY (ID)
-) ;
+) ENGINE=MyISAM ;
 
 CREATE TABLE `formovulation` (
   `ID` bigint(11) NOT NULL auto_increment,
@@ -1265,7 +1265,7 @@ CREATE TABLE `formovulation` (
   `comment12` varchar(255) default '',
   `postComment` varchar(255) default '',
   PRIMARY KEY  (`ID`)
-);
+) ENGINE=MyISAM;
 
 CREATE TABLE billing_on_diskname (
   id int(11) NOT NULL auto_increment,

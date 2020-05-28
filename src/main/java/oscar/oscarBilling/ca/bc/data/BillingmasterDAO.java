@@ -260,7 +260,7 @@ public class BillingmasterDAO {
 				" d.hin, d.month_of_birth, d.date_of_birth, d.year_of_birth, b.practitioner_no, b.billing_code, w.bill_amount, b.billing_unit, b.service_date,"+
 				" b.billing_no, t.t_dataseq,  w.w_servicelocation, w.w_icd9, w.w_reporttype, w.w_mname, w.w_gender, w.w_doi, w.w_area, w.w_phone, w.w_empname, "+
 				"w.w_emparea, w.w_empphone,w.w_wcbno, w.w_opaddress,w.w_opcity,w.w_rphysician,w.w_duration,w.w_ftreatment,w.w_problem,w.w_servicedate,"+
-				"w.w_diagnosis, w.w_icd9,w.w_bp,w.w_side,w.w_noi,w.w_work,w.w_workdate,w.w_clinicinfo,w.w_capability,w.w_capreason,w.w_estimate,w.w_rehab,"+
+				"w.w_diagnosis, w.w_icd9 as icd9,w.w_bp,w.w_side,w.w_noi,w.w_work,w.w_workdate,w.w_clinicinfo,w.w_capability,w.w_capreason,w.w_estimate,w.w_rehab,"+
 				"w.w_rehabtype,w.w_estimatedate,w.w_tofollow,w.w_wcbadvisor,w.w_feeitem,w.w_extrafeeitem,b.billingstatus,w.formNeeded,w.provider_no,w.w_payeeno, w.w_pracno "+
 				" FROM billingmaster b LEFT JOIN teleplanC12  t ON t.t_officefolioclaimno=b.billingmaster_no, demographic d , wcb w "+
 				"WHERE b.demographic_no=d.demographic_no AND b.billing_no=w.billing_no AND b.billingmaster_no=?1");

@@ -34,7 +34,22 @@ public class DefaultViewConfig implements WebMvcConfigurer
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry)
 	{
-		registry.addViewController("/web/").setViewName("index");
+		registry.addViewController("/web/").setViewName("forward:/web/index.jsp");
+		registry.addViewController("/administration/").setViewName("forward:/administration/index.jsp");
+		registry.addViewController("/ticklerPlus/").setViewName("forward:/ticklerPlus/index.jsp");
+		registry.addViewController("/lab/CA/BC/").setViewName("forward:/lab/CA/BC/index.jsp");
+		registry.addViewController("/mcedt/mailbox/").setViewName("forward:/mcedt/mailbox/index.jsp");
+		registry.addViewController("/mcedt/").setViewName("forward:/mcedt/index.jsp");
+		registry.addViewController("/scratch/").setViewName("forward:/scratch/index.jsp");
+		registry.addViewController("/schedule/").setViewName("forward:/schedule/index.jsp");
+		registry.addViewController("/survey/").setViewName("forward:/survey/index.jsp");
+		registry.addViewController("/oscarPrevention/").setViewName("forward:/oscarPrevention/index.jsp");
+		registry.addViewController("/oscarEncounter/").setViewName("forward:/oscarEncounter/Index.jsp");
+		registry.addViewController("/eaaps/").setViewName("forward:/eaaps/index.jsp");
+		registry.addViewController("/administration/").setViewName("forward:/administration/index.jsp");
+		registry.addViewController("/appointment/").setViewName("forward:/appointment/index.jsp");
+		registry.addViewController("/casemgmt/").setViewName("forward:/casemgmt/index.jsp");
+		registry.addViewController("/tickler/").setViewName("forward:/tickler/index.jsp");
 		registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
 	}
 }

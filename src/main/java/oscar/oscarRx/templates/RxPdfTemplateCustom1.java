@@ -25,6 +25,8 @@
 package oscar.oscarRx.templates;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +55,8 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import oscar.OscarProperties;
 
 public class RxPdfTemplateCustom1 extends RxPdfTemplate {
@@ -182,11 +186,14 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		Image img = null;
 		try {
 			String custom_logo_name = OscarProperties.getInstance().getProperty("rx_custom_logo");
-			if(custom_logo_name != null ){
+			if(custom_logo_name != null )
+			{
 				img = Image.getInstance(OscarProperties.getInstance().getProperty("eform_image") + custom_logo_name);
 			}
-			else {
-				img = Image.getInstance(System.getProperty( "catalina.base" ) + "/webapps" + req.getContextPath() + "/oscarRx/img/rx.gif");
+			else
+			{
+				URL url = this.ctx.getResource("/oscarRx/img/rx.gif");
+				img = Image.getInstance(url);
 			}
 		}
 		catch(Exception e) {

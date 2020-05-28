@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import oscar.OscarProperties;
 
 /**
  * This ContextListener is used to Initialize classes at startup - Initialize the DBConnection Pool.
@@ -49,30 +50,10 @@ public class Startup implements ServletContextListener
 	private static Logger logger = MiscUtils.getLogger();
 	private oscar.OscarProperties p = oscar.OscarProperties.getInstance();
 
-	@Value("#{junoProperties.properties.filename}")
-	private String propertiesFilename;
-
 	public void contextInitialized(ServletContextEvent sc)
 	{
 		try
 		{
-			// Load properties file from system property
-			//String propertyFileLocation = System.getProperty("juno.properties-file.location");
-
-			try
-			{
-				//propertiesFilename = "/usr/share/tomcat/juno.properties";
-
-				// load property file
-				logger.info("looking up " + propertiesFilename);
-				p.readFromFile(propertiesFilename);
-				logger.info("loading properties from " + propertiesFilename);
-			}
-			catch (java.io.FileNotFoundException ex)
-			{
-				logger.info(propertiesFilename + " not found");
-			}
-
 			logger.debug("contextInit");
 
 			String contextPath = "";
@@ -98,47 +79,6 @@ public class Startup implements ServletContextListener
 				logger.error("Error", e);
 			}
 
-			/*
-			String propFileName = "";
-			String propName = contextPath + ".properties";
-			propFileName = "";
-
-			if (System.getProperty("oscar.use.integration.prop.file") != null && System.getProperty("oscar.use.integration.prop.file").equals("true"))
-			{
-				propFileName = "src/test/resources/integration.properties";
-			}
-			else
-			{
-				char sep = System.getProperty("file.separator").toCharArray()[0];
-				propFileName = System.getProperty("user.home") + sep + propName;
-			}
-
-			try
-			{
-				// load property file
-				logger.info("looking up " + propFileName);
-				p.readFromFile(propFileName);
-				logger.info("loading properties from " + propFileName);
-			} catch (java.io.FileNotFoundException ex)
-			{
-				logger.info(propFileName + " not found");
-			}
-
-			if (p.isEmpty()) {
-				// if the file not found in the user root, look in the WEB-INF directory
-				try {
-					logger.info("looking up  /WEB-INF/" + propName);
-					p.readFromFile("/WEB-INF/" + propName);
-					logger.info("loading properties from /WEB-INF/" + propName);
-				} catch (java.io.FileNotFoundException e) {
-					logger.error("Configuration file: " + propName + " cannot be found, it should be put either in the User's home or in WEB-INF ");
-					return;
-				} catch (Exception e) {
-					logger.error("Error", e);
-					return;
-				}
-			}
-			*/
 			try {
 				// Specify who will see new casemanagement screen
 				ArrayList<String> listUsers;

@@ -368,7 +368,7 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
     
     @SuppressWarnings("unchecked")
     public List<Integer> findDemographicIdsSince(Date date) {    	
-    	String query = "select x.demographicNo from " + modelClass.getName() + " x where x.dateModified > ?1)";
+    	String query = "select x.demographicNo from " + modelClass.getName() + " x where x.dateModified > ?1";
     	Query q = entityManager.createQuery(query);
 
     	q.setParameter(1, date);

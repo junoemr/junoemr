@@ -29,6 +29,7 @@ import org.oscarehr.common.dao.AbstractDao;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -61,7 +62,8 @@ public class TeleplanC12Dao extends AbstractDao<TeleplanC12> {
     }
 	
 	@SuppressWarnings("unchecked")
-	public List<TeleplanC12> select_c12_record(String status, String claimNo) { 
+	public List<TeleplanC12> select_c12_record(Character status, String claimNo)
+	{
 		Query query = createQuery("t", "t.status = :status and t.officeFolioClaimNo = :claimNo");
 		query.setParameter("claimNo", claimNo);
 		query.setParameter("status", status);

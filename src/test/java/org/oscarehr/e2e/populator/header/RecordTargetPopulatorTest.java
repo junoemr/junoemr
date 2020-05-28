@@ -29,11 +29,16 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Patient;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.PatientRole;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.RecordTarget;
 import org.oscarehr.e2e.populator.AbstractPopulatorTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class RecordTargetPopulatorTest extends AbstractPopulatorTest {
 	@Test
 	public void recordTargetTest() {

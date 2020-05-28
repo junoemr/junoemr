@@ -29,25 +29,32 @@ import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(
+		classes = JunoApplication.class,
+		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EFormTests extends SeleniumTestBase
 {
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 	private static String EFORM_URL = "/eform/efmformslistadd.jsp?demographic_no=1&appointment=&parentAjaxId=eforms";
 
-	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	@Before
+	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "demographic",
 				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
@@ -58,14 +65,11 @@ public class EFormTests extends SeleniumTestBase
 		DatabaseUtil.createTestDemographic();
 
 		SchemaUtils.loadFileIntoMySQL(SqlFiles.EFORM_ADD_TRAVLE_FORM_V4);
-	}
 
-	@Before
-	public void login()
-	{
 		if(!Navigation.isLoggedIn(driver))
 		{
-			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN,
+					Navigation.getOscarUrl(tomcatPort), driver);
 		}
 	}
 
@@ -74,7 +78,7 @@ public class EFormTests extends SeleniumTestBase
 	{
 		//navigate to eform addition page
 		String oldUrl = driver.getCurrentUrl();
-		driver.get(Navigation.OSCAR_URL + EFORM_URL);
+		driver.get(Navigation.getOscarUrl(tomcatPort) + EFORM_URL);
 		PageUtil.waitForPageChange(oldUrl, driver);
 		Assert.assertFalse("expecting eform page but found error page!", PageUtil.isErrorPage(driver));
 		logger.info("Navigate to eform add page. OK");
@@ -93,6 +97,7 @@ public class EFormTests extends SeleniumTestBase
 		PageUtil.switchToWindow(newWindows.get(0), driver);
 		Thread.sleep(2000);
 
+		String content = driver.getPageSource();
 		Assert.assertFalse("got error page on eform page", PageUtil.isErrorPage(driver));
 		logger.info("Open eform travel_form_v4. OK");
 
@@ -100,7 +105,7 @@ public class EFormTests extends SeleniumTestBase
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		logger.info("Submit eform travel_form_v4. OK");
 
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(tomcatPort) + ECHART_URL);
 		Thread.sleep(5000);
 		Assert.assertNotNull(driver.findElement(By.xpath("//a[contains(., 'travel_from_v4:')]")));
 		logger.info("Eform added to Echart? OK");

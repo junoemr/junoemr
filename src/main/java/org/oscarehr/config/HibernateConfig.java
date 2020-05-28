@@ -51,7 +51,7 @@ public class HibernateConfig
 		LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
 		sessionFactoryBean.setDataSource(dataSource);
 		sessionFactoryBean.setMappingLocations(loadResources());
-		sessionFactoryBean.setPackagesToScan("org.oscarehr");
+		sessionFactoryBean.setPackagesToScan(new String[] {"org.oscarehr", "oscar"});
 		sessionFactoryBean.setHibernateProperties(hibernateProperties());
 		return sessionFactoryBean;
 	}

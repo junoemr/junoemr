@@ -139,7 +139,7 @@ if(!authed) {
 
   <%
     
-    for(TeleplanS21 result : teleplanS21Dao.search_all_tahd("D")) {
+    for(TeleplanS21 result : teleplanS21Dao.search_all_tahd('D')) {
     
         raNo  = result.getId().toString();
         paymentdate = result.getPayment();

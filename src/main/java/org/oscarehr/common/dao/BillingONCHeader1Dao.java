@@ -298,10 +298,11 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
 
     public int getDaysSinceBilled(String serviceCode, Integer demographicNo) {
         String sql = "select b from BillingONCHeader1 h1, BillingONItem b where b.ch1Id = h1.id and b.serviceCode = :code and" +
-                " h1.demographicNo = :demo and h1.status != 'D' order by h1.billingDate desc limit 1";
+                " h1.demographicNo = :demo and h1.status != 'D' order by h1.billingDate desc";
         Query q = entityManager.createQuery(sql);
         q.setParameter("code", serviceCode);
         q.setParameter("demo", demographicNo);
+        q.setMaxResults(1);
         List<BillingONItem> billingClaims = q.getResultList();
         int numDays = -1;
 
@@ -321,10 +322,11 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
     
     public int getDaysSincePaid(String serviceCode, Integer demographic_no) {
         String sql = "select b from BillingONCHeader1 h1, BillingONItem b where b.ch1Id = h1.id and b.serviceCode = :code and" +
-                " h1.demographicNo = :demo and h1.status = 'S' order by h1.billingDate desc limit 1";
+                " h1.demographicNo = :demo and h1.status = 'S' order by h1.billingDate desc";
         Query q = entityManager.createQuery(sql);
         q.setParameter("code", serviceCode);
         q.setParameter("demo", demographic_no);
+        q.setMaxResults(1);
         List<BillingONItem> billingClaims = q.getResultList();
         int numDays = -1;
 

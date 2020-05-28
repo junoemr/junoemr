@@ -65,6 +65,7 @@ public class ScheduleTemplateCodeDaoTest extends DaoTestFixtures
 		ScheduleTemplateCode entity = new ScheduleTemplateCode();
         EntityDataGenerator.generateTestDataForModelClass(entity);
         entity.setCode('A');
+        entity.setJunoColor("#000000");
         scheduleTemplateCodeDao.persist(entity);
         assertNotNull(entity.getId());
 	}
@@ -74,14 +75,17 @@ public class ScheduleTemplateCodeDaoTest extends DaoTestFixtures
 		
 		ScheduleTemplateCode scheduleTempCode1 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode1);
+		scheduleTempCode1.setJunoColor("#000000");
 		scheduleTemplateCodeDao.persist(scheduleTempCode1);
 		
 		ScheduleTemplateCode scheduleTempCode2 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode2);
+		scheduleTempCode2.setJunoColor("#000000");
 		scheduleTemplateCodeDao.persist(scheduleTempCode2);
 		
 		ScheduleTemplateCode scheduleTempCode3 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode3);
+		scheduleTempCode3.setJunoColor("#000000");
 		scheduleTemplateCodeDao.persist(scheduleTempCode3);
 		
 		List<ScheduleTemplateCode> expectedResult = new ArrayList<ScheduleTemplateCode>(Arrays.asList(scheduleTempCode1, scheduleTempCode2, scheduleTempCode3));
@@ -112,16 +116,19 @@ public class ScheduleTemplateCodeDaoTest extends DaoTestFixtures
 		ScheduleTemplateCode scheduleTempCode1 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode1);
 		scheduleTempCode1.setCode(code1);
+		scheduleTempCode1.setJunoColor("#000000");
 		scheduleTemplateCodeDao.persist(scheduleTempCode1);
 		
 		ScheduleTemplateCode scheduleTempCode2 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode2);
 		scheduleTempCode2.setCode(code2);
+		scheduleTempCode2.setJunoColor("#000000");
 		scheduleTemplateCodeDao.persist(scheduleTempCode2);
 		
 		ScheduleTemplateCode scheduleTempCode3 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode3);
 		scheduleTempCode3.setCode(code3);
+		scheduleTempCode3.setJunoColor("#000000");
 		scheduleTemplateCodeDao.persist(scheduleTempCode3);
 		
 		ScheduleTemplateCode expectedResult = scheduleTempCode2;
@@ -139,16 +146,19 @@ public class ScheduleTemplateCodeDaoTest extends DaoTestFixtures
 		ScheduleTemplateCode scheduleTempCode1 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode1);
 		scheduleTempCode1.setCode(code1);
+		scheduleTempCode1.setJunoColor("#000000");
 		scheduleTemplateCodeDao.persist(scheduleTempCode1);
 		
 		ScheduleTemplateCode scheduleTempCode2 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode2);
 		scheduleTempCode2.setCode(code2);
+		scheduleTempCode2.setJunoColor("#000000");
 		scheduleTemplateCodeDao.persist(scheduleTempCode2);
 		
 		ScheduleTemplateCode scheduleTempCode3 = new ScheduleTemplateCode();
 		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode3);
 		scheduleTempCode3.setCode(code3);
+		scheduleTempCode3.setJunoColor("#000000");
 		scheduleTemplateCodeDao.persist(scheduleTempCode3);
 		
 		ScheduleTemplateCode expectedResult = scheduleTempCode2;

@@ -141,7 +141,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 	}
 	
 
-	public List<ScheduleDate> findByProviderStartDateAndPriority(String providerNo, Date apptDate, String priority) {
+	public List<ScheduleDate> findByProviderStartDateAndPriority(String providerNo, Date apptDate, Character priority) {
 		Query query = createQuery("sd", "sd.date = :apptDate AND sd.providerNo = :providerNo AND sd.priority = :priority");
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("apptDate", apptDate);

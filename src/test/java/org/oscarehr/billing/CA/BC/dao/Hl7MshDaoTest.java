@@ -32,6 +32,7 @@ import org.oscarehr.billing.CA.BC.model.Hl7Msh;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -39,6 +40,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class Hl7MshDaoTest extends DaoTestFixtures
 {
+	@Autowired
 	public Hl7MshDao hl7MshDao;
 
 	public Hl7MshDaoTest() {

@@ -57,6 +57,34 @@ public class OscarProperties extends Properties {
 	private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
 	private static final String DEFAULT_DATETIME_FORMAT = DEFAULT_DATE_FORMAT + " HH:mm:ss";
 
+	private static final String MODULE_PROPERTY_NAME = "ModuleNames";
+
+
+	public enum Module
+	{
+		MODULE_BORN18M("BORN18M"),
+		MODULE_BORN("BORN"),
+		MODULE_CAISI("Caisi"),
+		MODULE_CBI("CBI"),
+		MODULE_E2E("E2E"),
+		MODULE_EMERALDA04("EmeraldA04"),
+		MODULE_ERX("ERx"),
+		MODULE_HRM("HRM"),
+		MODULE_INDIVO("Indivo"),
+		MODULE_JOBS("Jobs"),
+		MODULE_OLIS("OLIS"),
+		MODULE_ORN("ORN"),
+		REST("REST"),
+		MODULE_SPIRE("Spire");
+
+		public final String moduleName;
+
+		Module(String moduleName)
+		{
+			this.moduleName = moduleName;
+		}
+	}
+
 	/* Do not use this constructor. Use getInstance instead */
 	private OscarProperties() {
 		MiscUtils.getLogger().debug("OSCAR PROPS CONSTRUCTOR");
@@ -528,6 +556,31 @@ public class OscarProperties extends Properties {
 	{
 		return isPropertyActive("has_hrm_documents");
 	}
+
+	public boolean isModuleEnabled(Module module)
+	{
+		// Get the module string from the config
+		// separate it by commas
+		// See if the module is included
+
+		String moduleNames = getProperty(MODULE_PROPERTY_NAME);
+		if(moduleNames == null || moduleNames.trim().length() == 0)
+		{
+			return false;
+		}
+
+		String[] moduleList = moduleNames.split(",");
+		for (String selectedModule : moduleList)
+		{
+			if(module.moduleName.equals(selectedModule))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	// =========================================================================
 	// Static methods for getting specific property values
 	// =========================================================================

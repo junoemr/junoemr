@@ -42,8 +42,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class DemographicConverterTest extends DaoTestFixtures
 {
-	@Autowired
-	private DemographicConverter demoConverter;
+	private DemographicConverter demoConverter = new DemographicConverter();
 
 	@Test
 	public void testConversion() throws Exception {

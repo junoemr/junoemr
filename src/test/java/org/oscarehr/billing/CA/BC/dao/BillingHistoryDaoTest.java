@@ -75,5 +75,4 @@ public class BillingHistoryDaoTest extends DaoTestFixtures
 		dd = billingHistoryDao.getTotalPaidFromHistory(100, false);
 		assertNotNull(dd);
 	}
-	
 }

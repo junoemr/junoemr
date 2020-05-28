@@ -26,14 +26,15 @@ package org.oscarehr.common.web;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.ContextLoaderListener;
 
+// TODO: SPRINGUPGRADE: Not used anymore
 public class OscarSpringContextLoaderListener extends ContextLoaderListener {
 
 	private static Logger logger = MiscUtils.getLogger();
 
-	//@Override
     protected ContextLoader createContextLoader() {
 		try {
 			logger.info("Creating OscarContextLoader");

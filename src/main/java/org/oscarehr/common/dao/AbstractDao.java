@@ -142,7 +142,7 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 			MiscUtils.getLogger().error("Criteria search count returned null result");
 			result = -1;
 		}
-		return ((Integer)result);
+		return ((Long)result).intValue();
 	}
 	
 	protected int getMaxSelectSize() {

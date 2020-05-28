@@ -30,6 +30,7 @@ import org.oscarehr.common.dao.AbstractDao;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -62,7 +63,8 @@ public class TeleplanS21Dao extends AbstractDao<TeleplanS21>{
 		return results;
 	}
 	
-	public List<TeleplanS21> search_all_tahd(String excludeStatus) {
+	public List<TeleplanS21> search_all_tahd(Character excludeStatus)
+	{
 		Query q = entityManager.createQuery("SELECT t from TeleplanS21 t WHERE t.status <> ?1 ORDER BY t.payment desc");
 		q.setParameter(1, excludeStatus);
 		

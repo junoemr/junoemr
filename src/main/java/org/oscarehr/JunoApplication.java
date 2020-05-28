@@ -23,6 +23,9 @@
 
 package org.oscarehr;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.init.OscarPropertiesInitializer;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -30,6 +33,10 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
+import oscar.OscarProperties;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 @SpringBootApplication
@@ -38,15 +45,28 @@ import org.springframework.context.annotation.ImportResource;
 @ImportResource({"classpath*:applicationContext.xml"})
 public class JunoApplication extends SpringBootServletInitializer
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
+	// TODO: SPRINGUPGRADE: Figure out if this runs for war/jar startup
+	// XXX: Does not seem to run when running from intellij.  Suspect it doesn't run when running as a jar, likely
+	//      for startup when using a war file.
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application)
 	{
-		return application.sources(JunoApplication.class);
+		logger.info("Starting Juno with the application builder");
+
+		return application
+				.sources(JunoApplication.class)
+				.initializers(new OscarPropertiesInitializer());
 	}
 
 	public static void main(String[] args)
 	{
-		SpringApplication.run(JunoApplication.class, args);
+		logger.info("Starting Juno with a new SpringApplication");
+
+		SpringApplication application = new SpringApplication(JunoApplication.class);
+		application.addInitializers(new OscarPropertiesInitializer());
+		application.run(args);
 	}
 
 

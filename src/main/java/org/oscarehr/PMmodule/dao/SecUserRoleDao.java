@@ -59,7 +59,7 @@ public class SecUserRoleDao extends HibernateDaoSupport {
     
     public List<SecUserRole> findByRoleNameAndProviderNo(String roleName, String providerNo) {
         @SuppressWarnings("unchecked")
-        List<SecUserRole> results = (List<SecUserRole>) getHibernateTemplate().find("from SecUserRole s where s.RoleName = ?0 and s.ProviderNo=?0", new Object[]{roleName,providerNo});
+        List<SecUserRole> results = (List<SecUserRole>) getHibernateTemplate().find("from SecUserRole s where s.RoleName = ?0 and s.ProviderNo=?1", new Object[]{roleName,providerNo});
 
         return results;
     }

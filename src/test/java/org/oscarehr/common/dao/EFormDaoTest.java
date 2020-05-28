@@ -29,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,25 +47,34 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class EFormDaoTest extends DaoTestFixtures
 {
 
-	protected static Integer populatedFormId;
+	protected Integer populatedFormId;
 
 	@Autowired
-	protected static EFormDao eFormDao;
+	protected EFormDao eFormDao;
 
 	@BeforeClass
-	public static void initSchema() throws Exception {
+	public static void initSchema() throws Exception
+	{
 		SchemaUtils.restoreTable("eform","eform_groups");
-		
-		EForm eform = new EForm();
-		EntityDataGenerator.generateTestDataForModelClass(eform);
-		eform.setFormName("NUVASHENAH");
-		eFormDao.persist(eform);
-		
-		populatedFormId = eform.getId();
+	}
+
+	@Before
+	public void createTestEform() throws Exception
+	{
+	    if(populatedFormId == null)
+	    {
+			EForm eform = new EForm();
+			EntityDataGenerator.generateTestDataForModelClass(eform);
+			eform.setFormName("NUVASHENAH");
+			eFormDao.persist(eform);
+
+			populatedFormId = eform.getId();
+		}
 	}
 
 	@Test
-	public void testFindByStatus() {
+	public void testFindByStatus()
+	{
 		List<EForm> eforms = eFormDao.findByStatus(true, EFormSortOrder.DATE);
 		assertFalse(eforms.isEmpty());
 		
@@ -82,14 +92,16 @@ public class EFormDaoTest extends DaoTestFixtures
 	}
 	
 	@Test
-	public void testFindMaxIdForActiveForm() {
+	public void testFindMaxIdForActiveForm()
+	{
 		Integer id = eFormDao.findMaxIdForActiveForm("NUVASHENAH");
 		assertNotNull(id);
 		assertTrue(id > 0);
 	}
 	
 	@Test
-	public void testCountFormsOtherThanSpecified() {
+	public void testCountFormsOtherThanSpecified()
+	{
 		Long count = eFormDao.countFormsOtherThanSpecified("NUVASHENAH", populatedFormId);
 		assertNotNull(count);
 		assertTrue(count >= 0);		

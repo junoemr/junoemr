@@ -28,6 +28,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -127,7 +130,14 @@ public class MeasurementDaoTest extends DaoTestFixtures
 		m.setAppointmentNo(100);
 		m.setComments("NUIOBLAHA");
 		m.setDataField("DTATAHEROVATA");
-		m.setDateObserved(new Date());
+		try
+		{
+			m.setDateObserved((new SimpleDateFormat("yyyy-MM-dd")).parse("2020-01-01"));
+		}
+		catch (ParseException e)
+		{
+
+		}
 		m.setMeasuringInstruction("MSRNIGINSRCTIONS");
 		m.setProviderNo("PRVDRE");
 		m.setType("TIPPITIP");

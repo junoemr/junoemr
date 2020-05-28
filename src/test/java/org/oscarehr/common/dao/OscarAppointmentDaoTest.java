@@ -29,6 +29,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -50,7 +52,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class OscarAppointmentDaoTest extends DaoTestFixtures
 {
 	@Autowired
-	static OscarAppointmentDao oscarAppointmentDao;
+	protected OscarAppointmentDao oscarAppointmentDao;
 
 	@Before
 	public void before() throws Exception {
@@ -141,7 +143,17 @@ public class OscarAppointmentDaoTest extends DaoTestFixtures
 		Appointment appt = new Appointment();
 		EntityDataGenerator.generateTestDataForModelClass(appt);
 		appt.setProviderNo("000001");
-		appt.setAppointmentDate(new Date());
+		try
+		{
+			appt.setAppointmentDate((new SimpleDateFormat("yyyy-MM-dd")).parse("2020-01-01"));
+			appt.setCreateDateTime((new SimpleDateFormat("yyyy-MM-dd")).parse("2020-01-01"));
+			appt.setStartTime((new SimpleDateFormat("yyyy-MM-dd")).parse("2020-01-01"));
+			appt.setEndTime((new SimpleDateFormat("yyyy-MM-dd")).parse("2020-01-01"));
+		}
+		catch (ParseException e)
+		{
+
+		}
 		appt.setStatus("t");
 		oscarAppointmentDao.persist(appt);
 
@@ -233,8 +245,9 @@ public class OscarAppointmentDaoTest extends DaoTestFixtures
 	public void testFindByDateAndProvider() {
 		assertNotNull(oscarAppointmentDao.findByDateAndProvider(new Date(), "100"));
 	}
-	
-	public static Appointment makePersistedAppointment()
+
+	/*
+	public Appointment makePersistedAppointment()
 	{
 		Appointment a=new Appointment();
 		a.setProviderNo("1111");
@@ -245,4 +258,6 @@ public class OscarAppointmentDaoTest extends DaoTestFixtures
 		a= oscarAppointmentDao.find(a.getId()); // must select back out to get the proper update date (with ms zero-ed from the db etc...)
 		return(a);
 	}
+
+	 */
 }

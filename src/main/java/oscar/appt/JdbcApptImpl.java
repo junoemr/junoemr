@@ -52,12 +52,12 @@ public class JdbcApptImpl {
 	}
 
 	public String getLocationFromSchedule(String apptDate, String provider_no) {
-		String retval = getLocationFromSpec(apptDate, provider_no, "c");
+		String retval = getLocationFromSpec(apptDate, provider_no, 'c');
 		if (!"".equals(retval)) {
 			return retval;
 		}
 		
-		retval = getLocationFromSpec(apptDate, provider_no, "b");
+		retval = getLocationFromSpec(apptDate, provider_no, 'b');
 		
 		if (!"".equals(retval)) {
 			return retval;
@@ -86,7 +86,7 @@ public class JdbcApptImpl {
 	}
 
 	// priority = c, reason = location
-	private String getLocationFromSpec(String apptDate, String provider_no, String priority) {
+	private String getLocationFromSpec(String apptDate, String provider_no, Character priority) {
 		String retval = "";
 		
 		ScheduleDateDao dao = SpringUtils.getBean(ScheduleDateDao.class);

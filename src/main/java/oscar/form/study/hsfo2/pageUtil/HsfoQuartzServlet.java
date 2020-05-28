@@ -40,6 +40,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import org.quartz.impl.StdSchedulerFactory;
 
+// TODO: SPRINGUPGRADE: is this ever used?
 public class HsfoQuartzServlet implements Servlet
 {
 	public static final String RESUBMIT_JOB = "hsfoResubmitJob";

@@ -261,12 +261,9 @@ public class EFormDataDao extends AbstractDao<EFormData>
 		sb.append(" x where x.demographicId=?1");
 		sb.append(" and x.patientIndependent=false");
 
-		int counter = 2;
-
-		if (current != null) {
-			sb.append(" and x.current=?1");
-			sb.append(counter);
-			counter++;
+		if (current != null)
+		{
+			sb.append(" and x.current=?2");
 		}
 
 		sb.append(" ORDER BY ");
@@ -281,11 +278,8 @@ public class EFormDataDao extends AbstractDao<EFormData>
 		query.setFirstResult(startIndex);
 		query.setMaxResults(numToReturn);
 
-		counter = 2;
-
 		if (current != null) {
-			query.setParameter(counter, current);
-			counter++;
+			query.setParameter(2, current);
 		}
 
 		@SuppressWarnings("unchecked")

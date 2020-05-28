@@ -47,6 +47,7 @@ public class TomcatConfig
 
 				// This turns off the manifest jar scanner to get rid of exceptions during boot, as per
 				// https://stackoverflow.com/a/52229296
+                // XXX: Potentially need to remove this line for integration tests
 				((StandardJarScanner) context.getJarScanner()).setScanManifest(false);
 
 				// Add filetypes to compile as jsp files.  Formerly configured in web.xml
