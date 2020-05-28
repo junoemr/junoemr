@@ -1583,7 +1583,7 @@
 			var msg = jQuery("#telehealth-message");
 			msg.css("visibility", "visible");
 			msg.css("color", "green");
-			msg.html("One time telehealth avaialbe for this patient");
+			msg.html("One time telehealth available for this patient");
 			if (jQuery("#telehealth-checkbox").attr("checked"))
 			{
 				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
