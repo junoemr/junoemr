@@ -262,6 +262,7 @@ public class ServletConfig
 		<url-pattern>/servlet/OscarDownload</url-pattern>
 	</servlet-mapping>
 	 */
+	// TODO: OSCARUPGRADE: Test this, it appears to be related to billing downloads (OBEC, teleplan, etc)
 	private static final int SERVLET_ORDER_OSCAR_DOWNLOAD = 0;
 	@Bean
 	public ServletRegistrationBean<OscarDownload> registerOscarDownloadServlet()
@@ -284,6 +285,7 @@ public class ServletConfig
 		<url-pattern>/Download</url-pattern>
 	</servlet-mapping>
 	 */
+	// TODO: SPRINGUPGRADE: The only thing I can see that uses this is ReportSurvey, and I don't know how to find that.
 	private static final int SERVLET_ORDER_DOWNLOAD = 0;
 	@Bean
 	public ServletRegistrationBean<GenericDownload> registerDownloadServlet()
@@ -306,6 +308,7 @@ public class ServletConfig
 		<url-pattern>/servlet/BackupDownload</url-pattern>
 	</servlet-mapping>
 	 */
+	// TODO: SPRINGUPGRADE: Ontario billing, I'm not set up to test that.
 	private static final int SERVLET_ORDER_BACKUP_DOWNLOAD = 0;
 	@Bean
 	public ServletRegistrationBean<BackupDownload> registerBackupDownloadServlet()
@@ -328,6 +331,7 @@ public class ServletConfig
 		<url-pattern>/servlet/oscar.DocumentTeleplanReportUploadServlet</url-pattern>
 	</servlet-mapping>
 	 */
+	// TODO: SPRINGUPGRADE: Old style BC billing, I'm not set up to test that.
 	private static final int SERVLET_ORDER_UPLOAD_TELEPLAN_SERVLET = 0;
 	@Bean
 	public ServletRegistrationBean<DocumentTeleplanReportUploadServlet> registerUploadTeleplanServlet()
@@ -349,6 +353,7 @@ public class ServletConfig
 		<url-pattern>/servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet</url-pattern>
 	</servlet-mapping>
 	 */
+	// TODO: SPRINGUPGRADE: Runs, but seems to be used for the diab3 flowsheet template.  Is this used?  It's not default.
 	@Bean
 	public ServletRegistrationBean<ScatterPlotChartServlet> registerScatterPlotChartServlet()
 	{
