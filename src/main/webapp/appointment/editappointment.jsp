@@ -1405,14 +1405,10 @@
 					"<%=request.getParameter("appointment_no")%>").then((res) =>
 			{
 				var appt = JSON.parse(res).body;
-				if (appt && appt.appointmentType === "ONE_TIME_LINK")
+				if (appt)
 				{
 					jQuery("#send-telehealth-link-btn").css("display", "inherit");
 					mhaAppointment = appt;
-				}
-				else
-				{
-					jQuery("#send-telehealth-link-btn").css("display", "none");
 				}
 			}).catch((error) =>
 			{
@@ -1449,7 +1445,7 @@
 				{
 					if (mhaAppointment)
 					{
-						myhealthaccess.sendAppointmentOneTimeLinkNotification("<%=request.getContextPath()%>",
+						myhealthaccess.sendTelehealthAppointmentNotification("<%=request.getContextPath()%>",
 								jQuery(document.forms.EDITAPPT.location).val(), mhaAppointment).then(() =>
 						{
 							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
