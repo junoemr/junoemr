@@ -62,6 +62,12 @@ public class IntegrationService
         return integrationDao.findMyHealthAccessIntegrations();
     }
 
+    public boolean hasMyHealthAccessIntegration()
+    {
+        List<Integration> integrations = getMyHealthAccessIntegrations();
+        return integrations != null && integrations.size() > 0;
+    }
+
     public Integration findMhaIntegration(String siteName)
     {
         Integration integration;
