@@ -172,7 +172,7 @@ public class AppointmentManager {
 	 * @param loggedInInfo - logged in info
 	 * @param appointment - the appointment to add
 	 * @param sendNotification - if true notification of appointment will be sent to patient
-	 * @return
+	 * @return the newly created appointment.
 	 */
 	public Appointment addTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, Boolean sendNotification) {
 		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_appointment");
