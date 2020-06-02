@@ -1700,36 +1700,35 @@ public class MSPReconcile {
 	public ResultSet getMSPRemittanceQuery(String payeeNo, String s21Id) {
 		MiscUtils.getLogger().debug(new java.util.Date() + ":MSPReconcile.getMSPRemittanceQuery(payeeNo, s21Id)");
 		String qry =
-				"SELECT " +
-					"s00_id," +
-					"billing_code," +
-					"provider.first_name," +
-					"provider.last_name," +
-					"t_practitionerno," +
-					"t_s00type," +
-					"billingmaster.service_date as 't_servicedate'," +
-					"t_payment," +
-					"t_datacenter," +
-					"billing.demographic_name," +
-					"billing.demographic_no," +
-					"teleplanS00.t_paidamt," +
-					"t_exp1," +
-					"t_exp2," +
-					"t_exp3," +
-					"t_exp4," +
-					"t_exp5," +
-					"t_exp6," +
-					"t_dataseq " +
-				" from " +
-					"teleplanS00,billing,billingmaster,provider " +
-				" where " +
-					"teleplanS00.t_officeno = billingmaster.billingmaster_no " +
-					" and teleplanS00.s21_id = ? " +
-					" and billingmaster.billing_no = billing.billing_no " +
-					" and provider.ohip_no= teleplanS00.t_practitionerno " +
-					" and teleplanS00.t_payeeno = ?" +
-					" group by s00_id " +
-					"order by provider.first_name,t_servicedate,billing.demographic_name";
+				"SELECT\n" +
+				"    t.s00_id,\n" +
+				"    bm.billing_code,\n" +
+				"    p.first_name,\n" +
+				"    p.last_name,\n" +
+				"    t.t_practitionerno,\n" +
+				"    t.t_s00type,\n" +
+				"    bm.service_date as 't_servicedate',\n" +
+				"    t.t_payment,\n" +
+				"    t.t_datacenter,\n" +
+				"    b.demographic_name,\n" +
+				"    b.demographic_no,\n" +
+				"    t.t_paidamt,\n" +
+				"    t.t_exp1,\n" +
+				"    t.t_exp2,\n" +
+				"    t.t_exp3,\n" +
+				"    t.t_exp4,\n" +
+				"    t.t_exp5,\n" +
+				"    t.t_exp6,\n" +
+				"    t.t_dataseq \n" +
+				"FROM\n" +
+				"    teleplanS00 t \n" +
+				"    LEFT JOIN billingmaster bm ON bm.billingmaster_no = t.t_officeno\n" +
+				"    LEFT JOIN billing b ON b.billing_no = bm.billing_no\n" +
+				"    LEFT JOIN provider p ON p.ohip_no = t.t_practitionerno\n" +
+				"WHERE \n" +
+				"    t.s21_id = ? AND t.t_payeeno = ?\n" +
+				"GROUP BY t.s00_id\n" +
+				"ORDER BY p.first_name,t.t_servicedate,b.demographic_name;";
 		ResultSet rs = null;
 
 		try {
