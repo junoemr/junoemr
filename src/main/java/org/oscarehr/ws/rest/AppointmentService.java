@@ -153,7 +153,6 @@ public class AppointmentService extends AbstractServiceImpl
 		responseAppointment.setUserProviderNo(calendarAppointment.getUserProviderNo());
 		responseAppointment.setUserFirstName(calendarAppointment.getUserFirstName());
 		responseAppointment.setUserLastName(calendarAppointment.getUserLastName());
-		responseAppointment.setBookingSource(calendarAppointment.getBookingSource());
 
 		return RestResponse.successResponse(responseAppointment);
 	}
