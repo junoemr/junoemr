@@ -181,7 +181,14 @@ public class AppointmentMapper extends AbstractMapper
 				apptDurationRawValue = DEFAULT_APPOINTMENT_DURATION_MIN;
 			}
 		}
-		apptDuration = Integer.parseInt(apptDurationRawValue);
+		// Round down duration. "12.5" parses to 12
+		double apptDurationDouble = Double.parseDouble(apptDurationRawValue);
+		apptDuration = (int) apptDurationDouble;
+
+		if(Math.abs(apptDuration - apptDurationDouble) > 0.1)
+		{
+			logger.warn("Appointment duration " + apptDurationDouble + " " + apptDurationUnit + "is being truncated to " + apptDuration + " " + apptDurationUnit);
+		}
 
 		if (appointmentDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{// if no appointment date, use creation date instead.

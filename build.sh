@@ -4,3 +4,4 @@ export JOB_NAME BUILD_NUMBER
 CATALINA_HOME=/usr/java/apache-tomcat
 rm -rf target
 mvn process-resources -Dmaven.test.skip=true verify $1
+#-Dcheckstyle.skip=true -Dskip.webpack=true

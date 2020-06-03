@@ -34,8 +34,11 @@ public class Hl7Const
 
 	public static final String HL7_SEGMENT_ZAT_2 = "ZAT.2";
 
+	public static final String HL7_SEGMENT_ZBA_4 = "ZBA.4";
 	public static final String HL7_SEGMENT_ZBA_29 = "ZBA.29";
 	public static final String HL7_SEGMENT_ZBA_31 = "ZBA.31";
+
+	public static final String HL7_SEGMENT_ZPV_5 = "ZPV.5";
 
 	public static final String HL7_SEGMENT_ZQO_4 = "ZQO.4";
 	public static final String HL7_SEGMENT_ZQO_5 = "ZQO.5";

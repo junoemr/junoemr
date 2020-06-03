@@ -55,7 +55,7 @@ public class CoPDPreProcessorService
 		StringBuffer sb = new StringBuffer();
 		String line;
 		int lineCount = 0;
-		while((line = br.readLine()) != null)
+		while ((line = br.readLine()) != null)
 		{
 			if (lineCount > 100)
 			{
@@ -71,6 +71,7 @@ public class CoPDPreProcessorService
 
 	/**
 	 * Attempt to repair and format the hl7 message for the COPD Parser
+	 *
 	 * @param message the original message string
 	 * @return the formatted and fixed message string
 	 */
@@ -81,10 +82,13 @@ public class CoPDPreProcessorService
 		message = fixPhoneNumbers(message);
 		message = fixDateTimeNumbers(message);
 
-		if(CoPDImportService.IMPORT_SOURCE.WOLF.equals(importSource))
+		if (CoPDImportService.IMPORT_SOURCE.WOLF.equals(importSource))
 		{
-//			message = formatWolfZPV5SegmentNames(message);
-			message = formatWolfFollowupSegments(message);
+			message = formatWolfZPV5SegmentNames(message);
+			message = stripTagWhiteSpace(message);
+			message = trimTagNewLines(message);
+			message = fixDashBPMeasurements(message);
+			message = fixBackTickBPMeasurements(message);
 		}
 
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
@@ -111,16 +115,49 @@ public class CoPDPreProcessorService
 	}
 
 	/**
+	 * strip out white space in tag values ie. <ZQO.5> 80</ZQO.5> => <ZQO.5>80</ZQO.5>. The Hl7 parser
+	 * sees ' 80' as invalid while '80' is valid.
+	 *
+	 * @param message - the message to process
+	 * @return - the message with tag white space striped.
+	 */
+	private String trimTagNewLines(String message)
+	{
+		Function<String, String> trimTagNewLines = tagValue -> tagValue.replaceAll("^[\n\r]", "").replaceAll("[\n\r]$", "");
+
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_TS_1, trimTagNewLines, Pattern.DOTALL);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_XTN_6, trimTagNewLines, Pattern.DOTALL);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZBA_4, trimTagNewLines, Pattern.DOTALL);
+		return message;
+	}
+
+	/**
 	 * iterate over each tag with name=tagName found in the message. Allowing modification
 	 * to its content
-	 * @param message message to process
-	 * @param tagName the tag on which the callback is triggered
+	 *
+	 * @param message  message to process
+	 * @param tagName  the tag on which the callback is triggered
 	 * @param callback the callback to call for all instances of the tag (tag content in -> , -> modified content out).
 	 * @return a modified message.
 	 */
 	private String foreachTag(String message, String tagName, Function<String, String> callback)
 	{
-		Pattern tagPattern = Pattern.compile("<" + tagName + ">(.*?)<\\/" + tagName + ">");
+		return foreachTag(message, tagName, callback, 0);
+	}
+
+	/**
+	 * iterate over each tag with name=tagName found in the message. Allowing modification
+	 * to its content
+	 *
+	 * @param message      message to process
+	 * @param tagName      the tag on which the callback is triggered
+	 * @param callback     the callback to call for all instances of the tag (tag content in -> , -> modified content out).
+	 * @param patternFlags the regex Pattern flags
+	 * @return a modified message.
+	 */
+	private String foreachTag(String message, String tagName, Function<String, String> callback, int patternFlags)
+	{
+		Pattern tagPattern = Pattern.compile("<" + tagName + ">(.*?)<\\/" + tagName + ">", patternFlags);
 		Matcher tagMatcher = tagPattern.matcher(message);
 
 		StringBuffer sb = new StringBuffer(message.length());
@@ -136,40 +173,37 @@ public class CoPDPreProcessorService
 	/**
 	 * Fix timestamp strings. Mediplan outputs unknown timestamps like, 00000 or 00000000 this causes parsing exceptions.
 	 * This function switches <TS.1>00000[0000]</TS.1> to, <TS.1>00010101</TS.1>
+	 *
 	 * @param message the message to process
 	 * @return fixed message
 	 */
 	private String fixTimestamps(String message)
 	{
-		Function<String, String> callback = new Function<String,String>() {
+		final Pattern timeStampPattern = Pattern.compile("(\\d{8})(\\d{2})(\\d{4})$");
 
-			private final Pattern timeStampPattern = Pattern.compile("(\\d{8})(\\d{2})(\\d{4})$");
-
-			@Override
-			public String apply(String timeStamp)
+		Function<String, String> callback = timeStamp ->
+		{
+			Matcher timeStampMatcher = timeStampPattern.matcher(timeStamp);
+			if ("00000".equals(timeStamp) || "00000000".equals(timeStamp) || "00000000000".equals(timeStamp))
 			{
-				Matcher timeStampMatcher = timeStampPattern.matcher(timeStamp);
-				if ("00000".equals(timeStamp) || "00000000".equals(timeStamp) || "00000000000".equals(timeStamp))
-				{
-					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
-				}
-				else if (timeStampMatcher.find())
-				{// look for timestamps with bad hour.
-					try
-					{
-						Integer hours = Integer.parseInt(timeStampMatcher.group(2));
-						if (hours > 23)
-						{// sub in fake hour
-							return timeStampMatcher.group(1) + "12" + timeStampMatcher.group(3);
-						}
-					}
-					catch (NumberFormatException e)
-					{
-						//nop
-					}
-				}
-				return timeStamp;
+				return HL7_TIMESTAMP_BEGINNING_OF_TIME;
 			}
+			else if (timeStampMatcher.find())
+			{// look for timestamps with bad hour.
+				try
+				{
+					Integer hours = Integer.parseInt(timeStampMatcher.group(2));
+					if (hours > 23)
+					{// sub in fake hour
+						return timeStampMatcher.group(1) + "12" + timeStampMatcher.group(3);
+					}
+				}
+				catch (NumberFormatException e)
+				{
+					//nop
+				}
+			}
+			return timeStamp;
 		};
 
 		return foreachTag(message, Hl7Const.HL7_SEGMENT_TS_1, callback);
@@ -177,21 +211,19 @@ public class CoPDPreProcessorService
 
 	/**
 	 * fix timestamps in ZAT segments (attachments)
+	 *
 	 * @param message the message to fix
 	 * @return the fixed message
 	 */
 	public String fixTimestampsAttachments(String message)
 	{
-		Function<String, String> callback = new Function<String,String>() {
-			@Override
-			public String apply(String timeStamp)
+		Function<String, String> callback = timeStamp ->
+		{
+			if (timeStamp.contains("00000"))
 			{
-				if (timeStamp.contains("00000"))
-				{
-					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
-				}
-				return timeStamp;
+				return HL7_TIMESTAMP_BEGINNING_OF_TIME;
 			}
+			return timeStamp;
 		};
 
 		return foreachTag(message, Hl7Const.HL7_SEGMENT_ZAT_2, callback);
@@ -200,18 +232,13 @@ public class CoPDPreProcessorService
 	/**
 	 * strip out white space in tag values ie. <ZQO.5> 80</ZQO.5> => <ZQO.5>80</ZQO.5>. The Hl7 parser
 	 * sees ' 80' as invalid while '80' is valid.
+	 *
 	 * @param message - the message to process
 	 * @return - the message with tag white space striped.
 	 */
 	private String stripTagWhiteSpace(String message)
 	{
-		Function<String, String> trimValueCallback = new Function<String, String>() {
-			@Override
-			public String apply(String tagValue)
-			{
-				return StringUtils.trimToEmpty(tagValue);
-			}
-		};
+		Function<String, String> trimValueCallback = tagValue -> StringUtils.trimToEmpty(tagValue);
 
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZBA_31, trimValueCallback);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_4, trimValueCallback);
@@ -223,25 +250,23 @@ public class CoPDPreProcessorService
 
 	/**
 	 * Insure that some numeric elements of the hl7 message are indeed numeric. If not replace with "0".
+	 *
 	 * @param message - the message to operate on.
 	 * @return - the resulting message
 	 */
 	private String ensureNumeric(String message)
 	{
-		Function<String, String> ensureNumeric = new Function<String, String>() {
-			@Override
-			public String apply(String tagValue)
+		Function<String, String> ensureNumeric = tagValue ->
+		{
+			try
 			{
-				try
-				{
-					Float.parseFloat(tagValue);
-					return tagValue;
-				}
-				catch (NumberFormatException e)
-				{
-					logger.warn("Replacing invalid numeric value:" + tagValue + " with: \"0\"");
-					return "0";
-				}
+				Float.parseFloat(tagValue);
+				return tagValue;
+			}
+			catch (NumberFormatException e)
+			{
+				logger.warn("Replacing invalid numeric value:" + tagValue + " with: \"0\"");
+				return "0";
 			}
 		};
 
@@ -257,24 +282,22 @@ public class CoPDPreProcessorService
 	 * Fix double blood pressure measurements in the ZQO.4 / ZQO.5 tags.
 	 * Some times blood pressure is recorded as "num num" but the COPD spec only allows "num".
 	 * To fix simply take the first number.
+	 *
 	 * @param message - the message to fix
 	 * @return - the fixed message
 	 */
 	private String fixDoubleBPMeasurements(String message)
 	{
-		Function<String, String> deleteDoubleValue = new Function<String, String>() {
-			@Override
-			public String apply(String tagValue)
+		Function<String, String> deleteDoubleValue = tagValue ->
+		{
+			if (tagValue.contains(" "))
 			{
-				if (tagValue.contains(" "))
-				{
-					String [] nums = tagValue.split(" ");
-					return nums[0];
-				}
-				else
-				{
-					return tagValue;
-				}
+				String[] nums = tagValue.split(" ");
+				return nums[0];
+			}
+			else
+			{
+				return tagValue;
 			}
 		};
 
@@ -285,23 +308,21 @@ public class CoPDPreProcessorService
 
 	/**
 	 * fix BP measurements of the form "/<num>" convert to "<num>".
+	 *
 	 * @param message - message to operate on
 	 * @return - the transformed message
 	 */
 	private String fixSlashBPMeasurements(String message)
 	{
-		Function<String, String> fixBPSlash = new Function<String, String>() {
-			@Override
-			public String apply(String tagValue)
+		Function<String, String> fixBPSlash = tagValue ->
+		{
+			if (StringUtils.trimToEmpty(tagValue).startsWith("/"))
 			{
-				if (StringUtils.trimToEmpty(tagValue).startsWith("/"))
-				{
-					return tagValue.substring(tagValue.indexOf("/") + 1);
-				}
-				else
-				{
-					return tagValue;
-				}
+				return tagValue.substring(tagValue.indexOf("/") + 1);
+			}
+			else
+			{
+				return tagValue;
 			}
 		};
 
@@ -311,25 +332,73 @@ public class CoPDPreProcessorService
 	}
 
 	/**
+	 * fix BP measurements of the form "<num>-" convert to "<num>".
+	 *
+	 * @param message - message to operate on
+	 * @return - the transformed message
+	 */
+	private String fixDashBPMeasurements(String message)
+	{
+		Function<String, String> fixBPDash = tagValue ->
+		{
+			if (StringUtils.trimToEmpty(tagValue).endsWith("-"))
+			{
+				return tagValue.substring(0, tagValue.indexOf("-"));
+			}
+			else
+			{
+				return tagValue;
+			}
+		};
+
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_4, fixBPDash);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_5, fixBPDash);
+		return message;
+	}
+
+	/**
+	 * fix BP measurements of the form "<num>`" convert to "<num>".
+	 *
+	 * @param message - message to operate on
+	 * @return - the transformed message
+	 */
+	private String fixBackTickBPMeasurements(String message)
+	{
+		Function<String, String> fixBPBackTick = tagValue ->
+		{
+			if (StringUtils.trimToEmpty(tagValue).endsWith("`"))
+			{
+				return tagValue.substring(0, tagValue.indexOf("`"));
+			}
+			else
+			{
+				return tagValue;
+			}
+		};
+
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_4, fixBPBackTick);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_5, fixBPBackTick);
+		return message;
+	}
+
+	/**
 	 * Some ZAT.2 date strings do not follow the spec and include a timestamp instead of a date. This causes parsing errors.
 	 * If there is a timestamp in ZAT.2 simply strip the timestamp information.
+	 *
 	 * @param message message to operate on
 	 * @return fixed date string
 	 */
 	private String fixZATDateString(String message)
 	{
-		Function<String, String> fixZATDate = new Function<String, String>() {
-			@Override
-			public String apply(String tagValue)
+		Function<String, String> fixZATDate = tagValue ->
+		{
+			if (tagValue.length() > 8)
+			{ // ZAT.2 length is 8 in CoPD spec (YYYYMMDD)
+				return tagValue.substring(0, 8);
+			}
+			else
 			{
-				if (tagValue.length() > 8)
-				{ // ZAT.2 length is 8 in CoPD spec (YYYYMMDD)
-					return tagValue.substring(0,8);
-				}
-				else
-				{
-					return tagValue;
-				}
+				return tagValue;
 			}
 		};
 
@@ -338,24 +407,22 @@ public class CoPDPreProcessorService
 
 	/**
 	 * pad timestamp values (TS.1), insuring they have an even number of characters. If they are odd a '0' is appended
+	 *
 	 * @param message - message on which the timestamps will be padded
 	 * @return - the modified message
 	 */
 	private String timestampPad(String message)
 	{
-		Function<String, String> padTimestamps = new Function<String, String>() {
-			@Override
-			public String apply(String tagValue)
+		Function<String, String> padTimestamps = tagValue ->
+		{
+			if (tagValue.length() % 2 != 0)
 			{
-				if (tagValue.length() % 2 != 0)
-				{
-					return tagValue + "0";
-				}
-				return tagValue;
+				return tagValue + "0";
 			}
+			return tagValue;
 		};
 
-		return foreachTag(message,Hl7Const.HL7_SEGMENT_TS_1, padTimestamps);
+		return foreachTag(message, Hl7Const.HL7_SEGMENT_TS_1, padTimestamps);
 	}
 
 	/**
@@ -367,7 +434,7 @@ public class CoPDPreProcessorService
 		Matcher versionPatternMatcher = versionPattern.matcher(message);
 
 		StringBuffer sb = new StringBuffer(message.length());
-		while(versionPatternMatcher.find())
+		while (versionPatternMatcher.find())
 		{
 			// the hl7 version must be 2.4
 			String replacement = "<VID\\.1>2.4</VID\\.1>";
@@ -384,27 +451,15 @@ public class CoPDPreProcessorService
 	 */
 	private String fixPhoneNumbers(String message)
 	{
-		Function<String, String> fixPhoneNumbersOnlyNum = new Function<String, String>()
-		{
-			@Override
-			public String apply(String tagValue)
-			{
-				return tagValue.replaceAll("[^\\d.]", "");
-			}
-		};
+		Function<String, String> fixPhoneNumbersOnlyNum = tagValue -> tagValue.replaceAll("[^\\d.]", "");
+		Function<String, String> fixPhoneNumbersNoSpace = tagValue -> tagValue.replaceAll("\\s", "");
+		Function<String, String> fixPhoneNumbersNoNewLine = tagValue -> tagValue.replace("\n", "");
 
-		Function<String, String> fixPhoneNumbersNoSpace = new Function<String, String>()
-		{
-			@Override
-			public String apply(String tagValue)
-			{
-				return tagValue.replaceAll("\\s", "");
-			}
-		};
-
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_XTN_1, fixPhoneNumbersNoNewLine, Pattern.DOTALL);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_XTN_1, fixPhoneNumbersNoSpace);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_XTN_6, fixPhoneNumbersOnlyNum);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_XTN_7, fixPhoneNumbersOnlyNum);
+
 
 		return message;
 	}
@@ -418,7 +473,7 @@ public class CoPDPreProcessorService
 		Matcher timePatternMatcher = timePattern.matcher(message);
 
 		StringBuffer sb = new StringBuffer(message.length());
-		while(timePatternMatcher.find())
+		while (timePatternMatcher.find())
 		{
 			// strip non numeric characters from dates
 			String replacement = "<TS\\.1>" + timePatternMatcher.group(1).replaceAll("\\D", "") + "</TS\\.1>";
@@ -438,7 +493,7 @@ public class CoPDPreProcessorService
 		Pattern patt = Pattern.compile("<PRD>(.*?)<\\/PRD>", Pattern.DOTALL);
 		Matcher m = patt.matcher(message);
 		StringBuffer sb = new StringBuffer(message.length());
-		while(m.find())
+		while (m.find())
 		{
 			// for each PRD segment in the message, fix the PRD numbers
 			String replacement = "<PRD>" + fixPRDSegmentNumbers(m.group(1)) + "</PRD>";
@@ -454,16 +509,16 @@ public class CoPDPreProcessorService
 	 */
 	private String fixPRDSegmentNumbers(String xmlPRD)
 	{
-		if(!xmlPRD.contains("<PRD.1>"))
+		if (!xmlPRD.contains("<PRD.1>"))
 		{
 			Pattern patt = Pattern.compile("<(\\/?PRD)\\.([0-9]+)>");
 			Matcher m = patt.matcher(xmlPRD);
 			StringBuffer sb = new StringBuffer(xmlPRD.length());
-			while(m.find())
+			while (m.find())
 			{
 				String segmentNumStr = m.group(2);
 				Integer segmentNumber = Integer.parseInt(segmentNumStr);
-				String replacement = "<" + m.group(1) + "." + String.valueOf(segmentNumber - 1) + ">";
+				String replacement = "<" + m.group(1) + "." + (segmentNumber - 1) + ">";
 
 				m.appendReplacement(sb, replacement);
 				logger.info("Replace:" + m.group(0) + " -> " + replacement);
@@ -477,6 +532,7 @@ public class CoPDPreProcessorService
 	/**
 	 * Referral practitioner numbers in Alberta have extra non-numeric characters.
 	 * Juno treats it as a single number.
+	 *
 	 * @param message message on which referral number will be stripped of non-numeric characters
 	 * @return modified message
 	 */
@@ -490,27 +546,48 @@ public class CoPDPreProcessorService
 		return message;
 	}
 
-//	private String formatWolfZPV5SegmentNames(String message)
-//	{
-//		Pattern patt = Pattern.compile("<ZPV\\.5>\\s*<firstname>(.*?)<\\/firstname>\\s*<lastname>(.*?)<\\/lastname>\\s*<ZPV\\.5>", Pattern.DOTALL);
-//		Matcher m = patt.matcher(message);
-//		StringBuffer sb = new StringBuffer(message.length());
-//		while(m.find())
-//		{
-//			String firstName = m.group(1);
-//			String lastName = m.group(2);
-//			String replacement = "<ZPV\\.5>" + firstName + "|" + lastName + "<ZPV\\.5>";
-//			m.appendReplacement(sb, replacement);
-//		}
-//		m.appendTail(sb);
-//		return sb.toString();
-//	}
+	/**
+	 * Format a provider name. Replaces the first space with a | pipe when there is none.
+	 *
+	 * @param message message on which provider name will have a | pipe inserted.
+	 * @return modified message
+	 */
+	private String formatWolfZPV5SegmentNames(String message)
+	{
+		Function<String, String> fixProviderName = tagValue ->
+		{
+			if (tagValue.contains("|"))
+			{
+				return tagValue;
+			}
+			else if (tagValue.indexOf(' ') == -1)
+			{
+				return tagValue + "|";
+			}
+			else
+			{
+				int index = tagValue.indexOf(' ');
+				String firstName = tagValue.substring(0, index);
+				String lastName = "";
+				if (index > tagValue.length())
+				{
+					lastName = tagValue.substring(index + 1);
+				}
+				return firstName + "|" + lastName;
+			}
+		};
+
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZPV_5, fixProviderName);
+
+		return message;
+	}
 
 	/**
 	 * Largely here to replace any bad characters present in the import data.
 	 * "Bad" characters in context of this importer are ones that conflict with the usual HL7 reserved characters:
 	 * '|', '&', '~', '\', '^'
 	 * The presence of any of these characters (usually via some HTML or XML encoding) breaks the HAPI parser.
+	 *
 	 * @param message message to clean
 	 * @return message stripped of problematic encoded segments
 	 */
@@ -561,7 +638,7 @@ public class CoPDPreProcessorService
 		Matcher m = patt.matcher(message);
 
 		logger.info("followup segment:");
-		while(m.find())
+		while (m.find())
 		{
 			logger.info(m.group(0));
 		}
