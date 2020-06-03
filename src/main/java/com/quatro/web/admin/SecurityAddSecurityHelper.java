@@ -83,7 +83,11 @@ public class SecurityAddSecurityHelper {
 
 		boolean isUserAlreadyExists = securityDao.findByUserName(request.getParameter("user_name")) != null;
 		if (isUserAlreadyExists) return "admin.securityaddsecurity.msgAdditionFailureDuplicate";
-		if (!securityInfoManager.superAdminModificationCheck(request.getParameter("current_user"),request.getParameter("provider_no")))
+		try
+		{
+			securityInfoManager.requireSuperAdminPrivilege(request.getParameter("current_user"),request.getParameter("provider_no"));
+		}
+		catch (SecurityException e)
 		{
 			return "admin.securityaddsecurity.msgProviderNoAuthorization";
 		}
