@@ -1700,34 +1700,34 @@ public class MSPReconcile {
 	public ResultSet getMSPRemittanceQuery(String payeeNo, String s21Id) {
 		MiscUtils.getLogger().debug(new java.util.Date() + ":MSPReconcile.getMSPRemittanceQuery(payeeNo, s21Id)");
 		String qry =
-				"SELECT\n" +
-				"    t.s00_id,\n" +
-				"    bm.billing_code,\n" +
-				"    p.first_name,\n" +
-				"    p.last_name,\n" +
-				"    t.t_practitionerno,\n" +
-				"    t.t_s00type,\n" +
-				"    bm.service_date as 't_servicedate',\n" +
-				"    t.t_payment,\n" +
-				"    t.t_datacenter,\n" +
-				"    b.demographic_name,\n" +
-				"    b.demographic_no,\n" +
-				"    t.t_paidamt,\n" +
-				"    t.t_exp1,\n" +
-				"    t.t_exp2,\n" +
-				"    t.t_exp3,\n" +
-				"    t.t_exp4,\n" +
-				"    t.t_exp5,\n" +
-				"    t.t_exp6,\n" +
-				"    t.t_dataseq \n" +
-				"FROM\n" +
-				"    teleplanS00 t \n" +
-				"    LEFT JOIN billingmaster bm ON bm.billingmaster_no = t.t_officeno\n" +
-				"    LEFT JOIN billing b ON b.billing_no = bm.billing_no\n" +
-				"    LEFT JOIN provider p ON p.ohip_no = t.t_practitionerno\n" +
-				"WHERE \n" +
-				"    t.s21_id = ? AND t.t_payeeno = ?\n" +
-				"GROUP BY t.s00_id\n" +
+				"SELECT" +
+				"    t.s00_id," +
+				"    bm.billing_code," +
+				"    p.first_name," +
+				"    p.last_name," +
+				"    t.t_practitionerno," +
+				"    t.t_s00type," +
+				"    bm.service_date as 't_servicedate'," +
+				"    t.t_payment," +
+				"    t.t_datacenter," +
+				"    b.demographic_name," +
+				"    b.demographic_no," +
+				"    t.t_paidamt," +
+				"    t.t_exp1," +
+				"    t.t_exp2," +
+				"    t.t_exp3," +
+				"    t.t_exp4," +
+				"    t.t_exp5," +
+				"    t.t_exp6," +
+				"    t.t_dataseq " +
+				"FROM" +
+				"    teleplanS00 t " +
+				"    LEFT JOIN billingmaster bm ON bm.billingmaster_no = t.t_officeno" +
+				"    LEFT JOIN billing b ON b.billing_no = bm.billing_no" +
+				"    LEFT JOIN provider p ON p.ohip_no = t.t_practitionerno " +
+				"WHERE " +
+				"    t.s21_id = ? AND t.t_payeeno = ? " +
+				"GROUP BY t.s00_id " +
 				"ORDER BY p.first_name,t.t_servicedate,b.demographic_name;";
 		ResultSet rs = null;
 
