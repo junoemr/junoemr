@@ -38,7 +38,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -107,23 +106,15 @@ public class BillingCreateBillingAction extends Action {
     bean.setPatientAddress2(demo.getCity());
     bean.setPatientPostal(demo.getPostal());
     bean.setPatientSex(demo.getSex());
-
+    bean.setPatientPHN(demo.getHin()+demo.getVer());
     if (frm.isOinPayPatient())
     {
       bean.setPatientHCType(Demographic.HC_TYPE.PP.name());
-      bean.setPatientPHN(StringUtils.leftPad(demo.getHin() + StringUtils.trimToEmpty(demo.getVer()),12, '0'));
-    }
-    else if (!StringUtils.equals(demo.getHcType(), request.getParameter("billRegion")))
-    {
-	    bean.setPatientHCType(demo.getHcType());
-	    bean.setPatientPHN(StringUtils.leftPad(demo.getHin() + StringUtils.trimToEmpty(demo.getVer()),12, '0'));
     }
     else
     {
-	  bean.setPatientHCType(demo.getHcType());
-	  bean.setPatientPHN(demo.getHin()+ StringUtils.trimToEmpty(demo.getVer()));
+      bean.setPatientHCType(demo.getHcType());
     }
-
     bean.setPatientAge(demo.getAge());
     bean.setBillingType(frm.getXml_billtype());
     bean.setPaymentType(payMeth);

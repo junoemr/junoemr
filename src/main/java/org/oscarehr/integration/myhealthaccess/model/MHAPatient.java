@@ -57,6 +57,7 @@ public class MHAPatient
 
 	public enum PROVINCE_CODES
 	{
+		UNKNOWN,
 		NL,
 		PE,
 		NS,
@@ -95,6 +96,15 @@ public class MHAPatient
 		return false;
 	}
 
+	public static PROVINCE_CODES stringToProvinceCode(String provinceCode)
+	{
+		if (provinceCode != null)
+		{
+			return PROVINCE_CODES.valueOf(provinceCode);
+		}
+		return PROVINCE_CODES.UNKNOWN;
+	}
+
 	public MHAPatient()
 	{
 
@@ -103,8 +113,8 @@ public class MHAPatient
 	public MHAPatient(PatientTo1 patientTo1)
 	{
 		BeanUtils.copyProperties(patientTo1, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus");
-		this.healthCareProvinceCode = PROVINCE_CODES.valueOf(patientTo1.getHealthCareProvinceCode());
-		this.addressProvinceCode = PROVINCE_CODES.valueOf(patientTo1.getAddressProvinceCode());
+		this.healthCareProvinceCode = stringToProvinceCode(patientTo1.getHealthCareProvinceCode());
+		this.addressProvinceCode = stringToProvinceCode(patientTo1.getAddressProvinceCode());
 		this.linkStatus = LINK_STATUS.valueOf(patientTo1.getLinkStatus().toUpperCase());
 	}
 
