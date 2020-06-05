@@ -779,20 +779,20 @@ private long getAppointmentRowSpan(
 		</td>
 		<td id="firstMenu">
 			<ul id="navlist">
-				<c:if test="${menuBarController.infirmaryOscarView}">
-					<c:choose>
-						<c:when test="${menuBarController.isViewAll()}">
-							<li>
-								<a href=# onClick = "review('0')" title="<bean:message key="provider.appointmentProviderAdminDay.viewProvAval"/>"><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
-							</li>
-						</c:when>
-						<c:otherwise>
-							<li>
-								<a href='providercontrol.jsp?year=<%=menuBarController.getCurrentYear()%>&month=<%=menuBarController.getCurrentMonth()%>&day=<%=menuBarController.getCurrentDay()%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1'><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
-							</li>
-						</c:otherwise>
-					</c:choose>
-				</c:if>
+
+				<c:choose>
+					<c:when test="${menuBarController.isViewAll()}">
+						<li>
+							<a href=# onClick = "review('0')" title="<bean:message key="provider.appointmentProviderAdminDay.viewProvAval"/>"><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
+						</li>
+					</c:when>
+					<c:otherwise>
+						<li>
+							<a href='providercontrol.jsp?year=<%=menuBarController.getCurrentYear()%>&month=<%=menuBarController.getCurrentMonth()%>&day=<%=menuBarController.getCurrentDay()%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1'><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
+						</li>
+					</c:otherwise>
+				</c:choose>
+
 
 				<li>
 					<a href='providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&caseload=1&clProv=<%=curUser_no%>'><bean:message key="global.caseload"/></a>
