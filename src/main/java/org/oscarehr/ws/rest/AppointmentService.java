@@ -87,7 +87,7 @@ public class AppointmentService extends AbstractServiceImpl
 		}
 		else
 		{
-			savedAppointment = appointmentManager.addAppointment(getLoggedInInfo(), appointment);
+			savedAppointment = appointmentManager.addAppointment(getLoggedInInfo(), appointment, calendarAppointment.isSendNotification());
 		}
 
 		LoggedInInfo loggedInInfo = getLoggedInInfo();

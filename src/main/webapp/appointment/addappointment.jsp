@@ -1303,7 +1303,7 @@
 									title="Add a new appointment and send a confirmation email to the patient"
 									onclick="document.forms.ADDAPPT.sendBookingNotification.value='true';
 													 document.forms.ADDAPPT.displaymode.value='Add Appointment';"
-									style="display: none"
+									style="display: none;"
 					>
 				</td>
 			</tr>
@@ -1573,10 +1573,7 @@
 			msg.css("visibility", "visible");
 			msg.css("color", "green");
 			msg.html("Patient connected to MyHealthAccess");
-			if (jQuery("#telehealth-checkbox").attr("checked"))
-			{
-				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
-			}
+			jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
 			virtualBookingState = 'confirmed';
 		}
 
@@ -1587,10 +1584,7 @@
 			msg.css("visibility", "visible");
 			msg.css("color", "green");
 			msg.html("One time telehealth available for this patient");
-			if (jQuery("#telehealth-checkbox").attr("checked"))
-			{
-				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
-			}
+			jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
 			virtualBookingState = 'oneTime';
 		}
 
@@ -1630,19 +1624,6 @@
 		jQuery("#site-select").change(() =>
 		{
 			updateTelehealthControlls();
-		});
-
-		jQuery("#telehealth-checkbox").change((event) =>
-		{
-
-			if (event.target.checked)
-			{
-				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
-			}
-			else
-			{
-				jQuery("#add-appt-and-send-confirmation").css("display", "none");
-			}
 		});
 
 		<%
