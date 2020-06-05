@@ -38,6 +38,8 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -57,9 +59,10 @@ public class EchartTests extends SeleniumTestBase
 		DatabaseUtil.createTestDemographic();
 	}
 
-	@Test
+	/*@Test
 	public void testWritingNote() throws InterruptedException
 	{
+		Assert.assertTrue("Inside test...", true);
 		// login
 		if (!Navigation.isLoggedIn(driver))
 		{
@@ -117,5 +120,112 @@ public class EchartTests extends SeleniumTestBase
 		Assert.assertTrue("Sign and save note. FAILED",
 				PageUtil.isExistsBy(By.xpath("//*[contains(., '" + myUUID + "') and contains(., 'Signed on') and contains(@id, 'txt')]"), driver));
 		logger.info("Sign and save note. OK");
+		//Assert.assertTrue(false);
+
+	}*/
+	@Test
+	public void testWritingCPPNote() throws InterruptedException
+	{
+		// login
+		if (!Navigation.isLoggedIn(driver))
+		{
+			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+		}
+
+		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+
+		// add new CPP note
+		String noteCPPId = null;
+
+		WebElement addSocHistoryNoteBox = driver.findElement(By.id("divR1I1"));
+		WebElement addSocHistoryButton = addSocHistoryNoteBox.findElement(By.xpath(".//a[contains(.,'+')]"));
+		Assert.assertNotNull(addSocHistoryButton);
+		Thread.sleep(2000);
+		addSocHistoryButton.click();//social history edit window opens.
+
+		WebElement socHistoryNote = driver.findElement(By.id("noteEditTxt"));
+		socHistoryNote.sendKeys("Social History I.");
+		WebElement startDate = driver.findElement(By.id("startdate"));
+		startDate.sendKeys("2020-02-02");
+		WebElement resolutionDate = driver.findElement(By.id("resolutiondate"));
+		resolutionDate.sendKeys("2020-06-05");
+		Thread.sleep(4000);
+		WebElement signNSaveButton = driver.findElement((By.xpath("//input[@title=\"Sign & Save\"]")));
+		Thread.sleep(4000);
+		signNSaveButton.click();//error happens.
+
+
+
+		//Preventions
+		//WebElement addSocHistoryNoteBox = driver.findElement(By.id("divR1I1"));
+		//WebElement addSocHistoryButton = addSocHistoryNoteBox.findElement(By.xpath(".//a[contains(.,'+')]"));
+		//Assert.assertNotNull(addSocHistoryButton);
+/*
+		//open eform
+		WebElement eformButton = driver.findElement(By.xpath("//a[contains(., 'travel_from_v4')]"));
+		Assert.assertNotNull(eformButton);
+
+		String currWindowHandle = driver.getWindowHandle();
+		Set<String> oldWindowHandles = driver.getWindowHandles();
+		eformButton.click();
+		Thread.sleep(2000);
+		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
+
+		Assert.assertEquals("more than one window opened when opening eform", 1, newWindows.size());
+		PageUtil.switchToWindow(newWindows.get(0), driver);
+		Thread.sleep(2000);
+
+		Assert.assertFalse("got error page on eform page", PageUtil.isErrorPage(driver));
+		logger.info("Open eform travel_form_v4. OK");
+
+		driver.findElement(By.xpath("//input[@id='SubmitButton']")).click();
+		PageUtil.switchToWindow(currWindowHandle, driver);
+		logger.info("Submit eform travel_form_v4. OK");
+
+		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		Thread.sleep(5000);
+		Assert.assertNotNull(driver.findElement(By.xpath("//a[contains(., 'travel_from_v4:')]")));
+		logger.info("Eform added to Echart? OK");
+
+		/*WebElement newNote = null;
+		try
+		{
+			newNote = driver.findElement(By.xpath("//textarea[@name='caseNote_note']"));
+		}
+		catch (NoSuchElementException e)
+		{
+			Assert.fail("Create new note. FAIL");
+		}
+
+		if (noteId != null)
+		{
+			Assert.assertEquals("Create new note. FAIL", noteId, newNote.getAttribute("id"));
+		}
+		logger.info("Create new note. OK");
+
+		//write in note
+		UUID myUUID = UUID.randomUUID();
+		newNote.sendKeys(myUUID.toString());
+		Assert.assertTrue("Write to encounter note. FAIL", !newNote.getText().isEmpty());
+		logger.info("Write to encounter note. OK");
+
+		// test auto save
+		Thread.sleep(10000); // oscar auto saves every 5 seconds
+		driver.navigate().refresh();
+		Thread.sleep(5000);
+		newNote = driver.findElement(By.xpath("//textarea[@name='caseNote_note']"));
+		Assert.assertTrue("Auto save note. FAIL", Pattern.compile(myUUID.toString()).matcher(newNote.getText()).find());
+		logger.info("Auto save note. OK");
+
+		// sign and save
+		String currentUrl = driver.getCurrentUrl();
+		driver.findElement(By.id("signSaveImg")).click();
+		Thread.sleep(2000);
+		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		Thread.sleep(5000);
+		Assert.assertTrue("Sign and save note. FAILED",
+				PageUtil.isExistsBy(By.xpath("//*[contains(., '" + myUUID + "') and contains(., 'Signed on') and contains(@id, 'txt')]"), driver));
+		logger.info("Sign and save note. OK");*/
+
 	}
 }
