@@ -25,6 +25,7 @@ package org.oscarehr.integration.service;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.SiteDao;
+import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.dao.UserIntegrationAccessDao;
@@ -34,6 +35,7 @@ import org.oscarehr.integration.myhealthaccess.dto.IntegrationTransfer;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import oscar.OscarProperties;
 import oscar.util.StringUtils;
 
 import java.util.List;
@@ -66,6 +68,21 @@ public class IntegrationService
     {
         List<Integration> integrations = getMyHealthAccessIntegrations();
         return integrations != null && integrations.size() > 0;
+    }
+
+    /**
+     * find MHA integration by appointment. Integration selected is based on the appointments site.
+     * @param appointment - the appointment used to determine the integration.
+     * @return - mha integration
+     */
+    public Integration findMhaIntegration(Appointment appointment)
+    {
+        String siteName = null;
+        if (OscarProperties.getInstance().isMultisiteEnabled())
+        {
+            siteName = appointment.getLocation();
+        }
+        return findMhaIntegration(siteName);
     }
 
     public Integration findMhaIntegration(String siteName)

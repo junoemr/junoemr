@@ -50,7 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
@@ -58,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Deprecated
 @Service
 @Transactional
 public class AppointmentManager {
@@ -171,13 +171,7 @@ public class AppointmentManager {
 
 		if (sendNotification)
 		{// send booking notification through MHA
-			String siteName = null;
-			if (OscarProperties.getInstance().isMultisiteEnabled())
-			{
-				siteName = appointment.getLocation();
-			}
-
-			Integration integration = integrationService.findMhaIntegration(siteName);
+			Integration integration = integrationService.findMhaIntegration(appointment);
 			if (integration != null)
 			{
 				ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
@@ -185,51 +179,6 @@ public class AppointmentManager {
 				appointmentService.sendGeneralAppointmentNotification(integration, loginTokenTo1.getToken(),
 						appointment.getId());
 			}
-		}
-
-		return appointment;
-	}
-
-	/**
-	 * add a new telehealth appointment.
-	 * @param loggedInInfo - logged in info
-	 * @param appointment - the appointment to add
-	 * @param sendNotification - if true notification of appointment will be sent to patient
-	 * @return the newly created appointment.
-	 */
-	public Appointment addTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, Boolean sendNotification) {
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_appointment");
-
-		if (!appointment.getIsVirtual())
-		{
-			throw new IllegalArgumentException("Cannot book telehealth appointment. Appointment is not virtual");
-		}
-
-		// Set automatic information
-		appointment.setCreator(loggedInInfo.getLoggedInProviderNo());
-		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
-		appointment.setCreateDateTime(new Date());
-		appointment.setUpdateDateTime(new Date());
-		appointment.setReasonCode(Appointment.DEFAULT_REASON_CODE);
-
-		// Subtract a minute
-
-		appointmentDao.persist(appointment);
-
-		// book telehealth appointment in MHA
-		String siteName = null;
-		if (OscarProperties.getInstance().isMultisiteEnabled())
-		{
-			siteName = appointment.getLocation();
-		}
-
-		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), integrationService.findMhaIntegration(siteName)))
-		{
-			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment, sendNotification);
-		}
-		else
-		{
-			appointmentService.bookOneTimeTelehealthAppointment(loggedInInfo, appointment, sendNotification);
 		}
 
 		return appointment;

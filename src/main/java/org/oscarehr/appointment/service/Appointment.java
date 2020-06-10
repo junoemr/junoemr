@@ -122,21 +122,15 @@ public class Appointment
 	 * @param appointment - the appointment to save
 	 * @param loggedInInfo - logged in info.
 	 */
-	public void saveNewAppointment(org.oscarehr.common.model.Appointment appointment,
-								 	LoggedInInfo loggedInInfo, HttpServletRequest request,
-								   boolean sendNotification)
+	public org.oscarehr.common.model.Appointment saveNewAppointment(org.oscarehr.common.model.Appointment appointment,
+																																	LoggedInInfo loggedInInfo, HttpServletRequest request,
+																																	boolean sendNotification)
 	{
 		oscarAppointmentDao.persist(appointment);
 
 		if (sendNotification)
 		{// send MHA based appointment notification
-			String siteName = null;
-			if (OscarProperties.getInstance().isMultisiteEnabled())
-			{
-				siteName = appointment.getLocation();
-			}
-
-			Integration integration = integrationService.findMhaIntegration(siteName);
+			Integration integration = integrationService.findMhaIntegration(appointment);
 			if (integration != null)
 			{
 				ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
@@ -153,6 +147,8 @@ public class Appointment
 						LogConst.STATUS_SUCCESS,
 						String.valueOf(appointment.getId()),
 						request.getRemoteAddr());
+
+		return appointment;
 	}
 
 	/**
@@ -161,8 +157,8 @@ public class Appointment
 	 * @param loggedInInfo - logged in info.
 	 * @param sendNotification - Whether to send notification of appointment booking to user or not.
 	 */
-	public void saveNewTelehealthAppointment(org.oscarehr.common.model.Appointment appointment,
-								   LoggedInInfo loggedInInfo, HttpServletRequest request, boolean sendNotification)
+	public org.oscarehr.common.model.Appointment saveNewTelehealthAppointment(org.oscarehr.common.model.Appointment appointment,
+																																						LoggedInInfo loggedInInfo, HttpServletRequest request, boolean sendNotification)
 	{
 		if (!appointment.getIsVirtual())
 		{
@@ -194,6 +190,8 @@ public class Appointment
 				LogConst.STATUS_SUCCESS,
 				String.valueOf(appointment.getId()),
 				request.getRemoteAddr());
+
+		return appointment;
 	}
 
 	/**
