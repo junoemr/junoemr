@@ -1727,8 +1727,11 @@ public class MSPReconcile {
 				"    LEFT JOIN provider p ON p.ohip_no = t.t_practitionerno " +
 				"WHERE " +
 				"    t.s21_id = ? AND t.t_payeeno = ? " +
-				"GROUP BY t.s00_id " +
-				"ORDER BY p.first_name,t.t_servicedate,b.demographic_name;";
+				"GROUP BY " +
+					" t.s00_id, bm.billing_code, p.first_name, p.last_name, t.t_practitionerno, t.t_s00type, t_servicedate," +
+					" t.t_payment, t.t_datacenter, b.demographic_name, b.demographic_no, t.t_paidamt, t.t_exp1," +
+					" t.t_exp2, t.t_exp3, t.t_exp4, t.t_exp5, t.t_exp6, t.t_dataseq " +
+				"ORDER BY p.first_name,t.t_servicedate,b.demographic_name";
 		ResultSet rs = null;
 
 		try {
