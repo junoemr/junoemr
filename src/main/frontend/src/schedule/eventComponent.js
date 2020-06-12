@@ -168,7 +168,8 @@ angular.module('Schedule').component('eventComponent', {
 			$scope.TELEHEALTH_MODES = {
 				NONE: "none",
 				TELEHEALTH: "telehealth",
-				ONE_TIME_TELEHEALTH: "oneTimeTelehealth"
+				ONE_TIME_TELEHEALTH: "oneTimeTelehealth",
+				NO_CONNECTION: "noConnection",
 			};
 			$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;
 
@@ -470,7 +471,7 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.updateDemographicTelehealthEligibility = async () =>
 			{
-				if (controller.demographicModel.demographicNo && !controller.editMode)
+				if (controller.demographicModel.demographicNo)
 				{
 					let integration = (await mhaIntegrationApi.searchIntegrations($scope.eventData.site)).data.body;
 					if (integration.length > 0)
@@ -489,9 +490,20 @@ angular.module('Schedule').component('eventComponent', {
 							else
 							{
 								$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;
-								$scope.eventData.virtual = false;
+								if (!controller.editMode)
+								{
+									$scope.eventData.virtual = false;
+								}
 							}
 						});
+					}
+					else
+					{
+						$scope.telehealthMode = $scope.TELEHEALTH_MODES.NO_CONNECTION;
+						if (!controller.editMode)
+						{
+							$scope.eventData.virtual = false;
+						}
 					}
 				}
 				else
@@ -742,6 +754,7 @@ angular.module('Schedule').component('eventComponent', {
 					controller.repeatBookingDates = controller.generateRepeatBookingDateList(controller.repeatBooking.max_bookings_limit);
 				}
 			};
+
 			controller.removeRepeatBookingDate = function removeRepeatBookingDate(dataObj)
 			{
 				controller.repeatBookingDates = controller.repeatBookingDates.filter(function(e) { return e !== dataObj })
@@ -1394,7 +1407,14 @@ angular.module('Schedule').component('eventComponent', {
 				}
 			};
 
-			controller.sendTelehealthAppointmentNotification = async () =>
+			controller.shouldShowNotificationButtons = () =>
+			{
+				return (controller.demographicModel.data.email ||
+							 ($scope.telehealthMode === $scope.TELEHEALTH_MODES.TELEHEALTH && $scope.eventData.virtual)) &&
+								$scope.telehealthMode !== $scope.TELEHEALTH_MODES.NO_CONNECTION;
+			}
+
+			controller.sendAppointmentNotification = async () =>
 			{
 				controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.SENDING;
 				try
@@ -1407,6 +1427,10 @@ angular.module('Schedule').component('eventComponent', {
 						if (controller.mhaAppointment)
 						{
 							await mhaAppointmentApi.sendTelehealthAppointmentNotification(integration.id, controller.mhaAppointment.id)
+						}
+						else
+						{
+							await mhaAppointmentApi.sendGeneralAppointmentNotification(integration.id, $scope.eventUuid)
 						}
 						result = controller.SENDING_NOTIFICATION_STATES.SENT
 					}

@@ -127,6 +127,28 @@ myhealthaccess = {
 		});
 	},
 
+	// send a general appointment notification to the the patient of the appointment
+	sendGeneralAppointmentNotification: function (contextPath, site, junoAppointmentNo)
+	{
+		return myhealthaccess.getIntegrationWrapper(contextPath, site, (resolve, reject, integration) =>
+		{
+			jQuery.ajax(
+					{
+						url: contextPath + "/ws/rs/myhealthaccess/integration/" + integration.id + "/appointment/non_mha/" +
+								junoAppointmentNo + "/send_general_appt_notification",
+						type: "POST",
+						success: (result) =>
+						{
+							resolve(result);
+						},
+						error: (error) =>
+						{
+							reject(error);
+						}
+					});
+		});
+	},
+
 	getIntegrationWrapper: function getIntegrationWrapper(contextPath, site, callback)
 	{
 		return new Promise((resolve, reject) =>
