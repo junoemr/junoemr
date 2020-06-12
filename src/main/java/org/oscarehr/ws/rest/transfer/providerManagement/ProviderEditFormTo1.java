@@ -174,7 +174,6 @@ public class ProviderEditFormTo1 implements Serializable
 		ProviderData providerData = new ProviderData();
 
 		// fill out general provider record
-		providerData.setProviderNo(providerDataDao.getNextIdWithThreshold(1, 9999));
 		providerData.setLastName(this.getLastName());
 		providerData.setFirstName(this.getFirstName());
 		providerData.setProviderType(this.getType());
