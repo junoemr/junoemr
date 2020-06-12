@@ -270,6 +270,7 @@ module.exports = {
 			'./src/record/details/module.js',
 			'./src/record/details/detailsController.js',
 			'./src/record/details/swipecardController.js',
+			'./src/record/details/components/mhaPatientConnection/mhaPatientConnectionComponent.js',
 			'./src/record/phr/module.js',
 			'./src/record/phr/phrController.js',
 

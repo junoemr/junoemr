@@ -56,7 +56,14 @@ myhealthaccess = {
 						type: "GET",
 						success: (result) =>
 						{
-							resolve(result);
+							if (result.length > 0)
+							{
+								resolve(result[0]);
+							}
+							else
+							{
+								resolve(null);
+							}
 						},
 						error: (error) =>
 						{

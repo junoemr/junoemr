@@ -22,6 +22,7 @@
  */
 package org.oscarehr.ws.rest.myhealthaccess;
 
+import com.indivica.olis.queries.Query;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.service.IntegrationService;
@@ -35,6 +36,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Path("myhealthaccess/integrations")
 @Component("IntegrationWebService")
@@ -47,13 +51,20 @@ public class IntegrationWebService extends AbstractServiceImpl
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<IntegrationTo1> searchIntegrations(@QueryParam("site") String siteName)
+	public RestResponse<List<IntegrationTo1>> searchIntegrations(@QueryParam("site") String siteName, @QueryParam("all") Boolean allSites)
 	{
-		Integration integration = integrationService.findMhaIntegration(siteName);
-		if (integration != null)
+		if (allSites != null && allSites)
 		{
-			return RestResponse.successResponse(new IntegrationTo1(integration));
+			return RestResponse.successResponse(IntegrationTo1.fromIntegrationList(integrationService.getMyHealthAccessIntegrations()));
 		}
-		return RestResponse.successResponse(null);
+		else
+		{
+			Integration integration = integrationService.findMhaIntegration(siteName);
+			if (integration != null)
+			{
+				return RestResponse.successResponse(Arrays.asList(new IntegrationTo1(integration)));
+			}
+		}
+		return RestResponse.successResponse(new ArrayList<>());
 	}
 }

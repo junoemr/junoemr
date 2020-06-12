@@ -24,6 +24,9 @@ package org.oscarehr.ws.rest.transfer.myhealthaccess;
 
 import org.oscarehr.integration.model.Integration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class IntegrationTo1
 {
 	private Integer id;
@@ -32,6 +35,16 @@ public class IntegrationTo1
 	private Integer siteId;
 	private String siteName;
 	private String integrationType;
+
+	public static List<IntegrationTo1> fromIntegrationList(List<Integration> integrations)
+	{
+		ArrayList<IntegrationTo1> integrationTo1s = new ArrayList<>();
+		for (Integration integration : integrations)
+		{
+			integrationTo1s.add(new IntegrationTo1(integration));
+		}
+		return integrationTo1s;
+	}
 
 	public IntegrationTo1(Integration integration)
 	{

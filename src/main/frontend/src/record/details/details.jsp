@@ -126,6 +126,9 @@
 							Save
 						</button>
 					</div>
+					<div class=" col-sm-2 col-xs-12 pull-right">
+						<mha-patient-connection></mha-patient-connection>
+					</div>
 				</div>
 			</div>
 	</div>
