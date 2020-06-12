@@ -6,36 +6,22 @@ myhealthaccess = {
 	// ask MHA if the demographic is confirmed with this clinic
 	checkDemographicConfirmed: function checkDemographicConfirmed(contextPath, demographicNo, site)
 	{
-		return new Promise((resolve, reject) =>
+		return myhealthaccess.getIntegrationWrapper(contextPath, site, (resolve, reject, integration) =>
 		{
-			myhealthaccess.getIntegration(contextPath, site).then((integration) =>
-			{
-				integration = JSON.parse(integration).body;
-				if (integration)
-				{
-					jQuery.ajax(
-							{
-								url: contextPath + "/ws/rs/myhealthaccess/integration/" + integration.id +
-										"/demographic/" + demographicNo + "/confirmed",
-								type: "GET",
-								success: (result) =>
-								{
-									resolve(result);
-								},
-								error: (error) =>
-								{
-									reject(error);
-								}
-							});
-				}
-				else
-				{
-					reject(myhealthaccess.ERROR_NO_INTEGRATION)
-				}
-			}).catch((error) =>
-			{
-				reject(error);
-			});
+			jQuery.ajax(
+					{
+						url: contextPath + "/ws/rs/myhealthaccess/integration/" + integration.id +
+								"/demographic/" + demographicNo + "/confirmed",
+						type: "GET",
+						success: (result) =>
+						{
+							resolve(result);
+						},
+						error: (error) =>
+						{
+							reject(error);
+						}
+					});
 		});
 	},
 
@@ -56,14 +42,7 @@ myhealthaccess = {
 						type: "GET",
 						success: (result) =>
 						{
-							if (result.length > 0)
-							{
-								resolve(result[0]);
-							}
-							else
-							{
-								resolve(null);
-							}
+							resolve(result);
 						},
 						error: (error) =>
 						{
@@ -76,33 +55,22 @@ myhealthaccess = {
 	// get the mha integration for the specified site
 	getAppointment: function getAppointment(contextPath, site, apptNo)
 	{
-		return new Promise((resolve, reject) =>
+		return myhealthaccess.getIntegrationWrapper(contextPath, site, (resolve, reject, integration) =>
 		{
-			myhealthaccess.getIntegration(contextPath, site).then((integration) =>
-			{
-				integration = JSON.parse(integration).body;
-				if (integration)
-				{
-					var queryParams = "?appointmentNo=" + apptNo;
-					jQuery.ajax(
-							{
-								url: contextPath + "/ws/rs/myhealthaccess/integration/" + integration.id + "/appointments/" + queryParams,
-								type: "GET",
-								success: (result) =>
-								{
-									resolve(result);
-								},
-								error: (error) =>
-								{
-									reject(error);
-								}
-							});
-				}
-				else
-				{
-					reject(myhealthaccess.ERROR_NO_INTEGRATION)
-				}
-			});
+			var queryParams = "?appointmentNo=" + apptNo;
+			jQuery.ajax(
+					{
+						url: contextPath + "/ws/rs/myhealthaccess/integration/" + integration.id + "/appointments/" + queryParams,
+						type: "GET",
+						success: (result) =>
+						{
+							resolve(result);
+						},
+						error: (error) =>
+						{
+							reject(error);
+						}
+					});
 		});
 	},
 
@@ -155,10 +123,10 @@ myhealthaccess = {
 		{
 			myhealthaccess.getIntegration(contextPath, site).then((integration) =>
 			{
-				integration = JSON.parse(integration).body;
-				if (integration)
+				integrations = JSON.parse(integration).body;
+				if (integrations.length > 0)
 				{
-					callback(resolve, reject, integration)
+					callback(resolve, reject, integrations[0])
 				}
 				else
 				{
