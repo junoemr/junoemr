@@ -1394,7 +1394,7 @@ angular.module('Schedule').component('eventComponent', {
 				}
 			};
 
-			controller.sendOnTimeTelehealthNotification = async () =>
+			controller.sendTelehealthAppointmentNotification = async () =>
 			{
 				controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.SENDING;
 				try
@@ -1406,7 +1406,7 @@ angular.module('Schedule').component('eventComponent', {
 						integration = integration[0];
 						if (controller.mhaAppointment)
 						{
-							await mhaAppointmentApi.sendOneTimeTelehealthLink(integration.id, controller.mhaAppointment.id)
+							await mhaAppointmentApi.sendTelehealthAppointmentNotification(integration.id, controller.mhaAppointment.id)
 						}
 						result = controller.SENDING_NOTIFICATION_STATES.SENT
 					}

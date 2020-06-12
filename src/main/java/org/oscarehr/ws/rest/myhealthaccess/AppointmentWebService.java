@@ -81,15 +81,15 @@ public class AppointmentWebService extends AbstractServiceImpl
 
 
 	@POST
-	@Path("/appointment/{appointmentId}/send_one_time_link")
+	@Path("/appointment/{appointmentId}/send_telehealth_appt_notification")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> sendOneTimeTelehealthLink(@PathParam("integrationId") Integer integrationId,
+	public RestResponse<Boolean> sendTelehealthAppointmentNotification(@PathParam("integrationId") Integer integrationId,
 														   @PathParam("appointmentId") String appointmentId)
 	{
 		Integration integration = integrationDao.find(integrationId);
 		ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
 				getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
-		appointmentService.sendOneTimeTelehealthNotification(integration, loginTokenTo1.getToken(), appointmentId);
+		appointmentService.sendTelehealthAppointmentNotification(integration, loginTokenTo1.getToken(), appointmentId);
 
 		return RestResponse.successResponse(true);
 	}

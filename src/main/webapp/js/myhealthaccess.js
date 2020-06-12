@@ -106,14 +106,14 @@ myhealthaccess = {
 		});
 	},
 
-	// send a one time telehealth link the the patient of the appointment
-	sendAppointmentOneTimeLinkNotification: function sendAppointmentOneTimeLinkNotification(contextPath, site, mhaAppointment)
+	// send a telehealth appointment notification to the the patient of the appointment
+	sendTelehealthAppointmentNotification: function (contextPath, site, mhaAppointment)
 	{
 		return myhealthaccess.getIntegrationWrapper(contextPath, site, (resolve, reject, integration) =>
 		{
 			jQuery.ajax(
 				{
-					url: contextPath + "/ws/rs/myhealthaccess/integration/" + integration.id + "/appointment/" + mhaAppointment.id + "/send_one_time_link",
+					url: contextPath + "/ws/rs/myhealthaccess/integration/" + integration.id + "/appointment/" + mhaAppointment.id + "/send_telehealth_appt_notification",
 					type: "POST",
 					success: (result) =>
 					{

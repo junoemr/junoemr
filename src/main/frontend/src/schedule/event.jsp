@@ -483,7 +483,7 @@
 			</button>
 
 			<button
-							ng-if="telehealthMode === TELEHEALTH_MODES.ONE_TIME_TELEHEALTH && eventData.virtual && !eventController.editMode"
+							ng-if=" eventData.virtual && !eventController.editMode"
 							type="button"
 							class="btn btn-primary"
 							tooltip-placement="top"
@@ -495,12 +495,12 @@
 			</button>
 
 			<button
-							ng-if="eventController.mhaAppointment.appointmentType == 'ONE_TIME_LINK' && eventData.virtual && eventController.editMode"
+							ng-if="eventData.virtual && eventController.editMode"
 							type="button"
 							class="btn btn-default"
 							tooltip-placement="top"
 							tooltip-append-to-body="true"
-							ng-click="eventController.sendOnTimeTelehealthNotification();"
+							ng-click="eventController.sendTelehealthAppointmentNotification();"
 							title="Send a notification email to the patient containing the one time telehealth link"
 							ng-disabled="eventController.sendingNotificationState !== eventController.SENDING_NOTIFICATION_STATES.NONE">
 				{{ eventController.getSendNotificationText() }}

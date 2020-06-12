@@ -155,7 +155,7 @@ public class Appointment
 
 		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), integrationService.findMhaIntegration(siteName)))
 		{
-			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
+			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment, sendNotification);
 		}
 		else
 		{
