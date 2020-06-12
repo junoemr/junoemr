@@ -23,7 +23,8 @@
 		       ng-focus="focus_fn()"
 		       ng-change="change_fn()"
 		       ng-disabled="disabled"
-		       tabindex="{{tab_index}}">
+		       tabindex="{{tab_index}}"
+					 maxlength="{{text_length}}">
 		</input>
 		<span class="label label-default textarea-char-counter"
 					ng-class="{'hidden': max_characters == null}">

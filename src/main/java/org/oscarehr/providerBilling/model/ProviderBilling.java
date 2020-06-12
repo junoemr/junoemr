@@ -107,6 +107,11 @@ public class ProviderBilling extends AbstractModel<Integer>
 		this.id = id;
 	}
 
+	public Integer getProviderNo()
+	{
+		return this.provider.getProviderNo();
+	}
+
 	public ProviderData getProvider()
 	{
 		return provider;

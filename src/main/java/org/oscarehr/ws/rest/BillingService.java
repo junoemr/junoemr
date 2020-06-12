@@ -27,21 +27,52 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
+import org.oscarehr.billing.CA.AB.dao.AlbertaFacilityDao;
+import org.oscarehr.billing.CA.AB.dao.AlbertaFunctionalCenterDao;
+import org.oscarehr.billing.CA.AB.dao.AlbertaSkillCodeDao;
+import org.oscarehr.billing.CA.ON.dao.OntarioMasterNumberDao;
+import org.oscarehr.common.dao.BillingBCDao;
+import org.oscarehr.common.dao.BillingServiceDao;
 import org.oscarehr.managers.BillingManager;
 import org.oscarehr.ws.rest.conversion.ServiceTypeConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.model.ServiceTypeTo;
+import org.oscarehr.ws.rest.transfer.billing.AlbertaFacilityTo1;
+import org.oscarehr.ws.rest.transfer.billing.AlbertaFunctionalCenterTo1;
+import org.oscarehr.ws.rest.transfer.billing.AlbertaSkillCodeTo1;
+import org.oscarehr.ws.rest.transfer.billing.BCBillingLocationTo1;
+import org.oscarehr.ws.rest.transfer.billing.BCBillingVisitCodeTo1;
+import org.oscarehr.ws.rest.transfer.billing.OntarioMasterNumberTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import oscar.OscarProperties;
+
+import java.util.List;
 
 @Path("/billing")
 public class BillingService extends AbstractServiceImpl {
 
 	@Autowired
 	BillingManager billingManager;
+
+	@Autowired
+	AlbertaSkillCodeDao albertaSkillCodeDao;
+
+	@Autowired
+	AlbertaFacilityDao albertaFacilityDao;
+
+	@Autowired
+	AlbertaFunctionalCenterDao albertaFunctionalCenterDao;
+
+	@Autowired
+	BillingBCDao billingBCDao;
+
+	@Autowired
+	OntarioMasterNumberDao ontarioMasterNumberDao;
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
 	
@@ -61,27 +92,76 @@ public class BillingService extends AbstractServiceImpl {
 
 	}
 
-    @GET
-    @Path("/billingRegion")
-    @Produces("application/json")
-    public GenericRESTResponse billingRegion() {
-        boolean billRegionSet = true;
-        String billRegion = oscarProperties.getBillingType().trim().toUpperCase();
-        if(billRegion.isEmpty()){
-            billRegionSet = false;
-        }
-        return new GenericRESTResponse(billRegionSet, billRegion);
-    }
-	
-    @GET
-    @Path("/defaultView")
-    @Produces("application/json")
-    public GenericRESTResponse defaultView() {
-        boolean defaultViewSet = true;
-        String defaultView = oscarProperties.getProperty("default_view", "").trim();
-        if(defaultView.isEmpty()){
-        	defaultViewSet = false;
-        }
-        return new GenericRESTResponse(defaultViewSet, defaultView);
-    }
+	@GET
+	@Path("/billingRegion")
+	@Produces("application/json")
+	public GenericRESTResponse billingRegion() {
+			boolean billRegionSet = true;
+			String billRegion = oscarProperties.getBillingType().trim().toUpperCase();
+			if(billRegion.isEmpty()){
+					billRegionSet = false;
+			}
+			return new GenericRESTResponse(billRegionSet, billRegion);
+	}
+
+	@GET
+	@Path("/defaultView")
+	@Produces("application/json")
+	public GenericRESTResponse defaultView() {
+			boolean defaultViewSet = true;
+			String defaultView = oscarProperties.getProperty("default_view", "").trim();
+			if(defaultView.isEmpty()){
+				defaultViewSet = false;
+			}
+			return new GenericRESTResponse(defaultViewSet, defaultView);
+	}
+
+	@GET
+	@Path("/alberta/skillCodes")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<AlbertaSkillCodeTo1>> getAlbertaSkillCodes()
+	{
+		return RestResponse.successResponse(AlbertaSkillCodeTo1.fromList(albertaSkillCodeDao.getAllSkillCodes()));
+	}
+
+	@GET
+	@Path("/alberta/facilities")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<AlbertaFacilityTo1>> getAlbertaActiveFacilities()
+	{
+		return RestResponse.successResponse(AlbertaFacilityTo1.fromList(albertaFacilityDao.getAllActiveFacilities()));
+	}
+
+	@GET
+	@Path("/alberta/functional_centers")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<AlbertaFunctionalCenterTo1>> getAlbertaFunctionalCenters()
+	{
+		return RestResponse.successResponse(AlbertaFunctionalCenterTo1.fromList(albertaFunctionalCenterDao.getAllFunctionalCenters()));
+	}
+
+	@GET
+	@Path("/bc/billing_visit_codes")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<BCBillingVisitCodeTo1>> getBCBillingVisitCodes()
+	{
+		return RestResponse.successResponse(BCBillingVisitCodeTo1.fromList(billingBCDao.findBillingVisits(BillingServiceDao.BC)));
+	}
+
+	@GET
+	@Path("/bc/billing_locations")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<BCBillingLocationTo1>> getBCBillingLocations()
+	{
+		return RestResponse.successResponse(BCBillingLocationTo1.fromList(billingBCDao.findBillingLocations(BillingServiceDao.BC)));
+	}
+
+	@GET
+	@Path("/on/master_numbers")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<OntarioMasterNumberTo1>> getOntarioMasterNumbers()
+	{
+		return RestResponse.successResponse(OntarioMasterNumberTo1.fromList(ontarioMasterNumberDao.findAll()));
+	}
+
 }

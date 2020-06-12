@@ -161,3 +161,7 @@ $color-timepicker-border: #CCC;
 $input-color-invalid-background: #ffefef;
 $input-color-invalid-border: #a94442;
 $input-color-invalid-text: #a94442;
+
+@mixin background-opacity($color, $opacity) {
+	background-color: rgba($color, $opacity);
+}

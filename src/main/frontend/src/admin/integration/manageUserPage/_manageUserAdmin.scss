@@ -1,0 +1,17 @@
+.manage-user-page-admin {
+	@include juno-font-body-small();
+
+	.control-label {
+		padding: 0;
+	}
+
+	.provider-button-column {
+		i {
+			font-size: 20px;
+		}
+		.btn {
+			padding: 0;
+			flex-grow: 0.1;
+		}
+	}
+}

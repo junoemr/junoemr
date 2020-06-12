@@ -1,5 +1,7 @@
 'use strict';
 
+import {JUNO_ALERT_MODES} from "../components/junoAlert/junoAlertConstants";
+
 if (!window.Juno) window.Juno = {};
 
 
@@ -343,4 +345,75 @@ Juno.Common.Util.windowClosedPromise = function (popup)
 			}
 		}, 500);
 	});
+};
+
+// show a success alert box similar to the browsers built in alert functionality
+Juno.Common.Util.successAlert = function(uibModal, title, message)
+{
+	uibModal.open(
+		{
+			component: 'junoAlertComponent',
+			backdrop: 'static',
+			windowClass: "juno-alert",
+			resolve: {
+				title: function(){return title},
+				message: function(){return message},
+				mode: function(){return JUNO_ALERT_MODES.SUCCESS}
+			}
+		}
+	);
+};
+
+// show a error alert box similar to the browsers built in alert functionality
+Juno.Common.Util.errorAlert = function(uibModal, title, message)
+{
+	uibModal.open(
+			{
+				component: 'junoAlertComponent',
+				backdrop: 'static',
+				windowClass: "juno-alert",
+				resolve: {
+					title: function(){return title},
+					message: function(){return message},
+					mode: function(){return JUNO_ALERT_MODES.ERROR}
+				}
+			}
+	);
+};
+
+// show a confirmation box. returns a promise that will resolve to true / false based on user selection.
+Juno.Common.Util.confirmationDialog = function(uibModal, title, message)
+{
+	return uibModal.open(
+			{
+				component: 'junoAlertComponent',
+				backdrop: 'static',
+				windowClass: "juno-alert",
+				resolve: {
+					title: function(){return title},
+					message: function(){return message},
+					mode: function(){return JUNO_ALERT_MODES.CONFIRM}
+				}
+			}
+	).result;
+};
+
+/**
+ * lookup typeahead object form options list based on value
+ * @param value - the value to look up
+ * @param options - the options list from which to lookup the object
+ * @returns - the matching typeahead object or the value if no match found.
+ */
+Juno.Common.Util.typeaheadValueLookup = function(value, options)
+{
+	if (value && options && options.length > 0)
+	{
+		let res = options.find((el) => el.value === value);
+		if (res)
+		{
+			return res;
+		}
+	}
+
+	return value;
 };

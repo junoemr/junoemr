@@ -36,6 +36,14 @@ public class UserRoleTo1 implements Serializable {
 	
 	private String roleName;
 
+	public UserRoleTo1(){}
+
+	public UserRoleTo1(String roleName, Integer roleId)
+	{
+		this.roleName = roleName;
+		this.roleId = roleId;
+	}
+
 	public Integer getRoleId() {
 		return roleId;
 	}

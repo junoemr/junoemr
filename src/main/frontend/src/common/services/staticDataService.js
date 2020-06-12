@@ -61,6 +61,341 @@ angular.module("Common.Services").service("staticDataService", [
 			return genders;
 		};
 
+		service.getBillingRegions = function ()
+		{
+			let regions = [];
+			regions.push(
+			{
+				"value": "BC",
+				"label": "BC"
+			});
+			regions.push(
+			{
+				"value": "ON",
+				"label": "ON"
+			});
+			regions.push(
+			{
+				"value": "AB",
+				"label": "AB"
+			});
+			regions.push(
+			{
+				"value": "SK",
+				"label": "SK"
+			});
+			regions.push(
+			{
+				"value": "CLINICAID",
+				"label": "CLINICAID"
+			});
+			return regions;
+		};
+
+		service.getAlbertaTimeRoleModifier = function ()
+		{
+			let modifiers = [];
+			modifiers.push(
+					{
+						value: "ANE",
+						label: "Anaesthetist"
+					}
+			);
+			modifiers.push(
+					{
+						value: "ANEST",
+						label: "Anaesthetist TRC"
+					}
+			);
+			modifiers.push(
+					{
+						value: "2ANES",
+						label: "Anaesthetist TRC2"
+					}
+			);
+			modifiers.push(
+					{
+						value: "SA",
+						label: "Surgical Assistant"
+					}
+			);
+			modifiers.push(
+					{
+						value: "SAQS",
+						label: "Surgical Assistant (Second) "
+					}
+			);
+			modifiers.push(
+					{
+						value: "SOSS",
+						label: "Second Oral Surgeon"
+					}
+			);
+			modifiers.push(
+					{
+						value: "SSOS",
+						label: "Second Orthopedic Surgeon "
+					}
+			);
+			modifiers.push(
+					{
+						value: "SSPS",
+						label: "Second Podiatric Surgeon"
+					}
+			);
+			modifiers.push(
+					{
+						value: "MSRGN",
+						label: "Second Neurosurgeon"
+					}
+			);
+			modifiers.push(
+					{
+						value: "MSRGP",
+						label: "Second Plastic Surgeon "
+					}
+			);
+			modifiers.push(
+					{
+						value: "MSURG2",
+						label: "Second Microsurgery"
+					}
+			);
+			return modifiers;
+		};
+
+		service.getSaskatchewanBillingModes =  function()
+		{
+			let billingModes = [];
+			billingModes.push({
+				label: "Physicians (1)",
+				value: 1
+			});
+			billingModes.push({
+				label: "Optometrists (6)",
+				value: 6
+			});
+			billingModes.push({
+				label: "Chiropractors (8)",
+				value: 8
+			});
+			billingModes.push({
+				label: "Alternate Payment Method (9)",
+				value: 9
+			});
+			billingModes.push({
+				label: "Global (0)",
+				value: 0
+			});
+			return billingModes;
+		};
+
+		service.getSaskatchewanLocationCodes = function ()
+		{
+			let locationCodes = [];
+			locationCodes.push({
+				label: "Office (1)",
+				value: "1"
+			});
+			locationCodes.push({
+				label: "In Patient (2)",
+				value: "2"
+			});
+			locationCodes.push({
+				label: "Out Patient (3)",
+				value: "3"
+			});
+			locationCodes.push({
+				label: "Home (4)",
+				value: "4"
+			});
+			locationCodes.push({
+				label: "Other (5)",
+				value: "5"
+			});
+			locationCodes.push({
+				label: "ER (9)",
+				value: "9"
+			});
+			locationCodes.push({
+				label: "10% Premium Office (F)",
+				value: "F"
+			});
+			locationCodes.push({
+				label: "50% Premium In Patient (B)",
+				value: "B"
+			});
+			locationCodes.push({
+				label: "50% Premium Out Patient (C)",
+				value: "C"
+			});
+			locationCodes.push({
+				label: "50% Premium Home (D)",
+				value: "D"
+			});
+			locationCodes.push({
+				label: "50% Premium Other (E)",
+				value: "E"
+			});
+			locationCodes.push({
+				label: "100% Premium In Patient (K)",
+				value: "K"
+			});
+			locationCodes.push({
+				label: "100% Premium Out Patient (M)",
+				value: "M"
+			});
+			locationCodes.push({
+				label: "100% Premium Home (P)",
+				value: "P"
+			});
+			locationCodes.push({
+				label: "100% Premium Other (T)",
+				value: "T"
+			});
+			return locationCodes;
+		};
+
+		service.getSaskatchewanSubmissionTypes = function()
+		{
+			let submissionTypes = [];
+			submissionTypes.push({
+				label: "Regular Submission (8)",
+				value: "8"
+			});
+			submissionTypes.push({
+				label: "Requesting EMR transaction fee(E)",
+				value: "E"
+			});
+			return submissionTypes;
+		};
+
+		service.getSaskatchewanCorporationIndicators = function()
+		{
+			let corporationIndicators = [];
+			corporationIndicators.push({
+				label: "Practitioner Billing",
+				value: "Practitioner Billing"
+			});
+			corporationIndicators.push({
+				label: "Physician Corporation 1",
+				value: "Physician Corporation 1"
+			});
+			corporationIndicators.push({
+				label: "Physician Corporation 2",
+				value: "Physician Corporation 2"
+			});
+			corporationIndicators.push({
+				label: "Physician Corporation 3",
+				value: "Physician Corporation 3"
+			});
+			corporationIndicators.push({
+				label: "Physician Corporation 4",
+				value: "Physician Corporation 4"
+			});
+
+			return corporationIndicators;
+		};
+
+		service.getOntarioServiceLocationIndicators = function()
+		{
+			let serviceLocationIndicators = [];
+			serviceLocationIndicators.push({
+				label: "Not Applicable (3821)",
+				value: "3821"
+			});
+			serviceLocationIndicators.push({
+				label: "Hospital Day Surgery (HDS)",
+				value: "HDS"
+			});
+			serviceLocationIndicators.push({
+				label: "Hospital Emergency Department (HED)",
+				value: "HED"
+			});
+			serviceLocationIndicators.push({
+				label: "Hospital In-Patient (HIP)",
+				value: "HIP"
+			});
+			serviceLocationIndicators.push({
+				label: "Hospital Out-Patient (HOP)",
+				value: "HOP"
+			});
+			serviceLocationIndicators.push({
+				label: "Hospital Referred Patient (HRP)",
+				value: "HRP"
+			});
+			serviceLocationIndicators.push({
+				label: "Independent Health Facility (IHF)",
+				value: "IHF"
+			});
+			serviceLocationIndicators.push({
+				label: "Office of community physician (OFF)",
+				value: "OFF"
+			});
+			serviceLocationIndicators.push({
+				label: "Ontario Telemedicine Network (OTN)",
+				value: "OTN"
+			});
+			serviceLocationIndicators.push({
+				label: "Private Diagnostic Facility (PDF)",
+				value: "PDF"
+			});
+			serviceLocationIndicators.push({
+				label: "Rehabilitation Treatment Facility (RTF)",
+				value: "RTF"
+			});
+			return serviceLocationIndicators;
+		};
+
+		service.getProviderTypes = function ()
+		{
+			var types = [];
+			types.push({
+				"label": "receptionist",
+				"value": "receptionist",
+			});
+			types.push({
+				"label": "doctor",
+				"value": "doctor",
+			});
+			types.push({
+				"label": "nurse",
+				"value": "nurse",
+			});
+			types.push({
+				"label": "resident",
+				"value": "resident",
+			});
+			types.push({
+				"label": "midwife",
+				"value": "midwife",
+			});
+			types.push({
+				"label": "admin",
+				"value": "admin",
+			});
+			return types;
+		};
+
+		service.getProviderStatuses = function ()
+		{
+			let statuses = [];
+			statuses.push({
+				label: "Active",
+				value: true,
+			});
+			statuses.push({
+				label: "Deleted",
+				value: false,
+			});
+			statuses.push({
+				label: "All",
+				value: null,
+			});
+
+			return statuses;
+		};
+
 		service.getTitles = function getTitles()
 		{
 			var titles = [];

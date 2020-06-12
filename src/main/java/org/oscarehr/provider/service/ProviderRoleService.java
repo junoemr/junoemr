@@ -83,6 +83,19 @@ public class ProviderRoleService
 		return true;
 	}
 
+	public boolean setDefaultPrimaryRole(Integer providerNo)
+	{
+		String providerDefaultRoleName = OscarProperties.getInstance().getProperty("default_provider_role_name");
+		if (providerDefaultRoleName != null)
+		{
+			return setPrimaryRole(providerNo, providerDefaultRoleName);
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	/**
 	 * Assign a primary role to the provider
 	 * @param providerId - provider record id
@@ -136,8 +149,6 @@ public class ProviderRoleService
 
 	public Secuserrole addRoleAndAssignPrimary(Integer roleProviderId, String roleName)
 	{
-
-
 		Secuserrole secUserRole = addRole(roleProviderId, roleName);
 
 		Long caisiProgram = new Long(programManager.getDefaultProgramId());
@@ -187,6 +198,57 @@ public class ProviderRoleService
 	public boolean validRoleName(String roleName)
 	{
 		return (secRoleDao.findByName(roleName) != null);
+	}
+
+	/**
+	 * assign the specified roles to the provider
+	 * @param roles - role id list
+	 * @param providerNo - the provider to assign to.
+	 */
+	public synchronized void assignProviderRoles(List<Integer> roles, Integer providerNo)
+	{
+		if (roles != null)
+		{
+			for (Integer role : roles)
+			{
+				String roleName = secRoleDao.find(role).getName();
+				if (!hasRole(providerNo, roleName))
+				{
+					addRole(providerNo, roleName);
+				}
+			}
+		}
+	}
+
+	/**
+	 * remove roles from a provider that are not contained in the role list.
+	 * @param roles - the list of roles to keep
+	 * @param providerNo - the provider to apply the operation on
+	 */
+	public synchronized void removeOtherProviderRoles(List<Integer> roles, Integer providerNo)
+	{
+		if (roles != null)
+		{
+			List<Secuserrole> secUserRoles = secUserRoleDao.findByProviderNo(providerNo.toString());
+			for (Secuserrole userRole : secUserRoles)
+			{
+				boolean contains = false;
+				for (Integer roleId : roles)
+				{
+					String roleName = secRoleDao.find(roleId).getName();
+					if (roleName.equals(userRole.getRoleName()))
+					{
+						contains = true;
+						break;
+					}
+				}
+
+				if (!contains)
+				{
+					secUserRoleDao.delete(userRole);
+				}
+			}
+		}
 	}
 
 

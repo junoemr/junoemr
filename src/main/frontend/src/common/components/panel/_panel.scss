@@ -1,25 +1,27 @@
-.panel-component {
+
+panel {
 	@include juno-font-body-small();
+	display: block;
 
 	.panel-header {
-		background-color: $color-neutral-lightest;
-		border-color: $color-neutral-lightest;
-		border-width: 1px;
+		background-color: $color-neutral-lighter;
+		border-color: $color-neutral-lighter;
+		border-width: 4px;
 		border-radius: 8px;
 		border-style: solid;
 
 		border-bottom-left-radius: 0;
 		border-bottom-right-radius: 0;
 
-		padding: 8px;
+		padding: 4px;
 		padding-right: 16px;
 		padding-left: 16px;
 	}
 
 	.panel-body {
-		background-color: $color-neutral-lightest;
-		border-color: $color-neutral-lightest;
-		border-width: 1px;
+		background-color: white;
+		border-color: $color-neutral-lighter;
+		border-width: 4px;
 		border-radius: 8px;
 		border-style: solid;
 
@@ -28,7 +30,7 @@
 		border-top-left-radius: 0;
 		border-top-right-radius: 0;
 
-		padding: 8px;
+		padding: 16px;
 	}
 
 }

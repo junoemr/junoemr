@@ -22,6 +22,7 @@
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	box-shadow: 0 2px 2px rgba($color-neutral-black, 0.1);
 	&.btn-sm {
 		padding: 5px 10px;
 		line-height: 1.5;
@@ -57,6 +58,13 @@
 		@include juno-button-colour-scheme($color-neutral-white, $color-red-base, $color-red-dark);
 	}
 
+	// a button that only is "active" (colored) on mouse over.
+	&.btn-active-hover {
+		&:not(:hover)
+		{
+			@include juno-button-colour-scheme($color-neutral-darker, $color-neutral-white, $color-neutral-light);
+		}
+	}
 
 	// for icon only buttons
 	&.btn-icon {

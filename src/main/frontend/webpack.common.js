@@ -119,6 +119,7 @@ module.exports = {
 			'../webapp/share/javascript/HealthCardParser.js',
 			'./src/common/displayMessages.js',
 			'./src/common/util/util.js',
+			'./src/common/util/validations.js',
 			'./src/common/util/serviceHelper.js',
 			'./src/consults/common.js',
 			'./app.js',
@@ -233,9 +234,11 @@ module.exports = {
 
 			'./src/common/components/module.js',
 			'./src/common/components/modalComponent.js',
+			'./src/common/components/junoAlert/junoAlertComponent.js',
 			'./src/common/components/loadingIndicatorComponent.js',
 			'./src/common/components/zeroStateDisplayComponent.js',
 			'./src/common/components/accordionList/accordionListComponent.js',
+			'./src/common/components/junoTypeahead/junoTypeaheadComponent.js',
 			'./src/common/components/iconCard/iconCardComponent.js',
 			'./src/common/components/panel/panelComponent.js',
 
@@ -299,6 +302,8 @@ module.exports = {
 			'./src/admin/integration/fax/faxSendReceiveController.js',
 			'./src/admin/integration/landingPage/landingPageComponent.js',
 			'./src/admin/integration/panelManagement/panelManagementAdminComponent.js',
+			'./src/admin/integration/editProviderPage/editProviderAdminComponent.js',
+			'./src/admin/integration/manageUserPage/manageUserAdminComponent.js',
 			'./src/admin/integration/integrationModules/integrationModulesComponent.js',
 			'./src/admin/integration/iceFall/iceFallAdminComponent.js',
 			'./src/admin/integration/iceFall/settings/iceFallAdminSettingsComponent.js',

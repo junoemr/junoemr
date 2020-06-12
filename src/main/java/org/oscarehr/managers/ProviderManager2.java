@@ -142,14 +142,14 @@ public class ProviderManager2
 		return (results);
 	}
 
-	public List<Provider> search(LoggedInInfo loggedInInfo, String term, boolean active, int startIndex, int itemsToReturn)
+	public List<Provider> search(LoggedInInfo loggedInInfo, String term, String status, int startIndex, int itemsToReturn)
 	{
 
-		List<Provider> results = providerDao.search(term, active, startIndex, itemsToReturn);
+		List<Provider> results = providerDao.search(term, status, startIndex, itemsToReturn);
 
 		if (logger.isDebugEnabled())
 		{
-			logger.debug("search, active=" + active + ", term=" + term + " result.size=" + results.size());
+			logger.debug("search, active=" + status + ", term=" + term + " result.size=" + results.size());
 		}
 
 		//--- log action --- this seems useless
