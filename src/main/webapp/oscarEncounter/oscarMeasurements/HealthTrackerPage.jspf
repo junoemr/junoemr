@@ -700,39 +700,40 @@ function fsPopup(width,height,url,window) {
 					MeasurementFlowSheet flowSheetGroups = MeasurementTemplateFlowSheetConfig.getInstance().getFlowSheet(name);
 					Flowsheet fs = MeasurementTemplateFlowSheetConfig.getInstance().getFlowsheetSettings().get(flowSheetGroups.getName());
 					
-					boolean enabled=true;
+					boolean enabled = true;
 					if(fs != null) {
 						enabled = fs.isEnabled();
 					}
-					
-																
-					if(enabled && flowSheetGroups.isUniversal()!=true) { 
 
-						//out.print(flowsheets.size());
-						for (int f = 0; f < flowsheets.size(); f++) {
-							String flowsheetName = flowsheets.get(f);
-							//out.print(flowsheetName);
-							if(flowsheetName.equals(flowSheetGroups.getName())){
-						
-								diagnosed.add(flowSheetGroups.getName());
-								break;		
+					if(enabled)
+					{
+						if (flowSheetGroups.isUniversal())
+						{
+							diagnosed.add(flowSheetGroups.getName());
+						}
+						else
+						{
+							for (int f = 0; f < flowsheets.size(); f++)
+							{
+								String flowsheetName = flowsheets.get(f);
+								if (flowsheetName.equals(flowSheetGroups.getName()))
+								{
+									diagnosed.add(flowSheetGroups.getName());
+								}
+							}
+
+							flowsheetList.add(flowSheetGroups.getName());
+
+							if (displayName.equals(flowSheet)) {
+								try {
+									dxCodeQueryString = flowSheetGroups.getDxTriggersQueryBuilder(demographic_no, providerNo);
+								} catch (Exception e) {
+									MiscUtils.getLogger().error("Error getting DxTriggers - Health Tracker", e);
+								}
+
 							}
 						}
-						
-						flowsheetList.add(flowSheetGroups.getName());
-						
-						if(displayName.equals(flowSheet)){
-							//current flowsheet							
-							try{	
-								dxCodeQueryString=flowSheetGroups.getDxTriggersQueryBuilder(demographic_no,providerNo);	
-							}catch(Exception e){	
-								MiscUtils.getLogger().error("Error getting DxTriggers - Health Tracker",e);	
-							}
-							
-						}						
-											
-					}// if enabled and universal 
-					
+					}
 				}
 
      int idx=0;
