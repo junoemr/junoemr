@@ -26,6 +26,7 @@ package org.oscarehr.common.model;
 import org.oscarehr.common.annotation.SiteLocation;
 import org.oscarehr.common.listeners.BeanValidationEventListener;
 import org.oscarehr.provider.model.ProviderData;
+import oscar.util.ConversionUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -44,6 +45,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -485,5 +487,10 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 		{
 			return null;
 		}
+	}
+
+	public LocalDateTime getStartDateTime()
+	{
+		return ConversionUtils.toLocalDateTime(this.getStartTime());
 	}
 }

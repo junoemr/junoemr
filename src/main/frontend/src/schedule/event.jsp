@@ -166,7 +166,7 @@
 										>
 										</ca-field-select>
 									</div>
-									<div class="col-md-4 lower-content">
+									<div class="col-md-4 top-checkbox-container">
 										<ca-field-boolean
 												ca-form-group-class="vertical-align"
 												ca-name="check-critical"
@@ -175,6 +175,18 @@
 												ca-input-size="col-md-6"
 												ca-model="eventData.critical"
 												ca-template="juno"
+										>
+										</ca-field-boolean>
+										<ca-field-boolean
+														ca-form-group-class="vertical-align"
+														ca-name="check-telehealth"
+														ca-title="Telehealth"
+														ca-label-size="col-md-6"
+														ca-input-size="col-md-6"
+														ca-model="eventData.virtual"
+														ca-template="juno"
+														ca-disabled="telehealthMode === TELEHEALTH_MODES.NONE"
+														title="{{ eventController.getTelehealthToolTip() }}"
 										>
 										</ca-field-boolean>
 									</div>
@@ -468,6 +480,30 @@
 					uib-tooltip="{{eventController.keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 					ng-click="eventController.saveAndPrint()"
 					ng-disabled="isWorking() || eventController.isDoubleBookPrevented || !isPatientSelected()">Print
+			</button>
+
+			<button
+							ng-if="telehealthMode === TELEHEALTH_MODES.ONE_TIME_TELEHEALTH && eventData.virtual && !eventController.editMode"
+							type="button"
+							class="btn btn-primary"
+							tooltip-placement="top"
+							tooltip-append-to-body="true"
+							ng-click="eventController.save(true);"
+							ng-disabled="isWorking() || eventController.isDoubleBookPrevented"
+							title="Create the appointment and send a notification email to the user">
+				Create & Notify
+			</button>
+
+			<button
+							ng-if="eventController.mhaAppointment.appointmentType == 'ONE_TIME_LINK' && eventData.virtual && eventController.editMode"
+							type="button"
+							class="btn btn-default"
+							tooltip-placement="top"
+							tooltip-append-to-body="true"
+							ng-click="eventController.sendOnTimeTelehealthNotification();"
+							title="Send a notification email to the patient containing the one time telehealth link"
+							ng-disabled="eventController.sendingNotificationState !== eventController.SENDING_NOTIFICATION_STATES.NONE">
+				{{ eventController.getSendNotificationText() }}
 			</button>
 
 			<button

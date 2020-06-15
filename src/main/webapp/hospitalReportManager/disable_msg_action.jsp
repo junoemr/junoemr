@@ -12,6 +12,6 @@
 <%@page import="org.oscarehr.hospitalReportManager.SFTPConnector"%>
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-	SFTPConnector.addMeToDoNotSendList(loggedInInfo);
+	// SFTPConnector.addMeToDoNotSendList(loggedInInfo);
 	response.sendRedirect("hospitalReportManager.jsp");
 %>

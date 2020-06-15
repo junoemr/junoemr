@@ -149,7 +149,7 @@ public class DemographicMerged {
     public Integer getHead(Integer demographic_no)  {
     	Integer head = null;
 
-		org.oscarehr.demographic.model.DemographicMerged dm = dao.findCurrentByDemographicNo(demographic_no);
+		org.oscarehr.demographic.model.DemographicMerged dm = dao.getCurrentHead(demographic_no);
 
 		if (dm != null)
 		{

@@ -44,6 +44,8 @@ public class AllergyMapper extends AbstractMapper
 	private static final Logger logger = MiscUtils.getLogger();
 	public static final String MEDIPLAN_ALLERGY_NOTE_ID = "MEDIPLAN ALLERGY SECTION";
 
+	public static final int ALLERGY_DESCRIPTION_LENGTH = 50;
+
 	public AllergyMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
 		super(message, providerRep, importSource);
@@ -100,6 +102,13 @@ public class AllergyMapper extends AbstractMapper
 					logger.warn("Missing allergy description. values set to:" + description);
 				}
 			}
+
+			if (description.length() > ALLERGY_DESCRIPTION_LENGTH)
+			{
+				logger.warn("Description '" + description + "' is too long, truncating to 50 chars");
+				description = StringUtils.left(description, ALLERGY_DESCRIPTION_LENGTH);
+			}
+
 			allergy.setStartDate(getStartDate(rep));
 			allergy.setEntryDate(getStartDate(rep));
 			allergy.setDescription(description);

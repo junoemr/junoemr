@@ -44,6 +44,9 @@ import java.util.regex.Pattern;
 
 public class MedicationMapper extends AbstractMapper
 {
+
+	public static final int MEDICATION_DRUG_NAME_LENGTH = 60;
+
 	enum MEDICATION_FREQUENCY_CODES
 	{
 		BID, 		// Two times daily
@@ -134,7 +137,13 @@ public class MedicationMapper extends AbstractMapper
 		drug.setLongTerm(isLongTerm(rep));
 
 		// import drugs as custom
-		drug.setCustomName(getRequestedGiveCodeText(rep));
+		String drugName = getRequestedGiveCodeText(rep);
+		if (drugName != null && drugName.length() > MEDICATION_DRUG_NAME_LENGTH)
+		{
+			logger.warn("Name of custom drug is too long and will be truncated: '" + drugName + "'");
+			drugName = StringUtils.left(drugName, MEDICATION_DRUG_NAME_LENGTH);
+		}
+		drug.setCustomName(drugName);
 		drug.setCustomInstructions(false);
 
 		drug.setQuantity(String.valueOf(getRequestedDispenseAmount(rep)));

@@ -136,6 +136,12 @@
                                 <label for="clinic.clinicLocationCode">Clinic Location Code</label>
                                 <html:text property="clinic.clinicLocationCode"/>
                             </div>
+                            <oscarprop:oscarPropertiesCheck property="instance_type" value="BC">
+                                <div class="input-field">
+                                    <label for="clinic.bcFacilityNumber" maxlength="5">Clinic Facility Number</label>
+                                    <html:text property="clinic.bcFacilityNumber"/>
+                                </div>
+                            </oscarprop:oscarPropertiesCheck>
                             <div class="input-field">
                                 <label for="clinic.clinicDelimPhone">
                                     Multi Phone -
