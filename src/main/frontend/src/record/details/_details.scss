@@ -1,4 +1,10 @@
 #patient-details-page {
+	@include juno-tab-color-scheme-white;
+
+	#profile-fields {
+		margin-left: 10px;
+	}
+
 	#details-dob-year {
 		width: 65px;
 	}

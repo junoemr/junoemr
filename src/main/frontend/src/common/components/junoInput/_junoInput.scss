@@ -1,0 +1,14 @@
+.juno-input {
+
+	input {
+		flex: 1 1 0;
+
+		&.uppercase {
+			text-transform: uppercase;
+		}
+	}
+
+	label {
+		min-width: 104px;
+	}
+}

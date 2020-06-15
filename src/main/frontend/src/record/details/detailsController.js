@@ -26,6 +26,7 @@
 
 import {INSTANCE_TYPE, SYSTEM_PROPERTIES, BILLING_TYPE} from "../../common/services/systemPreferenceServiceConstants";
 import {SystemPreferenceApi} from "../../../generated";
+import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
 
 angular.module('Record.Details').controller('Record.Details.DetailsController', [
 
@@ -104,6 +105,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.properties = $scope.$parent.recordCtrl.properties;
 		controller.displayMessages = messagesFactory.factory();
 
+		$scope.JUNO_STYLE = JUNO_STYLE;
+		$scope.pageStyle = JUNO_STYLE.GREY;
 
 		controller.init = function init()
 		{
@@ -423,6 +426,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			{
 				controller.page.demo.hcRenewDate = null;
 			}
+
+			// convert demographic date of birth to a moment
+			controller.page.demo.dateOfBirthMoment = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.dobYear,
+					controller.page.demo.dobMonth, controller.page.demo.dobDay);
 
 			phoneNum["C"] = controller.page.demo.scrCellPhone;
 			phoneNum["H"] = controller.page.demo.scrHomePhone;
@@ -1450,7 +1457,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 
 			//validate field inputs
-			controller.page.demo.dateOfBirth = buildDate(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
+			controller.page.demo.dateOfBirth = buildDate(controller.page.demo.dateOfBirthMoment.year(),
+					controller.page.demo.dateOfBirthMoment.month() + 1, controller.page.demo.dateOfBirthMoment.date());
 			if (controller.page.demo.dateOfBirth == null)
 			{
 				alert("Invalid Date of Birth");
@@ -1522,6 +1530,19 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.saving = false;
 			controller.page.dataChanged = false;
 		};
+
+		controller.pageClasses = () =>
+		{
+			if ($scope.pageStyle === JUNO_STYLE.DRACULA)
+			{
+				return ["juno-style-dracula-background"]
+			}
+		}
+
+		controller.setStyle = (style) =>
+		{
+			$scope.pageStyle = style;
+		}
 
 		controller.init(); // Initialize the controller
 	}

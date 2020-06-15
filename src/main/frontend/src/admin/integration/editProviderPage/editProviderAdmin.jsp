@@ -131,7 +131,7 @@
 					<h6>Site Assignment</h6>
 				</panel-header>
 				<panel-body>
-					<div class="flex-row flex-wrap">
+					<div class="flex-row flex-wrap align-items-baseline">
 						<juno-typeahead
 										name="siteSelection"
 										class="flex-grow lg-margin-right"
@@ -140,6 +140,7 @@
 										placeholder="Search..."
 										on-enter-key="$ctrl.addSiteAssignment($ctrl.currentSiteSelection.value)"
 										disabled="$ctrl.fieldsDisabled"
+										raw-output="true"
 						>
 						</juno-typeahead>
 						<button class="btn btn-primary lg-padding-left lg-padding-right add-role-button" title="Add role" ng-click="$ctrl.addSiteAssignment($ctrl.currentSiteSelection.value)">Add</button>
@@ -167,7 +168,7 @@
 					<h6>Access Roles</h6>
 				</panel-header>
 				<panel-body>
-					<div class="flex-row flex-wrap">
+					<div class="flex-row flex-wrap align-items-baseline">
 						<juno-typeahead
 										name="access_roles"
 										class="flex-grow lg-margin-right"
@@ -176,6 +177,7 @@
 										placeholder="Search..."
 										on-enter-key="$ctrl.addUserRole($ctrl.currentRoleSelection.value)"
 										disabled="$ctrl.fieldsDisabled"
+										raw-output="true"
 						>
 						</juno-typeahead>
 						<button class="btn btn-primary lg-padding-left lg-padding-right add-role-button" title="Add role" ng-click="$ctrl.addUserRole($ctrl.currentRoleSelection.value)">Add</button>
@@ -506,7 +508,7 @@
 					</juno-typeahead>
 
 					<!-- BC Billing options -->
-					<div ng-if="$ctrl.billingRegion.value === 'BC'">
+					<div ng-if="$ctrl.billingRegion === 'BC'">
 						<!-- OHIP number -->
 						<ca-field-text
 										ca-name="billingNoBC"
@@ -535,6 +537,7 @@
 										options="$ctrl.bcBillingLocationOptions"
 										placeholder="Search..."
 										disabled="$ctrl.fieldsDisabled"
+										raw-output="true"
 						>
 						</juno-typeahead>
 
@@ -551,7 +554,7 @@
 					</div>
 
 					<!-- ON billing -->
-					<div ng-if="$ctrl.billingRegion.value === 'ON'">
+					<div ng-if="$ctrl.billingRegion === 'ON'">
 						<!-- OHIP number -->
 						<ca-field-text
 										ca-name="billingNoON"
@@ -610,7 +613,7 @@
 					</div>
 
 					<!-- AB billing -->
-					<div ng-if="$ctrl.billingRegion.value === 'AB'">
+					<div ng-if="$ctrl.billingRegion === 'AB'">
 						<!-- OHIP number -->
 						<ca-field-text
 										ca-name="billingNoAB"
@@ -673,7 +676,7 @@
 										model="$ctrl.provider.abFacilityNumber"
 										options="$ctrl.albertaFacilityOptions"
 										placeholder="Search..."
-										typeahead-min-length="3"
+										typeahead-min-length="4"
 										disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-typeahead>
@@ -703,7 +706,7 @@
 
 					</div>
 
-					<div ng-if="$ctrl.billingRegion.value === 'SK'">
+					<div ng-if="$ctrl.billingRegion === 'SK'">
 						<!-- OHIP number -->
 						<ca-field-text
 										ca-name="billingNoSK"
@@ -799,12 +802,12 @@
 				</panel-body>
 			</panel>
 
-			<panel ng-if="$ctrl.billingRegion.value === 'BC'" id="edit-provider-bcp-sites">
+			<panel ng-if="$ctrl.billingRegion === 'BC'" id="edit-provider-bcp-sites">
 				<panel-header>
 					<h6>BCP Sites</h6>
 				</panel-header>
 				<panel-body>
-					<div class="flex-row flex-wrap">
+					<div class="flex-row flex-wrap align-items-center">
 						<juno-typeahead
 										name="bcp-site-selection"
 										class="flex-grow lg-margin-right"
@@ -813,6 +816,7 @@
 										placeholder="Search..."
 										on-enter-key="$ctrl.addBCPSiteAssignment($ctrl.currentBcpSiteSelection.value)"
 										disabled="$ctrl.fieldsDisabled"
+										raw-output="true"
 						>
 						</juno-typeahead>
 						<button class="btn btn-primary lg-padding-left lg-padding-right add-role-button" title="Add role"
@@ -841,7 +845,7 @@
 				</panel-header>
 				<panel-body>
 					<!-- 3rd Party Identifiers -->
-					<div ng-if="$ctrl.billingRegion.value === 'BC'">
+					<div ng-if="$ctrl.billingRegion === 'BC'">
 						<ca-field-text
 										ca-name="ihaProviderMnemonic"
 										ca-title="IHA Provider Mnemonic"
@@ -851,7 +855,7 @@
 						>
 						</ca-field-text>
 					</div>
-					<div ng-if="$ctrl.billingRegion.value === 'ON'">
+					<div ng-if="$ctrl.billingRegion === 'ON'">
 						<ca-field-text
 										ca-name="cpsid"
 										ca-title="CPSID"
@@ -870,7 +874,7 @@
 						</ca-field-text>
 					</div>
 
-					<div ng-if="$ctrl.billingRegion.value === 'AB'">
+					<div ng-if="$ctrl.billingRegion === 'AB'">
 						<ca-field-text
 										ca-name="eDeliveryIds"
 										ca-title="E-Delivery Ids"

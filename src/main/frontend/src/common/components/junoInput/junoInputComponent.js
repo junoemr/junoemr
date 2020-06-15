@@ -21,53 +21,55 @@
 * Canada
 */
 
-import {MhaIntegrationApi} from "../../../../../generated";
-import {MhaPatientApi} from "../../../../../generated/api/MhaPatientApi";
+import {JUNO_STYLE, LABEL_POSITION, labelStyle} from "../junoComponentConstants";
 
-angular.module('Record.Details').component('mhaPatientConnection', {
-	templateUrl: 'src/record/details/components/mhaPatientConnection/mhaPatientConnection.jsp',
+angular.module('Common.Components').component('junoInput', {
+	templateUrl: 'src/common/components/junoInput/junoInput.jsp',
 	bindings: {
-
+		ngModel: "=",
+		ngChange: "&?",
+		type: "<?",
+		label: "@?",
+		labelPosition: "<?",
+		uppercase: "<?",
+		componentStyle: "<?",
 	},
-	controller: [
-		'$scope',
-		'$location',
-		'$window',
-		'$http',
-		'$httpParamSerializer',
-		function ($scope,
-							$location,
-							$window,
-							$http,
-							$httpParamSerializer)
-	{
+	controller: [ "$scope", function ($scope) {
 		let ctrl = this;
 
-		// map of site -> mha patient profile.
-		ctrl.mhaPatientProfiles = {};
-
-		// load api's
-		let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
-				'../ws/rs');
-		let mhaPatientApi = new MhaPatientApi($http, $httpParamSerializer,
-				'../ws/rs');
+		$scope.LABEL_POSITION = LABEL_POSITION;
 
 		ctrl.$onInit = () =>
 		{
-			ctrl.loadMhaPatientProfiles();
+			ctrl.type = ctrl.type || 'text';
+			ctrl.uppercase = ctrl.uppercase || false;
+			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
+			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+		};
+
+		ctrl.componentClasses = () =>
+		{
+			return [ctrl.componentStyle];
 		}
 
-		// ============= public methods =============
-
-		ctrl.getButtonText = () =>
+		ctrl.inputClasses = () =>
 		{
-			return "View or Edit MHA Status";
+			return {
+				uppercase: Boolean(ctrl.uppercase),
+			};
 		}
 
-		// ============ private methods ==============
-
-		ctrl.loadMhaPatientProfiles = async () =>
+		ctrl.labelClasses = () =>
 		{
+			return [ctrl.labelPosition];
+		};
+
+		ctrl.onChange = () =>
+		{
+			if (ctrl.ngChange)
+			{
+				ctrl.ngChange({});
+			}
 		}
 	}]
 });

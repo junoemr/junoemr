@@ -21,27 +21,73 @@
  * Canada
  */
 
+import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
+
 angular.module('Common.Components').component('junoTypeahead',
 {
 	templateUrl: 'src/common/components/junoTypeahead/junoTypeahead.jsp',
 	bindings: {
 		title: '@?',
+		labelPosition: "<?",
 		name: '@',
 		model: '=',
 		options: "<",
 		placeholder: "@?",
 		onEnterKey: '&?',
 		disabled: '<?',
-		typeaheadMinLength: "@?"
+		typeaheadMinLength: "@?",
+		componentStyle: "<?",
+		// output the output of the ubi-typeahead directly, without translation
+		rawOutput: "<?"
 	},
 	controller: ['$scope', function ($scope)
 	{
 		let ctrl = this;
+		$scope.LABEL_POSITION = LABEL_POSITION;
+
+		ctrl.selectedValue = null;
+
+		let lastModel = null;
 
 		ctrl.$onInit = function()
 		{
 			ctrl.typeaheadMinLength = ctrl.typeaheadMinLength ? ctrl.typeaheadMinLength : 1;
+			ctrl.rawOutput = ctrl.rawOutput || false;
+			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.TOP;
+			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 		};
+
+		ctrl.$doCheck = () =>
+		{
+			if (ctrl.model && ctrl.options && ctrl.options.length >= 1 && !ctrl.rawOutput)
+			{
+				if (lastModel !== ctrl.model)
+				{
+					lastModel = ctrl.model;
+					ctrl.selectedValue = Juno.Common.Util.typeaheadValueLookup(ctrl.model, ctrl.options);
+				}
+			}
+			else if (ctrl.model && ctrl.options && ctrl.options.length >= 1)
+			{
+				if (lastModel !== ctrl.model)
+				{
+					lastModel = ctrl.model;
+					ctrl.selectedValue = ctrl.model;
+				}
+			}
+		}
+
+		ctrl.onSelect = () =>
+		{
+			if (ctrl.rawOutput)
+			{
+				ctrl.model = ctrl.selectedValue;
+			}
+			else
+			{
+				ctrl.model = ctrl.selectedValue.value;
+			}
+		}
 
 		ctrl.onKeyPress = function (event)
 		{
@@ -49,9 +95,19 @@ angular.module('Common.Components').component('junoTypeahead',
 			{// Enter key
 				if (ctrl.onEnterKey)
 				{
-					ctrl.onEnterKey({})
+					ctrl.onEnterKey({});
 				}
 			}
+		}
+
+		ctrl.labelClasses = () =>
+		{
+			return [ctrl.labelPosition];
+		};
+
+		ctrl.componentClasses = () =>
+		{
+			return [ctrl.componentStyle];
 		}
 
 	}]

@@ -28,11 +28,11 @@
 <div class="col-lg-12" ng-show="detailsCtrl.page.canRead === false">
 	<bean:message key="demographic.demographiceditdemographic.accessDenied"/>
 </div>
-<div class="col-xs-12" ng-show="detailsCtrl.page.canRead === true" id="patient-details-page">
+<div class="col-xs-12" ng-show="detailsCtrl.page.canRead === true" id="patient-details-page" ng-class="detailsCtrl.pageClasses()">
 	<div class="row">
 			<div class="col-md-10 col-lg-8">
 				<div class="row">
-					<div class="col-md-7 pull-left">
+					<div class="col-md-8 pull-left">
 						<div class="btn-group sub-nav">
 							<div class="btn-group">
 								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -116,6 +116,21 @@
 							        ng-click="detailsCtrl.openSwipecardModal()">
 								Swipe Health Card</button>
 						</div>
+						<button class="btn"
+										ng-class="{'btn-primary': pageStyle === JUNO_STYLE.DEFAULT}"
+										ng-click="detailsCtrl.setStyle(JUNO_STYLE.DEFAULT)">
+							Style Default
+						</button>
+						<button class="btn"
+										ng-class="{'btn-primary': pageStyle === JUNO_STYLE.GREY}"
+										ng-click="detailsCtrl.setStyle(JUNO_STYLE.GREY)">
+							Style Grey
+						</button>
+						<button class="btn"
+										ng-class="{'btn-primary': pageStyle === JUNO_STYLE.DRACULA}"
+										ng-click="detailsCtrl.setStyle(JUNO_STYLE.DRACULA)">
+							Style Dracula
+						</button>
 					</div>
 					<div class=" col-sm-2 col-xs-12 pull-right">
 						<button id="save-button-top"
@@ -126,16 +141,16 @@
 							Save
 						</button>
 					</div>
-					<div class=" col-sm-2 col-xs-12 pull-right">
-						<mha-patient-connection></mha-patient-connection>
-					</div>
 				</div>
 			</div>
 	</div>
-	<div class="row">
+	<div id="profile-fields" class="row">
 		<div class="col-md-10 col-lg-8 ">
 			<div id="pd1" ng-click="detailsCtrl.checkAction($event)" ng-keypress="detailsCtrl.checkAction($event)">
-				
+
+			<demographic-section ng-model="detailsCtrl.page.demo" component-style="pageStyle"></demographic-section>
+			<hr class="form-divider">
+
 			<div class="form-horizontal">
 				<div class="row">
 					<div class="col-md-12">
@@ -145,13 +160,13 @@
 				
 				<div class="form-group">
 					<label class="col-md-2 control-label required" title="Required Field">
-						<bean:message key="demographic.demographiceditdemographic.formLastName"/> 
+						<bean:message key="demographic.demographiceditdemographic.formLastName"/>
 					</label>
 					<div class="col-md-4"
 					     ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['lastName']}">
-						<input type="text" class="form-control form-control-details" 
-							placeholder="Family Name" title="Family Name" 
-							ng-model="detailsCtrl.page.demo.lastName" 
+						<input type="text" class="form-control form-control-details"
+							placeholder="Family Name" title="Family Name"
+							ng-model="detailsCtrl.page.demo.lastName"
 							ng-change="detailsCtrl.formatLastName()"
 						/>
 					</div>
@@ -264,6 +279,13 @@
 							<option value="Yes">Yes</option>
 							<option value="No">No</option>
 						</select>
+					</div>
+
+					<label class="col-md-2 control-label">
+							Connection Status
+					</label>
+					<div class="col-md-4">
+						<mha-patient-connection></mha-patient-connection>
 					</div>
 
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.alias"/></label>
@@ -923,16 +945,6 @@
 					ng-click="detailsCtrl.launchPhoto()" 
 					ng-src="../imageRenderingServlet?source=local_client&clientId={{detailsCtrl.page.demo.demographicNo}}"
 				/>
-				<%--Remove this?--%>
-				<%--<div class="pull-left" style="margin-left:5px;">
-					<address>
-						<strong>{{page.demo.lastName}}, {{page.demo.firstName}}</strong><br/>
-						{{page.demo.address.address}}<br/>
-						{{page.demo.address.city}}, {{page.demo.address.province}} {{page.demo.address.postal}}<br/>
-						<abbr title="Phone" ng-show="page.preferredPhoneNumber"><bean:message key="web.record.details.phoneShortHand"/></abbr> {{page.preferredPhoneNumber}}
-					</address>
-					<a ng-click="macPHRDo('Verification')" ng-show="page.macPHRIdsSet"><bean:message key="global.phr"/>{{page.macPHRVerificationLevel}}</a>
-				</div>--%>
 			</div>
 			<br/>
 			<div>

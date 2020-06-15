@@ -331,7 +331,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			systemPreferenceApi.getPropertyValue("billing_type", "BC").then(
 					function success(result)
 					{
-						ctrl.billingRegion = {label: result.data.body, value: result.data.body};
+						ctrl.billingRegion = result.data.body;
 					},
 					function error(result)
 					{
@@ -345,20 +345,19 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			{
 				if (newVal)
 				{
-					if (newVal.value === "AB")
+					if (newVal === "AB")
 					{
 						await ctrl.loadAlbertaBillingData();
 					}
-					else if (newVal.value === "BC")
+					else if (newVal === "BC")
 					{
 						await ctrl.loadBCBillingData();
 					}
-					else if (newVal.value === "ON")
+					else if (newVal === "ON")
 					{
 						await ctrl.loadOntarioBillingData();
 					}
 				}
-				ctrl.mapTypeaheadValues();
 			});
 
 
@@ -637,7 +636,6 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					function success(result)
 					{
 						ctrl.provider = result.body;
-						ctrl.mapTypeaheadValues();
 						ctrl.setupSecurityRecords();
 						ctrl.setupFormValidations();
 						ctrl.updateBCPSiteList();
@@ -650,28 +648,6 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 						ctrl.loadingError = true;
 					}
 			);
-		};
-
-		// map typeahead values to labels. because typeahead does not auto fill label.
-		ctrl.mapTypeaheadValues = function()
-		{
-			// map bc service location.
-			ctrl.provider.bcServiceLocation = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.bcServiceLocation, ctrl.bcServiceLocationOptions);
-
-			// map on visit location
-			ctrl.provider.onVisitLocation = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.onVisitLocation, ctrl.onVisitLocationOptions);
-
-			// map ab billing fields
-			// skill code
-			ctrl.provider.abSkillCode = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.abSkillCode, ctrl.skillCodeOptions);
-			// location code
-			ctrl.provider.abLocationCode = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.abLocationCode, ctrl.locationCodeOptions);
-			// facility number
-			ctrl.provider.abFacilityNumber = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.abFacilityNumber, ctrl.albertaFacilityOptions);
-			// functional centers
-			ctrl.provider.abFunctionalCenter = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.abFunctionalCenter, ctrl.albertaFunctionalCenterOptions);
-			// time role modifier
-			ctrl.provider.abRoleModifier = Juno.Common.Util.typeaheadValueLookup(ctrl.provider.abRoleModifier, ctrl.albertaDefaultTimeRoleOptions);
 		};
 
 		ctrl.setupSecurityRecords = function ()
@@ -810,39 +786,6 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			// copy provider obj
 			let newProvider = {};
 			Object.assign(newProvider, providerObj);
-
-			//translate fields
-			// BC Billing
-			if (providerObj.bcServiceLocation)
-			{
-				newProvider.bcServiceLocation = providerObj.bcServiceLocation.value;
-			}
-			// ON Billing
-			if (providerObj.onVisitLocation)
-			{
-				newProvider.onVisitLocation = providerObj.onVisitLocation.value;
-			}
-			// AB Billing
-			if(providerObj.abSkillCode)
-			{
-				newProvider.abSkillCode = providerObj.abSkillCode.value;
-			}
-			if(providerObj.abLocationCode)
-			{
-				newProvider.abLocationCode = providerObj.abLocationCode.value;
-			}
-			if (providerObj.abFacilityNumber)
-			{
-				newProvider.abFacilityNumber = providerObj.abFacilityNumber.value;
-			}
-			if (providerObj.abFunctionalCenter)
-			{
-				newProvider.abFunctionalCenter = providerObj.abFunctionalCenter.value;
-			}
-			if (providerObj.abRoleModifier)
-			{
-				newProvider.abRoleModifier = providerObj.abRoleModifier.value;
-			}
 
 			return newProvider;
 		};

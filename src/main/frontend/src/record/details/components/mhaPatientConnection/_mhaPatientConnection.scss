@@ -1,3 +1,12 @@
 .mha-patient-connection {
+	.btn {
+		border-radius: 8px;
+		display: flex;
+		align-items: center;
 
+		.icon {
+			flex: 1 1 100%;
+			font-size: 16px;
+		}
+	}
 }

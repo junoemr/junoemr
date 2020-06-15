@@ -21,53 +21,35 @@
 * Canada
 */
 
-import {MhaIntegrationApi} from "../../../../../generated";
-import {MhaPatientApi} from "../../../../../generated/api/MhaPatientApi";
+import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
 
-angular.module('Record.Details').component('mhaPatientConnection', {
-	templateUrl: 'src/record/details/components/mhaPatientConnection/mhaPatientConnection.jsp',
+angular.module('Common.Components').component('junoSelect', {
+	templateUrl: 'src/common/components/junoSelect/junoSelect.jsp',
 	bindings: {
-
+		ngModel: "=",
+		options: "<",
+		placeholder: "@?",
+		label: "@?",
+		labelPosition: "<?",
+		componentStyle: "<?",
 	},
-	controller: [
-		'$scope',
-		'$location',
-		'$window',
-		'$http',
-		'$httpParamSerializer',
-		function ($scope,
-							$location,
-							$window,
-							$http,
-							$httpParamSerializer)
-	{
+	controller: [ function () {
 		let ctrl = this;
-
-		// map of site -> mha patient profile.
-		ctrl.mhaPatientProfiles = {};
-
-		// load api's
-		let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
-				'../ws/rs');
-		let mhaPatientApi = new MhaPatientApi($http, $httpParamSerializer,
-				'../ws/rs');
 
 		ctrl.$onInit = () =>
 		{
-			ctrl.loadMhaPatientProfiles();
-		}
+			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
+			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+		};
 
-		// ============= public methods =============
-
-		ctrl.getButtonText = () =>
+		ctrl.labelClasses = () =>
 		{
-			return "View or Edit MHA Status";
-		}
+			return [ctrl.labelPosition];
+		};
 
-		// ============ private methods ==============
-
-		ctrl.loadMhaPatientProfiles = async () =>
+		ctrl.componentClasses = () =>
 		{
+			return [ctrl.componentStyle];
 		}
 	}]
 });

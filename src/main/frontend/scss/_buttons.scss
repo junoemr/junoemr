@@ -23,6 +23,9 @@
 	-ms-user-select: none;
 	user-select: none;
 	box-shadow: 0 2px 2px rgba($color-neutral-black, 0.1);
+	&:focus,&:active {
+		outline: none !important;
+	}
 	&.btn-sm {
 		padding: 5px 10px;
 		line-height: 1.5;
@@ -43,7 +46,7 @@
 		@include juno-button-colour-scheme($color-primary-base, $color-neutral-white, $color-neutral-light);
 	}
 	&.btn-primary {
-		@include juno-button-colour-scheme($color-neutral-white, $color-primary-base, $color-primary-dark);
+		@include juno-button-colour-scheme($color-neutral-white, $color-primary-base, $color-primary-base);
 	}
 	&.btn-primary-inverted {
 		@include juno-button-colour-scheme($color-primary-base, $color-neutral-white, $color-neutral-white);

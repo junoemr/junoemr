@@ -20,17 +20,21 @@
  * Victoria, British Columbia
  * Canada
 --%>
-<div class="juno-typeahead form-group">
-	<label ng-if="$ctrl.title" for="name-{{$ctrl.name}}">
+<div class="juno-typeahead form-group" ng-class="$ctrl.componentClasses()">
+	<label ng-if="$ctrl.title"
+					ng-class="$ctrl.labelClasses()"
+					for="name-{{$ctrl.name}}"
+	>
 		{{$ctrl.title}}
 	</label>
 	<input
 					id="name-{{$ctrl.name}}"
-					class="form-control"
 					type="text"
-					ng-model="$ctrl.model"
+					autocomplete="off"
+					ng-model="$ctrl.selectedValue"
 					uib-typeahead="option as option.label for option in $ctrl.options | filter:$viewValue"
 					typeahead-select-on-exact="true"
+					typeahead-on-select="$ctrl.onSelect()"
 					typeahead-min-length="$ctrl.typeaheadMinLength"
 					ng-keypress="$ctrl.onKeyPress($event)"
 					placeholder="{{$ctrl.placeholder}}"
