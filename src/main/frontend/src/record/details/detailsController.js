@@ -431,6 +431,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.demo.dateOfBirthMoment = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.dobYear,
 					controller.page.demo.dobMonth, controller.page.demo.dobDay);
 
+			// oscar stores no country of origin as "-1" because why not.
+			if (controller.page.demo.countryOfOrigin === "-1")
+			{
+				controller.page.demo.countryOfOrigin = null;
+			}
+
 			phoneNum["C"] = controller.page.demo.scrCellPhone;
 			phoneNum["H"] = controller.page.demo.scrHomePhone;
 			phoneNum["W"] = controller.page.demo.scrWorkPhone;
@@ -1509,8 +1515,18 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			newDemoExtras = updateDemoExtras("rxInteractionWarningLevel", controller.page.demo.scrRxInteractionLevel, posExtras, controller.page.demo.extras, newDemoExtras);
 			controller.page.demo.extras = newDemoExtras;
 
+			// clone the demographic, so that final modifications can be made before save.
+			let demographicForSave = {};
+			Object.assign(demographicForSave, controller.page.demo)
+
+			// convert null back to "-1"
+			if (!demographicForSave.countryOfOrigin)
+			{
+				demographicForSave.countryOfOrigin = "-1";
+			}
+
 			//save to database
-			demographicService.updateDemographic(controller.page.demo).then(
+			demographicService.updateDemographic(demographicForSave).then(
 				function success()
 				{
 					controller.resetEditState();

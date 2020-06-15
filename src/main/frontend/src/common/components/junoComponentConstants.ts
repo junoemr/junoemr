@@ -35,3 +35,10 @@ export enum JUNO_STYLE
 	GREY = "juno-style-grey",
 	DRACULA = "juno-style-dracula",
 }
+
+export enum JUNO_BUTTON_COLOR
+{
+	PRIMARY = "btn-primary",
+	SECONDARY = "btn-secondary",
+	BASE = "btn-base",
+}

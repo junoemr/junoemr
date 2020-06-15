@@ -21,33 +21,31 @@
 * Canada
 */
 
-import {JUNO_STYLE, LABEL_POSITION, labelStyle} from "../junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
 
-angular.module('Common.Components').component('junoInput', {
-	templateUrl: 'src/common/components/junoInput/junoInput.jsp',
+angular.module('Common.Components').component('junoButton', {
+	templateUrl: 'src/common/components/junoButton/junoButton.jsp',
 	bindings: {
 		ngModel: "=",
-		ngChange: "&?",
-		type: "<?",
 		label: "@?",
 		labelPosition: "<?",
-		placeholder: "@?",
-		uppercase: "<?",
-		readonly: "<?",
 		componentStyle: "<?",
+		buttonColor: "<?"
 	},
-	controller: [ "$scope", function ($scope) {
+	transclude: true,
+	controller: [ function () {
 		let ctrl = this;
-
-		$scope.LABEL_POSITION = LABEL_POSITION;
 
 		ctrl.$onInit = () =>
 		{
-			ctrl.type = ctrl.type || 'text';
-			ctrl.uppercase = ctrl.uppercase || false;
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-			ctrl.readonly = ctrl.readonly || false;
+			ctrl.buttonColor = ctrl.buttonColor || JUNO_BUTTON_COLOR.PRIMARY;
+		};
+
+		ctrl.labelClasses = () =>
+		{
+			return [ctrl.labelPosition];
 		};
 
 		ctrl.componentClasses = () =>
@@ -55,24 +53,9 @@ angular.module('Common.Components').component('junoInput', {
 			return [ctrl.componentStyle];
 		}
 
-		ctrl.inputClasses = () =>
+		ctrl.buttonClasses = () =>
 		{
-			return {
-				uppercase: Boolean(ctrl.uppercase),
-			};
-		}
-
-		ctrl.labelClasses = () =>
-		{
-			return [ctrl.labelPosition];
-		};
-
-		ctrl.onChange = () =>
-		{
-			if (ctrl.ngChange)
-			{
-				ctrl.ngChange({});
-			}
+			return [ctrl.buttonColor];
 		}
 	}]
 });

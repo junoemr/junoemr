@@ -23,11 +23,12 @@
 
 import {MhaIntegrationApi} from "../../../../../generated";
 import {MhaPatientApi} from "../../../../../generated/api/MhaPatientApi";
+import {JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
 
 angular.module('Record.Details').component('mhaPatientConnection', {
 	templateUrl: 'src/record/details/components/mhaPatientConnection/mhaPatientConnection.jsp',
 	bindings: {
-
+		componentStyle: "<?"
 	},
 	controller: [
 		'$scope',
@@ -54,6 +55,8 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.$onInit = () =>
 		{
+			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+
 			ctrl.loadMhaPatientProfiles();
 		}
 

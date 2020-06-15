@@ -38,6 +38,12 @@ angular.module('Record.Details').component('demographicSection', {
 			ctrl.languages =  staticDataService.getEngFre();
 			ctrl.titles = staticDataService.getTitles();
 			ctrl.titles.push({"label": "--", "value": ''})
+			ctrl.aboriginalStatuses = [
+				{label: "Yes", value: "Yes"},
+				{label: "No", value: "No"},
+				{label: "Select Aboriginal status", value: ""}
+			]
+			ctrl.countries = staticDataService.getCountries();
 
 			$scope.LABEL_POSITION = LABEL_POSITION;
 

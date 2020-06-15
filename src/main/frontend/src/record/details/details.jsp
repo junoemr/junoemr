@@ -281,13 +281,6 @@
 						</select>
 					</div>
 
-					<label class="col-md-2 control-label">
-							Connection Status
-					</label>
-					<div class="col-md-4">
-						<mha-patient-connection></mha-patient-connection>
-					</div>
-
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.alias"/></label>
 					<div class="col-md-4">
 						<input type="text" class="form-control form-control-details" 

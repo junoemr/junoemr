@@ -30,17 +30,26 @@
 			}
 		}
 	}
+
+	button {
+		height: 32px;
+		box-shadow: none;
+		border-radius: 4px;
+		padding: 0 4px 0 4px;
+	}
 }
 
 .juno-style-default {
 	@include styleCommon;
+
+	@include juno-tab-color-scheme-white;
 
 	input,select {
 		@include juno-font-body-smallest;
 
 		border-radius: 4px;
 		border: solid 1px $color-neutral-light;
-		background-color: white;
+		background-color: $color-neutral-white;
 		color: $color-neutral-darker;
 
 		&:focus, &:active {
@@ -54,12 +63,33 @@
 				border-color: $color-neutral-light;
 			}
 		}
+	}
 
+	button {
+		&.btn-primary {
+			border: 1px solid $color-primary-base;
+			background-color: $color-primary-base;
+			color: $color-neutral-white;
+		}
+
+		&.btn-secondary {
+			border: 1px solid $color-primary-light;
+			background-color: $color-primary-light;
+			color: $color-neutral-white;
+		}
+
+		&.btn-base {
+			border: 1px solid $color-neutral-lighter-grey;
+			background-color: $color-neutral-white;
+			color: $color-neutral-darker;
+		}
 	}
 }
 
 .juno-style-grey {
 	@include styleCommon;
+
+	@include juno-tab-color-scheme-white;
 
 	input,select {
 		@include juno-font-body-smallest;
@@ -81,10 +111,36 @@
 			}
 		}
 	}
+
+	button {
+		height: 32px;
+		box-shadow: none;
+		border-radius: 8px;
+
+		&.btn-primary {
+			border: 1px solid $color-primary-base;
+			background-color: $color-primary-base;
+			color: $color-neutral-white;
+		}
+
+		&.btn-secondary {
+			border: 1px solid $color-cyan-base;
+			background-color: $color-cyan-base;
+			color: $color-neutral-white;
+		}
+
+		&.btn-base {
+			border: 1px solid $color-neutral-lighter-grey;
+			background-color: $color-neutral-lightest;
+			color: $color-neutral-darker;
+		}
+	}
 }
 
 .juno-style-dracula {
 	@include styleCommon;
+
+	@include juno-tab-color-scheme-dark;
 
 	color: $color-neutral-white;
 
@@ -106,6 +162,27 @@
 			&:active {
 				border-color: $color-neutral-darker;
 			}
+		}
+	}
+
+	button {
+		border-radius: 8px;
+		&.btn-primary {
+			border: 1px solid $color-primary-base;
+			background-color: $color-primary-base;
+			color: $color-neutral-white;
+		}
+
+		&.btn-secondary {
+			border: 1px solid $color-primary-light;
+			background-color: $color-primary-light;
+			color: $color-neutral-white;
+		}
+
+		&.btn-base {
+			border: 1px solid $color-neutral-dark;
+			background-color: $color-neutral-darkest;
+			color: $color-neutral-white;
 		}
 	}
 }

@@ -30,6 +30,21 @@
 			.juno-typeahead {
 				width: $field-width;
 			}
+
+			.connected-sites {
+				display: flex;
+				.juno-input {
+					width: calc(#{$field-width} - 36px)
+				}
+				.juno-button {
+					width: 32px;
+					margin-left: 4px;
+
+					.icon {
+						font-size: 20px;
+					}
+				}
+			}
 		}
 	}
 }
