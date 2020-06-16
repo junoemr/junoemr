@@ -4,7 +4,9 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.*;
+import junit.framework.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -55,11 +57,11 @@ public class AddPatientsTests extends SeleniumTestBase {
 	private static final String motherName = "Mom TestLastName";
 	private static final String fatherName = "Dad TestLastName";
 	private static final String referralDoctor = "Dr Referral";
-	private static final String referralDoctorNo = "250-250-2500";
-	private static final String roasterStatus = "RO";
-	private static final String roasteredYear = "2018";
-	private static final String roasteredMonth = "08";
-	private static final String roasteredDate = "08";
+	private static final String referralDoctorNo = "111111111";
+	private static final String rosterStatus = "RO";
+	private static final String rosteredYear = "2018";
+	private static final String rosteredMonth = "08";
+	private static final String rosteredDate = "08";
 	private static final String patientStatus = "AC";
 	private static final String chartNo = "10001";
 
@@ -70,6 +72,7 @@ public class AddPatientsTests extends SeleniumTestBase {
 		String lastHandle = allHandles.iterator().next();
 		driver.switchTo().window(lastHandle);
 	}
+
 	public static void dropdownSelectByValue(By dropdown, String dropdownSelection)
 	{
 		Select langOfficial = new Select(driver.findElement(dropdown));
@@ -85,17 +88,10 @@ public class AddPatientsTests extends SeleniumTestBase {
 	public static boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException {
 		driver.findElement(searchPage).click();
 		WebElement searchTermField = driver.findElement(searchTerm);
-		searchTermField.sendKeys(lastName+", "+firstName);
+		searchTermField.sendKeys(lastName + ", " + firstName);
 		searchTermField.sendKeys(Keys.ENTER);
 		Thread.sleep(1000);
-		if (PageUtil.isExistsBy(nameRow, driver))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return PageUtil.isExistsBy(nameRow, driver);
 	}
 
 	@BeforeClass
@@ -167,10 +163,10 @@ public class AddPatientsTests extends SeleniumTestBase {
 		dropdownSelectByIndex(By.xpath("//select[@name='cust2']"), 0);
 		driver.findElement(By.xpath("//input[@name='referral_doctor_name']")).sendKeys(referralDoctor);
 		driver.findElement(By.xpath("//input[@name='referral_doctor_no']")).sendKeys(referralDoctorNo);
-		dropdownSelectByValue(By.id("roster_status"), roasterStatus);
-		driver.findElement(By.xpath("//input[@name='roster_date_year']")).sendKeys(roasteredYear);
-		driver.findElement(By.xpath("//input[@name='roster_date_month']")).sendKeys(roasteredMonth);
-		driver.findElement(By.xpath("//input[@name='roster_date_date']")).sendKeys(roasteredDate);
+		dropdownSelectByValue(By.id("roster_status"), rosterStatus);
+		driver.findElement(By.xpath("//input[@name='roster_date_year']")).sendKeys(rosteredYear);
+		driver.findElement(By.xpath("//input[@name='roster_date_month']")).sendKeys(rosteredMonth);
+		driver.findElement(By.xpath("//input[@name='roster_date_date']")).sendKeys(rosteredDate);
 		dropdownSelectByValue(By.id("patient_status"), patientStatus);
 		driver.findElement(By.id("chart_no")).sendKeys(chartNo);
 		dropdownSelectByIndex(By.id("name_list_id"), 0);
