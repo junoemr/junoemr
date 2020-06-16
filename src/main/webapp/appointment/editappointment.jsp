@@ -1395,7 +1395,10 @@
 	<script type="text/javascript">
 		var loc = document.forms['EDITAPPT'].location;
 		if (loc.nodeName.toUpperCase() === 'SELECT') loc.style.backgroundColor = loc.options[loc.selectedIndex].style.backgroundColor;
-
+		<%
+			Demographic demographic = demographicManager.getDemographic(loggedInInfo, demono);
+		%>
+		var demographicEmail = '<%=StringUtils.trimToEmpty(demographic.getEmail())%>';
 		var mhaAppointment = null;
 
 		function updateTelehealthControls()
@@ -1405,10 +1408,11 @@
 					"<%=request.getParameter("appointment_no")%>").then((res) =>
 			{
 				var appt = JSON.parse(res).body;
-				if (appt)
+				mhaAppointment = appt;
+
+				if (appt != null || demographicEmail !== '')
 				{
 					jQuery("#send-telehealth-link-btn").css("display", "inherit");
-					mhaAppointment = appt;
 				}
 			}).catch((error) =>
 			{
@@ -1450,11 +1454,25 @@
 						{
 							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
 							window.setTimeout(() => {
-								jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0")
+								jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
 							}, 3000);
 						}).catch((err) =>
 						{
-							jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0")
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
+						});
+					}
+					else
+					{// non mha appt
+						myhealthaccess.sendGeneralAppointmentNotification("<%=request.getContextPath()%>",
+								jQuery(document.forms.EDITAPPT.location).val(), "<%=request.getParameter("appointment_no")%>").then(() =>
+						{
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
+							window.setTimeout(() => {
+								jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
+							}, 3000);
+						}).catch((err) =>
+						{
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
 						});
 					}
 				});

@@ -25,7 +25,10 @@ package org.oscarehr.appointment.service;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
+import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.schedule.dto.AppointmentDetails;
@@ -62,6 +65,9 @@ public class Appointment
 
 	@Autowired
 	PatientService patientService;
+
+	@Autowired
+	ClinicService clinicService;
 
 	@Autowired
 	MyHealthAccessService myHealthAccessService;
@@ -116,10 +122,23 @@ public class Appointment
 	 * @param appointment - the appointment to save
 	 * @param loggedInInfo - logged in info.
 	 */
-	public void saveNewAppointment(org.oscarehr.common.model.Appointment appointment,
-								 	LoggedInInfo loggedInInfo, HttpServletRequest request)
+	public org.oscarehr.common.model.Appointment saveNewAppointment(org.oscarehr.common.model.Appointment appointment,
+																																	LoggedInInfo loggedInInfo, HttpServletRequest request,
+																																	boolean sendNotification)
 	{
 		oscarAppointmentDao.persist(appointment);
+
+		if (sendNotification)
+		{// send MHA based appointment notification
+			Integration integration = integrationService.findMhaIntegration(appointment);
+			if (integration != null)
+			{
+				ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
+						loggedInInfo.getLoggedInSecurity().getSecurityNo());
+				appointmentService.sendGeneralAppointmentNotification(integration, loginTokenTo1.getToken(),
+						appointment.getId());
+			}
+		}
 
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
 						appointment.getDemographicNo(),
@@ -128,6 +147,8 @@ public class Appointment
 						LogConst.STATUS_SUCCESS,
 						String.valueOf(appointment.getId()),
 						request.getRemoteAddr());
+
+		return appointment;
 	}
 
 	/**
@@ -136,8 +157,8 @@ public class Appointment
 	 * @param loggedInInfo - logged in info.
 	 * @param sendNotification - Whether to send notification of appointment booking to user or not.
 	 */
-	public void saveNewTelehealthAppointment(org.oscarehr.common.model.Appointment appointment,
-								   LoggedInInfo loggedInInfo, HttpServletRequest request, boolean sendNotification)
+	public org.oscarehr.common.model.Appointment saveNewTelehealthAppointment(org.oscarehr.common.model.Appointment appointment,
+																																						LoggedInInfo loggedInInfo, HttpServletRequest request, boolean sendNotification)
 	{
 		if (!appointment.getIsVirtual())
 		{
@@ -169,6 +190,8 @@ public class Appointment
 				LogConst.STATUS_SUCCESS,
 				String.valueOf(appointment.getId()),
 				request.getRemoteAddr());
+
+		return appointment;
 	}
 
 	/**
