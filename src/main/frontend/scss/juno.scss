@@ -35,9 +35,11 @@
 @import "../src/common/components/modal";
 @import "../src/common/components/junoAlert/junoAlert";
 @import "../src/common/components/junoButton/junoButton";
+@import "../src/common/components/junoCheckBox/junoCheckBox";
 @import "../src/common/components/junoInput/junoInput";
 @import "../src/common/components/junoSelect/junoSelect";
 @import "../src/common/components/junoDateSelect/junoDateSelect";
+@import "../src/common/components/junoDivider/junoDivider";
 @import "../src/common/components/junoComponentStyles";
 @import "../src/common/components/zeroStateDisplay";
 @import "../src/common/components/accordionList/accordionList";
@@ -59,7 +61,9 @@
 @import "../src/record/details/details";
 @import "../src/record/details/swipecard";
 @import "../src/record/details/components/mhaPatientConnection/mhaPatientConnection";
+@import "../src/record/details/components/sectionCommon";
 @import "../src/record/details/components/demographicSection/demographicSection";
+@import "../src/record/details/components/contactSection/contactSection";
 @import "../src/record/summary/summary";
 @import "../src/record/summary/summaryModule";
 @import "../src/record/summary/encounterNoteList";

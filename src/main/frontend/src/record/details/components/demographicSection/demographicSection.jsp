@@ -1,4 +1,4 @@
-<div class="demographic-details-demographic-section">
+<div class="demographic-details-section demographic-section">
 	<h4 class="title">
 		Demographic
 	</h4>

@@ -1,0 +1,38 @@
+.demographic-details-section.contact-section{
+	.fields {
+		.column {
+			.mobile-phone {
+				display: flex;
+				align-items: center;
+
+				.juno-input {
+					width: 376px;
+				}
+				.juno-check-box {
+					margin-left: 8px;
+				}
+			}
+
+			.phone-with-ext {
+				display: flex;
+				align-items: center;
+
+				.juno-input {
+					width: 248px;
+				}
+				.phone-ext {
+					.juno-input {
+						width: 128px;
+
+						label {
+							min-width: 32px;
+						}
+					}
+				}
+				.juno-check-box {
+					margin-left: 8px;
+				}
+			}
+		}
+	}
+}

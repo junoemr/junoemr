@@ -21,48 +21,41 @@
 * Canada
 */
 
-import {JUNO_STYLE, LABEL_POSITION, labelStyle} from "../junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
 
-angular.module('Common.Components').component('junoInput', {
-	templateUrl: 'src/common/components/junoInput/junoInput.jsp',
+angular.module('Common.Components').component('junoCheckBox', {
+	templateUrl: 'src/common/components/junoCheckBox/junoCheckBox.jsp',
 	bindings: {
 		ngModel: "=",
-		ngChange: "&?",
-		type: "@?",
+		title: "@?",
 		label: "@?",
 		labelPosition: "<?",
-		placeholder: "@?",
-		uppercase: "<?",
-		readonly: "<?",
-		validRegex: "<?",
 		componentStyle: "<?",
+		buttonColor: "<?",
+		//alternate value returned when checkbox is true
+		trueValue: "<?",
 	},
-	controller: [ "$scope", function ($scope) {
+	controller: [ function () {
 		let ctrl = this;
-
-		$scope.LABEL_POSITION = LABEL_POSITION;
-		ctrl.oldNgModel = null;
 
 		ctrl.$onInit = () =>
 		{
-			ctrl.type = ctrl.type || 'text';
-			ctrl.uppercase = ctrl.uppercase || false;
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-			ctrl.readonly = ctrl.readonly || false;
-			ctrl.oldNgModel = ctrl.ngModel;
+			ctrl.buttonColor = ctrl.buttonColor || JUNO_BUTTON_COLOR.PRIMARY;
+			ctrl.trueValue = ctrl.trueValue || true;
 		};
 
-		ctrl.componentClasses = () =>
+		ctrl.onClick = () =>
 		{
-			return [ctrl.componentStyle];
-		}
-
-		ctrl.inputClasses = () =>
-		{
-			return {
-				uppercase: Boolean(ctrl.uppercase),
-			};
+			if (ctrl.ngModel === ctrl.trueValue)
+			{
+				ctrl.ngModel = false;
+			}
+			else
+			{
+				ctrl.ngModel = ctrl.trueValue;
+			}
 		}
 
 		ctrl.labelClasses = () =>
@@ -70,24 +63,22 @@ angular.module('Common.Components').component('junoInput', {
 			return [ctrl.labelPosition];
 		};
 
-		ctrl.onChange = () =>
+		ctrl.buttonClasses = () =>
 		{
-			if (ctrl.ngModel && ctrl.validRegex)
-			{
-				if (!ctrl.validRegex.test(ctrl.ngModel))
-				{
-					// reset to old value
-					ctrl.ngModel = ctrl.oldNgModel;
-				}
-			}
+			return [
+					ctrl.buttonColor,
+					ctrl.ngModel === ctrl.trueValue ? "checked" : "un-checked",
+			];
+		}
 
-			// update the old value
-			ctrl.oldNgModel = ctrl.ngModel;
+		ctrl.componentClasses = () =>
+		{
+			return [ctrl.componentStyle];
+		}
 
-			if (ctrl.ngChange)
-			{
-				ctrl.ngChange({});
-			}
+		ctrl.hideIcon = () =>
+		{
+			return {visibility: ctrl.ngModel === ctrl.trueValue ? "visible" : "hidden"};
 		}
 	}]
 });

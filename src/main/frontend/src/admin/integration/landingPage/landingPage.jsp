@@ -32,8 +32,7 @@
 
 <div id="admin-landing-page">
 	<icon-card card-size="'card-md-wide'" text="'Unlock Account'" icon="'icon-user'" on-click="$ctrl.goToFrame('%2Fadmin%2FunLock.jsp', 'User Management')"></icon-card>
-	<icon-card card-size="'card-md-wide'" text="'Add a Provider Record'" icon="'icon-user-add'" on-click="$ctrl.goToFrame('%2Fadmin%2Fprovideraddarecordhtm.jsp', 'User Management')"></icon-card>
-	<icon-card card-size="'card-md-wide'" text="'Add a Login Record'" icon="'icon-user-add'" on-click="$ctrl.goToFrame('%2Fadmin%2Fsecurityaddarecord.jsp', 'User Management')"></icon-card>
+	<icon-card card-size="'card-md-wide'" text="'Manage Users'" icon="'icon-user'" on-click="$ctrl.goTo('admin/manageUsers', 'User Management')"></icon-card>
 	<icon-card card-size="'card-md-wide'" text="'Manage eForms'" icon="'icon-file'" on-click="$ctrl.goToFrame('%2Feform%2Fefmformmanager.jsp&useCompat=true', 'Forms/eForms')"></icon-card>
 	<icon-card card-size="'card-md-wide'" text="'Schedule Setting'" icon="'icon-calendar'" on-click="$ctrl.goToFrame('%2Fschedule%2Fscheduletemplatesetting.jsp', 'Schedule Management')"></icon-card>
 	<icon-card card-size="'card-md-wide'" text="'Manage Groups'" icon="'icon-user-group'" on-click="$ctrl.goToFrame('%2Fadmin%2Fadmindisplaymygroup.jsp', 'Schedule Management')"></icon-card>

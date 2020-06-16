@@ -1,0 +1,35 @@
+.demographic-details-section {
+	@include juno-font-default();
+
+	$field-width: 400px;
+
+	.title {
+		margin: 0 0 8px 0;
+		color: $color-primary-base;
+	}
+
+	.fields {
+		display: flex;
+		flex-wrap: wrap;
+
+		.divider {
+			flex: 1 1 0;
+			max-width: 84px;
+		}
+
+		.column {
+			.juno-input {
+				width: $field-width;
+			}
+			.juno-select {
+				width: $field-width;
+			}
+			.juno-date-select {
+				width: $field-width;
+			}
+			.juno-typeahead {
+				width: $field-width;
+			}
+		}
+	}
+}

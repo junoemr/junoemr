@@ -315,7 +315,8 @@ public class ProviderEditFormTo1 implements Serializable
 			}
 			newSecurityRecord.setUserName((securityRecordTo1.getUserName() == null || securityRecordTo1.getUserName().isEmpty()) ?
 					null : securityRecordTo1.getUserName());
-			newSecurityRecord.setEmail(securityRecordTo1.getEmail());
+			newSecurityRecord.setEmail((securityRecordTo1.getEmail() == null || securityRecordTo1.getEmail().isEmpty()) ?
+					null: securityRecordTo1.getEmail());
 			setSecurityRecordCommonFields(newSecurityRecord, securityRecordTo1, providerNo);
 			newSecurityRecords.add(newSecurityRecord);
 		}

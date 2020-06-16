@@ -2,6 +2,7 @@
 
 	input {
 		flex: 1 1 0;
+		min-width: 24px;
 
 		&.uppercase {
 			text-transform: uppercase;

@@ -95,6 +95,10 @@
 			border-bottom-color: $color-primary-lighter;
 		}
 	}
+
+	.demographic-details-section.demographic-section {
+		margin-top: 32px;
+	}
 }
 
 @media (max-width: 768px) {

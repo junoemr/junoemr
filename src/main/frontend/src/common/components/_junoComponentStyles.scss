@@ -37,6 +37,28 @@
 		border-radius: 4px;
 		padding: 0 4px 0 4px;
 	}
+
+	&.juno-check-box {
+		button {
+			padding: 0;
+			border-radius: 3px;
+
+			width: 16px;
+			height: 16px;
+			font-size: 12px;
+
+			&.un-checked {
+				&:hover {
+					border-color: $color-blue-light;
+				}
+			}
+		}
+	}
+
+	&.juno-divider {
+		background-color: $color-neutral-lightest;
+		border: 1px solid $color-neutral-lighter-grey;
+	}
 }
 
 .juno-style-default {
@@ -83,6 +105,20 @@
 			background-color: $color-neutral-white;
 			color: $color-neutral-darker;
 		}
+	}
+
+	&.juno-check-box {
+		button {
+			&.un-checked {
+				border-color: $color-neutral-light;
+				background-color: $color-neutral-white;
+			}
+		}
+	}
+
+	&.juno-divider {
+		height: 0;
+		border: 1px solid $color-neutral-lighter;
 	}
 }
 
@@ -135,6 +171,15 @@
 			color: $color-neutral-darker;
 		}
 	}
+
+	&.juno-check-box {
+		button {
+			&.un-checked {
+				border-color: $color-neutral-lighter-grey;
+				background-color: $color-neutral-lightest;
+			}
+		}
+	}
 }
 
 .juno-style-dracula {
@@ -184,6 +229,24 @@
 			background-color: $color-neutral-darkest;
 			color: $color-neutral-white;
 		}
+	}
+
+	&.juno-check-box {
+		button {
+			&.un-checked {
+				border-color: $color-neutral-darker;
+				background-color: $color-neutral-darkest;
+
+				&:hover {
+					border-color: $color-orange-base;
+				}
+			}
+		}
+	}
+
+	&.juno-divider {
+		height: 0;
+		border: 1px solid $color-neutral-darker;
 	}
 }
 .juno-style-dracula-background {

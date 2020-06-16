@@ -1,0 +1,10 @@
+.juno-divider {
+	height: 4px;
+	width: 100%;
+}
+
+div {
+	&.juno-divider {
+		margin: 24px 0 24px 0;
+	}
+}

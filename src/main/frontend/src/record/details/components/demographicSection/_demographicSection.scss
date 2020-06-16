@@ -1,49 +1,15 @@
-.demographic-details-demographic-section {
-	@include juno-font-default();
-
-	$field-width: 400px;
-
-	.title {
-		margin-bottom: 16px;
-		color: $color-primary-base;
-	}
-
-	.fields {
+.demographic-details-section.demographic-section  {
+	.connected-sites {
 		display: flex;
-		flex-wrap: wrap;
-
-		.divider {
-			flex: 1 1 0;
-			max-width: 84px;
+		.juno-input {
+			width: 364px;
 		}
+		.juno-button {
+			width: 32px;
+			margin-left: 4px;
 
-		.column {
-			.juno-input {
-				width: $field-width;
-			}
-			.juno-select {
-				width: $field-width;
-			}
-			.juno-date-select {
-				width: $field-width;
-			}
-			.juno-typeahead {
-				width: $field-width;
-			}
-
-			.connected-sites {
-				display: flex;
-				.juno-input {
-					width: calc(#{$field-width} - 36px)
-				}
-				.juno-button {
-					width: 32px;
-					margin-left: 4px;
-
-					.icon {
-						font-size: 20px;
-					}
-				}
+			.icon {
+				font-size: 20px;
 			}
 		}
 	}
