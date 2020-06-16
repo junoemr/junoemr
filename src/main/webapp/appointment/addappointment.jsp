@@ -1303,7 +1303,7 @@
 									title="Add a new appointment and send a confirmation email to the patient"
 									onclick="document.forms.ADDAPPT.sendBookingNotification.value='true';
 													 document.forms.ADDAPPT.displaymode.value='Add Appointment';"
-									style="display: none"
+									style="display: none;"
 					>
 				</td>
 			</tr>
@@ -1573,7 +1573,14 @@
 			msg.css("visibility", "visible");
 			msg.css("color", "green");
 			msg.html("Patient connected to MyHealthAccess");
-			jQuery("#add-appt-and-send-confirmation").css("display", "none");
+			if ("<%=StringUtils.trimToEmpty(email)%>" === "" && !jQuery("#telehealth-checkbox").get(0).checked)
+			{// if the confirmed user has no juno email and the telehealth button is not checked, hide notify.
+				jQuery("#add-appt-and-send-confirmation").css("display", "none");
+			}
+			else
+			{
+				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
+			}
 			virtualBookingState = 'confirmed';
 		}
 
@@ -1584,10 +1591,7 @@
 			msg.css("visibility", "visible");
 			msg.css("color", "green");
 			msg.html("One time telehealth available for this patient");
-			if (jQuery("#telehealth-checkbox").attr("checked"))
-			{
-				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
-			}
+			jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
 			virtualBookingState = 'oneTime';
 		}
 
@@ -1619,28 +1623,27 @@
 		if (IsPropertiesOn.isTelehealthEnabled())
 		{
 		%>
-		jQuery(document).ready(() =>
-		{
-			updateTelehealthControlls();
-		});
-
-		jQuery("#site-select").change(() =>
-		{
-			updateTelehealthControlls();
-		});
-
-		jQuery("#telehealth-checkbox").change((event) =>
-		{
-
-			if (virtualBookingState === "oneTime" && event.target.checked)
+			jQuery(document).ready(() =>
 			{
-				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
-			}
-			else
+				updateTelehealthControlls();
+			});
+
+			jQuery("#site-select").change(() =>
 			{
-				jQuery("#add-appt-and-send-confirmation").css("display", "none");
-			}
-		});
+				updateTelehealthControlls();
+			});
+
+			jQuery("#telehealth-checkbox").change((event) =>
+			{
+				if (event.target.checked)
+				{
+					jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
+				}
+				else if ("<%=StringUtils.trimToEmpty(email)%>" === "")
+				{
+					jQuery("#add-appt-and-send-confirmation").css("display", "none");
+				}
+			});
 
 		<%
 		}

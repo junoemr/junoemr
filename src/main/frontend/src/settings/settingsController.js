@@ -538,13 +538,35 @@ angular.module('Settings').controller('Settings.SettingsController', [
 
 		controller.validateSettings = function()
 		{
+			let isValid = true;
 			// check eform fields are valid
 			if (!controller.pref.eformPopupWidth || !controller.pref.eformPopupHeight)
 			{
-				return false;
+				alert("Eform width and height fields must be filled in.");
+				isValid = false;
 			}
 
-			return true;
+			if (isNaN(controller.pref.appointmentScreenLinkNameDisplayLength))
+			{
+				alert("The value of link and form names displayed on appointment screen must be a positive number.");
+				isValid = false;
+			}
+			else if (controller.pref.appointmentScreenLinkNameDisplayLength.length > 3)
+			{
+				alert("Please reduce the length of the link and form names that you want to display to a value under 999.");
+				isValid = false;
+			}
+			else
+			{
+				let intVal = parseInt(controller.pref.appointmentScreenLinkNameDisplayLength);
+				if (intVal < 1)
+				{
+					alert("The value of link and form names displayed on appointment screen must be a positive number.");
+					isValid = false;
+				}
+			}
+
+			return isValid;
 		};
 
 		controller.cancel = function()
