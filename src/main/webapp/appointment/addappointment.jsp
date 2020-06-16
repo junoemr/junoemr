@@ -1573,7 +1573,14 @@
 			msg.css("visibility", "visible");
 			msg.css("color", "green");
 			msg.html("Patient connected to MyHealthAccess");
-			jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
+			if ("<%=StringUtils.trimToEmpty(email)%>" === "" && !jQuery("#telehealth-checkbox").get(0).checked)
+			{// if the confirmed user has no juno email and the telehealth button is not checked, hide notify.
+				jQuery("#add-appt-and-send-confirmation").css("display", "none");
+			}
+			else
+			{
+				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
+			}
 			virtualBookingState = 'confirmed';
 		}
 
@@ -1616,15 +1623,27 @@
 		if (IsPropertiesOn.isTelehealthEnabled())
 		{
 		%>
-		jQuery(document).ready(() =>
-		{
-			updateTelehealthControlls();
-		});
+			jQuery(document).ready(() =>
+			{
+				updateTelehealthControlls();
+			});
 
-		jQuery("#site-select").change(() =>
-		{
-			updateTelehealthControlls();
-		});
+			jQuery("#site-select").change(() =>
+			{
+				updateTelehealthControlls();
+			});
+
+			jQuery("#telehealth-checkbox").change((event) =>
+			{
+				if (event.target.checked)
+				{
+					jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
+				}
+				else if ("<%=StringUtils.trimToEmpty(email)%>" === "")
+				{
+					jQuery("#add-appt-and-send-confirmation").css("display", "none");
+				}
+			});
 
 		<%
 		}
