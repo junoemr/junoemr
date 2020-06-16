@@ -196,7 +196,8 @@ public class CopdCommandLineImporter
 		logger.info("loading properties from " + propertiesFileName);
 
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
-		context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
+//		context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
+		context.setConfigLocations(new String[]{"/applicationContext.xml"});
 		context.refresh();
 		SpringUtils.beanFactory = context;
 
@@ -209,18 +210,22 @@ public class CopdCommandLineImporter
 	{
 		boolean hasFailure = false;
 		int failureCount = 0;
+		int messageCount = 0;
+
 		String message;
 		while (!(message = messageStream.getNextMessage()).isEmpty())
 		{
 			try
 			{
+				messageCount += 1;
 				message = coPDPreProcessorService.preProcessMessage(message, importSource);
 				coPDImportService.importFromHl7Message(message, documentDirectory, importSource, skipMissingDocs, mergeDemographics);
 			}
 			catch (Exception e)
 			{
-				logger.error("failed to import message: \n " + message + "\n With error:", e);
+				logger.error("failed to import message: " + messageCount + "\n With error:", e);
 				hasFailure = true;
+				failureCount += 1;
 			}
 		}
 
