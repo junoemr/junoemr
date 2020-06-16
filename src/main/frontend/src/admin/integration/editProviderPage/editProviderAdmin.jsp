@@ -501,9 +501,8 @@
 									class="flex-grow lg-margin-right"
 									model="$ctrl.billingRegion"
 									options="$ctrl.billingRegionOptions"
-									enabled="$ctrl.billingRegionSelectEnabled"
 									placeholder="Search..."
-									disabled="$ctrl.fieldsDisabled"
+									disabled="$ctrl.fieldsDisabled || !$ctrl.billingRegionSelectEnabled"
 					>
 					</juno-typeahead>
 

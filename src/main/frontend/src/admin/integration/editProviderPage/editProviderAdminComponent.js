@@ -538,7 +538,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.removeUserRole = function(roleId)
 		{
-			if (roleId)
+			if (roleId && ctrl.mode !== EDIT_PROVIDER_MODE.VIEW)
 			{
 				let idx = ctrl.provider.userRoles.findIndex(el => el === roleId);
 				ctrl.provider.userRoles.splice(idx, 1);
@@ -569,7 +569,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.removeSiteAssignment = function(siteId)
 		{
-			if (siteId)
+			if (siteId && ctrl.mode !== EDIT_PROVIDER_MODE.VIEW)
 			{
 				let idx = ctrl.provider.siteAssignments.findIndex(el => el === siteId);
 				ctrl.provider.siteAssignments.splice(idx, 1);
@@ -588,7 +588,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 
 		ctrl.removeBCPSiteAssignment = function(siteId)
 		{
-			if (siteId)
+			if (siteId && ctrl.mode !== EDIT_PROVIDER_MODE.VIEW)
 			{
 				let idx = ctrl.provider.bcpSites.findIndex(el => el === siteId);
 				ctrl.provider.bcpSites.splice(idx, 1);
