@@ -1573,7 +1573,10 @@
 			msg.css("visibility", "visible");
 			msg.css("color", "green");
 			msg.html("Patient connected to MyHealthAccess");
-			jQuery("#add-appt-and-send-confirmation").css("display", "none");
+			if (jQuery("#telehealth-checkbox").attr("checked"))
+			{
+				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
+			}
 			virtualBookingState = 'confirmed';
 		}
 
@@ -1632,7 +1635,7 @@
 		jQuery("#telehealth-checkbox").change((event) =>
 		{
 
-			if (virtualBookingState === "oneTime" && event.target.checked)
+			if (event.target.checked)
 			{
 				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
 			}
