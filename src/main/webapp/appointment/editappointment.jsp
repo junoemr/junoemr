@@ -958,9 +958,16 @@
 					<li class="weak row">
 						<div class="label">Creator:</div>
 						<div class="input">
-							<% String lastCreatorNo = bFirstDisp ? (appt.getCreator()) : request.getParameter("user_id"); %>
-							<INPUT TYPE="TEXT" NAME="user_id" VALUE="<%=lastCreatorNo%>" readonly
-								   WIDTH="25">
+							<%
+								String lastCreatorNo = bFirstDisp ? (appt.getCreator()) : request.getParameter("user_id");
+								ProviderData provider = providerDao.findByProviderNo(lastCreatorNo);
+								String creatorName = lastCreatorNo;
+								if (provider != null)
+								{
+									creatorName = provider.getLastName() + ", " + provider.getFirstName();
+								}
+							%>
+							<INPUT TYPE="TEXT" NAME="user_id" VALUE="<%=creatorName%>" readonly WIDTH="25">
 						</div>
 						<div class="space">&nbsp;</div>
 						<div class="label"><bean:message key="Appointment.formLastTime"/>:</div>
@@ -990,24 +997,26 @@
 							<INPUT TYPE="hidden" NAME="createdatetime" VALUE="<%=strDateTime%>">
 							<INPUT TYPE="hidden" NAME="provider_no" VALUE="<%=curProvider_no%>">
 							<INPUT TYPE="hidden" NAME="dboperation" VALUE="">
-							<INPUT TYPE="hidden" NAME="creator"
-								   VALUE="<%=userlastname+", "+userfirstname%>">
+							<INPUT TYPE="hidden" NAME="creator" VALUE="<%=loggedInInfo.getLoggedInProviderNo()%>">
 							<INPUT TYPE="hidden" NAME="remarks" VALUE="<%=remarks%>">
 							<INPUT TYPE="hidden" NAME="appointment_no" VALUE="<%=appointment_no%>">
 						</div>
 					</li>
-					<% lastCreatorNo = request.getParameter("user_id");
+					<%
+						lastCreatorNo = request.getParameter("user_id");
+						String lastCreatorName = "";
 						if (bFirstDisp)
 						{
 							if (appt.getLastUpdateUser() != null)
 							{
-
-								ProviderData provider = providerDao.findByProviderNo(appt.getLastUpdateUser());
+								provider = providerDao.findByProviderNo(appt.getLastUpdateUser());
 								if (provider != null)
 								{
-									lastCreatorNo = provider.getLastName() + ", " + provider.getFirstName();
+									lastCreatorName = provider.getLastName() + ", " + provider.getFirstName();
+									lastCreatorNo = provider.getProviderNo().toString();
 								}
-							} else
+							}
+							else
 							{
 								lastCreatorNo = appt.getCreator();
 							}
@@ -1019,8 +1028,8 @@
 						<div class="space">&nbsp;</div>
 						<div class="label">Last Editor:</div>
 						<div class="input">
-							<INPUT TYPE="TEXT" readonly
-								   VALUE="<%=lastCreatorNo%>" WIDTH="25">
+							<input type="hidden" name="lasteditor" value="<%=lastCreatorNo%>">
+							<INPUT TYPE="TEXT" readonly VALUE="<%=lastCreatorName%>" WIDTH="25">
 						</div>
 					</li>
 

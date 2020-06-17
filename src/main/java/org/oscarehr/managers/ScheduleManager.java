@@ -184,7 +184,7 @@ public class ScheduleManager {
 
 	public void addAppointment(LoggedInInfo loggedInInfo, Security security, Appointment appointment) {
 		appointment.setCreatorSecurityId(security.getSecurityNo());
-		appointment.setCreator(security.getUserName());
+		appointment.setCreator(security.getProviderNo());
 		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 
 		oscarAppointmentDao.persist(appointment);

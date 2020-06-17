@@ -52,6 +52,7 @@ org.oscarehr.event.EventService"%>
 <%@ page import="oscar.log.LogAction" %>
 <%@ page import="oscar.log.LogConst" %>
 <%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
@@ -72,7 +73,8 @@ org.oscarehr.event.EventService"%>
 	</tr>
 </table>
 	<%
-		String updateuser = (String) session.getAttribute("user");
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		String updateuser = loggedInInfo.getLoggedInProviderNo();
 
 		int rowsAffected = 0;
 		Appointment appt = appointmentDao.find(Integer.parseInt(request.getParameter("appointment_no")));

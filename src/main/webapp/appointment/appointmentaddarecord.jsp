@@ -151,6 +151,7 @@
 	appointment.setStatus(status);
 	appointment.setCreateDateTime(createDateTime);
 	appointment.setCreator(creator);
+	appointment.setLastUpdateUser(creator);
 	appointment.setRemarks(remarks);
 	appointment.setReasonCode(reasonCode);
 	appointment.setDemographicNo(demographicNo);
