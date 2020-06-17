@@ -58,6 +58,7 @@ public class CalendarAppointment implements Serializable
 	private boolean tagSelfBooked;
 	private boolean tagSelfCancelled;
 	private boolean virtual;
+	private boolean sendNotification;
 	private String tagSystemCodes;
 	private String appointmentName;
 
@@ -414,6 +415,16 @@ public class CalendarAppointment implements Serializable
 	public void setAppointmentName(String appointmentName)
 	{
 		this.appointmentName = appointmentName;
+	}
+
+	public boolean isSendNotification()
+	{
+		return sendNotification;
+	}
+
+	public void setSendNotification(boolean sendNotification)
+	{
+		this.sendNotification = sendNotification;
 	}
 
 	@Override

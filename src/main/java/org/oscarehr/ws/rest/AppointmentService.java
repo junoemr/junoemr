@@ -80,7 +80,15 @@ public class AppointmentService extends AbstractServiceImpl
 		AppointmentConverter converter = new AppointmentConverter();
 		Appointment appointment = converter.getAsDomainObject(calendarAppointment);
 
-		Appointment savedAppointment = appointmentManager.addAppointment(getLoggedInInfo(), appointment);
+		Appointment savedAppointment = null;
+		if (appointment.getIsVirtual())
+		{
+			savedAppointment = appointmentManager.addTelehealthAppointment(getLoggedInInfo(), appointment, calendarAppointment.isSendNotification());
+		}
+		else
+		{
+			savedAppointment = appointmentManager.addAppointment(getLoggedInInfo(), appointment);
+		}
 
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), savedAppointment.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_APPT,

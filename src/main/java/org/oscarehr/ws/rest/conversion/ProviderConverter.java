@@ -65,7 +65,7 @@ public class ProviderConverter extends AbstractConverter<Provider, ProviderTo1> 
 		d.setTitle(t.getTitle());
 		d.setLastUpdateUser(t.getLastUpdateUser());
 		d.setLastUpdateDate(t.getLastUpdateDate());
-
+		// super admin setting not allowed via REST for now
 		return d;
 	}
 
@@ -105,6 +105,7 @@ public class ProviderConverter extends AbstractConverter<Provider, ProviderTo1> 
 		t.setTitle(d.getTitle());
 		t.setLastUpdateUser(d.getLastUpdateUser());
 		t.setLastUpdateDate(d.getLastUpdateDate());
+		t.setSuperAdmin(d.getSuperAdmin());
 		return t;
 	}
 
