@@ -186,12 +186,12 @@
 		function updateProviderRoles(form, actionMethod, isClickedProviderSuperAdmin)
 		{
 			var isLoginUserSuperAdmin = <%=isCurrentLoginSuperAdmin%>;
-			var result = Juno.Admin.UserPermissionCtrl.checkProviderPermission(isLoginUserSuperAdmin, isClickedProviderSuperAdmin,document.getElementById("no_authorization_error_msg").value);
-			if (result)
+			var hasPermission = Juno.Admin.Provider.Profile.checkProviderPermission(isLoginUserSuperAdmin, isClickedProviderSuperAdmin,document.getElementById("no_authorization_error_msg").value);
+			if (hasPermission)
 			{
 				form.action = "providerRole.do?method=" + actionMethod;
 			}
-			return result;
+			return hasPermission;
 		}
 	</script>
 

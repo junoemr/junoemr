@@ -50,3 +50,12 @@ Juno.Admin.Provider.Profile.initSiteSelectHandler = function initSiteSelectHandl
         Juno.Admin.Provider.Profile.bindSiteHandler(element);
     }
 };
+
+Juno.Admin.Provider.Profile.checkProviderPermission = function checkProviderPermission (isLoginUserSuperAdmin, isProviderSuperAdmin)
+{
+    if (!isLoginUserSuperAdmin && isProviderSuperAdmin)
+    {
+        return false;
+    }
+    return true;
+};
