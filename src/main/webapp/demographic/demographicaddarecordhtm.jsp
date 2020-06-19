@@ -155,7 +155,8 @@
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
+<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
    <script>
      jQuery.noConflict();
    </script>
@@ -1732,13 +1733,9 @@ jQuery(document).ready(function(){
 <%
 }
 %>
+</script>
 <% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true") && "BC".equals(instanceType)) { %>
-</script>
-<script src="https://www.google.com/jsapi"></script>
-<script>
-	google.load("jquery", "1");
-	google.load("jqueryui", "1");
-</script>
+
 <script type="text/javascript">
     jQuery(document).ready(function()
 	{
