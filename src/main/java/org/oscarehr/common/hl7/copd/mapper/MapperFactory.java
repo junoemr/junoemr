@@ -175,6 +175,18 @@ public class MapperFactory
 	}
 
 	/**
+	 * new message mapper
+	 * @param message - message to import
+	 * @param providerRep - rep of provider
+	 * @param importSource - source of import
+	 * @return - new message mapper
+	 */
+	public static MessageMapper newMessageMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	{
+		return new MessageMapper(message, providerRep, importSource);
+	}
+
+	/**
 	 * new prevention mapper
 	 * @param message - message to import
 	 * @param providerRep - rep of provider

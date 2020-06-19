@@ -35,7 +35,22 @@ import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.TicklerDao;
-import org.oscarehr.common.hl7.copd.mapper.*;
+import org.oscarehr.common.hl7.copd.mapper.AlertMapper;
+import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
+import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
+import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
+import org.oscarehr.common.hl7.copd.mapper.DocumentMapper;
+import org.oscarehr.common.hl7.copd.mapper.DxMapper;
+import org.oscarehr.common.hl7.copd.mapper.EncounterNoteMapper;
+import org.oscarehr.common.hl7.copd.mapper.HistoryNoteMapper;
+import org.oscarehr.common.hl7.copd.mapper.LabMapper;
+import org.oscarehr.common.hl7.copd.mapper.MapperFactory;
+import org.oscarehr.common.hl7.copd.mapper.MeasurementsMapper;
+import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
+import org.oscarehr.common.hl7.copd.mapper.MessageMapper;
+import org.oscarehr.common.hl7.copd.mapper.PreventionMapper;
+import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
+import org.oscarehr.common.hl7.copd.mapper.TicklerMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.parser.CoPDParser;
 import org.oscarehr.common.io.FileFactory;
@@ -44,6 +59,8 @@ import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.MessageList;
+import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.demographic.dao.DemographicDao;
@@ -57,6 +74,7 @@ import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.labs.service.LabService;
+import org.oscarehr.message.service.MessageService;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.service.PreventionManager;
@@ -156,6 +174,9 @@ public class CoPDImportService
 
 	@Autowired
 	MeasurementDao measurementDao;
+
+	@Autowired
+	MessageService messageService;
 
 	@Autowired
 	ProviderRoleService providerRoleService;
@@ -277,6 +298,8 @@ public class CoPDImportService
 			importTicklers(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			logger.info("Importing Measurements ...");
 			importMeasurements(zpdZtrMessage, demographic, i, assignedProvider, importSource);
+			logger.info("Importing Messages ...");
+			importMessageData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 		}
 
 		return mrpProvider;
@@ -645,6 +668,11 @@ public class CoPDImportService
 		int numNotes = encounterNoteMapper.getNumEncounterNotes();
 		for(int i=0; i< numNotes; i++)
 		{
+			// don't import notes that are meant to be messages
+			if(encounterNoteMapper.isMessageNote(i))
+			{
+				continue;
+			}
 			CaseManagementNote encounterNote = encounterNoteMapper.getEncounterNote(i);
 			ProviderData signingProvider = encounterNoteMapper.getSigningProvider(i);
 			ProviderData noteProvider = provider;
@@ -689,6 +717,49 @@ public class CoPDImportService
 			famHistNote.setSigningProvider(provider);
 			famHistNote.setDemographic(demographic);
 			encounterNoteService.saveFamilyHistoryNote(famHistNote);
+		}
+	}
+
+	private void importMessageData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
+	{
+		MessageMapper messageMapper = MapperFactory.newMessageMapper(zpdZtrMessage, providerRep, importSource);
+
+		int numNotes = messageMapper.getNumMessageNotes();
+		for(int i=0; i< numNotes; i++)
+		{
+			// don't import notes that are meant not to be messages
+			if(!messageMapper.isMessageNote(i))
+			{
+				continue;
+			}
+
+			// get recipient provider info, or default if unavailable
+			ProviderData recipientProvider = messageMapper.getRecipientProvider(i);
+			if(recipientProvider != null)
+			{
+				recipientProvider = findOrCreateProviderRecord(recipientProvider);
+			}
+			else
+			{
+				recipientProvider = getDefaultProvider();
+			}
+			List<ProviderData> providers = new ArrayList<>(1);
+			providers.add(recipientProvider);
+
+			// get the message and set up sending provider info
+			MessageTbl message = messageMapper.getMessageNote(i);
+			ProviderData sendingProvider = messageMapper.getSigningProvider(i);
+			if(sendingProvider != null)
+			{
+				sendingProvider = findOrCreateProviderRecord(sendingProvider);
+			}
+			else
+			{
+				sendingProvider = provider;
+			}
+
+			message.setSendingProvider(sendingProvider);
+			messageService.saveMessage(message, providers, demographic, MessageList.STATUS_READ);
 		}
 	}
 }
