@@ -36,9 +36,9 @@ angular.module('Common.Components').component('junoDateSelect', {
 	{
 		let ctrl = this;
 
-		ctrl.year = 0;
-		ctrl.month = 0;
-		ctrl.day = 0;
+		ctrl.year = null;
+		ctrl.month = null;
+		ctrl.day = null;
 
 		ctrl.yearValid = true;
 		ctrl.monthValid = true;
@@ -91,6 +91,8 @@ angular.module('Common.Components').component('junoDateSelect', {
 
 		ctrl.onDateChange = (field, isYear) =>
 		{
+			ctrl.assignDefaults();
+
 			let date = Juno.Common.Util.getDateMomentFromComponents(ctrl.year, ctrl.month, ctrl.day);
 
 			if (date.isValid())
@@ -112,6 +114,13 @@ angular.module('Common.Components').component('junoDateSelect', {
 				}
 				return field;
 			}
+		}
+
+		ctrl.assignDefaults = () =>
+		{
+			ctrl.year = ctrl.year || "0000";
+			ctrl.month = ctrl.month || "01";
+			ctrl.day = ctrl.day || "01";
 		}
 
 		ctrl.getInvalidClass = (isInvalid) =>

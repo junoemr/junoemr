@@ -235,6 +235,7 @@ module.exports = {
 			'./src/common/components/module.js',
 			'./src/common/components/modalComponent.js',
 			'./src/common/components/junoAlert/junoAlertComponent.js',
+			'./src/common/components/junoInputModal/junoInputModalComponent.js',
 			'./src/common/components/junoButton/junoButtonComponent.js',
 			'./src/common/components/junoCheckBox/junoCheckBoxComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
@@ -282,6 +283,9 @@ module.exports = {
 			'./src/record/details/components/mhaPatientConnection/mhaPatientConnectionComponent.js',
 			'./src/record/details/components/demographicSection/demographicSectionComponent.js',
 			'./src/record/details/components/contactSection/contactSectionComponent.js',
+			'./src/record/details/components/healthInsuranceSection/healthInsuranceSectionComponent.js',
+			'./src/record/details/components/careTeamSection/careTeamSectionComponent.js',
+			'./src/record/details/components/additionalInformationSection/additionalInformationSectionComponent.js',
 			'./src/record/phr/module.js',
 			'./src/record/phr/phrController.js',
 

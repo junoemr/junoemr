@@ -2,6 +2,7 @@
 
 .juno-input-label-top {
 	flex: 0 0 100%;
+	margin-bottom: 8px;
 }
 
 .juno-input-label-left {
@@ -13,7 +14,7 @@
 
 @mixin styleCommon()
 {
-	margin-top: 8px;
+	margin: 8px 0 0 0;
 	display: flex;
 	align-items: baseline;
 	flex-wrap: wrap;
@@ -29,6 +30,14 @@
 				border-color: $color-red-base;
 			}
 		}
+
+		&.ng-empty {
+			color: $color-neutral-grey;
+		}
+	}
+
+	::placeholder {
+		color: $color-neutral-grey;
 	}
 
 	button {
@@ -36,6 +45,10 @@
 		box-shadow: none;
 		border-radius: 4px;
 		padding: 0 4px 0 4px;
+	}
+
+	label {
+		min-width: 108px;
 	}
 
 	&.juno-check-box {
@@ -61,6 +74,7 @@
 	}
 }
 
+// ============ STYLE DEFAULT ===============
 .juno-style-default {
 	@include styleCommon;
 
@@ -122,6 +136,7 @@
 	}
 }
 
+// ============ STYLE GREY ===============
 .juno-style-grey {
 	@include styleCommon;
 
@@ -182,11 +197,11 @@
 	}
 }
 
+// ============ STYLE DRACULA ===============
 .juno-style-dracula {
 	@include styleCommon;
 
 	@include juno-tab-color-scheme-dark;
-
 	color: $color-neutral-white;
 
 	input,select {
@@ -228,6 +243,10 @@
 			border: 1px solid $color-neutral-dark;
 			background-color: $color-neutral-darkest;
 			color: $color-neutral-white;
+
+			&:hover {
+				border-color: $color-orange-base;
+			}
 		}
 	}
 
@@ -250,5 +269,5 @@
 	}
 }
 .juno-style-dracula-background {
-	background-color: $color-neutral-darkest;
+	background-color: $color-neutral-darkest !important;
 }

@@ -4845,28 +4845,28 @@ angular.module("Common.Services").service("staticDataService", [
 			var levels = [];
 			levels.push(
 			{
-				value: 0,
-				name: "Not Specified"
+				value: "0",
+				label: "Not Specified"
 			});
 			levels.push(
 			{
-				value: 1,
-				name: "Low"
+				value: "1",
+				label: "Low"
 			});
 			levels.push(
 			{
-				value: 2,
-				name: "Medium"
+				value: "2",
+				label: "Medium"
 			});
 			levels.push(
 			{
-				value: 3,
-				name: "High"
+				value: "3",
+				label: "High"
 			});
 			levels.push(
 			{
-				value: 4,
-				name: "None"
+				value: "4",
+				label: "None"
 			});
 			return levels;
 		};

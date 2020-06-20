@@ -104,9 +104,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.showEligibility = false;
 		controller.properties = $scope.$parent.recordCtrl.properties;
 		controller.displayMessages = messagesFactory.factory();
+		controller.validations = {};
 
 		$scope.JUNO_STYLE = JUNO_STYLE;
-		$scope.pageStyle = JUNO_STYLE.GREY;
+		$scope.pageStyle = JUNO_STYLE.DRACULA;
 
 		controller.init = function init()
 		{
@@ -427,9 +428,19 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				controller.page.demo.hcRenewDate = null;
 			}
 
-			// convert demographic date of birth to a moment
-			controller.page.demo.dateOfBirthMoment = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.dobYear,
+			// convert dates to moment
+			controller.page.demo.dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.dobYear,
 					controller.page.demo.dobMonth, controller.page.demo.dobDay);
+			controller.page.demo.effDate = Juno.Common.Util.getDateMoment(controller.page.demo.effDate);
+			controller.page.demo.hcRenewDate = Juno.Common.Util.getDateMoment(controller.page.demo.hcRenewDate);
+			controller.page.demo.rosterDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterDate);
+			controller.page.demo.rosterTerminationDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterTerminationDate);
+			controller.page.demo.patientStatusDate = Juno.Common.Util.getDateMoment(controller.page.demo.patientStatusDate);
+			controller.page.demo.dateJoined = Juno.Common.Util.getDateMoment(controller.page.demo.dateJoined);
+			controller.page.demo.endDate = Juno.Common.Util.getDateMoment(controller.page.demo.endDate);
+
+			controller.page.demo.onWaitingListSinceDate = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.onWaitingListSinceDate.getFullYear(),
+					controller.page.demo.onWaitingListSinceDate.getMonth(), controller.page.demo.onWaitingListSinceDate.getDate());
 
 			// oscar stores no country of origin as "-1" because why not.
 			if (controller.page.demo.countryOfOrigin === "-1")
@@ -1437,6 +1448,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//-----------------//
 		controller.save = function save()
 		{
+			if (!Juno.Validations.allValidationsValid(controller.validations))
+			{
+				alert("Some fields are invalid, Please correct the highlighted fields");
+				return;
+			}
+
 			controller.page.saving = true;
 			controller.displayMessages.clear();
 
@@ -1463,8 +1480,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 
 			//validate field inputs
-			controller.page.demo.dateOfBirth = buildDate(controller.page.demo.dateOfBirthMoment.year(),
-					controller.page.demo.dateOfBirthMoment.month() + 1, controller.page.demo.dateOfBirthMoment.date());
 			if (controller.page.demo.dateOfBirth == null)
 			{
 				alert("Invalid Date of Birth");
@@ -1475,6 +1490,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			if (!controller.validateSin()) return;
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
+
 
 			//save notes
 			if (controller.page.demo.scrNotes != null)
@@ -1519,7 +1535,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			let demographicForSave = {};
 			Object.assign(demographicForSave, controller.page.demo)
 
-			// convert null back to "-1"
+			// convert null back to "-1" why? because Oscar.
 			if (!demographicForSave.countryOfOrigin)
 			{
 				demographicForSave.countryOfOrigin = "-1";
@@ -1593,6 +1609,11 @@ function updateDemoExtras(extKey, newVal, posExtras, oldExtras, newExtras)
 		});
 	}
 	return newExtras;
+}
+
+function buildDateFromMoment(moment)
+{
+	return buildDate(moment.year(), Juno.Common.Util.padDateWithZero(moment.month() + 1), moment.date())
 }
 
 function buildDate(year, month, day)

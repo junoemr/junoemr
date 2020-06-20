@@ -11,7 +11,7 @@
 							component-style="$ctrl.componentStyle">
 			</juno-input>
 
-			<juno-date-select ng-model="$ctrl.ngModel.dateOfBirthMoment"
+			<juno-date-select ng-model="$ctrl.ngModel.dateOfBirth"
 							label="Date of Birth"
 							show-age="true"
 							component-style="$ctrl.componentStyle"

@@ -177,3 +177,11 @@ Juno.Validations.validationPassword = function (obj, field, ...validationFunc)
 		return Juno.Validations.validationFieldsChain(...validationFunc);
 	}
 };
+
+Juno.Validations.validationCustom = function (customValidationFunc, ...validationFunc)
+{
+	return () =>
+	{
+		return Juno.Validations.validationFieldsChain(...[customValidationFunc, ...validationFunc]);
+	}
+}

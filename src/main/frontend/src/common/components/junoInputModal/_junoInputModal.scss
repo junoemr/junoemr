@@ -1,0 +1,29 @@
+.juno-input-modal {
+	@include juno-font-body-small();
+	padding: 16px 32px 24px 32px;
+
+	.modal-dialog {
+		width: 400px;
+		height: 200px;
+
+		.modal-content {
+			background: $color-neutral-white none;
+		}
+	}
+
+	.buttons {
+		display: flex;
+		justify-content: flex-end;
+
+		juno-button {
+			max-width: 100px;
+
+			&:first-child {
+				margin-right: 8px;
+			}
+		}
+
+	}
+
+
+}

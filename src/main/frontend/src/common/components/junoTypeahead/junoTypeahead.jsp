@@ -32,11 +32,12 @@
 					type="text"
 					autocomplete="off"
 					ng-model="$ctrl.selectedValue"
-					uib-typeahead="option as option.label for option in $ctrl.options | filter:$viewValue"
+					uib-typeahead="option as option.label for option in $ctrl.getOptions($viewValue)"
 					typeahead-select-on-exact="true"
 					typeahead-on-select="$ctrl.onSelect()"
 					typeahead-min-length="$ctrl.typeaheadMinLength"
 					ng-keypress="$ctrl.onKeyPress($event)"
+					ng-change="$ctrl.doOnChange()"
 					placeholder="{{$ctrl.placeholder}}"
 					ng-disabled="$ctrl.disabled">
 </div>

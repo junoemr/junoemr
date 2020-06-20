@@ -34,13 +34,17 @@ angular.module('Common.Components').component('junoTypeahead',
 		options: "<",
 		placeholder: "@?",
 		onEnterKey: '&?',
+		onChange: "&?",
+		onSelected: "&?",
 		disabled: '<?',
 		typeaheadMinLength: "@?",
 		componentStyle: "<?",
 		// output the output of the ubi-typeahead directly, without translation
-		rawOutput: "<?"
+		rawOutput: "<?",
+		// if true options are filtered on $viewValue. Set to false if you plan to self filter
+		filterOptions: "<?",
 	},
-	controller: ['$scope', function ($scope)
+	controller: ['$scope', "filterFilter", function ($scope, filterFilter)
 	{
 		let ctrl = this;
 		$scope.LABEL_POSITION = LABEL_POSITION;
@@ -53,6 +57,10 @@ angular.module('Common.Components').component('junoTypeahead',
 		{
 			ctrl.typeaheadMinLength = ctrl.typeaheadMinLength ? ctrl.typeaheadMinLength : 1;
 			ctrl.rawOutput = ctrl.rawOutput || false;
+			if (ctrl.filterOptions === undefined)
+			{
+				ctrl.filterOptions = true;
+			}
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.TOP;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 		};
@@ -77,6 +85,30 @@ angular.module('Common.Components').component('junoTypeahead',
 			}
 		}
 
+		ctrl.doOnChange = () =>
+		{
+			if (ctrl.onChange)
+			{
+				if (ctrl.selectedValue.value)
+				{
+					ctrl.onChange({value: ctrl.selectedValue.value});
+				}
+				else
+				{
+					ctrl.onChange({value: ctrl.selectedValue});
+				}
+			}
+		}
+
+		ctrl.getOptions = (viewValue) =>
+		{
+			if (ctrl.filterOptions)
+			{
+				return filterFilter(ctrl.options, viewValue);
+			}
+			return ctrl.options;
+		}
+
 		ctrl.onSelect = () =>
 		{
 			if (ctrl.rawOutput)
@@ -86,6 +118,11 @@ angular.module('Common.Components').component('junoTypeahead',
 			else
 			{
 				ctrl.model = ctrl.selectedValue.value;
+			}
+
+			if (ctrl.onSelected)
+			{
+				ctrl.onSelected({value: ctrl.selectedValue});
 			}
 		}
 

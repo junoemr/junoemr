@@ -344,6 +344,16 @@ Juno.Common.Util.trimToLength = function trimToLength(string, maxLength)
 	return shortString;
 };
 
+Juno.Common.Util.trimToNull = (str) =>
+{
+	str.trim();
+	if (str === "")
+	{
+		return null;
+	}
+	return str;
+}
+
 // create a promise that resolves when the provided window is closed
 Juno.Common.Util.windowClosedPromise = function (popup)
 {
@@ -410,6 +420,22 @@ Juno.Common.Util.confirmationDialog = function(uibModal, title, message)
 			}
 	).result;
 };
+
+Juno.Common.Util.openInputDialog = (uibModal, title, message, style) =>
+{
+	return uibModal.open(
+			{
+				component: 'junoInputModal',
+				backdrop: 'static',
+				windowClass: "juno-input-modal ",
+				resolve: {
+					title: () => title,
+					message: () => message,
+					style: () => style,
+				}
+			}
+	).result;
+}
 
 /**
  * lookup typeahead object form options list based on value

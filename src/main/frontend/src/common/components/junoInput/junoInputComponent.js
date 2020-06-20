@@ -34,7 +34,11 @@ angular.module('Common.Components').component('junoInput', {
 		placeholder: "@?",
 		uppercase: "<?",
 		readonly: "<?",
+		// block characters from being entered that do not match this regex
 		validRegex: "<?",
+		invalid: "<?",
+		// if true show invalid state even while focused
+		showInvalidFocus: "<?",
 		componentStyle: "<?",
 	},
 	controller: [ "$scope", function ($scope) {
@@ -42,14 +46,20 @@ angular.module('Common.Components').component('junoInput', {
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
 		ctrl.oldNgModel = null;
+		ctrl.isFocused = false;
 
 		ctrl.$onInit = () =>
 		{
 			ctrl.type = ctrl.type || 'text';
 			ctrl.uppercase = ctrl.uppercase || false;
+			ctrl.readonly = ctrl.readonly || false;
+			ctrl.invalid = ctrl.invalid || false;
+			if (ctrl.showInvalidFocus === undefined)
+			{
+				ctrl.showInvalidFocus = false;
+			}
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-			ctrl.readonly = ctrl.readonly || false;
 			ctrl.oldNgModel = ctrl.ngModel;
 		};
 
@@ -61,7 +71,8 @@ angular.module('Common.Components').component('junoInput', {
 		ctrl.inputClasses = () =>
 		{
 			return {
-				uppercase: Boolean(ctrl.uppercase),
+				uppercase: ctrl.uppercase,
+				"field-invalid": ctrl.invalid && (ctrl.showInvalidFocus || !ctrl.isFocused),
 			};
 		}
 
@@ -88,6 +99,16 @@ angular.module('Common.Components').component('junoInput', {
 			{
 				ctrl.ngChange({});
 			}
+		}
+
+		ctrl.onFocus = () =>
+		{
+			ctrl.isFocused = true;
+		}
+
+		ctrl.onBlur = () =>
+		{
+			ctrl.isFocused = false;
 		}
 	}]
 });
