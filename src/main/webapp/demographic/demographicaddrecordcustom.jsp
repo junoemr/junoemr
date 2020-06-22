@@ -171,12 +171,11 @@
 <html:html locale="true">
 	<head>
 		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-		<title><bean:message
-				key="demographic.demographicaddrecordhtm.title" /></title>
-		<meta http-equiv="Expires" content="Monday, 8 Aug 88 18:18:18 GMT">
+		<title><bean:message key="demographic.demographicaddrecordhtm.title" /></title>
 		<!-- calendar stylesheet -->
 		<link rel="stylesheet" type="text/css" media="all"
 		      href="../share/calendar/calendar.css" title="win2k-cold-1" />
+
 
 		<!-- main calendar program -->
 		<script type="text/javascript" src="../share/calendar/calendar.js"></script>
@@ -1674,10 +1673,6 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 		</div>
 	</form>
 	<script src="<%=protocol%>www.google.com/jsapi"></script>
-	<script>
-		google.load("jquery", "1");
-		google.load("jqueryui", "1");
-	</script>
 	<script type="text/javascript">
 	<%
 		if(request.getParameter("dupHin") != null && request.getParameter("dupHin").equals("true"))
