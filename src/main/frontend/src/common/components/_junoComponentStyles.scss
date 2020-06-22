@@ -10,6 +10,45 @@
 	text-align: right;
 }
 
+// ============ MIXINS ===============
+
+@mixin buttonColor ($primary-color, $secondary-color, $base-color, $border-color, $hover-color, $text-color)
+{
+	&.btn-primary {
+		border: 1px solid $primary-color;
+		background-color: $primary-color;
+		color: $text-color;
+	}
+
+	&.btn-secondary {
+		border: 1px solid $secondary-color;
+		background-color: $secondary-color;
+		color: $text-color;
+	}
+
+	&.btn-base {
+		border: 1px solid $border-color;
+		background-color: $base-color;
+		color: $text-color;
+
+		&:hover {
+			border-color: $hover-color;
+		}
+	}
+
+	&.btn-transparent {
+		border: 1px solid $border-color;
+		background-color: transparent;
+		color: $text-color;
+	}
+}
+
+@mixin junoTabColor ($background-color, $selected-background-color, $border-color, $text-color)
+{
+	border: 1px solid $color-neutral-lightest;
+	background-color: $color-neutral-lighter-grey;
+}
+
 // ============ STYLES ===============
 
 @mixin styleCommon()
@@ -72,6 +111,11 @@
 		background-color: $color-neutral-lightest;
 		border: 1px solid $color-neutral-lighter-grey;
 	}
+
+	&.juno-tab {
+		min-height: 56px;
+		border-radius: 8px;
+	}
 }
 
 // ============ STYLE DEFAULT ===============
@@ -102,22 +146,11 @@
 	}
 
 	button {
-		&.btn-primary {
-			border: 1px solid $color-primary-base;
-			background-color: $color-primary-base;
-			color: $color-neutral-white;
-		}
+		@include buttonColor($color-primary-base, $color-primary-light, $color-neutral-white,
+						$color-neutral-lighter-grey, $color-neutral-lighter-grey, $color-neutral-white);
 
-		&.btn-secondary {
-			border: 1px solid $color-primary-light;
-			background-color: $color-primary-light;
-			color: $color-neutral-white;
-		}
-
-		&.btn-base {
-			border: 1px solid $color-neutral-lighter-grey;
-			background-color: $color-neutral-white;
-			color: $color-neutral-darker;
+		&.btn-base, &.btn-transparent {
+			color: $color-neutral-darker !important;
 		}
 	}
 
@@ -164,26 +197,13 @@
 	}
 
 	button {
-		height: 32px;
-		box-shadow: none;
 		border-radius: 8px;
 
-		&.btn-primary {
-			border: 1px solid $color-primary-base;
-			background-color: $color-primary-base;
-			color: $color-neutral-white;
-		}
+		@include buttonColor($color-primary-base, $color-cyan-base, $color-neutral-lightest,
+						$color-neutral-lighter-grey, $color-neutral-lighter-grey, $color-neutral-white);
 
-		&.btn-secondary {
-			border: 1px solid $color-cyan-base;
-			background-color: $color-cyan-base;
-			color: $color-neutral-white;
-		}
-
-		&.btn-base {
-			border: 1px solid $color-neutral-lighter-grey;
-			background-color: $color-neutral-lightest;
-			color: $color-neutral-darker;
+		&.btn-base, &.btn-transparent {
+			color: $color-neutral-darker !important;
 		}
 	}
 
@@ -195,6 +215,8 @@
 			}
 		}
 	}
+
+	@include junoTabColor($color-neutral-lighter-grey, $color-neutral-white, $color-neutral-lightest, $color-neutral-darker);
 }
 
 // ============ STYLE DRACULA ===============
@@ -227,27 +249,8 @@
 
 	button {
 		border-radius: 8px;
-		&.btn-primary {
-			border: 1px solid $color-primary-base;
-			background-color: $color-primary-base;
-			color: $color-neutral-white;
-		}
-
-		&.btn-secondary {
-			border: 1px solid $color-primary-light;
-			background-color: $color-primary-light;
-			color: $color-neutral-white;
-		}
-
-		&.btn-base {
-			border: 1px solid $color-neutral-dark;
-			background-color: $color-neutral-darkest;
-			color: $color-neutral-white;
-
-			&:hover {
-				border-color: $color-orange-base;
-			}
-		}
+		@include buttonColor($color-primary-base, $color-primary-light, $color-neutral-darkest,
+						$color-neutral-dark, $color-orange-base, $color-neutral-white)
 	}
 
 	&.juno-check-box {

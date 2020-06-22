@@ -23,10 +23,13 @@
 
 package org.oscarehr.integration.myhealthaccess.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
+import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDate;
 
@@ -72,6 +75,18 @@ public class PatientTo1
 	private String primaryFax;
 	@JsonProperty("link_status")
 	private String linkStatus;
+
+	public PatientTo1()
+	{
+	}
+
+	public PatientTo1(MHAPatient mhaPatient)
+	{
+		BeanUtils.copyProperties(mhaPatient, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus");
+		this.healthCareProvinceCode = mhaPatient.getHealthCareProvinceCode().name();
+		this.addressProvinceCode = mhaPatient.getAddressProvinceCode().name();
+		this.linkStatus = mhaPatient.getLinkStatus().name();
+	}
 
 	public String getId()
 	{

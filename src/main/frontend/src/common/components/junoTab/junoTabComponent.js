@@ -21,25 +21,26 @@
 * Canada
 */
 
-// position of input label
-export enum LABEL_POSITION
-{
-	TOP = "juno-input-label-top",
-	LEFT = "juno-input-label-left",
-}
+import {JUNO_STYLE} from "../junoComponentConstants";
 
-// styles of juno inputs
-export enum JUNO_STYLE
-{
-	DEFAULT = "juno-style-default",
-	GREY = "juno-style-grey",
-	DRACULA = "juno-style-dracula",
-}
+angular.module('Common.Components').component('junoTab', {
+	templateUrl: 'src/common/components/junoTab/junoTab.jsp',
+	bindings: {
+		ngModel: "=",
+		tabs: "<",
+		componentStyle: "<?",
+	},
+	controller: [ function () {
+		let ctrl = this;
 
-export enum JUNO_BUTTON_COLOR
-{
-	PRIMARY = "btn-primary",
-	SECONDARY = "btn-secondary",
-	BASE = "btn-base",
-	TRANSPARENT = "btn-transparent",
-}
+		ctrl.$onInit = () =>
+		{
+			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+		};
+
+		ctrl.componentClasses = () =>
+		{
+			return [ctrl.componentStyle];
+		}
+	}]
+});

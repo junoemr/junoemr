@@ -107,7 +107,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.validations = {};
 
 		$scope.JUNO_STYLE = JUNO_STYLE;
-		$scope.pageStyle = JUNO_STYLE.DRACULA;
+		$scope.pageStyle = JUNO_STYLE.GREY;
 
 		controller.init = function init()
 		{
@@ -438,9 +438,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.demo.patientStatusDate = Juno.Common.Util.getDateMoment(controller.page.demo.patientStatusDate);
 			controller.page.demo.dateJoined = Juno.Common.Util.getDateMoment(controller.page.demo.dateJoined);
 			controller.page.demo.endDate = Juno.Common.Util.getDateMoment(controller.page.demo.endDate);
-
-			controller.page.demo.onWaitingListSinceDate = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.onWaitingListSinceDate.getFullYear(),
-					controller.page.demo.onWaitingListSinceDate.getMonth(), controller.page.demo.onWaitingListSinceDate.getDate());
+			if (controller.page.demo.onWaitingListSinceDate)
+			{
+				controller.page.demo.onWaitingListSinceDate = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.onWaitingListSinceDate.getFullYear(),
+						controller.page.demo.onWaitingListSinceDate.getMonth(), controller.page.demo.onWaitingListSinceDate.getDate());
+			}
 
 			// oscar stores no country of origin as "-1" because why not.
 			if (controller.page.demo.countryOfOrigin === "-1")

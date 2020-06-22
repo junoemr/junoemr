@@ -23,8 +23,14 @@
 package org.oscarehr.ws.rest.myhealthaccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
+import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
+import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueException;
+import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -46,6 +52,27 @@ public class DemographicWebService extends AbstractServiceImpl
 
 	@Autowired
 	IntegrationDao integrationDao;
+
+	@Autowired
+	DemographicDao demographicDao;
+
+	@GET
+	@Path("demographic/{demographic_no}/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<PatientTo1> getMHAPatient(@PathParam("integrationId") Integer integrationId, @PathParam("demographic_no") String demographicNo)
+	{
+		Integration integration = integrationDao.find(integrationId);
+		Demographic demographic = demographicDao.find(Integer.parseInt(demographicNo));
+		try
+		{
+			MHAPatient patient = patientService.getPatient(integration, demographic);
+			return RestResponse.successResponse(new PatientTo1(patient));
+		}
+		catch (RecordNotFoundException | RecordNotUniqueException e)
+		{
+			return RestResponse.successResponse(null);
+		}
+	}
 
 	@GET
 	@Path("demographic/{demographic_no}/confirmed")

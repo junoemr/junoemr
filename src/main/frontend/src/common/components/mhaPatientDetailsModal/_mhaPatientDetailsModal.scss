@@ -1,0 +1,50 @@
+.juno-modal {
+	.mha-patient-details-modal {
+		@include juno-font-body-small();
+
+		.modal-ctl-buttons {
+			.icon-modal-ctl {
+				cursor: pointer;
+			}
+		}
+
+		.modal-title {
+			.patient-title {
+				display: flex;
+				align-items: baseline !important;
+				color: $color-neutral-white;
+				font-size: 14px;
+
+				.header-start {
+					display: flex;
+					align-items: baseline;
+					margin-right: 12px;
+
+					h3 {
+						font-size: 20px;
+					}
+
+					h4 {
+						font-size: 18px;
+					}
+				}
+
+				h5 {
+					font-weight: normal;
+					font-size: 14px;
+					margin: 0 8px 0 8px;
+				}
+			}
+		}
+
+		.modal-body {
+			.patient-modal-body {
+				padding: 8px;
+
+				.juno-tab {
+					margin-top: 0;
+				}
+			}
+		}
+	}
+}

@@ -1,10 +1,14 @@
 <div class="mha-patient-connection">
-	<juno-button label="Connection Status"
+	<juno-button ng-click="$ctrl.onClick()"
+					title="{{$ctrl.getToolTip()}}"
+					label="Connection Status"
+					button-color="$ctrl.getButtonColor()"
 					component-style="$ctrl.componentStyle">
 		<div class="button-content">
-			<i class="icon icon-mha text-left"></i>
-			{{ $ctrl.getButtonText() }}
-			<i class="icon icon-check text-right"></i>
+			<i ng-if="$ctrl.isConfirmed || $ctrl.hasEmail()" class="icon icon-mha text-left" ng-class="$ctrl.iconClasses()"></i>
+			<div>{{ $ctrl.getButtonText() }}</div>
+			<i ng-if="$ctrl.isConfirmed" class="icon icon-check text-right" ng-class="$ctrl.iconClasses()"></i>
+			<i ng-if="!$ctrl.isConfirmed && $ctrl.hasEmail()" class="icon icon-send text-right" ng-class="$ctrl.iconClasses()"></i>
 		</div>
 	</juno-button>
 </div>

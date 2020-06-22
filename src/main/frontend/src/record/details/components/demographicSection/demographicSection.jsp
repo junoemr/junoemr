@@ -40,7 +40,9 @@
 							component-style="$ctrl.componentStyle">
 			</juno-select>
 
-			<mha-patient-connection component-style="$ctrl.componentStyle">
+			<mha-patient-connection demographic-no="$ctrl.ngModel.demographicNo"
+							demographic-email="$ctrl.ngModel.email"
+							component-style="$ctrl.componentStyle">
 			</mha-patient-connection>
 		</div>
 

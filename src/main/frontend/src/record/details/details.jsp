@@ -116,21 +116,6 @@
 							        ng-click="detailsCtrl.openSwipecardModal()">
 								Swipe Health Card</button>
 						</div>
-						<button class="btn"
-										ng-class="{'btn-primary': pageStyle === JUNO_STYLE.DEFAULT}"
-										ng-click="detailsCtrl.setStyle(JUNO_STYLE.DEFAULT)">
-							Style Default
-						</button>
-						<button class="btn"
-										ng-class="{'btn-primary': pageStyle === JUNO_STYLE.GREY}"
-										ng-click="detailsCtrl.setStyle(JUNO_STYLE.GREY)">
-							Style Grey
-						</button>
-						<button class="btn"
-										ng-class="{'btn-primary': pageStyle === JUNO_STYLE.DRACULA}"
-										ng-click="detailsCtrl.setStyle(JUNO_STYLE.DRACULA)">
-							Style Dracula
-						</button>
 					</div>
 					<div class=" col-sm-2 col-xs-12 pull-right">
 						<button id="save-button-top"
