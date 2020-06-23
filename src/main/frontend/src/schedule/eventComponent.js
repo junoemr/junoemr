@@ -516,6 +516,14 @@ angular.module('Schedule').component('eventComponent', {
 				}
 			};
 
+			controller.getSiteChangeToolTip = () =>
+            {
+                if ($scope.eventData.virtual && controller.inEditMode())
+                {
+                    return "Sites can't be changed for telehealth appointments";
+                }
+            };
+
 			controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 			{
 				var eventStatusCode = $scope.defaultEventStatus;

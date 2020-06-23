@@ -252,12 +252,14 @@
 										<!-- location/site -->
 										<ca-field-select
 												ca-hide="!eventController.sitesEnabled"
+                                                ca-disabled="eventData.virtual && eventController.editMode"
 												ca-name="site"
 												ca-title="Site"
 												ca-template="label"
 												ca-model="eventData.site"
 												ca-error="{{displayMessages.field_errors()['site']}}"
 												ca-options="eventController.siteOptions"
+                                                title="{{ eventController.getSiteChangeToolTip() }}"
 										>
 										</ca-field-select>
 									</div>
