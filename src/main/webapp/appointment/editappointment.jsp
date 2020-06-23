@@ -865,8 +865,10 @@
 								if (bMultisites)
 								{ %>
 							<select tabindex="4" name="location" style="background-color: <%=colo%>"
-									onchange='this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor'>
-
+									onchange='this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor'
+                                    <%= appt.getIsVirtual() ? "disabled=\"disabled\"" : ""%>
+                                    <%= appt.getIsVirtual() ? "title=\"Sites can't be changed for virtual appointments\"" : ""%>
+                            >
 								<% for (Site site : sites)
 								{
 									boolean currentSite = site.getName().equals(loc);
@@ -874,8 +876,7 @@
                                 %>
                                     <option value="<%= site.getName() %>"
                                             style="background-color: <%= site.getBgColor() %>"
-                                            <%= currentSite ? "selected=\"selected\"" : "" %>
-                                            <%= appt.getIsVirtual() && !currentSite ? "disabled=\"disabled\"" : "" %>>
+                                            <%= currentSite ? "selected=\"selected\"" : "" %>>
                                         <%= site.getName() %>
                                     </option>
                                 <%  } %>
