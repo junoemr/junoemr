@@ -866,23 +866,19 @@
 								{ %>
 							<select tabindex="4" name="location" style="background-color: <%=colo%>"
 									onchange='this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor'>
-								<%
-									StringBuilder sb = new StringBuilder();
-									for (Site s : sites)
-									{
-										if (s.getName().equals(loc))
-											isSiteSelected = true; // added by vic
-										sb.append("<option value=\"").append(s.getName()).append("\" style=\"background-color: ").append(s.getBgColor()).append("\" ").append(s.getName().equals(loc) ? "selected" : "").append(">").append(s.getName()).append("</option>");
-									}
-									if (isSiteSelected)
-									{
-										out.println(sb.toString());
-									} else
-									{
-										out.println("<option value='" + loc + "'>" + loc + "</option>");
-									}
-								%>
 
+								<% for (Site site : sites)
+								{
+									boolean currentSite = site.getName().equals(loc);
+									isSiteSelected = isSiteSelected || currentSite;
+                                %>
+                                    <option value="<%= site.getName() %>"
+                                            style="background-color: <%= site.getBgColor() %>"
+                                            <%= currentSite ? "selected=\"selected\"" : "" %>
+                                            <%= appt.getIsVirtual() && !currentSite ? "disabled=\"disabled\"" : "" %>>
+                                        <%= site.getName() %>
+                                    </option>
+                                <%  } %>
 							</select>
 							<% } else
 							{
