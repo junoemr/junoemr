@@ -45,8 +45,10 @@
 
 @mixin junoTabColor ($background-color, $selected-background-color, $border-color, $text-color)
 {
-	border: 1px solid $color-neutral-lightest;
-	background-color: $color-neutral-lighter-grey;
+	.juno-tab {
+		border: 1px solid $color-neutral-lightest;
+		background-color: $color-neutral-lighter-grey;
+	}
 }
 
 // ============ STYLES ===============
