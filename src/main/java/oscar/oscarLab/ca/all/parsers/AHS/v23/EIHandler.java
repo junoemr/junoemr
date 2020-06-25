@@ -72,6 +72,7 @@ public class EIHandler extends CLSHandler
 
     /* ===================================== MSH ====================================== */
 
+    @Override
     public String getMsgType()
     {
         return "EI";
