@@ -80,8 +80,8 @@ public class AddPatientsTests extends SeleniumTestBase {
 
 		//Patient p = PatientCollection.patients.get(0);
 		Patient mom = PatientCollection.patientMap.get("Momlastname");
-		driver.findElement(By.id("last_name")).sendKeys(mom.getLastNames());
-		driver.findElement(By.id("first_name")).sendKeys(mom.getFirstNames());
+		driver.findElement(By.id("last_name")).sendKeys(mom.getLastName());
+		driver.findElement(By.id("first_name")).sendKeys(mom.getFirstName());
 		dropdownSelectByValue(By.id("official_lang"), mom.getLanguage());
 		dropdownSelectByValue(By.id("title"), mom.getTitle());
 		dropdownSelectByValue(By.xpath("//select[@name='spoken_lang']"), mom.getSpoken());
@@ -138,7 +138,7 @@ public class AddPatientsTests extends SeleniumTestBase {
 		Thread.sleep(1000);
 
 		Assert.assertNotNull(driver.findElement(By.xpath(".//h2[contains(.,'Successful Addition of a Demographic Record.')]")));
-		Assert.assertTrue(isPatientAdded(mom.getLastNames(), mom.getFirstNames(),
+		Assert.assertTrue(isPatientAdded(mom.getLastName(), mom.getFirstName(),
 				By.xpath("//a[contains(.,'Back to Demographic Search Page')]"),
 				By.xpath("//input[@class='wideInput']"),
 				By.xpath("//tr[@class='odd']")));
@@ -158,8 +158,8 @@ public class AddPatientsTests extends SeleniumTestBase {
 		driver.findElement(By.xpath(".//a[contains(@href,'demographicaddrecordcustom')]")).click();
 		Thread.sleep(2000);
 		Patient dad = PatientCollection.patientMap.get("Dadlastname");
-		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(dad.getLastNames());
-		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(dad.getFirstNames());
+		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(dad.getLastName());
+		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(dad.getFirstName());
 		driver.findElement(By.xpath("//input[@name='year_of_birth']")).sendKeys(dad.getDobYear());
 		dropdownSelectByValue(By.xpath("//select[@name='month_of_birth']"), dad.getDobMonth());
 		dropdownSelectByValue(By.xpath("//select[@name='date_of_birth']"), dad.getDobDate());
@@ -171,7 +171,7 @@ public class AddPatientsTests extends SeleniumTestBase {
 		Thread.sleep(1000);
 
 		Assert.assertNotNull(driver.findElement(By.xpath(".//h2[contains(.,'Successful Addition of a Demographic Record.')]")));
-		Assert.assertTrue(isPatientAdded(dad.getLastNames(), dad.getFirstNames(),
+		Assert.assertTrue(isPatientAdded(dad.getLastName(), dad.getFirstName(),
 				By.xpath("//a[contains(.,'Back to Demographic Search Page')]"),
 				By.xpath("//input[@class='wideInput']"),
 				By.xpath("//tr[@class='odd']")));
@@ -192,8 +192,8 @@ public class AddPatientsTests extends SeleniumTestBase {
 		Thread.sleep(2000);
 
 		Patient son = PatientCollection.patientMap.get("Sonlastname");
-		driver.findElement(By.id("input-lastName")).sendKeys(son.getLastNames());
-		driver.findElement(By.id("input-firstName")).sendKeys(son.getFirstNames());
+		driver.findElement(By.id("input-lastName")).sendKeys(son.getLastName());
+		driver.findElement(By.id("input-firstName")).sendKeys(son.getFirstName());
 		dropdownSelectByValue(By.id("input-gender"), "string:" + son.getSex());
 		driver.findElement(By.id("input-dob")).sendKeys(son.getDobYear() + "-" + son.getDobMonth() + "-" + son.getDobDate());
 		driver.findElement(By.id("input-hin")).sendKeys(son.getHin());
@@ -207,7 +207,7 @@ public class AddPatientsTests extends SeleniumTestBase {
 		driver.findElement(By.xpath("//button[contains(., 'Add')]")).click();
 		Thread.sleep(1000);
 
-		Assert.assertTrue(isPatientAdded(son.getLastNames(), son.getFirstNames(),
+		Assert.assertTrue(isPatientAdded(son.getLastName(), son.getFirstName(),
 				By.xpath("//button[@title='Search']"),
 				By.xpath("//input[@placeholder='Search Term']"),
 				By.xpath("//tr[@class='ng-scope']")));

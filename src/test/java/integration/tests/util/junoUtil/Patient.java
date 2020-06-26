@@ -26,8 +26,8 @@ package integration.tests.util.junoUtil;
   public class Patient
 {
 
-	private String lastNames = "";
-	private String firstNames = "";
+	private String lastName = "";
+	private String firstName = "";
 	private String dobYear = "";
 	private String dobMonth = "";
 	private String dobDate = "";
@@ -74,20 +74,20 @@ package integration.tests.util.junoUtil;
 
 
 
-	public String getLastNames() {
-		return lastNames;
+	public String getLastName() {
+		return lastName;
 	}
 
-	public void setLastNames(String lastNames) {
-		this.lastNames = lastNames;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
-	public String getFirstNames() {
-		return firstNames;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setFirstNames(String firstNames) {
-		this.firstNames = firstNames;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
 	public String getDobYear() {

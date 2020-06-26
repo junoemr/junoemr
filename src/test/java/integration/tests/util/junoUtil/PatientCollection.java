@@ -32,20 +32,20 @@ public class PatientCollection
 	public static HashMap<String, Patient> patientMap = new HashMap<String, Patient>();
 	static {
 		Patient patient = new Patient();
-		patient.setLastNames("Momlastname");
-		patient.setFirstNames("Momfirstname");
+		patient.setLastName("Momlastname");
+		patient.setFirstName("Momfirstname");
 		patient.setDobYear("1980");
 		patient.setDobMonth("09");
 		patient.setDobDate("09");
 		patient.setSex("F");
 		patient.setHin("01234566540");
 		patients.add(patient);
-		patientMap.put(patient.getLastNames(), patient);
+		patientMap.put(patient.getLastName(), patient);
 
 		//Demographic demo = new Demographic();
 		Patient patient2 = new Patient();
-		patient2.setLastNames("Dadlastname");
-		patient2.setFirstNames("Dadfirstname");
+		patient2.setLastName("Dadlastname");
+		patient2.setFirstName("Dadfirstname");
 		//patient2.setFirstNames(demo.getFirstName());
 		patient2.setDobYear("1988");
 		patient2.setDobMonth("08");
@@ -53,18 +53,18 @@ public class PatientCollection
 		patient2.setSex("M");
 		patient2.setHin("111111111");
 		patients.add(patient2);
-		patientMap.put(patient2.getLastNames(), patient2);
+		patientMap.put(patient2.getLastName(), patient2);
 
 		Patient patient3 = new Patient();
-		patient3.setLastNames("Sonlastname");
-		patient3.setFirstNames("Sonfirstname");
+		patient3.setLastName("Sonlastname");
+		patient3.setFirstName("Sonfirstname");
 		patient3.setDobYear("2008");
 		patient3.setDobMonth("08");
 		patient3.setDobDate("08");
 		patient3.setSex("M");
 		patient3.setHin("9874397159");
 		patients.add(patient3);
-		patientMap.put(patient3.getLastNames(), patient3);
+		patientMap.put(patient3.getLastName(), patient3);
 
 	}
 
