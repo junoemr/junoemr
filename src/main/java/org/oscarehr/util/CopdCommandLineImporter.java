@@ -31,6 +31,7 @@ import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.demographicImport.service.CoPDMessageStream;
 import org.oscarehr.demographicImport.service.CoPDPreProcessorService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import oscar.OscarProperties;
 
@@ -215,17 +216,23 @@ public class CopdCommandLineImporter
 		String message;
 		while (!(message = messageStream.getNextMessage()).isEmpty())
 		{
+			CoPDRecordData recordData = new CoPDRecordData();
 			try
 			{
 				messageCount += 1;
-				message = coPDPreProcessorService.preProcessMessage(message, importSource);
-				coPDImportService.importFromHl7Message(message, documentDirectory, importSource, skipMissingDocs, mergeDemographics);
+				message = coPDPreProcessorService.preProcessMessage(message, importSource, recordData);
+				coPDImportService.importFromHl7Message(message, documentDirectory, importSource, recordData, skipMissingDocs, mergeDemographics);
 			}
 			catch (Exception e)
 			{
 				logger.error("failed to import message: " + messageCount + "\n With error:", e);
 				hasFailure = true;
 				failureCount += 1;
+			}
+			finally
+			{
+				//TODO - potentially print this to it's own log file
+				recordData.print();
 			}
 		}
 

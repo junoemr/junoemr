@@ -74,6 +74,17 @@ public class ZQO extends AbstractSegment
 		return null;
 	}
 
+	public SI getZQO1_setId() throws HL7Exception
+	{
+		try
+		{
+			return (SI) getField(1, 0);
+		}
+		catch (ClassCastException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
 	public TS getZQO2_1_observationDate() throws HL7Exception
 	{
 		try

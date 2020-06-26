@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.Hl7Const;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,7 +77,7 @@ public class CoPDPreProcessorService
 	 * @param message the original message string
 	 * @return the formatted and fixed message string
 	 */
-	public String preProcessMessage(String message, CoPDImportService.IMPORT_SOURCE importSource)
+	public String preProcessMessage(String message, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
 		message = setHl7Version(message);
 		message = fixPRDSegment(message);
@@ -106,10 +108,10 @@ public class CoPDPreProcessorService
 			message = fixZATDateString(message);
 			message = timestampPad(message);
 			message = fixReferralPractitionerNo(message);
-
-			// should come last
-			message = ensureNumeric(message);
 		}
+
+		// should come last
+		message = ensureNumeric(message, recordData);
 
 		return message;
 	}
@@ -128,6 +130,8 @@ public class CoPDPreProcessorService
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_TS_1, trimTagNewLines, Pattern.DOTALL);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_XTN_6, trimTagNewLines, Pattern.DOTALL);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZBA_4, trimTagNewLines, Pattern.DOTALL);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_4, trimTagNewLines, Pattern.DOTALL);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_5, trimTagNewLines, Pattern.DOTALL);
 		return message;
 	}
 
@@ -165,6 +169,38 @@ public class CoPDPreProcessorService
 		{
 			String newContent = callback.apply(tagMatcher.group(1));
 			tagMatcher.appendReplacement(sb, "<" + tagName + ">" + newContent + "</" + tagName + ">");
+		}
+		tagMatcher.appendTail(sb);
+		return sb.toString();
+	}
+
+	/**
+	 * iterate over each segment with found in the message. Allowing modification
+	 * to its content
+	 *
+	 * @param message      message to process
+	 * @param segment      the segment on which to run
+	 * @param segmentField the segment field on which the callback is triggered
+	 * @param callback     the callback to call for all instances of the tag (tag content in -> , -> modified content out).
+	 * @return a modified message.
+	 */
+	private String foreachSegment(String message, String segment, String segmentField, BiFunction<String, String, String> callback)
+	{
+		String tagName = segment + "\\." + segmentField;
+		Pattern tagPattern = Pattern.compile(
+				"<" + segment + "\\.1>(.*?)<\\/" + segment + "\\.1>" + // segment ID
+				"(.*?)" + // inbetween
+				"<" + tagName + ">(.*?)<\\/" + tagName + ">", Pattern.DOTALL); // specific field
+		Matcher tagMatcher = tagPattern.matcher(message);
+
+		StringBuffer sb = new StringBuffer(message.length());
+		while (tagMatcher.find())
+		{
+			String newContent = callback.apply(tagMatcher.group(1), tagMatcher.group(3));
+			tagMatcher.appendReplacement(sb,
+					"<" + segment + "\\.1>" + tagMatcher.group(1) + "<\\/" + segment + "\\.1>"
+					+ tagMatcher.group(2) +
+					"<" + tagName + ">" + newContent + "</" + tagName + ">");
 		}
 		tagMatcher.appendTail(sb);
 		return sb.toString();
@@ -254,9 +290,18 @@ public class CoPDPreProcessorService
 	 * @param message - the message to operate on.
 	 * @return - the resulting message
 	 */
-	private String ensureNumeric(String message)
+	private String ensureNumeric(String message, CoPDRecordData recordData)
 	{
-		Function<String, String> ensureNumeric = tagValue ->
+		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZBA, "31");
+		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZQO, "4");
+		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZQO, "5");
+		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZQO, "6");
+		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZQO, "7");
+		return message;
+	}
+	private String ensureNumeric(String message, CoPDRecordData recordData, String segment, String segmentField)
+	{
+		BiFunction<String, String, String> ensureNumericCallback = (segmentId, tagValue) ->
 		{
 			try
 			{
@@ -265,17 +310,15 @@ public class CoPDPreProcessorService
 			}
 			catch (NumberFormatException e)
 			{
-				logger.warn("Replacing invalid numeric value:" + tagValue + " with: \"0\"");
+				String dataMessage = Hl7Const.getReadableSegmentName(segment + "." + segmentField) +
+						"=> Invalid numeric value of '" + tagValue + "'. Value was set to 0";
+				recordData.addObservationMessage(segmentId, dataMessage);
+				logger.warn("[" + segment + "." + segmentField + "] Replacing invalid numeric value:" + tagValue + " with: \"0\"");
 				return "0";
 			}
 		};
 
-		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZBA_31, ensureNumeric);
-		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_4, ensureNumeric);
-		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_5, ensureNumeric);
-		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_6, ensureNumeric);
-		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_7, ensureNumeric);
-		return message;
+		return foreachSegment(message, segment, segmentField, ensureNumericCallback);
 	}
 
 	/**

@@ -29,6 +29,8 @@ import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
+import org.oscarehr.demographicImport.transfer.CoPDRecordMessage;
 import org.oscarehr.measurements.service.MeasurementsService;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.provider.model.ProviderData;
@@ -46,13 +48,13 @@ public class MeasurementsMapper extends AbstractMapper
 		super(message, providerRep, importSource);
 	}
 
-	public List<Measurement> getMeasurementList(Demographic demo, ProviderData providerData) throws HL7Exception
+	public List<Measurement> getMeasurementList(Demographic demo, ProviderData providerData, CoPDRecordData recordData) throws HL7Exception
 	{
 		//TODO. import more measurements here
-		return getZQOMeasurements(demo, providerData);
+		return getZQOMeasurements(demo, providerData, recordData);
 	}
 
-	protected List<Measurement> getZQOMeasurements(Demographic demo, ProviderData providerData) throws HL7Exception
+	protected List<Measurement> getZQOMeasurements(Demographic demo, ProviderData providerData, CoPDRecordData recordData) throws HL7Exception
 	{
 		ArrayList<Measurement> measurements = new ArrayList<>();
 
@@ -69,6 +71,13 @@ public class MeasurementsMapper extends AbstractMapper
 			String height = provider.getZQO(i).getZQO6_height().getValue();
 			String weight = provider.getZQO(i).getZQO7_weight().getValue();
 			String waist  = provider.getZQO(i).getZQO8_waist().getValue();
+
+			// if there is a message object corresponding to the segment id, set additional import info
+			CoPDRecordMessage recordMessage = recordData.getObservationMessage(provider.getZQO(i).getZQO1_setId().getValue());
+			if(recordMessage != null)
+			{
+				recordMessage.setDateTime(obsDate);
+			}
 
 			if (miniHealth != null)
 			{

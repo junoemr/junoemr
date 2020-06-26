@@ -69,6 +69,7 @@ import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
@@ -183,7 +184,12 @@ public class CoPDImportService
 
 	private static long missingDocumentCount = 0;
 
-	public void importFromHl7Message(String message, String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs, boolean mergeDemographics) throws HL7Exception, IOException, InterruptedException
+	public void importFromHl7Message(String message, String documentLocation,
+	                                 IMPORT_SOURCE importSource,
+	                                 CoPDRecordData recordData,
+	                                 boolean skipMissingDocs,
+	                                 boolean mergeDemographics)
+			throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Initialize HL7 parser");
 		HapiContext context = new DefaultHapiContext();
@@ -202,14 +208,19 @@ public class CoPDImportService
 		ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(message);
 
 		missingDocumentCount = 0;
-		importRecordData(zpdZtrMessage, documentLocation, importSource, skipMissingDocs, mergeDemographics);
+		importRecordData(zpdZtrMessage, documentLocation, importSource, recordData, skipMissingDocs, mergeDemographics);
 	}
 	public long getMissingDocumentCount()
 	{
 		return missingDocumentCount;
 	}
 
-	private void importRecordData(ZPD_ZTR zpdZtrMessage, String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs, boolean mergeDemographics)
+	private void importRecordData(ZPD_ZTR zpdZtrMessage,
+	                              String documentLocation,
+	                              IMPORT_SOURCE importSource,
+	                              CoPDRecordData recordData,
+	                              boolean skipMissingDocs,
+	                              boolean mergeDemographics)
 			throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Creating Demographic Record ...");
@@ -217,9 +228,10 @@ public class CoPDImportService
 		if (demographic != null)
 		{
 			logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
+			recordData.setDemographicId(demographic.getId());
 
 			logger.info("Find/Create Provider Record(s) ...");
-			ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource, skipMissingDocs);
+			ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource, recordData, skipMissingDocs);
 
 			// set the mrp doctor after all the provider records are created
 			demographic.setProviderNo(mrpProvider.getId());
@@ -238,7 +250,8 @@ public class CoPDImportService
 	 * @throws HL7Exception
 	 */
 	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage, Demographic demographic,
-	                                        String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
+	                                        String documentLocation, IMPORT_SOURCE importSource,
+	                                        CoPDRecordData recordData, boolean skipMissingDocs)
 			throws HL7Exception, IOException, InterruptedException
 	{
 		ProviderData mrpProvider = null;
@@ -297,7 +310,7 @@ public class CoPDImportService
 			logger.info("Import Ticklers ...");
 			importTicklers(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			logger.info("Importing Measurements ...");
-			importMeasurements(zpdZtrMessage, demographic, i, assignedProvider, importSource);
+			importMeasurements(zpdZtrMessage, demographic, i, assignedProvider, importSource, recordData);
 			logger.info("Importing Messages ...");
 			importMessageData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 		}
@@ -392,11 +405,12 @@ public class CoPDImportService
 		return demographic;
 	}
 
-	private void importMeasurements(ZPD_ZTR zpdZtrMessage, Demographic demographic, int provderRep, ProviderData assignedProvider, IMPORT_SOURCE importSource) throws HL7Exception
+	private void importMeasurements(ZPD_ZTR zpdZtrMessage, Demographic demographic, int provderRep, ProviderData assignedProvider,
+	                                IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		MeasurementsMapper measurementsMapper = MapperFactory.newMeasurementsMapper(zpdZtrMessage, provderRep, importSource);
 
-		List<Measurement> measurements = measurementsMapper.getMeasurementList(demographic, assignedProvider);
+		List<Measurement> measurements = measurementsMapper.getMeasurementList(demographic, assignedProvider, recordData);
 		for (Measurement measurement : measurements)
 		{
 			logger.info("Saving measurement of type: " + measurement.getType() + " value: " + measurement.getDataField() + " to demographic: " + demographic.getDemographicId());

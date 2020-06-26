@@ -34,14 +34,29 @@ public class Hl7Const
 
 	public static final String HL7_SEGMENT_ZAT_2 = "ZAT.2";
 
+	public static final String HL7_SEGMENT_ZBA = "ZBA";
 	public static final String HL7_SEGMENT_ZBA_4 = "ZBA.4";
 	public static final String HL7_SEGMENT_ZBA_29 = "ZBA.29";
 	public static final String HL7_SEGMENT_ZBA_31 = "ZBA.31";
 
 	public static final String HL7_SEGMENT_ZPV_5 = "ZPV.5";
 
+	public static final String HL7_SEGMENT_ZQO = "ZQO";
 	public static final String HL7_SEGMENT_ZQO_4 = "ZQO.4";
 	public static final String HL7_SEGMENT_ZQO_5 = "ZQO.5";
 	public static final String HL7_SEGMENT_ZQO_6 = "ZQO.6";
 	public static final String HL7_SEGMENT_ZQO_7 = "ZQO.7";
+
+	public static String getReadableSegmentName(String segment)
+	{
+		switch(segment)
+		{
+			case HL7_SEGMENT_ZQO: return "Observations";
+			case HL7_SEGMENT_ZQO_4: return "Observations: Systolic Blood Pressure";
+			case HL7_SEGMENT_ZQO_5: return "Observations: Diastolic Blood Pressure";
+			case HL7_SEGMENT_ZQO_6: return "Observations: Height (in cm)";
+			case HL7_SEGMENT_ZQO_7: return "Observations: Weight (in kg)";
+			default: return "Unknown";
+		}
+	}
 }
