@@ -338,6 +338,15 @@ public class ScheduleWs extends AbstractWs {
 		scheduleManager.updateAppointment(getLoggedInInfo(), appointment);
 	}
 
+	public void confirmAppointment(Integer appointmentId, String confirmedByType, String confirmedBy)
+	{
+		scheduleManager.confirmAppointment(
+				getLoggedInInfo(),
+				appointmentId,
+				Appointment.ConfirmedByType.valueOf(confirmedByType),
+				confirmedBy);
+	}
+
 	/**
 	 * @deprecated you should use the method with the useGMTTime option
 	 */

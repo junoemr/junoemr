@@ -218,3 +218,50 @@ p {
 #helpLink {
 	color: #A40000;
 }
+
+.self-booked {
+	position: absolute;
+	display: inline-block;
+	right: 32px;
+}
+
+.self-booked .self-booked-marker {
+	width: 16px;
+	height: 16px;
+	background-color: white;
+	border: 1px solid gray;
+	border-radius: 50%;
+}
+
+.self-booked .confirmation-marker {
+	width: 8px;
+	height: 8px;
+	background-color: white;
+	border: 1px solid gray;
+	border-radius: 50%;
+	position: absolute;
+	right: -11px;
+	bottom: 12px;
+}
+
+.self-booked .confirmation-marker.confirmed_true {
+	background-color: #151515;
+	border-color: #151515;
+}
+
+.self-booked .tooltip {
+	position: absolute;
+	display: none;
+	top: -37px;
+	right: -17px;
+	color: white;
+	background-color: rgba(0,0,0,0.5);
+	padding: 8px;
+	border-radius: 8px;
+
+}
+
+.self-booked .tooltip-trigger:hover > .tooltip {
+	display: block;
+}
+

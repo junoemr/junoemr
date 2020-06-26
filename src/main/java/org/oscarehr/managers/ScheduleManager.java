@@ -30,6 +30,7 @@ import org.oscarehr.appointment.dao.AppointmentStatusDao;
 import org.oscarehr.common.dao.AppointmentArchiveDao;
 import org.oscarehr.common.dao.AppointmentTypeDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.common.model.AppointmentStatus;
@@ -46,16 +47,13 @@ import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.NotAuthorisedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.function.Function;
 
 @Service
 public class ScheduleManager {
@@ -85,6 +83,9 @@ public class ScheduleManager {
 
 	@Autowired
 	private AppointmentStatusDao appointmentStatusDao;
+
+	@Autowired
+	private SecurityDao securityDao;
 
 	/*Right now the date object passed is converted to a local time.  
 	*
@@ -251,5 +252,34 @@ public class ScheduleManager {
 	public List<Integer> getAllDemographicIdByProgramProvider(LoggedInInfo loggedInInfo, Integer programId, String providerNo) {
 		List<Integer> results = oscarAppointmentDao.findAllDemographicIdByProgramProvider(programId, providerNo);
 		return (results);
+	}
+
+	public void confirmAppointment(LoggedInInfo loggedInInfo, Integer appointmentId)
+	{
+		Integer securityNo = loggedInInfo.getLoggedInSecurity().getSecurityNo();
+		this.confirmAppointment(loggedInInfo, appointmentId, Appointment.ConfirmedByType.SECURITY_NO, securityNo.toString());
+	}
+
+	public void confirmAppointment(LoggedInInfo loggedInInfo, Integer appointmentId,
+								   Appointment.ConfirmedByType confirmedByType, String confirmedBy)
+	{
+		Optional<Appointment> appointment = oscarAppointmentDao.findOptional(appointmentId);
+
+		appointment.ifPresent(appt -> {
+			boolean canConfirm = true;
+
+			// Prevent juno confirmations if security_no doesn't exist
+			if (confirmedByType == Appointment.ConfirmedByType.SECURITY_NO)
+			{
+				Optional<Security> security = securityDao.findOptional(Integer.getInteger(confirmedBy));
+				canConfirm = security.isPresent();
+			}
+
+			if (canConfirm)
+			{
+				appt.confirm(confirmedByType, confirmedBy);
+				this.updateAppointment(loggedInInfo, appt);
+			}
+		});
 	}
 }
