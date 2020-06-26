@@ -62,17 +62,15 @@ public class SeleniumTestBase
 	@AfterClass
 	public static void closeWebDriver()
 	{
-
-		//driver.quit();
+		driver.quit();
 	}
-
 
 	private static void createWebDriver()
 	{
 		System.setProperty("webdriver.gecko.driver", GECKO_DRIVER);
 		FirefoxBinary ffb = new FirefoxBinary();
 		FirefoxOptions ffo = new FirefoxOptions();
-		//ffb.addCommandLineOptions("--headless");
+		ffb.addCommandLineOptions("--headless");
 		ffo.setBinary(ffb);
 		driver = new FirefoxDriver(ffo);
 		driver.manage().timeouts().implicitlyWait(WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);

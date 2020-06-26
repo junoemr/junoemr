@@ -69,18 +69,20 @@ public class AddProvidersTests extends SeleniumTestBase {
 		// open administration panel
 		Thread.sleep(2000);
 		driver.findElement(By.id("admin-panel")).click();
+		Thread.sleep(2000);
 		PageUtil.switchToLastWindow(driver);
 		Thread.sleep(2000);
 
 		// Add a provider record page
-		driver.findElement(By.xpath(".//a[contains(@rel,'provideraddarecord')]")).click();
+		driver.findElement(By.xpath(".//h5[contains(.,'Add a Provider Record')]")).click();
 		Thread.sleep(1000);
-
 		Provider drApple = ProviderCollection.providerMap.get("Apple");
+		driver.switchTo().frame("myFrame");
+		driver.findElement(By.xpath("//input[@value='Suggest']")).click();
 		driver.findElement(By.xpath("//input[@name='provider_no']")).clear();
 		driver.findElement(By.xpath("//input[@name='provider_no']")).sendKeys(drApple.getProviderNo());
-		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(drApple.getLastNames());
-		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(drApple.getFirstNames());
+		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(drApple.getLastName());
+		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(drApple.getFirstName());
 		dropdownSelectByValue(driver, By.id("provider_type"), drApple.getType());
 		driver.findElement(By.xpath("//input[@name='specialty']")).sendKeys(drApple.getSpecialty());
 		driver.findElement(By.xpath("//input[@name='team']")).sendKeys(drApple.getTeam());

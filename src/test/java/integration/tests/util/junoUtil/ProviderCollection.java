@@ -33,35 +33,35 @@ public class ProviderCollection
 	static {
 		Provider provider = new Provider();
 		provider.setProviderNo("100001");
-		provider.setLastNames("Apple");
-		provider.setFirstNames("Afname");
+		provider.setLastName("Apple");
+		provider.setFirstName("Afname");
 		provider.setType("doctor");
 		provider.setSpecialty("Family");
 		provider.setDob("1980-02-02");
 		provider.setSex("F");
 		providers.add(provider);
-		providerMap.put(provider.getLastNames(), provider);
+		providerMap.put(provider.getLastName(), provider);
 
 		Provider provider2 = new Provider();
 		provider.setProviderNo("100002");
-		provider2.setLastNames("Berry");
-		provider2.setFirstNames("Bfname");
+		provider2.setLastName("Berry");
+		provider2.setFirstName("Bfname");
 		provider2.setType("doctor");
-		provider2.setSpecialty("Maternity");
+		provider2.setSpecialty("Family");
 		provider2.setDob("1988-08-08");
-		provider2.setSex("F");
+		provider2.setSex("M");
 		providers.add(provider2);
-		providerMap.put(provider2.getLastNames(), provider2);
+		providerMap.put(provider2.getLastName(), provider2);
 
 		Provider provider3 = new Provider();
-		provider3.setLastNames("Cherry");
-		provider3.setFirstNames("Cfname");
+		provider3.setLastName("Cherry");
+		provider3.setFirstName("Cfname");
 		provider3.setType("doctor");
-		provider3.setSpecialty("Family");
+		provider3.setSpecialty("Maternity");
 		provider3.setDob("2000-08-08");
-		provider3.setSex("M");
+		provider3.setSex("F");
 		providers.add(provider3);
-		providerMap.put(provider3.getLastNames(), provider3);
+		providerMap.put(provider3.getLastName(), provider3);
 
 	}
 
