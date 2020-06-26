@@ -20,9 +20,9 @@
  * Victoria, British Columbia
  * Canada
  */
+
 package integration.tests;
 
-import integration.tests.sql.SqlFiles;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
@@ -30,7 +30,7 @@ import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openqa.selenium.By;
+ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.common.dao.utils.AuthUtils;
@@ -38,7 +38,6 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
 import java.util.UUID;
 import java.util.regex.Pattern;
 
