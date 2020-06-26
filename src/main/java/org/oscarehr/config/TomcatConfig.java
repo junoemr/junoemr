@@ -27,6 +27,8 @@ import org.apache.catalina.Context;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,6 +37,17 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationPropertiesScan("org.oscarehr.config")
 public class TomcatConfig
 {
+	private oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
+
+	// TODO: SPRINGUPGRADE: Set the context path from the properties files.  This might not be a
+	//                      thing we need to do.
+	@Bean
+	public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> webServerFactoryCustomizer()
+	{
+		String contextPath = oscarProperties.getProjectHome();
+		return factory -> factory.setContextPath("/" + contextPath);
+	}
+
 	@Bean
 	public TomcatServletWebServerFactory tomcatServletWebServerFactory()
 	{

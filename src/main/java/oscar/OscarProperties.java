@@ -386,6 +386,11 @@ public class OscarProperties extends Properties {
 		return getProperty("db_type");
 	}
 
+	public String getDbName()
+	{
+		return getProperty("db_name");
+	}
+
 	public String getDbUserName() {
 		return getProperty("db_username");
 	}
@@ -579,6 +584,11 @@ public class OscarProperties extends Properties {
 		}
 
 		return false;
+	}
+
+	public String getProjectHome()
+	{
+		return getProperty("project_home");
 	}
 
 	// =========================================================================
