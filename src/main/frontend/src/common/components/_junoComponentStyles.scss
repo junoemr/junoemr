@@ -21,7 +21,7 @@
 	}
 
 	&.btn-secondary {
-		border: 1px solid $secondary-color;
+		border: 1px solid $border-color;
 		background-color: $secondary-color;
 		color: $text-color;
 	}
@@ -248,11 +248,11 @@
 	button {
 		border-radius: 8px;
 
-		@include buttonColor($color-primary-base, $color-cyan-base, $color-neutral-lightest,
+		@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-lightest,
 						$color-neutral-lighter-grey, $color-neutral-lighter-grey, $color-neutral-white);
 
-		&.btn-base, &.btn-transparent {
-			color: $color-neutral-darker !important;
+		&.btn-secondary, &.btn-base, &.btn-transparent {
+			color: $color-neutral-darker;
 		}
 	}
 

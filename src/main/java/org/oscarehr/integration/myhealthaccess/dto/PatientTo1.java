@@ -23,13 +23,14 @@
 
 package org.oscarehr.integration.myhealthaccess.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
 import org.springframework.beans.BeanUtils;
+import oscar.util.Jackson.LocalDateSerializer;
 
 import java.time.LocalDate;
 
@@ -46,6 +47,7 @@ public class PatientTo1
 	private String lastName;
 	@JsonProperty("birth_date")
 	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonSerialize(using = LocalDateSerializer.class)
 	private LocalDate birthDate;
 	private String sex;
 	@JsonProperty("health_number")

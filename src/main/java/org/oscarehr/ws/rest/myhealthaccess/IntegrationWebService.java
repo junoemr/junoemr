@@ -22,7 +22,6 @@
  */
 package org.oscarehr.ws.rest.myhealthaccess;
 
-import com.indivica.olis.queries.Query;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.service.IntegrationService;

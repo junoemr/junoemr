@@ -112,6 +112,25 @@
 					.right-content {
 						flex: 1 0 303px;
 						height: 100%;
+
+						display: flex;
+						flex-direction: column;
+
+						.juno-input {
+							width: 255px;
+						}
+
+						.connection-status {
+							width: 100%;
+							display: flex;
+							align-items: flex-end;
+
+							.icon {
+								font-size: 16px;
+								margin-bottom: 8px;
+								color: $color-primary-base;
+							}
+						}
 					}
 				}
 			}
@@ -126,6 +145,19 @@
 				margin-top: 0;
 				.panel-body {
 					padding: 12px 8px 12px 8px;
+					display: flex;
+
+					.cancel-connection-btn {
+						flex: 0 0 128px;
+						.juno-button {
+							margin: 0;
+							width: 128px;
+
+							.cancel-btn-text {
+								color: $color-red-base;
+							}
+						}
+					}
 				}
 			}
 		}

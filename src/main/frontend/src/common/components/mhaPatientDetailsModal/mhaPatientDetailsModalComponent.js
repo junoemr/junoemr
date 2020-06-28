@@ -75,10 +75,12 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 				for (let integration of integrationsList)
 				{
 					let patient = (await mhaDemographicApi.getMHAPatient(integration.id, ctrl.resolve.demographicNo)).data.body;
-					if (patient)
+					if (patient && patient.link_status === "ACTIVE")
 					{
+						console.log(patient);
 						// add computed attribute for display, inputs get upset when they cannot assign to a ng-model
 						patient.city_province = `${patient.city}  ${patient.address_province_code}`;
+						patient.connection_status = ctrl.getConnectionStatusHuman(patient.link_status)
 
 						ctrl.patientProfiles.push({
 							label: integration.siteName,
@@ -106,6 +108,22 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 			}
 			return "";
 		};
+
+		ctrl.getConnectionStatusHuman = (patientConnectionStatus) =>
+		{
+			if (patientConnectionStatus === "ACTIVE")
+			{
+				return "Patient is a CONFIRMED user";
+			}
+			else if (patientConnectionStatus === "CLINIC_REJECTED")
+			{
+				return "Patient has been REJECTED by clinic";
+			}
+			else
+			{
+				return "Patient is a UNCONFIRMED user";
+			}
+		}
 
 		ctrl.getCurrentPatientHinAndProv = () =>
 		{

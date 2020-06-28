@@ -26,7 +26,7 @@
 									label="Email Address"
 									label-position="LABEL_POSITION.TOP"
 									readonly="true"
-									no-border="true"
+									no-box="true"
 									component-style="$ctrl.resolve.style">
 					</juno-input>
 				</div>
@@ -40,7 +40,7 @@
 												label="Phone Number"
 												label-position="LABEL_POSITION.TOP"
 												readonly="true"
-												no-border="true"
+												no-box="true"
 												component-style="$ctrl.resolve.style">
 								</juno-input>
 
@@ -49,7 +49,7 @@
 												label="Street Address"
 												label-position="LABEL_POSITION.TOP"
 												readonly="true"
-												no-border="true"
+												no-box="true"
 												component-style="$ctrl.resolve.style"
 												class="no-margin">
 								</juno-input>
@@ -61,7 +61,7 @@
 												label="Date of Birth"
 												label-position="LABEL_POSITION.TOP"
 												readonly="true"
-												no-border="true"
+												no-box="true"
 												component-style="$ctrl.resolve.style">
 								</juno-input>
 
@@ -70,7 +70,7 @@
 												label="Gender"
 												label-position="LABEL_POSITION.TOP"
 												readonly="true"
-												no-border="true"
+												no-box="true"
 												component-style="$ctrl.resolve.style"
 												class="small">
 								</juno-input>
@@ -80,7 +80,7 @@
 												label="City Province"
 												label-position="LABEL_POSITION.TOP"
 												readonly="true"
-												no-border="true"
+												no-box="true"
 												component-style="$ctrl.resolve.style"
 												class="no-margin">
 								</juno-input>
@@ -90,7 +90,7 @@
 												label="Postal Code"
 												label-position="LABEL_POSITION.TOP"
 												readonly="true"
-												no-border="true"
+												no-box="true"
 												component-style="$ctrl.resolve.style"
 												class="no-margin small">
 								</juno-input>
@@ -103,7 +103,18 @@
 			<juno-divider component-style="$ctrl.resolve.style" horizontal="true"></juno-divider>
 
 			<div class="right-content">
-
+				<!-- Connection Status -->
+				<div class="connection-status">
+					<juno-input ng-model="$ctrl.currentProfile.connection_status"
+									label="Connection"
+									label-position="LABEL_POSITION.TOP"
+									readonly="true"
+									no-box="true"
+									component-style="$ctrl.resolve.style"
+									class="no-margin small">
+					</juno-input>
+					<i ng-if="$ctrl.currentProfile.link_status === 'ACTIVE'" class="icon icon-check"></i>
+				</div>
 			</div>
 		</div>
 	</modal-body>
@@ -111,7 +122,13 @@
 	<modal-footer>
 		<panel no-header="true" component-style="$ctrl.resolve.style">
 			<panel-body>
-				hello world
+				<juno-button component-style="$ctrl.resolve.style"
+								button-color="JUNO_BUTTON_COLOR.SECONDARY"
+								class="cancel-connection-btn">
+					<div class="cancel-btn-text">
+						Cancel Connection
+					</div>
+				</juno-button>
 			</panel-body>
 		</panel>
 	</modal-footer>
