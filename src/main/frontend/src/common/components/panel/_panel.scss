@@ -1,7 +1,6 @@
 
-panel {
-	@include juno-font-body-small();
-	display: block;
+.juno-panel {
+	display: block !important;
 
 	.panel-header {
 		background-color: $color-neutral-lighter;
@@ -31,6 +30,12 @@ panel {
 		border-top-right-radius: 0;
 
 		padding: 16px;
+
+		&.no-header {
+			border-top-left-radius: 8px;
+			border-top-right-radius: 8px;
+			border-top-width: 4px;
+		}
 	}
 
 }

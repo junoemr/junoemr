@@ -2,7 +2,7 @@
 
 .juno-input-label-top {
 	flex: 0 0 100%;
-	margin-bottom: 8px;
+	margin-bottom: 4px;
 }
 
 .juno-input-label-left {
@@ -45,9 +45,48 @@
 
 @mixin junoTabColor ($background-color, $selected-background-color, $border-color, $text-color)
 {
-	.juno-tab {
-		border: 1px solid $color-neutral-lightest;
-		background-color: $color-neutral-lighter-grey;
+	&.juno-tab {
+		@include juno-font-body-small();
+
+		height: 56px;
+		border-radius: 8px;
+
+		border: 1px solid $border-color;
+		background-color: $background-color;
+		color: $text-color;
+
+		.tab {
+			border-color: $border-color;
+			border-right-style: solid;
+			border-right-width: 1px;
+
+			cursor: pointer;
+
+			&.active {
+				background-color: $selected-background-color;
+			}
+
+			&:first-child {
+				border-bottom-left-radius: 8px;
+				border-top-left-radius: 8px;
+			}
+		}
+	}
+}
+
+@mixin junoPanelColor($body-background, $header-background, $border-color)
+{
+	&.juno-panel {
+		color: $color-neutral-darker;
+		.panel-header {
+			background-color: $header-background;
+			border-color: $border-color;
+		}
+
+		.panel-body {
+			background-color: $body-background;
+			border-color: $border-color;
+		}
 	}
 }
 
@@ -60,20 +99,27 @@
 	align-items: baseline;
 	flex-wrap: wrap;
 
-	input,select {
-		height: 32px;
-		padding: 9px 16px 9px 16px;
+	&.juno-input, &.juno-select, &.juno-typeahead,
+	&.juno-check-box, &.juno-date-select, &.juno-button {
+		input, select {
+			height: 32px;
+			padding: 9px 16px 9px 16px;
 
-		&.field-invalid {
-			border-color: $color-red-base;
-
-			&:focus,&:active {
+			&.field-invalid {
 				border-color: $color-red-base;
+
+				&:focus, &:active {
+					border-color: $color-red-base;
+				}
+			}
+
+			&.ng-empty {
+				color: $color-neutral-grey;
 			}
 		}
 
-		&.ng-empty {
-			color: $color-neutral-grey;
+		label {
+			min-width: 108px;
 		}
 	}
 
@@ -86,10 +132,6 @@
 		box-shadow: none;
 		border-radius: 4px;
 		padding: 0 4px 0 4px;
-	}
-
-	label {
-		min-width: 108px;
 	}
 
 	&.juno-check-box {
@@ -114,10 +156,7 @@
 		border: 1px solid $color-neutral-lighter-grey;
 	}
 
-	&.juno-tab {
-		min-height: 56px;
-		border-radius: 8px;
-	}
+	@include junoPanelColor(white, $color-neutral-lighter, $color-neutral-lighter);
 }
 
 // ============ STYLE DEFAULT ===============
@@ -126,23 +165,27 @@
 
 	@include juno-tab-color-scheme-white;
 
-	input,select {
-		@include juno-font-body-smallest;
+	&.juno-input, &.juno-select, &.juno-typeahead,
+	&.juno-check-box, &.juno-date-select, &.juno-button {
+		input, select {
+			@include juno-font-body-smallest;
 
-		border-radius: 4px;
-		border: solid 1px $color-neutral-light;
-		background-color: $color-neutral-white;
-		color: $color-neutral-darker;
+			border-radius: 4px;
+			border: solid 1px $color-neutral-light;
+			background-color: $color-neutral-white;
+			color: $color-neutral-darker;
 
-		&:focus, &:active {
-			outline: none;
-			border: solid 1px $color-blue-light;
-		}
+			&:focus, &:active {
+				outline: none;
+				border: solid 1px $color-blue-light;
+			}
 
-		&:disabled {
-			color: $color-neutral-grey;
-			&:active {
-				border-color: $color-neutral-light;
+			&:disabled {
+				color: $color-neutral-grey;
+
+				&:active {
+					border-color: $color-neutral-light;
+				}
 			}
 		}
 	}
@@ -177,23 +220,27 @@
 
 	@include juno-tab-color-scheme-white;
 
-	input,select {
-		@include juno-font-body-smallest;
+	&.juno-input, &.juno-select, &.juno-typeahead,
+	&.juno-check-box, &.juno-date-select, &.juno-button {
+		input, select {
+			@include juno-font-body-smallest;
 
-		border-radius: 8px;
-		border: solid 1px $color-neutral-lighter-grey;
-		background-color: $color-neutral-lightest;
-		color: $color-neutral-darker;
+			border-radius: 8px;
+			border: solid 1px $color-neutral-lighter-grey;
+			background-color: $color-neutral-lightest;
+			color: $color-neutral-darker;
 
-		&:focus, &:active {
-			outline: none;
-			border: solid 1px $color-blue-light;
-		}
+			&:focus, &:active {
+				outline: none;
+				border: solid 1px $color-blue-light;
+			}
 
-		&:disabled {
-			color: $color-neutral-grey;
-			&:active {
-				border-color: $color-neutral-lighter-grey;
+			&:disabled {
+				color: $color-neutral-grey;
+
+				&:active {
+					border-color: $color-neutral-lighter-grey;
+				}
 			}
 		}
 	}
@@ -218,7 +265,17 @@
 		}
 	}
 
-	@include junoTabColor($color-neutral-lighter-grey, $color-neutral-white, $color-neutral-lightest, $color-neutral-darker);
+	@include junoTabColor($color-neutral-lightest, $color-neutral-white, $color-neutral-lighter-grey, $color-neutral-darker);
+
+	@include junoPanelColor($color-neutral-lightest, $color-neutral-lightest, $color-neutral-lighter-grey);
+	&.juno-panel {
+		.panel-body {
+			border-width: 1px;
+			&.no-header {
+				border-top-width: 1px;
+			}
+		}
+	}
 }
 
 // ============ STYLE DRACULA ===============
@@ -228,23 +285,27 @@
 	@include juno-tab-color-scheme-dark;
 	color: $color-neutral-white;
 
-	input,select {
-		@include juno-font-body-smallest;
+	&.juno-input, &.juno-select, &.juno-typeahead,
+	&.juno-check-box, &.juno-date-select, &.juno-button {
+		input, select {
+			@include juno-font-body-smallest;
 
-		border-radius: 8px;
-		border: solid 1px $color-neutral-darker;
-		background-color: $color-neutral-darkest;
-		color: $color-neutral-white;
+			border-radius: 8px;
+			border: solid 1px $color-neutral-darker;
+			background-color: $color-neutral-darkest;
+			color: $color-neutral-white;
 
-		&:focus, &:active {
-			outline: none;
-			border: solid 1px $color-orange-base;
-		}
+			&:focus, &:active {
+				outline: none;
+				border: solid 1px $color-orange-base;
+			}
 
-		&:disabled {
-			color: $color-neutral-dark;
-			&:active {
-				border-color: $color-neutral-darker;
+			&:disabled {
+				color: $color-neutral-dark;
+
+				&:active {
+					border-color: $color-neutral-darker;
+				}
 			}
 		}
 	}

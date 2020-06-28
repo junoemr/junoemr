@@ -77,11 +77,19 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 					let patient = (await mhaDemographicApi.getMHAPatient(integration.id, ctrl.resolve.demographicNo)).data.body;
 					if (patient)
 					{
+						// add computed attribute for display, inputs get upset when they cannot assign to a ng-model
+						patient.city_province = `${patient.city}  ${patient.address_province_code}`;
+
 						ctrl.patientProfiles.push({
 							label: integration.siteName,
 							value: patient,
 						})
 					}
+				}
+
+				if (ctrl.patientProfiles.length > 0)
+				{
+					ctrl.currentProfile = ctrl.patientProfiles[0].value;
 				}
 			}
 			catch(err)

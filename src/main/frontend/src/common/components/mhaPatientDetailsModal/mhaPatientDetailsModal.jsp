@@ -18,5 +18,101 @@
 						tabs="$ctrl.patientProfiles"
 						component-style="$ctrl.resolve.style">
 		</juno-tab>
+		<div class="content-area">
+			<div class="left-content">
+				<div class="top-content">
+					<!-- Email -->
+					<juno-input ng-model="$ctrl.currentProfile.email"
+									label="Email Address"
+									label-position="LABEL_POSITION.TOP"
+									readonly="true"
+									no-border="true"
+									component-style="$ctrl.resolve.style">
+					</juno-input>
+				</div>
+
+				<panel no-header="true" component-style="$ctrl.resolve.style">
+					<panel-body>
+						<div class="panel-content">
+							<div class="panel-left">
+								<!-- Phone -->
+								<juno-input ng-model="$ctrl.currentProfile.cell_phone"
+												label="Phone Number"
+												label-position="LABEL_POSITION.TOP"
+												readonly="true"
+												no-border="true"
+												component-style="$ctrl.resolve.style">
+								</juno-input>
+
+								<!-- Address -->
+								<juno-input ng-model="$ctrl.currentProfile.address_1"
+												label="Street Address"
+												label-position="LABEL_POSITION.TOP"
+												readonly="true"
+												no-border="true"
+												component-style="$ctrl.resolve.style"
+												class="no-margin">
+								</juno-input>
+							</div>
+
+							<div class="panel-right">
+								<!-- Birth Date -->
+								<juno-input ng-model="$ctrl.currentProfile.birth_date"
+												label="Date of Birth"
+												label-position="LABEL_POSITION.TOP"
+												readonly="true"
+												no-border="true"
+												component-style="$ctrl.resolve.style">
+								</juno-input>
+
+								<!-- Gender  -->
+								<juno-input ng-model="$ctrl.currentProfile.sex"
+												label="Gender"
+												label-position="LABEL_POSITION.TOP"
+												readonly="true"
+												no-border="true"
+												component-style="$ctrl.resolve.style"
+												class="small">
+								</juno-input>
+
+								<!-- City Province -->
+								<juno-input ng-model="$ctrl.currentProfile.city_province"
+												label="City Province"
+												label-position="LABEL_POSITION.TOP"
+												readonly="true"
+												no-border="true"
+												component-style="$ctrl.resolve.style"
+												class="no-margin">
+								</juno-input>
+
+								<!-- Postal Code -->
+								<juno-input ng-model="$ctrl.currentProfile.postal_code"
+												label="Postal Code"
+												label-position="LABEL_POSITION.TOP"
+												readonly="true"
+												no-border="true"
+												component-style="$ctrl.resolve.style"
+												class="no-margin small">
+								</juno-input>
+							</div>
+						</div>
+					</panel-body>
+				</panel>
+			</div>
+
+			<juno-divider component-style="$ctrl.resolve.style" horizontal="true"></juno-divider>
+
+			<div class="right-content">
+
+			</div>
+		</div>
 	</modal-body>
+
+	<modal-footer>
+		<panel no-header="true" component-style="$ctrl.resolve.style">
+			<panel-body>
+				hello world
+			</panel-body>
+		</panel>
+	</modal-footer>
 </juno-modal>

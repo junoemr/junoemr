@@ -39,6 +39,8 @@ angular.module('Common.Components').component('junoInput', {
 		invalid: "<?",
 		// if true show invalid state even while focused
 		showInvalidFocus: "<?",
+		// if true do not draw the input "box" just draw its contents
+		noBorder: "<?",
 		componentStyle: "<?",
 	},
 	controller: [ "$scope", function ($scope) {
@@ -54,6 +56,8 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.uppercase = ctrl.uppercase || false;
 			ctrl.readonly = ctrl.readonly || false;
 			ctrl.invalid = ctrl.invalid || false;
+			ctrl.noBorder = ctrl.noBorder || false;
+
 			if (ctrl.showInvalidFocus === undefined)
 			{
 				ctrl.showInvalidFocus = false;
@@ -73,6 +77,7 @@ angular.module('Common.Components').component('junoInput', {
 			return {
 				uppercase: ctrl.uppercase,
 				"field-invalid": ctrl.invalid && (ctrl.showInvalidFocus || !ctrl.isFocused),
+				"field-no-border": ctrl.noBorder,
 			};
 		}
 

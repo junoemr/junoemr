@@ -38,6 +38,23 @@ angular.module('Common.Components').component('junoTab', {
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 		};
 
+		ctrl.onTabSelect = (tab) =>
+		{
+			ctrl.ngModel = tab.value;
+		}
+
+		ctrl.tabClasses = (tab) =>
+		{
+			if (ctrl.ngModel)
+			{
+				if (ctrl.ngModel === tab.value)
+				{
+					return ["active"];
+				}
+			}
+			return [];
+		}
+
 		ctrl.componentClasses = () =>
 		{
 			return [ctrl.componentStyle];
