@@ -23,11 +23,14 @@
 
 package org.oscarehr.casemgmt.dao;
 
+import java.sql.Blob;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.oscarehr.casemgmt.model.ClientImage;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.QueueCache;

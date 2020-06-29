@@ -374,6 +374,7 @@ public class ServletConfig
 		<url-pattern>/servlet/oscar.DocumentUploadServlet</url-pattern>
 	</servlet-mapping>
 	 */
+	// TODO: SPRINGUPGRADE: Ontario billing
 	private static final int SERVLET_ORDER_DOCUMENT_UPLOAD_SERVLET = 0;
 	@Bean
 	public ServletRegistrationBean<DocumentUploadServlet> registerDocumentUploadServletServlet()
@@ -385,7 +386,6 @@ public class ServletConfig
 		return bean;
 	}
 
-	// TODO: SPRINGUPGRADE: is this ever used?
 	/*
 	<servlet>
 		<servlet-name>HsfoQuartzSchedulerServlet</servlet-name>
@@ -404,6 +404,7 @@ public class ServletConfig
 		<url-pattern>/patientlistbyappt</url-pattern>
 	</servlet-mapping>
 	 */
+	// TODO: SPRINGUPGRADE: It "works" as well as it does in regular Juno.
 	@Bean
 	public ServletRegistrationBean<PatientListByAppt> registerPatientListByAppointmentServlet()
 	{
@@ -442,6 +443,7 @@ public class ServletConfig
 		<url-pattern>/contentRenderingServlet/*</url-pattern>
 	</servlet-mapping>
 	 */
+	// TODO: SPRINGUPGRADE: This seems to be for QR code rendering.  I can get it to work with specific entries.
 	@Bean
 	public ServletRegistrationBean<ContentRenderingServlet> registerContentRenderingServlet()
 	{
@@ -499,6 +501,7 @@ public class ServletConfig
 		<url-pattern>/ProxyEformNotification</url-pattern>
 	</servlet-mapping>
 	*/
+	// TODO: SPRINGUPGRADE: I don't know what this is or if it works
 	@Bean
 	public ServletRegistrationBean<EmailTriggerServlet> registerProxyEformNotificationServlet()
 	{
@@ -518,6 +521,7 @@ public class ServletConfig
 		<url-pattern>/EFormSignatureViewForPdfGenerationServlet</url-pattern>
 	</servlet-mapping>
 	*/
+	// TODO: SPRINGUPGRADE: for signature pad, seems to work.
 	@Bean
 	public ServletRegistrationBean<EFormSignatureViewForPdfGenerationServlet> registerEformSignatureViewForPdfGenerationServlet()
 	{
@@ -537,6 +541,7 @@ public class ServletConfig
 		<url-pattern>/EFormImageViewForPdfGenerationServlet</url-pattern>
 	</servlet-mapping>
 	*/
+	// TODO: SPRINGUPGRADE: for eform images, works.
 	@Bean
 	public ServletRegistrationBean<EFormImageViewForPdfGenerationServlet> registerEformImageViewForPdfGenerationServlet()
 	{
@@ -557,6 +562,7 @@ public class ServletConfig
 		<url-pattern>/PMmodule/export</url-pattern>
 	</servlet-mapping>
 	*/
+	// TODO: SPRINGUPGRADE: CAISI, ignoring.
 	private static final int SERVLET_ORDER_DATIS_EXPORT_TEST = 0;
 	@Bean
 	public ServletRegistrationBean<TestServlet> registerDATISExportTestServlet()
@@ -579,6 +585,7 @@ public class ServletConfig
 		<url-pattern>/PMmodule/exportfiles</url-pattern>
 	</servlet-mapping>
 	*/
+	// TODO: SPRINGUPGRADE: CAISI, ignoring.
 	private static final int SERVLET_ORDER_DATIS_EXPORT = 0;
 	@Bean
 	public ServletRegistrationBean<DATISExporterServlet> registerDatisExportServlet()
