@@ -37,6 +37,8 @@ import oscar.OscarProperties;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 
 public class CopdCommandLineImporter
 {
@@ -220,8 +222,14 @@ public class CopdCommandLineImporter
 			try
 			{
 				messageCount += 1;
+				Instant startPreProcess = Instant.now();
 				message = coPDPreProcessorService.preProcessMessage(message, importSource, recordData);
+				Instant startImport = Instant.now();
+				logger.info("[DURATION] Pre-Processing took " + Duration.between(startPreProcess, startImport));
+
 				coPDImportService.importFromHl7Message(message, documentDirectory, importSource, recordData, skipMissingDocs, mergeDemographics);
+				Instant endImport = Instant.now();
+				logger.info("[DURATION] Import process took " + Duration.between(startImport, endImport));
 			}
 			catch (Exception e)
 			{

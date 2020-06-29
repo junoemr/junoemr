@@ -105,6 +105,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -223,15 +225,19 @@ public class CoPDImportService
 	                              boolean mergeDemographics)
 			throws HL7Exception, IOException, InterruptedException
 	{
+		Instant instant = Instant.now();
 		logger.info("Creating Demographic Record ...");
 		Demographic demographic = importDemographicData(zpdZtrMessage, importSource, mergeDemographics);
+
 		if (demographic != null)
 		{
 			logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
 			recordData.setDemographicId(demographic.getId());
+			instant = printDuration(instant, "importDemographicData");
 
 			logger.info("Find/Create Provider Record(s) ...");
 			ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource, recordData, skipMissingDocs);
+			instant = printDuration(instant, "importProviderData");
 
 			// set the mrp doctor after all the provider records are created
 			demographic.setProviderNo(mrpProvider.getId());
@@ -239,6 +245,7 @@ public class CoPDImportService
 
 			logger.info("Create Appointments ...");
 			importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource);
+			instant = printDuration(instant, "importAppointmentData");
 		}
 	}
 
@@ -287,32 +294,58 @@ public class CoPDImportService
 				}
 			}
 
+			Instant instant = Instant.now();
 			logger.info("Import Notes & History ...");
 			importProviderNotes(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			instant = printDuration(instant, "importProviderNotes");
+
 			logger.info("Import Alerts ...");
 			importAlerts(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			instant = printDuration(instant, "importAlerts");
+
 			logger.info("Import diagnosed health problems ...");
 			importDxData(zpdZtrMessage, i, assignedProvider, demographic);
+			instant = printDuration(instant, "importDxData");
+
 			logger.info("Import Medications ...");
 			importMedicationData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			instant = printDuration(instant, "importMedicationData");
+
 			logger.info("Import Pediatrics ...");
 			importPediatricsData(zpdZtrMessage, i, assignedProvider, demographic);
+			instant = printDuration(instant, "importPediatricsData");
+
 			logger.info("Import Pregnancy ...");
 			importPregnancyData(zpdZtrMessage, i, assignedProvider, demographic);
+			instant = printDuration(instant, "importPregnancyData");
+
 			logger.info("Import Allergies ...");
 			importAllergyData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			instant = printDuration(instant, "importAllergyData");
+
 			logger.info("Import Immunizations ...");
 			importPreventionData(zpdZtrMessage, i, assignedProvider, demographic);
+			instant = printDuration(instant, "importPreventionData");
+
 			logger.info("Import Labs ...");
 			importLabData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			instant = printDuration(instant, "importLabData");
+
 			logger.info("Import Documents ...");
 			importDocumentData(zpdZtrMessage, i, assignedProvider, demographic, documentLocation, importSource, skipMissingDocs);
+			instant = printDuration(instant, "importDocumentData");
+
 			logger.info("Import Ticklers ...");
 			importTicklers(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			instant = printDuration(instant, "importTicklers");
+
 			logger.info("Importing Measurements ...");
 			importMeasurements(zpdZtrMessage, demographic, i, assignedProvider, importSource, recordData);
+			instant = printDuration(instant, "importMeasurements");
+
 			logger.info("Importing Messages ...");
 			importMessageData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			instant = printDuration(instant, "importMessageData");
 		}
 
 		return mrpProvider;
@@ -775,5 +808,12 @@ public class CoPDImportService
 			message.setSendingProvider(sendingProvider);
 			messageService.saveMessage(message, providers, demographic, MessageList.STATUS_READ);
 		}
+	}
+
+	private Instant printDuration(Instant start, String what)
+	{
+		Instant now = Instant.now();
+		logger.info("[DURATION] " + what + " took " + Duration.between(start, now));
+		return now;
 	}
 }

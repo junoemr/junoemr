@@ -36,6 +36,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -79,39 +81,73 @@ public class CoPDPreProcessorService
 	 */
 	public String preProcessMessage(String message, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
-		message = setHl7Version(message);
-		message = fixPRDSegment(message);
-		message = fixPhoneNumbers(message);
-		message = fixDateTimeNumbers(message);
+		Instant instant = Instant.now();
 
-		if (CoPDImportService.IMPORT_SOURCE.WOLF.equals(importSource))
+		message = setHl7Version(message);
+		instant = printDuration(instant, "setHl7Version");
+
+		message = fixPRDSegment(message);
+		instant = printDuration(instant, "fixPRDSegment");
+
+		message = fixPhoneNumbers(message);
+		instant = printDuration(instant, "fixPhoneNumbers");
+
+		message = fixDateTimeNumbers(message);
+		instant = printDuration(instant, "fixDateTimeNumbers");
+
+		if(CoPDImportService.IMPORT_SOURCE.WOLF.equals(importSource))
 		{
 			message = formatWolfZPV5SegmentNames(message);
-			message = stripTagWhiteSpace(message);
-			message = trimTagNewLines(message);
-			message = fixDashBPMeasurements(message);
-			message = fixBackTickBPMeasurements(message);
-		}
+			instant = printDuration(instant, "formatWolfZPV5SegmentNames");
 
+			message = stripTagWhiteSpace(message);
+			instant = printDuration(instant, "stripTagWhiteSpace");
+
+			message = trimTagNewLines(message);
+			instant = printDuration(instant, "trimTagNewLines");
+
+			message = fixDashBPMeasurements(message);
+			instant = printDuration(instant, "fixDashBPMeasurements");
+
+			message = fixBackTickBPMeasurements(message);
+			instant = printDuration(instant, "fixBackTickBPMeasurements");
+		}
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
 			message = fixTimestamps(message);
+			instant = printDuration(instant, "fixTimestamps");
+
 			message = fixTimestampsAttachments(message);
+			instant = printDuration(instant, "fixTimestampsAttachments");
 		}
 
 		if (CoPDImportService.IMPORT_SOURCE.MEDACCESS.equals(importSource))
 		{
 			message = formatMedAccessSegments(message);
+			instant = printDuration(instant, "formatMedAccessSegments");
+
 			message = stripTagWhiteSpace(message);
+			instant = printDuration(instant, "stripTagWhiteSpace");
+
 			message = fixDoubleBPMeasurements(message);
+			instant = printDuration(instant, "fixDoubleBPMeasurements");
+
 			message = fixSlashBPMeasurements(message);
+			instant = printDuration(instant, "fixSlashBPMeasurements");
+
 			message = fixZATDateString(message);
+			instant = printDuration(instant, "fixZATDateString");
+
 			message = timestampPad(message);
+			instant = printDuration(instant, "timestampPad");
+
 			message = fixReferralPractitionerNo(message);
+			instant = printDuration(instant, "fixReferralPractitionerNo");
 		}
 
 		// should come last
 		message = ensureNumeric(message, recordData);
+		instant = printDuration(instant, "ensureNumeric");
 
 		return message;
 	}
@@ -161,6 +197,7 @@ public class CoPDPreProcessorService
 	 */
 	private String foreachTag(String message, String tagName, Function<String, String> callback, int patternFlags)
 	{
+		/* match a pattern of <tagName>A</tagName> where A is the tagValue */
 		Pattern tagPattern = Pattern.compile("<" + tagName + ">(.*?)<\\/" + tagName + ">", patternFlags);
 		Matcher tagMatcher = tagPattern.matcher(message);
 
@@ -176,7 +213,7 @@ public class CoPDPreProcessorService
 
 	/**
 	 * iterate over each segment with found in the message. Allowing modification
-	 * to its content
+	 * to its content. callback has 2 params, segment sequence(always in the first field of hl7) and the value of the specified segmentField
 	 *
 	 * @param message      message to process
 	 * @param segment      the segment on which to run
@@ -184,8 +221,10 @@ public class CoPDPreProcessorService
 	 * @param callback     the callback to call for all instances of the tag (tag content in -> , -> modified content out).
 	 * @return a modified message.
 	 */
-	private String foreachSegment(String message, String segment, String segmentField, BiFunction<String, String, String> callback)
+	private String foreachTagWithSequence(String message, String segment, String segmentField, BiFunction<String, String, String> callback)
 	{
+		/* match a pattern of <segment.1>A</segment.1>B<segment.segmentField>C</segment.segmentField>
+		* where A is the segment ID, and C is the tagValue*/
 		String tagName = segment + "\\." + segmentField;
 		Pattern tagPattern = Pattern.compile(
 				"<" + segment + "\\.1>(.*?)<\\/" + segment + "\\.1>" + // segment ID
@@ -293,13 +332,24 @@ public class CoPDPreProcessorService
 	private String ensureNumeric(String message, CoPDRecordData recordData)
 	{
 		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZBA, "31");
-		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZQO, "4");
-		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZQO, "5");
-		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZQO, "6");
-		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZQO, "7");
+		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZQO, "4","5","6","7");
 		return message;
 	}
-	private String ensureNumeric(String message, CoPDRecordData recordData, String segment, String segmentField)
+	private String ensureNumeric(String message, CoPDRecordData recordData, String segment, String...segmentFields)
+	{
+		Function<String, String> callback = tagValue ->
+		{
+			String messageSegment = tagValue;
+			for(String segmentField : segmentFields)
+			{
+				messageSegment = ensureNumericField(messageSegment, recordData, segment, segmentField);
+			}
+			return messageSegment;
+		};
+
+		return foreachTag(message, segment, callback, Pattern.DOTALL);
+	}
+	private String ensureNumericField(String message, CoPDRecordData recordData, String segment, String segmentField)
 	{
 		BiFunction<String, String, String> ensureNumericCallback = (segmentId, tagValue) ->
 		{
@@ -318,7 +368,7 @@ public class CoPDPreProcessorService
 			}
 		};
 
-		return foreachSegment(message, segment, segmentField, ensureNumericCallback);
+		return foreachTagWithSequence(message, segment, segmentField, ensureNumericCallback);
 	}
 
 	/**
@@ -359,7 +409,7 @@ public class CoPDPreProcessorService
 	{
 		Function<String, String> fixBPSlash = tagValue ->
 		{
-			if (StringUtils.trimToEmpty(tagValue).startsWith("/"))
+			if(StringUtils.trimToEmpty(tagValue).startsWith("/"))
 			{
 				return tagValue.substring(tagValue.indexOf("/") + 1);
 			}
@@ -687,5 +737,12 @@ public class CoPDPreProcessorService
 		}
 
 		return message;
+	}
+
+	private Instant printDuration(Instant start, String what)
+	{
+		Instant now = Instant.now();
+		logger.info("[DURATION] " + what + " took " + Duration.between(start, now));
+		return now;
 	}
 }
