@@ -96,8 +96,8 @@ angular.module("Common.Services").service("demographicService", [
                 },
                 function error(errors)
                 {
-                    console.log("demographicServices::updateDemographic error", errors);
-                    deferred.reject("An error occurred while saving demographic");
+                    console.log("demographicServices::saveDemographic error", errors);
+                    deferred.reject(errors.data.error.message);
                 });
 
             return deferred.promise;

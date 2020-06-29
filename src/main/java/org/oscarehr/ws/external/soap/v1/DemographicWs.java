@@ -36,6 +36,7 @@ import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -79,9 +80,21 @@ public class DemographicWs extends AbstractWs {
 	@Autowired
 	private EligibilityCheckService eligibilityCheckService;
 
+	@Autowired
+	private HinValidationService hinValidationService;
+
+	/**
+	 * get demographic by ID if available
+	 * @param demographicId demographic ID that we think there is an entry for
+	 * @return transfer object if exists, null otherwise
+	 */
 	public DemographicTransfer getDemographic(Integer demographicId)
 	{
 		Demographic demographic = demographicManager.getDemographic(getLoggedInInfo(), demographicId);
+		if (demographic == null)
+		{
+			return null;
+		}
 		DemographicCust custResult = demographicCustDao.find(demographic.getDemographicNo());
 
 		DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
@@ -241,6 +254,8 @@ public class DemographicWs extends AbstractWs {
 		{
 			throw new Exception("Demographic number can not be specified on creation. It is automatically generated.");
 		}
+
+		hinValidationService.validateNoDuplication(demographic.getHin(), demographic.getVer(), demographic.getHcType());
 
 		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
 		demographicManager.addDemographicExtras(loggedInInfo, demographic, demographicTransfer);

@@ -1,1 +1,0 @@
-UPDATE security SET pin = '7412' WHERE user_name = 'oscar_host';

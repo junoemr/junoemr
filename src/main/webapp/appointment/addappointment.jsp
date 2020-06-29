@@ -149,6 +149,7 @@
 	int iPageSize = 5;
 
 	ApptData apptObj = ApptUtil.getAppointmentFromSession(request);
+	ApptUtil.APPOINTMENT_OP_TYPE operationType = ApptUtil.getOperationTypeFromSession(request);
 
 	oscar.OscarProperties pros = oscar.OscarProperties.getInstance();
 	String strEditable = pros.getProperty("ENABLE_EDIT_APPT_STATUS");
@@ -166,11 +167,14 @@
 %>
 <%@page import="org.oscarehr.common.dao.SiteDao" %>
 <%@page import="org.oscarehr.common.model.Site" %>
+<%@ page import="org.oscarehr.common.IsPropertiesOn" %>
 <html:html locale="true">
 	<head>
 		<script type="text/javascript" src="../js/jquery-1.7.1.min.js"></script>
 		<script src="<%=request.getContextPath()%>/js/jquery-ui-1.8.18.custom.min.js"></script>
 		<script src="<%=request.getContextPath()%>/js/fg.menu.js"></script>
+		<script src="<%=request.getContextPath()%>/js/promisePolyfill.js"></script>
+		<script src="<%=request.getContextPath()%>/js/myhealthaccess.js"></script>
 
 
 		<link rel="stylesheet"
@@ -339,6 +343,8 @@
 				{
 					warnMsgId.style.display = "none";
 				}
+				document.forms[0].appointmentNo.value = "<%=apptObj.getAppointmentNo()%>";
+				document.forms[0].operationType.value = "<%=operationType%>";
 				//document.forms[0].status.value = "<%=apptObj.getStatus()%>";
 				document.forms[0].duration.value = "<%=apptObj.getDuration()%>";
 				//document.forms[0].chart_no.value = "<%=apptObj.getChart_no()%>";
@@ -353,7 +359,11 @@
 				{
 					document.forms[0].urgency.checked = "checked";
 				}
-
+				if ("<%=apptObj.isVirtual()%>" === "true")
+				{
+					document.forms[0].isVirtual.checked = "checked";
+					updateTelehealthControlls();
+				}
 			}
 
 			<% } %>
@@ -864,6 +874,9 @@
 		<input type="hidden" name="month" value="<%=request.getParameter("month") %>">
 		<input type="hidden" name="day" value="<%=request.getParameter("day") %>">
 		<input type="hidden" name="fromAppt" value="1">
+		<input type="hidden" name="appointmentNo" value="">
+		<input type="hidden" name="operationType" value="<%=ApptUtil.APPOINTMENT_OP_TYPE.NONE%>">
+		<input type="hidden" name="sendBookingNotification" value="false">
 
 		<div class="header deep">
 			<div class="title">
@@ -1074,7 +1087,7 @@
 						<% // multisites start ==================
 							if (bMultisites)
 							{ %>
-						<select tabindex="4" name="location" style="background-color: <%=colo%>"
+						<select id="site-select" tabindex="4" name="location" style="background-color: <%=colo%>"
 								onchange='this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor'>
 							<% for (Site s : sites)
 							{ %>
@@ -1129,9 +1142,10 @@
 				<% if(org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() ) { %>
 
 				<li class="weak row">
-						<div class="label">Virtual:</div>
-						<div class="input">
-						<input type="checkbox" name="isVirtual" disabled/>
+					<div class="label">Virtual:</div>
+					<div class="input" style="display: flex; flex-direction: row; align-items: center; width: calc(100% - 1px);">
+						<input id="telehealth-checkbox" type="checkbox" name="isVirtual" disabled/>
+						<div id="telehealth-message" style="visibility: hidden; display: inline-block; border: none; font-size: 12px;"></div>
 					</div>
 					<div class="space">&nbsp;</div>
 					<div class="label"></div>
@@ -1280,6 +1294,18 @@
 						   onclick="onButRepeat()" <%=disabled%>>
 					<% } %>
 				</TD>
+			</tr>
+			<tr>
+				<td>
+					<input id="add-appt-and-send-confirmation"
+									type="submit"
+									value="Create & Notify"
+									title="Add a new appointment and send a confirmation email to the patient"
+									onclick="document.forms.ADDAPPT.sendBookingNotification.value='true';
+													 document.forms.ADDAPPT.displaymode.value='Add Appointment';"
+									style="display: none"
+					>
+				</td>
 			</tr>
 		</table>
 	</FORM>
@@ -1487,5 +1513,137 @@
 	<script type="text/javascript">
 		var loc = document.forms['ADDAPPT'].location;
 		if (loc.nodeName.toUpperCase() == 'SELECT') loc.style.backgroundColor = loc.options[loc.selectedIndex].style.backgroundColor;
+
+		var virtualBookingState = 'none';
+
+		function updateTelehealthControlls()
+		{
+			var siteSelect = jQuery("#site-select");
+			var demographicNo = document.forms[0].demographic_no.value;
+			if (demographicNo !== '')
+			{
+				myhealthaccess.checkDemographicConfirmed("<%=request.getContextPath()%>", demographicNo, siteSelect.val()).then((res) =>
+				{
+					res = JSON.parse(res);
+					if (res.body)
+					{
+						setTelehealthConfirmed();
+					}
+					else
+					{
+						if ("<%=StringUtils.trimToEmpty(email)%>" != "")
+						{
+							myhealthaccess.getIntegration("<%=request.getContextPath()%>", siteSelect.val()).then((res) =>
+							{
+								res = JSON.parse(res);
+								if (res.body)
+								{
+									setTelehealthOneTime();
+								}
+								else
+								{
+									setTelehealthNotAvaiable();
+								}
+							});
+						}
+						else
+						{
+							setTelehealthNotAvaiable();
+						}
+					}
+				}).catch((error) =>
+				{
+					if (error === myhealthaccess.ERROR_NO_INTEGRATION)
+					{
+						setTelehealthNotAvaiable();
+					}
+					else
+					{
+						setTelehealthError();
+						console.error(error);
+					}
+				});
+			}
+		}
+
+		function setTelehealthConfirmed()
+		{
+			jQuery("#telehealth-checkbox").attr("disabled", false);
+			var msg = jQuery("#telehealth-message");
+			msg.css("visibility", "visible");
+			msg.css("color", "green");
+			msg.html("Patient connected to MyHealthAccess");
+			jQuery("#add-appt-and-send-confirmation").css("display", "none");
+			virtualBookingState = 'confirmed';
+		}
+
+		function setTelehealthOneTime()
+		{
+			jQuery("#telehealth-checkbox").attr("disabled", false);
+			var msg = jQuery("#telehealth-message");
+			msg.css("visibility", "visible");
+			msg.css("color", "green");
+			msg.html("One time telehealth available for this patient");
+			if (jQuery("#telehealth-checkbox").attr("checked"))
+			{
+				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
+			}
+			virtualBookingState = 'oneTime';
+		}
+
+		function setTelehealthNotAvaiable()
+		{
+			jQuery("#telehealth-checkbox").attr("checked", false);
+			jQuery("#telehealth-checkbox").attr("disabled", true);
+			var msg = jQuery("#telehealth-message");
+			msg.css("visibility", "visible");
+			msg.css("color", "orange");
+			msg.html("Patient not connected to MyHealthAccess");
+			jQuery("#add-appt-and-send-confirmation").css("display", "none");
+			virtualBookingState = 'none';
+		}
+
+		function setTelehealthError()
+		{
+			jQuery("#telehealth-checkbox").attr("checked", false);
+			jQuery("#telehealth-checkbox").attr("disabled", true);
+			var msg = jQuery("#telehealth-message");
+			msg.css("visibility", "visible");
+			msg.css("color", "red");
+			msg.html("Error connecting to MyHealthAccess");
+			jQuery("#add-appt-and-send-confirmation").css("display", "none");
+			virtualBookingState = 'none';
+		}
+
+		<%
+		if (IsPropertiesOn.isTelehealthEnabled())
+		{
+		%>
+		jQuery(document).ready(() =>
+		{
+			updateTelehealthControlls();
+		});
+
+		jQuery("#site-select").change(() =>
+		{
+			updateTelehealthControlls();
+		});
+
+		jQuery("#telehealth-checkbox").change((event) =>
+		{
+
+			if (virtualBookingState === "oneTime" && event.target.checked)
+			{
+				jQuery("#add-appt-and-send-confirmation").css("display", "inherit");
+			}
+			else
+			{
+				jQuery("#add-appt-and-send-confirmation").css("display", "none");
+			}
+		});
+
+		<%
+		}
+		%>
 	</script>
 </html:html>

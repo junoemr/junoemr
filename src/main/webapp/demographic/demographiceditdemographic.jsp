@@ -286,6 +286,8 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
 <%@ page import="org.oscarehr.common.model.ProviderPreference" %>
 <%@ page import="java.sql.ResultSet" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
+<%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
 <html:html locale="true">
 
 <head>
@@ -1385,22 +1387,30 @@ if (iviewTag!=null && !"".equalsIgnoreCase(iviewTag.trim())){
 					<tr>
 						<td class="RowTop">
 						<%
-						oscar.oscarDemographic.data.DemographicMerged dmDAO = new oscar.oscarDemographic.data.DemographicMerged();
+							DemographicMergedDao demographicMergedDao = SpringUtils.getBean(DemographicMergedDao.class);
+							DemographicMerged headRecord = demographicMergedDao.getCurrentHead(demographicNo);
+							Integer headDemographicNo = demographicNo;
+							if (headRecord != null)
+							{
+								headDemographicNo = headRecord.getMergedTo();
+							}
+							List<DemographicMerged> records = demographicMergedDao.findCurrentByMergedTo(headDemographicNo);
+							String head = headDemographicNo.toString();
                             String dboperation = "search_detail";
-                            String head = dmDAO.getHead(demographic_no);
-                            ArrayList records = dmDAO.getTail(head);
-                           
+
                                     %><a
 							href="demographiccontrol.jsp?demographic_no=<%= head %>&displaymode=edit&dboperation=<%= dboperation %>"><%=head%></a>
 						<%
-
-                                for (int i=0; i < records.size(); i++){
-                                    if (((String) records.get(i)).equals(demographic_no)){
-                                        %><%=", "+demographic_no %>
+							for (DemographicMerged merged : records)
+							{
+									if ((merged.getDemographicNo() == demographicNo))
+									{
+										%><%=", "+demographic_no %>
 						<%
-                                    }else{
-                                        %>, <a
-							href="demographiccontrol.jsp?demographic_no=<%= records.get(i) %>&displaymode=edit&dboperation=<%= dboperation %>"><%=records.get(i)%></a>
+									}
+									else
+									{
+										%>, <a href="demographiccontrol.jsp?demographic_no=<%=merged.getDemographicNo()%>&displaymode=edit&dboperation=<%= dboperation %>"><%=merged.getDemographicNo()%></a>
 						<%
                                     }
                                 }

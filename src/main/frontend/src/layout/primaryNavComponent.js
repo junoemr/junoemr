@@ -595,15 +595,9 @@ angular.module('Layout').component("primaryNavigation", {
 			modalInstance.result.then(
 				function success(results)
 				{
-					console.log(results);
-					console.log('patient #: ', results.demographicNo);
-					console.log($location.path());
-
 					$location.path('/record/' +
 						encodeURIComponent(results.demographicNo) +
 						'/details');
-
-					console.log($location.path());
 				},
 				function error(errors)
 				{
@@ -611,7 +605,6 @@ angular.module('Layout').component("primaryNavigation", {
 					console.log(errors);
 				});
 
-			console.log($('#myModal'));
 		};
 
 		ctrl.isActive = function(tab)

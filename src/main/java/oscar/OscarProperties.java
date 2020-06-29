@@ -630,4 +630,9 @@ public class OscarProperties extends Properties {
 	{
 		return isPropertyActive("echart_additional_patient_info");
 	}
+
+	public boolean isOptimizeSmallSchedulesEnabled()
+	{
+		return isPropertyActive("optimize_small_schedules");
+	}
 }

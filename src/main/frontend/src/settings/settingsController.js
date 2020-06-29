@@ -519,19 +519,54 @@ angular.module('Settings').controller('Settings.SettingsController', [
 				if (controller.pref.appointmentScreenQuickLinks[i].checked == null || controller.pref.appointmentScreenQuickLinks[i].checked == false)
 				{
 					newList.push(
-					{
-						name: controller.pref.appointmentScreenQuickLinks[i].name,
-						url: controller.pref.appointmentScreenQuickLinks[i].url
-					});
+							{
+								name: controller.pref.appointmentScreenQuickLinks[i].name,
+								url: controller.pref.appointmentScreenQuickLinks[i].url
+							});
 				}
 			}
 			controller.pref.appointmentScreenQuickLinks = newList;
 
-			providerService.saveSettings(controller.user.providerNo, controller.pref).then(function(data)
+			if (controller.validateSettings())
 			{
-				alert('saved');
-			});
+				providerService.saveSettings(controller.user.providerNo, controller.pref).then(function (data)
+				{
+					alert('saved');
+				});
+			}
+		};
 
+		controller.validateSettings = function()
+		{
+			let isValid = true;
+			// check eform fields are valid
+			if (!controller.pref.eformPopupWidth || !controller.pref.eformPopupHeight)
+			{
+				alert("Eform width and height fields must be filled in.");
+				isValid = false;
+			}
+
+			if (isNaN(controller.pref.appointmentScreenLinkNameDisplayLength))
+			{
+				alert("The value of link and form names displayed on appointment screen must be a positive number.");
+				isValid = false;
+			}
+			else if (controller.pref.appointmentScreenLinkNameDisplayLength.length > 3)
+			{
+				alert("Please reduce the length of the link and form names that you want to display to a value under 999.");
+				isValid = false;
+			}
+			else
+			{
+				let intVal = parseInt(controller.pref.appointmentScreenLinkNameDisplayLength);
+				if (intVal < 1)
+				{
+					alert("The value of link and form names displayed on appointment screen must be a positive number.");
+					isValid = false;
+				}
+			}
+
+			return isValid;
 		};
 
 		controller.cancel = function()

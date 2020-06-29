@@ -234,7 +234,7 @@
 						<input ng-model="settingsCtrl.pref.patientNameLength" placeholder="Length" class="form-control" type="text">
 					</div>
 					<div class="form-group col-sm-6">
-						<label>Length of link and form names to display on appointment screen:</label>
+						<label>Length of link and form names to display on appointment screen (> 0):</label>
 						<input ng-model="settingsCtrl.pref.appointmentScreenLinkNameDisplayLength" placeholder="Length" class="form-control" type="text">
 					</div>
 					<div class="form-group col-sm-6">
@@ -716,10 +716,29 @@
 
 			<div class="row" ng-show="settingsCtrl.currentTab.path == 'eforms'">
 				<div class="col-lg-4 col-sm-6 md-margin-top">
-					<div class="form-group col-sm-12">
+					<div class="form-group col-sm-12 juno-modal">
 						<label>Favorite Group:</label>
 						<select ng-model="settingsCtrl.pref.favoriteFormGroup" class="form-control" ng-options="p.value as p.label for p in settingsCtrl.formGroupNames">
 						</select>
+						<div class="flex-row md-margin-top">
+							<div class="flex-grow lg-margin-right" ng-class="{'required-field': !settingsCtrl.pref.eformPopupWidth}">
+								<ca-field-number
+												ca-title="Eform Popup Width"
+												ca-name="popup_width"
+												ca-model="settingsCtrl.pref.eformPopupWidth"
+												ca-rows="1">
+								</ca-field-number>
+							</div>
+							<div class="flex-grow lg-margin-right" ng-class="{'required-field': !settingsCtrl.pref.eformPopupHeight}">
+								<ca-field-number
+												class="flex-grow"
+												ca-title="Eform Popup Height"
+												ca-name="popup_height"
+												ca-model="settingsCtrl.pref.eformPopupHeight"
+												ca-rows="1">
+								</ca-field-number>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

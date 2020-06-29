@@ -66,14 +66,18 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 	 * @return true if a conflict is detected.
 	 */
 	public boolean checkForConflict(Appointment appointment) {
-		String sb = "select a from Appointment a where a.appointmentDate = ?1 and a.startTime >= ?2 and a.endTime <= ?3 and a.providerNo = ?4 and a.status != 'N' and a.status != 'C'";
+		String sb = "select a from Appointment a where a.appointmentDate = :appDate and " +
+						"((a.startTime >= :startTime and a.startTime <= :endTime) or" +
+						" (a.endTime >= :startTime and a.endTime <= :endTime) or " +
+						" (a.startTime <= :startTime and a.endTime >= :endTime)) and" +
+						" a.providerNo = :providerNo and a.status != 'N' and a.status != 'C'";
 
 		Query query = entityManager.createQuery(sb);
 
-		query.setParameter(1, appointment.getAppointmentDate());
-		query.setParameter(2, appointment.getStartTime());
-		query.setParameter(3, appointment.getEndTime());
-		query.setParameter(4, appointment.getProviderNo());
+		query.setParameter("appDate", appointment.getAppointmentDate());
+		query.setParameter("startTime", appointment.getStartTime());
+		query.setParameter("endTime", appointment.getEndTime());
+		query.setParameter("providerNo", appointment.getProviderNo());
 
 		List<Facility> results = query.getResultList();
 
@@ -231,7 +235,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 	}
 	
 	public List<Appointment> findByProviderAndDayandNotStatus(String providerNo, Date date, String notThisStatus) {
-		String sql = "SELECT a FROM Appointment a WHERE a.providerNo=?1 and a.appointmentDate = ?2 and a.status != ?3 ORDER BY a.appointmentDate, a.startTime";
+		String sql = "SELECT a FROM Appointment a WHERE a.providerNo=?1 and a.appointmentDate = ?2 and SUBSTR(a.status, 1, 1) != ?3 ORDER BY a.appointmentDate, a.startTime";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, providerNo);
 		query.setParameter(2, date);

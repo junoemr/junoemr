@@ -23,6 +23,8 @@
  */
 package org.oscarehr.managers.model;
 
+import org.oscarehr.eform.service.EFormTemplateService;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -135,6 +137,8 @@ public class ProviderSettings
 	private boolean encounterWindowMaximize;
 
 	private String favoriteFormGroup = "";
+	private Integer eformPopupWidth = EFormTemplateService.EFORM_DEFAULT_WIDTH;
+	private Integer eformPopupHeight = EFormTemplateService.EFORM_DEFAULT_HEIGHT;
 
 	private boolean disableCommentOnAck;
 	private boolean defaultPmm;
@@ -1084,5 +1088,25 @@ public class ProviderSettings
 	public void setAppointmentCountIncludeNoDemographic(boolean appointmentCountIncludeNoDemographic)
 	{
 		this.appointmentCountIncludeNoDemographic = appointmentCountIncludeNoDemographic;
+	}
+
+	public Integer getEformPopupWidth()
+	{
+		return eformPopupWidth;
+	}
+
+	public void setEformPopupWidth(Integer eformPopupWidth)
+	{
+		this.eformPopupWidth = eformPopupWidth;
+	}
+
+	public Integer getEformPopupHeight()
+	{
+		return eformPopupHeight;
+	}
+
+	public void setEformPopupHeight(Integer eformPopupHeight)
+	{
+		this.eformPopupHeight = eformPopupHeight;
 	}
 }

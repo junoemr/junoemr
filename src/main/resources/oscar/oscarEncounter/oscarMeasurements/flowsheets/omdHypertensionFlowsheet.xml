@@ -215,7 +215,7 @@
     <measurement type="BMED" typeDesc="BP Med Changes" typeDisplayName="Blood Pressure Medication Changes" measuringInstrc="Changed">
         <validationRule name="Yes/No" regularExp="YES|yes|Yes|Y|NO|no|No|N" />
     </measurement>
-    <measurement type="TCHL" typeDesc="Total Cholestorol" typeDisplayName="Total Cholestorol" measuringInstrc="in mmol/L (nn.n) Range:2.0-12.0">
+    <measurement type="TCHL" typeDesc="Total Cholesterol" typeDisplayName="Total Cholesterol" measuringInstrc="in mmol/L (nn.n) Range:2.0-12.0">
         <validationRule name="Numeric Value: 2.0 to 12.0"
 			maxValue="12" minValue="2" isDate="" isNumeric="1" regularExp="" maxLength="" minLength="" />
     </measurement>

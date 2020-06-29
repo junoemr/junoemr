@@ -24,8 +24,6 @@
 package org.oscarehr.ws.rest;
 
 import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
-import net.sf.json.processors.JsDateJsonBeanProcessor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
@@ -39,7 +37,10 @@ import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
+import org.oscarehr.providerBilling.model.ProviderBilling;
+import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
@@ -48,6 +49,7 @@ import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -66,6 +68,7 @@ import java.util.List;
 
 @Component("ProviderService")
 @Path("/providerService/")
+@Transactional
 public class ProviderService extends AbstractServiceImpl {
 
 	private static Logger logger = MiscUtils.getLogger();
@@ -84,8 +87,10 @@ public class ProviderService extends AbstractServiceImpl {
 
 	@Autowired
 	private PreferenceManager preferenceManager;
-	
-	
+
+	@Autowired
+	private org.oscarehr.provider.service.ProviderService providerService;
+
 	protected SecurityContext getSecurityContext() {
 		Message m = PhaseInterceptorChain.getCurrentMessage();
     	org.apache.cxf.security.SecurityContext sc = m.getContent(org.apache.cxf.security.SecurityContext.class);
@@ -118,10 +123,8 @@ public class ProviderService extends AbstractServiceImpl {
     @GET
     @Path("/providers_json")
     @Produces("application/json")
-    public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON() {
-    	JsonConfig config = new JsonConfig();
-    	config.registerJsonBeanProcessor(java.sql.Date.class, new JsDateJsonBeanProcessor());
-    	
+    public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON()
+    {
     	List<ProviderTo1> providers = new ProviderConverter().getAllAsTransferObjects(getLoggedInInfo(), providerDao.getActiveProviders());
     	
     	AbstractSearchResponse<ProviderTo1> response = new AbstractSearchResponse<ProviderTo1>();
@@ -131,32 +134,47 @@ public class ProviderService extends AbstractServiceImpl {
     }
 
     @GET
-    @Path("/provider/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public ProviderTransfer getProvider(@PathParam("id") String id) {
-        return ProviderTransfer.toTransfer(providerDao.getProvider(id));
-    }
-    
-    @GET
     @Path("/provider/me")
     @Produces("application/json")
-    public String getLoggedInProvider() {
+    public ProviderTo1 getLoggedInProvider()
+    {
     	Provider provider = getLoggedInInfo().getLoggedInProvider();
-    	
-    	if(provider != null) {
-    		JsonConfig config = new JsonConfig();
-        	config.registerJsonBeanProcessor(java.sql.Date.class, new JsDateJsonBeanProcessor());
-            return JSONObject.fromObject(provider,config).toString();
+
+    	if(provider != null)
+    	{
+		    ProviderTo1 transfer = new ProviderConverter().getAsTransferObject(getLoggedInInfo(), provider);
+		    return transfer;
     	}
+
     	return null;
     }
-    
+
+	@GET
+	@Path("/provider/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ProviderTransfer getProvider(@PathParam("id") String id) {
+		return ProviderTransfer.toTransfer(providerDao.getProvider(id));
+	}
+
+
+	@GET
+	@Path("/provider/{id}/billing")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<ProviderBillingTransfer> getProviderBilling(@PathParam("id") String providerNo)
+	{
+		ProviderBilling billing = providerService.getProviderBilling(providerNo);
+		ProviderBillingTransfer transfer = ProviderBillingTransfer.toTransferObj(billing);
+		return RestResponse.successResponse(transfer);
+	}
+
     @GET
     @Path("/providerjson/{id}")
-    public String getProviderAsJSON(@PathParam("id") String id) {
-    	JsonConfig config = new JsonConfig();
-    	config.registerJsonBeanProcessor(java.sql.Date.class, new JsDateJsonBeanProcessor());
-        return JSONObject.fromObject(providerDao.getProvider(id),config).toString();
+    public ProviderTo1 getProviderAsJSON(@PathParam("id") String id)
+    {
+	    Provider provider = providerDao.getProvider(id);
+	    ProviderTo1 transfer = new ProviderConverter().getAsTransferObject(getLoggedInInfo(), provider);
+
+    	return transfer;
     }
 
     @GET

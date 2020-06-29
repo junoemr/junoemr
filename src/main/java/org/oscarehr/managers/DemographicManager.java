@@ -49,6 +49,7 @@ import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.model.DemographicExtArchive;
 import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
@@ -56,8 +57,10 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -74,6 +77,7 @@ import java.util.regex.Pattern;
  *
  */
 @Service
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class DemographicManager {
 	public static final String PHR_VERIFICATION_LEVEL_3 = "+3";
 	public static final String PHR_VERIFICATION_LEVEL_2 = "+2";
@@ -99,6 +103,9 @@ public class DemographicManager {
 
 	@Autowired
 	private DemographicMergedDao demographicMergedDao;
+
+	@Autowired
+	private DemographicService demographicService;
 
 	@Autowired
 	private PHRVerificationDao phrVerificationDao;
@@ -277,9 +284,13 @@ public class DemographicManager {
 		{
 			demographic.setPatientStatus(PatientStatus.AC.name());
 		}
-		if(demographic.getFamilyDoctor() == null)
+		if(demographic.getFamilyDoctor().isEmpty())
 		{
 			demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
+		}
+		if (demographic.getFamilyDoctor2() == null)
+		{
+			demographic.setFamilyDoctor2("<fd></fd><fdname></fdname>");
 		}
 		demographic.setLastUpdateUser(providerNo);
 		demographicDao.save(demographic);
@@ -319,6 +330,9 @@ public class DemographicManager {
 		//save current demo
 		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		demographicDao.save(demographic);
+
+		// update MyHealthAccess connection status.
+		demographicService.queueMHAPatientUpdates(demographic, prevDemo, loggedInInfo);
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
@@ -373,7 +387,6 @@ public class DemographicManager {
 	 * @param demographicArchiveId - id of the archived demographic record
 	 * @param extensions - list of objects to update/insert
 	 */
-	@Transactional
 	public void saveAndArchiveDemographicExt(Long demographicArchiveId, List<DemographicExt> extensions)
 	{
 		for(DemographicExt extension : extensions)
@@ -424,22 +437,36 @@ public class DemographicManager {
 
 	}
 
-	public void unmergeDemographics(LoggedInInfo loggedInInfo, Integer parentId, List<Integer> children) {
-		checkPrivilege(loggedInInfo, securityInfoManager.WRITE);
-		for (Integer childId : children) {
-			List<DemographicMerged> dms = demographicMergedDao.findByParentAndChildIds(parentId, childId);
-			if (dms.isEmpty()) {
+	public void unmergeDemographics(LoggedInInfo loggedInInfo, Integer parentId, List<Integer> children)
+	{
+		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+		for (Integer childId : children)
+		{
+			List<DemographicMerged> demographicsMerged = demographicMergedDao.findByParentAndChildIds(parentId, childId);
+			if (demographicsMerged.isEmpty())
+			{
 				throw new IllegalArgumentException("Unable to find merge record for parent " + parentId + " and child " + childId);
 			}
-			for (DemographicMerged dm : demographicMergedDao.findByParentAndChildIds(parentId, childId)) {
-				dm.setDeleted(1);
+			for (DemographicMerged dm : demographicsMerged)
+			{
+				// Update the demographicMerged entry to be deleted
+				dm.delete();
 				demographicMergedDao.merge(dm);
+				// Add a log entry to indicate who did this
+				LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+						parentId,
+						LogConst.ACTION_DELETE,
+						LogConst.CON_DEMOGRAPHIC_MERGE,
+						LogConst.STATUS_SUCCESS,
+						"parentDemographic=" + parentId,
+						loggedInInfo.getIp(),
+						"mergedDemographic=" + childId);
 			}
 		}
 	}
 
 	public Long getActiveDemographicCount(LoggedInInfo loggedInInfo) {
-		checkPrivilege(loggedInInfo, securityInfoManager.READ);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		return demographicDao.getActiveDemographicCount();
 	}
 
@@ -457,7 +484,7 @@ public class DemographicManager {
 	 * 		Returns all merged demographic records for the specified parent id.
 	 */
 	public List<DemographicMerged> getMergedDemographics(LoggedInInfo loggedInInfo, Integer parentId) {
-		checkPrivilege(loggedInInfo, securityInfoManager.READ);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		return demographicMergedDao.findCurrentByMergedTo(parentId);
 	}
 
@@ -871,48 +898,48 @@ public class DemographicManager {
 		}
 
 		if (
-				!validateString(demographic.getPhone()) ||
-						!validateString(demographic.getPatientStatus()) ||
-						!validateString(demographic.getRosterStatus()) ||
-						!validateString(demographic.getProviderNo()) ||
-						!validateString(demographic.getMyOscarUserName()) ||
-						!validateString(demographic.getHin()) ||
-						!validateString(demographic.getAddress()) ||
-						!validateString(demographic.getProvince()) ||
-						!validateString(demographic.getMonthOfBirth()) ||
-						!validateString(demographic.getVer()) ||
-						!validateString(demographic.getDateOfBirth()) ||
-						!validateString(demographic.getSex()) ||
-						!validateString(demographic.getSexDesc()) ||
-						!validateString(demographic.getCity()) ||
-						!validateString(demographic.getFirstName()) ||
-						!validateString(demographic.getPostal()) ||
-						!validateString(demographic.getPhone2()) ||
-						!validateString(demographic.getPcnIndicator()) ||
-						!validateString(demographic.getLastName()) ||
-						!validateString(demographic.getHcType()) ||
-						!validateString(demographic.getChartNo()) ||
-						!validateString(demographic.getEmail()) ||
-						!validateString(demographic.getYearOfBirth()) ||
-						!validateString(demographic.getRosterTerminationReason()) ||
-						!validateString(demographic.getLinks()) ||
-						!validateString(demographic.getAlias()) ||
-						!validateString(demographic.getPreviousAddress()) ||
-						!validateString(demographic.getChildren()) ||
-						!validateString(demographic.getSourceOfIncome()) ||
-						!validateString(demographic.getCitizenship()) ||
-						!validateString(demographic.getSin()) ||
-						!validateString(demographic.getAnonymous()) ||
-						!validateString(demographic.getSpokenLanguage()) ||
-						!validateString(demographic.getDisplayName()) ||
-						!validateString(demographic.getLastUpdateUser()) ||
-						!validateString(demographic.getTitle()) ||
-						!validateString(demographic.getOfficialLanguage()) ||
-						!validateString(demographic.getCountryOfOrigin()) ||
-						!validateString(demographic.getNewsletter()) ||
-						!validateString(demographic.getVeteranNo()) ||
-						!validateString(demographic.getNameOfFather()) ||
-						!validateString(demographic.getNameOfMother())
+				!oscar.util.StringUtils.isStringSafe(demographic.getPhone()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getPatientStatus()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getRosterStatus()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getProviderNo()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getMyOscarUserName()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getHin()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getAddress()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getProvince()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getMonthOfBirth()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getVer()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getDateOfBirth()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getSex()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getSexDesc()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getCity()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getFirstName()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getPostal()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getPhone2()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getPcnIndicator()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getLastName()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getHcType()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getChartNo()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getEmail()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getYearOfBirth()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getRosterTerminationReason()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getLinks()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getAlias()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getPreviousAddress()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getChildren()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getSourceOfIncome()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getCitizenship()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getSin()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getAnonymous()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getSpokenLanguage()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getDisplayName()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getLastUpdateUser()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getTitle()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getOfficialLanguage()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getCountryOfOrigin()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getNewsletter()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getVeteranNo()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getNameOfFather()) ||
+						!oscar.util.StringUtils.isStringSafe(demographic.getNameOfMother())
 				)
 		{
 			error_string += "No html tags and no quotes, line breaks ";
@@ -946,43 +973,10 @@ public class DemographicManager {
 		int numGroups = m.groupCount();
 		for (int group = 1; group <= numGroups; group++)
 		{
-			if (!validateString(m.group(group)))
+			if (!oscar.util.StringUtils.isStringSafe(m.group(group)))
 			{
 				return false;
 			}
-		}
-
-		return true;
-	}
-
-	private boolean validateString(String testValue)
-	{
-		if (testValue == null)
-		{
-			return true;
-		}
-
-		Pattern p = Pattern.compile(".*\\<.*?>.*");
-		Matcher m = p.matcher(testValue);
-
-		if (m.matches())
-		{
-			return false;
-		}
-
-		if (
-				testValue.matches("(?s).*;.*") ||
-						testValue.matches("(?s).*\".*") ||
-						testValue.matches("(?s).*'.*") ||
-						testValue.matches("(?s).*--.*") ||
-						testValue.matches("(?s).*\\n.*") ||
-						testValue.matches("(?s).*\\r.*") ||
-						testValue.matches("(?s).*\\\\.*") ||
-						testValue.matches("(?s).*\\x00.*") ||
-						testValue.matches("(?s).*\\x1a.*")
-				)
-		{
-			return false;
 		}
 
 		return true;

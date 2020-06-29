@@ -55,17 +55,10 @@ public class TicklerDaoTest extends DaoTestFixtures
 	@Autowired
 	protected TicklerDao ticklerDao;
 
-	//protected TicklerUpdate1Dao updateDao = SpringUtils.getBean(TicklerUpdate1Dao.class);
+	private DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	private ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
 
-	@Autowired
-	private DemographicDao demographicDao;
-
-	@Autowired
-	private ProviderDao providerDao;
-
-	@Autowired
-	private ProgramDao programDao;
-	
 	@Before
 	public void before() throws Exception {
 		SchemaUtils.restoreTable("tickler", "tickler_update","tickler_comments","custom_filter","provider","demographic","program","lst_gender", "admission", "demographic_merged",  
@@ -123,7 +116,7 @@ public class TicklerDaoTest extends DaoTestFixtures
 		return cal.getTime();
 	}
 
-	@Test 
+	@Test
 	public void testFindSomeStuff() {
 		ticklerDao.persist(this.createTickler(1, "hello there", 10015, today(), Tickler.STATUS.A, "1"));
 		ticklerDao.persist(this.createTickler(1, "I am coding", 10015, yesterday(), Tickler.STATUS.C, "2"));
@@ -190,7 +183,6 @@ public class TicklerDaoTest extends DaoTestFixtures
 		
 		ticklerDao.persist(entity);
 		assertNotNull(entity.getId());
-		
 		
 		tu.setTicklerNo(entity.getId());
 		ticklerDao.persist(tu);

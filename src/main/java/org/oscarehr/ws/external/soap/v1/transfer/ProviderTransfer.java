@@ -57,6 +57,8 @@ public final class ProviderTransfer {
 	private String email;
 	private String title;
 
+	private String providerBilling;
+
 	public String getProviderNo() {
 		return (providerNo);
 	}

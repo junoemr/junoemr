@@ -77,12 +77,13 @@
                  org.oscarehr.util.SpringUtils"
          errorPage="errorpage.jsp" %>
 <%@page import="oscar.Misc" %>
-<%@page import="oscar.oscarDemographic.data.DemographicMerged" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
+<%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties"	scope="session" />
 
@@ -383,12 +384,17 @@
 		
 		
 
-		DemographicMerged dmDAO = new DemographicMerged();
+		DemographicMergedDao demographicMergedDao = SpringUtils.getBean(DemographicMergedDao.class);
 
 		for(Demographic demo : demoList) {
 
 			String dem_no = demo.getId().toString();
-			String head = dmDAO.getHead(dem_no);
+			DemographicMerged headRecord = demographicMergedDao.getCurrentHead(demo.getId());
+			String head = dem_no;
+			if (headRecord != null)
+			{
+				head = Integer.toString(headRecord.getMergedTo());
+			}
 
 %>
 	<tr class="<%=toggleLine?"even":"odd"%>">

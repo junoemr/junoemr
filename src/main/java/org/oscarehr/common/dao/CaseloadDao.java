@@ -86,8 +86,8 @@ public class CaseloadDao {
 	private static void initializeDemoQueries() {
 		caseloadDemoQueries = new HashMap<String, String>();
 		caseloadDemoQueries.put("search_rsstatus", "select distinct roster_status from demographic where roster_status not in ('', 'RO', 'NR', 'TE', 'FS')");
-		caseloadDemoQueries.put("cl_demographic_query", "select last_name, first_name, sex, CAST(month_of_birth AS UNSIGNED INTEGER), CAST(date_of_birth AS UNSIGNED INTEGER), CAST((DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(concat(year_of_birth,month_of_birth,date_of_birth), '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(concat(year_of_birth,month_of_birth,date_of_birth), '00-%m-%d'))) as UNSIGNED INTEGER) as age from demographic where demographic_no=?");
-		caseloadDemoQueries.put("cl_demographic_query_roster", "select last_name, first_name, sex, month_of_birth, date_of_birth, CAST((DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(concat(year_of_birth,month_of_birth,date_of_birth), '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(concat(year_of_birth,month_of_birth,date_of_birth), '00-%m-%d'))) as UNSIGNED INTEGER) as age from demographic where demographic_no=? AND roster_status=?");
+		caseloadDemoQueries.put("cl_demographic_query", "select last_name, first_name, sex, CAST(month_of_birth AS UNSIGNED INTEGER), CAST(date_of_birth AS UNSIGNED INTEGER), TIMESTAMPDIFF(YEAR, CONCAT(year_of_birth, '-', month_of_birth, '-', date_of_birth), current_date) AS age from demographic where demographic_no=?");
+		caseloadDemoQueries.put("cl_demographic_query_roster", "select last_name, first_name, sex, month_of_birth, date_of_birth, TIMESTAMPDIFF(YEAR, CONCAT(year_of_birth, '-', month_of_birth, '-', date_of_birth), current_date) AS age from demographic where demographic_no=? AND roster_status=?");
 		caseloadDemoQueries.put("cl_last_appt", "select max(appointment_date) from appointment where addtime(appointment_date, start_time) < now() and demographic_no=?");
 		caseloadDemoQueries.put("cl_next_appt", "select min(appointment_date) from appointment where addtime(appointment_date, start_time) > now() and demographic_no=?");
 		caseloadDemoQueries.put("cl_num_appts", "select count(*) from appointment where demographic_no=? and appointment_date > curdate() - 365");
@@ -154,7 +154,7 @@ public class CaseloadDao {
 			query = demoQuery + String.format(" ORDER BY last_name %s, first_name %s LIMIT %d, %d", sortDir, sortDir, page * pageSize, pageSize);
 		} else if (category == CaseloadCategory.Age) {
 			int split = demoQuery.indexOf(",", demoQuery.indexOf("demographic_no"));
-			query = demoQuery.substring(0,split) + ", CAST((DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(concat(year_of_birth,month_of_birth,date_of_birth), '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(concat(year_of_birth,month_of_birth,date_of_birth), '00-%m-%d'))) as UNSIGNED INTEGER) as age " + demoQuery.substring(split) + String.format(" ORDER BY ISNULL(age) ASC, age %s, last_name %s, first_name %s LIMIT %d, %d", sortDir, sortDir, sortDir, page * pageSize, pageSize);
+			query = demoQuery.substring(0,split) + ", TIMESTAMPDIFF(YEAR, CONCAT(year_of_birth, '-', month_of_birth, '-', date_of_birth), current_date) AS age " + demoQuery.substring(split) + String.format(" ORDER BY ISNULL(age) ASC, age %s, last_name %s, first_name %s LIMIT %d, %d", sortDir, sortDir, sortDir, page * pageSize, pageSize);
 		} else if (category == CaseloadCategory.Sex) {
 			int split = demoQuery.indexOf(",", demoQuery.indexOf("demographic_no"));
 			query = demoQuery.substring(0,split) + ", sex " + demoQuery.substring(split) + String.format(" ORDER BY sex = '' ASC, sex %s, last_name %s, first_name %s LIMIT %d, %d", sortDir, sortDir, sortDir, page * pageSize, pageSize);

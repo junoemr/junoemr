@@ -100,7 +100,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		// Please don't tell me anything about session handling - this hibernate stuff must be refactored into JPA, then we will talk, ok?
 		Session session = getSession();
 		try {
-			SQLQuery sqlQuery = session.createSQLQuery("select demographic_no from demographic_merged where merged_to = :parentId and deleted = 0");
+			SQLQuery sqlQuery = session.createSQLQuery("select demographic_no from demographic_merged where merged_to = :parentId and deleted = false");
 			sqlQuery.setInteger("parentId", demographicNo);
 			return sqlQuery.list();
 		} finally {

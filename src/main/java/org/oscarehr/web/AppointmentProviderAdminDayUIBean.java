@@ -31,18 +31,25 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
 public final class AppointmentProviderAdminDayUIBean {
-	private static EFormDao eFormDao=(EFormDao)SpringUtils.getBean("EFormDao");
-	private static ProviderPreferenceDao providerPreferenceDao=(ProviderPreferenceDao)SpringUtils.getBean("providerPreferenceDao");
+	private static EFormDao eFormDao = SpringUtils.getBean(EFormDao.class);
+	private static ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
 	
-	public static String getLengthLimitedLinkName(LoggedInInfo loggedInInfo, String formName) {
-		int maxLength=3;
+	public static String getLengthLimitedLinkName(LoggedInInfo loggedInInfo, String formName)
+	{
+		int maxLength = 3;
 
-		ProviderPreference providerPreference=providerPreferenceDao.find(loggedInInfo.getLoggedInProviderNo());
-		if (providerPreference!=null) maxLength=providerPreference.getAppointmentScreenLinkNameDisplayLength();
+		ProviderPreference providerPreference = providerPreferenceDao.find(loggedInInfo.getLoggedInProviderNo());
+		if (providerPreference != null && providerPreference.getAppointmentScreenLinkNameDisplayLength() > 0)
+		{
+			maxLength = providerPreference.getAppointmentScreenLinkNameDisplayLength();
+		}
 		
-		
-		if (formName.length()<=maxLength) return(formName);
-		else return(formName.substring(0, maxLength-1)+".");
+		if (formName.length() <= maxLength)
+		{
+			return formName;
+		}
+
+		return formName.substring(0, maxLength - 1) + ".";
 	}
 	
 	public static EForm getEForms(Integer eformId)

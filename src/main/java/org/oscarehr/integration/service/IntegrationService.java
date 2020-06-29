@@ -62,14 +62,31 @@ public class IntegrationService
         return integrationDao.findMyHealthAccessIntegrations();
     }
 
+    public boolean hasMyHealthAccessIntegration()
+    {
+        List<Integration> integrations = getMyHealthAccessIntegrations();
+        return integrations != null && integrations.size() > 0;
+    }
+
     public Integration findMhaIntegration(String siteName)
     {
+        Integration integration;
+
         if (StringUtils.isNullOrEmpty(siteName))
         {
-            return integrationDao.findDefaultByIntegration(Integration.INTEGRATION_TYPE_MHA);
+            integration = integrationDao.findDefaultByIntegration(Integration.INTEGRATION_TYPE_MHA);
+
+            if (integration == null)
+            {
+                integration = integrationDao.findDefaultByIntegration(Integration.INTEGRATION_TYPE_CLOUD_MD);
+            }
+        }
+        else
+        {
+            integration = integrationDao.findByIntegrationAndSiteName(siteName, Integration.INTEGRATION_TYPE_MHA);
         }
 
-        return integrationDao.findByIntegrationAndSiteName(siteName, Integration.INTEGRATION_TYPE_MHA);
+        return integration;
     }
 
     public UserIntegrationAccess findMhaUserAccessBySecurityAndSiteName(Security security, String siteName)
