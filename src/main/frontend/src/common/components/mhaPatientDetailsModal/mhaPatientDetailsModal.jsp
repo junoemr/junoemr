@@ -1,4 +1,4 @@
-<juno-modal class="mha-patient-details-modal">
+<juno-modal class="mha-patient-details-modal" component-style="$ctrl.resolve.style">
 
 	<modal-ctl-buttons>
 			<i class="icon icon-modal-ctl icon-close" ng-click="$ctrl.onCancel()"></i>
@@ -124,6 +124,7 @@
 			<panel-body>
 				<juno-button component-style="$ctrl.resolve.style"
 								button-color="JUNO_BUTTON_COLOR.SECONDARY"
+								ng-click="$ctrl.cancelConnection()"
 								class="cancel-connection-btn">
 					<div class="cancel-btn-text">
 						Cancel Connection

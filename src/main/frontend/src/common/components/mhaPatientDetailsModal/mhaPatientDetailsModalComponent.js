@@ -52,6 +52,8 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 		ctrl.patientProfiles = [];
 		ctrl.currentProfile = null;
 
+		ctrl.connectionStatusChanged = false;
+
 		ctrl.$onInit = () =>
 		{
 			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
@@ -77,13 +79,13 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 					let patient = (await mhaDemographicApi.getMHAPatient(integration.id, ctrl.resolve.demographicNo)).data.body;
 					if (patient && patient.link_status === "ACTIVE")
 					{
-						console.log(patient);
 						// add computed attribute for display, inputs get upset when they cannot assign to a ng-model
 						patient.city_province = `${patient.city}  ${patient.address_province_code}`;
 						patient.connection_status = ctrl.getConnectionStatusHuman(patient.link_status)
 
 						ctrl.patientProfiles.push({
 							label: integration.siteName,
+							integrationId: integration.id,
 							value: patient,
 						})
 					}
@@ -92,6 +94,11 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 				if (ctrl.patientProfiles.length > 0)
 				{
 					ctrl.currentProfile = ctrl.patientProfiles[0].value;
+				}
+				else
+				{
+					// close modal
+					ctrl.onCancel();
 				}
 			}
 			catch(err)
@@ -134,9 +141,21 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 			return "";
 		};
 
+		ctrl.cancelConnection = async () =>
+		{
+			ctrl.connectionStatusChanged = true;
+			let integrationId = ctrl.patientProfiles.find( (profile) => profile.value === ctrl.currentProfile).integrationId
+
+			if (integrationId)
+			{
+				await mhaDemographicApi.rejectPatientConnection(integrationId, ctrl.resolve.demographicNo);
+				ctrl.loadMHAPatientProfiles();
+			}
+		}
+
 		ctrl.onCancel = () =>
 		{
-			ctrl.modalInstance.dismiss();
+			ctrl.modalInstance.close(ctrl.connectionStatusChanged);
 		}
 	}]
 });

@@ -143,7 +143,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 		{
 			try
 			{
-				await $uibModal.open(
+				let connectionChange = await $uibModal.open(
 					{
 						component: 'mhaPatientDetailsModal',
 						backdrop: 'static',
@@ -154,6 +154,12 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 						}
 					}
 				).result;
+
+				if (connectionChange)
+				{
+					// re check confirmation status
+					await ctrl.loadMhaPatientProfiles();
+				}
 			}
 			catch(err)
 			{

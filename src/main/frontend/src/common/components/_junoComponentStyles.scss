@@ -155,8 +155,6 @@
 		background-color: $color-neutral-lightest;
 		border: 1px solid $color-neutral-lighter-grey;
 	}
-
-	@include junoPanelColor(white, $color-neutral-lighter, $color-neutral-lighter);
 }
 
 // ============ STYLE DEFAULT ===============
@@ -191,7 +189,7 @@
 	}
 
 	button {
-		@include buttonColor($color-primary-base, $color-primary-light, $color-neutral-white,
+		@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-white,
 						$color-neutral-lighter-grey, $color-neutral-lighter-grey, $color-neutral-white);
 
 		&.btn-base, &.btn-transparent {
@@ -209,9 +207,12 @@
 	}
 
 	&.juno-divider {
-		height: 0;
 		border: 1px solid $color-neutral-lighter;
 	}
+
+	@include junoTabColor($color-neutral-white, $color-neutral-lighter, $color-neutral-lighter-grey, $color-neutral-darker);
+
+	@include junoPanelColor(white, $color-neutral-lighter, $color-neutral-lighter);
 }
 
 // ============ STYLE GREY ===============
@@ -312,8 +313,8 @@
 
 	button {
 		border-radius: 8px;
-		@include buttonColor($color-primary-base, $color-primary-light, $color-neutral-darkest,
-						$color-neutral-dark, $color-orange-base, $color-neutral-white)
+		@include buttonColor($color-primary-base, $color-neutral-black, $color-neutral-darkest,
+						$color-neutral-darker, $color-orange-base, $color-neutral-white)
 	}
 
 	&.juno-check-box {
@@ -330,10 +331,28 @@
 	}
 
 	&.juno-divider {
-		height: 0;
+		background-color: $color-neutral-darker;
 		border: 1px solid $color-neutral-darker;
 	}
+
+	@include junoTabColor($color-neutral-darkest, $color-neutral-black, $color-neutral-darker, $color-neutral-white);
+
+	@include junoPanelColor($color-neutral-black, $color-neutral-black, $color-neutral-darker);
+	&.juno-panel {
+		.panel-body {
+			border-width: 1px;
+			&.no-header {
+				border-top-width: 1px;
+			}
+		}
+	}
+
 }
 .juno-style-dracula-background {
 	background-color: $color-neutral-darkest !important;
+
+	&.modal-content {
+		background: linear-gradient(-45deg, $color-neutral-darkest 45%, transparent 0) no-repeat 100% 100%,
+		linear-gradient(247deg, $color-primary-light, $color-primary-base 30%, $color-primary-base 64%, $color-primary-dark) no-repeat !important;
+	}
 }

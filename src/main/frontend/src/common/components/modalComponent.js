@@ -23,10 +23,13 @@
 
  */
 
+import {JUNO_STYLE} from "./junoComponentConstants";
+
 angular.module('Common.Components').component('junoModal', {
 	bindings: {
 		hideFooter: '<',
 		showLoading: '<',
+		componentStyle: '<?',
 	},
 	templateUrl: "src/common/components/modalTemplate.jsp",
 	transclude: {
@@ -42,7 +45,9 @@ angular.module('Common.Components').component('junoModal', {
 		{
 			ctrl.hideFooter = ctrl.hideFooter || false;
 			ctrl.showLoading = ctrl.showLoading || false;
+			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 		};
+
 		ctrl.$onChanges = function onChanges(bindingHash)
 		{
 			// bindingsHash only has data for changed bindings, so check for object existance
@@ -50,6 +55,21 @@ angular.module('Common.Components').component('junoModal', {
 			{
 				ctrl.showLoading = bindingHash.showLoading.currentValue;
 			}
+		}
+
+		ctrl.getBackgroundClass = () =>
+		{
+			return [ctrl.componentStyle + "-background"];
+		}
+
+		ctrl.getBodyClasses = () =>
+		{
+			let classes = ctrl.getBackgroundClass();
+			if (ctrl.hideFooter)
+			{
+				classes.push('no-footer');
+			}
+			return classes;
 		}
 	}
 });

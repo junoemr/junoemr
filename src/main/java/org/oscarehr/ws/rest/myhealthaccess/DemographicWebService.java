@@ -27,16 +27,20 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueException;
 import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
+import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -55,6 +59,9 @@ public class DemographicWebService extends AbstractServiceImpl
 
 	@Autowired
 	DemographicDao demographicDao;
+
+	@Autowired
+	ClinicService clinicService;
 
 	@GET
 	@Path("demographic/{demographic_no}/")
@@ -81,5 +88,36 @@ public class DemographicWebService extends AbstractServiceImpl
 	{
 		Integration integration = integrationDao.find(integrationId);
 		return RestResponse.successResponse(patientService.isPatientConfirmed(Integer.parseInt(demographicNo), integration));
+	}
+
+	@PATCH
+	@Path("demographic/{demographic_no}/reject_connection")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> rejectPatientConnection(@PathParam("integrationId") Integer integrationId,
+														   @PathParam("demographic_no") String demographicNo)
+	{
+		updatePatientConnection(integrationId, demographicNo, true);
+		return RestResponse.successResponse(true);
+	}
+
+	@PATCH
+	@Path("demographic/{demographic_no}/cancel_reject_connection")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> cancelRejectPatientConnection(@PathParam("integrationId") Integer integrationId,
+														   @PathParam("demographic_no") String demographicNo)
+	{
+		updatePatientConnection(integrationId, demographicNo, false);
+		return RestResponse.successResponse(true);
+	}
+
+
+	protected void updatePatientConnection(Integer integrationId, String demographicNo, Boolean rejected)
+	{
+		Integration integration = integrationDao.find(integrationId);
+		Demographic demographic = demographicDao.find(Integer.parseInt(demographicNo));
+		ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
+				getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
+
+		patientService.updatePatientConnection(integration, loginTokenTo1.getToken(), demographic, rejected);
 	}
 }
