@@ -123,7 +123,12 @@ public class HistoryNoteMapper extends AbstractMapper
 
 	public int getNumMedicalProblemsNotes()
 	{
-		return provider.getZPBReps();
+		// medaccess puts history notes in the ZPB section - normally used by DxImporter
+		if (CoPDImportService.IMPORT_SOURCE.MEDACCESS.equals(importSource))
+		{
+			return provider.getZPBReps();
+		}
+		return 0;
 	}
 
 	public int getNumMedicalSurgicalNotes()

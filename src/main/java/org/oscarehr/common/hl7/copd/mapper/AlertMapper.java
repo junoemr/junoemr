@@ -72,7 +72,7 @@ public class AlertMapper extends AbstractMapper
 	{
 		CaseManagementNote note = null;
 
-		String noteText = getAlertText(rep);
+		String noteText = getNoteText(rep);
 		if(noteText != null)
 		{
 			note = new CaseManagementNote();
@@ -98,8 +98,39 @@ public class AlertMapper extends AbstractMapper
 				.getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValue());
 	}
 
-	public String getAlertText(int rep) throws HL7Exception
+	private String getNoteText(int rep) throws HL7Exception
+	{
+		String textSent = getAlertTextSent(rep);
+		String comments = getAlertComments(rep);
+		String advanceDir = getAlertAdvanceDirFlag(rep);
+		String response = "";
+
+		if(textSent != null)
+		{
+			response += textSent + "\n";
+		}
+		if(comments != null)
+		{
+			response += comments + "\n";
+		}
+		if(advanceDir != null)
+		{
+			// wolf likes to put things in here so include them in the note
+			response += advanceDir + "\n";
+		}
+		return StringUtils.trimToNull(response);
+	}
+
+	public String getAlertTextSent(int rep) throws HL7Exception
 	{
 		return StringUtils.trimToNull(provider.getZAL(rep).getZal5_alertTextSent().getValue());
+	}
+	public String getAlertComments(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZAL(rep).getZal6_commentsToAlert().getValue());
+	}
+	public String getAlertAdvanceDirFlag(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZAL(rep).getZal7_advanceDirFlag().getValue());
 	}
 }
