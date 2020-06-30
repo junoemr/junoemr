@@ -360,6 +360,7 @@ jQuery(document).ready(function()
     var $providerSelect = jQuery('#provider-number');
     var $facilityNumber = jQuery('#facility-number');
     var $siteSelect = jQuery('#site-select');
+    var $serviceLocationSelect = jQuery("select[name=serviceLocation]");
 
     if ($siteSelect.length > 0)
     {
@@ -369,6 +370,8 @@ jQuery(document).ready(function()
     {
         Juno.BillingHelper.BC.initAutoApplyBCP("<%=request.getContextPath() %>", $providerSelect, $facilityNumber);
     }
+
+    Juno.BillingHelper.BC.initServiceLocationCodeHook("<%=request.getContextPath() %>", $providerSelect, $serviceLocationSelect);
 })
 
 </script>

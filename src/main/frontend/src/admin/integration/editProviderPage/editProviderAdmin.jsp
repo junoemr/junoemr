@@ -806,7 +806,7 @@
 					<h6>BCP Sites</h6>
 				</panel-header>
 				<panel-body>
-					<div class="flex-row flex-wrap align-items-center">
+					<div class="flex-row flex-wrap align-items-baseline">
 						<juno-typeahead
 										name="bcp-site-selection"
 										class="flex-grow lg-margin-right"
@@ -846,6 +846,14 @@
 					<!-- 3rd Party Identifiers -->
 					<div ng-if="$ctrl.billingRegion === 'BC'">
 						<ca-field-text
+										ca-name="cpsid"
+										ca-title="CPSID"
+										ca-model="$ctrl.provider.cpsid"
+										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
+						>
+						</ca-field-text>
+						<ca-field-text
 										ca-name="ihaProviderMnemonic"
 										ca-title="IHA Provider Mnemonic"
 										ca-model="$ctrl.provider.ihaProviderMnemonic"
@@ -875,6 +883,14 @@
 
 					<div ng-if="$ctrl.billingRegion === 'AB'">
 						<ca-field-text
+										ca-name="cpsid"
+										ca-title="CPSID"
+										ca-model="$ctrl.provider.cpsid"
+										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
+						>
+						</ca-field-text>
+						<ca-field-text
 										ca-name="eDeliveryIds"
 										ca-title="E-Delivery Ids"
 										ca-model="$ctrl.provider.eDeliveryIds"
@@ -894,6 +910,16 @@
 										ca-name="connectCareId"
 										ca-title="Connect Care Provider Id"
 										ca-model="$ctrl.provider.connectCareProviderId"
+										ca-rows="1"
+										ca-disabled="$ctrl.fieldsDisabled"
+						>
+						</ca-field-text>
+					</div>
+					<div ng-if="$ctrl.billingRegion === 'SK'">
+						<ca-field-text
+										ca-name="cpsid"
+										ca-title="CPSID"
+										ca-model="$ctrl.provider.cpsid"
 										ca-rows="1"
 										ca-disabled="$ctrl.fieldsDisabled"
 						>

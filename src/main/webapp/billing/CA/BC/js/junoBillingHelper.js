@@ -24,6 +24,29 @@ Juno.BillingHelper.BC._alertError = function alertError(error)
     console.error(error);
 };
 
+/**
+ * executes the provider callback with the provider billing data returned from the server
+ * @param context - juno context path
+ * @param providerNo - the provider who's billing data is to be retrieved
+ * @param callback - the callback to call with the billing data as an argument
+ * @private
+ */
+Juno.BillingHelper._providerBillingWrapper = function (context, providerNo, callback)
+{
+    var providerEndpoint = context + "/ws/rs/providerService/provider/" + providerNo + "/billing";
+
+    if (Juno.BillingHelper.BC._isProviderSelected(providerNo))
+    {
+        jQuery.get(providerEndpoint).done(function (result)
+        {
+            callback(result.body);
+        }).fail(function(err)
+        {
+            console.error("Failed to update rural retention code based on provider setting with error: " + err);
+        });
+    }
+}
+
 Juno.BillingHelper.BC._applyBCP = function applyBCP($providerSelect, $facNumInput) {
     if (Juno.BillingHelper.BC._isProviderSelected($providerSelect.val()))
     {
@@ -200,6 +223,51 @@ Juno.BillingHelper.BC._applyBCPMultiSite = function applyBCPMultiSite($providerS
 };
 
 /**
+ * updates rural retention code base on provider billing setting.
+ * @param providerNo - the provider who's billing setting will be used.
+ * @param $ruralRetentionCodeSelect - the rural retention code select to update.
+ * @private
+ */
+Juno.BillingHelper.BC._updateRuralRetentionCode = function(providerNo, $ruralRetentionCodeSelect)
+{
+    Juno.BillingHelper._providerBillingWrapper(Juno.BillingHelper.BC._localJunoInstance, providerNo, function (providerBilling)
+    {
+        if (providerBilling.bcRuralRetentionCode && providerBilling.bcRuralRetentionName)
+        {
+            let ruralRetentionSelectVal = providerBilling.bcRuralRetentionCode + "|" +
+                providerBilling.bcRuralRetentionName.replace(/^\(\d+\)\s+/, "");
+            $ruralRetentionCodeSelect.val(ruralRetentionSelectVal);
+        }
+    });
+}
+
+/**
+ * updates service location based on provider billing setting.
+ * @param providerNo - the provider who's billing setting will be used.
+ * @param $serviceLocationSelect - the service location select to update
+ * @private
+ */
+Juno.BillingHelper.BC._updateServiceLocationCode = function(providerNo, $serviceLocationSelect)
+{
+    Juno.BillingHelper._providerBillingWrapper(Juno.BillingHelper.BC._localJunoInstance, providerNo, function (providerBilling)
+    {
+        if (providerBilling.bcServiceLocationCode)
+        {
+            for (var $option of $serviceLocationSelect.children("option").toArray())
+            {
+                $option = jQuery($option);
+                var match = $option.val().match(/^\w/);
+                if (match && match[0] === providerBilling.bcServiceLocationCode)
+                {
+                    $serviceLocationSelect.val($option.val());
+                }
+            }
+        }
+    });
+}
+
+
+/**
  * Bind the select provider element to the facility number element.  When a new provider
  * is selected, automatically fill in the facility number.
  */
@@ -237,3 +305,38 @@ Juno.BillingHelper.BC.initAutoApplyBCPMultiSite = function initAutoApplyBCPMulti
     Juno.BillingHelper.BC._applyBCPMultiSite($providerSelect, $siteSelect, $facNoInput);
 };
 
+/**
+ * create on change hook for provider select. This hook will adjust the rural retention code value,
+ * to the default specified in the providers profile
+ * @param context - juno context path
+ * @param $providerSelect - the provider select to watch
+ * @param $ruralRetentionCodeSelect - the rural retention code select to adjust
+ */
+Juno.BillingHelper.BC.initRuralRetentionCodeHook = function(context, $providerSelect, $ruralRetentionCodeSelect)
+{
+    Juno.BillingHelper.BC._localJunoInstance = context;
+
+    Juno.BillingHelper.BC._updateRuralRetentionCode($providerSelect.val(), $ruralRetentionCodeSelect);
+    $providerSelect.change(function()
+    {
+        Juno.BillingHelper.BC._updateRuralRetentionCode($providerSelect.val(), $ruralRetentionCodeSelect);
+    });
+}
+
+/**
+ * create on change hook for provider select. This hook will adjust the service location
+ * based on provider setting
+ * @param context - juno context path
+ * @param $providerSelect - the provider select to watch
+ * @param $serviceLocationSelect - the service location select to adjust
+ */
+Juno.BillingHelper.BC.initServiceLocationCodeHook = function(context, $providerSelect, $serviceLocationSelect)
+{
+    Juno.BillingHelper.BC._localJunoInstance = context;
+
+    Juno.BillingHelper.BC._updateServiceLocationCode($providerSelect.val(), $serviceLocationSelect);
+    $providerSelect.change(function()
+    {
+        Juno.BillingHelper.BC._updateServiceLocationCode($providerSelect.val(), $serviceLocationSelect);
+    });
+}
