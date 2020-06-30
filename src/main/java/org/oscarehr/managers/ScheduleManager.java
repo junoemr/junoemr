@@ -47,13 +47,18 @@ import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.NotAuthorisedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
+
 import java.time.LocalDate;
-import java.util.*;
-import java.util.function.Function;
 
 @Service
 public class ScheduleManager {
