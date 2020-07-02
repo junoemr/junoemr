@@ -33,6 +33,8 @@ import org.oscarehr.util.SpringUtils;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import static integration.tests.util.junoUtil.ProviderCollection.providerLNames;
+
 public class DatabaseUtil
 {
 	public static Demographic createTestDemographic()
@@ -47,12 +49,11 @@ public class DatabaseUtil
 	}
 	public static void createTestProvider()
 	{
-		String[] providers = {"Apple", "Berry", "Cherry"};
-		int length = providers.length;
+		ProviderService providerService = (ProviderService) SpringUtils.getBean("provider.service.ProviderService");
+		int length = providerLNames.length;
 		for (int i=0; i<length; i++) {
-			ProviderService providerService = (ProviderService) SpringUtils.getBean("provider.service.ProviderService");
 			ProviderData demoProvider = new ProviderData();
-			Provider dr = ProviderCollection.providerMap.get(providers[i]);
+			Provider dr = ProviderCollection.providerMap.get(providerLNames[i]);
 			demoProvider.setProviderNo(Integer.parseInt(dr.getProviderNo()));
 			demoProvider.setFirstName(dr.getFirstName());
 			demoProvider.setLastName(dr.getLastName());

@@ -74,355 +74,443 @@ package integration.tests.util.junoUtil;
 
 
 
-	public String getLastName() {
+	public String getLastName()
+	{
 		return lastName;
 	}
 
-	public void setLastName(String lastName) {
+	public void setLastName(String lastName)
+	{
 		this.lastName = lastName;
 	}
 
-	public String getFirstName() {
+	public String getFirstName()
+	{
 		return firstName;
 	}
 
-	public void setFirstName(String firstName) {
+	public void setFirstName(String firstName)
+	{
 		this.firstName = firstName;
 	}
 
-	public String getDobYear() {
+	public String getDobYear()
+	{
 		return dobYear;
 	}
 
-	public void setDobYear(String dobYear) {
+	public void setDobYear(String dobYear)
+	{
 		this.dobYear = dobYear;
 	}
 
-	public String getDobMonth() {
+	public String getDobMonth()
+	{
 		return dobMonth;
 	}
 
-	public void setDobMonth(String dobMonth) {
+	public void setDobMonth(String dobMonth)
+	{
 		this.dobMonth = dobMonth;
 	}
 
-	public String getDobDate() {
+	public String getDobDate()
+	{
 		return dobDate;
 	}
 
-	public void setDobDate(String dobDate) {
+	public void setDobDate(String dobDate)
+	{
 		this.dobDate = dobDate;
 	}
 
-	public String getSex() {
+	public String getSex()
+	{
 		return sex;
 	}
 
-	public void setSex(String sex) {
+	public void setSex(String sex)
+	{
 		this.sex = sex;
 	}
 
-	public String getHin() {
+	public String getHin()
+	{
 		return hin;
 	}
 
-	public void setHin(String hin) {
+	public void setHin(String hin)
+	{
 		this.hin = hin;
 	}
 
-	public String getLanguage() {
+	public String getLanguage()
+	{
 		return language;
 	}
 
-	public void setLanguage(String language) {
+	public void setLanguage(String language)
+	{
 		this.language = language;
 	}
 
-	public String getTitle() {
+	public String getTitle()
+	{
 		return title;
 	}
 
-	public void setTitle(String title) {
+	public void setTitle(String title)
+	{
 		this.title = title;
 	}
 
-	public String getSpoken() {
+	public String getSpoken()
+	{
 		return spoken;
 	}
 
-	public void setSpoken(String spoken) {
+	public void setSpoken(String spoken)
+	{
 		this.spoken = spoken;
 	}
 
-	public String getAddress() {
+	public String getAddress()
+	{
 		return address;
 	}
 
-	public void setAddress(String address) {
+	public void setAddress(String address)
+	{
 		this.address = address;
 	}
 
-	public String getCity() {
+	public String getCity()
+	{
 		return city;
 	}
 
-	public void setCity(String city) {
+	public void setCity(String city)
+	{
 		this.city = city;
 	}
 
-	public String getProvince() {
+	public String getProvince()
+	{
 		return province;
 	}
 
-	public void setProvince(String province) {
+	public void setProvince(String province)
+	{
 		this.province = province;
 	}
 
-	public String getPostal() {
+	public String getPostal()
+	{
 		return postal;
 	}
 
-	public void setPostal(String postal) {
+	public void setPostal(String postal)
+	{
 		this.postal = postal;
 	}
 
-	public String getHomePhone() {
+	public String getHomePhone()
+	{
 		return homePhone;
 	}
 
-	public void setHomePhone(String homePhone) {
+	public void setHomePhone(String homePhone)
+	{
 		this.homePhone = homePhone;
 	}
 
-	public String getHomePhoneExt() {
+	public String getHomePhoneExt()
+	{
 		return homePhoneExt;
 	}
 
-	public void setHomePhoneExt(String homePhoneExt) {
+	public void setHomePhoneExt(String homePhoneExt)
+	{
 		this.homePhoneExt = homePhoneExt;
 	}
 
-	public String getWorkPhone() {
+	public String getWorkPhone()
+	{
 		return workPhone;
 	}
 
-	public void setWorkPhone(String workPhone) {
+	public void setWorkPhone(String workPhone)
+	{
 		this.workPhone = workPhone;
 	}
 
-	public String getWorkPhoneExt() {
+	public String getWorkPhoneExt()
+	{
 		return workPhoneExt;
 	}
 
-	public void setWorkPhoneExt(String workPhoneExt) {
+	public void setWorkPhoneExt(String workPhoneExt)
+	{
 		this.workPhoneExt = workPhoneExt;
 	}
 
-	public String getCellPhone() {
+	public String getCellPhone()
+	{
 		return cellPhone;
 	}
 
-	public void setCellPhone(String cellPhone) {
+	public void setCellPhone(String cellPhone)
+	{
 		this.cellPhone = cellPhone;
 	}
 
-	public String getPhoneComment() {
+	public String getPhoneComment()
+	{
 		return phoneComment;
 	}
 
-	public void setPhoneComment(String phoneComment) {
+	public void setPhoneComment(String phoneComment)
+	{
 		this.phoneComment = phoneComment;
 	}
 
-	public String getNewsletter() {
+	public String getNewsletter()
+	{
 		return newsletter;
 	}
 
-	public void setNewsletter(String newsletter) {
+	public void setNewsletter(String newsletter)
+	{
 		this.newsletter = newsletter;
 	}
 
-	public String getAboriginal() {
+	public String getAboriginal()
+	{
 		return aboriginal;
 	}
 
-	public void setAboriginal(String aboriginal) {
+	public void setAboriginal(String aboriginal)
+	{
 		this.aboriginal = aboriginal;
 	}
 
-	public String getEmail() {
+	public String getEmail()
+	{
 		return email;
 	}
 
-	public void setEmail(String email) {
+	public void setEmail(String email)
+	{
 		this.email = email;
 	}
 
-	public String getPhrUserName() {
+	public String getPhrUserName()
+	{
 		return phrUserName;
 	}
 
-	public void setPhrUserName(String phrUserName) {
+	public void setPhrUserName(String phrUserName)
+	{
 		this.phrUserName = phrUserName;
 	}
 
-	public String getEffYear() {
+	public String getEffYear()
+	{
 		return effYear;
 	}
 
-	public void setEffYear(String effYear) {
+	public void setEffYear(String effYear)
+	{
 		this.effYear = effYear;
 	}
 
-	public String getEffMonth() {
+	public String getEffMonth()
+	{
 		return effMonth;
 	}
 
-	public void setEffMonth(String effMonth) {
+	public void setEffMonth(String effMonth)
+	{
 		this.effMonth = effMonth;
 	}
 
-	public String getEffDate() {
+	public String getEffDate()
+	{
 		return effDate;
 	}
 
-	public void setEffDate(String effDate) {
+	public void setEffDate(String effDate)
+	{
 		this.effDate = effDate;
 	}
 
-	public String getHcType() {
+	public String getHcType()
+	{
 		return hcType;
 	}
 
-	public void setHcType(String hcType) {
+	public void setHcType(String hcType)
+	{
 		this.hcType = hcType;
 	}
 
-	public String getHcRenewYear() {
+	public String getHcRenewYear()
+	{
 		return hcRenewYear;
 	}
 
-	public void setHcRenewYear(String hcRenewYear) {
+	public void setHcRenewYear(String hcRenewYear)
+	{
 		this.hcRenewYear = hcRenewYear;
 	}
 
-	public String getHcRenewMonth() {
+	public String getHcRenewMonth()
+	{
 		return hcRenewMonth;
 	}
 
-	public void setHcRenewMonth(String hcRenewMonth) {
+	public void setHcRenewMonth(String hcRenewMonth)
+	{
 		this.hcRenewMonth = hcRenewMonth;
 	}
 
-	public String getHcRenewDate() {
+	public String getHcRenewDate()
+	{
 		return hcRenewDate;
 	}
 
-	public void setHcRenewDate(String hcRenewDate) {
+	public void setHcRenewDate(String hcRenewDate)
+	{
 		this.hcRenewDate = hcRenewDate;
 	}
 
-	public String getCountryOfOrigin() {
+	public String getCountryOfOrigin()
+	{
 		return countryOfOrigin;
 	}
 
-	public void setCountryOfOrigin(String countryOfOrigin) {
+	public void setCountryOfOrigin(String countryOfOrigin)
+	{
 		this.countryOfOrigin = countryOfOrigin;
 	}
 
-	public String getSin() {
+	public String getSin()
+	{
 		return sin;
 	}
 
-	public void setSin(String sin) {
+	public void setSin(String sin)
+	{
 		this.sin = sin;
 	}
 
-	public String getCytology() {
+	public String getCytology()
+	{
 		return cytology;
 	}
 
-	public void setCytology(String cytology) {
+	public void setCytology(String cytology)
+	{
 		this.cytology = cytology;
 	}
 
-	public String getMotherName() {
+	public String getMotherName()
+	{
 		return motherName;
 	}
 
-	public void setMotherName(String motherName) {
+	public void setMotherName(String motherName)
+	{
 		this.motherName = motherName;
 	}
 
-	public String getFatherName() {
+	public String getFatherName()
+	{
 		return fatherName;
 	}
 
-	public void setFatherName(String fatherName) {
+	public void setFatherName(String fatherName)
+	{
 		this.fatherName = fatherName;
 	}
 
-	public String getReferralDoctor() {
+	public String getReferralDoctor()
+	{
 		return referralDoctor;
 	}
 
-	public void setReferralDoctor(String referralDoctor) {
+	public void setReferralDoctor(String referralDoctor)
+	{
 		this.referralDoctor = referralDoctor;
 	}
 
-	public String getReferralDoctorNo() {
+	public String getReferralDoctorNo()
+	{
 		return referralDoctorNo;
 	}
 
-	public void setReferralDoctorNo(String referralDoctorNo) {
+	public void setReferralDoctorNo(String referralDoctorNo)
+	{
 		this.referralDoctorNo = referralDoctorNo;
 	}
 
-	public String getRosterStatus() {
+	public String getRosterStatus()
+	{
 		return rosterStatus;
 	}
 
-	public void setRosterStatus(String rosterStatus) {
+	public void setRosterStatus(String rosterStatus)
+	{
 		this.rosterStatus = rosterStatus;
 	}
 
-	public String getRosteredYear() {
+	public String getRosteredYear()
+	{
 		return rosteredYear;
 	}
 
-	public void setRosteredYear(String rosteredYear) {
+	public void setRosteredYear(String rosteredYear)
+	{
 		this.rosteredYear = rosteredYear;
 	}
 
-	public String getRosteredMonth() {
+	public String getRosteredMonth()
+	{
 		return rosteredMonth;
 	}
 
-	public void setRosteredMonth(String rosteredMonth) {
+	public void setRosteredMonth(String rosteredMonth)
+	{
 		this.rosteredMonth = rosteredMonth;
 	}
 
-	public String getRosteredDate() {
+	public String getRosteredDate()
+	{
 		return rosteredDate;
 	}
 
-	public void setRosteredDate(String rosteredDate) {
+	public void setRosteredDate(String rosteredDate)
+	{
 		this.rosteredDate = rosteredDate;
 	}
 
-	public String getPatientStatus() {
+	public String getPatientStatus()
+	{
 		return patientStatus;
 	}
 
-	public void setPatientStatus(String patientStatus) {
+	public void setPatientStatus(String patientStatus)
+	{
 		this.patientStatus = patientStatus;
 	}
 
-	public String getChartNo() {
+	public String getChartNo()
+	{
 		return chartNo;
 	}
 
-	public void setChartNo(String chartNo) {
+	public void setChartNo(String chartNo)
+	{
 		this.chartNo = chartNo;
 	}
 

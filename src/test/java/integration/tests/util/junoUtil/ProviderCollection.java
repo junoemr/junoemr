@@ -30,10 +30,11 @@ public class ProviderCollection
 {
 	public static ArrayList<Provider> providers = new ArrayList<Provider>();
 	public static HashMap<String, Provider> providerMap = new HashMap<String, Provider>();
+	public static String[] providerLNames = {"Apple", "Berry", "Cherry"};
 	static {
 		Provider provider = new Provider();
 		provider.setProviderNo("100001");
-		provider.setLastName("Apple");
+		provider.setLastName(providerLNames[0]);
 		provider.setFirstName("Afname");
 		provider.setType("doctor");
 		provider.setSpecialty("Family");
@@ -43,8 +44,8 @@ public class ProviderCollection
 		providerMap.put(provider.getLastName(), provider);
 
 		Provider provider2 = new Provider();
-		provider.setProviderNo("100002");
-		provider2.setLastName("Berry");
+		provider2.setProviderNo("100002");
+		provider2.setLastName(providerLNames[1]);
 		provider2.setFirstName("Bfname");
 		provider2.setType("doctor");
 		provider2.setSpecialty("Family");
@@ -54,7 +55,8 @@ public class ProviderCollection
 		providerMap.put(provider2.getLastName(), provider2);
 
 		Provider provider3 = new Provider();
-		provider3.setLastName("Cherry");
+		provider3.setProviderNo("100003");
+		provider3.setLastName(providerLNames[2]);
 		provider3.setFirstName("Cfname");
 		provider3.setType("doctor");
 		provider3.setSpecialty("Maternity");
