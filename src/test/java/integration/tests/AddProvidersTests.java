@@ -32,9 +32,8 @@ import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import java.io.IOException;
@@ -49,15 +48,6 @@ public class AddProvidersTests extends SeleniumTestBase {
 	{
 		SchemaUtils.restoreTable("admission", "log", "program_provider",
 				"provider", "provider_billing", "providerbillcenter", "secUserRole");
-	}
-
-	public static boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException {
-		driver.findElement(searchPage).click();
-		WebElement searchTermField = driver.findElement(searchTerm);
-		searchTermField.sendKeys(lastName + ", " + firstName);
-		searchTermField.sendKeys(Keys.ENTER);
-		Thread.sleep(1000);
-		return PageUtil.isExistsBy(nameRow, driver);
 	}
 
 	@Test
@@ -76,7 +66,7 @@ public class AddProvidersTests extends SeleniumTestBase {
 		// Add a provider record page
 		driver.findElement(By.xpath(".//h5[contains(.,'Add a Provider Record')]")).click();
 		Thread.sleep(1000);
-		Provider drApple = ProviderCollection.providerMap.get("Apple");
+		Provider drApple = ProviderCollection.providerMap.get(ProviderCollection.providerLNames[0]);
 		driver.switchTo().frame("myFrame");
 		driver.findElement(By.xpath("//input[@value='Suggest']")).click();
 		driver.findElement(By.xpath("//input[@name='provider_no']")).clear();
@@ -116,16 +106,18 @@ public class AddProvidersTests extends SeleniumTestBase {
 		Thread.sleep(1000);
 
 		Assert.assertNotNull(driver.findElement(By.xpath(".//h1[contains(.,'Successful Addition of a Provider Record.')]")));
+
+		driver.switchTo().defaultContent();
 		driver.findElement(By.xpath(".//a[contains(.,'User Management')]")).click();
 		driver.findElement(By.xpath(".//a[contains(.,'Search/Edit/Delete Provider Records')]")).click();
-
 		Thread.sleep(1000);
 		driver.switchTo().frame("myFrame");
 		driver.findElement(By.xpath("//input[@value='search_providerno']")).click();
 		driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(drApple.getProviderNo());
 		driver.findElement(By.xpath("//input[@name='button']")).click();
-		Assert.assertTrue(PageUtil.isExistsBy(By.xpath("//tr[contains(.,drApple.getProviderNo())]"), driver));
-
+		WebElement providerAdded = driver.findElement(By.xpath("html/body/center/center/table/tbody/tr[2]/td[3]"));
+		String providerAddedLName = providerAdded.getText();
+		Assert.assertEquals(drApple.getLastName(), providerAddedLName);
 	}
 }
 

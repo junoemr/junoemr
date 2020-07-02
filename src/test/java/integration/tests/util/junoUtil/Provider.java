@@ -55,227 +55,283 @@ public class Provider
 	private String selfLearningPassword = "Welcome@123";
 	private String status = "1";//active
 
-	public String getProviderNo() {
+	public String getProviderNo()
+	{
 		return providerNo;
 	}
 
-	public void setProviderNo(String providerNo) {
+	public void setProviderNo(String providerNo)
+	{
 		this.providerNo = providerNo;
 	}
 
-	public String getLastName() {
+	public String getLastName()
+	{
 		return lastName;
 	}
 
-	public void setLastName(String lastName) {
+	public void setLastName(String lastName)
+	{
 		this.lastName = lastName;
 	}
 
-	public String getFirstName() {
+	public String getFirstName()
+	{
 		return firstName;
 	}
 
-	public void setFirstName(String firstName) {
+	public void setFirstName(String firstName)
+	{
 		this.firstName = firstName;
 	}
 
-	public String getType() {
+	public String getType()
+	{
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(String type)
+	{
 		this.type = type;
 	}
 
-	public String getSpecialty() {
+	public String getSpecialty()
+	{
 		return specialty;
 	}
 
-	public void setSpecialty(String specialty) {
+	public void setSpecialty(String specialty)
+	{
 		this.specialty = specialty;
 	}
 
-	public String getTeam() {
+	public String getTeam()
+	{
 		return team;
 	}
 
-	public void setTeam(String team) {
+	public void setTeam(String team)
+	{
 		this.team = team;
 	}
 
-	public String getSex() {
+	public String getSex()
+	{
 		return sex;
 	}
 
-	public void setSex(String sex) {
+	public void setSex(String sex)
+	{
 		this.sex = sex;
 	}
 
-	public String getDob() {
+	public String getDob()
+	{
 		return dob;
 	}
 
-	public void setDob(String dob) {
+	public void setDob(String dob)
+	{
 		this.dob = dob;
 	}
 
-	public String getAddress() {
+	public String getAddress()
+	{
 		return address;
 	}
 
-	public void setAddress(String address) {
+	public void setAddress(String address)
+	{
 		this.address = address;
 	}
 
-	public String getHomePhone() {
+	public String getHomePhone()
+	{
 		return homePhone;
 	}
 
-	public void setHomePhone(String homePhone) {
+	public void setHomePhone(String homePhone)
+	{
 		this.homePhone = homePhone;
 	}
 
-	public String getWorkPhone() {
+	public String getWorkPhone()
+	{
 		return workPhone;
 	}
 
-	public void setWorkPhone(String workPhone) {
+	public void setWorkPhone(String workPhone)
+	{
 		this.workPhone = workPhone;
 	}
 
-	public String getEmail() {
+	public String getEmail()
+	{
 		return email;
 	}
 
-	public void setEmail(String email) {
+	public void setEmail(String email)
+	{
 		this.email = email;
 	}
 
-	public String getPager() {
+	public String getPager()
+	{
 		return pager;
 	}
 
-	public void setPager(String pager) {
+	public void setPager(String pager)
+	{
 		this.pager = pager;
 	}
 
-	public String getCell() {
+	public String getCell()
+	{
 		return cell;
 	}
 
-	public void setCell(String cell) {
+	public void setCell(String cell)
+	{
 		this.cell = cell;
 	}
 
-	public String getOtherPhone() {
+	public String getOtherPhone()
+	{
 		return otherPhone;
 	}
 
-	public void setOtherPhone(String otherPhone) {
+	public void setOtherPhone(String otherPhone)
+	{
 		this.otherPhone = otherPhone;
 	}
 
-	public String getFax() {
+	public String getFax()
+	{
 		return fax;
 	}
 
-	public void setFax(String fax) {
+	public void setFax(String fax)
+	{
 		this.fax = fax;
 	}
 
-	public String getMspNo() {
+	public String getMspNo()
+	{
 		return mspNo;
 	}
 
-	public void setMspNo(String mspNo) {
+	public void setMspNo(String mspNo)
+	{
 		this.mspNo = mspNo;
 	}
 
-	public String getThirdPartyBillinNo() {
+	public String getThirdPartyBillinNo()
+	{
 		return thirdPartyBillinNo;
 	}
 
-	public void setThirdPartyBillinNo(String thirdPartyBillinNo) {
+	public void setThirdPartyBillinNo(String thirdPartyBillinNo)
+	{
 		this.thirdPartyBillinNo = thirdPartyBillinNo;
 	}
 
-	public String getBillingNo() {
+	public String getBillingNo()
+	{
 		return billingNo;
 	}
 
-	public void setBillingNo(String billingNo) {
+	public void setBillingNo(String billingNo)
+	{
 		this.billingNo = billingNo;
 	}
 
-	public String getAlternateBillingNo() {
+	public String getAlternateBillingNo()
+	{
 		return alternateBillingNo;
 	}
 
-	public void setAlternateBillingNo(String alternateBillingNo) {
+	public void setAlternateBillingNo(String alternateBillingNo)
+	{
 		this.alternateBillingNo = alternateBillingNo;
 	}
 
-	public String getBcpEligibility() {
+	public String getBcpEligibility()
+	{
 		return bcpEligibility;
 	}
 
-	public void setBcpEligibility(String bcpEligibility) {
+	public void setBcpEligibility(String bcpEligibility)
+	{
 		this.bcpEligibility = bcpEligibility;
 	}
 
-	public String getIhaProviderMnemonic() {
+	public String getIhaProviderMnemonic()
+	{
 		return ihaProviderMnemonic;
 	}
 
-	public void setIhaProviderMnemonic(String ihaProviderMnemonic) {
+	public void setIhaProviderMnemonic(String ihaProviderMnemonic)
+	{
 		this.ihaProviderMnemonic = ihaProviderMnemonic;
 	}
 
-	public String getSpecialtyCodeNo() {
+	public String getSpecialtyCodeNo()
+	{
 		return specialtyCodeNo;
 	}
 
-	public void setSpecialtyCodeNo(String specialtyCodeNo) {
+	public void setSpecialtyCodeNo(String specialtyCodeNo)
+	{
 		this.specialtyCodeNo = specialtyCodeNo;
 	}
 
-	public String getGroupBillingNo() {
+	public String getGroupBillingNo()
+	{
 		return groupBillingNo;
 	}
 
-	public void setGroupBillingNo(String groupBillingNo) {
+	public void setGroupBillingNo(String groupBillingNo)
+	{
 		this.groupBillingNo = groupBillingNo;
 	}
 
-	public String getCpsidNo() {
+	public String getCpsidNo()
+	{
 		return cpsidNo;
 	}
 
-	public void setCpsidNo(String cpsidNo) {
+	public void setCpsidNo(String cpsidNo)
+	{
 		this.cpsidNo = cpsidNo;
 	}
 
-	public String getSelfLearningUsername() {
+	public String getSelfLearningUsername()
+	{
 		return selfLearningUsername;
 	}
 
-	public void setSelfLearningUsername(String selfLearningUsername) {
+	public void setSelfLearningUsername(String selfLearningUsername)
+	{
 		this.selfLearningUsername = selfLearningUsername;
 	}
 
-	public String getSelfLearningPassword() {
+	public String getSelfLearningPassword()
+	{
 		return selfLearningPassword;
 	}
 
-	public void setSelfLearningPassword(String selfLearningPassword) {
+	public void setSelfLearningPassword(String selfLearningPassword)
+	{
 		this.selfLearningPassword = selfLearningPassword;
 	}
 
-	public String getStatus() {
+	public String getStatus()
+	{
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(String status)
+	{
 		this.status = status;
 	}
 }
