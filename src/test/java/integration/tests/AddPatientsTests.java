@@ -36,16 +36,16 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-
 import java.io.IOException;
 import java.sql.SQLException;
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByIndex;
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 
-import static integration.tests.AddAppointmentsTests.dropdownSelectByIndex;
-import static integration.tests.AddAppointmentsTests.dropdownSelectByValue;
+public class AddPatientsTests extends SeleniumTestBase
+{
 
-public class AddPatientsTests extends SeleniumTestBase {
-
-	public static boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException {
+	public static boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException
+	{
 		driver.findElement(searchPage).click();
 		WebElement searchTermField = driver.findElement(searchTerm);
 		searchTermField.sendKeys(lastName + ", " + firstName);
@@ -63,7 +63,8 @@ public class AddPatientsTests extends SeleniumTestBase {
 	}
 
 	@Test
-	public void addPatientsClassicUITest() throws Exception {
+	public void addPatientsClassicUITest() throws Exception
+	{
 		// login
 		if (!Navigation.isLoggedIn(driver)) {
 			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
@@ -82,12 +83,12 @@ public class AddPatientsTests extends SeleniumTestBase {
 		Patient mom = PatientCollection.patientMap.get("Momlastname");
 		driver.findElement(By.id("last_name")).sendKeys(mom.getLastName());
 		driver.findElement(By.id("first_name")).sendKeys(mom.getFirstName());
-		dropdownSelectByValue(By.id("official_lang"), mom.getLanguage());
-		dropdownSelectByValue(By.id("title"), mom.getTitle());
-		dropdownSelectByValue(By.xpath("//select[@name='spoken_lang']"), mom.getSpoken());
+		dropdownSelectByValue(driver, By.id("official_lang"), mom.getLanguage());
+		dropdownSelectByValue(driver, By.id("title"), mom.getTitle());
+		dropdownSelectByValue(driver, By.xpath("//select[@name='spoken_lang']"), mom.getSpoken());
 		driver.findElement(By.id("address")).sendKeys(mom.getAddress());
 		driver.findElement(By.id("city")).sendKeys(mom.getCity());
-		dropdownSelectByValue(By.id("province"), mom.getProvince());
+		dropdownSelectByValue(driver, By.id("province"), mom.getProvince());
 		driver.findElement(By.id("postal")).sendKeys(mom.getPostal());
 		driver.findElement(By.id("phone")).sendKeys(mom.getHomePhone());
 		driver.findElement(By.id("hPhoneExt")).sendKeys(mom.getHomePhoneExt());
@@ -95,14 +96,14 @@ public class AddPatientsTests extends SeleniumTestBase {
 		driver.findElement(By.xpath("//input[@name='wPhoneExt']")).sendKeys(mom.getWorkPhoneExt());
 		driver.findElement(By.xpath("//input[@name='demo_cell']")).sendKeys(mom.getCellPhone());
 		driver.findElement(By.xpath("//textarea[@name='phoneComment']")).sendKeys(mom.getPhoneComment());
-		dropdownSelectByValue(By.xpath("//select[@name='newsletter']"), mom.getNewsletter());
-		dropdownSelectByValue(By.xpath("//select[@name='aboriginal']"), mom.getAboriginal());
+		dropdownSelectByValue(driver, By.xpath("//select[@name='newsletter']"), mom.getNewsletter());
+		dropdownSelectByValue(driver, By.xpath("//select[@name='aboriginal']"), mom.getAboriginal());
 		driver.findElement(By.id("email")).sendKeys(mom.getEmail());
 		driver.findElement(By.xpath("//input[@name='myOscarUserName']")).sendKeys(mom.getPhrUserName());
 		driver.findElement(By.id("year_of_birth")).sendKeys(mom.getDobYear());
 		driver.findElement(By.id("month_of_birth")).sendKeys(mom.getDobMonth());
 		driver.findElement(By.id("date_of_birth")).sendKeys(mom.getDobDate());
-		dropdownSelectByValue(By.id("sex"), mom.getSex());
+		dropdownSelectByValue(driver, By.id("sex"), mom.getSex());
 		driver.findElement(By.id("hin")).sendKeys(mom.getHin());
 		driver.findElement(By.id("eff_date_year")).sendKeys(mom.getEffYear());
 		driver.findElement(By.id("eff_date_month")).sendKeys(mom.getEffMonth());
@@ -111,27 +112,27 @@ public class AddPatientsTests extends SeleniumTestBase {
 		driver.findElement(By.id("hc_renew_date_year")).sendKeys(mom.getHcRenewYear());
 		driver.findElement(By.id("hc_renew_date_month")).sendKeys(mom.getHcRenewMonth());
 		driver.findElement(By.id("hc_renew_date_date")).sendKeys(mom.getHcRenewDate());
-		dropdownSelectByValue(By.id("countryOfOrigin"), mom.getCountryOfOrigin());
+		dropdownSelectByValue(driver, By.id("countryOfOrigin"), mom.getCountryOfOrigin());
 		driver.findElement(By.xpath("//input[@name='sin']")).sendKeys(mom.getSin());
 		driver.findElement(By.xpath("//input[@name='cytolNum']")).sendKeys(mom.getCytology());
 		driver.findElement(By.id("nameOfMother")).sendKeys(mom.getMotherName());
 		driver.findElement(By.id("nameOfFather")).sendKeys(mom.getFatherName());
-		dropdownSelectByIndex(By.xpath("//select[@name='staff']"), 1);
-		dropdownSelectByIndex(By.xpath("//select[@name='cust1']"), 0);
-		dropdownSelectByIndex(By.xpath("//select[@name='cust4']"), 0);
-		dropdownSelectByIndex(By.xpath("//select[@name='cust2']"), 0);
+		dropdownSelectByIndex(driver, By.xpath("//select[@name='staff']"), 1);
+		dropdownSelectByIndex(driver, By.xpath("//select[@name='cust1']"), 0);
+		dropdownSelectByIndex(driver, By.xpath("//select[@name='cust4']"), 0);
+		dropdownSelectByIndex(driver, By.xpath("//select[@name='cust2']"), 0);
 		driver.findElement(By.xpath("//input[@name='referral_doctor_name']")).sendKeys(mom.getReferralDoctor());
 		driver.findElement(By.xpath("//input[@name='referral_doctor_no']")).sendKeys(mom.getReferralDoctorNo());
-		dropdownSelectByValue(By.id("roster_status"), mom.getRosterStatus());
+		dropdownSelectByValue(driver, By.id("roster_status"), mom.getRosterStatus());
 		driver.findElement(By.xpath("//input[@name='roster_date_year']")).sendKeys(mom.getRosteredYear());
 		driver.findElement(By.xpath("//input[@name='roster_date_month']")).sendKeys(mom.getRosteredMonth());
 		driver.findElement(By.xpath("//input[@name='roster_date_date']")).sendKeys(mom.getRosteredDate());
-		dropdownSelectByValue(By.id("patient_status"), mom.getPatientStatus());
+		dropdownSelectByValue(driver, By.id("patient_status"), mom.getPatientStatus());
 		driver.findElement(By.id("chart_no")).sendKeys(mom.getChartNo());
-		dropdownSelectByIndex(By.id("name_list_id"), 0);
+		dropdownSelectByIndex(driver, By.id("name_list_id"), 0);
 		driver.findElement(By.id("waiting_list_note")).sendKeys("Waiting List Note");
 		driver.findElement(By.id("waiting_list_referral_date")).sendKeys("2020-06-06");
-		dropdownSelectByIndex(By.id("rsid"), 0);
+		dropdownSelectByIndex(driver, By.id("rsid"), 0);
 		driver.findElement(By.id("cust3")).sendKeys("Alert Note");
 		driver.findElement(By.id("content")).sendKeys("Notes");
 		driver.findElement(By.id("btnAddRecord")).click();
@@ -145,7 +146,8 @@ public class AddPatientsTests extends SeleniumTestBase {
 	}
 
 	@Test
-	public void addPatientsClassicUIQuickFormTest() throws Exception {
+	public void addPatientsClassicUIQuickFormTest() throws Exception
+	{
 		// login
 		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
 		// open patient search page
@@ -161,12 +163,12 @@ public class AddPatientsTests extends SeleniumTestBase {
 		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(dad.getLastName());
 		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(dad.getFirstName());
 		driver.findElement(By.xpath("//input[@name='year_of_birth']")).sendKeys(dad.getDobYear());
-		dropdownSelectByValue(By.xpath("//select[@name='month_of_birth']"), dad.getDobMonth());
-		dropdownSelectByValue(By.xpath("//select[@name='date_of_birth']"), dad.getDobDate());
-		dropdownSelectByValue(By.xpath("//select[@name='sex']"), dad.getSex());
+		dropdownSelectByValue(driver, By.xpath("//select[@name='month_of_birth']"), dad.getDobMonth());
+		dropdownSelectByValue(driver, By.xpath("//select[@name='date_of_birth']"), dad.getDobDate());
+		dropdownSelectByValue(driver, By.xpath("//select[@name='sex']"), dad.getSex());
 		driver.findElement(By.xpath("//input[@name='hin']")).sendKeys(dad.getHin());
-		dropdownSelectByValue(By.xpath("//select[@name='patient_status']"), dad.getPatientStatus());
-		dropdownSelectByIndex(By.xpath("//select[@name='staff']"), 0);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='patient_status']"), dad.getPatientStatus());
+		dropdownSelectByIndex(driver, By.xpath("//select[@name='staff']"), 0);
 		driver.findElement(By.xpath("//input[@name='submit']")).click();
 		Thread.sleep(1000);
 
@@ -178,7 +180,8 @@ public class AddPatientsTests extends SeleniumTestBase {
 	}
 
 	@Test
-	public void addPatientsJUNOUITest() throws Exception {
+	public void addPatientsJUNOUITest() throws Exception
+	{
 		// login
 		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
 		Thread.sleep(2000);
@@ -194,13 +197,13 @@ public class AddPatientsTests extends SeleniumTestBase {
 		Patient son = PatientCollection.patientMap.get("Sonlastname");
 		driver.findElement(By.id("input-lastName")).sendKeys(son.getLastName());
 		driver.findElement(By.id("input-firstName")).sendKeys(son.getFirstName());
-		dropdownSelectByValue(By.id("input-gender"), "string:" + son.getSex());
+		dropdownSelectByValue(driver, By.id("input-gender"), "string:" + son.getSex());
 		driver.findElement(By.id("input-dob")).sendKeys(son.getDobYear() + "-" + son.getDobMonth() + "-" + son.getDobDate());
 		driver.findElement(By.id("input-hin")).sendKeys(son.getHin());
-		dropdownSelectByValue(By.id("input-hcType"), "string:" + son.getHcType());
+		dropdownSelectByValue(driver, By.id("input-hcType"), "string:" + son.getHcType());
 		driver.findElement(By.id("input-address")).sendKeys(son.getAddress());
 		driver.findElement(By.id("input-city")).sendKeys(son.getCity());
-		dropdownSelectByValue(By.id("input-province"), "string:" + son.getProvince());
+		dropdownSelectByValue(driver, By.id("input-province"), "string:" + son.getProvince());
 		driver.findElement(By.id("input-postal-code")).sendKeys(son.getPostal());
 		driver.findElement(By.id("input-email")).sendKeys(son.getEmail());
 		driver.findElement(By.id("input-phone")).sendKeys(son.getHomePhone());
