@@ -235,7 +235,7 @@
 							   title="<bean:message key="navbar.user" bundle="ui"/>"
 							data-toggle="dropdown">
 							<i class="icon icon-user-md"></i>
-							<span>
+							<span class="user-first-name">
 								{{$ctrl.me.firstName}}
 							</span>
 							</a>
