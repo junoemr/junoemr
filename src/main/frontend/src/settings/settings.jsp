@@ -234,7 +234,7 @@
 						<input ng-model="settingsCtrl.pref.patientNameLength" placeholder="Length" class="form-control" type="text">
 					</div>
 					<div class="form-group col-sm-6">
-						<label>Length of link and form names to display on appointment screen:</label>
+						<label>Length of link and form names to display on appointment screen (> 0):</label>
 						<input ng-model="settingsCtrl.pref.appointmentScreenLinkNameDisplayLength" placeholder="Length" class="form-control" type="text">
 					</div>
 					<div class="form-group col-sm-6">

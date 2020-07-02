@@ -2519,8 +2519,8 @@
 			<forward name="success" path="/olis/Preferences.jsp" />
 		</action>
 		<action path="/admin/ManageSites" name="siteForm" type="org.springframework.web.struts.DelegatingActionProxy" parameter="method" scope="request">
-			<forward name="list" path="/admin/sitesAdmin.jsp" />
-			<forward name="details" path="/admin/sitesAdminDetail.jsp" />
+			<forward name="list" path="/admin/sites/sitesAdmin.jsp" />
+			<forward name="details" path="/admin/sites/sitesAdminDetail.jsp" />
 		</action>
 
 		<action path="/admin/ManageBillingReferral" name="billingreferralForm" type="org.oscarehr.common.web.BillingreferralEditAction" parameter="method" scope="request">

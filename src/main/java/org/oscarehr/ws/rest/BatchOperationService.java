@@ -95,7 +95,7 @@ public class BatchOperationService extends AbstractServiceImpl
 			{
 				Demographic demo = demographicDao.find(demoNo);
 				demo.setPatientStatus(newStatus);
-				demographicService.updateDemographicRecord(demo);
+				demographicService.updateDemographicRecord(demo, getLoggedInInfo());
 			}
 			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, "Change Demographic Status: " + demoTransfer.toString());
 			return RestResponse.successResponse(true);
