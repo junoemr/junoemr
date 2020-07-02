@@ -101,7 +101,6 @@ import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
@@ -509,7 +508,6 @@ public class CoPDImportService
 				drug.setArchivedReason("represcribed");
 			}
 
-
 			drugDao.persist(drug);
 
 			if(note != null)
@@ -661,7 +659,7 @@ public class CoPDImportService
 				 * Not sure why they include the xml in the export, but we don't want/need them */
 				continue;
 			}
-			InputStream stream = new FileInputStream(documentFile.getFileObject());
+			InputStream stream = documentFile.asFileInputStream();
 			try
 			{
 				documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId(), false);
