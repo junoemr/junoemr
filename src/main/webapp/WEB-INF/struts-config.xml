@@ -1209,9 +1209,6 @@
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
 			<forward name="error" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
 		</action>
-		<action input="/oscarEncounter/oscarConsultationRequest/attachmentReport.jsp" name="FrmForm" path="/oscarEncounter/oscarConsultation/printAttached" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationPrintDocsAction">
-			<forward name="noprint" path="/oscarEncounter/oscarConsultationRequest/nothingtoPrint.jsp" />
-		</action>
 		<action input="/oscarConsultationRequest/config/EnableRequestResponse.jsp" name="EctConEnableReqRespForm" path="/oscarEncounter/EnableConRequestResponse" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConEnableReqRespAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/config/EnableRequestResponse.jsp" />
 		</action>

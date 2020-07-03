@@ -101,7 +101,7 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 	}
 
 	public CaseManagementNote getMostRecentNote(String uuid) {
-		String hql = "select distinct cmn from CaseManagementNote cmn where cmn.uuid = ?0 and cmn.id = (select max(cmn.id) from cmn where cmn.uuid = ?0)";
+		String hql = "select distinct cmn from CaseManagementNote cmn where cmn.uuid = ?0 and cmn.id = (select max(cmn.id) from cmn where cmn.uuid = ?1)";
 		@SuppressWarnings("unchecked")
 		List<CaseManagementNote> tmp = (List<CaseManagementNote>) this.getHibernateTemplate().find(hql, new Object[] { uuid, uuid });
 		if (tmp == null) return null;

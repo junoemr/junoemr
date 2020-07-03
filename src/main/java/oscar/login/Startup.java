@@ -58,6 +58,7 @@ public class Startup implements ServletContextListener
 
 			String contextPath = "";
 
+			// TODO: SPRINGUPGRADE: make this better, perhaps read from the properties file?
 			try
 			{
 				// Anyone know a better way to do this?

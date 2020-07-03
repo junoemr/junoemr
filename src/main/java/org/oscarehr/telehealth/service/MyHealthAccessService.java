@@ -67,7 +67,7 @@ public class MyHealthAccessService
 	ClinicService clinicService;
 
 	@Autowired
-	@Qualifier("mha_AppointmentService")
+	@Qualifier("myHealthAppointmentService")
 	AppointmentService appointmentService;
 
 	@Autowired

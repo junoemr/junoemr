@@ -60,7 +60,7 @@ public class IntegrationPushUpdateService
 	private static final Integer MAX_SEND_ATTEMPTS = 25;
 
 	@Autowired
-	@Qualifier("mha_AppointmentService")
+	@Qualifier("myHealthAppointmentService")
 	private AppointmentService appointmentService;
 
 	@Autowired

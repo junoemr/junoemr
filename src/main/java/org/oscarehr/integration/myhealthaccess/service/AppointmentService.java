@@ -41,7 +41,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service("mha_AppointmentService")
+@Service("myHealthAppointmentService")
 public class AppointmentService extends BaseService
 {
 	@Autowired

@@ -222,7 +222,7 @@ public class SecurityDaoTest extends DaoTestFixtures
 		security3.setUserName(userName3);
 		securityDao.persist(security3);
 		
-		Security result = dao.findByUserName(userName1);
+		Security result = securityDao.findByUserName(userName1);
 
 		Logger logger = MiscUtils.getLogger();
 		
