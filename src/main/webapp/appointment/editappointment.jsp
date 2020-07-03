@@ -1396,9 +1396,14 @@
 		var loc = document.forms['EDITAPPT'].location;
 		if (loc.nodeName.toUpperCase() === 'SELECT') loc.style.backgroundColor = loc.options[loc.selectedIndex].style.backgroundColor;
 		<%
+			String demographicEmail = "";
 			Demographic demographic = demographicManager.getDemographic(loggedInInfo, demono);
+			if (demographic != null)
+			{
+				demographicEmail = StringUtils.trimToEmpty(demographic.getEmail());
+			}
 		%>
-		var demographicEmail = '<%=StringUtils.trimToEmpty(demographic.getEmail())%>';
+		var demographicEmail = '<%=demographicEmail%>';
 		var mhaAppointment = null;
 
 		function updateTelehealthControls()
