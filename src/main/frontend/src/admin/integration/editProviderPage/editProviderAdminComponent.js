@@ -228,7 +228,8 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 				// User Info
 				firstName: Juno.Validations.validationFieldRequired(ctrl.provider, 'firstName'),
 				lastName: Juno.Validations.validationFieldRequired(ctrl.provider, 'lastName'),
-				type: Juno.Validations.validationFieldRequired(ctrl.provider, 'type')
+				type: Juno.Validations.validationFieldRequired(ctrl.provider, 'type'),
+				userRoles: Juno.Validations.validationCustom(() => ctrl.provider.userRoles.length >= 1),
 			};
 
 			// password field validations

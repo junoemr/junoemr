@@ -166,10 +166,14 @@
 			<panel id="edit-provider-access-roles">
 				<panel-header>
 					<h6>Access Roles</h6>
+					<div class="error-message" ng-if="!$ctrl.providerValidations.userRoles()">
+						* Provider must be assigned at least one role.
+					</div>
 				</panel-header>
 				<panel-body>
 					<div class="flex-row flex-wrap align-items-baseline">
 						<juno-typeahead
+										ng-class="{'field-error': !$ctrl.providerValidations.userRoles()}"
 										name="access_roles"
 										class="flex-grow lg-margin-right"
 										model="$ctrl.currentRoleSelection"
