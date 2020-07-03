@@ -234,8 +234,6 @@ module.exports = {
 
 			'./src/common/components/module.js',
 			'./src/common/components/modalComponent.js',
-			'./src/common/components/junoAlert/junoAlertComponent.js',
-			'./src/common/components/junoInputModal/junoInputModalComponent.js',
 			'./src/common/components/junoButton/junoButtonComponent.js',
 			'./src/common/components/junoCheckBox/junoCheckBoxComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
@@ -243,13 +241,16 @@ module.exports = {
 			'./src/common/components/junoTab/junoTabComponent.js',
 			'./src/common/components/junoDateSelect/junoDateSelectComponent.js',
 			'./src/common/components/junoDivider/junoDividerComponent.js',
-			'./src/common/components/mhaPatientDetailsModal/mhaPatientDetailsModalComponent.js',
 			'./src/common/components/loadingIndicatorComponent.js',
 			'./src/common/components/zeroStateDisplayComponent.js',
 			'./src/common/components/accordionList/accordionListComponent.js',
 			'./src/common/components/junoTypeahead/junoTypeaheadComponent.js',
 			'./src/common/components/iconCard/iconCardComponent.js',
 			'./src/common/components/panel/panelComponent.js',
+
+			'./src/common/modals/junoAlert/junoAlertComponent.js',
+			'./src/common/modals/junoInputModal/junoInputModalComponent.js',
+			'./src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModalComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',

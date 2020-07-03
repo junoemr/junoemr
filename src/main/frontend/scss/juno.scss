@@ -33,8 +33,6 @@
 @import "../src/common/directives/clinicaid/ca_field";
 @import "../src/common/components/junoLoadingIndicator";
 @import "../src/common/components/modal";
-@import "../src/common/components/junoAlert/junoAlert";
-@import "../src/common/components/junoInputModal/junoInputModal";
 @import "../src/common/components/junoButton/junoButton";
 @import "../src/common/components/junoCheckBox/junoCheckBox";
 @import "../src/common/components/junoInput/junoInput";
@@ -43,11 +41,14 @@
 @import "../src/common/components/junoDateSelect/junoDateSelect";
 @import "../src/common/components/junoDivider/junoDivider";
 @import "../src/common/components/junoComponentStyles";
-@import "../src/common/components/mhaPatientDetailsModal/mhaPatientDetailsModal";
 @import "../src/common/components/zeroStateDisplay";
 @import "../src/common/components/accordionList/accordionList";
 @import "../src/common/components/iconCard/iconCard";
 @import "../src/common/components/panel/_panel.scss";
+@import "../src/common/modals/junoAlert/junoAlert";
+@import "../src/common/modals/junoInputModal/junoInputModal";
+@import "../src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModal";
+
 // Section-specific things
 @import "../src/layout/primaryNav";
 @import "../src/layout/leftAside";

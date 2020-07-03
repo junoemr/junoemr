@@ -107,7 +107,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.validations = {};
 
 		$scope.JUNO_STYLE = JUNO_STYLE;
-		$scope.pageStyle = JUNO_STYLE.DRACULA;
+		$scope.pageStyle = JUNO_STYLE.GREY;
 
 		controller.init = function init()
 		{

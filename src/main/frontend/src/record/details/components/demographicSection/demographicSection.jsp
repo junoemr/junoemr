@@ -42,7 +42,8 @@
 
 			<mha-patient-connection demographic-no="$ctrl.ngModel.demographicNo"
 							demographic-email="$ctrl.ngModel.email"
-							component-style="$ctrl.componentStyle">
+							component-style="$ctrl.componentStyle"
+							on-site-list-change="$ctrl.onMHASiteListChange(sites)">
 			</mha-patient-connection>
 		</div>
 
@@ -89,12 +90,14 @@
 			</juno-input>
 
 			<div class="connected-sites">
-				<juno-input label="Connected Site"
+				<juno-input ng-model="$ctrl.mhaSites"
+								label="Connected Site"
 								placeholder="No Connected Sites"
 								readonly="true"
 								component-style="$ctrl.componentStyle">
 				</juno-input>
-				<juno-button component-style="$ctrl.componentStyle">
+				<juno-button ng-click="$ctrl.openPatientModal()"
+								component-style="$ctrl.componentStyle">
 					<div class="flex-row justify-content-center">
 						<i class="icon icon-view"></i>
 					</div>

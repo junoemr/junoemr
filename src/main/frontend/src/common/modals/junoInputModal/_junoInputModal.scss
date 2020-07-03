@@ -1,6 +1,16 @@
 .juno-input-modal {
 	@include juno-font-body-small();
 	padding: 16px 32px 24px 32px;
+	-webkit-border-radius: 16px !important;
+	-moz-border-radius: 16px !important;
+	border-radius: 16px !important;
+
+	.modal-content {
+		-webkit-border-radius: 16px !important;
+		-moz-border-radius: 16px !important;
+		border-radius: 16px !important;
+		border: none;
+	}
 
 	.modal-dialog {
 		width: 400px;

@@ -1,6 +1,6 @@
 'use strict';
 
-import {JUNO_ALERT_MODES} from "../components/junoAlert/junoAlertConstants";
+import {JUNO_ALERT_MODES} from "../modals/junoAlert/junoAlertConstants";
 
 if (!window.Juno) window.Juno = {};
 

@@ -22,6 +22,7 @@
 */
 
 import {JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import { MHA_PATIENT_CONNECTION_ACTIONS } from "../mhaPatientConnection/mhaPatientConnectionConstants"
 
 angular.module('Record.Details').component('demographicSection', {
 	templateUrl: 'src/record/details/components/demographicSection/demographicSection.jsp',
@@ -29,7 +30,11 @@ angular.module('Record.Details').component('demographicSection', {
 		ngModel: "=",
 		componentStyle: "<?"
 	},
-	controller: [ "staticDataService", "$scope", function (staticDataService, $scope)
+	controller: [
+			"staticDataService",
+			"$scope",
+			"$uibModal",
+		function (staticDataService, $scope, $uibModal)
 		{
 			let ctrl = this;
 
@@ -45,11 +50,46 @@ angular.module('Record.Details').component('demographicSection', {
 			]
 			ctrl.countries = staticDataService.getCountries();
 
+			// a list displaying the connected MHA sites.
+			ctrl.mhaSites = "";
+
 			$scope.LABEL_POSITION = LABEL_POSITION;
 
 			ctrl.$onInit = () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
+			}
+
+			ctrl.onMHASiteListChange = (sites) =>
+			{
+				ctrl.mhaSites = sites.reduce((acc, site) => acc = `${acc}, ${site}` );
+			}
+
+			ctrl.openPatientModal = async () =>
+			{
+				try
+				{
+					let connectionChange = await $uibModal.open(
+							{
+								component: 'mhaPatientDetailsModal',
+								backdrop: 'static',
+								windowClass: "juno-modal",
+								resolve: {
+									style: () => ctrl.componentStyle,
+									demographicNo: () => ctrl.ngModel.demographicNo,
+								}
+							}
+					).result;
+
+					if (connectionChange)
+					{
+						$scope.$broadcast(MHA_PATIENT_CONNECTION_ACTIONS.REFRESH, null)
+					}
+				}
+				catch(err)
+				{
+					// user pressed ESC key
+				}
 			}
 		}]
 });

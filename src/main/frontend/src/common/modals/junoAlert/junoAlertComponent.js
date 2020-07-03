@@ -20,12 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
+import {JUNO_ALERT_MODES} from "./junoAlertConstants";
 
-import {LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_STYLE} from "../junoComponentConstants";
-
-angular.module('Common.Components').component('junoInputModal',
+angular.module('Common.Components').component('junoAlertComponent',
 {
-	templateUrl: 'src/common/components/junoInputModal/junoInputModal.jsp',
+	templateUrl: 'src/common/modals/junoAlert/junoAlert.jsp',
 	bindings: {
 		modalInstance: "<",
 		resolve: "<",
@@ -33,39 +32,16 @@ angular.module('Common.Components').component('junoInputModal',
 	controller: ['$scope', function ($scope)
 	{
 		let ctrl = this;
+		ctrl.alertModes = JUNO_ALERT_MODES;
 
-		ctrl.value = "";
-		$scope.LABEL_POSITION = LABEL_POSITION;
-		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
-
-		ctrl.$onInit = () =>
-		{
-			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
-
-			if (ctrl.resolve.style === JUNO_STYLE.DRACULA)
-			{
-				// we are inside an bootstrap transclude component, restyle it.
-				angular.element(document.querySelector(".modal-content")).addClass("juno-style-dracula-background");
-			}
-		}
-
-		ctrl.onKeyDown = (event) =>
-		{
-			if (event.key === "Enter")
-			{
-				ctrl.onOk();
-				event.preventDefault();
-			}
-		}
-
-		ctrl.onCancel = () =>
+		ctrl.close = function()
 		{
 			ctrl.modalInstance.close();
 		};
 
-		ctrl.onOk = () =>
+		ctrl.onSelection = function(userOk)
 		{
-			ctrl.modalInstance.close(ctrl.value);
+			ctrl.modalInstance.close(userOk);
 		}
 	}]
 });

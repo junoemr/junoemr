@@ -22,7 +22,7 @@
 */
 
 import {MhaDemographicApi, MhaIntegrationApi, SitesApi} from "../../../../../generated";
-import {MhaPatientApi} from "../../../../../generated/api/MhaPatientApi";
+import { MHA_PATIENT_CONNECTION_ACTIONS } from "./mhaPatientConnectionConstants"
 import {JUNO_BUTTON_COLOR, JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
 
 angular.module('Record.Details').component('mhaPatientConnection', {
@@ -31,6 +31,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 		demographicNo: "<",
 		demographicEmail: "<",
 		componentStyle: "<?",
+		onSiteListChange: "&?",
 	},
 	controller: [
 		'$scope',
@@ -175,9 +176,22 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 			{
 				ctrl.isConfirmed = false;
 				let integrationsList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
+				let siteList = [];
 				for (let integration of integrationsList)
 				{
-					ctrl.isConfirmed = ctrl.isConfirmed || (await mhaDemographicApi.isPatientConfirmed(integration.id, ctrl.demographicNo)).data.body;
+					let isConfirmed = (await mhaDemographicApi.isPatientConfirmed(integration.id, ctrl.demographicNo)).data.body;
+					ctrl.isConfirmed = ctrl.isConfirmed || isConfirmed;
+
+					if (isConfirmed)
+					{
+						siteList.push(integration.siteName);
+					}
+				}
+
+
+				if (ctrl.onSiteListChange)
+				{
+					ctrl.onSiteListChange({sites: siteList});
 				}
 			}
 			catch (err)
@@ -185,5 +199,11 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 				console.error("Failed to check MHA connection status with error: " + err.toString());
 			}
 		}
+
+		// re-check patient connection status
+		$scope.$on(MHA_PATIENT_CONNECTION_ACTIONS.REFRESH, () =>
+		{
+			ctrl.loadMhaPatientProfiles();
+		});
 	}]
 });

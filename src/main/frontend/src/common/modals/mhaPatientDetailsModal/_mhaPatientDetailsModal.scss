@@ -87,12 +87,12 @@
 								flex-wrap: wrap;
 
 								juno-input {
-									flex: 1 0 104px;
-									width: 104px;
+									flex: 1 0 145px;
+									max-width: 145px;
 
 									&.small {
 										flex: 0 0 84px;
-										width: 84px;
+										max-width: 84px;
 									}
 								}
 							}

@@ -21,12 +21,12 @@
  * Canada
  */
 
-import {LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_STYLE} from "../junoComponentConstants";
+import {LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_STYLE} from "../../components/junoComponentConstants";
 import {MhaDemographicApi, MhaIntegrationApi} from "../../../../generated";
 
 angular.module('Common.Components').component('mhaPatientDetailsModal',
 {
-	templateUrl: 'src/common/components/mhaPatientDetailsModal/mhaPatientDetailsModal.jsp',
+	templateUrl: 'src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModal.jsp',
 	bindings: {
 		modalInstance: "<",
 		resolve: "<",
