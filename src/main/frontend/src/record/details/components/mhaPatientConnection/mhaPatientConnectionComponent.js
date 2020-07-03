@@ -21,8 +21,7 @@
 * Canada
 */
 
-import {MhaDemographicApi, MhaIntegrationApi, SitesApi} from "../../../../../generated";
-import {MhaPatientApi} from "../../../../../generated/api/MhaPatientApi";
+import {MhaDemographicApi, MhaIntegrationApi} from "../../../../../generated";
 import {JUNO_BUTTON_COLOR, JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
 
 angular.module('Record.Details').component('mhaPatientConnection', {
@@ -49,6 +48,8 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 		let ctrl = this;
 
 		ctrl.isConfirmed = false;
+		ctrl.inviteSent = false;
+		ctrl.selectedIntegration = null;
 
 		// load apis
 		let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
@@ -70,6 +71,10 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 			if (this.isConfirmed)
 			{
 				return "View or Edit MHA Status";
+			}
+			else if (this.hasEmail() && ctrl.inviteSent)
+			{
+				return "Invite Sent";
 			}
 			else if (this.hasEmail())
 			{
@@ -131,11 +136,20 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 			return this.demographicEmail && this.demographicEmail !== "";
 		}
 
+		ctrl.buttonDisabled = () =>
+		{
+			return this.inviteSent;
+		}
+
 		ctrl.onClick = () =>
 		{
 			if (ctrl.isConfirmed)
 			{
 				ctrl.openPatientModal();
+			}
+			else
+			{
+				ctrl.sendPatientInvite();
 			}
 		}
 
@@ -178,11 +192,28 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 				for (let integration of integrationsList)
 				{
 					ctrl.isConfirmed = ctrl.isConfirmed || (await mhaDemographicApi.isPatientConfirmed(integration.id, ctrl.demographicNo)).data.body;
+					ctrl.selectedIntegration = integration; //TODO selection logic
 				}
 			}
 			catch (err)
 			{
 				console.error("Failed to check MHA connection status with error: " + err.toString());
+			}
+		}
+
+		ctrl.sendPatientInvite = () =>
+		{
+			if (ctrl.selectedIntegration)
+			{
+				ctrl.inviteSent = true;
+				mhaDemographicApi.patientInvite(ctrl.selectedIntegration.id, ctrl.demographicNo).then((response) =>
+				{
+					console.info("send success", response);
+				}).catch((error) =>
+				{
+					console.error("Failed to invite patient to MHA", error);
+					ctrl.inviteSent = false;
+				});
 			}
 		}
 	}]

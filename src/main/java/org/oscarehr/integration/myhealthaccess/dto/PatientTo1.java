@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
 import org.springframework.beans.BeanUtils;
 import oscar.util.Jackson.LocalDateSerializer;
@@ -88,6 +89,14 @@ public class PatientTo1
 		this.healthCareProvinceCode = mhaPatient.getHealthCareProvinceCode().name();
 		this.addressProvinceCode = mhaPatient.getAddressProvinceCode().name();
 		this.linkStatus = mhaPatient.getLinkStatus().name();
+	}
+
+	public PatientTo1(Demographic demographic)
+	{
+		BeanUtils.copyProperties(demographic, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus");
+		this.healthCareProvinceCode = demographic.getHcType();
+		this.addressProvinceCode = demographic.getProvince();
+		this.linkStatus = MHAPatient.LINK_STATUS.NO_LINK.name();
 	}
 
 	public String getId()

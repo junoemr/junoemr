@@ -25,12 +25,13 @@ package org.oscarehr.integration.myhealthaccess.service;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.dto.PatientInviteTo1;
 import org.oscarehr.integration.myhealthaccess.dto.PatientSingleSearchResponseTo1;
+import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueException;
 import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
-import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,13 +44,7 @@ import java.util.List;
 public class PatientService extends BaseService
 {
 	@Autowired
-	ClinicService clinicService;
-
-	@Autowired
 	DemographicDao demographicDao;
-
-	@Autowired
-	IntegrationService integrationService;
 
 	public boolean isPatientConfirmed(Integer demographicNo, Integration integration)
 	{
@@ -210,6 +205,15 @@ public class PatientService extends BaseService
 		}
 
 		return false;
+	}
+
+	public void patientInvite(Integration integration, String loginToken, Demographic demographic)
+	{
+		String url = formatEndpoint("/clinic_user/self/clinic/patient_invite");
+
+		PatientTo1 patientTransfer = new PatientTo1(demographic);
+		PatientInviteTo1 patientInvite = new PatientInviteTo1(patientTransfer, demographic.getProviderNo());
+		Boolean response = postWithToken(url, integration.getApiKey(), patientInvite, Boolean.class, loginToken);
 	}
 
 	private void logInvalidIntegrationWarn(InvalidIntegrationException e)
