@@ -586,8 +586,19 @@
 <!--
 jQuery.noConflict();
 </script>
+<script type="text/javascript" src="js/junoBillingHelper.js"></script>
 <oscar:customInterface section="billing"/>
 <script>
+
+jQuery(document).ready(function ()
+{
+	var $providerSelect = jQuery("select[name=xml_provider]");
+	var $visitLocationSelect = jQuery("select[name=xml_location]");
+	var $serviceLocationSelect = jQuery("select[name=xml_slicode]");
+
+	Juno.BillingHelper.ON.initVisitLocationCodeHook('<%=request.getContextPath() %>', $providerSelect, $visitLocationSelect);
+	Juno.BillingHelper.ON.initServiceLocationCodeHook('<%=request.getContextPath() %>', $providerSelect, $serviceLocationSelect);
+});
 
 function gotoBillingOB() {
     if(self.location.href.lastIndexOf("?") > 0) {
