@@ -50,10 +50,10 @@ public class DatabaseUtil
 	public static void createTestProvider()
 	{
 		ProviderService providerService = (ProviderService) SpringUtils.getBean("provider.service.ProviderService");
-		int length = providerLNames.length;
-		for (int i=0; i<length; i++) {
+		for (String provider : providerLNames)
+		{
 			ProviderData demoProvider = new ProviderData();
-			Provider dr = ProviderCollection.providerMap.get(providerLNames[i]);
+			Provider dr = ProviderCollection.providerMap.get(provider);
 			demoProvider.setProviderNo(Integer.parseInt(dr.getProviderNo()));
 			demoProvider.setFirstName(dr.getFirstName());
 			demoProvider.setLastName(dr.getLastName());
