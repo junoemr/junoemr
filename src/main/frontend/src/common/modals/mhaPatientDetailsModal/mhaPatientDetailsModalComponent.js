@@ -34,9 +34,11 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 	controller: ['$scope',
 			'$http',
 			'$httpParamSerializer',
+			'$uibModal',
 		function ($scope,
 							$http,
-							$httpParamSerializer)
+							$httpParamSerializer,
+							$uibModal)
 	{
 		let ctrl = this;
 
@@ -143,13 +145,19 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 
 		ctrl.cancelConnection = async () =>
 		{
-			ctrl.connectionStatusChanged = true;
-			let integrationId = ctrl.patientProfiles.find( (profile) => profile.value === ctrl.currentProfile).integrationId
+			let userOk = await Juno.Common.Util.confirmationDialog($uibModal, "Cancel Connection?",
+					"Are you sure you want to cancel this patients MyHealthAccess connection?", ctrl.resolve.style);
 
-			if (integrationId)
+			if (userOk)
 			{
-				await mhaDemographicApi.rejectPatientConnection(integrationId, ctrl.resolve.demographicNo);
-				ctrl.loadMHAPatientProfiles();
+				ctrl.connectionStatusChanged = true;
+				let integrationId = ctrl.patientProfiles.find((profile) => profile.value === ctrl.currentProfile).integrationId
+
+				if (integrationId)
+				{
+					await mhaDemographicApi.rejectPatientConnection(integrationId, ctrl.resolve.demographicNo);
+					ctrl.loadMHAPatientProfiles();
+				}
 			}
 		}
 

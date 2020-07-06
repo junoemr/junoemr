@@ -19,7 +19,7 @@
 			background: $color-neutral-white none;
 
 			.alert-content {
-				flex: 1 1 100%
+				flex-grow: 1;
 			}
 		}
 	}

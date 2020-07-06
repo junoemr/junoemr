@@ -46,7 +46,14 @@ angular.module('Record.Details').component('healthInsuranceSection', {
 				{
 					if (ctrl.ngModel)
 					{
-						return HinValidator.healthCardNumber(ctrl.ngModel.hcType, ctrl.ngModel.hin);
+						if (ctrl.ngModel.hin)
+						{
+							return HinValidator.healthCardNumber(ctrl.ngModel.hcType, ctrl.ngModel.hin);
+						}
+						else
+						{
+							return true;
+						}
 					}
 					return false;
 				}),

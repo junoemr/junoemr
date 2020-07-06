@@ -21,6 +21,7 @@
  * Canada
  */
 import {JUNO_ALERT_MODES} from "./junoAlertConstants";
+import {JUNO_STYLE} from "../../components/junoComponentConstants";
 
 angular.module('Common.Components').component('junoAlertComponent',
 {
@@ -34,6 +35,12 @@ angular.module('Common.Components').component('junoAlertComponent',
 		let ctrl = this;
 		ctrl.alertModes = JUNO_ALERT_MODES;
 
+		ctrl.$onInit = () =>
+		{
+			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
+			angular.element(document.querySelector(".modal-content")).addClass(ctrl.resolve.style + "-background-no-accent");
+		}
+
 		ctrl.close = function()
 		{
 			ctrl.modalInstance.close();
@@ -42,6 +49,11 @@ angular.module('Common.Components').component('junoAlertComponent',
 		ctrl.onSelection = function(userOk)
 		{
 			ctrl.modalInstance.close(userOk);
+		}
+
+		ctrl.getComponentClasses = () =>
+		{
+			return [ctrl.resolve.style, ctrl.resolve.style + "-background"]
 		}
 	}]
 });

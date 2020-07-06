@@ -90,6 +90,13 @@
 	}
 }
 
+@mixin junoText($color)
+{
+	.juno-text {
+		color: $color;
+	}
+}
+
 // ============ STYLES ===============
 
 @mixin styleCommon()
@@ -213,6 +220,8 @@
 	@include junoTabColor($color-neutral-white, $color-neutral-lighter, $color-neutral-lighter-grey, $color-neutral-darker);
 
 	@include junoPanelColor(white, $color-neutral-lighter, $color-neutral-lighter);
+
+	@include junoText($color-neutral-darker);
 }
 
 // ============ STYLE GREY ===============
@@ -277,6 +286,8 @@
 			}
 		}
 	}
+
+	@include junoText($color-neutral-darker);
 }
 
 // ============ STYLE DRACULA ===============
@@ -347,9 +358,14 @@
 		}
 	}
 
+	@include junoText($color-neutral-white);
 }
-.juno-style-dracula-background {
+.juno-style-dracula-background-no-accent {
 	background-color: $color-neutral-darkest !important;
+}
+
+.juno-style-dracula-background {
+	@extend .juno-style-dracula-background-no-accent;
 
 	&.modal-content {
 		background: linear-gradient(-45deg, $color-neutral-darkest 45%, transparent 0) no-repeat 100% 100%,

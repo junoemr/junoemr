@@ -20,8 +20,8 @@
  * Victoria, British Columbia
  * Canada
 --%>
-<div class="juno-alert height-100">
-	<div class="flex-column height-100">
+<div class="juno-alert height-100" ng-class="$ctrl.getComponentClasses()">
+	<div class="flex-column height-100 juno-text">
 		<div>
 			<h6 class="body-bold text-center">{{$ctrl.resolve.title}}</h6>
 			<hr class="md-margin-bottom no-margin-top header-divider">

@@ -21,7 +21,7 @@
 * Canada
 */
 
-import {JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
 import { MHA_PATIENT_CONNECTION_ACTIONS } from "../mhaPatientConnection/mhaPatientConnectionConstants"
 
 angular.module('Record.Details').component('demographicSection', {
@@ -54,6 +54,7 @@ angular.module('Record.Details').component('demographicSection', {
 			ctrl.mhaSites = "";
 
 			$scope.LABEL_POSITION = LABEL_POSITION;
+			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 
 			ctrl.$onInit = () =>
 			{
@@ -62,33 +63,38 @@ angular.module('Record.Details').component('demographicSection', {
 
 			ctrl.onMHASiteListChange = (sites) =>
 			{
-				ctrl.mhaSites = sites.reduce((acc, site) => acc = `${acc}, ${site}` );
+				if (sites.length > 0)
+				{
+					ctrl.mhaSites = sites.reduce((acc, site) => acc = `${acc}, ${site}`);
+				}
 			}
 
 			ctrl.openPatientModal = async () =>
 			{
-				try
+				if (ctrl.mhaSites !== '')
 				{
-					let connectionChange = await $uibModal.open(
-							{
-								component: 'mhaPatientDetailsModal',
-								backdrop: 'static',
-								windowClass: "juno-modal",
-								resolve: {
-									style: () => ctrl.componentStyle,
-									demographicNo: () => ctrl.ngModel.demographicNo,
-								}
-							}
-					).result;
-
-					if (connectionChange)
+					try
 					{
-						$scope.$broadcast(MHA_PATIENT_CONNECTION_ACTIONS.REFRESH, null)
+						let connectionChange = await $uibModal.open(
+								{
+									component: 'mhaPatientDetailsModal',
+									backdrop: 'static',
+									windowClass: "juno-modal",
+									resolve: {
+										style: () => ctrl.componentStyle,
+										demographicNo: () => ctrl.ngModel.demographicNo,
+									}
+								}
+						).result;
+
+						if (connectionChange)
+						{
+							$scope.$broadcast(MHA_PATIENT_CONNECTION_ACTIONS.REFRESH, null)
+						}
+					} catch (err)
+					{
+						// user pressed ESC key
 					}
-				}
-				catch(err)
-				{
-					// user pressed ESC key
 				}
 			}
 		}]
