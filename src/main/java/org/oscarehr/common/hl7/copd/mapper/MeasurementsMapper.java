@@ -25,6 +25,7 @@
 package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.demographic.model.Demographic;
@@ -65,12 +66,12 @@ public class MeasurementsMapper extends AbstractMapper
 			{
 				obsDate = new Date();
 			}
-			String miniHealth = provider.getZQO(i).getZQO3_miniHealth().getValue();
-			String systolicBP = provider.getZQO(i).getZQO4_systolicBP().getValue();
-			String diastolicBP = provider.getZQO(i).getZQO5_diastolicBP().getValue();
-			String height = provider.getZQO(i).getZQO6_height().getValue();
-			String weight = provider.getZQO(i).getZQO7_weight().getValue();
-			String waist  = provider.getZQO(i).getZQO8_waist().getValue();
+			String miniHealth = StringUtils.trimToNull(provider.getZQO(i).getZQO3_miniHealth().getValue());
+			String systolicBP = StringUtils.trimToNull(provider.getZQO(i).getZQO4_systolicBP().getValue());
+			String diastolicBP = StringUtils.trimToNull(provider.getZQO(i).getZQO5_diastolicBP().getValue());
+			String height = StringUtils.trimToNull(provider.getZQO(i).getZQO6_height().getValue());
+			String weight = StringUtils.trimToNull(provider.getZQO(i).getZQO7_weight().getValue());
+			String waist  = StringUtils.trimToNull(provider.getZQO(i).getZQO8_waist().getValue());
 
 			// if there is a message object corresponding to the segment id, set additional import info
 			CoPDRecordMessage recordMessage = recordData.getObservationMessage(provider.getZQO(i).getZQO1_setId().getValue());
