@@ -27,6 +27,7 @@ angular.module('Record.Details').component('contactSection', {
 	templateUrl: 'src/record/details/components/contactSection/contactSection.jsp',
 	bindings: {
 		ngModel: "=",
+		validations: "=",
 		componentStyle: "<?"
 	},
 	controller: [ "staticDataService", "$scope", function (staticDataService, $scope)
@@ -36,11 +37,22 @@ angular.module('Record.Details').component('contactSection', {
 		$scope.LABEL_POSITION = LABEL_POSITION;
 
 		ctrl.provinces = staticDataService.getProvinces();
-		ctrl.phoneNumberRegex = /^[\d-\s]*$/;
+		ctrl.phoneNumberRegex = /^[\d-\s()]*$/;
 
 		ctrl.$onInit = () =>
 		{
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
+
+			ctrl.validations = Object.assign(ctrl.validations, {
+				email: Juno.Validations.validationCustom(() =>
+				{
+					if (ctrl.ngModel)
+					{
+						return !ctrl.ngModel.email || ctrl.ngModel.email.match(/^[^@]+@[^.]+\.[^.]+$/)
+					}
+					return false;
+				}),
+			});
 		}
 
 	}]

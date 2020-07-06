@@ -21,6 +21,7 @@
 			<juno-input ng-model="$ctrl.ngModel.email"
 							label="Email Address"
 							placeholder="Email"
+							invalid="!$ctrl.validations.email()"
 							component-style="$ctrl.componentStyle">
 			</juno-input>
 

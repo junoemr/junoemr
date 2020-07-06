@@ -136,7 +136,10 @@
 				<demographic-section ng-model="detailsCtrl.page.demo" component-style="pageStyle"></demographic-section>
 				<juno-divider component-style="pageStyle"></juno-divider>
 
-				<contact-section ng-model="detailsCtrl.page.demo" component-style="pageStyle"></contact-section>
+				<contact-section ng-model="detailsCtrl.page.demo"
+								validations="detailsCtrl.validations"
+								component-style="pageStyle">
+				</contact-section>
 				<juno-divider component-style="pageStyle"></juno-divider>
 
 				<health-insurance-section ng-model="detailsCtrl.page.demo"
