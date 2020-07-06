@@ -82,7 +82,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 					if (patient && patient.link_status === "ACTIVE")
 					{
 						// add computed attribute for display, inputs get upset when they cannot assign to a ng-model
-						let province = patient.address_province_code !== "UNKOWN" ? patient.address_province_code : "";
+						let province = patient.address_province_code !== "UNKNOWN" ? patient.address_province_code : "";
 						let city = patient.city != null ? patient.city : "";
 						patient.city_province = `${city} ${province}`;
 						patient.connection_status = ctrl.getConnectionStatusHuman(patient.link_status)
