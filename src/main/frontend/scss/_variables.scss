@@ -32,13 +32,13 @@ $page-subheader-height: 56px;
 
 $modal-height: 512px;
 $modal-width: 800px;
-$modal-header-height: 48px;
-$modal-footer-height: 64px;
+$modal-height-sml: 256px;
+$modal-width-sml: 512px;
+
+$modal-default-header-height: 48px;
+$modal-default-footer-height: 64px;
 
 $modal-border-space: 8px;
-
-$modal-body-height: calc(#{$modal-height} - #{$modal-header-height} - #{$modal-footer-height} - #{$modal-border-space});
-$modal-body-no-footer-height: calc(#{$modal-height} - #{$modal-header-height} - #{$modal-border-space});
 
 
 $form-input-height: 32px;

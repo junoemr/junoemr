@@ -49,7 +49,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.isConfirmed = false;
 		ctrl.inviteSent = false;
-		ctrl.selectedIntegration = null;
+		ctrl.integrationsList = [];
 
 		// load apis
 		let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
@@ -138,7 +138,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.buttonDisabled = () =>
 		{
-			return this.inviteSent;
+			return (this.inviteSent || ctrl.integrationsList.length <= 0);
 		}
 
 		ctrl.onClick = () =>
@@ -149,7 +149,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 			}
 			else
 			{
-				ctrl.sendPatientInvite();
+				ctrl.openInviteConfirmModal();
 			}
 		}
 
@@ -181,6 +181,29 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 			}
 		}
 
+		ctrl.openInviteConfirmModal = async () =>
+		{
+			try
+			{
+				ctrl.inviteSent = await $uibModal.open(
+					{
+						component: 'mhaPatientInviteConfirmModal',
+						backdrop: 'static',
+						windowClass: "juno-modal sml",
+						resolve: {
+							style: () => ctrl.componentStyle,
+							demographicNo: () => ctrl.demographicNo,
+							integrationsList: () => ctrl.integrationsList,
+						}
+					}
+				).result;
+			}
+			catch(err)
+			{
+				// user pressed ESC key
+			}
+		}
+
 		// ============ private methods ==============
 
 		ctrl.loadMhaPatientProfiles = async () =>
@@ -188,32 +211,15 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 			try
 			{
 				ctrl.isConfirmed = false;
-				let integrationsList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
-				for (let integration of integrationsList)
+				ctrl.integrationsList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
+				for (let integration of ctrl.integrationsList)
 				{
 					ctrl.isConfirmed = ctrl.isConfirmed || (await mhaDemographicApi.isPatientConfirmed(integration.id, ctrl.demographicNo)).data.body;
-					ctrl.selectedIntegration = integration; //TODO selection logic
 				}
 			}
 			catch (err)
 			{
 				console.error("Failed to check MHA connection status with error: " + err.toString());
-			}
-		}
-
-		ctrl.sendPatientInvite = () =>
-		{
-			if (ctrl.selectedIntegration)
-			{
-				ctrl.inviteSent = true;
-				mhaDemographicApi.patientInvite(ctrl.selectedIntegration.id, ctrl.demographicNo).then((response) =>
-				{
-					console.info("send success", response);
-				}).catch((error) =>
-				{
-					console.error("Failed to invite patient to MHA", error);
-					ctrl.inviteSent = false;
-				});
 			}
 		}
 	}]

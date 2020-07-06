@@ -4,11 +4,39 @@
 	background: linear-gradient(90deg, $color-left $left-pane-width, $color-right 0), no-repeat 100% 100%;
 }
 
+@mixin modal-size($modal-width, $modal-height, $header-height: $modal-default-header-height, $footer-height: $modal-default-footer-height)
+{
+	$modal-body-height: calc(#{$modal-height} - #{$header-height} - #{$footer-height} - #{$modal-border-space});
+	$modal-body-no-footer-height: calc(#{$modal-height} - #{$header-height} - #{$modal-border-space});
 
-.juno-modal {
 	.modal-dialog {
 		width: $modal-width;
 		height: $modal-height;
+
+		juno-modal {
+			.modal-header {
+				height: $header-height;
+			}
+			.modal-body {
+				height: $modal-body-height;
+
+				&.no-footer {
+					height: $modal-body-no-footer-height;
+				}
+			}
+			.modal-footer {
+				height: $footer-height;
+			}
+		}
+	}
+}
+
+.juno-modal {
+	@include modal-size($modal-width, $modal-height);
+	&.sml {
+		@include modal-size($modal-width-sml, $modal-height-sml, 48px, 48px);
+	}
+	.modal-dialog {
 		.modal-content {
 			height: 100%;
 			display: flex;
@@ -34,7 +62,6 @@
 
 			juno-modal {
 				.modal-header {
-					height: $modal-header-height;
 					padding: 12px 4px 12px 16px;
 					display: flex;
 					align-items: center;
@@ -93,7 +120,6 @@
 				}
 
 				.modal-body {
-					height: $modal-body-height;
 					background-color: $color-neutral-white;
 					border-radius: 16px 16px 0 0;
 					padding: 0;
@@ -106,13 +132,11 @@
 					}
 					
 					&.no-footer {
-						height: $modal-body-no-footer-height;
 						border-radius: 16px 0 0 16px;
 					}
 				}
 
 				.modal-footer {
-					height: $modal-footer-height;
 					border-radius: 0 0 16px 16px;
 					padding: 0 8px 8px 8px;
 					background-color: $color-neutral-white;

@@ -45,7 +45,7 @@
 
 		.tab-pane {
 			overflow: auto;
-			height: calc(#{$modal-body-height} - #{$tabs-height});
+			height: calc(100% - #{$tabs-height});
 
 			.tab-bar-inputs {
 				position: absolute;
