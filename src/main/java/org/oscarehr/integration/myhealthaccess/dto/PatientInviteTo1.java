@@ -26,14 +26,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PatientInviteTo1
 {
+	@JsonProperty("remote_id")
+	private String remoteId;
 	private PatientTo1 patient;
 	@JsonProperty("primary_provider_id")
 	private String primaryProviderId;
 
-	public PatientInviteTo1(PatientTo1 patient, String primaryProviderId)
+	public PatientInviteTo1(PatientTo1 patient, String remoteId, String primaryProviderId)
 	{
 		this.patient = patient;
+		this.remoteId = remoteId;
 		this.primaryProviderId = primaryProviderId;
+	}
+
+	public String getRemoteId()
+	{
+		return remoteId;
+	}
+
+	public void setRemoteId(String remoteId)
+	{
+		this.remoteId = remoteId;
 	}
 
 	public PatientTo1 getPatient()

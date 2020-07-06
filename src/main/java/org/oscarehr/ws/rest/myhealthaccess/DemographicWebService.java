@@ -34,7 +34,6 @@ import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueExceptio
 import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,8 +119,6 @@ public class DemographicWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> patientInvite(@PathParam("integrationId") Integer integrationId,
 	                                           @PathParam("demographicId") Integer demographicId)
 	{
-		MiscUtils.getLogger().info("BEGIN patientInvite");
-
 		Integration integration = integrationDao.find(integrationId);
 		Demographic demographic = demographicDao.find(demographicId);
 

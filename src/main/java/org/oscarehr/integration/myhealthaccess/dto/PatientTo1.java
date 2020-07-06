@@ -91,11 +91,28 @@ public class PatientTo1
 		this.linkStatus = mhaPatient.getLinkStatus().name();
 	}
 
-	public PatientTo1(Demographic demographic)
+	public PatientTo1(Demographic demographic, String cellPhone)
 	{
-		BeanUtils.copyProperties(demographic, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus");
+		this.id = null; // This should be the MHA id
+		this.email = demographic.getEmail();
+		this.firstName = demographic.getFirstName();
+		this.middleName = null;
+		this.lastName = demographic.getLastName();
+		this.birthDate = demographic.getDateOfBirth();
+		this.sex = demographic.getSex();
+		this.healthNumber = demographic.getHin();
+		this.healthNumberVersion = demographic.getVer();
 		this.healthCareProvinceCode = demographic.getHcType();
+		this.address1 = demographic.getAddress();
+		this.address2 = null;
+		this.city = demographic.getCity();
 		this.addressProvinceCode = demographic.getProvince();
+		this.postalCode = demographic.getPostal();
+		this.countryCode = demographic.getCountryOfOrigin();
+		this.homePhone = demographic.getPhone();
+		this.workPhone = demographic.getPhone2();
+		this.cellPhone = cellPhone;
+		this.primaryFax = null;
 		this.linkStatus = MHAPatient.LINK_STATUS.NO_LINK.name();
 	}
 
