@@ -47,6 +47,7 @@ import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentConfirmationTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -259,15 +260,12 @@ public class ScheduleManager {
 		return (results);
 	}
 
-	public void confirmAppointment(LoggedInInfo loggedInInfo, Integer appointmentId)
+	public void confirmAppointment(LoggedInInfo loggedInInfo, AppointmentConfirmationTransfer confirmationTransfer)
 	{
-		Integer securityNo = loggedInInfo.getLoggedInSecurity().getSecurityNo();
-		this.confirmAppointment(loggedInInfo, appointmentId, Appointment.ConfirmedByType.SECURITY_NO, securityNo.toString());
-	}
+		Integer appointmentId = confirmationTransfer.getAppointmentNo();
+		Appointment.ConfirmedByType confirmedByType = confirmationTransfer.getConfirmedByType();
+		String confirmedBy = confirmationTransfer.getConfirmedBy();
 
-	public void confirmAppointment(LoggedInInfo loggedInInfo, Integer appointmentId,
-								   Appointment.ConfirmedByType confirmedByType, String confirmedBy)
-	{
 		Optional<Appointment> appointment = oscarAppointmentDao.findOptional(appointmentId);
 
 		appointment.ifPresent(appt -> {
@@ -282,7 +280,7 @@ public class ScheduleManager {
 
 			if (canConfirm)
 			{
-				appt.confirm(confirmedByType, confirmedBy);
+				appt.confirm(confirmationTransfer.getConfirmedAt(), confirmedByType, confirmedBy);
 				this.updateAppointment(loggedInInfo, appt);
 			}
 		});

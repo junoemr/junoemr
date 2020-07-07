@@ -460,9 +460,9 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 		this.confirmedBy = confirmedBy;
 	}
 
-	public void confirm(ConfirmedByType confirmedByType, String confirmedBy)
+	public void confirm(Date confirmedAt, ConfirmedByType confirmedByType, String confirmedBy)
 	{
-		this.confirmedAt = new Date();
+		this.confirmedAt = confirmedAt;
 		this.confirmedBy = confirmedBy;
 		this.confirmedByType = confirmedByType;
 	}

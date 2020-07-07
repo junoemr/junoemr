@@ -39,11 +39,13 @@ import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.schedule.service.Schedule;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.external.soap.util.LocalDateAdapter;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentArchiveTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentConfirmationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTypeTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.ValidatedAppointmentBookingTransfer;
@@ -338,13 +340,19 @@ public class ScheduleWs extends AbstractWs {
 		scheduleManager.updateAppointment(getLoggedInInfo(), appointment);
 	}
 
-	public void confirmAppointment(Integer appointmentId, String confirmedByType, String confirmedBy)
+	public void confirmAppointment(AppointmentConfirmationTransfer confirmationTransfer)
 	{
-		scheduleManager.confirmAppointment(
-				getLoggedInInfo(),
-				appointmentId,
-				Appointment.ConfirmedByType.valueOf(confirmedByType),
-				confirmedBy);
+		scheduleManager.confirmAppointment(getLoggedInInfo(), confirmationTransfer);
+	}
+
+	public void confirmAppointments(AppointmentConfirmationTransfer[] confirmationTransfers)
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+
+		for (AppointmentConfirmationTransfer confirmationTransfer : confirmationTransfers)
+		{
+			scheduleManager.confirmAppointment(loggedInInfo, confirmationTransfer);
+		}
 	}
 
 	/**
