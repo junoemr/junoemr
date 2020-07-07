@@ -21,7 +21,7 @@
 * Canada
 */
 
-import {MhaDemographicApi, MhaIntegrationApi, SitesApi} from "../../../../../generated";
+import {MhaDemographicApi, MhaIntegrationApi} from "../../../../../generated";
 import { MHA_PATIENT_CONNECTION_ACTIONS } from "./mhaPatientConnectionConstants"
 import {JUNO_BUTTON_COLOR, JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
 
@@ -50,6 +50,8 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 		let ctrl = this;
 
 		ctrl.isConfirmed = false;
+		ctrl.inviteSent = false;
+		ctrl.integrationsList = [];
 
 		// load apis
 		let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
@@ -78,6 +80,10 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 			if (this.isConfirmed)
 			{
 				return "View or Edit MHA Status";
+			}
+			else if (this.hasEmail() && ctrl.inviteSent)
+			{
+				return "Invite Sent";
 			}
 			else if (this.hasEmail())
 			{
@@ -139,11 +145,20 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 			return this.demographicEmail && this.demographicEmail !== "";
 		}
 
+		ctrl.buttonDisabled = () =>
+		{
+			return (this.inviteSent || ctrl.integrationsList.length <= 0);
+		}
+
 		ctrl.onClick = () =>
 		{
 			if (ctrl.isConfirmed)
 			{
 				ctrl.openPatientModal();
+			}
+			else
+			{
+				ctrl.openInviteConfirmModal();
 			}
 		}
 
@@ -175,6 +190,29 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 			}
 		}
 
+		ctrl.openInviteConfirmModal = async () =>
+		{
+			try
+			{
+				ctrl.inviteSent = await $uibModal.open(
+					{
+						component: 'mhaPatientInviteConfirmModal',
+						backdrop: 'static',
+						windowClass: "juno-modal sml",
+						resolve: {
+							style: () => ctrl.componentStyle,
+							demographicNo: () => ctrl.demographicNo,
+							integrationsList: () => ctrl.integrationsList,
+						}
+					}
+				).result;
+			}
+			catch(err)
+			{
+				// user pressed ESC key
+			}
+		}
+
 		// ============ private methods ==============
 
 		ctrl.loadMhaPatientProfiles = async () =>
@@ -184,9 +222,9 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 				try
 				{
 					ctrl.isConfirmed = false;
-					let integrationsList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
+					ctrl.integrationsList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
 					let siteList = [];
-					for (let integration of integrationsList)
+					for (let integration of ctrl.integrationsList)
 					{
 						let isConfirmed = (await mhaDemographicApi.isPatientConfirmed(integration.id, ctrl.demographicNo)).data.body;
 						ctrl.isConfirmed = ctrl.isConfirmed || isConfirmed;

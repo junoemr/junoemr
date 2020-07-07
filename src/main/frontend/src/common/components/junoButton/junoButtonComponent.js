@@ -30,7 +30,8 @@ angular.module('Common.Components').component('junoButton', {
 		label: "@?",
 		labelPosition: "<?",
 		componentStyle: "<?",
-		buttonColor: "<?"
+		buttonColor: "<?",
+		disabled: "<?"
 	},
 	transclude: true,
 	controller: [ function () {

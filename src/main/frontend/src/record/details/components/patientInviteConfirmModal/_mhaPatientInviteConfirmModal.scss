@@ -1,0 +1,34 @@
+.juno-modal {
+	.mha-patient-details-modal {
+		@include juno-font-body-small();
+
+		.modal-ctl-buttons {
+			.icon-modal-ctl {
+				cursor: pointer;
+			}
+		}
+
+		.modal-title {
+		}
+		.modal-body {
+
+			.confirm-content {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				height: 100%;
+				padding: 16px;
+
+				.confirm-message {
+					text-align: center;
+				}
+				label {
+					text-align: left;
+				}
+			}
+
+		}
+		.modal-footer {
+		}
+	}
+}

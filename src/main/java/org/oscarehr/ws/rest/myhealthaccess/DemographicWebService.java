@@ -41,6 +41,7 @@ import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -66,7 +67,8 @@ public class DemographicWebService extends AbstractServiceImpl
 	@GET
 	@Path("demographic/{demographic_no}/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<PatientTo1> getMHAPatient(@PathParam("integrationId") Integer integrationId, @PathParam("demographic_no") String demographicNo)
+	public RestResponse<PatientTo1> getMHAPatient(@PathParam("integrationId") Integer integrationId,
+	                                              @PathParam("demographic_no") String demographicNo)
 	{
 		Integration integration = integrationDao.find(integrationId);
 		Demographic demographic = demographicDao.find(Integer.parseInt(demographicNo));
@@ -84,7 +86,8 @@ public class DemographicWebService extends AbstractServiceImpl
 	@GET
 	@Path("demographic/{demographic_no}/confirmed")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> isPatientConfirmed(@PathParam("integrationId") Integer integrationId, @PathParam("demographic_no") String demographicNo)
+	public RestResponse<Boolean> isPatientConfirmed(@PathParam("integrationId") Integer integrationId,
+	                                                @PathParam("demographic_no") String demographicNo)
 	{
 		Integration integration = integrationDao.find(integrationId);
 		return RestResponse.successResponse(patientService.isPatientConfirmed(Integer.parseInt(demographicNo), integration));
@@ -94,7 +97,7 @@ public class DemographicWebService extends AbstractServiceImpl
 	@Path("demographic/{demographic_no}/reject_connection")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> rejectPatientConnection(@PathParam("integrationId") Integer integrationId,
-														   @PathParam("demographic_no") String demographicNo)
+	                                                     @PathParam("demographic_no") String demographicNo)
 	{
 		updatePatientConnection(integrationId, demographicNo, true);
 		return RestResponse.successResponse(true);
@@ -104,9 +107,26 @@ public class DemographicWebService extends AbstractServiceImpl
 	@Path("demographic/{demographic_no}/cancel_reject_connection")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> cancelRejectPatientConnection(@PathParam("integrationId") Integer integrationId,
-														   @PathParam("demographic_no") String demographicNo)
+	                                                           @PathParam("demographic_no") String demographicNo)
 	{
 		updatePatientConnection(integrationId, demographicNo, false);
+		return RestResponse.successResponse(true);
+	}
+
+	@POST
+	@Path("/demographic/{demographicId}/invite")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> patientInvite(@PathParam("integrationId") Integer integrationId,
+	                                           @PathParam("demographicId") Integer demographicId)
+	{
+		Integration integration = integrationDao.find(integrationId);
+		Demographic demographic = demographicDao.find(demographicId);
+
+		ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
+				getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
+
+
+		patientService.patientInvite(integration, loginTokenTo1.getToken(), demographic);
 		return RestResponse.successResponse(true);
 	}
 
