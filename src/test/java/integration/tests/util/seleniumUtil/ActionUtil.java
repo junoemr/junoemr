@@ -24,6 +24,7 @@ package integration.tests.util.seleniumUtil;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 public class ActionUtil
@@ -38,6 +39,13 @@ public class ActionUtil
 	{
 		Select doctor = new Select(driver.findElement(dropdown));
 		doctor.selectByIndex(dropdownIndex);
+	}
+
+	public static void textEdit(WebDriver driver, By textField, String textNew)
+	{
+		WebElement text = driver.findElement(textField);
+		text.clear();
+		text.sendKeys(textNew);
 	}
 
 }
