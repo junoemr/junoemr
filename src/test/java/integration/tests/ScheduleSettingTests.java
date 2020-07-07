@@ -48,19 +48,28 @@ import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 import static integration.tests.util.seleniumUtil.PageUtil.switchToNewWindow;
 
 public class ScheduleSettingTests extends SeleniumTestBase {
+	@BeforeClass
+	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	{
+		SchemaUtils.restoreTable("admission", "log", "program_provider",
+				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
+				"scheduledate", "scheduleholiday", "scheduletemplate", "scheduletemplatecode");
+		loadSpringBeans();
+		DatabaseUtil.createTestProvider();
+	}
 
-	public static boolean isTemplateInDropdownOtions(By dropdownpath, String valueExpected)
+	public static boolean isTemplateInDropdownOpions(By dropdownpath, String valueExpected)
 	{
 		WebElement dropdown = driver.findElement(dropdownpath);
 		Select select = new Select(dropdown);
 		List<WebElement> options = select.getOptions();
 		boolean match = false;
-		for(WebElement code:options)
+		for(WebElement code : options)
 		{
 			if (code.getAttribute("value").equals(valueExpected))
 			{
 				match = true;
-				break;
+				return match;
 			}
 		}
 		return match;
@@ -68,9 +77,9 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 
 	public static void setDailySchedule(int intervali, int intervalj, int intervalk, int intervall, int intervalm, int tr, String templateCode)
 	{
-		for (int i = 0; i<intervali; i++)
+		for (int i = 0; i < intervali; i++)
 		{
-			for (int j = 0; j<intervalj; j++)
+			for (int j = 0; j < intervalj; j++)
 			{
 				driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[" + tr +
 						"]/td[" + (intervalk+i*intervall+j*intervalm) + "]/input")).sendKeys(templateCode);
@@ -83,16 +92,6 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		driver.findElement(weekday).click();
 		driver.findElement(template).click();
 		driver.findElement(addingButton).click();
-	}
-
-	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
-	{
-		SchemaUtils.restoreTable("admission", "log", "program_provider",
-				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
-				"scheduledate", "scheduleholiday", "scheduletemplate", "scheduletemplatecode");
-		loadSpringBeans();
-		DatabaseUtil.createTestProvider();
 	}
 
 	@Test
@@ -131,7 +130,7 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		dropdownSelectByValue(driver, By.xpath("//select[@name='code']"), "A");
 		driver.findElement(By.xpath("//input[@value='Edit']")).click();
 		driver.findElement(By.xpath("//input[@value='Delete']")).click();
-		Assert.assertFalse("Template is NOT deleted successfully.", isTemplateInDropdownOtions(By.xpath("//select[@name='code']"), "A"));
+		Assert.assertFalse("Template is NOT deleted successfully.", isTemplateInDropdownOpions(By.xpath("//select[@name='code']"), "A"));
 
 		//Set "5|Dr. Apple 5 mins"
 		driver.findElement(By.xpath("//input[@name='code']")).sendKeys("5");
@@ -142,7 +141,7 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		driver.findElement(By.id("bookinglimit")).sendKeys("1");
 		driver.findElement(By.xpath("//input[@value='Wk']")).click();
 		driver.findElement(By.xpath("//input[@value='Save']")).click();
-		Assert.assertTrue("Template is NOT added successfully.", isTemplateInDropdownOtions(By.xpath("//select[@name='code']"), "5"));
+		Assert.assertTrue("Template is NOT added successfully.", isTemplateInDropdownOpions(By.xpath("//select[@name='code']"), "5"));
 
 		//Edit "a|Administrative Work" to be " b|Break 30 mins"
 		dropdownSelectByValue(driver, By.xpath("//select[@name='code']"), "a");
@@ -151,7 +150,7 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		textEdit(driver, By.xpath("//input[@name='description']"), "Break 30 mins");
 		textEdit(driver, By.xpath("//input[@name='duration']"), "30");
 		driver.findElement(By.xpath("//input[@value='Save']")).click();
-		Assert.assertTrue("Template is NOT edited successfully.", isTemplateInDropdownOtions(By.xpath("//select[@name='code']"), "b"));
+		Assert.assertTrue("Template is NOT edited successfully.", isTemplateInDropdownOpions(By.xpath("//select[@name='code']"), "b"));
 		driver.findElement(By.xpath("//input[@value='Exit']")).click();
 
 		//Template setting for public
@@ -167,7 +166,7 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		//15 mins duration 13-15
 		setDailySchedule(3, 4, 7, 5, 1, 4, "1");
 		driver.findElement(By.xpath("//input[@value='Save']")).click();
-		Assert.assertTrue("Template for public is NOT added successfully.", isTemplateInDropdownOtions(By.xpath("//select[@name='name']"), "P:General"));
+		Assert.assertTrue("Template for public is NOT added successfully.", isTemplateInDropdownOpions(By.xpath("//select[@name='name']"), "P:General"));
 
 		//Edit Template
 		dropdownSelectByValue(driver, By.xpath("//select[@name='name']"), "P:General");
@@ -177,14 +176,14 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		textEdit(driver, By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[4]/td[4]/input"), "2");
 		driver.findElement(By.xpath("//input[@value='Save']")).click();
 		Assert.assertTrue("Template for public is NOT updated successfully.",
-				isTemplateInDropdownOtions(By.xpath("//select[@name='name']"), "P:General-Updated"));
+				isTemplateInDropdownOpions(By.xpath("//select[@name='name']"), "P:General-Updated"));
 
 		//Delete Template
 		dropdownSelectByValue(driver, By.xpath("//select[@name='name']"), "P:General-Updated");
 		driver.findElement(By.xpath("//input[@value='Edit']")).click();
 		driver.findElement(By.xpath("//input[@value='Delete']")).click();
 		Assert.assertFalse("Template for public is NOT deleted successfully.",
-				isTemplateInDropdownOtions(By.xpath("//select[@name='name']"), "General-Updated"));
+				isTemplateInDropdownOpions(By.xpath("//select[@name='name']"), "General-Updated"));
 		driver.findElement(By.xpath("//input[@value='Exit']")).click();
 
 		//Template Setting for Dr. Apple
@@ -210,7 +209,7 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[3]/td[41]/input")).sendKeys("6");
 		driver.findElement(By.xpath("//input[@value='Save']")).click();
 		Assert.assertTrue("Template for Dr. Apple is NOT added successfully.",
-				isTemplateInDropdownOtions(By.xpath("//select[@name='name']"), "Tue/Thur Schedule"));
+				isTemplateInDropdownOpions(By.xpath("//select[@name='name']"), "Tue/Thur Schedule"));
 		driver.findElement(By.xpath("//input[@value='Exit']")).click();
 
 		//Set from Provider - Dr. Apple
