@@ -16,14 +16,18 @@
 				display: flex;
 				flex-direction: column;
 				justify-content: center;
+				align-items: center;
 				height: 100%;
-				padding: 16px;
+				padding: 8px;
 
 				.confirm-message {
 					text-align: center;
 				}
-				label {
-					text-align: left;
+				juno-select {
+					width: 75%;
+					label {
+						text-align: left;
+					}
 				}
 			}
 

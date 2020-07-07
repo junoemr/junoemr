@@ -46,6 +46,9 @@ angular.module('Common.Components').component('junoModal', {
 			ctrl.hideFooter = ctrl.hideFooter || false;
 			ctrl.showLoading = ctrl.showLoading || false;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+
+			// we are inside an bootstrap transclude component, restyle it.
+			angular.element(document.querySelector(".modal-content")).addClass(ctrl.componentStyle + "-background");
 		};
 
 		ctrl.$onChanges = function onChanges(bindingHash)

@@ -104,5 +104,10 @@ angular.module('Common.Components').component('mhaPatientInviteConfirmModal',
 		{
 			return (ctrl.isLoading || ctrl.integrationsList.length <= 0 || ctrl.selectedIntegrationId == null);
 		}
+
+		ctrl.getComponentClasses = () =>
+		{
+			return [ctrl.resolve.style]
+		}
 	}]
 });

@@ -9,22 +9,19 @@
 			-webkit-appearance: none;
 			appearance: none;
 			cursor: pointer;
+			background-image: none;
 
 			width: 100%;
 			padding: 0 16px 0 16px;
 
 		}
 
-		// custom drop down arrow
-		&:after {
-			position: absolute;
-			right: 8px;
-			top: calc(50% - 8px);
-
-			font-family: icomoon;
-			content: "\e934"; //chevron down (is there a better way to do this? can't get @extend .icon-chevron-down to work)
-			font-size: 16px;
-			pointer-events: none;
+		.icon {
+				position: absolute;
+				right: 8px;
+				top: calc(50% - 8px);
+				font-size: 16px;
+				pointer-events: none;
 		}
 	}
 }

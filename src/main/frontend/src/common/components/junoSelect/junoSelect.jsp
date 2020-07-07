@@ -9,5 +9,6 @@
 				{{$ctrl.placeholder}}
 			</option>
 		</select>
+		<i class="icon icon-chevron-down"></i>
 	</div>
 </div>

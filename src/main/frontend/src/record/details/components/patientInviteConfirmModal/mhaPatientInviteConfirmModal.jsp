@@ -10,9 +10,9 @@
 		</div>
 	</modal-title>
 
-	<modal-body>
+	<modal-body ng-class="$ctrl.getComponentClasses()">
 		<div class="confirm-content">
-			<h3 class="confirm-message">
+			<h3 class="confirm-message juno-text">
 				Are you sure you want to send an invite to this patient?
 			</h3>
 			<juno-select ng-if="$ctrl.isMultisiteEnabled"
