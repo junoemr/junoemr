@@ -76,14 +76,7 @@ public class MessageMapper extends AbstractMapper
 
 	public ProviderData getSigningProvider(int rep) throws HL7Exception
 	{
-		ProviderData signingProvider = null;
-
-		if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
-		{
-			String noteProviderStr = getNoteSignature(rep);
-			signingProvider = getWOLFParsedProviderInfo(noteProviderStr, "ZPV.5");
-		}
-		return signingProvider;
+		return null;
 	}
 
 	public ProviderData getRecipientProvider(int rep) throws HL7Exception
@@ -113,14 +106,9 @@ public class MessageMapper extends AbstractMapper
 		return StringUtils.trimToNull(provider.getZPV(rep).getZpv5_commentSignature().getValue());
 	}
 
-	/* Wolf sends their provider messages in encounter notes. Here we try to separate them out. */
+	/** messages may be sent as encounter notes. Here we try to separate them out. */
 	public boolean isMessageNote(int rep) throws HL7Exception
 	{
-		String noteText = getNoteComment(rep);
-		if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
-		{
-			return (noteText != null && noteText.startsWith("Message:"));
-		}
 		return false;
 	}
 }

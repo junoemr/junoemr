@@ -20,10 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.common.hl7.copd.mapper;
+package org.oscarehr.common.hl7.copd.mapper.mediplan;
 
 import ca.uhn.hl7v2.HL7Exception;
-import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.hl7.copd.mapper.AlertMapper;
+import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
@@ -32,18 +33,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class AlertMapper extends AbstractMapper
+public class AlertMapperMediplan extends AlertMapper
 {
-	public AlertMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public AlertMapperMediplan(ZPD_ZTR message, int providerRep)
 	{
-		super(message, providerRep, importSource);
+		super(message, providerRep, CoPDImportService.IMPORT_SOURCE.MEDIPLAN);
 	}
 
-	public int getNumAlerts()
-	{
-		return provider.getZALReps();
-	}
-
+	@Override
 	public List<CaseManagementNote> getReminderNoteList() throws HL7Exception
 	{
 		int numNotes = getNumAlerts();
@@ -51,7 +48,7 @@ public class AlertMapper extends AbstractMapper
 		for (int i = 0; i < numNotes; i++)
 		{
 			CaseManagementNote note = getReminderNote(i, importSource);
-			if (note != null)
+			if (note != null && !isNoteFilteredMediplan(note))
 			{
 				noteList.add(note);
 			}
@@ -59,6 +56,16 @@ public class AlertMapper extends AbstractMapper
 		return noteList;
 	}
 
+	private boolean isNoteFilteredMediplan(CaseManagementNote note)
+	{
+		return (note.getNote().indexOf(HistoryNoteMapperMediplan.MEDIPLAN_FAMILY_HISTORY_ID) == 0 ||
+				note.getNote().indexOf(HistoryNoteMapperMediplan.MEDIPLAN_MEDICAL_NOTE_ID_1) == 0 ||
+				note.getNote().indexOf(HistoryNoteMapperMediplan.MEDIPLAN_MEDICAL_NOTE_ID_2) == 0 ||
+				note.getNote().indexOf(HistoryNoteMapperMediplan.MEDIPLAN_SOCIAL_HISTORY_ID) == 0 ||
+				note.getNote().indexOf(AllergyMapper.MEDIPLAN_ALLERGY_NOTE_ID) == 0);
+	}
+
+	@Override
 	public CaseManagementNote getReminderNote(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		CaseManagementNote note = null;
@@ -71,50 +78,8 @@ public class AlertMapper extends AbstractMapper
 			Date date = getAlertDate(rep);
 			note.setObservationDate(date);
 			note.setUpdateDate(date);
-			note.setNote(noteText.replaceAll("~crlf~", "\n"));
+			note.setNote(noteText.replace(" / ", "\n"));
 		}
 		return note;
-	}
-
-	public Date getAlertDate(int rep) throws HL7Exception
-	{
-		return getNullableDate(provider.getZAL(rep)
-				.getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValue());
-	}
-
-	protected String getNoteText(int rep) throws HL7Exception
-	{
-		String textSent = getAlertTextSent(rep);
-		String comments = getAlertComments(rep);
-		String advanceDir = getAlertAdvanceDirFlag(rep);
-		String response = "";
-
-		if(textSent != null)
-		{
-			response += textSent + "\n";
-		}
-		if(comments != null)
-		{
-			response += comments + "\n";
-		}
-		if(advanceDir != null)
-		{
-			// wolf likes to put things in here so include them in the note
-			response += advanceDir + "\n";
-		}
-		return StringUtils.trimToNull(response);
-	}
-
-	public String getAlertTextSent(int rep) throws HL7Exception
-	{
-		return StringUtils.trimToNull(provider.getZAL(rep).getZal5_alertTextSent().getValue());
-	}
-	public String getAlertComments(int rep) throws HL7Exception
-	{
-		return StringUtils.trimToNull(provider.getZAL(rep).getZal6_commentsToAlert().getValue());
-	}
-	public String getAlertAdvanceDirFlag(int rep) throws HL7Exception
-	{
-		return StringUtils.trimToNull(provider.getZAL(rep).getZal7_advanceDirFlag().getValue());
 	}
 }

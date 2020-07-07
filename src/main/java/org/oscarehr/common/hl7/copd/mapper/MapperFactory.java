@@ -23,6 +23,15 @@
 package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
+import org.oscarehr.common.hl7.copd.mapper.accuro.AppointmentMapperAccuro;
+import org.oscarehr.common.hl7.copd.mapper.medaccess.AppointmentMapperMedaccess;
+import org.oscarehr.common.hl7.copd.mapper.medaccess.DocumentMapperMedaccess;
+import org.oscarehr.common.hl7.copd.mapper.medaccess.EncounterNoteMapperMedAccess;
+import org.oscarehr.common.hl7.copd.mapper.medaccess.HistoryNoteMapperMedaccess;
+import org.oscarehr.common.hl7.copd.mapper.mediplan.AlertMapperMediplan;
+import org.oscarehr.common.hl7.copd.mapper.mediplan.HistoryNoteMapperMediplan;
+import org.oscarehr.common.hl7.copd.mapper.wolf.EncounterNoteMapperWolf;
+import org.oscarehr.common.hl7.copd.mapper.wolf.MessageMapperWolf;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 
@@ -65,7 +74,13 @@ public class MapperFactory
 	 */
 	public static AlertMapper newAlertMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		return new AlertMapper(message, providerRep, importSource);
+		switch(importSource)
+		{
+			case MEDIPLAN:
+				return new AlertMapperMediplan(message, providerRep);
+			default:
+				return new AlertMapper(message, providerRep, importSource);
+		}
 	}
 
 	/**
@@ -133,6 +148,8 @@ public class MapperFactory
 		{
 			case MEDACCESS:
 				return new EncounterNoteMapperMedAccess(message, providerRep, importSource);
+			case WOLF:
+				return new EncounterNoteMapperWolf(message, providerRep);
 			default:
 				return new EncounterNoteMapper(message, providerRep, importSource);
 		}
@@ -147,7 +164,21 @@ public class MapperFactory
 	 */
 	public static HistoryNoteMapper newHistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		return new HistoryNoteMapper(message, providerRep, importSource);
+		switch(importSource)
+		{
+			case MEDACCESS:
+			{
+				return new HistoryNoteMapperMedaccess(message, providerRep);
+			}
+			case MEDIPLAN:
+			{
+				return new HistoryNoteMapperMediplan(message, providerRep);
+			}
+			default:
+			{
+				return new HistoryNoteMapper(message, providerRep, importSource);
+			}
+		}
 	}
 
 	/**
@@ -183,7 +214,14 @@ public class MapperFactory
 	 */
 	public static MessageMapper newMessageMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		return new MessageMapper(message, providerRep, importSource);
+		switch(importSource)
+		{
+			case WOLF:
+				return new MessageMapperWolf(message, providerRep);
+			default:
+				return new MessageMapper(message, providerRep, importSource);
+		}
+
 	}
 
 	/**

@@ -20,10 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.common.hl7.copd.mapper;
+package org.oscarehr.common.hl7.copd.mapper.medaccess;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.jsoup.Jsoup;
+import org.oscarehr.common.hl7.copd.mapper.EncounterNoteMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 
