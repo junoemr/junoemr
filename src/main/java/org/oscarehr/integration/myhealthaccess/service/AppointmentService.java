@@ -23,6 +23,7 @@
 package org.oscarehr.integration.myhealthaccess.service;
 
 import org.oscarehr.common.IsPropertiesOn;
+import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
@@ -31,6 +32,7 @@ import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentSearchTo1;
+import org.oscarehr.integration.myhealthaccess.dto.NotificationTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.BookingException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
@@ -46,6 +48,9 @@ public class AppointmentService extends BaseService
 {
 	@Autowired
 	ClinicService clinicService;
+
+	@Autowired
+	OscarAppointmentDao oscarAppointmentDao;
 
 	public void updateAppointmentCache(IntegrationData integrationData, AppointmentCacheTo1 appointmentTransfer)
 	{
@@ -76,7 +81,7 @@ public class AppointmentService extends BaseService
 	 * @param appointment - the appointment to book.
 	 * @throws InvalidIntegrationException
 	 */
-	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment) throws InvalidIntegrationException
+	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, boolean sendNotification) throws InvalidIntegrationException
 	{
 		String appointmentSite = null;
 		if (IsPropertiesOn.isMultisitesEnable())
@@ -87,7 +92,7 @@ public class AppointmentService extends BaseService
 		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointmentSite).getToken();
 		String apiKey = getApiKey(appointmentSite);
 		AppointmentBookResponseTo1 appointmentBookResponseTo1 = postWithToken(formatEndpoint("/clinic_user/appointment/book"),
-				apiKey, new AppointmentBookTo1(appointment), AppointmentBookResponseTo1.class, loginToken);
+				apiKey, new AppointmentBookTo1(appointment, false, sendNotification), AppointmentBookResponseTo1.class, loginToken);
 		if (!appointmentBookResponseTo1.isSuccess())
 		{
 			throw new BookingException(appointmentBookResponseTo1.getMessage());
@@ -120,15 +125,37 @@ public class AppointmentService extends BaseService
 	}
 
 	/**
-	 * send a one time telehealth notification for the specified appointment, to the patient.
+	 * send a telehealth appointment notification for the specified appointment, to the patient.
 	 * @param integration - the integration under which to perform the action
 	 * @param loginToken - the login token of the user performing the action
-	 * @param remote_id - the appointments remote_id (mha id)
+	 * @param remoteId - the appointments remote_id (mha id)
 	 */
-	public void sendOneTimeTelehealthNotification(Integration integration, String loginToken, String remote_id)
+	public void sendTelehealthAppointmentNotification(Integration integration, String loginToken, String remoteId)
 	{
-		postWithToken(formatEndpoint("/clinic_user/self/clinic/appointment/%s/send_one_time_link", remote_id),
+		postWithToken(formatEndpoint("/clinic_user/self/clinic/appointment/%s/send_telehealth_notification", remoteId),
 				integration.getApiKey(), null, Boolean.class, loginToken);
+	}
+
+	/**
+	 * send a genearal appointment notification for the specified appointment, to the patient.
+	 * @param integration - the integration under which to perform the action
+	 * @param loginToken - the login token of the user performing the action
+	 * @param appointmentNo - the appointment no
+	 */
+	public void sendGeneralAppointmentNotification(Integration integration, String loginToken, Integer appointmentNo)
+	{
+		Appointment appointment = oscarAppointmentDao.find(appointmentNo);
+
+		if (appointment != null)
+		{
+			NotificationTo1 notificationTo1 = new NotificationTo1(appointment);
+			postWithToken(formatEndpoint("/clinic_user/self/juno/appointment/%s/send_general_notification", appointmentNo.toString()),
+					integration.getApiKey(), notificationTo1, Boolean.class, loginToken);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Appointment with appointment_no: " + appointmentNo + " not found!");
+		}
 	}
 
 	/**

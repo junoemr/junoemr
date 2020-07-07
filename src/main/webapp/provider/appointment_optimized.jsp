@@ -1896,7 +1896,7 @@ private long getAppointmentRowSpan(
 																					 "../integrations/myhealthaccess.do?method=connect" +
 																					 "&demographicNo=${appointmentInfo.demographicNo}" +
 																					 "&siteName=${appointmentInfo.siteName}" +
-																					 "&appt=${appointmentInfo.appointmentNo}");return false;'
+																					 "&appt=${appointmentInfo.appointmentNo}", "telehealth");return false;'
 																	 title="Telehealth">
 																		<img
 																						style="vertical-align: bottom"
