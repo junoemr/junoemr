@@ -175,7 +175,7 @@
 			}
 			else
 			{
-				appointmentService.saveNewAppointment(appointment, loggedInInfo, request);
+				appointmentService.saveNewAppointment(appointment, loggedInInfo, request, sendBookingNotification);
 			}
 		}
 		appointmentNo = appointment.getId();
