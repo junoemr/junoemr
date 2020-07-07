@@ -384,7 +384,7 @@ public class CoPDImportService
 
 			String billCenterCode = properties.getProperty("default_bill_center","");
 			provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
-			providerRoleService.setPrimaryRole(provider.getProviderNo(), "doctor");
+			providerRoleService.setDefaultRoleForNewProvider(provider.getProviderNo());
 
 			logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 		}
