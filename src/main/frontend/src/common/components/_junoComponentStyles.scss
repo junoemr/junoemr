@@ -110,7 +110,7 @@
 	&.juno-check-box, &.juno-date-select, &.juno-button {
 		input, select {
 			height: 32px;
-			padding: 9px 16px 9px 16px;
+			padding: 0 16px 0 16px;
 
 			&.field-invalid {
 				border-color: $color-red-base;
