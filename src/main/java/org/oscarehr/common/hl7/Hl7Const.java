@@ -46,6 +46,7 @@ public class Hl7Const
 	public static final String HL7_SEGMENT_ZQO_5 = "ZQO.5";
 	public static final String HL7_SEGMENT_ZQO_6 = "ZQO.6";
 	public static final String HL7_SEGMENT_ZQO_7 = "ZQO.7";
+	public static final String HL7_SEGMENT_ZQO_8 = "ZQO.8";
 
 	public static String getReadableSegmentName(String segment)
 	{

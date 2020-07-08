@@ -168,6 +168,9 @@ public class CoPDPreProcessorService
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZBA_4, trimTagNewLines, Pattern.DOTALL);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_4, trimTagNewLines, Pattern.DOTALL);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_5, trimTagNewLines, Pattern.DOTALL);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_6, trimTagNewLines, Pattern.DOTALL);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_7, trimTagNewLines, Pattern.DOTALL);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_8, trimTagNewLines, Pattern.DOTALL);
 		return message;
 	}
 
@@ -221,7 +224,7 @@ public class CoPDPreProcessorService
 	 * @param callback     the callback to call for all instances of the tag (tag content in -> , -> modified content out).
 	 * @return a modified message.
 	 */
-	private String foreachTagWithSequence(String message, String segment, String segmentField, BiFunction<String, String, String> callback)
+	private String foreachTagWithSequence(String message, BiFunction<String, String, String> callback, String segment, String segmentField)
 	{
 		/* match a pattern of <segment.1>A</segment.1>B<segment.segmentField>C</segment.segmentField>
 		* where A is the segment ID, and C is the tagValue*/
@@ -315,11 +318,13 @@ public class CoPDPreProcessorService
 	{
 		Function<String, String> trimValueCallback = tagValue -> StringUtils.trimToEmpty(tagValue);
 
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_TS_1, trimValueCallback);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZBA_31, trimValueCallback);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_4, trimValueCallback);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_5, trimValueCallback);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_6, trimValueCallback);
 		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_7, trimValueCallback);
+		message = foreachTag(message, Hl7Const.HL7_SEGMENT_ZQO_8, trimValueCallback);
 		return message;
 	}
 
@@ -331,8 +336,8 @@ public class CoPDPreProcessorService
 	 */
 	private String ensureNumeric(String message, CoPDRecordData recordData)
 	{
-		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZBA, "31");
-		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZQO, "4","5","6","7");
+		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZBA, "4","31");
+		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZQO, "4","5","6","7","8");
 		return message;
 	}
 	private String ensureNumeric(String message, CoPDRecordData recordData, String segment, String...segmentFields)
@@ -368,7 +373,7 @@ public class CoPDPreProcessorService
 			}
 		};
 
-		return foreachTagWithSequence(message, segment, segmentField, ensureNumericCallback);
+		return foreachTagWithSequence(message, ensureNumericCallback, segment, segmentField);
 	}
 
 	/**

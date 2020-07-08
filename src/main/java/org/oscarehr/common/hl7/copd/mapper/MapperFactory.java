@@ -31,6 +31,7 @@ import org.oscarehr.common.hl7.copd.mapper.medaccess.HistoryNoteMapperMedaccess;
 import org.oscarehr.common.hl7.copd.mapper.mediplan.AlertMapperMediplan;
 import org.oscarehr.common.hl7.copd.mapper.mediplan.HistoryNoteMapperMediplan;
 import org.oscarehr.common.hl7.copd.mapper.wolf.EncounterNoteMapperWolf;
+import org.oscarehr.common.hl7.copd.mapper.wolf.MedicationMapperWolf;
 import org.oscarehr.common.hl7.copd.mapper.wolf.MessageMapperWolf;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
@@ -202,7 +203,13 @@ public class MapperFactory
 	 */
 	public static MedicationMapper newMedicationMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		return new MedicationMapper(message, providerRep, importSource);
+		switch(importSource)
+		{
+			case WOLF:
+				return new MedicationMapperWolf(message, providerRep);
+			default:
+				return new MedicationMapper(message, providerRep, importSource);
+		}
 	}
 
 	/**

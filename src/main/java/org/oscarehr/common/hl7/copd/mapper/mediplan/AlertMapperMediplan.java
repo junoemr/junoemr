@@ -24,7 +24,6 @@ package org.oscarehr.common.hl7.copd.mapper.mediplan;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.oscarehr.common.hl7.copd.mapper.AlertMapper;
-import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
@@ -62,7 +61,7 @@ public class AlertMapperMediplan extends AlertMapper
 				note.getNote().indexOf(HistoryNoteMapperMediplan.MEDIPLAN_MEDICAL_NOTE_ID_1) == 0 ||
 				note.getNote().indexOf(HistoryNoteMapperMediplan.MEDIPLAN_MEDICAL_NOTE_ID_2) == 0 ||
 				note.getNote().indexOf(HistoryNoteMapperMediplan.MEDIPLAN_SOCIAL_HISTORY_ID) == 0 ||
-				note.getNote().indexOf(AllergyMapper.MEDIPLAN_ALLERGY_NOTE_ID) == 0);
+				note.getNote().indexOf(AllergyMapperMediplan.MEDIPLAN_ALLERGY_NOTE_ID) == 0);
 	}
 
 	@Override

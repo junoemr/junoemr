@@ -90,45 +90,9 @@ public class MedicationMapper extends AbstractMapper
 	{
 		Drug drug = new Drug();
 
-		Date writtenDate;
-		Date startDate;
-		Date endDate;
-		switch(importSource)
-		{
-			case WOLF:
-			{
-				// prescribed date: ORC-9 else ORC-15, else ZRX-3
-				writtenDate = getWOLFCreatedDate(rep);
-				// start date: ORC-15, else ZRX-3
-				startDate = getWOLFStartDate(rep);
-				// end date: ZRX-3, else calculate? else ORC-15(start date)
-				endDate = getWOLFEndDate(rep);
-				break;
-			}
-			default:
-			case UNKNOWN:
-			{
-				writtenDate = getTransactionDate(rep);
-				startDate = getAdministrationStartDate(rep);
-				endDate = getAdministrationStopDate(rep);
-				if(endDate == null)
-				{
-					// try to calculate from TQ1
-					endDate = getCalculatedEndDate(rep, startDate);
-					if (endDate == null)
-					{
-						// try to calculate from duration, frequency and quantity.
-						endDate = getCalculatedEndDateAlternate(rep, startDate);
-						if (endDate == null)
-						{
-							//end date can't be null
-							endDate = startDate;
-						}
-					}
-				}
-				break;
-			}
-		}
+		Date writtenDate = getWrittenDate(rep);
+		Date startDate = getStartDate(rep);
+		Date endDate = getEndDate(rep);
 
 		drug.setCreateDate(writtenDate);
 		drug.setWrittenDate(writtenDate);
@@ -272,48 +236,36 @@ public class MedicationMapper extends AbstractMapper
 		return note;
 	}
 
-	/** ORC-9 else ORC-15, else ZRX-3 */
-	private Date getWOLFCreatedDate(int rep) throws HL7Exception
+	protected Date getWrittenDate(int rep) throws HL7Exception
 	{
-		Date createdDate = getTransactionDate(rep);
-		if(createdDate == null)
-		{
-			createdDate = getOrderEffectiveDate(rep);
-		}
-		if(createdDate == null)
-		{
-			createdDate = getAdministrationStopDate(rep);
-		}
-		return createdDate;
+		return getTransactionDate(rep);
 	}
-
-	/** start date: ORC-15, else ZRX-3 */
-	private Date getWOLFStartDate(int rep) throws HL7Exception
+	protected Date getStartDate(int rep) throws HL7Exception
 	{
-		Date startDate = getOrderEffectiveDate(rep);
-		if(startDate == null)
-		{
-			startDate = getAdministrationStopDate(rep);
-		}
-		return startDate;
+		return getAdministrationStartDate(rep);
 	}
-
-	/** ZRX-3, else calculate? else start date */
-	private Date getWOLFEndDate(int rep) throws HL7Exception
+	protected Date getEndDate(int rep) throws HL7Exception
 	{
+		Date startDate = getStartDate(rep);
 		Date endDate = getAdministrationStopDate(rep);
 		if(endDate == null)
 		{
-			endDate = getCalculatedEndDate(rep, getWOLFStartDate(rep));
-		}
-		if(endDate == null)
-		{
-			endDate = getOrderEffectiveDate(rep);
+			// try to calculate from TQ1
+			endDate = getCalculatedEndDate(rep, startDate);
+			if (endDate == null)
+			{
+				// try to calculate from duration, frequency and quantity.
+				endDate = getCalculatedEndDateAlternate(rep, startDate);
+				if (endDate == null)
+				{
+					//end date can't be null
+					endDate = startDate;
+				}
+			}
 		}
 		return endDate;
 	}
-
-	private Date getCalculatedEndDate(int rep, Date rxDate)
+	protected Date getCalculatedEndDate(int rep, Date rxDate)
 	{
 		if (hasTimingQuantity(rep) && getServiceDurationUnit(rep, 0) != null)
 		{
@@ -337,7 +289,7 @@ public class MedicationMapper extends AbstractMapper
 	 * @param rxDate - the rx start date
 	 * @return - the rx end date or null if end date cannot be determined
 	 */
-	private Date getCalculatedEndDateAlternate(int rep, Date rxDate) throws HL7Exception
+	protected Date getCalculatedEndDateAlternate(int rep, Date rxDate) throws HL7Exception
 	{
 		try
 		{
@@ -558,7 +510,9 @@ public class MedicationMapper extends AbstractMapper
 
 	public Integer getNumberOfRefills(int rep)
 	{
-		return Integer.parseInt(provider.getMEDS(rep).getRXO().getRxo13_NumberOfRefills().getValue());
+		// somehow once they were given 1.5 refills???
+		double repeatsAsDouble = Double.parseDouble(provider.getMEDS(rep).getRXO().getRxo13_NumberOfRefills().getValue());
+		return (int) Math.floor(repeatsAsDouble);
 	}
 
 	public Integer getDispenseInterval(int rep) throws HL7Exception
