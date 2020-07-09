@@ -260,7 +260,7 @@ public class ScheduleManager {
 		return (results);
 	}
 
-	public void confirmAppointment(LoggedInInfo loggedInInfo, AppointmentConfirmationTransfer confirmationTransfer)
+	public boolean confirmAppointment(LoggedInInfo loggedInInfo, AppointmentConfirmationTransfer confirmationTransfer)
 	{
 		Integer appointmentId = confirmationTransfer.getAppointmentNo();
 		Appointment.ConfirmedByType confirmedByType = confirmationTransfer.getConfirmedByType();
@@ -268,7 +268,7 @@ public class ScheduleManager {
 
 		Optional<Appointment> appointment = oscarAppointmentDao.findOptional(appointmentId);
 
-		appointment.ifPresent(appt -> {
+		return appointment.map(appt -> {
 			boolean canConfirm = true;
 
 			// Prevent juno confirmations if security_no doesn't exist
@@ -283,6 +283,8 @@ public class ScheduleManager {
 				appt.confirm(confirmationTransfer.getConfirmedAt(), confirmedByType, confirmedBy);
 				this.updateAppointment(loggedInInfo, appt);
 			}
-		});
+
+			return canConfirm;
+		}).orElse(false);
 	}
 }

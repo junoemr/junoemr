@@ -340,9 +340,9 @@ public class ScheduleWs extends AbstractWs {
 		scheduleManager.updateAppointment(getLoggedInInfo(), appointment);
 	}
 
-	public void confirmAppointment(AppointmentConfirmationTransfer confirmationTransfer)
+	public boolean confirmAppointment(AppointmentConfirmationTransfer confirmationTransfer)
 	{
-		scheduleManager.confirmAppointment(getLoggedInInfo(), confirmationTransfer);
+		return scheduleManager.confirmAppointment(getLoggedInInfo(), confirmationTransfer);
 	}
 
 	public void confirmAppointments(AppointmentConfirmationTransfer[] confirmationTransfers)
