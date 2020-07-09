@@ -329,6 +329,7 @@ module.exports = {
 			'./src/admin/integration/know2act/Know2actNotificationController.js',
 			'./src/admin/integration/know2act/Know2actTemplateController.js',
 			'./src/admin/integration/frameContent/frameContentController.js',
+			'./src/admin/integration/manageAppointmentQueuesPage/manageAppointmentQueuesComponent.js',
 
 			'./src/billing/billingController.js',
 
