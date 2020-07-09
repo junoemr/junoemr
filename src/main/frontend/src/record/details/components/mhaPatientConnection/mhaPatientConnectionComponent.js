@@ -53,6 +53,12 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 		ctrl.inviteSent = false;
 		ctrl.integrationsList = [];
 
+		ctrl.buttonStates = Object.freeze({
+			unavailable: 0,
+			invite: 1,
+			edit: 2,
+		});
+
 		// load apis
 		let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
 				'../ws/rs');
@@ -77,15 +83,15 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.getButtonText = () =>
 		{
-			if (this.isConfirmed)
+			if (ctrl.isButtonStateEdit())
 			{
 				return "View or Edit MHA Status";
 			}
-			else if (this.hasEmail() && ctrl.inviteSent)
+			else if (ctrl.isButtonStateInvite() && ctrl.inviteSent)
 			{
 				return "Invite Sent";
 			}
-			else if (this.hasEmail())
+			else if (ctrl.isButtonStateInvite())
 			{
 				return "Invite to MyHealthAccess";
 			}
@@ -97,11 +103,11 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.getToolTip = () =>
 		{
-			if (this.isConfirmed)
+			if (ctrl.isButtonStateEdit())
 			{
 				return "View or Edit MHA Status";
 			}
-			else if (this.hasEmail())
+			else if (ctrl.isButtonStateInvite())
 			{
 				return "Invite patient to MHA via email";
 			}
@@ -114,11 +120,11 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.getButtonColor = () =>
 		{
-			if (this.isConfirmed)
+			if (ctrl.isButtonStateEdit())
 			{
 				return JUNO_BUTTON_COLOR.PRIMARY
 			}
-			else if (ctrl.hasEmail())
+			else if (ctrl.isButtonStateInvite())
 			{
 				return JUNO_BUTTON_COLOR.BASE;
 			}
@@ -147,16 +153,45 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.buttonDisabled = () =>
 		{
-			return (this.inviteSent || ctrl.integrationsList.length <= 0);
+			return (this.inviteSent || ctrl.isButtonStateUnavailable());
+		}
+
+		ctrl.isButtonStateEdit = () =>
+		{
+			return ctrl.buttonState() === ctrl.buttonStates.edit;
+		}
+		ctrl.isButtonStateInvite = () =>
+		{
+			return ctrl.buttonState() === ctrl.buttonStates.invite;
+		}
+		ctrl.isButtonStateUnavailable = () =>
+		{
+			return ctrl.buttonState() === ctrl.buttonStates.unavailable;
+		}
+
+		ctrl.buttonState = () =>
+		{
+			if (ctrl.isConfirmed)
+			{
+				return ctrl.buttonStates.edit;
+			}
+			else if (ctrl.hasEmail() && ctrl.integrationsList.length > 0)
+			{
+				return ctrl.buttonStates.invite;
+			}
+			else
+			{
+				return ctrl.buttonStates.unavailable;
+			}
 		}
 
 		ctrl.onClick = () =>
 		{
-			if (ctrl.isConfirmed)
+			if (ctrl.isButtonStateEdit())
 			{
 				ctrl.openPatientModal();
 			}
-			else
+			else if (ctrl.isButtonStateInvite())
 			{
 				ctrl.openInviteConfirmModal();
 			}

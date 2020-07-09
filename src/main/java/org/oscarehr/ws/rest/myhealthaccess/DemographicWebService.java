@@ -23,6 +23,7 @@
 package org.oscarehr.ws.rest.myhealthaccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.validator.EmailValidator;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.dao.IntegrationDao;
@@ -39,6 +40,7 @@ import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.validation.ValidationException;
 import javax.ws.rs.GET;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
@@ -122,11 +124,15 @@ public class DemographicWebService extends AbstractServiceImpl
 		Integration integration = integrationDao.find(integrationId);
 		Demographic demographic = demographicDao.find(demographicId);
 
+		if (!isEmailValid(demographic.getEmail()))
+		{
+			throw new ValidationException("Missing or invalid patient email");
+		}
+
 		ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
 				getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
-
-
 		patientService.patientInvite(integration, loginTokenTo1.getToken(), demographic);
+
 		return RestResponse.successResponse(true);
 	}
 
@@ -139,5 +145,16 @@ public class DemographicWebService extends AbstractServiceImpl
 				getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 
 		patientService.updatePatientConnection(integration, loginTokenTo1.getToken(), demographic, rejected);
+	}
+
+	private boolean isEmailValid(String emailAddr)
+	{
+		boolean isValid = false;
+		if(emailAddr != null && !emailAddr.trim().isEmpty())
+		{
+			EmailValidator eValidator = EmailValidator.getInstance();
+			isValid = eValidator.isValid(emailAddr);
+		}
+		return isValid;
 	}
 }
