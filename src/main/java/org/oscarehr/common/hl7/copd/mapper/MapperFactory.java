@@ -35,6 +35,7 @@ import org.oscarehr.common.hl7.copd.mapper.wolf.MedicationMapperWolf;
 import org.oscarehr.common.hl7.copd.mapper.wolf.MessageMapperWolf;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 
 /**
  * constructs mappers based on import source setting.
@@ -201,12 +202,12 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new medication mapper
 	 */
-	public static MedicationMapper newMedicationMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public static MedicationMapper newMedicationMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
 		switch(importSource)
 		{
 			case WOLF:
-				return new MedicationMapperWolf(message, providerRep);
+				return new MedicationMapperWolf(message, providerRep, recordData);
 			default:
 				return new MedicationMapper(message, providerRep, importSource);
 		}

@@ -307,7 +307,7 @@ public class CoPDImportService
 			instant = printDuration(instant, "importDxData");
 
 			logger.info("Import Medications ...");
-			importMedicationData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			importMedicationData(zpdZtrMessage, i, assignedProvider, demographic, importSource, recordData);
 			instant = printDuration(instant, "importMedicationData");
 
 			logger.info("Import Pediatrics ...");
@@ -481,10 +481,11 @@ public class CoPDImportService
 		}
 	}
 
-	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource)
+	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic,
+	                                  IMPORT_SOURCE importSource, CoPDRecordData recordData)
 			throws HL7Exception
 	{
-		MedicationMapper medicationMapper = MapperFactory.newMedicationMapper(zpdZtrMessage, providerRep, importSource);
+		MedicationMapper medicationMapper = MapperFactory.newMedicationMapper(zpdZtrMessage, providerRep, importSource, recordData);
 
 		int numMedications = medicationMapper.getNumMedications();
 

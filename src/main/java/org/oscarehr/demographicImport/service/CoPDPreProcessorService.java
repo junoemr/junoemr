@@ -336,7 +336,7 @@ public class CoPDPreProcessorService
 	 */
 	private String ensureNumeric(String message, CoPDRecordData recordData)
 	{
-		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZBA, "4","31");
+		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZBA, "31");
 		message = ensureNumeric(message, recordData, Hl7Const.HL7_SEGMENT_ZQO, "4","5","6","7","8");
 		return message;
 	}
@@ -356,7 +356,7 @@ public class CoPDPreProcessorService
 	}
 	private String ensureNumericField(String message, CoPDRecordData recordData, String segment, String segmentField)
 	{
-		BiFunction<String, String, String> ensureNumericCallback = (segmentId, tagValue) ->
+		BiFunction<String, String, String> ensureNumericCallback = (setId, tagValue) ->
 		{
 			try
 			{
@@ -365,9 +365,9 @@ public class CoPDPreProcessorService
 			}
 			catch (NumberFormatException e)
 			{
-				String dataMessage = Hl7Const.getReadableSegmentName(segment + "." + segmentField) +
+				String dataMessage = Hl7Const.getReadableSegmentName(segment, segmentField) +
 						"=> Invalid numeric value of '" + tagValue + "'. Value was set to 0";
-				recordData.addObservationMessage(segmentId, dataMessage);
+				recordData.addMessage(segment, setId, dataMessage);
 				logger.warn("[" + segment + "." + segmentField + "] Replacing invalid numeric value:" + tagValue + " with: \"0\"");
 				return "0";
 			}

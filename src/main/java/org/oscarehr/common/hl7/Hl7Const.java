@@ -24,6 +24,8 @@ package org.oscarehr.common.hl7;
 
 public class Hl7Const
 {
+	public static final String HL7_GROUP_MEDS = "MEDS";
+
 	public static final String HL7_SEGMENT_TS_1 = "TS.1";
 
 	public static final String HL7_SEGMENT_XCN_1 = "XCN.1";
@@ -48,16 +50,42 @@ public class Hl7Const
 	public static final String HL7_SEGMENT_ZQO_7 = "ZQO.7";
 	public static final String HL7_SEGMENT_ZQO_8 = "ZQO.8";
 
-	public static String getReadableSegmentName(String segment)
+	public static String getReadableSegmentName(String segment, String segmentField)
 	{
+		String segmentReadableName = "";
+		String subSegmentReadableName = "";
 		switch(segment)
 		{
-			case HL7_SEGMENT_ZQO: return "Observations";
-			case HL7_SEGMENT_ZQO_4: return "Observations: Systolic Blood Pressure";
-			case HL7_SEGMENT_ZQO_5: return "Observations: Diastolic Blood Pressure";
-			case HL7_SEGMENT_ZQO_6: return "Observations: Height (in cm)";
-			case HL7_SEGMENT_ZQO_7: return "Observations: Weight (in kg)";
-			default: return "Unknown";
+			case HL7_SEGMENT_ZQO:
+			{
+				segmentReadableName = "Measurements";
+				switch(segmentField)
+				{
+					case "4": subSegmentReadableName = "Systolic Blood Pressure"; break;
+					case "5": subSegmentReadableName = "Diastolic Blood Pressure"; break;
+					case "6": subSegmentReadableName = "Height (in cm)"; break;
+					case "7": subSegmentReadableName = "Weight (in kg)"; break;
+					case "8": subSegmentReadableName = "Waist Circumference (in cm)"; break;
+				}
+				break;
+			}
+			case HL7_GROUP_MEDS:
+			{
+				segmentReadableName = "Medications";
+				break;
+			}
+			case HL7_SEGMENT_ZBA:
+			{
+				segmentReadableName = "Billing - Alberta Health & Wellness";
+				switch(segmentField)
+				{
+					case "4": subSegmentReadableName = "Facility Number"; break;
+					case "31": subSegmentReadableName = "Business Arrangement"; break;
+				}
+				break;
+			}
 		}
+
+		return segmentReadableName + (subSegmentReadableName.isEmpty() ? "" : ": " + subSegmentReadableName);
 	}
 }

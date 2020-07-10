@@ -27,24 +27,36 @@ import java.util.Date;
 
 public class CoPDRecordMessage
 {
-	private String segmentId;
+	private String segment;
+	private String setId;
 	private String messageText;
 	private Date dateTime;
 
-	CoPDRecordMessage(String segmentId, String messageText)
+	CoPDRecordMessage(String segment, String setId, String messageText)
 	{
-		this.segmentId = segmentId;
+		this.segment = segment;
+		this.setId = setId;
 		this.messageText = messageText;
 	}
 
-	public String getSegmentId()
+	public String getSegment()
 	{
-		return segmentId;
+		return segment;
 	}
 
-	public void setSegmentId(String segmentId)
+	public void setSegment(String segment)
 	{
-		this.segmentId = segmentId;
+		this.segment = segment;
+	}
+
+	public String getSetId()
+	{
+		return setId;
+	}
+
+	public void setSetId(String setId)
+	{
+		this.setId = setId;
 	}
 
 	public String getMessageText()
@@ -70,6 +82,6 @@ public class CoPDRecordMessage
 	@Override
 	public String toString()
 	{
-		return ConversionUtils.toDateString(dateTime) + "," + messageText;
+		return segment + "(" + setId + ")," + ConversionUtils.toDateString(dateTime) + "," + messageText;
 	}
 }

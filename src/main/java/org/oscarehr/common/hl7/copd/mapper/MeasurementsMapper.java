@@ -26,6 +26,7 @@ package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.hl7.Hl7Const;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.demographic.model.Demographic;
@@ -74,7 +75,7 @@ public class MeasurementsMapper extends AbstractMapper
 			String waist  = StringUtils.trimToNull(provider.getZQO(i).getZQO8_waist().getValue());
 
 			// if there is a message object corresponding to the segment id, set additional import info
-			CoPDRecordMessage recordMessage = recordData.getObservationMessage(provider.getZQO(i).getZQO1_setId().getValue());
+			CoPDRecordMessage recordMessage = recordData.getMessage(Hl7Const.HL7_SEGMENT_ZQO, provider.getZQO(i).getZQO1_setId().getValue());
 			if(recordMessage != null)
 			{
 				recordMessage.setDateTime(obsDate);

@@ -36,11 +36,11 @@ public class CoPDRecordData
 	private static final Logger logger = Logger.getLogger(CoPDRecordData.class);
 
 	private Integer demographicId;
-	private final HashMap<String, CoPDRecordMessage> observationMessages;
+	private final HashMap<String, CoPDRecordMessage> messages;
 
 	public CoPDRecordData()
 	{
-		this.observationMessages = new HashMap<>();
+		this.messages = new HashMap<>();
 	}
 
 	public Integer getDemographicId()
@@ -53,21 +53,21 @@ public class CoPDRecordData
 		this.demographicId = demographicId;
 	}
 
-	public CoPDRecordMessage getObservationMessage(String segmentId)
+	public CoPDRecordMessage getMessage(String segment, String setId)
 	{
-		return observationMessages.get(segmentId);
+		return messages.get(segment + "-" + setId);
 	}
 
-	public void addObservationMessage(String segmentId, String message)
+	public void addMessage(String segment, String setId, String message)
 	{
-		this.observationMessages.put(segmentId, new CoPDRecordMessage(segmentId, message));
+		this.messages.put(segment + "-" + setId, new CoPDRecordMessage(segment, setId, message));
 	}
 
 	public void print()
 	{
-		if(!observationMessages.isEmpty())
+		if(!messages.isEmpty())
 		{
-			for(CoPDRecordMessage message : this.observationMessages.values())
+			for(CoPDRecordMessage message : this.messages.values())
 			{
 				logger.info(getDemographicId() + "," + message.toString());
 			}

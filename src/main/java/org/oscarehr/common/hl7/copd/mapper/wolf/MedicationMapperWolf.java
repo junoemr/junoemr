@@ -23,17 +23,41 @@
 package org.oscarehr.common.hl7.copd.mapper.wolf;
 
 import ca.uhn.hl7v2.HL7Exception;
+import org.oscarehr.common.hl7.Hl7Const;
 import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
+import org.oscarehr.rx.model.Drug;
+import oscar.util.ConversionUtils;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class MedicationMapperWolf extends MedicationMapper
 {
-	public MedicationMapperWolf(ZPD_ZTR message, int providerRep)
+	private final CoPDRecordData recordData;
+	public MedicationMapperWolf(ZPD_ZTR message, int providerRep, CoPDRecordData recordData)
 	{
 		super(message, providerRep, CoPDImportService.IMPORT_SOURCE.WOLF);
+		this.recordData = recordData;
+	}
+
+	@Override
+	public Drug getDrug(int rep) throws HL7Exception
+	{
+		Drug drug = super.getDrug(rep);
+
+		if (drug.getRxDate() == null)
+		{
+			Date defaultDate = ConversionUtils.toLegacyDate(LocalDate.of(1900, 1, 1));
+			drug.setRxDate(defaultDate);
+			drug.setEndDate(defaultDate);
+			recordData.addMessage(Hl7Const.HL7_GROUP_MEDS, String.valueOf(rep),
+					"Medication missing Start Date. Set to " + ConversionUtils.toDateString(defaultDate) + "\n[" + drug.getCustomName() + "]");
+		}
+
+		return drug;
 	}
 
 	/** ORC-9 else ORC-15, else ZRX-3 */
