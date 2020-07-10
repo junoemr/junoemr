@@ -209,4 +209,73 @@ public class PreventionDao extends AbstractDao<Prevention>
 	{
 		return ext.getPrevention();
 	}
+
+	public Map<String, PreventionListData> getPreventionListData(String demographicNo)
+	{
+		return getPreventionListData(Integer.parseInt(demographicNo));
+	}
+
+	@NativeSql("preventions")
+	public Map<String, PreventionListData> getPreventionListData(Integer demographicNo)
+	{
+		String sql = "select " +
+				"  p.id,\n" +
+				"  p.prevention_type,\n" +
+				"  p.prevention_date,\n" +
+				"  p.refused,\n" +
+				"  pe_result.val as ext_result,\n" +
+				"  p_count.count as prevention_count\n" +
+				"from preventions p\n" +
+				"left join preventions p_filter\n" +
+				"    on binary p.prevention_type = binary p_filter.prevention_type\n" +
+				"    and p.demographic_no = p_filter.demographic_no\n" +
+				"    and p.deleted = p_filter.deleted\n" +
+				"    and (\n" +
+				"        p.prevention_date < p_filter.prevention_date\n" +
+				"        or (p.prevention_date = p_filter.prevention_date and p.id < p_filter.id)\n" +
+				"        )\n" +
+				"join (\n" +
+				"         select p.prevention_type, count(*) as count\n" +
+				"         from preventions p\n" +
+				"         where p.demographic_no = :demographicNo\n" +
+				"           and p.deleted = 0\n" +
+				"         group by binary p.prevention_type\n" +
+				"     ) as p_count on binary p.prevention_type = binary p_count.prevention_type\n" +
+				"left join preventionsExt pe_result on p.id = pe_result.prevention_id and pe_result.keyval = 'result'\n" +
+				"where p.demographic_no = :demographicNo\n" +
+				"and p_filter.id is null\n" +
+				"and p.deleted = 0\n";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("demographicNo", demographicNo);
+		List<Object[]> results = query.getResultList();
+
+		Map<String, PreventionListData> out = new HashMap<>();
+		for(Object[] row: results)
+		{
+			int column = 0;
+
+			PreventionListData data = new PreventionListData();
+
+			data.setPreventionId((Integer) row[column++]);
+
+			String type = (String) row[column++];
+			data.setType(type);
+
+			LocalDateTime preventionDate = null;
+			if(row[column++] != null)
+			{
+				preventionDate = ((Timestamp) row[column - 1]).toLocalDateTime();
+			}
+			data.setPreventionDate(preventionDate);
+
+			data.setRefused((Character) row[column++]);
+			data.setPreventionResult((String) row[column++]);
+			data.setPreventionCount(((BigInteger) row[column++]).intValue());
+
+			out.put(type, data);
+		}
+
+		return out;
+	}
 }
