@@ -24,8 +24,50 @@
 	<div class="col-sm-12">
 		<panel>
 			<panel-header>
-				<h6 class="d-inline-block">Appointment Queue</h6>
+				<div class="row queues-header">
+					<div class="col-md-10">
+						<h6 class="d-inline-block">Appointment Queues</h6>
+					</div>
+					<div class="col-md-2 pull-right">
+						<juno-button ng-click="$ctrl.addQueue()">Add New Queue</juno-button>
+					</div>
+				</div>
 			</panel-header>
+			<panel-body>
+				<table ng-table="$ctrl.tableParams" class="table table-striped table-bordered">
+					<tbody>
+					<tr ng-repeat="queue in $ctrl.queueList | orderBy:$ctrl.sortMode">
+						<td data-title="'Queue Name'" sortable="'name'">
+							{{queue.name}}
+						</td>
+						<td data-title="'Queue data'">
+							{{queue.data}}
+						</td>
+						<td data-title="'Actions'" class="actions-column">
+							<div class="row">
+								<div class="col-md-6">
+									<juno-button
+											title="Edit Queue"
+											component-style=" JUNO_STYLE.GREY"
+											button-color="JUNO_BUTTON_COLOR.BASE"
+											ng-click="$ctrl.editQueue(queue)">
+										<i class="icon icon-write"></i>Edit
+									</juno-button>
+								</div>
+								<div class="col-md-6">
+									<juno-button
+											title="Delete Queue"
+											button-color="JUNO_BUTTON_COLOR.BASE"
+											ng-click="$ctrl.deleteQueue(queue)">
+										<i class="icon icon-delete"></i>Delete
+									</juno-button>
+								</div>
+							</div>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</panel-body>
 		</panel>
 	</div>
 	<div class="col-sm-12 lg-margin-top">

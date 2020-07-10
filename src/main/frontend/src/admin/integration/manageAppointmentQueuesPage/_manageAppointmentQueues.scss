@@ -1,3 +1,19 @@
 .manage-appointment-queues-page-admin {
+	.panel-header {
+		.juno-button {
+			width: 128px;
+			float: right;
+		}
+	}
 
+	.panel-body {
+		padding: 0;
+		table {
+			margin-bottom: 0;
+
+			.actions-column {
+				width: 256px;
+			}
+		}
+	}
 }
