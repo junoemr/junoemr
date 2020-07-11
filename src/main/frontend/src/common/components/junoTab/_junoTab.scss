@@ -1,5 +1,4 @@
 .juno-tab {
-
 	.tab {
 		display: flex;
 		align-items: center;
@@ -7,5 +6,12 @@
 
 		width: 144px;
 		height: 100%;
+	}
+
+	&.juno-tab-swim-lane {
+		background-color: transparent !important;
+		border-color: transparent !important;
+		border-radius: 0 !important;
+		overflow: hidden;
 	}
 }

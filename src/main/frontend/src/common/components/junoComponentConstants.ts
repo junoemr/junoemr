@@ -42,4 +42,11 @@ export enum JUNO_BUTTON_COLOR
 	SECONDARY = "btn-secondary",
 	BASE = "btn-base",
 	TRANSPARENT = "btn-transparent",
+	INVISIBLE = "btn-invisible",
+}
+
+export enum JUNO_TAB_TYPE
+{
+	NORMAL = "juno-tab-normal",
+	SWIM_LANE = "juno-tab-swim-lane"
 }

@@ -1,0 +1,144 @@
+.appointment-queue {
+	margin: 0;
+
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+
+	height: 100%;
+
+	.header {
+		width: 100%;
+		height: 120px;
+		flex-shrink: 0;
+
+		.juno-tab {
+			margin: 0 8px 0 8px;
+		}
+
+		.panel-body {
+			padding: 0 16px 0 16px;
+			margin: 8px 8px 0 8px;
+
+			height: 44px;
+
+			border-style: dashed;
+			border-width: 2px;
+			border-top-width: 2px !important;
+			border-radius: 8px;
+
+			panel-body {
+				height: 100%;
+
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+
+				filter: brightness(2.2);
+
+				.text {
+					margin: 0 8px 0 8px;
+					flex-grow: 1;
+
+					font-weight: bold;
+					line-height: 1.14;
+				}
+
+				i {
+					font-size: 20px;
+
+					&.icon-reply {
+						// flip icon
+						transform: scaleX(-1);
+					}
+				}
+			}
+		}
+	}
+
+	.juno-divider {
+		margin: 2px 0 0 0;
+	}
+
+	.list {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		padding: 0 8px 0 8px;
+		overflow-y: auto;
+
+		.list-content {
+			height: 100%;
+
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+
+			overflow: hidden;
+		}
+
+		.list-footer {
+			position: fixed;
+			bottom: 0;
+			left: 0;
+
+			width: $left-aside-width;
+			height: 32px;
+
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			@include juno-font-body-smallest();
+
+			.juno-panel {
+				margin: 0 6px 0 6px;
+
+				.panel-body {
+					border-radius: 4px;
+					padding: 0;
+					margin: 0;
+
+					width: 32px;
+					height: 24px;
+
+					display: flex;
+					justify-content: center;
+					align-items: center;
+				}
+			}
+
+			juno-button {
+				flex-grow: 0;
+
+				.juno-button {
+					margin: 0;
+					width: 24px;
+					height: 24px;
+					button {
+						font-size: 16px;
+					}
+				}
+			}
+
+		}
+	}
+}
+
+@-moz-document url-prefix() {
+	//Fire Fox specific
+	.appointment-queue {
+		.header {
+			.panel-body {
+				panel-body {
+					.text {
+						// Line height adjustment. On FF line height operates differently than, on Chrome, causing "Add to my schedule"
+						// to not line up with the plus icon.
+						line-height: unset !important;
+						height: 16px;
+					}
+				}
+			}
+		}
+	}
+}

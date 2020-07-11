@@ -41,6 +41,12 @@
 		background-color: transparent;
 		color: $text-color;
 	}
+
+	&.btn-invisible {
+		border: 1px solid transparent;
+		background-color: transparent;
+		color: $text-color;
+	}
 }
 
 @mixin junoTabColor ($background-color, $selected-background-color, $border-color, $text-color)
@@ -106,6 +112,8 @@
 	align-items: baseline;
 	flex-wrap: wrap;
 
+	@include juno-font-default();
+
 	&.juno-input, &.juno-select, &.juno-typeahead,
 	&.juno-check-box, &.juno-date-select, &.juno-button {
 		input, select {
@@ -135,10 +143,13 @@
 	}
 
 	button {
-		height: 32px;
 		box-shadow: none;
 		border-radius: 4px;
 		padding: 0 4px 0 4px;
+	}
+
+	&.juno-button {
+		height: 32px;
 	}
 
 	&.juno-check-box {
@@ -199,7 +210,7 @@
 		@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-white,
 						$color-neutral-lighter-grey, $color-neutral-lighter-grey, $color-neutral-white);
 
-		&.btn-base, &.btn-transparent {
+		&.btn-base, &.btn-transparent, &.btn-invisible {
 			color: $color-neutral-darker !important;
 		}
 	}
@@ -222,6 +233,10 @@
 	@include junoPanelColor(white, $color-neutral-lighter, $color-neutral-lighter);
 
 	@include junoText($color-neutral-darker);
+}
+
+.juno-style-default-background {
+	background-color: white;
 }
 
 // ============ STYLE GREY ===============
@@ -261,7 +276,7 @@
 		@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-lightest,
 						$color-neutral-lighter-grey, $color-neutral-lighter-grey, $color-neutral-white);
 
-		&.btn-secondary, &.btn-base, &.btn-transparent {
+		&.btn-secondary, &.btn-base, &.btn-transparent, &.btn-invisible {
 			color: $color-neutral-darker;
 		}
 	}
@@ -288,6 +303,10 @@
 	}
 
 	@include junoText($color-neutral-darker);
+}
+
+.juno-style-grey-background {
+	background-color: white;
 }
 
 // ============ STYLE DRACULA ===============

@@ -2,9 +2,17 @@
 	height: 4px;
 	width: 100%;
 
+	&.slim {
+		height: 1px;
+	}
+
 	&.horizontal {
 		height: 100%;
 		width: 4px;
+
+		&.slim {
+			width: 1px;
+		}
 	}
 }
 

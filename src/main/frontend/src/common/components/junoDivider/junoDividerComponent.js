@@ -27,7 +27,8 @@ angular.module('Common.Components').component('junoDivider', {
 	templateUrl: 'src/common/components/junoDivider/junoDivider.jsp',
 	bindings: {
 		componentStyle: "<?",
-		horizontal: "<?"
+		horizontal: "<?",
+		slim: "<?", // only 1px width
 	},
 	controller: [ function () {
 		let ctrl = this;
@@ -36,6 +37,7 @@ angular.module('Common.Components').component('junoDivider', {
 		{
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.horizontal = ctrl.horizontal || false;
+			ctrl.slim = ctrl.slim || false;
 		};
 
 		ctrl.componentClasses = () =>
@@ -45,6 +47,12 @@ angular.module('Common.Components').component('junoDivider', {
 			if (ctrl.horizontal)
 			{
 				classes.push("horizontal");
+				classes.push("horizontal-slim");
+			}
+
+			if (ctrl.slim)
+			{
+				classes.push("slim");
 			}
 
 			return classes;
