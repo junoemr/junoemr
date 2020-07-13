@@ -25,6 +25,7 @@
 
 package oscar.oscarEncounter.pageUtil;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.util.MessageResources;
 import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.dto.PreventionListData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
@@ -50,16 +52,22 @@ import oscar.util.StringUtils;
  */
 public class EctDisplayPreventionAction extends EctDisplayAction
 {
+	protected static final String COLOUR_HIGHLITE = "#FF0000";
+	protected static final String COLOUR_INELLIGIBLE = "#FF6600";
+	protected static final String COLOUR_PENDING = "#FF00FF";
+
 	private static final String cmd = "preventions";
 
 	public boolean getInfo(EctSessionBean bean, HttpServletRequest request, NavBarDisplayDAO Dao, MessageResources messages)
 	{
-		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_prevention", "r", null))
 		{
             return true; //Prevention link won't show up on new CME screen.
 		}
+
+		//String oldPrevention = .getParameter("old_preventions");
 
 		//set lefthand module heading and link
 		String winName = "prevention" + bean.demographicNo;
@@ -77,118 +85,126 @@ public class EctDisplayPreventionAction extends EctDisplayAction
 		PreventionDS pf = SpringUtils.getBean(PreventionDS.class);//PreventionDS.getInstance();
 		PreventionDao preventionDao = SpringUtils.getBean(PreventionDao.class);//PreventionDS.getInstance();
 
-		Map<String, PreventionListData>	preventionListDataMap = preventionDao.getPreventionListData(sectionParams.getDemographicNo());
+		Map<String, PreventionListData>	preventionListDataMap = preventionDao.getPreventionListData(bean.demographicNo);
 
-        try{
-            pf.getMessages(p);
-        }catch(Exception dsException){
-            return false;
-        }
+		try
+		{
+			pf.getMessages(p);
+		}
+		catch(Exception dsException)
+		{
+			return false;
+		}
 
-        //now we list prevention modules as items
-        PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
-        ArrayList<HashMap<String,String>> prevList = pdc.getPreventions();
-        Map warningTable = p.getWarningMsgs();
-
-
-
-        String highliteColour = "#FF0000";
-        String inelligibleColour = "#FF6600";
-        String pendingColour = "#FF00FF";
+		//now we list prevention modules as items
+		PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
+		ArrayList<HashMap<String,String>> prevList = pdc.getPreventions();
+		Map warningTable = p.getWarningMsgs();
 
 
 
-
-
-        Date date = null;
-        //Date defaultDate = new Date(System.currentTimeMillis());
         url += "; return false;";
         ArrayList<NavBarDisplayDAO.Item> warnings = new ArrayList<NavBarDisplayDAO.Item>();
         ArrayList<NavBarDisplayDAO.Item> items = new ArrayList<NavBarDisplayDAO.Item>();
-        String result;
         for (int i = 0 ; i < prevList.size(); i++)
-        {
-            HashMap<String,String> h = prevList.get(i);
-            String prevName = h.get("name");
+		{
+			/*
+			HashMap<String, String> h = prevList.get(i);
+			String prevName = h.get("name");
 
-            PreventionListData preventionListData = preventionListDataMap.get(prevName);
+			PreventionListData preventionListData = preventionListDataMap.get(prevName);
 
-            int preventionCount = 0;
-            if(preventionListData != null)
-            {
-                preventionCount = preventionListData.getPreventionCount();
-            }
-
-
-            //ArrayList<Map<String,Object>> alist = PreventionData.getPreventionData(loggedInInfo, prevName, Integer.valueOf(demographicNo));
-
-            // alist - list of prevention details
-            // What is read:
-            // - alist.size()
-            // - last record (most recent)
-            //   - id
-            //   - prevention_date_asDate
-            //   - refused
-            // - last record ext
-            //   - result
+			int preventionCount = 0;
+			if (preventionListData != null)
+			{
+				preventionCount = preventionListData.getPreventionCount();
+			}
 
 
-            // Ignore, integrator
-            //Date demographicDateOfBirth=PreventionData.getDemographicDateOfBirth(loggedInInfo, Integer.valueOf(demographicNo));
-            //PreventionData.addRemotePreventions(loggedInInfo, alist, Integer.valueOf(demographicNo),prevName,demographicDateOfBirth);
+			//ArrayList<Map<String,Object>> alist = PreventionData.getPreventionData(loggedInInfo, prevName, Integer.valueOf(demographicNo));
 
-            // Does a few things
-            // - Checks if it's hidden (this can be loaded before and checked quicker)
-            //    - property table, hide_prevention_item key
-            //    - Only hides if there are no preventions (alist.size() > 0)
-            // - Shows if it has more than the min threshold (showIfMinRecordNum)
-            // - Show if it meets the age requirements (based on min/max age being defined)
-            // - Show if there are no ages set but sex matches
-
-
-            boolean show = pdc.display(sectionParams.getLoggedInInfo(), h, demographic, preventionCount);
-
-            if(show)
-            {
-                if( preventionCount > 0 )
-                {
-                    sectionNote.setUpdateDate(preventionListData.getPreventionDate());
-
-                    if(
-                            preventionListData.getRefused() != null &&
-                                    preventionListData.getRefused().equals('2')
-                    )
-                    {
-                        sectionNote.setColour(COLOUR_INELLIGIBLE);
-                    }
-                    else if(
-                            preventionListData.getPreventionResult() != null &&
-                                    preventionListData.getPreventionResult().equalsIgnoreCase("pending")
-                    )
-                    {
-                        sectionNote.setColour(COLOUR_PENDING);
-                    }
-                }
-
-                String title = StringUtils.maxLenString(h.get("name"),  MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-                sectionNote.setText(title);
-                sectionNote.setOnClick(onClickString);
-
-                //if there's a warning associated with this prevention set item apart
-                if( warningTable.containsKey(prevName) )
-                {
-                    sectionNote.setColour(COLOUR_HIGHLITE);
-                    warnings.add(sectionNote);
-                }
-                else
-                {
-                    items.add(sectionNote);
-                }
-            }
+			// alist - list of prevention details
+			// What is read:
+			// - alist.size()
+			// - last record (most recent)
+			//   - id
+			//   - prevention_date_asDate
+			//   - refused
+			// - last record ext
+			//   - result
 
 
+			// Ignore, integrator
+			//Date demographicDateOfBirth=PreventionData.getDemographicDateOfBirth(loggedInInfo, Integer.valueOf(demographicNo));
+			//PreventionData.addRemotePreventions(loggedInInfo, alist, Integer.valueOf(demographicNo),prevName,demographicDateOfBirth);
 
-            NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
+			// Does a few things
+			// - Checks if it's hidden (this can be loaded before and checked quicker)
+			//    - property table, hide_prevention_item key
+			//    - Only hides if there are no preventions (alist.size() > 0)
+			// - Shows if it has more than the min threshold (showIfMinRecordNum)
+			// - Show if it meets the age requirements (based on min/max age being defined)
+			// - Show if there are no ages set but sex matches
+
+
+			boolean show = pdc.display(loggedInInfo, h, bean.demographicNo, preventionCount);
+
+			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
+			if (show)
+			{
+				if (preventionCount > 0)
+				{
+					//sectionNote.setUpdateDate(preventionListData.getPreventionDate());
+					Date itemDate = Date.from(preventionListData.getPreventionDate().atZone(ZoneId.systemDefault()).toInstant());
+					item.setDate(itemDate);
+
+					if (
+							preventionListData.getRefused() != null &&
+									preventionListData.getRefused().equals('2')
+					)
+					{
+						//sectionNote.setColour(COLOUR_INELLIGIBLE);
+						item.setColour(COLOUR_INELLIGIBLE);
+					} else if (
+							preventionListData.getPreventionResult() != null &&
+									preventionListData.getPreventionResult().equalsIgnoreCase(
+											"pending")
+					)
+					{
+						//sectionNote.setColour(COLOUR_PENDING);
+						item.setColour(COLOUR_PENDING);
+					}
+				}
+
+				String title = StringUtils.maxLenString(
+						h.get("name"),
+						MAX_LEN_TITLE,
+						CROP_LEN_TITLE,
+						ELLIPSES
+				);
+				//sectionNote.setText(title);
+				//sectionNote.setOnClick(onClickString);
+				item.setTitle(title);
+				item.setURL(url);
+
+				//if there's a warning associated with this prevention set item apart
+				if (warningTable.containsKey(prevName))
+				{
+					//sectionNote.setColour(COLOUR_HIGHLITE);
+					item.setColour(COLOUR_HIGHLITE);
+					warnings.add(item);
+				} else
+				{
+					items.add(item);
+				}
+			}
+
+			 */
+
+			Date date = null;
+			String result;
+
+			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
             HashMap<String,String> h = prevList.get(i);
             String prevName = h.get("name");
             ArrayList<Map<String,Object>> alist = PreventionData.getPreventionData(loggedInInfo, prevName, Integer.valueOf(bean.demographicNo));
@@ -212,10 +228,10 @@ public class EctDisplayPreventionAction extends EctDisplayAction
                     item.setDate(date);
 
                     if( hdata.get("refused") != null && hdata.get("refused").equals("2") ) {
-                        item.setColour(inelligibleColour);
+                        item.setColour(COLOUR_INELLIGIBLE);
                     }
                     else if( result != null && result.equalsIgnoreCase("pending") ) {
-                        item.setColour(pendingColour);
+                        item.setColour(COLOUR_PENDING);
                     }
                 }
                 else {
@@ -229,28 +245,33 @@ public class EctDisplayPreventionAction extends EctDisplayAction
 
                 //if there's a warning associated with this prevention set item apart
                 if( warningTable.containsKey(prevName) ){
-                    item.setColour(highliteColour);
+                    item.setColour(COLOUR_HIGHLITE);
                     warnings.add(item);
                 }
                 else {
                     items.add(item);
                 }
             }
-        }
 
-        //sort items without warnings chronologically
-        Dao.sortItems(items, NavBarDisplayDAO.DATESORT_ASC);
+		}
 
-        //add warnings to Dao array first so they will be at top of list
-        for(int idx = 0; idx < warnings.size(); ++idx )
-            Dao.addItem(warnings.get(idx));
+		//sort items without warnings chronologically
+		Dao.sortItems(items, NavBarDisplayDAO.DATESORT_ASC);
 
-        //now copy remaining sorted items
-        for(int idx = 0; idx < items.size(); ++idx)
-            Dao.addItem(items.get(idx));
+		//add warnings to Dao array first so they will be at top of list
+		for(int idx = 0; idx < warnings.size(); ++idx)
+		{
+			Dao.addItem(warnings.get(idx));
+		}
 
-        return true;
-   }
+		//now copy remaining sorted items
+		for(int idx = 0; idx < items.size(); ++idx)
+		{
+			Dao.addItem(items.get(idx));
+		}
+
+		return true;
+	}
 
     public String getCmd()
     {
