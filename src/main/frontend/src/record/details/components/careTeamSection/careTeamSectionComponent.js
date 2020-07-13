@@ -80,26 +80,6 @@ angular.module('Record.Details').component('careTeamSection', {
 					function success(data)
 					{
 						ctrl.rosterStatusList = data;
-						ctrl.rosterStatusList.unshift(
-								{
-									"value": "FS",
-									"label": "FS - fee for service"
-								});
-						ctrl.rosterStatusList.unshift(
-								{
-									"value": "TE",
-									"label": "TE - terminated"
-								});
-						ctrl.rosterStatusList.unshift(
-								{
-									"value": "NR",
-									"label": "NR - not rostered"
-								});
-						ctrl.rosterStatusList.unshift(
-								{
-									"value": "RO",
-									"label": "RO - rostered"
-								});
 					}
 			);
 
@@ -107,31 +87,6 @@ angular.module('Record.Details').component('careTeamSection', {
 					function success(data)
 					{
 						ctrl.patientStatusList = data;
-						ctrl.patientStatusList.unshift(
-								{
-									"value": "FI",
-									"label": "FI - Fired"
-								});
-						ctrl.patientStatusList.unshift(
-								{
-									"value": "MO",
-									"label": "MO - Moved"
-								});
-						ctrl.patientStatusList.unshift(
-								{
-									"value": "DE",
-									"label": "DE - Deceased"
-								});
-						ctrl.patientStatusList.unshift(
-								{
-									"value": "IN",
-									"label": "IN - Inactive"
-								});
-						ctrl.patientStatusList.unshift(
-								{
-									"value": "AC",
-									"label": "AC - Active"
-								});
 					}
 			);
 		}

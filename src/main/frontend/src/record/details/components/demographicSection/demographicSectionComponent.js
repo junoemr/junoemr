@@ -43,11 +43,7 @@ angular.module('Record.Details').component('demographicSection', {
 			ctrl.languages =  staticDataService.getEngFre();
 			ctrl.titles = staticDataService.getTitles();
 			ctrl.titles.push({"label": "--", "value": ''})
-			ctrl.aboriginalStatuses = [
-				{label: "Yes", value: "Yes"},
-				{label: "No", value: "No"},
-				{label: "Select Aboriginal status", value: ""}
-			]
+			ctrl.aboriginalStatuses = staticDataService.getAboriginalStatuses();
 			ctrl.countries = staticDataService.getCountries();
 
 			// a list displaying the connected MHA sites.

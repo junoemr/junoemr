@@ -90,11 +90,12 @@ Juno.Validations.validationFieldRequired = function(obj, field, ...validationFun
 {
 	return function validationFunction ()
 	{
-		if (!obj[field])
+		let value = Juno.Validations.getAttribute(obj, field);
+		if (!value)
 		{
 			return false;
 		}
-		if (typeof (obj[field]) === "string" && obj[field].length === 0)
+		if (typeof (value) === "string" && value.length === 0)
 		{
 			return false;
 		}
@@ -114,11 +115,12 @@ Juno.Validations.validationFieldBlankOrOther = function(obj, field, ...validatio
 {
 	return function validationFunction ()
 	{
-		if (!obj[field])
+		let value = Juno.Validations.getAttribute(obj, field);
+		if (!value)
 		{
 			return true;
 		}
-		if (typeof (obj[field]) === "string" && obj[field].length === 0)
+		if (typeof (value) === "string" && value.length === 0)
 		{
 			return true;
 		}
@@ -133,11 +135,12 @@ Juno.Validations.validationFieldNumber = function(obj, field, ...validationFunc)
 {
 	return function validationFunction ()
 	{
-		if (!obj[field])
+		let value = Juno.Validations.getAttribute(obj, field);
+		if (!value)
 		{
 			return false;
 		}
-		if (isNaN(obj[field]))
+		if (isNaN(value))
 		{
 			return false;
 		}
@@ -152,7 +155,9 @@ Juno.Validations.validationFieldsEqual = function(obj0, field0, obj1, field1, ..
 {
 	return function validationFunction ()
 	{
-		if (obj0[field0] !== obj1[field1])
+		let value0 = Juno.Validations.getAttribute(obj0, field0);
+		let value1 = Juno.Validations.getAttribute(obj1, field1);
+		if (value0 !== value1)
 		{
 			return false;
 		}
@@ -161,14 +166,42 @@ Juno.Validations.validationFieldsEqual = function(obj0, field0, obj1, field1, ..
 	}
 };
 
+/**
+ * get the value of the attribute from object, denoted by attributeString
+ * @param obj - the object containing the attribute you wish to access
+ * @param attributeString - a string indicating the attribute like "attr" or "foo.bar"
+ */
+Juno.Validations.getAttribute = (obj, attributeString) =>
+{
+	let currObj = obj;
+	let splitAttributes = attributeString.split(".");
+	for (let attr of splitAttributes)
+	{
+		currObj = currObj[attr];
+		if (currObj === undefined)
+		{
+			break;
+		}
+	}
+	return currObj;
+}
+
+Juno.Validations.validationCustom = function (customValidationFunc, ...validationFunc)
+{
+	return () =>
+	{
+		return Juno.Validations.validationFieldsChain(...[customValidationFunc, ...validationFunc]);
+	}
+}
 
 Juno.Validations.validationPassword = function (obj, field, ...validationFunc)
 {
 	return function validationFunction ()
 	{
-		if (!obj[field] ||
-				obj[field].length < 8 ||
-				!obj[field].match(".*[^a-zA-Z].*")// must contain a number
+		let value = Juno.Validations.getAttribute(obj, field);
+		if (!value ||
+				value.length < 8 ||
+				!value.match(".*[^a-zA-Z].*")// must contain a number
 		)
 		{
 			return false;
@@ -178,10 +211,17 @@ Juno.Validations.validationPassword = function (obj, field, ...validationFunc)
 	}
 };
 
-Juno.Validations.validationCustom = function (customValidationFunc, ...validationFunc)
+Juno.Validations.validationEmail = function (obj, field, ...validationFunc)
 {
-	return () =>
+	return function validationFunction ()
 	{
-		return Juno.Validations.validationFieldsChain(...[customValidationFunc, ...validationFunc]);
+		let value = Juno.Validations.getAttribute(obj, field);
+		// valid if undefined, blank or matches regex
+		if (value && (value === "" || !value.match(/^[^@]+@[^.]+\.[^.]+$/)))
+		{
+			return false;
+		}
+
+		return Juno.Validations.validationFieldsChain(...validationFunc);
 	}
-}
+};
