@@ -22,6 +22,7 @@
  */
 package integration.tests.util.junoUtil;
 
+import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.data.ProviderTestData;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.demographic.model.Demographic;
@@ -34,7 +35,7 @@ import org.oscarehr.util.SpringUtils;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import static integration.tests.util.junoUtil.ProviderTestCollection.providerLNames;
+import static integration.tests.util.data.ProviderTestCollection.providerLNames;
 
 public class DatabaseUtil
 {

@@ -26,7 +26,7 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.PatientTestData;
 import integration.tests.util.junoUtil.Navigation;
-import integration.tests.util.junoUtil.PatientTestCollection;
+import integration.tests.util.data.PatientTestCollection;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.BeforeClass;
@@ -40,7 +40,7 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static integration.tests.util.junoUtil.PatientTestCollection.patientLNames;
+import static integration.tests.util.data.PatientTestCollection.patientLNames;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByIndex;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 

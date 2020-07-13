@@ -26,7 +26,7 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.ProviderTestData;
 import integration.tests.util.junoUtil.Navigation;
-import integration.tests.util.junoUtil.ProviderTestCollection;
+import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.BeforeClass;
