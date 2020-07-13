@@ -66,13 +66,14 @@ Juno.Common.Util.pad0 = function pad0(n) {
 
 // if the date is a single digit add a zero in front. if it is 3 or more and
 // has a leading zero remove it.
-Juno.Common.Util.padDateWithZero = function pad0(n) {
-	let s = Juno.Common.Util.pad0(n);
-	if (s.length > 2)
+Juno.Common.Util.padDateWithZero = (dateNumber) =>
+{
+	let zeroPaddedDateString = Juno.Common.Util.pad0(dateNumber);
+	if (zeroPaddedDateString.length > 2)
 	{
-		s = s.substring(1);
+		zeroPaddedDateString = zeroPaddedDateString.substring(1);
 	}
-	return s;
+	return zeroPaddedDateString;
 };
 
 

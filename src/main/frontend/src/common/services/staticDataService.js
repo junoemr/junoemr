@@ -4871,6 +4871,25 @@ angular.module("Common.Services").service("staticDataService", [
 			return levels;
 		};
 
+		service.getAboriginalStatuses = () =>
+		{
+			return [
+				{label: "Yes", value: "Yes"},
+				{label: "No", value: "No"},
+				{label: "Select Aboriginal status", value: ""}
+			]
+		};
+
+		service.getArchivedChartOptions = () =>
+		{
+			return [
+				{label: "--", value: ""},
+				{label: "No", value: "NO"},
+				{label: "Yes", value: "YES"},
+			]
+		}
+
 		return service;
 	}
+
 ]);

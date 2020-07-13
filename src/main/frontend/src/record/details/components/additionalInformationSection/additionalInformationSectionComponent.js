@@ -36,11 +36,7 @@ angular.module('Record.Details').component('additionalInformationSection', {
 		$scope.LABEL_POSITION = LABEL_POSITION;
 		ctrl.waitingListNames = [];
 
-		ctrl.archivedChartOptions = [
-			{label: "--", value: ""},
-			{label: "No", value: "NO"},
-			{label: "Yes", value: "YES"},
-		]
+		ctrl.archivedChartOptions = staticDataService.getArchivedChartOptions();
 		ctrl.securityQuestions = staticDataService.getSecurityQuestions();
 		ctrl.securityQuestions.unshift({label: "--", value: null});
 		ctrl.rxInteractionLevels = staticDataService.getRxInteractionLevels();
