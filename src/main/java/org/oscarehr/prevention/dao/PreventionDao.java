@@ -24,14 +24,20 @@ package org.oscarehr.prevention.dao;
 
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.prevention.dto.PreventionListData;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.model.PreventionExt;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
+import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository("dao.preventionDao")
 @Transactional
