@@ -25,7 +25,7 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
-import integration.tests.util.junoUtil.ProviderCollection;
+import integration.tests.util.junoUtil.ProviderTestCollection;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -69,20 +69,22 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 			if (code.getAttribute("value").equals(valueExpected))
 			{
 				match = true;
-				return match;
+				break;
 			}
 		}
 		return match;
 	}
 
-	public static void setDailySchedule(int intervali, int intervalj, int intervalk, int intervall, int intervalm, int tr, String templateCode)
+	public static void setDailySchedule(int numHours, int numSlotsPerHour, int startingCell, int numCellsPerHour,
+										int apptDuration, int durationSelected, int tr, String templateCode)
 	{
-		for (int i = 0; i < intervali; i++)
+		for (int i = 0; i < numHours; i++)
 		{
-			for (int j = 0; j < intervalj; j++)
+			for (int j = 0; j < numSlotsPerHour; j++)
 			{
+				int inputPosition = startingCell + i * numCellsPerHour + j * (apptDuration / durationSelected);
 				driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[" + tr +
-						"]/td[" + (intervalk+i*intervall+j*intervalm) + "]/input")).sendKeys(templateCode);
+						"]/td[" + inputPosition + "]/input")).sendKeys(templateCode);
 			}
 		}
 	}
@@ -104,10 +106,8 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		}
 
 		// open administration panel
-		Thread.sleep(2000);
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
 		driver.findElement(By.xpath(".//a[contains(.,'Schedule Management')]")).click();
 		driver.findElement(By.xpath(".//a[contains(.,'Schedule Setting')]")).click();
 		driver.switchTo().frame("myFrame");
@@ -159,12 +159,12 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General");
 		driver.findElement(By.xpath("//input[@name='summary']")).sendKeys("15 mins duration");
 		//15 mins duration 9-12
-		setDailySchedule(3, 4, 7, 5, 1, 3,"1");
+		setDailySchedule(3, 4, 7, 5, 15, 15,3,"1");
 		//30 mins breaks 12-12:30
 		driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[4]/td[2]/input")).sendKeys("b");
 		driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[4]/td[4]/input")).sendKeys("b");
 		//15 mins duration 13-15
-		setDailySchedule(3, 4, 7, 5, 1, 4, "1");
+		setDailySchedule(3, 4, 7, 5, 15, 15,4, "1");
 		driver.findElement(By.xpath("//input[@value='Save']")).click();
 		Assert.assertTrue("Template for public is NOT added successfully.", isTemplateInDropdownOpions(By.xpath("//select[@name='name']"), "P:General"));
 
@@ -188,14 +188,14 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 
 		//Template Setting for Dr. Apple
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='providerid']"), ProviderCollection.providerMap.get(ProviderCollection.providerLNames[0]).getProviderNo());
+		dropdownSelectByValue(driver, By.xpath("//select[@name='providerid']"), ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]).providerNo);
 		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles);
 		dropdownSelectByValue(driver, By.xpath("//select[@name='step1']"), "5");
 		driver.findElement(By.xpath("//input[@value='Go']")).click();
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("Tue/Thur Schedule");
 		driver.findElement(By.xpath("//input[@name='summary']")).sendKeys("Tue/Thur Combination");
 		//5 mins duration 9-10
-		setDailySchedule(1, 12, 15, 1, 1, 3, "5");
+		setDailySchedule(1, 12, 15, 1, 5, 5, 3, "5");
 		//30 mins break 12-12:30
 		driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[4]/td[2]/input")).sendKeys("b");
 		//45 mins duration 12:30-14:00
@@ -204,7 +204,7 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		//15 mins duration 10-11
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		js.executeScript("window.scrollBy(document.body.scrollWidth, 0)");
-		setDailySchedule(1, 4, 28, 1, 3, 3, "1");
+		setDailySchedule(1, 4, 28, 1, 15, 5, 3, "1");
 		//60 mins duration 11-12
 		driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[3]/td[41]/input")).sendKeys("6");
 		driver.findElement(By.xpath("//input[@value='Save']")).click();
@@ -214,7 +214,7 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 
 		//Set from Provider - Dr. Apple
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), ProviderCollection.providerMap.get(ProviderCollection.providerLNames[0]).getProviderNo());
+		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]).providerNo);
 		LocalDate currentDate = LocalDate.now();
 		String month = Integer.toString(currentDate.getMonthValue());
 		String year = Integer.toString(currentDate.getYear());
