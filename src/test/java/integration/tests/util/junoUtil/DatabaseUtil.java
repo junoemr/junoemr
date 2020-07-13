@@ -22,6 +22,7 @@
  */
 package integration.tests.util.junoUtil;
 
+import integration.tests.util.data.ProviderTestData;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
@@ -33,7 +34,7 @@ import org.oscarehr.util.SpringUtils;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import static integration.tests.util.junoUtil.ProviderCollection.providerLNames;
+import static integration.tests.util.junoUtil.ProviderTestCollection.providerLNames;
 
 public class DatabaseUtil
 {
@@ -53,10 +54,10 @@ public class DatabaseUtil
 		for (String provider : providerLNames)
 		{
 			ProviderData demoProvider = new ProviderData();
-			Provider dr = ProviderCollection.providerMap.get(provider);
-			demoProvider.setProviderNo(Integer.parseInt(dr.getProviderNo()));
-			demoProvider.setFirstName(dr.getFirstName());
-			demoProvider.setLastName(dr.getLastName());
+			ProviderTestData dr = ProviderTestCollection.providerMap.get(provider);
+			demoProvider.setProviderNo(Integer.parseInt(dr.providerNo));
+			demoProvider.setFirstName(dr.firstName);
+			demoProvider.setLastName(dr.lastName);
 			providerService.addNewProvider(AuthUtils.TEST_PROVIDER_ID, demoProvider, null);
 		}
 	}

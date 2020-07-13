@@ -24,9 +24,9 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.data.PatientTestData;
 import integration.tests.util.junoUtil.Navigation;
-import integration.tests.util.junoUtil.Patient;
-import integration.tests.util.junoUtil.PatientCollection;
+import integration.tests.util.junoUtil.PatientTestCollection;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.BeforeClass;
@@ -36,8 +36,11 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+
 import java.io.IOException;
 import java.sql.SQLException;
+
+import static integration.tests.util.junoUtil.PatientTestCollection.patientLNames;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByIndex;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 
@@ -70,65 +73,62 @@ public class AddPatientsTests extends SeleniumTestBase
 			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
 		}
 		// open patient search page
-		Thread.sleep(2000);
 		driver.findElement((By.xpath("//a[@title=\"Search for patient records\"]"))).click();
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
 
 		// Add a demographic record page
 		driver.findElement(By.xpath(".//a[contains(@href,'demographiccontrol')]")).click();
-		Thread.sleep(2000);
 
 		//Patient p = PatientCollection.patients.get(0);
-		Patient mom = PatientCollection.patientMap.get("Momlastname");
-		driver.findElement(By.id("last_name")).sendKeys(mom.getLastName());
-		driver.findElement(By.id("first_name")).sendKeys(mom.getFirstName());
-		dropdownSelectByValue(driver, By.id("official_lang"), mom.getLanguage());
-		dropdownSelectByValue(driver, By.id("title"), mom.getTitle());
-		dropdownSelectByValue(driver, By.xpath("//select[@name='spoken_lang']"), mom.getSpoken());
-		driver.findElement(By.id("address")).sendKeys(mom.getAddress());
-		driver.findElement(By.id("city")).sendKeys(mom.getCity());
-		dropdownSelectByValue(driver, By.id("province"), mom.getProvince());
-		driver.findElement(By.id("postal")).sendKeys(mom.getPostal());
-		driver.findElement(By.id("phone")).sendKeys(mom.getHomePhone());
-		driver.findElement(By.id("hPhoneExt")).sendKeys(mom.getHomePhoneExt());
-		driver.findElement(By.xpath("//input[@name='phone2']")).sendKeys(mom.getWorkPhone());
-		driver.findElement(By.xpath("//input[@name='wPhoneExt']")).sendKeys(mom.getWorkPhoneExt());
-		driver.findElement(By.xpath("//input[@name='demo_cell']")).sendKeys(mom.getCellPhone());
-		driver.findElement(By.xpath("//textarea[@name='phoneComment']")).sendKeys(mom.getPhoneComment());
-		dropdownSelectByValue(driver, By.xpath("//select[@name='newsletter']"), mom.getNewsletter());
-		dropdownSelectByValue(driver, By.xpath("//select[@name='aboriginal']"), mom.getAboriginal());
-		driver.findElement(By.id("email")).sendKeys(mom.getEmail());
-		driver.findElement(By.xpath("//input[@name='myOscarUserName']")).sendKeys(mom.getPhrUserName());
-		driver.findElement(By.id("year_of_birth")).sendKeys(mom.getDobYear());
-		driver.findElement(By.id("month_of_birth")).sendKeys(mom.getDobMonth());
-		driver.findElement(By.id("date_of_birth")).sendKeys(mom.getDobDate());
-		dropdownSelectByValue(driver, By.id("sex"), mom.getSex());
-		driver.findElement(By.id("hin")).sendKeys(mom.getHin());
-		driver.findElement(By.id("eff_date_year")).sendKeys(mom.getEffYear());
-		driver.findElement(By.id("eff_date_month")).sendKeys(mom.getEffMonth());
-		driver.findElement(By.id("eff_date_date")).sendKeys(mom.getEffDate());
-		driver.findElement(By.id("hc_type")).sendKeys(mom.getHcType());
-		driver.findElement(By.id("hc_renew_date_year")).sendKeys(mom.getHcRenewYear());
-		driver.findElement(By.id("hc_renew_date_month")).sendKeys(mom.getHcRenewMonth());
-		driver.findElement(By.id("hc_renew_date_date")).sendKeys(mom.getHcRenewDate());
-		dropdownSelectByValue(driver, By.id("countryOfOrigin"), mom.getCountryOfOrigin());
-		driver.findElement(By.xpath("//input[@name='sin']")).sendKeys(mom.getSin());
-		driver.findElement(By.xpath("//input[@name='cytolNum']")).sendKeys(mom.getCytology());
-		driver.findElement(By.id("nameOfMother")).sendKeys(mom.getMotherName());
-		driver.findElement(By.id("nameOfFather")).sendKeys(mom.getFatherName());
+		PatientTestData mom = PatientTestCollection.patientMap.get(patientLNames[0]);
+		driver.findElement(By.id("last_name")).sendKeys(mom.lastName);
+		driver.findElement(By.id("first_name")).sendKeys(mom.firstName);
+		dropdownSelectByValue(driver, By.id("official_lang"), mom.language);
+		dropdownSelectByValue(driver, By.id("title"), mom.title);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='spoken_lang']"), mom.spoken);
+		driver.findElement(By.id("address")).sendKeys(mom.address);
+		driver.findElement(By.id("city")).sendKeys(mom.city);
+		dropdownSelectByValue(driver, By.id("province"), mom.province);
+		driver.findElement(By.id("postal")).sendKeys(mom.postal);
+		driver.findElement(By.id("phone")).sendKeys(mom.homePhone);
+		driver.findElement(By.id("hPhoneExt")).sendKeys(mom.homePhoneExt);
+		driver.findElement(By.xpath("//input[@name='phone2']")).sendKeys(mom.workPhone);
+		driver.findElement(By.xpath("//input[@name='wPhoneExt']")).sendKeys(mom.workPhoneExt);
+		driver.findElement(By.xpath("//input[@name='demo_cell']")).sendKeys(mom.cellPhone);
+		driver.findElement(By.xpath("//textarea[@name='phoneComment']")).sendKeys(mom.phoneComment);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='newsletter']"), mom.newsletter);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='aboriginal']"), mom.aboriginal);
+		driver.findElement(By.id("email")).sendKeys(mom.email);
+		driver.findElement(By.xpath("//input[@name='myOscarUserName']")).sendKeys(mom.phrUserName);
+		driver.findElement(By.id("year_of_birth")).sendKeys(mom.dobYear);
+		driver.findElement(By.id("month_of_birth")).sendKeys(mom.dobMonth);
+		driver.findElement(By.id("date_of_birth")).sendKeys(mom.dobDate);
+		dropdownSelectByValue(driver, By.id("sex"), mom.sex);
+		driver.findElement(By.id("hin")).sendKeys(mom.hin);
+		driver.findElement(By.id("eff_date_year")).sendKeys(mom.effYear);
+		driver.findElement(By.id("eff_date_month")).sendKeys(mom.effMonth);
+		driver.findElement(By.id("eff_date_date")).sendKeys(mom.effDate);
+		driver.findElement(By.id("hc_type")).sendKeys(mom.hcType);
+		driver.findElement(By.id("hc_renew_date_year")).sendKeys(mom.hcRenewYear);
+		driver.findElement(By.id("hc_renew_date_month")).sendKeys(mom.hcRenewMonth);
+		driver.findElement(By.id("hc_renew_date_date")).sendKeys(mom.hcRenewDate);
+		dropdownSelectByValue(driver, By.id("countryOfOrigin"), mom.countryOfOrigin);
+		driver.findElement(By.xpath("//input[@name='sin']")).sendKeys(mom.sin);
+		driver.findElement(By.xpath("//input[@name='cytolNum']")).sendKeys(mom.cytology);
+		driver.findElement(By.id("nameOfMother")).sendKeys(mom.motherName);
+		driver.findElement(By.id("nameOfFather")).sendKeys(mom.fatherName);
 		dropdownSelectByIndex(driver, By.xpath("//select[@name='staff']"), 1);
 		dropdownSelectByIndex(driver, By.xpath("//select[@name='cust1']"), 0);
 		dropdownSelectByIndex(driver, By.xpath("//select[@name='cust4']"), 0);
 		dropdownSelectByIndex(driver, By.xpath("//select[@name='cust2']"), 0);
-		driver.findElement(By.xpath("//input[@name='referral_doctor_name']")).sendKeys(mom.getReferralDoctor());
-		driver.findElement(By.xpath("//input[@name='referral_doctor_no']")).sendKeys(mom.getReferralDoctorNo());
-		dropdownSelectByValue(driver, By.id("roster_status"), mom.getRosterStatus());
-		driver.findElement(By.xpath("//input[@name='roster_date_year']")).sendKeys(mom.getRosteredYear());
-		driver.findElement(By.xpath("//input[@name='roster_date_month']")).sendKeys(mom.getRosteredMonth());
-		driver.findElement(By.xpath("//input[@name='roster_date_date']")).sendKeys(mom.getRosteredDate());
-		dropdownSelectByValue(driver, By.id("patient_status"), mom.getPatientStatus());
-		driver.findElement(By.id("chart_no")).sendKeys(mom.getChartNo());
+		driver.findElement(By.xpath("//input[@name='referral_doctor_name']")).sendKeys(mom.referralDoctor);
+		driver.findElement(By.xpath("//input[@name='referral_doctor_no']")).sendKeys(mom.referralDoctorNo);
+		dropdownSelectByValue(driver, By.id("roster_status"), mom.rosterStatus);
+		driver.findElement(By.xpath("//input[@name='roster_date_year']")).sendKeys(mom.rosteredYear);
+		driver.findElement(By.xpath("//input[@name='roster_date_month']")).sendKeys(mom.rosteredMonth);
+		driver.findElement(By.xpath("//input[@name='roster_date_date']")).sendKeys(mom.rosteredDate);
+		dropdownSelectByValue(driver, By.id("patient_status"), mom.patientStatus);
+		driver.findElement(By.id("chart_no")).sendKeys(mom.chartNo);
 		dropdownSelectByIndex(driver, By.id("name_list_id"), 0);
 		driver.findElement(By.id("waiting_list_note")).sendKeys("Waiting List Note");
 		driver.findElement(By.id("waiting_list_referral_date")).sendKeys("2020-06-06");
@@ -136,10 +136,9 @@ public class AddPatientsTests extends SeleniumTestBase
 		driver.findElement(By.id("cust3")).sendKeys("Alert Note");
 		driver.findElement(By.id("content")).sendKeys("Notes");
 		driver.findElement(By.id("btnAddRecord")).click();
-		Thread.sleep(1000);
 
 		Assert.assertNotNull(driver.findElement(By.xpath(".//h2[contains(.,'Successful Addition of a Demographic Record.')]")));
-		Assert.assertTrue(isPatientAdded(mom.getLastName(), mom.getFirstName(),
+		Assert.assertTrue(isPatientAdded(mom.lastName, mom.firstName,
 				By.xpath("//a[contains(.,'Back to Demographic Search Page')]"),
 				By.xpath("//input[@class='wideInput']"),
 				By.xpath("//tr[@class='odd']")));
@@ -151,29 +150,25 @@ public class AddPatientsTests extends SeleniumTestBase
 		// login
 		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
 		// open patient search page
-		Thread.sleep(2000);
 		driver.findElement((By.xpath("//a[@title=\"Search for patient records\"]"))).click();
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
 
 		// Add a demographic record page
 		driver.findElement(By.xpath(".//a[contains(@href,'demographicaddrecordcustom')]")).click();
-		Thread.sleep(2000);
-		Patient dad = PatientCollection.patientMap.get("Dadlastname");
-		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(dad.getLastName());
-		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(dad.getFirstName());
-		driver.findElement(By.xpath("//input[@name='year_of_birth']")).sendKeys(dad.getDobYear());
-		dropdownSelectByValue(driver, By.xpath("//select[@name='month_of_birth']"), dad.getDobMonth());
-		dropdownSelectByValue(driver, By.xpath("//select[@name='date_of_birth']"), dad.getDobDate());
-		dropdownSelectByValue(driver, By.xpath("//select[@name='sex']"), dad.getSex());
-		driver.findElement(By.xpath("//input[@name='hin']")).sendKeys(dad.getHin());
-		dropdownSelectByValue(driver, By.xpath("//select[@name='patient_status']"), dad.getPatientStatus());
+		PatientTestData dad = PatientTestCollection.patientMap.get(patientLNames[1]);
+		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(dad.lastName);
+		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(dad.firstName);
+		driver.findElement(By.xpath("//input[@name='year_of_birth']")).sendKeys(dad.dobYear);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='month_of_birth']"), dad.dobMonth);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='date_of_birth']"), dad.dobDate);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='sex']"), dad.sex);
+		driver.findElement(By.xpath("//input[@name='hin']")).sendKeys(dad.hin);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='patient_status']"), dad.patientStatus);
 		dropdownSelectByIndex(driver, By.xpath("//select[@name='staff']"), 0);
 		driver.findElement(By.xpath("//input[@name='submit']")).click();
-		Thread.sleep(1000);
 
 		Assert.assertNotNull(driver.findElement(By.xpath(".//h2[contains(.,'Successful Addition of a Demographic Record.')]")));
-		Assert.assertTrue(isPatientAdded(dad.getLastName(), dad.getFirstName(),
+		Assert.assertTrue(isPatientAdded(dad.lastName, dad.firstName,
 				By.xpath("//a[contains(.,'Back to Demographic Search Page')]"),
 				By.xpath("//input[@class='wideInput']"),
 				By.xpath("//tr[@class='odd']")));
@@ -184,33 +179,29 @@ public class AddPatientsTests extends SeleniumTestBase
 	{
 		// login
 		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
-		Thread.sleep(2000);
 
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
-		Thread.sleep(2000);
 
 		// Add a demographic record page
 		driver.findElement(By.xpath("//button[@title=\"Add a new Patient\"]")).click();
-		Thread.sleep(2000);
 
-		Patient son = PatientCollection.patientMap.get("Sonlastname");
-		driver.findElement(By.id("input-lastName")).sendKeys(son.getLastName());
-		driver.findElement(By.id("input-firstName")).sendKeys(son.getFirstName());
-		dropdownSelectByValue(driver, By.id("input-gender"), "string:" + son.getSex());
-		driver.findElement(By.id("input-dob")).sendKeys(son.getDobYear() + "-" + son.getDobMonth() + "-" + son.getDobDate());
-		driver.findElement(By.id("input-hin")).sendKeys(son.getHin());
-		dropdownSelectByValue(driver, By.id("input-hcType"), "string:" + son.getHcType());
-		driver.findElement(By.id("input-address")).sendKeys(son.getAddress());
-		driver.findElement(By.id("input-city")).sendKeys(son.getCity());
-		dropdownSelectByValue(driver, By.id("input-province"), "string:" + son.getProvince());
-		driver.findElement(By.id("input-postal-code")).sendKeys(son.getPostal());
-		driver.findElement(By.id("input-email")).sendKeys(son.getEmail());
-		driver.findElement(By.id("input-phone")).sendKeys(son.getHomePhone());
+		PatientTestData son = PatientTestCollection.patientMap.get(patientLNames[2]);
+		driver.findElement(By.id("input-lastName")).sendKeys(son.lastName);
+		driver.findElement(By.id("input-firstName")).sendKeys(son.firstName);
+		dropdownSelectByValue(driver, By.id("input-gender"), "string:" + son.sex);
+		driver.findElement(By.id("input-dob")).sendKeys(son.dobYear + "-" + son.dobMonth + "-" + son.dobDate);
+		driver.findElement(By.id("input-hin")).sendKeys(son.hin);
+		dropdownSelectByValue(driver, By.id("input-hcType"), "string:" + son.hcType);
+		driver.findElement(By.id("input-address")).sendKeys(son.address);
+		driver.findElement(By.id("input-city")).sendKeys(son.city);
+		dropdownSelectByValue(driver, By.id("input-province"), "string:" + son.province);
+		driver.findElement(By.id("input-postal-code")).sendKeys(son.postal);
+		driver.findElement(By.id("input-email")).sendKeys(son.email);
+		driver.findElement(By.id("input-phone")).sendKeys(son.homePhone);
 		driver.findElement(By.xpath("//button[contains(., 'Add')]")).click();
-		Thread.sleep(1000);
 
-		Assert.assertTrue(isPatientAdded(son.getLastName(), son.getFirstName(),
+		Assert.assertTrue(isPatientAdded(son.lastName, son.firstName,
 				By.xpath("//button[@title='Search']"),
 				By.xpath("//input[@placeholder='Search Term']"),
 				By.xpath("//tr[@class='ng-scope']")));

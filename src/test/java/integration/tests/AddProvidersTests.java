@@ -24,9 +24,9 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.data.ProviderTestData;
 import integration.tests.util.junoUtil.Navigation;
-import integration.tests.util.junoUtil.Provider;
-import integration.tests.util.junoUtil.ProviderCollection;
+import integration.tests.util.junoUtil.ProviderTestCollection;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.BeforeClass;
@@ -36,8 +36,10 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+
 import java.io.IOException;
 import java.sql.SQLException;
+
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByIndex;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 
@@ -57,54 +59,48 @@ public class AddProvidersTests extends SeleniumTestBase {
 			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
 		}
 		// open administration panel
-		Thread.sleep(2000);
 		driver.findElement(By.id("admin-panel")).click();
-		Thread.sleep(2000);
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
 
 		// Add a provider record page
 		driver.findElement(By.xpath(".//h5[contains(.,'Add a Provider Record')]")).click();
-		Thread.sleep(1000);
-		Provider drApple = ProviderCollection.providerMap.get(ProviderCollection.providerLNames[0]);
+		ProviderTestData drApple = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]);
 		driver.switchTo().frame("myFrame");
 		driver.findElement(By.xpath("//input[@value='Suggest']")).click();
 		driver.findElement(By.xpath("//input[@name='provider_no']")).clear();
-		driver.findElement(By.xpath("//input[@name='provider_no']")).sendKeys(drApple.getProviderNo());
-		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(drApple.getLastName());
-		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(drApple.getFirstName());
-		dropdownSelectByValue(driver, By.id("provider_type"), drApple.getType());
-		driver.findElement(By.xpath("//input[@name='specialty']")).sendKeys(drApple.getSpecialty());
-		driver.findElement(By.xpath("//input[@name='team']")).sendKeys(drApple.getTeam());
-		dropdownSelectByValue(driver, By.id("sex"), drApple.getSex());
-		driver.findElement(By.xpath("//input[@name='dob']")).sendKeys(drApple.getDob());
-		driver.findElement(By.xpath("//input[@name='address']")).sendKeys(drApple.getAddress());
-		driver.findElement(By.xpath("//input[@name='phone']")).sendKeys(drApple.getHomePhone());
-		driver.findElement(By.xpath("//input[@name='workphone']")).sendKeys(drApple.getWorkPhone());
-		driver.findElement(By.xpath("//input[@name='email']")).sendKeys(drApple.getEmail());
-		driver.findElement(By.xpath("//input[@name='xml_p_pager']")).sendKeys(drApple.getPager());
-		driver.findElement(By.xpath("//input[@name='xml_p_cell']")).sendKeys(drApple.getCell());
+		driver.findElement(By.xpath("//input[@name='provider_no']")).sendKeys(drApple.providerNo);
+		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(drApple.lastName);
+		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(drApple.firstName);
+		dropdownSelectByValue(driver, By.id("provider_type"), drApple.type);
+		driver.findElement(By.xpath("//input[@name='specialty']")).sendKeys(drApple.specialty);
+		driver.findElement(By.xpath("//input[@name='team']")).sendKeys(drApple.team);
+		dropdownSelectByValue(driver, By.id("sex"), drApple.sex);
+		driver.findElement(By.xpath("//input[@name='dob']")).sendKeys(drApple.dob);
+		driver.findElement(By.xpath("//input[@name='address']")).sendKeys(drApple.address);
+		driver.findElement(By.xpath("//input[@name='phone']")).sendKeys(drApple.homePhone);
+		driver.findElement(By.xpath("//input[@name='workphone']")).sendKeys(drApple.workPhone);
+		driver.findElement(By.xpath("//input[@name='email']")).sendKeys(drApple.email);
+		driver.findElement(By.xpath("//input[@name='xml_p_pager']")).sendKeys(drApple.pager);
+		driver.findElement(By.xpath("//input[@name='xml_p_cell']")).sendKeys(drApple.cell);
 
 		//Scroll the web page till end.
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		js.executeScript("window.scrollBy(0,document.body.scrollHeight)");
-		driver.findElement(By.xpath("//input[@name='xml_p_phone2']")).sendKeys(drApple.getOtherPhone());
-		driver.findElement(By.xpath("//input[@name='xml_p_fax']")).sendKeys(drApple.getFax());
-		driver.findElement(By.xpath("//input[@name='ohip_no']")).sendKeys(drApple.getMspNo());
-		driver.findElement(By.xpath("//input[@name='rma_no']")).sendKeys(drApple.getThirdPartyBillinNo());
-		driver.findElement(By.xpath("//input[@name='billing_no']")).sendKeys(drApple.getBillingNo());
-		driver.findElement(By.xpath("//input[@name='hso_no']")).sendKeys(drApple.getAlternateBillingNo());
-		driver.findElement(By.xpath("//input[@name='alberta_e_delivery_ids']")).sendKeys(drApple.getIhaProviderMnemonic());
-		driver.findElement(By.xpath("//input[@name='xml_p_specialty_code']")).sendKeys(drApple.getSpecialtyCodeNo());
-		driver.findElement(By.xpath("//input[@name='xml_p_billinggroup_no']")).sendKeys(drApple.getGroupBillingNo());
-		driver.findElement(By.xpath("//input[@name='practitionerNo']")).sendKeys(drApple.getCpsidNo());
+		driver.findElement(By.xpath("//input[@name='xml_p_phone2']")).sendKeys(drApple.otherPhone);
+		driver.findElement(By.xpath("//input[@name='xml_p_fax']")).sendKeys(drApple.fax);
+		driver.findElement(By.xpath("//input[@name='ohip_no']")).sendKeys(drApple.mspNo);
+		driver.findElement(By.xpath("//input[@name='rma_no']")).sendKeys(drApple.thirdPartyBillinNo);
+		driver.findElement(By.xpath("//input[@name='billing_no']")).sendKeys(drApple.billingNo);
+		driver.findElement(By.xpath("//input[@name='hso_no']")).sendKeys(drApple.alternateBillingNo);
+		driver.findElement(By.xpath("//input[@name='alberta_e_delivery_ids']")).sendKeys(drApple.ihaProviderMnemonic);
+		driver.findElement(By.xpath("//input[@name='xml_p_specialty_code']")).sendKeys(drApple.specialtyCodeNo);
+		driver.findElement(By.xpath("//input[@name='xml_p_billinggroup_no']")).sendKeys(drApple.groupBillingNo);
+		driver.findElement(By.xpath("//input[@name='practitionerNo']")).sendKeys(drApple.cpsidNo);
 		dropdownSelectByIndex(driver, By.xpath("//select[@name='billcenter']"), 0);//dropdown empty
-		driver.findElement(By.xpath("//input[@name='xml_p_slpusername']")).sendKeys(drApple.getSelfLearningUsername());
-		driver.findElement(By.xpath("//input[@name='xml_p_slppassword']")).sendKeys(drApple.getSelfLearningPassword());
-		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), drApple.getStatus());
+		driver.findElement(By.xpath("//input[@name='xml_p_slpusername']")).sendKeys(drApple.selfLearningUsername);
+		driver.findElement(By.xpath("//input[@name='xml_p_slppassword']")).sendKeys(drApple.selfLearningPassword);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), drApple.status);
 		driver.findElement(By.xpath("//input[@name='submitbtn']")).click();
-		Thread.sleep(1000);
-
 		Assert.assertNotNull(driver.findElement(By.xpath(".//h1[contains(.,'Successful Addition of a Provider Record.')]")));
 
 		driver.switchTo().defaultContent();
@@ -113,11 +109,11 @@ public class AddProvidersTests extends SeleniumTestBase {
 		Thread.sleep(1000);
 		driver.switchTo().frame("myFrame");
 		driver.findElement(By.xpath("//input[@value='search_providerno']")).click();
-		driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(drApple.getProviderNo());
+		driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(drApple.providerNo);
 		driver.findElement(By.xpath("//input[@name='button']")).click();
 		WebElement providerAdded = driver.findElement(By.xpath("html/body/center/center/table/tbody/tr[2]/td[3]"));
 		String providerAddedLName = providerAdded.getText();
-		Assert.assertEquals(drApple.getLastName(), providerAddedLName);
+		Assert.assertEquals(drApple.lastName, providerAddedLName);
 	}
 }
 
