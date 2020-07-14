@@ -298,7 +298,8 @@ public class Appointment
 						isSelfBooked,
 						false,
 						details.isVirtual(),
-						null
+						null,
+						details.isConfirmed()
 				);
 				// for the case where appointments are saved with a name but no demographic
 				if((appointment.getDemographicNo() == null || appointment.getDemographicNo() == 0) && details.getName() != null)

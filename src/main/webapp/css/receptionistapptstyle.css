@@ -174,6 +174,7 @@ p {
     border-collapse: collapse;
     border: 2px ridge #777777;
 }
+
 #providerSchedule td.noGrid { border:none; }
 
 .scheduleTime00, .scheduleTimeNot00{
@@ -218,3 +219,49 @@ p {
 #helpLink {
 	color: #A40000;
 }
+
+.self-booked {
+	position: relative;
+	display: flex;
+	float: right;
+	margin-right: 2px;
+}
+
+.self-booked .self-booked-marker {
+	width: 14px;
+	height: 14px;
+	background-color: white;
+	border: 1px solid gray;
+	border-radius: 50%;
+}
+
+.self-booked .confirmation-marker {
+	width: 6px;
+	height: 6px;
+	background-color: white;
+	border: 1px solid gray;
+	border-radius: 50%;
+	margin-top: 1px;
+	margin-left: 2px;
+}
+
+.self-booked .confirmation-marker.confirmed_true {
+	background-color: #151515;
+	border-color: #151515;
+}
+
+.self-booked .tooltip {
+	position: absolute;
+	display: none;
+	top: -32px;
+	right: 0;
+	color: white;
+	background-color: rgba(0,0,0,0.8);
+	padding: 8px;
+	pointer-events: none;
+}
+
+.self-booked .tooltip-trigger:hover > .tooltip {
+	display: block;
+}
+

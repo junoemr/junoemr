@@ -630,6 +630,7 @@ private long getAppointmentRowSpan(
 	<script type="text/javascript" src="../phr/phr.js"></script>
 
 	<script src="<c:out value="../js/jquery.js"/>"></script>
+
 	<script>
 		jQuery.noConflict();
 	</script>
@@ -2069,7 +2070,31 @@ private long getAppointmentRowSpan(
 
 															</c:if>
 														</c:if>
-														</font></td>
+														</font>
+
+														<c:if test="${appointmentInfo.selfBooked}">
+															<div class="self-booked">
+																<div class="self-booked-marker tooltip-trigger">
+																	<span class="tooltip">
+																		<bean:message key="provider.appointmentProviderAdminDay.titleSelfBooked"/>
+																	</span>
+																</div>
+																<div class="confirmation-marker tooltip-trigger confirmed_${appointmentInfo.confirmed}">
+																	<span class="tooltip">
+																		<c:choose>
+																			<c:when test="${appointmentInfo.confirmed}">
+																				<bean:message key="provider.appointmentProviderAdminDay.titleConfirmed"/>
+																			</c:when>
+																			<c:otherwise>
+																				<bean:message key="provider.appointmentProviderAdminDay.titleNotConfirmed"/>
+																			</c:otherwise>
+																		</c:choose>
+																	</span>
+																</div>
+															</div>
+														</c:if>
+
+														</td>
 													</c:otherwise>
 												</c:choose>
 
