@@ -1392,7 +1392,15 @@
 	<script type="text/javascript">
 		var loc = document.forms['EDITAPPT'].location;
 		if (loc.nodeName.toUpperCase() === 'SELECT') loc.style.backgroundColor = loc.options[loc.selectedIndex].style.backgroundColor;
-
+		<%
+			String demographicEmail = "";
+			Demographic demographic = demographicManager.getDemographic(loggedInInfo, demono);
+			if (demographic != null)
+			{
+				demographicEmail = StringUtils.trimToEmpty(demographic.getEmail());
+			}
+		%>
+		var demographicEmail = '<%=demographicEmail%>';
 		var mhaAppointment = null;
 
 		function updateTelehealthControls()
@@ -1402,14 +1410,11 @@
 					"<%=request.getParameter("appointment_no")%>").then((res) =>
 			{
 				var appt = JSON.parse(res).body;
-				if (appt && appt.appointmentType === "ONE_TIME_LINK")
+				mhaAppointment = appt;
+
+				if (appt != null || demographicEmail !== '')
 				{
 					jQuery("#send-telehealth-link-btn").css("display", "inherit");
-					mhaAppointment = appt;
-				}
-				else
-				{
-					jQuery("#send-telehealth-link-btn").css("display", "none");
 				}
 			}).catch((error) =>
 			{
@@ -1446,16 +1451,30 @@
 				{
 					if (mhaAppointment)
 					{
-						myhealthaccess.sendAppointmentOneTimeLinkNotification("<%=request.getContextPath()%>",
+						myhealthaccess.sendTelehealthAppointmentNotification("<%=request.getContextPath()%>",
 								jQuery(document.forms.EDITAPPT.location).val(), mhaAppointment).then(() =>
 						{
 							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
 							window.setTimeout(() => {
-								jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0")
+								jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
 							}, 3000);
 						}).catch((err) =>
 						{
-							jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0")
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
+						});
+					}
+					else
+					{// non mha appt
+						myhealthaccess.sendGeneralAppointmentNotification("<%=request.getContextPath()%>",
+								jQuery(document.forms.EDITAPPT.location).val(), "<%=request.getParameter("appointment_no")%>").then(() =>
+						{
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
+							window.setTimeout(() => {
+								jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
+							}, 3000);
+						}).catch((err) =>
+						{
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
 						});
 					}
 				});

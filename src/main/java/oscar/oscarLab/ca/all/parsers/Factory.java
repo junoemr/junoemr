@@ -69,7 +69,7 @@ public final class Factory {
 
 	private static Logger logger = MiscUtils.getLogger();
 
-	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS", "CCLAB", "CCENDO", "CCCARDIOLOGY", "CCIMAGING", "CCDOC","CLS","CLSDI", JunoGenericLabHandler.LAB_TYPE_VALUE);
+	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS", "CCLAB", "CCENDO", "CCCARDIOLOGY", "CCIMAGING", "CCDOC","CLS","CLSDI", "EI", JunoGenericLabHandler.LAB_TYPE_VALUE);
 
 	private Factory() {
 		// static methods no need for instance
@@ -224,6 +224,8 @@ public final class Factory {
 				handler = new ConnectCareLabHandler(msg);
 			else if(CLSHandler.handlerTypeMatch(msg))
 				handler = new CLSHandler(msg);
+			else if(EIHandler.handlerTypeMatch(msg))
+				handler = new EIHandler(msg);
 			else if(CLSDIHandler.handlerTypeMatch(msg))
 				handler = new CLSDIHandler(msg);
 			else if(SunquestHandler.handlerTypeMatch(msg))
