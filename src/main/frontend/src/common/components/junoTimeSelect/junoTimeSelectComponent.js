@@ -23,38 +23,85 @@
 
 import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
 
-angular.module('Common.Components').component('junoSelect', {
-	templateUrl: 'src/common/components/junoSelect/junoSelect.jsp',
+angular.module('Common.Components').component('junoTimeSelect', {
+	templateUrl: 'src/common/components/junoTimeSelect/junoTimeSelect.jsp',
 	bindings: {
 		ngModel: "=",
-		options: "<",
-		change: "<?",
-		placeholder: "@?",
 		label: "@?",
 		labelPosition: "<?",
 		componentStyle: "<?",
+		change: "<?",
 	},
-	controller: [
-		'$timeout',
-		function ($timeout) {
+	controller: ["$scope", function ($scope)
+	{
 		let ctrl = this;
+
+		ctrl.hour = null;
+		ctrl.minute = null;
+		ctrl.amPm = "AM";
+
+		ctrl.hourOptions = [];
+		ctrl.minuteOptions = [];
+		ctrl.amPmOptions = [];
 
 		ctrl.$onInit = () =>
 		{
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+
+			for(let i=0; i<12; i++)
+			{
+				ctrl.hourOptions.push({value: (i + 1) % 12, label: i+1});
+			}
+			for(let i=0; i<60; i++)
+			{
+				ctrl.minuteOptions.push({value: i, label: Juno.Common.Util.pad0(i)});
+			}
+			ctrl.amPmOptions = [
+				{
+					value: "AM",
+					label: "AM",
+				},
+				{
+					value: "PM",
+					label: "PM",
+				},
+			];
+
+			ctrl.updateDateFields();
 		};
 
-		ctrl.onChange = () =>
+		ctrl.updateDateFields = () =>
 		{
-			// use timeout to execute after the model has been updated
-			$timeout(function()
+			if (ctrl.ngModel && ctrl.ngModel.isValid())
 			{
+				const hour24 = ctrl.ngModel.hour();
+				ctrl.hour = ((hour24) % 12);
+				ctrl.minute = ctrl.ngModel.minute();
+				ctrl.amPm = (hour24 >= 12) ? "PM" : "AM";
+			}
+		}
+
+		ctrl.onTimeChange = () =>
+		{
+			// clone current moment model
+			let date = moment(ctrl.ngModel);
+			date.minute(ctrl.minute);
+			date.second(0);
+			date.hour((ctrl.amPm === "AM") ? ctrl.hour : ctrl.hour + 12);
+
+			if (date.isValid())
+			{
+				ctrl.ngModel = date;
+
+				//TODO remove
+				console.info("updated date", Juno.Common.Util.formatMomentDateTimeNoTimezone(date));
+
 				if (ctrl.change)
 				{
-					ctrl.change();
+					ctrl.change(ctrl.ngModel);
 				}
-			});
+			}
 		}
 
 		ctrl.labelClasses = () =>

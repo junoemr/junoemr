@@ -240,6 +240,7 @@ module.exports = {
 			'./src/common/components/junoSelect/junoSelectComponent.js',
 			'./src/common/components/junoTab/junoTabComponent.js',
 			'./src/common/components/junoDateSelect/junoDateSelectComponent.js',
+			'./src/common/components/junoTimeSelect/junoTimeSelectComponent.js',
 			'./src/common/components/junoDivider/junoDividerComponent.js',
 			'./src/common/components/loadingIndicatorComponent.js',
 			'./src/common/components/zeroStateDisplayComponent.js',
@@ -251,6 +252,7 @@ module.exports = {
 			'./src/common/modals/junoAlert/junoAlertComponent.js',
 			'./src/common/modals/junoInputModal/junoInputModalComponent.js',
 			'./src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModalComponent.js',
+			'./src/common/modals/appointmentQueueModal/appointmentQueueModalComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',

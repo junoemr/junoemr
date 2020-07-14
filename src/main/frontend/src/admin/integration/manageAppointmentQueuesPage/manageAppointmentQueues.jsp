@@ -21,7 +21,7 @@
 * Canada
 --%>
 <div class="manage-appointment-queues-page-admin">
-	<div class="col-sm-12">
+	<div class="col-sm-12 queues-table-panel">
 		<panel>
 			<panel-header>
 				<div class="row queues-header">
@@ -40,8 +40,8 @@
 						<td data-title="'Queue Name'" sortable="'name'">
 							{{queue.name}}
 						</td>
-						<td data-title="'Queue data'">
-							{{queue.data}}
+						<td data-title="'Queue size limit'">
+							{{queue.limit}}
 						</td>
 						<td data-title="'Actions'" class="actions-column">
 							<div class="row">
@@ -70,7 +70,47 @@
 			</panel-body>
 		</panel>
 	</div>
-	<div class="col-sm-12 lg-margin-top">
 
+	<div class="col-sm-12 on-demand-settings-panel" ng-if="$ctrl.onDemandBookingEnabled">
+		<panel>
+			<panel-header>
+				<div class="row queues-header">
+					<div class="col-md-12">
+						<h6 class="d-inline-block">On Demand Booking Settings</h6>
+					</div>
+				</div>
+			</panel-header>
+			<panel-body>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="row">
+							<div class="col-md-12">
+								<juno-select
+										label="Assigned On Demand Booking Queue"
+										ng-model="$ctrl.onDemandAssignedQueue"
+										options="$ctrl.onDemandQueueSelectOptions"
+								>
+								</juno-select>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="row time-selection-row" ng-repeat="day in $ctrl.onDemandQueueHours">
+							<div class="col-md-4">
+								<label>{{day.name}}</label>
+							</div>
+							<div class="col-md-4">
+								<juno-time-select ng-model="day.start">
+								</juno-time-select>
+							</div>
+							<div class="col-md-4">
+								<juno-time-select ng-model="day.end">
+								</juno-time-select>
+							</div>
+						</div>
+					</div>
+				</div>
+			</panel-body>
+		</panel>
 	</div>
 </div>

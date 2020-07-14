@@ -1,19 +1,35 @@
 .manage-appointment-queues-page-admin {
-	.panel-header {
-		.juno-button {
-			width: 128px;
-			float: right;
+	.queues-table-panel {
+		.panel-header {
+			.juno-button {
+				width: 128px;
+				float: right;
+			}
 		}
-	}
 
-	.panel-body {
-		padding: 0;
-		table {
-			margin-bottom: 0;
+		.panel-body {
+			padding: 0;
+			table {
+				margin-bottom: 0;
 
-			.actions-column {
-				width: 256px;
+				.actions-column {
+					width: 256px;
+				}
 			}
 		}
 	}
+	.on-demand-settings-panel {
+		padding-top:12px;
+
+		.panel-body {
+			padding: 0;
+
+			.time-selection-row {
+				padding: 4px 0;
+				display: flex;
+				align-items: center;
+			}
+		}
+	}
+
 }
