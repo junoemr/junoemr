@@ -35,7 +35,10 @@ import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
+import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.provider.model.ProviderData;
@@ -47,7 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
@@ -55,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Deprecated
 @Service
 @Transactional
 public class AppointmentManager {
@@ -79,6 +82,8 @@ public class AppointmentManager {
 	private IntegrationService integrationService;
 	@Autowired
 	private PatientService patientService;
+	@Autowired
+	private ClinicService clinicService;
 
 	public List<Appointment> getAppointmentHistoryWithoutDeleted(LoggedInInfo loggedInInfo, Integer demographicNo, Integer offset, Integer limit) {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "r", null)) {
@@ -148,7 +153,7 @@ public class AppointmentManager {
 	 * @param loggedInInfo
 	 * @param appointment - appointment data
 	 */
-	public Appointment addAppointment(LoggedInInfo loggedInInfo, Appointment appointment) {
+	public Appointment addAppointment(LoggedInInfo loggedInInfo, Appointment appointment, boolean sendNotification) {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
 			throw new RuntimeException("Access Denied");
 		}
@@ -164,49 +169,16 @@ public class AppointmentManager {
 
 		appointmentDao.persist(appointment);
 
-		return appointment;
-	}
-
-	/**
-	 * add a new telehealth appointment.
-	 * @param loggedInInfo - logged in info
-	 * @param appointment - the appointment to add
-	 * @param sendNotification - if true notification of appointment will be sent to patient
-	 * @return
-	 */
-	public Appointment addTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, Boolean sendNotification) {
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_appointment");
-
-		if (!appointment.getIsVirtual())
-		{
-			throw new IllegalArgumentException("Cannot book telehealth appointment. Appointment is not virtual");
-		}
-
-		// Set automatic information
-		appointment.setCreator(loggedInInfo.getLoggedInProviderNo());
-		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
-		appointment.setCreateDateTime(new Date());
-		appointment.setUpdateDateTime(new Date());
-		appointment.setReasonCode(Appointment.DEFAULT_REASON_CODE);
-
-		// Subtract a minute
-
-		appointmentDao.persist(appointment);
-
-		// book telehealth appointment in MHA
-		String siteName = null;
-		if (OscarProperties.getInstance().isMultisiteEnabled())
-		{
-			siteName = appointment.getLocation();
-		}
-
-		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), integrationService.findMhaIntegration(siteName)))
-		{
-			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
-		}
-		else
-		{
-			appointmentService.bookOneTimeTelehealthAppointment(loggedInInfo, appointment, sendNotification);
+		if (sendNotification)
+		{// send booking notification through MHA
+			Integration integration = integrationService.findMhaIntegration(appointment);
+			if (integration != null)
+			{
+				ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
+						loggedInInfo.getLoggedInSecurity().getSecurityNo());
+				appointmentService.sendGeneralAppointmentNotification(integration, loginTokenTo1.getToken(),
+						appointment.getId());
+			}
 		}
 
 		return appointment;
@@ -220,14 +192,14 @@ public class AppointmentManager {
 		}
 		ArrayList<Appointment> appointments = new ArrayList<>(dateList.size());
 
-		appointment = addAppointment(loggedInInfo, appointment);
+		appointment = addAppointment(loggedInInfo, appointment, false);
 		appointments.add(appointment);
 
 		for(Date date : dateList)
 		{
 			Appointment appointmentCopy = new Appointment(appointment);
 			appointmentCopy.setAppointmentDate(date);
-			appointmentCopy = addAppointment(loggedInInfo, appointmentCopy);
+			appointmentCopy = addAppointment(loggedInInfo, appointmentCopy, false);
 			appointments.add(appointmentCopy);
 		}
 
