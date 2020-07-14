@@ -40,9 +40,9 @@ import javax.persistence.TemporalType;
 import java.util.Date;
 
 @Entity
-@Table(name="integration_push_appointment_update")
+@Table(name="integration_push_update")
 @Where(clause="deleted_at IS NULL")
-public class IntegrationPushAppointmentUpdate extends AbstractModel<Integer>
+public class IntegrationPushUpdate extends AbstractModel<Integer>
 {
 	public enum PUSH_STATUS
 	{
@@ -51,19 +51,29 @@ public class IntegrationPushAppointmentUpdate extends AbstractModel<Integer>
 		ERROR,
 	}
 
+	public enum UPDATE_TYPE
+	{
+		APPOINTMENT_CACHE,
+		PATIENT_CONNECTION,
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Integer id;
 
-	@Column(name = "appointment_id")
-	private String appointmentId;
+	@Column(name = "update_type")
+	@Enumerated(EnumType.STRING)
+	private UPDATE_TYPE updateType;
 
 	@Column(name = "integration_type")
 	private String integrationType;
 
 	@Column(name = "integration_id")
 	private Integer integrationId;
+
+	@Column(name = "security_no")
+	private Integer securityNo;
 
 	@Column(name = "created_at")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -97,14 +107,14 @@ public class IntegrationPushAppointmentUpdate extends AbstractModel<Integer>
 		return id;
 	}
 
-	public String getAppointmentId()
+	public UPDATE_TYPE getUpdateType()
 	{
-		return appointmentId;
+		return updateType;
 	}
 
-	public void setAppointmentId(String appointmentId)
+	public void setUpdateType(UPDATE_TYPE updateType)
 	{
-		this.appointmentId = appointmentId;
+		this.updateType = updateType;
 	}
 
 	public String getIntegrationType()
@@ -125,6 +135,16 @@ public class IntegrationPushAppointmentUpdate extends AbstractModel<Integer>
 	public void setIntegrationId(Integer integrationId)
 	{
 		this.integrationId = integrationId;
+	}
+
+	public Integer getSecurityNo()
+	{
+		return securityNo;
+	}
+
+	public void setSecurityNo(Integer securityNo)
+	{
+		this.securityNo = securityNo;
 	}
 
 	public Date getCreatedAt()

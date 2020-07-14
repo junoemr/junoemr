@@ -8,7 +8,6 @@
 				 title="{{hint}}">
 		{{title}}:
 	</label>
-
 	<div class="{{input_size}}">
 		<input type="checkbox"
 					 bs-switch

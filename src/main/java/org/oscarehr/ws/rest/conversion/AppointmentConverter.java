@@ -128,7 +128,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		}
 		else
 		{
-			appointment.setName(name);
+			appointment.setName(org.apache.commons.lang3.StringUtils.left(name, 50));
 		}
 
 
@@ -291,6 +291,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		calendarAppointment.setTagSelfCancelled(false);
 		calendarAppointment.setDoNotBook(appointment.getName().equals(Appointment.DONOTBOOK));
 		calendarAppointment.setAppointmentName(appointmentName);
+		calendarAppointment.setConfirmed(appointment.isConfirmed());
 
 		return calendarAppointment;
 	}

@@ -58,14 +58,6 @@
   String tmp_dir = op.getProperty("TMP_DIR");
   boolean tmp_dir_ready = Util.checkDir(tmp_dir);
 
-  String pgp_ready = (String)session.getAttribute("pgp_ready");
-  if (pgp_ready==null || pgp_ready.equals("No")) {
-      PGPEncrypt pgp = new PGPEncrypt();
-      if (pgp.check(tmp_dir)) pgp_ready = "Yes";
-      else pgp_ready = "No";
-  }
-  session.setAttribute("pgp_ready", pgp_ready);
-
   String demographicNo = request.getParameter("demographicNo");
   DemographicSetManager  ds = new DemographicSetManager();
   List<String> sets = ds.getDemographicSets();
@@ -274,20 +266,8 @@ if (!userRole.toLowerCase().contains("admin")) { %>
 <html:checkbox property="exAlertsAndSpecialNeeds"><bean:message key="demographic.demographicexport.alertsandspecialneeds" /></html:checkbox>                    
 
 <br>
-<html:hidden property="pgpReady" value="<%=pgp_ready%>" />
-		
-<%  boolean pgpReady = pgp_ready.equals("Yes") ? true : false;
-    pgpReady = true; //To be removed after CMS4
-    if (!pgpReady) { %>
-                   
-    <div class="alert alert-block alert-error">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-     <bean:message key="demographic.demographicexport.msgwarning" />
-    </div>
 
-<%  } %>
-
-<input class="btn btn-primary" type="submit" value="<bean:message key="export" />"<%=pgpReady?"":"disabled"%> />
+<input class="btn btn-primary" type="submit" value="<bean:message key="export" />"/>
 
 <%	if (isSharingCenterEnabled) { %>
 	<!-- Sharing Center Submission -->

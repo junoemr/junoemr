@@ -586,6 +586,7 @@ public class Demographic implements Serializable
 
 	/**
 	 * Return the value associated with the column: family_doctor
+	 * @return family doctor field if available, empty string otherwise
 	 */
 	public String getFamilyDoctor()
 	{
@@ -1569,4 +1570,13 @@ public class Demographic implements Serializable
 		return org.oscarehr.demographic.model.Demographic.isNewBorn(birthday, getVer());
 	}
 
+	/**
+	 * checks if the demographic is active. Not to be confused with "isActive"
+	 * which is completely different.
+	 * @return - true if active false otherwise.
+	 */
+	public boolean isPatientActive()
+	{
+		return !org.oscarehr.demographic.model.Demographic.getInactiveDemographicStatuses().contains(this.getPatientStatus());
+	}
 }

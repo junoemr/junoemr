@@ -31,6 +31,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -86,13 +87,14 @@ public class ViewWCBAction extends Action {
         frm.setW_gender(demographic.getSex());
         frm.setW_phone(demographic.getPhone());
         frm.setW_area(Misc.areaCode(demographic.getPhone()));
-        String[] pc = demographic.getPostal().split(" ");
 
-        String postal = "";
-        for (int i = 0; i < pc.length; i++) {  // DOES THIS JUST REMOVE SPACES???
-          postal += pc[i];
+        String postalCode = demographic.getPostal();
+        postalCode = StringUtils.deleteWhitespace(postalCode);
+
+        if (postalCode != null)
+        {
+	        frm.setW_postal(postalCode);
         }
-        frm.setW_postal(postal);
 
         frm.setW_phn(demographic.getHin());
         String seperator = "-";

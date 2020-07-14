@@ -378,7 +378,7 @@ private long getAppointmentRowSpan(
 	providerBean.clear();
 	for (Provider p : providerDao.getActiveProviders())
 	{
-	    providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
+		providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
 	}
 
 	ProviderPreference providerPreference2=(ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
@@ -630,6 +630,7 @@ private long getAppointmentRowSpan(
 	<script type="text/javascript" src="../phr/phr.js"></script>
 
 	<script src="<c:out value="../js/jquery.js"/>"></script>
+
 	<script>
 		jQuery.noConflict();
 	</script>
@@ -1392,33 +1393,45 @@ private long getAppointmentRowSpan(
 					%>
 					<td valign="top" width="<%=isWeekView(request)?100/7:100/numProvider%>%"> <!-- for the first provider's schedule -->
 
+						<%
+							int appointmentCount = 0;
+							if (showApptCountForProvider)
+							{
+								for (List<AppointmentDetails> appointmentDetailsList : schedule.getAppointments().values())
+								{
+									for (AppointmentDetails appointmentDetails : appointmentDetailsList)
+									{
+										String status = appointmentDetails.getStatus();
+
+										if (status == null)
+										{
+											appointmentCount++;
+										}
+										else if ((status.contains(Appointment.CANCELLED) && countIncludeCancelled) ||
+												(status.contains(Appointment.NO_SHOW) && countIncludeNoShow) ||
+												(appointmentDetails.getDemographicNo() == 0) && countIncludeNoDemographic)
+										{
+											appointmentCount++;
+										}
+										else if (!status.contains(Appointment.CANCELLED) &&
+												!status.contains(Appointment.NO_SHOW) &&
+												appointmentDetails.getDemographicNo() != 0)
+										{
+											appointmentCount++;
+										}
+									}
+								}
+							}
+						%>
 						<table border="0" cellpadding="0" bgcolor="#486ebd" cellspacing="0" width="100%"><!-- for the first provider's name -->
 							<tr><td class="infirmaryView" NOWRAP ALIGN="center" BGCOLOR="<%=headerColor?"#bfefff":"silver"%>">
 								<!-- caisi infirmary view extension modify ffffffffffff-->
 								<%
-								if (showApptCountForProvider) {
-									int appointmentCount = 0;
-									for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
-									{
-											for(AppointmentDetails appointmentDetails : appointmentDetailsList)
-											{
-												String status = appointmentDetails.getStatus();
-
-												if (status == null)
-                                                {
-                                                	appointmentCount++;
-                                                }
-                                                else if (countIncludeCancelled && status.contains(Appointment.CANCELLED) ||
-                                                        (countIncludeNoShow && status.contains(Appointment.NO_SHOW)) ||
-                                                        (countIncludeNoDemographic && appointmentDetails.getDemographicNo() == 0))
-                                                {
-                                                	appointmentCount++;
-                                                }
-											}
-										}
-								%>
-								<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>
-								<%
+								if (showApptCountForProvider)
+								{
+									%>
+									<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>
+									<%
 								}
 								%>
 								<logic:notEqual name="infirmaryView_isOscar" value="false">
@@ -1461,12 +1474,12 @@ private long getAppointmentRowSpan(
 								%>
 
 								<%
-          						if (notOnSchedule) {
-          						%>
+								if (notOnSchedule) {
+								%>
 									[<bean:message key="provider.appointmentProviderAdminDay.msgNotOnSched"/>]
 								<%
-          						}
-          						%>
+								}
+								%>
 									</logic:notEqual>
 									<logic:equal name="infirmaryView_isOscar" value="false">
 								<%
@@ -1479,8 +1492,8 @@ private long getAppointmentRowSpan(
 								</logic:present>
 								<logic:iterate id="pb" name="infirmaryView_programBeans" type="org.apache.struts.util.LabelValueBean">
 								<%
-						  		if (pb.getValue().equals(prID)) {
-	  							%>
+								if (pb.getValue().equals(prID)) {
+								%>
 									<b><label><%=pb.getLabel()%></label></b>
 								<%
 								}
@@ -1884,7 +1897,7 @@ private long getAppointmentRowSpan(
 																					 "../integrations/myhealthaccess.do?method=connect" +
 																					 "&demographicNo=${appointmentInfo.demographicNo}" +
 																					 "&siteName=${appointmentInfo.siteName}" +
-                                                                                     "&appt=${appointmentInfo.appointmentNo}");return false;'
+																					 "&appt=${appointmentInfo.appointmentNo}", "telehealth");return false;'
 																	 title="Telehealth">
 																		<img
 																						style="vertical-align: bottom"
@@ -2057,7 +2070,31 @@ private long getAppointmentRowSpan(
 
 															</c:if>
 														</c:if>
-														</font></td>
+														</font>
+
+														<c:if test="${appointmentInfo.selfBooked}">
+															<div class="self-booked">
+																<div class="self-booked-marker tooltip-trigger">
+																	<span class="tooltip">
+																		<bean:message key="provider.appointmentProviderAdminDay.titleSelfBooked"/>
+																	</span>
+																</div>
+																<div class="confirmation-marker tooltip-trigger confirmed_${appointmentInfo.confirmed}">
+																	<span class="tooltip">
+																		<c:choose>
+																			<c:when test="${appointmentInfo.confirmed}">
+																				<bean:message key="provider.appointmentProviderAdminDay.titleConfirmed"/>
+																			</c:when>
+																			<c:otherwise>
+																				<bean:message key="provider.appointmentProviderAdminDay.titleNotConfirmed"/>
+																			</c:otherwise>
+																		</c:choose>
+																	</span>
+																</div>
+															</div>
+														</c:if>
+
+														</td>
 													</c:otherwise>
 												</c:choose>
 
@@ -2096,26 +2133,6 @@ private long getAppointmentRowSpan(
 								<%
 								if (showApptCountForProvider)
 								{
-									int appointmentCount = 0;
-
-									for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
-									{
-										for(AppointmentDetails appointmentDetails : appointmentDetailsList)
-										{
-
-
-											/*
-											 *.Do_Not_Book type appointments shall not been count for appointment total
-											 * on the top of the schedule page
-											 */
-											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName()) == 0)
-											{
-												continue;
-											}
-
-											appointmentCount++;
-										}
-									}
 									%>
 									<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>
 									<%

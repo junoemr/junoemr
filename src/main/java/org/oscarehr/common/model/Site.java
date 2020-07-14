@@ -65,32 +65,52 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+
 	@Column(name="site_id")
 	private Integer siteId;
+
 	@Column(name="name")
 	private String name;
+
 	@Column(name="short_name")
 	private String shortName;
+
 	private String phone;
+
 	private String fax;
+
 	@Column(name="bg_color")
 	private String bgColor;
+
 	private String address;
+
 	private String city;
+
 	private String province;
+
 	private String postal;
+
 	@Column(name="providerId_from")
 	private Integer providerIdFrom;
+
 	@Column(name="providerId_to")
 	private Integer providerIdTo;
+
 	private byte status;
+
 	private Integer siteLogoId=null;
+
 	@Column(name="siteUrl", length=100)
 	private String siteUrl = "";
+
 	@Column(name="alberta_connect_care_lab_id")
 	private String albertaConnectCareLabId;
+
 	@Column(name="alberta_connect_care_department_id")
 	private String albertaConnectCareDepartmentId;
+
+	@Column(name="bc_facility_number")
+	private String bcFacilityNumber;
 
 	public String getSiteUrl() {
 		return siteUrl;
@@ -199,7 +219,11 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	}
 
 	public void setBgColor(String bgColor) {
-		this.bgColor = bgColor;
+		// Only allow valid characters associated with HTML colors, to prevent code injection
+		// eg:  "dodgerblue", "FFA4G8"
+
+		String cleaned = bgColor.replaceAll("[^A-Za-z0-9#]", "");
+		this.bgColor = cleaned;
 	}
 
 	public String getAddress() {
@@ -300,5 +324,15 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public void setAlbertaConnectCareDepartmentId(String albertaConnectCareDepartmentId)
 	{
 		this.albertaConnectCareDepartmentId = albertaConnectCareDepartmentId;
+	}
+
+	public String getBcFacilityNumber()
+	{
+		return bcFacilityNumber;
+	}
+
+	public void setBcFacilityNumber(String bcFacilityNumber)
+	{
+		this.bcFacilityNumber = bcFacilityNumber;
 	}
 }

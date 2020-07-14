@@ -34,11 +34,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.dao.ClinicDAO;
+import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.ProviderSiteDao;
+import org.oscarehr.common.dao.SiteDao;
+import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.ProviderSite;
+import org.oscarehr.common.model.ProviderSitePK;
+import org.oscarehr.common.model.Site;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidApiLimitInfoTo1;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidResultTo1;
 import org.oscarehr.integration.clinicaid.dto.PatientEligibilityDataTo1;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.util.LoggedInInfo;
 
 import org.oscarehr.util.MiscUtils;
@@ -68,6 +79,21 @@ public class ClinicaidAPIService
 	{
 		this.sessionManager = sessionManager;
 	}
+
+	@Autowired
+	private ProviderService providerService;
+
+	@Autowired
+	private ClinicDAO clinicDAO;
+
+	@Autowired
+	private OscarAppointmentDao appointmentDao;
+
+	@Autowired
+	private SiteDao siteDao;
+
+	@Autowired
+	private ProviderSiteDao provSiteDao;
 
 	private String formatEligibilityData(PatientEligibilityDataTo1 data)
 	{
@@ -339,6 +365,45 @@ public class ClinicaidAPIService
 				{
 					data.remove("service_recipient_ver");
 					data.put("guardian_health_number", data.remove("service_recipient_uli"));
+				}
+
+				ProviderData providerData = providerService.getProviderEager(provider_no);
+
+				// Default facility number
+				String facilityNumber = null;
+
+				if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
+				{
+					Integer appointmentNo = Integer.parseInt(request.getParameter("appointment_no"));
+					Appointment appointment = appointmentDao.find(appointmentNo);
+
+					// If billed from the master file, appointmentNo = 0
+					// So we just can't check for the present of the query parameter
+					if (appointment != null)
+					{
+						Site site = siteDao.findByName(appointment.getLocation());
+
+						ProviderSitePK key = new ProviderSitePK(provider_no, site.getId());
+						ProviderSite provSite = provSiteDao.find(key);
+
+						if (provSite != null && provSite.isBcBCPEligible())
+						{
+							facilityNumber = site.getBcFacilityNumber();
+						}
+					}
+				}
+				else
+				{
+					if (providerData.getBillingOpts() != null && providerData.getBillingOpts().getBcBCPEligible())
+					{
+						Clinic clinic = clinicDAO.getClinic();
+						facilityNumber = clinic.getBcFacilityNumber();
+					}
+				}
+
+				if (facilityNumber != null)
+				{
+					data.put("facility_number", StringUtils.trimToEmpty(facilityNumber));
 				}
 			}
 

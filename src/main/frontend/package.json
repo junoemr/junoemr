@@ -16,7 +16,6 @@
     "bower": "^1.8.0",
     "clean-webpack-plugin": "^0.1.19",
     "copy-webpack-plugin": "^4.5.1",
-    "cp-calendar": "git+ssh://git@git.oscarhost.ca/var/lib/git/cloudpractice/cp-calendar.git",
     "css-loader": "^0.28.11",
     "expose-loader": "^0.7.5",
     "file-loader": "^1.1.11",

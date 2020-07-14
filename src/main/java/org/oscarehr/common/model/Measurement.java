@@ -44,6 +44,8 @@ import java.util.Date;
 @Table(name = "measurements")
 public class Measurement extends AbstractModel<Integer> implements Serializable {
 
+	public static final int RESULT_LENGTH = 500;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

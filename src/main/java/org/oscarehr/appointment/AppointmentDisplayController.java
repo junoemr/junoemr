@@ -180,6 +180,11 @@ public class AppointmentDisplayController
 		return appointment.isVirtual();
 	}
 
+	public boolean isConfirmed()
+	{
+		return appointment.isConfirmed();
+	}
+
 	public boolean isMultisitesEnabled()
 	{
 		return multisitesEnabled;
