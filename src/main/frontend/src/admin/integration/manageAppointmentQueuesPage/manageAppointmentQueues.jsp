@@ -96,7 +96,11 @@
 					</div>
 					<div class="col-md-6">
 						<div class="row time-selection-row" ng-repeat="day in $ctrl.onDemandQueueHours">
-							<div class="col-md-4">
+							<div class="col-md-2">
+								<juno-check-box ng-model="day.enabled">
+								</juno-check-box>
+							</div>
+							<div class="col-md-2">
 								<label>{{day.name}}</label>
 							</div>
 							<div class="col-md-4">

@@ -104,19 +104,16 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 							id: 1,
 							name: "Queue name 1",
 							limit: 25,
-							onDemandBookingEnabled: false,
 						},
 						{
 							id: 2,
 							name: "Queue name 2",
 							limit: 10,
-							onDemandBookingEnabled: false,
 						},
 						{
 							id: 3,
 							name: "Queue name 3",
 							limit: 10,
-							onDemandBookingEnabled: false,
 						}
 					];
 
@@ -133,36 +130,43 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 					ctrl.onDemandQueueHours = [
 						{
 							name: 'Monday',
+							enabled: true,
 							start: moment(),
 							end: moment(),
 						},
 						{
 							name: 'Tuesday',
+							enabled: true,
 							start: moment(),
 							end: moment(),
 						},
 						{
 							name: 'Wednesday',
+							enabled: true,
 							start: moment(),
 							end: moment(),
 						},
 						{
 							name: 'Thursday',
+							enabled: true,
 							start: moment(),
 							end: moment(),
 						},
 						{
 							name: 'Friday',
+							enabled: true,
 							start: moment(),
 							end: moment(),
 						},
 						{
 							name: 'Saturday',
+							enabled: false,
 							start: moment(),
 							end: moment(),
 						},
 						{
 							name: 'Sunday',
+							enabled: false,
 							start: moment(),
 							end: moment(),
 						},
