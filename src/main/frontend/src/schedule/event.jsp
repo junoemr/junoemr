@@ -185,7 +185,9 @@
 														ca-input-size="col-md-6"
 														ca-model="eventData.virtual"
 														ca-template="juno"
-														ca-disabled="telehealthMode === TELEHEALTH_MODES.NONE"
+														ca-disabled="telehealthMode === TELEHEALTH_MODES.NONE ||
+														 						 telehealthMode === TELEHEALTH_MODES.NO_CONNECTION  ||
+														 						 eventController.editMode"
 														title="{{ eventController.getTelehealthToolTip() }}"
 										>
 										</ca-field-boolean>
@@ -252,12 +254,14 @@
 										<!-- location/site -->
 										<ca-field-select
 												ca-hide="!eventController.sitesEnabled"
+                                                ca-disabled="eventData.virtual && eventController.editMode"
 												ca-name="site"
 												ca-title="Site"
 												ca-template="label"
 												ca-model="eventData.site"
 												ca-error="{{displayMessages.field_errors()['site']}}"
 												ca-options="eventController.siteOptions"
+                                                title="{{ eventController.getSiteChangeToolTip() }}"
 										>
 										</ca-field-select>
 									</div>
@@ -483,7 +487,7 @@
 			</button>
 
 			<button
-							ng-if="telehealthMode === TELEHEALTH_MODES.ONE_TIME_TELEHEALTH && eventData.virtual && !eventController.editMode"
+							ng-if="eventController.shouldShowNotificationButtons() && !eventController.editMode"
 							type="button"
 							class="btn btn-primary"
 							tooltip-placement="top"
@@ -495,12 +499,12 @@
 			</button>
 
 			<button
-							ng-if="eventController.mhaAppointment.appointmentType == 'ONE_TIME_LINK' && eventData.virtual && eventController.editMode"
+							ng-if="eventController.shouldShowNotificationButtons() && eventController.editMode"
 							type="button"
 							class="btn btn-default"
 							tooltip-placement="top"
 							tooltip-append-to-body="true"
-							ng-click="eventController.sendOnTimeTelehealthNotification();"
+							ng-click="eventController.sendAppointmentNotification();"
 							title="Send a notification email to the patient containing the one time telehealth link"
 							ng-disabled="eventController.sendingNotificationState !== eventController.SENDING_NOTIFICATION_STATES.NONE">
 				{{ eventController.getSendNotificationText() }}
