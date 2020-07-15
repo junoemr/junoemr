@@ -922,8 +922,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String type = (String) result[index++];
 			String style = (String) result[index++];
 			String bookingSource = (String) result[index++];
-			String status = (String) result[index++];
 			Integer creatorSecurityId = (Integer) result[index++];
+			String status = (String) result[index++];
 			String urgency = (String) result[index++];
 			Byte isVirtualResult = (Byte) result[index++];
 			boolean isVirtual = (Byte.toUnsignedInt(isVirtualResult) == 1);
@@ -990,49 +990,56 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				}
 
 			}
+			try
+			{
+				boolean hasTicklers = (maxTicklerNo != null);
 
-			boolean hasTicklers = (maxTicklerNo != null);
+				appointmentDetails.get(startTime).add(new AppointmentDetails(
+						appointmentNo,
+						demographicNo,
+						appointmentDate,
+						startTime,
+						endTime,
+						name,
+						notes,
+						reason,
+						reasonCode,
+						location,
+						resources,
+						type,
+						style,
+						bookingSource,
+						status,
+						urgency,
+						statusTitle,
+						color,
+						junoColor,
+						iconImage,
+						shortLetterColour,
+						shortLetters,
+						firstName,
+						lastName,
+						ver,
+						hin,
+						chartNo,
+						familyDoctor,
+						rosterStatus,
+						hcRenewDate,
+						custNotes,
+						custAlert,
+						colorProperty,
+						birthday,
+						hasTicklers,
+						ticklerMessages,
+						isVirtual,
+						creatorSecurityId
+				));
+			}
+			catch (Exception e)
+			{
+				MiscUtils.getLogger().info("\n\n\n\n\n\n\n\n"+e+"\n\n\n\n\n\n");
+			}
 
-			appointmentDetails.get(startTime).add(new AppointmentDetails(
-				appointmentNo,
-				demographicNo,
-				appointmentDate,
-				startTime,
-				endTime,
-				name,
-				notes,
-				reason,
-				reasonCode,
-				location,
-				resources,
-				type,
-				style,
-				bookingSource,
-				status,
-				urgency,
-				statusTitle,
-				color,
-				junoColor,
-				iconImage,
-				shortLetterColour,
-				shortLetters,
-				firstName,
-				lastName,
-				ver,
-				hin,
-				chartNo,
-				familyDoctor,
-				rosterStatus,
-				hcRenewDate,
-				custNotes,
-				custAlert,
-				colorProperty,
-				birthday,
-				hasTicklers,
-				ticklerMessages,
-				isVirtual,
-				creatorSecurityId
-			));
 		}
 
 		return appointmentDetails;

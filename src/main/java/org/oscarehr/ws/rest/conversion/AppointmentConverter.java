@@ -154,6 +154,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		//appointment.setRemarks(t.getRemarks());
 		Appointment.BookingSource bookingSource = (t.isTagSelfBooked())? Appointment.BookingSource.MYOSCAR_SELF_BOOKING : null;
 		appointment.setBookingSource(bookingSource);
+		appointment.setCreatorSecurityId(t.getCreatorSecurityId());
 
 		return appointment;
 	}
