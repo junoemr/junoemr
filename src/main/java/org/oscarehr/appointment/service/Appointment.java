@@ -299,6 +299,7 @@ public class Appointment
 						false,
 						details.isVirtual(),
 						null,
+						details.getCreatorSecurityId(),
 						details.getBookingSource()
 				);
 				// for the case where appointments are saved with a name but no demographic
