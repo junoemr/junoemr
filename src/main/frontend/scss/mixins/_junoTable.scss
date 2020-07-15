@@ -1,14 +1,17 @@
 
-@mixin juno-table($text-color, $header-color, $cell-color-even, $cell-color-odd, $border-color,
-$hover-color, $hover-border-color, $border-radius: 6px, $border-width: 1px)
-{
-	table {
+@mixin juno-table($text-color, $header-color,
+ $cell-color-even, $cell-color-odd,
+ $border-color,
+ $border-radius: 6px, $border-width: 1px) {
+	table,.table-bordered {
+		border:none;
 		width: 100%;
 		text-align: center;
 		border-collapse: separate;
 		color: $text-color;
 
 		th, td {
+			border: none;
 			border-left: solid $border-color #{$border-width};
 			height: 32px;
 		}
@@ -32,6 +35,8 @@ $hover-color, $hover-border-color, $border-radius: 6px, $border-width: 1px)
 		}
 
 		tr {
+			background-color: transparent !important;
+
 			&:last-child {
 				td {
 					border-bottom: solid $border-color #{$border-width};
@@ -44,10 +49,14 @@ $hover-color, $hover-border-color, $border-radius: 6px, $border-width: 1px)
 				}
 			}
 			&:nth-child(even) {
-				background-color: $cell-color-even;
+				td {
+					background-color: $cell-color-even;
+				}
 			}
 			&:nth-child(odd) {
-				background-color: $cell-color-odd;
+				td {
+					background-color: $cell-color-odd;
+				}
 			}
 		}
 	}
@@ -71,8 +80,9 @@ $hover-color, $hover-border-color, $border-radius: 6px, $border-width: 1px)
 
 @mixin juno-table-default($border-radius: 6px, $border-width: 1px)
 {
-	@include juno-table($color-neutral-darker, $color-neutral-lighter, $color-neutral-lightest,
-			$color-neutral-white, $color-neutral-light, $border-radius, $border-width);
+	@include juno-table($color-neutral-darker, $color-neutral-lighter,
+			$color-neutral-lightest, $color-neutral-white,
+			$color-neutral-light, $border-radius, $border-width);
 }
 @mixin juno-table-default-selectable($border-radius: 6px, $border-width: 1px)
 {

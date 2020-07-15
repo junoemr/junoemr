@@ -22,14 +22,17 @@
 --%>
 <div class="manage-appointment-queues-page-admin">
 	<div class="col-sm-12 queues-table-panel">
-		<panel>
+		<panel component-style="$ctrl.componentStyle">
 			<panel-header>
-				<div class="row queues-header">
+				<div class="row queues-header juno-text">
 					<div class="col-md-10">
 						<h6 class="d-inline-block">Appointment Queues</h6>
 					</div>
 					<div class="col-md-2 pull-right">
-						<juno-button ng-click="$ctrl.addQueue()">Add New Queue</juno-button>
+						<juno-button ng-click="$ctrl.addQueue()"
+						             component-style="$ctrl.componentStyle">
+							Add New Queue
+						</juno-button>
 					</div>
 				</div>
 			</panel-header>
@@ -48,7 +51,7 @@
 								<div class="col-md-6">
 									<juno-button
 											title="Edit Queue"
-											component-style=" JUNO_STYLE.GREY"
+											component-style="$ctrl.componentStyle"
 											button-color="JUNO_BUTTON_COLOR.BASE"
 											ng-click="$ctrl.editQueue(queue)">
 										<i class="icon icon-write"></i>Edit
@@ -58,6 +61,7 @@
 									<juno-button
 											title="Delete Queue"
 											button-color="JUNO_BUTTON_COLOR.BASE"
+											component-style="$ctrl.componentStyle"
 											ng-click="$ctrl.deleteQueue(queue)">
 										<i class="icon icon-delete"></i>Delete
 									</juno-button>
@@ -72,9 +76,9 @@
 	</div>
 
 	<div class="col-sm-12 on-demand-settings-panel" ng-if="$ctrl.onDemandBookingEnabled">
-		<panel>
+		<panel component-style="$ctrl.componentStyle">
 			<panel-header>
-				<div class="row queues-header">
+				<div class="row queues-header juno-text">
 					<div class="col-md-12">
 						<h6 class="d-inline-block">On Demand Booking Settings</h6>
 					</div>
@@ -83,12 +87,14 @@
 			<panel-body>
 				<div class="row">
 					<div class="col-md-6">
-						<div class="row">
+						<div class="row queue-selection-row">
 							<div class="col-md-12">
 								<juno-select
 										label="Assigned On Demand Booking Queue"
+										label-position="$ctrl.LABEL_POSITION.TOP"
 										ng-model="$ctrl.onDemandAssignedQueue"
 										options="$ctrl.onDemandQueueSelectOptions"
+										component-style="$ctrl.componentStyle"
 								>
 								</juno-select>
 							</div>
@@ -96,19 +102,28 @@
 					</div>
 					<div class="col-md-6">
 						<div class="row time-selection-row" ng-repeat="day in $ctrl.onDemandQueueHours">
-							<div class="col-md-2">
-								<juno-check-box ng-model="day.enabled">
+							<div class="col-sm-1">
+								<juno-check-box ng-model="day.enabled"
+								                component-style="$ctrl.componentStyle">
 								</juno-check-box>
 							</div>
-							<div class="col-md-2">
+							<div class="col-sm-2">
 								<label>{{day.name}}</label>
 							</div>
-							<div class="col-md-4">
-								<juno-time-select ng-model="day.start">
+							<div class="col-md-5">
+								<juno-time-select ng-model="day.start"
+								                  label="From"
+								                  disabled="!day.enabled"
+								                  component-style="$ctrl.componentStyle"
+								>
 								</juno-time-select>
 							</div>
 							<div class="col-md-4">
-								<juno-time-select ng-model="day.end">
+								<juno-time-select ng-model="day.end"
+								                  label="To"
+								                  disabled="!day.enabled"
+								                  component-style="$ctrl.componentStyle"
+								>
 								</juno-time-select>
 							</div>
 						</div>

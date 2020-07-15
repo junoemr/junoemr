@@ -8,18 +8,24 @@
 		             ng-model="$ctrl.hour"
 		             options="$ctrl.hourOptions"
 		             change="$ctrl.onTimeChange"
+		             disabled="$ctrl.disabled"
+		             component-style="$ctrl.componentStyle"
 		>
 		</juno-select>
 		<juno-select class="minute"
 		             ng-model="$ctrl.minute"
 		             options="$ctrl.minuteOptions"
 		             change="$ctrl.onTimeChange"
+		             disabled="$ctrl.disabled"
+		             component-style="$ctrl.componentStyle"
 		>
 		</juno-select>
 		<juno-select class="am_pm"
 		             ng-model="$ctrl.amPm"
 		             options="$ctrl.amPmOptions"
 		             change="$ctrl.onTimeChange"
+		             disabled="$ctrl.disabled"
+		             component-style="$ctrl.componentStyle"
 		>
 		</juno-select>
 	</div>

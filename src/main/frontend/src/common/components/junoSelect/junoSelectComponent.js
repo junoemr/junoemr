@@ -33,6 +33,7 @@ angular.module('Common.Components').component('junoSelect', {
 		label: "@?",
 		labelPosition: "<?",
 		componentStyle: "<?",
+		disabled: "<?",
 	},
 	controller: [
 		'$timeout',

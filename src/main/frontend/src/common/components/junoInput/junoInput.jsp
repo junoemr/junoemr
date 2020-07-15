@@ -11,5 +11,6 @@
 					ng-readonly="$ctrl.readonly"
 					ng-focus="$ctrl.onFocus()"
 					ng-blur="$ctrl.onBlur()"
+	                ng-disabled="$ctrl.disabled"
 					placeholder="{{$ctrl.placeholder}}">
 </div>

@@ -9,18 +9,18 @@
 	</modal-title>
 
 	<modal-body>
-		<div class="row">
-			<div class="col-md-12">
-				<juno-input
-						label="Queue Name"
-						ng-model="$ctrl.queueModel.name">
-				</juno-input>
+		<div class="queue-options-container">
+			<juno-input
+					label="Queue Name"
+					ng-model="$ctrl.queueModel.name"
+					component-style="$ctrl.resolve.style">
+			</juno-input>
 
-				<juno-input
-						label="Queue Limit"
-						ng-model="$ctrl.queueModel.limit">
-				</juno-input>
-			</div>
+			<juno-input
+					label="Queue Limit"
+					ng-model="$ctrl.queueModel.limit"
+					component-style="$ctrl.resolve.style">
+			</juno-input>
 		</div>
 	</modal-body>
 

@@ -31,6 +31,7 @@ angular.module('Common.Components').component('junoTimeSelect', {
 		labelPosition: "<?",
 		componentStyle: "<?",
 		change: "<?",
+		disabled: "<?",
 	},
 	controller: ["$scope", function ($scope)
 	{

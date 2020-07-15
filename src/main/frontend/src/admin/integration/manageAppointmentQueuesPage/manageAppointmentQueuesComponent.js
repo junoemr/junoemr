@@ -1,3 +1,5 @@
+import {JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
+
 angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 	{
 		templateUrl: 'src/admin/integration/manageAppointmentQueuesPage/manageAppointmentQueues.jsp',
@@ -19,12 +21,15 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 				let ctrl = this;
 
 				ctrl.onDemandBookingEnabled = true;
+				ctrl.componentStyle = JUNO_STYLE.GREY;
 
 				ctrl.sortMode = "id";
 				ctrl.queueList = [];
 				ctrl.onDemandQueueHours = [];
 				ctrl.onDemandAssignedQueue = null;
 				ctrl.onDemandQueueSelectOptions = [];
+
+				ctrl.LABEL_POSITION = LABEL_POSITION;
 
 				ctrl.$onInit = function ()
 				{

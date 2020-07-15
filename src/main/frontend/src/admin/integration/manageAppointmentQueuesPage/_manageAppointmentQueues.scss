@@ -19,11 +19,12 @@
 		}
 	}
 	.on-demand-settings-panel {
-		padding-top:12px;
-
 		.panel-body {
 			padding: 0;
 
+			.queue-selection-row {
+				padding: 12px;
+			}
 			.time-selection-row {
 				padding: 4px 0;
 				display: flex;

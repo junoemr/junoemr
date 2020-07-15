@@ -169,6 +169,7 @@
 	@include styleCommon;
 
 	@include juno-tab-color-scheme-white;
+	@include juno-table-default();
 
 	&.juno-input, &.juno-select, &.juno-typeahead,
 	&.juno-check-box, &.juno-date-select, &.juno-button {
@@ -288,6 +289,8 @@
 	}
 
 	@include junoText($color-neutral-darker);
+
+	@include juno-table-default();
 }
 
 // ============ STYLE DRACULA ===============
@@ -359,6 +362,10 @@
 	}
 
 	@include junoText($color-neutral-white);
+
+	@include juno-table($color-neutral-white, $color-neutral-darkest,
+			$color-neutral-dark, $color-neutral-darker,
+			$color-neutral-black);
 }
 .juno-style-dracula-background-no-accent {
 	background-color: $color-neutral-darkest !important;

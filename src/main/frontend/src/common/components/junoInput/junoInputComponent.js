@@ -28,6 +28,7 @@ angular.module('Common.Components').component('junoInput', {
 	bindings: {
 		ngModel: "=",
 		ngChange: "&?",
+		disabled: "<?",
 		type: "@?",
 		label: "@?",
 		labelPosition: "<?",
