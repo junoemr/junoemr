@@ -61,13 +61,23 @@
 		bFirstDisp = (request.getParameter("bFirstDisp")).equals("true");
 %>
 
-<%@page import="org.oscarehr.PMmodule.model.Program, org.oscarehr.PMmodule.service.ProgramManager, org.oscarehr.PMmodule.service.ProviderManager, org.oscarehr.common.OtherIdManager, org.oscarehr.common.dao.BillingONCHeader1Dao, org.oscarehr.common.dao.BillingONExtDao, org.oscarehr.common.dao.EncounterFormDao, org.oscarehr.common.dao.OscarAppointmentDao, org.oscarehr.common.dao.SiteDao" %>
+<%@ page import="org.oscarehr.PMmodule.model.Program"%>
+<%@ page import="org.oscarehr.PMmodule.service.ProgramManager"%>
+<%@ page import="org.oscarehr.PMmodule.service.ProviderManager"%>
+<%@ page import="org.oscarehr.common.OtherIdManager"%>
+<%@ page import="org.oscarehr.common.dao.BillingONCHeader1Dao"%>
+<%@ page import="org.oscarehr.common.dao.BillingONExtDao" %>
+<%@ page import="org.oscarehr.common.dao.EncounterFormDao" %>
+<%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
+<%@ page import="org.oscarehr.common.dao.SiteDao" %>
 <%@ page import="org.oscarehr.common.model.Appointment" %>
 <%@ page import="org.oscarehr.common.model.AppointmentStatus" %>
-<%@page import="org.oscarehr.common.model.BillingONCHeader1" %>
-<%@page import="org.oscarehr.common.model.Demographic" %>
-<%@ page
-		import="org.oscarehr.common.model.EncounterForm, org.oscarehr.common.model.Facility, org.oscarehr.common.model.LookupList, org.oscarehr.common.model.LookupListItem" %>
+<%@ page import="org.oscarehr.common.model.BillingONCHeader1" %>
+<%@ page import="org.oscarehr.common.model.Demographic" %>
+<%@ page import="org.oscarehr.common.model.EncounterForm" %>
+<%@ page import="org.oscarehr.common.model.Facility" %>
+<%@ page import="org.oscarehr.common.model.LookupList" %>
+<%@ page import="org.oscarehr.common.model.LookupListItem" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -283,10 +293,10 @@
 
 			function validateForm()
 			{
-				if (saveTemp == 1)
+				if (saveTemp === 1)
 				{
 					var aptStat = document.EDITAPPT.status.value;
-					if (aptStat.indexOf('B') == 0)
+					if (aptStat.indexOf('B') === 0)
 					{
 						return (confirm("<bean:message key="appointment.editappointment.msgDeleteBilledConfirmation"/>"));
 					}
@@ -295,11 +305,16 @@
 						return (confirm("<bean:message key="appointment.editappointment.msgDeleteConfirmation"/>"));
 					}
 				}
-				if (saveTemp == 2)
+				if (saveTemp === 2)
 				{
-					if (document.EDITAPPT.notes.value.length > 255)
+					if (Oscar.Util.Common.getLengthWithLineBreaks(document.EDITAPPT.notes) > 255)
 					{
 						window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
+						return false;
+					}
+					if (Oscar.Util.Common.getLengthWithLineBreaks(document.EDITAPPT.reason) > 80)
+					{
+						window.alert("<bean:message key="appointment.editappointment.msgReasonTooBig"/>");
 						return false;
 					}
 					if (!handleDateChange(document.EDITAPPT.appointment_date))
@@ -837,7 +852,7 @@
 						<div class="space">&nbsp;</div>
 						<div class="label"><bean:message key="Appointment.formNotes"/>:</div>
 						<div class="input">
-				<textarea name="notes" tabindex="3" rows="2" wrap="virtual"
+				<textarea name="notes" tabindex="3" rows="2" wrap="virtual" maxlength="255"
 						  cols="18"><%=bFirstDisp ? appt.getNotes() : request.getParameter("notes")%></textarea>
 						</div>
 					</li>

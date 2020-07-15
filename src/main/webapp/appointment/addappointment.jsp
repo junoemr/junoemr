@@ -210,9 +210,14 @@
 		<script type="text/javascript">
 			function validateForm()
 			{
-				if (document.ADDAPPT.notes.value.length > 255)
+				if (Oscar.Util.Common.getLengthWithLineBreaks(document.ADDAPPT.notes) > 255)
 				{
 					window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
+					return false;
+				}
+				if (Oscar.Util.Common.getLengthWithLineBreaks(document.ADDAPPT.reason) > 80)
+				{
+					window.alert("<bean:message key="appointment.editappointment.msgReasonTooBig"/>");
 					return false;
 				}
 				// set no-show status if no demographic selected and "Last Name" starts with '.'
@@ -1064,7 +1069,7 @@
 					<div class="space">&nbsp;</div>
 					<div class="label"><bean:message key="Appointment.formNotes"/>:</div>
 					<div class="input">
-						<textarea name="notes" tabindex="3" rows="2" wrap="virtual"
+						<textarea name="notes" tabindex="3" rows="2" wrap="virtual" maxlength="255"
 								  cols="18"><%=bFirstDisp ? "" : request.getParameter("notes").equals("") ? "" : request.getParameter("notes")%></textarea>
 					</div>
 				</li>
@@ -1175,8 +1180,7 @@
 							   WIDTH="25" HEIGHT="20" border="0" hspace="2">
 						<INPUT TYPE="hidden" NAME="provider_no" VALUE="<%=curProvider_no%>">
 						<INPUT TYPE="hidden" NAME="dboperation" VALUE="search_titlename">
-						<INPUT TYPE="hidden" NAME="creator"
-							   VALUE='<%=StringEscapeUtils.escapeHtml(userlastname)+", "+StringEscapeUtils.escapeHtml(userfirstname)%>'>
+						<INPUT TYPE="hidden" NAME="creator" VALUE='<%=curUser_no%>'>
 						<INPUT TYPE="hidden" NAME="remarks" VALUE="">
 					</div>
 				</li>

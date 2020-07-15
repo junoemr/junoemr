@@ -750,6 +750,16 @@ angular.module('Schedule').component('eventComponent', {
 				Juno.Common.Util.validateDateString(controller.repeatBookingData.endDate,
 					$scope.displayMessages, 'repeatEndOnDate', 'Repeat End Date', false);
 
+				if (Juno.Common.Util.exists($scope.eventData.notes) && $scope.eventData.notes.length > 255)
+				{
+					$scope.displayMessages.add_field_error('notes', 'Note length cannot exceed 255 characters');
+				}
+
+				if (Juno.Common.Util.exists($scope.eventData.reason) && $scope.eventData.reason.length > 80)
+				{
+					$scope.displayMessages.add_field_error('event_reason', 'Reason length cannot exceed 80 characters');
+				}
+
 				return !$scope.displayMessages.has_errors();
 			};
 
