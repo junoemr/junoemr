@@ -31,11 +31,14 @@ import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.demographicImport.service.CoPDMessageStream;
 import org.oscarehr.demographicImport.service.CoPDPreProcessorService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import oscar.OscarProperties;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 
 public class CopdCommandLineImporter
 {
@@ -196,7 +199,8 @@ public class CopdCommandLineImporter
 		logger.info("loading properties from " + propertiesFileName);
 
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
-		context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
+//		context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
+		context.setConfigLocations(new String[]{"/applicationContext.xml"});
 		context.refresh();
 		SpringUtils.beanFactory = context;
 
@@ -209,18 +213,34 @@ public class CopdCommandLineImporter
 	{
 		boolean hasFailure = false;
 		int failureCount = 0;
+		int messageCount = 0;
+
 		String message;
 		while (!(message = messageStream.getNextMessage()).isEmpty())
 		{
+			CoPDRecordData recordData = new CoPDRecordData();
 			try
 			{
-				message = coPDPreProcessorService.preProcessMessage(message, importSource);
-				coPDImportService.importFromHl7Message(message, documentDirectory, importSource, skipMissingDocs, mergeDemographics);
+				messageCount += 1;
+				Instant startPreProcess = Instant.now();
+				message = coPDPreProcessorService.preProcessMessage(message, importSource, recordData);
+				Instant startImport = Instant.now();
+				logger.info("[DURATION] Pre-Processing took " + Duration.between(startPreProcess, startImport));
+
+				coPDImportService.importFromHl7Message(message, documentDirectory, importSource, recordData, skipMissingDocs, mergeDemographics);
+				Instant endImport = Instant.now();
+				logger.info("[DURATION] Import process took " + Duration.between(startImport, endImport));
 			}
 			catch (Exception e)
 			{
-				logger.error("failed to import message: \n " + message + "\n With error:", e);
+				logger.error("failed to import message: " + messageCount + "\n With error:", e);
 				hasFailure = true;
+				failureCount += 1;
+			}
+			finally
+			{
+				//TODO - potentially print this to it's own log file
+				recordData.print();
 			}
 		}
 
