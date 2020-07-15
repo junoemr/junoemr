@@ -53,7 +53,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 
 					if(ctrl.editMode)
 					{
-						ctrl.queueModel = ctrl.resolve.queue;
+						ctrl.queueModel = angular.copy(ctrl.resolve.queue);
 					}
 					else
 					{
@@ -72,9 +72,8 @@ angular.module('Common.Components').component('appointmentQueueModal',
 				ctrl.onSave = () =>
 				{
 					// TODO hit endpoint
-					console.info("save queue", ctrl.queueModel);
 					// TODO handle name conflicts
-					ctrl.modalInstance.close();
+					ctrl.modalInstance.close(ctrl.queueModel);
 				}
 
 				ctrl.onCancel = () =>

@@ -35,6 +35,7 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 				{
 					ctrl.loadQueuesList();
 					ctrl.loadOnDemandQueueHours();
+					ctrl.updateQueueSelectOptions();
 					ctrl.tableParams = new NgTableParams(
 						{
 							page: 1, // show first page
@@ -50,12 +51,6 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 							{
 								ctrl.sortMode = params.orderBy();
 							}
-						}
-					);
-					ctrl.hoursTableParams = new NgTableParams(
-						{
-							page: 1, // show first page
-							count: -1, // unlimited
 						}
 					);
 
@@ -75,14 +70,20 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 
 				ctrl.deleteQueue = (queue) =>
 				{
-					console.info("delete queue", queue);
+					// TODO call api delete
+					// remove queue from queue list
+					ctrl.queueList = ctrl.queueList.filter((obj) =>
+					{
+						return obj.id !== queue.id;
+					});
+					ctrl.updateQueueSelectOptions();
 				}
 
-				ctrl.openQueueModal = async (queue, editMode) =>
+				ctrl.openQueueModal = (queue, editMode) =>
 				{
 					try
 					{
-						ctrl.inviteSent = await $uibModal.open(
+						$uibModal.open(
 							{
 								component: 'appointmentQueueModal',
 								backdrop: 'static',
@@ -93,12 +94,40 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 									editMode: editMode,
 								}
 							}
-						).result;
+						).result.then(
+							(updatedQueue) =>
+							{
+								if (editMode)
+								{
+									// update local copy with updated data
+									angular.copy(updatedQueue, queue);
+								}
+								else
+								{
+									ctrl.queueList.push(updatedQueue);
+								}
+								ctrl.updateQueueSelectOptions();
+							},
+							(error) =>
+							{
+								console.error("Error updating queue", error);
+							});
 					}
 					catch(err)
 					{
 						// user pressed ESC key
 					}
+				}
+
+				ctrl.updateQueueSelectOptions = () =>
+				{
+					ctrl.onDemandQueueSelectOptions = ctrl.queueList.map((queue) =>
+					{
+						return {
+							value: queue,
+							label: queue.name,
+						}
+					});
 				}
 
 				ctrl.loadQueuesList = () =>
@@ -121,59 +150,53 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 							limit: 10,
 						}
 					];
-
-					ctrl.onDemandQueueSelectOptions = ctrl.queueList.map((queue) =>
-					{
-						return {
-							value: queue,
-							label: queue.name,
-						}
-					});
 				}
 				ctrl.loadOnDemandQueueHours = () =>
 				{
+					const sampleStart = moment({hour: 8, minute: 0});
+					const sampleEnd = moment({hour: 16, minute: 30});
 					ctrl.onDemandQueueHours = [
 						{
 							name: 'Monday',
 							enabled: true,
-							start: moment(),
-							end: moment(),
+							start: sampleStart,
+							end: sampleEnd,
 						},
 						{
 							name: 'Tuesday',
 							enabled: true,
-							start: moment(),
-							end: moment(),
+							start: sampleStart,
+							end: sampleEnd,
 						},
 						{
 							name: 'Wednesday',
 							enabled: true,
-							start: moment(),
-							end: moment(),
+							start: sampleStart,
+							end: sampleEnd,
 						},
 						{
 							name: 'Thursday',
 							enabled: true,
-							start: moment(),
-							end: moment(),
+							start: sampleStart,
+							end: sampleEnd,
 						},
 						{
 							name: 'Friday',
 							enabled: true,
-							start: moment(),
-							end: moment(),
+							start: sampleStart,
+							end: sampleEnd,
 						},
 						{
 							name: 'Saturday',
 							enabled: false,
-							start: moment(),
-							end: moment(),
+							start: sampleStart,
+							end: sampleEnd,
 						},
 						{
 							name: 'Sunday',
 							enabled: false,
-							start: moment(),
-							end: moment(),
+							start: sampleStart,
+							end: sampleEnd,
 						},
 					];
 				}
