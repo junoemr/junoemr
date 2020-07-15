@@ -20,34 +20,40 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.myHealthAccess;
+package org.oscarehr.ws.rest.myhealthaccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.integration.myhealthaccess.service.PatientService;
+import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.transfer.myhealthaccess.IntegrationTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-@Path("myhealthaccess/patient")
-@Component("PatientWebService")
-@Tag(name = "mhaPatient")
-public class PatientWebService extends AbstractServiceImpl
+@Path("myhealthaccess/integrations")
+@Component("IntegrationWebService")
+@Tag(name = "mhaIntegration")
+public class IntegrationWebService extends AbstractServiceImpl
 {
 	@Autowired
-	PatientService patientService;
+	IntegrationService integrationService;
 
 	@GET
-	@Path("/{demographic_no}/confirmed")
+	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> isPatientConfirmed(@PathParam("demographic_no") String demographicNo, @QueryParam("site") String siteName)
+	public RestResponse<IntegrationTo1> searchIntegrations(@QueryParam("site") String siteName)
 	{
-		return RestResponse.successResponse(patientService.isPatientConfirmed(Integer.parseInt(demographicNo), siteName));
+		Integration integration = integrationService.findMhaIntegration(siteName);
+		if (integration != null)
+		{
+			return RestResponse.successResponse(new IntegrationTo1(integration));
+		}
+		return RestResponse.successResponse(null);
 	}
 }

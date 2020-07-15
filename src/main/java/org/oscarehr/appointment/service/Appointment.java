@@ -25,7 +25,12 @@ package org.oscarehr.appointment.service;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
+import org.oscarehr.integration.myhealthaccess.service.ClinicService;
+import org.oscarehr.integration.myhealthaccess.service.PatientService;
+import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
@@ -59,7 +64,16 @@ public class Appointment
 	AppointmentService appointmentService;
 
 	@Autowired
+	PatientService patientService;
+
+	@Autowired
+	ClinicService clinicService;
+
+	@Autowired
 	MyHealthAccessService myHealthAccessService;
+
+	@Autowired
+	IntegrationService integrationService;
 
 	private String formatName(String upperFirstName, String upperLastName)
 	{
@@ -108,15 +122,22 @@ public class Appointment
 	 * @param appointment - the appointment to save
 	 * @param loggedInInfo - logged in info.
 	 */
-	public void saveNewAppointment(org.oscarehr.common.model.Appointment appointment,
-																 LoggedInInfo loggedInInfo, HttpServletRequest request)
+	public org.oscarehr.common.model.Appointment saveNewAppointment(org.oscarehr.common.model.Appointment appointment,
+																																	LoggedInInfo loggedInInfo, HttpServletRequest request,
+																																	boolean sendNotification)
 	{
 		oscarAppointmentDao.persist(appointment);
 
-		// book telehealth appointment in MHA
-		if (appointment.getIsVirtual())
-		{
-			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
+		if (sendNotification)
+		{// send MHA based appointment notification
+			Integration integration = integrationService.findMhaIntegration(appointment);
+			if (integration != null)
+			{
+				ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
+						loggedInInfo.getLoggedInSecurity().getSecurityNo());
+				appointmentService.sendGeneralAppointmentNotification(integration, loginTokenTo1.getToken(),
+						appointment.getId());
+			}
 		}
 
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
@@ -126,6 +147,51 @@ public class Appointment
 						LogConst.STATUS_SUCCESS,
 						String.valueOf(appointment.getId()),
 						request.getRemoteAddr());
+
+		return appointment;
+	}
+
+	/**
+	 * save a new telehealth appointment
+	 * @param appointment - the appointment to save
+	 * @param loggedInInfo - logged in info.
+	 * @param sendNotification - Whether to send notification of appointment booking to user or not.
+	 */
+	public org.oscarehr.common.model.Appointment saveNewTelehealthAppointment(org.oscarehr.common.model.Appointment appointment,
+																																						LoggedInInfo loggedInInfo, HttpServletRequest request, boolean sendNotification)
+	{
+		if (!appointment.getIsVirtual())
+		{
+			throw new IllegalArgumentException("Could not save telehealth appointment. Appointment is not virtual");
+		}
+
+		oscarAppointmentDao.persist(appointment);
+
+		// book telehealth appointment in MHA
+		String siteName = null;
+		if (OscarProperties.getInstance().isMultisiteEnabled())
+		{
+			siteName = appointment.getLocation();
+		}
+
+		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), integrationService.findMhaIntegration(siteName)))
+		{
+			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment, sendNotification);
+		}
+		else
+		{
+			appointmentService.bookOneTimeTelehealthAppointment(loggedInInfo, appointment, sendNotification);
+		}
+
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				appointment.getDemographicNo(),
+				LogConst.ACTION_ADD,
+				LogConst.CON_APPT,
+				LogConst.STATUS_SUCCESS,
+				String.valueOf(appointment.getId()),
+				request.getRemoteAddr());
+
+		return appointment;
 	}
 
 	/**

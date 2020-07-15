@@ -35,7 +35,12 @@ import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
+import org.oscarehr.integration.myhealthaccess.service.ClinicService;
+import org.oscarehr.integration.myhealthaccess.service.PatientService;
+import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
@@ -52,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Deprecated
 @Service
 @Transactional
 public class AppointmentManager {
@@ -72,6 +78,12 @@ public class AppointmentManager {
 	private MyHealthAccessService myHealthAccessService;
 	@Autowired
 	private AppointmentService appointmentService;
+	@Autowired
+	private IntegrationService integrationService;
+	@Autowired
+	private PatientService patientService;
+	@Autowired
+	private ClinicService clinicService;
 
 	public List<Appointment> getAppointmentHistoryWithoutDeleted(LoggedInInfo loggedInInfo, Integer demographicNo, Integer offset, Integer limit) {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "r", null)) {
@@ -141,7 +153,7 @@ public class AppointmentManager {
 	 * @param loggedInInfo
 	 * @param appointment - appointment data
 	 */
-	public Appointment addAppointment(LoggedInInfo loggedInInfo, Appointment appointment) {
+	public Appointment addAppointment(LoggedInInfo loggedInInfo, Appointment appointment, boolean sendNotification) {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
 			throw new RuntimeException("Access Denied");
 		}
@@ -157,10 +169,16 @@ public class AppointmentManager {
 
 		appointmentDao.persist(appointment);
 
-		// book telehealth appointment in MHA
-		if (appointment.getIsVirtual())
-		{
-			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
+		if (sendNotification)
+		{// send booking notification through MHA
+			Integration integration = integrationService.findMhaIntegration(appointment);
+			if (integration != null)
+			{
+				ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
+						loggedInInfo.getLoggedInSecurity().getSecurityNo());
+				appointmentService.sendGeneralAppointmentNotification(integration, loginTokenTo1.getToken(),
+						appointment.getId());
+			}
 		}
 
 		return appointment;
@@ -174,14 +192,14 @@ public class AppointmentManager {
 		}
 		ArrayList<Appointment> appointments = new ArrayList<>(dateList.size());
 
-		appointment = addAppointment(loggedInInfo, appointment);
+		appointment = addAppointment(loggedInInfo, appointment, false);
 		appointments.add(appointment);
 
 		for(Date date : dateList)
 		{
 			Appointment appointmentCopy = new Appointment(appointment);
 			appointmentCopy.setAppointmentDate(date);
-			appointmentCopy = addAppointment(loggedInInfo, appointmentCopy);
+			appointmentCopy = addAppointment(loggedInInfo, appointmentCopy, false);
 			appointments.add(appointmentCopy);
 		}
 

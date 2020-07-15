@@ -34,7 +34,7 @@
 				.form-control {
 					@include juno-form-colour-scheme-dark;
 					height: $input-size;
-					width: 304px;
+					width: 232px;
 				}
 				.btn {
 					height: $input-size;
@@ -79,6 +79,12 @@
 			left: initial;
 			right: 0;
 			top: $primary-navbar-height;
+		}
+		.user-first-name {
+			max-width: 104px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
 		}
 	}
 }

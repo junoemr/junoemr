@@ -161,6 +161,7 @@
 <%@page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
+<%@ page import="org.oscarehr.common.IsPropertiesOn" %>
 <html:html locale="true">
 	<head>
 		<% if (isMobileOptimized)
@@ -190,6 +191,8 @@
 				src="<%= request.getContextPath() %>/js/util/date.js"></script>
 		<script type="text/javascript"
 				src="<%= request.getContextPath() %>/js/util/appointment.js"></script>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/promisePolyfill.js"></script>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/myhealthaccess.js"></script>
 		<title><bean:message key="appointment.editappointment.title"/></title>
 		<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
 		<script>
@@ -1103,6 +1106,18 @@
 							       value="<bean:message key="appointment.editappointment.btnEmailReminder"/>">
 							<% } %>
 
+							<input id="send-telehealth-link-btn"
+											type="button"
+											style="display:none;"
+											value="Send Appointment Notification"
+											title="Send a notification containing the link needed to join the telehealth session to the patient"
+							>
+							<p id="send-telehealth-link-msg-sent"
+								 style="color: green; display: inline; opacity: 0.0; font-size:13px; margin-left: 10px; transition: opacity 1s;"
+							>
+								Message Sent!
+							</p>
+
 						</td>
 						<td align="right" nowrap><input type="button" name="labelprint"
 														id="labelButton"
@@ -1380,6 +1395,42 @@
 	<script type="text/javascript">
 		var loc = document.forms['EDITAPPT'].location;
 		if (loc.nodeName.toUpperCase() === 'SELECT') loc.style.backgroundColor = loc.options[loc.selectedIndex].style.backgroundColor;
+		<%
+			String demographicEmail = "";
+			Demographic demographic = demographicManager.getDemographic(loggedInInfo, demono);
+			if (demographic != null)
+			{
+				demographicEmail = StringUtils.trimToEmpty(demographic.getEmail());
+			}
+		%>
+		var demographicEmail = '<%=demographicEmail%>';
+		var mhaAppointment = null;
+
+		function updateTelehealthControls()
+		{
+			myhealthaccess.getAppointment("<%=request.getContextPath()%>",
+					jQuery(document.forms.EDITAPPT.location).val(),
+					"<%=request.getParameter("appointment_no")%>").then((res) =>
+			{
+				var appt = JSON.parse(res).body;
+				mhaAppointment = appt;
+
+				if (appt != null || demographicEmail !== '')
+				{
+					jQuery("#send-telehealth-link-btn").css("display", "inherit");
+				}
+			}).catch((error) =>
+			{
+				if (error === myhealthaccess.ERROR_NO_INTEGRATION)
+				{
+					jQuery("#send-telehealth-link-btn").css("display", "none");
+				}
+				else
+				{
+					console.error(error);
+				}
+			});
+		}
 
 		jQuery(document).ready(function()
 		{
@@ -1388,6 +1439,52 @@
 			{
 				jQuery(belowTbl.find("tr")[1]).remove();
 			}
+
+			<%
+			if (IsPropertiesOn.isTelehealthEnabled())
+			{
+			%>
+				updateTelehealthControls();
+				jQuery(document.forms.EDITAPPT.location).change(() =>
+				{
+					updateTelehealthControls();
+				});
+
+				jQuery("#send-telehealth-link-btn").click(() =>
+				{
+					if (mhaAppointment)
+					{
+						myhealthaccess.sendTelehealthAppointmentNotification("<%=request.getContextPath()%>",
+								jQuery(document.forms.EDITAPPT.location).val(), mhaAppointment).then(() =>
+						{
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
+							window.setTimeout(() => {
+								jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
+							}, 3000);
+						}).catch((err) =>
+						{
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
+						});
+					}
+					else
+					{// non mha appt
+						myhealthaccess.sendGeneralAppointmentNotification("<%=request.getContextPath()%>",
+								jQuery(document.forms.EDITAPPT.location).val(), "<%=request.getParameter("appointment_no")%>").then(() =>
+						{
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
+							window.setTimeout(() => {
+								jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
+							}, 3000);
+						}).catch((err) =>
+						{
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
+						});
+					}
+				});
+			<%
+			}
+			%>
+
 		});
 
 	</script>
