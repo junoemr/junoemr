@@ -25,6 +25,7 @@
 package org.oscarehr.demographic.model;
 
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.util.MiscUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -40,6 +41,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+
+import static oscar.util.StringUtils.filterControlCharacters;
 
 @Entity
 @Table(name="demographicExt")
@@ -66,7 +69,7 @@ public class DemographicExt extends AbstractModel<Integer> implements Serializab
 	@PreUpdate
 	protected void prePersist() {
 		this.dateCreated = new Date();
-		setValue(oscar.util.StringUtils.filterControlCharacters(getValue()));
+		setValue(filterControlCharacters(getValue()));
 	}
 	
     // constructors

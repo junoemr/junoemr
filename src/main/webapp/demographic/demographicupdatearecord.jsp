@@ -67,6 +67,7 @@
 <%@page import="java.util.HashSet" %>
 <%@page import="java.util.List" %>
 <%@page import="java.util.Set" %>
+<%@ page import="static oscar.util.StringUtils.filterControlCharacters" %>
 <%@page errorPage="errorpage.jsp"%>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -118,8 +119,8 @@
 	demographic.setCity(request.getParameter("city"));
 	demographic.setProvince(request.getParameter("province"));
 	demographic.setPostal(request.getParameter("postal"));
-	demographic.setPhone(request.getParameter("phone"));
-	demographic.setPhone2(request.getParameter("phone2"));
+	demographic.setPhone(filterControlCharacters(request.getParameter("phone")));
+	demographic.setPhone2(filterControlCharacters(request.getParameter("phone2")));
 	demographic.setEmail(StringUtils.trimToNull(request.getParameter("email")));
 	demographic.setMyOscarUserName(StringUtils.trimToNull(request.getParameter("myOscarUserName")));
 	demographic.setYearOfBirth(request.getParameter("year_of_birth"));
@@ -273,10 +274,10 @@
 	/* Prepare demographic extension models */
 	List<DemographicExt> extensions = new ArrayList<DemographicExt>();
 
-	extensions.add(new DemographicExt(request.getParameter("demo_cell_id"), currentUserNoStr, demographicNo, "demo_cell", request.getParameter("demo_cell")));
+	extensions.add(new DemographicExt(request.getParameter("demo_cell_id"), currentUserNoStr, demographicNo, "demo_cell", filterControlCharacters(request.getParameter("demo_cell"))));
 	extensions.add(new DemographicExt(request.getParameter("aboriginal_id"), currentUserNoStr, demographicNo, "aboriginal", request.getParameter("aboriginal")));
-	extensions.add(new DemographicExt(request.getParameter("hPhoneExt_id"), currentUserNoStr, demographicNo, "hPhoneExt", request.getParameter("hPhoneExt")));
-	extensions.add(new DemographicExt(request.getParameter("wPhoneExt_id"), currentUserNoStr, demographicNo, "wPhoneExt", request.getParameter("wPhoneExt")));
+	extensions.add(new DemographicExt(request.getParameter("hPhoneExt_id"), currentUserNoStr, demographicNo, "hPhoneExt", filterControlCharacters(request.getParameter("hPhoneExt"))));
+	extensions.add(new DemographicExt(request.getParameter("wPhoneExt_id"), currentUserNoStr, demographicNo, "wPhoneExt", filterControlCharacters(request.getParameter("wPhoneExt"))));
 	extensions.add(new DemographicExt(request.getParameter("cytolNum_id"), currentUserNoStr, demographicNo, "cytolNum",  request.getParameter("cytolNum")));
 	extensions.add(new DemographicExt(request.getParameter("ethnicity_id"), currentUserNoStr, demographicNo, "ethnicity",  request.getParameter("ethnicity")));
 	extensions.add(new DemographicExt(request.getParameter("area_id"), currentUserNoStr, demographicNo, "area", request.getParameter("area")));
@@ -285,7 +286,7 @@
 	extensions.add(new DemographicExt(request.getParameter("given_consent_id"), currentUserNoStr, demographicNo, "given_consent", request.getParameter("given_consent")));
 	extensions.add(new DemographicExt(request.getParameter("rxInteractionWarningLevel_id"), currentUserNoStr, demographicNo, "rxInteractionWarningLevel", request.getParameter("rxInteractionWarningLevel")));
 	extensions.add(new DemographicExt(request.getParameter("primaryEMR_id"), currentUserNoStr, demographicNo, "primaryEMR", request.getParameter("primaryEMR")));
-	extensions.add(new DemographicExt(request.getParameter("phoneComment_id"), currentUserNoStr, demographicNo, "phoneComment", request.getParameter("phoneComment")));
+	extensions.add(new DemographicExt(request.getParameter("phoneComment_id"), currentUserNoStr, demographicNo, "phoneComment", filterControlCharacters(request.getParameter("phoneComment"))));
 	extensions.add(new DemographicExt(request.getParameter("usSigned_id"), currentUserNoStr, demographicNo, "usSigned", request.getParameter("usSigned")));
 	extensions.add(new DemographicExt(request.getParameter("privacyConsent_id"), currentUserNoStr, demographicNo, "privacyConsent", request.getParameter("privacyConsent")));
 	extensions.add(new DemographicExt(request.getParameter("informedConsent_id"), currentUserNoStr, demographicNo, "informedConsent", request.getParameter("informedConsent")));

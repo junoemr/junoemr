@@ -16,15 +16,6 @@ Juno.Demographic.InputCtrl.formatPhoneNumber = function formatPhoneNumber(phone)
 	if (phone.value.length === 11 && phone.value.charAt(3) === '-') {
 		phone.value = phone.value.substring(0,3) + "-" + phone.value.substring(4,7) + "-" + phone.value.substring(7);
 	}
-	// console.log("test getting an nonexisting element");
-	// if(typeof document.adddemographic.whatever != "undefined")
-	// {
-	//
-	// 	console.log(document.adddemographic.whatever.value);
-	//
-	// }else{
-	// 	console.log("document.adddemographic.whatever is undefined!!!!!!!!!!!!!!!!!!");
-	// }
 };
 
 Juno.Demographic.InputCtrl.formatPhoneOnLoad = function formatPhoneOnLoad (phone1,phone2,cellPhone)
