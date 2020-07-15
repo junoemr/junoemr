@@ -160,7 +160,11 @@
 			<button ng-click="faxConfigEditController.cancel()" type="button" class="btn" data-dismiss="modal">
 				<bean:message key="modal.newPatient.cancel" bundle="ui"/>
 			</button>
-			<button ng-click="faxConfigEditController.saveSettings(form)" data-dismiss="modal" type="button" class="btn btn-success">
+			<button ng-click="faxConfigEditController.saveSettings(form)"
+					ng-disabled="faxConfigEditController.submitDisabled"
+					data-dismiss="modal"
+					type="button"
+					class="btn btn-success">
 				<bean:message key="modal.newPatient.submit" bundle="ui"/>
 			</button>
 		</div>
