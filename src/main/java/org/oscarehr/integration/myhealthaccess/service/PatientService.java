@@ -22,6 +22,7 @@
  */
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.model.Demographic;
@@ -180,7 +181,14 @@ public class PatientService extends BaseService
 		}
 		else
 		{
-			return getPatientByHin(integration, demographic.getHin(), MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()));
+			if (StringUtils.trimToNull(demographic.getHin()) != null)
+			{
+				return getPatientByHin(integration, demographic.getHin(), MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()));
+			}
+			else
+			{
+				throw new RecordNotFoundException("Demographic is not confirmed and has no HIN.");
+			}
 		}
 	}
 
