@@ -108,7 +108,6 @@ public class EctDisplayPreventionAction extends EctDisplayAction
         ArrayList<NavBarDisplayDAO.Item> items = new ArrayList<NavBarDisplayDAO.Item>();
         for (int i = 0 ; i < prevList.size(); i++)
 		{
-			/*
 			HashMap<String, String> h = prevList.get(i);
 			String prevName = h.get("name");
 
@@ -199,8 +198,8 @@ public class EctDisplayPreventionAction extends EctDisplayAction
 				}
 			}
 
-			 */
 
+			/*
 			Date date = null;
 			String result;
 
@@ -253,6 +252,7 @@ public class EctDisplayPreventionAction extends EctDisplayAction
                 }
             }
 
+			 */
 		}
 
 		//sort items without warnings chronologically

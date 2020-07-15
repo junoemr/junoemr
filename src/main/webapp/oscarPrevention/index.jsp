@@ -593,7 +593,7 @@ text-align:left;
                         ArrayList<Map<String,Object>> alist = PreventionData.getPreventionData(loggedInInfo, prevName, Integer.valueOf(demographic_no));
                         PreventionData.addRemotePreventions(loggedInInfo, alist, demographicId,prevName,demographicDateOfBirth);
                         boolean show = pdc.display(loggedInInfo, h, demographic_no,alist.size());
-                        if(!show){
+                        if(!show)
                             Map<String,Object> h2 = new HashMap<String,Object>();
                             h2.put("prev",h);
                             h2.put("list",alist);
