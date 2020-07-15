@@ -290,6 +290,7 @@ angular.module('Schedule').component('eventComponent', {
 				controller.editMode = controller.resolve.editMode;
 				var focus = controller.resolve.focus;
 				var data = controller.resolve.data;
+
 				$scope.events = data.events;
 				$scope.scheduleId = data.scheduleId;
 
