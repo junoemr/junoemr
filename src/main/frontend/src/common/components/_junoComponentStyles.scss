@@ -160,7 +160,7 @@
 
 	&.juno-divider {
 		background-color: $color-neutral-lightest;
-		border: 1px solid $color-neutral-lighter-grey;
+		border: 1px solid $color-neutral-lighter;
 	}
 }
 
@@ -198,7 +198,7 @@
 
 	button {
 		@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-white,
-						$color-neutral-lighter-grey, $color-neutral-lighter-grey, $color-neutral-white);
+						$color-neutral-lighter, $color-neutral-lighter, $color-neutral-white);
 
 		&.btn-base, &.btn-transparent {
 			color: $color-neutral-darker !important;
@@ -218,7 +218,7 @@
 		border: 1px solid $color-neutral-lighter;
 	}
 
-	@include junoTabColor($color-neutral-white, $color-neutral-lighter, $color-neutral-lighter-grey, $color-neutral-darker);
+	@include junoTabColor($color-neutral-white, $color-neutral-lighter, $color-neutral-lighter, $color-neutral-darker);
 
 	@include junoPanelColor(white, $color-neutral-lighter, $color-neutral-lighter);
 
@@ -237,7 +237,7 @@
 			@include juno-font-body-smallest;
 
 			border-radius: 8px;
-			border: solid 1px $color-neutral-lighter-grey;
+			border: solid 1px $color-neutral-lighter;
 			background-color: $color-neutral-lightest;
 			color: $color-neutral-darker;
 
@@ -250,7 +250,7 @@
 				color: $color-neutral-grey;
 
 				&:active {
-					border-color: $color-neutral-lighter-grey;
+					border-color: $color-neutral-lighter;
 				}
 			}
 		}
@@ -260,7 +260,7 @@
 		border-radius: 8px;
 
 		@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-lightest,
-						$color-neutral-lighter-grey, $color-neutral-lighter-grey, $color-neutral-white);
+						$color-neutral-lighter, $color-neutral-lighter, $color-neutral-white);
 
 		&.btn-secondary, &.btn-base, &.btn-transparent {
 			color: $color-neutral-darker;
@@ -270,15 +270,15 @@
 	&.juno-check-box {
 		button {
 			&.un-checked {
-				border-color: $color-neutral-lighter-grey;
+				border-color: $color-neutral-lighter;
 				background-color: $color-neutral-lightest;
 			}
 		}
 	}
 
-	@include junoTabColor($color-neutral-lightest, $color-neutral-white, $color-neutral-lighter-grey, $color-neutral-darker);
+	@include junoTabColor($color-neutral-lightest, $color-neutral-white, $color-neutral-lighter, $color-neutral-darker);
 
-	@include junoPanelColor($color-neutral-lightest, $color-neutral-lightest, $color-neutral-lighter-grey);
+	@include junoPanelColor($color-neutral-lightest, $color-neutral-lightest, $color-neutral-lighter);
 	&.juno-panel {
 		.panel-body {
 			border-width: 1px;
