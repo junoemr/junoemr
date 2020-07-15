@@ -21,7 +21,12 @@
 * Canada
 */
 
-import {JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_TAB_TYPE} from "../../../common/components/junoComponentConstants";
+import {
+	JUNO_BACKGROUND_STYLE,
+	JUNO_BUTTON_COLOR,
+	JUNO_STYLE,
+	JUNO_TAB_TYPE
+} from "../../../common/components/junoComponentConstants";
 
 angular.module('Layout.Components').component('appointmentQueue', {
 	templateUrl: 'src/layout/components/appointmentQueue/appointmentQueue.jsp',
@@ -42,16 +47,19 @@ angular.module('Layout.Components').component('appointmentQueue', {
 
 				items: [
 					{
+						demographicNo: 1,
 						patientName: "Kirk",
 						reason: "Set phasers to kill *rips of shirt*",
 						isTelehealth: true,
 					},
 					{
+						demographicNo: 2,
 						patientName: "Spock",
 						reason: "Logic dictates that this is a test",
 						isTelehealth: true,
 					},
 					{
+						demographicNo: 3,
 						patientName: "Dr. MiCoy",
 						reason: "He's dead Jim",
 						isTelehealth: true,
@@ -64,21 +72,25 @@ angular.module('Layout.Components').component('appointmentQueue', {
 
 				items: [
 					{
+						demographicNo: 1,
 						patientName: "Admiral Adama",
 						reason: "Fire the nukes!",
 						isTelehealth: true,
 					},
 					{
+						demographicNo: 2,
 						patientName: "Starbuck",
-						reason: "I'm dead but, I came back as an angle or some bull crap",
+						reason: "I'm dead but, I came back as an angle or some bull crap like that",
 						isTelehealth: true,
 					},
 					{
+						demographicNo: 3,
 						patientName: "Boomer",
 						reason: "def not a Cylon",
 						isTelehealth: true,
 					},
 					{
+						demographicNo: 4,
 						patientName: "Gaius Baltar",
 						reason: "Loves, Number Six, A Cylon",
 						isTelehealth: false,
@@ -86,15 +98,15 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				],
 			},
 			longList: {
-				items: [...Array(16)].map((i) => {return {patientName: "Long, Long", reason: "lost of appts", isTelehealth: true}}),
+				items: [...Array(16)].map((i) => {return {patientName: "Long, Long", reason: "lots of appts", isTelehealth: true}}),
 			}
 		};
 
 		// tab options used to select queue.
 		ctrl.tabOptions = [
-			{label: "Star Trek", value: ctrl.queues["starTrek"]},
-			{label: "Battle Star Galactica", value: ctrl.queues["galactica"]},
-			{label: "Long List", value: ctrl.queues["longList"]},
+			{label: "Star Trek", value: ctrl.queues["starTrek"], color: "#27ae60"},
+			{label: "Battle Star Galactica", value: ctrl.queues["galactica"], color: "#f39c12"},
+			{label: "Long List", value: ctrl.queues["longList"], color: "#e74c3c"},
 		];
 
 		// currently selected queue (selected by tab bar)
@@ -157,8 +169,12 @@ angular.module('Layout.Components').component('appointmentQueue', {
 
 		ctrl.getComponentClasses = () =>
 		{
-			return [ctrl.componentStyle, ctrl.componentStyle + "-background"];
+			return [ctrl.componentStyle, ctrl.componentStyle + JUNO_BACKGROUND_STYLE.SECONDARY];
 		}
 
+		ctrl.getPrimaryBackgroundClass = () =>
+		{
+			return [ctrl.componentStyle + JUNO_BACKGROUND_STYLE.PRIMARY];
+		}
 	}]
 });

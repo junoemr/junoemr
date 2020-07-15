@@ -22,7 +22,11 @@
 */
 
 
-import {JUNO_BUTTON_COLOR, JUNO_STYLE} from "../../../../../common/components/junoComponentConstants";
+import {
+	JUNO_BACKGROUND_STYLE,
+	JUNO_BUTTON_COLOR,
+	JUNO_STYLE
+} from "../../../../../common/components/junoComponentConstants";
 
 angular.module('Layout.Components').component('appointmentCard', {
 	templateUrl: 'src/layout/components/appointmentQueue/components/appointmentCard/appointmentCard.jsp',
@@ -43,13 +47,14 @@ angular.module('Layout.Components').component('appointmentCard', {
 
 		ctrl.getComponentClasses = () =>
 		{
-			let classes = [ctrl.componentStyle, ctrl.componentStyle + "-background"];
+			let classes = [ctrl.componentStyle];
 			if (!ctrl.ngModel)
 			{
 				classes.push("zero-state");
 			}
 			else
 			{
+				classes.push(ctrl.componentStyle + JUNO_BACKGROUND_STYLE.PRIMARY);
 				classes.push("active");
 			}
 			return classes;

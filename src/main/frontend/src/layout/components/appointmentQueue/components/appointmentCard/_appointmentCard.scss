@@ -29,6 +29,8 @@
 			}
 
 			&.icon-button {
+				flex-grow: 0;
+
 				button {
 					padding: 0;
 					.icon {
@@ -56,6 +58,10 @@
 			white-space: nowrap;
 			text-overflow: ellipsis;
 			overflow: hidden;
+
+			a {
+				text-decoration: underline;
+			}
 		}
 	}
 
@@ -66,15 +72,20 @@
 
 	&.zero-state
 	{
-		background-color: $color-neutral-lightest;
+		background-color: rgba($color-neutral-darker, 0.05);
 	}
 
 	&.juno-style-dracula {
 		border-color: $color-neutral-darker;
 
+		&.zero-state
+		{
+			background-color: rgba($color-neutral-darker, 0.1);
+		}
+
 		&.active {
 			box-shadow: 0 2px 2px rgba($color-neutral-darker, 0.7);
-			background-color: $color-neutral-black !important;
+			background-color: rgba($color-neutral-black, 0.05) !important;
 		}
 	}
 }

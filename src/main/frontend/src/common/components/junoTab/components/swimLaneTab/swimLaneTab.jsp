@@ -3,7 +3,7 @@
 	             ng-mousedown="$ctrl.startScroll($event, tab)"
 	             ng-mouseup="$ctrl.endScroll($event, tab)"
 	             ng-class="$ctrl.tabClasses(tab)"
-	             button-color="JUNO_BUTTON_COLOR.PRIMARY">
+	             button-color-override="tab.color">
 		{{tab.label}}
 	</juno-button>
 </div>

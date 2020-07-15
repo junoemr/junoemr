@@ -1,23 +1,23 @@
 <div class="appointment-queue" ng-class="$ctrl.getComponentClasses()">
 	<div class="header">
-		<juno-tab ng-model="$ctrl.currentQueue"
-						  tabs="$ctrl.tabOptions"
-						  component-style="$ctrl.componentStyle"
-							type="JUNO_TAB_TYPE.SWIM_LANE">
-		</juno-tab>
-		
-		<juno-divider class="width-100"
-		              component-style="$ctrl.componentStyle"
-		              slim="true">
-		</juno-divider>
+		<div ng-class="$ctrl.getPrimaryBackgroundClass()">
+			<juno-tab ng-model="$ctrl.currentQueue"
+							  tabs="$ctrl.tabOptions"
+							  component-style="$ctrl.componentStyle"
+								type="JUNO_TAB_TYPE.SWIM_LANE">
+			</juno-tab>
+			
+			<juno-divider class="width-100"
+			              component-style="$ctrl.componentStyle"
+			              slim="true">
+			</juno-divider>
+		</div>
 		
 		<panel component-style="$ctrl.componentStyle" no-header="true">
 			<panel-body class="juno-text">
-				<i class="icon icon-plus"></i>
 				<div class="text">
-					Add to my schedule
+					Drag here to add to my schedule
 				</div>
-				<i class="icon icon-reply"></i>
 			</panel-body>
 		</panel>
 	</div>
@@ -35,18 +35,11 @@
 		</div>
 		
 		<div class="list-footer juno-text" ng-class="[$ctrl.componentStyle + '-background']">
-			<panel component-style="$ctrl.componentStyle" no-header="true">
-				<panel-body class="juno-text">
-					{{$ctrl.currentQueue.items.length}}
-				</panel-body>
-			</panel>
-			Appointments In Queue. Max Capacity
-			<panel component-style="$ctrl.componentStyle" no-header="true">
-				<panel-body class="juno-text">
-					{{$ctrl.maxQueueLength}}
-				</panel-body>
-			</panel>
-			Appointments
+			{{$ctrl.currentQueue.items.length}}
+			<span class="middle-text juno-text-secondary">
+				items in queue. max capacity
+			</span>
+			{{$ctrl.maxQueueLength}}
 			<juno-button component-style="$ctrl.componentStyle"
 			             button-color="JUNO_BUTTON_COLOR.INVISIBLE">
 				<i class="icon icon-linux"></i>

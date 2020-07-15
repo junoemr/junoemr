@@ -96,10 +96,26 @@
 	}
 }
 
-@mixin junoText($color)
+@mixin junoText($color, $color-secondary)
 {
 	.juno-text {
 		color: $color;
+
+		a:not(:hover) {
+			color: $color;
+		}
+	}
+
+	.juno-text-secondary {
+		color: $color-secondary;
+	}
+}
+
+@mixin junoModalBackground ($color)
+{
+	&.modal-content {
+		background: linear-gradient(-45deg, $color 45%, transparent 0) no-repeat 100% 100%,
+		linear-gradient(247deg, $color-primary-light, $color-primary-base 30%, $color-primary-base 64%, $color-primary-dark) no-repeat !important;
 	}
 }
 
@@ -232,11 +248,18 @@
 
 	@include junoPanelColor(white, $color-neutral-lighter, $color-neutral-lighter);
 
-	@include junoText($color-neutral-darker);
+	@include junoText($color-neutral-darker, $color-neutral-grey);
 }
 
+.juno-style-default-background-no-accent {
+	background-color: $color-neutral-white !important;
+}
 .juno-style-default-background {
-	background-color: white;
+	@extend .juno-style-default-background-no-accent;
+	@include junoModalBackground($color-neutral-white);
+}
+.juno-style-default-background-secondary {
+	background-color: $color-neutral-lightest !important;
 }
 
 // ============ STYLE GREY ===============
@@ -302,11 +325,17 @@
 		}
 	}
 
-	@include junoText($color-neutral-darker);
+	@include junoText($color-neutral-darker, $color-neutral-grey);
 }
-
+.juno-style-grey-background-no-accent {
+	background-color: $color-neutral-white !important;
+}
 .juno-style-grey-background {
-	background-color: white;
+	@extend .juno-style-grey-background-no-accent;
+	@include junoModalBackground($color-neutral-white);
+}
+.juno-style-grey-background-secondary {
+	background-color: $color-neutral-lightest !important;
 }
 
 // ============ STYLE DRACULA ===============
@@ -377,17 +406,16 @@
 		}
 	}
 
-	@include junoText($color-neutral-white);
+	@include junoText($color-neutral-white, $color-neutral-grey);
 }
+
 .juno-style-dracula-background-no-accent {
 	background-color: $color-neutral-darkest !important;
 }
-
 .juno-style-dracula-background {
 	@extend .juno-style-dracula-background-no-accent;
-
-	&.modal-content {
-		background: linear-gradient(-45deg, $color-neutral-darkest 45%, transparent 0) no-repeat 100% 100%,
-		linear-gradient(247deg, $color-primary-light, $color-primary-base 30%, $color-primary-base 64%, $color-primary-dark) no-repeat !important;
-	}
+	@include junoModalBackground($color-neutral-darkest);
+}
+.juno-style-dracula-background-secondary {
+	background-color: $color-neutral-black !important;
 }

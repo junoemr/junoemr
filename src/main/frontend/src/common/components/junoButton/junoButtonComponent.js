@@ -31,6 +31,7 @@ angular.module('Common.Components').component('junoButton', {
 		labelPosition: "<?",
 		componentStyle: "<?",
 		buttonColor: "<?",
+		buttonColorOverride: "<?",
 		disabled: "<?"
 	},
 	transclude: true,
@@ -57,6 +58,18 @@ angular.module('Common.Components').component('junoButton', {
 		ctrl.buttonClasses = () =>
 		{
 			return [ctrl.buttonColor];
+		}
+
+		ctrl.buttonStyle = () =>
+		{
+			if (ctrl.buttonColorOverride)
+			{
+				return {
+					"background-color": ctrl.buttonColorOverride,
+					"border-color": ctrl.buttonColorOverride,
+				};
+			}
+			return {};
 		}
 	}]
 });
