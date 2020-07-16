@@ -24,6 +24,8 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.data.SiteTestCollection;
+import integration.tests.util.data.SiteTestData;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
@@ -40,16 +42,43 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 
 public class AddSitesTests extends SeleniumTestBase {
 
+
 	@BeforeClass
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "site");
 	}
 
+	public void addNewSites(SiteTestData site)
+	{
+		driver.findElement(By.xpath(".//a[contains(.,'System Management')]")).click();
+		driver.findElement(By.xpath(".//a[contains(.,'Satellite-sites Admin')]")).click();
+		if (PageUtil.isExistsBy(By.id("myFrame"), driver))
+		{
+			driver.switchTo().frame("myFrame");
+		}
+		else
+		{
+			driver.switchTo().frame("content-frame");
+		}
+		driver.findElement(By.xpath("//input[@value='Add New Site']")).click();
+		driver.findElement(By.xpath("//input[@name='site.name']")).sendKeys(site.siteName);
+		driver.findElement(By.xpath("//input[@name='site.shortName']")).sendKeys(site.shortName);
+		driver.findElement(By.xpath("//input[@name='site.bgColor']")).sendKeys(site.address);
+		driver.findElement(By.xpath("//input[@name='site.status']")).click();
+		driver.findElement(By.xpath("//input[@name='site.phone']")).sendKeys(site.telephone);
+		driver.findElement(By.xpath("//input[@name='site.fax']")).sendKeys(site.fax);
+		driver.findElement(By.xpath("//input[@name='site.address']")).sendKeys(site.address);
+		driver.findElement(By.xpath("//input[@name='site.city']")).sendKeys(site.city);
+		dropdownSelectByValue(driver, By.id("province-select"), site.province);
+		driver.findElement(By.xpath("//input[@name='site.postal']")).sendKeys(site.postCode);
+		driver.findElement(By.xpath("//input[@name='site.bcFacilityNumber']")).sendKeys(site.bcpFacilityNumber);
+		driver.findElement(By.id("save-button")).click();
+	}
+
 	@Test
-	public void addProvidersClassicUITest() throws Exception {
-		String siteName = "Test Clinic";
-		String shortName = "TC";
+	public void addSitesClassicUITest() throws Exception {
+		SiteTestData site = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[0]);
 		// login
 		if (!Navigation.isLoggedIn(driver)) {
 			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
@@ -57,25 +86,29 @@ public class AddSitesTests extends SeleniumTestBase {
 		// open administration panel
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);
-		driver.findElement(By.linkText("System Management")).click();
-		driver.findElement(By.linkText("Satellite-sites Admin")).click();
-		driver.switchTo().frame("myFrame");
-		driver.findElement(By.xpath("//input[@value='Add New Site']")).click();
-		driver.findElement(By.xpath("//input[@name='site.name']")).sendKeys(siteName);
-		driver.findElement(By.xpath("//input[@name='site.shortName']")).sendKeys(shortName);
-		driver.findElement(By.xpath("//input[@name='site.bgColor']")).sendKeys("#1b2c3d");
-		driver.findElement(By.xpath("//input[@name='site.status']")).click();
-		driver.findElement(By.xpath("//input[@name='site.phone']")).sendKeys("250-250-2599");
-		driver.findElement(By.xpath("//input[@name='site.fax']")).sendKeys("250-250-2598");
-		driver.findElement(By.xpath("//input[@name='site.address']")).sendKeys("101 2500 Johnson St");
-		driver.findElement(By.xpath("//input[@name='site.city']")).sendKeys("Victoria");
-		dropdownSelectByValue(driver, By.id("province-select"), "BC");
-		driver.findElement(By.xpath("//input[@name='site.postal']")).sendKeys("V1N 2X3");
-		driver.findElement(By.xpath("//input[@name='site.bcFacilityNumber']")).sendKeys("111-222");
-		driver.findElement(By.id("save-button")).click();
-		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(siteName), driver));
-		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(shortName), driver));
+		addNewSites(site);
+		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(site.siteName), driver));
+		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
+	}
+
+	@Test
+	public void addSitesJUNOUITest() throws Exception
+	{
+		SiteTestData siteJuno = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[1]);
+		// login
+		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+
+		// open JUNO UI page
+		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
+
+		// open administration panel
+		driver.findElement(By.linkText("More")).click();
+		driver.findElement(By.linkText("Admin")).click();
+		addNewSites(siteJuno);
+		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(siteJuno.siteName), driver));
+		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
 	}
 }
+
 
 
