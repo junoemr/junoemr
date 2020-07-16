@@ -51,7 +51,7 @@ public class AlertMapper extends AbstractMapper
 		for (int i = 0; i < numNotes; i++)
 		{
 			CaseManagementNote note = getReminderNote(i, importSource);
-			if (note != null && (!CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource) || !isNoteFilteredMediplan(note)))
+			if (note != null)
 			{
 				noteList.add(note);
 			}
@@ -59,20 +59,11 @@ public class AlertMapper extends AbstractMapper
 		return noteList;
 	}
 
-	public boolean isNoteFilteredMediplan(CaseManagementNote note)
-	{
-		return (note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_FAMILY_HISTORY_ID) == 0 ||
-				note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_MEDICAL_NOTE_ID_1) == 0 ||
-				note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_MEDICAL_NOTE_ID_2) == 0 ||
-				note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_SOCIAL_HISTORY_ID) == 0 ||
-				note.getNote().indexOf(AllergyMapper.MEDIPLAN_ALLERGY_NOTE_ID) == 0);
-	}
-
 	public CaseManagementNote getReminderNote(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		CaseManagementNote note = null;
 
-		String noteText = getAlertText(rep);
+		String noteText = getNoteText(rep);
 		if(noteText != null)
 		{
 			note = new CaseManagementNote();
@@ -80,14 +71,7 @@ public class AlertMapper extends AbstractMapper
 			Date date = getAlertDate(rep);
 			note.setObservationDate(date);
 			note.setUpdateDate(date);
-			if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
-			{
-				note.setNote(noteText.replace(" / ", "\n"));
-			}
-			else
-			{
-				note.setNote(noteText.replaceAll("~crlf~", "\n"));
-			}
+			note.setNote(noteText.replaceAll("~crlf~", "\n"));
 		}
 		return note;
 	}
@@ -98,8 +82,39 @@ public class AlertMapper extends AbstractMapper
 				.getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValue());
 	}
 
-	public String getAlertText(int rep) throws HL7Exception
+	protected String getNoteText(int rep) throws HL7Exception
+	{
+		String textSent = getAlertTextSent(rep);
+		String comments = getAlertComments(rep);
+		String advanceDir = getAlertAdvanceDirFlag(rep);
+		String response = "";
+
+		if(textSent != null)
+		{
+			response += textSent + "\n";
+		}
+		if(comments != null)
+		{
+			response += comments + "\n";
+		}
+		if(advanceDir != null)
+		{
+			// wolf likes to put things in here so include them in the note
+			response += advanceDir + "\n";
+		}
+		return StringUtils.trimToNull(response);
+	}
+
+	public String getAlertTextSent(int rep) throws HL7Exception
 	{
 		return StringUtils.trimToNull(provider.getZAL(rep).getZal5_alertTextSent().getValue());
+	}
+	public String getAlertComments(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZAL(rep).getZal6_commentsToAlert().getValue());
+	}
+	public String getAlertAdvanceDirFlag(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZAL(rep).getZal7_advanceDirFlag().getValue());
 	}
 }

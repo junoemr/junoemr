@@ -49,6 +49,7 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Optional;
 
 @Entity
 @EntityListeners(BeanValidationEventListener.class)
@@ -63,6 +64,12 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	{
 		OSCAR,
 		MYOSCAR_SELF_BOOKING
+	}
+
+	public enum ConfirmedByType
+	{
+		MHA_PATIENT_USER_ID,
+		SECURITY_NO
 	}
 
 	public static final String DONOTBOOK = "Do_Not_Book";
@@ -136,7 +143,18 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	
 	@Enumerated(EnumType.STRING)
 	private BookingSource bookingSource;
-	
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "confirmed_at")
+	private Date confirmedAt;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "confirmed_by_type")
+	private ConfirmedByType confirmedByType;
+
+	@Column(name = "confirmed_by")
+	private String confirmedBy;
+
 	private Integer reasonCode;
 
 	/** default constructor */
@@ -176,7 +194,6 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 		this.bookingSource = appointmentToCopy.bookingSource;
 		this.reasonCode = appointmentToCopy.reasonCode;
 	}
-
 
 	public Integer getReasonCode() {
 		return reasonCode;
@@ -413,6 +430,43 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
     	this.bookingSource = bookingSource;
     }
 
+	public Optional<Date> getConfirmedAt()
+	{
+		return Optional.ofNullable(this.confirmedAt);
+	}
+
+	public void setConfirmedAt(Date confirmedAt)
+	{
+		this.confirmedAt = confirmedAt;
+	}
+
+	public Optional<ConfirmedByType> getConfirmedByType()
+	{
+		return Optional.ofNullable(confirmedByType);
+	}
+
+	public void setConfirmedByType(ConfirmedByType confirmedByType)
+	{
+		this.confirmedByType = confirmedByType;
+	}
+
+	public Optional<String> getConfirmedBy()
+	{
+		return Optional.ofNullable(confirmedBy);
+	}
+
+	public void setConfirmedBy(String confirmedBy)
+	{
+		this.confirmedBy = confirmedBy;
+	}
+
+	public void confirm(Date confirmedAt, ConfirmedByType confirmedByType, String confirmedBy)
+	{
+		this.confirmedAt = confirmedAt;
+		this.confirmedBy = confirmedBy;
+		this.confirmedByType = confirmedByType;
+	}
+
 	@Override
 	public Integer getId() {
 		return id;
@@ -426,6 +480,11 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@PreUpdate
 	protected void jpaUpdateLastUpdateTime() {
 		this.updateDateTime = new Date();
+	}
+
+	public boolean isConfirmed()
+	{
+		return this.getConfirmedAt().isPresent();
 	}
 	
     public static final Comparator<Appointment> APPT_DATE_COMPARATOR =new Comparator<Appointment>()

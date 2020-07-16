@@ -61,13 +61,23 @@
 		bFirstDisp = (request.getParameter("bFirstDisp")).equals("true");
 %>
 
-<%@page import="org.oscarehr.PMmodule.model.Program, org.oscarehr.PMmodule.service.ProgramManager, org.oscarehr.PMmodule.service.ProviderManager, org.oscarehr.common.OtherIdManager, org.oscarehr.common.dao.BillingONCHeader1Dao, org.oscarehr.common.dao.BillingONExtDao, org.oscarehr.common.dao.EncounterFormDao, org.oscarehr.common.dao.OscarAppointmentDao, org.oscarehr.common.dao.SiteDao" %>
+<%@ page import="org.oscarehr.PMmodule.model.Program"%>
+<%@ page import="org.oscarehr.PMmodule.service.ProgramManager"%>
+<%@ page import="org.oscarehr.PMmodule.service.ProviderManager"%>
+<%@ page import="org.oscarehr.common.OtherIdManager"%>
+<%@ page import="org.oscarehr.common.dao.BillingONCHeader1Dao"%>
+<%@ page import="org.oscarehr.common.dao.BillingONExtDao" %>
+<%@ page import="org.oscarehr.common.dao.EncounterFormDao" %>
+<%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
+<%@ page import="org.oscarehr.common.dao.SiteDao" %>
 <%@ page import="org.oscarehr.common.model.Appointment" %>
 <%@ page import="org.oscarehr.common.model.AppointmentStatus" %>
-<%@page import="org.oscarehr.common.model.BillingONCHeader1" %>
-<%@page import="org.oscarehr.common.model.Demographic" %>
-<%@ page
-		import="org.oscarehr.common.model.EncounterForm, org.oscarehr.common.model.Facility, org.oscarehr.common.model.LookupList, org.oscarehr.common.model.LookupListItem" %>
+<%@ page import="org.oscarehr.common.model.BillingONCHeader1" %>
+<%@ page import="org.oscarehr.common.model.Demographic" %>
+<%@ page import="org.oscarehr.common.model.EncounterForm" %>
+<%@ page import="org.oscarehr.common.model.Facility" %>
+<%@ page import="org.oscarehr.common.model.LookupList" %>
+<%@ page import="org.oscarehr.common.model.LookupListItem" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -283,10 +293,10 @@
 
 			function validateForm()
 			{
-				if (saveTemp == 1)
+				if (saveTemp === 1)
 				{
 					var aptStat = document.EDITAPPT.status.value;
-					if (aptStat.indexOf('B') == 0)
+					if (aptStat.indexOf('B') === 0)
 					{
 						return (confirm("<bean:message key="appointment.editappointment.msgDeleteBilledConfirmation"/>"));
 					}
@@ -295,11 +305,16 @@
 						return (confirm("<bean:message key="appointment.editappointment.msgDeleteConfirmation"/>"));
 					}
 				}
-				if (saveTemp == 2)
+				if (saveTemp === 2)
 				{
-					if (document.EDITAPPT.notes.value.length > 255)
+					if (Oscar.Util.Common.getLengthWithLineBreaks(document.EDITAPPT.notes) > 255)
 					{
 						window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
+						return false;
+					}
+					if (Oscar.Util.Common.getLengthWithLineBreaks(document.EDITAPPT.reason) > 80)
+					{
+						window.alert("<bean:message key="appointment.editappointment.msgReasonTooBig"/>");
 						return false;
 					}
 					if (!handleDateChange(document.EDITAPPT.appointment_date))
@@ -837,7 +852,7 @@
 						<div class="space">&nbsp;</div>
 						<div class="label"><bean:message key="Appointment.formNotes"/>:</div>
 						<div class="input">
-				<textarea name="notes" tabindex="3" rows="2" wrap="virtual"
+				<textarea name="notes" tabindex="3" rows="2" wrap="virtual" maxlength="255"
 						  cols="18"><%=bFirstDisp ? appt.getNotes() : request.getParameter("notes")%></textarea>
 						</div>
 					</li>
@@ -865,24 +880,21 @@
 								if (bMultisites)
 								{ %>
 							<select tabindex="4" name="location" style="background-color: <%=colo%>"
-									onchange='this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor'>
-								<%
-									StringBuilder sb = new StringBuilder();
-									for (Site s : sites)
-									{
-										if (s.getName().equals(loc))
-											isSiteSelected = true; // added by vic
-										sb.append("<option value=\"").append(s.getName()).append("\" style=\"background-color: ").append(s.getBgColor()).append("\" ").append(s.getName().equals(loc) ? "selected" : "").append(">").append(s.getName()).append("</option>");
-									}
-									if (isSiteSelected)
-									{
-										out.println(sb.toString());
-									} else
-									{
-										out.println("<option value='" + loc + "'>" + loc + "</option>");
-									}
-								%>
-
+									onchange='this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor'
+                                    <%= appt.getIsVirtual() ? "disabled=\"disabled\"" : ""%>
+                                    <%= appt.getIsVirtual() ? "title=\"Sites can't be changed for virtual appointments\"" : ""%>
+                            >
+								<% for (Site site : sites)
+								{
+									boolean currentSite = site.getName().equals(loc);
+									isSiteSelected = isSiteSelected || currentSite;
+                                %>
+                                    <option value="<%= site.getName() %>"
+                                            style="background-color: <%= site.getBgColor() %>"
+                                            <%= currentSite ? "selected=\"selected\"" : "" %>>
+                                        <%= site.getName() %>
+                                    </option>
+                                <%  } %>
 							</select>
 							<% } else
 							{
@@ -1404,7 +1416,15 @@
 	<script type="text/javascript">
 		var loc = document.forms['EDITAPPT'].location;
 		if (loc.nodeName.toUpperCase() === 'SELECT') loc.style.backgroundColor = loc.options[loc.selectedIndex].style.backgroundColor;
-
+		<%
+			String demographicEmail = "";
+			Demographic demographic = demographicManager.getDemographic(loggedInInfo, demono);
+			if (demographic != null)
+			{
+				demographicEmail = StringUtils.trimToEmpty(demographic.getEmail());
+			}
+		%>
+		var demographicEmail = '<%=demographicEmail%>';
 		var mhaAppointment = null;
 
 		function updateTelehealthControls()
@@ -1414,14 +1434,11 @@
 					"<%=request.getParameter("appointment_no")%>").then((res) =>
 			{
 				var appt = JSON.parse(res).body;
-				if (appt && appt.appointmentType === "ONE_TIME_LINK")
+				mhaAppointment = appt;
+
+				if (appt != null || demographicEmail !== '')
 				{
 					jQuery("#send-telehealth-link-btn").css("display", "inherit");
-					mhaAppointment = appt;
-				}
-				else
-				{
-					jQuery("#send-telehealth-link-btn").css("display", "none");
 				}
 			}).catch((error) =>
 			{
@@ -1458,16 +1475,30 @@
 				{
 					if (mhaAppointment)
 					{
-						myhealthaccess.sendAppointmentOneTimeLinkNotification("<%=request.getContextPath()%>",
+						myhealthaccess.sendTelehealthAppointmentNotification("<%=request.getContextPath()%>",
 								jQuery(document.forms.EDITAPPT.location).val(), mhaAppointment).then(() =>
 						{
 							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
 							window.setTimeout(() => {
-								jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0")
+								jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
 							}, 3000);
 						}).catch((err) =>
 						{
-							jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0")
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
+						});
+					}
+					else
+					{// non mha appt
+						myhealthaccess.sendGeneralAppointmentNotification("<%=request.getContextPath()%>",
+								jQuery(document.forms.EDITAPPT.location).val(), "<%=request.getParameter("appointment_no")%>").then(() =>
+						{
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
+							window.setTimeout(() => {
+								jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
+							}, 3000);
+						}).catch((err) =>
+						{
+							jQuery("#send-telehealth-link-msg-sent").css("opacity", "0.0");
 						});
 					}
 				});

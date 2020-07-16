@@ -46,6 +46,9 @@ public class DemographicSets extends AbstractModel<Integer> {
 	@JoinColumn(name="demographic_no")
 	private Demographic demographic;
 
+	@Column(insertable = false, updatable = false)
+	private Integer demographic_no;
+
 	@Column(name="set_name")
 	private String name;
 
@@ -94,4 +97,14 @@ public class DemographicSets extends AbstractModel<Integer> {
 	public void setArchive(String archive) {
     	this.archive = archive;
     }
+
+	public Integer getDemographic_no()
+	{
+		return demographic_no;
+	}
+
+	public void setDemographic_no(Integer demographic_no)
+	{
+		this.demographic_no = demographic_no;
+	}
 }

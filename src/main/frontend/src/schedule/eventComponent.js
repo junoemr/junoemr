@@ -168,7 +168,8 @@ angular.module('Schedule').component('eventComponent', {
 			$scope.TELEHEALTH_MODES = {
 				NONE: "none",
 				TELEHEALTH: "telehealth",
-				ONE_TIME_TELEHEALTH: "oneTimeTelehealth"
+				ONE_TIME_TELEHEALTH: "oneTimeTelehealth",
+				NO_CONNECTION: "noConnection",
 			};
 			$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;
 
@@ -470,7 +471,7 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.updateDemographicTelehealthEligibility = async () =>
 			{
-				if (controller.demographicModel.demographicNo && !controller.editMode)
+				if (controller.demographicModel.demographicNo)
 				{
 					let integration = (await mhaIntegrationApi.searchIntegrations($scope.eventData.site)).data.body;
 					if (integration)
@@ -488,9 +489,20 @@ angular.module('Schedule').component('eventComponent', {
 							else
 							{
 								$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;
-								$scope.eventData.virtual = false;
+								if (!controller.editMode)
+								{
+									$scope.eventData.virtual = false;
+								}
 							}
 						});
+					}
+					else
+					{
+						$scope.telehealthMode = $scope.TELEHEALTH_MODES.NO_CONNECTION;
+						if (!controller.editMode)
+						{
+							$scope.eventData.virtual = false;
+						}
 					}
 				}
 				else
@@ -515,6 +527,14 @@ angular.module('Schedule').component('eventComponent', {
 					return "Telehealth appointment unavailable";
 				}
 			};
+
+			controller.getSiteChangeToolTip = () =>
+            {
+                if ($scope.eventData.virtual && controller.inEditMode())
+                {
+                    return "Sites can't be changed for telehealth appointments";
+                }
+            };
 
 			controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 			{
@@ -730,6 +750,16 @@ angular.module('Schedule').component('eventComponent', {
 				Juno.Common.Util.validateDateString(controller.repeatBookingData.endDate,
 					$scope.displayMessages, 'repeatEndOnDate', 'Repeat End Date', false);
 
+				if (Juno.Common.Util.exists($scope.eventData.notes) && $scope.eventData.notes.length > 255)
+				{
+					$scope.displayMessages.add_field_error('notes', 'Note length cannot exceed 255 characters');
+				}
+
+				if (Juno.Common.Util.exists($scope.eventData.reason) && $scope.eventData.reason.length > 80)
+				{
+					$scope.displayMessages.add_field_error('event_reason', 'Reason length cannot exceed 80 characters');
+				}
+
 				return !$scope.displayMessages.has_errors();
 			};
 
@@ -741,6 +771,7 @@ angular.module('Schedule').component('eventComponent', {
 					controller.repeatBookingDates = controller.generateRepeatBookingDateList(controller.repeatBooking.max_bookings_limit);
 				}
 			};
+
 			controller.removeRepeatBookingDate = function removeRepeatBookingDate(dataObj)
 			{
 				controller.repeatBookingDates = controller.repeatBookingDates.filter(function(e) { return e !== dataObj })
@@ -1393,7 +1424,14 @@ angular.module('Schedule').component('eventComponent', {
 				}
 			};
 
-			controller.sendOnTimeTelehealthNotification = async () =>
+			controller.shouldShowNotificationButtons = () =>
+			{
+				return (controller.demographicModel.data.email ||
+							 ($scope.telehealthMode === $scope.TELEHEALTH_MODES.TELEHEALTH && $scope.eventData.virtual)) &&
+								$scope.telehealthMode !== $scope.TELEHEALTH_MODES.NO_CONNECTION;
+			}
+
+			controller.sendAppointmentNotification = async () =>
 			{
 				controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.SENDING;
 				try
@@ -1404,7 +1442,11 @@ angular.module('Schedule').component('eventComponent', {
 					{
 						if (controller.mhaAppointment)
 						{
-							await mhaAppointmentApi.sendOneTimeTelehealthLink(integration.id, controller.mhaAppointment.id)
+							await mhaAppointmentApi.sendTelehealthAppointmentNotification(integration.id, controller.mhaAppointment.id)
+						}
+						else
+						{
+							await mhaAppointmentApi.sendGeneralAppointmentNotification(integration.id, $scope.eventUuid)
 						}
 						result = controller.SENDING_NOTIFICATION_STATES.SENT
 					}
