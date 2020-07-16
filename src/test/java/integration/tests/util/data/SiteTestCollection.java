@@ -29,12 +29,15 @@ public class SiteTestCollection
 {
 	public static HashMap<String, SiteTestData> siteMap = new HashMap<>();
 	public static String[] siteNames = {"Test Clinic", "Test Clinic JUNO"};
+	public static String[] shortNames = {"TC", "TC JUNO"};
+	public static String[] themeColors = {"#E6C72E", "#80CC33"};
+
 	static {
 
-		SiteTestData site = new SiteTestData(siteNames[0], "TC", "#E6C72E");
+		SiteTestData site = new SiteTestData(siteNames[0], shortNames[0], themeColors[0]);
 		siteMap.put(site.siteName, site);
 
-		SiteTestData site2 = new SiteTestData(siteNames[1], "TC JUNO", "#80CC33");
+		SiteTestData site2 = new SiteTestData(siteNames[1], shortNames[1], themeColors[1]);
 		siteMap.put(site2.siteName, site2);
 	}
 
