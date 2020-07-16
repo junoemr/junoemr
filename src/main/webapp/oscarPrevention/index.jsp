@@ -43,8 +43,10 @@
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-      String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-	  boolean authed=true;
+	PreventionDao preventionDao = SpringUtils.getBean(PreventionDao.class);
+
+	String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+	boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_prevention" rights="r" reverse="<%=true%>">
 	<%authed=false; %>
@@ -57,45 +59,62 @@ if(!authed) {
 %>
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-   		 
-  //int demographic_no = Integer.parseInt(request.getParameter("demographic_no"));
-  String demographic_no = request.getParameter("demographic_no");
-  DemographicData demoData = new DemographicData();
-  String nameAge = demoData.getNameAgeString(loggedInInfo, demographic_no);
-  org.oscarehr.common.model.Demographic demo = demoData.getDemographic(loggedInInfo, demographic_no);
-  String hin = demo.getHin()+demo.getVer();
-  String mrp = demo.getProviderNo();
-  PreventionManager preventionManager = SpringUtils.getBean(PreventionManager.class);
 
-  PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
-  ArrayList<HashMap<String,String>> prevList = pdc.getPreventions();
+	String demographic_no = request.getParameter("demographic_no");
+	DemographicData demoData = new DemographicData();
+	String nameAge = demoData.getNameAgeString(loggedInInfo, demographic_no);
+	org.oscarehr.common.model.Demographic demo = demoData.getDemographic(loggedInInfo, demographic_no);
+	String hin = demo.getHin()+demo.getVer();
+	String mrp = demo.getProviderNo();
+	PreventionManager preventionManager = SpringUtils.getBean(PreventionManager.class);
 
-  ArrayList<Map<String,Object>> configSets = pdc.getConfigurationSets();
+	PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
+	ArrayList<HashMap<String,String>> prevList = pdc.getPreventions();
+	ArrayList<Map<String,Object>> configSets = pdc.getConfigurationSets();
+
+	Integer demographicId = Integer.parseInt(demographic_no);
+
+	Map<String,ArrayList<Map<String,Object>>> alistHash = new HashMap<String,ArrayList<Map<String,Object>>>();
+	Map<String, PreventionListData>	preventionListDataMap = preventionDao.getPreventionListData(demographicId);
+
+	DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+	Demographic demographic = demographicManager.getDemographic(loggedInInfo, Integer.valueOf(demographic_no));
+	for(HashMap<String,String> prevention:prevList)
+	{
+		ArrayList<Map<String, Object>> alist = new ArrayList<Map<String, Object>>();
+
+		String preventionName = prevention.get("name");
+		PreventionListData preventionListData = preventionListDataMap.get(preventionName);
+		if(preventionListData != null && preventionListData.getPreventionCount() > 0)
+		{
+			alist = PreventionData.getPreventionData(loggedInInfo, prevention.get("name"), demographic);
+		}
+
+		alistHash.put(prevention.get("name"), alist);
+	}
+
+	Prevention p = PreventionData.getPrevention(loggedInInfo, Integer.valueOf(demographic_no));
+
+	Date demographicDateOfBirth = PreventionData.getDemographicDateOfBirth(loggedInInfo, Integer.valueOf(demographic_no));
+
+	PreventionDS pf = SpringUtils.getBean(PreventionDS.class);
 
 
+	boolean dsProblems = false;
+	try
+	{
+		pf.getMessages(p);
+	}
+	catch(Exception dsException)
+	{
+		MiscUtils.getLogger().error("Error running prevention rules",dsException);
+		dsProblems = true;
+	}
 
-  Prevention p = PreventionData.getPrevention(loggedInInfo, Integer.valueOf(demographic_no));
+	ArrayList warnings = p.getWarnings();
+	ArrayList recomendations = p.getReminder();
 
-  Integer demographicId=Integer.parseInt(demographic_no);
-  PreventionData.addRemotePreventions(loggedInInfo, p, demographicId);
-  Date demographicDateOfBirth=PreventionData.getDemographicDateOfBirth(loggedInInfo, Integer.valueOf(demographic_no));
-  String demographicDob = oscar.util.UtilDateUtilities.DateToString(demographicDateOfBirth);
-
-  PreventionDS pf = SpringUtils.getBean(PreventionDS.class);
-
-
-  boolean dsProblems = false;
-  try{
-     pf.getMessages(p);
-  }catch(Exception dsException){
-	  MiscUtils.getLogger().error("Error running prevention rules",dsException);
-      dsProblems = true;
-  }
-
-  ArrayList warnings = p.getWarnings();
-  ArrayList recomendations = p.getReminder();
-
-  boolean printError = request.getAttribute("printError") != null;
+	boolean printError = request.getAttribute("printError") != null;
 %>
 
 <%!
@@ -111,8 +130,11 @@ if(!authed) {
 
 
 
-<%@page import="org.oscarehr.util.SessionConstants"%><html:html
-	locale="true">
+<%@page import="org.oscarehr.util.SessionConstants"%>
+<%@ page import="org.oscarehr.prevention.dto.PreventionListData" %>
+<%@ page import="org.oscarehr.prevention.dao.PreventionDao" %>
+<%@ page import="org.oscarehr.managers.DemographicManager" %>
+<html:html locale="true">
 
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -181,7 +203,9 @@ span.footnote {
 <script type="text/javascript">
 window.onload=function(){
 if(!NiftyCheck())
+{
     return;
+}
 
 //Rounded("div.news","all","transparent","#FFF","small border #999");
 Rounded("div.headPrevention","all","#CCF","#efeadc","small border blue");
@@ -460,20 +484,23 @@ text-align:left;
 		<div class="leftBox">
 		<h3>&nbsp;Preventions</h3>
 		<div style="background-color: #EEEEFF;">
-		<ul>
-			<%for (int i = 0 ; i < prevList.size(); i++){
-				HashMap<String,String> h = prevList.get(i);
-                String prevName = h.get("name");
-                           
-	            if(!preventionManager.hideItem(prevName)){%>
-					<li style="margin-top: 2px;"><a
+			<ul>
+				<%
+					for (int i = 0 ; i < prevList.size(); i++)
+					{
+						HashMap<String,String> h = prevList.get(i);
+						String prevName = h.get("name");
+
+						if(!preventionManager.hideItem(prevName))
+						{%>
+				<li style="margin-top: 2px;"><a
 						href="javascript: function myFunction() {return false; }"
 						onclick="javascript:popup(465,635,'AddPreventionData.jsp?prevention=<%= java.net.URLEncoder.encode(prevName) %>&amp;demographic_no=<%=demographic_no%>&amp;prevResultDesc=<%= java.net.URLEncoder.encode(h.get("resultDesc")) %>','addPreventionData<%=Math.abs(prevName.hashCode()) %>')" title="<%=h.get("desc")%>">
 					<%=prevName%> </a></li>
 				<%
-				}
-			}
-			%>
+						}
+					}
+				%>
 		</ul>
 		</div>
 		</div>
@@ -543,124 +570,153 @@ text-align:left;
 		</ul>
 		</div>
 		<% }
-	
-	 String[] ColourCodesArray=new String[7];
-	 ColourCodesArray[1]="#F0F0E7"; //very light grey - completed or normal
-	 ColourCodesArray[2]="#FFDDDD"; //light pink - Refused
-	 ColourCodesArray[3]="#FFCC24"; //orange - Ineligible
-	 ColourCodesArray[4]="#FF00FF"; //dark pink - pending
-	 ColourCodesArray[5]="#ee5f5b"; //dark salmon to match part of bootstraps danger - abnormal
-	 ColourCodesArray[6]="#BDFCC9"; //green - other
 
-	 //labels for colour codes
-	 String[] lblCodesArray=new String[7];
-	 lblCodesArray[1]="Completed or Normal";
-	 lblCodesArray[2]="Refused";
-	 lblCodesArray[3]="Ineligible";
-	 lblCodesArray[4]="Pending";
-	 lblCodesArray[5]="Abnormal";
-	 lblCodesArray[6]="Other";
+			String[] ColourCodesArray=new String[7];
+			ColourCodesArray[1]="#F0F0E7"; //very light grey - completed or normal
+			ColourCodesArray[2]="#FFDDDD"; //light pink - Refused
+			ColourCodesArray[3]="#FFCC24"; //orange - Ineligible
+			ColourCodesArray[4]="#FF00FF"; //dark pink - pending
+			ColourCodesArray[5]="#ee5f5b"; //dark salmon to match part of bootstraps danger - abnormal
+			ColourCodesArray[6]="#BDFCC9"; //green - other
 
-	 //Title ie: Legend or Profile Legend
-	 String legend_title="Legend: ";
+			//labels for colour codes
+			String[] lblCodesArray=new String[7];
+			lblCodesArray[1]="Completed or Normal";
+			lblCodesArray[2]="Refused";
+			lblCodesArray[3]="Ineligible";
+			lblCodesArray[4]="Pending";
+			lblCodesArray[5]="Abnormal";
+			lblCodesArray[6]="Other";
 
-	 //creat empty builder string
-	 String legend_builder=" ";
+			//Title ie: Legend or Profile Legend
+			String legend_title="Legend: ";
+
+			//creat empty builder string
+			String legend_builder=" ";
 
 
-	 	for (int iLegend = 1; iLegend < 7; iLegend++){
+			for (int iLegend = 1; iLegend < 7; iLegend++){
 
-			legend_builder +="<td> <table class='colour_codes' style=\"white-space:nowrap;\" bgcolor='"+ColourCodesArray[iLegend]+"'><tr><td> </td></tr></table> </td> <td align='center' style=\"white-space:nowrap;\">"+lblCodesArray[iLegend]+"</td>";
+				legend_builder +="<td> <table class='colour_codes' style=\"white-space:nowrap;\" bgcolor='"+ColourCodesArray[iLegend]+"'><tr><td> </td></tr></table> </td> <td align='center' style=\"white-space:nowrap;\">"+lblCodesArray[iLegend]+"</td>";
 
-		}
+			}
 
-	 	String legend = "<table class='legend' cellspacing='0'><tr><td><b>"+legend_title+"</b></td>"+legend_builder+" </tr></table>";
+			String legend = "<table class='legend' cellspacing='0'><tr><td><b>"+legend_title+"</b></td>"+legend_builder+" </tr></table>";
 
-		out.print(legend);
-%>
+			out.print(legend);
+		%>
 
-		<div>
-		<input type="hidden" name="demographic_no" value="<%=demographic_no%>">
-		<input type="hidden" name="hin" value="<%=hin%>"/>
-		<input type="hidden" name="mrp" value="<%=mrp%>" />
-                <input type="hidden" name="module" value="prevention">
-		<%
-                 if (!oscar.OscarProperties.getInstance().getBooleanProperty("PREVENTION_CLASSIC_VIEW","yes")){
-                   ArrayList<Map<String,Object>> hiddenlist = new ArrayList<Map<String,Object>>();
-                  for (int i = 0 ; i < prevList.size(); i++){
+			<div>
+				<input type="hidden" name="demographic_no" value="<%=demographic_no%>">
+				<input type="hidden" name="hin" value="<%=hin%>"/>
+				<input type="hidden" name="mrp" value="<%=mrp%>" />
+				<input type="hidden" name="module" value="prevention">
+						<%
+                 if (!oscar.OscarProperties.getInstance().getBooleanProperty("PREVENTION_CLASSIC_VIEW","yes"))
+                 {
+		            //Map<String, PreventionListData>	preventionListDataMap = preventionDao.getPreventionListData(demographicId);
+
+                    //DemographicData dData = new DemographicData();
+                    //Demographic demographic = dData.getDemographic(loggedInInfo, demographic_no);
+                 	ArrayList<Map<String,Object>> hiddenlist = new ArrayList<Map<String,Object>>();
+                    for (int i = 0 ; i < prevList.size(); i++)
+                    {
                   		HashMap<String,String> h = prevList.get(i);
                         String prevName = h.get("name");
-                        ArrayList<Map<String,Object>> alist = PreventionData.getPreventionData(loggedInInfo, prevName, Integer.valueOf(demographic_no));
-                        PreventionData.addRemotePreventions(loggedInInfo, alist, demographicId,prevName,demographicDateOfBirth);
-                        boolean show = pdc.display(loggedInInfo, h, demographic_no,alist.size());
+                        //ArrayList<Map<String,Object>> alist = new ArrayList<Map<String,Object>>();
+                        //PreventionData.addRemotePreventions(loggedInInfo, alist, demographicId,prevName,demographicDateOfBirth);
+                            //alist = PreventionData.getPreventionData(loggedInInfo, prevName, Integer.valueOf(demographic_no));
+
+                        ArrayList<Map<String,Object>> alist = alistHash.get(prevName);
+
+			            PreventionListData preventionListData = preventionListDataMap.get(prevName);
+
+                        int preventionCount = 0;
+                        if (preventionListData != null)
+                        {
+                            preventionCount = preventionListData.getPreventionCount();
+                        }
+
+                        boolean show = pdc.display(loggedInInfo, h, demographic, preventionCount);
                         if(!show)
+                        {
                             Map<String,Object> h2 = new HashMap<String,Object>();
                             h2.put("prev",h);
                             h2.put("list",alist);
                             hiddenlist.add(h2);
-                        }else{
+                        }
+                        else
+                       	{
                %>
 
-		<div class="preventionSection">
-		<%
+				<div class="preventionSection">
+							<%
                     if( alist.size() > 0 ) {
                     %>
-		<div style="position: relative; float: left; padding-right: 10px;">
-		<input style="display: none;" type="checkbox" name="printHP"
-			value="<%=i%>" checked /> <%}else {%>
-		<div style="position: relative; float: left; padding-right: 25px;">
-		<span style="display: none;" name="printSp">&nbsp;</span> <%}%>
-		</div>
-		<div class="headPrevention">
-		<p><a href="javascript: function myFunction() {return false; }"
-			onclick="javascript:popup(465,635,'AddPreventionData.jsp?prevention=<%= response.encodeURL( h.get("name")) %>&amp;demographic_no=<%=demographic_no%>&amp;prevResultDesc=<%= java.net.URLEncoder.encode(h.get("resultDesc")) %>','addPreventionData<%=Math.abs( ( h.get("name")).hashCode() ) %>')">
-		<span title="<%=h.get("desc")%>" style="font-weight: bold;"><%=h.get("name")%></span>
-		</a>
-		<br />
-		</p>
-		</div>
-		<%              String result;
-                        for (int k = 0; k < alist.size(); k++){
-                        Map<String,Object> hdata = alist.get(k);
-                        Map<String,String> hExt = PreventionData.getPreventionKeyValues((String)hdata.get("id"));
-                        result = hExt.get("result");
+					<div style="position: relative; float: left; padding-right: 10px;">
+						<input style="display: none;" type="checkbox" name="printHP"
+							   value="<%=i%>" checked /> <%}else {%>
+						<div style="position: relative; float: left; padding-right: 25px;">
+							<span style="display: none;" name="printSp">&nbsp;</span> <%}%>
+						</div>
+						<div class="headPrevention">
+							<p><a href="javascript: function myFunction() {return false; }"
+								  onclick="javascript:popup(465,635,'AddPreventionData.jsp?prevention=<%= response.encodeURL( h.get("name")) %>&amp;demographic_no=<%=demographic_no%>&amp;prevResultDesc=<%= java.net.URLEncoder.encode(h.get("resultDesc")) %>','addPreventionData<%=Math.abs( ( h.get("name")).hashCode() ) %>')">
+								<span title="<%=h.get("desc")%>" style="font-weight: bold;"><%=h.get("name")%></span>
+							</a>
+								<br />
+							</p>
+						</div>
+						<%
+							String result;
+							for (int k = 0; k < alist.size(); k++)
+							{
+								Map<String,Object> hdata = alist.get(k);
+								Map<String,String> hExt = PreventionData.getPreventionKeyValues((String)hdata.get("id"));
+								result = hExt.get("result");
 
-                        String onClickCode="javascript:popup(465,635,'AddPreventionData.jsp?id="+hdata.get("id")+"&amp;demographic_no="+demographic_no+"','addPreventionData')";
-                        if (hdata.get("id")==null) onClickCode="popup(300,500,'display_remote_prevention.jsp?remoteFacilityId="+hdata.get("integratorFacilityId")+"&remotePreventionId="+hdata.get("integratorPreventionId")+"&amp;demographic_no="+demographic_no+"')";
-                        %>
-             
-		<div class="preventionProcedure" onclick="<%=onClickCode%>" title="fade=[on] header=[<%=hdata.get("age")%> -- Date:<%=hdata.get("prevention_date_no_time")%>] body=[<%=hExt.get("comments")%>&lt;br/&gt;Entered By: <%=hdata.get("creator_name")%>]">
-		
-		<!--this is setting the style <%=r(hdata.get("refused"),result)%>  -->
-		<p <%=r(hdata.get("refused"),result)%> >Age: <%=hdata.get("age")%> <%if(result!=null && result.equals("abnormal")){out.print("result:"+result);}%> <br />
-		<!--<%=refused(hdata.get("refused"))%>-->Date: <%=hdata.get("prevention_date_no_time")%>
-		<%if (hExt.get("comments") != null && (hExt.get("comments")).length()>0) {
+								String onClickCode="javascript:popup(465,635,'AddPreventionData.jsp?id="+hdata.get("id")+"&amp;demographic_no="+demographic_no+"','addPreventionData')";
+								if (hdata.get("id")==null)
+								{
+									onClickCode="popup(300,500,'display_remote_prevention.jsp?remoteFacilityId="+hdata.get("integratorFacilityId")+"&remotePreventionId="+hdata.get("integratorPreventionId")+"&amp;demographic_no="+demographic_no+"')";
+								}
+						%>
+
+						<div class="preventionProcedure" onclick="<%=onClickCode%>" title="fade=[on] header=[<%=hdata.get("age")%> -- Date:<%=hdata.get("prevention_date_no_time")%>] body=[<%=hExt.get("comments")%>&lt;br/&gt;Entered By: <%=hdata.get("creator_name")%>]">
+
+							<!--this is setting the style <%=r(hdata.get("refused"),result)%>  -->
+							<p <%=r(hdata.get("refused"),result)%> >Age: <%=hdata.get("age")%> <%if(result!=null && result.equals("abnormal")){out.print("result:"+result);}%> <br />
+								<!--<%=refused(hdata.get("refused"))%>-->Date: <%=hdata.get("prevention_date_no_time")%>
+										<%if (hExt.get("comments") != null && (hExt.get("comments")).length()>0) {
                     if (oscar.OscarProperties.getInstance().getBooleanProperty("prevention_show_comments","yes")){%>
-                    <div class="comments"><span><%=hExt.get("comments")%></span></div>
-               <%   } else { %>
-            <span class="footnote">1</span>
-            <%      }
-                 }%>
-		<%=getFromFacilityMsg(hdata)%></p>
-		</div>
-		<%}%>
-		</div>
-		<%
+							<div class="comments"><span><%=hExt.get("comments")%></span></div>
+							<%   } else { %>
+							<span class="footnote">1</span>
+							<%      }
+							}%>
+									<%=getFromFacilityMsg(hdata)%></p>
+						</div>
+						<%}%>
+					</div>
+										<%
                         }
                     } %> <a href="#"
 			onclick="Element.toggle('otherElements'); return false;"
 			style="font-size: xx-small;">show/hide all other Preventions</a>
 		<div style="display: none;" id="otherElements">
-		<%for (int i = 0 ; i < hiddenlist.size(); i++){
-						Map<String,Object> h2 = hiddenlist.get(i);
-						HashMap<String,String> h = (HashMap<String,String>) h2.get("prev");
-                        String prevName = h.get("name");
-                        ArrayList<HashMap<String,String>> alist = (ArrayList<HashMap<String,String>>)  h2.get("list");
-                        %>
-		<div class="preventionSection">
 		<%
-                            if( alist.size() > 0 ) {
-                            %>
+			for (int i = 0 ; i < hiddenlist.size(); i++)
+			{
+				Map<String,Object> h2 = hiddenlist.get(i);
+				HashMap<String,String> h = (HashMap<String,String>) h2.get("prev");
+				String prevName = h.get("name");
+				ArrayList<HashMap<String,String>> alist = (ArrayList<HashMap<String,String>>)  h2.get("list");
+		%>
+			<div class="preventionSection">
+				<%
+					if( alist.size() > 0 )
+					{
+				%>
 		<div style="position: relative; float: left; padding-right: 10px;">
 		<input style="display: none;" type="checkbox" name="printHP"
 			value="<%=i%>" checked /> <%}else {%>
@@ -688,7 +744,7 @@ text-align:left;
 		<%if (hExt.get("comments") != null && (hExt.get("comments")).length()>0) {
                      if (oscar.OscarProperties.getInstance().getBooleanProperty("prevention_show_comments","yes")){ %>
                      <div class="comments"><span><%=hExt.get("comments")%></span></div>
-               <%   } else { %>                
+               <%   } else { %>
             <span class="footnote">1</span>
             <%      }
                 }%>
@@ -699,7 +755,11 @@ text-align:left;
 
 		<%}%>
 		</div>
-		<%}else{  //OLD
+		<%
+        }
+        else
+        {  //OLD
+
                     if (configSets == null )
                     {
                   	  configSets = new ArrayList<Map<String,Object>>();
@@ -736,7 +796,8 @@ text-align:left;
             ArrayList<Map<String,Object>> alist = PreventionData.getPreventionData(loggedInInfo, prevType, Integer.valueOf(demographic_no));
             PreventionData.addRemotePreventions(loggedInInfo, alist, demographicId, prevType,demographicDateOfBirth);
             String result;
-            for (int k = 0; k < alist.size(); k++){
+            for (int k = 0; k < alist.size(); k++)
+            {
             	Map<String,Object> hdata = alist.get(k);
           	  Map<String,String> hExt = PreventionData.getPreventionKeyValues((String)hdata.get("id"));
             result = hExt.get("result");
@@ -755,7 +816,7 @@ text-align:left;
 		</div>
 		</div>
 		<!--immSet--> <%}
-                    }%>
+        }%>
 		</div>
 		<%=legend %>
 		</td>
@@ -768,43 +829,48 @@ text-align:left;
 			<input type="button" name="sendToPhrButton" value="Send To MyOscar (PDF)" style="display: none;" onclick="sendToPhr(this)">
 -->
 		</td>
-            
-                <input type="hidden" id="demographicNo" name="demographicNo" value="<%=demographic_no%>"/> 		
+
+                <input type="hidden" id="demographicNo" name="demographicNo" value="<%=demographic_no%>"/>
 
 		<%
-		    for (int i = 0 ; i < prevList.size(); i++){
+		    for (int i = 0 ; i < prevList.size(); i++)
+            {
 		   	 	HashMap<String,String> h = prevList.get(i);
 		        String prevName = h.get("name");
-		        ArrayList<Map<String,Object>> alist = PreventionData.getPreventionData(loggedInInfo, prevName, Integer.valueOf(demographic_no));
-		        PreventionData.addRemotePreventions(loggedInInfo, alist, demographicId, prevName,demographicDateOfBirth);
-		        if( alist.size() > 0 ) { %>
+                ArrayList<Map<String,Object>> alist = alistHash.get(prevName);
+		        if(alist.size() > 0)
+		        { %>
 		<input type="hidden" id="preventionHeader<%=i%>"
 			name="preventionHeader<%=i%>" value="<%=h.get("name")%>">
 
 		<%
-		            for (int k = 0; k < alist.size(); k++){
-		            	Map<String,Object> hdata = alist.get(k);
-                                Map<String,String> hExt = PreventionData.getPreventionKeyValues((String)hdata.get("id"));
-		    %>
+					for (int k = 0; k < alist.size(); k++)
+					{
+						Map<String,Object> hdata = alist.get(k);
+						Map<String,String> hExt = PreventionData.getPreventionKeyValues((String)hdata.get("id"));
+		%>
 		<input type="hidden" id="preventProcedureStatus<%=i%>-<%=k%>"
-			name="preventProcedureStatus<%=i%>-<%=k%>"
-			value="<%=hdata.get("refused")%>">
+			   name="preventProcedureStatus<%=i%>-<%=k%>"
+			   value="<%=hdata.get("refused")%>">
 		<input type="hidden" id="preventProcedureAge<%=i%>-<%=k%>"
-			name="preventProcedureAge<%=i%>-<%=k%>"
-			value="<%=hdata.get("age")%>">
+			   name="preventProcedureAge<%=i%>-<%=k%>"
+			   value="<%=hdata.get("age")%>">
 		<input type="hidden" id="preventProcedureDate<%=i%>-<%=k%>"
-			name="preventProcedureDate<%=i%>-<%=k%>"
-			value="<%=hdata.get("prevention_date_no_time")%>">
-                    <%  String comments = hExt.get("comments");
-                        if (comments != null && !comments.isEmpty() && OscarProperties.getInstance().getBooleanProperty("prevention_show_comments","true")) {%>      
-                <input type="hidden" id="preventProcedureComments<%=i%>-<%=k%>"
-			name="preventProcedureComments<%=i%>-<%=k%>"
-			value="<%=comments%>">
-                    <% }
-                            	     }
-                                       }
-		    } //for there are preventions
-		    %>
+			   name="preventProcedureDate<%=i%>-<%=k%>"
+			   value="<%=hdata.get("prevention_date_no_time")%>">
+		<%
+					String comments = hExt.get("comments");
+					if (comments != null && !comments.isEmpty() && OscarProperties.getInstance().getBooleanProperty("prevention_show_comments","true")) {
+		%>
+		<input type="hidden" id="preventProcedureComments<%=i%>-<%=k%>"
+			   name="preventProcedureComments<%=i%>-<%=k%>"
+			   value="<%=comments%>">
+		<%
+						}
+					}
+				}
+			} //for there are preventions
+		%>
 		</form>
 	</tr>
 </table>
