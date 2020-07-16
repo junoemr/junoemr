@@ -24,7 +24,6 @@ package integration.tests.util;
 
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
@@ -65,7 +64,6 @@ public class SeleniumTestBase
 	{
 		driver.quit();
 	}
-
 
 	private static void createWebDriver()
 	{
