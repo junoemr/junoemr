@@ -311,11 +311,6 @@ public class AppointmentTest
 						org.oscarehr.common.model.Appointment.BookingSource.MYOSCAR_SELF_BOOKING.name()
 				)
 		));
-		System.out.println("herererere");
-		System.out.println(expectedResult.size());
-		System.out.println(result.size());
-		System.out.println("\n\n\n"+expectedResult.get(0).getData().toString()+"\n\n\n");
-		System.out.println("\n\n\n"+result.get(0).getData().toString()+"\n\n\n");
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
 

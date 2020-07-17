@@ -45,7 +45,6 @@ public class CtlDocTypeDaoTest extends DaoTestFixtures {
 	@Before
 	public void before() throws Exception {
 		SchemaUtils.restoreTable("ctl_doctype");
-		fail("test failed when restoring table");
 	}
 
 	@Test
