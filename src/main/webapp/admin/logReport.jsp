@@ -125,6 +125,7 @@ boolean authed=true;
 	contentTypeMap.put(LogConst.CON_EFORM_DATA, "E-Form");
 	contentTypeMap.put(LogConst.CON_EFORM_TEMPLATE, "E-Form Template");
 	contentTypeMap.put(LogConst.CON_FAX, "Fax");
+	contentTypeMap.put(LogConst.CON_FORM, "Form");
 	contentTypeMap.put(LogConst.CON_HL7_LAB, "Lab");
 	contentTypeMap.put(LogConst.CON_LOGIN, "Login");
 	contentTypeMap.put(LogConst.CON_MEDICATION, "Medication");

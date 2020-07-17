@@ -101,7 +101,8 @@ public class AppointmentMapper extends AbstractMapper
 			reason = StringUtils.left(reason, APPOINTMENT_REASON_LENGTH);
 		}
 
-		appointment.setReason(reason);
+		// hopefully one day appointments will handle null values correctly. until then, trim to empty
+		appointment.setReason(StringUtils.trimToEmpty(reason));
 		appointment.setType(type);
 		appointment.setLocation("");
 		appointment.setResources("");
@@ -128,12 +129,16 @@ public class AppointmentMapper extends AbstractMapper
 
 	public String getNotes(int rep) throws HL7Exception
 	{
-		return StringUtils.trimToNull(message.getPATIENT().getSCH(rep).getSch30_zNotes().getValue());
+		String value = message.getPATIENT().getSCH(rep).getSch30_zNotes().getValue();
+		value = (value == null) ? null : value.replaceAll("~crlf~", "\n");
+		return StringUtils.trimToNull(value);
 	}
 
 	public String getReason(int rep) throws HL7Exception
 	{
-		return StringUtils.trimToNull(message.getPATIENT().getSCH(rep).getSch29_zAppointmentReason().getValue());
+		String value = message.getPATIENT().getSCH(rep).getSch29_zAppointmentReason().getValue();
+		value = (value == null) ? null : value.replaceAll("~crlf~", "\n");
+		return StringUtils.trimToNull(value);
 	}
 
 	/**
@@ -181,7 +186,14 @@ public class AppointmentMapper extends AbstractMapper
 				apptDurationRawValue = DEFAULT_APPOINTMENT_DURATION_MIN;
 			}
 		}
-		apptDuration = Integer.parseInt(apptDurationRawValue);
+		// Round down duration. "12.5" parses to 12
+		double apptDurationDouble = Double.parseDouble(apptDurationRawValue);
+		apptDuration = (int) apptDurationDouble;
+
+		if(Math.abs(apptDuration - apptDurationDouble) > 0.1)
+		{
+			logger.warn("Appointment duration " + apptDurationDouble + " " + apptDurationUnit + "is being truncated to " + apptDuration + " " + apptDurationUnit);
+		}
 
 		if (appointmentDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{// if no appointment date, use creation date instead.

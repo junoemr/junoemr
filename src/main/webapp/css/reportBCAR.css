@@ -1,0 +1,65 @@
+.control-align {
+    text-align: right;
+}
+
+.edd-body {
+    margin: 0;
+}
+
+.edd-table {
+    border-collapse: separate;
+    white-space: normal;
+    line-height: normal;
+    font-weight: normal;
+    font-size: medium;
+    font-style: normal;
+    color: inherit;
+    text-align: start;
+    border-spacing: 0;
+    border-width: 0;
+    font-variant: normal;
+    background-color: #c0c0c0;
+    width: 100%;
+}
+
+.edd-table-header {
+    background-color: #ccccFF;
+    font-family: Helvetica, sans-serif;
+    font-weight: bold;
+}
+
+.edd-table-row {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit;
+}
+
+.main-results-table {
+    border-spacing: 2px;
+    border-width: 2px;
+}
+
+.minimized-header {
+    font-size: 12px;
+}
+
+.page-limiter-controls {
+    background-color: #FFFFFF;
+}
+
+.result-row:nth-child(odd) {
+    background-color: white;
+}
+
+.result-row:nth-child(even) {
+    background-color: #eeeeFF;
+}
+
+.result-table-header {
+    background-color: #ccccFF;
+    font-size: 16px;
+    font-family: serif;
+    border-spacing: 2px;
+    border: 2px grey;
+    width: 100%;
+}

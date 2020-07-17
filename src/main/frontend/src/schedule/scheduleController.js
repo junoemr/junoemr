@@ -892,7 +892,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let statusElem = eventElement.find('.icon-status');
 				let labelElem = eventElement.find('.event-label');
 				let detailElem = eventElement.find('.event-details');
-				let selfBookElem = eventElement.find('.self-book-indicator');
+				let selfBookElem = eventElement.find('.self-book-container');
 				let telehealthElem = eventElement.find('.event-telehealth');
 				// By default this element is hidden
 				telehealthElem.hide();
@@ -976,11 +976,18 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 
 				// mark self booked appointments
+				// TODO: Can we move this to the template?
 				if(Juno.Common.Util.exists(event.data.tagSelfBooked) && event.data.tagSelfBooked)
 				{
 					selfBookElem.addClass('visible');
 					selfBookElem.attr("title", "Self Booked");
 					detailElem.parent().addClass('show-self-booked');
+
+					var confirmedEl = eventElement.find('.appointment-confirmation')
+					if (event.data.confirmed && confirmedEl)
+					{
+						confirmedEl.addClass('confirmed');
+					}
 				}
 
 				var maxNameLengthProp = controller.providerSettings.patientNameLength;

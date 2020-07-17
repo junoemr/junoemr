@@ -254,12 +254,14 @@
 										<!-- location/site -->
 										<ca-field-select
 												ca-hide="!eventController.sitesEnabled"
+                                                ca-disabled="eventData.virtual && eventController.editMode"
 												ca-name="site"
 												ca-title="Site"
 												ca-template="label"
 												ca-model="eventData.site"
 												ca-error="{{displayMessages.field_errors()['site']}}"
 												ca-options="eventController.siteOptions"
+                                                title="{{ eventController.getSiteChangeToolTip() }}"
 										>
 										</ca-field-select>
 									</div>
@@ -280,6 +282,8 @@
 										ca-title="Notes"
 										ca-model="eventData.notes"
 										ca-rows="1"
+										ca-error="{{displayMessages.field_errors()['notes']}}"
+										ca-max-characters="255"
 								>
 								</ca-field-text>
 							</div>
@@ -289,7 +293,10 @@
 										ca-title="Reason"
 										ca-name="event_reason"
 										ca-model="eventData.reason"
-										ca-rows="1">
+										ca-rows="1"
+										ca-error="{{displayMessages.field_errors()['event_reason']}}"
+										ca-max-characters="80"
+								>
 								</ca-field-text>
 							</div>
 						</div>
