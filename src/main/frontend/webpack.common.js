@@ -252,6 +252,7 @@ module.exports = {
 
 			'./src/common/modals/junoAlert/junoAlertComponent.js',
 			'./src/common/modals/junoInputModal/junoInputModalComponent.js',
+			'./src/common/modals/junoSimpleModal/junoSimpleModalComponent.js',
 			'./src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModalComponent.js',
 
 			'./src/layout/module.js',

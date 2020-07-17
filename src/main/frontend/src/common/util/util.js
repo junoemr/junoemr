@@ -423,17 +423,27 @@ Juno.Common.Util.confirmationDialog = function(uibModal, title, message, style)
 	).result;
 };
 
-Juno.Common.Util.openInputDialog = (uibModal, title, message, style) =>
+/**
+ * display a input modal
+ * @param uibModal - uibModal instance
+ * @param title - title of the modal.
+ * @param message - message to display to the user
+ * @param style - the style of the modal
+ * @param okText - alternate text for the ok button. omit if you want default ("Ok").
+ * @returns {*}
+ */
+Juno.Common.Util.openInputDialog = (uibModal, title, message, style, okText) =>
 {
 	return uibModal.open(
 			{
 				component: 'junoInputModal',
 				backdrop: 'static',
-				windowClass: "juno-input-modal ",
+				windowClass: "juno-simple-modal-window",
 				resolve: {
 					title: () => title,
 					message: () => message,
 					style: () => style,
+					okText: () => okText
 				}
 			}
 	).result;

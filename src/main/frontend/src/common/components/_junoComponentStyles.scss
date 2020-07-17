@@ -96,7 +96,7 @@
 	}
 }
 
-@mixin junoText($color, $color-secondary)
+@mixin junoText($color, $color-primary, $color-secondary)
 {
 	.juno-text {
 		color: $color;
@@ -104,6 +104,10 @@
 		a:not(:hover) {
 			color: $color;
 		}
+	}
+
+	.juno-text-primary {
+		color: $color-primary;
 	}
 
 	.juno-text-secondary {
@@ -248,7 +252,7 @@
 
 	@include junoPanelColor(white, $color-neutral-lighter, $color-neutral-lighter);
 
-	@include junoText($color-neutral-darker, $color-neutral-grey);
+	@include junoText($color-neutral-darker, $color-primary-base, $color-neutral-grey);
 }
 
 .juno-style-default-background-no-accent {
@@ -325,7 +329,7 @@
 		}
 	}
 
-	@include junoText($color-neutral-darker, $color-neutral-grey);
+	@include junoText($color-neutral-darker, $color-primary-base, $color-neutral-grey);
 }
 .juno-style-grey-background-no-accent {
 	background-color: $color-neutral-white !important;
@@ -406,7 +410,7 @@
 		}
 	}
 
-	@include junoText($color-neutral-white, $color-neutral-grey);
+	@include junoText($color-neutral-white, $color-primary-base, $color-neutral-grey);
 }
 
 .juno-style-dracula-background-no-accent {

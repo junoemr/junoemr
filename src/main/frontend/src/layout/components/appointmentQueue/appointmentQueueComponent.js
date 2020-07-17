@@ -33,7 +33,13 @@ angular.module('Layout.Components').component('appointmentQueue', {
 	bindings: {
 		componentStyle: "<?"
 	},
-	controller: ["$scope", function ($scope)
+	controller: [
+		"$scope",
+		"$uibModal",
+		function (
+			$scope,
+			$uibModal,
+		)
 	{
 		let ctrl = this;
 
@@ -159,6 +165,27 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				{
 					$scope.$digest();
 				}
+			}
+		}
+
+		ctrl.deleteQueueItem = async (itemIndex) => {
+			try
+			{
+				let reason = await Juno.Common.Util.openInputDialog($uibModal,
+				                                       "Delete Queued Appointment?",
+				                                       "Please provide a reason as to why you are deleting this appointment.",
+				                                       ctrl.componentStyle,
+				                                       "Proceed");
+				if (reason)
+				{
+					// TODO actually delete the queued appointment
+					ctrl.currentQueue.items.splice(itemIndex, 1);
+				}
+			}
+			catch (err)
+			{
+				// user hit ESC.
+				console.log(err);
 			}
 		}
 

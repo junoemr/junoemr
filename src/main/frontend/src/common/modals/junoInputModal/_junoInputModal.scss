@@ -1,24 +1,20 @@
 .juno-input-modal {
 	@include juno-font-body-small();
-	padding: 16px 32px 24px 32px;
-	-webkit-border-radius: 16px !important;
-	-moz-border-radius: 16px !important;
-	border-radius: 16px !important;
 
-	.modal-content {
-		-webkit-border-radius: 16px !important;
-		-moz-border-radius: 16px !important;
-		border-radius: 16px !important;
-		border: none;
+	.title {
+		margin: 8px 0 8px 0;
 	}
 
-	.modal-dialog {
-		width: 400px;
-		height: 200px;
+	.juno-input {
+		margin: 24px 0 0 0;
 
-		.modal-content {
-			background: $color-neutral-white none;
+		input {
+			height: 40px;
 		}
+	}
+
+	.juno-divider {
+		margin: 24px 0 16px 0;
 	}
 
 	.buttons {
@@ -26,7 +22,13 @@
 		justify-content: flex-end;
 
 		juno-button {
-			max-width: 100px;
+			max-width: 160px;
+			.juno-button {
+				margin-top: 0;
+				button {
+					height: 40px;
+				}
+			}
 
 			&:first-child {
 				margin-right: 8px;

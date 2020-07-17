@@ -11,7 +11,10 @@
 		</div>
 		
 		<!-- delete icon -->
-		<juno-button class="icon-button" component-style="$ctrl.componentStyle" button-color="JUNO_BUTTON_COLOR.INVISIBLE">
+		<juno-button ng-click="$ctrl.onDeleteBtnClick()"
+		             class="icon-button"
+		             component-style="$ctrl.componentStyle"
+		             button-color="JUNO_BUTTON_COLOR.INVISIBLE">
 			<i class="icon icon-delete"></i>
 		</juno-button>
 		

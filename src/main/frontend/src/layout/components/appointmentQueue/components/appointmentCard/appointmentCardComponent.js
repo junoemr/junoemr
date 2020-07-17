@@ -33,6 +33,7 @@ angular.module('Layout.Components').component('appointmentCard', {
 	bindings: {
 		ngModel: "=?",
 		componentStyle: "<?",
+		onDelete: "&?"
 	},
 	controller: ["$scope", function ($scope)
 	{
@@ -58,6 +59,14 @@ angular.module('Layout.Components').component('appointmentCard', {
 				classes.push("active");
 			}
 			return classes;
+		}
+
+		ctrl.onDeleteBtnClick = () =>
+		{
+			if (ctrl.onDelete)
+			{
+				ctrl.onDelete({});
+			}
 		}
 	}]
 });

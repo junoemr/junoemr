@@ -4,6 +4,7 @@
 
 	&.slim {
 		height: 1px;
+		border-top-width: 0 !important;
 	}
 
 	&.horizontal {
@@ -12,6 +13,7 @@
 
 		&.slim {
 			width: 1px;
+			border-top-width: 0 !important;
 		}
 	}
 }

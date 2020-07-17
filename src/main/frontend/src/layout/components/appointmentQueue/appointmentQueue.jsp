@@ -30,7 +30,10 @@
 	<div class="list">
 		<div class="list-content" ng-style="$ctrl.getListScrollHeightStyle()">
 			<div ng-repeat="foobar in [].constructor($ctrl.maxQueueLength) track by $index" class="flex-fill-row">
-				<appointment-card component-style="$ctrl.componentStyle" ng-model="$ctrl.currentQueue.items[$index]"></appointment-card>
+				<appointment-card ng-model="$ctrl.currentQueue.items[$index]"
+				                  on-delete="$ctrl.deleteQueueItem($index);"
+				                  component-style="$ctrl.componentStyle">
+				</appointment-card>
 			</div>
 		</div>
 		
