@@ -27,7 +27,6 @@ package oscar.oscarEncounter.pageUtil;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
