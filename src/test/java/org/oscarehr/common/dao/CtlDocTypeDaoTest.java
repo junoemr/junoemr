@@ -25,6 +25,7 @@ package org.oscarehr.common.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class CtlDocTypeDaoTest extends DaoTestFixtures {
 	@Before
 	public void before() throws Exception {
 		SchemaUtils.restoreTable("ctl_doctype");
+		fail("test failed when restoring table");
 	}
 
 	@Test

@@ -133,7 +133,8 @@ public class AppointmentTest
 			LocalDate.of(2000, 1, 1),
 			false,
 			null,
-			false
+			false,
+			1
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -188,7 +189,10 @@ public class AppointmentTest
 				false,
 				false,
 				false,
+				null,
+				1,
 				null
+
 			)
 		));
 
@@ -246,7 +250,8 @@ public class AppointmentTest
 				LocalDate.of(2000, 1, 1),
 				false,
 				null,
-				false
+				false,
+				1
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -301,10 +306,16 @@ public class AppointmentTest
 						true,
 						false,
 						false,
+						null,
+						1,
 						null
 				)
 		));
-
+		System.out.println("herererere");
+		System.out.println(expectedResult.size());
+		System.out.println(result.size());
+		System.out.println("\n\n\n"+expectedResult.get(0).getData().toString()+"\n\n\n");
+		System.out.println("\n\n\n"+result.get(0).getData().toString()+"\n\n\n");
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
 
@@ -359,7 +370,8 @@ public class AppointmentTest
 			LocalDate.of(2000, 1, 1),
 			false,
 			null,
-			false
+			false,
+			1
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -420,6 +432,8 @@ public class AppointmentTest
 				false,
 				false,
 				false,
+				null,
+				1,
 				null
 			)
 		));
@@ -478,7 +492,8 @@ public class AppointmentTest
 			LocalDate.of(2000, 1, 1),
 			false,
 			null,
-			false
+			false,
+			1
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -538,6 +553,8 @@ public class AppointmentTest
 				false,
 				false,
 				false,
+				null,
+				1,
 				null
 			)
 		));

@@ -54,6 +54,7 @@ public class ProviderInboxRoutingDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		ProviderInboxItem entity = new ProviderInboxItem();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		System.out.println("\n\n\n"+entity.getLabType()+"\n\n\n");
 		dao.persist(entity);
 
 		assertNotNull(entity.getId());
