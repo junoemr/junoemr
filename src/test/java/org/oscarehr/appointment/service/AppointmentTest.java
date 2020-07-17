@@ -308,7 +308,7 @@ public class AppointmentTest
 						false,
 						null,
 						1,
-						null
+						org.oscarehr.common.model.Appointment.BookingSource.MYOSCAR_SELF_BOOKING.name()
 				)
 		));
 		System.out.println("herererere");
