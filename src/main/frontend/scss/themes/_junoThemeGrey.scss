@@ -1,0 +1,14 @@
+.juno-style-grey {
+	--theme-color-form-field-text: var(--color-neutral-darker);
+	--theme-color-form-field-text-hover: var(--color-neutral-darker);
+	--theme-color-form-field-text-active: var(--color-neutral-darker);
+	--theme-color-form-field-text-disabled: var(--color-neutral-light-grey);
+	--theme-color-form-field-background: var(--color-neutral-lightest);
+	--theme-color-form-field-background-hover: var(--color-neutral-lightest);
+	--theme-color-form-field-background-active: var(--color-neutral-lightest);
+	--theme-color-form-field-background-disabled: var(--color-neutral-lightest);
+	--theme-color-form-field-border: var(--color-neutral-lighter);
+	--theme-color-form-field-border-hover: var(--color-neutral-light);
+	--theme-color-form-field-border-active: var(--color-primary-light);
+	--theme-color-form-field-border-disabled: var(--color-neutral-lighter);
+}

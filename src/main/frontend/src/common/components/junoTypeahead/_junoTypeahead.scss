@@ -2,12 +2,6 @@
 
 	@include juno-form-inputs-style();
 	@include juno-form-inputs-colors-default;
-	&.juno-style-grey {
-		@include juno-form-inputs-colors-grey;
-	}
-	&.juno-style-dracula {
-		@include juno-form-inputs-colors-dracula;
-	}
 
 	input {
 		flex: 1 1 0;

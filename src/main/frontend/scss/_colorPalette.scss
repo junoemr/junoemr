@@ -1,5 +1,22 @@
 
 // Colour Palette
+
+:root {
+	--color-neutral-black: #17181a;
+	--color-neutral-darkest: #2e3033;
+	--color-neutral-darker: #45474d;
+	--color-neutral-dark: #5c5f66;
+	--color-neutral-dark-grey: #737780;
+	--color-neutral-grey: #919399;
+	--color-neutral-light-grey: #aaacb3;
+	--color-neutral-light: #c2c5cc;
+	--color-neutral-lighter: #d2d3d6;
+	--color-neutral-lightest: #f2f4f7;
+	--color-neutral-white: #ffffff;
+}
+
+//deprecated - use css variables above
+
 $color-primary-darkest: #16243f;
 $color-primary-darker: #243a66;
 $color-primary-dark: #31508c;

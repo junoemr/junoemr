@@ -35,21 +35,11 @@
 		}
 	}
 }
-
 @mixin juno-form-inputs-colors-default() {
-	@include juno-form-inputs-colors($color-neutral-darker, $color-neutral-white, $color-neutral-light,
-			$color-neutral-darker, $color-neutral-white, $color-primary-light,
-			$color-neutral-grey, $color-neutral-lighter, $color-neutral-light);
-}
-@mixin juno-form-inputs-colors-grey() {
-	@include juno-form-inputs-colors($color-neutral-darker, $color-neutral-lightest, $color-neutral-lighter,
-			$color-neutral-darker, $color-neutral-white, $color-primary-light,
-			$color-neutral-light-grey, $color-neutral-lightest, $color-neutral-lighter);
-}
-@mixin juno-form-inputs-colors-dracula() {
-	@include juno-form-inputs-colors($color-neutral-white, $color-neutral-darkest, $color-neutral-darker,
-			$color-neutral-white, $color-neutral-darkest, $color-neutral-dark,
-			$color-neutral-light, $color-neutral-darkest, $color-neutral-darker);
+	@include juno-form-inputs-colors(
+					var(--theme-color-form-field-text), var(--theme-color-form-field-background), var(--theme-color-form-field-border),
+					var(--theme-color-form-field-text-active), var(--theme-color-form-field-background-active), var(--theme-color-form-field-border-active),
+					var(--theme-color-form-field-text-disabled), var(--theme-color-form-field-background-disabled), var(--theme-color-form-field-border-disabled));
 }
 
 @mixin juno-form-inputs-style($border-width: 1px, $border-radius: 8px)
