@@ -1,6 +1,15 @@
 .juno-date-select {
 
+	&.juno-style-grey .fields {
+		@include juno-form-inputs-colors-grey;
+	}
+	&.juno-style-dracula .fields {
+		@include juno-form-inputs-colors-dracula;
+	}
+
 	.fields {
+		@include juno-form-inputs-style();
+		@include juno-form-inputs-colors-default;
 		flex: 1 1 0;
 
 		input {

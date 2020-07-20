@@ -1,6 +1,16 @@
 .juno-select {
 
+	&.juno-style-grey .select-container {
+		@include juno-form-inputs-colors-grey;
+	}
+	&.juno-style-dracula .select-container {
+		@include juno-form-inputs-colors-dracula;
+	}
+
 	.select-container {
+		@include juno-form-inputs-style();
+		@include juno-form-inputs-colors-default;
+
 		position: relative;
 		flex: 1 1 0;
 

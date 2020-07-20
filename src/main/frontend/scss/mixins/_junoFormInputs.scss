@@ -1,43 +1,34 @@
 @mixin juno-form-inputs-colors($text-color, $background-color, $border-color,
 			$active-text-color, $active-background-color, $active-border-color,
 			$disabled-text-color, $disabled-background-color, $disabled-border-color) {
-	&.juno-input, &.juno-select, &.juno-typeahead,
-	&.juno-check-box, &.juno-date-select, &.juno-time-select,
-	&.juno-button {
-		input,
-		select {
+	input, select {
+		border-color: $border-color;
+		background-color: $background-color;
+		color: $text-color;
 
-			border-color: $border-color;
-			background-color: $background-color;
-			color: $text-color;
+		&:focus, &:active {
+			border-color: $active-border-color;
+			background-color: $active-background-color;
+			color: $active-text-color;
+		}
 
-			&:focus, &:active {
-				border-color: $active-border-color;
-				background-color: $active-background-color;
-				color: $active-text-color;
-			}
+		&:disabled,
+		&:disabled:active {
+			border-color: $disabled-border-color;
+			background-color: $disabled-background-color;
+			color: $disabled-text-color;
 
-			&:disabled,
-			&:disabled:active {
-				border-color: $disabled-border-color;
-				background-color: $disabled-background-color;
+			~ i {
 				color: $disabled-text-color;
-
-				~ i {
-					color: $disabled-text-color;
-				}
-			}
-
-			&.field-invalid {
-				border-color: $color-red-base;
-
-				&:focus, &:active {
-					border-color: $color-red-base;
-				}
 			}
 		}
-		label {
-			//min-width: 108px;
+
+		&.field-invalid {
+			border-color: $color-red-base;
+
+			&:focus, &:active {
+				border-color: $color-red-base;
+			}
 		}
 		::placeholder {
 			color: $color-neutral-grey;
@@ -45,19 +36,34 @@
 	}
 }
 
+@mixin juno-form-inputs-colors-default() {
+	@include juno-form-inputs-colors($color-neutral-darker, $color-neutral-white, $color-neutral-light,
+			$color-neutral-darker, $color-neutral-white, $color-primary-light,
+			$color-neutral-grey, $color-neutral-lighter, $color-neutral-light);
+}
+@mixin juno-form-inputs-colors-grey() {
+	@include juno-form-inputs-colors($color-neutral-darker, $color-neutral-lightest, $color-neutral-lighter,
+			$color-neutral-darker, $color-neutral-white, $color-primary-light,
+			$color-neutral-light-grey, $color-neutral-lightest, $color-neutral-lighter);
+}
+@mixin juno-form-inputs-colors-dracula() {
+	@include juno-form-inputs-colors($color-neutral-white, $color-neutral-darkest, $color-neutral-darker,
+			$color-neutral-white, $color-neutral-darkest, $color-neutral-dark,
+			$color-neutral-light, $color-neutral-darkest, $color-neutral-darker);
+}
+
 @mixin juno-form-inputs-style($border-width: 1px, $border-radius: 8px)
 {
-	&.juno-input, &.juno-select, &.juno-typeahead,
-	&.juno-check-box, &.juno-date-select, &.juno-time-select,
-	&.juno-button {
-		input, select {
-			@include juno-font-body-smallest;
-			height: 32px;
-			padding: 0 16px 0 16px;
+	input, select {
+		@include juno-font-body-smallest;
+		height: 32px;
+		padding: 0 16px 0 16px;
 
-			border-radius: $border-radius;
-			border: solid $border-width;
-		}
+		border-radius: $border-radius;
+		border: solid $border-width;
+	}
+	label {
+		min-width: 108px;
 	}
 }
 

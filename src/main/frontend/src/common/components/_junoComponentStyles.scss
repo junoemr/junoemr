@@ -106,11 +106,6 @@
 	align-items: baseline;
 	flex-wrap: wrap;
 
-	@include juno-form-inputs-style();
-	@include juno-form-inputs-colors($color-neutral-darker, $color-neutral-white, $color-neutral-light,
-			$color-neutral-darker, $color-neutral-white, $color-primary-light,
-			$color-neutral-grey, $color-neutral-lighter, $color-neutral-light);
-
 	button {
 		height: 32px;
 		box-shadow: none;
@@ -183,11 +178,6 @@
 
 	@include juno-tab-color-scheme-white;
 
-	@include juno-form-inputs-style();
-	@include juno-form-inputs-colors($color-neutral-darker, $color-neutral-white, $color-neutral-lighter,
-			$color-neutral-darker, $color-neutral-white, $color-primary-light,
-			$color-neutral-light-grey, $color-neutral-lightest, $color-neutral-lighter);
-
 	button {
 		border-radius: 8px;
 
@@ -231,11 +221,6 @@
 
 	@include juno-tab-color-scheme-dark;
 	color: $color-neutral-white;
-
-	@include juno-form-inputs-style();
-	@include juno-form-inputs-colors($color-neutral-white, $color-neutral-darkest, $color-neutral-darker,
-			$color-neutral-white, $color-neutral-darkest, $color-neutral-dark,
-			$color-neutral-light, $color-neutral-darkest, $color-neutral-darker);
 
 	button {
 		border-radius: 8px;

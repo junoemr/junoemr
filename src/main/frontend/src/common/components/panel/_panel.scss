@@ -3,6 +3,13 @@
 	display: block !important;
 	margin-top: 8px;
 
+	// the normal grey input style conflicts with the grey panel background
+	&.juno-style-grey > .panel-body {
+		@include juno-form-inputs-colors($color-neutral-darker, $color-neutral-white, $color-neutral-lighter,
+			$color-neutral-darker, $color-neutral-white, $color-primary-light,
+			$color-neutral-light-grey, $color-neutral-lightest, $color-neutral-lighter);
+	}
+
 	.panel-header {
 		background-color: $color-neutral-lighter;
 		border-color: $color-neutral-lighter;

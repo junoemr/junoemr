@@ -110,7 +110,7 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 							},
 							(error) =>
 							{
-								console.error("Error updating queue", error);
+								// on canceled
 							});
 					}
 					catch(err)
