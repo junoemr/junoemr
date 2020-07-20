@@ -41,8 +41,8 @@ angular.module('Common.Components').component('appointmentQueueModal',
 			{
 				let ctrl = this;
 
-				$scope.LABEL_POSITION = LABEL_POSITION;
-				$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+				ctrl.LABEL_POSITION = LABEL_POSITION;
+				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.editMode = false;
 				ctrl.queueModel = {};
 
@@ -78,7 +78,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 
 				ctrl.onCancel = () =>
 				{
-					ctrl.modalInstance.dismiss();
+					ctrl.modalInstance.dismiss("modal cancelled");
 				}
 			}]
 	});

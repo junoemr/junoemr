@@ -70,53 +70,49 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 
 				ctrl.deleteQueue = (queue) =>
 				{
-					// TODO call api delete
-					// remove queue from queue list
-					ctrl.queueList = ctrl.queueList.filter((obj) =>
+					if(window.confirm("Are you sure you want to delete this queue?"))
 					{
-						return obj.id !== queue.id;
-					});
-					ctrl.updateQueueSelectOptions();
+						// TODO call api delete
+						// remove queue from queue list
+						ctrl.queueList = ctrl.queueList.filter((obj) =>
+						{
+							return obj.id !== queue.id;
+						});
+						ctrl.updateQueueSelectOptions();
+					}
 				}
 
 				ctrl.openQueueModal = (queue, editMode) =>
 				{
-					try
-					{
-						$uibModal.open(
-							{
-								component: 'appointmentQueueModal',
-								backdrop: 'static',
-								windowClass: "juno-modal sml",
-								resolve: {
-									style: () => ctrl.componentStyle,
-									queue: () => queue,
-									editMode: editMode,
-								}
+					$uibModal.open(
+						{
+							component: 'appointmentQueueModal',
+							backdrop: 'static',
+							windowClass: "juno-modal sml",
+							resolve: {
+								style: () => ctrl.componentStyle,
+								queue: () => queue,
+								editMode: editMode,
 							}
-						).result.then(
-							(updatedQueue) =>
+						}
+					).result.then(
+						(updatedQueue) =>
+						{
+							if (editMode)
 							{
-								if (editMode)
-								{
-									// update local copy with updated data
-									angular.copy(updatedQueue, queue);
-								}
-								else
-								{
-									ctrl.queueList.push(updatedQueue);
-								}
-								ctrl.updateQueueSelectOptions();
-							},
-							(error) =>
+								// update local copy with updated data
+								angular.copy(updatedQueue, queue);
+							}
+							else
 							{
-								// on canceled
-							});
-					}
-					catch(err)
-					{
-						// user pressed ESC key
-					}
+								ctrl.queueList.push(updatedQueue);
+							}
+							ctrl.updateQueueSelectOptions();
+						},
+						(dismissReason) =>
+						{
+							// modal dismissed
+						});
 				}
 
 				ctrl.updateQueueSelectOptions = () =>
