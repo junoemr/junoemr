@@ -11,4 +11,20 @@
 	--theme-color-form-field-border-hover: var(--color-neutral-dark);
 	--theme-color-form-field-border-active: var(--color-neutral-dark);
 	--theme-color-form-field-border-disabled: var(--color-neutral-darker);
+
+	--theme-color-table-border: var(--color-neutral-black);
+	--theme-color-table-border-hover: var(--color-primary-darker);
+	--theme-color-table-header-text: var(--color-neutral-white);
+	--theme-color-table-header-background: var(--color-neutral-darkest);
+	--theme-color-table-body-text: var(--color-neutral-white);
+	--theme-color-table-body-text-hover: var(--color-neutral-darker);
+	--theme-color-table-body-background-even: var(--color-neutral-dark);
+	--theme-color-table-body-background-odd: var(--color-neutral-darker);
+	--theme-color-table-body-background-hover: var(--color-primary-darkest);
+
+	--theme-color-panel-header-text: var(--color-neutral-white);
+	--theme-color-panel-header-background: var(--color-neutral-black);
+	--theme-color-panel-body-text: var(--color-neutral-white);
+	--theme-color-panel-body-background: var(--color-neutral-black);
+	--theme-color-panel-border: var(--color-neutral-darker);
 }

@@ -17,6 +17,22 @@
 	--theme-color-form-field-border-active: var(--color-primary-light);
 	--theme-color-form-field-border-disabled: var(--color-neutral-light);
 
+	--theme-color-table-border: var(--color-neutral-light);
+	--theme-color-table-border-hover: var(--color-primary-lighter);
+	--theme-color-table-header-text: var(--color-neutral-darker);
+	--theme-color-table-header-background: var(--color-neutral-lighter);
+	--theme-color-table-body-text: var(--color-neutral-darker);
+	--theme-color-table-body-text-hover: var(--color-neutral-darker);
+	--theme-color-table-body-background-even: var(--color-neutral-lightest);
+	--theme-color-table-body-background-odd: var(--color-neutral-white);
+	--theme-color-table-body-background-hover: var(--color-primary-lightest);
+
+	--theme-color-panel-header-text: var(--color-neutral-darkest);
+	--theme-color-panel-header-background: var(--color-neutral-lightest);
+	--theme-color-panel-body-text: var(--color-neutral-darkest);
+	--theme-color-panel-body-background: var(--color-neutral-white);
+	--theme-color-panel-border: var(--color-neutral-lightest);
+
 	@import "junoThemeGrey";
 	@import "junoThemeDracula";
 }

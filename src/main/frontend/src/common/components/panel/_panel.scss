@@ -1,7 +1,29 @@
+@mixin juno-panel-color(
+	$header-text, $header-background,
+	$body-text, $body-background,
+	$border-color)
+{
+	.panel-header {
+		color: $header-text;
+		background-color: $header-background;
+		border-color: $border-color;
+	}
+
+	.panel-body {
+		color: $body-text;
+		background-color: $body-background;
+		border-color: $border-color;
+	}
+}
 
 .juno-panel {
 	display: block !important;
 	margin-top: 8px;
+
+	@include juno-panel-color(
+					var(--theme-color-panel-header-text), var(--theme-color-panel-header-background),
+					var(--theme-color-panel-body-text), var(--theme-color-panel-body-background),
+					var(--theme-color-panel-border));
 
 	// the normal grey input style conflicts with the grey panel background
 	&.juno-style-grey > .panel-body {
@@ -11,8 +33,6 @@
 	}
 
 	.panel-header {
-		background-color: $color-neutral-lighter;
-		border-color: $color-neutral-lighter;
 		border-width: 4px;
 		border-radius: 8px;
 		border-style: solid;
@@ -26,8 +46,6 @@
 	}
 
 	.panel-body {
-		background-color: white;
-		border-color: $color-neutral-lighter;
 		border-width: 4px;
 		border-radius: 8px;
 		border-style: solid;

@@ -74,22 +74,6 @@
 	}
 }
 
-@mixin junoPanelColor($body-background, $header-background, $border-color)
-{
-	&.juno-panel {
-		color: $color-neutral-darker;
-		.panel-header {
-			background-color: $header-background;
-			border-color: $border-color;
-		}
-
-		.panel-body {
-			background-color: $body-background;
-			border-color: $border-color;
-		}
-	}
-}
-
 @mixin junoText($color)
 {
 	.juno-text {
@@ -134,6 +118,8 @@
 		background-color: $color-neutral-lightest;
 		border: 1px solid $color-neutral-lighter;
 	}
+
+	@include juno-table-default();
 }
 
 // ============ STYLE DEFAULT ===============
@@ -141,7 +127,6 @@
 	@include styleCommon;
 
 	@include juno-tab-color-scheme-white;
-	@include juno-table-default();
 
 	button {
 		@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-white,
@@ -166,9 +151,6 @@
 	}
 
 	@include junoTabColor($color-neutral-white, $color-neutral-lighter, $color-neutral-lighter, $color-neutral-darker);
-
-	@include junoPanelColor(white, $color-neutral-lighter, $color-neutral-lighter);
-
 	@include junoText($color-neutral-darker);
 }
 
@@ -200,7 +182,6 @@
 
 	@include junoTabColor($color-neutral-lightest, $color-neutral-white, $color-neutral-lighter, $color-neutral-darker);
 
-	@include junoPanelColor($color-neutral-lightest, $color-neutral-lightest, $color-neutral-lighter);
 	&.juno-panel {
 		.panel-body {
 			border-width: 1px;
@@ -211,8 +192,6 @@
 	}
 
 	@include junoText($color-neutral-darker);
-
-	@include juno-table-default();
 }
 
 // ============ STYLE DRACULA ===============
@@ -248,7 +227,6 @@
 
 	@include junoTabColor($color-neutral-darkest, $color-neutral-black, $color-neutral-darker, $color-neutral-white);
 
-	@include junoPanelColor($color-neutral-black, $color-neutral-black, $color-neutral-darker);
 	&.juno-panel {
 		.panel-body {
 			border-width: 1px;
@@ -259,10 +237,6 @@
 	}
 
 	@include junoText($color-neutral-white);
-
-	@include juno-table($color-neutral-white, $color-neutral-darkest,
-			$color-neutral-dark, $color-neutral-darker,
-			$color-neutral-black);
 }
 .juno-style-dracula-background-no-accent {
 	background-color: $color-neutral-darkest !important;
