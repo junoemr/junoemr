@@ -239,6 +239,8 @@ module.exports = {
 			'./src/common/components/junoInput/junoInputComponent.js',
 			'./src/common/components/junoSelect/junoSelectComponent.js',
 			'./src/common/components/junoTab/junoTabComponent.js',
+			'./src/common/components/junoTab/components/module.js',
+			'./src/common/components/junoTab/components/swimLaneTab/swimLaneTabComponent.js',
 			'./src/common/components/junoDateSelect/junoDateSelectComponent.js',
 			'./src/common/components/junoTimeSelect/junoTimeSelectComponent.js',
 			'./src/common/components/junoDivider/junoDividerComponent.js',
@@ -251,6 +253,7 @@ module.exports = {
 
 			'./src/common/modals/junoAlert/junoAlertComponent.js',
 			'./src/common/modals/junoInputModal/junoInputModalComponent.js',
+			'./src/common/modals/junoSimpleModal/junoSimpleModalComponent.js',
 			'./src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModalComponent.js',
 			'./src/common/modals/appointmentQueueModal/appointmentQueueModalComponent.js',
 
@@ -258,6 +261,9 @@ module.exports = {
 			'./src/layout/bodyController.js',
 			'./src/layout/primaryNavComponent.js',
 			'./src/layout/leftAsideComponent.js',
+			'./src/layout/components/module.js',
+			'./src/layout/components/appointmentQueue/appointmentQueueComponent.js',
+			'./src/layout/components/appointmentQueue/components/appointmentCard/appointmentCardComponent.js',
 
 			'./src/patient/module.js',
 			'./src/patient/addDemographicModal/addDemographicModalComponent.js',

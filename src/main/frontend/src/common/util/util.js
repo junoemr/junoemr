@@ -66,13 +66,14 @@ Juno.Common.Util.pad0 = function pad0(n) {
 
 // if the date is a single digit add a zero in front. if it is 3 or more and
 // has a leading zero remove it.
-Juno.Common.Util.padDateWithZero = function pad0(n) {
-	let s = Juno.Common.Util.pad0(n);
-	if (s.length > 2)
+Juno.Common.Util.padDateWithZero = (dateNumber) =>
+{
+	let zeroPaddedDateString = Juno.Common.Util.pad0(dateNumber);
+	if (zeroPaddedDateString.length > 2)
 	{
-		s = s.substring(1);
+		zeroPaddedDateString = zeroPaddedDateString.substring(1);
 	}
-	return s;
+	return zeroPaddedDateString;
 };
 
 
@@ -422,17 +423,27 @@ Juno.Common.Util.confirmationDialog = function(uibModal, title, message, style)
 	).result;
 };
 
-Juno.Common.Util.openInputDialog = (uibModal, title, message, style) =>
+/**
+ * display a input modal
+ * @param uibModal - uibModal instance
+ * @param title - title of the modal.
+ * @param message - message to display to the user
+ * @param style - the style of the modal
+ * @param okText - alternate text for the ok button. omit if you want default ("Ok").
+ * @returns {*}
+ */
+Juno.Common.Util.openInputDialog = (uibModal, title, message, style, okText) =>
 {
 	return uibModal.open(
 			{
 				component: 'junoInputModal',
 				backdrop: 'static',
-				windowClass: "juno-input-modal ",
+				windowClass: "juno-simple-modal-window",
 				resolve: {
 					title: () => title,
 					message: () => message,
 					style: () => style,
+					okText: () => okText
 				}
 			}
 	).result;

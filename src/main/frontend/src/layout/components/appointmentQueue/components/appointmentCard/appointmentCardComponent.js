@@ -21,48 +21,52 @@
 * Canada
 */
 
-import {JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_TAB_TYPE} from "../junoComponentConstants";
 
-angular.module('Common.Components').component('junoTab', {
-	templateUrl: 'src/common/components/junoTab/junoTab.jsp',
+import {
+	JUNO_BACKGROUND_STYLE,
+	JUNO_BUTTON_COLOR,
+	JUNO_STYLE
+} from "../../../../../common/components/junoComponentConstants";
+
+angular.module('Layout.Components').component('appointmentCard', {
+	templateUrl: 'src/layout/components/appointmentQueue/components/appointmentCard/appointmentCard.jsp',
 	bindings: {
-		ngModel: "=",
-		tabs: "<",
+		ngModel: "=?",
 		componentStyle: "<?",
-		type: "<?"
+		onDelete: "&?"
 	},
-	controller: ['$scope', function ($scope) {
+	controller: ["$scope", function ($scope)
+	{
 		let ctrl = this;
 
-		$scope.JUNO_TAB_TYPE = JUNO_TAB_TYPE;
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 
 		ctrl.$onInit = () =>
 		{
-			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-			ctrl.type = ctrl.type || JUNO_TAB_TYPE.NORMAL;
-		};
-
-		ctrl.onTabSelect = (tab) =>
-		{
-			ctrl.ngModel = tab.value;
+			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 		}
 
-		ctrl.tabClasses = (tab) =>
+		ctrl.getComponentClasses = () =>
 		{
-			if (ctrl.ngModel)
+			let classes = [ctrl.componentStyle];
+			if (!ctrl.ngModel)
 			{
-				if (ctrl.ngModel === tab.value)
-				{
-					return ["active"];
-				}
+				classes.push("zero-state");
 			}
-			return [];
+			else
+			{
+				classes.push(ctrl.componentStyle + JUNO_BACKGROUND_STYLE.PRIMARY);
+				classes.push("active");
+			}
+			return classes;
 		}
 
-		ctrl.componentClasses = () =>
+		ctrl.onDeleteBtnClick = () =>
 		{
-			return [ctrl.componentStyle, ctrl.type];
+			if (ctrl.onDelete)
+			{
+				ctrl.onDelete({});
+			}
 		}
 	}]
 });

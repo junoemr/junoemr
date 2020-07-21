@@ -27,6 +27,7 @@
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {SystemPreferenceApi} from "../../generated/api/SystemPreferenceApi";
+import {JUNO_BACKGROUND_STYLE, JUNO_STYLE} from "../common/components/junoComponentConstants";
 
 angular.module('Layout').component('leftAside', {
 	bindings: {
@@ -57,6 +58,8 @@ angular.module('Layout').component('leftAside', {
 			securityService)
 	{
 
+		$scope.pageStyle = JUNO_STYLE.GREY;
+
 		var ctrl = this;
 		ctrl.initialized = false;
 
@@ -70,6 +73,7 @@ angular.module('Layout').component('leftAside', {
 		ctrl.tabEnum = Object.freeze({
 			appointments: 0,
 			recent: 1,
+			appointmentQueue: 2,
 		});
 		ctrl.activeTab = ctrl.tabEnum.appointments;
 		ctrl.activePatientList = [];
@@ -126,6 +130,16 @@ angular.module('Layout').component('leftAside', {
 			ctrl.activeTab = tabId;
 			ctrl.refresh();
 		};
+
+		ctrl.getTabClasses = (active) =>
+		{
+			let classHash = {
+				'active': active
+			};
+			classHash[$scope.pageStyle + JUNO_BACKGROUND_STYLE.PRIMARY] = active;
+
+			return classHash;
+		}
 
 		ctrl.goToRecord = function goToRecord(patient)
 		{
@@ -216,6 +230,10 @@ angular.module('Layout').component('leftAside', {
 		{
 			return (ctrl.activeTab === ctrl.tabEnum.appointments);
 		};
+		ctrl.isAppointmentQueueView = function ()
+		{
+			return (ctrl.activeTab === ctrl.tabEnum.appointmentQueue);
+		}
 
 		ctrl.refreshRecentPatientList = function ()
 		{

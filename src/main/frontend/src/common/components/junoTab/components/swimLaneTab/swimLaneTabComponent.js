@@ -21,26 +21,32 @@
 * Canada
 */
 
-import {JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_TAB_TYPE} from "../junoComponentConstants";
 
-angular.module('Common.Components').component('junoTab', {
-	templateUrl: 'src/common/components/junoTab/junoTab.jsp',
+import {JUNO_BUTTON_COLOR, JUNO_STYLE} from "../../../junoComponentConstants";
+
+angular.module('Common.Components.JunoTab').component('swimLaneTab', {
+	templateUrl: 'src/common/components/junoTab/components/swimLaneTab/swimLaneTab.jsp',
 	bindings: {
 		ngModel: "=",
 		tabs: "<",
 		componentStyle: "<?",
-		type: "<?"
 	},
 	controller: ['$scope', function ($scope) {
 		let ctrl = this;
 
-		$scope.JUNO_TAB_TYPE = JUNO_TAB_TYPE;
+		ctrl.isScrolling = false;
+		ctrl.mouseStartX = 0;
+		ctrl.clickMaxScroll = 8;
+		ctrl.swimLane = null; // need angularjs 1.8 ref!
+
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 
 		ctrl.$onInit = () =>
 		{
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-			ctrl.type = ctrl.type || JUNO_TAB_TYPE.NORMAL;
+
+			window.addEventListener("mouseup", ctrl.endScroll);
+			window.addEventListener("mousemove", ctrl.scrollUpdate);
 		};
 
 		ctrl.onTabSelect = (tab) =>
@@ -63,6 +69,38 @@ angular.module('Common.Components').component('junoTab', {
 		ctrl.componentClasses = () =>
 		{
 			return [ctrl.componentStyle, ctrl.type];
+		}
+
+		// <--- mouse scroll tracking --->
+		ctrl.startScroll = (event) =>
+		{
+			ctrl.isScrolling = true;
+
+			ctrl.swimLane = event.currentTarget.parentElement;
+			ctrl.mouseStartX = event.clientX;
+			ctrl.initalScrollPosition = ctrl.swimLane.scrollLeft;
+		}
+
+		ctrl.scrollUpdate = (event) =>
+		{
+			if (ctrl.isScrolling)
+			{
+				ctrl.swimLane.scroll(ctrl.initalScrollPosition - (event.clientX - ctrl.mouseStartX), 0);
+				$scope.$digest();
+			}
+		}
+
+		ctrl.endScroll = (event, tab) =>
+		{
+			if (ctrl.isScrolling)
+			{
+				ctrl.isScrolling = false;
+
+				if (Math.abs(ctrl.initalScrollPosition - ctrl.swimLane.scrollLeft) < ctrl.clickMaxScroll && tab)
+				{
+					ctrl.onTabSelect(tab);
+				}
+			}
 		}
 	}]
 });

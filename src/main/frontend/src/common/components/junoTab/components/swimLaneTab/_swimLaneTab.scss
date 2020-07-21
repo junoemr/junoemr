@@ -1,0 +1,36 @@
+.juno-tab-swim-lane {
+	overflow-y: hidden;
+	overflow-x: auto;
+
+	.swim-lane {
+		juno-button {
+			flex-grow: 0;
+
+			&:not(:first-child) {
+				margin-left: 4px;
+			}
+
+			.juno-button {
+				margin: 0;
+				height: 24px;
+
+				button {
+					border-radius: 4px;
+					padding: 0 24px 0 24px;
+				}
+			}
+
+			&:not(.active) {
+				button {
+					filter: brightness(0.9);
+				}
+			}
+			&.active {
+				button {
+					filter: brightness(1.2);
+				}
+			}
+		}
+	}
+
+}

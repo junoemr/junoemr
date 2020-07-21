@@ -1,17 +1,36 @@
-<div class="juno-input-modal height-100" ng-keydown="$ctrl.onKeyDown($event)" ng-class="$ctrl.getComponentClasses()">
-	<h3 ng-class="$ctrl.resolve.style">{{$ctrl.resolve.title}}</h3>
+<juno-simple-modal class="juno-input-modal"
+                   component-style="$ctrl.resolve.style"
+                   modal-instance="$ctrl.modalInstance"
+                   ng-keydown="$ctrl.onKeyDown($event)">
+	
+	<h5 class="title juno-text-primary">{{$ctrl.resolve.title}}</h5>
+	
+	<p class="juno-text">
+		{{$ctrl.resolve.message}}
+	</p>
+	
 	<juno-input id="modal-input"
 					ng-model="$ctrl.value"
-					component-style="$ctrl.resolve.style"
-					label="{{$ctrl.resolve.message}}"
-					label-position="LABEL_POSITION.TOP">
+          invalid="!$ctrl.validations.value() && $ctrl.hasSubmitted"
+          placeholder="Please enter reason here"
+					component-style="$ctrl.resolve.style">
 	</juno-input>
+	
+	<juno-divider component-style="$ctrl.resolve.style"
+	              slim="true">
+	</juno-divider>
+	
 	<div class="buttons">
-		<juno-button ng-click="$ctrl.onCancel()" component-style="$ctrl.resolve.style" button-color="JUNO_BUTTON_COLOR.BASE">
+		<juno-button ng-click="$ctrl.onCancel()"
+		             component-style="$ctrl.resolve.style"
+		             button-color="JUNO_BUTTON_COLOR.BASE">
 			Cancel
 		</juno-button>
-		<juno-button ng-click="$ctrl.onOk()" component-style="$ctrl.resolve.style">
-			Ok
+		<juno-button ng-click="$ctrl.onOk()"
+		             disabled="!allValidationsValid($ctrl.validations)"
+		             component-style="$ctrl.resolve.style">
+			{{$ctrl.resolve.okText}}
 		</juno-button>
 	</div>
-</div>
+	
+</juno-simple-modal>

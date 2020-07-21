@@ -109,6 +109,9 @@ body {
 .flex-grow {
 	flex-grow: 1;
 }
+.flex-fill-row {
+	flex: 1 1 100%;
+}
 .overflow-auto {
 	overflow: auto;
 }

@@ -44,14 +44,7 @@ angular.module('Record.Details').component('contactSection', {
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 
 			ctrl.validations = Object.assign(ctrl.validations, {
-				email: Juno.Validations.validationCustom(() =>
-				{
-					if (ctrl.ngModel)
-					{
-						return !ctrl.ngModel.email || ctrl.ngModel.email.match(/^[^@]+@[^.]+\.[^.]+$/)
-					}
-					return false;
-				}),
+				email: Juno.Validations.validationEmail(ctrl, "ngModel.email"),
 			});
 		}
 

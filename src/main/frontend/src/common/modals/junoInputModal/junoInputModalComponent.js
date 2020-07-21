@@ -34,19 +34,21 @@ angular.module('Common.Components').component('junoInputModal',
 	{
 		let ctrl = this;
 
-		ctrl.value = "";
 		$scope.LABEL_POSITION = LABEL_POSITION;
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		$scope.allValidationsValid = Juno.Validations.allValidationsValid;
+
+		ctrl.value = "";
+		ctrl.hasSubmitted = false;
+		ctrl.validations = {
+			value: Juno.Validations.validationFieldRequired(ctrl, "value"),
+		};
+
 
 		ctrl.$onInit = () =>
 		{
 			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
-
-			if (ctrl.resolve.style === JUNO_STYLE.DRACULA)
-			{
-				// we are inside an bootstrap transclude component, restyle it.
-				angular.element(document.querySelector(".modal-content")).addClass(ctrl.resolve.style + "-background");
-			}
+			ctrl.resolve.okText = ctrl.resolve.okText || "Ok";
 		}
 
 		ctrl.onKeyDown = (event) =>
@@ -65,7 +67,11 @@ angular.module('Common.Components').component('junoInputModal',
 
 		ctrl.onOk = () =>
 		{
-			ctrl.modalInstance.close(ctrl.value);
+			if (Juno.Validations.allValidationsValid(ctrl.validations))
+			{
+				ctrl.modalInstance.close(ctrl.value);
+			}
+			ctrl.hasSubmitted = true;
 		}
 
 		ctrl.getComponentClasses = () =>

@@ -36,10 +36,24 @@ export enum JUNO_STYLE
 	DRACULA = "juno-style-dracula",
 }
 
+// use as, JUNO_STYLE + BACKGROUND_STYLE
+export enum JUNO_BACKGROUND_STYLE
+{
+	PRIMARY = "-background",
+	SECONDARY = "-background-secondary",
+}
+
 export enum JUNO_BUTTON_COLOR
 {
 	PRIMARY = "btn-primary",
 	SECONDARY = "btn-secondary",
 	BASE = "btn-base",
 	TRANSPARENT = "btn-transparent",
+	INVISIBLE = "btn-invisible",
+}
+
+export enum JUNO_TAB_TYPE
+{
+	NORMAL = "juno-tab-normal",
+	SWIM_LANE = "juno-tab-swim-lane"
 }
