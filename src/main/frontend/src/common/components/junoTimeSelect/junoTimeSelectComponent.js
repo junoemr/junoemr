@@ -30,11 +30,10 @@ angular.module('Common.Components').component('junoTimeSelect', {
 		label: "@?",
 		labelPosition: "<?",
 		componentStyle: "<?",
-		change: "<?",
 		disabled: "<?",
 	},
 	controller: ["$scope", function ($scope)
-	{
+		{
 		let ctrl = this;
 
 		ctrl.hour = null;
@@ -70,6 +69,15 @@ angular.module('Common.Components').component('junoTimeSelect', {
 			];
 
 			ctrl.updateDateFields();
+
+			$scope.$watchGroup( ["$ctrl.hour", "$ctrl.minute", "$ctrl.amPm"], (newValue, oldValue) =>
+				{
+					if (newValue !== oldValue)
+					{
+						ctrl.onTimeChange();
+					}
+				}
+			);
 		};
 
 		ctrl.updateDateFields = () =>
@@ -87,9 +95,9 @@ angular.module('Common.Components').component('junoTimeSelect', {
 		{
 			// clone current moment model
 			let date = moment(ctrl.ngModel);
+			date.hour((ctrl.amPm === "AM") ? ctrl.hour : ctrl.hour + 12);
 			date.minute(ctrl.minute);
 			date.second(0);
-			date.hour((ctrl.amPm === "AM") ? ctrl.hour : ctrl.hour + 12);
 
 			if (date.isValid())
 			{
@@ -97,11 +105,6 @@ angular.module('Common.Components').component('junoTimeSelect', {
 
 				//TODO remove
 				console.info("updated date", Juno.Common.Util.formatMomentDateTimeNoTimezone(date));
-
-				if (ctrl.change)
-				{
-					ctrl.change(ctrl.ngModel);
-				}
 			}
 		}
 

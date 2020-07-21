@@ -28,16 +28,14 @@ angular.module('Common.Components').component('junoSelect', {
 	bindings: {
 		ngModel: "=",
 		options: "<",
-		change: "<?",
 		placeholder: "@?",
 		label: "@?",
 		labelPosition: "<?",
 		componentStyle: "<?",
 		disabled: "<?",
 	},
-	controller: [
-		'$timeout',
-		function ($timeout) {
+	controller: [function ()
+	{
 		let ctrl = this;
 
 		ctrl.$onInit = () =>
@@ -45,18 +43,6 @@ angular.module('Common.Components').component('junoSelect', {
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 		};
-
-		ctrl.onChange = () =>
-		{
-			// use timeout to execute after the model has been updated
-			$timeout(function()
-			{
-				if (ctrl.change)
-				{
-					ctrl.change();
-				}
-			});
-		}
 
 		ctrl.labelClasses = () =>
 		{
