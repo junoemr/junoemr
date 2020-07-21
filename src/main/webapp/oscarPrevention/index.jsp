@@ -68,6 +68,8 @@ if(!authed) {
 	String mrp = demo.getProviderNo();
 	PreventionManager preventionManager = SpringUtils.getBean(PreventionManager.class);
 
+	List<String> itemsToHide = preventionManager.getItemsToHide();
+
 	PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
 	ArrayList<HashMap<String,String>> prevList = pdc.getPreventions();
 	ArrayList<Map<String,Object>> configSets = pdc.getConfigurationSets();
@@ -491,7 +493,7 @@ text-align:left;
 						HashMap<String,String> h = prevList.get(i);
 						String prevName = h.get("name");
 
-						if(!preventionManager.hideItem(prevName))
+						if(!preventionManager.hideItem(prevName, itemsToHide))
 						{%>
 				<li style="margin-top: 2px;"><a
 						href="javascript: function myFunction() {return false; }"
@@ -637,7 +639,7 @@ text-align:left;
                             preventionCount = preventionListData.getPreventionCount();
                         }
 
-                        boolean show = pdc.display(loggedInInfo, h, demographic, preventionCount);
+                        boolean show = pdc.display(h, demographic, preventionCount, itemsToHide);
                         if(!show)
                         {
                             Map<String,Object> h2 = new HashMap<String,Object>();

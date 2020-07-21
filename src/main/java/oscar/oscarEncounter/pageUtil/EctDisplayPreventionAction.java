@@ -29,6 +29,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +38,7 @@ import org.apache.struts.util.MessageResources;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.dto.PreventionListData;
+import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
@@ -105,6 +107,9 @@ public class EctDisplayPreventionAction extends EctDisplayAction
 		DemographicData dData = new DemographicData();
 		Demographic demographic = dData.getDemographic(loggedInInfo, bean.demographicNo);
 
+		PreventionManager preventionManager = SpringUtils.getBean(PreventionManager.class);
+		List<String> itemsToHide = preventionManager.getItemsToHide();
+
 		url += "; return false;";
         ArrayList<NavBarDisplayDAO.Item> warnings = new ArrayList<NavBarDisplayDAO.Item>();
         ArrayList<NavBarDisplayDAO.Item> items = new ArrayList<NavBarDisplayDAO.Item>();
@@ -121,7 +126,7 @@ public class EctDisplayPreventionAction extends EctDisplayAction
 				preventionCount = preventionListData.getPreventionCount();
 			}
 
-			boolean show = pdc.display(loggedInInfo, h, demographic, preventionCount);
+			boolean show = pdc.display(h, demographic, preventionCount, itemsToHide);
 
 			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
 			if (show)
