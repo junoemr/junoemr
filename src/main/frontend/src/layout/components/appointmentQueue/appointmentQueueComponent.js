@@ -164,8 +164,15 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				                                       "Proceed");
 				if (reason)
 				{
-					// TODO actually delete the queued appointment
-					ctrl.currentQueue.items.splice(itemIndex, 1);
+					try
+					{
+						await aqsAppointmentsApi.deleteAppointment(ctrl.currentQueue.items[itemIndex].queueId, ctrl.currentQueue.items[itemIndex].id, reason);
+						ctrl.currentQueue.items.splice(itemIndex, 1);
+					}
+					catch(err)
+					{
+						console.error("Failed to delete queued appointment, with error: " + err);
+					}
 				}
 			}
 			catch (err)

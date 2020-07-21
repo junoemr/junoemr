@@ -55,9 +55,11 @@ public class QueuedAppointmentTo1
 	private String demographicName;
 	private String reason;
 
-	public QueuedAppointmentTo1(Integer queuePosition, String demographicNo, String reason, String demographicDisplayName)
+	public QueuedAppointmentTo1(String queueId, Integer queuePosition, String demographicNo, String reason, String demographicDisplayName)
 	{
 		//TODO remove once REST calls in.
+		this.remoteId = "1234";
+		this.queueId = queueId;
 		this.demographicNo = demographicNo;
 		this.reason = reason;
 		this.queuePosition = queuePosition;

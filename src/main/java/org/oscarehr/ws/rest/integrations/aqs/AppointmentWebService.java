@@ -24,10 +24,12 @@
 package org.oscarehr.ws.rest.integrations.aqs;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.QueuedAppointmentTo1;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -45,31 +47,40 @@ public class AppointmentWebService
 	@GET
 	@Path("appointments/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<QueuedAppointmentTo1>> getAppointmentsInQueue(@PathParam("queueId") Integer queueId)
+	public RestResponse<List<QueuedAppointmentTo1>> getAppointmentsInQueue(@PathParam("queueId") String queueId)
 	{
 		ArrayList<QueuedAppointmentTo1> list = new ArrayList<>();
 
 		//TODO real data
 		switch(queueId)
 		{
-			case 0:
-				list.add(new QueuedAppointmentTo1(0, "1" , "foobar", "Jon Duo"));
-				list.add(new QueuedAppointmentTo1(1, "2" , "warts on ass", "Frank. Dr."));
+			case "0":
+				list.add(new QueuedAppointmentTo1("0", 0, "1" , "foobar", "Jon Doe"));
+				list.add(new QueuedAppointmentTo1("0", 1, "2" , "warts on ass", "Frank. Dr."));
 				break;
-			case 1:
-				list.add(new QueuedAppointmentTo1(0, "3" , "power over whelming!", "Man "));
-				list.add(new QueuedAppointmentTo1(1, "4" , "Its over 9000!", "Super Saiyan "));
-				list.add(new QueuedAppointmentTo1(2, "5" , "What! 9000!", "Other guy"));
+			case "1":
+				list.add(new QueuedAppointmentTo1("1", 0, "3" , "power over whelming!", "Man "));
+				list.add(new QueuedAppointmentTo1("1", 1, "4" , "Its over 9000!", "Super Saiyan "));
+				list.add(new QueuedAppointmentTo1("1", 2, "5" , "What! 9000!", "Other guy"));
 				break;
-			case 2:
+			case "2":
 				for (Integer i =0; i < 64; i ++)
 				{
-					list.add(new QueuedAppointmentTo1(i, i.toString(), "Long", "appts"));
+					list.add(new QueuedAppointmentTo1("2", i, i.toString(), "Long", "appts"));
 				}
 				break;
 		}
 
 		return RestResponse.successResponse(list);
+	}
+
+	@DELETE
+	@Path("appointment/{appointmentId}/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> deleteAppointment(@PathParam("queueId") String queueId, @PathParam("appointmentId") String appointmentId, String reason)
+	{
+		MiscUtils.getLogger().info("TEMP! Would have deleted appointment: " + appointmentId + " From queue: " + queueId + " In the AQS system. Delete reason: " + reason);
+		return RestResponse.successResponse(true);
 	}
 
 }
