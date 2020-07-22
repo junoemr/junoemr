@@ -78,12 +78,6 @@
 	align-items: baseline;
 	flex-wrap: wrap;
 
-	//button {
-	//	box-shadow: none;
-	//	border-radius: 4px;
-	//	padding: 0 4px 0 4px;
-	//}
-
 	&.juno-button {
 		height: 32px;
 	}
@@ -101,24 +95,6 @@
 	@include styleCommon;
 
 	@include juno-tab-color-scheme-white;
-
-	button {
-		//@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-white,
-		//				$color-neutral-lighter, $color-neutral-lighter, $color-neutral-white);
-
-		&.btn-base, &.btn-transparent, &.btn-invisible {
-			color: $color-neutral-darker !important;
-		}
-	}
-
-	//&.juno-check-box {
-	//	button {
-	//		&.un-checked {
-	//			border-color: $color-neutral-light;
-	//			background-color: $color-neutral-white;
-	//		}
-	//	}
-	//}
 
 	&.juno-divider {
 		border: 1px solid $color-neutral-lighter;
@@ -144,27 +120,6 @@
 	@include styleCommon;
 
 	@include juno-tab-color-scheme-white;
-
-	button {
-		//border-radius: 8px;
-
-		//@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-lightest,
-		//				$color-neutral-lighter, $color-neutral-lighter, $color-neutral-white);
-
-		&.btn-secondary, &.btn-base, &.btn-transparent, &.btn-invisible {
-			color: $color-neutral-darker;
-		}
-	}
-
-	//&.juno-check-box {
-	//	button {
-	//		&.un-checked {
-	//			border-color: $color-neutral-lighter;
-	//			background-color: $color-neutral-lightest;
-	//		}
-	//	}
-	//}
-
 	@include junoTabColor($color-neutral-lightest, $color-neutral-white, $color-neutral-lighter, $color-neutral-darker);
 
 	&.juno-panel {
@@ -195,25 +150,6 @@
 
 	@include juno-tab-color-scheme-dark;
 	color: $color-neutral-white;
-
-	//button {
-		//border-radius: 8px;
-		//@include buttonColor($color-primary-base, $color-neutral-black, $color-neutral-darkest,
-		//				$color-neutral-darker, $color-orange-base, $color-neutral-white)
-	//}
-
-	//&.juno-check-box {
-	//	button {
-	//		&.un-checked {
-	//			border-color: $color-neutral-darker;
-	//			background-color: $color-neutral-darkest;
-	//
-	//			&:hover {
-	//				border-color: $color-orange-base;
-	//			}
-	//		}
-	//	}
-	//}
 
 	&.juno-divider {
 		background-color: $color-neutral-darker;
