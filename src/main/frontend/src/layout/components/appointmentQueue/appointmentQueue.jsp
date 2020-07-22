@@ -26,10 +26,16 @@
 					      component-style="$ctrl.componentStyle"
 					      slim="true">
 	</juno-divider>
-	
+
 	<div class="list">
 		<div class="list-content" ng-style="$ctrl.getListScrollHeightStyle()">
-			<div ng-repeat="foobar in [].constructor($ctrl.maxQueueLength) track by $index" class="flex-fill-row">
+			<juno-loading-indicator ng-if="!$ctrl.currentQueue"
+															class="loading-indicator-container"
+															message = "Loading"
+															message-alignment="vertical"
+															indicator-type="dot-pulse">
+			</juno-loading-indicator>
+			<div ng-if="$ctrl.currentQueue" ng-repeat="foobar in [].constructor($ctrl.currentQueue.queueLimit) track by $index" class="flex-fill-row">
 				<appointment-card ng-model="$ctrl.currentQueue.items[$index]"
 				                  on-delete="$ctrl.deleteQueueItem($index);"
 				                  component-style="$ctrl.componentStyle">
@@ -42,7 +48,7 @@
 			<span class="middle-text juno-text-secondary">
 				items in queue. max capacity
 			</span>
-			{{$ctrl.maxQueueLength}}
+			{{$ctrl.currentQueue.queueLimit}}
 			<juno-button component-style="$ctrl.componentStyle"
 			             button-color="JUNO_BUTTON_COLOR.PRIMARY"
 			             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">

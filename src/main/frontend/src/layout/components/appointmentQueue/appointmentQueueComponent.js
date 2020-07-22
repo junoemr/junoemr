@@ -27,6 +27,7 @@ import {
 	JUNO_STYLE,
 	JUNO_TAB_TYPE
 } from "../../../common/components/junoComponentConstants";
+import {AqsQueuesApi, AqsAppointmentsApi} from "../../../../generated";
 
 angular.module('Layout.Components').component('appointmentQueue', {
 	templateUrl: 'src/layout/components/appointmentQueue/appointmentQueue.jsp',
@@ -35,9 +36,13 @@ angular.module('Layout.Components').component('appointmentQueue', {
 	},
 	controller: [
 		"$scope",
+		"$http",
+		"$httpParamSerializer",
 		"$uibModal",
 		function (
 			$scope,
+			$http,
+			$httpParamSerializer,
 			$uibModal,
 		)
 	{
@@ -47,89 +52,31 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-		// hash of all queues {queueName: [array of queue appts]}
-		ctrl.queues = {
-			starTrek: {
-				metaDataAndStuff: 42,
+		// load apis
+		let aqsQueuesApi = new AqsQueuesApi($http, $httpParamSerializer,
+				'../ws/rs');
+		// load apis
+		let aqsAppointmentsApi = new AqsAppointmentsApi($http, $httpParamSerializer,
+				'../ws/rs');
 
-				items: [
-					{
-						demographicNo: 1,
-						patientName: "Kirk",
-						reason: "Set phasers to kill *rips of shirt*",
-						isTelehealth: true,
-					},
-					{
-						demographicNo: 2,
-						patientName: "Spock",
-						reason: "Logic dictates that this is a test",
-						isTelehealth: true,
-					},
-					{
-						demographicNo: 3,
-						patientName: "Dr. MiCoy",
-						reason: "He's dead Jim",
-						isTelehealth: true,
-					},
-				],
-
-			},
-			galactica: {
-				metaDataAndStuff: 42,
-
-				items: [
-					{
-						demographicNo: 1,
-						patientName: "Admiral Adama",
-						reason: "Fire the nukes!",
-						isTelehealth: true,
-					},
-					{
-						demographicNo: 2,
-						patientName: "Starbuck",
-						reason: "I'm dead but, I came back as an angle or some bull crap like that",
-						isTelehealth: true,
-					},
-					{
-						demographicNo: 3,
-						patientName: "Boomer",
-						reason: "def not a Cylon",
-						isTelehealth: true,
-					},
-					{
-						demographicNo: 4,
-						patientName: "Gaius Baltar",
-						reason: "Loves, Number Six, A Cylon",
-						isTelehealth: false,
-					},
-				],
-			},
-			longList: {
-				items: [...Array(16)].map((i) => {return {patientName: "Long, Long", reason: "lots of appts", isTelehealth: true}}),
-			}
-		};
-
+		// hash of all queues
+		ctrl.queues = [];
 		// tab options used to select queue.
-		ctrl.tabOptions = [
-			{label: "Star Trek", value: ctrl.queues["starTrek"], color: "#27ae60"},
-			{label: "Battle Star Galactica", value: ctrl.queues["galactica"], color: "#f39c12"},
-			{label: "Long List", value: ctrl.queues["longList"], color: "#e74c3c"},
-		];
-
+		ctrl.tabOptions = [];
 		// currently selected queue (selected by tab bar)
-		ctrl.currentQueue = ctrl.queues["starTrek"];
-		// max queue length
-		ctrl.maxQueueLength = 128;
+		ctrl.currentQueue = null;
 
+		// ======= Scroll Height tracking ===========
 		// List container element reference
 		ctrl.listRef = null;
 		ctrl.listContentRef = null;
 		// Height of the content of the appointment list. Used
 		// to adjust scroll height.
-		ctrl.listContentHeight = 0;
+		ctrl.listContentHeight = 300;
 		// minimum number of blank appointment slots to show.
 		ctrl.appointmentSlots = 4;
 		ctrl.resizeObserver = null;
+		// ======= Scroll Height tracking ===========
 
 		ctrl.$onInit = () =>
 		{
@@ -144,6 +91,8 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				ctrl.calculateScrollHeight(true);
 			});
 			ctrl.resizeObserver.observe(ctrl.listRef[0]);
+
+			ctrl.loadQueues();
 		}
 
 		ctrl.$doCheck = () =>
@@ -152,10 +101,47 @@ angular.module('Layout.Components').component('appointmentQueue', {
 			ctrl.calculateScrollHeight(false);
 		}
 
+		ctrl.loadQueues = async () =>
+		{
+			ctrl.queues = [];
+
+			try
+			{
+				let appointmentQueues = (await aqsQueuesApi.getAppointmentQueues()).data.body;
+				for(let queue of appointmentQueues)
+				{
+					queue.items = (await aqsAppointmentsApi.getAppointmentsInQueue(queue.id)).data.body;
+					ctrl.queues.push(queue);
+				}
+
+				ctrl.setupQueueTabs();
+
+				// set default selection to first queue.
+				ctrl.currentQueue = ctrl.queues[0];
+			}
+			catch(err)
+			{
+				console.error("Failed to fetch appointment queues with error: " + err);
+			}
+		}
+
+		ctrl.setupQueueTabs = () =>
+		{
+			ctrl.tabOptions = [];
+			for (let queue of ctrl.queues)
+			{
+				ctrl.tabOptions.push({
+					label: queue.queueName,
+					value: queue,
+					color: queue.queueColor,
+				});
+			}
+		}
+
 		ctrl.calculateScrollHeight = (digest) =>
 		{
 			let childElement = ctrl.listContentRef.children()[0];
-			if (childElement)
+			if (childElement && ctrl.currentQueue)
 			{
 				let elementHeight = childElement.clientHeight;
 				let elementsToDisplay = Math.max(ctrl.currentQueue.items.length + ctrl.appointmentSlots,
@@ -179,8 +165,15 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				                                       "Proceed");
 				if (reason)
 				{
-					// TODO actually delete the queued appointment
-					ctrl.currentQueue.items.splice(itemIndex, 1);
+					try
+					{
+						await aqsAppointmentsApi.deleteAppointment(ctrl.currentQueue.items[itemIndex].queueId, ctrl.currentQueue.items[itemIndex].id, reason);
+						ctrl.currentQueue.items.splice(itemIndex, 1);
+					}
+					catch(err)
+					{
+						console.error("Failed to delete queued appointment, with error: " + err);
+					}
 				}
 			}
 			catch (err)
