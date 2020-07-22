@@ -158,8 +158,8 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 		cell.setBorder(0);
 		mainTable.addCell(cell);
 
-		document.add(mainTable);
 		cb.endLayer();
+		document.add(mainTable);
 
 		if (RxWatermarkService.isWatermarkEnabled() && !RxWatermarkService.isWatermarkBackground())
 		{
