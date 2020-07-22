@@ -24,9 +24,9 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.data.ProviderTestData;
 import integration.tests.util.junoUtil.Navigation;
-import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.BeforeClass;
@@ -40,7 +40,6 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByIndex;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 
 public class AddProvidersTests extends SeleniumTestBase {
@@ -96,7 +95,7 @@ public class AddProvidersTests extends SeleniumTestBase {
 		driver.findElement(By.xpath("//input[@name='xml_p_specialty_code']")).sendKeys(drApple.specialtyCodeNo);
 		driver.findElement(By.xpath("//input[@name='xml_p_billinggroup_no']")).sendKeys(drApple.groupBillingNo);
 		driver.findElement(By.xpath("//input[@name='practitionerNo']")).sendKeys(drApple.cpsidNo);
-		dropdownSelectByIndex(driver, By.xpath("//select[@name='billcenter']"), 0);//dropdown empty
+		dropdownSelectByValue(driver, By.xpath("//select[@name='billcenter']"), drApple.billCenter);//dropdown empty
 		driver.findElement(By.xpath("//input[@name='xml_p_slpusername']")).sendKeys(drApple.selfLearningUsername);
 		driver.findElement(By.xpath("//input[@name='xml_p_slppassword']")).sendKeys(drApple.selfLearningPassword);
 		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), drApple.status);
