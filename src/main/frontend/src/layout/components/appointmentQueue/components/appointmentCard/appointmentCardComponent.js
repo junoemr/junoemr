@@ -24,7 +24,7 @@
 
 import {
 	JUNO_BACKGROUND_STYLE,
-	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN,
 	JUNO_STYLE
 } from "../../../../../common/components/junoComponentConstants";
 
@@ -40,6 +40,7 @@ angular.module('Layout.Components').component('appointmentCard', {
 		let ctrl = this;
 
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 		ctrl.$onInit = () =>
 		{

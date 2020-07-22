@@ -28,7 +28,8 @@
 		<div class="row">
 			<div class="col-md-6">
 				<juno-button component-style="$ctrl.resolve.style"
-				             button-color="$ctrl.JUNO_BUTTON_COLOR.SECONDARY"
+				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
 				             ng-click="$ctrl.onCancel()"
 				             class="cancel-connection-btn">
 					<div class="cancel-btn-text">
@@ -39,6 +40,7 @@
 			<div class="col-md-6">
 				<juno-button component-style="$ctrl.resolve.style"
 				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
 				             ng-click="$ctrl.onSave()"
 				             disabled="$ctrl.saveDisabled()"
 				             class="cancel-connection-btn">

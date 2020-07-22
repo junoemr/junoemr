@@ -30,6 +30,8 @@
 					</div>
 					<div class="col-md-2 pull-right">
 						<juno-button ng-click="$ctrl.addQueue()"
+						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
 						             component-style="$ctrl.componentStyle">
 							Add New Queue
 						</juno-button>
@@ -51,13 +53,15 @@
 								<juno-button
 										title="Edit Queue"
 										component-style="$ctrl.componentStyle"
-										button-color="JUNO_BUTTON_COLOR.BASE"
+										button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+										button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED"
 										ng-click="$ctrl.editQueue(queue)">
 									<i class="icon icon-write"></i>Edit
 								</juno-button>
 								<juno-button
 										title="Delete Queue"
-										button-color="JUNO_BUTTON_COLOR.BASE"
+										button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
+										button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
 										component-style="$ctrl.componentStyle"
 										ng-click="$ctrl.deleteQueue(queue)">
 									<i class="icon icon-delete"></i>Delete

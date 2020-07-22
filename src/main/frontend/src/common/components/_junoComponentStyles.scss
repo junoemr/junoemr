@@ -12,43 +12,6 @@
 
 // ============ MIXINS ===============
 
-@mixin buttonColor ($primary-color, $secondary-color, $base-color, $border-color, $hover-color, $text-color)
-{
-	&.btn-primary {
-		border: 1px solid $primary-color;
-		background-color: $primary-color;
-		color: $text-color;
-	}
-
-	&.btn-secondary {
-		border: 1px solid $border-color;
-		background-color: $secondary-color;
-		color: $text-color;
-	}
-
-	&.btn-base {
-		border: 1px solid $border-color;
-		background-color: $base-color;
-		color: $text-color;
-
-		&:hover {
-			border-color: $hover-color;
-		}
-	}
-
-	&.btn-transparent {
-		border: 1px solid $border-color;
-		background-color: transparent;
-		color: $text-color;
-	}
-
-	&.btn-invisible {
-		border: 1px solid transparent;
-		background-color: transparent;
-		color: $text-color;
-	}
-}
-
 @mixin junoTabColor ($background-color, $selected-background-color, $border-color, $text-color)
 {
 	&.juno-tab {
@@ -157,8 +120,8 @@
 	@include juno-tab-color-scheme-white;
 
 	button {
-		@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-white,
-						$color-neutral-lighter, $color-neutral-lighter, $color-neutral-white);
+		//@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-white,
+		//				$color-neutral-lighter, $color-neutral-lighter, $color-neutral-white);
 
 		&.btn-base, &.btn-transparent, &.btn-invisible {
 			color: $color-neutral-darker !important;
@@ -202,8 +165,8 @@
 	button {
 		border-radius: 8px;
 
-		@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-lightest,
-						$color-neutral-lighter, $color-neutral-lighter, $color-neutral-white);
+		//@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-lightest,
+		//				$color-neutral-lighter, $color-neutral-lighter, $color-neutral-white);
 
 		&.btn-secondary, &.btn-base, &.btn-transparent, &.btn-invisible {
 			color: $color-neutral-darker;
@@ -252,8 +215,8 @@
 
 	button {
 		border-radius: 8px;
-		@include buttonColor($color-primary-base, $color-neutral-black, $color-neutral-darkest,
-						$color-neutral-darker, $color-orange-base, $color-neutral-white)
+		//@include buttonColor($color-primary-base, $color-neutral-black, $color-neutral-darkest,
+		//				$color-neutral-darker, $color-orange-base, $color-neutral-white)
 	}
 
 	&.juno-check-box {

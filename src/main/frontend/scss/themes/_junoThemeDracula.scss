@@ -1,4 +1,9 @@
 .juno-style-dracula {
+
+	--theme-color-primary-base: var(--color-neutral-darker);
+	--theme-color-primary-accent: var(--color-orange-base);
+	--theme-color-primary-text: var(--color-neutral-white);
+
 	--theme-color-form-field-text: var(--color-neutral-white);
 	--theme-color-form-field-text-hover: var(--color-neutral-white);
 	--theme-color-form-field-text-active: var(--color-neutral-white);

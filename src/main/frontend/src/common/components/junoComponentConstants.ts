@@ -43,13 +43,27 @@ export enum JUNO_BACKGROUND_STYLE
 	SECONDARY = "-background-secondary",
 }
 
+export enum JUNO_BUTTON_COLOR_PATTERN
+{
+	DEFAULT = "default",
+	COLORED = "colored",
+	DARK_HOVER = "dark-hover",
+	TRANSPARENT = "transparent",
+	FILL = "fill",
+	FILL_LIGHT = "fill-light",
+	FILL_DARK = "fill-dark",
+}
+
 export enum JUNO_BUTTON_COLOR
 {
-	PRIMARY = "btn-primary",
-	SECONDARY = "btn-secondary",
-	BASE = "btn-base",
-	TRANSPARENT = "btn-transparent",
-	INVISIBLE = "btn-invisible",
+	PRIMARY = "primary",
+	SECONDARY = "secondary",
+	GREYSCALE_LIGHT = "greyscale-light",
+	GREYSCALE_DARK = "greyscale-dark",
+	INFO = "info",
+	SUCCESS = "success",
+	WARNING = "warning",
+	DANGER = "danger",
 }
 
 export enum JUNO_TAB_TYPE

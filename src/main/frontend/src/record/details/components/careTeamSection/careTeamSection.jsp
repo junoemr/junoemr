@@ -40,7 +40,9 @@
 								component-style="$ctrl.componentStyle">
 				</juno-select>
 
-				<juno-button ng-click="$ctrl.openAddRosterStatusModal()">
+				<juno-button ng-click="$ctrl.openAddRosterStatusModal()"
+				             button-color="JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
 					Add
 				</juno-button>
 
@@ -61,7 +63,9 @@
 								component-style="$ctrl.componentStyle">
 				</juno-select>
 
-				<juno-button ng-click="$ctrl.openAddPatientStatusModal()">
+				<juno-button ng-click="$ctrl.openAddPatientStatusModal()"
+				             button-color="JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL">
 					Add
 				</juno-button>
 			</div>

@@ -97,8 +97,9 @@
 								component-style="$ctrl.componentStyle">
 				</juno-input>
 				<juno-button ng-click="$ctrl.openPatientModal()"
-								button-color="$ctrl.mhaSites === '' ? JUNO_BUTTON_COLOR.TRANSPARENT : JUNO_BUTTON_COLOR.PRIMARY"
-								component-style="$ctrl.componentStyle">
+				             button-color="JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.mhaSites === '' ? JUNO_BUTTON_COLOR_PATTERN.DEFAULT : JUNO_BUTTON_COLOR_PATTERN.FILL"
+				             component-style="$ctrl.componentStyle">
 					<div class="flex-row justify-content-center">
 						<i class="icon icon-view"></i>
 					</div>

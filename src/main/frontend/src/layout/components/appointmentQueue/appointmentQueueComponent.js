@@ -23,7 +23,7 @@
 
 import {
 	JUNO_BACKGROUND_STYLE,
-	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN,
 	JUNO_STYLE,
 	JUNO_TAB_TYPE
 } from "../../../common/components/junoComponentConstants";
@@ -45,6 +45,7 @@ angular.module('Layout.Components').component('appointmentQueue', {
 
 		$scope.JUNO_TAB_TYPE = JUNO_TAB_TYPE;
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 		// hash of all queues {queueName: [array of queue appts]}
 		ctrl.queues = {

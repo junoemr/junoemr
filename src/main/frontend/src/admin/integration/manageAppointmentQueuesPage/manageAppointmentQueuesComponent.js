@@ -1,4 +1,4 @@
-import {JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 
 angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 	{
@@ -30,6 +30,8 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 				ctrl.onDemandQueueSelectOptions = [];
 
 				ctrl.LABEL_POSITION = LABEL_POSITION;
+				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.$onInit = function ()
 				{

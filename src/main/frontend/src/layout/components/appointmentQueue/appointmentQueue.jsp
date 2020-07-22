@@ -44,7 +44,8 @@
 			</span>
 			{{$ctrl.maxQueueLength}}
 			<juno-button component-style="$ctrl.componentStyle"
-			             button-color="JUNO_BUTTON_COLOR.INVISIBLE">
+			             button-color="JUNO_BUTTON_COLOR.PRIMARY"
+			             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
 				<i class="icon icon-linux"></i>
 			</juno-button>
 		</div>
