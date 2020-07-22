@@ -20,52 +20,30 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.integrations.aqs.transfer;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.oscarehr.integration.aqs.model.AppointmentQueue;
-import org.springframework.beans.BeanUtils;
-import oscar.util.Jackson.ZonedDateTimeStringSerializer;
-
+package org.oscarehr.integration.aqs.model;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AppointmentQueueTo1
+public class AppointmentQueue
 {
-	@JsonProperty("id")
 	private String remoteId;
 	private String organizationId;
 	private String queueName;
 	private Integer queueLimit;
 	private String queueColor;
-	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
 	private ZonedDateTime createdAt;
-	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
 	private ZonedDateTime updatedAt;
 	private String createdBy;
 	private String createdByType;//TODO change to enum once types are defined
 	private String updatedBy;
 	private String updatedByType;//TODO change to enum once types are defined
 
-	public static List<AppointmentQueueTo1> fromAppointmentQueueList(List<AppointmentQueue> appointmentQueues)
+	public AppointmentQueue(String remoteId, String queueName, Integer queueLimit, String queueColor)
 	{
-		ArrayList<AppointmentQueueTo1> appointmentQueueTo1s = new ArrayList<>();
-
-		for (AppointmentQueue appointmentQueue: appointmentQueues)
-		{
-			appointmentQueueTo1s.add(new AppointmentQueueTo1(appointmentQueue));
-		}
-
-		return appointmentQueueTo1s;
-	}
-
-	public AppointmentQueueTo1(AppointmentQueue appointmentQueue)
-	{
-		BeanUtils.copyProperties(appointmentQueue, this);
+		//TODO remove. more for fake data injection.
+		this.remoteId = remoteId;
+		this.queueName = queueName;
+		this.queueLimit = queueLimit;
+		this.queueColor = queueColor;
 	}
 
 	public String getRemoteId()

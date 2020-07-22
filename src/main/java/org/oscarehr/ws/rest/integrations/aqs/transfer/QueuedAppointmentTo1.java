@@ -25,12 +25,14 @@ package org.oscarehr.ws.rest.integrations.aqs.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import oscar.util.Jackson.LocalDateSerializer;
+import org.oscarehr.integration.aqs.model.QueuedAppointment;
+import org.springframework.beans.BeanUtils;
+import oscar.util.Jackson.ZonedDateTimeStringSerializer;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QueuedAppointmentTo1
@@ -42,12 +44,10 @@ public class QueuedAppointmentTo1
 	private String status;//TODO change to enum once statuses are defined
 	@JsonProperty("integrationPatientId")
 	private String demographicNo;
-	@JsonDeserialize(using = LocalDateDeserializer.class)
-	@JsonSerialize(using = LocalDateSerializer.class)
-	private LocalDate createdAt;
-	@JsonDeserialize(using = LocalDateDeserializer.class)
-	@JsonSerialize(using = LocalDateSerializer.class)
-	private LocalDate updatedAt;
+	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
+	private ZonedDateTime createdAt;
+	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
+	private ZonedDateTime updatedAt;
 	private String createdBy;
 	private String createdByType;//TODO change to enum once types are defined
 	private String updatedBy;
@@ -55,15 +55,20 @@ public class QueuedAppointmentTo1
 	private String demographicName;
 	private String reason;
 
-	public QueuedAppointmentTo1(String queueId, Integer queuePosition, String demographicNo, String reason, String demographicDisplayName)
+	public static List<QueuedAppointmentTo1> fromQueuedAppointmentList(List<QueuedAppointment> queuedAppointments)
 	{
-		//TODO remove once REST calls in.
-		this.remoteId = "1234";
-		this.queueId = queueId;
-		this.demographicNo = demographicNo;
-		this.reason = reason;
-		this.queuePosition = queuePosition;
-		this.demographicName = demographicDisplayName;
+		ArrayList<QueuedAppointmentTo1> queuedAppointmentTo1s = new ArrayList<>();
+
+		for (QueuedAppointment queuedAppointment : queuedAppointments)
+		{
+			queuedAppointmentTo1s.add(new QueuedAppointmentTo1(queuedAppointment));
+		}
+		return queuedAppointmentTo1s;
+	}
+
+	public QueuedAppointmentTo1(QueuedAppointment queuedAppointment)
+	{
+		BeanUtils.copyProperties(queuedAppointment, this);
 	}
 
 	public String getRemoteId()
@@ -116,22 +121,22 @@ public class QueuedAppointmentTo1
 		this.demographicNo = demographicNo;
 	}
 
-	public LocalDate getCreatedAt()
+	public ZonedDateTime getCreatedAt()
 	{
 		return createdAt;
 	}
 
-	public void setCreatedAt(LocalDate createdAt)
+	public void setCreatedAt(ZonedDateTime createdAt)
 	{
 		this.createdAt = createdAt;
 	}
 
-	public LocalDate getUpdatedAt()
+	public ZonedDateTime getUpdatedAt()
 	{
 		return updatedAt;
 	}
 
-	public void setUpdatedAt(LocalDate updatedAt)
+	public void setUpdatedAt(ZonedDateTime updatedAt)
 	{
 		this.updatedAt = updatedAt;
 	}

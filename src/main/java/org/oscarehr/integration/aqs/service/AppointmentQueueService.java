@@ -20,37 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.integration.aqs.service;
 
-package org.oscarehr.ws.rest.integrations.aqs;
+import org.oscarehr.integration.aqs.model.AppointmentQueue;
+import org.springframework.stereotype.Service;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.integration.aqs.service.AppointmentQueueService;
-import org.oscarehr.ws.rest.integrations.aqs.transfer.AppointmentQueueTo1;
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 
-@Path("/integrations/aqs")
-@Component("aqs.QueuesWebService")
-@Tag(name = "aqsQueues")
-public class QueueWebService
+@Service
+public class AppointmentQueueService extends BaseService
 {
-
-	@Autowired
-	private AppointmentQueueService appointmentQueueService;
-
-	@GET
-	@Path("queues/")
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<AppointmentQueueTo1>> getAppointmentQueues()
+	public List<AppointmentQueue> getAppointmentQueues()
 	{
-		return RestResponse.successResponse(AppointmentQueueTo1.fromAppointmentQueueList(appointmentQueueService.getAppointmentQueues()));
-	}
+		ArrayList<AppointmentQueue> list = new ArrayList<>();
+		list.add(new AppointmentQueue("0", "Back End Magic", 128, "#27ae60"));
+		list.add(new AppointmentQueue("1", "Short queue", 24, "#f39c12"));
+		list.add(new AppointmentQueue("2", "Magic Mike", 128, "#e74c3c"));
+		return list;
 
+		//TODO fetch from AQS Server
+	}
 }

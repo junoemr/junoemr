@@ -20,52 +20,36 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.integrations.aqs.transfer;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.oscarehr.integration.aqs.model.AppointmentQueue;
-import org.springframework.beans.BeanUtils;
-import oscar.util.Jackson.ZonedDateTimeStringSerializer;
+package org.oscarehr.integration.aqs.model;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AppointmentQueueTo1
+public class QueuedAppointment
 {
-	@JsonProperty("id")
 	private String remoteId;
-	private String organizationId;
-	private String queueName;
-	private Integer queueLimit;
-	private String queueColor;
-	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
+	private String queueId;
+	private Integer queuePosition;
+	private String status;//TODO change to enum once statuses are defined
+	private String demographicNo;
 	private ZonedDateTime createdAt;
-	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
 	private ZonedDateTime updatedAt;
 	private String createdBy;
 	private String createdByType;//TODO change to enum once types are defined
 	private String updatedBy;
 	private String updatedByType;//TODO change to enum once types are defined
+	private String demographicName;
+	private String reason;
 
-	public static List<AppointmentQueueTo1> fromAppointmentQueueList(List<AppointmentQueue> appointmentQueues)
+
+	public QueuedAppointment(String queueId, Integer queuePosition, String demographicNo, String reason, String demographicDisplayName)
 	{
-		ArrayList<AppointmentQueueTo1> appointmentQueueTo1s = new ArrayList<>();
-
-		for (AppointmentQueue appointmentQueue: appointmentQueues)
-		{
-			appointmentQueueTo1s.add(new AppointmentQueueTo1(appointmentQueue));
-		}
-
-		return appointmentQueueTo1s;
-	}
-
-	public AppointmentQueueTo1(AppointmentQueue appointmentQueue)
-	{
-		BeanUtils.copyProperties(appointmentQueue, this);
+		//TODO remove once REST calls in.
+		this.remoteId = "1234";
+		this.queueId = queueId;
+		this.demographicNo = demographicNo;
+		this.reason = reason;
+		this.queuePosition = queuePosition;
+		this.demographicName = demographicDisplayName;
 	}
 
 	public String getRemoteId()
@@ -78,44 +62,44 @@ public class AppointmentQueueTo1
 		this.remoteId = remoteId;
 	}
 
-	public String getOrganizationId()
+	public String getQueueId()
 	{
-		return organizationId;
+		return queueId;
 	}
 
-	public void setOrganizationId(String organizationId)
+	public void setQueueId(String queueId)
 	{
-		this.organizationId = organizationId;
+		this.queueId = queueId;
 	}
 
-	public String getQueueName()
+	public Integer getQueuePosition()
 	{
-		return queueName;
+		return queuePosition;
 	}
 
-	public void setQueueName(String queueName)
+	public void setQueuePosition(Integer queuePosition)
 	{
-		this.queueName = queueName;
+		this.queuePosition = queuePosition;
 	}
 
-	public Integer getQueueLimit()
+	public String getStatus()
 	{
-		return queueLimit;
+		return status;
 	}
 
-	public void setQueueLimit(Integer queueLimit)
+	public void setStatus(String status)
 	{
-		this.queueLimit = queueLimit;
+		this.status = status;
 	}
 
-	public String getQueueColor()
+	public String getDemographicNo()
 	{
-		return queueColor;
+		return demographicNo;
 	}
 
-	public void setQueueColor(String queueColor)
+	public void setDemographicNo(String demographicNo)
 	{
-		this.queueColor = queueColor;
+		this.demographicNo = demographicNo;
 	}
 
 	public ZonedDateTime getCreatedAt()
@@ -176,5 +160,25 @@ public class AppointmentQueueTo1
 	public void setUpdatedByType(String updatedByType)
 	{
 		this.updatedByType = updatedByType;
+	}
+
+	public String getDemographicName()
+	{
+		return demographicName;
+	}
+
+	public void setDemographicName(String demographicName)
+	{
+		this.demographicName = demographicName;
+	}
+
+	public String getReason()
+	{
+		return reason;
+	}
+
+	public void setReason(String reason)
+	{
+		this.reason = reason;
 	}
 }
