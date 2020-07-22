@@ -49,7 +49,7 @@ public class EchartTests extends SeleniumTestBase
 	@BeforeClass
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
-		SchemaUtils.restoreTable("admission", "demographic",
+		SchemaUtils.restoreTable("admission", "appointment", "demographic",
 				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
 				"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
 				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "hash_audit");
