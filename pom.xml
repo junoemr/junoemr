@@ -63,6 +63,7 @@
 			<url>file://${basedir}/local_repo</url>
 		</pluginRepository>
 	</pluginRepositories>
+
 	<dependencies>
 		<!-- general libraries -->
 		<dependency>
@@ -1282,7 +1283,24 @@
 			<artifactId>selenium-java</artifactId>
 			<version>3.141.59</version>
 		</dependency>
+		<!-- Google APIs for OAuth -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>1.30.10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-cloudresourcemanager</artifactId>
+			<version>v1-rev20200720-1.30.10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-oauth2-http</artifactId>
+			<version>0.21.1</version>
+		</dependency>
 	</dependencies>
+
 	<build>
 		<resources>
 			<resource>

@@ -528,6 +528,18 @@ public class OscarProperties extends Properties {
 	{
 		return isPropertyActive("has_hrm_documents");
 	}
+
+	// Methods for Google OAuth
+	public String getGoogleClientID()
+	{
+		return getProperty("google_client_id");
+	}
+
+	public String getGoogleResource()
+	{
+		return getProperty("google_resource");
+	}
+
 	// =========================================================================
 	// Static methods for getting specific property values
 	// =========================================================================
