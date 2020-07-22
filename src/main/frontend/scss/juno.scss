@@ -2,6 +2,7 @@
 @import "variables";
 @import "colorPalette";
 @import "imageVariables";
+@import "mixins/junoCheckbox";
 @import "mixins/junoFonts";
 @import "mixins/junoFormInputs";
 @import "mixins/junoSelect";
@@ -28,7 +29,6 @@
 @import "directives/date_picker";
 @import "directives/time_picker";
 @import "directives/juno-toggle";
-@import "directives/juno-checkbox";
 @import "directives/juno-radio";
 @import "directives/juno-select";
 @import "directives/juno-typeahead";

@@ -14,7 +14,7 @@
 		<juno-button ng-click="$ctrl.onDeleteBtnClick()"
 		             class="icon-button"
 		             component-style="$ctrl.componentStyle"
-		             button-color="JUNO_BUTTON_COLOR.PRIMARY"
+		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARK"
 		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
 			<i class="icon icon-delete"></i>
 		</juno-button>

@@ -2,9 +2,8 @@
  * custom css for the field-toggle-juno directive
  */
 
-.juno-checkbox {
-
-	$check-size: 16px;
+@mixin juno-checkbox($check-size: 16px)
+{
 	$input-height: $form-input-height;
 	$vertical-margin: calc((#{$input-height} - #{$check-size})/2);
 

@@ -78,31 +78,14 @@
 	align-items: baseline;
 	flex-wrap: wrap;
 
-	button {
-		box-shadow: none;
-		border-radius: 4px;
-		padding: 0 4px 0 4px;
-	}
+	//button {
+	//	box-shadow: none;
+	//	border-radius: 4px;
+	//	padding: 0 4px 0 4px;
+	//}
 
 	&.juno-button {
 		height: 32px;
-	}
-
-	&.juno-check-box {
-		button {
-			padding: 0;
-			border-radius: 3px;
-
-			width: 16px;
-			height: 16px;
-			font-size: 12px;
-
-			&.un-checked {
-				&:hover {
-					border-color: $color-blue-light;
-				}
-			}
-		}
 	}
 
 	&.juno-divider {
@@ -128,14 +111,14 @@
 		}
 	}
 
-	&.juno-check-box {
-		button {
-			&.un-checked {
-				border-color: $color-neutral-light;
-				background-color: $color-neutral-white;
-			}
-		}
-	}
+	//&.juno-check-box {
+	//	button {
+	//		&.un-checked {
+	//			border-color: $color-neutral-light;
+	//			background-color: $color-neutral-white;
+	//		}
+	//	}
+	//}
 
 	&.juno-divider {
 		border: 1px solid $color-neutral-lighter;
@@ -163,7 +146,7 @@
 	@include juno-tab-color-scheme-white;
 
 	button {
-		border-radius: 8px;
+		//border-radius: 8px;
 
 		//@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-lightest,
 		//				$color-neutral-lighter, $color-neutral-lighter, $color-neutral-white);
@@ -173,14 +156,14 @@
 		}
 	}
 
-	&.juno-check-box {
-		button {
-			&.un-checked {
-				border-color: $color-neutral-lighter;
-				background-color: $color-neutral-lightest;
-			}
-		}
-	}
+	//&.juno-check-box {
+	//	button {
+	//		&.un-checked {
+	//			border-color: $color-neutral-lighter;
+	//			background-color: $color-neutral-lightest;
+	//		}
+	//	}
+	//}
 
 	@include junoTabColor($color-neutral-lightest, $color-neutral-white, $color-neutral-lighter, $color-neutral-darker);
 
@@ -213,24 +196,24 @@
 	@include juno-tab-color-scheme-dark;
 	color: $color-neutral-white;
 
-	button {
-		border-radius: 8px;
+	//button {
+		//border-radius: 8px;
 		//@include buttonColor($color-primary-base, $color-neutral-black, $color-neutral-darkest,
 		//				$color-neutral-darker, $color-orange-base, $color-neutral-white)
-	}
+	//}
 
-	&.juno-check-box {
-		button {
-			&.un-checked {
-				border-color: $color-neutral-darker;
-				background-color: $color-neutral-darkest;
-
-				&:hover {
-					border-color: $color-orange-base;
-				}
-			}
-		}
-	}
+	//&.juno-check-box {
+	//	button {
+	//		&.un-checked {
+	//			border-color: $color-neutral-darker;
+	//			background-color: $color-neutral-darkest;
+	//
+	//			&:hover {
+	//				border-color: $color-orange-base;
+	//			}
+	//		}
+	//	}
+	//}
 
 	&.juno-divider {
 		background-color: $color-neutral-darker;

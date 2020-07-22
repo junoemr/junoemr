@@ -18,4 +18,11 @@
 			background-color: white;
 		}
 	}
+
+	/**
+    * custom css for the field-toggle-juno directive
+    */
+	.juno-checkbox {
+		@include juno-checkbox;
+	}
 }
