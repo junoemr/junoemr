@@ -243,7 +243,7 @@ public class CoPDImportService
 			demographicDao.merge(demographic);
 
 			logger.info("Create Appointments ...");
-			importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource);
+			importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource, recordData);
 			instant = printDuration(instant, "importAppointmentData");
 		}
 	}
@@ -450,7 +450,7 @@ public class CoPDImportService
 		}
 	}
 
-	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider, IMPORT_SOURCE importSource) throws HL7Exception
+	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider, IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		if(properties.isPropertyActive("multisites"))
 		{
@@ -458,7 +458,7 @@ public class CoPDImportService
 			throw new RuntimeException("Multisite Imports not supported");
 		}
 
-		AppointmentMapper appointmentMapper = MapperFactory.newAppointmentMapper(zpdZtrMessage, importSource);
+		AppointmentMapper appointmentMapper = MapperFactory.newAppointmentMapper(zpdZtrMessage, importSource, recordData);
 
 		int numAppointments = appointmentMapper.getNumAppointments();
 

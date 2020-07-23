@@ -48,21 +48,21 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new appointment mapper
 	 */
-	public static AppointmentMapper newAppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
+	public static AppointmentMapper newAppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
 		switch(importSource)
 		{
 			case MEDACCESS:
 			{
-				return new AppointmentMapperMedaccess(message, importSource);
+				return new AppointmentMapperMedaccess(message, importSource, recordData);
 			}
 			case ACCURO:
 			{
-				return new AppointmentMapperAccuro(message, importSource);
+				return new AppointmentMapperAccuro(message, importSource, recordData);
 			}
 			default:
 			{
-				return new AppointmentMapper(message, importSource);
+				return new AppointmentMapper(message, importSource, recordData);
 			}
 		}
 	}
