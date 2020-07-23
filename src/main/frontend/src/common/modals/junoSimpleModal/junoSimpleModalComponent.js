@@ -45,9 +45,6 @@ angular.module('Common.Components').component('junoSimpleModal',
 				ctrl.$onInit = () =>
 				{
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-
-					// we are inside an bootstrap transclude component, restyle it.
-					angular.element(document.querySelector(".modal-content")).addClass(ctrl.componentStyle + JUNO_BACKGROUND_STYLE.PRIMARY);
 				}
 
 				ctrl.$doCheck = () =>

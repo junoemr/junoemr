@@ -48,7 +48,6 @@ angular.module('Common.Components').component('junoInputModal',
 		ctrl.$onInit = () =>
 		{
 			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
-			ctrl.resolve.okText = ctrl.resolve.okText || "Ok";
 		}
 
 		ctrl.onKeyDown = (event) =>

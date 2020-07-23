@@ -29,7 +29,7 @@
 		<juno-button ng-click="$ctrl.onOk()"
 		             disabled="!allValidationsValid($ctrl.validations)"
 		             component-style="$ctrl.resolve.style">
-			{{$ctrl.resolve.okText}}
+			{{$ctrl.resolve.okText ? $ctrl.resolve.okText : "Ok"}}
 		</juno-button>
 	</div>
 	
