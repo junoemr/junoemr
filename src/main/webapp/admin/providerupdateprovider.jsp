@@ -82,7 +82,7 @@
     <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/SetUserPermissionControl.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/admin/provider/providerProfile.js"></script>
 <script type="text/javascript" src="./provider/providerProfile.js"></script>
 
 <title><bean:message key="admin.providerupdateprovider.title" /></title>

@@ -107,7 +107,7 @@
 <html>
 <head>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-	<script type="text/javascript" src="<%= request.getContextPath() %>/js/SetUserPermissionControl.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/admin/provider/providerProfile.js"></script>
 	<title>
 		PROVIDER
 	</title>
@@ -190,6 +190,7 @@
 			if (hasPermission)
 			{
 				form.action = "providerRole.do?method=" + actionMethod;
+				console.log("action clicked  "+actionMethod)
 			}
 			return hasPermission;
 		}
