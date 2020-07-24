@@ -30,12 +30,12 @@ import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
- import org.openqa.selenium.By;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -48,10 +48,10 @@ public class EchartTests extends SeleniumTestBase
 	@BeforeClass
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
-		SchemaUtils.restoreTable("admission", "demographic",
+		SchemaUtils.restoreTable("admission", "appointment", "demographic",
 				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
 				"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
-				"casemgmt_tmpsave", "validations", "measurementType", "eChart");
+				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "hash_audit");
 
 		loadSpringBeans();
 		DatabaseUtil.createTestDemographic();
@@ -75,6 +75,8 @@ public class EchartTests extends SeleniumTestBase
 			noteId = driver.findElement(By.xpath("//textarea[@name='caseNote_note']")).getAttribute("id");
 		}
 
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		js.executeScript("window.scrollBy(0, document.body.scrollHeight)");
 		WebElement newNoteButton = driver.findElement(By.id("newNoteImg"));
 		newNoteButton.click();
 
@@ -90,7 +92,7 @@ public class EchartTests extends SeleniumTestBase
 
 		if (noteId != null)
 		{
-			Assert.assertEquals("Create new note. FAIL", noteId, newNote.getAttribute("id"));
+			Assert.assertEquals("Create new note. FAIL", (noteId + '1'), newNote.getAttribute("id"));
 		}
 		logger.info("Create new note. OK");
 
