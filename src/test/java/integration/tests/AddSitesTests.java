@@ -86,7 +86,7 @@ public class AddSitesTests extends SeleniumTestBase {
 			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
 		}
 		// open administration panel
-		WebDriverWait wait = new WebDriverWait(driver,WEB_DRIVER_EXPLICIT_TIMEOUT);
+		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("admin-panel")));
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);
