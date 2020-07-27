@@ -170,17 +170,16 @@ public class AppointmentMapper extends AbstractMapper
 
 			if (creationDate != null)
 			{
-				logger.warn("Appointment date is null, using as creation date instead\n");
+				String warning = "Appointment date is null, falling back to creation date: " + creationDate.toString() + "\n";
+				logger.info(warning);
+				recordData.addMessage(HL7_SEGMENT_SCH_11, String.valueOf(rep), warning);
 				apptDate = creationDate;
 			}
 			else
 			{
-				logger.warn("Appointment date and creation date are both null, using fallback date 1900-01-01 00:00:00\n"
-						            + sch.toString());
-
-				recordData.addMessage(HL7_SEGMENT_SCH_11, String.valueOf(rep),
-				                      "Appointment date and creation date are both null, using fallback date 1900-01-01 00:00:00");
-
+				String warning = "Appointment date and creation date are both null, using fallback date 1900-01-01 00:00:00\n" + sch.toString() + "\n";
+				logger.warn(warning);
+				recordData.addMessage(HL7_SEGMENT_SCH_11, String.valueOf(rep), warning);
 				apptDate = FALLBACK_APPOINTMENT_DATE;
 			}
 		}
@@ -217,11 +216,6 @@ public class AppointmentMapper extends AbstractMapper
 		{
 			logger.warn("Appointment duration " + apptDurationDouble + " " + apptDurationUnit + "is being truncated to " + apptDuration + " " + apptDurationUnit);
 		}
-
-/*		if (appointmentDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
-		{// if no appointment date, use creation date instead.
-			appointmentDate = getCreationDate(rep);
-		}*/
 
 		return calcEndTime(appointmentDate, apptDuration, apptDurationUnit);
 	}

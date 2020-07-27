@@ -36,9 +36,9 @@ import java.util.List;
 
 public class AppointmentMapperMedaccess extends AppointmentMapper
 {
-	public AppointmentMapperMedaccess(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
+	public AppointmentMapperMedaccess(ZPD_ZTR message, CoPDRecordData recordData)
 	{
-		super(message, importSource, recordData);
+		super(message, CoPDImportService.IMPORT_SOURCE.MEDACCESS, recordData);
 	}
 
 

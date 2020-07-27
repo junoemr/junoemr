@@ -32,9 +32,9 @@ import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 
 public class AppointmentMapperAccuro extends AppointmentMapper
 {
-	public AppointmentMapperAccuro(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
+	public AppointmentMapperAccuro(ZPD_ZTR message, CoPDRecordData recordData)
 	{
-		super(message, importSource, recordData);
+		super(message, CoPDImportService.IMPORT_SOURCE.ACCURO, recordData);
 	}
 
 	/**
