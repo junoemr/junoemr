@@ -862,7 +862,9 @@ public class DemographicManager {
 			error_string += "yearOfBirth should be should be a numeric value. ";
 			has_error = true;
 		}
-		else if (demographic.getYearOfBirth().length() != 4)
+		else if (demographic.getYearOfBirth().length() != 4
+				|| ConversionUtils.fromIntString(demographic.getYearOfBirth()) < 1000
+				|| ConversionUtils.fromIntString(demographic.getYearOfBirth()) > 10000)
 		{
 			error_string += "yearOfBirth is expected to be a 4-digit number.";
 			has_error = true;
@@ -874,7 +876,9 @@ public class DemographicManager {
 			has_error = true;
 		}
 		else if (ConversionUtils.fromIntString(demographic.getMonthOfBirth()) <= 0
-				|| ConversionUtils.fromIntString(demographic.getMonthOfBirth()) > 12)
+				|| ConversionUtils.fromIntString(demographic.getMonthOfBirth()) > 12
+				|| (demographic.getMonthOfBirth().length() != 1 && demographic.getMonthOfBirth().length() != 2)
+		)
 		{
 			error_string += "monthOfBirth should be a number between 1 and 12. ";
 			has_error = true;
@@ -890,8 +894,9 @@ public class DemographicManager {
 			error_string += "dateOfBirth should be a numeric value. ";
 			has_error = true;
 		}
-		else if (ConversionUtils.fromIntString(demographic.getDateOfBirth()) <= 1
-		|| ConversionUtils.fromIntString(demographic.getDateOfBirth()) >= 31)
+		else if (ConversionUtils.fromIntString(demographic.getDateOfBirth()) < 1
+		|| ConversionUtils.fromIntString(demographic.getDateOfBirth()) > 31
+		|| (demographic.getDateOfBirth().length() != 1 && demographic.getDateOfBirth().length() != 2))
 		{
 			error_string += "dateOfBirth should be a number between 1 and 31 (depending on month).";
 			has_error = true;
