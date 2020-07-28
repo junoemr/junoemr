@@ -24,8 +24,11 @@
 package org.oscarehr.ws.rest.integrations.aqs;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.integration.aqs.service.QueuedAppointmentService;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.QueuedAppointmentTo1;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,16 +45,20 @@ import java.util.List;
 @Path("/integrations/aqs/queue/{queueId}/")
 @Component("aqs.AppointmentWebService")
 @Tag(name = "aqsAppointments")
-public class AppointmentWebService
+public class AppointmentWebService extends AbstractServiceImpl
 {
 	@Autowired
 	private QueuedAppointmentService appointmentService;
+
+	@Autowired
+	private SecurityInfoManager securityInfoManager;
 
 	@GET
 	@Path("appointments/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<QueuedAppointmentTo1>> getAppointmentsInQueue(@PathParam("queueId") String queueId)
 	{
+		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._APPOINTMENT);
 		return RestResponse.successResponse(QueuedAppointmentTo1.fromQueuedAppointmentList(appointmentService.getAppointmentsInQueue(queueId)));
 	}
 
@@ -60,6 +67,7 @@ public class AppointmentWebService
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> deleteAppointment(@PathParam("queueId") String queueId, @PathParam("appointmentId") String appointmentId, String reason)
 	{
+		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.DELETE, null, SecObjectName._APPOINTMENT);
 		MiscUtils.getLogger().info("TEMP! Would have deleted appointment: " + appointmentId + " From queue: " + queueId + " In the AQS system. Delete reason: " + reason);
 		return RestResponse.successResponse(true);
 	}

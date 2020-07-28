@@ -1,16 +1,21 @@
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
+import {AqsQueuesApi} from "../../../../generated";
 
 angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 	{
 		templateUrl: 'src/admin/integration/manageAppointmentQueuesPage/manageAppointmentQueues.jsp',
 		bindings: {},
 		controller: [
+			'$http',
+			'$httpParamSerializer',
 			'$scope',
 			'$location',
 			'$uibModal',
 			'staticDataService',
 			'NgTableParams',
 			function (
+				$http,
+				$httpParamSerializer,
 				$scope,
 				$location,
 				$uibModal,
@@ -19,6 +24,9 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 			)
 			{
 				let ctrl = this;
+
+				// load appointment queue api
+				let aqsQueuesApi = new AqsQueuesApi($http, $httpParamSerializer, '../ws/rs');
 
 				ctrl.onDemandBookingEnabled = true;
 				ctrl.componentStyle = JUNO_STYLE.GREY;
@@ -37,7 +45,6 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 				{
 					ctrl.loadQueuesList();
 					ctrl.loadOnDemandQueueHours();
-					ctrl.updateQueueSelectOptions();
 					ctrl.tableParams = new NgTableParams(
 						{
 							page: 1, // show first page
@@ -55,9 +62,7 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 							}
 						}
 					);
-
-					//TODO assign correctly
-					ctrl.onDemandAssignedQueue = ctrl.queueList[0];
+					aqsQueuesApi.getAppointmentQueue("1");
 				};
 
 				ctrl.addQueue = () =>
@@ -72,15 +77,23 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 
 				ctrl.deleteQueue = (queue) =>
 				{
-					if(window.confirm("Are you sure you want to delete this queue?"))
+					if (window.confirm("Are you sure you want to delete this queue?"))
 					{
-						// TODO call api delete
-						// remove queue from queue list
-						ctrl.queueList = ctrl.queueList.filter((obj) =>
+						aqsQueuesApi.deleteAppointmentQueue(queue.id).then(
+							(response) =>
+							{
+								// remove queue from queue list
+								ctrl.queueList = ctrl.queueList.filter((obj) =>
+								{
+									return obj.id !== queue.id;
+								});
+								ctrl.updateQueueSelectOptions();
+							}
+						).catch((error) =>
 						{
-							return obj.id !== queue.id;
+							console.error(error);
+							alert("Failed to delete the queue");
 						});
-						ctrl.updateQueueSelectOptions();
 					}
 				}
 
@@ -123,31 +136,27 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 					{
 						return {
 							value: queue,
-							label: queue.name,
+							label: queue.queueName,
 						}
 					});
 				}
 
 				ctrl.loadQueuesList = () =>
 				{
-					//TODO replace with backend call
-					ctrl.queueList = [
+					aqsQueuesApi.getAppointmentQueues().then(
+						(response) =>
 						{
-							id: 1,
-							name: "Queue name 1",
-							limit: 25,
-						},
-						{
-							id: 2,
-							name: "Queue name 2",
-							limit: 10,
-						},
-						{
-							id: 3,
-							name: "Queue name 3",
-							limit: 10,
+							ctrl.queueList = response.data.body;
+							ctrl.updateQueueSelectOptions();
+
+							//TODO assign correctly
+							ctrl.onDemandAssignedQueue = ctrl.queueList[0];
 						}
-					];
+					).catch((error) =>
+					{
+						console.error(error);
+						alert("Failed to load appointment queue list");
+					});
 				}
 				ctrl.loadOnDemandQueueHours = () =>
 				{

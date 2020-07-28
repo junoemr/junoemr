@@ -22,6 +22,7 @@
  */
 
 import {LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_BUTTON_COLOR_PATTERN} from "../../components/junoComponentConstants";
+import {AqsQueuesApi} from "../../../../generated";
 
 angular.module('Common.Components').component('appointmentQueueModal',
 	{
@@ -41,11 +42,15 @@ angular.module('Common.Components').component('appointmentQueueModal',
 			{
 				let ctrl = this;
 
+				// load appointment queue api
+				let aqsQueuesApi = new AqsQueuesApi($http, $httpParamSerializer, '../ws/rs');
+
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 				ctrl.editMode = false;
 				ctrl.queueModel = {};
+				ctrl.isoading = true;
 
 				ctrl.$onInit = () =>
 				{
@@ -59,22 +64,51 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					else
 					{
 						ctrl.queueModel = {
-							name: "",
-							limit: 10,
+							id: null,
+							queueName: "",
+							queueLimit: 10,
+							queueColor: "#ffffff",
+							organizationId: null,
+							createdAt: null,
+							updatedAt: null,
+							createdBy: null,
+							createdByType: null,
+							updatedBy: null,
+							updatedByType: null,
 						}
 					}
+					ctrl.isoading = false;
 				}
 
 				ctrl.saveDisabled = () =>
 				{
-					return ctrl.queueModel.name == null || ctrl.queueModel.name.length < 1;
+					return ctrl.isoading || ctrl.queueModel.queueName == null || ctrl.queueModel.queueName.length < 1;
 				}
 
 				ctrl.onSave = () =>
 				{
-					// TODO hit endpoint
-					// TODO handle name conflicts
-					ctrl.modalInstance.close(ctrl.queueModel);
+					ctrl.isoading = true;
+					const onSaveSuccess = (response) =>
+					{
+						ctrl.modalInstance.close(response.data.body);
+						ctrl.isoading = false;
+					}
+					const onSaveError = (error) =>
+					{
+						// TODO handle name conflicts/errors
+						console.error(error);
+						alert("Failed to save appointment queue");
+						ctrl.isoading = false;
+					}
+
+					if (ctrl.editMode)
+					{
+						aqsQueuesApi.updateAppointmentQueue(ctrl.queueModel.id, ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
+					}
+					else
+					{
+						aqsQueuesApi.createAppointmentQueue(ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
+					}
 				}
 
 				ctrl.onCancel = () =>

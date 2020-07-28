@@ -23,6 +23,7 @@
 package org.oscarehr.integration.aqs.service;
 
 import org.oscarehr.integration.aqs.model.AppointmentQueue;
+import org.oscarehr.ws.rest.integrations.aqs.transfer.AppointmentQueueTo1;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,5 +41,28 @@ public class AppointmentQueueService extends BaseService
 		return list;
 
 		//TODO fetch from AQS Server
+	}
+
+	public AppointmentQueue createAppointmentQueue(AppointmentQueueTo1 queueTransfer)
+	{
+		//TODO create & fetch from AQS Server
+		return new AppointmentQueue("-1", "New Back End Magic", 128, "#27ae60");
+	}
+
+	public AppointmentQueue getAppointmentQueue(String queueId)
+	{
+		//TODO fetch from AQS Server
+		return new AppointmentQueue(queueId, "Back End Magic", 128, "#27ae60");
+	}
+
+	public AppointmentQueue updateAppointmentQueue(String queueId, AppointmentQueueTo1 queueTransfer)
+	{
+		//TODO update & fetch from AQS Server
+		return new AppointmentQueue(queueId, "Updated End Magic", 128, "#27ae60");
+	}
+
+	public void deleteAppointmentQueue(String queueId)
+	{
+		//TODO delete from AQS Server
 	}
 }

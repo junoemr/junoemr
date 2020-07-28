@@ -12,13 +12,13 @@
 		<div class="queue-options-container">
 			<juno-input
 					label="Queue Name"
-					ng-model="$ctrl.queueModel.name"
+					ng-model="$ctrl.queueModel.queueName"
 					component-style="$ctrl.resolve.style">
 			</juno-input>
 
 			<juno-input
 					label="Queue Limit"
-					ng-model="$ctrl.queueModel.limit"
+					ng-model="$ctrl.queueModel.queueLimit"
 					component-style="$ctrl.resolve.style">
 			</juno-input>
 		</div>

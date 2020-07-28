@@ -43,10 +43,10 @@
 					<tbody>
 					<tr ng-repeat="queue in $ctrl.queueList | orderBy:$ctrl.sortMode">
 						<td data-title="'Queue Name'" sortable="'name'">
-							{{queue.name}}
+							{{queue.queueName}}
 						</td>
 						<td data-title="'Queue size limit'">
-							{{queue.limit}}
+							{{queue.queueLimit}}
 						</td>
 						<td data-title="'Actions'" class="actions-column">
 							<div class="action-button-wrapper">
