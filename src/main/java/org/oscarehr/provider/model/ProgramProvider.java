@@ -63,7 +63,7 @@ public class ProgramProvider extends AbstractModel<Long> implements Serializable
 	@JoinColumn(name = "role_id", insertable = false, updatable = false)
 	private Secrole role;
 	@Column(name = "team_id")
-	private int teamId;
+	private Integer teamId;
 
 	/**
 	 * Return the unique identifier of this class
