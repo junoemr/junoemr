@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.mapper.HistoryNoteMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import oscar.util.ConversionUtils;
@@ -35,11 +36,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.oscarehr.common.hl7.Hl7Const.HL7_SEGMENT_ZPB_10;
+
 public class HistoryNoteMapperMedaccess extends HistoryNoteMapper
 {
-	public HistoryNoteMapperMedaccess(ZPD_ZTR message, int providerRep) throws HL7Exception
+	public HistoryNoteMapperMedaccess(ZPD_ZTR message, int providerRep, CoPDRecordData recordData) throws HL7Exception
 	{
-		super(message, providerRep, CoPDImportService.IMPORT_SOURCE.MEDACCESS);
+		super(message, providerRep, CoPDImportService.IMPORT_SOURCE.MEDACCESS, recordData);
 	}
 
 	@Override
@@ -118,6 +121,15 @@ public class HistoryNoteMapperMedaccess extends HistoryNoteMapper
 		note.setUpdateDate(diagnosisDate);
 
 		String noteText = StringUtils.trimToEmpty(getMedProblemNoteText(rep)).replaceAll("~crlf~", "\n");
+
+		if (noteText.isEmpty())
+		{
+			String warning = "No CPP Med history note text, using dx description instead. (ZPB Rep: " + rep + ")";
+			logger.info(warning);
+			recordData.addMessage(HL7_SEGMENT_ZPB_10, String.valueOf(rep), warning);
+			noteText = StringUtils.trimToEmpty(getMedProblemDiagnosisDescription(rep));
+		}
+
 		note.setNote(noteText + " - " + ConversionUtils.toDateString(diagnosisDate));
 
 		return note;
@@ -141,6 +153,7 @@ public class HistoryNoteMapperMedaccess extends HistoryNoteMapper
 		// 3 - name of coding system
 		return StringUtils.trimToEmpty(provider.getZPB(rep).getZpb4_diagnosisCode().getCe2_Text().getValue());
 	}
+
 
 	public String getMedProblemNoteText(int rep) throws HL7Exception
 	{

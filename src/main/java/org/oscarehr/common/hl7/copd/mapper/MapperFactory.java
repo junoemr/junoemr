@@ -164,21 +164,21 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new history mapper
 	 */
-	public static HistoryNoteMapper newHistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public static HistoryNoteMapper newHistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		switch(importSource)
 		{
 			case MEDACCESS:
 			{
-				return new HistoryNoteMapperMedaccess(message, providerRep);
+				return new HistoryNoteMapperMedaccess(message, providerRep, recordData);
 			}
 			case MEDIPLAN:
 			{
-				return new HistoryNoteMapperMediplan(message, providerRep);
+				return new HistoryNoteMapperMediplan(message, providerRep, recordData);
 			}
 			default:
 			{
-				return new HistoryNoteMapper(message, providerRep, importSource);
+				return new HistoryNoteMapper(message, providerRep, importSource, recordData);
 			}
 		}
 	}
