@@ -28,6 +28,7 @@ import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -35,9 +36,9 @@ import java.util.List;
 
 public class AppointmentMapperMedaccess extends AppointmentMapper
 {
-	public AppointmentMapperMedaccess(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
+	public AppointmentMapperMedaccess(ZPD_ZTR message, CoPDRecordData recordData)
 	{
-		super(message, importSource);
+		super(message, CoPDImportService.IMPORT_SOURCE.MEDACCESS, recordData);
 	}
 
 
@@ -131,6 +132,10 @@ public class AppointmentMapperMedaccess extends AppointmentMapper
 			case "No Show":
 			{
 				return AppointmentStatus.APPOINTMENT_STATUS_NO_SHOW;
+			}
+			case "Booked":
+			{
+				return AppointmentStatus.APPOINTMENT_STATUS_NEW;
 			}
 			default :
 			{

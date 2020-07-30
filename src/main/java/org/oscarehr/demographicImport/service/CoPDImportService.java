@@ -243,7 +243,7 @@ public class CoPDImportService
 			demographicDao.merge(demographic);
 
 			logger.info("Create Appointments ...");
-			importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource);
+			importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource, recordData);
 			instant = printDuration(instant, "importAppointmentData");
 		}
 	}
@@ -295,7 +295,7 @@ public class CoPDImportService
 
 			Instant instant = Instant.now();
 			logger.info("Import Notes & History ...");
-			importProviderNotes(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			importProviderNotes(zpdZtrMessage, i, assignedProvider, demographic, importSource, recordData);
 			instant = printDuration(instant, "importProviderNotes");
 
 			logger.info("Import Alerts ...");
@@ -450,7 +450,7 @@ public class CoPDImportService
 		}
 	}
 
-	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider, IMPORT_SOURCE importSource) throws HL7Exception
+	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider, IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		if(properties.isPropertyActive("multisites"))
 		{
@@ -458,7 +458,7 @@ public class CoPDImportService
 			throw new RuntimeException("Multisite Imports not supported");
 		}
 
-		AppointmentMapper appointmentMapper = MapperFactory.newAppointmentMapper(zpdZtrMessage, importSource);
+		AppointmentMapper appointmentMapper = MapperFactory.newAppointmentMapper(zpdZtrMessage, importSource, recordData);
 
 		int numAppointments = appointmentMapper.getNumAppointments();
 
@@ -707,7 +707,7 @@ public class CoPDImportService
 		}
 	}
 
-	private void importProviderNotes(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
+	private void importProviderNotes(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		EncounterNoteMapper encounterNoteMapper = MapperFactory.newEncounterNoteMapper(zpdZtrMessage, providerRep, importSource);
 
@@ -742,7 +742,7 @@ public class CoPDImportService
 			encounterNoteService.saveChartNote(encounterNote);
 		}
 
-		HistoryNoteMapper historyNoteMapper = MapperFactory.newHistoryNoteMapper(zpdZtrMessage, providerRep, importSource);
+		HistoryNoteMapper historyNoteMapper = MapperFactory.newHistoryNoteMapper(zpdZtrMessage, providerRep, importSource, recordData);
 		for(CaseManagementNote medHistNote : historyNoteMapper.getMedicalHistoryNoteList())
 		{
 			medHistNote.setProvider(provider);
