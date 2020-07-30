@@ -26,16 +26,26 @@ package org.oscarehr.ws.rest.integrations.aqs.transfer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
+import lombok.Getter;
+import lombok.Setter;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.aqs.model.QueuedAppointment;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import oscar.util.Jackson.ZonedDateTimeStringSerializer;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QueuedAppointmentTo1 implements Serializable
@@ -47,14 +57,8 @@ public class QueuedAppointmentTo1 implements Serializable
 	private String status;//TODO change to enum once statuses are defined
 	@JsonProperty("integrationPatientId")
 	private String demographicNo;
-	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
-	private ZonedDateTime createdAt;
-	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
-	private ZonedDateTime updatedAt;
-	private String createdBy;
-	private String createdByType;//TODO change to enum once types are defined
-	private String updatedBy;
-	private String updatedByType;//TODO change to enum once types are defined
+	@JsonSerialize(using = OffsetDateTimeSerializer.class)
+	private OffsetDateTime createdAt;
 	private String demographicName;
 	private String reason;
 
@@ -77,135 +81,10 @@ public class QueuedAppointmentTo1 implements Serializable
 	public QueuedAppointmentTo1(QueuedAppointment queuedAppointment)
 	{
 		BeanUtils.copyProperties(queuedAppointment, this);
-	}
 
-	public String getRemoteId()
-	{
-		return remoteId;
-	}
-
-	public void setRemoteId(String remoteId)
-	{
-		this.remoteId = remoteId;
-	}
-
-	public String getQueueId()
-	{
-		return queueId;
-	}
-
-	public void setQueueId(String queueId)
-	{
-		this.queueId = queueId;
-	}
-
-	public Integer getQueuePosition()
-	{
-		return queuePosition;
-	}
-
-	public void setQueuePosition(Integer queuePosition)
-	{
-		this.queuePosition = queuePosition;
-	}
-
-	public String getStatus()
-	{
-		return status;
-	}
-
-	public void setStatus(String status)
-	{
-		this.status = status;
-	}
-
-	public String getDemographicNo()
-	{
-		return demographicNo;
-	}
-
-	public void setDemographicNo(String demographicNo)
-	{
-		this.demographicNo = demographicNo;
-	}
-
-	public ZonedDateTime getCreatedAt()
-	{
-		return createdAt;
-	}
-
-	public void setCreatedAt(ZonedDateTime createdAt)
-	{
-		this.createdAt = createdAt;
-	}
-
-	public ZonedDateTime getUpdatedAt()
-	{
-		return updatedAt;
-	}
-
-	public void setUpdatedAt(ZonedDateTime updatedAt)
-	{
-		this.updatedAt = updatedAt;
-	}
-
-	public String getCreatedBy()
-	{
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy)
-	{
-		this.createdBy = createdBy;
-	}
-
-	public String getCreatedByType()
-	{
-		return createdByType;
-	}
-
-	public void setCreatedByType(String createdByType)
-	{
-		this.createdByType = createdByType;
-	}
-
-	public String getUpdatedBy()
-	{
-		return updatedBy;
-	}
-
-	public void setUpdatedBy(String updatedBy)
-	{
-		this.updatedBy = updatedBy;
-	}
-
-	public String getUpdatedByType()
-	{
-		return updatedByType;
-	}
-
-	public void setUpdatedByType(String updatedByType)
-	{
-		this.updatedByType = updatedByType;
-	}
-
-	public String getDemographicName()
-	{
-		return demographicName;
-	}
-
-	public void setDemographicName(String demographicName)
-	{
-		this.demographicName = demographicName;
-	}
-
-	public String getReason()
-	{
-		return reason;
-	}
-
-	public void setReason(String reason)
-	{
-		this.reason = reason;
+		// get demographic name
+		DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+		Demographic demographic = demographicDao.find(queuedAppointment.getDemographicNo());
+		this.demographicName = demographic.getDisplayName();
 	}
 }

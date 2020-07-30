@@ -22,12 +22,15 @@
  */
 package org.oscarehr.integration.aqs.service;
 
+import ca.cloudpractice.aqs.client.ApiException;
+import org.oscarehr.integration.aqs.exception.AqsCommunicationException;
 import org.oscarehr.integration.aqs.model.AppointmentQueue;
 import org.oscarehr.integration.aqs.model.QueuedAppointment;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class QueuedAppointmentService extends BaseService
@@ -47,32 +50,24 @@ public class QueuedAppointmentService extends BaseService
 	 * @param queueId - the queue to get the appointment list for
 	 * @return - list of queued appointments
 	 */
-	public List<QueuedAppointment> getAppointmentsInQueue(String queueId)
+	public List<QueuedAppointment> getAppointmentsInQueue(UUID queueId)
 	{
-		ArrayList<QueuedAppointment> list = new ArrayList<>();
-
-		switch(queueId)
+		try
 		{
-			case "0":
-				list.add(new QueuedAppointment("0", 0, "1" , "foobar", "Jon Doe"));
-				list.add(new QueuedAppointment("0", 1, "2" , "warts on ass", "Frank. Dr."));
-				break;
-			case "1":
-				list.add(new QueuedAppointment("1", 0, "3" , "power over whelming!", "Man "));
-				list.add(new QueuedAppointment("1", 1, "4" , "Its over 9000!", "Super Saiyan "));
-				list.add(new QueuedAppointment("1", 2, "5" , "What! 9000!", "Other guy"));
-				list.add(new QueuedAppointment("1", 2, "5" , "Dragon Ball Z!", "Dragon Dragon Ball!"));
-				break;
-			case "2":
-				for (Integer i =0; i < 64; i ++)
-				{
-					list.add(new QueuedAppointment("2", i, i.toString(), "Long", "appts"));
-				}
-				break;
+			return organizationApi.getAllAppointments(queueId).stream().map(QueuedAppointment::new).collect(Collectors.toList());
 		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to get appointments in queue [" + queueId + "] from the AQS server", apiException);
+		}
+	}
 
-		return list;
-
-		//TODO pull real data from AQS server
+	/**
+	 * delete an appointment form the appointment queue
+	 * @param appointmentId - the remote id of the appointment to delete
+	 */
+	public void deleteQueuedAppointment(UUID appointmentId)
+	{
+		// TODO implement when method available
 	}
 }

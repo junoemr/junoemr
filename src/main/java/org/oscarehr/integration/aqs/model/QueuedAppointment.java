@@ -22,163 +22,29 @@
  */
 package org.oscarehr.integration.aqs.model;
 
-import java.time.ZonedDateTime;
+import ca.cloudpractice.aqs.client.model.AppointmentDto;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.BeanUtils;
 
+import java.time.OffsetDateTime;
+import java.util.UUID;
+
+@Getter @Setter
 public class QueuedAppointment
 {
-	private String remoteId;
-	private String queueId;
+	private UUID remoteId;
+	private UUID queueId;
 	private Integer queuePosition;
-	private String status;//TODO change to enum once statuses are defined
 	private String demographicNo;
-	private ZonedDateTime createdAt;
-	private ZonedDateTime updatedAt;
-	private String createdBy;
-	private String createdByType;//TODO change to enum once types are defined
-	private String updatedBy;
-	private String updatedByType;//TODO change to enum once types are defined
-	private String demographicName;
+	private OffsetDateTime createdAt;
 	private String reason;
 
 
-	public QueuedAppointment(String queueId, Integer queuePosition, String demographicNo, String reason, String demographicDisplayName)
+	public QueuedAppointment(AppointmentDto appointmentDto)
 	{
-		//TODO remove once REST calls in.
-		this.remoteId = "1234";
-		this.queueId = queueId;
-		this.demographicNo = demographicNo;
-		this.reason = reason;
-		this.queuePosition = queuePosition;
-		this.demographicName = demographicDisplayName;
-	}
-
-	public String getRemoteId()
-	{
-		return remoteId;
-	}
-
-	public void setRemoteId(String remoteId)
-	{
-		this.remoteId = remoteId;
-	}
-
-	public String getQueueId()
-	{
-		return queueId;
-	}
-
-	public void setQueueId(String queueId)
-	{
-		this.queueId = queueId;
-	}
-
-	public Integer getQueuePosition()
-	{
-		return queuePosition;
-	}
-
-	public void setQueuePosition(Integer queuePosition)
-	{
-		this.queuePosition = queuePosition;
-	}
-
-	public String getStatus()
-	{
-		return status;
-	}
-
-	public void setStatus(String status)
-	{
-		this.status = status;
-	}
-
-	public String getDemographicNo()
-	{
-		return demographicNo;
-	}
-
-	public void setDemographicNo(String demographicNo)
-	{
-		this.demographicNo = demographicNo;
-	}
-
-	public ZonedDateTime getCreatedAt()
-	{
-		return createdAt;
-	}
-
-	public void setCreatedAt(ZonedDateTime createdAt)
-	{
-		this.createdAt = createdAt;
-	}
-
-	public ZonedDateTime getUpdatedAt()
-	{
-		return updatedAt;
-	}
-
-	public void setUpdatedAt(ZonedDateTime updatedAt)
-	{
-		this.updatedAt = updatedAt;
-	}
-
-	public String getCreatedBy()
-	{
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy)
-	{
-		this.createdBy = createdBy;
-	}
-
-	public String getCreatedByType()
-	{
-		return createdByType;
-	}
-
-	public void setCreatedByType(String createdByType)
-	{
-		this.createdByType = createdByType;
-	}
-
-	public String getUpdatedBy()
-	{
-		return updatedBy;
-	}
-
-	public void setUpdatedBy(String updatedBy)
-	{
-		this.updatedBy = updatedBy;
-	}
-
-	public String getUpdatedByType()
-	{
-		return updatedByType;
-	}
-
-	public void setUpdatedByType(String updatedByType)
-	{
-		this.updatedByType = updatedByType;
-	}
-
-	public String getDemographicName()
-	{
-		return demographicName;
-	}
-
-	public void setDemographicName(String demographicName)
-	{
-		this.demographicName = demographicName;
-	}
-
-	public String getReason()
-	{
-		return reason;
-	}
-
-	public void setReason(String reason)
-	{
-		this.reason = reason;
+		BeanUtils.copyProperties(appointmentDto, this, "id", "integrationPatientId");
+		this.setRemoteId(appointmentDto.getId());
+		this.setDemographicNo(appointmentDto.getIntegrationPatientId().toString());
 	}
 }

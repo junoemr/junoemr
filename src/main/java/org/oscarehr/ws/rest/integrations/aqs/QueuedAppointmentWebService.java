@@ -41,11 +41,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.UUID;
 
 @Path("/integrations/aqs/queue/{queueId}/")
-@Component("aqs.AppointmentWebService")
-@Tag(name = "aqsAppointments")
-public class AppointmentWebService extends AbstractServiceImpl
+@Component("aqs.QueuedAppointmentWebService")
+@Tag(name = "aqsQueuedAppointments")
+public class QueuedAppointmentWebService extends AbstractServiceImpl
 {
 	@Autowired
 	private QueuedAppointmentService appointmentService;
@@ -56,7 +57,7 @@ public class AppointmentWebService extends AbstractServiceImpl
 	@GET
 	@Path("appointments/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<QueuedAppointmentTo1>> getAppointmentsInQueue(@PathParam("queueId") String queueId)
+	public RestResponse<List<QueuedAppointmentTo1>> getAppointmentsInQueue(@PathParam("queueId") UUID queueId)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._APPOINTMENT);
 		return RestResponse.successResponse(QueuedAppointmentTo1.fromQueuedAppointmentList(appointmentService.getAppointmentsInQueue(queueId)));

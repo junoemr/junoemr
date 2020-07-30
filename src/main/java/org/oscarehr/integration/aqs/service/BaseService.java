@@ -22,14 +22,14 @@
  */
 package org.oscarehr.integration.aqs.service;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import ca.cloudpractice.aqs.client.ApiClient;
+import ca.cloudpractice.aqs.client.Configuration;
+import ca.cloudpractice.aqs.client.api.AdminApi;
+import ca.cloudpractice.aqs.client.api.OrganizationApi;
+import ca.cloudpractice.aqs.client.auth.ApiKeyAuth;
 import oscar.OscarProperties;
-import oscar.util.RESTClient;
 
-import java.util.Map;
-
-public class BaseService extends org.oscarehr.integration.BaseService
+public abstract class BaseService extends org.oscarehr.integration.BaseService
 {
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
 	protected final String AQS_PROTOCOL = oscarProps.getProperty("aqs_protocol");
@@ -37,93 +37,25 @@ public class BaseService extends org.oscarehr.integration.BaseService
 	protected final String BASE_API_URI = oscarProps.getProperty("aqs_api_uri");
 	protected final String BASE_END_POINT = concatEndpointStrings(AQS_DOMAIN, BASE_API_URI);
 
-	private final RESTClient restClient = new RESTClient();
+	protected final String AQS_AUTH_REMOTE_INTEGRATION_ID = "RemoteIntegrationId";
+	protected final String AQS_AUTH_REMOTE_USER_ID = "RemoteUserId";
+	protected final String AQS_AUTH_REMOTE_USER_TYPE = "RemoteUserType";
 
-	/**
-	 * build an endpoint url. the BASE AQS url is prepended.
-	 * @param endpoint - the endpoint to hit
-	 * @return - the complete url
-	 */
-	public String formatEndpoint(String endpoint)
+	protected OrganizationApi organizationApi;
+	protected AdminApi adminApi;
+
+	public BaseService()
 	{
-		return concatEndpointStrings(BASE_END_POINT, endpoint);
+		//setup api client
+		ApiClient apiClient = Configuration.getDefaultApiClient();
+		apiClient.setBasePath(AQS_PROTOCOL + BASE_END_POINT);
+		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_INTEGRATION_ID)).setApiKey("API KEY??!?!?!?!?");
+		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_ID)).setApiKey("1234??????");
+		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_TYPE)).setApiKey("Oscar?");
+
+		adminApi = new AdminApi(apiClient);
+		organizationApi = new OrganizationApi(apiClient);
 	}
 
-	/**
-	 * perform a get request on the AQS server
-	 * @param url - url to hit. use formatEndpoint to generate this
-	 * @param headers - headers to send with the request
-	 * @param queryParams - query params for the request
-	 * @param responseClass - response class
-	 * @param <T> - type of response class
-	 * @return - the response as parse by response class
-	 */
-	public <T> T doGet(String url, HttpHeaders headers, Map<String, Object> queryParams, Class<T> responseClass)
-	{
-		headers = this.httpHeadersForRequest(headers, null, null);
-		return restClient.doGet(url, headers, queryParams, responseClass);
-	}
 
-	// just like doGet by sets the X-Auth-Token header
-	public <T> T doGetWithToken(String url, String token, HttpHeaders headers, Map<String, Object> queryParams, Class<T> responseClass)
-	{
-		headers = this.httpHeadersForRequest(headers, token, null);
-		return restClient.doGet(url, headers, queryParams, responseClass);
-	}
-
-	/**
-	 * perform a post request on the AQS server
-	 * @param url - url to hit. Use formatEndpoint to generate this
-	 * @param headers - headers to send with the request
-	 * @param queryParams - map of query params to send
-	 * @param body - Jax object to use as request body
-	 * @param responseClass - response object
-	 * @param <U> - type of body
-	 * @param <T> - type of response
-	 * @return - response object
-	 */
-	public <U, T> T doPost(String url, HttpHeaders headers, Map<String, Object> queryParams, U body, Class<T> responseClass)
-	{
-		headers = this.httpHeadersForRequest(headers, null, null);
-		return restClient.doPost(url, headers, queryParams, body, responseClass);
-	}
-
-	// Like doPost but with an token param. This is sent in the X-Auth-Token header
-	public <U, T> T doPostWithToken(String url, String token, HttpHeaders headers, Map<String, Object> queryParams, U body, Class<T> responseClass)
-	{
-		headers = this.httpHeadersForRequest(headers, token, null);
-		return restClient.doPost(url, headers, queryParams, body, responseClass);
-	}
-
-	public RESTClient getRestClient()
-	{
-		return restClient;
-	}
-
-	/**
-	 * prepare / create headers for request
-	 * @param headers - headers object to add to. Can be NULL. If Null the object is created
-	 * @param token - auth token. Can be NULL.
-	 * @param apiKey - api key. Can be NULL
-	 * @return - HTTP headers
-	 */
-	protected HttpHeaders httpHeadersForRequest(HttpHeaders headers, String token, String apiKey)
-	{
-		if (headers == null)
-		{
-			headers = new HttpHeaders();
-		}
-		headers.setContentType(MediaType.APPLICATION_JSON);
-
-		if (token != null)
-		{
-			headers.set("X-Auth-token", token);
-		}
-		if (apiKey != null)
-		{
-			headers.set("X-API-Key", apiKey);
-		}
-
-		return headers;
-	}
 }

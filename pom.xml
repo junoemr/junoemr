@@ -56,6 +56,10 @@
 			<id>local_repo</id>
 			<url>file://${basedir}/local_repo</url>
 		</repository>
+		<repository>
+			<id>archiva.internal</id>
+			<url>https://mvn.cloudpractice.ca/repository/internal</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -1282,6 +1286,18 @@
 			<artifactId>selenium-java</artifactId>
 			<version>3.141.59</version>
 		</dependency>
+		<!-- Lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.12</version>
+		</dependency>
+		<!-- AQS -->
+		<dependency>
+			<groupId>ca.cloudpractice</groupId>
+			<artifactId>aqs-java-client</artifactId>
+			<version>RELEASE</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<resources>
@@ -1705,7 +1721,7 @@
 					<systemProperties>
 						<systemProperty>
 							<key>openApiSpecBuilder.resourceClassCsv</key>
-							<value>org.oscarehr.ws.rest.SystemPreferenceWebService,org.oscarehr.ws.rest.ScheduleService,org.oscarehr.ws.rest.SitesService,org.oscarehr.ws.rest.AppointmentService,org.oscarehr.ws.rest.ProviderPreferenceWebService,org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService,org.oscarehr.ws.rest.myhealthaccess.DemographicWebService,org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService,org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService,org.oscarehr.ws.rest.integrations.aqs.AppointmentWebService,org.oscarehr.ws.rest.integrations.aqs.QueueWebService</value>
+							<value>org.oscarehr.ws.rest.SystemPreferenceWebService,org.oscarehr.ws.rest.ScheduleService,org.oscarehr.ws.rest.SitesService,org.oscarehr.ws.rest.AppointmentService,org.oscarehr.ws.rest.ProviderPreferenceWebService,org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService,org.oscarehr.ws.rest.myhealthaccess.DemographicWebService,org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService,org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService,org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService,org.oscarehr.ws.rest.integrations.aqs.QueueWebService</value>
 						</systemProperty>
 						<systemProperty>
 							<key>openApiSpecBuilder.outputDirectory</key>

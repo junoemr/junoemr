@@ -21,138 +21,26 @@
  * Canada
  */
 package org.oscarehr.integration.aqs.model;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
+import ca.cloudpractice.aqs.client.model.QueueDto;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.BeanUtils;
+
+@Getter @Setter
 public class AppointmentQueue
 {
-	private String remoteId;
-	private String organizationId;
-	private String queueName;
+	private UUID remoteId;
+	private String name;
 	private Integer queueLimit;
-	private String queueColor;
-	private ZonedDateTime createdAt;
-	private ZonedDateTime updatedAt;
-	private String createdBy;
-	private String createdByType;//TODO change to enum once types are defined
-	private String updatedBy;
-	private String updatedByType;//TODO change to enum once types are defined
+  private String queueColor;
+	private OffsetDateTime createdAt;
 
-	public AppointmentQueue(String remoteId, String queueName, Integer queueLimit, String queueColor)
+	public AppointmentQueue(QueueDto queueDto)
 	{
-		//TODO remove. more for fake data injection.
-		this.remoteId = remoteId;
-		this.queueName = queueName;
-		this.queueLimit = queueLimit;
-		this.queueColor = queueColor;
-	}
-
-	public String getRemoteId()
-	{
-		return remoteId;
-	}
-
-	public void setRemoteId(String remoteId)
-	{
-		this.remoteId = remoteId;
-	}
-
-	public String getOrganizationId()
-	{
-		return organizationId;
-	}
-
-	public void setOrganizationId(String organizationId)
-	{
-		this.organizationId = organizationId;
-	}
-
-	public String getQueueName()
-	{
-		return queueName;
-	}
-
-	public void setQueueName(String queueName)
-	{
-		this.queueName = queueName;
-	}
-
-	public Integer getQueueLimit()
-	{
-		return queueLimit;
-	}
-
-	public void setQueueLimit(Integer queueLimit)
-	{
-		this.queueLimit = queueLimit;
-	}
-
-	public String getQueueColor()
-	{
-		return queueColor;
-	}
-
-	public void setQueueColor(String queueColor)
-	{
-		this.queueColor = queueColor;
-	}
-
-	public ZonedDateTime getCreatedAt()
-	{
-		return createdAt;
-	}
-
-	public void setCreatedAt(ZonedDateTime createdAt)
-	{
-		this.createdAt = createdAt;
-	}
-
-	public ZonedDateTime getUpdatedAt()
-	{
-		return updatedAt;
-	}
-
-	public void setUpdatedAt(ZonedDateTime updatedAt)
-	{
-		this.updatedAt = updatedAt;
-	}
-
-	public String getCreatedBy()
-	{
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy)
-	{
-		this.createdBy = createdBy;
-	}
-
-	public String getCreatedByType()
-	{
-		return createdByType;
-	}
-
-	public void setCreatedByType(String createdByType)
-	{
-		this.createdByType = createdByType;
-	}
-
-	public String getUpdatedBy()
-	{
-		return updatedBy;
-	}
-
-	public void setUpdatedBy(String updatedBy)
-	{
-		this.updatedBy = updatedBy;
-	}
-
-	public String getUpdatedByType()
-	{
-		return updatedByType;
-	}
-
-	public void setUpdatedByType(String updatedByType)
-	{
-		this.updatedByType = updatedByType;
+		BeanUtils.copyProperties(queueDto, this, "id");
+		this.remoteId = queueDto.getId();
 	}
 }

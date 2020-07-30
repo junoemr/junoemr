@@ -43,6 +43,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.UUID;
 
 @Path("/integrations/aqs")
 @Component("aqs.QueuesWebService")
@@ -77,7 +78,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@GET
 	@Path("queue/{queueId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<AppointmentQueueTo1> getAppointmentQueue(@PathParam("queueId") String queueId)
+	public RestResponse<AppointmentQueueTo1> getAppointmentQueue(@PathParam("queueId") UUID queueId)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 		return RestResponse.successResponse(new AppointmentQueueTo1(appointmentQueueService.getAppointmentQueue(queueId)));
@@ -87,7 +88,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@Path("queue/{queueId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<AppointmentQueueTo1> updateAppointmentQueue(@PathParam("queueId") String queueId,
+	public RestResponse<AppointmentQueueTo1> updateAppointmentQueue(@PathParam("queueId") UUID queueId,
 	                                                                AppointmentQueueTo1 queueTransfer)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
@@ -97,7 +98,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@DELETE
 	@Path("queue/{queueId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> deleteAppointmentQueue(@PathParam("queueId") String queueId)
+	public RestResponse<Boolean> deleteAppointmentQueue(@PathParam("queueId") UUID queueId)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.DELETE, null, SecObjectName._ADMIN);
 		appointmentQueueService.deleteAppointmentQueue(queueId);

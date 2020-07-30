@@ -22,46 +22,68 @@
  */
 package org.oscarehr.integration.aqs.service;
 
+import ca.cloudpractice.aqs.client.ApiException;
+import org.oscarehr.integration.aqs.exception.AqsCommunicationException;
 import org.oscarehr.integration.aqs.model.AppointmentQueue;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.AppointmentQueueTo1;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentQueueService extends BaseService
 {
 	public List<AppointmentQueue> getAppointmentQueues()
 	{
-		ArrayList<AppointmentQueue> list = new ArrayList<>();
-		list.add(new AppointmentQueue("0", "Back End Magic", 128, "#27ae60"));
-		list.add(new AppointmentQueue("1", "Short queue", 24, "#f39c12"));
-		list.add(new AppointmentQueue("2", "Magic Mike", 128, "#e74c3c"));
-		return list;
-
-		//TODO fetch from AQS Server
+		try
+		{
+			return organizationApi.getAllQueues().stream().map(AppointmentQueue::new).collect(Collectors.toList());
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to fetch appointment queues from AQS server", apiException);
+		}
 	}
 
 	public AppointmentQueue createAppointmentQueue(AppointmentQueueTo1 queueTransfer)
 	{
-		//TODO create & fetch from AQS Server
-		return new AppointmentQueue("-1", "New Back End Magic", 128, "#27ae60");
+		try
+		{
+			return new AppointmentQueue(organizationApi.createQueue(queueTransfer.asCreateQueueInput()));
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed create new appointment queue on the AQS server", apiException);
+		}
 	}
 
-	public AppointmentQueue getAppointmentQueue(String queueId)
+	public AppointmentQueue getAppointmentQueue(UUID queueId)
 	{
-		//TODO fetch from AQS Server
-		return new AppointmentQueue(queueId, "Back End Magic", 128, "#27ae60");
+		try
+		{
+			return new AppointmentQueue(organizationApi.getQueue(queueId));
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to fetch appointment queue [" + queueId + "] from AQS server", apiException);
+		}
 	}
 
-	public AppointmentQueue updateAppointmentQueue(String queueId, AppointmentQueueTo1 queueTransfer)
+	public AppointmentQueue updateAppointmentQueue(UUID queueId, AppointmentQueueTo1 queueTransfer)
 	{
-		//TODO update & fetch from AQS Server
-		return new AppointmentQueue(queueId, "Updated End Magic", 128, "#27ae60");
+		try
+		{
+			return new AppointmentQueue(organizationApi.updateQueue(queueId, queueTransfer.asCreateQueueInput()));
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to update appointment queue [" + queueId + "] on the AQS server", apiException);
+		}
 	}
 
-	public void deleteAppointmentQueue(String queueId)
+	public void deleteAppointmentQueue(UUID queueId)
 	{
 		//TODO delete from AQS Server
 	}

@@ -22,37 +22,36 @@
  */
 package org.oscarehr.ws.rest.integrations.aqs.transfer;
 
+import ca.cloudpractice.aqs.client.model.CreateQueueInput;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.integration.aqs.model.AppointmentQueue;
 import org.springframework.beans.BeanUtils;
 import oscar.util.Jackson.ZonedDateTimeStringSerializer;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter @Setter
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AppointmentQueueTo1 implements Serializable
 {
 	@JsonProperty("id")
 	private String remoteId;
-	private String organizationId;
 	private String queueName;
 	private Integer queueLimit;
 	private String queueColor;
-	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
-	private ZonedDateTime createdAt;
-	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
-	private ZonedDateTime updatedAt;
-	private String createdBy;
-	private String createdByType;//TODO change to enum once types are defined
-	private String updatedBy;
-	private String updatedByType;//TODO change to enum once types are defined
+	@JsonSerialize(using = OffsetDateTimeSerializer.class)
+	private OffsetDateTime createdAt;
 
 	public static List<AppointmentQueueTo1> fromAppointmentQueueList(List<AppointmentQueue> appointmentQueues)
 	{
@@ -76,113 +75,11 @@ public class AppointmentQueueTo1 implements Serializable
 		BeanUtils.copyProperties(appointmentQueue, this);
 	}
 
-	public String getRemoteId()
+	public CreateQueueInput asCreateQueueInput()
 	{
-		return remoteId;
-	}
-
-	public void setRemoteId(String remoteId)
-	{
-		this.remoteId = remoteId;
-	}
-
-	public String getOrganizationId()
-	{
-		return organizationId;
-	}
-
-	public void setOrganizationId(String organizationId)
-	{
-		this.organizationId = organizationId;
-	}
-
-	public String getQueueName()
-	{
-		return queueName;
-	}
-
-	public void setQueueName(String queueName)
-	{
-		this.queueName = queueName;
-	}
-
-	public Integer getQueueLimit()
-	{
-		return queueLimit;
-	}
-
-	public void setQueueLimit(Integer queueLimit)
-	{
-		this.queueLimit = queueLimit;
-	}
-
-	public String getQueueColor()
-	{
-		return queueColor;
-	}
-
-	public void setQueueColor(String queueColor)
-	{
-		this.queueColor = queueColor;
-	}
-
-	public ZonedDateTime getCreatedAt()
-	{
-		return createdAt;
-	}
-
-	public void setCreatedAt(ZonedDateTime createdAt)
-	{
-		this.createdAt = createdAt;
-	}
-
-	public ZonedDateTime getUpdatedAt()
-	{
-		return updatedAt;
-	}
-
-	public void setUpdatedAt(ZonedDateTime updatedAt)
-	{
-		this.updatedAt = updatedAt;
-	}
-
-	public String getCreatedBy()
-	{
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy)
-	{
-		this.createdBy = createdBy;
-	}
-
-	public String getCreatedByType()
-	{
-		return createdByType;
-	}
-
-	public void setCreatedByType(String createdByType)
-	{
-		this.createdByType = createdByType;
-	}
-
-	public String getUpdatedBy()
-	{
-		return updatedBy;
-	}
-
-	public void setUpdatedBy(String updatedBy)
-	{
-		this.updatedBy = updatedBy;
-	}
-
-	public String getUpdatedByType()
-	{
-		return updatedByType;
-	}
-
-	public void setUpdatedByType(String updatedByType)
-	{
-		this.updatedByType = updatedByType;
+		CreateQueueInput createQueueInput = new CreateQueueInput();
+		createQueueInput.setName(this.getQueueName());
+		createQueueInput.setQueueLimit(this.getQueueLimit());
+		return createQueueInput;
 	}
 }
