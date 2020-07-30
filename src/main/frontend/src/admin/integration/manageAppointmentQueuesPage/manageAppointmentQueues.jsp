@@ -118,10 +118,10 @@
 								</juno-check-box>
 							</div>
 							<div class="col-time-selection-label">
-								<label>{{day.name}}</label>
+								<label>{{day.dayOfWeek}}</label>
 							</div>
 							<div class="col-time-selection-start">
-								<juno-time-select ng-model="day.start"
+								<juno-time-select ng-model="day.startTime"
 								                  label="From"
 								                  disabled="!day.enabled"
 								                  component-style="$ctrl.componentStyle"
@@ -129,7 +129,7 @@
 								</juno-time-select>
 							</div>
 							<div class="col-time-selection-end">
-								<juno-time-select ng-model="day.end"
+								<juno-time-select ng-model="day.endTime"
 								                  label="To"
 								                  disabled="!day.enabled"
 								                  component-style="$ctrl.componentStyle"
