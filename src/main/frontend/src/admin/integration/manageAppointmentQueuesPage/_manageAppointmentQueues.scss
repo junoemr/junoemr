@@ -1,0 +1,81 @@
+.manage-appointment-queues-page-admin {
+	.queues-table-panel {
+		.panel-header {
+			juno-button {
+				margin-top: 4px;
+				width: 128px;
+				float: right;
+			}
+		}
+
+		.panel-body {
+			//padding: 0;
+
+			table {
+				margin-bottom: 0;
+
+				.actions-column {
+					width: 256px;
+
+					.action-button-wrapper {
+						display: flex;
+						flex-direction: row;
+						justify-content: center;
+						align-items: center;
+
+						juno-button {
+							max-width: 72px;
+							margin: 0 4px;
+						}
+					}
+				}
+			}
+		}
+	}
+	.on-demand-settings-panel {
+		$time-table-min-width: 620px;
+
+		.panel-body {
+			padding: 0;
+
+			.on-demand-booking-wrapper {
+				display: flex;
+				flex-flow: row wrap;
+
+				.queue-selection {
+					flex-grow: 1;
+					padding: 12px;
+				}
+				.time-selection {
+					flex-grow: 1;
+					padding: 4px 12px;
+
+					.time-selection-row {
+						padding: 4px 0;
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						min-width: $time-table-min-width;
+
+						.col-time-selection-enabled {
+							width: 10%;
+						}
+						.col-time-selection-label {
+							width: 20%;
+						}
+						.col-time-selection-start {
+							width: 35%;
+						}
+						.col-time-selection-end {
+							width: 35%;
+						}
+
+						label {
+							min-width: 0;
+						}
+					}
+				}
+			}
+		}
+	}
+}

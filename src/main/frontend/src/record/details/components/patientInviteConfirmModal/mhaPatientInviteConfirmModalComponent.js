@@ -23,7 +23,7 @@
 
 
 import {MhaDemographicApi, SystemPreferenceApi} from "../../../../../generated";
-import {JUNO_BUTTON_COLOR, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
 
 angular.module('Common.Components').component('mhaPatientInviteConfirmModal',
 {
@@ -49,6 +49,7 @@ angular.module('Common.Components').component('mhaPatientInviteConfirmModal',
 
 		ctrl.LABEL_POSITION = LABEL_POSITION;
 		ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 		ctrl.integrationsList = [];
 		ctrl.selectedIntegrationId = null;

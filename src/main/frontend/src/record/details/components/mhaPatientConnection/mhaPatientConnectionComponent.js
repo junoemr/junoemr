@@ -23,7 +23,7 @@
 
 import {MhaDemographicApi, MhaIntegrationApi} from "../../../../../generated";
 import { MHA_PATIENT_CONNECTION_ACTIONS } from "./mhaPatientConnectionConstants"
-import {JUNO_BUTTON_COLOR, JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
 
 angular.module('Record.Details').component('mhaPatientConnection', {
 	templateUrl: 'src/record/details/components/mhaPatientConnection/mhaPatientConnection.jsp',
@@ -122,16 +122,21 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 		{
 			if (ctrl.isButtonStateEdit())
 			{
-				return JUNO_BUTTON_COLOR.PRIMARY
+				return JUNO_BUTTON_COLOR.PRIMARY;
 			}
 			else if (ctrl.isButtonStateInvite())
 			{
-				return JUNO_BUTTON_COLOR.BASE;
+				return JUNO_BUTTON_COLOR.GREYSCALE_LIGHT;
 			}
 			else
 			{
-				return JUNO_BUTTON_COLOR.TRANSPARENT;
+				return JUNO_BUTTON_COLOR.PRIMARY;
 			}
+		}
+
+		ctrl.getButtonColorPattern = () =>
+		{
+			return JUNO_BUTTON_COLOR_PATTERN.FILL;
 		}
 
 		ctrl.iconClasses = () =>

@@ -4,7 +4,7 @@
 	</label>
 	<button ng-class="$ctrl.buttonClasses()"
 	        ng-style="$ctrl.buttonStyle();"
-	        class="btn" ng-disabled="$ctrl.disabled">
+	        ng-disabled="$ctrl.disabled">
 		<ng-transclude>
 		</ng-transclude>
 	</button>

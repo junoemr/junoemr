@@ -291,7 +291,8 @@ public class PersonaService extends AbstractServiceImpl {
 											"admin.addUser",
 											"admin.editUser",
 											"admin.viewUser",
-											"admin.manageUsers"))
+											"admin.manageUsers",
+											"admin.manageAppointmentQueues"))
 			.addWithState(idCounter++,bundle.getString("navbar.menu.reports"),null,"reports")
 			.addWithState(idCounter++,bundle.getString("navbar.menu.documents"),null,"documents");
 

@@ -242,6 +242,7 @@ module.exports = {
 			'./src/common/components/junoTab/components/module.js',
 			'./src/common/components/junoTab/components/swimLaneTab/swimLaneTabComponent.js',
 			'./src/common/components/junoDateSelect/junoDateSelectComponent.js',
+			'./src/common/components/junoTimeSelect/junoTimeSelectComponent.js',
 			'./src/common/components/junoDivider/junoDividerComponent.js',
 			'./src/common/components/loadingIndicatorComponent.js',
 			'./src/common/components/zeroStateDisplayComponent.js',
@@ -254,6 +255,7 @@ module.exports = {
 			'./src/common/modals/junoInputModal/junoInputModalComponent.js',
 			'./src/common/modals/junoSimpleModal/junoSimpleModalComponent.js',
 			'./src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModalComponent.js',
+			'./src/common/modals/appointmentQueueModal/appointmentQueueModalComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
@@ -335,6 +337,7 @@ module.exports = {
 			'./src/admin/integration/know2act/Know2actNotificationController.js',
 			'./src/admin/integration/know2act/Know2actTemplateController.js',
 			'./src/admin/integration/frameContent/frameContentController.js',
+			'./src/admin/integration/manageAppointmentQueuesPage/manageAppointmentQueuesComponent.js',
 
 			'./src/billing/billingController.js',
 

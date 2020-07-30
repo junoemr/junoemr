@@ -126,6 +126,21 @@ public class AbstractMapper
 			parsedProvider.setFirstName(StringUtils.trimToNull(providerNames[0]));
 			parsedProvider.setLastName(StringUtils.trimToNull(providerNames[1]));
 		}
+		// often wolf just puts a space between provider names. this can still be matched if there is exactly 1 space in the signature
+		else if(segmentToParse != null && segmentToParse.contains(" "))
+		{
+			String[] providerNames = segmentToParse.trim().split("\\s+");
+			if(providerNames.length == 2)
+			{
+				parsedProvider = new ProviderData();
+				parsedProvider.setFirstName(StringUtils.trimToNull(providerNames[0]));
+				parsedProvider.setLastName(StringUtils.trimToNull(providerNames[1]));
+			}
+			else
+			{
+				logger.warn("["+debugLocation+"] WOLF provider data cannot be parsed (invalid whitespace): '"+segmentToParse+"'");
+			}
+		}
 		else if(segmentToParse != null)
 		{
 			logger.error("["+debugLocation+"] WOLF provider data is malformed: '"+segmentToParse+"'");

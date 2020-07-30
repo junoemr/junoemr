@@ -23,11 +23,14 @@
 	<div class="buttons">
 		<juno-button ng-click="$ctrl.onCancel()"
 		             component-style="$ctrl.resolve.style"
-		             button-color="JUNO_BUTTON_COLOR.BASE">
+		             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+		             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT">
 			Cancel
 		</juno-button>
 		<juno-button ng-click="$ctrl.onOk()"
 		             disabled="!allValidationsValid($ctrl.validations)"
+		             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+		             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
 		             component-style="$ctrl.resolve.style">
 			{{$ctrl.resolve.okText ? $ctrl.resolve.okText : "Ok"}}
 		</juno-button>

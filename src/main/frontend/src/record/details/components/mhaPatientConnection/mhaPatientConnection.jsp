@@ -4,6 +4,7 @@
 	             label="Connection Status"
 	             disabled="$ctrl.buttonDisabled()"
 	             button-color="$ctrl.getButtonColor()"
+	             button-color-pattern="$ctrl.getButtonColorPattern()"
 	             component-style="$ctrl.componentStyle">
 		<div class="button-content">
 			<i ng-if="$ctrl.isConfirmed || $ctrl.hasEmail()" class="icon icon-mha text-left" ng-class="$ctrl.iconClasses()"></i>

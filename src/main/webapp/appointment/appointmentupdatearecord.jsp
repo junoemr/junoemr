@@ -39,24 +39,24 @@
 	}
 %>
 
-<%@ page import="org.oscarehr.common.OtherIdManager,
-org.oscarehr.common.dao.AppointmentArchiveDao,
-org.oscarehr.common.dao.OscarAppointmentDao,
-org.oscarehr.common.model.Appointment,
-org.oscarehr.event.EventService"%>
+<%@ page import="org.oscarehr.common.OtherIdManager"%>
+<%@ page import="org.oscarehr.common.dao.AppointmentArchiveDao"%>
+<%@ page import="org.oscarehr.common.dao.OscarAppointmentDao"%>
+<%@ page import="org.oscarehr.common.model.Appointment"%>
+<%@ page import="org.oscarehr.event.EventService"%>
 <%@ page import="org.oscarehr.telehealth.service.MyHealthAccessService"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="oscar.MyDateFormat" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="oscar.log.LogAction" %>
 <%@ page import="oscar.log.LogConst" %>
 <%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="java.util.Date" %>
 <%
-	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
-	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
+	AppointmentArchiveDao appointmentArchiveDao = SpringUtils.getBean(AppointmentArchiveDao.class);
+	OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 	MyHealthAccessService myHealthAccessService = SpringUtils.getBean(MyHealthAccessService.class);
-	String changedStatus = null;
 %>
 <html:html locale="true">
 <head>
@@ -72,23 +72,59 @@ org.oscarehr.event.EventService"%>
 	</tr>
 </table>
 	<%
-		String updateuser = (String) session.getAttribute("user");
+		final String cancelledAppointment = "Cancel Appt";
 
-		int rowsAffected = 0;
-		Appointment appt = appointmentDao.find(Integer.parseInt(request.getParameter("appointment_no")));
+		String apptNo = request.getParameter("appointment_no");
+		Appointment appt = appointmentDao.find(Integer.parseInt(apptNo));
 		appointmentArchiveDao.archiveAppointment(appt);
 
-		//Did the appt status change ?
-		if(appt.getStatus() != null && !appt.getStatus().equals(request.getParameter("status")))
+		// Try to read all the request parameters and use default (previous) values where appropriate
+		String updateuser = (String) session.getAttribute("user");
+		String buttonCancel = request.getParameter("buttoncancel");
+
+		String status = ConversionUtils.getStringOrDefaultValue(request.getParameter("status"), appt.getAppointmentStatus());
+		String changedStatus = null;
+		String headRecord = ConversionUtils.getStringOrDefaultValue(request.getParameter("demographic_no"), "0");
+		Date appointmentDate = ConversionUtils.fromDateString(request.getParameter("appointment_date"));
+		Date startDate = ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time"));
+		Date endDate = ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time"));
+
+		String appointmentName = ConversionUtils.getStringOrDefaultValue(request.getParameter("keyword"), appt.getName());
+		String notes = ConversionUtils.getStringOrDefaultValue(request.getParameter("notes"), appt.getNotes());
+		String reason = ConversionUtils.getStringOrDefaultValue(request.getParameter("reason"), appt.getReason());
+		String location = ConversionUtils.getStringOrDefaultValue(request.getParameter("location"), appt.getLocation());
+		String isVirtual = ConversionUtils.getStringOrDefaultValue(request.getParameter("isVirtual"), "off");
+		String resources = ConversionUtils.getStringOrDefaultValue(request.getParameter("resources"), appt.getResources());
+		String type = ConversionUtils.getStringOrDefaultValue(request.getParameter("type"), appt.getType());
+		String style = ConversionUtils.getStringOrDefaultValue(request.getParameter("style"), appt.getStyle());
+		String billing = ConversionUtils.getStringOrDefaultValue(request.getParameter("billing"), appt.getBilling());
+		String remarks = ConversionUtils.getStringOrDefaultValue(request.getParameter("remarks"), appt.getRemarks());
+		String urgency = ConversionUtils.getStringOrDefaultValue(request.getParameter("urgency"), appt.getUrgency());
+
+		Integer reasonCode = appt.getReasonCode();
+		int demographicNo = appt.getDemographicNo();
+		try
 		{
-			changedStatus = request.getParameter("status");
+			reasonCode = Integer.parseInt(request.getParameter("reasonCode"));
+			demographicNo = Integer.parseInt(headRecord);
+		}
+		catch (NumberFormatException e)
+		{
+			MiscUtils.getLogger().error("Error attempting to parse a number when saving appointment", e);
 		}
 
-		if(request.getParameter("buttoncancel") != null &&
-				(request.getParameter("buttoncancel").equals("Cancel Appt") || request.getParameter("buttoncancel").equals("No Show")))
+		int rowsAffected = 0;
+
+		//Did the appt status change ?
+		if(appt.getStatus() != null && !appt.getStatus().equals(status))
 		{
-			changedStatus = request.getParameter("buttoncancel").equals("Cancel Appt") ? "C" : "N";
-			appt.setStatus(request.getParameter("buttoncancel").equals("Cancel Appt") ? "C" : "N");
+			changedStatus = status;
+		}
+
+		if(buttonCancel != null && (buttonCancel.equals(cancelledAppointment) || buttonCancel.equals("No Show")))
+		{
+			changedStatus = buttonCancel.equals(cancelledAppointment) ? Appointment.CANCELLED : Appointment.NO_SHOW;
+			appt.setStatus(changedStatus);
 			appt.setLastUpdateUser(updateuser);
 			appointmentDao.merge(appt);
 			rowsAffected = 1;
@@ -104,37 +140,26 @@ org.oscarehr.event.EventService"%>
 		}
 		else
 		{
-			if(request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals("")))
-			{
-				appt.setDemographicNo(Integer.parseInt(request.getParameter("demographic_no")));
-			}
-			else
-			{
-				appt.setDemographicNo(0);
-			}
-			appt.setAppointmentDate(ConversionUtils.fromDateString(request.getParameter("appointment_date")));
-			appt.setStartTime(ConversionUtils.fromTimeString(MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"))));
-			appt.setEndTime(ConversionUtils.fromTimeString(MyDateFormat.getTimeXX_XX_XX(request.getParameter("end_time"))));
-			appt.setName(request.getParameter("keyword"));
-			appt.setNotes(request.getParameter("notes"));
-			appt.setReason(request.getParameter("reason"));
-			appt.setLocation(request.getParameter("location"));
-			appt.setIsVirtual(request.getParameter("isVirtual") != null &&
-					request.getParameter("isVirtual").equals("on"));
-			appt.setResources(request.getParameter("resources"));
-			appt.setType(request.getParameter("type"));
-			appt.setStyle(request.getParameter("style"));
-			appt.setBilling(request.getParameter("billing"));
-			appt.setStatus(request.getParameter("status"));
-			appt.setLastUpdateUser(updateuser);
-			appt.setRemarks(request.getParameter("remarks"));
-			appt.setUpdateDateTime(new java.util.Date());
-			appt.setUrgency((request.getParameter("urgency") != null) ? request.getParameter("urgency") : "");
+			appt.setDemographicNo(demographicNo);
 
-			if(request.getParameter("reasonCode") != null)
-			{
-				appt.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
-			}
+			appt.setAppointmentDate(appointmentDate);
+			appt.setStartTime(startDate);
+			appt.setEndTime(endDate);
+			appt.setName(appointmentName);
+			appt.setNotes(notes);
+			appt.setReason(reason);
+			appt.setLocation(location);
+			appt.setIsVirtual(isVirtual.equals("on"));
+			appt.setResources(resources);
+			appt.setType(type);
+			appt.setStyle(style);
+			appt.setBilling(billing);
+			appt.setStatus(status);
+			appt.setLastUpdateUser(updateuser);
+			appt.setRemarks(remarks);
+			appt.setUpdateDateTime(new java.util.Date());
+			appt.setUrgency(urgency);
+			appt.setReasonCode(reasonCode);
 
 			appointmentDao.merge(appt);
 
@@ -164,7 +189,6 @@ org.oscarehr.event.EventService"%>
 	self.close();
 </script>
 <%
-	String apptNo = request.getParameter("appointment_no");
 	String mcNumber = request.getParameter("appt_mc_number");
 	OtherIdManager.saveIdAppointment(apptNo, "appt_mc_number", mcNumber);
 	

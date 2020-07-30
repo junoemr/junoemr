@@ -21,7 +21,7 @@
 * Canada
 */
 
-import {JUNO_BUTTON_COLOR, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
 import { MHA_PATIENT_CONNECTION_ACTIONS } from "../mhaPatientConnection/mhaPatientConnectionConstants"
 
 angular.module('Record.Details').component('demographicSection', {
@@ -51,6 +51,7 @@ angular.module('Record.Details').component('demographicSection', {
 
 			$scope.LABEL_POSITION = LABEL_POSITION;
 			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 			ctrl.$onInit = () =>
 			{

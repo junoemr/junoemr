@@ -1,0 +1,42 @@
+:root {
+
+	--theme-color-primary-base: var(--color-primary-base);
+	--theme-color-primary-accent: var(--color-primary-dark);
+	--theme-color-primary-text: var(--color-neutral-darker);
+
+	--theme-color-background-primary: var(--color-neutral-white);
+	--theme-color-background-secondary: var(--color-neutral-lightest);
+	--theme-color-background-form: var(--color-neutral-white);
+
+	--theme-color-form-field-text: var(--color-neutral-darker);
+	--theme-color-form-field-text-hover: var(--color-neutral-darker);
+	--theme-color-form-field-text-active: var(--color-neutral-darker);
+	--theme-color-form-field-text-disabled: var(--color-neutral-grey);
+	--theme-color-form-field-background: var(--color-neutral-white);
+	--theme-color-form-field-background-hover: var(--color-neutral-white);
+	--theme-color-form-field-background-active: var(--color-neutral-white);
+	--theme-color-form-field-background-disabled: var(--color-neutral-lighter);
+	--theme-color-form-field-border: var(--color-neutral-light);
+	--theme-color-form-field-border-hover: var(--color-neutral-light-grey);
+	--theme-color-form-field-border-active: var(--color-primary-light);
+	--theme-color-form-field-border-disabled: var(--color-neutral-light);
+
+	--theme-color-table-border: var(--color-neutral-light);
+	--theme-color-table-border-hover: var(--color-primary-lighter);
+	--theme-color-table-header-text: var(--color-neutral-darker);
+	--theme-color-table-header-background: var(--color-neutral-lighter);
+	--theme-color-table-body-text: var(--color-neutral-darker);
+	--theme-color-table-body-text-hover: var(--color-neutral-darker);
+	--theme-color-table-body-background-even: var(--color-neutral-lightest);
+	--theme-color-table-body-background-odd: var(--color-neutral-white);
+	--theme-color-table-body-background-hover: var(--color-primary-lightest);
+
+	--theme-color-panel-header-text: var(--color-neutral-darkest);
+	--theme-color-panel-header-background: var(--color-neutral-lightest);
+	--theme-color-panel-body-text: var(--color-neutral-darkest);
+	--theme-color-panel-body-background: var(--color-neutral-white);
+	--theme-color-panel-border: var(--color-neutral-lightest);
+
+	@import "junoThemeGrey";
+	@import "junoThemeDracula";
+}

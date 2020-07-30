@@ -21,7 +21,7 @@
  * Canada
  */
 
-import {LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_STYLE} from "../../components/junoComponentConstants";
+import {LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_BUTTON_COLOR_PATTERN} from "../../components/junoComponentConstants";
 import {MhaDemographicApi, MhaIntegrationApi} from "../../../../generated";
 
 angular.module('Common.Components').component('mhaPatientDetailsModal',
@@ -50,6 +50,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 		ctrl.patientProfiles = [];
 		ctrl.currentProfile = null;

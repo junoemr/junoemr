@@ -123,9 +123,10 @@
 		<panel no-header="true" component-style="$ctrl.resolve.style">
 			<panel-body>
 				<juno-button component-style="$ctrl.resolve.style"
-								button-color="JUNO_BUTTON_COLOR.SECONDARY"
-								ng-click="$ctrl.cancelConnection()"
-								class="cancel-connection-btn">
+				             button-color="JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+				             ng-click="$ctrl.cancelConnection()"
+				             class="cancel-connection-btn">
 					<div class="cancel-btn-text">
 						Cancel Connection
 					</div>

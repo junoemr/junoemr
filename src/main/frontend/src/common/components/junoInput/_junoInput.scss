@@ -1,5 +1,7 @@
 juno-input {
 	.juno-input {
+		@include juno-form-inputs-style();
+		@include juno-form-inputs-colors-default();
 
 		input {
 			flex: 1 1 0;

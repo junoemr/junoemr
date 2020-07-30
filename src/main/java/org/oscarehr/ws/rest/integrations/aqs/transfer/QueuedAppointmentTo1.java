@@ -30,12 +30,15 @@ import org.oscarehr.integration.aqs.model.QueuedAppointment;
 import org.springframework.beans.BeanUtils;
 import oscar.util.Jackson.ZonedDateTimeStringSerializer;
 
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class QueuedAppointmentTo1
+public class QueuedAppointmentTo1 implements Serializable
 {
 	@JsonProperty("id")
 	private String remoteId;
@@ -64,6 +67,11 @@ public class QueuedAppointmentTo1
 			queuedAppointmentTo1s.add(new QueuedAppointmentTo1(queuedAppointment));
 		}
 		return queuedAppointmentTo1s;
+	}
+
+	// default constructor required for serialization
+	public QueuedAppointmentTo1()
+	{
 	}
 
 	public QueuedAppointmentTo1(QueuedAppointment queuedAppointment)

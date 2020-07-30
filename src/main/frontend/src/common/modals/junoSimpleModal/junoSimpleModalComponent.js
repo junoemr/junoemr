@@ -23,7 +23,7 @@
 
 import {
 	JUNO_STYLE,
-	JUNO_BACKGROUND_STYLE, JUNO_BUTTON_COLOR
+	JUNO_BACKGROUND_STYLE, JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN
 } from "../../components/junoComponentConstants";
 
 angular.module('Common.Components').component('junoSimpleModal',
@@ -41,6 +41,7 @@ angular.module('Common.Components').component('junoSimpleModal',
 				let ctrl = this;
 
 				$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+				$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.$onInit = () =>
 				{

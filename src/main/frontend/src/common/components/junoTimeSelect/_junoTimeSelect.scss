@@ -1,0 +1,28 @@
+.juno-time-select {
+
+	.fields {
+		flex: 1 1 0;
+		justify-content: center;
+		align-items: center;
+
+		input {
+			text-align: center;
+		}
+
+		.hour {
+			width: 64px;
+			margin-right: 2px;
+		}
+
+		.minute {
+			width: 64px;
+			margin-right: 2px;
+			margin-left: 2px;
+		}
+
+		.am_pm {
+			width: 64px;
+			margin-left: 2px;
+		}
+	}
+}

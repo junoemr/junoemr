@@ -1,0 +1,14 @@
+.appointment-queue-modal {
+	.icon-close {
+		cursor: pointer;
+	}
+
+	.queue-options-container {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-evenly;
+		height: 100%;
+		width: 100%;
+		padding: 4px;
+	}
+}

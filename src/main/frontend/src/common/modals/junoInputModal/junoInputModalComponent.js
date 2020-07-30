@@ -21,7 +21,7 @@
  * Canada
  */
 
-import {LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_STYLE} from "../../components/junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_BUTTON_COLOR_PATTERN} from "../../components/junoComponentConstants";
 
 angular.module('Common.Components').component('junoInputModal',
 {
@@ -34,8 +34,8 @@ angular.module('Common.Components').component('junoInputModal',
 	{
 		let ctrl = this;
 
-		$scope.LABEL_POSITION = LABEL_POSITION;
-		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 		$scope.allValidationsValid = Juno.Validations.allValidationsValid;
 
 		ctrl.value = "";

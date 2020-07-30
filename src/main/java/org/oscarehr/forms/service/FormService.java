@@ -20,35 +20,33 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.common.hl7.copd.mapper;
 
-import ca.uhn.hl7v2.HL7Exception;
-import org.jsoup.Jsoup;
-import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.demographicImport.service.CoPDImportService;
+package org.oscarehr.forms.service;
 
+import org.oscarehr.common.dao.forms.FormsDao;
+import org.oscarehr.forms.converter.FormBCAR2012Converter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-// override of EncounterNoteMapper with custom functionality for MedAccess
-public class EncounterNoteMapperMedAccess extends EncounterNoteMapper
+import java.util.List;
+
+@Service
+public class FormService
 {
-	public EncounterNoteMapperMedAccess(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
-	{
-		super(message, providerRep, importSource);
-	}
-
-	@Override
-	protected String getEncounterNoteText(int rep) throws HL7Exception
-	{
-		return stripHTML(super.getEncounterNoteText(rep));
-	}
+	@Autowired
+	private FormsDao formsDao;
 
 	/**
-	 * strip html tags from text
-	 * @param text - text to preform the stripping on
-	 * @return - the modified text
+	 * For now, thin wrapper to avoid having to directly call the Dao at the application layer.
+	 * @param beginEdd string representation of beginning expected delivery date
+	 * @param endEdd string representation of end expected delivery date
+	 * @param limit number of results we want
+	 * @param offset where we want to start querying results from
+	 * @return list of BC AR 2012 form entries that fall within [beginEdd, endEdd] range
 	 */
-	private String stripHTML(String text)
+	public List<FormBCAR2012Converter> getBCAR2012(String beginEdd, String endEdd, int limit, int offset)
 	{
-		return Jsoup.parse(text).wholeText();
+		return formsDao.selectBCAR2012(beginEdd, endEdd, limit, offset);
 	}
+
 }

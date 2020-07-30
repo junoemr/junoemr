@@ -32,8 +32,10 @@ angular.module('Common.Components').component('junoSelect', {
 		label: "@?",
 		labelPosition: "<?",
 		componentStyle: "<?",
+		disabled: "<?",
 	},
-	controller: [ function () {
+	controller: [function ()
+	{
 		let ctrl = this;
 
 		ctrl.$onInit = () =>

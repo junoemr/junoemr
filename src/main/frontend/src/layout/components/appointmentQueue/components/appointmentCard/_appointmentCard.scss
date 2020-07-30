@@ -6,7 +6,7 @@
 	flex-grow: 1;
 
 	border-radius: 8px;
-	border: solid 1px $color-neutral-lighter-grey;
+	border: solid 1px $color-neutral-lighter;
 
 	.content {
 		padding: 9px 10px 9px 10px;
@@ -66,7 +66,7 @@
 	}
 
 	&.active {
-		box-shadow: 0 3px 3px $color-neutral-lighter-grey;
+		box-shadow: 0 3px 3px $color-neutral-lighter;
 		background-color: $color-neutral-white;
 	}
 
