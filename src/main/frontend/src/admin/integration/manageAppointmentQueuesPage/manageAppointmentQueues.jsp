@@ -139,6 +139,16 @@
 						</div>
 					</div>
 				</div>
+				<div class="on-demand-booking-controls">
+					<div class="button-wrapper">
+						<juno-button ng-click="$ctrl.saveOnDemandBookingSettings()"
+						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+						             component-style="$ctrl.componentStyle">
+							Save
+						</juno-button>
+					</div>
+				</div>
 			</panel-body>
 		</panel>
 	</div>

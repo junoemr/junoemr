@@ -83,8 +83,11 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 
 				ctrl.deleteQueue = async (queue) =>
 				{
-					const userOk = await Juno.Common.Util.confirmationDialog($uibModal, "Delete Queue?",
-						"Are you sure you want to delete this queue?", ctrl.componentStyle);
+					const userOk = await Juno.Common.Util.confirmationDialog(
+						$uibModal,
+						"Delete Queue?",
+						"Are you sure you want to delete this queue?",
+						ctrl.componentStyle);
 					if (userOk)
 					{
 						aqsQueuesApi.deleteAppointmentQueue(queue.id).then(
@@ -195,6 +198,40 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 							deferred.reject(error);
 						}
 					);
+					return deferred.promise;
+				}
+
+				ctrl.saveOnDemandBookingSettings = () =>
+				{
+					const deferred = $q.defer();
+
+					const hoursSettingsTransfer = ctrl.onDemandQueueHours.map(
+						(localSettings) =>
+						{
+							return {
+								dayOfWeek: localSettings.dayOfWeek,
+								enabled: localSettings.enabled,
+								startTime: localSettings.startTime.format("HH:mm:ss"),
+								endTime: localSettings.endTime.format("HH:mm:ss"),
+							}
+						});
+					const transfer = {
+						queueId: ctrl.onDemandAssignedQueue.id,
+						bookingHours: hoursSettingsTransfer,
+					}
+
+					aqsQueuesApi.setOnDemandBookingSettings(transfer).then(
+						(response) =>
+						{
+							deferred.resolve(response);
+						}).catch(
+						(error) =>
+						{
+							console.error(error);
+							alert("Failed to save on-demand booking settings");
+							deferred.reject(error);
+						});
+
 					return deferred.promise;
 				}
 			}]
