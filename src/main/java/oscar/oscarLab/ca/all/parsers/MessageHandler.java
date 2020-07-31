@@ -39,6 +39,7 @@ import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.labs.service.Hl7TextInfoService;
 import org.oscarehr.util.SpringUtils;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
@@ -1145,15 +1146,15 @@ public abstract class MessageHandler
 
 	protected String formatDateTime(String plain)
 	{
-		return formatDateTime(plain, "yyyyMMddHHmmss", "yyyy-MM-dd HH:mm:ss");
+		return formatDateTime(plain, "yyyyMMddHHmmss", ConversionUtils.DEFAULT_TS_PATTERN);
 	}
 	protected String formatDate(String plain)
 	{
-		return formatDateTime(plain, "yyyyMMddHHmmss", "yyyy-MM-dd");
+		return formatDateTime(plain, "yyyyMMddHHmmss", ConversionUtils.DEFAULT_DATE_PATTERN);
 	}
 	protected String formatTime(String plain)
 	{
-		return formatDateTime(plain, "yyyyMMddHHmmss", "HH:mm:ss");
+		return formatDateTime(plain, "yyyyMMddHHmmss", ConversionUtils.DEFAULT_TIME_PATTERN);
 	}
 
 	protected String formatDateTime(String plain, String inFormat, String outFormat)
@@ -1161,13 +1162,36 @@ public abstract class MessageHandler
 		String formatted = "";
 
 		if(plain == null || plain.trim().isEmpty())
+		{
 			return formatted;
+		}
 
 		if(inFormat.length() > plain.length())
+		{
 			inFormat = inFormat.substring(0, plain.length());
+		}
 
 		try
 		{
+			if( plain.length()>inFormat.length() )
+			{
+				// a time like this 2016-09-20 12:22:00 -0700
+				if (plain.charAt(4) == '-' && plain.charAt(7) == '-' && plain.charAt(10) == ' ' && plain.charAt(13) == ':' && plain.charAt(16) == ':')
+				{
+					if (outFormat.equals(ConversionUtils.DEFAULT_TIME_PATTERN))
+					{
+						return plain.substring(11,19);
+					}
+					else
+					{
+						return plain.substring(0,outFormat.length());
+					}
+				}
+				else
+				{
+					throw new DateTimeException("input date string " + plain + " not reconigzed");
+				}
+			}
 			DateTimeFormatter inFormatter = DateTimeFormatter.ofPattern(inFormat);
 			DateTimeFormatter outFormatter = DateTimeFormatter.ofPattern(outFormat);
 
