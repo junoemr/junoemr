@@ -158,6 +158,8 @@ if(!authed) {
    <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
    <script type="text/javascript" src="./js/junoBillingHelper.js"></script>
         <script language="JavaScript">
+        jQuery.noConflict();
+
         if('<%=request.getAttribute("close")%>' == 'true'){
           window.close();
         }
@@ -353,7 +355,7 @@ function calculateFee(){
 }
 
 
-$(document).ready(function()
+jQuery(document).ready(function()
 {
     var $providerSelect = jQuery('#provider-number');
     var $facilityNumber = jQuery('#facility-number');
@@ -717,6 +719,8 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
             <input type="text" name="icbcClaim" value="<%=allFields.getProperty("icbcClaimNo")%>"size="8" maxlength="8"/></td>
        </tr>
        <tr>
+
+
 
             <td class="bCellData">Facility Number
             <input type="text" name="facilityNum" id= facility-number value="<%=allFields.getProperty("facilityNo")%>" size="5" maxlength="5"/></td>

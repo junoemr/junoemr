@@ -24,13 +24,13 @@ package org.oscarehr.provider.service;
 
 import com.quatro.dao.security.SecuserroleDao;
 import com.quatro.model.security.Secuserrole;
-import org.oscarehr.PMmodule.dao.ProgramProviderDAO;
-import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.dao.RecycleBinDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.RecycleBin;
 import org.oscarehr.common.model.SecRole;
+import org.oscarehr.provider.dao.ProgramProviderDao;
+import org.oscarehr.provider.model.ProgramProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +47,7 @@ public class ProviderRoleService
 	SecRoleDao securityRoleDao;
 
 	@Autowired
-	ProgramProviderDAO programProviderDao;
+	ProgramProviderDao programProviderDao;
 
 	@Autowired
 	ProgramManager programManager;
@@ -106,7 +106,7 @@ public class ProviderRoleService
 		if(programProvider != null)
 		{
 			programProvider.setRoleId(roleId);
-			programProviderDao.saveProgramProvider(programProvider);
+			programProviderDao.merge(programProvider);
 		}
 		else
 		{
@@ -114,7 +114,7 @@ public class ProviderRoleService
 			programProvider.setProgramId(caisiProgram);
 			programProvider.setProviderNo(String.valueOf(providerId));
 			programProvider.setRoleId(roleId);
-			programProviderDao.saveProgramProvider(programProvider);
+			programProviderDao.persist(programProvider);
 		}
 
 		return true;
@@ -136,8 +136,6 @@ public class ProviderRoleService
 
 	public Secuserrole addRoleAndAssignPrimary(Integer roleProviderId, String roleName)
 	{
-
-
 		Secuserrole secUserRole = addRole(roleProviderId, roleName);
 
 		Long caisiProgram = new Long(programManager.getDefaultProgramId());
@@ -145,11 +143,18 @@ public class ProviderRoleService
 		if(programProvider == null)
 		{
 			programProvider = new ProgramProvider();
+			programProvider.setProgramId(caisiProgram);
+			programProvider.setProviderNo(String.valueOf(roleProviderId));
+			programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleName).getId()));
+			programProviderDao.persist(programProvider);
 		}
-		programProvider.setProgramId(caisiProgram);
-		programProvider.setProviderNo(String.valueOf(roleProviderId));
-		programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleName).getId()));
-		programProviderDao.saveProgramProvider(programProvider);
+		else
+		{
+			programProvider.setProgramId(caisiProgram);
+			programProvider.setProviderNo(String.valueOf(roleProviderId));
+			programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleName).getId()));
+			programProviderDao.merge(programProvider);
+		}
 		return secUserRole;
 	}
 

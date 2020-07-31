@@ -22,14 +22,20 @@
  */
 package integration.tests.util.junoUtil;
 
+import integration.tests.util.data.ProviderTestCollection;
+import integration.tests.util.data.ProviderTestData;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.util.SpringUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+
+import static integration.tests.util.data.ProviderTestCollection.providerLNames;
 
 public class DatabaseUtil
 {
@@ -43,4 +49,19 @@ public class DatabaseUtil
 		demo.setSex("F");
 		return demoService.addNewDemographicRecord(AuthUtils.TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
 	}
+	public static void createTestProvider()
+	{
+		ProviderService providerService = (ProviderService) SpringUtils.getBean("provider.service.ProviderService");
+		for (String provider : providerLNames)
+		{
+			ProviderData demoProvider = new ProviderData();
+			ProviderTestData dr = ProviderTestCollection.providerMap.get(provider);
+			demoProvider.setProviderNo(Integer.parseInt(dr.providerNo));
+			demoProvider.setFirstName(dr.firstName);
+			demoProvider.setLastName(dr.lastName);
+			providerService.addNewProvider(AuthUtils.TEST_PROVIDER_ID, demoProvider, null);
+		}
+	}
+
+
 }

@@ -49,6 +49,7 @@ import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.model.DemographicExtArchive;
 import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
@@ -102,6 +103,9 @@ public class DemographicManager {
 
 	@Autowired
 	private DemographicMergedDao demographicMergedDao;
+
+	@Autowired
+	private DemographicService demographicService;
 
 	@Autowired
 	private PHRVerificationDao phrVerificationDao;
@@ -326,6 +330,9 @@ public class DemographicManager {
 		//save current demo
 		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		demographicDao.save(demographic);
+
+		// update MyHealthAccess connection status.
+		demographicService.queueMHAPatientUpdates(demographic, prevDemo, loggedInInfo);
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {

@@ -20,34 +20,18 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.dao;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.integration.model.IntegrationPushAppointmentUpdate;
-import org.springframework.stereotype.Repository;
+package org.oscarehr.integration.myhealthaccess.dto.integrationPushUpdate;
 
-import javax.persistence.Query;
-import java.util.List;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-@Repository
-public class IntegrationPushAppointmentUpdateDao extends AbstractDao<IntegrationPushAppointmentUpdate>
+import java.io.Serializable;
+
+public class IntegrationPushUpdateBaseTo1 implements Serializable
 {
-	protected IntegrationPushAppointmentUpdateDao()
+	@Override
+	public String toString()
 	{
-		super(IntegrationPushAppointmentUpdate.class);
-	}
-
-	public List<IntegrationPushAppointmentUpdate> findUnsent(String integrationType)
-	{
-		Query query = entityManager.createQuery(
-				"SELECT x FROM IntegrationPushAppointmentUpdate x " +
-						"WHERE x.status <> :status " +
-						"AND x.integrationType = :integrationType " +
-						"ORDER BY x.createdAt, x.id");
-
-		query.setParameter("status", IntegrationPushAppointmentUpdate.PUSH_STATUS.SENT);
-		query.setParameter("integrationType", integrationType);
-
-		return query.getResultList();
+		return new ReflectionToStringBuilder(this).toString();
 	}
 }
