@@ -15,6 +15,7 @@
 	<parameter name="criteria" class="java.lang.String" isForPrompting="false"/>
 	<field name="first_name" class="java.lang.String"/>
 	<field name="last_name" class="java.lang.String"/>
+	<field name="provider_no" class="java.lang.String"/>
 	<field name="t_practitionerno" class="java.lang.String"/>
 	<field name="t_s00type" class="java.lang.String"/>
 	<field name="t_servicedate" class="java.lang.String"/>
@@ -83,7 +84,7 @@
                     <textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
                         <paragraph lineSpacing="Single"/>
                     </textElement>
-                    <textFieldExpression><![CDATA["Total for " +$F{first_name} + " " + $F{last_name}+ " : " + NumberFormat.getCurrencyInstance().format($V{amtTotal})]]></textFieldExpression>
+                    <textFieldExpression><![CDATA["Total for " +$F{first_name} + " " + $F{last_name}+ "(" + $F{provider_no} + ")" +" : " + NumberFormat.getCurrencyInstance().format($V{amtTotal})]]></textFieldExpression>
                 </textField>
             </band>
 		</groupFooter>
@@ -258,7 +259,7 @@
 				<text><![CDATA[DC#]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="element-97" mode="Transparent" x="132" y="4" width="38" height="12" forecolor="#FFFFFF" backcolor="#FFFFFF"/>
+				<reportElement key="element-97" mode="Transparent" x="137" y="4" width="38" height="12" forecolor="#FFFFFF" backcolor="#FFFFFF"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -271,7 +272,7 @@
 				<text><![CDATA[PMT Date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="element-98" mode="Transparent" x="78" y="4" width="50" height="12" forecolor="#FFFFFF" backcolor="#FFFFFF"/>
+				<reportElement key="element-98" mode="Transparent" x="83" y="4" width="50" height="12" forecolor="#FFFFFF" backcolor="#FFFFFF"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -284,7 +285,7 @@
 				<text><![CDATA[Service Date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="element-99" mode="Transparent" x="32" y="4" width="36" height="12" forecolor="#FFFFFF" backcolor="#FFFFFF"/>
+				<reportElement key="element-99" mode="Transparent" x="42" y="4" width="31" height="12" forecolor="#FFFFFF" backcolor="#FFFFFF"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -297,7 +298,7 @@
 				<text><![CDATA[Code]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="element-100" mode="Transparent" x="1" y="4" width="26" height="12" forecolor="#FFFFFF" backcolor="#FFFFFF"/>
+				<reportElement key="element-100" mode="Transparent" x="1" y="4" width="50" height="12" forecolor="#FFFFFF" backcolor="#FFFFFF"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -307,14 +308,14 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None">
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Pract]]></text>
+				<text><![CDATA[Provider]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="20" splitType="Prevent">
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="31" y="0" width="47" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement key="textField" mode="Transparent" x="46" y="0" width="42" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -327,7 +328,7 @@
 				<textFieldExpression><![CDATA[$F{t_s00type}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="dd-MMM-yy" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="133" y="0" width="49" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement key="textField" mode="Transparent" x="138" y="0" width="49" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -340,7 +341,7 @@
 				<textFieldExpression><![CDATA[new SimpleDateFormat("yyyyMMdd").parse($F{t_payment})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="dd-MMM-yy" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="78" y="0" width="54" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement key="textField" mode="Transparent" x="83" y="0" width="54" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -366,7 +367,7 @@
 				<textFieldExpression><![CDATA[$F{billing_code}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="227" y="0" width="122" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement key="textField" mode="Transparent" x="231" y="0" width="118" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -379,7 +380,7 @@
 				<textFieldExpression><![CDATA[$F{demographic_name} + "(" + $F{demographic_no} + ")"]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="183" y="0" width="44" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement key="textField" mode="Transparent" x="187" y="0" width="43" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -431,7 +432,7 @@
 				<textFieldExpression><![CDATA[$F{t_exp1}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement key="textField-1" mode="Transparent" x="0" y="0" width="30" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement key="textField-1" mode="Transparent" x="0" y="0" width="40" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -441,7 +442,8 @@
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[String.valueOf($F{first_name}).substring(0,1) +  String.valueOf($F{last_name}).substring(0,1)]]></textFieldExpression>
+				<textFieldExpression><![CDATA[String.valueOf($F{first_name}).substring(0,1) +  String.valueOf($F{last_name}).substring(0,1)+ "(provider_no:" + String.valueOf($F{provider_no}) + ")"]]></textFieldExpression>
+
 			</textField>
 		</band>
 	</detail>
