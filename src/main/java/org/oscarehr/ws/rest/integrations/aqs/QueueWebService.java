@@ -29,6 +29,7 @@ import org.oscarehr.integration.aqs.service.AppointmentQueueService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.AppointmentQueueTo1;
+import org.oscarehr.ws.rest.integrations.aqs.transfer.OnDemandBookingSettingsTransfer;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -61,7 +62,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<AppointmentQueueTo1>> getAppointmentQueues()
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN, SecObjectName._APPOINTMENT);
 		return RestResponse.successResponse(AppointmentQueueTo1.fromAppointmentQueueList(appointmentQueueService.getAppointmentQueues()));
 	}
 
@@ -80,7 +81,7 @@ public class QueueWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<AppointmentQueueTo1> getAppointmentQueue(@PathParam("queueId") UUID queueId)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN, SecObjectName._APPOINTMENT);
 		return RestResponse.successResponse(new AppointmentQueueTo1(appointmentQueueService.getAppointmentQueue(queueId)));
 	}
 
@@ -103,6 +104,27 @@ public class QueueWebService extends AbstractServiceImpl
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.DELETE, null, SecObjectName._ADMIN);
 		appointmentQueueService.deleteAppointmentQueue(queueId);
 		return RestResponse.successResponse(true);
+	}
+
+	@GET
+	@Path("odb/settings")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<OnDemandBookingSettingsTransfer> getOnDemandBookingSettings()
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN, SecObjectName._APPOINTMENT);
+		// TODO update queue server
+		return RestResponse.successResponse(new OnDemandBookingSettingsTransfer());
+	}
+
+	@PUT
+	@Path("odb/settings")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<OnDemandBookingSettingsTransfer> setOnDemandBookingSettings(OnDemandBookingSettingsTransfer settingsTransfer)
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
+		// TODO update queue server
+		return RestResponse.successResponse(settingsTransfer);
 	}
 
 }

@@ -6,6 +6,7 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 		templateUrl: 'src/admin/integration/manageAppointmentQueuesPage/manageAppointmentQueues.jsp',
 		bindings: {},
 		controller: [
+			'$q',
 			'$http',
 			'$httpParamSerializer',
 			'$scope',
@@ -14,6 +15,7 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 			'staticDataService',
 			'NgTableParams',
 			function (
+				$q,
 				$http,
 				$httpParamSerializer,
 				$scope,
@@ -43,8 +45,6 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 
 				ctrl.$onInit = function ()
 				{
-					ctrl.loadQueuesList();
-					ctrl.loadOnDemandQueueHours();
 					ctrl.tableParams = new NgTableParams(
 						{
 							page: 1, // show first page
@@ -62,6 +62,12 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 							}
 						}
 					);
+
+					ctrl.loadQueuesList().then(() =>
+					{
+						ctrl.loadOnDemandQueueHours();
+					});
+
 					aqsQueuesApi.getAppointmentQueue("1");
 				};
 
@@ -75,9 +81,14 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 					ctrl.openQueueModal(queue, true);
 				}
 
-				ctrl.deleteQueue = (queue) =>
+				ctrl.deleteQueue = async (queue) =>
 				{
-					if (window.confirm("Are you sure you want to delete this queue?"))
+					const userOk = await Juno.Common.Util.confirmationDialog(
+						$uibModal,
+						"Delete Queue?",
+						"Are you sure you want to delete this queue?",
+						ctrl.componentStyle);
+					if (userOk)
 					{
 						aqsQueuesApi.deleteAppointmentQueue(queue.id).then(
 							(response) =>
@@ -143,69 +154,85 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 
 				ctrl.loadQueuesList = () =>
 				{
+					const deferred = $q.defer();
 					aqsQueuesApi.getAppointmentQueues().then(
 						(response) =>
 						{
 							ctrl.queueList = response.data.body;
 							ctrl.updateQueueSelectOptions();
-
-							//TODO assign correctly
-							ctrl.onDemandAssignedQueue = ctrl.queueList[0];
+							deferred.resolve();
 						}
 					).catch((error) =>
 					{
 						console.error(error);
 						alert("Failed to load appointment queue list");
+						deferred.reject(error);
 					});
+					return deferred.promise;
 				}
 				ctrl.loadOnDemandQueueHours = () =>
 				{
-					const sampleStart = moment({hour: 8, minute: 0});
-					const sampleEnd = moment({hour: 16, minute: 30});
-					ctrl.onDemandQueueHours = [
+					const deferred = $q.defer();
+					aqsQueuesApi.getOnDemandBookingSettings().then(
+						(response) =>
 						{
-							name: 'Monday',
-							enabled: true,
-							start: sampleStart,
-							end: sampleEnd,
-						},
+							ctrl.onDemandQueueHours = response.data.body.bookingHours.map((transfer) =>
+							{
+								return {
+									dayOfWeek: transfer.dayOfWeek,
+									enabled: transfer.enabled,
+									startTime: moment(transfer.startTime, "HH:mm:ss"),
+									endTime: moment(transfer.endTime, "HH:mm:ss"),
+								}
+							});
+
+							// set the selected on-demand queue based on settings data
+							ctrl.onDemandAssignedQueue = ctrl.queueList.find((queue) => queue.id === response.data.body.queueId);
+							deferred.resolve();
+						}
+					).catch(
+						(error) =>
 						{
-							name: 'Tuesday',
-							enabled: true,
-							start: sampleStart,
-							end: sampleEnd,
-						},
+							console.error(error);
+							alert("Failed to load on-demand booking settings");
+							deferred.reject(error);
+						}
+					);
+					return deferred.promise;
+				}
+
+				ctrl.saveOnDemandBookingSettings = () =>
+				{
+					const deferred = $q.defer();
+
+					const hoursSettingsTransfer = ctrl.onDemandQueueHours.map(
+						(localSettings) =>
 						{
-							name: 'Wednesday',
-							enabled: true,
-							start: sampleStart,
-							end: sampleEnd,
-						},
+							return {
+								dayOfWeek: localSettings.dayOfWeek,
+								enabled: localSettings.enabled,
+								startTime: localSettings.startTime.format("HH:mm:ss"),
+								endTime: localSettings.endTime.format("HH:mm:ss"),
+							}
+						});
+					const transfer = {
+						queueId: ctrl.onDemandAssignedQueue.id,
+						bookingHours: hoursSettingsTransfer,
+					}
+
+					aqsQueuesApi.setOnDemandBookingSettings(transfer).then(
+						(response) =>
 						{
-							name: 'Thursday',
-							enabled: true,
-							start: sampleStart,
-							end: sampleEnd,
-						},
+							deferred.resolve(response);
+						}).catch(
+						(error) =>
 						{
-							name: 'Friday',
-							enabled: true,
-							start: sampleStart,
-							end: sampleEnd,
-						},
-						{
-							name: 'Saturday',
-							enabled: false,
-							start: sampleStart,
-							end: sampleEnd,
-						},
-						{
-							name: 'Sunday',
-							enabled: false,
-							start: sampleStart,
-							end: sampleEnd,
-						},
-					];
+							console.error(error);
+							alert("Failed to save on-demand booking settings");
+							deferred.reject(error);
+						});
+
+					return deferred.promise;
 				}
 			}]
 	});

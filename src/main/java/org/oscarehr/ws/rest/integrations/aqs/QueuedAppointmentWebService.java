@@ -34,6 +34,7 @@ import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -65,6 +66,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 
 	@DELETE
 	@Path("appointment/{appointmentId}/")
+	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> deleteAppointment(@PathParam("queueId") String queueId, @PathParam("appointmentId") String appointmentId, String reason)
 	{

@@ -76,6 +76,19 @@
 					}
 				}
 			}
+			.on-demand-booking-controls {
+				padding: 8px 16px;
+
+				display: flex;
+				flex-direction: row;
+				justify-content: flex-end;
+				align-items: center;
+				width: 100%;
+
+				.button-wrapper {
+					width: 256px;
+				}
+			}
 		}
 	}
 }
