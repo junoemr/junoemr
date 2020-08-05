@@ -27,7 +27,6 @@ package oscar.login;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -47,6 +46,8 @@ import org.oscarehr.common.dao.ServiceRequestTokenDao;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ServiceRequestToken;
+import org.oscarehr.login.dto.LoginForwardURL;
+import org.oscarehr.login.service.LoginService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SessionConstants;
 import org.oscarehr.util.SpringUtils;
@@ -70,6 +71,7 @@ public final class LoginAction extends DispatchAction
 
 	private FacilityDao facilityDao = (FacilityDao) SpringUtils.getBean("facilityDao");
 	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	private LoginService loginService = SpringUtils.getBean(LoginService.class);
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
@@ -78,7 +80,6 @@ public final class LoginAction extends DispatchAction
 		String ip = request.getRemoteAddr();
 
 		LoginCheckLogin cl = new LoginCheckLogin();
-		LoginUtil loginUtil = new LoginUtil();
 
 		String userName = "";
 		String password = "";
@@ -102,7 +103,7 @@ public final class LoginAction extends DispatchAction
 
 			try
 			{
-				String errorStr = errorHandling(password, newPassword, confirmPassword, loginUtil.encodePassword(oldPassword), oldPassword);
+				String errorStr = errorHandling(password, newPassword, confirmPassword, loginService.encodePassword(oldPassword), oldPassword);
 
 				//Error Handling
 				if (errorStr != null && !errorStr.isEmpty())
@@ -112,7 +113,7 @@ public final class LoginAction extends DispatchAction
 					return (new ActionForward(newURL));
 				}
 
-				loginUtil.persistNewPassword(userName, newPassword);
+				loginService.persistNewPassword(userName, newPassword);
 
 				password = newPassword;
 
@@ -218,20 +219,21 @@ public final class LoginAction extends DispatchAction
 		if (strAuth != null && strAuth.length != 1)
 		{ // login successfully
 
-			HashMap<String, String> loginInfo = new HashMap<>();
-			loginInfo.put("providerNo", strAuth[0]);
-			loginInfo.put("userName", userName);
-			loginInfo.put("userFirstName", strAuth[1]);
-			loginInfo.put("userLastName", strAuth[2]);
-			loginInfo.put("profession", strAuth[3]);
-			loginInfo.put("userRole", strAuth[4]);
-			loginInfo.put("expiredDays", strAuth[5]);
-			loginInfo.put("password", password);
-			loginInfo.put("pin", password);
-			loginInfo.put("nextPage", nextPage);
-
-			where = loginUtil.loginSuccess(mapping, request, loginInfo, forcedPasswordChange);
-			if (loginUtil.getIsForwarding())
+			LoginForwardURL loginForwardURL = loginService.loginSuccess(mapping,
+					request,
+					userName,
+					strAuth[0],
+					strAuth[1],
+					strAuth[2],
+					strAuth[3],
+					strAuth[4],
+					strAuth[5],
+					password,
+					pin,
+					nextPage,
+					forcedPasswordChange);
+			where = loginForwardURL.getUrl();
+			if (loginForwardURL.getForwarding())
 			{
 				return mapping.findForward(where);
 			}
@@ -265,7 +267,8 @@ public final class LoginAction extends DispatchAction
 			cl.updateLoginList(ip, userName);
 			CRHelper.recordLoginFailure(userName, request);
 
-			if(ajaxResponse) {
+			if (ajaxResponse)
+			{
 				JSONObject json = new JSONObject();
 				json.put("success", false);
 				response.setContentType("text/x-json");
@@ -310,6 +313,7 @@ public final class LoginAction extends DispatchAction
 
 	/**
 	 * Removes attributes from session
+	 *
 	 * @param request
 	 */
 	private void removeAttributesFromSession(HttpServletRequest request)
@@ -322,6 +326,7 @@ public final class LoginAction extends DispatchAction
 
 	/**
 	 * Performs the error handling
+	 *
 	 * @param password
 	 * @param newPassword
 	 * @param confirmPassword

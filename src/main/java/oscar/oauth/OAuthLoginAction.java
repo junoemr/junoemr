@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,11 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  * <p>
- * This software was written for the
- * Department of Family Medicine
- * McMaster University
- * Hamilton
- * Ontario, Canada
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
  */
 
 
@@ -44,9 +43,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.login.dto.LoginForwardURL;
+import org.oscarehr.login.service.LoginService;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
-import oscar.login.LoginUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,6 +62,8 @@ public final class OAuthLoginAction extends DispatchAction
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	protected static final OscarProperties props = oscar.OscarProperties.getInstance();
+
+	private LoginService loginService = SpringUtils.getBean(LoginService.class);
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -94,23 +97,22 @@ public final class OAuthLoginAction extends DispatchAction
 				String email = payload.getEmail();
 				logger.info("Successfully logged in user by Google OAuth: " + email);
 
-				LoginUtil loginService = new LoginUtil();
-				if (email.contains("cloudpractice.ca") && isProjectMember(email))
+				if (isProjectMember(email))
 				{
-					// Set user to "oscar_host"
-					HashMap<String, String> loginInfo = new HashMap<>();
-					loginInfo.put("email", payload.getEmail());
-					loginInfo.put("providerNo", "999900");
-					loginInfo.put("userName", "oscar_host");
-					loginInfo.put("userFirstName", (String) payload.get("family_name"));
-					loginInfo.put("userLastName", (String) payload.get("given_name"));
-					loginInfo.put("profession", "doctor");
-					loginInfo.put("userRole", "doctor,admin");
-					loginInfo.put("expiredDays", "");
-					loginInfo.put("tokenExpiresIn", payload.getExpirationTimeSeconds().toString());
-
-					String where = loginService.loginSuccess(mapping, request, loginInfo, false);
-					return mapping.findForward(where);
+					LoginForwardURL loginForwardURL = loginService.loginSuccess(mapping,
+							request,
+							"oscar_host",
+							"999900",
+							(String) payload.get("given_name"),
+							(String) payload.get("family_name"),
+							"doctor",
+							"doctor,admin",
+							payload.getExpirationTimeSeconds().toString(),
+							"",
+							"",
+							"",
+							false);
+					return mapping.findForward(loginForwardURL.getUrl());
 				}
 				else
 				{

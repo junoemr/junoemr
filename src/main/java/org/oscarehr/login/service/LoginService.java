@@ -1,10 +1,32 @@
-package oscar.login;
+/**
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
+ */
+
+package org.oscarehr.login.service;
 
 import com.quatro.model.security.LdapSecurity;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.PMmodule.service.ProviderManager;
 import org.oscarehr.PMmodule.web.OcanForm;
 import org.oscarehr.common.dao.FacilityDao;
 import org.oscarehr.common.dao.ProviderPreferenceDao;
@@ -15,12 +37,15 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.login.dto.LoginForwardURL;
 import org.oscarehr.phr.util.MyOscarUtils;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.LoggedInUserFilter;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SessionConstants;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
@@ -31,20 +56,28 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-public class LoginUtil
+@Service
+public class LoginService
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final String LOG_PRE = "Login!@#$: ";
 
+	@Autowired
+	FacilityDao facilityDao;
 
-	private ProviderManager providerManager = (ProviderManager) SpringUtils.getBean("providerManager");
-	private FacilityDao facilityDao = (FacilityDao) SpringUtils.getBean("facilityDao");
-	private ProviderPreferenceDao providerPreferenceDao = (ProviderPreferenceDao) SpringUtils.getBean("providerPreferenceDao");
-	private UserPropertyDAO propDao = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
-	private Boolean isFowarding = false;
+	@Autowired
+	ProviderDao providerDao;
+
+	@Autowired
+	ProviderPreferenceDao providerPreferenceDao;
+
+	@Autowired
+	SecurityDao securityDao;
+
+	@Autowired
+	UserPropertyDAO userPropertyDAO;
 
 	/**
 	 * This method is called upon a successful login with a mapping, request, login information (hash of information
@@ -52,36 +85,36 @@ public class LoginUtil
 	 *
 	 * @param mapping
 	 * @param request
-	 * @param loginInfo
-	 * @param forcedPasswordChange
 	 * @return where
 	 */
-	public String loginSuccess(ActionMapping mapping, HttpServletRequest request, HashMap<String, String> loginInfo, Boolean forcedPasswordChange)
+	public LoginForwardURL loginSuccess(ActionMapping mapping,
+	                                    HttpServletRequest request,
+	                                    String userName,
+	                                    String providerNo,
+	                                    String userFirstName,
+	                                    String userLastName,
+	                                    String profession,
+	                                    String userRole,
+	                                    String expiredDays,
+	                                    String password,
+	                                    String pin,
+	                                    String nextPage,
+	                                    Boolean forcedPasswordChange
+	)
 	{
-		String providerNo = loginInfo.get("providerNo");
-		String userName = loginInfo.get("userName");
-		String userFirstName = loginInfo.get("userFirstName");
-		String userLastName = loginInfo.get("userLastName");
-		String profession = loginInfo.get("doctor");
-		String userRole = loginInfo.get("userRole");
-		String expiredDays = loginInfo.get("expiredDays");
-		String password = loginInfo.get("expiredDays");
-		String pin = loginInfo.get("pin");
-		String nextPage = loginInfo.get("nextPage");
 		logger.info("Successfully logged in " + userName);
 
 		//is the provider record inactive?
 		ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
-		Provider p = providerDao.getProvider(providerNo);
-		if (p == null || (p.getStatus() != null && p.getStatus().equals("0")))
+		Provider provider = providerDao.getProvider(providerNo);
+		if (provider == null || (provider.getStatus() != null && provider.getStatus().equals("0")))
 		{
 			logger.info(LOG_PRE + " Inactive: " + userName);
 			LogAction.addLogEntry(providerNo, LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_FAILURE, "inactive");
 
 			String newURL = mapping.findForward("error").getPath();
 			newURL = newURL + "?errormsg=Your account is inactive. Please contact your administrator to activate.";
-			setIsForwarding(true);
-			return newURL;
+			return new LoginForwardURL(newURL, true);
 		}
 
 		/*
@@ -104,8 +137,7 @@ public class LoginUtil
 				newURL = mapping.findForward("error").getPath();
 				newURL = newURL + "?errormsg=Setting values to the session.";
 			}
-			setIsForwarding(true);
-			return newURL;
+			return new LoginForwardURL(newURL, true);
 		}
 
 		// invalidate the existing session
@@ -145,7 +177,7 @@ public class LoginUtil
 			session.setAttribute("mobileOptimized", "true");
 		}
 		// initiate security manager
-		String default_pmm = null;
+		String defaultPmm = null;
 
 
 		// get preferences from preference table
@@ -162,7 +194,7 @@ public class LoginUtil
 		if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable())
 		{
 			String tklerProviderNo = null;
-			UserProperty prop = propDao.getProp(providerNo, UserProperty.PROVIDER_FOR_TICKLER_WARNING);
+			UserProperty prop = userPropertyDAO.getProp(providerNo, UserProperty.PROVIDER_FOR_TICKLER_WARNING);
 			if (prop == null)
 			{
 				tklerProviderNo = providerNo;
@@ -177,7 +209,7 @@ public class LoginUtil
 			session.setAttribute("default_pmm", providerPreference.getDefaultCaisiPmm());
 			session.setAttribute("caisiBillingPreferenceNotDelete", String.valueOf(providerPreference.getDefaultDoNotDeleteBilling()));
 
-			default_pmm = providerPreference.getDefaultCaisiPmm();
+			defaultPmm = providerPreference.getDefaultCaisiPmm();
 			@SuppressWarnings("unchecked")
 			ArrayList<String> newDocArr = (ArrayList<String>) request.getSession().getServletContext().getAttribute("CaseMgmtUsers");
 			if ("enabled".equals(providerPreference.getDefaultNewOscarCme()))
@@ -192,7 +224,7 @@ public class LoginUtil
 		session.setAttribute("groupno", providerPreference.getMyGroupNo());
 
 		String where = "provider";
-		if (default_pmm != null && "enabled".equals(default_pmm))
+		if (defaultPmm != null && "enabled".equals(defaultPmm))
 		{
 			where = "caisiPMM";
 		}
@@ -209,9 +241,6 @@ public class LoginUtil
 		}
 
 		CRHelper.recordLoginSuccess(userName, providerNo, request);
-
-		String username = (String) session.getAttribute("user");
-		Provider provider = providerManager.getProvider(username);
 		session.setAttribute(SessionConstants.LOGGED_IN_PROVIDER, provider);
 		session.setAttribute(SessionConstants.LOGGED_IN_SECURITY, security);
 
@@ -222,8 +251,7 @@ public class LoginUtil
 		List<Integer> facilityIds = providerDao.getFacilityIds(provider.getProviderNo());
 		if (facilityIds.size() > 1)
 		{
-			setIsForwarding(true);
-			return "/select_facility.jsp?nextPage=" + where;
+			return new LoginForwardURL("/select_facility.jsp?nextPage=" + where, true);
 		}
 		else if (facilityIds.size() == 1)
 		{
@@ -258,37 +286,16 @@ public class LoginUtil
 		{
 			String proceedURL = mapping.findForward(where).getPath();
 			request.getSession().setAttribute("proceedURL", proceedURL);
-			setIsForwarding(true);
-			return "LoginTest";
+			return new LoginForwardURL("LoginTest", true);
 		}
 
 		//are they using the new UI?
-		UserProperty prop = propDao.getProp(provider.getProviderNo(), UserProperty.COBALT);
+		UserProperty prop = userPropertyDAO.getProp(provider.getProviderNo(), UserProperty.COBALT);
 		if (prop != null && prop.getValue() != null && prop.getValue().equals("yes"))
 		{
 			where = "cobalt";
 		}
-		return where;
-	}
-
-	/**
-	 * This method gets whether the returned URL should be forwarded immediately
-	 *
-	 * @return isFowarding
-	 */
-	public Boolean getIsForwarding()
-	{
-		return isFowarding;
-	}
-
-	/**
-	 * This method sets whether the returned URL should be forwarded immediately
-	 *
-	 * @param isFowarding
-	 */
-	private void setIsForwarding(Boolean isFowarding)
-	{
-		this.isFowarding = isFowarding;
+		return new LoginForwardURL(where, false);
 	}
 
 	/**
@@ -364,7 +371,6 @@ public class LoginUtil
 		Security security = getSecurity(userName);
 		security.setPassword(encodePassword(newPassword));
 		security.setForcePasswordReset(Boolean.FALSE);
-		SecurityDao securityDao = (SecurityDao) SpringUtils.getBean("securityDao");
 		securityDao.saveEntity(security);
 
 	}
