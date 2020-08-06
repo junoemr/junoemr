@@ -27,6 +27,7 @@ import ca.cloudpractice.aqs.client.Configuration;
 import ca.cloudpractice.aqs.client.api.AdminApi;
 import ca.cloudpractice.aqs.client.api.OrganizationApi;
 import ca.cloudpractice.aqs.client.auth.ApiKeyAuth;
+import ca.cloudpractice.aqs.client.model.RemoteUserType;
 import oscar.OscarProperties;
 
 public abstract class BaseService extends org.oscarehr.integration.BaseService
@@ -48,10 +49,10 @@ public abstract class BaseService extends org.oscarehr.integration.BaseService
 	{
 		//setup api client
 		ApiClient apiClient = Configuration.getDefaultApiClient();
-		apiClient.setBasePath(AQS_PROTOCOL + BASE_END_POINT);
-		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_INTEGRATION_ID)).setApiKey("API KEY??!?!?!?!?");
-		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_ID)).setApiKey("1234??????");
-		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_TYPE)).setApiKey("Oscar?");
+		apiClient.setBasePath(AQS_PROTOCOL + "://" + BASE_END_POINT);
+		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_INTEGRATION_ID)).setApiKey("ben1");//TODO get juno instance name
+		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_ID)).setApiKey("128");//TODO (security number) use logged in user to set this!!!!!!!!!!!!!!
+		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_TYPE)).setApiKey(RemoteUserType.JUNO_SECURITY.name());
 
 		adminApi = new AdminApi(apiClient);
 		organizationApi = new OrganizationApi(apiClient);

@@ -27,7 +27,7 @@ import {
 	JUNO_STYLE,
 	JUNO_TAB_TYPE
 } from "../../../common/components/junoComponentConstants";
-import {AqsQueuesApi, AqsQueuedAppointmentsApi} from "../../../../generated";
+import {AqsQueuesApi, AqsQueuedAppointmentApi} from "../../../../generated";
 
 angular.module('Layout.Components').component('appointmentQueue', {
 	templateUrl: 'src/layout/components/appointmentQueue/appointmentQueue.jsp',
@@ -56,7 +56,7 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		let aqsQueuesApi = new AqsQueuesApi($http, $httpParamSerializer,
 				'../ws/rs');
 		// load apis
-		let aqsQueuedAppointmentsApi = new AqsQueuedAppointmentsApi($http, $httpParamSerializer,
+		let aqsQueuedAppointmentApi = new AqsQueuedAppointmentApi($http, $httpParamSerializer,
 				'../ws/rs');
 
 		// hash of all queues
@@ -110,7 +110,7 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				let appointmentQueues = (await aqsQueuesApi.getAppointmentQueues()).data.body;
 				for(let queue of appointmentQueues)
 				{
-					queue.items = (await aqsQueuedAppointmentsApi.getAppointmentsInQueue(queue.id)).data.body;
+					queue.items = (await aqsQueuedAppointmentApi.getAppointmentsInQueue(queue.id)).data.body;
 					ctrl.queues.push(queue);
 				}
 
@@ -167,7 +167,7 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				{
 					try
 					{
-						await aqsQueuedAppointmentsApi.deleteAppointment(ctrl.currentQueue.items[itemIndex].queueId, ctrl.currentQueue.items[itemIndex].id, reason);
+						await aqsQueuedAppointmentApi.deleteAppointment(ctrl.currentQueue.items[itemIndex].queueId, ctrl.currentQueue.items[itemIndex].id, reason);
 						ctrl.currentQueue.items.splice(itemIndex, 1);
 					}
 					catch(err)

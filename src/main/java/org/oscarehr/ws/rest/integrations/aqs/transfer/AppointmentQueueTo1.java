@@ -31,12 +31,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.oscarehr.integration.aqs.model.AppointmentQueue;
 import org.springframework.beans.BeanUtils;
-import oscar.util.Jackson.ZonedDateTimeStringSerializer;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

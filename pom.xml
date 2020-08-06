@@ -1296,7 +1296,7 @@
 		<dependency>
 			<groupId>ca.cloudpractice</groupId>
 			<artifactId>aqs-java-client</artifactId>
-			<version>RELEASE</version>
+			<version>0.0.10</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -1721,7 +1721,7 @@
 					<systemProperties>
 						<systemProperty>
 							<key>openApiSpecBuilder.resourceClassCsv</key>
-							<value>org.oscarehr.ws.rest.SystemPreferenceWebService,org.oscarehr.ws.rest.ScheduleService,org.oscarehr.ws.rest.SitesService,org.oscarehr.ws.rest.AppointmentService,org.oscarehr.ws.rest.ProviderPreferenceWebService,org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService,org.oscarehr.ws.rest.myhealthaccess.DemographicWebService,org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService,org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService,org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService,org.oscarehr.ws.rest.integrations.aqs.QueueWebService</value>
+							<value>org.oscarehr.ws.rest.SystemPreferenceWebService,org.oscarehr.ws.rest.ScheduleService,org.oscarehr.ws.rest.SitesService,org.oscarehr.ws.rest.AppointmentService,org.oscarehr.ws.rest.ProviderPreferenceWebService,org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService,org.oscarehr.ws.rest.myhealthaccess.DemographicWebService,org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService,org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService,org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService,org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService,org.oscarehr.ws.rest.integrations.aqs.QueueWebService</value>
 						</systemProperty>
 						<systemProperty>
 							<key>openApiSpecBuilder.outputDirectory</key>

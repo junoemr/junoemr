@@ -371,6 +371,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.InboxService"/>
 			<!-- AQS (Appointment Queue Service) -->
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueueWebService"/>
 			<!-- AQS -->

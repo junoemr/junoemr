@@ -34,13 +34,10 @@ import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.aqs.model.QueuedAppointment;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import oscar.util.Jackson.ZonedDateTimeStringSerializer;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
