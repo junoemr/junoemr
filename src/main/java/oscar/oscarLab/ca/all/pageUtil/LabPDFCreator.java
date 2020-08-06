@@ -56,6 +56,7 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
 import org.oscarehr.labs.service.Hl7TextInfoService;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
@@ -65,6 +66,8 @@ import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.rtf.RTFEditorKit;
 import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -166,6 +169,35 @@ public class LabPDFCreator extends PdfPageEventHelper {
     	document.close();
     	os.flush();
     }
+
+	/**
+	 * Exists solely because CELLPATHR labs have RTF documents inside their HL7 body for whatever reason.
+	 * Function gets text in same way that we do for displaying labs.
+	 * @return RTF content of lab as a String
+	 */
+	public String getRtfAsText(MessageHandler handler)
+	{
+		try
+		{
+			//create bytes from the rtf string
+			byte[] rtfBytes = handler.getOBXResult(0, 0).getBytes();
+			ByteArrayInputStream rtfStream = new ByteArrayInputStream(rtfBytes);
+
+			//Use RTFEditor Kit to get plaintext from RTF
+			RTFEditorKit rtfParser = new  RTFEditorKit();
+			javax.swing.text.Document doc = rtfParser.createDefaultDocument();
+			rtfParser.read(rtfStream, doc, 0);
+			String disclaimer = "IMPORTANT DISCLAIMER: You are viewing a PREVIEW of the original report. " +
+					"The rich text formatting contained in the original report may convey critical information that must be considered for clinical decision making.";
+			return disclaimer + "\n" + doc.getText(0, doc.getLength());
+		}
+		catch (BadLocationException | IOException e)
+		{
+			MiscUtils.getLogger().error("Error attempting to treat RTF as text: ", e);
+			return "The attached CELLPATHR lab type could not be converted for consultation printing.";
+		}
+	}
+
     public void printPdf() throws IOException, DocumentException{
 
         // check that we have data to print
@@ -201,7 +233,10 @@ public class LabPDFCreator extends PdfPageEventHelper {
 			PdfPTable table = new PdfPTable(1);
 			table.setWidthPercentage(100);
 			PdfPCell cell = new PdfPCell();
-			cell.setPhrase(new Phrase("The attached CELLPATHR lab type is not compatible with consultation prints", boldFont));
+
+			String rtfText = getRtfAsText(handler);
+			cell.setPhrase(new Phrase(rtfText, boldFont));
+
 			table.addCell(cell);
 			document.add(table);
 		}
