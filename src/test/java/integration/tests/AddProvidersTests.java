@@ -26,15 +26,14 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.data.ProviderTestData;
-import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.io.IOException;
@@ -42,21 +41,18 @@ import java.sql.SQLException;
 
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 
-public class AddProvidersTests extends SeleniumTestBase {
-
-	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+public class AddProvidersTests extends SeleniumTestBase
+{
+	@AfterClass
+	public static void cheanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "program_provider",
 				"provider", "provider_billing", "providerbillcenter", "secUserRole");
 	}
 
 	@Test
-	public void addProvidersClassicUITest() throws Exception {
-		// login
-		if (!Navigation.isLoggedIn(driver)) {
-			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
-		}
+	public void addProvidersClassicUITest() throws Exception
+	{
 		// open administration panel
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);

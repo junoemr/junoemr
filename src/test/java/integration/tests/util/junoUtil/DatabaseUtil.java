@@ -45,14 +45,14 @@ import static org.oscarehr.common.dao.utils.AuthUtils.TEST_PROVIDER_ID;
 
 public class DatabaseUtil
 {
-	public static Demographic createTestDemographic()
+	public static Demographic createTestDemographic(String fName, String lName, String sex)
 	{
 		DemographicService demoService = (DemographicService)SpringUtils.getBean("demographic.service.DemographicService");
 		Demographic demo = new Demographic();
 		demo.setDateOfBirth(LocalDate.now());
-		demo.setFirstName("Test");
-		demo.setLastName("Test");
-		demo.setSex("F");
+		demo.setFirstName(fName);
+		demo.setLastName(lName);
+		demo.setSex(sex);
 		demo.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
 		return demoService.addNewDemographicRecord(TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
 	}

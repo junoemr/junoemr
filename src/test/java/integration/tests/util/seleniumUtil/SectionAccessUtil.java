@@ -20,24 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-package integration.tests;
+package integration.tests.util.seleniumUtil;
 
-import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.Navigation;
-import org.junit.Assert;
-import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 
-
-public class BasicOscarTests extends SeleniumTestBase
+public class SectionAccessUtil
 {
-	@Test
-	public void isOscarReachable() throws Exception {
-		driver.get(Navigation.OSCAR_URL + "/index.jsp");
-		Assert.assertTrue("Cannot reach login page",!driver.getTitle().isEmpty());
+	public static void accessScheduleMgSection(WebDriver driver, String sectionName)
+	{
+		driver.findElement(By.id("admin-panel")).click();
+		PageUtil.switchToLastWindow(driver);
+		driver.findElement(By.linkText("Schedule Management")).click();
+		driver.findElement(By.linkText(sectionName)).click();
+		driver.switchTo().frame("myFrame");
 	}
-
-	/*@Test
-	public void canLogin() throws Exception {
-		Navigation.doLogin(AuthUtils.TEST_USER_NAME,AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
-	}*/
 }
