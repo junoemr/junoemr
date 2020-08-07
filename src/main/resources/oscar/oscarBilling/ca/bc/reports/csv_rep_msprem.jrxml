@@ -205,7 +205,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None">
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Practioner/Provider]]></text>
+				<text><![CDATA[Provider]]></text>
 			</staticText>
 		</band>
 	</title>
