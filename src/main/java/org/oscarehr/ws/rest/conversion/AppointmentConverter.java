@@ -292,7 +292,10 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		calendarAppointment.setTagSelfCancelled(false);
 		calendarAppointment.setDoNotBook(appointment.getName().equals(Appointment.DONOTBOOK));
 		calendarAppointment.setAppointmentName(appointmentName);
-		calendarAppointment.setBookingSource(appointment.getBookingSource() == null ? null : appointment.getBookingSource().toString());
+		if (appointment.getBookingSource() != null)
+		{
+			calendarAppointment.setBookingSource(appointment.getBookingSource().toString());
+		}
 
 		return calendarAppointment;
 	}
