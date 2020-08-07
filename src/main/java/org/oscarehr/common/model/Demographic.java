@@ -1582,4 +1582,14 @@ public class Demographic implements Serializable
 		setPhone(filterControlCharacters(getPhone()));
 		setPhone2(filterControlCharacters(getPhone2()));
 	}
+
+	/**
+	 * checks if the demographic is active. Not to be confused with "isActive"
+	 * which is completely different.
+	 * @return - true if active false otherwise.
+	 */
+	public boolean isPatientActive()
+	{
+		return !org.oscarehr.demographic.model.Demographic.getInactiveDemographicStatuses().contains(this.getPatientStatus());
+	}
 }

@@ -58,8 +58,10 @@ public class CalendarAppointment implements Serializable
 	private boolean tagSelfBooked;
 	private boolean tagSelfCancelled;
 	private boolean virtual;
+	private boolean sendNotification;
 	private String tagSystemCodes;
 	private String appointmentName;
+	private boolean isConfirmed;
 
 	public CalendarAppointment()
 	{}
@@ -72,7 +74,7 @@ public class CalendarAppointment implements Serializable
 	                           String eventStatusModifier, Integer numInvoices, String reason, Integer reasonCode,
 	                           String notes, String tagNames, String site, String type,
 	                           String resources, String urgency, boolean doNotBook, boolean tagSelfBooked,
-	                           boolean tagSelfCancelled, boolean virtual, String tagSystemCodes)
+	                           boolean tagSelfCancelled, boolean virtual, String tagSystemCodes, boolean isConfirmed)
 	{
 		this.appointmentNo = appointmentNo;
 		this.billingRegion = billingRegion;
@@ -104,6 +106,7 @@ public class CalendarAppointment implements Serializable
 		this.tagSelfCancelled = tagSelfCancelled;
 		this.tagSystemCodes = tagSystemCodes;
 		this.virtual = virtual;
+		this.isConfirmed = isConfirmed;
 	}
 
 	public Integer getAppointmentNo()
@@ -416,6 +419,26 @@ public class CalendarAppointment implements Serializable
 		this.appointmentName = appointmentName;
 	}
 
+	public boolean isSendNotification()
+	{
+		return sendNotification;
+	}
+
+	public void setSendNotification(boolean sendNotification)
+	{
+		this.sendNotification = sendNotification;
+	}
+
+	public boolean isConfirmed()
+	{
+		return isConfirmed;
+	}
+
+	public void setConfirmed(boolean confirmed)
+	{
+		isConfirmed = confirmed;
+	}
+
 	@Override
 	public boolean equals(Object o)
 	{
@@ -449,7 +472,8 @@ public class CalendarAppointment implements Serializable
 				Objects.equals(type, that.type) &&
 				Objects.equals(resources, that.resources) &&
 				Objects.equals(urgency, that.urgency) &&
-				Objects.equals(tagSystemCodes, that.tagSystemCodes);
+				Objects.equals(tagSystemCodes, that.tagSystemCodes) &&
+				Objects.equals(isConfirmed, that.isConfirmed);
 	}
 
 	@Override
@@ -491,6 +515,7 @@ public class CalendarAppointment implements Serializable
 				", tagSelfCancelled=" + tagSelfCancelled +
 				", isVirtual=" + virtual +
 				", tagSystemCodes='" + tagSystemCodes + '\'' +
+				", isConfirmed=" + isConfirmed +
 				'}';
 	}
 }

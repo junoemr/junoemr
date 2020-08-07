@@ -68,6 +68,7 @@
 <%@page import="java.util.List" %>
 <%@page import="java.util.Set" %>
 <%@ page import="static oscar.util.StringUtils.filterControlCharacters" %>
+<%@ page import="org.oscarehr.demographic.service.DemographicService" %>
 <%@page errorPage="errorpage.jsp"%>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -83,7 +84,8 @@
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 	DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
 	RecentDemographicAccessService recentDemographicAccessService = SpringUtils.getBean(RecentDemographicAccessService.class);
-	
+	DemographicService demographicService = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
+
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 	
 %>
@@ -334,11 +336,9 @@
 	        }
 	    }
 	}
-	//archive the existing demographic record, main table entry
-	Long demographicArchiveId = demographicArchiveDao.archiveRecord(demographic);
 
-	//save the demographic
-	demographicDao.save(demographic);
+	//save
+	demographicService.updateLegacyDemographicRecord(demographic, extensions, loggedInInfo);
 
 	// save custom licensed producer if enabled
 	if(oscarVariables.isPropertyActive("show_demographic_licensed_producers")) {
@@ -358,9 +358,6 @@
 
 	// for the IBD clinic
 	OtherIdManager.saveIdDemographic(demographicNo, "meditech_id", request.getParameter("meditech_id"));
-
-	// save the demographic extensions & archive them
-	demographicManager.saveAndArchiveDemographicExt(demographicArchiveId, extensions);
     
     try{
     	oscar.oscarDemographic.data.DemographicNameAgeString.resetDemographic(demographicNoStr);

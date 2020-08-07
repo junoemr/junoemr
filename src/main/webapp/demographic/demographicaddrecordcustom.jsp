@@ -180,6 +180,9 @@
 		<link rel="stylesheet" type="text/css" media="all"
 		      href="../share/calendar/calendar.css" title="win2k-cold-1" />
 
+        <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+        <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
+
 		<!-- main calendar program -->
 		<script type="text/javascript" src="../share/calendar/calendar.js"></script>
 
@@ -734,14 +737,6 @@
 			<input type="text" name="email" value="">
 		</div>
 		<%
-		}else if(custom_demographic_fields.get(i).equals("pin")){
-		%>
-		<div>
-			<label><b><bean:message key="demographic.demographicaddrecordhtm.formPIN" />:</b></label>
-			<input type="text" name="pin" value="">
-		</div>
-		<%
-
 		}else if(custom_demographic_fields.get(i).equals("dob")){
 		%>
 		<div>
@@ -1661,10 +1656,6 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 		</div>
 	</form>
 	<script src="<%=protocol%>www.google.com/jsapi"></script>
-	<script>
-		google.load("jquery", "1");
-		google.load("jqueryui", "1");
-	</script>
 	<script type="text/javascript">
 	<%
 		if(request.getParameter("dupHin") != null && request.getParameter("dupHin").equals("true"))
@@ -1682,12 +1673,12 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 	<%
 		}
 	%>
-		$(document).ready(function()
+        jQuery(document).ready(function()
 		{
 			// AJAX autocomplete referrer doctors
-			$("input[name=referral_doctor_name]").keypress(function()
+            jQuery("input[name=referral_doctor_name]").keypress(function()
 			{
-				$("input[name=referral_doctor_name]").autocomplete({
+                jQuery("input[name=referral_doctor_name]").autocomplete({
 					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
 					select: function(event, ui)
 					{
@@ -1695,13 +1686,13 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 					}
 				});
 			});
-			$("input[name=referral_doctor_no]").keypress(function()
+            jQuery("input[name=referral_doctor_no]").keypress(function()
 			{
-				$("input[name=referral_doctor_no]").autocomplete({
+                jQuery("input[name=referral_doctor_no]").autocomplete({
 					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
 					select: function(event, ui)
 					{
-						$("input[name=referral_doctor_name]").val(ui.item.namedesc);
+                        jQuery("input[name=referral_doctor_name]").val(ui.item.namedesc);
 					}
 				});
 			});

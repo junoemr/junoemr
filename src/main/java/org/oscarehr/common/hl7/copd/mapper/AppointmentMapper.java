@@ -29,6 +29,7 @@ import org.oscarehr.common.hl7.copd.model.v24.segment.SCH;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;
 
@@ -39,17 +40,22 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.oscarehr.common.hl7.Hl7Const.HL7_SEGMENT_SCH_11;
+
 public class AppointmentMapper extends AbstractMapper
 {
+	private final CoPDRecordData recordData;
 
 	public static final int APPOINTMENT_TYPE_LENGTH = 50;
 	public static final int APPOINTMENT_REASON_LENGTH = 80;
 	public static final String DEFAULT_APPOINTMENT_DURATION_HR = "1";
 	public static final String DEFAULT_APPOINTMENT_DURATION_MIN = "15";
+	public static final Date FALLBACK_APPOINTMENT_DATE = new Date(1900, 1, 1, 0 ,0);
 
-	public AppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
+	public AppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
 		super(message, importSource);
+		this.recordData = recordData;
 	}
 
 	public int getNumAppointments()
@@ -72,11 +78,6 @@ public class AppointmentMapper extends AbstractMapper
 	{
 		Appointment appointment = new Appointment();
 		Date appointmentDate = getAppointmentDate(rep);
-
-		if (appointmentDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
-		{
-			appointmentDate = getCreationDate(rep);
-		}
 
 		appointment.setAppointmentDate(appointmentDate);
 		appointment.setStartTime(appointmentDate);
@@ -101,7 +102,8 @@ public class AppointmentMapper extends AbstractMapper
 			reason = StringUtils.left(reason, APPOINTMENT_REASON_LENGTH);
 		}
 
-		appointment.setReason(reason);
+		// hopefully one day appointments will handle null values correctly. until then, trim to empty
+		appointment.setReason(StringUtils.trimToEmpty(reason));
 		appointment.setType(type);
 		appointment.setLocation("");
 		appointment.setResources("");
@@ -128,12 +130,16 @@ public class AppointmentMapper extends AbstractMapper
 
 	public String getNotes(int rep) throws HL7Exception
 	{
-		return StringUtils.trimToNull(message.getPATIENT().getSCH(rep).getSch30_zNotes().getValue());
+		String value = message.getPATIENT().getSCH(rep).getSch30_zNotes().getValue();
+		value = (value == null) ? null : value.replaceAll("~crlf~", "\n");
+		return StringUtils.trimToNull(value);
 	}
 
 	public String getReason(int rep) throws HL7Exception
 	{
-		return StringUtils.trimToNull(message.getPATIENT().getSCH(rep).getSch29_zAppointmentReason().getValue());
+		String value = message.getPATIENT().getSCH(rep).getSch29_zAppointmentReason().getValue();
+		value = (value == null) ? null : value.replaceAll("~crlf~", "\n");
+		return StringUtils.trimToNull(value);
 	}
 
 	/**
@@ -157,6 +163,27 @@ public class AppointmentMapper extends AbstractMapper
 	{
 		SCH sch = message.getPATIENT().getSCH(rep);
 		Date apptDate = ConversionUtils.getLegacyDateFromDateString(sch.getSch11_AppointmentTimingQuantity(0).getStartDateTime().getTimeOfAnEvent().getValue(), "yyyyMMddHHmmss");
+
+		if (apptDate == null)
+		{
+			Date creationDate = getCreationDate(rep);
+
+			if (creationDate != null)
+			{
+				String warning = "Appointment date is null, falling back to creation date: " + creationDate.toString() + "\n";
+				logger.info(warning);
+				recordData.addMessage(HL7_SEGMENT_SCH_11, String.valueOf(rep), warning);
+				apptDate = creationDate;
+			}
+			else
+			{
+				String warning = "Appointment date and creation date are both null, using fallback date 1900-01-01 00:00:00\n" + sch.toString() + "\n";
+				logger.warn(warning);
+				recordData.addMessage(HL7_SEGMENT_SCH_11, String.valueOf(rep), warning);
+				apptDate = FALLBACK_APPOINTMENT_DATE;
+			}
+		}
+
 		return apptDate;
 	}
 
@@ -181,11 +208,13 @@ public class AppointmentMapper extends AbstractMapper
 				apptDurationRawValue = DEFAULT_APPOINTMENT_DURATION_MIN;
 			}
 		}
-		apptDuration = Integer.parseInt(apptDurationRawValue);
+		// Round down duration. "12.5" parses to 12
+		double apptDurationDouble = Double.parseDouble(apptDurationRawValue);
+		apptDuration = (int) apptDurationDouble;
 
-		if (appointmentDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
-		{// if no appointment date, use creation date instead.
-			appointmentDate = getCreationDate(rep);
+		if(Math.abs(apptDuration - apptDurationDouble) > 0.1)
+		{
+			logger.warn("Appointment duration " + apptDurationDouble + " " + apptDurationUnit + "is being truncated to " + apptDuration + " " + apptDurationUnit);
 		}
 
 		return calcEndTime(appointmentDate, apptDuration, apptDurationUnit);

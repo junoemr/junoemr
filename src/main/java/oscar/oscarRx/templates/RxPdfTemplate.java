@@ -24,10 +24,10 @@
 
 package oscar.oscarRx.templates;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 

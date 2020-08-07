@@ -116,6 +116,8 @@
 	String reason = ConversionUtils.getStringOrDefaultValue(request.getParameter("reason"), "");
 	String location = ConversionUtils.getStringOrDefaultValue(request.getParameter("location"), "");
 	String isVirtual = ConversionUtils.getStringOrDefaultValue(request.getParameter("isVirtual"), "off");
+	Boolean sendBookingNotification = ConversionUtils.parseBoolean(
+			ConversionUtils.getStringOrDefaultValue(request.getParameter("sendBookingNotification"), "false"));
 	String resources = ConversionUtils.getStringOrDefaultValue(request.getParameter("resources"), "");
 	String type = ConversionUtils.getStringOrDefaultValue(request.getParameter("type"), "");
 	String style = ConversionUtils.getStringOrDefaultValue(request.getParameter("style"), null);
@@ -149,6 +151,7 @@
 	appointment.setStatus(status);
 	appointment.setCreateDateTime(createDateTime);
 	appointment.setCreator(creator);
+	appointment.setLastUpdateUser(creator);
 	appointment.setRemarks(remarks);
 	appointment.setReasonCode(reasonCode);
 	appointment.setDemographicNo(demographicNo);
@@ -167,7 +170,14 @@
 		}
 		else
 		{
-			appointmentService.saveNewAppointment(appointment, loggedInInfo, request);
+			if (appointment.getIsVirtual())
+			{
+				appointmentService.saveNewTelehealthAppointment(appointment, loggedInInfo, request, sendBookingNotification);
+			}
+			else
+			{
+				appointmentService.saveNewAppointment(appointment, loggedInInfo, request, sendBookingNotification);
+			}
 		}
 		appointmentNo = appointment.getId();
 	}

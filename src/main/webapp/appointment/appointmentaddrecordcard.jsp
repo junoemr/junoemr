@@ -53,6 +53,7 @@ org.oscarehr.common.model.Provider"%>
 <%@page import="oscar.util.ConversionUtils" %>
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Date" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
@@ -82,6 +83,8 @@ org.oscarehr.common.model.Provider"%>
 		demographicNo = Integer.parseInt(request.getParameter("demographic_no"));
 	} 
 
+	String creatorNo = request.getParameter("creator");
+
     int rowsAffected = 0;
     
     if(request.getParameter("appointment_no") == null) {
@@ -105,8 +108,9 @@ org.oscarehr.common.model.Provider"%>
     	a.setUrgency((request.getParameter("urgency")!=null)?request.getParameter("urgency"):"");
     	a.setDemographicNo(demographicNo);
     	a.setProgramId(Integer.parseInt((String)request.getSession().getAttribute("programId_oscarView")));
-    	a.setCreator(request.getParameter("creator"));
-    	a.setCreateDateTime(ConversionUtils.fromDateString(request.getParameter("createdatetime")));
+    	a.setCreator(creatorNo);
+    	a.setLastUpdateUser(creatorNo);
+    	a.setCreateDateTime(new Date());
     	a.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
     	appointmentDao.persist(a);
    		rowsAffected=1;

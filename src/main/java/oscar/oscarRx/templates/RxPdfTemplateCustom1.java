@@ -32,45 +32,51 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import com.lowagie.text.pdf.PdfContentByte;
 import org.oscarehr.rx.service.RxWatermarkService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.PrescriptionQrCodeUIBean;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Element;
-import com.lowagie.text.Font;
-import com.lowagie.text.FontFactory;
-import com.lowagie.text.Image;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Phrase;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.PdfPCell;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfLayer;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import oscar.OscarProperties;
 
-public class RxPdfTemplateCustom1 extends RxPdfTemplate {
+public class RxPdfTemplateCustom1 extends RxPdfTemplate
+{
 
 	Font baseFont;
 	Font headerFont;
 	Font smallFont;
 
-	public RxPdfTemplateCustom1(final HttpServletRequest req, final ServletContext ctx) {
+	public RxPdfTemplateCustom1(final HttpServletRequest req, final ServletContext ctx)
+	{
 		super(req, ctx);
 	}
 
 	@Override
-	protected Rectangle getPageSize(String pageSizeParameter) {
+	protected Rectangle getPageSize(String pageSizeParameter)
+	{
 		return PageSize.LETTER;
 	}
+
 	@Override
-	protected Document documentSetup(Document document, PdfWriter writer) {
+	protected Document documentSetup(Document document, PdfWriter writer)
+	{
 
 		String title = req.getParameter("__title") != null ? req.getParameter("__title") : "Unknown";
 		document.addTitle(title);
@@ -81,16 +87,18 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		document.addHeader("Expires", "0");
 		return document;
 	}
-	@Override
-	protected void buildPdfLayout(Document document, PdfWriter writer) throws DocumentException, IOException {
 
-		headerFont = FontFactory.getFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+	@Override
+	protected void buildPdfLayout(Document document, PdfWriter writer) throws DocumentException, IOException
+	{
+
+		headerFont = FontFactory.getFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 		headerFont.setSize(18);
 
-		baseFont = FontFactory.getFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+		baseFont = FontFactory.getFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 		baseFont.setSize(12);
 
-		smallFont = FontFactory.getFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+		smallFont = FontFactory.getFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 		smallFont.setSize(8);
 
 		createRxPdf(document, writer);
@@ -103,30 +111,40 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 	 * @param border true if a border should surround the table being added
 	 * @return the cell containing the table being added to the main table.	 *
 	 */
-	protected PdfPCell addToTable(PdfPTable main, PdfPTable add, boolean border) {
+	protected PdfPCell addToTable(PdfPTable main, PdfPTable add, boolean border)
+	{
 		PdfPCell cell = new PdfPCell(add);
-		if (!border) { cell.setBorder(0); }
+		if (!border)
+		{
+			cell.setBorder(0);
+		}
 		main.addCell(cell);
 		return cell;
 	}
 
-	protected void createRxPdf(Document document, PdfWriter writer) throws DocumentException {
+	protected void createRxPdf(Document document, PdfWriter writer) throws DocumentException, IOException
+	{
+		PdfLayer pdflayer = new PdfLayer("Main layer", writer);
+		PdfLayer watermarkLayer = new PdfLayer("Watermark layer", writer);
+		PdfContentByte cb = writer.getDirectContent();
 
-		PdfPTable mainTable = new PdfPTable(1);
-		mainTable.setExtendLastRow(false);//last cell will try to fill the page
-		mainTable.setTotalWidth(document.getPageSize().getWidth());
-		//mainTable.getDefaultCell().setPadding(10f);
-
-		// render background watermark
 		if (RxWatermarkService.isWatermarkEnabled() && RxWatermarkService.isWatermarkBackground())
 		{
-			PdfContentByte cb = writer.getDirectContent();
 			Image image = createWaterMarkImage(document);
 			if (image != null)
 			{
+				watermarkLayer.setOn(true);
+				cb.beginLayer(watermarkLayer);
 				cb.addImage(image);
+				cb.endLayer();
 			}
 		}
+
+		pdflayer.setOn(true);
+		cb.beginLayer(pdflayer);
+		PdfPTable mainTable = new PdfPTable(1);
+		mainTable.setExtendLastRow(true);
+		mainTable.setTotalWidth(document.getPageSize().getWidth());
 
 		addToTable(mainTable, buildClinicHeader(), true);
 
@@ -134,27 +152,24 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 
 		addToTable(mainTable, buildPrescriptionBody(), false);
 
+		// Align the footer to the bottom
 		PdfPCell cell = new PdfPCell(buildPageFooter());
 		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
 		cell.setBorder(0);
-		cell.setFixedHeight(document.getPageSize().getHeight() - mainTable.getTotalHeight() - 36);//last cell will try to fill the page
 		mainTable.addCell(cell);
 
-		/*PdfPCell borderCell = new PdfPCell(mainTable);
-		borderCell.setBorder(1);
-		PdfPTable outerTable = new PdfPTable(1);
-		outerTable.addCell(borderCell);*/
-
+		cb.endLayer();
 		document.add(mainTable);
 
-		// render foreground watermark
 		if (RxWatermarkService.isWatermarkEnabled() && !RxWatermarkService.isWatermarkBackground())
 		{
-			PdfContentByte cb = writer.getDirectContent();
-			Image waterMark = createWaterMarkImage(document);
-			if (waterMark != null)
+			Image image = createWaterMarkImage(document);
+			if (image != null)
 			{
-				cb.addImage(waterMark);
+				watermarkLayer.setOn(true);
+				cb.beginLayer(watermarkLayer);
+				cb.addImage(image);
+				cb.endLayer();
 			}
 		}
 	}
@@ -163,67 +178,79 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 	{
 		try
 		{
+
 			Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
-			float scaleFactor = (document.getPageSize().getWidth()*0.8f)/watermarkImg.getWidth();
-			watermarkImg.scalePercent(scaleFactor*100f);
-			watermarkImg.setAbsolutePosition(document.getPageSize().getWidth()/2 - (watermarkImg.getWidth()*scaleFactor) / 2,
-					document.getPageSize().getHeight()/2 - (watermarkImg.getHeight()*scaleFactor) / 2);
+			float scaleFactor = (document.getPageSize().getWidth() * 0.8f) / watermarkImg.getWidth();
+			watermarkImg.scalePercent(scaleFactor * 100f);
+			watermarkImg.setAbsolutePosition(document.getPageSize().getWidth() / 2 - (watermarkImg.getWidth() * scaleFactor) / 2,
+					document.getPageSize().getHeight() / 2 - (watermarkImg.getHeight() * scaleFactor) / 2);
 			return watermarkImg;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			MiscUtils.getLogger().error("error creating watermark image: " + e.getMessage(), e);
 		}
 		return null;
 	}
 
-	protected Image buildLogoImage() {
+	protected Image buildLogoImage()
+	{
 
 		Image img = null;
-		try {
+		try
+		{
 			String custom_logo_name = OscarProperties.getInstance().getProperty("rx_custom_logo");
-			if(custom_logo_name != null ){
+			if (custom_logo_name != null)
+			{
 				img = Image.getInstance(OscarProperties.getInstance().getProperty("eform_image") + custom_logo_name);
 			}
-			else {
-				img = Image.getInstance(System.getProperty( "catalina.base" ) + "/webapps" + req.getContextPath() + "/oscarRx/img/rx.gif");
+			else
+			{
+				img = Image.getInstance(System.getProperty("catalina.base") + "/webapps" + req.getContextPath() + "/oscarRx/img/rx.gif");
 			}
 		}
-		catch(Exception e) {
+		catch (Exception e)
+		{
 			logger.error("Error loading Rx Logo image", e);
 		}
 		return img;
 	}
 
-	protected Image buildSignatureImage() {
-		String imgFile=req.getParameter("imgFile");
+	protected Image buildSignatureImage()
+	{
+		String imgFile = req.getParameter("imgFile");
 		Image img = null;
-		try {
+		try
+		{
 			img = Image.getInstance(imgFile);
 			img.setBorder(0);
 		}
-		catch(Exception e) {
+		catch (Exception e)
+		{
 			logger.error("Error loading Rx Signature image", e);
 		}
 		return img;
 	}
 
-	protected PdfPTable buildDoctorHeader() {
+	protected PdfPTable buildDoctorHeader()
+	{
 		String sigDoctorName = req.getParameter("sigDoctorName");
-		String pracNo=req.getParameter("pracNo");
+		String pracNo = req.getParameter("pracNo");
 		String clinicName;
 		String clinicTel;
 		String clinicFax;
 		// check if satellite clinic is used
 		String useSatelliteClinic = req.getParameter("useSC");
-		if (useSatelliteClinic != null && useSatelliteClinic.equalsIgnoreCase("true")) {
+		if (useSatelliteClinic != null && useSatelliteClinic.equalsIgnoreCase("true"))
+		{
 			String scAddress = req.getParameter("scAddress");
-			HashMap<String,String> hm = parseSCAddress(scAddress);
-			clinicName =  hm.get("clinicName");
+			HashMap<String, String> hm = parseSCAddress(scAddress);
+			clinicName = hm.get("clinicName");
 			clinicTel = hm.get("clinicTel");
 			clinicFax = hm.get("clinicFax");
 		}
-		else {
+		else
+		{
 			clinicName = req.getParameter("clinicName");
 			clinicTel = req.getParameter("clinicPhone");
 			clinicFax = req.getParameter("clinicFax");
@@ -251,16 +278,19 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 
 		return headerTable;
 	}
-	protected PdfPTable buildClinicHeader() {
+
+	protected PdfPTable buildClinicHeader()
+	{
 
 		float[] tableWidths = new float[]{ 1.0f, 3.0f };
 		PdfPTable headerTable = new PdfPTable(tableWidths);
 		headerTable.getDefaultCell().setPadding(5f);
 
 		Image logo = buildLogoImage();
-		if(logo != null) {
-			logo.setBorder(0);
+		if (logo != null)
+		{
 			logo.setAlignment(Element.ALIGN_CENTER);
+			headerTable.getDefaultCell().setBorder(Rectangle.RIGHT);
 			headerTable.addCell(logo);
 		}
 
@@ -270,17 +300,18 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 
 	}
 
-	protected PdfPTable buildPatientInfoHeader() {
+	protected PdfPTable buildPatientInfoHeader()
+	{
 
 		String patientPhone = req.getParameter("patientPhone");
 		patientPhone = patientPhone.replace("Tel", "");
 		String patientCityPostal = req.getParameter("patientCityPostal");
 		String patientAddress = req.getParameter("patientAddress");
 		String patientName = req.getParameter("patientName");
-		String patientHIN=req.getParameter("patientHIN");
+		String patientHIN = req.getParameter("patientHIN");
 		String patientChartNo = req.getParameter("patientChartNo");
-		String showPatientDOB=req.getParameter("showPatientDOB");
-		String patientDOB=req.getParameter("patientDOB");
+		String showPatientDOB = req.getParameter("showPatientDOB");
+		String patientDOB = req.getParameter("patientDOB");
 		String datePrescribed = req.getParameter("rxDate");
 
 		PdfPTable headerTable = new PdfPTable(1);
@@ -297,7 +328,8 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		headerTable.addCell(cell);
 
-		if(showPatientDOB!=null && showPatientDOB.equalsIgnoreCase("true")){
+		if (showPatientDOB != null && showPatientDOB.equalsIgnoreCase("true"))
+		{
 			cell.setPhrase(new Phrase("DOB: " + patientDOB, baseFont));
 			headerTable.addCell(cell);
 		}
@@ -318,24 +350,29 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 	}
 
 
-	protected PdfPTable buildPrescriptionBody() {
-		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(req);
+	protected PdfPTable buildPrescriptionBody()
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(req);
 		String newline = System.getProperty("line.separator");
 		String additNotes = req.getParameter("additNotes");
 		String rx = req.getParameter("rx");
-		if (rx == null) {
+		if (rx == null)
+		{
 			rx = "";
 		}
 		String[] rxA = rx.split(newline);
 		List<String> listRx = new ArrayList<String>();
 		String listElem = "";
 		// parse rx and put into a list of rx;
-		for (String s : rxA) {
-			if (s.equals("") || s.equals(newline) || s.length() == 1) {
+		for (String s : rxA)
+		{
+			if (s.equals("") || s.equals(newline) || s.length() == 1)
+			{
 				listRx.add(listElem);
 				listElem = "";
 			}
-			else {
+			else
+			{
 				listElem = listElem + s;
 				listElem += newline;
 			}
@@ -346,36 +383,42 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		table.getDefaultCell().setPadding(5f);
 
 		// render prescriptions
-		for (String rxStr : listRx) {
+		for (String rxStr : listRx)
+		{
 			Paragraph p = new Paragraph(new Phrase(rxStr, baseFont));
 			p.setKeepTogether(true);
 			p.setSpacingBefore(20f);
 			table.addCell(p);
 		}
 		// render additional notes
-		if (additNotes != null && !additNotes.equals("")) {
+		if (additNotes != null && !additNotes.equals(""))
+		{
 			Paragraph p = new Paragraph(new Phrase(additNotes, baseFont));
 			p.setKeepTogether(true);
 			p.setSpacingBefore(20f);
 			table.addCell(p);
 		}
 		// render QrCode
-		if (PrescriptionQrCodeUIBean.isPrescriptionQrCodeEnabledForProvider(loggedInInfo.getLoggedInProviderNo())) {
+		if (PrescriptionQrCodeUIBean.isPrescriptionQrCodeEnabledForProvider(loggedInInfo.getLoggedInProviderNo()))
+		{
 			Integer scriptId = Integer.parseInt(req.getParameter("scriptId"));
 			byte[] qrCodeImage = PrescriptionQrCodeUIBean.getPrescriptionHl7QrCodeImage(scriptId);
 			Image qrCode = null;
-			try {
+			try
+			{
 				qrCode = Image.getInstance(qrCodeImage);
 				table.addCell(qrCode);
 			}
-			catch (Exception e) {
+			catch (Exception e)
+			{
 				logger.error("Failed to load QR Code image", e);
 			}
 		}
 		return table;
 	}
 
-	protected PdfPTable buildPageFooter() {
+	protected PdfPTable buildPageFooter()
+	{
 		String method = req.getParameter("__method");
 		String origPrintDate = req.getParameter("origPrintDate");
 		String numPrint = req.getParameter("numPrints");
@@ -398,10 +441,12 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 
 		Image sig = buildSignatureImage();
 
-		if(sig != null) {
+		if (sig != null)
+		{
 			subtable1.addCell(sig);
 		}
-		else {
+		else
+		{
 			cell = new PdfPCell();
 			cell.setBorder(0);
 			subtable1.addCell(cell);//empty cell
@@ -418,7 +463,8 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		addToTable(table, subtable2, false);
 
 		cell.setBorder(0);
-		if (method != null && method.equalsIgnoreCase("rePrint")) {
+		if (method != null && method.equalsIgnoreCase("rePrint"))
+		{
 			String printsLine = "Original print date: " + origPrintDate + ". printed " + numPrint + " times";
 
 			cell.setHorizontalAlignment(Element.ALIGN_RIGHT);

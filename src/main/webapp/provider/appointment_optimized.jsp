@@ -630,6 +630,7 @@ private long getAppointmentRowSpan(
 	<script type="text/javascript" src="../phr/phr.js"></script>
 
 	<script src="<c:out value="../js/jquery.js"/>"></script>
+
 	<script>
 		jQuery.noConflict();
 	</script>
@@ -779,20 +780,20 @@ private long getAppointmentRowSpan(
 		</td>
 		<td id="firstMenu">
 			<ul id="navlist">
-				<c:if test="${menuBarController.infirmaryOscarView}">
-					<c:choose>
-						<c:when test="${menuBarController.isViewAll()}">
-							<li>
-								<a href=# onClick = "review('0')" title="<bean:message key="provider.appointmentProviderAdminDay.viewProvAval"/>"><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
-							</li>
-						</c:when>
-						<c:otherwise>
-							<li>
-								<a href='providercontrol.jsp?year=<%=menuBarController.getCurrentYear()%>&month=<%=menuBarController.getCurrentMonth()%>&day=<%=menuBarController.getCurrentDay()%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1'><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
-							</li>
-						</c:otherwise>
-					</c:choose>
-				</c:if>
+
+				<c:choose>
+					<c:when test="${menuBarController.isViewAll()}">
+						<li>
+							<a href=# onClick = "review('0')" title="<bean:message key="provider.appointmentProviderAdminDay.viewProvAval"/>"><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
+						</li>
+					</c:when>
+					<c:otherwise>
+						<li>
+							<a href='providercontrol.jsp?year=<%=menuBarController.getCurrentYear()%>&month=<%=menuBarController.getCurrentMonth()%>&day=<%=menuBarController.getCurrentDay()%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1'><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
+						</li>
+					</c:otherwise>
+				</c:choose>
+
 
 				<li>
 					<a href='providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&caseload=1&clProv=<%=curUser_no%>'><bean:message key="global.caseload"/></a>
@@ -1896,7 +1897,7 @@ private long getAppointmentRowSpan(
 																					 "../integrations/myhealthaccess.do?method=connect" +
 																					 "&demographicNo=${appointmentInfo.demographicNo}" +
 																					 "&siteName=${appointmentInfo.siteName}" +
-																					 "&appt=${appointmentInfo.appointmentNo}");return false;'
+																					 "&appt=${appointmentInfo.appointmentNo}", "telehealth");return false;'
 																	 title="Telehealth">
 																		<img
 																						style="vertical-align: bottom"
@@ -2069,7 +2070,31 @@ private long getAppointmentRowSpan(
 
 															</c:if>
 														</c:if>
-														</font></td>
+														</font>
+
+														<c:if test="${appointmentInfo.selfBooked}">
+															<div class="self-booked">
+																<div class="self-booked-marker tooltip-trigger">
+																	<span class="tooltip">
+																		<bean:message key="provider.appointmentProviderAdminDay.titleSelfBooked"/>
+																	</span>
+																</div>
+																<div class="confirmation-marker tooltip-trigger confirmed_${appointmentInfo.confirmed}">
+																	<span class="tooltip">
+																		<c:choose>
+																			<c:when test="${appointmentInfo.confirmed}">
+																				<bean:message key="provider.appointmentProviderAdminDay.titleConfirmed"/>
+																			</c:when>
+																			<c:otherwise>
+																				<bean:message key="provider.appointmentProviderAdminDay.titleNotConfirmed"/>
+																			</c:otherwise>
+																		</c:choose>
+																	</span>
+																</div>
+															</div>
+														</c:if>
+
+														</td>
 													</c:otherwise>
 												</c:choose>
 

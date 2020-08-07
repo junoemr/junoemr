@@ -68,6 +68,7 @@ org.oscarehr.util.SpringUtils"
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
 	SimpleDateFormat dayFormatter = new SimpleDateFormat("yyyy-MM-dd");
+	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 %>
 <%!
   GregorianCalendar addDateByYMD(GregorianCalendar cal, String unit, int n) {
@@ -85,7 +86,7 @@ org.oscarehr.util.SpringUtils"
   if (request.getParameter("groupappt") != null) {
     boolean bSucc = false;
 	String createdDateTime = UtilDateUtilities.DateToString(new java.util.Date(),"yyyy-MM-dd HH:mm:ss");
-	String userName =  (String) session.getAttribute("userlastname") + ", " + (String) session.getAttribute("userfirstname");
+	String creatorNo =  loggedInInfo.getLoggedInProviderNo();
 	String everyNum = request.getParameter("everyNum")!=null? request.getParameter("everyNum") : "0";
 	String everyUnit = request.getParameter("everyUnit")!=null? request.getParameter("everyUnit") : "day";
 	String endDate = request.getParameter("endDate")!=null? request.getParameter("endDate") : UtilDateUtilities.DateToString(new java.util.Date(),"dd/MM/yyyy");
@@ -120,7 +121,8 @@ org.oscarehr.util.SpringUtils"
 			a.setBilling(request.getParameter("billing"));
 			a.setStatus(request.getParameter("status"));
 			a.setCreateDateTime(new java.util.Date());
-			a.setCreator(userName);
+			a.setCreator(creatorNo);
+			a.setLastUpdateUser(creatorNo);
 			a.setRemarks(request.getParameter("remarks"));
 			if (request.getParameter("demographic_no")!=null && !(request.getParameter("demographic_no").equals(""))) {
 				a.setDemographicNo(Integer.parseInt(request.getParameter("demographic_no")));
@@ -130,7 +132,10 @@ org.oscarehr.util.SpringUtils"
 			
 			a.setProgramId(Integer.parseInt((String)request.getSession().getAttribute("programId_oscarView")));
 			a.setUrgency(request.getParameter("urgency"));
-			a.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
+			if (request.getParameter("reasonCode") != null && !request.getParameter("reasonCode").isEmpty())
+			{
+				a.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
+			}
 			appointmentDao.persist(a);
 
 			LogAction.addLogEntry(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
@@ -175,7 +180,7 @@ org.oscarehr.util.SpringUtils"
         	Object[] param = new Object[13];
             param[0]="C";
             param[1]=createdDateTime;
- 	        param[2]=userName;
+ 	        param[2]=creatorNo;
  	        for (int k=0; k<paramE.length; k++) param[k+3] = paramE[k];
 
 			// repeat doing
@@ -189,7 +194,7 @@ org.oscarehr.util.SpringUtils"
             	for(Appointment a:appts) {
             		a.setStatus("C");
             		a.setUpdateDateTime(ConversionUtils.fromTimestampString(createdDateTime));
-            		a.setLastUpdateUser(userName);
+            		a.setLastUpdateUser(creatorNo);
             		appointmentDao.merge(a);
             		rowsAffected++;
 
@@ -247,7 +252,7 @@ org.oscarehr.util.SpringUtils"
             param[6]=request.getParameter("location");
             param[7]=request.getParameter("resources");
             param[8]=createdDateTime;
-            param[9]=userName;
+            param[9]=creatorNo;
             param[10]=request.getParameter("urgency");
             param[11]=request.getParameter("reasonCode");
  	        for(int k=0; k<paramE.length; k++) 
@@ -268,7 +273,7 @@ org.oscarehr.util.SpringUtils"
 					appt.setLocation(request.getParameter("location"));
 					appt.setResources(request.getParameter("resources"));
 					appt.setUpdateDateTime(ConversionUtils.fromTimestampString(createdDateTime));
-					appt.setLastUpdateUser(userName);
+					appt.setLastUpdateUser(creatorNo);
 					appt.setUrgency(request.getParameter("urgency"));
 					appt.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
 					appointmentDao.merge(appt);

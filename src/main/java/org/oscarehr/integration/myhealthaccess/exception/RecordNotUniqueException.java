@@ -20,35 +20,18 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.common.hl7.copd.mapper;
 
-import ca.uhn.hl7v2.HL7Exception;
-import org.jsoup.Jsoup;
-import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.demographicImport.service.CoPDImportService;
+package org.oscarehr.integration.myhealthaccess.exception;
 
-
-// override of EncounterNoteMapper with custom functionality for MedAccess
-public class EncounterNoteMapperMedAccess extends EncounterNoteMapper
+public class RecordNotUniqueException extends RuntimeException
 {
-	public EncounterNoteMapperMedAccess(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public RecordNotUniqueException()
 	{
-		super(message, providerRep, importSource);
+		super();
 	}
 
-	@Override
-	protected String getEncounterNoteText(int rep) throws HL7Exception
+	public RecordNotUniqueException(String msg)
 	{
-		return stripHTML(super.getEncounterNoteText(rep));
-	}
-
-	/**
-	 * strip html tags from text
-	 * @param text - text to preform the stripping on
-	 * @return - the modified text
-	 */
-	private String stripHTML(String text)
-	{
-		return Jsoup.parse(text).wholeText();
+		super(msg);
 	}
 }

@@ -538,7 +538,7 @@ public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServlet
             address.setLine1(demographic.getAddress());
 	    if (StringUtils.filled(demographic.getCity()) || StringUtils.filled(demographic.getProvince()) || StringUtils.filled(demographic.getPostal())) {
 		address.setCity(StringUtils.noNull(demographic.getCity()));
-		address.setCountrySubdivisionCode(Util.setCountrySubDivCode(demographic.getProvince()));
+		address.setCountrySubdivisionCode(Util.setCountrySubDivCode(StringUtils.noNull(demographic.getProvince())));
 		address.addNewPostalZipCode().setPostalCode(StringUtils.noNull(demographic.getPostal()).replace(" ",""));
 	    }
         }
