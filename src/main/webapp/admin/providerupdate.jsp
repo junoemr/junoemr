@@ -207,7 +207,7 @@ if (securityInfoManager.superAdminModificationCheck(request.getParameter("curren
 			provider.setSupervisor(StringUtils.trimToNull(supervisor));
 
 
-			if (provider.getBillingOpts() == null || provider.getBillingOpts().getId() == null)     // todo check if it's null if there's nothing there
+			if (provider.getBillingOpts() == null || provider.getBillingOpts().getId() == null)
 			{
 				provider.setBillingOpts(new ProviderBilling());
 			}

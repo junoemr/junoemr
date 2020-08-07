@@ -190,7 +190,6 @@
 			if (hasPermission)
 			{
 				form.action = "providerRole.do?method=" + actionMethod;
-				console.log("action clicked  "+actionMethod)
 			}
 			return hasPermission;
 		}
