@@ -25,7 +25,6 @@
 package org.oscarehr.demographic.model;
 
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.util.MiscUtils;
 
 import java.io.Serializable;
 import java.util.Date;

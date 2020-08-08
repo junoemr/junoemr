@@ -451,6 +451,7 @@ public class StringUtils {
                 input = matcher.replaceAll("");
             }
         }
+
         return input;
     }
 

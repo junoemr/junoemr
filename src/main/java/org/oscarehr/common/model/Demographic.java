@@ -1579,8 +1579,8 @@ public class Demographic implements Serializable
 	@PreUpdate
 	private void removeControlCharacter()
 	{
-		setPhone(filterControlCharacters(getPhone()));
-		setPhone2(filterControlCharacters(getPhone2()));
+		setPhone(filterControlCharacters(this.getPhone()));
+		setPhone2(filterControlCharacters(this.getPhone2()));
 	}
 
 	/**
