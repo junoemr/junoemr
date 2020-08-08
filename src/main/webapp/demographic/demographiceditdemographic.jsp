@@ -818,11 +818,9 @@ jQuery(document).ready(function() {
 });
 
 jQuery(document).ready(function(){
-	Juno.Demographic.InputCtrl.formatPhoneOnLoad(
-		document.updatedelete.phone,
-		document.updatedelete.phone2,
-		document.updatedelete.demo_cell
-	);
+	Juno.Demographic.InputCtrl.formatPhoneNumber(document.updatedelete.phone);
+	Juno.Demographic.InputCtrl.formatPhoneNumber(document.updatedelete.phone2,);
+	Juno.Demographic.InputCtrl.formatPhoneNumber(document.updatedelete.demo_cell);
 
 });
 
