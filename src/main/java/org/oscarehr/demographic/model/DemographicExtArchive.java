@@ -191,7 +191,8 @@ public class DemographicExtArchive extends AbstractModel<Integer> implements Ser
 
 	@PrePersist
 	@PreUpdate
-	protected void prePersist() {
+	protected void prePersist()
+	{
 		setValue(filterControlCharacters(this.getValue()));
 	}
 
