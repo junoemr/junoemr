@@ -35,7 +35,22 @@ import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.TicklerDao;
-import org.oscarehr.common.hl7.copd.mapper.*;
+import org.oscarehr.common.hl7.copd.mapper.AlertMapper;
+import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
+import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
+import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
+import org.oscarehr.common.hl7.copd.mapper.DocumentMapper;
+import org.oscarehr.common.hl7.copd.mapper.DxMapper;
+import org.oscarehr.common.hl7.copd.mapper.EncounterNoteMapper;
+import org.oscarehr.common.hl7.copd.mapper.HistoryNoteMapper;
+import org.oscarehr.common.hl7.copd.mapper.LabMapper;
+import org.oscarehr.common.hl7.copd.mapper.MapperFactory;
+import org.oscarehr.common.hl7.copd.mapper.MeasurementsMapper;
+import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
+import org.oscarehr.common.hl7.copd.mapper.MessageMapper;
+import org.oscarehr.common.hl7.copd.mapper.PreventionMapper;
+import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
+import org.oscarehr.common.hl7.copd.mapper.TicklerMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.parser.CoPDParser;
 import org.oscarehr.common.io.FileFactory;
@@ -44,18 +59,23 @@ import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.MessageList;
+import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.labs.service.LabService;
+import org.oscarehr.message.service.MessageService;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.service.PreventionManager;
@@ -68,20 +88,24 @@ import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.rx.dao.PrescriptionDao;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.rx.model.Prescription;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -154,11 +178,19 @@ public class CoPDImportService
 	MeasurementDao measurementDao;
 
 	@Autowired
+	MessageService messageService;
+
+	@Autowired
 	ProviderRoleService providerRoleService;
 
 	private static long missingDocumentCount = 0;
 
-	public void importFromHl7Message(String message, String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs) throws HL7Exception, IOException, InterruptedException
+	public void importFromHl7Message(String message, String documentLocation,
+	                                 IMPORT_SOURCE importSource,
+	                                 CoPDRecordData recordData,
+	                                 boolean skipMissingDocs,
+	                                 boolean mergeDemographics)
+			throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Initialize HL7 parser");
 		HapiContext context = new DefaultHapiContext();
@@ -177,31 +209,42 @@ public class CoPDImportService
 		ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(message);
 
 		missingDocumentCount = 0;
-		importRecordData(zpdZtrMessage, documentLocation, importSource, skipMissingDocs);
+		importRecordData(zpdZtrMessage, documentLocation, importSource, recordData, skipMissingDocs, mergeDemographics);
 	}
 	public long getMissingDocumentCount()
 	{
 		return missingDocumentCount;
 	}
 
-	private void importRecordData(ZPD_ZTR zpdZtrMessage, String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
+	private void importRecordData(ZPD_ZTR zpdZtrMessage,
+	                              String documentLocation,
+	                              IMPORT_SOURCE importSource,
+	                              CoPDRecordData recordData,
+	                              boolean skipMissingDocs,
+	                              boolean mergeDemographics)
 			throws HL7Exception, IOException, InterruptedException
 	{
+		Instant instant = Instant.now();
 		logger.info("Creating Demographic Record ...");
-		Demographic demographic = importDemographicData(zpdZtrMessage, importSource);
+		Demographic demographic = importDemographicData(zpdZtrMessage, importSource, mergeDemographics);
+
 		if (demographic != null)
 		{
 			logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
+			recordData.setDemographicId(demographic.getId());
+			instant = printDuration(instant, "importDemographicData");
 
 			logger.info("Find/Create Provider Record(s) ...");
-			ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource, skipMissingDocs);
+			ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource, recordData, skipMissingDocs);
+			instant = printDuration(instant, "importProviderData");
 
 			// set the mrp doctor after all the provider records are created
 			demographic.setProviderNo(mrpProvider.getId());
 			demographicDao.merge(demographic);
 
 			logger.info("Create Appointments ...");
-			importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource);
+			importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource, recordData);
+			instant = printDuration(instant, "importAppointmentData");
 		}
 	}
 
@@ -213,7 +256,8 @@ public class CoPDImportService
 	 * @throws HL7Exception
 	 */
 	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage, Demographic demographic,
-	                                        String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
+	                                        String documentLocation, IMPORT_SOURCE importSource,
+	                                        CoPDRecordData recordData, boolean skipMissingDocs)
 			throws HL7Exception, IOException, InterruptedException
 	{
 		ProviderData mrpProvider = null;
@@ -249,30 +293,58 @@ public class CoPDImportService
 				}
 			}
 
+			Instant instant = Instant.now();
 			logger.info("Import Notes & History ...");
-			importProviderNotes(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			importProviderNotes(zpdZtrMessage, i, assignedProvider, demographic, importSource, recordData);
+			instant = printDuration(instant, "importProviderNotes");
+
 			logger.info("Import Alerts ...");
 			importAlerts(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			instant = printDuration(instant, "importAlerts");
+
 			logger.info("Import diagnosed health problems ...");
 			importDxData(zpdZtrMessage, i, assignedProvider, demographic);
+			instant = printDuration(instant, "importDxData");
+
 			logger.info("Import Medications ...");
-			importMedicationData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			importMedicationData(zpdZtrMessage, i, assignedProvider, demographic, importSource, recordData);
+			instant = printDuration(instant, "importMedicationData");
+
 			logger.info("Import Pediatrics ...");
 			importPediatricsData(zpdZtrMessage, i, assignedProvider, demographic);
+			instant = printDuration(instant, "importPediatricsData");
+
 			logger.info("Import Pregnancy ...");
 			importPregnancyData(zpdZtrMessage, i, assignedProvider, demographic);
+			instant = printDuration(instant, "importPregnancyData");
+
 			logger.info("Import Allergies ...");
 			importAllergyData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			instant = printDuration(instant, "importAllergyData");
+
 			logger.info("Import Immunizations ...");
 			importPreventionData(zpdZtrMessage, i, assignedProvider, demographic);
+			instant = printDuration(instant, "importPreventionData");
+
 			logger.info("Import Labs ...");
 			importLabData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			instant = printDuration(instant, "importLabData");
+
 			logger.info("Import Documents ...");
 			importDocumentData(zpdZtrMessage, i, assignedProvider, demographic, documentLocation, importSource, skipMissingDocs);
+			instant = printDuration(instant, "importDocumentData");
+
 			logger.info("Import Ticklers ...");
 			importTicklers(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			instant = printDuration(instant, "importTicklers");
+
 			logger.info("Importing Measurements ...");
-			importMeasurements(zpdZtrMessage, demographic, i, assignedProvider, importSource);
+			importMeasurements(zpdZtrMessage, demographic, i, assignedProvider, importSource, recordData);
+			instant = printDuration(instant, "importMeasurements");
+
+			logger.info("Importing Messages ...");
+			importMessageData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			instant = printDuration(instant, "importMessageData");
 		}
 
 		return mrpProvider;
@@ -312,7 +384,7 @@ public class CoPDImportService
 
 			String billCenterCode = properties.getProperty("default_bill_center","");
 			provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
-			providerRoleService.setPrimaryRole(provider.getProviderNo(), "doctor");
+			providerRoleService.setDefaultRoleForNewProvider(provider.getProviderNo());
 
 			logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 		}
@@ -328,10 +400,33 @@ public class CoPDImportService
 		return provider;
 	}
 
-	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage, IMPORT_SOURCE importSource) throws HL7Exception
+	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage, IMPORT_SOURCE importSource, boolean mergeDemographics) throws HL7Exception
 	{
 		DemographicMapper demographicMapper = MapperFactory.newDemographicMapper(zpdZtrMessage, importSource);
 		Demographic demographic = demographicMapper.getDemographic();
+
+		// Optional flag you can run the importer with.
+		if (mergeDemographics && demographic.getHin() != null && !demographic.getHin().trim().isEmpty())
+		{
+			DemographicCriteriaSearch searchQuery = new DemographicCriteriaSearch();
+			searchQuery.setHin(demographic.getHin());
+			searchQuery.setDateOfBirth(demographic.getDateOfBirth());
+
+			List<Demographic> possibleMatches = demographicDao.criteriaSearch(searchQuery);
+			if (possibleMatches.size() == 1)
+			{
+				demographic = possibleMatches.get(0);
+				LogAction.addLogEntry(LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo(),
+						demographic.getId(),
+						LogConst.ACTION_ADD,
+						LogConst.CON_DEMOGRAPHIC,
+						LogConst.STATUS_SUCCESS,
+						"Merged patient information from " + importSource.toString());
+				logger.warn("Merging into demographic record " + demographic.getId() + " with HIN: " + demographic.getHin());
+				return demographic;
+			}
+		}
+
 		if (demographic != null)
 		{
 			DemographicCust demographicCust = demographicMapper.getDemographicCust();
@@ -342,11 +437,12 @@ public class CoPDImportService
 		return demographic;
 	}
 
-	private void importMeasurements(ZPD_ZTR zpdZtrMessage, Demographic demographic, int provderRep, ProviderData assignedProvider, IMPORT_SOURCE importSource) throws HL7Exception
+	private void importMeasurements(ZPD_ZTR zpdZtrMessage, Demographic demographic, int provderRep, ProviderData assignedProvider,
+	                                IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		MeasurementsMapper measurementsMapper = MapperFactory.newMeasurementsMapper(zpdZtrMessage, provderRep, importSource);
 
-		List<Measurement> measurements = measurementsMapper.getMeasurementList(demographic, assignedProvider);
+		List<Measurement> measurements = measurementsMapper.getMeasurementList(demographic, assignedProvider, recordData);
 		for (Measurement measurement : measurements)
 		{
 			logger.info("Saving measurement of type: " + measurement.getType() + " value: " + measurement.getDataField() + " to demographic: " + demographic.getDemographicId());
@@ -354,7 +450,7 @@ public class CoPDImportService
 		}
 	}
 
-	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider, IMPORT_SOURCE importSource) throws HL7Exception
+	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider, IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		if(properties.isPropertyActive("multisites"))
 		{
@@ -362,7 +458,7 @@ public class CoPDImportService
 			throw new RuntimeException("Multisite Imports not supported");
 		}
 
-		AppointmentMapper appointmentMapper = MapperFactory.newAppointmentMapper(zpdZtrMessage, importSource);
+		AppointmentMapper appointmentMapper = MapperFactory.newAppointmentMapper(zpdZtrMessage, importSource, recordData);
 
 		int numAppointments = appointmentMapper.getNumAppointments();
 
@@ -385,10 +481,11 @@ public class CoPDImportService
 		}
 	}
 
-	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource)
+	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic,
+	                                  IMPORT_SOURCE importSource, CoPDRecordData recordData)
 			throws HL7Exception
 	{
-		MedicationMapper medicationMapper = MapperFactory.newMedicationMapper(zpdZtrMessage, providerRep, importSource);
+		MedicationMapper medicationMapper = MapperFactory.newMedicationMapper(zpdZtrMessage, providerRep, importSource, recordData);
 
 		int numMedications = medicationMapper.getNumMedications();
 
@@ -411,7 +508,6 @@ public class CoPDImportService
 				drug.setArchived(true);
 				drug.setArchivedReason("represcribed");
 			}
-
 
 			drugDao.persist(drug);
 
@@ -564,7 +660,7 @@ public class CoPDImportService
 				 * Not sure why they include the xml in the export, but we don't want/need them */
 				continue;
 			}
-			InputStream stream = new FileInputStream(documentFile.getFileObject());
+			InputStream stream = documentFile.asFileInputStream();
 			try
 			{
 				documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId(), false);
@@ -611,13 +707,18 @@ public class CoPDImportService
 		}
 	}
 
-	private void importProviderNotes(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
+	private void importProviderNotes(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		EncounterNoteMapper encounterNoteMapper = MapperFactory.newEncounterNoteMapper(zpdZtrMessage, providerRep, importSource);
 
 		int numNotes = encounterNoteMapper.getNumEncounterNotes();
 		for(int i=0; i< numNotes; i++)
 		{
+			// don't import notes that are meant to be messages
+			if(encounterNoteMapper.isMessageNote(i))
+			{
+				continue;
+			}
 			CaseManagementNote encounterNote = encounterNoteMapper.getEncounterNote(i);
 			ProviderData signingProvider = encounterNoteMapper.getSigningProvider(i);
 			ProviderData noteProvider = provider;
@@ -641,7 +742,7 @@ public class CoPDImportService
 			encounterNoteService.saveChartNote(encounterNote);
 		}
 
-		HistoryNoteMapper historyNoteMapper = MapperFactory.newHistoryNoteMapper(zpdZtrMessage, providerRep, importSource);
+		HistoryNoteMapper historyNoteMapper = MapperFactory.newHistoryNoteMapper(zpdZtrMessage, providerRep, importSource, recordData);
 		for(CaseManagementNote medHistNote : historyNoteMapper.getMedicalHistoryNoteList())
 		{
 			medHistNote.setProvider(provider);
@@ -663,5 +764,55 @@ public class CoPDImportService
 			famHistNote.setDemographic(demographic);
 			encounterNoteService.saveFamilyHistoryNote(famHistNote);
 		}
+	}
+
+	private void importMessageData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
+	{
+		MessageMapper messageMapper = MapperFactory.newMessageMapper(zpdZtrMessage, providerRep, importSource);
+
+		int numNotes = messageMapper.getNumMessageNotes();
+		for(int i=0; i< numNotes; i++)
+		{
+			// don't import notes that are meant not to be messages
+			if(!messageMapper.isMessageNote(i))
+			{
+				continue;
+			}
+
+			// get recipient provider info, or default if unavailable
+			ProviderData recipientProvider = messageMapper.getRecipientProvider(i);
+			if(recipientProvider != null)
+			{
+				recipientProvider = findOrCreateProviderRecord(recipientProvider);
+			}
+			else
+			{
+				recipientProvider = getDefaultProvider();
+			}
+			List<ProviderData> providers = new ArrayList<>(1);
+			providers.add(recipientProvider);
+
+			// get the message and set up sending provider info
+			MessageTbl message = messageMapper.getMessageNote(i);
+			ProviderData sendingProvider = messageMapper.getSigningProvider(i);
+			if(sendingProvider != null)
+			{
+				sendingProvider = findOrCreateProviderRecord(sendingProvider);
+			}
+			else
+			{
+				sendingProvider = provider;
+			}
+
+			message.setSendingProvider(sendingProvider);
+			messageService.saveMessage(message, providers, demographic, MessageList.STATUS_READ);
+		}
+	}
+
+	private Instant printDuration(Instant start, String what)
+	{
+		Instant now = Instant.now();
+		logger.info("[DURATION] " + what + " took " + Duration.between(start, now));
+		return now;
 	}
 }

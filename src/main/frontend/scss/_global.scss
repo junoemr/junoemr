@@ -68,6 +68,12 @@ body {
 .align-items-first-baseline {
 	align-items: first baseline;
 }
+.align-items-end {
+	align-items: end;
+}
+.justify-content-right {
+	justify-content: right;
+}
 .justify-content-center {
 	justify-content: center;
 }
@@ -77,7 +83,6 @@ body {
 .justify-content-between {
 	justify-content: space-between;
 }
-
 .flex-row {
 	display: flex;
 	flex-direction: row;
@@ -144,6 +149,9 @@ body {
 	margin-left: $margin-sm;
 }
 
+.sm-margin-top {
+	margin-top: $margin-sm;
+}
 
 .no-margin-bottom {
 	margin-bottom: 0;
@@ -153,8 +161,24 @@ body {
 	padding: 0;
 }
 
+.no-padding-left {
+	padding-left: 0;
+}
+
 .no-margin {
 	margin: 0;
+}
+
+.icon-lg {
+	font-size: $icon-lg;
+}
+
+.icon-md {
+	font-size: $icon-md;
+}
+
+.icon-sm {
+	font-size: $icon-sm;
 }
 
 // Makes checkbox flush with input (as long as checkbox margin is 0)

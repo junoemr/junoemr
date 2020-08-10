@@ -30,8 +30,7 @@ if(!authed) {
    LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 %>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
-<%@ page import="java.util.*"%>
-<%@ page import="org.oscarehr.hospitalReportManager.SFTPConnector, org.oscarehr.hospitalReportManager.dao.HRMProviderConfidentialityStatementDao" %>
+<%@ page import="org.oscarehr.hospitalReportManager.dao.HRMProviderConfidentialityStatementDao" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -76,16 +75,18 @@ jQuery(function() {
 </head>
 <body>
 <h4>Hospital Report Manager</h4>
-<% if (request.getParameter("fetch") != null && request.getParameter("fetch").equalsIgnoreCase("true"))
-		new SFTPConnector().startAutoFetch(loggedInInfo);
+<%
+	/*	Section intentionally commented out to avoid unneeded SFTP connections
+	 *	Can revisit this when we are looking to become accredited with OntarioMD
+		if (request.getParameter("fetch") != null && request.getParameter("fetch").equalsIgnoreCase("true"))
+		{
+			new SFTPConnector().startAutoFetch(loggedInInfo);
+		}
+	 */
 %>
 <p>
-	HRM Status: <%=SFTPConnector.isFetchRunning() ? "Fetching data from HRM" : "Idle" %><br />
-	<% if (!SFTPConnector.isFetchRunning()) { %>
-		<input type="button" class="btn" onClick="runFetch()" value="Fetch New Data from HRM" />
-	<% } else { %>
-		Please wait until the current fetch task completes before requesting another data fetch.
-	<% } %>
+	HRM Status: Not Fetching<br />
+	Data fetching is currently unsupported.
 </p>
 <form enctype="multipart/form-data" action="<%=request.getContextPath() %>/hospitalReportManager/UploadLab.do" method="post">
     Upload an HRM report from your computer: <input type="file" name="importFile" />

@@ -27,4 +27,11 @@
 		margin-top: $margin-md;
 		margin-bottom: $margin-md;
 	}
+
+	.required-field
+	{
+		input {
+			border-color: $color-red-base;
+		}
+	}
 }

@@ -53,6 +53,7 @@ public class ProviderTo1 implements Serializable {
 	private String practitionerNo;
 	private String email;
 	private String title;
+	private Boolean superAdmin;
 	private String lastUpdateUser;
 	private Date lastUpdateDate;
 
@@ -254,5 +255,15 @@ public class ProviderTo1 implements Serializable {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	public Boolean getSuperAdmin()
+	{
+		return superAdmin;
+	}
+
+	public void setSuperAdmin(Boolean superAdmin)
+	{
+		this.superAdmin = superAdmin;
 	}
 }

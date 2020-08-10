@@ -116,8 +116,20 @@
 				}
 			}
 		}
+		.top-checkbox-container {
+			.form-group {
+				margin: 0 0 2px 0;
+			}
+		}
 	}
 	.form-control-static {
 		min-height: 10px;
+	}
+
+	// ca-max-characters directive
+	.form-group .textarea-char-counter {
+		margin-top: -50px;
+		margin-left: 50px;
+		float: left;
 	}
 }

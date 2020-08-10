@@ -23,7 +23,7 @@
 
 package org.oscarehr.integration.myhealthaccess.exception;
 
-public class InvalidIntegrationException extends Exception
+public class InvalidIntegrationException extends RuntimeException
 {
 	public final static String NO_INTEGRATION_MHA = "No active MyHealthAccess integration found";
 

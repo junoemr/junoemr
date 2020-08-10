@@ -47,6 +47,12 @@ public class AppointmentCacheTo1 implements Serializable
 	@JsonProperty("is_cancelled")
 	private Boolean isCancelled;
 
+	@JsonProperty("provider_no")
+	private String providerNo;
+
+	@JsonProperty("demographic_no")
+	private String demographicNo;
+
 	@JsonProperty("start_datetime")
 	@JsonSerialize(using = ZonedDateTimeStringSerializer.class)
 	@JsonDeserialize(using = ZonedDateTimeStringDeserializer.class)
@@ -105,6 +111,26 @@ public class AppointmentCacheTo1 implements Serializable
 	public void setEndDateTime(ZonedDateTime endDateTime)
 	{
 		this.endDateTime = endDateTime;
+	}
+
+	public String getProviderNo()
+	{
+		return providerNo;
+	}
+
+	public void setProviderNo(String providerNo)
+	{
+		this.providerNo = providerNo;
+	}
+
+	public String getDemographicNo()
+	{
+		return demographicNo;
+	}
+
+	public void setDemographicNo(String demographicNo)
+	{
+		this.demographicNo = demographicNo;
 	}
 
 	@Override

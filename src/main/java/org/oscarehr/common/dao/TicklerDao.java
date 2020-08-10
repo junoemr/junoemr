@@ -219,7 +219,53 @@ public class TicklerDao extends AbstractDao<Tickler>{
 		
 		return results;
 	}
-	
+
+	// wrapper for portion deciding asc/desc order + what we want to order by
+	private String getTicklerSortingClause(SORTDIR sortDirection, SORTCOLUMN sortColumn)
+	{
+		String orderDir = "DESC";
+		if (SORTDIR.asc.equals(sortDirection))
+		{
+			orderDir = "ASC";
+		}
+
+		String orderBy = "t.updateDate " + orderDir;
+
+		if (SORTCOLUMN.DemographicName.equals(sortColumn))
+		{
+			orderBy = "d.LastName " + orderDir + ", d.FirstName " + orderDir;
+		}
+		else if (SORTCOLUMN.Creator.equals(sortColumn))
+		{
+			orderBy = "t.creator " + orderDir;
+		}
+		else if (SORTCOLUMN.ServiceDate.equals(sortColumn))
+		{
+			orderBy = "t.serviceDate " + orderDir;
+		}
+		else if (SORTCOLUMN.UpdateDate.equals(sortColumn))
+		{
+			orderBy = "t.updateDate " + orderDir;
+		}
+		else if (SORTCOLUMN.Priority.equals(sortColumn))
+		{
+			orderBy = "t.priority " + orderDir;
+		}
+		else if (SORTCOLUMN.TaskAssignedTo.equals(sortColumn))
+		{
+			orderBy = "t.taskAssignedTo " + orderDir;
+		}
+		else if (SORTCOLUMN.Status.equals(sortColumn))
+		{
+			orderBy = "t.status " + orderDir;
+		}
+		else if (SORTCOLUMN.Message.equals(sortColumn))
+		{
+			orderBy = "t.message " + orderDir;
+		}
+
+		return "ORDER BY " + orderBy;
+	}
 	
 	/**
 	 * @deprecated

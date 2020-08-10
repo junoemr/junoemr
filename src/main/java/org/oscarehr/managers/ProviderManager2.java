@@ -316,6 +316,29 @@ public class ProviderManager2
 			settings.setTicklerViewOnlyMine(false);
 		}
 
+		if(map.get(UserProperty.EFORM_POPUP_WIDTH) != null)
+		{
+			try
+			{
+				settings.setEformPopupWidth(Integer.parseInt(map.get(UserProperty.EFORM_POPUP_WIDTH).getValue()));
+			}
+			catch (NumberFormatException ne)
+			{
+				MiscUtils.getLogger().error("Failed to lookup eform popup width due to error: " + ne.getMessage(), ne);
+			}
+		}
+		if(map.get(UserProperty.EFORM_POPUP_HEIGHT) != null)
+		{
+			try
+			{
+				settings.setEformPopupHeight(Integer.parseInt(map.get(UserProperty.EFORM_POPUP_HEIGHT).getValue()));
+			}
+			catch (NumberFormatException ne)
+			{
+				MiscUtils.getLogger().error("Failed to lookup eform popup height due to error: " + ne.getMessage(), ne);
+			}
+		}
+
 		if (map.get(UserProperty.SCHEDULE_SITE) != null)
 		{
 			settings.setSiteSelected(map.get(UserProperty.SCHEDULE_SITE).getValue());
@@ -906,6 +929,10 @@ public class ProviderManager2
 		property.setValue(settings.getFavoriteFormGroup());
 		property = getMappedOrNewProperty(map, "lab_ack_comment", providerNo);
 		property.setValue(settings.isDisableCommentOnAck() ? "yes" : "no");
+		property = getMappedOrNewProperty(map, UserProperty.EFORM_POPUP_WIDTH, providerNo);
+		property.setValue(settings.getEformPopupWidth().toString());
+		property = getMappedOrNewProperty(map, UserProperty.EFORM_POPUP_HEIGHT, providerNo);
+		property.setValue(settings.getEformPopupHeight().toString());
 
 
 		property = getMappedOrNewProperty(map, "olis_reportingLab", providerNo);

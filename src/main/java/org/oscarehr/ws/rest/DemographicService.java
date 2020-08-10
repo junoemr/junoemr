@@ -44,6 +44,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
+import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.LoggedInInfo;
@@ -128,6 +129,9 @@ public class DemographicService extends AbstractServiceImpl {
 	{
 		this.caseManagementMgr = caseManagementMgr;
 	}
+
+	@Autowired
+	private HinValidationService hinValidationService;
 
 	private DemographicConverter demoConverter = new DemographicConverter();
 	private DemographicContactFewConverter demoContactFewConverter = new DemographicContactFewConverter();
@@ -319,25 +323,19 @@ public class DemographicService extends AbstractServiceImpl {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> createDemographicData(DemographicTo1 data) {
-		try
-		{
-			Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
-			demographicManager.createDemographic(getLoggedInInfo(), demographic, data.getAdmissionProgramId());
+	public RestResponse<DemographicTo1> createDemographicData(DemographicTo1 data)
+	{
+		Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
+		hinValidationService.validateNoDuplication(demographic.getHin(), demographic.getVer(), demographic.getHcType());
+		demographicManager.createDemographic(getLoggedInInfo(), demographic, data.getAdmissionProgramId());
 
-			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
-			int providerNo = Integer.parseInt(providerNoStr);
+		String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
+		int providerNo = Integer.parseInt(providerNoStr);
 
-			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,getLoggedInInfo().getIp());
-			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
+		LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,getLoggedInInfo().getIp());
+		recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
 
-			return RestResponse.successResponse(demoConverter.getAsTransferObject(getLoggedInInfo(), demographic));
-		}
-		catch (Exception e)
-		{
-			logger.error("Error",e);
-		}
-		return RestResponse.errorResponse("Error");
+		return RestResponse.successResponse(demoConverter.getAsTransferObject(getLoggedInInfo(), demographic));
 	}
 
 	/**

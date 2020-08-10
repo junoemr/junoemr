@@ -24,7 +24,6 @@ package integration.tests.util;
 
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
@@ -41,10 +40,12 @@ import java.util.concurrent.TimeUnit;
 public class SeleniumTestBase
 {
 	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 20;
+	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 20;
 	private static final String GECKO_DRIVER="src/test/resources/vendor/geckodriver";
 
 	protected static WebDriver driver;
 	protected static Logger logger= MiscUtils.getLogger();
+
 
 	@BeforeClass
 	public static void buildWebDriver() throws SQLException, InstantiationException,
@@ -66,7 +67,6 @@ public class SeleniumTestBase
 		driver.quit();
 	}
 
-
 	private static void createWebDriver()
 	{
 		System.setProperty("webdriver.gecko.driver", GECKO_DRIVER);
@@ -76,6 +76,7 @@ public class SeleniumTestBase
 		ffo.setBinary(ffb);
 		driver = new FirefoxDriver(ffo);
 		driver.manage().timeouts().implicitlyWait(WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+
 	}
 
 	protected static void loadSpringBeans()

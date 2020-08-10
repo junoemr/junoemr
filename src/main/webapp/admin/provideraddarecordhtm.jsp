@@ -35,7 +35,6 @@
 <%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
 <%@ page import="org.oscarehr.provider.model.ProviderData"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@ page import="oscar.OscarProperties"%>
 <%@ page  import="oscar.oscarProvider.data.ProviderBillCenter"%>
 <%@ page import="java.util.ArrayList" %>
@@ -99,6 +98,7 @@
 <head>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="./provider/providerProfile.js"></script>
 <title><bean:message key="admin.provideraddrecordhtm.title" /></title>
 <link rel="stylesheet" href="../web.css">
 <script LANGUAGE="JavaScript">
@@ -142,13 +142,10 @@ jQuery(document).ready( function() {
                     jQuery(".supervisor").slideUp(600);
                 }
             }
-        }
-        )
-        
-    }
-        
-        
- ); 
+        })
+
+        Juno.Admin.Provider.Profile.initSiteSelectHandler();
+    });
         
         
     
@@ -197,7 +194,40 @@ jQuery(document).ready( function() {
 		</td>
 	</tr>
 
-<%
+    <% if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) { %>
+    <tr>
+        <td>
+            <div align="right"><bean:message key="admin.provider.sitesAssigned" /><font color="red">:</font></div>
+        </td>
+        <td>
+            <table>
+                <%
+                    SiteDao siteDao = (SiteDao) SpringUtils.getBean("siteDao");
+
+                    List<Site> sites = ( isSiteAccessPrivacy ? siteDao.getActiveSitesByProviderNo(curProvider_no) : siteDao.getAllActiveSites());
+
+                    for (Site site : sites) {
+                %>
+                <tr>
+                    <td>
+                        <input type="checkbox" name="sites" value="<%= site.getSiteId() %>">
+                        <%= site.getName() %>
+                    </td>
+                    <td style="display: none">
+                        <% if (site.getProvince().equals("BC")) {
+                        %>
+                        <input type="checkbox" name="sitesBCP" id="bcp-site-<%= site.getSiteId()%>" value="<%= site.getSiteId()%>">
+                        Apply BCP
+                        <% } %>
+                    </td>
+                </tr>
+                <% } %>
+            </table>
+        </td>
+    </tr>
+    <% } %>
+
+<%--    <%
 		if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 	%>
 	<tr>
@@ -218,7 +248,7 @@ for (int i=0; i<sites.size(); i++) {
 	</tr>
 <%
 	}
-%>
+    %>--%>
 
 	<tr>
 		<td align="right"><bean:message key="admin.provider.formType" /><font
@@ -378,6 +408,16 @@ for (int i=0; i<sites.size(); i++) {
 		<%
 			if (OscarProperties.getInstance().getProperty("instance_type").equals("BC")) {
 		%>
+        <% if (!org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) { %>
+        <tr>
+            <td align="right">BCP Eligible?</td>
+            <td>
+                <select name="bc_bcp_eligible">
+                    <option value="0" selected>No</option>
+                    <option value="1">Yes</option>
+                </select>
+        </tr>
+        <% } %>
 		<tr>
 			<td align="right"><bean:message key="admin.provider.formIHAMnemonic" />:</td>
 			<td><input type="text" name="alberta_e_delivery_ids"></td>

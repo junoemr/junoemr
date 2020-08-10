@@ -36,7 +36,10 @@ public class DemographicMergedConverter extends AbstractConverter<DemographicMer
 		d.setId(t.getId());
 		d.setDemographicNo(t.getDemographicNo());
 		d.setMergedTo(t.getMergedTo());
-		d.setDeleted(t.getDeleted());
+		if (t.getDeleted())
+		{
+			d.delete();
+		}
 		d.setLastUpdateUser(t.getLastUpdateUser());
 		d.setLastUpdateDate(t.getLastUpdateDate());
 		return d;

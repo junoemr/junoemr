@@ -66,14 +66,18 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 	 * @return true if a conflict is detected.
 	 */
 	public boolean checkForConflict(Appointment appointment) {
-		String sb = "select a from Appointment a where a.appointmentDate = ? and a.startTime >= ? and a.endTime <= ? and a.providerNo = ? and a.status != 'N' and a.status != 'C'";
+		String sb = "select a from Appointment a where a.appointmentDate = :appDate and " +
+						"((a.startTime >= :startTime and a.startTime <= :endTime) or" +
+						" (a.endTime >= :startTime and a.endTime <= :endTime) or " +
+						" (a.startTime <= :startTime and a.endTime >= :endTime)) and" +
+						" a.providerNo = :providerNo and a.status != 'N' and a.status != 'C'";
 
 		Query query = entityManager.createQuery(sb);
 
-		query.setParameter(1, appointment.getAppointmentDate());
-		query.setParameter(2, appointment.getStartTime());
-		query.setParameter(3, appointment.getEndTime());
-		query.setParameter(4, appointment.getProviderNo());
+		query.setParameter("appDate", appointment.getAppointmentDate());
+		query.setParameter("startTime", appointment.getStartTime());
+		query.setParameter("endTime", appointment.getEndTime());
+		query.setParameter("providerNo", appointment.getProviderNo());
 
 		List<Facility> results = query.getResultList();
 
@@ -231,7 +235,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 	}
 	
 	public List<Appointment> findByProviderAndDayandNotStatus(String providerNo, Date date, String notThisStatus) {
-		String sql = "SELECT a FROM Appointment a WHERE a.providerNo=?1 and a.appointmentDate = ?2 and a.status != ?3 ORDER BY a.appointmentDate, a.startTime";
+		String sql = "SELECT a FROM Appointment a WHERE a.providerNo=?1 and a.appointmentDate = ?2 and SUBSTR(a.status, 1, 1) != ?3 ORDER BY a.appointmentDate, a.startTime";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, providerNo);
 		query.setParameter(2, date);
@@ -803,6 +807,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  a.status,\n" +
 				"  a.urgency,\n" +
 				"  a.isVirtual,\n" +
+				"  a.confirmed_at,\n" +
 				"  aps.description,\n" +
 				"  aps.color,\n" +
 				"  aps.juno_color,\n" +
@@ -920,6 +925,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String urgency = (String) result[index++];
 			Byte isVirtualResult = (Byte) result[index++];
 			boolean isVirtual = (Byte.toUnsignedInt(isVirtualResult) == 1);
+			java.sql.Timestamp confirmedAt = (java.sql.Timestamp) result[index++];
+			boolean isConfirmed = confirmedAt != null;
 			String statusTitle = (String) result[index++];
 			String color = (String) result[index++];
 			String junoColor = (String) result[index++];
@@ -1023,7 +1030,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				birthday,
 				hasTicklers,
 				ticklerMessages,
-				isVirtual
+				isVirtual,
+				isConfirmed
 			));
 		}
 

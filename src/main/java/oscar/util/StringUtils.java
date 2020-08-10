@@ -45,6 +45,7 @@ import org.springframework.web.util.UriUtils;
 
 public class StringUtils {
 
+    private static Pattern HTML_TAG_PATTERN = Pattern.compile(".*\\<.*?>.*");
     private static Logger logger = MiscUtils.getLogger();
     public final static String ELLIPSIS = "...";
 
@@ -451,5 +452,37 @@ public class StringUtils {
             MiscUtils.getLogger().error("Unable to encode string using UTF-8", e);
             throw new RuntimeException(e);
         }
+	}
+
+    /**
+     * checks that a string is safe for use in Juno.
+     * This is primarily intended to prevent XSS in Juno.
+     * @param testValue - string to test
+     * @return - true if safe, false otherwise.
+     */
+    public static boolean isStringSafe(String testValue)
+    {
+        if (testValue == null)
+        {
+            return true;
+        }
+
+        if (
+                testValue.matches("(?s).*;.*") ||
+                        testValue.matches("(?s).*\".*") ||
+                        testValue.matches("(?s).*'.*") ||
+                        testValue.matches("(?s).*--.*") ||
+                        testValue.matches("(?s).*\\n.*") ||
+                        testValue.matches("(?s).*\\r.*") ||
+                        testValue.matches("(?s).*\\\\.*") ||
+                        testValue.matches("(?s).*\\x00.*") ||
+                        testValue.matches("(?s).*\\x1a.*") ||
+                        HTML_TAG_PATTERN.matcher(testValue).matches()
+        )
+        {
+            return false;
+        }
+
+        return true;
     }
 }

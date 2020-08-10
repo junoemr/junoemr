@@ -31,11 +31,14 @@ import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.demographicImport.service.CoPDMessageStream;
 import org.oscarehr.demographicImport.service.CoPDPreProcessorService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import oscar.OscarProperties;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 
 public class CopdCommandLineImporter
 {
@@ -54,7 +57,7 @@ public class CopdCommandLineImporter
 	 */
 	public static void main (String [] args)
 	{
-		if(args == null || args.length != 6)
+		if(args == null || args.length != 7)
 		{
 			BasicConfigurator.configure();
 			logger.error("Invalid argument count");
@@ -105,7 +108,8 @@ public class CopdCommandLineImporter
 		}
 
 		// flag to allow importing demographics with missing document files by skipping those records.
-		boolean skipMissingDocs= Boolean.parseBoolean(args[5]);
+		boolean skipMissingDocs = Boolean.parseBoolean(args[5]);
+		boolean mergeDemographics = Boolean.parseBoolean(args[6]);
 
 		ClassPathXmlApplicationContext ctx = null;
 		long importCount = 0;
@@ -144,7 +148,7 @@ public class CopdCommandLineImporter
 
 						try
 						{
-							importFileMessages(new CoPDMessageStream(copdFile), copdDocumentLocation, importSource, skipMissingDocs);
+							importFileMessages(new CoPDMessageStream(copdFile), copdDocumentLocation, importSource, skipMissingDocs, mergeDemographics);
 							importCount++;
 							moveToCompleted(copdFile, copdDirectory);
 						}
@@ -195,7 +199,8 @@ public class CopdCommandLineImporter
 		logger.info("loading properties from " + propertiesFileName);
 
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
-		context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
+//		context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
+		context.setConfigLocations(new String[]{"/applicationContext.xml"});
 		context.refresh();
 		SpringUtils.beanFactory = context;
 
@@ -203,23 +208,39 @@ public class CopdCommandLineImporter
 	}
 
 
-	private static void importFileMessages(CoPDMessageStream messageStream, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource, boolean skipMissingDocs)
+	private static void importFileMessages(CoPDMessageStream messageStream, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource, boolean skipMissingDocs, boolean mergeDemographics)
 			throws Exception
 	{
 		boolean hasFailure = false;
 		int failureCount = 0;
+		int messageCount = 0;
+
 		String message;
 		while (!(message = messageStream.getNextMessage()).isEmpty())
 		{
+			CoPDRecordData recordData = new CoPDRecordData();
 			try
 			{
-				message = coPDPreProcessorService.preProcessMessage(message, importSource);
-				coPDImportService.importFromHl7Message(message, documentDirectory, importSource, skipMissingDocs);
+				messageCount += 1;
+				Instant startPreProcess = Instant.now();
+				message = coPDPreProcessorService.preProcessMessage(message, importSource, recordData);
+				Instant startImport = Instant.now();
+				logger.info("[DURATION] Pre-Processing took " + Duration.between(startPreProcess, startImport));
+
+				coPDImportService.importFromHl7Message(message, documentDirectory, importSource, recordData, skipMissingDocs, mergeDemographics);
+				Instant endImport = Instant.now();
+				logger.info("[DURATION] Import process took " + Duration.between(startImport, endImport));
 			}
 			catch (Exception e)
 			{
-				logger.error("failed to import message: \n " + message + "\n With error:", e);
+				logger.error("failed to import message: " + messageCount + "\n With error:", e);
 				hasFailure = true;
+				failureCount += 1;
+			}
+			finally
+			{
+				//TODO - potentially print this to it's own log file
+				recordData.print();
 			}
 		}
 

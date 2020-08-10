@@ -26,128 +26,199 @@ package org.oscarehr.common.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
-import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.schedule.dao.ScheduleTemplateCodeDao;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 public class ScheduleTemplateCodeDaoTest extends DaoTestFixtures {
 
-	protected ScheduleTemplateCodeDao dao = SpringUtils.getBean(ScheduleTemplateCodeDao.class);
+	protected static ScheduleTemplateCodeDao dao = SpringUtils.getBean(ScheduleTemplateCodeDao.class);
 
-	public ScheduleTemplateCodeDaoTest() {
+	// TemplatesCodes are compared for equality on the code character only
+	// MySql performs case insensitive matching unless specified using the BINARY keyword
+	// Therefore need to test codes of the same letter, with different cases
+
+	@AfterClass
+	public static void cleanUp() throws Exception
+	{
+		SchemaUtils.restoreTable(false, "scheduletemplatecode");
 	}
 
 	@Before
-	public void before() throws Exception {
+	public void resetTable() throws Exception {
 		SchemaUtils.restoreTable(false, "scheduletemplatecode");
 	}
 
 	@Test
-    public void testCreate() throws Exception {
-		ScheduleTemplateCode entity = new ScheduleTemplateCode();
-        EntityDataGenerator.generateTestDataForModelClass(entity);
-        entity.setCode('A');
-        dao.persist(entity);
-        assertNotNull(entity.getId());
+    public void testCreate() {
+		ScheduleTemplateCode template = makeScheduleTemplateCode('A');
+        dao.persist(template);
+        assertNotNull(template.getId());
 	}
-	
+
 	@Test
-	public void testFindAll() throws Exception {
-		
-		ScheduleTemplateCode scheduleTempCode1 = new ScheduleTemplateCode();
-		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode1);
-		dao.persist(scheduleTempCode1);
-		
-		ScheduleTemplateCode scheduleTempCode2 = new ScheduleTemplateCode();
-		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode2);
-		dao.persist(scheduleTempCode2);
-		
-		ScheduleTemplateCode scheduleTempCode3 = new ScheduleTemplateCode();
-		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode3);
-		dao.persist(scheduleTempCode3);
-		
-		List<ScheduleTemplateCode> expectedResult = new ArrayList<ScheduleTemplateCode>(Arrays.asList(scheduleTempCode1, scheduleTempCode2, scheduleTempCode3));
+	public void testFindAll() {
+		ScheduleTemplateCode template1 = makeScheduleTemplateCode('A');
+		dao.persist(template1);
+
+		ScheduleTemplateCode template2 = makeScheduleTemplateCode('B');
+		dao.persist(template2);
+
+		ScheduleTemplateCode template3 = makeScheduleTemplateCode('C');
+		dao.persist(template3);
+
 		List<ScheduleTemplateCode> result = dao.findAll();
-
-		Logger logger = MiscUtils.getLogger();
-		
-		if (result.size() != expectedResult.size()) {
-			logger.warn("Array sizes do not match.");
-			fail("Array sizes do not match.");
-		}
-		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
-				logger.warn("Items  do not match.");
-				fail("Items  do not match.");
-			}
-		}
-		assertTrue(true);	
+		assertEquals(3, result.size());
 	}
 
 	@Test
-	public void testGetByCode() throws Exception {
-		
-		char code1 = 's';
-		char code2 = 'a';
-		char code3 = 'b';
-		
-		ScheduleTemplateCode scheduleTempCode1 = new ScheduleTemplateCode();
-		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode1);
-		scheduleTempCode1.setCode(code1);
-		dao.persist(scheduleTempCode1);
-		
-		ScheduleTemplateCode scheduleTempCode2 = new ScheduleTemplateCode();
-		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode2);
-		scheduleTempCode2.setCode(code2);
-		dao.persist(scheduleTempCode2);
-		
-		ScheduleTemplateCode scheduleTempCode3 = new ScheduleTemplateCode();
-		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode3);
-		scheduleTempCode3.setCode(code3);
-		dao.persist(scheduleTempCode3);
-		
-		ScheduleTemplateCode expectedResult = scheduleTempCode2;
-		ScheduleTemplateCode result = dao.getByCode(code2);
-		
-		assertEquals(expectedResult, result);
+	public void testFindByCode()
+	{
+		Character searchCode = 'S';
+		Character fillerCode = 'F';
+
+		ScheduleTemplateCode template1 = makeScheduleTemplateCode(searchCode);
+		dao.persist(template1);
+
+		ScheduleTemplateCode template2 = makeScheduleTemplateCode(fillerCode);
+		dao.persist(template2);
+
+		ScheduleTemplateCode found = dao.findByCode(Character.toString(searchCode));
+		assertEquals(searchCode,found.getCode());
 	}
 
 	@Test
-	public void testFindByCode() throws Exception {
-		
-		char code1 = 'a', code2 = 'b', code3 = 'c';
-		String code = "b";
+	public void testGetByCode()
+	{
+		Character searchCode = 'S';
+		Character fillerCode = 'F';
 
-		ScheduleTemplateCode scheduleTempCode1 = new ScheduleTemplateCode();
-		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode1);
-		scheduleTempCode1.setCode(code1);
-		dao.persist(scheduleTempCode1);
-		
-		ScheduleTemplateCode scheduleTempCode2 = new ScheduleTemplateCode();
-		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode2);
-		scheduleTempCode2.setCode(code2);
-		dao.persist(scheduleTempCode2);
-		
-		ScheduleTemplateCode scheduleTempCode3 = new ScheduleTemplateCode();
-		EntityDataGenerator.generateTestDataForModelClass(scheduleTempCode3);
-		scheduleTempCode3.setCode(code3);
-		dao.persist(scheduleTempCode3);
-		
-		ScheduleTemplateCode expectedResult = scheduleTempCode2;
-		ScheduleTemplateCode result = dao.findByCode(code);
-		
-		assertEquals(expectedResult, result);	
-	}	
+		ScheduleTemplateCode template1 = makeScheduleTemplateCode(searchCode);
+		dao.persist(template1);
+
+		ScheduleTemplateCode template2 = makeScheduleTemplateCode(fillerCode);
+		dao.persist(template2);
+
+		ScheduleTemplateCode found = dao.getByCode(searchCode);
+		assertEquals(template1.getCode(), found.getCode());
+	}
+
+
+	@Test
+	public void testNoOverwriteOnCreateCaseSensitive()
+	{
+		Character lowerCaseCode = 'a';
+		Character upperCaseCode = 'A';
+
+		ScheduleTemplateCode lowerCase = makeScheduleTemplateCode(lowerCaseCode);
+		dao.persist(lowerCase);
+		assertNotNull(lowerCase.getId());
+
+		ScheduleTemplateCode upperCase = makeScheduleTemplateCode(upperCaseCode);
+		dao.persist(upperCase);
+		assertNotNull(upperCase.getCode());
+
+		List<ScheduleTemplateCode> results = dao.findAll();
+		assertEquals(2, results.size());
+	}
+
+	@Test
+	public void testGetByCaseSensitive()
+	{
+		Character lowerCaseCode = 'a';
+		Character upperCaseCode = 'A';
+
+		ScheduleTemplateCode lowerCase = makeScheduleTemplateCode(lowerCaseCode);
+		dao.persist(lowerCase);
+
+		ScheduleTemplateCode upperCase = makeScheduleTemplateCode(upperCaseCode);
+		dao.persist(upperCase);
+
+		lowerCase = dao.getByCode(lowerCaseCode);
+		assertNotNull(lowerCase);
+		assertEquals("getBy(a) returned the wrong code", lowerCase.getCode(), lowerCaseCode);
+
+		upperCase = dao.getByCode(upperCaseCode);
+		assertNotNull(upperCase);
+		assertEquals("getBy(A) returned returned the wrong code", upperCase.getCode(), upperCaseCode);
+	}
+
+	@Test
+	public void testFindByCaseSensitive()
+	{
+		Character lowerCaseCode = 'a';
+		Character upperCaseCode = 'A';
+
+		ScheduleTemplateCode lowerCase = makeScheduleTemplateCode(lowerCaseCode);
+		dao.persist(lowerCase);
+
+		ScheduleTemplateCode upperCase = makeScheduleTemplateCode(upperCaseCode);
+		dao.persist(upperCase);
+
+		lowerCase = dao.findByCode(Character.toString(lowerCaseCode));
+		assertNotNull(lowerCase);
+		assertEquals("findBy(a) returned the wrong code", lowerCase.getCode(), lowerCaseCode);
+
+		upperCase = dao.findByCode(Character.toString(upperCaseCode));
+		assertNotNull(upperCase);
+		assertEquals("findBy(A) returned the wrong code", upperCase.getCode(), upperCaseCode);
+	}
+
+	@Test
+	public void testOverWriteCaseSensitive()
+	{
+		Character lowerCaseCode = 'a';
+		Character upperCaseCode = 'A';
+		String defaultDescription = "description";
+
+		ScheduleTemplateCode lowerCase = makeScheduleTemplateCode(lowerCaseCode);
+		lowerCase.setDescription(defaultDescription);
+		dao.persist(lowerCase);
+
+		ScheduleTemplateCode upperCase = makeScheduleTemplateCode(upperCaseCode);
+		upperCase.setDescription(defaultDescription);
+		dao.persist(upperCase);
+
+		// Updating 'a' should not update 'A'
+		String lowerCaseDescription = "lowerCaseDescription";
+
+		lowerCase = dao.getByCode(lowerCaseCode);
+		lowerCase.setDescription(lowerCaseDescription);
+		dao.merge(lowerCase);
+
+		lowerCase = dao.getByCode(lowerCaseCode);
+		upperCase = dao.getByCode(upperCaseCode);
+
+		assertEquals("a does not have expected description", lowerCaseDescription, lowerCase.getDescription());
+		assertTrue("Updating a also updated A", !upperCase.getDescription().equals(lowerCaseDescription));
+
+		// Updating 'A' should not overwrite 'a'.
+		String upperCaseDescription = "UPPERCASEDESCRIPTION";
+
+		upperCase = dao.getByCode(upperCaseCode);
+		upperCase.setDescription(upperCaseDescription);
+		dao.merge(upperCase);
+
+		upperCase = dao.getByCode(upperCaseCode);
+		lowerCase = dao.getByCode(lowerCaseCode);
+
+		assertEquals("TemplateCode A does not have expected description", upperCaseDescription, upperCase.getDescription());
+		assertTrue("Updating A also updated a", !lowerCase.getDescription().equals(upperCaseDescription));
+	}
+
+	private static ScheduleTemplateCode makeScheduleTemplateCode(Character code)
+	{
+		ScheduleTemplateCode toReturn = new ScheduleTemplateCode();
+		toReturn.setCode(code);
+		toReturn.setConfirm("N");
+
+		return toReturn;
+	}
 }

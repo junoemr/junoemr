@@ -36,6 +36,8 @@
 <%@page import="java.util.Enumeration,java.util.Iterator "%>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.oscarehr.eform.service.EFormTemplateService" %>
+<%@ page import="org.oscarehr.eform.model.EForm" %>
 
 <%
     String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -544,9 +546,13 @@ int maxId = 0;
 
 					 	if (note.isEformData())
 						{
+							EFormTemplateService eFormTemplateService = (EFormTemplateService) SpringUtils.getBean(EFormTemplateService.class);
+							Integer popupWidth = eFormTemplateService.getEformPopupWidth(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
+							Integer popupHeight = eFormTemplateService.getEformPopupHeight(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
+
 							String winName = "eforms"+demographicNo;
 							int hash = Math.abs(winName.hashCode());
-							String url = "popupPage(700,800,'"+hash+"','"+request.getContextPath()+"/eform/efmshowform_data.jsp?appointment=' + appointmentNo + '&fdid=";
+							String url = "popupPage(" + popupHeight + "," + popupWidth + ",'"+hash+"','"+request.getContextPath()+"/eform/efmshowform_data.jsp?appointment=' + appointmentNo + '&fdid=";
 
 							CaseManagementNoteLink noteLink = note.getNoteLink();
 							if (noteLink!=null) url += noteLink.getTableId();

@@ -263,6 +263,7 @@
 	<bean id="myHealthAppointmentService" class="org.oscarehr.integration.myhealthaccess.service.AppointmentService" autowire="byName"/>
 	<bean id="myHealthClinicService" class="org.oscarehr.integration.myhealthaccess.service.ClinicService" autowire="byName"/>
     <bean id="myHealthAccessService" class="org.oscarehr.telehealth.service.MyHealthAccessService" autowire="byName"/>
+	<bean id="myHealthPatientService" class="org.oscarehr.integration.myhealthaccess.service.PatientService" autowire="byName"/>
 
    <!--Email Support -->
    <context:component-scan base-package="oscar.service"/>

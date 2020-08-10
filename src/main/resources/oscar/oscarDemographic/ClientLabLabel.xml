@@ -4,30 +4,32 @@
 <jasperReport name="label" pageWidth="400" pageHeight="74"
 	columnWidth="270" leftMargin="15" rightMargin="0" topMargin="0"
 	bottomMargin="4">
-	<reportFont name="sansserif" isDefault="false" fontName="sansserif"
+	<reportFont name="sansserif" fontName="sansserif"
 		isBold="false" isItalic="false" isUnderline="false"
 		isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252"
 		isPdfEmbedded="false" />
-	<parameter name="demo" class="java.lang.String">
-	</parameter>
+	<parameter name="demo"></parameter>
+    <parameter name="clinic_name"></parameter>
 	<queryString>
-		<![CDATA[SELECT d.demographic_no, d.first_name, d.last_name,
-			if(trim(ifnull(d.hin,''))='', 'N/A', d.hin) as hin,
-			CONCAT(d.year_of_birth, '-' ,d.month_of_birth, '-', d.date_of_birth) as birthday, d.sex,
-			year(from_days(datediff(now(),STR_TO_DATE(CONCAT(d.year_of_birth,'-',d.month_of_birth,'-',d.date_of_birth),'%Y-%m-%d')))) as age,
-			current_date as curr_date, p.name as program_name
-			FROM demographic d, program_provider pp, program p
-			where d.provider_no = pp.provider_no and pp.program_id = p.id and d.demographic_no = $P{demo}]]>
+		<![CDATA[
+		    SELECT d.demographic_no, d.first_name, d.last_name,
+            IF(TRIM(IFNULL(d.hin,'')) = '', 'N/A', d.hin) AS hin,
+            CONCAT(d.year_of_birth, '-' ,d.month_of_birth, '-', d.date_of_birth) AS birthday,
+            d.sex,
+            TIMESTAMPDIFF(YEAR, CONCAT(d.year_of_birth, d.month_of_birth, d.date_of_birth), current_date) AS age,
+            current_date AS curr_date
+            FROM demographic d
+            WHERE d.demographic_no = $P{demo}
+        ]]>
 	</queryString>
-	<field name="demographic_no" class="java.lang.String"/>
-	<field name="first_name" class="java.lang.String"/>
-	<field name="last_name" class="java.lang.String"/>
-	<field name="hin" class="java.lang.String"/>
-	<field name="birthday" class="java.lang.String"/>
-	<field name="sex" class="java.lang.String"/>
-	<field name="age" class="java.lang.String"/>
-	<field name="curr_date" class="java.lang.String"/>
-	<field name="program_name" class="java.lang.String"/>
+	<field name="demographic_no"/>
+	<field name="first_name"/>
+	<field name="last_name"/>
+	<field name="hin"/>
+	<field name="birthday"/>
+	<field name="sex"/>
+	<field name="age"/>
+	<field name="curr_date"/>
 	<title>
 		<band height="60">
 			<textField>
@@ -36,21 +38,20 @@
 				<textElement>
 					<font isBold="true" />
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{first_name} + " " + $F{last_name} + " (Client Record# " + $F{demographic_no} + ")"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{first_name} + " " + $F{last_name} + " (Client Record# " + $F{demographic_no} + ")"]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" mode="Opaque" x="0"
 					y="25" width="330" height="14" />
 				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA["HIN: " +$F{hin} + ", Birthday: " + $F{birthday} + ", Gender: " + $F{sex} + ", Age: " + $F{age}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["HIN: " +$F{hin} + ", Birthday: " + $F{birthday} + ", Gender: " + $F{sex} + ", Age: " + $F{age}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" mode="Opaque" x="0"
 					y="38" width="330" height="14" />
 				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA["Date of Collection: " + $F{curr_date} + ", Clinic Location: " + $F{program_name} ]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Date of Collection: " + $F{curr_date} + ", " + $P{clinic_name}]]></textFieldExpression>
 			</textField>
-
 		</band>
 	</title>
 </jasperReport>

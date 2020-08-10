@@ -1,4 +1,6 @@
-<%--
+<%@ page import="org.oscarehr.eform.service.EFormTemplateService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %><%--
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -40,6 +42,9 @@ if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.Is
     cbiReminderWindow = (String)session.getAttribute("cbiReminderWindow");
 }
 
+	EFormTemplateService eFormTemplateService = (EFormTemplateService) SpringUtils.getBean(EFormTemplateService.class);
+	Integer eformPopupWidth = eFormTemplateService.getEformPopupWidth(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
+	Integer eformPopupHeight = eFormTemplateService.getEformPopupHeight(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
 %>
 function storeApptNo(apptNo) {
 	var url = "storeApptInSession.jsp?appointment_no="+apptNo;
@@ -116,16 +121,24 @@ function setfocus() {
 this.focus();
 }
 
-function popupPage(vheight,vwidth,varpage) {
-var page = "" + varpage;
-windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=50,screenY=50,top=0,left=0";
-var popup=window.open(page, "<bean:message key="provider.appointmentProviderAdminDay.apptProvider"/>", windowprops);
-if (popup != null) {
-if (popup.opener == null) {
-popup.opener = self;
-}
-popup.focus();
-}
+function popupPage(vheight,vwidth,varpage,windowName)
+{
+	if (!windowName)
+	{
+		windowName = "<bean:message key="provider.appointmentProviderAdminDay.apptProvider"/>"
+	}
+
+	var page = "" + varpage;
+	windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=50,screenY=50,top=0,left=0";
+	var popup=window.open(page, windowName, windowprops);
+	if (popup != null)
+	{
+		if (popup.opener == null)
+		{
+			popup.opener = self;
+		}
+		popup.focus();
+	}
 }
 
 function popUpEncounter(vheight,vwidth,varpage) {
@@ -166,6 +179,11 @@ function popupInboxManager(varpage){
         }
         popup.focus();
     }
+}
+
+function eformPopup(varpage, windowname)
+{
+	popupPage2(varpage, windowname, <%=eformPopupHeight%>, <%=eformPopupWidth%>);
 }
 
 function popupPage2(varpage) {

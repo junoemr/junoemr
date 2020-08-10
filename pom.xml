@@ -751,7 +751,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.6</version>
+			<version>3.17</version>
 		</dependency>
 		<!-- ostermillerutils_1_04_03_for_java_1_4.jar we need to stop using this and replace it with apache commons -->
 		<dependency>
@@ -1270,6 +1270,13 @@
             <artifactId>java-jwt</artifactId>
             <version>3.8.1</version>
         </dependency>
+        <!-- Integration Tests -->
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>3.0.0-M4</version>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
@@ -1700,7 +1707,7 @@
 					<systemProperties>
 						<systemProperty>
 							<key>openApiSpecBuilder.resourceClassCsv</key>
-							<value>org.oscarehr.ws.rest.SystemPreferenceWebService,org.oscarehr.ws.rest.ScheduleService,org.oscarehr.ws.rest.SitesService,org.oscarehr.ws.rest.AppointmentService,org.oscarehr.ws.rest.ProviderPreferenceWebService</value>
+							<value>org.oscarehr.ws.rest.SystemPreferenceWebService,org.oscarehr.ws.rest.ScheduleService,org.oscarehr.ws.rest.SitesService,org.oscarehr.ws.rest.AppointmentService,org.oscarehr.ws.rest.ProviderPreferenceWebService,org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService,org.oscarehr.ws.rest.myhealthaccess.DemographicWebService,org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService,org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService</value>
 						</systemProperty>
 						<systemProperty>
 							<key>openApiSpecBuilder.outputDirectory</key>
@@ -2212,30 +2219,37 @@
 									</systemPropertyVariables>
 								</configuration>
 							</execution>
-							<execution>
-								<id>integration-test</id>
-								<goals>
-									<goal>test</goal>
-								</goals>
-								<phase>integration-test</phase>
-								<configuration>
-									<skipTests>false</skipTests>
-									<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
-									<excludes>
-										<exclude>**/SetupDatabase.java</exclude>
-									</excludes>
-									<includes>
-										<include>integration/tests/*</include>
-									</includes>
-									<systemPropertyVariables>
-										<oscar.skip.dbinit>true</oscar.skip.dbinit>
-										<buildDirectory>${project.build.directory}</buildDirectory>
-									</systemPropertyVariables>
-								</configuration>
-							</execution>
 						</executions>
 						<version>2.10</version>
 					</plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>integration-test</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                                <phase>integration-test</phase>
+                                <configuration>
+                                    <skipTests>false</skipTests>
+                                    <argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
+                                    <excludes>
+                                        <exclude>**/SetupDatabase.java</exclude>
+                                    </excludes>
+                                    <includes>
+                                        <include>integration/tests/*</include>
+                                    </includes>
+                                    <systemPropertyVariables>
+                                        <oscar.skip.dbinit>true</oscar.skip.dbinit>
+                                        <buildDirectory>${project.build.directory}</buildDirectory>
+                                    </systemPropertyVariables>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <version>3.0.0-M4</version>
+                    </plugin>
 				</plugins>
 			</build>
 		</profile>

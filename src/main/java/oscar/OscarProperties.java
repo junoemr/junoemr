@@ -592,7 +592,13 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("DEMOGRAPHIC_PATIENT_HEALTH_CARE_TEAM");
 	}
 
-	public static Integer getNumLoadedNotes(int defaultValue) {
+	public static Integer getNumLoadedNotes(int defaultValue) 
+	{
 		return oscarProperties.getIntegerProperty("num_loaded_notes", defaultValue);
+	}
+
+	public boolean isOptimizeSmallSchedulesEnabled()
+	{
+		return isPropertyActive("optimize_small_schedules");
 	}
 }

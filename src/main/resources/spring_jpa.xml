@@ -150,6 +150,9 @@
 	<context:component-scan base-package="org.oscarehr.securityLog" />
 	<context:component-scan base-package="org.oscarehr.fax" />
 	<context:component-scan base-package="org.oscarehr.admin" />
+	<context:component-scan base-package="org.oscarehr.forms" />
+	<context:component-scan base-package="org.oscarehr.integration.iceFall" />
+	<context:component-scan base-package="org.oscarehr.message" />
 	<!-- Sharing Center -->
 	<context:component-scan base-package="org.oscarehr.sharingcenter.dao" />
 	<context:component-scan base-package="oscar.oscarLab.ca.all.upload.handlers"/>

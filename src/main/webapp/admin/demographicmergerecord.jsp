@@ -72,29 +72,45 @@ if(!authed) {
 		if(outcome.equals("success"))
 		{
 %>
-<script language="JavaScript">
+<script type="text/javascript">
 	alert("Records merged successfully");
 </script>
 <%
 	}else if (outcome.equals("failure")){
 %>
-<script language="JavaScript">
+<script type="text/javascript">
 	alert("Failed to merge records");
 </script>
 <%
 	}else if (outcome.equals("successUnMerge")){
 %>
-<script language="JavaScript">
+<script type="text/javascript">
 	alert("Record(s) unmerged successfully");
 </script>
 <%
 	}else if (outcome.equals("failureUnMerge")){
 %>
-<script language="JavaScript">
+<script type="text/javascript">
 	alert("Failed to unmerge records");
 </script>
 <%
-	}
+		}
+		else if (outcome.equals("alreadyMerged"))
+		{
+%>
+<script type="text/javascript">
+	alert("This merge has already occurred!");
+</script>
+<%
+		}
+		else if (outcome.equals("alreadyUnMerged"))
+		{
+%>
+<script type="text/javascript">
+	alert("This demographic has already been un-merged!");
+</script>
+<%
+		}
 	}
 %>
 
@@ -103,13 +119,15 @@ if(!authed) {
 <%@ page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
 <%@ page import="oscar.OscarProperties"%>
-<%@ page import="oscar.oscarDemographic.data.DemographicMerged"%>
 <%@ page import="java.util.Collections"%>
 <%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
+<%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
 
 <%
 	List<Demographic> demoList = null;
 	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	DemographicMergedDao demographicMergedDao = SpringUtils.getBean(DemographicMergedDao.class);
 
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 	String providerNo = loggedInInfo.getLoggedInProviderNo();
@@ -312,9 +330,14 @@ else {
 %>
 	<tr>
 		<%
-        DemographicMerged dmDAO = new DemographicMerged();
-		String demographicNo = demo.getDemographicNo().toString() ;
-		String head = dmDAO.getHead(demographicNo);
+
+		int demographicNo = demo.getDemographicNo();
+		DemographicMerged headRecord = demographicMergedDao.getCurrentHead(demographicNo);
+		String head = "";
+		if (headRecord != null)
+		{
+			head = Integer.toString(headRecord.getMergedTo());
+		}
         
 		// default to head record
         boolean isHeadRecord = true;

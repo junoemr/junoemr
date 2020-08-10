@@ -239,10 +239,8 @@ public class TicklerManager {
     
     public List<Tickler> getTicklers(LoggedInInfo loggedInInfo, CustomFilter filter, int offset, int limit) {
     	checkPrivilege(loggedInInfo, PRIVILEGE_READ);
-    	
-    	List<Tickler> results = ticklerDao.getTicklers(filter,offset,limit);     
-        
-        return(results);
+
+		return ticklerDao.getTicklers(filter, offset, limit);
     }
     
     protected List<Tickler> ticklerFacilityFiltering(LoggedInInfo loggedInInfo, List<Tickler> ticklers) {
