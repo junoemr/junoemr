@@ -19,6 +19,7 @@
 		       class="form-control"
 		       placeholder="{{text_placeholder}}"
 		       ng-class="{'no_scroll_bar': max_characters > 0}"
+		       maxlength="{{max_characters}}"
 		       ng-model="model"
 		       ng-focus="focus_fn()"
 		       ng-change="change_fn()"

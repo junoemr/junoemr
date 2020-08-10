@@ -164,7 +164,7 @@ public class IntegrationAction extends DispatchAction
 	private IntegrationData createClinicUser(HttpServletRequest request, IntegrationData integrationData)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		ProviderData loggedInProvider = loggedInInfo.getLoggedInProvider().getProvider();
+		ProviderData loggedInProvider = loggedInInfo.getLoggedInProvider().convertToProviderData();
 		Security loggedInUser = loggedInInfo.getLoggedInSecurity();
 
 		ClinicUserCreateTo1 clinicUser = new ClinicUserCreateTo1(

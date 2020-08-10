@@ -158,23 +158,40 @@ public class MeasurementFlowSheet {
 
     public String getDxTriggersQueryBuilder(String demo, String provider){
         StringBuilder sb = new StringBuilder();
-        String query="";
-        String desc="";
+        String query = "";
+        String desc = "";
         
         DxDao dao = SpringUtils.getBean(DxDao.class);
         
-        if (dxTriggers != null){
-            for(String s:dxTriggers){
+        if (dxTriggers != null)
+        {
+            for(String trigger : dxTriggers)
+            {
                 // I don't know how icd10 is being put into this dxTriggers but we don't support it currently
-                if (!s.equals("OscarCode:CKDSCREEN") && !s.contains("icd10")){
-                	 String[] type = s.split(":");
-                 desc=dao.getCodeDescription(type[0], type[1]);
-                 sb.append("<li><a href='javascript:void(0);' id='dxlink"+type[1]+"' rel='selectedCodingSystem="+type[0]+"&forward="+type[1]+"&demographicNo="+demo+"&providerNo="+provider+"'>"+s+ " " + desc +"</a></li>");
-                 }
+                if (!trigger.equals("OscarCode:CKDSCREEN") && !trigger.contains("icd10"))
+                {
+                    String[] type = trigger.split(":");
+                    desc = dao.getCodeDescription(type[0], type[1]);
+                    sb.append("<li><a href='javascript:void(0);' id='dxlink")
+                            .append(type[1])
+                            .append("' rel='selectedCodingSystem=")
+                            .append(type[0])
+                            .append("&forward=")
+                            .append(type[1])
+                            .append("&demographicNo=")
+                            .append(demo)
+                            .append("&providerNo=")
+                            .append(provider)
+                            .append("'>")
+                            .append(trigger)
+                            .append(" ")
+                            .append(desc)
+                            .append("</a></li>");
+                }
             }
             
-            query=sb.toString();
-            query="<ul>"+query+"</ul>";
+            query = sb.toString();
+            query = "<ul>" + query + "</ul>";
         }
         return query;
      }

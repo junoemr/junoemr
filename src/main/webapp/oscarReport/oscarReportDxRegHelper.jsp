@@ -17,27 +17,29 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 --%>
-<%@page import="java.util.Iterator"%>
 <%@page import="java.util.List"%>
 <%@page import="org.oscarehr.common.dao.Icd9Dao"%>
 <%@page import="org.oscarehr.common.model.Icd9"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="org.json.simple.JSONArray" %>
+<%@ page import="java.util.ArrayList" %>
 <%
 
-            Icd9Dao icd9dao = (Icd9Dao) SpringUtils.getBean("Icd9DAO");
+    Icd9Dao icd9dao = (Icd9Dao) SpringUtils.getBean("Icd9DAO");
 
+    String searchParams = request.getParameter("term");
 
-            String query = request.getParameter("q");
+    List<Icd9> Icd9List = icd9dao.getIcd9(searchParams);
 
-            List<Icd9> Icd9List = icd9dao.getIcd9(query);
+    List<String> responseList = new ArrayList<String>();
 
-            if (Icd9List != null && Icd9List.size() > 0) {
-                Iterator<Icd9> iterator = Icd9List.iterator();
-                while (iterator.hasNext()) {
-                    Icd9 icd9 = iterator.next();
-                    String code = icd9.getIcd9();
-                    String description = icd9.getDescription();
-                    out.println(code + " --> " + description);
-                }
-            }
+    if (Icd9List != null)
+    {
+    	for (Icd9 entry : Icd9List)
+        {
+        	responseList.add(entry.getCode() + " --> " + entry.getDescription());
+        }
+    }
+
+    response.getWriter().write(JSONArray.toJSONString(responseList));
 %>

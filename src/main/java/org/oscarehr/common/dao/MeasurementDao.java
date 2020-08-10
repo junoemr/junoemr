@@ -48,6 +48,7 @@ import oscar.util.UtilDateUtilities;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 @Repository
+@Transactional(propagation = Propagation.REQUIRED)
 public class MeasurementDao extends AbstractDao<Measurement> {
 
 	@Autowired
@@ -63,7 +64,6 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 		super(Measurement.class);
 	}
 
-	@Transactional(propagation = Propagation.REQUIRED)
 	public void deleteMatchingLabs(String[] matchingLabs, String lab_no)
 	{
 		int k = 0;
@@ -80,20 +80,33 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 		}
 	}
 
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void populateMeasurements(
-			MessageHandler messageHandler, String lab_no, String demographic_no, String dateEntered) {
-
+	public void populateMeasurements(MessageHandler messageHandler, String lab_no, String demographic_no, Date dateEntered)
+	{
 		Logger logger = MiscUtils.getLogger();
 
-		for (int i = 0; i < messageHandler.getOBRCount(); i++) {
-			for (int j = 0; j < messageHandler.getOBXCount(i); j++) {
+		for (int i = 0; i < messageHandler.getOBRCount(); i++)
+		{
+			for (int j = 0; j < messageHandler.getOBXCount(i); j++)
+			{
 
 				String result = messageHandler.getOBXResult(i, j);
 
 				// only add if there is a result and it is supposed to be viewed
-				if (result.equals("") || result.equals("DNR") || messageHandler.getOBXName(i, j).equals("") || messageHandler.getOBXResultStatus(i, j).equals("DNS")) continue;
+				if (result.equals("")
+						|| result.equals("DNR")
+						|| messageHandler.getOBXName(i, j).equals("")
+						|| messageHandler.getOBXResultStatus(i, j).equals("DNS"))
+				{
+					continue;
+				}
 				logger.debug("obx(" + j + ") should be added");
+
+				if (result.length() > Measurement.RESULT_LENGTH)
+				{
+					logger.warn("Following result is going to be truncated:");
+					logger.warn(result);
+					result = org.apache.commons.lang3.StringUtils.left(result, Measurement.RESULT_LENGTH);
+				}
 				String identifier = messageHandler.getOBXIdentifier(i, j);
 				String name = messageHandler.getOBXName(i, j);
 				String unit = messageHandler.getOBXUnits(i, j);
@@ -112,7 +125,8 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 				}
 				String[] refRange = splitRefRange(messageHandler.getOBXReferenceRange(i, j));
 				String comments = "";
-				for (int l = 0; l < messageHandler.getOBXCommentCount(i, j); l++) {
+				for (int l = 0; l < messageHandler.getOBXCommentCount(i, j); l++)
+				{
 					comments += comments.length() > 0 ? "\n" + messageHandler.getOBXComment(i, j, l) : messageHandler.getOBXComment(i, j, l);
 				}
 
@@ -120,10 +134,14 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 				String measInst = "";
 
 				List<Object[]> measurements = measurementMapDao.findMeasurements("FLOWSHEET", identifier);
-				if (measurements.isEmpty()) {
+				if(measurements.isEmpty())
+				{
 					logger.warn("CODE:" + identifier + " needs to be mapped");
-				} else {
-					for (Object[] o : measurements) {
+				}
+				else
+				{
+					for(Object[] o : measurements)
+					{
 						MeasurementMap mm = (MeasurementMap) o[1];
 						MeasurementType type = (MeasurementType) o[2];
 
@@ -149,7 +167,7 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 				}
 
 				if( m.getDateObserved() == null ){
-					m.setDateObserved(UtilDateUtilities.StringToDate(dateEntered, "yyyy-MM-dd hh:mm:ss"));
+					m.setDateObserved(dateEntered);
 				}
 				m.setAppointmentNo(0);
 
@@ -693,8 +711,10 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 		return query.getResultList();
 	}
 
-	public List<Measurement> findByValue(String key, String value) {
-		Query q = entityManager.createQuery("SELECT m FROM Measurement m, MeasurementsExt e " + "WHERE m.id = e.measurementId " + "AND e.keyVal = :key " + "AND e.val = :val");
+	public List<Measurement> findByValue(String key, String value)
+	{
+		Query q = entityManager.createQuery("SELECT m FROM Measurement m, MeasurementsExt e " +
+				"WHERE m.id = e.measurementId " + "AND e.keyVal = :key " + "AND e.val = :val");
 		q.setParameter("key", key);
 		q.setParameter("val", value);
 		return q.getResultList();

@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ApptData implements Serializable {
-	String appointment_no;
+	String appointmentNo;
 	String provider_no;
 	String appointment_date;
 	String start_time;
@@ -48,6 +48,7 @@ public class ApptData implements Serializable {
 	String providerFirstName;
 	String ohipNo;
 	String urgency;
+	Boolean isVirtual;
 
 	public String getAppointment_date() {
 		return appointment_date;
@@ -57,12 +58,14 @@ public class ApptData implements Serializable {
 		this.appointment_date = appointment_date;
 	}
 
-	public String getAppointment_no() {
-		return appointment_no;
+	public String getAppointmentNo()
+	{
+		return appointmentNo;
 	}
 
-	public void setAppointment_no(String appointment_no) {
-		this.appointment_no = appointment_no;
+	public void setAppointmentNo(String appointmentNo)
+	{
+		this.appointmentNo = appointmentNo;
 	}
 
 	public String getBilling() {
@@ -258,6 +261,14 @@ public class ApptData implements Serializable {
 	public void setUrgency(String urgency) {
     	this.urgency = urgency;
     }
-	
-	
+
+	public Boolean isVirtual()
+	{
+		return isVirtual;
+	}
+
+	public void setVirtual(Boolean virtual)
+	{
+		isVirtual = virtual;
+	}
 }

@@ -28,6 +28,7 @@ import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.collections.comparators.ReverseComparator;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.report.reportByTemplate.service.ReportByTemplateService;
 import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.ScheduleDate;
@@ -132,7 +133,7 @@ public class ThirdApptTimeReporter implements Reporter
                 timecodes = st.getTimecode();
                 duration = dayMins/timecodes.length();
 
-                List<Appointment> appts = apptDao.findByProviderAndDayandNotStatus(st.getId().getProviderNo(), sd.getDate(), "C");
+                List<Appointment> appts = apptDao.findByProviderAndDayandNotStatus(st.getId().getProviderNo(), sd.getDate(), AppointmentStatus.APPOINTMENT_STATUS_CANCELLED);
                 Collections.sort(appts, new ReverseComparator(new BeanComparator("startTime")));
                 
                 codePos = 0;

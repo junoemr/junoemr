@@ -109,12 +109,7 @@ public class HRMReportParser {
 			} catch (JAXBException e) {
 				// TODO Auto-generated catch block
 				logger.error("error",e);
-				if(e.getLinkedException() != null) {
-					SFTPConnector.notifyHrmError(loggedInInfo, e.getLinkedException().getMessage());
-				} else {
-					SFTPConnector.notifyHrmError(loggedInInfo, e.getMessage());
-				}
-				
+
 			}
 
                         if (root!=null && hrmReportFileLocation!=null && fileData!=null)

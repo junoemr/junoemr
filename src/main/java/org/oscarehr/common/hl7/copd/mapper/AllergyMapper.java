@@ -34,7 +34,6 @@ import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,7 +41,7 @@ import java.util.List;
 public class AllergyMapper extends AbstractMapper
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	public static final String MEDIPLAN_ALLERGY_NOTE_ID = "MEDIPLAN ALLERGY SECTION";
+	public static final int ALLERGY_DESCRIPTION_LENGTH = 50;
 
 	public AllergyMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
@@ -51,22 +50,7 @@ public class AllergyMapper extends AbstractMapper
 
 	public int getNumAllergies() throws HL7Exception
 	{
-		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
-		{
-			int count = 0;
-			for (int i =0; i < provider.getZALReps(); i++)
-			{
-				if (isMedicalAllergyNoteMediplan(i))
-				{
-					count ++;
-				}
-			}
-			return count;
-		}
-		else
-		{
-			return provider.getALLERGYReps();
-		}
+		return provider.getALLERGYReps();
 	}
 
 	public List<Allergy> getAllergyList() throws HL7Exception
@@ -82,64 +66,38 @@ public class AllergyMapper extends AbstractMapper
 
 	public Allergy getAllergy(int rep) throws HL7Exception
 	{
-		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
-		{
-			return getAllergyMediplan(rep);
-		}
-		else
-		{
-			Allergy allergy = new Allergy();
-
-			String description = getDescription(rep);
-			if (description == null)
-			{
-				description = getGroupDescription(rep);
-				if (description == null)
-				{
-					description = "INVALID/MISSING DESCRIPTION";
-					logger.warn("Missing allergy description. values set to:" + description);
-				}
-			}
-			allergy.setStartDate(getStartDate(rep));
-			allergy.setEntryDate(getStartDate(rep));
-			allergy.setDescription(description);
-			allergy.setArchived(false);
-			allergy.setTypeCode(0);// TODO can numeric code be mapped from string in IAM.2.1?
-			allergy.setDrugrefId("0");
-			allergy.setSeverityOfReaction(getSeverity(rep));
-			allergy.setOnsetOfReaction(Allergy.ONSET_CODE_UNKNOWN);
-			allergy.setReaction(getReaction(rep));
-			allergy.setPosition(0);
-
-			allergy.setAgeOfOnset(getAgeAtOnset(rep));
-
-			return allergy;
-		}
-	}
-
-	public Allergy getAllergyMediplan(int rep) throws HL7Exception
-	{
-		rep = translateAllergyRepToZALRep(rep);
-
 		Allergy allergy = new Allergy();
-		String description = provider.getZAL(rep).getZal5_alertTextSent().getValue().replace(" / ", "\n");
+
+		String description = getDescription(rep);
 		if (description == null)
 		{
-			description = "INVALID/MISSING DESCRIPTION";
-			logger.warn("Missing allergy description. values set to:" + description);
+			description = getGroupDescription(rep);
+			if (description == null)
+			{
+				description = "INVALID/MISSING DESCRIPTION";
+				logger.warn("Missing allergy description. values set to:" + description);
+			}
 		}
-		allergy.setStartDate(provider.getZAL(rep).getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValueAsDate());
-		allergy.setEntryDate(provider.getZAL(rep).getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValueAsDate());
-		allergy.setDescription(description);
 
+		if (description.length() > ALLERGY_DESCRIPTION_LENGTH)
+		{
+			logger.warn("Description '" + description + "' is too long, truncating to 50 chars");
+			description = StringUtils.left(description, ALLERGY_DESCRIPTION_LENGTH);
+		}
+
+		allergy.setStartDate(getStartDate(rep));
+		allergy.setEntryDate(getStartDate(rep));
+		allergy.setDescription(description);
 		allergy.setArchived(false);
 		allergy.setTypeCode(0);// TODO can numeric code be mapped from string in IAM.2.1?
 		allergy.setDrugrefId("0");
-		allergy.setSeverityOfReaction(Allergy.SEVERITY_CODE_UNKNOWN);
+		allergy.setSeverityOfReaction(getSeverity(rep));
 		allergy.setOnsetOfReaction(Allergy.ONSET_CODE_UNKNOWN);
-
-		allergy.setReaction("");
+		allergy.setReaction(getReaction(rep));
 		allergy.setPosition(0);
+
+		allergy.setAgeOfOnset(getAgeAtOnset(rep));
+
 		return allergy;
 	}
 
@@ -156,36 +114,14 @@ public class AllergyMapper extends AbstractMapper
 
 	public CaseManagementNote getAllergyNote(int rep) throws HL7Exception
 	{
-		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
-		{
-			return getAllergyNoteMediplan(rep);
-		}
-		else
-		{
-			String nteNote = StringUtils.trimToNull(getComment(rep));
-			CaseManagementNote note = null;
-			if (nteNote != null)
-			{
-				note = new CaseManagementNote();
-				note.setNote(nteNote.replaceAll("~crlf~", "\n"));
-				note.setObservationDate(getStartDate(rep));
-				note.setUpdateDate(getStartDate(rep));
-			}
-			return note;
-		}
-	}
-
-	public CaseManagementNote getAllergyNoteMediplan(int rep) throws HL7Exception
-	{
-		rep = translateAllergyRepToZALRep(rep);
-		String nteNote = StringUtils.trimToNull(provider.getZAL(rep).getZal5_alertTextSent().getValue().replace(" / ", "\n"));
+		String nteNote = StringUtils.trimToNull(getComment(rep));
 		CaseManagementNote note = null;
 		if (nteNote != null)
 		{
 			note = new CaseManagementNote();
 			note.setNote(nteNote.replaceAll("~crlf~", "\n"));
-			note.setObservationDate(provider.getZAL(rep).getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValueAsDate());
-			note.setUpdateDate(provider.getZAL(rep).getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValueAsDate());
+			note.setObservationDate(getStartDate(rep));
+			note.setUpdateDate(getStartDate(rep));
 		}
 		return note;
 	}
@@ -225,9 +161,9 @@ public class AllergyMapper extends AbstractMapper
 
 	public String getAgeAtOnset(int rep)
 	{
-		String dobDateStr = message.getPATIENT().getPID().getDateTimeOfBirth().getTimeOfAnEvent().getValue();
-		LocalDate dob = ConversionUtils.toLocalDate(dobDateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
+		Date date = getNullableDate(message.getPATIENT().getPID().getDateTimeOfBirth().getTimeOfAnEvent().getValue());
 
+		LocalDate dob = ConversionUtils.toNullableLocalDate(date);
 		LocalDate startDate = ConversionUtils.toNullableLocalDate(getStartDate(rep));
 
 		if(dob != null && startDate != null)
@@ -241,39 +177,4 @@ public class AllergyMapper extends AbstractMapper
 	{
 		return StringUtils.trimToNull(provider.getALLERGY(rep).getNTE().getComment(0).getValue());
 	}
-
-	private boolean isMedicalAllergyNoteMediplan(int rep) throws HL7Exception
-	{
-		String ZALText = provider.getZAL(rep).getZal5_alertTextSent().getValue();
-		if ( ZALText != null)
-		{
-			return ZALText.indexOf(MEDIPLAN_ALLERGY_NOTE_ID) == 0;
-		}
-		return false;
-	}
-
-	/**
-	 * convert allergy rep which is an absolute offset to a ZAL rep which may have holes.
-	 * @param rep
-	 * @return
-	 * @throws HL7Exception
-	 */
-	private int translateAllergyRepToZALRep(int rep) throws HL7Exception
-	{
-		int count = 0;
-		for (int i =0; i < provider.getZALReps(); i++)
-		{
-			if (isMedicalAllergyNoteMediplan(i))
-			{
-				count ++;
-			}
-
-			if (count > rep)
-			{
-				return i;
-			}
-		}
-		return count;
-	}
-
 }

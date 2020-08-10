@@ -23,12 +23,16 @@
 package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.common.dao.ProviderSiteDao;
 import org.oscarehr.common.dao.SiteDao;
+import org.oscarehr.common.model.ProviderSite;
+import org.oscarehr.common.model.ProviderSitePK;
 import org.oscarehr.common.model.Site;
+import org.oscarehr.site.transfer.ProviderSiteBillingTransfer;
 import org.oscarehr.ws.rest.conversion.SiteConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
-import org.oscarehr.ws.rest.transfer.SiteTransfer;
+import org.oscarehr.site.transfer.SiteTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -49,6 +53,9 @@ public class SitesService extends AbstractServiceImpl
 	@Autowired
 	SiteDao siteDao;
 
+	@Autowired
+	ProviderSiteDao providerSiteDao;
+
 	@GET
 	public RestSearchResponse<SiteTransfer> getSiteList()
 	{
@@ -67,6 +74,18 @@ public class SitesService extends AbstractServiceImpl
 		return RestResponse.successResponse(org.oscarehr.common.IsPropertiesOn.isMultisitesEnable());
 	}
 
+
+	@GET
+	@Path("/{siteId}")
+	public RestResponse<SiteTransfer> getSite(@PathParam("siteId") Integer siteId)
+	{
+		Site site = siteDao.find(siteId);
+		SiteConverter converter = new SiteConverter();
+		SiteTransfer transfer = converter.getAsTransferObject(null, site);
+
+		return RestResponse.successResponse(transfer);
+	}
+
 	@GET
 	@Path("/provider/{providerNo}")
 	public RestSearchResponse<SiteTransfer> getSitesByProvider(@PathParam("providerNo") String providerNo)
@@ -77,6 +96,18 @@ public class SitesService extends AbstractServiceImpl
 		List<SiteTransfer> transferList = converter.getAllAsTransferObjects(null, sites);
 
 		return RestSearchResponse.successResponseOnePage(transferList);
+	}
+
+	@GET
+	@Path("/{siteId}/provider/{providerNo}/billing")
+	public RestResponse<ProviderSiteBillingTransfer> getProviderBillingForSite(@PathParam("providerNo") String providerNo, @PathParam("siteId") Integer siteId)
+	{
+		ProviderSitePK key = new ProviderSitePK(providerNo, siteId);
+		ProviderSite providerSite = providerSiteDao.find(key);
+
+		ProviderSiteBillingTransfer transfer = ProviderSiteBillingTransfer.toTransferObj(providerSite);
+
+		return RestResponse.successResponse(transfer);
 	}
 
 	@GET

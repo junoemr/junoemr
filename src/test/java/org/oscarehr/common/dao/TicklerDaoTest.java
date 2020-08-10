@@ -47,7 +47,6 @@ import org.oscarehr.util.SpringUtils;
 public class TicklerDaoTest extends DaoTestFixtures {
 
 	protected TicklerDao dao = SpringUtils.getBean(TicklerDao.class);
-	//protected TicklerUpdate1Dao updateDao = SpringUtils.getBean(TicklerUpdate1Dao.class);
 	private DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	private ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
@@ -109,7 +108,7 @@ public class TicklerDaoTest extends DaoTestFixtures {
 		return cal.getTime();
 	}
 
-	@Test 
+	@Test
 	public void testFindSomeStuff() {
 		dao.persist(this.createTickler(1, "hello there", 10015, today(), Tickler.STATUS.A, "1"));
 		dao.persist(this.createTickler(1, "I am coding", 10015, yesterday(), Tickler.STATUS.C, "2"));
@@ -176,7 +175,6 @@ public class TicklerDaoTest extends DaoTestFixtures {
 		
 		dao.persist(entity);
 		assertNotNull(entity.getId());
-		
 		
 		tu.setTicklerNo(entity.getId());
 		dao.persist(tu);

@@ -144,6 +144,20 @@ function ogo2() {
   popupPage(700,900,u);
 }
 
+function openAR2012()
+{
+	var region = '<%=billingRegion%>';
+	var startDate = document.getElementsByName("startDate")[0].value.replace('/', '-');
+	var endDate = document.getElementsByName("endDate")[0].value.replace('/', '-');
+
+	var url = '';
+	if (region === "BC")
+	{
+		url = 'reportBCEDBList2012.jsp?startDate=' + startDate + '&endDate=' + endDate;
+	}
+	popupPage(700, 900, url);
+}
+
 function popupPageNew(vheight,vwidth,varpage) {
   var page = "" + varpage;
   windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
@@ -283,11 +297,27 @@ String today = now.get(Calendar.YEAR)+"-"+(now.get(Calendar.MONTH)+1)+"-"+now.ge
 		</td>
 		<td width="1"></td>
 		<td width="300">
-		<% if (billingRegion.equals("BC")) { %> <a HREF="#" ONCLICK="ogo()"><bean:message
-			key="report.reportindex.btnEDDList" /></a> &nbsp;<a HREF="#"
-			ONCLICK="ogo2()">07</a> <% } else { %> <a HREF="#" ONCLICK="ogo()"><bean:message
-			key="report.reportindex.btnEDBList" /></a> &nbsp;<a HREF="#"
-			ONCLICK="ogo2()">05</a> <% } %>
+		<%
+			if (billingRegion.equals("BC"))
+			{
+		%>
+			<a HREF="#" ONCLICK="ogo()">
+				<bean:message key="report.reportindex.btnEDDList" />
+			</a> &nbsp;
+			<a HREF="#" ONCLICK="ogo2()">07</a>
+			<a href="#" onclick="openAR2012()">12</a>
+		<%
+			}
+			else
+			{
+		%>
+			<a HREF="#" ONCLICK="ogo()">
+				<bean:message key="report.reportindex.btnEDBList" />
+			</a> &nbsp;
+			<a HREF="#" ONCLICK="ogo2()">05</a>
+		<%
+			}
+		%>
 		</td>
 		<td><a HREF="#"
 			onClick="popupPage(310,430,'../share/CalendarPopup.jsp?urlfrom=../report/reportindex.jsp&year=<%=now.get(Calendar.YEAR)%>&month=<%=now.get(Calendar.MONTH)+1%>&param=<%=URLEncoder.encode("&formdatebox=document.getElementsByName('startDate')[0].value")%>')">

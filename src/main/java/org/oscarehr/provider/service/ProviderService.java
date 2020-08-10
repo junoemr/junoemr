@@ -25,6 +25,7 @@ package org.oscarehr.provider.service;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,28 @@ public class ProviderService
 {
 	@Autowired
 	ProviderDataDao providerDataDao;
+
+	public ProviderData getProvider(String providerNo)
+	{
+		return providerDataDao.findByProviderNo(providerNo);
+	}
+
+	public void saveProvider(ProviderData provider)
+	{
+		providerDataDao.merge(provider);
+	}
+
+	/**
+	 * Fetch a provider including with all associations preloaded.  Use this get method if you are in a layer which
+	 * doesn't support transactions and you need to read or write to lazily loaded entities.
+	 *
+	 * @param providerNo id of Provider to fetch
+	 * @return Fully instantiated provider object
+	 */
+	public ProviderData getProviderEager(String providerNo)
+	{
+		return providerDataDao.eagerFindByProviderNo(providerNo);
+	}
 
 	public ProviderData addNewProvider(String creatingProviderNo, ProviderData provider, String billCenterCode)
 	{
@@ -100,5 +123,17 @@ public class ProviderService
 	public Integer getNextProviderNumberInSequence(int minThreshold, int ignoreThreshold)
 	{
 		return providerDataDao.getNextIdWithThreshold(minThreshold, ignoreThreshold);
+	}
+
+	public ProviderBilling getProviderBilling(String providerNo)
+	{
+		ProviderData provider = providerDataDao.findByProviderNo(providerNo);
+
+		if (provider == null)
+		{
+			return null;
+		}
+
+		return provider.getBillingOpts();
 	}
 }

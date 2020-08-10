@@ -171,23 +171,46 @@
 
 								&.show-self-booked {
 									margin-right: 16px;
+
+									.self-book-container {
+										position: absolute;
+										right: 0;
+										top: 0;
+										height: 20px;
+										width: 54px;
+										display: flex;
+										align-items: center;
+										justify-content: center;
+
+										.self-booked-status {
+											background-color: $color-neutral-white;
+											border-radius: 50%;
+											margin: 0;
+											width: 16px;
+											height: 16px;
+
+											&.appointment-confirmation {
+												width: 9px;
+												height: 9px;
+												transform: unset;
+												position: absolute;
+												right: 8px;
+												top: 2px;
+												margin-left: auto;
+
+												&.confirmed {
+													background-color: black;
+												}
+											}
+										}
+									}
+
 								}
+
 								.inline-flex {
 									display: inline-flex;
 									align-items: baseline;
 									flex-wrap: wrap;
-								}
-
-								.self-book-indicator.visible {
-									position: absolute;
-									top: 0;
-									right: 0;
-
-									width: 12px;
-									height: 12px;
-									background-color: $color-neutral-white;
-									border-radius: 50%;
-									margin: 2px;
 								}
 
 								.event-item {

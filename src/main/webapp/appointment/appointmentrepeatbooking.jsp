@@ -53,17 +53,19 @@
 <%@page import="org.oscarehr.common.model.Appointment" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="oscar.util.ConversionUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
 %>
 <%
-  if (request.getParameter("groupappt") != null) {
+	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+	String creatorNo = loggedInInfo.getLoggedInProviderNo();
+	if (request.getParameter("groupappt") != null) {
     boolean bSucc = false;
     if (request.getParameter("groupappt").equals("Add Group Appointment")) {
         int rowsAffected=0, datano=0;
 		Date createdDateTime = new Date();
-		String userName = (String) session.getAttribute("userlastname") + ", " + (String) session.getAttribute("userfirstname");
 		String everyNum = request.getParameter("everyNum")!=null? request.getParameter("everyNum") : "0";
 		String everyUnit = request.getParameter("everyUnit")!=null? request.getParameter("everyUnit") : "day";
 		String endDate = request.getParameter("endDate")!=null? request.getParameter("endDate") : UtilDateUtilities.DateToString(new Date(),"dd/MM/yyyy");
@@ -94,7 +96,8 @@
 			a.setBilling(request.getParameter("billing"));
 			a.setStatus(request.getParameter("status"));
 			a.setCreateDateTime(createdDateTime);
-			a.setCreator(userName);
+			a.setCreator(creatorNo);
+			a.setLastUpdateUser(creatorNo);
 			a.setRemarks(request.getParameter("remarks"));
 			if (request.getParameter("demographic_no")!=null && !(request.getParameter("demographic_no").equals(""))) {
 				a.setDemographicNo(Integer.parseInt(request.getParameter("demographic_no")));
@@ -187,7 +190,7 @@
 				a.setBilling(request.getParameter("billing"));
 				a.setStatus(request.getParameter("status"));
 				a.setCreateDateTime(createdDateTime);
-				a.setCreator(userName);
+				a.setCreator(creatorNo);
 				a.setRemarks(request.getParameter("remarks"));
 				if (!(request.getParameter("demographic_no").equals("")) && strbuf.toString().indexOf("one") != -1) {
 					a.setDemographicNo(Integer.parseInt(request.getParameter("demographic_no")));

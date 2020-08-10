@@ -33,7 +33,6 @@ public class DemographicExportForm extends ActionForm {
 
     String demographicNo;
     String patientSet;
-    String pgpReady;
     String template;
     
     boolean exPersonalHistory;
@@ -64,9 +63,6 @@ public class DemographicExportForm extends ActionForm {
     }
     public String getPatientSet() {
         return patientSet;
-    }
-    public String getPgpReady() {
-        return pgpReady;
     }
     public String getTemplate() {
         return template;
@@ -123,9 +119,6 @@ public class DemographicExportForm extends ActionForm {
     }
     public void setPatientSet(String patientSet) {
         this.patientSet = patientSet;
-    }
-    public void setPgpReady(String pgpReady) {
-        this.pgpReady = pgpReady;
     }
     public void setTemplate(String template) {
         this.template = template;

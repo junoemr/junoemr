@@ -26,8 +26,8 @@ package org.oscarehr.ws.rest;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -42,9 +42,12 @@ import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.CustomFilter;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.model.TicklerTextSuggest;
+import org.oscarehr.common.search.AbstractCriteriaSearch;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.managers.TicklerManager;
+import org.oscarehr.ticklers.search.TicklerCriteriaSearch;
+import org.oscarehr.ticklers.service.TicklerService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.TicklerConverter;
@@ -55,6 +58,7 @@ import org.oscarehr.ws.rest.to.TicklerResponse;
 import org.oscarehr.ws.rest.to.model.TicklerTextSuggestTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
 @Path("/tickler")
 @Component("ticklerWebService")
@@ -62,16 +66,17 @@ public class TicklerWebService extends AbstractServiceImpl {
 	
 	@Autowired
 	private TicklerManager ticklerManager; 
-		
+
 	private TicklerConverter ticklerConverter = new TicklerConverter();
-	
+
+	@Autowired
+	private TicklerService ticklerService;
+
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 	
 	@Autowired
 	private ProgramManager2 programManager;
-	
-	
 
 	@POST
 	@Path("/search")
@@ -161,106 +166,57 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@GET
 	@Path("/ticklers")
 	@Produces("application/json")
-	public TicklerResponse getTicklerList() {
+	public TicklerResponse getTicklerList(@QueryParam("count") Integer count,
+										  @QueryParam("page") Integer page,
+										  @QueryParam("serviceStartDate") String serviceStartDate,
+										  @QueryParam("serviceEndDate") String serviceEndDate,
+										  @DefaultValue("A") @QueryParam("status") String status,
+										  @QueryParam("taskAssignedTo") String taskAssignedTo,
+										  @QueryParam("mrp") String mrp,
+										  @QueryParam("creator") String creator,
+										  @QueryParam("priority") String priority,
+										  @QueryParam("sortColumn") String sortColumn,
+										  @QueryParam("sortDirection") String sortDirection,
+										  @QueryParam("demographicNo") Integer demographicNo,
+										  @QueryParam("includeComments") boolean includeComments,
+										  @QueryParam("includeLinks") boolean includeLinks,
+										  @QueryParam("includeProgram") boolean includeProgram,
+										  @QueryParam("includeUpdates") boolean includeUpdates)
+	{
+		String providerNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireOnePrivilege(providerNo, "r", null, "_tickler");
 
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "r", null)) {
-			throw new RuntimeException("Access Denied");
-		}
-	
-		HttpServletRequest req = this.getHttpServletRequest();
-	        
-	    String strCount = req.getParameter("count");
-	    String strPage = req.getParameter("page");
-	    String serviceStartDate = req.getParameter("serviceStartDate");
-	    String serviceEndDate = req.getParameter("serviceEndDate");
-	    String status = req.getParameter("status");
-	    String taskAssignedTo = req.getParameter("taskAssignedTo");
-	    String mrp = req.getParameter("mrp");
-	    String creator = req.getParameter("creator");
-	    String priority = req.getParameter("priority");
-	    String sortColumn = req.getParameter("sortColumn");
-	    String sortDirection = req.getParameter("sortDirection");
+		AbstractCriteriaSearch.SORTDIR sortDir = AbstractCriteriaSearch.SORTDIR.valueOf(sortDirection);
+		TicklerCriteriaSearch.SORT_MODE sortMode = TicklerCriteriaSearch.SORT_MODE.valueOf(sortColumn);
 
-	    boolean includeLinks = Boolean.valueOf(req.getParameter("includeLinks"));
-	    boolean includeComments = Boolean.valueOf(req.getParameter("includeComments"));
-	    boolean includeUpdates = Boolean.valueOf(req.getParameter("includeUpdates"));
-	    boolean includeProgram = Boolean.valueOf(req.getParameter("includeProgram"));
-	    
-	    
-	    int count = Integer.parseInt(strCount);
-	    int page = Integer.parseInt(strPage);
+		TicklerCriteriaSearch ticklerCriteriaSearch = new TicklerCriteriaSearch();
+		ticklerCriteriaSearch.setSortDir(sortDir);
+		ticklerCriteriaSearch.setSortMode(sortMode);
+		ticklerCriteriaSearch.setStartDate(ConversionUtils.fromDateString(serviceStartDate));
+		ticklerCriteriaSearch.setEndDate(ConversionUtils.fromDateString(serviceEndDate));
+		ticklerCriteriaSearch.setTaskAssignedTo(taskAssignedTo);
+		ticklerCriteriaSearch.setCreator(creator);
+		ticklerCriteriaSearch.setMrp(mrp);
+		ticklerCriteriaSearch.setDemographicNo(demographicNo);
 
-		CustomFilter cf = new CustomFilter(true);
-		
-		if(serviceStartDate != null && !"".equals(serviceStartDate)) {
-			serviceStartDate = serviceStartDate.startsWith("\"")?serviceStartDate.substring(1,serviceStartDate.length()-1):serviceStartDate;
-			try {
-				cf.setStartDate(javax.xml.bind.DatatypeConverter.parseDateTime(serviceStartDate).getTime());
-			}catch(Exception e) {
-				MiscUtils.getLogger().warn("Error parsing start date - " + serviceStartDate);
-			}
-	    }
-		if(serviceEndDate != null && !"".equals(serviceEndDate)) {
-			serviceEndDate = serviceEndDate.startsWith("\"")?serviceEndDate.substring(1,serviceEndDate.length()-1):serviceEndDate;
-			try {
-				cf.setEndDate(javax.xml.bind.DatatypeConverter.parseDateTime(serviceEndDate).getTime());
-			}catch(Exception e) {
-				MiscUtils.getLogger().warn("Error parsing end date - " + serviceEndDate);
-			}
-	    }
-		
-		cf.setStatus(status);
-		
-		cf.setPriority(priority);
-		
-		
-		if(taskAssignedTo != null && !"".equals(taskAssignedTo)) {
-			cf.setAssignee(taskAssignedTo);
-		}
-		
-		if(creator != null && !"".equals(creator)) {
-			cf.setProviderNo(creator);
-		}
-		
-		if(mrp != null && !"".equals(mrp)) {
-			cf.setMrp(mrp);
-		}
-		
-		if(req.getParameter("demographicNo") != null){
-			cf.setDemographicNo(req.getParameter("demographicNo"));
+		Tickler.STATUS ticklerStatus = Tickler.STATUS.valueOf(status);
+		ticklerCriteriaSearch.setStatus(ticklerStatus);
+
+		if (priority != null && !priority.isEmpty())
+		{
+			Tickler.PRIORITY ticklerPriority = Tickler.PRIORITY.valueOf(priority);
+			ticklerCriteriaSearch.setPriority(ticklerPriority);
 		}
 
-		if(sortColumn != null){
-			cf.setSortColumn(CustomFilter.SORTCOLUMN.valueOf(sortColumn));
-		}
-
-		if(sortDirection != null){
-			cf.setSortDir(CustomFilter.SORTDIR.valueOf(sortDirection));
-		}
-		
 		TicklerResponse result = new TicklerResponse();
-		
+		List<Tickler> comparisonSearch = ticklerService.getSearchResponse(ticklerCriteriaSearch, page, count);
 
-		int total = ticklerManager.getNumTicklers(getLoggedInInfo(),cf);
-		result.setTotal(total);
+		ticklerConverter.setIncludeLinks(includeLinks);
+		ticklerConverter.setIncludeComments(includeComments);
+		ticklerConverter.setIncludeUpdates(includeUpdates);
+		ticklerConverter.setIncludeProgram(includeProgram);
 
-
-		List<Tickler> ticklers = ticklerManager.getTicklers(getLoggedInInfo(),cf,((page-1)*count),count);
-
-		if(includeLinks) {
-			ticklerConverter.setIncludeLinks(true);
-		}
-		if(includeComments) {
-			ticklerConverter.setIncludeComments(true);
-		}
-		if(includeUpdates) {
-			ticklerConverter.setIncludeUpdates(true);
-		}
-		if(includeProgram) {
-			ticklerConverter.setIncludeProgram(true);
-		}
-		
-		result.getContent().addAll(ticklerConverter.getAllAsTransferObjects(getLoggedInInfo(),ticklers)); 
+		result.getContent().addAll(ticklerConverter.getAllAsTransferObjects(getLoggedInInfo(), comparisonSearch));
 		
 		return result;
 	}
@@ -388,7 +344,8 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Path("/add")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public GenericRESTResponse addTickler(Tickler tickler){
+	public GenericRESTResponse addTickler(Tickler tickler)
+	{
 		GenericRESTResponse response = new GenericRESTResponse();
 		
 		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "w", null)) {

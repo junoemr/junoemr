@@ -25,15 +25,26 @@ package org.oscarehr.appointment.service;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
+import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
+import org.oscarehr.integration.myhealthaccess.service.ClinicService;
+import org.oscarehr.integration.myhealthaccess.service.PatientService;
+import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.telehealth.service.MyHealthAccessService;
+import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 import oscar.SxmlMisc;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -48,6 +59,21 @@ public class Appointment
 {
 	@Autowired
 	OscarAppointmentDao oscarAppointmentDao;
+
+	@Autowired
+	AppointmentService appointmentService;
+
+	@Autowired
+	PatientService patientService;
+
+	@Autowired
+	ClinicService clinicService;
+
+	@Autowired
+	MyHealthAccessService myHealthAccessService;
+
+	@Autowired
+	IntegrationService integrationService;
 
 	private String formatName(String upperFirstName, String upperLastName)
 	{
@@ -89,6 +115,111 @@ public class Appointment
 		}
 
 		return null;
+	}
+
+	/**
+	 * save an appointment in to the database. updating the MHA integration if applicable.
+	 * @param appointment - the appointment to save
+	 * @param loggedInInfo - logged in info.
+	 */
+	public org.oscarehr.common.model.Appointment saveNewAppointment(org.oscarehr.common.model.Appointment appointment,
+																																	LoggedInInfo loggedInInfo, HttpServletRequest request,
+																																	boolean sendNotification)
+	{
+		appointment.setCreator(loggedInInfo.getLoggedInProviderNo());
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		oscarAppointmentDao.persist(appointment);
+
+		if (sendNotification)
+		{// send MHA based appointment notification
+			Integration integration = integrationService.findMhaIntegration(appointment);
+			if (integration != null)
+			{
+				ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
+						loggedInInfo.getLoggedInSecurity().getSecurityNo());
+				appointmentService.sendGeneralAppointmentNotification(integration, loginTokenTo1.getToken(),
+						appointment.getId());
+			}
+		}
+
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+						appointment.getDemographicNo(),
+						LogConst.ACTION_ADD,
+						LogConst.CON_APPT,
+						LogConst.STATUS_SUCCESS,
+						String.valueOf(appointment.getId()),
+						request.getRemoteAddr());
+
+		return appointment;
+	}
+
+	/**
+	 * save a new telehealth appointment
+	 * @param appointment - the appointment to save
+	 * @param loggedInInfo - logged in info.
+	 * @param sendNotification - Whether to send notification of appointment booking to user or not.
+	 */
+	public org.oscarehr.common.model.Appointment saveNewTelehealthAppointment(org.oscarehr.common.model.Appointment appointment,
+																																						LoggedInInfo loggedInInfo, HttpServletRequest request, boolean sendNotification)
+	{
+		if (!appointment.getIsVirtual())
+		{
+			throw new IllegalArgumentException("Could not save telehealth appointment. Appointment is not virtual");
+		}
+
+		appointment.setCreator(loggedInInfo.getLoggedInProviderNo());
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+
+		oscarAppointmentDao.persist(appointment);
+
+		// book telehealth appointment in MHA
+		String siteName = null;
+		if (OscarProperties.getInstance().isMultisiteEnabled())
+		{
+			siteName = appointment.getLocation();
+		}
+
+		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), integrationService.findMhaIntegration(siteName)))
+		{
+			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment, sendNotification);
+		}
+		else
+		{
+			appointmentService.bookOneTimeTelehealthAppointment(loggedInInfo, appointment, sendNotification);
+		}
+
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				appointment.getDemographicNo(),
+				LogConst.ACTION_ADD,
+				LogConst.CON_APPT,
+				LogConst.STATUS_SUCCESS,
+				String.valueOf(appointment.getId()),
+				request.getRemoteAddr());
+
+		return appointment;
+	}
+
+	/**
+	 * update appointment. notifying MHA of update if applicable.
+	 * @param appointment - appointment to update
+	 */
+	public void updateAppointment(org.oscarehr.common.model.Appointment appointment,
+																LoggedInInfo loggedInInfo, HttpServletRequest request)
+	{
+		oscarAppointmentDao.merge(appointment);
+
+		if (appointment.getIsVirtual())
+		{
+			myHealthAccessService.queueAppointmentCacheUpdate(appointment);
+		}
+
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+						appointment.getDemographicNo(),
+						LogConst.ACTION_UPDATE,
+						LogConst.CON_APPT,
+						LogConst.STATUS_SUCCESS,
+						String.valueOf(appointment.getId()),
+						request.getRemoteAddr());
 	}
 
 	public List<CalendarEvent> getCalendarEvents(HttpSession session,
@@ -172,7 +303,8 @@ public class Appointment
 						isSelfBooked,
 						false,
 						details.isVirtual(),
-						null
+						null,
+						details.isConfirmed()
 				);
 				// for the case where appointments are saved with a name but no demographic
 				if((appointment.getDemographicNo() == null || appointment.getDemographicNo() == 0) && details.getName() != null)

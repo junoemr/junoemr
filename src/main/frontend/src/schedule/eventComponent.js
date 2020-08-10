@@ -8,6 +8,7 @@
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {SitesApi} from "../../generated";
+import {MhaDemographicApi, MhaIntegrationApi, MhaAppointmentApi} from "../../generated";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
@@ -53,6 +54,15 @@ angular.module('Schedule').component('eventComponent', {
 
 			$scope.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 				'../ws/rs');
+
+			let mhaDemographicApi = new MhaDemographicApi($http, $httpParamSerializer,
+					'../ws/rs');
+
+			let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
+					'../ws/rs');
+
+			let mhaAppointmentApi = new MhaAppointmentApi($http, $httpParamSerializer,
+					'../ws/rs');
 
 			let sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
 			//=========================================================================
@@ -144,6 +154,24 @@ angular.module('Schedule').component('eventComponent', {
 			controller.repeatBookingDates = null;
 
 			controller.eventHistory = [];
+
+			controller.mhaAppointment = null;
+
+			controller.SENDING_NOTIFICATION_STATES = {
+				NONE: "none",
+				SENDING: "sending",
+				SENT: "sent",
+				FAILED: "failed",
+			};
+			controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.NONE;
+
+			$scope.TELEHEALTH_MODES = {
+				NONE: "none",
+				TELEHEALTH: "telehealth",
+				ONE_TIME_TELEHEALTH: "oneTimeTelehealth",
+				NO_CONNECTION: "noConnection",
+			};
+			$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;
 
 			controller.patientTypeahead = {};
 			$scope.autocompleteValues = {};
@@ -313,6 +341,7 @@ angular.module('Schedule').component('eventComponent', {
 							if ($scope.isPatientSelected())
 							{
 								controller.patientTypeahead = controller.demographicModel.data;
+								controller.updateDemographicTelehealthEligibility();
 							}
 							else
 							{
@@ -325,6 +354,11 @@ angular.module('Schedule').component('eventComponent', {
 							$scope.initialized = true;
 						});
 					controller.loadAppointmentHistory($scope.eventUuid);
+
+					if ($scope.eventData.virtual)
+					{
+						controller.fetchMhaAppointment();
+					}
 				}
 				else //create new
 				{
@@ -435,6 +469,72 @@ angular.module('Schedule').component('eventComponent', {
 				}
 			};
 
+			controller.updateDemographicTelehealthEligibility = async () =>
+			{
+				if (controller.demographicModel.demographicNo)
+				{
+					let integration = (await mhaIntegrationApi.searchIntegrations($scope.eventData.site)).data.body;
+					if (integration)
+					{
+						mhaDemographicApi.isPatientConfirmed(integration.id, controller.demographicModel.demographicNo, $scope.eventData.site).then((result) =>
+						{
+							if (result.data.body)
+							{
+								$scope.telehealthMode = $scope.TELEHEALTH_MODES.TELEHEALTH;
+							}
+							else if(integration && controller.demographicModel.data.email)
+							{
+								$scope.telehealthMode = $scope.TELEHEALTH_MODES.ONE_TIME_TELEHEALTH;
+							}
+							else
+							{
+								$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;
+								if (!controller.editMode)
+								{
+									$scope.eventData.virtual = false;
+								}
+							}
+						});
+					}
+					else
+					{
+						$scope.telehealthMode = $scope.TELEHEALTH_MODES.NO_CONNECTION;
+						if (!controller.editMode)
+						{
+							$scope.eventData.virtual = false;
+						}
+					}
+				}
+				else
+				{
+					$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;
+				}
+
+			};
+
+			controller.getTelehealthToolTip = () =>
+			{
+				if ($scope.telehealthMode === $scope.TELEHEALTH_MODES.ONE_TIME_TELEHEALTH)
+				{
+					return "Book a one time telehealth appointment for this patient";
+				}
+				else if ($scope.telehealthMode === $scope.TELEHEALTH_MODES.TELEHEALTH)
+				{
+					return "Book a telehealth appointment for this patient";
+				}
+				else
+				{
+					return "Telehealth appointment unavailable";
+				}
+			};
+
+			controller.getSiteChangeToolTip = () =>
+            {
+                if ($scope.eventData.virtual && controller.inEditMode())
+                {
+                    return "Sites can't be changed for telehealth appointments";
+                }
+            };
 
 			controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 			{
@@ -459,6 +559,8 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				var deferred = $q.defer();
 
+				const defaultAppointmentReason = "Others";
+
 				$scope.scheduleApi.getAppointmentReasons().then(
 					function success(rawResults)
 					{
@@ -479,7 +581,9 @@ angular.module('Schedule').component('eventComponent', {
 						// set the default selected option
 						if (!Juno.Common.Util.exists($scope.eventData.reasonCode))
 						{
-							$scope.eventData.reasonCode = controller.reasonCodeList[0].value;
+
+							$scope.eventData.reasonCode = controller.findDefaultAppointmentType(controller.reasonCodeList, defaultAppointmentReason);
+
 						}
 						deferred.resolve(controller.reasonCodeList);
 					});
@@ -646,6 +750,16 @@ angular.module('Schedule').component('eventComponent', {
 				Juno.Common.Util.validateDateString(controller.repeatBookingData.endDate,
 					$scope.displayMessages, 'repeatEndOnDate', 'Repeat End Date', false);
 
+				if (Juno.Common.Util.exists($scope.eventData.notes) && $scope.eventData.notes.length > 255)
+				{
+					$scope.displayMessages.add_field_error('notes', 'Note length cannot exceed 255 characters');
+				}
+
+				if (Juno.Common.Util.exists($scope.eventData.reason) && $scope.eventData.reason.length > 80)
+				{
+					$scope.displayMessages.add_field_error('event_reason', 'Reason length cannot exceed 80 characters');
+				}
+
 				return !$scope.displayMessages.has_errors();
 			};
 
@@ -657,6 +771,7 @@ angular.module('Schedule').component('eventComponent', {
 					controller.repeatBookingDates = controller.generateRepeatBookingDateList(controller.repeatBooking.max_bookings_limit);
 				}
 			};
+
 			controller.removeRepeatBookingDate = function removeRepeatBookingDate(dataObj)
 			{
 				controller.repeatBookingDates = controller.repeatBookingDates.filter(function(e) { return e !== dataObj })
@@ -707,7 +822,7 @@ angular.module('Schedule').component('eventComponent', {
 				return dateList;
 			};
 
-			$scope.saveEvent = function saveEvent()
+			$scope.saveEvent = function saveEvent(sendNotification= false)
 			{
 				var deferred = $q.defer();
 
@@ -744,6 +859,7 @@ angular.module('Schedule').component('eventComponent', {
 						doNotBook: $scope.eventData.doNotBook,
 						urgency: (($scope.eventData.critical) ? 'critical' : null),
 						virtual: $scope.eventData.virtual,
+						sendNotification: sendNotification,
 					},
 					repeatOnDates,
 
@@ -762,7 +878,7 @@ angular.module('Schedule').component('eventComponent', {
 					function (results)
 					{
 						controller.parentScope.processSaveResults(results, $scope.displayMessages);
-						deferred.reject();
+						deferred.reject(results);
 					});
 
 				return deferred.promise;
@@ -799,7 +915,10 @@ angular.module('Schedule').component('eventComponent', {
 
 			$scope.loadPatientFromTypeahead = function loadPatientFromTypeahead(patientTypeahead)
 			{
-				controller.demographicModel.loadData(patientTypeahead.demographicNo);
+				controller.demographicModel.loadData(patientTypeahead.demographicNo).finally(() =>
+				{
+					controller.updateDemographicTelehealthEligibility();
+				})
 			};
 
 			controller.autofillDataFromType = function (typeValue)
@@ -828,6 +947,11 @@ angular.module('Schedule').component('eventComponent', {
 				}
 			};
 
+			controller.findDefaultAppointmentType = function(reasonCodeList, defaultAppointmentReason)
+			{
+				return (reasonCodeList.find((code) => code.label === defaultAppointmentReason).value) || reasonCodeList[0].value;
+			};
+
 			//=========================================================================
 			// Watches
 			//=========================================================================/
@@ -854,6 +978,10 @@ angular.module('Schedule').component('eventComponent', {
 					{
 						controller.autofillDataFromType(newValue);
 					}
+				});
+				$scope.$watch("eventData.site", (newVal, oldVal) =>
+				{
+					controller.updateDemographicTelehealthEligibility();
 				});
 				$scope.$watch('[' +
 					'eventController.repeatBookingData.enabled,' +
@@ -946,7 +1074,7 @@ angular.module('Schedule').component('eventComponent', {
 				controller.demographicModel.clear();
 			};
 
-			controller.save = function save()
+			controller.save = function save(sendNotification = false)
 			{
 				if (!$scope.validateForm())
 				{
@@ -954,17 +1082,25 @@ angular.module('Schedule').component('eventComponent', {
 				}
 
 				$scope.working = true;
-				$scope.saveEvent().then(function ()
+				$scope.saveEvent(sendNotification).then(function ()
 				{
 					controller.parentScope.refetchEvents();
 					controller.modalInstance.close();
 					$scope.working = false;
-				}, function ()
+				}, function (result)
 				{
 					console.log($scope.displayMessages.field_errors()['location']);
 					if (!$scope.displayMessages.has_standard_errors())
 					{
-						$scope.displayMessages.add_generic_fatal_error();
+						console.log(result);
+						if (result.error.message)
+						{
+							$scope.displayMessages.add_standard_error(result.error.message);
+						}
+						else
+						{
+							$scope.displayMessages.add_generic_fatal_error();
+						}
 					}
 					$scope.working = false;
 				});
@@ -1286,6 +1422,91 @@ angular.module('Schedule').component('eventComponent', {
 						+ "&siteName=" + encodeURIComponent($scope.eventData.site)
 						+ "&appt=" + encodeURIComponent($scope.eventUuid), "_blank");
 				}
+			};
+
+			controller.shouldShowNotificationButtons = () =>
+			{
+				return (controller.demographicModel.data.email ||
+							 ($scope.telehealthMode === $scope.TELEHEALTH_MODES.TELEHEALTH && $scope.eventData.virtual)) &&
+								$scope.telehealthMode !== $scope.TELEHEALTH_MODES.NO_CONNECTION;
+			}
+
+			controller.sendAppointmentNotification = async () =>
+			{
+				controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.SENDING;
+				try
+				{
+					let result = controller.SENDING_NOTIFICATION_STATES.FAILED;
+					let integration = (await mhaIntegrationApi.searchIntegrations($scope.eventData.site)).data.body;
+					if (integration)
+					{
+						if (controller.mhaAppointment)
+						{
+							await mhaAppointmentApi.sendTelehealthAppointmentNotification(integration.id, controller.mhaAppointment.id)
+						}
+						else
+						{
+							await mhaAppointmentApi.sendGeneralAppointmentNotification(integration.id, $scope.eventUuid)
+						}
+						result = controller.SENDING_NOTIFICATION_STATES.SENT
+					}
+
+					window.setTimeout(() =>
+					{
+						controller.sendingNotificationState = result;
+						$scope.$digest()
+						window.setTimeout(() =>
+						{
+							controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.NONE;
+							$scope.$digest()
+						}, 5000);
+					}, 1000);
+				}
+				catch (err)
+				{
+					controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.FAILED;
+					window.setTimeout(() =>
+					{
+						controller.sendingNotificationState = controller.SENDING_NOTIFICATION_STATES.NONE;
+						$scope.$digest()
+					}, 5000);
+					console.error(err);
+				}
+			};
+
+			// get the text to display on the send one time link button
+			controller.getSendNotificationText = () =>
+			{
+				if (controller.sendingNotificationState === controller.SENDING_NOTIFICATION_STATES.SENDING)
+				{
+					return "Sending..."
+				}
+				else if (controller.sendingNotificationState === controller.SENDING_NOTIFICATION_STATES.SENT)
+				{
+					return "Sent!"
+				}
+				else if (controller.sendingNotificationState === controller.SENDING_NOTIFICATION_STATES.FAILED)
+				{
+					return "Failed"
+				}
+				else
+				{
+					return "Send Notification"
+				}
+			};
+
+			controller.fetchMhaAppointment = async () =>
+			{
+				try
+				{
+					let integration = (await mhaIntegrationApi.searchIntegrations($scope.eventData.site)).data.body;
+					controller.mhaAppointment = (await mhaAppointmentApi.searchAppointments(integration.id, $scope.eventUuid)).data.body;
+				}
+				catch(err)
+				{
+					console.error(err);
+				}
+
 			};
 
 			//=========================================================================
