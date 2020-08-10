@@ -990,55 +990,48 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				}
 
 			}
-			try
-			{
-				boolean hasTicklers = (maxTicklerNo != null);
+			boolean hasTicklers = (maxTicklerNo != null);
 
-				appointmentDetails.get(startTime).add(new AppointmentDetails(
-						appointmentNo,
-						demographicNo,
-						appointmentDate,
-						startTime,
-						endTime,
-						name,
-						notes,
-						reason,
-						reasonCode,
-						location,
-						resources,
-						type,
-						style,
-						bookingSource,
-						status,
-						urgency,
-						statusTitle,
-						color,
-						junoColor,
-						iconImage,
-						shortLetterColour,
-						shortLetters,
-						firstName,
-						lastName,
-						ver,
-						hin,
-						chartNo,
-						familyDoctor,
-						rosterStatus,
-						hcRenewDate,
-						custNotes,
-						custAlert,
-						colorProperty,
-						birthday,
-						hasTicklers,
-						ticklerMessages,
-						isVirtual,
-						creatorSecurityId
-				));
-			}
-			catch (Exception e)
-			{
-				MiscUtils.getLogger().info("\n\n\n\n\n\n\n\n"+e+"\n\n\n\n\n\n");
-			}
+			appointmentDetails.get(startTime).add(new AppointmentDetails(
+					appointmentNo,
+					demographicNo,
+					appointmentDate,
+					startTime,
+					endTime,
+					name,
+					notes,
+					reason,
+					reasonCode,
+					location,
+					resources,
+					type,
+					style,
+					bookingSource,
+					status,
+					urgency,
+					statusTitle,
+					color,
+					junoColor,
+					iconImage,
+					shortLetterColour,
+					shortLetters,
+					firstName,
+					lastName,
+					ver,
+					hin,
+					chartNo,
+					familyDoctor,
+					rosterStatus,
+					hcRenewDate,
+					custNotes,
+					custAlert,
+					colorProperty,
+					birthday,
+					hasTicklers,
+					ticklerMessages,
+					isVirtual,
+					creatorSecurityId
+			));
 
 		}
 
