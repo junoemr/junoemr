@@ -807,6 +807,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  a.status,\n" +
 				"  a.urgency,\n" +
 				"  a.isVirtual,\n" +
+				"  a.confirmed_at,\n" +
 				"  aps.description,\n" +
 				"  aps.color,\n" +
 				"  aps.juno_color,\n" +
@@ -924,6 +925,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String urgency = (String) result[index++];
 			Byte isVirtualResult = (Byte) result[index++];
 			boolean isVirtual = (Byte.toUnsignedInt(isVirtualResult) == 1);
+			java.sql.Timestamp confirmedAt = (java.sql.Timestamp) result[index++];
+			boolean isConfirmed = confirmedAt != null;
 			String statusTitle = (String) result[index++];
 			String color = (String) result[index++];
 			String junoColor = (String) result[index++];
@@ -1027,7 +1030,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				birthday,
 				hasTicklers,
 				ticklerMessages,
-				isVirtual
+				isVirtual,
+				isConfirmed
 			));
 		}
 

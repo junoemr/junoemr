@@ -65,9 +65,11 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 
 		controller.saveSettings = function (form)
 		{
+			controller.submitDisabled = true;
 			if(!form.$valid)
 			{
 				alert("The form contains errors");
+				controller.submitDisabled = false;
 				return;
 			}
 
@@ -80,6 +82,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 			let closeError = function(error)
 			{
 				console.error(error);
+				controller.submitDisabled = false;
 			};
 
 			if (controller.faxAccount.id)

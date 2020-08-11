@@ -180,6 +180,11 @@ public class AppointmentDisplayController
 		return appointment.isVirtual();
 	}
 
+	public boolean isConfirmed()
+	{
+		return appointment.isConfirmed();
+	}
+
 	public boolean isMultisitesEnabled()
 	{
 		return multisitesEnabled;
@@ -391,7 +396,7 @@ public class AppointmentDisplayController
 				"&appointmentNo=" + appointment.getAppointmentNo().toString() +
 				"&demographicNo=" + appointment.getDemographicNo() +
 				"&curProviderNo=" + parameterProviderNo +
-				"&reason=" + URLEncoder.encode(appointment.getReason()) +
+				"&reason=" + URLEncoder.encode(StringUtils.trimToEmpty(appointment.getReason()), "UTF-8") +
 				"&encType=" + URLEncoder.encode("face to face encounter with client","UTF-8") +
 				"&userName=" + URLEncoder.encode( userFirstName + " " + userLastName, "UTF-8") +
 				"&curDate=" + LocalDate.now().format(dateFormatter) +

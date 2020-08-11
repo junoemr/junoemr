@@ -115,34 +115,34 @@ public class DemographicMapper extends AbstractMapper
 
 	public String getFirstName(int rep) throws HL7Exception
 	{
-		String firstName = messagePID.getPatientName(rep).getGivenName().getValue();
+		String firstName = StringUtils.trimToNull(messagePID.getPatientName(rep).getGivenName().getValue());
 		if (firstName == null)
 		{
 			MiscUtils.getLogger().warn("demographic has no first name! using: " + DEMO_NULL_NAME);
-			return 	DEMO_NULL_NAME;
+			return DEMO_NULL_NAME;
 		}
-		return firstName;
+		return firstName.replaceAll("<", "").replaceAll(">", "");
 	}
 	public String getLastName(int rep) throws HL7Exception
 	{
-		String lastName = messagePID.getPatientName(rep).getFamilyName().getSurname().getValue();
+		String lastName = StringUtils.trimToNull(messagePID.getPatientName(rep).getFamilyName().getSurname().getValue());
 		if (lastName == null)
 		{
 			MiscUtils.getLogger().warn("demographic has no last name! using: " + DEMO_NULL_NAME);
 			return DEMO_NULL_NAME;
 		}
-		return lastName;
+		return lastName.replaceAll("<", "").replaceAll(">", "");
 	}
 
 	public boolean hasFirstName(int rep) throws HL7Exception
 	{
-		String firstName = messagePID.getPatientName(rep).getGivenName().getValue();
+		String firstName = StringUtils.trimToNull(messagePID.getPatientName(rep).getGivenName().getValue());
 		return  firstName != null;
 	}
 
 	public boolean hasLastName(int rep) throws HL7Exception
 	{
-		String lastName = messagePID.getPatientName(rep).getFamilyName().getSurname().getValue();
+		String lastName = StringUtils.trimToNull(messagePID.getPatientName(rep).getFamilyName().getSurname().getValue());
 		return  lastName != null;
 	}
 
@@ -153,7 +153,7 @@ public class DemographicMapper extends AbstractMapper
 	public LocalDate getDOB() throws HL7Exception
 	{
 		String dateStr = messagePID.getDateTimeOfBirth().getTimeOfAnEvent().getValue();
-		if (dateStr.isEmpty())
+		if (dateStr.isEmpty() || "00000000".equals(dateStr))
 		{
 			logger.warn("Replacing empty DOB string with :" + CoPDPreProcessorService.HL7_TIMESTAMP_BEGINNING_OF_TIME +
 					" for demographic: " + getLastName(0) + "," + getFirstName(0));

@@ -61,6 +61,9 @@ public class AppointmentService extends AbstractServiceImpl
 	@Autowired
 	private AppointmentManager appointmentManager;
 
+	@Autowired
+	private org.oscarehr.appointment.service.Appointment appointmentService;
+
 	@GET
 	@Path("/{appointmentNo}")
 	@Produces("application/json")
@@ -83,11 +86,11 @@ public class AppointmentService extends AbstractServiceImpl
 		Appointment savedAppointment = null;
 		if (appointment.getIsVirtual())
 		{
-			savedAppointment = appointmentManager.addTelehealthAppointment(getLoggedInInfo(), appointment, calendarAppointment.isSendNotification());
+			savedAppointment = appointmentService.saveNewTelehealthAppointment(appointment, getLoggedInInfo(), getHttpServletRequest(), calendarAppointment.isSendNotification());
 		}
 		else
 		{
-			savedAppointment = appointmentManager.addAppointment(getLoggedInInfo(), appointment);
+			savedAppointment = appointmentService.saveNewAppointment(appointment, getLoggedInInfo(), getHttpServletRequest(), calendarAppointment.isSendNotification());
 		}
 
 		LoggedInInfo loggedInInfo = getLoggedInInfo();

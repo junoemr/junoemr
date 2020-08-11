@@ -36,7 +36,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class ProgramProviderDAO extends HibernateDaoSupport {
 
-    private Logger log=MiscUtils.getLogger();
+    private Logger log = MiscUtils.getLogger();
 
 	private static QueueCache<String, List<ProgramProvider>> programProviderByProviderProgramIdCache = new QueueCache<String, List<ProgramProvider>>(4, 100, DateUtils.MILLIS_PER_HOUR, null);
 

@@ -23,6 +23,8 @@
  */
 package org.oscarehr.common.model;
 
+import org.oscarehr.provider.model.ProviderData;
+
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -210,5 +212,9 @@ public class MessageTbl extends AbstractModel<Integer>{
         this.type_link = type_link;
     }
 	
-	
+	public void setSendingProvider(ProviderData provider)
+	{
+		this.setSentBy(provider.getDisplayName());
+		this.setSentByNo(provider.getId());
+	}
 }

@@ -20,6 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
+
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
@@ -27,18 +28,16 @@ import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.oscarehr.JunoApplication;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -50,13 +49,13 @@ public class EchartTests extends SeleniumTestBase
 {
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 
-	@Before
-	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	@BeforeClass
+	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
-		SchemaUtils.restoreTable("admission", "demographic",
+		SchemaUtils.restoreTable("admission", "appointment", "demographic",
 				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
 				"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
-				"casemgmt_tmpsave", "validations", "measurementType", "eChart");
+				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "hash_audit");
 
 		loadSpringBeans();
 		DatabaseUtil.createTestDemographic();
@@ -84,6 +83,10 @@ public class EchartTests extends SeleniumTestBase
 			noteId = driver.findElement(By.xpath("//textarea[@name='caseNote_note']")).getAttribute("id");
 		}
 
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		js.executeScript("window.scrollBy(0, document.body.scrollHeight)");
+		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("newNoteImg")));
 		WebElement newNoteButton = driver.findElement(By.id("newNoteImg"));
 		newNoteButton.click();
 
@@ -99,7 +102,7 @@ public class EchartTests extends SeleniumTestBase
 
 		if (noteId != null)
 		{
-			Assert.assertEquals("Create new note. FAIL", noteId, newNote.getAttribute("id"));
+			Assert.assertEquals("Create new note. FAIL", (noteId + '1'), newNote.getAttribute("id"));
 		}
 		logger.info("Create new note. OK");
 
@@ -126,5 +129,6 @@ public class EchartTests extends SeleniumTestBase
 		Assert.assertTrue("Sign and save note. FAILED",
 				PageUtil.isExistsBy(By.xpath("//*[contains(., '" + myUUID + "') and contains(., 'Signed on') and contains(@id, 'txt')]"), driver));
 		logger.info("Sign and save note. OK");
+
 	}
 }

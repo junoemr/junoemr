@@ -1439,6 +1439,13 @@
             <artifactId>java-jwt</artifactId>
             <version>3.8.1</version>
         </dependency>
+        <!-- Integration Tests -->
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>3.0.0-M4</version>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
@@ -2376,7 +2383,6 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<executions>
-							<!--
 							<execution>
 								<id>default-test</id>
 								<goals>
@@ -2393,31 +2399,37 @@
 									</systemPropertyVariables>
 								</configuration>
 							</execution>
-							-->
-							<execution>
-								<id>integration-test</id>
-								<goals>
-									<goal>test</goal>
-								</goals>
-								<phase>integration-test</phase>
-								<configuration>
-									<skipTests>false</skipTests>
-									<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
-									<excludes>
-										<exclude>**/SetupDatabase.java</exclude>
-									</excludes>
-									<includes>
-										<include>integration/tests/*</include>
-									</includes>
-									<systemPropertyVariables>
-										<oscar.skip.dbinit>true</oscar.skip.dbinit>
-										<buildDirectory>${project.build.directory}</buildDirectory>
-									</systemPropertyVariables>
-								</configuration>
-							</execution>
 						</executions>
 						<version>2.10</version>
 					</plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>integration-test</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                                <phase>integration-test</phase>
+                                <configuration>
+                                    <skipTests>false</skipTests>
+                                    <argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
+                                    <excludes>
+                                        <exclude>**/SetupDatabase.java</exclude>
+                                    </excludes>
+                                    <includes>
+                                        <include>integration/tests/*</include>
+                                    </includes>
+                                    <systemPropertyVariables>
+                                        <oscar.skip.dbinit>true</oscar.skip.dbinit>
+                                        <buildDirectory>${project.build.directory}</buildDirectory>
+                                    </systemPropertyVariables>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <version>3.0.0-M4</version>
+                    </plugin>
 				</plugins>
 			</build>
 		</profile>

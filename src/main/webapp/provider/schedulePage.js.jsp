@@ -121,16 +121,24 @@ function setfocus() {
 this.focus();
 }
 
-function popupPage(vheight,vwidth,varpage) {
-var page = "" + varpage;
-windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=50,screenY=50,top=0,left=0";
-var popup=window.open(page, "<bean:message key="provider.appointmentProviderAdminDay.apptProvider"/>", windowprops);
-if (popup != null) {
-if (popup.opener == null) {
-popup.opener = self;
-}
-popup.focus();
-}
+function popupPage(vheight,vwidth,varpage,windowName)
+{
+	if (!windowName)
+	{
+		windowName = "<bean:message key="provider.appointmentProviderAdminDay.apptProvider"/>"
+	}
+
+	var page = "" + varpage;
+	windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=50,screenY=50,top=0,left=0";
+	var popup=window.open(page, windowName, windowprops);
+	if (popup != null)
+	{
+		if (popup.opener == null)
+		{
+			popup.opener = self;
+		}
+		popup.focus();
+	}
 }
 
 function popUpEncounter(vheight,vwidth,varpage) {

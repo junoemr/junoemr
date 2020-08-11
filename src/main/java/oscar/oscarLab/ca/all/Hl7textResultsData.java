@@ -24,27 +24,29 @@
 
 package oscar.oscarLab.ca.all;
 
-import java.util.*;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.consultations.dao.ConsultDocsDao;
-import org.oscarehr.consultations.dao.ConsultResponseDocDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
-import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.common.model.ConsultResponseDoc;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.PatientLabRouting;
+import org.oscarehr.consultations.dao.ConsultDocsDao;
+import org.oscarehr.consultations.dao.ConsultResponseDocDao;
+import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 public class Hl7textResultsData {
 
@@ -59,24 +61,16 @@ public class Hl7textResultsData {
 		// no one should instantiate this
 	}
 
-	public static void populateMeasurementsTable(String lab_no, String demographic_no) {
+	public static void populateMeasurementsTable(String lab_no, String demographic_no)
+	{
 		MessageHandler messageHandler = Factory.getHandler(lab_no);
-
-		java.util.Calendar calender = java.util.Calendar.getInstance();
-		String day = Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
-		String month = Integer.toString(calender.get(java.util.Calendar.MONTH) + 1);
-		String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
-		String hour = Integer.toString(calender.get(java.util.Calendar.HOUR));
-		String min = Integer.toString(calender.get(java.util.Calendar.MINUTE));
-		String second = Integer.toString(calender.get(java.util.Calendar.SECOND));
-		String dateEntered = year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + second + ":";
 
 		//Check for other versions of this lab
 		String[] matchingLabs = getMatchingLabs(lab_no).split(",");
-		//if this lab is the latest version delete the measurements from the previous version and add the new ones
 
+		//if this lab is the latest version delete the measurements from the previous version and add the new ones
 		measurementDao.deleteMatchingLabs(matchingLabs, lab_no);
-	 	measurementDao.populateMeasurements( messageHandler, lab_no, demographic_no, dateEntered);
+	 	measurementDao.populateMeasurements( messageHandler, lab_no, demographic_no, new Date());
 	}
 
 	public static String getMatchingLabs(String lab_no) {

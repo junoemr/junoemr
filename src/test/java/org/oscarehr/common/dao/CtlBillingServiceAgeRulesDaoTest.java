@@ -23,13 +23,9 @@
  */
 package org.oscarehr.common.dao;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,22 +47,14 @@ public class CtlBillingServiceAgeRulesDaoTest extends DaoTestFixtures
 
 	@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreTable("ctl_billingservice_age_rules", "ctl_billingservice_sex_rules");
-	}
-
-	@Test
-	public void testCreate() throws Exception {
-		CtlBillingServiceSexRules entity = new CtlBillingServiceSexRules();
-		EntityDataGenerator.generateTestDataForModelClass(entity);
-		entity.setId(null);
-		ctlBillingServiceAgeRulesDao.persist(entity);
-		assertNotNull(entity.getId());
+		SchemaUtils.restoreTable("ctl_billingservice_age_rules");
 	}
 
 	@Test
 	public void testFindByServiceCode() throws Exception {
 		
-		String serviceCode1 = "alpha", serviceCode2 = "bravo";
+		String serviceCode1 = "foo";
+		String serviceCode2 = "bar";
 		
 		CtlBillingServiceAgeRules cBSAR1 = new CtlBillingServiceAgeRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSAR1);

@@ -174,7 +174,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 										  @QueryParam("taskAssignedTo") String taskAssignedTo,
 										  @QueryParam("mrp") String mrp,
 										  @QueryParam("creator") String creator,
-										  @DefaultValue("Normal") @QueryParam("priority") String priority,
+										  @QueryParam("priority") String priority,
 										  @QueryParam("sortColumn") String sortColumn,
 										  @QueryParam("sortDirection") String sortDirection,
 										  @QueryParam("demographicNo") Integer demographicNo,
@@ -202,8 +202,11 @@ public class TicklerWebService extends AbstractServiceImpl {
 		Tickler.STATUS ticklerStatus = Tickler.STATUS.valueOf(status);
 		ticklerCriteriaSearch.setStatus(ticklerStatus);
 
-		Tickler.PRIORITY ticklerPriority = Tickler.PRIORITY.valueOf(priority);
-		ticklerCriteriaSearch.setPriority(ticklerPriority);
+		if (priority != null && !priority.isEmpty())
+		{
+			Tickler.PRIORITY ticklerPriority = Tickler.PRIORITY.valueOf(priority);
+			ticklerCriteriaSearch.setPriority(ticklerPriority);
+		}
 
 		TicklerResponse result = new TicklerResponse();
 		List<Tickler> comparisonSearch = ticklerService.getSearchResponse(ticklerCriteriaSearch, page, count);

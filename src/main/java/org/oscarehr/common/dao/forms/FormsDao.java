@@ -24,6 +24,7 @@
 package org.oscarehr.common.dao.forms;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -31,6 +32,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.oscarehr.common.NativeSql;
+import org.oscarehr.forms.converter.FormBCAR2012Converter;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,6 +98,52 @@ public class FormsDao {
 		
 		return query.getResultList();
 	}
+
+	@NativeSql("formBCAR2012")
+	public List<FormBCAR2012Converter> selectBCAR2012(String beginEdd, String endEdd, int limit, int offset)
+	{
+		String sql = "SELECT demographic_no, c_EDD, c_surname, c_givenName, pg1_dateOfBirth, pg1_gravida, pg1_term, c_phone, pg1_langPref, c_phn, pg2_doula, pg2_doulaNo " +
+				"FROM formBCAR2012 f1 " +
+				"WHERE f1.c_EDD >= ? " +
+				"AND f1.c_EDD <= ? " +
+				"AND f1.formEdited = " +
+				"( " +
+				"	SELECT MAX(formEdited)" +
+				"	FROM formBCAR2012 f2 " +
+				"	WHERE f1.demographic_no=f2.demographic_no" +
+				") " +
+				"ORDER BY c_EDD DESC, ID DESC";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter(1, beginEdd);
+		query.setParameter(2, endEdd);
+		query.setMaxResults(limit);
+		query.setFirstResult(offset);
+
+		List<Object[]> rawResults = query.getResultList();
+		List<FormBCAR2012Converter> convertedResults = new ArrayList<>();
+		for (Object[] result : rawResults)
+		{
+			FormBCAR2012Converter bcar2012Converter = new FormBCAR2012Converter();
+
+			bcar2012Converter.setDemographicNo(Integer.parseInt(result[0].toString()));
+			bcar2012Converter.setEdd((Date)result[1]);
+			bcar2012Converter.setLastName(String.valueOf(result[2]));
+			bcar2012Converter.setFirstName(String.valueOf(result[3]));
+			bcar2012Converter.setDateOfBirth((Date)result[4]);
+			bcar2012Converter.setGravida(String.valueOf(result[5]));
+			bcar2012Converter.setTerm(String.valueOf(result[6]));
+			bcar2012Converter.setPhone(String.valueOf(result[7]));
+			bcar2012Converter.setLangPreferred(String.valueOf(result[8]));
+			bcar2012Converter.setPhn(String.valueOf(result[9]));
+			bcar2012Converter.setDoula(String.valueOf(result[10]));
+			bcar2012Converter.setDoulaNo(String.valueOf(result[11]));
+
+			convertedResults.add(bcar2012Converter);
+		}
+
+		return convertedResults;
+	}
+
 	
 	@NativeSql("formONAR")
 	public Object select_maxformar_id(String dateStart, String dateEnd) {

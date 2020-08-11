@@ -23,8 +23,19 @@
 package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
+import org.oscarehr.common.hl7.copd.mapper.accuro.AppointmentMapperAccuro;
+import org.oscarehr.common.hl7.copd.mapper.medaccess.AppointmentMapperMedaccess;
+import org.oscarehr.common.hl7.copd.mapper.medaccess.DocumentMapperMedaccess;
+import org.oscarehr.common.hl7.copd.mapper.medaccess.EncounterNoteMapperMedAccess;
+import org.oscarehr.common.hl7.copd.mapper.medaccess.HistoryNoteMapperMedaccess;
+import org.oscarehr.common.hl7.copd.mapper.mediplan.AlertMapperMediplan;
+import org.oscarehr.common.hl7.copd.mapper.mediplan.HistoryNoteMapperMediplan;
+import org.oscarehr.common.hl7.copd.mapper.wolf.EncounterNoteMapperWolf;
+import org.oscarehr.common.hl7.copd.mapper.wolf.MedicationMapperWolf;
+import org.oscarehr.common.hl7.copd.mapper.wolf.MessageMapperWolf;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 
 /**
  * constructs mappers based on import source setting.
@@ -37,21 +48,21 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new appointment mapper
 	 */
-	public static AppointmentMapper newAppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
+	public static AppointmentMapper newAppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
 		switch(importSource)
 		{
 			case MEDACCESS:
 			{
-				return new AppointmentMapperMedaccess(message, importSource);
+				return new AppointmentMapperMedaccess(message, recordData);
 			}
 			case ACCURO:
 			{
-				return new AppointmentMapperAccuro(message, importSource);
+				return new AppointmentMapperAccuro(message, recordData);
 			}
 			default:
 			{
-				return new AppointmentMapper(message, importSource);
+				return new AppointmentMapper(message, importSource, recordData);
 			}
 		}
 	}
@@ -65,7 +76,13 @@ public class MapperFactory
 	 */
 	public static AlertMapper newAlertMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		return new AlertMapper(message, providerRep, importSource);
+		switch(importSource)
+		{
+			case MEDIPLAN:
+				return new AlertMapperMediplan(message, providerRep);
+			default:
+				return new AlertMapper(message, providerRep, importSource);
+		}
 	}
 
 	/**
@@ -133,6 +150,8 @@ public class MapperFactory
 		{
 			case MEDACCESS:
 				return new EncounterNoteMapperMedAccess(message, providerRep, importSource);
+			case WOLF:
+				return new EncounterNoteMapperWolf(message, providerRep);
 			default:
 				return new EncounterNoteMapper(message, providerRep, importSource);
 		}
@@ -145,9 +164,23 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new history mapper
 	 */
-	public static HistoryNoteMapper newHistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public static HistoryNoteMapper newHistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
-		return new HistoryNoteMapper(message, providerRep, importSource);
+		switch(importSource)
+		{
+			case MEDACCESS:
+			{
+				return new HistoryNoteMapperMedaccess(message, providerRep, recordData);
+			}
+			case MEDIPLAN:
+			{
+				return new HistoryNoteMapperMediplan(message, providerRep, recordData);
+			}
+			default:
+			{
+				return new HistoryNoteMapper(message, providerRep, importSource, recordData);
+			}
+		}
 	}
 
 	/**
@@ -169,9 +202,34 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new medication mapper
 	 */
-	public static MedicationMapper newMedicationMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	public static MedicationMapper newMedicationMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
-		return new MedicationMapper(message, providerRep, importSource);
+		switch(importSource)
+		{
+			case WOLF:
+				return new MedicationMapperWolf(message, providerRep, recordData);
+			default:
+				return new MedicationMapper(message, providerRep, importSource);
+		}
+	}
+
+	/**
+	 * new message mapper
+	 * @param message - message to import
+	 * @param providerRep - rep of provider
+	 * @param importSource - source of import
+	 * @return - new message mapper
+	 */
+	public static MessageMapper newMessageMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	{
+		switch(importSource)
+		{
+			case WOLF:
+				return new MessageMapperWolf(message, providerRep);
+			default:
+				return new MessageMapper(message, providerRep, importSource);
+		}
+
 	}
 
 	/**
