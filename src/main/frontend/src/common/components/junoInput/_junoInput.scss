@@ -3,9 +3,23 @@ juno-input {
 		@include juno-form-inputs-style();
 		@include juno-form-inputs-colors-default();
 
-		input {
+		div {
 			flex: 1 1 0;
 			min-width: 24px;
+			position: relative;
+
+			.character-display {
+				position: absolute;
+				top: 1px;
+				right: 8px;
+
+				@include juno-font-body-smallest();
+				color: var(--color-neutral-grey);
+			}
+		}
+
+		input {
+			width: 100%;
 
 			&.uppercase {
 				text-transform: uppercase;

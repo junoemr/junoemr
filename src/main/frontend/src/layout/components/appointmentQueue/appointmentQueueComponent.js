@@ -188,7 +188,8 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				                                       "Delete Queued Appointment?",
 				                                       "Please provide a reason as to why you are deleting this appointment.",
 				                                       ctrl.componentStyle,
-				                                       "Proceed");
+				                                       "Proceed",
+						                       1024);
 				if (reason)
 				{
 					try

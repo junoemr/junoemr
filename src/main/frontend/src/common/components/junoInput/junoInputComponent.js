@@ -35,6 +35,7 @@ angular.module('Common.Components').component('junoInput', {
 		placeholder: "@?",
 		uppercase: "<?",
 		readonly: "<?",
+		characterLimit: "<?",
 		// block characters from being entered that do not match this regex
 		validRegex: "<?",
 		invalid: "<?",

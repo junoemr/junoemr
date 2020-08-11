@@ -63,7 +63,7 @@ public class QueueWebService extends AbstractServiceImpl
 	public RestResponse<List<AppointmentQueueTo1>> getAppointmentQueues()
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN, SecObjectName._APPOINTMENT);
-		return RestResponse.successResponse(AppointmentQueueTo1.fromAppointmentQueueList(appointmentQueueService.getAppointmentQueues()));
+		return RestResponse.successResponse(AppointmentQueueTo1.fromAppointmentQueueList(appointmentQueueService.getAppointmentQueues(getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
 	}
 
 	@POST
@@ -73,7 +73,7 @@ public class QueueWebService extends AbstractServiceImpl
 	public RestResponse<AppointmentQueueTo1> createAppointmentQueue(AppointmentQueueTo1 queueTransfer)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
-		return RestResponse.successResponse(new AppointmentQueueTo1(appointmentQueueService.createAppointmentQueue(queueTransfer)));
+		return RestResponse.successResponse(new AppointmentQueueTo1(appointmentQueueService.createAppointmentQueue(queueTransfer, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
 	}
 
 	@GET
@@ -82,7 +82,7 @@ public class QueueWebService extends AbstractServiceImpl
 	public RestResponse<AppointmentQueueTo1> getAppointmentQueue(@PathParam("queueId") UUID queueId)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN, SecObjectName._APPOINTMENT);
-		return RestResponse.successResponse(new AppointmentQueueTo1(appointmentQueueService.getAppointmentQueue(queueId)));
+		return RestResponse.successResponse(new AppointmentQueueTo1(appointmentQueueService.getAppointmentQueue(queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
 	}
 
 	@PUT
@@ -93,7 +93,7 @@ public class QueueWebService extends AbstractServiceImpl
 	                                                                AppointmentQueueTo1 queueTransfer)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
-		return RestResponse.successResponse(new AppointmentQueueTo1(appointmentQueueService.updateAppointmentQueue(queueId, queueTransfer)));
+		return RestResponse.successResponse(new AppointmentQueueTo1(appointmentQueueService.updateAppointmentQueue(queueId, queueTransfer, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
 	}
 
 	@DELETE
@@ -102,7 +102,7 @@ public class QueueWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> deleteAppointmentQueue(@PathParam("queueId") UUID queueId)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.DELETE, null, SecObjectName._ADMIN);
-		appointmentQueueService.deleteAppointmentQueue(queueId);
+		appointmentQueueService.deleteAppointmentQueue(queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		return RestResponse.successResponse(true);
 	}
 

@@ -58,7 +58,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> deleteAppointment(@PathParam("queueId") UUID queueId, @PathParam("appointmentId") UUID appointmentId, String reason)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.DELETE, null, SecObjectName._APPOINTMENT);
-		appointmentService.deleteQueuedAppointment(appointmentId, queueId);
+		appointmentService.deleteQueuedAppointment(appointmentId, queueId, reason, getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		return RestResponse.successResponse(true);
 	}
 

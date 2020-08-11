@@ -40,9 +40,9 @@ public class QueuedAppointmentService extends BaseService
 	 * @param appointmentQueue - queue object to get appointments for
 	 * @return - list of queued appointments
 	 */
-	public List<QueuedAppointment> getAppointmentsInQueue(AppointmentQueue appointmentQueue)
+	public List<QueuedAppointment> getAppointmentsInQueue(AppointmentQueue appointmentQueue, Integer securityNo)
 	{
-		return getAppointmentsInQueue(appointmentQueue.getRemoteId());
+		return getAppointmentsInQueue(appointmentQueue.getRemoteId(), securityNo);
 	}
 
 	/**
@@ -50,11 +50,11 @@ public class QueuedAppointmentService extends BaseService
 	 * @param queueId - the queue to get the appointment list for
 	 * @return - list of queued appointments
 	 */
-	public List<QueuedAppointment> getAppointmentsInQueue(UUID queueId)
+	public List<QueuedAppointment> getAppointmentsInQueue(UUID queueId, Integer securityNo)
 	{
 		try
 		{
-			return organizationApi.getAllAppointments(queueId).stream().map(QueuedAppointment::new).collect(Collectors.toList());
+			return getOrganizationApi(securityNo).getAllAppointments(queueId).stream().map(QueuedAppointment::new).collect(Collectors.toList());
 		}
 		catch (ApiException apiException)
 		{
@@ -65,12 +65,15 @@ public class QueuedAppointmentService extends BaseService
 	/**
 	 * delete an appointment form the appointment queue
 	 * @param appointmentId - the remote id of the appointment to delete
+	 * @param queueId - the queue in which the appointment is contained
+	 * @param reason - the reason for deleting the appointment free text
+	 * @param securityNo - the security no of the person performing the delete.
 	 */
-	public void deleteQueuedAppointment(UUID appointmentId, UUID queueId)
+	public void deleteQueuedAppointment(UUID appointmentId, UUID queueId, String reason, Integer securityNo)
 	{
 		try
 		{
-			organizationApi.dequeueAppointment(appointmentId, queueId);
+			getOrganizationApi(securityNo).dequeueAppointment(appointmentId, queueId, reason);
 		}
 		catch (ApiException apiException)
 		{

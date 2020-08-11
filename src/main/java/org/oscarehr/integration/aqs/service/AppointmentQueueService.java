@@ -35,11 +35,11 @@ import java.util.stream.Collectors;
 @Service
 public class AppointmentQueueService extends BaseService
 {
-	public List<AppointmentQueue> getAppointmentQueues()
+	public List<AppointmentQueue> getAppointmentQueues(Integer securityNo)
 	{
 		try
 		{
-			return organizationApi.getAllQueues().stream().map(AppointmentQueue::new).collect(Collectors.toList());
+			return getOrganizationApi(securityNo).getAllQueues().stream().map(AppointmentQueue::new).collect(Collectors.toList());
 		}
 		catch (ApiException apiException)
 		{
@@ -47,11 +47,11 @@ public class AppointmentQueueService extends BaseService
 		}
 	}
 
-	public AppointmentQueue createAppointmentQueue(AppointmentQueueTo1 queueTransfer)
+	public AppointmentQueue createAppointmentQueue(AppointmentQueueTo1 queueTransfer, Integer securityNo)
 	{
 		try
 		{
-			return new AppointmentQueue(organizationApi.createQueue(queueTransfer.asCreateQueueInput()));
+			return new AppointmentQueue(getOrganizationApi(securityNo).createQueue(queueTransfer.asCreateQueueInput()));
 		}
 		catch (ApiException apiException)
 		{
@@ -59,11 +59,11 @@ public class AppointmentQueueService extends BaseService
 		}
 	}
 
-	public AppointmentQueue getAppointmentQueue(UUID queueId)
+	public AppointmentQueue getAppointmentQueue(UUID queueId, Integer securityNo)
 	{
 		try
 		{
-			return new AppointmentQueue(organizationApi.getQueue(queueId));
+			return new AppointmentQueue(getOrganizationApi(securityNo).getQueue(queueId));
 		}
 		catch (ApiException apiException)
 		{
@@ -71,11 +71,11 @@ public class AppointmentQueueService extends BaseService
 		}
 	}
 
-	public AppointmentQueue updateAppointmentQueue(UUID queueId, AppointmentQueueTo1 queueTransfer)
+	public AppointmentQueue updateAppointmentQueue(UUID queueId, AppointmentQueueTo1 queueTransfer, Integer securityNo)
 	{
 		try
 		{
-			return new AppointmentQueue(organizationApi.updateQueue(queueId, queueTransfer.asCreateQueueInput()));
+			return new AppointmentQueue(getOrganizationApi(securityNo).updateQueue(queueId, queueTransfer.asCreateQueueInput()));
 		}
 		catch (ApiException apiException)
 		{
@@ -83,7 +83,7 @@ public class AppointmentQueueService extends BaseService
 		}
 	}
 
-	public void deleteAppointmentQueue(UUID queueId)
+	public void deleteAppointmentQueue(UUID queueId, Integer securityNo)
 	{
 		//TODO delete from AQS Server
 	}

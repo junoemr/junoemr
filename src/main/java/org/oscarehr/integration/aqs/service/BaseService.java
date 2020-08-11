@@ -42,21 +42,36 @@ public abstract class BaseService extends org.oscarehr.integration.BaseService
 	protected final String AQS_AUTH_REMOTE_USER_ID = "RemoteUserId";
 	protected final String AQS_AUTH_REMOTE_USER_TYPE = "RemoteUserType";
 
-	protected OrganizationApi organizationApi;
-	protected AdminApi adminApi;
+	protected ApiClient apiClient;
 
 	public BaseService()
 	{
 		//setup api client
-		ApiClient apiClient = Configuration.getDefaultApiClient();
+		this.apiClient = Configuration.getDefaultApiClient();
 		apiClient.setBasePath(AQS_PROTOCOL + "://" + BASE_END_POINT);
-		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_INTEGRATION_ID)).setApiKey("ben1");//TODO get juno instance name
-		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_ID)).setApiKey("128");//TODO (security number) use logged in user to set this!!!!!!!!!!!!!!
+		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_INTEGRATION_ID)).setApiKey(OscarProperties.getInstance().getProperty("project_home"));
 		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_TYPE)).setApiKey(RemoteUserType.JUNO_SECURITY.name());
-
-		adminApi = new AdminApi(apiClient);
-		organizationApi = new OrganizationApi(apiClient);
 	}
 
+	/**
+	 * get the organization api.
+	 * @param securityNo - security no of the user performing the action
+	 * @return - the organization api
+	 */
+	public OrganizationApi getOrganizationApi(Integer securityNo)
+	{
+		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_ID)).setApiKey(securityNo.toString());
+		return new OrganizationApi(apiClient);
+	}
 
+	/**
+	 * get the admin api
+	 * @param securityNo - security no of the user performing the action
+	 * @return - the admin api
+	 */
+	public AdminApi getAdminApi(Integer securityNo)
+	{
+		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_ID)).setApiKey(securityNo.toString());
+		return new AdminApi(apiClient);
+	}
 }

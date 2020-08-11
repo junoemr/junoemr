@@ -430,9 +430,10 @@ Juno.Common.Util.confirmationDialog = function(uibModal, title, message, style)
  * @param message - message to display to the user
  * @param style - the style of the modal
  * @param okText - alternate text for the ok button. omit if you want default ("Ok").
+ * @param characterLimit - limit the number of characters that can be entered in to the input box. omit for unlimited.
  * @returns {*}
  */
-Juno.Common.Util.openInputDialog = (uibModal, title, message, style, okText) =>
+Juno.Common.Util.openInputDialog = (uibModal, title, message, style, okText, characterLimit) =>
 {
 	return uibModal.open(
 			{
@@ -443,7 +444,8 @@ Juno.Common.Util.openInputDialog = (uibModal, title, message, style, okText) =>
 					title: () => title,
 					message: () => message,
 					style: () => style,
-					okText: () => okText
+					okText: () => okText,
+					characterLimit: () => characterLimit,
 				}
 			}
 	).result;

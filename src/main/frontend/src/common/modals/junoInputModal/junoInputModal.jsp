@@ -13,6 +13,7 @@
 					ng-model="$ctrl.value"
           invalid="!$ctrl.validations.value() && $ctrl.hasSubmitted"
           placeholder="Please enter reason here"
+					character-limit="$ctrl.resolve.characterLimit"
 					component-style="$ctrl.resolve.style">
 	</juno-input>
 	

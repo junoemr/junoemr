@@ -4,13 +4,19 @@
 		{{$ctrl.label}}
 	</label>
 
-	<input type="{{$ctrl.type}}"
-					ng-model="$ctrl.ngModel"
-					ng-change="$ctrl.onChange()"
-					ng-class="$ctrl.inputClasses()"
-					ng-readonly="$ctrl.readonly"
-					ng-focus="$ctrl.onFocus()"
-					ng-blur="$ctrl.onBlur()"
-	                ng-disabled="$ctrl.disabled"
-					placeholder="{{$ctrl.placeholder}}">
+	<div>
+		<input type="{{$ctrl.type}}"
+						ng-model="$ctrl.ngModel"
+						ng-change="$ctrl.onChange()"
+						ng-class="$ctrl.inputClasses()"
+						ng-readonly="$ctrl.readonly"
+						ng-focus="$ctrl.onFocus()"
+						ng-blur="$ctrl.onBlur()"
+						maxlength="{{$ctrl.characterLimit}}"
+						ng-disabled="$ctrl.disabled"
+						placeholder="{{$ctrl.placeholder}}">
+		<div ng-if="$ctrl.characterLimit" class="character-display">
+			{{$ctrl.ngModel.length}}/{{$ctrl.characterLimit}}
+		</div>
+	</div>
 </div>
