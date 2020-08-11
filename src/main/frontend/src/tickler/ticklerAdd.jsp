@@ -158,7 +158,7 @@
 	</div>
 	<div class="modal-footer">
 		<button class="btn btn-default" type="button" ng-click="ticklerAddCtrl.close()"><bean:message key="global.close" bundle="ui"/></button>
-		<button class="btn btn-success" type="submit" ng-disabled="isDisabled"><bean:message key="global.save" bundle="ui"/></button>
+		<button class="btn btn-success" type="submit" ng-disabled="ticklerAddCtrl.isDisabled"><bean:message key="global.save" bundle="ui"/></button>
 	</div>
 </form>
 
