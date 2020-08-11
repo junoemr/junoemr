@@ -54,6 +54,8 @@ if(!authed) {
 
 <head>
 <title><bean:message key="admin.admin.ManageReferralDoc"/></title>
+<script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery-1.9.1.js"></script>
+<link href="<%=request.getContextPath() %>/css/bootstrap.min.css" rel="stylesheet">
 
 <script type="text/javascript">
 
@@ -79,6 +81,23 @@ function checkUnits(){
 	}
 	return true;
 }
+function registerFormSubmit(formId, divId) {
+	$('#'+formId).submit(function() {
+		if(!$('#'+formId).valid()){
+			return false;
+		}
+		// gather the form data
+		var data = $(this).serialize();
+		// post data
+		$.post($('#'+formId).attr('action'), data, function(returnData) {
+			// insert returned html
+			$('#'+divId).html(returnData)
+		})
+
+		return false; // stops browser from doing default submit process
+	});
+}
+
 </script>
 
 <style>
@@ -188,19 +207,24 @@ table td{font-size:10px;}
 <script>
 registerFormSubmit('referralDocform', 'dynamic-content');
 
-$( document ).ready(function( $ ) {
-$("a.contentLink").on("click", function(e) {
-	e.preventDefault();
-	$("#dynamic-content").load($(this).attr("href"), 
-		function(response, status, xhr) {
-	  		if (status == "error") {
-		    	var msg = "Sorry but there was an error: ";
-		    	$("#dynamic-content").html(msg + xhr.status + " " + xhr.statusText);
+$( document ).ready(function( $ )
+{
+	$("a.contentLink").on("click", function(e)
+	{
+		e.preventDefault();
+		$(document.body).load
+		(
+			$(this).attr("href"),
+			function(response, status, xhr)
+			{
+				if (status === "error")
+				{
+					var msg = "Sorry but there was an error: ";
+					$(document.body).html(msg + xhr.status + " " + xhr.statusText);
+				}
 			}
-		}
-	);
-});
-		
+		);
+	});
 });
 </script>
 </body>
