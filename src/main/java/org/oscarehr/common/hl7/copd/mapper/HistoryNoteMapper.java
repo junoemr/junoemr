@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.oscarehr.util.MiscUtils;
@@ -41,15 +42,17 @@ import java.util.Map;
 
 public class HistoryNoteMapper extends AbstractMapper
 {
-	private static final Logger logger = MiscUtils.getLogger();
+	protected final CoPDRecordData recordData;
+	protected static final Logger logger = MiscUtils.getLogger();
 	protected final Date oldestEncounterNoteDate; // used as a default for notes with no date info
 
 	protected static Map<String, String> relationshipTypeMap = new HashMap<>();
 
-	public HistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public HistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		super(message, providerRep, importSource);
 		this.oldestEncounterNoteDate = getOldestEncounterNoteContactDate();
+		this.recordData = recordData;
 	}
 
 	protected Date getOldestEncounterNoteContactDate() throws HL7Exception

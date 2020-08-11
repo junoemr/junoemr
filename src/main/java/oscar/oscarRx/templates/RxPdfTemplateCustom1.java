@@ -131,10 +131,13 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 		if (RxWatermarkService.isWatermarkEnabled() && RxWatermarkService.isWatermarkBackground())
 		{
 			Image image = createWaterMarkImage(document);
-			watermarkLayer.setOn(true);
-			cb.beginLayer(watermarkLayer);
-			cb.addImage(image);
-			cb.endLayer();
+			if (image != null)
+			{
+				watermarkLayer.setOn(true);
+				cb.beginLayer(watermarkLayer);
+				cb.addImage(image);
+				cb.endLayer();
+			}
 		}
 
 		pdflayer.setOn(true);
@@ -155,16 +158,19 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 		cell.setBorder(0);
 		mainTable.addCell(cell);
 
-		document.add(mainTable);
 		cb.endLayer();
+		document.add(mainTable);
 
 		if (RxWatermarkService.isWatermarkEnabled() && !RxWatermarkService.isWatermarkBackground())
 		{
 			Image image = createWaterMarkImage(document);
-			watermarkLayer.setOn(true);
-			cb.beginLayer(watermarkLayer);
-			cb.addImage(image);
-			cb.endLayer();
+			if (image != null)
+			{
+				watermarkLayer.setOn(true);
+				cb.beginLayer(watermarkLayer);
+				cb.addImage(image);
+				cb.endLayer();
+			}
 		}
 	}
 

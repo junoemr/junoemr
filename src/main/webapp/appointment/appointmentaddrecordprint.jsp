@@ -49,9 +49,11 @@ oscar.log.LogAction,oscar.log.LogConst"%>
 <%@ page import="oscar.oscarDemographic.data.DemographicData"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@page import="oscar.oscarDemographic.data.DemographicMerged" %>
 <%@page import="oscar.util.ConversionUtils" %>
 <%@page import="oscar.util.UtilDateUtilities" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
+<%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
 <%
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
     		
@@ -73,10 +75,19 @@ oscar.log.LogAction,oscar.log.LogConst"%>
 	int demographicNo = 0;
 	org.oscarehr.common.model.Demographic demo = null;
 	String createDateTime = UtilDateUtilities.DateToString(new java.util.Date(), "yyyy-MM-dd HH:mm:ss");
-	if(request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals("")))
+	DemographicMergedDao demographicMergedDao = SpringUtils.getBean(DemographicMergedDao.class);
+
+	try
 	{
 		demographicNo = Integer.parseInt(request.getParameter("demographic_no"));
 	}
+	catch (NumberFormatException e)
+	{
+		MiscUtils.getLogger().error("Error attempting to parse demographicNo when saving appointment: "
+				+ request.getParameter("demographic_no"));
+	}
+
+	String creator = request.getParameter("creator");
 
 	Appointment a = new Appointment();
 	a.setProviderNo(request.getParameter("provider_no"));
@@ -93,15 +104,16 @@ oscar.log.LogAction,oscar.log.LogConst"%>
 	a.setBilling(request.getParameter("billing"));
 	a.setStatus(request.getParameter("status"));
 	a.setCreateDateTime(ConversionUtils.fromTimestampString(createDateTime));
-	a.setCreator(request.getParameter("creator"));
+	a.setCreator(creator);
+	a.setLastUpdateUser(creator);
 	a.setRemarks(request.getParameter("remarks"));
 	a.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
 	//the keyword(name) must match the demographic_no if it has been changed
-	if(request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals("")))
+	DemographicMerged demographicMerged = demographicMergedDao.getCurrentHead(demographicNo);
+	if (demographicMerged != null)
 	{
-		DemographicMerged dmDAO = new DemographicMerged();
-		a.setDemographicNo(Integer.parseInt(dmDAO.getHead(request.getParameter("demographic_no"))));
-
+		demographicNo = demographicMerged.getMergedTo();
+		a.setDemographicNo(demographicNo);
 		DemographicData demData = new DemographicData();
 		demo = demData.getDemographic(loggedInInfo, String.valueOf(a.getDemographicNo()));
 		a.setName(demo.getLastName() + "," + demo.getFirstName());

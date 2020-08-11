@@ -41,6 +41,8 @@ public class Hl7Const
 	public static final String HL7_SEGMENT_ZBA_29 = "ZBA.29";
 	public static final String HL7_SEGMENT_ZBA_31 = "ZBA.31";
 
+	public static final String HL7_SEGMENT_ZPB_10 = "ZPB.10";
+
 	public static final String HL7_SEGMENT_ZPV_5 = "ZPV.5";
 
 	public static final String HL7_SEGMENT_ZQO = "ZQO";
@@ -49,6 +51,8 @@ public class Hl7Const
 	public static final String HL7_SEGMENT_ZQO_6 = "ZQO.6";
 	public static final String HL7_SEGMENT_ZQO_7 = "ZQO.7";
 	public static final String HL7_SEGMENT_ZQO_8 = "ZQO.8";
+
+	public static final String HL7_SEGMENT_SCH_11 = "SCH.11";
 
 	public static String getReadableSegmentName(String segment, String segmentField)
 	{

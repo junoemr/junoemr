@@ -51,6 +51,7 @@
 <%@ page import="oscar.log.LogAction" %>
 <%@ page import="oscar.log.LogConst" %>
 <%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="java.util.Date" %>
 <%
@@ -72,6 +73,8 @@
 	</tr>
 </table>
 	<%
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		String updateuser = loggedInInfo.getLoggedInProviderNo();
 		final String cancelledAppointment = "Cancel Appt";
 
 		String apptNo = request.getParameter("appointment_no");
@@ -79,7 +82,6 @@
 		appointmentArchiveDao.archiveAppointment(appt);
 
 		// Try to read all the request parameters and use default (previous) values where appropriate
-		String updateuser = (String) session.getAttribute("user");
 		String buttonCancel = request.getParameter("buttoncancel");
 
 		String status = ConversionUtils.getStringOrDefaultValue(request.getParameter("status"), appt.getAppointmentStatus());
