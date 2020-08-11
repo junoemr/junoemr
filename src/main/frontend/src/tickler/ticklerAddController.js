@@ -25,6 +25,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		// holds the patient typeahead selection
 		controller.demographicSearch = null;
 
+		$scope.isDisabled = false; // Save button enabled by default
 		//=========================================================================
 		// Watches
 		//=========================================================================
@@ -124,9 +125,11 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 
 		controller.save = function()
 		{
+			$scope.isDisabled = true; // Disable save button
 			controller.showErrors = true;
 			if (!controller.validate())
 			{
+				$scope.isDisabled = false; // Enable save button if validation failed
 				return;
 			}
 
@@ -148,6 +151,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				$uibModalInstance.close(true);
 			}, function(reason)
 			{
+				$scope.isDisabled = False; // Enable save button if adding tickler failed
 				alert(reason);
 			});
 
