@@ -42,18 +42,18 @@
 				</appointment-card>
 			</div>
 		</div>
-		
-		<div class="list-footer juno-text" ng-class="[$ctrl.componentStyle + '-background']">
-			{{$ctrl.currentQueue.items.length}}
-			<span class="middle-text juno-text-secondary">
+	</div>
+
+	<div class="list-footer juno-text" ng-class="[$ctrl.componentStyle + '-background']">
+		{{$ctrl.currentQueue.items.length}}
+		<span class="middle-text juno-text-secondary">
 				items in queue. max capacity
 			</span>
-			{{$ctrl.currentQueue.queueLimit}}
-			<juno-button component-style="$ctrl.componentStyle"
-			             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARK"
-			             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
-				<i class="icon icon-linux"></i>
-			</juno-button>
-		</div>
+		{{$ctrl.currentQueue.queueLimit}}
+		<juno-button component-style="$ctrl.componentStyle"
+								 button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARK"
+								 button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
+			<i class="icon icon-linux"></i>
+		</juno-button>
 	</div>
 </div>

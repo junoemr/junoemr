@@ -170,9 +170,8 @@ angular.module('Layout.Components').component('appointmentQueue', {
 			if (childElement && ctrl.currentQueue)
 			{
 				let elementHeight = childElement.clientHeight;
-				let elementsToDisplay = Math.max(ctrl.currentQueue.items.length + ctrl.appointmentSlots,
-																	Math.floor(ctrl.listRef[0].clientHeight / elementHeight));
-				ctrl.listContentHeight = elementHeight * elementsToDisplay;
+				let elementsToDisplay = ctrl.currentQueue.items.length + ctrl.appointmentSlots;
+				ctrl.listContentHeight = Math.max(elementHeight * elementsToDisplay, ctrl.listRef[0].clientHeight);
 
 				if (digest)
 				{
