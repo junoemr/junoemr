@@ -29,7 +29,6 @@ import integration.tests.util.data.ProviderTestData;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -43,6 +42,10 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 
 public class AddProvidersTests extends SeleniumTestBase
 {
+	public static ProviderTestData drApple = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]);
+	public static ProviderTestData drBerry = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[1]);
+	public static ProviderTestData drCherry = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[2]);
+
 	@AfterClass
 	public static void cheanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
@@ -59,7 +62,6 @@ public class AddProvidersTests extends SeleniumTestBase
 
 		// Add a provider record page
 		driver.findElement(By.xpath(".//h5[contains(.,'Add a Provider Record')]")).click();
-		ProviderTestData drApple = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]);
 		driver.switchTo().frame("myFrame");
 		driver.findElement(By.xpath("//input[@value='Suggest']")).click();
 		driver.findElement(By.xpath("//input[@name='provider_no']")).clear();

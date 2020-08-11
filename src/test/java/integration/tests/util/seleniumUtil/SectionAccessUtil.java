@@ -27,12 +27,25 @@ import org.openqa.selenium.WebDriver;
 
 public class SectionAccessUtil
 {
-	public static void accessScheduleMgSection(WebDriver driver, String sectionName)
+	public static void accessAdministrationSectionClassicUI(WebDriver driver, String sectionName, String subSectionName)
 	{
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);
-		driver.findElement(By.linkText("Schedule Management")).click();
 		driver.findElement(By.linkText(sectionName)).click();
+		driver.findElement(By.linkText(subSectionName)).click();
 		driver.switchTo().frame("myFrame");
+	}
+
+	public static void accessAdministrationSectionJUNOUI(WebDriver driver, String sectionName, String subSectionName)
+	{
+		// open JUNO UI page
+		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
+
+		// open administration panel
+		driver.findElement(By.linkText("More")).click();
+		driver.findElement(By.linkText("Admin")).click();
+		driver.findElement(By.linkText(sectionName)).click();
+		driver.findElement(By.linkText(subSectionName)).click();
+		driver.switchTo().frame("content-frame");
 	}
 }

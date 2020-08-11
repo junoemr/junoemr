@@ -41,15 +41,16 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import java.util.List;
 import java.util.Set;
 
+import static integration.tests.AddGroupTests.*;
 import static integration.tests.ScheduleSettingTests.*;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
-import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessScheduleMgSection;
+import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
 class ScheduleIntegrationTests
 {
 	static void setupScheduleTest(WebDriver driver) throws InterruptedException
 	{
-		accessScheduleMgSection(driver, "Schedule Setting");
+		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Schedule Setting");
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 		setupTemplate(currWindowHandle, oldWindowHandles);
@@ -66,15 +67,11 @@ class GroupViewIntegrationTests
 {
 	static void setupGroupTest(WebDriver driver)
 	{
-		accessScheduleMgSection(driver, "Add a Group");
-		driver.findElement(By.xpath("//input[@name='mygroup_no']")).sendKeys("TestGroup");
-		driver.findElement(By.xpath("//input[@value='1']")).click();
-		driver.findElement(By.xpath("//input[@value='2']")).click();
-		driver.findElement(By.xpath("//input[@value='Save']")).click();
-		driver.findElement(By.linkText("View Group List")).click();
+		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group");
+		addGroup(groupName, 2);
 		Assert.assertTrue("Group is Not added successfully.",
-				PageUtil.isExistsBy(By.name("TestGroup100001"), driver) &&
-						PageUtil.isExistsBy(By.name("TestGroup100002"), driver));
+				PageUtil.isExistsBy(By.name(valueOfDrApple), driver) &&
+						PageUtil.isExistsBy(By.name(valueOfDrBerry), driver));
 		driver.close();
 	}
 }
