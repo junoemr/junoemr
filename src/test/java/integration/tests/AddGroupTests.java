@@ -47,10 +47,8 @@ public class AddGroupTests extends SeleniumTestBase
 	public static String valueOfDrCherry = groupName + drCherry.providerNo;
 
 	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	public static void setup()
 	{
-		/*SchemaUtils.restoreTable("admission", "log", "mygroup", "program_provider",
-				"provider", "provider_billing", "providerbillcenter", "secUserRole");*/
 		loadSpringBeans();
 		DatabaseUtil.createTestProvider();
 	}
