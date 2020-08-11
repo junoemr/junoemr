@@ -46,7 +46,7 @@ import java.util.Set;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 import static integration.tests.util.seleniumUtil.PageUtil.switchToNewWindow;
-import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessScheduleMgSection;
+import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
 public class ScheduleSettingTests extends SeleniumTestBase
 {
@@ -165,7 +165,7 @@ public class ScheduleSettingTests extends SeleniumTestBase
 		String holidayName = "Happy Monday";
 
 		// open Schedule Template Setting page
-		accessScheduleMgSection(driver, "Schedule Setting");
+		accessAdministrationSectionClassicUI(driver, "Schedule Management","Schedule Setting");
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 
