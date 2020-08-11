@@ -34,7 +34,6 @@
 <%@ page import="oscar.OscarProperties"%>
 <%@ page import="org.oscarehr.common.model.Validations" %>
 
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
 <%@ page import="org.oscarehr.measurements.model.Flowsheet" %>
 <%@ page import="oscar.log.LogAction" %>
@@ -42,7 +41,6 @@
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementInfo" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
-<%@ page import="static org.caisi.comp.web.WebComponentUtil.getServletContext" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.FlowSheetItem" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean" %>
@@ -805,7 +803,7 @@ function fsPopup(width,height,url,window) {
 		fsSelected = "";
 	}
 
-	String undiagnosed = "";
+	StringBuilder undiagnosed = new StringBuilder();
 	String unDxShow ="";
 
 	for (String value : flowsheetList)
@@ -842,32 +840,46 @@ function fsPopup(width,height,url,window) {
 
 			if (!btnLabel.equals("PHV"))
 			{
-				MeasurementFlowSheet findName = MeasurementTemplateFlowSheetConfig.getInstance().getFlowSheet(value);
-				undiagnosed = undiagnosed + "<li class='" + fsSelected + "'><a href='" + request.getRequestURI() + "?demographic_no=" + demographic_no + "&template=" + value.toString() + "'  title='Undiagnosed' id='group-btn-" + value + "'>" + findName.getDisplayName() + "</a></li>";
+				MeasurementFlowSheet findName = flowsheetService.getFlowsheetTemplate(value);
+				String templateDisplayName = "";
+				if (findName != null)
+				{
+					templateDisplayName = findName.getDisplayName();
+				}
+				undiagnosed.append("<li class='")
+						.append(fsSelected)
+						.append("'><a href='")
+						.append(request.getRequestURI())
+						.append("?demographic_no=")
+						.append(demographic_no)
+						.append("&template=")
+						.append(value)
+						.append("'  title='Undiagnosed' id='group-btn-")
+						.append(value).append("'>")
+						.append(templateDisplayName).append("</a></li>");
 				fsSelected = "";
 			}
 
 		}
 	}
 
+	String primaryMore = "";
+	if (!unDxShow.isEmpty())
+	{
+		primaryMore="btn-primary";
+	}
+
+
 %>
-<span class="btn-divider" title="View undiagnosed flowsheets">| </span>			
-<%
-String primaryMore="";
-if(unDxShow!=""){  
-primaryMore="btn-primary";
-}
-%>			
-			<div class="btn-group">
-			  <button type="button" class="btn btn-default <%=primaryMore%> dropdown-toggle" data-toggle="dropdown" title="View undiagnosed flowsheets">
-			    <%=unDxShow%> <span class="glyphicon glyphicon-chevron-down "></span>
-			  </button>
-			  <ul class="dropdown-menu" role="menu">
-			  	<li class="dropdown-header">Undiagnosed</li>
-				<%=undiagnosed %>
-			  </ul>
-			</div>
-		</div>
+<span class="btn-divider" title="View undiagnosed flowsheets">| </span>
+<div class="btn-group">
+	<button type="button" class="btn btn-default <%=primaryMore%> dropdown-toggle" data-toggle="dropdown" title="View undiagnosed flowsheets">
+		<%=unDxShow%> <span class="glyphicon glyphicon-chevron-down "></span>
+	</button>
+	<ul class="dropdown-menu" role="menu">
+		<li class="dropdown-header">Undiagnosed</li>
+		<%=undiagnosed %>
+	</ul>
 </div>
 
 

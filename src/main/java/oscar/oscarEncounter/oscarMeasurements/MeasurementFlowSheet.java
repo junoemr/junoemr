@@ -520,7 +520,6 @@ public class MeasurementFlowSheet {
                 workingMemory.fireAllRules();
             } catch (Exception e) {
                 MiscUtils.getLogger().error("Error", e);
-            //throw new Exception("ERROR: Drools ",e);
             }
         }
     }

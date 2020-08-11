@@ -82,7 +82,7 @@
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath() %>/js/jquery_css/smoothness/jquery-ui-1.10.2.custom.min.css"/>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
-<script>
+<script type="text/javascript">
 jQuery.noConflict();
 jQuery(function() {
     jQuery( document ).tooltip();
@@ -201,7 +201,9 @@ br {
 			<%
 				List<MeasurementFlowSheet> flowsheetTemplates = flowsheetService.getFlowsheetTemplates();
 				List<Flowsheet> systemFlowsheets = flowsheetService.getSystemFlowsheets();
+				List<Flowsheet> databaseFlowsheets = flowsheetService.getDatabaseFlowsheets();
 				List<FlowSheetUserCreated> userCreatedFlowSheets = flowsheetService.getUserCreatedFlowsheets();
+
 				for (MeasurementFlowSheet flowsheetTemplate : flowsheetTemplates)
 				{
 					String type = "Unknown";
@@ -211,22 +213,27 @@ br {
 					{
 						if (flowsheetTemplate.getName().equals(sheet.getName()))
 						{
+							enabled = sheet.isEnabled();
+							displayName = sheet.getDisplayName();
 							if (sheet.isExternal())
 							{
 								type = "System";
 							}
-							else
-							{
-								type = "Custom";
-							}
-							enabled = sheet.isEnabled();
-							displayName = sheet.getDisplayName();
 							break;
 						}
 					}
 
 					if (type.equals("Unknown"))
 					{
+						for (Flowsheet customFlowsheet : databaseFlowsheets)
+						{
+							if (flowsheetTemplate.getName().equals(customFlowsheet.getName()))
+							{
+								type = "Custom";
+								break;
+							}
+						}
+
 						for (FlowSheetUserCreated userCreated : userCreatedFlowSheets)
 						{
 							if (flowsheetTemplate.getName().equals(userCreated.getName()))

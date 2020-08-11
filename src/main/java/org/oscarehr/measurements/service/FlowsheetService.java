@@ -71,7 +71,6 @@ public class FlowsheetService
 
 	public MeasurementFlowSheet getFlowsheetTemplate(String name)
 	{
-		MeasurementTemplateFlowSheetConfig config = MeasurementTemplateFlowSheetConfig.getInstance();
 		List<MeasurementFlowSheet> flowsheetTemplates = getFlowsheetTemplates();
 		for (MeasurementFlowSheet flowsheetTemplate : flowsheetTemplates)
 		{
