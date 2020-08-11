@@ -81,18 +81,25 @@ function checkUnits(){
 	}
 	return true;
 }
-function registerFormSubmit(formId, divId) {
-	$('#'+formId).submit(function() {
-		if(!$('#'+formId).valid()){
+function registerFormSubmit(formId, divId)
+{
+	$('#'+formId).submit(function()
+	{
+		if(!$('#'+formId).valid())
+		{
 			return false;
 		}
 		// gather the form data
 		var data = $(this).serialize();
 		// post data
-		$.post($('#'+formId).attr('action'), data, function(returnData) {
-			// insert returned html
-			$('#'+divId).html(returnData)
-		})
+		$.post(
+			$('#'+formId).attr('action'),
+			data,
+			function(returnData)
+			{
+				// insert returned html
+				$('#'+divId).html(returnData)
+			});
 
 		return false; // stops browser from doing default submit process
 	});
