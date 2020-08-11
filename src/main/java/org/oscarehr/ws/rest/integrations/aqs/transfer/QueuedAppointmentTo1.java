@@ -24,7 +24,6 @@
 package org.oscarehr.ws.rest.integrations.aqs.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import lombok.Getter;
@@ -40,6 +39,7 @@ import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -47,13 +47,10 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QueuedAppointmentTo1 implements Serializable
 {
-	@JsonProperty("id")
-	private String remoteId;
-	private String queueId;
+	private UUID id;
+	private UUID queueId;
 	private Integer queuePosition;
-	private String status;//TODO change to enum once statuses are defined
-	@JsonProperty("integrationPatientId")
-	private String demographicNo;
+	private Integer demographicNo;
 	@JsonSerialize(using = OffsetDateTimeSerializer.class)
 	private OffsetDateTime createdAt;
 	private String demographicName;
@@ -80,8 +77,8 @@ public class QueuedAppointmentTo1 implements Serializable
 		BeanUtils.copyProperties(queuedAppointment, this);
 
 		// get demographic name
-		DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
-		Demographic demographic = demographicDao.find(queuedAppointment.getDemographicNo());
+		DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
+		Demographic demographic = demographicDao.find(this.getDemographicNo());
 		this.demographicName = demographic.getDisplayName();
 	}
 }

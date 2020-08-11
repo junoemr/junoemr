@@ -4,6 +4,13 @@
 	             ng-mouseup="$ctrl.endScroll($event, tab)"
 	             ng-class="$ctrl.tabClasses(tab)"
 	             button-color-override="tab.color">
-		{{tab.label}}
+		<div class="tab-text">
+			{{tab.label}}
+			<div class="tab-count" ng-if="tab.tabCount">
+				<div class="content">
+					{{ tab.tabCount }}
+				</div>
+			</div>
+		</div>
 	</juno-button>
 </div>

@@ -25,6 +25,7 @@ package org.oscarehr.integration.aqs.model;
 import ca.cloudpractice.aqs.client.model.AppointmentDto;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.time.OffsetDateTime;
@@ -33,10 +34,10 @@ import java.util.UUID;
 @Getter @Setter
 public class QueuedAppointment
 {
-	private UUID remoteId;
+	private UUID id;
 	private UUID queueId;
 	private Integer queuePosition;
-	private String demographicNo;
+	private Integer demographicNo;
 	private OffsetDateTime createdAt;
 	private String reason;
 
@@ -44,7 +45,7 @@ public class QueuedAppointment
 	public QueuedAppointment(AppointmentDto appointmentDto)
 	{
 		BeanUtils.copyProperties(appointmentDto, this, "id", "integrationPatientId");
-		this.setRemoteId(appointmentDto.getId());
-		this.setDemographicNo(appointmentDto.getIntegrationPatientId().toString());
+		this.setId(appointmentDto.getId());
+		this.setDemographicNo(Integer.parseInt(StringUtils.trimToEmpty(appointmentDto.getIntegrationPatientId())));
 	}
 }

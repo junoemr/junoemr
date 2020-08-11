@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.integration.aqs.service.QueuedAppointmentService;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +38,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.UUID;
 
 @Path("/integrations/aqs/queue/{queueId}/appointment")
 @Component("aqs.QueuedAppointmentWebService")
@@ -55,10 +55,10 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	@Path("{appointmentId}/")
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> deleteAppointment(@PathParam("queueId") String queueId, @PathParam("appointmentId") String appointmentId, String reason)
+	public RestResponse<Boolean> deleteAppointment(@PathParam("queueId") UUID queueId, @PathParam("appointmentId") UUID appointmentId, String reason)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.DELETE, null, SecObjectName._APPOINTMENT);
-		MiscUtils.getLogger().info("TEMP! Would have deleted appointment: " + appointmentId + " From queue: " + queueId + " In the AQS system. Delete reason: " + reason);
+		appointmentService.deleteQueuedAppointment(appointmentId, queueId);
 		return RestResponse.successResponse(true);
 	}
 

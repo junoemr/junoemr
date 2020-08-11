@@ -22,7 +22,7 @@
  */
 package org.oscarehr.ws.rest.integrations.aqs.transfer;
 
-import ca.cloudpractice.aqs.client.model.CreateQueueInput;
+import ca.cloudpractice.aqs.client.model.QueueInput;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -37,6 +37,7 @@ import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter @Setter
 @XmlRootElement
@@ -44,7 +45,7 @@ import java.util.List;
 public class AppointmentQueueTo1 implements Serializable
 {
 	@JsonProperty("id")
-	private String remoteId;
+	private UUID remoteId;
 	private String queueName;
 	private Integer queueLimit;
 	private String queueColor;
@@ -70,12 +71,13 @@ public class AppointmentQueueTo1 implements Serializable
 
 	public AppointmentQueueTo1(AppointmentQueue appointmentQueue)
 	{
-		BeanUtils.copyProperties(appointmentQueue, this);
+		BeanUtils.copyProperties(appointmentQueue, this, "name");
+		this.setQueueName(appointmentQueue.getName());
 	}
 
-	public CreateQueueInput asCreateQueueInput()
+	public QueueInput asCreateQueueInput()
 	{
-		CreateQueueInput createQueueInput = new CreateQueueInput();
+		QueueInput createQueueInput = new QueueInput();
 		createQueueInput.setName(this.getQueueName());
 		createQueueInput.setQueueLimit(this.getQueueLimit());
 		return createQueueInput;

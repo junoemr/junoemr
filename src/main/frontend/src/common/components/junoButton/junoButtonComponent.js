@@ -66,9 +66,15 @@ angular.module('Common.Components').component('junoButton', {
 		{
 			if (ctrl.buttonColorOverride)
 			{
+				let color = ctrl.buttonColorOverride;
+				if (!color.startsWith("#"))
+				{
+					color = "#" + color;
+				}
+
 				return {
-					"background-color": ctrl.buttonColorOverride,
-					"border-color": ctrl.buttonColorOverride,
+					"background-color": color,
+					"border-color": color,
 				};
 			}
 			return {};

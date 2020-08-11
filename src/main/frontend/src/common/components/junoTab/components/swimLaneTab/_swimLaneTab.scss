@@ -31,6 +31,23 @@
 				}
 			}
 		}
+
+		.tab-text {
+			color: var(--color-neutral-white);
+		}
+
+		.tab-count {
+			display: inline-block;
+			.content {
+				text-align: center;
+
+				color: var(--color-neutral-white);
+				background-color: var(--color-red-base);
+
+				border-radius: 10px;
+				min-width: 24px;
+			}
+		}
 	}
 
 }

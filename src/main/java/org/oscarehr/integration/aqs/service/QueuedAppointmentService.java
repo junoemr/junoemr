@@ -66,8 +66,15 @@ public class QueuedAppointmentService extends BaseService
 	 * delete an appointment form the appointment queue
 	 * @param appointmentId - the remote id of the appointment to delete
 	 */
-	public void deleteQueuedAppointment(UUID appointmentId)
+	public void deleteQueuedAppointment(UUID appointmentId, UUID queueId)
 	{
-		// TODO implement when method available
+		try
+		{
+			organizationApi.dequeueAppointment(appointmentId, queueId);
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to get appointments in queue [" + appointmentId + "] from the AQS server", apiException);
+		}
 	}
 }

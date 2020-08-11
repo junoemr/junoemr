@@ -66,6 +66,10 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		// currently selected queue (selected by tab bar)
 		ctrl.currentQueue = null;
 
+		// queue polling
+		ctrl.QUEUE_POLLING_INVTERVAL = 120000; // 2 minutes
+		ctrl.queueUpdateInterval = null;
+
 		// ======= Scroll Height tracking ===========
 		// List container element reference
 		ctrl.listRef = null;
@@ -93,12 +97,21 @@ angular.module('Layout.Components').component('appointmentQueue', {
 			ctrl.resizeObserver.observe(ctrl.listRef[0]);
 
 			ctrl.loadQueues();
+
+			ctrl.queueUpdateInterval = window.setInterval(() => {
+				this.loadQueues();
+			}, ctrl.QUEUE_POLLING_INVTERVAL);
 		}
 
 		ctrl.$doCheck = () =>
 		{
 			// update scroll bar
 			ctrl.calculateScrollHeight(false);
+		}
+
+		ctrl.$onDestroy = () =>
+		{
+			window.clearInterval(ctrl.queueUpdateInterval);
 		}
 
 		ctrl.loadQueues = async () =>
@@ -116,8 +129,14 @@ angular.module('Layout.Components').component('appointmentQueue', {
 
 				ctrl.setupQueueTabs();
 
-				// set default selection to first queue.
-				ctrl.currentQueue = ctrl.queues[0];
+				if (ctrl.currentQueue == null)
+				{	// set default selection to first queue.
+					ctrl.currentQueue = ctrl.queues[0];
+				}
+				else
+				{ // we have updated attempt to re-acquire queue
+					ctrl.currentQueue = ctrl.queues.find((queue) => queue.queueName === ctrl.currentQueue.queueName)
+				}
 			}
 			catch(err)
 			{
@@ -130,10 +149,17 @@ angular.module('Layout.Components').component('appointmentQueue', {
 			ctrl.tabOptions = [];
 			for (let queue of ctrl.queues)
 			{
+				let tabColor = queue.queueColor;
+				if (!tabColor)
+				{// default to primary base
+					tabColor = "4d73bf";
+				}
+
 				ctrl.tabOptions.push({
 					label: queue.queueName,
 					value: queue,
-					color: queue.queueColor,
+					color: tabColor,
+					tabCount: queue.items.length,
 				});
 			}
 		}
@@ -167,7 +193,7 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				{
 					try
 					{
-						await aqsQueuedAppointmentApi.deleteAppointment(ctrl.currentQueue.items[itemIndex].queueId, ctrl.currentQueue.items[itemIndex].id, reason);
+						await aqsQueuedAppointmentApi.deleteAppointment(ctrl.currentQueue.id, ctrl.currentQueue.items[itemIndex].id, reason);
 						ctrl.currentQueue.items.splice(itemIndex, 1);
 					}
 					catch(err)

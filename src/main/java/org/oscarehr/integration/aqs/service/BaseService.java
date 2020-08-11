@@ -36,7 +36,7 @@ public abstract class BaseService extends org.oscarehr.integration.BaseService
 	protected final String AQS_PROTOCOL = oscarProps.getProperty("aqs_protocol");
 	protected final String AQS_DOMAIN = oscarProps.getProperty("aqs_domain");
 	protected final String BASE_API_URI = oscarProps.getProperty("aqs_api_uri");
-	protected final String BASE_END_POINT = concatEndpointStrings(AQS_DOMAIN, BASE_API_URI);
+	protected final String BASE_END_POINT = AQS_DOMAIN + BASE_API_URI;
 
 	protected final String AQS_AUTH_REMOTE_INTEGRATION_ID = "RemoteIntegrationId";
 	protected final String AQS_AUTH_REMOTE_USER_ID = "RemoteUserId";
