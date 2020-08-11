@@ -41,8 +41,14 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import java.util.List;
 import java.util.Set;
 
-import static integration.tests.AddGroupTests.*;
-import static integration.tests.ScheduleSettingTests.*;
+import static integration.tests.AddGroupTests.addGroup;
+import static integration.tests.AddGroupTests.groupName;
+import static integration.tests.AddGroupTests.valueOfDrApple;
+import static integration.tests.AddGroupTests.valueOfDrBerry;
+import static integration.tests.ScheduleSettingTests.getDailySchedule;
+import static integration.tests.ScheduleSettingTests.setupSchedule;
+import static integration.tests.ScheduleSettingTests.setupTemplate;
+import static integration.tests.ScheduleSettingTests.templateTitleGeneral;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 

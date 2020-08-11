@@ -35,7 +35,9 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 
-import static integration.tests.AddProvidersTests.*;
+import static integration.tests.AddProvidersTests.drApple;
+import static integration.tests.AddProvidersTests.drBerry;
+import static integration.tests.AddProvidersTests.drCherry;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
 
