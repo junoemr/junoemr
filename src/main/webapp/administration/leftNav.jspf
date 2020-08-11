@@ -111,7 +111,7 @@ OscarProperties props = OscarProperties.getInstance();
 							{
 					%>
 								<!--oscar:oscarPropertiesCheck property="instance_type" value="BC"-->
-								<li><a href="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="contentLink defaultManageReferralDoc"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
+								<li><a href='javascript:void(0);' rel="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="xlink"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
 					<%
 							}
 						}
@@ -134,7 +134,7 @@ OscarProperties props = OscarProperties.getInstance();
 							<li><a href='javascript:void(0);'
 								class="xlink" rel="${ctx}/billing/CA/BC/supServiceCodeAssocAction.do"><bean:message key="admin.admin.ManageProcedureFeeCodeAssoc"/></a></li>
 
-							<li><a href="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="contentLink defaultManageReferralDoc"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
+							<li><a href='javascript:void(0);' rel="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="xlink"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
 
 							<li>
 								<a href="javascript:void(0);" class="xlink" rel="${ ctx }/quickBillingBC.do" >
@@ -305,7 +305,7 @@ OscarProperties props = OscarProperties.getInstance();
 						<li><a href='javascript:void(0);'
 							   class="xlink" rel="${ctx}/billing/CA/BC/supServiceCodeAssocAction.do"><bean:message key="admin.admin.ManageProcedureFeeCodeAssoc"/></a></li>
 
-						<li><a href="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="contentLink defaultManageReferralDoc"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
+						<li><a href='javascript:void(0);' rel="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="xlink"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
 
 						<li>
 							<a href="javascript:void(0);" class="xlink" rel="${ ctx }/quickBillingBC.do" >
