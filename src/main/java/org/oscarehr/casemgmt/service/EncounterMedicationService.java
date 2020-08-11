@@ -176,54 +176,5 @@ public class EncounterMedicationService extends EncounterSectionService
 	{
 		List<String> titleClassList = getTitleClasses(drug, referenceTime, durationToSoon);
 		return "class=\"" + String.join(" ", titleClassList) + "\"";
-
-		/*
-		StringBuilder sb = new StringBuilder("class=\"");
-
-		if (drug.isCurrent() && drug.getEndDate() != null && (drug.getEndDate().getTime() - referenceTime <= durationToSoon))
-		{
-			sb.append("expireInReference ");
-		}
-
-		if ((drug.isCurrent() && !drug.isArchived()) || drug.isLongTerm())
-		{
-			sb.append("currentDrug ");
-		}
-
-		if (drug.isArchived())
-		{
-			sb.append("archivedDrug ");
-		}
-
-		if(drug.isExpired())
-		{
-			sb.append("expiredDrug ");
-		}
-
-		if(drug.isLongTerm())
-		{
-			sb.append("longTermMed ");
-		}
-
-		if(drug.isDiscontinued())
-		{
-			sb.append("discontinued ");
-		}
-
-		if(drug.getOutsideProviderName() !=null && !drug.getOutsideProviderName().equals("")  )
-		{
-			sb = new StringBuilder("class=\"");
-			sb.append("external ");
-		}
-
-		String retval = sb.toString();
-
-		if(retval.equals("class=\""))
-		{
-			return "";
-		}
-
-		return retval.substring(0,retval.length()) + "\"";
-		 */
 	}
 }

@@ -29,9 +29,9 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.drools.FactException;
 import org.oscarehr.billing.CA.service.BillingUrlService;
 import org.oscarehr.casemgmt.dto.EncounterSection;
+import org.oscarehr.casemgmt.exception.EncounterSectionException;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.model.ClientImage;
 import org.oscarehr.casemgmt.service.CaseManagementIssueService;
@@ -220,7 +220,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		ActionForm form,
 		HttpServletRequest request,
 		HttpServletResponse response
-	) throws IOException, ServletException, FactException
+	) throws IOException, ServletException, EncounterSectionException
 	{
 		// Get the form bean.  I am using this to pass information from this controller to the jsp
 		// view.

@@ -215,88 +215,8 @@ public class NotesService extends AbstractServiceImpl
 		{
 			criteria.setProgramId(programId);
 		}
-//
-//		processJsonArray(jsonobject, "filterRoles", criteria.getRoles());
-//		processJsonArray(jsonobject, "filterProviders", criteria.getProviders());
-//		processJsonArray(jsonobject, "filterIssues", criteria.getIssues());
-
 
 		NoteSelectionTo1 returnResult  = noteService.searchEncounterNotes(loggedInInfo, criteria);
-		/*
-		returnResult.setNotelist(noteList);
-		returnResult.setMoreNotes(false);
-		 */
-		//NoteSelectionResult result = noteService.findNotes(loggedInInfo, criteria);
-
-		//returnResult.setMoreNotes(result.isMoreNotes());
-		/*
-		List<NoteTo1> noteList = returnResult.getNotelist();
-		for(NoteDisplay nd : result.getNotes())
-		{
-			NoteTo1 note = new NoteTo1();
-			note.setNoteId(nd.getNoteId());
-
-			boolean isDeleted = false;
-			// TODO: speed this up
-			if(nd.isDocument()) {
-				Document doc = getDocumentByNoteId(nd.getNoteId().longValue());
-				if(doc != null) {
-					isDeleted = (Document.STATUS_DELETED == doc.getStatus());
-					note.setDocumentId(doc.getId());
-				}
-			}
-
-			if(nd.isEformData())
-			{
-				//TODO why is the note id fake and also the eform id???
-				note.setEformDataId(nd.getNoteId());
-				note.setNoteId(null);
-			}
-			else if (nd.isEncounterForm())
-			{
-				//TODO why is the note id fake and also the encounter form id???
-				note.setEncounterFormId(nd.getNoteId());
-				note.setNoteId(null);
-			}
-
-			note.setArchived(nd.isArchived());
-			note.setIsSigned(nd.isSigned());
-			note.setIsEditable(nd.isEditable());
-			note.setObservationDate(nd.getObservationDate());
-			note.setRevision(nd.getRevision());
-			note.setUpdateDate(nd.getUpdateDate());
-			note.setProviderName(nd.getProviderName());
-			note.setProviderNo(nd.getProviderNo());
-			note.setStatus(nd.getStatus());
-			note.setProgramName(nd.getProgramName());
-			note.setLocation(nd.getLocation());
-			note.setRoleName(nd.getRoleName());
-			note.setRemoteFacilityId(nd.getRemoteFacilityId());
-			note.setUuid(nd.getUuid());
-			note.setHasHistory(nd.getHasHistory());
-			note.setLocked(nd.isLocked());
-			note.setNote(nd.getNote());
-			note.setDocument(nd.isDocument());
-			note.setDeleted(isDeleted);
-			note.setRxAnnotation(nd.isRxAnnotation());
-			note.setEformData(nd.isEformData());
-			note.setEncounterForm(nd.isEncounterForm());
-			note.setInvoice(nd.isInvoice());
-			note.setTicklerNote(nd.isTicklerNote());
-			note.setEncounterType(nd.getEncounterType());
-			note.setEditorNames(nd.getEditorNames());
-			note.setIssueDescriptions(nd.getIssueDescriptions());
-			note.setReadOnly(nd.isReadOnly());
-			note.setGroupNote(nd.isGroupNote());
-			note.setCpp(nd.isCpp());
-			note.setEncounterTime(nd.getEncounterTime());
-			note.setEncounterTransportationTime(nd.getEncounterTransportationTime());
-
-			noteList.add(note);
-		}
-		logger.debug("returning note list size " + noteList.size() + "  numToReturn was " + numToReturn + " offset " + offset);
-
-		 */
 
 		return RestResponse.successResponse(returnResult);
 	}

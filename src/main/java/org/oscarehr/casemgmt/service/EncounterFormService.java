@@ -28,6 +28,7 @@ import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.dto.EncounterSectionMenuItem;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
+import org.oscarehr.casemgmt.exception.EncounterSectionException;
 import org.oscarehr.common.dao.EncounterFormDao;
 import org.oscarehr.common.model.EncounterForm;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -105,7 +106,7 @@ public class EncounterFormService extends EncounterSectionService
 	public EncounterSection getSection(
 			SectionParameters sectionParams, Integer limit,
 			Integer offset
-	) throws FactException
+	) throws EncounterSectionException
 	{
 		// XXX: Don't like that this is duplicated code, but don't have a great way to avoid this
 		//      at the moment.

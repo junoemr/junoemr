@@ -27,6 +27,7 @@ import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.eform.service.EFormTemplateService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.eform.EFormUtil;
@@ -48,6 +49,9 @@ public class EncounterEFormService extends EncounterSectionService
 
 	@Autowired
 	private EFormDataDao eFormDataDao;
+
+	@Autowired
+	private EFormTemplateService eFormTemplateService;
 
 	@Override
 	public String getSectionId()
@@ -105,7 +109,10 @@ public class EncounterEFormService extends EncounterSectionService
 			return EncounterNotes.noNotes();
 		}
 
-		//I've put in an arbitrary limit here of 100. Some people use a single eform/patient for
+		String eformPopupHeight = getEformPopupHeight(sectionParams);
+		String eformPopupWidth = getEformPopupWidth(sectionParams);
+
+				//I've put in an arbitrary limit here of 100. Some people use a single eform/patient for
 		//logging calls, etc. This makes this result set huge. People can click on the eform tab and view the full
 		//history if they need to.
 		List<EFormData> eFormDatas = eFormDataDao.findInstancedByDemographicId(
@@ -128,7 +135,11 @@ public class EncounterEFormService extends EncounterSectionService
 					"&appointment=" + encodeUrlParam(sectionParams.getAppointmentNo()) +
 					"&parentAjaxId=" + SECTION_ID;
 
-			String onClickString = "popupPage( 700, 800, '" + hash + "', '" + url +"');";
+			String onClickString = "popupPage( " +
+					eformPopupHeight + ", " +
+					eformPopupWidth + ", '" +
+					hash + "', '" +
+					url +"');";
 
 			sectionNote.setOnClick(onClickString);
 
@@ -143,5 +154,18 @@ public class EncounterEFormService extends EncounterSectionService
 		}
 
 		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
+	}
+
+	private String getEformPopupWidth(SectionParameters sectionParameters)
+	{
+		String loggedInProviderNo = sectionParameters.getLoggedInInfo().getLoggedInProviderNo();
+		return eFormTemplateService.getEformPopupWidth(loggedInProviderNo).toString();
+
+	}
+
+	private String getEformPopupHeight(SectionParameters sectionParameters)
+	{
+		String loggedInProviderNo = sectionParameters.getLoggedInInfo().getLoggedInProviderNo();
+		return eFormTemplateService.getEformPopupHeight(loggedInProviderNo).toString();
 	}
 }

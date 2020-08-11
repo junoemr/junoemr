@@ -23,10 +23,10 @@
 
 package org.oscarehr.casemgmt.service;
 
-import org.drools.FactException;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.dto.EncounterSectionMenuItem;
+import org.oscarehr.casemgmt.exception.EncounterSectionException;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.UrlUtils;
 
@@ -100,7 +100,7 @@ public abstract class EncounterSectionService
 	public EncounterSection getInitialSection(
 			SectionParameters sectionParams, String title,
 			String colour
-	) throws FactException
+	) throws EncounterSectionException
 	{
 		this.sectionTitle = title;
 		this.sectionTitleColour = colour;
@@ -111,7 +111,7 @@ public abstract class EncounterSectionService
 		);
 	}
 
-	public EncounterSection getDefaultSection(SectionParameters params) throws FactException
+	public EncounterSection getDefaultSection(SectionParameters params) throws EncounterSectionException
 	{
 		return getSection(params, INITIAL_ENTRIES_TO_SHOW, INITIAL_OFFSET);
 	}
@@ -119,7 +119,7 @@ public abstract class EncounterSectionService
 	public EncounterSection getSection(
 			SectionParameters sectionParams, Integer limit,
 			Integer offset
-	) throws FactException
+	) throws EncounterSectionException
 	{
 		EncounterSection section = new EncounterSection();
 
@@ -150,7 +150,7 @@ public abstract class EncounterSectionService
 	public EncounterNotes getNotes(
 			SectionParameters sectionParams, Integer limit,
 			Integer offset
-	) throws FactException
+	) throws EncounterSectionException
 	{
 		return EncounterNotes.noNotes();
 	}

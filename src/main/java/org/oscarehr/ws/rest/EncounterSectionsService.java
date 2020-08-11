@@ -25,9 +25,9 @@ package org.oscarehr.ws.rest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.drools.FactException;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
+import org.oscarehr.casemgmt.exception.EncounterSectionException;
 import org.oscarehr.casemgmt.service.EncounterDocumentService;
 import org.oscarehr.casemgmt.service.EncounterEFormService;
 import org.oscarehr.casemgmt.service.EncounterFormService;
@@ -103,7 +103,7 @@ public class EncounterSectionsService extends AbstractServiceImpl
 			@QueryParam("limit") Integer limit,
 			@QueryParam("offset") Integer offset
 	)
-			throws FactException
+			throws EncounterSectionException
 	{
 		EncounterSectionService sectionService = encounterService.getEncounterSectionServiceByName(sectionName);
 
@@ -124,7 +124,7 @@ public class EncounterSectionsService extends AbstractServiceImpl
 			@PathParam("searchTerm") String searchTerm,
 			@QueryParam("appointmentNo") String appointmentNo
 	)
-			throws FactException
+			throws EncounterSectionException
 	{
 		EncounterSectionService.SectionParameters sectionParams = getSectionParams(appointmentNo);
 

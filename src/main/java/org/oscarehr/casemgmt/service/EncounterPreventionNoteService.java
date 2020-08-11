@@ -25,10 +25,13 @@ package org.oscarehr.casemgmt.service;
 
 import org.drools.FactException;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
+import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
+import org.oscarehr.casemgmt.exception.EncounterSectionException;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.dto.PreventionListData;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.oscarDemographic.data.DemographicData;
@@ -98,45 +101,10 @@ public class EncounterPreventionNoteService extends EncounterSectionService
 		return "popupPage(700,960,'" + winName + "', '" + url + "')";
 	}
 
-	/*
-	@Override
-	public EncounterSection getSection(
-			SectionParameters sectionParameters,
-			Integer limit,
-			Integer offset
-	) throws FactException
-	{
-		String onClickString = getOnClick(
-				sectionParameters.getContextPath(), sectionParameters.getDemographicNo());
-
-		EncounterSection section = new EncounterSection();
-
-		section.setTitle(SECTION_NAME);
-		section.setColour(SECTION_TITLE_COLOUR);
-		section.setCppIssues("");
-		section.setAddUrl("");
-		section.setIdentUrl("");
-		section.setOnClickTitle(onClickString);
-		section.setOnClickPlus(onClickString);
-
-		EncounterNotes notes = getNotes(
-				sectionParameters,
-				limit,
-				offset
-		);
-
-		section.setNotes(notes.getEncounterSectionNotes());
-
-		section.setRemainingNotes(notes.getNoteCount() - notes.getEncounterSectionNotes().size());
-
-		return section;
-	}
-	 */
-
 	public EncounterNotes getNotes(
 			SectionParameters sectionParams, Integer limit,
 			Integer offset
-	) throws FactException
+	) throws EncounterSectionException
 	{
 		List<EncounterSectionNote> noteList = new ArrayList<>();
 
@@ -145,7 +113,15 @@ public class EncounterPreventionNoteService extends EncounterSectionService
 
 		// Might throw an exception
 		// XXX: make this exception better (FactException)
-		pf.getMessages(p);
+		try
+		{
+			pf.getMessages(p);
+		}
+		catch(FactException e)
+		{
+			MiscUtils.getLogger().error("Error in the prevention section of the encounter page", e);
+			throw new EncounterSectionException("Error getting prevention warnings", e);
+		}
 
 		//now we list prevention modules as items
 		PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
