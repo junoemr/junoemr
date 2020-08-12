@@ -208,7 +208,6 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate
 			}
 			else
 			{
-			{
 				URL url = this.ctx.getResource("/oscarRx/img/rx.gif");
 				img = Image.getInstance(url);
 			}

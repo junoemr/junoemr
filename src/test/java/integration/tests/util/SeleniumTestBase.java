@@ -24,6 +24,7 @@ package integration.tests.util;
 
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
@@ -48,6 +49,7 @@ public class SeleniumTestBase
 	protected static WebDriver driver;
 	protected static Logger logger= MiscUtils.getLogger();
 
+	protected String tomcatPort;
 
 	@BeforeClass
 	public static void buildWebDriver() throws SQLException, InstantiationException,
@@ -80,12 +82,6 @@ public class SeleniumTestBase
 		driver = new FirefoxDriver(ffo);
 		driver.manage().timeouts().implicitlyWait(WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 
-	}
-
-	@Before
-	public void before()
-	{
-		tomcatPort = environment.getProperty("local.server.port");
 	}
 
 	protected static void loadSpringBeans()
