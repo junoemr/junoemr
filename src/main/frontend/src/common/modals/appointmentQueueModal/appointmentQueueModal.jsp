@@ -10,17 +10,23 @@
 
 	<modal-body>
 		<div class="queue-options-container">
-			<juno-input
-					label="Queue Name"
-					ng-model="$ctrl.queueModel.queueName"
-					component-style="$ctrl.resolve.style">
-			</juno-input>
+			<div class="options-common">
+				<juno-input
+						label="Queue Name"
+						ng-model="$ctrl.queueModel.queueName"
+						component-style="$ctrl.resolve.style">
+				</juno-input>
 
-			<juno-input
-					label="Queue Limit"
-					ng-model="$ctrl.queueModel.queueLimit"
-					component-style="$ctrl.resolve.style">
-			</juno-input>
+				<juno-input
+						label="Queue Limit"
+						ng-model="$ctrl.queueModel.queueLimit"
+						component-style="$ctrl.resolve.style">
+				</juno-input>
+			</div>
+			<div class="options-odb">
+				<on-demand-booking-settings settings-model="$ctrl.queueModel.onDemandBookingSettings">
+				</on-demand-booking-settings>
+			</div>
 		</div>
 	</modal-body>
 

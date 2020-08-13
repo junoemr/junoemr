@@ -33,13 +33,13 @@ import java.time.LocalTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OnDemandBookingSettingsTransfer implements Serializable
 {
-	private String queueId;
+	private Boolean enabled;
 	private OnDemandBookingHoursTransfer[] bookingHours;
 
 	public OnDemandBookingSettingsTransfer()
 	{
 		// TODO - remove sample data
-		this.queueId = "1";
+		this.enabled = true;
 		this.bookingHours = new OnDemandBookingHoursTransfer[7];
 		this.bookingHours[0] = new OnDemandBookingHoursTransfer("Monday", true, LocalTime.of(8,0), LocalTime.of(16,0));
 		this.bookingHours[1] = new OnDemandBookingHoursTransfer("Tuesday", true, LocalTime.of(8,0), LocalTime.of(16,0));
@@ -50,14 +50,14 @@ public class OnDemandBookingSettingsTransfer implements Serializable
 		this.bookingHours[6] = new OnDemandBookingHoursTransfer("Sunday", false, LocalTime.of(8,0), LocalTime.of(14,0));
 	}
 
-	public String getQueueId()
+	public Boolean getEnabled()
 	{
-		return queueId;
+		return enabled;
 	}
 
-	public void setQueueId(String queueId)
+	public void setEnabled(Boolean enabled)
 	{
-		this.queueId = queueId;
+		this.enabled = enabled;
 	}
 
 	public OnDemandBookingHoursTransfer[] getBookingHours()

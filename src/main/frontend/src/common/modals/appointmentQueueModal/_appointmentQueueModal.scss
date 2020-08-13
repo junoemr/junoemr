@@ -6,9 +6,18 @@
 	.queue-options-container {
 		display: flex;
 		flex-direction: column;
-		justify-content: space-evenly;
+		//justify-content: space-evenly;
 		height: 100%;
 		width: 100%;
 		padding: 4px;
+
+		.options-common {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+		}
+		.options-odb {
+			overflow-y: auto;
+		}
 	}
 }

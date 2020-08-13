@@ -256,6 +256,7 @@ module.exports = {
 			'./src/common/modals/junoSimpleModal/junoSimpleModalComponent.js',
 			'./src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModalComponent.js',
 			'./src/common/modals/appointmentQueueModal/appointmentQueueModalComponent.js',
+			'./src/common/modals/appointmentQueueModal/components/onDemandBookingSettings/onDemandBookingSettingsComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',

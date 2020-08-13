@@ -52,6 +52,8 @@ angular.module('Common.Components').component('appointmentQueueModal',
 				ctrl.queueModel = {};
 				ctrl.isoading = true;
 
+				ctrl.onDemandBookingEnabled = true;
+
 				ctrl.$onInit = () =>
 				{
 					ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
@@ -63,19 +65,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					}
 					else
 					{
-						ctrl.queueModel = {
-							id: null,
-							queueName: "",
-							queueLimit: 10,
-							queueColor: "#ffffff",
-							organizationId: null,
-							createdAt: null,
-							updatedAt: null,
-							createdBy: null,
-							createdByType: null,
-							updatedBy: null,
-							updatedByType: null,
-						}
+						ctrl.queueModel = ctrl.getEmptyModel();
 					}
 					ctrl.isoading = false;
 				}
@@ -90,7 +80,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					ctrl.isoading = true;
 					const onSaveSuccess = (response) =>
 					{
-						ctrl.modalInstance.close(response.data.body);
+						ctrl.modalInstance.close(ctrl.queueModel);
 						ctrl.isoading = false;
 					}
 					const onSaveError = (error) =>
@@ -101,19 +91,105 @@ angular.module('Common.Components').component('appointmentQueueModal',
 						ctrl.isoading = false;
 					}
 
+					// convert moment to string before transferring
+					// TODO better wat to serialize moment to LocalTime compatible string?
+					// need a copy so we don't try to read moments from original object
+					let queueCopy = {};
+					angular.copy(ctrl.queueModel, queueCopy);
+
+					queueCopy.onDemandBookingSettings.bookingHours = ctrl.queueModel.onDemandBookingSettings.bookingHours.map(
+						(localSettings) =>
+						{
+							return {
+								dayOfWeek: localSettings.dayOfWeek,
+								enabled: localSettings.enabled,
+								startTime: localSettings.startTime.format("HH:mm:ss"),
+								endTime: localSettings.endTime.format("HH:mm:ss"),
+							}
+						});
+
 					if (ctrl.editMode)
 					{
-						aqsQueuesApi.updateAppointmentQueue(ctrl.queueModel.id, ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
+						aqsQueuesApi.updateAppointmentQueue(queueCopy.id, queueCopy).then(onSaveSuccess).catch(onSaveError);
 					}
 					else
 					{
-						aqsQueuesApi.createAppointmentQueue(ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
+						aqsQueuesApi.createAppointmentQueue(queueCopy).then(onSaveSuccess).catch(onSaveError);
 					}
 				}
 
 				ctrl.onCancel = () =>
 				{
 					ctrl.modalInstance.dismiss("modal cancelled");
+				}
+
+				ctrl.getEmptyModel = () =>
+				{
+					const defaultStartHour = 8;
+					const defaultEndHour = 16;
+
+					return {
+						id: null,
+						queueName: "",
+						queueLimit: 10,
+						queueColor: "#ffffff",
+						organizationId: null,
+						createdAt: null,
+						updatedAt: null,
+						createdBy: null,
+						createdByType: null,
+						updatedBy: null,
+						updatedByType: null,
+
+						// TODO is there a better way to set up the empty objects?
+						onDemandBookingSettings: {
+							enabled: false,
+							bookingHours: [
+								{
+									dayOfWeek: "Monday",
+									enabled: true,
+									startTime: moment({hour: defaultStartHour}),
+									endTime:  moment({hour: defaultEndHour}),
+								},
+								{
+									dayOfWeek: "Tuesday",
+									enabled: true,
+									startTime: moment({hour: defaultStartHour}),
+									endTime:  moment({hour: defaultEndHour}),
+								},
+								{
+									dayOfWeek: "Wednesday",
+									enabled: true,
+									startTime: moment({hour: defaultStartHour}),
+									endTime:  moment({hour: defaultEndHour}),
+								},
+								{
+									dayOfWeek: "Thursday",
+									enabled: true,
+									startTime: moment({hour: defaultStartHour}),
+									endTime:  moment({hour: defaultEndHour}),
+								},
+								{
+									dayOfWeek: "Friday",
+									enabled: true,
+									startTime: moment({hour: defaultStartHour}),
+									endTime:  moment({hour: defaultEndHour}),
+								},
+								{
+									dayOfWeek: "Saturday",
+									enabled: false,
+									startTime: moment({hour: defaultStartHour}),
+									endTime:  moment({hour: defaultEndHour}),
+								},
+								{
+									dayOfWeek: "Sunday",
+									enabled: false,
+									startTime: moment({hour: defaultStartHour}),
+									endTime:  moment({hour: defaultEndHour}),
+								},
+							],
+						}
+					}
 				}
 			}]
 	});

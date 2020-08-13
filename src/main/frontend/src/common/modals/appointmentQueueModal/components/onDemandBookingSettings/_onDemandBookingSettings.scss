@@ -1,0 +1,56 @@
+.on-demand-booking-settings {
+	$time-table-min-width: 620px;
+	overflow-y: auto;
+
+	.panel-body {
+		padding: 0;
+
+		.on-demand-booking-wrapper {
+			display: flex;
+			flex-flow: row wrap;
+
+			.time-selection {
+				flex-grow: 1;
+				padding: 4px 12px;
+
+				.time-selection-row {
+					padding: 4px 0;
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					min-width: $time-table-min-width;
+
+					.col-time-selection-enabled {
+						width: 10%;
+					}
+					.col-time-selection-label {
+						width: 20%;
+					}
+					.col-time-selection-start {
+						width: 35%;
+					}
+					.col-time-selection-end {
+						width: 35%;
+					}
+
+					label {
+						min-width: 0;
+					}
+				}
+			}
+		}
+		.on-demand-booking-controls {
+			padding: 8px 16px;
+
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-end;
+			align-items: center;
+			width: 100%;
+
+			.button-wrapper {
+				width: 256px;
+			}
+		}
+	}
+}
