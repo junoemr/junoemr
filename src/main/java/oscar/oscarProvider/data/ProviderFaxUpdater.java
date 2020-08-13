@@ -75,18 +75,22 @@ public class ProviderFaxUpdater {
        */
    public boolean setFax(String fax) {
 	   
-	   Property p = new Property();
+	   Property property = new Property();
 	   List<Property> props = dao.findByNameAndProvider(faxColName, provider);
-	   if(props.size()>0) {
-		   for(Property pp:props) {
-			   pp.setValue(fax);
+	   if(props.size() > 0)
+	   {
+		   for(Property pp:props)
+		   {
+			   pp.setValueNoNull(fax);
 			   dao.merge(pp);
 		   }
-	   } else {
-		   p.setName(faxColName);
-		   p.setValue(fax);
-		   p.setProviderNo(provider);
-		   dao.persist(p);
+	   }
+	   else
+       {
+           property.setName(faxColName);
+           property.setValueNoNull(fax);
+           property.setProviderNo(provider);
+		   dao.persist(property);
 	   }
 	   return true;
    }
