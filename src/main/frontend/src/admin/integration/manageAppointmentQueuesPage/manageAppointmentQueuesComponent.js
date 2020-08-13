@@ -138,18 +138,21 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 						{
 							ctrl.queueList = response.data.body.map((queueTransfer) =>
 							{
-								// modify the transfer to have date/times as proper moments
-								// TODO better wat to de-serialize a LocalTime string to a moment?
-								queueTransfer.availabilitySettings.bookingHours = queueTransfer.availabilitySettings.bookingHours.map(
-									(transfer) =>
+								if (queueTransfer.availabilitySettings)
 								{
-									return {
-										dayOfWeek: transfer.dayOfWeek,
-										enabled: transfer.enabled,
-										startTime: moment(transfer.startTime, "HH:mm:ss"),
-										endTime: moment(transfer.endTime, "HH:mm:ss"),
-									}
-								});
+									// modify the transfer to have date/times as proper moments
+									// TODO better wat to de-serialize a LocalTime string to a moment?
+									queueTransfer.availabilitySettings.bookingHours = queueTransfer.availabilitySettings.bookingHours.map(
+										(transfer) =>
+										{
+											return {
+												dayOfWeek: transfer.dayOfWeek,
+												enabled: transfer.enabled,
+												startTime: moment(transfer.startTime, "HH:mm:ss"),
+												endTime: moment(transfer.endTime, "HH:mm:ss"),
+											}
+										});
+								}
 								return queueTransfer;
 							});
 							deferred.resolve();

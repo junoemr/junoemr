@@ -21,7 +21,7 @@
  * Canada
  */
 
-import {LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_BUTTON_COLOR_PATTERN} from "../../components/junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../components/junoComponentConstants";
 import {AqsQueuesApi} from "../../../../generated";
 
 angular.module('Common.Components').component('appointmentQueueModal',
@@ -50,7 +50,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 				ctrl.editMode = false;
 				ctrl.queueModel = {};
-				ctrl.isoading = true;
+				ctrl.isLoading = true;
 
 				ctrl.$onInit = () =>
 				{
@@ -60,17 +60,21 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					if(ctrl.editMode)
 					{
 						ctrl.queueModel = angular.copy(ctrl.resolve.queue);
+						if(!ctrl.queueModel.availabilitySettings)
+						{
+							ctrl.queueModel.availabilitySettings = ctrl.getDefaultAvailabilitySettings();
+						}
 					}
 					else
 					{
 						ctrl.queueModel = ctrl.getEmptyModel();
 					}
-					ctrl.isoading = false;
+					ctrl.isLoading = false;
 				}
 
 				ctrl.saveDisabled = () =>
 				{
-					return ctrl.isoading || ctrl.queueModel.queueName == null || ctrl.queueModel.queueName.length < 1;
+					return ctrl.isLoading || ctrl.queueModel.queueName == null || ctrl.queueModel.queueName.length < 1;
 				}
 
 				ctrl.onSave = () =>
@@ -123,9 +127,6 @@ angular.module('Common.Components').component('appointmentQueueModal',
 
 				ctrl.getEmptyModel = () =>
 				{
-					const defaultStartHour = 8;
-					const defaultEndHour = 16;
-
 					return {
 						id: null,
 						queueName: "",
@@ -138,55 +139,61 @@ angular.module('Common.Components').component('appointmentQueueModal',
 						createdByType: null,
 						updatedBy: null,
 						updatedByType: null,
+						availabilitySettings: ctrl.getDefaultAvailabilitySettings(),
+					}
+				}
+				ctrl.getDefaultAvailabilitySettings = () =>
+				{
+					const defaultStartHour = 8;
+					const defaultEndHour = 16;
 
-						// TODO is there a better way to set up the empty objects?
-						availabilitySettings: {
-							enabled: false,
-							bookingHours: [
-								{
-									dayOfWeek: "Monday",
-									enabled: true,
-									startTime: moment({hour: defaultStartHour}),
-									endTime:  moment({hour: defaultEndHour}),
-								},
-								{
-									dayOfWeek: "Tuesday",
-									enabled: true,
-									startTime: moment({hour: defaultStartHour}),
-									endTime:  moment({hour: defaultEndHour}),
-								},
-								{
-									dayOfWeek: "Wednesday",
-									enabled: true,
-									startTime: moment({hour: defaultStartHour}),
-									endTime:  moment({hour: defaultEndHour}),
-								},
-								{
-									dayOfWeek: "Thursday",
-									enabled: true,
-									startTime: moment({hour: defaultStartHour}),
-									endTime:  moment({hour: defaultEndHour}),
-								},
-								{
-									dayOfWeek: "Friday",
-									enabled: true,
-									startTime: moment({hour: defaultStartHour}),
-									endTime:  moment({hour: defaultEndHour}),
-								},
-								{
-									dayOfWeek: "Saturday",
-									enabled: false,
-									startTime: moment({hour: defaultStartHour}),
-									endTime:  moment({hour: defaultEndHour}),
-								},
-								{
-									dayOfWeek: "Sunday",
-									enabled: false,
-									startTime: moment({hour: defaultStartHour}),
-									endTime:  moment({hour: defaultEndHour}),
-								},
-							],
-						}
+					// TODO is there a better way to set up the empty objects?
+					return {
+						enabled: false,
+						bookingHours: [
+							{
+								dayOfWeek: "Monday",
+								enabled: false,
+								startTime: moment({hour: defaultStartHour}),
+								endTime: moment({hour: defaultEndHour}),
+							},
+							{
+								dayOfWeek: "Tuesday",
+								enabled: false,
+								startTime: moment({hour: defaultStartHour}),
+								endTime: moment({hour: defaultEndHour}),
+							},
+							{
+								dayOfWeek: "Wednesday",
+								enabled: false,
+								startTime: moment({hour: defaultStartHour}),
+								endTime: moment({hour: defaultEndHour}),
+							},
+							{
+								dayOfWeek: "Thursday",
+								enabled: false,
+								startTime: moment({hour: defaultStartHour}),
+								endTime: moment({hour: defaultEndHour}),
+							},
+							{
+								dayOfWeek: "Friday",
+								enabled: false,
+								startTime: moment({hour: defaultStartHour}),
+								endTime: moment({hour: defaultEndHour}),
+							},
+							{
+								dayOfWeek: "Saturday",
+								enabled: false,
+								startTime: moment({hour: defaultStartHour}),
+								endTime: moment({hour: defaultEndHour}),
+							},
+							{
+								dayOfWeek: "Sunday",
+								enabled: false,
+								startTime: moment({hour: defaultStartHour}),
+								endTime: moment({hour: defaultEndHour}),
+							},
+						],
 					}
 				}
 			}]

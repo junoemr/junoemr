@@ -24,6 +24,7 @@
 package org.oscarehr.ws.rest.integrations.aqs.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.oscarehr.integration.aqs.model.QueueAvailability;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
@@ -38,7 +39,6 @@ public class QueueAvailabilitySettingsTransfer implements Serializable
 
 	public QueueAvailabilitySettingsTransfer()
 	{
-		// TODO - remove sample data
 		this.enabled = true;
 		this.bookingHours = new QueueAvailabilityDayTransfer[7];
 		this.bookingHours[0] = new QueueAvailabilityDayTransfer("Monday", true, LocalTime.of(8,0), LocalTime.of(16,0));
@@ -48,6 +48,19 @@ public class QueueAvailabilitySettingsTransfer implements Serializable
 		this.bookingHours[4] = new QueueAvailabilityDayTransfer("Friday", true, LocalTime.of(8,0), LocalTime.of(16,0));
 		this.bookingHours[5] = new QueueAvailabilityDayTransfer("Saturday", false, LocalTime.of(8,0), LocalTime.of(14,0));
 		this.bookingHours[6] = new QueueAvailabilityDayTransfer("Sunday", false, LocalTime.of(8,0), LocalTime.of(14,0));
+	}
+
+	public QueueAvailabilitySettingsTransfer(Boolean enabled, QueueAvailability availability)
+	{
+		this.enabled = enabled;
+		this.bookingHours = new QueueAvailabilityDayTransfer[7];
+		this.bookingHours[0] = new QueueAvailabilityDayTransfer("Monday", availability.getMonday());
+		this.bookingHours[1] = new QueueAvailabilityDayTransfer("Tuesday", availability.getTuesday());
+		this.bookingHours[2] = new QueueAvailabilityDayTransfer("Wednesday", availability.getWednesday());
+		this.bookingHours[3] = new QueueAvailabilityDayTransfer("Thursday", availability.getThursday());
+		this.bookingHours[4] = new QueueAvailabilityDayTransfer("Friday", availability.getFriday());
+		this.bookingHours[5] = new QueueAvailabilityDayTransfer("Saturday", availability.getSaturday());
+		this.bookingHours[6] = new QueueAvailabilityDayTransfer("Sunday", availability.getSunday());
 	}
 
 	public Boolean getEnabled()

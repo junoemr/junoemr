@@ -21,13 +21,14 @@
  * Canada
  */
 package org.oscarehr.integration.aqs.model;
-import java.time.OffsetDateTime;
-import java.util.UUID;
 
 import ca.cloudpractice.aqs.client.model.QueueDto;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
+
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Getter @Setter
 public class AppointmentQueue
@@ -35,12 +36,19 @@ public class AppointmentQueue
 	private UUID remoteId;
 	private String name;
 	private Integer queueLimit;
-  private String queueColor;
+	private String queueColor;
 	private OffsetDateTime createdAt;
+	private QueueAvailability availability;
+	private Boolean available;
 
 	public AppointmentQueue(QueueDto queueDto)
 	{
-		BeanUtils.copyProperties(queueDto, this, "id");
+		BeanUtils.copyProperties(queueDto, this, "id", "availability");
 		this.remoteId = queueDto.getId();
+
+		if(queueDto.getAvailability() != null)
+		{
+			this.availability = new QueueAvailability(queueDto.getAvailability());
+		}
 	}
 }

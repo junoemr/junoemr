@@ -24,6 +24,7 @@
 package org.oscarehr.ws.rest.integrations.aqs.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.oscarehr.integration.aqs.model.QueueAvailabilityDay;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
@@ -47,6 +48,13 @@ public class QueueAvailabilityDayTransfer implements Serializable
 		this.enabled = enabled;
 		this.startTime = start;
 		this.endTime = end;
+	}
+	public QueueAvailabilityDayTransfer(String day, QueueAvailabilityDay availabilityDay)
+	{
+		this.dayOfWeek = day;
+		this.enabled = availabilityDay.getEnabled();
+		this.startTime = availabilityDay.getStart();
+		this.endTime = availabilityDay.getStop();
 	}
 
 	public String getDayOfWeek()
