@@ -23,9 +23,10 @@
 						component-style="$ctrl.resolve.style">
 				</juno-input>
 			</div>
-			<div class="options-odb">
-				<on-demand-booking-settings settings-model="$ctrl.queueModel.onDemandBookingSettings">
-				</on-demand-booking-settings>
+			<div class="options-availability">
+				<availability-settings settings-model="$ctrl.queueModel.availabilitySettings"
+				                       component-style="$ctrl.componentStyle">
+				</availability-settings>
 			</div>
 		</div>
 	</modal-body>

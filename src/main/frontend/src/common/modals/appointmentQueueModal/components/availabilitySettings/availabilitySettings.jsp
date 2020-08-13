@@ -20,17 +20,17 @@
 * Victoria, British Columbia
 * Canada
 --%>
-<div class="on-demand-booking-settings">
+<div class="availability-settings">
 	<panel component-style="$ctrl.componentStyle">
 		<panel-header>
 			<div class="row queues-header juno-text">
 				<div class="col-md-12">
-					<h6 class="d-inline-block">On Demand Booking Settings</h6>
+					<h6 class="d-inline-block">Availability Settings</h6>
 				</div>
 			</div>
 		</panel-header>
 		<panel-body>
-			<div class="on-demand-booking-wrapper">
+			<div class="availability-wrapper">
 				<div class="time-selection">
 					<div class="time-selection-row">
 						<div class="col-time-selection-enabled">

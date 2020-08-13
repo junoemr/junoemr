@@ -1,11 +1,11 @@
-.on-demand-booking-settings {
+.availability-settings {
 	$time-table-min-width: 620px;
 	overflow-y: auto;
 
 	.panel-body {
 		padding: 0;
 
-		.on-demand-booking-wrapper {
+		.availability-wrapper {
 			display: flex;
 			flex-flow: row wrap;
 
@@ -37,19 +37,6 @@
 						min-width: 0;
 					}
 				}
-			}
-		}
-		.on-demand-booking-controls {
-			padding: 8px 16px;
-
-			display: flex;
-			flex-direction: row;
-			justify-content: flex-end;
-			align-items: center;
-			width: 100%;
-
-			.button-wrapper {
-				width: 256px;
 			}
 		}
 	}

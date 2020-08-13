@@ -52,7 +52,7 @@ public class AppointmentQueueTo1 implements Serializable
 	@JsonSerialize(using = OffsetDateTimeSerializer.class)
 	private OffsetDateTime createdAt;
 
-	private OnDemandBookingSettingsTransfer onDemandBookingSettings;
+	private QueueAvailabilitySettingsTransfer availabilitySettings;
 
 	public static List<AppointmentQueueTo1> fromAppointmentQueueList(List<AppointmentQueue> appointmentQueues)
 	{
@@ -76,7 +76,7 @@ public class AppointmentQueueTo1 implements Serializable
 		BeanUtils.copyProperties(appointmentQueue, this, "name", "onDemandBookingSettings");
 		this.setQueueName(appointmentQueue.getName());
 		//TODO this should come from the aqs queue object
-		this.setOnDemandBookingSettings(new OnDemandBookingSettingsTransfer());
+		this.setAvailabilitySettings(new QueueAvailabilitySettingsTransfer());
 	}
 
 	public QueueInput asCreateQueueInput()
@@ -87,13 +87,13 @@ public class AppointmentQueueTo1 implements Serializable
 		return createQueueInput;
 	}
 
-	public OnDemandBookingSettingsTransfer getOnDemandBookingSettings()
+	public QueueAvailabilitySettingsTransfer getAvailabilitySettings()
 	{
-		return onDemandBookingSettings;
+		return availabilitySettings;
 	}
 
-	public void setOnDemandBookingSettings(OnDemandBookingSettingsTransfer onDemandBookingSettings)
+	public void setAvailabilitySettings(QueueAvailabilitySettingsTransfer availabilitySettings)
 	{
-		this.onDemandBookingSettings = onDemandBookingSettings;
+		this.availabilitySettings = availabilitySettings;
 	}
 }

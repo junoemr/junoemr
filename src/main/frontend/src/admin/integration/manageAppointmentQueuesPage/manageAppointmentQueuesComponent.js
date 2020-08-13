@@ -140,7 +140,7 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 							{
 								// modify the transfer to have date/times as proper moments
 								// TODO better wat to de-serialize a LocalTime string to a moment?
-								queueTransfer.onDemandBookingSettings.bookingHours = queueTransfer.onDemandBookingSettings.bookingHours.map(
+								queueTransfer.availabilitySettings.bookingHours = queueTransfer.availabilitySettings.bookingHours.map(
 									(transfer) =>
 								{
 									return {

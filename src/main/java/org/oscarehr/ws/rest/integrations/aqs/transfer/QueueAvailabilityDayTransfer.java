@@ -31,17 +31,17 @@ import java.time.LocalTime;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OnDemandBookingHoursTransfer implements Serializable
+public class QueueAvailabilityDayTransfer implements Serializable
 {
 	private String dayOfWeek;
 	private boolean enabled;
 	private LocalTime startTime;
 	private LocalTime endTime;
 
-	public OnDemandBookingHoursTransfer()
+	public QueueAvailabilityDayTransfer()
 	{
 	}
-	public OnDemandBookingHoursTransfer(String day, boolean enabled, LocalTime start, LocalTime end)
+	public QueueAvailabilityDayTransfer(String day, boolean enabled, LocalTime start, LocalTime end)
 	{
 		this.dayOfWeek = day;
 		this.enabled = enabled;

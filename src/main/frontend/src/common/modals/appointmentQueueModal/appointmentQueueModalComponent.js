@@ -52,8 +52,6 @@ angular.module('Common.Components').component('appointmentQueueModal',
 				ctrl.queueModel = {};
 				ctrl.isoading = true;
 
-				ctrl.onDemandBookingEnabled = true;
-
 				ctrl.$onInit = () =>
 				{
 					ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
@@ -97,7 +95,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					let queueCopy = {};
 					angular.copy(ctrl.queueModel, queueCopy);
 
-					queueCopy.onDemandBookingSettings.bookingHours = ctrl.queueModel.onDemandBookingSettings.bookingHours.map(
+					queueCopy.availabilitySettings.bookingHours = ctrl.queueModel.availabilitySettings.bookingHours.map(
 						(localSettings) =>
 						{
 							return {
@@ -142,7 +140,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 						updatedByType: null,
 
 						// TODO is there a better way to set up the empty objects?
-						onDemandBookingSettings: {
+						availabilitySettings: {
 							enabled: false,
 							bookingHours: [
 								{
