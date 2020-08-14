@@ -26,4 +26,4 @@
 
  */
 
-angular.module('Layout.Components', ['Common', 'Common.Services', 'Layout.Components.Modal']);
+angular.module('Layout.Components.Modal', ['Common', 'Common.Services']);

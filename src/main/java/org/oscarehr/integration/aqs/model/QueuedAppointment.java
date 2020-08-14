@@ -22,7 +22,7 @@
  */
 package org.oscarehr.integration.aqs.model;
 
-import ca.cloudpractice.aqs.client.model.AppointmentDto;
+import ca.cloudpractice.aqs.client.model.QueuedAppointmentDto;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
@@ -42,7 +42,7 @@ public class QueuedAppointment
 	private String reason;
 
 
-	public QueuedAppointment(AppointmentDto appointmentDto)
+	public QueuedAppointment(QueuedAppointmentDto appointmentDto)
 	{
 		BeanUtils.copyProperties(appointmentDto, this, "id", "integrationPatientId");
 		this.setId(appointmentDto.getId());

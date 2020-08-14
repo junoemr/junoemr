@@ -38,6 +38,7 @@
 			<div ng-if="$ctrl.currentQueue" ng-repeat="foobar in [].constructor($ctrl.currentQueue.queueLimit) track by $index" class="flex-fill-row">
 				<appointment-card ng-model="$ctrl.currentQueue.items[$index]"
 				                  on-delete="$ctrl.deleteQueueItem($index);"
+													on-add="$ctrl.addToSchedule($index)"
 				                  component-style="$ctrl.componentStyle">
 				</appointment-card>
 			</div>

@@ -33,7 +33,8 @@ angular.module('Layout.Components').component('appointmentCard', {
 	bindings: {
 		ngModel: "=?",
 		componentStyle: "<?",
-		onDelete: "&?"
+		onDelete: "&?",
+		onAdd: "&?",
 	},
 	controller: ["$scope", function ($scope)
 	{
@@ -60,6 +61,14 @@ angular.module('Layout.Components').component('appointmentCard', {
 				classes.push("active");
 			}
 			return classes;
+		}
+
+		ctrl.onAddBtnClick = () =>
+		{
+			if (ctrl.onAdd)
+			{
+				ctrl.onAdd({});
+			}
 		}
 
 		ctrl.onDeleteBtnClick = () =>

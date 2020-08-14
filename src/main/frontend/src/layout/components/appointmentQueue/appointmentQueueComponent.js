@@ -180,7 +180,8 @@ angular.module('Layout.Components').component('appointmentQueue', {
 			}
 		}
 
-		ctrl.deleteQueueItem = async (itemIndex) => {
+		ctrl.deleteQueueItem = async (itemIndex) =>
+		{
 			try
 			{
 				let reason = await Juno.Common.Util.openInputDialog($uibModal,
@@ -206,6 +207,30 @@ angular.module('Layout.Components').component('appointmentQueue', {
 			{
 				// user hit ESC.
 				console.log(err);
+			}
+		}
+
+		// add a queued appointment to a schedule
+		ctrl.addToSchedule = async (itemIndex) =>
+		{
+			try
+			{
+				await $uibModal.open(
+						{
+							component: 'addQueuedAppointmentModal',
+							backdrop: 'static',
+							windowClass: "juno-simple-modal-window",
+							resolve: {
+								style: () => ctrl.componentStyle,
+								queuedAppointmentId: () => ctrl.currentQueue.items[itemIndex].id,
+							}
+						}
+				).result;
+			}
+			catch(err)
+			{
+				// ESC button pressed probably
+				console.warn("Modal closed with rejection ", err);
 			}
 		}
 
