@@ -48,6 +48,9 @@ import java.util.regex.Pattern;
 public abstract class AbstractDao<T extends AbstractModel<?>> {
 	public static final int MAX_LIST_RETURN_SIZE = 5000;
 
+	public static final String SORT_ASC = "ASC";
+	public static final String SORT_DESC = "DESC";
+
 	protected Class<T> modelClass;
 
 	@PersistenceContext

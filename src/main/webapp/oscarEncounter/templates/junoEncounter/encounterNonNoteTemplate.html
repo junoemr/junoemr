@@ -1,0 +1,53 @@
+<div id="nc\${index}" style="display:block;" class="note">
+
+    <div id="n\${note.noteId}">
+
+        <div id="wrapper\${note.noteId}" style="color:#FFFFFF;background-color:\${colour};color:white;font-size:10px;">
+
+            <div id="txt\${note.noteId}" style="display:inline-block;overflow-wrap:break-word;word-wrap:break-word;max-width:60%;">
+                \${note.note}
+            </div>
+            <div id="observation\${note.noteId}" style="display:inline-block;font-size: 11px; float: right; margin-right: 3px;">
+                {{if !note.document && !note.rxAnnotation}}
+                    Encounter Date:&nbsp;
+                    <span id="obs">\${formattedObservationDate}</span>
+                    &nbsp;
+                    {{if note.revision}}
+                    Rev
+
+                    <a style="color:#ddddff;" href="#" onclick="return junoEncounter.showHistory('\${note.noteId}', event);">\${note.revision}</a>
+                    {{/if}}
+                {{/if}}
+                {{if note.eformData || note.encounterForm}}
+                    <a class="links" title="View eForm" id="viewEFORM\${note.eformDataId}" href="#"
+                       onclick="\${onClickString};return false;"
+                       style="float: right; margin-right: 5px; font-size: 10px;"> View </a>
+                {{/if}}
+                {{if note.document}}
+                    <a
+                        class="links"
+                        title="View Document"
+                        id="view\${note.noteId}"
+                        href="#"
+                        onclick="\${documentOnClickString}"
+                        style="float: right; margin-right: 5px; font-size: 10px;color:black">
+
+                        View
+                    </a>
+                {{/if}}
+                {{if note.rxAnnotation}}
+                <a
+                        class="links"
+                        title="View Prescription"
+                        id="view\${note.noteId}"
+                        href="#"
+                        onclick="\${prescriptionOnClickString}"
+                        style="float: right; margin-right: 5px; font-size: 10px;color:black">
+
+                    View
+                </a>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>

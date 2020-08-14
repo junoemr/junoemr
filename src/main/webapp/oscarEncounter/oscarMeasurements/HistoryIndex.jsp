@@ -99,7 +99,7 @@
 		</tr>
 		<logic:present name="measurementsData">
 			<logic:iterate id="data" name="measurementsData"
-	                 property="measurementsDataVector" type="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean" indexId="ctr">
+	                 property="measurementsData" type="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean" indexId="ctr">
 				<tr class="data">                                                  
 	                         <td width="20"><bean:write name="data" property="type" /></td>
 					<td width="200"><bean:write name="data"

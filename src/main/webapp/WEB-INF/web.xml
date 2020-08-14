@@ -50,6 +50,10 @@
 			<param-name>validate</param-name>
 			<param-value>true</param-value>
 		</init-param>
+		<init-param>
+			<param-name>autowire</param-name>
+			<param-value>byName</param-value>
+		</init-param>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 	<servlet-mapping>

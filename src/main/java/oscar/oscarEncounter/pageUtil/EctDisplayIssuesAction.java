@@ -36,6 +36,7 @@ import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicIssue;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
+import org.oscarehr.casemgmt.service.CaseManagementIssueService;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.util.CppUtils;
 import org.oscarehr.util.LoggedInInfo;
@@ -82,7 +83,7 @@ public class EctDisplayIssuesAction extends EctDisplayAction {
 		List<CaseManagementIssue> issues_unr = new ArrayList<CaseManagementIssue>();
 		//only list unresolved issues				
 		for(CaseManagementIssue issue : issues) {
-			if(containsIssue(CppUtils.cppCodes,issue.getIssue().getCode())) {
+			if(CaseManagementIssueService.containsIssue(CppUtils.cppCodes,issue.getIssue().getCode())) {
 				continue;
 			}
 			if(!issue.isResolved()) {
@@ -222,7 +223,8 @@ public class EctDisplayIssuesAction extends EctDisplayAction {
 	public String getCmd() {
 		return cmd;
 	}
-	
+
+	/*
 	public boolean containsIssue(String[]  issues, String issueCode) {
 		for (String caseManagementIssue : issues) {
 			if (caseManagementIssue.equals(issueCode)) {
@@ -231,4 +233,5 @@ public class EctDisplayIssuesAction extends EctDisplayAction {
 		}
 		return false;
 	}
+	 */
 }

@@ -250,7 +250,7 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 			skipTmpSave = false; // only skip once
 		};
-		$scope.$watch('controller.page.encounterNote.note', delayTmpSave);
+		$scope.$watch('recordCtrl.page.encounterNote.note', delayTmpSave);
 
 		//////
 

@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Entity(name = "model.CaseManagementNote")
+@Entity(name = "model_CaseManagementNote")
 @Table(name = "casemgmt_note")
 public class CaseManagementNote extends AbstractModel<Long>
 {
@@ -503,5 +503,94 @@ public class CaseManagementNote extends AbstractModel<Long>
 			issueNoteList = new ArrayList<>(1);
 		}
 		issueNoteList.add(issueNote);
+	}
+
+	public String getStatus()
+	{
+		String status = "";
+		if (getSigned())
+		{
+			status = "Signed";
+		}
+		else
+		{
+			status = "Unsigned";
+		}
+
+		if (getPassword() != null && getPassword().length() > 0)
+		{
+			// locked note - can be temporarily unlocked
+			if (locked)
+			{
+				status += "/Locked";
+			}
+			else
+			{
+				status += "/Unlocked";
+			}
+		}
+
+		return status;
+	}
+
+	public boolean getHasHistory()
+	{
+		if(getHistory() != null)
+		{
+			if(getHistory().indexOf("----------------History Record----------------") != -1)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public ArrayList<String> getIssueDescriptions()
+	{
+		ArrayList<String> issueDescriptions = new ArrayList<String>();
+
+		for (CaseManagementIssueNote issue : getIssueNoteList())
+		{
+			issueDescriptions.add(issue.getId().getCaseManagementIssue().getIssue().getDescription());
+		}
+
+		return (issueDescriptions);
+	}
+
+	public String getEncounterTime()
+	{
+		StringBuilder et = new StringBuilder();
+
+		if(getHourOfEncounterTime()!=null)
+		{
+			et.append(getHourOfEncounterTime());
+			et.append(":");
+		}
+
+		if(getMinuteOfEncounterTime()!=null)
+		{
+			et.append(getMinuteOfEncounterTime());
+		}
+
+		return et.toString();
+	}
+
+	public String getEncounterTransportationTime()
+	{
+		StringBuilder et = new StringBuilder();
+
+		if(getHourOfEncTransportationTime()!=null)
+		{
+			et.append(getHourOfEncTransportationTime());
+			et.append(":");
+		}
+
+		if(getMinuteOfEncTransportationTime()!=null)
+		{
+			et.append(getMinuteOfEncTransportationTime());
+		}
+
+		return et.toString();
 	}
 }

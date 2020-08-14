@@ -277,7 +277,7 @@ function update_date(did, demoNo, provNo) {
 							<%} %>					
 						</tr>
 						<logic:iterate id="diagnotics" name="allDiagnostics"
-							property="dxResearchBeanVector" indexId="ctr">
+							property="dxResearchBeans" indexId="ctr">
 							<%  
                         if (Count == 0){
                             Count = 1;

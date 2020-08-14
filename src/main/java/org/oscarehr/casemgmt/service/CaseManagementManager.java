@@ -1475,6 +1475,7 @@ public class CaseManagementManager {
 	/**
 	 * Filters a list of CaseManagementIssue objects based on role.
 	 */
+	// TODO: speed this up
 	public List<CaseManagementIssue> filterIssues(LoggedInInfo loggedInInfo, String providerNo, List<CaseManagementIssue> issues, String programId) {
 
 		List<CaseManagementIssue> filteredIssues = new ArrayList<CaseManagementIssue>();

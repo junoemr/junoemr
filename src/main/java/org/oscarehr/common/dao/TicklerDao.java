@@ -74,13 +74,63 @@ public class TicklerDao extends AbstractDao<Tickler>{
 		
 		return results;
 	}
-	
+
+	public int getActiveByDemographicNoCount(Integer demographicNo)
+	{
+		String sql =
+				"select count(t) " +
+						"from Tickler t " +
+						"where t.demographicNo = ?1 " +
+						"and t.status = 'A' ";
+
+		Query query = entityManager.createQuery(sql);
+		query.setParameter(1, demographicNo);
+
+		Long result = (Long)query.getSingleResult();
+
+		return result.intValue();
+	}
+
 	@SuppressWarnings("unchecked")
-    public List<Tickler> findActiveByDemographicNo(Integer demoNo) {
-		
-		Query query = entityManager.createQuery("select t from Tickler t where t.demographicNo = ?1 and t.status = 'A' order by t.serviceDate desc");
-		query.setParameter(1, demoNo);
-		
+	public List<Tickler> findActiveByDemographicNo(
+			Integer demographicNo,
+			Integer limit,
+			Integer offset,
+			String sortOrder)
+	{
+
+		String sql =
+			"select t " +
+				"from Tickler t " +
+				"where t.demographicNo = ?1 " +
+				"and t.status = 'A' " +
+				"order by t.serviceDate ";
+
+		if(AbstractDao.SORT_DESC.equals(sortOrder))
+		{
+			sql += "desc";
+		}
+		else
+		{
+			sql += "asc";
+		}
+
+		sql += ", t.message";
+
+		Query query = entityManager.createQuery(sql);
+
+		query.setParameter(1, demographicNo);
+
+		if(limit != null)
+		{
+			query.setMaxResults(limit);
+		}
+
+		if(offset != null)
+		{
+			query.setFirstResult(offset);
+		}
+
 		List<Tickler> results = query.getResultList();
 		
 		return results;

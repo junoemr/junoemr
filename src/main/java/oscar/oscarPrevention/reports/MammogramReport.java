@@ -305,7 +305,7 @@ public class MammogramReport implements PreventionReport{
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
               log.debug("getting followup data for "+prd.demographicNo);
 
-              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsData();
               //NO Contact
 
               if ( followupData.size() == 0 ){
@@ -391,7 +391,7 @@ public class MammogramReport implements PreventionReport{
           }else if (prd.state.equals("Refused")){  //Not sure what to do about refused
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
               log.debug("getting followup data for "+prd.demographicNo);
-              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsData();
 
               if ( followupData.size() > 0 ){
                   EctMeasurementsDataBean measurementData = followupData.iterator().next();
@@ -409,7 +409,7 @@ public class MammogramReport implements PreventionReport{
                 //Do nothing
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
               log.debug("getting followup data for "+prd.demographicNo);
-              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsData();
 
               if ( followupData.size() > 0 ){
                   EctMeasurementsDataBean measurementData = followupData.iterator().next();

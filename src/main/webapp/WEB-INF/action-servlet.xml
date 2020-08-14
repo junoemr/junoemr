@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-        "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
-		
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Enable annotations for this spring context.  Note that this appears to be a separate    -->
+	<!-- context from the one configured by applicationContext.xml                               -->
+	<context:annotation-config/>
+
+
 	<bean name="/dms/inboxManage" class="oscar.dms.actions.DmsInboxManageAction">
 		<property name="providerInboxRoutingDAO" ref="providerInboxRoutingDAO" />
 		<property name="queueDocumentLinkDAO" ref="queueDocumentLinkDAO" />
@@ -101,9 +108,6 @@
 		<property name="clientManager" ref="clientManager" />
 		<property name="admissionManager" ref="admissionManager" />
 		<property name="caseManagementManager" ref="caseManagementManager" />
-<!--
-		<property name="providerManager" ref="providerManager" />
--->
 	</bean>
 	<!--  CASE MANAGEMENT -->
 	<bean name="/CaseManagementView" class="org.oscarehr.casemgmt.web.CaseManagementViewAction" scope="singleton" autowire="byName">
@@ -129,17 +133,10 @@
 	</bean>
 	<!--  Vaccine -->
 	<bean name="/VaccineProviderReport" class="org.oscarehr.vaccine.VaccineProviderReportAction" scope="singleton">
-<!--
-		<property name="programManager" ref="programManager" />
--->
 		<property name="clientManager" ref="clientManager" />
-<!--
-		<property name="admissionManager" ref="admissionManager" />
-		<property name="caseManagementManager" ref="caseManagementManager" />
-		<property name="providerManager" ref="providerManager" />
--->
 		<property name="genericIntakeManager" ref="genericIntakeManager" />
 	</bean>
+
 	<!-- Population Report -->
 	<bean name="/PopulationReport" class="org.oscarehr.common.web.PopulationReportAction" scope="singleton">
 		<property name="populationReportManager" ref="populationReportManager" />
@@ -214,19 +211,11 @@
 		<property name="clinicDAO" ref="clinicDAO" />
 		<property name="clinicBillingAddressDAO" ref="clinicBillingAddressDAO" />
 	</bean>
-<!--
-	<bean name="/admin/ClinicBillingAddress" class="org.oscarehr.common.web.ClinicBillingAddressAction" scope="singleton">
-		<property name="clinicBillingDao" ref="clinicBillingAddressDAO" />
-	</bean>
--->
 	<bean name="/admin/ManageSites" class="org.oscarehr.common.web.SitesManageAction" scope="singleton">
 		<property name="siteDao" ref="siteDao" />
 	</bean>
 
 	<bean name="/billing/CA/ON/BatchBill" class="org.oscarehr.billing.CA.ON.web.BatchBillAction" scope="singleton">
-<!--
-		<property name="billClaimDAO" ref="billingClaimDAO" />
--->
 	</bean>
 	
     <bean name="/billing/CA/ON/managePaymentType" class="oscar.oscarBilling.ca.on.pageUtil.PaymentTypeAction" scope="singleton" autowire="byName">
@@ -234,4 +223,7 @@
  	<property name="billPaymentDao" ref="billingONPaymentDao" />
  	</bean>
 	<bean name="/billing/CA/ON/billingON3rdPayments" class="org.oscarehr.billing.CA.ON.web.BillingONPaymentsAction" scope="singleton" autowire="byName"/>
+
+	<bean name="/oscarEncounter/junoEncounter" class="org.oscarehr.casemgmt.web.JunoEncounterAction" autowire="byName"></bean>
+
 </beans>

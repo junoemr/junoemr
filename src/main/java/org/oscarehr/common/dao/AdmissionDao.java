@@ -44,8 +44,8 @@ public class AdmissionDao extends AbstractDao<Admission> {
 	public AdmissionDao() {
 		super(Admission.class);
 	}
-	
-private Logger log=MiscUtils.getLogger();
+
+    private Logger log=MiscUtils.getLogger();
     
     public List<Admission> getAdmissions_archiveView(Integer programId, Integer demographicNo) {
         Admission admission = null;

@@ -1444,6 +1444,8 @@
 	{
 		var name = document.getElementById('enTemplate').value;
 		var func = autoCompleted[name];
+		console.log(autoCompleted);
+		console.log(func);
 		eval(func);
 	}
 

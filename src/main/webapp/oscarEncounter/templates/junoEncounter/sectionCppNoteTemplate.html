@@ -1,0 +1,16 @@
+<li class="\${rowClass}">
+	<span id="spanListNote\${index}">
+		<a class="topLinks"
+          onmouseover="this.className='topLinkhover'"
+          onmouseout="this.className='topLinks'"
+          title="Rev:\${revision} - Last update:\${updateDateFormatted}"
+          id="listNote\${noteId}"
+          href="#"
+          onclick="\${onClick};return false;"
+          style="width:100%;overflow:scroll;" >
+            {{each textLineArray}}
+            \${$value}<br />
+            {{/each}}
+		</a>
+	</span>
+</li>

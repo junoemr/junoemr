@@ -65,7 +65,7 @@
 	if (request.getSession().getAttribute("measurementsData") == null && type != null && !type.isEmpty())
 	{
 		EctMeasurementsDataBeanHandler handler = new EctMeasurementsDataBeanHandler(Integer.parseInt(demo), type);
-		List<EctMeasurementsDataBean> measurements = (List<EctMeasurementsDataBean>)handler.getMeasurementsDataVector();
+		List<EctMeasurementsDataBean> measurements = (List<EctMeasurementsDataBean>)handler.getMeasurementsData();
 		EctMeasurementsDataBeanHandler.addRemoteMeasurements(loggedInInfo, measurements, type, Integer.parseInt(demo));
 		// Now that we have the measurements, toss them in to the request and continue on like the page normally would
 		request.setAttribute("measurementsData", handler);
@@ -148,7 +148,7 @@
 					</security:oscarSec> 
 					
 				</tr>
-				<logic:iterate id="data" name="measurementsData" property="measurementsDataVector" indexId="ctr">
+				<logic:iterate id="data" name="measurementsData" property="measurementsData" indexId="ctr">
 					<logic:present name="data" property="remoteFacility">
 						<tr class="data" style="background-color:#ffcccc" >
 					</logic:present>

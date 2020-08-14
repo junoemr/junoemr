@@ -23,8 +23,6 @@
  */
 package org.oscarehr.common.dao;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -39,8 +37,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.fail;
-
-import javax.persistence.PersistenceException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -77,7 +73,7 @@ public class CtlBillingServiceAgeRulesDaoTest extends DaoTestFixtures
 		Assert.assertEquals("Find by code found more than one entity", 1, result.size());
 	}
 
-	@Test(expected= PersistenceException.class)
+	@Test(expected=org.springframework.dao.DataIntegrityViolationException.class)
 	public void testUniqueServiceCode()
 	{
 		String serviceCode = "baz";

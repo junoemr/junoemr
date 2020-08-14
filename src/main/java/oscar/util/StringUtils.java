@@ -26,6 +26,8 @@
 package oscar.util;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.web.util.UriUtils;
 
 public class StringUtils {
 
@@ -437,6 +440,11 @@ public class StringUtils {
     {
         return str.replaceAll("[\\\\/:*?\"<>|]", "-");
     }
+
+    public static String encodeUrlParam(String param)
+    {
+		return UriUtils.encodeQueryParam(param, StandardCharsets.UTF_8.toString());
+	}
 
     /**
      * checks that a string is safe for use in Juno.

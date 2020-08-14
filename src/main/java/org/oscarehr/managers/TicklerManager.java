@@ -45,6 +45,7 @@ import org.oscarehr.PMmodule.model.ProgramAccess;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
+import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.CustomFilterDao;
 import org.oscarehr.common.dao.TicklerCategoryDao;
@@ -648,11 +649,20 @@ public class TicklerManager {
     		  
     		  return result;
     	  }
-    	  
-    	  public List<Tickler> findActiveByDemographicNo(LoggedInInfo loggedInInfo, Integer demographicNo) {
-    		  checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+
+		public int getActiveByDemographicNoCount(LoggedInInfo loggedInInfo, Integer demographicNo) {
+			checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+			return ticklerDao.getActiveByDemographicNoCount(demographicNo);
+		}
+
+		public List<Tickler> findActiveByDemographicNo(LoggedInInfo loggedInInfo, Integer demographicNo) {
+    	  	return findActiveByDemographicNo(loggedInInfo, demographicNo, null, null, AbstractDao.SORT_ASC);
+		  }
+
+		  public List<Tickler> findActiveByDemographicNo(LoggedInInfo loggedInInfo, Integer demographicNo, Integer limit, Integer offset, String sortOrder) {
+				  checkPrivilege(loggedInInfo, PRIVILEGE_READ);
     		  
-    		  List<Tickler> result = ticklerDao.findActiveByDemographicNo(demographicNo);
+    		  List<Tickler> result = ticklerDao.findActiveByDemographicNo(demographicNo, limit, offset, sortOrder);
     		  
     		  for(Tickler tmp:result) {
 	    		//--- log action ---

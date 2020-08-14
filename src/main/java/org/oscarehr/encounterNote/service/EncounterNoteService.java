@@ -22,6 +22,8 @@
  */
 package org.oscarehr.encounterNote.service;
 
+import org.oscarehr.PMmodule.dao.ProgramDao;
+import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.SecRoleDao;
@@ -43,12 +45,18 @@ import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.rx.model.Drug;
+import org.oscarehr.ws.rest.conversion.CaseManagementIssueConverter;
+import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
+import org.oscarehr.ws.rest.to.model.NoteIssueTo1;
+import org.oscarehr.ws.rest.to.model.NoteTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -87,20 +95,143 @@ public class EncounterNoteService
 	@Autowired
 	DemographicDao demographicDao;
 
+	@Autowired
+	ProgramDao programDao;
+
+	public NoteIssueTo1 getLatestUnsignedNote(Integer demographicNo, Integer providerNo)
+	{
+		CaseManagementNote note = caseManagementNoteDao.getLatestUnsignedNote(demographicNo, providerNo);
+
+		return getNoteTo1FromNote(note);
+	}
+
+	public NoteIssueTo1 getNoteToEdit(Integer demographicNo, Integer noteId)
+	{
+		CaseManagementNote note = caseManagementNoteDao.find(noteId.longValue());
+
+		if (!note.getDemographic().getId().equals(demographicNo))
+		{
+			return null;
+		}
+
+		return getNoteTo1FromNote(note);
+	}
+
+	public CaseManagementNote getAnnotation(Integer parentNoteId)
+	{
+		if(parentNoteId == null)
+		{
+			return null;
+		}
+
+		CaseManagementNoteLink noteLink = caseManagementNoteLinkDao.getNoteLinkByTableIdAndTableName(
+				parentNoteId, CaseManagementNoteLink.CASEMGMTNOTE);
+
+		CaseManagementNote note = null;
+		if(noteLink != null)
+		{
+			note = caseManagementNoteDao.find(noteLink.getNote().getNoteId());
+		}
+
+		return note;
+	}
+
+	private NoteIssueTo1 getNoteTo1FromNote(CaseManagementNote note)
+	{
+		if(note == null)
+		{
+			return null;
+		}
+
+		NoteTo1 noteTo = new NoteTo1();
+
+		boolean editable = note.getSigned() || note.getLocked();
+		SecRole secRole = null;
+		if(note.getReporterCaisiRole() != null)
+		{
+			secRole = secRoleDao.find(Integer.parseInt(note.getReporterCaisiRole()));
+		}
+
+		noteTo.setNoteId(note.getNoteId().intValue());
+		try
+		{
+			noteTo.setAppointmentNo(note.getAppointment().getId().intValue());
+		}
+		catch(EntityNotFoundException e)
+		{
+			// Do nothing
+		}
+		noteTo.setObservationDate(note.getObservationDate());
+		noteTo.setProviderNo(note.getProvider().getProviderNo().toString());
+		Program program = programDao.getProgram(Integer.parseInt(note.getProgramNo()));
+		noteTo.setProgramName(program.getName());
+		noteTo.setUuid(note.getUuid());
+		noteTo.setUpdateDate(note.getUpdateDate());
+		//noteTo.setDocumentId((row[column++]));
+		noteTo.setArchived(note.getArchived());
+		noteTo.setIsSigned(note.getSigned());
+		noteTo.setIsEditable(editable);
+		noteTo.setRevision(caseManagementNoteDao.getRevision(note.getUuid()).toString());
+		noteTo.setProviderName(note.getProvider().getDisplayName());
+		noteTo.setStatus(note.getStatus());
+		//noteTo.setLocation();
+		noteTo.setRoleName(secRole.getName());
+		noteTo.setHasHistory(note.getHasHistory());
+		noteTo.setLocked(note.getLocked());
+		noteTo.setNote(note.getNote());
+		noteTo.setDocument(false);
+		noteTo.setDeleted(false);
+		noteTo.setRxAnnotation(false);
+		noteTo.setEformData(false);
+		noteTo.setEncounterForm(false);
+		noteTo.setInvoice(false);
+		noteTo.setTicklerNote(false);
+		noteTo.setEncounterType(note.getEncounterType());
+
+		noteTo.setEditorNames(new ArrayList<String>(caseManagementNoteDao.getEditorNames(note.getUuid())));
+
+		noteTo.setIssueDescriptions(note.getIssueDescriptions());
+		noteTo.setReadOnly(false);
+		//noteTo.setGroupNote(getBooleanFromInteger(row[column++]));
+		noteTo.setCpp(false);
+		noteTo.setEncounterTime(note.getEncounterTime());
+		noteTo.setEncounterTransportationTime(note.getEncounterTransportationTime());
+
+
+		//assigned issues..remove the CPP one.
+		List<CaseManagementIssueNote> issueNotes = new ArrayList<>(note.getIssueNoteList());
+
+		List<CaseManagementIssueTo1> issueTos = new ArrayList<>();
+		for(CaseManagementIssueNote issueNote : issueNotes)
+		{
+			issueTos.add(CaseManagementIssueConverter.getAsTransferObject(issueNote.getId().getCaseManagementIssue()));
+		}
+
+		//set NoteIssue to return
+		NoteIssueTo1 noteIssue = new NoteIssueTo1();
+		noteIssue.setEncounterNote(noteTo);
+		noteIssue.setAssignedCMIssues(issueTos);
+
+		return noteIssue;
+	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note)
 	{
 		return saveChartNote(note, null);
 	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note, String providerNo, Integer demographicNo)
 	{
 		return saveChartNote(note, null, providerNo, demographicNo);
 	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note, List<Issue> issueList, String providerNo, Integer demographicNo)
 	{
 		note.setDemographic(demographicDao.find(demographicNo));
 		note.setProvider(providerDataDao.find(providerNo));
 		return saveChartNote(note, issueList);
 	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note, List<Issue> issueList)
 	{
 		note.setIncludeIssueInNote(true);
