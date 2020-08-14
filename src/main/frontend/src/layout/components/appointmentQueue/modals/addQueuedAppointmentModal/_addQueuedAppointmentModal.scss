@@ -1,0 +1,29 @@
+.add-queued-appointment-modal {
+
+	.center-options {
+		juno-button {
+			&:not(last-child) {
+				margin-right: 8px;
+			}
+		}
+	}
+
+	.buttons {
+		display: flex;
+		justify-content: flex-end;
+
+		juno-button {
+			max-width: 160px;
+			.juno-button {
+				margin-top: 0;
+				button {
+					height: 40px;
+				}
+			}
+
+			&:first-child {
+				margin-right: 8px;
+			}
+		}
+	}
+}

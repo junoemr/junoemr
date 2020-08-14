@@ -265,6 +265,8 @@ module.exports = {
 			'./src/layout/components/module.js',
 			'./src/layout/components/appointmentQueue/appointmentQueueComponent.js',
 			'./src/layout/components/appointmentQueue/components/appointmentCard/appointmentCardComponent.js',
+			'./src/layout/components/appointmentQueue/modals/module.js',
+			'./src/layout/components/appointmentQueue/modals/addQueuedAppointmentModal/addQueuedAppointmentModalComponent.js',
 
 			'./src/patient/module.js',
 			'./src/patient/addDemographicModal/addDemographicModalComponent.js',
