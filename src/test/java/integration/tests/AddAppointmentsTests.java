@@ -38,6 +38,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -45,6 +49,8 @@ import static integration.tests.AddGroupTests.addGroup;
 import static integration.tests.AddGroupTests.groupName;
 import static integration.tests.AddGroupTests.valueOfDrApple;
 import static integration.tests.AddGroupTests.valueOfDrBerry;
+import static integration.tests.AddProvidersTests.drApple;
+import static integration.tests.AddProvidersTests.drBerry;
 import static integration.tests.ScheduleSettingTests.getDailySchedule;
 import static integration.tests.ScheduleSettingTests.setupSchedule;
 import static integration.tests.ScheduleSettingTests.setupTemplate;
@@ -175,7 +181,8 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 		String xpathAt9 =
-				"/html/body/table[2]/tbody/tr[2]/td/table/tbody/tr/td[2]/table/tbody/tr[2]/td/table/tbody/tr[5]/td[1]/a";
+				"//a[contains(., 'Mon,')]/ancestor::tr/following-sibling::tr" +
+						"/descendant::td//a[@title='9:00 AM - 9:15 AM']";
 		addAppointmentWithDemo(By.xpath(xpathAt9), currWindowHandle, "t");//To Do
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
@@ -183,7 +190,8 @@ public class AddAppointmentsTests extends SeleniumTestBase
 
 		//Add an appointment at 10:00-10:15 Tuesday with NO demographic selected.
 		String xpathAt10 =
-				"/html/body/table[2]/tbody/tr[2]/td/table/tbody/tr/td[3]/table/tbody/tr[2]/td/table/tbody/tr[9]/td[1]/a";
+				"//a[contains(., 'Tue,')]/ancestor::tr/following-sibling::tr" +
+						"/descendant::td//a[@title='10:00 AM - 10:15 AM']";
 		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");//To Do
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
@@ -196,19 +204,34 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		//Flip View - next Month
 		driver.findElement(By.xpath("//input[@name='flipview']")).click();
 		driver.findElement(By.xpath("//a[@title='Next Month']")).click();
-		// Add an appointment at 9:00-9:15 the next date of next Month with demographic selected.
+		// Add an appointment at 9:00-9:15 the same date of next Month with demographic selected.
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		String xpathAt9 = "/html/body/table/tbody/tr[3]/td[7]/table/tbody/tr[1]/td[1]/a";
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		Date date = new Date();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.MONTH, 1);
+		Date apptAt9Date= calendar.getTime();
+		calendar.add(Calendar.DAY_OF_MONTH, 1);
+		Date apptAt10Date = calendar.getTime();
+		String apptAt9DateFormated = dateFormat.format(apptAt9Date);
+		String apptAt10DateFormated = dateFormat.format(apptAt10Date);
+		String xpathAt9 =
+				"//a[contains(., '" + apptAt9DateFormated + "')]/parent::td" +
+						"/following-sibling::td[@title='9:00']" +
+						"/descendant::td[@style='vertical-align:middle;']";
 		addAppointmentWithDemo(By.xpath(xpathAt9), currWindowHandle, "t");//To Do
 
-		//Add an appointment at 10:00-10:15 the 2nd next date as tomorrow of next Month with NO demographic selected.
-		String xpathAt10 = "/html/body/table/tbody/tr[4]/td[11]/table/tbody/tr[1]/td[1]/a";
+		//Add an appointment at 10:00-10:15 the next date as tomorrow of next Month with NO demographic selected.
+		String xpathAt10 =
+				"//a[contains(., '" + apptAt10DateFormated + "')]/parent::td" +
+						"/following-sibling::td[@title='10:00']" +
+						"/descendant::td[@style='vertical-align:middle;']";
 		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");// To Do
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Day Page")));
-		driver.findElement(By.xpath("/html/body/table/tbody/tr[3]/td[2]/a")).click();
+		driver.findElement(By.xpath("//a[contains(., '" + apptAt9DateFormated + "')]")).click();
 		driver.findElement(By.linkText("All")).click();
-
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
@@ -269,19 +292,17 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
 		dropdownSelectByValue(driver, By.id("mygroup_no"), "_grp_TestGroup");
-
-		// Add an appointment at 9:00-9:15 with demographic selected under the first provider
 		String xpathAt9 =
-				"/html/body/table[2]/tbody/tr[2]/td/table/tbody/tr/td[1]/table/tbody/tr[2]/td/table/tbody/tr[5]/td[1]/a";
+				"//a[contains(.,'" + drApple.lastName + "')]" +
+						"/ancestor::tr/following-sibling::tr" +
+						"/descendant::td//a[@title='9:00 AM - 9:15 AM']";
 		addAppointmentWithDemo(By.xpath(xpathAt9), currWindowHandle, "t");//To Do
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
 
 		//Schedule View of the first provider
-		String xpathFirstProvider =
-				"/html/body/table[2]/tbody/tr[2]/td/table/tbody/tr/td[1]/table/tbody/tr[1]/td/b/b/a[1]";
-		driver.findElement(By.xpath(xpathFirstProvider)).click();
+		driver.findElement(By.xpath("//a[contains(., '" + drApple.lastName + "')]")).click();
 		Assert.assertTrue(
 				"Appointment with demographic selected is NOT added successfully under the first provider.",
 				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
@@ -289,19 +310,18 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		//Add an appointment at 10:00-10:15 with NO demographic selected under the second provider.
 		driver.findElement(By.linkText("Group View")).click();
 		String xpathAt10 =
-				"/html/body/table[2]/tbody/tr[2]/td/table/tbody/tr/td[2]/table/tbody/tr[2]/td/table/tbody/tr[9]/td[1]/a";
+				"//a[contains(.,'" + drBerry.lastName + "')]" +
+						"/ancestor::tr/following-sibling::tr" +
+						"/descendant::td//a[@title='10:00 AM - 10:15 AM']";
 		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");//To Do
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
 
 		//Schedule View of the second provider
-		String xpathSecProvider =
-				"/html/body/table[2]/tbody/tr[2]/td/table/tbody/tr/td[2]/table/tbody/tr[1]/td/b/b/a[1]";
-		driver.findElement(By.xpath(xpathSecProvider)).click();
+		driver.findElement(By.xpath("//a[contains(., '" + drBerry.lastName + "')]")).click();
 		Assert.assertTrue(
 				"Appointment with NO demographic selected is NOT added successfully under the second provider.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
-
 	}
 }
