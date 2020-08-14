@@ -43,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.util.ConversionUtils;
 
 import java.text.ParseException;
@@ -110,14 +111,18 @@ public class ProviderManager2
 		return results;
 	}
 
-	public List<Property> getProviderProperties(LoggedInInfo loggedInInfo, String providerNo, String propertyName)
+	public Property getProviderProperties(LoggedInInfo loggedInInfo, String providerNo, String propertyName)
 	{
-		List<Property> results = propertyDao.findByNameAndProvider(propertyName, providerNo);
+		Property results = propertyDao.findByNameAndProvider(propertyName, providerNo);
 
 		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.getProviderProperties", "providerNo=" + providerNo + ", propertyName=" + propertyName);
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				"getProviderProperties",
+				"ProviderManager",
+				LogConst.ACTION_ACCESS,
+				"providerNo=" + providerNo + ", propertyName=" + propertyName);
 
-		return (results);
+		return results;
 	}
 
 	/*
@@ -1020,25 +1025,18 @@ public class ProviderManager2
 
 		if (!isProviderPreferenceEntry)
 		{
-			//TODO check for valid key
-//			throw new IllegalArgumentException(key + " is not a valid provider property");
-
-			List<Property> userPropList = propertyDao.findByNameAndProvider(key, providerNo);
+			Property userPropList = propertyDao.findByNameAndProvider(key, providerNo);
 
 			Property userProp;
-			if (userPropList.isEmpty())
+			if (userPropList == null)
 			{
 				userProp = new Property();
 				userProp.setProviderNo(providerNo);
 				userProp.setName(key);
 			}
-			else if (userPropList.size() == 1)
-			{
-				userProp = userPropList.get(0);
-			}
 			else
 			{
-				throw new IllegalStateException("Multiple values found for property " + key + " and provider " + providerNo);
+				userProp = userPropList;
 			}
 			userProp.setValue(value);
 			propertyDao.merge(userProp);

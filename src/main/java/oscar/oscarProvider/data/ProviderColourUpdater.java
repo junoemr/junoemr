@@ -25,60 +25,67 @@
 
 package oscar.oscarProvider.data;
 
-import java.util.List;
-
 import org.oscarehr.common.dao.PropertyDao;
 import org.oscarehr.common.model.Property;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.util.SpringUtils;
 
 /**
- * Manages Fax number for provider 
- * 
+ * Manages provider colour for provider
+ *
  */
 public class ProviderColourUpdater {
-    
-    private String strColName;    
-    private String provider;
-    
-    /** Creates a new instance of ProviderColourUpdater */
-   public ProviderColourUpdater(String p) {
-       strColName = "ProviderColour";
-       provider = p;       
-    }
+
+	private String provider;
+
+	/**
+	 * Creates a new instance of ProviderColourUpdater
+	 */
+	public ProviderColourUpdater(String providerNo)
+	{
+		this.provider = providerNo;
+	}
    
-   /**
-    *Retrieve colour for current provider first by querying property table 
-    */
-   public String getColour() {
-       PropertyDao dao = SpringUtils.getBean(PropertyDao.class);
-	   List<Property> props = dao.findByNameAndProvider(strColName, provider);
-       for(Property prop : props) {
-            return prop.getValue()!=null?prop.getValue():"";
-       }
-       return "";
-   }
-      /**
-       *set colour in property table
-       */
-   public boolean setColour(String c) {
-	   PropertyDao dao = SpringUtils.getBean(PropertyDao.class);
-	   List<Property> props = dao.findByNameAndProvider(strColName, provider);
-	   Property property = null;
-	   for(Property p : props) {
-           property = p;
-           break;
-      }
-	   
-	  if (property == null) {
-		  property = new Property();
-	  }
-	   
-	  property.setValue(c);
-	  property.setName(strColName);
-	  property.setProviderNo(provider);
-	  
-	  dao.saveEntity(property);
-	   
-	  return true;
-   }
+
+	/**
+	 * Retrieve colour for current provider first by querying property table
+	 */
+	public String getColour()
+	{
+		PropertyDao dao = SpringUtils.getBean(PropertyDao.class);
+		Property props = dao.findByNameAndProvider(UserProperty.PROVIDER_COLOUR, provider);
+		if (props != null)
+		{
+			return props.getValue();
+		}
+
+		return "";
+	}
+
+
+	/**
+	 * set colour in property table
+	 */
+	public boolean setColour(String colour)
+	{
+		PropertyDao dao = SpringUtils.getBean(PropertyDao.class);
+		Property props = dao.findByNameAndProvider(UserProperty.PROVIDER_COLOUR, provider);
+
+		if (props != null)
+		{
+			props.setValueNoNull(colour);
+			dao.merge(props);
+		}
+		else
+		{
+			props = new Property();
+			props.setValue(colour);
+			props.setName(UserProperty.PROVIDER_COLOUR);
+			props.setProviderNo(provider);
+
+			dao.persist(props);
+		}
+
+		return true;
+	}
 }

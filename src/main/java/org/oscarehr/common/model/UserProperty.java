@@ -63,6 +63,8 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String EFORM_FAVOURITE_GROUP = "favourite_eform_group";
     public static final String RX_SHOW_PATIENT_DOB="rx_show_patient_dob";
     public static final String PATIENT_NAME_LENGTH="patient_name_length";
+    public static final String PROVIDER_FAXNUMBER = "faxnumber";
+    public static final String PROVIDER_COLOUR = "ProviderColour";
     
     public static final String OFFICIAL_FIRST_NAME="official_first_name";
     public static final String OFFICIAL_SECOND_NAME="official_second_name";

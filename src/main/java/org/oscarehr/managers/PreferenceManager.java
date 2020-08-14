@@ -95,21 +95,11 @@ public class PreferenceManager {
 	public boolean displaySummaryItem(LoggedInInfo loggedInInfo, String item){
 		if(isCustomSummaryEnabled(loggedInInfo))
 		{
-			List<Property> results = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), item);
-
-			if(results.size() > 0)
+			Property results = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), item);
+			if(results != null)
 			{
-				String value = null;
-
-				for(Property result : results)
-				{
-					value = result.getValue();
-				}
-
-				if(value.isEmpty() || value.equals("off"))
-				{
-					return false;
-				}
+				String value = results.getValue();
+				return !value.isEmpty() && !value.equals("off");
 			}
 			else
 			{
@@ -118,11 +108,7 @@ public class PreferenceManager {
 			}
 		}
 		// default these to false instead
-		else if(DS_SUPPORT_POS.equals(item))
-		{
-			return false;
-		}
-		return true;
+		return !DS_SUPPORT_POS.equals(item);
 	}
 	
 	private boolean isOldCppPosition(LoggedInInfo loggedInInfo, String property){
@@ -228,55 +214,37 @@ public class PreferenceManager {
 	
 	
 	public boolean isCustomSummaryEnabled(LoggedInInfo loggedInInfo){
-		List<Property> results = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), CUSTOM_SUMMARY_ENABLE);
+		Property results = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), CUSTOM_SUMMARY_ENABLE);
 		
-		if(results.size()>0){
-			String value = null;
-			
-			for(Property result:results){
-				value = result.getValue();
-			}
-			
-			if(value.equals("on")){
-				return true;	
-			}
+		if(results != null)
+		{
+			String value = results.getValue();
+			return value.equals("on");
 		}
 		
 		return false;		
 	}
 	
 	private boolean isCustomCppItemOn(LoggedInInfo loggedInInfo, String propertyName){
-		List<Property> results = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), propertyName);
+		Property results = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), propertyName);
 		
-		if(results.size()>0){
-			String value = null;
-			
-			for(Property result:results){
-				value = result.getValue();
-			}
-			
-			if(value.equals("on")){
-				return true;	
-			}
+		if(results != null)
+		{
+			String value = results.getValue();
+			return value.equals("on");
 		}
 		return false;
 	}
 	
 	public String getProviderPreference(LoggedInInfo loggedInInfo, String propertyName){
-		List<Property> results = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), propertyName);
-		
-		String value = null;
-		
-		if(results.size()>0){
-			
-			for(Property result:results){
-				value = result.getValue();
-			}
+		Property results = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), propertyName);
 
-			return value;
+		if(results != null)
+		{
+			return results.getValue();
 		}
 		
-		return value;		
+		return null;
 	}
 	
 }

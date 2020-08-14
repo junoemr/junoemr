@@ -50,35 +50,34 @@ public final class ProviderMyOscarIdData {
 	 */
 	public static String getMyOscarId(String providerNo) {
 		
-		List<Property> props = dao.findByNameAndProvider(PROPERTY_KEY, providerNo);
-		if(props.size()>0) {
-			return props.get(0).getValue();
+		Property property = dao.findByNameAndProvider(PROPERTY_KEY, providerNo);
+		if(property != null)
+		{
+			return property.getValue();
 		}
 
-		return new String();
+		return "";
 	}
 
 	/**
 	 *set myOscar login id in property table
 	 */
-	public static boolean setId(String providerId, String id) {
-		String sql;
-		boolean ret = true;
-
-		List<Property> props = dao.findByNameAndProvider(PROPERTY_KEY, providerId);
-		Property p = new Property();
-		if(props.size()>0) {
-			p = props.get(0);
-			p.setValue(id);
-			dao.merge(p);
-		} else {
-			p.setName(PROPERTY_KEY);
-			p.setValue(id);
-			p.setProviderNo(providerId);
-			dao.persist(p);
+	public static void setId(String providerId, String id)
+	{
+		Property props = dao.findByNameAndProvider(PROPERTY_KEY, providerId);
+		if(props != null)
+		{
+			props.setValue(id);
+			dao.merge(props);
 		}
-
-		return ret;
+		else
+		{
+			props = new Property();
+			props.setName(PROPERTY_KEY);
+			props.setValue(id);
+			props.setProviderNo(providerId);
+			dao.persist(props);
+		}
 	}
 
 	public static boolean idIsSet(String providerId)  {
