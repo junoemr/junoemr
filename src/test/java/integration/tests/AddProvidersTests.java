@@ -47,7 +47,7 @@ public class AddProvidersTests extends SeleniumTestBase
 	public static ProviderTestData drCherry = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[2]);
 
 	@AfterClass
-	public static void cheanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "program_provider",
 				"provider", "provider_billing", "providerbillcenter", "secUserRole");
