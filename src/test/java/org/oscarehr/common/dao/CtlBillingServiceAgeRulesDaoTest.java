@@ -23,6 +23,8 @@
  */
 package org.oscarehr.common.dao;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -32,11 +34,13 @@ import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlBillingServiceAgeRules;
-import org.oscarehr.common.model.CtlBillingServiceSexRules;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.junit.Assert.fail;
+
+import javax.persistence.PersistenceException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -52,45 +56,40 @@ public class CtlBillingServiceAgeRulesDaoTest extends DaoTestFixtures
 
 	@Test
 	public void testFindByServiceCode() throws Exception {
-		
+
 		String serviceCode1 = "foo";
 		String serviceCode2 = "bar";
-		
+
 		CtlBillingServiceAgeRules cBSAR1 = new CtlBillingServiceAgeRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSAR1);
 		cBSAR1.setServiceCode(serviceCode1);
 		ctlBillingServiceAgeRulesDao.persist(cBSAR1);
-		
+
 		CtlBillingServiceAgeRules cBSAR2 = new CtlBillingServiceAgeRules();
 		EntityDataGenerator.generateTestDataForModelClass(cBSAR2);
-		cBSAR2.setServiceCode(serviceCode1);
+		cBSAR2.setServiceCode(serviceCode2);
 		ctlBillingServiceAgeRulesDao.persist(cBSAR2);
-		
-		CtlBillingServiceAgeRules cBSAR3 = new CtlBillingServiceAgeRules();
-		EntityDataGenerator.generateTestDataForModelClass(cBSAR3);
-		cBSAR3.setServiceCode(serviceCode2);
-		ctlBillingServiceAgeRulesDao.persist(cBSAR3);
-		
-		CtlBillingServiceAgeRules cBSAR4 = new CtlBillingServiceAgeRules();
-		EntityDataGenerator.generateTestDataForModelClass(cBSAR4);
-		cBSAR4.setServiceCode(serviceCode1);
-		ctlBillingServiceAgeRulesDao.persist(cBSAR4);
-		
-		List<CtlBillingServiceAgeRules> expectedResult = new ArrayList<CtlBillingServiceAgeRules>(Arrays.asList(cBSAR1, cBSAR2, cBSAR4));
-		List<CtlBillingServiceAgeRules> result = ctlBillingServiceAgeRulesDao.findByServiceCode(serviceCode1);
 
-		Logger logger = MiscUtils.getLogger();
-		
-		if (result.size() != expectedResult.size()) {
-			logger.warn("Array sizes do not match.");
-			fail("Array sizes do not match.");
-		}
-		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
-				logger.warn("Items  do not match.");
-				fail("Items  do not match.");
-			}
-		}
-		assertTrue(true);
+		List<CtlBillingServiceAgeRules> result = ctlBillingServiceAgeRulesDao.findByServiceCode(serviceCode1);
+		Assert.assertEquals("Find by code found more than one entity", 1, result.size());
+
+		List<CtlBillingServiceAgeRules> result2 = ctlBillingServiceAgeRulesDao.findByServiceCode(serviceCode2);
+		Assert.assertEquals("Find by code found more than one entity", 1, result.size());
+	}
+
+	@Test(expected= PersistenceException.class)
+	public void testUniqueServiceCode()
+	{
+		String serviceCode = "baz";
+
+		CtlBillingServiceAgeRules rules1 = new CtlBillingServiceAgeRules();
+		rules1.setServiceCode(serviceCode);
+		ctlBillingServiceAgeRulesDao.persist(rules1);
+
+		CtlBillingServiceAgeRules rules2 = new CtlBillingServiceAgeRules();
+		rules2.setServiceCode(serviceCode);
+		ctlBillingServiceAgeRulesDao.persist(rules2);
+
+		fail("CtlBillingServiceAgeRules must have a unique service code");
 	}
 }
