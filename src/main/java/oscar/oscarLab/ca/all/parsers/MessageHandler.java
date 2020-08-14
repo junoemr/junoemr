@@ -33,6 +33,7 @@ import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.validator.GenericValidator;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
@@ -1170,28 +1171,13 @@ public abstract class MessageHandler
 		{
 			inFormat = inFormat.substring(0, plain.length());
 		}
-
-		try
+		else if(inFormat.length() < plain.length())
 		{
-			if( plain.length()>inFormat.length() )
-			{
-				// a time like this 2016-09-20 12:22:00 -0700
-				if (plain.charAt(4) == '-' && plain.charAt(7) == '-' && plain.charAt(10) == ' ' && plain.charAt(13) == ':' && plain.charAt(16) == ':')
-				{
-					if (outFormat.equals(ConversionUtils.DEFAULT_TIME_PATTERN))
-					{
-						return plain.substring(11,19);
-					}
-					else
-					{
-						return plain.substring(0,outFormat.length());
-					}
-				}
-				else
-				{
-					throw new DateTimeException("input date string " + plain + " not reconigzed");
-				}
-			}
+			inFormat = ConversionUtils.DATE_TIME_ZONE_OFFSET_x_PATTERN;
+		}
+
+		if(GenericValidator.isDate(plain, inFormat, true))
+		{
 			DateTimeFormatter inFormatter = DateTimeFormatter.ofPattern(inFormat);
 			DateTimeFormatter outFormatter = DateTimeFormatter.ofPattern(outFormat);
 
@@ -1206,9 +1192,9 @@ public abstract class MessageHandler
 
 			formatted = parsedDate.format(outFormatter);
 		}
-		catch(DateTimeException e)
+		else
 		{
-			logger.error("Date parse Exception", e);
+			logger.error("Date " + plain + "cannot be handled");
 		}
 		return formatted;
 	}
