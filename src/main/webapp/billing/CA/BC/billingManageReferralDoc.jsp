@@ -91,12 +91,19 @@ function registerFormSubmit(formId, divId)
 			// post data
 			$.post(
 				$('#'+formId).attr('action'),
-				data,
-				function(returnData)
+				data)
+			.done(
+				function success(returnData)
 				{
 					// insert returned html
 					$('#'+divId).html(returnData)
-				});
+				})
+			.fail(
+				function fail(response)
+				{
+					$('#'+divId).html("There is error loading the page: " + response.responseText);
+				})
+			;
 		}
 		return false; // stops browser from doing default submit process
 	});
