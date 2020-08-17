@@ -37,6 +37,7 @@ import org.oscarehr.util.SpringUtils;
 public class ProviderColourUpdater {
 
 	private String provider;
+	private static PropertyDao propertyDao = SpringUtils.getBean(PropertyDao.class);
 
 	/**
 	 * Creates a new instance of ProviderColourUpdater
@@ -52,8 +53,7 @@ public class ProviderColourUpdater {
 	 */
 	public String getColour()
 	{
-		PropertyDao dao = SpringUtils.getBean(PropertyDao.class);
-		Property props = dao.findByNameAndProvider(UserProperty.PROVIDER_COLOUR, provider);
+		Property props = propertyDao.findByNameAndProvider(UserProperty.PROVIDER_COLOUR, provider);
 		if (props != null)
 		{
 			return props.getValue();
@@ -68,13 +68,12 @@ public class ProviderColourUpdater {
 	 */
 	public boolean setColour(String colour)
 	{
-		PropertyDao dao = SpringUtils.getBean(PropertyDao.class);
-		Property props = dao.findByNameAndProvider(UserProperty.PROVIDER_COLOUR, provider);
+		Property props = propertyDao.findByNameAndProvider(UserProperty.PROVIDER_COLOUR, provider);
 
 		if (props != null)
 		{
 			props.setValueNoNull(colour);
-			dao.merge(props);
+			propertyDao.merge(props);
 		}
 		else
 		{
@@ -83,7 +82,7 @@ public class ProviderColourUpdater {
 			props.setName(UserProperty.PROVIDER_COLOUR);
 			props.setProviderNo(provider);
 
-			dao.persist(props);
+			propertyDao.persist(props);
 		}
 
 		return true;
