@@ -23,27 +23,15 @@
 
 package org.oscarehr.common.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.annotation.SiteLocation;
 import org.oscarehr.common.listeners.BeanValidationEventListener;
+import org.oscarehr.integration.aqs.model.QueuedAppointmentLink;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -56,6 +44,7 @@ import java.util.Optional;
 @Table(name = "appointment")
 public class Appointment extends AbstractModel<Integer> implements Serializable {
 
+	public static final String TODO = "t";
 	public static final String CANCELLED = "C";
 	public static final String BILLED = "B";
 	public static final String NO_SHOW = "N";
@@ -114,7 +103,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	private String type;
 	private String style;
 	private String billing;
-	private String status;
+		private String status;
 
 	@Column(name = "imported_status")
 	private String importedStatus;
@@ -135,6 +124,11 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="lastupdateuser", referencedColumnName="provider_no", insertable=false, updatable=false)
 	private ProviderData lastUpdateUserRecord;
+
+	@Getter
+	@Setter
+	@OneToOne(mappedBy="appointment")
+	private QueuedAppointmentLink queuedAppointmentLink;
 
 	private String remarks;
 	private String urgency;

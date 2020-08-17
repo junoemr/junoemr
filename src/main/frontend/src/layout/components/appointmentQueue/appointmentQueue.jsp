@@ -12,20 +12,7 @@
 			              slim="true">
 			</juno-divider>
 		</div>
-		
-		<panel component-style="$ctrl.componentStyle" no-header="true">
-			<panel-body class="juno-text">
-				<div class="text">
-					Drag here to add to my schedule
-				</div>
-			</panel-body>
-		</panel>
 	</div>
-	
-	<juno-divider class="width-100"
-					      component-style="$ctrl.componentStyle"
-					      slim="true">
-	</juno-divider>
 
 	<div class="list">
 		<div class="list-content" ng-style="$ctrl.getListScrollHeightStyle()">

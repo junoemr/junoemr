@@ -63,6 +63,25 @@ public class QueuedAppointmentService extends BaseService
 	}
 
 	/**
+	 * get a queued appointment
+	 * @param queuedAppointmentId - the queued appointment id to get
+	 * @param queueId - the queue from which to fetch the appointment
+	 * @param securityNo - the security no of the user performing the action
+	 * @return - the queued appointment
+	 */
+	public QueuedAppointment getQueuedAppointment(UUID queuedAppointmentId, UUID queueId, Integer securityNo)
+	{
+		try
+		{
+			return new QueuedAppointment(getOrganizationApi(securityNo).getAppointment(queuedAppointmentId, queueId));
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to get appointments in queue [" + queueId + "] from the AQS server", apiException);
+		}
+	}
+
+	/**
 	 * delete an appointment form the appointment queue
 	 * @param appointmentId - the remote id of the appointment to delete
 	 * @param queueId - the queue in which the appointment is contained

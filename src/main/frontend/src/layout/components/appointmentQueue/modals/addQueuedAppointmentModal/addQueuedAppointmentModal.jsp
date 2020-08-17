@@ -9,7 +9,7 @@
 	</p>
 
 	<div class="center-options flex-row align-items-flex-end">
-		<juno-button ng-click="$ctrl.onCancel()"
+		<juno-button ng-click="$ctrl.assignToMe()"
 								 component-style="$ctrl.resolve.style"
 								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
@@ -36,6 +36,13 @@
 								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT">
 			Cancel
+		</juno-button>
+		<juno-button ng-click="$ctrl.bookQueuedAppointment()"
+								 component-style="$ctrl.resolve.style"
+								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+								 disabled="!$ctrl.bookProviderNo">
+			Assign To Selected
 		</juno-button>
 	</div>
 

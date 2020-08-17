@@ -8,14 +8,24 @@
 	<p class="juno-text">
 		{{$ctrl.resolve.message}}
 	</p>
-	
-	<juno-input id="modal-input"
-					ng-model="$ctrl.value"
-          invalid="!$ctrl.validations.value() && $ctrl.hasSubmitted"
-          placeholder="Please enter reason here"
-					character-limit="$ctrl.resolve.characterLimit"
-					component-style="$ctrl.resolve.style">
+
+	<juno-input ng-if="$ctrl.inputModalType === $ctrl.JUNO_INPUT_MODAL_TYPE.TEXT"
+							class="modal-input"
+							ng-model="$ctrl.value"
+							invalid="!$ctrl.validations.value() && $ctrl.hasSubmitted"
+							placeholder="Please enter reason here"
+							character-limit="$ctrl.resolve.characterLimit"
+							component-style="$ctrl.resolve.style">
 	</juno-input>
+
+	<juno-select ng-if="$ctrl.inputModalType === $ctrl.JUNO_INPUT_MODAL_TYPE.SELECT"
+							 class="modal-input"
+							 ng-model="$ctrl.value"
+							 options="$ctrl.resolve.options"
+							 placeholder="Please Select An Option"
+							 component-style="$ctrl.resolve.style"
+	>
+	</juno-select>
 	
 	<juno-divider component-style="$ctrl.resolve.style"
 	              slim="true">

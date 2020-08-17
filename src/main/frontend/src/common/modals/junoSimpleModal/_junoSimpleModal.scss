@@ -3,6 +3,7 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	overflow: hidden !important;
 
 	$modal-border-radius: 8px;
 	--juno-simple-modal-width: 480px;

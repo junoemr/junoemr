@@ -71,3 +71,9 @@ export enum JUNO_TAB_TYPE
 	NORMAL = "juno-tab-normal",
 	SWIM_LANE = "juno-tab-swim-lane"
 }
+
+export enum JUNO_INPUT_MODAL_TYPE
+{
+	TEXT = "text",
+	SELECT = "select",
+}

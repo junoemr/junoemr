@@ -21,7 +21,12 @@
  * Canada
  */
 
-import {JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_BUTTON_COLOR_PATTERN} from "../../components/junoComponentConstants";
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_STYLE,
+	JUNO_BUTTON_COLOR_PATTERN,
+	JUNO_INPUT_MODAL_TYPE
+} from "../../components/junoComponentConstants";
 
 angular.module('Common.Components').component('junoInputModal',
 {
@@ -34,20 +39,27 @@ angular.module('Common.Components').component('junoInputModal',
 	{
 		let ctrl = this;
 
+		ctrl.JUNO_INPUT_MODAL_TYPE = JUNO_INPUT_MODAL_TYPE;
 		ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 		$scope.allValidationsValid = Juno.Validations.allValidationsValid;
 
+		ctrl.inputModalType = null;
 		ctrl.value = "";
 		ctrl.hasSubmitted = false;
 		ctrl.validations = {
 			value: Juno.Validations.validationFieldRequired(ctrl, "value"),
 		};
 
-
 		ctrl.$onInit = () =>
 		{
 			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
+			ctrl.inputModalType = ctrl.resolve.type || JUNO_INPUT_MODAL_TYPE.TEXT;
+
+			if (ctrl.inputModalType === JUNO_INPUT_MODAL_TYPE.SELECT)
+			{
+				ctrl.value = null;
+			}
 		}
 
 		ctrl.onKeyDown = (event) =>

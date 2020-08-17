@@ -1,6 +1,7 @@
 'use strict';
 
 import {JUNO_ALERT_MODES} from "../modals/junoAlert/junoAlertConstants";
+import {JUNO_INPUT_MODAL_TYPE} from "../components/junoComponentConstants";
 
 if (!window.Juno) window.Juno = {};
 
@@ -431,7 +432,7 @@ Juno.Common.Util.confirmationDialog = function(uibModal, title, message, style)
  * @param style - the style of the modal
  * @param okText - alternate text for the ok button. omit if you want default ("Ok").
  * @param characterLimit - limit the number of characters that can be entered in to the input box. omit for unlimited.
- * @returns {*}
+ * @returns {*} - user selection
  */
 Juno.Common.Util.openInputDialog = (uibModal, title, message, style, okText, characterLimit) =>
 {
@@ -446,6 +447,35 @@ Juno.Common.Util.openInputDialog = (uibModal, title, message, style, okText, cha
 					style: () => style,
 					okText: () => okText,
 					characterLimit: () => characterLimit,
+				}
+			}
+	).result;
+}
+
+/**
+ * display a select dialog to the user
+ * @param uibModal - the uib modal instance
+ * @param title - title of the modal
+ * @param message - message inside the modal
+ * @param options - the select menu options
+ * @param style - style of the modal
+ * @param okText - the text to display on the "ok" button. Leave blank for "Ok"
+ * @returns {*} - user selection
+ */
+Juno.Common.Util.openSelectDialog = (uibModal, title, message, options, style, okText) =>
+{
+	return uibModal.open(
+			{
+				component: 'junoInputModal',
+				backdrop: 'static',
+				windowClass: "juno-simple-modal-window",
+				resolve: {
+					title: () => title,
+					message: () => message,
+					style: () => style,
+					okText: () => okText,
+					options: () => options,
+					type: () => JUNO_INPUT_MODAL_TYPE.SELECT,
 				}
 			}
 	).result;
