@@ -46,7 +46,8 @@ public class AppointmentQueue
 		BeanUtils.copyProperties(queueDto, this, "id", "availability");
 		this.remoteId = queueDto.getId();
 
-		if(queueDto.getAvailability() != null)
+		boolean hasAvailabilitySettings = (queueDto.getAvailability() != null);
+		if(hasAvailabilitySettings)
 		{
 			this.availability = new QueueAvailability(queueDto.getAvailability());
 		}
