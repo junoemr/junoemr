@@ -39,28 +39,30 @@ public class QueueAvailabilitySettingsTransfer implements Serializable
 
 	public QueueAvailabilitySettingsTransfer()
 	{
-		this.enabled = true;
 		this.bookingHours = new QueueAvailabilityDayTransfer[7];
-		this.bookingHours[0] = new QueueAvailabilityDayTransfer("Monday", true, LocalTime.of(8,0), LocalTime.of(16,0));
-		this.bookingHours[1] = new QueueAvailabilityDayTransfer("Tuesday", true, LocalTime.of(8,0), LocalTime.of(16,0));
-		this.bookingHours[2] = new QueueAvailabilityDayTransfer("Wednesday", true, LocalTime.of(8,0), LocalTime.of(16,0));
-		this.bookingHours[3] = new QueueAvailabilityDayTransfer("Thursday", true, LocalTime.of(8,0), LocalTime.of(16,0));
-		this.bookingHours[4] = new QueueAvailabilityDayTransfer("Friday", true, LocalTime.of(8,0), LocalTime.of(16,0));
-		this.bookingHours[5] = new QueueAvailabilityDayTransfer("Saturday", false, LocalTime.of(8,0), LocalTime.of(14,0));
-		this.bookingHours[6] = new QueueAvailabilityDayTransfer("Sunday", false, LocalTime.of(8,0), LocalTime.of(14,0));
+		this.enabled = false;
+		initDefaultBookingHours();
 	}
 
-	public QueueAvailabilitySettingsTransfer(Boolean enabled, QueueAvailability availability)
+	public QueueAvailabilitySettingsTransfer(QueueAvailability availability)
 	{
-		this.enabled = enabled;
 		this.bookingHours = new QueueAvailabilityDayTransfer[7];
-		this.bookingHours[0] = new QueueAvailabilityDayTransfer("Monday", availability.getMonday());
-		this.bookingHours[1] = new QueueAvailabilityDayTransfer("Tuesday", availability.getTuesday());
-		this.bookingHours[2] = new QueueAvailabilityDayTransfer("Wednesday", availability.getWednesday());
-		this.bookingHours[3] = new QueueAvailabilityDayTransfer("Thursday", availability.getThursday());
-		this.bookingHours[4] = new QueueAvailabilityDayTransfer("Friday", availability.getFriday());
-		this.bookingHours[5] = new QueueAvailabilityDayTransfer("Saturday", availability.getSaturday());
-		this.bookingHours[6] = new QueueAvailabilityDayTransfer("Sunday", availability.getSunday());
+		this.enabled = (availability != null);
+
+		if(enabled)
+		{
+			this.bookingHours[0] = new QueueAvailabilityDayTransfer(1, availability.getSunday());
+			this.bookingHours[1] = new QueueAvailabilityDayTransfer(2, availability.getMonday());
+			this.bookingHours[2] = new QueueAvailabilityDayTransfer(3, availability.getTuesday());
+			this.bookingHours[3] = new QueueAvailabilityDayTransfer(4, availability.getWednesday());
+			this.bookingHours[4] = new QueueAvailabilityDayTransfer(5, availability.getThursday());
+			this.bookingHours[5] = new QueueAvailabilityDayTransfer(6, availability.getFriday());
+			this.bookingHours[6] = new QueueAvailabilityDayTransfer(7, availability.getSaturday());
+		}
+		else
+		{
+			initDefaultBookingHours();
+		}
 	}
 
 	public Boolean getEnabled()
@@ -81,5 +83,16 @@ public class QueueAvailabilitySettingsTransfer implements Serializable
 	public void setBookingHours(QueueAvailabilityDayTransfer[] bookingHours)
 	{
 		this.bookingHours = bookingHours;
+	}
+
+	private void initDefaultBookingHours()
+	{
+		this.bookingHours[0] = new QueueAvailabilityDayTransfer(1, false, LocalTime.of(8,0), LocalTime.of(14,0));
+		this.bookingHours[1] = new QueueAvailabilityDayTransfer(2, true, LocalTime.of(8,0), LocalTime.of(16,0));
+		this.bookingHours[2] = new QueueAvailabilityDayTransfer(3, true, LocalTime.of(8,0), LocalTime.of(16,0));
+		this.bookingHours[3] = new QueueAvailabilityDayTransfer(4, true, LocalTime.of(8,0), LocalTime.of(16,0));
+		this.bookingHours[4] = new QueueAvailabilityDayTransfer(5, true, LocalTime.of(8,0), LocalTime.of(16,0));
+		this.bookingHours[5] = new QueueAvailabilityDayTransfer(6, true, LocalTime.of(8,0), LocalTime.of(16,0));
+		this.bookingHours[6] = new QueueAvailabilityDayTransfer(7, false, LocalTime.of(8,0), LocalTime.of(14,0));
 	}
 }

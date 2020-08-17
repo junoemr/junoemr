@@ -9,6 +9,11 @@ angular.module('Common.Components').component('availabilitySettings',
 		controller: [function ()
 		{
 			let ctrl = this;
+
+			ctrl.getDayLabel = (weekday) =>
+			{
+				return Juno.Common.Util.ISODayString(weekday);
+			}
 		}],
 	}
 );

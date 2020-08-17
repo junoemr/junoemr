@@ -76,13 +76,7 @@ public class AppointmentQueueTo1 implements Serializable
 	{
 		BeanUtils.copyProperties(appointmentQueue, this, "name", "availability");
 		this.setQueueName(appointmentQueue.getName());
-
-		if(appointmentQueue.getAvailability() != null)
-		{
-			this.setAvailabilitySettings(new QueueAvailabilitySettingsTransfer(
-					appointmentQueue.getAvailable(), appointmentQueue.getAvailability())
-			);
-		}
+		this.setAvailabilitySettings(new QueueAvailabilitySettingsTransfer(appointmentQueue.getAvailability()));
 	}
 
 	public QueueInput asCreateQueueInput()
@@ -91,9 +85,11 @@ public class AppointmentQueueTo1 implements Serializable
 		createQueueInput.setName(this.getQueueName());
 		createQueueInput.setQueueLimit(this.getQueueLimit());
 
-		if(this.getAvailabilitySettings() != null)
+		// only send availability settings if the enabled flag is set.
+		QueueAvailabilitySettingsTransfer availabilitySettings = this.getAvailabilitySettings();
+		if(availabilitySettings != null && availabilitySettings.getEnabled())
 		{
-			QueueAvailability availabilityModel = new QueueAvailability(this.getAvailabilitySettings());
+			QueueAvailability availabilityModel = new QueueAvailability(availabilitySettings);
 			createQueueInput.setAvailability(availabilityModel.asAqsServerDto());
 		}
 		return createQueueInput;

@@ -21,7 +21,7 @@
 * Canada
 */
 
-import {JUNO_STYLE, LABEL_POSITION, labelStyle} from "../junoComponentConstants";
+import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
 
 angular.module('Common.Components').component('junoInput', {
 	templateUrl: 'src/common/components/junoInput/junoInput.jsp',

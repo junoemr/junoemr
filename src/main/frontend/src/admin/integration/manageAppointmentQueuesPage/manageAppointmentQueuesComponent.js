@@ -146,7 +146,7 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 										(transfer) =>
 										{
 											return {
-												dayOfWeek: transfer.dayOfWeek,
+												weekdayNumber: transfer.weekdayNumber,
 												enabled: transfer.enabled,
 												startTime: moment(transfer.startTime, "HH:mm:ss"),
 												endTime: moment(transfer.endTime, "HH:mm:ss"),

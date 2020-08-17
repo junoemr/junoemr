@@ -23,14 +23,16 @@
 <div class="availability-settings">
 	<panel component-style="$ctrl.componentStyle">
 		<panel-header>
-			<div class="row queues-header juno-text">
-				<div class="col-md-12">
-					<h6 class="d-inline-block">Availability Settings</h6>
-				</div>
+			<div class="queues-header juno-text">
+				<h6 class="d-inline-block">Availability Settings</h6>
+				<juno-check-box label="Enabled"
+				                ng-model="$ctrl.settingsModel.enabled"
+				                component-style="$ctrl.componentStyle">
+				</juno-check-box>
 			</div>
 		</panel-header>
 		<panel-body>
-			<div class="availability-wrapper">
+			<div class="availability-wrapper" ng-if="$ctrl.settingsModel.enabled">
 				<div class="time-selection">
 					<div class="time-selection-row">
 						<div class="col-time-selection-enabled">
@@ -53,7 +55,7 @@
 							</juno-check-box>
 						</div>
 						<div class="col-time-selection-label">
-							<label>{{day.dayOfWeek}}</label>
+							<label>{{$ctrl.getDayLabel(day.weekdayNumber)}}</label>
 						</div>
 						<div class="col-time-selection-start">
 							<juno-time-select ng-model="day.startTime"

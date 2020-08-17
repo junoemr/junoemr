@@ -20,6 +20,7 @@
 				<juno-input
 						label="Queue Limit"
 						ng-model="$ctrl.queueModel.queueLimit"
+						valid-regex="$ctrl.numberRegex"
 						component-style="$ctrl.resolve.style">
 				</juno-input>
 			</div>
@@ -32,7 +33,7 @@
 	</modal-body>
 
 	<modal-footer>
-		<div class="row">
+		<div class="row footer-wrapper">
 			<div class="col-md-6">
 				<juno-button component-style="$ctrl.resolve.style"
 				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"

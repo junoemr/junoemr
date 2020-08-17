@@ -34,7 +34,7 @@ import java.time.LocalTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QueueAvailabilityDayTransfer implements Serializable
 {
-	private String dayOfWeek;
+	private Integer weekdayNumber;
 	private boolean enabled;
 	private LocalTime startTime;
 	private LocalTime endTime;
@@ -42,29 +42,54 @@ public class QueueAvailabilityDayTransfer implements Serializable
 	public QueueAvailabilityDayTransfer()
 	{
 	}
-	public QueueAvailabilityDayTransfer(String day, boolean enabled, LocalTime start, LocalTime end)
+
+	/**
+	 * create a new transfer object
+	 * @param weekdayNumber - the ISO weekday index 1-7, where 1 is Sunday, 7 = Saturday
+	 * @param enabled - is the day enabled
+	 * @param start start time
+	 * @param end end time
+	 */
+	public QueueAvailabilityDayTransfer(Integer weekdayNumber, boolean enabled, LocalTime start, LocalTime end)
 	{
-		this.dayOfWeek = day;
+		this.weekdayNumber = weekdayNumber;
 		this.enabled = enabled;
 		this.startTime = start;
 		this.endTime = end;
 	}
-	public QueueAvailabilityDayTransfer(String day, QueueAvailabilityDay availabilityDay)
+
+	/**
+	 * create a new transfer object from the QueueAvailabilityDay model
+	 * @param weekdayNumber - the ISO weekday index 1-7, where 1 is Sunday, 7 = Saturday
+	 * @param availabilityDay - model object, if null default settings will be used
+	 */
+	public QueueAvailabilityDayTransfer(Integer weekdayNumber, QueueAvailabilityDay availabilityDay)
 	{
-		this.dayOfWeek = day;
-		this.enabled = availabilityDay.getEnabled();
-		this.startTime = availabilityDay.getStart();
-		this.endTime = availabilityDay.getStop();
+		this.weekdayNumber = weekdayNumber;
+		if(availabilityDay != null)
+		{
+			this.enabled = true;
+			this.startTime = availabilityDay.getStart();
+			this.endTime = availabilityDay.getStop();
+		}
+		else
+		{
+			// use default time settings
+			this.enabled = false;
+			this.startTime = LocalTime.of(8, 0);
+			this.endTime = LocalTime.of(16, 0);
+		}
+
 	}
 
-	public String getDayOfWeek()
+	public Integer getWeekdayNumber()
 	{
-		return dayOfWeek;
+		return weekdayNumber;
 	}
 
-	public void setDayOfWeek(String dayOfWeek)
+	public void setWeekdayNumber(Integer weekdayNumber)
 	{
-		this.dayOfWeek = dayOfWeek;
+		this.weekdayNumber = weekdayNumber;
 	}
 
 	public boolean isEnabled()

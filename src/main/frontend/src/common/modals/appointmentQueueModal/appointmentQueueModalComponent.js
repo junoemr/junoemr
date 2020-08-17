@@ -48,6 +48,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+				ctrl.numberRegex=/^\d*$/
 				ctrl.editMode = false;
 				ctrl.queueModel = {};
 				ctrl.isLoading = true;
@@ -60,10 +61,6 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					if(ctrl.editMode)
 					{
 						ctrl.queueModel = angular.copy(ctrl.resolve.queue);
-						if(!ctrl.queueModel.availabilitySettings)
-						{
-							ctrl.queueModel.availabilitySettings = ctrl.getDefaultAvailabilitySettings();
-						}
 					}
 					else
 					{
@@ -74,7 +71,11 @@ angular.module('Common.Components').component('appointmentQueueModal',
 
 				ctrl.saveDisabled = () =>
 				{
-					return ctrl.isLoading || ctrl.queueModel.queueName == null || ctrl.queueModel.queueName.length < 1;
+					return ctrl.isLoading ||
+						ctrl.queueModel.queueName === null ||
+						ctrl.queueModel.queueName.length < 1 ||
+						ctrl.queueModel.queueLimit === null ||
+						ctrl.queueModel.queueLimit.length < 1;
 				}
 
 				ctrl.onSave = () =>
@@ -103,7 +104,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 						(localSettings) =>
 						{
 							return {
-								dayOfWeek: localSettings.dayOfWeek,
+								weekdayNumber: localSettings.weekdayNumber,
 								enabled: localSettings.enabled,
 								startTime: localSettings.startTime.format("HH:mm:ss"),
 								endTime: localSettings.endTime.format("HH:mm:ss"),
@@ -131,70 +132,38 @@ angular.module('Common.Components').component('appointmentQueueModal',
 						id: null,
 						queueName: "",
 						queueLimit: 10,
-						queueColor: "#ffffff",
-						organizationId: null,
+						queueColor: null,
 						createdAt: null,
-						updatedAt: null,
-						createdBy: null,
-						createdByType: null,
-						updatedBy: null,
-						updatedByType: null,
 						availabilitySettings: ctrl.getDefaultAvailabilitySettings(),
 					}
 				}
 				ctrl.getDefaultAvailabilitySettings = () =>
 				{
-					const defaultStartHour = 8;
-					const defaultEndHour = 16;
-
-					// TODO is there a better way to set up the empty objects?
 					return {
 						enabled: false,
 						bookingHours: [
-							{
-								dayOfWeek: "Monday",
-								enabled: false,
-								startTime: moment({hour: defaultStartHour}),
-								endTime: moment({hour: defaultEndHour}),
-							},
-							{
-								dayOfWeek: "Tuesday",
-								enabled: false,
-								startTime: moment({hour: defaultStartHour}),
-								endTime: moment({hour: defaultEndHour}),
-							},
-							{
-								dayOfWeek: "Wednesday",
-								enabled: false,
-								startTime: moment({hour: defaultStartHour}),
-								endTime: moment({hour: defaultEndHour}),
-							},
-							{
-								dayOfWeek: "Thursday",
-								enabled: false,
-								startTime: moment({hour: defaultStartHour}),
-								endTime: moment({hour: defaultEndHour}),
-							},
-							{
-								dayOfWeek: "Friday",
-								enabled: false,
-								startTime: moment({hour: defaultStartHour}),
-								endTime: moment({hour: defaultEndHour}),
-							},
-							{
-								dayOfWeek: "Saturday",
-								enabled: false,
-								startTime: moment({hour: defaultStartHour}),
-								endTime: moment({hour: defaultEndHour}),
-							},
-							{
-								dayOfWeek: "Sunday",
-								enabled: false,
-								startTime: moment({hour: defaultStartHour}),
-								endTime: moment({hour: defaultEndHour}),
-							},
+							ctrl.getDefaultBookingHours(1),
+							ctrl.getDefaultBookingHours(2),
+							ctrl.getDefaultBookingHours(3),
+							ctrl.getDefaultBookingHours(4),
+							ctrl.getDefaultBookingHours(5),
+							ctrl.getDefaultBookingHours(6),
+							ctrl.getDefaultBookingHours(7),
 						],
 					}
+				}
+
+				ctrl.getDefaultBookingHours = (weekdayNumber) =>
+				{
+					const defaultStartHour = 8;
+					const defaultEndHour = 16;
+
+					return {
+						weekdayNumber: weekdayNumber,
+						enabled: false,
+						startTime: moment({hour: defaultStartHour}),
+						endTime: moment({hour: defaultEndHour}),
+					};
 				}
 			}]
 	});

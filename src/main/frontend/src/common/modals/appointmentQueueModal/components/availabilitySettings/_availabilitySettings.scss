@@ -2,6 +2,14 @@
 	$time-table-min-width: 620px;
 	overflow-y: auto;
 
+	.panel-header {
+		.queues-header {
+			display:flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+		}
+	}
 	.panel-body {
 		padding: 0;
 
@@ -11,7 +19,7 @@
 
 			.time-selection {
 				flex-grow: 1;
-				padding: 4px 12px;
+				padding: 8px 12px;
 
 				.time-selection-row {
 					padding: 4px 0;
@@ -24,13 +32,14 @@
 						width: 10%;
 					}
 					.col-time-selection-label {
-						width: 20%;
+						width: 15%;
 					}
 					.col-time-selection-start {
 						width: 35%;
 					}
 					.col-time-selection-end {
 						width: 35%;
+						margin-left: 5%;
 					}
 
 					label {

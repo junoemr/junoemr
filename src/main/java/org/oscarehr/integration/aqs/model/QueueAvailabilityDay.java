@@ -32,19 +32,16 @@ import java.time.LocalTime;
 @Getter @Setter
 public class QueueAvailabilityDay
 {
-	private Boolean enabled;
 	private LocalTime start;
 	private LocalTime stop;
 
 	public QueueAvailabilityDay(ca.cloudpractice.aqs.client.model.QueueAvailabilityDay aqsServerDto)
 	{
-		this.enabled = true; // TODO - where does this live?
 		this.start = ConversionUtils.toLocalTime(aqsServerDto.getStart());
 		this.stop = ConversionUtils.toLocalTime(aqsServerDto.getStop());
 	}
 	public QueueAvailabilityDay(QueueAvailabilityDayTransfer availabilityDayDto)
 	{
-		this.enabled = availabilityDayDto.isEnabled();
 		this.start = availabilityDayDto.getStartTime();
 		this.stop = availabilityDayDto.getEndTime();
 	}
@@ -54,8 +51,6 @@ public class QueueAvailabilityDay
 		ca.cloudpractice.aqs.client.model.QueueAvailabilityDay dto = new ca.cloudpractice.aqs.client.model.QueueAvailabilityDay();
 		dto.setStart(ConversionUtils.toTimeString(this.getStart()));
 		dto.setStop(ConversionUtils.toTimeString(this.getStop()));
-		// TODO set enabled flag
-
 		return dto;
 	}
 }
