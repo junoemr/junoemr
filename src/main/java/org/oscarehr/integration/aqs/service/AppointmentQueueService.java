@@ -85,6 +85,13 @@ public class AppointmentQueueService extends BaseService
 
 	public void deleteAppointmentQueue(UUID queueId, Integer securityNo)
 	{
-		//TODO delete from AQS Server
+		try
+		{
+			getOrganizationApi(securityNo).deleteQueue(queueId);
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to delete appointment queue [" + queueId + "] on the AQS server", apiException);
+		}
 	}
 }
