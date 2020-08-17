@@ -421,9 +421,17 @@ public class ConversionUtilsTest
 	}
 
 	@Test
-	public void toTimeString_NullParameter_ExpectEmptyString()
+	public void toTimeString_NullDate_ExpectEmptyString()
 	{
-		Assert.assertEquals("", ConversionUtils.toTimeString(null));
+		Date testDate = null;
+		Assert.assertEquals("", ConversionUtils.toTimeString(testDate));
+	}
+
+	@Test
+	public void toTimeString_NullLocalTime_ExpectEmptyString()
+	{
+		LocalTime testTime = null;
+		Assert.assertEquals("", ConversionUtils.toTimeString(testTime));
 	}
 
 	@Test
@@ -439,6 +447,24 @@ public class ConversionUtilsTest
 		String expectedTimeString = formatter.format(today);
 
 		Assert.assertEquals(expectedTimeString, ConversionUtils.toTimeString(today));
+	}
+
+	@Test
+	public void toTimeString_FixedLocalTime_ExpectTimeString()
+	{
+		LocalTime testTime = LocalTime.of(13, 32, 0);
+		String expectedTimeString = "13:32:00";
+
+		Assert.assertEquals(expectedTimeString, ConversionUtils.toTimeString(testTime));
+	}
+
+	@Test
+	public void toTimeString_FixedLocalTimeWithFormat_ExpectTimeString()
+	{
+		LocalTime testTime = LocalTime.of(13, 32, 0);
+		String expectedTimeString = "13/32/00";
+
+		Assert.assertEquals(expectedTimeString, ConversionUtils.toTimeString(testTime, "HH/mm/ss"));
 	}
 
 	@Test

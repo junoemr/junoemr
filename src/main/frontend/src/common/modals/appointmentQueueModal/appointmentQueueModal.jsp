@@ -10,22 +10,30 @@
 
 	<modal-body>
 		<div class="queue-options-container">
-			<juno-input
-					label="Queue Name"
-					ng-model="$ctrl.queueModel.queueName"
-					component-style="$ctrl.resolve.style">
-			</juno-input>
+			<div class="options-common">
+				<juno-input
+						label="Queue Name"
+						ng-model="$ctrl.queueModel.queueName"
+						component-style="$ctrl.resolve.style">
+				</juno-input>
 
-			<juno-input
-					label="Queue Limit"
-					ng-model="$ctrl.queueModel.queueLimit"
-					component-style="$ctrl.resolve.style">
-			</juno-input>
+				<juno-input
+						label="Queue Limit"
+						ng-model="$ctrl.queueModel.queueLimit"
+						valid-regex="$ctrl.numberRegex"
+						component-style="$ctrl.resolve.style">
+				</juno-input>
+			</div>
+			<div class="options-availability">
+				<availability-settings settings-model="$ctrl.queueModel.availabilitySettings"
+				                       component-style="$ctrl.componentStyle">
+				</availability-settings>
+			</div>
 		</div>
 	</modal-body>
 
 	<modal-footer>
-		<div class="row">
+		<div class="row footer-wrapper">
 			<div class="col-md-6">
 				<juno-button component-style="$ctrl.resolve.style"
 				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"

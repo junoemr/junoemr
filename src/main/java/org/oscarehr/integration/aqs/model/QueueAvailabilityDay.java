@@ -22,34 +22,35 @@
  */
 package org.oscarehr.integration.aqs.model;
 
-import ca.cloudpractice.aqs.client.model.QueueDto;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.BeanUtils;
+import org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilityDayTransfer;
+import oscar.util.ConversionUtils;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
+import java.time.LocalTime;
 
 @Getter @Setter
-public class AppointmentQueue
+public class QueueAvailabilityDay
 {
-	private UUID remoteId;
-	private String name;
-	private Integer queueLimit;
-	private String queueColor;
-	private OffsetDateTime createdAt;
-	private QueueAvailability availability;
-	private Boolean available;
+	private LocalTime start;
+	private LocalTime stop;
 
-	public AppointmentQueue(QueueDto queueDto)
+	public QueueAvailabilityDay(ca.cloudpractice.aqs.client.model.QueueAvailabilityDay aqsServerDto)
 	{
-		BeanUtils.copyProperties(queueDto, this, "id", "availability");
-		this.remoteId = queueDto.getId();
+		this.start = ConversionUtils.toLocalTime(aqsServerDto.getStart());
+		this.stop = ConversionUtils.toLocalTime(aqsServerDto.getStop());
+	}
+	public QueueAvailabilityDay(QueueAvailabilityDayTransfer availabilityDayDto)
+	{
+		this.start = availabilityDayDto.getStartTime();
+		this.stop = availabilityDayDto.getEndTime();
+	}
 
-		boolean hasAvailabilitySettings = (queueDto.getAvailability() != null);
-		if(hasAvailabilitySettings)
-		{
-			this.availability = new QueueAvailability(queueDto.getAvailability());
-		}
+	public ca.cloudpractice.aqs.client.model.QueueAvailabilityDay asAqsServerDto()
+	{
+		ca.cloudpractice.aqs.client.model.QueueAvailabilityDay dto = new ca.cloudpractice.aqs.client.model.QueueAvailabilityDay();
+		dto.setStart(ConversionUtils.toTimeString(this.getStart()));
+		dto.setStop(ConversionUtils.toTimeString(this.getStop()));
+		return dto;
 	}
 }

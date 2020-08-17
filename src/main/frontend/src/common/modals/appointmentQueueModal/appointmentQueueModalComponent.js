@@ -21,7 +21,7 @@
  * Canada
  */
 
-import {LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_STYLE, JUNO_BUTTON_COLOR_PATTERN} from "../../components/junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../components/junoComponentConstants";
 import {AqsQueuesApi} from "../../../../generated";
 
 angular.module('Common.Components').component('appointmentQueueModal',
@@ -48,9 +48,10 @@ angular.module('Common.Components').component('appointmentQueueModal',
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+				ctrl.numberRegex=/^\d*$/
 				ctrl.editMode = false;
 				ctrl.queueModel = {};
-				ctrl.isoading = true;
+				ctrl.isLoading = true;
 
 				ctrl.$onInit = () =>
 				{
@@ -63,26 +64,18 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					}
 					else
 					{
-						ctrl.queueModel = {
-							id: null,
-							queueName: "",
-							queueLimit: 10,
-							queueColor: "#ffffff",
-							organizationId: null,
-							createdAt: null,
-							updatedAt: null,
-							createdBy: null,
-							createdByType: null,
-							updatedBy: null,
-							updatedByType: null,
-						}
+						ctrl.queueModel = ctrl.getEmptyModel();
 					}
-					ctrl.isoading = false;
+					ctrl.isLoading = false;
 				}
 
 				ctrl.saveDisabled = () =>
 				{
-					return ctrl.isoading || ctrl.queueModel.queueName == null || ctrl.queueModel.queueName.length < 1;
+					return ctrl.isLoading ||
+						ctrl.queueModel.queueName === null ||
+						ctrl.queueModel.queueName.length < 1 ||
+						ctrl.queueModel.queueLimit === null ||
+						ctrl.queueModel.queueLimit.length < 1;
 				}
 
 				ctrl.onSave = () =>
@@ -90,7 +83,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					ctrl.isoading = true;
 					const onSaveSuccess = (response) =>
 					{
-						ctrl.modalInstance.close(response.data.body);
+						ctrl.modalInstance.close(ctrl.queueModel);
 						ctrl.isoading = false;
 					}
 					const onSaveError = (error) =>
@@ -101,19 +94,76 @@ angular.module('Common.Components').component('appointmentQueueModal',
 						ctrl.isoading = false;
 					}
 
+					// convert moment to string before transferring
+					// TODO better wat to serialize moment to LocalTime compatible string?
+					// need a copy so we don't try to read moments from original object
+					let queueCopy = {};
+					angular.copy(ctrl.queueModel, queueCopy);
+
+					queueCopy.availabilitySettings.bookingHours = ctrl.queueModel.availabilitySettings.bookingHours.map(
+						(localSettings) =>
+						{
+							return {
+								weekdayNumber: localSettings.weekdayNumber,
+								enabled: localSettings.enabled,
+								startTime: localSettings.startTime.format("HH:mm:ss"),
+								endTime: localSettings.endTime.format("HH:mm:ss"),
+							}
+						});
+
 					if (ctrl.editMode)
 					{
-						aqsQueuesApi.updateAppointmentQueue(ctrl.queueModel.id, ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
+						aqsQueuesApi.updateAppointmentQueue(queueCopy.id, queueCopy).then(onSaveSuccess).catch(onSaveError);
 					}
 					else
 					{
-						aqsQueuesApi.createAppointmentQueue(ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
+						aqsQueuesApi.createAppointmentQueue(queueCopy).then(onSaveSuccess).catch(onSaveError);
 					}
 				}
 
 				ctrl.onCancel = () =>
 				{
 					ctrl.modalInstance.dismiss("modal cancelled");
+				}
+
+				ctrl.getEmptyModel = () =>
+				{
+					return {
+						id: null,
+						queueName: "",
+						queueLimit: 10,
+						queueColor: null,
+						createdAt: null,
+						availabilitySettings: ctrl.getDefaultAvailabilitySettings(),
+					}
+				}
+				ctrl.getDefaultAvailabilitySettings = () =>
+				{
+					return {
+						enabled: false,
+						bookingHours: [
+							ctrl.getDefaultBookingHours(1),
+							ctrl.getDefaultBookingHours(2),
+							ctrl.getDefaultBookingHours(3),
+							ctrl.getDefaultBookingHours(4),
+							ctrl.getDefaultBookingHours(5),
+							ctrl.getDefaultBookingHours(6),
+							ctrl.getDefaultBookingHours(7),
+						],
+					}
+				}
+
+				ctrl.getDefaultBookingHours = (weekdayNumber) =>
+				{
+					const defaultStartHour = 8;
+					const defaultEndHour = 16;
+
+					return {
+						weekdayNumber: weekdayNumber,
+						enabled: false,
+						startTime: moment({hour: defaultStartHour}),
+						endTime: moment({hour: defaultEndHour}),
+					};
 				}
 			}]
 	});

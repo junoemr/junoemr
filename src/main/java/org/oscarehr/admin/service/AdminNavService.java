@@ -88,7 +88,7 @@ public class AdminNavService
 		}
 		if (securityInfoManager.hasOnePrivileges(providerNo, securityInfoManager.READ, null, "_admin", "_admin.schedule"))
 		{
-			adminNavList.add(getAdminNavSchedule(contextPath, resourceBundle));
+			adminNavList.add(getAdminNavSchedule(contextPath, resourceBundle, providerNo));
 		}
 		if (oscarProperties.isPropertyActive("caisi"))
 		{// CAISI module loaded
@@ -404,7 +404,7 @@ public class AdminNavService
 		return echartGroup;
 	}
 
-	private AdminNavGroupTo1 getAdminNavSchedule(String contextPath, ResourceBundle resourceBundle)
+	private AdminNavGroupTo1 getAdminNavSchedule(String contextPath, ResourceBundle resourceBundle, String providerNo)
 	{
 		AdminNavGroupTo1 scheduleGroup = new AdminNavGroupTo1();
 		List<AdminNavItemTo1> scheduleItems = new ArrayList<>();
@@ -423,7 +423,12 @@ public class AdminNavService
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGroupNoAcl"), "frame?frameUrl=" + contextPath + "/admin/groupnoacl.jsp"));
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGroupPreference"), "frame?frameUrl=" + contextPath + "/admin/groupPreferences.jsp"));
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.preventionNotification.title"), "frame?frameUrl=" + contextPath + "/oscarPrevention/PreventionManager.jsp"));
-		scheduleItems.add(new AdminNavItemTo1("Manage Appointment Queues", "manageAppointmentQueues"));
+
+		// TODO remove super admin requirement when ready for general use
+		if(securityInfoManager.isSuperAdmin(providerNo))
+		{
+			scheduleItems.add(new AdminNavItemTo1("Manage Appointment Queues", "manageAppointmentQueues"));
+		}
 
 		scheduleGroup.setItems(scheduleItems);
 		return scheduleGroup;

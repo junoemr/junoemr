@@ -30,6 +30,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import lombok.Getter;
 import lombok.Setter;
 import org.oscarehr.integration.aqs.model.AppointmentQueue;
+import org.oscarehr.integration.aqs.model.QueueAvailability;
 import org.springframework.beans.BeanUtils;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -52,6 +53,8 @@ public class AppointmentQueueTo1 implements Serializable
 	@JsonSerialize(using = OffsetDateTimeSerializer.class)
 	private OffsetDateTime createdAt;
 
+	private QueueAvailabilitySettingsTransfer availabilitySettings;
+
 	public static List<AppointmentQueueTo1> fromAppointmentQueueList(List<AppointmentQueue> appointmentQueues)
 	{
 		ArrayList<AppointmentQueueTo1> appointmentQueueTo1s = new ArrayList<>();
@@ -71,8 +74,9 @@ public class AppointmentQueueTo1 implements Serializable
 
 	public AppointmentQueueTo1(AppointmentQueue appointmentQueue)
 	{
-		BeanUtils.copyProperties(appointmentQueue, this, "name");
+		BeanUtils.copyProperties(appointmentQueue, this, "name", "availability");
 		this.setQueueName(appointmentQueue.getName());
+		this.setAvailabilitySettings(new QueueAvailabilitySettingsTransfer(appointmentQueue.getAvailability()));
 	}
 
 	public QueueInput asCreateQueueInput()
@@ -80,6 +84,24 @@ public class AppointmentQueueTo1 implements Serializable
 		QueueInput createQueueInput = new QueueInput();
 		createQueueInput.setName(this.getQueueName());
 		createQueueInput.setQueueLimit(this.getQueueLimit());
+
+		// only send availability settings if the enabled flag is set.
+		QueueAvailabilitySettingsTransfer availabilitySettings = this.getAvailabilitySettings();
+		if(availabilitySettings != null && availabilitySettings.getEnabled())
+		{
+			QueueAvailability availabilityModel = new QueueAvailability(availabilitySettings);
+			createQueueInput.setAvailability(availabilityModel.asAqsServerDto());
+		}
 		return createQueueInput;
+	}
+
+	public QueueAvailabilitySettingsTransfer getAvailabilitySettings()
+	{
+		return availabilitySettings;
+	}
+
+	public void setAvailabilitySettings(QueueAvailabilitySettingsTransfer availabilitySettings)
+	{
+		this.availabilitySettings = availabilitySettings;
 	}
 }

@@ -500,3 +500,22 @@ Juno.Common.Util.typeaheadValueLookup = function(value, options)
 
 	return value;
 };
+
+/**
+ * returns the name of the day, given the ISO weekday index 1-7.
+ * Where 1 = Sunday, and 7 = Saturday
+ */
+Juno.Common.Util.ISODayString = function(weekday)
+{
+	switch (weekday)
+	{
+		case 1: return "Sunday";
+		case 2: return "Monday";
+		case 3: return "Tuesday";
+		case 4: return "Wednesday";
+		case 5: return "Thursday";
+		case 6: return "Friday";
+		case 7: return "Saturday";
+		default: throw "Invalid Weekday index '" + weekday + "' (must be in range of 1-7)";
+	}
+}

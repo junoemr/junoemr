@@ -241,6 +241,15 @@ public class ConversionUtils {
 		return date.format(format);
 	}
 
+	public static String toTimeString(LocalTime time, String formatPattern) {
+		if (time == null) {
+			return "";
+		}
+
+		DateTimeFormatter format = DateTimeFormatter.ofPattern(formatPattern);
+		return time.format(format);
+	}
+
 	/**
 	 * Formats the date instance into a string keeping only the time of the day and excluding the remaining info.   
 	 * 
@@ -251,6 +260,10 @@ public class ConversionUtils {
 	 */
 	public static String toTimeString(Date time) {
 		return toDateString(time, DEFAULT_TIME_PATTERN);
+	}
+
+	public static String toTimeString(LocalTime time) {
+		return toTimeString(time, DEFAULT_TIME_PATTERN);
 	}
 
 	/**
