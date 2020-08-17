@@ -73,7 +73,7 @@ public class QueuedAppointmentService extends BaseService
 	{
 		try
 		{
-			return new QueuedAppointment(getOrganizationApi(securityNo).getAppointment(queuedAppointmentId, queueId));
+			return new QueuedAppointment(getOrganizationApi(securityNo).getAppointment(queuedAppointmentId));
 		}
 		catch (ApiException apiException)
 		{
