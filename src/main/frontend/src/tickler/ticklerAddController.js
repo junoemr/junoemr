@@ -132,27 +132,30 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				return;
 			}
 
-			var t = {};
-			t.demographicNo = controller.tickler.demographic.demographicNo;
-			t.taskAssignedTo = controller.tickler.taskAssignedTo;
-			t.priority = controller.tickler.priority;
-			t.status = 'A';
-			t.message = controller.tickler.message;
+			var tickler = {};
+			tickler.demographicNo = controller.tickler.demographic.demographicNo;
+			tickler.taskAssignedTo = controller.tickler.taskAssignedTo;
+			tickler.priority = controller.tickler.priority;
+			tickler.status = 'A';
+			tickler.message = controller.tickler.message;
 
 			var givenDate = controller.tickler.serviceDateDate;
 			var givenTime = moment(controller.tickler.serviceDateTime, 'hh:mm A');
 			givenDate.setHours(givenTime.get('hour'));
 			givenDate.setMinutes(givenTime.get('minute'));
 
-			t.serviceDate = givenDate;
-			ticklerService.add(t).then(function(data)
-			{
-				$uibModalInstance.close(true);
-			}, function(reason)
-			{
-				controller.isDisabled = false; // Enable save button if adding tickler failed
-				alert(reason);
-			});
+			tickler.serviceDate = givenDate;
+            ticklerService.add(tickler).then(
+                (response) =>
+                {
+                    $uibModalInstance.close(true);
+                }).catch((error) =>
+                {
+                    alert(error);
+                }).finally(() =>
+                {
+                    controller.isDisabled = false;
+                });
 
 
 		};
