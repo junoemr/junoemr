@@ -14,7 +14,9 @@ Juno.Common.Util.settings = {
 	datetime_no_timezone_format: "YYYY-MM-DDTHH:mm:ss",
 	time_format: "h:mma",
 	date_format: "YYYY-MM-DD",
-	dayofweek_format: "dddd"
+	dayofweek_format: "dddd",
+
+	defaultTimeFormat: "HH:mm:ss"
 };
 
 Juno.Common.Util.DisplaySettings = {

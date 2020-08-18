@@ -28,6 +28,14 @@ import lombok.Setter;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilityDayTransfer;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer;
 
+import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_FRIDAY;
+import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_MONDAY;
+import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_SATURDAY;
+import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_SUNDAY;
+import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_THURSDAY;
+import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_TUESDAY;
+import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_WEDNESDAY;
+
 @Getter @Setter
 public class QueueAvailability
 {
@@ -52,13 +60,13 @@ public class QueueAvailability
 
 	public QueueAvailability(QueueAvailabilitySettingsTransfer availabilitySettingsDto)
 	{
-		this.sunday = getDayAvailability(availabilitySettingsDto, 0);
-		this.monday = getDayAvailability(availabilitySettingsDto, 1);
-		this.tuesday = getDayAvailability(availabilitySettingsDto, 2);
-		this.wednesday = getDayAvailability(availabilitySettingsDto, 3);
-		this.thursday = getDayAvailability(availabilitySettingsDto, 4);
-		this.friday = getDayAvailability(availabilitySettingsDto, 5);
-		this.saturday = getDayAvailability(availabilitySettingsDto, 6);
+		this.sunday = getDayAvailability(availabilitySettingsDto, INDEX_SUNDAY);
+		this.monday = getDayAvailability(availabilitySettingsDto, INDEX_MONDAY);
+		this.tuesday = getDayAvailability(availabilitySettingsDto, INDEX_TUESDAY);
+		this.wednesday = getDayAvailability(availabilitySettingsDto, INDEX_WEDNESDAY);
+		this.thursday = getDayAvailability(availabilitySettingsDto, INDEX_THURSDAY);
+		this.friday = getDayAvailability(availabilitySettingsDto, INDEX_FRIDAY);
+		this.saturday = getDayAvailability(availabilitySettingsDto, INDEX_SATURDAY);
 	}
 
 	public QueueAvailabilityDto asAqsServerDto()
@@ -84,14 +92,14 @@ public class QueueAvailability
 		return null;
 	}
 
-	private QueueAvailabilityDay getDayAvailability(QueueAvailabilitySettingsTransfer transfer, int dayOfWeek)
+	private QueueAvailabilityDay getDayAvailability(QueueAvailabilitySettingsTransfer transfer, int dayOfWeekIndex)
 	{
 		QueueAvailabilityDayTransfer[] bookingHours = transfer.getBookingHours();
 		QueueAvailabilityDay availabilityDay = null;
 
-		if(bookingHours.length > dayOfWeek)
+		if(bookingHours.length > dayOfWeekIndex)
 		{
-			QueueAvailabilityDayTransfer availability = bookingHours[dayOfWeek];
+			QueueAvailabilityDayTransfer availability = bookingHours[dayOfWeekIndex];
 
 			// the aqs server expects only enabled day availability objects. use null to signify disabled
 			if(availability.isEnabled())
