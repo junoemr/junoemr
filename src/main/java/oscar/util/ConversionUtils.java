@@ -72,6 +72,7 @@ public class ConversionUtils {
 	public static final String DATE_TIME_ZONE_OFFSET_x_PATTERN = "yyyy-MM-dd HH:mm:ss x";
 
 	public static final String HL7_DATE_TIME_OFFICIAL_FULL_PATTERN = "yyyyMMddHHmmssx";
+	public static final String HL7_DATE_TIME_DEFAULT_IN_PATTERN = "yyyyMMddHHmmss";
 
 	public static final String TS_NO_SEC_PATTERN = "yyyy-MM-dd H:mm";
 

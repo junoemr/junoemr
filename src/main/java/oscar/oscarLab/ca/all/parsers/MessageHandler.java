@@ -1146,15 +1146,15 @@ public abstract class MessageHandler
 
 	protected String formatDateTime(String plain)
 	{
-		return formatDateTime(plain, "yyyyMMddHHmmss", ConversionUtils.DEFAULT_TS_PATTERN);
+		return formatDateTime(plain, ConversionUtils.HL7_DATE_TIME_DEFAULT_IN_PATTERN, ConversionUtils.DEFAULT_TS_PATTERN);
 	}
 	protected String formatDate(String plain)
 	{
-		return formatDateTime(plain, "yyyyMMddHHmmss", ConversionUtils.DEFAULT_DATE_PATTERN);
+		return formatDateTime(plain, ConversionUtils.HL7_DATE_TIME_DEFAULT_IN_PATTERN, ConversionUtils.DEFAULT_DATE_PATTERN);
 	}
 	protected String formatTime(String plain)
 	{
-		return formatDateTime(plain, "yyyyMMddHHmmss", ConversionUtils.DEFAULT_TIME_PATTERN);
+		return formatDateTime(plain, ConversionUtils.HL7_DATE_TIME_DEFAULT_IN_PATTERN, ConversionUtils.DEFAULT_TIME_PATTERN);
 	}
 
 	protected String formatDateTime(String plain, String inFormat, String outFormat)
