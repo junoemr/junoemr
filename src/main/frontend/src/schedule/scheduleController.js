@@ -892,7 +892,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let statusElem = eventElement.find('.icon-status');
 				let labelElem = eventElement.find('.event-label');
 				let detailElem = eventElement.find('.event-details');
-				let selfBookElem = eventElement.find('.self-book-indicator');
+				let bookingStatusElem = eventElement.find('.book-status-container');
 				let telehealthElem = eventElement.find('.event-telehealth');
 				// By default this element is hidden
 				telehealthElem.hide();
@@ -976,11 +976,25 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 
 				// mark self booked appointments
+				// TODO: Can we move this to the template?
 				if(Juno.Common.Util.exists(event.data.tagSelfBooked) && event.data.tagSelfBooked)
 				{
-					selfBookElem.addClass('visible');
-					selfBookElem.attr("title", "Self Booked");
+					let text = bookingStatusElem.attr("title") ? bookingStatusElem.attr("title") : "";
+					bookingStatusElem.attr("title",  text + " Self Booked |");
+					bookingStatusElem.children(".booking-status-box").children(".self-booked-status").addClass("visible");
 					detailElem.parent().addClass('show-self-booked');
+				}
+
+				if (event.data.confirmed)
+				{
+					let text = bookingStatusElem.attr("title") ? bookingStatusElem.attr("title") : "";
+					bookingStatusElem.attr("title", text + " Confirmed |");
+					bookingStatusElem.children(".booking-status-box").find('.confirmed-appointment').addClass('visible');
+				}
+
+				if (event.data.tagSelfBooked || event.data.confirmed)
+				{
+					bookingStatusElem.addClass("visible");
 				}
 
 				var maxNameLengthProp = controller.providerSettings.patientNameLength;

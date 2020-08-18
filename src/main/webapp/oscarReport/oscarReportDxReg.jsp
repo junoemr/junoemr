@@ -37,11 +37,6 @@ if(!authed) {
 }
 %>
 
-<%@ page import="org.oscarehr.common.dao.DxresearchDAO"%>
-<%@ page import="org.oscarehr.common.model.Dxresearch"%>
-<%@ page import="oscar.oscarResearch.oscarDxResearch.util.*"%>
-<%@ page import="java.util.*, java.sql.*"%>
-
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
@@ -57,24 +52,24 @@ if(!authed) {
     <head>
         <title><bean:message key="admin.admin.DiseaseRegistry"/></title>
     
-    <link rel="stylesheet" type="text/css" href="../css/jquery.autocomplete.css" />
-    <script src="https://www.google.com/jsapi"></script>    
-	<script>
-		google.load("jquery", "1");
-	</script>
-	<script src="../js/jquery.autocomplete.js"></script>
-	<script type="text/javascript">
-    	function setAction(target)
-    	{
-     		document.forms[0].action.value=target;
-		};
-	</script>
-<script src="../js/jquery.autocomplete.js"></script>
-	<link href="<%=request.getContextPath() %>/css/bootstrap.min.css" rel="stylesheet">
+
+        <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+        <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
+	    <script type="text/javascript">
+            jQuery.noConflict();
+
+    	    function setAction(target)
+    	    {
+     		    document.forms[0].action.value=target;
+		    }
+	    </script>
+        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/js/jquery_css/smoothness/jquery-ui-1.10.2.custom.min.css"/>
+        <link rel="stylesheet" type="text/css" href="../css/jquery.autocomplete.css" />
+	    <link href="<%=request.getContextPath() %>/css/bootstrap.min.css" rel="stylesheet">
 	
-	<style>
-	label {display:inline; margin-right:6px;}
-	.sel {width:180px}
+	    <style>
+	        label {display:inline; margin-right:6px;}
+	        .sel {width:180px}
 	</style>
     </head>
     <%
@@ -117,7 +112,10 @@ if(!authed) {
 		</html:select>
         <input type="text" id="codesearch" name="codesearch" class="span4"/>
         <script>
-            $("#codesearch").autocomplete("../oscarReport/oscarReportDxRegHelper.jsp");
+            jQuery("#codesearch").autocomplete({
+                source: "../oscarReport/oscarReportDxRegHelper.jsp",
+                minLength: 2,
+            });
         </script>
         <br>
         <nested:submit styleClass="btn" onclick="setAction('edit');submit();">EDIT</nested:submit>

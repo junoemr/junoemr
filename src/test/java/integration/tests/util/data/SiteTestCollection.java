@@ -20,35 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.common.hl7.copd.mapper;
 
-import ca.uhn.hl7v2.HL7Exception;
-import org.jsoup.Jsoup;
-import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.demographicImport.service.CoPDImportService;
+package integration.tests.util.data;
 
+import java.util.HashMap;
 
-// override of EncounterNoteMapper with custom functionality for MedAccess
-public class EncounterNoteMapperMedAccess extends EncounterNoteMapper
+public class SiteTestCollection
 {
-	public EncounterNoteMapperMedAccess(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
-	{
-		super(message, providerRep, importSource);
+	public static HashMap<String, SiteTestData> siteMap = new HashMap<>();
+	public static String[] siteNames = {"Test Clinic", "Test Clinic JUNO"};
+	public static String[] shortNames = {"TC", "TC JUNO"};
+	public static String[] themeColors = {"#E6C72E", "#80CC33"};
+
+	static {
+
+		SiteTestData site = new SiteTestData(siteNames[0], shortNames[0], themeColors[0]);
+		siteMap.put(site.siteName, site);
+
+		SiteTestData site2 = new SiteTestData(siteNames[1], shortNames[1], themeColors[1]);
+		siteMap.put(site2.siteName, site2);
 	}
 
-	@Override
-	protected String getEncounterNoteText(int rep) throws HL7Exception
-	{
-		return stripHTML(super.getEncounterNoteText(rep));
-	}
-
-	/**
-	 * strip html tags from text
-	 * @param text - text to preform the stripping on
-	 * @return - the modified text
-	 */
-	private String stripHTML(String text)
-	{
-		return Jsoup.parse(text).wholeText();
-	}
 }
