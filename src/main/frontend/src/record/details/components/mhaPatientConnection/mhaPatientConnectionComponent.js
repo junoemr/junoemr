@@ -237,6 +237,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 						resolve: {
 							style: () => ctrl.componentStyle,
 							demographicNo: () => ctrl.demographicNo,
+							demographicEmail: () => this.demographicEmail,
 							integrationsList: () => ctrl.integrationsList,
 						}
 					}
