@@ -58,7 +58,7 @@ angular.module('Common.Components').component('mhaPatientInviteConfirmModal',
 
 		ctrl.$onInit = () =>
 		{
-			ctrl.integrationsList = ctrl.resolve.integrationsList.map((obj) => ({ label: obj.siteName, value: obj.siteId}));
+			ctrl.integrationsList = ctrl.resolve.integrationsList.map((obj) => ({ label: obj.siteName, value: obj.id}));
 			ctrl.demographicNo = ctrl.resolve.demographicNo;
 			ctrl.demographicEmail = ctrl.resolve.demographicEmail;
 
