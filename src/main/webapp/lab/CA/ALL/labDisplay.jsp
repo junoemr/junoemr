@@ -1766,13 +1766,30 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                        	if (isPDF)
 										{
-											int docId = documentLinks.get(j).getDocumentNo();
+											int docId = 0;
+											if (documentLinks.size() > j)
+											{
+												docId = documentLinks.get(j).getDocumentNo();
 										%>
-						   					<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>">
-												<td valign="top" align="middle">
-													<a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=docId%>');">Display PDF</a>
-												</td>
-											</tr>
+											   <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>">
+												   <td valign="top" align="middle">
+													   <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=docId%>');">Display PDF</a>
+												   </td>
+											   </tr>
+
+										<%
+											}
+											else
+											{
+										%>
+											   <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>">
+												   <td valign="top" align="middle">
+													   Lab contains a PDF that cannot be displayed. Contact support for more details.
+												   </td>
+											   </tr>
+										<%
+											}
+										%>
 						   			<%
 										}
 										else if(isUnstructuredDoc)
