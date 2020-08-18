@@ -80,23 +80,35 @@ angular.module('Common.Components').component('appointmentQueueModal',
 
 				ctrl.onSave = () =>
 				{
-					ctrl.isoading = true;
+					ctrl.isLoading = true;
 					const onSaveSuccess = (response) =>
 					{
+						// update the queue object with the results from the server, just in case they don't match
+						ctrl.queueModel = response.data.body;
+						ctrl.queueModel.availabilitySettings.bookingHours = ctrl.queueModel.availabilitySettings.bookingHours.map(
+							(transfer) =>
+							{
+								return {
+									weekdayNumber: transfer.weekdayNumber,
+									enabled: transfer.enabled,
+									startTime: moment(transfer.startTime, Juno.Common.Util.settings.defaultTimeFormat),
+									endTime: moment(transfer.endTime, Juno.Common.Util.settings.defaultTimeFormat),
+								}
+							});
+						ctrl.isLoading = false;
 						ctrl.modalInstance.close(ctrl.queueModel);
-						ctrl.isoading = false;
 					}
 					const onSaveError = (error) =>
 					{
 						// TODO handle name conflicts/errors
 						console.error(error);
 						alert("Failed to save appointment queue");
-						ctrl.isoading = false;
+						ctrl.isLoading = false;
 					}
 
 					// convert moment to string before transferring
 					// TODO better wat to serialize moment to LocalTime compatible string?
-					// need a copy so we don't try to read moments from original object
+					// need a copy so angular doesn't read the converted time strings as moments
 					let queueCopy = {};
 					angular.copy(ctrl.queueModel, queueCopy);
 
@@ -106,8 +118,8 @@ angular.module('Common.Components').component('appointmentQueueModal',
 							return {
 								weekdayNumber: localSettings.weekdayNumber,
 								enabled: localSettings.enabled,
-								startTime: localSettings.startTime.format("HH:mm:ss"),
-								endTime: localSettings.endTime.format("HH:mm:ss"),
+								startTime: localSettings.startTime.format(Juno.Common.Util.settings.defaultTimeFormat),
+								endTime: localSettings.endTime.format(Juno.Common.Util.settings.defaultTimeFormat),
 							}
 						});
 
@@ -142,6 +154,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					return {
 						enabled: false,
 						bookingHours: [
+							// iso standard weekday numbers used by moment(), where 1 = Sunday and 7 = Saturday
 							ctrl.getDefaultBookingHours(1),
 							ctrl.getDefaultBookingHours(2),
 							ctrl.getDefaultBookingHours(3),

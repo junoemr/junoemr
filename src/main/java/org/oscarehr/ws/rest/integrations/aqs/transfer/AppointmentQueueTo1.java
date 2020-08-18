@@ -85,14 +85,19 @@ public class AppointmentQueueTo1 implements Serializable
 		createQueueInput.setName(this.getQueueName());
 		createQueueInput.setQueueLimit(this.getQueueLimit());
 
-		// only send availability settings if the enabled flag is set.
-		QueueAvailabilitySettingsTransfer availabilitySettings = this.getAvailabilitySettings();
-		if(availabilitySettings != null && availabilitySettings.getEnabled())
+		// only send availability settings if they exist and the enabled flag is set.
+		if(this.hasAvailabilitySettingsEnabled())
 		{
 			QueueAvailability availabilityModel = new QueueAvailability(availabilitySettings);
 			createQueueInput.setAvailability(availabilityModel.asAqsServerDto());
 		}
 		return createQueueInput;
+	}
+
+	public boolean hasAvailabilitySettingsEnabled()
+	{
+		QueueAvailabilitySettingsTransfer availabilitySettings = this.getAvailabilitySettings();
+		return (availabilitySettings != null) && availabilitySettings.getEnabled();
 	}
 
 	public QueueAvailabilitySettingsTransfer getAvailabilitySettings()
