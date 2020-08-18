@@ -123,7 +123,9 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				let appointmentQueues = (await aqsQueuesApi.getAppointmentQueues()).data.body;
 				for(let queue of appointmentQueues)
 				{
-					queue.items = (await aqsQueuedAppointmentApi.getAppointmentsInQueue(queue.id)).data.body;
+					let queuedAppointments = (await aqsQueuedAppointmentApi.getAppointmentsInQueue(queue.id)).data.body;
+					queuedAppointments.sort((firstAppt, secondAppt) => firstAppt.queuePosition - secondAppt.queuePosition);
+					queue.items = queuedAppointments;
 					ctrl.queues.push(queue);
 				}
 
