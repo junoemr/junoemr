@@ -71,6 +71,8 @@ public class ConversionUtils {
 	public static final String DEFAULT_TS_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	public static final String DATE_TIME_ZONE_OFFSET_x_PATTERN = "yyyy-MM-dd HH:mm:ss x";
 
+	public static final String HL7_DATE_TIME_OFFICIAL_FULL_PATTERN = "yyyyMMddHHmmssx";
+
 	public static final String TS_NO_SEC_PATTERN = "yyyy-MM-dd H:mm";
 
 	private static final Long ZERO_LONG = new Long(0);

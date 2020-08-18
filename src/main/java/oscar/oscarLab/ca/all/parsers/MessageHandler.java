@@ -46,7 +46,6 @@ import oscar.util.UtilDateUtilities;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -1173,7 +1172,16 @@ public abstract class MessageHandler
 		}
 		else if(inFormat.length() < plain.length())
 		{
-			inFormat = ConversionUtils.DATE_TIME_ZONE_OFFSET_x_PATTERN;
+			if (plain.length() == 19)
+			{
+				// handle this format that is stated in official HL7 document 19981004010159+0100
+				inFormat = ConversionUtils.HL7_DATE_TIME_OFFICIAL_FULL_PATTERN;
+			}
+			else
+			{
+				//handle this format 2013-10-19 15:23:00 -0700
+				inFormat = ConversionUtils.DATE_TIME_ZONE_OFFSET_x_PATTERN;
+			}
 		}
 
 		if(GenericValidator.isDate(plain, inFormat, true))
@@ -1194,7 +1202,7 @@ public abstract class MessageHandler
 		}
 		else
 		{
-			logger.error("Date " + plain + "cannot be handled");
+			logger.error( getClass().getName() + " Date format: " + plain + " cannot be handled");
 		}
 		return formatted;
 	}
