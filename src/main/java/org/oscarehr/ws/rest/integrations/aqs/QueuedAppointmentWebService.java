@@ -118,6 +118,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 		appointment.setCreator(provider.getDisplayName());
 		appointment.setBookingSource(Appointment.BookingSource.OSCAR);
 		appointment.setReason(queuedAppointment.getReason());
+		appointment.setNotes(queuedAppointment.getNotes());
 		appointment.setName("");
 		appointment.setIsVirtual(true);
 

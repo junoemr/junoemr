@@ -55,6 +55,7 @@ public class QueuedAppointmentTo1 implements Serializable
 	private OffsetDateTime createdAt;
 	private String demographicName;
 	private String reason;
+	private String notes;
 
 	public static List<QueuedAppointmentTo1> fromQueuedAppointmentList(List<QueuedAppointment> queuedAppointments)
 	{

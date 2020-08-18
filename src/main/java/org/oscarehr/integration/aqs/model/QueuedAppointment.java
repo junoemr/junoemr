@@ -29,23 +29,36 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter @Setter
 public class QueuedAppointment
 {
+	private final String EXTRAS_NOTES = "notes";
+
 	private UUID id;
 	private UUID queueId;
 	private Integer queuePosition;
 	private Integer demographicNo;
 	private OffsetDateTime createdAt;
 	private String reason;
+	private String notes;
 
 
 	public QueuedAppointment(QueuedAppointmentDto appointmentDto)
 	{
-		BeanUtils.copyProperties(appointmentDto, this, "id", "integrationPatientId");
+		BeanUtils.copyProperties(appointmentDto, this, "id", "integrationPatientId", "extraInfo");
 		this.setId(appointmentDto.getId());
 		this.setDemographicNo(Integer.parseInt(StringUtils.trimToEmpty(appointmentDto.getIntegrationPatientId())));
+		if (appointmentDto.getExtraInfo() != null)
+		{
+			@SuppressWarnings("unchecked")
+			Map<String, Object> extrasMap = (Map<String, Object>)appointmentDto.getExtraInfo();
+			if (extrasMap.get(EXTRAS_NOTES) != null)
+			{
+				this.setNotes(extrasMap.get(EXTRAS_NOTES).toString());
+			}
+		}
 	}
 }
