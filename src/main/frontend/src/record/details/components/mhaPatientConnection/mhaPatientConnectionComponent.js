@@ -89,7 +89,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 			}
 			else if (ctrl.isButtonStateInvite() && ctrl.inviteSent)
 			{
-				return "Invite Sent";
+				return "Invite Pending";
 			}
 			else if (ctrl.isButtonStateInvite())
 			{
@@ -209,6 +209,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 						resolve: {
 							style: () => ctrl.componentStyle,
 							demographicNo: () => ctrl.demographicNo,
+							demographicEmail: () => ctrl.demographicEmail,
 						}
 					}
 				).result;
@@ -237,7 +238,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 						resolve: {
 							style: () => ctrl.componentStyle,
 							demographicNo: () => ctrl.demographicNo,
-							demographicEmail: () => this.demographicEmail,
+							demographicEmail: () => ctrl.demographicEmail,
 							integrationsList: () => ctrl.integrationsList,
 						}
 					}
