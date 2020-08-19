@@ -30,8 +30,6 @@ import ca.cloudpractice.aqs.client.auth.ApiKeyAuth;
 import ca.cloudpractice.aqs.client.model.RemoteUserType;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.util.SpringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 
