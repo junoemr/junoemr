@@ -41,6 +41,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import static oscar.util.StringUtils.filteroutControlCharacters;
+
 @Entity
 @Table(name="demographicExt")
 public class DemographicExt extends AbstractModel<Integer> implements Serializable {
@@ -66,7 +68,7 @@ public class DemographicExt extends AbstractModel<Integer> implements Serializab
 	@PreUpdate
 	protected void prePersist() {
 		this.dateCreated = new Date();
-		setValue(oscar.util.StringUtils.filteroutControlCharacters(getValue()));
+		setValue(filteroutControlCharacters(this.getValue()));
 	}
 	
     // constructors

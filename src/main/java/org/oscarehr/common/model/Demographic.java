@@ -47,6 +47,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static oscar.util.StringUtils.filteroutControlCharacters;
+
 /**
  * This is the object class that relates to the demographic table. Any customizations belong here.
  * @deprecated use the jpa version instead
@@ -1576,7 +1578,7 @@ public class Demographic implements Serializable
 	@PreUpdate
 	private void removeControlCharacter()
 	{
-		setPhone(oscar.util.StringUtils.filteroutControlCharacters(getPhone()));
-		setPhone2(oscar.util.StringUtils.filteroutControlCharacters(getPhone2()));
+		setPhone(filteroutControlCharacters(this.getPhone()));
+		setPhone2(filteroutControlCharacters(this.getPhone2()));
 	}
 }

@@ -50,6 +50,7 @@ import java.util.Date;
 import java.util.List;
 
 import static java.time.temporal.ChronoUnit.DAYS;
+import static oscar.util.StringUtils.filteroutControlCharacters;
 
 @Entity(name = "model.Demographic") // use a name to prevent autowire conflict with old model
 @Table(name = "demographic")
@@ -845,9 +846,9 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 
 	@PrePersist
 	@PreUpdate
-	private void removeControlCharacter()
+	public void removeControlCharacter()
 	{
-		setPhone(oscar.util.StringUtils.filteroutControlCharacters(getPhone()));
-		setPhone2(oscar.util.StringUtils.filteroutControlCharacters(getPhone2()));
+		setPhone(filteroutControlCharacters(this.getPhone()));
+		setPhone2(filteroutControlCharacters(this.getPhone2()));
 	}
 }
