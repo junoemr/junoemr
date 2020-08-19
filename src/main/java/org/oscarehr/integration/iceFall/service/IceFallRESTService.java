@@ -120,7 +120,7 @@ public class IceFallRESTService
 	/**
 	 * send a prescription to ice fall
 	 * @param iceFallCreatePrescriptionTo1 - prescription creation transfer object
-	 * @return
+	 * @return icefall response for making prescription
 	 */
 	public IceFallCreatePrescriptionResponseTo1 sendPrescription(IceFallCreatePrescriptionTo1 iceFallCreatePrescriptionTo1)
 	{

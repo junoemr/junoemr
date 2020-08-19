@@ -66,14 +66,20 @@ public class Tickler extends AbstractModel<Integer> {
 	public static final String NORMAL = "Normal";
 	public static final String LOW = "Low";
         
-        public static final String NOT_APPLICABLE = "N/A";
+	public static final String NOT_APPLICABLE = "N/A";
 	
-	public static enum STATUS {
-        A, C, D
+	public enum STATUS
+	{
+		A,
+		C,
+		D
 	}
 	
-	public static enum PRIORITY {
-        High, Normal, Low
+	public enum PRIORITY
+	{
+		High,
+		Normal,
+		Low
 	}
 	
 	public static final String DATE_FORMAT = "MM-dd-yyyy";
@@ -303,10 +309,10 @@ public class Tickler extends AbstractModel<Integer> {
         if (status.equals(Tickler.STATUS.A)){
             statusStr = LocaleUtils.getMessage(locale,"tickler.ticklerMain.stActive");
         }
-        else if (status.equals(Tickler.STATUS.C)) {               
+        else if (status.equals(Tickler.STATUS.C)) {
             statusStr = LocaleUtils.getMessage(locale,"tickler.ticklerMain.stComplete");
         }
-        else if (status.equals(Tickler.STATUS.D)) {                
+        else if (status.equals(Tickler.STATUS.D)) {
             statusStr = LocaleUtils.getMessage(locale,"tickler.ticklerMain.stDeleted");
         }
         return statusStr;

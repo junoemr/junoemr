@@ -185,7 +185,10 @@
 														ca-input-size="col-md-6"
 														ca-model="eventData.virtual"
 														ca-template="juno"
-														ca-disabled="!eligibleForTelehealth"
+														ca-disabled="telehealthMode === TELEHEALTH_MODES.NONE ||
+														 						 telehealthMode === TELEHEALTH_MODES.NO_CONNECTION  ||
+														 						 eventController.editMode"
+														title="{{ eventController.getTelehealthToolTip() }}"
 										>
 										</ca-field-boolean>
 									</div>
@@ -251,12 +254,14 @@
 										<!-- location/site -->
 										<ca-field-select
 												ca-hide="!eventController.sitesEnabled"
+                                                ca-disabled="eventData.virtual && eventController.editMode"
 												ca-name="site"
 												ca-title="Site"
 												ca-template="label"
 												ca-model="eventData.site"
 												ca-error="{{displayMessages.field_errors()['site']}}"
 												ca-options="eventController.siteOptions"
+                                                title="{{ eventController.getSiteChangeToolTip() }}"
 										>
 										</ca-field-select>
 									</div>
@@ -277,6 +282,8 @@
 										ca-title="Notes"
 										ca-model="eventData.notes"
 										ca-rows="1"
+										ca-error="{{displayMessages.field_errors()['notes']}}"
+										ca-max-characters="255"
 								>
 								</ca-field-text>
 							</div>
@@ -286,7 +293,10 @@
 										ca-title="Reason"
 										ca-name="event_reason"
 										ca-model="eventData.reason"
-										ca-rows="1">
+										ca-rows="1"
+										ca-error="{{displayMessages.field_errors()['event_reason']}}"
+										ca-max-characters="80"
+								>
 								</ca-field-text>
 							</div>
 						</div>
@@ -479,6 +489,30 @@
 					uib-tooltip="{{eventController.keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 					ng-click="eventController.saveAndPrint()"
 					ng-disabled="isWorking() || eventController.isDoubleBookPrevented || !isPatientSelected()">Print
+			</button>
+
+			<button
+							ng-if="eventController.shouldShowNotificationButtons() && !eventController.editMode"
+							type="button"
+							class="btn btn-primary"
+							tooltip-placement="top"
+							tooltip-append-to-body="true"
+							ng-click="eventController.save(true);"
+							ng-disabled="isWorking() || eventController.isDoubleBookPrevented"
+							title="Create the appointment and send a notification email to the user">
+				Create & Notify
+			</button>
+
+			<button
+							ng-if="eventController.shouldShowNotificationButtons() && eventController.editMode"
+							type="button"
+							class="btn btn-default"
+							tooltip-placement="top"
+							tooltip-append-to-body="true"
+							ng-click="eventController.sendAppointmentNotification();"
+							title="Send a notification email to the patient containing the one time telehealth link"
+							ng-disabled="eventController.sendingNotificationState !== eventController.SENDING_NOTIFICATION_STATES.NONE">
+				{{ eventController.getSendNotificationText() }}
 			</button>
 
 			<button

@@ -172,20 +172,25 @@ public class ConversionUtils {
 	/**
 	 * Parses the date string using the specified format pattern 
 	 * 
-	 * @param dateString
-	 * 		Date string to be parsed
-	 * @param formatPattern
-	 * 		Format pattern to use for parsing
-	 * @return
-	 * 		Returns the parsed date or null if the date can't be parsed
+	 * @param dateString Date string to be parsed
+	 * @param formatPattern Format pattern to use for parsing
+	 * @return Returns the parsed date or null if the date can't be parsed
 	 */
-	public static Date fromDateString(String dateString, String formatPattern) {
-		if (dateString == null || "".equals(dateString.trim())) return null;
+	public static Date fromDateString(String dateString, String formatPattern)
+	{
+		if (dateString == null || dateString.trim().isEmpty())
+		{
+			return null;
+		}
 
 		SimpleDateFormat format = new SimpleDateFormat(formatPattern);
-		try {
+		format.setLenient(false);
+		try
+		{
 			return format.parse(dateString);
-		} catch (ParseException e) {
+		}
+		catch (ParseException e)
+		{
 			return null;
 		}
 	}

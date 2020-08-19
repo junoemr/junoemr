@@ -61,6 +61,10 @@ if(!authed) {
 <%@ page import="oscar.oscarBilling.ca.bc.data.BillingPreference" %>
 <%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
 <%@ page import="org.oscarehr.common.model.ProviderPreference" %>
+<%@ page import="org.oscarehr.common.dao.SiteDao" %>
+<%@ page import="org.oscarehr.common.model.Site" %>
+<%@ page import="org.oscarehr.common.model.Appointment" %>
+<%@ page import="org.oscarehr.managers.AppointmentManager" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -203,8 +207,9 @@ if(!authed) {
 <script type="text/javascript" src="../../../share/javascript/prototype.js"></script>
 <script type="text/javascript" src="../../../share/javascript/Oscar.js"></script>
 <script type="text/javascript" src="../../../share/javascript/boxover.js"></script>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
+<script type="text/javascript" src="./js/junoBillingHelper.js"></script>
 <style type="text/css">
   <!--
     A, BODY, INPUT, OPTION ,SELECT , TABLE, TEXTAREA, TD, TR {font-family:tahoma,Verdana, Arial, Helvetica,sans-serif; font-size:10px;}
@@ -233,8 +238,8 @@ if(!authed) {
 
     // Autocompletion of referral doctors
     jQuery(document).ready(function(){
-        var xml_refer1 = jQuery('input[name=xml_refer1]'),
-            xml_refer2 = jQuery('input[name=xml_refer2]');
+        var xml_refer1 = jQuery('input[name=xml_refer1]');
+        var xml_refer2 = jQuery('input[name=xml_refer2]');
 
         xml_refer1.removeAttr('onkeypress');
         xml_refer2.removeAttr('onkeypress');
@@ -270,6 +275,19 @@ if(!authed) {
                 }
             });
         });
+
+        var $providerSelect = jQuery('#billing-provider-select');
+        var $facilityNumber = jQuery('#facility-number');
+        var $siteSelect = jQuery('#site-select');
+
+        if ($siteSelect.length > 0)
+        {
+            Juno.BillingHelper.BC.initAutoApplyBCPMultiSite("<%=request.getContextPath() %>", $providerSelect, $facilityNumber, $siteSelect);
+        }
+        else
+        {
+            Juno.BillingHelper.BC.initAutoApplyBCP("<%=request.getContextPath() %>", $providerSelect, $facilityNumber);
+        }
     });
 
 //creates a javaspt array of associated dx codes
@@ -479,14 +497,6 @@ function correspondenceNote(){
 	  ShowElementById('CORRESPONDENCENOTE');
 	}else {(document.BillingCreateBillingForm.correspondenceCode.value == "B" )
      ShowElementById('CORRESPONDENCENOTE');
-	}
-}
-
-function checkFACILITY(){
-	if (document.getElementById('FACILITY').style.display == 'none'){
-		ShowElementById('FACILITY');
-	}else{
-		HideElementById('FACILITY');
 	}
 }
 
@@ -1031,7 +1041,7 @@ if(wcbneeds != null){%>
                   <b><bean:message key="billing.provider.billProvider"/></b>
             </td>
             <td width="29%">
-                <html:select property="xml_provider" value="<%=sxml_provider%>">
+                <html:select property="xml_provider" value="<%=sxml_provider%>" styleId="billing-provider-select">
                   <html:option value="000000">
                     <b>Select Provider</b>
                   </html:option>
@@ -1041,6 +1051,45 @@ if(wcbneeds != null){%>
                 </html:select>
             </td>
           </tr>
+
+          <% if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
+          {
+          	    SiteDao siteDao = (SiteDao) SpringUtils.getBean(SiteDao.class);
+          	    List<Site> sites = siteDao.getAllActiveSites();
+          	    List<Site> providerSites = siteDao.getActiveSitesByProviderNo(sxml_provider);
+          	    List<Integer> siteIds = new ArrayList<Integer>();
+
+          	    for (Site site : providerSites)
+                {
+                	siteIds.add(site.getId());
+                }
+
+                LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromSession(request);
+
+              AppointmentManager apptManager = SpringUtils.getBean(AppointmentManager.class);
+              Appointment appt = apptManager.getAppointment(info, Integer.parseInt(bean.getApptNo()));
+
+                //OscarAppointmentDao apptDao = SpringUtils.getBean(OscarAppointmentDao.class);
+                //Appointment appt = apptDao.find(Integer.parseInt(bean.getApptNo()));
+          %>
+          <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td><b>Site</b></td>
+              <td>
+                  <select name="site" id="site-select">
+                      <option value="-1">Select Site</option>
+                  <% for (Site site : sites) {
+                  	    boolean isSelected = appt != null && appt.getLocation().equals(site.getName());
+                  	    boolean isDisabled = !isSelected && !siteIds.contains(site.getId());
+                  %>
+                      <option value="<%= site.getId()%>" <%=isSelected ? " selected" : ""%> <%=isDisabled ? " disabled" : ""%>><%=site.getName()%></option>
+                  <% } %>
+                  </select>
+              </td>
+          </tr>
+          <% } %>
           <tr>
             <td>
                   <bean:message key="billing.billingtype"/>
@@ -1196,10 +1245,13 @@ if(wcbneeds != null){%>
               </html:select>
             </td>
             <td nowrap>
-              <a href="javascript: function myFunction() {return false; }" onClick="checkFACILITY();">
-                  <strong>Facility</strong>
-              </a>
-              <span style="display: none;" id="FACILITY">  <table>  <tr>   <td title="Facilty Num">  Fac Num <html:text property="facilityNum" size="5" maxlength="5"/>  </td>   <td title="Facilty Sub Num">  Fac Sub Num <html:text property="facilitySubNum" size="5" maxlength="5"/>  </td>  </tr>  </table>  </span>
+              <strong>Facility</strong>
+                <table>
+                    <tr>
+                        <td title="Facilty Number">No. <html:text property="facilityNum" size="7" maxlength="7" styleId="facility-number"/></td>
+                        <td title="Facilty Sub Number">Sub <html:text property="facilitySubNum" size="5" maxlength="5"/></td>
+                      </tr>
+                </table>
             </td>
           </tr>
         </table>

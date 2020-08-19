@@ -38,7 +38,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -52,7 +51,6 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import oscar.Misc;
 import oscar.OscarProperties;
 import oscar.entities.PaymentType;
 import oscar.entities.WCB;
@@ -108,12 +106,10 @@ public class BillingCreateBillingAction extends Action {
     bean.setPatientAddress2(demo.getCity());
     bean.setPatientPostal(demo.getPostal());
     bean.setPatientSex(demo.getSex());
-
-    bean.setPatientPHN(demo.getHin()+ StringUtils.trimToEmpty(demo.getVer()));
+    bean.setPatientPHN(demo.getHin()+demo.getVer());
     if (frm.isOinPayPatient())
     {
       bean.setPatientHCType(Demographic.HC_TYPE.PP.name());
-      bean.setPatientPHN(Misc.backwardZero(bean.getPatientPHN(),12));
     }
     else
     {

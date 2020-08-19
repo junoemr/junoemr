@@ -105,37 +105,68 @@ function checkTypeIn(obj) {
 	}
 }
 
-function checkTypeInAll() {
-  var checkin = false;
-  var s=0;
-  var e=0;
-  var i=0;
-  if(isNumeric(document.UPDATEPRE.start_hour.value) && isNumeric(document.UPDATEPRE.end_hour.value) && isNumeric(document.UPDATEPRE.every_min.value)) {
-    s=eval(document.UPDATEPRE.start_hour.value);
-    e=eval(document.UPDATEPRE.end_hour.value);
-    i=eval(document.UPDATEPRE.every_min.value);
-    if(e < 24){
-      if(s < e){
-        if(i <= (e - s)*60 && i > 0){
-          checkin = true;
-        }else{
-          alert ("<bean:message key="provider.providerpreference.msgPositivePeriod"/>");
-          this.focus();
-          document.UPDATEPRE.every_min.focus();
-         }
-      }else{
-        alert ("<bean:message key="provider.providerpreference.msgStartHourErlierEndHour"/>");
-        this.focus();
-        document.UPDATEPRE.start_hour.focus();
-       }
-    }else{
-      alert ("<bean:message key="provider.providerpreference.msgHourLess24"/>");
-      this.focus();
-      document.UPDATEPRE.end_hour.focus();
-     }
-  } else {
-     alert ("<bean:message key="provider.providerpreference.msgTypeNumbers"/>");
-  }
+function checkTypeInAll()
+{
+	var checkin = false;
+	var startHour = 0;
+	var endHour = 0;
+	var interval = 0;
+	if (isNumeric(document.UPDATEPRE.start_hour.value)
+		&& isNumeric(document.UPDATEPRE.end_hour.value)
+		&& isNumeric(document.UPDATEPRE.every_min.value))
+	{
+		startHour = eval(document.UPDATEPRE.start_hour.value);
+		endHour = eval(document.UPDATEPRE.end_hour.value);
+		interval = eval(document.UPDATEPRE.every_min.value);
+		if(endHour < 24)
+		{
+			if(startHour < endHour)
+			{
+				if(interval <= (endHour - startHour)*60 && interval > 0)
+				{
+					checkin = true;
+				}
+				else
+				{
+					alert ("<bean:message key="provider.providerpreference.msgPositivePeriod"/>");
+					this.focus();
+					document.UPDATEPRE.every_min.focus();
+				}
+			}
+			else
+			{
+				alert ("<bean:message key="provider.providerpreference.msgStartHourErlierEndHour"/>");
+				this.focus();
+				document.UPDATEPRE.start_hour.focus();
+			}
+
+		}
+		else
+		{
+			alert ("<bean:message key="provider.providerpreference.msgHourLess24"/>");
+			this.focus();
+			document.UPDATEPRE.end_hour.focus();
+		}
+	}
+	else
+	{
+		alert ("<bean:message key="provider.providerpreference.msgTypeNumbers"/>");
+	}
+
+	if (!isPositiveInteger(document.UPDATEPRE.appointmentScreenFormsNameDisplayLength.value))
+	{
+		checkin = false;
+		this.focus();
+		alert("<bean:message key="provider.providerpreference.msgLinkLength"/>");
+	}
+
+	if (document.UPDATEPRE.appointmentScreenFormsNameDisplayLength.value.length > 3)
+	{
+		checkin = false;
+		this.focus();
+		alert("<bean:message key="provider.providerpreference.msgCharLength"/>");
+	}
+
 	return checkin;
 }
 
@@ -150,20 +181,48 @@ function popupPage(vheight,vwidth,varpage) { //open a new popup window
   }
 }
 
-function isNumeric(strString) {
-    var validNums = "0123456789";
-    var strChar;
-    var retval = true;
-    if(strString.length == 0){
-    retval = false;
-    }
-    for (i = 0; i < strString.length && retval == true; i++){
-	strChar = strString.charAt(i);
-	if (validNums.indexOf(strChar) == -1){
-	    retval = false;
+/**
+ * Validation for strings intended to be numbers.
+ * Gist: loop over character-by-character and ensure all components of the string are numeric.
+ * Note: Would do it like the following, but regex support is not universally available:
+ * 		string.match(/^[0-9]+$/) !== null;
+ * @input numericString string to check for numeric characters
+ * @return boolean if all characters in input string are in [0-9], false otherwise
+ */
+function isNumeric(numericString)
+{
+	if (numericString.length === 0)
+	{
+		return false;
 	}
-    }
-    return retval;
+
+	numericString = numericString.trim();
+
+	var numericCharacters = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+	for (var i = 0; i < numericString.length; i++)
+	{
+		if (numericCharacters.indexOf(numericString.charAt(i)) === -1)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
+ * Validation function for integer settings.
+ * Checks that the given input is a number and that it's an integer > 0.
+ */
+function isPositiveInteger(num)
+{
+	if (isNumeric(num))
+	{
+		var intVal = parseInt(num);
+		return !isNaN(intVal) && intVal > 0;
+	}
+
+	return false;
 }
 
 function showHideBillPref() {
@@ -812,10 +871,10 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
 				<td align="center"><a href=# onClick ="popupPage(230,860,'../setProviderStaleDate.do?method=viewAppointmentCardPrefs');return false;"><bean:message key="provider.btnEditSetAppointmentCardPrefs"/></a></td>
 		</tr>
 		<tr>
-			<td align="center"><a href=# onClick ="popupPage(230,860,'providerTicklerSettings.jsp');return false;"><bean:message key="provider.btnTicklerSettings"/></a></td>
+			<td align="center"><a href=# onClick ="popupPage(230,860,'../setAppointmentCountPrefs.do?method=viewAppointmentCountPrefs');return false;"><bean:message key="provider.btnEditSetAppointmentCountPrefs"/></a></td>
 		</tr>
 		<tr>
-			<td align="center"><a href=# onClick ="popupPage(230,860,'../setAppointmentCountPrefs.do?method=viewAppointmentCountPrefs');return false;"><bean:message key="provider.btnEditSetAppointmentCountPrefs"/></a></td>
+			<td align="center"><a href=# onClick ="popupPage(230,860,'providerTicklerSettings.jsp');return false;"><bean:message key="provider.btnTicklerSettings"/></a></td>
 		</tr>
 		<tr>
 			<td align="center"><a href=# onClick ="popupPage(230,860,'providerEformSettings.jsp');return false;"><bean:message key="provider.btnEformSettings"/></a></td>

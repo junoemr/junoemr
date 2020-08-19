@@ -23,19 +23,14 @@
  */
 package org.oscarehr.common.dao.utils;
 
-import java.util.List;
-import java.util.Locale;
-
-import javax.servlet.http.HttpSession;
-
-import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.util.LoggedInInfo;
-
-import org.oscarehr.util.SpringUtils;
 import oscar.util.ConversionUtils;
+
+import javax.servlet.http.HttpSession;
+import java.util.Locale;
 
 public class AuthUtils {
 
@@ -43,6 +38,9 @@ public class AuthUtils {
 	public static final String TEST_USER_NAME 	= "oscardoc";
 	public static final String TEST_PASSWORD  	= "mac2002";
 	public static final String TEST_PIN		  	= "1117";
+
+	//Patients Information
+	//public static final String[]
 
 	public static LoggedInInfo initLoginContext() {
 		HttpSession session = null;

@@ -46,8 +46,10 @@ import javax.persistence.TemporalType;
 import java.io.Serializable;
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static oscar.util.StringUtils.filteroutControlCharacters;
@@ -214,6 +216,18 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		PP
 	}
 
+	/**
+	 * get the list of inactive statuses as dictated by the properties file.
+	 * @return - list of inactive status strings
+	 */
+	public static List<String> getInactiveDemographicStatuses()
+	{
+		String inactiveStatusString = OscarProperties.getInstance().getProperty("inactive_statuses");
+		List<String> inactiveStatuses = Arrays.asList(inactiveStatusString.split(","));
+		return inactiveStatuses.stream()
+				.map((status) -> status.trim().substring(1, status.length() -1))
+				.collect(Collectors.toList());
+	}
 
 	/**
 	 * Determine if demographic is a newborn.  A demographic is a newborn if the HIN version code is 66 in BC, or
@@ -850,5 +864,14 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	{
 		setPhone(filteroutControlCharacters(this.getPhone()));
 		setPhone2(filteroutControlCharacters(this.getPhone2()));
+	}
+
+	/**
+	 * checks if the demographic is active
+	 * @return - true if active, false otherwise
+	 */
+	public boolean isActive()
+	{
+		return !getInactiveDemographicStatuses().contains(this.getPatientStatus());
 	}
 }

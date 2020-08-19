@@ -1208,6 +1208,22 @@
 		<ap-output>${note}</ap-output>
 	</databaseap>
 
+	<databaseap>
+		<!-- get latest note uuid by observation_date. Then the latest revision
+			by update_date DESPITE its 'include_issue' or not -->
+		<ap-name>latest_echart_note_all_type</ap-name>
+		<ap-sql>SELECT cmn.note AS note FROM casemgmt_note cmn
+			JOIN (SELECT DISTINCT a.uuid FROM casemgmt_note a
+			WHERE a.demographic_no=${demographic}
+			ORDER BY a.observation_date DESC LIMIT 1)
+			AS A ON (cmn.uuid = A.uuid)
+			WHERE cmn.demographic_no=${demographic}
+			ORDER BY update_date
+			DESC LIMIT 1;
+		</ap-sql>
+		<ap-output>${note}</ap-output>
+	</databaseap>
+
 	<!-- Prenatal information -->
 	<databaseap>
 		<ap-name>onGTPAL</ap-name>
@@ -1733,7 +1749,7 @@
 			WHERE var_name='${var_name}'
 			AND fdid=
 			(SELECT MIN(fdid) FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1)
 		</ap-sql>
 		<ap-output>${var_value}</ap-output>
@@ -1744,7 +1760,7 @@
 			WHERE var_name='${var_name}'
 			AND fdid=
 			(SELECT MAX(fdid) FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1)
 		</ap-sql>
 		<ap-output>${var_value}</ap-output>
@@ -1755,7 +1771,7 @@
 			eform_values
 			WHERE fdid=
 			(SELECT MIN(fdid) FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1)
 		</ap-sql>
 		<ap-output>${fieldname}, ${fieldvalue}</ap-output>
@@ -1767,7 +1783,7 @@
 			eform_values
 			WHERE fdid=
 			(SELECT MAX(fdid) FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1)
 		</ap-sql>
 		<ap-output>${fieldname}, ${fieldvalue}</ap-output>
@@ -1779,7 +1795,7 @@
 			WHERE var_name='${var_name}' AND var_value='${var_value}'
 			AND fdid IN
 			(SELECT fdid FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1)
 		</ap-sql>
 		<ap-output>${count(0)}</ap-output>
@@ -1790,7 +1806,7 @@
 			WHERE var_name='${var_name}' AND NOT (var_value='' OR var_value IS NULL)
 			AND fdid IN
 			(SELECT fdid FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1)
 		</ap-sql>
 		<ap-output>${count(0)}</ap-output>
@@ -1804,7 +1820,7 @@
 			WHERE var_name='${ref_var_name}' AND var_value='${ref_var_value}'
 			AND fdid IN
 			(SELECT fdid FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1))
 		</ap-sql>
 		<ap-output>${count(0)}</ap-output>
@@ -1818,7 +1834,7 @@
 			WHERE var_name='${ref_var_name}' AND var_value='${ref_var_value}'
 			AND fdid IN
 			(SELECT fdid FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1))
 		</ap-sql>
 		<ap-output>${count(0)}</ap-output>
@@ -1833,7 +1849,7 @@
 			NULL)
 			AND fdid IN
 			(SELECT fdid FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1))
 		</ap-sql>
 		<ap-output>${count(0)}</ap-output>
@@ -1848,7 +1864,7 @@
 			NULL)
 			AND fdid IN
 			(SELECT fdid FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1))
 		</ap-sql>
 		<ap-output>${count(0)}</ap-output>

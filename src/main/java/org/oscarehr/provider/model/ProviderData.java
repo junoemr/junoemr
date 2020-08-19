@@ -27,10 +27,15 @@ package org.oscarehr.provider.model;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.providerBilling.model.ProviderBilling;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -38,7 +43,6 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-
 
 @Entity
 @Table(name = "provider")
@@ -111,7 +115,6 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
     @Column(name = "super_admin")
 	private boolean superAdmin = false;
 
-
 	/* -- Province specific -- */
 	/* AB */
 	@Column(name = "alberta_tak_no")
@@ -124,8 +127,10 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	@Column(name = "ontario_lifelabs_id")
 	private String ontarioLifeLabsId;
 
-	public ProviderData() {
-	}
+	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name="provider_billing_id")
+	private ProviderBilling billingOpts;
+
 
 	/** returns a formatted name String in the form of 'first_name, last_name' */
 	public String getDisplayName()
@@ -426,5 +431,15 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public void setAlbertaConnectCareId(String albertaConnectCareId)
 	{
 		this.albertaConnectCareId = albertaConnectCareId;
+	}
+
+	public ProviderBilling getBillingOpts()
+	{
+		return billingOpts;
+	}
+
+	public void setBillingOpts(ProviderBilling billingOpts)
+	{
+		this.billingOpts = billingOpts;
 	}
 }
