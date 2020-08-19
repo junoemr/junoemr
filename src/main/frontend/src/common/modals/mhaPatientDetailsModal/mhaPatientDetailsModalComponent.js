@@ -61,6 +61,8 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 		ctrl.$onInit = () =>
 		{
 			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
+			ctrl.demographic = ctrl.resolve.demographic;
+
 			ctrl.loadMHAPatientProfiles();
 
 			$scope.$watch("$ctrl.currentIntegration", (newValue, oldValue) =>
@@ -83,7 +85,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 				ctrl.integrationsList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
 				for (let integration of ctrl.integrationsList)
 				{
-					let patient = (await mhaDemographicApi.getMHAPatient(integration.id, ctrl.resolve.demographicNo)).data.body;
+					let patient = (await mhaDemographicApi.getMHAPatient(integration.id, ctrl.demographic.demographicNo)).data.body;
 					if (patient)
 					{
 						if(patient.link_status === "ACTIVE")
@@ -120,6 +122,16 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 				console.error(`Failed to load MHA patient profiles with error ${err}`);
 			}
 		};
+
+		ctrl.getLocalPatientName = () =>
+		{
+			return `${ctrl.demographic.firstName}, ${ctrl.demographic.lastName}`;
+		}
+
+		ctrl.getLocalPatientHinAndProv = () =>
+		{
+			return `${ctrl.demographic.hin} ${ctrl.demographic.hcType}`;
+		}
 
 		ctrl.getCurrentPatientName = () =>
 		{
@@ -165,9 +177,9 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 						backdrop: 'static',
 						windowClass: "juno-modal sml",
 						resolve: {
-							style: () => ctrl.componentStyle,
-							demographicNo: () => ctrl.resolve.demographicNo,
-							demographicEmail: () => ctrl.resolve.demographicEmail,
+							style: () => JUNO_STYLE.GREY, //TODO regular style use when it doesn't break button/text colours
+							demographicNo: () => ctrl.demographic.demographicNo,
+							demographicEmail: () => ctrl.demographic.email,
 							integrationsList: () => ctrl.integrationsList,
 						}
 					}
@@ -193,7 +205,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 
 					if (integrationId)
 					{
-						await mhaDemographicApi.rejectPatientConnection(integrationId, ctrl.resolve.demographicNo);
+						await mhaDemographicApi.rejectPatientConnection(integrationId, ctrl.demographic.demographicNo);
 						ctrl.loadMHAPatientProfiles();
 					}
 				}

@@ -8,9 +8,9 @@
 		<div class="header-start">
 			<h3>MHA Profile</h3>
 			<h5> for </h5>
-			<h4>{{$ctrl.getCurrentPatientName()}}</h4>
+			<h4>{{$ctrl.getLocalPatientName()}}</h4>
 		</div>
-		<h5>{{$ctrl.getCurrentPatientHinAndProv()}}</h5>
+		<h5>{{$ctrl.getLocalPatientHinAndProv()}}</h5>
 	</modal-title>
 
 	<modal-body class="patient-modal-body">

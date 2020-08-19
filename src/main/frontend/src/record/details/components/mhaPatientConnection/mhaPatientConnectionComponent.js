@@ -28,8 +28,7 @@ import {JUNO_BUTTON_COLOR, JUNO_STYLE} from "../../../../common/components/junoC
 angular.module('Record.Details').component('mhaPatientConnection', {
 	templateUrl: 'src/record/details/components/mhaPatientConnection/mhaPatientConnection.jsp',
 	bindings: {
-		demographicNo: "<",
-		demographicEmail: "<",
+		demographic: "<",
 		componentStyle: "<?",
 		onSiteListChange: "&?",
 	},
@@ -41,11 +40,11 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 		'$httpParamSerializer',
 		'$uibModal',
 		function ($scope,
-							$location,
-							$window,
-							$http,
-							$httpParamSerializer,
-							$uibModal)
+		          $location,
+		          $window,
+		          $http,
+		          $httpParamSerializer,
+		          $uibModal)
 	{
 		let ctrl = this;
 
@@ -73,7 +72,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.$onChanges = (changesObj) =>
 		{
-			if (changesObj.demographicNo)
+			if (changesObj.demographic)
 			{
 				ctrl.loadMhaPatientProfiles();
 			}
@@ -148,7 +147,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.hasEmail = () =>
 		{
-			return this.demographicEmail && this.demographicEmail !== "";
+			return this.demographic && this.demographic.email && this.demographic.email !== "";
 		}
 
 		ctrl.buttonDisabled = () =>
@@ -208,8 +207,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 						windowClass: "juno-modal",
 						resolve: {
 							style: () => ctrl.componentStyle,
-							demographicNo: () => ctrl.demographicNo,
-							demographicEmail: () => ctrl.demographicEmail,
+							demographic: () => ctrl.demographic,
 						}
 					}
 				).result;
@@ -237,8 +235,8 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 						windowClass: "juno-modal sml",
 						resolve: {
 							style: () => ctrl.componentStyle,
-							demographicNo: () => ctrl.demographicNo,
-							demographicEmail: () => ctrl.demographicEmail,
+							demographicNo: () => ctrl.demographic.demographicNo,
+							demographicEmail: () => ctrl.demographic.email,
 							integrationsList: () => ctrl.integrationsList,
 						}
 					}
@@ -254,7 +252,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.loadMhaPatientProfiles = async () =>
 		{
-			if (ctrl.demographicNo)
+			if (ctrl.demographic && ctrl.demographic.demographicNo)
 			{
 				try
 				{
@@ -263,7 +261,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 					let siteList = [];
 					for (let integration of ctrl.integrationsList)
 					{
-						let isConfirmed = (await mhaDemographicApi.isPatientConfirmed(integration.id, ctrl.demographicNo)).data.body;
+						let isConfirmed = (await mhaDemographicApi.isPatientConfirmed(integration.id, ctrl.demographic.demographicNo)).data.body;
 						ctrl.isConfirmed = ctrl.isConfirmed || isConfirmed;
 
 						if (isConfirmed)

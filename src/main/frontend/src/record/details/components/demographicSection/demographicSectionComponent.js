@@ -78,7 +78,7 @@ angular.module('Record.Details').component('demographicSection', {
 									windowClass: "juno-modal",
 									resolve: {
 										style: () => ctrl.componentStyle,
-										demographicNo: () => ctrl.ngModel.demographicNo,
+										demographic: () => ctrl.ngModel,
 									}
 								}
 						).result;
