@@ -68,6 +68,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static oscar.util.StringUtils.filterControlCharacters;
+
 public class AddDemographicAction extends Action
 {
 	private OscarProperties oscarVariables = oscar.OscarProperties.getInstance();
@@ -116,8 +118,8 @@ public class AddDemographicAction extends Action
 		demographic.setCity(StringUtils.trimToNull(request.getParameter("city")));
 		demographic.setProvince(StringUtils.trimToNull(request.getParameter("province")));
 		demographic.setPostal(StringUtils.trimToNull(request.getParameter("postal")));
-		demographic.setPhone(StringUtils.trimToNull(request.getParameter("phone")));
-		demographic.setPhone2(StringUtils.trimToNull(request.getParameter("phone2")));
+		demographic.setPhone(filterControlCharacters(request.getParameter("phone")));
+		demographic.setPhone2(filterControlCharacters(request.getParameter("phone2")));
 		demographic.setEmail(StringUtils.trimToNull(request.getParameter("email")));
 		demographic.setDateOfBirth(dateOfBirth);
 		demographic.setHin(StringUtils.trimToNull(request.getParameter("hin")));
@@ -248,9 +250,9 @@ public class AddDemographicAction extends Action
 		//Create demographic extensions
 		List<DemographicExt> extensions = new ArrayList<DemographicExt>();
 
-		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "hPhoneExt", StringUtils.trimToEmpty(request.getParameter("hPhoneExt"))));
-		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "wPhoneExt", StringUtils.trimToEmpty(request.getParameter("wPhoneExt"))));
-		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "demo_cell", StringUtils.trimToEmpty(request.getParameter("demo_cell"))));
+		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "hPhoneExt", filterControlCharacters(request.getParameter("hPhoneExt"))));
+		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "wPhoneExt", filterControlCharacters(request.getParameter("wPhoneExt"))));
+		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "demo_cell", filterControlCharacters(request.getParameter("demo_cell"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "aboriginal", StringUtils.trimToEmpty(request.getParameter("aboriginal"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "cytolNum", StringUtils.trimToEmpty(request.getParameter("cytolNum"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "ethnicity", StringUtils.trimToEmpty(request.getParameter("ethnicity"))));
@@ -260,7 +262,7 @@ public class AddDemographicAction extends Action
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "given_consent", StringUtils.trimToEmpty(request.getParameter("given_consent"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "rxInteractionWarningLevel", StringUtils.trimToEmpty(request.getParameter("rxInteractionWarningLevel"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "primaryEMR", StringUtils.trimToEmpty(request.getParameter("primaryEMR"))));
-		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "phoneComment", StringUtils.trimToEmpty(request.getParameter("phoneComment"))));
+		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "phoneComment", filterControlCharacters(request.getParameter("phoneComment"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "usSigned", StringUtils.trimToEmpty(request.getParameter("usSigned"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "privacyConsent", StringUtils.trimToEmpty(request.getParameter("privacyConsent"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "informedConsent", StringUtils.trimToEmpty(request.getParameter("informedConsent"))));

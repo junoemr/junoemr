@@ -157,6 +157,7 @@
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
 <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/UserInputDemoControl.js"></script>
    <script>
      jQuery.noConflict();
    </script>
@@ -824,14 +825,14 @@ function ignoreDuplicates() {
 				<td id="phoneLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPhoneHome" />: </b></td>
 				<td id="phoneCell" align="left"><input type="text" id="phone" name="phone"
-				   	onBlur="formatPhoneNum()"
+				   	onBlur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.adddemographic.phone)"
 					value="<%=props.getProperty("phoneprefix", "905-")%>"> <bean:message
 					key="demographic.demographicaddrecordhtm.Ext" />:<input
 					type="text" id="hPhoneExt" name="hPhoneExt" value="" size="4" /></td>
 				<td id="phoneWorkLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPhoneWork" />:</b></td>
 				<td id="phoneWorkCell" align="left"><input type="text" name="phone2"
-				   	onBlur="formatPhoneNum()" value=""> <bean:message
+				   	onBlur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.adddemographic.phone2)" value=""> <bean:message
 					key="demographic.demographicaddrecordhtm.Ext" />:<input type="text"
 					name="wPhoneExt" value="" style="display: inline" size="4" /></td>
 			</tr>
@@ -839,7 +840,7 @@ function ignoreDuplicates() {
 				<td id="phoneCellLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPhoneCell" />: </b></td>
 				<td id="phoneCellCell" align="left"><input type="text" name="demo_cell"
-				   	onBlur="formatPhoneNum()"></td>
+				   	onBlur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.adddemographic.demo_cell)"></td>
 				<td align="right"><b><bean:message
 						key="demographic.demographicaddrecordhtm.formPhoneComment" />: </b></td>
 				<td align="left" colspan="3">

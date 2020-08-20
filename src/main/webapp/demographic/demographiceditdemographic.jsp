@@ -341,6 +341,7 @@ if(!authed) {
     <link rel="stylesheet" type="text/css" href="../share/css/searchBox.css">
     <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <% } %>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/UserInputDemoControl.js"></script>
 <script language="javascript" type="text/javascript"
 	src="../share/javascript/Oscar.js"></script>
 
@@ -816,12 +817,19 @@ jQuery(document).ready(function() {
        });
 });
 
+jQuery(document).ready(function(){
+	Juno.Demographic.InputCtrl.formatPhoneNumber(document.updatedelete.phone);
+	Juno.Demographic.InputCtrl.formatPhoneNumber(document.updatedelete.phone2,);
+	Juno.Demographic.InputCtrl.formatPhoneNumber(document.updatedelete.demo_cell);
+
+});
+
 </script>
 
 <script type="text/javascript" src="<%=request.getContextPath() %>/demographic/demographiceditdemographic.js.jsp?demographic_no=<%=request.getParameter("demographic_no")%>&apptProvider=<%=request.getParameter("apptProvider")%>&appointment=<%=request.getParameter("appointment")%>"></script>
 
 </head>
-<body onLoad="setfocus(); formatPhoneNum(); checkRosterStatus2();"
+<body onLoad="setfocus(); checkRosterStatus2();"
 	topmargin="0" leftmargin="0" rightmargin="0" id="demographiceditdemographic">
 <%
        Demographic demographic = demographicDao.getDemographic(demographic_no);
@@ -2579,7 +2587,7 @@ if ( Dead.equals(PatStat) ) {%>
 								<td align="right"><b><bean:message
 									key="demographic.demographiceditdemographic.formPhoneH" />: </b></td>
 								<td align="left">
-								<input type="text" name="phone" onblur="formatPhoneNum();" <%=getDisabled("phone")%>
+								<input type="text" name="phone" onblur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.updatedelete.phone);" <%=getDisabled("phone")%>
 									style="display: inline; width: auto;"
 									value="<%=StringUtils.trimToEmpty(StringUtils.trimToEmpty(demographic.getPhone()))%>"> <bean:message key="demographic.demographiceditdemographic.msgExt"/>:<input
 									type="text" name="hPhoneExt" <%=getDisabled("hPhoneExt")%>
@@ -2590,7 +2598,7 @@ if ( Dead.equals(PatStat) ) {%>
 								<td align="right"><b><bean:message
 									key="demographic.demographiceditdemographic.formPhoneW" />:</b></td>
 								<td align="left"><input type="text" name="phone2" <%=getDisabled("phone2")%>
-									onblur="formatPhoneNum();"
+									onblur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.updatedelete.phone2);"
 									style="display: inline; width: auto;"
 									value="<%=StringUtils.trimToEmpty(demographic.getPhone2())%>"> <bean:message key="demographic.demographiceditdemographic.msgExt"/>:<input
 									type="text" name="wPhoneExt" <%=getDisabled("wPhoneExt")%>
@@ -2604,7 +2612,7 @@ if ( Dead.equals(PatStat) ) {%>
 								<td align="right"><b><bean:message
 									key="demographic.demographiceditdemographic.formPhoneC" />: </b></td>
 								<td align="left">
-								<input type="text" name="demo_cell" onblur="formatPhoneNum();"
+								<input type="text" name="demo_cell" onblur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.updatedelete.demo_cell);"
 									style="display: inline; width: auto;" <%=getDisabled("demo_cell")%>
 									value="<%=StringUtils.trimToEmpty(demoExt.get("demo_cell"))%>">
 								<input type="hidden" name="demo_cellOrig"

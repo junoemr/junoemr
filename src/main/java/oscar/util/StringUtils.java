@@ -474,6 +474,23 @@ public class StringUtils {
     }
 
     /**
+     * remove invisible control characters (unicode 0000-001F and 007F-009F) that comes from user input.
+     */
+    public static String filterControlCharacters(String input)
+    {
+        if (input != null && input.trim().length() > 0)
+        {
+            Matcher matcher = UtilMisc.controlCharPattern.matcher(input);
+            if (matcher.find())
+            {
+                input = matcher.replaceAll("");
+            }
+        }
+
+        return input;
+    }
+
+    /**
      * checks that a string is safe for use in Juno.
      * This is primarily intended to prevent XSS in Juno.
      * @param testValue - string to test
