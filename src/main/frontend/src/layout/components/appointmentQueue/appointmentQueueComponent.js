@@ -239,6 +239,7 @@ angular.module('Layout.Components').component('appointmentQueue', {
 								style: () => ctrl.componentStyle,
 								queueId: () => ctrl.currentQueue.id,
 								queuedAppointmentId: () => ctrl.currentQueue.items[itemIndex].id,
+								loadQueuesCallback: () => ctrl.loadQueues,
 							}
 						}
 				).result;

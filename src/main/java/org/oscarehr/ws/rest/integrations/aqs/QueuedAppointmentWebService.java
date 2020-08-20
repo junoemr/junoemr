@@ -23,6 +23,7 @@
 
 package org.oscarehr.ws.rest.integrations.aqs;
 
+import ca.cloudpractice.aqs.client.model.QueuedAppointmentStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Appointment;
@@ -53,6 +54,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.validation.ValidationException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -99,13 +101,20 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public RestResponse<AppointmentTo1> bookQueuedAppointment(@PathParam("queueId") UUID queueId, @PathParam("appointmentId") UUID appointmentId, BookQueuedAppointmentTransfer bookQueuedAppointmentTransfer)
+	public RestResponse<AppointmentTo1> bookQueuedAppointment(@PathParam("queueId") UUID queueId,
+	                                                          @PathParam("appointmentId") UUID appointmentId,
+	                                                          BookQueuedAppointmentTransfer bookQueuedAppointmentTransfer) throws ValidationException
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._APPOINTMENT);
 		QueuedAppointment queuedAppointment = queuedAppointmentService.getQueuedAppointment(appointmentId, queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		Demographic demographic = demographicDao.find(queuedAppointment.getDemographicNo());
 		ProviderData provider = providerDataDao.find(bookQueuedAppointmentTransfer.getProviderNo());
 		Date now = new Date();
+
+		if (queuedAppointment.getStatus() != QueuedAppointmentStatus.QUEUED)
+		{
+			throw new ValidationException("Queued Appointment [" + queuedAppointment.getId() +"] is no longer in the queue");
+		}
 
 		// create new juno appointment
 		Appointment appointment = new Appointment();

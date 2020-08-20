@@ -23,6 +23,7 @@
 package org.oscarehr.ws.rest.integrations.aqs.transfer;
 
 import ca.cloudpractice.aqs.client.model.QueueInput;
+import ca.cloudpractice.aqs.client.model.QueuedAppointmentStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -52,6 +53,7 @@ public class AppointmentQueueTo1 implements Serializable
 	private String queueColor;
 	@JsonSerialize(using = OffsetDateTimeSerializer.class)
 	private OffsetDateTime createdAt;
+	private QueuedAppointmentStatus status;
 
 	private QueueAvailabilitySettingsTransfer availabilitySettings;
 

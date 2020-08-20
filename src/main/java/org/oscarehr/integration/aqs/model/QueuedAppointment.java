@@ -23,6 +23,7 @@
 package org.oscarehr.integration.aqs.model;
 
 import ca.cloudpractice.aqs.client.model.QueuedAppointmentDto;
+import ca.cloudpractice.aqs.client.model.QueuedAppointmentStatus;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
@@ -44,6 +45,7 @@ public class QueuedAppointment
 	private OffsetDateTime createdAt;
 	private String reason;
 	private String notes;
+	private QueuedAppointmentStatus status;
 
 
 	public QueuedAppointment(QueuedAppointmentDto appointmentDto)

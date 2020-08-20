@@ -151,8 +151,26 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 
 			bookQueuedAppointmentTransfer.providerNo = ctrl.bookProviderNo;
 
-			await aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId,  ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer);
-			ctrl.modalInstance.close();
+			try
+			{
+				await aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId, ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer);
+			}
+			catch(err)
+			{
+				Juno.Common.Util.errorAlert($uibModal,
+				                            "Failed to book appointment",
+				                            "Could not schedule the queued appointment. It may have been canceled");
+			}
+			finally
+			{
+				// refresh the queued appointment list
+				if (ctrl.resolve.loadQueuesCallback)
+				{
+					ctrl.resolve.loadQueuesCallback();
+				}
+
+				ctrl.modalInstance.close();
+			}
 		}
 	}]
 });
