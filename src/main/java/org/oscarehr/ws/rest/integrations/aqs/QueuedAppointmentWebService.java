@@ -154,7 +154,9 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 		queuedAppointmentLink.setQueuedAppointmentId(queuedAppointment.getId().toString());
 		queuedAppointmentLinkDao.persist(queuedAppointmentLink);
 
-		// TODO update AQS status
+		// mark appointment as schedule on AQS server
+		queuedAppointment.setStatus(QueuedAppointmentStatus.SCHEDULED);
+		queuedAppointmentService.updateQueuedAppointment(queuedAppointment, getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 
 		// return newly created appointment
 		AppointmentConverter converter = new AppointmentConverter(true, true);

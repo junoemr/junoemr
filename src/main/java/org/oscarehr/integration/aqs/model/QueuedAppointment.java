@@ -23,6 +23,7 @@
 package org.oscarehr.integration.aqs.model;
 
 import ca.cloudpractice.aqs.client.model.QueuedAppointmentDto;
+import ca.cloudpractice.aqs.client.model.QueuedAppointmentInput;
 import ca.cloudpractice.aqs.client.model.QueuedAppointmentStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,6 +47,7 @@ public class QueuedAppointment
 	private String reason;
 	private String notes;
 	private QueuedAppointmentStatus status;
+	private String createdBy;
 
 
 	public QueuedAppointment(QueuedAppointmentDto appointmentDto)
@@ -62,5 +64,19 @@ public class QueuedAppointment
 				this.setNotes(extrasMap.get(EXTRAS_NOTES).toString());
 			}
 		}
+	}
+
+	/**
+	 * construct a QueuedAppointmentInput form this QueuedAppointment
+	 * @return - a new QueuedAppointmentInput
+	 */
+	public QueuedAppointmentInput asQueuedAppointmentInput()
+	{
+		QueuedAppointmentInput queuedAppointmentInput = new QueuedAppointmentInput();
+
+		BeanUtils.copyProperties(this, queuedAppointmentInput, "demographicNo");
+		queuedAppointmentInput.setIntegrationPatientId(this.getDemographicNo().toString());
+
+		return queuedAppointmentInput;
 	}
 }

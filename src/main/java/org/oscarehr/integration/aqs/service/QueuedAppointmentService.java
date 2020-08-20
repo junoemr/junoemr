@@ -73,7 +73,7 @@ public class QueuedAppointmentService extends BaseService
 	{
 		try
 		{
-			return new QueuedAppointment(getOrganizationApi(securityNo).getAppointment(queuedAppointmentId));
+			return new QueuedAppointment(getOrganizationApi(securityNo).getQueuedAppointment(queuedAppointmentId));
 		}
 		catch (ApiException apiException)
 		{
@@ -97,6 +97,23 @@ public class QueuedAppointmentService extends BaseService
 		catch (ApiException apiException)
 		{
 			throw new AqsCommunicationException("Failed to get appointments in queue [" + appointmentId + "] from the AQS server", apiException);
+		}
+	}
+
+	/**
+	 * Update a queued appointment on the AQS server
+	 * @param queuedAppointment - the appointment to update
+	 * @param securityNo - the security no of the provider performing this action
+	 */
+	public void updateQueuedAppointment(QueuedAppointment queuedAppointment, Integer securityNo)
+	{
+		try
+		{
+			getOrganizationApi(securityNo).updateQueuedAppointment(queuedAppointment.getId(), queuedAppointment.asQueuedAppointmentInput());
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to update queued appointment [" + queuedAppointment.getId() + "] on the AQS server", apiException);
 		}
 	}
 }
