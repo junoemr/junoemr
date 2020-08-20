@@ -2,9 +2,14 @@
 
 	.center-options {
 		juno-button {
+			max-width: 140px;
 			&:not(last-child) {
 				margin-right: 8px;
 			}
+		}
+
+		juno-typeahead {
+			flex-grow: 1;
 		}
 	}
 

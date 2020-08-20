@@ -151,7 +151,7 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 
 			bookQueuedAppointmentTransfer.providerNo = ctrl.bookProviderNo;
 
-			aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId,  ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer);
+			await aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId,  ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer);
 			ctrl.modalInstance.close();
 		}
 	}]

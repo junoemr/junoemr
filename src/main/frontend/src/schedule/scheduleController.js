@@ -354,6 +354,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			$scope.calendar().fullCalendar('prev');
 		};
+
 		$scope.stepForward = function stepForward()
 		{
 			$scope.calendar().fullCalendar('next');

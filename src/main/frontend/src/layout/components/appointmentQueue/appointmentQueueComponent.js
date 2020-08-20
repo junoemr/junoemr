@@ -36,11 +36,13 @@ angular.module('Layout.Components').component('appointmentQueue', {
 	},
 	controller: [
 		"$scope",
+		"$rootScope",
 		"$http",
 		"$httpParamSerializer",
 		"$uibModal",
 		function (
 			$scope,
+			$rootScope,
 			$http,
 			$httpParamSerializer,
 			$uibModal,
@@ -240,6 +242,8 @@ angular.module('Layout.Components').component('appointmentQueue', {
 							}
 						}
 				).result;
+
+				$rootScope.$broadcast('schedule:refreshEvents');
 			}
 			catch(err)
 			{
