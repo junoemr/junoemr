@@ -16,12 +16,15 @@
 
 	<div class="list">
 		<div class="list-content" ng-style="$ctrl.getListScrollHeightStyle()">
-			<juno-loading-indicator ng-if="!$ctrl.currentQueue"
+			<juno-loading-indicator ng-if="!$ctrl.currentQueue && !$ctrl.noQueues"
 															class="loading-indicator-container"
 															message = "Loading"
 															message-alignment="vertical"
 															indicator-type="dot-pulse">
 			</juno-loading-indicator>
+			<h2 class="no-queues-zero-state" ng-if="$ctrl.noQueues">
+				Appointment Queue feature is not available at this time.
+			</h2>
 			<div ng-if="$ctrl.currentQueue" ng-repeat="foobar in [].constructor($ctrl.currentQueue.queueLimit) track by $index" class="flex-fill-row">
 				<appointment-card ng-model="$ctrl.currentQueue.items[$index]"
 				                  on-delete="$ctrl.deleteQueueItem($index);"

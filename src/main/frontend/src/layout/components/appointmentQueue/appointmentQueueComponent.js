@@ -59,6 +59,9 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		let aqsQueuedAppointmentApi = new AqsQueuedAppointmentApi($http, $httpParamSerializer,
 				'../ws/rs');
 
+		// if true show no queues zero state
+		ctrl.noQueues = false;
+
 		// hash of all queues
 		ctrl.queues = [];
 		// tab options used to select queue.
@@ -121,23 +124,31 @@ angular.module('Layout.Components').component('appointmentQueue', {
 			try
 			{
 				let appointmentQueues = (await aqsQueuesApi.getAppointmentQueues()).data.body;
-				for(let queue of appointmentQueues)
+
+				if (appointmentQueues.length > 0)
 				{
-					let queuedAppointments = (await aqsQueuedAppointmentApi.getAppointmentsInQueue(queue.id)).data.body;
-					queuedAppointments.sort((firstAppt, secondAppt) => firstAppt.queuePosition - secondAppt.queuePosition);
-					queue.items = queuedAppointments;
-					ctrl.queues.push(queue);
-				}
+					for (let queue of appointmentQueues)
+					{
+						let queuedAppointments = (await aqsQueuedAppointmentApi.getAppointmentsInQueue(queue.id)).data.body;
+						queuedAppointments.sort((firstAppt, secondAppt) => firstAppt.queuePosition - secondAppt.queuePosition);
+						queue.items = queuedAppointments;
+						ctrl.queues.push(queue);
+					}
 
-				ctrl.setupQueueTabs();
+					ctrl.setupQueueTabs();
 
-				if (ctrl.currentQueue == null)
-				{	// set default selection to first queue.
-					ctrl.currentQueue = ctrl.queues[0];
+					if (ctrl.currentQueue == null)
+					{	// set default selection to first queue.
+						ctrl.currentQueue = ctrl.queues[0];
+					} else
+					{ // we have updated attempt to re-acquire queue
+						ctrl.currentQueue = ctrl.queues.find((queue) => queue.queueName === ctrl.currentQueue.queueName)
+					}
 				}
 				else
-				{ // we have updated attempt to re-acquire queue
-					ctrl.currentQueue = ctrl.queues.find((queue) => queue.queueName === ctrl.currentQueue.queueName)
+				{
+					// no queues
+					ctrl.noQueues = true;
 				}
 			}
 			catch(err)

@@ -30,6 +30,8 @@ import ca.cloudpractice.aqs.client.auth.ApiKeyAuth;
 import ca.cloudpractice.aqs.client.model.RemoteUserType;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 
@@ -50,6 +52,10 @@ public abstract class BaseService extends org.oscarehr.integration.BaseService
 	protected final String AQS_PROPERTY_API_SECRET_KEY = "aqs_api_secret_key";
 
 	protected ApiClient apiClient;
+
+	@Autowired
+	@Qualifier("UserPropertyDAO")
+	private UserPropertyDAO userPropertyDao;
 
 	public BaseService()
 	{
@@ -79,7 +85,7 @@ public abstract class BaseService extends org.oscarehr.integration.BaseService
 	 */
 	public OrganizationApi getOrganizationApi(Integer securityNo)
 	{
-		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_ID)).setApiKey(securityNo.toString());
+		setApiCredentials(securityNo);
 		return new OrganizationApi(apiClient);
 	}
 
@@ -90,7 +96,27 @@ public abstract class BaseService extends org.oscarehr.integration.BaseService
 	 */
 	public AdminApi getAdminApi(Integer securityNo)
 	{
-		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_ID)).setApiKey(securityNo.toString());
+		setApiCredentials(securityNo);
 		return new AdminApi(apiClient);
+	}
+
+	/**
+	 * set the per request api credentials
+	 * @param securityNo - the security no of the user making the request
+	 */
+	private void setApiCredentials(Integer securityNo)
+	{
+		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_ID)).setApiKey(securityNo.toString());
+
+		// autowire not available in abstract class
+		if (userPropertyDao.getProp(AQS_PROPERTY_API_SECRET_KEY) != null)
+		{
+			((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_ORG_SECRET)).setApiKey(userPropertyDao.getProp(AQS_PROPERTY_API_SECRET_KEY).getValue());
+		}
+		else
+		{
+			throw new RuntimeException("The property [" + AQS_PROPERTY_API_SECRET_KEY + "] is not set in the [property] table! " +
+							                           "AQS integration will not function until corrected!");
+		}
 	}
 }
