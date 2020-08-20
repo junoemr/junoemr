@@ -69,8 +69,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static oscar.util.StringUtils.filterControlCharacters;
-
 /**
  * Will provide access to demographic data, as well as closely related data such as 
  * extensions (DemographicExt), merge data, archive data, etc.
