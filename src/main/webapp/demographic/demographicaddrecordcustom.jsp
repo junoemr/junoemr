@@ -208,8 +208,6 @@
 		</style>
 		<script language="JavaScript">
 
-
-
 			function onSubmit()
 			{
 
@@ -298,6 +296,7 @@
 					alert("Invalid entry");
 				}
 			}
+
 			function rs(n,u,w,h,x) {
 				args="width="+w+",height="+h+",resizable=yes,scrollbars=yes,status=0,top=60,left=30";
 				remote=window.open(u,n,args);

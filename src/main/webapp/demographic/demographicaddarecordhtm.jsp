@@ -155,6 +155,9 @@
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/UserInputDemoControl.js"></script>
+
 <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
 <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/UserInputDemoControl.js"></script>

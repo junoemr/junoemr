@@ -250,9 +250,9 @@ public class AddDemographicAction extends Action
 		//Create demographic extensions
 		List<DemographicExt> extensions = new ArrayList<DemographicExt>();
 
-		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "hPhoneExt", filterControlCharacters(StringUtils.trimToNull(request.getParameter("hPhoneExt")))));
-		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "wPhoneExt", filterControlCharacters(StringUtils.trimToNull(request.getParameter("wPhoneExt")))));
-		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "demo_cell", filterControlCharacters(StringUtils.trimToNull(request.getParameter("demo_cell")))));
+		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "hPhoneExt", filterControlCharacters(StringUtils.trimToEmpty(request.getParameter("hPhoneExt")))));
+		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "wPhoneExt", filterControlCharacters(StringUtils.trimToEmpty(request.getParameter("wPhoneExt")))));
+		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "demo_cell", filterControlCharacters(StringUtils.trimToEmpty(request.getParameter("demo_cell")))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "aboriginal", StringUtils.trimToEmpty(request.getParameter("aboriginal"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "cytolNum", StringUtils.trimToEmpty(request.getParameter("cytolNum"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "ethnicity", StringUtils.trimToEmpty(request.getParameter("ethnicity"))));
@@ -262,7 +262,7 @@ public class AddDemographicAction extends Action
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "given_consent", StringUtils.trimToEmpty(request.getParameter("given_consent"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "rxInteractionWarningLevel", StringUtils.trimToEmpty(request.getParameter("rxInteractionWarningLevel"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "primaryEMR", StringUtils.trimToEmpty(request.getParameter("primaryEMR"))));
-		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "phoneComment", filterControlCharacters(StringUtils.trimToNull(request.getParameter("phoneComment")))));
+		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "phoneComment", filterControlCharacters(StringUtils.trimToEmpty(request.getParameter("phoneComment")))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "usSigned", StringUtils.trimToEmpty(request.getParameter("usSigned"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "privacyConsent", StringUtils.trimToEmpty(request.getParameter("privacyConsent"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "informedConsent", StringUtils.trimToEmpty(request.getParameter("informedConsent"))));

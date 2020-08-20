@@ -438,43 +438,8 @@ public class StringUtils {
         return str.replaceAll("[\\\\/:*?\"<>|]", "-");
     }
 
-
-    public static String filteroutControlCharacters(String input)
-    {
-        if (input.length() > 0)
-        {
-            int index = 0;
-            StringBuilder sb = new StringBuilder(input);
-            while (index < sb.length())
-            {
-                while (isControlCharacter(sb.charAt(index)))
-                {
-                    sb.deleteCharAt(index);
-                }
-                index++;
-            }
-            input = sb.toString();
-        }
-        return input;
-    }
-
-    private static boolean isControlCharacter(char c)
-    {
-        return isC0GroupControlCode(c) || isC1GroupControlCode(c);
-    }
-
-    private static boolean isC0GroupControlCode(int code)
-    {
-        return code <= 31;
-    }
-
-    private static boolean isC1GroupControlCode(int code)
-    {
-        return 127<=code && code <= 159;
-    }
-
     /**
-     * remove invisible control characters (unicode 0000-001F and 007F-009F) that comes from user input.
+     * remove invisible control characters (unicode 0000-001F and 007F-009F).
      */
     public static String filterControlCharacters(String input)
     {

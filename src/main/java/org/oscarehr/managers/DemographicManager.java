@@ -295,8 +295,8 @@ public class DemographicManager {
 		{
 			demographic.setFamilyDoctor2("<fd></fd><fdname></fdname>");
 		}
-		demographic.setPhone(filterControlCharacters(demographic.getPhone()));
-		demographic.setPhone2(filterControlCharacters(demographic.getPhone2()));
+		demographic.setPhone(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone()));
+		demographic.setPhone2(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone2()));
 		demographic.setLastUpdateUser(providerNo);
 		demographicDao.save(demographic);
 
@@ -334,6 +334,9 @@ public class DemographicManager {
 		
 		//save current demo
 		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		//remove control characters for existing records.
+		demographic.setPhone(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone()));
+		demographic.setPhone2(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone2()));
 		demographicDao.save(demographic);
 
 		// update MyHealthAccess connection status.
