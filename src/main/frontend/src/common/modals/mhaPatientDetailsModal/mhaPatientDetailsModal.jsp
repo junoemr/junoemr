@@ -21,6 +21,22 @@
 		<div class="content-area">
 			<div class="left-content">
 				<div class="top-content">
+					<div class="flex-row">
+						<juno-input ng-model="$ctrl.currentProfile.last_name"
+						            label="Last Name"
+						            label-position="LABEL_POSITION.TOP"
+						            readonly="true"
+						            no-box="true"
+						            component-style="$ctrl.resolve.style">
+						</juno-input>
+						<juno-input ng-model="$ctrl.currentProfile.first_name"
+						            label="First Name"
+						            label-position="LABEL_POSITION.TOP"
+						            readonly="true"
+						            no-box="true"
+						            component-style="$ctrl.resolve.style">
+						</juno-input>
+					</div>
 					<!-- Email -->
 					<juno-input ng-model="$ctrl.currentProfile.email"
 									label="Email Address"

@@ -61,6 +61,7 @@ angular.module('Common.Components').component('mhaPatientInviteConfirmModal',
 			ctrl.integrationsList = ctrl.resolve.integrationsList.map((obj) => ({ label: obj.siteName, value: obj.id}));
 			ctrl.demographicNo = ctrl.resolve.demographicNo;
 			ctrl.demographicEmail = ctrl.resolve.demographicEmail;
+			ctrl.initialIntegration = ctrl.resolve.selectedIntegration;
 
 			systemPreferenceApi.getPropertyEnabled("multisites").then((response) =>
 			{
@@ -70,6 +71,10 @@ angular.module('Common.Components').component('mhaPatientInviteConfirmModal',
 				if (!ctrl.isMultisiteEnabled)
 				{
 					ctrl.selectedIntegrationId = ctrl.integrationsList[0].value;
+				}
+				else if (ctrl.initialIntegration)
+				{
+					ctrl.selectedIntegrationId = ctrl.initialIntegration.id;
 				}
 
 			}).finally(() =>

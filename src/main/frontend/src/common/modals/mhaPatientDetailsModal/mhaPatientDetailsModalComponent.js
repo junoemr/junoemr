@@ -125,7 +125,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 
 		ctrl.getLocalPatientName = () =>
 		{
-			return `${ctrl.demographic.firstName}, ${ctrl.demographic.lastName}`;
+			return `${ctrl.demographic.lastName}, ${ctrl.demographic.firstName}`;
 		}
 
 		ctrl.getLocalPatientHinAndProv = () =>
@@ -137,7 +137,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 		{
 			if (ctrl.currentProfile)
 			{
-				return `${ctrl.currentProfile.first_name}, ${ctrl.currentProfile.last_name}`;
+				return `${ctrl.currentProfile.last_name}, ${ctrl.currentProfile.first_name}`;
 			}
 			return "";
 		};
@@ -181,6 +181,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 							demographicNo: () => ctrl.demographic.demographicNo,
 							demographicEmail: () => ctrl.demographic.email,
 							integrationsList: () => ctrl.integrationsList,
+							selectedIntegration: () => ctrl.currentIntegration,
 						}
 					}
 				).result;
