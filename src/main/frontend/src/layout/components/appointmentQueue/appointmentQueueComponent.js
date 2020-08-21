@@ -72,7 +72,7 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		ctrl.currentQueue = null;
 
 		// queue polling
-		ctrl.QUEUE_POLLING_INVTERVAL = 120000; // 2 minutes
+		ctrl.QUEUE_POLLING_INVTERVAL = 30000; // 30 seconds
 		ctrl.queueUpdateInterval = null;
 
 		// ======= Scroll Height tracking ===========
