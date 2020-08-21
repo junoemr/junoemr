@@ -88,7 +88,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 			}
 			else if (ctrl.isButtonStateInvite() && ctrl.inviteSent)
 			{
-				return "Invite Pending";
+				return "Resend MyHealthAccess Invite";
 			}
 			else if (ctrl.isButtonStateInvite())
 			{
@@ -152,7 +152,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.buttonDisabled = () =>
 		{
-			return (this.inviteSent || ctrl.isButtonStateUnavailable());
+			return (ctrl.isButtonStateUnavailable());
 		}
 
 		ctrl.isButtonStateEdit = () =>

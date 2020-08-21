@@ -65,9 +65,14 @@ angular.module('Record.Details').component('demographicSection', {
 				}
 			}
 
+			ctrl.canOpenPatientModal = () =>
+			{
+				return (ctrl.mhaSites !== '');
+			}
+
 			ctrl.openPatientModal = async () =>
 			{
-				if (ctrl.mhaSites !== '')
+				if (ctrl.canOpenPatientModal())
 				{
 					try
 					{

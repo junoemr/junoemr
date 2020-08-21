@@ -141,6 +141,7 @@
 				<div class="footer-button-wrapper">
 					<juno-button component-style="$ctrl.resolve.style"
 					             button-color="JUNO_BUTTON_COLOR.SECONDARY"
+					             disabled="!$ctrl.hasActiveConnection()"
 					             ng-click="$ctrl.cancelConnection()"
 					             class="cancel-connection-btn">
 						<div class="cancel-btn-text">
