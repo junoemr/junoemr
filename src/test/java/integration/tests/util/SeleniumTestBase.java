@@ -69,6 +69,7 @@ public class SeleniumTestBase
 	public void login()
 	{
 		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+		driver.manage().window().maximize();
 	}
 
 	@AfterClass
@@ -86,7 +87,6 @@ public class SeleniumTestBase
 		ffo.setBinary(ffb);
 		driver = new FirefoxDriver(ffo);
 		driver.manage().timeouts().implicitlyWait(WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
-
 	}
 
 	protected static void loadSpringBeans()
