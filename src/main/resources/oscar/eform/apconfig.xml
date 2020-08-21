@@ -563,7 +563,7 @@
             CASE
               WHEN TIMESTAMPDIFF(MONTH,t.birthdate, CURDATE()) &lt; 1
                 THEN CONCAT(TIMESTAMPDIFF(DAY, t.birthdate, CURDATE()), ' days old')
-              WHEN TIMESTAMPDIFF(YEAR, t.birthdate, NOW()) &lt; 1
+              WHEN TIMESTAMPDIFF(YEAR, t.birthdate, CURDATE()) &lt; 1
                 THEN CONCAT(TIMESTAMPDIFF(MONTH, t.birthdate, CURDATE()), ' months ', TIMESTAMPDIFF(WEEK, DATE_ADD(t.birthdate, INTERVAL TIMESTAMPDIFF(MONTH, t.birthdate, CURDATE()) MONTH), CURDATE()), ' weeks old')
             ELSE
               CONCAT(TIMESTAMPDIFF(YEAR, t.birthdate, CURDATE()), " years ", MOD(TIMESTAMPDIFF(MONTH, t.birthdate, CURDATE()), 12), " months")
