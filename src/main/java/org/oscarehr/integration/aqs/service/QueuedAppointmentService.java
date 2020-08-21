@@ -23,11 +23,33 @@
 package org.oscarehr.integration.aqs.service;
 
 import ca.cloudpractice.aqs.client.ApiException;
+import ca.cloudpractice.aqs.client.model.QueuedAppointmentStatus;
+import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.dao.SiteDao;
+import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Site;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.integration.aqs.dao.QueuedAppointmentLinkDao;
 import org.oscarehr.integration.aqs.exception.AqsCommunicationException;
 import org.oscarehr.integration.aqs.model.AppointmentQueue;
 import org.oscarehr.integration.aqs.model.QueuedAppointment;
+import org.oscarehr.integration.aqs.model.QueuedAppointmentLink;
+import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
+import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
+import org.oscarehr.integration.service.IntegrationService;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.LoggedInInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ValidationException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -35,6 +57,27 @@ import java.util.stream.Collectors;
 @Service
 public class QueuedAppointmentService extends BaseService
 {
+	@Autowired
+	private QueuedAppointmentLinkDao queuedAppointmentLinkDao;
+
+	@Autowired
+	private AppointmentService mhaAppointmentService;
+
+	@Autowired
+	private DemographicDao demographicDao;
+
+	@Autowired
+	private ProviderDataDao providerDataDao;
+
+	@Autowired
+	private org.oscarehr.appointment.service.Appointment appointmentService;
+
+	@Autowired
+	private SiteDao siteDao;
+
+	@Autowired
+	private IntegrationService integrationService;
+
 	/**
 	 * calls through to lower definition of getAppointmentsInQueue
 	 * @param appointmentQueue - queue object to get appointments for
@@ -115,5 +158,82 @@ public class QueuedAppointmentService extends BaseService
 		{
 			throw new AqsCommunicationException("Failed to update queued appointment [" + queuedAppointment.getId() + "] on the AQS server", apiException);
 		}
+	}
+
+	/**
+	 * move a queued appointment in to the schedule updating all necessary servers (AQS & MHA)
+	 * @param queuedAppointmentId - the id of the queued appointment to move in to the schedule
+	 * @param queueId - the queue the above appointment is contained in
+	 * @param providerNo - the provider who's schedule the appointment is getting moved to
+	 * @param siteId - the site the appointment is getting booked in to
+	 * @param loggedInInfo - logged in info
+	 * @param httpServletRequest - http servlet request
+	 * @return - the newly scheduled appointment
+	 */
+	@Transactional
+	public Appointment scheduleQueuedAppointment(UUID queuedAppointmentId, UUID queueId, String providerNo,
+	                                             Integer siteId, LoggedInInfo loggedInInfo, HttpServletRequest httpServletRequest)
+	{
+		QueuedAppointment queuedAppointment = getQueuedAppointment(queuedAppointmentId, queueId, loggedInInfo.getLoggedInSecurity().getSecurityNo());
+		Demographic demographic = demographicDao.find(queuedAppointment.getDemographicNo());
+		ProviderData provider = providerDataDao.find(providerNo);
+		Date now = new Date();
+
+		if (queuedAppointment.getStatus() != QueuedAppointmentStatus.QUEUED)
+		{
+			throw new ValidationException("Queued Appointment [" + queuedAppointment.getId() +"] is no longer in the queue");
+		}
+
+		// create new juno appointment
+		Appointment appointment = new Appointment();
+		appointment.setProviderNo(providerNo);
+		appointment.setDemographicNo(demographic.getId());
+		appointment.setAppointmentDate(now);
+		appointment.setStartTime(now);
+		appointment.setCreateDateTime(now);
+		appointment.setStatus(Appointment.TODO);
+		appointment.setCreator(provider.getDisplayName());
+		appointment.setBookingSource(Appointment.BookingSource.OSCAR);
+		appointment.setReason(queuedAppointment.getReason());
+		appointment.setNotes(queuedAppointment.getNotes());
+		appointment.setName("");
+		appointment.setIsVirtual(true);
+
+		// book 15 min appointment
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(now);
+		calendar.add(Calendar.MINUTE, 15);
+		appointment.setEndTime(calendar.getTime());
+
+		// set site, if provided
+		if (siteId != null)
+		{
+			Site site = siteDao.find(siteId);
+			appointment.setLocation(site.getName());
+		}
+
+		// save
+		Appointment newAppointment = appointmentService.saveNewAppointment(appointment, loggedInInfo, httpServletRequest, false);
+
+		// link to AQS queued appointment id
+		QueuedAppointmentLink queuedAppointmentLink = new QueuedAppointmentLink();
+		queuedAppointmentLink.setAppointment(newAppointment);
+		queuedAppointmentLink.setQueueId(queueId.toString());
+		queuedAppointmentLink.setQueuedAppointmentId(queuedAppointment.getId().toString());
+		queuedAppointmentLinkDao.persist(queuedAppointmentLink);
+
+		// mark appointment as schedule on AQS server
+		queuedAppointment.setStatus(QueuedAppointmentStatus.SCHEDULED);
+		updateQueuedAppointment(queuedAppointment, loggedInInfo.getLoggedInSecurity().getSecurityNo());
+
+		// book the appointment in to MHA
+		mhaAppointmentService.bookTelehealthAppointment(loggedInInfo, newAppointment, false, UUID.fromString(queuedAppointment.getCreatedBy()));
+
+		// link the mha appointments telehealth session to the AQS telehealth session
+		Integration integration = integrationService.findMhaIntegration(StringUtils.trimToNull(appointment.getLocation()));
+		MHAAppointment mhaAppointment = mhaAppointmentService.getAppointment(integration, newAppointment.getId());
+		mhaAppointmentService.linkAppointmentToAqsTelehealth(integration, loggedInInfo, mhaAppointment, queuedAppointmentId);
+
+		return newAppointment;
 	}
 }
