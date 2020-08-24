@@ -45,12 +45,12 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 
 public class AddPatientsTests extends SeleniumTestBase
 {
-	WebDriverWait wait= new WebDriverWait(driver,WEB_DRIVER_EXPLICIT_TIMEOUT);
+	WebDriverWait wait = new WebDriverWait(driver,WEB_DRIVER_EXPLICIT_TIMEOUT);
 
 	@AfterClass
 	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
-		SchemaUtils.restoreTable("admission", "appointment", "demographic",
+		SchemaUtils.restoreTable("admission", "demographic",
 				"demographicArchive", "demographiccust", "demographicExt", "demographicExtArchive", "log", "log_ws_rest",
 				"program", "provider_recent_demographic_access");
 	}
