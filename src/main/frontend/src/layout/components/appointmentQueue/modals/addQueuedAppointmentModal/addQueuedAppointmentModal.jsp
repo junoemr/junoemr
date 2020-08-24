@@ -5,7 +5,7 @@
 	<h5 class="title juno-text-primary">Move Queued Appointment to Schedule </h5>
 
 	<p class="juno-text">
-		Select which schedule you want to move the queued appointment too.
+		Select which schedule you want to move the queued appointment to.
 	</p>
 
 	<div class="center-options flex-row align-items-flex-end">

@@ -55,6 +55,7 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
+@Transactional
 public class IntegrationAction extends DispatchAction
 {
 	private static MyHealthAccessService myHealthAccessService = SpringUtils.getBean(MyHealthAccessService.class);
@@ -153,7 +154,6 @@ public class IntegrationAction extends DispatchAction
 		}
 	}
 
-	@Transactional
 	protected ActionForward getRemoteRedirect(IntegrationData integrationData, HttpServletRequest request)
 	{
 		OscarAppointmentDao oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
