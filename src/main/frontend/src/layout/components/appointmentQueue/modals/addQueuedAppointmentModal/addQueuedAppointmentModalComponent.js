@@ -66,17 +66,16 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 
 		ctrl.bookProviderNo = null;
 		ctrl.providerOptions = [];
+		ctrl.siteOptions = [];
+		ctrl.siteSelection = null;
 		ctrl.isMultisiteEnabled = false;
+		ctrl.isLoading = false;
 
-		ctrl.$onInit = () =>
+		ctrl.$onInit = async () =>
 		{
 			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 
-			systemPreferenceApi.getPropertyEnabled("multisites").then((response) =>
-			{
-				ctrl.isMultisiteEnabled = response.data.body;
-			});
-
+			ctrl.isMultisiteEnabled = (await systemPreferenceApi.getPropertyEnabled("multisites")).data.body;
 			ctrl.loadProviderList();
 		}
 
@@ -93,20 +92,32 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			}
 		}
 
-		ctrl.close = function()
+		ctrl.onProviderSelectChange = (newProviderNo) =>
 		{
-			ctrl.modalInstance.close();
-		};
-
-		ctrl.onCancel = () =>
-		{
-			ctrl.modalInstance.close();
-		};
+			if (ctrl.isMultisiteEnabled && newProviderNo)
+			{
+				ctrl.loadSiteOptions(newProviderNo);
+			}
+		}
 
 		ctrl.assignToMe = async () =>
 		{
 			ctrl.bookProviderNo = (await providerService.getMe()).providerNo;
-			ctrl.bookQueuedAppointment();
+			ctrl.loadSiteOptions(ctrl.bookProviderNo)
+		}
+
+		ctrl.loadSiteOptions = async (providerNo) =>
+		{
+			ctrl.siteSelection = null;
+
+			// load site and integration list
+			let integrationList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
+			let siteList = (await sitesApi.getSitesByProvider(providerNo)).data.body;
+
+			//filter out sites that don't have an MHA integration
+			siteList = siteList.filter((site) => integrationList.find((integration) => site.siteId === integration.siteId))
+
+			ctrl.siteOptions = siteList.map((site) => { return {label: site.name, value: site.siteId}});
 		}
 
 		ctrl.bookQueuedAppointment = async () =>
@@ -114,45 +125,14 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			let bookQueuedAppointmentTransfer = {};
 			if (ctrl.isMultisiteEnabled)
 			{
-				// mutli site! we must prompt for site
-				let integrationList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
-				let siteList = (await sitesApi.getSitesByProvider(ctrl.bookProviderNo)).data.body;
-
-				//filter out sites that don't have an MHA integration
-				siteList = siteList.filter((site) => integrationList.find((integration) => site.siteId === integration.siteId))
-
-				let siteOptions = siteList.map((site) => { return {label: site.name, value: site.siteId}});
-
-				try
-				{
-					let result = await Juno.Common.Util.openSelectDialog($uibModal,
-					                                                     "Select Site",
-					                                                     "Please select the site in to which the appointment will be booked",
-					                                                     siteOptions,
-					                                                     ctrl.resolve.style,
-					                                                     "Book");
-					if (result)
-					{
-						bookQueuedAppointmentTransfer.siteId = result;
-					}
-					else
-					{
-						// no option selected
-						return;
-					}
-				}
-				catch(err)
-				{
-					// user prob just pressed ESC
-					console.warn("Modal dismissed with ", err)
-					return;
-				}
+				bookQueuedAppointmentTransfer.siteId = ctrl.siteSelection;
 			}
 
 			bookQueuedAppointmentTransfer.providerNo = ctrl.bookProviderNo;
 
 			try
 			{
+				ctrl.isLoading = true;
 				await aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId, ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer);
 			}
 			catch(err)
@@ -163,6 +143,8 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			}
 			finally
 			{
+				ctrl.isLoading = false;
+
 				// refresh the queued appointment list
 				if (ctrl.resolve.loadQueuesCallback)
 				{
@@ -172,5 +154,11 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 				ctrl.modalInstance.close();
 			}
 		}
+
+		ctrl.onCancel = () =>
+		{
+			ctrl.modalInstance.close();
+		};
+
 	}]
 });

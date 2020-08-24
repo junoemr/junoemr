@@ -1,5 +1,17 @@
 .add-queued-appointment-modal {
 
+	.content {
+		min-height: 152px;
+	}
+
+	h5 {
+		margin-top: 0;
+	}
+
+	.juno-divider {
+		margin: 8px 0 8px 0;
+	}
+
 	.center-options {
 		juno-button {
 			max-width: 140px;
@@ -10,6 +22,16 @@
 
 		juno-typeahead {
 			flex-grow: 1;
+		}
+	}
+
+	.site-select {
+		display: flex;
+		justify-content: flex-end;
+
+		.juno-select {
+			margin-top: 8px;
+			width: 405px;
 		}
 	}
 
