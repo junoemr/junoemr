@@ -211,6 +211,7 @@ angular.module('Layout.Components').component('appointmentQueue', {
 					{
 						await aqsQueuedAppointmentApi.deleteAppointment(ctrl.currentQueue.id, ctrl.currentQueue.items[itemIndex].id, reason);
 						ctrl.currentQueue.items.splice(itemIndex, 1);
+						ctrl.setupQueueTabs();
 					}
 					catch(err)
 					{
