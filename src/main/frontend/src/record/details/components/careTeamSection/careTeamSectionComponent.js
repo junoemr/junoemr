@@ -27,6 +27,7 @@ angular.module('Record.Details').component('careTeamSection', {
 	templateUrl: 'src/record/details/components/careTeamSection/careTeamSection.jsp',
 	bindings: {
 		ngModel: "=",
+		validations: "=",
 		componentStyle: "<?"
 	},
 	controller: [ "$scope",
@@ -51,8 +52,21 @@ angular.module('Record.Details').component('careTeamSection', {
 		ctrl.referralDoctors = [{value: "", label: "--"}];
 		ctrl.rosterTermReasons = staticDataService.getRosterTerminationReasons();
 
+		ctrl.rosterDateValid = true;
+		ctrl.patientStatusDateValid = true;
+		ctrl.endDateValid = true;
+		ctrl.dateJoinedValid = true;
+		ctrl.terminationDateValid = true;
+
 		ctrl.$onInit = () =>
 		{
+			// add date validations
+			ctrl.validations["rosterDate"] = Juno.Validations.validationCustom(() => ctrl.rosterDateValid);
+			ctrl.validations["patientStatusDate"] = Juno.Validations.validationCustom(() => ctrl.patientStatusDateValid);
+			ctrl.validations["endDate"] = Juno.Validations.validationCustom(() => ctrl.endDateValid);
+			ctrl.validations["dateJoined"] = Juno.Validations.validationCustom(() => ctrl.dateJoinedValid);
+			ctrl.validations["terminationDate"] = Juno.Validations.validationCustom(() => ctrl.terminationDateValid);
+
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 
 			providersService.getBySecurityRole("doctor").then(

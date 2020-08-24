@@ -69,7 +69,7 @@ Juno.Common.Util.pad0 = function pad0(n) {
 Juno.Common.Util.padDateWithZero = (dateNumber) =>
 {
 	let zeroPaddedDateString = Juno.Common.Util.pad0(dateNumber);
-	if (zeroPaddedDateString.length > 2)
+	if (zeroPaddedDateString.length > 2 && zeroPaddedDateString.charAt(0) === "0")
 	{
 		zeroPaddedDateString = zeroPaddedDateString.substring(1);
 	}

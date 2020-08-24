@@ -133,7 +133,10 @@
 		<div class="col-md-10 col-lg-8 ">
 			<div id="pd1" ng-click="detailsCtrl.checkAction($event)" ng-keypress="detailsCtrl.checkAction($event)">
 
-				<demographic-section ng-model="detailsCtrl.page.demo" component-style="pageStyle"></demographic-section>
+				<demographic-section ng-model="detailsCtrl.page.demo"
+														 validations="detailsCtrl.validations"
+														 component-style="pageStyle">
+				</demographic-section>
 				<juno-divider component-style="pageStyle"></juno-divider>
 
 				<contact-section ng-model="detailsCtrl.page.demo"
@@ -148,10 +151,16 @@
 				</health-insurance-section>
 				<juno-divider component-style="pageStyle"></juno-divider>
 
-				<care-team-section ng-model="detailsCtrl.page.demo" component-style="pageStyle"></care-team-section>
+				<care-team-section ng-model="detailsCtrl.page.demo"
+													 validations="detailsCtrl.validations"
+													 component-style="pageStyle">
+				</care-team-section>
 				<juno-divider component-style="pageStyle"></juno-divider>
 
-				<additional-information-section ng-model="detailsCtrl.page.demo" component-style="pageStyle"></additional-information-section>
+				<additional-information-section ng-model="detailsCtrl.page.demo"
+																				validations="detailsCtrl.validations"
+																				component-style="pageStyle">
+				</additional-information-section>
 				<juno-divider component-style="pageStyle"></juno-divider>
 			</div>
 		</div>

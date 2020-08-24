@@ -14,6 +14,7 @@
 			<juno-date-select ng-model="$ctrl.ngModel.dateOfBirth"
 							label="Date of Birth"
 							show-age="true"
+							on-validity-change="$ctrl.dobValid = valid;"
 							component-style="$ctrl.componentStyle"
 			>
 			</juno-date-select>
@@ -67,7 +68,7 @@
 							title="Spoken Language"
 							model="$ctrl.ngModel.spokenLanguage"
 							options="$ctrl.spokenLanguages"
-							placeholder="Select spoken language"
+							placeholder="Spoken language"
 							label-position="LABEL_POSITION.LEFT"
 							component-style="$ctrl.componentStyle">
 			</juno-typeahead>
@@ -77,7 +78,7 @@
 							title="Country of Origin"
 							model="$ctrl.ngModel.countryOfOrigin"
 							options="$ctrl.countries"
-							placeholder="Select Country of Origin"
+							placeholder="Country of Origin"
 							label-position="LABEL_POSITION.LEFT"
 							component-style="$ctrl.componentStyle">
 			</juno-typeahead>

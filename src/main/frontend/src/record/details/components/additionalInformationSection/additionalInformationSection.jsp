@@ -53,6 +53,7 @@
 			<!-- Waiting list date -->
 			<juno-date-select ng-model="$ctrl.ngModel.onWaitingListSinceDate"
 							label="Date of request"
+							on-validity-change="$ctrl.dateOfRequestValid = valid"
 							component-style="$ctrl.componentStyle">
 			</juno-date-select>
 
