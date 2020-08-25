@@ -17,7 +17,7 @@
 	--color-activated: $active-color;
 	--background-activated: $active-border-color;
 	--background-focused: $active-background-color;
-	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+	box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.3);
 
 	&:active,
 	&:focus,

@@ -131,10 +131,11 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 
 			bookQueuedAppointmentTransfer.providerNo = ctrl.bookProviderNo;
 
+			let newAppt = null;
 			try
 			{
 				ctrl.isLoading = true;
-				await aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId, ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer);
+				newAppt = (await aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId, ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer)).data.body;
 			}
 			catch(err)
 			{
@@ -153,6 +154,17 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 				}
 
 				ctrl.modalInstance.close();
+			}
+
+			return newAppt;
+		}
+
+		ctrl.bookAndStartTelehealth = async () =>
+		{
+			let appointment = await ctrl.bookQueuedAppointment();
+			if (appointment)
+			{
+				Juno.Common.Util.openTelehealthWindow(appointment.demographicNo, appointment.id, ctrl.isMultisiteEnabled ? appointment.location : null);
 			}
 		}
 

@@ -484,6 +484,20 @@ Juno.Common.Util.openSelectDialog = (uibModal, title, message, options, style, o
 }
 
 /**
+ * open a telehealth window for the specified appointment
+ * @param demographicNo - the demographic who the appointment is for
+ * @param appointmentNo - the appointmentNo
+ * @param site - the site of the appointment or null
+ */
+Juno.Common.Util.openTelehealthWindow = (demographicNo, appointmentNo, site) =>
+{
+	window.open("../integrations/myhealthaccess.do?method=connect"
+			            + "&demographicNo=" + encodeURIComponent(demographicNo)
+			            + "&siteName=" + encodeURIComponent(site)
+			            + "&appt=" + encodeURIComponent(appointmentNo), "_blank");
+}
+
+/**
  * lookup typeahead object form options list based on value
  * @param value - the value to look up
  * @param options - the options list from which to lookup the object
