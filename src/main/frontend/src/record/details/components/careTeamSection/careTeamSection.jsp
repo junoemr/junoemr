@@ -105,7 +105,7 @@
 			<juno-input ng-model="$ctrl.ngModel.scrReferralDocNo"
 							label="Referral Doctor #"
 							placeholder="Referral Doctor #"
-							readonly="true"
+							valid-regex="$ctrl.numberRegex"
 							component-style="$ctrl.componentStyle">
 			</juno-input>
 

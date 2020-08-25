@@ -67,6 +67,11 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.oldNgModel = ctrl.ngModel;
 		};
 
+		$scope.$watch("$ctrl.ngModel", () =>
+		{
+			ctrl.oldNgModel = ctrl.ngModel;
+		});
+
 		ctrl.componentClasses = () =>
 		{
 			return [ctrl.componentStyle];
