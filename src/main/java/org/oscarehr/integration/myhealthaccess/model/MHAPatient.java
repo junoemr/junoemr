@@ -25,7 +25,8 @@ package org.oscarehr.integration.myhealthaccess.model;
 
 import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
 import org.springframework.beans.BeanUtils;
-import java.time.ZonedDateTime;
+
+import java.time.LocalDate;
 
 public class MHAPatient
 {
@@ -34,7 +35,7 @@ public class MHAPatient
 	private String firstName;
 	private String middleName;
 	private String lastName;
-	private ZonedDateTime birthDate;
+	private LocalDate birthDate;
 	private String sex;
 
 	private String healthNumber;
@@ -168,12 +169,12 @@ public class MHAPatient
 		this.lastName = lastName;
 	}
 
-	public ZonedDateTime getBirthDate()
+	public LocalDate getBirthDate()
 	{
 		return birthDate;
 	}
 
-	public void setBirthDate(ZonedDateTime birthDate)
+	public void setBirthDate(LocalDate birthDate)
 	{
 		this.birthDate = birthDate;
 	}

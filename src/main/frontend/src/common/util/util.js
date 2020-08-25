@@ -1,5 +1,7 @@
 'use strict';
 
+import {JUNO_ALERT_MODES} from "../modals/junoAlert/junoAlertConstants";
+
 if (!window.Juno) window.Juno = {};
 
 
@@ -61,6 +63,20 @@ Juno.Common.Util.pad0 = function pad0(n) {
 	if (s.length == 1) s = "0" + s;
 	return s;
 };
+
+// if the date is a single digit add a zero in front. if it is 3 or more and
+// has a leading zero remove it.
+Juno.Common.Util.padDateWithZero = (dateNumber) =>
+{
+	let zeroPaddedDateString = Juno.Common.Util.pad0(dateNumber);
+	if (zeroPaddedDateString.length > 2 && zeroPaddedDateString.charAt(0) === "0")
+	{
+		zeroPaddedDateString = zeroPaddedDateString.substring(1);
+	}
+	return zeroPaddedDateString;
+};
+
+
 
 Juno.Common.Util.toTrimmedString = function toTrimmedString(s) {
 	if (s == null) s = "";
@@ -329,6 +345,16 @@ Juno.Common.Util.trimToLength = function trimToLength(string, maxLength)
 	return shortString;
 };
 
+Juno.Common.Util.trimToNull = (str) =>
+{
+	str.trim();
+	if (str === "")
+	{
+		return null;
+	}
+	return str;
+}
+
 // create a promise that resolves when the provided window is closed
 Juno.Common.Util.windowClosedPromise = function (popup)
 {
@@ -343,4 +369,92 @@ Juno.Common.Util.windowClosedPromise = function (popup)
 			}
 		}, 500);
 	});
+};
+
+// show a success alert box similar to the browsers built in alert functionality
+Juno.Common.Util.successAlert = function(uibModal, title, message)
+{
+	uibModal.open(
+		{
+			component: 'junoAlertComponent',
+			backdrop: 'static',
+			windowClass: "juno-alert",
+			resolve: {
+				title: function(){return title},
+				message: function(){return message},
+				mode: function(){return JUNO_ALERT_MODES.SUCCESS}
+			}
+		}
+	);
+};
+
+// show a error alert box similar to the browsers built in alert functionality
+Juno.Common.Util.errorAlert = function(uibModal, title, message)
+{
+	uibModal.open(
+			{
+				component: 'junoAlertComponent',
+				backdrop: 'static',
+				windowClass: "juno-alert",
+				resolve: {
+					title: function(){return title},
+					message: function(){return message},
+					mode: function(){return JUNO_ALERT_MODES.ERROR}
+				}
+			}
+	);
+};
+
+// show a confirmation box. returns a promise that will resolve to true / false based on user selection.
+Juno.Common.Util.confirmationDialog = function(uibModal, title, message, style)
+{
+	return uibModal.open(
+			{
+				component: 'junoAlertComponent',
+				backdrop: 'static',
+				windowClass: "juno-alert",
+				resolve: {
+					title: function(){return title},
+					message: function(){return message},
+					mode: function(){return JUNO_ALERT_MODES.CONFIRM},
+					style: () => style,
+				}
+			}
+	).result;
+};
+
+Juno.Common.Util.openInputDialog = (uibModal, title, message, style) =>
+{
+	return uibModal.open(
+			{
+				component: 'junoInputModal',
+				backdrop: 'static',
+				windowClass: "juno-input-modal ",
+				resolve: {
+					title: () => title,
+					message: () => message,
+					style: () => style,
+				}
+			}
+	).result;
+}
+
+/**
+ * lookup typeahead object form options list based on value
+ * @param value - the value to look up
+ * @param options - the options list from which to lookup the object
+ * @returns - the matching typeahead object or the value if no match found.
+ */
+Juno.Common.Util.typeaheadValueLookup = function(value, options)
+{
+	if (value && options && options.length > 0)
+	{
+		let res = options.find((el) => el.value === value);
+		if (res)
+		{
+			return res;
+		}
+	}
+
+	return value;
 };

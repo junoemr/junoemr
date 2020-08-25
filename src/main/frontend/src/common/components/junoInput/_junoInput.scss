@@ -1,0 +1,23 @@
+juno-input {
+	.juno-input {
+
+		input {
+			flex: 1 1 0;
+			min-width: 24px;
+
+			&.uppercase {
+				text-transform: uppercase;
+			}
+
+			&.field-no-border {
+				border: none;
+				background-color: transparent;
+				padding: 0;
+
+				&:active, &:focus {
+					border: none;
+				}
+			}
+		}
+	}
+}

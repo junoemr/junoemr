@@ -148,6 +148,12 @@ public final class LoginCheckLoginBean {
 		SecurityDao securityDao = (SecurityDao) SpringUtils.getBean("securityDao");
 		Security security = securityDao.findByUserName(username);
 
+		// attempt lookup by email.
+		if (security == null)
+		{
+			security = securityDao.findByEmail(username);
+		}
+
 		if (security == null) {
 			return null;
 		} else if (OscarProperties.isLdapAuthenticationEnabled()) {

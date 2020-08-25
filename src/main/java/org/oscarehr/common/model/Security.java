@@ -51,6 +51,9 @@ public class Security extends AbstractModel<Integer> {
 	
 	@Column(name = "user_name")
 	private String userName;
+
+	@Column(name = "email")
+	private String email;
 	
 	@Column(name = "password")
 	private String password;
@@ -196,6 +199,16 @@ public class Security extends AbstractModel<Integer> {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getEmail()
+	{
+		return email;
+	}
+
+	public void setEmail(String email)
+	{
+		this.email = email;
 	}
 
 	/**

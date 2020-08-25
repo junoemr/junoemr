@@ -1,9 +1,9 @@
 
 // Colour Palette
-$color-primary-darkest: #1a2033;
+$color-primary-darkest: #16243f;
 $color-primary-darker: #1f2e59;
 $color-primary-dark: #384d8c;
-$color-primary-base: #455899;
+$color-primary-base: #4d73bf;
 $color-primary-light: #6680cc;
 $color-primary-lighter: #8aa1e6;
 $color-primary-lightest: #bfcfff;
@@ -18,11 +18,12 @@ $color-secondary-lightest: #e4ffbf;
 
 $color-neutral-black: #242833;
 $color-neutral-darkest: #262933;
-$color-neutral-darker: #393e4d;
+$color-neutral-darker: #45474d;
 $color-neutral-dark: #585f73;
 $color-neutral-dark-grey: #70778c;
-$color-neutral-grey: #8f95a8;
+$color-neutral-grey: #919399;
 $color-neutral-light-grey: #b5bac9;
+$color-neutral-lighter-grey: #d2d3d6;
 $color-neutral-light: #d0d5e3;
 $color-neutral-lighter: #e6e9f0;
 $color-neutral-lightest: #f2f4f7;
@@ -161,3 +162,7 @@ $color-timepicker-border: #CCC;
 $input-color-invalid-background: #ffefef;
 $input-color-invalid-border: #a94442;
 $input-color-invalid-text: #a94442;
+
+@mixin background-opacity($color, $opacity) {
+	background-color: rgba($color, $opacity);
+}

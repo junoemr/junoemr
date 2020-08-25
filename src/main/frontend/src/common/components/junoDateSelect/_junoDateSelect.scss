@@ -1,0 +1,21 @@
+.juno-date-select {
+
+	.fields {
+		flex: 1 1 0;
+
+		input {
+			margin-right: 4px;
+			text-align: center;
+		}
+
+		.year {
+			flex: 1 1 72px;
+			max-width: 88px;
+			min-width: 72px;
+		}
+
+		.month,.day {
+			width: 72px;
+		}
+	}
+}

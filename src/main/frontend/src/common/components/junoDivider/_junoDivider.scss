@@ -1,0 +1,19 @@
+.juno-divider {
+	height: 4px;
+	width: 100%;
+
+	&.horizontal {
+		height: 100%;
+		width: 4px;
+	}
+}
+
+div {
+	&.juno-divider {
+		margin: 24px 0 24px 0;
+
+		&.horizontal {
+			margin: 0 24px 0 24px;
+		}
+	}
+}

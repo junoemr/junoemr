@@ -1,0 +1,374 @@
+// ============ LABELS ===============
+
+.juno-input-label-top {
+	flex: 0 0 100%;
+	margin-bottom: 4px;
+}
+
+.juno-input-label-left {
+	margin-right: 16px;
+	text-align: right;
+}
+
+// ============ MIXINS ===============
+
+@mixin buttonColor ($primary-color, $secondary-color, $base-color, $border-color, $hover-color, $text-color)
+{
+	&.btn-primary {
+		border: 1px solid $primary-color;
+		background-color: $primary-color;
+		color: $text-color;
+	}
+
+	&.btn-secondary {
+		border: 1px solid $border-color;
+		background-color: $secondary-color;
+		color: $text-color;
+	}
+
+	&.btn-base {
+		border: 1px solid $border-color;
+		background-color: $base-color;
+		color: $text-color;
+
+		&:hover {
+			border-color: $hover-color;
+		}
+	}
+
+	&.btn-transparent {
+		border: 1px solid $border-color;
+		background-color: transparent;
+		color: $text-color;
+	}
+}
+
+@mixin junoTabColor ($background-color, $selected-background-color, $border-color, $text-color)
+{
+	&.juno-tab {
+		@include juno-font-body-small();
+
+		height: 56px;
+		border-radius: 8px;
+
+		border: 1px solid $border-color;
+		background-color: $background-color;
+		color: $text-color;
+
+		.tab {
+			border-color: $border-color;
+			border-right-style: solid;
+			border-right-width: 1px;
+
+			cursor: pointer;
+
+			&.active {
+				background-color: $selected-background-color;
+			}
+
+			&:first-child {
+				border-bottom-left-radius: 8px;
+				border-top-left-radius: 8px;
+			}
+		}
+	}
+}
+
+@mixin junoPanelColor($body-background, $header-background, $border-color)
+{
+	&.juno-panel {
+		color: $color-neutral-darker;
+		.panel-header {
+			background-color: $header-background;
+			border-color: $border-color;
+		}
+
+		.panel-body {
+			background-color: $body-background;
+			border-color: $border-color;
+		}
+	}
+}
+
+@mixin junoText($color)
+{
+	.juno-text {
+		color: $color;
+	}
+}
+
+// ============ STYLES ===============
+
+@mixin styleCommon()
+{
+	margin: 8px 0 0 0;
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+
+	&.juno-input, &.juno-select, &.juno-typeahead,
+	&.juno-check-box, &.juno-date-select, &.juno-button {
+		input, select {
+			height: 32px;
+			padding: 0 16px 0 16px;
+
+			&.field-invalid {
+				border-color: $color-red-base;
+
+				&:focus, &:active {
+					border-color: $color-red-base;
+				}
+			}
+
+			&.ng-empty {
+				color: $color-neutral-grey;
+			}
+		}
+
+		label {
+			min-width: 128px;
+		}
+	}
+
+	::placeholder {
+		color: $color-neutral-grey;
+	}
+
+	button {
+		height: 32px;
+		box-shadow: none;
+		border-radius: 4px;
+		padding: 0 4px 0 4px;
+	}
+
+	&.juno-check-box {
+		button {
+			padding: 0;
+			border-radius: 3px;
+
+			width: 16px;
+			height: 16px;
+			font-size: 12px;
+
+			&.un-checked {
+				&:hover {
+					border-color: $color-blue-light;
+				}
+			}
+		}
+	}
+
+	&.juno-divider {
+		background-color: $color-neutral-lightest;
+		border: 1px solid $color-neutral-lighter-grey;
+	}
+}
+
+// ============ STYLE DEFAULT ===============
+.juno-style-default {
+	@include styleCommon;
+
+	@include juno-tab-color-scheme-white;
+
+	&.juno-input, &.juno-select, &.juno-typeahead,
+	&.juno-check-box, &.juno-date-select, &.juno-button {
+		input, select {
+			@include juno-font-body-smallest;
+
+			border-radius: 4px;
+			border: solid 1px $color-neutral-light;
+			background-color: $color-neutral-white;
+			color: $color-neutral-darker;
+
+			&:focus, &:active {
+				outline: none;
+				border: solid 1px $color-blue-light;
+			}
+
+			&:disabled {
+				color: $color-neutral-grey;
+
+				&:active {
+					border-color: $color-neutral-light;
+				}
+			}
+		}
+	}
+
+	button {
+		@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-white,
+						$color-neutral-lighter-grey, $color-neutral-lighter-grey, $color-neutral-white);
+
+		&.btn-base, &.btn-transparent {
+			color: $color-neutral-darker !important;
+		}
+	}
+
+	&.juno-check-box {
+		button {
+			&.un-checked {
+				border-color: $color-neutral-light;
+				background-color: $color-neutral-white;
+			}
+		}
+	}
+
+	&.juno-divider {
+		border: 1px solid $color-neutral-lighter;
+	}
+
+	@include junoTabColor($color-neutral-white, $color-neutral-lighter, $color-neutral-lighter-grey, $color-neutral-darker);
+
+	@include junoPanelColor(white, $color-neutral-lighter, $color-neutral-lighter);
+
+	@include junoText($color-neutral-darker);
+}
+
+// ============ STYLE GREY ===============
+.juno-style-grey {
+	@include styleCommon;
+
+	@include juno-tab-color-scheme-white;
+
+	&.juno-input, &.juno-select, &.juno-typeahead,
+	&.juno-check-box, &.juno-date-select, &.juno-button {
+		input, select {
+			@include juno-font-body-smallest;
+
+			border-radius: 8px;
+			border: solid 1px $color-neutral-lighter-grey;
+			background-color: $color-neutral-lightest;
+			color: $color-neutral-darker;
+
+			&:focus, &:active {
+				outline: none;
+				border: solid 1px $color-blue-light;
+			}
+
+			&:disabled {
+				color: $color-neutral-grey;
+
+				&:active {
+					border-color: $color-neutral-lighter-grey;
+				}
+			}
+		}
+	}
+
+	button {
+		border-radius: 8px;
+
+		@include buttonColor($color-primary-base, $color-neutral-white, $color-neutral-lightest,
+						$color-neutral-lighter-grey, $color-neutral-lighter-grey, $color-neutral-white);
+
+		&.btn-secondary, &.btn-base, &.btn-transparent {
+			color: $color-neutral-darker;
+		}
+	}
+
+	&.juno-check-box {
+		button {
+			&.un-checked {
+				border-color: $color-neutral-lighter-grey;
+				background-color: $color-neutral-lightest;
+			}
+		}
+	}
+
+	@include junoTabColor($color-neutral-lightest, $color-neutral-white, $color-neutral-lighter-grey, $color-neutral-darker);
+
+	@include junoPanelColor($color-neutral-lightest, $color-neutral-lightest, $color-neutral-lighter-grey);
+	&.juno-panel {
+		.panel-body {
+			border-width: 1px;
+			&.no-header {
+				border-top-width: 1px;
+			}
+		}
+	}
+
+	@include junoText($color-neutral-darker);
+}
+
+// ============ STYLE DRACULA ===============
+.juno-style-dracula {
+	@include styleCommon;
+
+	@include juno-tab-color-scheme-dark;
+	color: $color-neutral-white;
+
+	&.juno-input, &.juno-select, &.juno-typeahead,
+	&.juno-check-box, &.juno-date-select, &.juno-button {
+		input, select {
+			@include juno-font-body-smallest;
+
+			border-radius: 8px;
+			border: solid 1px $color-neutral-darker;
+			background-color: $color-neutral-darkest;
+			color: $color-neutral-white;
+
+			&:focus, &:active {
+				outline: none;
+				border: solid 1px $color-orange-base;
+			}
+
+			&:disabled {
+				color: $color-neutral-dark;
+
+				&:active {
+					border-color: $color-neutral-darker;
+				}
+			}
+		}
+	}
+
+	button {
+		border-radius: 8px;
+		@include buttonColor($color-primary-base, $color-neutral-black, $color-neutral-darkest,
+						$color-neutral-darker, $color-orange-base, $color-neutral-white)
+	}
+
+	&.juno-check-box {
+		button {
+			&.un-checked {
+				border-color: $color-neutral-darker;
+				background-color: $color-neutral-darkest;
+
+				&:hover {
+					border-color: $color-orange-base;
+				}
+			}
+		}
+	}
+
+	&.juno-divider {
+		background-color: $color-neutral-darker;
+		border: 1px solid $color-neutral-darker;
+	}
+
+	@include junoTabColor($color-neutral-darkest, $color-neutral-black, $color-neutral-darker, $color-neutral-white);
+
+	@include junoPanelColor($color-neutral-black, $color-neutral-black, $color-neutral-darker);
+	&.juno-panel {
+		.panel-body {
+			border-width: 1px;
+			&.no-header {
+				border-top-width: 1px;
+			}
+		}
+	}
+
+	@include junoText($color-neutral-white);
+}
+.juno-style-dracula-background-no-accent {
+	background-color: $color-neutral-darkest !important;
+}
+
+.juno-style-dracula-background {
+	@extend .juno-style-dracula-background-no-accent;
+
+	&.modal-content {
+		background: linear-gradient(-45deg, $color-neutral-darkest 45%, transparent 0) no-repeat 100% 100%,
+		linear-gradient(247deg, $color-primary-light, $color-primary-base 30%, $color-primary-base 64%, $color-primary-dark) no-repeat !important;
+	}
+}

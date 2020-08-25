@@ -539,6 +539,12 @@ public final class LoginAction extends DispatchAction {
 		SecurityDao securityDao = (SecurityDao) SpringUtils.getBean("securityDao");
 		Security security = securityDao.findByUserName(username);
 
+		// attempt email lookup.
+		if (security == null)
+		{
+			security = securityDao.findByEmail(username);
+		}
+
 		if (security == null) {
 			return null;
 		} else if (OscarProperties.isLdapAuthenticationEnabled()) {

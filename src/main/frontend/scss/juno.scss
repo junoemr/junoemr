@@ -33,10 +33,22 @@
 @import "../src/common/directives/clinicaid/ca_field";
 @import "../src/common/components/junoLoadingIndicator";
 @import "../src/common/components/modal";
+@import "../src/common/components/junoButton/junoButton";
+@import "../src/common/components/junoCheckBox/junoCheckBox";
+@import "../src/common/components/junoInput/junoInput";
+@import "../src/common/components/junoSelect/junoSelect";
+@import "../src/common/components/junoTab/junoTab";
+@import "../src/common/components/junoDateSelect/junoDateSelect";
+@import "../src/common/components/junoDivider/junoDivider";
+@import "../src/common/components/junoComponentStyles";
 @import "../src/common/components/zeroStateDisplay";
 @import "../src/common/components/accordionList/accordionList";
 @import "../src/common/components/iconCard/iconCard";
 @import "../src/common/components/panel/_panel.scss";
+@import "../src/common/modals/junoAlert/junoAlert";
+@import "../src/common/modals/junoInputModal/junoInputModal";
+@import "../src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModal";
+
 // Section-specific things
 @import "../src/layout/primaryNav";
 @import "../src/layout/leftAside";
@@ -52,6 +64,14 @@
 @import "../src/record/record";
 @import "../src/record/details/details";
 @import "../src/record/details/swipecard";
+@import "../src/record/details/components/mhaPatientConnection/mhaPatientConnection";
+@import "../src/record/details/components/sectionCommon";
+@import "../src/record/details/components/demographicSection/demographicSection";
+@import "../src/record/details/components/contactSection/contactSection";
+@import "../src/record/details/components/healthInsuranceSection/healthInsuranceSection";
+@import "../src/record/details/components/careTeamSection/careTeamSection";
+@import "../src/record/details/components/additionalInformationSection/additionalInformationSection";
+@import "../src/record/details/components/patientInviteConfirmModal/mhaPatientInviteConfirmModal";
 @import "../src/record/summary/summary";
 @import "../src/record/summary/summaryModule";
 @import "../src/record/summary/encounterNoteList";
@@ -66,6 +86,9 @@
 @import "../src/admin/integration/iceFall/iceFall";
 @import "../src/admin/integration/iceFall/settings/iceFallAdminSettings";
 @import "../src/admin/integration/iceFall/activity/iceFallAdminActivity";
+@import "../src/admin/integration/editProviderPage/editProviderAdmin";
+@import "../src/admin/integration/manageUserPage/manageUserAdmin";
+@import "../src/common/components/junoTypeahead/junoTypeahead";
 @import "../src/admin/admin";
 @import "../src/admin/integration/frameContent/frameContent";
 @import "../src/record/forms/forms";

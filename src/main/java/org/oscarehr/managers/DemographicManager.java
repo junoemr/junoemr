@@ -337,6 +337,13 @@ public class DemographicManager {
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
+
+				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicNo(), ext.getKey());
+				if (existingExt != null)
+				{
+					ext.setId(existingExt.getId());
+				}
+
 				updateExtension(loggedInInfo, ext);
 			}
 		}

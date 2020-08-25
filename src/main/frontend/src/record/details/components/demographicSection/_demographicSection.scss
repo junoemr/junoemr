@@ -1,0 +1,17 @@
+.demographic-details-section.demographic-section  {
+
+	.connected-sites {
+		display: flex;
+		.juno-input {
+			width: 384px;
+		}
+		.juno-button {
+			width: 32px;
+			margin-left: 4px;
+
+			.icon {
+				font-size: 20px;
+			}
+		}
+	}
+}
