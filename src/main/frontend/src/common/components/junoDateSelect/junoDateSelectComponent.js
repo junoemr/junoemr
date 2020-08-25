@@ -80,7 +80,7 @@ angular.module('Common.Components').component('junoDateSelect', {
 		ctrl.onYearChange = (field) =>
 		{
 			ctrl.year = ctrl.onDateChange(field, true);
-			ctrl.yearValid = ctrl.year < 99999;
+			ctrl.yearValid = ctrl.year < 9999;
 
 		}
 
