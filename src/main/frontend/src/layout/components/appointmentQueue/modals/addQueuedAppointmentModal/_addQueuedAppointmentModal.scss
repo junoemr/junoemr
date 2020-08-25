@@ -1,7 +1,7 @@
 .add-queued-appointment-modal {
 
 	.content {
-		min-height: 152px;
+		min-height: 200px;
 	}
 
 	h5 {
@@ -13,25 +13,22 @@
 	}
 
 	.center-options {
+		display: flex;
+		flex-wrap: wrap;
+
 		juno-button {
-			max-width: 140px;
-			&:not(last-child) {
-				margin-right: 8px;
-			}
+			flex: 1 0 100%;
+			margin-top: 8px;
 		}
 
 		juno-typeahead {
-			flex-grow: 1;
+			flex: 1 0 100%;
+			margin-top: 16px;
 		}
-	}
 
-	.site-select {
-		display: flex;
-		justify-content: flex-end;
-
-		.juno-select {
+		juno-select {
+			flex: 1 0 100%;
 			margin-top: 8px;
-			width: 405px;
 		}
 	}
 

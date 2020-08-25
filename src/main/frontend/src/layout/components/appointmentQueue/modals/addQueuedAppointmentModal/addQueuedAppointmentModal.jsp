@@ -1,4 +1,5 @@
 <juno-simple-modal class="add-queued-appointment-modal"
+									 modal-height="300"
 									 component-style="$ctrl.resolve.style"
 									 modal-instance="$ctrl.modalInstance">
 
@@ -10,31 +11,28 @@
 		</p>
 
 		<div class="center-options flex-row align-items-flex-end">
+			<juno-typeahead
+							name="Provider"
+							model="$ctrl.bookProviderNo"
+							options="$ctrl.providerOptions"
+							placeholder="Assign to provider"
+							on-selected="$ctrl.onProviderSelectChange(value.value)"
+							component-style="$ctrl.resolve.style">
+			</juno-typeahead>
+
+			<juno-select ng-if="$ctrl.isMultisiteEnabled"
+									 ng-model="$ctrl.siteSelection"
+									 placeholder="Select Site"
+									 options="$ctrl.siteOptions"
+									 component-style="$ctrl.resolve.style">
+			</juno-select>
+
 			<juno-button ng-click="$ctrl.assignToMe()"
 									 component-style="$ctrl.resolve.style"
 									 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 									 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
 				Assign To Me
 			</juno-button>
-			<juno-typeahead
-							name="Provider"
-							title="Provider Selection"
-							model="$ctrl.bookProviderNo"
-							options="$ctrl.providerOptions"
-							placeholder="Or assign to provider"
-							on-selected="$ctrl.onProviderSelectChange(value.value)"
-							label-position="LABEL_POSITION.TOP"
-							component-style="$ctrl.resolve.style">
-			</juno-typeahead>
-		</div>
-
-		<div ng-if="$ctrl.isMultisiteEnabled" class="site-select">
-			<juno-select ng-model="$ctrl.siteSelection"
-									 label="Select Site"
-									 placeholder="Select Site"
-									 options="$ctrl.siteOptions"
-									 component-style="$ctrl.resolve.style">
-			</juno-select>
 		</div>
 	</div>
 

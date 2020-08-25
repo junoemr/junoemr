@@ -83,7 +83,7 @@ angular.module('Common.Components').component('junoTypeahead',
 					ctrl.selectedValue = ctrl.model;
 				}
 			}
-		}
+		};
 
 		ctrl.doOnChange = () =>
 		{
@@ -98,6 +98,9 @@ angular.module('Common.Components').component('junoTypeahead',
 					ctrl.onChange({value: ctrl.selectedValue});
 				}
 			}
+
+			ctrl.model = null;
+			lastModel = null;
 		}
 
 		ctrl.getOptions = (viewValue) =>

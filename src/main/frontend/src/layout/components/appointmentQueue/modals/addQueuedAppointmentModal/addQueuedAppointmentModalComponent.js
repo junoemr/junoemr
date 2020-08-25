@@ -24,7 +24,7 @@
 import {
 	JUNO_BUTTON_COLOR,
 	JUNO_BUTTON_COLOR_PATTERN,
-	JUNO_STYLE
+	JUNO_STYLE, LABEL_POSITION
 } from "../../../../../common/components/junoComponentConstants";
 import {
 	AqsQueuedAppointmentApi,
@@ -63,6 +63,7 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 
 		ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+		ctrl.LABEL_POSITION = LABEL_POSITION;
 
 		ctrl.bookProviderNo = null;
 		ctrl.providerOptions = [];
