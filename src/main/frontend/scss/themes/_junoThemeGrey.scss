@@ -1,4 +1,10 @@
 .juno-style-grey {
+
+	//================ layout ======================
+	--theme-form-field-boarder-radius: 8px;
+	//================ layout ======================
+
+	//================ colors ======================
 	--theme-color-form-field-text: var(--color-neutral-darker);
 	--theme-color-form-field-text-hover: var(--color-neutral-darker);
 	--theme-color-form-field-text-active: var(--color-neutral-darker);
@@ -17,4 +23,5 @@
 	--theme-color-panel-body-text: var(--color-neutral-darkest);
 	--theme-color-panel-body-background: var(--color-neutral-lightest);
 	--theme-color-panel-border: var(--color-neutral-lighter);
+	//================ colors ======================
 }

@@ -1,5 +1,10 @@
 .juno-style-dracula {
 
+	//================ layout ======================
+	--theme-form-field-boarder-radius: 8px;
+	//================ layout ======================
+
+	//================ colors ======================
 	--theme-color-primary-base: var(--color-neutral-darker);
 	--theme-color-primary-accent: var(--color-orange-base);
 	--theme-color-primary-text: var(--color-neutral-white);
@@ -32,4 +37,5 @@
 	--theme-color-panel-body-text: var(--color-neutral-white);
 	--theme-color-panel-body-background: var(--color-neutral-black);
 	--theme-color-panel-border: var(--color-neutral-darker);
+	//================ colors ======================
 }

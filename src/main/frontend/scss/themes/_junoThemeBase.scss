@@ -1,5 +1,10 @@
 :root {
 
+	//================ layout ======================
+	--theme-form-field-boarder-radius: 4px;
+	//================ layout ======================
+
+	//================ colors ======================
 	--theme-color-primary-base: var(--color-primary-base);
 	--theme-color-primary-accent: var(--color-primary-dark);
 	--theme-color-primary-text: var(--color-neutral-darker);
@@ -36,6 +41,7 @@
 	--theme-color-panel-body-text: var(--color-neutral-darkest);
 	--theme-color-panel-body-background: var(--color-neutral-white);
 	--theme-color-panel-border: var(--color-neutral-lightest);
+	//================ colors ======================
 
 	@import "junoThemeGrey";
 	@import "junoThemeDracula";
