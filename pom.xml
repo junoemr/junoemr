@@ -1296,7 +1296,7 @@
 		<dependency>
 			<groupId>ca.cloudpractice</groupId>
 			<artifactId>aqs-java-client</artifactId>
-			<version>0.0.20</version>
+			<version>0.3.3</version>
 		</dependency>
 	</dependencies>
 	<build>

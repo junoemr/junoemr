@@ -22,40 +22,18 @@
  */
 package org.oscarehr.integration.aqs.model;
 
-import ca.cloudpractice.aqs.client.model.QueueDto;
+import ca.cloudpractice.aqs.client.model.OnDemandQueueSettingsDto;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.BeanUtils;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
-
-@Getter @Setter
-public class AppointmentQueue
+@Getter
+@Setter
+public class QueueOnDemandSettings
 {
-	private UUID remoteId;
-	private String name;
-	private Integer queueLimit;
-	private String queueColor;
-	private OffsetDateTime createdAt;
-	private QueueAvailability availability;
-	private QueueOnDemandSettings onDemandSettings;
-	private Boolean available;
+	private Integer expirationThresholdSeconds;
 
-	public AppointmentQueue(QueueDto queueDto)
+	public QueueOnDemandSettings(OnDemandQueueSettingsDto onDemandQueueSettingsDto)
 	{
-		BeanUtils.copyProperties(queueDto, this, "id", "availability");
-		this.remoteId = queueDto.getId();
-
-		boolean hasAvailabilitySettings = (queueDto.getAvailability() != null);
-		if(hasAvailabilitySettings)
-		{
-			this.availability = new QueueAvailability(queueDto.getAvailability());
-		}
-
-		if (queueDto.getOnDemandSettings() != null)
-		{
-			this.onDemandSettings = new QueueOnDemandSettings(queueDto.getOnDemandSettings());
-		}
+		this.expirationThresholdSeconds = onDemandQueueSettingsDto.getExpirationThresholdSeconds();
 	}
 }

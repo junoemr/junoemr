@@ -54,6 +54,7 @@ public class AppointmentQueueTo1 implements Serializable
 	@JsonSerialize(using = OffsetDateTimeSerializer.class)
 	private OffsetDateTime createdAt;
 	private QueuedAppointmentStatus status;
+	private AppointmentQueueOnDemandSettingsTransfer appointmentQueueOnDemandSettings;
 
 	private QueueAvailabilitySettingsTransfer availabilitySettings;
 
@@ -79,6 +80,10 @@ public class AppointmentQueueTo1 implements Serializable
 		BeanUtils.copyProperties(appointmentQueue, this, "name", "availability");
 		this.setQueueName(appointmentQueue.getName());
 		this.setAvailabilitySettings(new QueueAvailabilitySettingsTransfer(appointmentQueue.getAvailability()));
+		if (appointmentQueue.getOnDemandSettings() != null)
+		{
+			this.setAppointmentQueueOnDemandSettings(new AppointmentQueueOnDemandSettingsTransfer(appointmentQueue.getOnDemandSettings()));
+		}
 	}
 
 	public QueueInput asCreateQueueInput()
@@ -86,6 +91,11 @@ public class AppointmentQueueTo1 implements Serializable
 		QueueInput createQueueInput = new QueueInput();
 		createQueueInput.setName(this.getQueueName());
 		createQueueInput.setQueueLimit(this.getQueueLimit());
+
+		if (this.getAppointmentQueueOnDemandSettings() != null)
+		{
+			createQueueInput.setOnDemandSettings(this.getAppointmentQueueOnDemandSettings().asOnDemandQueueSettingsDto());
+		}
 
 		// only send availability settings if they exist and the enabled flag is set.
 		if(this.hasAvailabilitySettingsEnabled())
