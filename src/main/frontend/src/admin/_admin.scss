@@ -24,7 +24,11 @@
   }
 
   #admin-page-body {
-    margin: 16px;
+    height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height});
+    overflow: auto;
+
+    margin: 0;
+    padding: 16px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;

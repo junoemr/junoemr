@@ -1,6 +1,6 @@
 juno-input {
 	.juno-input {
-		@include juno-form-inputs-style();
+		@include juno-form-inputs-style(1px, var(--theme-form-field-boarder-radius));
 		@include juno-form-inputs-colors-default();
 
 		div {
