@@ -55,21 +55,21 @@
 								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
 			Cancel
 		</juno-button>
-		<juno-button ng-click="$ctrl.bookAndStartTelehealth()"
-								 title="Assign the appointment to a schedule and start the telehealth call"
-								 component-style="$ctrl.resolve.style"
-								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-								 disabled="!$ctrl.bookProviderNo || (!$ctrl.siteSelection && $ctrl.isMultisiteEnabled) || $ctrl.isLoading">
-			Start
-		</juno-button>
 		<juno-button ng-click="$ctrl.bookQueuedAppointment()"
 								 title="Assign the appointment to a schedule"
 								 component-style="$ctrl.resolve.style"
 								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
 								 disabled="!$ctrl.bookProviderNo || (!$ctrl.siteSelection && $ctrl.isMultisiteEnabled) || $ctrl.isLoading">
 			Assign
+		</juno-button>
+		<juno-button ng-click="$ctrl.bookAndStartTelehealth()"
+								 title="Assign the appointment to a schedule and start the telehealth call"
+								 component-style="$ctrl.resolve.style"
+								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+								 disabled="!$ctrl.bookProviderNo || (!$ctrl.siteSelection && $ctrl.isMultisiteEnabled) || $ctrl.isLoading">
+			Start
 		</juno-button>
 	</div>
 
