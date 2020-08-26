@@ -295,24 +295,45 @@ public class BillingDao extends AbstractDao<Billing> {
 				statusTypeClause += " like '" + statusType + "'";
 			}
 	    }
-	    //
-	    String p = " select b.billing_no, b.demographic_no, b.demographic_name, b.update_date, b.billingtype,"
-	        + " b.status, b.apptProvider_no,b.appointment_no, b.billing_date,b.billing_time, bm.billingstatus, "
-	        +
-	        " bm.bill_amount, bm.billing_code, bm.dx_code1, bm.dx_code2, bm.dx_code3,"
-	        +
-	        " b.provider_no, b.visitdate, b.visittype,bm.billingmaster_no,p.first_name,p.last_name,bm.billing_unit from billing b left join provider p on p.provider_no = b.provider_no, "
-	        + " billingmaster bm where b.billing_no= bm.billing_no "
 
+	    String billingQuery =
+				"SELECT " +
+				"b.billing_no, " +
+				"b.demographic_no, " +
+				"b.demographic_name, " +
+				"b.update_date, " +
+				"b.billingtype, " +
+				"b.status, " +
+				"b.apptProvider_no," +
+				"b.appointment_no, " +
+				"b.billing_date, " +
+				"b.billing_time, " +
+				"LEFT(bm.billingstatus, 1), " +
+	        	"bm.bill_amount, " +
+				"bm.billing_code, " +
+				"bm.dx_code1, " +
+				"bm.dx_code2, " +
+				"bm.dx_code3, " +
+	        	"b.provider_no, " +
+				"b.visitdate, " +
+				"b.visittype, " +
+				"bm.billingmaster_no, " +
+				"p.first_name, " +
+				"p.last_name, " +
+				"bm.billing_unit " +
+				"FROM " +
+					"billing b LEFT JOIN provider p ON p.provider_no = b.provider_no, " +
+					"billingmaster bm " +
+				"WHERE b.billing_no= bm.billing_no "
 	        + statusTypeClause
 	        + providerQuery
 	        + startDateQuery
 	        + endDateQuery
 	        + demoQuery
 	        + billingType
-	        + " order by b.billing_date desc";
+	        + " ORDER BY b.billing_date DESC";
 
-	    Query query = entityManager.createNativeQuery(p);
+	    Query query = entityManager.createNativeQuery(billingQuery);
 		return query.getResultList();
 	}
 
