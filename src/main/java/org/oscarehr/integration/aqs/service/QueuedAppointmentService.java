@@ -39,8 +39,6 @@ import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.service.IntegrationService;
-import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,9 +63,6 @@ public class QueuedAppointmentService extends BaseService
 
 	@Autowired
 	private DemographicDao demographicDao;
-
-	@Autowired
-	private ProviderDataDao providerDataDao;
 
 	@Autowired
 	private org.oscarehr.appointment.service.Appointment appointmentService;
@@ -176,7 +171,6 @@ public class QueuedAppointmentService extends BaseService
 	{
 		QueuedAppointment queuedAppointment = getQueuedAppointment(queuedAppointmentId, queueId, loggedInInfo.getLoggedInSecurity().getSecurityNo());
 		Demographic demographic = demographicDao.find(queuedAppointment.getDemographicNo());
-		ProviderData provider = providerDataDao.find(providerNo);
 		Date now = new Date();
 
 		if (queuedAppointment.getStatus() != QueuedAppointmentStatus.QUEUED)
@@ -192,11 +186,10 @@ public class QueuedAppointmentService extends BaseService
 		appointment.setStartTime(now);
 		appointment.setCreateDateTime(now);
 		appointment.setStatus(Appointment.TODO);
-		appointment.setCreator(provider.getDisplayName());
-		appointment.setBookingSource(Appointment.BookingSource.OSCAR);
+		appointment.setCreator(providerNo);
 		appointment.setReason(queuedAppointment.getReason());
 		appointment.setNotes(queuedAppointment.getNotes());
-		appointment.setName("");
+		appointment.setName(demographic.getDisplayName());
 		appointment.setIsVirtual(true);
 
 		// book 15 min appointment

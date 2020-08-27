@@ -46,13 +46,12 @@ public class QueuedAppointmentLink extends AbstractModel<Integer>
 	@Column(name = "aqs_queued_id")
 	private String queueId;
 
-	@OneToOne(fetch= FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToOne(fetch= FetchType.EAGER)
 	@JoinColumn(name="appointment_no")
 	private Appointment appointment;
 
 	public QueuedAppointmentLink()
 	{
-
 	}
 
 	@Override

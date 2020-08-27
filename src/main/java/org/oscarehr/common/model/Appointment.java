@@ -31,6 +31,7 @@ import org.oscarehr.integration.aqs.model.QueuedAppointmentLink;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -101,7 +102,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@Column(name = "end_time")
 	private Date endTime;
 
-	private String name;
+	private String name = "";
 
 	@Column(name = "demographic_no")
 	private int demographicNo;
@@ -115,8 +116,8 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@SiteLocation
 	private String location;
 
-	private String resources;
-	private String type;
+	private String resources = "";
+	private String type = "";
 	private String style;
 	private String billing;
 		private String status;
@@ -143,11 +144,11 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	@Getter
 	@Setter
-	@OneToOne(mappedBy="appointment")
+	@OneToOne(mappedBy="appointment", cascade = CascadeType.ALL)
 	private QueuedAppointmentLink queuedAppointmentLink;
 
-	private String remarks;
-	private String urgency;
+	private String remarks = "";
+	private String urgency = "";
 	private boolean isVirtual;
 	private Integer creatorSecurityId;
 	
@@ -165,7 +166,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@Column(name = "confirmed_by")
 	private String confirmedBy;
 
-	private Integer reasonCode;
+	private Integer reasonCode = DEFAULT_REASON_CODE;
 
 	/** default constructor */
 	public Appointment()
