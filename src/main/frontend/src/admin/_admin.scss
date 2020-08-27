@@ -24,7 +24,7 @@
   }
 
   #admin-page-body {
-    height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height});
+    @extend %juno-primary-view-pane;
     overflow: auto;
 
     margin: 0;
