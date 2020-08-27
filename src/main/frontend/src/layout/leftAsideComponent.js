@@ -45,6 +45,7 @@ angular.module('Layout').component('leftAside', {
 		"scheduleService",
 		"providerService",
 		"securityService",
+		"systemPreferenceService",
 		function (
 			$rootScope,
 			$scope,
@@ -55,7 +56,8 @@ angular.module('Layout').component('leftAside', {
 			angularUtil,
 			scheduleService,
 			providerService,
-			securityService)
+			securityService,
+			systemPreferenceService)
 	{
 
 		$scope.pageStyle = JUNO_STYLE.GREY;
@@ -90,6 +92,8 @@ angular.module('Layout').component('leftAside', {
 		};
 		ctrl.eventStatusOptions = [];
 
+		ctrl.show_appointment_queue = false;
+
 		ctrl.init = function ()
 		{
 			scheduleService.loadEventStatuses().then(
@@ -109,6 +113,13 @@ angular.module('Layout').component('leftAside', {
 			ctrl.provider = securityService.getUser();
 			ctrl.telehealthEnabled = ctrl.loadTelehealthEnabled();
 			ctrl.loadProviderSettings();
+
+
+			// only show the appointment queue if enabled
+			systemPreferenceService.isPreferenceEnabled("aqs_enabled", false).then((enabled) =>
+			{
+				ctrl.show_appointment_queue = enabled;
+			});
 		};
 
 		ctrl.loadProviderSettings = function ()

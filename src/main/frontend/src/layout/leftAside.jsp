@@ -51,7 +51,7 @@
 		<!-- main content pane -->
 		<div class="patient-list-content flex-column">
 			<ul class="nav nav-tabs" id="patient-list-nav">
-				<li ng-class="{'active' : $ctrl.isAppointmentQueueView()}">
+				<li ng-if="$ctrl.show_appointment_queue" ng-class="{'active' : $ctrl.isAppointmentQueueView()}">
 					<a class="round-top" ng-class="$ctrl.getTabClasses($ctrl.isAppointmentQueueView())" data-toggle="tab"
 					ng-click="$ctrl.changeTab($ctrl.tabEnum.appointmentQueue);"> Queue
 					</a>

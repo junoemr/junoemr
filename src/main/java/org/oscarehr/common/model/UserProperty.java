@@ -130,6 +130,8 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String ICE_FALL_VISIBLE = "icefall_visible";
     public static final String ICE_FALL_INTEGRATION_ENABLED = "icefall_enabled";
 
+    public static final String AQS_INTEGRATION_API_SECRET_KEY = "aqs_api_secret_key";
+    public static final String AQS_INTEGRATION_ENABLED = "aqs_enabled";
     
     public static final String DEFAULT_PRINTER_PDF_LABEL="default_printer_pdf_label";
     public static final String DEFAULT_PRINTER_PDF_ENVELOPE="default_printer_pdf_envelope";
