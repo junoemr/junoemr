@@ -29,7 +29,6 @@ import ca.cloudpractice.aqs.client.api.OrganizationApi;
 import ca.cloudpractice.aqs.client.auth.ApiKeyAuth;
 import ca.cloudpractice.aqs.client.model.RemoteUserType;
 import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -64,18 +63,6 @@ public abstract class BaseService extends org.oscarehr.integration.BaseService
 		apiClient.setBasePath(AQS_PROTOCOL + "://" + BASE_END_POINT);
 		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_INTEGRATION_ID)).setApiKey(OscarProperties.getInstance().getProperty("project_home"));
 		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_TYPE)).setApiKey(RemoteUserType.JUNO_SECURITY.name());
-
-		// autowire not available in constructor of abstract class
-		UserPropertyDAO userPropertyDao = SpringUtils.getBean(UserPropertyDAO.class);
-		if (userPropertyDao.getProp(AQS_PROPERTY_API_SECRET_KEY) != null)
-		{
-			((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_ORG_SECRET)).setApiKey(userPropertyDao.getProp(AQS_PROPERTY_API_SECRET_KEY).getValue());
-		}
-		else
-		{
-			throw new RuntimeException("The property [" + AQS_PROPERTY_API_SECRET_KEY + "] is not set in the [property] table! " +
-			                           "AQS integration will not function until corrected!");
-		}
 	}
 
 	/**
@@ -108,7 +95,6 @@ public abstract class BaseService extends org.oscarehr.integration.BaseService
 	{
 		((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_USER_ID)).setApiKey(securityNo.toString());
 
-		// autowire not available in abstract class
 		if (userPropertyDao.getProp(AQS_PROPERTY_API_SECRET_KEY) != null)
 		{
 			((ApiKeyAuth) apiClient.getAuthentication(AQS_AUTH_REMOTE_ORG_SECRET)).setApiKey(userPropertyDao.getProp(AQS_PROPERTY_API_SECRET_KEY).getValue());
