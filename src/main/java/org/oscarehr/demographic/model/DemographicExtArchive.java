@@ -31,13 +31,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import static oscar.util.StringUtils.filterControlCharacters;
 
 @Entity
 @Table(name = "demographicExtArchive")
@@ -187,13 +183,6 @@ public class DemographicExtArchive extends AbstractModel<Integer> implements Ser
 	 */
 	public void setArchiveId(Long archiveId) {
 		this.archiveId = archiveId;
-	}
-
-	@PrePersist
-	@PreUpdate
-	protected void prePersist()
-	{
-		setValue(filterControlCharacters(this.getValue()));
 	}
 
 }
