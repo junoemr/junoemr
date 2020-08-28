@@ -49,6 +49,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -1146,64 +1147,94 @@ public abstract class MessageHandler
 
 	protected String formatDateTime(String plain)
 	{
-		return formatDateTime(plain, ConversionUtils.HL7_DATE_TIME_DEFAULT_IN_PATTERN, ConversionUtils.DEFAULT_TS_PATTERN);
+		return getHL7V2DateTime(plain, ConversionUtils.DEFAULT_TS_PATTERN);
 	}
 	protected String formatDate(String plain)
 	{
-		return formatDateTime(plain, ConversionUtils.HL7_DATE_TIME_DEFAULT_IN_PATTERN, ConversionUtils.DEFAULT_DATE_PATTERN);
+		return getHL7V2DateTime(plain, ConversionUtils.DEFAULT_DATE_PATTERN);
 	}
 	protected String formatTime(String plain)
 	{
-		return formatDateTime(plain, ConversionUtils.HL7_DATE_TIME_DEFAULT_IN_PATTERN, ConversionUtils.DEFAULT_TIME_PATTERN);
+		return getHL7V2DateTime(plain, ConversionUtils.DEFAULT_TIME_PATTERN);
+	}
+
+	protected String getHL7V2DateTime(String dateInput, String outputFormat)
+	{
+		String dateOutput = "";
+
+		if(dateInput != null && !dateInput.trim().isEmpty())
+		{
+			String datePattern = matchHL7V2DateTimePattern(dateInput);
+
+			if (datePattern != null)
+			{
+				dateOutput = formatDateTime(dateInput, datePattern, outputFormat);
+			}
+			else
+			{
+				logger.error("Date " + dateInput + " format is not handled");
+			}
+		}
+
+		return dateOutput;
+	}
+
+	/**
+	 * to match this HL7 v2.* version time format design YYYY[MM[DD[HH[MM[SS[.S[S[S[S]]]]]]]]][+/-ZZZZ]
+	 * @param dateInput
+	 * @return datePattern String that is matched, if no matched date pattern, return null
+	 */
+	protected String matchHL7V2DateTimePattern(String dateInput)
+	{
+		String datePattern = ConversionUtils.HL7_V2_DATE_TIME_OFFICIAL_PATTERN;
+
+		if(datePattern.length() > dateInput.length())
+		{
+			// For this format YYYY[MM[DD[HH[MM[SS[.S[S[S[S]]]]]]]]][+/-ZZZZ]
+			datePattern = datePattern.substring(0, dateInput.length());
+		}
+		else if(datePattern.length() < dateInput.length())
+		{
+			//handle this format 2013-10-19 15:23:00 -0700
+			datePattern = ConversionUtils.DATE_TIME_ZONE_OFFSET_X_PATTERN;
+		}
+
+		if(!GenericValidator.isDate(dateInput, datePattern, false))
+		{
+			datePattern = null;
+		}
+
+		return datePattern;
 	}
 
 	protected String formatDateTime(String plain, String inFormat, String outFormat)
 	{
 		String formatted = "";
 
-		if(plain == null || plain.trim().isEmpty())
+		if( plain != null && !plain.trim().isEmpty())
 		{
-			return formatted;
-		}
-
-		if(inFormat.length() > plain.length())
-		{
-			inFormat = inFormat.substring(0, plain.length());
-		}
-		else if(inFormat.length() < plain.length())
-		{
-			if (plain.length() == 19)
+			try
 			{
-				// handle this format that is stated in official HL7 document 19981004010159+0100
-				inFormat = ConversionUtils.HL7_DATE_TIME_OFFICIAL_FULL_PATTERN;
+				DateTimeFormatter inFormatter = DateTimeFormatter.ofPattern(inFormat);
+				DateTimeFormatter outFormatter = DateTimeFormatter.ofPattern(outFormat);
+
+				// use format builder to set default missing time values
+				DateTimeFormatter customFormatter = new DateTimeFormatterBuilder().append(inFormatter)
+						.parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+						.parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+						.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+						.toFormatter();
+
+				LocalDateTime parsedDate = LocalDateTime.parse(plain, customFormatter);
+
+				formatted = parsedDate.format(outFormatter);
 			}
-			else
+			catch (DateTimeParseException exception)
 			{
-				//handle this format 2013-10-19 15:23:00 -0700
-				inFormat = ConversionUtils.DATE_TIME_ZONE_OFFSET_x_PATTERN;
+				logger.error("Error parsing datetime: ", exception);
 			}
 		}
 
-		if(GenericValidator.isDate(plain, inFormat, true))
-		{
-			DateTimeFormatter inFormatter = DateTimeFormatter.ofPattern(inFormat);
-			DateTimeFormatter outFormatter = DateTimeFormatter.ofPattern(outFormat);
-
-			// use format builder to set default missing time values
-			DateTimeFormatter customFormatter = new DateTimeFormatterBuilder().append(inFormatter)
-					.parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-					.parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-					.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
-					.toFormatter();
-
-			LocalDateTime parsedDate = LocalDateTime.parse(plain, customFormatter);
-
-			formatted = parsedDate.format(outFormatter);
-		}
-		else
-		{
-			logger.error( getClass().getName() + " Date format: " + plain + " cannot be handled");
-		}
 		return formatted;
 	}
 
