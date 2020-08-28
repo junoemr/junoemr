@@ -298,29 +298,29 @@ public class BillingDao extends AbstractDao<Billing> {
 
 	    String billingQuery =
 				"SELECT " +
-				"b.billing_no, " +
-				"b.demographic_no, " +
-				"b.demographic_name, " +
-				"b.update_date, " +
-				"b.billingtype, " +
-				"b.status, " +
-				"b.apptProvider_no," +
-				"b.appointment_no, " +
-				"b.billing_date, " +
-				"b.billing_time, " +
-				"LEFT(bm.billingstatus, 1), " +
-	        	"bm.bill_amount, " +
-				"bm.billing_code, " +
-				"bm.dx_code1, " +
-				"bm.dx_code2, " +
-				"bm.dx_code3, " +
-	        	"b.provider_no, " +
-				"b.visitdate, " +
-				"b.visittype, " +
-				"bm.billingmaster_no, " +
-				"p.first_name, " +
-				"p.last_name, " +
-				"bm.billing_unit " +
+					"b.billing_no, " +
+					"b.demographic_no, " +
+					"b.demographic_name, " +
+					"b.update_date, " +
+					"b.billingtype, " +
+					"b.status, " +
+					"b.apptProvider_no," +
+					"b.appointment_no, " +
+					"b.billing_date, " +
+					"b.billing_time, " +
+					"LEFT(bm.billingstatus, 1), " +
+					"bm.bill_amount, " +
+					"bm.billing_code, " +
+					"bm.dx_code1, " +
+					"bm.dx_code2, " +
+					"bm.dx_code3, " +
+					"b.provider_no, " +
+					"b.visitdate, " +
+					"b.visittype, " +
+					"bm.billingmaster_no, " +
+					"p.first_name, " +
+					"p.last_name, " +
+					"bm.billing_unit " +
 				"FROM " +
 					"billing b LEFT JOIN provider p ON p.provider_no = b.provider_no, " +
 					"billingmaster bm " +
