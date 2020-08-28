@@ -61,12 +61,22 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					if(ctrl.editMode)
 					{
 						ctrl.queueModel = angular.copy(ctrl.resolve.queue);
+						ctrl.isLoading = false;
 					}
 					else
 					{
-						ctrl.queueModel = ctrl.getEmptyModel();
+						aqsQueuesApi.getNewAppointmentQueue().then((response) =>
+						{
+							ctrl.queueModel = response.data;
+						}).catch((error) =>
+						{
+							console.error(error)
+							Juno.Common.Util.errorAlert($uibModal, "Error", "Initialization Error");
+						}).finally(() =>
+						{
+							ctrl.isLoading = false;
+						})
 					}
-					ctrl.isLoading = false;
 				}
 
 				ctrl.saveDisabled = () =>
@@ -102,7 +112,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					{
 						// TODO handle name conflicts/errors
 						console.error(error);
-						alert("Failed to save appointment queue");
+						Juno.Common.Util.errorAlert($uibModal, "Error", "Failed to save appointment queue");
 						ctrl.isLoading = false;
 					}
 
@@ -136,47 +146,6 @@ angular.module('Common.Components').component('appointmentQueueModal',
 				ctrl.onCancel = () =>
 				{
 					ctrl.modalInstance.dismiss("modal cancelled");
-				}
-
-				ctrl.getEmptyModel = () =>
-				{
-					return {
-						id: null,
-						queueName: "",
-						queueLimit: 10,
-						queueColor: null,
-						createdAt: null,
-						availabilitySettings: ctrl.getDefaultAvailabilitySettings(),
-					}
-				}
-				ctrl.getDefaultAvailabilitySettings = () =>
-				{
-					return {
-						enabled: false,
-						bookingHours: [
-							// iso standard weekday numbers used by moment(), where 1 = Sunday and 7 = Saturday
-							ctrl.getDefaultBookingHours(1),
-							ctrl.getDefaultBookingHours(2),
-							ctrl.getDefaultBookingHours(3),
-							ctrl.getDefaultBookingHours(4),
-							ctrl.getDefaultBookingHours(5),
-							ctrl.getDefaultBookingHours(6),
-							ctrl.getDefaultBookingHours(7),
-						],
-					}
-				}
-
-				ctrl.getDefaultBookingHours = (weekdayNumber) =>
-				{
-					const defaultStartHour = 8;
-					const defaultEndHour = 16;
-
-					return {
-						weekdayNumber: weekdayNumber,
-						enabled: false,
-						startTime: moment({hour: defaultStartHour}),
-						endTime: moment({hour: defaultEndHour}),
-					};
 				}
 			}]
 	});

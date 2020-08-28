@@ -28,7 +28,6 @@ import org.oscarehr.integration.aqs.model.QueueAvailability;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.time.LocalTime;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -55,9 +54,7 @@ public class QueueAvailabilitySettingsTransfer implements Serializable
 
 	public QueueAvailabilitySettingsTransfer()
 	{
-		this.bookingHours = new QueueAvailabilityDayTransfer[7];
-		this.enabled = false;
-		initDefaultBookingHours();
+		this(null);
 	}
 
 	public QueueAvailabilitySettingsTransfer(QueueAvailability availability)
@@ -77,7 +74,13 @@ public class QueueAvailabilitySettingsTransfer implements Serializable
 		}
 		else
 		{
-			initDefaultBookingHours();
+			this.bookingHours[INDEX_SUNDAY]     = new QueueAvailabilityDayTransfer(INDEX_ISO_SUNDAY,    null);
+			this.bookingHours[INDEX_MONDAY]     = new QueueAvailabilityDayTransfer(INDEX_ISO_MONDAY,    null);
+			this.bookingHours[INDEX_TUESDAY]    = new QueueAvailabilityDayTransfer(INDEX_ISO_TUESDAY,   null);
+			this.bookingHours[INDEX_WEDNESDAY]  = new QueueAvailabilityDayTransfer(INDEX_ISO_WEDNESDAY, null);
+			this.bookingHours[INDEX_THURSDAY]   = new QueueAvailabilityDayTransfer(INDEX_ISO_THURSDAY,  null);
+			this.bookingHours[INDEX_FRIDAY]     = new QueueAvailabilityDayTransfer(INDEX_ISO_FRIDAY,    null);
+			this.bookingHours[INDEX_SATURDAY]   = new QueueAvailabilityDayTransfer(INDEX_ISO_SATURDAY,  null);
 		}
 	}
 
@@ -99,23 +102,5 @@ public class QueueAvailabilitySettingsTransfer implements Serializable
 	public void setBookingHours(QueueAvailabilityDayTransfer[] bookingHours)
 	{
 		this.bookingHours = bookingHours;
-	}
-
-	private void initDefaultBookingHours()
-	{
-		this.bookingHours[INDEX_SUNDAY]     = new QueueAvailabilityDayTransfer(INDEX_ISO_SUNDAY,   false,
-				LocalTime.of(8,0), LocalTime.of(14,0));
-		this.bookingHours[INDEX_MONDAY]     = new QueueAvailabilityDayTransfer(INDEX_ISO_MONDAY,   true,
-				LocalTime.of(8,0), LocalTime.of(16,0));
-		this.bookingHours[INDEX_TUESDAY]    = new QueueAvailabilityDayTransfer(INDEX_ISO_TUESDAY,  true,
-				LocalTime.of(8,0), LocalTime.of(16,0));
-		this.bookingHours[INDEX_WEDNESDAY]  = new QueueAvailabilityDayTransfer(INDEX_ISO_WEDNESDAY,true,
-				LocalTime.of(8,0), LocalTime.of(16,0));
-		this.bookingHours[INDEX_THURSDAY]   = new QueueAvailabilityDayTransfer(INDEX_ISO_THURSDAY, true,
-				LocalTime.of(8,0), LocalTime.of(16,0));
-		this.bookingHours[INDEX_FRIDAY]     = new QueueAvailabilityDayTransfer(INDEX_ISO_FRIDAY,   true,
-				LocalTime.of(8,0), LocalTime.of(16,0));
-		this.bookingHours[INDEX_SATURDAY]   = new QueueAvailabilityDayTransfer(INDEX_ISO_SATURDAY, false,
-				LocalTime.of(8,0), LocalTime.of(14,0));
 	}
 }

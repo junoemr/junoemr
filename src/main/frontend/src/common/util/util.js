@@ -521,7 +521,7 @@ Juno.Common.Util.typeaheadValueLookup = function(value, options)
  * returns the name of the day, given the ISO weekday index 1-7.
  * Where 1 = Sunday, and 7 = Saturday
  */
-Juno.Common.Util.ISODayString = function(weekday)
+Juno.Common.Util.ISODayString = function ISODayString(weekday)
 {
 	switch (weekday)
 	{

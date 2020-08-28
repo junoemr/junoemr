@@ -104,4 +104,13 @@ public class QueueWebService extends AbstractServiceImpl
 		appointmentQueueService.deleteAppointmentQueue(queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		return RestResponse.successResponse(true);
 	}
+
+	@GET
+	@Path("newQueue")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<AppointmentQueueTo1> getNewAppointmentQueue()
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		return RestResponse.successResponse(new AppointmentQueueTo1());
+	}
 }

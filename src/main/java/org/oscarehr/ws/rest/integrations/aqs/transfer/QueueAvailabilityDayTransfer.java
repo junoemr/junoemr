@@ -25,15 +25,19 @@ package org.oscarehr.ws.rest.integrations.aqs.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.oscarehr.integration.aqs.model.QueueAvailabilityDay;
+import oscar.OscarProperties;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QueueAvailabilityDayTransfer implements Serializable
 {
+	private static final OscarProperties props = OscarProperties.getInstance();
+
 	private Integer weekdayNumber;
 	private boolean enabled;
 	private LocalTime startTime;
@@ -76,8 +80,9 @@ public class QueueAvailabilityDayTransfer implements Serializable
 		{
 			// use default time settings
 			this.enabled = false;
-			this.startTime = LocalTime.of(8, 0);
-			this.endTime = LocalTime.of(16, 0);
+			DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_TIME;
+			this.startTime = LocalTime.parse(props.getProperty("aqs_default_availability_day_start", "08:00"), formatter);
+			this.endTime = LocalTime.parse(props.getProperty("aqs_default_availability_day_end", "17:00"), formatter);
 		}
 
 	}
