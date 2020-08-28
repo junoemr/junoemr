@@ -1158,6 +1158,13 @@ public abstract class MessageHandler
 		return getHL7V2DateTime(plain, ConversionUtils.DEFAULT_TIME_PATTERN);
 	}
 
+	/**
+	 *
+	 * @param dateInput
+	 * @param outputFormat
+	 * @return formated date based on @param outputFormat.
+	 * 		   if error, log error and return ""
+	 */
 	protected String getHL7V2DateTime(String dateInput, String outputFormat)
 	{
 		String dateOutput = "";
