@@ -1184,7 +1184,7 @@ public abstract class MessageHandler
 	 * @param dateInput
 	 * @return datePattern String that is matched, if no matched date pattern, return null
 	 */
-	protected String matchHL7V2DateTimePattern(String dateInput)
+	private String matchHL7V2DateTimePattern(String dateInput)
 	{
 		String datePattern = ConversionUtils.HL7_V2_DATE_TIME_OFFICIAL_PATTERN;
 
@@ -1207,7 +1207,7 @@ public abstract class MessageHandler
 		return datePattern;
 	}
 
-	protected String formatDateTime(String plain, String inFormat, String outFormat)
+	private String formatDateTime(String plain, String inFormat, String outFormat)
 	{
 		String formatted = "";
 
