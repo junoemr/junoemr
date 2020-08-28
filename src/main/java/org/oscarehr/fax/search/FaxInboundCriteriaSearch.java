@@ -29,7 +29,6 @@ import org.oscarehr.common.search.AbstractCriteriaSearch;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneOffset;
 
 public class FaxInboundCriteriaSearch extends AbstractCriteriaSearch
 {
