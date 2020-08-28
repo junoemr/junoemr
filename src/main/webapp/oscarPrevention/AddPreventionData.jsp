@@ -36,12 +36,11 @@
 <%@ page import="oscar.oscarPrevention.PreventionDisplayConfig" %>
 <%@ page import="oscar.oscarProvider.data.ProviderData"%>
 <%@ page import="oscar.util.UtilDateUtilities" %>
-<%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="java.text.ParseException" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -65,16 +64,16 @@ if(!authed) {
   DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
       		
   if(session.getValue("user") == null) response.sendRedirect("../logout.jsp");
-  //int demographic_no = Integer.parseInt(request.getParameter("demographic_no"));
   String demographic_no = request.getParameter("demographic_no");
   String id = request.getParameter("id");
-  Map<String,Object> existingPrevention = null;
+  Map<String, Object> existingPrevention = null;
 
   String providerName ="";
   String lot ="";
   String provider = (String) session.getValue("user");
-  String dateFmt = "yyyy-MM-dd HH:mm";
-  String prevDate = UtilDateUtilities.getToday(dateFmt);
+    Date currentDate = new Date();
+    String prevDate = ConversionUtils.toDateString(currentDate, ConversionUtils.TS_NO_SEC_PATTERN);
+
   String completed = "0";
   String nextDate = "";
   String summary = "";
@@ -148,18 +147,12 @@ if(!authed) {
   
   //calc age at time of prevention
   Date dob = PreventionData.getDemographicDateOfBirth(LoggedInInfo.getLoggedInInfoFromSession(request), Integer.valueOf(demographic_no));
-  SimpleDateFormat fmt = new SimpleDateFormat(dateFmt);
 
-  String age;
-  try
-  {
-      Date dateOfPrev = fmt.parse(prevDate);
-      age = UtilDateUtilities.calcAgeAtDate(dob, dateOfPrev);
-  }
-  catch (ParseException e)
-  {
-     age = "Unknown";
-  }
+    String age = UtilDateUtilities.calcAgeAtDate(dob, currentDate);
+    if (age == null)
+    {
+        age = "Unknown";
+    }
 
   DemographicData demoData = new DemographicData();
   String[] demoInfo = demoData.getNameAgeSexArray(LoggedInInfo.getLoggedInInfoFromSession(request), Integer.valueOf(demographic_no));
@@ -186,7 +179,6 @@ if(!authed) {
 <script type="text/javascript" src="../share/calendar/calendar-setup.js" ></script>
 
 <style type="text/css">
-  div.ImmSet { background-color: #ffffff; }
   div.ImmSet h2 {  }
   div.ImmSet ul {  }
   div.ImmSet li {  }

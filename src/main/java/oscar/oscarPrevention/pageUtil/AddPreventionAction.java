@@ -25,6 +25,7 @@
 
 package oscar.oscarPrevention.pageUtil;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +43,8 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarPrevention.PreventionData;
+import oscar.util.ConversionUtils;
+
 /**
  *
  * @author Jay Gallagher
@@ -54,12 +57,11 @@ public class AddPreventionAction  extends Action {
    public AddPreventionAction() {
    }
    
-      public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)  {
-                       
-    	  if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_prevention", "w", null)) {
-    		  throw new SecurityException("missing required security object (_prevention)");
-    	  }
-    	  
+      public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
+      {
+         String loggedInProvider = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+         securityInfoManager.requireOnePrivilege(loggedInProvider, SecurityInfoManager.WRITE, null, "_prevention");
+
          String sessionUser  = (String) request.getSession().getAttribute("user");
          if ( sessionUser == null){
             return mapping.findForward("Logout");
@@ -68,13 +70,15 @@ public class AddPreventionAction  extends Action {
          String demographic_no = request.getParameter("demographic_no");
          String id = request.getParameter("id");
          String delete = request.getParameter("delete");
-         
-         MiscUtils.getLogger().debug("id "+id+"  delete "+ delete);
-         
-         MiscUtils.getLogger().debug("prevention Type "+preventionType);
-         
+
          String given = request.getParameter("given");
          String prevDate = request.getParameter("prevDate");
+         // In the UI, prevention_date is defaulted to the current datetime if we're making a new prevention
+         // If an empty date somehow slips by us, fill it in as the UI would
+         if (prevDate == null || prevDate.isEmpty())
+         {
+            prevDate = ConversionUtils.toDateString(new Date(), ConversionUtils.TS_NO_SEC_PATTERN);
+         }
          String providerName = request.getParameter("providerName");
          String providerNo = request.getParameter("provider");
          
