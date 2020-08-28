@@ -41,10 +41,5 @@
 				items in queue. max capacity
 			</span>
 		{{$ctrl.currentQueue.queueLimit}}
-		<juno-button component-style="$ctrl.componentStyle"
-								 button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARK"
-								 button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
-			<i class="icon icon-linux"></i>
-		</juno-button>
 	</div>
 </div>
