@@ -38,6 +38,7 @@ import java.util.UUID;
 public class QueuedAppointment
 {
 	private final String EXTRAS_NOTES = "notes";
+	private final String EXTRAS_CLINIC_ID = "clinic_id";
 
 	private UUID id;
 	private UUID queueId;
@@ -46,6 +47,7 @@ public class QueuedAppointment
 	private OffsetDateTime createdAt;
 	private String reason;
 	private String notes;
+	private UUID clinicId;
 	private QueuedAppointmentStatus status;
 	private String createdBy;
 
@@ -62,6 +64,10 @@ public class QueuedAppointment
 			if (extrasMap.get(EXTRAS_NOTES) != null)
 			{
 				this.setNotes(extrasMap.get(EXTRAS_NOTES).toString());
+			}
+			if (extrasMap.get(EXTRAS_CLINIC_ID) != null)
+			{
+				this.setClinicId(UUID.fromString(extrasMap.get(EXTRAS_CLINIC_ID).toString()));
 			}
 		}
 	}

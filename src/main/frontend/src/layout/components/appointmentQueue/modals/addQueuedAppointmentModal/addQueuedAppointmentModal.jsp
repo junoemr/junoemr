@@ -1,5 +1,4 @@
 <juno-simple-modal class="add-queued-appointment-modal"
-									 modal-height="300"
 									 component-style="$ctrl.resolve.style"
 									 modal-instance="$ctrl.modalInstance">
 
@@ -17,16 +16,8 @@
 								model="$ctrl.bookProviderNo"
 								options="$ctrl.providerOptions"
 								placeholder="Assign to provider"
-								on-selected="$ctrl.onProviderSelectChange(value.value)"
 								component-style="$ctrl.resolve.style">
 				</juno-typeahead>
-
-				<juno-select ng-if="$ctrl.isMultisiteEnabled"
-										 ng-model="$ctrl.siteSelection"
-										 placeholder="Select Site"
-										 options="$ctrl.siteOptions"
-										 component-style="$ctrl.resolve.style">
-				</juno-select>
 
 				<juno-button ng-click="$ctrl.assignToMe()"
 										 component-style="$ctrl.resolve.style"
@@ -60,7 +51,7 @@
 								 component-style="$ctrl.resolve.style"
 								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-								 disabled="!$ctrl.bookProviderNo || (!$ctrl.siteSelection && $ctrl.isMultisiteEnabled) || $ctrl.isLoading">
+								 disabled="!$ctrl.bookProviderNo || $ctrl.isLoading">
 			Assign
 		</juno-button>
 		<juno-button ng-click="$ctrl.bookAndStartTelehealth()"
@@ -68,7 +59,7 @@
 								 component-style="$ctrl.resolve.style"
 								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-								 disabled="!$ctrl.bookProviderNo || (!$ctrl.siteSelection && $ctrl.isMultisiteEnabled) || $ctrl.isLoading">
+								 disabled="!$ctrl.bookProviderNo || $ctrl.isLoading">
 			Start
 		</juno-button>
 	</div>

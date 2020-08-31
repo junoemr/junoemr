@@ -93,49 +93,22 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			}
 		}
 
-		ctrl.onProviderSelectChange = (newProviderNo) =>
-		{
-			if (ctrl.isMultisiteEnabled && newProviderNo)
-			{
-				ctrl.loadSiteOptions(newProviderNo);
-			}
-		}
-
 		ctrl.assignToMe = async () =>
 		{
 			ctrl.bookProviderNo = (await providerService.getMe()).providerNo;
-			ctrl.loadSiteOptions(ctrl.bookProviderNo)
-		}
-
-		ctrl.loadSiteOptions = async (providerNo) =>
-		{
-			ctrl.siteSelection = null;
-
-			// load site and integration list
-			let integrationList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
-			let siteList = (await sitesApi.getSitesByProvider(providerNo)).data.body;
-
-			//filter out sites that don't have an MHA integration
-			siteList = siteList.filter((site) => integrationList.find((integration) => site.siteId === integration.siteId))
-
-			ctrl.siteOptions = siteList.map((site) => { return {label: site.name, value: site.siteId}});
 		}
 
 		ctrl.bookQueuedAppointment = async () =>
 		{
-			let bookQueuedAppointmentTransfer = {};
-			if (ctrl.isMultisiteEnabled)
-			{
-				bookQueuedAppointmentTransfer.siteId = ctrl.siteSelection;
-			}
+			let bookQueuedAppointmentTransfer = {
+				siteId: await ctrl.siteFromClinicId(ctrl.resolve.clinicId),
+				providerNo: ctrl.bookProviderNo,
+			};
 
-			bookQueuedAppointmentTransfer.providerNo = ctrl.bookProviderNo;
-
-			let newAppt = null;
 			try
 			{
 				ctrl.isLoading = true;
-				newAppt = (await aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId, ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer)).data.body;
+				return (await aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId, ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer)).data.body;
 			}
 			catch(err)
 			{
@@ -156,7 +129,27 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 				ctrl.modalInstance.close();
 			}
 
-			return newAppt;
+			return null;
+		}
+
+		// get the appointment site from the clinic id
+		ctrl.siteFromClinicId = async (clinicId) =>
+		{
+			let integrationList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
+
+			for (let integration of integrationList)
+			{
+				if (integration.remoteId === clinicId)
+				{
+					return integration.siteId;
+				}
+			}
+
+			Juno.Common.Util.errorAlert($uibModal,
+			                            "Failed to book appointment",
+			                            "The clinic this queued appointment was booked for is not connected to your Juno server." +
+					                            " Please contact support. Clinic Id [" + clinicId + "]");
+			throw "No integration for clinicId [" + clinicId + "]";
 		}
 
 		ctrl.bookAndStartTelehealth = async () =>

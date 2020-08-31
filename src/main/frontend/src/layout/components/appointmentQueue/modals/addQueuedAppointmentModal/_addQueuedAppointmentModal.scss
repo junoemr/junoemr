@@ -1,7 +1,7 @@
 .add-queued-appointment-modal {
 
 	.content {
-		min-height: 200px;
+		min-height: 152px;
 	}
 
 	h5 {
@@ -24,11 +24,6 @@
 		juno-typeahead {
 			flex: 1 0 100%;
 			margin-top: 16px;
-		}
-
-		juno-select {
-			flex: 1 0 100%;
-			margin-top: 8px;
 		}
 	}
 
