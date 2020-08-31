@@ -20,25 +20,20 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.integrations.aqs.transfer;
+package org.oscarehr.common.conversion;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.stereotype.Component;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Getter
-@Setter
-@XmlRootElement
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AppointmentQueueOnDemandSettingsTransfer implements Serializable
+@Component
+public abstract class AbstractModelConverter<T, K> implements ListModelConverter<T, K>
 {
-	private Integer expirationThresholdSeconds;
-	private Boolean enabled;
-
-	public AppointmentQueueOnDemandSettingsTransfer()
+	@Override
+	public List<K> convert(Collection<T> entities)
 	{
+		return entities.stream().map(this::convert).collect(Collectors.toList());
 	}
 }

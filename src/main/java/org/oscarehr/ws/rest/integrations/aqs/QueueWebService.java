@@ -25,6 +25,8 @@ package org.oscarehr.ws.rest.integrations.aqs;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.integration.aqs.conversion.AppointmentQueueModelConverter;
+import org.oscarehr.integration.aqs.conversion.AppointmentQueueTransferConverter;
 import org.oscarehr.integration.aqs.service.AppointmentQueueService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
@@ -56,13 +58,21 @@ public class QueueWebService extends AbstractServiceImpl
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 
+	@Autowired
+	private AppointmentQueueTransferConverter transferConverter;
+
+	@Autowired
+	private AppointmentQueueModelConverter modelConverter;
+
 	@GET
 	@Path("queues/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<AppointmentQueueTo1>> getAppointmentQueues()
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN, SecObjectName._APPOINTMENT);
-		return RestResponse.successResponse(AppointmentQueueTo1.fromAppointmentQueueList(appointmentQueueService.getAppointmentQueues(getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
+		return RestResponse.successResponse(modelConverter.convert(
+				appointmentQueueService.getAppointmentQueues(getLoggedInInfo().getLoggedInSecurity().getSecurityNo())
+		));
 	}
 
 	@POST
@@ -72,7 +82,9 @@ public class QueueWebService extends AbstractServiceImpl
 	public RestResponse<AppointmentQueueTo1> createAppointmentQueue(AppointmentQueueTo1 queueTransfer)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
-		return RestResponse.successResponse(new AppointmentQueueTo1(appointmentQueueService.createAppointmentQueue(queueTransfer, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
+		return RestResponse.successResponse(modelConverter.convert(
+				appointmentQueueService.createAppointmentQueue(transferConverter.convert(queueTransfer), getLoggedInInfo().getLoggedInSecurity().getSecurityNo())
+		));
 	}
 
 	@GET
@@ -81,7 +93,9 @@ public class QueueWebService extends AbstractServiceImpl
 	public RestResponse<AppointmentQueueTo1> getAppointmentQueue(@PathParam("queueId") UUID queueId)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN, SecObjectName._APPOINTMENT);
-		return RestResponse.successResponse(new AppointmentQueueTo1(appointmentQueueService.getAppointmentQueue(queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
+		return RestResponse.successResponse(modelConverter.convert(
+				appointmentQueueService.getAppointmentQueue(queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())
+		));
 	}
 
 	@PUT
@@ -92,7 +106,8 @@ public class QueueWebService extends AbstractServiceImpl
 	                                                                AppointmentQueueTo1 queueTransfer)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
-		return RestResponse.successResponse(new AppointmentQueueTo1(appointmentQueueService.updateAppointmentQueue(queueId, queueTransfer, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
+		return RestResponse.successResponse(modelConverter.convert(
+				appointmentQueueService.updateAppointmentQueue(queueId, transferConverter.convert(queueTransfer), getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
 	}
 
 	@DELETE

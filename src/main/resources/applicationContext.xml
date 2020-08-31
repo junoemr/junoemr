@@ -259,11 +259,6 @@
     <bean id="myHealthAccessService" class="org.oscarehr.telehealth.service.MyHealthAccessService" autowire="byName"/>
 	<bean id="myHealthPatientService" class="org.oscarehr.integration.myhealthaccess.service.PatientService" autowire="byName"/>
 
-	<!-- AQS -->
-	<bean id="QueuedAppointmentLinkDao" class="org.oscarehr.integration.aqs.dao.QueuedAppointmentLinkDao" autowire="byName"/>
-	<bean id="aqsAppointmentQueueService" class="org.oscarehr.integration.aqs.service.AppointmentQueueService" autowire="byName"/>
-	<bean id="aqsQueuedAppointmentService" class="org.oscarehr.integration.aqs.service.QueuedAppointmentService" autowire="byName"/>
-
    <!--Email Support -->
    <context:component-scan base-package="oscar.service"/>
 

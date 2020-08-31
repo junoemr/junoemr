@@ -24,23 +24,18 @@
 package org.oscarehr.ws.rest.integrations.aqs.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.oscarehr.integration.aqs.model.QueueAvailability;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.HashMap;
 
+@Getter @Setter
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QueueAvailabilitySettingsTransfer implements Serializable
 {
-	public static final int INDEX_SUNDAY = 0;
-	public static final int INDEX_MONDAY = 1;
-	public static final int INDEX_TUESDAY = 2;
-	public static final int INDEX_WEDNESDAY = 3;
-	public static final int INDEX_THURSDAY = 4;
-	public static final int INDEX_FRIDAY = 5;
-	public static final int INDEX_SATURDAY = 6;
-
 	public static final int INDEX_ISO_SUNDAY = 1;
 	public static final int INDEX_ISO_MONDAY = 2;
 	public static final int INDEX_ISO_TUESDAY = 3;
@@ -50,57 +45,91 @@ public class QueueAvailabilitySettingsTransfer implements Serializable
 	public static final int INDEX_ISO_SATURDAY = 7;
 
 	private Boolean enabled;
-	private QueueAvailabilityDayTransfer[] bookingHours;
+	private HashMap<Integer, QueueAvailabilityDayTransfer> bookingHours;
 
 	public QueueAvailabilitySettingsTransfer()
 	{
-		this(null);
+		this.bookingHours = new HashMap<>();
 	}
 
-	public QueueAvailabilitySettingsTransfer(QueueAvailability availability)
+	public void setDay(Integer isoDayIndex, QueueAvailabilityDayTransfer transfer)
 	{
-		this.bookingHours = new QueueAvailabilityDayTransfer[7];
-		this.enabled = (availability != null);
-
-		if(enabled)
-		{
-			this.bookingHours[INDEX_SUNDAY]     = new QueueAvailabilityDayTransfer(INDEX_ISO_SUNDAY,    availability.getSunday());
-			this.bookingHours[INDEX_MONDAY]     = new QueueAvailabilityDayTransfer(INDEX_ISO_MONDAY,    availability.getMonday());
-			this.bookingHours[INDEX_TUESDAY]    = new QueueAvailabilityDayTransfer(INDEX_ISO_TUESDAY,   availability.getTuesday());
-			this.bookingHours[INDEX_WEDNESDAY]  = new QueueAvailabilityDayTransfer(INDEX_ISO_WEDNESDAY, availability.getWednesday());
-			this.bookingHours[INDEX_THURSDAY]   = new QueueAvailabilityDayTransfer(INDEX_ISO_THURSDAY,  availability.getThursday());
-			this.bookingHours[INDEX_FRIDAY]     = new QueueAvailabilityDayTransfer(INDEX_ISO_FRIDAY,    availability.getFriday());
-			this.bookingHours[INDEX_SATURDAY]   = new QueueAvailabilityDayTransfer(INDEX_ISO_SATURDAY,  availability.getSaturday());
-		}
-		else
-		{
-			this.bookingHours[INDEX_SUNDAY]     = new QueueAvailabilityDayTransfer(INDEX_ISO_SUNDAY,    null);
-			this.bookingHours[INDEX_MONDAY]     = new QueueAvailabilityDayTransfer(INDEX_ISO_MONDAY,    null);
-			this.bookingHours[INDEX_TUESDAY]    = new QueueAvailabilityDayTransfer(INDEX_ISO_TUESDAY,   null);
-			this.bookingHours[INDEX_WEDNESDAY]  = new QueueAvailabilityDayTransfer(INDEX_ISO_WEDNESDAY, null);
-			this.bookingHours[INDEX_THURSDAY]   = new QueueAvailabilityDayTransfer(INDEX_ISO_THURSDAY,  null);
-			this.bookingHours[INDEX_FRIDAY]     = new QueueAvailabilityDayTransfer(INDEX_ISO_FRIDAY,    null);
-			this.bookingHours[INDEX_SATURDAY]   = new QueueAvailabilityDayTransfer(INDEX_ISO_SATURDAY,  null);
-		}
+		transfer.setWeekdayNumber(isoDayIndex);
+		this.bookingHours.put(isoDayIndex, transfer);
 	}
 
-	public Boolean getEnabled()
+	public QueueAvailabilityDayTransfer getDay(Integer isoDayIndex)
 	{
-		return enabled;
+		return this.bookingHours.get(isoDayIndex);
 	}
 
-	public void setEnabled(Boolean enabled)
+	public void setSunday(QueueAvailabilityDayTransfer transfer)
 	{
-		this.enabled = enabled;
+		this.setDay(INDEX_ISO_SUNDAY, transfer);
 	}
 
-	public QueueAvailabilityDayTransfer[] getBookingHours()
+	public void setMonday(QueueAvailabilityDayTransfer transfer)
 	{
-		return bookingHours;
+		this.setDay(INDEX_ISO_MONDAY, transfer);
 	}
 
-	public void setBookingHours(QueueAvailabilityDayTransfer[] bookingHours)
+	public void setTuesday(QueueAvailabilityDayTransfer transfer)
 	{
-		this.bookingHours = bookingHours;
+		this.setDay(INDEX_ISO_TUESDAY, transfer);
+	}
+
+	public void setWednesday(QueueAvailabilityDayTransfer transfer)
+	{
+		this.setDay(INDEX_ISO_WEDNESDAY, transfer);
+	}
+
+	public void setThursday(QueueAvailabilityDayTransfer transfer)
+	{
+		this.setDay(INDEX_ISO_THURSDAY, transfer);
+	}
+
+	public void setFriday(QueueAvailabilityDayTransfer transfer)
+	{
+		this.setDay(INDEX_ISO_FRIDAY, transfer);
+	}
+
+	public void setSaturday(QueueAvailabilityDayTransfer transfer)
+	{
+		this.setDay(INDEX_ISO_SATURDAY, transfer);
+	}
+
+	public QueueAvailabilityDayTransfer getSunday()
+	{
+		return this.getDay(INDEX_ISO_SUNDAY);
+	}
+
+	public QueueAvailabilityDayTransfer getMonday()
+	{
+		return this.getDay(INDEX_ISO_MONDAY);
+	}
+
+	public QueueAvailabilityDayTransfer getTuesday()
+	{
+		return this.getDay(INDEX_ISO_TUESDAY);
+	}
+
+	public QueueAvailabilityDayTransfer getWednesday()
+	{
+		return this.getDay(INDEX_ISO_WEDNESDAY);
+	}
+
+	public QueueAvailabilityDayTransfer getThursday()
+	{
+		return this.getDay(INDEX_ISO_THURSDAY);
+	}
+
+	public QueueAvailabilityDayTransfer getFriday()
+	{
+		return this.getDay(INDEX_ISO_FRIDAY);
+	}
+
+	public QueueAvailabilityDayTransfer getSaturday()
+	{
+		return this.getDay(INDEX_ISO_SATURDAY);
 	}
 }

@@ -24,33 +24,24 @@ package org.oscarehr.integration.aqs.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilityDayTransfer;
-import oscar.util.ConversionUtils;
+import oscar.OscarProperties;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter @Setter
 public class QueueAvailabilityDay
 {
+	private static final OscarProperties props = OscarProperties.getInstance();
+
 	private LocalTime start;
-	private LocalTime stop;
+	private LocalTime end;
+	private Boolean enabled = false;
 
-	public QueueAvailabilityDay(ca.cloudpractice.aqs.client.model.QueueAvailabilityDay aqsServerDto)
+	public QueueAvailabilityDay()
 	{
-		this.start = ConversionUtils.toLocalTime(aqsServerDto.getStart());
-		this.stop = ConversionUtils.toLocalTime(aqsServerDto.getStop());
-	}
-	public QueueAvailabilityDay(QueueAvailabilityDayTransfer availabilityDayDto)
-	{
-		this.start = availabilityDayDto.getStartTime();
-		this.stop = availabilityDayDto.getEndTime();
-	}
-
-	public ca.cloudpractice.aqs.client.model.QueueAvailabilityDay asAqsServerDto()
-	{
-		ca.cloudpractice.aqs.client.model.QueueAvailabilityDay dto = new ca.cloudpractice.aqs.client.model.QueueAvailabilityDay();
-		dto.setStart(ConversionUtils.toTimeString(this.getStart()));
-		dto.setStop(ConversionUtils.toTimeString(this.getStop()));
-		return dto;
+		DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_TIME;
+		this.start = LocalTime.parse(props.getProperty("aqs_default_availability_day_start", "08:00"), formatter);
+		this.end = LocalTime.parse(props.getProperty("aqs_default_availability_day_end", "17:00"), formatter);
 	}
 }

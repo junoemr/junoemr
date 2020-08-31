@@ -22,10 +22,8 @@
  */
 package org.oscarehr.integration.aqs.model;
 
-import ca.cloudpractice.aqs.client.model.QueueDto;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.BeanUtils;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -42,20 +40,7 @@ public class AppointmentQueue
 	private QueueOnDemandSettings onDemandSettings;
 	private Boolean available;
 
-	public AppointmentQueue(QueueDto queueDto)
+	public AppointmentQueue()
 	{
-		BeanUtils.copyProperties(queueDto, this, "id", "availability");
-		this.remoteId = queueDto.getId();
-
-		boolean hasAvailabilitySettings = (queueDto.getAvailability() != null);
-		if(hasAvailabilitySettings)
-		{
-			this.availability = new QueueAvailability(queueDto.getAvailability());
-		}
-
-		if (queueDto.getOnDemandSettings() != null)
-		{
-			this.onDemandSettings = new QueueOnDemandSettings(queueDto.getOnDemandSettings());
-		}
 	}
 }

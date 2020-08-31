@@ -23,23 +23,30 @@
 package org.oscarehr.integration.aqs.service;
 
 import ca.cloudpractice.aqs.client.ApiException;
+import org.oscarehr.integration.aqs.conversion.AppointmentQueueIntegrationModelConverter;
+import org.oscarehr.integration.aqs.conversion.AppointmentQueueIntegrationTransferConverter;
 import org.oscarehr.integration.aqs.exception.AqsCommunicationException;
 import org.oscarehr.integration.aqs.model.AppointmentQueue;
-import org.oscarehr.ws.rest.integrations.aqs.transfer.AppointmentQueueTo1;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-@Service
+@Service("aqs.AppointmentQueueService")
 public class AppointmentQueueService extends BaseService
 {
+	@Autowired
+	private AppointmentQueueIntegrationTransferConverter integrationTransferConverter;
+
+	@Autowired
+	private AppointmentQueueIntegrationModelConverter integrationModelConverter;
+
 	public List<AppointmentQueue> getAppointmentQueues(Integer securityNo)
 	{
 		try
 		{
-			return getOrganizationApi(securityNo).getAllQueues().stream().map(AppointmentQueue::new).collect(Collectors.toList());
+			return integrationTransferConverter.convert(getOrganizationApi(securityNo).getAllQueues());
 		}
 		catch (ApiException apiException)
 		{
@@ -47,11 +54,12 @@ public class AppointmentQueueService extends BaseService
 		}
 	}
 
-	public AppointmentQueue createAppointmentQueue(AppointmentQueueTo1 queueTransfer, Integer securityNo)
+	public AppointmentQueue createAppointmentQueue(AppointmentQueue queue, Integer securityNo)
 	{
 		try
 		{
-			return new AppointmentQueue(getOrganizationApi(securityNo).createQueue(queueTransfer.asCreateQueueInput()));
+			return integrationTransferConverter.convert(getOrganizationApi(securityNo).createQueue(
+					integrationModelConverter.convert(queue)));
 		}
 		catch (ApiException apiException)
 		{
@@ -63,7 +71,7 @@ public class AppointmentQueueService extends BaseService
 	{
 		try
 		{
-			return new AppointmentQueue(getOrganizationApi(securityNo).getQueue(queueId));
+			return integrationTransferConverter.convert(getOrganizationApi(securityNo).getQueue(queueId));
 		}
 		catch (ApiException apiException)
 		{
@@ -71,11 +79,12 @@ public class AppointmentQueueService extends BaseService
 		}
 	}
 
-	public AppointmentQueue updateAppointmentQueue(UUID queueId, AppointmentQueueTo1 queueTransfer, Integer securityNo)
+	public AppointmentQueue updateAppointmentQueue(UUID queueId, AppointmentQueue queue, Integer securityNo)
 	{
 		try
 		{
-			return new AppointmentQueue(getOrganizationApi(securityNo).updateQueue(queueId, queueTransfer.asCreateQueueInput()));
+			return integrationTransferConverter.convert(getOrganizationApi(securityNo).updateQueue(
+					queueId, integrationModelConverter.convert(queue)));
 		}
 		catch (ApiException apiException)
 		{

@@ -20,25 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.integrations.aqs.transfer;
+package org.oscarehr.common.conversion;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Collection;
+import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
-
-@Getter
-@Setter
-@XmlRootElement
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AppointmentQueueOnDemandSettingsTransfer implements Serializable
+/**
+ * Converts one type into another type.
+ *
+ *
+ * @param <T> The type of the input entity.
+ * @param <K> The type of the output entity.
+ */
+public interface ListModelConverter<T, K> extends ModelConverter<T, K>
 {
-	private Integer expirationThresholdSeconds;
-	private Boolean enabled;
 
-	public AppointmentQueueOnDemandSettingsTransfer()
-	{
-	}
+	/**
+	 * Converts a list of entities.
+	 *
+	 * @param entities the entities to convert
+	 * @return a list of converted entities
+	 */
+	List<K> convert(Collection<T> entities);
 }

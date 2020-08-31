@@ -22,7 +22,6 @@
  */
 package org.oscarehr.ws.rest.integrations.aqs.transfer;
 
-import ca.cloudpractice.aqs.client.model.QueueInput;
 import ca.cloudpractice.aqs.client.model.QueuedAppointmentStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,15 +29,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import lombok.Getter;
 import lombok.Setter;
-import org.oscarehr.integration.aqs.model.AppointmentQueue;
-import org.oscarehr.integration.aqs.model.QueueAvailability;
-import org.springframework.beans.BeanUtils;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter @Setter
@@ -55,70 +49,10 @@ public class AppointmentQueueTo1 implements Serializable
 	private OffsetDateTime createdAt;
 	private QueuedAppointmentStatus status;
 	private AppointmentQueueOnDemandSettingsTransfer appointmentQueueOnDemandSettings;
-
 	private QueueAvailabilitySettingsTransfer availabilitySettings;
+	private Boolean isAvailable;
 
-	public static List<AppointmentQueueTo1> fromAppointmentQueueList(List<AppointmentQueue> appointmentQueues)
-	{
-		ArrayList<AppointmentQueueTo1> appointmentQueueTo1s = new ArrayList<>();
-
-		for (AppointmentQueue appointmentQueue: appointmentQueues)
-		{
-			appointmentQueueTo1s.add(new AppointmentQueueTo1(appointmentQueue));
-		}
-
-		return appointmentQueueTo1s;
-	}
-
-	// default constructor required for serialization
 	public AppointmentQueueTo1()
 	{
-	}
-
-	public AppointmentQueueTo1(AppointmentQueue appointmentQueue)
-	{
-		BeanUtils.copyProperties(appointmentQueue, this, "name", "availability");
-		this.setQueueName(appointmentQueue.getName());
-		this.setAvailabilitySettings(new QueueAvailabilitySettingsTransfer(appointmentQueue.getAvailability()));
-		if (appointmentQueue.getOnDemandSettings() != null)
-		{
-			this.setAppointmentQueueOnDemandSettings(new AppointmentQueueOnDemandSettingsTransfer(appointmentQueue.getOnDemandSettings()));
-		}
-	}
-
-	public QueueInput asCreateQueueInput()
-	{
-		QueueInput createQueueInput = new QueueInput();
-		createQueueInput.setName(this.getQueueName());
-		createQueueInput.setQueueLimit(this.getQueueLimit());
-
-		if (this.getAppointmentQueueOnDemandSettings() != null)
-		{
-			createQueueInput.setOnDemandSettings(this.getAppointmentQueueOnDemandSettings().asOnDemandQueueSettingsDto());
-		}
-
-		// only send availability settings if they exist and the enabled flag is set.
-		if(this.hasAvailabilitySettingsEnabled())
-		{
-			QueueAvailability availabilityModel = new QueueAvailability(availabilitySettings);
-			createQueueInput.setAvailability(availabilityModel.asAqsServerDto());
-		}
-		return createQueueInput;
-	}
-
-	public boolean hasAvailabilitySettingsEnabled()
-	{
-		QueueAvailabilitySettingsTransfer availabilitySettings = this.getAvailabilitySettings();
-		return (availabilitySettings != null) && availabilitySettings.getEnabled();
-	}
-
-	public QueueAvailabilitySettingsTransfer getAvailabilitySettings()
-	{
-		return availabilitySettings;
-	}
-
-	public void setAvailabilitySettings(QueueAvailabilitySettingsTransfer availabilitySettings)
-	{
-		this.availabilitySettings = availabilitySettings;
 	}
 }

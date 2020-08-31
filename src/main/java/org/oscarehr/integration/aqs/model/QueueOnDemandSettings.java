@@ -22,7 +22,6 @@
  */
 package org.oscarehr.integration.aqs.model;
 
-import ca.cloudpractice.aqs.client.model.OnDemandQueueSettingsDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,9 +30,9 @@ import lombok.Setter;
 public class QueueOnDemandSettings
 {
 	private Integer expirationThresholdSeconds;
+	private Boolean enabled;
 
-	public QueueOnDemandSettings(OnDemandQueueSettingsDto onDemandQueueSettingsDto)
+	public QueueOnDemandSettings()
 	{
-		this.expirationThresholdSeconds = onDemandQueueSettingsDto.getExpirationThresholdSeconds();
 	}
 }

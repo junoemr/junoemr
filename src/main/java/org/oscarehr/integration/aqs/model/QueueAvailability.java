@@ -22,23 +22,13 @@
  */
 package org.oscarehr.integration.aqs.model;
 
-import ca.cloudpractice.aqs.client.model.QueueAvailabilityDto;
 import lombok.Getter;
 import lombok.Setter;
-import org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilityDayTransfer;
-import org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer;
-
-import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_FRIDAY;
-import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_MONDAY;
-import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_SATURDAY;
-import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_SUNDAY;
-import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_THURSDAY;
-import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_TUESDAY;
-import static org.oscarehr.ws.rest.integrations.aqs.transfer.QueueAvailabilitySettingsTransfer.INDEX_WEDNESDAY;
 
 @Getter @Setter
 public class QueueAvailability
 {
+	private Boolean enabled;
 	private QueueAvailabilityDay sunday;
 	private QueueAvailabilityDay monday;
 	private QueueAvailabilityDay tuesday;
@@ -47,76 +37,14 @@ public class QueueAvailability
 	private QueueAvailabilityDay friday;
 	private QueueAvailabilityDay saturday;
 
-	public QueueAvailability(QueueAvailabilityDto availabilityDto)
+	public QueueAvailability()
 	{
-		this.sunday = getDayAvailability(availabilityDto.getSunday());
-		this.monday = getDayAvailability(availabilityDto.getMonday());
-		this.tuesday = getDayAvailability(availabilityDto.getTuesday());
-		this.wednesday = getDayAvailability(availabilityDto.getWednesday());
-		this.thursday = getDayAvailability(availabilityDto.getThursday());
-		this.friday = getDayAvailability(availabilityDto.getFriday());
-		this.saturday = getDayAvailability(availabilityDto.getSaturday());
-	}
-
-	public QueueAvailability(QueueAvailabilitySettingsTransfer availabilitySettingsDto)
-	{
-		this.sunday = getDayAvailability(availabilitySettingsDto, INDEX_SUNDAY);
-		this.monday = getDayAvailability(availabilitySettingsDto, INDEX_MONDAY);
-		this.tuesday = getDayAvailability(availabilitySettingsDto, INDEX_TUESDAY);
-		this.wednesday = getDayAvailability(availabilitySettingsDto, INDEX_WEDNESDAY);
-		this.thursday = getDayAvailability(availabilitySettingsDto, INDEX_THURSDAY);
-		this.friday = getDayAvailability(availabilitySettingsDto, INDEX_FRIDAY);
-		this.saturday = getDayAvailability(availabilitySettingsDto, INDEX_SATURDAY);
-	}
-
-	public QueueAvailabilityDto asAqsServerDto()
-	{
-		QueueAvailabilityDto dto = new QueueAvailabilityDto();
-		dto.setSunday(asAqsServerDto(this.getSunday()));
-		dto.setMonday(asAqsServerDto(this.getMonday()));
-		dto.setTuesday(asAqsServerDto(this.getTuesday()));
-		dto.setWednesday(asAqsServerDto(this.getWednesday()));
-		dto.setThursday(asAqsServerDto(this.getThursday()));
-		dto.setFriday(asAqsServerDto(this.getFriday()));
-		dto.setSaturday(asAqsServerDto(this.getSaturday()));
-
-		return dto;
-	}
-
-	private ca.cloudpractice.aqs.client.model.QueueAvailabilityDay asAqsServerDto(QueueAvailabilityDay day)
-	{
-		if(day != null)
-		{
-			return day.asAqsServerDto();
-		}
-		return null;
-	}
-
-	private QueueAvailabilityDay getDayAvailability(QueueAvailabilitySettingsTransfer transfer, int dayOfWeekIndex)
-	{
-		QueueAvailabilityDayTransfer[] bookingHours = transfer.getBookingHours();
-		QueueAvailabilityDay availabilityDay = null;
-
-		if(bookingHours.length > dayOfWeekIndex)
-		{
-			QueueAvailabilityDayTransfer availability = bookingHours[dayOfWeekIndex];
-
-			// the aqs server expects only enabled day availability objects. use null to signify disabled
-			if(availability.isEnabled())
-			{
-				availabilityDay = new QueueAvailabilityDay(availability);
-			}
-
-		}
-		return availabilityDay;
-	}
-
-	private QueueAvailabilityDay getDayAvailability(ca.cloudpractice.aqs.client.model.QueueAvailabilityDay transfer)
-	{
-		if( transfer != null)
-		{
-			return new QueueAvailabilityDay(transfer);
-		}
-		return null;
+		this.setSunday(new QueueAvailabilityDay());
+		this.setMonday(new QueueAvailabilityDay());
+		this.setTuesday(new QueueAvailabilityDay());
+		this.setWednesday(new QueueAvailabilityDay());
+		this.setThursday(new QueueAvailabilityDay());
+		this.setFriday(new QueueAvailabilityDay());
+		this.setSaturday(new QueueAvailabilityDay());
 	}
 }
