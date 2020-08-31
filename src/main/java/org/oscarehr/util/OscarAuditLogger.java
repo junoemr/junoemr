@@ -29,6 +29,18 @@ import org.oscarehr.common.model.OscarLog;
 
 public class OscarAuditLogger {
 
+	public enum ACTION
+	{
+		AQS_SCHEDULE_APPOINTMENT,
+		AQS_UPDATE_APPOINTMENT,
+		AQS_CANCEL_APPOINTMENT,
+	}
+
+	public enum CONTENT
+	{
+		AQS,
+	}
+
 	private static OscarAuditLogger instance = new OscarAuditLogger();
 	private static OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
 

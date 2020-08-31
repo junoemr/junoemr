@@ -40,6 +40,7 @@ import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.OscarAuditLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -124,13 +125,17 @@ public class QueuedAppointmentService extends BaseService
 	 * @param appointmentId - the remote id of the appointment to delete
 	 * @param queueId - the queue in which the appointment is contained
 	 * @param reason - the reason for deleting the appointment free text
-	 * @param securityNo - the security no of the person performing the delete.
+	 * @param loggedInInfo - the security no of the person performing the delete.
 	 */
-	public void deleteQueuedAppointment(UUID appointmentId, UUID queueId, String reason, Integer securityNo)
+	public void deleteQueuedAppointment(UUID appointmentId, UUID queueId, String reason, LoggedInInfo loggedInInfo)
 	{
 		try
 		{
-			getOrganizationApi(securityNo).dequeueAppointment(appointmentId, reason);
+			getOrganizationApi(loggedInInfo.getLoggedInSecurity().getSecurityNo()).dequeueAppointment(appointmentId, reason);
+
+			OscarAuditLogger.getInstance().log(loggedInInfo, OscarAuditLogger.ACTION.AQS_CANCEL_APPOINTMENT.name(),
+			                                   OscarAuditLogger.CONTENT.AQS.name(),
+			                                   "Queued appointment [" + appointmentId + "] canceled with reason: " + reason);
 		}
 		catch (ApiException apiException)
 		{
@@ -141,13 +146,18 @@ public class QueuedAppointmentService extends BaseService
 	/**
 	 * Update a queued appointment on the AQS server
 	 * @param queuedAppointment - the appointment to update
-	 * @param securityNo - the security no of the provider performing this action
+	 * @param loggedInInfo - the users logged in info
 	 */
-	public void updateQueuedAppointment(QueuedAppointment queuedAppointment, Integer securityNo)
+	public void updateQueuedAppointment(QueuedAppointment queuedAppointment, LoggedInInfo loggedInInfo)
 	{
 		try
 		{
-			getOrganizationApi(securityNo).updateQueuedAppointment(queuedAppointment.getId(), queuedAppointment.asQueuedAppointmentInput());
+			getOrganizationApi(loggedInInfo.getLoggedInSecurity().getSecurityNo())
+							.updateQueuedAppointment(queuedAppointment.getId(), queuedAppointment.asQueuedAppointmentInput());
+
+			OscarAuditLogger.getInstance().log(loggedInInfo, OscarAuditLogger.ACTION.AQS_UPDATE_APPOINTMENT.name(),
+			                                   OscarAuditLogger.CONTENT.AQS.name(),
+			                                   "Queued appointment [" + queuedAppointment.getId() + "] updated");
 		}
 		catch (ApiException apiException)
 		{
@@ -217,7 +227,7 @@ public class QueuedAppointmentService extends BaseService
 
 		// mark appointment as schedule on AQS server
 		queuedAppointment.setStatus(QueuedAppointmentStatus.SCHEDULED);
-		updateQueuedAppointment(queuedAppointment, loggedInInfo.getLoggedInSecurity().getSecurityNo());
+		updateQueuedAppointment(queuedAppointment, loggedInInfo);
 
 		// book the appointment in to MHA
 		mhaAppointmentService.bookTelehealthAppointment(loggedInInfo, newAppointment, false, UUID.fromString(queuedAppointment.getCreatedBy()));
@@ -226,6 +236,11 @@ public class QueuedAppointmentService extends BaseService
 		Integration integration = integrationService.findMhaIntegration(StringUtils.trimToNull(appointment.getLocation()));
 		MHAAppointment mhaAppointment = mhaAppointmentService.getAppointment(integration, newAppointment.getId());
 		mhaAppointmentService.linkAppointmentToAqsTelehealth(integration, loggedInInfo, mhaAppointment, queuedAppointmentId);
+
+		OscarAuditLogger.getInstance().log(loggedInInfo, OscarAuditLogger.ACTION.AQS_SCHEDULE_APPOINTMENT.name(),
+		                                   OscarAuditLogger.CONTENT.AQS.name(), demographic.getId(),
+		                                   "Queued appointment [" + queuedAppointment.getId() + "] scheduled in to provider [" +
+						                                    providerNo +"]'s schedule");
 
 		return newAppointment;
 	}
