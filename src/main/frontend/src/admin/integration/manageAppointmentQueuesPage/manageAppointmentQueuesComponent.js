@@ -136,19 +136,7 @@ angular.module('Admin.Integration').component('manageAppointmentQueuesAdmin',
 					aqsQueuesApi.getAppointmentQueues().then(
 						(response) =>
 						{
-							ctrl.queueList = response.data.body.map((queueTransfer) =>
-							{
-								// modify the transfer to have date/times as proper moments
-								// TODO better wat to de-serialize a LocalTime string to a moment?
-								Object.values(queueTransfer.availabilitySettings.bookingHours).forEach(
-									(transfer) =>
-									{
-										transfer.startTime = moment(transfer.startTime, Juno.Common.Util.settings.defaultTimeFormat);
-										transfer.endTime = moment(transfer.endTime, Juno.Common.Util.settings.defaultTimeFormat);
-									});
-
-								return queueTransfer;
-							});
+							ctrl.queueList = response.data.body;
 							deferred.resolve();
 						}
 					).catch((error) =>

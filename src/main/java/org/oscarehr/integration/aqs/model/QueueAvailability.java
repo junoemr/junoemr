@@ -39,6 +39,7 @@ public class QueueAvailability
 
 	public QueueAvailability()
 	{
+		this.setEnabled(false);
 		this.setSunday(new QueueAvailabilityDay());
 		this.setMonday(new QueueAvailabilityDay());
 		this.setTuesday(new QueueAvailabilityDay());

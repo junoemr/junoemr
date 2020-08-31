@@ -48,9 +48,10 @@
 							End Time
 						</div>
 					</div>
-					<div class="time-selection-row" ng-repeat="day in $ctrl.settingsModel.bookingHours">
+					<div class="time-selection-row" ng-repeat="day in $ctrl.availableDaysList">
 						<div class="col-time-selection-enabled">
 							<juno-check-box ng-model="day.enabled"
+							                change="$ctrl.onEnabledChange(value, day)"
 							                component-style="$ctrl.componentStyle">
 							</juno-check-box>
 						</div>
@@ -58,7 +59,8 @@
 							<label>{{$ctrl.getDayLabel(day.weekdayNumber)}}</label>
 						</div>
 						<div class="col-time-selection-start">
-							<juno-time-select ng-model="day.startTime"
+							<juno-time-select ng-model="day.startTimeMoment"
+							                  change="$ctrl.onStartDateChange(moment, day)"
 							                  label="From"
 							                  disabled="!day.enabled"
 							                  component-style="$ctrl.componentStyle"
@@ -66,7 +68,8 @@
 							</juno-time-select>
 						</div>
 						<div class="col-time-selection-end">
-							<juno-time-select ng-model="day.endTime"
+							<juno-time-select ng-model="day.endTimeMoment"
+							                  change="$ctrl.onEndDateChange(moment, day)"
 							                  label="To"
 							                  disabled="!day.enabled"
 							                  component-style="$ctrl.componentStyle"

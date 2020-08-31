@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.integration.aqs.conversion.AppointmentQueueModelConverter;
 import org.oscarehr.integration.aqs.conversion.AppointmentQueueTransferConverter;
+import org.oscarehr.integration.aqs.model.AppointmentQueue;
 import org.oscarehr.integration.aqs.service.AppointmentQueueService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
@@ -126,6 +127,6 @@ public class QueueWebService extends AbstractServiceImpl
 	public RestResponse<AppointmentQueueTo1> getNewAppointmentQueue()
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN);
-		return RestResponse.successResponse(new AppointmentQueueTo1());
+		return RestResponse.successResponse(modelConverter.convert(new AppointmentQueue()));
 	}
 }

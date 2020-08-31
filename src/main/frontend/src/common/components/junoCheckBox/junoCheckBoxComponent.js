@@ -34,6 +34,7 @@ angular.module('Common.Components').component('junoCheckBox', {
 		buttonColor: "<?",
 		//alternate value returned when checkbox is true
 		trueValue: "<?",
+		change: "&?",
 	},
 	controller: [ function () {
 		let ctrl = this;
@@ -55,6 +56,10 @@ angular.module('Common.Components').component('junoCheckBox', {
 			else
 			{
 				ctrl.ngModel = ctrl.trueValue;
+			}
+			if(ctrl.change)
+			{
+				ctrl.change({value: ctrl.ngModel});
 			}
 		}
 

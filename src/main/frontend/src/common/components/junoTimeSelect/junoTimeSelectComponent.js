@@ -31,6 +31,7 @@ angular.module('Common.Components').component('junoTimeSelect', {
 		labelPosition: "<?",
 		componentStyle: "<?",
 		disabled: "<?",
+		change: "&?",
 	},
 	controller: ["$scope", function ($scope)
 		{
@@ -103,8 +104,12 @@ angular.module('Common.Components').component('junoTimeSelect', {
 			{
 				ctrl.ngModel = date;
 
-				//TODO remove
 				console.info("updated date", Juno.Common.Util.formatMomentDateTimeNoTimezone(date));
+
+				if(ctrl.change)
+				{
+					ctrl.change({moment: date});
+				}
 			}
 		}
 

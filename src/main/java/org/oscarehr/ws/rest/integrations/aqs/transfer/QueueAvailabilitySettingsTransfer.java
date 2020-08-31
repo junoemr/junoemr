@@ -27,12 +27,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.util.HashMap;
 
 @Getter @Setter
-@XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QueueAvailabilitySettingsTransfer implements Serializable
 {
@@ -45,91 +42,57 @@ public class QueueAvailabilitySettingsTransfer implements Serializable
 	public static final int INDEX_ISO_SATURDAY = 7;
 
 	private Boolean enabled;
-	private HashMap<Integer, QueueAvailabilityDayTransfer> bookingHours;
+	private QueueAvailabilityDayTransfer sunday;
+	private QueueAvailabilityDayTransfer monday;
+	private QueueAvailabilityDayTransfer tuesday;
+	private QueueAvailabilityDayTransfer wednesday;
+	private QueueAvailabilityDayTransfer thursday;
+	private QueueAvailabilityDayTransfer friday;
+	private QueueAvailabilityDayTransfer saturday;
 
 	public QueueAvailabilitySettingsTransfer()
 	{
-		this.bookingHours = new HashMap<>();
-	}
-
-	public void setDay(Integer isoDayIndex, QueueAvailabilityDayTransfer transfer)
-	{
-		transfer.setWeekdayNumber(isoDayIndex);
-		this.bookingHours.put(isoDayIndex, transfer);
-	}
-
-	public QueueAvailabilityDayTransfer getDay(Integer isoDayIndex)
-	{
-		return this.bookingHours.get(isoDayIndex);
 	}
 
 	public void setSunday(QueueAvailabilityDayTransfer transfer)
 	{
-		this.setDay(INDEX_ISO_SUNDAY, transfer);
+		transfer.setWeekdayNumber(INDEX_ISO_SUNDAY);
+		this.sunday = transfer;
 	}
 
 	public void setMonday(QueueAvailabilityDayTransfer transfer)
 	{
-		this.setDay(INDEX_ISO_MONDAY, transfer);
+		transfer.setWeekdayNumber(INDEX_ISO_MONDAY);
+		this.monday = transfer;
 	}
 
 	public void setTuesday(QueueAvailabilityDayTransfer transfer)
 	{
-		this.setDay(INDEX_ISO_TUESDAY, transfer);
+		transfer.setWeekdayNumber(INDEX_ISO_TUESDAY);
+		this.tuesday = transfer;
 	}
 
 	public void setWednesday(QueueAvailabilityDayTransfer transfer)
 	{
-		this.setDay(INDEX_ISO_WEDNESDAY, transfer);
+		transfer.setWeekdayNumber(INDEX_ISO_WEDNESDAY);
+		this.wednesday = transfer;
 	}
 
 	public void setThursday(QueueAvailabilityDayTransfer transfer)
 	{
-		this.setDay(INDEX_ISO_THURSDAY, transfer);
+		transfer.setWeekdayNumber(INDEX_ISO_THURSDAY);
+		this.thursday = transfer;
 	}
 
 	public void setFriday(QueueAvailabilityDayTransfer transfer)
 	{
-		this.setDay(INDEX_ISO_FRIDAY, transfer);
+		transfer.setWeekdayNumber(INDEX_ISO_FRIDAY);
+		this.friday = transfer;
 	}
 
 	public void setSaturday(QueueAvailabilityDayTransfer transfer)
 	{
-		this.setDay(INDEX_ISO_SATURDAY, transfer);
-	}
-
-	public QueueAvailabilityDayTransfer getSunday()
-	{
-		return this.getDay(INDEX_ISO_SUNDAY);
-	}
-
-	public QueueAvailabilityDayTransfer getMonday()
-	{
-		return this.getDay(INDEX_ISO_MONDAY);
-	}
-
-	public QueueAvailabilityDayTransfer getTuesday()
-	{
-		return this.getDay(INDEX_ISO_TUESDAY);
-	}
-
-	public QueueAvailabilityDayTransfer getWednesday()
-	{
-		return this.getDay(INDEX_ISO_WEDNESDAY);
-	}
-
-	public QueueAvailabilityDayTransfer getThursday()
-	{
-		return this.getDay(INDEX_ISO_THURSDAY);
-	}
-
-	public QueueAvailabilityDayTransfer getFriday()
-	{
-		return this.getDay(INDEX_ISO_FRIDAY);
-	}
-
-	public QueueAvailabilityDayTransfer getSaturday()
-	{
-		return this.getDay(INDEX_ISO_SATURDAY);
+		transfer.setWeekdayNumber(INDEX_ISO_SATURDAY);
+		this.saturday = transfer;
 	}
 }

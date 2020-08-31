@@ -31,7 +31,8 @@ angular.module('Common.Components').component('appointmentQueueModal',
 			modalInstance: "<",
 			resolve: "<",
 		},
-		controller: ['$scope',
+		controller: [
+			'$scope',
 			'$http',
 			'$httpParamSerializer',
 			'$uibModal',
@@ -67,7 +68,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					{
 						aqsQueuesApi.getNewAppointmentQueue().then((response) =>
 						{
-							ctrl.queueModel = response.data;
+							ctrl.queueModel = response.data.body;
 						}).catch((error) =>
 						{
 							console.error(error)
@@ -82,10 +83,8 @@ angular.module('Common.Components').component('appointmentQueueModal',
 				ctrl.saveDisabled = () =>
 				{
 					return ctrl.isLoading ||
-						ctrl.queueModel.queueName === null ||
-						ctrl.queueModel.queueName.length < 1 ||
-						ctrl.queueModel.queueLimit === null ||
-						ctrl.queueModel.queueLimit.length < 1;
+						!ctrl.queueModel.queueName || ctrl.queueModel.queueName.length < 1 ||
+						!ctrl.queueModel.queueLimit || ctrl.queueModel.queueLimit.length < 1;
 				}
 
 				ctrl.onSave = () =>
@@ -95,16 +94,6 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					{
 						// update the queue object with the results from the server, just in case they don't match
 						ctrl.queueModel = response.data.body;
-						ctrl.queueModel.availabilitySettings.bookingHours = ctrl.queueModel.availabilitySettings.bookingHours.map(
-							(transfer) =>
-							{
-								return {
-									weekdayNumber: transfer.weekdayNumber,
-									enabled: transfer.enabled,
-									startTime: moment(transfer.startTime, Juno.Common.Util.settings.defaultTimeFormat),
-									endTime: moment(transfer.endTime, Juno.Common.Util.settings.defaultTimeFormat),
-								}
-							});
 						ctrl.isLoading = false;
 						ctrl.modalInstance.close(ctrl.queueModel);
 					}
@@ -116,30 +105,13 @@ angular.module('Common.Components').component('appointmentQueueModal',
 						ctrl.isLoading = false;
 					}
 
-					// convert moment to string before transferring
-					// TODO better wat to serialize moment to LocalTime compatible string?
-					// need a copy so angular doesn't read the converted time strings as moments
-					let queueCopy = {};
-					angular.copy(ctrl.queueModel, queueCopy);
-
-					queueCopy.availabilitySettings.bookingHours = ctrl.queueModel.availabilitySettings.bookingHours.map(
-						(localSettings) =>
-						{
-							return {
-								weekdayNumber: localSettings.weekdayNumber,
-								enabled: localSettings.enabled,
-								startTime: localSettings.startTime.format(Juno.Common.Util.settings.defaultTimeFormat),
-								endTime: localSettings.endTime.format(Juno.Common.Util.settings.defaultTimeFormat),
-							}
-						});
-
 					if (ctrl.editMode)
 					{
-						aqsQueuesApi.updateAppointmentQueue(queueCopy.id, queueCopy).then(onSaveSuccess).catch(onSaveError);
+						aqsQueuesApi.updateAppointmentQueue(ctrl.queueModel.id, ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
 					}
 					else
 					{
-						aqsQueuesApi.createAppointmentQueue(queueCopy).then(onSaveSuccess).catch(onSaveError);
+						aqsQueuesApi.createAppointmentQueue(ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
 					}
 				}
 

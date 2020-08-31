@@ -25,7 +25,8 @@
 				</juno-input>
 			</div>
 			<div class="options-availability">
-				<availability-settings settings-model="$ctrl.queueModel.availabilitySettings"
+				<availability-settings ng-if="$ctrl.queueModel.availabilitySettings"
+				                       settings-model="$ctrl.queueModel.availabilitySettings"
 				                       component-style="$ctrl.componentStyle">
 				</availability-settings>
 			</div>

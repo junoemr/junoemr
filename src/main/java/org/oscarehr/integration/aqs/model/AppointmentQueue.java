@@ -24,6 +24,7 @@ package org.oscarehr.integration.aqs.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import oscar.OscarProperties;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -31,6 +32,8 @@ import java.util.UUID;
 @Getter @Setter
 public class AppointmentQueue
 {
+	private static final OscarProperties props = OscarProperties.getInstance();
+
 	private UUID remoteId;
 	private String name;
 	private Integer queueLimit;
@@ -42,5 +45,9 @@ public class AppointmentQueue
 
 	public AppointmentQueue()
 	{
+		this.queueLimit = Integer.parseInt(props.getProperty("aqs_default_queue_limit", "25"));
+		this.onDemandSettings = new QueueOnDemandSettings();
+		this.availability = new QueueAvailability();
+		this.available = false;
 	}
 }

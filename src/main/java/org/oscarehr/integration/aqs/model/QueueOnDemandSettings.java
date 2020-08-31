@@ -24,15 +24,21 @@ package org.oscarehr.integration.aqs.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import oscar.OscarProperties;
 
 @Getter
 @Setter
 public class QueueOnDemandSettings
 {
+	private static final OscarProperties props = OscarProperties.getInstance();
+
 	private Integer expirationThresholdSeconds;
 	private Boolean enabled;
 
 	public QueueOnDemandSettings()
 	{
+		this.setEnabled(false);
+		Integer expirationThreshold = Integer.parseInt(props.getProperty("aqs_default_on_demand_expiration_threshold_seconds", "120"));
+		this.setExpirationThresholdSeconds(expirationThreshold);
 	}
 }
