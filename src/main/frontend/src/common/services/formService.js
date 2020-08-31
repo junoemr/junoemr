@@ -274,14 +274,14 @@ angular.module("Common.Services").service("formService", [
 		// open a popup window for the specified eform. returns a promise that is resolved when the popup is closed
 		service.openEFormPopup = function (demographicNo, id)
 		{
-			let url = '../eform/efmformadd_data.jsp?fid=' + id + '&demographic_no=' + demographicNo + '&appointment=null';
+			let url = '../eform/efmformadd_data.jsp?fid=' + encodeURIComponent(id) + '&demographic_no=' + encodeURIComponent(demographicNo) + '&appointment=null';
 			return Juno.Common.Util.windowClosedPromise(window.open(url,'_blank', service.popupOptions));
 		};
 
 		// open a popup window for the specified eform instance. returns a promise that is resolved when the popup is closed
 		service.openEFormInstancePopup = function (demographicNo, fdid)
 		{
-			let url = '../eform/efmshowform_data.jsp?fdid=' + fdid + '&demographic_no=' + demographicNo + '&appointment=null';
+			let url = '../eform/efmshowform_data.jsp?fdid=' + encodeURIComponent(fdid) + '&demographic_no=' + encodeURIComponent(demographicNo) + '&appointment=null';
 			return Juno.Common.Util.windowClosedPromise(window.open(url,'_blank', service.popupOptions));
 		};
 
