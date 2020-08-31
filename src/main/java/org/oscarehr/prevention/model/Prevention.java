@@ -71,8 +71,13 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 	@Column(name = "prevention_type")
 	private String preventionType = null;
 
+	@Column(name = "deleted")
 	private char deleted = '0';
-	private char refused = '0';
+
+	@Column(name = "refused")
+	private char refused = REFUSED_STATUS_COMPLETED;
+
+	@Column(name = "never")
 	private char never = '0';
 
 	@Column(name = "next_date")
@@ -81,13 +86,20 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 
 	@Column(name = "creator")
 	private String creatorProviderNo = null;
-	
-	private Date lastUpdateDate = null;
+
+	@Column(name = "lastUpdateDate")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastUpdateDate = new Date();
 
 	// with cascade, these entities will be persisted when this class is.
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "prevention", cascade = CascadeType.PERSIST)
 	private List<PreventionExt> preventionExtensionList;
 
+	// The names are weird, these are all the possible values for the "refused" column
+	// also who the hell made these literal chars
+	public static final char REFUSED_STATUS_COMPLETED = '0';
+	public static final char REFUSED_STATUS_REFUSED = '1';
+	public static final char REFUSED_STATUS_INELIGIBLE = '2';
 
 	public Integer getDemographicId() {
 		return demographicId;
@@ -137,20 +149,24 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 		this.deleted = deleted ? '1' : '0';
 	}
 
-	public boolean isRefused() {
-		return refused=='1';
+	public boolean isRefused()
+	{
+		return refused == REFUSED_STATUS_REFUSED;
 	}
 	
-	public boolean isIneligible(){
-		return refused == '2';
+	public boolean isIneligible()
+	{
+		return refused == REFUSED_STATUS_INELIGIBLE;
 	}
 
-	public void setRefused(boolean refused) {
-		this.refused = refused ? '1' : '0';
+	public void setRefused(boolean refused)
+	{
+		this.refused = refused ? REFUSED_STATUS_REFUSED : REFUSED_STATUS_COMPLETED;
 	}
 	
-	public void setIneligible(boolean ineligible){
-		this.refused = ineligible ? '2' : '0';
+	public void setIneligible(boolean ineligible)
+	{
+		this.refused = ineligible ? REFUSED_STATUS_INELIGIBLE : REFUSED_STATUS_COMPLETED;
 	}
 
 	public Date getNextDate() {

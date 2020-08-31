@@ -41,6 +41,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="org.oscarehr.prevention.model.Prevention" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -55,98 +56,111 @@
 	<%response.sendRedirect("../securityError.jsp?type=_prevention");%>
 </security:oscarSec>
 <%
-if(!authed) {
-	return;
-}
-%>
 
-<%
-  DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
-      		
-  if(session.getValue("user") == null) response.sendRedirect("../logout.jsp");
-  String demographic_no = request.getParameter("demographic_no");
-  String id = request.getParameter("id");
-  Map<String, Object> existingPrevention = null;
+    if(!authed)
+    {
+        return;
+    }
 
-  String providerName ="";
-  String lot ="";
-  String provider = (String) session.getValue("user");
+    if(session.getValue("user") == null)
+    {
+        response.sendRedirect("../logout.jsp");
+    }
+
+    DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
+    String demographic_no = request.getParameter("demographic_no");
+    String id = request.getParameter("id");
+    Map<String, Object> existingPrevention = null;
+
+    String providerName ="";
+    String lot ="";
+    String provider = (String) session.getValue("user");
     Date currentDate = new Date();
     String prevDate = ConversionUtils.toDateString(currentDate, ConversionUtils.TS_NO_SEC_PATTERN);
 
-  String completed = "0";
-  String nextDate = "";
-  String summary = "";
-  String creatorProviderNo = "";
-  String creatorName = "";
-  boolean never = false;
-  Map<String,String> extraData = new HashMap<String,String>();
+    String completed = String.valueOf(Prevention.REFUSED_STATUS_COMPLETED);
+    String nextDate = "";
+    String summary = "";
+    String creatorProviderNo = "";
+    String creatorName = "";
+    boolean never = false;
+    Map<String,String> extraData = new HashMap<String,String>();
 	boolean hasImportExtra = false;
 	String annotation_display = CaseManagementNoteLink.DISP_PREV;
 
-  if (id != null){
+    if (id != null)
+    {
+        existingPrevention = PreventionData.getPreventionById(id);
 
-     existingPrevention = PreventionData.getPreventionById(id);
+        prevDate = (String) existingPrevention.get("preventionDate");
+        providerName = (String) existingPrevention.get("providerName");
+        provider = (String) existingPrevention.get("provider_no");
+        creatorProviderNo = (String) existingPrevention.get("creator");
 
-     prevDate = (String) existingPrevention.get("preventionDate");
-     providerName = (String) existingPrevention.get("providerName");
-     provider = (String) existingPrevention.get("provider_no");
-     creatorProviderNo = (String) existingPrevention.get("creator");
+        if (existingPrevention.get("refused") != null
+                && existingPrevention.get("refused").equals(String.valueOf(Prevention.REFUSED_STATUS_REFUSED)))
+        {
+            completed = String.valueOf(Prevention.REFUSED_STATUS_REFUSED);
+        }
+        else if (existingPrevention.get("refused") != null
+                && existingPrevention.get("refused").equals(String.valueOf(Prevention.REFUSED_STATUS_INELIGIBLE)))
+        {
+            completed = String.valueOf(Prevention.REFUSED_STATUS_INELIGIBLE);
+        }
+        if ( existingPrevention.get("never") != null && existingPrevention.get("never").equals("1") )
+        {
+            never = true;
+        }
+        nextDate = (String) existingPrevention.get("next_date");
+        if ( nextDate == null || nextDate.equalsIgnoreCase("null") || nextDate.equals("0000-00-00"))
+        {
+            nextDate = "";
+        }
+        summary = (String) existingPrevention.get("summary");
+        extraData = PreventionData.getPreventionKeyValues(id);
+        lot = extraData.get("lot");
      
-     if ( existingPrevention.get("refused") != null && ((String)existingPrevention.get("refused")).equals("1") ){
-        completed = "1";
-     }else if ( existingPrevention.get("refused") != null && ((String)existingPrevention.get("refused")).equals("2") ){
-        completed = "2";
-     }
-     if ( existingPrevention.get("never") != null && ((String)existingPrevention.get("never")).equals("1") ){
-        never = true;
-     }
-     nextDate = (String) existingPrevention.get("next_date");
-     if ( nextDate == null || nextDate.equalsIgnoreCase("null") || nextDate.equals("0000-00-00")){
-        nextDate = "";
-     }
-     summary = (String) existingPrevention.get("summary");
-     extraData = PreventionData.getPreventionKeyValues(id);
-     lot = (String) extraData.get("lot");
-     
-	CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
-	List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.PREVENTIONS, Long.valueOf(id));
-	hasImportExtra = (cml.size()>0);
-  }
+	    CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
+	    List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.PREVENTIONS, Long.valueOf(id));
+	    hasImportExtra = (cml.size()>0);
+    }
 
-  String prevention = request.getParameter("prevention");
-  if (prevention == null && existingPrevention != null){
-      prevention = (String) existingPrevention.get("preventionType");
-  }
+    String prevention = request.getParameter("prevention");
+    if (prevention == null && existingPrevention != null)
+    {
+        prevention = (String) existingPrevention.get("preventionType");
+    }
 
-  PreventionsLotNrsDao PreventionsLotNrsDao = (PreventionsLotNrsDao)SpringUtils.getBean(PreventionsLotNrsDao.class);
-  List<String> lotNrList = PreventionsLotNrsDao.findLotNrs(prevention, false);
+    PreventionsLotNrsDao PreventionsLotNrsDao = SpringUtils.getBean(PreventionsLotNrsDao.class);
+    List<String> lotNrList = PreventionsLotNrsDao.findLotNrs(prevention, false);
   
-  String prevResultDesc = request.getParameter("prevResultDesc");
+    String prevResultDesc = request.getParameter("prevResultDesc");
 
-  PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
-  HashMap<String,String> prevHash = pdc.getPrevention(prevention);
+    PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
+    HashMap<String,String> prevHash = pdc.getPrevention(prevention);
 
-  String layoutType = prevHash.get("layout");
-  if ( layoutType == null){
-      layoutType = "default";
-  }
+    String layoutType = prevHash.get("layout");
+    if ( layoutType == null)
+    {
+        layoutType = "default";
+    }
 
-  List<Map<String, String>>  providers = ProviderData.getProviderList();
-  if (creatorProviderNo.equals(""))
-  { 
-	  creatorProviderNo = provider;
-  }
-  for (int i=0; i < providers.size(); i++) {
-       Map<String,String> h = providers.get(i);
-	   if (h.get("providerNo").equals(creatorProviderNo))
-	   {
-	   		creatorName = h.get("lastName") + " " +  h.get("firstName");
-	   }
-  }
+    List<Map<String, String>>  providers = ProviderData.getProviderList();
+    if (creatorProviderNo.isEmpty())
+    {
+	    creatorProviderNo = provider;
+    }
+
+    for (Map<String, String> providerMap : providers)
+    {
+        if (providerMap.get("providerNo").equals(creatorProviderNo))
+        {
+            creatorName = providerMap.get("lastName") + " " + providerMap.get("firstName");
+        }
+    }
   
-  //calc age at time of prevention
-  Date dob = PreventionData.getDemographicDateOfBirth(LoggedInInfo.getLoggedInInfoFromSession(request), Integer.valueOf(demographic_no));
+    //calc age at time of prevention
+    Date dob = PreventionData.getDemographicDateOfBirth(LoggedInInfo.getLoggedInInfoFromSession(request), Integer.valueOf(demographic_no));
 
     String age = UtilDateUtilities.calcAgeAtDate(dob, currentDate);
     if (age == null)
@@ -154,14 +168,14 @@ if(!authed) {
         age = "Unknown";
     }
 
-  DemographicData demoData = new DemographicData();
-  String[] demoInfo = demoData.getNameAgeSexArray(LoggedInInfo.getLoggedInInfoFromSession(request), Integer.valueOf(demographic_no));
-  String nameage = demoInfo[0] + ", " + demoInfo[1] + ": " + demoInfo[2] + ", " + age;
+    DemographicData demoData = new DemographicData();
+    String[] demoInfo = demoData.getNameAgeSexArray(LoggedInInfo.getLoggedInInfoFromSession(request), Integer.valueOf(demographic_no));
+    String nameage = demoInfo[0] + ", " + demoInfo[1] + ": " + demoInfo[2] + ", " + age;
 
-  HashMap<String,String> genders = new HashMap<String,String>();
-  genders.put("M", "Male");
-  genders.put("F", "Female");
-  genders.put("U", "Unknown");
+    HashMap<String,String> genders = new HashMap<String,String>();
+    genders.put("M", "Male");
+    genders.put("F", "Female");
+    genders.put("U", "Unknown");
 %>
 
 
