@@ -161,60 +161,64 @@ public class RenalAction extends DispatchAction {
 		{
 			nextSteps  = "Screen patient for CKD<br/>using eGFR, ACR, and BP";
 		}
-		
+
+		int demographicId = Integer.parseInt(demographicNo);
+
 		//get tests
-		List<Measurement> egfrs = measurementDao.findByType(Integer.parseInt(demographicNo), "EGFR");
-		List<Measurement> acrs = measurementDao.findByType(Integer.parseInt(demographicNo), "ACR");
-		Date latestEgfrDate = null;
-		
-		
+		Measurement currentEgfr = measurementDao.findLatestByDemographicNoAndType(demographicId, "EGFR");
+		Measurement currentAcr = measurementDao.findLatestByDemographicNoAndType(demographicId, "ACR");
+
 		Double latestEgfr = null;
 		Double aYearAgoEgfr = null;
-		if(egfrs.size()>0) {
+		if(currentEgfr != null)
+		{
 			try
 			{
-				latestEgfr = Double.valueOf(egfrs.get(0).getDataField());
+				latestEgfr = Double.valueOf(currentEgfr.getDataField());
 			}
 			catch (NumberFormatException e)
 			{
-				MiscUtils.getLogger().error("Following EGFR measurement contains non-numeric data: " + egfrs.get(0).getId());
+				MiscUtils.getLogger().warn("Following EGFR measurement contains non-numeric data: " + currentEgfr.getDataField());
 			}
-			latestEgfrDate = egfrs.get(0).getDateObserved();
 
+			Date latestEgfrDate = currentEgfr.getDateObserved();
+			if(latestEgfrDate != null)
+			{
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(latestEgfrDate);
+				cal.add(Calendar.MONTH, -12);
+				Date aYearBefore = cal.getTime();
+
+				//do we have any egfrs from before this date?
+				List<Measurement> previousMeasurements = measurementDao.findByTypeBefore(Integer.parseInt(demographicNo), "EGFR",aYearBefore);
+				if(previousMeasurements.size() > 0)
+				{
+					Measurement measurement = previousMeasurements.get(0);
+					try
+					{
+						aYearAgoEgfr = Double.valueOf(measurement.getDataField());
+					}
+					catch (NumberFormatException e)
+					{
+						MiscUtils.getLogger().warn("Following EGFR measurement contains non-numeric data: " + measurement.getDataField());
+					}
+				}
+			}
 		}
 
 		Double latestAcr = null;
-		if(acrs.size()>0) {
+		if(currentAcr != null)
+		{
 			try
 			{
-				latestAcr = Double.valueOf(acrs.get(0).getDataField());
+				latestAcr = Double.valueOf(currentAcr.getDataField());
 			}
 			catch (NumberFormatException e)
 			{
-				MiscUtils.getLogger().error("Following ACR measurement contains non-numeric data: " + acrs.get(0).getId());
+				MiscUtils.getLogger().warn("Following ACR measurement contains non-numeric data: " + currentAcr.getDataField());
 			}
 		}
-		if(latestEgfrDate != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(latestEgfrDate);
-			cal.add(Calendar.MONTH, -12);
-			Date aYearBefore = cal.getTime();
-			
-			//do we have any egfrs from before this date?
-			List<Measurement> tmp = measurementDao.findByTypeBefore(Integer.parseInt(demographicNo), "EGFR",aYearBefore);
-			if(tmp.size()>0) {
-				Measurement m = tmp.get(0);
-				try
-				{
-					aYearAgoEgfr = Double.valueOf(m.getDataField());
-				}
-				catch (NumberFormatException e)
-				{
-					MiscUtils.getLogger().error("Following EGFR measurement contains non-numeric data: " + m.getId());
-				}
-			}
-		}
-		
+
 		if((latestEgfr != null && latestEgfr < 30) || (latestAcr != null && latestAcr >= 60)) {
 			nextSteps = "<a href=\"javascript:void();\" onclick=\"window.open('"+request.getContextPath()+"/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp?de="+demographicNo+"&teamVar=','Consultation"+demographicNo+"','width=960,height=700');return false;\">Refer to Nephrology</a>";
 		}
@@ -232,7 +236,7 @@ public class RenalAction extends DispatchAction {
 		}
 		
 		if(latestEgfr != null && aYearAgoEgfr != null) {
-			if((aYearAgoEgfr.doubleValue() - latestEgfr.doubleValue()) > 20) {
+			if((aYearAgoEgfr - latestEgfr) > 20) {
 				nextSteps = "Check ACR, and if drop pesistent, <a href=\"javascript:void();\" onclick=\"window.open('"+request.getContextPath()+"/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp?de="+demographicNo+"&teamVar=','Consultation"+demographicNo+"','width=960,height=700');return false;\">Refer to Nephrology</a>";
 			}
 		}
