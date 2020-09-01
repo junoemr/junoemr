@@ -33,31 +33,26 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
-import java.util.Set;
 
 import static integration.tests.AddProvidersTests.drApple;
+import static integration.tests.AssignRolesTests.assignRoles;
+import static integration.tests.AssignRolesTests.xpathDropdown;
+import static integration.tests.AssignRolesTests.xpathProvider;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
-class AssignRolesTests
+class AssignRolesIntegrationTests
 {
-	static void assignRolesTest(WebDriver driver, String role, String providerLastName)
+	static void assignRolesTest(WebDriver driver, String role)
 	{
 		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
-		driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(providerLastName);
-		driver.findElement(By.xpath("//input[@name='search']")).click();
-		WebElement providerRow = driver.findElement(By.xpath("//td[contains(., '" + drApple.providerNo + "')]"));
-		Select roleDropdown = new Select(providerRow.findElement(By.xpath("//select[@name='roleNew']")));
-		roleDropdown.selectByValue(role);
-		providerRow.findElement(By.xpath("//input[@value='Add']")).click();
-		String ss = "Role admin is added. (" + drApple.providerNo + ")";
+		assignRoles(xpathDropdown, xpathProvider, "admin", "//following-sibling::td/input[@value='Add']");
+		String message = "Role " + role + " is added. (" + drApple.providerNo + ")";
 		Assert.assertTrue("Admin is NOT assigned to the provider successfully.",
-				PageUtil.isExistsBy(By.xpath("//font[contains(., '" + ss + "')]"), driver));
+				PageUtil.isExistsBy(By.xpath("//font[contains(., '" + message + "')]"), driver));
 		driver.close();
 	}
 }
@@ -73,7 +68,6 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 	@BeforeClass
 	public static void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
-		SchemaUtils.restoreTable("admission", "log", "property", "provider", "providerbillcenter", "security", "secUserRole");
 		loadSpringBeans();
 		DatabaseUtil.createTestProvider();
 	}
@@ -88,7 +82,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 	public void addLoginRecordsClassicUITest()
 	{
 		String currWindowHandle = driver.getWindowHandle();
-		AssignRolesTests.assignRolesTest(driver, role, drApple.lastName);
+		AssignRolesIntegrationTests.assignRolesTest(driver, role);
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		accessAdministrationSectionClassicUI(driver, "User Management", "Add a Login Record");
 		driver.findElement(By.xpath("//input[@name='user_name']")).sendKeys(userName);

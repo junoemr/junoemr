@@ -192,6 +192,7 @@ public class AddPatientsTests extends SeleniumTestBase
 		driver.findElement(By.id("input-postal-code")).sendKeys(son.postal);
 		driver.findElement(By.id("input-email")).sendKeys(son.email);
 		driver.findElement(By.id("input-phone")).sendKeys(son.homePhone);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@ng-click='$ctrl.onAdd()']")));
 		driver.findElement(By.xpath("//button[@ng-click='$ctrl.onAdd()']")).click();
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title='Search']")));
 
