@@ -25,13 +25,22 @@
 			<h2 class="no-queues-zero-state" ng-if="$ctrl.noQueues">
 				Appointment Queue feature is not available at this time.
 			</h2>
-			<div ng-if="$ctrl.currentQueue" ng-repeat="foobar in [].constructor($ctrl.currentQueue.queueLimit) track by $index" class="flex-fill-row">
-				<appointment-card ng-model="$ctrl.currentQueue.items[$index]"
-				                  on-delete="$ctrl.deleteQueueItem($index);"
-													on-add="$ctrl.addToSchedule($index)"
-				                  component-style="$ctrl.componentStyle">
-				</appointment-card>
-			</div>
+			<ul dnd-list="$ctrl.currentQueue.items">
+				<li ng-if="$ctrl.currentQueue"
+						ng-repeat="foobar in [].constructor($ctrl.currentQueue.queueLimit) track by $index"
+						class="flex-fill-row"
+						dnd-draggable="$ctrl.currentQueue.items[$index]"
+						dnd-effect-allowed="move"
+						dnd-moved="$ctrl.onDragMoved(event, $index)"
+						dnd-dragstart="$ctrl.onDragStart(event)">
+
+					<appointment-card ng-model="$ctrl.currentQueue.items[$index]"
+														on-delete="$ctrl.deleteQueueItem($index);"
+														on-add="$ctrl.addToSchedule($index)"
+														component-style="$ctrl.componentStyle">
+					</appointment-card>
+				</li>
+			</ul>
 		</div>
 	</div>
 

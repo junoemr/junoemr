@@ -87,12 +87,17 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		ctrl.resizeObserver = null;
 		// ======= Scroll Height tracking ===========
 
+		// ======= Drag N Drop ===========
+		ctrl.dragStartY = 0;
+		// ======= Drag N Drop ===========
+
+
 		ctrl.$onInit = () =>
 		{
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 
 			ctrl.listRef = angular.element(".appointment-queue .list");
-			ctrl.listContentRef = angular.element(".appointment-queue .list .list-content");
+			ctrl.listContentRef = angular.element(".appointment-queue .list .list-content ul");
 
 			// recalculate scroll height on height change
 			ctrl.resizeObserver = new ResizeObserver(() =>
@@ -268,6 +273,23 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		ctrl.getPrimaryBackgroundClass = () =>
 		{
 			return [ctrl.componentStyle + JUNO_BACKGROUND_STYLE.PRIMARY];
+		}
+
+		ctrl.onDragMoved = (event, index) =>
+		{
+			// compensate for bug in dnd library
+			// https://github.com/marceljuenemann/angular-drag-and-drop-lists/issues/500
+			if (event.screenY - ctrl.dragStartY < 0)
+			{
+				index += 1
+			}
+
+			ctrl.currentQueue.items.splice(index, 1);
+		}
+
+		ctrl.onDragStart = (event) =>
+		{
+			ctrl.dragStartY = event.screenY;
 		}
 	}]
 });
