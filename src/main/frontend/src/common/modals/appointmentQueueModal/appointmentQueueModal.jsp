@@ -24,6 +24,20 @@
 						component-style="$ctrl.resolve.style">
 				</juno-input>
 			</div>
+			<div class="options-on-demand" ng-if="$ctrl.showOnDemandSettings && $ctrl.queueModel.appointmentQueueOnDemandSettings">
+				<juno-check-box
+						label="Use for On Demand Booking"
+						ng-model="$ctrl.queueModel.appointmentQueueOnDemandSettings.enabled"
+						component-style="$ctrl.componentStyle">
+				</juno-check-box>
+				<juno-input
+						label="Expiration Threshold (seconds)"
+						ng-model="$ctrl.queueModel.appointmentQueueOnDemandSettings.expirationThresholdSeconds"
+						valid-regex="$ctrl.numberRegex"
+						disabled="!$ctrl.queueModel.appointmentQueueOnDemandSettings.enabled"
+						component-style="$ctrl.resolve.style">
+				</juno-input>
+			</div>
 			<div class="options-availability">
 				<availability-settings ng-if="$ctrl.queueModel.availabilitySettings"
 				                       settings-model="$ctrl.queueModel.availabilitySettings"

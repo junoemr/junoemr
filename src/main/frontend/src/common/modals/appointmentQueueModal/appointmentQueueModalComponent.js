@@ -53,6 +53,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 				ctrl.editMode = false;
 				ctrl.queueModel = {};
 				ctrl.isLoading = true;
+				ctrl.showOnDemandSettings = true; // TODO - when should this be false?
 
 				ctrl.$onInit = () =>
 				{

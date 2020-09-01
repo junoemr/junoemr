@@ -36,7 +36,7 @@ Juno.Common.Util.isBlank = function isBlank(object) {
 };
 
 // convert a string in to a boolean
-Juno.Common.Util.parseBoolean = function (str)
+Juno.Common.Util.parseBoolean = function parseBoolean(str)
 {
 	let trueValues = ["on", "yes", "true", "enabled"];
 	let falseValues = ["off", "no", "false", "disabled"];
@@ -69,7 +69,7 @@ Juno.Common.Util.pad0 = function pad0(n) {
 
 // if the date is a single digit add a zero in front. if it is 3 or more and
 // has a leading zero remove it.
-Juno.Common.Util.padDateWithZero = (dateNumber) =>
+Juno.Common.Util.padDateWithZero = function padDateWithZero(dateNumber)
 {
 	let zeroPaddedDateString = Juno.Common.Util.pad0(dateNumber);
 	if (zeroPaddedDateString.length > 2)
@@ -153,7 +153,7 @@ Juno.Common.Util.getDatetimeNoTimezoneMoment = function getDatetimeNoTimezoneMom
 		Juno.Common.Util.settings.datetime_no_timezone_format, true);
 };
 
-Juno.Common.Util.getUserISOTimezoneOffset = function ()
+Juno.Common.Util.getUserISOTimezoneOffset = function getUserISOTimezoneOffset()
 {
 	let sign = "-";
 	let offsetRaw = (new Date()).getTimezoneOffset();
@@ -348,7 +348,7 @@ Juno.Common.Util.trimToLength = function trimToLength(string, maxLength)
 	return shortString;
 };
 
-Juno.Common.Util.trimToNull = (str) =>
+Juno.Common.Util.trimToNull = function trimToNull(str)
 {
 	str.trim();
 	if (str === "")
@@ -356,10 +356,10 @@ Juno.Common.Util.trimToNull = (str) =>
 		return null;
 	}
 	return str;
-}
+};
 
 // create a promise that resolves when the provided window is closed
-Juno.Common.Util.windowClosedPromise = function (popup)
+Juno.Common.Util.windowClosedPromise = function windowClosedPromise(popup)
 {
 	return new Promise(function (resolve, reject)
 	{
@@ -375,7 +375,7 @@ Juno.Common.Util.windowClosedPromise = function (popup)
 };
 
 // show a success alert box similar to the browsers built in alert functionality
-Juno.Common.Util.successAlert = function(uibModal, title, message)
+Juno.Common.Util.successAlert = function successAlert(uibModal, title, message)
 {
 	uibModal.open(
 		{
@@ -392,7 +392,7 @@ Juno.Common.Util.successAlert = function(uibModal, title, message)
 };
 
 // show a error alert box similar to the browsers built in alert functionality
-Juno.Common.Util.errorAlert = function(uibModal, title, message)
+Juno.Common.Util.errorAlert = function errorAlert(uibModal, title, message)
 {
 	uibModal.open(
 			{
@@ -409,7 +409,7 @@ Juno.Common.Util.errorAlert = function(uibModal, title, message)
 };
 
 // show a confirmation box. returns a promise that will resolve to true / false based on user selection.
-Juno.Common.Util.confirmationDialog = function(uibModal, title, message, style)
+Juno.Common.Util.confirmationDialog = function confirmationDialog(uibModal, title, message, style)
 {
 	return uibModal.open(
 			{
@@ -436,7 +436,7 @@ Juno.Common.Util.confirmationDialog = function(uibModal, title, message, style)
  * @param characterLimit - limit the number of characters that can be entered in to the input box. omit for unlimited.
  * @returns {*} - user selection
  */
-Juno.Common.Util.openInputDialog = (uibModal, title, message, style, okText, characterLimit) =>
+Juno.Common.Util.openInputDialog = function openInputDialog(uibModal, title, message, style, okText, characterLimit)
 {
 	return uibModal.open(
 			{
@@ -452,7 +452,7 @@ Juno.Common.Util.openInputDialog = (uibModal, title, message, style, okText, cha
 				}
 			}
 	).result;
-}
+};
 
 /**
  * display a select dialog to the user
@@ -464,7 +464,7 @@ Juno.Common.Util.openInputDialog = (uibModal, title, message, style, okText, cha
  * @param okText - the text to display on the "ok" button. Leave blank for "Ok"
  * @returns {*} - user selection
  */
-Juno.Common.Util.openSelectDialog = (uibModal, title, message, options, style, okText) =>
+Juno.Common.Util.openSelectDialog = function openSelectDialog(uibModal, title, message, options, style, okText)
 {
 	return uibModal.open(
 			{
@@ -481,7 +481,7 @@ Juno.Common.Util.openSelectDialog = (uibModal, title, message, options, style, o
 				}
 			}
 	).result;
-}
+};
 
 /**
  * open a telehealth window for the specified appointment
@@ -489,13 +489,13 @@ Juno.Common.Util.openSelectDialog = (uibModal, title, message, options, style, o
  * @param appointmentNo - the appointmentNo
  * @param site - the site of the appointment or null
  */
-Juno.Common.Util.openTelehealthWindow = (demographicNo, appointmentNo, site) =>
+Juno.Common.Util.openTelehealthWindow = function openTelehealthWindow(demographicNo, appointmentNo, site)
 {
 	window.open("../integrations/myhealthaccess.do?method=connect"
 			            + "&demographicNo=" + encodeURIComponent(demographicNo)
 			            + "&siteName=" + encodeURIComponent(site)
 			            + "&appt=" + encodeURIComponent(appointmentNo), "_blank");
-}
+};
 
 /**
  * lookup typeahead object form options list based on value
@@ -503,7 +503,7 @@ Juno.Common.Util.openTelehealthWindow = (demographicNo, appointmentNo, site) =>
  * @param options - the options list from which to lookup the object
  * @returns - the matching typeahead object or the value if no match found.
  */
-Juno.Common.Util.typeaheadValueLookup = function(value, options)
+Juno.Common.Util.typeaheadValueLookup = function typeaheadValueLookup(value, options)
 {
 	if (value && options && options.length > 0)
 	{
