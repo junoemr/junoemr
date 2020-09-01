@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -88,7 +89,7 @@ public final class LoginAction extends DispatchAction
 		boolean forcedPasswordChange = true;
 		String where = "failure";
 
-		if (request.getParameter("forcedpasswordchange") != null && request.getParameter("forcedpasswordchange").equalsIgnoreCase("true"))
+		if (StringUtils.equalsIgnoreCase(request.getParameter("forcedpasswordchange"), "true"))
 		{
 			//Coming back from force password change.
 			userName = (String) request.getSession().getAttribute("userName");
@@ -233,9 +234,13 @@ public final class LoginAction extends DispatchAction
 					nextPage,
 					forcedPasswordChange);
 			where = loginForwardURL.getUrl();
-			if (loginForwardURL.getForwarding())
+			if (loginForwardURL.getForwarding() && loginForwardURL.getMapping())
 			{
 				return mapping.findForward(where);
+			}
+			else if (loginForwardURL.getForwarding() && !loginForwardURL.getMapping())
+			{
+				return (new ActionForward(where));
 			}
 		}
 		// expired password

@@ -26,12 +26,14 @@ package org.oscarehr.login.dto;
 public class LoginForwardURL
 {
 	String url;
-	Boolean isForwarding;
+	boolean isForwarding;
+	boolean isMapping;
 
-	public LoginForwardURL(String url, Boolean isForwarding)
+	public LoginForwardURL(String url, boolean isForwarding, boolean isMapping)
 	{
 		this.url = url;
 		this.isForwarding = isForwarding;
+		this.isMapping = isMapping;
 	}
 
 	public String getUrl()
@@ -39,8 +41,13 @@ public class LoginForwardURL
 		return url;
 	}
 
-	public Boolean getForwarding()
+	public boolean getForwarding()
 	{
 		return isForwarding;
+	}
+
+	public boolean getMapping()
+	{
+		return isMapping;
 	}
 }

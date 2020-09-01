@@ -114,7 +114,7 @@ public class LoginService
 
 			String newURL = mapping.findForward("error").getPath();
 			newURL = newURL + "?errormsg=Your account is inactive. Please contact your administrator to activate.";
-			return new LoginForwardURL(newURL, true);
+			return new LoginForwardURL(newURL, true, false);
 		}
 
 		/*
@@ -137,7 +137,7 @@ public class LoginService
 				newURL = mapping.findForward("error").getPath();
 				newURL = newURL + "?errormsg=Setting values to the session.";
 			}
-			return new LoginForwardURL(newURL, true);
+			return new LoginForwardURL(newURL, true, false);
 		}
 
 		// invalidate the existing session
@@ -251,7 +251,7 @@ public class LoginService
 		List<Integer> facilityIds = providerDao.getFacilityIds(provider.getProviderNo());
 		if (facilityIds.size() > 1)
 		{
-			return new LoginForwardURL("/select_facility.jsp?nextPage=" + where, true);
+			return new LoginForwardURL("/select_facility.jsp?nextPage=" + where, true, false);
 		}
 		else if (facilityIds.size() == 1)
 		{
@@ -286,7 +286,7 @@ public class LoginService
 		{
 			String proceedURL = mapping.findForward(where).getPath();
 			request.getSession().setAttribute("proceedURL", proceedURL);
-			return new LoginForwardURL("LoginTest", true);
+			return new LoginForwardURL("LoginTest", true, true);
 		}
 
 		//are they using the new UI?
@@ -295,7 +295,7 @@ public class LoginService
 		{
 			where = "cobalt";
 		}
-		return new LoginForwardURL(where, false);
+		return new LoginForwardURL(where, false, true);
 	}
 
 	/**
