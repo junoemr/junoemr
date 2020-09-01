@@ -746,25 +746,16 @@
 			<forward name="provider" path="/provider/providercontrol.jsp" redirect="true" />
 			<forward name="failure" path="/logout.jsp?login=failed" />
 			<forward name="error" path="/loginfailed.jsp" />
-			<forward name="caisiPMM" path="/PMmodule/ProviderInfo.do" />
-			<forward name="shelterSelection" path="/shelterSelection.do" redirect="true" />
-			<forward name="LoginTest" path="/login/LoginTest.jsp" redirect="true" />
-			
 			<forward name="forcepasswordreset" path="/forcepasswordreset.jsp" />
 			<forward name="programLocation" path="/location.jsp" redirect="true"/>
 			<forward name="cobalt" path="/web/" redirect="true" />
-			
 		</action>
-		<action input="/login/loginTest.jsp" path="/login/recordLogin" scope="request" type="oscar.login.LoginAgreementAction"></action>
 
 		<!-- Google OAuth Login -->
 		<action path="/oauth/action" scope="request" type="oscar.oauth.OAuthLoginAction" validate="true">
 			<forward name="provider" path="/provider/providercontrol.jsp" redirect="true" />
 			<forward name="failure" path="/oauth/index.jsp?login=failed" />
 			<forward name="error" path="/loginfailed.jsp" />
-			<forward name="caisiPMM" path="/PMmodule/ProviderInfo.do" />
-			<forward name="shelterSelection" path="/shelterSelection.do" redirect="true" />
-			<forward name="LoginTest" path="/login/LoginTest.jsp" redirect="true" />
 			<forward name="forcepasswordreset" path="/forcepasswordreset.jsp" />
 			<forward name="programLocation" path="/location.jsp" redirect="true"/>
 			<forward name="cobalt" path="/web/" redirect="true" />

@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -89,6 +89,7 @@ public final class LoginAction extends DispatchAction
 		boolean forcedPasswordChange = true;
 		String where = "failure";
 
+		LoginForm loginForm = (LoginForm) form;
 		if (StringUtils.equalsIgnoreCase(request.getParameter("forcedpasswordchange"), "true"))
 		{
 			//Coming back from force password change.
@@ -97,9 +98,9 @@ public final class LoginAction extends DispatchAction
 			pin = (String) request.getSession().getAttribute("pin");
 			nextPage = (String) request.getSession().getAttribute("nextPage");
 
-			String newPassword = ((LoginForm) form).getNewPassword();
-			String confirmPassword = ((LoginForm) form).getConfirmPassword();
-			String oldPassword = ((LoginForm) form).getOldPassword();
+			String newPassword = loginForm.getNewPassword();
+			String confirmPassword = loginForm.getConfirmPassword();
+			String oldPassword = loginForm.getOldPassword();
 
 
 			try
@@ -139,9 +140,9 @@ public final class LoginAction extends DispatchAction
 		}
 		else
 		{
-			userName = ((LoginForm) form).getUsername();
-			password = ((LoginForm) form).getPassword();
-			pin = ((LoginForm) form).getPin();
+			userName = loginForm.getUsername();
+			password = loginForm.getPassword();
+			pin = loginForm.getPin();
 			nextPage = request.getParameter("nextPage");
 
 			String username = (String) request.getSession().getAttribute("user");
@@ -341,21 +342,18 @@ public final class LoginAction extends DispatchAction
 	private String errorHandling(String password, String newPassword, String confirmPassword, String encodedOldPassword, String oldPassword)
 	{
 
-		String newURL = "";
-
 		if (!encodedOldPassword.equals(password))
 		{
-			newURL = newURL + "?errormsg=Your old password, does NOT match the password in the system. Please enter your old password.";
+			return "?errormsg=Your old password, does NOT match the password in the system. Please enter your old password.";
 		}
 		else if (!newPassword.equals(confirmPassword))
 		{
-			newURL = newURL + "?errormsg=Your new password, does NOT match the confirmed password. Please try again.";
+			return "?errormsg=Your new password, does NOT match the confirmed password. Please try again.";
 		}
 		else if (!Boolean.parseBoolean(OscarProperties.getInstance().getProperty("IGNORE_PASSWORD_REQUIREMENTS")) && newPassword.equals(oldPassword))
 		{
-			newURL = newURL + "?errormsg=Your new password, is the same as your old password. Please choose a new password.";
+			return "?errormsg=Your new password, is the same as your old password. Please choose a new password.";
 		}
-
-		return newURL;
+		return "";
 	}
 }

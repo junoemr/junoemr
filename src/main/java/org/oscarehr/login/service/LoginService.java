@@ -176,9 +176,6 @@ public class LoginService
 		{
 			session.setAttribute("mobileOptimized", "true");
 		}
-		// initiate security manager
-		String defaultPmm = null;
-
 
 		// get preferences from preference table
 		ProviderPreference providerPreference = providerPreferenceDao.find(providerNo);
@@ -209,7 +206,6 @@ public class LoginService
 			session.setAttribute("default_pmm", providerPreference.getDefaultCaisiPmm());
 			session.setAttribute("caisiBillingPreferenceNotDelete", String.valueOf(providerPreference.getDefaultDoNotDeleteBilling()));
 
-			defaultPmm = providerPreference.getDefaultCaisiPmm();
 			@SuppressWarnings("unchecked")
 			ArrayList<String> newDocArr = (ArrayList<String>) request.getSession().getServletContext().getAttribute("CaseMgmtUsers");
 			if ("enabled".equals(providerPreference.getDefaultNewOscarCme()))
@@ -224,20 +220,9 @@ public class LoginService
 		session.setAttribute("groupno", providerPreference.getMyGroupNo());
 
 		String where = "provider";
-		if (defaultPmm != null && "enabled".equals(defaultPmm))
-		{
-			where = "caisiPMM";
-		}
-
-		if (where.equals("provider") && OscarProperties.getInstance().getProperty("useProgramLocation", "false").equals("true"))
+		if (OscarProperties.getInstance().getProperty("useProgramLocation", "false").equals("true"))
 		{
 			where = "programLocation";
-		}
-
-		String quatroShelter = OscarProperties.getInstance().getProperty("QUATRO_SHELTER");
-		if (quatroShelter != null && quatroShelter.equals("on"))
-		{
-			where = "shelterSelection";
 		}
 
 		CRHelper.recordLoginSuccess(userName, providerNo, request);
@@ -280,13 +265,6 @@ public class LoginService
 				request.getSession().setAttribute("currentFacility", facility);
 				LogAction.addLogEntry(providerNo, LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_SUCCESS, "facilityId=" + first_id, ip);
 			}
-		}
-
-		if (pvar.getProperty("LOGINTEST", "").equalsIgnoreCase("yes"))
-		{
-			String proceedURL = mapping.findForward(where).getPath();
-			request.getSession().setAttribute("proceedURL", proceedURL);
-			return new LoginForwardURL("LoginTest", true, true);
 		}
 
 		//are they using the new UI?

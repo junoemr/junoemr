@@ -533,11 +533,6 @@ public class AdminNavService
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.lotnrsearchrecordshtm.title"), "frame?frameUrl=" + contextPath + "/admin/lotnrsearchrecordshtm.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobs.title"), "frame?frameUrl=" + contextPath + "/admin/jobs.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobtypes.title"), "frame?frameUrl=" + contextPath + "/admin/jobTypes.jsp"));
-
-			if (oscarProperties.isPropertyActive("LOGINTEST"))
-			{
-				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.uploadEntryTxt"), "frame?frameUrl=" + contextPath + "/admin/uploadEntryText.jsp"));
-			}
 		}
 
 		if (oscar.oscarSecurity.CRHelper.isCRFrameworkEnabled())
