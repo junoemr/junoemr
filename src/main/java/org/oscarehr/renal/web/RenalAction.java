@@ -147,7 +147,8 @@ public class RenalAction extends DispatchAction {
 
 		return null;
 	}
-	
+
+	// Called as part of health tracker for reasons unknown
 	public ActionForward getNextSteps(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String demographicNo = request.getParameter("demographicNo");
 		
@@ -157,7 +158,9 @@ public class RenalAction extends DispatchAction {
 		
 		String nextSteps = "N/A";
 		if(match)
+		{
 			nextSteps  = "Screen patient for CKD<br/>using eGFR, ACR, and BP";
+		}
 		
 		//get tests
 		List<Measurement> egfrs = measurementDao.findByType(Integer.parseInt(demographicNo), "EGFR");
@@ -168,12 +171,28 @@ public class RenalAction extends DispatchAction {
 		Double latestEgfr = null;
 		Double aYearAgoEgfr = null;
 		if(egfrs.size()>0) {
-			latestEgfr = Double.valueOf(egfrs.get(0).getDataField());
+			try
+			{
+				latestEgfr = Double.valueOf(egfrs.get(0).getDataField());
+			}
+			catch (NumberFormatException e)
+			{
+				MiscUtils.getLogger().error("Following EGFR measurement contains non-numeric data: " + egfrs.get(0).getId());
+			}
 			latestEgfrDate = egfrs.get(0).getDateObserved();
+
 		}
+
 		Double latestAcr = null;
 		if(acrs.size()>0) {
-			latestAcr = Double.valueOf(acrs.get(0).getDataField());
+			try
+			{
+				latestAcr = Double.valueOf(acrs.get(0).getDataField());
+			}
+			catch (NumberFormatException e)
+			{
+				MiscUtils.getLogger().error("Following ACR measurement contains non-numeric data: " + acrs.get(0).getId());
+			}
 		}
 		if(latestEgfrDate != null) {
 			Calendar cal = Calendar.getInstance();
@@ -185,7 +204,14 @@ public class RenalAction extends DispatchAction {
 			List<Measurement> tmp = measurementDao.findByTypeBefore(Integer.parseInt(demographicNo), "EGFR",aYearBefore);
 			if(tmp.size()>0) {
 				Measurement m = tmp.get(0);
-				aYearAgoEgfr = Double.valueOf(m.getDataField());
+				try
+				{
+					aYearAgoEgfr = Double.valueOf(m.getDataField());
+				}
+				catch (NumberFormatException e)
+				{
+					MiscUtils.getLogger().error("Following EGFR measurement contains non-numeric data: " + m.getId());
+				}
 			}
 		}
 		
