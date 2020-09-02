@@ -26,12 +26,14 @@ package org.oscarehr.ws.rest.integrations.aqs;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.integration.aqs.model.QueuedAppointment;
 import org.oscarehr.integration.aqs.service.QueuedAppointmentService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.BookQueuedAppointmentTransfer;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.QueuedAppointmentMoveTransfer;
+import org.oscarehr.ws.rest.integrations.aqs.transfer.QueuedAppointmentTo1;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.AppointmentTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,12 +77,12 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	@Path("{appointmentId}/move")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> moveAppointment(@PathParam("queueId") UUID queueId, @PathParam("appointmentId") UUID appointmentId, QueuedAppointmentMoveTransfer queuedAppointmentMoveTransfer)
+	public RestResponse<QueuedAppointmentTo1> moveAppointment(@PathParam("queueId") UUID queueId, @PathParam("appointmentId") UUID appointmentId, QueuedAppointmentMoveTransfer queuedAppointmentMoveTransfer)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._APPOINTMENT);
 
-		queuedAppointmentService.moveQueuedAppointment(appointmentId, queuedAppointmentMoveTransfer.getQueuePosition(), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
-		return RestResponse.successResponse(true);
+		QueuedAppointment queuedAppointment = queuedAppointmentService.moveQueuedAppointment(appointmentId, queuedAppointmentMoveTransfer.getQueuePosition(), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
+		return RestResponse.successResponse(new QueuedAppointmentTo1(queuedAppointment));
 	}
 
 	@POST

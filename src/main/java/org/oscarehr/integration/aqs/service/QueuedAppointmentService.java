@@ -150,11 +150,11 @@ public class QueuedAppointmentService extends BaseService
 	 * @param queuePosition - the new position of said appointment
 	 * @param securityNo - the security no of the user performing this action
 	 */
-	public void moveQueuedAppointment(UUID appointmentId, Integer queuePosition, Integer securityNo)
+	public QueuedAppointment moveQueuedAppointment(UUID appointmentId, Integer queuePosition, Integer securityNo)
 	{
 		try
 		{
-			getOrganizationApi(securityNo).moveAppointment(appointmentId, (new IntegerToQueuedAppointmentMoveDtoConverter()).convert(queuePosition));
+			return new QueuedAppointment(getOrganizationApi(securityNo).moveAppointment(appointmentId, (new IntegerToQueuedAppointmentMoveDtoConverter()).convert(queuePosition)));
 		}
 		catch (ApiException apiException)
 		{
