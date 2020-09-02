@@ -27,7 +27,7 @@ juno-input {
 
 			&.field-no-border {
 				border: none;
-				background-color: transparent;
+				background-color: transparent !important;
 				padding: 0;
 
 				&:active, &:focus {
