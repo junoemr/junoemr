@@ -275,7 +275,7 @@ angular.module('Layout.Components').component('appointmentQueue', {
 			return [ctrl.componentStyle + JUNO_BACKGROUND_STYLE.PRIMARY];
 		}
 
-		ctrl.onDragMoved = (event, index) =>
+		ctrl.onDragMoved = async (event, index) =>
 		{
 			// compensate for bug in dnd library
 			// https://github.com/marceljuenemann/angular-drag-and-drop-lists/issues/500
@@ -290,6 +290,21 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		ctrl.onDragStart = (event) =>
 		{
 			ctrl.dragStartY = event.screenY;
+		}
+
+		// fires when item is droped in to list
+		ctrl.onDragDrop = (index, item, event) =>
+		{
+			// compensate for bug in dnd library
+			// https://github.com/marceljuenemann/angular-drag-and-drop-lists/issues/500
+			if (event.screenY - ctrl.dragStartY > 0)
+			{
+				index -= 1;
+			}
+
+			console.log("Move " + item.queuePosition + " To index " + index);
+			aqsQueuedAppointmentApi.moveAppointment(this.currentQueue.id, item.id, { queuePosition: index});
+			return item;
 		}
 	}]
 });

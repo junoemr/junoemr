@@ -31,6 +31,7 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.BookQueuedAppointmentTransfer;
+import org.oscarehr.ws.rest.integrations.aqs.transfer.QueuedAppointmentMoveTransfer;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.AppointmentTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -66,6 +68,18 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.DELETE, null, SecObjectName._APPOINTMENT);
 		queuedAppointmentService.deleteQueuedAppointment(appointmentId, queueId, reason, getLoggedInInfo());
+		return RestResponse.successResponse(true);
+	}
+
+	@PATCH
+	@Path("{appointmentId}/move")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> moveAppointment(@PathParam("queueId") UUID queueId, @PathParam("appointmentId") UUID appointmentId, QueuedAppointmentMoveTransfer queuedAppointmentMoveTransfer)
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._APPOINTMENT);
+
+		queuedAppointmentService.moveQueuedAppointment(appointmentId, queuedAppointmentMoveTransfer.getQueuePosition(), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		return RestResponse.successResponse(true);
 	}
 

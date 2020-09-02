@@ -30,6 +30,7 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.integration.aqs.conversion.IntegerToQueuedAppointmentMoveDtoConverter;
 import org.oscarehr.integration.aqs.dao.QueuedAppointmentLinkDao;
 import org.oscarehr.integration.aqs.exception.AqsCommunicationException;
 import org.oscarehr.integration.aqs.model.AppointmentQueue;
@@ -139,7 +140,25 @@ public class QueuedAppointmentService extends BaseService
 		}
 		catch (ApiException apiException)
 		{
-			throw new AqsCommunicationException("Failed to get appointments in queue [" + appointmentId + "] from the AQS server", apiException);
+			throw new AqsCommunicationException("Failed to delete appointment [" + appointmentId + "] from the AQS server", apiException);
+		}
+	}
+
+	/**
+	 * move an appointment to the specified queue position
+	 * @param appointmentId - the queued appointment to move
+	 * @param queuePosition - the new position of said appointment
+	 * @param securityNo - the security no of the user performing this action
+	 */
+	public void moveQueuedAppointment(UUID appointmentId, Integer queuePosition, Integer securityNo)
+	{
+		try
+		{
+			getOrganizationApi(securityNo).moveAppointment(appointmentId, (new IntegerToQueuedAppointmentMoveDtoConverter()).convert(queuePosition));
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to update queued appointment [" + appointmentId + "]'s position on the AQS server", apiException);
 		}
 	}
 

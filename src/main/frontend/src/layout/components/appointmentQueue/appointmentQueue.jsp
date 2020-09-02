@@ -25,7 +25,8 @@
 			<h2 class="no-queues-zero-state" ng-if="$ctrl.noQueues">
 				Appointment Queue feature is not available at this time.
 			</h2>
-			<ul dnd-list="$ctrl.currentQueue.items">
+			<ul dnd-list="$ctrl.currentQueue.items"
+					dnd-drop="$ctrl.onDragDrop(index, item, event)">
 				<li ng-if="$ctrl.currentQueue"
 						ng-repeat="foobar in [].constructor($ctrl.currentQueue.queueLimit) track by $index"
 						class="flex-fill-row"
