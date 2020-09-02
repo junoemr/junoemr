@@ -302,7 +302,6 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				index -= 1;
 			}
 
-			console.log("Move " + item.queuePosition + " To index " + index);
 			aqsQueuedAppointmentApi.moveAppointment(this.currentQueue.id, item.id, { queuePosition: index});
 			return item;
 		}
