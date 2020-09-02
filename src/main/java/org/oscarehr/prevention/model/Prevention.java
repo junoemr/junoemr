@@ -89,7 +89,7 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 
 	@Column(name = "lastUpdateDate")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date lastUpdateDate = new Date();
+	private Date lastUpdateDate = null;
 
 	// with cascade, these entities will be persisted when this class is.
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "prevention", cascade = CascadeType.PERSIST)
@@ -214,7 +214,11 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 	@PrePersist
 	protected void autoSetUpdateTime()
 	{
-		lastUpdateDate=new Date();
+		lastUpdateDate = new Date();
+		if (preventionDate == null)
+		{
+			preventionDate = getCreationDate();
+		}
 	}
 	
 	public String getDeletedRawValue() {

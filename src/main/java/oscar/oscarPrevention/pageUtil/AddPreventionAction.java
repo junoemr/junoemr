@@ -25,7 +25,6 @@
 
 package oscar.oscarPrevention.pageUtil;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,13 +36,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.provider.model.ProviderPreventionManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarPrevention.PreventionData;
-import oscar.util.ConversionUtils;
 
 /**
  *
@@ -73,34 +72,22 @@ public class AddPreventionAction  extends Action {
 
          String given = request.getParameter("given");
          String prevDate = request.getParameter("prevDate");
-         // In the UI, prevention_date is defaulted to the current datetime if we're making a new prevention
-         // If an empty date somehow slips by us, fill it in as the UI would
-         if (prevDate == null || prevDate.isEmpty())
-         {
-            prevDate = ConversionUtils.toDateString(new Date(), ConversionUtils.TS_NO_SEC_PATTERN);
-         }
          String providerName = request.getParameter("providerName");
          String providerNo = request.getParameter("provider");
          
-         
          String nextDate = request.getParameter("nextDate");
          String neverWarn = request.getParameter("neverWarn");
-         
-         
-         MiscUtils.getLogger().debug("nextDate "+nextDate+" neverWarn "+neverWarn);
-         
-         String refused = "0";
-         if (given != null && given.equals("refused")){
-        	 refused = "1";
-         }else if (given != null && given.equals("ineligible")){
-        	 refused = "2";
-         }else if (given != null && given.equals("never")){
-        	 refused = "1";
-         }else if (given != null && given.equals("previous")){
-        	 refused = "2";
-         }
-         
-         
+
+		 String refused = String.valueOf(Prevention.REFUSED_STATUS_COMPLETED);
+		 if ("refused".equals(given) || "never".equals(given))
+		 {
+			 refused = String.valueOf(Prevention.REFUSED_STATUS_REFUSED);
+		 }
+		 else if ("ineligible".equals(given) || "previous".equals(given))
+		 {
+			refused = String.valueOf(Prevention.REFUSED_STATUS_INELIGIBLE);
+		 }
+
          if (neverWarn != null && neverWarn.equals("neverRemind")){
             neverWarn = "1";
          }else{

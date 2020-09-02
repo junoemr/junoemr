@@ -84,8 +84,8 @@ public class PreventionData {
 
 			insertId = prevention.getId();
 			for (int i = 0; i < list.size(); i++) {
-				Map<String, String> h = list.get(i);
-				for (Map.Entry<String, String> entry : h.entrySet()) {
+				Map<String, String> preventionMap = list.get(i);
+				for (Map.Entry<String, String> entry : preventionMap.entrySet()) {
 					if (entry.getKey() != null && entry.getValue() != null) {
 						addPreventionKeyValue("" + insertId, entry.getKey(), entry.getValue());
 					}
