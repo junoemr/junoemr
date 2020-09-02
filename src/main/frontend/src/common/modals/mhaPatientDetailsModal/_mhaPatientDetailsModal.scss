@@ -146,6 +146,17 @@
 				.panel-body {
 					padding: 12px 8px 12px 8px;
 					display: flex;
+					width: 100%;
+
+					panel-body {
+						width: 100%;
+					}
+
+					.footer-button-wrapper {
+						display: flex;
+						flex-direction: row;
+						justify-content: space-between;
+					}
 
 					.cancel-connection-btn {
 						flex: 0 0 128px;

@@ -47,6 +47,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 @Path("myhealthaccess/integration/{integrationId}/")
@@ -119,14 +120,22 @@ public class DemographicWebService extends AbstractServiceImpl
 	@Path("/demographic/{demographicId}/invite")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> patientInvite(@PathParam("integrationId") Integer integrationId,
-	                                           @PathParam("demographicId") Integer demographicId)
+	                                           @PathParam("demographicId") Integer demographicId,
+	                                           @QueryParam("email") String patientEmail)
 	{
 		Integration integration = integrationDao.find(integrationId);
 		Demographic demographic = demographicDao.find(demographicId);
 
-		if (!isEmailValid(demographic.getEmail()))
+		if (!isEmailValid(patientEmail))
 		{
 			throw new ValidationException("Missing or invalid patient email");
+		}
+
+		// update the demographic email as it may not be set
+		if(!patientEmail.equals(demographic.getEmail()))
+		{
+			demographic.setEmail(patientEmail);
+			demographicDao.merge(demographic);
 		}
 
 		ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,

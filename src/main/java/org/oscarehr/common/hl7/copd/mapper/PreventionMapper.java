@@ -125,7 +125,7 @@ public class PreventionMapper extends AbstractMapper
 			}
 			return mapValue;
 		}
-		logger.error("Invalid or unknown vaccine code: " + typeCode);
+		logger.error("Invalid or unknown vaccine code: [" + typeCode + "] defaulting to generic \'OtherA\'");
 		return "OtherA";// default to generic 'other' type
 	}
 
@@ -271,6 +271,7 @@ public class PreventionMapper extends AbstractMapper
 		preventionTypeMap.put("PPD".toUpperCase(), 					"Tuberculosis");
 		preventionTypeMap.put("PPD = TB Skin Test".toUpperCase(), 	"Tuberculosis");
 		preventionTypeMap.put("Prevnar".toUpperCase(), 				"Pneu-C");
+		preventionTypeMap.put("Prevnar 13".toUpperCase(), 			"Pneu-C");
 		preventionTypeMap.put("PROQUAD".toUpperCase(), 				"MMRV");
 		preventionTypeMap.put("PRPD".toUpperCase(), 				"Hib");
 		preventionTypeMap.put("quad".toUpperCase(), 				"DPTP-IPV");
@@ -314,6 +315,7 @@ public class PreventionMapper extends AbstractMapper
 		preventionTypeMap.put("varivax".toUpperCase(), 				"VZ");
 		preventionTypeMap.put("Vaxigrip 2012-2013".toUpperCase(), 	"Flu");
 		preventionTypeMap.put("Vivaxim".toUpperCase(), 				"HA-Typh-I");
+		preventionTypeMap.put("VZIG".toUpperCase(),                 "VS");
 		preventionTypeMap.put("Yellow Fever Vaccine".toUpperCase(), "YF");
 		preventionTypeMap.put("zostavax".toUpperCase(), 			"Zostavax");
 		preventionTypeMap.put("zoster".toUpperCase(), 				"HZV");

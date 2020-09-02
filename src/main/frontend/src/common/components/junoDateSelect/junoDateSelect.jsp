@@ -4,21 +4,18 @@
 	</label>
 	<div class="fields flex-row">
 		<input class="year" ng-model="$ctrl.year"
-						ng-class="$ctrl.getInvalidClass(!$ctrl.yearValid)"
-						ng-change="$ctrl.year = $ctrl.onYearChange($ctrl.year)"
-						ng-disabled="!$ctrl.monthValid || !$ctrl.dayValid"
+						ng-class="$ctrl.getInvalidClass(!$ctrl.yearValid && !$ctrl.fieldsBlank )"
+						ng-change="$ctrl.onYearChange($ctrl.year)"
 						placeholder="year">
 		<input class="month"
 						ng-model="$ctrl.month"
-						ng-class="$ctrl.getInvalidClass(!$ctrl.monthValid)"
-						ng-change="$ctrl.month = $ctrl.onMonthChange($ctrl.month)"
-						ng-disabled="!$ctrl.yearValid || !$ctrl.dayValid"
+						ng-class="$ctrl.getInvalidClass(!$ctrl.monthValid && !$ctrl.fieldsBlank)"
+						ng-change="$ctrl.onMonthChange($ctrl.month)"
 						placeholder="month">
 		<input class="day"
 						ng-model="$ctrl.day"
-						ng-class="$ctrl.getInvalidClass(!$ctrl.dayValid)"
-						ng-change="$ctrl.day = $ctrl.onDayChange($ctrl.day)"
-						ng-disabled="!$ctrl.monthValid || !$ctrl.yearValid"
+						ng-class="$ctrl.getInvalidClass(!$ctrl.dayValid && !$ctrl.fieldsBlank)"
+						ng-change="$ctrl.onDayChange($ctrl.day)"
 						placeholder="day">
 	</div>
 	<div ng-if="$ctrl.showAge">

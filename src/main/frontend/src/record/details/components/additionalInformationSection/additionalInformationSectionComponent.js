@@ -27,6 +27,7 @@ angular.module('Record.Details').component('additionalInformationSection', {
 	templateUrl: 'src/record/details/components/additionalInformationSection/additionalInformationSection.jsp',
 	bindings: {
 		ngModel: "=",
+		validations: "=",
 		componentStyle: "<?"
 	},
 	controller: [ "staticDataService", "$scope", function (staticDataService, $scope)
@@ -41,8 +42,11 @@ angular.module('Record.Details').component('additionalInformationSection', {
 		ctrl.securityQuestions.unshift({label: "--", value: null});
 		ctrl.rxInteractionLevels = staticDataService.getRxInteractionLevels();
 
+		ctrl.dateOfRequestValid = true;
+
 		ctrl.$onInit = () =>
 		{
+			ctrl.validations["dateOfRequest"] = Juno.Validations.validationCustom(() => ctrl.dateOfRequestValid);
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 		}
 

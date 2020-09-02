@@ -15,6 +15,7 @@
 			<h3 class="confirm-message juno-text">
 				Are you sure you want to send an invite to this patient?
 			</h3>
+			<span>{{$ctrl.demographicEmail}}</span>
 			<juno-select ng-if="$ctrl.isMultisiteEnabled"
 			             component-style="$ctrl.resolve.style"
 			             label="Site"

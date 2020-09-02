@@ -59,8 +59,10 @@ angular.module('Common.Components').component('mhaPatientInviteConfirmModal',
 
 		ctrl.$onInit = () =>
 		{
-			ctrl.integrationsList = ctrl.resolve.integrationsList.map((obj) => ({ label: obj.siteName, value: obj.siteId}));
+			ctrl.integrationsList = ctrl.resolve.integrationsList.map((obj) => ({ label: obj.siteName, value: obj.id}));
 			ctrl.demographicNo = ctrl.resolve.demographicNo;
+			ctrl.demographicEmail = ctrl.resolve.demographicEmail;
+			ctrl.initialIntegration = ctrl.resolve.selectedIntegration;
 
 			systemPreferenceApi.getPropertyEnabled("multisites").then((response) =>
 			{
@@ -70,6 +72,10 @@ angular.module('Common.Components').component('mhaPatientInviteConfirmModal',
 				if (!ctrl.isMultisiteEnabled)
 				{
 					ctrl.selectedIntegrationId = ctrl.integrationsList[0].value;
+				}
+				else if (ctrl.initialIntegration)
+				{
+					ctrl.selectedIntegrationId = ctrl.initialIntegration.id;
 				}
 
 			}).finally(() =>
@@ -88,12 +94,13 @@ angular.module('Common.Components').component('mhaPatientInviteConfirmModal',
 			if (ctrl.selectedIntegrationId)
 			{
 				ctrl.isLoading = true;
-				mhaDemographicApi.patientInvite(ctrl.selectedIntegrationId, ctrl.demographicNo).then((response) =>
+				mhaDemographicApi.patientInvite(ctrl.selectedIntegrationId, ctrl.demographicNo, ctrl.demographicEmail).then((response) =>
 				{
 					ctrl.modalInstance.close(true);
 				}).catch((error) =>
 				{
 					console.error("Failed to invite patient to MHA", error);
+					alert("An error occurred. Check the integration settings or contact support if it persists.");
 				}).finally(() =>
 				{
 					ctrl.isLoading = false;

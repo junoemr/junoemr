@@ -26,6 +26,7 @@
 			<!-- Effective Date -->
 			<juno-date-select ng-model="$ctrl.ngModel.effDate"
 							label="Effective date"
+							on-validity-change="$ctrl.effectiveDateValid = valid"
 							component-style="$ctrl.componentStyle">
 			</juno-date-select>
 

@@ -14,6 +14,7 @@
 			<juno-date-select ng-model="$ctrl.ngModel.dateOfBirth"
 							label="Date of Birth"
 							show-age="true"
+							on-validity-change="$ctrl.dobValid = valid;"
 							component-style="$ctrl.componentStyle"
 			>
 			</juno-date-select>
@@ -40,10 +41,9 @@
 							component-style="$ctrl.componentStyle">
 			</juno-select>
 
-			<mha-patient-connection demographic-no="$ctrl.ngModel.demographicNo"
-							demographic-email="$ctrl.ngModel.email"
-							component-style="$ctrl.componentStyle"
-							on-site-list-change="$ctrl.onMHASiteListChange(sites)">
+			<mha-patient-connection demographic="$ctrl.ngModel"
+			                        component-style="$ctrl.componentStyle"
+			                        on-site-list-change="$ctrl.onMHASiteListChange(sites)">
 			</mha-patient-connection>
 		</div>
 
@@ -68,7 +68,7 @@
 							title="Spoken Language"
 							model="$ctrl.ngModel.spokenLanguage"
 							options="$ctrl.spokenLanguages"
-							placeholder="Select spoken language"
+							placeholder="Spoken language"
 							label-position="LABEL_POSITION.LEFT"
 							component-style="$ctrl.componentStyle">
 			</juno-typeahead>
@@ -78,7 +78,7 @@
 							title="Country of Origin"
 							model="$ctrl.ngModel.countryOfOrigin"
 							options="$ctrl.countries"
-							placeholder="Select Country of Origin"
+							placeholder="Country of Origin"
 							label-position="LABEL_POSITION.LEFT"
 							component-style="$ctrl.componentStyle">
 			</juno-typeahead>
@@ -96,9 +96,9 @@
 								readonly="true"
 								component-style="$ctrl.componentStyle">
 				</juno-input>
-				<juno-button ng-click="$ctrl.openPatientModal()"
-				             button-color="JUNO_BUTTON_COLOR.PRIMARY"
-				             button-color-pattern="$ctrl.mhaSites === '' ? JUNO_BUTTON_COLOR_PATTERN.DEFAULT : JUNO_BUTTON_COLOR_PATTERN.FILL"
+				<juno-button disabled="!$ctrl.canOpenPatientModal()"
+				             ng-click="$ctrl.openPatientModal()"
+				             button-color="!$ctrl.canOpenPatientModal() ? JUNO_BUTTON_COLOR.TRANSPARENT : JUNO_BUTTON_COLOR.PRIMARY"
 				             component-style="$ctrl.componentStyle">
 					<div class="flex-row justify-content-center">
 						<i class="icon icon-view"></i>

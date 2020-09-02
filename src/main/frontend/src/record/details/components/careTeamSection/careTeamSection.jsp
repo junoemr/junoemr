@@ -52,6 +52,7 @@
 			<juno-date-select ng-if="$ctrl.ngModel.rosterStatus === 'TE'"
 							ng-model="$ctrl.ngModel.rosterTerminationDate"
 							label="Termination Date"
+							on-validity-change="$ctrl.terminationDateValid = valid"
 							component-style="$ctrl.componentStyle">
 			</juno-date-select>
 
@@ -73,6 +74,7 @@
 			<!-- Date Joined -->
 			<juno-date-select ng-model="$ctrl.ngModel.dateJoined"
 							label="Date Joined"
+							on-validity-change="$ctrl.dateJoinedValid = valid"
 							component-style="$ctrl.componentStyle">
 			</juno-date-select>
 
@@ -107,13 +109,14 @@
 			<juno-input ng-model="$ctrl.ngModel.scrReferralDocNo"
 							label="Referral Doctor #"
 							placeholder="Referral Doctor #"
-							readonly="true"
+							valid-regex="$ctrl.numberRegex"
 							component-style="$ctrl.componentStyle">
 			</juno-input>
 
 			<!-- Date Rostered -->
 			<juno-date-select ng-model="$ctrl.ngModel.rosterDate"
 							label="Roster Date"
+							on-validity-change="$ctrl.rosterDateValid = valid"
 							component-style="$ctrl.componentStyle">
 			</juno-date-select>
 
@@ -128,12 +131,14 @@
 			<!-- Patient Status Date -->
 			<juno-date-select ng-model="$ctrl.ngModel.patientStatusDate"
 							label="Patient Status Date"
+							on-validity-change="$ctrl.patientStatusDateValid = valid"
 							component-style="$ctrl.componentStyle">
 			</juno-date-select>
 
 			<!-- End Date -->
 			<juno-date-select ng-model="$ctrl.ngModel.endDate"
 							label="End Date"
+							on-validity-change="$ctrl.endDateValid = valid"
 							component-style="$ctrl.componentStyle">
 			</juno-date-select>
 

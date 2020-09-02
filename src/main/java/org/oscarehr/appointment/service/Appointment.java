@@ -126,6 +126,8 @@ public class Appointment
 																																	LoggedInInfo loggedInInfo, HttpServletRequest request,
 																																	boolean sendNotification)
 	{
+		appointment.setCreator(loggedInInfo.getLoggedInProviderNo());
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		oscarAppointmentDao.persist(appointment);
 
 		if (sendNotification)
@@ -164,6 +166,9 @@ public class Appointment
 		{
 			throw new IllegalArgumentException("Could not save telehealth appointment. Appointment is not virtual");
 		}
+
+		appointment.setCreator(loggedInInfo.getLoggedInProviderNo());
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 
 		oscarAppointmentDao.persist(appointment);
 

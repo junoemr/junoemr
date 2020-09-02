@@ -37,6 +37,8 @@ angular.module('Record.Details').component('healthInsuranceSection', {
 
 		ctrl.provinces = staticDataService.getProvinces();
 
+		ctrl.effectiveDateValid = true;
+
 		ctrl.$onInit = () =>
 		{
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
@@ -57,6 +59,7 @@ angular.module('Record.Details').component('healthInsuranceSection', {
 					}
 					return false;
 				}),
+				hinEffectiveDate: Juno.Validations.validationCustom(() => ctrl.effectiveDateValid),
 			});
 		}
 

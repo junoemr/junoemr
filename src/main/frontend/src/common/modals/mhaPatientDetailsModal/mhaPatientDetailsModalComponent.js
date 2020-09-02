@@ -36,15 +36,15 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 			'$httpParamSerializer',
 			'$uibModal',
 		function ($scope,
-							$http,
-							$httpParamSerializer,
-							$uibModal)
+		          $http,
+		          $httpParamSerializer,
+		          $uibModal)
 	{
 		let ctrl = this;
 
 		// load apis
 		let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
-				'../ws/rs');
+			'../ws/rs');
 		let mhaDemographicApi = new MhaDemographicApi($http, $httpParamSerializer,
 				'../ws/rs');
 
@@ -52,22 +52,28 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-		ctrl.patientProfiles = [];
 		ctrl.currentProfile = null;
-
+		ctrl.connectionStatus = null;
 		ctrl.connectionStatusChanged = false;
+
+		ctrl.integrationTabs = [];
+		ctrl.currentIntegration = null;
 
 		ctrl.$onInit = () =>
 		{
 			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
-
-			if (ctrl.resolve.style === JUNO_STYLE.DRACULA)
-			{
-				// we are inside an bootstrap transclude component, restyle it.
-				angular.element(document.querySelector(".modal-content")).addClass("juno-style-dracula-background");
-			}
+			ctrl.demographic = ctrl.resolve.demographic;
 
 			ctrl.loadMHAPatientProfiles();
+
+			$scope.$watch("$ctrl.currentIntegration", (newValue, oldValue) =>
+			{
+				if (newValue !== oldValue)
+				{
+					ctrl.currentProfile = ctrl.currentIntegration.patient;
+					ctrl.updateConnectionStatus();
+				}
+			});
 		}
 
 		ctrl.loadMHAPatientProfiles = async () =>
@@ -75,30 +81,36 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 			try
 			{
 				ctrl.currentProfile = null;
-				ctrl.patientProfiles = [];
-				let integrationsList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
-				for (let integration of integrationsList)
+				ctrl.integrationTabs = [];
+				ctrl.currentIntegration = null;
+				ctrl.integrationsList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
+				for (let integration of ctrl.integrationsList)
 				{
-					let patient = (await mhaDemographicApi.getMHAPatient(integration.id, ctrl.resolve.demographicNo)).data.body;
-					if (patient && patient.link_status === "ACTIVE")
+					let patient = (await mhaDemographicApi.getMHAPatient(integration.id, ctrl.demographic.demographicNo)).data.body;
+					if (patient)
 					{
-						// add computed attribute for display, inputs get upset when they cannot assign to a ng-model
-						let province = patient.address_province_code !== "UNKNOWN" ? patient.address_province_code : "";
-						let city = patient.city != null ? patient.city : "";
-						patient.city_province = `${city} ${province}`;
-						patient.connection_status = ctrl.getConnectionStatusHuman(patient.link_status)
-
-						ctrl.patientProfiles.push({
-							label: integration.siteName,
-							integrationId: integration.id,
-							value: patient,
-						})
+						if(patient.link_status === "ACTIVE")
+						{
+							// add computed attribute for display, inputs get upset when they cannot assign to a ng-model
+							let province = patient.address_province_code !== "UNKNOWN" ? patient.address_province_code : "";
+							let city = patient.city != null ? patient.city : "";
+							patient.city_province = `${city} ${province}`;
+						}
+						integration.patient = patient;
 					}
+					integration.inviteSent = false;
+
+					ctrl.integrationTabs.push({
+						label: integration.siteName,
+						value: integration,
+					})
 				}
 
-				if (ctrl.patientProfiles.length > 0)
+				if (ctrl.integrationTabs.length > 0)
 				{
-					ctrl.currentProfile = ctrl.patientProfiles[0].value;
+					ctrl.currentIntegration = ctrl.integrationTabs[0].value;
+					ctrl.currentProfile = ctrl.currentIntegration.patient;
+					ctrl.updateConnectionStatus();
 				}
 				else
 				{
@@ -112,11 +124,21 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 			}
 		};
 
+		ctrl.getLocalPatientName = () =>
+		{
+			return `${ctrl.demographic.lastName}, ${ctrl.demographic.firstName}`;
+		}
+
+		ctrl.getLocalPatientHinAndProv = () =>
+		{
+			return `${ctrl.demographic.hin} ${ctrl.demographic.hcType}`;
+		}
+
 		ctrl.getCurrentPatientName = () =>
 		{
 			if (ctrl.currentProfile)
 			{
-				return `${ctrl.currentProfile.first_name}, ${ctrl.currentProfile.last_name}`;
+				return `${ctrl.currentProfile.last_name}, ${ctrl.currentProfile.first_name}`;
 			}
 			return "";
 		};
@@ -146,20 +168,48 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 			return "";
 		};
 
+		ctrl.openInviteConfirmModal = async () =>
+		{
+			try
+			{
+				ctrl.currentIntegration.inviteSent = await $uibModal.open(
+					{
+						component: 'mhaPatientInviteConfirmModal',
+						backdrop: 'static',
+						windowClass: "juno-modal sml",
+						resolve: {
+							style: () => JUNO_STYLE.GREY, //TODO regular style use when it doesn't break button/text colours
+							demographicNo: () => ctrl.demographic.demographicNo,
+							demographicEmail: () => ctrl.demographic.email,
+							integrationsList: () => ctrl.integrationsList,
+							selectedIntegration: () => ctrl.currentIntegration,
+						}
+					}
+				).result;
+			}
+			catch(err)
+			{
+				// user pressed ESC key
+			}
+		}
+
 		ctrl.cancelConnection = async () =>
 		{
-			let userOk = await Juno.Common.Util.confirmationDialog($uibModal, "Cancel Connection?",
+			if(ctrl.currentIntegration)
+			{
+				let userOk = await Juno.Common.Util.confirmationDialog($uibModal, "Cancel Connection?",
 					"Are you sure you want to cancel this patients MyHealthAccess connection?", ctrl.resolve.style);
 
-			if (userOk)
-			{
-				ctrl.connectionStatusChanged = true;
-				let integrationId = ctrl.patientProfiles.find((profile) => profile.value === ctrl.currentProfile).integrationId
-
-				if (integrationId)
+				if (userOk)
 				{
-					await mhaDemographicApi.rejectPatientConnection(integrationId, ctrl.resolve.demographicNo);
-					ctrl.loadMHAPatientProfiles();
+					ctrl.connectionStatusChanged = true;
+					let integrationId = ctrl.currentIntegration.id;
+
+					if (integrationId)
+					{
+						await mhaDemographicApi.rejectPatientConnection(integrationId, ctrl.demographic.demographicNo);
+						ctrl.loadMHAPatientProfiles();
+					}
 				}
 			}
 		}
@@ -167,6 +217,36 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 		ctrl.onCancel = () =>
 		{
 			ctrl.modalInstance.close(ctrl.connectionStatusChanged);
+		}
+
+		ctrl.updateConnectionStatus = () =>
+		{
+			if(ctrl.currentProfile)
+			{
+				ctrl.connectionStatus = ctrl.getConnectionStatusHuman(ctrl.currentProfile.link_status);
+			}
+			else
+			{
+				ctrl.connectionStatus = "No Connection";
+			}
+		}
+
+		ctrl.hasActiveConnection = () =>
+		{
+			if(ctrl.currentProfile)
+			{
+				return ctrl.currentProfile.link_status === 'ACTIVE';
+			}
+			return false;
+		}
+
+		ctrl.getInviteButtonText = () =>
+		{
+			if(ctrl.currentIntegration && ctrl.currentIntegration.inviteSent)
+			{
+				return "Resend Invite";
+			}
+			return "Send Invite";
 		}
 	}]
 });

@@ -33,7 +33,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -226,6 +225,13 @@ public class ConversionUtilsTest
 	public void fromDateString_EmptyDateString_ExpectNull()
 	{
 		Assert.assertNull(ConversionUtils.fromDateString("", null));
+	}
+
+	@Test
+	public void fromDateString_InvalidDate_ExpectNull()
+	{
+		String dateString = "2020-14-77 10:20:30";
+		Assert.assertNull(ConversionUtils.fromDateString(dateString));
 	}
 
 	@Test
@@ -506,6 +512,13 @@ public class ConversionUtilsTest
 	public void fromIntString_EmptyStringParameter_ExpectZero()
 	{
 		int returnedVal = ConversionUtils.fromIntString("");
+		Assert.assertEquals(0, returnedVal);
+	}
+
+	@Test
+	public void fromIntString_IntAndLetter_ExpectZero()
+	{
+		int returnedVal = ConversionUtils.fromIntString("2x");
 		Assert.assertEquals(0, returnedVal);
 	}
 

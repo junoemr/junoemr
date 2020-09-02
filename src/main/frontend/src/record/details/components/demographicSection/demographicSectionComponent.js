@@ -28,6 +28,7 @@ angular.module('Record.Details').component('demographicSection', {
 	templateUrl: 'src/record/details/components/demographicSection/demographicSection.jsp',
 	bindings: {
 		ngModel: "=",
+		validations: "=",
 		componentStyle: "<?"
 	},
 	controller: [
@@ -49,6 +50,8 @@ angular.module('Record.Details').component('demographicSection', {
 			// a list displaying the connected MHA sites.
 			ctrl.mhaSites = "";
 
+			ctrl.dobValid = true;
+
 			$scope.LABEL_POSITION = LABEL_POSITION;
 			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
@@ -56,6 +59,13 @@ angular.module('Record.Details').component('demographicSection', {
 			ctrl.$onInit = () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
+
+				ctrl.validations["dateOfBirth"] = Juno.Validations.validationCustom(() => ctrl.dobValid);
+			}
+
+			ctrl.onValidChange = (valid) =>
+			{
+				console.log(valid)
 			}
 
 			ctrl.onMHASiteListChange = (sites) =>
@@ -66,9 +76,14 @@ angular.module('Record.Details').component('demographicSection', {
 				}
 			}
 
+			ctrl.canOpenPatientModal = () =>
+			{
+				return (ctrl.mhaSites !== '');
+			}
+
 			ctrl.openPatientModal = async () =>
 			{
-				if (ctrl.mhaSites !== '')
+				if (ctrl.canOpenPatientModal())
 				{
 					try
 					{
@@ -79,7 +94,7 @@ angular.module('Record.Details').component('demographicSection', {
 									windowClass: "juno-modal",
 									resolve: {
 										style: () => ctrl.componentStyle,
-										demographicNo: () => ctrl.ngModel.demographicNo,
+										demographic: () => ctrl.ngModel,
 									}
 								}
 						).result;

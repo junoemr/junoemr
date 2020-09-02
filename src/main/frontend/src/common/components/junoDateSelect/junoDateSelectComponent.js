@@ -30,19 +30,22 @@ angular.module('Common.Components').component('junoDateSelect', {
 		label: "@?",
 		labelPosition: "<?",
 		componentStyle: "<?",
-		showAge: "<?"
+		showAge: "<?",
+		onValidityChange: "&?"
 	},
 	controller: ["$scope", function ($scope)
 	{
 		let ctrl = this;
 
-		ctrl.year = null;
-		ctrl.month = null;
-		ctrl.day = null;
+		ctrl.year = "";
+		ctrl.month = "";
+		ctrl.day = "";
 
 		ctrl.yearValid = true;
-		ctrl.monthValid = true;
-		ctrl.dayValid = true;
+		ctrl.monthValid = false;
+		ctrl.dayValid = false;
+
+		ctrl.fieldsBlank = false;
 
 		ctrl.$onInit = () =>
 		{
@@ -56,71 +59,76 @@ angular.module('Common.Components').component('junoDateSelect', {
 		ctrl.$doCheck = () =>
 		{
 			ctrl.updateDateFields();
+			ctrl.onInvalidStateChange();
 		}
 
 		ctrl.updateDateFields = () =>
 		{
-			if (ctrl.ngModel && ctrl.ngModel.isValid())
+			if (ctrl.ngModel && ctrl.ngModel.isValid() && ctrl.ngModel.year() !== 0)
 			{
 				ctrl.year = ctrl.ngModel.year();
 				ctrl.month = Juno.Common.Util.padDateWithZero(ctrl.ngModel.month() + 1);
 				ctrl.day = Juno.Common.Util.padDateWithZero(ctrl.ngModel.date());
+
+				ctrl.monthValid = true;
+				ctrl.dayValid = true;
 			}
+
+			ctrl.fieldsBlank = ctrl.allFieldsBlank()
 		}
 
 		ctrl.onYearChange = (field) =>
 		{
-			field = ctrl.onDateChange(field, true);
-			ctrl.yearValid = ctrl.ngModel.isValid()
-			return field;
+			ctrl.year = ctrl.onDateChange(field, true);
+			ctrl.yearValid = ctrl.year < 9999;
+
 		}
 
 		ctrl.onMonthChange = (field) =>
 		{
-			field = ctrl.onDateChange(field);
-			ctrl.monthValid = ctrl.ngModel.isValid()
-			return field;
+			ctrl.month = ctrl.onDateChange(field);
+			ctrl.monthValid = ctrl.ngModel.isValid();
 		}
 
 		ctrl.onDayChange = (field) =>
 		{
-			field = ctrl.onDateChange(field);
-			ctrl.dayValid = ctrl.ngModel.isValid()
-			return field;
+			ctrl.day = ctrl.onDateChange(field);
+			ctrl.dayValid = ctrl.ngModel.isValid();
 		}
 
 		ctrl.onDateChange = (field, isYear) =>
 		{
-			ctrl.assignDefaults();
-
-			let date = Juno.Common.Util.getDateMomentFromComponents(ctrl.year, ctrl.month, ctrl.day);
-
-			if (date.isValid())
+			ctrl.ngModel = Juno.Common.Util.getDateMomentFromComponents(ctrl.year, ctrl.month, ctrl.day);
+			if (!isYear)
 			{
-				ctrl.ngModel = date;
-				if (!isYear)
-				{
-					field = Juno.Common.Util.padDateWithZero(field);
-				}
-				return field;
+				field = Juno.Common.Util.padDateWithZero(field);
 			}
-			else
+
+			if (field === "0" || field === "00")
 			{
-				field = field.substring(0, field.length - 1);
-				if (field === "")
-				{
-					ctrl.ngModel = date;
-					field = "0";
-				}
-				return field;
+				field = "";
+			}
+
+			ctrl.fieldsBlank = ctrl.allFieldsBlank();
+
+			return field;
+		}
+
+		ctrl.onInvalidStateChange = () =>
+		{
+			if ((!ctrl.monthValid || !ctrl.yearValid || !ctrl.dayValid) && !ctrl.allFieldsBlank() && ctrl.onValidityChange)
+			{
+				ctrl.onValidityChange({valid: false})
+			}
+			else if (ctrl.onValidityChange)
+			{
+				ctrl.onValidityChange({valid: true})
 			}
 		}
 
-		ctrl.assignDefaults = () =>
+		ctrl.allFieldsBlank = () =>
 		{
-			ctrl.year = ctrl.year || "0000";
-			ctrl.month = ctrl.month || "01";
-			ctrl.day = ctrl.day || "01";
+			return (ctrl.day === "" && ctrl.month === "" && ctrl.year === "")
 		}
 
 		ctrl.getInvalidClass = (isInvalid) =>

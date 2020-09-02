@@ -1,0 +1,327 @@
+/**
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
+ */
+
+package integration.tests;
+
+import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.junoUtil.DatabaseUtil;
+import integration.tests.util.seleniumUtil.PageUtil;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.oscarehr.common.dao.utils.AuthUtils;
+import org.oscarehr.common.dao.utils.SchemaUtils;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import static integration.tests.AddGroupTests.addGroup;
+import static integration.tests.AddGroupTests.groupName;
+import static integration.tests.AddGroupTests.valueOfDrApple;
+import static integration.tests.AddGroupTests.valueOfDrBerry;
+import static integration.tests.AddProvidersTests.drApple;
+import static integration.tests.AddProvidersTests.drBerry;
+import static integration.tests.ScheduleSettingTests.getDailySchedule;
+import static integration.tests.ScheduleSettingTests.setupSchedule;
+import static integration.tests.ScheduleSettingTests.setupTemplate;
+import static integration.tests.ScheduleSettingTests.templateTitleGeneral;
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
+
+class ScheduleIntegrationTests
+{
+	static void setupScheduleTest(WebDriver driver) throws InterruptedException
+	{
+		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Schedule Setting");
+		String currWindowHandle = driver.getWindowHandle();
+		Set<String> oldWindowHandles = driver.getWindowHandles();
+		setupTemplate(currWindowHandle, oldWindowHandles);
+		driver.findElement(By.xpath("//input[@value='Exit']")).click();
+		setupSchedule(currWindowHandle, AuthUtils.TEST_PROVIDER_ID, templateTitleGeneral, templateTitleGeneral);
+		List<String> daySchedule = getDailySchedule();
+		Assert.assertTrue("Schedule setting for Monday is NOT completed successfully.", daySchedule.get(1).contains(templateTitleGeneral));
+		Assert.assertTrue("Schedule setting for Tuesday is NOT completed successfully.", daySchedule.get(2).contains(templateTitleGeneral));
+		driver.close();
+	}
+}
+
+class GroupViewIntegrationTests
+{
+	static void setupGroupTest(WebDriver driver)
+	{
+		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group");
+		addGroup(groupName, 2);
+		Assert.assertTrue("Group is Not added successfully.",
+				PageUtil.isExistsBy(By.name(valueOfDrApple), driver) &&
+						PageUtil.isExistsBy(By.name(valueOfDrBerry), driver));
+		driver.close();
+	}
+}
+
+public class AddAppointmentsTests extends SeleniumTestBase
+{
+	WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+	@BeforeClass
+	public static void setup() throws Exception
+	{
+		loadSpringBeans();
+		DatabaseUtil.createTestDemographic("Test", "Test", "F");
+		DatabaseUtil.createTestProvider();
+		DatabaseUtil.createProviderSite();
+	}
+
+	@AfterClass
+	public static void cleanup() throws Exception
+	{
+		SchemaUtils.restoreTable("admission", "appointment", "demographic", "log", "log_ws_rest", "mygroup",
+				"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
+				"ProviderPreference", "providersite", "secUserRole", "site",
+				"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
+	}
+
+	public static void appointmentDateDisplay(By appointmentDateBy, String appointmentDate)
+	{
+		boolean isAppointmentDateDisplayed = false;
+		isAppointmentDateDisplayed = PageUtil.isExistsBy(appointmentDateBy, driver);
+		if (!isAppointmentDateDisplayed)//If the next Wednesday is not in current week.
+		{
+			driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
+			driver.findElement(By.partialLinkText(appointmentDate)).click();
+		}
+	}
+
+	public static void addAppointmentWithDemo(By timeFrame, String currWindowHandle, String status)
+	{
+		driver.findElement(timeFrame).click();
+		PageUtil.switchToLastWindow(driver);
+		addAppointmentPageWithDemo(currWindowHandle, status);
+	}
+
+	public static void addAppointmentWithNODemo(By timeFrame,Set<String> oldWindowHandles, String currWindowHandle, String status)
+	{
+		driver.findElement(timeFrame).click();
+		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
+		PageUtil.switchToWindow(newWindows.get(newWindows.size() - 1), driver);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), status);
+		driver.findElement(By.id("addButton")).click();
+		PageUtil.switchToWindow(currWindowHandle, driver);
+	}
+
+	public static void addAppointmentPageWithDemo(String secCurrWindowHandle, String status)
+	{
+		driver.findElement(By.id("searchBtn")).click();
+		driver.findElement(By.xpath(".//td[contains(., 'Test')]")).click();
+		dropdownSelectByValue(driver, By.xpath("//select[@name='reasonCode']"), "4");//Follow-Up
+		driver.findElement(By.id("reason")).sendKeys("Appointment Reason.");
+		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), status);//To Do
+		driver.findElement(By.xpath("//input[@name='type']")).sendKeys("Appointment Type");
+		driver.findElement(By.xpath("//textarea[@name='notes']")).sendKeys("Appointment Notes");
+		driver.findElement(By.xpath("//input[@name='resources']")).sendKeys("Appointment Resources");
+		driver.findElement(By.xpath("//input[@value='critical']")).click();
+		driver.findElement(By.id("addButton")).click();
+		PageUtil.switchToWindow(secCurrWindowHandle, driver);
+	}
+
+	@Test
+	public void addAppointmentsSchedulePageTest()
+	{
+		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
+		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
+		String currWindowHandle = driver.getWindowHandle();
+		Set<String> oldWindowHandles = driver.getWindowHandles();
+		addAppointmentWithDemo(By.linkText("09:00"), currWindowHandle, "t");//To Do
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
+		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
+				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
+
+		//Add an appointment at 10:00-10:15 with NO demographic selected.
+		addAppointmentWithNODemo(By.linkText("10:00"),oldWindowHandles, currWindowHandle, "t");//To Do
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
+		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
+				PageUtil.isExistsBy(By.linkText("."), driver));
+	}
+
+	@Test
+	public void addAppointmentsSchedulePageWeeklyViewTest()
+	{
+		//Weekly View - next week
+		driver.findElement(By.xpath("//input[@name='weekview']")).click();
+		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
+		// Add an appointment at 9:00-9:15 next Monday with demographic selected.
+		String currWindowHandle = driver.getWindowHandle();
+		Set<String> oldWindowHandles = driver.getWindowHandles();
+		String xpathAt9 =
+				"//a[contains(., 'Mon,')]/ancestor::tr/following-sibling::tr" +
+						"/descendant::td//a[@title='9:00 AM - 9:15 AM']";
+		addAppointmentWithDemo(By.xpath(xpathAt9), currWindowHandle, "t");//To Do
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
+		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
+				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
+
+		//Add an appointment at 10:00-10:15 Tuesday with NO demographic selected.
+		String xpathAt10 =
+				"//a[contains(., 'Tue,')]/ancestor::tr/following-sibling::tr" +
+						"/descendant::td//a[@title='10:00 AM - 10:15 AM']";
+		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");//To Do
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
+		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
+				PageUtil.isExistsBy(By.linkText("."), driver));
+	}
+
+	@Test
+	public void addAppointmentsSchedulePageFlipViewTest()
+	{
+		//Flip View - next Month
+		driver.findElement(By.xpath("//input[@name='flipview']")).click();
+		driver.findElement(By.xpath("//a[@title='Next Month']")).click();
+		// Add an appointment at 9:00-9:15 the same date of next Month with demographic selected.
+		String currWindowHandle = driver.getWindowHandle();
+		Set<String> oldWindowHandles = driver.getWindowHandles();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		Date date = new Date();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.MONTH, 1);
+		Date apptAt9Date= calendar.getTime();
+		calendar.add(Calendar.DAY_OF_MONTH, 1);
+		Date apptAt10Date = calendar.getTime();
+		String apptAt9DateFormated = dateFormat.format(apptAt9Date);
+		String apptAt10DateFormated = dateFormat.format(apptAt10Date);
+		String xpathAt9 =
+				"//a[contains(., '" + apptAt9DateFormated + "')]/parent::td" +
+						"/following-sibling::td[@title='9:00']" +
+						"/descendant::td[@style='vertical-align:middle;']";
+		addAppointmentWithDemo(By.xpath(xpathAt9), currWindowHandle, "t");//To Do
+
+		//Add an appointment at 10:00-10:15 the next date as tomorrow of next Month with NO demographic selected.
+		String xpathAt10 =
+				"//a[contains(., '" + apptAt10DateFormated + "')]/parent::td" +
+						"/following-sibling::td[@title='10:00']" +
+						"/descendant::td[@style='vertical-align:middle;']";
+		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");// To Do
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Day Page")));
+		driver.findElement(By.xpath("//a[contains(., '" + apptAt9DateFormated + "')]")).click();
+		driver.findElement(By.linkText("All")).click();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
+		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
+				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
+
+		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
+		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
+				PageUtil.isExistsBy(By.linkText("."), driver));
+	}
+
+	@Test
+	public void addAppointmentsSearchToolTest() throws Exception
+	{
+		String currWindowHandle = driver.getWindowHandle();
+		Set<String> oldWindowHandles = driver.getWindowHandles();
+		ScheduleIntegrationTests.setupScheduleTest(driver);
+
+		//Search available schedule for Wednesdays
+		PageUtil.switchToWindow(currWindowHandle, driver);
+		driver.findElement(By.xpath("//input[@name='searchview']")).click();
+		PageUtil.switchToLastWindow(driver);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), AuthUtils.TEST_PROVIDER_ID);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='dayOfWeek']"), "4"); //Wednesday
+		driver.findElement(By.xpath("//input[@value='Search']")).click();
+		String secCurrWindowHandle = driver.getWindowHandle();
+
+		// Add an appointment at the first available spot on Wednesday with demographic selected.
+		String xpathFirst = "/html/body/center/table/tbody/tr[2]/td[1]";
+		driver.findElement(By.xpath(xpathFirst)).click();
+		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
+		PageUtil.switchToWindow(newWindows.get(1), driver);
+		WebElement appointmentDateElement = driver.findElement(By.cssSelector("input[name='appointment_date']"));
+		String appointmentDate = appointmentDateElement.getAttribute("value");
+		addAppointmentPageWithDemo(secCurrWindowHandle, "P");//Picked
+
+		// Add an appointment at the next available Wednesday with NO demographic selected.
+		driver.navigate().refresh(); //page refresh
+		String xpathNext = "/html/body/center/table/tbody/tr[2]/td[1]";
+		addAppointmentWithNODemo(By.xpath(xpathNext),oldWindowHandles, secCurrWindowHandle, "H");//Here
+		driver.close();
+		PageUtil.switchToWindow(currWindowHandle, driver);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='weekview']")));
+		driver.findElement(By.xpath("//input[@name='weekview']")).click();
+		appointmentDateDisplay(By.partialLinkText(appointmentDate), appointmentDate);
+		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
+				PageUtil.isExistsBy(By.xpath("//img[@title='Picked']"), driver));
+		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
+				PageUtil.isExistsBy(By.xpath("//img[@title='Here']"), driver));
+	}
+
+	@Test
+	public void addAppointmentsGroupViewTest()
+	{
+		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
+		String currWindowHandle = driver.getWindowHandle();
+		Set<String> oldWindowHandles = driver.getWindowHandles();
+		GroupViewIntegrationTests.setupGroupTest(driver);
+		PageUtil.switchToWindow(currWindowHandle, driver);
+		driver.navigate().refresh();
+		dropdownSelectByValue(driver, By.id("mygroup_no"), "_grp_TestGroup");
+		String xpathAt9 =
+				"//a[contains(.,'" + drApple.lastName + "')]" +
+						"/ancestor::tr/following-sibling::tr" +
+						"/descendant::td//a[@title='9:00 AM - 9:15 AM']";
+		addAppointmentWithDemo(By.xpath(xpathAt9), currWindowHandle, "t");//To Do
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
+		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
+				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
+
+		//Schedule View of the first provider
+		driver.findElement(By.xpath("//a[contains(., '" + drApple.lastName + "')]")).click();
+		Assert.assertTrue(
+				"Appointment with demographic selected is NOT added successfully under the first provider.",
+				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
+
+		//Add an appointment at 10:00-10:15 with NO demographic selected under the second provider.
+		driver.findElement(By.linkText("Group View")).click();
+		String xpathAt10 =
+				"//a[contains(.,'" + drBerry.lastName + "')]" +
+						"/ancestor::tr/following-sibling::tr" +
+						"/descendant::td//a[@title='10:00 AM - 10:15 AM']";
+		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");//To Do
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
+		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
+				PageUtil.isExistsBy(By.linkText("."), driver));
+
+		//Schedule View of the second provider
+		driver.findElement(By.xpath("//a[contains(., '" + drBerry.lastName + "')]")).click();
+		Assert.assertTrue(
+				"Appointment with NO demographic selected is NOT added successfully under the second provider.",
+				PageUtil.isExistsBy(By.linkText("."), driver));
+	}
+}

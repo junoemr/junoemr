@@ -22,25 +22,69 @@
  */
 package integration.tests.util.junoUtil;
 
-import org.oscarehr.common.dao.utils.AuthUtils;
+import integration.tests.util.data.ProviderTestCollection;
+import integration.tests.util.data.ProviderTestData;
+import org.oscarehr.common.dao.ProviderSiteDao;
+import org.oscarehr.common.dao.SiteDao;
+import org.oscarehr.common.model.ProviderSite;
+import org.oscarehr.common.model.ProviderSitePK;
+import org.oscarehr.common.model.Site;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.util.SpringUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import static integration.tests.util.data.ProviderTestCollection.providerLNames;
+import static integration.tests.util.data.SiteTestCollection.*;
+import static org.oscarehr.common.dao.utils.AuthUtils.TEST_PROVIDER_ID;
+
 public class DatabaseUtil
 {
-	public static Demographic createTestDemographic()
+	public static Demographic createTestDemographic(String fName, String lName, String sex)
 	{
 		DemographicService demoService = (DemographicService)SpringUtils.getBean("demographic.service.DemographicService");
 		Demographic demo = new Demographic();
 		demo.setDateOfBirth(LocalDate.now());
-		demo.setFirstName("test");
-		demo.setLastName("test");
-		demo.setSex("F");
-		return demoService.addNewDemographicRecord(AuthUtils.TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
+		demo.setFirstName(fName);
+		demo.setLastName(lName);
+		demo.setSex(sex);
+		demo.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
+		return demoService.addNewDemographicRecord(TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
+	}
+	public static void createTestProvider()
+	{
+		ProviderService providerService = (ProviderService) SpringUtils.getBean("provider.service.ProviderService");
+		for (String provider : providerLNames)
+		{
+			ProviderData demoProvider = new ProviderData();
+			ProviderTestData dr = ProviderTestCollection.providerMap.get(provider);
+			demoProvider.setProviderNo(Integer.parseInt(dr.providerNo));
+			demoProvider.setFirstName(dr.firstName);
+			demoProvider.setLastName(dr.lastName);
+			providerService.addNewProvider(TEST_PROVIDER_ID, demoProvider, "");
+		}
+	}
+	public static void createProviderSite()
+	{
+		SiteDao siteDao = SpringUtils.getBean(SiteDao.class);
+		Site newSite = new Site();
+		newSite.setName(siteNames[0]);
+		newSite.setBgColor(themeColors[0]);
+		newSite.setShortName(shortNames[0]);
+		newSite.setStatus((byte) 1);
+		newSite.setProvince("BC");
+		siteDao.persist(newSite);
+		Integer siteAddedId = newSite.getId();
+		ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
+		ProviderSite providerAssignSite = new ProviderSite();
+		providerAssignSite.setId(new ProviderSitePK());
+		providerAssignSite.getId().setProviderNo(TEST_PROVIDER_ID);
+		providerAssignSite.getId().setSiteId(siteAddedId);
+		providerSiteDao.persist(providerAssignSite);
 	}
 }

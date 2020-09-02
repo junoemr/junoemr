@@ -48,21 +48,21 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new appointment mapper
 	 */
-	public static AppointmentMapper newAppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
+	public static AppointmentMapper newAppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData)
 	{
 		switch(importSource)
 		{
 			case MEDACCESS:
 			{
-				return new AppointmentMapperMedaccess(message, importSource);
+				return new AppointmentMapperMedaccess(message, recordData);
 			}
 			case ACCURO:
 			{
-				return new AppointmentMapperAccuro(message, importSource);
+				return new AppointmentMapperAccuro(message, recordData);
 			}
 			default:
 			{
-				return new AppointmentMapper(message, importSource);
+				return new AppointmentMapper(message, importSource, recordData);
 			}
 		}
 	}
@@ -164,21 +164,21 @@ public class MapperFactory
 	 * @param importSource - source of import
 	 * @return - new history mapper
 	 */
-	public static HistoryNoteMapper newHistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public static HistoryNoteMapper newHistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource, CoPDRecordData recordData) throws HL7Exception
 	{
 		switch(importSource)
 		{
 			case MEDACCESS:
 			{
-				return new HistoryNoteMapperMedaccess(message, providerRep);
+				return new HistoryNoteMapperMedaccess(message, providerRep, recordData);
 			}
 			case MEDIPLAN:
 			{
-				return new HistoryNoteMapperMediplan(message, providerRep);
+				return new HistoryNoteMapperMediplan(message, providerRep, recordData);
 			}
 			default:
 			{
-				return new HistoryNoteMapper(message, providerRep, importSource);
+				return new HistoryNoteMapper(message, providerRep, importSource, recordData);
 			}
 		}
 	}

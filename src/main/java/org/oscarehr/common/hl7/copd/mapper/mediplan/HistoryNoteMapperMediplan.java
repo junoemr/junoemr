@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.mapper.HistoryNoteMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.oscarehr.util.MiscUtils;
@@ -46,9 +47,9 @@ public class HistoryNoteMapperMediplan extends HistoryNoteMapper
 
 	private static final Logger logger = MiscUtils.getLogger();
 
-	public HistoryNoteMapperMediplan(ZPD_ZTR message, int providerRep) throws HL7Exception
+	public HistoryNoteMapperMediplan(ZPD_ZTR message, int providerRep, CoPDRecordData recordData) throws HL7Exception
 	{
-		super(message, providerRep, CoPDImportService.IMPORT_SOURCE.MEDIPLAN);
+		super(message, providerRep, CoPDImportService.IMPORT_SOURCE.MEDIPLAN, recordData);
 	}
 
 	// ---------------------------------------------------------------------------------------
