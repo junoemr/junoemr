@@ -296,6 +296,7 @@ public class BillingDao extends AbstractDao<Billing> {
 			}
 	    }
 
+		// the LEFT is to handle the "" value that is in a char() column in DB which crashes hibernate
 	    String billingQuery =
 				"SELECT " +
 					"b.billing_no, " +
