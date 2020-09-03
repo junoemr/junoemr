@@ -45,7 +45,9 @@
 				background-color: transparent;
 
 				.dndDraggingSource {
-					display: none;
+					.appointment-card {
+						filter: opacity(50%);
+					}
 				}
 
 				.dndPlaceholder {
