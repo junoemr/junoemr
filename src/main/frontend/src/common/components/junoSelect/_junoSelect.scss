@@ -1,0 +1,29 @@
+.juno-select {
+	.select-container {
+		@include juno-form-inputs-style();
+		@include juno-form-inputs-colors-default();
+
+		position: relative;
+		flex: 1 1 0;
+
+		select {
+			-moz-appearance: none;
+			-webkit-appearance: none;
+			appearance: none;
+			cursor: pointer;
+			background-image: none;
+
+			width: 100%;
+			padding: 0 16px 0 16px;
+
+		}
+
+		.icon {
+				position: absolute;
+				right: 8px;
+				top: calc(50% - 8px);
+				font-size: 16px;
+				pointer-events: none;
+		}
+	}
+}

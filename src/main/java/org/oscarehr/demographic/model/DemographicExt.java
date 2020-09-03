@@ -45,6 +45,8 @@ import javax.persistence.Transient;
 @Table(name="demographicExt")
 public class DemographicExt extends AbstractModel<Integer> implements Serializable {
 
+	public static final String KEY_DEMO_CELL = "demo_cell";
+
 	@Transient
     private int hashCode = Integer.MIN_VALUE;// primary key
 	@Id

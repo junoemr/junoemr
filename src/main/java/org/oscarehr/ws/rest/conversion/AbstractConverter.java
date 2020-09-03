@@ -37,6 +37,7 @@ import org.oscarehr.util.LoggedInInfo;
  * 		Transfer object type
  */
 // TODO define TO interface and bound T by that
+@Deprecated // use the AbstractModelConverter which can be autowired
 public abstract class AbstractConverter<D, T> {
 
 	

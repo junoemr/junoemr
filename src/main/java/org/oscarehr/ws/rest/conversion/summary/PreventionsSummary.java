@@ -98,10 +98,10 @@ public class PreventionsSummary implements Summary {
 				
 		List<String> items = new ArrayList<String>();
 
-		for (HashMap<String, String> prevension : prevList)
+		for (HashMap<String, String> prevention : prevList)
 		{
 
-			String prevName = prevension.get("name");
+			String prevName = prevention.get("name");
 			ArrayList<Map<String, Object>> alist = PreventionData.getPreventionData(
 					loggedInInfo, prevName, demographic);
 
@@ -109,7 +109,7 @@ public class PreventionsSummary implements Summary {
 			PreventionData.addRemotePreventions(
 					loggedInInfo, alist, demographic, prevName, demographicDateOfBirth);
 
-			boolean show = pdc.display(loggedInInfo, prevension, demographic, alist.size());
+			boolean show = pdc.display(prevention, demographic, alist.size());
 			if (show)
 			{
 				//add warnings right away so they display first

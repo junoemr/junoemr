@@ -20,7 +20,6 @@
  * Victoria, British Columbia
  * Canada
  */
-
 package org.oscarehr.integration.myhealthaccess.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

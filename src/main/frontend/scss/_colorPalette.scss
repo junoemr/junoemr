@@ -1,5 +1,45 @@
 
 // Colour Palette
+:root {
+	--color-neutral-black: #242833;
+	--color-neutral-darkest: #262933;
+	--color-neutral-darker: #45474d;
+	--color-neutral-dark: #585f73;
+	--color-neutral-dark-grey: #737780;
+	--color-neutral-grey: #70778c;
+	--color-neutral-light-grey: #b5bac9;
+	--color-neutral-light: #d0d5e3;
+	--color-neutral-lighter: #e6e9f0;
+	--color-neutral-lightest: #f2f4f7;
+	--color-neutral-white: #ffffff;
+
+	--color-primary-darkest: #1a2033;
+	--color-primary-darker: #1f2e59;
+	--color-primary-dark: #384d8c;
+	--color-primary-base: #455899;
+	--color-primary-light: #6680cc;
+	--color-primary-lighter: #8aa1e6;
+	--color-primary-lightest: #bfcfff;
+
+	--color-red-darkest: #401616;
+	--color-red-darker: #661a1a;
+	--color-red-dark: #991f1f;
+	--color-red-base: #cc2929;
+	--color-red-light: #e65c5c;
+	--color-red-lighter: #e68a8a;
+	--color-red-lightest: #ffcccc;
+
+	--color-orange-darkest: #4d2a08;
+	--color-orange-darker: #80460d;
+	--color-orange-dark: #b36212;
+	--color-orange-base: #e67e17;
+	--color-orange-light: #e69545;
+	--color-orange-lighter: #f2b679;
+	--color-orange-lightest: #ffd9b3;
+}
+
+//deprecated - use css variables above
+
 $color-primary-darkest: #1a2033;
 $color-primary-darker: #1f2e59;
 $color-primary-dark: #384d8c;
@@ -18,10 +58,10 @@ $color-secondary-lightest: #e4ffbf;
 
 $color-neutral-black: #242833;
 $color-neutral-darkest: #262933;
-$color-neutral-darker: #393e4d;
+$color-neutral-darker: #45474d;
 $color-neutral-dark: #585f73;
-$color-neutral-dark-grey: #70778c;
-$color-neutral-grey: #8f95a8;
+$color-neutral-dark-grey: #737780;
+$color-neutral-grey: #70778c;
 $color-neutral-light-grey: #b5bac9;
 $color-neutral-light: #d0d5e3;
 $color-neutral-lighter: #e6e9f0;
@@ -161,3 +201,7 @@ $color-timepicker-border: #CCC;
 $input-color-invalid-background: #ffefef;
 $input-color-invalid-border: #a94442;
 $input-color-invalid-text: #a94442;
+
+@mixin background-opacity($color, $opacity) {
+	background-color: rgba($color, $opacity);
+}

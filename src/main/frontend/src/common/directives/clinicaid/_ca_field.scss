@@ -10,4 +10,19 @@
 			background-color: white;
 		}
 	}
+
+	input.form-control {
+		background-color: white;
+
+		&.input:focus {
+			background-color: white;
+		}
+	}
+
+	/**
+    * custom css for the field-toggle-juno directive
+    */
+	.juno-checkbox {
+		@include juno-checkbox;
+	}
 }

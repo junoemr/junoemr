@@ -315,22 +315,23 @@ public class LoginService
 
 	/**
 	 * get the security record based on the username
-	 *
 	 * @param username username to get security record for
 	 * @return null if no entry found, otherwise corresponding security entry
 	 */
-	private Security getSecurity(String username)
-	{
+	private Security getSecurity(String username) {
 
 		SecurityDao securityDao = (SecurityDao) SpringUtils.getBean("securityDao");
 		Security security = securityDao.findByUserName(username);
 
+		// attempt email lookup.
 		if (security == null)
 		{
-			return null;
+			security = securityDao.findByEmail(username);
 		}
-		else if (OscarProperties.isLdapAuthenticationEnabled())
-		{
+
+		if (security == null) {
+			return null;
+		} else if (OscarProperties.isLdapAuthenticationEnabled()) {
 			security = new LdapSecurity(security);
 		}
 

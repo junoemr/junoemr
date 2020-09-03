@@ -1,0 +1,50 @@
+.juno-simple-modal-window {
+	display: flex !important;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden !important;
+
+	$modal-border-radius: 8px;
+	--juno-simple-modal-width: 480px;
+	--juno-simple-modal-height: 248px;
+
+	.modal-content {
+		-webkit-border-radius: $modal-border-radius !important;
+		-moz-border-radius: $modal-border-radius !important;
+		border-radius: $modal-border-radius !important;
+		border: none;
+	}
+
+	.modal-dialog, .modal-content {
+		width: var(--juno-simple-modal-width);
+		height: var(--juno-simple-modal-height);
+	}
+
+	.juno-simple-modal {
+		padding: 24px 16px 16px 16px;
+
+		$modal-border-radius: 8px;
+		--juno-simple-modal-width: 400px;
+		--juno-simple-modal-height: 400px;
+
+		-webkit-border-radius: $modal-border-radius !important;
+		-moz-border-radius: $modal-border-radius !important;
+		border-radius: $modal-border-radius !important;
+
+		.close-btn {
+			position: absolute;
+			top: 0;
+			right: 0;
+
+			.juno-button {
+				margin: 8px 8px 0 0;
+				height: 24px;
+
+				i {
+					font-size: 16px;
+				}
+			}
+		}
+	}
+}

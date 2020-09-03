@@ -27,8 +27,8 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -47,26 +47,20 @@ public class EFormTests extends SeleniumTestBase
 	private static String EFORM_URL = "/eform/efmformslistadd.jsp?demographic_no=1&appointment=&parentAjaxId=eforms";
 
 	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException
+	{
+		loadSpringBeans();
+		DatabaseUtil.createTestDemographic("Test", "Test", "F");
+		SchemaUtils.loadFileIntoMySQL(SqlFiles.EFORM_ADD_TRAVLE_FORM_V4);
+	}
+
+	@AfterClass
+	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
 		SchemaUtils.restoreTable("admission", "demographic",
 				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
 				"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
 				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "eform", "eform_values");
-
-		loadSpringBeans();
-		DatabaseUtil.createTestDemographic();
-
-		SchemaUtils.loadFileIntoMySQL(SqlFiles.EFORM_ADD_TRAVLE_FORM_V4);
-	}
-
-	@Before
-	public void login()
-	{
-		if(!Navigation.isLoggedIn(driver))
-		{
-			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
-		}
 	}
 
 	@Test

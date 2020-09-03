@@ -26,15 +26,13 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.SiteTestCollection;
 import integration.tests.util.data.SiteTestData;
-import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
-import org.junit.BeforeClass;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.io.IOException;
@@ -42,11 +40,10 @@ import java.sql.SQLException;
 
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 
-public class AddSitesTests extends SeleniumTestBase {
-
-
-	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+public class AddSitesTests extends SeleniumTestBase
+{
+	@AfterClass
+	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "site");
 	}
@@ -79,12 +76,10 @@ public class AddSitesTests extends SeleniumTestBase {
 	}
 
 	@Test
-	public void addSitesClassicUITest() throws Exception {
+	public void addSitesClassicUITest() throws Exception
+	{
 		SiteTestData site = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[0]);
-		// login
-		if (!Navigation.isLoggedIn(driver)) {
-			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
-		}
+
 		// open administration panel
 		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("admin-panel")));
@@ -99,8 +94,6 @@ public class AddSitesTests extends SeleniumTestBase {
 	public void addSitesJUNOUITest() throws Exception
 	{
 		SiteTestData siteJuno = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[1]);
-		// login
-		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
 
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();

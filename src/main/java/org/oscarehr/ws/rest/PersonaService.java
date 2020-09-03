@@ -28,6 +28,7 @@ import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.admin.service.AdminNavService;
+import org.oscarehr.common.IsPropertiesOn;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.Dashboard;
 import org.oscarehr.common.model.Provider;
@@ -272,18 +273,34 @@ public class PersonaService extends AbstractServiceImpl {
 			consultMenu.setDropdownItems(consultMenuList.getItems());
 			menu.getItems().add(consultMenu);
 		}
-		
+
+		//TODO add "star" states, Ex: admin.* to indicate any state starting with admin
 		menu.addWithState(idCounter++,bundle.getString("navbar.menu.tickler"),null,"ticklers")
 			//.add(0,"K2A",null,"#/k2a")
 			.addWithState(idCounter++,bundle.getString("navbar.menu.billing"),null,"billing")
 			.addWithStates(idCounter++,bundle.getString("navbar.menu.admin"),null,
 							Arrays.asList("admin.landingPage",
-														"admin.frame",
-														"admin.faxConfig",
-														"admin.faxSendReceive",
-														"admin.integrationModules"))
+											"admin.frame",
+											"admin.faxConfig",
+											"admin.faxSendReceive",
+											"admin.integrationModules",
+											"admin.panelManagement",
+											"admin.iceFall",
+											"admin.iceFall.settings",
+											"admin.iceFall.activity",
+											"admin.addUser",
+											"admin.editUser",
+											"admin.viewUser",
+											"admin.manageUsers",
+											"admin.manageAppointmentQueues"))
 			.addWithState(idCounter++,bundle.getString("navbar.menu.reports"),null,"reports")
 			.addWithState(idCounter++,bundle.getString("navbar.menu.documents"),null,"documents");
+
+		if (IsPropertiesOn.isTelehealthEnabled())
+		{
+			menu.add(idCounter++, "MyHealthAccess", null,
+					"../integrations/myhealthaccess.do?method=connectOrList");
+		}
 
 		MenuItemTo1 moreMenu = new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.more"), null);
 		moreMenu.setDropdown(true);
