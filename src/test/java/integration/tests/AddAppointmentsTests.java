@@ -127,8 +127,10 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		addAppointmentPageWithDemo(currWindowHandle, status);
 	}
 
-	public static void addAppointmentWithNODemo(By timeFrame,Set<String> oldWindowHandles, String currWindowHandle, String status)
+	public void
+	addAppointmentWithNODemo(By timeFrame, Set<String> oldWindowHandles, String currWindowHandle, String status)
 	{
+		wait.until(ExpectedConditions.elementToBeClickable(timeFrame));
 		driver.findElement(timeFrame).click();
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 		PageUtil.switchToWindow(newWindows.get(newWindows.size() - 1), driver);

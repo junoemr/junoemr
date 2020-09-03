@@ -45,17 +45,20 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 
 public class AddPatientsTests extends SeleniumTestBase
 {
+	WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+
 	@AfterClass
 	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
-		SchemaUtils.restoreTable("admission", "appointment", "demographic",
+		SchemaUtils.restoreTable("admission", "demographic",
 				"demographicArchive", "demographiccust", "demographicExt", "demographicExtArchive", "log", "log_ws_rest",
 				"program", "provider_recent_demographic_access");
 	}
 
-	public static boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException
+	public boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException
 	{
 		driver.findElement(searchPage).click();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(searchTerm));
 		WebElement searchTermField = driver.findElement(searchTerm);
 		searchTermField.sendKeys(lastName + ", " + firstName);
 		searchTermField.sendKeys(Keys.ENTER);
@@ -171,7 +174,6 @@ public class AddPatientsTests extends SeleniumTestBase
 	{
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
-		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title=\"Add a new Patient\"]")));
 
 		// Add a demographic record page
@@ -191,6 +193,7 @@ public class AddPatientsTests extends SeleniumTestBase
 		driver.findElement(By.id("input-email")).sendKeys(son.email);
 		driver.findElement(By.id("input-phone")).sendKeys(son.homePhone);
 		driver.findElement(By.xpath("//button[@ng-click='$ctrl.onAdd()']")).click();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title='Search']")));
 
 		Assert.assertTrue(isPatientAdded(son.lastName, son.firstName,
 				By.xpath("//button[@title='Search']"),
