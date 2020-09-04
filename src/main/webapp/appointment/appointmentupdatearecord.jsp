@@ -107,7 +107,10 @@
 		int demographicNo = appt.getDemographicNo();
 		try
 		{
-			reasonCode = Integer.parseInt(request.getParameter("reasonCode"));
+			if (request.getParameter("reasonCode") != null)
+			{
+				reasonCode = Integer.parseInt(request.getParameter("reasonCode"));
+			}
 			demographicNo = Integer.parseInt(headRecord);
 		}
 		catch (NumberFormatException e)
