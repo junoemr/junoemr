@@ -79,19 +79,22 @@ public class AddPreventionAction  extends Action {
          String neverWarn = request.getParameter("neverWarn");
 
 		 String refused = String.valueOf(Prevention.REFUSED_STATUS_COMPLETED);
-		 if ("refused".equals(given) || "never".equals(given))
+		 if (Prevention.REFUSED.equals(given) || Prevention.NEVER.equals(given))
 		 {
 			 refused = String.valueOf(Prevention.REFUSED_STATUS_REFUSED);
 		 }
-		 else if ("ineligible".equals(given) || "previous".equals(given))
+		 else if (Prevention.INELIGIBLE.equals(given) || Prevention.PREVIOUS.equals(given))
 		 {
 			refused = String.valueOf(Prevention.REFUSED_STATUS_INELIGIBLE);
 		 }
 
-         if (neverWarn != null && neverWarn.equals("neverRemind")){
-            neverWarn = "1";
-         }else{
-            neverWarn = "0";
+         if (Prevention.NEVER_REMIND.equals(neverWarn))
+         {
+            neverWarn = String.valueOf(Prevention.NEVER_SEND_REMINDER);
+         }
+         else
+         {
+            neverWarn = String.valueOf(Prevention.SEND_REMINDER);
          }
          
          ArrayList<Map<String,String>> extraData = new ArrayList<Map<String,String>>();

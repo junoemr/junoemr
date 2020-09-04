@@ -72,8 +72,8 @@
     String id = request.getParameter("id");
     Map<String, Object> existingPrevention = null;
 
-    String providerName ="";
-    String lot ="";
+    String providerName = "";
+    String lot = "";
     String provider = (String) session.getValue("user");
     Date currentDate = new Date();
     String prevDate = ConversionUtils.toDateString(currentDate, ConversionUtils.TS_NO_SEC_PATTERN);
@@ -97,20 +97,19 @@
         provider = (String) existingPrevention.get("provider_no");
         creatorProviderNo = (String) existingPrevention.get("creator");
 
-        if (existingPrevention.get("refused") != null
-                && existingPrevention.get("refused").equals(String.valueOf(Prevention.REFUSED_STATUS_REFUSED)))
+        if (String.valueOf(Prevention.REFUSED_STATUS_REFUSED).equals(existingPrevention.get("refused")))
         {
             completed = String.valueOf(Prevention.REFUSED_STATUS_REFUSED);
         }
-        else if (existingPrevention.get("refused") != null
-                && existingPrevention.get("refused").equals(String.valueOf(Prevention.REFUSED_STATUS_INELIGIBLE)))
+        else if (String.valueOf(Prevention.REFUSED_STATUS_INELIGIBLE).equals(existingPrevention.get("refused")))
         {
             completed = String.valueOf(Prevention.REFUSED_STATUS_INELIGIBLE);
         }
-        if ( existingPrevention.get("never") != null && existingPrevention.get("never").equals("1") )
+        if (String.valueOf(Prevention.NEVER_SEND_REMINDER).equals(existingPrevention.get("never")))
         {
             never = true;
         }
+
         nextDate = (String) existingPrevention.get("next_date");
         if ( nextDate == null || nextDate.equalsIgnoreCase("null") || nextDate.equals("0000-00-00"))
         {

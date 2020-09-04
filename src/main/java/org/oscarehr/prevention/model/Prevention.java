@@ -96,10 +96,22 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 	private List<PreventionExt> preventionExtensionList;
 
 	// The names are weird, these are all the possible values for the "refused" column
-	// also who the hell made these literal chars
 	public static final char REFUSED_STATUS_COMPLETED = '0';
 	public static final char REFUSED_STATUS_REFUSED = '1';
 	public static final char REFUSED_STATUS_INELIGIBLE = '2';
+
+	public static final char IS_ACTIVE = '0';
+	public static final char IS_DELETED = '1';
+
+	// for the 'never' column, seems to refer to whether to send a reminder to patient
+	public static final char SEND_REMINDER = '0';
+	public static final char NEVER_SEND_REMINDER = '1';
+
+	public static final String REFUSED = "refused";
+	public static final String NEVER = "never";
+	public static final String INELIGIBLE = "ineligible";
+	public static final String PREVIOUS = "previous";
+	public static final String NEVER_REMIND = "neverRemind";
 
 	public Integer getDemographicId() {
 		return demographicId;
@@ -141,12 +153,14 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 		this.preventionType = preventionType;
 	}
 
-	public boolean isDeleted() {
-		return deleted=='1';
+	public boolean isDeleted()
+	{
+		return deleted == IS_DELETED;
 	}
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted ? '1' : '0';
+	public void setDeleted(boolean deleted)
+	{
+		this.deleted = deleted ? IS_DELETED : IS_ACTIVE;
 	}
 
 	public boolean isRefused()
@@ -182,7 +196,7 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 	}
 
 	public void setNever(boolean never) {
-		this.never = never ? '1' : '0';
+		this.never = never ? NEVER_SEND_REMINDER : SEND_REMINDER;
 	}
 
 	public String getCreatorProviderNo() {
