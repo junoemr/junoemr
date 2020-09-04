@@ -72,6 +72,7 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import oscar.OscarProperties;
 import oscar.form.FrmLabReq07Record;
 import oscar.form.FrmLabReq10Record;
+import oscar.oscarEncounter.oscarMeasurements.util.MeasurementDSHelper;
 
 public class RenalAction extends DispatchAction {
 
@@ -172,14 +173,7 @@ public class RenalAction extends DispatchAction {
 		Double aYearAgoEgfr = null;
 		if(currentEgfr != null)
 		{
-			try
-			{
-				latestEgfr = Double.valueOf(currentEgfr.getDataField());
-			}
-			catch (NumberFormatException e)
-			{
-				MiscUtils.getLogger().warn("Following EGFR measurement contains non-numeric data: " + currentEgfr.getDataField());
-			}
+			latestEgfr = MeasurementDSHelper.getMeasurementValue(currentEgfr);
 
 			Date latestEgfrDate = currentEgfr.getDateObserved();
 			if(latestEgfrDate != null)
@@ -193,15 +187,7 @@ public class RenalAction extends DispatchAction {
 				List<Measurement> previousMeasurements = measurementDao.findByTypeBefore(Integer.parseInt(demographicNo), "EGFR",aYearBefore);
 				if(previousMeasurements.size() > 0)
 				{
-					Measurement measurement = previousMeasurements.get(0);
-					try
-					{
-						aYearAgoEgfr = Double.valueOf(measurement.getDataField());
-					}
-					catch (NumberFormatException e)
-					{
-						MiscUtils.getLogger().warn("Following EGFR measurement contains non-numeric data: " + measurement.getDataField());
-					}
+					aYearAgoEgfr = MeasurementDSHelper.getMeasurementValue(previousMeasurements.get(0));
 				}
 			}
 		}
@@ -209,14 +195,7 @@ public class RenalAction extends DispatchAction {
 		Double latestAcr = null;
 		if(currentAcr != null)
 		{
-			try
-			{
-				latestAcr = Double.valueOf(currentAcr.getDataField());
-			}
-			catch (NumberFormatException e)
-			{
-				MiscUtils.getLogger().warn("Following ACR measurement contains non-numeric data: " + currentAcr.getDataField());
-			}
+			latestAcr = MeasurementDSHelper.getMeasurementValue(currentAcr);
 		}
 
 		if((latestEgfr != null && latestEgfr < 30) || (latestAcr != null && latestAcr >= 60)) {
@@ -418,4 +397,5 @@ public class RenalAction extends DispatchAction {
 		return null;
 		
 	}
+
 }

@@ -347,18 +347,6 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 		return results;
 	}
 
-	public List<Measurement> findByDemographicNoAndType(Integer demographicNo, String type) {
-		String sqlCommand = "select x from Measurement x where x.demographicId = ?1 and x.type=?2";
-
-		Query query = entityManager.createQuery(sqlCommand);
-		query.setParameter(1, demographicNo);
-		query.setParameter(2, type);
-
-		List<Measurement> results = query.getResultList();
-
-		return results;
-	}
-
 	public Measurement findLatestByDemographicNoAndType(int demographicNo, String type)
 	{
 		String sqlCommand = "SELECT x " +
