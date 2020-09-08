@@ -202,6 +202,12 @@ public class QueuedAppointmentService extends BaseService
 		appointment.setName(demographic.getDisplayName());
 		appointment.setIsVirtual(true);
 
+		// Mark as self booked if booked through MHA
+		if (queuedAppointment.getCreatedByType() == QueuedAppointment.CREATED_BY_TYPE.MHA_PATIENT)
+		{
+			appointment.setBookingSource(Appointment.BookingSource.MYOSCAR_SELF_BOOKING);
+		}
+
 		// book 15 min appointment
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(now);
