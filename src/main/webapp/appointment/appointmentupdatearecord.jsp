@@ -73,7 +73,7 @@
 	</tr>
 </table>
 	<%
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+ 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String updateuser = loggedInInfo.getLoggedInProviderNo();
 		final String cancelledAppointment = "Cancel Appt";
 
@@ -92,12 +92,12 @@
 		Date endDate = ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time"));
 
 		String appointmentName = ConversionUtils.getStringOrDefaultValue(request.getParameter("keyword"), appt.getName());
-		String notes = ConversionUtils.getStringOrDefaultValue(request.getParameter("notes"), appt.getNotes());
-		String reason = ConversionUtils.getStringOrDefaultValue(request.getParameter("reason"), appt.getReason());
-		String location = ConversionUtils.getStringOrDefaultValue(request.getParameter("location"), appt.getLocation());
+		String notes = ConversionUtils.getStringOrDefaultValue(request.getParameter("notes"), "");
+		String reason = ConversionUtils.getStringOrDefaultValue(request.getParameter("reason"), "");
+		String location = ConversionUtils.getStringOrDefaultValue(request.getParameter("location"), "");
 		String isVirtual = ConversionUtils.getStringOrDefaultValue(request.getParameter("isVirtual"), "off");
-		String resources = ConversionUtils.getStringOrDefaultValue(request.getParameter("resources"), appt.getResources());
-		String type = ConversionUtils.getStringOrDefaultValue(request.getParameter("type"), appt.getType());
+		String resources = ConversionUtils.getStringOrDefaultValue(request.getParameter("resources"), "");
+		String type = ConversionUtils.getStringOrDefaultValue(request.getParameter("type"), "");
 		String style = ConversionUtils.getStringOrDefaultValue(request.getParameter("style"), appt.getStyle());
 		String billing = ConversionUtils.getStringOrDefaultValue(request.getParameter("billing"), appt.getBilling());
 		String remarks = ConversionUtils.getStringOrDefaultValue(request.getParameter("remarks"), appt.getRemarks());
