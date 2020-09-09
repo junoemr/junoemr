@@ -33,31 +33,32 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.util.LoggedInInfo;
 
-import oscar.oscarProvider.data.ProviderFaxUpdater;
-
+import org.oscarehr.util.SpringUtils;
 
 public class ProEditFaxNumAction extends Action {
+
+    private ProviderManager2 providerManager2 = SpringUtils.getBean(ProviderManager2.class);
 
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
         throws Exception
     {
-        String forward;
         String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-        if ( providerNo == null)
-              return mapping.findForward("eject");
+        if (providerNo == null)
+        {
+            return mapping.findForward("eject");
+        }
 
         DynaActionForm frm = (DynaActionForm)form;
                 
-        ProviderFaxUpdater faxUpdater = new ProviderFaxUpdater(providerNo);
-        if( faxUpdater.setFax((String)frm.get("faxNumber"))) {
-            request.setAttribute("status",new String("complete"));
-            forward = new String("success");
-        }
-        else
-            forward = new String("error");
-        
+        String faxNumber = (String)frm.get("faxNumber");
+        providerManager2.updateSingleSetting(providerNo, UserProperty.PROVIDER_FAXNUMBER, faxNumber);
+        request.setAttribute("status", "complete");
+        String forward = "success";
+
         return mapping.findForward(forward);
         
     }
