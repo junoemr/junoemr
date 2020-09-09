@@ -41,6 +41,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarProvider.data.ProviderData;
+import oscar.util.ConversionUtils;
 import oscar.util.DateUtils;
 import oscar.util.UtilDateUtilities;
 
@@ -69,11 +70,11 @@ public class PreventionData {
 			Prevention prevention = new Prevention();
 			prevention.setCreatorProviderNo(creator);
 			prevention.setDemographicId(Integer.valueOf(demoNo));
-			prevention.setPreventionDate(UtilDateUtilities.StringToDate(date, "yyyy-MM-dd HH:mm"));
+			prevention.setPreventionDate(ConversionUtils.fromDateString(date, ConversionUtils.TS_NO_SEC_PATTERN));
 			prevention.setProviderNo(providerNo);
 			prevention.setProviderName(providerName);
 			prevention.setPreventionType(preventionType);
-			prevention.setNextDate(UtilDateUtilities.StringToDate(nextDate, "yyyy-MM-dd"));
+			prevention.setNextDate(ConversionUtils.fromDateString(nextDate, ConversionUtils.DEFAULT_DATE_PATTERN));
 			prevention.setNever(neverWarn.trim().equals("1"));
 			if (refused.trim().equals("1")) prevention.setRefused(true);
 			else if (refused.trim().equals("2")) prevention.setIneligible(true);
@@ -83,8 +84,8 @@ public class PreventionData {
 
 			insertId = prevention.getId();
 			for (int i = 0; i < list.size(); i++) {
-				Map<String, String> h = list.get(i);
-				for (Map.Entry<String, String> entry : h.entrySet()) {
+				Map<String, String> preventionMap = list.get(i);
+				for (Map.Entry<String, String> entry : preventionMap.entrySet()) {
 					if (entry.getKey() != null && entry.getValue() != null) {
 						addPreventionKeyValue("" + insertId, entry.getKey(), entry.getValue());
 					}
