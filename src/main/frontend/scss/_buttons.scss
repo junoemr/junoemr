@@ -5,6 +5,146 @@
 	border-color: $border-color;
 }
 
+// color a single button
+@mixin juno-button-color($color, $background-color, $border-color,
+						$hover-color, $hover-background-color, $hover-border-color,
+						$active-color, $active-background-color, $active-border-color) {
+	color: $color;
+	background-color: $background-color;
+	border-color: $border-color;
+	--background: $background-color;
+	--color-focused: $active-color;
+	--color-activated: $active-color;
+	--background-activated: $active-border-color;
+	--background-focused: $active-background-color;
+	box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.3);
+
+	&:active,
+	&:focus,
+	&:focus:active {
+		color: $active-color;
+		background-color: $active-background-color;
+		border-color: $active-border-color;
+	}
+
+	@media only screen and (min-width: 769px) {
+		&:hover {
+			color: $hover-color;
+			background-color: $hover-background-color;
+			border-color: $hover-border-color;
+		}
+	}
+}
+
+@mixin juno-button-pattern($color-base, $color-dark, $color-darker, $color-darkest,
+ $text-color-base, $text-color-active: var(--color-neutral-white)) {
+
+	// default pattern
+	@include juno-button-color($text-color-base, var(--color-neutral-white), var(--color-neutral-lighter),
+			$text-color-active, $color-base, $color-base,
+			$text-color-active, $color-dark, $color-dark
+	);
+
+	&.colored {
+		@include juno-button-color($color-base, var(--color-neutral-white), var(--color-neutral-lighter),
+				$text-color-active, $color-base, $color-base,
+				$text-color-active, $color-dark, $color-dark
+		);
+	}
+
+	// same as default pattern but hover state is darker
+	&.dark-hover {
+		@include juno-button-color($text-color-base, var(--color-neutral-white), var(--color-neutral-light),
+				$text-color-active, $color-dark, $color-dark,
+				$text-color-active, $color-darker, $color-darker
+		);
+	}
+
+	// button is coloured with light text, darker hover states
+	&.fill {
+		@include juno-button-color($text-color-active, $color-base, $color-base,
+				$text-color-active, $color-dark, $color-dark,
+				$text-color-active, $color-darker, $color-darker
+		);
+	}
+
+	&.fill-light {
+		@include juno-button-color($text-color-active, $color-base, $color-base,
+				$text-color-active, $color-dark, $color-dark,
+				$text-color-active, $color-darker, $color-darker
+		);
+	}
+
+	&.fill-dark {
+		@include juno-button-color($text-color-active, $color-dark, $color-dark,
+				$text-color-active, $color-darker, $color-darker,
+				$text-color-active, $color-darkest, $color-darkest
+		);
+	}
+
+	// only text is visible
+	&.transparent {
+		@include juno-button-color($color-base, transparent, transparent,
+				$color-dark, transparent, transparent,
+				$color-darker, transparent, transparent
+		);
+		box-shadow: none;
+		--color-focused: $color-dark;
+		--color-activated: $color-darker;
+		--background-activated: transparent;
+		--background-focused: transparent;
+	}
+
+	// button is/appears disabled
+	&.disabled,
+	&[disabled],
+	&.disabledStyle {
+		@include juno-button-color(var(--color-neutral-light-grey), var(--color-neutral-lightest), var(--color-neutral-lighter),
+				var(--color-neutral-light-grey), var(--color-neutral-lightest), var(--color-neutral-lighter),
+				var(--color-neutral-light-grey), var(--color-neutral-lightest), var(--color-neutral-lighter),
+		);
+
+		&.transparent {
+			border: none;
+			background-color: transparent;
+		}
+
+		box-shadow: none;
+		--color: var(--color-neutral-grey);
+
+		& > * {
+			color: var(--color-neutral-grey);
+			--color: var(--color-neutral-grey);
+		}
+	}
+
+}
+
+@mixin juno-base-color-pattern {
+
+	// default / primary colour scheme
+	@include juno-button-pattern(var(--theme-color-primary-base), var(--theme-color-primary-accent), var(--color-primary-darker),
+			var(--theme-color-primary-text), var(--theme-color-primary-text));
+
+	&.default {
+		@include juno-button-pattern(var(--theme-color-primary-base), var(--theme-color-primary-accent), var(--color-primary-darker),
+				var(--theme-color-primary-text), var(--theme-color-primary-text));
+	}
+
+	&.greyscale-light {
+		@include juno-button-pattern(var(--color-neutral-lightest), var(--color-neutral-lighter), var(--color-neutral-light),
+				var(--color-neutral-light-grey), var(--color-neutral-darker), var(--color-neutral-darker));
+	}
+	&.greyscale-dark {
+		@include juno-button-pattern(var(--color-neutral-grey), var(--color-neutral-dark), var(--color-neutral-darker),
+				var(--color-neutral-darkest), var(--color-neutral-darker));
+	}
+	&.danger {
+		@include juno-button-pattern(var(--color-red-base), var(--color-red-dark), var(--color-red-darker),
+				var(--color-red-darkest), var(--color-neutral-darker));
+	}
+}
+
 .btn {
 	@include juno-font-button(12px, 400, 1.3);
 	display: inline-block;
@@ -22,6 +162,10 @@
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	box-shadow: 0 2px 2px rgba($color-neutral-black, 0.1);
+	&:focus,&:active {
+		outline: none !important;
+	}
 	&.btn-sm {
 		padding: 5px 10px;
 		line-height: 1.5;
@@ -42,7 +186,7 @@
 		@include juno-button-colour-scheme($color-primary-base, $color-neutral-white, $color-neutral-light);
 	}
 	&.btn-primary {
-		@include juno-button-colour-scheme($color-neutral-white, $color-primary-base, $color-primary-dark);
+		@include juno-button-colour-scheme($color-neutral-white, $color-primary-base, $color-primary-base);
 	}
 	&.btn-primary-inverted {
 		@include juno-button-colour-scheme($color-primary-base, $color-neutral-white, $color-neutral-white);
@@ -57,6 +201,13 @@
 		@include juno-button-colour-scheme($color-neutral-white, $color-red-base, $color-red-dark);
 	}
 
+	// a button that only is "active" (colored) on mouse over.
+	&.btn-active-hover {
+		&:not(:hover)
+		{
+			@include juno-button-colour-scheme($color-neutral-darker, $color-neutral-white, $color-neutral-light);
+		}
+	}
 
 	// for icon only buttons
 	&.btn-icon {

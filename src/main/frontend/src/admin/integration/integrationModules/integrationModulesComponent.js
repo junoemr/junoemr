@@ -46,6 +46,12 @@ angular.module('Admin.Integration').component('integrationModules',
 				propertyName: "icefall_enabled",
 				configUrl: ""
 			},
+			{
+				name: "Appointment Queue",
+				enabled: false,
+				propertyName: "aqs_enabled",
+				configUrl: "#!/admin/manageAppointmentQueues",
+			}
 		];
 
 		ctrl.$onInit = function()

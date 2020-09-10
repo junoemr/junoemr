@@ -351,6 +351,7 @@
 
 		<jaxrs:serviceBeans>
 			<!-- Alphabetically Please! -->
+
 			<bean autowire="byName" class="org.oscarehr.ws.rest.AllergyService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.AppointmentService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.AppService"/>
@@ -369,6 +370,13 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxOutboundWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.InboxService"/>
+			<!-- AQS (Appointment Queue Service) -->
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueueWebService"/>
+			<!-- AQS -->
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService"/>
+
 			<bean autowire="byName" class="org.oscarehr.ws.rest.MessagingService"/>
 			<!-- MHA -->
 			<bean autowire="byName" class="org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService"/>
@@ -399,7 +407,6 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SystemPreferenceWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.TicklerWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.UserMetricsService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService"/>
 
 			<!--  Not yet implemented
 

@@ -474,8 +474,9 @@ angular.module('Schedule').component('eventComponent', {
 				if (controller.demographicModel.demographicNo)
 				{
 					let integration = (await mhaIntegrationApi.searchIntegrations($scope.eventData.site)).data.body;
-					if (integration)
+					if (integration.length > 0)
 					{
+						integration = integration[0];
 						mhaDemographicApi.isPatientConfirmed(integration.id, controller.demographicModel.demographicNo, $scope.eventData.site).then((result) =>
 						{
 							if (result.data.body)
@@ -1438,8 +1439,9 @@ angular.module('Schedule').component('eventComponent', {
 				{
 					let result = controller.SENDING_NOTIFICATION_STATES.FAILED;
 					let integration = (await mhaIntegrationApi.searchIntegrations($scope.eventData.site)).data.body;
-					if (integration)
+					if (integration.length > 0)
 					{
+						integration = integration[0];
 						if (controller.mhaAppointment)
 						{
 							await mhaAppointmentApi.sendTelehealthAppointmentNotification(integration.id, controller.mhaAppointment.id)
@@ -1499,7 +1501,7 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				try
 				{
-					let integration = (await mhaIntegrationApi.searchIntegrations($scope.eventData.site)).data.body;
+					let integration = (await mhaIntegrationApi.searchIntegrations($scope.eventData.site)).data.body[0];
 					controller.mhaAppointment = (await mhaAppointmentApi.searchAppointments(integration.id, $scope.eventUuid)).data.body;
 				}
 				catch(err)

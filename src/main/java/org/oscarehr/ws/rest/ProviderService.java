@@ -30,25 +30,32 @@ import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.ProviderManager2;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
 import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
+import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditResponseTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.Consumes;
@@ -75,7 +82,10 @@ public class ProviderService extends AbstractServiceImpl {
 
 	@Autowired
 	ProviderDao providerDao;
-	
+
+	@Autowired
+	org.oscarehr.provider.service.ProviderService providerService;
+
 	@Autowired
 	ProviderManager2 providerManager;
 	
@@ -89,7 +99,7 @@ public class ProviderService extends AbstractServiceImpl {
 	private PreferenceManager preferenceManager;
 
 	@Autowired
-	private org.oscarehr.provider.service.ProviderService providerService;
+	private SecurityInfoManager securityInfoManager;
 
 	protected SecurityContext getSecurityContext() {
 		Message m = PhaseInterceptorChain.getCurrentMessage();
@@ -157,8 +167,87 @@ public class ProviderService extends AbstractServiceImpl {
 	}
 
 
+	/**
+	 * enable or disable the provider
+	 * @param id - the providerNo of the provider to enable or disable
+	 * @param enable - true to enable false to disable
+	 * @return - true on success. errorResponse on bad provider.
+	 */
+	@POST
+	@Path("/provider/{id}/update_status")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> enableProvider(@PathParam("id") Integer id, Boolean enable)
+	{
+		try
+		{
+			providerService.enableProvider(id, enable);
+			return RestResponse.successResponse(true);
+		}
+		catch (NoSuchRecordException nsre)
+		{
+			return RestResponse.errorResponse("Cannot find provider, with id: " + id);
+		}
+	}
+
+	/**
+	 * create a new provider.
+	 * @param providerEditFormTo1 - form data to create the provider from
+	 * @return - the new provider.
+	 */
+	@POST
+	@Path("/provider/new")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	public synchronized RestResponse<ProviderEditResponseTo1> createProvider(ProviderEditFormTo1 providerEditFormTo1)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
+		try
+		{
+			ProviderData providerData = providerService.createProvider(providerEditFormTo1, getLoggedInInfo());
+			return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
+		}
+		catch(SecurityRecordAlreadyExistsException secRecordExists)
+		{
+			return RestResponse.errorResponse(ProviderEditResponseTo1.STATUS_SEC_RECORD_EXISTS);
+		}
+	}
+
+	/**
+	 * edit provider.
+	 * @param providerEditFormTo1 - form data to update the provider with
+	 * @return - the new provider.
+	 */
+	@POST
+	@Path("/provider/{id}/edit")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	public synchronized RestResponse<ProviderEditResponseTo1> editProvider(@PathParam("id") Integer providerNo, ProviderEditFormTo1 providerEditFormTo1)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
+
+		try
+		{
+			ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo);
+			return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
+		}
+		catch(SecurityRecordAlreadyExistsException secRecordExists)
+		{
+			return RestResponse.errorResponse(ProviderEditResponseTo1.STATUS_SEC_RECORD_EXISTS);
+		}
+	}
+
 	@GET
-	@Path("/provider/{id}/billing")
+	@Path("/provider/{id}/edit_form")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<ProviderEditFormTo1> getProviderEditForm(@PathParam("id") Integer id)
+	{
+		return RestResponse.successResponse(providerService.getEditFormForProvider(id, getLoggedInInfo().getLoggedInSecurity()));
+	}
+
+    @GET
+    @Path("/provider/{id}/billing")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ProviderBillingTransfer> getProviderBilling(@PathParam("id") String providerNo)
 	{
@@ -166,7 +255,6 @@ public class ProviderService extends AbstractServiceImpl {
 		ProviderBillingTransfer transfer = ProviderBillingTransfer.toTransferObj(billing);
 		return RestResponse.successResponse(transfer);
 	}
-
     @GET
     @Path("/providerjson/{id}")
     public ProviderTo1 getProviderAsJSON(@PathParam("id") String id)
@@ -192,14 +280,26 @@ public class ProviderService extends AbstractServiceImpl {
 		
 		int startIndexVal = startIndex==null?0:startIndex.intValue();
 		int itemsToReturnVal = itemsToReturn==null?5000:startIndex.intValue();
-		boolean active = Boolean.valueOf(json.getString("active"));
+
+		String status = "%";// all provider statuses
+		if (json.containsKey("active"))
+		{
+			if(Boolean.valueOf(json.getString("active")))
+			{
+				status = ProviderData.PROVIDER_STATUS_ACTIVE;
+			}
+			else
+			{
+				status = ProviderData.PROVIDER_STATUS_INACTIVE;
+			}
+		}
 		
 		String term = null;
 		if(json.containsKey("searchTerm")) {
 			term = json.getString("searchTerm");
 		}
 		
-		List<Provider> results = providerManager.search(getLoggedInInfo(),term, active,startIndexVal, itemsToReturnVal);
+		List<Provider> results = providerManager.search(getLoggedInInfo(),term, status,startIndexVal, itemsToReturnVal);
 		
 		
 		ProviderConverter converter = new ProviderConverter();

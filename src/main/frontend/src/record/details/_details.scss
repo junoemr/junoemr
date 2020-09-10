@@ -1,4 +1,9 @@
 #patient-details-page {
+
+	#profile-fields {
+		margin-left: 10px;
+	}
+
 	#details-dob-year {
 		width: 65px;
 	}
@@ -89,6 +94,10 @@
 		.arrow:after {
 			border-bottom-color: $color-primary-lighter;
 		}
+	}
+
+	.demographic-details-section.demographic-section {
+		margin-top: 32px;
 	}
 }
 

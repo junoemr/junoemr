@@ -1,0 +1,41 @@
+.juno-style-dracula {
+
+	//================ layout ======================
+	--theme-form-field-border-radius: 8px;
+	//================ layout ======================
+
+	//================ colors ======================
+	--theme-color-primary-base: var(--color-neutral-darker);
+	--theme-color-primary-accent: var(--color-orange-base);
+	--theme-color-primary-text: var(--color-neutral-white);
+
+	--theme-color-form-field-text: var(--color-neutral-white);
+	--theme-color-form-field-text-hover: var(--color-neutral-white);
+	--theme-color-form-field-text-active: var(--color-neutral-white);
+	--theme-color-form-field-text-disabled: var(--color-neutral-light);
+	--theme-color-form-field-background: var(--color-neutral-darkest);
+	--theme-color-form-field-background-hover: var(--color-neutral-darkest);
+	--theme-color-form-field-background-active: var(--color-neutral-darkest);
+	--theme-color-form-field-background-disabled: var(--color-neutral-darkest);
+	--theme-color-form-field-border: var(--color-neutral-darker);
+	--theme-color-form-field-border-hover: var(--color-neutral-dark);
+	--theme-color-form-field-border-active: var(--color-orange-base);
+	--theme-color-form-field-border-disabled: var(--color-neutral-darker);
+
+	--theme-color-table-border: var(--color-neutral-black);
+	--theme-color-table-border-hover: var(--color-primary-darker);
+	--theme-color-table-header-text: var(--color-neutral-white);
+	--theme-color-table-header-background: var(--color-neutral-darkest);
+	--theme-color-table-body-text: var(--color-neutral-white);
+	--theme-color-table-body-text-hover: var(--color-neutral-darker);
+	--theme-color-table-body-background-even: var(--color-neutral-dark);
+	--theme-color-table-body-background-odd: var(--color-neutral-darker);
+	--theme-color-table-body-background-hover: var(--color-primary-darkest);
+
+	--theme-color-panel-header-text: var(--color-neutral-white);
+	--theme-color-panel-header-background: var(--color-neutral-black);
+	--theme-color-panel-body-text: var(--color-neutral-white);
+	--theme-color-panel-body-background: var(--color-neutral-black);
+	--theme-color-panel-border: var(--color-neutral-darker);
+	//================ colors ======================
+}

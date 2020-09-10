@@ -45,6 +45,7 @@ public class DemographicTo1 implements Serializable {
 	private String phone;
 	private String alternativePhone;
 	private String patientStatus;
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date patientStatusDate;
 	private String rosterStatus;
 	private String providerNo;
@@ -58,19 +59,25 @@ public class DemographicTo1 implements Serializable {
 	private String dobDay;
 	private String sex;
 	private String sexDesc;
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date dateJoined;
 	private String familyDoctor;
 	private String familyDoctor2;
 	private String firstName;
 	private String lastName;
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date hcRenewDate;
 	private String pcnIndicator;
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date endDate;
 	private String hcType;
 	private String chartNo;
 	private String email;
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date effDate;
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date rosterDate;
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date rosterTerminationDate;
 	private String rosterTerminationReason;
 	private String links;
@@ -99,6 +106,7 @@ public class DemographicTo1 implements Serializable {
 	private String notes;
 	private Integer waitingListID;
 	private String waitingListNote;
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date onWaitingListSinceDate;
 	private Integer admissionProgramId;
 	private String nameOfMother;

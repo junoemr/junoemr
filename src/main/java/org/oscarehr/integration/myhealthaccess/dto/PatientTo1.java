@@ -26,7 +26,12 @@ package org.oscarehr.integration.myhealthaccess.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
+import org.springframework.beans.BeanUtils;
+import oscar.util.Jackson.LocalDateSerializer;
 
 import java.time.LocalDate;
 
@@ -43,6 +48,7 @@ public class PatientTo1
 	private String lastName;
 	@JsonProperty("birth_date")
 	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonSerialize(using = LocalDateSerializer.class)
 	private LocalDate birthDate;
 	private String sex;
 	@JsonProperty("health_number")
@@ -72,6 +78,43 @@ public class PatientTo1
 	private String primaryFax;
 	@JsonProperty("link_status")
 	private String linkStatus;
+
+	public PatientTo1()
+	{
+	}
+
+	public PatientTo1(MHAPatient mhaPatient)
+	{
+		BeanUtils.copyProperties(mhaPatient, this, "addressProvinceCode", "healthCareProvinceCode", "linkStatus");
+		this.healthCareProvinceCode = mhaPatient.getHealthCareProvinceCode().name();
+		this.addressProvinceCode = mhaPatient.getAddressProvinceCode().name();
+		this.linkStatus = mhaPatient.getLinkStatus().name();
+	}
+
+	public PatientTo1(Demographic demographic, String cellPhone)
+	{
+		this.id = null; // This should be the MHA id
+		this.email = demographic.getEmail();
+		this.firstName = demographic.getFirstName();
+		this.middleName = null;
+		this.lastName = demographic.getLastName();
+		this.birthDate = demographic.getDateOfBirth();
+		this.sex = demographic.getSex();
+		this.healthNumber = demographic.getHin();
+		this.healthNumberVersion = demographic.getVer();
+		this.healthCareProvinceCode = demographic.getHcType();
+		this.address1 = demographic.getAddress();
+		this.address2 = null;
+		this.city = demographic.getCity();
+		this.addressProvinceCode = demographic.getProvince();
+		this.postalCode = demographic.getPostal();
+		this.countryCode = demographic.getCountryOfOrigin();
+		this.homePhone = demographic.getPhone();
+		this.workPhone = demographic.getPhone2();
+		this.cellPhone = cellPhone;
+		this.primaryFax = null;
+		this.linkStatus = MHAPatient.LINK_STATUS.NO_LINK.name();
+	}
 
 	public String getId()
 	{

@@ -3,31 +3,39 @@
 
   #admin-page-header {
     @extend %juno-page-header;
-    padding-left: 63px;
+    padding-left: 71px;
 
-    h3 {
+    h5 {
       color: $color-neutral-white;
     }
-    h3, p {
+    h5, p {
       margin: 0;
+    }
+
+    h6 {
+      display: inline-block;
     }
 
     a  {
       all: unset;
+      color: $color-neutral-white;
       cursor: pointer;
     }
   }
 
   #admin-page-body {
-    margin: 16px;
+    @extend %juno-primary-view-pane;
+    overflow: auto;
+
+    margin: 0;
+    padding: 16px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
 
     .admin-subpage-view {
       margin-left: 20px;
-      margin-right: 20px;
-      margin-top: 10px;
+      margin-top: 0;
       flex: 1 1;
     }
 

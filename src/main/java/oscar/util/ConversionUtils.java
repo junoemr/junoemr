@@ -70,7 +70,7 @@ public class ConversionUtils {
 	public static final String TIME_PATTERN_NO_SEC = "HH:mm";
 	public static final String DEFAULT_TS_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
-	public static final String TS_NO_SEC_PATTERN = "yyyy-MM-dd H:mm";
+	public static final String TS_NO_SEC_PATTERN = "yyyy-MM-dd HH:mm";
 
 	private static final Long ZERO_LONG = new Long(0);
 	private static final Integer ZERO_INT = new Integer(0);
@@ -172,20 +172,25 @@ public class ConversionUtils {
 	/**
 	 * Parses the date string using the specified format pattern 
 	 * 
-	 * @param dateString
-	 * 		Date string to be parsed
-	 * @param formatPattern
-	 * 		Format pattern to use for parsing
-	 * @return
-	 * 		Returns the parsed date or null if the date can't be parsed
+	 * @param dateString Date string to be parsed
+	 * @param formatPattern Format pattern to use for parsing
+	 * @return Returns the parsed date or null if the date can't be parsed
 	 */
-	public static Date fromDateString(String dateString, String formatPattern) {
-		if (dateString == null || "".equals(dateString.trim())) return null;
+	public static Date fromDateString(String dateString, String formatPattern)
+	{
+		if (dateString == null || dateString.trim().isEmpty())
+		{
+			return null;
+		}
 
 		SimpleDateFormat format = new SimpleDateFormat(formatPattern);
-		try {
+		format.setLenient(false);
+		try
+		{
 			return format.parse(dateString);
-		} catch (ParseException e) {
+		}
+		catch (ParseException e)
+		{
 			return null;
 		}
 	}
@@ -241,6 +246,15 @@ public class ConversionUtils {
 		return date.format(format);
 	}
 
+	public static String toTimeString(LocalTime time, String formatPattern) {
+		if (time == null) {
+			return "";
+		}
+
+		DateTimeFormatter format = DateTimeFormatter.ofPattern(formatPattern);
+		return time.format(format);
+	}
+
 	/**
 	 * Formats the date instance into a string keeping only the time of the day and excluding the remaining info.   
 	 * 
@@ -251,6 +265,10 @@ public class ConversionUtils {
 	 */
 	public static String toTimeString(Date time) {
 		return toDateString(time, DEFAULT_TIME_PATTERN);
+	}
+
+	public static String toTimeString(LocalTime time) {
+		return toTimeString(time, DEFAULT_TIME_PATTERN);
 	}
 
 	/**

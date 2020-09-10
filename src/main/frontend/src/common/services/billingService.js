@@ -90,6 +90,121 @@ angular.module("Common.Services").service("billingService", [
 			return deferred.promise;
 		};
 
+		service.getAlbertaSkillCodes = function ()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/alberta/skillCodes',
+					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+					function success(results)
+					{
+						deferred.resolve(results);
+					},
+					function error(errors)
+					{
+						console.error("Failed to fetch alberta skill codes with error: " + errors);
+						deferred.reject("Failed to fetch alberta skill codes with error: " + errors);
+					});
+
+			return deferred.promise;
+		};
+
+		service.getAlbertaFacilities = function ()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/alberta/facilities',
+					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+					function success(results)
+					{
+						deferred.resolve(results);
+					},
+					function error(errors)
+					{
+						console.error("Failed to fetch alberta facilities with error: " + errors);
+						deferred.reject("Failed to fetch alberta facilities codes with error: " + errors);
+					});
+
+			return deferred.promise;
+		};
+
+		service.getAlbertaFunctionalCenters = function ()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/alberta/functional_centers',
+					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+					function success(results)
+					{
+						deferred.resolve(results);
+					},
+					function error(errors)
+					{
+						console.error("Failed to fetch alberta functional centers with error: " + errors);
+						deferred.reject("Failed to fetch alberta functional centers codes with error: " + errors);
+					});
+
+			return deferred.promise;
+		};
+
+		service.getBCBillingVisitCodes = function ()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/bc/billing_visit_codes',
+					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+					function success(results)
+					{
+						deferred.resolve(results);
+					},
+					function error(errors)
+					{
+						console.error("Failed to fetch BC visit codes with error: " + errors);
+						deferred.reject("Failed to fetch BC visit codes codes with error: " + errors);
+					});
+
+			return deferred.promise;
+		};
+
+		service.getBCBillingLocations = function ()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/bc/billing_locations',
+					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+					function success(results)
+					{
+						deferred.resolve(results);
+					},
+					function error(errors)
+					{
+						console.error("Failed to fetch BC billing locations with error: " + errors);
+						deferred.reject("Failed to fetch BC billing locations with error: " + errors);
+					});
+
+			return deferred.promise;
+		};
+
+		service.getOntarioMasterNumbers = function ()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/on/master_numbers',
+					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+					function success(results)
+					{
+						deferred.resolve(results);
+					},
+					function error(errors)
+					{
+						console.error("Failed to fetch ON master numbers with error: " + errors);
+						deferred.reject("Failed to fetch ON master numbers  with error: " + errors);
+					});
+
+			return deferred.promise;
+		};
+
+
 		return service;
 	}
 ]);

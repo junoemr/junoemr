@@ -272,18 +272,27 @@ public class PreventionDisplayConfig {
 	{
 		DemographicData dData = new DemographicData();
 		Demographic demographic = dData.getDemographic(loggedInInfo, Demographic_no);
-		return display(loggedInInfo, setHash, demographic, numberOfPrevs);
+		return display(setHash, demographic, numberOfPrevs);
 	}
 	
-    public boolean display(LoggedInInfo loggedInInfo, Map<String,String> setHash,
+    public boolean display(Map<String,String> setHash,
 						   Demographic demographic, int numberOfPrevs)
+	{
+		PreventionManager preventionManager = SpringUtils.getBean(PreventionManager.class);
+		List<String> itemsToHide = preventionManager.getItemsToHide();
+
+		return display(setHash, demographic, numberOfPrevs, itemsToHide);
+	}
+
+	public boolean display(Map<String,String> setHash,
+						   Demographic demographic, int numberOfPrevs, List<String> itemsToHide)
 	{
 		boolean display = false;
 		PreventionManager preventionManager = SpringUtils.getBean(PreventionManager.class);
 		log.debug("Display: " + demographic.getDemographicNo());
 		try
 		{
-			if(preventionManager.hideItem(setHash.get("name")) && numberOfPrevs==0 )
+			if(preventionManager.hideItem(setHash.get("name"), itemsToHide) && numberOfPrevs==0 )
 			{
 				display = false;
 			}

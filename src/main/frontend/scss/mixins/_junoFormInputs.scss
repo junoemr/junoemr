@@ -1,0 +1,56 @@
+@mixin juno-form-inputs-colors($text-color, $background-color, $border-color,
+			$active-text-color, $active-background-color, $active-border-color,
+			$disabled-text-color, $disabled-background-color, $disabled-border-color) {
+	input, select {
+		border-color: $border-color;
+		background-color: $background-color;
+		color: $text-color;
+
+		&:focus, &:active {
+			border-color: $active-border-color;
+			background-color: $active-background-color;
+			color: $active-text-color;
+		}
+
+		&:disabled,
+		&:disabled:active {
+			border-color: $disabled-border-color;
+			background-color: $disabled-background-color;
+			color: $disabled-text-color;
+
+			~ i {
+				color: $disabled-text-color;
+			}
+		}
+
+		&.field-invalid {
+			border-color: $color-red-base;
+
+			&:focus, &:active {
+				border-color: $color-red-base;
+			}
+		}
+		::placeholder {
+			color: $color-neutral-grey;
+		}
+	}
+}
+@mixin juno-form-inputs-colors-default() {
+	@include juno-form-inputs-colors(
+					var(--theme-color-form-field-text), var(--theme-color-form-field-background), var(--theme-color-form-field-border),
+					var(--theme-color-form-field-text-active), var(--theme-color-form-field-background-active), var(--theme-color-form-field-border-active),
+					var(--theme-color-form-field-text-disabled), var(--theme-color-form-field-background-disabled), var(--theme-color-form-field-border-disabled));
+}
+
+@mixin juno-form-inputs-style($border-width: 1px, $border-radius: 8px)
+{
+	input, select {
+		@include juno-font-body-smallest;
+		height: 32px;
+		padding: 0 16px 0 16px;
+
+		border-radius: $border-radius;
+		border: solid $border-width;
+	}
+}
+

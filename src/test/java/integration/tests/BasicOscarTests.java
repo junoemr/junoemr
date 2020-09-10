@@ -26,7 +26,6 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import org.junit.Assert;
 import org.junit.Test;
-import org.oscarehr.common.dao.utils.AuthUtils;
 
 
 public class BasicOscarTests extends SeleniumTestBase
@@ -37,8 +36,8 @@ public class BasicOscarTests extends SeleniumTestBase
 		Assert.assertTrue("Cannot reach login page",!driver.getTitle().isEmpty());
 	}
 
-	@Test
+	/*@Test
 	public void canLogin() throws Exception {
 		Navigation.doLogin(AuthUtils.TEST_USER_NAME,AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
-	}
+	}*/
 }

@@ -279,6 +279,8 @@ if(!authed) {
         var $providerSelect = jQuery('#billing-provider-select');
         var $facilityNumber = jQuery('#facility-number');
         var $siteSelect = jQuery('#site-select');
+        var $ruralRetentionSelect = jQuery('select[name=xml_location]');
+				var $serviceLocationSelect = jQuery('select[name=xml_visittype]');
 
         if ($siteSelect.length > 0)
         {
@@ -288,6 +290,9 @@ if(!authed) {
         {
             Juno.BillingHelper.BC.initAutoApplyBCP("<%=request.getContextPath() %>", $providerSelect, $facilityNumber);
         }
+
+        Juno.BillingHelper.BC.initRuralRetentionCodeHook("<%=request.getContextPath() %>", $providerSelect, $ruralRetentionSelect);
+			  Juno.BillingHelper.BC.initServiceLocationCodeHook("<%=request.getContextPath() %>", $providerSelect, $serviceLocationSelect);
     });
 
 //creates a javaspt array of associated dx codes

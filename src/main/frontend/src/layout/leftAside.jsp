@@ -51,6 +51,11 @@
 		<!-- main content pane -->
 		<div class="patient-list-content flex-column">
 			<ul class="nav nav-tabs" id="patient-list-nav">
+				<li ng-if="$ctrl.show_appointment_queue" ng-class="{'active' : $ctrl.isAppointmentQueueView()}">
+					<a class="round-top" ng-class="$ctrl.getTabClasses($ctrl.isAppointmentQueueView())" data-toggle="tab"
+					ng-click="$ctrl.changeTab($ctrl.tabEnum.appointmentQueue);"> Queue
+					</a>
+				</li>
 				<li ng-class="{'active' : $ctrl.isAppointmentPatientView()}">
 					<a class="round-top" data-toggle="tab"
 					   ng-click="$ctrl.changeTab($ctrl.tabEnum.appointments);">Appointments
@@ -64,83 +69,90 @@
 			</ul>
 
 			<!-- tab contents -->
-			<div class="content-controller flex-row align-items-center">
-				<div class="form-inline flex-row flex-grow col-md-12">
-					<div class="form-group">
-						<button class="btn btn-icon visible"
-								ng-disabled="$ctrl.isRecentPatientView()"
-								ng-click="$ctrl.stepBack()">
-							<i class="icon icon-arrow-left"></i>
-						</button>
-					</div>
-					<div class="form-group">
-						<button class="btn btn-icon visible"
-								ng-disabled="$ctrl.isRecentPatientView()"
-								ng-click="$ctrl.stepForward()">
-							<i class="icon icon-arrow-right"></i>
-						</button>
-					</div>
-					<div class="form-group">
-						<ca-field-date
-							ca-template="bare"
-							ca-date-picker-id="patient-list-select-date"
-							ca-name="Date"
-							ca-model="$ctrl.datepickerSelectedDate"
-							ca-orientation="auto"
-							ca-disabled="$ctrl.isRecentPatientView()"
-						></ca-field-date>
-					</div>
-					<div class="form-group">
-						<button class="btn btn-icon"
-								title="Refresh patient list"
-								ng-click="$ctrl.refresh()">
-							<i class="icon icon-refresh"></i>
-						</button>
-					</div>
-				</div>
+			<div ng-if="$ctrl.isAppointmentQueueView()" class="tab-content">
+				<appointment-queue component-style="pageStyle">
+				</appointment-queue>
 			</div>
-
-			<!-- the displayed list of patients -->
-			<div class="content-display flex-grow overflow-scroll">
-				<div class="list-group"
-					ng-if="$ctrl.isRecentPatientView()">
-					<a ng-repeat="patient in $ctrl.activePatientList | filter:query"
-					class="list-group-item">
-						<div ng-click="$ctrl.goToRecord(patient)"
-							class="list-group-clickable">
-							<div class="patient-name-aside">{{patient.name}}</div>
+			<div ng-if="$ctrl.isAppointmentPatientView() || $ctrl.isRecentPatientView()">
+				<!-- Appointment And Patient View. -->
+				<div class="content-controller flex-row align-items-center">
+					<div class="form-inline flex-row flex-grow col-md-12">
+						<div class="form-group">
+							<button class="btn btn-icon visible"
+									ng-disabled="$ctrl.isRecentPatientView()"
+									ng-click="$ctrl.stepBack()">
+								<i class="icon icon-arrow-left"></i>
+							</button>
 						</div>
-					</a>
-
+						<div class="form-group">
+							<button class="btn btn-icon visible"
+									ng-disabled="$ctrl.isRecentPatientView()"
+									ng-click="$ctrl.stepForward()">
+								<i class="icon icon-arrow-right"></i>
+							</button>
+						</div>
+						<div class="form-group">
+							<ca-field-date
+								ca-template="bare"
+								ca-date-picker-id="patient-list-select-date"
+								ca-name="Date"
+								ca-model="$ctrl.datepickerSelectedDate"
+								ca-orientation="auto"
+								ca-disabled="$ctrl.isRecentPatientView()"
+							></ca-field-date>
+						</div>
+						<div class="form-group">
+							<button class="btn btn-icon"
+									title="Refresh patient list"
+									ng-click="$ctrl.refresh()">
+								<i class="icon icon-refresh"></i>
+							</button>
+						</div>
+					</div>
 				</div>
-				<div class="list-group"
-					ng-if="$ctrl.isAppointmentPatientView()">
-					<a ng-repeat="patient in $ctrl.activeAppointmentList | filter:query"
-					class="list-group-item">
-						<div class="flex-row vertical-align justify-content-between appt-aside-container">
-							<div class="container-telehealth">
-								<button class="btn btn-icon"
-								ng-if="$ctrl.telehealthEnabled && patient.isVirtual">
-									<i class="icon icon-video onclick-event-telehealth"
-									ng-click="$ctrl.openTelehealthLink(patient)"></i>
-								</button>
-							</div>
-							<div class="col-md-6" ng-click="$ctrl.goToRecord(patient)">
+
+				<!-- the displayed list of patients -->
+				<div class="content-display flex-grow overflow-scroll">
+					<div class="list-group"
+						ng-if="$ctrl.isRecentPatientView()">
+						<a ng-repeat="patient in $ctrl.activePatientList | filter:query"
+						class="list-group-item">
+							<div ng-click="$ctrl.goToRecord(patient)"
+								class="list-group-clickable">
 								<div class="patient-name-aside">{{patient.name}}</div>
-								<span>{{patient.startTime}} {{patient.reason}}</span>
 							</div>
-							<div class="col-md-6">
-								<juno-appointment-status-select
-								ca-name="aside-appt-status-{{patient.appointmentNo}}"
-								ca-no-label="true"
-								ca-model="patient.status"
-								ca-options="$ctrl.eventStatusOptions"
-								ca-change="$ctrl.updateAppointmentStatus(patient)"
-								>
-								</juno-appointment-status-select>
+						</a>
+
+					</div>
+					<div class="list-group"
+						ng-if="$ctrl.isAppointmentPatientView()">
+						<a ng-repeat="patient in $ctrl.activeAppointmentList | filter:query"
+						class="list-group-item">
+							<div class="flex-row vertical-align justify-content-between appt-aside-container">
+								<div class="container-telehealth">
+									<button class="btn btn-icon"
+									ng-if="$ctrl.telehealthEnabled && patient.isVirtual">
+										<i class="icon icon-video onclick-event-telehealth"
+										ng-click="$ctrl.openTelehealthLink(patient)"></i>
+									</button>
+								</div>
+								<div class="col-md-6" ng-click="$ctrl.goToRecord(patient)">
+									<div class="patient-name-aside">{{patient.name}}</div>
+									<span>{{patient.startTime}} {{patient.reason}}</span>
+								</div>
+								<div class="col-md-6">
+									<juno-appointment-status-select
+									ca-name="aside-appt-status-{{patient.appointmentNo}}"
+									ca-no-label="true"
+									ca-model="patient.status"
+									ca-options="$ctrl.eventStatusOptions"
+									ca-change="$ctrl.updateAppointmentStatus(patient)"
+									>
+									</juno-appointment-status-select>
+								</div>
 							</div>
-						</div>
-					</a>
+						</a>
+					</div>
 				</div>
 			</div>
 		</div>

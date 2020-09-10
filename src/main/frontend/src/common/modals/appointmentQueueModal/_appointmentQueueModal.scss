@@ -1,0 +1,32 @@
+.appointment-queue-modal {
+	.icon-close {
+		cursor: pointer;
+	}
+
+	.queue-options-container {
+		display: flex;
+		flex-direction: column;
+		//justify-content: space-evenly;
+		height: 100%;
+		width: 100%;
+		padding: 0 4px;
+
+		.options-common,
+		.options-on-demand {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			padding: 8px 0;
+		}
+		.options-availability {
+			overflow-y: auto;
+		}
+	}
+
+	.footer-wrapper {
+		height: 100%;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+	}
+}

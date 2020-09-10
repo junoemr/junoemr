@@ -1,0 +1,182 @@
+// ============ LABELS ===============
+
+.juno-input-label-top {
+	flex: 0 0 100%;
+	margin-bottom: 4px;
+}
+
+.juno-input-label-left {
+	margin-right: 16px;
+	text-align: right;
+}
+
+// ============ MIXINS ===============
+
+@mixin junoTabColor ($background-color, $selected-background-color, $border-color, $text-color)
+{
+	&.juno-tab {
+		@include juno-font-body-small();
+
+		height: 56px;
+		border-radius: 8px;
+
+		border: 1px solid $border-color;
+		background-color: $background-color;
+		color: $text-color;
+
+		.tab {
+			border-color: $border-color;
+			border-right-style: solid;
+			border-right-width: 1px;
+
+			cursor: pointer;
+
+			&.active {
+				background-color: $selected-background-color;
+			}
+
+			&:first-child {
+				border-bottom-left-radius: 8px;
+				border-top-left-radius: 8px;
+			}
+		}
+	}
+}
+@mixin junoText($color, $color-primary, $color-secondary)
+{
+	.juno-text {
+		color: $color;
+
+		a:not(:hover) {
+			color: $color;
+		}
+	}
+
+	.juno-text-primary {
+		color: $color-primary;
+	}
+
+	.juno-text-secondary {
+		color: $color-secondary;
+	}
+}
+
+@mixin junoModalBackground ($color)
+{
+	&.modal-content {
+		background: linear-gradient(-45deg, $color 45%, transparent 0) no-repeat 100% 100%,
+		linear-gradient(247deg, $color-primary-light, $color-primary-base 30%, $color-primary-base 64%, $color-primary-dark) no-repeat !important;
+	}
+}
+
+// ============ STYLES ===============
+
+@mixin styleCommon()
+{
+	margin: 0;
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+
+	&.juno-button {
+		height: 32px;
+	}
+
+	&.juno-divider {
+		background-color: $color-neutral-lightest;
+		border: 1px solid $color-neutral-lighter;
+	}
+
+	@include juno-table-default();
+}
+
+// ============ STYLE DEFAULT ===============
+.juno-style-default {
+	@include styleCommon;
+
+	@include juno-tab-color-scheme-white;
+
+	&.juno-divider {
+		border: 1px solid $color-neutral-lighter;
+	}
+
+	@include junoTabColor($color-neutral-white, $color-neutral-lighter, $color-neutral-lighter, $color-neutral-darker);
+	@include junoText($color-neutral-darker, $color-primary-base, $color-neutral-grey);
+}
+
+.juno-style-default-background-no-accent {
+	background-color: $color-neutral-white !important;
+}
+.juno-style-default-background {
+	@extend .juno-style-default-background-no-accent;
+	@include junoModalBackground($color-neutral-white);
+}
+.juno-style-default-background-secondary {
+	background-color: $color-neutral-lightest !important;
+}
+
+// ============ STYLE GREY ===============
+.juno-style-grey {
+	@include styleCommon;
+
+	@include juno-tab-color-scheme-white;
+	@include junoTabColor($color-neutral-lightest, $color-neutral-white, $color-neutral-lighter, $color-neutral-darker);
+
+	&.juno-panel {
+		.panel-body {
+			border-width: 1px;
+			&.no-header {
+				border-top-width: 1px;
+			}
+		}
+	}
+
+	@include junoText($color-neutral-darker, $color-primary-base, $color-neutral-grey);
+}
+.juno-style-grey-background-no-accent {
+	background-color: $color-neutral-white !important;
+}
+.juno-style-grey-background {
+	@extend .juno-style-grey-background-no-accent;
+	@include junoModalBackground($color-neutral-white);
+}
+.juno-style-grey-background-secondary {
+	background-color: $color-neutral-lightest !important;
+}
+
+// ============ STYLE DRACULA ===============
+.juno-style-dracula {
+	@include styleCommon;
+
+	@include juno-tab-color-scheme-dark;
+	color: $color-neutral-white;
+
+	&.juno-divider {
+		background-color: $color-neutral-darker;
+		border: 1px solid $color-neutral-darker;
+	}
+
+	@include junoTabColor($color-neutral-darkest, $color-neutral-black, $color-neutral-darker, $color-neutral-white);
+
+	&.juno-panel {
+		.panel-body {
+			border-width: 1px;
+			&.no-header {
+				border-top-width: 1px;
+			}
+		}
+	}
+
+	@include junoText($color-neutral-white, $color-primary-base, $color-neutral-grey);
+}
+
+.juno-style-dracula-background-no-accent {
+	background-color: $color-neutral-darkest !important;
+}
+.juno-style-dracula-background {
+	@extend .juno-style-dracula-background-no-accent;
+	@include junoModalBackground($color-neutral-darkest);
+}
+.juno-style-dracula-background-secondary {
+	background-color: $color-neutral-black !important;
+}

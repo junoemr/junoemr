@@ -62,9 +62,10 @@ public class ProviderWs extends AbstractWs {
 		return (results);
 	}
 
-	public ProviderPropertyTransfer[] getProviderProperties(String providerNo, String propertyName) {
-		List<Property> tempResults = providerManager.getProviderProperties(getLoggedInInfo(), providerNo, propertyName);
-		ProviderPropertyTransfer[] results = ProviderPropertyTransfer.toTransfers(tempResults);
-		return (results);
+	public ProviderPropertyTransfer getProviderProperties(String providerNo, String propertyName)
+	{
+		Property tempResults = providerManager.getProviderProperties(getLoggedInInfo(), providerNo, propertyName);
+		ProviderPropertyTransfer results = ProviderPropertyTransfer.toTransfer(tempResults);
+		return results;
 	}
 }

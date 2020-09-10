@@ -631,8 +631,8 @@ public class ProviderDao extends HibernateDaoSupport {
 		}
 		
 		@SuppressWarnings("unchecked")
-		public List<Provider> search(String term, boolean active, int startIndex, int itemsToReturn) {
-			String sqlCommand = "select x from Provider x WHERE x.Status = :status ";
+		public List<Provider> search(String term, String status, int startIndex, int itemsToReturn) {
+			String sqlCommand = "select x from Provider x WHERE x.Status like :status ";
 			
 			
 			if(term != null && term.length()>0) {
@@ -646,8 +646,8 @@ public class ProviderDao extends HibernateDaoSupport {
 			Session session = this.getSession();
 			try {
 				Query q = session.createQuery(sqlCommand);
-				
-				q.setString("status", active?"1":"0");
+
+				q.setString("status", status);
 				if(term != null && term.length()>0) {
 					q.setString("term", term + "%");
 				}

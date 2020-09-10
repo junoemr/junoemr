@@ -26,6 +26,7 @@
 
 import {INSTANCE_TYPE, SYSTEM_PROPERTIES, BILLING_TYPE} from "../../common/services/systemPreferenceServiceConstants";
 import {SystemPreferenceApi} from "../../../generated";
+import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
 
 angular.module('Record.Details').controller('Record.Details.DetailsController', [
 
@@ -103,7 +104,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.showEligibility = false;
 		controller.properties = $scope.$parent.recordCtrl.properties;
 		controller.displayMessages = messagesFactory.factory();
+		controller.validations = {};
 
+		$scope.JUNO_STYLE = JUNO_STYLE;
+		$scope.pageStyle = JUNO_STYLE.GREY;
 
 		controller.init = function init()
 		{
@@ -247,17 +251,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 					controller.page.dataChanged = false;
 
-					//get static lists to be selected
-					controller.page.genders = staticDataService.getGenders();
-					controller.page.titles = staticDataService.getTitles();
-					controller.page.provinces = staticDataService.getProvinces();
-					controller.page.countries = staticDataService.getCountries();
-					controller.page.engFre = staticDataService.getEngFre();
-					controller.page.spokenlangs = staticDataService.getSpokenLanguages();
-					controller.page.rosterTermReasons = staticDataService.getRosterTerminationReasons();
-					controller.page.securityQuestions = staticDataService.getSecurityQuestions();
-					controller.page.rxInteractionLevels = staticDataService.getRxInteractionLevels();
-
 					//get patient detail status
 					patientDetailStatusService.getStatus($stateParams.demographicNo).then(
 						function success(results)
@@ -298,67 +291,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 							console.log(errors);
 						});
 
-					//show patientStatusList & rosterStatusList values
-					demographicsService.getStatusList("roster").then(
-						function success(data)
-						{
-							controller.page.rosterStatusList = toArray(data);
-							controller.page.rosterStatusList.unshift(
-								{
-									"value": "FS",
-									"label": "FS - fee for service"
-								});
-							controller.page.rosterStatusList.unshift(
-								{
-									"value": "TE",
-									"label": "TE - terminated"
-								});
-							controller.page.rosterStatusList.unshift(
-								{
-									"value": "NR",
-									"label": "NR - not rostered"
-								});
-							controller.page.rosterStatusList.unshift(
-								{
-									"value": "RO",
-									"label": "RO - rostered"
-								});
-						}
-					);
-					demographicsService.getStatusList("patient").then(
-						function success(data)
-						{
-							controller.page.patientStatusList = toArray(data);
-							controller.page.patientStatusList.unshift(
-								{
-									"value": "FI",
-									"label": "FI - Fired"
-								});
-							controller.page.patientStatusList.unshift(
-								{
-									"value": "MO",
-									"label": "MO - Moved"
-								});
-							controller.page.patientStatusList.unshift(
-								{
-									"value": "DE",
-									"label": "DE - Deceased"
-								});
-							controller.page.patientStatusList.unshift(
-								{
-									"value": "IN",
-									"label": "IN - Inactive"
-								});
-							controller.page.patientStatusList.unshift(
-								{
-									"value": "AC",
-									"label": "AC - Active"
-								});
-						}
-					);
-
-					controller.formatDate("DobM"); //done on page load
-					controller.formatDate("DobD"); //done on page load
 					controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
 					controller.formatLastName(); //done on page load
 					controller.formatFirstName(); //done on page load
@@ -424,6 +356,28 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				controller.page.demo.hcRenewDate = null;
 			}
 
+			// convert dates to moment
+			controller.page.demo.dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.dobYear,
+					controller.page.demo.dobMonth, controller.page.demo.dobDay);
+			controller.page.demo.effDate = Juno.Common.Util.getDateMoment(controller.page.demo.effDate);
+			controller.page.demo.hcRenewDate = Juno.Common.Util.getDateMoment(controller.page.demo.hcRenewDate);
+			controller.page.demo.rosterDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterDate);
+			controller.page.demo.rosterTerminationDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterTerminationDate);
+			controller.page.demo.patientStatusDate = Juno.Common.Util.getDateMoment(controller.page.demo.patientStatusDate);
+			controller.page.demo.dateJoined = Juno.Common.Util.getDateMoment(controller.page.demo.dateJoined);
+			controller.page.demo.endDate = Juno.Common.Util.getDateMoment(controller.page.demo.endDate);
+			if (controller.page.demo.onWaitingListSinceDate)
+			{
+				controller.page.demo.onWaitingListSinceDate = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.onWaitingListSinceDate.getFullYear(),
+						controller.page.demo.onWaitingListSinceDate.getMonth(), controller.page.demo.onWaitingListSinceDate.getDate());
+			}
+
+			// oscar stores no country of origin as "-1" because why not.
+			if (controller.page.demo.countryOfOrigin === "-1")
+			{
+				controller.page.demo.countryOfOrigin = null;
+			}
+
 			phoneNum["C"] = controller.page.demo.scrCellPhone;
 			phoneNum["H"] = controller.page.demo.scrHomePhone;
 			phoneNum["W"] = controller.page.demo.scrWorkPhone;
@@ -468,12 +422,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					console.log(errors);
 				});
 
-		};
-
-		// Is there a shared location where this could be accessed from any controller? i.e. a utils file
-		controller.isNaN = function(num)
-		{
-			return isNaN(num);
 		};
 
 		//disable click and keypress if user only has read-access
@@ -702,61 +650,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				});
 		};
 
-		//manage hin/hinVer entries
-		controller.checkHin = function checkHin()
-		{
-			if (controller.page.demo.hcType == "ON" && controller.page.demo.hin != null && controller.page.demo.hin != "")
-			{
-				if (controller.page.demo.hin.length > 10) controller.page.demo.hin = hin0;
-				if (!isNumber(controller.page.demo.hin)) controller.page.demo.hin = hin0;
-			}
-			hin0 = controller.page.demo.hin;
-			controller.page.HCValidation = null;
-		};
-		controller.checkHinVer = function checkHinVer()
-		{
-			if (controller.page.demo.hcType == "ON")
-			{
-				if (controller.page.demo.ver.length > 2) controller.page.demo.ver = ver0;
-				if (!(/^[a-zA-Z()]*$/.test(controller.page.demo.ver))) controller.page.demo.ver = ver0;
-				controller.page.demo.ver = controller.page.demo.ver.toUpperCase();
-			}
-			ver0 = controller.page.demo.ver;
-		};
-
-		//manage date entries
-		controller.checkDate = function checkDate(id)
-		{
-			if (id == "DobY")
-			{
-				controller.page.demo.dobYear = checkYear(controller.page.demo.dobYear);
-			}
-			else if (id == "DobM")
-			{
-				controller.page.demo.dobMonth = checkMonth(controller.page.demo.dobMonth);
-			}
-			else if (id == "DobD")
-			{
-				controller.page.demo.dobDay = checkDay(controller.page.demo.dobDay, controller.page.demo.dobMonth, controller.page.demo.dobYear);
-			}
-			console.log('MONTH: ', controller.page.demo.dobMonth);
-			controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
-		};
-
-		controller.formatDate = function formatDate(id)
-		{
-			// controller.calculateAge();
-
-			if (id == "DobM" && controller.page.demo.dobMonth != null && String(controller.page.demo.dobMonth).length == 1)
-			{
-				controller.page.demo.dobMonth = "0" + controller.page.demo.dobMonth;
-			}
-			else if (id == "DobD" && controller.page.demo.dobDay != null && String(controller.page.demo.dobDay).length == 1)
-			{
-				controller.page.demo.dobDay = "0" + controller.page.demo.dobDay;
-			}
-		};
-
 		//check Patient Status if endDate is entered
 		controller.checkPatientStatus = function checkPatientStatus()
 		{
@@ -822,28 +715,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 		};
 
-		//check email
-		controller.checkEmail = function checkEmail()
-		{
-			if (controller.page.demo.email == null || controller.page.demo.email == "") return true;
-
-			var regex = /^[^@]+@[^@]+$/;
-			if (regex.test(controller.page.demo.email))
-			{
-				var email = controller.page.demo.email.split("@");
-
-				regex = /^[!#%&'=`~\{}\-\$\*\+\/\?\^\|\w]+(\.[!#%&'=`~\{}\-\$\*\+\/\?\^\|\w]+)*$/;
-				if (regex.test(email[0]))
-				{ //test email local address part
-
-					regex = /^[^\W_]+(([^\W_]|-)+[^\W_]+)*(\.[^\W_]+(([^\W_]|-)+[^\W_]+)*)*\.[^\W_]{2,3}$/;
-					if (regex.test(email[1])) return true; //test email address domain part
-				}
-			}
-			alert("Invalid email address");
-			return false;
-		};
-
 		//check Chart No (length)
 		controller.checkChartNo = function checkChartNo()
 		{
@@ -854,28 +725,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			if (controller.page.demo.chartNo.length > 10) controller.page.demo.chartNo = chartNo0;
 			else chartNo0 = controller.page.demo.chartNo;
-		};
-
-		//check Cytology Number
-		controller.checkCytoNum = function checkCytoNum()
-		{
-			if (controller.page.demo.scrCytolNum == null || controller.page.demo.scrCytolNum == "")
-			{
-				cytolNum0 = controller.page.demo.scrCytolNum;
-				return;
-			}
-			if (!isNumber(controller.page.demo.scrCytolNum)) controller.page.demo.scrCytolNum = cytolNum0;
-			else cytolNum0 = controller.page.demo.scrCytolNum;
-		};
-
-		//check Referral Doctor No
-		controller.checkReferralDocNo = function checkReferralDocNo()
-		{
-			var isValid = controller.validateDocNo(controller.page.demo.scrReferralDocNo, true);
-			if (isValid)
-				referralDocNo0 = controller.page.demo.scrReferralDocNo;
-			else
-				controller.page.demo.scrReferralDocNo = referralDocNo0;
 		};
 
 		//check Family Doctor No
@@ -946,225 +795,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return false;
 		};
 
-		//prevent manual input dates
-		controller.preventManualEffDate = function preventManualEffDate()
-		{
-			if (controller.page.demo.effDate == null) controller.page.demo.effDate = effDate0;
-			else effDate0 = controller.page.demo.effDate;
-		};
-		controller.preventManualHcRenewDate = function preventManualHcRenewDate()
-		{
-			if (controller.page.demo.hcRenewDate == null) controller.page.demo.hcRenewDate = hcRenewDate0;
-			else hcRenewDate0 = controller.page.demo.hcRenewDate;
-		};
-		controller.preventManualRosterDate = function preventManualRosterDate()
-		{
-			if (controller.page.demo.rosterDate == null) controller.page.demo.rosterDate = rosterDate0;
-			else rosterDate0 = controller.page.demo.rosterDate;
-		};
-		controller.preventManualRosterTerminationDate = function preventManualRosterTerminationDate()
-		{
-			if (controller.page.demo.rosterTerminationDate == null) controller.page.demo.rosterTerminationDate = rosterTerminationDate0;
-			else rosterTerminationDate0 = controller.page.demo.rosterTerminationDate;
-		};
-		controller.preventManualPatientStatusDate = function preventManualPatientStatusDate()
-		{
-			if (controller.page.demo.patientStatusDate == null) controller.page.demo.patientStatusDate = patientStatusDate0;
-			else patientStatusDate0 = controller.page.demo.patientStatusDate;
-		};
-		controller.preventManualDateJoined = function preventManualDateJoined()
-		{
-			if (controller.page.demo.dateJoined == null) controller.page.demo.dateJoined = dateJoined0;
-			else dateJoined0 = controller.page.demo.dateJoined;
-		};
-		controller.preventManualEndDate = function preventManualEndDate()
-		{
-			if (controller.page.demo.endDate == null) controller.page.demo.endDate = endDate0;
-			else endDate0 = controller.page.demo.endDate;
-		};
-		controller.preventManualOnWaitingListSinceDate = function preventManualOnWaitingListSinceDate()
-		{
-			if (controller.page.demo.onWaitingListSinceDate == null) controller.page.demo.onWaitingListSinceDate = onWaitingListSinceDate0;
-			else onWaitingListSinceDate0 = controller.page.demo.onWaitingListSinceDate;
-		};
-		controller.preventManualPaperChartArchivedDate = function preventManualPaperChartArchivedDate()
-		{
-			if (controller.page.demo.scrPaperChartArchivedDate == null) controller.page.demo.scrPaperChartArchivedDate = paperChartArchivedDate0;
-			else paperChartArchivedDate0 = controller.page.demo.scrPaperChartArchivedDate;
-		};
-
 		//show/hide items
-		// TODO: FIGURE OUT BETTER WAY TO SYNCHRONIZE THIS WITH DEMOGRAPHIC LOADING
-		controller.isRosterTerminated = function isRosterTerminated()
-		{
-			if(controller.page.demo !== null && controller.page.demo !== undefined)
-				return (controller.page.demo.rosterStatus === "TE");
-
-			return null;
-		};
-		controller.showReferralDocList = function showReferralDocList()
-		{
-			controller.page.showReferralDocList = !controller.page.showReferralDocList;
-		};
-
-		controller.searchReferralDocsName = function searchReferralDocsName(searchName)
-		{
-			return controller.searchReferralDocs(searchName, null);
-		};
-		controller.searchReferralDocsRefNo = function searchReferralDocsRefNo(searchRefNo)
-		{
-			return controller.searchReferralDocs(null, searchRefNo);
-		};
-		controller.searchReferralDocs = function searchReferralDocs(searchName, searchRefNo)
-		{
-			return referralDoctorsService.searchReferralDoctors(searchName, searchRefNo, 1, 10).then(
-				function success(results) {
-
-					var referralDoctors = new Array(results.length);
-					for (var i = 0; i < results.length; i++)
-					{
-						var displayName = results[i].lastName + ', ' + results[i].firstName;
-						referralDoctors[i] = {
-							label: displayName,
-							name: displayName,
-							referralNo: results[i].referralNo
-						};
-						if (results[i].specialtyType != null && results[i].specialtyType != "")
-						{
-							referralDoctors[i].label += " [" + results[i].specialtyType + "]";
-						}
-					}
-					return referralDoctors;
-				},
-				function failure(errors) {
-					return [];
-				}
-			);
-		};
-		controller.chooseReferralDoc = function chooseReferralDoc(item, model, label)
-		{
-			controller.page.demo.scrReferralDocNo = item.referralNo;
-			controller.page.demo.scrReferralDoc = item.name;
-			controller.checkReferralDocNo();
-		};
 		controller.chooseFamilyDoc = function chooseFamilyDoc(item, model, label)
 		{
 			controller.page.demo.scrFamilyDocNo = item.referralNo;
 			controller.page.demo.scrFamilyDoc = item.name;
 			controller.checkFamilyDocNo();
-		};
-		controller.showAddNewRosterStatus = function showAddNewRosterStatus()
-		{
-			controller.page.showAddNewRosterStatus = !controller.page.showAddNewRosterStatus;
-			controller.page.newRosterStatus = null;
-		};
-		controller.showAddNewPatientStatus = function showAddNewPatientStatus()
-		{
-			controller.page.showAddNewPatientStatus = !controller.page.showAddNewPatientStatus;
-			controller.page.newPatientStatus = null;
-		};
-
-		//add new Roster Status
-		controller.addNewRosterStatus = function addNewRosterStatus()
-		{
-			if (controller.page.newRosterStatus != null && controller.page.newRosterStatus != "")
-			{
-				controller.page.rosterStatusList.push(
-				{
-					"value": controller.page.newRosterStatus,
-					"label": controller.page.newRosterStatus
-				});
-				controller.page.demo.rosterStatus = controller.page.newRosterStatus;
-			}
-			controller.showAddNewRosterStatus();
-		};
-
-		//add new Patient Status
-		controller.addNewPatientStatus = function addNewPatientStatus()
-		{
-			if (controller.page.newPatientStatus != null && controller.page.newPatientStatus != "")
-			{
-				controller.page.patientStatusList.push(
-				{
-					"value": controller.page.newPatientStatus,
-					"label": controller.page.newPatientStatus
-				});
-				controller.page.demo.patientStatus = controller.page.newPatientStatus;
-			}
-			controller.showAddNewPatientStatus();
-		};
-
-		//check phone numbers
-		controller.checkPhone = function checkPhone(type)
-		{
-			if (type == "C")
-			{
-				if (invalidPhoneNumber(controller.page.demo.scrCellPhone)) controller.page.demo.scrCellPhone = phoneNum["C"];
-				else phoneNum["C"] = controller.page.demo.scrCellPhone;
-			}
-			else if (type == "H")
-			{
-				if (invalidPhoneNumber(controller.page.demo.scrHomePhone)) controller.page.demo.scrHomePhone = phoneNum["H"];
-				else phoneNum["H"] = controller.page.demo.scrHomePhone;
-			}
-			else if (type == "W")
-			{
-				if (invalidPhoneNumber(controller.page.demo.scrWorkPhone)) controller.page.demo.scrWorkPhone = phoneNum["W"];
-				else phoneNum["W"] = controller.page.demo.scrWorkPhone;
-			}
-			else if (type == "HX" && controller.page.demo.scrHPhoneExt != null && controller.page.demo.scrHPhoneExt != "")
-			{
-				if (!isNumber(controller.page.demo.scrHPhoneExt)) controller.page.demo.scrHPhoneExt = phoneNum["HX"];
-				else phoneNum["HX"] = controller.page.demo.scrHPhoneExt;
-			}
-			else if (type == "WX" && controller.page.demo.scrWPhoneExt != null && controller.page.demo.scrWPhoneExt != "")
-			{
-				if (!isNumber(controller.page.demo.scrWPhoneExt)) controller.page.demo.scrWPhoneExt = phoneNum["WX"];
-				else phoneNum["WX"] = controller.page.demo.scrWPhoneExt;
-			}
-		};
-
-		//set preferred contact phone number
-		controller.setPreferredPhone = function setPreferredPhone()
-		{
-			controller.page.cellPhonePreferredMsg = defPhTitle;
-			controller.page.cellPhonePreferredColor = "";
-			controller.page.homePhonePreferredMsg = defPhTitle;
-			controller.page.homePhonePreferredColor = "";
-			controller.page.workPhonePreferredMsg = defPhTitle;
-			controller.page.workPhonePreferredColor = "";
-
-			if (controller.page.demo.scrPreferredPhone == "C")
-			{
-				controller.page.preferredPhoneNumber = controller.page.demo.scrCellPhone;
-				controller.page.cellPhonePreferredMsg = prefPhTitle;
-				controller.page.cellPhonePreferredColor = colorAttn;
-			}
-			else if (controller.page.demo.scrPreferredPhone == "H")
-			{
-				controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
-				controller.page.homePhonePreferredMsg = prefPhTitle;
-				controller.page.homePhonePreferredColor = colorAttn;
-			}
-			else if (controller.page.demo.scrPreferredPhone == "W")
-			{
-				controller.page.preferredPhoneNumber = controller.page.demo.scrWorkPhone;
-				controller.page.workPhonePreferredMsg = prefPhTitle;
-				controller.page.workPhonePreferredColor = colorAttn;
-			}
-		};
-
-		//disable set-preferred if phone number empty
-		controller.isPhoneVoid = function isPhoneVoid(phone)
-		{
-			return (phone == null || phone == "");
-		};
-
-		//show enrollment history (roster staus history)
-		controller.showEnrollmentHistory = function showEnrollmentHistory()
-		{
-			var url = "../demographic/EnrollmentHistory.jsp?demographicNo=" + controller.page.demo.demographicNo;
-			window.open(url, "enrollmentHistory", "width=650, height=1000");
 		};
 
 		//upload photo
@@ -1424,6 +1060,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//-----------------//
 		controller.save = function save()
 		{
+			if (!Juno.Validations.allValidationsValid(controller.validations))
+			{
+				alert("Some fields are invalid, Please correct the highlighted fields");
+				return;
+			}
+
 			controller.page.saving = true;
 			controller.displayMessages.clear();
 
@@ -1450,7 +1092,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 
 			//validate field inputs
-			controller.page.demo.dateOfBirth = buildDate(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
 			if (controller.page.demo.dateOfBirth == null)
 			{
 				alert("Invalid Date of Birth");
@@ -1461,6 +1102,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			if (!controller.validateSin()) return;
 			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
 			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
+
 
 			//save notes
 			if (controller.page.demo.scrNotes != null)
@@ -1501,8 +1143,18 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			newDemoExtras = updateDemoExtras("rxInteractionWarningLevel", controller.page.demo.scrRxInteractionLevel, posExtras, controller.page.demo.extras, newDemoExtras);
 			controller.page.demo.extras = newDemoExtras;
 
+			// clone the demographic, so that final modifications can be made before save.
+			let demographicForSave = {};
+			Object.assign(demographicForSave, controller.page.demo)
+
+			// convert null back to "-1" why? because Oscar.
+			if (!demographicForSave.countryOfOrigin)
+			{
+				demographicForSave.countryOfOrigin = "-1";
+			}
+
 			//save to database
-			demographicService.updateDemographic(controller.page.demo).then(
+			demographicService.updateDemographic(demographicForSave).then(
 				function success()
 				{
 					controller.resetEditState();
@@ -1522,6 +1174,19 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.saving = false;
 			controller.page.dataChanged = false;
 		};
+
+		controller.pageClasses = () =>
+		{
+			if ($scope.pageStyle === JUNO_STYLE.DRACULA)
+			{
+				return ["juno-style-dracula-background"]
+			}
+		}
+
+		controller.setStyle = (style) =>
+		{
+			$scope.pageStyle = style;
+		}
 
 		controller.init(); // Initialize the controller
 	}
@@ -1558,96 +1223,6 @@ function updateDemoExtras(extKey, newVal, posExtras, oldExtras, newExtras)
 	return newExtras;
 }
 
-function buildDate(year, month, day)
-{
-	if (dateEmpty(year, month, day)) return "";
-	if (date3Valid(year, month, day)) return year + "-" + month + "-" + day;
-	return null;
-}
-
-function checkYear(year)
-{
-	for (var i = 0; i < year.length; i++)
-	{
-		if (!isNumber(year.charAt(i)))
-		{
-			year = year.substring(0, i) + year.substring(i + 1);
-		}
-	}
-	if (year != "")
-	{
-		year = parseInt(year).toString();
-		if (year.length > 4) year = year.substring(0, 4);
-		if (year == 0) year = "";
-	}
-	return year;
-}
-
-function checkMonth(month)
-{
-	for (var i = 0; i < month.length; i++)
-	{
-		if (!isNumber(month.charAt(i)))
-		{
-			month = month.substring(0, i) + month.substring(i + 1);
-		}
-	}
-	if (month != "")
-	{
-		if (month.length > 2) month = month.substring(0, 2);
-		if (month > 12) month = month.substring(0, 1);
-	}
-	return month;
-}
-
-var daysOfMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
-function checkDay(day, month, year)
-{
-	for (var i = 0; i < day.length; i++)
-	{
-		if (!isNumber(day.charAt(i)))
-		{
-			day = day.substring(0, i) + day.substring(i + 1);
-		}
-	}
-	if (day != "")
-	{
-		if (day.length > 2) day = day.substring(0, 2);
-
-		if (month == null)
-		{
-			if (day > 31) day = day.substring(0, 1);
-		}
-		else if (year == null)
-		{
-			if (day > daysOfMonth[month - 1]) day.substring(0, 1);
-		}
-		else if (!date3Valid(year, month, day))
-		{
-			day = day.substring(0, 1);
-		}
-	}
-	return day;
-}
-
-function date3Valid(year, month, day)
-{
-	if (year != null && year != "" && month != null && month != "" && day != null && day != "")
-	{
-		var maxDaysOfMonth = daysOfMonth[month - 1];
-		if (month == 2)
-		{
-			if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
-			{
-				maxDaysOfMonth = 29;
-			}
-		}
-		return (day > 0 && day <= maxDaysOfMonth);
-	}
-	return dateEmpty(year, month, day);
-}
-
 function dateEmpty(year, month, day)
 {
 	return ((year == null || year == "") && (month == null || month == "") && (day == null || day == ""));
@@ -1673,12 +1248,6 @@ function dateValid(dateStr)
 function isNumber(s)
 {
 	return /^[0-9]+$/.test(s);
-}
-
-function invalidPhoneNumber(phone)
-{
-	if (phone == null) return false; //phone number is NOT invalid
-	return !(/^[0-9 \-\()]*$/.test(phone));
 }
 
 function isPreferredPhone(phone)

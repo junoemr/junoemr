@@ -31,6 +31,7 @@ import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.SpringUtils;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
@@ -107,7 +108,9 @@ public class AppointmentMapper extends AbstractMapper
 		appointment.setType(type);
 		appointment.setLocation("");
 		appointment.setResources("");
-		appointment.setReasonCode(17); // TODO look this up somewhere
+
+		org.oscarehr.appointment.service.Appointment appointmentService = SpringUtils.getBean(org.oscarehr.appointment.service.Appointment.class);
+		appointment.setReasonCode(appointmentService.getIdForAppointmentReasonCode(Appointment.DEFAULT_REASON));
 
 		return appointment;
 	}

@@ -115,22 +115,32 @@ public class PreventionManager
 
 	public boolean hideItem(String item)
 	{
-		String itemsToRemove = null;
+		List<String> itemsToHide = getItemsToHide();
+		return hideItem(item, itemsToHide);
+	}
+
+	public List<String> getItemsToHide()
+	{
 		Property p = propertyDao.checkByName(HIDE_PREVENTION_ITEM);
 
+		List<String> items = new ArrayList<>();
 		if(p != null && p.getValue() != null)
 		{
-			itemsToRemove = p.getValue();
-			List<String> items = Arrays.asList(itemsToRemove.split("\\s*,\\s*"));
-			for(String i : items)
-			{
-				if(i.equals(item))
-				{
-					return true;
-				}
-			}
+			String itemsToHideRawString = p.getValue();
+			items = Arrays.asList(itemsToHideRawString.split("\\s*,\\s*"));
 		}
-		return false;
+
+		return items;
+	}
+
+	public boolean hideItem(String item, List<String> itemsToHide)
+	{
+		if(itemsToHide == null)
+		{
+			return false;
+		}
+
+		return itemsToHide.contains(item);
 	}
 
 	public static String getCustomPreventionItems()
