@@ -881,7 +881,8 @@ function fsPopup(width,height,url,window) {
 		<%=undiagnosed %>
 	</ul>
 </div>
-
+		</div>
+</div>
 
 <div id="main" class="container">
    <div class="row-fluid">
