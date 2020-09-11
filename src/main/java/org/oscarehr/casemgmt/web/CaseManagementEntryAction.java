@@ -169,8 +169,6 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		request.setAttribute("change_flag", "false");
 		request.setAttribute("from", "casemgmt");
 
-		boolean isIssueNote = cform.getCaseNote().isIncludeissue();
-
 		logger.debug("Get demo and provider no");
 		String demono = getDemographicNo(request);
 		Integer demographicNo = Integer.parseInt(demono);
@@ -311,6 +309,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 				note.setEncounter_type(bean.encType);
 			}
 
+			boolean isIssueNote = cform.getCaseNote().isIncludeissue();
 			if (!isIssueNote)
 			{
 				resetTemp(providerNo, demono, programIdString);
