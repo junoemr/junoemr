@@ -48,8 +48,10 @@ if(!authed) {
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.common.model.Security" %>
 <%@ page import="org.oscarehr.common.dao.SecurityDao" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
 <%
 	SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
+	SecurityInfoManager securityInfoManager =SpringUtils.getBean(SecurityInfoManager.class);
 %>
 <html:html locale="true">
 <head>
@@ -64,27 +66,36 @@ if(!authed) {
 	</tr>
 </table>
 <%
+if (securityInfoManager.superAdminModificationCheck((String)session.getAttribute("user"), request.getParameter("provider_number")))
+{
 	int rowsAffected=0;
-	Security s = securityDao.find(Integer.parseInt(request.getParameter("keyword")));
+	Security s = securityDao.find(Integer.parseInt(request.getParameter("security_no")));
 	if(s != null) {
 		securityDao.remove(s.getId());
 		rowsAffected=1;
 		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_DELETE, LogConst.CON_SECURITY,
-        		request.getParameter("keyword"), request.getRemoteAddr());
+        		request.getParameter("security_no"), request.getRemoteAddr());
 	}
 
 	if (rowsAffected ==1) {
 %>
 <p>
 <h2><bean:message key="admin.securitydelete.msgDeletionSuccess" />:
-<%= request.getParameter("keyword") %>.</h2>
+<%= request.getParameter("security_no") %>.</h2>
 <%
   } else {
 %>
 <h1><bean:message key="admin.securitydelete.msgDeletionFailure" />:
-<%= request.getParameter("keyword") %>.</h1>
+<%= request.getParameter("security_no") %>.</h1>
 <%
   }
+}
+else
+{
+%>
+	<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization"/> <%=request.getParameter("provider_number")%></h1>
+<%
+}
 %>
 <p></p>
 
