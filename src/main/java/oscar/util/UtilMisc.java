@@ -30,11 +30,14 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
 import org.oscarehr.util.MiscUtils;
 
 public class UtilMisc {
+    static final Pattern controlCharPattern = Pattern.compile("(?U)\\p{Cntrl}");
+
   /**
    * @deprecated use apache's StringEscapeUtils instead.
    */

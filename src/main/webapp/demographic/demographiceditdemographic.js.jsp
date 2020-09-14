@@ -336,26 +336,6 @@ function checkTypeInEdit()
 	return (true);
 }
 
-function formatPhoneNum()
-{
-	if (document.updatedelete.phone.value.length == 10)
-	{
-		document.updatedelete.phone.value = document.updatedelete.phone.value.substring(0, 3) + "-" + document.updatedelete.phone.value.substring(3, 6) + "-" + document.updatedelete.phone.value.substring(6);
-	}
-	if (document.updatedelete.phone.value.length == 11 && document.updatedelete.phone.value.charAt(3) == '-')
-	{
-		document.updatedelete.phone.value = document.updatedelete.phone.value.substring(0, 3) + "-" + document.updatedelete.phone.value.substring(4, 7) + "-" + document.updatedelete.phone.value.substring(7);
-	}
-	if (document.updatedelete.phone2.value.length == 10)
-	{
-		document.updatedelete.phone2.value = document.updatedelete.phone2.value.substring(0, 3) + "-" + document.updatedelete.phone2.value.substring(3, 6) + "-" + document.updatedelete.phone2.value.substring(6);
-	}
-	if (document.updatedelete.phone2.value.length == 11 && document.updatedelete.phone2.value.charAt(3) == '-')
-	{
-		document.updatedelete.phone2.value = document.updatedelete.phone2.value.substring(0, 3) + "-" + document.updatedelete.phone2.value.substring(4, 7) + "-" + document.updatedelete.phone2.value.substring(7);
-	}
-}
-
 //
 function rs(n, u, w, h, x)
 {
