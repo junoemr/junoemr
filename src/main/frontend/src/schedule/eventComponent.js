@@ -99,6 +99,9 @@ angular.module('Schedule').component('eventComponent', {
 				critical: false,
 				site: null,
 				virtual: false,
+				bookingSource: null,
+				isSelfBooked: false,
+				creatorSecurityId: null
 			};
 
 			controller.repeatBooking =
@@ -330,6 +333,9 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.eventData.critical = data.eventData.urgency === 'critical';
 					$scope.eventData.site = data.eventData.site;
 					$scope.eventData.virtual = data.eventData.virtual;
+					$scope.eventData.bookingSource = data.eventData.bookingSource;
+					$scope.eventData.creatorSecurityId = data.eventData.creatorSecurityId;
+					$scope.eventData.isSelfBooked = data.eventData.tagSelfBooked;
 
 					controller.checkEventConflicts(); // uses the eventData
 
@@ -860,6 +866,9 @@ angular.module('Schedule').component('eventComponent', {
 						doNotBook: $scope.eventData.doNotBook,
 						urgency: (($scope.eventData.critical) ? 'critical' : null),
 						virtual: $scope.eventData.virtual,
+						bookingSource: $scope.eventData.bookingSource,
+						creatorSecurityId: $scope.eventData.creatorSecurityId,
+						tagSelfBooked: $scope.eventData.isSelfBooked,
 						sendNotification: sendNotification,
 					},
 					repeatOnDates,

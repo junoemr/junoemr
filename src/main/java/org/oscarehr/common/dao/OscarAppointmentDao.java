@@ -804,6 +804,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  a.type,\n" +
 				"  a.style,\n" +
 				"  a.bookingSource,\n" +
+				"  a.creatorSecurityId, \n" +
 				"  a.status,\n" +
 				"  a.urgency,\n" +
 				"  a.isVirtual,\n" +
@@ -864,6 +865,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  a.type,\n" +
 				"  a.style,\n" +
 				"  a.bookingSource,\n" +
+				"  a.creatorSecurityId, \n" +
 				"  a.status,\n" +
 				"  a.urgency,\n" +
 				"  a.isVirtual,\n" +
@@ -921,6 +923,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String type = (String) result[index++];
 			String style = (String) result[index++];
 			String bookingSource = (String) result[index++];
+			Integer creatorSecurityId = (Integer) result[index++];
 			String status = (String) result[index++];
 			String urgency = (String) result[index++];
 			Byte isVirtualResult = (Byte) result[index++];
@@ -990,49 +993,51 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				}
 
 			}
-
 			boolean hasTicklers = (maxTicklerNo != null);
 
 			appointmentDetails.get(startTime).add(new AppointmentDetails(
-				appointmentNo,
-				demographicNo,
-				appointmentDate,
-				startTime,
-				endTime,
-				name,
-				notes,
-				reason,
-				reasonCode,
-				location,
-				resources,
-				type,
-				style,
-				bookingSource,
-				status,
-				urgency,
-				statusTitle,
-				color,
-				junoColor,
-				iconImage,
-				shortLetterColour,
-				shortLetters,
-				firstName,
-				lastName,
-				ver,
-				hin,
-				chartNo,
-				familyDoctor,
-				rosterStatus,
-				hcRenewDate,
-				custNotes,
-				custAlert,
-				colorProperty,
-				birthday,
-				hasTicklers,
-				ticklerMessages,
-				isVirtual,
-				isConfirmed
+					appointmentNo,
+					demographicNo,
+					appointmentDate,
+					startTime,
+					endTime,
+					name,
+					notes,
+					reason,
+					reasonCode,
+					location,
+					resources,
+					type,
+					style,
+					bookingSource,
+					status,
+					urgency,
+					statusTitle,
+					color,
+					junoColor,
+					iconImage,
+					shortLetterColour,
+					shortLetters,
+					firstName,
+					lastName,
+					ver,
+					hin,
+					chartNo,
+					familyDoctor,
+					rosterStatus,
+					hcRenewDate,
+					custNotes,
+					custAlert,
+					colorProperty,
+					birthday,
+					hasTicklers,
+					ticklerMessages,
+					isVirtual,
+					isConfirmed,
+					creatorSecurityId
+
 			));
+
 		}
 
 		return appointmentDetails;
