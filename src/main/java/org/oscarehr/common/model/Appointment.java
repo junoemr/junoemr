@@ -80,7 +80,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	public static final String DONOTBOOK = "Do_Not_Book";
 
-	public static final int DEFAULT_REASON_CODE = 17;
+	public static final String DEFAULT_REASON = "Others";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -166,7 +166,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@Column(name = "confirmed_by")
 	private String confirmedBy;
 
-	private Integer reasonCode = DEFAULT_REASON_CODE;
+	private Integer reasonCode;
 
 	/** default constructor */
 	public Appointment()

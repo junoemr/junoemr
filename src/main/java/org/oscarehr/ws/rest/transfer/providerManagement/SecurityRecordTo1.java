@@ -62,7 +62,7 @@ public class SecurityRecordTo1
 
 	/**
 	 * convert transfer object to security record
-	 * @return
+	 * @return current entry as a Security object
 	 */
 	@JsonIgnore
 	public Security getSecurity()

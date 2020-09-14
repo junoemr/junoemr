@@ -69,8 +69,12 @@ public class ConversionUtils {
 	public static final String DEFAULT_TIME_PATTERN = "HH:mm:ss";
 	public static final String TIME_PATTERN_NO_SEC = "HH:mm";
 	public static final String DEFAULT_TS_PATTERN = "yyyy-MM-dd HH:mm:ss";
+	public static final String DATE_TIME_ZONE_OFFSET_X_PATTERN = "yyyy-MM-dd HH:mm:ss X";
 
-	public static final String TS_NO_SEC_PATTERN = "yyyy-MM-dd H:mm";
+	public static final String HL7_V2_DATE_TIME_OFFICIAL_PATTERN = "yyyyMMddHHmmssX";
+	public static final String HL7_DATE_TIME_DEFAULT_IN_PATTERN = "yyyyMMddHHmmss";
+
+	public static final String TS_NO_SEC_PATTERN = "yyyy-MM-dd HH:mm";
 
 	private static final Long ZERO_LONG = new Long(0);
 	private static final Integer ZERO_INT = new Integer(0);

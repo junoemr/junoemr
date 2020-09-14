@@ -44,6 +44,7 @@ import javax.servlet.http.HttpSession;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -926,14 +927,12 @@ public final class RxWriteScriptAction extends DispatchAction {
 								rx.setBrandName(val);
 							}
 							
-						} else if (elem.equals("repeats_" + num)) {
-							if (val.equals("") || val == null) {
-								rx.setRepeat(0);
-							} else {
-								rx.setRepeat(Integer.parseInt(val));
-							}
-						
-						} else if(elem.equals("codingSystem_" + num)) {
+						}
+						else if (elem.equals("repeats_" + num))
+						{
+							rx.setRepeat(NumberUtils.toInt(val, 0));
+						}
+						else if(elem.equals("codingSystem_" + num)) {
 							if(val != null) {
 								rx.setDrugReasonCodeSystem(val);
 							}

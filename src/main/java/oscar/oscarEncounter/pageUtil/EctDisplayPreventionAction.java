@@ -133,8 +133,11 @@ public class EctDisplayPreventionAction extends EctDisplayAction
 			{
 				if (preventionCount > 0)
 				{
-					Date itemDate = Date.from(preventionListData.getPreventionDate().atZone(ZoneId.systemDefault()).toInstant());
-					item.setDate(itemDate);
+					if (preventionListData.getPreventionDate() != null)
+					{
+						Date itemDate = Date.from(preventionListData.getPreventionDate().atZone(ZoneId.systemDefault()).toInstant());
+						item.setDate(itemDate);
+					}
 
 					if (
 							preventionListData.getRefused() != null &&

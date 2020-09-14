@@ -1984,6 +1984,7 @@ private long getAppointmentRowSpan(
 																		<c:otherwise>
 																			&#124; <a
 																				id="billingLink"
+																				rel="opener"
 																				href="${appointmentInfo.billLink}"
 																				target="_blank"
 																				title="<bean:message key="global.billingtag"/>"

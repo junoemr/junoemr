@@ -49,27 +49,29 @@ public class ProEditMyOscarIdAction extends Action {
     {
         String forward;
         String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-        if ( providerNo == null)
-              return mapping.findForward("eject");
+        if (providerNo == null)
+        {
+            return mapping.findForward("eject");
+        }
 
         DynaActionForm frm = (DynaActionForm)form;
         String loginId = (String)frm.get("myOscarLoginId");
         loginId=MiscUtilsOld.getUserNameNoDomain(loginId);
                 
-        if( ProviderMyOscarIdData.getMyOscarId(providerNo).equals(loginId) ) {
+        if (ProviderMyOscarIdData.getMyOscarId(providerNo).equals(loginId))
+        {
             ActionMessages errors = new ActionMessages();
             errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("provider.setPHRLogin.msgNotUnique"));
             this.addErrors(request, errors);
-            forward = new String("failure");
-            
-        }
-        else if( ProviderMyOscarIdData.setId(providerNo,loginId)) {
-            request.setAttribute("status",new String("complete"));
-            forward = new String("success");
+            forward = "failure";
         }
         else
-            forward = new String("error");
-        
+        {
+            ProviderMyOscarIdData.setId(providerNo,loginId);
+            request.setAttribute("status", "complete");
+            forward = "success";
+        }
+
         return mapping.findForward(forward);
         
     }

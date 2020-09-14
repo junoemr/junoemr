@@ -24,13 +24,17 @@ package org.oscarehr.appointment.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
+import org.oscarehr.common.dao.LookupListItemDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.model.LookupList;
+import org.oscarehr.common.model.LookupListItem;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
 import org.oscarehr.integration.service.IntegrationService;
+import org.oscarehr.managers.LookupListManager;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
@@ -74,6 +78,11 @@ public class Appointment
 
 	@Autowired
 	IntegrationService integrationService;
+
+	@Autowired
+	private LookupListManager lookupListManager;
+	@Autowired
+	private LookupListItemDao lookupListItemDao;
 
 	private String formatName(String upperFirstName, String upperLastName)
 	{
@@ -304,7 +313,9 @@ public class Appointment
 						false,
 						details.isVirtual(),
 						null,
-						details.isConfirmed()
+						details.isConfirmed(),
+						details.getCreatorSecurityId(),
+						details.getBookingSource()
 				);
 				// for the case where appointments are saved with a name but no demographic
 				if((appointment.getDemographicNo() == null || appointment.getDemographicNo() == 0) && details.getName() != null)
@@ -328,4 +339,28 @@ public class Appointment
 
 		return calendarEvents;
 	}
+
+	/**
+	 * Appointment reason codes map to lookup list items, which usually have the correct IDs but may not
+	 * be guaranteed to have the exact ID between instances.
+	 * This is the "safe" way of getting the correct reasonCode id for the reason we're trying to set.
+	 * @param reasonValue string corresponding to the reason code we're looking for
+	 * @return id of the LookupListItem entry with the correct reasonCode and LookupList, -1 otherwise
+	 */
+	public Integer getIdForAppointmentReasonCode(String reasonValue)
+	{
+		// reasonCode is intended to be a foreign key on LookupListItem, which is referenced by LookupList
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod();
+		LookupList reasonCodeList = lookupListManager.findLookupListByName(loggedInInfo, "reasonCode");
+		List<LookupListItem> reasonCodes = lookupListItemDao.findAll(null, null);
+		for (LookupListItem reasonCode : reasonCodes)
+		{
+			if (reasonCode.getLookupListId().equals(reasonCodeList.getId()) && reasonCode.getValue().equals(reasonValue))
+			{
+				return reasonCode.getId();
+			}
+		}
+		return -1;
+	}
+
 }

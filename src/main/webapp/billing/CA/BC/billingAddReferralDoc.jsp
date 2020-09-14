@@ -55,7 +55,7 @@ if(!authed) {
 
 <head>
 <title><bean:message key="admin.admin.ManageReferralDoc"/></title>
-
+<link href="<%=request.getContextPath() %>/css/bootstrap.min.css" rel="stylesheet">
 
 <script type="text/javascript">
 
@@ -82,26 +82,33 @@ function checkUnits(){
 	return true;
 }
 
-function checkBillingNumber(){
-    //alert(">"+document.AddReferralDocForm.referral_no.value+"<");
-    if( document.AddReferralDocForm.referral_no.value.length == 0){
-        alert("You must enter a Billing Number");
-        return false;
-    }else if  (!isNumeric(document.AddReferralDocForm.referral_no.value)){
-        alert("Billing Number has to be a numeric value");
-	document.AddReferralDocForm.referral_no.value.focus();
-        return false;
-    }else if( document.AddReferralDocForm.referral_no.value.length != 5){
-       if( document.AddReferralDocForm.referral_no.value.length < 5){
-          //need to addzeros
-	  document.AddReferralDocForm.referral_no.value = forwardZero(document.AddReferralDocForm.referral_no.value, 5);
-       }else{
-	  alert("Billing Number must be digits");
-          return false;
-       }
-
+function checkBillingNumber()
+{
+    if(document.AddReferralDocForm.referral_no.value.length == 0)
+    {
+		alert('<bean:message key="admin.admin.referralDoc.billingNumberRequired" />');
+		return false;
     }
-
+    else if(!isNumeric(document.AddReferralDocForm.referral_no.value))
+    {
+		alert('<bean:message key="admin.admin.referralDoc.billingDigitNotNumber" />');
+        return false;
+    }
+    else if(document.AddReferralDocForm.referral_no.value.length != 5)
+    {
+		if( document.AddReferralDocForm.referral_no.value.length < 5)
+		{
+          //need to addzeros
+			document.AddReferralDocForm.referral_no.value = forwardZero(document.AddReferralDocForm.referral_no.value, 5);
+		}
+		else
+		{
+			alert('<bean:message key="admin.admin.referralDoc.billingDigitOverLimit" />');
+          	return false;
+       	}
+    }
+	document.getElementById("submitBtn").disabled = true;
+	registerFormSubmit('addReferralDocform', 'dynamic-content');
 	return true;
 }
 
@@ -169,12 +176,12 @@ function forwardZero(str, len) {
 				Postal:<html:text property="postal" /><br />
 				Phone:<html:text property="phone" />
 				Fax:<html:text property="fax" /><br />
-				<input class="btn btn-primary" type="submit" value="Save" />
+				<input class="btn btn-primary" id="submitBtn" type="submit" value="Save" />
 			</fieldset>
 		</html:form>
 	</div>
 <script>
-registerFormSubmit('addReferralDocform', 'dynamic-content');
+
 </script>
 </body>
 </html:html>

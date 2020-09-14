@@ -438,7 +438,6 @@ public class Schedule
 						continue;
 					}
 				}
-
 				userSchedule = getUserDateSchedule(
 						date,
 						new Integer(result.getId().getProviderNo()),
@@ -473,7 +472,6 @@ public class Schedule
 
 			userDateSchedules.add(userSchedule);
 		}
-
 		// Create transfer object
 		return new ResourceSchedule(userDateSchedules);
 	}

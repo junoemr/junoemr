@@ -38,6 +38,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -50,6 +52,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
+import static oscar.util.StringUtils.filterControlCharacters;
 
 @Entity(name = "model.Demographic") // use a name to prevent autowire conflict with old model
 @Table(name = "demographic")
@@ -853,6 +856,14 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public boolean isNewBorn()
 	{
 		return Demographic.isNewBorn(getDateOfBirth(), getVer());
+	}
+
+	@PrePersist
+	@PreUpdate
+	public void removeControlCharacter()
+	{
+		setPhone(filterControlCharacters(this.getPhone()));
+		setPhone2(filterControlCharacters(this.getPhone2()));
 	}
 
 	/**
