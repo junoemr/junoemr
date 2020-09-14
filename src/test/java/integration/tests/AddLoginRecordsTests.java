@@ -109,7 +109,6 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='b_ExpireSet']")).click();
 		driver.findElement(By.id("date_ExpireDate_cal")).click();
 		driver.findElement(By.xpath("//div[@class='calendar']//div[contains(., 'Today')]")).click();
-
 		driver.findElement(By.xpath("//input[@name='pin']")).sendKeys(pin);
 		driver.findElement(By.xpath("//input[@name='conPin']")).sendKeys(pin);
 		dropdownSelectByValue(driver, By.xpath("//select[@name='forcePasswordReset']"), "1");
@@ -166,10 +165,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 
 		//Reset password
 		resetPassword(password, passwordUpdated);
-		Assert.assertTrue(Navigation.isLoggedIn(driver));
-
-		//Add login Record for super admin from non-superadmin account.
-
+			Assert.assertTrue(Navigation.isLoggedIn(driver));
 	}
 
 	@Test
