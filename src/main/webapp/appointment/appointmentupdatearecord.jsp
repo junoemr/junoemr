@@ -74,7 +74,7 @@
 	</tr>
 </table>
 	<%
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+ 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String updateuser = loggedInInfo.getLoggedInProviderNo();
 		final String cancelledAppointment = "Cancel Appt";
 
@@ -93,6 +93,7 @@
 		Date endDate = ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time"));
 
 		String appointmentName = ConversionUtils.getStringOrDefaultValue(request.getParameter("keyword"), appt.getName());
+
 		String notes = StringUtils.transformNullInEmptyString(request.getParameter("notes"));
 		String reason = StringUtils.transformNullInEmptyString(request.getParameter("reason"));
 		String location = ConversionUtils.getStringOrDefaultValue(request.getParameter("location"), appt.getLocation());
