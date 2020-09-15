@@ -16,7 +16,8 @@
 								model="$ctrl.bookProviderNo"
 								options="$ctrl.providerOptions"
 								placeholder="Assign to provider"
-								component-style="$ctrl.resolve.style">
+								component-style="$ctrl.resolve.style"
+								on-selected="$ctrl.onProviderSelect()">
 				</juno-typeahead>
 
 				<juno-button ng-click="$ctrl.assignToMe()"
@@ -47,19 +48,19 @@
 			Cancel
 		</juno-button>
 		<juno-button ng-click="$ctrl.bookQueuedAppointment()"
-								 title="Assign the appointment to a schedule"
+								 title="{{$ctrl.bookTooltip('Assign the appointment to a schedule')}}"
 								 component-style="$ctrl.resolve.style"
 								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-								 disabled="!$ctrl.bookProviderNo || $ctrl.isLoading">
+								 disabled="!$ctrl.bookProviderNo || $ctrl.isLoading || !$ctrl.providerHasSite">
 			Assign
 		</juno-button>
 		<juno-button ng-click="$ctrl.bookAndStartTelehealth()"
-								 title="Assign the appointment to a schedule and start the telehealth call"
+								 title="{{$ctrl.bookTooltip('Assign the appointment to a schedule and start the telehealth call')}}"
 								 component-style="$ctrl.resolve.style"
 								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-								 disabled="!$ctrl.bookProviderNo || $ctrl.isLoading">
+								 disabled="!$ctrl.bookProviderNo || $ctrl.isLoading || !$ctrl.providerHasSite">
 			Start
 		</juno-button>
 	</div>

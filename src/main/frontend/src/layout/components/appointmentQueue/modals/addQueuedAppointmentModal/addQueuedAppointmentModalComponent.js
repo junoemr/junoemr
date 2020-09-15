@@ -67,10 +67,9 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 
 		ctrl.bookProviderNo = null;
 		ctrl.providerOptions = [];
-		ctrl.siteOptions = [];
-		ctrl.siteSelection = null;
 		ctrl.isMultisiteEnabled = false;
 		ctrl.isLoading = false;
+		ctrl.providerHasSite = false;
 
 		ctrl.$onInit = async () =>
 		{
@@ -93,9 +92,32 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			}
 		}
 
+		ctrl.checkProviderSite = async () =>
+		{
+			const bookingSiteId = await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
+			const siteList = (await sitesApi.getSitesByProvider(ctrl.bookProviderNo)).data.body;
+
+			for (let providerSite of siteList)
+			{
+				if (providerSite.siteId === bookingSiteId)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
 		ctrl.assignToMe = async () =>
 		{
 			ctrl.bookProviderNo = (await providerService.getMe()).providerNo;
+			ctrl.providerHasSite = false;
+			ctrl.providerHasSite = await ctrl.checkProviderSite();
+		}
+
+		ctrl.onProviderSelect = async () =>
+		{
+			ctrl.providerHasSite = false;
+			ctrl.providerHasSite = await ctrl.checkProviderSite();
 		}
 
 		ctrl.bookQueuedAppointment = async () =>
@@ -165,6 +187,19 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		{
 			ctrl.modalInstance.close();
 		};
+
+		ctrl.bookTooltip = (okMsg) =>
+		{
+			if (!ctrl.bookProviderNo)
+			{
+				return "Select a provider"
+			}
+			else if (!ctrl.providerHasSite)
+			{
+				return "Provider is not assigned to the site of this appointment";
+			}
+			return okMsg;
+		}
 
 	}]
 });
