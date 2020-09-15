@@ -54,8 +54,10 @@ angular.module('Common.Components').component('appointmentQueueModal',
 				ctrl.queueModel = {};
 				ctrl.isLoading = true;
 				ctrl.showOnDemandSettings = true; // TODO - when should this be false?
+				ctrl.notifyPhoneNumbers = "";
+				ctrl.queueContacts = [];
 
-				ctrl.$onInit = () =>
+				ctrl.$onInit = async () =>
 				{
 					ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 					ctrl.editMode = ctrl.resolve.editMode;
@@ -63,6 +65,8 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					if(ctrl.editMode)
 					{
 						ctrl.queueModel = angular.copy(ctrl.resolve.queue);
+						ctrl.queueContacts = (await aqsQueuesApi.getQueueContacts(ctrl.queueModel.id)).data.body;
+						ctrl.notifyPhoneNumbers = ctrl.queueContacts.map((contact) => contact.phone).join(", ");
 						ctrl.isLoading = false;
 					}
 					else
@@ -79,6 +83,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 							ctrl.isLoading = false;
 						})
 					}
+
 				}
 
 				ctrl.saveDisabled = () =>
@@ -114,6 +119,32 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					{
 						aqsQueuesApi.createAppointmentQueue(ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
 					}
+
+					ctrl.saveQueueContacts();
+				}
+
+				// parse out the comma list of phone numbers in to contacts and save / remove them
+				// (comma list is stupid! one day.... Kelly will let me do it better!)
+				ctrl.saveQueueContacts = () =>
+				{
+					let contactPhones  = ctrl.notifyPhoneNumbers.split(",").map((phone) => phone.trim()).filter((phone) => phone !== "")
+					let deleteContacts = ctrl.queueContacts.filter((contact) => !contactPhones.includes(contact.phone))
+					let newContactPhones = contactPhones.filter((phone) =>
+          {
+            return !ctrl.queueContacts.find((contact) => contact.phone.trim() === phone)
+          });
+
+					// delete removed contacts
+					deleteContacts.forEach((contact) => aqsQueuesApi.removeQueueContact(ctrl.queueModel.id, contact.remoteId));
+
+					// add new ones
+					newContactPhones.forEach((phone) =>
+					{
+						const newContact = {
+							phone,
+						}
+						aqsQueuesApi.addQueueContact(ctrl.queueModel.id, newContact);
+					})
 				}
 
 				ctrl.onCancel = () =>
