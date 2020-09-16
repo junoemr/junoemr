@@ -29,9 +29,12 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.util.MiscUtils;
+import oscar.OscarProperties;
 
 public class Navigation
 {
+	private static final OscarProperties properties = OscarProperties.getInstance();
+
 	public static final String OSCAR_URL="http://localhost";
 
 
@@ -79,6 +82,6 @@ public class Navigation
 
 	public static String getOscarUrl(String serverPort)
 	{
-		return OSCAR_URL + ":" + serverPort;
+		return OSCAR_URL + ":" + serverPort + "/" + properties.getProjectHome();
 	}
 }

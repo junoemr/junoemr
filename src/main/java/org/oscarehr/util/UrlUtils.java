@@ -25,7 +25,6 @@ package org.oscarehr.util;
 
 import org.springframework.web.util.UriUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 public class UrlUtils

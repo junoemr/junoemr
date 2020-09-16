@@ -31,11 +31,16 @@ import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -44,6 +49,8 @@ import static integration.tests.util.data.PatientTestCollection.patientLNames;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByIndex;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddPatientsTests extends SeleniumTestBase
 {
 
@@ -53,7 +60,7 @@ public class AddPatientsTests extends SeleniumTestBase
 		WebElement searchTermField = driver.findElement(searchTerm);
 		searchTermField.sendKeys(lastName + ", " + firstName);
 		searchTermField.sendKeys(Keys.ENTER);
-		Thread.sleep(1000);
+		Thread.sleep(2000);
 		return PageUtil.isExistsBy(nameRow, driver);
 	}
 
@@ -70,8 +77,14 @@ public class AddPatientsTests extends SeleniumTestBase
 	{
 		// login
 		if (!Navigation.isLoggedIn(driver)) {
-			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+			Navigation.doLogin(
+					AuthUtils.TEST_USER_NAME,
+					AuthUtils.TEST_PASSWORD,
+					AuthUtils.TEST_PIN,
+					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+					driver);
 		}
+
 		// open patient search page
 		driver.findElement((By.xpath("//a[@title=\"Search for patient records\"]"))).click();
 		PageUtil.switchToLastWindow(driver);
@@ -148,7 +161,12 @@ public class AddPatientsTests extends SeleniumTestBase
 	public void addPatientsClassicUIQuickFormTest() throws Exception
 	{
 		// login
-		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+		Navigation.doLogin(
+				AuthUtils.TEST_USER_NAME,
+				AuthUtils.TEST_PASSWORD,
+				AuthUtils.TEST_PIN,
+				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+				driver);
 		// open patient search page
 		driver.findElement((By.xpath("//a[@title=\"Search for patient records\"]"))).click();
 		PageUtil.switchToLastWindow(driver);
@@ -178,7 +196,12 @@ public class AddPatientsTests extends SeleniumTestBase
 	public void addPatientsJUNOUITest() throws Exception
 	{
 		// login
-		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+		Navigation.doLogin(
+				AuthUtils.TEST_USER_NAME,
+				AuthUtils.TEST_PASSWORD,
+				AuthUtils.TEST_PIN,
+				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+				driver);
 
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();

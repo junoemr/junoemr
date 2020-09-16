@@ -31,11 +31,15 @@ import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -43,6 +47,8 @@ import java.sql.SQLException;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByIndex;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddProvidersTests extends SeleniumTestBase {
 
 	@BeforeClass
@@ -56,7 +62,12 @@ public class AddProvidersTests extends SeleniumTestBase {
 	public void addProvidersClassicUITest() throws Exception {
 		// login
 		if (!Navigation.isLoggedIn(driver)) {
-			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+			Navigation.doLogin(
+					AuthUtils.TEST_USER_NAME,
+					AuthUtils.TEST_PASSWORD,
+					AuthUtils.TEST_PIN,
+					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+					driver);
 		}
 		// open administration panel
 		driver.findElement(By.id("admin-panel")).click();

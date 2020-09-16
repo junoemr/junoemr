@@ -35,9 +35,7 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import oscar.OscarProperties;
 
 /**
  * This ContextListener is used to Initialize classes at startup - Initialize the DBConnection Pool.

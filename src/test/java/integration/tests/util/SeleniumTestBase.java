@@ -31,9 +31,11 @@ import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.oscarehr.common.dao.DaoTestFixtures;
+import org.oscarehr.common.dao.utils.ConfigUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.env.Environment;
 
 import java.io.IOException;
@@ -42,9 +44,16 @@ import java.util.concurrent.TimeUnit;
 
 public class SeleniumTestBase
 {
+	@LocalServerPort
+	protected int randomTomcatPort;
+
 	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 20;
 	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 20;
 	private static final String GECKO_DRIVER="src/test/resources/vendor/geckodriver";
+
+	private static final String INTEGRATION_PROPERTIES_FILE = "src/test/resources/integration.properties";
+
+
 
 	protected static WebDriver driver;
 	protected static Logger logger= MiscUtils.getLogger();
@@ -55,6 +64,8 @@ public class SeleniumTestBase
 	public static void buildWebDriver() throws SQLException, InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException
 	{
+		oscar.OscarProperties p = oscar.OscarProperties.getInstance();
+		p.readFromFile(INTEGRATION_PROPERTIES_FILE);
 
 		//load database (during the integration-test phase this will only populate table creation maps)
 		SchemaUtils.createDatabaseAndTables();

@@ -20,18 +20,13 @@
  * Victoria, British Columbia
  * Canada
  */
+package integration.tests.config;
 
-package integration.tests;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
-public class TestIT
+@Configuration
+@ComponentScan({"integration.tests"})
+public class TestConfig
 {
-	@Test
-	public void canITestAnything()
-	{
-		assertEquals("TEST", "Notest?");
-	}
 }

@@ -30,7 +30,6 @@ import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
 import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 

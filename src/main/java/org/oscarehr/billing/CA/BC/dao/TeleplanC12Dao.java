@@ -29,7 +29,6 @@ import org.oscarehr.common.dao.AbstractDao;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository

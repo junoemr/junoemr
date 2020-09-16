@@ -30,18 +30,26 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.service.ProviderService;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestComponent;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 import static integration.tests.util.data.ProviderTestCollection.providerLNames;
 
+@TestComponent
 public class DatabaseUtil
 {
-	public static Demographic createTestDemographic()
+	@Autowired
+	DemographicService demoService;
+
+	@Autowired
+	ProviderService providerService;
+
+	public Demographic createTestDemographic()
 	{
-		DemographicService demoService = (DemographicService)SpringUtils.getBean("demographic.service.DemographicService");
+		//DemographicService demoService = (DemographicService)SpringUtils.getBean("demographic.service.DemographicService");
 		Demographic demo = new Demographic();
 		demo.setDateOfBirth(LocalDate.now());
 		demo.setFirstName("test");
@@ -49,9 +57,10 @@ public class DatabaseUtil
 		demo.setSex("F");
 		return demoService.addNewDemographicRecord(AuthUtils.TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
 	}
-	public static void createTestProvider()
+
+	public void createTestProvider()
 	{
-		ProviderService providerService = (ProviderService) SpringUtils.getBean("provider.service.ProviderService");
+		//ProviderService providerService = (ProviderService) SpringUtils.getBean("provider.service.ProviderService");
 		for (String provider : providerLNames)
 		{
 			ProviderData demoProvider = new ProviderData();

@@ -25,7 +25,6 @@ package org.oscarehr.casemgmt.service;
 
 import org.drools.FactException;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
-import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.casemgmt.exception.EncounterSectionException;
 import org.oscarehr.common.model.Demographic;

@@ -23,11 +23,13 @@
 
 package integration.tests;
 
+import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +42,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -49,13 +52,16 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EchartTests extends SeleniumTestBase
 {
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 
-	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	@Autowired
+	DatabaseUtil databaseUtil;
+
+	@Before
+	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "appointment", "demographic",
 				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
@@ -63,23 +69,31 @@ public class EchartTests extends SeleniumTestBase
 				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "hash_audit");
 
 		loadSpringBeans();
-		DatabaseUtil.createTestDemographic();
+		databaseUtil.createTestDemographic();
 	}
 
 	@Test
 	public void testWritingNote() throws InterruptedException
 	{
 		// login
-		//if (!Navigation.isLoggedIn(driver))
-		//{
-			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN,
-					Navigation.getOscarUrl(tomcatPort), driver);
-			Thread.sleep(10000);
-		//}
+		if (!Navigation.isLoggedIn(driver))
+		{
+			Navigation.doLogin(
+					AuthUtils.TEST_USER_NAME,
+					AuthUtils.TEST_PASSWORD,
+					AuthUtils.TEST_PIN,
+					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+					driver);
+		}
 
-		driver.get(Navigation.getOscarUrl(tomcatPort) + ECHART_URL);
+		String echartFullUrl = Navigation.getOscarUrl(Integer.toString(randomTomcatPort)) + ECHART_URL;
+		driver.get(echartFullUrl);
 
-		Thread.sleep(10000);
+
+		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//textarea[@name='caseNote_note']")));
+
+		String source = driver.getPageSource();
 
 		// create new encounter note
 		String noteId = null;
@@ -90,7 +104,6 @@ public class EchartTests extends SeleniumTestBase
 
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		js.executeScript("window.scrollBy(0, document.body.scrollHeight)");
-		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("newNoteImg")));
 		WebElement newNoteButton = driver.findElement(By.id("newNoteImg"));
 		newNoteButton.click();
@@ -114,7 +127,8 @@ public class EchartTests extends SeleniumTestBase
 		//write in note
 		UUID myUUID = UUID.randomUUID();
 		newNote.sendKeys(myUUID.toString());
-		Assert.assertTrue("Write to encounter note. FAIL", !newNote.getText().isEmpty());
+		String newNoteText = newNote.getText();
+		Assert.assertTrue("Write to encounter note. FAIL", !newNoteText.isEmpty());
 		logger.info("Write to encounter note. OK");
 
 		// test auto save
@@ -129,7 +143,7 @@ public class EchartTests extends SeleniumTestBase
 		String currentUrl = driver.getCurrentUrl();
 		driver.findElement(By.id("signSaveImg")).click();
 		Thread.sleep(2000);
-		driver.get(Navigation.getOscarUrl(tomcatPort) + ECHART_URL);
+		driver.get(Navigation.getOscarUrl(Integer.toString(randomTomcatPort)) + ECHART_URL);
 		Thread.sleep(5000);
 		Assert.assertTrue("Sign and save note. FAILED",
 				PageUtil.isExistsBy(By.xpath("//*[contains(., '" + myUUID + "') and contains(., 'Signed on') and contains(@id, 'txt')]"), driver));

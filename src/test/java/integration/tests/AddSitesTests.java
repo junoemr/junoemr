@@ -31,17 +31,23 @@ import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddSitesTests extends SeleniumTestBase {
 
 
@@ -51,8 +57,18 @@ public class AddSitesTests extends SeleniumTestBase {
 		SchemaUtils.restoreTable("admission", "log", "site");
 	}
 
-	public void addNewSites(SiteTestData site)
+	public void addNewSites(SiteTestData site, WebDriverWait wait)
 	{
+/*
+		try
+		{
+			Thread.sleep(1000000);
+		}
+		catch(Exception e)
+		{
+
+		}
+*/
 		driver.findElement(By.xpath(".//a[contains(.,'System Management')]")).click();
 		driver.findElement(By.xpath(".//a[contains(.,'Satellite-sites Admin')]")).click();
 		if (PageUtil.isExistsBy(By.id("myFrame"), driver))
@@ -63,6 +79,7 @@ public class AddSitesTests extends SeleniumTestBase {
 		{
 			driver.switchTo().frame("content-frame");
 		}
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@value='Add New Site']")));
 		driver.findElement(By.xpath("//input[@value='Add New Site']")).click();
 		driver.findElement(By.xpath("//input[@name='site.name']")).sendKeys(site.siteName);
 		driver.findElement(By.xpath("//input[@name='site.shortName']")).sendKeys(site.shortName);
@@ -83,14 +100,19 @@ public class AddSitesTests extends SeleniumTestBase {
 		SiteTestData site = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[0]);
 		// login
 		if (!Navigation.isLoggedIn(driver)) {
-			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+			Navigation.doLogin(
+					AuthUtils.TEST_USER_NAME,
+					AuthUtils.TEST_PASSWORD,
+					AuthUtils.TEST_PIN,
+					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+					driver);
 		}
 		// open administration panel
 		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("admin-panel")));
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);
-		addNewSites(site);
+		addNewSites(site, wait);
 		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(site.siteName), driver));
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
 	}
@@ -100,7 +122,12 @@ public class AddSitesTests extends SeleniumTestBase {
 	{
 		SiteTestData siteJuno = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[1]);
 		// login
-		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+		Navigation.doLogin(
+				AuthUtils.TEST_USER_NAME,
+				AuthUtils.TEST_PASSWORD,
+				AuthUtils.TEST_PIN,
+				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+				driver);
 
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
@@ -108,7 +135,8 @@ public class AddSitesTests extends SeleniumTestBase {
 		// open administration panel
 		driver.findElement(By.linkText("More")).click();
 		driver.findElement(By.linkText("Admin")).click();
-		addNewSites(siteJuno);
+		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+		addNewSites(siteJuno, wait);
 		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(siteJuno.siteName), driver));
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
 	}

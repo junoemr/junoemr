@@ -141,12 +141,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+<!--
 			<exclusions>
 				<exclusion>
 					<groupId>org.junit.vintage</groupId>
 					<artifactId>junit-vintage-engine</artifactId>
 				</exclusion>
 			</exclusions>
+-->
 		</dependency>
 
 		<!-- general libraries -->
@@ -1440,12 +1442,6 @@
             <version>3.8.1</version>
         </dependency>
         <!-- Integration Tests -->
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <version>3.0.0-M4</version>
-            <scope>test</scope>
-        </dependency>
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
@@ -1797,7 +1793,10 @@
 						</goals>
 						<phase>test</phase>
 						<configuration>
+<!--
 							<skipTests>false</skipTests>
+-->
+                            <skipTests>true</skipTests>
 							<argLine>-Xms1024m -Xmx1024m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
 							<excludes>
 								<exclude>**/AR2005*.java</exclude>
@@ -1814,7 +1813,43 @@
 				</executions>
 				<version>2.10</version>
 			</plugin>
-			<plugin>
+
+<!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <skipTests>false</skipTests>
+                            <argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
+                            <excludes>
+                                <exclude>**/SetupDatabase.java</exclude>
+                            </excludes>
+                            <includes>
+                                <include>integration/tests/*</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <oscar.skip.dbinit>true</oscar.skip.dbinit>
+                                <buildDirectory>${project.build.directory}</buildDirectory>
+                            </systemPropertyVariables>
+                        </configuration>
+                        &lt;!&ndash;
+                        <configuration>
+                            <includes>src/test/java/**/*</includes>
+                        </configuration>
+                        &ndash;&gt;
+                    </execution>
+                </executions>
+            </plugin>
+-->
+
+            <plugin>
 				<groupId>org.oscarehr</groupId>
 				<artifactId>oscar-il18n-check-plugin</artifactId>
 				<version>1.0</version>
@@ -2331,6 +2366,11 @@
 				</plugins>
 			</build>
 		</profile>
+
+
+
+
+
 		<profile>
 			<id>integration</id>
 			<activation>
@@ -2405,34 +2445,40 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>integration/tests/*</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/SetupDatabase.java</exclude>
+                            </excludes>
+                            <skipTests>false</skipTests>
+                            <argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
+                            <systemPropertyVariables>
+                                <oscar.skip.dbinit>true</oscar.skip.dbinit>
+                                <buildDirectory>${project.build.directory}</buildDirectory>
+                            </systemPropertyVariables>
+                            <useManifestOnlyJar>false</useManifestOnlyJar>
+                        </configuration>
                         <executions>
                             <execution>
-                                <id>integration-test</id>
+                                <id>verify</id>
                                 <goals>
-                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
                                 </goals>
                                 <phase>integration-test</phase>
-                                <configuration>
-                                    <skipTests>false</skipTests>
-                                    <argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
-                                    <excludes>
-                                        <exclude>**/SetupDatabase.java</exclude>
-                                    </excludes>
-                                    <includes>
-                                        <include>integration/tests/*</include>
-                                    </includes>
-                                    <systemPropertyVariables>
-                                        <oscar.skip.dbinit>true</oscar.skip.dbinit>
-                                        <buildDirectory>${project.build.directory}</buildDirectory>
-                                    </systemPropertyVariables>
-                                </configuration>
                             </execution>
                         </executions>
-                        <version>3.0.0-M4</version>
+                        <version>3.0.0-M5</version>
                     </plugin>
 				</plugins>
 			</build>
 		</profile>
+
+
+
+
+
 		<profile>
 			<id>environment-dev</id>
 			<activation>

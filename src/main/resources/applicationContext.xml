@@ -17,6 +17,7 @@
 		already loaded
 	-->
 	<bean id="propertyConfigurer" class="org.oscarehr.common.OscarPropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
 		<property name="locations">
 			<list>
 				<value>classpath:oscar_mcmaster.properties</value>

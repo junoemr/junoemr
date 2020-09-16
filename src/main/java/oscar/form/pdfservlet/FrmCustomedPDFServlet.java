@@ -40,8 +40,6 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
 import oscar.oscarRx.templates.RxPdfTemplate;
 import oscar.oscarRx.templates.RxPdfTemplateCustom1;

@@ -23,7 +23,6 @@
 
 package org.oscarehr.casemgmt.service;
 
-import org.drools.FactException;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.dto.EncounterSectionMenuItem;

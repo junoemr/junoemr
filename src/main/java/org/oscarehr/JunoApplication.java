@@ -33,10 +33,6 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
-import oscar.OscarProperties;
-
-import java.util.HashSet;
-import java.util.Set;
 
 
 @SpringBootApplication
