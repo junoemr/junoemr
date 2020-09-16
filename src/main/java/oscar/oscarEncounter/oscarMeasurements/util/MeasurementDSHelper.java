@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.Measurement;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 
@@ -183,5 +184,31 @@ public class MeasurementDSHelper {
         
         return mths;
     }
-    
+
+    /**
+     * Given a measurement, attempt to treat its recorded value as a Double.
+     * @param measurement Measurement object to try and pull from
+     * @return Double if it can be parsed, null otherwise
+     */
+    public static Double getMeasurementValue(Measurement measurement)
+    {
+        if (measurement == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            return Double.parseDouble(measurement.getDataField());
+        }
+        catch (NumberFormatException ex)
+        {
+            MiscUtils.getLogger().warn("Following measurement could not be parsed: '"
+                    + measurement.getType()
+                    + "' -> '"
+                    + measurement.getDataField() + "'");
+            return null;
+        }
+    }
+
 }
