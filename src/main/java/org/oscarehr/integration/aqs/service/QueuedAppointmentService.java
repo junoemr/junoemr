@@ -24,6 +24,7 @@ package org.oscarehr.integration.aqs.service;
 
 import ca.cloudpractice.aqs.client.ApiException;
 import ca.cloudpractice.aqs.client.model.QueuedAppointmentStatus;
+import ca.cloudpractice.aqs.client.model.RemoteUserType;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Appointment;
@@ -47,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ValidationException;
+import java.rmi.Remote;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -203,7 +205,7 @@ public class QueuedAppointmentService extends BaseService
 		appointment.setIsVirtual(true);
 
 		// Mark as self booked if booked through MHA
-		if (queuedAppointment.getCreatedByType() == QueuedAppointment.CREATED_BY_TYPE.MHA_PATIENT)
+		if (queuedAppointment.getCreatedByType().equals(RemoteUserType.MHA_PATIENT))
 		{
 			appointment.setBookingSource(Appointment.BookingSource.MYOSCAR_SELF_BOOKING);
 		}

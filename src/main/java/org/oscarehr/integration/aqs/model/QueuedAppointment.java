@@ -37,12 +37,6 @@ import java.util.UUID;
 @Getter @Setter
 public class QueuedAppointment
 {
-	public enum CREATED_BY_TYPE
-	{
-		JUNO_SECURITY,
-		MHA_PATIENT,
-	}
-
 	private final String EXTRAS_NOTES = "notes";
 	private final String EXTRAS_CLINIC_ID = "clinic_id";
 
@@ -56,14 +50,14 @@ public class QueuedAppointment
 	private UUID clinicId;
 	private QueuedAppointmentStatus status;
 	private String createdBy;
-	private CREATED_BY_TYPE createdByType;
+	private RemoteUserType createdByType;
 
 
 	public QueuedAppointment(QueuedAppointmentDto appointmentDto)
 	{
 		BeanUtils.copyProperties(appointmentDto, this, "id", "integrationPatientId", "extraInfo", "createdByType");
 
-		this.createdByType = CREATED_BY_TYPE.valueOf(appointmentDto.getCreatedByType().name());
+		this.createdByType = new RemoteUserType(appointmentDto.getCreatedByType());
 		this.setId(appointmentDto.getId());
 		this.setDemographicNo(Integer.parseInt(StringUtils.trimToEmpty(appointmentDto.getIntegrationPatientId())));
 
