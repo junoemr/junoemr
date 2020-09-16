@@ -74,6 +74,12 @@ public class QueueWebService extends AbstractServiceImpl
 	@Autowired
 	private AppointmentQueueModelConverter modelConverter;
 
+	@Autowired
+	private ContactContactTransferConverter contactContactTransferConverter;
+
+	@Autowired
+	private ContactTransferContactConverter contactTransferContactConverter;
+
 	@GET
 	@Path("queues/")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -145,7 +151,7 @@ public class QueueWebService extends AbstractServiceImpl
 	public RestResponse<List<ContactTransfer>> getQueueContacts(@PathParam("queueId") UUID queueId)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN);
-		return RestResponse.successResponse(new ContactContactTransferConverter().convert(appointmentQueueService.getAppointmentQueueContacts(queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
+		return RestResponse.successResponse(contactContactTransferConverter.convert(appointmentQueueService.getAppointmentQueueContacts(queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
 	}
 
 	@POST
@@ -155,9 +161,10 @@ public class QueueWebService extends AbstractServiceImpl
 	public RestResponse<ContactTransfer> addQueueContact(@PathParam("queueId") UUID queueId, @RequestBody ContactTransfer contactTransfer)
 	{
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
-		Contact newContact = contactService.createNewContact(new ContactTransferContactConverter().convert(contactTransfer), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
+
+		Contact newContact = contactService.createNewContact(contactTransferContactConverter.convert(contactTransfer), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		appointmentQueueService.addAppointmentQueueContact(queueId, newContact.getRemoteId(), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
-		return RestResponse.successResponse(new ContactContactTransferConverter().convert(newContact));
+		return RestResponse.successResponse(contactContactTransferConverter.convert(newContact));
 	}
 
 	@DELETE

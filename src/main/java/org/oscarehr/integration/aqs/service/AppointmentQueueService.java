@@ -44,6 +44,9 @@ public class AppointmentQueueService extends BaseService
 	@Autowired
 	private AppointmentQueueIntegrationModelConverter integrationModelConverter;
 
+	@Autowired
+	private ContactDtoContactConverter contactDtoContactConverter;
+
 	public List<AppointmentQueue> getAppointmentQueues(Integer securityNo)
 	{
 		try
@@ -110,7 +113,7 @@ public class AppointmentQueueService extends BaseService
 	{
 		try
 		{
-			return new ContactDtoContactConverter().convert(getOrganizationApi(securityNo).getQueueContacts(queueId));
+			return contactDtoContactConverter.convert(getOrganizationApi(securityNo).getQueueContacts(queueId));
 		}
 		catch (ApiException apiException)
 		{
@@ -122,7 +125,7 @@ public class AppointmentQueueService extends BaseService
 	{
 		try
 		{
-			return new ContactDtoContactConverter().convert(getOrganizationApi(securityNo).addQueueContact(queueId, contactId));
+			return contactDtoContactConverter.convert(getOrganizationApi(securityNo).addQueueContact(queueId, contactId));
 		}
 		catch (ApiException apiException)
 		{

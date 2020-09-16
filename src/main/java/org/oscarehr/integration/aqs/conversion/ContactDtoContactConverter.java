@@ -27,7 +27,9 @@ import ca.cloudpractice.aqs.client.model.ContactDto;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.integration.aqs.model.Contact;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ContactDtoContactConverter extends AbstractModelConverter<ContactDto, Contact>
 {
 

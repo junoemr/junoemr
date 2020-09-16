@@ -26,7 +26,9 @@ import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.integration.aqs.model.Contact;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.ContactTransfer;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ContactTransferContactConverter extends AbstractModelConverter<ContactTransfer, Contact>
 {
 	@Override

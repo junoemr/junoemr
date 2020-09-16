@@ -27,16 +27,20 @@ import org.oscarehr.integration.aqs.conversion.ContactContactDtoConverter;
 import org.oscarehr.integration.aqs.conversion.ContactDtoContactConverter;
 import org.oscarehr.integration.aqs.exception.AqsCommunicationException;
 import org.oscarehr.integration.aqs.model.Contact;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("aqs.ContactService")
 public class ContactService extends BaseService
 {
+	@Autowired
+	private ContactDtoContactConverter contactDtoContactConverter;
+
 	public Contact createNewContact(Contact contact, Integer securityNo)
 	{
 		try
 		{
-			return new ContactDtoContactConverter().convert(getOrganizationApi(securityNo).createContact(new ContactContactDtoConverter().convert(contact)));
+			return contactDtoContactConverter.convert(getOrganizationApi(securityNo).createContact(new ContactContactDtoConverter().convert(contact)));
 		}
 		catch (ApiException apiException)
 		{
