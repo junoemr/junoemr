@@ -94,6 +94,11 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 
 		ctrl.checkProviderSite = async () =>
 		{
+			if (!ctrl.isMultisiteEnabled)
+			{
+				return true;
+			}
+
 			const bookingSiteId = await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
 			const siteList = (await sitesApi.getSitesByProvider(ctrl.bookProviderNo)).data.body;
 
@@ -118,6 +123,7 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		{
 			ctrl.providerHasSite = false;
 			ctrl.providerHasSite = await ctrl.checkProviderSite();
+			$scope.$digest();
 		}
 
 		ctrl.bookQueuedAppointment = async () =>
