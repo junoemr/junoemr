@@ -59,16 +59,12 @@ if(!authed) {
     String user = (String) session.getAttribute("user");
     ProviderColourUpdater colourUpdater = new ProviderColourUpdater(user);
     userColour = colourUpdater.getColour();
+    if(userColour == null || userColour.length() == 0)
+    {
+        userColour = ProviderColourUpdater.DEFAULT_COLOUR_BLUE;   //default blue if no preference set
+    }
     //we calculate inverse of provider colour for text
-    int base = 16;
-	if(userColour == null || userColour.length() == 0)
-	{
-		userColour = "#CCCCFF";   //default blue if no preference set
-	}
-
-    int num = Integer.parseInt(userColour.substring(1), base);      //strip leading # sign and convert
-    int inv = ~num;                                                 //get inverse
-    inverseUserColour = Integer.toHexString(inv).substring(2);    //strip 2 leading digits as html colour codes are 24bits
+    inverseUserColour = ProviderColourUpdater.getInverseColour(userColour);
 
     if(bean.familyDoctorNo.equals("")) {
         famDocName = "";
