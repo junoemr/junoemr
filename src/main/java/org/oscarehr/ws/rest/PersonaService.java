@@ -298,7 +298,7 @@ public class PersonaService extends AbstractServiceImpl {
 
 		if (IsPropertiesOn.isTelehealthEnabled())
 		{
-			menu.add(idCounter++, "MyHealthAccess", null,
+			menu.addNewTab(idCounter++, "MyHealthAccess", null,
 					"../integrations/myhealthaccess.do?method=connectOrList");
 		}
 
