@@ -50,6 +50,7 @@ public class ProviderColourUpdater {
 
 	/**
 	 * Retrieve colour for current provider first by querying property table
+	 * @return ProviderColor property value associated with user, null if no setting found
 	 */
 	public String getColour()
 	{
@@ -59,7 +60,7 @@ public class ProviderColourUpdater {
 			return props.getValue();
 		}
 
-		return "";
+		return null;
 	}
 
 

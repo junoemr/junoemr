@@ -45,6 +45,7 @@ import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.common.model.Facility;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.BeanUtils;
@@ -892,7 +893,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"ORDER BY a.start_time, appointment_no\n";
 
 		Query query = entityManager.createNativeQuery(sql);
-		query.setParameter("property_name", UserPropertyDAO.COLOR_PROPERTY);
+		query.setParameter("property_name", UserProperty.PROVIDER_COLOUR);
 		query.setParameter("startDate", java.sql.Date.valueOf(startDate), TemporalType.DATE);
 		query.setParameter("endDate", java.sql.Date.valueOf(endDate), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);

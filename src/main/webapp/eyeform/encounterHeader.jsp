@@ -61,8 +61,10 @@ if(!authed) {
     userColour = colourUpdater.getColour();
     //we calculate inverse of provider colour for text
     int base = 16;
-    if( userColour.length() == 0 )
-        userColour = "#CCCCFF";   //default blue if no preference set
+	if(userColour == null || userColour.length() == 0)
+	{
+		userColour = "#CCCCFF";   //default blue if no preference set
+	}
 
     int num = Integer.parseInt(userColour.substring(1), base);      //strip leading # sign and convert
     int inv = ~num;                                                 //get inverse
@@ -79,9 +81,11 @@ if(!authed) {
         famDocSurname = prov.getSurname();
         colourUpdater = new ProviderColourUpdater(bean.familyDoctorNo);
         famDocColour = colourUpdater.getColour();
-        if( famDocColour.length() == 0 )
-            famDocColour = "#CCCCFF";
-    }
+		if(famDocColour == null || famDocColour.length() == 0)
+		{
+			famDocColour = "#CCCCFF";
+		}
+	}
 
     String patientName = pd.getFirstName()+" "+pd.getSurname();
     String patientAge = pd.getAge();

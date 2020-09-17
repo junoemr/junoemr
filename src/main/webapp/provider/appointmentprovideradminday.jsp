@@ -2157,7 +2157,7 @@ start_time += iSm + ":00";
                 String providerColor = null;
                 if(view == 1 && demographicDao != null && userPropertyDao != null) {
                         String providerNo = (demographicDao.getDemographic(String.valueOf(demographic_no))==null?null:demographicDao.getDemographic(String.valueOf(demographic_no)).getProviderNo());
-                        UserProperty property = userPropertyDao.getProp(providerNo, UserPropertyDAO.COLOR_PROPERTY);
+                        UserProperty property = userPropertyDao.getProp(providerNo, UserProperty.PROVIDER_COLOUR);
                         if(property != null) {
                                 providerColor = property.getValue();
                         }
