@@ -59,7 +59,7 @@ if(!authed) {
     String user = (String) session.getAttribute("user");
     ProviderColourUpdater colourUpdater = new ProviderColourUpdater(user);
     userColour = colourUpdater.getColour();
-    if(userColour == null || userColour.length() == 0)
+    if(userColour == null || userColour.isEmpty())
     {
         userColour = ProviderColourUpdater.DEFAULT_COLOUR_BLUE;   //default blue if no preference set
     }
@@ -77,9 +77,9 @@ if(!authed) {
         famDocSurname = prov.getSurname();
         colourUpdater = new ProviderColourUpdater(bean.familyDoctorNo);
         famDocColour = colourUpdater.getColour();
-		if(famDocColour == null || famDocColour.length() == 0)
+		if(famDocColour == null || famDocColour.isEmpty())
 		{
-			famDocColour = "#CCCCFF";
+			famDocColour = ProviderColourUpdater.DEFAULT_COLOUR_BLUE;
 		}
 	}
 
