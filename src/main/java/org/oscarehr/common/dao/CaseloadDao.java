@@ -11,11 +11,12 @@ package org.oscarehr.common.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -31,7 +32,6 @@ public class CaseloadDao {
 	public CaseloadDao() {
 		if (caseloadSearchQueries == null) { initializeSearchQueries(); }
 		if (caseloadSortQueries == null) { initializeSortQueries(); }
-		if (caseloadDemoQueries == null) { initializeDemoQueries(); }
 	}
 
 	private static HashMap<String,String> caseloadSearchQueries;
@@ -79,52 +79,6 @@ public class CaseloadDao {
 		caseloadSortQueries.put("cl_search_lastenctype", "select demographic_no, encounter_type from casemgmt_note AS c where NOT EXISTS (SELECT * FROM casemgmt_note WHERE update_date > c.update_date)");
 		caseloadSortQueries.put("cl_search_cashaddate", "select cr.client_id as demographic_no, cr.referral_date from client_referral cr where cr.program_id in (select id from program where name = '%s') and not exists (select * from client_referral where cr.program_id=program_id and cr.client_id=client_id and referral_date>cr.referral_date)");
 		caseloadSortQueries.put("cl_search_access1addate", "select cr.client_id as demographic_no, cr.referral_date from client_referral cr where cr.program_id in (select id from program where name = '%s') and not exists (select * from client_referral where cr.program_id=program_id and cr.client_id=client_id and referral_date>cr.referral_date)");
-	}
-
-	private static HashMap<String, String> caseloadDemoQueries;
-
-	private static void initializeDemoQueries() {
-		caseloadDemoQueries = new HashMap<String, String>();
-		caseloadDemoQueries.put("search_rsstatus", "select distinct roster_status from demographic where roster_status not in ('', 'RO', 'NR', 'TE', 'FS')");
-		caseloadDemoQueries.put("cl_demographic_query", "select last_name, first_name, sex, CAST(month_of_birth AS UNSIGNED INTEGER), CAST(date_of_birth AS UNSIGNED INTEGER), TIMESTAMPDIFF(YEAR, CONCAT(year_of_birth, '-', month_of_birth, '-', date_of_birth), current_date) AS age from demographic where demographic_no=?");
-		caseloadDemoQueries.put("cl_demographic_query_roster", "select last_name, first_name, sex, month_of_birth, date_of_birth, TIMESTAMPDIFF(YEAR, CONCAT(year_of_birth, '-', month_of_birth, '-', date_of_birth), current_date) AS age from demographic where demographic_no=? AND roster_status=?");
-		caseloadDemoQueries.put("cl_last_appt", "select max(appointment_date) from appointment where addtime(appointment_date, start_time) < now() and demographic_no=?");
-		caseloadDemoQueries.put("cl_next_appt", "select min(appointment_date) from appointment where addtime(appointment_date, start_time) > now() and demographic_no=?");
-		caseloadDemoQueries.put("cl_num_appts", "select count(*) from appointment where demographic_no=? and appointment_date > curdate() - 365");
-		caseloadDemoQueries.put("cl_new_labs", "select count(*) from providerLabRouting left join patientLabRouting using (lab_no) where providerLabRouting.lab_type='HL7' and status='N' and provider_no=? and demographic_no=?");
-		caseloadDemoQueries.put("cl_new_docs", "select count(*) from providerLabRouting left join patientLabRouting using (lab_no) where providerLabRouting.lab_type='DOC' and status='N' and provider_no=? and demographic_no=?");
-		caseloadDemoQueries.put("cl_new_ticklers", "select count(*) from tickler where status='A' and demographic_no=?");
-		caseloadDemoQueries.put("cl_new_msgs", "select count(*) from msgDemoMap left join messagelisttbl on message = messageID where demographic_no=? and status='new'");
-		caseloadDemoQueries.put("cl_measurement", "select dataField from measurements where type=? and demographicNo=? order by dateObserved desc limit 1");
-		
-		caseloadDemoQueries.put("LastEncounterDate", "select max(update_date) from casemgmt_note where update_date < now() and demographic_no=?");
-		caseloadDemoQueries.put("LastEncounterType", "SELECT encounter_type FROM casemgmt_note AS c WHERE demographic_no=? AND NOT EXISTS (SELECT * FROM casemgmt_note WHERE update_date > c.update_date)");
-		caseloadDemoQueries.put("CashAdmissionDate", "SELECT MAX(referral_date) FROM client_referral WHERE client_id=? AND program_id IN (SELECT id FROM program WHERE name=?)");
-		caseloadDemoQueries.put("Access1AdmissionDate", "SELECT MAX(referral_date) FROM client_referral WHERE client_id=? AND program_id IN (SELECT id FROM program WHERE name=?)");
-
-		initializeDemoQueryColumns();
-	}
-
-	private static HashMap<String, String[]> caseloadDemoQueryColumns;
-
-	private static void initializeDemoQueryColumns() {
-		caseloadDemoQueryColumns = new HashMap<String, String[]>();
-		caseloadDemoQueryColumns.put("search_rsstatus", new String[] { "roster_status" } );
-		caseloadDemoQueryColumns.put("cl_demographic_query", new String[] { "last_name", "first_name", "sex", "month_of_birth", "date_of_birth", "age" } );
-		caseloadDemoQueryColumns.put("cl_demographic_query_roster", new String[] { "last_name", "first_name", "sex", "month_of_birth", "date_of_birth", "age" } );
-		caseloadDemoQueryColumns.put("cl_last_appt", new String[] { "max(appointment_date)" } );
-		caseloadDemoQueryColumns.put("cl_next_appt", new String[] { "min(appointment_date)" } );
-		caseloadDemoQueryColumns.put("cl_num_appts", new String[] { "count(*)" } );
-		caseloadDemoQueryColumns.put("cl_new_labs", new String[] { "count(*)" } );
-		caseloadDemoQueryColumns.put("cl_new_docs", new String[] { "count(*)" } );
-		caseloadDemoQueryColumns.put("cl_new_ticklers", new String[] { "count(*)" } );
-		caseloadDemoQueryColumns.put("cl_new_msgs", new String[] { "count(*)" } );
-		caseloadDemoQueryColumns.put("cl_measurement", new String[] { "dataField" } );
-		
-		caseloadDemoQueryColumns.put("LastEncounterDate", new String[] { "update_date" } );
-		caseloadDemoQueryColumns.put("LastEncounterType", new String[] { "encounter_type" } );
-		caseloadDemoQueryColumns.put("CashAdmissionDate", new String[] { "referral_date" } );
-		caseloadDemoQueryColumns.put("Access1AdmissionDate", new String[] { "referral_date" } );
 	}
 
 	private String getFormatedSearchQuery(String searchQuery, String[] searchParams) {
@@ -180,35 +134,6 @@ public class CaseloadDao {
 		return demographicNoList;
 	}
 
-	public List<Map<String, Object>> getCaseloadDemographicData(String searchQuery, Object[] params) {
-		String query = caseloadDemoQueries.get(searchQuery);
-		String[] queryColumns = caseloadDemoQueryColumns.get(searchQuery);
-
-		Query q = entityManager.createNativeQuery(query);
-		if (params != null) {
-			for (int i = 0; i < params.length; i++) {
-				q.setParameter(i+1, params[i]);
-			}
-		}
-
-		List<Object> result = q.getResultList();
-
-		List<Map<String, Object>> dataResult = new ArrayList<Map<String, Object>>();
-
-		for (Object r : result) {
-			Map<String, Object> row = new HashMap<String, Object>();
-			if (r instanceof Object[]) {
-				for (int i = 0; i < ((Object[])r).length; i++) {
-					row.put(queryColumns[i], ((Object[])r)[i]);
-				}
-			} else {
-				row.put(queryColumns[0], r);
-			}
-			dataResult.add(row);
-		}
-		return dataResult;
-	}
-
 	@SuppressWarnings("unchecked")
 	public Integer getCaseloadDemographicSearchSize(String searchQuery, String[] searchParams) {
 
@@ -223,4 +148,163 @@ public class CaseloadDao {
 
 		return result.get(0).intValue();
 	}
+
+	/**
+	 * Given text to look for in a note, find all demographics for a given MRP that have a similar-looking note.
+	 * Note: doing a search like this
+	 * @param providerNo provider whose caseload we want to populate
+	 * @param note the note text to search for
+	 * @param page where to begin searching
+	 * @param pageSize the number of results we want
+	 * @return a list of demographics, ordered by demographicNo, that have the given MRP and a similar-looking note
+	 */
+	public List<Integer> searchDemographicSetByNote(String providerNo, String note, int page, int pageSize)
+	{
+		String sql = "SELECT DISTINCT Z.demographic_no " +
+				"FROM (" +
+				"    SELECT DISTINCT d.demographic_no, d.last_name, d.first_name " +
+				"    FROM demographic d " +
+				"    LEFT JOIN demographiccust dc " +
+				"    ON d.demographic_no=dc.demographic_no " +
+				"    WHERE (d.provider_no=:providerNo OR dc.cust1=:providerNo OR dc.cust2=:providerNo OR dc.cust4=:providerNo) " +
+				"    AND d.patient_status NOT IN ('FI', 'MO', 'DE', 'IN') " +
+				") as Z " +
+				"INNER JOIN casemgmt_note cn " +
+				"ON Z.demographic_no=cn.demographic_no  " +
+				"WHERE cn.note LIKE CONCAT('%', :noteSearch, '%') AND cn.locked <> '1' " +
+				"LIMIT :page, :pageSize ";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("noteSearch", note);
+		query.setParameter("page", page * pageSize);
+		query.setParameter("pageSize", pageSize);
+
+		return (List<Integer>)query.getResultList();
+	}
+
+	/**
+	 * Given a demographic, get the number of labs that have newly come in and haven't been handled yet.
+	 * @param providerNo provider whose caseload is being queried
+	 * @param demographicNo the demographic number to search against
+	 * @return the number of unhandled labs for the given demographic
+	 */
+	public Integer getNumberNewLabs(String providerNo, int demographicNo)
+	{
+		String sql = "SELECT COUNT(*) " +
+				"FROM providerLabRouting " +
+				"LEFT JOIN patientLabRouting USING (lab_no) " +
+				"WHERE providerLabRouting.lab_type='HL7' " +
+				"AND status='N' " +
+				"AND provider_no=:providerNo " +
+				"AND demographic_no=:demographicNo";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("demographicNo", demographicNo);
+
+		BigInteger numResults = (BigInteger) query.getSingleResult();
+		return numResults.intValue();
+	}
+
+	/**
+	 * Given a demographic, get the number of new documents associated with the demographic.
+	 * @param providerNo provider whose caseload is being queried
+	 * @param demographicNo the demographic number to search against
+	 * @return the number of unhandled documents for the given demographic
+	 */
+	public Integer getNumNewDocs(String providerNo, int demographicNo)
+	{
+		String sql = "SELECT COUNT(*) " +
+				"FROM providerLabRouting " +
+				"LEFT JOIN patientLabRouting USING (lab_no) " +
+				"WHERE providerLabRouting.lab_type='DOC' " +
+				"AND status='N' " +
+				"AND provider_no=:providerNo " +
+				"AND demographic_no=:demographicNo";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("demographicNo", demographicNo);
+
+		BigInteger numResults = (BigInteger) query.getSingleResult();
+		return numResults.intValue();
+	}
+
+	// TODO look in TicklerDao to see if this exists
+	public Integer getNumNewTicklers(int demographicNo)
+	{
+		String sql = "SELECT COUNT(*) " +
+				"FROM tickler " +
+				"WHERE status='A' " +
+				"AND demographic_no=:demographicNo";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("demographicNo", demographicNo);
+
+		BigInteger numResults = (BigInteger)query.getSingleResult();
+		return numResults.intValue();
+	}
+
+	/**
+	 * Get the number of new (unread) messages associated with a demographic.
+	 * @param demographicNo demographic to search against
+	 * @return number of new messages
+	 */
+	public Integer getNumNewMessages(int demographicNo)
+	{
+		String sql = "SELECT COUNT(*) " +
+				"FROM msgDemoMap " +
+				"LEFT JOIN messagelisttbl ON message = messageID " +
+				"WHERE demographic_no=:demographicNo " +
+				"AND status='new'";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("demographicNo", demographicNo);
+
+		BigInteger numResults = (BigInteger) query.getSingleResult();
+		return numResults.intValue();
+	}
+
+	/**
+	 * Get the last date we had an encounter note written on.
+	 * @param demographicNo the demographic to search against
+	 * @return a Date for the last encounter note, or null if we can't find one
+	 */
+	public Date getLastEncounterDate(int demographicNo)
+	{
+		String sql = "SELECT MAX(update_date) " +
+				"FROM casemgmt_note " +
+				"WHERE update_date < NOW() " +
+				"AND demographic_no=:demographicNo";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("demographicNo", demographicNo);
+
+		return (Date)query.getSingleResult();
+	}
+
+	/**
+	 * Given a demographic, get the last type of encounter note that was written
+	 * @param demographicNo the demographic to search against
+	 * @return the type of encounter that was last had, or null if we can't find one
+	 */
+	public String getLastEncounterType(int demographicNo)
+	{
+		String sql = "SELECT encounter_type " +
+				"FROM casemgmt_note AS c " +
+				"WHERE c.demographic_no=:demographicNo " +
+				"AND NOT EXISTS (" +
+				"    SELECT * " +
+				"    FROM casemgmt_note " +
+				"    WHERE update_date > c.update_date" +
+				")";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("demographicNo", demographicNo);
+
+		// We don't have access to our usual getSingleResultOrNull() wrapper here due to this being a native query
+		try
+		{
+			return (String)query.getSingleResult();
+		}
+		catch (NoResultException e)
+		{
+			return null;
+		}
+	}
+
 }

@@ -12,11 +12,13 @@ package org.oscarehr.caseload;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +34,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.dao.CaseloadDao;
+import org.oscarehr.common.dao.MeasurementDao;
+import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Measurement;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -39,23 +47,27 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
 import oscar.log.LogAction;
+import oscar.log.LogConst;
+import oscar.util.ConversionUtils;
 import oscar.util.OscarRoleObjectPrivilege;
 import oscar.util.StringUtils;
 
 public class CaseloadContentAction extends DispatchAction {
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	   
+	private CaseloadDao caseloadDao = SpringUtils.getBean(CaseloadDao.class);
+	private DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
+	private OscarAppointmentDao oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
+	private MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
 
 	public ActionForward noteSearch(ActionMapping actionMapping,
 			ActionForm actionForm,
 			HttpServletRequest request,
 			HttpServletResponse response) {
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_demographic", "r", null)) {
-        	throw new SecurityException("missing required security object (_demographic)");
-        }
-		
+
+		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireOnePrivilege(providerNo, SecurityInfoManager.READ, null, "_demographic");
+
 		String caseloadProv     = request.getParameter("clProv");
 		String caseloadQuery    = request.getParameter("clQ");
 		boolean sortAscending   = "true".equals(request.getParameter("clSortAsc"));
@@ -117,7 +129,6 @@ public class CaseloadContentAction extends DispatchAction {
 		List<Integer> demoSearchResult = caseloadDao.getCaseloadDemographicSet(clSearchQuery, clSearchParams, clSortParams, caseloadCategory, sortAscending ? "ASC" : "DESC", caseloadPage, caseloadPageSize);
 		JSONArray data = generateCaseloadDataForDemographics(request, response, caseloadProv, demoSearchResult);
 
-
 		response.setContentType("text/x-json");
 		JSONObject json = new JSONObject();
 		json.put("data", data);
@@ -127,7 +138,11 @@ public class CaseloadContentAction extends DispatchAction {
 			json.put("size", size);
 		}
 
-		LogAction.addLogSynchronous(LoggedInInfo.getLoggedInInfoFromSession(request), "CaseloadContentAction", "view caseload");
+		LogAction.addLogEntry(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
+				null,
+				LogConst.CON_CASELOAD,
+				LogConst.ACTION_ACCESS,
+				LogConst.STATUS_SUCCESS);
 
 		try {
 			json.write(response.getWriter());
@@ -150,28 +165,40 @@ public class CaseloadContentAction extends DispatchAction {
 		String caseloadProgram	= request.getParameter("clProg");
 		boolean sortAscending   = "true".equals(request.getParameter("clSortAsc"));
 
-		Integer caseloadPage;
-		Integer caseloadPageSize;
+		int caseloadPage;
+		int caseloadPageSize;
 
 		HttpSession session = request.getSession();
 		String curUser_no = (String) session.getAttribute("user");
 
-		try {
+		try
+		{
 			caseloadPage = Integer.parseInt(request.getParameter("clPage"));
 		}
-		catch (Exception e) { caseloadPage = 0; }
-		try {
+		catch (NumberFormatException e)
+		{
+			caseloadPage = 0;
+		}
+		try
+		{
 			caseloadPageSize = Integer.parseInt(request.getParameter("clPSize"));
 		}
-		catch (Exception e) { caseloadPageSize = 100; }
+		catch (NumberFormatException e)
+		{
+			caseloadPageSize = 100;
+		}
 
 		CaseloadCategory caseloadCategory = CaseloadCategory.getCategory(request.getParameter("clCat"));
-		if (caseloadCategory == null) { caseloadCategory = CaseloadCategory.Demographic; }
+		if (caseloadCategory == null)
+		{
+			caseloadCategory = CaseloadCategory.Demographic;
+		}
 
 		String clSearchQuery;
 		String[] clSearchParams;
 		String[] clSortParams = null;
-		
+
+		// all => constant?
 		if ("all".equals(caseloadProgram) && "all".equals(caseloadProv)){ // program and provider are all
 			
 			Integer facilityId = loggedInInfo.getCurrentFacility().getId();
@@ -354,15 +381,8 @@ public class CaseloadContentAction extends DispatchAction {
 			case LastEncounterType:
 				clSortParams = null;
 				break;
-			case CashAdmissionDate:
-				clSortParams = new String[] {"CASH WAITLIST PROGRAM"};
-				break;
-			case Access1AdmissionDate:
-				clSortParams = new String[] {"ACCESS 1 WAITLIST PROGRAM"};
-				break;
 		}
 
-	    CaseloadDao caseloadDao = (CaseloadDao)SpringUtils.getBean("caseloadDao");
 		List<Integer> demoSearchResult = caseloadDao.getCaseloadDemographicSet(clSearchQuery, clSearchParams, clSortParams, caseloadCategory, sortAscending ? "ASC" : "DESC", caseloadPage, caseloadPageSize);
 		JSONArray data = generateCaseloadDataForDemographics(request, response, caseloadProv, demoSearchResult);
 
@@ -370,12 +390,14 @@ public class CaseloadContentAction extends DispatchAction {
 		JSONObject json = new JSONObject();
 		json.put("data", data);
 
-		if (caseloadPage == 0) {
+		if (caseloadPage == 0)
+		{
 			Integer size = caseloadDao.getCaseloadDemographicSearchSize(clSearchQuery, clSearchParams);
 			json.put("size", size);
 		}
 
-		try {
+		try
+		{
 			json.write(response.getWriter());
 		} catch (IOException e) {
 			MiscUtils.getLogger().error("Couldn't get data for caseload", e);
@@ -384,13 +406,10 @@ public class CaseloadContentAction extends DispatchAction {
 		return null;
 	}
 
-
 	private JSONArray generateCaseloadDataForDemographics(HttpServletRequest request, HttpServletResponse response, String caseloadProv, List<Integer> demoSearchResult) {
 		JSONArray entry;
 		String buttons;
 		JSONArray data = new JSONArray();
-
-		CaseloadDao caseloadDao = (CaseloadDao)SpringUtils.getBean("caseloadDao");
 
 		HttpSession session = request.getSession();
 
@@ -429,13 +448,9 @@ public class CaseloadContentAction extends DispatchAction {
 			String demographic_no = result.toString();
 			entry = new JSONArray();
 			// name
-			String demographicQuery = "cl_demographic_query";
-			String[] demographicParam = new String[1];
-			demographicParam[0] = demographic_no;
-			List<Map<String, Object>> demographicResult = caseloadDao.getCaseloadDemographicData(demographicQuery, demographicParam);
-
-			String clLastName = demographicResult.get(0).get("last_name").toString();
-			String clFirstName = demographicResult.get(0).get("first_name").toString();
+			Demographic demographic = demographicDao.find(result);
+			String clLastName = demographic.getLastName();
+			String clFirstName = demographic.getFirstName();
 			String clFullName = StringEscapeUtils.escapeJavaScript(clLastName + ", " + clFirstName).toUpperCase();
 			entry.add(clFullName);
 
@@ -487,8 +502,8 @@ public class CaseloadContentAction extends DispatchAction {
 			
 			// age
 			if (hasPrivilege("_caseload.Age", roleName$)){
-				String clAge = demographicResult.get(0).get("age") != null ? demographicResult.get(0).get("age").toString() : "";
-				String clBDay = demographicResult.get(0).get("month_of_birth").toString()+"-"+demographicResult.get(0).get("date_of_birth").toString();
+				String clAge = String.valueOf(Period.between(demographic.getDateOfBirth(), LocalDate.now()).getYears());
+				String clBDay = demographic.getMonthOfBirth() + "-" + demographic.getDayOfBirth();
 				if (isBirthday(monthDay,clBDay)) {
 					clAge += " <img src='../images/cake.gif' height='20' />";
 				}
@@ -497,112 +512,114 @@ public class CaseloadContentAction extends DispatchAction {
 
 			// sex
 			if (hasPrivilege("_caseload.Sex", roleName$)){
-				String clSex = demographicResult.get(0).get("sex").toString();
+				String clSex = demographic.getSex();
 				entry.add(clSex);
 			}
 
 			// last appt
 			if (hasPrivilege("_caseload.LastAppt", roleName$)){
-				String lapptQuery = "cl_last_appt";
-				List<Map<String, Object>> lapptResult = caseloadDao.getCaseloadDemographicData(lapptQuery, demographicParam);
-				if ((!lapptResult.isEmpty()) && lapptResult.get(0).get("max(appointment_date)")!=null && !lapptResult.get(0).get("max(appointment_date)").toString().equals("")) {
-					String clLappt = lapptResult.get(0).get("max(appointment_date)").toString();
-
+				Appointment lastAppointment = oscarAppointmentDao.findLastAppointment(demographic.getDemographicId());
+				if (lastAppointment != null)
+				{
+					String clLappt = lastAppointment.getAppointmentDate().toString();
 					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../demographic/demographiccontrol.jsp?demographic_no="+demographic_no+"&last_name="+URLEncoder.encode(clLastName)+"&first_name="+URLEncoder.encode(clFirstName)+"&orderby=appttime&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25'); return false;\">"+ clLappt + "</a>");
-				} else {
+				}
+				else
+				{
 					entry.add("&nbsp;");
 				}
 			}
 
 			// next appt
 			if (hasPrivilege("_caseload.NextAppt", roleName$)){
-				String napptQuery = "cl_next_appt";
-				List<Map<String, Object>> napptResult = caseloadDao.getCaseloadDemographicData(napptQuery, demographicParam);
-				if (!napptResult.isEmpty() && napptResult.get(0).get("min(appointment_date)")!=null && !napptResult.get(0).get("min(appointment_date)").toString().equals("")) {
-					String clNappt = napptResult.get(0).get("min(appointment_date)").toString();
+				Appointment nextAppointment = oscarAppointmentDao.findNextAppointment(demographic.getDemographicId());
+				if (nextAppointment != null)
+				{
+					String clNappt = nextAppointment.getAppointmentDate().toString();
 					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../demographic/demographiccontrol.jsp?demographic_no="+demographic_no+"&last_name="+URLEncoder.encode(clLastName)+"&first_name="+URLEncoder.encode(clFirstName)+"&orderby=appttime&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25'); return false;\">" + clNappt + "</a>");
-				} else {
+				}
+				else
+				{
 					entry.add("&nbsp;");
 				}
 			}
 
 			// num appts in last year
 			if (hasPrivilege("_caseload.ApptsLYTD", roleName$)){
-				String numApptsQuery = "cl_num_appts";
-				List<Map<String, Object>> numApptsResult = caseloadDao.getCaseloadDemographicData(numApptsQuery, demographicParam);
-				if (!numApptsResult.isEmpty() && numApptsResult.get(0).get("count(*)")!=null && !numApptsResult.get(0).get("count(*)").toString().equals("") && !numApptsResult.get(0).get("count(*)").toString().equals("0")) {
-					String clNumAppts = numApptsResult.get(0).get("count(*)").toString();
+				int numAppointments = oscarAppointmentDao.findAppointmentsWithinLastYear(demographic.getDemographicId());
+				if (numAppointments > 0)
+				{
+					String clNumAppts = Integer.toString(numAppointments);
 					entry.add(clNumAppts);
-				} else {
+				}
+				else
+				{
 					entry.add("&nbsp;");
 				}
+
 			}
 
-			// new labs
-			String[] userDemoParam = new String[2];
-			
 			if (hasPrivilege("_caseload.Lab", roleName$)){
-				userDemoParam[0] = curUser_no;
-				userDemoParam[1] = demographic_no;
-				String newLabQuery = "cl_new_labs";
-				List<Map<String, Object>> newLabResult = caseloadDao.getCaseloadDemographicData(newLabQuery, userDemoParam);
-				if (!newLabResult.isEmpty() && newLabResult.get(0).get("count(*)")!=null && !newLabResult.get(0).get("count(*)").toString().equals("") && !newLabResult.get(0).get("count(*)").toString().equals("0")) {
-					String clNewLab = newLabResult.get(0).get("count(*)").toString();
-
+				int numNewLabs = caseloadDao.getNumberNewLabs(curUser_no, demographic.getDemographicId());
+				if (numNewLabs > 0)
+				{
+					String clNewLab = Integer.toString(numNewLabs);
 					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../dms/inboxManage.do?method=prepareForIndexPage&providerNo="+curUser_no+"&selectedCategory=CATEGORY_PATIENT_SUB&selectedCategoryPatient="+demographic_no+"&selectedCategoryType=CATEGORY_TYPE_HL7'); return false;\">" + clNewLab + "</a>");
-				} else {
+				}
+				else
+				{
 					entry.add("&nbsp;");
 				}
 			}
 			
 			// new docs
 			if (hasPrivilege("_caseload.Doc", roleName$)){
-				String newDocQuery = "cl_new_docs";
-				List<Map<String, Object>> newDocResult = caseloadDao.getCaseloadDemographicData(newDocQuery, userDemoParam);
-				if (!newDocResult.isEmpty() && newDocResult.get(0).get("count(*)")!=null && !newDocResult.get(0).get("count(*)").toString().equals("") && !newDocResult.get(0).get("count(*)").toString().equals("0")) {
-					String clNewDoc = newDocResult.get(0).get("count(*)").toString();
+				int numNewDocs = caseloadDao.getNumNewDocs(curUser_no, demographic.getDemographicId());
+				if (numNewDocs > 0)
+				{
+					String clNewDoc = Integer.toString(numNewDocs);
 					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../dms/inboxManage.do?method=prepareForIndexPage&providerNo="+curUser_no+"&selectedCategory=CATEGORY_PATIENT_SUB&selectedCategoryPatient="+demographic_no+"&selectedCategoryType=CATEGORY_TYPE_DOC'); return false;\">" + clNewDoc + "</a>");
-				} else {
+				}
+				else
+				{
 					entry.add("&nbsp;");
 				}
 			}
 
 			// new ticklers
 			if (hasPrivilege("_caseload.Tickler", roleName$)){
-				String newTicklerQuery = "cl_new_ticklers";
-			    List<Map<String, Object>> newTicklerResult = caseloadDao.getCaseloadDemographicData(newTicklerQuery, demographicParam);
-			    if (!newTicklerResult.isEmpty() && newTicklerResult.get(0).get("count(*)")!=null && !newTicklerResult.get(0).get("count(*)").toString().equals("") && !newTicklerResult.get(0).get("count(*)").toString().equals("0")) {
-					String clNewTickler = newTicklerResult.get(0).get("count(*)").toString();
+				int numTicklers = caseloadDao.getNumNewTicklers(demographic.getDemographicId());
+				if (numTicklers > 0)
+				{
+					String clNewTickler = Integer.toString(numTicklers);
 					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../tickler/ticklerMain.jsp?demoview="+demographic_no+"'); return false;\">" + clNewTickler + "</a>");
-				} else {
+				}
+				else
+				{
 					entry.add("&nbsp;");
 				}
 			}
 
 			// new messages
 			if (hasPrivilege("_caseload.Msg", roleName$)){
-				String newMsgQuery = "cl_new_msgs";
-				List<Map<String, Object>> newMsgResult = caseloadDao.getCaseloadDemographicData(newMsgQuery, demographicParam);
-				if (!newMsgResult.isEmpty() && newMsgResult.get(0).get("count(*)")!=null && !newMsgResult.get(0).get("count(*)").toString().equals("") && !newMsgResult.get(0).get("count(*)").toString().equals("0")) {
-					String clNewMsg = newMsgResult.get(0).get("count(*)").toString();
+				int numMessages = caseloadDao.getNumNewMessages(demographic.getDemographicId());
+				if (numMessages > 0)
+				{
+					String clNewMsg = Integer.toString(numMessages);
 					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarMessenger/DisplayDemographicMessages.do?orderby=date&boxType=3&demographic_no="+demographic_no+"&providerNo="+curUser_no+"&userName="+URLEncoder.encode(userfirstname+" "+userlastname)+"'); return false;\">" + clNewMsg + "</a>");
-				} else {
+				}
+				else
+				{
 					entry.add("&nbsp;");
 				}
 			}
 
-			// measurements
-			String msmtQuery = "cl_measurement";
-			String[] msmtParam = new String[2];
-			msmtParam[1]=demographic_no;
-			List<Map<String, Object>> msmtResult = null;
-			
 			if (hasPrivilege("_caseload.BMI", roleName$)){
 				// BMI
-				msmtParam[0] = "BMI";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("dataField")!=null && !msmtResult.get(0).get("dataField").toString().equals("")) {
-					String clBmi = msmtResult.get(0).get("dataField").toString();
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "BMI");
+				if (measurement != null)
+				{
+					String clBmi = measurement.getDataField();
 					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=BMI'); return false;\">" + clBmi + "</a>");
 				} else {
 					entry.add("&nbsp;");
@@ -611,11 +628,11 @@ public class CaseloadContentAction extends DispatchAction {
 
 			// BP
 			if (hasPrivilege("_caseload.BP", roleName$)){
-				msmtParam[0] = "BP";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("dataField")!=null && !msmtResult.get(0).get("dataField").toString().equals("")) {
-					String clBp = msmtResult.get(0).get("dataField").toString();
-			 		entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=BP'); return false;\">" + clBp + "</a>");
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "BP");
+				if (measurement != null)
+				{
+					String clBp = measurement.getDataField();
+					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=BP'); return false;\">" + clBp + "</a>");
 				} else {
 					entry.add("&nbsp;");
 				}
@@ -623,107 +640,115 @@ public class CaseloadContentAction extends DispatchAction {
 
 			// WT
 			if (hasPrivilege("_caseload.WT", roleName$)){
-				msmtParam[0] = "WT";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("dataField")!=null && !msmtResult.get(0).get("dataField").toString().equals("")) {
-					String clWt = msmtResult.get(0).get("dataField").toString();
-			 		entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=WT'); return false;\">" + clWt + "</a>");
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "WT");
+				if (measurement != null)
+				{
+					String clWt = measurement.getDataField();
+					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=WT'); return false;\">" + clWt + "</a>");
 				} else {
 					entry.add("&nbsp;");
 				}
+
 			}
 
 			// SMK
 			if (hasPrivilege("_caseload.SMK", roleName$)){
-				msmtParam[0] = "SMK";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("dataField")!=null && !msmtResult.get(0).get("dataField").toString().equals("")) {
-					String clSmk = msmtResult.get(0).get("dataField").toString();
-			 		entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=SMK'); return false;\">" + clSmk + "</a>");
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "SMK");
+				if (measurement != null)
+				{
+					String clSmk = measurement.getDataField();
+					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=SMK'); return false;\">" + clSmk + "</a>");
 				} else {
 					entry.add("&nbsp;");
 				}
+
 			}
 
 			// A1C
 			if (hasPrivilege("_caseload.A1C", roleName$)){
-				msmtParam[0] = "A1C";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("dataField")!=null && !msmtResult.get(0).get("dataField").toString().equals("")) {
-					String clA1c = msmtResult.get(0).get("dataField").toString();
-			 		entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=A1C'); return false;\">" + clA1c + "</a>");
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "A1C");
+				if (measurement != null)
+				{
+					String clA1c = measurement.getDataField();
+					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=A1C'); return false;\">" + clA1c + "</a>");
 				} else {
 					entry.add("&nbsp;");
 				}
+
 			}
 
 			// ACR
 			if (hasPrivilege("_caseload.ACR", roleName$)){
-				msmtParam[0] = "ACR";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("dataField")!=null && !msmtResult.get(0).get("dataField").toString().equals("")) {
-					String clAcr = msmtResult.get(0).get("dataField").toString();
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "ACR");
+				if (measurement != null)
+				{
+					String clAcr = measurement.getDataField();
 					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=ACR'); return false;\">" + clAcr + "</a>");
 				} else {
 					entry.add("&nbsp;");
 				}
+
 			}
 
 			// SCR
 			if (hasPrivilege("_caseload.SCR", roleName$)){
-				msmtParam[0] = "SCR";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("dataField")!=null && !msmtResult.get(0).get("dataField").toString().equals("")) {
-					String clScr = msmtResult.get(0).get("dataField").toString();
-			 		entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=SCR'); return false;\">" + clScr + "</a>");
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "SCR");
+				if (measurement != null)
+				{
+					String clScr = measurement.getDataField();
+					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=SCR'); return false;\">" + clScr + "</a>");
 				} else {
 					entry.add("&nbsp;");
 				}
+
 			}
 
 			// LDL
 			if (hasPrivilege("_caseload.LDL", roleName$)){
-				msmtParam[0] = "LDL";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("dataField")!=null && !msmtResult.get(0).get("dataField").toString().equals("")) {
-					String clLdl = msmtResult.get(0).get("dataField").toString();
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "LDL");
+				if (measurement != null)
+				{
+					String clLdl = measurement.getDataField();
 					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=LDL'); return false;\">" + clLdl + "</a>");
 				} else {
 					entry.add("&nbsp;");
 				}
+
 			}
 
 			// HDL
 			if (hasPrivilege("_caseload.HDL", roleName$)){
-				msmtParam[0] = "HDL";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("dataField")!=null && !msmtResult.get(0).get("dataField").toString().equals("")) {
-					String clHdl = msmtResult.get(0).get("dataField").toString();
-			 		entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=HDL'); return false;\">" + clHdl + "</a>");
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "HDL");
+				if (measurement != null)
+				{
+					String clHdl = measurement.getDataField();
+					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=HDL'); return false;\">" + clHdl + "</a>");
 				} else {
 					entry.add("&nbsp;");
 				}
+
 			}
 
 			// TCHD
 			if (hasPrivilege("_caseload.TCHD", roleName$)){
-				msmtParam[0] = "TCHD";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("dataField")!=null && !msmtResult.get(0).get("dataField").toString().equals("")) {
-					String clTchd = msmtResult.get(0).get("dataField").toString();
-			 		entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=TCHD'); return false;\">" + clTchd + "</a>");
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "TCHD");
+				if (measurement != null)
+				{
+					String clTchd = measurement.getDataField();
+					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=TCHD'); return false;\">" + clTchd + "</a>");
 				} else {
 					entry.add("&nbsp;");
 				}
+
 			}
 
 			// EGFR
 			if (hasPrivilege("_caseload.EGFR", roleName$)){
-				msmtParam[0] = "EGFR";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("dataField")!=null && !msmtResult.get(0).get("dataField").toString().equals("")) {
-					String clEgfr = msmtResult.get(0).get("dataField").toString();
-			 		entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=EGFR'); return false;\">" + clEgfr + "</a>");
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "EGFR");
+				if (measurement != null)
+				{
+					String clEgfr = measurement.getDataField();
+					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=EGFR'); return false;\">" + clEgfr + "</a>");
 				} else {
 					entry.add("&nbsp;");
 				}
@@ -731,79 +756,41 @@ public class CaseloadContentAction extends DispatchAction {
 
 			// EYEE
 			if (hasPrivilege("_caseload.EYEE", roleName$)){
-				msmtParam[0] = "EYEE";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("dataField")!=null && !msmtResult.get(0).get("dataField").toString().equals("")) {
-					String clEyee = msmtResult.get(0).get("dataField").toString();
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "EYEE");
+				if (measurement != null)
+				{
+					String clEyee = measurement.getDataField();
 					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=EYEE'); return false;\">" + clEyee + "</a>");
 				} else {
 					entry.add("&nbsp;");
 				}
+
 			}
 			
 			// LastEncounterDate
-			if (hasPrivilege("_caseload.LastEncounterDate", roleName$)){
-				msmtQuery = "LastEncounterDate";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, demographicParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("update_date")!=null && !msmtResult.get(0).get("update_date").toString().equals("")) {
-					String lastEncDate = msmtResult.get(0).get("update_date").toString();
-					int endIdx = lastEncDate.lastIndexOf('.');
-					if (-1 != endIdx){
-						lastEncDate = lastEncDate.substring(0, endIdx);
-					}
-					//entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=LastEncounterDate'); return false;\">" + clEyee + "</a>");
+			if (hasPrivilege("_caseload.LastEncounterDate", roleName$))
+			{
+				Date lastEncounterDate = caseloadDao.getLastEncounterDate(demographic.getDemographicId());
+				if (lastEncounterDate != null)
+				{
+					String lastEncDate = ConversionUtils.toTimestampString(lastEncounterDate);
 					entry.add(lastEncDate);
-				} else {
+				}
+				else
+				{
 					entry.add("&nbsp;");
 				}
 			}
+
 			// LastEncounterType
 			if (hasPrivilege("_caseload.LastEncounterType", roleName$)){
-				msmtQuery = "LastEncounterType";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, demographicParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("encounter_type")!=null && !msmtResult.get(0).get("encounter_type").toString().equals("")) {
-					String lastEncType = msmtResult.get(0).get("encounter_type").toString();
-					//entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=LastEncounterType'); return false;\">" + clEyee + "</a>");
+				String lastEncType = caseloadDao.getLastEncounterType(demographic.getDemographicId());
+				if (lastEncType != null)
+				{
 					entry.add(lastEncType);
-				} else {
-					entry.add("&nbsp;");
 				}
-			}
-			
-			msmtParam[0]=demographic_no;
-			
-			// [CASH]AdmissionDate
-			if (hasPrivilege("_caseload.CashAdmissionDate", roleName$)){
-				msmtQuery = "CashAdmissionDate";
-				msmtParam[1]="CASH WAITLIST PROGRAM";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("referral_date")!=null && !msmtResult.get(0).get("referral_date").toString().equals("")) {
-					String cashAdDate = msmtResult.get(0).get("referral_date").toString();
-					//entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=CashAdmissionDate'); return false;\">" + clEyee + "</a>");
-					int endIdx = cashAdDate.lastIndexOf('.');
-					if (-1 != endIdx){
-						cashAdDate = cashAdDate.substring(0, endIdx);
-					}
-					entry.add(cashAdDate);
-				} else {
-					entry.add("&nbsp;");
-				}
-			}
-			
-			// [ACCESS1]AdmissionDate
-			if (hasPrivilege("_caseload.Access1AdmissionDate", roleName$)){
-				msmtQuery = "Access1AdmissionDate";
-				msmtParam[1]="ACCESS 1 WAITLIST PROGRAM";
-				msmtResult = caseloadDao.getCaseloadDemographicData(msmtQuery, msmtParam);
-				if (!msmtResult.isEmpty() && msmtResult.get(0).get("referral_date")!=null && !msmtResult.get(0).get("referral_date").toString().equals("")) {
-					String access1Date = msmtResult.get(0).get("referral_date").toString();
-					//entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=Access1AdmissionDate'); return false;\">" + clEyee + "</a>");
-					int endIdx = access1Date.lastIndexOf('.');
-					if (-1 != endIdx){
-						access1Date = access1Date.substring(0, endIdx);
-					}
-					entry.add(access1Date);
-				} else {
+				else
+				{
 					entry.add("&nbsp;");
 				}
 			}

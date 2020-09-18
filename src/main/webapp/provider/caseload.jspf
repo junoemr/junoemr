@@ -10,16 +10,16 @@
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
-<%@ page import="oscar.*, org.oscarehr.util.*"%>
-<%@ page import="java.util.*, java.sql.*, java.net.URLEncoder "%>
+<%@ page import="java.net.URLEncoder "%>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@ page import="org.oscarehr.PMmodule.dao.ProviderDao, org.oscarehr.common.model.Provider" %>
+<%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@ page import="oscar.OscarProperties" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="org.oscarehr.util.LocaleUtils" %>
 <%@ page import="java.util.Locale" %>
+<%@ page import="java.nio.charset.StandardCharsets" %>
 
 <%
 
@@ -63,10 +63,61 @@
 <c:import url="/infirm.do?action=showProgram"/>
 <%
 Locale locale = request.getLocale();
-String[] clH = new String[] {   LocaleUtils.getMessage(locale, "caseload.msgDemographic"), "", LocaleUtils.getMessage(locale, "caseload.msgAge"), LocaleUtils.getMessage(locale, "caseload.msgSex"), LocaleUtils.getMessage(locale, "caseload.msgLastAppt"), LocaleUtils.getMessage(locale, "caseload.msgNextAppt"), LocaleUtils.getMessage(locale, "caseload.msgApptsLYTD"), LocaleUtils.getMessage(locale, "caseload.msgLab"), LocaleUtils.getMessage(locale, "caseload.msgDoc"), LocaleUtils.getMessage(locale, "caseload.msgTickler"), LocaleUtils.getMessage(locale, "caseload.msgMsg"), LocaleUtils.getMessage(locale, "caseload.msgBMI"), LocaleUtils.getMessage(locale, "caseload.msgBP"), LocaleUtils.getMessage(locale, "caseload.msgWT"), LocaleUtils.getMessage(locale, "caseload.msgSMK"), LocaleUtils.getMessage(locale, "caseload.msgA1C"), LocaleUtils.getMessage(locale, "caseload.msgACR"), LocaleUtils.getMessage(locale, "caseload.msgSCR"), LocaleUtils.getMessage(locale, "caseload.msgLDL"), LocaleUtils.getMessage(locale, "caseload.msgHDL"), LocaleUtils.getMessage(locale, "caseload.msgTCHD"), LocaleUtils.getMessage(locale, "caseload.msgEGFR"), LocaleUtils.getMessage(locale, "caseload.msgEYEE"), LocaleUtils.getMessage(locale, "caseload.msgLastEncounterDate"), LocaleUtils.getMessage(locale, "caseload.msgLastEncounterType"), LocaleUtils.getMessage(locale, "caseload.msgCASHAdmissionDate"), LocaleUtils.getMessage(locale, "caseload.msgACCESS1AdmissionDate")};
+String[] clH = new String[] {
+		LocaleUtils.getMessage(locale, "caseload.msgDemographic"),
+		"",
+		LocaleUtils.getMessage(locale, "caseload.msgAge"),
+		LocaleUtils.getMessage(locale, "caseload.msgSex"),
+		LocaleUtils.getMessage(locale, "caseload.msgLastAppt"),
+		LocaleUtils.getMessage(locale, "caseload.msgNextAppt"),
+		LocaleUtils.getMessage(locale, "caseload.msgApptsLYTD"),
+		LocaleUtils.getMessage(locale, "caseload.msgLab"),
+		LocaleUtils.getMessage(locale, "caseload.msgDoc"),
+		LocaleUtils.getMessage(locale, "caseload.msgTickler"),
+		LocaleUtils.getMessage(locale, "caseload.msgMsg"),
+		LocaleUtils.getMessage(locale, "caseload.msgBMI"),
+		LocaleUtils.getMessage(locale, "caseload.msgBP"),
+		LocaleUtils.getMessage(locale, "caseload.msgWT"),
+		LocaleUtils.getMessage(locale, "caseload.msgSMK"),
+		LocaleUtils.getMessage(locale, "caseload.msgA1C"),
+		LocaleUtils.getMessage(locale, "caseload.msgACR"),
+		LocaleUtils.getMessage(locale, "caseload.msgSCR"),
+		LocaleUtils.getMessage(locale, "caseload.msgLDL"),
+		LocaleUtils.getMessage(locale, "caseload.msgHDL"),
+		LocaleUtils.getMessage(locale, "caseload.msgTCHD"),
+		LocaleUtils.getMessage(locale, "caseload.msgEGFR"),
+		LocaleUtils.getMessage(locale, "caseload.msgEYEE"),
+		LocaleUtils.getMessage(locale, "caseload.msgLastEncounterDate"),
+		LocaleUtils.getMessage(locale, "caseload.msgLastEncounterType")
+};
 %>
 <script type="text/javascript">
-clH = ["<bean:message key="caseload.msgDemographic" />", "", "<bean:message key="caseload.msgAge" />", "<bean:message key="caseload.msgSex" />", "<bean:message key="caseload.msgLastAppt" />", "<bean:message key="caseload.msgNextAppt" />", "<bean:message key="caseload.msgApptsLYTD" />", "<bean:message key="caseload.msgLab" />", "<bean:message key="caseload.msgDoc" />", "<bean:message key="caseload.msgTickler" />", "<bean:message key="caseload.msgMsg" />", "<bean:message key="caseload.msgBMI" />", "<bean:message key="caseload.msgBP" />", "<bean:message key="caseload.msgWT" />", "<bean:message key="caseload.msgSMK" />", "<bean:message key="caseload.msgA1C" />", "<bean:message key="caseload.msgACR" />", "<bean:message key="caseload.msgSCR" />", "<bean:message key="caseload.msgLDL" />", "<bean:message key="caseload.msgHDL" />", "<bean:message key="caseload.msgTCHD" />", "<bean:message key="caseload.msgEYEE" />", "<bean:message key="caseload.msgLastEncounterDate" />", "<bean:message key="caseload.msgLastEncounterType" />", "<bean:message key="caseload.msgCASHAdmissionDate" />", "<bean:message key="caseload.msgACCESS1AdmissionDate" />"];
+clH = [
+	"<bean:message key="caseload.msgDemographic" />",
+	"",
+	"<bean:message key="caseload.msgAge" />",
+	"<bean:message key="caseload.msgSex" />",
+	"<bean:message key="caseload.msgLastAppt" />",
+	"<bean:message key="caseload.msgNextAppt" />",
+	"<bean:message key="caseload.msgApptsLYTD" />",
+	"<bean:message key="caseload.msgLab" />",
+	"<bean:message key="caseload.msgDoc" />",
+	"<bean:message key="caseload.msgTickler" />",
+	"<bean:message key="caseload.msgMsg" />",
+	"<bean:message key="caseload.msgBMI" />",
+	"<bean:message key="caseload.msgBP" />",
+	"<bean:message key="caseload.msgWT" />",
+	"<bean:message key="caseload.msgSMK" />",
+	"<bean:message key="caseload.msgA1C" />",
+	"<bean:message key="caseload.msgACR" />",
+	"<bean:message key="caseload.msgSCR" />",
+	"<bean:message key="caseload.msgLDL" />",
+	"<bean:message key="caseload.msgHDL" />",
+	"<bean:message key="caseload.msgTCHD" />",
+	"<bean:message key="caseload.msgEYEE" />",
+	"<bean:message key="caseload.msgLastEncounterDate" />",
+	"<bean:message key="caseload.msgLastEncounterType" />"
+];
 </script>
 <table border="1" cellpadding="0" cellspacing="0" width="100%" id="caseloadTable">
 <tr><td colspan='<%=clH.length%>'>
@@ -117,7 +168,7 @@ clH = ["<bean:message key="caseload.msgDemographic" />", "", "<bean:message key=
 			} %>
 					</select>
 					<b>Rostered: </b>
-					<select id='caseloadRoster' onChange='search("search");' style='width: 120'>
+					<select id='caseloadRoster' onChange='search("search");' style='width: 120px'>
 						<option value='' selected></option>
 						<option value='RO'><bean:message key='demographic.demographiceditdemographic.optRostered'/></option>
 						<option value='NR'><bean:message key='demographic.demographiceditdemographic.optNotRostered'/></option>
@@ -154,7 +205,7 @@ String[] objIds = new String[] {"Demographic", "_caseload.DisplayMode", "_caselo
 		, "_caseload.Tickler", "_caseload.Msg", "_caseload.BMI", "_caseload.BP", "_caseload.WT"
 		, "_caseload.SMK", "_caseload.A1C", "_caseload.ACR", "_caseload.SCR", "_caseload.LDL"
 		, "_caseload.HDL", "_caseload.TCHD", "_caseload.EGFR", "_caseload.EYEE", "_caseload.LastEncounterDate"
-		, "_caseload.LastEncounterType", "_caseload.CashAdmissionDate", "_caseload.Access1AdmissionDate"};
+		, "_caseload.LastEncounterType"};
 %>
 
 <% for (int i=0; i < clH.length; i++) { %>
