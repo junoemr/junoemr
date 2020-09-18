@@ -150,8 +150,13 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean
 		userCreatedFlowsheets = new ArrayList<>();
 	}
 
-	// Have to loop over both the system flowsheets and DB flowsheets
-	// The moment we get a match, we're done and can return
+	/**
+	 * Given a flowsheet name and its database entity, update our cached list with any new information.
+	 * Note that the flowsheet's display name is transient. If we find an entry to update, we have
+	 * to copy the display name from the old entry into the entry being cached.
+	 * @param name name of the old flowsheet entry to update
+	 * @param flowsheet Flowsheet entry to replace the old cached version with
+	 */
 	public void updateCache(String name, Flowsheet flowsheet)
 	{
 		for (Flowsheet cachedFlowsheet : systemFlowsheets)
@@ -715,7 +720,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean
 			int ruleCount = 0;
 			Element rules  = root.getChild("rules");
 
-			if (rules !=null)
+			if (rules != null)
 			{
 				List<Element> recomends = rules.getChildren("recommendation");
 				List<Recommendation> ds = new ArrayList<Recommendation>();

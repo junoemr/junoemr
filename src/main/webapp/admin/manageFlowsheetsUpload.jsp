@@ -87,21 +87,21 @@ try {
 				if(existingFlowsheet == null)
 				{
 					//save to db
-					Flowsheet f = new Flowsheet();
-					f.setContent(contents);
-					f.setCreatedDate(new java.util.Date());
-					f.setEnabled(true);
-					f.setExternal(false);
-					f.setName(fs.getName());
+					Flowsheet flowsheet = new Flowsheet();
+					flowsheet.setContent(contents);
+					flowsheet.setCreatedDate(new java.util.Date());
+					flowsheet.setEnabled(true);
+					flowsheet.setExternal(false);
+					flowsheet.setName(fs.getName());
 
-					flowsheetDao.persist(f);
-				} else
+					flowsheetDao.persist(flowsheet);
+				}
+				else
 				{
 					existingFlowsheet.setContent(contents);
 					flowsheetDao.merge(existingFlowsheet);
 				}
 
-				// flowsheetService.reloadFlowsheets();
             } else {
 				MiscUtils.getLogger().error("Invalid Flowsheet XML Format");
             }

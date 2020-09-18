@@ -56,6 +56,8 @@
 <%@ page import="oscar.oscarPrevention.PreventionData" %>
 <%@ page import="org.oscarehr.measurements.service.FlowsheetService" %>
 <%@ page import="org.oscarehr.measurements.model.FlowSheetUserCreated" %>
+<%@ page import="org.springframework.web.util.UriComponentsBuilder" %>
+<%@ page import="java.net.URI" %>
 
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 
@@ -846,15 +848,15 @@ function fsPopup(width,height,url,window) {
 				{
 					templateDisplayName = findName.getDisplayName();
 				}
+				UriComponentsBuilder undiagnosedUri = UriComponentsBuilder.fromUriString(request.getRequestURI());
+				undiagnosedUri.queryParam("demographic_no", demographic_no);
+				undiagnosedUri.queryParam("template", value);
+
 				undiagnosed.append("<li class='")
 						.append(fsSelected)
 						.append("'><a href='")
-						.append(request.getRequestURI())
-						.append("?demographic_no=")
-						.append(demographic_no)
-						.append("&template=")
-						.append(value)
-						.append("'  title='Undiagnosed' id='group-btn-")
+						.append(undiagnosedUri.build())
+						.append("' title='Undiagnosed' id='group-btn-")
 						.append(value).append("'>")
 						.append(templateDisplayName).append("</a></li>");
 				fsSelected = "";

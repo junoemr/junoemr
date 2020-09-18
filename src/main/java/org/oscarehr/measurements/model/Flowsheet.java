@@ -63,6 +63,11 @@ public class Flowsheet extends AbstractModel<Integer> implements Serializable {
 
 	@Transient
 	private String displayName;
+
+	public static final String TYPE_UNKNOWN = "Unknown";
+	public static final String TYPE_SYSTEM = "System";
+	public static final String TYPE_CUSTOM = "Custom";
+	public static final String TYPE_USER_ADDED = "User Added";
 	
 	public Flowsheet() {
 		

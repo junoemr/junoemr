@@ -54,12 +54,15 @@
 <%
 	FlowsheetService flowsheetService = SpringUtils.getBean(FlowsheetService.class);
 	String method = request.getParameter("method");
-	if(method != null ) {
-		if(method.equals("disable")) {
+	if(method != null)
+	{
+		if(method.equals("disable"))
+		{
 			String name = request.getParameter("name");
 			flowsheetService.disableFlowsheet(name);
 		}
-		if(method.equals("enable")) {
+		if(method.equals("enable"))
+		{
 			String name = request.getParameter("name");
 			flowsheetService.enableFlowsheet(name);
 		}
@@ -90,77 +93,10 @@ jQuery(function() {
 </script>
 
 <style type="text/css">
-table.outline {
-	margin-top: 50px;
-	border-bottom: 1pt solid #888888;
-	border-left: 1pt solid #888888;
-	border-top: 1pt solid #888888;
-	border-right: 1pt solid #888888;
-}
-
-table.grid {
-	border-bottom: 1pt solid #888888;
-	border-left: 1pt solid #888888;
-	border-top: 1pt solid #888888;
-	border-right: 1pt solid #888888;
-}
-
-td.gridTitles {
-	border-bottom: 2pt solid #888888;
-	font-weight: bold;
-	text-align: center;
-}
-
-td.gridTitlesWOBottom {
-	font-weight: bold;
-	text-align: center;
-}
-
-td.middleGrid {
-	border-left: 1pt solid #888888;
-	border-right: 1pt solid #888888;
-	text-align: center;
-}
-
 label {
 	float: left;
 	width: 120px;
 	font-weight: bold;
-}
-
-label.checkbox {
-	float: left;
-	width: 116px;
-	font-weight: bold;
-}
-
-label.fields {
-	float: left;
-	width: 80px;
-	font-weight: bold;
-}
-
-span.labelLook {
-	font-weight: bold;
-}
-
-input,textarea,select { //
-	margin-bottom: 5px;
-}
-
-textarea {
-	width: 450px;
-	height: 100px;
-}
-
-.boxes {
-	width: 1em;
-}
-
-#submitbutton {
-	margin-left: 120px;
-	margin-top: 5px;
-	width: 90px;
 }
 
 br {
@@ -206,7 +142,7 @@ br {
 
 				for (MeasurementFlowSheet flowsheetTemplate : flowsheetTemplates)
 				{
-					String type = "Unknown";
+					String type = Flowsheet.TYPE_UNKNOWN;
 					String displayName = flowsheetTemplate.getDisplayName();
 					boolean enabled = true;
 					for (Flowsheet sheet : systemFlowsheets)
@@ -217,19 +153,19 @@ br {
 							displayName = sheet.getDisplayName();
 							if (sheet.isExternal())
 							{
-								type = "System";
+								type = Flowsheet.TYPE_SYSTEM;
 							}
 							break;
 						}
 					}
 
-					if (type.equals("Unknown"))
+					if (Flowsheet.TYPE_UNKNOWN.equals(type))
 					{
 						for (Flowsheet customFlowsheet : databaseFlowsheets)
 						{
 							if (flowsheetTemplate.getName().equals(customFlowsheet.getName()))
 							{
-								type = "Custom";
+								type = Flowsheet.TYPE_CUSTOM;
 								break;
 							}
 						}
@@ -238,7 +174,7 @@ br {
 						{
 							if (flowsheetTemplate.getName().equals(userCreated.getName()))
 							{
-								type = "User Added";
+								type = Flowsheet.TYPE_USER_ADDED;
 								enabled = !userCreated.getArchived();
 								displayName = userCreated.getDisplayName();
 								break;
