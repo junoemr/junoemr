@@ -53,6 +53,7 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="oscar.util.StringUtils" %>
 
 <%
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -889,7 +890,6 @@
 							%>
 						</select>
 
-
 						<!-- -->
 						&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<font
 								face="Verdana, Arial, Helvetica, sans-serif" size="2"
@@ -900,11 +900,14 @@
 { // multisite start ==========================================
         	SiteDao siteDao = (SiteDao)SpringUtils.getBean("siteDao");
           	List<Site> sites = siteDao.getActiveSitesByProviderNo(user_no);
+          	List<Provider> prov = providerDao.getActiveProviders();
 %>
 						<script>
 							var _providers = [];
+							_providers["all"] = "<option value='all' <%=assignedTo.equals("all") ? "selected" : ""%>>All Providers</option>";
+							_providers["all"] += "<% for (Provider pr : prov){%> <option value='<%=pr.getProviderNo()%>' <%=assignedTo.equals(pr.getProviderNo()) ? "selected" : ""%> > <%=pr.getLastName()%>, <%=pr.getFirstName()%></option><%}%>";
 							<%for (int i=0; i<sites.size(); i++) {%>
-							_providers["<%=sites.get(i).getSiteId()%>"] = "<%Iterator<Provider> iter = sites.get(i).getProviders().iterator();
+							_providers["<%=sites.get(i).getSiteId()%>"] = "<option value=<%=sites.get(i).getName()%> <%=assignedTo.equals(sites.get(i).getName()) ? "selected" : ""%>>All Providers</option><%Iterator<Provider> iter = sites.get(i).getProviders().iterator();
 	while (iter.hasNext()) {
 		Provider p=iter.next();
 		if ("1".equals(p.getStatus())) {
@@ -915,11 +918,22 @@
 
 							function changeSite(sel)
 							{
-								sel.form.assignedTo.innerHTML = sel.value == "none" ? "" : _providers[sel.value];
+								switch (sel.value) {
+									case 'none' :
+										sel.form.assignedTo.innerHTML = "";
+										break;
+									case 'all':
+										sel.form.assignedTo.innerHTML = _providers["all"];
+										break;
+									default:
+										sel.form.assignedTo.innerHTML = _providers[sel.value];
+								}
+								//sel.form.assignedTo.innerHTML = sel.value == "none" ? "" : _providers[sel.value]; *****************undo uncomment to revert
 							}
 						</script>
 						<select id="site" name="site" onchange="changeSite(this)">
 							<option value="none">---select clinic---</option>
+							<option value="all">All Clinics</option>
 							<%
 								for (int i = 0; i < sites.size(); i++)
 								{
@@ -1217,7 +1231,13 @@
 
 				if (!assignedTo.isEmpty() && !assignedTo.equals("all"))
 				{
-					filter.setAssignee(assignedTo);
+					if ( !StringUtils.isNumeric(assignedTo)  ) {
+						SiteDao siteDao = (SiteDao)SpringUtils.getBean("siteDao");
+						Site site = siteDao.findByName(assignedTo);
+						filter.setAssignees(site.getProviders());
+					}else {
+						filter.setAssignee(assignedTo);
+					}
 				}
 
 				filter.setSort_order("desc");
