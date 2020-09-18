@@ -36,6 +36,7 @@ import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.dao.CaseloadDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.demographic.dao.DemographicDao;
@@ -57,6 +58,7 @@ public class CaseloadContentAction extends DispatchAction {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	private CaseloadDao caseloadDao = SpringUtils.getBean(CaseloadDao.class);
 	private DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
+	private TicklerDao ticklerDao = SpringUtils.getBean(TicklerDao.class);
 	private OscarAppointmentDao oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 	private MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
 
@@ -588,7 +590,7 @@ public class CaseloadContentAction extends DispatchAction {
 
 			// new ticklers
 			if (hasPrivilege("_caseload.Tickler", roleName$)){
-				int numTicklers = caseloadDao.getNumNewTicklers(demographic.getDemographicId());
+				int numTicklers = ticklerDao.getActiveTicklerCountForDemographic(demographic.getDemographicId());
 				if (numTicklers > 0)
 				{
 					String clNewTickler = Integer.toString(numTicklers);

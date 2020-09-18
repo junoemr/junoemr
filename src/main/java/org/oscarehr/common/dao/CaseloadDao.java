@@ -228,20 +228,6 @@ public class CaseloadDao {
 		return numResults.intValue();
 	}
 
-	// TODO look in TicklerDao to see if this exists
-	public Integer getNumNewTicklers(int demographicNo)
-	{
-		String sql = "SELECT COUNT(*) " +
-				"FROM tickler " +
-				"WHERE status='A' " +
-				"AND demographic_no=:demographicNo";
-		Query query = entityManager.createNativeQuery(sql);
-		query.setParameter("demographicNo", demographicNo);
-
-		BigInteger numResults = (BigInteger)query.getSingleResult();
-		return numResults.intValue();
-	}
-
 	/**
 	 * Get the number of new (unread) messages associated with a demographic.
 	 * @param demographicNo demographic to search against
