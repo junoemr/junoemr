@@ -333,6 +333,17 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					function success(result)
 					{
 						ctrl.billingRegion = result.data.body;
+						if (ctrl.billingRegion === "CLINICAID")
+						{
+							systemPreferenceApi.getPropertyValue("instance_type", "BC").then((result) =>
+							{
+								ctrl.billingRegion = result.data.body;
+							}).error((error) =>
+              {
+                console.error("Failed to fetch Clinicaid billing type with error" + error);
+	              ctrl.loadingError = true;
+              });
+						}
 					},
 					function error(result)
 					{
