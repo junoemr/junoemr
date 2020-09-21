@@ -339,10 +339,10 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 							{
 								ctrl.billingRegion = result.data.body;
 							}).error((error) =>
-              {
-                console.error("Failed to fetch Clinicaid billing type with error" + error);
-	              ctrl.loadingError = true;
-              });
+							{
+							  console.error("Failed to fetch Clinicaid billing type with error" + error);
+							  ctrl.loadingError = true;
+							});
 						}
 					},
 					function error(result)
