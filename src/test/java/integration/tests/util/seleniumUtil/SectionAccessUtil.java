@@ -49,4 +49,12 @@ public class SectionAccessUtil
 		driver.findElement(By.linkText(subSectionName)).click();
 		driver.switchTo().frame("content-frame");
 	}
+
+	public static void accessSectionJUNOUI(WebDriver driver, String sectionName)
+	{
+		// open JUNO UI page
+		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
+		driver.manage().window().maximize();
+		driver.findElement(By.linkText(sectionName)).click();
+	}
 }

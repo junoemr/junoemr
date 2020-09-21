@@ -90,7 +90,7 @@ class GroupViewIntegrationTests
 
 public class AddAppointmentsTests extends SeleniumTestBase
 {
-	WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+	static WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	@BeforeClass
 	public static void setup() throws Exception
 	{
@@ -153,15 +153,20 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		PageUtil.switchToWindow(secCurrWindowHandle, driver);
 	}
 
+	public static void addAppointmentsSchedulePage(String time, String currWindowHandle)
+	{
+		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
+		addAppointmentWithDemo(By.linkText(time), currWindowHandle, "t");//To Do
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
+	}
+
 	@Test
 	public void addAppointmentsSchedulePageTest()
 	{
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
-		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		addAppointmentWithDemo(By.linkText("09:00"), currWindowHandle, "t");//To Do
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
+		addAppointmentsSchedulePage("09:00", currWindowHandle);
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
 
@@ -232,6 +237,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");// To Do
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Day Page")));
 		driver.findElement(By.xpath("//a[contains(., '" + apptAt9DateFormated + "')]")).click();
+		wait.until(ExpectedConditions.elementToBeClickable(By.linkText("All")));
 		driver.findElement(By.linkText("All")).click();
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",

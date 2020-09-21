@@ -165,7 +165,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 
 		//Reset password
 		resetPassword(password, passwordUpdated);
-			Assert.assertTrue(Navigation.isLoggedIn(driver));
+		Assert.assertTrue(Navigation.isLoggedIn(driver));
 	}
 
 	@Test

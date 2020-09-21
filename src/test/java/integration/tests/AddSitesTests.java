@@ -50,6 +50,7 @@ public class AddSitesTests extends SeleniumTestBase
 
 	public void addNewSites(SiteTestData site)
 	{
+		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		driver.findElement(By.xpath(".//a[contains(.,'System Management')]")).click();
 		driver.findElement(By.xpath(".//a[contains(.,'Satellite-sites Admin')]")).click();
 		if (PageUtil.isExistsBy(By.id("myFrame"), driver))
@@ -61,6 +62,7 @@ public class AddSitesTests extends SeleniumTestBase
 			driver.switchTo().frame("content-frame");
 		}
 		driver.findElement(By.xpath("//input[@value='Add New Site']")).click();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='site.name']")));
 		driver.findElement(By.xpath("//input[@name='site.name']")).sendKeys(site.siteName);
 		driver.findElement(By.xpath("//input[@name='site.shortName']")).sendKeys(site.shortName);
 		driver.findElement(By.xpath("//input[@name='site.bgColor']")).sendKeys(site.address);
