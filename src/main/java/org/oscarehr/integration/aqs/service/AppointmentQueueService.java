@@ -25,8 +25,10 @@ package org.oscarehr.integration.aqs.service;
 import ca.cloudpractice.aqs.client.ApiException;
 import org.oscarehr.integration.aqs.conversion.AppointmentQueueIntegrationModelConverter;
 import org.oscarehr.integration.aqs.conversion.AppointmentQueueIntegrationTransferConverter;
+import org.oscarehr.integration.aqs.conversion.ContactDtoContactConverter;
 import org.oscarehr.integration.aqs.exception.AqsCommunicationException;
 import org.oscarehr.integration.aqs.model.AppointmentQueue;
+import org.oscarehr.integration.aqs.model.Contact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +43,9 @@ public class AppointmentQueueService extends BaseService
 
 	@Autowired
 	private AppointmentQueueIntegrationModelConverter integrationModelConverter;
+
+	@Autowired
+	private ContactDtoContactConverter contactDtoContactConverter;
 
 	public List<AppointmentQueue> getAppointmentQueues(Integer securityNo)
 	{
@@ -101,6 +106,42 @@ public class AppointmentQueueService extends BaseService
 		catch (ApiException apiException)
 		{
 			throw new AqsCommunicationException("Failed to delete appointment queue [" + queueId + "] on the AQS server", apiException);
+		}
+	}
+
+	public List<Contact> getAppointmentQueueContacts(UUID queueId, Integer securityNo)
+	{
+		try
+		{
+			return contactDtoContactConverter.convert(getOrganizationApi(securityNo).getQueueContacts(queueId));
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to fetch appointment queue contacts for queue with id [" + queueId + "] from AQS server", apiException);
+		}
+	}
+
+	public Contact addAppointmentQueueContact(UUID queueId, UUID contactId, Integer securityNo)
+	{
+		try
+		{
+			return contactDtoContactConverter.convert(getOrganizationApi(securityNo).addQueueContact(queueId, contactId));
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to add contact [" + contactId + "] to queue [" +queueId + "] on the AQS server", apiException);
+		}
+	}
+
+	public void removeAppointmentQueueContact(UUID queueId, UUID contactId, Integer securityNo)
+	{
+		try
+		{
+			getOrganizationApi(securityNo).removeQueueContact(queueId, contactId);
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to remove contact [" + contactId + "] from queue [" + queueId + "] on the AQS server", apiException);
 		}
 	}
 }

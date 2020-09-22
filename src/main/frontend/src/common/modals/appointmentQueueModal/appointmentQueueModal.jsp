@@ -38,6 +38,13 @@
 						component-style="$ctrl.resolve.style">
 				</juno-input>
 			</div>
+			<div class="align-items-flex-end options-common">
+				<juno-input
+								label="Text Notification Phone(s)"
+								ng-model="$ctrl.notifyPhoneNumbers"
+								component-style="$ctrl.resolve.style">
+				</juno-input>
+			</div>
 			<div class="options-availability">
 				<availability-settings ng-if="$ctrl.queueModel.availabilitySettings"
 				                       settings-model="$ctrl.queueModel.availabilitySettings"
