@@ -52,7 +52,7 @@ public class TeleplanS23Dao extends AbstractDao<TeleplanS23>{
 
 	public List<TeleplanS23> findDuplicates(TeleplanS23 lineEntry)
 	{
-		Query q = entityManager.createQuery(
+		Query query = entityManager.createQuery(
 				"SELECT t FROM TeleplanS23 t " +
 						"WHERE t.s23Type = :s23Type " +
 						"AND t.dataCentre = :dataCenter " +
@@ -61,14 +61,14 @@ public class TeleplanS23Dao extends AbstractDao<TeleplanS23>{
 						"AND t.payment = :paymentDate " +
 						"AND t.ajm = :providerName " +
 						"ORDER BY t.id ASC");
-		q.setParameter("s23Type", lineEntry.getS23Type());
-		q.setParameter("dataCenter", lineEntry.getDataCentre());
-		q.setParameter("sequenceNumber", lineEntry.getDataSeq());
-		q.setParameter("mspInternal", lineEntry.getMspCtlNo());
-		q.setParameter("paymentDate", lineEntry.getPayment());
-		q.setParameter("providerName", lineEntry.getAjm());
+		query.setParameter("s23Type", lineEntry.getS23Type());
+		query.setParameter("dataCenter", lineEntry.getDataCentre());
+		query.setParameter("sequenceNumber", lineEntry.getDataSeq());
+		query.setParameter("mspInternal", lineEntry.getMspCtlNo());
+		query.setParameter("paymentDate", lineEntry.getPayment());
+		query.setParameter("providerName", lineEntry.getAjm());
 
-		return q.getResultList();
+		return query.getResultList();
 	}
 
 	public boolean isDuplicate(TeleplanS23 lineEntry)
