@@ -26,4 +26,4 @@
 
  */
 
-angular.module('Layout', ['Common', 'Common.Services', 'Layout.Components']);
+angular.module('Layout', ['Common', 'Common.Services', 'Layout.Components', 'dndLists']);

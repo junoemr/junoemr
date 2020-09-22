@@ -37,6 +37,27 @@
 			align-content: flex-start;
 
 			overflow: hidden;
+
+			ul {
+				list-style-type: none;
+				padding: 0 0 16px 0;
+				flex: 1 1 100%;
+				background-color: transparent;
+
+				.dndDraggingSource {
+					.appointment-card {
+						filter: opacity(50%);
+					}
+				}
+
+				.dndPlaceholder {
+					min-height: 32px;
+					flex: 1 1 100%;
+					background-color: rgba(($color-neutral-darker), 0.1);
+					border-radius: 8px;
+					margin-top: 8px;
+				}
+			}
 		}
 	}
 
