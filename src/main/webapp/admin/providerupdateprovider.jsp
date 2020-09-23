@@ -163,7 +163,6 @@ jQuery(document).ready( function() {
 	    out.println("failed");
 	} 
 	else {
-		LogAction.addLogEntry((String)session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS, request.getParameter("keyword"), request.getRemoteAddr());
 %>
 
 			<table cellspacing="0" cellpadding="2" width="100%" border="0"
@@ -225,7 +224,7 @@ jQuery(document).ready( function() {
             %>
                 <tr>
                     <td>
-                        <input type="checkbox" name="sites" value="<%= site.getSiteId() %>" <%= isChecked ? " checked" : "" %> <%= isAllowed? "" : " disabled"%>>
+                        <input type="checkbox" name="sites" value="<%= site.getSiteId() %>" <%= isChecked ? " checked" : "" %> <%= isAllowed ? "" : " disabled"%>>
                         <%= site.getName() %>
                     </td>
                     <td style="display:none">

@@ -64,6 +64,8 @@ if(!authed) {
 <%@ page import="org.hibernate.Hibernate" %>
 <%@ page import="org.oscarehr.provider.service.ProviderService" %>
 <%@ page import="org.springframework.beans.BeanUtils" %>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
 	ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
@@ -88,6 +90,7 @@ if(!authed) {
   ProviderBillCenter billCenter = new ProviderBillCenter();
   billCenter.updateBillCenter(request.getParameter("provider_no"),request.getParameter("billcenter"));
 
+  LogAction.addLogEntry((String)session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS, request.getParameter("keyword"), request.getRemoteAddr());
 
 
 //multi-office provide id formalize check, can be turn off on properties multioffice.formalize.provider.id
