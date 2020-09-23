@@ -1119,7 +1119,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 	public Appointment findLastAppointment(int demographicNo)
 	{
 		String sql = "SELECT a FROM Appointment a " +
-				"WHERE ADDTIME(a.appointmentDate, a.startTime) < NOW()" +
+				"WHERE ADDTIME(a.appointmentDate, a.startTime) < NOW() " +
 				"AND a.demographicNo=:demographicNo " +
 				"ORDER BY a.appointmentDate DESC";
 		Query query = entityManager.createQuery(sql);
