@@ -2300,7 +2300,7 @@ private long getAppointmentRowSpan(
 		).catch(
 			(error) =>
 			{
-				console.error("Failed to get telehealth session info with erorr: ", error);
+				console.error("Failed to get telehealth session info with error: ", error);
 			}
 		)
 	}
