@@ -90,7 +90,6 @@ if(!authed) {
   ProviderBillCenter billCenter = new ProviderBillCenter();
   billCenter.updateBillCenter(request.getParameter("provider_no"),request.getParameter("billcenter"));
 
-  LogAction.addLogEntry((String)session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS, request.getParameter("keyword"), request.getRemoteAddr());
 
 
 //multi-office provide id formalize check, can be turn off on properties multioffice.formalize.provider.id
@@ -276,6 +275,7 @@ if(!authed) {
             providerArchiveDao.persist(pa);
 
             providerService.saveProvider(provider);
+            providerService.addLogEntry((String)session.getAttribute("user"), request.getParameter("keyword"), request.getRemoteAddr());
 %>
 <p>
 <h2><bean:message key="admin.providerupdate.msgUpdateSuccess" />
