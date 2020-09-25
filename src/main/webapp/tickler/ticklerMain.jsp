@@ -1505,7 +1505,6 @@
                 catch (ParseException ex)
                 {
                     MiscUtils.getLogger().error("Error", ex);
-                    filter.setStartDate("1950-01-01");
                 }
                 try
                 {
@@ -1514,7 +1513,6 @@
                 catch (ParseException ex)
                 {
                     MiscUtils.getLogger().error("Error", ex);
-                    filter.setEndDate("2080-01-01");
                 }
 
 

@@ -22,6 +22,8 @@
  */
 package org.oscarehr.ticklers.search;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.model.Tickler;
@@ -51,6 +53,8 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
     private Date endDate;
     private String creator;
     private String taskAssignedTo;
+    @Setter
+    @Getter
     private List<String> taskAssignedToMultiple;
     private String programId;
     private Integer demographicNo;
