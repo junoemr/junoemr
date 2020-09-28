@@ -637,7 +637,7 @@ public class CaseloadContentAction extends DispatchAction {
 			}
 
 			// measurements, in order as they appear on caseload
-			// temporary measure until this function
+			// temporary measure until we can rework this function or we find a way to grab all of these in one shot
 			List<String> caseloadMeasurements = Arrays.asList(
 					CASELOAD_MEASUREMENT_BMI,
 					CASELOAD_MEASUREMENT_BP,
