@@ -21,7 +21,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.oscarehr.caseload.CaseloadCategory;
-import org.oscarehr.util.LoggedInInfo;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -259,7 +258,8 @@ public class CaseloadDao {
 				"AND NOT EXISTS (" +
 				"    SELECT * " +
 				"    FROM casemgmt_note " +
-				"    WHERE update_date > c.update_date" +
+				"    WHERE demographic_no=:demographicNo " +
+				"    AND update_date > c.update_date " +
 				")";
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("demographicNo", demographicNo);

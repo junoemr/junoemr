@@ -655,19 +655,22 @@ public class CaseloadContentAction extends DispatchAction {
 
 			for (String caseloadMeasurement : caseloadMeasurements)
 			{
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), caseloadMeasurement);
-				String newEntry = "&nbsp;";
-				if (measurement != null)
+				if (hasPrivilege("_caseload." + caseloadMeasurement, roleName$))
 				{
-					newEntry = "<a href='#' onClick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="
-							+ URLEncoder.encode(demographic_no, "UTF-8")
-							+ "&type="
-							+ URLEncoder.encode(caseloadMeasurement, "UTF-8")
-							+ "'); return false;\">"
-							+ measurement.getDataField()
-							+ "</a>";
+					Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), caseloadMeasurement);
+					String newEntry = "&nbsp;";
+					if (measurement != null)
+					{
+						newEntry = "<a href='#' onClick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="
+								+ URLEncoder.encode(demographic_no, "UTF-8")
+								+ "&type="
+								+ URLEncoder.encode(caseloadMeasurement, "UTF-8")
+								+ "'); return false;\">"
+								+ measurement.getDataField()
+								+ "</a>";
+					}
+					entry.add(newEntry);
 				}
-				entry.add(newEntry);
 			}
 
 			// LastEncounterDate
