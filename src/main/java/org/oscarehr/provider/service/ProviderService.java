@@ -44,8 +44,6 @@ import org.oscarehr.ws.rest.transfer.providerManagement.SecurityRecordTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.log.LogAction;
-import oscar.log.LogConst;
 import oscar.oscarProvider.data.ProviderBillCenter;
 
 import java.security.NoSuchAlgorithmException;
@@ -92,11 +90,6 @@ public class ProviderService
 	public void saveProvider(ProviderData provider)
 	{
 		providerDataDao.merge(provider);
-	}
-
-	public void addLogEntry(String user, String keyword, String ip)
-	{
-		LogAction.addLogEntry(user, LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS, keyword, ip);
 	}
 
 	/**

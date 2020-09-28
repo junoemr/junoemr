@@ -275,8 +275,7 @@ if(!authed) {
             providerArchiveDao.persist(pa);
 
             providerService.saveProvider(provider);
-            providerService.addLogEntry((String)session.getAttribute("user"), request.getParameter("keyword"), request.getRemoteAddr());
-%>
+            LogAction.addLogEntry((String)session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS, request.getParameter("keyword"), request.getRemoteAddr());%>
 <p>
 <h2><bean:message key="admin.providerupdate.msgUpdateSuccess" />
 <a href="providerupdateprovider.jsp?keyword=<%=request.getParameter("provider_no")%>"><%= request.getParameter("provider_no") %></a>

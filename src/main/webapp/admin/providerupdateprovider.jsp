@@ -43,7 +43,6 @@
 
 <%@ page errorPage="errorpage.jsp"%>
 <%@ page import="oscar.SxmlMisc, oscar.oscarProvider.data.ProviderBillCenter"%>
-<%@ page import="oscar.log.LogAction,oscar.log.LogConst"%>
 <%@ page import="org.oscarehr.common.model.ClinicNbr"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
 <%@ page import="org.oscarehr.common.dao.ClinicNbrDao"%>
@@ -175,7 +174,6 @@ jQuery(document).ready( function() {
 		<% String provider_no = provider.getId(); %>
 		<%= provider_no %>
 		<input type="hidden" name="provider_no" value="<%= provider_no %>">
-		
 	</tr>
 	<tr>
 		<td>
