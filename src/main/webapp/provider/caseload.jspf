@@ -19,7 +19,6 @@
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="org.oscarehr.util.LocaleUtils" %>
 <%@ page import="java.util.Locale" %>
-<%@ page import="java.nio.charset.StandardCharsets" %>
 
 <%
 
@@ -63,7 +62,7 @@
 <c:import url="/infirm.do?action=showProgram"/>
 <%
 Locale locale = request.getLocale();
-String[] clH = new String[] {
+String[] caseloadHeader = new String[] {
 		LocaleUtils.getMessage(locale, "caseload.msgDemographic"),
 		"",
 		LocaleUtils.getMessage(locale, "caseload.msgAge"),
@@ -92,7 +91,7 @@ String[] clH = new String[] {
 };
 %>
 <script type="text/javascript">
-clH = [
+caseloadHeader = [
 	"<bean:message key="caseload.msgDemographic" />",
 	"",
 	"<bean:message key="caseload.msgAge" />",
@@ -120,10 +119,10 @@ clH = [
 ];
 </script>
 <table border="1" cellpadding="0" cellspacing="0" width="100%" id="caseloadTable">
-<tr><td colspan='<%=clH.length%>'>
+<tr><td colspan='<%=caseloadHeader.length%>'>
 	<table border='0' cellpadding='0' bgcolor='#fffff0' cellspacing='0' width='100%'>
 		<tr class='caseloadRow'>
-		<td colspan='<%=clH.length%>'>
+		<td colspan='<%=caseloadHeader.length%>'>
 			<div>
 				<div id="leftSearch">
 					<form>
@@ -194,8 +193,19 @@ clH = [
 		</td></tr>
 	</table>
 </td></tr>
-<tr id='loadingHeader' class='caseloadRow'><td style='text-align: center;' bgcolor='#fffff0' colspan='<%=clH.length%>'><img src='../images/DMSLoader.gif' /><bean:message key="caseload.msgLoading" /></td></tr>
-<tr id='totalResults2' class='caseloadRow'><td style='text-align: center;' bgcolor='#fffff0' colspan='<%=clH.length%>'> <span id="rows2"></span>/<span id="totalRows2"></span>&nbsp;<bean:message key="caseload.msgResults" /></td></tr>
+<tr id='loadingHeader' class='caseloadRow'>
+	<td style='text-align: center;' bgcolor='#fffff0' colspan='<%=caseloadHeader.length%>'>
+		<img src='../images/DMSLoader.gif' />
+		<bean:message key="caseload.msgLoading" />
+	</td>
+</tr>
+<tr id='totalResults2' class='caseloadRow'>
+	<td style='text-align: center;' bgcolor='#fffff0' colspan='<%=caseloadHeader.length%>'>
+		<span id="rows2"></span>/
+		<span id="totalRows2"></span>&nbsp;
+		<bean:message key="caseload.msgResults" />
+	</td>
+</tr>
 <tr class='caseloadRow' id='caseloadHeader'>
 
 <%
@@ -208,22 +218,36 @@ String[] objIds = new String[] {"Demographic", "_caseload.DisplayMode", "_caselo
 		, "_caseload.LastEncounterType"};
 %>
 
-<% for (int i=0; i < clH.length; i++) { %>
+<% for (int i=0; i < caseloadHeader.length; i++) { %>
 	<% if (i == 0) { %>
-	<td class='selectedCategory' bgcolor='#c0c0c0' onclick='changeCategory("<%=i%>")'><b><%=clH[i]%> &Delta;</b></td>
+	<td class='selectedCategory' bgcolor='#c0c0c0' onclick='changeCategory("<%=i%>")'><b><%=caseloadHeader[i]%> &Delta;</b></td>
 	<% } else if (i == 1) { %>
 	<security:oscarSec roleName="<%=caseloadroleName$%>" objectName="<%=objIds[i]%>" rights="r" reverse="<%=false%>" >
-		<td bgcolor='#c0c0c0' <%="style='width:307px'"%>><b><%=clH[i]%></b></td>
+		<td bgcolor='#c0c0c0' <%="style='width:307px'"%>><b><%=caseloadHeader[i]%></b></td>
 	</security:oscarSec>
 	<% } else{ %>
 	<security:oscarSec roleName="<%=caseloadroleName$%>" objectName="<%=objIds[i]%>" rights="r" reverse="<%=false%>" >
-		<td bgcolor='#c0c0c0' onclick='changeCategory("<%=i%>")'><b><%=clH[i]%></b></td>
+		<td bgcolor='#c0c0c0' onclick='changeCategory("<%=i%>")'><b><%=caseloadHeader[i]%></b></td>
 	</security:oscarSec>
 	<% } %>
 <% } %>
-<tr id='loadingFooter' class='caseloadRow'><td colspan='<%=clH.length%>' style='text-align: center;' bgcolor='#fffff0' colspan='<%=clH.length%>'><img src='../images/DMSLoader.gif' /><bean:message key="caseload.msgLoading" /></td></tr>
-<tr id='noResults' class='caseloadRow'><td colspan='<%=clH.length%>' style='text-align: center;' bgcolor='#fffff0' ><bean:message key="caseload.msgTryAgain" /></td></tr>
-<tr id='totalResults1' class='caseloadRow'><td colspan='<%=clH.length%>' style='text-align: center;' bgcolor='#fffff0' ><span id="rows1"></span>/<span id="totalRows1"></span>&nbsp;<bean:message key="caseload.msgResults" /></td></tr>
+<tr id='loadingFooter' class='caseloadRow'>
+	<td colspan='<%=caseloadHeader.length%>' style='text-align: center;' bgcolor='#fffff0' colspan='<%=caseloadHeader.length%>'>
+		<img src='../images/DMSLoader.gif' /><bean:message key="caseload.msgLoading" />
+	</td>
+</tr>
+<tr id='noResults' class='caseloadRow'>
+	<td colspan='<%=caseloadHeader.length%>' style='text-align: center;' bgcolor='#fffff0' >
+		<bean:message key="caseload.msgTryAgain" />
+	</td>
+</tr>
+<tr id='totalResults1' class='caseloadRow'>
+	<td colspan='<%=caseloadHeader.length%>' style='text-align: center;' bgcolor='#fffff0' >
+		<span id="rows1"></span>/
+		<span id="totalRows1"></span>&nbsp;
+		<bean:message key="caseload.msgResults" />
+	</td>
+</tr>
 </table>
 <script type="text/javascript">
 
@@ -299,7 +323,7 @@ function generateQuery(method) {
 	}
 	query += "&clPage=" + page;
     query += "&clPSize=" + pageSize;
-    query += "&clCat=" + escape(clH[category]);
+    query += "&clCat=" + escape(caseloadHeader[category]);
     query += "&clSortAsc=" + escape(sortAsc);
     return query;
 }
@@ -309,7 +333,7 @@ function getHeadersElement(headers,realIdx){
 	if (headers == undefined || headers == null || headers.length==0){
 		return null;
 	}
-	var heading = clH[realIdx];
+	var heading = caseloadHeader[realIdx];
 	if (heading == undefined || heading.length == 0){
 		return null;
 	}
@@ -339,9 +363,9 @@ function changeCategory(cat) {
 	}
 	if (cat == category) {
 		sortAsc = !sortAsc;
-//		headers.get(category).innerHTML = "<b onclick='changeCategory(\""+category+"\")'>"+clH[category] + " " + getSortDir() + "</b>";
+//		headers.get(category).innerHTML = "<b onclick='changeCategory(\""+category+"\")'>"+caseloadHeader[category] + " " + getSortDir() + "</b>";
 		oldCat.attr(onclick,"changeCategory(\"" + category+ "\")");
-		oldCat.html("<b>" + clH[category] + " " + getSortDir() + "</b>");
+		oldCat.html("<b>" + caseloadHeader[category] + " " + getSortDir() + "</b>");
 	}
 	else {
 //		var oldCat = jQuery(headers.get(category));
@@ -351,8 +375,8 @@ function changeCategory(cat) {
 		oldCat.removeClass("selectedCategory");
 		newCat.addClass("selectedCategory");
 		oldCat.attr(onclick,"changeCategory(\"" + category+ "\")");
-		oldCat.html("<b>"+clH[category]+"</b>");
-		newCat.html("<b>" + clH[cat] + " " + getSortDir() + "</b>");
+		oldCat.html("<b>"+caseloadHeader[category]+"</b>");
+		newCat.html("<b>" + caseloadHeader[cat] + " " + getSortDir() + "</b>");
 		category = cat;
 	}
 	search(searchMethod);

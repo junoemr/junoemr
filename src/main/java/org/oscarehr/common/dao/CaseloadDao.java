@@ -21,6 +21,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.oscarehr.caseload.CaseloadCategory;
+import org.oscarehr.util.LoggedInInfo;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -222,25 +223,6 @@ public class CaseloadDao {
 				"AND demographic_no=:demographicNo";
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("providerNo", providerNo);
-		query.setParameter("demographicNo", demographicNo);
-
-		BigInteger numResults = (BigInteger) query.getSingleResult();
-		return numResults.intValue();
-	}
-
-	/**
-	 * Get the number of new (unread) messages associated with a demographic.
-	 * @param demographicNo demographic to search against
-	 * @return number of new messages
-	 */
-	public Integer getNumNewMessages(int demographicNo)
-	{
-		String sql = "SELECT COUNT(*) " +
-				"FROM msgDemoMap " +
-				"LEFT JOIN messagelisttbl ON message = messageID " +
-				"WHERE demographic_no=:demographicNo " +
-				"AND status='new'";
-		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("demographicNo", demographicNo);
 
 		BigInteger numResults = (BigInteger) query.getSingleResult();

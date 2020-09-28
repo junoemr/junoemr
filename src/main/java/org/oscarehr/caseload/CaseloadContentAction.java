@@ -15,6 +15,7 @@ import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -35,10 +36,13 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.dao.CaseloadDao;
 import org.oscarehr.common.dao.MeasurementDao;
+import org.oscarehr.common.dao.MsgDemoMapDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.MessageList;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -61,14 +65,29 @@ public class CaseloadContentAction extends DispatchAction {
 	private TicklerDao ticklerDao = SpringUtils.getBean(TicklerDao.class);
 	private OscarAppointmentDao oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 	private MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
+	private MsgDemoMapDao msgDemoMapDao = SpringUtils.getBean(MsgDemoMapDao.class);
+
+	public static final String CASELOAD_MEASUREMENT_A1C = "A1C";
+	public static final String CASELOAD_MEASUREMENT_ACR = "ACR";
+	public static final String CASELOAD_MEASUREMENT_BMI = "BMI";
+	public static final String CASELOAD_MEASUREMENT_BP = "BP";
+	public static final String CASELOAD_MEASUREMENT_EGFR = "EGFR";
+	public static final String CASELOAD_MEASUREMENT_EYEE = "EYEE";
+	public static final String CASELOAD_MEASUREMENT_HDL = "HDL";
+	public static final String CASELOAD_MEASUREMENT_LDL = "LDL";
+	public static final String CASELOAD_MEASUREMENT_SCR = "SCR";
+	public static final String CASELOAD_MEASUREMENT_SMK = "SMK";
+	public static final String CASELOAD_MEASUREMENT_TCHD = "TCHD";
+	public static final String CASELOAD_MEASUREMENT_WT = "WT";
 
 	public ActionForward noteSearch(ActionMapping actionMapping,
 			ActionForm actionForm,
 			HttpServletRequest request,
-			HttpServletResponse response) {
+			HttpServletResponse response) throws UnsupportedEncodingException
+	{
 
 		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireOnePrivilege(providerNo, SecurityInfoManager.READ, null, "_demographic");
+		securityInfoManager.requireOnePrivilege(providerNo, SecurityInfoManager.READ, null, SecObjectName._DEMOGRAPHIC);
 
 		String caseloadProv     = request.getParameter("clProv");
 		String caseloadQuery    = request.getParameter("clQ");
@@ -127,7 +146,6 @@ public class CaseloadContentAction extends DispatchAction {
 				break;
 		}
 
-		CaseloadDao caseloadDao = (CaseloadDao)SpringUtils.getBean("caseloadDao");
 		List<Integer> demoSearchResult = caseloadDao.getCaseloadDemographicSet(clSearchQuery, clSearchParams, clSortParams, caseloadCategory, sortAscending ? "ASC" : "DESC", caseloadPage, caseloadPageSize);
 		JSONArray data = generateCaseloadDataForDemographics(request, response, caseloadProv, demoSearchResult);
 
@@ -158,7 +176,8 @@ public class CaseloadContentAction extends DispatchAction {
 	public ActionForward search(ActionMapping actionMapping,
 			ActionForm actionForm,
 			HttpServletRequest request,
-			HttpServletResponse response) {
+			HttpServletResponse response) throws UnsupportedEncodingException
+	{
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 
 		String caseloadDx       = request.getParameter("clDx");
@@ -408,7 +427,8 @@ public class CaseloadContentAction extends DispatchAction {
 		return null;
 	}
 
-	private JSONArray generateCaseloadDataForDemographics(HttpServletRequest request, HttpServletResponse response, String caseloadProv, List<Integer> demoSearchResult) {
+	private JSONArray generateCaseloadDataForDemographics(HttpServletRequest request, HttpServletResponse response, String caseloadProv, List<Integer> demoSearchResult) throws UnsupportedEncodingException
+	{
 		JSONArray entry;
 		String buttons;
 		JSONArray data = new JSONArray();
@@ -604,7 +624,7 @@ public class CaseloadContentAction extends DispatchAction {
 
 			// new messages
 			if (hasPrivilege("_caseload.Msg", roleName$)){
-				int numMessages = caseloadDao.getNumNewMessages(demographic.getDemographicId());
+				int numMessages = msgDemoMapDao.getNumMessagesWithStatus(demographic.getDemographicId(), MessageList.STATUS_NEW);
 				if (numMessages > 0)
 				{
 					String clNewMsg = Integer.toString(numMessages);
@@ -616,159 +636,40 @@ public class CaseloadContentAction extends DispatchAction {
 				}
 			}
 
-			if (hasPrivilege("_caseload.BMI", roleName$)){
-				// BMI
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "BMI");
+			// measurements, in order as they appear on caseload
+			// temporary measure until this function
+			List<String> caseloadMeasurements = Arrays.asList(
+					CASELOAD_MEASUREMENT_BMI,
+					CASELOAD_MEASUREMENT_BP,
+					CASELOAD_MEASUREMENT_WT,
+					CASELOAD_MEASUREMENT_SMK,
+					CASELOAD_MEASUREMENT_A1C,
+					CASELOAD_MEASUREMENT_ACR,
+					CASELOAD_MEASUREMENT_SCR,
+					CASELOAD_MEASUREMENT_LDL,
+					CASELOAD_MEASUREMENT_HDL,
+					CASELOAD_MEASUREMENT_TCHD,
+					CASELOAD_MEASUREMENT_EGFR,
+					CASELOAD_MEASUREMENT_EYEE
+			);
+
+			for (String caseloadMeasurement : caseloadMeasurements)
+			{
+				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), caseloadMeasurement);
+				String newEntry = "&nbsp;";
 				if (measurement != null)
 				{
-					String clBmi = measurement.getDataField();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=BMI'); return false;\">" + clBmi + "</a>");
-				} else {
-					entry.add("&nbsp;");
+					newEntry = "<a href='#' onClick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="
+							+ URLEncoder.encode(demographic_no, "UTF-8")
+							+ "&type="
+							+ URLEncoder.encode(caseloadMeasurement, "UTF-8")
+							+ "'); return false;\">"
+							+ measurement.getDataField()
+							+ "</a>";
 				}
+				entry.add(newEntry);
 			}
 
-			// BP
-			if (hasPrivilege("_caseload.BP", roleName$)){
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "BP");
-				if (measurement != null)
-				{
-					String clBp = measurement.getDataField();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=BP'); return false;\">" + clBp + "</a>");
-				} else {
-					entry.add("&nbsp;");
-				}
-			}
-
-			// WT
-			if (hasPrivilege("_caseload.WT", roleName$)){
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "WT");
-				if (measurement != null)
-				{
-					String clWt = measurement.getDataField();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=WT'); return false;\">" + clWt + "</a>");
-				} else {
-					entry.add("&nbsp;");
-				}
-
-			}
-
-			// SMK
-			if (hasPrivilege("_caseload.SMK", roleName$)){
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "SMK");
-				if (measurement != null)
-				{
-					String clSmk = measurement.getDataField();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=SMK'); return false;\">" + clSmk + "</a>");
-				} else {
-					entry.add("&nbsp;");
-				}
-
-			}
-
-			// A1C
-			if (hasPrivilege("_caseload.A1C", roleName$)){
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "A1C");
-				if (measurement != null)
-				{
-					String clA1c = measurement.getDataField();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=A1C'); return false;\">" + clA1c + "</a>");
-				} else {
-					entry.add("&nbsp;");
-				}
-
-			}
-
-			// ACR
-			if (hasPrivilege("_caseload.ACR", roleName$)){
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "ACR");
-				if (measurement != null)
-				{
-					String clAcr = measurement.getDataField();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=ACR'); return false;\">" + clAcr + "</a>");
-				} else {
-					entry.add("&nbsp;");
-				}
-
-			}
-
-			// SCR
-			if (hasPrivilege("_caseload.SCR", roleName$)){
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "SCR");
-				if (measurement != null)
-				{
-					String clScr = measurement.getDataField();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=SCR'); return false;\">" + clScr + "</a>");
-				} else {
-					entry.add("&nbsp;");
-				}
-
-			}
-
-			// LDL
-			if (hasPrivilege("_caseload.LDL", roleName$)){
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "LDL");
-				if (measurement != null)
-				{
-					String clLdl = measurement.getDataField();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=LDL'); return false;\">" + clLdl + "</a>");
-				} else {
-					entry.add("&nbsp;");
-				}
-
-			}
-
-			// HDL
-			if (hasPrivilege("_caseload.HDL", roleName$)){
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "HDL");
-				if (measurement != null)
-				{
-					String clHdl = measurement.getDataField();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=HDL'); return false;\">" + clHdl + "</a>");
-				} else {
-					entry.add("&nbsp;");
-				}
-
-			}
-
-			// TCHD
-			if (hasPrivilege("_caseload.TCHD", roleName$)){
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "TCHD");
-				if (measurement != null)
-				{
-					String clTchd = measurement.getDataField();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=TCHD'); return false;\">" + clTchd + "</a>");
-				} else {
-					entry.add("&nbsp;");
-				}
-
-			}
-
-			// EGFR
-			if (hasPrivilege("_caseload.EGFR", roleName$)){
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "EGFR");
-				if (measurement != null)
-				{
-					String clEgfr = measurement.getDataField();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=EGFR'); return false;\">" + clEgfr + "</a>");
-				} else {
-					entry.add("&nbsp;");
-				}
-			}
-
-			// EYEE
-			if (hasPrivilege("_caseload.EYEE", roleName$)){
-				Measurement measurement = measurementDao.findLatestByDemographicNoAndType(demographic.getDemographicId(), "EYEE");
-				if (measurement != null)
-				{
-					String clEyee = measurement.getDataField();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../oscarEncounter/oscarMeasurements/SetupDisplayHistory.do?demographicNo="+demographic_no+"&type=EYEE'); return false;\">" + clEyee + "</a>");
-				} else {
-					entry.add("&nbsp;");
-				}
-
-			}
-			
 			// LastEncounterDate
 			if (hasPrivilege("_caseload.LastEncounterDate", roleName$))
 			{
