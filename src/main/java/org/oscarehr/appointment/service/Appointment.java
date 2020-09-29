@@ -24,6 +24,7 @@ package org.oscarehr.appointment.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.oscarehr.common.dao.LookupListItemDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.LookupList;
@@ -57,6 +58,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -165,7 +167,7 @@ public class Appointment
 			}
 
 			// notify provider, booking notification numbers if appointment is virtual
-			if (appointment.getIsVirtual())
+			if (appointment.getIsVirtual() && appointment.hasDemographic() && DateUtils.isSameDay(appointment.getStartTimeAsFullDate(), new Date()))
 			{
 				sendAppointmentProviderNotificationSms(appointment, integration);
 			}
@@ -180,21 +182,6 @@ public class Appointment
 						request.getRemoteAddr());
 
 		return appointment;
-	}
-
-	/**
-	 * send appointment booking notification to providers notification numbers
-	 * @param appointment - the appointment that the notification is about
-	 * @param integration - integration used  to send the sms
-	 */
-	public void sendAppointmentProviderNotificationSms(org.oscarehr.common.model.Appointment appointment, Integration integration)
-	{
-		ProviderData provider = providerDataDao.find(appointment.getProviderNo());
-		List<String> smsNumbers = provider.getBookingNotificationNumbersList();
-		for (String phoneNumber: smsNumbers)
-		{
-			communicationService.sendSms(integration, phoneNumber, "New appointment, " + appointment.getName() + " booked for provider, " + provider.getDisplayName());
-		}
 	}
 
 	/**
@@ -222,14 +209,21 @@ public class Appointment
 		{
 			siteName = appointment.getLocation();
 		}
+		Integration integration = integrationService.findMhaIntegration(siteName);
 
-		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), integrationService.findMhaIntegration(siteName)))
+		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), integration))
 		{
 			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment, sendNotification);
 		}
 		else
 		{
 			appointmentService.bookOneTimeTelehealthAppointment(loggedInInfo, appointment, sendNotification);
+		}
+
+		// send provider booking notification
+		if (appointment.hasDemographic() && DateUtils.isSameDay(appointment.getStartTimeAsFullDate(), new Date()))
+		{
+			sendAppointmentProviderNotificationSms(appointment, integration);
 		}
 
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
@@ -396,6 +390,21 @@ public class Appointment
 			}
 		}
 		return -1;
+	}
+
+	/**
+	 * send appointment booking notification to providers notification numbers
+	 * @param appointment - the appointment that the notification is about
+	 * @param integration - integration used  to send the sms
+	 */
+	private void sendAppointmentProviderNotificationSms(org.oscarehr.common.model.Appointment appointment, Integration integration)
+	{
+		ProviderData provider = providerDataDao.find(appointment.getProviderNo());
+		List<String> smsNumbers = provider.getBookingNotificationNumbersList();
+		for (String phoneNumber: smsNumbers)
+		{
+			communicationService.sendSms(integration, phoneNumber, "New appointment: " + appointment.getName() + " booked for provider: " + provider.getDisplayName());
+		}
 	}
 
 }

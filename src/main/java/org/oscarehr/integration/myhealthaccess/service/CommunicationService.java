@@ -27,6 +27,8 @@ import org.oscarehr.integration.myhealthaccess.dto.AppointmentSearchTo1;
 import org.oscarehr.integration.myhealthaccess.dto.SmsMessageDto;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class CommunicationService extends BaseService
 {
@@ -42,6 +44,7 @@ public class CommunicationService extends BaseService
 		SmsMessageDto smsMessageDto = new SmsMessageDto();
 		smsMessageDto.setSmsNumber(smsNumber);
 		smsMessageDto.setSmsText(smsText);
+		smsMessageDto.setClinicId(UUID.fromString(integration.getRemoteId()));
 
 		String url = formatEndpoint("/integration/communication/send_sms");
 		AppointmentSearchTo1 result = post(url, integration.getApiKey(), smsMessageDto, null);
