@@ -61,6 +61,8 @@ import org.oscarehr.common.model.TicklerComment;
 import org.oscarehr.common.model.TicklerLink;
 import org.oscarehr.common.model.TicklerTextSuggest;
 import org.oscarehr.common.model.TicklerUpdate;
+import org.oscarehr.ticklers.search.TicklerCriteriaSearch;
+import org.oscarehr.ticklers.service.TicklerService;
 import org.oscarehr.util.EmailUtilsOld;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -128,6 +130,9 @@ public class TicklerManager {
 	
 	@Autowired
 	private TicklerCategoryDao ticklerCategoryDao;
+
+	@Autowired
+	private TicklerService ticklerService;
 	
 	public List<TicklerCategory> getActiveTicklerCategories( LoggedInInfo loggedInInfo ) {
 		checkPrivilege(loggedInInfo, PRIVILEGE_READ);
@@ -235,6 +240,14 @@ public class TicklerManager {
         
         return(results);
     }
+
+	public List<Tickler> getTicklers(LoggedInInfo loggedInInfo, TicklerCriteriaSearch filter) {
+		checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+
+		List<Tickler> results = ticklerService.getSearchResponse(filter);
+
+		return(results);
+	}
     
     public List<Tickler> getTicklers(LoggedInInfo loggedInInfo, CustomFilter filter, int offset, int limit) {
     	checkPrivilege(loggedInInfo, PRIVILEGE_READ);

@@ -29,7 +29,6 @@
 <%@ page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@ page import="org.oscarehr.common.dao.SiteDao" %>
 <%@ page import="org.oscarehr.common.dao.TicklerLinkDao" %>
-<%@ page import="org.oscarehr.common.model.CustomFilter" %>
 <%@ page import="org.oscarehr.common.model.Demographic" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
@@ -46,13 +45,15 @@
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="java.time.LocalDate" %>
-<%@ page import="java.util.Calendar" %>
-<%@ page import="java.util.Iterator" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Locale" %>
-<%@ page import="java.util.Set" %>
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="oscar.util.StringUtils" %>
+<%@ page import="org.oscarehr.ticklers.search.TicklerCriteriaSearch" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="java.util.Locale" %>
 
 <%
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -889,7 +890,6 @@
 							%>
 						</select>
 
-
 						<!-- -->
 						&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<font
 								face="Verdana, Arial, Helvetica, sans-serif" size="2"
@@ -900,11 +900,14 @@
 { // multisite start ==========================================
         	SiteDao siteDao = (SiteDao)SpringUtils.getBean("siteDao");
           	List<Site> sites = siteDao.getActiveSitesByProviderNo(user_no);
+          	List<Provider> prov = providerDao.getActiveProviders();
 %>
 						<script>
 							var _providers = [];
+							_providers["all"] = "<option value='all' <%=assignedTo.equals("all") ? "selected" : ""%>>All Providers</option>";
+							_providers["all"] += "<% for (Provider pr : prov){%> <option value='<%=pr.getProviderNo()%>' <%=assignedTo.equals(pr.getProviderNo()) ? "selected" : ""%> > <%=pr.getLastName()%>, <%=pr.getFirstName()%></option><%}%>";
 							<%for (int i=0; i<sites.size(); i++) {%>
-							_providers["<%=sites.get(i).getSiteId()%>"] = "<%Iterator<Provider> iter = sites.get(i).getProviders().iterator();
+							_providers["<%=sites.get(i).getSiteId()%>"] = "<option value=<%=sites.get(i).getName()%> <%=assignedTo.equals(sites.get(i).getName()) ? "selected" : ""%>>All Providers</option><%Iterator<Provider> iter = sites.get(i).getProviders().iterator();
 	while (iter.hasNext()) {
 		Provider p=iter.next();
 		if ("1".equals(p.getStatus())) {
@@ -915,11 +918,21 @@
 
 							function changeSite(sel)
 							{
-								sel.form.assignedTo.innerHTML = sel.value == "none" ? "" : _providers[sel.value];
+								switch (sel.value) {
+									case 'none' :
+										sel.form.assignedTo.innerHTML = "";
+										break;
+									case 'all':
+										sel.form.assignedTo.innerHTML = _providers["all"];
+										break;
+									default:
+										sel.form.assignedTo.innerHTML = _providers[sel.value];
+								}
 							}
 						</script>
 						<select id="site" name="site" onchange="changeSite(this)">
 							<option value="none">---select clinic---</option>
+							<option value="all">All Sites</option>
 							<%
 								for (int i = 0; i < sites.size(); i++)
 								{
@@ -960,8 +973,6 @@
 								<%
 	}
 %>
-
-
 						<!--/td>
 						<td -->
 						<font color="#333333" size="2" face="Verdana, Arial, Helvetica, sans-serif">
@@ -1193,16 +1204,17 @@
 				{
 					dateBegin = "1950-01-01"; // any early start date should suffice for selecting since the beginning
 				}
-				CustomFilter filter = new CustomFilter();
+				TicklerCriteriaSearch filter = new TicklerCriteriaSearch();
 				filter.setPriority(null);
 
-				filter.setStatus(ticklerview);
-				filter.setStartDateWeb(dateBegin);
-				filter.setEndDateWeb(dateEnd);
+				Tickler.STATUS status = Tickler.STATUS.valueOf(ticklerview);
+				filter.setStatus(status);
+				filter.setStartDate(dateBegin);
+				filter.setEndDate(dateEnd);
 
 				if (!demographic_no.isEmpty() && !demographic_no.equals("all"))
 				{
-					filter.setDemographicNo(demographic_no);
+					filter.setDemographicNo(Integer.parseInt(demographic_no));
 				}
 
 				if (!mrpview.isEmpty() && !mrpview.equals("all"))
@@ -1212,15 +1224,20 @@
 
 				if (!providerview.isEmpty() && !providerview.equals("all"))
 				{
-					filter.setProvider(providerview);
+					filter.setCreator(providerview);
 				}
 
 				if (!assignedTo.isEmpty() && !assignedTo.equals("all"))
 				{
-					filter.setAssignee(assignedTo);
+					if ( !StringUtils.isNumeric(assignedTo)  ) {
+						SiteDao siteDao = (SiteDao)SpringUtils.getBean("siteDao");
+						Site site = siteDao.findByName(assignedTo);
+						List<String> siteNames = siteDao.getProviderNoBySiteLocation(site.getName());
+						filter.setTaskAssignedToMultiple(siteNames);
+					}else {
+						filter.setTaskAssignedTo(assignedTo);
+					}
 				}
-
-				filter.setSort_order("desc");
 
 				List<Tickler> ticklers = ticklerManager.getTicklers(loggedInInfo, filter);
 

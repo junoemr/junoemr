@@ -27,7 +27,10 @@ import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 {
@@ -48,6 +51,7 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 	private Date endDate;
 	private String creator;
 	private String taskAssignedTo;
+	private List<String> taskAssignedToMultiple;
 	private String programId;
 	private Integer demographicNo;
 	private String message;
@@ -74,6 +78,11 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 		if (getTaskAssignedTo() != null)
 		{
 			criteria.add(Restrictions.eq("taskAssignedTo", getTaskAssignedTo()));
+		}
+
+		if (getTaskAssignedToMultiple() != null)
+		{
+			criteria.add(Restrictions.in("taskAssignedTo", getTaskAssignedToMultiple()));
 		}
 
 		if (getPriority() != null)
@@ -152,14 +161,17 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 		}
 	}
 
-	public Date getStartDate()
-	{
-		return startDate;
-	}
+	public Date getStartDate() { return startDate; }
 
 	public void setStartDate(Date startDate)
 	{
 		this.startDate = startDate;
+	}
+
+	public void setStartDate(String startDate) throws ParseException {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		Date sDate = formatter.parse(startDate);
+		this.startDate = sDate;
 	}
 
 	public Date getEndDate()
@@ -170,6 +182,12 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 	public void setEndDate(Date endDate)
 	{
 		this.endDate = endDate;
+	}
+
+	public void setEndDate(String endDate) throws ParseException {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		Date eDate = formatter.parse(endDate);
+		this.endDate = eDate;
 	}
 
 	public String getCreator()
@@ -191,6 +209,10 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 	{
 		this.taskAssignedTo = taskAssignedTo;
 	}
+
+	public List<String> getTaskAssignedToMultiple() { return taskAssignedToMultiple; }
+
+	public void setTaskAssignedToMultiple(List<String> taskAssignedToMultiple) { this.taskAssignedToMultiple = taskAssignedToMultiple; }
 
 	public String getProgramId()
 	{
@@ -247,10 +269,7 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 		return status;
 	}
 
-	public void setStatus(Tickler.STATUS status)
-	{
-		this.status = status;
-	}
+	public void setStatus(Tickler.STATUS status) { this.status = status; }
 
 	public String getMrp()
 	{
