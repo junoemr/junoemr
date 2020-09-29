@@ -59,14 +59,14 @@ public class TeleplanS23Dao extends AbstractDao<TeleplanS23>{
 						"AND t.dataSeq = :sequenceNumber " +
 						"AND t.mspCtlNo = :mspInternal " +
 						"AND t.payment = :paymentDate " +
-						"AND t.ajm = :providerName " +
+						"AND t.ajm = :adjustmentName " +
 						"ORDER BY t.id ASC");
 		query.setParameter("s23Type", lineEntry.getS23Type());
 		query.setParameter("dataCenter", lineEntry.getDataCentre());
 		query.setParameter("sequenceNumber", lineEntry.getDataSeq());
 		query.setParameter("mspInternal", lineEntry.getMspCtlNo());
 		query.setParameter("paymentDate", lineEntry.getPayment());
-		query.setParameter("providerName", lineEntry.getAjm());
+		query.setParameter("adjustmentName", lineEntry.getAjm());
 
 		return query.getResultList();
 	}
