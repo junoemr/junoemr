@@ -641,8 +641,8 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
                 <option value="-1">Select Site</option>
                 <% for (Site site : sites) {
                     boolean isSameFacilityNo = allFields.getProperty("facilityNo").equals(site.getBcFacilityNumber());
-                    boolean isSelected =  isSameFacilityNo && apptLocation.equals(site.getName());
-                    boolean isDisabled = !isSameFacilityNo && !siteIds.contains(site.getId());
+                    boolean isSelected = isSameFacilityNo && apptLocation.equals(site.getName());
+                    boolean isDisabled = !siteIds.contains(site.getId());
                 %>
                 <option value="<%=site.getId()%>" <%=isSelected ? " selected" : ""%> <%=isDisabled ? " disabled" : ""%>><%=site.getName()%></option>
                 <% } %>
