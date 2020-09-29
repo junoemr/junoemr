@@ -25,6 +25,8 @@
 
 package org.oscarehr.provider.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.providerBilling.model.ProviderBilling;
@@ -40,9 +42,11 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "provider")
@@ -143,6 +147,10 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	@JoinColumn(name="provider_billing_id")
 	private ProviderBilling billingOpts;
 
+	@Getter
+	@Setter
+	@Column(name = "booking_notification_numbers")
+	private String bookingNotificationNumbers;
 
 	/** returns a formatted name String in the form of 'first_name, last_name' */
 	public String getDisplayName()
@@ -453,5 +461,18 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public void setBillingOpts(ProviderBilling billingOpts)
 	{
 		this.billingOpts = billingOpts;
+	}
+
+	public List<String> getBookingNotificationNumbersList()
+	{
+		return Arrays.stream(this.bookingNotificationNumbers.split(","))
+				.map(String::trim)
+				.filter((str) -> !str.isEmpty())
+				.collect(Collectors.toList());
+	}
+
+	public void setBookingNotificationNumbersList(List<String> bookingNotificationNumbers)
+	{
+		this.bookingNotificationNumbers = bookingNotificationNumbers.stream().reduce("", (String acc, String str) -> acc + "," + str);
 	}
 }

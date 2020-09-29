@@ -32,9 +32,12 @@ import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
+import org.oscarehr.integration.myhealthaccess.service.CommunicationService;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.managers.LookupListManager;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
@@ -65,6 +68,9 @@ public class Appointment
 	OscarAppointmentDao oscarAppointmentDao;
 
 	@Autowired
+	ProviderDataDao providerDataDao;
+
+	@Autowired
 	AppointmentService appointmentService;
 
 	@Autowired
@@ -75,6 +81,9 @@ public class Appointment
 
 	@Autowired
 	MyHealthAccessService myHealthAccessService;
+
+	@Autowired
+	CommunicationService communicationService;
 
 	@Autowired
 	IntegrationService integrationService;
@@ -139,15 +148,26 @@ public class Appointment
 		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		oscarAppointmentDao.persist(appointment);
 
-		if (sendNotification)
-		{// send MHA based appointment notification
+		if (OscarProperties.getInstance().isMyHealthAccessEnabled())
+		{
 			Integration integration = integrationService.findMhaIntegration(appointment);
-			if (integration != null)
+
+			// send MHA based appointment notification
+			if (sendNotification)
 			{
-				ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
-						loggedInInfo.getLoggedInSecurity().getSecurityNo());
-				appointmentService.sendGeneralAppointmentNotification(integration, loginTokenTo1.getToken(),
-						appointment.getId());
+				if (integration != null)
+				{
+					ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
+					                                                                              loggedInInfo.getLoggedInSecurity().getSecurityNo());
+					appointmentService.sendGeneralAppointmentNotification(integration, loginTokenTo1.getToken(),
+					                                                      appointment.getId());
+				}
+			}
+
+			// notify provider, booking notification numbers if appointment is virtual
+			if (appointment.getIsVirtual())
+			{
+				sendAppointmentProviderNotificationSms(appointment, integration);
 			}
 		}
 
@@ -160,6 +180,21 @@ public class Appointment
 						request.getRemoteAddr());
 
 		return appointment;
+	}
+
+	/**
+	 * send appointment booking notification to providers notification numbers
+	 * @param appointment - the appointment that the notification is about
+	 * @param integration - integration used  to send the sms
+	 */
+	public void sendAppointmentProviderNotificationSms(org.oscarehr.common.model.Appointment appointment, Integration integration)
+	{
+		ProviderData provider = providerDataDao.find(appointment.getProviderNo());
+		List<String> smsNumbers = provider.getBookingNotificationNumbersList();
+		for (String phoneNumber: smsNumbers)
+		{
+			communicationService.sendSms(integration, phoneNumber, "New appointment, " + appointment.getName() + " booked for provider, " + provider.getDisplayName());
+		}
 	}
 
 	/**
