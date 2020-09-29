@@ -244,7 +244,7 @@
 		<td colspan="2" align="center">
 			<input type="hidden" name="security_no" value="<%= security.getSecurityNo() %>">
 			<input type="submit" name="subbutton" value='<bean:message key="admin.securityupdatesecurity.btnSubmit"/>'>
-			<input type="button" value="<bean:message key="admin.securityupdatesecurity.btnDelete"/>" onclick="window.location='securitydelete.jsp?keyword=<%=security.getSecurityNo()%>'">
+			<input type="button" value="<bean:message key="admin.securityupdatesecurity.btnDelete"/>" onclick="window.location='securitydelete.jsp?security_no=<%=security.getSecurityNo()%>&provider_number=<%=security.getProviderNo()%>'">
 		</td>
 	</tr>
 <%

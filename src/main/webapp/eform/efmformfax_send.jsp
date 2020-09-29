@@ -101,7 +101,7 @@ window.onload = function()
 <!--  -->
 <table class="MainTable" id="scrollNumber1" name="encounterTable">
 	<tr class="MainTableTopRow">
-		<td class="MainTableTopRowLeftColumn">E From</td>
+		<td class="MainTableTopRowLeftColumn">E Form</td>
 		<td class="MainTableTopRowRightColumn"></td>
 	</tr>
 	<tr style="vertical-align: top">

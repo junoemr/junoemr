@@ -39,6 +39,7 @@ public class ProviderColourUpdater {
 	private String provider;
 	private static PropertyDao propertyDao = SpringUtils.getBean(PropertyDao.class);
 
+	public static String DEFAULT_COLOUR_BLUE = "#CCCCFF";
 	/**
 	 * Creates a new instance of ProviderColourUpdater
 	 */
@@ -50,6 +51,7 @@ public class ProviderColourUpdater {
 
 	/**
 	 * Retrieve colour for current provider first by querying property table
+	 * @return ProviderColor property value associated with user, null if no setting found
 	 */
 	public String getColour()
 	{
@@ -59,7 +61,7 @@ public class ProviderColourUpdater {
 			return props.getValue();
 		}
 
-		return "";
+		return null;
 	}
 
 
@@ -86,5 +88,20 @@ public class ProviderColourUpdater {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Given a hex colour, invert it.
+	 * Code stripped from a couple JSP pages that were doing the same thing.
+	 * This should be revisited at some point.
+	 * @param colour hex color to invert
+	 * @return inverted colour
+	 */
+	public static String getInverseColour(String colour)
+	{
+		int base = 16;
+		int num = Integer.parseInt(colour.substring(1), base);      //strip leading # sign and convert
+		int inv = ~num;
+		return Integer.toHexString(inv).substring(2);    			//strip 2 leading digits as html colour codes are 24bits
 	}
 }

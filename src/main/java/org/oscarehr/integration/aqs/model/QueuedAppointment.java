@@ -50,13 +50,17 @@ public class QueuedAppointment
 	private UUID clinicId;
 	private QueuedAppointmentStatus status;
 	private String createdBy;
+	private RemoteUserType createdByType;
 
 
 	public QueuedAppointment(QueuedAppointmentDto appointmentDto)
 	{
-		BeanUtils.copyProperties(appointmentDto, this, "id", "integrationPatientId", "extraInfo");
+		BeanUtils.copyProperties(appointmentDto, this, "id", "integrationPatientId", "extraInfo", "createdByType");
+
+		this.createdByType = new RemoteUserType(appointmentDto.getCreatedByType());
 		this.setId(appointmentDto.getId());
 		this.setDemographicNo(Integer.parseInt(StringUtils.trimToEmpty(appointmentDto.getIntegrationPatientId())));
+
 		if (appointmentDto.getExtraInfo() != null)
 		{
 			@SuppressWarnings("unchecked")

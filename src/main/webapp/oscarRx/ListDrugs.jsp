@@ -25,7 +25,6 @@
 --%>
 
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@page import="org.oscarehr.casemgmt.web.PrescriptDrug"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -33,21 +32,17 @@
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%@ taglib uri="/WEB-INF/indivo-tag.tld" prefix="indivo" %>
-<%@ page import="oscar.oscarRx.data.*,oscar.oscarProvider.data.ProviderMyOscarIdData,oscar.oscarDemographic.data.DemographicData,oscar.OscarProperties,oscar.log.*"%>
-<%@page import="org.oscarehr.casemgmt.service.CaseManagementManager,org.springframework.web.context.WebApplicationContext,
-		org.springframework.web.context.support.WebApplicationContextUtils,org.oscarehr.casemgmt.model.CaseManagementNoteLink,org.oscarehr.casemgmt.model.CaseManagementNote"%>
-<%@page import="java.text.SimpleDateFormat" %>
-<%@page import="java.util.Calendar" %>
-<%@page import="java.util.Enumeration"%>
+<%@ page import="oscar.OscarProperties"%>
+<%@page import="org.oscarehr.casemgmt.service.CaseManagementManager, org.oscarehr.casemgmt.model.CaseManagementNoteLink,org.oscarehr.casemgmt.model.CaseManagementNote"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.util.SessionConstants"%>
 <%@page import="java.util.List,oscar.util.StringUtils"%>
-<%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager"%>
 <%@page import="org.oscarehr.util.LoggedInInfo,org.oscarehr.common.dao.DrugReasonDao,org.oscarehr.common.model.DrugReason"%>
-<%@page import="java.util.ArrayList,oscar.util.*,java.util.*,org.oscarehr.rx.model.Drug,org.oscarehr.common.dao.*"%>
+<%@page import="org.oscarehr.rx.model.Drug"%>
 <%@page import="org.oscarehr.managers.DrugDispensingManager" %>
 <%@page import="org.oscarehr.managers.CodingSystemManager" %>
 <%@page import="java.net.URLEncoder" %>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="oscar.oscarRx.data.RxPrescriptionData" %>
 <bean:define id="patient" type="oscar.oscarRx.data.RxPatientData.Patient" name="Patient" />
 <logic:notPresent name="RxSessionBean" scope="session">
     <logic:redirect href="error.html" />

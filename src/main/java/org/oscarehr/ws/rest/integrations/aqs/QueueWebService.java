@@ -27,14 +27,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.integration.aqs.conversion.AppointmentQueueModelConverter;
 import org.oscarehr.integration.aqs.conversion.AppointmentQueueTransferConverter;
+import org.oscarehr.integration.aqs.conversion.ContactContactTransferConverter;
+import org.oscarehr.integration.aqs.conversion.ContactTransferContactConverter;
 import org.oscarehr.integration.aqs.model.AppointmentQueue;
+import org.oscarehr.integration.aqs.model.Contact;
 import org.oscarehr.integration.aqs.service.AppointmentQueueService;
+import org.oscarehr.integration.aqs.service.ContactService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.AppointmentQueueTo1;
+import org.oscarehr.ws.rest.integrations.aqs.transfer.ContactTransfer;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -57,6 +63,9 @@ public class QueueWebService extends AbstractServiceImpl
 	private AppointmentQueueService appointmentQueueService;
 
 	@Autowired
+	private ContactService contactService;
+
+	@Autowired
 	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
@@ -64,6 +73,12 @@ public class QueueWebService extends AbstractServiceImpl
 
 	@Autowired
 	private AppointmentQueueModelConverter modelConverter;
+
+	@Autowired
+	private ContactContactTransferConverter contactContactTransferConverter;
+
+	@Autowired
+	private ContactTransferContactConverter contactTransferContactConverter;
 
 	@GET
 	@Path("queues/")
@@ -129,4 +144,37 @@ public class QueueWebService extends AbstractServiceImpl
 		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN);
 		return RestResponse.successResponse(modelConverter.convert(new AppointmentQueue()));
 	}
+
+	@GET
+	@Path("queue/{queueId}/contacts")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<ContactTransfer>> getQueueContacts(@PathParam("queueId") UUID queueId)
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		return RestResponse.successResponse(contactContactTransferConverter.convert(appointmentQueueService.getAppointmentQueueContacts(queueId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo())));
+	}
+
+	@POST
+	@Path("/queue/{queueId}/contact")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public RestResponse<ContactTransfer> addQueueContact(@PathParam("queueId") UUID queueId, @RequestBody ContactTransfer contactTransfer)
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
+
+		Contact newContact = contactService.createNewContact(contactTransferContactConverter.convert(contactTransfer), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
+		appointmentQueueService.addAppointmentQueueContact(queueId, newContact.getRemoteId(), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
+		return RestResponse.successResponse(contactContactTransferConverter.convert(newContact));
+	}
+
+	@DELETE
+	@Path("/queue/{queueId}/contact/{contactId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public void removeQueueContact(@PathParam("queueId") UUID queueId, @PathParam("contactId") UUID contactId)
+	{
+		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
+		appointmentQueueService.removeAppointmentQueueContact(queueId, contactId, getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
+	}
+
 }

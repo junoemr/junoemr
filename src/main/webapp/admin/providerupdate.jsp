@@ -27,8 +27,8 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-      String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-      boolean authed=true;
+	String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+	boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.userAdmin" rights="r" reverse="<%=true%>">
 	<%response.sendRedirect("../securityError.jsp?type=_admin&type=_admin.userAdmin");%>
@@ -36,14 +36,11 @@
 </security:oscarSec>
 
 <%
-if(!authed) {
-	return;
-}
+	if(!authed) {
+		return;
+	}
 %>
-<%@ page
-	import="java.sql.*, oscar.login.*, java.util.*,oscar.*,oscar.oscarDB.*,oscar.oscarProvider.data.ProviderBillCenter"
-	errorPage="errorpage.jsp"%>
-
+<%@page import="oscar.oscarProvider.data.ProviderBillCenter" errorPage="errorpage.jsp"%>
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.oscarehr.common.model.Site"%>
@@ -58,38 +55,45 @@ if(!authed) {
 <%@page import="org.oscarehr.common.dao.UserPropertyDAO"%>
 <%@page import="org.oscarehr.common.model.UserProperty"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
-<%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
 <%@ page import="org.oscarehr.provider.model.ProviderData" %>
 <%@ page import="org.oscarehr.providerBilling.model.ProviderBilling" %>
-<%@ page import="org.hibernate.Hibernate" %>
 <%@ page import="org.oscarehr.provider.service.ProviderService" %>
 <%@ page import="org.springframework.beans.BeanUtils" %>
 <%@ page import="oscar.log.LogAction" %>
 <%@ page import="oscar.log.LogConst" %>
+<%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="oscar.MyDateFormat" %>
+<%@ page import="oscar.SxmlMisc" %>
+<%@ page import="oscar.OscarProperties" %>
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
 	ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
 %>
 <html:html locale="true">
-<head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title><bean:message key="admin.providerupdate.title" /></title>
-</head>
-<link rel="stylesheet" href="../web.css" />
+	<head>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+		<title><bean:message key="admin.providerupdate.title" /></title>
+	</head>
+	<link rel="stylesheet" href="../web.css" />
 
-<body bgproperties="fixed" topmargin="0" leftmargin="0" rightmargin="0">
-<center>
-<table border="0" cellspacing="0" cellpadding="0" width="100%">
-	<tr bgcolor="#486ebd">
-		<th><font face="Helvetica" color="#FFFFFF"><bean:message
-			key="admin.providerupdate.description" /></font></th>
-	</tr>
-</table>
+
+	<body bgproperties="fixed" topmargin="0" leftmargin="0" rightmargin="0">
+	<center>
+		<table border="0" cellspacing="0" cellpadding="0" width="100%">
+			<tr bgcolor="#486ebd">
+				<th><font face="Helvetica" color="#FFFFFF"><bean:message
+						key="admin.providerupdate.description" /></font></th>
+			</tr>
+		</table>
 
 <%
   ProviderBillCenter billCenter = new ProviderBillCenter();
   billCenter.updateBillCenter(request.getParameter("provider_no"),request.getParameter("billcenter"));
-
+  SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
 
 //multi-office provide id formalize check, can be turn off on properties multioffice.formalize.provider.id
@@ -102,7 +106,6 @@ if(!authed) {
 
   	String StrProviderId = request.getParameter("provider_no");
   	OscarProperties props = OscarProperties.getInstance();
-
   	String[] provider_sites = {};
 
   	// get provider id ranger
@@ -155,150 +158,167 @@ if(!authed) {
 
   }
 
-    if (!org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable() || isProviderFormalize)
-    {
-        ProviderService providerService = SpringUtils.getBean(ProviderService.class);
-        ProviderData provider = providerService.getProviderEager(request.getParameter("provider_no"));
 
-        if (provider != null)
-        {
-            provider.setLastName(request.getParameter("last_name"));
-            provider.setFirstName(request.getParameter("first_name"));
-            provider.setProviderType(request.getParameter("provider_type"));
-            provider.setSpecialty(request.getParameter("specialty"));
-            provider.setTeam(request.getParameter("team"));
-            provider.setSex(request.getParameter("sex"));
-            provider.setDob(MyDateFormat.getSysDate(request.getParameter("dob")));
-            provider.setAddress(request.getParameter("address"));
-            provider.setPhone(request.getParameter("phone"));
-            provider.setWorkPhone(request.getParameter("workphone"));
-            provider.setEmail(request.getParameter("email"));
-            provider.setOhipNo(request.getParameter("ohip_no"));
-            provider.setRmaNo(request.getParameter("rma_no"));
-            provider.setBillingNo(request.getParameter("billing_no"));
-            provider.setHsoNo(request.getParameter("hso_no"));
-            provider.setAlbertaTakNo(StringUtils.trimToNull(request.getParameter("alberta_tak_no")));
-            provider.setAlbertaConnectCareId(StringUtils.trimToNull(request.getParameter("alberta_connect_care_provider_id")));
-            provider.setOntarioLifeLabsId(StringUtils.trimToNull(request.getParameter("ontario_lifelabs_id")));
-            provider.setStatus(request.getParameter("status"));
-            provider.setComments(SxmlMisc.createXmlDataString(request, "xml_p"));
-            provider.setProviderActivity(request.getParameter("provider_activity"));
-            provider.setPractitionerNo(request.getParameter("practitionerNo"));
-            provider.setLastUpdateUser((String) session.getAttribute("user"));
-            provider.setLastUpdateDate(new java.util.Date());
+if (securityInfoManager.superAdminModificationCheck(request.getParameter("current_user"),request.getParameter("provider_no")))
+{
+	if (!org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable() || isProviderFormalize)
+	{
+		ProviderService providerService = SpringUtils.getBean(ProviderService.class);
+		ProviderData provider = providerService.getProviderEager(request.getParameter("provider_no"));
 
-            String supervisor = request.getParameter("supervisor");
-            if (supervisor.equalsIgnoreCase("null"))
-            {
-                supervisor = null;
-            }
-            String albertaEDeliveryIds = StringUtils.trimToNull(request.getParameter("alberta_e_delivery_ids"));
-            // Only strip non-numeric characters if we are on an Alberta instance
-            if (albertaEDeliveryIds != null && OscarProperties.getInstance().getProperty("instance_type").equals("AB"))
-            {
-                albertaEDeliveryIds = albertaEDeliveryIds.replaceAll("[^0-9.,]", ""); // strip non-numbers
-            }
-            provider.setAlbertaEDeliveryIds(albertaEDeliveryIds);
-            provider.setSupervisor(StringUtils.trimToNull(supervisor));
+		if (provider != null)
+		{
+			provider.setLastName(request.getParameter("last_name"));
+			provider.setFirstName(request.getParameter("first_name"));
+			provider.setProviderType(request.getParameter("provider_type"));
+			provider.setSpecialty(request.getParameter("specialty"));
+			provider.setTeam(request.getParameter("team"));
+			provider.setSex(request.getParameter("sex"));
+			provider.setDob(MyDateFormat.getSysDate(request.getParameter("dob")));
+			provider.setAddress(request.getParameter("address"));
+			provider.setPhone(request.getParameter("phone"));
+			provider.setWorkPhone(request.getParameter("workphone"));
+			provider.setEmail(request.getParameter("email"));
+			provider.setOhipNo(request.getParameter("ohip_no"));
+			provider.setRmaNo(request.getParameter("rma_no"));
+			provider.setBillingNo(request.getParameter("billing_no"));
+			provider.setHsoNo(request.getParameter("hso_no"));
+			provider.setAlbertaTakNo(StringUtils.trimToNull(request.getParameter("alberta_tak_no")));
+			provider.setAlbertaConnectCareId(StringUtils.trimToNull(request.getParameter("alberta_connect_care_provider_id")));
+			provider.setOntarioLifeLabsId(StringUtils.trimToNull(request.getParameter("ontario_lifelabs_id")));
+			provider.setStatus(request.getParameter("status"));
+			provider.setComments(SxmlMisc.createXmlDataString(request, "xml_p"));
+			provider.setProviderActivity(request.getParameter("provider_activity"));
+			provider.setPractitionerNo(request.getParameter("practitionerNo"));
+			provider.setLastUpdateUser((String) session.getAttribute("user"));
+			provider.setLastUpdateDate(new Date());
 
-
-            if (provider.getBillingOpts() == null || provider.getBillingOpts().getId() == null)     // todo check if it's null if there's nothing there
-            {
-                provider.setBillingOpts(new ProviderBilling());
-            }
-
-            // Since each provincial billing option is only presented to the user if the appropriate province is selected
-            // we should check that each parameter is present before writing, otherwise we'll overwrite existing data
-
-            if (request.getParameter("bc_bcp_eligible") != null)
-            {
-                provider.getBillingOpts().setBcBCPEligible(Integer.parseInt(request.getParameter("bc_bcp_eligible")) == 1);
-            }
-
-            UserPropertyDAO userPropertyDAO = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
-
-            String officialFirstName = request.getParameter("officialFirstName");
-            String officialSecondName = request.getParameter("officialSecondName");
-            String officialLastName = request.getParameter("officialLastName");
-            String officialOlisIdtype = request.getParameter("officialOlisIdtype");
-
-            userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_FIRST_NAME, officialFirstName);
-            userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_SECOND_NAME, officialSecondName);
-            userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_LAST_NAME, officialLastName);
-            userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE, officialOlisIdtype);
+			String supervisor = request.getParameter("supervisor");
+			if (supervisor.equalsIgnoreCase("null"))
+			{
+				supervisor = null;
+			}
+			String albertaEDeliveryIds = StringUtils.trimToNull(request.getParameter("alberta_e_delivery_ids"));
+			// Only strip non-numeric characters if we are on an Alberta instance
+			if (albertaEDeliveryIds != null && OscarProperties.getInstance().getProperty("instance_type").equals("AB"))
+			{
+				albertaEDeliveryIds = albertaEDeliveryIds.replaceAll("[^0-9.,]", ""); // strip non-numbers
+			}
+			provider.setAlbertaEDeliveryIds(albertaEDeliveryIds);
+			provider.setSupervisor(StringUtils.trimToNull(supervisor));
 
 
-            if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
-            {
-                String provider_no = request.getParameter("provider_no");
-                List<ProviderSite> pss = providerSiteDao.findByProviderNo(provider_no);
+			if (provider.getBillingOpts() == null || provider.getBillingOpts().getId() == null)
+			{
+				provider.setBillingOpts(new ProviderBilling());
+			}
 
-                for (ProviderSite ps : pss)
-                {
-                    providerSiteDao.remove(ps.getId());
-                }
+			// Since each provincial billing option is only presented to the user if the appropriate province is selected
+			// we should check that each parameter is present before writing, otherwise we'll overwrite existing data
 
-            	List<String> sites = new ArrayList<String>();
-            	List<String> bcpSites = new ArrayList<String>();
+			if (request.getParameter("bc_bcp_eligible") != null)
+			{
+				provider.getBillingOpts().setBcBCPEligible(Integer.parseInt(request.getParameter("bc_bcp_eligible")) == 1);
+			}
 
-            	if (request.getParameterValues("sites") != null)
-                {
-                	sites.addAll(Arrays.asList(request.getParameterValues("sites")));
-                }
+			UserPropertyDAO userPropertyDAO = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
 
-                if (request.getParameterValues("sitesBCP") != null)
-                {
-                    bcpSites.addAll(Arrays.asList(request.getParameterValues("sitesBCP")));
-                }
+			String officialFirstName = request.getParameter("officialFirstName");
+			String officialSecondName = request.getParameter("officialSecondName");
+			String officialLastName = request.getParameter("officialLastName");
+			String officialOlisIdtype = request.getParameter("officialOlisIdtype");
 
-                for (String siteString : sites)
-                {
-                	Integer siteId = Integer.parseInt(siteString);
-
-                	ProviderSite provSite = new ProviderSite();
-                	provSite.setId(new ProviderSitePK(provider_no, siteId));
+			userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_FIRST_NAME, officialFirstName);
+			userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_SECOND_NAME, officialSecondName);
+			userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_LAST_NAME, officialLastName);
+			userPropertyDAO.saveProp(provider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE, officialOlisIdtype);
 
 
-                	provSite.setBcBCPEligible(bcpSites.contains(siteString));
+			if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
+			{
+				String provider_no = request.getParameter("provider_no");
+				List<ProviderSite> pss = providerSiteDao.findByProviderNo(provider_no);
 
-                	providerSiteDao.persist(provSite);
-                }
-            }
+				for (ProviderSite ps : pss)
+				{
+					providerSiteDao.remove(ps.getId());
+				}
 
-            ProviderArchiveDao providerArchiveDao = (ProviderArchiveDao) SpringUtils.getBean("providerArchiveDao");
-            ProviderArchive pa = new ProviderArchive();
-            // unfortunately the providerData provider_no is keyed on 'id' (aka provider_no), which conflicts with the id field
-            // of the providerArchive object.  We have to ignore the field and set it manually.
-            BeanUtils.copyProperties(provider, pa, "id");
-            pa.setProviderNo(provider.getId());
+				List<String> sites = new ArrayList<String>();
+				List<String> bcpSites = new ArrayList<String>();
 
-            providerArchiveDao.persist(pa);
+				if (request.getParameterValues("sites") != null)
+				{
+					sites.addAll(Arrays.asList(request.getParameterValues("sites")));
+				}
 
-            providerService.saveProvider(provider);
-            LogAction.addLogEntry((String)session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS, request.getParameter("keyword"), request.getRemoteAddr());%>
-<p>
-<h2><bean:message key="admin.providerupdate.msgUpdateSuccess" />
-<a href="providerupdateprovider.jsp?keyword=<%=request.getParameter("provider_no")%>"><%= request.getParameter("provider_no") %></a>
-</h2>
-<%
-  } else {
-%>
-<h1><bean:message key="admin.providerupdate.msgUpdateFailure" /><%= request.getParameter("provider_no") %>.</h1>
-<%
-  }
-}
-else {
-	if (!isProviderFormalize) {
-		//output ProviderFormalize error message
-	%>
-		<h1><bean:message key="<%=errMsgProviderFormalize%>" />  </h1>
-		Provider # range from : <%=min_value %> To : <%=max_value %>
-	<%
+				if (request.getParameterValues("sitesBCP") != null)
+				{
+					bcpSites.addAll(Arrays.asList(request.getParameterValues("sitesBCP")));
+				}
+
+				for (String siteString : sites)
+				{
+					Integer siteId = Integer.parseInt(siteString);
+
+					ProviderSite provSite = new ProviderSite();
+					provSite.setId(new ProviderSitePK(provider_no, siteId));
+
+
+					provSite.setBcBCPEligible(bcpSites.contains(siteString));
+
+					providerSiteDao.persist(provSite);
+				}
+			}
+
+			ProviderArchiveDao providerArchiveDao = (ProviderArchiveDao) SpringUtils.getBean("providerArchiveDao");
+			ProviderArchive pa = new ProviderArchive();
+			// unfortunately the providerData provider_no is keyed on 'id' (aka provider_no), which conflicts with the id field
+			// of the providerArchive object.  We have to ignore the field and set it manually.
+			BeanUtils.copyProperties(provider, pa, "id");
+			pa.setProviderNo(provider.getId());
+
+			providerArchiveDao.persist(pa);
+
+			providerService.saveProvider(provider);
+			LogAction.addLogEntry((String)session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS, request.getParameter("keyword"), request.getRemoteAddr());
+		%>
+			<p>
+			<h2><bean:message key="admin.providerupdate.msgUpdateSuccess" />
+			<a href="providerupdateprovider.jsp?keyword=<%=request.getParameter("provider_no")%>"><%= request.getParameter("provider_no") %></a>
+			</h2>
+			<%
+		}
+		else
+		{
+			%>
+			<h1><bean:message key="admin.providerupdate.msgUpdateFailure" /><%= request.getParameter("provider_no") %>.</h1>
+			<%
+		}
 	}
+	else
+	{
+		if (!isProviderFormalize)
+		{
+				//output ProviderFormalize error message
+			%>
+				<h1><bean:message key="<%=errMsgProviderFormalize%>" />  </h1>
+				Provider # range from : <%=min_value %> To : <%=max_value %>
+			<%
+		}
+	}
+
+}
+else
+{
+	%>
+
+	<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization" /> <%= request.getParameter("provider_no") %></h1>
+	<%
 }
 %>
 <p></p>
 
-</center>
-</body>
+	</center>
+	</body>
 </html:html>

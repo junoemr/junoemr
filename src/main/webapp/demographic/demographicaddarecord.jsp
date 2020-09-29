@@ -70,6 +70,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="static oscar.util.StringUtils.filterControlCharacters" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -131,8 +132,8 @@
 				demographic.setCity(request.getParameter("city"));
 				demographic.setProvince(request.getParameter("province"));
 				demographic.setPostal(request.getParameter("postal"));
-				demographic.setPhone(request.getParameter("phone"));
-				demographic.setPhone2(request.getParameter("phone2"));
+				demographic.setPhone(filterControlCharacters(request.getParameter("phone")));
+				demographic.setPhone2(filterControlCharacters(request.getParameter("phone2")));
 				demographic.setEmail(request.getParameter("email"));
 				demographic.setMyOscarUserName(StringUtils.trimToNull(request.getParameter("myOscarUserName")));
 				demographic.setYearOfBirth(request.getParameter("year_of_birth"));
@@ -306,9 +307,9 @@
 				}
 
 				String proNo = (String) session.getValue("user");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "hPhoneExt", request.getParameter("hPhoneExt"), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "wPhoneExt", request.getParameter("wPhoneExt"), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "demo_cell", request.getParameter("demo_cell"), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "hPhoneExt", filterControlCharacters(request.getParameter("hPhoneExt")), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "wPhoneExt", filterControlCharacters(request.getParameter("wPhoneExt")), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "demo_cell", filterControlCharacters(request.getParameter("demo_cell")), "");
 				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "aboriginal", request.getParameter("aboriginal"), "");
 				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "cytolNum",  request.getParameter("cytolNum"),  "");
 				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "ethnicity",     request.getParameter("ethnicity"),     "");
@@ -319,7 +320,7 @@
 				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "rxInteractionWarningLevel", request.getParameter("rxInteractionWarningLevel"), "");
 				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "primaryEMR", request.getParameter("primaryEMR"), "");
 				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "aboriginal", request.getParameter("aboriginal"), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "phoneComment", request.getParameter("phoneComment"), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "phoneComment", filterControlCharacters(request.getParameter("phoneComment")), "");
 				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "usSigned", request.getParameter("usSigned"), "");
 				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "privacyConsent", request.getParameter("privacyConsent"), "");
 				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "informedConsent", request.getParameter("informedConsent"), "");

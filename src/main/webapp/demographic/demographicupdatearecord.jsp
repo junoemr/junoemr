@@ -67,6 +67,7 @@
 <%@page import="java.util.HashSet" %>
 <%@page import="java.util.List" %>
 <%@page import="java.util.Set" %>
+<%@ page import="static oscar.util.StringUtils.filterControlCharacters" %>
 <%@ page import="org.oscarehr.demographic.service.DemographicService" %>
 <%@page errorPage="errorpage.jsp"%>
 
@@ -120,8 +121,8 @@
 	demographic.setCity(request.getParameter("city"));
 	demographic.setProvince(request.getParameter("province"));
 	demographic.setPostal(request.getParameter("postal"));
-	demographic.setPhone(request.getParameter("phone"));
-	demographic.setPhone2(request.getParameter("phone2"));
+	demographic.setPhone(filterControlCharacters(request.getParameter("phone")));
+	demographic.setPhone2(filterControlCharacters(request.getParameter("phone2")));
 	demographic.setEmail(StringUtils.trimToNull(request.getParameter("email")));
 	demographic.setMyOscarUserName(StringUtils.trimToNull(request.getParameter("myOscarUserName")));
 	demographic.setYearOfBirth(request.getParameter("year_of_birth"));

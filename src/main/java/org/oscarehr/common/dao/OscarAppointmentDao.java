@@ -45,6 +45,7 @@ import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.common.model.Facility;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.BeanUtils;
@@ -804,6 +805,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  a.type,\n" +
 				"  a.style,\n" +
 				"  a.bookingSource,\n" +
+				"  a.creatorSecurityId, \n" +
 				"  a.status,\n" +
 				"  a.urgency,\n" +
 				"  a.isVirtual,\n" +
@@ -864,6 +866,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  a.type,\n" +
 				"  a.style,\n" +
 				"  a.bookingSource,\n" +
+				"  a.creatorSecurityId, \n" +
 				"  a.status,\n" +
 				"  a.urgency,\n" +
 				"  a.isVirtual,\n" +
@@ -890,7 +893,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"ORDER BY a.start_time, appointment_no\n";
 
 		Query query = entityManager.createNativeQuery(sql);
-		query.setParameter("property_name", UserPropertyDAO.COLOR_PROPERTY);
+		query.setParameter("property_name", UserProperty.PROVIDER_COLOUR);
 		query.setParameter("startDate", java.sql.Date.valueOf(startDate), TemporalType.DATE);
 		query.setParameter("endDate", java.sql.Date.valueOf(endDate), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
@@ -921,6 +924,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String type = (String) result[index++];
 			String style = (String) result[index++];
 			String bookingSource = (String) result[index++];
+			Integer creatorSecurityId = (Integer) result[index++];
 			String status = (String) result[index++];
 			String urgency = (String) result[index++];
 			Byte isVirtualResult = (Byte) result[index++];
@@ -990,49 +994,51 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				}
 
 			}
-
 			boolean hasTicklers = (maxTicklerNo != null);
 
 			appointmentDetails.get(startTime).add(new AppointmentDetails(
-				appointmentNo,
-				demographicNo,
-				appointmentDate,
-				startTime,
-				endTime,
-				name,
-				notes,
-				reason,
-				reasonCode,
-				location,
-				resources,
-				type,
-				style,
-				bookingSource,
-				status,
-				urgency,
-				statusTitle,
-				color,
-				junoColor,
-				iconImage,
-				shortLetterColour,
-				shortLetters,
-				firstName,
-				lastName,
-				ver,
-				hin,
-				chartNo,
-				familyDoctor,
-				rosterStatus,
-				hcRenewDate,
-				custNotes,
-				custAlert,
-				colorProperty,
-				birthday,
-				hasTicklers,
-				ticklerMessages,
-				isVirtual,
-				isConfirmed
+					appointmentNo,
+					demographicNo,
+					appointmentDate,
+					startTime,
+					endTime,
+					name,
+					notes,
+					reason,
+					reasonCode,
+					location,
+					resources,
+					type,
+					style,
+					bookingSource,
+					status,
+					urgency,
+					statusTitle,
+					color,
+					junoColor,
+					iconImage,
+					shortLetterColour,
+					shortLetters,
+					firstName,
+					lastName,
+					ver,
+					hin,
+					chartNo,
+					familyDoctor,
+					rosterStatus,
+					hcRenewDate,
+					custNotes,
+					custAlert,
+					colorProperty,
+					birthday,
+					hasTicklers,
+					ticklerMessages,
+					isVirtual,
+					isConfirmed,
+					creatorSecurityId
+
 			));
+
 		}
 
 		return appointmentDetails;

@@ -13,7 +13,7 @@
 		<juno-button ng-click="$ctrl.onAddBtnClick()"
 								 class="icon-button"
 								 component-style="$ctrl.componentStyle"
-								 button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARK"
+								 button-color="JUNO_BUTTON_COLOR.PRIMARY"
 								 button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
 								 title="Schedule Queued Appointment">
 			<i class="icon icon-add"></i>
@@ -23,7 +23,7 @@
 		<juno-button ng-click="$ctrl.onDeleteBtnClick()"
 		             class="icon-button"
 		             component-style="$ctrl.componentStyle"
-		             button-color="JUNO_BUTTON_COLOR.GREYSCALE_DARK"
+		             button-color="JUNO_BUTTON_COLOR.DANGER"
 		             button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
 								 title="Cancel Queued Appointment">
 			<i class="icon icon-delete"></i>

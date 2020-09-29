@@ -24,12 +24,14 @@ package org.oscarehr.integration.aqs.service;
 
 import ca.cloudpractice.aqs.client.ApiException;
 import ca.cloudpractice.aqs.client.model.QueuedAppointmentStatus;
+import ca.cloudpractice.aqs.client.model.RemoteUserType;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.integration.aqs.conversion.IntegerToQueuedAppointmentMoveDtoConverter;
 import org.oscarehr.integration.aqs.dao.QueuedAppointmentLinkDao;
 import org.oscarehr.integration.aqs.exception.AqsCommunicationException;
 import org.oscarehr.integration.aqs.model.AppointmentQueue;
@@ -139,7 +141,25 @@ public class QueuedAppointmentService extends BaseService
 		}
 		catch (ApiException apiException)
 		{
-			throw new AqsCommunicationException("Failed to get appointments in queue [" + appointmentId + "] from the AQS server", apiException);
+			throw new AqsCommunicationException("Failed to delete appointment [" + appointmentId + "] from the AQS server", apiException);
+		}
+	}
+
+	/**
+	 * move an appointment to the specified queue position
+	 * @param appointmentId - the queued appointment to move
+	 * @param queuePosition - the new position of said appointment
+	 * @param securityNo - the security no of the user performing this action
+	 */
+	public QueuedAppointment moveQueuedAppointment(UUID appointmentId, Integer queuePosition, Integer securityNo)
+	{
+		try
+		{
+			return new QueuedAppointment(getOrganizationApi(securityNo).moveAppointment(appointmentId, (new IntegerToQueuedAppointmentMoveDtoConverter()).convert(queuePosition)));
+		}
+		catch (ApiException apiException)
+		{
+			throw new AqsCommunicationException("Failed to update queued appointment [" + appointmentId + "]'s position on the AQS server", apiException);
 		}
 	}
 
@@ -201,6 +221,12 @@ public class QueuedAppointmentService extends BaseService
 		appointment.setNotes(queuedAppointment.getNotes());
 		appointment.setName(demographic.getDisplayName());
 		appointment.setIsVirtual(true);
+
+		// Mark as self booked if booked through MHA
+		if (queuedAppointment.getCreatedByType().equals(RemoteUserType.MHA_PATIENT))
+		{
+			appointment.setBookingSource(Appointment.BookingSource.MYOSCAR_SELF_BOOKING);
+		}
 
 		// book 15 min appointment
 		Calendar calendar = Calendar.getInstance();
