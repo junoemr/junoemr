@@ -281,7 +281,8 @@ if (securityInfoManager.superAdminModificationCheck(request.getParameter("curren
 			providerArchiveDao.persist(pa);
 
 			providerService.saveProvider(provider);
-			LogAction.addLogEntry((String)session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS, request.getParameter("keyword"), request.getRemoteAddr());
+			LogAction.addLogEntry((String)session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS,
+					request.getParameter("keyword"), request.getRemoteAddr());
 		%>
 			<p>
 			<h2><bean:message key="admin.providerupdate.msgUpdateSuccess" />
