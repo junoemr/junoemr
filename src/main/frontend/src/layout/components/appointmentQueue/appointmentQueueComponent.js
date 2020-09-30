@@ -57,7 +57,6 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		// load apis
 		let aqsQueuesApi = new AqsQueuesApi($http, $httpParamSerializer,
 				'../ws/rs');
-		// load apis
 		let aqsQueuedAppointmentApi = new AqsQueuedAppointmentApi($http, $httpParamSerializer,
 				'../ws/rs');
 
