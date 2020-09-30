@@ -1,0 +1,57 @@
+.book-queued-appointment-modal {
+	.title-text {
+		color: var(--color-neutral-white);
+	}
+
+	.content {
+		display: flex;
+		flex-wrap: wrap;
+		height: 100%;
+
+		// fight style leakage (we need to aggressively scope styles to components or this stuff happens!!!)
+		label {
+			text-align: inherit;
+			padding: inherit;
+		}
+
+		.modal-column {
+			flex: 1 0 50%;
+			height: 80%;
+			padding: 16px 8px 0 8px;
+
+			.juno-input, .juno-select, .juno-patient-select {
+				margin: 8px 0 0 8px;
+			}
+
+			.appointment-duration {
+				.juno-input {
+					max-width: 128px;
+				}
+			}
+
+			.appointment-check-box-container
+			{
+				margin: 0 4px 0 8px;
+			}
+		}
+
+		.bottom-row {
+			padding: 0 8px 0 8px;
+
+			juno-input {
+				&:not(first-child) {
+					margin-left: 16px;
+				}
+				flex: 1 1 50%;
+			}
+		}
+
+	}
+
+	.button-footer-row {
+		juno-button {
+			max-width: 180px;
+			margin-left: 16px;
+		}
+	}
+}

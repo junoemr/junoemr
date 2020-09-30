@@ -36,6 +36,8 @@ angular.module('Common.Components').component('junoInput', {
 		uppercase: "<?",
 		readonly: "<?",
 		characterLimit: "<?",
+		// if try only numbers can be entered in to this input
+		onlyNumeric: "<?",
 		// block characters from being entered that do not match this regex
 		validRegex: "<?",
 		invalid: "<?",
@@ -59,6 +61,7 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.readonly = ctrl.readonly || false;
 			ctrl.invalid = ctrl.invalid || false;
 			ctrl.noBox = ctrl.noBox || false;
+			ctrl.onlyNumeric = ctrl.onlyNumeric || false;
 
 			if (ctrl.showInvalidFocus === undefined)
 			{
@@ -95,9 +98,9 @@ angular.module('Common.Components').component('junoInput', {
 
 		ctrl.onChange = () =>
 		{
-			if (ctrl.ngModel && ctrl.validRegex)
+			if (ctrl.ngModel)
 			{
-				if (!ctrl.validRegex.test(ctrl.ngModel))
+				if (!ctrl.isNgModelValid())
 				{
 					// reset to old value
 					ctrl.ngModel = ctrl.oldNgModel;
@@ -111,6 +114,20 @@ angular.module('Common.Components').component('junoInput', {
 			{
 				ctrl.ngChange({});
 			}
+		}
+
+		ctrl.isNgModelValid = () =>
+		{
+			if (ctrl.validRegex && !ctrl.validRegex.test(ctrl.ngModel))
+			{
+				return false;
+			}
+			else if (ctrl.onlyNumeric && !((/^\d+$/).test(ctrl.ngModel)))
+			{
+				return false;
+			}
+
+			return true;
 		}
 
 		ctrl.onFocus = () =>

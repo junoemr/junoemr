@@ -1,6 +1,15 @@
 <div class="appointment-queue" ng-class="$ctrl.getComponentClasses()">
 	<div class="header">
 		<div ng-class="$ctrl.getPrimaryBackgroundClass()">
+			<juno-button
+							class="add-button"
+							component-style="$ctrl.compoentStyle"
+							button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL"
+							button-color="JUNO_BUTTON_COLOR.PRIMARY"
+							ng-click="$ctrl.openBookQueuedAppointmentModal()"
+			>
+				Add
+			</juno-button>
 			<juno-tab ng-model="$ctrl.currentQueue"
 							  tabs="$ctrl.tabOptions"
 							  component-style="$ctrl.componentStyle"

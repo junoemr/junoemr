@@ -305,5 +305,29 @@ angular.module('Layout.Components').component('appointmentQueue', {
 			aqsQueuedAppointmentApi.moveAppointment(this.currentQueue.id, item.id, { queuePosition: index});
 			return item;
 		}
+
+		ctrl.openBookQueuedAppointmentModal = async () =>
+		{
+			try
+			{
+				await $uibModal.open(
+					{
+						component: 'bookQueuedAppointmentModal',
+						backdrop: 'static',
+						windowClass: "juno-modal",
+						resolve: {
+							style: () => ctrl.componentStyle,
+							queueId: () => ctrl.currentQueue.id,
+						}
+					}
+				).result;
+
+			}
+			catch(err)
+			{
+				// ESC button pressed probably
+				console.warn("Modal closed with rejection ", err);
+			}
+		}
 	}]
 });

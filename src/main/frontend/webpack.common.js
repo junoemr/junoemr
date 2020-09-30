@@ -237,6 +237,7 @@ module.exports = {
 			'./src/common/components/junoButton/junoButtonComponent.js',
 			'./src/common/components/junoCheckBox/junoCheckBoxComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
+			'./src/common/components/junoPatientSelect/junoPatientSelectComponent.js',
 			'./src/common/components/junoSelect/junoSelectComponent.js',
 			'./src/common/components/junoTab/junoTabComponent.js',
 			'./src/common/components/junoTab/components/module.js',
@@ -267,6 +268,7 @@ module.exports = {
 			'./src/layout/components/appointmentQueue/components/appointmentCard/appointmentCardComponent.js',
 			'./src/layout/components/appointmentQueue/modals/module.js',
 			'./src/layout/components/appointmentQueue/modals/addQueuedAppointmentModal/addQueuedAppointmentModalComponent.js',
+			'./src/layout/components/appointmentQueue/modals/bookQueuedAppointmentModal/bookQueuedAppointmentModalComponent.js',
 
 			'./src/patient/module.js',
 			'./src/patient/addDemographicModal/addDemographicModalComponent.js',

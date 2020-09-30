@@ -23,44 +23,61 @@
 
 import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
 
-angular.module('Common.Components').component('junoSelect', {
-	templateUrl: 'src/common/components/junoSelect/junoSelect.jsp',
+angular.module('Common.Components').component('junoPatientSelect', {
+	templateUrl: 'src/common/components/junoPatientSelect/junoPatientSelect.jsp',
 	bindings: {
 		ngModel: "=",
-		options: "<",
-		placeholder: "@?",
-		label: "@?",
-		labelPosition: "<?",
 		componentStyle: "<?",
-		disabled: "<?",
-		onChange: "&?"
+		showPatientCard: "<?"
 	},
-	controller: [function ()
+	controller: ['$scope', 'demographicsService', function ($scope, demographicsService)
 	{
 		let ctrl = this;
 
+		$scope.LABEL_POSITION = LABEL_POSITION;
+
+		ctrl.patientOptions = [];
+		ctrl.demographicNo = null;
+
 		ctrl.$onInit = () =>
 		{
-			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
+			ctrl.label = ctrl.label || "";
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-		};
+			ctrl.showPatientCard = ctrl.showPatientCard || false;
+		}
 
-		ctrl.labelClasses = () =>
+		$scope.$watch('ngModel', (newDemo) =>
 		{
-			return [ctrl.labelPosition];
-		};
+			if (newDemo)
+			{
+				ctrl.demographicNo = newDemo.demographicNo;
+			}
+		})
+
+		ctrl.loadPatientOptions = async (searchTerm) =>
+		{
+			let demographics = (await demographicsService.quickSearch(searchTerm)).data;
+
+			ctrl.patientOptions = [];
+			demographics.forEach((demo) =>
+			{
+				ctrl.patientOptions.push(
+					{
+						label: `${demo.lastName}, ${demo.firstName}`,
+						value: demo.demographicNo,
+						obj: demo,
+					});
+			});
+		}
+
+		ctrl.onDemographicSelected = (demoNo) =>
+		{
+			ctrl.ngModel = demoNo.obj;
+		}
 
 		ctrl.componentClasses = () =>
 		{
 			return [ctrl.componentStyle];
 		}
-
-		ctrl.onSelectChange = (value) =>
-		{
-			if (ctrl.onChange)
-			{
-				ctrl.onChange({value: value});
-			}
-		}
-	}]
+	}],
 });

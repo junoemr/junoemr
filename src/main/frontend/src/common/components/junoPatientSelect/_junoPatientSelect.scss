@@ -1,0 +1,19 @@
+.juno-patient-select {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+
+	div {
+		flex: 1 0 100%;
+	}
+
+	juno-typeahead {
+		.juno-typeahead {
+			margin-bottom: 8px;
+		}
+	}
+
+	label {
+		margin-bottom: 4px;
+	}
+}
