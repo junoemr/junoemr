@@ -104,7 +104,7 @@ var faxControl = {
         return true;
     },
 
-    _findAlternateControlsSite: function _findAlternateSite()
+    _findAlternateControlsSite: function findAlternateControlsSite()
     {
         var doNotPrintArea = $("div.DoNotPrint");
         if (doNotPrintArea.length)
