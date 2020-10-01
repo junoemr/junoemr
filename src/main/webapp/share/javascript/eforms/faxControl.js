@@ -104,7 +104,24 @@ var faxControl = {
         return true;
     },
 
-    _createFaxUI: function (data)
+    _findAlternateControlsSite: function findAlternateControlsSite()
+    {
+        var doNotPrintArea = $("div.DoNotPrint");
+        if (doNotPrintArea.length)
+        {
+            return doNotPrintArea;
+        }
+
+        var form = $("form").first();
+        if (form.length)
+        {
+            return form;
+        }
+
+        return false;
+    },
+
+    _createFaxUI: function createFaxUI(data)
     {
 
         var faxContainer = faxControl._faxControlContainer;
@@ -121,10 +138,7 @@ var faxControl = {
         }
         else
         {
-            var doNotPrintArea = $("div.DoNotPrint");
-            var form = $("form").first();
-
-            var alternateSite = doNotPrintArea || form;
+            var alternateSite = faxControl._findAlternateControlsSite();
 
             if (!alternateSite)
             {
