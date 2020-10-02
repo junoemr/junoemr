@@ -61,6 +61,7 @@ import com.lowagie.text.pdf.PdfWriter;
 
 import oscar.OscarProperties;
 import oscar.oscarClinic.ClinicData;
+import oscar.util.ConversionUtils;
 
 /**
  *
@@ -230,7 +231,7 @@ public class CaseManagementPrintPdf {
     public void printRx(String demoNo) throws DocumentException {
         printRx(demoNo,null);
     }
-    public void printRx(String demoNo,List<CaseManagementNote> cpp) throws DocumentException {
+    public void printRx(String demoNo,List<org.oscarehr.encounterNote.model.CaseManagementNote> cpp) throws DocumentException {
         if( demoNo == null )
             return;
 
@@ -270,7 +271,7 @@ public class CaseManagementPrintPdf {
         }
 
         if (cpp != null ){
-            List<CaseManagementNote>notes = cpp;
+            List<org.oscarehr.encounterNote.model.CaseManagementNote>notes = cpp;
             if (notes != null && notes.size() > 0){
                 p = new Paragraph();
                 p.setAlignment(Paragraph.ALIGN_LEFT);
@@ -278,13 +279,13 @@ public class CaseManagementPrintPdf {
                 p.add(phrase);
                 document.add(p);
                 newPage = false;
-                this.printNotes(notes);
+                this.printEncounterNotes(notes);
             }
 
         }
     }
 
-    public void printCPP(HashMap<String,List<CaseManagementNote> >cpp) throws DocumentException {
+    public void printCPP(HashMap<String,List<org.oscarehr.encounterNote.model.CaseManagementNote> >cpp) throws DocumentException {
         if( cpp == null )
             return;
 
@@ -305,23 +306,11 @@ public class CaseManagementPrintPdf {
         phrase = new Phrase(LEADING, "Patient CPP", obsfont);
         p.add(phrase);
         document.add(p);
-        //upperYcoord -= p.leading() * 2f;
-        //lworkingYcoord = rworkingYcoord = upperYcoord;
-        //ColumnText ct = new ColumnText(cb);
         String[] headings = {"Social History\n","Other Meds\n", "Medical History\n", "Ongoing Concerns\n", "Reminders\n", "Family History\n", "Risk Factors\n"};
         String[] issueCodes = {"SocHistory","OMeds","MedHistory","Concerns","Reminders","FamHistory","RiskFactors"};
-        //String[] content = {cpp.getSocialHistory(), cpp.getFamilyHistory(), cpp.getMedicalHistory(), cpp.getOngoingConcerns(), cpp.getReminders()};
 
         //init column to left side of page
-        //ct.setSimpleColumn(document.left(), document.bottomMargin()+25f, document.right()/2f, lworkingYcoord);
 
-        //int column = 1;
-        //Chunk chunk;
-        //float bottom = document.bottomMargin()+25f;
-        //float middle;
-        //bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-        //cb.beginText();
-        //String headerContd;
         //while there are cpp headings to process
 
         for( int idx = 0; idx < headings.length; ++idx ) {
@@ -331,75 +320,44 @@ public class CaseManagementPrintPdf {
             p.add(phrase);
             document.add(p);
             newPage = false;
-            this.printNotes(cpp.get(issueCodes[idx]));
+            this.printEncounterNotes(cpp.get(issueCodes[idx]));
         }
-            //phrase.add(content[idx]);
-            //ct.addText(phrase);
 
-//            //do we need a page break?  check if we're within a fudge factor of the bottom
-//            if( lworkingYcoord <= (bottom * 1.1) && rworkingYcoord <= (bottom*1.1) ) {
-//                document.newPage();
-//                rworkingYcoord = lworkingYcoord = document.top();
-//            }
-//
-//            //Are we in right column?  if so, flip over to left column if there is room
-//            if( column % 2 == 1 ) {
-//                if( lworkingYcoord > bottom ) {
-//                    ct.setSimpleColumn(document.left(), bottom, (document.right()/2f)-10f, lworkingYcoord);
-//                    ++column;
-//                }
-//            }
-//            //Are we in left column?  if so, flip over to right column only if text will fit
-//            else {
-//                ct.setSimpleColumn((document.right()/2f)+10f, bottom, document.right(), rworkingYcoord);
-//
-//                if( ct.go(true) == ColumnText.NO_MORE_COLUMN ) {
-//                    ct.setSimpleColumn(document.left(), bottom, (document.right()/2f)-10f, lworkingYcoord);
-//                }
-//                else {
-//                    ct.setYLine(rworkingYcoord);
-//                    ++column;
-//                }
-//
-//                //ct.go(true) consumes input so we reload
-//                phrase = new Phrase(LEADING, "", font);
-//                chunk = new Chunk(headings[idx], obsfont);
-//                phrase.add(chunk);
-//                phrase.add(content[idx]);
-//                ct.setText(phrase);
-//            }
-//
-//            //while there is text to write, fill columns/page break when page full
-//            while( ct.go() == ColumnText.NO_MORE_COLUMN ) {
-//                if( column % 2 == 0 ) {
-//                    lworkingYcoord = bottom;
-//                    middle = (document.right()/4f)*3f;
-//                    headerContd = headings[idx] + " cont'd";
-//                    cb.setFontAndSize(bf, FONTSIZE);
-//                    cb.showTextAligned(PdfContentByte.ALIGN_CENTER, headerContd, middle, rworkingYcoord-phrase.leading(), 0f);
-//                    //cb.showTextAligned(PdfContentByte.ALIGN_CENTER, headings[idx] + " cont'd", middle, rworkingYcoord, 0f);
-//                    rworkingYcoord -= phrase.leading();
-//                    ct.setSimpleColumn((document.right()/2f)+10f, bottom, document.right(), rworkingYcoord);
-//                }
-//                else {
-//                    document.newPage();
-//                    rworkingYcoord = lworkingYcoord = document.top();
-//                    middle = (document.right()/4f);
-//                    headerContd = headings[idx] + " cont'd";
-//                    cb.setFontAndSize(bf, FONTSIZE);
-//                    cb.showTextAligned(PdfContentByte.ALIGN_CENTER, headerContd, middle, lworkingYcoord-phrase.leading(), 0f);
-//                    lworkingYcoord -= phrase.leading();
-//                    ct.setSimpleColumn(document.left(), bottom, (document.right()/2f)-10f, lworkingYcoord);
-//                }
-//                ++column;
-//            }
-//
-//            if( column % 2 == 0 )
-//                lworkingYcoord -= (ct.getLinesWritten() * ct.getLeading() + (ct.getLeading() * 2f));
-//            else
-//                rworkingYcoord -= (ct.getLinesWritten() * ct.getLeading() + (ct.getLeading() * 2f));
-//        }
-//        cb.endText();
+    }
+
+    /**
+     * Very similar to the printNotes function, except using the newer CaseManagementNote model.
+     * @param notes list of notes to print
+     * @throws DocumentException if the document in question can't be written to
+     */
+    public void printEncounterNotes(List<org.oscarehr.encounterNote.model.CaseManagementNote> notes)
+        throws DocumentException
+    {
+        Font obsfont = new Font(bf, FONTSIZE, Font.UNDERLINE);
+        Paragraph paragraph;
+        Phrase phrase;
+        Chunk chunk;
+
+        if(newPage)
+        {
+            document.newPage();
+        }
+        else
+        {
+            newPage = true;
+        }
+
+        for (org.oscarehr.encounterNote.model.CaseManagementNote note : notes)
+        {
+            paragraph = new Paragraph();
+            phrase = new Phrase(LEADING, "", font);
+            String observationDate = ConversionUtils.toDateString(note.getObservationDate());
+            chunk = new Chunk("Documentation Date: " + observationDate + "\n", obsfont);
+            phrase.add(chunk);
+            phrase.add(note.getNote() + "\n\n");
+            paragraph.add(phrase);
+            document.add(paragraph);
+        }
     }
 
     public void printNotes(List<CaseManagementNote>notes) throws DocumentException{

@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -51,13 +52,15 @@ import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicNote;
 import org.oscarehr.caisi_integrator.ws.DemographicWs;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
-import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.util.ExtPrint;
 import org.oscarehr.casemgmt.web.NoteDisplay;
 import org.oscarehr.casemgmt.web.NoteDisplayLocal;
 import org.oscarehr.consultations.service.ConsultationPDFCreationService;
+import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
+import org.oscarehr.encounterNote.dao.IssueDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -78,7 +81,11 @@ public class CaseManagementPrint {
 	
 	private CaseManagementManager caseManagementMgr = SpringUtils.getBean(CaseManagementManager.class);
 
+	private CaseManagementNoteDao newCaseManagementNoteDao = (CaseManagementNoteDao) SpringUtils.getBean("encounterNote.dao.CaseManagementNoteDao");
 	private ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
+
+	private IssueDao issueDao = (IssueDao)SpringUtils.getBean("encounterNote.dao.IssueDao");
+
 	private NoteService noteService = SpringUtils.getBean(NoteService.class);
 	
 	private ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
@@ -104,7 +111,6 @@ public class CaseManagementPrint {
 			throws IOException, DocumentException
 	{
 		
-		String providerNo = loggedInInfo.getLoggedInProviderNo();
 		String demoNo = "" + demographicNo;
 
 		if (printAllNotes)
@@ -122,12 +128,12 @@ public class CaseManagementPrint {
 		request.setAttribute("demoDOB", dob);
 
 		List<CaseManagementNote> notes = getNotesToPrint(noteIds, loggedInInfo, demoNo, startDate, endDate);
-
+		notes = filterNotesByDate(notes, startDate, endDate);
 		HashMap<String, List<CaseManagementNote>> cpp = null;
 
 		if (printCPP)
 		{
-			cpp = getIssueNotesToPrint(providerNo, demoNo);
+			cpp = getIssueNotesToPrint(demoNo, startDate, endDate);
 		}
 		List<CaseManagementNote> othermeds = null;
 		if (printRx)
@@ -135,15 +141,16 @@ public class CaseManagementPrint {
 			// If we haven't already pulled out the OMeds issues, do so now
 			if (cpp == null)
 			{
-				List<Issue> issues = caseManagementMgr.getIssueInfoByCode(providerNo, "OMeds");
-				String[] issueIds = getIssueIds(issues);
-				othermeds = caseManagementMgr.getNotes(demoNo, issueIds);
+				Issue issue = issueDao.findByCode("OMeds");
+				othermeds = newCaseManagementNoteDao.findByDemographicAndIssue(demographicNo, issue.getIssueId());
 			}
 			else
 			{
 				othermeds = cpp.get("OMeds");
 			}
 		}
+
+		othermeds = filterNotesByDate(othermeds, startDate, endDate);
 
 		SimpleDateFormat headerFormat = new SimpleDateFormat("yyyy-MM-dd.hh.mm.ss");
 		Date now = new Date();
@@ -167,7 +174,7 @@ public class CaseManagementPrint {
 			{
 				printer.printRx(demoNo, othermeds);
 			}
-			printer.printNotes(notes);
+			printer.printEncounterNotes(notes);
 
 			/* check extensions */
 			Enumeration requestParameterNames = request.getParameterNames();
@@ -242,7 +249,7 @@ public class CaseManagementPrint {
 				Long noteId = ConversionUtils.fromLongString(note);
 				if (noteId > 0)
 				{
-					notes.add(caseManagementMgr.getNote(noteId.toString()));
+					notes.add(newCaseManagementNoteDao.find(noteId));
 				}
 			}
 		}
@@ -269,40 +276,27 @@ public class CaseManagementPrint {
 		// Notes are unordered - sort by observation date
 		OscarProperties properties = OscarProperties.getInstance();
 		String noteSort = properties.getProperty("CMESort", "");
-		notes.sort(CaseManagementNote.noteObservationDateComparator);
+		notes.sort(Comparator.comparing(
+				CaseManagementNote::getObservationDate,
+				Comparator.nullsLast(Comparator.reverseOrder())
+		));
 
 		if (noteSort.trim().equalsIgnoreCase("UP"))
 		{
 			Collections.reverse(notes);
 		}
 
-		// Now that notes are ordered, filter out any notes that do not fit within our start and end date range
-		if (startDate != null && endDate != null)
-		{
-			List<CaseManagementNote> dateFilteredList = new ArrayList<>();
-			for (CaseManagementNote cmn : notes)
-			{
-				Date start = removeTime(startDate.getTime()); // Start date with hours/mins/secs set to 0
-				Date end = removeTime(endDate.getTime()); // End date with hours/mins/secs set to 0
-				Date observation = removeTime(cmn.getObservation_date()); // Observation date with hours/mins/secs set to 0
-				if ((start.before(observation) || start.equals(observation))
-						&& (end.after(observation) || end.equals(observation)))
-				{
-					dateFilteredList.add(cmn);
-				}
-			}
-			notes = dateFilteredList;
-		}
 		return notes;
 	}
 
 	/**
-	 * Given a demographic and the currently logged in provider, grab all issue-related notes for printing.
-	 * @param providerNo logged in provider
+	 * Given a demographic and a range of dates, grab all issue-related notes for printing within that range.
 	 * @param demoNo demographic to pull CPP notes for
+	 * @param startDate date to begin looking for notes from
+	 * @param endDate date to look for notes until
 	 * @return a map containing issues as keys and any associated notes with each issue
 	 */
-	public HashMap<String, List<CaseManagementNote>> getIssueNotesToPrint(String providerNo, String demoNo)
+	public HashMap<String, List<CaseManagementNote>> getIssueNotesToPrint(String demoNo, Calendar startDate, Calendar endDate)
 	{
 		HashMap<String, List<CaseManagementNote>> cpp = new HashMap<>();
 		String[] issueCodes = {
@@ -318,15 +312,15 @@ public class CaseManagementPrint {
 		List<CaseManagementNote> issueNotes;
 		List<CaseManagementNote> tmpNotes;
 
+		Integer demographicNo = Integer.parseInt(demoNo);
 		for (String issueCode : issueCodes)
 		{
-			List<Issue> issues = caseManagementMgr.getIssueInfoByCode(providerNo, issueCode);
-			String[] issueIds = getIssueIds(issues);
-			tmpNotes = caseManagementMgr.getNotes(demoNo, issueIds);
+			Issue issue = issueDao.findByCode(issueCode);
+			tmpNotes = newCaseManagementNoteDao.findByDemographicAndIssue(demographicNo, issue.getIssueId());
 			issueNotes = new ArrayList<>();
 			for (CaseManagementNote tmpNote: tmpNotes)
 			{
-				if (!tmpNote.isLocked())
+				if (!tmpNote.getLocked())
 				{
 					List<CaseManagementNoteExt> exts = caseManagementMgr.getExtByNote(tmpNote.getId());
 					boolean exclude = false;
@@ -348,6 +342,7 @@ public class CaseManagementPrint {
 					}
 				}
 			}
+			issueNotes = filterNotesByDate(issueNotes, startDate, endDate);
 			cpp.put(issueCode, issueNotes);
 		}
 
@@ -435,12 +430,44 @@ public class CaseManagementPrint {
 	private CaseManagementNote getFakedNote(CachedDemographicNote remoteNote) {
 		CaseManagementNote note = new CaseManagementNote();
 
-		if (remoteNote.getObservationDate() != null) note.setObservation_date(remoteNote.getObservationDate().getTime());
+		if (remoteNote.getObservationDate() != null)
+		{
+			note.setObservationDate(remoteNote.getObservationDate().getTime());
+		}
 		note.setNote(remoteNote.getNote());
 
 		return (note);
 	}
-	
+
+	/**
+	 * Given a list of notes and a date range, remove any notes that fall outside of that range.
+	 * @param notes list of notes to filter
+	 * @param startDate earliest date that we want to include notes from
+	 * @param endDate latest date that we want to include notes up to
+	 * @return list of notes that fall between the range
+	 */
+	private List<CaseManagementNote> filterNotesByDate(List<CaseManagementNote> notes, Calendar startDate, Calendar endDate)
+	{
+		// filter out any notes that do not fit within our start and end date range
+		if (notes != null && startDate != null && endDate != null)
+		{
+			List<CaseManagementNote> dateFilteredList = new ArrayList<>();
+			for (CaseManagementNote cmn : notes)
+			{
+				Date start = removeTime(startDate.getTime()); // Start date with hours/mins/secs set to 0
+				Date end = removeTime(endDate.getTime()); // End date with hours/mins/secs set to 0
+				Date observation = removeTime(cmn.getObservationDate()); // Observation date with hours/mins/secs set to 0
+				if ((start.before(observation) || start.equals(observation))
+						&& (end.after(observation) || end.equals(observation)))
+				{
+					dateFilteredList.add(cmn);
+				}
+			}
+			notes = dateFilteredList;
+		}
+		return notes;
+
+	}
 	
 	@SuppressWarnings("unchecked")
     private String[] getAllNoteIds(LoggedInInfo loggedInInfo,HttpServletRequest request,String demoNo) {
