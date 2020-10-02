@@ -22,23 +22,20 @@
  */
 package org.oscarehr.integration.aqs.model;
 
-import ca.cloudpractice.aqs.client.model.QueuedAppointmentDto;
 import ca.cloudpractice.aqs.client.model.QueuedAppointmentInput;
 import ca.cloudpractice.aqs.client.model.QueuedAppointmentStatus;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.time.OffsetDateTime;
-import java.util.Map;
 import java.util.UUID;
 
+@NoArgsConstructor
 @Getter @Setter
 public class QueuedAppointment
 {
-	private final String EXTRAS_NOTES = "notes";
-	private final String EXTRAS_CLINIC_ID = "clinic_id";
 
 	private UUID id;
 	private UUID queueId;
@@ -46,35 +43,16 @@ public class QueuedAppointment
 	private Integer demographicNo;
 	private OffsetDateTime createdAt;
 	private String reason;
+	private Integer reasonTypeId;
 	private String notes;
+	private Integer durationMinutes;
+	private Integer siteId;
+	private Boolean virtual;
+	private Boolean critical;
 	private UUID clinicId;
 	private QueuedAppointmentStatus status;
 	private String createdBy;
 	private RemoteUserType createdByType;
-
-
-	public QueuedAppointment(QueuedAppointmentDto appointmentDto)
-	{
-		BeanUtils.copyProperties(appointmentDto, this, "id", "integrationPatientId", "extraInfo", "createdByType");
-
-		this.createdByType = new RemoteUserType(appointmentDto.getCreatedByType());
-		this.setId(appointmentDto.getId());
-		this.setDemographicNo(Integer.parseInt(StringUtils.trimToEmpty(appointmentDto.getIntegrationPatientId())));
-
-		if (appointmentDto.getExtraInfo() != null)
-		{
-			@SuppressWarnings("unchecked")
-			Map<String, Object> extrasMap = (Map<String, Object>)appointmentDto.getExtraInfo();
-			if (extrasMap.get(EXTRAS_NOTES) != null)
-			{
-				this.setNotes(extrasMap.get(EXTRAS_NOTES).toString());
-			}
-			if (extrasMap.get(EXTRAS_CLINIC_ID) != null)
-			{
-				this.setClinicId(UUID.fromString(extrasMap.get(EXTRAS_CLINIC_ID).toString()));
-			}
-		}
-	}
 
 	/**
 	 * construct a QueuedAppointmentInput form this QueuedAppointment
@@ -89,4 +67,15 @@ public class QueuedAppointment
 
 		return queuedAppointmentInput;
 	}
+
+	public Boolean isVirtual()
+	{
+		return this.getVirtual();
+	}
+
+	public Boolean isCritical()
+	{
+		return this.getCritical();
+	}
+
 }

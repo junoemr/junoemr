@@ -99,7 +99,11 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 				return true;
 			}
 
-			const bookingSiteId = await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
+			let bookingSiteId = ctrl.resolve.siteId;
+			if (!ctrl.resolve.siteId)
+			{
+				bookingSiteId = await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
+			}
 			const siteList = (await sitesApi.getSitesByProvider(ctrl.bookProviderNo)).data.body;
 
 			for (let providerSite of siteList)
@@ -128,8 +132,18 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 
 		ctrl.bookQueuedAppointment = async () =>
 		{
+			let siteId = null;
+			if (ctrl.isMultisiteEnabled)
+			{
+				siteId = ctrl.resolve.siteId
+				if (!siteId)
+				{
+					siteId = await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
+				}
+			}
+
 			let bookQueuedAppointmentTransfer = {
-				siteId: await ctrl.siteFromClinicId(ctrl.resolve.clinicId),
+				siteId: siteId,
 				providerNo: ctrl.bookProviderNo,
 			};
 

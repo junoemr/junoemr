@@ -1,6 +1,9 @@
 <juno-modal class="book-queued-appointment-modal" component-style="$ctrl.resolve.style">
-	<modal-title>
-		<h3 class="title-text"> Queue Appointment </h3>
+	<modal-title class="title-text">
+		<i class="icon icon-day-sheet"></i>
+		<h3 class="title-text">
+			{{$ctrl.resolve.title}}
+		</h3>
 	</modal-title>
 
 	<modal-ctl-buttons>
@@ -12,15 +15,15 @@
 			<div class="modal-column">
 				<!-- Demographic Select -->
 				<juno-patient-select
-								ng-model="$ctrl.bookingDto.demographic"
+								ng-model="$ctrl.resolve.bookingData.demographic"
 								show-patient-card="true"
 								component-style="$ctrl.resolve.style">
 				</juno-patient-select>
 			</div>
 			<div class="modal-column">
-				<div class="flex-row">
+				<div class="flex-row appointment-type-row">
 					<!-- Appointment type -->
-					<juno-select ng-model="$ctrl.bookingDto.appointmentType"
+					<juno-select ng-model="$ctrl.resolve.bookingData.appointmentType"
 									placeholder="Appointment Type"
 									options="$ctrl.appointmentTypeOptions"
 									label="Appointment Type"
@@ -31,33 +34,43 @@
 
 					<div class="flex-column align-items-flex-end justify-content-end appointment-check-box-container">
 						<!-- Appointment Critical -->
-						<juno-check-box ng-model="$ctrl.ngModel.critical"
+						<juno-check-box ng-model="$ctrl.resolve.bookingData.critical"
 										label="Critical"
 										title="Critical"
-										component-style="$ctrl.resolve.style">
-						</juno-check-box>
-
-						<!-- Appointment Telehealth -->
-						<juno-check-box ng-model="$ctrl.ngModel.virtual"
-										label="Telehealth"
-										title="Telehealth"
 										component-style="$ctrl.resolve.style">
 						</juno-check-box>
 					</div>
 				</div>
 
-				<!-- Duration -->
-				<juno-input class="appointment-duration"
-								label="Duration"
-								only-numeric="true"
-								label-position="LABEL_POSITION.TOP"
-								ng-model="$ctrl.bookingDto.duration"
-								component-style="$ctrl.resolve.style">
-				</juno-input>
+				<div class="flex-row">
+
+					<!-- Date FAKE  -->
+					<juno-input label="Date"
+									label-position="LABEL_POSITION.TOP"
+									disabled="true"
+									component-style="$ctrl.resolve.style">
+					</juno-input>
+
+					<!-- Time FAKE -->
+					<juno-input label="Time"
+									label-position="LABEL_POSITION.TOP"
+									disabled="true"
+									component-style="$ctrl.resolve.style">
+					</juno-input>
+
+					<!-- Duration -->
+					<juno-input class="appointment-duration"
+									label="Duration"
+									only-numeric="true"
+									label-position="LABEL_POSITION.TOP"
+									ng-model="$ctrl.resolve.bookingData.duration"
+									component-style="$ctrl.resolve.style">
+					</juno-input>
+				</div>
 
 				<div class="flex-row">
 					<!-- Reason type -->
-					<juno-select ng-model="$ctrl.bookingDto.reasonType"
+					<juno-select ng-model="$ctrl.resolve.bookingData.reasonType"
 									placeholder="Reason Type"
 									options="$ctrl.reasonTypeOptions"
 									label="Reason Type"
@@ -66,8 +79,7 @@
 					</juno-select>
 
 					<!-- Site -->
-					<juno-select ng-model="$ctrl.bookingDto.siteId"
-									placeholder="Site"
+					<juno-select ng-model="$ctrl.resolve.bookingData.siteId"
 									options="$ctrl.siteOptions"
 									label="Site"
 									label-position="LABEL_POSITION.TOP"
@@ -78,16 +90,18 @@
 			</div>
 			<div class="flex-row flex-fill-row justify-content-between bottom-row">
 				<!-- Notes -->
-				<juno-input label="Notes"
-								ng-model="$ctrl.bookingDto.notes"
+				<juno-input class="booking-notes"
+								label="Notes"
+								ng-model="$ctrl.resolve.bookingData.notes"
 								character-limit="255"
 								label-position="LABEL_POSITION.TOP"
 								component-style="$ctrl.resolve.style">
 				</juno-input>
 
 				<!-- Reason -->
-				<juno-input label="Reason"
-								ng-model="$ctrl.bookingDto.reason"
+				<juno-input class="booking-reason"
+								label="Reason"
+								ng-model="$ctrl.resolve.bookingData.reason"
 								character-limit="80"
 								label-position="LABEL_POSITION.TOP"
 								component-style="$ctrl.resolve.style">
@@ -101,6 +115,7 @@
 			<juno-button button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL"
 							button-color="JUNO_BUTTON_COLOR.PRIMARY"
 							component-style="$ctrl.resolve.style"
+							ng-click="$ctrl.onCreate()"
 							disabled="!$ctrl.canSubmit()">
 				Create
 			</juno-button>

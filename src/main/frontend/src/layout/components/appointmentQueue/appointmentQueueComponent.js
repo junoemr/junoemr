@@ -244,6 +244,8 @@ angular.module('Layout.Components').component('appointmentQueue', {
 								style: () => ctrl.componentStyle,
 								queueId: () => ctrl.currentQueue.id,
 								clinicId: () => ctrl.currentQueue.items[itemIndex].clinicId,
+								siteId: () => ctrl.currentQueue.items[itemIndex].siteId,
+								isVirtual: () => ctrl.currentQueue.items[itemIndex].virtual,
 								queuedAppointmentId: () => ctrl.currentQueue.items[itemIndex].id,
 								loadQueuesCallback: () => ctrl.loadQueues,
 							}
@@ -311,12 +313,13 @@ angular.module('Layout.Components').component('appointmentQueue', {
 			{
 				await $uibModal.open(
 					{
-						component: 'bookQueuedAppointmentModal',
+						component: 'bookAppointmentModal',
 						backdrop: 'static',
 						windowClass: "juno-modal",
 						resolve: {
-							style: () => ctrl.componentStyle,
-							queueId: () => ctrl.currentQueue.id,
+							style: () => JUNO_STYLE.DEFAULT,
+							title: () => "Queue Appointment",
+							onCreateCallback: () => ctrl.bookNewQueuedAppointment,
 						}
 					}
 				).result;
@@ -327,6 +330,26 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				// ESC button pressed probably
 				console.warn("Modal closed with rejection ", err);
 			}
+		}
+
+		// create a new queued appointment
+		ctrl.bookNewQueuedAppointment = async (appointmentBooking) =>
+		{
+			const queuedAppointmentBookingDto = {
+				demographicNo: appointmentBooking.demographic.demographicNo,
+				durationMinutes: parseInt(appointmentBooking.duration),
+				notes: appointmentBooking.notes,
+				reason: appointmentBooking.reason,
+				reasonType: appointmentBooking.reasonType,
+				siteId: appointmentBooking.siteId,
+				virtual: appointmentBooking.virtual,
+				critical: appointmentBooking.critical,
+			}
+
+			await aqsQueuedAppointmentApi.createQueuedAppointment(ctrl.currentQueue.id, queuedAppointmentBookingDto);
+
+			// refresh display
+			this.loadQueues();
 		}
 	}]
 });

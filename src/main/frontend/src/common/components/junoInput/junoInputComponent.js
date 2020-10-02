@@ -88,6 +88,7 @@ angular.module('Common.Components').component('junoInput', {
 				uppercase: ctrl.uppercase,
 				"field-invalid": ctrl.invalid && (ctrl.showInvalidFocus || !ctrl.isFocused),
 				"field-no-border": ctrl.noBox,
+				"field-disabled": ctrl.disabled,
 			};
 		}
 

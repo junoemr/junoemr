@@ -21,20 +21,23 @@
 * Canada
 */
 
-import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
 
 angular.module('Common.Components').component('junoPatientSelect', {
 	templateUrl: 'src/common/components/junoPatientSelect/junoPatientSelect.jsp',
 	bindings: {
 		ngModel: "=",
 		componentStyle: "<?",
-		showPatientCard: "<?"
+		showPatientCard: "<?",
+		showDemographicAdd: "<?",
 	},
-	controller: ['$scope', 'demographicsService', function ($scope, demographicsService)
+	controller: ['$scope', '$uibModal', 'demographicsService', function ($scope, $uibModal, demographicsService)
 	{
 		let ctrl = this;
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
+		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 		ctrl.patientOptions = [];
 		ctrl.demographicNo = null;
@@ -44,6 +47,7 @@ angular.module('Common.Components').component('junoPatientSelect', {
 			ctrl.label = ctrl.label || "";
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.showPatientCard = ctrl.showPatientCard || false;
+			ctrl.showDemographicAdd = ctrl.showDemographicAdd || true;
 		}
 
 		$scope.$watch('ngModel', (newDemo) =>
@@ -70,9 +74,45 @@ angular.module('Common.Components').component('junoPatientSelect', {
 			});
 		}
 
-		ctrl.onDemographicSelected = (demoNo) =>
+		ctrl.getPatientOptions = async (searchTerm) =>
 		{
-			ctrl.ngModel = demoNo.obj;
+			await ctrl.loadPatientOptions(searchTerm);
+			return ctrl.patientOptions;
+		}
+
+		ctrl.onDemographicSelected = (demo) =>
+		{
+			ctrl.ngModel = demo.obj;
+		}
+
+		ctrl.openNewDemographicModal = async () =>
+		{
+			try
+			{
+				let result = await $uibModal.open(
+					{
+						component: 'addDemographicModal',
+						backdrop: 'static',
+						windowClass: "juno-modal",
+					}).result;
+
+				if (result)
+				{
+					// select the newly created demographic
+					ctrl.patientOptions.push(
+						{
+							label: `${result.lastName}, ${result.firstName}`,
+							value: result.demographicNo,
+							obj: result,
+						});
+					ctrl.demographicNo = result.demographicNo;
+					ctrl.ngModel = result;
+				}
+			}
+			catch (err)
+			{
+				//ESC key
+			}
 		}
 
 		ctrl.componentClasses = () =>
