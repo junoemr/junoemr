@@ -152,11 +152,9 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 				ctrl.isLoading = true;
 				return (await aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId, ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer)).data.body;
 			}
-			catch(err)
+			catch(error)
 			{
-				Juno.Common.Util.errorAlert($uibModal,
-				                            "Failed to book appointment",
-				                            "Could not schedule the queued appointment. It may have been canceled");
+				Juno.Common.Util.errorAlert($uibModal,"Failed to book appointment", error.data.error.message);
 			}
 			finally
 			{

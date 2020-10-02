@@ -28,6 +28,7 @@ import {
 	JUNO_TAB_TYPE
 } from "../../../common/components/junoComponentConstants";
 import {AqsQueuesApi, AqsQueuedAppointmentApi} from "../../../../generated";
+import AppointmentBooking from "../../../common/modals/bookAppointmentModal/appointmentBooking";
 
 angular.module('Layout.Components').component('appointmentQueue', {
 	templateUrl: 'src/layout/components/appointmentQueue/appointmentQueue.jsp',
@@ -311,6 +312,10 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		{
 			try
 			{
+				let bookingData = new AppointmentBooking();
+				// default duration to queue duration.
+				bookingData.duration = ctrl.currentQueue.defaultAppointmentDurationMinutes;
+
 				await $uibModal.open(
 					{
 						component: 'bookAppointmentModal',
@@ -319,6 +324,7 @@ angular.module('Layout.Components').component('appointmentQueue', {
 						resolve: {
 							style: () => JUNO_STYLE.DEFAULT,
 							title: () => "Queue Appointment",
+							bookingData: () => bookingData,
 							onCreateCallback: () => ctrl.bookNewQueuedAppointment,
 						}
 					}

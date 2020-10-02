@@ -27,6 +27,7 @@ import ca.cloudpractice.aqs.client.model.QueuedAppointmentInput;
 import ca.cloudpractice.aqs.client.model.QueuedAppointmentStatus;
 import ca.cloudpractice.aqs.client.model.RemoteUserType;
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Site;
@@ -44,11 +45,14 @@ import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.service.IntegrationService;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.OscarAuditLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ValidationException;
@@ -68,10 +72,19 @@ public class QueuedAppointmentService extends BaseService
 	private AppointmentService mhaAppointmentService;
 
 	@Autowired
+	private AppointmentQueueService appointmentQueueService;
+
+	@Autowired
 	private DemographicDao demographicDao;
 
 	@Autowired
+	private ProviderDataDao providerDao;
+
+	@Autowired
 	private org.oscarehr.appointment.service.Appointment appointmentService;
+
+	@Autowired
+	private OscarAppointmentDao oscarAppointmentDao;
 
 	@Autowired
 	private SiteDao siteDao;
@@ -234,9 +247,17 @@ public class QueuedAppointmentService extends BaseService
 		Demographic demographic = demographicDao.find(queuedAppointment.getDemographicNo());
 		Date now = new Date();
 
-		if (queuedAppointment.getStatus() != QueuedAppointmentStatus.QUEUED)
+		if (queuedAppointment.getStatus() == QueuedAppointmentStatus.SCHEDULED)
 		{
-			throw new ValidationException("Queued Appointment [" + queuedAppointment.getId() +"] is no longer in the queue");
+			throw getAppointmentAlreadyScheduledException(queuedAppointment);
+		}
+		else if (queuedAppointment.getStatus() == QueuedAppointmentStatus.CANCELLED)
+		{
+			throw new ValidationException("The queued appointment has been deleted");
+		}
+		else if (queuedAppointment.getStatus() != QueuedAppointmentStatus.QUEUED)
+		{
+			throw new ValidationException("The queued appointment is no longer queued");
 		}
 
 		// create new juno appointment
@@ -270,12 +291,14 @@ public class QueuedAppointmentService extends BaseService
 		calendar.setTime(now);
 		if (queuedAppointment.getDurationMinutes() != null)
 		{
+			// use appointment duration
 			calendar.add(Calendar.MINUTE, queuedAppointment.getDurationMinutes());
 		}
 		else
 		{
-			//TODO queue duration here!
-			calendar.add(Calendar.MINUTE, 15);
+			// use default queue duration
+			AppointmentQueue queue = appointmentQueueService.getAppointmentQueue(queueId, loggedInInfo.getLoggedInSecurity().getSecurityNo());
+			calendar.add(Calendar.MINUTE, queue.getDefaultAppointmentDurationMinutes());
 		}
 		appointment.setEndTime(calendar.getTime());
 
@@ -295,11 +318,9 @@ public class QueuedAppointmentService extends BaseService
 		queuedAppointmentLink.setQueueId(queueId.toString());
 		queuedAppointmentLink.setQueuedAppointmentId(queuedAppointment.getId().toString());
 		queuedAppointmentLinkDao.persist(queuedAppointmentLink);
-
 		// mark appointment as schedule on AQS server
 		queuedAppointment.setStatus(QueuedAppointmentStatus.SCHEDULED);
 		updateQueuedAppointment(queuedAppointment, loggedInInfo);
-
 		if (queuedAppointment.isVirtual())
 		{
 			// book the appointment in to MHA
@@ -317,5 +338,15 @@ public class QueuedAppointmentService extends BaseService
 		}
 
 		return newAppointment;
+	}
+
+	private ValidationException getAppointmentAlreadyScheduledException(QueuedAppointment queuedAppointment)
+	{
+		QueuedAppointmentLink queuedAppointmentLink = queuedAppointmentLinkDao.findByQueuedAppointmentId(queuedAppointment.getId());
+		Appointment appointment = queuedAppointmentLink.getAppointment();
+		ProviderData provider = providerDao.find(appointment.getProviderNo());
+		return new ValidationException("The queued appointment has already been scheduled to provider: " + provider.getDisplayName() +
+				" by provider: " + appointment.getLastUpdateUserRecord().getDisplayName() + " at: " +
+				ConversionUtils.toDateString(appointment.getStartTimeAsFullDate(), ConversionUtils.DEFAULT_TS_PATTERN));
 	}
 }

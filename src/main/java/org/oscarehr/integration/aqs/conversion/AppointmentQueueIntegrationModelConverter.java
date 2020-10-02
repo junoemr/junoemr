@@ -41,6 +41,7 @@ public class AppointmentQueueIntegrationModelConverter extends AbstractModelConv
 		QueueInput queueInput = new QueueInput();
 		queueInput.setName(input.getName());
 		queueInput.setQueueLimit(input.getQueueLimit());
+		queueInput.setDefaultAppointmentDurationMinutes(input.getDefaultAppointmentDurationMinutes());
 
 		// only send odb settings if the enabled flag is set.
 		if (input.getOnDemandSettings().getEnabled())
