@@ -47,7 +47,6 @@ import java.util.TimerTask;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.ws.WebServiceException;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProgramDao;
 import org.oscarehr.PMmodule.dao.ProviderDao;
@@ -170,7 +169,6 @@ import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.dms.EDocUtil.EDocSort;
 import oscar.form.FrmLabReq07Record;
-import oscar.log.LogAction;
 import oscar.oscarLab.ca.all.web.LabDisplayHelper;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
@@ -821,7 +819,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 		service.setDemographic(demographicTransfer);
 		throttleAndChecks();
 
-		conformanceTestLog(facility, "Demographic", String.valueOf(demographicId));
 	}
 
 	/**
@@ -938,7 +935,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 
 		//let integrator know our current and active list of issues for this patient. The integrator will delete all not found in this list in it's db.
 		service.deleteCachedDemographicIssues(demographicId, caseManagementIssueDAO.getIssueIdsForIntegrator(cachedFacility.getIntegratorFacilityId(),demographicId));
-		conformanceTestLog(facility, "CaseManagementIssue", sentIds.toString());
 	}
 
 	private void pushAdmissions(Date lastDataUpdated, Facility facility, List<Program> programsInFacility, DemographicWs demographicService, Integer demographicId) throws ShutdownException {
@@ -988,7 +984,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 			throttleAndChecks();
 		}
 
-		conformanceTestLog(facility, "Admission", sentIds.toString());
 	}
 
 	private boolean isProgramIdInProgramList(List<Program> programList, int programId) {
@@ -1048,7 +1043,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 		if (preventionsToSend.size() > 0) {
 			service.setCachedDemographicPreventions(preventionsToSend);
 			throttleAndChecks();
-			conformanceTestLog(facility, "Prevention", sentIds.toString());
 		}
 
 		//let integrator know our current and active list of preventions for this patient. The integrator will delete all not found in this list in it's db.
@@ -1077,7 +1071,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 			throttleAndChecks();
 		}
 
-		conformanceTestLog(facility, "EDoc", sentIds.toString());
 	}
 
 	private void sendSingleDocument(DemographicWs demographicWs, EDoc eDoc, Integer demographicId) {
@@ -1160,7 +1153,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 			}
 		}
 
-		conformanceTestLog(facility, "LabResultData", sentIds.toString());
 
 	}
 
@@ -1230,7 +1222,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 			sentIds.append("," + p.getProperty("ID"));
 		}
 
-		conformanceTestLog(facility, "formLabReq07", sentIds.toString());
 	}
 
 	private void pushDemographicNotes(Date lastDataUpdated, Facility facility, DemographicWs service, Integer demographicId) throws ShutdownException {
@@ -1264,7 +1255,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 			}
 		}
 
-		conformanceTestLog(facility, "CaseManagementNote", sentIds.toString());
 		sentIds = new StringBuilder();
 
 		// add group notes as well.
@@ -1293,7 +1283,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 
 		}
 
-		conformanceTestLog(facility, "GroupNoteLink", sentIds.toString());
 
 		throttleAndChecks();
 	}
@@ -1414,7 +1403,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 		// if (drugsToSend.size()>0) demographicService.setCachedDemographicDrugs(drugsToSend);
 
 		throttleAndChecks();
-		conformanceTestLog(facility, "Drug", sentIds.toString());
 	}
 
 	private void pushAllergies(Date lastDataUpdated, Facility facility, DemographicWs demographicService, Integer demographicId) throws ShutdownException {
@@ -1478,7 +1466,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 			throttleAndChecks();
 		}
 
-		conformanceTestLog(facility, "Allergy", sentIds.toString());
 	}
 
 	private void pushAppointments(Date lastDataUpdated, Facility facility, DemographicWs demographicService, Integer demographicId) throws ShutdownException {
@@ -1529,7 +1516,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 			throttleAndChecks();
 		}
 
-		conformanceTestLog(facility, "Appointment", sentIds.toString());
 	}
 
 	private void pushDxresearchs(Date lastDataUpdated, Facility facility, DemographicWs demographicService, Integer demographicId) throws ShutdownException {
@@ -1573,7 +1559,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 		}
 
 
-		conformanceTestLog(facility, "DxResearch", sentIds.toString());
 	}
 
 	private void pushBillingItems(Date lastDataUpdated, Facility facility, DemographicWs demographicService, Integer demographicId) throws ShutdownException {
@@ -1676,7 +1661,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 			throttleAndChecks();
 		}
 
-		conformanceTestLog(facility, "EFormData", sentIds.toString());
 
 		List<EFormValue> eFormValues = eFormValueDao.findByFormDataIdList(fdids);
 		ArrayList<CachedEformValue> cachedEformValues = new ArrayList<CachedEformValue>();
@@ -1799,7 +1783,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 		}
 
 		throttleAndChecks();
-		conformanceTestLog(facility, "Measurements", sentIds.toString());
 	}
 
 
@@ -1881,19 +1864,6 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 			userPropertyDao.saveProp(UserProperty.INTEGRATOR_LAST_PULL_PRIMARY_EMR+"+"+facility.getId(), "" + nextTime.getTime().getTime());
 		}
 		logger.info("End fetch data for facility : " + facility.getId() + " : " + facility.getName());
-	}
-
-
-
-
-	/**
-	 * This method should not be used except during conformance testing. It will log all sends to the integrator. This is superfluous because all data is sent, we already know it's "all sent" even with out the logs.
-	 */
-	private static void conformanceTestLog(Facility facility, String dataType, String ids) {
-		if (ConformanceTestHelper.enableConformanceOnlyTestFeatures) {
-			ids = StringUtils.trimToNull(ids);
-			if (ids != null) LogAction.addLogSynchronous(null, "Integrator Send", dataType, ids, facility.getIntegratorUrl());
-		}
 	}
 
 	private static void throttleAndChecks() throws ShutdownException {
