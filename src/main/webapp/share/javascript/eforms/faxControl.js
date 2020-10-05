@@ -31,25 +31,6 @@ var faxControl = {
         }
     },
 
-    _fetchFaxControlSuccess: function fetchFaxControlSuccess(data)
-    {
-        if (data && data.trim())
-        {
-            faxControl._createFaxUI(data);
-            faxControl._announceDone();
-        }
-        else
-        {
-            faxControl._fetchFaxControlFailure();
-        }
-    },
-
-    _fetchFaxControlFailure: function fetchFaxControlFailure()
-    {
-        alert("Error loading fax control, please contact an administrator.");
-    },
-
-
     submitFax: function submitFax(save)
     {
         document.getElementById('fax').value = true;
@@ -112,6 +93,24 @@ var faxControl = {
 
         this._faxControlContainer.html(faxControl._elements.faxControlPlaceholder);
         return true;
+    },
+
+    _fetchFaxControlSuccess: function fetchFaxControlSuccess(data)
+    {
+        if (data && data.trim())
+        {
+            faxControl._createFaxUI(data);
+            faxControl._announceDone();
+        }
+        else
+        {
+            faxControl._fetchFaxControlFailure();
+        }
+    },
+
+    _fetchFaxControlFailure: function fetchFaxControlFailure()
+    {
+        alert("Error loading fax control, please contact an administrator.");
     },
 
     _createFaxUI: function (data)
