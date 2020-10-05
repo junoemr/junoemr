@@ -65,9 +65,12 @@ angular.module('Common.Components').component('junoPatientSelect', {
 			ctrl.patientOptions = [];
 			demographics.forEach((demo) =>
 			{
+				const lastName = demo.lastName ? demo.lastName.toUpperCase() : "";
+				const firstName = demo.firstName ? demo.firstName.toUpperCase() : "";
+
 				ctrl.patientOptions.push(
 					{
-						label: `${demo.lastName}, ${demo.firstName}`,
+						label: `${lastName}, ${firstName}`,
 						value: demo.demographicNo,
 						obj: demo,
 					});
@@ -98,10 +101,13 @@ angular.module('Common.Components').component('junoPatientSelect', {
 
 				if (result)
 				{
+
+					const lastName = result.lastName ? result.lastName.toUpperCase() : "";
+					const firstName = result.firstName ? result.firstName.toUpperCase() : "";
 					// select the newly created demographic
 					ctrl.patientOptions.push(
 						{
-							label: `${result.lastName}, ${result.firstName}`,
+							label: `${lastName}, ${firstName}`,
 							value: result.demographicNo,
 							obj: result,
 						});
