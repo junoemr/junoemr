@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.dao.DxresearchDAO;
+import org.oscarehr.common.dao.EpisodeDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.TicklerDao;
@@ -48,6 +49,7 @@ import org.oscarehr.common.hl7.copd.mapper.MapperFactory;
 import org.oscarehr.common.hl7.copd.mapper.MeasurementsMapper;
 import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
 import org.oscarehr.common.hl7.copd.mapper.MessageMapper;
+import org.oscarehr.common.hl7.copd.mapper.PregnancyMapper;
 import org.oscarehr.common.hl7.copd.mapper.PreventionMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.mapper.TicklerMapper;
@@ -58,6 +60,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Dxresearch;
+import org.oscarehr.common.model.Episode;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.MessageList;
 import org.oscarehr.common.model.MessageTbl;
@@ -146,6 +149,9 @@ public class CoPDImportService
 
 	@Autowired
 	OscarAppointmentDao appointmentDao;
+
+	@Autowired
+	EpisodeDao episodeDao;
 
 	@Autowired
 	AllergyService allergyService;
@@ -315,7 +321,7 @@ public class CoPDImportService
 			instant = printDuration(instant, "importPediatricsData");
 
 			logger.info("Import Pregnancy ...");
-			importPregnancyData(zpdZtrMessage, i, assignedProvider, demographic);
+			importPregnancyData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			instant = printDuration(instant, "importPregnancyData");
 
 			logger.info("Import Allergies ...");
@@ -541,9 +547,16 @@ public class CoPDImportService
 	{
 		//TODO - not implemented
 	}
-	private void importPregnancyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	private void importPregnancyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		//TODO - not implemented
+		PregnancyMapper pregnancyMapper = MapperFactory.newPregnancyMapper(zpdZtrMessage, providerRep, importSource);
+
+		for(Episode pregnancyEpisode : pregnancyMapper.getPregnancyEpisodes())
+		{
+			pregnancyEpisode.setDemographicNo(demographic.getDemographicId());
+			pregnancyEpisode.setLastUpdateUser(provider.getId());
+			episodeDao.persist(pregnancyEpisode);
+		}
 	}
 
 	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception

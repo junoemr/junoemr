@@ -38,6 +38,9 @@ import javax.persistence.Transient;
 @Entity
 public class Episode extends AbstractModel<Integer> {
 
+	public static final String STATUS_COMPLETE = "Complete";
+	public static final String STATUS_CURRENT = "Current";
+
 	@Transient
 	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
