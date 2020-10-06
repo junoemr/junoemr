@@ -68,4 +68,15 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		return query.getResultList();
 	}
 
+	public List<CaseManagementNote> findAllForDemographic(Integer demographicNo)
+	{
+		String queryString = "SELECT cm FROM model.CaseManagementNote cm " +
+				"WHERE cm.demographic.demographicId=:demographicNo " +
+				"AND cm.includeIssueInNote = false";
+
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("demographicNo", demographicNo);
+		return query.getResultList();
+	}
+
 }

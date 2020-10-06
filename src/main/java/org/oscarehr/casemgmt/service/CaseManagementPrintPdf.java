@@ -28,7 +28,6 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -37,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
 import org.oscarehr.managers.ProgramManager2;
@@ -52,11 +50,9 @@ import com.lowagie.text.HeaderFooter;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
-import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.ColumnText;
 import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
 
 import oscar.OscarProperties;
@@ -360,74 +356,8 @@ public class CaseManagementPrintPdf {
         }
     }
 
-    public void printNotes(List<CaseManagementNote>notes) throws DocumentException{
-
-        CaseManagementNote note;
-        Font obsfont = new Font(bf, FONTSIZE, Font.UNDERLINE);
-        Paragraph p;
-        Phrase phrase;
-        Chunk chunk;
-
-        if( newPage )
-            document.newPage();
-        else
-            newPage = true;
-
-        //Print notes
-        for( int idx = 0; idx < notes.size(); ++idx ) {
-            note = notes.get(idx);
-            p = new Paragraph();
-            //p.setSpacingBefore(font.leading(LINESPACING)*2f);
-            phrase = new Phrase(LEADING, "", font);
-            chunk = new Chunk("Documentation Date: " + formatter.format(note.getObservation_date()) + "\n", obsfont);
-            phrase.add(chunk);
-            phrase.add(note.getNote() + "\n\n");
-            p.add(phrase);
-            document.add(p);
-        }
-    }
-
     public void finish() {
         document.close();
     }
-
-    /*
-     *Used to print footers on each page
-     */
-    class EndPage extends PdfPageEventHelper {
-        private Date now;
-        private String promoTxt;
-
-        public EndPage() {
-            now = new Date();
-            promoTxt = OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT");
-            if( promoTxt == null ) {
-                promoTxt = "";
-            }
-        }
-
-        public void onEndPage( PdfWriter writer, Document document ) {
-            //Footer contains page numbers and date printed on all pages
-            PdfContentByte cb = writer.getDirectContent();
-            cb.saveState();
-
-            String strFooter = promoTxt + " " + formatter.format(now);
-
-            float textBase = document.bottom();
-            cb.beginText();
-            cb.setFontAndSize(font.getBaseFont(),FONTSIZE);
-            Rectangle page = document.getPageSize();
-            float width = page.getWidth();
-
-            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, strFooter, (width/2.0f), textBase - 20, 0);
-
-            strFooter = "-" + writer.getPageNumber() + "-";
-            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, strFooter, (width/2.0f), textBase-10, 0);
-
-            cb.endText();
-            cb.restoreState();
-        }
-    }
-
 
 }
