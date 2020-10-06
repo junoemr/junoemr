@@ -121,6 +121,34 @@ angular.module("Common.Services").service("providerService", [
 			return deferred.promise;
 		};
 
+		service.isProviderAssignedToSite = function isProviderAssignedToSite(provNo, siteNo)
+		{
+			var flag = false;
+			$http(
+				{
+					url: '../ws/rs/sites/provider/' + provNo,
+					method: "GET"
+				}).then(
+				function success(results)
+				{
+					for (var result in results.data.body)
+					{
+						if (results.data.body[result].siteId === siteNo)
+						{
+							flag = true;
+							console.log("true: " + flag);
+							return flag;
+						}
+					}
+					console.log("false or true: " + flag);
+					return flag;
+				},
+				function error(errors)
+				{
+					console.log("An error occurred while fetching the provider list");
+				});
+		};
+
 		//TODO move to its own service
 		service.saveSettings = function saveSettings(providerNo, settings)
 		{
