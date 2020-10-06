@@ -38,6 +38,7 @@ import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
+import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
@@ -281,40 +282,54 @@ public class CaseManagementPrintPdf {
         }
     }
 
-    public void printCPP(HashMap<String,List<org.oscarehr.encounterNote.model.CaseManagementNote> >cpp) throws DocumentException {
-        if( cpp == null )
+    public void printCPP(HashMap<String,List<org.oscarehr.encounterNote.model.CaseManagementNote> >cpp)
+            throws DocumentException
+    {
+        if (cpp == null)
+        {
             return;
+        }
 
-        if( newPage )
+        if (newPage)
+        {
             document.newPage();
+        }
         else
+        {
             newPage = true;
+        }
 
         Font obsfont = new Font(bf, FONTSIZE, Font.UNDERLINE);
 
-
-
-
-        Paragraph p = new Paragraph();
-        p.setAlignment(Paragraph.ALIGN_CENTER);
+        Paragraph paragraph = new Paragraph();
+        paragraph.setAlignment(Paragraph.ALIGN_CENTER);
         Phrase phrase = new Phrase(LEADING, "\n\n", font);
-        p.add(phrase);
+        paragraph.add(phrase);
         phrase = new Phrase(LEADING, "Patient CPP", obsfont);
-        p.add(phrase);
-        document.add(p);
+        paragraph.add(phrase);
+        document.add(paragraph);
         String[] headings = {"Social History\n","Other Meds\n", "Medical History\n", "Ongoing Concerns\n", "Reminders\n", "Family History\n", "Risk Factors\n"};
-        String[] issueCodes = {"SocHistory","OMeds","MedHistory","Concerns","Reminders","FamHistory","RiskFactors"};
+        String[] issueCodes = {
+                Issue.SUMMARY_CODE_SOCIAL_HISTORY,
+                Issue.SUMMARY_CODE_OTHER_MEDS,
+                Issue.SUMMARY_CODE_MEDICAL_HISTORY,
+                Issue.SUMMARY_CODE_CONCERNS,
+                Issue.SUMMARY_CODE_REMINDERS,
+                Issue.SUMMARY_CODE_FAMILY_HISTORY,
+                Issue.SUMMARY_CODE_RISK_FACTORS
+        };
 
         //init column to left side of page
 
         //while there are cpp headings to process
 
-        for( int idx = 0; idx < headings.length; ++idx ) {
-            p = new Paragraph();
-            p.setAlignment(Paragraph.ALIGN_LEFT);
+        for (int idx = 0; idx < headings.length; ++idx)
+        {
+            paragraph = new Paragraph();
+            paragraph.setAlignment(Paragraph.ALIGN_LEFT);
             phrase = new Phrase(LEADING, headings[idx], obsfont);
-            p.add(phrase);
-            document.add(p);
+            paragraph.add(phrase);
+            document.add(paragraph);
             newPage = false;
             this.printEncounterNotes(cpp.get(issueCodes[idx]));
         }

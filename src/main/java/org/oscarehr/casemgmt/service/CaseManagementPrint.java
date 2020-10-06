@@ -48,11 +48,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
+import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicNote;
 import org.oscarehr.caisi_integrator.ws.DemographicWs;
 import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
 import org.oscarehr.casemgmt.util.ExtPrint;
 import org.oscarehr.consultations.service.ConsultationPDFCreationService;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.dao.IssueDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
@@ -78,6 +81,7 @@ public class CaseManagementPrint {
 
 	private CaseManagementNoteDao newCaseManagementNoteDao = (CaseManagementNoteDao) SpringUtils.getBean("encounterNote.dao.CaseManagementNoteDao");
 	private ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
+	private DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
 	private IssueDao issueDao = (IssueDao)SpringUtils.getBean("encounterNote.dao.IssueDao");
 
 	/*
@@ -99,12 +103,13 @@ public class CaseManagementPrint {
 	{
 		
 		String demoNo = String.valueOf(demographicNo);
-		request.setAttribute("demoName", getDemoName(demoNo));
-		request.setAttribute("demoSex", getDemoSex(demoNo));
-		request.setAttribute("demoAge", getDemoAge(demoNo));
-		request.setAttribute("mrp", getMRP(request, demoNo));
-		request.setAttribute("hin", StringUtils.trimToEmpty(getDemoHIN(demoNo)));
-		String dob = getDemoDOB(demoNo);
+		Demographic demographic = demographicDao.find(demographicNo);
+		request.setAttribute("demoName", demographic.getFirstName() + " " + demographic.getLastName());
+		request.setAttribute("demoSex", demographic.getSex());
+		request.setAttribute("demoAge", getDemoAge(demographic));
+		request.setAttribute("mrp", getMRP(demographic));
+		request.setAttribute("hin", StringUtils.trimToEmpty(demographic.getHin()));
+		String dob = ConversionUtils.toDateString(demographic.getDateOfBirth());
 		dob = convertDateFmt(dob, request);
 		request.setAttribute("demoDOB", dob);
 
@@ -443,50 +448,25 @@ public class CaseManagementPrint {
 		return notes;
 
 	}
-	
-	protected String getDemoName(String demoNo) {
-		if (demoNo == null) {
+
+    protected String getDemoAge(Demographic demographic)
+	{
+		int age = Utility.calcAge(
+				demographic.getYearOfBirth(),
+				demographic.getMonthOfBirth(),
+				demographic.getDayOfBirth()
+		);
+		return String.valueOf(age);
+	}
+
+	protected String getMRP(Demographic demographic)
+	{
+		oscar.oscarEncounter.data.EctProviderData.Provider prov = new oscar.oscarEncounter.data.EctProviderData().getProvider(demographic.getProviderNo());
+		if (prov == null)
+		{
 			return "";
 		}
-		return caseManagementMgr.getDemoName(demoNo);
-	}
-
-	protected String getDemoSex(String demoNo) {
-            if(demoNo == null) {
-                return "";
-            }
-            return caseManagementMgr.getDemoGender(demoNo);
-        }
-
-        protected String getDemoAge(String demoNo){
-		if (demoNo==null) return "";
-		return caseManagementMgr.getDemoAge(demoNo);
-	}
-
-	protected String getDemoDOB(String demoNo){
-		if (demoNo==null) return "";
-		return caseManagementMgr.getDemoDOB(demoNo);
-	}
-
-	protected String getDemoHIN(String demoNo)
-	{
-		if (demoNo == null)
-		{
-			return null;
-		}
-		return caseManagementMgr.getDemoHIN(demoNo);
-	}
-	
-	protected String getMRP(HttpServletRequest request,String demographicNo) {
-		String strBeanName = "casemgmt_oscar_bean" + demographicNo;
-		oscar.oscarEncounter.pageUtil.EctSessionBean bean = (oscar.oscarEncounter.pageUtil.EctSessionBean) request.getSession().getAttribute(strBeanName);
-		if (bean == null) return new String("");
-		if (bean.familyDoctorNo == null) return new String("");
-		if (bean.familyDoctorNo.isEmpty()) return new String("");
-
-		oscar.oscarEncounter.data.EctProviderData.Provider prov = new oscar.oscarEncounter.data.EctProviderData().getProvider(bean.familyDoctorNo);
-		String name = prov.getFirstName() + " " + prov.getSurname();
-		return name;
+		return prov.getFirstName() + " " + prov.getSurname();
 	}
 
 	protected String convertDateFmt(String strOldDate, HttpServletRequest request) {
