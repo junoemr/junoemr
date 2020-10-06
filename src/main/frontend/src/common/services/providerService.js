@@ -136,11 +136,9 @@ angular.module("Common.Services").service("providerService", [
 						if (results.data.body[result].siteId === siteNo)
 						{
 							flag = true;
-							console.log("true: " + flag);
 							return flag;
 						}
 					}
-					console.log("false or true: " + flag);
 					return flag;
 				},
 				function error(errors)
