@@ -23,6 +23,7 @@
 import {EDIT_PROVIDER_MODE} from "./editProviderAdminConstants";
 import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi";
 import {SitesApi} from "../../../../generated";
+import {BILLING_REGION} from "../../../billing/billingConstants";
 
 
 angular.module('Admin.Integration').component('editProviderAdmin',
@@ -329,10 +330,21 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 					}
 			);
 
-			systemPreferenceApi.getPropertyValue("billing_type", "BC").then(
+			systemPreferenceApi.getPropertyValue("billing_type", BILLING_REGION.BC).then(
 					function success(result)
 					{
 						ctrl.billingRegion = result.data.body;
+						if (ctrl.billingRegion === BILLING_REGION.CLINICAID)
+						{
+							systemPreferenceApi.getPropertyValue("instance_type", BILLING_REGION.BC).then((result) =>
+							{
+								ctrl.billingRegion = result.data.body;
+							}).error((error) =>
+							{
+							  console.error("Failed to fetch Clinicaid billing type with error" + error);
+							  ctrl.loadingError = true;
+							});
+						}
 					},
 					function error(result)
 					{
