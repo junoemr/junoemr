@@ -236,6 +236,7 @@ module.exports = {
 			'./src/common/components/module.js',
 			'./src/common/components/modalComponent.js',
 			'./src/common/components/junoButton/junoButtonComponent.js',
+			'./src/common/components/junoRoundButton/junoRoundButtonComponent.js',
 			'./src/common/components/junoCheckBox/junoCheckBoxComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
 			'./src/common/components/junoPatientSelect/junoPatientSelectComponent.js',
