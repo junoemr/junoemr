@@ -34,7 +34,8 @@ public class MeasurementDSHelperTest
 	@Test
 	public void getMeasurementValue_testNull()
 	{
-		Assert.assertNull(MeasurementDSHelper.getMeasurementValue(null));
+		Measurement measurement = null;
+		Assert.assertNull(MeasurementDSHelper.getMeasurementValue(measurement));
 	}
 
 	@Test

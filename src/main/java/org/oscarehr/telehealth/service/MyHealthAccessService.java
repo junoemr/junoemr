@@ -75,7 +75,7 @@ public class MyHealthAccessService
 	protected static final String MHA_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
 	protected static final String CLOUD_MD_DOMAIN = oscarProps.getProperty("cloudmd_domain");
 	protected static final String MHA_HOME_URL = "/clinic/home";
-	public static final String MHA_BASE_TELEHEALTH_URL = "/provider/clinic/%s/telehealth/appointment/%s";
+	public static final String MHA_BASE_TELEHEALTH_URL = "/patient/#/clinic/%s/telehealth/appointment/%s";
 	public static final String MHA_BASE_AQS_TELEHEALTH_URL = "/patient/#/clinic_user/aqs/queue/%s/queued_appointment/%s/session";
 
 	public String getTelehealthUrl(IntegrationData integrationData, String appointmentNo)

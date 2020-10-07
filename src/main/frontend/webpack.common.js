@@ -163,6 +163,7 @@ module.exports = {
 			'./src/common/services/inboxService.js',
 			'./src/common/services/k2aService.js',
 			'./src/common/services/messageService.js',
+			'./src/common/services/mhaService.js',
 			'./src/common/services/noteService.js',
 			'./src/common/services/patientDetailStatusService.js',
 			'./src/common/services/personaService.js',
