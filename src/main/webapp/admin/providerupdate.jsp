@@ -44,7 +44,6 @@
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.oscarehr.common.model.Site"%>
-<%@page import="org.oscarehr.common.model.Provider"%>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
 <%@page import="org.oscarehr.common.model.ProviderArchive"%>
 <%@page import="org.oscarehr.common.dao.ProviderArchiveDao"%>
@@ -67,6 +66,8 @@
 <%@ page import="oscar.MyDateFormat" %>
 <%@ page import="oscar.SxmlMisc" %>
 <%@ page import="oscar.OscarProperties" %>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
 	ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
@@ -280,7 +281,8 @@ if (securityInfoManager.superAdminModificationCheck(request.getParameter("curren
 			providerArchiveDao.persist(pa);
 
 			providerService.saveProvider(provider);
-			%>
+            LogAction.addLogEntry((String)session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS, request.getParameter("keyword"), request.getRemoteAddr());
+        %>
 			<p>
 			<h2><bean:message key="admin.providerupdate.msgUpdateSuccess" />
 			<a href="providerupdateprovider.jsp?keyword=<%=request.getParameter("provider_no")%>"><%= request.getParameter("provider_no") %></a>
