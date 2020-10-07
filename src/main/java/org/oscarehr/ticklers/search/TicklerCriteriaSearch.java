@@ -22,282 +22,243 @@
  */
 package org.oscarehr.ticklers.search;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 {
-    public enum SORT_MODE
-    {
-        UpdateDate,
-        DemographicName,
-        Creator,
-        ServiceDate,
-        Priority,
-        TaskAssignedTo,
-        Status,
-        Message
-    }
+	public enum SORT_MODE
+	{
+		UpdateDate,
+		DemographicName,
+		Creator,
+		ServiceDate,
+		Priority,
+		TaskAssignedTo,
+		Status,
+		Message
+	}
 
-    // fields here
-    private Date startDate;
-    private Date endDate;
-    private String creator;
-    private String taskAssignedTo;
-    @Setter
-    @Getter
-    private List<String> taskAssignedToMultiple;
-    private String programId;
-    private Integer demographicNo;
-    private String message;
-    private Tickler.PRIORITY priority;
-    private Tickler.STATUS status;
-    private String mrp;
+	// fields here
+	private Date startDate;
+	private Date endDate;
+	private String creator;
+	private String taskAssignedTo;
+	private String programId;
+	private Integer demographicNo;
+	private String message;
+	private Tickler.PRIORITY priority;
+	private Tickler.STATUS status;
+	private String mrp;
 
-    private SORT_MODE sortMode = SORT_MODE.UpdateDate;
+	private SORT_MODE sortMode = SORT_MODE.UpdateDate;
 
-    @Override
-    public Criteria setCriteriaProperties(Criteria criteria)
-    {
-        // set search filters
-        if (getDemographicNo() != null)
-        {
-            criteria.add(Restrictions.eq("demographicNo", getDemographicNo()));
-        }
+	@Override
+	public Criteria setCriteriaProperties(Criteria criteria)
+	{
+		// set search filters
+		if (getDemographicNo() != null)
+		{
+			criteria.add(Restrictions.eq("demographicNo", getDemographicNo()));
+		}
 
-        if (getCreator() != null)
-        {
-            criteria.add(Restrictions.eq("creator", getCreator()));
-        }
+		if (getCreator() != null)
+		{
+			criteria.add(Restrictions.eq("creator", getCreator()));
+		}
 
-        if (getTaskAssignedTo() != null)
-        {
-            criteria.add(Restrictions.eq("taskAssignedTo", getTaskAssignedTo()));
-        }
+		if (getTaskAssignedTo() != null)
+		{
+			criteria.add(Restrictions.eq("taskAssignedTo", getTaskAssignedTo()));
+		}
 
-        if (getTaskAssignedToMultiple() != null)
-        {
-            criteria.add(Restrictions.in("taskAssignedTo", getTaskAssignedToMultiple()));
-        }
+		if (getPriority() != null)
+		{
+			criteria.add(Restrictions.eq("priority", getPriority()));
+		}
 
-        if (getPriority() != null)
-        {
-            criteria.add(Restrictions.eq("priority", getPriority()));
-        }
+		if (getMessage() != null)
+		{
+			criteria.add(Restrictions.eq("message", getMessage()));
+		}
 
-        if (getMessage() != null)
-        {
-            criteria.add(Restrictions.eq("message", getMessage()));
-        }
+		if (getProgramId() != null)
+		{
+			criteria.add(Restrictions.eq("programId", getProgramId()));
+		}
 
-        if (getProgramId() != null)
-        {
-            criteria.add(Restrictions.eq("programId", getProgramId()));
-        }
+		if (getStatus() != null)
+		{
+			criteria.add(Restrictions.eq("status", getStatus()));
+		}
 
-        if (getStatus() != null)
-        {
-            criteria.add(Restrictions.eq("status", getStatus()));
-        }
+		if (getMrp() != null)
+		{
+			criteria.add(Restrictions.eq("mrp", getMrp()));
+		}
 
-        if (getMrp() != null)
-        {
-            criteria.add(Restrictions.eq("mrp", getMrp()));
-        }
+		// date searching
+		if (getStartDate() != null && getEndDate() != null)
+		{
+			criteria.add(Restrictions.between("serviceDate", getStartDate(), getEndDate()));
+		}
+		else if (getStartDate() != null)
+		{
+			criteria.add(Restrictions.ge("serviceDate", getStartDate()));
+		}
+		else if (getEndDate() != null)
+		{
+			criteria.add(Restrictions.le("serviceDate", getEndDate()));
+		}
 
-        // date searching
-        if (getStartDate() != null && getEndDate() != null)
-        {
-            criteria.add(Restrictions.between("serviceDate", getStartDate(), getEndDate()));
-        }
-        else if (getStartDate() != null)
-        {
-            criteria.add(Restrictions.ge("serviceDate", getStartDate()));
-        }
-        else if (getEndDate() != null)
-        {
-            criteria.add(Restrictions.le("serviceDate", getEndDate()));
-        }
+		setOrderByCriteria(criteria);
 
-        setOrderByCriteria(criteria);
+		return criteria;
+	}
 
-        return criteria;
-    }
+	private void setOrderByCriteria(Criteria criteria)
+	{
+		switch(sortMode)
+		{
+			case DemographicName:
+				criteria.addOrder(getOrder("demographicNo"));
+				break;
+			case Creator:
+				criteria.addOrder(getOrder("creator"));
+				break;
+			case ServiceDate:
+				criteria.addOrder(getOrder("serviceDate"));
+				break;
+			case Priority:
+				criteria.addOrder(getOrder("priority"));
+				break;
+			case TaskAssignedTo:
+				criteria.addOrder(getOrder("taskAssignedTo"));
+				break;
+			case Status:
+				criteria.addOrder(getOrder("status"));
+				break;
+			case Message:
+				criteria.addOrder(getOrder("message"));
+				break;
+			case UpdateDate:
+			default:
+				criteria.addOrder(getOrder("updateDate"));
+				break;
+		}
+	}
 
-    private void setOrderByCriteria(Criteria criteria)
-    {
-        switch (sortMode)
-        {
-            case DemographicName:
-                criteria.addOrder(getOrder("demographicNo"));
-                break;
-            case Creator:
-                criteria.addOrder(getOrder("creator"));
-                break;
-            case ServiceDate:
-                criteria.addOrder(getOrder("serviceDate"));
-                break;
-            case Priority:
-                criteria.addOrder(getOrder("priority"));
-                break;
-            case TaskAssignedTo:
-                criteria.addOrder(getOrder("taskAssignedTo"));
-                break;
-            case Status:
-                criteria.addOrder(getOrder("status"));
-                break;
-            case Message:
-                criteria.addOrder(getOrder("message"));
-                break;
-            case UpdateDate:
-            default:
-                criteria.addOrder(getOrder("updateDate"));
-                break;
-        }
-    }
+	public Date getStartDate()
+	{
+		return startDate;
+	}
 
-    public Date getStartDate()
-    {
-        return startDate;
-    }
+	public void setStartDate(Date startDate)
+	{
+		this.startDate = startDate;
+	}
 
-    public void setStartDate(Date startDate)
-    {
-        this.startDate = startDate;
-    }
+	public Date getEndDate()
+	{
+		return endDate;
+	}
 
-    public void setStartDate(String startDate) throws ParseException
-    {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date sDate = formatter.parse(startDate);
-        this.startDate = sDate;
-    }
+	public void setEndDate(Date endDate)
+	{
+		this.endDate = endDate;
+	}
 
-    public Date getEndDate()
-    {
-        return endDate;
-    }
+	public String getCreator()
+	{
+		return creator;
+	}
 
-    public void setEndDate(Date endDate)
-    {
-        this.endDate = endDate;
-    }
+	public void setCreator(String creator)
+	{
+		this.creator = creator;
+	}
 
-    public void setEndDate(String endDate) throws ParseException
-    {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date eDate = formatter.parse(endDate);
-        this.endDate = eDate;
-    }
+	public String getTaskAssignedTo()
+	{
+		return taskAssignedTo;
+	}
 
-    public String getCreator()
-    {
-        return creator;
-    }
+	public void setTaskAssignedTo(String taskAssignedTo)
+	{
+		this.taskAssignedTo = taskAssignedTo;
+	}
 
-    public void setCreator(String creator)
-    {
-        this.creator = creator;
-    }
+	public String getProgramId()
+	{
+		return programId;
+	}
 
-    public String getTaskAssignedTo()
-    {
-        return taskAssignedTo;
-    }
+	public void setProgramId(String programId)
+	{
+		this.programId = programId;
+	}
 
-    public void setTaskAssignedTo(String taskAssignedTo)
-    {
-        this.taskAssignedTo = taskAssignedTo;
-        this.taskAssignedToMultiple = null;
-    }
+	public Tickler.PRIORITY getPriority()
+	{
+		return priority;
+	}
 
-    public List<String> getTaskAssignedToMultiple()
-    {
-        return taskAssignedToMultiple;
-    }
+	public void setPriority(Tickler.PRIORITY priority)
+	{
+		this.priority = priority;
+	}
 
-    public void setTaskAssignedToMultiple(List<String> taskAssignedToMultiple)
-    {
-        this.taskAssignedToMultiple = taskAssignedToMultiple;
-        this.taskAssignedTo = null;
-    }
+	public Integer getDemographicNo()
+	{
+		return demographicNo;
+	}
 
-    public String getProgramId()
-    {
-        return programId;
-    }
+	public void setDemographicNo(Integer demographicNo)
+	{
+		this.demographicNo = demographicNo;
+	}
 
-    public void setProgramId(String programId)
-    {
-        this.programId = programId;
-    }
+	public String getMessage()
+	{
+		return message;
+	}
 
-    public Tickler.PRIORITY getPriority()
-    {
-        return priority;
-    }
+	public void setMessage(String message)
+	{
+		this.message = message;
+	}
 
-    public void setPriority(Tickler.PRIORITY priority)
-    {
-        this.priority = priority;
-    }
+	public SORT_MODE getSortMode()
+	{
+		return sortMode;
+	}
 
-    public Integer getDemographicNo()
-    {
-        return demographicNo;
-    }
+	public void setSortMode(SORT_MODE sortMode)
+	{
+		this.sortMode = sortMode;
+	}
 
-    public void setDemographicNo(Integer demographicNo)
-    {
-        this.demographicNo = demographicNo;
-    }
+	public Tickler.STATUS getStatus()
+	{
+		return status;
+	}
 
-    public String getMessage()
-    {
-        return message;
-    }
+	public void setStatus(Tickler.STATUS status)
+	{
+		this.status = status;
+	}
 
-    public void setMessage(String message)
-    {
-        this.message = message;
-    }
+	public String getMrp()
+	{
+		return mrp;
+	}
 
-    public SORT_MODE getSortMode()
-    {
-        return sortMode;
-    }
-
-    public void setSortMode(SORT_MODE sortMode)
-    {
-        this.sortMode = sortMode;
-    }
-
-    public Tickler.STATUS getStatus()
-    {
-        return status;
-    }
-
-    public void setStatus(Tickler.STATUS status)
-    {
-        this.status = status;
-    }
-
-    public String getMrp()
-    {
-        return mrp;
-    }
-
-    public void setMrp(String mrp)
-    {
-        this.mrp = mrp;
-    }
+	public void setMrp(String mrp)
+	{
+		this.mrp = mrp;
+	}
 }

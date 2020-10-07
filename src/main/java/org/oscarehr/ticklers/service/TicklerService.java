@@ -44,147 +44,138 @@ import oscar.log.LogAction;
 
 import javax.validation.ValidationException;
 
-import static org.oscarehr.decisionSupport.model.DSConsequence.ConsequenceType.java;
-
 @Component
 public class TicklerService extends AbstractServiceImpl
 {
-    @Autowired
-    private TicklersDao TicklerDao;
+	@Autowired
+	private TicklersDao TicklerDao;
 
-    @Autowired
-    private TicklerCategoryDao ticklerCategoryDao;
+	@Autowired
+	private TicklerCategoryDao ticklerCategoryDao;
 
-    @Autowired
-    private ProgramManager programManager;
+	@Autowired
+	private ProgramManager programManager;
 
-    /**
-     * Use to get ticklers count for pagination display
-     * @param paginationQuery
-     * @return int count of ticklers
-     */
-    public int getTicklersCount(PaginationQuery paginationQuery)
-    {
-        return this.TicklerDao.getTicklersCount(paginationQuery);
-    }
+	/**
+	 * Use to get ticklers count for pagination display
+	 * @param paginationQuery
+	 * @return int count of ticklers
+	 */
+	public int getTicklersCount(PaginationQuery paginationQuery) {
+		return this.TicklerDao.getTicklersCount(paginationQuery);
+	}
+	
+	/**
+	 * List ticklers
+	 * @param paginationQuery
+	 * @return List of type Tickler
+	 */
+	public List<Tickler> getTicklers(LoggedInInfo loggedInInfo, PaginationQuery paginationQuery) {
+		TicklerQuery query = (TicklerQuery) paginationQuery;
 
-    /**
-     * List ticklers
-     * @param paginationQuery
-     * @return List of type Tickler
-     */
-    public List<Tickler> getTicklers(LoggedInInfo loggedInInfo, PaginationQuery paginationQuery)
-    {
-        TicklerQuery query = (TicklerQuery) paginationQuery;
+		List<Tickler> results = TicklerDao.getTicklers(query);
+		//--- log action ---
+		if (results.size()>0) {
+			String resultIds=Tickler.getIdsAsStringList(results);
+			LogAction.addLogSynchronous(loggedInInfo, "TicklerService.getTicklers", "ids returned=" + resultIds);
+		}
+				
+		return results;
+	}
 
-        List<Tickler> results = TicklerDao.getTicklers(query);
-        //--- log action ---
-        if (results.size() > 0)
-        {
-            String resultIds = Tickler.getIdsAsStringList(results);
-            LogAction.addLogSynchronous(loggedInInfo, "TicklerService.getTicklers", "ids returned=" + resultIds);
-        }
+	/**
+	 * create a new tickler
+	 * @param tickler - the tickler to create
+	 * @return - the new tickler
+	 * @throws ValidationException - if a required tickler field is missing
+	 */
+	public Tickler createTickler(Tickler tickler) throws ValidationException
+	{
+		if (tickler.getId() != null)
+		{// id must be null to create new tickler
+			tickler.setId(null);
+		}
 
-        return results;
-    }
+		//force program id to oscar default
+		tickler.setProgramId(programManager.getDefaultProgramId());
 
-    /**
-     * create a new tickler
-     * @param tickler - the tickler to create
-     * @return - the new tickler
-     * @throws ValidationException - if a required tickler field is missing
-     */
-    public Tickler createTickler(Tickler tickler) throws ValidationException
-    {
-        if (tickler.getId() != null)
-        {// id must be null to create new tickler
-            tickler.setId(null);
-        }
+		validateAndDefaultTickler(tickler);
+		TicklerDao.persist(tickler);
+		return tickler;
+	}
 
-        //force program id to oscar default
-        tickler.setProgramId(programManager.getDefaultProgramId());
+	/**
+	 * update a tickler record.
+	 * @param tickler - tickler to update
+	 * @return - the updated tickler
+	 * @throws ValidationException - if a required tickler field is missing
+	 */
+	public Tickler updateTickler(Tickler tickler) throws ValidationException
+	{
+		validateAndDefaultTickler(tickler);
+		tickler.setUpdateDate(new Date());
 
-        validateAndDefaultTickler(tickler);
-        TicklerDao.persist(tickler);
-        return tickler;
-    }
+		TicklerDao.merge(tickler);
+		return tickler;
+	}
 
-    /**
-     * update a tickler record.
-     * @param tickler - tickler to update
-     * @return - the updated tickler
-     * @throws ValidationException - if a required tickler field is missing
-     */
-    public Tickler updateTickler(Tickler tickler) throws ValidationException
-    {
-        validateAndDefaultTickler(tickler);
-        tickler.setUpdateDate(new Date());
+	/**
+	 * ensure that a tickler is configured correctly and set default values on null fields
+	 * @param tickler - the tickler to validate
+	 * @return - the validated tickler
+	 * @throws ValidationException - if a required tickler field is missing
+	 */
+	private Tickler validateAndDefaultTickler(Tickler tickler) throws ValidationException
+	{
+		if (tickler.getDemographicNo() == null)
+		{
+			throw new ValidationException("Demographic number is required for tickler");
+		}
+		if (tickler.getStatus() == null)
+		{
+			tickler.setStatus(Tickler.STATUS.A);
+		}
+		if (tickler.getUpdateDate() == null)
+		{
+			tickler.setUpdateDate(new Date());
+		}
+		if (tickler.getServiceDate() == null)
+		{
+			throw new ValidationException("Service date is required for tickler");
+		}
+		if (tickler.getCreator() == null)
+		{
+			throw new ValidationException("Creator number is required for tickler");
+		}
+		if (tickler.getTaskAssignedTo() == null)
+		{
+			throw new ValidationException("Assigned number is required for tickler");
+		}
+		if (tickler.getCategoryId() != null && ticklerCategoryDao.find(tickler.getCategoryId()) == null)
+		{
+			throw new ValidationException("Tickler category id is not valid");
+		}
 
-        TicklerDao.merge(tickler);
-        return tickler;
-    }
+		return tickler;
+	}
 
-    /**
-     * ensure that a tickler is configured correctly and set default values on null fields
-     * @param tickler - the tickler to validate
-     * @return - the validated tickler
-     * @throws ValidationException - if a required tickler field is missing
-     */
-    private Tickler validateAndDefaultTickler(Tickler tickler) throws ValidationException
-    {
-        if (tickler.getDemographicNo() == null)
-        {
-            throw new ValidationException("Demographic number is required for tickler");
-        }
-        if (tickler.getStatus() == null)
-        {
-            tickler.setStatus(Tickler.STATUS.A);
-        }
-        if (tickler.getUpdateDate() == null)
-        {
-            tickler.setUpdateDate(new Date());
-        }
-        if (tickler.getServiceDate() == null)
-        {
-            throw new ValidationException("Service date is required for tickler");
-        }
-        if (tickler.getCreator() == null)
-        {
-            throw new ValidationException("Creator number is required for tickler");
-        }
-        if (tickler.getTaskAssignedTo() == null)
-        {
-            throw new ValidationException("Assigned number is required for tickler");
-        }
-        if (tickler.getCategoryId() != null && ticklerCategoryDao.find(tickler.getCategoryId()) == null)
-        {
-            throw new ValidationException("Tickler category id is not valid");
-        }
+	public List<Tickler> getSearchResponse(TicklerCriteriaSearch criteriaSearch, int page, int perPage)
+	{
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
 
-        return tickler;
-    }
+		criteriaSearch.setLimit(perPage);
+		criteriaSearch.setOffset(offset);
 
-    public List<Tickler> getSearchResponse(TicklerCriteriaSearch criteriaSearch, int page, int perPage)
-    {
-        page = validPageNo(page);
-        perPage = limitedResultCount(perPage);
-        int offset = calculatedOffset(page, perPage);
+		int total = TicklerDao.criteriaSearchCount(criteriaSearch);
 
-        criteriaSearch.setLimit(perPage);
-        criteriaSearch.setOffset(offset);
+		List<Tickler> resultList = new ArrayList<>();
+		if (total > 0)
+		{
+			resultList = TicklerDao.criteriaSearch(criteriaSearch);
+		}
+		return resultList;
+	}
 
-        int total = TicklerDao.criteriaSearchCount(criteriaSearch);
-
-        List<Tickler> resultList = new ArrayList<>();
-        if (total > 0)
-        {
-            resultList = TicklerDao.criteriaSearch(criteriaSearch);
-        }
-        return resultList;
-    }
-
-    public List<Tickler> getSearchResponse(TicklerCriteriaSearch criteriaSearch)
-    {
-        return TicklerDao.criteriaSearch(criteriaSearch);
-    }
 }
