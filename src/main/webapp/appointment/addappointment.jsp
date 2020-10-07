@@ -1306,7 +1306,8 @@
 									value="Create & Notify"
 									title="Add a new appointment and send a confirmation email to the patient"
 									onclick="document.forms.ADDAPPT.sendBookingNotification.value='true';
-													 document.forms.ADDAPPT.displaymode.value='Add Appointment';"
+													 document.forms.ADDAPPT.displaymode.value='Add Appointment'
+													 jQuery('#add-appt-and-send-confirmation').attr('disabled', true);"
 									style="display: none;"
 					>
 				</td>
