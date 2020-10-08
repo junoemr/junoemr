@@ -27,7 +27,9 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Episode;
 import org.oscarehr.util.MiscUtils;
+import oscar.util.ConversionUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -86,7 +88,13 @@ public class PregnancyMapper extends AbstractMapper
 
 	public Date getDueDate(int rep)
 	{
-		return getNullableDate(provider.getPREGNANCY(rep).getZPG().getZpg4_DueDate().getTs1_TimeOfAnEvent().getValue());
+		Date dueDate = getNullableDate(provider.getPREGNANCY(rep).getZPG().getZpg4_DueDate().getTs1_TimeOfAnEvent().getValue());
+		if(dueDate == null)
+		{
+			// if there is no date provided, default to obviously wrong (but valid) date
+			dueDate = ConversionUtils.toLegacyDate(LocalDate.of(1900, 1, 1));
+		}
+		return dueDate;
 	}
 
 	public String getStatus(int rep)

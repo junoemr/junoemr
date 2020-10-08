@@ -246,11 +246,11 @@ public class MedicationMapper extends AbstractMapper
 	}
 	protected Date getEndDate(int rep) throws HL7Exception
 	{
-		Date startDate = getStartDate(rep);
 		Date endDate = getAdministrationStopDate(rep);
 		if(endDate == null)
 		{
 			// try to calculate from TQ1
+			Date startDate = getStartDate(rep);
 			endDate = getCalculatedEndDate(rep, startDate);
 			if (endDate == null)
 			{
