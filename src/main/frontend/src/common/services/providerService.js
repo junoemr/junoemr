@@ -131,6 +131,7 @@ angular.module("Common.Services").service("providerService", [
 				}).then(
 				function success(results)
 				{
+					
 					for (var result in results.data.body)
 					{
 						if (results.data.body[result].siteId === siteNo)
@@ -144,7 +145,7 @@ angular.module("Common.Services").service("providerService", [
 				function error(errors)
 				{
 					console.log("An error occurred while fetching the provider list");
-				});
+				})
 		};
 
 		//TODO move to its own service
