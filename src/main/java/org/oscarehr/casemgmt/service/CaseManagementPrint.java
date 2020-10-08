@@ -146,9 +146,9 @@ public class CaseManagementPrint {
 			}
 		}
 
-		SimpleDateFormat headerFormat = new SimpleDateFormat("yyyy-MM-dd.HH.mm.ss");
-		Date now = new Date();
-		String headerDate = headerFormat.format(now);
+		// This line doesn't actually set the filename that the user sees, but to lower the possibility of there being
+		// conflicts (two people attempting to print same demographic's notes) we'll set the temp name
+		String headerDate = ConversionUtils.toDateString(new Date(), ConversionUtils.DATE_TIME_FILENAME);
 		
 		// Create new file to save form to
 		String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
