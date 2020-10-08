@@ -6,8 +6,7 @@ angular.module('Layout').controller('Layout.BodyController', [
 	function($rootScope, $scope, providerService, securityService)
 	{
 		var controller = this;
-		console.log("!!!!!!Eleanor doing things!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		console.log(providerService.isProviderAssignedToSite("999900", "1"));
+
 		//=========================================================================
 		// Initialization
 		//=========================================================================
@@ -19,17 +18,13 @@ angular.module('Layout').controller('Layout.BodyController', [
 				{
 					securityService.setUser(results);
 					controller.userLoaded = true;
-					console.log(providerService);
-					console.log("!!!!!!Eleanor doing things!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-					console.log(providerService.isProviderAssignedToSite("999900", "1"));
 				},
 				function error(errors)
 				{
 					console.log(errors);
 				});
 		};
-		console.log("!!!!!!Eleanor doing things!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		console.log(providerService.isProviderAssignedToSite("999900", "1"));
+
 		// flag for whether the patient list should be showing or not
 		// can be set from controllers with $emit: $scope.$emit('configureShowPatientList', false);
 		controller.showPatientList = false;

@@ -46,6 +46,7 @@ angular.module('Schedule').component('eventComponent', {
 			scheduleService,
 		)
 		{
+
 			let controller = this;
 
 			$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
@@ -68,8 +69,6 @@ angular.module('Schedule').component('eventComponent', {
 			// Access Control
 			//=========================================================================/
 
-			console.log("!!!!!!Eleanor doing things!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			console.log(providerService.isProviderAssignedToSite("999900", "1"));
 
 			//=========================================================================
 			// Local scope variables

@@ -123,7 +123,6 @@ angular.module("Common.Services").service("providerService", [
 
 		service.isProviderAssignedToSite = function isProviderAssignedToSite(provNo, siteNo)
 		{
-			var flag = false;
 			$http(
 				{
 					url: '../ws/rs/sites/provider/' + provNo,
@@ -131,21 +130,19 @@ angular.module("Common.Services").service("providerService", [
 				}).then(
 				function success(results)
 				{
-					
 					for (var result in results.data.body)
 					{
 						if (results.data.body[result].siteId === siteNo)
 						{
-							flag = true;
-							return flag;
+							return true;
 						}
 					}
-					return flag;
+					return false;
 				},
 				function error(errors)
 				{
 					console.log("An error occurred while fetching the provider list");
-				})
+				});
 		};
 
 		//TODO move to its own service
