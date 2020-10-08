@@ -268,6 +268,7 @@
                     }
                 });
 
+                changeSite(document.getElementById("site"))
             });
 
             function validateForm()
@@ -1207,9 +1208,6 @@
                             {
                                 switch (sel.value)
                                 {
-                                    case 'none' :
-                                        sel.form.assignedTo.innerHTML = "";
-                                        break;
                                     case 'all':
                                         sel.form.assignedTo.innerHTML = _providers[all];
                                         break;
@@ -1219,8 +1217,7 @@
                             }
                         </script>
                         <select id="site" name="site" onchange="changeSite(this)">
-                            <option value="none">---select clinic---</option>
-                            <option value="all">All Sites</option>
+                            <option value="all" selected="selected">All Sites</option>
                             <%
                                 for (int i = 0; i < sites.size(); i++)
                                 {
