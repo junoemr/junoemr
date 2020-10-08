@@ -102,7 +102,7 @@
 		String style = ConversionUtils.getStringOrDefaultValue(request.getParameter("style"), appt.getStyle());
 		String billing = ConversionUtils.getStringOrDefaultValue(request.getParameter("billing"), appt.getBilling());
 		String remarks = ConversionUtils.getStringOrDefaultValue(request.getParameter("remarks"), appt.getRemarks());
-		String urgency = ConversionUtils.getStringOrDefaultValue(request.getParameter("urgency"), appt.getUrgency());
+		String urgency = StringUtils.transformNullInEmptyString(request.getParameter("urgency"));
 
 		Integer reasonCode = appt.getReasonCode();
 		int demographicNo = appt.getDemographicNo();
