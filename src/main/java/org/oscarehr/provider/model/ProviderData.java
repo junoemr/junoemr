@@ -42,6 +42,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
@@ -465,10 +466,14 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 
 	public List<String> getBookingNotificationNumbersList()
 	{
-		return Arrays.stream(this.bookingNotificationNumbers.split(","))
-				.map(String::trim)
-				.filter((str) -> !str.isEmpty())
-				.collect(Collectors.toList());
+		if (this.bookingNotificationNumbers != null)
+		{
+			return Arrays.stream(this.bookingNotificationNumbers.split(","))
+					.map(String::trim)
+					.filter((str) -> !str.isEmpty())
+					.collect(Collectors.toList());
+		}
+		return new ArrayList<>();
 	}
 
 	public void setBookingNotificationNumbersList(List<String> bookingNotificationNumbers)
