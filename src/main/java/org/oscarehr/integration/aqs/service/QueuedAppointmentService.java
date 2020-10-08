@@ -298,7 +298,15 @@ public class QueuedAppointmentService extends BaseService
 		{
 			// use default queue duration
 			AppointmentQueue queue = appointmentQueueService.getAppointmentQueue(queueId, loggedInInfo.getLoggedInSecurity().getSecurityNo());
-			calendar.add(Calendar.MINUTE, queue.getDefaultAppointmentDurationMinutes());
+			if (queue.getDefaultAppointmentDurationMinutes() != null)
+			{
+				calendar.add(Calendar.MINUTE, queue.getDefaultAppointmentDurationMinutes());
+			}
+			else
+			{
+				// fallback to 15 minutes
+				calendar.add(Calendar.MINUTE, 15);
+			}
 		}
 		appointment.setEndTime(calendar.getTime());
 
