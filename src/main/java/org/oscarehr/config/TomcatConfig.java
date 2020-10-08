@@ -24,8 +24,10 @@
 package org.oscarehr.config;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.webresources.ExtractingRoot;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
@@ -67,6 +69,27 @@ public class TomcatConfig
 				context.addServletMappingDecoded("*.jsp", "jsp");
 				context.addServletMappingDecoded("*.jspf", "jsp");
 				context.addServletMappingDecoded("*.json", "jsp");
+
+				context.setResources(new ExtractingRoot());
+			}
+		};
+	}
+
+	@Bean
+	public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainerCustomizer()
+	{
+		return new WebServerFactoryCustomizer<TomcatServletWebServerFactory>()
+		{
+			@Override
+			public void customize(TomcatServletWebServerFactory container)
+			{
+				container.addContextCustomizers(
+						new TomcatContextCustomizer() {
+							@Override
+							public void customize(Context context) {
+								context.setReloadable(false);
+							}
+						});
 			}
 		};
 	}
