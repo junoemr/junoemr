@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Episode;
+import org.oscarehr.common.model.SnomedCore;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
@@ -66,8 +67,8 @@ public class PregnancyMapper extends AbstractMapper
 	public Episode getPregnancyEpisode(int rep)
 	{
 		Episode pregnancy = new Episode();
-		pregnancy.setCode("72892002"); //TODO how to pick these?
-		pregnancy.setCodingSystem("SnomedCore");
+		pregnancy.setCode(SnomedCore.CODE_NORMAL_PREGNANCY);
+		pregnancy.setCodingSystem(Episode.CODE_SYSTEM_NAME_SNOMED_CORE);
 		pregnancy.setDescription("Normal pregnancy");
 		pregnancy.setNotes(getNote(rep));
 		pregnancy.setStatus(getStatus(rep));

@@ -734,21 +734,13 @@ public class CoPDImportService
 			}
 			CaseManagementNote encounterNote = encounterNoteMapper.getEncounterNote(i);
 			ProviderData signingProvider = encounterNoteMapper.getSigningProvider(i);
-			ProviderData noteProvider = provider;
-			if(signingProvider == null)
-			{
-				signingProvider = provider;
-			}
-			else
-			{
-				signingProvider = findOrCreateProviderRecord(signingProvider);
-			}
-			/* Wolf wants us to use the parsed provider name in the notes as the note creator and signature */
-			if(importSource.equals(IMPORT_SOURCE.WOLF))
-			{
-				noteProvider = signingProvider;
-			}
-			encounterNote.setProvider(noteProvider);
+			ProviderData creatingProvider = encounterNoteMapper.getCreatingProvider(i);
+
+			// ensure provider records are complete/loaded
+			signingProvider = (signingProvider == null) ? provider : findOrCreateProviderRecord(signingProvider);
+			creatingProvider = (creatingProvider == null) ? provider : findOrCreateProviderRecord(creatingProvider);
+
+			encounterNote.setProvider(creatingProvider);
 			encounterNote.setSigned(true);
 			encounterNote.setSigningProvider(signingProvider);
 			encounterNote.setDemographic(demographic);
