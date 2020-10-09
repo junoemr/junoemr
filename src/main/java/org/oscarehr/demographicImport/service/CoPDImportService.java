@@ -557,6 +557,15 @@ public class CoPDImportService
 			pregnancyEpisode.setLastUpdateUser(provider.getId());
 			episodeDao.persist(pregnancyEpisode);
 		}
+
+		CaseManagementNote metadataNote = pregnancyMapper.getMedHistoryMetadataNote();
+		if(metadataNote != null)
+		{
+			metadataNote.setProvider(provider);
+			metadataNote.setSigningProvider(provider);
+			metadataNote.setDemographic(demographic);
+			encounterNoteService.saveMedicalHistoryNote(metadataNote);
+		}
 	}
 
 	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception

@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Episode;
 import org.oscarehr.common.model.SnomedCore;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
@@ -70,7 +71,7 @@ public class PregnancyMapper extends AbstractMapper
 		pregnancy.setCode(SnomedCore.CODE_NORMAL_PREGNANCY);
 		pregnancy.setCodingSystem(Episode.CODE_SYSTEM_NAME_SNOMED_CORE);
 		pregnancy.setDescription("Normal pregnancy");
-		pregnancy.setNotes(getNote(rep));
+		pregnancy.setNotes(getIndividualPregnancyNoteText(rep));
 		pregnancy.setStatus(getStatus(rep));
 		// spec only allows for single due date, so use it for both start and end date
 		pregnancy.setStartDate(getDueDate(rep));
@@ -82,7 +83,115 @@ public class PregnancyMapper extends AbstractMapper
 		return pregnancy;
 	}
 
-	public String getNote(int rep)
+	public CaseManagementNote getMedHistoryMetadataNote()
+	{
+		CaseManagementNote note = null;
+		String noteText = getPregnancyMetaNoteText();
+
+		if(noteText != null && !noteText.isEmpty())
+		{
+			note = new CaseManagementNote();
+			Date noteDate = new Date();
+			note.setObservationDate(noteDate);
+			note.setUpdateDate(noteDate);
+			note.setNote(noteText);
+		}
+		return note;
+	}
+
+	public String getPregnancyMetaNoteText()
+	{
+		String termBirthNo = StringUtils.trimToEmpty(provider.getZHR().getZhr2_TermBirthNo().getValue());
+		String preTermBirthNo = StringUtils.trimToEmpty(provider.getZHR().getZhr3_PerTermBirthNo().getValue());
+		String gravida = StringUtils.trimToEmpty(provider.getZHR().getZhr4_Gravida().getValue());
+		String abortionsNo = StringUtils.trimToEmpty(provider.getZHR().getZhr5_SpontaneousAbortionsNo().getValue());
+		String inducedTerminalsNo = StringUtils.trimToEmpty(provider.getZHR().getZhr6_InducedTerminationNo().getValue());
+		String perinatalDeathNo = StringUtils.trimToEmpty(provider.getZHR().getZhr7_PerinatalDeathsNo().getValue());
+		String liveChildrenNo = StringUtils.trimToEmpty(provider.getZHR().getZhr8_NumberOfChildrenLiving().getValue());
+
+		StringBuilder noteTextBuilder = new StringBuilder();
+		if(!termBirthNo.isEmpty())
+		{
+			noteTextBuilder.append("Total term births: " + termBirthNo + "\n");
+		}
+		if(!preTermBirthNo.isEmpty())
+		{
+			noteTextBuilder.append("Total pre-term births: " + preTermBirthNo + "\n");
+		}
+		if(!gravida.isEmpty())
+		{
+			noteTextBuilder.append("Gravida: " + gravida + "\n");
+		}
+		if(!abortionsNo.isEmpty())
+		{
+			noteTextBuilder.append("Abortions: " + abortionsNo + "\n");
+		}
+		if(!inducedTerminalsNo.isEmpty())
+		{
+			noteTextBuilder.append("Induced Terminations: " + inducedTerminalsNo + "\n");
+		}
+		if(!perinatalDeathNo.isEmpty())
+		{
+			noteTextBuilder.append("Perinatal Deaths: " + perinatalDeathNo + "\n");
+		}
+		if(!liveChildrenNo.isEmpty())
+		{
+			noteTextBuilder.append("Living Children: " + liveChildrenNo + "\n");
+		}
+
+		String noteBody = noteTextBuilder.toString().trim();
+		if (!noteBody.isEmpty())
+		{
+			return "Pregnancy data:\n" + noteBody;
+		}
+		return null;
+	}
+
+	public String getIndividualPregnancyNoteText(int rep)
+	{
+		String baseText = StringUtils.trimToEmpty(getDueDateConfirmedText(rep));
+		String fathersName = StringUtils.trimToEmpty(getFathersName(rep));
+		String fathersOccupation = StringUtils.trimToEmpty(getFathersOccupation(rep));
+		String fathersDOBString = ConversionUtils.toDateString(getFathersDOB(rep));
+
+		StringBuilder noteTextBuilder = new StringBuilder();
+		noteTextBuilder.append(baseText);
+		if(!fathersName.isEmpty() || !fathersDOBString.isEmpty() || !fathersOccupation.isEmpty())
+		{
+			noteTextBuilder.append("\nFathers Info:\n");
+			if(!fathersName.isEmpty())
+			{
+				noteTextBuilder.append(" Name: " + fathersName + "\n");
+			}
+			if(!fathersDOBString.isEmpty())
+			{
+				noteTextBuilder.append(" DOB: " + fathersDOBString + "\n");
+			}
+			if(!fathersOccupation.isEmpty())
+			{
+				noteTextBuilder.append(" Occupation: " + fathersOccupation + "\n");
+			}
+		}
+
+		return noteTextBuilder.toString().trim();
+	}
+
+	public String getFathersName(int rep)
+	{
+		return StringUtils.trimToNull(provider.getPREGNANCY(rep).getZPG().getZpg1_FathersName().getValue());
+	}
+
+	public Date getFathersDOB(int rep)
+	{
+		return getNullableDate(provider.getPREGNANCY(rep).getZPG().getZpg2_FathersDOB().getTs1_TimeOfAnEvent().getValue());
+	}
+
+	public String getFathersOccupation(int rep)
+	{
+		return StringUtils.trimToNull(provider.getPREGNANCY(rep).getZPG().getZpg3_FathersOccupation().getValue());
+	}
+
+	public String getDueDateConfirmedText(int rep)
 	{
 		return StringUtils.trimToNull(provider.getPREGNANCY(rep).getZPG().getZpg5_DueDateConfirmed().getValue());
 	}
