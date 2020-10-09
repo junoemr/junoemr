@@ -125,19 +125,19 @@ public class EncounterNoteMapperWolf extends EncounterNoteMapper
 			commentPart = StringUtils.trimToEmpty(commentPart);
 			if(commentPart.startsWith(NOTE_KEY_CREATED_DATE + subSeparator))
 			{
-				noteMap.put(NOTE_KEY_CREATED_DATE, commentPart.split(":")[1]);
+				noteMap.put(NOTE_KEY_CREATED_DATE, commentPart.split(subSeparator)[1]);
 			}
 			else if(commentPart.startsWith(NOTE_KEY_LAST_EDIT_DATE + subSeparator))
 			{
-				noteMap.put(NOTE_KEY_LAST_EDIT_DATE, commentPart.split(":")[1]);
+				noteMap.put(NOTE_KEY_LAST_EDIT_DATE, commentPart.split(subSeparator)[1]);
 			}
 			else if(commentPart.startsWith(NOTE_KEY_CREATOR + subSeparator))
 			{
-				noteMap.put(NOTE_KEY_CREATOR, commentPart.split(":")[1]);
+				noteMap.put(NOTE_KEY_CREATOR, commentPart.split(subSeparator)[1]);
 			}
 			else if(commentPart.startsWith(NOTE_KEY_LAST_EDITOR + subSeparator))
 			{
-				noteMap.put(NOTE_KEY_LAST_EDITOR, commentPart.split(":")[1]);
+				noteMap.put(NOTE_KEY_LAST_EDITOR, commentPart.split(subSeparator)[1]);
 			}
 			else
 			{

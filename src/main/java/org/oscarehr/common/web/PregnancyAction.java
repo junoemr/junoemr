@@ -145,23 +145,23 @@ public class PregnancyAction extends DispatchAction {
 		}
 		
 		//create pregnancy episode
-		Episode e = new Episode();
-		e.setCode(code);
-		e.setCodingSystem(codeType);
-		e.setDemographicNo(demographicNo);
-		e.setDescription("");
-		e.setLastUpdateTime(new Date());
-		e.setLastUpdateUser(providerNo);
-		e.setStatus(Episode.STATUS_CURRENT);
-		e.setStartDate(new Date());
-		e.setDescription(mod.getDescription());
-		episodeDao.persist(e);
+		Episode episode = new Episode();
+		episode.setCode(code);
+		episode.setCodingSystem(codeType);
+		episode.setDemographicNo(demographicNo);
+		episode.setDescription("");
+		episode.setLastUpdateTime(new Date());
+		episode.setLastUpdateUser(providerNo);
+		episode.setStatus(Episode.STATUS_CURRENT);
+		episode.setStartDate(new Date());
+		episode.setDescription(mod.getDescription());
+		episodeDao.persist(episode);
 		
 		//start up a new ar on enhanced form
 		try {
 			FrmONAREnhancedRecord f = new FrmONAREnhancedRecord();
 			Properties p = f.getFormRecord(loggedInInfo, demographicNo, 0);
-			p.setProperty("episodeId", String.valueOf(e.getId()));
+			p.setProperty("episodeId", String.valueOf(episode.getId()));
 			f.saveFormRecord(p);
 		}catch(SQLException ee) {
 			MiscUtils.getLogger().error("Error",ee);
@@ -185,12 +185,12 @@ public class PregnancyAction extends DispatchAction {
 		Integer episodeId = Integer.parseInt(request.getParameter("episodeId"));
 		String endDate = request.getParameter("endDate");
 		String notes = request.getParameter("notes");
-		Episode e = episodeDao.find(episodeId);
-		if(e != null) {
-			e.setStatus(Episode.STATUS_COMPLETE);
-			e.setEndDateStr(endDate);
-			e.setNotes(notes);
-			episodeDao.merge(e); 
+		Episode episode = episodeDao.find(episodeId);
+		if(episode != null) {
+			episode.setStatus(Episode.STATUS_COMPLETE);
+			episode.setEndDateStr(endDate);
+			episode.setNotes(notes);
+			episodeDao.merge(episode);
 			request.setAttribute("close", true);
 		} else {
 			request.setAttribute("error","There was an internal error. Please contact tech support.");
@@ -202,13 +202,13 @@ public class PregnancyAction extends DispatchAction {
 	public ActionForward doDelete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
 		//Integer demographicNo = Integer.parseInt(request.getParameter("demographicNo"));
 		Integer episodeId = Integer.parseInt(request.getParameter("episodeId"));
-		Episode e = episodeDao.find(episodeId);
+		Episode episode = episodeDao.find(episodeId);
 		String notes = request.getParameter("notes");
-		if(e != null) {
-			e.setNotes(notes);
-			e.setStatus("Deleted");
-			e.setEndDate(new Date());
-			episodeDao.merge(e); 
+		if(episode != null) {
+			episode.setNotes(notes);
+			episode.setStatus(Episode.STATUS_DELETED);
+			episode.setEndDate(new Date());
+			episodeDao.merge(episode);
 			request.setAttribute("close", true);
 		} else {
 			request.setAttribute("error","There was an internal error. Please contact tech support.");
@@ -699,7 +699,7 @@ Repeat antibody screen
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		String providerNo=loggedInInfo.getLoggedInProviderNo();
 		
-		Episode e = null;
+		Episode episode = null;
 		//check for an existing pregnancy
 		List<String> codes = new ArrayList<String>();
 		codes.add(SnomedCore.CODE_NORMAL_PREGNANCY);
@@ -718,19 +718,21 @@ Repeat antibody screen
 			}
 			
 			//create pregnancy episode
-			e = new Episode();
-			e.setCode(SnomedCore.CODE_NORMAL_PREGNANCY);
-			e.setCodingSystem(Episode.CODE_SYSTEM_NAME_SNOMED_CORE);
-			e.setDemographicNo(demographicNo);
-			e.setDescription("");
-			e.setLastUpdateTime(new Date());
-			e.setLastUpdateUser(providerNo);
-			e.setStatus(Episode.STATUS_CURRENT);
-			e.setStartDate(new Date());
-			e.setDescription(mod.getDescription());
-			episodeDao.persist(e);						
-		} else {
-			e = existingEpisodes.get(0);
+			episode = new Episode();
+			episode.setCode(SnomedCore.CODE_NORMAL_PREGNANCY);
+			episode.setCodingSystem(Episode.CODE_SYSTEM_NAME_SNOMED_CORE);
+			episode.setDemographicNo(demographicNo);
+			episode.setDescription("");
+			episode.setLastUpdateTime(new Date());
+			episode.setLastUpdateUser(providerNo);
+			episode.setStatus(Episode.STATUS_CURRENT);
+			episode.setStartDate(new Date());
+			episode.setDescription(mod.getDescription());
+			episodeDao.persist(episode);
+		}
+		else
+		{
+			episode = existingEpisodes.get(0);
 		}
 	
 		EctFormData.PatientForm[] pforms = EctFormData.getPatientForms(String.valueOf(demographicNo), "formONAR");
@@ -758,7 +760,7 @@ Repeat antibody screen
 			request.setAttribute("message", "Error: Couldn't create new enhanced form");
 			return mapping.findForward("migrate");
 		}
-		newProps.setProperty("episodeId", String.valueOf(e.getId()));
+		newProps.setProperty("episodeId", String.valueOf(episode.getId()));
 		
 		for(Object key:p.keySet()) {
 			String val = p.getProperty((String)key);

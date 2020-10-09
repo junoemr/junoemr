@@ -40,6 +40,7 @@ public class Episode extends AbstractModel<Integer> {
 
 	public static final String STATUS_COMPLETE = "Complete";
 	public static final String STATUS_CURRENT = "Current";
+	public static final String STATUS_DELETED = "Deleted";
 
 	public static final String CODE_SYSTEM_NAME_SNOMED_CORE = "SnomedCore";
 
