@@ -377,7 +377,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{demographic_name} + "(" + $F{demographic_no} + ")"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{demographic_name} + " (" + $F{demographic_no} + ")"]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 				<reportElement key="textField" mode="Transparent" x="187" y="0" width="43" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
@@ -442,7 +442,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[String.valueOf($F{first_name}).substring(0,1) +  String.valueOf($F{last_name}).substring(0,1)+ "(provider_no:" + String.valueOf($F{provider_no}) + ")"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[String.valueOf($F{first_name}).substring(0,1) +  String.valueOf($F{last_name}).substring(0,1) + " (" + String.valueOf($F{provider_no}) + ")"]]></textFieldExpression>
 
 			</textField>
 		</band>
