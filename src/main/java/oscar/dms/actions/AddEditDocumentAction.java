@@ -33,7 +33,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
-import org.oscarehr.PMmodule.caisi_integrator.ConformanceTestHelper;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
@@ -41,8 +40,6 @@ import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.DocumentStorageDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.SecRoleDao;
-import org.oscarehr.common.io.FileFactory;
-import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.DocumentStorage;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.SecRole;
@@ -313,11 +310,6 @@ public class AddEditDocumentAction extends DispatchAction {
 				{
 					demoNo = moduleId;
 					document = documentService.uploadNewDemographicDocument(document, docFile.getInputStream(), demoNo);
-				}
-				GenericFile file = FileFactory.getDocumentFile(document.getDocfilename());
-
-				if(ConformanceTestHelper.enableConformanceOnlyTestFeatures){
-					storeDocumentInDatabase(file.getFileObject(), document.getDocumentNo());
 				}
 
 				Integer documentNo = document.getDocumentNo();
