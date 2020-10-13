@@ -69,7 +69,7 @@
 	}
     function onPrintStatureWeight(num) {
         //document.forms[0].submit.value="print";
-        var ret = checkAllDates();
+        var ret = isAllInputNumber();
         if(ret==true) {
             document.forms[0].action = "../form/formGrowth0_36Print.jsp?print=" + num + "&__title=GrowthCharts&__cfgfile=<%=bGirl?"growthGirlLength0_36Print":"growthBoyLength0_36Print"%>&__cfgGraphicFile=<%=bGirl?"growthGirlLength0_36Graphic":"growthBoyLength0_36Graphic"%>&__cfgGraphicFile=<%=bGirl?"growthGirlLength0_36Graphic2":"growthBoyLength0_36Graphic2"%>&__template=<%=bGirl?"growthGirlLength0_36":"growthBoyLength0_36"%>";
             document.forms[0].target="_blank";
@@ -78,7 +78,7 @@
     }
     function onPrintHeadCirc(num) {
         //document.forms[0].submit.value="print";
-        var ret = checkAllDates();
+        var ret = isAllInputNumber();
         if(ret==true) {
             document.forms[0].action = "../form/formGrowth0_36Print.jsp?print=" + num + "&__title=GrowthCharts&__cfgfile=<%=bGirl?"growthGirlHead0_36Print":"growthBoyHead0_36Print"%>&__cfgGraphicFile=<%=bGirl?"growthGirlHead0_36Graphic":"growthBoyHead0_36Graphic"%>&__cfgGraphicFile=<%=bGirl?"growthGirlHead0_36Graphic2":"growthBoyHead0_36Graphic2"%>&__template=<%=bGirl?"growthGirlHead0_36":"growthBoyHead0_36"%>";
             document.forms[0].target="_blank";
@@ -86,7 +86,7 @@
         return ret;
     }
     function onPrintStatureWeight1() {
-        var ret = checkAllDates();
+        var ret = isAllInputNumber();
         if(ret==true) {
             document.forms[0].action = "../form/formGrowthChartPrint.jsp?print=1&__title=GrowthCharts&__cfgfile=<%=bGirl?"growthChartGirlPrint":"growthChartBoyPrint"%>&__cfgGraphicFile=<%=bGirl?"growthChartGirlGraphic":"growthChartBoyGraphic"%>&__cfgGraphicFile=<%=bGirl?"growthChartGirlGraphic2":"growthChartBoyGraphic2"%>&__template=<%=bGirl?"growthChartGirlStatureWeight":"growthChartBoyStatureWeight"%>";
             document.forms[0].target="_blank";
@@ -94,7 +94,7 @@
         return ret;
     }
     function onPrintStatureWeight2() {
-        var ret = checkAllDates();
+        var ret = isAllInputNumber();
         if(ret==true) {
             document.forms[0].action = "../form/formGrowthChartPrint.jsp?print=2&__title=GrowthCharts&__cfgfile=<%=bGirl?"growthChartGirlPrint":"growthChartBoyPrint"%>&__cfgGraphicFile=<%=bGirl?"growthChartGirlGraphic":"growthChartBoyGraphic"%>&__cfgGraphicFile=<%=bGirl?"growthChartGirlGraphic2":"growthChartBoyGraphic2"%>&__template=<%=bGirl?"growthChartGirlStatureWeight":"growthChartBoyStatureWeight"%>";
             document.forms[0].target="_blank";
@@ -106,7 +106,7 @@
 
     function onSave() {
         document.forms[0].submit.value="save";
-        var ret = checkAllDates();
+        var ret = isAllInputNumber();
         if(ret==true) {
             reset();
             ret = confirm("Are you sure you want to save this form?");
@@ -116,7 +116,7 @@
     
     function onSaveExit() {
         //document.forms[0].submit.value="exit";
-        var ret = checkAllDates();
+        var ret = isAllInputNumber();
         if(ret == true) {
             reset();
             ret = confirm("Are you sure you wish to save and close this window?");
@@ -162,16 +162,30 @@
           alert ("You must type in a number in the field.");
         }
     }
-    function checkAllDates(){
-        var b = true;
-
-        for (var i =0; i <document.forms[0].elements.length; i++) {
-            if (document.forms[0].elements[i].name.indexOf("age_")>=0 || document.forms[0].elements[i].name.indexOf("stature_")>=0 || document.forms[0].elements[i].name.indexOf("bmi_")>=0) {
-               if(!isNumber(document.forms[0].elements[i]))
-                 b=false;
+    function isAllInputNumber()
+	{
+        var isValidNum = true;
+		var alertMSG = "";
+        for (var i = 0; i < document.forms[0].elements.length; i++)
+        {
+            if (document.forms[0].elements[i].name.indexOf("age_") >= 0 ||
+				document.forms[0].elements[i].name.indexOf("weight_") >= 0 ||
+				document.forms[0].elements[i].name.indexOf("length_") >= 0 ||
+				document.forms[0].elements[i].name.indexOf("headCirc_") >= 0)
+            {
+               if(isNaN(document.forms[0].elements[i].value))
+			   {
+				   alertMSG += "Invalid number " + document.forms[0].elements[i].value + "\n";
+				   isValidNum = false;
+			   }
     	    }
 	    }
-        return b;
+        if (!isValidNum)
+		{
+			alertMSG += "\n\nPlease enter number only.";
+			alert(alertMSG);
+		}
+        return isValidNum;
     }
 function wtEnglish2Metric(source) {
 	if(isNumber(source) ) {
