@@ -1707,7 +1707,7 @@ public class MSPReconcile {
 				"    p.provider_no," +
 				"    t.t_practitionerno," +
 				"    t.t_s00type," +
-				"    bm.service_date as 't_servicedate'," +
+				"    bm.service_date AS 't_servicedate'," +
 				"    t.t_payment," +
 				"    t.t_datacenter," +
 				"    b.demographic_name," +
@@ -1727,7 +1727,8 @@ public class MSPReconcile {
 				"    LEFT JOIN provider p ON p.provider_no = b.provider_no " +
 				"WHERE " +
 				"    t.s21_id = ? AND t.t_payeeno = ? " +
-				"ORDER BY p.first_name,t.t_servicedate,b.demographic_name";
+				" ORDER BY p.first_name, bm.servicedate, b.demographic_name";
+
 		ResultSet rs = null;
 
 		try {
