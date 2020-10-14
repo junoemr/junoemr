@@ -28,24 +28,27 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
+import org.oscarehr.integration.myhealthaccess.conversion.SessionInfoInboundDtoMHATelehealthSessionInfoConverter;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentAqsLinkTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentSearchTo1;
 import org.oscarehr.integration.myhealthaccess.dto.NotificationTo1;
+import org.oscarehr.integration.myhealthaccess.dto.SessionInfoInboundDto;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.BookingException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueException;
 import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
+import org.oscarehr.integration.myhealthaccess.model.MHATelehealthSessionInfo;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
-@Service
+@Service("myHealthAppointmentService")
 public class AppointmentService extends BaseService
 {
 	@Autowired
@@ -53,6 +56,9 @@ public class AppointmentService extends BaseService
 
 	@Autowired
 	OscarAppointmentDao oscarAppointmentDao;
+
+	@Autowired
+	SessionInfoInboundDtoMHATelehealthSessionInfoConverter sessionInfoConverter;
 
 	public void updateAppointmentCache(IntegrationData integrationData, AppointmentCacheTo1 appointmentTransfer)
 	{
@@ -209,6 +215,31 @@ public class AppointmentService extends BaseService
 					"] appointmentNo [" + appointmentNo + "]");
 		}
 	}
+
+	/**
+	 * get information about the MHA telehealth session
+	 * @param integration - integration to use when fetching the information
+	 * @param mhaAppointmentId - the appointment to get session information for.
+	 * @return telehealth session info
+	 */
+	public MHATelehealthSessionInfo getAppointmentSessionInformation(Integration integration, UUID mhaAppointmentId) throws IllegalAccessException, InstantiationException
+	{
+		String url = formatEndpoint("/clinic/%s/appointment/%s/session", integration.getRemoteId(), mhaAppointmentId);
+		return sessionInfoConverter.convert(get(url, integration.getApiKey(), SessionInfoInboundDto.class));
+	}
+
+	/**
+	 * get information about the MHA telehealth session
+	 * @param integration - integration to use when fetching the information
+	 * @param appointmentNo - the appointment no to get session information for.
+	 * @return telehealth session info
+	 */
+	public MHATelehealthSessionInfo getAppointmentSessionInformation(Integration integration, Integer appointmentNo) throws InstantiationException, IllegalAccessException
+	{
+		MHAAppointment mhaAppointment = getAppointment(integration, appointmentNo);
+		return getAppointmentSessionInformation(integration, UUID.fromString(mhaAppointment.getId()));
+	}
+
 
 	/**
 	 * link an MHA appointment with an AQS telehealth session

@@ -112,7 +112,6 @@ public class PatientDetailStatusService extends AbstractServiceImpl {
 		}
 		
 		//from oscar.properties
-		status.setConformanceFeaturesEnabled(oscarProperties.isPropertyActive("ENABLE_CONFORMANCE_ONLY_FEATURES"));
 		status.setWorkflowEnhance(oscarProperties.isPropertyActive("workflow_enhance"));
 		status.setBillregion(oscarProperties.getBillingType());
 		status.setDefaultView(oscarProperties.getProperty("default_view", ""));

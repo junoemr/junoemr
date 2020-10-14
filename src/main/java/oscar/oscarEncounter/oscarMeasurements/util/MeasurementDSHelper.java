@@ -37,7 +37,6 @@ import org.oscarehr.util.MiscUtils;
 import oscar.oscarDemographic.data.DemographicData;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
-import oscar.oscarEncounter.oscarMeasurements.pageUtil.MeasurementGraphAction2;
 
 /**
  *
@@ -122,22 +121,22 @@ public class MeasurementDSHelper {
         }
         return equal;
     }
-    
-    public double getDataAsDouble() {
-        log.debug("dataAsDouble");
-        double ret = -1;
 
-        double[] mdbDataFieldRange = MeasurementGraphAction2.getParameters(mdb.getDataField(), "");
-        if (mdbDataFieldRange == null || mdbDataFieldRange.length == 0)
+    /**
+     * This procedure is embedded into several XML/DRL files and is called whenever
+     * we attempt to validate a measurement falls within a particular range. In particular
+     * this happens for any measurements loaded via the Health Tracker.
+     */
+    public double getDataAsDouble()
+    {
+        Double mdbDataField = getMeasurementValue(mdb.getDataField());
+        if (mdbDataField == null)
         {
-            log.error("Error passing measurement value to chart. DataField is empty for ID: " + mdb.getId());
-            return ret;
+            return -1;
         }
 
-        ret = mdbDataFieldRange[0];
-        log.debug("DOUBLE val : "+ret);
-        return ret;
-    }       
+        return mdbDataField;
+    }
     
     public double getNumberFromSplit(String delimiter,int number){
         double ret = -1;
@@ -197,16 +196,34 @@ public class MeasurementDSHelper {
             return null;
         }
 
+        Double measurementValue = getMeasurementValue(measurement.getDataField());
+        if (measurementValue == null)
+        {
+            MiscUtils.getLogger().warn("Could not parse measurement of following type: '" + measurement.getType() + "'");
+        }
+
+        return measurementValue;
+    }
+
+    /**
+     * Given a string representing a measurement, attempt to treat the associated value as a Double.
+     * @param measurement Measurement string that presumably is a Double
+     * @return Double if it can be parsed, null otherwise
+     */
+    public static Double getMeasurementValue(String measurement)
+    {
+        if (measurement == null || measurement.isEmpty())
+        {
+            return null;
+        }
+
         try
         {
-            return Double.parseDouble(measurement.getDataField());
+            return Double.parseDouble(measurement);
         }
         catch (NumberFormatException ex)
         {
-            MiscUtils.getLogger().warn("Following measurement could not be parsed: '"
-                    + measurement.getType()
-                    + "' -> '"
-                    + measurement.getDataField() + "'");
+            MiscUtils.getLogger().warn("Following is being treated as a measurement: '" + measurement + "'");
             return null;
         }
     }
