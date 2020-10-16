@@ -631,7 +631,6 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
   	LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromSession(request);
   	AppointmentManager apptManager = SpringUtils.getBean(AppointmentManager.class);
   	Appointment appt = apptManager.getAppointment(info, bill.getAppointmentNo());
-  	String apptLocation = appt.getLocation();
   %>
   <tr bgcolor="#EEEEFF">
         <td></td>
@@ -640,9 +639,8 @@ document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
             <select id="site-select">
                 <option value="-1">Select Site</option>
                 <% for (Site site : sites) {
-                    boolean isSameFacilityNo = allFields.getProperty("facilityNo").equals(site.getBcFacilityNumber());
-                    boolean isSelected = isSameFacilityNo && apptLocation.equals(site.getName());
-                    boolean isDisabled = !siteIds.contains(site.getId());
+                    boolean isSelected = allFields.getProperty("facilityNo").equals(site.getBcFacilityNumber());
+                    boolean isDisabled = !isSelected && !siteIds.contains(site.getId());
                 %>
                 <option value="<%=site.getId()%>" <%=isSelected ? " selected" : ""%> <%=isDisabled ? " disabled" : ""%>><%=site.getName()%></option>
                 <% } %>
