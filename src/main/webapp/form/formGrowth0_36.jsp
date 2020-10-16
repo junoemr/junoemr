@@ -165,25 +165,22 @@
     function isAllInputNumber()
 	{
         var isValidNum = true;
-		var alertMSG = "";
-        for (var i = 0; i < document.forms[0].elements.length; i++)
-        {
-            if (document.forms[0].elements[i].name.indexOf("age_") >= 0 ||
-				document.forms[0].elements[i].name.indexOf("weight_") >= 0 ||
-				document.forms[0].elements[i].name.indexOf("length_") >= 0 ||
-				document.forms[0].elements[i].name.indexOf("headCirc_") >= 0)
-            {
-               if(isNaN(document.forms[0].elements[i].value))
-			   {
-				   alertMSG += "Invalid number " + document.forms[0].elements[i].value + "\n";
-				   isValidNum = false;
-			   }
-    	    }
-	    }
+		var number_class = document.forms[0].getElementsByClassName("number_input");
+		for (var i = 0; i < number_class.length; i++)
+		{
+			if(isNaN(number_class[i].value))
+			{
+		   		isValidNum = false;
+		   		number_class[i].style.backgroundColor = "red";
+			}
+			else
+			{
+				number_class[i].style.backgroundColor = "white";
+			}
+		}
         if (!isValidNum)
 		{
-			alertMSG += "\n\nPlease enter number only.";
-			alert(alertMSG);
+			alert("Please enter number only.");
 		}
         return isValidNum;
     }
@@ -415,18 +412,18 @@ function htEnglish2Metric(source) {
 						value="<%= props.getProperty("date_"+i, "") %>" @oscar.formDB
 						dbType="date" /> <img src="../images/cal.gif" id="date_<%=i%>_cal">
 					</td>
-					<td><input type="text" name="age_<%=i%>"
+					<td><input type="text" class="number_input" name="age_<%=i%>"
 						onDblClick="calcAge(this)" size="1" maxlength="5"
 						value="<%= props.getProperty("age_"+i, "") %>" @oscar.formDB /></td>
-					<td><input type="text" name="weight_<%=i%>"
+					<td><input type="text" class="number_input" name="weight_<%=i%>"
 						onDblClick="wtEnglish2Metric(this)" size="3" maxlength="6"
 						value="<%= props.getProperty("weight_"+i, "") %>" @oscar.formDB />
 					</td>
-					<td><input type="text" name="length_<%=i%>"
+					<td><input type="text" class="number_input" name="length_<%=i%>"
 						onDblClick="htEnglish2Metric(this)" size="3" maxlength="6"
 						value="<%= props.getProperty("length_"+i, "") %>" @oscar.formDB />
 					</td>
-					<td><input type="text" name="headCirc_<%=i%>"
+					<td><input type="text" class="number_input" name="headCirc_<%=i%>"
 						onDblClick="htEnglish2Metric(this)" size="3" maxlength="6"
 						value="<%= props.getProperty("headCirc_"+i, "") %>" @oscar.formDB />
 					</td>
@@ -475,18 +472,18 @@ function htEnglish2Metric(source) {
 						value="<%= props.getProperty("date_"+i, "") %>" @oscar.formDB
 						dbType="date" /> <img src="../images/cal.gif" id="date_<%=i%>_cal">
 					</td>
-					<td><input type="text" name="age_<%=i%>"
+					<td><input type="text"  class="number_input" name="age_<%=i%>"
 						onDblClick="calcAge(this)" size="1" maxlength="5"
 						value="<%= props.getProperty("age_"+i, "") %>" @oscar.formDB /></td>
-					<td><input type="text" name="weight_<%=i%>"
+					<td><input type="text"  class="number_input" name="weight_<%=i%>"
 						onDblClick="wtEnglish2Metric(this)" size="3" maxlength="6"
 						value="<%= props.getProperty("weight_"+i, "") %>" @oscar.formDB />
 					</td>
-					<td><input type="text" name="length_<%=i%>"
+					<td><input type="text"  class="number_input" name="length_<%=i%>"
 						onDblClick="htEnglish2Metric(this)" size="3" maxlength="6"
 						value="<%= props.getProperty("length_"+i, "") %>" @oscar.formDB />
 					</td>
-					<td><input type="text" name="headCirc_<%=i%>"
+					<td><input type="text"  class="number_input" name="headCirc_<%=i%>"
 						onDblClick="htEnglish2Metric(this)" size="3" maxlength="6"
 						value="<%= props.getProperty("headCirc_"+i, "") %>" @oscar.formDB />
 					</td>
