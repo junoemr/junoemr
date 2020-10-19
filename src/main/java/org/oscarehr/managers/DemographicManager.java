@@ -685,6 +685,25 @@ public class DemographicManager {
 		return demographicDao.searchByHealthCard(hin);
 	}
 
+	/**
+	 * Given a HIN and a demographic to compare against, see if any other demographics are using the same HIN.
+	 * @param loggedInInfo currently logged in user
+	 * @param hin HIN we want to check potential duplication for
+	 * @param demographicNo demographic to search for
+	 * @return false if a demographic outside of our given one has this HIN set, true otherwise
+	 */
+	public boolean isUniqueHealthCard(LoggedInInfo loggedInInfo, String hin, int demographicNo)
+	{
+		List<Demographic> potentialMatches = searchByHealthCard(loggedInInfo, hin);
+		if (potentialMatches != null)
+		{
+			return !(potentialMatches.size() > 1 ||
+					(potentialMatches.size() == 1 && !potentialMatches.get(0).getDemographicNo().equals(demographicNo)));
+		}
+
+		return true;
+	}
+
 	public Demographic getDemographicByNamePhoneEmail(LoggedInInfo loggedInInfo, String firstName, String lastName,
 			String hPhone, String wPhone, String email) {
 		if (loggedInInfo == null)
