@@ -73,6 +73,12 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
 	    controller.busyLoadingData = false;
 
+	    //console.log("hello...");
+	    //console.log(providerService);
+        console.log("Is this one? (should be true): " + providerService.isProviderAssignedToSite("999900", 1));
+
+	   // console.log("answer..."+providerService.isProviderAssignedToSite("999900", 1));
+
         personaService.getDashboardPreferences().then(
             function success(results)
             {

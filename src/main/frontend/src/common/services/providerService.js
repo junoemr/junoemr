@@ -26,16 +26,22 @@
 
  */
 
+import {SitesApi} from "../../../generated";
+
 angular.module("Common.Services").service("providerService", [
 	'$http',
 	'$q',
 	'junoHttp',
-	function($http, $q, junoHttp)
+	'$httpParamSerializer',
+	function($http, $q, junoHttp, $httpParamSerializer)
 	{
 
 		var service = {};
 
 		service.apiPath = '../ws/rs/providerService';
+
+		service.sitesApi = new SitesApi($http, $httpParamSerializer,
+			'../ws/rs');
 
 		service.getMe = function getMe()
 		{
@@ -121,7 +127,65 @@ angular.module("Common.Services").service("providerService", [
 			return deferred.promise;
 		};
 
+		service.getProviderSiteList = function getProviderSiteList(provNo)
+		{
+			var deferred = $q.defer();
+
+			service.sitesApi.getSitesByProvider(provNo).then(
+				function success(results)
+				{
+					deferred.resolve(results.data.body);
+				},
+				function error(errors)
+				{
+					console.log("error", errors);
+					deferred.reject("An error occurred...");
+				});
+			return deferred.promise;
+		};
+
 		service.isProviderAssignedToSite = function isProviderAssignedToSite(provNo, siteNo)
+		{
+			var assigned = false;
+			service.getProviderSiteList(provNo).then(
+				function success(data) {
+					for(var result in data)
+					{
+						console.log(data[result].siteId);
+						if (data[result].siteId === siteNo) assigned = true;
+					}
+				}
+			)
+			return assigned;
+		};
+
+		/*service.isProviderAssignedToSite = function isProviderAssignedToSite(provNo, siteNo)
+		{
+			let isAssigned = false; // myan
+			service.sitesApi.getSitesByProvider(provNo).then(
+				function success(results)
+				{
+					//console.log(results);
+					for (var result in results.data.body)
+					{
+						//console.log(results.data.body);
+						if (results.data.body[result].siteId === siteNo)
+						{
+							console.log("Site: " + results.data.body[result].siteId + "true");
+							isAssigned = true; // myan
+						}
+					}
+					console.log("Site: " + results.data.body[result].siteId + "false");
+					isAssigned = false; // myan
+				},
+				function error(errors)
+				{
+					console.log("providerService::isProviderAssignedToSite error", errors);
+				});
+			return isAssigned; // myan
+		};
+
+		/*service.isProviderAssignedToSite = function isProviderAssignedToSite(provNo, siteNo)
 		{
 			$http(
 				{
@@ -141,9 +205,9 @@ angular.module("Common.Services").service("providerService", [
 				},
 				function error(errors)
 				{
-					console.log("An error occurred while fetching the provider list");
+					console.log("providerService::isProviderAssignedToSite error", errors);
 				});
-		};
+		};*/
 
 		//TODO move to its own service
 		service.saveSettings = function saveSettings(providerNo, settings)
