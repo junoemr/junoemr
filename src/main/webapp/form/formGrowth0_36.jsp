@@ -180,7 +180,7 @@
 		}
         if (!isValidNum)
 		{
-			alert("Please enter number only.");
+			alert("Please correct these highlighted field, and enter number only.");
 		}
         return isValidNum;
     }
