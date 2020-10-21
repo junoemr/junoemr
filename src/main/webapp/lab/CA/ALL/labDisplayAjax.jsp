@@ -192,7 +192,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                          comment = "";
                      }
                  }
-                 var commentVal = prompt('Please enter a comment (max. 255 characters)', comment);
+                 var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
 
                  if (commentVal == null)
                  {
