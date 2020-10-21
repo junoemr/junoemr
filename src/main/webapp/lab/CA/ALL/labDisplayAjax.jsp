@@ -178,35 +178,42 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
      		}
      	%>
      	
-         getComment=function(labid, action) {
-            var ret = true;            
-            var text = "V" + <%=version%> + "commentText" + labid + $("providerNo").value;
-            
-            var commentVal = "";
-            
-            if( $(text) != null ) {
-            	commentVal = $(text).innerHTML;
-            	if( commentVal == null ) {
-            		commentVal = "";
-            	}
-            }
-            var commentID = "comment_" + labid;
-            
-            var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
-			
-            if( comment == null )
-                ret = false;
-            else if ( comment != null && comment.length > 0 ){
-                $(commentID).value = comment;
-            }
-            else {
-            	$(commentID).value = commentVal;
-            }
-            if(ret)
-                handleLab('acknowledgeForm_'+labid,labid,action);
+         getComment=function(segmentID, action)
+             {
+                 var ret = true;
+                 var comment = "";
 
-            return false;
-        }
+                 var text = "V" + <%=version%> + "commentText" + segmentID;
+		         if( $(text) != null)
+                 {
+                     comment = $(text).innerHTML;
+                     if (comment == null)
+                     {
+                         comment = "";
+                     }
+                 }
+                 var commentVal = prompt('Please enter a comment (max. 255 characters)', comment);
+
+                 if (commentVal == null)
+                 {
+                     ret = false;
+                 }
+                 else if (commentVal != null && commentVal.length > 0)
+                 {
+                     document.forms['acknowledgeForm_'+ segmentID].comment.value = commentVal;
+                 }
+                 else
+                 {
+                     document.forms['acknowledgeForm_'+ segmentID].comment.value = comment;
+                 }
+
+                 if (ret)
+                 {
+                     handleLab('acknowledgeForm_'+segmentID,segmentID, action);
+                 }
+
+                 return false;
+             }
 
          printPDF=function(doclabid){
             document.forms['acknowledgeForm_'+doclabid].action="../lab/CA/ALL/PrintPDF.do";
@@ -282,7 +289,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 				$(status).value = "N";
 			}
         	var data=$(formid).serialize(true);
-        	
+
         	var label = "V" + <%=version%> + "commentLabel" + labid + $F("providerNo");
         	var text = "V" + <%=version%> + "commentText" + labid + $("providerNo").value;
 			var commentID = "comment_" + labid;
