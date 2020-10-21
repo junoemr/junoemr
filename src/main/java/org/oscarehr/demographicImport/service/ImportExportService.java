@@ -57,10 +57,16 @@ public class ImportExportService
 //		// TODO persist the transient object structure
 	}
 
-	public void exportDemographic(Demographic junoTransientObject) throws IOException
+	public GenericFile exportDemographic(Demographic junoTransientObject) throws IOException
 	{
 //		// TODO load the transient object structure
 //		I formatObject = mapper.exportFromJuno(junoTransientObject);
 //		parser.write(formatObject);
+
+		CDSFileParser parser = new CDSFileParser();
+		CDSDemographicImportExportMapper mapper = new CDSDemographicImportExportMapper();
+
+		OmdCds exportStructure = mapper.exportFromJuno(junoTransientObject);
+		return parser.write(exportStructure);
 	}
 }

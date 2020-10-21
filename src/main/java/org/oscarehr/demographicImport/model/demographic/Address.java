@@ -23,9 +23,10 @@
 package org.oscarehr.demographicImport.model.demographic;
 
 import lombok.Data;
+import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
 @Data
-public class Address
+public class Address extends AbstractTransientModel
 {
 	public enum RESIDENCY_STATUS
 	{

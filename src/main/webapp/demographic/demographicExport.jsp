@@ -239,8 +239,9 @@ if (!userRole.toLowerCase().contains("admin")) { %>
 
 	<bean:message key="demographic.demographicexport.exporttemplate" /><br>
 	<html:select style="width: 189px" property="template">
-		<html:option value="<%=(new Integer(DemographicExportAction4.CMS4)).toString() %>">CMS Spec 4.0</html:option>
-		<html:option value="<%=(new Integer(DemographicExportAction4.E2E)).toString() %>">E2E</html:option>
+		<html:option value="<%= String.valueOf(DemographicExportAction4.CDS5_0) %>">CDS Spec 5.0</html:option>
+		<html:option value="<%= String.valueOf(DemographicExportAction4.CMS4) %>">CMS Spec 4.0</html:option>
+		<html:option value="<%= String.valueOf(DemographicExportAction4.E2E) %>">E2E</html:option>
 	</html:select>
 	   
 <br>

@@ -23,26 +23,22 @@
  */
 package oscar.oscarDemographic.pageUtil;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import cds.AlertsAndSpecialNeedsDocument.AlertsAndSpecialNeeds;
+import cds.AllergiesAndAdverseReactionsDocument.AllergiesAndAdverseReactions;
+import cds.AppointmentsDocument.Appointments;
+import cds.CareElementsDocument.CareElements;
+import cds.ClinicalNotesDocument.ClinicalNotes;
+import cds.DemographicsDocument.Demographics;
+import cds.FamilyHistoryDocument.FamilyHistory;
+import cds.ImmunizationsDocument.Immunizations;
+import cds.LaboratoryResultsDocument.LaboratoryResults;
+import cds.MedicationsAndTreatmentsDocument.MedicationsAndTreatments;
+import cds.OmdCdsDocument;
+import cds.PastHealthDocument.PastHealth;
+import cds.PatientRecordDocument.PatientRecord;
+import cds.ProblemListDocument.ProblemList;
+import cds.ReportsReceivedDocument.ReportsReceived;
+import cds.RiskFactorsDocument.RiskFactors;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -53,6 +49,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.xmlbeans.XmlOptions;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalDocument;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
@@ -60,12 +57,11 @@ import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.dao.DemographicContactDao;
-import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.PartialDateDao;
-import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.DemographicArchive;
 import org.oscarehr.common.model.DemographicContact;
@@ -73,6 +69,10 @@ import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
+import org.oscarehr.demographicImport.converter.DemographicModelToExportConverter;
+import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.e2e.director.E2ECreator;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentCommentDao;
@@ -90,23 +90,6 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WebUtils;
-
-import cds.AlertsAndSpecialNeedsDocument.AlertsAndSpecialNeeds;
-import cds.AllergiesAndAdverseReactionsDocument.AllergiesAndAdverseReactions;
-import cds.AppointmentsDocument.Appointments;
-import cds.CareElementsDocument.CareElements;
-import cds.ClinicalNotesDocument.ClinicalNotes;
-import cds.DemographicsDocument.Demographics;
-import cds.FamilyHistoryDocument.FamilyHistory;
-import cds.ImmunizationsDocument.Immunizations;
-import cds.LaboratoryResultsDocument.LaboratoryResults;
-import cds.MedicationsAndTreatmentsDocument.MedicationsAndTreatments;
-import cds.OmdCdsDocument;
-import cds.PastHealthDocument.PastHealth;
-import cds.PatientRecordDocument.PatientRecord;
-import cds.ProblemListDocument.ProblemList;
-import cds.ReportsReceivedDocument.ReportsReceived;
-import cds.RiskFactorsDocument.RiskFactors;
 import oscar.OscarProperties;
 import oscar.appt.ApptStatusData;
 import oscar.dms.EDoc;
@@ -130,6 +113,25 @@ import oscar.oscarRx.data.RxPrescriptionData;
 import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 import oscar.util.UtilDateUtilities;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -164,8 +166,9 @@ public class DemographicExportAction4 extends Action {
 	private static final String REPORTBINARY = "Binary";
 	private static final String REPORTTEXT = "Text";
 	private static final String RISKFACTOR = "Risk";
-	public static final int CMS4 = 0;
-	public static final int E2E = 1;
+	public static final int CDS5_0 = 0;
+	public static final int CMS4 = 1;
+	public static final int E2E = 2;
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
@@ -254,6 +257,26 @@ public class DemographicExportAction4 extends Action {
 		}
 
 		switch (template) {
+			case CDS5_0:
+			{
+				ImportExportService importExportService = SpringUtils.getBean(ImportExportService.class);
+				org.oscarehr.demographic.dao.DemographicDao demographicDao =
+						(org.oscarehr.demographic.dao.DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+				DemographicModelToExportConverter modelToExportConverter = SpringUtils.getBean(DemographicModelToExportConverter.class);
+				ArrayList<File> files = new ArrayList<>();
+
+				for (String demoNo : list)
+				{
+					Integer demographicId = Integer.parseInt(demoNo);
+					org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
+					org.oscarehr.demographicImport.model.demographic.Demographic exportDemographic = modelToExportConverter.convert(demographic);
+					GenericFile file = importExportService.exportDemographic(exportDemographic);
+					files.add(file.getFileObject());
+				}
+
+				exportPatientFilesZip(files);
+				ffwd = "success";
+			}
 			case CMS4 :
 				if (!Util.checkDir(tmpDir)) {
 					logger.debug("Error! Cannot write to TMP_DIR - Check oscar.properties or dir permissions.");
