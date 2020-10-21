@@ -24,7 +24,33 @@ package org.oscarehr.demographicImport.mapper;
 
 public abstract class AbstractImportExportMapper<I, E>
 {
+	/**
+	 * build the export structure from the provided import structure.
+	 * this method creates a new object to use as the export structure.
+	 * @param importStructure
+	 */
 	public abstract E importToJuno(I importStructure);
 
+	/**
+	 * build the export structure from the provided import structure.
+	 * this method modifies/appends to the provided export structure.
+	 * @param importStructure
+	 * @param exportStructure
+	 */
+	public abstract E importToJuno(I importStructure, E exportStructure);
+
+	/**
+	 * build the import structure from the provided export structure.
+	 * this method creates a new object to use as the import structure.
+	 * @param exportStructure
+	 */
 	public abstract I exportFromJuno(E exportStructure);
+
+	/**
+	 * build the import structure from the provided export structure.
+	 * this method modifies/appends to the provided import structure.
+	 * @param exportStructure
+	 * @param importStructure
+	 */
+	public abstract I exportFromJuno(E exportStructure, I importStructure);
 }

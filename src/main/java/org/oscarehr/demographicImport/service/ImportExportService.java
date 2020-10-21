@@ -22,9 +22,10 @@
  */
 package org.oscarehr.demographicImport.service;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.xml.cds.v5_0.CDSRootElement;
+import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.demographicImport.mapper.cds.CDSDemographicImportExportMapper;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
@@ -45,11 +46,11 @@ public class ImportExportService
 		CDSFileParser parser = new CDSFileParser();
 		CDSDemographicImportExportMapper mapper = new CDSDemographicImportExportMapper();
 
-		CDSRootElement elem = parser.parse(importFile);
-		logger.info(elem.toString());
+		OmdCds elem = parser.parse(importFile);
+		logger.info(ReflectionToStringBuilder.toString(elem));
 		Demographic junoImportObject = mapper.importToJuno(elem);
 
-		logger.info(junoImportObject.toString());
+		logger.info(ReflectionToStringBuilder.toString(junoImportObject));
 
 //		I parsedImportObject = parser.parse(importFile);
 //		E junoTransientObject = mapper.importToJuno(parsedImportObject);

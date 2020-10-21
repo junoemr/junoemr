@@ -26,6 +26,9 @@ package oscar.util;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
@@ -674,6 +677,12 @@ public class ConversionUtils {
 		return toZonedLocalDate(legacyDate);
 	}
 
+	public static LocalDate toNullableLocalDate(XMLGregorianCalendar xmlGregorianCalendar)
+	{
+		if(xmlGregorianCalendar == null) return null;
+		return toLocalDate(xmlGregorianCalendar);
+	}
+
 	public static LocalDate toLocalDate(String dateString)
 	{
 		return toLocalDate(dateString, DateTimeFormatter.ISO_DATE);
@@ -682,6 +691,15 @@ public class ConversionUtils {
 	public static LocalDate toLocalDate(String dateString, DateTimeFormatter dateTimeFormatter)
 	{
 		return LocalDate.parse(dateString, dateTimeFormatter);
+	}
+
+	public static LocalDate toLocalDate(XMLGregorianCalendar xmlGregorianCalendar)
+	{
+		// TODO raise custom non-nullable exception if null?
+		return LocalDate.of(
+				xmlGregorianCalendar.getYear(),
+				xmlGregorianCalendar.getMonth(),
+				xmlGregorianCalendar.getDay());
 	}
 
 	public static LocalDate toNullableZonedLocalDate(String dateString)
@@ -794,5 +812,17 @@ public class ConversionUtils {
 	public static java.sql.Timestamp toTimestamp(LocalDateTime dateTime)
 	{
 		return java.sql.Timestamp.from(dateTime.toInstant(TimeZone.getDefault().toZoneId().getRules().getOffset(dateTime)));
+	}
+
+	public static XMLGregorianCalendar toXmlGregorianCalendar(LocalDate localDate)
+	{
+		try
+		{
+			return DatatypeFactory.newInstance().newXMLGregorianCalendar(localDate.toString());
+		}
+		catch(DatatypeConfigurationException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 }

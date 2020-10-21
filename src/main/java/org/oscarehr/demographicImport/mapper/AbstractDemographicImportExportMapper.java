@@ -26,5 +26,10 @@ import org.oscarehr.demographicImport.model.demographic.Demographic;
 
 public abstract class AbstractDemographicImportExportMapper<I> extends AbstractImportExportMapper<I, Demographic>
 {
-
+	@Override
+	public Demographic importToJuno(I importStructure)
+	{
+		Demographic demographic = new Demographic();
+		return this.importToJuno(importStructure, demographic);
+	}
 }

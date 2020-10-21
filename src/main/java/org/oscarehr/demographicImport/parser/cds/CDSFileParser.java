@@ -25,7 +25,7 @@ package org.oscarehr.demographicImport.parser.cds;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
-import org.oscarehr.common.xml.cds.v5_0.CDSRootElement;
+import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.demographicImport.parser.AbstractFileParser;
 
 import javax.xml.bind.JAXBContext;
@@ -34,11 +34,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 
-public class CDSFileParser extends AbstractFileParser<CDSRootElement>
+public class CDSFileParser extends AbstractFileParser<OmdCds>
 {
 
 	@Override
-	public CDSRootElement parse(GenericFile genericFile) throws IOException
+	public OmdCds parse(GenericFile genericFile) throws IOException
 	{
 		if(!(genericFile instanceof XMLFile))
 		{
@@ -47,9 +47,9 @@ public class CDSFileParser extends AbstractFileParser<CDSRootElement>
 
 		try
 		{
-			JAXBContext jaxbContext = JAXBContext.newInstance(CDSRootElement.class);
+			JAXBContext jaxbContext = JAXBContext.newInstance(OmdCds.class);
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			return (CDSRootElement) jaxbUnmarshaller.unmarshal(genericFile.getFileObject());
+			return (OmdCds) jaxbUnmarshaller.unmarshal(genericFile.getFileObject());
 		}
 		catch (JAXBException e)
 		{
@@ -58,13 +58,13 @@ public class CDSFileParser extends AbstractFileParser<CDSRootElement>
 	}
 
 	@Override
-	public GenericFile write(CDSRootElement formatObject) throws IOException
+	public GenericFile write(OmdCds formatObject) throws IOException
 	{
 		GenericFile tempFile = FileFactory.createTempFile(".xml");
 
 		try
 		{
-			JAXBContext jaxbContext = JAXBContext.newInstance(CDSRootElement.class);
+			JAXBContext jaxbContext = JAXBContext.newInstance(OmdCds.class);
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
 			// output pretty printed

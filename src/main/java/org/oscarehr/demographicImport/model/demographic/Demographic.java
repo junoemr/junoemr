@@ -22,11 +22,69 @@
  */
 package org.oscarehr.demographicImport.model.demographic;
 
+import lombok.Data;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
 public class Demographic extends AbstractTransientModel
 {
+	private Integer demographicId;
+
+	// base info
+	private String firstName;
+	private String lastName;
+	private String title;
+	private LocalDate dateOfBirth;
+	private String sex;
+	private String healthNumber;
+	private String healthNumberVersion;
+	private String healthNumberProvinceCode;
+	private LocalDate healthNumberEffectiveDate;
+	private LocalDate healthNumberRenewDate;
+	private String chartNumber;
+	private String sin;
+	private String patientStatus;
+	private LocalDateTime patientStatusDateTime;
+	private LocalDate dateJoined;
+	private LocalDate dateEnded;
+
+	//contact info
+	private List<Address> addressList;
+	private String email;
+	private String homePhone;
+	private String workPhone;
+	private String cellPhone;
+
+	// physician info
+	private String mrpProviderId;
+	private String referralDoctorId;
+	private String familyDoctorId;
+
+	// roster info
+	private String rosterStatus;
+	private LocalDate rosterDate;
+	private LocalDate rosterTerminationDate;
+	private String rosterTerminationReason;
+
+	// other info
+	private String lastUpdateProviderId;
+	private LocalDateTime lastUpdateDateTime;
+
+	private String alias;
+	private String citizenship;
+	private String spokenLanguage;
+	private String officialLanguage;
+	private String countryOfOrigin;
+	private String newsletter;
+	private String nameOfMother;
+	private String nameOfFather;
+	private String veteranNumber;
+
 	@Override
 	public String toString()
 	{

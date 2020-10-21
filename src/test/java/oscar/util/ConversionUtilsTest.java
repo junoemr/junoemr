@@ -26,6 +26,9 @@ package oscar.util;
 import junit.framework.Assert;
 import org.junit.Test;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1064,6 +1067,17 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void toLocalDate_XmlGregorianCalendar_ExpectLocalDate() throws DatatypeConfigurationException
+	{
+		String dateString = "2019-04-30";
+		XMLGregorianCalendar xmlGregorianCalendar =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar(dateString);
+
+		LocalDate expectedDate = LocalDate.of(2019, 4, 30);
+		assertThat(expectedDate, is(ConversionUtils.toLocalDate(xmlGregorianCalendar)));
+	}
+
+	@Test
 	public void toZonedLocalDate_FixedDate_ExpectLocalDate()
 	{
 		LocalDate expectedLocalDate = LocalDate.of(2019, 4,30);
@@ -1274,5 +1288,14 @@ public class ConversionUtilsTest
 				Assert.fail(e.getMessage());
 			}
 		}
+	}
+
+	@Test
+	public void toXmlGregorianCalendar_LocalDate_ExpectXmlGregorianCalendar() throws DatatypeConfigurationException
+	{
+		XMLGregorianCalendar xmlGregorianCalendar =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2019-04-30");
+		LocalDate testDate = LocalDate.of(2019, 4, 30);
+		assertThat(xmlGregorianCalendar, is(ConversionUtils.toXmlGregorianCalendar(testDate)));
 	}
 }

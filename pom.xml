@@ -1516,6 +1516,9 @@
 						<exclude>src/main/webapp/library/bootstrap2-datepicker/**</exclude>
 						<exclude>src/main/webapp/library/ng-table/**</exclude>
 						<exclude>src/main/webapp/web/**</exclude>
+
+						<!-- omit generated models -->
+						<exclude>src/main/java/org/oscarehr/common/xml/cds/v5_0/model/**</exclude>
 					</excludes>
 					<strictCheck>true</strictCheck>
 				</configuration>

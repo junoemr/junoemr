@@ -22,8 +22,11 @@
  */
 package org.oscarehr.demographicImport.model;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
+@Data
 public abstract class AbstractTransientModel implements Serializable
 {
 }

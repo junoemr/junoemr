@@ -20,42 +20,24 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.common.xml.cds.v5_0.model;
+package org.oscarehr.demographicImport.model.demographic;
 
 import lombok.Data;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
-@XmlRootElement(namespace = "cds", name = "PatientRecord")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class PatientRecord implements Serializable
+public class Address
 {
-	@XmlElement(name = "Demographics")
-	protected Demographics demographics;
-
-	@XmlElement(name = "Appointments")
-	protected List<Appointments> appointments;
-
-	public List<Appointments> getAppointments()
+	public enum RESIDENCY_STATUS
 	{
-		if(this.appointments == null)
-		{
-			this.appointments = new ArrayList<>();
-		}
-		return this.appointments;
+		CURRENT,
+		PAST,
 	}
 
-	@Override
-	public String toString()
-	{
-		return new ReflectionToStringBuilder(this).toString();
-	}
+	private String addressLine1;
+	private String addressLine2;
+	private String city;
+	private String postalCode;
+	private String regionCode;
+	private String countryCode;
+	private RESIDENCY_STATUS residencyStatus;
 }
