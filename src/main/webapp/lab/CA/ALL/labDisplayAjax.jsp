@@ -178,7 +178,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
      		}
      	%>
      	
-         getComment=function(segmentID, action)
+         getComment = function(segmentID, action)
              {
                  var ret = true;
                  var comment = "";
@@ -192,7 +192,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                          comment = "";
                      }
                  }
-                 var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
+                 var commentVal = prompt('<bean:message key = "oscarMDS.segmentDisplay.msgComment"/>', comment);
 
                  if (commentVal == null)
                  {
@@ -200,16 +200,16 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                  }
                  else if (commentVal != null && commentVal.length > 0)
                  {
-                     document.forms['acknowledgeForm_'+ segmentID].comment.value = commentVal;
+                     document.forms['acknowledgeForm_' + segmentID].comment.value = commentVal;
                  }
                  else
                  {
-                     document.forms['acknowledgeForm_'+ segmentID].comment.value = comment;
+                     document.forms['acknowledgeForm_' + segmentID].comment.value = comment;
                  }
 
                  if (ret)
                  {
-                     handleLab('acknowledgeForm_'+segmentID,segmentID, action);
+                     handleLab('acknowledgeForm_' + segmentID, segmentID, action);
                  }
 
                  return false;
