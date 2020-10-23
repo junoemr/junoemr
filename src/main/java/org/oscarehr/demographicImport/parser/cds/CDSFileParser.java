@@ -23,10 +23,10 @@
 package org.oscarehr.demographicImport.parser.cds;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
+import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.demographicImport.parser.AbstractFileParser;
 
@@ -36,12 +36,10 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 
-public class CDSFileParser extends AbstractFileParser<PatientRecord>
+public class CDSFileParser extends AbstractFileParser<OmdCds>
 {
-	private static final Logger logger = Logger.getLogger(CDSFileParser.class);
-
 	@Override
-	public PatientRecord parse(GenericFile genericFile) throws IOException
+	public OmdCds parse(GenericFile genericFile) throws IOException
 	{
 		if(!(genericFile instanceof XMLFile))
 		{
@@ -52,7 +50,7 @@ public class CDSFileParser extends AbstractFileParser<PatientRecord>
 		{
 			JAXBContext jaxbContext = JAXBContext.newInstance(PatientRecord.class);
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			return (PatientRecord) jaxbUnmarshaller.unmarshal(genericFile.getFileObject());
+			return (OmdCds) jaxbUnmarshaller.unmarshal(genericFile.getFileObject());
 		}
 		catch (JAXBException e)
 		{
@@ -61,7 +59,7 @@ public class CDSFileParser extends AbstractFileParser<PatientRecord>
 	}
 
 	@Override
-	public GenericFile write(PatientRecord formatObject) throws IOException
+	public GenericFile write(OmdCds formatObject) throws IOException
 	{
 		GenericFile tempFile = FileFactory.createTempFile(".xml");
 
@@ -88,6 +86,8 @@ public class CDSFileParser extends AbstractFileParser<PatientRecord>
 
 	protected static class CDSNamespaceMapper extends NamespacePrefixMapper
 	{
+		public static final String NAMESPACE_CDS_URI = "cds";
+		public static final String NAMESPACE_CDS = "";
 		public static final String NAMESPACE_CDS_DATA_URI = "cds_dt";
 		public static final String NAMESPACE_CDS_DATA = "cdsd";
 
@@ -96,6 +96,7 @@ public class CDSFileParser extends AbstractFileParser<PatientRecord>
 		{
 			switch(namespaceUri)
 			{
+				case NAMESPACE_CDS_URI: return NAMESPACE_CDS;
 				case NAMESPACE_CDS_DATA_URI: return NAMESPACE_CDS_DATA;
 				default: return namespaceUri;
 			}

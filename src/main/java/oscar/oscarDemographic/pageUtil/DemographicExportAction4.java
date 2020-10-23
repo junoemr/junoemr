@@ -69,7 +69,6 @@ import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographicImport.converter.DemographicModelToExportConverter;
 import org.oscarehr.demographicImport.service.ImportExportService;

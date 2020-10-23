@@ -58,6 +58,13 @@ import static oscar.util.StringUtils.filterControlCharacters;
 @Table(name = "demographic")
 public class Demographic extends AbstractModel<Integer> implements Serializable
 {
+	public static final String GENDER_MALE = "M";
+	public static final String GENDER_FEMALE = "F";
+	public static final String GENDER_OTHER = "O";
+	public static final String GENDER_TRANSGENDER = "T";
+	public static final String GENDER_UNKNOWN = "U";
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "demographic_no")

@@ -22,9 +22,20 @@
  */
 package org.oscarehr.demographicImport.mapper.cds;
 
-import org.oscarehr.common.xml.cds.v5_0.model.LegalName;
+import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
+import org.oscarehr.common.xml.cds.v5_0.model.AddressType;
+import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
+import org.oscarehr.common.xml.cds.v5_0.model.Gender;
+import org.oscarehr.common.xml.cds.v5_0.model.HealthCard;
 import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
+import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
+import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePartTypeCode;
+import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePurposeCode;
+import org.oscarehr.common.xml.cds.v5_0.model.PersonNameStandard;
+import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber;
+import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
+import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
 import org.oscarehr.demographicImport.mapper.AbstractDemographicImportExportMapper;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
@@ -33,7 +44,12 @@ import oscar.util.ConversionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CDSDemographicImportExportMapper extends AbstractDemographicImportExportMapper<PatientRecord>
+import static org.oscarehr.demographic.model.Demographic.GENDER_FEMALE;
+import static org.oscarehr.demographic.model.Demographic.GENDER_MALE;
+import static org.oscarehr.demographic.model.Demographic.GENDER_OTHER;
+import static org.oscarehr.demographic.model.Demographic.GENDER_TRANSGENDER;
+
+public class CDSDemographicImportExportMapper extends AbstractDemographicImportExportMapper<OmdCds>
 {
 	protected final ObjectFactory objectFactory;
 
@@ -43,67 +59,69 @@ public class CDSDemographicImportExportMapper extends AbstractDemographicImportE
 	}
 
 	@Override
-	public Demographic importToJuno(PatientRecord importStructure, Demographic demographic)
+	public Demographic importToJuno(OmdCds importStructure, Demographic demographic)
 	{
-		fillImportDemographic(importStructure.getDemographics(), demographic);
+		fillImportDemographic(importStructure.getPatientRecord().getDemographics(), demographic);
 		return demographic;
 	}
 
 	@Override
-	public PatientRecord exportFromJuno(Demographic exportStructure)
+	public OmdCds exportFromJuno(Demographic exportStructure)
 	{
+		OmdCds omdCds = objectFactory.createOmdCds();
 		PatientRecord patientRecord = objectFactory.createPatientRecord();
-		return exportFromJuno(exportStructure, patientRecord);
+		omdCds.setPatientRecord(patientRecord);
+		return exportFromJuno(exportStructure, omdCds);
 	}
 
 	@Override
-	public PatientRecord exportFromJuno(Demographic exportStructure, PatientRecord importStructure)
+	public OmdCds exportFromJuno(Demographic exportStructure, OmdCds importStructure)
 	{
-		PatientRecord.Demographics demographics = importStructure.getDemographics();
+		Demographics demographics = importStructure.getPatientRecord().getDemographics();
 		if (demographics == null)
 		{
-			demographics = objectFactory.createPatientRecordDemographics();
+			demographics = objectFactory.createDemographics();
 		}
 		fillExportDemographic(exportStructure, demographics);
-		importStructure.setDemographics(demographics);
+		importStructure.getPatientRecord().setDemographics(demographics);
 		return importStructure;
 	}
 
-	protected void fillExportDemographic(Demographic exportStructure, PatientRecord.Demographics demographics)
+	protected void fillExportDemographic(Demographic exportStructure, Demographics demographics)
 	{
 		demographics.setNames(getExportNames(exportStructure));
 		demographics.setDateOfBirth(ConversionUtils.toXmlGregorianCalendar(exportStructure.getDateOfBirth()));
-		demographics.setGender(exportStructure.getSex());
+		demographics.setGender(getExportGender(exportStructure));
 		demographics.getAddress().addAll(getExportAddresses(exportStructure));
 		demographics.setEmail(exportStructure.getEmail());
 		demographics.setHealthCard(getExportHealthCard(exportStructure));
 		demographics.getPhoneNumber().addAll(getExportPhones(exportStructure));
 	}
 
-	protected void fillImportDemographic(PatientRecord.Demographics importStructure, Demographic demographic)
+	protected void fillImportDemographic(Demographics importStructure, Demographic demographic)
 	{
 		demographic.setFirstName(importStructure.getNames().getLegalName().getFirstName().getPart());
 		demographic.setLastName(importStructure.getNames().getLegalName().getLastName().getPart());
 		demographic.setDateOfBirth(ConversionUtils.toLocalDate(importStructure.getDateOfBirth()));
-		demographic.setSex(importStructure.getGender());
+		demographic.setSex(importStructure.getGender().toString());
 		demographic.setEmail(importStructure.getEmail());
 	}
 
-	protected PatientRecord.Demographics.Names getExportNames(Demographic exportStructure)
+	protected PersonNameStandard getExportNames(Demographic exportStructure)
 	{
-		PatientRecord.Demographics.Names names = objectFactory.createPatientRecordDemographicsNames();
-		LegalName legalName = objectFactory.createLegalName();
-		legalName.setNamePurpose("L"); //TODO lookup value
+		PersonNameStandard names = objectFactory.createPersonNameStandard();
+		PersonNameStandard.LegalName legalName = objectFactory.createPersonNameStandardLegalName();
+		legalName.setNamePurpose(PersonNamePurposeCode.L);
 
 		// first name
-		LegalName.FirstName firstName = objectFactory.createLegalNameFirstName();
+		PersonNameStandard.LegalName.FirstName firstName = objectFactory.createPersonNameStandardLegalNameFirstName();
 		firstName.setPart(exportStructure.getFirstName());
-		firstName.setPartType("GIV"); //TODO lookup CDS code
+		firstName.setPartType(PersonNamePartTypeCode.GIV);
 
 		// last name
-		LegalName.LastName lastName = objectFactory.createLegalNameLastName();
+		PersonNameStandard.LegalName.LastName lastName = objectFactory.createPersonNameStandardLegalNameLastName();
 		lastName.setPart(exportStructure.getLastName());
-		lastName.setPartType("FAMC"); //TODO lookup CDS code
+		lastName.setPartType(PersonNamePartTypeCode.FAMC);
 
 		legalName.setFirstName(firstName);
 		legalName.setLastName(lastName);
@@ -112,68 +130,86 @@ public class CDSDemographicImportExportMapper extends AbstractDemographicImportE
 		return names;
 	}
 
-	protected PatientRecord.Demographics.HealthCard getExportHealthCard(Demographic exportStructure)
+	protected Gender getExportGender(Demographic exportStructure)
 	{
-		PatientRecord.Demographics.HealthCard healthCard = objectFactory.createPatientRecordDemographicsHealthCard();
+		String sex = exportStructure.getSex();
+		switch(sex)
+		{
+			case GENDER_MALE: return Gender.M;
+			case GENDER_FEMALE: return Gender.F;
+			case GENDER_TRANSGENDER:
+			case GENDER_OTHER: return Gender.O;
+			default: return Gender.U;
+		}
+	}
+
+	protected HealthCard getExportHealthCard(Demographic exportStructure)
+	{
+		HealthCard healthCard = objectFactory.createHealthCard();
 		healthCard.setNumber(exportStructure.getHealthNumber());
 		healthCard.setVersion(exportStructure.getHealthNumberVersion());
-		healthCard.setExpiryDate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getHealthNumberRenewDate()));
+		healthCard.setExpirydate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getHealthNumberRenewDate()));
 		healthCard.setProvinceCode(exportStructure.getHealthNumberProvinceCode());
 
 		return healthCard;
 	}
 
-	protected List<PatientRecord.Demographics.Address> getExportAddresses(Demographic exportStructure)
+	protected List<org.oscarehr.common.xml.cds.v5_0.model.Address> getExportAddresses(Demographic exportStructure)
 	{
 		List<Address> addressList = exportStructure.getAddressList();
-		List<PatientRecord.Demographics.Address> exportAddressList = new ArrayList<>(addressList.size());
+		List<org.oscarehr.common.xml.cds.v5_0.model.Address> exportAddressList = new ArrayList<>(addressList.size());
 
 		for(Address address : addressList)
 		{
-			PatientRecord.Demographics.Address cdsAddress = objectFactory.createPatientRecordDemographicsAddress();
-			org.oscarehr.common.xml.cds.v5_0.model.Structured cdsAddressData = objectFactory.createStructured();
-			cdsAddressData.setLine1(address.getAddressLine1());
-			cdsAddressData.setLine2(address.getAddressLine2());
-			cdsAddressData.setCity(address.getCity());
-			cdsAddressData.setCountrySubDivisionCode(address.getRegionCode());
-			cdsAddressData.setPostalZipCode(address.getPostalCode());
+			org.oscarehr.common.xml.cds.v5_0.model.Address cdsAddress = objectFactory.createAddress();
+			AddressStructured structured = objectFactory.createAddressStructured();
+			PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
+			postalZipCode.setPostalCode(address.getPostalCode());
 
-			cdsAddress.setStructured(cdsAddressData);
-			cdsAddress.setAddressType("R"); //TODO load from Table CT-011: Address Type
+			structured.setLine1(address.getAddressLine1());
+			structured.setLine2(address.getAddressLine2());
+			structured.setCity(address.getCity());
+			structured.setCountrySubdivisionCode(address.getRegionCode());
+			structured.setPostalZipCode(postalZipCode);
+
+			cdsAddress.setStructured(structured);
+			cdsAddress.setAddressType(AddressType.R);
 			exportAddressList.add(cdsAddress);
 		}
 		return exportAddressList;
 	}
 
-	protected List<PatientRecord.Demographics.PhoneNumber> getExportPhones(Demographic exportStructure)
+	protected List<PhoneNumber> getExportPhones(Demographic exportStructure)
 	{
-		List<PatientRecord.Demographics.PhoneNumber> exportPhoneList = new ArrayList<>(3);
+		List<PhoneNumber> exportPhoneList = new ArrayList<>(3);
 
-		PatientRecord.Demographics.PhoneNumber homePhone = objectFactory.createPatientRecordDemographicsPhoneNumber();
-		homePhone.setPhoneNumber(exportStructure.getHomePhone());
-		homePhone.setPhoneNumberType("R"); //TODO lookup CDS code
-
-		PatientRecord.Demographics.PhoneNumber workPhone = objectFactory.createPatientRecordDemographicsPhoneNumber();
-		workPhone.setPhoneNumber(exportStructure.getWorkPhone());
-		workPhone.setPhoneNumberType("W"); //TODO lookup CDS code
-
-		PatientRecord.Demographics.PhoneNumber cellPhone = objectFactory.createPatientRecordDemographicsPhoneNumber();
-		cellPhone.setPhoneNumber(exportStructure.getCellPhone());
-		cellPhone.setPhoneNumberType("C"); //TODO lookup CDS code
-
-		if(homePhone.getPhoneNumber() != null)
+		String homePhone = exportStructure.getHomePhone();
+		String workPhone = exportStructure.getHomePhone();
+		String cellPhone = exportStructure.getHomePhone();
+		if(homePhone != null)
 		{
-			exportPhoneList.add(homePhone);
+			exportPhoneList.add(getExportPhone(PhoneNumberType.R, homePhone, null));
 		}
-		if(workPhone.getPhoneNumber() != null)
+		if(workPhone != null)
 		{
-			exportPhoneList.add(workPhone);
+			exportPhoneList.add(getExportPhone(PhoneNumberType.W, workPhone, null));
 		}
-		if(cellPhone.getPhoneNumber() != null)
+		if(cellPhone != null)
 		{
-			exportPhoneList.add(cellPhone);
+			exportPhoneList.add(getExportPhone(PhoneNumberType.C, cellPhone, null));
 		}
-
 		return exportPhoneList;
+	}
+
+	protected PhoneNumber getExportPhone(PhoneNumberType type, String number, String extension)
+	{
+		PhoneNumber phone = objectFactory.createPhoneNumber();
+		phone.getContent().add(objectFactory.createPhoneNumberNumber(number));
+		if(extension != null)
+		{
+			phone.getContent().add(objectFactory.createPhoneNumberExtension(number));
+		}
+		phone.setPhoneNumberType(type);
+		return phone;
 	}
 }
