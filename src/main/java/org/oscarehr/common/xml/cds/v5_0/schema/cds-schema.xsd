@@ -4,112 +4,234 @@ xjc -d src/main/java -p org.oscarehr.common.xml.cds.v5_0.model src/main/java/org
 xjc lives next to the java binary in your jdk -->
 
 <!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com) -->
-<xs:schema xmlns:cds="cds" xmlns:cdsd="cds_dt" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="cds" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:cds="cds" xmlns:cdsd="cds_dt" attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="cdsd-schema.xsd" namespace="cds_dt" />
-  <xs:element name="OmdCds">
+  <xs:element name="PatientRecord">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="PatientRecord">
+        <xs:element name="Demographics">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="Demographics">
+              <xs:element name="Names">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="Names">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element ref="cdsd:LegalName" />
-                        </xs:sequence>
-                      </xs:complexType>
-                    </xs:element>
-                    <xs:element name="DateOfBirth" type="xs:date" />
-                    <xs:element name="HealthCard">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element ref="cdsd:Number" />
-                          <xs:element ref="cdsd:ProvinceCode" />
-                        </xs:sequence>
-                      </xs:complexType>
-                    </xs:element>
-                    <xs:element name="Gender" type="xs:string" />
-                    <xs:element name="UniqueVendorIdSequence" type="xs:unsignedByte" />
-                    <xs:element maxOccurs="unbounded" name="PhoneNumber">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element ref="cdsd:phoneNumber" />
-                        </xs:sequence>
-                        <xs:attribute name="phoneNumberType" type="xs:string" use="required" />
-                      </xs:complexType>
-                    </xs:element>
-                    <xs:element name="Enrolment">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element name="EnrollmentStatus" type="xs:unsignedByte" />
-                        </xs:sequence>
-                      </xs:complexType>
-                    </xs:element>
-                    <xs:element name="PrimaryPhysician">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element name="OHIPPhysicianId" />
-                          <xs:element name="Name">
-                            <xs:complexType>
-                              <xs:sequence>
-                                <xs:element ref="cdsd:FirstName" />
-                                <xs:element ref="cdsd:LastName" />
-                              </xs:sequence>
-                            </xs:complexType>
-                          </xs:element>
-                        </xs:sequence>
-                      </xs:complexType>
-                    </xs:element>
-                    <xs:element name="Email" type="xs:string" />
-                    <xs:element name="PersonStatusCode">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element name="PersonStatusAsEnum" type="xs:string" />
-                        </xs:sequence>
-                      </xs:complexType>
-                    </xs:element>
-                    <xs:element name="PersonStatusDate" type="xs:date" />
+                    <xs:element ref="cdsd:LegalName" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
-              <xs:element maxOccurs="unbounded" name="Appointments">
+              <xs:element name="DateOfBirth" type="xs:date" />
+              <xs:element name="HealthCard" minOccurs="0">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:choice maxOccurs="unbounded">
-                      <xs:element name="AppointmentTime" type="xs:time" />
-                      <xs:element name="Duration" type="xs:unsignedByte" />
-                      <xs:element name="AppointmentStatus" type="xs:string" />
-                      <xs:element name="AppointmentDate">
-                        <xs:complexType>
-                          <xs:sequence>
-                            <xs:element ref="cdsd:FullDate" />
-                          </xs:sequence>
-                        </xs:complexType>
-                      </xs:element>
-                      <xs:element name="Provider">
-                        <xs:complexType>
-                          <xs:sequence>
-                            <xs:element name="OHIPPhysicianId" />
-                            <xs:element name="Name">
-                              <xs:complexType>
-                                <xs:sequence>
-                                  <xs:element ref="cdsd:FirstName" />
-                                  <xs:element ref="cdsd:LastName" />
-                                </xs:sequence>
-                              </xs:complexType>
-                            </xs:element>
-                          </xs:sequence>
-                        </xs:complexType>
-                      </xs:element>
-                      <xs:element name="AppointmentNotes" type="xs:string" />
-                      <xs:element name="AppointmentPurpose" type="xs:string" />
-                    </xs:choice>
+                    <xs:element ref="cdsd:Number" />
+                    <xs:element ref="cdsd:Version" />
+                    <xs:element ref="cdsd:ExpiryDate" />
+                    <xs:element ref="cdsd:ProvinceCode" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
+              <xs:element name="ChartNumber" type="xs:string" minOccurs="0"/>
+              <xs:element name="Gender" type="xs:string" />
+              <xs:element name="UniqueVendorIdSequence" type="xs:unsignedByte" />
+              <xs:element name="Address" maxOccurs="unbounded" >
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="cdsd:Structured" />
+                  </xs:sequence>
+                  <xs:attribute name="AddressType" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="PhoneNumber" maxOccurs="unbounded" >
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="cdsd:phoneNumber" />
+                  </xs:sequence>
+                  <xs:attribute name="phoneNumberType" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="PreferredOfficialLanguage" type="xs:string" minOccurs="0"/>
+              <xs:element name="PreferredSpokenLanguage" type="xs:string" minOccurs="0"/>
+              <xs:element name="Contact" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="ContactPurpose" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:choice>
+                          <xs:element ref="cdsd:PurposeAsEnum"/>
+                          <xs:element ref="cdsd:PurposeAsPlainText"/>
+                        </xs:choice>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Name">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element ref="cdsd:FirstName" minOccurs="0"/>
+                          <xs:element ref="cdsd:MiddleName" minOccurs="0"/>
+                          <xs:element ref="cdsd:LastName" minOccurs="0"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="PhoneNumber" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element ref="cdsd:phoneNumber" minOccurs="0"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="EmailAddress" type="xs:string" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Enrolment">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="EnrollmentStatus" type="xs:unsignedByte" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="PrimaryPhysician">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="OHIPPhysicianId" />
+                    <xs:element name="Name">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element ref="cdsd:FirstName" />
+                          <xs:element ref="cdsd:LastName" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Email" type="xs:string" />
+              <xs:element name="PersonStatusCode">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="PersonStatusAsEnum" type="xs:string" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="PersonStatusDate" type="xs:date" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="PersonalHistory" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="FamilyHistory" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="PastHealth" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ProblemList" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="RiskFactors" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="AllergiesAndAdverseReactions" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="MedicationsAndTreatments" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Immunizations" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="LaboratoryResults" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Appointments" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:choice maxOccurs="unbounded">
+                <xs:element name="AppointmentTime" type="xs:time" />
+                <xs:element name="Duration" type="xs:unsignedByte" />
+                <xs:element name="AppointmentStatus" type="xs:string" />
+                <xs:element name="AppointmentDate">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element ref="cdsd:FullDate" />
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="Provider">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="OHIPPhysicianId" />
+                      <xs:element name="Name">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element ref="cdsd:FirstName" />
+                            <xs:element ref="cdsd:LastName" />
+                          </xs:sequence>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="AppointmentNotes" type="xs:string" />
+                <xs:element name="AppointmentPurpose" type="xs:string" />
+              </xs:choice>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ClinicalNotes" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Reports" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="CareElements" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="AlertsAndSpecialNeeds" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="NewCategory" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
             </xs:sequence>
           </xs:complexType>
         </xs:element>

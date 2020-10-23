@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographicImport.model.demographic.Address;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -44,6 +45,15 @@ public class DemographicModelToExportConverter extends
 		exportDemographic.setHealthNumberProvinceCode(input.getHcType());
 		exportDemographic.setDateJoined(ConversionUtils.toNullableLocalDate(input.getDateJoined()));
 		exportDemographic.setDateEnded(ConversionUtils.toNullableLocalDate(input.getEndDate()));
+
+		Address address = new Address();
+		address.setAddressLine1(input.getAddress());
+		address.setCity(input.getCity());
+		address.setRegionCode(input.getProvince());
+		address.setCountryCode("CA"); //TODO do we even store this with demographics in juno
+		address.setPostalCode(input.getPostal());
+		address.setResidencyStatusCurrent();
+		exportDemographic.addAddress(address);
 
 		return exportDemographic;
 	}

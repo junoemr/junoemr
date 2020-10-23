@@ -25,7 +25,7 @@ package org.oscarehr.demographicImport.service;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
+import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.demographicImport.mapper.cds.CDSDemographicImportExportMapper;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
@@ -46,7 +46,7 @@ public class ImportExportService
 		CDSFileParser parser = new CDSFileParser();
 		CDSDemographicImportExportMapper mapper = new CDSDemographicImportExportMapper();
 
-		OmdCds elem = parser.parse(importFile);
+		PatientRecord elem = parser.parse(importFile);
 		logger.info(ReflectionToStringBuilder.toString(elem));
 		Demographic junoImportObject = mapper.importToJuno(elem);
 
@@ -66,7 +66,7 @@ public class ImportExportService
 		CDSFileParser parser = new CDSFileParser();
 		CDSDemographicImportExportMapper mapper = new CDSDemographicImportExportMapper();
 
-		OmdCds exportStructure = mapper.exportFromJuno(junoTransientObject);
+		PatientRecord exportStructure = mapper.exportFromJuno(junoTransientObject);
 		return parser.write(exportStructure);
 	}
 }

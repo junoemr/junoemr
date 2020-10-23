@@ -40,5 +40,14 @@ public class Address extends AbstractTransientModel
 	private String postalCode;
 	private String regionCode;
 	private String countryCode;
-	private RESIDENCY_STATUS residencyStatus;
+	private RESIDENCY_STATUS residencyStatus = RESIDENCY_STATUS.CURRENT;
+
+	public void setResidencyStatusCurrent()
+	{
+		this.setResidencyStatus(RESIDENCY_STATUS.CURRENT);
+	}
+	public void setResidencyStatusPast()
+	{
+		this.setResidencyStatus(RESIDENCY_STATUS.PAST);
+	}
 }

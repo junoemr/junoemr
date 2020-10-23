@@ -22,10 +22,12 @@
  */
 package org.oscarehr.demographicImport.parser.cds;
 
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
+import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.demographicImport.parser.AbstractFileParser;
 
 import javax.xml.bind.JAXBContext;
@@ -34,11 +36,12 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 
-public class CDSFileParser extends AbstractFileParser<OmdCds>
+public class CDSFileParser extends AbstractFileParser<PatientRecord>
 {
+	private static final Logger logger = Logger.getLogger(CDSFileParser.class);
 
 	@Override
-	public OmdCds parse(GenericFile genericFile) throws IOException
+	public PatientRecord parse(GenericFile genericFile) throws IOException
 	{
 		if(!(genericFile instanceof XMLFile))
 		{
@@ -47,9 +50,9 @@ public class CDSFileParser extends AbstractFileParser<OmdCds>
 
 		try
 		{
-			JAXBContext jaxbContext = JAXBContext.newInstance(OmdCds.class);
+			JAXBContext jaxbContext = JAXBContext.newInstance(PatientRecord.class);
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			return (OmdCds) jaxbUnmarshaller.unmarshal(genericFile.getFileObject());
+			return (PatientRecord) jaxbUnmarshaller.unmarshal(genericFile.getFileObject());
 		}
 		catch (JAXBException e)
 		{
@@ -58,18 +61,21 @@ public class CDSFileParser extends AbstractFileParser<OmdCds>
 	}
 
 	@Override
-	public GenericFile write(OmdCds formatObject) throws IOException
+	public GenericFile write(PatientRecord formatObject) throws IOException
 	{
 		GenericFile tempFile = FileFactory.createTempFile(".xml");
 
 		try
 		{
-			JAXBContext jaxbContext = JAXBContext.newInstance(OmdCds.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+			JAXBContext jaxbContext = JAXBContext.newInstance(PatientRecord.class);
+			Marshaller marshaller = jaxbContext.createMarshaller();
 
 			// output pretty printed
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			jaxbMarshaller.marshal(formatObject, tempFile.getFileObject());
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			// set correct namespaces
+			marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new CDSNamespaceMapper());
+			// write to file
+			marshaller.marshal(formatObject, tempFile.getFileObject());
 		}
 		catch(JAXBException e)
 		{
@@ -78,5 +84,21 @@ public class CDSFileParser extends AbstractFileParser<OmdCds>
 		}
 
 		return tempFile;
+	}
+
+	protected static class CDSNamespaceMapper extends NamespacePrefixMapper
+	{
+		public static final String NAMESPACE_CDS_DATA_URI = "cds_dt";
+		public static final String NAMESPACE_CDS_DATA = "cdsd";
+
+		@Override
+		public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix)
+		{
+			switch(namespaceUri)
+			{
+				case NAMESPACE_CDS_DATA_URI: return NAMESPACE_CDS_DATA;
+				default: return namespaceUri;
+			}
+		}
 	}
 }

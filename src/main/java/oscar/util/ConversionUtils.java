@@ -814,6 +814,12 @@ public class ConversionUtils {
 		return java.sql.Timestamp.from(dateTime.toInstant(TimeZone.getDefault().toZoneId().getRules().getOffset(dateTime)));
 	}
 
+	public static XMLGregorianCalendar toNullableXmlGregorianCalendar(LocalDate localDate)
+	{
+		if(localDate == null) return null;
+		return toXmlGregorianCalendar(localDate);
+	}
+
 	public static XMLGregorianCalendar toXmlGregorianCalendar(LocalDate localDate)
 	{
 		try

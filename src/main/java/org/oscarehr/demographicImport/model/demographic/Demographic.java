@@ -28,6 +28,7 @@ import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -84,6 +85,15 @@ public class Demographic extends AbstractTransientModel
 	private String nameOfMother;
 	private String nameOfFather;
 	private String veteranNumber;
+
+	public void addAddress(Address address)
+	{
+		if(this.addressList == null)
+		{
+			this.addressList = new ArrayList<>();
+		}
+		this.addressList.add(address);
+	}
 
 	@Override
 	public String toString()
