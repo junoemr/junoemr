@@ -540,7 +540,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			var timeStr = "08:00";
 			var preference = controller.providerSettings.startHour;
 			if (Juno.Common.Util.exists(preference) && Juno.Common.Util.isIntegerString(preference)
-				&& Number(preference) > 0 && Number(preference) < 24)
+				&& Number(preference) >= 0 && Number(preference) < 24)
 			{
 				timeStr = Juno.Common.Util.pad0(preference) + ":00";
 			}
@@ -552,9 +552,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			var timeStr = "20:00";
 			var preference = controller.providerSettings.endHour;
 			if (Juno.Common.Util.exists(preference) && Juno.Common.Util.isIntegerString(preference)
-				&& Number(preference) > 0 && Number(preference) < 24)
+				&& Number(preference) >= 0 && Number(preference) < 24)
 			{
-				timeStr = Juno.Common.Util.pad0(preference) + ":00";
+				timeStr = Juno.Common.Util.pad0(preference) + ":59";
 			}
 			return timeStr;
 		};
