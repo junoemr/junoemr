@@ -1727,7 +1727,7 @@ public class MSPReconcile {
 				"    LEFT JOIN provider p ON p.provider_no = b.provider_no " +
 				"WHERE " +
 				"    t.s21_id = ? AND t.t_payeeno = ? " +
-				" ORDER BY p.first_name, bm.servicedate, b.demographic_name";
+				" ORDER BY p.first_name, bm.service_date, b.demographic_name";
 
 		ResultSet rs = null;
 
