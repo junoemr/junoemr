@@ -25,7 +25,9 @@ package org.oscarehr.demographicImport.service;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
+import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographicImport.converter.DemographicModelToExportConverter;
 import org.oscarehr.demographicImport.mapper.cds.CDSDemographicImportExportMapper;
@@ -57,7 +59,7 @@ public class ImportExportService
 
 		OmdCds elem = parser.parse(importFile);
 		logger.info(ReflectionToStringBuilder.toString(elem));
-		Demographic junoImportObject = mapper.importToJuno(elem);
+		Demographic junoImportObject = mapper.importToJuno(elem.getPatientRecord().getDemographics());
 
 		logger.info(ReflectionToStringBuilder.toString(junoImportObject));
 
@@ -75,8 +77,13 @@ public class ImportExportService
 		CDSFileParser parser = new CDSFileParser();
 		CDSDemographicImportExportMapper mapper = new CDSDemographicImportExportMapper();
 
-		OmdCds exportStructure = mapper.exportFromJuno(junoTransientObject);
-		return parser.write(exportStructure);
+		ObjectFactory objectFactory = mapper.getObjectFactory();
+		OmdCds omdCds = objectFactory.createOmdCds();
+		PatientRecord patientRecord = objectFactory.createPatientRecord();
+		patientRecord.setDemographics(mapper.exportFromJuno(junoTransientObject));
+		omdCds.setPatientRecord(patientRecord);
+
+		return parser.write(omdCds);
 	}
 
 	public GenericFile exportDemographic(Integer demographicId) throws IOException

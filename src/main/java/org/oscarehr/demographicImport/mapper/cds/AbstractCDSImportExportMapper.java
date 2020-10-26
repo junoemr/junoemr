@@ -20,21 +20,22 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper;
+package org.oscarehr.demographicImport.mapper.cds;
 
-public abstract class AbstractImportExportMapper<I, E>
+import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
+import org.oscarehr.demographicImport.mapper.AbstractImportExportMapper;
+
+public abstract class AbstractCDSImportExportMapper<I, E> extends AbstractImportExportMapper<I, E>
 {
-	/**
-	 * build the export structure from the provided import structure.
-	 * this method creates a new object to use as the export structure.
-	 * @param importStructure
-	 */
-	public abstract E importToJuno(I importStructure);
+	protected final ObjectFactory objectFactory;
 
-	/**
-	 * build the import structure from the provided export structure.
-	 * this method creates a new object to use as the import structure.
-	 * @param exportStructure
-	 */
-	public abstract I exportFromJuno(E exportStructure);
+	public AbstractCDSImportExportMapper()
+	{
+		this.objectFactory = new ObjectFactory();
+	}
+
+	public ObjectFactory getObjectFactory()
+	{
+		return this.objectFactory;
+	}
 }

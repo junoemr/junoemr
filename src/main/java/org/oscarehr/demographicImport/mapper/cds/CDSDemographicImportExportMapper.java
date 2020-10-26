@@ -29,9 +29,6 @@ import org.oscarehr.common.xml.cds.v5_0.model.AddressType;
 import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
 import org.oscarehr.common.xml.cds.v5_0.model.Gender;
 import org.oscarehr.common.xml.cds.v5_0.model.HealthCard;
-import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
-import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePartTypeCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePrefixCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePurposeCode;
@@ -41,7 +38,6 @@ import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
 import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
-import org.oscarehr.demographicImport.mapper.AbstractDemographicImportExportMapper;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.provider.Provider;
@@ -58,44 +54,30 @@ import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
 
-public class CDSDemographicImportExportMapper extends AbstractDemographicImportExportMapper<OmdCds>
+public class CDSDemographicImportExportMapper extends AbstractCDSImportExportMapper<Demographics, Demographic>
 {
 	private static final Logger logger = Logger.getLogger(CDSDemographicImportExportMapper.class);
 
-	protected final ObjectFactory objectFactory;
 
 	public CDSDemographicImportExportMapper()
 	{
-		this.objectFactory = new ObjectFactory();
+		super();
 	}
 
 	@Override
-	public Demographic importToJuno(OmdCds importStructure, Demographic demographic)
+	public Demographic importToJuno(Demographics importStructure)
 	{
-		fillImportDemographic(importStructure.getPatientRecord().getDemographics(), demographic);
+		Demographic demographic = new Demographic();
+		fillImportDemographic(importStructure, demographic);
 		return demographic;
 	}
 
 	@Override
-	public OmdCds exportFromJuno(Demographic exportStructure)
+	public Demographics exportFromJuno(Demographic exportStructure)
 	{
-		OmdCds omdCds = objectFactory.createOmdCds();
-		PatientRecord patientRecord = objectFactory.createPatientRecord();
-		omdCds.setPatientRecord(patientRecord);
-		return exportFromJuno(exportStructure, omdCds);
-	}
-
-	@Override
-	public OmdCds exportFromJuno(Demographic exportStructure, OmdCds importStructure)
-	{
-		Demographics demographics = importStructure.getPatientRecord().getDemographics();
-		if (demographics == null)
-		{
-			demographics = objectFactory.createDemographics();
-		}
+		Demographics demographics = objectFactory.createDemographics();
 		fillExportDemographic(exportStructure, demographics);
-		importStructure.getPatientRecord().setDemographics(demographics);
-		return importStructure;
+		return demographics;
 	}
 
 	protected void fillExportDemographic(Demographic exportStructure, Demographics demographics)
@@ -119,6 +101,8 @@ public class CDSDemographicImportExportMapper extends AbstractDemographicImportE
 		demographic.setDateOfBirth(ConversionUtils.toLocalDate(importStructure.getDateOfBirth()));
 		demographic.setSex(importStructure.getGender().toString());
 		demographic.setEmail(importStructure.getEmail());
+
+		demographic.setMrpProvider(getImportPrimaryPhysician(importStructure));
 	}
 
 	protected PersonNameStandard getExportNames(Demographic exportStructure)
@@ -248,6 +232,16 @@ public class CDSDemographicImportExportMapper extends AbstractDemographicImportE
 		}
 		phone.setPhoneNumberType(type);
 		return phone;
+	}
+
+	protected Provider getImportPrimaryPhysician(Demographics importStructure)
+	{
+		Provider provider = new Provider();
+		provider.setFirstName(importStructure.getPrimaryPhysician().getName().getFirstName());
+		provider.setLastName(importStructure.getPrimaryPhysician().getName().getLastName());
+		provider.setOhipNumber(importStructure.getPrimaryPhysician().getOHIPPhysicianId());
+		provider.setPractitionerNumber(importStructure.getPrimaryPhysician().getPrimaryPhysicianCPSO());
+		return provider;
 	}
 
 	protected Demographics.PrimaryPhysician getExportPrimaryPhysician(Demographic exportStructure)

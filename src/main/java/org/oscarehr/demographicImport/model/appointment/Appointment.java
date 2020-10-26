@@ -20,16 +20,46 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper;
+package org.oscarehr.demographicImport.model.appointment;
 
+import lombok.Data;
+import org.oscarehr.demographicImport.model.AbstractTransientModel;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.provider.Provider;
 
-public abstract class AbstractDemographicImportExportMapper<I> extends AbstractImportExportMapper<I, Demographic>
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+@Data
+public class Appointment extends AbstractTransientModel
 {
-	@Override
-	public Demographic importToJuno(I importStructure)
+	private Integer id;
+
+	private Provider provider;
+
+	private LocalDateTime appointmentStartDateTime;
+	private LocalDateTime appointmentEndDateTime;
+
+	private String name;
+	private Demographic demographic;
+
+	private String notes;
+	private String reason;
+	private String resources;
+	private String type;
+	private String style;
+	private String status;
+
+	private String location;
+//	private Site site;
+
+	public Duration getDuration()
 	{
-		Demographic demographic = new Demographic();
-		return this.importToJuno(importStructure, demographic);
+		return Duration.between(appointmentStartDateTime, appointmentEndDateTime);
+	}
+
+	public long getDurationMin()
+	{
+		return getDuration().toMinutes();
 	}
 }
