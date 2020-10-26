@@ -25,11 +25,13 @@ package org.oscarehr.demographicImport.model.demographic;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.appointment.Appointment;
 import org.oscarehr.demographicImport.model.provider.Provider;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -87,6 +89,8 @@ public class Demographic extends AbstractTransientModel
 	private String nameOfFather;
 	private String veteranNumber;
 
+	private List<Appointment> appointmentList;
+
 	public void addAddress(Address address)
 	{
 		if(this.addressList == null)
@@ -94,6 +98,24 @@ public class Demographic extends AbstractTransientModel
 			this.addressList = new ArrayList<>();
 		}
 		this.addressList.add(address);
+	}
+
+	public void addAppointment(Appointment appointment)
+	{
+		if(this.appointmentList == null)
+		{
+			this.appointmentList = new ArrayList<>();
+		}
+		this.appointmentList.add(appointment);
+	}
+
+	public void addAppointments(Collection<Appointment> appointments)
+	{
+		if(this.appointmentList == null)
+		{
+			this.appointmentList = new ArrayList<>();
+		}
+		this.appointmentList.addAll(appointments);
 	}
 
 	@Override

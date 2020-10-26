@@ -24,6 +24,8 @@ package org.oscarehr.demographicImport.converter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.model.Appointment;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
@@ -34,10 +36,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+import java.util.List;
+
 @Component
 public class DemographicModelToExportConverter extends
 		AbstractModelConverter<Demographic, org.oscarehr.demographicImport.model.demographic.Demographic>
 {
+	@Autowired
+	private OscarAppointmentDao appointmentDao;
+
+	@Autowired
+	private AppointmentModelToExportConverter appointmentConverter;
+
 	@Autowired
 	private DemographicExtDao demographicExtDao;
 
@@ -102,6 +112,10 @@ public class DemographicModelToExportConverter extends
 		{
 			exportDemographic.setCellPhoneNumber(new PhoneNumber(cellPhoneNumber));
 		}
+
+		//TODO how to handle lazy loading etc.?
+		List<Appointment> appointments = appointmentDao.findByDemographicId(input.getDemographicId(), 0, 100);
+		exportDemographic.addAppointments(appointmentConverter.convert(appointments));
 
 		return exportDemographic;
 	}

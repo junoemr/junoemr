@@ -20,46 +20,36 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model.appointment;
+package org.oscarehr.demographicImport.mapper.cds.in;
 
-import lombok.Data;
-import org.oscarehr.demographicImport.model.AbstractTransientModel;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.common.xml.cds.v5_0.model.Appointments;
+import org.oscarehr.demographicImport.model.appointment.Appointment;
 import org.oscarehr.demographicImport.model.provider.Provider;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
-@Data
-public class Appointment extends AbstractTransientModel
+public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointments, Appointment>
 {
-	private Integer id;
-
-	private Provider provider;
-
-	private LocalDateTime appointmentStartDateTime;
-	private LocalDateTime appointmentEndDateTime;
-
-	private String name;
-	private Demographic demographic;
-
-	private String notes;
-	private String reason;
-	private String resources;
-	private String type;
-	private String style;
-	private AppointmentStatus status;
-
-	private String location;
-//	private Site site;
-
-	public Duration getDuration()
+	public CDSAppointmentImportMapper()
 	{
-		return Duration.between(appointmentStartDateTime, appointmentEndDateTime);
+		super();
 	}
 
-	public long getDurationMin()
+	@Override
+	public Appointment importToJuno(Appointments importStructure)
 	{
-		return getDuration().toMinutes() + 1;
+		Appointment appointment = new Appointment();
+
+		appointment.setProvider(getImportProvider(importStructure));
+		appointment.setReason(importStructure.getAppointmentPurpose());
+
+		return appointment;
+	}
+
+	protected Provider getImportProvider(Appointments importStructure)
+	{
+		Provider provider = new Provider();
+		provider.setFirstName(importStructure.getProvider().getName().getFirstName());
+		provider.setLastName(importStructure.getProvider().getName().getLastName());
+		provider.setOhipNumber(importStructure.getProvider().getOHIPPhysicianId());
+		return provider;
 	}
 }

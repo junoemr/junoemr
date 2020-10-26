@@ -1298,4 +1298,16 @@ public class ConversionUtilsTest
 		LocalDate testDate = LocalDate.of(2019, 4, 30);
 		assertThat(xmlGregorianCalendar, is(ConversionUtils.toXmlGregorianCalendar(testDate)));
 	}
+
+	@Test
+	public void toXmlGregorianCalendar_LocalDateTime_ExpectXmlGregorianCalendar() throws DatatypeConfigurationException
+	{
+		XMLGregorianCalendar xmlGregorianCalendar =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar("2019-04-30");
+		xmlGregorianCalendar.setHour(12);
+		xmlGregorianCalendar.setMinute(45);
+		xmlGregorianCalendar.setSecond(15);
+		LocalDateTime testDateTime = LocalDateTime.of(2019, 4, 30, 12,45, 15);
+		assertThat(xmlGregorianCalendar, is(ConversionUtils.toXmlGregorianCalendar(testDateTime)));
+	}
 }

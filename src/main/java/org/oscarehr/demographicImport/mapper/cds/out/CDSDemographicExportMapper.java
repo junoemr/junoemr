@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds;
+package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
@@ -54,34 +54,20 @@ import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
 
-public class CDSDemographicImportExportMapper extends AbstractCDSImportExportMapper<Demographics, Demographic>
+public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demographics, Demographic>
 {
-	private static final Logger logger = Logger.getLogger(CDSDemographicImportExportMapper.class);
+	private static final Logger logger = Logger.getLogger(CDSDemographicExportMapper.class);
 
-
-	public CDSDemographicImportExportMapper()
+	public CDSDemographicExportMapper()
 	{
 		super();
-	}
-
-	@Override
-	public Demographic importToJuno(Demographics importStructure)
-	{
-		Demographic demographic = new Demographic();
-		fillImportDemographic(importStructure, demographic);
-		return demographic;
 	}
 
 	@Override
 	public Demographics exportFromJuno(Demographic exportStructure)
 	{
 		Demographics demographics = objectFactory.createDemographics();
-		fillExportDemographic(exportStructure, demographics);
-		return demographics;
-	}
 
-	protected void fillExportDemographic(Demographic exportStructure, Demographics demographics)
-	{
 		demographics.setNames(getExportNames(exportStructure));
 		demographics.setDateOfBirth(ConversionUtils.toXmlGregorianCalendar(exportStructure.getDateOfBirth()));
 		demographics.setGender(getExportGender(exportStructure));
@@ -92,17 +78,8 @@ public class CDSDemographicImportExportMapper extends AbstractCDSImportExportMap
 		demographics.setPrimaryPhysician(getExportPrimaryPhysician(exportStructure));
 		demographics.setPersonStatusCode(getExportStatusCode(exportStructure));
 		demographics.setPersonStatusDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getPatientStatusDate()));
-	}
 
-	protected void fillImportDemographic(Demographics importStructure, Demographic demographic)
-	{
-		demographic.setFirstName(importStructure.getNames().getLegalName().getFirstName().getPart());
-		demographic.setLastName(importStructure.getNames().getLegalName().getLastName().getPart());
-		demographic.setDateOfBirth(ConversionUtils.toLocalDate(importStructure.getDateOfBirth()));
-		demographic.setSex(importStructure.getGender().toString());
-		demographic.setEmail(importStructure.getEmail());
-
-		demographic.setMrpProvider(getImportPrimaryPhysician(importStructure));
+		return demographics;
 	}
 
 	protected PersonNameStandard getExportNames(Demographic exportStructure)
@@ -232,16 +209,6 @@ public class CDSDemographicImportExportMapper extends AbstractCDSImportExportMap
 		}
 		phone.setPhoneNumberType(type);
 		return phone;
-	}
-
-	protected Provider getImportPrimaryPhysician(Demographics importStructure)
-	{
-		Provider provider = new Provider();
-		provider.setFirstName(importStructure.getPrimaryPhysician().getName().getFirstName());
-		provider.setLastName(importStructure.getPrimaryPhysician().getName().getLastName());
-		provider.setOhipNumber(importStructure.getPrimaryPhysician().getOHIPPhysicianId());
-		provider.setPractitionerNumber(importStructure.getPrimaryPhysician().getPrimaryPhysicianCPSO());
-		return provider;
 	}
 
 	protected Demographics.PrimaryPhysician getExportPrimaryPhysician(Demographic exportStructure)

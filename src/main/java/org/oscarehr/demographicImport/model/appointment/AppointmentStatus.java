@@ -24,42 +24,13 @@ package org.oscarehr.demographicImport.model.appointment;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
-import org.oscarehr.demographicImport.model.provider.Provider;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 @Data
-public class Appointment extends AbstractTransientModel
+public class AppointmentStatus extends AbstractTransientModel
 {
 	private Integer id;
-
-	private Provider provider;
-
-	private LocalDateTime appointmentStartDateTime;
-	private LocalDateTime appointmentEndDateTime;
-
-	private String name;
-	private Demographic demographic;
-
-	private String notes;
-	private String reason;
-	private String resources;
-	private String type;
-	private String style;
-	private AppointmentStatus status;
-
-	private String location;
-//	private Site site;
-
-	public Duration getDuration()
-	{
-		return Duration.between(appointmentStartDateTime, appointmentEndDateTime);
-	}
-
-	public long getDurationMin()
-	{
-		return getDuration().toMinutes() + 1;
-	}
+	private String statusCode;
+	private String description;
+	private Boolean active;
+	private Boolean editable;
 }

@@ -832,4 +832,20 @@ public class ConversionUtils {
 			throw new RuntimeException(e);
 		}
 	}
+
+	public static XMLGregorianCalendar toNullableXmlGregorianCalendar(LocalDateTime localDateTime)
+	{
+		if(localDateTime == null) return null;
+		return toXmlGregorianCalendar(localDateTime);
+	}
+
+	public static XMLGregorianCalendar toXmlGregorianCalendar(LocalDateTime localDateTime)
+	{
+		if(localDateTime == null) throw new RuntimeException("LocalDateTime cannot be null");
+		XMLGregorianCalendar calendar = toXmlGregorianCalendar(localDateTime.toLocalDate());
+		calendar.setHour(localDateTime.getHour());
+		calendar.setMinute(localDateTime.getMinute());
+		calendar.setSecond(localDateTime.getSecond());
+		return calendar;
+	}
 }

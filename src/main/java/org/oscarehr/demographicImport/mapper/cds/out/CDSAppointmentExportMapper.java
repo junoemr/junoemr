@@ -20,34 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds;
+package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.Appointments;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
+import org.oscarehr.demographicImport.model.appointment.AppointmentStatus;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import oscar.util.ConversionUtils;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class CDSAppointmentImportExportMapper extends AbstractCDSImportExportMapper<Appointments, Appointment>
+public class CDSAppointmentExportMapper extends AbstractCDSExportMapper<Appointments, Appointment>
 {
-	public CDSAppointmentImportExportMapper()
+	public CDSAppointmentExportMapper()
 	{
 		super();
-	}
-
-	@Override
-	public Appointment importToJuno(Appointments importStructure)
-	{
-		Appointment appointment = new Appointment();
-
-		appointment.setProvider(getImportProvider(importStructure));
-		appointment.setReason(importStructure.getAppointmentPurpose());
-
-		return appointment;
 	}
 
 	@Override
@@ -57,21 +49,12 @@ public class CDSAppointmentImportExportMapper extends AbstractCDSImportExportMap
 
 		appointments.setProvider(getExportProvider(exportStructure));
 		appointments.setAppointmentDate(getExportAppointmentDate(exportStructure));
+		appointments.setAppointmentTime(getExportAppointmentTime(exportStructure));
 		appointments.setDuration(BigInteger.valueOf(exportStructure.getDurationMin()));
-		appointments.setAppointmentStatus(exportStructure.getStatus());
+		appointments.setAppointmentStatus(getExportStatus(exportStructure));
 		appointments.setAppointmentPurpose(exportStructure.getReason());
 
 		return appointments;
-	}
-
-
-	protected Provider getImportProvider(Appointments importStructure)
-	{
-		Provider provider = new Provider();
-		provider.setFirstName(importStructure.getProvider().getName().getFirstName());
-		provider.setLastName(importStructure.getProvider().getName().getLastName());
-		provider.setOhipNumber(importStructure.getProvider().getOHIPPhysicianId());
-		return provider;
 	}
 
 	protected Appointments.Provider getExportProvider(Appointment exportStructure)
@@ -98,5 +81,17 @@ public class CDSAppointmentImportExportMapper extends AbstractCDSImportExportMap
 		fullOrPartial.setFullDate(ConversionUtils.toXmlGregorianCalendar(appointmentDate));
 
 		return fullOrPartial;
+	}
+
+	protected XMLGregorianCalendar getExportAppointmentTime(Appointment exportStructure)
+	{
+		LocalDateTime appointmentDateTime = exportStructure.getAppointmentStartDateTime();
+		return ConversionUtils.toXmlGregorianCalendar(appointmentDateTime);
+	}
+
+	protected String getExportStatus(Appointment exportStructure)
+	{
+		AppointmentStatus appointmentStatus = exportStructure.getStatus();
+		return appointmentStatus.getDescription();
 	}
 }

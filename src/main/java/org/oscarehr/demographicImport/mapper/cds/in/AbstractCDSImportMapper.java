@@ -20,22 +20,13 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds;
+package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
-import org.oscarehr.demographicImport.mapper.AbstractImportExportMapper;
+import org.oscarehr.demographicImport.mapper.AbstractImportMapper;
 
-public abstract class AbstractCDSImportExportMapper<I, E> extends AbstractImportExportMapper<I, E>
+public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper<I, E>
 {
-	protected final ObjectFactory objectFactory;
-
-	public AbstractCDSImportExportMapper()
+	public AbstractCDSImportMapper()
 	{
-		this.objectFactory = new ObjectFactory();
-	}
-
-	public ObjectFactory getObjectFactory()
-	{
-		return this.objectFactory;
 	}
 }
