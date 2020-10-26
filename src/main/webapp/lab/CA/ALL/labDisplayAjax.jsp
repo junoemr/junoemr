@@ -180,7 +180,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
      	
          getComment = function getComment(segmentID, action)
              {
-                 var ret = true;
+                 var saveComment = true;
                  var comment = "";
 
                  var text = "V" + <%=version%> + "commentText" + segmentID;
@@ -193,11 +193,12 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                      }
                  }
                  var commentVal = prompt('<bean:message key = "oscarMDS.segmentDisplay.msgComment"/>', comment);
+
                  if (!commentVal)
                  {
-                     ret = false;
+                     saveComment = false;
                  }
-                 else if (!commentVal && commentVal.length > 0)
+                 else if (commentVal && commentVal.length > 0)
                  {
                      document.forms['acknowledgeForm_' + segmentID].comment.value = commentVal;
                  }
@@ -206,7 +207,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                      document.forms['acknowledgeForm_' + segmentID].comment.value = comment;
                  }
 
-                 if (ret)
+                 if (saveComment)
                  {
                      handleLab('acknowledgeForm_' + segmentID, segmentID, action);
                  }
