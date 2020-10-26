@@ -66,6 +66,8 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	public static final String BILLED = "B";
 	public static final String NO_SHOW = "N";
 
+	public static final String URGENCY_CRITICAL = "critical";
+
 	public enum BookingSource
 	{
 		OSCAR,

@@ -20,35 +20,20 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.integration.aqs.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import oscar.OscarProperties;
+package org.oscarehr.ws.rest.integrations.aqs.transfer;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
+import lombok.Data;
 
-@Getter @Setter
-public class AppointmentQueue
+@Data
+public class QueuedAppointmentBookingTransfer
 {
-	private static final OscarProperties props = OscarProperties.getInstance();
-
-	private UUID remoteId;
-	private String name;
-	private Integer queueLimit;
-	private String queueColor;
-	private OffsetDateTime createdAt;
-	private QueueAvailability availability;
-	private QueueOnDemandSettings onDemandSettings;
-	private Integer defaultAppointmentDurationMinutes = 15;
-	private Boolean available;
-
-	public AppointmentQueue()
-	{
-		this.queueLimit = Integer.parseInt(props.getProperty("aqs_default_queue_limit", "25"));
-		this.onDemandSettings = new QueueOnDemandSettings();
-		this.availability = new QueueAvailability();
-		this.available = false;
-	}
+	private Integer demographicNo;
+	private Integer durationMinutes;
+	private String notes;
+	private String reason;
+	private Integer reasonType;
+	private Integer siteId;
+	private Boolean virtual;
+	private Boolean critical;
 }
