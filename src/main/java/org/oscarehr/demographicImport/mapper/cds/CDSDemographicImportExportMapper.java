@@ -22,6 +22,8 @@
  */
 package org.oscarehr.demographicImport.mapper.cds;
 
+import org.apache.commons.lang3.EnumUtils;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
 import org.oscarehr.common.xml.cds.v5_0.model.AddressType;
 import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
@@ -31,14 +33,18 @@ import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePartTypeCode;
+import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePrefixCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePurposeCode;
+import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameStandard;
+import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
 import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
 import org.oscarehr.demographicImport.mapper.AbstractDemographicImportExportMapper;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.provider.Provider;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
@@ -48,9 +54,14 @@ import static org.oscarehr.demographic.model.Demographic.GENDER_FEMALE;
 import static org.oscarehr.demographic.model.Demographic.GENDER_MALE;
 import static org.oscarehr.demographic.model.Demographic.GENDER_OTHER;
 import static org.oscarehr.demographic.model.Demographic.GENDER_TRANSGENDER;
+import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
+import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
+import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
 
 public class CDSDemographicImportExportMapper extends AbstractDemographicImportExportMapper<OmdCds>
 {
+	private static final Logger logger = Logger.getLogger(CDSDemographicImportExportMapper.class);
+
 	protected final ObjectFactory objectFactory;
 
 	public CDSDemographicImportExportMapper()
@@ -96,6 +107,9 @@ public class CDSDemographicImportExportMapper extends AbstractDemographicImportE
 		demographics.setEmail(exportStructure.getEmail());
 		demographics.setHealthCard(getExportHealthCard(exportStructure));
 		demographics.getPhoneNumber().addAll(getExportPhones(exportStructure));
+		demographics.setPrimaryPhysician(getExportPrimaryPhysician(exportStructure));
+		demographics.setPersonStatusCode(getExportStatusCode(exportStructure));
+		demographics.setPersonStatusDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getPatientStatusDate()));
 	}
 
 	protected void fillImportDemographic(Demographics importStructure, Demographic demographic)
@@ -126,8 +140,28 @@ public class CDSDemographicImportExportMapper extends AbstractDemographicImportE
 		legalName.setFirstName(firstName);
 		legalName.setLastName(lastName);
 
+		names.setNamePrefix(getExportNamePrefix(exportStructure));
+
 		names.setLegalName(legalName);
 		return names;
+	}
+
+	protected PersonNamePrefixCode getExportNamePrefix(Demographic exportStructure)
+	{
+		String title = exportStructure.getTitle();
+		PersonNamePrefixCode prefixCode = null;
+		if(title != null)
+		{
+			if(EnumUtils.isValidEnum(PersonNamePrefixCode.class, title))
+			{
+				prefixCode = PersonNamePrefixCode.valueOf(title);
+			}
+			else
+			{
+				logger.error("(#" +exportStructure.getId()+ ") Invalid Name Prefix in Export: '" + title + "'");
+			}
+		}
+		return prefixCode;
 	}
 
 	protected Gender getExportGender(Demographic exportStructure)
@@ -183,33 +217,80 @@ public class CDSDemographicImportExportMapper extends AbstractDemographicImportE
 	{
 		List<PhoneNumber> exportPhoneList = new ArrayList<>(3);
 
-		String homePhone = exportStructure.getHomePhone();
-		String workPhone = exportStructure.getHomePhone();
-		String cellPhone = exportStructure.getHomePhone();
+		org.oscarehr.demographicImport.model.demographic.PhoneNumber homePhone = exportStructure.getHomePhoneNumber();
+		org.oscarehr.demographicImport.model.demographic.PhoneNumber workPhone = exportStructure.getWorkPhoneNumber();
+		org.oscarehr.demographicImport.model.demographic.PhoneNumber cellPhone = exportStructure.getCellPhoneNumber();
 		if(homePhone != null)
 		{
-			exportPhoneList.add(getExportPhone(PhoneNumberType.R, homePhone, null));
+			exportPhoneList.add(getExportPhone(PhoneNumberType.R, homePhone));
 		}
 		if(workPhone != null)
 		{
-			exportPhoneList.add(getExportPhone(PhoneNumberType.W, workPhone, null));
+			exportPhoneList.add(getExportPhone(PhoneNumberType.W, workPhone));
 		}
 		if(cellPhone != null)
 		{
-			exportPhoneList.add(getExportPhone(PhoneNumberType.C, cellPhone, null));
+			exportPhoneList.add(getExportPhone(PhoneNumberType.C, cellPhone));
 		}
 		return exportPhoneList;
 	}
 
-	protected PhoneNumber getExportPhone(PhoneNumberType type, String number, String extension)
+	protected PhoneNumber getExportPhone(PhoneNumberType type, 	org.oscarehr.demographicImport.model.demographic.PhoneNumber phoneNumber)
 	{
+		String number = phoneNumber.getNumber();
+		String extension = phoneNumber.getExtension();
+
 		PhoneNumber phone = objectFactory.createPhoneNumber();
 		phone.getContent().add(objectFactory.createPhoneNumberNumber(number));
 		if(extension != null)
 		{
-			phone.getContent().add(objectFactory.createPhoneNumberExtension(number));
+			phone.getContent().add(objectFactory.createPhoneNumberExtension(extension));
 		}
 		phone.setPhoneNumberType(type);
 		return phone;
 	}
+
+	protected Demographics.PrimaryPhysician getExportPrimaryPhysician(Demographic exportStructure)
+	{
+		Provider provider = exportStructure.getMrpProvider();
+		Demographics.PrimaryPhysician primaryPhysician = null;
+		if(provider != null)
+		{
+			PersonNameSimple personNameSimple = objectFactory.createPersonNameSimple();
+			personNameSimple.setFirstName(provider.getFirstName());
+			personNameSimple.setLastName(provider.getLastName());
+
+			primaryPhysician = objectFactory.createDemographicsPrimaryPhysician();
+			primaryPhysician.setName(personNameSimple);
+		    primaryPhysician.setOHIPPhysicianId(provider.getOhipNumber());
+		    primaryPhysician.setPrimaryPhysicianCPSO(provider.getPractitionerNumber());
+		}
+		return primaryPhysician;
+	}
+	protected Demographics.PersonStatusCode getExportStatusCode(Demographic exportStructure)
+	{
+		Demographics.PersonStatusCode personStatusCode = objectFactory.createDemographicsPersonStatusCode();
+		String patientStatus = exportStructure.getPatientStatus();
+
+		PersonStatus personStatus = null;
+		switch(patientStatus)
+		{
+			case STATUS_ACTIVE:   personStatus = PersonStatus.A; break;
+			case STATUS_INACTIVE: personStatus = PersonStatus.I; break;
+			case STATUS_DECEASED: personStatus = PersonStatus.D; break;
+		}
+
+		// set as enum type if it matches a standard status code
+		if(personStatus != null)
+		{
+			personStatusCode.setPersonStatusAsEnum(personStatus);
+		}
+		else // plain text option for custom codes
+		{
+			personStatusCode.setPersonStatusAsPlainText(patientStatus);
+		}
+
+		return personStatusCode;
+	}
+
 }

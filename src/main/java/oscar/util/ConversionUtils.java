@@ -822,6 +822,7 @@ public class ConversionUtils {
 
 	public static XMLGregorianCalendar toXmlGregorianCalendar(LocalDate localDate)
 	{
+		if(localDate == null) throw new RuntimeException("LocalDate cannot be null");
 		try
 		{
 			return DatatypeFactory.newInstance().newXMLGregorianCalendar(localDate.toString());

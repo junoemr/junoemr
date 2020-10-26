@@ -26,9 +26,12 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographicImport.converter.DemographicModelToExportConverter;
 import org.oscarehr.demographicImport.mapper.cds.CDSDemographicImportExportMapper;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +43,12 @@ import java.io.IOException;
 public class ImportExportService
 {
 	private static final Logger logger = Logger.getLogger(ImportExportService.class);
+
+	@Autowired
+	DemographicDao demographicDao;
+
+	@Autowired
+	DemographicModelToExportConverter modelToExportConverter;
 
 	public void importDemographic(GenericFile importFile) throws IOException
 	{
@@ -68,5 +77,12 @@ public class ImportExportService
 
 		OmdCds exportStructure = mapper.exportFromJuno(junoTransientObject);
 		return parser.write(exportStructure);
+	}
+
+	public GenericFile exportDemographic(Integer demographicId) throws IOException
+	{
+		org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
+		Demographic exportDemographic = modelToExportConverter.convert(demographic);
+		return this.exportDemographic(exportDemographic);
 	}
 }

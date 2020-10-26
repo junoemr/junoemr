@@ -25,6 +25,7 @@ package org.oscarehr.demographicImport.model.demographic;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.provider.Provider;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,7 +35,7 @@ import java.util.List;
 @Data
 public class Demographic extends AbstractTransientModel
 {
-	private Integer demographicId;
+	private Integer id;
 
 	// base info
 	private String firstName;
@@ -50,21 +51,21 @@ public class Demographic extends AbstractTransientModel
 	private String chartNumber;
 	private String sin;
 	private String patientStatus;
-	private LocalDateTime patientStatusDateTime;
+	private LocalDate patientStatusDate;
 	private LocalDate dateJoined;
 	private LocalDate dateEnded;
 
 	//contact info
 	private List<Address> addressList;
 	private String email;
-	private String homePhone;
-	private String workPhone;
-	private String cellPhone;
+	private PhoneNumber homePhoneNumber;
+	private PhoneNumber workPhoneNumber;
+	private PhoneNumber cellPhoneNumber;
 
 	// physician info
-	private String mrpProviderId;
-	private String referralDoctorId;
-	private String familyDoctorId;
+	private Provider mrpProvider;
+	private Provider referralDoctor;
+	private Provider familyDoctor;
 
 	// roster info
 	private String rosterStatus;

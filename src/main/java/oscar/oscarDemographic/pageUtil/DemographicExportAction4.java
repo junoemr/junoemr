@@ -70,7 +70,6 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.demographic.dao.DemographicExtDao;
-import org.oscarehr.demographicImport.converter.DemographicModelToExportConverter;
 import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.e2e.director.E2ECreator;
 import org.oscarehr.e2e.util.EverestUtils;
@@ -259,17 +258,12 @@ public class DemographicExportAction4 extends Action {
 			case CDS5_0:
 			{
 				ImportExportService importExportService = SpringUtils.getBean(ImportExportService.class);
-				org.oscarehr.demographic.dao.DemographicDao demographicDao =
-						(org.oscarehr.demographic.dao.DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
-				DemographicModelToExportConverter modelToExportConverter = SpringUtils.getBean(DemographicModelToExportConverter.class);
 				ArrayList<File> files = new ArrayList<>();
 
 				for (String demoNo : list)
 				{
 					Integer demographicId = Integer.parseInt(demoNo);
-					org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
-					org.oscarehr.demographicImport.model.demographic.Demographic exportDemographic = modelToExportConverter.convert(demographic);
-					GenericFile file = importExportService.exportDemographic(exportDemographic);
+					GenericFile file = importExportService.exportDemographic(demographicId);
 					files.add(file.getFileObject());
 				}
 

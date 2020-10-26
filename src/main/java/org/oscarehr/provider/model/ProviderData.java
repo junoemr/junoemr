@@ -242,6 +242,17 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 		workPhone = s;
 	}
 
+	public String getCellPhone()
+	{
+		String comments = getComments();
+		String cellNo = null;
+		if(comments != null && comments.contains("<xml_p_cell>"))
+		{
+			cellNo = StringUtils.substringBetween(getComments(), "<xml_p_cell>", "</xml_p_cell>");
+		}
+		return cellNo;
+	}
+
 	public String getOhipNo() {
 		return ohipNo;
 	}

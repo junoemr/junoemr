@@ -22,10 +22,15 @@
  */
 package org.oscarehr.demographicImport.converter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographicImport.model.demographic.Address;
+import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -33,18 +38,40 @@ import oscar.util.ConversionUtils;
 public class DemographicModelToExportConverter extends
 		AbstractModelConverter<Demographic, org.oscarehr.demographicImport.model.demographic.Demographic>
 {
+	@Autowired
+	private DemographicExtDao demographicExtDao;
+
+	@Autowired
+	private ProviderModelToExportConverter providerConverter;
+
 	@Override
 	public org.oscarehr.demographicImport.model.demographic.Demographic convert(Demographic input)
 	{
+		if(input == null)
+		{
+			return null;
+		}
+
 		org.oscarehr.demographicImport.model.demographic.Demographic exportDemographic = new org.oscarehr.demographicImport.model.demographic.Demographic();
 		BeanUtils.copyProperties(input, exportDemographic, "address", "dateOfBirth");
 
+		exportDemographic.setId(input.getDemographicId());
 		exportDemographic.setDateOfBirth(input.getDateOfBirth());
 		exportDemographic.setHealthNumber(input.getHin());
 		exportDemographic.setHealthNumberVersion(input.getVer());
 		exportDemographic.setHealthNumberProvinceCode(input.getHcType());
+		exportDemographic.setHealthNumberRenewDate(ConversionUtils.toNullableLocalDate(input.getHcRenewDate()));
+		exportDemographic.setHealthNumberEffectiveDate(ConversionUtils.toNullableLocalDate(input.getHcEffectiveDate()));
 		exportDemographic.setDateJoined(ConversionUtils.toNullableLocalDate(input.getDateJoined()));
 		exportDemographic.setDateEnded(ConversionUtils.toNullableLocalDate(input.getEndDate()));
+		exportDemographic.setChartNumber(input.getChartNo());
+		exportDemographic.setRosterDate(ConversionUtils.toNullableLocalDate(input.getRosterDate()));
+		exportDemographic.setRosterTerminationDate(ConversionUtils.toNullableLocalDate(input.getRosterTerminationDate()));
+		exportDemographic.setMrpProvider(providerConverter.convert(input.getProvider()));
+//		exportDemographic.setReferralDoctor(providerConverter.convert(input.getProvider()));
+//		exportDemographic.setFamilyDoctor(providerConverter.convert(input.getProvider()));
+		exportDemographic.setPatientStatusDate(ConversionUtils.toNullableLocalDate(input.getPatientStatusDate()));
+		exportDemographic.setChartNumber(input.getChartNo());
 
 		Address address = new Address();
 		address.setAddressLine1(input.getAddress());
@@ -54,6 +81,27 @@ public class DemographicModelToExportConverter extends
 		address.setPostalCode(input.getPostal());
 		address.setResidencyStatusCurrent();
 		exportDemographic.addAddress(address);
+
+		// phone conversions
+		if(input.getPhone() != null)
+		{
+			DemographicExt homePhoneExtensionExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_H_PHONE_EXT);
+			String homePhoneExtension = (homePhoneExtensionExt != null) ? StringUtils.trimToNull(homePhoneExtensionExt.getValue()) : null;
+			exportDemographic.setHomePhoneNumber(new PhoneNumber(input.getPhone(), homePhoneExtension));
+		}
+		if(input.getPhone2() != null)
+		{
+			DemographicExt workPhoneExtensionExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_W_PHONE_EXT);
+			String workPhoneExtension = (workPhoneExtensionExt != null) ? StringUtils.trimToNull(workPhoneExtensionExt.getValue()) : null;
+			exportDemographic.setWorkPhoneNumber(new PhoneNumber(input.getPhone2(), workPhoneExtension));
+		}
+
+		DemographicExt cellNoExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_CELL);
+		String cellPhoneNumber = (cellNoExt != null) ? StringUtils.trimToNull(cellNoExt.getValue()) : null;
+		if(cellPhoneNumber != null)
+		{
+			exportDemographic.setCellPhoneNumber(new PhoneNumber(cellPhoneNumber));
+		}
 
 		return exportDemographic;
 	}

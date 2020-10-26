@@ -64,6 +64,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public static final String GENDER_TRANSGENDER = "T";
 	public static final String GENDER_UNKNOWN = "U";
 
+	public static final String STATUS_ACTIVE = "AC";
+	public static final String STATUS_DECEASED = "DE";
+	public static final String STATUS_INACTIVE = "IN";
+
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
