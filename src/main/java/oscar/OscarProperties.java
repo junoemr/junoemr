@@ -519,6 +519,11 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("multisites");
 	}
 
+	public boolean isMyHealthAccessEnabled()
+	{
+		return isPropertyActive("myhealthaccess_telehealth_enabled");
+	}
+
 	public boolean isScheduleEnabled()
 	{
 		return isPropertyActive("schedule.enabled");

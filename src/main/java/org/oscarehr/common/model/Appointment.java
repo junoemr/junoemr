@@ -258,6 +258,11 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 		return demographicNo;
 	}
 
+	public boolean hasDemographic()
+	{
+		return this.demographicNo != 0;
+	}
+
 	public void setDemographicNo(int demographicNo) {
 		this.demographicNo = demographicNo;
 	}

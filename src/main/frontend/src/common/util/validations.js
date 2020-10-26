@@ -225,3 +225,18 @@ Juno.Validations.validationEmail = function (obj, field, ...validationFunc)
 		return Juno.Validations.validationFieldsChain(...validationFunc);
 	}
 };
+
+Juno.Validations.validationPhone = function (obj, field, ...validationFunc)
+{
+	return function validationFunction ()
+	{
+		let value = Juno.Validations.getAttribute(obj, field);
+		// check phone number
+		if (value && value != "" && value.match(/[^\d-()\s,]/))
+		{
+			return false;
+		}
+
+		return Juno.Validations.validationFieldsChain(...validationFunc);
+	}
+};
