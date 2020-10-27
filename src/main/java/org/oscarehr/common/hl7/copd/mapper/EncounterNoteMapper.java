@@ -52,7 +52,10 @@ public class EncounterNoteMapper extends AbstractMapper
 		List<CaseManagementNote> encounterNoteList = new ArrayList<>(numNotes);
 		for(int i=0; i< numNotes; i++)
 		{
-			encounterNoteList.add(getEncounterNote(i));
+			if(!isMessageNote(i))
+			{
+				encounterNoteList.add(getEncounterNote(i));
+			}
 		}
 		return encounterNoteList;
 	}
@@ -105,15 +108,7 @@ public class EncounterNoteMapper extends AbstractMapper
 
 	public ProviderData getSigningProvider(int rep) throws HL7Exception
 	{
-		ProviderData signingProvider = null;
-
-
-		if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
-		{
-			String noteProviderStr = getEncounterNoteSignature(rep);
-			signingProvider = getWOLFParsedProviderInfo(noteProviderStr, "ZPV.5");
-		}
-		return signingProvider;
+		return null;
 	}
 
 	public Date getEncounterNoteContactDate(int rep) throws HL7Exception
@@ -135,5 +130,11 @@ public class EncounterNoteMapper extends AbstractMapper
 	public String getEncounterNoteSignature(int rep) throws HL7Exception
 	{
 		return StringUtils.trimToNull(provider.getZPV(rep).getZpv5_commentSignature().getValue());
+	}
+
+	/** messages may be sent as encounter notes. Here we try to separate them out. */
+	public boolean isMessageNote(int rep) throws HL7Exception
+	{
+		return false;
 	}
 }

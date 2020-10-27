@@ -309,8 +309,11 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 				note.setEncounter_type(bean.encType);
 			}
 
-			resetTemp(providerNo, demono, programIdString);
-
+			boolean isIssueNote = cform.getCaseNote().isIncludeissue();
+			if (!isIssueNote)
+			{
+				resetTemp(providerNo, demono, programIdString);
+			}
 		}
 		// get the last temp note?
 		else if (tmpsavenote != null && !forceNote.equals("true")) {

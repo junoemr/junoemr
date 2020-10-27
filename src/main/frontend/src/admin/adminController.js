@@ -33,8 +33,9 @@ angular.module('Admin').controller('Admin.AdminController', [
 	{
 		let controller = this;
 		controller.navList = [];
+		controller.currentState = "";
 
-		function generateTransition(newState, rawTransition)
+		function generateTransition(newState, rawTransition, name)
 		{
 			return function()
 			{
@@ -46,6 +47,7 @@ angular.module('Admin').controller('Admin.AdminController', [
 				{
 					angular.element(document.querySelector("html")).animate({scrollTop: 0}, 500);
 					$location.url("/admin/" + newState);
+					controller.currentState = " / " + name;
 				}
 			}
 		};
@@ -55,7 +57,7 @@ angular.module('Admin').controller('Admin.AdminController', [
 		{
 			results.forEach(function (group) {
 				group.items.forEach(function (item) {
-					item.callback = generateTransition(item.transitionState, item.rawTransition);
+					item.callback = generateTransition(item.transitionState, item.rawTransition, item.name);
 
 					// restore accordion state on reload
 					if (
@@ -65,6 +67,7 @@ angular.module('Admin').controller('Admin.AdminController', [
 					)
 					{
 						group.expanded = true;
+						controller.currentState = " / " + item.name;
 					}
 
 				})

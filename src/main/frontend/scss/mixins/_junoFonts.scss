@@ -1,9 +1,9 @@
 
-@import '../fonts/Hinde/stylesheet.css';
+@import '../fonts/Cabin/stylesheet.css';
 
 @mixin juno-font-default()
 {
-	font-family: Hinde, Arial, sans-serif;
+	font-family: Hindie, sans-serif;
     font-weight: normal;
     font-style: normal;
     font-stretch: normal;
@@ -17,7 +17,7 @@
 }
 @mixin juno-font-button($font-size: 12px, $weight : normal, $line-height: normal)
 {
-	font-family: Hinde, Arial, sans-serif;
+	font-family: Hindie, sans-serif;
     font-weight: $weight;
     font-style: normal;
     font-stretch: normal;

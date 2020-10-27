@@ -22,7 +22,7 @@
 --%>
 <div id="admin-page" class="height-100">
 	<div id="admin-page-header" class="row vertical-align">
-		<h3><a href="#!/admin/landingPage" ng-click="AdminCtrl.collapseAllNavGroups()">Administration</a></h3>
+		<h5><a href="#!/admin/landingPage" ng-click="AdminCtrl.collapseAllNavGroups()">Administration <h6>{{AdminCtrl.currentState}}</h6></a></h5>
 	</div>
 	<div id="admin-page-body" class="row height-100">
 		<div class="admin-side-nav">

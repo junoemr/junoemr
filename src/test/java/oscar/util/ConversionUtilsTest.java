@@ -33,7 +33,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -229,6 +228,13 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void fromDateString_InvalidDate_ExpectNull()
+	{
+		String dateString = "2020-14-77 10:20:30";
+		Assert.assertNull(ConversionUtils.fromDateString(dateString));
+	}
+
+	@Test
 	public void fromDateString_DefaultTSPattern_ExpectDate()
 	{
 		String dateString = "2019-04-23 09:30:15";
@@ -421,9 +427,17 @@ public class ConversionUtilsTest
 	}
 
 	@Test
-	public void toTimeString_NullParameter_ExpectEmptyString()
+	public void toTimeString_NullDate_ExpectEmptyString()
 	{
-		Assert.assertEquals("", ConversionUtils.toTimeString(null));
+		Date testDate = null;
+		Assert.assertEquals("", ConversionUtils.toTimeString(testDate));
+	}
+
+	@Test
+	public void toTimeString_NullLocalTime_ExpectEmptyString()
+	{
+		LocalTime testTime = null;
+		Assert.assertEquals("", ConversionUtils.toTimeString(testTime));
 	}
 
 	@Test
@@ -439,6 +453,24 @@ public class ConversionUtilsTest
 		String expectedTimeString = formatter.format(today);
 
 		Assert.assertEquals(expectedTimeString, ConversionUtils.toTimeString(today));
+	}
+
+	@Test
+	public void toTimeString_FixedLocalTime_ExpectTimeString()
+	{
+		LocalTime testTime = LocalTime.of(13, 32, 0);
+		String expectedTimeString = "13:32:00";
+
+		Assert.assertEquals(expectedTimeString, ConversionUtils.toTimeString(testTime));
+	}
+
+	@Test
+	public void toTimeString_FixedLocalTimeWithFormat_ExpectTimeString()
+	{
+		LocalTime testTime = LocalTime.of(13, 32, 0);
+		String expectedTimeString = "13/32/00";
+
+		Assert.assertEquals(expectedTimeString, ConversionUtils.toTimeString(testTime, "HH/mm/ss"));
 	}
 
 	@Test
@@ -480,6 +512,13 @@ public class ConversionUtilsTest
 	public void fromIntString_EmptyStringParameter_ExpectZero()
 	{
 		int returnedVal = ConversionUtils.fromIntString("");
+		Assert.assertEquals(0, returnedVal);
+	}
+
+	@Test
+	public void fromIntString_IntAndLetter_ExpectZero()
+	{
+		int returnedVal = ConversionUtils.fromIntString("2x");
 		Assert.assertEquals(0, returnedVal);
 	}
 

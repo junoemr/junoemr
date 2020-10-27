@@ -26,7 +26,6 @@ package org.oscarehr.phr.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -120,9 +119,12 @@ public final class MyOscarUtils {
 	public static String getMyOscarUserNameFromOscar(String providerNo)
 	{
 		PropertyDao propertyDao = (PropertyDao) SpringUtils.getBean("propertyDao");
-		List<org.oscarehr.common.model.Property> myOscarUserNameProperties=propertyDao.findByNameAndProvider("MyOscarId", providerNo); 
-		if (myOscarUserNameProperties.size()>0) return(myOscarUserNameProperties.get(0).getValue());
-		return(null);
+		org.oscarehr.common.model.Property myOscarUserNameProperties=propertyDao.findByNameAndProvider("MyOscarId", providerNo);
+		if (myOscarUserNameProperties != null)
+		{
+			return myOscarUserNameProperties.getValue();
+		}
+		return null;
 	}
 	
 	public static boolean isMyOscarUserNameSet(String providerNo){

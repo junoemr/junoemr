@@ -36,12 +36,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.provider.model.ProviderPreventionManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarPrevention.PreventionData;
+
 /**
  *
  * @author Jay Gallagher
@@ -54,12 +56,11 @@ public class AddPreventionAction  extends Action {
    public AddPreventionAction() {
    }
    
-      public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)  {
-                       
-    	  if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_prevention", "w", null)) {
-    		  throw new SecurityException("missing required security object (_prevention)");
-    	  }
-    	  
+      public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
+      {
+         String loggedInProvider = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+         securityInfoManager.requireOnePrivilege(loggedInProvider, SecurityInfoManager.WRITE, null, "_prevention");
+
          String sessionUser  = (String) request.getSession().getAttribute("user");
          if ( sessionUser == null){
             return mapping.findForward("Logout");
@@ -68,39 +69,32 @@ public class AddPreventionAction  extends Action {
          String demographic_no = request.getParameter("demographic_no");
          String id = request.getParameter("id");
          String delete = request.getParameter("delete");
-         
-         MiscUtils.getLogger().debug("id "+id+"  delete "+ delete);
-         
-         MiscUtils.getLogger().debug("prevention Type "+preventionType);
-         
+
          String given = request.getParameter("given");
          String prevDate = request.getParameter("prevDate");
          String providerName = request.getParameter("providerName");
          String providerNo = request.getParameter("provider");
          
-         
          String nextDate = request.getParameter("nextDate");
          String neverWarn = request.getParameter("neverWarn");
-         
-         
-         MiscUtils.getLogger().debug("nextDate "+nextDate+" neverWarn "+neverWarn);
-         
-         String refused = "0";
-         if (given != null && given.equals("refused")){
-        	 refused = "1";
-         }else if (given != null && given.equals("ineligible")){
-        	 refused = "2";
-         }else if (given != null && given.equals("never")){
-        	 refused = "1";
-         }else if (given != null && given.equals("previous")){
-        	 refused = "2";
+
+		 String refused = String.valueOf(Prevention.REFUSED_STATUS_COMPLETED);
+		 if (Prevention.REFUSED.equals(given) || Prevention.NEVER.equals(given))
+		 {
+			 refused = String.valueOf(Prevention.REFUSED_STATUS_REFUSED);
+		 }
+		 else if (Prevention.INELIGIBLE.equals(given) || Prevention.PREVIOUS.equals(given))
+		 {
+			refused = String.valueOf(Prevention.REFUSED_STATUS_INELIGIBLE);
+		 }
+
+         if (Prevention.NEVER_REMIND.equals(neverWarn))
+         {
+            neverWarn = String.valueOf(Prevention.NEVER_SEND_REMINDER);
          }
-         
-         
-         if (neverWarn != null && neverWarn.equals("neverRemind")){
-            neverWarn = "1";
-         }else{
-            neverWarn = "0";
+         else
+         {
+            neverWarn = String.valueOf(Prevention.SEND_REMINDER);
          }
          
          ArrayList<Map<String,String>> extraData = new ArrayList<Map<String,String>>();

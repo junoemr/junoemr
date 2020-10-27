@@ -83,12 +83,12 @@ while (iter.hasNext()){%>
 		<td >
 			<input <% if (doctypeerrors.containsKey("modulemissing")) {%>
 <%-- 				class="warning" <%}%> id="function" type="radio" name="function" value="Demographic"> Demographic</td> --%>
-				class="warning" <%}%> id="function" type="radio" name="function" value="Demographic"> <bean:message key="oscarReport.oscarReportCatchment.msgDemographic"/></td>
+				class="warning" <%}%> id="function" type="radio" name="function" value="demographic"> <bean:message key="oscarReport.oscarReportCatchment.msgDemographic"/></td>
 				
 		<td >
 			<input <% if (doctypeerrors.containsKey("modulemissing")) {%>
 <%-- 				class="warning" <%}%> id="function" type="radio" name="function" value="Provider"> Provider</td> --%>
- 				class="warning" <%}%> id="function" type="radio" name="function" value="Provider"> <bean:message key="oscarReport.RptByExample.MsgProvider"/></td> 
+ 				class="warning" <%}%> id="function" type="radio" name="function" value="provider"> <bean:message key="oscarReport.RptByExample.MsgProvider"/></td>
 					
 	</tr>
 	

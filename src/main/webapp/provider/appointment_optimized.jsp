@@ -628,8 +628,10 @@ private long getAppointmentRowSpan(
 	<script type="text/javascript" src="../share/javascript/Oscar.js" ></script>
 	<script type="text/javascript" src="../share/javascript/prototype.js"></script>
 	<script type="text/javascript" src="../phr/phr.js"></script>
+	<script type="text/javascript" src="../js/myhealthaccess.js"></script>
 
 	<script src="<c:out value="../js/jquery.js"/>"></script>
+
 	<script>
 		jQuery.noConflict();
 	</script>
@@ -779,20 +781,20 @@ private long getAppointmentRowSpan(
 		</td>
 		<td id="firstMenu">
 			<ul id="navlist">
-				<c:if test="${menuBarController.infirmaryOscarView}">
-					<c:choose>
-						<c:when test="${menuBarController.isViewAll()}">
-							<li>
-								<a href=# onClick = "review('0')" title="<bean:message key="provider.appointmentProviderAdminDay.viewProvAval"/>"><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
-							</li>
-						</c:when>
-						<c:otherwise>
-							<li>
-								<a href='providercontrol.jsp?year=<%=menuBarController.getCurrentYear()%>&month=<%=menuBarController.getCurrentMonth()%>&day=<%=menuBarController.getCurrentDay()%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1'><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
-							</li>
-						</c:otherwise>
-					</c:choose>
-				</c:if>
+
+				<c:choose>
+					<c:when test="${menuBarController.isViewAll()}">
+						<li>
+							<a href=# onClick = "review('0')" title="<bean:message key="provider.appointmentProviderAdminDay.viewProvAval"/>"><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
+						</li>
+					</c:when>
+					<c:otherwise>
+						<li>
+							<a href='providercontrol.jsp?year=<%=menuBarController.getCurrentYear()%>&month=<%=menuBarController.getCurrentMonth()%>&day=<%=menuBarController.getCurrentDay()%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1'><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
+						</li>
+					</c:otherwise>
+				</c:choose>
+
 
 				<li>
 					<a href='providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&caseload=1&clProv=<%=curUser_no%>'><bean:message key="global.caseload"/></a>
@@ -1896,8 +1898,8 @@ private long getAppointmentRowSpan(
 																					 "../integrations/myhealthaccess.do?method=connect" +
 																					 "&demographicNo=${appointmentInfo.demographicNo}" +
 																					 "&siteName=${appointmentInfo.siteName}" +
-																					 "&appt=${appointmentInfo.appointmentNo}");return false;'
-																	 title="Telehealth">
+																					 "&appt=${appointmentInfo.appointmentNo}", "telehealth");return false;'
+																	 onmouseover="onTelehealthIconHover(event, '<%=appointmentInfo.getSiteName()%>', '<%=appointmentInfo.getAppointmentNo()%>')">
 																		<img
 																						style="vertical-align: bottom"
 																						src="../images/icons/telehealth.svg"
@@ -1983,6 +1985,7 @@ private long getAppointmentRowSpan(
 																		<c:otherwise>
 																			&#124; <a
 																				id="billingLink"
+																				rel="opener"
 																				href="${appointmentInfo.billLink}"
 																				target="_blank"
 																				title="<bean:message key="global.billingtag"/>"
@@ -2273,6 +2276,33 @@ private long getAppointmentRowSpan(
 			}
 
 		}
+	}
+
+	// called when appointment telehealth icon is hovered
+	function onTelehealthIconHover(event, site, appointmentNo)
+	{
+		myhealthaccess.getAppointmentSessionInformation('<%=request.getContextPath()%>', site, appointmentNo).then(
+			(result) =>
+			{
+				var sessionInfo = JSON.parse(result).body;
+				if (sessionInfo)
+				{
+					if (sessionInfo.patientInSession)
+					{
+						event.target.setAttribute("title", myhealthaccess.telehealthStatusToDisplayName(sessionInfo.sessionStatus));
+					}
+					else
+					{
+						event.target.setAttribute("title", "Patient not present");
+					}
+				}
+			}
+		).catch(
+			(error) =>
+			{
+				console.error("Failed to get telehealth session info with error: ", error);
+			}
+		)
 	}
 
 </script>

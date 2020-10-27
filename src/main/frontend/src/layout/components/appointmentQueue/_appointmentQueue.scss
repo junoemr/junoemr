@@ -1,0 +1,115 @@
+.appointment-queue {
+	margin: 0;
+
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+
+	height: 100%;
+
+	.header {
+		width: 100%;
+		height: 64px;
+		flex-shrink: 0;
+
+		.juno-tab {
+			margin: 0 8px 0 8px;
+		}
+	}
+
+	.juno-divider {
+		margin: 2px 0 0 0;
+	}
+
+	.list {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		padding: 0 8px 0 8px;
+		overflow-y: auto;
+
+		.list-content {
+			height: 100%;
+
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-content: flex-start;
+
+			overflow: hidden;
+
+			ul {
+				list-style-type: none;
+				padding: 0 0 16px 0;
+				flex: 1 1 100%;
+				background-color: transparent;
+
+				.dndDraggingSource {
+					.appointment-card {
+						filter: opacity(50%);
+					}
+				}
+
+				.dndPlaceholder {
+					min-height: 32px;
+					flex: 1 1 100%;
+					background-color: rgba(($color-neutral-darker), 0.1);
+					border-radius: 8px;
+					margin-top: 8px;
+				}
+			}
+		}
+	}
+
+	.list-footer {
+
+		width: $left-aside-width;
+		height: 32px;
+
+		display: flex;
+		align-items: center;
+		padding: 0 8px 0 16px;
+
+		box-shadow: 0 -1px 2px $color-neutral-lighter;
+
+		@include juno-font-body-smallest();
+
+		.middle-text {
+			margin: 0 8px 0 8px;
+		}
+
+		juno-button {
+			flex-grow: 1;
+
+			.juno-button {
+				justify-content: flex-end;
+				align-items: center;
+				margin: 0;
+
+				button {
+					font-size: 16px;
+					max-width: 24px;
+					height: 24px;
+				}
+			}
+		}
+	}
+}
+
+@-moz-document url-prefix() {
+	//Fire Fox specific
+	.appointment-queue {
+		.header {
+			.panel-body {
+				panel-body {
+					.text {
+						// Line height adjustment. On FF line height operates differently than, on Chrome, causing "Add to my schedule"
+						// to not line up with the plus icon.
+						line-height: unset !important;
+						height: 16px;
+					}
+				}
+			}
+		}
+	}
+}

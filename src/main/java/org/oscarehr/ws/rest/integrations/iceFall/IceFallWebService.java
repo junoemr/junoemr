@@ -124,12 +124,12 @@ public class IceFallWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public RestResponse<IceFallLogEntryListTo1> getLogEntries(@QueryParam("startDate") String startDateString,
-																														@QueryParam("endDate") String endDateString,
-																														@QueryParam("page") Integer page,
-																														@QueryParam("pageSize") Integer pageSize,
-																														@QueryParam("status") String status,
-																														@QueryParam("SortBy") String sortBy,
-																														@QueryParam("sortDirection") String sortDirection)
+	                                                          @QueryParam("endDate") String endDateString,
+	                                                          @QueryParam("page") Integer page,
+	                                                          @QueryParam("pageSize") Integer pageSize,
+	                                                          @QueryParam("status") String status,
+	                                                          @QueryParam("SortBy") String sortBy,
+	                                                          @QueryParam("sortDirection") String sortDirection)
 	{
 		LocalDateTime startDate = LocalDateTime.parse(startDateString);
 		LocalDateTime endDate = LocalDateTime.parse(endDateString);

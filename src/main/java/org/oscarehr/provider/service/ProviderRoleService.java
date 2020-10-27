@@ -24,13 +24,13 @@ package org.oscarehr.provider.service;
 
 import com.quatro.dao.security.SecuserroleDao;
 import com.quatro.model.security.Secuserrole;
-import org.oscarehr.PMmodule.dao.ProgramProviderDAO;
-import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.dao.RecycleBinDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.RecycleBin;
 import org.oscarehr.common.model.SecRole;
+import org.oscarehr.provider.dao.ProgramProviderDao;
+import org.oscarehr.provider.model.ProgramProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +47,7 @@ public class ProviderRoleService
 	SecRoleDao securityRoleDao;
 
 	@Autowired
-	ProgramProviderDAO programProviderDao;
+	ProgramProviderDao programProviderDao;
 
 	@Autowired
 	ProgramManager programManager;
@@ -83,6 +83,19 @@ public class ProviderRoleService
 		return true;
 	}
 
+	public boolean setDefaultPrimaryRole(Integer providerNo)
+	{
+		String providerDefaultRoleName = OscarProperties.getInstance().getProperty("default_provider_role_name");
+		if (providerDefaultRoleName != null)
+		{
+			return setPrimaryRole(providerNo, providerDefaultRoleName);
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	/**
 	 * Assign a primary role to the provider
 	 * @param providerId - provider record id
@@ -106,7 +119,7 @@ public class ProviderRoleService
 		if(programProvider != null)
 		{
 			programProvider.setRoleId(roleId);
-			programProviderDao.saveProgramProvider(programProvider);
+			programProviderDao.merge(programProvider);
 		}
 		else
 		{
@@ -114,7 +127,7 @@ public class ProviderRoleService
 			programProvider.setProgramId(caisiProgram);
 			programProvider.setProviderNo(String.valueOf(providerId));
 			programProvider.setRoleId(roleId);
-			programProviderDao.saveProgramProvider(programProvider);
+			programProviderDao.persist(programProvider);
 		}
 
 		return true;
@@ -136,8 +149,6 @@ public class ProviderRoleService
 
 	public Secuserrole addRoleAndAssignPrimary(Integer roleProviderId, String roleName)
 	{
-
-
 		Secuserrole secUserRole = addRole(roleProviderId, roleName);
 
 		Long caisiProgram = new Long(programManager.getDefaultProgramId());
@@ -145,11 +156,18 @@ public class ProviderRoleService
 		if(programProvider == null)
 		{
 			programProvider = new ProgramProvider();
+			programProvider.setProgramId(caisiProgram);
+			programProvider.setProviderNo(String.valueOf(roleProviderId));
+			programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleName).getId()));
+			programProviderDao.persist(programProvider);
 		}
-		programProvider.setProgramId(caisiProgram);
-		programProvider.setProviderNo(String.valueOf(roleProviderId));
-		programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleName).getId()));
-		programProviderDao.saveProgramProvider(programProvider);
+		else
+		{
+			programProvider.setProgramId(caisiProgram);
+			programProvider.setProviderNo(String.valueOf(roleProviderId));
+			programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleName).getId()));
+			programProviderDao.merge(programProvider);
+		}
 		return secUserRole;
 	}
 
@@ -187,6 +205,57 @@ public class ProviderRoleService
 	public boolean validRoleName(String roleName)
 	{
 		return (secRoleDao.findByName(roleName) != null);
+	}
+
+	/**
+	 * assign the specified roles to the provider
+	 * @param roles - role id list
+	 * @param providerNo - the provider to assign to.
+	 */
+	public synchronized void assignProviderRoles(List<Integer> roles, Integer providerNo)
+	{
+		if (roles != null)
+		{
+			for (Integer role : roles)
+			{
+				String roleName = secRoleDao.find(role).getName();
+				if (!hasRole(providerNo, roleName))
+				{
+					addRole(providerNo, roleName);
+				}
+			}
+		}
+	}
+
+	/**
+	 * remove roles from a provider that are not contained in the role list.
+	 * @param roles - the list of roles to keep
+	 * @param providerNo - the provider to apply the operation on
+	 */
+	public synchronized void removeOtherProviderRoles(List<Integer> roles, Integer providerNo)
+	{
+		if (roles != null)
+		{
+			List<Secuserrole> secUserRoles = secUserRoleDao.findByProviderNo(providerNo.toString());
+			for (Secuserrole userRole : secUserRoles)
+			{
+				boolean contains = false;
+				for (Integer roleId : roles)
+				{
+					String roleName = secRoleDao.find(roleId).getName();
+					if (roleName.equals(userRole.getRoleName()))
+					{
+						contains = true;
+						break;
+					}
+				}
+
+				if (!contains)
+				{
+					secUserRoleDao.delete(userRole);
+				}
+			}
+		}
 	}
 
 

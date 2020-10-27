@@ -23,6 +23,7 @@
 
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
@@ -36,17 +37,26 @@ import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidAccessException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidUserIntegrationException;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.oscarehr.common.model.Provider;
 
-@Service
+@Service("myHealthClinicService")
 public class ClinicService extends BaseService
 {
 	@Autowired
 	MyHealthAccessService myHealthAccessService;
+
+	@Autowired
+	SecurityDao securityDao;
+
+	@Autowired
+	ProviderDataDao providerDataDao;
 
 	// Clinic API calls
 	public ClinicUserCreateResponseTo1 createClinicUser(IntegrationData integrationData, ClinicUserCreateTo1 newUser)
@@ -79,24 +89,56 @@ public class ClinicService extends BaseService
 	 */
 	public ClinicUserLoginTokenTo1 loginOrCreateClinicUser(LoggedInInfo loggedInInfo, String siteName) throws InvalidIntegrationException
 	{
+		Provider provider = loggedInInfo.getLoggedInProvider();
+		return loginOrCreateClinicUser(loggedInInfo.getLoggedInSecurity(), provider.getFirstName(), provider.getLastName(), siteName);
+	}
+
+	/**
+	 * login to or create a new clinic user
+	 * @param integration - integration on which to perform this action
+	 * @param securityNo - security_no of the user to login or create
+	 * @return - clinic user login token
+	 * @throws InvalidIntegrationException
+	 */
+	public ClinicUserLoginTokenTo1 loginOrCreateClinicUser(Integration integration, Integer securityNo) throws InvalidIntegrationException
+	{
+		Security security = securityDao.find(securityNo);
+		ProviderData provider = providerDataDao.find(security.getProviderNo());
+		if (security != null && provider != null)
+		{
+			return loginOrCreateClinicUser(security, provider.getFirstName(), provider.getLastName(),
+					integration.getSite() != null ? integration.getSite().getName() : null);
+		}
+		else
+		{
+			MiscUtils.getLogger().warn("Failed to create or login to MHA clinic_user. Security lookup failed. Security No:" + securityNo);
+			return null;
+		}
+	}
+
+	public ClinicUserLoginTokenTo1 loginOrCreateClinicUser(Security security, String firstName,
+														   String lastName, String siteName) throws InvalidIntegrationException
+	{
 		try
 		{
-			return clinicUserLogin(loggedInInfo, siteName);
+			return clinicUserLogin(security, siteName);
 		}
 		catch(InvalidUserIntegrationException e)
 		{
 			IntegrationData integrationData = getIntegrationData(siteName);
-			Provider provider = loggedInInfo.getLoggedInProvider();
-			integrationData = myHealthAccessService.createClinicUser(integrationData,loggedInInfo.getLoggedInSecurity(),
-							new ClinicUserCreateTo1(Integer.toString(loggedInInfo.getLoggedInSecurity().getSecurityNo()), provider.getFirstName(), provider.getLastName()));
+			integrationData = myHealthAccessService.createClinicUser(integrationData,security,
+							new ClinicUserCreateTo1(Integer.toString(security.getSecurityNo()), firstName, lastName));
 			return new ClinicUserLoginTokenTo1(integrationData.getLoginToken());
 		}
 	}
 
 	public ClinicUserLoginTokenTo1 clinicUserLogin(LoggedInInfo loggedInInfo, String siteName) throws InvalidIntegrationException, InvalidUserIntegrationException
 	{
-		Security security = loggedInInfo.getLoggedInSecurity();
+		return clinicUserLogin(loggedInInfo.getLoggedInSecurity(), siteName);
+	}
 
+	public ClinicUserLoginTokenTo1 clinicUserLogin(Security security, String siteName) throws InvalidIntegrationException, InvalidUserIntegrationException
+	{
 		IntegrationData integrationData = getIntegrationData(siteName);
 
 		UserIntegrationAccess userIntegrationAccess = integrationService.findMhaUserAccessBySecurityAndSiteName(security, siteName);

@@ -133,7 +133,9 @@ public class AppointmentTest
 			LocalDate.of(2000, 1, 1),
 			false,
 			null,
-			false
+			false,
+			false,
+			1
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -188,6 +190,9 @@ public class AppointmentTest
 				false,
 				false,
 				false,
+				null,
+				false,
+				1,
 				null
 			)
 		));
@@ -246,7 +251,9 @@ public class AppointmentTest
 				LocalDate.of(2000, 1, 1),
 				false,
 				null,
-				false
+				false,
+				false,
+				1
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -301,10 +308,12 @@ public class AppointmentTest
 						true,
 						false,
 						false,
-						null
+						null,
+						false,
+						1,
+						org.oscarehr.common.model.Appointment.BookingSource.MYOSCAR_SELF_BOOKING.name()
 				)
 		));
-
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
 
@@ -359,7 +368,9 @@ public class AppointmentTest
 			LocalDate.of(2000, 1, 1),
 			false,
 			null,
-			false
+			false,
+				false,
+			1
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -420,6 +431,9 @@ public class AppointmentTest
 				false,
 				false,
 				false,
+				null,
+				false,
+				1,
 				null
 			)
 		));
@@ -478,7 +492,9 @@ public class AppointmentTest
 			LocalDate.of(2000, 1, 1),
 			false,
 			null,
-			false
+			false,
+			false,
+			1
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -538,6 +554,9 @@ public class AppointmentTest
 				false,
 				false,
 				false,
+				null,
+				false,
+				1,
 				null
 			)
 		));

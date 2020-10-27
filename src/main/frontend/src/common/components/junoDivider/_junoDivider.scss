@@ -1,0 +1,29 @@
+.juno-divider {
+	height: 4px;
+	width: 100%;
+
+	&.slim {
+		height: 1px;
+		border-top-width: 0 !important;
+	}
+
+	&.horizontal {
+		height: 100%;
+		width: 4px;
+
+		&.slim {
+			width: 1px;
+			border-top-width: 0 !important;
+		}
+	}
+}
+
+div {
+	&.juno-divider {
+		margin: 24px 0 24px 0;
+
+		&.horizontal {
+			margin: 0 24px 0 24px;
+		}
+	}
+}

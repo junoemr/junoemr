@@ -26,6 +26,7 @@
 package org.oscarehr.common.dao;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -40,70 +41,68 @@ public class CtlDocTypeDao extends AbstractDao<CtlDocType>{
 		super(CtlDocType.class);
 	}
 
+	public Integer updateDocTypeStatus(String docType, String module, String status){
+		String sql = "UPDATE ctl_doctype SET status = :status WHERE module = :module AND BINARY doctype = :docType";
+		Query query = entityManager.createNativeQuery(sql, CtlDocType.class);
+		query.setParameter("status", status);
+		query.setParameter("module", module);
+		query.setParameter("docType", docType);
+
+		return query.executeUpdate();
+	}
+
+	public List<CtlDocType> findByStatusAndModule(String[] statuses, String module){
+		List<String> search = new ArrayList<>();
+		Collections.addAll(search, statuses);
+
+		return this.findByStatusAndModule(search, module);
+	}
 	
-	
-	public void changeDocType(String docType, String module, String status){
-		String sql = "UPDATE CtlDocType SET status =?1 WHERE module =?2 AND doctype =?3";
+	public List<CtlDocType> findByStatusAndModule(List<String> statuses, String module){
+
+		String sql = "SELECT c FROM CtlDocType c WHERE c.status IN (:status) AND c.module = :module ORDER BY doctype ASC";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1,status);
-		query.setParameter(2, module);
-		query.setParameter(3, docType);
+		query.setParameter("status", statuses);
+		query.setParameter("module", module);
 
-		query.executeUpdate();
-
-	}
-
-	public List<CtlDocType> findByStatusAndModule(String[] status, String module){
-		List<String> result = new ArrayList<String>();
-		for(int x=0;x<status.length;x++) {
-			result.add(status[x]);
-		}
-		return this.findByStatusAndModule(result, module);
-	}
-	
-	public List<CtlDocType> findByStatusAndModule(List<String> status, String module){
-		Query query = entityManager.createQuery("select c from CtlDocType c where c.status in (?1) and c.module=?2 order by doctype asc");
-		query.setParameter(1, status);
-		query.setParameter(2, module);
 		@SuppressWarnings("unchecked")
 		List<CtlDocType> results = query.getResultList();
+
 		return results;
 	}
 
 	public List<CtlDocType> findByDocTypeAndModule(String docType, String module){
 
-		Query query = entityManager.createQuery("select c from CtlDocType c where c.docType=?1 and c.module=?2");
-		query.setParameter(1, docType);
-		query.setParameter(2, module);
+		String sql = "SELECT * FROM ctl_doctype c WHERE BINARY c.doctype = :docType AND c.module = :module";
+		Query query = entityManager.createNativeQuery(sql, CtlDocType.class);
+		query.setParameter("docType", docType);
+		query.setParameter("module", module);
 		@SuppressWarnings("unchecked")
 		List<CtlDocType> results = query.getResultList();
+
 		return results;
 
 	}
 
-	public void addDocType(String docType, String module) {		
-        CtlDocType d = new CtlDocType();
-        d.setDocType(docType);
-        d.setModule(module);
-        d.setStatus("A");
-        entityManager.persist(d);
-    }
+	public Integer addDocType(String name, String module) {
 
-	public List<String> findModules() {
-		Query query = createQuery("SELECT DISTINCT d.module", "d", "");
-		List<String> result = new ArrayList<String>();
-		for(Object o : query.getResultList()) {
-			result.add(String.valueOf(o));
-		}
-		return result;
+		CtlDocType docType = new CtlDocType();
+        docType.setDocType(name);
+        docType.setModule(module.toLowerCase());
+        docType.setStatus(CtlDocType.Status.Active.toString());
+        entityManager.persist(docType);
+
+        return docType.getId();
     }
 
     public List<CtlDocType> findByModule(String module)
     {
-	    Query query = entityManager.createQuery("select c from CtlDocType c where c.module=:module order by c.docType asc");
-	    query.setParameter("module", module);
+    	String sql = "SELECT c FROM CtlDocType c WHERE c.module = :module ORDER BY c.docType ASC";
+	    Query query = entityManager.createQuery(sql);
+	    query.setParameter("module", module.toLowerCase());
 	    @SuppressWarnings("unchecked")
 	    List<CtlDocType> results = query.getResultList();
+
 	    return results;
     }
 }

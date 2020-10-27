@@ -88,7 +88,7 @@ public class AdminNavService
 		}
 		if (securityInfoManager.hasOnePrivileges(providerNo, securityInfoManager.READ, null, "_admin", "_admin.schedule"))
 		{
-			adminNavList.add(getAdminNavSchedule(contextPath, resourceBundle));
+			adminNavList.add(getAdminNavSchedule(contextPath, resourceBundle, providerNo));
 		}
 		if (oscarProperties.isPropertyActive("caisi"))
 		{// CAISI module loaded
@@ -154,8 +154,7 @@ public class AdminNavService
 
 		userManagement.setName(resourceBundle.getString("admin.admin.UserManagement"));
 
-		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAddProvider"), "frame?frameUrl=" + contextPath + "/admin/provideraddarecordhtm.jsp"));
-		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSearchProvider"), "frame?frameUrl=" + contextPath + "/admin/providersearchrecordshtm.jsp"));
+		userManagementItems.add(new AdminNavItemTo1("Manage Users", "manageUsers"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAddLogin"), "frame?frameUrl=" + contextPath + "/admin/securityaddarecord.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSearchLogin"), "frame?frameUrl=" + contextPath + "/admin/securitysearchrecordshtm.jsp"));
 		userManagementItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.assignRole"), "frame?frameUrl=" + contextPath + "/admin/providerRole.jsp"));
@@ -405,7 +404,7 @@ public class AdminNavService
 		return echartGroup;
 	}
 
-	private AdminNavGroupTo1 getAdminNavSchedule(String contextPath, ResourceBundle resourceBundle)
+	private AdminNavGroupTo1 getAdminNavSchedule(String contextPath, ResourceBundle resourceBundle, String providerNo)
 	{
 		AdminNavGroupTo1 scheduleGroup = new AdminNavGroupTo1();
 		List<AdminNavItemTo1> scheduleItems = new ArrayList<>();
@@ -424,6 +423,12 @@ public class AdminNavService
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGroupNoAcl"), "frame?frameUrl=" + contextPath + "/admin/groupnoacl.jsp"));
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGroupPreference"), "frame?frameUrl=" + contextPath + "/admin/groupPreferences.jsp"));
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.preventionNotification.title"), "frame?frameUrl=" + contextPath + "/oscarPrevention/PreventionManager.jsp"));
+
+		// TODO remove super admin requirement when ready for general use
+		if(securityInfoManager.isSuperAdmin(providerNo) && systemPreferenceService.isPreferenceEnabled(UserProperty.AQS_INTEGRATION_ENABLED, false))
+		{
+			scheduleItems.add(new AdminNavItemTo1("Manage Appointment Queues", "manageAppointmentQueues"));
+		}
 
 		scheduleGroup.setItems(scheduleItems);
 		return scheduleGroup;
@@ -533,11 +538,6 @@ public class AdminNavService
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.lotnrsearchrecordshtm.title"), "frame?frameUrl=" + contextPath + "/admin/lotnrsearchrecordshtm.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobs.title"), "frame?frameUrl=" + contextPath + "/admin/jobs.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobtypes.title"), "frame?frameUrl=" + contextPath + "/admin/jobTypes.jsp"));
-
-			if (oscarProperties.isPropertyActive("LOGINTEST"))
-			{
-				systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.uploadEntryTxt"), "frame?frameUrl=" + contextPath + "/admin/uploadEntryText.jsp"));
-			}
 		}
 
 		if (oscar.oscarSecurity.CRHelper.isCRFrameworkEnabled())

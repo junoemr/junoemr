@@ -137,6 +137,18 @@ angular.module("Common.Services").service("demographicsService", [
 			junoHttp.get(service.apiPath + '/statusList', config).then(
 				function success(results)
 				{
+					if (results.data)
+					{
+						switch(listType)
+						{
+							case "roster":
+								service.addDefaultRosterStatuses(results.data);
+								break;
+							case "patient":
+								service.addDefaultPatientStatuses(results.data);
+						}
+					}
+
 					deferred.resolve(results.data);
 				},
 				function error(errors)
@@ -147,6 +159,63 @@ angular.module("Common.Services").service("demographicsService", [
 
 			return deferred.promise;
 		};
+
+		// add the default roster statuses to the roster status list.
+		service.addDefaultRosterStatuses = (rosterList) =>
+		{
+			rosterList.unshift(
+				{
+					"value": "FS",
+					"label": "FS - fee for service"
+				});
+			rosterList.unshift(
+				{
+					"value": "TE",
+					"label": "TE - terminated"
+				});
+			rosterList.unshift(
+				{
+					"value": "NR",
+					"label": "NR - not rostered"
+				});
+			rosterList.unshift(
+				{
+					"value": "RO",
+					"label": "RO - rostered"
+				});
+			return rosterList;
+		}
+
+		// add the default patient statuses to the status list
+		service.addDefaultPatientStatuses = (statusList) =>
+		{
+			statusList.unshift(
+				{
+					"value": "FI",
+					"label": "FI - Fired"
+				});
+			statusList.unshift(
+				{
+					"value": "MO",
+					"label": "MO - Moved"
+				});
+			statusList.unshift(
+				{
+					"value": "DE",
+					"label": "DE - Deceased"
+				});
+			statusList.unshift(
+				{
+					"value": "IN",
+					"label": "IN - Inactive"
+				});
+			statusList.unshift(
+				{
+					"value": "AC",
+					"label": "AC - Active"
+				});
+			return statusList;
+		}
 
 		return service;
 	}

@@ -41,6 +41,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.common.dao.ClinicDAO;
+import org.oscarehr.common.model.Clinic;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.UserProperty;
@@ -67,6 +69,9 @@ public class PrintClientLabLabelAction extends OscarAction {
     	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_demographic", "r", null)) {
 			throw new SecurityException("missing required security object (_demographic)");
 		}
+
+		ClinicDAO clinicDao = SpringUtils.getBean(ClinicDAO.class);
+    	Clinic clinic = clinicDao.getClinic();
     	
         //patient
         String classpath = (String)request.getSession().getServletContext().getAttribute("org.apache.catalina.jsp_classpath");
@@ -98,8 +103,11 @@ public class PrintClientLabLabelAction extends OscarAction {
             }
             exportPdfJavascript += "this.print(params);";
         }    
-        HashMap<String, String> parameters = new HashMap<String, String>();
+
+        HashMap<String, String> parameters = new HashMap<>();
+
         parameters.put("demo", request.getParameter("demographic_no"));
+        parameters.put("clinic_name", clinic.getClinicName());
 
         InputStream ins = null;
         try {

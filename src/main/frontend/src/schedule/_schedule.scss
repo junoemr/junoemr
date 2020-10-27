@@ -169,25 +169,10 @@
 								overflow: hidden;
 								margin-right: 4px;
 
-								&.show-self-booked {
-									margin-right: 16px;
-								}
 								.inline-flex {
 									display: inline-flex;
 									align-items: baseline;
 									flex-wrap: wrap;
-								}
-
-								.self-book-indicator.visible {
-									position: absolute;
-									top: 0;
-									right: 0;
-
-									width: 12px;
-									height: 12px;
-									background-color: $color-neutral-white;
-									border-radius: 50%;
-									margin: 2px;
 								}
 
 								.event-item {
@@ -235,6 +220,45 @@
 									&:hover {
 										background-color: rgba(255, 255, 255, 0.2);
 										border-radius: 50%;
+									}
+								}
+							}
+
+							.book-status-container {
+								display: flex;
+								justify-content: flex-end;
+								height: 100%;
+								flex-grow: 1;
+								margin: 2px 4px 2px 2px;
+								visibility: hidden;
+
+								&.visible {
+									visibility: visible;
+								}
+
+								.booking-status-box {
+									background-color: $color-neutral-white;
+									border-radius: 4px;
+									padding-top: 2px;
+									min-width: 16px;
+									max-width: 16px;
+									min-height: 14px;
+
+									display: flex;
+									flex-direction: row;
+									flex-wrap: wrap;
+									justify-content: space-around;
+								}
+
+								.booking-circle {
+									width: 6px;
+									height: 6px;
+									border-radius: 6px;
+									background-color: $color-neutral-darker;
+									visibility: hidden;
+
+									&.visible {
+										visibility: visible;
 									}
 								}
 							}

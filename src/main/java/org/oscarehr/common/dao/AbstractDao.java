@@ -40,6 +40,7 @@ import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -89,6 +90,20 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 
 	public T find(Object id) {
 		return (entityManager.find(modelClass, id));
+	}
+
+	public Optional<T> findOptional(Object id) {
+		return Optional.ofNullable(entityManager.find(modelClass, id));
+	}
+
+	/**
+	 * fetch all instances of the persistent class handled by this DAO
+	 * @return - all records
+	 */
+	public List<T> findAll()
+	{
+		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName());
+		return query.getResultList();
 	}
 
 	/**

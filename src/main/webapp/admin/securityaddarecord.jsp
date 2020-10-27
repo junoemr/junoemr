@@ -44,7 +44,6 @@
 
 <%
     String curProvider_no = (String) session.getAttribute("user");
-
     boolean isSiteAccessPrivacy=false;
 %>
 
@@ -66,7 +65,6 @@
 <%
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
-	
 	OscarProperties op = OscarProperties.getInstance();
 %>
 
@@ -188,7 +186,7 @@
 </table>
 <form method="post" action="securityaddsecurity.jsp" name="searchprovider"
 	onsubmit="return onsub()">
-
+<input type="hidden" name="current_user" value="<%=curProvider_no%>">
 <table cellspacing="0" cellpadding="2" width="90%" border="0">
 	<tr>
 		<td>

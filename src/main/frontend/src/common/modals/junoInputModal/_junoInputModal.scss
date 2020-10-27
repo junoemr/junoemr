@@ -1,0 +1,40 @@
+.juno-input-modal {
+	@include juno-font-body-small();
+
+	.title {
+		margin: 8px 0 8px 0;
+	}
+
+	.juno-input {
+		margin: 24px 0 0 0;
+
+		input {
+			height: 40px;
+		}
+	}
+
+	.juno-divider {
+		margin: 24px 0 16px 0;
+	}
+
+	.buttons {
+		display: flex;
+		justify-content: flex-end;
+
+		juno-button {
+			max-width: 160px;
+			.juno-button {
+				margin-top: 0;
+				button {
+					height: 40px;
+				}
+			}
+
+			&:first-child {
+				margin-right: 8px;
+			}
+		}
+	}
+
+
+}

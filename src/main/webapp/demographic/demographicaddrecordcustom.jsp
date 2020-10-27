@@ -171,12 +171,14 @@
 <html:html locale="true">
 	<head>
 		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-		<title><bean:message
-				key="demographic.demographicaddrecordhtm.title" /></title>
-		<meta http-equiv="Expires" content="Monday, 8 Aug 88 18:18:18 GMT">
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/UserInputDemoControl.js"></script>
+		<title><bean:message key="demographic.demographicaddrecordhtm.title" /></title>
 		<!-- calendar stylesheet -->
 		<link rel="stylesheet" type="text/css" media="all"
 		      href="../share/calendar/calendar.css" title="win2k-cold-1" />
+
+        <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+        <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
 
 		<!-- main calendar program -->
 		<script type="text/javascript" src="../share/calendar/calendar.js"></script>
@@ -295,21 +297,6 @@
 				}
 			}
 
-			function formatPhoneNum() {
-				if (document.adddemographic.phone.value.length == 10) {
-					document.adddemographic.phone.value = document.adddemographic.phone.value.substring(0,3) + "-" + document.adddemographic.phone.value.substring(3,6) + "-" + document.adddemographic.phone.value.substring(6);
-				}
-				if (document.adddemographic.phone.value.length == 11 && document.adddemographic.phone.value.charAt(3) == '-') {
-					document.adddemographic.phone.value = document.adddemographic.phone.value.substring(0,3) + "-" + document.adddemographic.phone.value.substring(4,7) + "-" + document.adddemographic.phone.value.substring(7);
-				}
-
-				if (document.adddemographic.phone2.value.length == 10) {
-					document.adddemographic.phone2.value = document.adddemographic.phone2.value.substring(0,3) + "-" + document.adddemographic.phone2.value.substring(3,6) + "-" + document.adddemographic.phone2.value.substring(6);
-				}
-				if (document.adddemographic.phone2.value.length == 11 && document.adddemographic.phone2.value.charAt(3) == '-') {
-					document.adddemographic.phone2.value = document.adddemographic.phone2.value.substring(0,3) + "-" + document.adddemographic.phone2.value.substring(4,7) + "-" + document.adddemographic.phone2.value.substring(7);
-				}
-			}
 			function rs(n,u,w,h,x) {
 				args="width="+w+",height="+h+",resizable=yes,scrollbars=yes,status=0,top=60,left=30";
 				remote=window.open(u,n,args);
@@ -706,7 +693,7 @@
 		%>
 		<div>
 			<label><b><bean:message key="demographic.demographicaddrecordhtm.formPhoneHome" />: </b></label>
-			<input type="text" name="phone" onBlur="formatPhoneNum()" value="<%=props.getProperty("phoneprefix", "905-")%>">
+			<input type="text" name="phone" onBlur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.adddemographic.phone)" value="<%=props.getProperty("phoneprefix", "905-")%>">
 			<bean:message key="demographic.demographicaddrecordhtm.Ext" />:
 			<input type="text" name="hPhoneExt" value="" size="4" />
 		</div>
@@ -716,7 +703,7 @@
 		%>
 		<div>
 			<label><b><bean:message key="demographic.demographicaddrecordhtm.formPhoneWork" />:</b></label>
-			<input type="text" name="phone2" onBlur="formatPhoneNum()" value="">
+			<input type="text" name="phone2" onBlur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.adddemographic.phone2)" value="">
 			<bean:message key="demographic.demographicaddrecordhtm.Ext" />:
 			<input type="text" name="wPhoneExt" value="" style="display: inline" size="4" />
 		</div>
@@ -725,7 +712,7 @@
 		%>
 		<div>
 			<label><b><bean:message key="demographic.demographicaddrecordhtm.formPhoneCell" />: </b></label>
-			<input type="text" name="demo_cell" onBlur="formatPhoneNum()">
+			<input type="text" name="demo_cell" onBlur="Juno.Demographic.InputCtrl.formatPhoneNumber(document.adddemographic.demo_cell)">
 		</div>
 		<%
 		}else if(custom_demographic_fields.get(i).equals("newsletter")){
@@ -747,14 +734,6 @@
 			<input type="text" name="email" value="">
 		</div>
 		<%
-		}else if(custom_demographic_fields.get(i).equals("pin")){
-		%>
-		<div>
-			<label><b><bean:message key="demographic.demographicaddrecordhtm.formPIN" />:</b></label>
-			<input type="text" name="pin" value="">
-		</div>
-		<%
-
 		}else if(custom_demographic_fields.get(i).equals("dob")){
 		%>
 		<div>
@@ -1674,10 +1653,6 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 		</div>
 	</form>
 	<script src="<%=protocol%>www.google.com/jsapi"></script>
-	<script>
-		google.load("jquery", "1");
-		google.load("jqueryui", "1");
-	</script>
 	<script type="text/javascript">
 	<%
 		if(request.getParameter("dupHin") != null && request.getParameter("dupHin").equals("true"))
@@ -1695,12 +1670,12 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 	<%
 		}
 	%>
-		$(document).ready(function()
+        jQuery(document).ready(function()
 		{
 			// AJAX autocomplete referrer doctors
-			$("input[name=referral_doctor_name]").keypress(function()
+            jQuery("input[name=referral_doctor_name]").keypress(function()
 			{
-				$("input[name=referral_doctor_name]").autocomplete({
+                jQuery("input[name=referral_doctor_name]").autocomplete({
 					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
 					select: function(event, ui)
 					{
@@ -1708,13 +1683,13 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 					}
 				});
 			});
-			$("input[name=referral_doctor_no]").keypress(function()
+            jQuery("input[name=referral_doctor_no]").keypress(function()
 			{
-				$("input[name=referral_doctor_no]").autocomplete({
+                jQuery("input[name=referral_doctor_no]").autocomplete({
 					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
 					select: function(event, ui)
 					{
-						$("input[name=referral_doctor_name]").val(ui.item.namedesc);
+                        jQuery("input[name=referral_doctor_name]").val(ui.item.namedesc);
 					}
 				});
 			});

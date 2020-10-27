@@ -213,7 +213,7 @@ String login_input_style="login_txt_fields";
                         <br/>
                         <input type="submit" value="<bean:message key="index.btnSignIn"/>" />
                         </html:form>
-                        
+
                         <%if (AcceptableUseAgreementManager.hasAUA()){ %>
                         <span class="extrasmall">
                         	<bean:message key="global.aua" /> &nbsp; <a href="javascript:void(0);" onclick="showHideItem('auaText');"><bean:message key="global.showhide"/></a>

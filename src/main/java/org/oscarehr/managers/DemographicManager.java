@@ -49,6 +49,7 @@ import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.model.DemographicExtArchive;
 import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
@@ -60,6 +61,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
+import oscar.util.ConversionUtils;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -102,6 +104,9 @@ public class DemographicManager {
 
 	@Autowired
 	private DemographicMergedDao demographicMergedDao;
+
+	@Autowired
+	private DemographicService demographicService;
 
 	@Autowired
 	private PHRVerificationDao phrVerificationDao;
@@ -288,6 +293,8 @@ public class DemographicManager {
 		{
 			demographic.setFamilyDoctor2("<fd></fd><fdname></fdname>");
 		}
+		demographic.setPhone(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone()));
+		demographic.setPhone2(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone2()));
 		demographic.setLastUpdateUser(providerNo);
 		demographicDao.save(demographic);
 
@@ -325,10 +332,23 @@ public class DemographicManager {
 		
 		//save current demo
 		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		//remove control characters for existing records.
+		demographic.setPhone(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone()));
+		demographic.setPhone2(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone2()));
 		demographicDao.save(demographic);
+
+		// update MyHealthAccess connection status.
+		demographicService.queueMHAPatientUpdates(demographic, prevDemo, loggedInInfo);
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
+
+				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicNo(), ext.getKey());
+				if (existingExt != null)
+				{
+					ext.setId(existingExt.getId());
+				}
+
 				updateExtension(loggedInInfo, ext);
 			}
 		}
@@ -817,6 +837,10 @@ public class DemographicManager {
 			demographic.setProviderNo(null);
 		}
 
+		// Oscar expects date and month of birth to always be 2 character strings
+		demographic.setDateOfBirth(StringUtils.leftPad(demographic.getDateOfBirth(), 2, "0"));
+		demographic.setMonthOfBirth(StringUtils.leftPad(demographic.getMonthOfBirth(), 2, "0"));
+
 	}
 
 	private void validateDemographic(Demographic demographic)
@@ -856,16 +880,59 @@ public class DemographicManager {
 			error_string += "yearOfBirth is a required field.  ";
 			has_error = true;
 		}
+		else if (ConversionUtils.fromIntString(demographic.getYearOfBirth()) == 0)
+		{
+			error_string += "yearOfBirth should be should be a numeric value. ";
+			has_error = true;
+		}
+		else if (demographic.getYearOfBirth().length() != 4
+				|| ConversionUtils.fromIntString(demographic.getYearOfBirth()) < 1000
+				|| ConversionUtils.fromIntString(demographic.getYearOfBirth()) > 10000)
+		{
+			error_string += "yearOfBirth is expected to be a 4-digit number.";
+			has_error = true;
+		}
 
 		if (demographic.getMonthOfBirth() == null)
 		{
 			error_string += "monthOfBirth is a required field.  ";
 			has_error = true;
 		}
+		else if (ConversionUtils.fromIntString(demographic.getMonthOfBirth()) <= 0
+				|| ConversionUtils.fromIntString(demographic.getMonthOfBirth()) > 12
+				|| (demographic.getMonthOfBirth().length() != 1 && demographic.getMonthOfBirth().length() != 2)
+		)
+		{
+			error_string += "monthOfBirth should be a number between 1 and 12. ";
+			has_error = true;
+		}
 
 		if (demographic.getDateOfBirth() == null)
 		{
 			error_string += "dateOfBirth is a required field.  ";
+			has_error = true;
+		}
+		else if (ConversionUtils.fromIntString(demographic.getDateOfBirth()) <= 0)
+		{
+			error_string += "dateOfBirth should be a numeric value. ";
+			has_error = true;
+		}
+		else if (ConversionUtils.fromIntString(demographic.getDateOfBirth()) < 1
+		|| ConversionUtils.fromIntString(demographic.getDateOfBirth()) > 31
+		|| (demographic.getDateOfBirth().length() != 1 && demographic.getDateOfBirth().length() != 2))
+		{
+			error_string += "dateOfBirth should be a number between 1 and 31 (depending on month).";
+			has_error = true;
+		}
+
+		// Ensure that the proposed date is actually a valid date
+		String possibleBirthday = ConversionUtils.fromIntString(demographic.getYearOfBirth()).toString() + "-"
+				+ ConversionUtils.fromIntString(demographic.getMonthOfBirth()).toString() + "-"
+				+ ConversionUtils.fromIntString(demographic.getDateOfBirth());
+		Date validDate = ConversionUtils.fromDateString(possibleBirthday);
+		if (validDate == null)
+		{
+			error_string += "Need a valid birth date.";
 			has_error = true;
 		}
 

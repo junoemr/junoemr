@@ -23,11 +23,15 @@
 
 package org.oscarehr.common.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.annotation.SiteLocation;
 import org.oscarehr.common.listeners.BeanValidationEventListener;
+import org.oscarehr.integration.aqs.model.QueuedAppointmentLink;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -39,6 +43,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -49,12 +54,14 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Optional;
 
 @Entity
 @EntityListeners(BeanValidationEventListener.class)
 @Table(name = "appointment")
 public class Appointment extends AbstractModel<Integer> implements Serializable {
 
+	public static final String TODO = "t";
 	public static final String CANCELLED = "C";
 	public static final String BILLED = "B";
 	public static final String NO_SHOW = "N";
@@ -65,9 +72,15 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 		MYOSCAR_SELF_BOOKING
 	}
 
+	public enum ConfirmedByType
+	{
+		MHA_PATIENT_USER_ID,
+		SECURITY_NO
+	}
+
 	public static final String DONOTBOOK = "Do_Not_Book";
 
-	public static final int DEFAULT_REASON_CODE = 17;
+	public static final String DEFAULT_REASON = "Others";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -89,7 +102,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@Column(name = "end_time")
 	private Date endTime;
 
-	private String name;
+	private String name = "";
 
 	@Column(name = "demographic_no")
 	private int demographicNo;
@@ -103,11 +116,11 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@SiteLocation
 	private String location;
 
-	private String resources;
-	private String type;
+	private String resources = "";
+	private String type = "";
 	private String style;
 	private String billing;
-	private String status;
+		private String status;
 
 	@Column(name = "imported_status")
 	private String importedStatus;
@@ -129,14 +142,30 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@JoinColumn(name="lastupdateuser", referencedColumnName="provider_no", insertable=false, updatable=false)
 	private ProviderData lastUpdateUserRecord;
 
-	private String remarks;
-	private String urgency;
+	@Getter
+	@Setter
+	@OneToOne(mappedBy="appointment", cascade = CascadeType.ALL)
+	private QueuedAppointmentLink queuedAppointmentLink;
+
+	private String remarks = "";
+	private String urgency = "";
 	private boolean isVirtual;
 	private Integer creatorSecurityId;
 	
 	@Enumerated(EnumType.STRING)
 	private BookingSource bookingSource;
-	
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "confirmed_at")
+	private Date confirmedAt;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "confirmed_by_type")
+	private ConfirmedByType confirmedByType;
+
+	@Column(name = "confirmed_by")
+	private String confirmedBy;
+
 	private Integer reasonCode;
 
 	/** default constructor */
@@ -176,7 +205,6 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 		this.bookingSource = appointmentToCopy.bookingSource;
 		this.reasonCode = appointmentToCopy.reasonCode;
 	}
-
 
 	public Integer getReasonCode() {
 		return reasonCode;
@@ -413,6 +441,43 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
     	this.bookingSource = bookingSource;
     }
 
+	public Optional<Date> getConfirmedAt()
+	{
+		return Optional.ofNullable(this.confirmedAt);
+	}
+
+	public void setConfirmedAt(Date confirmedAt)
+	{
+		this.confirmedAt = confirmedAt;
+	}
+
+	public Optional<ConfirmedByType> getConfirmedByType()
+	{
+		return Optional.ofNullable(confirmedByType);
+	}
+
+	public void setConfirmedByType(ConfirmedByType confirmedByType)
+	{
+		this.confirmedByType = confirmedByType;
+	}
+
+	public Optional<String> getConfirmedBy()
+	{
+		return Optional.ofNullable(confirmedBy);
+	}
+
+	public void setConfirmedBy(String confirmedBy)
+	{
+		this.confirmedBy = confirmedBy;
+	}
+
+	public void confirm(Date confirmedAt, ConfirmedByType confirmedByType, String confirmedBy)
+	{
+		this.confirmedAt = confirmedAt;
+		this.confirmedBy = confirmedBy;
+		this.confirmedByType = confirmedByType;
+	}
+
 	@Override
 	public Integer getId() {
 		return id;
@@ -426,6 +491,11 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@PreUpdate
 	protected void jpaUpdateLastUpdateTime() {
 		this.updateDateTime = new Date();
+	}
+
+	public boolean isConfirmed()
+	{
+		return this.getConfirmedAt().isPresent();
 	}
 	
     public static final Comparator<Appointment> APPT_DATE_COMPARATOR =new Comparator<Appointment>()

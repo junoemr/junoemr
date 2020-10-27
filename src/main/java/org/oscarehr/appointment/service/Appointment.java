@@ -24,8 +24,17 @@ package org.oscarehr.appointment.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
+import org.oscarehr.common.dao.LookupListItemDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.model.LookupList;
+import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
+import org.oscarehr.integration.myhealthaccess.service.ClinicService;
+import org.oscarehr.integration.myhealthaccess.service.PatientService;
+import org.oscarehr.integration.service.IntegrationService;
+import org.oscarehr.managers.LookupListManager;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
@@ -59,7 +68,21 @@ public class Appointment
 	AppointmentService appointmentService;
 
 	@Autowired
+	PatientService patientService;
+
+	@Autowired
+	ClinicService clinicService;
+
+	@Autowired
 	MyHealthAccessService myHealthAccessService;
+
+	@Autowired
+	IntegrationService integrationService;
+
+	@Autowired
+	private LookupListManager lookupListManager;
+	@Autowired
+	private LookupListItemDao lookupListItemDao;
 
 	private String formatName(String upperFirstName, String upperLastName)
 	{
@@ -108,15 +131,24 @@ public class Appointment
 	 * @param appointment - the appointment to save
 	 * @param loggedInInfo - logged in info.
 	 */
-	public void saveNewAppointment(org.oscarehr.common.model.Appointment appointment,
-																 LoggedInInfo loggedInInfo, HttpServletRequest request)
+	public org.oscarehr.common.model.Appointment saveNewAppointment(org.oscarehr.common.model.Appointment appointment,
+																																	LoggedInInfo loggedInInfo, HttpServletRequest request,
+																																	boolean sendNotification)
 	{
+		appointment.setCreator(loggedInInfo.getLoggedInProviderNo());
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		oscarAppointmentDao.persist(appointment);
 
-		// book telehealth appointment in MHA
-		if (appointment.getIsVirtual())
-		{
-			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment);
+		if (sendNotification)
+		{// send MHA based appointment notification
+			Integration integration = integrationService.findMhaIntegration(appointment);
+			if (integration != null)
+			{
+				ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
+						loggedInInfo.getLoggedInSecurity().getSecurityNo());
+				appointmentService.sendGeneralAppointmentNotification(integration, loginTokenTo1.getToken(),
+						appointment.getId());
+			}
 		}
 
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
@@ -126,6 +158,54 @@ public class Appointment
 						LogConst.STATUS_SUCCESS,
 						String.valueOf(appointment.getId()),
 						request.getRemoteAddr());
+
+		return appointment;
+	}
+
+	/**
+	 * save a new telehealth appointment
+	 * @param appointment - the appointment to save
+	 * @param loggedInInfo - logged in info.
+	 * @param sendNotification - Whether to send notification of appointment booking to user or not.
+	 */
+	public org.oscarehr.common.model.Appointment saveNewTelehealthAppointment(org.oscarehr.common.model.Appointment appointment,
+																																						LoggedInInfo loggedInInfo, HttpServletRequest request, boolean sendNotification)
+	{
+		if (!appointment.getIsVirtual())
+		{
+			throw new IllegalArgumentException("Could not save telehealth appointment. Appointment is not virtual");
+		}
+
+		appointment.setCreator(loggedInInfo.getLoggedInProviderNo());
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+
+		oscarAppointmentDao.persist(appointment);
+
+		// book telehealth appointment in MHA
+		String siteName = null;
+		if (OscarProperties.getInstance().isMultisiteEnabled())
+		{
+			siteName = appointment.getLocation();
+		}
+
+		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), integrationService.findMhaIntegration(siteName)))
+		{
+			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment, sendNotification);
+		}
+		else
+		{
+			appointmentService.bookOneTimeTelehealthAppointment(loggedInInfo, appointment, sendNotification);
+		}
+
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
+				appointment.getDemographicNo(),
+				LogConst.ACTION_ADD,
+				LogConst.CON_APPT,
+				LogConst.STATUS_SUCCESS,
+				String.valueOf(appointment.getId()),
+				request.getRemoteAddr());
+
+		return appointment;
 	}
 
 	/**
@@ -232,7 +312,10 @@ public class Appointment
 						isSelfBooked,
 						false,
 						details.isVirtual(),
-						null
+						null,
+						details.isConfirmed(),
+						details.getCreatorSecurityId(),
+						details.getBookingSource()
 				);
 				// for the case where appointments are saved with a name but no demographic
 				if((appointment.getDemographicNo() == null || appointment.getDemographicNo() == 0) && details.getName() != null)
@@ -256,4 +339,28 @@ public class Appointment
 
 		return calendarEvents;
 	}
+
+	/**
+	 * Appointment reason codes map to lookup list items, which usually have the correct IDs but may not
+	 * be guaranteed to have the exact ID between instances.
+	 * This is the "safe" way of getting the correct reasonCode id for the reason we're trying to set.
+	 * @param reasonValue string corresponding to the reason code we're looking for
+	 * @return id of the LookupListItem entry with the correct reasonCode and LookupList, -1 otherwise
+	 */
+	public Integer getIdForAppointmentReasonCode(String reasonValue)
+	{
+		// reasonCode is intended to be a foreign key on LookupListItem, which is referenced by LookupList
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod();
+		LookupList reasonCodeList = lookupListManager.findLookupListByName(loggedInInfo, "reasonCode");
+		List<LookupListItem> reasonCodes = lookupListItemDao.findAll(null, null);
+		for (LookupListItem reasonCode : reasonCodes)
+		{
+			if (reasonCode.getLookupListId().equals(reasonCodeList.getId()) && reasonCode.getValue().equals(reasonValue))
+			{
+				return reasonCode.getId();
+			}
+		}
+		return -1;
+	}
+
 }

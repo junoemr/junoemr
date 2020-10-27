@@ -30,6 +30,7 @@
 <%
     String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
     boolean authed=true;
+    String providerNo = (String)request.getAttribute("provider_no");
 %>
 <security:oscarSec roleName="<%=roleName$%>"
         objectName="_admin,_admin.userAdmin" rights="r"
@@ -54,8 +55,10 @@
 <%@ page import="oscar.OscarProperties" %>
 <%@ page import="oscar.Misc" %>
 <%@ page import="oscar.MyDateFormat" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
 <%
 	SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
+	SecurityInfoManager securityInfoManager =SpringUtils.getBean(SecurityInfoManager.class);
 %>
 
 <html:html locale="true">
@@ -94,60 +97,69 @@
 	Security overlappingEntry = securityDao.findByUserName(username);
 	Security security = securityDao.find(Integer.parseInt(request.getParameter("security_no")));
 
-	if(security != null && (overlappingEntry == null || security.equals(overlappingEntry)))
+	if (securityInfoManager.superAdminModificationCheck((String)session.getAttribute("user"), request.getParameter("provider_no")))
 	{
-		security.setUserName(request.getParameter("user_name"));
-		security.setProviderNo(request.getParameter("provider_no"));
-		security.setBExpireset(request.getParameter("b_ExpireSet")==null?0:Integer.parseInt(request.getParameter("b_ExpireSet")));
-		security.setDateExpiredate(MyDateFormat.getSysDate(request.getParameter("date_ExpireDate")));
-		security.setBLocallockset(request.getParameter("b_LocalLockSet")==null?0:Integer.parseInt(request.getParameter("b_LocalLockSet")));
-		security.setBRemotelockset(request.getParameter("b_RemoteLockSet")==null?0:Integer.parseInt(request.getParameter("b_RemoteLockSet")));
-
-		if(request.getParameter("password") == null || !"*********".equals(request.getParameter("password")))
+		if(security != null && (overlappingEntry == null || security.equals(overlappingEntry)))
 		{
-			security.setPassword(sbTemp.toString());
+			security.setUserName(request.getParameter("user_name"));
+			security.setProviderNo(request.getParameter("provider_no"));
+			security.setBExpireset(request.getParameter("b_ExpireSet")==null?0:Integer.parseInt(request.getParameter("b_ExpireSet")));
+			security.setDateExpiredate(MyDateFormat.getSysDate(request.getParameter("date_ExpireDate")));
+			security.setBLocallockset(request.getParameter("b_LocalLockSet")==null?0:Integer.parseInt(request.getParameter("b_LocalLockSet")));
+			security.setBRemotelockset(request.getParameter("b_RemoteLockSet")==null?0:Integer.parseInt(request.getParameter("b_RemoteLockSet")));
+
+			if(request.getParameter("password") == null || !"*********".equals(request.getParameter("password")))
+			{
+				security.setPassword(sbTemp.toString());
+			}
+
+			if(request.getParameter("pin") == null || !"****".equals(request.getParameter("pin")))
+			{
+				security.setPin(sPin);
+			}
+
+			if (request.getParameter("forcePasswordReset") != null && request.getParameter("forcePasswordReset").equals("1"))
+			{
+				security.setForcePasswordReset(Boolean.TRUE);
+			}
+			else
+			{
+				security.setForcePasswordReset(Boolean.FALSE);
+			}
+
+			securityDao.saveEntity(security);
+			rowsAffected = 1;
 		}
 
-		if(request.getParameter("pin") == null || !"****".equals(request.getParameter("pin")))
-		{
-			security.setPin(sPin);
-		}
 
-		if (request.getParameter("forcePasswordReset") != null && request.getParameter("forcePasswordReset").equals("1"))
+		if (rowsAffected == 1)
 		{
-			security.setForcePasswordReset(Boolean.TRUE);
+			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_SECURITY,
+			request.getParameter("security_no") + "->" + request.getParameter("user_name"), request.getRemoteAddr());
+			%>
+			<p>
+			<h2><bean:message key="admin.securityupdate.msgUpdateSuccess" /> <%=request.getParameter("provider_no")%></h2>
+			<%
+		}
+		else if (security != null && !security.equals(overlappingEntry))
+		{
+			%>
+			<h2><bean:message key="admin.securityupdate.msgUpdateUsernameConflict"/></h2>
+			<%
 		}
 		else
 		{
-			security.setForcePasswordReset(Boolean.FALSE);
+			%>
+			<h1><bean:message key="admin.securityupdate.msgUpdateFailure" /><%= request.getParameter("provider_no") %>.</h1>
+			<%
 		}
-
-		securityDao.saveEntity(security);
-		rowsAffected = 1;
 	}
-
-
-  if (rowsAffected == 1)
-  {
-      LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_SECURITY,
-    		request.getParameter("security_no") + "->" + request.getParameter("user_name"), request.getRemoteAddr());
-%>
-<p>
-<h2><bean:message key="admin.securityupdate.msgUpdateSuccess" /> <%=request.getParameter("provider_no")%></h2>
-<%
-  }
-  else if (security != null && !security.equals(overlappingEntry))
-  {
-%>
-<h2><bean:message key="admin.securityupdate.msgUpdateUsernameConflict"/></h2>
-<%
-  }
-  else
-  {
-%>
-<h1><bean:message key="admin.securityupdate.msgUpdateFailure" /><%= request.getParameter("provider_no") %>.</h1>
-<%
-  }
+	else
+	{
+	%>
+		<h1><bean:message key="admin.securityaddsecurity.msgProviderNoAuthorization" /></h1>
+	<%
+	}
 %>
 
 </center>

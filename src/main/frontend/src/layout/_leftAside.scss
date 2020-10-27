@@ -1,6 +1,11 @@
 
 #patient-list-template {
 
+	.tab-content {
+		height: 100%;
+		overflow: hidden;
+	}
+
 	.appt-aside-container {
 		padding-top: 8px;
 		padding-bottom: 8px;

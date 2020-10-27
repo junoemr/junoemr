@@ -43,6 +43,7 @@ import org.oscarehr.common.dao.BillingDao;
 import org.oscarehr.common.dao.BillingPaymentTypeDao;
 import org.oscarehr.common.model.Billing;
 import org.oscarehr.common.model.BillingPaymentType;
+import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.entities.Billingmaster;
@@ -62,6 +63,7 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -1697,13 +1699,43 @@ public class MSPReconcile {
 	 */
 	public ResultSet getMSPRemittanceQuery(String payeeNo, String s21Id) {
 		MiscUtils.getLogger().debug(new java.util.Date() + ":MSPReconcile.getMSPRemittanceQuery(payeeNo, s21Id)");
-		String qry = "SELECT billing_code,provider.first_name,provider.last_name,t_practitionerno,t_s00type,billingmaster.service_date as 't_servicedate',t_payment," + "t_datacenter,billing.demographic_name,billing.demographic_no,teleplanS00.t_paidamt,t_exp1,t_exp2,t_exp3,t_exp4,t_exp5,t_exp6,t_dataseq " + " from teleplanS00,billing,billingmaster,provider " + " where teleplanS00.t_officeno = billingmaster.billingmaster_no " + " and teleplanS00.s21_id = " + s21Id
-		        + " and billingmaster.billing_no = billing.billing_no " + " and provider.ohip_no= teleplanS00.t_practitionerno " + " and teleplanS00.t_payeeno = " + payeeNo + " order by provider.first_name,t_servicedate,billing.demographic_name";
-
+		String qry =
+				"SELECT" +
+				"    bm.billing_code," +
+				"    p.first_name," +
+				"    p.last_name," +
+				"    p.provider_no," +
+				"    t.t_practitionerno," +
+				"    t.t_s00type," +
+				"    bm.service_date as 't_servicedate'," +
+				"    t.t_payment," +
+				"    t.t_datacenter," +
+				"    b.demographic_name," +
+				"    b.demographic_no," +
+				"    t.t_paidamt," +
+				"    t.t_exp1," +
+				"    t.t_exp2," +
+				"    t.t_exp3," +
+				"    t.t_exp4," +
+				"    t.t_exp5," +
+				"    t.t_exp6," +
+				"    t.t_dataseq " +
+				"FROM" +
+				"    teleplanS00 t " +
+				"    LEFT JOIN billingmaster bm ON bm.billingmaster_no = t.t_officeno" +
+				"    LEFT JOIN billing b ON b.billing_no = bm.billing_no " +
+				"    LEFT JOIN provider p ON p.provider_no = b.provider_no " +
+				"WHERE " +
+				"    t.s21_id = ? AND t.t_payeeno = ? " +
+				"ORDER BY p.first_name,t.t_servicedate,b.demographic_name";
 		ResultSet rs = null;
-		try {
 
-			rs = DBHandler.GetSQL(qry);
+		try {
+			PreparedStatement preparedStatement = DbConnectionFilter.getThreadLocalDbConnection().prepareStatement(qry);
+			preparedStatement.setString(1,s21Id);
+			preparedStatement.setString(2,payeeNo);
+
+			rs = preparedStatement.executeQuery();
 		} catch (SQLException ex) {
 			MiscUtils.getLogger().error("Error", ex);
 		}

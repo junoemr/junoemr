@@ -65,6 +65,8 @@ public class AppointmentDetails
 	private boolean hasTicklers;
 	private String ticklerMessages;
 	private boolean isVirtual;
+	private boolean isConfirmed;
+	private Integer creatorSecurityId;
 
 	public AppointmentDetails(
 		Integer appointmentNo,
@@ -103,7 +105,9 @@ public class AppointmentDetails
 		LocalDate birthday,
 		boolean hasTicklers,
 		String ticklerMessages,
-		boolean isVirtual
+		boolean isVirtual,
+		boolean isConfirmed,
+		Integer creatorSecurityId
 	)
 	{
 		this.appointmentNo = appointmentNo;
@@ -120,6 +124,7 @@ public class AppointmentDetails
 		this.type = type;
 		this.style = style;
 		this.bookingSource = bookingSource;
+		this.creatorSecurityId = creatorSecurityId;
 		this.status = status;
 		this.urgency = urgency;
 		this.statusTitle = statusTitle;
@@ -143,6 +148,7 @@ public class AppointmentDetails
 		this.hasTicklers = hasTicklers;
 		this.ticklerMessages = ticklerMessages;
 		this.isVirtual = isVirtual;
+		this.isConfirmed = isConfirmed;
 	}
 
 	public Integer getAppointmentNo()
@@ -332,5 +338,20 @@ public class AppointmentDetails
 	public String getFamilyDoctor()
 	{
 		return familyDoctor;
+	}
+
+	public boolean isConfirmed()
+	{
+		return isConfirmed;
+	}
+
+	public Integer getCreatorSecurityId()
+	{
+		return creatorSecurityId;
+	}
+
+	public void setCreatorSecurityId(Integer creatorSecurityId)
+	{
+		this.creatorSecurityId = creatorSecurityId;
 	}
 }

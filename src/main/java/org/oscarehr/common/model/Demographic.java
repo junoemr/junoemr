@@ -33,6 +33,8 @@ import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,6 +46,8 @@ import java.util.GregorianCalendar;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static oscar.util.StringUtils.filterControlCharacters;
 
 /**
  * This is the object class that relates to the demographic table. Any customizations belong here.
@@ -1570,4 +1574,22 @@ public class Demographic implements Serializable
 		return org.oscarehr.demographic.model.Demographic.isNewBorn(birthday, getVer());
 	}
 
+
+	@PrePersist
+	@PreUpdate
+	private void removeControlCharacter()
+	{
+		setPhone(filterControlCharacters(this.getPhone()));
+		setPhone2(filterControlCharacters(this.getPhone2()));
+	}
+
+	/**
+	 * checks if the demographic is active. Not to be confused with "isActive"
+	 * which is completely different.
+	 * @return - true if active false otherwise.
+	 */
+	public boolean isPatientActive()
+	{
+		return !org.oscarehr.demographic.model.Demographic.getInactiveDemographicStatuses().contains(this.getPatientStatus());
+	}
 }

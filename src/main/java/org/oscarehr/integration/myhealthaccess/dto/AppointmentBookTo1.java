@@ -31,6 +31,7 @@ import oscar.util.Jackson.ZonedDateTimeStringDeserializer;
 import oscar.util.Jackson.ZonedDateTimeStringSerializer;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 public class AppointmentBookTo1
 {
@@ -60,9 +61,21 @@ public class AppointmentBookTo1
 	String status;
 	@JsonProperty("is_virtual")
 	Boolean isVirtual;
+	@JsonProperty("patient_user_id")
+	UUID remoteId;
 
+	// one time telehealth booking parameters
+	@JsonProperty("one_time_telehealth")
+	Boolean oneTimeTelehealth = false; // indicates if one time telehealth
+	@JsonProperty("send_one_time_link")
+	Boolean sendOneTimeLink = false; // indicates if the initial invite should be sent to patient
 
 	public AppointmentBookTo1(Appointment appointment)
+	{
+		this(appointment, false, false, null);
+	}
+
+	public AppointmentBookTo1(Appointment appointment, Boolean oneTimeTelehealth, Boolean sendOneTimeLink, UUID remoteId)
 	{
 		this.appointmentNo = appointment.getId().toString();
 		this.providerNo = appointment.getProviderNo();
@@ -74,6 +87,9 @@ public class AppointmentBookTo1
 		this.notes = appointment.getNotes();
 		this.isVirtual = appointment.getIsVirtual();
 		this.status = appointment.getStatus();
+		this.oneTimeTelehealth = oneTimeTelehealth;
+		this.sendOneTimeLink = sendOneTimeLink;
+		this.remoteId = remoteId;
 	}
 
 	public String getAppointmentNo()
@@ -185,4 +201,26 @@ public class AppointmentBookTo1
 	{
 		this.status = status;
 	}
+
+	public Boolean getOneTimeTelehealth()
+	{
+		return oneTimeTelehealth;
+	}
+
+	public void setOneTimeTelehealth(Boolean oneTimeTelehealth)
+	{
+		this.oneTimeTelehealth = oneTimeTelehealth;
+	}
+
+	public Boolean getSendOneTimeLink()
+	{
+		return sendOneTimeLink;
+	}
+
+	public void setSendOneTimeLink(Boolean sendOneTimeLink)
+	{
+		this.sendOneTimeLink = sendOneTimeLink;
+	}
+
+
 }

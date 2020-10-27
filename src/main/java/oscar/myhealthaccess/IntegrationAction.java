@@ -29,6 +29,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
@@ -44,6 +46,7 @@ import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.transaction.annotation.Transactional;
 import oscar.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,6 +55,7 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
+@Transactional
 public class IntegrationAction extends DispatchAction
 {
 	private static MyHealthAccessService myHealthAccessService = SpringUtils.getBean(MyHealthAccessService.class);
@@ -145,15 +149,38 @@ public class IntegrationAction extends DispatchAction
 		}
 		catch (Exception e)
 		{
+			MiscUtils.getLogger().error(e.toString());
 			return listIntegrations(mapping, request);
 		}
 	}
 
-	private ActionForward getRemoteRedirect(IntegrationData integrationData, HttpServletRequest request)
+	protected ActionForward getRemoteRedirect(IntegrationData integrationData, HttpServletRequest request)
 	{
+		OscarAppointmentDao oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 		String appointmentNo = request.getParameter(Param.APPOINTMENT);
+
+		Appointment appointment = null;
+		if(appointmentNo != null)
+		{
+			appointment = oscarAppointmentDao.find(Integer.parseInt(appointmentNo));
+		}
+
 		// TODO: Better implementation for dynamic redirect links
-		String myHealthAccessURL = myHealthAccessService.getTelehealthUrl(integrationData, appointmentNo);
+		String myHealthAccessURL = "";
+		if (appointment != null && appointment.getQueuedAppointmentLink() != null)
+		{
+			// aqs telehealth
+			myHealthAccessURL = myHealthAccessService.getTelehealthUrl(integrationData,
+			                                                           appointmentNo,
+			                                                           String.format(MyHealthAccessService.MHA_BASE_AQS_TELEHEALTH_URL,
+			                                                                         appointment.getQueuedAppointmentLink().getQueueId(),
+			                                                                         appointment.getQueuedAppointmentLink().getQueuedAppointmentId()));
+		}
+		else
+		{
+			// regular telehealth
+			myHealthAccessURL = myHealthAccessService.getTelehealthUrl(integrationData, appointmentNo);
+		}
 
 		ActionRedirect myHealthAccessRedirectAction = new ActionRedirect();
 		myHealthAccessRedirectAction.setPath(myHealthAccessURL);

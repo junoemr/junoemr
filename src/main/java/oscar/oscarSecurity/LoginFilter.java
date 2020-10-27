@@ -78,7 +78,10 @@ public class LoginFilter implements Filter {
 		"/myoscar_login_tester.jsp",
 		"/myoscar_login_tester2.jsp",
 		"/share/javascript/jquery/",
-		"/prometheus/metrics"
+		"/prometheus/metrics",
+		"/oauth",
+		"/oauth/action.do",
+		"/oauth/index.jsp"
 	};
 	
 	private static final String[] EXEMPT_URLS_FOR_REQUEST_TIMEOUT = {

@@ -12,15 +12,19 @@
 		.integration-item {
 			flex: 0 0 100%;
 			justify-content: center;
+			align-items: center;
+			margin-bottom: 8px;
 
 			.switch {
+				margin: 0;
 				display: inline-block;
 				@include juno-toggle-switch(32px, 4px, .4s);
 			}
 
 			.switch-label {
 				padding-right: 12px;
-				min-width: 150px;
+				margin: 0;
+				min-width: 200px;
 				@include juno-font-default-size(20px);
 			}
 

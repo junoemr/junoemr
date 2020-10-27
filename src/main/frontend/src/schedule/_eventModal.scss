@@ -45,7 +45,7 @@
 
 		.tab-pane {
 			overflow: auto;
-			height: calc(#{$modal-body-height} - #{$tabs-height});
+			height: calc(100% - #{$tabs-height});
 
 			.tab-bar-inputs {
 				position: absolute;
@@ -124,5 +124,12 @@
 	}
 	.form-control-static {
 		min-height: 10px;
+	}
+
+	// ca-max-characters directive
+	.form-group .textarea-char-counter {
+		margin-top: -50px;
+		margin-left: 50px;
+		float: left;
 	}
 }

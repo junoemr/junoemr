@@ -488,6 +488,11 @@ angular.module('Layout').component("primaryNavigation", {
 					}
 				}
 			}
+			else if (angular.isDefined(item) && angular.isDefined(item.url) &&
+					item.url !== null && item.openNewTab)
+			{
+				window.open(item.url, "_blank");
+			}
 			else if (angular.isDefined(item) &&
 				angular.isDefined(item.url) &&
 				item.url !== null)

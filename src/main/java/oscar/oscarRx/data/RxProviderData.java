@@ -56,7 +56,7 @@ public class RxProviderData {
         return convertProvider(providerDao.getProvider(providerNo));
     }
     
-    public Provider convertProvider(org.oscarehr.common.model.Provider p) {
+    public Provider convertProvider(org.oscarehr.common.model.Provider provider) {
     	String surname=null, firstName=null,  clinicName=null, clinicAddress=null, clinicCity=null, clinicPostal=null, clinicPhone=null, clinicFax=null, clinicProvince=null, practitionerNo=null;
     	boolean useFullAddress=true;
         //Get Provider from database
@@ -75,35 +75,34 @@ public class RxProviderData {
         Provider prov = null;
         String providerNo = null;
         
-        if(p != null) {
-        	surname = p.getLastName();
-        	firstName = p.getFirstName();
-        	practitionerNo = p.getPractitionerNo();
+        if(provider != null) {
+        	surname = provider.getLastName();
+        	firstName = provider.getFirstName();
+        	practitionerNo = provider.getPractitionerNo();
         	if(firstName.indexOf("Dr.")<0) {
                 firstName = "Dr. " + firstName;
             }
         	
-        	if(p.getWorkPhone() != null && p.getWorkPhone().length()>0) {
-        		clinicPhone = p.getWorkPhone();
+        	if(provider.getWorkPhone() != null && provider.getWorkPhone().length()>0) {
+        		clinicPhone = provider.getWorkPhone();
         	}
         	
-        	if(p.getComments() != null && p.getComments().length()>0) {
-        		String pFax = SxmlMisc.getXmlContent(p.getComments(), "xml_p_fax");
+        	if(provider.getComments() != null && provider.getComments().length()>0) {
+        		String pFax = SxmlMisc.getXmlContent(provider.getComments(), "xml_p_fax");
         		if(pFax != null && pFax.length()>0) {
         			clinicFax = pFax;
         		}
         	}
         	
-        	if(p.getAddress() != null && p.getAddress().length()>0) {
-        		clinicAddress = p.getAddress();
+        	if(provider.getAddress() != null && provider.getAddress().length()>0) {
+        		clinicAddress = provider.getAddress();
         		useFullAddress=false;
         	}
         
-        	providerNo = p.getProviderNo();
-        	UserProperty prop = null;
-        
-        	prop = userPropertyDao.getProp(providerNo, "faxnumber");
-        	if(prop != null && prop.getValue().length()>0) {
+        	providerNo = provider.getProviderNo();
+        	UserProperty prop = userPropertyDao.getProp(providerNo, UserProperty.PROVIDER_FAXNUMBER);
+        	if(prop != null && prop.getValue() != null && prop.getValue().length() > 0)
+        	{
         		clinicFax = prop.getValue();
         	}
         

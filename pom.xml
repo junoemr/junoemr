@@ -56,6 +56,10 @@
 			<id>local_repo</id>
 			<url>file://${basedir}/local_repo</url>
 		</repository>
+		<repository>
+			<id>archiva.internal</id>
+			<url>https://mvn.cloudpractice.ca/repository/internal</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -63,6 +67,7 @@
 			<url>file://${basedir}/local_repo</url>
 		</pluginRepository>
 	</pluginRepositories>
+
 	<dependencies>
 		<!-- general libraries -->
 		<dependency>
@@ -1270,12 +1275,48 @@
             <artifactId>java-jwt</artifactId>
             <version>3.8.1</version>
         </dependency>
+        <!-- Integration Tests -->
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>3.0.0-M4</version>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
 			<version>3.141.59</version>
 		</dependency>
+		<!-- Google APIs for OAuth -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>1.30.10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-cloudresourcemanager</artifactId>
+			<version>v1-rev20200720-1.30.10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-oauth2-http</artifactId>
+			<version>0.21.1</version>
+		</dependency>
+		<!-- Lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.12</version>
+		</dependency>
+		<!-- AQS -->
+		<dependency>
+			<groupId>ca.cloudpractice</groupId>
+			<artifactId>aqs-java-client</artifactId>
+			<version>0.3.5</version>
+		</dependency>
 	</dependencies>
+
 	<build>
 		<resources>
 			<resource>
@@ -1698,7 +1739,7 @@
 					<systemProperties>
 						<systemProperty>
 							<key>openApiSpecBuilder.resourceClassCsv</key>
-							<value>org.oscarehr.ws.rest.SystemPreferenceWebService,org.oscarehr.ws.rest.ScheduleService,org.oscarehr.ws.rest.SitesService,org.oscarehr.ws.rest.AppointmentService,org.oscarehr.ws.rest.ProviderPreferenceWebService,org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService,org.oscarehr.ws.rest.myHealthAccess.PatientWebService</value>
+							<value>org.oscarehr.ws.rest.SystemPreferenceWebService,org.oscarehr.ws.rest.ScheduleService,org.oscarehr.ws.rest.SitesService,org.oscarehr.ws.rest.AppointmentService,org.oscarehr.ws.rest.ProviderPreferenceWebService,org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService,org.oscarehr.ws.rest.myhealthaccess.DemographicWebService,org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService,org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService,org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService,org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService,org.oscarehr.ws.rest.integrations.aqs.QueueWebService</value>
 						</systemProperty>
 						<systemProperty>
 							<key>openApiSpecBuilder.outputDirectory</key>
@@ -2210,30 +2251,37 @@
 									</systemPropertyVariables>
 								</configuration>
 							</execution>
-							<execution>
-								<id>integration-test</id>
-								<goals>
-									<goal>test</goal>
-								</goals>
-								<phase>integration-test</phase>
-								<configuration>
-									<skipTests>false</skipTests>
-									<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
-									<excludes>
-										<exclude>**/SetupDatabase.java</exclude>
-									</excludes>
-									<includes>
-										<include>integration/tests/*</include>
-									</includes>
-									<systemPropertyVariables>
-										<oscar.skip.dbinit>true</oscar.skip.dbinit>
-										<buildDirectory>${project.build.directory}</buildDirectory>
-									</systemPropertyVariables>
-								</configuration>
-							</execution>
 						</executions>
 						<version>2.10</version>
 					</plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>integration-test</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                                <phase>integration-test</phase>
+                                <configuration>
+                                    <skipTests>false</skipTests>
+                                    <argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
+                                    <excludes>
+                                        <exclude>**/SetupDatabase.java</exclude>
+                                    </excludes>
+                                    <includes>
+                                        <include>integration/tests/*</include>
+                                    </includes>
+                                    <systemPropertyVariables>
+                                        <oscar.skip.dbinit>true</oscar.skip.dbinit>
+                                        <buildDirectory>${project.build.directory}</buildDirectory>
+                                    </systemPropertyVariables>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <version>3.0.0-M4</version>
+                    </plugin>
 				</plugins>
 			</build>
 		</profile>
