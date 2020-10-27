@@ -71,6 +71,7 @@ import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographicImport.service.ImportExportService;
+import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.oscarehr.e2e.director.E2ECreator;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentCommentDao;
@@ -263,7 +264,7 @@ public class DemographicExportAction4 extends Action {
 				for (String demoNo : list)
 				{
 					Integer demographicId = Integer.parseInt(demoNo);
-					GenericFile file = importExportService.exportDemographic(demographicId);
+					GenericFile file = importExportService.exportDemographic(ImporterExporterFactory.IMPORTER_TYPE.CDS_5, demographicId);
 					files.add(file.getFileObject());
 				}
 

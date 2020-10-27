@@ -114,8 +114,8 @@ public class DemographicModelToExportConverter extends
 		}
 
 		//TODO how to handle lazy loading etc.?
-		List<Appointment> appointments = appointmentDao.findByDemographicId(input.getDemographicId(), 0, 100);
-		exportDemographic.addAppointments(appointmentConverter.convert(appointments));
+		List<Appointment> appointments = appointmentDao.getAllByDemographicNo(input.getDemographicId());
+		exportDemographic.setAppointmentList(appointmentConverter.convert(appointments));
 
 		return exportDemographic;
 	}

@@ -25,13 +25,9 @@ package org.oscarehr.demographicImport.service;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographicImport.converter.DemographicModelToExportConverter;
-import org.oscarehr.demographicImport.mapper.cds.in.CDSDemographicImportMapper;
-import org.oscarehr.demographicImport.mapper.cds.out.CDSExportMapper;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
-import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -51,39 +47,25 @@ public class ImportExportService
 	@Autowired
 	DemographicModelToExportConverter modelToExportConverter;
 
-	public void importDemographic(GenericFile importFile) throws IOException
+	public void importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType, GenericFile importFile) throws IOException
 	{
-		CDSFileParser parser = new CDSFileParser();
-		CDSDemographicImportMapper mapper = new CDSDemographicImportMapper();
+		DemographicImporter importer = ImporterExporterFactory.getImporter(importType);
+		Demographic demographic = importer.importDemographic(importFile);
 
-		OmdCds elem = parser.parse(importFile);
-		logger.info(ReflectionToStringBuilder.toString(elem));
-		Demographic junoImportObject = mapper.importToJuno(elem.getPatientRecord().getDemographics());
-
-		logger.info(ReflectionToStringBuilder.toString(junoImportObject));
-
-//		I parsedImportObject = parser.parse(importFile);
-//		E junoTransientObject = mapper.importToJuno(parsedImportObject);
-//		// TODO persist the transient object structure
+		// TODO persist the transient object structure
+		logger.info(ReflectionToStringBuilder.toString(demographic));
 	}
 
-	public GenericFile exportDemographic(Demographic junoTransientObject) throws IOException
+	public GenericFile exportDemographic(ImporterExporterFactory.IMPORTER_TYPE importType, Demographic junoTransientObject) throws IOException
 	{
-//		// TODO load the transient object structure
-//		I formatObject = mapper.exportFromJuno(junoTransientObject);
-//		parser.write(formatObject);
-
-		CDSFileParser parser = new CDSFileParser();
-		CDSExportMapper mapper = new CDSExportMapper();
-		OmdCds omdCds = mapper.exportFromJuno(junoTransientObject);
-
-		return parser.write(omdCds);
+		DemographicExporter exporter = ImporterExporterFactory.getExporter(importType);
+		return exporter.exportDemographic(junoTransientObject);
 	}
 
-	public GenericFile exportDemographic(Integer demographicId) throws IOException
+	public GenericFile exportDemographic(ImporterExporterFactory.IMPORTER_TYPE importType, Integer demographicId) throws IOException
 	{
 		org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
 		Demographic exportDemographic = modelToExportConverter.convert(demographic);
-		return this.exportDemographic(exportDemographic);
+		return this.exportDemographic(importType, exportDemographic);
 	}
 }

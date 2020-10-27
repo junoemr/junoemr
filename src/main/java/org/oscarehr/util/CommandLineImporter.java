@@ -28,6 +28,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.service.ImportExportService;
+import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import oscar.OscarProperties;
 
@@ -111,7 +112,7 @@ public class CommandLineImporter
 
 				try
 				{
-					importExportService.importDemographic(importFile);
+					importExportService.importDemographic(ImporterExporterFactory.IMPORTER_TYPE.CDS_5, importFile);
 
 					importCount++;
 					moveToCompleted(importFile, importFileDirectory);
