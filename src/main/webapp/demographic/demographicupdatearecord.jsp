@@ -318,7 +318,7 @@
 
 	if(request.getParameter("hin") != null && request.getParameter("hin").length() > 5 && !hinDupCheckException)
 	{
-		boolean isUnique = demographicManager.isUniqueHealthCard(loggedInInfo, hin, demographicNo);
+		boolean isUnique = demographicManager.isUniqueHealthCard(loggedInInfo, hin, ver, hcType, demographicNo);
 
 		if (!isUnique)
 		{

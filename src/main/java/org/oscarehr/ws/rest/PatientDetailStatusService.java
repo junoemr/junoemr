@@ -149,11 +149,15 @@ public class PatientDetailStatusService extends AbstractServiceImpl {
 	
 	@GET
 	@Path("/isUniqueHC")
-	public GenericRESTResponse isUniqueHC(@QueryParam("hin") String healthCardNo, @QueryParam("demographicNo") Integer demographicNo) {
+	public GenericRESTResponse isUniqueHC(@QueryParam("hin") String healthCardNo,
+										  @QueryParam("ver") String version,
+										  @QueryParam("province") String hcType,
+										  @QueryParam("demographicNo") Integer demographicNo)
+	{
 		GenericRESTResponse response = new GenericRESTResponse();
 		if (healthCardNo != null && !healthCardNo.trim().isEmpty() && demographicNo != null)
 		{
-			boolean isUnique = demographicManager.isUniqueHealthCard(getLoggedInInfo(), healthCardNo, demographicNo);
+			boolean isUnique = demographicManager.isUniqueHealthCard(getLoggedInInfo(), healthCardNo, version, hcType, demographicNo);
 			response.setSuccess(isUnique);
 		}
 		return response;
