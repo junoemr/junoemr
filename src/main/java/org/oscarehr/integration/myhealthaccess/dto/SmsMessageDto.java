@@ -20,40 +20,24 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.integrations.aqs.transfer;
+package org.oscarehr.integration.myhealthaccess.dto;
 
-import ca.cloudpractice.aqs.client.model.QueuedAppointmentStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@Getter @Setter
-@XmlRootElement
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AppointmentQueueTo1 implements Serializable
+public class SmsMessageDto
 {
-	@JsonProperty("id")
-	private UUID remoteId;
-	private String queueName;
-	private Integer queueLimit;
-	private String queueColor;
-	@JsonSerialize(using = OffsetDateTimeSerializer.class)
-	private OffsetDateTime createdAt;
-	private QueuedAppointmentStatus status;
-	private AppointmentQueueOnDemandSettingsTransfer appointmentQueueOnDemandSettings;
-	private QueueAvailabilitySettingsTransfer availabilitySettings;
-	private Integer defaultAppointmentDurationMinutes;
-	private Boolean isAvailable;
+	@JsonProperty("clinic_id")
+	private UUID clinicId;
 
-	public AppointmentQueueTo1()
-	{
-	}
+	@JsonProperty("phone_number")
+	private String smsNumber;
+	@JsonProperty("message_text")
+	private String smsText;
+
 }

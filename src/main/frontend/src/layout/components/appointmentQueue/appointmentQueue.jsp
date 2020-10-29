@@ -45,6 +45,17 @@
 		</div>
 	</div>
 
+	<juno-round-button
+					class="add-button"
+					component-style="$ctrl.compoentStyle"
+					button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL"
+					button-color="JUNO_BUTTON_COLOR.PRIMARY"
+					title="add to queue"
+					ng-click="$ctrl.openBookQueuedAppointmentModal()"
+	>
+		<i class="icon icon-plus"></i>
+	</juno-round-button>
+
 	<div class="list-footer juno-text" ng-class="[$ctrl.componentStyle + '-background']">
 		{{$ctrl.currentQueue.items.length}}
 		<span class="middle-text juno-text-secondary">

@@ -24,6 +24,8 @@ package org.oscarehr.ws.rest.transfer.providerManagement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
@@ -69,6 +71,9 @@ public class ProviderEditFormTo1 implements Serializable
 	private String workPhone;
 	private String cellPhone;
 	private String otherPhone;
+	@Getter
+	@Setter
+	private String bookingNotificationNumbers;
 	private String fax;
 	private String contactEmail;
 	private String pagerNumber;
@@ -140,6 +145,7 @@ public class ProviderEditFormTo1 implements Serializable
 		this.setHomePhone(providerData.getPhone());
 		this.setWorkPhone(providerData.getWorkPhone());
 		this.setContactEmail(providerData.getEmail());
+		this.setBookingNotificationNumbers(providerData.getBookingNotificationNumbers());
 		this.setFax(SxmlMisc.getXmlContent(providerData.getComments(), ProviderData.COMMENT_FAX_TAG));
 		this.setCellPhone(SxmlMisc.getXmlContent(providerData.getComments(), ProviderData.COMMENT_CELL_TAG));
 		this.setPagerNumber(SxmlMisc.getXmlContent(providerData.getComments(), ProviderData.COMMENT_PAGER_TAG));
@@ -186,6 +192,7 @@ public class ProviderEditFormTo1 implements Serializable
 		providerData.setAddress(this.getAddress());
 		providerData.setPhone(this.getHomePhone());
 		providerData.setWorkPhone(this.getWorkPhone());
+		providerData.setBookingNotificationNumbers(this.getBookingNotificationNumbers());
 		providerData.setEmail(this.getContactEmail());
 
 		// set provider extended settings. yes it is an xml string shoved in to the comments column *face palm*

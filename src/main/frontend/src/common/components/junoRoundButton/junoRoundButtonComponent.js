@@ -21,46 +21,22 @@
 * Canada
 */
 
-import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
 
-angular.module('Common.Components').component('junoSelect', {
-	templateUrl: 'src/common/components/junoSelect/junoSelect.jsp',
+angular.module('Common.Components').component('junoRoundButton', {
+	templateUrl: 'src/common/components/junoRoundButton/junoRoundButton.jsp',
 	bindings: {
-		ngModel: "=",
-		options: "<",
-		placeholder: "@?",
 		label: "@?",
 		labelPosition: "<?",
 		componentStyle: "<?",
+		buttonColor: "<?",
+		buttonColorPattern: "<?",
+		buttonColorOverride: "<?",
 		disabled: "<?",
-		onChange: "&?"
 	},
-	controller: [function ()
-	{
+	transclude: true,
+	controller: [ function () {
 		let ctrl = this;
 
-		ctrl.$onInit = () =>
-		{
-			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
-			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-		};
-
-		ctrl.labelClasses = () =>
-		{
-			return [ctrl.labelPosition];
-		};
-
-		ctrl.componentClasses = () =>
-		{
-			return [ctrl.componentStyle];
-		}
-
-		ctrl.onSelectChange = (value) =>
-		{
-			if (ctrl.onChange)
-			{
-				ctrl.onChange({value: value});
-			}
-		}
 	}]
 });

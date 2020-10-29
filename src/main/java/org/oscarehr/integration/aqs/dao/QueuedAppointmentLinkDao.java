@@ -26,11 +26,21 @@ import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.integration.aqs.model.QueuedAppointmentLink;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.Query;
+import java.util.UUID;
+
 @Repository
 public class QueuedAppointmentLinkDao extends AbstractDao<QueuedAppointmentLink>
 {
 	public QueuedAppointmentLinkDao()
 	{
 		super(QueuedAppointmentLink.class);
+	}
+
+	public QueuedAppointmentLink findByQueuedAppointmentId(UUID queuedAppointmentId)
+	{
+		Query query = entityManager.createQuery("SELECT q FROM QueuedAppointmentLink q WHERE q.queuedAppointmentId = :queuedAppointmentId");
+		query.setParameter("queuedAppointmentId", queuedAppointmentId.toString());
+		return getSingleResultOrNull(query);
 	}
 }

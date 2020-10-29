@@ -5,6 +5,7 @@
 	<button class="btn"
 					ng-class="$ctrl.buttonClasses()"
 					ng-click="$ctrl.onClick()"
+					ng-disabled="$ctrl.disabled"
 					title="{{$ctrl.title}}">
 		<i class="icon icon-check" ng-style="$ctrl.hideIcon()"></i>
 	</button>
