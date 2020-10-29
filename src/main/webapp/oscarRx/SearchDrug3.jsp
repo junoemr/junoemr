@@ -1704,26 +1704,33 @@
 		}
 
 		function customWarning2(){
-			if (confirm('This feature will allow you to manually enter a drug.'
-				+ '\nWarning: Only use this feature if absolutely necessary, as you will lose the following functionality:'
-				+ '\n  *  Known Dosage Forms / Routes'
-				+ '\n  *  Drug Allergy Information'
-				+ '\n  *  Drug-Drug Interaction Information'
-				+ '\n  *  Drug Information'
-				+ '\n\nAre you sure you wish to use this feature?')==true) {
-				//call another function to bring up prescribe.jsp
-				var randomId=Math.round(Math.random()*1000000);
-				var searchString = $("searchString").value;
-				var url="<c:out value="${ctx}"/>"+ "/oscarRx/WriteScript.do?parameterValue=newCustomDrug&name=" + encodeURIComponent(searchString);
-				var data="randomId="+randomId;
-				new Ajax.Updater('rxText',url,{method:'get',parameters:data,asynchronous:true,evalScripts:true,
-					insertion: Insertion.Bottom, onComplete:function(transport){
-						updateQty($('quantity_'+randomId));
-					}});
-
-			}
-
+		    if ($("searchString").value === null || $("searchString").value === "")
+		    {
+		        window.alert("Please enter a drug name")
+		    }
+		        else
+		        {
+				if (confirm('This feature will allow you to manually enter a drug.'
+					+ '\nWarning: Only use this feature if absolutely necessary, as you will lose the following functionality:'
+					+ '\n  *  Known Dosage Forms / Routes'
+					+ '\n  *  Drug Allergy Information'
+					+ '\n  *  Drug-Drug Interaction Information'
+					+ '\n  *  Drug Information'
+					+ '\n\nAre you sure you wish to use this feature?') === true)
+				{
+					//call another function to bring up prescribe.jsp
+					var randomId=Math.round(Math.random()*1000000);
+					var searchString = $("searchString").value;
+					var url="<c:out value="${ctx}"/>"+ "/oscarRx/WriteScript.do?parameterValue=newCustomDrug&name=" + encodeURIComponent(searchString);
+					var data="randomId="+randomId;
+					new Ajax.Updater('rxText',url,{method:'get',parameters:data,asynchronous:true,evalScripts:true,
+						insertion: Insertion.Bottom, onComplete:function(transport){
+							updateQty($('quantity_'+randomId));
+						}});
+				}
+		    }
 		}
+
 		function saveCustomName(element)
 		{
 			var elemId=element.id;
