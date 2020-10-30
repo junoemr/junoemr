@@ -74,6 +74,13 @@ function clearSession(){
 .MainTableRightColumn {
 	border: 0;
 }
+
+	div.reportBorderDiv
+	{
+		float:none
+	}
+
+
 </style>
 </head>
 
