@@ -31,41 +31,26 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
+import java.awt.*;
+import java.util.List;
 import java.util.Set;
 
-import static integration.tests.AddAppointmentsTests.addAppointmentsSchedulePage;
-import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
-
-class AddAppointmentIntegrationTest
-{
-	static void addAppointmentTest(WebDriver driver, String time)
-	{
-		String currWindowHandle = driver.getWindowHandle();
-		addAppointmentsSchedulePage(time, currWindowHandle);
-		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
-				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
-	}
-}
 
 public class RescheduleAppointmentTests extends SeleniumTestBase
 {
-	String statusExpectedTD = "To Do";
-	String statusExpectedDP = "Daysheet Printed";
-	String statusExpectedCusomized2 = "Customized 2";
-	String statusExpectedCancelled = "Cancelled";
+	//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	static String patientFName = "Test";
 	static String patientLName = "Test";
 	static String patientName = patientLName + "," + patientFName;
-	WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+	//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 
 	@BeforeClass
 	public static void setup() throws Exception
@@ -86,72 +71,97 @@ public class RescheduleAppointmentTests extends SeleniumTestBase
 				"secUserRole", "site", "tickler_text_suggest" );
 	}
 
-	public String apptStatusHoverOver()
-	{
-		wait.until(ExpectedConditions.elementToBeClickable(By.className("apptStatus")));
-		WebElement statusButton = driver.findElement(By.className("apptStatus"));
-		Actions builder = new Actions(driver);
-		builder.clickAndHold().moveToElement(statusButton);
-		builder.moveToElement(statusButton).build().perform();
-		WebElement tollTip = statusButton.findElement(By.tagName("img"));
-		builder.moveToElement(driver.findElement(By.className("apptLink"))).build().perform();
-		String status = tollTip.getAttribute("title");
-		return status;
-	}
-
 	@Test
 	public void rescheduleAppointmentTestsClassicUI() throws InterruptedException
 	{
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
-		AddAppointmentIntegrationTests.addAppointmentTest(driver, "09:00");
-		//Edit from "Edit An Appointment" page
 		String currWindowHandle = driver.getWindowHandle();
+		//////////////////////////
+		AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
+		addAppointmentsTests.addAppointmentsSchedulePage("09:00", currWindowHandle);
+		Assert.assertTrue("Appointments is NOT added successfully.",
+				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
+
+		//Edit from "Edit An Appointment" page
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
 		//Cut & Paste from 9:00 to 9:45
-		driver.manage().window().maximize();
 		driver.findElement(By.xpath("//input[@value='Cut']")).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		wait.until(ExpectedConditions.elementToBeClickable(By.linkText("09:45")));
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("09:45")));
 		driver.findElement(By.linkText("09:45")).click();
 		PageUtil.switchToLastWindow(driver);
-		driver.manage().window().maximize();
 		driver.findElement(By.id("pasteButton")).click();
 		driver.findElement(By.id("addButton")).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("09:45")));
 		String apptXpath = "//a[@title='9:45 AM - 10:00 AM']/../../td/a[contains(., '" + patientName +"')]";
-		Assert.assertTrue("Appointment is NOT Cut/Paste to 9:45am successfully",
+		Assert.assertTrue("Appointment is NOT Cut/Pasted to 9:45am successfully",
 				PageUtil.isExistsBy(By.xpath(apptXpath), driver));
+
+		//Copy & paste from 9:45 to 10:45
+		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
+		driver.findElement(By.xpath("//input[@value='Copy']")).click();
+		PageUtil.switchToWindow(currWindowHandle, driver);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("10:45")));
+		driver.findElement(By.linkText("10:45")).click();
+		PageUtil.switchToLastWindow(driver);
+		driver.findElement(By.id("pasteButton")).click();
+		driver.findElement(By.id("addButton")).click();
+		PageUtil.switchToWindow(currWindowHandle, driver);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("10:45")));
+		String apptCopyXpath = "//a[@title='10:45 AM - 11:00 AM']/../../td/a[contains(., '" + patientName +"')]";
+		Assert.assertTrue("Appointment is NOT Copied/Pasted to 10:45am successfully",
+				PageUtil.isExistsBy(By.xpath(apptCopyXpath), driver));
 	}
 
 	@Test
-	public void rescheduleAppointmentTestsJUNOUI()
-	{
+	public void rescheduleAppointmentTestsJUNOUI() throws AWTException {
 		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
-		AddAppointmentIntegrationTests.addAppointmentTest(driver, "10:00");
+		String currWindowHandle = driver.getWindowHandle();
+		//////////////////////////
+		AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
+		addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle);
+		Assert.assertTrue("Appointments is NOT added successfully.",
+				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
+
 		accessSectionJUNOUI(driver, "Schedule");
-		wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
 		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
 		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
 		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
 		providerDropDown.selectByVisibleText("oscardoc, doctor");
-		WebElement statusButton = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-starbill rotate']"));
-		String statusTD = statusButton.getAttribute("title");
-		Assert.assertEquals("Status is NOT To Do", statusExpectedTD, statusTD);
 
-		//Edit by clicking the status button from Schedule page
-		statusButton.click();
-		String statusDP = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-todo rotate']"))
-				.getAttribute("title");
-		Assert.assertEquals("Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);
-
-		//Edit from "Modify Appointment" page
-		driver.findElement(By.xpath("//span[contains(., 'Test, Test')]")).click();
-		dropdownSelectByValue(driver, By.id("input-event-appt-status"), "C");//Cancelled
+		//Reschedule the appointment from 10:00am to 10:45am
+		String patientNameJUNO = patientLName + ", " + patientFName;
+		driver.findElement(By.xpath("//span[contains(., '" + patientNameJUNO + "')]")).click();
+		textEdit(driver, By.id("input-startTime"), "10:45 AM");
 		driver.findElement(By.xpath("//button[contains(., 'Modify')]")).click();
-		String statusCancelled = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-cancel rotate']"))
-				.getAttribute("title");
-		Assert.assertEquals("Status is NOT updated to Customized 2 Successfully", statusExpectedCancelled, statusCancelled);
+
+		String timeFrameExpected = "10:45:00";
+		driver.findElement(By.xpath("//span[contains(., '" + patientNameJUNO + "')]")).click();
+		String startTimeAfterReschedule = driver.findElement(By.id("input-startTime")).getAttribute("value");
+		driver.findElement(By.xpath("//button[@title='Cancel']")).click();
+		Assert.assertEquals("Appointment is NOT rescheduled from 10:00 to 10:45", timeFrameExpected.substring(0,5), startTimeAfterReschedule.substring(0,5));
+
+		//Drag and Drop to 11:00
+		Actions act=new Actions(driver);
+		String startTimeDNDExpected = "11:00:00";
+		WebElement apptBeforeDND = driver.findElement(By.xpath("//span[contains(., '" + patientNameJUNO + "')]"));
+		List<WebElement> schedulesRight = driver.findElements(By.className("fc-bgevent"));
+		List<WebElement> schedulesLeft = driver.findElement((By.className("fc-slats"))).findElements(By.tagName("tr"));
+		for (int i = 0; i < schedulesLeft.size(); i++ )
+		{
+			String timeFrame = schedulesLeft.get(i).getAttribute("data-time");
+			if (timeFrame.equals(startTimeDNDExpected))
+			{
+				act.dragAndDrop(apptBeforeDND, schedulesRight.get(i)).build().perform();
+				break;
+			}
+		}
+		driver.findElement(By.xpath("//span[contains(., '" + patientNameJUNO + "')]")).click();
+		String startTimeAfterDND = driver.findElement(By.id("input-startTime")).getAttribute("value");
+		Assert.assertEquals("Appointment is NOT rescheduled from 10:45 to 11:00", startTimeDNDExpected.substring(0,5), startTimeAfterDND.substring(0,5));
 	}
 }
