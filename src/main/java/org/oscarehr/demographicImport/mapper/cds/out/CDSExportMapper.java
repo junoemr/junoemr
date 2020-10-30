@@ -23,10 +23,14 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.Appointments;
+import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
+import org.oscarehr.common.xml.cds.v5_0.model.FamilyHistory;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
+import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +50,8 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 
 		patientRecord.setDemographics(new CDSDemographicExportMapper().exportFromJuno(exportStructure));
 		patientRecord.getAppointments().addAll(getAppointmentList(exportStructure));
-
+		patientRecord.getFamilyHistory().addAll(getFamilyHistoryList(exportStructure));
+		patientRecord.getClinicalNotes().addAll(getClinicalNotesList(exportStructure));
 
 		omdCds.setPatientRecord(patientRecord);
 		return omdCds;
@@ -63,5 +68,31 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 		}
 
 		return appointments;
+	}
+
+	protected List<FamilyHistory> getFamilyHistoryList(Demographic exportStructure)
+	{
+		CDSFamilyHistoryExportMapper mapper = new CDSFamilyHistoryExportMapper();
+		List<FamilyHistory> familyHistoryList = new ArrayList<>();
+
+		for(FamilyHistoryNote historyNote : exportStructure.getFamilyHistoryNoteList())
+		{
+			familyHistoryList.add(mapper.exportFromJuno(historyNote));
+		}
+
+		return familyHistoryList;
+	}
+
+	protected List<ClinicalNotes> getClinicalNotesList(Demographic exportStructure)
+	{
+		CDSEncounterNoteExportMapper mapper = new CDSEncounterNoteExportMapper();
+		List<ClinicalNotes> clinicalNotes = new ArrayList<>();
+
+		for(EncounterNote note : exportStructure.getEncounterNoteList())
+		{
+			clinicalNotes.add(mapper.exportFromJuno(note));
+		}
+
+		return clinicalNotes;
 	}
 }

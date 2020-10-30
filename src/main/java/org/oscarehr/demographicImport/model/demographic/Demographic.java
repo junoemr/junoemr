@@ -26,6 +26,10 @@ import lombok.Data;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
+import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
+import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
+import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
+import org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote;
 import org.oscarehr.demographicImport.model.provider.Provider;
 
 import java.time.LocalDate;
@@ -91,31 +95,54 @@ public class Demographic extends AbstractTransientModel
 
 	private List<Appointment> appointmentList;
 
+	private List<FamilyHistoryNote> familyHistoryNoteList;
+	private List<SocialHistoryNote> socialHistoryNoteList;
+	private List<MedicalHistoryNote> medicalHistoryNoteList;
+	private List<EncounterNote> encounterNoteList;
+
+	public Demographic()
+	{
+		this.addressList = new ArrayList<>();
+		this.appointmentList = new ArrayList<>();
+		this.familyHistoryNoteList = new ArrayList<>();
+		this.socialHistoryNoteList = new ArrayList<>();
+		this.medicalHistoryNoteList = new ArrayList<>();
+		this.encounterNoteList = new ArrayList<>();
+	}
+
 	public void addAddress(Address address)
 	{
-		if(this.addressList == null)
-		{
-			this.addressList = new ArrayList<>();
-		}
 		this.addressList.add(address);
 	}
 
 	public void addAppointment(Appointment appointment)
 	{
-		if(this.appointmentList == null)
-		{
-			this.appointmentList = new ArrayList<>();
-		}
 		this.appointmentList.add(appointment);
 	}
 
 	public void addAppointments(Collection<Appointment> appointments)
 	{
-		if(this.appointmentList == null)
-		{
-			this.appointmentList = new ArrayList<>();
-		}
 		this.appointmentList.addAll(appointments);
+	}
+
+	public void addFamilyHistoryNote(FamilyHistoryNote note)
+	{
+		this.familyHistoryNoteList.add(note);
+	}
+
+	public void addSocialHistoryNote(SocialHistoryNote note)
+	{
+		this.socialHistoryNoteList.add(note);
+	}
+
+	public void addMedicalHistoryNote(MedicalHistoryNote note)
+	{
+		this.medicalHistoryNoteList.add(note);
+	}
+
+	public void addEncounterNote(EncounterNote note)
+	{
+		this.encounterNoteList.add(note);
 	}
 
 	@Override

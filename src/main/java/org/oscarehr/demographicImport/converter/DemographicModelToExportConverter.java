@@ -29,8 +29,13 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographicImport.converter.note.EncounterNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.note.FamilyHistoryNoteModelToExportConverter;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
+import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.search.CaseManagementNoteCriteriaSearch;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,7 +54,16 @@ public class DemographicModelToExportConverter extends
 	private AppointmentModelToExportConverter appointmentConverter;
 
 	@Autowired
+	private CaseManagementNoteDao caseManagementNoteDao;
+
+	@Autowired
 	private DemographicExtDao demographicExtDao;
+
+	@Autowired
+	private EncounterNoteModelToExportConverter encounterNoteConverter;
+
+	@Autowired
+	private FamilyHistoryNoteModelToExportConverter familyHistoryNoteConverter;
 
 	@Autowired
 	private ProviderModelToExportConverter providerConverter;
@@ -81,7 +95,6 @@ public class DemographicModelToExportConverter extends
 //		exportDemographic.setReferralDoctor(providerConverter.convert(input.getProvider()));
 //		exportDemographic.setFamilyDoctor(providerConverter.convert(input.getProvider()));
 		exportDemographic.setPatientStatusDate(ConversionUtils.toNullableLocalDate(input.getPatientStatusDate()));
-		exportDemographic.setChartNumber(input.getChartNo());
 
 		Address address = new Address();
 		address.setAddressLine1(input.getAddress());
@@ -117,6 +130,32 @@ public class DemographicModelToExportConverter extends
 		List<Appointment> appointments = appointmentDao.getAllByDemographicNo(input.getDemographicId());
 		exportDemographic.setAppointmentList(appointmentConverter.convert(appointments));
 
+		setNotes(input, exportDemographic);
+
 		return exportDemographic;
+	}
+
+	private void setNotes(Demographic input, org.oscarehr.demographicImport.model.demographic.Demographic exportDemographic)
+	{
+		CaseManagementNoteCriteriaSearch criteriaSearch = new CaseManagementNoteCriteriaSearch();
+		criteriaSearch.setDemographicId(input.getId());
+		criteriaSearch.setIssueCodeNone();
+		criteriaSearch.setNoLimit();
+
+		// get family history notes by demographic
+		List<CaseManagementNote> encounterNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : encounterNotes)
+		{
+			exportDemographic.addEncounterNote(encounterNoteConverter.convert(note));
+		}
+
+
+		// get family history notes by demographic
+		criteriaSearch.setIssueCodeFamilyHistory();
+		List<CaseManagementNote> familyHistoryNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : familyHistoryNotes)
+		{
+			exportDemographic.addFamilyHistoryNote(familyHistoryNoteConverter.convert(note));
+		}
 	}
 }

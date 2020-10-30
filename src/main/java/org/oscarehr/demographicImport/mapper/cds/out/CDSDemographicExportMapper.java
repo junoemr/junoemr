@@ -74,6 +74,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		demographics.getAddress().addAll(getExportAddresses(exportStructure));
 		demographics.setEmail(exportStructure.getEmail());
 		demographics.setHealthCard(getExportHealthCard(exportStructure));
+		demographics.setChartNumber(exportStructure.getChartNumber());
 		demographics.getPhoneNumber().addAll(getExportPhones(exportStructure));
 		demographics.setPrimaryPhysician(getExportPrimaryPhysician(exportStructure));
 		demographics.setPersonStatusCode(getExportStatusCode(exportStructure));

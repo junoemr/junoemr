@@ -43,6 +43,7 @@ public abstract class AbstractCriteriaSearch
 
 	private int limit = 100;
 	private int offset = 0;
+	private boolean noLimit = false;
 	private SORTDIR sortDir = SORTDIR.asc;
 	private JUNCTION_TYPE junctionType = JUNCTION_TYPE.conjunction;
 
@@ -56,6 +57,16 @@ public abstract class AbstractCriteriaSearch
 	public void setLimit(int limit)
 	{
 		this.limit = limit;
+	}
+
+	public void setNoLimit()
+	{
+		this.noLimit = true;
+	}
+
+	public boolean hasNoLimit()
+	{
+		return this.noLimit;
 	}
 
 	public int getOffset()
