@@ -26,13 +26,11 @@ import org.oscarehr.common.xml.cds.v5_0.model.Appointments;
 import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
 import org.oscarehr.common.xml.cds.v5_0.model.FamilyHistory;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
+import org.oscarehr.common.xml.cds.v5_0.model.PastHealth;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
-import org.oscarehr.demographicImport.model.appointment.Appointment;
+import org.oscarehr.common.xml.cds.v5_0.model.PersonalHistory;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
-import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
-import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic>
@@ -50,7 +48,9 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 
 		patientRecord.setDemographics(new CDSDemographicExportMapper().exportFromJuno(exportStructure));
 		patientRecord.getAppointments().addAll(getAppointmentList(exportStructure));
+		patientRecord.getPersonalHistory().addAll(getPersonalHistoryList(exportStructure));
 		patientRecord.getFamilyHistory().addAll(getFamilyHistoryList(exportStructure));
+		patientRecord.getPastHealth().addAll(getPastHealthList(exportStructure));
 		patientRecord.getClinicalNotes().addAll(getClinicalNotesList(exportStructure));
 
 		omdCds.setPatientRecord(patientRecord);
@@ -60,39 +60,30 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 	protected List<Appointments> getAppointmentList(Demographic exportStructure)
 	{
 		CDSAppointmentExportMapper mapper = new CDSAppointmentExportMapper();
-		List<Appointments> appointments = new ArrayList<>();
+		return mapper.exportAll(exportStructure.getAppointmentList());
+	}
 
-		for(Appointment appointment : exportStructure.getAppointmentList())
-		{
-			appointments.add(mapper.exportFromJuno(appointment));
-		}
-
-		return appointments;
+	protected List<PersonalHistory> getPersonalHistoryList(Demographic exportStructure)
+	{
+		CDSPersonalHistoryExportMapper mapper = new CDSPersonalHistoryExportMapper();
+		return mapper.exportAll(exportStructure.getSocialHistoryNoteList());
 	}
 
 	protected List<FamilyHistory> getFamilyHistoryList(Demographic exportStructure)
 	{
 		CDSFamilyHistoryExportMapper mapper = new CDSFamilyHistoryExportMapper();
-		List<FamilyHistory> familyHistoryList = new ArrayList<>();
+		return mapper.exportAll(exportStructure.getFamilyHistoryNoteList());
+	}
 
-		for(FamilyHistoryNote historyNote : exportStructure.getFamilyHistoryNoteList())
-		{
-			familyHistoryList.add(mapper.exportFromJuno(historyNote));
-		}
-
-		return familyHistoryList;
+	protected List<PastHealth> getPastHealthList(Demographic exportStructure)
+	{
+		CDSMedicalHistoryExportMapper mapper = new CDSMedicalHistoryExportMapper();
+		return mapper.exportAll(exportStructure.getMedicalHistoryNoteList());
 	}
 
 	protected List<ClinicalNotes> getClinicalNotesList(Demographic exportStructure)
 	{
 		CDSEncounterNoteExportMapper mapper = new CDSEncounterNoteExportMapper();
-		List<ClinicalNotes> clinicalNotes = new ArrayList<>();
-
-		for(EncounterNote note : exportStructure.getEncounterNoteList())
-		{
-			clinicalNotes.add(mapper.exportFromJuno(note));
-		}
-
-		return clinicalNotes;
+		return mapper.exportAll(exportStructure.getEncounterNoteList());
 	}
 }

@@ -25,10 +25,14 @@ package org.oscarehr.demographicImport.model.encounterNote;
 import lombok.Data;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
+import java.time.LocalDateTime;
+
 @Data
 public class BaseNote extends AbstractTransientModel
 {
 	private String id;
 	private String noteText;
 	private String revisionId;
+
+	private LocalDateTime observationDate;
 }

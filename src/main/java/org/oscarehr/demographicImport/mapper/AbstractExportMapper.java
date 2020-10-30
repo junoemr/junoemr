@@ -22,6 +22,10 @@
  */
 package org.oscarehr.demographicImport.mapper;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public abstract class AbstractExportMapper<I, E>
 {
 	/**
@@ -30,4 +34,9 @@ public abstract class AbstractExportMapper<I, E>
 	 * @param exportStructure
 	 */
 	public abstract I exportFromJuno(E exportStructure);
+
+	public List<I> exportAll(Collection<E> entities)
+	{
+		return entities.stream().map(this::exportFromJuno).collect(Collectors.toList());
+	}
 }

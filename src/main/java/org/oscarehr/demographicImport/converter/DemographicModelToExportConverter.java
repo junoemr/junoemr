@@ -31,6 +31,8 @@ import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographicImport.converter.note.EncounterNoteModelToExportConverter;
 import org.oscarehr.demographicImport.converter.note.FamilyHistoryNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.note.MedicalHistoryNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.note.SocialHistoryNoteModelToExportConverter;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
@@ -64,6 +66,12 @@ public class DemographicModelToExportConverter extends
 
 	@Autowired
 	private FamilyHistoryNoteModelToExportConverter familyHistoryNoteConverter;
+
+	@Autowired
+	private SocialHistoryNoteModelToExportConverter socialHistoryNoteMapper;
+
+	@Autowired
+	private MedicalHistoryNoteModelToExportConverter medicalHistoryNoteConverter;
 
 	@Autowired
 	private ProviderModelToExportConverter providerConverter;
@@ -142,13 +150,20 @@ public class DemographicModelToExportConverter extends
 		criteriaSearch.setIssueCodeNone();
 		criteriaSearch.setNoLimit();
 
-		// get family history notes by demographic
+		// get encounter notes by demographic
 		List<CaseManagementNote> encounterNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
 		for(CaseManagementNote note : encounterNotes)
 		{
 			exportDemographic.addEncounterNote(encounterNoteConverter.convert(note));
 		}
 
+		// get social history notes by demographic
+		criteriaSearch.setIssueCodeSocialHistory();
+		List<CaseManagementNote> socialHistoryNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : socialHistoryNotes)
+		{
+			exportDemographic.addSocialHistoryNote(socialHistoryNoteMapper.convert(note));
+		}
 
 		// get family history notes by demographic
 		criteriaSearch.setIssueCodeFamilyHistory();
@@ -156,6 +171,14 @@ public class DemographicModelToExportConverter extends
 		for(CaseManagementNote note : familyHistoryNotes)
 		{
 			exportDemographic.addFamilyHistoryNote(familyHistoryNoteConverter.convert(note));
+		}
+
+		// get medical history notes by demographic
+		criteriaSearch.setIssueCodeMedicalHistory();
+		List<CaseManagementNote> medicalHistoryNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : medicalHistoryNotes)
+		{
+			exportDemographic.addMedicalHistoryNote(medicalHistoryNoteConverter.convert(note));
 		}
 	}
 }

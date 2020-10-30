@@ -23,58 +23,51 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
-import org.oscarehr.common.xml.cds.v5_0.model.FamilyHistory;
-import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
-import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
+import org.oscarehr.common.xml.cds.v5_0.model.PastHealth;
+import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
 import oscar.util.ConversionUtils;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.math.BigInteger;
 
-public class CDSFamilyHistoryExportMapper extends AbstractCDSExportMapper<FamilyHistory, FamilyHistoryNote>
+public class CDSMedicalHistoryExportMapper extends AbstractCDSExportMapper<PastHealth, MedicalHistoryNote>
 {
-	public CDSFamilyHistoryExportMapper()
+	public CDSMedicalHistoryExportMapper()
 	{
 		super();
 	}
 
 	@Override
-	public FamilyHistory exportFromJuno(FamilyHistoryNote exportStructure)
+	public PastHealth exportFromJuno(MedicalHistoryNote exportStructure)
 	{
-		FamilyHistory familyHistory = objectFactory.createFamilyHistory();
+		PastHealth pastHealth = objectFactory.createPastHealth();
+		pastHealth.setNotes(exportStructure.getNoteText());
 
-		familyHistory.setNotes(exportStructure.getNoteText());
-		familyHistory.setLifeStage(getLifeStage(exportStructure));
-		familyHistory.setAgeAtOnset(BigInteger.valueOf(exportStructure.getAgeAtOnset()));
-		familyHistory.setTreatment(exportStructure.getTreatment());
-		familyHistory.setRelationship(exportStructure.getRelationship());
+		XMLGregorianCalendar procedureDate = ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getProcedureDate());
+		if(procedureDate != null)
+		{
+			DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
+			dateFullOrPartial.setFullDate(procedureDate);
+			pastHealth.setProcedureDate(dateFullOrPartial);
+		}
 
 		XMLGregorianCalendar startDate = ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getStartDate());
 		if(startDate != null)
 		{
 			DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
 			dateFullOrPartial.setFullDate(startDate);
-			familyHistory.setStartDate(dateFullOrPartial);
+			pastHealth.setOnsetOrEventDate(dateFullOrPartial);
 		}
 
-
-		return familyHistory;
-	}
-
-	protected LifeStage getLifeStage(FamilyHistoryNote exportStructure)
-	{
-		String lifeStage = exportStructure.getLifeStage();
-		if(lifeStage != null)
+		XMLGregorianCalendar resolutionDate = ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getResolutionDate());
+		if(resolutionDate != null)
 		{
-			switch(lifeStage)
-			{
-				case "N": return LifeStage.N;
-				case "I": return LifeStage.I;
-				case "C": return LifeStage.C;
-				case "T": return LifeStage.T;
-				case "A": return LifeStage.A;
-			}
+			DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
+			dateFullOrPartial.setFullDate(resolutionDate);
+			pastHealth.setResolvedDate(dateFullOrPartial);
 		}
-		return null;
+
+
+		return pastHealth;
 	}
+
 }

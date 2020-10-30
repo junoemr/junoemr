@@ -32,7 +32,6 @@ import org.hibernate.criterion.Subqueries;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.encounterNote.model.CaseManagementIssue;
-import org.oscarehr.encounterNote.model.CaseManagementNote;
 
 @Data
 public class CaseManagementNoteCriteriaSearch extends AbstractCriteriaSearch
@@ -119,16 +118,11 @@ public class CaseManagementNoteCriteriaSearch extends AbstractCriteriaSearch
 		// filter note revisions out, getting the latest as the 'max id' since that's how the old dao does it.
 		if(resultSet == RESULT_SET.LATEST_REVISIONS)
 		{
-			// TODO this subquery is not correct
-			String tableAlias = "cmn2";
-			DetachedCriteria subquery = DetachedCriteria.forClass(CaseManagementNote.class, tableAlias);
-			subquery.add(Restrictions.eqProperty("uuid", tableAlias + ".uuid"));
-			subquery.setProjection(Projections.max(tableAlias + ".noteId"));
-
-//			criteria.add(Subqueries.propertyEq("noteId", subquery));
+			// use raw sql because I couldn't get projections to select a single column result
+			criteria.add(Restrictions.sqlRestriction(
+					"{alias}.note_id = (SELECT max(cmn2.note_id) FROM casemgmt_note cmn2 WHERE cmn2.uuid = {alias}.uuid GROUP BY cmn2.uuid)"
+			));
 		}
-
-
 
 		return criteria;
 	}
