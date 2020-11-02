@@ -30,14 +30,15 @@ import org.oscarehr.common.xml.cds.v5_0.model.PastHealth;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonalHistory;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.service.ExportPreferences;
 
 import java.util.List;
 
 public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic>
 {
-	public CDSExportMapper()
+	public CDSExportMapper(ExportPreferences exportPreferences)
 	{
-		super();
+		super(exportPreferences);
 	}
 
 	@Override
@@ -47,11 +48,27 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 		PatientRecord patientRecord = objectFactory.createPatientRecord();
 
 		patientRecord.setDemographics(new CDSDemographicExportMapper().exportFromJuno(exportStructure));
-		patientRecord.getAppointments().addAll(getAppointmentList(exportStructure));
-		patientRecord.getPersonalHistory().addAll(getPersonalHistoryList(exportStructure));
-		patientRecord.getFamilyHistory().addAll(getFamilyHistoryList(exportStructure));
-		patientRecord.getPastHealth().addAll(getPastHealthList(exportStructure));
-		patientRecord.getClinicalNotes().addAll(getClinicalNotesList(exportStructure));
+
+		if(exportPreferences.isExportAppointments())
+		{
+			patientRecord.getAppointments().addAll(getAppointmentList(exportStructure));
+		}
+		if(exportPreferences.isExportPersonalHistory())
+		{
+			patientRecord.getPersonalHistory().addAll(getPersonalHistoryList(exportStructure));
+		}
+		if(exportPreferences.isExportFamilyHistory())
+		{
+			patientRecord.getFamilyHistory().addAll(getFamilyHistoryList(exportStructure));
+		}
+		if(exportPreferences.isExportPastHealth())
+		{
+			patientRecord.getPastHealth().addAll(getPastHealthList(exportStructure));
+		}
+		if(exportPreferences.isExportClinicalNotes())
+		{
+			patientRecord.getClinicalNotes().addAll(getClinicalNotesList(exportStructure));
+		}
 
 		omdCds.setPatientRecord(patientRecord);
 		return omdCds;

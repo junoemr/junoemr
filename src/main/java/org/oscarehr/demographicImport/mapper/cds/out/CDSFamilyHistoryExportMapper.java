@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.FamilyHistory;
 import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
@@ -45,7 +46,7 @@ public class CDSFamilyHistoryExportMapper extends AbstractCDSExportMapper<Family
 
 		familyHistory.setNotes(exportStructure.getNoteText());
 		familyHistory.setLifeStage(getLifeStage(exportStructure));
-		familyHistory.setAgeAtOnset(BigInteger.valueOf(exportStructure.getAgeAtOnset()));
+		familyHistory.setAgeAtOnset(getAgeAtOnset(exportStructure));
 		familyHistory.setTreatment(exportStructure.getTreatment());
 		familyHistory.setRelationship(exportStructure.getRelationship());
 
@@ -61,19 +62,22 @@ public class CDSFamilyHistoryExportMapper extends AbstractCDSExportMapper<Family
 		return familyHistory;
 	}
 
+	protected BigInteger getAgeAtOnset(FamilyHistoryNote exportStructure)
+	{
+		Long onsetAge = exportStructure.getAgeAtOnset();
+		if(onsetAge != null)
+		{
+			return BigInteger.valueOf(onsetAge);
+		}
+		return null;
+	}
+
 	protected LifeStage getLifeStage(FamilyHistoryNote exportStructure)
 	{
 		String lifeStage = exportStructure.getLifeStage();
-		if(lifeStage != null)
+		if(EnumUtils.isValidEnum(LifeStage.class, lifeStage))
 		{
-			switch(lifeStage)
-			{
-				case "N": return LifeStage.N;
-				case "I": return LifeStage.I;
-				case "C": return LifeStage.C;
-				case "T": return LifeStage.T;
-				case "A": return LifeStage.A;
-			}
+			return LifeStage.fromValue(lifeStage);
 		}
 		return null;
 	}

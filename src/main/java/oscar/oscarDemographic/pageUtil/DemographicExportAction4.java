@@ -70,6 +70,7 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.demographic.dao.DemographicExtDao;
+import org.oscarehr.demographicImport.service.ExportPreferences;
 import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.oscarehr.e2e.director.E2ECreator;
@@ -260,11 +261,26 @@ public class DemographicExportAction4 extends Action {
 			{
 				ImportExportService importExportService = SpringUtils.getBean(ImportExportService.class);
 				ArrayList<File> files = new ArrayList<>();
+				ExportPreferences exportPreferences = new ExportPreferences();
+				exportPreferences.setExportAlertsAndSpecialNeeds(exAlertsAndSpecialNeeds);
+				exportPreferences.setExportAllergiesAndAdverseReactions(exAllergiesAndAdverseReactions);
+				exportPreferences.setExportAppointments(exAppointments);
+				exportPreferences.setExportCareElements(exCareElements);
+				exportPreferences.setExportClinicalNotes(exClinicalNotes);
+				exportPreferences.setExportFamilyHistory(exFamilyHistory);
+				exportPreferences.setExportImmunizations(exImmunizations);
+				exportPreferences.setExportLaboratoryResults(exLaboratoryResults);
+				exportPreferences.setExportMedicationsAndTreatments(exMedicationsAndTreatments);
+				exportPreferences.setExportPastHealth(exPastHealth);
+				exportPreferences.setExportPersonalHistory(exPersonalHistory);
+				exportPreferences.setExportProblemList(exProblemList);
+				exportPreferences.setExportReportsReceived(exReportsReceived);
+				exportPreferences.setExportRiskFactors(exRiskFactors);
 
 				for (String demoNo : list)
 				{
 					Integer demographicId = Integer.parseInt(demoNo);
-					GenericFile file = importExportService.exportDemographic(ImporterExporterFactory.IMPORTER_TYPE.CDS_5, demographicId);
+					GenericFile file = importExportService.exportDemographic(ImporterExporterFactory.IMPORTER_TYPE.CDS_5, demographicId, exportPreferences);
 					files.add(file.getFileObject());
 				}
 

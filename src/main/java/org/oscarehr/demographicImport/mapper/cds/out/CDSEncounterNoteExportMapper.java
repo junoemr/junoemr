@@ -23,9 +23,7 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
-import org.oscarehr.common.xml.cds.v5_0.model.FamilyHistory;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
-import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
 
 public class CDSEncounterNoteExportMapper extends AbstractCDSExportMapper<ClinicalNotes, EncounterNote>
 {

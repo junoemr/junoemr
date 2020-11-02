@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.service.cds;
 
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
+import org.oscarehr.demographicImport.service.ExportPreferences;
 import org.oscarehr.demographicImport.mapper.cds.out.CDSExportMapper;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
@@ -33,10 +34,10 @@ import java.io.IOException;
 
 public class CDSExporter implements DemographicExporter
 {
-	public GenericFile exportDemographic(Demographic demographic) throws IOException
+	public GenericFile exportDemographic(Demographic demographic, ExportPreferences preferences) throws IOException
 	{
 		CDSFileParser parser = new CDSFileParser();
-		CDSExportMapper mapper = new CDSExportMapper();
+		CDSExportMapper mapper = new CDSExportMapper(preferences);
 		OmdCds omdCds = mapper.exportFromJuno(demographic);
 
 		return parser.write(omdCds);

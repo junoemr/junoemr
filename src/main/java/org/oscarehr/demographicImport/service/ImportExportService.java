@@ -56,16 +56,20 @@ public class ImportExportService
 		logger.info(ReflectionToStringBuilder.toString(demographic));
 	}
 
-	public GenericFile exportDemographic(ImporterExporterFactory.IMPORTER_TYPE importType, Demographic junoTransientObject) throws IOException
+	public GenericFile exportDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,
+	                                     Demographic junoTransientObject,
+	                                     ExportPreferences preferences) throws IOException
 	{
 		DemographicExporter exporter = ImporterExporterFactory.getExporter(importType);
-		return exporter.exportDemographic(junoTransientObject);
+		return exporter.exportDemographic(junoTransientObject, preferences);
 	}
 
-	public GenericFile exportDemographic(ImporterExporterFactory.IMPORTER_TYPE importType, Integer demographicId) throws IOException
+	public GenericFile exportDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,
+	                                     Integer demographicId,
+	                                     ExportPreferences preferences) throws IOException
 	{
 		org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
 		Demographic exportDemographic = modelToExportConverter.convert(demographic);
-		return this.exportDemographic(importType, exportDemographic);
+		return this.exportDemographic(importType, exportDemographic, preferences);
 	}
 }

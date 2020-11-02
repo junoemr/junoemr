@@ -22,12 +22,25 @@
  */
 package org.oscarehr.demographicImport.mapper;
 
+import org.oscarehr.demographicImport.service.ExportPreferences;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class AbstractExportMapper<I, E>
 {
+	protected final ExportPreferences exportPreferences;
+
+	public AbstractExportMapper()
+	{
+		this(null);
+	}
+	public AbstractExportMapper(ExportPreferences exportPreferences)
+	{
+		this.exportPreferences = exportPreferences;
+	}
+
 	/**
 	 * build the import structure from the provided export structure.
 	 * this method creates a new object to use as the import structure.

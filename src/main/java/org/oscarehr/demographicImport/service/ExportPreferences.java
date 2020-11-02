@@ -22,12 +22,23 @@
  */
 package org.oscarehr.demographicImport.service;
 
-import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
+import lombok.Data;
 
-import java.io.IOException;
-
-public interface DemographicExporter
+@Data
+public class ExportPreferences
 {
-	GenericFile exportDemographic(Demographic demographic, ExportPreferences preferences) throws IOException;
+	boolean exportAlertsAndSpecialNeeds;
+	boolean exportAllergiesAndAdverseReactions;
+	boolean exportAppointments;
+	boolean exportCareElements;
+	boolean exportClinicalNotes;
+	boolean exportFamilyHistory;
+	boolean exportImmunizations;
+	boolean exportLaboratoryResults;
+	boolean exportMedicationsAndTreatments;
+	boolean exportPastHealth;
+	boolean exportPersonalHistory;
+	boolean exportProblemList;
+	boolean exportReportsReceived;
+	boolean exportRiskFactors;
 }

@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
 import org.oscarehr.demographicImport.mapper.AbstractExportMapper;
+import org.oscarehr.demographicImport.service.ExportPreferences;
 
 public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper<I, E>
 {
@@ -31,8 +32,14 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 
 	public AbstractCDSExportMapper()
 	{
+		this(null);
+	}
+	public AbstractCDSExportMapper(ExportPreferences exportPreferences)
+	{
+		super(exportPreferences);
 		this.objectFactory = new ObjectFactory();
 	}
+
 
 	public ObjectFactory getObjectFactory()
 	{
