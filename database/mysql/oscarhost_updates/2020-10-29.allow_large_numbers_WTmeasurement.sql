@@ -3,8 +3,8 @@ UPDATE validations
   isDate = NULL,
   minLength = NULL,
   maxLength = NULL
-WHERE id = 14 AND name = 'Numeric Value greater than or equal to 0';
+WHERE id = (SELECT id from validations WHERE name = 'Numeric Value greater than or equal to 0');
 
 UPDATE measurementType
-  SET validation = '14'
+  SET validation = (SELECT id FROM validations WHERE name = 'Numeric Value greater than or equal to 0')
 WHERE type = 'WT';
