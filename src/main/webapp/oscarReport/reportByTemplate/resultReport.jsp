@@ -65,23 +65,7 @@ function clearSession(){
 
 }
 </script>
-<style type="text/css" media="print">
-.MainTableTopRow,.MainTableLeftColumn,.noprint,.showhidequery,.sqlBorderDiv,.MainTableBottomRow
-	{
-	display: none;
-}
 
-.MainTableRightColumn {
-	border: 0;
-}
-
-	div.reportBorderDiv
-	{
-		float:none
-	}
-
-
-</style>
 </head>
 
 <body vlink="#0000FF" class="BodyStyle" onunload="clearSession();">
