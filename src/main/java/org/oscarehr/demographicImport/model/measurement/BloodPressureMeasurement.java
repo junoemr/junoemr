@@ -32,6 +32,10 @@ public class BloodPressureMeasurement extends Measurement
 	private String systolic;
 	private String diastolic;
 
+	public BloodPressureMeasurement()
+	{
+		super();
+	}
 	public BloodPressureMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);

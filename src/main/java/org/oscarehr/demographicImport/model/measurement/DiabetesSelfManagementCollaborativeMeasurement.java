@@ -27,6 +27,11 @@ import lombok.Data;
 @Data
 public class DiabetesSelfManagementCollaborativeMeasurement extends Measurement
 {
+	public DiabetesSelfManagementCollaborativeMeasurement()
+	{
+		super();
+	}
+
 	public DiabetesSelfManagementCollaborativeMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);

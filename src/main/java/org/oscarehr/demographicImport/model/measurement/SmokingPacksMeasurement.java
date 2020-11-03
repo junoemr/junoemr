@@ -27,6 +27,10 @@ import lombok.Data;
 @Data
 public class SmokingPacksMeasurement extends Measurement
 {
+	public SmokingPacksMeasurement()
+	{
+		super();
+	}
 	public SmokingPacksMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);

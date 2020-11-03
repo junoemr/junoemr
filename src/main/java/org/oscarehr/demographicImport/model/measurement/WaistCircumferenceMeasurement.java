@@ -29,6 +29,10 @@ import static org.oscarehr.common.model.Measurement.MEASUREMENT_UNIT_CM;
 @Data
 public class WaistCircumferenceMeasurement extends Measurement
 {
+	public WaistCircumferenceMeasurement()
+	{
+		super();
+	}
 	public WaistCircumferenceMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);

@@ -22,8 +22,35 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.oscarehr.common.xml.cds.v5_0.model.BloodPressure;
 import org.oscarehr.common.xml.cds.v5_0.model.CareElements;
+import org.oscarehr.common.xml.cds.v5_0.model.DiabetesComplicationScreening;
+import org.oscarehr.common.xml.cds.v5_0.model.DiabetesEducationalSelfManagement;
+import org.oscarehr.common.xml.cds.v5_0.model.DiabetesMotivationalCounselling;
+import org.oscarehr.common.xml.cds.v5_0.model.DiabetesSelfManagementChallenges;
+import org.oscarehr.common.xml.cds.v5_0.model.DiabetesSelfManagementCollaborative;
+import org.oscarehr.common.xml.cds.v5_0.model.Height;
+import org.oscarehr.common.xml.cds.v5_0.model.HypoglycemicEpisodes;
+import org.oscarehr.common.xml.cds.v5_0.model.SelfMonitoringBloodGlucose;
+import org.oscarehr.common.xml.cds.v5_0.model.SmokingPacks;
+import org.oscarehr.common.xml.cds.v5_0.model.SmokingStatus;
+import org.oscarehr.common.xml.cds.v5_0.model.WaistCircumference;
+import org.oscarehr.common.xml.cds.v5_0.model.Weight;
+import org.oscarehr.demographicImport.model.measurement.BloodPressureMeasurement;
+import org.oscarehr.demographicImport.model.measurement.DiabetesComplicationsScreeningMeasurement;
+import org.oscarehr.demographicImport.model.measurement.DiabetesMotivationalCounselingMeasurement;
+import org.oscarehr.demographicImport.model.measurement.DiabetesSelfManagementChallengesMeasurement;
+import org.oscarehr.demographicImport.model.measurement.DiabetesSelfManagementCollaborativeMeasurement;
+import org.oscarehr.demographicImport.model.measurement.DiabetesSelfManagementEducationalMeasurement;
+import org.oscarehr.demographicImport.model.measurement.HeightMeasurement;
+import org.oscarehr.demographicImport.model.measurement.HypoglycemicEpisodesMeasurement;
 import org.oscarehr.demographicImport.model.measurement.Measurement;
+import org.oscarehr.demographicImport.model.measurement.SelfMonitoringBloodGlucoseMeasurement;
+import org.oscarehr.demographicImport.model.measurement.SmokingPacksMeasurement;
+import org.oscarehr.demographicImport.model.measurement.SmokingStatusMeasurement;
+import org.oscarehr.demographicImport.model.measurement.WaistCircumferenceMeasurement;
+import org.oscarehr.demographicImport.model.measurement.WeightMeasurement;
+import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +66,112 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 	public List<Measurement> importToJuno(CareElements importStructure)
 	{
 		List<Measurement> measurements = new ArrayList<>();
+
+		for(SmokingStatus smokingStatus : importStructure.getSmokingStatus())
+		{
+			SmokingStatusMeasurement measurement = new SmokingStatusMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(smokingStatus.getDate()));
+			measurement.setMeasurementValue(smokingStatus.getStatus());
+			measurements.add(measurement);
+		}
+
+		for(SmokingPacks smokingPacks : importStructure.getSmokingPacks())
+		{
+			SmokingPacksMeasurement measurement = new SmokingPacksMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(smokingPacks.getDate()));
+			measurement.setMeasurementValue(String.valueOf(smokingPacks.getPerDay().longValue()));
+			measurements.add(measurement);
+		}
+
+		for(Weight weight : importStructure.getWeight())
+		{
+			WeightMeasurement measurement = new WeightMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(weight.getDate()));
+			measurement.setMeasurementValue(weight.getWeight());
+			measurements.add(measurement);
+		}
+
+		for(Height height : importStructure.getHeight())
+		{
+			HeightMeasurement measurement = new HeightMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(height.getDate()));
+			measurement.setMeasurementValue(height.getHeight());
+			measurements.add(measurement);
+		}
+
+		for(WaistCircumference waistCircumference : importStructure.getWaistCircumference())
+		{
+			WaistCircumferenceMeasurement measurement = new WaistCircumferenceMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(waistCircumference.getDate()));
+			measurement.setMeasurementValue(waistCircumference.getWaistCircumference());
+			measurements.add(measurement);
+		}
+
+		for(BloodPressure bloodPressure : importStructure.getBloodPressure())
+		{
+			BloodPressureMeasurement measurement = new BloodPressureMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(bloodPressure.getDate()));
+			measurement.setSystolic(bloodPressure.getSystolicBP());
+			measurement.setDiastolic(bloodPressure.getDiastolicBP());
+			measurements.add(measurement);
+		}
+
+		for(DiabetesComplicationScreening complicationScreening : importStructure.getDiabetesComplicationsScreening())
+		{
+			DiabetesComplicationsScreeningMeasurement measurement = new DiabetesComplicationsScreeningMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(complicationScreening.getDate()));
+			measurement.setMeasurementValue(complicationScreening.getExamCode());
+			measurements.add(measurement);
+		}
+
+		for(DiabetesMotivationalCounselling motivationalCounselling : importStructure.getDiabetesMotivationalCounselling())
+		{
+			DiabetesMotivationalCounselingMeasurement measurement = new DiabetesMotivationalCounselingMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(motivationalCounselling.getDate()));
+			measurement.setMeasurementValue(motivationalCounselling.getCounsellingPerformed());
+			measurements.add(measurement);
+		}
+
+		for(DiabetesSelfManagementCollaborative selfManagementCollaborative : importStructure.getDiabetesSelfManagementCollaborative())
+		{
+			DiabetesSelfManagementCollaborativeMeasurement measurement = new DiabetesSelfManagementCollaborativeMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(selfManagementCollaborative.getDate()));
+			measurement.setMeasurementValue(selfManagementCollaborative.getDocumentedGoals());
+			measurements.add(measurement);
+		}
+
+		for(DiabetesSelfManagementChallenges selfManagementChallenges : importStructure.getDiabetesSelfManagementChallenges())
+		{
+			DiabetesSelfManagementChallengesMeasurement measurement = new DiabetesSelfManagementChallengesMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(selfManagementChallenges.getDate()));
+			measurement.setMeasurementValue(selfManagementChallenges.getChallengesIdentified());
+			measurements.add(measurement);
+		}
+
+		for(DiabetesEducationalSelfManagement educationalSelfManagement : importStructure.getDiabetesEducationalSelfManagement())
+		{
+			DiabetesSelfManagementEducationalMeasurement measurement = new DiabetesSelfManagementEducationalMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(educationalSelfManagement.getDate()));
+			measurement.setMeasurementValue(educationalSelfManagement.getEducationalTrainingPerformed());
+			measurements.add(measurement);
+		}
+
+		for(HypoglycemicEpisodes hypoglycemicEpisodes : importStructure.getHypoglycemicEpisodes())
+		{
+			HypoglycemicEpisodesMeasurement measurement = new HypoglycemicEpisodesMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(hypoglycemicEpisodes.getDate()));
+			measurement.setMeasurementValue(String.valueOf(hypoglycemicEpisodes.getNumOfReportedEpisodes().longValue()));
+			measurements.add(measurement);
+		}
+
+		for(SelfMonitoringBloodGlucose bloodGlucose : importStructure.getSelfMonitoringBloodGlucose())
+		{
+			SelfMonitoringBloodGlucoseMeasurement measurement = new SelfMonitoringBloodGlucoseMeasurement();
+			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(bloodGlucose.getDate()));
+			measurement.setMeasurementValue(bloodGlucose.getSelfMonitoring());
+			measurements.add(measurement);
+		}
+
 		return measurements;
 	}
 }

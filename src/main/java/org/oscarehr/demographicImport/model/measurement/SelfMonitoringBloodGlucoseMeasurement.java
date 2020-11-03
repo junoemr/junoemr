@@ -27,6 +27,10 @@ import lombok.Data;
 @Data
 public class SelfMonitoringBloodGlucoseMeasurement extends Measurement
 {
+	public SelfMonitoringBloodGlucoseMeasurement()
+	{
+		super();
+	}
 	public SelfMonitoringBloodGlucoseMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);

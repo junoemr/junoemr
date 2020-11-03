@@ -27,6 +27,10 @@ import lombok.Data;
 @Data
 public class HypoglycemicEpisodesMeasurement extends Measurement
 {
+	public HypoglycemicEpisodesMeasurement()
+	{
+		super();
+	}
 	public HypoglycemicEpisodesMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);

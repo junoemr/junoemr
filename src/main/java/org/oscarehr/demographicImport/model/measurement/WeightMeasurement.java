@@ -29,6 +29,10 @@ import static org.oscarehr.common.model.Measurement.MEASUREMENT_UNIT_KG;
 @Data
 public class WeightMeasurement extends Measurement
 {
+	public WeightMeasurement()
+	{
+		super();
+	}
 	public WeightMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);

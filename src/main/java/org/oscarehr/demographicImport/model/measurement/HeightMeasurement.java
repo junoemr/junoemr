@@ -29,6 +29,10 @@ import static org.oscarehr.common.model.Measurement.MEASUREMENT_UNIT_CM;
 @Data
 public class HeightMeasurement extends Measurement
 {
+	public HeightMeasurement()
+	{
+		super();
+	}
 	public HeightMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);

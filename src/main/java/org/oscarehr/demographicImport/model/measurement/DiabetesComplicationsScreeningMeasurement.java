@@ -27,6 +27,10 @@ import lombok.Data;
 @Data
 public class DiabetesComplicationsScreeningMeasurement extends Measurement
 {
+	public DiabetesComplicationsScreeningMeasurement()
+	{
+		super();
+	}
 	public DiabetesComplicationsScreeningMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
