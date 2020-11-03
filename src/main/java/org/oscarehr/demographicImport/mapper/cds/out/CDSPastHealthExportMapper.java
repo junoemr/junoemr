@@ -29,9 +29,9 @@ import oscar.util.ConversionUtils;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-public class CDSMedicalHistoryExportMapper extends AbstractCDSExportMapper<PastHealth, MedicalHistoryNote>
+public class CDSPastHealthExportMapper extends AbstractCDSExportMapper<PastHealth, MedicalHistoryNote>
 {
-	public CDSMedicalHistoryExportMapper()
+	public CDSPastHealthExportMapper()
 	{
 		super();
 	}

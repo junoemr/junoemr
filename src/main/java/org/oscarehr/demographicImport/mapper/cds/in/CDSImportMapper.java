@@ -41,8 +41,18 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic
 
 		demographic.setSocialHistoryNoteList(new CDSPersonalHistoryImportMapper().importAll(patientRecord.getPersonalHistory()));
 		demographic.setFamilyHistoryNoteList(new CDSFamilyHistoryImportMapper().importAll(patientRecord.getFamilyHistory()));
-		demographic.setMedicalHistoryNoteList(new CDSMedicalHistoryImportMapper().importAll(patientRecord.getPastHealth()));
+		demographic.setMedicalHistoryNoteList(new CDSPastHealthImportMapper().importAll(patientRecord.getPastHealth()));
+		demographic.setProblemList(new CDSProblemImportMapper().importAll(patientRecord.getProblemList()));
+		demographic.setRiskFactorList(new CDSRiskFactorImportMapper().importAll(patientRecord.getRiskFactors()));
+		demographic.setAllergyList(new CDSAllergyImportMapper().importAll(patientRecord.getAllergiesAndAdverseReactions()));
+		demographic.setMedicationList(new CDSMedicationImportMapper().importAll(patientRecord.getMedicationsAndTreatments()));
+		demographic.setImmunizationList(new CDSImmunizationImportMapper().importAll(patientRecord.getImmunizations()));
+		demographic.setLabList(new CDSLabImportMapper().importAll(patientRecord.getLaboratoryResults()));
+		demographic.setAppointmentList(new CDSAppointmentImportMapper().importAll(patientRecord.getAppointments()));
 		demographic.setEncounterNoteList(new CDSEncounterNoteImportMapper().importAll(patientRecord.getClinicalNotes()));
+		demographic.setReportList(new CDSReportImportMapper().importAll(patientRecord.getReports()));
+		demographic.setCareElementList(new CDSCareElementImportMapper().importAll(patientRecord.getCareElements()));
+		demographic.setAlertList(new CDSAlertImportMapper().importAll(patientRecord.getAlertsAndSpecialNeeds()));
 
 		return demographic;
 	}

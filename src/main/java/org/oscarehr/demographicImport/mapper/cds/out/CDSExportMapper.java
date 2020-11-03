@@ -22,17 +22,10 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.oscarehr.common.xml.cds.v5_0.model.Appointments;
-import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
-import org.oscarehr.common.xml.cds.v5_0.model.FamilyHistory;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
-import org.oscarehr.common.xml.cds.v5_0.model.PastHealth;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonalHistory;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.service.ExportPreferences;
-
-import java.util.List;
 
 public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic>
 {
@@ -47,60 +40,81 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 		OmdCds omdCds = objectFactory.createOmdCds();
 		PatientRecord patientRecord = objectFactory.createPatientRecord();
 
-		patientRecord.setDemographics(new CDSDemographicExportMapper().exportFromJuno(exportStructure));
+		patientRecord.setDemographics(
+				new CDSDemographicExportMapper().exportFromJuno(exportStructure));
 
-		if(exportPreferences.isExportAppointments())
-		{
-			patientRecord.getAppointments().addAll(getAppointmentList(exportStructure));
-		}
 		if(exportPreferences.isExportPersonalHistory())
 		{
-			patientRecord.getPersonalHistory().addAll(getPersonalHistoryList(exportStructure));
+			patientRecord.getPersonalHistory().addAll(
+					new CDSPersonalHistoryExportMapper().exportAll(exportStructure.getSocialHistoryNoteList()));
 		}
 		if(exportPreferences.isExportFamilyHistory())
 		{
-			patientRecord.getFamilyHistory().addAll(getFamilyHistoryList(exportStructure));
+			patientRecord.getFamilyHistory().addAll(
+					new CDSFamilyHistoryExportMapper().exportAll(exportStructure.getFamilyHistoryNoteList()));
 		}
 		if(exportPreferences.isExportPastHealth())
 		{
-			patientRecord.getPastHealth().addAll(getPastHealthList(exportStructure));
+			patientRecord.getPastHealth().addAll(
+					new CDSPastHealthExportMapper().exportAll(exportStructure.getMedicalHistoryNoteList()));
+		}
+		if(exportPreferences.isExportProblemList())
+		{
+			patientRecord.getProblemList().addAll(
+					new CDSProblemExportMapper().exportAll(exportStructure.getProblemList()));
+		}
+		if(exportPreferences.isExportRiskFactors())
+		{
+			patientRecord.getRiskFactors().addAll(
+					new CDSRiskFactorExportMapper().exportAll(exportStructure.getRiskFactorList()));
+		}
+		if(exportPreferences.isExportAllergiesAndAdverseReactions())
+		{
+			patientRecord.getAllergiesAndAdverseReactions().addAll(
+					new CDSAllergyExportMapper().exportAll(exportStructure.getAllergyList()));
+		}
+		if(exportPreferences.isExportMedicationsAndTreatments())
+		{
+			patientRecord.getMedicationsAndTreatments().addAll(
+					new CDSMedicationExportMapper().exportAll(exportStructure.getMedicationList()));
+		}
+		if(exportPreferences.isExportImmunizations())
+		{
+			patientRecord.getImmunizations().addAll(
+					new CDSImmunizationExportMapper().exportAll(exportStructure.getImmunizationList()));
+		}
+		if(exportPreferences.isExportLaboratoryResults())
+		{
+			patientRecord.getLaboratoryResults().addAll(
+					new CDSLabExportMapper().exportAll(exportStructure.getLabList()));
+		}
+		if(exportPreferences.isExportAppointments())
+		{
+			patientRecord.getAppointments().addAll(
+					new CDSAppointmentExportMapper().exportAll(exportStructure.getAppointmentList()));
 		}
 		if(exportPreferences.isExportClinicalNotes())
 		{
-			patientRecord.getClinicalNotes().addAll(getClinicalNotesList(exportStructure));
+			patientRecord.getClinicalNotes().addAll(
+					new CDSEncounterNoteExportMapper().exportAll(exportStructure.getEncounterNoteList()));
+		}
+		if(exportPreferences.isExportReportsReceived())
+		{
+			patientRecord.getReports().addAll(
+					new CDSReportExportMapper().exportAll(exportStructure.getReportList()));
+		}
+		if(exportPreferences.isExportCareElements())
+		{
+			patientRecord.getCareElements().addAll(
+					new CDSCareElementExportMapper().exportAll(exportStructure.getCareElementList()));
+		}
+		if(exportPreferences.isExportAlertsAndSpecialNeeds())
+		{
+			patientRecord.getAlertsAndSpecialNeeds().addAll(
+					new CDSAlertExportMapper().exportAll(exportStructure.getAlertList()));
 		}
 
 		omdCds.setPatientRecord(patientRecord);
 		return omdCds;
-	}
-
-	protected List<Appointments> getAppointmentList(Demographic exportStructure)
-	{
-		CDSAppointmentExportMapper mapper = new CDSAppointmentExportMapper();
-		return mapper.exportAll(exportStructure.getAppointmentList());
-	}
-
-	protected List<PersonalHistory> getPersonalHistoryList(Demographic exportStructure)
-	{
-		CDSPersonalHistoryExportMapper mapper = new CDSPersonalHistoryExportMapper();
-		return mapper.exportAll(exportStructure.getSocialHistoryNoteList());
-	}
-
-	protected List<FamilyHistory> getFamilyHistoryList(Demographic exportStructure)
-	{
-		CDSFamilyHistoryExportMapper mapper = new CDSFamilyHistoryExportMapper();
-		return mapper.exportAll(exportStructure.getFamilyHistoryNoteList());
-	}
-
-	protected List<PastHealth> getPastHealthList(Demographic exportStructure)
-	{
-		CDSMedicalHistoryExportMapper mapper = new CDSMedicalHistoryExportMapper();
-		return mapper.exportAll(exportStructure.getMedicalHistoryNoteList());
-	}
-
-	protected List<ClinicalNotes> getClinicalNotesList(Demographic exportStructure)
-	{
-		CDSEncounterNoteExportMapper mapper = new CDSEncounterNoteExportMapper();
-		return mapper.exportAll(exportStructure.getEncounterNoteList());
 	}
 }

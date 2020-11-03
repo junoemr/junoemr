@@ -25,6 +25,15 @@ package org.oscarehr.demographicImport.model.demographic;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.Alert;
+import org.oscarehr.demographicImport.model.Allergy;
+import org.oscarehr.demographicImport.model.CareElement;
+import org.oscarehr.demographicImport.model.Immunization;
+import org.oscarehr.demographicImport.model.LabResult;
+import org.oscarehr.demographicImport.model.Medication;
+import org.oscarehr.demographicImport.model.Problem;
+import org.oscarehr.demographicImport.model.Report;
+import org.oscarehr.demographicImport.model.RiskFactor;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
@@ -93,12 +102,23 @@ public class Demographic extends AbstractTransientModel
 	private String nameOfFather;
 	private String veteranNumber;
 
+	// associations
 	private List<Appointment> appointmentList;
 
 	private List<FamilyHistoryNote> familyHistoryNoteList;
 	private List<SocialHistoryNote> socialHistoryNoteList;
 	private List<MedicalHistoryNote> medicalHistoryNoteList;
 	private List<EncounterNote> encounterNoteList;
+
+	private List<Alert> alertList;
+	private List<Allergy> allergyList;
+	private List<LabResult> labList;
+	private List<Report> reportList;
+	private List<Medication> medicationList;
+	private List<Immunization> immunizationList;
+	private List<Problem> problemList;
+	private List<RiskFactor> riskFactorList;
+	private List<CareElement> careElementList;
 
 	public Demographic()
 	{
@@ -108,6 +128,15 @@ public class Demographic extends AbstractTransientModel
 		this.socialHistoryNoteList = new ArrayList<>();
 		this.medicalHistoryNoteList = new ArrayList<>();
 		this.encounterNoteList = new ArrayList<>();
+		this.alertList = new ArrayList<>();
+		this.labList = new ArrayList<>();
+		this.reportList = new ArrayList<>();
+		this.medicationList = new ArrayList<>();
+		this.immunizationList = new ArrayList<>();
+		this.allergyList = new ArrayList<>();
+		this.problemList = new ArrayList<>();
+		this.riskFactorList = new ArrayList<>();
+		this.careElementList = new ArrayList<>();
 	}
 
 	public void addAddress(Address address)

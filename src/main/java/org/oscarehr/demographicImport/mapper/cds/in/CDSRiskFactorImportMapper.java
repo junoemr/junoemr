@@ -22,27 +22,19 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.oscarehr.common.xml.cds.v5_0.model.PastHealth;
-import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
+import org.oscarehr.common.xml.cds.v5_0.model.RiskFactors;
+import org.oscarehr.demographicImport.model.RiskFactor;
 
-public class CDSMedicalHistoryImportMapper extends AbstractCDSImportMapper<PastHealth, MedicalHistoryNote>
+public class CDSRiskFactorImportMapper extends AbstractCDSImportMapper<RiskFactors, RiskFactor>
 {
-	public CDSMedicalHistoryImportMapper()
+	public CDSRiskFactorImportMapper()
 	{
 		super();
 	}
 
 	@Override
-	public MedicalHistoryNote importToJuno(PastHealth importStructure)
+	public RiskFactor importToJuno(RiskFactors importStructure)
 	{
-		MedicalHistoryNote note = new MedicalHistoryNote();
-		note.setNoteText(importStructure.getNotes());
-
-		note.setObservationDate(toLocalDateTime(importStructure.getOnsetOrEventDate()));
-		note.setStartDate(toLocalDate(importStructure.getOnsetOrEventDate()));
-		note.setResolutionDate(toLocalDate(importStructure.getResolvedDate()));
-		note.setProcedureDate(toLocalDate(importStructure.getProcedureDate()));
-
-		return note;
+		return new RiskFactor();
 	}
 }
