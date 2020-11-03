@@ -41,7 +41,7 @@
 		</button>
 	</modal-ctl-buttons>
 
-	<modal-body>
+	<modal-body style="overflow-y: scroll ; overflow-x: hidden">
 		<div class="tabs-heading">
 			<ul class="nav nav-tabs round-top">
 				<li class="active">
