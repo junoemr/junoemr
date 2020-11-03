@@ -1704,13 +1704,15 @@ public class MSPReconcile {
 				"    bm.billing_code," +
 				"    p.first_name," +
 				"    p.last_name," +
-				"    p.provider_no," +
 				"    t.t_practitionerno," +
 				"    t.t_s00type," +
 				"    bm.service_date AS 't_servicedate'," +
 				"    t.t_payment," +
 				"    t.t_datacenter," +
-				"    b.demographic_name," +
+				"    CASE WHEN LENGTH(b.demographic_name) > 10" +
+				"	      THEN CONCAT(SUBSTRING(b.demographic_name, 1, 10), '...')" +
+				"         ELSE b.demographic_name" +
+				"    END AS demographic_name," +
 				"    b.demographic_no," +
 				"    t.t_paidamt," +
 				"    t.t_exp1," +
@@ -1727,7 +1729,7 @@ public class MSPReconcile {
 				"    LEFT JOIN provider p ON p.provider_no = b.provider_no " +
 				"WHERE " +
 				"    t.s21_id = ? AND t.t_payeeno = ? " +
-				" ORDER BY p.first_name, bm.service_date, b.demographic_name";
+				" ORDER BY t.t_practitionerno, bm.service_date, b.demographic_name";
 
 		ResultSet rs = null;
 
