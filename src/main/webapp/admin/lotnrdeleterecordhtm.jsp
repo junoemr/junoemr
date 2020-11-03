@@ -66,7 +66,25 @@
 </security:oscarSec>
 
 <%
-PreventionsLotNrsDao PreventionsLotNrsDao = (PreventionsLotNrsDao)SpringUtils.getBean(PreventionsLotNrsDao.class);
+PreventionsLotNrsDao preventionsLotNrsDao = (PreventionsLotNrsDao)SpringUtils.getBean(PreventionsLotNrsDao.class);
+Integer id = 0;
+try
+{
+	id = Integer.parseInt(request.getParameter("lotnr"));
+}
+catch (NumberFormatException ignored)
+{
+	// legit dunno what to do here
+}
+PreventionsLotNrs entity = preventionsLotNrsDao.find(id);
+
+String preventionType = request.getParameter("prevention")==null?"":request.getParameter("prevention");
+String lotName = "";
+
+if (entity != null)
+{
+	lotName = entity.getLotNr();
+}
 %>
 <html:html locale="true">
 <script LANGUAGE="JavaScript">
@@ -108,16 +126,18 @@ function onsub() {
 		<td width="50%" align="right"><bean:message
 			key="admin.admin.add_lot_nr.prevention" /><font color="red">:</font></td>
 		<td>
-		 <input type="text" name="prevention" size=30 maxlength="30" value=<%=request.getParameter("prevention")==null?"":request.getParameter("prevention")%>>
+		 <input type="text" name="prevention" size=30 maxlength="30" value=<%=preventionType%>>
 		</td>
 	</tr>
 	
 	<tr>
 			<td align="right"><bean:message
 				key="admin.admin.add_lot_nr.lotnr" />:</td>
-			<td><input type="text" name="lotnr" size="20"
-				maxlength="20" value=<%=request.getParameter("lotnr")==null?"":request.getParameter("lotnr")%>></td>
-	</tr>		
+			<td><input type="text" name="lotname" size="20"
+				maxlength="20" value="<%=lotName%>"></td>
+		<input type="hidden" name="lotnr" value="<%=id%>">
+
+	</tr>
 
 	<tr>
 		<td colspan="2">

@@ -149,7 +149,7 @@ boolean authed=true;
 <tr bgcolor="<%=bodd?"white":weakcolor%>">
 	<td><%=pRec.getPreventionType()%></td>
 	<td><a
-	href="lotnrdeleterecordhtm.jsp?prevention=<%=pRec.getPreventionType()%>&lotnr=<%=pRec.getLotNr()%>"><%= pRec.getLotNr()%></a></td>
+	href="lotnrdeleterecordhtm.jsp?prevention=<%=pRec.getPreventionType()%>&lotnr=<%=pRec.getId()%>"><%= pRec.getLotNr()%></a></td>
 	</tr>
 	<% }
 	%>

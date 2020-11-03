@@ -61,9 +61,19 @@
 <%@ page import="org.oscarehr.common.model.PreventionsLotNrs"%>
 <%@ page import="org.oscarehr.common.dao.PreventionsLotNrsDao"%>
 <%
-PreventionsLotNrsDao PreventionsLotNrsDao = (PreventionsLotNrsDao)SpringUtils.getBean(PreventionsLotNrsDao.class);
+PreventionsLotNrsDao preventionsLotNrsDao = (PreventionsLotNrsDao)SpringUtils.getBean(PreventionsLotNrsDao.class);
 String prevention = request.getParameter("prevention");
+
+Integer lotId = 0;
 String lotNr = request.getParameter("lotnr");
+try
+{
+	lotId = Integer.parseInt(lotNr);
+}
+catch (NumberFormatException ignored)
+{
+	// it'll fail in the next bit anyways and tell user we can't delete, so just let it attempt to find lot 0
+}
 %>
 
 <html:html locale="true">
@@ -83,10 +93,8 @@ String lotNr = request.getParameter("lotnr");
 	</tr>
 </table>
 <%
-String curUser_no = (String)session.getAttribute("user");
-
-List<String> lotnrs = PreventionsLotNrsDao.findLotNrs(prevention, false);
-if (!lotnrs.contains(lotNr))
+PreventionsLotNrs entry = preventionsLotNrsDao.findActive(lotId);
+if (entry == null)
 {
   %>
 	<bean:message key="admin.lotdeleterecord.msgNonExistentLotnr"/>
@@ -94,13 +102,10 @@ if (!lotnrs.contains(lotNr))
 }
 else
 {
-	PreventionsLotNrs p =  PreventionsLotNrsDao.findByName(prevention, lotNr, false);
-	if(p != null) {
-		p.setDeleted(true);
-		PreventionsLotNrsDao.merge(p);
-	}
+	entry.setDeleted(true);
+	preventionsLotNrsDao.merge(entry);
 	
-	lotnrs = PreventionsLotNrsDao.findLotNrs(prevention, false);
+	List<String> lotnrs = preventionsLotNrsDao.findLotNrs(prevention, false);
 	if (!lotnrs.contains(lotNr)){
 	%>
 		<bean:message key="admin.lotdeleterecord.msgDeletionSuccess" />
