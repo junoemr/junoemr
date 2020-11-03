@@ -23,7 +23,9 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
+import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.mapper.AbstractExportMapper;
+import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.service.ExportPreferences;
 
 public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper<I, E>
@@ -44,5 +46,17 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 	public ObjectFactory getObjectFactory()
 	{
 		return this.objectFactory;
+	}
+
+	/* ==== common helper methods for cds ==== */
+
+	protected ResidualInformation.DataElement createResidualInfoDataElement(CDSConstants.RESIDUAL_INFO_DATA_TYPE dataType, String name, String value)
+	{
+		ResidualInformation.DataElement dataElement = objectFactory.createResidualInformationDataElement();
+		dataElement.setDataType(dataType.name());
+		dataElement.setName(name);
+		dataElement.setContent(value);
+
+		return dataElement;
 	}
 }

@@ -1078,6 +1078,20 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void toLocalDateTime_XmlGregorianCalendar_ExpectLocalDateTime() throws DatatypeConfigurationException
+	{
+		String dateString = "2019-04-30";
+		XMLGregorianCalendar xmlGregorianCalendar =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar(dateString);
+		xmlGregorianCalendar.setHour(12);
+		xmlGregorianCalendar.setMinute(45);
+		xmlGregorianCalendar.setSecond(15);
+
+		LocalDateTime expectedDateTime = LocalDateTime.of(2019, 4, 30, 12, 45, 15);
+		assertThat(expectedDateTime, is(ConversionUtils.toLocalDateTime(xmlGregorianCalendar)));
+	}
+
+	@Test
 	public void toZonedLocalDate_FixedDate_ExpectLocalDate()
 	{
 		LocalDate expectedLocalDate = LocalDate.of(2019, 4,30);
@@ -1110,7 +1124,8 @@ public class ConversionUtilsTest
 	@Test
 	public void toNullableLocalDateTime_NullParameter_ExpectNull()
 	{
-		Assert.assertNull(ConversionUtils.toNullableLocalDateTime(null));
+		Date date = null;
+		Assert.assertNull(ConversionUtils.toNullableLocalDateTime(date));
 	}
 
 	@Test

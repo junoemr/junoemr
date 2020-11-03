@@ -702,6 +702,24 @@ public class ConversionUtils {
 				xmlGregorianCalendar.getDay());
 	}
 
+	public static LocalDateTime toLocalDateTime(XMLGregorianCalendar xmlGregorianCalendar)
+	{
+		// TODO raise custom non-nullable exception if null?
+		return LocalDateTime.of(
+				xmlGregorianCalendar.getYear(),
+				xmlGregorianCalendar.getMonth(),
+				xmlGregorianCalendar.getDay(),
+				xmlGregorianCalendar.getHour(),
+				xmlGregorianCalendar.getMinute(),
+				xmlGregorianCalendar.getSecond());
+	}
+
+	public static LocalDateTime toNullableLocalDateTime(XMLGregorianCalendar xmlGregorianCalendar)
+	{
+		if(xmlGregorianCalendar == null) return null;
+		return toLocalDateTime(xmlGregorianCalendar);
+	}
+
 	public static LocalDate toNullableZonedLocalDate(String dateString)
 	{
 		if(dateString == null) return null;
@@ -740,6 +758,17 @@ public class ConversionUtils {
 	public static LocalDateTime toLocalDateTime(Date legacyDate)
 	{
 		return new java.sql.Timestamp(legacyDate.getTime()).toLocalDateTime();
+	}
+
+	public static LocalDateTime toLocalDateTime(String dateString)
+	{
+		return toLocalDateTime(dateString, DEFAULT_TS_PATTERN);
+	}
+
+	public static LocalDateTime toLocalDateTime(String dateString, String dateTimeFormat)
+	{
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimeFormat);
+		return LocalDateTime.parse(dateString, formatter);
 	}
 
 

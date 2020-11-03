@@ -50,14 +50,6 @@ public class CDSMedicalHistoryExportMapper extends AbstractCDSExportMapper<PastH
 			pastHealth.setProcedureDate(dateFullOrPartial);
 		}
 
-		XMLGregorianCalendar startDate = ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getStartDate());
-		if(startDate != null)
-		{
-			DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
-			dateFullOrPartial.setFullDate(startDate);
-			pastHealth.setOnsetOrEventDate(dateFullOrPartial);
-		}
-
 		XMLGregorianCalendar resolutionDate = ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getResolutionDate());
 		if(resolutionDate != null)
 		{
@@ -65,6 +57,22 @@ public class CDSMedicalHistoryExportMapper extends AbstractCDSExportMapper<PastH
 			dateFullOrPartial.setFullDate(resolutionDate);
 			pastHealth.setResolvedDate(dateFullOrPartial);
 		}
+
+		DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
+		XMLGregorianCalendar startDate = ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getStartDate());
+		if(startDate != null)
+		{
+			// use start date field if we can
+			dateFullOrPartial.setFullDate(startDate);
+		}
+		else
+		{
+			// otherwise use the observation date
+			XMLGregorianCalendar observationDate = ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDate());
+			dateFullOrPartial.setFullDate(observationDate);
+		}
+		pastHealth.setOnsetOrEventDate(dateFullOrPartial);
+
 
 
 		return pastHealth;

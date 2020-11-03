@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds.out;
+package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.PersonalHistory;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
@@ -31,53 +31,50 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_IN
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_OBS_DATE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_RESOLVE_DATE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_START_DATE;
-import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_TYPE;
 
-public class CDSPersonalHistoryExportMapper extends AbstractCDSExportMapper<PersonalHistory, SocialHistoryNote>
+public class CDSPersonalHistoryImportMapper extends AbstractCDSImportMapper<PersonalHistory, SocialHistoryNote>
 {
-
-
-	public CDSPersonalHistoryExportMapper()
+	public CDSPersonalHistoryImportMapper()
 	{
 		super();
 	}
 
 	@Override
-	public PersonalHistory exportFromJuno(SocialHistoryNote exportStructure)
+	public SocialHistoryNote importToJuno(PersonalHistory importStructure)
 	{
-		PersonalHistory personalHistory = objectFactory.createPersonalHistory();
-		ResidualInformation residualInformation = objectFactory.createResidualInformation();
+		SocialHistoryNote note = new SocialHistoryNote();
 
-		addNonNullDataElements(
-				residualInformation,
-				RESIDUAL_INFO_DATA_TYPE.TEXT,
-				RESIDUAL_INFO_DATA_NAME_NOTE,
-				exportStructure.getNoteText());
-		addNonNullDataElements(
-				residualInformation,
-				RESIDUAL_INFO_DATA_TYPE.DATETIME,
-				RESIDUAL_INFO_DATA_NAME_OBS_DATE,
-				ConversionUtils.toDateTimeString(exportStructure.getObservationDate()));
-		addNonNullDataElements(
-				residualInformation,
-				RESIDUAL_INFO_DATA_TYPE.DATE,
-				RESIDUAL_INFO_DATA_NAME_START_DATE,
-				ConversionUtils.toDateString(exportStructure.getStartDate()));
-		addNonNullDataElements(
-				residualInformation,
-				RESIDUAL_INFO_DATA_TYPE.DATE,
-				RESIDUAL_INFO_DATA_NAME_RESOLVE_DATE,
-				ConversionUtils.toDateString(exportStructure.getResolutionDate()));
-
-		personalHistory.setResidualInfo(residualInformation);
-		return personalHistory;
-	}
-
-	protected void addNonNullDataElements(ResidualInformation residualInformation, RESIDUAL_INFO_DATA_TYPE dataType, String name, String value)
-	{
-		if(value != null && !value.isEmpty())
+		for(ResidualInformation.DataElement dataElement : importStructure.getResidualInfo().getDataElement())
 		{
-			residualInformation.getDataElement().add(createResidualInfoDataElement(dataType, name, value));
+			String name = dataElement.getName();
+			String content = dataElement.getContent();
+			String type = dataElement.getDataType();
+
+			//TODO how to handle types? do we need/want to check them?
+			if(name != null)
+			{
+				switch(name)
+				{
+					case RESIDUAL_INFO_DATA_NAME_NOTE:
+					{
+						note.setNoteText(content); break;
+					}
+					case RESIDUAL_INFO_DATA_NAME_OBS_DATE:
+					{
+						note.setObservationDate(ConversionUtils.toLocalDateTime(content)); break;
+					}
+					case RESIDUAL_INFO_DATA_NAME_START_DATE:
+					{
+						note.setStartDate(ConversionUtils.toLocalDate(content)); break;
+					}
+					case RESIDUAL_INFO_DATA_NAME_RESOLVE_DATE:
+					{
+						note.setResolutionDate(ConversionUtils.toLocalDate(content)); break;
+					}
+				}
+			}
 		}
+
+		return note;
 	}
 }

@@ -22,28 +22,27 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
-import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.common.xml.cds.v5_0.model.PastHealth;
+import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
 
-public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic>
+public class CDSMedicalHistoryImportMapper extends AbstractCDSImportMapper<PastHealth, MedicalHistoryNote>
 {
-	public CDSImportMapper()
+	public CDSMedicalHistoryImportMapper()
 	{
 		super();
 	}
 
 	@Override
-	public Demographic importToJuno(OmdCds importStructure)
+	public MedicalHistoryNote importToJuno(PastHealth importStructure)
 	{
-		PatientRecord patientRecord = importStructure.getPatientRecord();
-		Demographic demographic = new CDSDemographicImportMapper().importToJuno(patientRecord.getDemographics());
+		MedicalHistoryNote note = new MedicalHistoryNote();
+		note.setNoteText(importStructure.getNotes());
 
-		demographic.setSocialHistoryNoteList(new CDSPersonalHistoryImportMapper().importAll(patientRecord.getPersonalHistory()));
-		demographic.setFamilyHistoryNoteList(new CDSFamilyHistoryImportMapper().importAll(patientRecord.getFamilyHistory()));
-		demographic.setMedicalHistoryNoteList(new CDSMedicalHistoryImportMapper().importAll(patientRecord.getPastHealth()));
-		demographic.setEncounterNoteList(new CDSEncounterNoteImportMapper().importAll(patientRecord.getClinicalNotes()));
+		note.setObservationDate(toLocalDateTime(importStructure.getOnsetOrEventDate()));
+		note.setStartDate(toLocalDate(importStructure.getOnsetOrEventDate()));
+		note.setResolutionDate(toLocalDate(importStructure.getResolvedDate()));
+		note.setProcedureDate(toLocalDate(importStructure.getProcedureDate()));
 
-		return demographic;
+		return note;
 	}
 }

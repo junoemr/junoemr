@@ -20,35 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds.out;
+package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
-import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
-import oscar.util.ConversionUtils;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-
-public class CDSEncounterNoteExportMapper extends AbstractCDSExportMapper<ClinicalNotes, EncounterNote>
+public class CDSEncounterNoteImportMapper extends AbstractCDSImportMapper<ClinicalNotes, EncounterNote>
 {
-	public CDSEncounterNoteExportMapper()
+	public CDSEncounterNoteImportMapper()
 	{
 		super();
 	}
 
 	@Override
-	public ClinicalNotes exportFromJuno(EncounterNote exportStructure)
+	public EncounterNote importToJuno(ClinicalNotes importStructure)
 	{
-		ClinicalNotes clinicalNotes = objectFactory.createClinicalNotes();
+		EncounterNote note = new EncounterNote();
+		note.setNoteText(importStructure.getMyClinicalNotesContent());
+		note.setObservationDate(toLocalDateTime(importStructure.getEventDateTime()));
 
-		clinicalNotes.setMyClinicalNotesContent(exportStructure.getNoteText());
-
-		XMLGregorianCalendar observationDate = ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDate());
-		DateTimeFullOrPartial dateFullOrPartial = objectFactory.createDateTimeFullOrPartial();
-		dateFullOrPartial.setFullDateTime(observationDate);
-		clinicalNotes.setEventDateTime(dateFullOrPartial);
-
-		return clinicalNotes;
+		return note;
 	}
-
 }

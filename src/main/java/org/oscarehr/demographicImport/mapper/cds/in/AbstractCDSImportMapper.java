@@ -22,11 +22,110 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
+import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.demographicImport.mapper.AbstractImportMapper;
+import oscar.util.ConversionUtils;
+
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper<I, E>
 {
 	public AbstractCDSImportMapper()
 	{
+	}
+
+	@Override
+	public String toString()
+	{
+		return ReflectionToStringBuilder.toString(this);
+	}
+
+	protected LocalDateTime toLocalDateTime(DateTimeFullOrPartial fullOrPartial)
+	{
+		if(fullOrPartial != null)
+		{
+			return fillPartialCalendar(
+					fullOrPartial.getFullDateTime(),
+					fullOrPartial.getFullDate(),
+					fullOrPartial.getYearMonth(),
+					fullOrPartial.getYearOnly());
+		}
+		return null;
+	}
+
+	protected LocalDateTime toLocalDateTime(DateFullOrPartial fullOrPartial)
+	{
+		if(fullOrPartial != null)
+		{
+			return fillPartialCalendar(
+					fullOrPartial.getFullDate(),
+					fullOrPartial.getYearMonth(),
+					fullOrPartial.getYearOnly());
+		}
+		return null;
+	}
+
+	protected LocalDate toLocalDate(DateFullOrPartial fullOrPartial)
+	{
+		if(fullOrPartial != null)
+		{
+			LocalDateTime dateTime = fillPartialCalendar(
+					fullOrPartial.getFullDate(),
+					fullOrPartial.getYearMonth(),
+					fullOrPartial.getYearOnly());
+			return dateTime.toLocalDate();
+		}
+		return null;
+	}
+
+	private LocalDateTime fillPartialCalendar(
+			XMLGregorianCalendar fullDateTime,
+			XMLGregorianCalendar fullDate,
+			XMLGregorianCalendar yearMonth,
+			XMLGregorianCalendar yearOnly)
+	{
+		if(fullDateTime != null)
+		{
+			return ConversionUtils.toNullableLocalDateTime(fullDateTime);
+		}
+		else
+		{
+			return fillPartialCalendar(fullDate, yearMonth, yearOnly);
+		}
+	}
+
+	private LocalDateTime fillPartialCalendar(
+			XMLGregorianCalendar fullDate,
+			XMLGregorianCalendar yearMonth,
+			XMLGregorianCalendar yearOnly)
+	{
+		XMLGregorianCalendar xmlGregorianCalendar = null;
+		if(fullDate != null)
+		{
+			xmlGregorianCalendar = fullDate;
+		}
+		else if (yearMonth != null)
+		{
+			xmlGregorianCalendar = yearMonth;
+			xmlGregorianCalendar.setDay(1);
+		}
+		else if(yearOnly != null)
+		{
+			xmlGregorianCalendar = yearOnly;
+			xmlGregorianCalendar.setMonth(1);
+			xmlGregorianCalendar.setDay(1);
+		}
+
+		if(xmlGregorianCalendar != null)
+		{
+			xmlGregorianCalendar.setHour(0);
+			xmlGregorianCalendar.setMinute(0);
+			xmlGregorianCalendar.setSecond(0);
+		}
+		return ConversionUtils.toNullableLocalDateTime(xmlGregorianCalendar);
 	}
 }

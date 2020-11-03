@@ -50,13 +50,21 @@ public class CDSFamilyHistoryExportMapper extends AbstractCDSExportMapper<Family
 		familyHistory.setTreatment(exportStructure.getTreatment());
 		familyHistory.setRelationship(exportStructure.getRelationship());
 
+		DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
 		XMLGregorianCalendar startDate = ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getStartDate());
 		if(startDate != null)
 		{
-			DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
+			// use start date field if we can
 			dateFullOrPartial.setFullDate(startDate);
 			familyHistory.setStartDate(dateFullOrPartial);
 		}
+		else
+		{
+			// otherwise use the observation date
+			XMLGregorianCalendar observationDate = ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDate());
+			dateFullOrPartial.setFullDate(observationDate);
+		}
+		familyHistory.setStartDate(dateFullOrPartial);
 
 
 		return familyHistory;
