@@ -360,9 +360,8 @@ else {
 			<%}
 		}%>
 		<td width="15%" align="center" height="25">
-		<caisi:isModuleLoad	moduleName="TORONTO_RFQ" reverse="true">
-			<a href="javascript:popupWindow('../demographic/demographiccontrol.jsp?demographic_no=<%= head %>&displaymode=edit&dboperation=search_detail')"><%=demographicNo%></a>
-		</caisi:isModuleLoad></td>
+			<a href="javascript:popupWindow('../demographic/demographiccontrol.jsp?demographic_no=<%=(!head.isEmpty() ? head : demographicNo)%>&displaymode=edit&dboperation=search_detail')"><%=demographicNo%></a>
+		</td>
 		<td align="center" width="20%" height="25"><%=demo.getLastName()%></td>
 		<td align="center" width="20%" height="25"><%=demo.getFirstName()%></td>
 		<td align="center" width="10%" height="25"><%=demo.getAge()%></td>

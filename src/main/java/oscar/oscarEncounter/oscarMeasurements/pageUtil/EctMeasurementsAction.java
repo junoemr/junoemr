@@ -121,6 +121,7 @@ public class EctMeasurementsAction extends Action
 		Double dMin = new Double(0);
 		Integer iMax = 0;
 		Integer iMin = 0;
+		boolean isADate = false;
 
 		List<Validations> vs = null;
 		String regCharExp;
@@ -146,18 +147,21 @@ public class EctMeasurementsAction extends Action
 			dMin = new Double(0);
 			iMax = 0;
 			iMin = 0;
+			isADate = false;
 
 			vs = ectValidation.getValidationType(inputType, mInstrc);
 			regCharExp = ectValidation.getRegCharacterExp();
 
 			if(!vs.isEmpty())
 			{
-				Validations v = vs.iterator().next();
-				dMax = v.getMaxValue();
-				dMin = v.getMinValue();
-				iMax = v.getMaxLength();
-				iMin = v.getMinLength();
-				regExp = v.getRegularExp();
+				Validations valType = vs.iterator().next();
+				dMax = valType.getMaxValue();
+				dMin = valType.getMinValue();
+				iMax = valType.getMaxLength();
+				iMin = valType.getMinLength();
+				regExp = valType.getRegularExp();
+				isADate = (valType.isDate() != null) && valType.isDate();
+
 			}
 
 			if(dMax == null)
@@ -209,12 +213,12 @@ public class EctMeasurementsAction extends Action
 				saveErrors(request, errors);
 				valid = false;
 			}
-			if(!ectValidation.isDate(dateObserved) && inputValue.compareTo("") != 0)
+			if ((isADate) && (!ectValidation.isDate(inputValue) && !inputValue.isEmpty()))
 			{
-				errors.add(dateName,
-						new ActionMessage("errors.invalidDate", inputTypeDisplay));
-				saveErrors(request, errors);
-				valid = false;
+					errors.add(dateName,
+							new ActionMessage("errors.invalidDate", inputTypeDisplay));
+					saveErrors(request, errors);
+					valid = false;
 			}
 		}
 
