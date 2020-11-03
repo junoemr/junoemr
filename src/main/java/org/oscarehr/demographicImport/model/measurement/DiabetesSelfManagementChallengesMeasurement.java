@@ -20,25 +20,21 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds.in;
+package org.oscarehr.demographicImport.model.measurement;
 
-import org.oscarehr.common.xml.cds.v5_0.model.CareElements;
-import org.oscarehr.demographicImport.model.measurement.Measurement;
+import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElements, List<Measurement>>
+@Data
+public class DiabetesSelfManagementChallengesMeasurement extends Measurement
 {
-	public CDSCareElementImportMapper()
+	public DiabetesSelfManagementChallengesMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
-		super();
+		super(dbModel);
 	}
 
 	@Override
-	public List<Measurement> importToJuno(CareElements importStructure)
+	public String getMeasurementUnit()
 	{
-		List<Measurement> measurements = new ArrayList<>();
-		return measurements;
+		return null;
 	}
 }

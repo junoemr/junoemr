@@ -22,10 +22,19 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
+import org.oscarehr.common.xml.cds.v5_0.model.BloodPressure;
 import org.oscarehr.common.xml.cds.v5_0.model.CareElements;
-import org.oscarehr.demographicImport.model.CareElement;
+import org.oscarehr.common.xml.cds.v5_0.model.Height;
+import org.oscarehr.common.xml.cds.v5_0.model.WaistCircumference;
+import org.oscarehr.common.xml.cds.v5_0.model.Weight;
+import org.oscarehr.demographicImport.model.measurement.BloodPressureMeasurement;
+import org.oscarehr.demographicImport.model.measurement.HeightMeasurement;
+import org.oscarehr.demographicImport.model.measurement.Measurement;
+import org.oscarehr.demographicImport.model.measurement.WaistCircumferenceMeasurement;
+import org.oscarehr.demographicImport.model.measurement.WeightMeasurement;
+import oscar.util.ConversionUtils;
 
-public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElements, CareElement>
+public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElements, Measurement>
 {
 	public CDSCareElementExportMapper()
 	{
@@ -33,10 +42,69 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 	}
 
 	@Override
-	public CareElements exportFromJuno(CareElement exportStructure)
+	public CareElements exportFromJuno(Measurement exportStructure)
 	{
 		CareElements careElements = objectFactory.createCareElements();
 
+		//TODO a better pattern for this?
+		if(exportStructure instanceof HeightMeasurement)
+		{
+			careElements.getHeight().add(getHeight((HeightMeasurement) exportStructure));
+		}
+		else if(exportStructure instanceof WeightMeasurement)
+		{
+			careElements.getWeight().add(getWeight((WeightMeasurement) exportStructure));
+		}
+		else if(exportStructure instanceof WaistCircumferenceMeasurement)
+		{
+			careElements.getWaistCircumference().add(getWaist((WaistCircumferenceMeasurement) exportStructure));
+		}
+		else if(exportStructure instanceof BloodPressureMeasurement)
+		{
+			careElements.getBloodPressure().add(getBloodPressure((BloodPressureMeasurement) exportStructure));
+		}
+
 		return careElements;
+	}
+
+	protected Height getHeight(HeightMeasurement exportStructure)
+	{
+		Height height = objectFactory.createHeight();
+		height.setHeight(exportStructure.getMeasurementValue());
+		height.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		height.setHeightUnit(exportStructure.getMeasurementUnit());
+
+		return height;
+	}
+
+	protected Weight getWeight(WeightMeasurement exportStructure)
+	{
+		Weight weight = objectFactory.createWeight();
+		weight.setWeight(exportStructure.getMeasurementValue());
+		weight.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		weight.setWeightUnit(exportStructure.getMeasurementUnit());
+
+		return weight;
+	}
+
+	protected WaistCircumference getWaist(WaistCircumferenceMeasurement exportStructure)
+	{
+		WaistCircumference waist = objectFactory.createWaistCircumference();
+		waist.setWaistCircumference(exportStructure.getMeasurementValue());
+		waist.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		waist.setWaistCircumferenceUnit(exportStructure.getMeasurementUnit());
+
+		return waist;
+	}
+
+	protected BloodPressure getBloodPressure(BloodPressureMeasurement exportStructure)
+	{
+		BloodPressure bloodPressure = objectFactory.createBloodPressure();
+		bloodPressure.setSystolicBP(exportStructure.getSystolic());
+		bloodPressure.setDiastolicBP(exportStructure.getDiastolic());
+		bloodPressure.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		bloodPressure.setBPUnit(exportStructure.getMeasurementUnit());
+
+		return bloodPressure;
 	}
 }

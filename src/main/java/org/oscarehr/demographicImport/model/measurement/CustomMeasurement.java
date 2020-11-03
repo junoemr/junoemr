@@ -20,25 +20,30 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds.in;
+package org.oscarehr.demographicImport.model.measurement;
 
-import org.oscarehr.common.xml.cds.v5_0.model.CareElements;
-import org.oscarehr.demographicImport.model.measurement.Measurement;
+import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElements, List<Measurement>>
+@Data
+public class CustomMeasurement extends Measurement
 {
-	public CDSCareElementImportMapper()
+	private String measurementType;
+	private String measurementUnit;
+
+	public CustomMeasurement()
 	{
 		super();
 	}
 
-	@Override
-	public List<Measurement> importToJuno(CareElements importStructure)
+	public CustomMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
-		List<Measurement> measurements = new ArrayList<>();
-		return measurements;
+		super(dbModel);
+		this.measurementType = dbModel.getType();
+	}
+
+	@Override
+	public String getMeasurementUnit()
+	{
+		return measurementUnit;
 	}
 }

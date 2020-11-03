@@ -22,9 +22,14 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.oscarehr.common.xml.cds.v5_0.model.CareElements;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.measurement.Measurement;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic>
 {
@@ -51,9 +56,16 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic
 		demographic.setAppointmentList(new CDSAppointmentImportMapper().importAll(patientRecord.getAppointments()));
 		demographic.setEncounterNoteList(new CDSEncounterNoteImportMapper().importAll(patientRecord.getClinicalNotes()));
 		demographic.setReportList(new CDSReportImportMapper().importAll(patientRecord.getReports()));
-		demographic.setCareElementList(new CDSCareElementImportMapper().importAll(patientRecord.getCareElements()));
+		demographic.setMeasurementList(getMeasurementsList(patientRecord.getCareElements()));
 		demographic.setAlertList(new CDSAlertImportMapper().importAll(patientRecord.getAlertsAndSpecialNeeds()));
 
 		return demographic;
+	}
+
+	private List<Measurement> getMeasurementsList(List<CareElements> careElements)
+	{
+		// because we get a list back from the base converter, we need to flatten the list of lists
+		List<List<Measurement>> measurementLists = new CDSCareElementImportMapper().importAll(careElements);
+		return measurementLists.stream().flatMap(List::stream).collect(Collectors.toList());
 	}
 }

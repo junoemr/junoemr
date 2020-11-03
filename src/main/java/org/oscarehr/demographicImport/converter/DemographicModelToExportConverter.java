@@ -24,8 +24,10 @@ package org.oscarehr.demographicImport.converter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Measurement;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
@@ -69,6 +71,12 @@ public class DemographicModelToExportConverter extends
 
 	@Autowired
 	private SocialHistoryNoteModelToExportConverter socialHistoryNoteMapper;
+
+	@Autowired
+	private MeasurementDao measurementDao;
+
+	@Autowired
+	private MeasurementToExportConverter measurementToExportConverter;
 
 	@Autowired
 	private MedicalHistoryNoteModelToExportConverter medicalHistoryNoteConverter;
@@ -139,6 +147,9 @@ public class DemographicModelToExportConverter extends
 		exportDemographic.setAppointmentList(appointmentConverter.convert(appointments));
 
 		setNotes(input, exportDemographic);
+
+		List<Measurement> measurements = measurementDao.findByDemographicId(input.getDemographicId());
+		exportDemographic.setMeasurementList(measurementToExportConverter.convert(measurements));
 
 		return exportDemographic;
 	}

@@ -106,7 +106,7 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 		if(exportPreferences.isExportCareElements())
 		{
 			patientRecord.getCareElements().addAll(
-					new CDSCareElementExportMapper().exportAll(exportStructure.getCareElementList()));
+					new CDSCareElementExportMapper().exportAll(exportStructure.getMeasurementList()));
 		}
 		if(exportPreferences.isExportAlertsAndSpecialNeeds())
 		{

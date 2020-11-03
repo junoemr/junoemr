@@ -27,7 +27,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 import org.oscarehr.demographicImport.model.Alert;
 import org.oscarehr.demographicImport.model.Allergy;
-import org.oscarehr.demographicImport.model.CareElement;
+import org.oscarehr.demographicImport.model.measurement.Measurement;
 import org.oscarehr.demographicImport.model.Immunization;
 import org.oscarehr.demographicImport.model.LabResult;
 import org.oscarehr.demographicImport.model.Medication;
@@ -118,7 +118,7 @@ public class Demographic extends AbstractTransientModel
 	private List<Immunization> immunizationList;
 	private List<Problem> problemList;
 	private List<RiskFactor> riskFactorList;
-	private List<CareElement> careElementList;
+	private List<Measurement> measurementList;
 
 	public Demographic()
 	{
@@ -136,7 +136,7 @@ public class Demographic extends AbstractTransientModel
 		this.allergyList = new ArrayList<>();
 		this.problemList = new ArrayList<>();
 		this.riskFactorList = new ArrayList<>();
-		this.careElementList = new ArrayList<>();
+		this.measurementList = new ArrayList<>();
 	}
 
 	public void addAddress(Address address)

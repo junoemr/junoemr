@@ -20,25 +20,35 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds.in;
+package org.oscarehr.demographicImport.model.measurement;
 
-import org.oscarehr.common.xml.cds.v5_0.model.CareElements;
-import org.oscarehr.demographicImport.model.measurement.Measurement;
+import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_UNIT_MMHG;
 
-public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElements, List<Measurement>>
+@Data
+public class BloodPressureMeasurement extends Measurement
 {
-	public CDSCareElementImportMapper()
+	private String systolic;
+	private String diastolic;
+
+	public BloodPressureMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
-		super();
+		super(dbModel);
+
+		String dataField = dbModel.getDataField();
+		String splitChar = "/";
+		if(dataField != null && dataField.contains(splitChar))
+		{
+			String[] systolicDiastolicBloodPressure = dbModel.getDataField().split(splitChar, 2);
+			systolic = systolicDiastolicBloodPressure[0];
+			diastolic = systolicDiastolicBloodPressure[1];
+		}
 	}
 
 	@Override
-	public List<Measurement> importToJuno(CareElements importStructure)
+	public String getMeasurementUnit()
 	{
-		List<Measurement> measurements = new ArrayList<>();
-		return measurements;
+		return MEASUREMENT_UNIT_MMHG;
 	}
 }

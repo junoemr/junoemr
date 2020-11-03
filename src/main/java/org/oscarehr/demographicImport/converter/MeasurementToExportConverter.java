@@ -20,25 +20,22 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds.in;
+package org.oscarehr.demographicImport.converter;
 
-import org.oscarehr.common.xml.cds.v5_0.model.CareElements;
-import org.oscarehr.demographicImport.model.measurement.Measurement;
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.common.model.Measurement;
+import org.oscarehr.demographicImport.model.measurement.MeasurementFactory;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElements, List<Measurement>>
+@Component
+public class MeasurementToExportConverter extends
+		AbstractModelConverter<Measurement, org.oscarehr.demographicImport.model.measurement.Measurement>
 {
-	public CDSCareElementImportMapper()
-	{
-		super();
-	}
 
 	@Override
-	public List<Measurement> importToJuno(CareElements importStructure)
+	public org.oscarehr.demographicImport.model.measurement.Measurement convert(Measurement input)
 	{
-		List<Measurement> measurements = new ArrayList<>();
-		return measurements;
+		// TODO is the factory how we want to convert this?
+		return MeasurementFactory.getMeasurement(input);
 	}
 }

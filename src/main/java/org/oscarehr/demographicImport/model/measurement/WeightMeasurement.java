@@ -20,13 +20,23 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model;
+package org.oscarehr.demographicImport.model.measurement;
 
 import lombok.Data;
 
-@Data
-public class CareElement extends AbstractTransientModel
-{
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_UNIT_KG;
 
-	// TODO not sure if this is going to be kept as a single object or split up into disease registry / issues / measurements etc.
+@Data
+public class WeightMeasurement extends Measurement
+{
+	public WeightMeasurement(org.oscarehr.common.model.Measurement dbModel)
+	{
+		super(dbModel);
+	}
+
+	@Override
+	public String getMeasurementUnit()
+	{
+		return MEASUREMENT_UNIT_KG;
+	}
 }
