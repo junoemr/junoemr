@@ -1,4 +1,4 @@
-<%--
+<%@ page import="oscar.util.ConversionUtils" %><%--
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -25,6 +25,7 @@
 --%>
 <%
 	boolean faxAll = request.getParameter("faxAll") != null;
+	boolean faxAR1AR2 = ConversionUtils.hasContent(request.getParameter("faxAR1AR2"));
 %>
 <html>
 <head>
@@ -39,7 +40,11 @@
 
 			// let form set things up as it would for printing but set target to original window
 			// (we don't want that window to persist after it's been polluted with faxing values)
-			if (<%=faxAll%>)
+			if (<%=faxAR1AR2%>)
+			{
+				window.opener.onPrint12();
+			}
+			else if (<%=faxAll%>)
 			{
 				window.opener.onPrintAll();
 			}
