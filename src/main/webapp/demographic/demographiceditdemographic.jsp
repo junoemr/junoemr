@@ -43,7 +43,6 @@
 <%-- @ taglib uri="../WEB-INF/taglibs-log.tld" prefix="log" --%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
-<%@page import="org.oscarehr.PMmodule.caisi_integrator.ConformanceTestHelper"%>
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao"%>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@page import="org.oscarehr.PMmodule.model.Program"%>
@@ -3893,19 +3892,6 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) { out.println(os
 						</table>
 <%-- END BOTTOM TOOLBAR  --%>
 
-						<%
-							if (ConformanceTestHelper.enableConformanceOnlyTestFeatures)
-							{
-								String styleBut = "";
-								if(ConformanceTestHelper.hasDifferentRemoteDemographics(loggedInInfo, Integer.parseInt(demographic$))){
-                                                                       styleBut = " style=\"background-color:yellow\" ";
-                                                                }%>
-									<input type="button" value="Compare with Integrator" <%=styleBut%>  onclick="popup(425, 600, 'DiffRemoteDemographics.jsp?demographicId=<%=demographic$%>', 'RemoteDemoWindow')" />
-									<input type="button" value="Update latest integrated demographics information" onclick="document.location='<%=request.getContextPath()%>/demographic/copyLinkedDemographicInfoAction.jsp?demographicId=<%=demographic$%>&<%=request.getQueryString()%>'" />
-									<input type="button" value="Send note to integrated provider" onclick="document.location='<%=request.getContextPath()%>/demographic/followUpSelection.jsp?demographicId=<%=demographic$%>'" />
-								<%
-							}
-						%>
 						</td>
 					</tr>
 				</table>

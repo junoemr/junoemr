@@ -64,7 +64,7 @@
 										</a>
 									</li>
 									<li><a ng-click="detailsCtrl.integratorDo('Linking')"><bean:message key="web.record.details.manageLinkedClients"/></a></li>
-									<div ng-show="detailsCtrl.page.conformanceFeaturesEnabled && !detailsCtrl.page.integratorOffline">
+									<div ng-show="!detailsCtrl.page.integratorOffline">
 										<li><a ng-click="detailsCtrl.integratorDo('Compare')"><bean:message key="web.record.details.compareWithIntegrator"/></a></li>
 										<li><a ng-click="detailsCtrl.integratorDo('Update')"><bean:message key="web.record.details.updateFromIntegrator"/></a></li>
 										<li><a ng-click="detailsCtrl.integratorDo('SendNote')"><bean:message key="web.record.details.sendNoteIntegrator"/></a></li>

@@ -23,6 +23,9 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -40,6 +43,9 @@ public class MenuItemTo1 implements Serializable {
     private String url;
     private List<String> state;
     private boolean openNewWindow = false;
+    @Getter
+    @Setter
+    private boolean openNewTab = false;
     private List<MenuItemTo1> dropdownItems;
     private Boolean dropdown = false;
     

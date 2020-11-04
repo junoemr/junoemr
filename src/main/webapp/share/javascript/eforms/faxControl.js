@@ -24,19 +24,10 @@ var faxControl = {
 
             $.ajax({
                 url: "../eform/efmformfax_form.jsp",
-                data: "demographicNo=" + demoNo
-            }).then(function(data)
-            {
-                if (data && data.trim())
-                {
-                    faxControl._createFaxUI(data);
-                    faxControl._announceDone();
-                }
-                else
-                {
-                    alert("Error loading fax control, please contact an administrator.");
-                }
-            });
+                data: "demographicNo=" + demoNo,
+                success: faxControl._fetchFaxControlSuccess,
+                error: faxControl._fetchFaxControlFailure
+            }); // Avoid using .then() to process response to preserve backwards compatibility with older versions of jQuery
         }
     },
 
@@ -121,7 +112,25 @@ var faxControl = {
         return false;
     },
 
-    _createFaxUI: function createFaxUI(data)
+    _fetchFaxControlSuccess: function fetchFaxControlSuccess(data)
+    {
+        if (data && data.trim())
+        {
+            faxControl._createFaxUI(data);
+            faxControl._announceDone();
+        }
+        else
+        {
+            faxControl._fetchFaxControlFailure();
+        }
+    },
+
+    _fetchFaxControlFailure: function fetchFaxControlFailure()
+    {
+        alert("Error loading fax control, please contact an administrator.");
+    },
+
+    _createFaxUI: function (data)
     {
 
         var faxContainer = faxControl._faxControlContainer;

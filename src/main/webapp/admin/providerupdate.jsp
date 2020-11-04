@@ -60,6 +60,8 @@
 <%@ page import="org.oscarehr.providerBilling.model.ProviderBilling" %>
 <%@ page import="org.oscarehr.provider.service.ProviderService" %>
 <%@ page import="org.springframework.beans.BeanUtils" %>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.List" %>
@@ -104,7 +106,6 @@
 
   	String StrProviderId = request.getParameter("provider_no");
   	OscarProperties props = OscarProperties.getInstance();
-
   	String[] provider_sites = {};
 
   	// get provider id ranger
@@ -280,7 +281,9 @@ if (securityInfoManager.superAdminModificationCheck(request.getParameter("curren
 			providerArchiveDao.persist(pa);
 
 			providerService.saveProvider(provider);
-			%>
+			LogAction.addLogEntry((String)session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS,
+					request.getParameter("keyword"), request.getRemoteAddr());
+		%>
 			<p>
 			<h2><bean:message key="admin.providerupdate.msgUpdateSuccess" />
 			<a href="providerupdateprovider.jsp?keyword=<%=request.getParameter("provider_no")%>"><%= request.getParameter("provider_no") %></a>

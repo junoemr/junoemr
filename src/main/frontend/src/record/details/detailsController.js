@@ -263,7 +263,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 							controller.page.integratorOffline = results.integratorOffline;
 							controller.page.integratorAllSynced = results.integratorAllSynced;
 
-							controller.page.conformanceFeaturesEnabled = results.conformanceFeaturesEnabled;
 							controller.page.workflowEnhance = results.workflowEnhance;
 							controller.page.billregion = results.billregion;
 							controller.page.defaultView = results.defaultView;
