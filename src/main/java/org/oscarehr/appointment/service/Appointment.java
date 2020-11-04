@@ -24,6 +24,7 @@ package org.oscarehr.appointment.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.oscarehr.common.dao.LookupListItemDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.LookupList;
@@ -32,9 +33,12 @@ import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
+import org.oscarehr.integration.myhealthaccess.service.CommunicationService;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.managers.LookupListManager;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
@@ -54,6 +58,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -63,6 +68,9 @@ public class Appointment
 {
 	@Autowired
 	OscarAppointmentDao oscarAppointmentDao;
+
+	@Autowired
+	ProviderDataDao providerDataDao;
 
 	@Autowired
 	AppointmentService appointmentService;
@@ -75,6 +83,9 @@ public class Appointment
 
 	@Autowired
 	MyHealthAccessService myHealthAccessService;
+
+	@Autowired
+	CommunicationService communicationService;
 
 	@Autowired
 	IntegrationService integrationService;
@@ -139,15 +150,26 @@ public class Appointment
 		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		oscarAppointmentDao.persist(appointment);
 
-		if (sendNotification)
-		{// send MHA based appointment notification
+		if (OscarProperties.getInstance().isMyHealthAccessEnabled())
+		{
 			Integration integration = integrationService.findMhaIntegration(appointment);
-			if (integration != null)
+
+			// send MHA based appointment notification
+			if (sendNotification)
 			{
-				ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
-						loggedInInfo.getLoggedInSecurity().getSecurityNo());
-				appointmentService.sendGeneralAppointmentNotification(integration, loginTokenTo1.getToken(),
-						appointment.getId());
+				if (integration != null)
+				{
+					ClinicUserLoginTokenTo1 loginTokenTo1 = clinicService.loginOrCreateClinicUser(integration,
+					                                                                              loggedInInfo.getLoggedInSecurity().getSecurityNo());
+					appointmentService.sendGeneralAppointmentNotification(integration, loginTokenTo1.getToken(),
+					                                                      appointment.getId());
+				}
+			}
+
+			// notify provider, booking notification numbers if appointment is virtual
+			if (appointment.getIsVirtual() && appointment.hasDemographic() && DateUtils.isSameDay(appointment.getStartTimeAsFullDate(), new Date()))
+			{
+				sendAppointmentProviderNotificationSms(appointment, integration);
 			}
 		}
 
@@ -187,14 +209,21 @@ public class Appointment
 		{
 			siteName = appointment.getLocation();
 		}
+		Integration integration = integrationService.findMhaIntegration(siteName);
 
-		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), integrationService.findMhaIntegration(siteName)))
+		if (patientService.isPatientConfirmed(appointment.getDemographicNo(), integration))
 		{
 			appointmentService.bookTelehealthAppointment(loggedInInfo, appointment, sendNotification);
 		}
 		else
 		{
 			appointmentService.bookOneTimeTelehealthAppointment(loggedInInfo, appointment, sendNotification);
+		}
+
+		// send provider booking notification
+		if (appointment.hasDemographic() && DateUtils.isSameDay(appointment.getStartTimeAsFullDate(), new Date()))
+		{
+			sendAppointmentProviderNotificationSms(appointment, integration);
 		}
 
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),
@@ -361,6 +390,21 @@ public class Appointment
 			}
 		}
 		return -1;
+	}
+
+	/**
+	 * send appointment booking notification to providers notification numbers
+	 * @param appointment - the appointment that the notification is about
+	 * @param integration - integration used  to send the sms
+	 */
+	private void sendAppointmentProviderNotificationSms(org.oscarehr.common.model.Appointment appointment, Integration integration)
+	{
+		ProviderData provider = providerDataDao.find(appointment.getProviderNo());
+		List<String> smsNumbers = provider.getBookingNotificationNumbersList();
+		for (String phoneNumber: smsNumbers)
+		{
+			communicationService.sendSms(integration, phoneNumber, "New appointment: " + appointment.getName() + " booked for provider: " + provider.getDisplayName());
+		}
 	}
 
 }

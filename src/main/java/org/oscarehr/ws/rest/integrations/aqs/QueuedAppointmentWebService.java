@@ -26,12 +26,14 @@ package org.oscarehr.ws.rest.integrations.aqs;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.SecObjectName;
+import org.oscarehr.integration.aqs.conversion.QueuedAppointmentBookingTransferQueuedAppointmentConverter;
 import org.oscarehr.integration.aqs.model.QueuedAppointment;
 import org.oscarehr.integration.aqs.service.QueuedAppointmentService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.BookQueuedAppointmentTransfer;
+import org.oscarehr.ws.rest.integrations.aqs.transfer.QueuedAppointmentBookingTransfer;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.QueuedAppointmentMoveTransfer;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.QueuedAppointmentTo1;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -61,6 +63,20 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
+
+	@Autowired
+	QueuedAppointmentBookingTransferQueuedAppointmentConverter queuedAppointmentConverter;
+
+	@POST
+	@Path("/")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<QueuedAppointmentTo1> createQueuedAppointment(@PathParam("queueId") UUID queueId, QueuedAppointmentBookingTransfer queuedAppointmentBookingTransfer)
+	{
+		QueuedAppointment newQueuedAppointment = queuedAppointmentConverter.convert(queuedAppointmentBookingTransfer);
+		newQueuedAppointment = queuedAppointmentService.bookQueuedAppointment(queueId, newQueuedAppointment, getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
+		return RestResponse.successResponse(new QueuedAppointmentTo1(newQueuedAppointment));
+	}
 
 	@DELETE
 	@Path("{appointmentId}/")

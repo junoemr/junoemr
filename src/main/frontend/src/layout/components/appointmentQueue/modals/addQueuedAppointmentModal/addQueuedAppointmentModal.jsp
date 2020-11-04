@@ -60,7 +60,7 @@
 								 component-style="$ctrl.resolve.style"
 								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-								 disabled="!$ctrl.bookProviderNo || $ctrl.isLoading || !$ctrl.providerHasSite">
+								 disabled="!$ctrl.bookProviderNo || $ctrl.isLoading || !$ctrl.providerHasSite || !$ctrl.resolve.isVirtual">
 			Start
 		</juno-button>
 	</div>

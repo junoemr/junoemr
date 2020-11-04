@@ -1,6 +1,6 @@
 .juno-date-select {
 	.fields {
-		@include juno-form-inputs-style();
+		@include juno-form-inputs-style(1px, var(--theme-form-field-border-radius));
 		@include juno-form-inputs-colors-default();
 		flex: 1 1 0;
 

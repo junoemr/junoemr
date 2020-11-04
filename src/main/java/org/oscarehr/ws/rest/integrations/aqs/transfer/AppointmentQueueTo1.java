@@ -50,6 +50,7 @@ public class AppointmentQueueTo1 implements Serializable
 	private QueuedAppointmentStatus status;
 	private AppointmentQueueOnDemandSettingsTransfer appointmentQueueOnDemandSettings;
 	private QueueAvailabilitySettingsTransfer availabilitySettings;
+	private Integer defaultAppointmentDurationMinutes;
 	private Boolean isAvailable;
 
 	public AppointmentQueueTo1()

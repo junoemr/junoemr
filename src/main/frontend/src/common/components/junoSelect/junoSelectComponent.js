@@ -33,6 +33,7 @@ angular.module('Common.Components').component('junoSelect', {
 		labelPosition: "<?",
 		componentStyle: "<?",
 		disabled: "<?",
+		onChange: "&?"
 	},
 	controller: [function ()
 	{
@@ -52,6 +53,14 @@ angular.module('Common.Components').component('junoSelect', {
 		ctrl.componentClasses = () =>
 		{
 			return [ctrl.componentStyle];
+		}
+
+		ctrl.onSelectChange = (value) =>
+		{
+			if (ctrl.onChange)
+			{
+				ctrl.onChange({value: value});
+			}
 		}
 	}]
 });

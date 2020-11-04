@@ -1,0 +1,1 @@
+ALTER TABLE integration_push_update ADD COLUMN IF NOT EXISTS target_id VARCHAR(255);

@@ -189,6 +189,7 @@ public class ScheduleManager {
 		return (appointmentTypes);
 	}
 
+	@Deprecated // Use the appointment service. Appointment.saveNewAppointment(...) and Appointment.saveNewTelehealthAppointment(...)
 	public void addAppointment(LoggedInInfo loggedInInfo, Security security, Appointment appointment) {
 		appointment.setCreatorSecurityId(security.getSecurityNo());
 		appointment.setCreator(security.getProviderNo());

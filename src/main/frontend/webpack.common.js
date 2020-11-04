@@ -236,8 +236,10 @@ module.exports = {
 			'./src/common/components/module.js',
 			'./src/common/components/modalComponent.js',
 			'./src/common/components/junoButton/junoButtonComponent.js',
+			'./src/common/components/junoRoundButton/junoRoundButtonComponent.js',
 			'./src/common/components/junoCheckBox/junoCheckBoxComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
+			'./src/common/components/junoPatientSelect/junoPatientSelectComponent.js',
 			'./src/common/components/junoSelect/junoSelectComponent.js',
 			'./src/common/components/junoTab/junoTabComponent.js',
 			'./src/common/components/junoTab/components/module.js',
@@ -257,6 +259,7 @@ module.exports = {
 			'./src/common/modals/junoSimpleModal/junoSimpleModalComponent.js',
 			'./src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModalComponent.js',
 			'./src/common/modals/appointmentQueueModal/appointmentQueueModalComponent.js',
+			'./src/common/modals/bookAppointmentModal/bookAppointmentModalComponent.js',
 			'./src/common/modals/appointmentQueueModal/components/availabilitySettings/availabilitySettingsComponent.js',
 
 			'./src/layout/module.js',

@@ -56,6 +56,9 @@ public class QueuedAppointmentTo1 implements Serializable
 	private String demographicName;
 	private String reason;
 	private String notes;
+	private Integer siteId;
+	private Boolean virtual;
+	private Boolean critical;
 	private UUID clinicId;
 
 	public static List<QueuedAppointmentTo1> fromQueuedAppointmentList(List<QueuedAppointment> queuedAppointments)
