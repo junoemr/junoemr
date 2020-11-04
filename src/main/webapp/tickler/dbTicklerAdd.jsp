@@ -29,11 +29,13 @@
 <%@ page import="org.oscarehr.common.dao.TicklerLinkDao"%>
 <%@ page import="org.oscarehr.common.model.Tickler"%>
 <%@ page import="org.oscarehr.common.model.TicklerLink" %>
+<%@ page import="org.oscarehr.encounterNote.model.CaseManagementNote" %>
+<%@ page import="org.oscarehr.encounterNote.service.EncounterNoteService" %>
 <%@ page import="org.oscarehr.managers.TicklerManager" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="org.oscarehr.util.MiscUtils"%>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="oscar.util.UtilDateUtilities"%>
+<%@ page import="oscar.util.UtilDateUtilities" %>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
@@ -57,10 +59,21 @@
 
 <%!
 	// create new tickler.
-	void AddTickler(String demographic_no, String docpriority, String docType, String docId, String docassigned, String doccreator, String docfilename, String docdate, LoggedInInfo loggedInInfo, TicklerManager ticklerManager)
+	void AddTickler(String demographic_no,
+	                String docpriority,
+	                String docType,
+	                String docId,
+	                String docassigned,
+	                String doccreator,
+	                String message,
+	                String docdate,
+	                Boolean writeEncounterNote,
+	                LoggedInInfo loggedInInfo,
+	                TicklerManager ticklerManager)
 	{
 		Tickler tickler = new Tickler();
-		tickler.setDemographicNo(Integer.parseInt(demographic_no));
+		Integer demographicNo = Integer.parseInt(demographic_no);
+		tickler.setDemographicNo(demographicNo);
 		tickler.setUpdateDate(new java.util.Date());
 		if (docpriority != null && docpriority.equalsIgnoreCase("High"))
 		{
@@ -72,12 +85,19 @@
 		}
 		tickler.setTaskAssignedTo(docassigned);
 		tickler.setCreator(doccreator);
-		tickler.setMessage(docfilename);
+		tickler.setMessage(message);
 		tickler.setServiceDate(UtilDateUtilities.StringToDate(docdate));
 
 
 		ticklerManager.addTickler(loggedInInfo, tickler);
 
+		if(writeEncounterNote)
+		{
+			EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
+			CaseManagementNote ticklerNote = new CaseManagementNote();
+			ticklerNote.setNote(message);
+			encounterNoteService.saveTicklerNote(ticklerNote, tickler, doccreator, demographicNo);
+		}
 
 		if (docType != null && docId != null && !docType.trim().equals("") && !docId.trim().equals("") && !docId.equalsIgnoreCase("null"))
 		{
@@ -103,13 +123,14 @@
 %>
 
 <%
-	String module="", demographic_no ="", doctype="", docdesc="", docxml="", doccreator="", docdate="", docfilename="", docpriority="", docassigned="";
-demographic_no = request.getParameter("demographic_no");
-doccreator = request.getParameter("user_no");
-docdate = request.getParameter("xml_appointment_date");
-docfilename =request.getParameter("textarea");
-docpriority =request.getParameter("priority");
-docassigned =request.getParameter("task_assigned_to");
+	String module = "", demographic_no = "", doctype = "", docdesc = "", docxml = "", doccreator = "", docdate = "", textArea = "", docpriority = "", docassigned = "";
+	demographic_no = request.getParameter("demographic_no");
+	doccreator = request.getParameter("user_no");
+	docdate = request.getParameter("xml_appointment_date");
+	textArea = request.getParameter("textarea");
+	docpriority = request.getParameter("priority");
+	docassigned = request.getParameter("task_assigned_to");
+	Boolean writeEncounterNote = Boolean.parseBoolean(request.getParameter("writeEncounterNote"));
 boolean multiDemo = "true".equalsIgnoreCase(request.getParameter("multiple_demographics"));
 
 String docType =request.getParameter("docType");
@@ -125,12 +146,12 @@ if (multiDemo)
 	String[] demographicNumbers = demographic_no.split("&");
 	for (String demoNo : demographicNumbers)
 	{
-		AddTickler(demoNo, docpriority, docType, docId, docassigned, doccreator, docfilename, docdate, loggedInInfo, ticklerManager);
+		AddTickler(demoNo, docpriority, docType, docId, docassigned, doccreator, textArea, docdate, writeEncounterNote, loggedInInfo, ticklerManager);
 	}
 }
 else
 {
-	AddTickler(demographic_no, docpriority, docType, docId, docassigned, doccreator, docfilename, docdate, loggedInInfo, ticklerManager);
+	AddTickler(demographic_no, docpriority, docType, docId, docassigned, doccreator, textArea, docdate, writeEncounterNote, loggedInInfo, ticklerManager);
 }
 
 String parentAjaxId = request.getParameter("parentAjaxId");

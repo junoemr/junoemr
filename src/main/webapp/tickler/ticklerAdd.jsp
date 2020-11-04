@@ -94,6 +94,7 @@
 	String xml_appointment_date = request.getParameter("xml_appointment_date") == null ?
 			MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay) : request.getParameter("xml_appointment_date");
 %>
+<%@page import="org.apache.commons.lang.StringUtils" %>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.dao.SiteDao" %>
@@ -103,12 +104,11 @@
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@page import="oscar.MyDateFormat" %>
+<%@page import="java.util.Arrays" %>
 <%@page import="java.util.Calendar" %>
 <%@page import="java.util.GregorianCalendar" %>
-<%@page import="java.util.Iterator" %>
-<%@page import="java.util.List" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.List" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -239,6 +239,11 @@
 			{
 				return addDateToForm(0, months, 0);
 			}
+			function submitAndWriteEncounterNote()
+			{
+				document.getElementById("writeEncounterNote").value = true;
+				document.getElementById("serviceform").submit();
+			}
 			//-->
 		</script>
 	</head>
@@ -332,7 +337,7 @@
 		</form>
 	</table>
 	<table width="100%" border="0" bgcolor="#EEEEFF">
-		<form name="serviceform" method="post" action="dbTicklerAdd.jsp"
+		<form name="serviceform" id="serviceform" method="post" action="dbTicklerAdd.jsp"
 			  onsubmit="return validateForm()">
 			<input type="hidden" name="parentAjaxId" value="<%=parentAjaxId%>"/>
 			<input type="hidden" name="updateParent" value="<%=updateParent%>"/>
@@ -512,7 +517,9 @@ else
 												   face="Verdana, Arial, Helvetica, sans-serif"><strong><bean:message
 						key="tickler.ticklerAdd.formReminder"/>:</strong></font></td>
 				<td valign="top"><textarea style="font-face:Verdana, Arial, Helvetica, sans-serif"
-										   name="textarea" cols="50" rows="10"></textarea></td>
+										   name="textarea" cols="50" rows="10"></textarea>
+					<input type="hidden" id="writeEncounterNote" name="writeEncounterNote" value="false"/>
+				</td>
 				<td>&nbsp;</td>
 			</tr>
 
@@ -521,9 +528,14 @@ else
 				<td><input type="button" name="Button"
 						   value="<bean:message key="tickler.ticklerAdd.btnCancel"/>"
 						   onClick="window.close()"></td>
-				<td><input type="submit" name="Button"
-						   value="<bean:message key="tickler.ticklerAdd.btnSubmit"/>"></td>
-				<td></td>
+				<td>
+					<input type="submit" name="Button"
+						   value="<bean:message key="tickler.ticklerAdd.btnSubmit"/>">
+					<input type="button" name="Button"
+				           value="<bean:message key="tickler.ticklerAdd.btnSubmitEncounter"/>"
+				           onClick="submitAndWriteEncounterNote()">
+				</td>
+				<td>&nbsp;</td>
 			</tr>
 		</form>
 	</table>

@@ -26,6 +26,7 @@ import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.SecRole;
+import org.oscarehr.common.model.Tickler;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
@@ -164,6 +165,29 @@ public class EncounterNoteService
 		CaseManagementNoteLink link = new CaseManagementNoteLink();
 		link.setNote(note);
 		link.setDrug(drug.getId());
+		caseManagementNoteLinkDao.persist(link);
+
+		return note;
+	}
+
+	public CaseManagementNote saveTicklerNote(CaseManagementNote note, Tickler tickler,  String providerNo, Integer demographicNo)
+	{
+		note.setDemographic(demographicDao.find(demographicNo));
+		note.setProvider(providerDataDao.find(providerNo));
+		return saveTicklerNote(note, tickler);
+	}
+	public CaseManagementNote saveTicklerNote(CaseManagementNote note, Tickler tickler)
+	{
+		if(note.getSigningProvider() == null)
+		{
+			note.setSigningProvider(note.getProvider());
+		}
+		note.setArchived(false);
+		note = saveHistoryNote(note, Issue.SUMMARY_CODE_TICKLER_NOTE);
+
+		CaseManagementNoteLink link = new CaseManagementNoteLink();
+		link.setNote(note);
+		link.setTickler(tickler.getId());
 		caseManagementNoteLinkDao.persist(link);
 
 		return note;
