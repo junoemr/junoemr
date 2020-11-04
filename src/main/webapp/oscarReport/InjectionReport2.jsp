@@ -179,6 +179,7 @@ table.ele {
 		<th>First Name</th>
 		<th>Last Name</th>
 		<th>DOB</th>
+		<th>Age</th>
 		<th>Chart #</th>
 		<th>Product #</th>
 		<th>Injection Date</th>
@@ -198,6 +199,7 @@ table.ele {
 		<td><%=demog.getFirstName()%></td>
 		<td><%=demog.getLastName()%></td>
 		<td><%=DemographicData.getDob(demog,"-")%></td>
+		<td style="text-align:center"><%=demog.getAge()%></td>
 		<td><%=demog.getChartNo()%></td>
 		<td><%=h.get("val")%>&nbsp;</td>
 		<td><%=h.get("prevention_date")%></td>
