@@ -794,28 +794,19 @@ public class PATHL7Handler extends ORU_R01MessageHandler
             return true;
         }
 
+        // Check every OBX segment of every OBR segment for
+        // OBX|...|ED|...|...|...^TEXT^PDF^Base64^...
+        // If match is found, lab contains an embedded PDF
         for (int i = 0; i < getOBRCount(); i++)
         {
             for (int j = 0; j < getOBXCount(i); j++)
             {
-                if (getOBXResult(i, j,4).startsWith(embeddedPdfPrefix))
-                {
-                    logger.error("LAB " + getAccessionNum() + " CONTAINS UNPROCESSED EMBEDDED PDF");
-                    return false;
-                }
-
                 if (getOBXValueType(i, j).equals("ED")
                         && getOBXResult(i, j, 2).equals("TEXT")
                         && getOBXResult(i, j, 3).equals("PDF")
                         && getOBXResult(i, j, 4).equals("Base64"))
                 {
-                    for (String replacement : pdfReplacements)
-                    {
-                        if (getOBXResult(i, j, 5).contains(replacement))
-                        {
-                            return true;
-                        }
-                    }
+                    return true;
                 }
             }
         }
