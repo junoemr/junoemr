@@ -28,6 +28,7 @@ import {
 	JUNO_TAB_TYPE
 } from "../../../common/components/junoComponentConstants";
 import {AqsQueuesApi, AqsQueuedAppointmentApi} from "../../../../generated";
+import AppointmentBooking from "../../../common/modals/bookAppointmentModal/appointmentBooking";
 
 angular.module('Layout.Components').component('appointmentQueue', {
 	templateUrl: 'src/layout/components/appointmentQueue/appointmentQueue.jsp',
@@ -244,6 +245,8 @@ angular.module('Layout.Components').component('appointmentQueue', {
 								style: () => ctrl.componentStyle,
 								queueId: () => ctrl.currentQueue.id,
 								clinicId: () => ctrl.currentQueue.items[itemIndex].clinicId,
+								siteId: () => ctrl.currentQueue.items[itemIndex].siteId,
+								isVirtual: () => ctrl.currentQueue.items[itemIndex].virtual,
 								queuedAppointmentId: () => ctrl.currentQueue.items[itemIndex].id,
 								loadQueuesCallback: () => ctrl.loadQueues,
 							}
@@ -303,6 +306,56 @@ angular.module('Layout.Components').component('appointmentQueue', {
 
 			aqsQueuedAppointmentApi.moveAppointment(this.currentQueue.id, item.id, { queuePosition: index});
 			return item;
+		}
+
+		ctrl.openBookQueuedAppointmentModal = async () =>
+		{
+			try
+			{
+				let bookingData = new AppointmentBooking();
+				// default duration to queue duration.
+				bookingData.duration = ctrl.currentQueue.defaultAppointmentDurationMinutes;
+
+				await $uibModal.open(
+					{
+						component: 'bookAppointmentModal',
+						backdrop: 'static',
+						windowClass: "juno-modal",
+						resolve: {
+							style: () => JUNO_STYLE.DEFAULT,
+							title: () => "Queue Appointment",
+							bookingData: () => bookingData,
+							onCreateCallback: () => ctrl.bookNewQueuedAppointment,
+						}
+					}
+				).result;
+
+			}
+			catch(err)
+			{
+				// ESC button pressed probably
+				console.warn("Modal closed with rejection ", err);
+			}
+		}
+
+		// create a new queued appointment
+		ctrl.bookNewQueuedAppointment = async (appointmentBooking) =>
+		{
+			const queuedAppointmentBookingDto = {
+				demographicNo: appointmentBooking.demographic.demographicNo,
+				durationMinutes: parseInt(appointmentBooking.duration),
+				notes: appointmentBooking.notes,
+				reason: appointmentBooking.reason,
+				reasonType: appointmentBooking.reasonType,
+				siteId: appointmentBooking.siteId,
+				virtual: appointmentBooking.virtual,
+				critical: appointmentBooking.critical,
+			}
+
+			await aqsQueuedAppointmentApi.createQueuedAppointment(ctrl.currentQueue.id, queuedAppointmentBookingDto);
+
+			// refresh display
+			this.loadQueues();
 		}
 	}]
 });

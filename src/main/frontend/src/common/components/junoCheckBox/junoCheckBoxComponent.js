@@ -34,6 +34,7 @@ angular.module('Common.Components').component('junoCheckBox', {
 		buttonColor: "<?",
 		//alternate value returned when checkbox is true
 		trueValue: "<?",
+		disabled: "<?",
 		change: "&?",
 	},
 	controller: [ function () {

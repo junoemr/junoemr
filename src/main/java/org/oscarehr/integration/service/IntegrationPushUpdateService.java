@@ -93,6 +93,7 @@ public class IntegrationPushUpdateService
 		pushUpdate.setUpdateType(IntegrationPushUpdate.UPDATE_TYPE.APPOINTMENT_CACHE);
 		pushUpdate.setStatusQueued();
 		pushUpdate.setJsonData(jsonData);
+		pushUpdate.setTargetId(appointment.getId());
 
 		integrationPushUpdateDao.persist(pushUpdate);
 	}
@@ -113,6 +114,7 @@ public class IntegrationPushUpdateService
 		pushUpdate.setUpdateType(IntegrationPushUpdate.UPDATE_TYPE.PATIENT_CONNECTION);
 		pushUpdate.setStatusQueued();
 		pushUpdate.setJsonData(mapper.writeValueAsString(patientConnectionTo1));
+		pushUpdate.setTargetId(demographicId.toString());
 
 		integrationPushUpdateDao.persist(pushUpdate);
 	}
@@ -121,7 +123,7 @@ public class IntegrationPushUpdateService
 	{
 		ObjectMapper mapper = new ObjectMapper();
 		List<IntegrationPushUpdate> unsentUpdates = integrationPushUpdateDao.findUnsent(INTEGRATION_TYPE_MHA);
-		ArrayList<Integer> failedIdList = new ArrayList<>();
+		ArrayList<String> failedIdList = new ArrayList<>();
 
 		if(!unsentUpdates.isEmpty() && serverStateHandler.isThisServerMaster())
 		{
@@ -132,14 +134,18 @@ public class IntegrationPushUpdateService
 				// if an error status found, skip it and all subsequent updates by id
 				if(update.getStatus() == IntegrationPushUpdate.PUSH_STATUS.ERROR)
 				{
-					failedIdList.add(update.getId());
+					if (update.hasTarget())
+					{
+						failedIdList.add(update.getTargetId());
+					}
 					logger.error("Integration update failed [" + update.getId() + "] " +
-							" is in an error state and cannot be pushed.");
+							" is in an error state and cannot be pushed. All future updates" +
+							" for target Id [" + update.getTargetId() + "] blocked.");
 					continue;
 				}
 
 				// skip sending subsequent updates for appointments that have failed
-				if(failedIdList.contains(update.getId()))
+				if(update.hasTarget() && failedIdList.contains(update.getTargetId()))
 				{
 					continue;
 				}
@@ -154,7 +160,10 @@ public class IntegrationPushUpdateService
 				catch(Exception e)
 				{
 					logger.error("Error sending integration update [" + update.getId() + "]", e);
-					failedIdList.add(update.getId());
+					if (update.hasTarget())
+					{
+						failedIdList.add(update.getTargetId());
+					}
 
 					// +1 to account for increment that is not added yet
 					if(update.getSendCount() + 1 >= MAX_SEND_ATTEMPTS)

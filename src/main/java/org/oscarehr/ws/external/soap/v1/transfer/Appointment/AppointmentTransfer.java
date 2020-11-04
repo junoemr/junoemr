@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.TimeZone;
 
 import org.oscarehr.common.model.Appointment;
@@ -75,6 +76,7 @@ public final class AppointmentTransfer {
 	private BookingSource bookingSource;
 	private boolean isVirtual;
 	private Calendar currentClinicTime;
+	private Calendar confirmedAt;
 
 	public Integer getId() {
 		return (id);
@@ -270,6 +272,16 @@ public final class AppointmentTransfer {
 		this.currentClinicTime = currentClinicTime;
 	}
 
+	public Calendar getConfirmedAt()
+	{
+		return confirmedAt;
+	}
+
+	public void setConfirmedAt(Calendar confirmedAt)
+	{
+		this.confirmedAt = confirmedAt;
+	}
+
 	public Appointment copyTo(Appointment appointment) {
 
 		List<String> ignored = new ArrayList<>(Arrays.asList("id", "appointmentDate", "startTime", "endTime", "createDateTime", "updateDateTime", "creator", "creatorSecurityId"));
@@ -326,6 +338,14 @@ public final class AppointmentTransfer {
 		cal=DateUtils.toGregorianCalendar(appointment.getUpdateDateTime());
 		cal=setToGMTIfRequired(cal,useGMTTime);
 		appointmentTransfer.setUpdateDateTime(cal);
+
+		Optional<Date> confirmedAt = appointment.getConfirmedAt();
+		if (confirmedAt.isPresent())
+		{
+			cal=DateUtils.toGregorianCalendar(confirmedAt.get());
+			cal=setToGMTIfRequired(cal,useGMTTime);
+			appointmentTransfer.setConfirmedAt(cal);
+		}
 
 		return (appointmentTransfer);
 	}

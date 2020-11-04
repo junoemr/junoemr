@@ -1,0 +1,78 @@
+.book-queued-appointment-modal {
+	.title-text {
+		color: var(--color-neutral-white);
+
+		i {
+			font-size: 32px;
+		}
+	}
+
+	.icon-modal-ctl {
+		cursor: pointer;
+	}
+
+	.content {
+		display: flex;
+		flex-wrap: wrap;
+		height: 100%;
+
+		.modal-column {
+			flex: 1 0 50%;
+			height: 80%;
+			padding: 16px 8px 0 8px;
+
+			.juno-input, .juno-select, .juno-patient-select {
+				margin: 16px 0 0 16px;
+			}
+
+			.appointment-duration {
+				.juno-input {
+					max-width: 128px;
+				}
+			}
+
+			.appointment-check-box-container
+			{
+				margin: 0 4px 0 8px;
+			}
+
+			.appointment-type-row {
+				margin-bottom: 32px;
+			}
+		}
+
+		.bottom-row {
+			padding: 0 8px 0 24px;
+
+			juno-input {
+				margin: 0;
+
+				&.booking-notes {
+					margin-right: 16px;
+				}
+
+				&.booking-reason {
+					margin-left: 16px;
+				}
+
+				flex: 1 1 50%;
+			}
+		}
+
+	}
+
+	.button-footer-row {
+		juno-button {
+			max-width: 128px;
+			margin-left: 16px;
+		}
+	}
+
+	.juno-input, .juno-select, .juno-typeahead {
+		// fight style leakage (we need to aggressively scope styles to components or this stuff happens!!!)
+		label {
+			text-align: inherit;
+			padding: inherit;
+		}
+	}
+}
