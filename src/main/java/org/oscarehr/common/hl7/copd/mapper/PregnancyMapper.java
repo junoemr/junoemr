@@ -70,7 +70,7 @@ public class PregnancyMapper extends AbstractMapper
 		Episode pregnancy = new Episode();
 		pregnancy.setCode(SnomedCore.CODE_NORMAL_PREGNANCY);
 		pregnancy.setCodingSystem(Episode.CODE_SYSTEM_NAME_SNOMED_CORE);
-		pregnancy.setDescription("Normal pregnancy");
+		pregnancy.setDescription("Pregnancy");
 		pregnancy.setNotes(getIndividualPregnancyNoteText(rep));
 		pregnancy.setStatus(getStatus(rep));
 		// spec only allows for single due date, so use it for both start and end date

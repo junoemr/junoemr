@@ -230,7 +230,7 @@ public class MedicationMapper extends AbstractMapper
 			Date writtenDate = getTransactionDate(rep);
 			note.setObservationDate(writtenDate);
 			note.setUpdateDate(writtenDate);
-			note.setNote(noteText);
+			note.setNote(noteText.replaceAll("~crlf~", "\n"));
 		}
 
 		return note;
