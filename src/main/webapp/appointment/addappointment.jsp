@@ -1049,7 +1049,7 @@
 							%>
 							<option value="<%=reasonCode.getId()%>"
 									<%=reasonCode.getValue().equals("Others") ? "selected" : ""%>>
-								<%=StringEscapeUtils.escapeHtml(reasonCode.getValue())%>
+								<%=StringEscapeUtils.escapeHtml(reasonCode.getLabel())%>
 							</option>
 							<%
 									}
