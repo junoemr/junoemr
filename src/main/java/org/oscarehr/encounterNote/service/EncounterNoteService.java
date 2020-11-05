@@ -202,6 +202,21 @@ public class EncounterNoteService
 
 	/**
 	 * save a new tickler note. auto-sets all the note requirements needed to make the given note appear as a tickler note
+	 * @param noteText - the note text to be saved
+	 * @param tickler - the tickler to link the note with
+	 * @param providerNo - the provider number for the note
+	 * @param demographicNo - the demographic number
+	 * @return - the new note
+	 */
+	public CaseManagementNote saveTicklerNote(String noteText, Tickler tickler, String providerNo, Integer demographicNo)
+	{
+		CaseManagementNote ticklerNote = new CaseManagementNote();
+		ticklerNote.setNote(noteText);
+		return saveTicklerNote(ticklerNote, tickler, providerNo, demographicNo);
+	}
+
+	/**
+	 * save a new tickler note. auto-sets all the note requirements needed to make the given note appear as a tickler note
 	 * @param note - the note to be saved
 	 * @param tickler - the tickler to link the note with
 	 * @param providerNo - the provider number for the note

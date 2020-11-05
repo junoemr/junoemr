@@ -29,12 +29,11 @@
 <%@ page import="org.oscarehr.common.dao.TicklerLinkDao"%>
 <%@ page import="org.oscarehr.common.model.Tickler"%>
 <%@ page import="org.oscarehr.common.model.TicklerLink" %>
-<%@ page import="org.oscarehr.encounterNote.model.CaseManagementNote" %>
 <%@ page import="org.oscarehr.encounterNote.service.EncounterNoteService" %>
 <%@ page import="org.oscarehr.managers.TicklerManager" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
-<%@ page import="org.oscarehr.util.MiscUtils"%>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
 <%@ page import="oscar.util.UtilDateUtilities" %>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -94,9 +93,7 @@
 		if(writeEncounterNote)
 		{
 			EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
-			CaseManagementNote ticklerNote = new CaseManagementNote();
-			ticklerNote.setNote(message);
-			encounterNoteService.saveTicklerNote(ticklerNote, tickler, doccreator, demographicNo);
+			encounterNoteService.saveTicklerNote(message, tickler, doccreator, demographicNo);
 		}
 
 		if (docType != null && docId != null && !docType.trim().equals("") && !docId.trim().equals("") && !docId.equalsIgnoreCase("null"))
@@ -123,39 +120,38 @@
 %>
 
 <%
-	String module = "", demographic_no = "", doctype = "", docdesc = "", docxml = "", doccreator = "", docdate = "", textArea = "", docpriority = "", docassigned = "";
-	demographic_no = request.getParameter("demographic_no");
-	doccreator = request.getParameter("user_no");
-	docdate = request.getParameter("xml_appointment_date");
-	textArea = request.getParameter("textarea");
-	docpriority = request.getParameter("priority");
-	docassigned = request.getParameter("task_assigned_to");
+	String demographic_no = request.getParameter("demographic_no");
+	String doccreator = request.getParameter("user_no");
+	String docdate = request.getParameter("xml_appointment_date");
+	String textArea = request.getParameter("textarea");
+	String docpriority = request.getParameter("priority");
+	String docassigned = request.getParameter("task_assigned_to");
 	Boolean writeEncounterNote = Boolean.parseBoolean(request.getParameter("writeEncounterNote"));
-boolean multiDemo = "true".equalsIgnoreCase(request.getParameter("multiple_demographics"));
+	boolean multiDemo = "true".equalsIgnoreCase(request.getParameter("multiple_demographics"));
 
-String docType =request.getParameter("docType");
+	String docType = request.getParameter("docType");
 
-String docId = request.getParameter("docId");
-if (docId == null)
-{
-	docId = loggedInInfo.getLoggedInProvider().getProviderNo();
-}
-
-if (multiDemo)
-{
-	String[] demographicNumbers = demographic_no.split("&");
-	for (String demoNo : demographicNumbers)
+	String docId = request.getParameter("docId");
+	if(docId == null)
 	{
-		AddTickler(demoNo, docpriority, docType, docId, docassigned, doccreator, textArea, docdate, writeEncounterNote, loggedInInfo, ticklerManager);
+		docId = loggedInInfo.getLoggedInProvider().getProviderNo();
 	}
-}
-else
-{
-	AddTickler(demographic_no, docpriority, docType, docId, docassigned, doccreator, textArea, docdate, writeEncounterNote, loggedInInfo, ticklerManager);
-}
 
-String parentAjaxId = request.getParameter("parentAjaxId");
-String updateParent = request.getParameter("updateParent");
+	if(multiDemo)
+	{
+		String[] demographicNumbers = demographic_no.split("&");
+		for(String demoNo : demographicNumbers)
+		{
+			AddTickler(demoNo, docpriority, docType, docId, docassigned, doccreator, textArea, docdate, writeEncounterNote, loggedInInfo, ticklerManager);
+		}
+	}
+	else
+	{
+		AddTickler(demographic_no, docpriority, docType, docId, docassigned, doccreator, textArea, docdate, writeEncounterNote, loggedInInfo, ticklerManager);
+	}
+
+	String parentAjaxId = request.getParameter("parentAjaxId");
+	String updateParent = request.getParameter("updateParent");
 
 %>
 <script LANGUAGE="JavaScript">
