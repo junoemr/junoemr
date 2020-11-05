@@ -170,12 +170,57 @@ public class EncounterNoteService
 		return note;
 	}
 
-	public CaseManagementNote saveTicklerNote(CaseManagementNote note, Tickler tickler,  String providerNo, Integer demographicNo)
+
+	/**
+	 * Create a new tickler note based on an already existing tickler note.
+	 * If there is no previous note associated with this tickler, a new note will be created,
+	 * If a previous note exists, this will create a new note with the given text appended to the previous notes' text
+	 * @param noteText - the new text for the new note
+	 * @param tickler - the ticker
+	 * @param providerNo - the provider number for the note
+	 * @param demographicNo - the demographic number
+	 * @return - the new note
+	 */
+	public CaseManagementNote saveTicklerNoteFromPrevious(String noteText, Tickler tickler, String providerNo, Integer demographicNo)
+	{
+		CaseManagementNoteLink link = caseManagementNoteLinkDao.findLatestByTableAndTableId(CaseManagementNoteLink.TICKLER, tickler.getId());
+		CaseManagementNote ticklerNote;
+		if(link != null)
+		{
+			CaseManagementNote previousNote = link.getNote();
+			ticklerNote = new CaseManagementNote(previousNote);// get a copy without an ID
+			ticklerNote.setNote(previousNote.getNote() + "\n\n" + noteText);
+			ticklerNote.setUuid(null); // because this copy should be saved as a new note
+		}
+		else
+		{
+			ticklerNote = new CaseManagementNote();
+			ticklerNote.setNote(noteText);
+		}
+		return saveTicklerNote(ticklerNote, tickler, providerNo, demographicNo);
+	}
+
+	/**
+	 * save a new tickler note. auto-sets all the note requirements needed to make the given note appear as a tickler note
+	 * @param note - the note to be saved
+	 * @param tickler - the tickler to link the note with
+	 * @param providerNo - the provider number for the note
+	 * @param demographicNo - the demographic number
+	 * @return - the new note
+	 */
+	public CaseManagementNote saveTicklerNote(CaseManagementNote note, Tickler tickler, String providerNo, Integer demographicNo)
 	{
 		note.setDemographic(demographicDao.find(demographicNo));
 		note.setProvider(providerDataDao.find(providerNo));
 		return saveTicklerNote(note, tickler);
 	}
+
+	/**
+	 * save a new tickler note. auto-sets all the note requirements needed to make the given note appear as a tickler note
+	 * @param note - the note to be saved
+	 * @param tickler - the tickler to link the note with
+	 * @return - the new note
+	 */
 	public CaseManagementNote saveTicklerNote(CaseManagementNote note, Tickler tickler)
 	{
 		if(note.getSigningProvider() == null)

@@ -241,8 +241,11 @@
 			}
 			function submitAndWriteEncounterNote()
 			{
-				document.getElementById("writeEncounterNote").value = true;
-				document.getElementById("serviceform").submit();
+				if(validateForm())
+				{
+					document.getElementById("writeEncounterNote").value = true;
+					document.getElementById("serviceform").submit();
+				}
 			}
 			//-->
 		</script>

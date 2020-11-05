@@ -203,11 +203,19 @@
 				}
 				return true;
 			}
+			function updateAndWriteEncounterNote()
+			{
+				if(validateForm())
+				{
+					document.getElementById("writeEncounterNote").value = true;
+					document.getElementById("serviceform").submit();
+				}
+			}
 		</script>
 	</head>
 
 	<body>
-	<html:form action="/tickler/EditTickler" onsubmit="return validateForm();">
+	<html:form styleId="serviceform" action="/tickler/EditTickler" onsubmit="return validateForm();">
 		<input type="hidden" name="method" value="editTickler"/>
 		<input type="hidden" name="ticklerNo" value="<%=ticklerNo%>"/>
 		<table width="100%">
@@ -358,6 +366,7 @@
 				<td style="text-align:right"><input type="button" name="pasteMessage"
 													onclick="pasteMessageText()"
 													value="<bean:message key="tickler.ticklerEdit.pasteMessage"/>"/>
+					<input type="hidden" id="writeEncounterNote" name="writeEncounterNote" value="false"/>
 				</td>
 				<td colspan="2">
 					<select name="priority">
@@ -456,6 +465,9 @@
 								key="tickler.ticklerEdit.emailDemographic"/></html:checkbox>
 					</oscar:oscarPropertiesCheck>
 
+					<input type="button" name="updateTicklerAndSaveEncounter"
+					       value="<bean:message key="tickler.ticklerEdit.updateEncounter"/>"
+					       onClick="updateAndWriteEncounterNote();"/>
 					<input type="submit" name="updateTickler"
 						   value="<bean:message key="tickler.ticklerEdit.update"/>"/>
 					<input type="button" name="cancelChangeTickler"
