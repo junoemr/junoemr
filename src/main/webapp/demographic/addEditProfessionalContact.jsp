@@ -75,7 +75,6 @@
 			var contactId = "${ requestScope.contactId }"; // server returns the id that was saved.
 			var demographicContactId = "${ requestScope.demographicContactId }";
 			var contactRole = "${ requestScope.contactRole }";
-			var contactName = "${ requestScope.contactName }";
 			var contactType = "${ requestScope.contactType }";
 			
 			if( contactId ) {

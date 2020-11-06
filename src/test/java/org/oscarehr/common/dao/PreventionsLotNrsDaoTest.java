@@ -147,19 +147,31 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 	@Test
 	public void testFindLotNrs() throws Exception {
 		String prevention = "Flu";
-		String lotNr1 = "abcdef1";
-		String lotNr2 = "abcdef2";
-		String lotNr3 = "abcdef3";
+		List<String> expectedResult = new ArrayList<>();
+		List<PreventionsLotNrs> preventionLotNrs = new ArrayList<>();
+
+		//String lotNr1 = "abcdef1";
+		//String lotNr2 = "abcdef2";
+		//String lotNr3 = "abcdef3";
+
+		for (int i = 50; i > 0; i--)
+		{
+			String lotNrBase = "abcdef";
+			lotNrBase += String.valueOf(i);
+			expectedResult.add(lotNrBase);
+			PreventionsLotNrs p = new PreventionsLotNrs();
+			EntityDataGenerator.generateTestDataForModelClass(p);
+			preventionLotNrs.add(p);
+			preventionLotNrs.get(i).setLotNr(expectedResult.get(i));
+			preventionLotNrs.get(i).setPreventionType(prevention);
+			preventionLotNrs.get(i).setProviderNo("unit_test");
+			preventionLotNrs.get(i).setCreationDate(new java.util.Date());
+			preventionLotNrs.get(i).setDeleted(false);
+			dao.persist(preventionLotNrs.get(i));
+		}
 				
-		PreventionsLotNrs p1 = new PreventionsLotNrs();
-		EntityDataGenerator.generateTestDataForModelClass(p1);
-		p1.setLotNr(lotNr1);
-		p1.setPreventionType(prevention);
-		p1.setProviderNo("unit_tester");
-		p1.setCreationDate(new java.util.Date());
-		p1.setDeleted(false);
-		dao.persist(p1);
-		
+
+		/*
 		PreventionsLotNrs p2 = new PreventionsLotNrs();
 		EntityDataGenerator.generateTestDataForModelClass(p2);
 		p2.setLotNr(lotNr2);
@@ -177,11 +189,9 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		p3.setCreationDate(new java.util.Date());
 		p3.setDeleted(true);
 		dao.persist(p3);
-		
-		List<String> expectedResult = new ArrayList<String>(Arrays.asList(lotNr1, lotNr2, lotNr3));
-		Collections.sort(expectedResult);
+		 */
+		//List<String> expectedResult = new ArrayList<String>(Arrays.asList(lotNr1, lotNr2, lotNr3));
 		List<String> result = dao.findLotNrs(prevention, null);
-		Collections.sort(result);
 		
 		Logger logger = MiscUtils.getLogger();
 		
