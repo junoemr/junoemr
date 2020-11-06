@@ -29,6 +29,7 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -178,7 +179,9 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		dao.persist(p3);
 		
 		List<String> expectedResult = new ArrayList<String>(Arrays.asList(lotNr1, lotNr2, lotNr3));
+		Collections.sort(expectedResult);
 		List<String> result = dao.findLotNrs(prevention, null);
+		Collections.sort(result);
 		
 		Logger logger = MiscUtils.getLogger();
 		
