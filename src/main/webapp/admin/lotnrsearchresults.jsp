@@ -94,7 +94,7 @@
 						<INPUT TYPE="hidden" NAME="limit2" VALUE="10">
 						<INPUT TYPE="SUBMIT"
 							   NAME="button"
-							   VALUE=<bean:message key="admin.lotnrsearchresults.btnSubmit"/>SIZE="17">
+							   VALUE=<bean:message key="admin.lotnrsearchresults.btnSubmit"/>>
 					</td>
 				</tr>
 			</table>
