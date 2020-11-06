@@ -151,7 +151,6 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 						controller.groupNotesForm.groupNoteExt.startDate = moment(results.groupNoteExt.startDate).toDate();
 						controller.groupNotesForm.groupNoteExt.resolutionDate = moment(results.groupNoteExt.resolutionDate).toDate();
 						controller.groupNotesForm.groupNoteExt.procedureDate = moment(results.groupNoteExt.procedureDate).toDate();
-						console.log("hidecpp is "  + controller.groupNotesForm.groupNoteExt.hideCpp);
 						controller.groupNotesForm.assignedCMIssues = results.assignedCMIssues;
 
 						controller.groupNotesForm.assignedCMIssues = [];
