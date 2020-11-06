@@ -22,6 +22,7 @@
  */
 package org.oscarehr.encounterNote.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.SecRoleDao;
@@ -48,8 +49,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.util.ConversionUtils;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -242,6 +245,7 @@ public class EncounterNoteService
 		{
 			note.setSigningProvider(note.getProvider());
 		}
+		note.setNote(getNoteHeaderText("Tickler") + "\n" + note.getNote() + "\n" + getSignatureText(note.getSigningProvider()));
 		note.setArchived(false);
 		note = saveHistoryNote(note, Issue.SUMMARY_CODE_TICKLER_NOTE);
 
@@ -251,6 +255,18 @@ public class EncounterNoteService
 		caseManagementNoteLinkDao.persist(link);
 
 		return note;
+	}
+
+	public String getNoteHeaderText(String reason)
+	{
+		String dateStr = ConversionUtils.toDateTimeString(LocalDateTime.now(), ConversionUtils.DISPLAY_DATE_PATTERN);
+		return "[" + dateStr + " .: " + reason + "]";
+	}
+
+	public String getSignatureText(ProviderData signingProvider)
+	{
+		String dateStr = ConversionUtils.toDateTimeString(LocalDateTime.now(), ConversionUtils.DISPLAY_DATE_TIME_PATTERN);
+		return "[Signed on " + dateStr + " by " + StringUtils.trimToEmpty(signingProvider.getFirstName() + " " + signingProvider.getLastName()) + "]";
 	}
 
 	public CaseManagementNote saveMedicalHistoryNote(CaseManagementNote note)
