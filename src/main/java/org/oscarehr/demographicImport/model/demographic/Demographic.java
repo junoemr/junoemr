@@ -29,7 +29,7 @@ import org.oscarehr.demographicImport.model.Alert;
 import org.oscarehr.demographicImport.model.Allergy;
 import org.oscarehr.demographicImport.model.measurement.Measurement;
 import org.oscarehr.demographicImport.model.Immunization;
-import org.oscarehr.demographicImport.model.LabResult;
+import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.Medication;
 import org.oscarehr.demographicImport.model.Problem;
 import org.oscarehr.demographicImport.model.Report;
@@ -112,7 +112,7 @@ public class Demographic extends AbstractTransientModel
 
 	private List<Alert> alertList;
 	private List<Allergy> allergyList;
-	private List<LabResult> labList;
+	private List<Lab> labList;
 	private List<Report> reportList;
 	private List<Medication> medicationList;
 	private List<Immunization> immunizationList;
@@ -172,6 +172,11 @@ public class Demographic extends AbstractTransientModel
 	public void addEncounterNote(EncounterNote note)
 	{
 		this.encounterNoteList.add(note);
+	}
+
+	public void addLab(Lab lab)
+	{
+		this.labList.add(lab);
 	}
 
 	@Override

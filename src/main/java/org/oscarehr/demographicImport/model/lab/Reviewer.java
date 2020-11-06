@@ -20,11 +20,15 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model;
+package org.oscarehr.demographicImport.model.lab;
 
 import lombok.Data;
+import org.oscarehr.demographicImport.model.provider.Provider;
+
+import java.time.LocalDateTime;
 
 @Data
-public class LabResult extends AbstractTransientModel
+public class Reviewer extends Provider
 {
+	private LocalDateTime reviewDateTime;
 }

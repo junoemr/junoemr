@@ -22,11 +22,15 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
+import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.mapper.AbstractExportMapper;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.service.ExportPreferences;
+import oscar.util.ConversionUtils;
+
+import java.time.LocalDateTime;
 
 public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper<I, E>
 {
@@ -58,5 +62,12 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		dataElement.setContent(value);
 
 		return dataElement;
+	}
+
+	protected DateTimeFullOrPartial toFullDateTime(LocalDateTime localDateTime)
+	{
+		DateTimeFullOrPartial dateTimeFullOrPartial = objectFactory.createDateTimeFullOrPartial();
+		dateTimeFullOrPartial.setFullDateTime(ConversionUtils.toNullableXmlGregorianCalendar(localDateTime));
+		return dateTimeFullOrPartial;
 	}
 }

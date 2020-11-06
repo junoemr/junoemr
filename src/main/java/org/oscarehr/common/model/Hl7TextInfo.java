@@ -23,17 +23,21 @@
 
 package org.oscarehr.common.model;
 
-import java.io.Serializable;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.apache.commons.lang.StringUtils;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "hl7TextInfo")
@@ -88,6 +92,11 @@ public class Hl7TextInfo extends AbstractModel<Integer> implements Serializable 
 	private String sendingFacility;
 
 	private String label;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "lab_no", referencedColumnName = "lab_id", insertable=false, updatable=false)
+	@NotFound(action= NotFoundAction.IGNORE)
+	private Hl7TextMessage hl7TextMessage;
 
 	public enum REPORT_STATUS {
 		C, // corrected
@@ -238,7 +247,17 @@ public class Hl7TextInfo extends AbstractModel<Integer> implements Serializable 
 	public void setLabel(String label) {
     	this.label = label;
     }
-	
+
+	public Hl7TextMessage getHl7TextMessage()
+	{
+		return hl7TextMessage;
+	}
+
+	public void setHl7TextMessage(Hl7TextMessage hl7TextMessage)
+	{
+		this.hl7TextMessage = hl7TextMessage;
+	}
+
 	@Transient
 	public String getLabelOrDiscipline(){
 		if (label == null || label.equals("")){

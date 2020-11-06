@@ -38,4 +38,11 @@ public class CDSConstants
 		TIME,
 		DATETIME,
 	}
+
+	public enum LAB_ABNORMAL_FLAG
+	{
+		U,
+		Y,
+		N,
+	}
 }

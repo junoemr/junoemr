@@ -23,9 +23,18 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.LaboratoryResults;
-import org.oscarehr.demographicImport.model.LabResult;
+import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
+import org.oscarehr.common.xml.cds.v5_0.model.ResultNormalAbnormalFlag;
+import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
+import org.oscarehr.demographicImport.model.lab.Lab;
+import org.oscarehr.demographicImport.model.lab.LabObservation;
+import org.oscarehr.demographicImport.model.lab.LabObservationResult;
+import org.oscarehr.demographicImport.model.lab.Reviewer;
 
-public class CDSLabExportMapper extends AbstractCDSExportMapper<LaboratoryResults, LabResult>
+import java.util.ArrayList;
+import java.util.List;
+
+public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryResults>, Lab>
 {
 	public CDSLabExportMapper()
 	{
@@ -33,10 +42,82 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<LaboratoryResult
 	}
 
 	@Override
-	public LaboratoryResults exportFromJuno(LabResult exportStructure)
+	public List<LaboratoryResults> exportFromJuno(Lab exportLab)
 	{
-		LaboratoryResults laboratoryResults = objectFactory.createLaboratoryResults();
+		List<LaboratoryResults> laboratoryResults = new ArrayList<>();
+
+		for(LabObservation labObservation : exportLab.getLabObservationList())
+		{
+			for(LabObservationResult observationResult : labObservation.getResults())
+			{
+				LaboratoryResults laboratoryResult = objectFactory.createLaboratoryResults();
+
+				laboratoryResult.setLaboratoryName(exportLab.getPatientLocation());
+				laboratoryResult.setTestNameReportedByLab(labObservation.getName());
+				laboratoryResult.setLabTestCode(labObservation.getCode());
+				laboratoryResult.setAccessionNumber(exportLab.getAccessionNumber());
+
+				String resultValue = observationResult.getValue();
+				if(resultValue != null)
+				{
+					LaboratoryResults.Result result = objectFactory.createLaboratoryResultsResult();
+					result.setValue(resultValue);
+					result.setUnitOfMeasure(observationResult.getUnits());
+					laboratoryResult.setResult(result);
+				}
+
+				//TODO low/high limits vs text range
+				String range = observationResult.getRange();
+				LaboratoryResults.ReferenceRange referenceRange = objectFactory.createLaboratoryResultsReferenceRange();
+				referenceRange.setReferenceRangeText(range);
+				laboratoryResult.setReferenceRange(referenceRange);
+
+				laboratoryResult.setLabRequisitionDateTime(toFullDateTime(labObservation.getRequestDateTime()));
+				laboratoryResult.setCollectionDateTime(toFullDateTime(exportLab.getReceivedDateTime()));
+
+				for(Reviewer reviewProvider : exportLab.getReviewers())
+				{
+					LaboratoryResults.ResultReviewer resultReviewer = objectFactory.createLaboratoryResultsResultReviewer();
+					PersonNameSimple simpleName = objectFactory.createPersonNameSimple();
+					simpleName.setLastName(reviewProvider.getLastName());
+					simpleName.setFirstName(reviewProvider.getFirstName());
+					resultReviewer.setName(simpleName);
+					resultReviewer.setOHIPPhysicianId(reviewProvider.getOhipNumber());
+					resultReviewer.setDateTimeResultReviewed(toFullDateTime(reviewProvider.getReviewDateTime()));
+
+					laboratoryResult.getResultReviewer().add(resultReviewer);
+				}
+
+				laboratoryResult.setResultNormalAbnormalFlag(getAbnormalFlag(observationResult.getAbnormal()));
+				laboratoryResult.setNotesFromLab(observationResult.getNotes());
+				laboratoryResult.setTestResultStatus(observationResult.getResultStatus());
+
+				laboratoryResults.add(laboratoryResult);
+			}
+		}
 
 		return laboratoryResults;
+	}
+
+	private ResultNormalAbnormalFlag getAbnormalFlag(Boolean isAbnormal)
+	{
+		ResultNormalAbnormalFlag resultNormalAbnormalFlag = objectFactory.createResultNormalAbnormalFlag();
+
+		CDSConstants.LAB_ABNORMAL_FLAG abnormalEnum;
+		if(isAbnormal == null)
+		{
+			abnormalEnum = CDSConstants.LAB_ABNORMAL_FLAG.U;
+		}
+		else if(isAbnormal)
+		{
+			abnormalEnum = CDSConstants.LAB_ABNORMAL_FLAG.Y;
+		}
+		else
+		{
+			abnormalEnum = CDSConstants.LAB_ABNORMAL_FLAG.N;
+		}
+		resultNormalAbnormalFlag.setResultNormalAbnormalFlagAsEnum(abnormalEnum.name());
+
+		return resultNormalAbnormalFlag;
 	}
 }

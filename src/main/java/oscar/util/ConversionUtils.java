@@ -754,6 +754,11 @@ public class ConversionUtils {
 		if(legacyDate == null) return null;
 		return toLocalDateTime(legacyDate);
 	}
+	public static LocalDateTime toNullableLocalDateTime(String dateString)
+	{
+		if(dateString == null) return null;
+		return toLocalDateTime(dateString, DEFAULT_TS_PATTERN);
+	}
 
 	public static LocalDateTime toLocalDateTime(Date legacyDate)
 	{

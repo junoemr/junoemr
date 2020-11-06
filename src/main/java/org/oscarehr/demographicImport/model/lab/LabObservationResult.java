@@ -20,21 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds.in;
+package org.oscarehr.demographicImport.model.lab;
 
-import org.oscarehr.common.xml.cds.v5_0.model.LaboratoryResults;
-import org.oscarehr.demographicImport.model.lab.Lab;
+import lombok.Data;
+import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
-public class CDSLabImportMapper extends AbstractCDSImportMapper<LaboratoryResults, Lab>
+import java.time.LocalDateTime;
+
+/**
+ * represents a lab result, OBX with associated data
+ */
+@Data
+public class LabObservationResult extends AbstractTransientModel
 {
-	public CDSLabImportMapper()
-	{
-		super();
-	}
+	private String value;
+	private String units;
+	private String range;
+	private String resultStatus;
+	private Boolean abnormal;
+	private LocalDateTime specimenCollectionDateTime;
+	private LocalDateTime specimenReceivedDateTime;
+	private String notes;
 
-	@Override
-	public Lab importToJuno(LaboratoryResults importStructure)
-	{
-		return new Lab();
-	}
 }

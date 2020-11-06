@@ -22,10 +22,15 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
+import org.oscarehr.common.xml.cds.v5_0.model.LaboratoryResults;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.service.ExportPreferences;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic>
 {
@@ -86,7 +91,7 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 		if(exportPreferences.isExportLaboratoryResults())
 		{
 			patientRecord.getLaboratoryResults().addAll(
-					new CDSLabExportMapper().exportAll(exportStructure.getLabList()));
+					getLabList(exportStructure.getLabList()));
 		}
 		if(exportPreferences.isExportAppointments())
 		{
@@ -116,5 +121,12 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 
 		omdCds.setPatientRecord(patientRecord);
 		return omdCds;
+	}
+
+	private List<LaboratoryResults> getLabList(List<Lab> labs)
+	{
+		// because we get a list back from the base converter, we need to flatten the list of lists
+		List<List<LaboratoryResults>> labsLists = new CDSLabExportMapper().exportAll(labs);
+		return labsLists.stream().flatMap(List::stream).collect(Collectors.toList());
 	}
 }

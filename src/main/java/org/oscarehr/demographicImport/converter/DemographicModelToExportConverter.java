@@ -24,13 +24,16 @@ package org.oscarehr.demographicImport.converter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographicImport.converter.lab.LabToExportConverter;
 import org.oscarehr.demographicImport.converter.note.EncounterNoteModelToExportConverter;
 import org.oscarehr.demographicImport.converter.note.FamilyHistoryNoteModelToExportConverter;
 import org.oscarehr.demographicImport.converter.note.MedicalHistoryNoteModelToExportConverter;
@@ -71,6 +74,12 @@ public class DemographicModelToExportConverter extends
 
 	@Autowired
 	private SocialHistoryNoteModelToExportConverter socialHistoryNoteMapper;
+
+	@Autowired
+	private LabToExportConverter labToExportConverter;
+
+	@Autowired
+	private Hl7TextInfoDao hl7TextInfoDao;
 
 	@Autowired
 	private MeasurementDao measurementDao;
@@ -151,6 +160,8 @@ public class DemographicModelToExportConverter extends
 		List<Measurement> measurements = measurementDao.findByDemographicId(input.getDemographicId());
 		exportDemographic.setMeasurementList(measurementToExportConverter.convert(measurements));
 
+		setLabs(input, exportDemographic);
+
 		return exportDemographic;
 	}
 
@@ -190,6 +201,17 @@ public class DemographicModelToExportConverter extends
 		for(CaseManagementNote note : medicalHistoryNotes)
 		{
 			exportDemographic.addMedicalHistoryNote(medicalHistoryNoteConverter.convert(note));
+		}
+	}
+
+	private void setLabs(Demographic input, org.oscarehr.demographicImport.model.demographic.Demographic exportDemographic)
+	{
+		//TODO this getter needs an update
+		List<Object[]> infos = hl7TextInfoDao.findByDemographicId(input.getDemographicId());
+		for (Object[] info : infos)
+		{
+			Hl7TextInfo hl7TxtInfo = (Hl7TextInfo) info[0];
+			exportDemographic.addLab(labToExportConverter.convert(hl7TxtInfo));
 		}
 	}
 }
