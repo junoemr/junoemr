@@ -26,6 +26,8 @@ import lombok.Data;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * represents a lab result, OBX with associated data
@@ -33,13 +35,24 @@ import java.time.LocalDateTime;
 @Data
 public class LabObservationResult extends AbstractTransientModel
 {
+	private String name;
+	private String identifier;
 	private String value;
 	private String units;
 	private String range;
 	private String resultStatus;
 	private Boolean abnormal;
-	private LocalDateTime specimenCollectionDateTime;
-	private LocalDateTime specimenReceivedDateTime;
+	private LocalDateTime observationDateTime;
 	private String notes;
+	private List<String> comments;
 
+	public LabObservationResult()
+	{
+		this.comments = new ArrayList<>();
+	}
+
+	public void addComment(String comment)
+	{
+		this.comments.add(comment);
+	}
 }

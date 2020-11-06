@@ -52,9 +52,9 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 			{
 				LaboratoryResults laboratoryResult = objectFactory.createLaboratoryResults();
 
-				laboratoryResult.setLaboratoryName(exportLab.getPatientLocation());
-				laboratoryResult.setTestNameReportedByLab(labObservation.getName());
-				laboratoryResult.setLabTestCode(labObservation.getCode());
+				laboratoryResult.setLaboratoryName(exportLab.getSendingFacility());
+				laboratoryResult.setTestNameReportedByLab(observationResult.getName());
+				laboratoryResult.setLabTestCode(observationResult.getIdentifier());
 				laboratoryResult.setAccessionNumber(exportLab.getAccessionNumber());
 
 				String resultValue = observationResult.getValue();
@@ -73,7 +73,7 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 				laboratoryResult.setReferenceRange(referenceRange);
 
 				laboratoryResult.setLabRequisitionDateTime(toFullDateTime(labObservation.getRequestDateTime()));
-				laboratoryResult.setCollectionDateTime(toFullDateTime(exportLab.getReceivedDateTime()));
+				laboratoryResult.setCollectionDateTime(toFullDateTime(exportLab.getEmrReceivedDateTime()));
 
 				for(Reviewer reviewProvider : exportLab.getReviewers())
 				{

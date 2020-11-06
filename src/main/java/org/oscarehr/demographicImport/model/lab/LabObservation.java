@@ -36,19 +36,26 @@ import java.util.List;
 public class LabObservation extends AbstractTransientModel
 {
 	private String name;
-	private String code;
+	private String procedureCode;
 	private LocalDateTime observationDateTime;
 	private LocalDateTime requestDateTime;
 
+	private List<String> comments;
 	private List<LabObservationResult> results;
 
 	public LabObservation()
 	{
 		this.results = new ArrayList<>();
+		this.comments = new ArrayList<>();
 	}
 
 	public void addResult(LabObservationResult result)
 	{
 		this.results.add(result);
+	}
+
+	public void addComment(String comment)
+	{
+		this.comments.add(comment);
 	}
 }

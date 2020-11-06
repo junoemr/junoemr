@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.model.lab;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.model.provider.Provider;
+import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
 
@@ -31,4 +32,11 @@ import java.time.LocalDateTime;
 public class Reviewer extends Provider
 {
 	private LocalDateTime reviewDateTime;
+
+	public static Reviewer fromProvider(Provider provider)
+	{
+		Reviewer reviewer = new Reviewer();
+		BeanUtils.copyProperties(provider, reviewer);
+		return reviewer;
+	}
 }

@@ -38,9 +38,11 @@ public class Lab extends AbstractTransientModel
 	private String accessionNumber;
 	private String version;
 
-	private String patientLocation;
+	private String sendingApplication;
+	private String sendingFacility;
 
-	private LocalDateTime receivedDateTime;
+	private LocalDateTime messageDateTime;
+	private LocalDateTime emrReceivedDateTime;
 
 
 	private List<LabObservation> labObservationList;
