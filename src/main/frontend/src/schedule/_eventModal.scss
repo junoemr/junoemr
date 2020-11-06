@@ -7,6 +7,8 @@
 		@include juno-tab-lg($tabs-height);
 		@include juno-tab-color-scheme-white(2px);
 		@include juno-font-tab;
+		overflow-y: scroll;
+		overflow-x: hidden;
 
 		.form-group {
 			align-items: center;
