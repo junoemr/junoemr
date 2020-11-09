@@ -25,6 +25,7 @@ package org.oscarehr.integration.myhealthaccess.model;
 
 import org.oscarehr.integration.myhealthaccess.dto.PatientTo1;
 import org.springframework.beans.BeanUtils;
+import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
 
@@ -99,7 +100,7 @@ public class MHAPatient
 
 	public static PROVINCE_CODES stringToProvinceCode(String provinceCode)
 	{
-		if (provinceCode != null)
+		if (ConversionUtils.hasContent(provinceCode))
 		{
 			return PROVINCE_CODES.valueOf(provinceCode);
 		}
