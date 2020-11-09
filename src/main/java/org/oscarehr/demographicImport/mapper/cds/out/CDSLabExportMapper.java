@@ -45,34 +45,34 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 	public List<LaboratoryResults> exportFromJuno(Lab exportLab)
 	{
 		List<LaboratoryResults> laboratoryResults = new ArrayList<>();
-
-		for(LabObservation labObservation : exportLab.getLabObservationList())
+		for(LabObservation labObr : exportLab.getLabObservationList())
 		{
-			for(LabObservationResult observationResult : labObservation.getResults())
+			for(LabObservationResult labObrResult : labObr.getResults())
 			{
 				LaboratoryResults laboratoryResult = objectFactory.createLaboratoryResults();
 
 				laboratoryResult.setLaboratoryName(exportLab.getSendingFacility());
-				laboratoryResult.setTestNameReportedByLab(observationResult.getName());
-				laboratoryResult.setLabTestCode(observationResult.getIdentifier());
+				laboratoryResult.setTestNameReportedByLab(labObrResult.getName());
+				laboratoryResult.setLabTestCode(labObrResult.getIdentifier());
+				laboratoryResult.setTestName(labObr.getName());
 				laboratoryResult.setAccessionNumber(exportLab.getAccessionNumber());
 
-				String resultValue = observationResult.getValue();
+				String resultValue = labObrResult.getValue();
 				if(resultValue != null)
 				{
 					LaboratoryResults.Result result = objectFactory.createLaboratoryResultsResult();
 					result.setValue(resultValue);
-					result.setUnitOfMeasure(observationResult.getUnits());
+					result.setUnitOfMeasure(labObrResult.getUnits());
 					laboratoryResult.setResult(result);
 				}
 
 				//TODO low/high limits vs text range
-				String range = observationResult.getRange();
+				String range = labObrResult.getRange();
 				LaboratoryResults.ReferenceRange referenceRange = objectFactory.createLaboratoryResultsReferenceRange();
 				referenceRange.setReferenceRangeText(range);
 				laboratoryResult.setReferenceRange(referenceRange);
 
-				laboratoryResult.setLabRequisitionDateTime(toFullDateTime(labObservation.getRequestDateTime()));
+				laboratoryResult.setLabRequisitionDateTime(toFullDateTime(labObr.getRequestDateTime()));
 				laboratoryResult.setCollectionDateTime(toFullDateTime(exportLab.getEmrReceivedDateTime()));
 
 				for(Reviewer reviewProvider : exportLab.getReviewers())
@@ -88,9 +88,9 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 					laboratoryResult.getResultReviewer().add(resultReviewer);
 				}
 
-				laboratoryResult.setResultNormalAbnormalFlag(getAbnormalFlag(observationResult.getAbnormal()));
-				laboratoryResult.setNotesFromLab(observationResult.getNotes());
-				laboratoryResult.setTestResultStatus(observationResult.getResultStatus());
+				laboratoryResult.setResultNormalAbnormalFlag(getAbnormalFlag(labObrResult.getAbnormal()));
+				laboratoryResult.setNotesFromLab(labObrResult.getNotes());
+				laboratoryResult.setTestResultStatus(labObrResult.getResultStatus());
 
 				laboratoryResults.add(laboratoryResult);
 			}

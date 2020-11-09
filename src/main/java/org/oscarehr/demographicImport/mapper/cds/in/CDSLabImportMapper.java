@@ -22,10 +22,23 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.xml.cds.v5_0.model.LaboratoryResults;
+import org.oscarehr.common.xml.cds.v5_0.model.ResultNormalAbnormalFlag;
+import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.lab.Lab;
+import org.oscarehr.demographicImport.model.lab.LabObservation;
+import org.oscarehr.demographicImport.model.lab.LabObservationResult;
+import org.oscarehr.demographicImport.model.lab.Reviewer;
+import oscar.util.ConversionUtils;
 
-public class CDSLabImportMapper extends AbstractCDSImportMapper<LaboratoryResults, Lab>
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
+public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryResults>, List<Lab>>
 {
 	public CDSLabImportMapper()
 	{
@@ -33,8 +46,151 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<LaboratoryResult
 	}
 
 	@Override
-	public Lab importToJuno(LaboratoryResults importStructure)
+	public List<Lab> importToJuno(List<LaboratoryResults> importLabResultList)
 	{
-		return new Lab();
+		List<Lab> labList = new ArrayList<>();
+
+		// Group all the results based on labName and accession number
+		// results with matching accession number coming from the same lab will be treated as a single lab in Juno
+		HashMap<String, List<LaboratoryResults>> groupedLabHash = new HashMap<>();
+		for(LaboratoryResults laboratoryResults : importLabResultList)
+		{
+			String labName = laboratoryResults.getLaboratoryName();
+			String accessionNumber = laboratoryResults.getAccessionNumber();
+			String hashKey = labName + accessionNumber;
+
+			if(groupedLabHash.containsKey(hashKey))
+			{
+				groupedLabHash.get(hashKey).add(laboratoryResults);
+			}
+			else
+			{
+				List<LaboratoryResults> labGroup = new ArrayList<>();
+				labGroup.add(laboratoryResults);
+				groupedLabHash.put(hashKey, labGroup);
+			}
+		}
+
+		// now that the labs are grouped, we can do the conversion
+		for(List<LaboratoryResults> labGroup : groupedLabHash.values())
+		{
+			labList.add(getAsLab(labGroup));
+		}
+
+		return labList;
+	}
+
+	private Lab getAsLab(List<LaboratoryResults> importLabGroup)
+	{
+		Lab lab = new Lab();
+
+		lab.setAccessionNumber(importLabGroup.get(0).getAccessionNumber());
+		lab.setSendingFacility(importLabGroup.get(0).getLaboratoryName());
+		lab.setEmrReceivedDateTime(LocalDateTime.now());
+
+		// now need to group labs on the lab test
+		// juno will treat these groups as observations
+		HashMap<String, List<LaboratoryResults>> groupedTestHash = new HashMap<>();
+
+		// review hash is an easy way to check for duplicates across multiple lab results
+		HashSet<String> uniqueReviewerSet = new HashSet<>();
+
+		for(LaboratoryResults laboratoryResults : importLabGroup)
+		{
+			String testName = laboratoryResults.getTestNameReportedByLab();
+			if(groupedTestHash.containsKey(testName))
+			{
+				groupedTestHash.get(testName).add(laboratoryResults);
+			}
+			else
+			{
+				List<LaboratoryResults> labGroup = new ArrayList<>();
+				labGroup.add(laboratoryResults);
+				groupedTestHash.put(testName, labGroup);
+			}
+
+			// add all unique reviewers
+			for(LaboratoryResults.ResultReviewer importReviewer : laboratoryResults.getResultReviewer())
+			{
+				// use names not ohip number for check since names are required
+				String reviewerKey = importReviewer.getName().getFirstName() + importReviewer.getName().getLastName();
+				if(!uniqueReviewerSet.contains(reviewerKey))
+				{
+					Reviewer reviewer = new Reviewer();
+					reviewer.setReviewDateTime(ConversionUtils.toLocalDateTime(importReviewer.getDateTimeResultReviewed().getFullDateTime()));
+					reviewer.setFirstName(importReviewer.getName().getFirstName());
+					reviewer.setLastName(importReviewer.getName().getLastName());
+					reviewer.setOhipNumber(importReviewer.getOHIPPhysicianId());
+
+					lab.addReviewer(reviewer);
+					uniqueReviewerSet.add(reviewerKey);
+				}
+			}
+		}
+
+		// now that the labs are grouped, we can do the conversion
+		for(List<LaboratoryResults> labGroup : groupedTestHash.values())
+		{
+			lab.getLabObservationList().add(getAsLabObservation(labGroup));
+		}
+
+		return lab;
+	}
+
+	private LabObservation getAsLabObservation(List<LaboratoryResults> importLabGroup)
+	{
+		LabObservation labObservation = new LabObservation();
+		labObservation.setName(importLabGroup.get(0).getTestName()); //they should all be the same, so use the first one
+		labObservation.setRequestDateTime(toLocalDateTime(importLabGroup.get(0).getLabRequisitionDateTime()));
+		labObservation.setObservationDateTime(toLocalDateTime(importLabGroup.get(0).getCollectionDateTime()));
+
+		for(LaboratoryResults importLabResults : importLabGroup)
+		{
+			LabObservationResult result = new LabObservationResult();
+			result.setName(importLabResults.getTestNameReportedByLab());
+			result.setIdentifier(importLabResults.getLabTestCode());
+			result.setObservationDateTime(toLocalDateTime(importLabResults.getCollectionDateTime()));
+
+			LaboratoryResults.Result labResult = importLabResults.getResult();
+			if(labResult != null)
+			{
+				result.setValue(labResult.getValue());
+				result.setUnits(labResult.getUnitOfMeasure());
+			}
+
+			LaboratoryResults.ReferenceRange referenceRange = importLabResults.getReferenceRange();
+			if(referenceRange != null)
+			{
+				String lowLimit = referenceRange.getLowLimit();
+				String highLimit = referenceRange.getLowLimit();
+				String rangeText;
+				if(lowLimit != null || highLimit != null)
+				{
+					rangeText = StringUtils.trimToEmpty(lowLimit) + "-" + StringUtils.trimToEmpty(highLimit);
+				}
+				else
+				{
+					rangeText = referenceRange.getReferenceRangeText();
+				}
+				result.setRange(rangeText);
+			}
+
+			ResultNormalAbnormalFlag abnormalFlag = importLabResults.getResultNormalAbnormalFlag();
+			result.setAbnormal(CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum())
+							|| CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsPlainText())
+			);
+			result.setNotes(importLabResults.getNotesFromLab());
+
+			String physicianNotes = StringUtils.trimToNull(importLabResults.getPhysiciansNotes());
+			if(physicianNotes != null)
+			{
+				labObservation.addComment(physicianNotes);
+			}
+			result.setResultStatus(importLabResults.getTestResultStatus());
+
+			labObservation.addResult(result);
+		}
+
+		return labObservation;
 	}
 }

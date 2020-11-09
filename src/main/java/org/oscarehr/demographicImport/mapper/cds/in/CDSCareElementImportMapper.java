@@ -70,7 +70,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(SmokingStatus smokingStatus : importStructure.getSmokingStatus())
 		{
 			SmokingStatusMeasurement measurement = new SmokingStatusMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(smokingStatus.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(smokingStatus.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(smokingStatus.getStatus());
 			measurements.add(measurement);
 		}
@@ -78,7 +78,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(SmokingPacks smokingPacks : importStructure.getSmokingPacks())
 		{
 			SmokingPacksMeasurement measurement = new SmokingPacksMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(smokingPacks.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(smokingPacks.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(String.valueOf(smokingPacks.getPerDay().longValue()));
 			measurements.add(measurement);
 		}
@@ -86,7 +86,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(Weight weight : importStructure.getWeight())
 		{
 			WeightMeasurement measurement = new WeightMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(weight.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(weight.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(weight.getWeight());
 			measurements.add(measurement);
 		}
@@ -94,7 +94,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(Height height : importStructure.getHeight())
 		{
 			HeightMeasurement measurement = new HeightMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(height.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(height.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(height.getHeight());
 			measurements.add(measurement);
 		}
@@ -102,7 +102,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(WaistCircumference waistCircumference : importStructure.getWaistCircumference())
 		{
 			WaistCircumferenceMeasurement measurement = new WaistCircumferenceMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(waistCircumference.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(waistCircumference.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(waistCircumference.getWaistCircumference());
 			measurements.add(measurement);
 		}
@@ -110,7 +110,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(BloodPressure bloodPressure : importStructure.getBloodPressure())
 		{
 			BloodPressureMeasurement measurement = new BloodPressureMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(bloodPressure.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(bloodPressure.getDate()).atStartOfDay());
 			measurement.setSystolic(bloodPressure.getSystolicBP());
 			measurement.setDiastolic(bloodPressure.getDiastolicBP());
 			measurements.add(measurement);
@@ -119,7 +119,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(DiabetesComplicationScreening complicationScreening : importStructure.getDiabetesComplicationsScreening())
 		{
 			DiabetesComplicationsScreeningMeasurement measurement = new DiabetesComplicationsScreeningMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(complicationScreening.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(complicationScreening.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(complicationScreening.getExamCode());
 			measurements.add(measurement);
 		}
@@ -127,7 +127,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(DiabetesMotivationalCounselling motivationalCounselling : importStructure.getDiabetesMotivationalCounselling())
 		{
 			DiabetesMotivationalCounselingMeasurement measurement = new DiabetesMotivationalCounselingMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(motivationalCounselling.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(motivationalCounselling.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(motivationalCounselling.getCounsellingPerformed());
 			measurements.add(measurement);
 		}
@@ -135,7 +135,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(DiabetesSelfManagementCollaborative selfManagementCollaborative : importStructure.getDiabetesSelfManagementCollaborative())
 		{
 			DiabetesSelfManagementCollaborativeMeasurement measurement = new DiabetesSelfManagementCollaborativeMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(selfManagementCollaborative.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(selfManagementCollaborative.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(selfManagementCollaborative.getDocumentedGoals());
 			measurements.add(measurement);
 		}
@@ -143,7 +143,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(DiabetesSelfManagementChallenges selfManagementChallenges : importStructure.getDiabetesSelfManagementChallenges())
 		{
 			DiabetesSelfManagementChallengesMeasurement measurement = new DiabetesSelfManagementChallengesMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(selfManagementChallenges.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(selfManagementChallenges.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(selfManagementChallenges.getChallengesIdentified());
 			measurements.add(measurement);
 		}
@@ -151,7 +151,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(DiabetesEducationalSelfManagement educationalSelfManagement : importStructure.getDiabetesEducationalSelfManagement())
 		{
 			DiabetesSelfManagementEducationalMeasurement measurement = new DiabetesSelfManagementEducationalMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(educationalSelfManagement.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(educationalSelfManagement.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(educationalSelfManagement.getEducationalTrainingPerformed());
 			measurements.add(measurement);
 		}
@@ -159,7 +159,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(HypoglycemicEpisodes hypoglycemicEpisodes : importStructure.getHypoglycemicEpisodes())
 		{
 			HypoglycemicEpisodesMeasurement measurement = new HypoglycemicEpisodesMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(hypoglycemicEpisodes.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(hypoglycemicEpisodes.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(String.valueOf(hypoglycemicEpisodes.getNumOfReportedEpisodes().longValue()));
 			measurements.add(measurement);
 		}
@@ -167,7 +167,7 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 		for(SelfMonitoringBloodGlucose bloodGlucose : importStructure.getSelfMonitoringBloodGlucose())
 		{
 			SelfMonitoringBloodGlucoseMeasurement measurement = new SelfMonitoringBloodGlucoseMeasurement();
-			measurement.setObservationDateTime(ConversionUtils.toLocalDateTime(bloodGlucose.getDate()));
+			measurement.setObservationDateTime(ConversionUtils.toLocalDate(bloodGlucose.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(bloodGlucose.getSelfMonitoring());
 			measurements.add(measurement);
 		}

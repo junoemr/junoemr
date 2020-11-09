@@ -1,11 +1,3 @@
-package org.oscarehr.demographicImport.model.provider;
-
-import lombok.Data;
-import org.oscarehr.demographicImport.model.AbstractTransientModel;
-import org.oscarehr.demographicImport.model.demographic.Address;
-import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
-
-import java.time.LocalDate;
 /**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
@@ -28,6 +20,14 @@ import java.time.LocalDate;
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.demographicImport.model.provider;
+
+import lombok.Data;
+import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.demographic.Address;
+import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

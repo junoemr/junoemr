@@ -58,4 +58,9 @@ public class Lab extends AbstractTransientModel
 	{
 		this.labObservationList.add(observation);
 	}
+
+	public void addReviewer(Reviewer reviewer)
+	{
+		this.reviewers.add(reviewer);
+	}
 }
