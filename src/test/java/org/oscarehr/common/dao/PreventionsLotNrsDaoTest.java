@@ -145,16 +145,13 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 }
 	
 	@Test
-	public void testFindLotNrs() throws Exception {
+	public void testFindLotNrs() throws Exception
+	{
 		String prevention = "Flu";
 		List<String> expectedResult = new ArrayList<>();
 		List<PreventionsLotNrs> preventionLotNrs = new ArrayList<>();
 
-		//String lotNr1 = "abcdef1";
-		//String lotNr2 = "abcdef2";
-		//String lotNr3 = "abcdef3";
-
-		for (int i = 50; i > 0; i--)
+		for (int i = 0; i < 50; i++)
 		{
 			String lotNrBase = "abcdef";
 			lotNrBase += String.valueOf(i);
@@ -169,43 +166,26 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 			preventionLotNrs.get(i).setDeleted(false);
 			dao.persist(preventionLotNrs.get(i));
 		}
-				
 
-		/*
-		PreventionsLotNrs p2 = new PreventionsLotNrs();
-		EntityDataGenerator.generateTestDataForModelClass(p2);
-		p2.setLotNr(lotNr2);
-		p2.setPreventionType(prevention);
-		p2.setProviderNo("unit_tester");
-		p2.setCreationDate(new java.util.Date());
-		p2.setDeleted(false);
-		dao.persist(p2);
-		
-		PreventionsLotNrs p3 = new PreventionsLotNrs();
-		EntityDataGenerator.generateTestDataForModelClass(p3);
-		p3.setLotNr(lotNr3);
-		p3.setPreventionType(prevention);
-		p3.setProviderNo("unit_tester");
-		p3.setCreationDate(new java.util.Date());
-		p3.setDeleted(true);
-		dao.persist(p3);
-		 */
-		//List<String> expectedResult = new ArrayList<String>(Arrays.asList(lotNr1, lotNr2, lotNr3));
 		List<String> result = dao.findLotNrs(prevention, null);
 		
 		Logger logger = MiscUtils.getLogger();
 		
-		if (result.size() != expectedResult.size()) {
+		if (result.size() != expectedResult.size())
+		{
 			logger.warn("FindLotNrs array sizes do not match.");
 			logger.warn("resultsize="+result.size()+"expectedResult.size="+expectedResult.size());
 			fail("FindLotNrs array sizes do not match.");
 		}
-
-		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
+		int resultNum = 49;
+		for (int i = 0; i < expectedResult.size(); i++)
+		{
+			if (!expectedResult.get(i).equals(result.get(resultNum)))
+			{
 				logger.warn("FindLotNrs items do not match. All lot nr items not found.");
 				fail("FindLotNrs items do not match. All lot nr items not found.");
 			}
+			resultNum --;
 		}
 		assertTrue(true);
 }
