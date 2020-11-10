@@ -28,6 +28,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.demographicImport.mapper.cds.out.CDSExportMapper;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
 import org.oscarehr.demographicImport.service.DemographicExporter;
 import org.oscarehr.demographicImport.service.ExportLogger;
@@ -44,7 +45,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static oscar.util.ConversionUtils.DATE_PATTERN_DAY;
+import static oscar.util.ConversionUtils.DATE_PATTERN_MONTH;
+import static oscar.util.ConversionUtils.DATE_PATTERN_YEAR;
 
 public class CDSExporter implements DemographicExporter, ExportLogger
 {
@@ -52,9 +59,11 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 	private static final int LOG_COLUMN_WIDTH = 14;
 
 	private final GenericFile logFile;
+	private final HashMap<String, Integer> providerExportCountHash;
 
 	public CDSExporter() throws IOException
 	{
+		providerExportCountHash = new HashMap<>();
 		logFile = FileFactory.createTempFile(".log");
 		logFile.rename("ExportEvent.log");
 		logSummaryHeaderLine();
@@ -66,9 +75,12 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 		CDSExportMapper mapper = new CDSExportMapper(preferences);
 
 		logSummaryLine(demographic);
+		incrementProviderExportCount(demographic);
 		OmdCds omdCds = mapper.exportFromJuno(demographic);
 
-		return parser.write(omdCds);
+		GenericFile exportFile = parser.write(omdCds);
+		exportFile.rename(createExportFilename(demographic));
+		return exportFile;
 	}
 
 	@Override
@@ -93,6 +105,38 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 		return this.logFile;
 	}
 
+	/**
+	 * creates the filename string according to CDS requirement PatientFN_PatientLN_PatientUniqueID_DOB
+	 */
+	protected String createExportFilename(Demographic demographic)
+	{
+		String filename =
+				demographic.getFirstName().replace("_", "-") + "_" +
+				demographic.getLastName().replace("_", "-") + "_" +
+				demographic.getId() + "_" +
+				ConversionUtils.toDateString(demographic.getDateOfBirth(), DATE_PATTERN_DAY + DATE_PATTERN_MONTH + DATE_PATTERN_YEAR);
+		return filename.replaceAll("[\\s,.]", "-") + ".xml";
+	}
+
+	protected void incrementProviderExportCount(Demographic demographic)
+	{
+		Provider provider = demographic.getMrpProvider();
+		String providerKey = "Provider Unassigned";
+		if(provider != null)
+		{
+			providerKey = StringUtils.trimToEmpty(
+					StringUtils.trimToEmpty(provider.getTitle()) + " " + provider.getFirstName() + " " + provider.getLastName());
+		}
+		if(providerExportCountHash.containsKey(providerKey))
+		{
+			providerExportCountHash.put(providerKey, providerExportCountHash.get(providerKey) + 1);
+		}
+		else
+		{
+			providerExportCountHash.put(providerKey, 1);
+		}
+	}
+
 	protected GenericFile createReadme() throws IOException
 	{
 		GenericFile readme = FileFactory.createTempFile(".txt");
@@ -104,9 +148,17 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 				StringUtils.trimToEmpty(oscarProperties.getProperty("Vendor_Product")) + " " + OscarProperties.getBuildTag()));
 		streamWriter.write(paddedReadmeLine("Application Support Contact", oscarProperties.getProperty("Support_Contact")));
 		streamWriter.write(paddedReadmeLine("Date and Time", ConversionUtils.toDateTimeString(ZonedDateTime.now())));
+
+		// CDS requires the readme to display a count of how many demographics are exported for each provider.
+		for(Map.Entry<String, Integer> entry : providerExportCountHash.entrySet())
+		{
+			String providerName = entry.getKey();
+			Object exportCounter = entry.getValue();
+			streamWriter.write(paddedReadmeLine(providerName + " (total patients exported)", String.valueOf(exportCounter)));
+		}
 		streamWriter.close();
 
-		readme.rename("Readme.txt");
+		readme.rename("ReadMe.txt");
 		return readme;
 	}
 
@@ -189,7 +241,7 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 
 	private String paddedReadmeLine(String name, String value)
 	{
-		return StringUtils.rightPad(name + ":", 34) + " " + StringUtils.trimToEmpty(value) + "\n";
+		return StringUtils.rightPad(name + ":", 64) + " " + StringUtils.trimToEmpty(value) + "\n";
 	}
 
 }

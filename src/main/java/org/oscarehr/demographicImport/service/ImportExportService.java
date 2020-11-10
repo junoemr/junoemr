@@ -22,7 +22,6 @@
  */
 package org.oscarehr.demographicImport.service;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
@@ -33,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.util.ConversionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -72,7 +70,6 @@ public class ImportExportService
 		for (Demographic demographic : demographicList)
 		{
 			GenericFile file = exporter.exportDemographic(demographic, preferences);
-			file.rename(createExportFilename(demographic));
 			fileList.add(file);
 		}
 		fileList.addAll(exporter.getAdditionalFiles(preferences));
@@ -95,14 +92,5 @@ public class ImportExportService
 		}
 
 		return exportDemographics(importType, demographicList, preferences);
-	}
-
-	private String createExportFilename(Demographic demographic)
-	{
-		return  demographic.getId() + "_" +
-				demographic.getLastName() + "_" +
-				demographic.getFirstName() + "_" +
-				StringUtils.trimToEmpty(demographic.getHealthNumber()) + "_" +
-				ConversionUtils.toDateString(demographic.getDateOfBirth()) + ".xml";
 	}
 }
