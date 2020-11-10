@@ -213,7 +213,7 @@ public class EctMeasurementsAction extends Action
 				saveErrors(request, errors);
 				valid = false;
 			}
-			if ((isADate) && (!ectValidation.isDate(inputValue) && !inputValue.isEmpty()))
+			if ((isADate) && !(ectValidation.isDate(inputValue) || inputValue.isEmpty()))
 			{
 					errors.add(dateName,
 							new ActionMessage("errors.invalidDate", inputTypeDisplay));
