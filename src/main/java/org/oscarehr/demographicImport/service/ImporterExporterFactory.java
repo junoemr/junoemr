@@ -25,6 +25,8 @@ package org.oscarehr.demographicImport.service;
 import org.oscarehr.demographicImport.service.cds.CDSExporter;
 import org.oscarehr.demographicImport.service.cds.CDSImporter;
 
+import java.io.IOException;
+
 public class ImporterExporterFactory
 {
 	public enum IMPORTER_TYPE
@@ -37,7 +39,7 @@ public class ImporterExporterFactory
 		return new CDSImporter();
 	}
 
-	public static DemographicExporter getExporter(IMPORTER_TYPE type)
+	public static DemographicExporter getExporter(IMPORTER_TYPE type) throws IOException
 	{
 		return new CDSExporter();
 	}

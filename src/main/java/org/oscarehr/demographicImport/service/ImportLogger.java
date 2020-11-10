@@ -23,14 +23,12 @@
 package org.oscarehr.demographicImport.service;
 
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
 
 import java.io.IOException;
-import java.util.List;
 
-public interface DemographicExporter
+public interface ImportLogger
 {
-	GenericFile exportDemographic(Demographic demographic, ExportPreferences preferences) throws IOException;
+	void log(String message) throws IOException;
 
-	List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException;
+	GenericFile getLogFile();
 }

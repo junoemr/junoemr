@@ -313,6 +313,16 @@ public class ConversionUtils {
 		return toDateTimeString(date, TS_NO_SEC_PATTERN);
 	}
 
+	public static String toDateTimeString(ZonedDateTime zonedDateTime)
+	{
+		return toDateTimeString(zonedDateTime, DateTimeFormatter.ISO_DATE_TIME);
+	}
+
+	public static String toDateTimeString(ZonedDateTime zonedDateTime, DateTimeFormatter formatter)
+	{
+		return zonedDateTime.format(formatter);
+	}
+
 	/**
 	 * Parses the specified string as a Long instance. 
 	 * 
@@ -723,6 +733,11 @@ public class ConversionUtils {
 	public static LocalDate toNullableZonedLocalDate(String dateString)
 	{
 		if(dateString == null) return null;
+		return toZonedLocalDate(dateString);
+	}
+
+	public static LocalDate toZonedLocalDate(String dateString)
+	{
 		return toZonedLocalDate(dateString, DateTimeFormatter.ISO_DATE_TIME);
 	}
 

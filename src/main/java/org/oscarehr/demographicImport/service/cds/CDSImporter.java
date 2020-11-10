@@ -22,17 +22,29 @@
  */
 package org.oscarehr.demographicImport.service.cds;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.demographicImport.mapper.cds.in.CDSImportMapper;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
 import org.oscarehr.demographicImport.service.DemographicImporter;
+import org.oscarehr.demographicImport.service.ExportPreferences;
+import org.oscarehr.demographicImport.service.ImportLogger;
+import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class CDSImporter implements DemographicImporter
+public class CDSImporter implements DemographicImporter, ImportLogger
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
+	public CDSImporter()
+	{
+	}
+
 	public Demographic importDemographic(GenericFile importFile) throws IOException
 	{
 		CDSFileParser parser = new CDSFileParser();
@@ -40,5 +52,29 @@ public class CDSImporter implements DemographicImporter
 
 		OmdCds elem = parser.parse(importFile);
 		return mapper.importToJuno(elem);
+	}
+
+	@Override
+	public List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException
+	{
+		return new ArrayList<>();
+	}
+
+	@Override
+	public ImportLogger getImportLogger()
+	{
+		return this;
+	}
+
+	@Override
+	public void log(String message) throws IOException
+	{
+		logger.info(message);
+	}
+
+	@Override
+	public GenericFile getLogFile()
+	{
+		return null;
 	}
 }

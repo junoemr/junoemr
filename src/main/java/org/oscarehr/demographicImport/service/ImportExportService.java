@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
@@ -32,8 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.util.ConversionUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -47,29 +51,58 @@ public class ImportExportService
 	@Autowired
 	DemographicModelToExportConverter modelToExportConverter;
 
-	public void importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType, GenericFile importFile) throws IOException
+	public ImportLogger importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType, GenericFile importFile) throws IOException
 	{
 		DemographicImporter importer = ImporterExporterFactory.getImporter(importType);
 		Demographic demographic = importer.importDemographic(importFile);
 
 		// TODO persist the transient object structure
 		logger.info(ReflectionToStringBuilder.toString(demographic));
+
+		return importer.getImportLogger();
 	}
 
-	public GenericFile exportDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,
-	                                     Demographic junoTransientObject,
-	                                     ExportPreferences preferences) throws IOException
+	public List<GenericFile> exportDemographics(ImporterExporterFactory.IMPORTER_TYPE importType,
+	                                            List<Demographic> demographicList,
+	                                            ExportPreferences preferences) throws IOException
 	{
 		DemographicExporter exporter = ImporterExporterFactory.getExporter(importType);
-		return exporter.exportDemographic(junoTransientObject, preferences);
+		List<GenericFile> fileList = new ArrayList<>(demographicList.size() + 2);
+
+		for (Demographic demographic : demographicList)
+		{
+			GenericFile file = exporter.exportDemographic(demographic, preferences);
+			file.rename(createExportFilename(demographic));
+			fileList.add(file);
+		}
+		fileList.addAll(exporter.getAdditionalFiles(preferences));
+
+		return fileList;
 	}
 
-	public GenericFile exportDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,
-	                                     Integer demographicId,
-	                                     ExportPreferences preferences) throws IOException
+	public List<GenericFile> exportDemographicsWithLookup(ImporterExporterFactory.IMPORTER_TYPE importType,
+	                                                      List<String> demographicIdList,
+	                                                      ExportPreferences preferences) throws IOException
 	{
-		org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
-		Demographic exportDemographic = modelToExportConverter.convert(demographic);
-		return this.exportDemographic(importType, exportDemographic, preferences);
+		//TODO batch query get demographics
+		List<Demographic> demographicList = new ArrayList<>(demographicIdList.size());
+		for(String demographicIdStr : demographicIdList)
+		{
+			Integer demographicId = Integer.parseInt(demographicIdStr);
+			org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
+			Demographic exportDemographic = modelToExportConverter.convert(demographic);
+			demographicList.add(exportDemographic);
+		}
+
+		return exportDemographics(importType, demographicList, preferences);
+	}
+
+	private String createExportFilename(Demographic demographic)
+	{
+		return  demographic.getId() + "_" +
+				demographic.getLastName() + "_" +
+				demographic.getFirstName() + "_" +
+				StringUtils.trimToEmpty(demographic.getHealthNumber()) + "_" +
+				ConversionUtils.toDateString(demographic.getDateOfBirth()) + ".xml";
 	}
 }
