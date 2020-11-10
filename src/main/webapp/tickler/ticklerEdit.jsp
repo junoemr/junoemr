@@ -203,13 +203,20 @@
 				}
 				return true;
 			}
+
+			var submitted = false;
+			function submit(writeNote = false)
+			{
+				if(!submitted && validateForm())
+				{
+					document.getElementById("writeEncounterNote").value = writeNote;
+					document.getElementById("serviceform").submit();
+					submitted = true;
+				}
+			}
 			function updateAndWriteEncounterNote()
 			{
-				if(validateForm())
-				{
-					document.getElementById("writeEncounterNote").value = true;
-					document.getElementById("serviceform").submit();
-				}
+				return submit(true);
 			}
 		</script>
 	</head>
@@ -468,8 +475,9 @@
 					<input type="button" name="updateTicklerAndSaveEncounter"
 					       value="<bean:message key="tickler.ticklerEdit.updateEncounter"/>"
 					       onClick="updateAndWriteEncounterNote();"/>
-					<input type="submit" name="updateTickler"
-						   value="<bean:message key="tickler.ticklerEdit.update"/>"/>
+					<input type="button" name="updateTickler"
+						   value="<bean:message key="tickler.ticklerEdit.update"/>"
+						   onClick="submit();"/>
 					<input type="button" name="cancelChangeTickler"
 						   value="<bean:message key="tickler.ticklerEdit.cancel"/>"
 						   onClick="window.close()"/>

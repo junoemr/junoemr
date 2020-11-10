@@ -239,13 +239,20 @@
 			{
 				return addDateToForm(0, months, 0);
 			}
+
+			var submitted = false;
+			function submit(writeNote = false)
+			{
+				if(!submitted && validateForm())
+				{
+					document.getElementById("writeEncounterNote").value = writeNote;
+					document.getElementById("serviceform").submit();
+					submitted = true;
+				}
+			}
 			function submitAndWriteEncounterNote()
 			{
-				if(validateForm())
-				{
-					document.getElementById("writeEncounterNote").value = true;
-					document.getElementById("serviceform").submit();
-				}
+				return submit(true);
 			}
 			//-->
 		</script>
@@ -532,8 +539,9 @@ else
 						   value="<bean:message key="tickler.ticklerAdd.btnCancel"/>"
 						   onClick="window.close()"></td>
 				<td>
-					<input type="submit" name="Button"
-						   value="<bean:message key="tickler.ticklerAdd.btnSubmit"/>">
+					<input type="button" name="Button"
+						   value="<bean:message key="tickler.ticklerAdd.btnSubmit"/>"
+						   onClick="submit()">
 					<input type="button" name="Button"
 				           value="<bean:message key="tickler.ticklerAdd.btnSubmitEncounter"/>"
 				           onClick="submitAndWriteEncounterNote()">
