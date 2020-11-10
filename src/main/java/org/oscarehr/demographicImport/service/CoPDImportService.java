@@ -110,6 +110,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -191,6 +192,8 @@ public class CoPDImportService
 
 	private static long missingDocumentCount = 0;
 
+	private static final HashMap<String, ProviderData> providerLookupCache = new HashMap<>();
+
 	public void importFromHl7Message(String message, String documentLocation,
 	                                 IMPORT_SOURCE importSource,
 	                                 CoPDRecordData recordData,
@@ -199,6 +202,7 @@ public class CoPDImportService
 			throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Initialize HL7 parser");
+		providerLookupCache.clear();
 		HapiContext context = new DefaultHapiContext();
 		// default Obx2 types to string
 		context.getParserConfiguration().setDefaultObx2Type("ST");
@@ -374,34 +378,45 @@ public class CoPDImportService
 			newProvider = getDefaultProvider();
 		}
 
-		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
-		criteriaSearch.setFirstName(newProvider.getFirstName());
-		criteriaSearch.setLastName(newProvider.getLastName());
+		String cacheKey = newProvider.getFirstName() + newProvider.getLastName();
 
 		ProviderData provider;
-		List<ProviderData> matchedProviders = providerDataDao.criteriaSearch(criteriaSearch);
-		if(matchedProviders.isEmpty())
+		if(providerLookupCache.containsKey(cacheKey))
 		{
-			provider = newProvider;
-			// providers don't have auto-generated id's, so we have to pick one
-			Integer newProviderId = providerService.getNextProviderNumberInSequence(9999, 900000);
-			newProviderId = (newProviderId == null) ? 10000 : newProviderId;
-			provider.set(String.valueOf(newProviderId));
-
-			String billCenterCode = properties.getProperty("default_bill_center","");
-			provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
-			providerRoleService.setDefaultRoleForNewProvider(provider.getProviderNo());
-
-			logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
-		}
-		else if(matchedProviders.size() == 1)
-		{
-			provider = matchedProviders.get(0);
-			logger.info("Use existing Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
+			provider = providerLookupCache.get(cacheKey);
+			logger.info("Use existing cached Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 		}
 		else
 		{
-			throw new RuntimeException("Multiple providers exist in the system with the same name (" + newProvider.getLastName() + "," + newProvider.getFirstName() + ").");
+			ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+			criteriaSearch.setFirstName(newProvider.getFirstName());
+			criteriaSearch.setLastName(newProvider.getLastName());
+
+			List<ProviderData> matchedProviders = providerDataDao.criteriaSearch(criteriaSearch);
+			if(matchedProviders.isEmpty())
+			{
+				provider = newProvider;
+				// providers don't have auto-generated id's, so we have to pick one
+				Integer newProviderId = providerService.getNextProviderNumberInSequence(9999, 900000);
+				newProviderId = (newProviderId == null) ? 10000 : newProviderId;
+				provider.set(String.valueOf(newProviderId));
+
+				String billCenterCode = properties.getProperty("default_bill_center", "");
+				provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
+				providerRoleService.setDefaultRoleForNewProvider(provider.getProviderNo());
+
+				logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
+			}
+			else if(matchedProviders.size() == 1)
+			{
+				provider = matchedProviders.get(0);
+				logger.info("Use existing uncached Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
+			}
+			else
+			{
+				throw new RuntimeException("Multiple providers exist in the system with the same name (" + newProvider.getLastName() + "," + newProvider.getFirstName() + ").");
+			}
+			providerLookupCache.put(cacheKey, provider);
 		}
 		return provider;
 	}
