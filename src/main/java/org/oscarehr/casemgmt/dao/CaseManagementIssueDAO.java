@@ -86,7 +86,7 @@ public class CaseManagementIssueDAO extends HibernateDaoSupport {
 
     public CaseManagementIssue getIssuebyIssueCode(String demo, String issueCode) {
         @SuppressWarnings("unchecked")
-        List<CaseManagementIssue> list = (List<CaseManagementIssue>) this.getHibernateTemplate().find("select cmi from CaseManagementIssue cmi, Issue issue where cmi.issue_id=issue.id and issue.code = ?0 and cmi.demographic_no = ?0",new Object[]{issueCode,demo});
+        List<CaseManagementIssue> list = (List<CaseManagementIssue>) this.getHibernateTemplate().find("select cmi from CaseManagementIssue cmi, Issue issue where cmi.issue_id=issue.id and issue.code = ?0 and cmi.demographic_no = ?1",new Object[]{issueCode,demo});
         
         if(list == null || list.size()<1) return(null);
         	
