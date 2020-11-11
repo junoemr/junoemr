@@ -23,9 +23,9 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.AlertsAndSpecialNeeds;
-import org.oscarehr.demographicImport.model.Alert;
+import org.oscarehr.demographicImport.model.encounterNote.ReminderNote;
 
-public class CDSAlertImportMapper extends AbstractCDSImportMapper<AlertsAndSpecialNeeds, Alert>
+public class CDSAlertImportMapper extends AbstractCDSImportMapper<AlertsAndSpecialNeeds, ReminderNote>
 {
 	public CDSAlertImportMapper()
 	{
@@ -33,8 +33,8 @@ public class CDSAlertImportMapper extends AbstractCDSImportMapper<AlertsAndSpeci
 	}
 
 	@Override
-	public Alert importToJuno(AlertsAndSpecialNeeds importStructure)
+	public ReminderNote importToJuno(AlertsAndSpecialNeeds importStructure)
 	{
-		return new Alert();
+		return new ReminderNote();
 	}
 }

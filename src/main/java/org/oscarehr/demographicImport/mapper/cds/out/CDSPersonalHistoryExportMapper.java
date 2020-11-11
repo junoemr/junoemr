@@ -33,7 +33,7 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_IN
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_START_DATE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_TYPE;
 
-public class CDSPersonalHistoryExportMapper extends AbstractCDSExportMapper<PersonalHistory, SocialHistoryNote>
+public class CDSPersonalHistoryExportMapper extends AbstractCDSNoteExportMapper<PersonalHistory, SocialHistoryNote>
 {
 
 
@@ -71,13 +71,5 @@ public class CDSPersonalHistoryExportMapper extends AbstractCDSExportMapper<Pers
 
 		personalHistory.setResidualInfo(residualInformation);
 		return personalHistory;
-	}
-
-	protected void addNonNullDataElements(ResidualInformation residualInformation, RESIDUAL_INFO_DATA_TYPE dataType, String name, String value)
-	{
-		if(value != null && !value.isEmpty())
-		{
-			residualInformation.getDataElement().add(createResidualInfoDataElement(dataType, name, value));
-		}
 	}
 }

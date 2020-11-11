@@ -20,11 +20,15 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model;
+package org.oscarehr.demographicImport.model.encounterNote;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
-public class RiskFactor extends AbstractTransientModel
+public class ReminderNote extends BaseNote
 {
+	private LocalDate startDate;
+	private LocalDate resolutionDate;
 }

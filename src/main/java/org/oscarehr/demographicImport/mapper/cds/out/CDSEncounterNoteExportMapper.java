@@ -23,13 +23,9 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
-import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
-import oscar.util.ConversionUtils;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-
-public class CDSEncounterNoteExportMapper extends AbstractCDSExportMapper<ClinicalNotes, EncounterNote>
+public class CDSEncounterNoteExportMapper extends AbstractCDSNoteExportMapper<ClinicalNotes, EncounterNote>
 {
 	public CDSEncounterNoteExportMapper()
 	{
@@ -42,11 +38,7 @@ public class CDSEncounterNoteExportMapper extends AbstractCDSExportMapper<Clinic
 		ClinicalNotes clinicalNotes = objectFactory.createClinicalNotes();
 
 		clinicalNotes.setMyClinicalNotesContent(exportStructure.getNoteText());
-
-		XMLGregorianCalendar observationDate = ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDate());
-		DateTimeFullOrPartial dateFullOrPartial = objectFactory.createDateTimeFullOrPartial();
-		dateFullOrPartial.setFullDateTime(observationDate);
-		clinicalNotes.setEventDateTime(dateFullOrPartial);
+		clinicalNotes.setEventDateTime(toFullDateTime(exportStructure.getObservationDate()));
 
 		return clinicalNotes;
 	}

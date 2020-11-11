@@ -23,9 +23,9 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.AlertsAndSpecialNeeds;
-import org.oscarehr.demographicImport.model.Alert;
+import org.oscarehr.demographicImport.model.encounterNote.ReminderNote;
 
-public class CDSAlertExportMapper extends AbstractCDSExportMapper<AlertsAndSpecialNeeds, Alert>
+public class CDSAlertExportMapper extends AbstractCDSNoteExportMapper<AlertsAndSpecialNeeds, ReminderNote>
 {
 	public CDSAlertExportMapper()
 	{
@@ -33,9 +33,12 @@ public class CDSAlertExportMapper extends AbstractCDSExportMapper<AlertsAndSpeci
 	}
 
 	@Override
-	public AlertsAndSpecialNeeds exportFromJuno(Alert exportStructure)
+	public AlertsAndSpecialNeeds exportFromJuno(ReminderNote exportStructure)
 	{
 		AlertsAndSpecialNeeds alertsAndSpecialNeeds = objectFactory.createAlertsAndSpecialNeeds();
+		alertsAndSpecialNeeds.setAlertDescription(exportStructure.getNoteText());
+		alertsAndSpecialNeeds.setDateActive(toNullableDateFullOrPartial(exportStructure.getStartDate()));
+		alertsAndSpecialNeeds.setEndDate(toNullableDateFullOrPartial(exportStructure.getResolutionDate()));
 
 		return alertsAndSpecialNeeds;
 	}

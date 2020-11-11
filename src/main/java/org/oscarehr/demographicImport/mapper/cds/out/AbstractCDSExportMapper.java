@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
+import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
@@ -30,6 +31,8 @@ import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.service.ExportPreferences;
 import oscar.util.ConversionUtils;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper<I, E>
@@ -69,5 +72,46 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		DateTimeFullOrPartial dateTimeFullOrPartial = objectFactory.createDateTimeFullOrPartial();
 		dateTimeFullOrPartial.setFullDateTime(ConversionUtils.toNullableXmlGregorianCalendar(localDateTime));
 		return dateTimeFullOrPartial;
+	}
+
+	protected DateTimeFullOrPartial toNullableDateTimeFullOrPartial(LocalDateTime localDateTime, LocalDateTime defaultDateTime)
+	{
+		DateTimeFullOrPartial dateTimeFullOrPartial = null;
+		XMLGregorianCalendar calendar = ConversionUtils.toNullableXmlGregorianCalendar(localDateTime);
+		if(calendar != null)
+		{
+			dateTimeFullOrPartial = objectFactory.createDateTimeFullOrPartial();
+			dateTimeFullOrPartial.setFullDate(calendar);
+		}
+		else if(defaultDateTime != null)
+		{
+			dateTimeFullOrPartial = this.toNullableDateTimeFullOrPartial(defaultDateTime, null);
+		}
+		return dateTimeFullOrPartial;
+	}
+
+	protected DateTimeFullOrPartial toNullableDateTimeFullOrPartial(LocalDateTime localDateTime)
+	{
+		return this.toNullableDateTimeFullOrPartial(localDateTime, null);
+	}
+
+	protected DateFullOrPartial toNullableDateFullOrPartial(LocalDate localDate, LocalDate defaultDate)
+	{
+		DateFullOrPartial dateFullOrPartial = null;
+		XMLGregorianCalendar calendar = ConversionUtils.toNullableXmlGregorianCalendar(localDate);
+		if(calendar != null)
+		{
+			dateFullOrPartial = objectFactory.createDateFullOrPartial();
+			dateFullOrPartial.setFullDate(calendar);
+		}
+		else if(localDate != null)
+		{
+			dateFullOrPartial = this.toNullableDateFullOrPartial(defaultDate, null);
+		}
+		return dateFullOrPartial;
+	}
+	protected DateFullOrPartial toNullableDateFullOrPartial(LocalDate localDate)
+	{
+		return this.toNullableDateFullOrPartial(localDate, null);
 	}
 }

@@ -34,9 +34,12 @@ import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographicImport.converter.lab.LabToExportConverter;
+import org.oscarehr.demographicImport.converter.note.ConcernNoteModelToExportConverter;
 import org.oscarehr.demographicImport.converter.note.EncounterNoteModelToExportConverter;
 import org.oscarehr.demographicImport.converter.note.FamilyHistoryNoteModelToExportConverter;
 import org.oscarehr.demographicImport.converter.note.MedicalHistoryNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.note.ReminderNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.note.RiskFactorNoteModelToExportConverter;
 import org.oscarehr.demographicImport.converter.note.SocialHistoryNoteModelToExportConverter;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
@@ -89,6 +92,15 @@ public class DemographicModelToExportConverter extends
 
 	@Autowired
 	private MedicalHistoryNoteModelToExportConverter medicalHistoryNoteConverter;
+
+	@Autowired
+	private ReminderNoteModelToExportConverter reminderNoteModelConverter;
+
+	@Autowired
+	private RiskFactorNoteModelToExportConverter riskFactorNoteModelConverter;
+
+	@Autowired
+	private ConcernNoteModelToExportConverter concernNoteModelConverter;
 
 	@Autowired
 	private ProviderModelToExportConverter providerConverter;
@@ -201,6 +213,30 @@ public class DemographicModelToExportConverter extends
 		for(CaseManagementNote note : medicalHistoryNotes)
 		{
 			exportDemographic.addMedicalHistoryNote(medicalHistoryNoteConverter.convert(note));
+		}
+
+		// get reminder notes by demographic
+		criteriaSearch.setIssueCodeReminders();
+		List<CaseManagementNote> reminderNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : reminderNotes)
+		{
+			exportDemographic.addReminderNote(reminderNoteModelConverter.convert(note));
+		}
+
+		// get risk factor notes by demographic
+		criteriaSearch.setIssueCodeRiskFactors();
+		List<CaseManagementNote> riskFactorNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : riskFactorNotes)
+		{
+			exportDemographic.addRiskFactorNote(riskFactorNoteModelConverter.convert(note));
+		}
+
+		// get concerns notes by demographic
+		criteriaSearch.setIssueCodeConcerns();
+		List<CaseManagementNote> concernNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : concernNotes)
+		{
+			exportDemographic.addConcernNote(concernNoteModelConverter.convert(note));
 		}
 	}
 

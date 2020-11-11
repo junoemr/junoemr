@@ -166,7 +166,7 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 	{
 		String summaryLine = buildSummaryLine("Patient ID", "Family", "Past Health", "Problem List",
 				"Risk Factor", "Allergy &", "Medication", "Immunization",
-				"Labs", "App", "Clinical", "Reports", "Reports",
+				"Labs", "Appointments", "Clinical", "Reports", "Reports",
 				"Care Elements", "Alerts and");
 		String summaryLine2 = buildSummaryLine("", "History", "", "",
 				"", "Adv. Reaction", "", "",
@@ -186,8 +186,8 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 				String.valueOf(demographic.getId()),
 				String.valueOf(demographic.getFamilyHistoryNoteList().size()),
 				String.valueOf(demographic.getMedicalHistoryNoteList().size()),
-				String.valueOf(demographic.getProblemList().size()),
-				String.valueOf(demographic.getRiskFactorList().size()),
+				String.valueOf(demographic.getConcernNoteList().size()),
+				String.valueOf(demographic.getRiskFactorNoteList().size()),
 				String.valueOf(demographic.getAllergyList().size()),
 				String.valueOf(demographic.getMedicationList().size()),
 				String.valueOf(demographic.getImmunizationList().size()),
@@ -197,7 +197,7 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 				String.valueOf(demographic.getReportList().size()),
 				String.valueOf(demographic.getReportList().size()),
 				String.valueOf(demographic.getMeasurementList().size()),
-				String.valueOf(demographic.getAlertList().size()));
+				String.valueOf(demographic.getReminderNoteList().size()));
 		this.log(summaryLine);
 	}
 

@@ -66,12 +66,12 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 		if(exportPreferences.isExportProblemList())
 		{
 			patientRecord.getProblemList().addAll(
-					new CDSProblemExportMapper().exportAll(exportStructure.getProblemList()));
+					new CDSProblemExportMapper().exportAll(exportStructure.getConcernNoteList()));
 		}
 		if(exportPreferences.isExportRiskFactors())
 		{
 			patientRecord.getRiskFactors().addAll(
-					new CDSRiskFactorExportMapper().exportAll(exportStructure.getRiskFactorList()));
+					new CDSRiskFactorExportMapper().exportAll(exportStructure.getRiskFactorNoteList()));
 		}
 		if(exportPreferences.isExportAllergiesAndAdverseReactions())
 		{
@@ -116,7 +116,7 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 		if(exportPreferences.isExportAlertsAndSpecialNeeds())
 		{
 			patientRecord.getAlertsAndSpecialNeeds().addAll(
-					new CDSAlertExportMapper().exportAll(exportStructure.getAlertList()));
+					new CDSAlertExportMapper().exportAll(exportStructure.getReminderNoteList()));
 		}
 
 		omdCds.setPatientRecord(patientRecord);

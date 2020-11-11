@@ -25,20 +25,20 @@ package org.oscarehr.demographicImport.model.demographic;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
-import org.oscarehr.demographicImport.model.Alert;
 import org.oscarehr.demographicImport.model.Allergy;
-import org.oscarehr.demographicImport.model.measurement.Measurement;
 import org.oscarehr.demographicImport.model.Immunization;
-import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.Medication;
-import org.oscarehr.demographicImport.model.Problem;
+import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
 import org.oscarehr.demographicImport.model.Report;
-import org.oscarehr.demographicImport.model.RiskFactor;
+import org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
 import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
+import org.oscarehr.demographicImport.model.encounterNote.ReminderNote;
 import org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote;
+import org.oscarehr.demographicImport.model.lab.Lab;
+import org.oscarehr.demographicImport.model.measurement.Measurement;
 import org.oscarehr.demographicImport.model.provider.Provider;
 
 import java.time.LocalDate;
@@ -110,14 +110,14 @@ public class Demographic extends AbstractTransientModel
 	private List<MedicalHistoryNote> medicalHistoryNoteList;
 	private List<EncounterNote> encounterNoteList;
 
-	private List<Alert> alertList;
+	private List<ReminderNote> reminderNoteList;
 	private List<Allergy> allergyList;
 	private List<Lab> labList;
 	private List<Report> reportList;
 	private List<Medication> medicationList;
 	private List<Immunization> immunizationList;
-	private List<Problem> problemList;
-	private List<RiskFactor> riskFactorList;
+	private List<ConcernNote> concernNoteList;
+	private List<RiskFactorNote> riskFactorNoteList;
 	private List<Measurement> measurementList;
 
 	public Demographic()
@@ -128,14 +128,14 @@ public class Demographic extends AbstractTransientModel
 		this.socialHistoryNoteList = new ArrayList<>();
 		this.medicalHistoryNoteList = new ArrayList<>();
 		this.encounterNoteList = new ArrayList<>();
-		this.alertList = new ArrayList<>();
+		this.reminderNoteList = new ArrayList<>();
 		this.labList = new ArrayList<>();
 		this.reportList = new ArrayList<>();
 		this.medicationList = new ArrayList<>();
 		this.immunizationList = new ArrayList<>();
 		this.allergyList = new ArrayList<>();
-		this.problemList = new ArrayList<>();
-		this.riskFactorList = new ArrayList<>();
+		this.concernNoteList = new ArrayList<>();
+		this.riskFactorNoteList = new ArrayList<>();
 		this.measurementList = new ArrayList<>();
 	}
 
@@ -172,6 +172,21 @@ public class Demographic extends AbstractTransientModel
 	public void addEncounterNote(EncounterNote note)
 	{
 		this.encounterNoteList.add(note);
+	}
+
+	public void addReminderNote(ReminderNote note)
+	{
+		this.reminderNoteList.add(note);
+	}
+
+	public void addRiskFactorNote(RiskFactorNote note)
+	{
+		this.riskFactorNoteList.add(note);
+	}
+
+	public void addConcernNote(ConcernNote note)
+	{
+		this.concernNoteList.add(note);
 	}
 
 	public void addLab(Lab lab)

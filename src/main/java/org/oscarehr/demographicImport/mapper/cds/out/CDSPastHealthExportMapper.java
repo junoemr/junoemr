@@ -22,14 +22,10 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.PastHealth;
 import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
-import oscar.util.ConversionUtils;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-
-public class CDSPastHealthExportMapper extends AbstractCDSExportMapper<PastHealth, MedicalHistoryNote>
+public class CDSPastHealthExportMapper extends AbstractCDSNoteExportMapper<PastHealth, MedicalHistoryNote>
 {
 	public CDSPastHealthExportMapper()
 	{
@@ -42,38 +38,12 @@ public class CDSPastHealthExportMapper extends AbstractCDSExportMapper<PastHealt
 		PastHealth pastHealth = objectFactory.createPastHealth();
 		pastHealth.setNotes(exportStructure.getNoteText());
 
-		XMLGregorianCalendar procedureDate = ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getProcedureDate());
-		if(procedureDate != null)
-		{
-			DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
-			dateFullOrPartial.setFullDate(procedureDate);
-			pastHealth.setProcedureDate(dateFullOrPartial);
-		}
+		pastHealth.setProcedureDate(toNullableDateFullOrPartial(exportStructure.getProcedureDate()));
+		pastHealth.setResolvedDate(toNullableDateFullOrPartial(exportStructure.getResolutionDate()));
 
-		XMLGregorianCalendar resolutionDate = ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getResolutionDate());
-		if(resolutionDate != null)
-		{
-			DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
-			dateFullOrPartial.setFullDate(resolutionDate);
-			pastHealth.setResolvedDate(dateFullOrPartial);
-		}
-
-		DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
-		XMLGregorianCalendar startDate = ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getStartDate());
-		if(startDate != null)
-		{
-			// use start date field if we can
-			dateFullOrPartial.setFullDate(startDate);
-		}
-		else
-		{
-			// otherwise use the observation date
-			XMLGregorianCalendar observationDate = ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDate());
-			dateFullOrPartial.setFullDate(observationDate);
-		}
-		pastHealth.setOnsetOrEventDate(dateFullOrPartial);
-
-
+		// use start date field if we can, otherwise use the observation date
+		pastHealth.setOnsetOrEventDate(
+				toNullableDateFullOrPartial(exportStructure.getStartDate(), exportStructure.getObservationDate().toLocalDate()));
 
 		return pastHealth;
 	}

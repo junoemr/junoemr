@@ -22,17 +22,10 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.apache.commons.lang3.EnumUtils;
-import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.FamilyHistory;
-import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
 import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
-import oscar.util.ConversionUtils;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.math.BigInteger;
-
-public class CDSFamilyHistoryExportMapper extends AbstractCDSExportMapper<FamilyHistory, FamilyHistoryNote>
+public class CDSFamilyHistoryExportMapper extends AbstractCDSNoteExportMapper<FamilyHistory, FamilyHistoryNote>
 {
 	public CDSFamilyHistoryExportMapper()
 	{
@@ -45,48 +38,16 @@ public class CDSFamilyHistoryExportMapper extends AbstractCDSExportMapper<Family
 		FamilyHistory familyHistory = objectFactory.createFamilyHistory();
 
 		familyHistory.setNotes(exportStructure.getNoteText());
-		familyHistory.setLifeStage(getLifeStage(exportStructure));
-		familyHistory.setAgeAtOnset(getAgeAtOnset(exportStructure));
+		familyHistory.setLifeStage(getLifeStage(exportStructure.getLifeStage()));
+		familyHistory.setAgeAtOnset(getAgeAtOnset(exportStructure.getAgeAtOnset()));
 		familyHistory.setTreatment(exportStructure.getTreatment());
 		familyHistory.setRelationship(exportStructure.getRelationship());
 
-		DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
-		XMLGregorianCalendar startDate = ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getStartDate());
-		if(startDate != null)
-		{
-			// use start date field if we can
-			dateFullOrPartial.setFullDate(startDate);
-			familyHistory.setStartDate(dateFullOrPartial);
-		}
-		else
-		{
-			// otherwise use the observation date
-			XMLGregorianCalendar observationDate = ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDate());
-			dateFullOrPartial.setFullDate(observationDate);
-		}
-		familyHistory.setStartDate(dateFullOrPartial);
-
+		// use start date field if we can, otherwise use the observation date
+		familyHistory.setStartDate(toNullableDateFullOrPartial(exportStructure.getStartDate(), exportStructure.getObservationDate().toLocalDate()));
 
 		return familyHistory;
 	}
 
-	protected BigInteger getAgeAtOnset(FamilyHistoryNote exportStructure)
-	{
-		Long onsetAge = exportStructure.getAgeAtOnset();
-		if(onsetAge != null)
-		{
-			return BigInteger.valueOf(onsetAge);
-		}
-		return null;
-	}
 
-	protected LifeStage getLifeStage(FamilyHistoryNote exportStructure)
-	{
-		String lifeStage = exportStructure.getLifeStage();
-		if(EnumUtils.isValidEnum(LifeStage.class, lifeStage))
-		{
-			return LifeStage.fromValue(lifeStage);
-		}
-		return null;
-	}
 }

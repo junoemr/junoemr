@@ -143,4 +143,16 @@ public class CaseManagementNoteCriteriaSearch extends AbstractCriteriaSearch
 	{
 		this.setIssueCode(Constants.IssueCodes.MedHistory);
 	}
+	public void setIssueCodeReminders()
+	{
+		this.setIssueCode(Constants.IssueCodes.Reminders);
+	}
+	public void setIssueCodeRiskFactors()
+	{
+		this.setIssueCode(Constants.IssueCodes.RiskFactors);
+	}
+	public void setIssueCodeConcerns()
+	{
+		this.setIssueCode(Constants.IssueCodes.Concerns);
+	}
 }

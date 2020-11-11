@@ -23,9 +23,9 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.RiskFactors;
-import org.oscarehr.demographicImport.model.RiskFactor;
+import org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote;
 
-public class CDSRiskFactorImportMapper extends AbstractCDSImportMapper<RiskFactors, RiskFactor>
+public class CDSRiskFactorImportMapper extends AbstractCDSImportMapper<RiskFactors, RiskFactorNote>
 {
 	public CDSRiskFactorImportMapper()
 	{
@@ -33,8 +33,8 @@ public class CDSRiskFactorImportMapper extends AbstractCDSImportMapper<RiskFacto
 	}
 
 	@Override
-	public RiskFactor importToJuno(RiskFactors importStructure)
+	public RiskFactorNote importToJuno(RiskFactors importStructure)
 	{
-		return new RiskFactor();
+		return new RiskFactorNote();
 	}
 }

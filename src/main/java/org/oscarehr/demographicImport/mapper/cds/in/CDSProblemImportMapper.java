@@ -23,9 +23,9 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.ProblemList;
-import org.oscarehr.demographicImport.model.Problem;
+import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
 
-public class CDSProblemImportMapper extends AbstractCDSImportMapper<ProblemList, Problem>
+public class CDSProblemImportMapper extends AbstractCDSImportMapper<ProblemList, ConcernNote>
 {
 	public CDSProblemImportMapper()
 	{
@@ -33,8 +33,8 @@ public class CDSProblemImportMapper extends AbstractCDSImportMapper<ProblemList,
 	}
 
 	@Override
-	public Problem importToJuno(ProblemList importStructure)
+	public ConcernNote importToJuno(ProblemList importStructure)
 	{
-		return new Problem();
+		return new ConcernNote();
 	}
 }

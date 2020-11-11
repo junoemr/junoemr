@@ -23,9 +23,9 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.RiskFactors;
-import org.oscarehr.demographicImport.model.RiskFactor;
+import org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote;
 
-public class CDSRiskFactorExportMapper extends AbstractCDSExportMapper<RiskFactors, RiskFactor>
+public class CDSRiskFactorExportMapper extends AbstractCDSNoteExportMapper<RiskFactors, RiskFactorNote>
 {
 	public CDSRiskFactorExportMapper()
 	{
@@ -33,9 +33,16 @@ public class CDSRiskFactorExportMapper extends AbstractCDSExportMapper<RiskFacto
 	}
 
 	@Override
-	public RiskFactors exportFromJuno(RiskFactor exportStructure)
+	public RiskFactors exportFromJuno(RiskFactorNote exportStructure)
 	{
 		RiskFactors riskFactors = objectFactory.createRiskFactors();
+
+		riskFactors.setExposureDetails(exportStructure.getExposureDetails());
+		riskFactors.setAgeOfOnset(getAgeAtOnset(exportStructure.getAgeAtOnset()));
+		riskFactors.setStartDate(toNullableDateFullOrPartial(exportStructure.getStartDate()));
+		riskFactors.setEndDate(toNullableDateFullOrPartial(exportStructure.getResolutionDate()));
+		riskFactors.setLifeStage(getLifeStage(exportStructure.getLifeStage()));
+		riskFactors.setNotes(exportStructure.getNoteText());
 
 		return riskFactors;
 	}
