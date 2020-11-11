@@ -149,14 +149,20 @@ angular.module("Common.Services").service("providerService", [
 			var assigned = false;
 			service.getProviderSiteList(provNo).then(
 				function success(data) {
+					console.log("return of the data" + data);
 					for(var result in data)
 					{
-						console.log(data[result].siteId);
-						if (data[result].siteId === siteNo) assigned = true;
+						console.log("each site: " + data[result].siteId);
+						if (data[result].siteId === siteNo)
+						{
+							console.log("assigned from siteid===siteno? " + assigned);
+							assigned = true;
+						}
 					}
-				}
-			)
-			return assigned;
+				}).then( function returnit() {
+				console.log("assigned from end of method: " + assigned);
+				return assigned;
+			})
 		};
 
 		/*service.isProviderAssignedToSite = function isProviderAssignedToSite(provNo, siteNo)
