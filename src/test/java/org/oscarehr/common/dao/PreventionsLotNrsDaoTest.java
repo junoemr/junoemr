@@ -153,20 +153,21 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 
 		for (int i = 0; i < 50; i++)
 		{
-			String lotNrBase = "abcdef";
-			lotNrBase += String.valueOf(i);
-			expectedResult.add(lotNrBase);
+			String lotNr = "abcdef";
+			lotNr += String.valueOf(i);
+			expectedResult.add(lotNr);
 			PreventionsLotNrs prevLotNr = new PreventionsLotNrs();
 			EntityDataGenerator.generateTestDataForModelClass(prevLotNr);
+			prevLotNr.setLotNr(expectedResult.get(i));
+			prevLotNr.setPreventionType(prevention);
+			prevLotNr.setProviderNo("unit_test");
+			prevLotNr.setCreationDate(new java.util.Date());
+			prevLotNr.setDeleted(false);
 			preventionLotNrs.add(prevLotNr);
-			preventionLotNrs.get(i).setLotNr(expectedResult.get(i));
-			preventionLotNrs.get(i).setPreventionType(prevention);
-			preventionLotNrs.get(i).setProviderNo("unit_test");
-			preventionLotNrs.get(i).setCreationDate(new java.util.Date());
-			preventionLotNrs.get(i).setDeleted(false);
 			dao.persist(preventionLotNrs.get(i));
 		}
-
+		//Results from the database are ordered in reverse
+		Collections.reverse(expectedResult);
 		List<String> result = dao.findLotNrs(prevention, null);
 		
 		Logger logger = MiscUtils.getLogger();
@@ -177,15 +178,14 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 			logger.warn("resultsize="+result.size()+"expectedResult.size="+expectedResult.size());
 			fail("FindLotNrs array sizes do not match.");
 		}
-		int resultIndex = 49;
+
 		for (int i = 0; i < expectedResult.size(); i++)
 		{
-			if (!expectedResult.get(i).equals(result.get(resultIndex)))
+			if (!expectedResult.get(i).equals(result.get(i)))
 			{
 				logger.warn("FindLotNrs items do not match. All lot nr items not found.");
 				fail("FindLotNrs items do not match. All lot nr items not found.");
 			}
-			resultIndex --;
 		}
 		assertTrue(true);
 }
