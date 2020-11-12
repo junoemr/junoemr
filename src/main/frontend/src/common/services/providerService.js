@@ -127,93 +127,31 @@ angular.module("Common.Services").service("providerService", [
 			return deferred.promise;
 		};
 
-		service.getProviderSiteList = function getProviderSiteList(provNo)
+		service.isProviderAssignedToSite = function isProviderAssignedToSite(provNo, siteNo)
 		{
 			var deferred = $q.defer();
 
 			service.sitesApi.getSitesByProvider(provNo).then(
+
 				function success(results)
 				{
-					deferred.resolve(results.data.body);
-				},
-				function error(errors)
-				{
-					console.log("error", errors);
-					deferred.reject("An error occurred...");
-				});
-			return deferred.promise;
-		};
-
-		service.isProviderAssignedToSite = function isProviderAssignedToSite(provNo, siteNo)
-		{
-			var assigned = false;
-			service.getProviderSiteList(provNo).then(
-				function success(data) {
-					console.log("return of the data" + data);
-					for(var result in data)
+					var assigned = false;
+					for(var result in results.data.body)
 					{
-						console.log("each site: " + data[result].siteId);
-						if (data[result].siteId === siteNo)
+						if (results.data.body[result].siteId === siteNo)
 						{
-							console.log("assigned from siteid===siteno? " + assigned);
 							assigned = true;
 						}
 					}
-				}).then( function returnit() {
-				console.log("assigned from end of method: " + assigned);
-				return assigned;
-			})
-		};
-
-		/*service.isProviderAssignedToSite = function isProviderAssignedToSite(provNo, siteNo)
-		{
-			let isAssigned = false; // myan
-			service.sitesApi.getSitesByProvider(provNo).then(
-				function success(results)
-				{
-					//console.log(results);
-					for (var result in results.data.body)
-					{
-						//console.log(results.data.body);
-						if (results.data.body[result].siteId === siteNo)
-						{
-							console.log("Site: " + results.data.body[result].siteId + "true");
-							isAssigned = true; // myan
-						}
-					}
-					console.log("Site: " + results.data.body[result].siteId + "false");
-					isAssigned = false; // myan
+					deferred.resolve(assigned);
 				},
 				function error(errors)
 				{
-					console.log("providerService::isProviderAssignedToSite error", errors);
+					console.log("providerService::getProviderList error", errors);
+					deferred.reject("An error occurred fetching the Provider");
 				});
-			return isAssigned; // myan
+			return deferred.promise;
 		};
-
-		/*service.isProviderAssignedToSite = function isProviderAssignedToSite(provNo, siteNo)
-		{
-			$http(
-				{
-					url: '../ws/rs/sites/provider/' + provNo,
-					method: "GET"
-				}).then(
-				function success(results)
-				{
-					for (var result in results.data.body)
-					{
-						if (results.data.body[result].siteId === siteNo)
-						{
-							return true;
-						}
-					}
-					return false;
-				},
-				function error(errors)
-				{
-					console.log("providerService::isProviderAssignedToSite error", errors);
-				});
-		};*/
 
 		//TODO move to its own service
 		service.saveSettings = function saveSettings(providerNo, settings)

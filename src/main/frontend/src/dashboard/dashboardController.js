@@ -54,7 +54,6 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
         var controller = this;
 
-        console.log("answer to the isprovider" + providerService.isProviderAssignedToSite('999900', 1));
         // Intervals for periodic updates
         controller.dashboardInterval = undefined;
         controller.dashboardMessageInterval = undefined;
@@ -73,12 +72,6 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 	    controller.k2aFeedActive = false;
 
 	    controller.busyLoadingData = false;
-
-	    //console.log("hello...");
-	    console.log("the provider service" + providerService);
-        console.log("Is this one? (should be true): " + providerService.isProviderAssignedToSite("999900", 1));
-
-	   // console.log("answer..."+providerService.isProviderAssignedToSite("999900", 1));
 
         personaService.getDashboardPreferences().then(
             function success(results)
