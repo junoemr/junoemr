@@ -29,7 +29,7 @@ import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
-import org.oscarehr.demographicImport.model.lab.Reviewer;
+import org.oscarehr.demographicImport.model.provider.Reviewer;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;

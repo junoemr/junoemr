@@ -29,7 +29,7 @@ import org.oscarehr.demographicImport.model.Allergy;
 import org.oscarehr.demographicImport.model.Immunization;
 import org.oscarehr.demographicImport.model.Medication;
 import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
-import org.oscarehr.demographicImport.model.Report;
+import org.oscarehr.demographicImport.model.document.Document;
 import org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
@@ -113,7 +113,7 @@ public class Demographic extends AbstractTransientModel
 	private List<ReminderNote> reminderNoteList;
 	private List<Allergy> allergyList;
 	private List<Lab> labList;
-	private List<Report> reportList;
+	private List<Document> documentList;
 	private List<Medication> medicationList;
 	private List<Immunization> immunizationList;
 	private List<ConcernNote> concernNoteList;
@@ -130,7 +130,7 @@ public class Demographic extends AbstractTransientModel
 		this.encounterNoteList = new ArrayList<>();
 		this.reminderNoteList = new ArrayList<>();
 		this.labList = new ArrayList<>();
-		this.reportList = new ArrayList<>();
+		this.documentList = new ArrayList<>();
 		this.medicationList = new ArrayList<>();
 		this.immunizationList = new ArrayList<>();
 		this.allergyList = new ArrayList<>();

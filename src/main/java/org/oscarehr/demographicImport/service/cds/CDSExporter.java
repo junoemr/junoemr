@@ -194,8 +194,8 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 				String.valueOf(demographic.getLabList().size()),
 				String.valueOf(demographic.getAppointmentList().size()),
 				String.valueOf(demographic.getEncounterNoteList().size()),
-				String.valueOf(demographic.getReportList().size()),
-				String.valueOf(demographic.getReportList().size()),
+				String.valueOf(demographic.getDocumentList().size()),
+				String.valueOf(demographic.getDocumentList().size()),
 				String.valueOf(demographic.getMeasurementList().size()),
 				String.valueOf(demographic.getReminderNoteList().size()));
 		this.log(summaryLine);

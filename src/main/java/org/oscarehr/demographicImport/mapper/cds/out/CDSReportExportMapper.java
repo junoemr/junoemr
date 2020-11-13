@@ -22,10 +22,17 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
+import org.apache.commons.lang3.EnumUtils;
+import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.xml.cds.v5_0.model.ReportClass;
+import org.oscarehr.common.xml.cds.v5_0.model.ReportContent;
+import org.oscarehr.common.xml.cds.v5_0.model.ReportFormat;
 import org.oscarehr.common.xml.cds.v5_0.model.Reports;
-import org.oscarehr.demographicImport.model.Report;
+import org.oscarehr.demographicImport.model.document.Document;
 
-public class CDSReportExportMapper extends AbstractCDSExportMapper<Reports, Report>
+import java.io.IOException;
+
+public class CDSReportExportMapper extends AbstractCDSExportMapper<Reports, Document>
 {
 	public CDSReportExportMapper()
 	{
@@ -33,10 +40,52 @@ public class CDSReportExportMapper extends AbstractCDSExportMapper<Reports, Repo
 	}
 
 	@Override
-	public Reports exportFromJuno(Report exportStructure)
+	public Reports exportFromJuno(Document exportStructure)
 	{
 		Reports reports = objectFactory.createReports();
 
+		// all Juno documents will be treated as binary reports
+		reports.setFormat(ReportFormat.BINARY);
+		try
+		{
+			GenericFile documentFile = exportStructure.getFile();
+
+			ReportContent reportContent = objectFactory.createReportContent();
+			reportContent.setMedia(documentFile.toBase64ByteArray());
+			reports.setContent(reportContent);
+
+			reports.setFileExtensionAndVersion(documentFile.getExtension());
+		}
+		catch(IOException e)
+		{
+			throw new RuntimeException("Failed Document Conversion", e);
+		}
+
+		reports.setClazz(toReportClass(exportStructure.getDocumentClass()));
+		reports.setSubClass(exportStructure.getDocumentSubClass());
+		reports.setEventDateTime(toNullableDateTimeFullOrPartial(exportStructure.getObservationDate().atStartOfDay()));
+		reports.setReceivedDateTime(toNullableDateTimeFullOrPartial(exportStructure.getCreatedAt()));
+
+		Reports.SourceAuthorPhysician sourceAuthorPhysician = objectFactory.createReportsSourceAuthorPhysician();
+		sourceAuthorPhysician.setAuthorName(toPersonNameSimple(exportStructure.getCreatedBy()));
+		reports.setSourceAuthorPhysician(sourceAuthorPhysician);
+
+		reports.setSourceFacility(exportStructure.getSourceFacility());
+
 		return reports;
+	}
+
+	protected ReportClass toReportClass(String docClass)
+	{
+		ReportClass reportClass;
+		if(EnumUtils.isValidEnum(ReportClass.class, docClass))
+		{
+			reportClass = ReportClass.valueOf(docClass);
+		}
+		else
+		{
+			reportClass = ReportClass.OTHER_LETTER;
+		}
+		return reportClass;
 	}
 }

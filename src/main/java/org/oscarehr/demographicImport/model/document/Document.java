@@ -20,23 +20,46 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model.lab;
+package org.oscarehr.demographicImport.model.document;
 
 import lombok.Data;
+import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.appointment.Appointment;
+import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.oscarehr.demographicImport.model.provider.Provider;
-import org.springframework.beans.BeanUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-public class Reviewer extends Provider
+public class Document extends AbstractTransientModel
 {
-	private LocalDateTime reviewDateTime;
-
-	public static Reviewer fromProvider(Provider provider)
+	public enum STATUS
 	{
-		Reviewer reviewer = new Reviewer();
-		BeanUtils.copyProperties(provider, reviewer);
-		return reviewer;
+		ACTIVE,
+		DELETED,
 	}
+
+	private Integer id;
+
+	private String description;
+	private String documentType;
+	private String documentClass;
+	private String documentSubClass;
+	private LocalDate observationDate;
+
+	private GenericFile file;
+
+	private String source;
+	private String sourceFacility;
+	private LocalDateTime updatedAt;
+	private STATUS status;
+	private LocalDateTime createdAt;
+	private Boolean publicDocument;
+	private Appointment appointment;
+
+	private Provider createdBy;
+	private Provider responsible;
+	private Reviewer reviewer;
 }

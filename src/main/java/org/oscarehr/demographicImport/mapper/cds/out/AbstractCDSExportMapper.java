@@ -25,9 +25,11 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
+import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.mapper.AbstractExportMapper;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
+import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.service.ExportPreferences;
 import oscar.util.ConversionUtils;
 
@@ -113,5 +115,17 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 	protected DateFullOrPartial toNullableDateFullOrPartial(LocalDate localDate)
 	{
 		return this.toNullableDateFullOrPartial(localDate, null);
+	}
+
+	protected PersonNameSimple toPersonNameSimple(Provider provider)
+	{
+		if(provider == null)
+		{
+			return null;
+		}
+		PersonNameSimple personNameSimple = objectFactory.createPersonNameSimple();
+		personNameSimple.setFirstName(provider.getFirstName());
+		personNameSimple.setLastName(provider.getLastName());
+		return personNameSimple;
 	}
 }

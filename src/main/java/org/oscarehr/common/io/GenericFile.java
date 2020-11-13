@@ -24,6 +24,9 @@
 package org.oscarehr.common.io;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
@@ -36,6 +39,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
@@ -293,10 +298,29 @@ public class GenericFile
 		return javaFile.getName();
 	}
 
+	public String getExtension()
+	{
+		return FilenameUtils.getExtension(javaFile.getName());
+	}
+
 	public FileInputStream toFileInputStream() throws FileNotFoundException
 	{
 		return new FileInputStream(javaFile);
 	}
+
+	public String toBase64() throws IOException
+	{
+		return toBase64(StandardCharsets.UTF_8);
+	}
+	public String toBase64(Charset charset) throws IOException
+	{
+		return new String(toBase64ByteArray(), charset);
+	}
+	public byte[] toBase64ByteArray() throws IOException
+	{
+		return Base64.encodeBase64(FileUtils.readFileToByteArray(javaFile));
+	}
+
 	/**
 	 * returns the file content type, or null if it cannot be determined
 	 * @param f - the file to read

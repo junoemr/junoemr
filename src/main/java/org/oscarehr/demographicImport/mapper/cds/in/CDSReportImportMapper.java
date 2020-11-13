@@ -22,10 +22,11 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.oscarehr.common.xml.cds.v5_0.model.ReportFormat;
 import org.oscarehr.common.xml.cds.v5_0.model.Reports;
-import org.oscarehr.demographicImport.model.Report;
+import org.oscarehr.demographicImport.model.document.Document;
 
-public class CDSReportImportMapper extends AbstractCDSImportMapper<Reports, Report>
+public class CDSReportImportMapper extends AbstractCDSImportMapper<Reports, Document>
 {
 	public CDSReportImportMapper()
 	{
@@ -33,8 +34,20 @@ public class CDSReportImportMapper extends AbstractCDSImportMapper<Reports, Repo
 	}
 
 	@Override
-	public Report importToJuno(Reports importStructure)
+	public Document importToJuno(Reports importStructure)
 	{
-		return new Report();
+		Document document = new Document();
+
+		ReportFormat format = importStructure.getFormat();
+		if(format.equals(ReportFormat.BINARY))
+		{
+			//Document
+		}
+		else
+		{
+			//text report
+		}
+
+		return document;
 	}
 }

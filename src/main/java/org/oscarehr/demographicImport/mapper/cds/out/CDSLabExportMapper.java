@@ -23,13 +23,12 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.LaboratoryResults;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.common.xml.cds.v5_0.model.ResultNormalAbnormalFlag;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
-import org.oscarehr.demographicImport.model.lab.Reviewer;
+import org.oscarehr.demographicImport.model.provider.Reviewer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,10 +77,7 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 				for(Reviewer reviewProvider : exportLab.getReviewers())
 				{
 					LaboratoryResults.ResultReviewer resultReviewer = objectFactory.createLaboratoryResultsResultReviewer();
-					PersonNameSimple simpleName = objectFactory.createPersonNameSimple();
-					simpleName.setLastName(reviewProvider.getLastName());
-					simpleName.setFirstName(reviewProvider.getFirstName());
-					resultReviewer.setName(simpleName);
+					resultReviewer.setName(toPersonNameSimple(reviewProvider));
 					resultReviewer.setOHIPPhysicianId(reviewProvider.getOhipNumber());
 					resultReviewer.setDateTimeResultReviewed(toFullDateTime(reviewProvider.getReviewDateTime()));
 

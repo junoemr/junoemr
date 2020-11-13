@@ -32,7 +32,7 @@ import org.oscarehr.demographicImport.converter.ProviderModelToExportConverter;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
-import org.oscarehr.demographicImport.model.lab.Reviewer;
+import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;

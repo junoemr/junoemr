@@ -55,7 +55,7 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic
 		demographic.setLabList(new CDSLabImportMapper().importToJuno(patientRecord.getLaboratoryResults()));
 		demographic.setAppointmentList(new CDSAppointmentImportMapper().importAll(patientRecord.getAppointments()));
 		demographic.setEncounterNoteList(new CDSEncounterNoteImportMapper().importAll(patientRecord.getClinicalNotes()));
-		demographic.setReportList(new CDSReportImportMapper().importAll(patientRecord.getReports()));
+		demographic.setDocumentList(new CDSReportImportMapper().importAll(patientRecord.getReports()));
 		demographic.setMeasurementList(getMeasurementsList(patientRecord.getCareElements()));
 		demographic.setReminderNoteList(new CDSAlertImportMapper().importAll(patientRecord.getAlertsAndSpecialNeeds()));
 

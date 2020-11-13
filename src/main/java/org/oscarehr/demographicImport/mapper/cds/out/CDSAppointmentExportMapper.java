@@ -24,7 +24,6 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.Appointments;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
 import org.oscarehr.demographicImport.model.appointment.AppointmentStatus;
 import org.oscarehr.demographicImport.model.provider.Provider;
@@ -63,12 +62,8 @@ public class CDSAppointmentExportMapper extends AbstractCDSExportMapper<Appointm
 		Appointments.Provider primaryPhysician = null;
 		if(provider != null)
 		{
-			PersonNameSimple personNameSimple = objectFactory.createPersonNameSimple();
-			personNameSimple.setFirstName(provider.getFirstName());
-			personNameSimple.setLastName(provider.getLastName());
-
 			primaryPhysician = objectFactory.createAppointmentsProvider();
-			primaryPhysician.setName(personNameSimple);
+			primaryPhysician.setName(toPersonNameSimple(provider));
 			primaryPhysician.setOHIPPhysicianId(provider.getOhipNumber());
 		}
 		return primaryPhysician;

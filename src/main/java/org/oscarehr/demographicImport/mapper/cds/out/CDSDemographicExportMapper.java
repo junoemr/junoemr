@@ -32,7 +32,6 @@ import org.oscarehr.common.xml.cds.v5_0.model.HealthCard;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePartTypeCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePrefixCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePurposeCode;
-import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameStandard;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber;
@@ -78,7 +77,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		demographics.getPhoneNumber().addAll(getExportPhones(exportStructure));
 		demographics.setPrimaryPhysician(getExportPrimaryPhysician(exportStructure));
 		demographics.setPersonStatusCode(getExportStatusCode(exportStructure));
-		demographics.setPersonStatusDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getPatientStatusDate()));
+		demographics.setPersonStatusDate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getPatientStatusDate()));
 
 		return demographics;
 	}
@@ -218,12 +217,8 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		Demographics.PrimaryPhysician primaryPhysician = null;
 		if(provider != null)
 		{
-			PersonNameSimple personNameSimple = objectFactory.createPersonNameSimple();
-			personNameSimple.setFirstName(provider.getFirstName());
-			personNameSimple.setLastName(provider.getLastName());
-
 			primaryPhysician = objectFactory.createDemographicsPrimaryPhysician();
-			primaryPhysician.setName(personNameSimple);
+			primaryPhysician.setName(toPersonNameSimple(provider));
 		    primaryPhysician.setOHIPPhysicianId(provider.getOhipNumber());
 		    primaryPhysician.setPrimaryPhysicianCPSO(provider.getPractitionerNumber());
 		}

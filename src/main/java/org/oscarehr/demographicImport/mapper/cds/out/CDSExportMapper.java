@@ -106,7 +106,7 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 		if(exportPreferences.isExportReportsReceived())
 		{
 			patientRecord.getReports().addAll(
-					new CDSReportExportMapper().exportAll(exportStructure.getReportList()));
+					new CDSReportExportMapper().exportAll(exportStructure.getDocumentList()));
 		}
 		if(exportPreferences.isExportCareElements())
 		{

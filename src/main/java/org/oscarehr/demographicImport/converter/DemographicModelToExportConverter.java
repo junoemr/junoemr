@@ -43,6 +43,8 @@ import org.oscarehr.demographicImport.converter.note.RiskFactorNoteModelToExport
 import org.oscarehr.demographicImport.converter.note.SocialHistoryNoteModelToExportConverter;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.search.CaseManagementNoteCriteriaSearch;
@@ -68,6 +70,12 @@ public class DemographicModelToExportConverter extends
 
 	@Autowired
 	private DemographicExtDao demographicExtDao;
+
+	@Autowired
+	private DocumentDao documentDao;
+
+	@Autowired
+	private DocumentModelToExportConverter documentModelToExportConverter;
 
 	@Autowired
 	private EncounterNoteModelToExportConverter encounterNoteConverter;
@@ -173,6 +181,9 @@ public class DemographicModelToExportConverter extends
 		exportDemographic.setMeasurementList(measurementToExportConverter.convert(measurements));
 
 		setLabs(input, exportDemographic);
+
+		List<Document> documents = documentDao.findByDemographicId(String.valueOf(input.getDemographicId()));
+		exportDemographic.setDocumentList(documentModelToExportConverter.convert(documents));
 
 		return exportDemographic;
 	}
