@@ -188,6 +188,7 @@ public class EncounterNoteService
 	{
 		CaseManagementNoteLink link = caseManagementNoteLinkDao.findLatestByTableAndTableId(CaseManagementNoteLink.TICKLER, tickler.getId());
 		CaseManagementNote ticklerNote;
+		boolean addNoteHeader = false;
 		if(link != null)
 		{
 			CaseManagementNote previousNote = link.getNote();
@@ -199,8 +200,9 @@ public class EncounterNoteService
 		{
 			ticklerNote = new CaseManagementNote();
 			ticklerNote.setNote(noteText);
+			addNoteHeader = true;
 		}
-		return saveTicklerNote(ticklerNote, tickler, providerNo, demographicNo);
+		return saveTicklerNote(ticklerNote, tickler, providerNo, demographicNo, addNoteHeader);
 	}
 
 	/**
@@ -230,7 +232,14 @@ public class EncounterNoteService
 	{
 		note.setDemographic(demographicDao.find(demographicNo));
 		note.setProvider(providerDataDao.find(providerNo));
-		return saveTicklerNote(note, tickler);
+		return saveTicklerNote(note, tickler, true);
+	}
+
+	protected CaseManagementNote saveTicklerNote(CaseManagementNote note, Tickler tickler, String providerNo, Integer demographicNo, boolean addNoteHeader)
+	{
+		note.setDemographic(demographicDao.find(demographicNo));
+		note.setProvider(providerDataDao.find(providerNo));
+		return saveTicklerNote(note, tickler, addNoteHeader);
 	}
 
 	/**
@@ -241,11 +250,16 @@ public class EncounterNoteService
 	 */
 	public CaseManagementNote saveTicklerNote(CaseManagementNote note, Tickler tickler)
 	{
+		return saveTicklerNote(note, tickler, true);
+	}
+	protected CaseManagementNote saveTicklerNote(CaseManagementNote note, Tickler tickler, boolean addNoteHeader)
+	{
 		if(note.getSigningProvider() == null)
 		{
 			note.setSigningProvider(note.getProvider());
 		}
-		note.setNote(getNoteHeaderText("Tickler") + "\n" + note.getNote() + "\n" + getSignatureText(note.getSigningProvider()));
+		String headerText = addNoteHeader ? getNoteHeaderText(Tickler.HEADER_NAME) + "\n" : "";
+		note.setNote(headerText + note.getNote() + "\n" + getSignatureText(note.getSigningProvider()));
 		note.setArchived(false);
 		note = saveHistoryNote(note, Issue.SUMMARY_CODE_TICKLER_NOTE);
 
