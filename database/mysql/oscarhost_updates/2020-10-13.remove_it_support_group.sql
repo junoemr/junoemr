@@ -1,1 +1,0 @@
-DELETE FROM mygroup WHERE mygroup_no = 'IT Support' AND provider_no = '88888';
