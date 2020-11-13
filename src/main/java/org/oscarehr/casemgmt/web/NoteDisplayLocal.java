@@ -248,26 +248,18 @@ public class NoteDisplayLocal implements NoteDisplay {
 
 
 	public ArrayList<String> getIssueDescriptions() {
-		ArrayList<String> issueDescriptions = new ArrayList<String>();
+		ArrayList<String> issueDescriptions = new ArrayList<>();
 
 		for(CaseManagementIssue issue : caseManagementNote.getIssues())
 		{
-			// don't show ticklerNote issues
-			if(this.isTicklerNote() && Issue.SUMMARY_CODE_TICKLER_NOTE.equals(issue.getIssue().getCode()))
-			{
-				continue;
-			}
 			issueDescriptions.add(issue.getIssue().getDescription());
 		}
 
 		return (issueDescriptions);
 	}
 
-	public boolean isReadOnly() {
-		if(this.isTicklerNote())
-		{
-			return true;
-		}
+	public boolean isReadOnly()
+	{
 		return readonly;
 	}
 
