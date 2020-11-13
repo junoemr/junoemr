@@ -20,30 +20,12 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds.in;
+package org.oscarehr.demographicImport.exception;
 
-import org.oscarehr.common.xml.cds.v5_0.model.ProblemList;
-import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
-
-public class CDSProblemImportMapper extends AbstractCDSImportMapper<ProblemList, ConcernNote>
+public class InvalidImportFileException extends Exception
 {
-	public CDSProblemImportMapper()
+	public InvalidImportFileException()
 	{
 		super();
-	}
-
-	@Override
-	public ConcernNote importToJuno(ProblemList importStructure)
-	{
-		ConcernNote note = new ConcernNote();
-
-		note.setProblemDescription(importStructure.getProblemDescription());
-		note.setProblemStatus(importStructure.getProblemStatus());
-		note.setStartDate(toLocalDate(importStructure.getOnsetDate()));
-//		note.setLifeStage(String.valueOf(importStructure.getLifeStage()));
-		note.setResolutionDate(toLocalDate(importStructure.getResolutionDate()));
-		note.setNoteText(importStructure.getNotes());
-
-		return note;
 	}
 }

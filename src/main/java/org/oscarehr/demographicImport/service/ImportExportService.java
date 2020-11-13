@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographicImport.converter.DemographicModelToExportConverter;
+import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,15 +50,21 @@ public class ImportExportService
 	@Autowired
 	DemographicModelToExportConverter modelToExportConverter;
 
-	public ImportLogger importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType, GenericFile importFile) throws IOException
+	public void importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,
+	                                      ImporterExporterFactory.IMPORT_SOURCE importSource,
+	                                      ImportLogger importLogger,
+	                                      GenericFile importFile,
+	                                      String documentLocation,
+	                                      boolean skipMissingDocs,
+	                                      boolean mergeDemographics) throws IOException, InvalidImportFileException
 	{
-		DemographicImporter importer = ImporterExporterFactory.getImporter(importType);
+		DemographicImporter importer = ImporterExporterFactory.getImporter(importType, importSource, importLogger, documentLocation, skipMissingDocs);
+		importer.verifyFileFormat(importFile);
 		Demographic demographic = importer.importDemographic(importFile);
 
 		// TODO persist the transient object structure
+		// TODO handle demographic merging
 		logger.info(ReflectionToStringBuilder.toString(demographic));
-
-		return importer.getImportLogger();
 	}
 
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.IMPORTER_TYPE importType,

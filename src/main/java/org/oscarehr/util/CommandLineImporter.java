@@ -22,12 +22,15 @@
  */
 package org.oscarehr.util;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.service.ImportExportService;
+import org.oscarehr.demographicImport.service.ImportLogger;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import oscar.OscarProperties;
@@ -51,13 +54,24 @@ public class CommandLineImporter
 	 */
 	public static void main (String [] args)
 	{
-		if(args == null || args.length != 5)
+		if(args == null || args.length != 8)
 		{
 			BasicConfigurator.configure();
 			logger.error("Invalid argument count");
 			return;
 		}
-		else if(!(new File(args[0]).exists()))
+
+		String logLocation = args[0];
+		String propertiesFileName = args[1];
+		String importType = args[2];
+		String importFileLocation = args[3];
+		String importDocumentLocation = args[4];
+		String importSourceStr = args[5];
+		// flag to allow importing demographics with missing document files by skipping those records.
+		boolean skipMissingDocs = Boolean.parseBoolean(args[6]);
+		boolean mergeDemographics = Boolean.parseBoolean(args[7]);
+
+		if(!(new File(logLocation).exists()))
 		{
 			BasicConfigurator.configure();
 			logger.warn("Invalid log configuration file. Default logger initialized");
@@ -69,19 +83,39 @@ public class CommandLineImporter
 			logger.info("Log properties loaded success");
 		}
 
-		String propertiesFileName = args[1];
-		String importFileLocation = args[2];
-
 		File importFileDirectory = new File(importFileLocation);
 		if(!(importFileDirectory.exists() && importFileDirectory.isDirectory()))
 		{
-			logger.error("Invalid import directory");
+			logger.error("Invalid import directory: " + importFileLocation);
 			return;
 		}
 
-		// flag to allow importing demographics with missing document files by skipping those records.
-		boolean skipMissingDocs = Boolean.parseBoolean(args[3]);
-		boolean mergeDemographics = Boolean.parseBoolean(args[4]);
+		File importDocumentDirectory = new File(importDocumentLocation);
+		if(!(importDocumentDirectory.exists() && importDocumentDirectory.isDirectory()))
+		{
+			logger.error("Invalid document directory: " + importDocumentLocation);
+			return;
+		}
+
+		if(!EnumUtils.isValidEnum(ImporterExporterFactory.IMPORTER_TYPE.class, importType))
+		{
+			logger.error(importType + " is not a valid IMPORTER_TYPE enum. must be one of " +
+					java.util.Arrays.asList(ImporterExporterFactory.IMPORTER_TYPE.values()));
+			return;
+		}
+		ImporterExporterFactory.IMPORTER_TYPE importerType = ImporterExporterFactory.IMPORTER_TYPE.valueOf(importType);
+
+		ImporterExporterFactory.IMPORT_SOURCE importSource;
+		if(EnumUtils.isValidEnum(ImporterExporterFactory.IMPORT_SOURCE.class, importSourceStr))
+		{
+			logger.info("Import source: " + importSourceStr);
+			importSource = ImporterExporterFactory.IMPORT_SOURCE.valueOf(importSourceStr);
+		}
+		else
+		{
+			logger.warn("Unknown import source. Defaulting to UNKNOWN");
+			importSource = ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN;
+		}
 
 		ClassPathXmlApplicationContext ctx = null;
 		long importCount = 0;
@@ -105,23 +139,38 @@ public class CommandLineImporter
 				// skip sub directories
 				if(file.isDirectory())
 				{
-					logger.info("Skip Directory");
+					logger.info("Skip Directory: " + file.getName());
 					continue;
 				}
 				GenericFile importFile = FileFactory.getExistingFile(file);
 
+				ImportLogger importLogger = ImporterExporterFactory.getImportLogger(importerType);
 				try
 				{
-					importExportService.importDemographic(ImporterExporterFactory.IMPORTER_TYPE.CDS_5, importFile);
+					importExportService.importDemographic(importerType,
+							importSource,
+							importLogger,
+							importFile,
+							importDocumentLocation,
+							skipMissingDocs,
+							mergeDemographics);
 
 					importCount++;
 					moveToCompleted(importFile, importFileDirectory);
 				}
+				catch(InvalidImportFileException e)
+				{
+					logger.info("Skip (invalid import file): " + importFile.getName());
+				}
 				catch(Exception e)
 				{
-					logger.error("Failed to import " + importFile.getName(), e);
+					logger.error("Failed to import: " + importFile.getName(), e);
 					failureCount++;
 					moveToFailed(importFile, importFileDirectory);
+				}
+				finally
+				{
+					importLogger.flush();
 				}
 			}
 		}

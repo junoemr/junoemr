@@ -28,7 +28,20 @@ import java.io.IOException;
 
 public interface ImportLogger
 {
+	/**
+	 * 	adds a log statement to the import log
+	 * @param message - the statement to log
+ 	 */
 	void log(String message) throws IOException;
 
+	/**
+	 * forces all unwritten log data to be written to the log file.
+	 * This may be useful for loggers that need to collect amalgamated data before writing it to the log.
+	 */
+	void flush();
+
+	/**
+	 * @return - the log file
+	 */
 	GenericFile getLogFile();
 }

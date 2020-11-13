@@ -20,30 +20,34 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds.in;
+package org.oscarehr.demographicImport.service.cds;
 
-import org.oscarehr.common.xml.cds.v5_0.model.ProblemList;
-import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.demographicImport.service.ImportLogger;
+import org.oscarehr.util.MiscUtils;
 
-public class CDSProblemImportMapper extends AbstractCDSImportMapper<ProblemList, ConcernNote>
+import java.io.IOException;
+
+public class CDSImportLogger implements ImportLogger
 {
-	public CDSProblemImportMapper()
+	private static final Logger logger = MiscUtils.getLogger();
+
+	@Override
+	public void log(String message) throws IOException
 	{
-		super();
+		logger.info(message);
 	}
 
 	@Override
-	public ConcernNote importToJuno(ProblemList importStructure)
+	public void flush()
 	{
-		ConcernNote note = new ConcernNote();
 
-		note.setProblemDescription(importStructure.getProblemDescription());
-		note.setProblemStatus(importStructure.getProblemStatus());
-		note.setStartDate(toLocalDate(importStructure.getOnsetDate()));
-//		note.setLifeStage(String.valueOf(importStructure.getLifeStage()));
-		note.setResolutionDate(toLocalDate(importStructure.getResolutionDate()));
-		note.setNoteText(importStructure.getNotes());
+	}
 
-		return note;
+	@Override
+	public GenericFile getLogFile()
+	{
+		return null;
 	}
 }

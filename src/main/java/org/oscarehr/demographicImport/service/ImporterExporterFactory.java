@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.service;
 
 import org.oscarehr.demographicImport.service.cds.CDSExporter;
+import org.oscarehr.demographicImport.service.cds.CDSImportLogger;
 import org.oscarehr.demographicImport.service.cds.CDSImporter;
 
 import java.io.IOException;
@@ -32,15 +33,49 @@ public class ImporterExporterFactory
 	public enum IMPORTER_TYPE
 	{
 		CDS_5,
+		ToPD,
 	}
 
-	public static DemographicImporter getImporter(IMPORTER_TYPE type)
+	public enum IMPORT_SOURCE
 	{
-		return new CDSImporter();
+		WOLF,
+		MEDIPLAN,
+		MEDACCESS,
+		ACCURO,
+		UNKNOWN
+	}
+
+	public static ImportLogger getImportLogger(IMPORTER_TYPE type)
+	{
+		switch(type)
+		{
+			case CDS_5: return new CDSImportLogger();
+			case ToPD: // TODO
+			default: throw new RuntimeException(type + " logger not implemented");
+		}
+	}
+
+	public static DemographicImporter getImporter(IMPORTER_TYPE type,
+	                                              IMPORT_SOURCE importSource,
+	                                              ImportLogger importLogger,
+	                                              String documentLocation,
+	                                              boolean skipMissingDocs)
+	{
+		switch(type)
+		{
+			case CDS_5: return new CDSImporter();
+			case ToPD: // TODO
+			default: throw new RuntimeException(type + " importer not implemented");
+		}
 	}
 
 	public static DemographicExporter getExporter(IMPORTER_TYPE type) throws IOException
 	{
-		return new CDSExporter();
+		switch(type)
+		{
+			case CDS_5: return new CDSExporter();
+			case ToPD: // TODO
+			default: throw new RuntimeException(type + " exporter not implemented");
+		}
 	}
 }

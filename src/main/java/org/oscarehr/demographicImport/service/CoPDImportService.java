@@ -120,6 +120,8 @@ public class CoPDImportService
 	private static final String DEFAULT_PROVIDER_LAST_NAME = properties.getProperty("copd_import_service.default_provider.last_name", "CoPD-provider");
 	private static final String DEFAULT_PROVIDER_FIRST_NAME = properties.getProperty("copd_import_service.default_provider.first_name", "CoPD-missing");
 
+	@Deprecated // use the more generic ImporterExporterFactory instead
+	// this will be refactored out when topd is moved to the new system
 	public enum IMPORT_SOURCE
 	{
 		WOLF,
