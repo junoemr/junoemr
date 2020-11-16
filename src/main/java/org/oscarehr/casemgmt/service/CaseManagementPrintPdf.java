@@ -307,15 +307,14 @@ public class CaseManagementPrintPdf {
         paragraph.add(phrase);
         document.add(paragraph);
 
-        Map<String, String> issueHeaders = new HashMap<String, String>() {{
-            put(Issue.SUMMARY_CODE_SOCIAL_HISTORY, "Social History\n");
-            put(Issue.SUMMARY_CODE_OTHER_MEDS, "Other Meds\n");
-            put(Issue.SUMMARY_CODE_MEDICAL_HISTORY, "Medical History\n");
-            put(Issue.SUMMARY_CODE_CONCERNS, "Ongoing Concerns\n");
-            put(Issue.SUMMARY_CODE_REMINDERS, "Reminders\n");
-            put(Issue.SUMMARY_CODE_FAMILY_HISTORY, "Family History\n");
-            put(Issue.SUMMARY_CODE_RISK_FACTORS, "Risk Factors\n");
-        }};
+        Map<String, String> issueHeaders = new HashMap<>();
+        issueHeaders.put(Issue.SUMMARY_CODE_SOCIAL_HISTORY, "Social History\n");
+        issueHeaders.put(Issue.SUMMARY_CODE_OTHER_MEDS, "Other Meds\n");
+        issueHeaders.put(Issue.SUMMARY_CODE_MEDICAL_HISTORY, "Medical History\n");
+        issueHeaders.put(Issue.SUMMARY_CODE_CONCERNS, "Ongoing Concerns\n");
+        issueHeaders.put(Issue.SUMMARY_CODE_REMINDERS, "Reminders\n");
+        issueHeaders.put(Issue.SUMMARY_CODE_FAMILY_HISTORY, "Family History\n");
+        issueHeaders.put(Issue.SUMMARY_CODE_RISK_FACTORS, "Risk Factors\n");
 
         for (String issue : cpp.keySet())
         {

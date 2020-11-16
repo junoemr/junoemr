@@ -3677,7 +3677,7 @@
 	{
 		var sdate = $F("printStartDate");
 		var edate = $F("printEndDate");
-		return !(sdate.length == 0 || edate.length == 0);
+		return !(sdate.length === 0 || edate.length === 0 );
 	}
 
 	var printDateMsg;
@@ -3686,7 +3686,7 @@
 	{
 		var sdate = $F("printStartDate");
 		var edate = $F("printEndDate");
-		if (sdate.length == 0 || edate.length == 0)
+		if (sdate.length === 0 || edate.length === 0)
 		{
 			alert(printDateMsg);
 			return false;
