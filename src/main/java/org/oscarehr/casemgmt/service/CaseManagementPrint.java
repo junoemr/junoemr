@@ -472,9 +472,9 @@ public class CaseManagementPrint {
 	}
 
 	protected String convertDateFmt(String strOldDate, HttpServletRequest request) {
-		String strNewDate = new String();
+		String strNewDate = "";
 		if (strOldDate != null && strOldDate.length() > 0) {
-			SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd", request.getLocale());
+			SimpleDateFormat fmt = new SimpleDateFormat(ConversionUtils.DEFAULT_DATE_PATTERN, request.getLocale());
 			try {
 
 				Date tempDate = fmt.parse(strOldDate);

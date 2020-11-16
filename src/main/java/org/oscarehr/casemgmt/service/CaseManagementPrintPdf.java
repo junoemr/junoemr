@@ -70,9 +70,7 @@ public class CaseManagementPrintPdf {
     private HttpServletRequest request;
     private OutputStream os;
 
-    private float upperYcoord;
     private Document document;
-    private PdfContentByte cb;
     private BaseFont bf;
     private Font font;
     private boolean newPage = false;
@@ -82,7 +80,6 @@ public class CaseManagementPrintPdf {
     public final int LINESPACING = 1;
     public final float LEADING = 12;
     public final float FONTSIZE = 10;
-    public final int NUMCOLS = 2;
 
     /** Creates a new instance of CaseManagementPrintPdf */
     public CaseManagementPrintPdf(HttpServletRequest request, OutputStream os) {
@@ -176,7 +173,7 @@ public class CaseManagementPrintPdf {
         document.setHeader(header);
 
         //Write title with top and bottom borders on p1
-        cb = writer.getDirectContent();
+        PdfContentByte cb = writer.getDirectContent();
         cb.setColorStroke(new Color(0,0,0));
         cb.setLineWidth(0.5f);
 
@@ -185,7 +182,7 @@ public class CaseManagementPrintPdf {
         cb.stroke();
         //cb.setFontAndSize(bf, FONTSIZE);
 
-        upperYcoord = document.top() - (font.getCalculatedLeading(LINESPACING)*2f);
+        float upperYcoord = document.top() - (font.getCalculatedLeading(LINESPACING) * 2f);
 
         ColumnText ct = new ColumnText(cb);
         Paragraph p = new Paragraph();
