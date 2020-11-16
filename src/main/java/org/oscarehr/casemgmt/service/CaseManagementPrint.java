@@ -122,9 +122,9 @@ public class CaseManagementPrint {
 		else
 		{
 			notes = getNotesToPrint(noteIds, loggedInInfo, demoNo);
+			notes = filterNotesByDate(notes, startDate, endDate);
 		}
 
-		notes = filterNotesByDate(notes, startDate, endDate);
 		HashMap<String, List<CaseManagementNote>> cpp = null;
 
 		if (printCPP)
@@ -142,7 +142,9 @@ public class CaseManagementPrint {
 			}
 			else
 			{
-				othermeds = cpp.get(Issue.SUMMARY_CODE_OTHER_MEDS);
+				// In this case, we're printing both CPP and Rx, and we only want these notes to show up under Rx
+				othermeds = new ArrayList<>(cpp.get(Issue.SUMMARY_CODE_OTHER_MEDS));
+				cpp.remove(Issue.SUMMARY_CODE_OTHER_MEDS);
 			}
 		}
 

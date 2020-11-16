@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -308,30 +309,26 @@ public class CaseManagementPrintPdf {
         phrase = new Phrase(LEADING, "Patient CPP", obsfont);
         paragraph.add(phrase);
         document.add(paragraph);
-        String[] headings = {"Social History\n","Other Meds\n", "Medical History\n", "Ongoing Concerns\n", "Reminders\n", "Family History\n", "Risk Factors\n"};
-        String[] issueCodes = {
-                Issue.SUMMARY_CODE_SOCIAL_HISTORY,
-                Issue.SUMMARY_CODE_OTHER_MEDS,
-                Issue.SUMMARY_CODE_MEDICAL_HISTORY,
-                Issue.SUMMARY_CODE_CONCERNS,
-                Issue.SUMMARY_CODE_REMINDERS,
-                Issue.SUMMARY_CODE_FAMILY_HISTORY,
-                Issue.SUMMARY_CODE_RISK_FACTORS
-        };
 
-        //init column to left side of page
+        Map<String, String> issueHeaders = new HashMap<String, String>() {{
+            put(Issue.SUMMARY_CODE_SOCIAL_HISTORY, "Social History\n");
+            put(Issue.SUMMARY_CODE_OTHER_MEDS, "Other Meds\n");
+            put(Issue.SUMMARY_CODE_MEDICAL_HISTORY, "Medical History\n");
+            put(Issue.SUMMARY_CODE_CONCERNS, "Ongoing Concerns\n");
+            put(Issue.SUMMARY_CODE_REMINDERS, "Reminders\n");
+            put(Issue.SUMMARY_CODE_FAMILY_HISTORY, "Family History\n");
+            put(Issue.SUMMARY_CODE_RISK_FACTORS, "Risk Factors\n");
+        }};
 
-        //while there are cpp headings to process
-
-        for (int idx = 0; idx < headings.length; ++idx)
+        for (String issue : cpp.keySet())
         {
             paragraph = new Paragraph();
             paragraph.setAlignment(Paragraph.ALIGN_LEFT);
-            phrase = new Phrase(LEADING, headings[idx], obsfont);
+            phrase = new Phrase(LEADING, issueHeaders.get(issue), obsfont);
             paragraph.add(phrase);
             document.add(paragraph);
             newPage = false;
-            this.printEncounterNotes(cpp.get(issueCodes[idx]));
+            this.printEncounterNotes(cpp.get(issue));
         }
 
     }
