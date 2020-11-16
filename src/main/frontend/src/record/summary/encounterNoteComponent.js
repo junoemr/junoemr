@@ -105,7 +105,7 @@ angular.module('Record.Summary').component('encounterNote', {
 
 		ctrl.showNoteEditButton = function showNoteEditButton()
 		{
-			return ctrl.note.editable && ((ctrl.isRegularNote()) || (ctrl.note.cpp && !ctrl.note.archived && !ctrl.note.ticklerNote));
+			return ctrl.note.editable && ((ctrl.isRegularNote()) || (ctrl.note.cpp && !ctrl.note.archived));
 		};
 
 		ctrl.editButtonClick = function editButtonClick()
@@ -213,7 +213,6 @@ angular.module('Record.Summary').component('encounterNote', {
 				ctrl.note.eformData ||
 				ctrl.note.encounterForm ||
 				ctrl.note.invoice ||
-				ctrl.note.ticklerNote ||
 				ctrl.note.cpp);
 		};
 

@@ -252,6 +252,11 @@ public class NoteDisplayLocal implements NoteDisplay {
 
 		for(CaseManagementIssue issue : caseManagementNote.getIssues())
 		{
+			// don't show ticklerNote issues
+			if(this.isTicklerNote() && Issue.SUMMARY_CODE_TICKLER_NOTE.equals(issue.getIssue().getCode()))
+			{
+				continue;
+			}
 			issueDescriptions.add(issue.getIssue().getDescription());
 		}
 
