@@ -760,7 +760,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                         if (multiID[j].equals(segmentID))
                                             startFlag = true;
                                         if (startFlag)
-                                            if (ackList.size() > 0){{%>
+                                            if (ackList.size() >= 0){{%>
                                                 <table width="100%" height="20" cellpadding="2" cellspacing="2">
                                                     <tr>
                                                         <% if (multiID.length > 1){ %>
