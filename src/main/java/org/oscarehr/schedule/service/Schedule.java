@@ -23,8 +23,10 @@
 package org.oscarehr.schedule.service;
 
 import com.google.common.collect.RangeMap;
+import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.appointment.service.Appointment;
+import org.oscarehr.common.IsPropertiesOn;
 import org.oscarehr.common.dao.MyGroupDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.ProviderSiteDao;
@@ -75,9 +77,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -123,6 +127,8 @@ public class Schedule
 	@Autowired
 	SiteDao siteDao;
 
+	private static final Logger logger = MiscUtils.getLogger();
+
 
 	public long updateSchedule(RscheduleBean scheduleRscheduleBean,
 	                           Hashtable<String, HScheduleDate> scheduleDateBean,
@@ -147,11 +153,13 @@ public class Schedule
 		if(startDateString.equals(scheduleRscheduleBean.sdate))
 		{
 			List<RSchedule> rsl = rScheduleDao.findByProviderAvailableAndDate(providerNo, "1", startDate);
+
 			for(RSchedule rs : rsl)
 			{
 				rs.setStatus(RSchedule.STATUS_DELETED);
 				rScheduleDao.merge(rs);
 			}
+
 			// I don't believe that available is any value other than 0 or 1. left this here for compatibility
 			rsl = rScheduleDao.findByProviderAvailableAndDate(providerNo, "A", startDate);
 			for(RSchedule rs : rsl)
@@ -168,13 +176,14 @@ public class Schedule
 
 		//if the schedule is the same we are editing instead
 		Long existsResult = rScheduleDao.search_rschedule_exists(providerNo, startDate, endDate);
+
+
 		boolean editingSchedule = existsResult > 0;
 
 		//save rschedule data
 		scheduleRscheduleBean.setRscheduleBean(providerNo, startDateString, endDateString, available, dayOfWeek1, dayOfWeek2, availableHour1, availableHour2, providerName);
 		Date beanStartDate = MyDateFormat.getSysDate(scheduleRscheduleBean.sdate);
 		Date beanEndDate = MyDateFormat.getSysDate(scheduleRscheduleBean.edate);
-
 
 		if(editingSchedule)
 		{
@@ -228,6 +237,18 @@ public class Schedule
 			scheduleDateDao.merge(scheduleDate);
 		}
 
+		Map<String, Site> siteNameMap = new HashMap<>();
+
+		// Precache the sites to avoid having to lookup on each iteration.
+		if (IsPropertiesOn.isMultisitesEnable())
+		{
+			List<Site> sites = siteDao.getAllSites();
+			for (Site site : sites)
+			{
+				siteNameMap.put(site.getName(), site);
+			}
+		}
+
 		for(int i = 0; i < 365 * yearLimit; i++)
 		{
 			int year = cal.get(Calendar.YEAR);
@@ -245,11 +266,15 @@ public class Schedule
 				sd.setCreator(providerName);
 				sd.setStatus(scheduleRscheduleBean.active.toCharArray()[0]);
 
-				//attempt to map to a schedule
-				Site site = siteDao.findByName(scheduleRscheduleBean.getSiteAvail(cal));
-				if (site != null)
+				if (IsPropertiesOn.isMultisitesEnable())
 				{
-					sd.setSiteId(site.getId());
+					String siteName = scheduleRscheduleBean.getSiteAvail(cal);
+
+					if (siteNameMap.containsKey(siteName))
+					{
+						Site site = siteNameMap.get(siteName);
+						sd.setSiteId(site.getId());
+					}
 				}
 
 				scheduleDateDao.persist(sd);
@@ -257,6 +282,7 @@ public class Schedule
 			if((year + "-" + MyDateFormat.getDigitalXX(month) + "-" + MyDateFormat.getDigitalXX(day)).equals(endDateString)) break;
 			cal.add(Calendar.DATE, 1);
 		}
+
 		return overLapResult;
 	}
 
@@ -893,5 +919,4 @@ public class Schedule
 		}
 		return false;
 	}
-
 }
