@@ -20,38 +20,32 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter.note;
+package org.oscarehr.demographicImport.converter.out;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.demographicImport.model.encounterNote.BaseNote;
-import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.common.model.AppointmentStatus;
 import org.springframework.stereotype.Component;
-import oscar.util.ConversionUtils;
 
 @Component
-public abstract class BaseNoteModelToExportConverter<N extends BaseNote> extends
-		AbstractModelConverter<CaseManagementNote, N>
+public class AppointmentStatusModelToExportConverter extends
+		AbstractModelConverter<AppointmentStatus, org.oscarehr.demographicImport.model.appointment.AppointmentStatus>
 {
 
 	@Override
-	public N convert(CaseManagementNote input)
+	public org.oscarehr.demographicImport.model.appointment.AppointmentStatus convert(AppointmentStatus input)
 	{
 		if(input == null)
 		{
 			return null;
 		}
+		org.oscarehr.demographicImport.model.appointment.AppointmentStatus status = new org.oscarehr.demographicImport.model.appointment.AppointmentStatus();
 
-		N exportNote = getNewNoteObject();
+		status.setId(input.getId());
+		status.setActive(input.getActive() != 0);
+		status.setEditable(input.getEditable() != 0);
+		status.setDescription(input.getDescription());
+		status.setStatusCode(input.getStatus());
 
-		exportNote.setId(String.valueOf(input.getId()));
-		exportNote.setNoteText(input.getNote());
-		exportNote.setRevisionId(input.getUuid());
-		exportNote.setObservationDate(ConversionUtils.toNullableLocalDateTime(input.getObservationDate()));
-
-		return subConvert(input, exportNote);
+		return status;
 	}
-
-	public abstract N getNewNoteObject();
-
-	public abstract N subConvert(CaseManagementNote input, N exportNote);
 }

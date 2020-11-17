@@ -20,22 +20,27 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter;
+package org.oscarehr.demographicImport.converter.out.note;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.common.model.Measurement;
-import org.oscarehr.demographicImport.model.measurement.MeasurementFactory;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MeasurementToExportConverter extends
-		AbstractModelConverter<Measurement, org.oscarehr.demographicImport.model.measurement.Measurement>
+public class EncounterNoteModelToExportConverter extends
+		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.EncounterNote>
 {
 
 	@Override
-	public org.oscarehr.demographicImport.model.measurement.Measurement convert(Measurement input)
+	public org.oscarehr.demographicImport.model.encounterNote.EncounterNote subConvert(
+			CaseManagementNote input,
+	        org.oscarehr.demographicImport.model.encounterNote.EncounterNote exportNote)
 	{
-		// TODO is the factory how we want to convert this?
-		return MeasurementFactory.getMeasurement(input);
+		return exportNote;
+	}
+
+	@Override
+	public org.oscarehr.demographicImport.model.encounterNote.EncounterNote getNewNoteObject()
+	{
+		return new org.oscarehr.demographicImport.model.encounterNote.EncounterNote();
 	}
 }

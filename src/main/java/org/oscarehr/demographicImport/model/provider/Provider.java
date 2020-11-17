@@ -69,6 +69,11 @@ public class Provider extends AbstractTransientModel
 	private LocalDateTime signedConfidentialityDateTime;
 	private Provider supervisor;
 
+	public Provider()
+	{
+		this.addressList = new ArrayList<>();
+	}
+
 	public void addAddress(Address address)
 	{
 		if(this.addressList == null)

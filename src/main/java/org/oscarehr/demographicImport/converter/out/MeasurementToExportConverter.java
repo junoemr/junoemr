@@ -20,32 +20,22 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter;
+package org.oscarehr.demographicImport.converter.out;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.common.model.AppointmentStatus;
+import org.oscarehr.common.model.Measurement;
+import org.oscarehr.demographicImport.model.measurement.MeasurementFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AppointmentStatusModelToExportConverter extends
-		AbstractModelConverter<AppointmentStatus, org.oscarehr.demographicImport.model.appointment.AppointmentStatus>
+public class MeasurementToExportConverter extends
+		AbstractModelConverter<Measurement, org.oscarehr.demographicImport.model.measurement.Measurement>
 {
 
 	@Override
-	public org.oscarehr.demographicImport.model.appointment.AppointmentStatus convert(AppointmentStatus input)
+	public org.oscarehr.demographicImport.model.measurement.Measurement convert(Measurement input)
 	{
-		if(input == null)
-		{
-			return null;
-		}
-		org.oscarehr.demographicImport.model.appointment.AppointmentStatus status = new org.oscarehr.demographicImport.model.appointment.AppointmentStatus();
-
-		status.setId(input.getId());
-		status.setActive(input.getActive() != 0);
-		status.setEditable(input.getEditable() != 0);
-		status.setDescription(input.getDescription());
-		status.setStatusCode(input.getStatus());
-
-		return status;
+		// TODO is the factory how we want to convert this?
+		return MeasurementFactory.getMeasurement(input);
 	}
 }

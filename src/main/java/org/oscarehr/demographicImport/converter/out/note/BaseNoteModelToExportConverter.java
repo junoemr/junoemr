@@ -20,27 +20,38 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter.note;
+package org.oscarehr.demographicImport.converter.out.note;
 
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.demographicImport.model.encounterNote.BaseNote;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
 @Component
-public class EncounterNoteModelToExportConverter extends
-		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.EncounterNote>
+public abstract class BaseNoteModelToExportConverter<N extends BaseNote> extends
+		AbstractModelConverter<CaseManagementNote, N>
 {
 
 	@Override
-	public org.oscarehr.demographicImport.model.encounterNote.EncounterNote subConvert(
-			CaseManagementNote input,
-	        org.oscarehr.demographicImport.model.encounterNote.EncounterNote exportNote)
+	public N convert(CaseManagementNote input)
 	{
-		return exportNote;
+		if(input == null)
+		{
+			return null;
+		}
+
+		N exportNote = getNewNoteObject();
+
+		exportNote.setId(String.valueOf(input.getId()));
+		exportNote.setNoteText(input.getNote());
+		exportNote.setRevisionId(input.getUuid());
+		exportNote.setObservationDate(ConversionUtils.toNullableLocalDateTime(input.getObservationDate()));
+
+		return subConvert(input, exportNote);
 	}
 
-	@Override
-	public org.oscarehr.demographicImport.model.encounterNote.EncounterNote getNewNoteObject()
-	{
-		return new org.oscarehr.demographicImport.model.encounterNote.EncounterNote();
-	}
+	public abstract N getNewNoteObject();
+
+	public abstract N subConvert(CaseManagementNote input, N exportNote);
 }

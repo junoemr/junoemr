@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.demographicImport.service.ImportLogger;
@@ -180,6 +181,9 @@ public class CommandLineImporter
 		}
 		finally
 		{
+			// always clear the provider cache after an import to unload resources
+			// TODO a better way to handle this? only the service should be dealing with converters
+			BaseModelToDbConverter.clearProviderCache();
 			if(ctx != null)
 			{
 				ctx.close();

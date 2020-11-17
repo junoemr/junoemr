@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter.lab;
+package org.oscarehr.demographicImport.converter.out.lab;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
@@ -28,7 +28,7 @@ import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
-import org.oscarehr.demographicImport.converter.ProviderModelToExportConverter;
+import org.oscarehr.demographicImport.converter.out.ProviderModelToExportConverter;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;

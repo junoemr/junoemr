@@ -20,25 +20,29 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter.note;
+package org.oscarehr.demographicImport.converter.out.note;
 
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.AGEATONSET;
+import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.LIFESTAGE;
+import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.RELATIONSHIP;
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.RESOLUTIONDATE;
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.STARTDATE;
+import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.TREATMENT;
 
 @Component
-public class SocialHistoryNoteModelToExportConverter extends
-		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote>
+public class FamilyHistoryNoteModelToExportConverter extends
+		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote>
 {
 
 	@Override
-	public org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote subConvert(
+	public org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote subConvert(
 			CaseManagementNote input,
-			org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote exportNote)
+			org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote exportNote)
 	{
 		for(CaseManagementNoteExt ext : input.getNoteExtensionList())
 		{
@@ -50,14 +54,29 @@ public class SocialHistoryNoteModelToExportConverter extends
 			{
 				exportNote.setResolutionDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
 			}
+			if(ext.getKey().equals(AGEATONSET))
+			{
+				exportNote.setAgeAtOnset(Long.parseLong(ext.getValue()));
+			}
+			if(ext.getKey().equals(LIFESTAGE))
+			{
+				exportNote.setLifeStage(ext.getValue());
+			}
+			if(ext.getKey().equals(TREATMENT))
+			{
+				exportNote.setTreatment(ext.getValue());
+			}
+			if(ext.getKey().equals(RELATIONSHIP))
+			{
+				exportNote.setRelationship(ext.getValue());
+			}
 		}
-
 		return exportNote;
 	}
 
 	@Override
-	public org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote getNewNoteObject()
+	public org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote getNewNoteObject()
 	{
-		return new org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote();
+		return new org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote();
 	}
 }

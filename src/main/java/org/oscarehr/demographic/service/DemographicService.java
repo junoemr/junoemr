@@ -35,7 +35,7 @@ import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.model.DemographicIntegration;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
-
+import org.oscarehr.demographicImport.converter.in.DemographicModelToDbConverter;
 import org.oscarehr.integration.service.IntegrationPushUpdateService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
@@ -87,6 +87,9 @@ public class DemographicService
 
 	@Autowired
 	private IntegrationPushUpdateService integrationPushUpdateService;
+
+	@Autowired
+	private DemographicModelToDbConverter demographicModelToDBConverter;
 
 	public enum SEARCH_MODE
 	{
@@ -332,6 +335,22 @@ public class DemographicService
 
 		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtensions);
 	}
+	public Demographic addNewDemographicRecord(String providerNoStr, org.oscarehr.demographicImport.model.demographic.Demographic demographicModel)
+	{
+		Demographic demographic = demographicModelToDBConverter.convert(demographicModel);
+		List<DemographicExt> demographicExtensions = demographic.getDemographicExtList();
+
+		DemographicCust demoCustom = null;
+		List<DemographicCust> custList = demographic.getDemographicCust();
+		if(custList != null && !custList.isEmpty())
+		{
+			// there is only 1 record expected, and if not (legacy data), should only use the latest
+			demoCustom = custList.get(0);
+		}
+
+		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtensions);
+	}
+
 	public Demographic addNewDemographicRecord(String providerNoStr, Demographic demographic,
 	                                    DemographicCust demoCustom, List<DemographicExt> demographicExtensions)
 	{

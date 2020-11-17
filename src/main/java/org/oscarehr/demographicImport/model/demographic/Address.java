@@ -50,4 +50,13 @@ public class Address extends AbstractTransientModel
 	{
 		this.setResidencyStatus(RESIDENCY_STATUS.PAST);
 	}
+
+	public boolean isCurrentAddress()
+	{
+		return this.residencyStatus.equals(RESIDENCY_STATUS.CURRENT);
+	}
+	public boolean isPastAddress()
+	{
+		return this.residencyStatus.equals(RESIDENCY_STATUS.PAST);
+	}
 }

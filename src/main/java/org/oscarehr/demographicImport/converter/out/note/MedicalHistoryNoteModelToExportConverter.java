@@ -20,28 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter.note;
+package org.oscarehr.demographicImport.converter.out.note;
 
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
-import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.LIFESTAGE;
-import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.PROBLEMDESC;
-import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.PROBLEMSTATUS;
+import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.PROCEDUREDATE;
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.RESOLUTIONDATE;
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.STARTDATE;
 
 @Component
-public class ConcernNoteModelToExportConverter extends
-		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.ConcernNote>
+public class MedicalHistoryNoteModelToExportConverter extends
+		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote>
 {
 
 	@Override
-	public org.oscarehr.demographicImport.model.encounterNote.ConcernNote subConvert(
+	public org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote subConvert(
 			CaseManagementNote input,
-			org.oscarehr.demographicImport.model.encounterNote.ConcernNote exportNote)
+			org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote exportNote)
 	{
 		for(CaseManagementNoteExt ext : input.getNoteExtensionList())
 		{
@@ -49,29 +47,23 @@ public class ConcernNoteModelToExportConverter extends
 			{
 				exportNote.setStartDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
 			}
+			if(ext.getKey().equals(PROCEDUREDATE))
+			{
+				exportNote.setProcedureDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
+			}
 			if(ext.getKey().equals(RESOLUTIONDATE))
 			{
 				exportNote.setResolutionDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
 			}
-			if(ext.getKey().equals(PROBLEMSTATUS))
-			{
-				exportNote.setProblemStatus(ext.getValue());
-			}
-			if(ext.getKey().equals(PROBLEMDESC))
-			{
-				exportNote.setProblemDescription(ext.getValue());
-			}
-			if(ext.getKey().equals(LIFESTAGE))
-			{
-				exportNote.setLifeStage(ext.getValue());
-			}
 		}
+
+
 		return exportNote;
 	}
 
 	@Override
-	public org.oscarehr.demographicImport.model.encounterNote.ConcernNote getNewNoteObject()
+	public org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote getNewNoteObject()
 	{
-		return new org.oscarehr.demographicImport.model.encounterNote.ConcernNote();
+		return new org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote();
 	}
 }

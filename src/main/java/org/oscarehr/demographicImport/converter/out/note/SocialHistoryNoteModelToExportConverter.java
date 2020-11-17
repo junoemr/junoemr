@@ -20,26 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter.note;
+package org.oscarehr.demographicImport.converter.out.note;
 
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
-import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.PROCEDUREDATE;
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.RESOLUTIONDATE;
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.STARTDATE;
 
 @Component
-public class MedicalHistoryNoteModelToExportConverter extends
-		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote>
+public class SocialHistoryNoteModelToExportConverter extends
+		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote>
 {
 
 	@Override
-	public org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote subConvert(
+	public org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote subConvert(
 			CaseManagementNote input,
-			org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote exportNote)
+			org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote exportNote)
 	{
 		for(CaseManagementNoteExt ext : input.getNoteExtensionList())
 		{
@@ -47,23 +46,18 @@ public class MedicalHistoryNoteModelToExportConverter extends
 			{
 				exportNote.setStartDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
 			}
-			if(ext.getKey().equals(PROCEDUREDATE))
-			{
-				exportNote.setProcedureDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
-			}
 			if(ext.getKey().equals(RESOLUTIONDATE))
 			{
 				exportNote.setResolutionDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
 			}
 		}
 
-
 		return exportNote;
 	}
 
 	@Override
-	public org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote getNewNoteObject()
+	public org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote getNewNoteObject()
 	{
-		return new org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote();
+		return new org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote();
 	}
 }

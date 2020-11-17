@@ -22,11 +22,12 @@
  */
 package org.oscarehr.demographicImport.service;
 
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographicImport.converter.DemographicModelToExportConverter;
+import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographicImport.converter.in.DemographicModelToDbConverter;
+import org.oscarehr.demographicImport.converter.out.DemographicModelToExportConverter;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
+
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class ImportExportService
@@ -48,7 +51,13 @@ public class ImportExportService
 	DemographicDao demographicDao;
 
 	@Autowired
+	DemographicService demographicService;
+
+	@Autowired
 	DemographicModelToExportConverter modelToExportConverter;
+
+	@Autowired
+	DemographicModelToDbConverter demographicModelToDBConverter;
 
 	public void importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,
 	                                      ImporterExporterFactory.IMPORT_SOURCE importSource,
@@ -64,7 +73,9 @@ public class ImportExportService
 
 		// TODO persist the transient object structure
 		// TODO handle demographic merging
-		logger.info(ReflectionToStringBuilder.toString(demographic));
+//		logger.info(ReflectionToStringBuilder.toString(demographic));
+
+		org.oscarehr.demographic.model.Demographic dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, demographic);
 	}
 
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.IMPORTER_TYPE importType,

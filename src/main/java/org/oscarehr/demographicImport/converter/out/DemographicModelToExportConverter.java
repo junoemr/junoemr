@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter;
+package org.oscarehr.demographicImport.converter.out;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
@@ -33,14 +33,14 @@ import org.oscarehr.common.model.Measurement;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
-import org.oscarehr.demographicImport.converter.lab.LabToExportConverter;
-import org.oscarehr.demographicImport.converter.note.ConcernNoteModelToExportConverter;
-import org.oscarehr.demographicImport.converter.note.EncounterNoteModelToExportConverter;
-import org.oscarehr.demographicImport.converter.note.FamilyHistoryNoteModelToExportConverter;
-import org.oscarehr.demographicImport.converter.note.MedicalHistoryNoteModelToExportConverter;
-import org.oscarehr.demographicImport.converter.note.ReminderNoteModelToExportConverter;
-import org.oscarehr.demographicImport.converter.note.RiskFactorNoteModelToExportConverter;
-import org.oscarehr.demographicImport.converter.note.SocialHistoryNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.out.lab.LabToExportConverter;
+import org.oscarehr.demographicImport.converter.out.note.ConcernNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.out.note.EncounterNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.out.note.FamilyHistoryNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.out.note.MedicalHistoryNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.out.note.ReminderNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.out.note.RiskFactorNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.out.note.SocialHistoryNoteModelToExportConverter;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
 import org.oscarehr.document.dao.DocumentDao;

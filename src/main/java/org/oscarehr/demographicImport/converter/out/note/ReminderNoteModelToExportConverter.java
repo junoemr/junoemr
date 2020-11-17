@@ -20,28 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter.note;
+package org.oscarehr.demographicImport.converter.out.note;
 
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
-import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.AGEATONSET;
-import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.EXPOSUREDETAIL;
-import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.LIFESTAGE;
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.RESOLUTIONDATE;
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.STARTDATE;
 
 @Component
-public class RiskFactorNoteModelToExportConverter extends
-		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote>
+public class ReminderNoteModelToExportConverter extends
+		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.ReminderNote>
 {
 
 	@Override
-	public org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote subConvert(
+	public org.oscarehr.demographicImport.model.encounterNote.ReminderNote subConvert(
 			CaseManagementNote input,
-			org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote exportNote)
+			org.oscarehr.demographicImport.model.encounterNote.ReminderNote exportNote)
 	{
 		for(CaseManagementNoteExt ext : input.getNoteExtensionList())
 		{
@@ -53,25 +50,13 @@ public class RiskFactorNoteModelToExportConverter extends
 			{
 				exportNote.setResolutionDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
 			}
-			if(ext.getKey().equals(AGEATONSET))
-			{
-				exportNote.setAgeAtOnset(Long.parseLong(ext.getValue()));
-			}
-			if(ext.getKey().equals(LIFESTAGE))
-			{
-				exportNote.setLifeStage(ext.getValue());
-			}
-			if(ext.getKey().equals(EXPOSUREDETAIL))
-			{
-				exportNote.setExposureDetails(ext.getValue());
-			}
 		}
 		return exportNote;
 	}
 
 	@Override
-	public org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote getNewNoteObject()
+	public org.oscarehr.demographicImport.model.encounterNote.ReminderNote getNewNoteObject()
 	{
-		return new org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote();
+		return new org.oscarehr.demographicImport.model.encounterNote.ReminderNote();
 	}
 }

@@ -32,6 +32,11 @@ public class Reviewer extends Provider
 {
 	private LocalDateTime reviewDateTime;
 
+	public Reviewer()
+	{
+		super();
+	}
+
 	public static Reviewer fromProvider(Provider provider)
 	{
 		Reviewer reviewer = new Reviewer();
