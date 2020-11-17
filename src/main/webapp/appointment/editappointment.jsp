@@ -838,7 +838,7 @@
 									for (LookupListItem reasonCode : reasonCodes.getItems()) {
 									    boolean isApptReason = reasonCode.getId().equals(apptReasonCode);
 									    if (reasonCode.isActive() || isApptReason) { %>
-								<option value="<%=reasonCode.getId()%>" <%=isApptReason ? "selected=\"selected\"" : "" %>><%=StringEscapeUtils.escapeHtml(reasonCode.getValue())%></option>
+								<option value="<%=reasonCode.getId()%>" <%=isApptReason ? "selected=\"selected\"" : "" %>><%=StringEscapeUtils.escapeHtml(reasonCode.getLabel())%></option>
 								<%		}
 									}
 								} else { %>
