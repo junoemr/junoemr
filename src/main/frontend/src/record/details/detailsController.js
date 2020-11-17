@@ -1007,22 +1007,26 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//HCValidation on open & save
 		controller.validateHCSave = function validateHCSave(doSave)
 		{
-			if (controller.page.demo.hin == null || controller.page.demo.hin == "")
+			if ((controller.page.demo.hin == null || controller.page.demo.hin === "") && doSave)
 			{
-				if (doSave) controller.save();
+				controller.save();
 			}
 			else
 			{
-				patientDetailStatusService.isUniqueHC(controller.page.demo.hin, controller.page.demo.demographicNo).then(
+				let hin = controller.page.demo.hin;
+				let ver = controller.page.demo.ver;
+				let hcType = controller.page.demo.hcType;
+				let demographicNo = controller.page.demo.demographicNo;
+				patientDetailStatusService.isUniqueHC(hin, ver, hcType, demographicNo).then(
 					function success(results)
 					{
 						if (!results.success)
 						{
 							alert("HIN is already in use!");
 						}
-						else if (controller.page.demo.hcType != "ON")
+						else if (hcType !== "ON" && doSave)
 						{
-							if (doSave) controller.save();
+							controller.save();
 						}
 						else
 						{
