@@ -43,7 +43,7 @@ public class GetFaxStatusResult
 	@JsonProperty("DateSent")
 	private String dateSent;
 	@JsonProperty("EpochTime")
-	private Long epochTime;
+	private String epochTime;
 	@JsonProperty("ToFaxNumber")
 	private String toFaxNumber;
 	@JsonProperty("Pages")
@@ -112,12 +112,12 @@ public class GetFaxStatusResult
 		this.dateSent = dateSent;
 	}
 
-	public Long getEpochTime()
+	public String getEpochTime()
 	{
 		return epochTime;
 	}
 
-	public void setEpochTime(Long epochTime)
+	public void setEpochTime(String epochTime)
 	{
 		this.epochTime = epochTime;
 	}
