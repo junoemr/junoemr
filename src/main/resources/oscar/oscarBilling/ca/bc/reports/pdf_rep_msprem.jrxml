@@ -13,9 +13,8 @@
 	</parameter>
 	<parameter name="payeeno" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="criteria" class="java.lang.String" isForPrompting="false"/>
-	<field name="first_name" class="java.lang.String"/>
-	<field name="last_name" class="java.lang.String"/>
-	<field name="provider_no" class="java.lang.String"/>
+    <field name="first_name" class="java.lang.String"/>
+    <field name="last_name" class="java.lang.String"/>
 	<field name="t_practitionerno" class="java.lang.String"/>
 	<field name="t_s00type" class="java.lang.String"/>
 	<field name="t_servicedate" class="java.lang.String"/>
@@ -84,7 +83,7 @@
                     <textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
                         <paragraph lineSpacing="Single"/>
                     </textElement>
-                    <textFieldExpression><![CDATA["Total for " +$F{first_name} + " " + $F{last_name}+ "(" + $F{provider_no} + ")" +" : " + NumberFormat.getCurrencyInstance().format($V{amtTotal})]]></textFieldExpression>
+                    <textFieldExpression><![CDATA["Total for " +$F{first_name} + " " + $F{last_name}+ "(" + $F{t_practitionerno} + ")" + " : " + NumberFormat.getCurrencyInstance().format($V{amtTotal})]]></textFieldExpression>
                 </textField>
             </band>
 		</groupFooter>
@@ -308,7 +307,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None">
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Provider]]></text>
+				<text><![CDATA[Practitioner]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -316,13 +315,14 @@
 		<band height="20" splitType="Prevent">
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 				<reportElement key="textField" mode="Transparent" x="46" y="0" width="42" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
+                <box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
+                    <font size="10"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{t_s00type}]]></textFieldExpression>
@@ -336,6 +336,7 @@
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
+                    <font size="10"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new SimpleDateFormat("yyyyMMdd").parse($F{t_payment})]]></textFieldExpression>
@@ -349,6 +350,7 @@
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
+                    <font size="10"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{t_servicedate}.equals("")?null:new SimpleDateFormat("yyyyMMdd").parse($F{t_servicedate})]]></textFieldExpression>
@@ -362,6 +364,7 @@
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
+                    <font size="10"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{billing_code}]]></textFieldExpression>
@@ -375,9 +378,10 @@
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
+                    <font size="10"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{demographic_name} + "(" + $F{demographic_no} + ")"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{demographic_name} + " (" + $F{demographic_no} + ")"]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 				<reportElement key="textField" mode="Transparent" x="187" y="0" width="43" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
@@ -388,7 +392,8 @@
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
-					<paragraph lineSpacing="Single"/>
+                    <font size="10"/>
+                    <paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{t_datacenter}]]></textFieldExpression>
 			</textField>
@@ -401,6 +406,7 @@
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
+                    <font size="10"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{t_dataseq}]]></textFieldExpression>
@@ -414,6 +420,7 @@
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None">
+                    <font size="10"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[NumberFormat.getCurrencyInstance().format(new Double(oscar.oscarBilling.ca.bc.MSP.MSPReconcile.convCurValue($F{t_paidamt})))]]></textFieldExpression>
@@ -427,7 +434,8 @@
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
-					<paragraph lineSpacing="Single"/>
+                    <font size="10"/>
+                    <paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{t_exp1}]]></textFieldExpression>
 			</textField>
@@ -440,9 +448,10 @@
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
+                    <font size="10"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[String.valueOf($F{first_name}).substring(0,1) +  String.valueOf($F{last_name}).substring(0,1)+ "(provider_no:" + String.valueOf($F{provider_no}) + ")"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[String.valueOf($F{t_practitionerno})]]></textFieldExpression>
 
 			</textField>
 		</band>
