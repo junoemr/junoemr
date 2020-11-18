@@ -1141,6 +1141,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"AND a.appointmentDate BETWEEN :startDate AND CURDATE()";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("demographicNo", demographicNo);
+		// JPA itself doesn't allow for DATE_SUB, otherwise we could do DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
 		Calendar lastYear = Calendar.getInstance();
 		lastYear.add(Calendar.YEAR, -1);
 		Date previousYear = lastYear.getTime();

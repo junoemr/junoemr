@@ -382,7 +382,8 @@ public class CaseloadContentAction extends DispatchAction {
 				break;
 			case Lab:
 			case Doc:
-				clSortParams = new String[] { curUser_no };
+				clSortParams = new String[1];
+				clSortParams[0] = curUser_no;
 				break;
 			case BMI:
 			case BP:
@@ -396,12 +397,16 @@ public class CaseloadContentAction extends DispatchAction {
 			case TCHD:
 			case EGFR:
 			case EYEE:
-				clSortParams = new String[] { caseloadCategory.getLabel(), caseloadCategory.getLabel() };
+				clSortParams = new String[2];
+				clSortParams[0] = caseloadCategory.getLabel();
+				clSortParams[1] = caseloadCategory.getLabel();
 				break;
 			case LastEncounterDate:
 			case LastEncounterType:
-				clSortParams = null;
-				break;
+				clSortParams = new String[2];
+				clSortParams[0] = caseloadCategory.getLabel();
+				clSortParams[1] = caseloadCategory.getQuery();
+ 				break;
 		}
 
 		List<Integer> demoSearchResult = caseloadDao.getCaseloadDemographicSet(clSearchQuery, clSearchParams, clSortParams, caseloadCategory, sortAscending ? "ASC" : "DESC", caseloadPage, caseloadPageSize);
