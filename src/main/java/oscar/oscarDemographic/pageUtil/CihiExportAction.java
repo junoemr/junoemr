@@ -695,7 +695,7 @@ public class CihiExportAction extends DispatchAction {
         	xmlAllergies.setSeverity(cdsDtCihi.AdverseReactionSeverity.Enum.forString(severity[index]));
         	date = allergy.getStartDate();
         	if( date != null ) {
-        		Util.putPartialDate(xmlAllergies.addNewStartDate(), date, PartialDate.ALLERGIES, allergy.getAllergyId(), PartialDate.ALLERGIES_STARTDATE);
+        		Util.putPartialDate(xmlAllergies.addNewStartDate(), date, PartialDate.TABLE_ALLERGIES, allergy.getAllergyId(), PartialDate.ALLERGIES_STARTDATE);
         	}
         }
 	}
@@ -939,7 +939,7 @@ public class CihiExportAction extends DispatchAction {
 
 			Date writtenDate = pa[p].getWrittenDate();
 			if (writtenDate!=null) {
-	        	String dateFormat = partialDateDao.getFormat(PartialDate.DRUGS, pa[p].getDrugId(), PartialDate.DRUGS_WRITTENDATE);
+	        	String dateFormat = partialDateDao.getFormat(PartialDate.TABLE_DRUGS, pa[p].getDrugId(), PartialDate.DRUGS_WRITTENDATE);
 	        	Util.putPartialDate(medications.addNewPrescriptionWrittenDate(), writtenDate, dateFormat);
 			}
 

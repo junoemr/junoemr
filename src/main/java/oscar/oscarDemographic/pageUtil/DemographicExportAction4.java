@@ -1109,7 +1109,7 @@ public class DemographicExportAction4 extends Action {
 									if (alr.getSeverity() != null) aSummary = Util.addSummary(aSummary, "Adverse Reaction Severity", alr.getSeverity().toString());
 								}
 								if (allergy.getStartDate() != null) {
-									dateFormat = partialDateDao.getFormat(PartialDate.ALLERGIES, allergies[j].getAllergyId(), PartialDate.ALLERGIES_STARTDATE);
+									dateFormat = partialDateDao.getFormat(PartialDate.TABLE_ALLERGIES, allergies[j].getAllergyId(), PartialDate.ALLERGIES_STARTDATE);
 									Util.putPartialDate(alr.addNewStartDate(), allergy.getStartDate(), dateFormat);
 									aSummary = Util.addSummary(aSummary, "Start Date", partialDateDao.getDatePartial(allergy.getStartDate(), dateFormat));
 								}
@@ -1119,7 +1119,7 @@ public class DemographicExportAction4 extends Action {
 								}
 
 								if (allergies[j].getEntryDate() != null) {
-									dateFormat = partialDateDao.getFormat(PartialDate.ALLERGIES, allergies[j].getAllergyId(), PartialDate.ALLERGIES_ENTRYDATE);
+									dateFormat = partialDateDao.getFormat(PartialDate.TABLE_ALLERGIES, allergies[j].getAllergyId(), PartialDate.ALLERGIES_ENTRYDATE);
 									Util.putPartialDate(alr.addNewRecordedDate(), allergies[j].getEntryDate(), dateFormat);
 									aSummary = Util.addSummary(aSummary, "Recorded Date", partialDateDao.getDatePartial(allergies[j].getEntryDate(), dateFormat));
 								}
@@ -1259,7 +1259,7 @@ public class DemographicExportAction4 extends Action {
 								MedicationsAndTreatments medi = patientRec.addNewMedicationsAndTreatments();
 								String mSummary = "";
 								if (arr[p].getWrittenDate() != null) {
-									String dateFormat = partialDateDao.getFormat(PartialDate.DRUGS, arr[p].getDrugId(), PartialDate.DRUGS_WRITTENDATE);
+									String dateFormat = partialDateDao.getFormat(PartialDate.TABLE_DRUGS, arr[p].getDrugId(), PartialDate.DRUGS_WRITTENDATE);
 									Util.putPartialDate(medi.addNewPrescriptionWrittenDate(), arr[p].getWrittenDate(), dateFormat);
 									mSummary = Util.addSummary("Prescription Written Date", partialDateDao.getDatePartial(arr[p].getWrittenDate(), dateFormat));
 								}

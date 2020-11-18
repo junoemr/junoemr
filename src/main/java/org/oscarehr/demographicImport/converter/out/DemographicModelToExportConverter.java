@@ -23,6 +23,8 @@
 package org.oscarehr.demographicImport.converter.out;
 
 import org.apache.commons.lang3.StringUtils;
+import org.oscarehr.allergy.dao.AllergyDao;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.MeasurementDao;
@@ -64,6 +66,12 @@ public class DemographicModelToExportConverter extends
 
 	@Autowired
 	private AppointmentModelToExportConverter appointmentConverter;
+
+	@Autowired
+	private AllergyDao allergyDao;
+
+	@Autowired
+	private AllergyDbToModelConverter allergyDbToModelConverter;
 
 	@Autowired
 	private CaseManagementNoteDao caseManagementNoteDao;
@@ -184,6 +192,9 @@ public class DemographicModelToExportConverter extends
 
 		List<Document> documents = documentDao.findByDemographicId(String.valueOf(input.getDemographicId()));
 		exportDemographic.setDocumentList(documentModelToExportConverter.convert(documents));
+
+		List<Allergy> allergies = allergyDao.findActiveAllergies(input.getDemographicId());
+		exportDemographic.setAllergyList(allergyDbToModelConverter.convert(allergies));
 
 		return exportDemographic;
 	}

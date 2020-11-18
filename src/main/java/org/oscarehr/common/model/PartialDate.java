@@ -71,12 +71,13 @@ public class PartialDate extends AbstractModel<Integer> implements Serializable 
 	@Column(name = "format")
 	private String format = null;
 	  
-	public static final String YEARONLY = "YYYY";
-	public static final String YEARMONTH = "YYYY-MM";
+	public static final String FORMAT_YEAR_ONLY = "YYYY";
+	public static final String FORMAT_YEAR_MONTH = "YYYY-MM";
+	public static final String FORMAT_FULL_DATE = "yyyy-MM-dd";
 	
-	public static final Integer ALLERGIES = 1;
-	public static final Integer DRUGS = 2;
-	public static final Integer DXRESEARCH = 3;
+	public static final Integer TABLE_ALLERGIES = 1;
+	public static final Integer TABLE_DRUGS = 2;
+	public static final Integer TABLE_DXRESEARCH = 3;
 	
 	public static final Integer ALLERGIES_STARTDATE = 1;
 	public static final Integer ALLERGIES_ENTRYDATE = 2;

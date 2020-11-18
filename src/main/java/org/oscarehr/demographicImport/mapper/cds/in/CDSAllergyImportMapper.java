@@ -23,7 +23,7 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.AllergiesAndAdverseReactions;
-import org.oscarehr.demographicImport.model.Allergy;
+import org.oscarehr.demographicImport.model.allergy.Allergy;
 
 public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAndAdverseReactions, Allergy>
 {

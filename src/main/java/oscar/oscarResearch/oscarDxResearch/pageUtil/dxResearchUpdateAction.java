@@ -65,7 +65,7 @@ public class dxResearchUpdateAction extends Action {
 		String startDate = request.getParameter("startdate");
 		String selectedQuickList = request.getParameter("quickList");
 
-		partialDateDao.setPartialDate(startDate, PartialDate.DXRESEARCH, Integer.valueOf(did), PartialDate.DXRESEARCH_STARTDATE);
+		partialDateDao.setPartialDate(startDate, PartialDate.TABLE_DXRESEARCH, Integer.valueOf(did), PartialDate.DXRESEARCH_STARTDATE);
 		startDate = partialDateDao.getFullDate(startDate);
 
 		DxresearchDAO dao = SpringUtils.getBean(DxresearchDAO.class);

@@ -22,8 +22,6 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.apache.commons.lang3.EnumUtils;
-import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.service.ExportPreferences;
@@ -39,15 +37,6 @@ public abstract class AbstractCDSNoteExportMapper<I, E> extends AbstractCDSExpor
 	public AbstractCDSNoteExportMapper(ExportPreferences exportPreferences)
 	{
 		super(exportPreferences);
-	}
-
-	protected LifeStage getLifeStage(String lifeStage)
-	{
-		if(EnumUtils.isValidEnum(LifeStage.class, lifeStage))
-		{
-			return LifeStage.fromValue(lifeStage);
-		}
-		return null;
 	}
 
 	protected BigInteger getAgeAtOnset(Long onsetAge)

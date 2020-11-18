@@ -20,11 +20,31 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model;
+package org.oscarehr.demographicImport.model.allergy;
 
 import lombok.Data;
+import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.common.PartialDate;
+import org.oscarehr.demographicImport.model.provider.Provider;
+
+import java.time.LocalDate;
 
 @Data
 public class Allergy extends AbstractTransientModel
 {
+	private Integer id;
+	private String description;
+	private String reaction;
+	private String typeCode;
+	private Long ageOfOnset;
+	private String lifeStage;
+	private String severityOfReaction;
+	private String onsetOfReaction;
+	private String drugIdentificationNumber;
+
+	private LocalDate entryDate;
+	private PartialDate startDate;
+
+	private Provider provider;
+	private String annotation;
 }

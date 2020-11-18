@@ -1,0 +1,113 @@
+/**
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
+ */
+package org.oscarehr.demographicImport.model.common;
+
+import lombok.Data;
+import org.oscarehr.demographicImport.model.AbstractTransientModel;
+
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
+
+import static org.oscarehr.common.model.PartialDate.FORMAT_FULL_DATE;
+import static org.oscarehr.common.model.PartialDate.FORMAT_YEAR_MONTH;
+import static org.oscarehr.common.model.PartialDate.FORMAT_YEAR_ONLY;
+
+@Data
+public class PartialDate extends AbstractTransientModel
+{
+	private Year year;
+	private Month month;
+	private Integer day;
+
+	public PartialDate()
+	{
+		this(null, null, null);
+	}
+	public PartialDate(Integer year)
+	{
+		this(year, null, null);
+	}
+	public PartialDate(Integer year, Integer month)
+	{
+		this(year, month, null);
+	}
+	public PartialDate(Integer year, Integer month, Integer day)
+	{
+		this.year = (year != null) ? Year.of(year) : null;
+		this.month = (month != null) ? Month.of(month) : null;
+		this.day = day;
+	}
+
+	public boolean isFullDate()
+	{
+		return this.day != null && this.month != null && this.year != null;
+	}
+	public boolean isYearMonth()
+	{
+		return this.day == null && this.month != null && this.year != null;
+	}
+	public boolean isYearOnly()
+	{
+		return this.day == null && this.month == null && this.year != null;
+	}
+
+	/**
+	 * get a localDate representation of the partial date.
+	 * if the date is partial, missing day/month values will be set to 01
+	 * @return a date representation of the partial date. with default values as necessary
+	 */
+	public LocalDate toLocalDate()
+	{
+		if(this.year == null)
+		{
+			return null;
+		}
+
+		int month = (this.month == null) ? 1 : this.month.getValue();
+		int day = (this.day == null) ? 1 : this.day;
+		return LocalDate.of(this.year.getValue(), month, day);
+	}
+
+	public static PartialDate from(LocalDate localDate, org.oscarehr.common.model.PartialDate dbPartialDate)
+	{
+		PartialDate partial = null;
+		if(localDate != null)
+		{
+			if(dbPartialDate == null || FORMAT_FULL_DATE.equals(dbPartialDate.getFormat()))
+			{
+				partial = new PartialDate(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
+			}
+			else if(FORMAT_YEAR_MONTH.equals(dbPartialDate.getFormat()))
+			{
+				partial = new PartialDate(localDate.getYear(), localDate.getMonthValue());
+			}
+			else if(FORMAT_YEAR_ONLY.equals(dbPartialDate.getFormat()))
+			{
+				partial = new PartialDate(localDate.getYear());
+			}
+		}
+
+		return partial;
+	}
+}

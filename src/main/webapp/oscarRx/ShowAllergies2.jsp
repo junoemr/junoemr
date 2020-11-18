@@ -840,8 +840,8 @@
 
 													if (!filterOut)
 													{
-														String entryDate = partialDateDao.getDatePartial(allergy.getEntryDate(), PartialDate.ALLERGIES, allergy.getAllergyId(), PartialDate.ALLERGIES_ENTRYDATE);
-														String startDate = partialDateDao.getDatePartial(allergy.getStartDate(), PartialDate.ALLERGIES, allergy.getAllergyId(), PartialDate.ALLERGIES_STARTDATE);
+														String entryDate = partialDateDao.getDatePartial(allergy.getEntryDate(), PartialDate.TABLE_ALLERGIES, allergy.getAllergyId(), PartialDate.ALLERGIES_ENTRYDATE);
+														String startDate = partialDateDao.getDatePartial(allergy.getStartDate(), PartialDate.TABLE_ALLERGIES, allergy.getAllergyId(), PartialDate.ALLERGIES_STARTDATE);
 											%>
 											<tr bgcolor="<%=trColour%>" id="allergy_<%= allergy.getAllergyId() %>" >
 												<td><%=labelStatus%></td>

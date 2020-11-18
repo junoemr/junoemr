@@ -1228,7 +1228,7 @@ public final class RxWriteScriptAction extends DispatchAction {
 
 				//write partial date
 				if (StringUtils.filled(rx.getWrittenDateFormat()))
-					partialDateDao.setPartialDate(PartialDate.DRUGS, rx.getDrugId(), PartialDate.DRUGS_WRITTENDATE, rx.getWrittenDateFormat());
+					partialDateDao.setPartialDate(PartialDate.TABLE_DRUGS, rx.getDrugId(), PartialDate.DRUGS_WRITTENDATE, rx.getWrittenDateFormat());
 			} catch (Exception e) {
 				logger.error("Error", e);
 			}

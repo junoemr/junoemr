@@ -77,10 +77,10 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 	public String getDatePartial(String dateString, String format) {
 		if (dateString==null || dateString.length()<10) return dateString;
 		
-		if (PartialDate.YEARONLY.equals(format)) {
+		if (PartialDate.FORMAT_YEAR_ONLY.equals(format)) {
 			dateString = dateString.substring(0,4);
 		}
-		else if (PartialDate.YEARMONTH.equals(format)) {
+		else if (PartialDate.FORMAT_YEAR_MONTH.equals(format)) {
 			dateString = dateString.substring(0,7);
 		}
 		return dateString;
@@ -115,12 +115,12 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 
 		dateValue = dateValue.trim();
 		dateValue = dateValue.replace("/", "-");
-		if (dateValue.length()==4 && NumberUtils.isDigits(dateValue)) return PartialDate.YEARONLY;
+		if (dateValue.length()==4 && NumberUtils.isDigits(dateValue)) return PartialDate.FORMAT_YEAR_ONLY;
 
 		String[] dateParts = dateValue.split("-");
 		if (dateParts.length==2 && NumberUtils.isDigits(dateParts[0]) && NumberUtils.isDigits(dateParts[1])) {
 			if (dateParts[0].length()==4 && dateParts[1].length()>=1 && dateParts[1].length()<=2)
-					return PartialDate.YEARMONTH;
+					return PartialDate.FORMAT_YEAR_MONTH;
 		}
 		return null;
     }
@@ -128,8 +128,8 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 	public String getFullDate(String partialDate) {
 		String format = getFormat(partialDate);
 		
-		if (PartialDate.YEARONLY.equals(format)) partialDate += "-01-01";
-		else if (PartialDate.YEARMONTH.equals(format)) partialDate += "-01";
+		if (PartialDate.FORMAT_YEAR_ONLY.equals(format)) partialDate += "-01-01";
+		else if (PartialDate.FORMAT_YEAR_MONTH.equals(format)) partialDate += "-01";
 		
 		return partialDate;
 	}

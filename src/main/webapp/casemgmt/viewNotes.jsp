@@ -212,9 +212,9 @@
             String val = null;
 
             if (type!=null && !type.trim().equals("")) {
-                if (type.equals(PartialDate.YEARONLY))
+                if (type.equals(PartialDate.FORMAT_YEAR_ONLY))
                     val = oscar.util.UtilDateUtilities.DateToString(cme.getDateValue(),"yyyy");
-                else if (type.equals(PartialDate.YEARMONTH))
+                else if (type.equals(PartialDate.FORMAT_YEAR_MONTH))
                     val = oscar.util.UtilDateUtilities.DateToString(cme.getDateValue(),"yyyy-MM");
                 else val = oscar.util.UtilDateUtilities.DateToString(cme.getDateValue(),"yyyy-MM-dd");
             } else {

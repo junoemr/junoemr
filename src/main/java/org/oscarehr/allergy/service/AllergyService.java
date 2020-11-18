@@ -51,7 +51,7 @@ public class AllergyService
 		}
 
 		allergyDao.persist(allergy);
-		partialDateDao.setPartialDate(PartialDate.ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
+		partialDateDao.setPartialDate(PartialDate.TABLE_ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
 
 		return allergy;
 	}
@@ -64,6 +64,6 @@ public class AllergyService
 	public void update(Allergy allergy)
 	{
 		allergyDao.merge(allergy);
-		partialDateDao.setPartialDate(PartialDate.ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
+		partialDateDao.setPartialDate(PartialDate.TABLE_ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
 	}
 }

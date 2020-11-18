@@ -1361,8 +1361,8 @@ import java.util.zip.ZipInputStream;
                     addOneEntry(ALLERGY);
 
                     //write partial dates
-                    if (entryDateFormat!=null) partialDateDao.setPartialDate(PartialDate.ALLERGIES, allergyId.intValue(), PartialDate.ALLERGIES_ENTRYDATE, entryDateFormat);
-                    if (startDateFormat!=null) partialDateDao.setPartialDate(PartialDate.ALLERGIES, allergyId.intValue(), PartialDate.ALLERGIES_STARTDATE, startDateFormat);
+                    if (entryDateFormat!=null) partialDateDao.setPartialDate(PartialDate.TABLE_ALLERGIES, allergyId.intValue(), PartialDate.ALLERGIES_ENTRYDATE, entryDateFormat);
+                    if (startDateFormat!=null) partialDateDao.setPartialDate(PartialDate.TABLE_ALLERGIES, allergyId.intValue(), PartialDate.ALLERGIES_STARTDATE, startDateFormat);
 
                     //annotation
                     String note = StringUtils.noNull(aaReactArray[i].getNotes());
@@ -1523,7 +1523,7 @@ import java.util.zip.ZipInputStream;
                     addOneEntry(MEDICATION);
 
                     //partial date
-                    partialDateDao.setPartialDate(PartialDate.DRUGS, drug.getId(), PartialDate.DRUGS_WRITTENDATE, writtenDateFormat);
+                    partialDateDao.setPartialDate(PartialDate.TABLE_DRUGS, drug.getId(), PartialDate.DRUGS_WRITTENDATE, writtenDateFormat);
 
                     //annotation
                     CaseManagementNote cmNote = prepareCMNote(programId,null);
@@ -2439,16 +2439,16 @@ import java.util.zip.ZipInputStream;
     String dateFPGetPartial(cdsDt.DateFullOrPartial dfp) {
 		if (dfp==null) return "";
 
-		if (dfp.getYearMonth()!=null) return PartialDate.YEARMONTH;
-		else if (dfp.getYearOnly()!=null) return PartialDate.YEARONLY;
+		if (dfp.getYearMonth()!=null) return PartialDate.FORMAT_YEAR_MONTH;
+		else if (dfp.getYearOnly()!=null) return PartialDate.FORMAT_YEAR_ONLY;
 		else return "";
     }
 
     String dateFPGetPartial(cdsDt.DateTimeFullOrPartial dfp) {
 		if (dfp==null) return "";
 
-		if (dfp.getYearMonth()!=null) return PartialDate.YEARMONTH;
-		else if (dfp.getYearOnly()!=null) return PartialDate.YEARONLY;
+		if (dfp.getYearMonth()!=null) return PartialDate.FORMAT_YEAR_MONTH;
+		else if (dfp.getYearOnly()!=null) return PartialDate.FORMAT_YEAR_ONLY;
 		else return "";
     }
 

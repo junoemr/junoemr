@@ -91,12 +91,12 @@ public final class RxAddAllergyAction extends Action
 		else if(startDate.length() >= 6 && getCharOccur(startDate, '-') >= 1)
 		{
 			allergy.setStartDate(ConversionUtils.fromDateString(startDate, "yyyy-MM"));
-			allergy.setStartDateFormat(PartialDate.YEARMONTH);
+			allergy.setStartDateFormat(PartialDate.FORMAT_YEAR_MONTH);
 		}
 		else if(startDate.length() >= 4)
 		{
 			allergy.setStartDate(ConversionUtils.fromDateString(startDate, "yyyy"));
-			allergy.setStartDateFormat(PartialDate.YEARONLY);
+			allergy.setStartDateFormat(PartialDate.FORMAT_YEAR_ONLY);
 		}
 		allergy.setAgeOfOnset(ageOfOnset);
 		allergy.setSeverityOfReaction(severityOfReaction);

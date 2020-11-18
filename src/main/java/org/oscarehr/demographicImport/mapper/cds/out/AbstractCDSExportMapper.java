@@ -22,13 +22,16 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
+import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
 import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.mapper.AbstractExportMapper;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
+import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.service.ExportPreferences;
 import oscar.util.ConversionUtils;
@@ -97,6 +100,12 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		return this.toNullableDateTimeFullOrPartial(localDateTime, null);
 	}
 
+	protected DateTimeFullOrPartial toNullableDateTimeFullOrPartial(LocalDate localDate)
+	{
+		if(localDate == null) return null;
+		return this.toNullableDateTimeFullOrPartial(localDate.atStartOfDay(), null);
+	}
+
 	protected DateFullOrPartial toNullableDateFullOrPartial(LocalDate localDate, LocalDate defaultDate)
 	{
 		DateFullOrPartial dateFullOrPartial = null;
@@ -117,6 +126,28 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		return this.toNullableDateFullOrPartial(localDate, null);
 	}
 
+	protected DateFullOrPartial toNullableDateFullOrPartial(PartialDate partialDate)
+	{
+		if(partialDate == null) return null;
+
+		DateFullOrPartial dateFullOrPartial = objectFactory.createDateFullOrPartial();
+		XMLGregorianCalendar calendar = ConversionUtils.toNullableXmlGregorianCalendar(partialDate.toLocalDate());
+
+		if(partialDate.isFullDate())
+		{
+			dateFullOrPartial.setFullDate(calendar);
+		}
+		else if(partialDate.isYearMonth())
+		{
+			dateFullOrPartial.setYearMonth(calendar);
+		}
+		else if(partialDate.isYearOnly())
+		{
+			dateFullOrPartial.setYearOnly(calendar);
+		}
+		return dateFullOrPartial;
+	}
+
 	protected PersonNameSimple toPersonNameSimple(Provider provider)
 	{
 		if(provider == null)
@@ -127,5 +158,14 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		personNameSimple.setFirstName(provider.getFirstName());
 		personNameSimple.setLastName(provider.getLastName());
 		return personNameSimple;
+	}
+
+	protected LifeStage getLifeStage(String lifeStage)
+	{
+		if(EnumUtils.isValidEnum(LifeStage.class, lifeStage))
+		{
+			return LifeStage.fromValue(lifeStage);
+		}
+		return null;
 	}
 }

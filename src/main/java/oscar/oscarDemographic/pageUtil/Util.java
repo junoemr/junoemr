@@ -596,16 +596,16 @@ public class Util {
 
     static public void putPartialDate(cdsDt.DateFullOrPartial dfp, Date dateValue, String format) {
         if (dateValue!=null) {
-            if (PartialDate.YEARONLY.equals(format)) dfp.setYearOnly(calDate(dateValue));
-            else if (PartialDate.YEARMONTH.equals(format)) dfp.setYearMonth(calDate(dateValue));
+            if (PartialDate.FORMAT_YEAR_ONLY.equals(format)) dfp.setYearOnly(calDate(dateValue));
+            else if (PartialDate.FORMAT_YEAR_MONTH.equals(format)) dfp.setYearMonth(calDate(dateValue));
             else dfp.setFullDate(calDate(dateValue));
         }
     }
 
     static public void putPartialDate(cdsDt.DateTimeFullOrPartial dfp, Date dateValue, String format) {
         if (dateValue!=null) {
-            if (PartialDate.YEARONLY.equals(format)) dfp.setYearOnly(calDate(dateValue));
-            else if (PartialDate.YEARMONTH.equals(format)) dfp.setYearMonth(calDate(dateValue));
+            if (PartialDate.FORMAT_YEAR_ONLY.equals(format)) dfp.setYearOnly(calDate(dateValue));
+            else if (PartialDate.FORMAT_YEAR_MONTH.equals(format)) dfp.setYearMonth(calDate(dateValue));
             else dfp.setFullDate(calDate(dateValue));
         }
     }
@@ -623,8 +623,8 @@ public class Util {
 
     static public void putPartialDate(cdsDtCihi.DateFullOrPartial dfp, Date dateValue, String format) {
         if (dateValue!=null) {
-            if (PartialDate.YEARONLY.equals(format)) dfp.setYearOnly(calDate(dateValue));
-            else if (PartialDate.YEARMONTH.equals(format)) dfp.setYearMonth(calDate(dateValue));
+            if (PartialDate.FORMAT_YEAR_ONLY.equals(format)) dfp.setYearOnly(calDate(dateValue));
+            else if (PartialDate.FORMAT_YEAR_MONTH.equals(format)) dfp.setYearMonth(calDate(dateValue));
             else dfp.setFullDate(calDate(dateValue));
         }
     }
@@ -634,9 +634,9 @@ public class Util {
         String val = null;
 
         if (StringUtils.filled(type)) {
-            if (type.equals(PartialDate.YEARONLY))
+            if (type.equals(PartialDate.FORMAT_YEAR_ONLY))
                 val = oscar.util.UtilDateUtilities.DateToString(cme.getDateValue(),"yyyy");
-            else if (type.equals(PartialDate.YEARMONTH))
+            else if (type.equals(PartialDate.FORMAT_YEAR_MONTH))
                 val = oscar.util.UtilDateUtilities.DateToString(cme.getDateValue(),"yyyy-MM");
             else val = oscar.util.UtilDateUtilities.DateToString(cme.getDateValue(),"yyyy-MM-dd");
         } else {

@@ -84,7 +84,7 @@
 			if (allergyToArchive.getStartDate() != null)
 			{
 				startDate = partialDateDao.getDatePartial(allergyToArchive.getStartDate(),
-						PartialDate.ALLERGIES,
+						PartialDate.TABLE_ALLERGIES,
 						allergyToArchive.getAllergyId(),
 						PartialDate.ALLERGIES_STARTDATE);
 			}

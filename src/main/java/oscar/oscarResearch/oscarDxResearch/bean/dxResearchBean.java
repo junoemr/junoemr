@@ -93,7 +93,7 @@ public class dxResearchBean{
        }
        
        public String getStart_date(){
-           return partialDateDao.getDatePartial(start_date, PartialDate.DXRESEARCH, Integer.valueOf(dxResearchNo), PartialDate.DXRESEARCH_STARTDATE);
+           return partialDateDao.getDatePartial(start_date, PartialDate.TABLE_DXRESEARCH, Integer.valueOf(dxResearchNo), PartialDate.DXRESEARCH_STARTDATE);
        }       
        public void setStart_date(String start_date){
            this.start_date = start_date;

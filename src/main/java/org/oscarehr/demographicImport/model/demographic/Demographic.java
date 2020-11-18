@@ -25,7 +25,7 @@ package org.oscarehr.demographicImport.model.demographic;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
-import org.oscarehr.demographicImport.model.Allergy;
+import org.oscarehr.demographicImport.model.allergy.Allergy;
 import org.oscarehr.demographicImport.model.Immunization;
 import org.oscarehr.demographicImport.model.Medication;
 import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
