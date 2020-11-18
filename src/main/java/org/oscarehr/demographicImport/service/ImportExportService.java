@@ -22,22 +22,35 @@
  */
 package org.oscarehr.demographicImport.service;
 
+import ca.uhn.hl7v2.HL7Exception;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.hl7.copd.writer.JunoGenericImportLabWriter;
+import org.oscarehr.common.hl7.writer.HL7LabWriter;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.service.DemographicService;
-import org.oscarehr.demographicImport.converter.in.DemographicModelToDbConverter;
+import org.oscarehr.demographicImport.converter.in.ReviewerModelToDbConverter;
 import org.oscarehr.demographicImport.converter.out.DemographicModelToExportConverter;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.lab.Lab;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.labs.service.LabService;
+import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.oscarLab.ca.all.parsers.Factory;
+import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
 
@@ -48,35 +61,22 @@ public class ImportExportService
 	private static final Logger logger = Logger.getLogger(ImportExportService.class);
 
 	@Autowired
-	DemographicDao demographicDao;
+	private DemographicDao demographicDao;
 
 	@Autowired
-	DemographicService demographicService;
+	private DemographicService demographicService;
 
 	@Autowired
-	DemographicModelToExportConverter modelToExportConverter;
+	private DemographicModelToExportConverter modelToExportConverter;
 
 	@Autowired
-	DemographicModelToDbConverter demographicModelToDBConverter;
+	private EncounterNoteService encounterNoteService;
 
-	public void importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,
-	                                      ImporterExporterFactory.IMPORT_SOURCE importSource,
-	                                      ImportLogger importLogger,
-	                                      GenericFile importFile,
-	                                      String documentLocation,
-	                                      boolean skipMissingDocs,
-	                                      boolean mergeDemographics) throws IOException, InvalidImportFileException
-	{
-		DemographicImporter importer = ImporterExporterFactory.getImporter(importType, importSource, importLogger, documentLocation, skipMissingDocs);
-		importer.verifyFileFormat(importFile);
-		Demographic demographic = importer.importDemographic(importFile);
+	@Autowired
+	private LabService labService;
 
-		// TODO persist the transient object structure
-		// TODO handle demographic merging
-//		logger.info(ReflectionToStringBuilder.toString(demographic));
-
-		org.oscarehr.demographic.model.Demographic dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, demographic);
-	}
+	@Autowired
+	private ReviewerModelToDbConverter reviewerModelToDbConverter;
 
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.IMPORTER_TYPE importType,
 	                                            List<Demographic> demographicList,
@@ -110,5 +110,67 @@ public class ImportExportService
 		}
 
 		return exportDemographics(importType, demographicList, preferences);
+	}
+
+	public void importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,
+	                              ImporterExporterFactory.IMPORT_SOURCE importSource,
+	                              ImportLogger importLogger,
+	                              GenericFile importFile,
+	                              String documentLocation,
+	                              boolean skipMissingDocs,
+	                              boolean mergeDemographics) throws IOException, InvalidImportFileException, HL7Exception
+	{
+		DemographicImporter importer = ImporterExporterFactory.getImporter(importType, importSource, importLogger, documentLocation, skipMissingDocs);
+		importer.verifyFileFormat(importFile);
+		Demographic demographic = importer.importDemographic(importFile);
+
+		// TODO handle demographic merging
+//		logger.info(ReflectionToStringBuilder.toString(demographic));
+
+		org.oscarehr.demographic.model.Demographic dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, demographic);
+
+		importLabs(demographic, dbDemographic);
+
+	}
+
+	private void importLabs(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic) throws HL7Exception, IOException
+	{
+		for(Lab lab : demographic.getLabList())
+		{
+			HL7LabWriter labWriter = new JunoGenericImportLabWriter(demographic, lab);
+			String labHl7 = labWriter.encode();
+
+			MessageHandler parser = Factory.getHandler(JunoGenericLabHandler.LAB_TYPE_VALUE, labHl7);
+			// just in case
+			if(parser == null)
+			{
+				throw new RuntimeException("No Parser available for lab");
+			}
+
+			// allow each lab type to make modifications to the hl7 if needed.
+			// This is for special cases only most labs return an identical string to the input parameter
+			labHl7 = parser.preUpload(labHl7);
+
+			// check if the lab has passed validation and can be saved
+			if(parser.canUpload())
+			{
+				List<ProviderData> reviewers = reviewerModelToDbConverter.convert(lab.getReviewers());
+
+				// remove provider duplicates
+				Map<String, ProviderData> duplicateMap = new HashMap<>();
+				for(ProviderData provider : reviewers)
+				{
+					duplicateMap.put(provider.getId(), provider);
+				}
+				List<ProviderData> filteredReviewers = new ArrayList<>(duplicateMap.values());
+
+				labService.persistNewHL7Lab(parser, labHl7, "Juno-Import", 0, dbDemographic, filteredReviewers, ProviderInboxItem.FILE);
+				parser.postUpload();
+			}
+			else
+			{
+				logger.warn("Hl7 Lab Could Not be Uploaded");
+			}
+		}
 	}
 }

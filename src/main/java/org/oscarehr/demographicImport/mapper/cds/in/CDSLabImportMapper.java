@@ -23,6 +23,8 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.EnumUtils;
+import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.xml.cds.v5_0.model.LaboratoryResults;
 import org.oscarehr.common.xml.cds.v5_0.model.ResultNormalAbnormalFlag;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
@@ -87,6 +89,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		lab.setAccessionNumber(importLabGroup.get(0).getAccessionNumber());
 		lab.setSendingFacility(importLabGroup.get(0).getLaboratoryName());
 		lab.setEmrReceivedDateTime(LocalDateTime.now());
+		lab.setMessageDateTime(toLocalDateTime(importLabGroup.get(0).getCollectionDateTime()));
 
 		// now need to group labs on the lab test
 		// juno will treat these groups as observations
@@ -140,9 +143,11 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	private LabObservation getAsLabObservation(List<LaboratoryResults> importLabGroup)
 	{
 		LabObservation labObservation = new LabObservation();
-		labObservation.setName(importLabGroup.get(0).getTestName()); //they should all be the same, so use the first one
-		labObservation.setRequestDateTime(toLocalDateTime(importLabGroup.get(0).getLabRequisitionDateTime()));
-		labObservation.setObservationDateTime(toLocalDateTime(importLabGroup.get(0).getCollectionDateTime()));
+		LaboratoryResults result0 = importLabGroup.get(0); //they should all be the same, so use the first one
+		labObservation.setName(result0.getTestName());
+		labObservation.setRequestDateTime(toLocalDateTime(result0.getLabRequisitionDateTime()));
+		labObservation.setObservationDateTime(toLocalDateTime(result0.getCollectionDateTime()));
+		labObservation.setReportStatus(getReportStatusEnum(result0));
 
 		for(LaboratoryResults importLabResults : importLabGroup)
 		{
@@ -176,9 +181,18 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 			}
 
 			ResultNormalAbnormalFlag abnormalFlag = importLabResults.getResultNormalAbnormalFlag();
-			result.setAbnormal(CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum())
-							|| CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsPlainText())
-			);
+			if(abnormalFlag == null
+					|| CDSConstants.LAB_ABNORMAL_FLAG.U.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum()))
+			{
+				result.setAbnormal(null);
+			}
+			else
+			{
+				result.setAbnormal(CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum())
+						|| CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsPlainText())
+				);
+			}
+
 			result.setNotes(importLabResults.getNotesFromLab());
 
 			String physicianNotes = StringUtils.trimToNull(importLabResults.getPhysiciansNotes());
@@ -192,5 +206,19 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		}
 
 		return labObservation;
+	}
+
+	private Hl7TextInfo.REPORT_STATUS getReportStatusEnum(LaboratoryResults laboratoryResults)
+	{
+		String statusStr = laboratoryResults.getTestResultStatus();
+		if(EnumUtils.isValidEnum(Hl7TextInfo.REPORT_STATUS.class, statusStr))
+		{
+			return Hl7TextInfo.REPORT_STATUS.valueOf(statusStr);
+		}
+		else
+		{
+			// TODO could map additional statuses here manually to the enum
+			return Hl7TextInfo.REPORT_STATUS.F; // unknown status is final, since labs will never get updates, are probably old.
+		}
 	}
 }

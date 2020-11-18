@@ -67,7 +67,7 @@ public class ConversionUtils {
 	public static final String DATE_PATTERN_YEAR = "yyyy";
 	public static final String DATE_PATTERN_MONTH = "MM";
 	public static final String DATE_PATTERN_DAY = "dd";
-	
+
 	public static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
 	public static final String DEFAULT_TIME_PATTERN = "HH:mm:ss";
 	public static final String TIME_PATTERN_NO_SEC = "HH:mm";
@@ -76,6 +76,7 @@ public class ConversionUtils {
 
 	public static final String HL7_V2_DATE_TIME_OFFICIAL_PATTERN = "yyyyMMddHHmmssX";
 	public static final String HL7_DATE_TIME_DEFAULT_IN_PATTERN = "yyyyMMddHHmmss";
+	public static final String HL7_DATE_FORMAT = "yyyyMMdd";
 
 	public static final String TS_NO_SEC_PATTERN = "yyyy-MM-dd HH:mm";
 
@@ -242,6 +243,13 @@ public class ConversionUtils {
 
 		DateTimeFormatter format = DateTimeFormatter.ofPattern(formatPattern);
 		return date.format(format);
+	}
+
+	public static String toDateString(LocalDateTime dateTime, String formatPattern) {
+		if (dateTime == null) {
+			return "";
+		}
+		return toDateString(dateTime.toLocalDate(), formatPattern);
 	}
 
 	public static String toDateTimeString(LocalDateTime date, String formatPattern) {

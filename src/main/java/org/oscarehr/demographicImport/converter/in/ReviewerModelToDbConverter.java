@@ -20,44 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model.lab;
+package org.oscarehr.demographicImport.converter.in;
 
-import lombok.Data;
-import org.oscarehr.common.model.Hl7TextInfo;
-import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.provider.Reviewer;
+import org.oscarehr.provider.model.ProviderData;
+import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * represents a lab observation, OBR with associated data
- */
-@Data
-public class LabObservation extends AbstractTransientModel
+// can't extend the base class because the base uses this converter
+@Component
+public class ReviewerModelToDbConverter extends BaseModelToDbConverter<Reviewer, ProviderData>
 {
-	private String name;
-	private String procedureCode;
-	private LocalDateTime observationDateTime;
-	private LocalDateTime requestDateTime;
-	private Hl7TextInfo.REPORT_STATUS reportStatus;
-
-	private List<String> comments;
-	private List<LabObservationResult> results;
-
-	public LabObservation()
+	@Override
+	public ProviderData convert(Reviewer input)
 	{
-		this.results = new ArrayList<>();
-		this.comments = new ArrayList<>();
-	}
-
-	public void addResult(LabObservationResult result)
-	{
-		this.results.add(result);
-	}
-
-	public void addComment(String comment)
-	{
-		this.comments.add(comment);
+		return findOrCreateProviderRecord(input);
 	}
 }
