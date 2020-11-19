@@ -40,54 +40,60 @@ if(!authed) {
 %>
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page
-	import="java.util.*,oscar.oscarReport.data.*,oscar.util.*,oscar.oscarDB.*,java.sql.*,oscar.oscarDemographic.data.*,oscar.oscarPrevention.*"%>
 <%@ page import="java.util.Date" %>
+<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="oscar.oscarPrevention.PreventionData" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="oscar.oscarDemographic.data.DemographicData" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <link rel="stylesheet" type="text/css"
 	href="../oscarEncounter/encounterStyles.css">
 <%  //This could be done alot better.
-  String startStr = "";
-  String endStr   = "";
-  String injectionType ="";
 
-  if (request.getParameter("startDate") != null && request.getParameter("startDate") != null && request.getParameter("startDate") != null  ){
+	String startStr = "";
+	String endStr   = "";
+	String injectionType ="";
 
-      injectionType = request.getParameter("injectionType");
+	if (request.getParameter("startDate") != null && request.getParameter("startDate") != null && request.getParameter("startDate") != null)
+	{
+		injectionType = request.getParameter("injectionType");
 
-      Date startDate = ConversionUtils.fromDateString(request.getParameter("startDate"));
-      Date endDate = ConversionUtils.fromDateString(request.getParameter("endDate"));
-	  startStr = ConversionUtils.toDateString(startDate);
-	  endStr   = ConversionUtils.toDateString(endDate);
+		Date startDate = ConversionUtils.fromDateString(request.getParameter("startDate"));
+		Date endDate = ConversionUtils.fromDateString(request.getParameter("endDate"));
+		startStr = ConversionUtils.toDateString(startDate);
+		endStr   = ConversionUtils.toDateString(endDate);
 
-	  // adjust end date by 1 for querying purposes
-	  Calendar calendar = Calendar.getInstance();
-	  calendar.setTime(endDate);
-	  calendar.add(Calendar.DATE, 1);
-	  endDate = calendar.getTime();
+		// adjust end date by 1 for querying purposes
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(endDate);
+		calendar.add(Calendar.DATE, 1);
+		endDate = calendar.getTime();
 
-      String keyVal = "lot";
-      if (injectionType != null && injectionType.equals("RH")){
-          keyVal = "product";
-      }
+		String keyVal = "lot";
+		if ("RH".equals(injectionType))
+		{
+			keyVal = "product";
+		}
 
-      List<Map<String,Object>> list = PreventionData.getExtValues(injectionType, startDate, endDate, keyVal);
-      pageContext.setAttribute("list",list);
+		List<Map<String,Object>> list = PreventionData.getExtValues(injectionType, startDate, endDate, keyVal);
+		pageContext.setAttribute("list",list);
+	}
+	else
+	{
+		Calendar cal = Calendar.getInstance();
+		int daysTillMonday = cal.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY;
+		java.util.Date endDate = cal.getTime();
+		cal.add(Calendar.DATE,-daysTillMonday);
+		java.util.Date startDate = cal.getTime();
 
-  }
-  else
-{
-     Calendar cal = Calendar.getInstance();
-     int daysTillMonday = cal.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY;
-     java.util.Date endDate = cal.getTime();
-     cal.add(Calendar.DATE,-daysTillMonday);
-     java.util.Date startDate = cal.getTime();
-
-	startStr = ConversionUtils.toDateString(startDate);
-	endStr   = ConversionUtils.toDateString(endDate);
-  }
+		startStr = ConversionUtils.toDateString(startDate);
+		endStr   = ConversionUtils.toDateString(endDate);
+	}
 %>
 <html>
 <head>
@@ -190,11 +196,12 @@ table.ele {
 		<th>Comments</th>
 	</tr>
 	<% for (int i = 0; i < report.size(); i++){
-				Map<String,Object> h = report.get(i);
-                String demo = (String) h.get("demographic_no");
+				Map<String,Object> prevention = report.get(i);
+                String demo = (String) prevention.get("demographic_no");
                 org.oscarehr.common.model.Demographic demog = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demo);
-                String comments = PreventionData.getPreventionComment((String)h.get("preventions_id"));
-                if( comments == null ) {
+                String comments = PreventionData.getPreventionComment((String)prevention.get("preventions_id"));
+                if(comments == null)
+                {
                     comments = "";
                 }
             %>
@@ -205,8 +212,8 @@ table.ele {
 		<td><%=DemographicData.getDob(demog,"-")%></td>
 		<td><%=demog.getAge()%></td>
 		<td><%=demog.getChartNo()%></td>
-		<td><%=h.get("val")%>&nbsp;</td>
-		<td><%=h.get("prevention_date")%></td>
+		<td><%=prevention.get("val")%>&nbsp;</td>
+		<td><%=prevention.get("prevention_date")%></td>
 		<td><%=comments%></td>
 	</tr>
 	<%}%>
