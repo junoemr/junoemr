@@ -27,7 +27,6 @@ import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.prevention.dto.PreventionListData;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.model.PreventionExt;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
