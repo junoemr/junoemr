@@ -24,8 +24,35 @@ package org.oscarehr.demographicImport.model.immunization;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.common.PartialDateTime;
+import org.oscarehr.demographicImport.model.provider.Provider;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class Immunization extends AbstractTransientModel
 {
+	private Integer id;
+	private String preventionType;
+	private String drugIdentificationNumber;
+	private PartialDateTime administrationDate;
+	private LocalDate nextDate;
+	private Boolean refused;
+	private Boolean never;
+
+	private Provider provider;
+	private Provider createdBy;
+	private LocalDateTime createdAt;
+	private LocalDateTime lastUpdateDate;
+
+	private String name;
+	private String dose;
+	private String manufacture;
+	private String route;
+	private String lot;
+	private String location;
+	private String reason;
+	private String result;
+	private String comments;
 }

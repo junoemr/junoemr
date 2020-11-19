@@ -42,7 +42,6 @@ public class PartialDate extends AbstractTransientModel
 
 	public PartialDate()
 	{
-		this(null, null, null);
 	}
 	public PartialDate(Integer year)
 	{
@@ -56,6 +55,12 @@ public class PartialDate extends AbstractTransientModel
 	{
 		this.year = (year != null) ? Year.of(year) : null;
 		this.month = (month != null) ? Month.of(month) : null;
+		this.day = day;
+	}
+	public PartialDate(Year year, Month month, Integer day)
+	{
+		this.year = year;
+		this.month = month;
 		this.day = day;
 	}
 

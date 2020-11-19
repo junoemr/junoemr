@@ -32,6 +32,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.mapper.AbstractExportMapper;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.common.PartialDate;
+import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.service.ExportPreferences;
 import oscar.util.ConversionUtils;
@@ -146,6 +147,33 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 			dateFullOrPartial.setYearOnly(calendar);
 		}
 		return dateFullOrPartial;
+	}
+
+	protected DateTimeFullOrPartial toNullableDateTimeFullOrPartial(PartialDateTime partialDateTime)
+	{
+		if(partialDateTime == null) return null;
+
+		DateTimeFullOrPartial dateTimeFullOrPartial = objectFactory.createDateTimeFullOrPartial();
+		XMLGregorianCalendar calendar = ConversionUtils.toNullableXmlGregorianCalendar(partialDateTime.toLocalDateTime());
+
+		if(partialDateTime.isFullDateTime())
+		{
+			dateTimeFullOrPartial.setFullDateTime(calendar);
+		}
+		else if(partialDateTime.isFullDate())
+		{
+			dateTimeFullOrPartial.setFullDate(calendar);
+		}
+		else if(partialDateTime.isYearMonth())
+		{
+			dateTimeFullOrPartial.setYearMonth(calendar);
+		}
+		else if(partialDateTime.isYearOnly())
+		{
+			dateTimeFullOrPartial.setYearOnly(calendar);
+		}
+
+		return dateTimeFullOrPartial;
 	}
 
 	protected PersonNameSimple toPersonNameSimple(Provider provider)

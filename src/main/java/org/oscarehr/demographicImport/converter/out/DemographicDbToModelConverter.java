@@ -49,6 +49,8 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.search.CaseManagementNoteCriteriaSearch;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.model.Prevention;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -119,6 +121,12 @@ public class DemographicDbToModelConverter extends
 
 	@Autowired
 	private ProviderDbToModelConverter providerConverter;
+
+	@Autowired
+	private PreventionDao preventionDao;
+
+	@Autowired
+	private PreventionDbToModelConverter preventionConverter;
 
 	@Override
 	public org.oscarehr.demographicImport.model.demographic.Demographic convert(Demographic input)
@@ -194,6 +202,9 @@ public class DemographicDbToModelConverter extends
 
 		List<Allergy> allergies = allergyDao.findActiveAllergies(input.getDemographicId());
 		exportDemographic.setAllergyList(allergyDbToModelConverter.convert(allergies));
+
+		List<Prevention> preventions = preventionDao.findActiveByDemoId(input.getDemographicId());
+		exportDemographic.setImmunizationList(preventionConverter.convert(preventions));
 
 		return exportDemographic;
 	}

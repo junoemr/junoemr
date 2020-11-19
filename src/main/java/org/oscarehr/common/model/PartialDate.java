@@ -78,11 +78,13 @@ public class PartialDate extends AbstractModel<Integer> implements Serializable 
 	public static final Integer TABLE_ALLERGIES = 1;
 	public static final Integer TABLE_DRUGS = 2;
 	public static final Integer TABLE_DXRESEARCH = 3;
+	public static final Integer TABLE_PREVENTIONS = 4;
 	
 	public static final Integer ALLERGIES_STARTDATE = 1;
 	public static final Integer ALLERGIES_ENTRYDATE = 2;
 	public static final Integer DRUGS_WRITTENDATE = 3;
 	public static final Integer DXRESEARCH_STARTDATE = 4;
+	public static final Integer PREVENTION_DATE = 5;
 	
 	@Override
 	public Integer getId() {
@@ -119,9 +121,6 @@ public class PartialDate extends AbstractModel<Integer> implements Serializable 
 	public void setFormat(String format) {
 		this.format = format;
 	}
-
-
-
 
 	public PartialDate() {
 		//default constructor
