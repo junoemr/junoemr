@@ -1028,28 +1028,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						{
 							controller.save();
 						}
-						else
-						{
-							if (controller.page.demo.ver == null) controller.page.demo.ver = "";
-							patientDetailStatusService.validateHC(controller.page.demo.hin, controller.page.demo.ver).then(
-								function success(results)
-								{
-									if (results.valid == null)
-									{
-										controller.page.HCValidation = "n/a";
-									}
-									else if (!results.valid)
-									{
-										alert("Health Card Validation failed: " + results.responseDescription + " (" + results.responseCode + ")");
-										doSave = false;
-									}
-									if (doSave) controller.save();
-								},
-								function error(errors)
-								{
-									console.log(errors);
-								});
-						}
 					},
 					function error(errors)
 					{
