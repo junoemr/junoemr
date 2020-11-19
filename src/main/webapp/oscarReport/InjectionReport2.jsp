@@ -195,16 +195,18 @@ table.ele {
 		<th>Injection Date</th>
 		<th>Comments</th>
 	</tr>
-	<% for (int i = 0; i < report.size(); i++){
-				Map<String,Object> prevention = report.get(i);
-                String demo = (String) prevention.get("demographic_no");
-                org.oscarehr.common.model.Demographic demog = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demo);
-                String comments = PreventionData.getPreventionComment((String)prevention.get("preventions_id"));
-                if(comments == null)
-                {
-                    comments = "";
-                }
-            %>
+	<%
+		for (int i = 0; i < report.size(); i++)
+		{
+			Map<String,Object> prevention = report.get(i);
+			String demo = (String) prevention.get("demographic_no");
+			org.oscarehr.common.model.Demographic demog = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demo);
+			String comments = PreventionData.getPreventionComment((String)prevention.get("preventions_id"));
+			if(comments == null)
+			{
+				comments = "";
+			}
+	%>
 	<tr>
 		<td><%=i+1%></td>
 		<td><%=demog.getFirstName()%></td>
