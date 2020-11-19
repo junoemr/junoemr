@@ -34,20 +34,20 @@ import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 @Component
-public class AppointmentModelToExportConverter extends
+public class AppointmentDbToModelConverter extends
 		AbstractModelConverter<Appointment, org.oscarehr.demographicImport.model.appointment.Appointment>
 {
 	@Autowired
 	private AppointmentStatusDao appointmentStatusDao;
 
 	@Autowired
-	private AppointmentStatusModelToExportConverter appointmentStatusConverter;
+	private AppointmentStatusDbToModelConverter appointmentStatusConverter;
 
 	@Autowired
 	private ProviderDataDao providerDao;
 
 	@Autowired
-	private ProviderModelToExportConverter providerConverter;
+	private ProviderDbToModelConverter providerConverter;
 
 	@Override
 	public org.oscarehr.demographicImport.model.appointment.Appointment convert(Appointment input)

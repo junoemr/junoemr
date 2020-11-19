@@ -22,36 +22,41 @@
  */
 package org.oscarehr.demographicImport.converter.out.note;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.demographicImport.model.encounterNote.BaseNote;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.RESOLUTIONDATE;
+import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.STARTDATE;
+
 @Component
-public abstract class BaseNoteModelToExportConverter<N extends BaseNote> extends
-		AbstractModelConverter<CaseManagementNote, N>
+public class ReminderNoteDbToModelConverter extends
+		BaseNoteDbToModelConverter<org.oscarehr.demographicImport.model.encounterNote.ReminderNote>
 {
 
 	@Override
-	public N convert(CaseManagementNote input)
+	public org.oscarehr.demographicImport.model.encounterNote.ReminderNote subConvert(
+			CaseManagementNote input,
+			org.oscarehr.demographicImport.model.encounterNote.ReminderNote exportNote)
 	{
-		if(input == null)
+		for(CaseManagementNoteExt ext : input.getNoteExtensionList())
 		{
-			return null;
+			if(ext.getKey().equals(STARTDATE))
+			{
+				exportNote.setStartDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
+			}
+			if(ext.getKey().equals(RESOLUTIONDATE))
+			{
+				exportNote.setResolutionDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
+			}
 		}
-
-		N exportNote = getNewNoteObject();
-
-		exportNote.setId(String.valueOf(input.getId()));
-		exportNote.setNoteText(input.getNote());
-		exportNote.setRevisionId(input.getUuid());
-		exportNote.setObservationDate(ConversionUtils.toNullableLocalDateTime(input.getObservationDate()));
-
-		return subConvert(input, exportNote);
+		return exportNote;
 	}
 
-	public abstract N getNewNoteObject();
-
-	public abstract N subConvert(CaseManagementNote input, N exportNote);
+	@Override
+	public org.oscarehr.demographicImport.model.encounterNote.ReminderNote getNewNoteObject()
+	{
+		return new org.oscarehr.demographicImport.model.encounterNote.ReminderNote();
+	}
 }

@@ -34,8 +34,8 @@ import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.RESOLUTIOND
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.STARTDATE;
 
 @Component
-public class RiskFactorNoteModelToExportConverter extends
-		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote>
+public class RiskFactorNoteDbToModelConverter extends
+		BaseNoteDbToModelConverter<org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote>
 {
 
 	@Override

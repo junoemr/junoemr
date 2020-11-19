@@ -37,20 +37,20 @@ import oscar.util.ConversionUtils;
 import java.io.IOException;
 
 @Component
-public class DocumentModelToExportConverter extends
+public class DocumentDbToModelConverter extends
 		AbstractModelConverter<Document, org.oscarehr.demographicImport.model.document.Document>
 {
 	@Autowired
 	private OscarAppointmentDao appointmentDao;
 
 	@Autowired
-	private AppointmentModelToExportConverter appointmentConverter;
+	private AppointmentDbToModelConverter appointmentConverter;
 
 	@Autowired
 	private ProviderDataDao providerDao;
 
 	@Autowired
-	private ProviderModelToExportConverter providerConverter;
+	private ProviderDbToModelConverter providerConverter;
 
 	@Override
 	public org.oscarehr.demographicImport.model.document.Document convert(Document input)

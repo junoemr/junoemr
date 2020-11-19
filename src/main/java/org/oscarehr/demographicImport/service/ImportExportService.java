@@ -31,7 +31,7 @@ import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographicImport.converter.in.ReviewerModelToDbConverter;
-import org.oscarehr.demographicImport.converter.out.DemographicModelToExportConverter;
+import org.oscarehr.demographicImport.converter.out.DemographicDbToModelConverter;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.lab.Lab;
@@ -67,7 +67,7 @@ public class ImportExportService
 	private DemographicService demographicService;
 
 	@Autowired
-	private DemographicModelToExportConverter modelToExportConverter;
+	private DemographicDbToModelConverter modelToExportConverter;
 
 	@Autowired
 	private EncounterNoteService encounterNoteService;

@@ -23,7 +23,7 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.Immunizations;
-import org.oscarehr.demographicImport.model.Immunization;
+import org.oscarehr.demographicImport.model.immunization.Immunization;
 
 public class CDSImmunizationExportMapper extends AbstractCDSExportMapper<Immunizations, Immunization>
 {

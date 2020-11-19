@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 @Component
-public class ProviderModelToExportConverter extends
+public class ProviderDbToModelConverter extends
 		AbstractModelConverter<ProviderData, org.oscarehr.demographicImport.model.provider.Provider>
 {
 	@Override

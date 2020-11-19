@@ -20,32 +20,27 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter.out;
+package org.oscarehr.demographicImport.converter.out.note;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.common.model.AppointmentStatus;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AppointmentStatusModelToExportConverter extends
-		AbstractModelConverter<AppointmentStatus, org.oscarehr.demographicImport.model.appointment.AppointmentStatus>
+public class EncounterNoteDbToModelConverter extends
+		BaseNoteDbToModelConverter<org.oscarehr.demographicImport.model.encounterNote.EncounterNote>
 {
 
 	@Override
-	public org.oscarehr.demographicImport.model.appointment.AppointmentStatus convert(AppointmentStatus input)
+	public org.oscarehr.demographicImport.model.encounterNote.EncounterNote subConvert(
+			CaseManagementNote input,
+	        org.oscarehr.demographicImport.model.encounterNote.EncounterNote exportNote)
 	{
-		if(input == null)
-		{
-			return null;
-		}
-		org.oscarehr.demographicImport.model.appointment.AppointmentStatus status = new org.oscarehr.demographicImport.model.appointment.AppointmentStatus();
+		return exportNote;
+	}
 
-		status.setId(input.getId());
-		status.setActive(input.getActive() != 0);
-		status.setEditable(input.getEditable() != 0);
-		status.setDescription(input.getDescription());
-		status.setStatusCode(input.getStatus());
-
-		return status;
+	@Override
+	public org.oscarehr.demographicImport.model.encounterNote.EncounterNote getNewNoteObject()
+	{
+		return new org.oscarehr.demographicImport.model.encounterNote.EncounterNote();
 	}
 }

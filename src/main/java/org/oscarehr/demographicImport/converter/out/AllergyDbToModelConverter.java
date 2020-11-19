@@ -47,7 +47,7 @@ public class AllergyDbToModelConverter extends
 	private ProviderDataDao providerDao;
 
 	@Autowired
-	private ProviderModelToExportConverter providerConverter;
+	private ProviderDbToModelConverter providerConverter;
 
 	@Autowired
 	private CaseManagementNoteLinkDao caseManagementNoteLinkDao;

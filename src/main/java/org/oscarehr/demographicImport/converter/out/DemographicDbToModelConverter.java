@@ -35,14 +35,13 @@ import org.oscarehr.common.model.Measurement;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
-import org.oscarehr.demographicImport.converter.out.lab.LabToExportConverter;
-import org.oscarehr.demographicImport.converter.out.note.ConcernNoteModelToExportConverter;
-import org.oscarehr.demographicImport.converter.out.note.EncounterNoteModelToExportConverter;
-import org.oscarehr.demographicImport.converter.out.note.FamilyHistoryNoteModelToExportConverter;
-import org.oscarehr.demographicImport.converter.out.note.MedicalHistoryNoteModelToExportConverter;
-import org.oscarehr.demographicImport.converter.out.note.ReminderNoteModelToExportConverter;
-import org.oscarehr.demographicImport.converter.out.note.RiskFactorNoteModelToExportConverter;
-import org.oscarehr.demographicImport.converter.out.note.SocialHistoryNoteModelToExportConverter;
+import org.oscarehr.demographicImport.converter.out.note.ConcernNoteDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.note.EncounterNoteDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.note.FamilyHistoryNoteDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.note.MedicalHistoryNoteDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.note.ReminderNoteDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.note.RiskFactorNoteDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.note.SocialHistoryNoteDbToModelConverter;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
 import org.oscarehr.document.dao.DocumentDao;
@@ -58,14 +57,14 @@ import oscar.util.ConversionUtils;
 import java.util.List;
 
 @Component
-public class DemographicModelToExportConverter extends
+public class DemographicDbToModelConverter extends
 		AbstractModelConverter<Demographic, org.oscarehr.demographicImport.model.demographic.Demographic>
 {
 	@Autowired
 	private OscarAppointmentDao appointmentDao;
 
 	@Autowired
-	private AppointmentModelToExportConverter appointmentConverter;
+	private AppointmentDbToModelConverter appointmentConverter;
 
 	@Autowired
 	private AllergyDao allergyDao;
@@ -83,19 +82,19 @@ public class DemographicModelToExportConverter extends
 	private DocumentDao documentDao;
 
 	@Autowired
-	private DocumentModelToExportConverter documentModelToExportConverter;
+	private DocumentDbToModelConverter documentDbToModelConverter;
 
 	@Autowired
-	private EncounterNoteModelToExportConverter encounterNoteConverter;
+	private EncounterNoteDbToModelConverter encounterNoteConverter;
 
 	@Autowired
-	private FamilyHistoryNoteModelToExportConverter familyHistoryNoteConverter;
+	private FamilyHistoryNoteDbToModelConverter familyHistoryNoteConverter;
 
 	@Autowired
-	private SocialHistoryNoteModelToExportConverter socialHistoryNoteMapper;
+	private SocialHistoryNoteDbToModelConverter socialHistoryNoteMapper;
 
 	@Autowired
-	private LabToExportConverter labToExportConverter;
+	private LabDbToModelConverter labDbToModelConverter;
 
 	@Autowired
 	private Hl7TextInfoDao hl7TextInfoDao;
@@ -104,22 +103,22 @@ public class DemographicModelToExportConverter extends
 	private MeasurementDao measurementDao;
 
 	@Autowired
-	private MeasurementToExportConverter measurementToExportConverter;
+	private MeasurementDbToModelConverter measurementDbToModelConverter;
 
 	@Autowired
-	private MedicalHistoryNoteModelToExportConverter medicalHistoryNoteConverter;
+	private MedicalHistoryNoteDbToModelConverter medicalHistoryNoteConverter;
 
 	@Autowired
-	private ReminderNoteModelToExportConverter reminderNoteModelConverter;
+	private ReminderNoteDbToModelConverter reminderNoteModelConverter;
 
 	@Autowired
-	private RiskFactorNoteModelToExportConverter riskFactorNoteModelConverter;
+	private RiskFactorNoteDbToModelConverter riskFactorNoteModelConverter;
 
 	@Autowired
-	private ConcernNoteModelToExportConverter concernNoteModelConverter;
+	private ConcernNoteDbToModelConverter concernNoteModelConverter;
 
 	@Autowired
-	private ProviderModelToExportConverter providerConverter;
+	private ProviderDbToModelConverter providerConverter;
 
 	@Override
 	public org.oscarehr.demographicImport.model.demographic.Demographic convert(Demographic input)
@@ -186,12 +185,12 @@ public class DemographicModelToExportConverter extends
 		setNotes(input, exportDemographic);
 
 		List<Measurement> measurements = measurementDao.findByDemographicId(input.getDemographicId());
-		exportDemographic.setMeasurementList(measurementToExportConverter.convert(measurements));
+		exportDemographic.setMeasurementList(measurementDbToModelConverter.convert(measurements));
 
 		setLabs(input, exportDemographic);
 
 		List<Document> documents = documentDao.findByDemographicId(String.valueOf(input.getDemographicId()));
-		exportDemographic.setDocumentList(documentModelToExportConverter.convert(documents));
+		exportDemographic.setDocumentList(documentDbToModelConverter.convert(documents));
 
 		List<Allergy> allergies = allergyDao.findActiveAllergies(input.getDemographicId());
 		exportDemographic.setAllergyList(allergyDbToModelConverter.convert(allergies));
@@ -269,7 +268,7 @@ public class DemographicModelToExportConverter extends
 		for (Object[] info : infos)
 		{
 			Hl7TextInfo hl7TxtInfo = (Hl7TextInfo) info[0];
-			exportDemographic.addLab(labToExportConverter.convert(hl7TxtInfo));
+			exportDemographic.addLab(labDbToModelConverter.convert(hl7TxtInfo));
 		}
 	}
 }

@@ -23,7 +23,7 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.MedicationsAndTreatments;
-import org.oscarehr.demographicImport.model.Medication;
+import org.oscarehr.demographicImport.model.medication.Medication;
 
 public class CDSMedicationImportMapper extends AbstractCDSImportMapper<MedicationsAndTreatments, Medication>
 {

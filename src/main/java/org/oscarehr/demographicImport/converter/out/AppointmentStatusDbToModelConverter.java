@@ -20,11 +20,32 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model;
+package org.oscarehr.demographicImport.converter.out;
 
-import lombok.Data;
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.common.model.AppointmentStatus;
+import org.springframework.stereotype.Component;
 
-@Data
-public class Immunization extends AbstractTransientModel
+@Component
+public class AppointmentStatusDbToModelConverter extends
+		AbstractModelConverter<AppointmentStatus, org.oscarehr.demographicImport.model.appointment.AppointmentStatus>
 {
+
+	@Override
+	public org.oscarehr.demographicImport.model.appointment.AppointmentStatus convert(AppointmentStatus input)
+	{
+		if(input == null)
+		{
+			return null;
+		}
+		org.oscarehr.demographicImport.model.appointment.AppointmentStatus status = new org.oscarehr.demographicImport.model.appointment.AppointmentStatus();
+
+		status.setId(input.getId());
+		status.setActive(input.getActive() != 0);
+		status.setEditable(input.getEditable() != 0);
+		status.setDescription(input.getDescription());
+		status.setStatusCode(input.getStatus());
+
+		return status;
+	}
 }

@@ -20,22 +20,12 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter.out;
+package org.oscarehr.demographicImport.model.immunization;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.common.model.Measurement;
-import org.oscarehr.demographicImport.model.measurement.MeasurementFactory;
-import org.springframework.stereotype.Component;
+import lombok.Data;
+import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
-@Component
-public class MeasurementToExportConverter extends
-		AbstractModelConverter<Measurement, org.oscarehr.demographicImport.model.measurement.Measurement>
+@Data
+public class Immunization extends AbstractTransientModel
 {
-
-	@Override
-	public org.oscarehr.demographicImport.model.measurement.Measurement convert(Measurement input)
-	{
-		// TODO is the factory how we want to convert this?
-		return MeasurementFactory.getMeasurement(input);
-	}
 }

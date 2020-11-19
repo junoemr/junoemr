@@ -35,8 +35,8 @@ import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.STARTDATE;
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.TREATMENT;
 
 @Component
-public class FamilyHistoryNoteModelToExportConverter extends
-		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote>
+public class FamilyHistoryNoteDbToModelConverter extends
+		BaseNoteDbToModelConverter<org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote>
 {
 
 	@Override

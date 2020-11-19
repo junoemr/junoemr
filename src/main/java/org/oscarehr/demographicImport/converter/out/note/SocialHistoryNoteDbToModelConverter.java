@@ -31,14 +31,14 @@ import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.RESOLUTIOND
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.STARTDATE;
 
 @Component
-public class ReminderNoteModelToExportConverter extends
-		BaseNoteModelToExportConverter<org.oscarehr.demographicImport.model.encounterNote.ReminderNote>
+public class SocialHistoryNoteDbToModelConverter extends
+		BaseNoteDbToModelConverter<org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote>
 {
 
 	@Override
-	public org.oscarehr.demographicImport.model.encounterNote.ReminderNote subConvert(
+	public org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote subConvert(
 			CaseManagementNote input,
-			org.oscarehr.demographicImport.model.encounterNote.ReminderNote exportNote)
+			org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote exportNote)
 	{
 		for(CaseManagementNoteExt ext : input.getNoteExtensionList())
 		{
@@ -51,12 +51,13 @@ public class ReminderNoteModelToExportConverter extends
 				exportNote.setResolutionDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
 			}
 		}
+
 		return exportNote;
 	}
 
 	@Override
-	public org.oscarehr.demographicImport.model.encounterNote.ReminderNote getNewNoteObject()
+	public org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote getNewNoteObject()
 	{
-		return new org.oscarehr.demographicImport.model.encounterNote.ReminderNote();
+		return new org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote();
 	}
 }

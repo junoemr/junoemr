@@ -20,9 +20,10 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model;
+package org.oscarehr.demographicImport.model.medication;
 
 import lombok.Data;
+import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
 @Data
 public class Medication extends AbstractTransientModel
