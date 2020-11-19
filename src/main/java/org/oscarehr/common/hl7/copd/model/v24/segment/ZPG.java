@@ -60,6 +60,71 @@ public class ZPG extends AbstractSegment
 		}
 	}
 
+	public ST getZpg1_FathersName()
+	{
+		try
+		{
+			Type t = this.getField(1, 0);
+			return (ST) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public TS getZpg2_FathersDOB()
+	{
+		try
+		{
+			Type t = this.getField(2, 0);
+			return (TS) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public ST getZpg3_FathersOccupation()
+	{
+		try
+		{
+			Type t = this.getField(3, 0);
+			return (ST) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public TS getZpg4_DueDate()
+	{
+		try
+		{
+			Type t = this.getField(4, 0);
+			return (TS) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public ST getZpg5_DueDateConfirmed()
+	{
+		try
+		{
+			Type t = this.getField(5, 0);
+			return (ST) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
 	 * This method must be overridden. The easiest way is just to return null.
 	 */

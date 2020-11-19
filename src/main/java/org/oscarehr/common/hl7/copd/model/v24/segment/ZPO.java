@@ -57,6 +57,32 @@ public class ZPO extends AbstractSegment
 		}
 	}
 
+	public TS getZpo1_DateOfFundusHeightGrowthCurve()
+	{
+		try
+		{
+			Type t = this.getField(1, 0);
+			return (TS) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public ST getZpo2_FundusHeightGrowthCurve()
+	{
+		try
+		{
+			Type t = this.getField(2, 0);
+			return (ST) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
 	 * This method must be overridden. The easiest way is just to return null.
 	 */

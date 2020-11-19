@@ -63,6 +63,104 @@ public class ZHR extends AbstractSegment
 		}
 	}
 
+	public SI getZhr1_SetID()
+	{
+		try
+		{
+			Type t = this.getField(1, 0);
+			return (SI) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public ST getZhr2_TermBirthNo()
+	{
+		try
+		{
+			Type t = this.getField(2, 0);
+			return (ST) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	public ST getZhr3_PerTermBirthNo()
+	{
+		try
+		{
+			Type t = this.getField(3, 0);
+			return (ST) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	public ST getZhr4_Gravida()
+	{
+		try
+		{
+			Type t = this.getField(4, 0);
+			return (ST) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	public ST getZhr5_SpontaneousAbortionsNo()
+	{
+		try
+		{
+			Type t = this.getField(5, 0);
+			return (ST) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	public ST getZhr6_InducedTerminationNo()
+	{
+		try
+		{
+			Type t = this.getField(6, 0);
+			return (ST) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	public ST getZhr7_PerinatalDeathsNo()
+	{
+		try
+		{
+			Type t = this.getField(7, 0);
+			return (ST) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	public ST getZhr8_NumberOfChildrenLiving()
+	{
+		try
+		{
+			Type t = this.getField(8, 0);
+			return (ST) t;
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
 	 * This method must be overridden. The easiest way is just to return null.
 	 */

@@ -123,7 +123,14 @@ public class MedicationMapper extends AbstractMapper
 		drug.setDrugForm(getDispenseUnitsId(rep));
 
 		drug.setPosition(0); // this is display order. set to all zero so that medications are ordered by date.
-		drug.setSpecialInstruction(getPharmacyInstructions(rep));
+
+		String pharmaInstructions = getPharmacyInstructions(rep);
+		if(pharmaInstructions != null)
+		{
+			//instructions don't handle newlines well, so just set them as spaces
+			pharmaInstructions = pharmaInstructions.replaceAll("~crlf~", " ");
+		}
+		drug.setSpecialInstruction(pharmaInstructions);
 
 		drug.setSpecial(generateSpecial(drug, rep));
 
@@ -230,7 +237,7 @@ public class MedicationMapper extends AbstractMapper
 			Date writtenDate = getTransactionDate(rep);
 			note.setObservationDate(writtenDate);
 			note.setUpdateDate(writtenDate);
-			note.setNote(noteText);
+			note.setNote(noteText.replaceAll("~crlf~", "\n"));
 		}
 
 		return note;
@@ -246,11 +253,11 @@ public class MedicationMapper extends AbstractMapper
 	}
 	protected Date getEndDate(int rep) throws HL7Exception
 	{
-		Date startDate = getStartDate(rep);
 		Date endDate = getAdministrationStopDate(rep);
 		if(endDate == null)
 		{
 			// try to calculate from TQ1
+			Date startDate = getStartDate(rep);
 			endDate = getCalculatedEndDate(rep, startDate);
 			if (endDate == null)
 			{
