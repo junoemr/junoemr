@@ -31,6 +31,7 @@
 <%@page import="org.oscarehr.common.model.Facility"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
+<%@page import="org.oscarehr.encounterNote.model.Issue"%>
 <%@ include file="/casemgmt/taglibs.jsp"%>
 
 <%
@@ -248,7 +249,9 @@ if(currentFacility.isEnableEncounterTransportationTime() || (currentProgram != n
 	<ul style="float: left; list-style: circle inside; margin: 0px;">
 		<nested:iterate id="noteIssue" property="caseNote.issues"
 			name="caseManagementEntryForm">
-			<li><c:out value="${noteIssue.issue.description}" /></li>
+			<c:if test="${Issue.SUMMARY_CODE_TICKLER_NOTE eq noteIssue.issue.description}">
+				<li><c:out value="${noteIssue.issue.description}"/></li>
+			</c:if>
 		</nested:iterate>
 	</ul>
 	<br style="clear: both;">

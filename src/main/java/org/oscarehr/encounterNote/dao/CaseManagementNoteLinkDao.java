@@ -27,6 +27,8 @@ import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Query;
+
 @SuppressWarnings("unchecked")
 @Transactional
 @Repository("encounterNote.dao.CaseManagementNoteLinkDao")
@@ -35,5 +37,19 @@ public class CaseManagementNoteLinkDao extends AbstractDao<CaseManagementNoteLin
 	public CaseManagementNoteLinkDao()
 	{
 		super(CaseManagementNoteLink.class);
+	}
+
+	public CaseManagementNoteLink findLatestByTableAndTableId(Integer tableName, Integer tableId)
+	{
+		// select model name must match specified @Entity name in model object
+		String queryString = "SELECT x FROM model.CaseManagementNoteLink x " +
+				"WHERE x.tableName=:tableName AND x.tableId=:tableId " +
+				"ORDER BY x.note.noteId DESC";
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("tableName", tableName);
+		query.setParameter("tableId", tableId);
+		query.setMaxResults(1);
+
+		return this.getSingleResultOrNull(query);
 	}
 }
