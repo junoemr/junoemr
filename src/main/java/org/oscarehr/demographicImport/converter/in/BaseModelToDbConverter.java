@@ -64,7 +64,7 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 
 	public static void clearProviderCache()
 	{
-		logger.info("Clearing provider cache");
+		logger.info("Clearing db provider cache");
 		providerLookupCache.clear();
 	}
 

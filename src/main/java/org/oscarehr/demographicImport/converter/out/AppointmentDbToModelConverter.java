@@ -23,11 +23,8 @@
 package org.oscarehr.demographicImport.converter.out;
 
 import org.oscarehr.appointment.dao.AppointmentStatusDao;
-import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentStatus;
-import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,19 +32,13 @@ import oscar.util.ConversionUtils;
 
 @Component
 public class AppointmentDbToModelConverter extends
-		AbstractModelConverter<Appointment, org.oscarehr.demographicImport.model.appointment.Appointment>
+		BaseDbToModelConverter<Appointment, org.oscarehr.demographicImport.model.appointment.Appointment>
 {
 	@Autowired
 	private AppointmentStatusDao appointmentStatusDao;
 
 	@Autowired
 	private AppointmentStatusDbToModelConverter appointmentStatusConverter;
-
-	@Autowired
-	private ProviderDataDao providerDao;
-
-	@Autowired
-	private ProviderDbToModelConverter providerConverter;
 
 	@Override
 	public org.oscarehr.demographicImport.model.appointment.Appointment convert(Appointment input)
@@ -71,13 +62,7 @@ public class AppointmentDbToModelConverter extends
 
 		appointment.setAppointmentStartDateTime(ConversionUtils.toLocalDateTime(input.getStartTimeAsFullDate()));
 		appointment.setAppointmentEndDateTime(ConversionUtils.toLocalDateTime(input.getEndTimeAsFullDate()));
-
-		ProviderData provider = providerDao.find(input.getProviderNo());
-		if(provider != null)
-		{
-			appointment.setProvider(providerConverter.convert(provider));
-		}
-
+		appointment.setProvider(findProvider(input.getProviderNo()));
 		AppointmentStatus status = appointmentStatusDao.findByStatus(input.getStatus());
 		appointment.setStatus(appointmentStatusConverter.convert(status));
 

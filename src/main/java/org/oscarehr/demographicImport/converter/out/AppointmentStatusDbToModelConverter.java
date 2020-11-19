@@ -22,13 +22,12 @@
  */
 package org.oscarehr.demographicImport.converter.out;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AppointmentStatusDbToModelConverter extends
-		AbstractModelConverter<AppointmentStatus, org.oscarehr.demographicImport.model.appointment.AppointmentStatus>
+		BaseDbToModelConverter<AppointmentStatus, org.oscarehr.demographicImport.model.appointment.AppointmentStatus>
 {
 
 	@Override

@@ -31,6 +31,7 @@ import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographicImport.converter.in.ReviewerModelToDbConverter;
+import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.DemographicDbToModelConverter;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
@@ -91,6 +92,7 @@ public class ImportExportService
 			fileList.add(file);
 		}
 		fileList.addAll(exporter.getAdditionalFiles(preferences));
+		BaseDbToModelConverter.clearProviderCache();
 
 		return fileList;
 	}

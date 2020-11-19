@@ -22,14 +22,11 @@
  */
 package org.oscarehr.demographicImport.converter.out;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -38,19 +35,13 @@ import java.io.IOException;
 
 @Component
 public class DocumentDbToModelConverter extends
-		AbstractModelConverter<Document, org.oscarehr.demographicImport.model.document.Document>
+		BaseDbToModelConverter<Document, org.oscarehr.demographicImport.model.document.Document>
 {
 	@Autowired
 	private OscarAppointmentDao appointmentDao;
 
 	@Autowired
 	private AppointmentDbToModelConverter appointmentConverter;
-
-	@Autowired
-	private ProviderDataDao providerDao;
-
-	@Autowired
-	private ProviderDbToModelConverter providerConverter;
 
 	@Override
 	public org.oscarehr.demographicImport.model.document.Document convert(Document input)
@@ -74,16 +65,13 @@ public class DocumentDbToModelConverter extends
 		exportDocument.setSource(input.getSource());
 		exportDocument.setSourceFacility(input.getSourceFacility());
 
-		ProviderData createdBy = providerDao.find(input.getDoccreator());
-		exportDocument.setCreatedBy(providerConverter.convert(createdBy));
-
-		ProviderData responsible = providerDao.find(input.getResponsible());
-		exportDocument.setResponsible(providerConverter.convert(responsible));
+		exportDocument.setCreatedBy(findProvider(input.getDoccreator()));
+		exportDocument.setResponsible(findProvider(input.getResponsible()));
 
 		String reviewerId = input.getReviewer();
 		if(reviewerId != null)
 		{
-			Reviewer reviewer = Reviewer.fromProvider(providerConverter.convert(providerDao.find(reviewerId)));
+			Reviewer reviewer = Reviewer.fromProvider(findProvider(reviewerId));
 			reviewer.setReviewDateTime(ConversionUtils.toLocalDateTime(input.getReviewdatetime()));
 			exportDocument.setReviewer(reviewer);
 		}

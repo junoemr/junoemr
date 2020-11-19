@@ -1,0 +1,75 @@
+/**
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
+ */
+package org.oscarehr.demographicImport.converter.out;
+
+import org.apache.log4j.Logger;
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.common.dao.PartialDateDao;
+import org.oscarehr.demographicImport.model.provider.Provider;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+
+@Component
+public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverter<I, E>
+{
+	private static final Logger logger = MiscUtils.getLogger();
+	private static final HashMap<String, Provider> providerLookupCache = new HashMap<>();
+
+	@Autowired
+	private PartialDateDao partialDateDao;
+
+	@Autowired
+	private ProviderDataDao providerDao;
+
+	@Autowired
+	private ProviderDbToModelConverter providerConverter;
+
+	public static void clearProviderCache()
+	{
+		logger.info("Clearing model provider cache");
+		providerLookupCache.clear();
+	}
+
+	protected Provider findProvider(String providerId)
+	{
+		Provider providerRecord = null;
+		if(providerId != null)
+		{
+			if(providerLookupCache.containsKey(providerId))
+			{
+				providerRecord = providerLookupCache.get(providerId);
+			}
+			else
+			{
+				providerRecord = providerConverter.convert(providerDao.find(providerId));
+				providerLookupCache.put(providerId, providerRecord);
+			}
+		}
+
+		return providerRecord;
+	}
+}

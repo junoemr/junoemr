@@ -22,14 +22,13 @@
  */
 package org.oscarehr.demographicImport.converter.out;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.demographicImport.model.measurement.MeasurementFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MeasurementDbToModelConverter extends
-		AbstractModelConverter<Measurement, org.oscarehr.demographicImport.model.measurement.Measurement>
+		BaseDbToModelConverter<Measurement, org.oscarehr.demographicImport.model.measurement.Measurement>
 {
 
 	@Override

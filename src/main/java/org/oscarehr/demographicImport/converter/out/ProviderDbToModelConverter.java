@@ -30,6 +30,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+// can't extend the base class because the base uses this converter
 @Component
 public class ProviderDbToModelConverter extends
 		AbstractModelConverter<ProviderData, org.oscarehr.demographicImport.model.provider.Provider>

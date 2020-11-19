@@ -23,7 +23,6 @@
 package org.oscarehr.demographicImport.converter.out;
 
 import org.apache.commons.lang.StringUtils;
-import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
@@ -32,8 +31,6 @@ import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
-import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.oscarLab.ca.all.parsers.Factory;
@@ -45,16 +42,10 @@ import java.util.List;
 
 @Component
 public class LabDbToModelConverter extends
-		AbstractModelConverter<Hl7TextInfo, org.oscarehr.demographicImport.model.lab.Lab>
+		BaseDbToModelConverter<Hl7TextInfo, org.oscarehr.demographicImport.model.lab.Lab>
 {
 	@Autowired
 	private ProviderLabRoutingDao providerLabRoutingDao;
-
-	@Autowired
-	private ProviderDbToModelConverter providerConverter;
-
-	@Autowired
-	private ProviderDataDao providerDao;
 
 
 	@Override
@@ -92,10 +83,10 @@ public class LabDbToModelConverter extends
 		List<Reviewer> reviewers = new ArrayList<>(providerLabRoutingList.size());
 		for(ProviderLabRoutingModel providerLabRouting : providerLabRoutingList)
 		{
-			ProviderData provider = providerDao.find(providerLabRouting.getProviderNo());
-			if(provider != null)
+			String reviewerId = providerLabRouting.getProviderNo();
+			if(reviewerId != null)
 			{
-				Reviewer reviewer = Reviewer.fromProvider(providerConverter.convert(provider));
+				Reviewer reviewer = Reviewer.fromProvider(findProvider(reviewerId));
 				reviewer.setReviewDateTime(ConversionUtils.toLocalDateTime(providerLabRouting.getTimestamp()));
 				reviewers.add(reviewer);
 			}

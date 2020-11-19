@@ -23,13 +23,11 @@
 package org.oscarehr.demographicImport.converter.out;
 
 import org.oscarehr.allergy.model.Allergy;
-import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteLinkDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
-import org.oscarehr.provider.dao.ProviderDataDao;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,17 +35,11 @@ import oscar.util.ConversionUtils;
 
 @Component
 public class AllergyDbToModelConverter extends
-		AbstractModelConverter<Allergy, org.oscarehr.demographicImport.model.allergy.Allergy>
+		BaseDbToModelConverter<Allergy, org.oscarehr.demographicImport.model.allergy.Allergy>
 {
 
 	@Autowired
 	private PartialDateDao partialDateDao;
-
-	@Autowired
-	private ProviderDataDao providerDao;
-
-	@Autowired
-	private ProviderDbToModelConverter providerConverter;
 
 	@Autowired
 	private CaseManagementNoteLinkDao caseManagementNoteLinkDao;
@@ -71,13 +63,7 @@ public class AllergyDbToModelConverter extends
 		allergy.setStartDate(startDatePartial);
 		allergy.setEntryDate(ConversionUtils.toNullableLocalDate(input.getEntryDate()));
 		allergy.setDrugIdentificationNumber(input.getRegionalIdentifier());
-
-		String providerNo = input.getProviderNo();
-		if(providerNo != null)
-		{
-			allergy.setProvider(providerConverter.convert(providerDao.find(providerNo)));
-		}
-
+		allergy.setProvider(findProvider(input.getProviderNo()));
 		allergy.setAgeOfOnset(Long.parseLong(input.getAgeOfOnset()));
 		allergy.setAnnotation(getNote(input));
 

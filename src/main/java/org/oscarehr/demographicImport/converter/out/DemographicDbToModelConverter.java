@@ -25,7 +25,6 @@ package org.oscarehr.demographicImport.converter.out;
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.allergy.dao.AllergyDao;
 import org.oscarehr.allergy.model.Allergy;
-import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
@@ -60,7 +59,7 @@ import java.util.List;
 
 @Component
 public class DemographicDbToModelConverter extends
-		AbstractModelConverter<Demographic, org.oscarehr.demographicImport.model.demographic.Demographic>
+		BaseDbToModelConverter<Demographic, org.oscarehr.demographicImport.model.demographic.Demographic>
 {
 	@Autowired
 	private OscarAppointmentDao appointmentDao;
@@ -120,9 +119,6 @@ public class DemographicDbToModelConverter extends
 	private ConcernNoteDbToModelConverter concernNoteModelConverter;
 
 	@Autowired
-	private ProviderDbToModelConverter providerConverter;
-
-	@Autowired
 	private PreventionDao preventionDao;
 
 	@Autowired
@@ -151,9 +147,9 @@ public class DemographicDbToModelConverter extends
 		exportDemographic.setChartNumber(input.getChartNo());
 		exportDemographic.setRosterDate(ConversionUtils.toNullableLocalDate(input.getRosterDate()));
 		exportDemographic.setRosterTerminationDate(ConversionUtils.toNullableLocalDate(input.getRosterTerminationDate()));
-		exportDemographic.setMrpProvider(providerConverter.convert(input.getProvider()));
-//		exportDemographic.setReferralDoctor(providerConverter.convert(input.getProvider()));
-//		exportDemographic.setFamilyDoctor(providerConverter.convert(input.getProvider()));
+		exportDemographic.setMrpProvider(findProvider(input.getProviderNo()));
+//		exportDemographic.setReferralDoctor(findProvider(input.getProvider()));
+//		exportDemographic.setFamilyDoctor(findProvider(input.getProvider()));
 		exportDemographic.setPatientStatusDate(ConversionUtils.toNullableLocalDate(input.getPatientStatusDate()));
 
 		Address address = new Address();

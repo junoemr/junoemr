@@ -23,12 +23,10 @@
 package org.oscarehr.demographicImport.converter.out;
 
 import org.oscarehr.common.dao.PartialDateDao;
-import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.immunization.Immunization;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.model.PreventionExt;
-import org.oscarehr.provider.dao.ProviderDataDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -47,16 +45,10 @@ import static org.oscarehr.prevention.model.PreventionExt.KEY_ROUTE;
 
 // can't extend the base class because the base uses this converter
 @Component
-public class PreventionDbToModelConverter extends BaseModelToDbConverter<Prevention, Immunization>
+public class PreventionDbToModelConverter extends BaseDbToModelConverter<Prevention, Immunization>
 {
 	@Autowired
 	private PartialDateDao partialDateDao;
-
-	@Autowired
-	private ProviderDataDao providerDao;
-
-	@Autowired
-	private ProviderDbToModelConverter providerConverter;
 
 	@Override
 	public Immunization convert(Prevention input)
@@ -76,12 +68,7 @@ public class PreventionDbToModelConverter extends BaseModelToDbConverter<Prevent
 		immunization.setAdministrationDate(PartialDateTime.from(ConversionUtils.toNullableLocalDateTime(input.getPreventionDate()), dbPartialDate));
 
 		immunization.setCreatedAt(ConversionUtils.toNullableLocalDateTime(input.getCreationDate()));
-
-		String providerNo = input.getProviderNo();
-		if(providerNo != null)
-		{
-			immunization.setCreatedBy(providerConverter.convert(providerDao.find(providerNo)));
-		}
+		immunization.setCreatedBy(findProvider(input.getProviderNo()));
 
 		immunization.setRefused(input.isRefused());
 		immunization.setNever(input.isNever());
