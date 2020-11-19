@@ -27,6 +27,7 @@ import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.prevention.dto.PreventionListData;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.model.PreventionExt;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -143,12 +144,18 @@ public class PreventionDao extends AbstractDao<Prevention>
 		return (results);
 	}
 
-	public List<Prevention> findByTypeAndDate(String preventionType, Date startDate, Date endDate) {
-		Query query = entityManager.createQuery("select x from "+modelClass.getSimpleName()+" x where x.preventionType=?1 and x.preventionDate>=?2 and x.preventionDate<=?3 and x.deleted='0' and x.refused='0' order by x.preventionDate");
-		query.setParameter(1, preventionType);
-		query.setParameter(2, startDate);
-		query.setParameter(3, endDate);
-
+	public List<Prevention> findByTypeAndDate(String preventionType, Date startDate, Date endDate)
+	{
+		String sql = "SELECT x FROM Prevention x " +
+				"WHERE x.preventionType = :preventionType " +
+				"AND x.preventionDate BETWEEN :startDate AND :endDate " +
+				"AND x.deleted='0'" +
+				"AND x.refused='0'" +
+				"ORDER BY x.preventionDate";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("preventionType", preventionType);
+		query.setParameter("startDate", startDate);
+		query.setParameter("endDate", endDate);
 		@SuppressWarnings("unchecked")
         List<Prevention> results = query.getResultList();
 

@@ -42,47 +42,51 @@ if(!authed) {
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ page
 	import="java.util.*,oscar.oscarReport.data.*,oscar.util.*,oscar.oscarDB.*,java.sql.*,oscar.oscarDemographic.data.*,oscar.oscarPrevention.*"%>
+<%@ page import="java.util.Date" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <link rel="stylesheet" type="text/css"
 	href="../oscarEncounter/encounterStyles.css">
 <%  //This could be done alot better.
-  String curUser_no,userfirstname,userlastname;
-  curUser_no = (String) session.getAttribute("user");
-
   String startStr = "";
   String endStr   = "";
   String injectionType ="";
 
   if (request.getParameter("startDate") != null && request.getParameter("startDate") != null && request.getParameter("startDate") != null  ){
 
-      String startDate =     request.getParameter("startDate");
-      String endDate  =      request.getParameter("endDate");
       injectionType = request.getParameter("injectionType");
 
-      java.util.Date sDate = UtilDateUtilities.StringToDate(startDate);
-      java.util.Date eDate = UtilDateUtilities.StringToDate(endDate);
+      Date startDate = ConversionUtils.fromDateString(request.getParameter("startDate"));
+      Date endDate = ConversionUtils.fromDateString(request.getParameter("endDate"));
+	  startStr = ConversionUtils.toDateString(startDate);
+	  endStr   = ConversionUtils.toDateString(endDate);
+
+	  // adjust end date by 1 for querying purposes
+	  Calendar calendar = Calendar.getInstance();
+	  calendar.setTime(endDate);
+	  calendar.add(Calendar.DATE, 1);
+	  endDate = calendar.getTime();
 
       String keyVal = "lot";
       if (injectionType != null && injectionType.equals("RH")){
           keyVal = "product";
       }
 
-      ArrayList<Map<String,Object>> list = PreventionData.getExtValues(injectionType,sDate,eDate,keyVal);
+      List<Map<String,Object>> list = PreventionData.getExtValues(injectionType, startDate, endDate, keyVal);
       pageContext.setAttribute("list",list);
 
-      startStr = UtilDateUtilities.DateToString(sDate);
-      endStr   = UtilDateUtilities.DateToString(eDate);
-  }else{
+  }
+  else
+{
      Calendar cal = Calendar.getInstance();
      int daysTillMonday = cal.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY;
      java.util.Date endDate = cal.getTime();
      cal.add(Calendar.DATE,-daysTillMonday);
      java.util.Date startDate = cal.getTime();
 
-     startStr = UtilDateUtilities.DateToString(startDate);
-     endStr   = UtilDateUtilities.DateToString(endDate);
+	startStr = ConversionUtils.toDateString(startDate);
+	endStr   = ConversionUtils.toDateString(endDate);
   }
 %>
 <html>
