@@ -50,6 +50,8 @@ import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.search.CaseManagementNoteCriteriaSearch;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.rx.dao.DrugDao;
+import org.oscarehr.rx.model.Drug;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -123,6 +125,12 @@ public class DemographicDbToModelConverter extends
 
 	@Autowired
 	private PreventionDbToModelConverter preventionConverter;
+
+	@Autowired
+	private DrugDao drugDao;
+
+	@Autowired
+	private MedicationDbToModelConverter medicationDbToModelConverter;
 
 	@Override
 	public org.oscarehr.demographicImport.model.demographic.Demographic convert(Demographic input)
@@ -201,6 +209,9 @@ public class DemographicDbToModelConverter extends
 
 		List<Prevention> preventions = preventionDao.findActiveByDemoId(input.getDemographicId());
 		exportDemographic.setImmunizationList(preventionConverter.convert(preventions));
+
+		List<Drug> drugs = drugDao.findByDemographicId(input.getDemographicId());
+		exportDemographic.setMedicationList(medicationDbToModelConverter.convert(drugs));
 
 		return exportDemographic;
 	}

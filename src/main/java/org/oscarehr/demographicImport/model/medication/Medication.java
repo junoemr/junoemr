@@ -24,8 +24,86 @@ package org.oscarehr.demographicImport.model.medication;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.common.PartialDate;
+import org.oscarehr.demographicImport.model.common.PartialDateTime;
+import org.oscarehr.demographicImport.model.provider.Provider;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
-public class Medication extends AbstractTransientModel
+public abstract class Medication extends AbstractTransientModel
 {
+	private Integer id;
+
+	// prescription given
+	private Provider prescribingProvider;
+	private PartialDate rxStartDate;
+	private PartialDateTime writtenDate;
+	private LocalDate rxEndDate;
+	private LocalDateTime createdDateTime;
+	private Boolean patientCompliance;
+	private LocalDateTime pickupDateTime;
+	private String rxStatus;
+
+
+	// prescription details
+	private String brandName;
+	private String genericName;
+	private String customName;
+	private Integer gcnSeqNo;
+	private Boolean prn;
+	private Boolean noSubs;
+	private String atc;
+	private Integer scriptNo;
+	private String regionalIdentifier;
+	private String drugForm;
+	private String unit;
+	private String unitName;
+	private String method;
+	private String route;
+	private Boolean nonAuthoritative;
+
+
+	// dosage info
+	private float takeMin;
+	private float takeMax;
+	private String freqCode;
+	private String duration;
+	private String durationUnit;
+	private String quantity;
+	private Integer repeat;
+	private String dosage;
+	private Boolean longTerm;
+	private Boolean pastMed;
+	private String strengthAmount;
+	private String strengthUnit;
+
+	// refill info
+	private LocalDate lastRefillDate;
+	private Integer refillDuration;
+	private Integer refillQuantity;
+	private Integer dispenseInterval;
+	private Boolean dispenseInternal;
+
+	// notes, comments, instructions
+	private String instructions;
+	private String specialInstructions;
+	private String comment;
+	private Boolean customInstructions;
+	private Boolean customNote;
+
+	// other
+	private String archivedReason;
+	private LocalDateTime archivedDateTime;
+	private LocalDateTime lastUpdateDateTime;
+
+	private String outsideProviderName;
+	private String outsideProviderOhip;
+	private Boolean hideFromDrugProfile;
+	private String eTreatmentType;
+	private Boolean hideFromCpp;
+	private Integer position;
+
+	public abstract String getName();
 }

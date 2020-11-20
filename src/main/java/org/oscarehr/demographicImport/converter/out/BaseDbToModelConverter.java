@@ -24,7 +24,6 @@ package org.oscarehr.demographicImport.converter.out;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.MiscUtils;
@@ -38,9 +37,6 @@ public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverte
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final HashMap<String, Provider> providerLookupCache = new HashMap<>();
-
-	@Autowired
-	private PartialDateDao partialDateDao;
 
 	@Autowired
 	private ProviderDataDao providerDao;

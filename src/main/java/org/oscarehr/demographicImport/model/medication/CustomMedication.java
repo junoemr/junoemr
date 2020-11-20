@@ -20,22 +20,16 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds.in;
+package org.oscarehr.demographicImport.model.medication;
 
-import org.oscarehr.common.xml.cds.v5_0.model.MedicationsAndTreatments;
-import org.oscarehr.demographicImport.model.medication.CustomMedication;
-import org.oscarehr.demographicImport.model.medication.Medication;
+import lombok.Data;
 
-public class CDSMedicationImportMapper extends AbstractCDSImportMapper<MedicationsAndTreatments, Medication>
+@Data
+public class CustomMedication extends Medication
 {
-	public CDSMedicationImportMapper()
-	{
-		super();
-	}
-
 	@Override
-	public Medication importToJuno(MedicationsAndTreatments importStructure)
+	public String getName()
 	{
-		return new CustomMedication();
+		return this.getCustomName();
 	}
 }
