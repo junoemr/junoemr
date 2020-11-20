@@ -73,7 +73,7 @@ public class AllergyDbToModelConverter extends
 	private String getNote(Allergy input)
 	{
 		String noteString = null;
-		CaseManagementNoteLink link = caseManagementNoteLinkDao.findAllergyNoteLinkById(input.getId());
+		CaseManagementNoteLink link = caseManagementNoteLinkDao.findLatestAllergyNoteLinkById(input.getId());
 		if(link != null)
 		{
 			CaseManagementNote note = link.getNote();

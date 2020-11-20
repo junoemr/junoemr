@@ -276,4 +276,16 @@ public class MapperFactory
 	{
 		return new MeasurementsMapper(message, providerRep, importSource);
 	}
+
+	/**
+	 * new allergy mapper
+	 * @param message - message to import
+	 * @param providerRep - rep of provider
+	 * @param importSource - source of import
+	 * @return - new allergy mapper
+	 */
+	public static PregnancyMapper newPregnancyMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	{
+		return new PregnancyMapper(message, providerRep);
+	}
 }

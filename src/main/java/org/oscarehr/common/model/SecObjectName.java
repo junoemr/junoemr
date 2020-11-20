@@ -36,6 +36,7 @@ public class SecObjectName extends AbstractModel<String> {
 
 	public static final String _ADMIN = "_admin";
 	public static final String _APPOINTMENT = "_appointment";
+	public static final String _TICKLER = "_tickler";
 
 	@Id
 	@Column(name="objectName")

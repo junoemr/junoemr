@@ -225,6 +225,10 @@
 			ng-show="ticklerViewCtrl.ticklerWriteAccess">
 		<bean:message key="tickler.view.save" bundle="ui"/>
 	</button>
+	<button class="btn btn-success" ng-click="ticklerViewCtrl.saveChangesAndWriteEncounter()"
+	        ng-show="ticklerViewCtrl.ticklerWriteAccess">
+		<bean:message key="tickler.view.saveWithEncounter" bundle="ui"/>
+	</button>
 </div>
 
 

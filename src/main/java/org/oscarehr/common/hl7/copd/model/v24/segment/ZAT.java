@@ -63,7 +63,7 @@ public class ZAT extends AbstractSegment
 		}
 	}
 
-	public SI getZat2_SetId()
+	public SI getZat1_SetId()
 	{
 		try
 		{

@@ -39,23 +39,28 @@ public class CaseManagementNoteLinkDao extends AbstractDao<CaseManagementNoteLin
 		super(CaseManagementNoteLink.class);
 	}
 
-	public CaseManagementNoteLink findNoteLinkByTableId(Integer tableName, Integer tableId)
+	public CaseManagementNoteLink findLatestAllergyNoteLinkById(Integer allergyId)
+	{
+		return this.findLatestByTableAndTableId(CaseManagementNoteLink.ALLERGIES, allergyId);
+	}
+
+	public CaseManagementNoteLink findLatestTicklerNoteLinkById(Integer ticklerId)
+	{
+		return this.findLatestByTableAndTableId(CaseManagementNoteLink.TICKLER, ticklerId);
+	}
+
+	public CaseManagementNoteLink findLatestByTableAndTableId(Integer tableName, Integer tableId)
 	{
 		// select model name must match specified @Entity name in model object
 		String queryString = "SELECT x FROM model.CaseManagementNoteLink x " +
-				"WHERE x.tableName = :tableName " +
-				"AND x.tableId = :tableId " +
-				"ORDER BY x.id ASC";
+				"WHERE x.tableName=:tableName " +
+				"AND x.tableId=:tableId " +
+				"ORDER BY x.note.noteId DESC";
 		Query query = entityManager.createQuery(queryString);
 		query.setParameter("tableName", tableName);
 		query.setParameter("tableId", tableId);
 		query.setMaxResults(1);
 
-		return (CaseManagementNoteLink) query.getSingleResult();
-	}
-
-	public CaseManagementNoteLink findAllergyNoteLinkById(Integer allergyId)
-	{
-		return this.findNoteLinkByTableId(CaseManagementNoteLink.ALLERGIES, allergyId);
+		return this.getSingleResultOrNull(query);
 	}
 }

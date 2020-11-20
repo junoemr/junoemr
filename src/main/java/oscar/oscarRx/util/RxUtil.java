@@ -1403,7 +1403,18 @@ public class RxUtil {
 					//p(""+rx.isCustomNote());
 					//p(""+rxTemp.getRandomId());
 					//p(""+rx.getRandomId());
-					if (rxTemp.isCustom() && rxTemp.getCustomName().equals(rx.getCustomName()) && rxTemp.isCustomNote() == rx.isCustomNote() && rxTemp.getRandomId() != rx.getRandomId()) {
+					String rxTempCustomName = rxTemp.getCustomName();
+					String rxCustomName = rx.getCustomName();
+					if (rxTempCustomName == null)
+					{
+						rxTempCustomName = "";
+					}
+					if (rxCustomName == null)
+					{
+						rxCustomName = "";
+					}
+					if (rxTemp.isCustom() && rxTempCustomName.equals(rxCustomName) && rxTemp.isCustomNote() == rx.isCustomNote() && rxTemp.getRandomId() != rx.getRandomId())
+					{
 						p("1unique turning false");
 						unique = false;
 					}

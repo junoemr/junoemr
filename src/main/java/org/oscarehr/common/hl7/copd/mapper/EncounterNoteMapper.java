@@ -72,7 +72,7 @@ public class EncounterNoteMapper extends AbstractMapper
 
 		note.setNote(noteText);
 		note.setObservationDate(getEncounterNoteContactDate(rep));
-		note.setUpdateDate(getEncounterNoteContactDate(rep));
+		note.setUpdateDate(getEncounterUpdatedDate(rep));
 
 		return note;
 	}
@@ -97,7 +97,7 @@ public class EncounterNoteMapper extends AbstractMapper
 
 		if(!signatureText.isEmpty() && !signatureText.equals("|"))
 		{
-			Date noteDate = getEncounterNoteContactDate(rep);
+			Date noteDate = getEncounterUpdatedDate(rep);
 			String dateStr = ConversionUtils.toDateString(noteDate, "dd-MMM-yyyy HH:mm");
 			signatureText = "[Signed on " + dateStr + " by " + signatureText.replaceAll("\\|", " ") + "]";
 			text += signatureText;
@@ -110,11 +110,20 @@ public class EncounterNoteMapper extends AbstractMapper
 	{
 		return null;
 	}
+	public ProviderData getCreatingProvider(int rep) throws HL7Exception
+	{
+		return null;
+	}
 
 	public Date getEncounterNoteContactDate(int rep) throws HL7Exception
 	{
 		return getNullableDateTime(provider.getZPV(rep)
 				.getZpv2_contactDate().getTs1_TimeOfAnEvent().getValue());
+	}
+
+	public Date getEncounterUpdatedDate(int rep) throws HL7Exception
+	{
+		return getEncounterNoteContactDate(rep);
 	}
 
 	public String getEncounterNoteReason(int rep) throws HL7Exception

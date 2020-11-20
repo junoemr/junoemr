@@ -137,26 +137,33 @@ window.Oscar.AttachConsultation = {
 		return ret;
 	},
 
-	previewPDF: function previewPDF(docId, url, contextPath)
-	{
-		$("#previewPane").attr("src",
-			contextPath + "/oscarEncounter/oscarConsultationRequest/displayImage.jsp?url="
-			+ encodeURIComponent(contextPath + "/dms/ManageDocument.do?method=view&doc_no=" + docId)
-			+ "&link=" + encodeURIComponent(url));
-	},
+    previewPDF: function previewPDF(docId, url, contextPath)
+    {
+        var path = contextPath + "/oscarEncounter/oscarConsultationRequest/displayImage.jsp?url="
+            + encodeURIComponent(contextPath + "/dms/ManageDocument.do?method=view&doc_no=" + docId)
+            + "&link=" + encodeURIComponent(url);
+
+        Oscar.AttachConsultation._setPreviewFrame(path);
+    },
 
 	previewHTML: function previewHTML(url)
 	{
-		$("#previewPane").attr("src", url);
+        Oscar.AttachConsultation._setPreviewFrame(url);
 	},
 
 	previewImage: function previewImage(url, contextPath)
 	{
-		$("#previewPane").attr("src", contextPath + "/oscarEncounter/oscarConsultationRequest/displayImage.jsp?url=" + encodeURIComponent(url));
+	    var path = contextPath + "/oscarEncounter/oscarConsultationRequest/displayImage.jsp?url=" + encodeURIComponent(url);
+        Oscar.AttachConsultation._setPreviewFrame(path);
 	},
 
 	toggleSelectAll: function toggleSelectAll()
 	{
 		$("input[type='checkbox']").attr("checked", $("#selectAll").attr("checked"));
-	}
+	},
+
+    _setPreviewFrame: function(srcPath)
+    {
+        $("#previewPane").html('<iframe id="previewPane" class="flexGrow" sandbox="allow-same-origin" src="' + srcPath + '">')
+    },
 };
