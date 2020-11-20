@@ -25,7 +25,9 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 import org.oscarehr.common.xml.cds.v5_0.model.DrugMeasure;
 import org.oscarehr.common.xml.cds.v5_0.model.MedicationsAndTreatments;
 import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
+import org.oscarehr.demographicImport.model.medication.CustomMedication;
 import org.oscarehr.demographicImport.model.medication.Medication;
+import org.oscarehr.demographicImport.model.medication.StandardMedication;
 import org.oscarehr.demographicImport.model.provider.Provider;
 
 public class CDSMedicationExportMapper extends AbstractCDSExportMapper<MedicationsAndTreatments, Medication>
@@ -36,29 +38,24 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 	}
 
 	@Override
-	public MedicationsAndTreatments exportFromJuno(Medication exportStructure)
+	public MedicationsAndTreatments exportFromJuno(Medication medication)
 	{
 		MedicationsAndTreatments medicationsAndTreatments = objectFactory.createMedicationsAndTreatments();
 
-		medicationsAndTreatments.setPrescriptionWrittenDate(toNullableDateTimeFullOrPartial(exportStructure.getWrittenDate()));
-		medicationsAndTreatments.setStartDate(toNullableDateFullOrPartial(exportStructure.getRxStartDate()));
-		medicationsAndTreatments.setDrugIdentificationNumber(exportStructure.getRegionalIdentifier());
-		medicationsAndTreatments.setDrugName(exportStructure.getName());
-		medicationsAndTreatments.setStrength(getDrugMeasure(exportStructure));
-		medicationsAndTreatments.setNumberOfRefills(toStringOrNull(exportStructure.getRefillQuantity()));
-		medicationsAndTreatments.setDosage(exportStructure.getDosage());
-		medicationsAndTreatments.setDosageUnitOfMeasure(exportStructure.getUnit());
-		medicationsAndTreatments.setForm(exportStructure.getDrugForm());
-		medicationsAndTreatments.setRoute(exportStructure.getRoute());
-		medicationsAndTreatments.setFrequency(exportStructure.getFreqCode());
-		medicationsAndTreatments.setDuration(exportStructure.getDuration());
-		medicationsAndTreatments.setRefillDuration(toStringOrNull(exportStructure.getRefillDuration()));
-		medicationsAndTreatments.setQuantity(exportStructure.getQuantity());
-		medicationsAndTreatments.setRefillQuantity(toStringOrNull(exportStructure.getRefillQuantity()));
-		medicationsAndTreatments.setLongTermMedication(getLongTermIndicator(exportStructure));
-		medicationsAndTreatments.setPastMedications(getPastMedicationIndicator(exportStructure));
+		medicationsAndTreatments.setPrescriptionWrittenDate(toNullableDateTimeFullOrPartial(medication.getWrittenDate()));
+		medicationsAndTreatments.setStartDate(toNullableDateFullOrPartial(medication.getRxStartDate()));
+		medicationsAndTreatments.setNumberOfRefills(toStringOrNull(medication.getRefillQuantity()));
+		medicationsAndTreatments.setForm(medication.getDrugForm());
+		medicationsAndTreatments.setRoute(medication.getRoute());
+		medicationsAndTreatments.setFrequency(medication.getFreqCode());
+		medicationsAndTreatments.setDuration(medication.getDuration());
+		medicationsAndTreatments.setRefillDuration(toStringOrNull(medication.getRefillDuration()));
+		medicationsAndTreatments.setQuantity(medication.getQuantity());
+		medicationsAndTreatments.setRefillQuantity(toStringOrNull(medication.getRefillQuantity()));
+		medicationsAndTreatments.setLongTermMedication(getLongTermIndicator(medication));
+		medicationsAndTreatments.setPastMedications(getPastMedicationIndicator(medication));
 
-		Provider prescribingProvider = exportStructure.getPrescribingProvider();
+		Provider prescribingProvider = medication.getPrescribingProvider();
 		if(prescribingProvider != null)
 		{
 			MedicationsAndTreatments.PrescribedBy prescribedBy = objectFactory.createMedicationsAndTreatmentsPrescribedBy();
@@ -67,23 +64,58 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 			medicationsAndTreatments.setPrescribedBy(prescribedBy);
 		}
 
-		medicationsAndTreatments.setNotes(exportStructure.getComment());
-		medicationsAndTreatments.setPrescriptionInstructions(exportStructure.getInstructions());
-		medicationsAndTreatments.setPatientCompliance(getComplianceIndicator(exportStructure));
-		medicationsAndTreatments.setTreatmentType(exportStructure.getETreatmentType());
-		medicationsAndTreatments.setPrescriptionStatus(exportStructure.getRxStatus());
-		medicationsAndTreatments.setNonAuthoritativeIndicator(toStringOrNull(exportStructure.getNonAuthoritative()));
+		medicationsAndTreatments.setNotes(medication.getComment());
+		medicationsAndTreatments.setPrescriptionInstructions(medication.getInstructions());
+		medicationsAndTreatments.setPatientCompliance(getComplianceIndicator(medication));
+		medicationsAndTreatments.setTreatmentType(medication.getETreatmentType());
+		medicationsAndTreatments.setPrescriptionStatus(medication.getRxStatus());
+		medicationsAndTreatments.setNonAuthoritativeIndicator(toStringOrNull(medication.getNonAuthoritative()));
 		medicationsAndTreatments.setPriorPrescriptionReferenceIdentifier(null); //TODO
-		medicationsAndTreatments.setDispenseInterval(toStringOrNull(exportStructure.getDispenseInterval()));
+		medicationsAndTreatments.setDispenseInterval(toStringOrNull(medication.getDispenseInterval()));
 		medicationsAndTreatments.setDrugDescription(null); //TODO
-		medicationsAndTreatments.setSubstitutionNotAllowed(getSubsNotAllowedIndicator(exportStructure));
 		medicationsAndTreatments.setProblemCode(null); //TODO
 		medicationsAndTreatments.setProtocolIdentifier(null); //TODO
+
+		if(medication instanceof StandardMedication)
+		{
+			return fillStandardDrugElements(medicationsAndTreatments, (StandardMedication) medication);
+		}
+		else if(medication instanceof CustomMedication)
+		{
+			return fillCustomDrugElements(medicationsAndTreatments, (CustomMedication) medication);
+		}
+		else
+		{
+			return medicationsAndTreatments;
+		}
+	}
+
+	protected MedicationsAndTreatments fillStandardDrugElements(MedicationsAndTreatments medicationsAndTreatments,
+	                                                            StandardMedication medication)
+	{
+		String drugName = (medication.getBrandName() != null) ? medication.getBrandName() : medication.getGenericName();
+		medicationsAndTreatments.setDrugName(drugName);
+
+		medicationsAndTreatments.setDrugIdentificationNumber(medication.getRegionalIdentifier());
+		medicationsAndTreatments.setDosage(medication.getDosage());
+		medicationsAndTreatments.setDosageUnitOfMeasure(medication.getUnit());
+		medicationsAndTreatments.setStrength(getDrugMeasure(medication));
+
+		medicationsAndTreatments.setSubstitutionNotAllowed(getSubsNotAllowedIndicator(medication));
 
 		return medicationsAndTreatments;
 	}
 
-	protected DrugMeasure getDrugMeasure(Medication exportStructure)
+	protected MedicationsAndTreatments fillCustomDrugElements(MedicationsAndTreatments medicationsAndTreatments,
+	                                                          CustomMedication medication)
+	{
+		medicationsAndTreatments.setDrugName(medication.getCustomName());
+
+
+		return medicationsAndTreatments;
+	}
+
+	protected DrugMeasure getDrugMeasure(StandardMedication exportStructure)
 	{
 		DrugMeasure drugMeasure = null;
 
@@ -116,7 +148,7 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		ynIndicator.setBoolean(exportStructure.getPatientCompliance());
 		return ynIndicator;
 	}
-	protected String getSubsNotAllowedIndicator(Medication exportStructure)
+	protected String getSubsNotAllowedIndicator(StandardMedication exportStructure)
 	{
 		return exportStructure.getNoSubs() ? "Y" : "N";
 	}

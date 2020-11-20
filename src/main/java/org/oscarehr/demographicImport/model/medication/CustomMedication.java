@@ -27,9 +27,6 @@ import lombok.Data;
 @Data
 public class CustomMedication extends Medication
 {
-	@Override
-	public String getName()
-	{
-		return this.getCustomName();
-	}
+	// prescription details
+	private String customName;
 }

@@ -57,6 +57,7 @@ public class MedicationDbToModelConverter extends BaseDbToModelConverter<Drug, M
 		else
 		{
 			medication = new StandardMedication();
+			parseDosageValue(input, (StandardMedication) medication);
 		}
 
 		BeanUtils.copyProperties(input, medication,
@@ -85,13 +86,11 @@ public class MedicationDbToModelConverter extends BaseDbToModelConverter<Drug, M
 
 		medication.setDurationUnit(input.getDurUnit());
 
-		parseDosageValue(input, medication);
-
 		return medication;
 	}
 
 	// this was basically taken from cds 4 export
-	private void parseDosageValue(Drug input, Medication medication)
+	private void parseDosageValue(Drug input, StandardMedication medication)
 	{
 		String rawDosage = input.getDosage();
 		if(StringUtils.filled(rawDosage))

@@ -38,6 +38,9 @@ public abstract class Medication extends AbstractTransientModel
 
 	// prescription given
 	private Provider prescribingProvider;
+	private String outsideProviderName;
+	private String outsideProviderOhip;
+
 	private PartialDate rxStartDate;
 	private PartialDateTime writtenDate;
 	private LocalDate rxEndDate;
@@ -48,18 +51,8 @@ public abstract class Medication extends AbstractTransientModel
 
 
 	// prescription details
-	private String brandName;
-	private String genericName;
-	private String customName;
-	private Integer gcnSeqNo;
-	private Boolean prn;
-	private Boolean noSubs;
-	private String atc;
 	private Integer scriptNo;
-	private String regionalIdentifier;
 	private String drugForm;
-	private String unit;
-	private String unitName;
 	private String method;
 	private String route;
 	private Boolean nonAuthoritative;
@@ -73,11 +66,8 @@ public abstract class Medication extends AbstractTransientModel
 	private String durationUnit;
 	private String quantity;
 	private Integer repeat;
-	private String dosage;
 	private Boolean longTerm;
 	private Boolean pastMed;
-	private String strengthAmount;
-	private String strengthUnit;
 
 	// refill info
 	private LocalDate lastRefillDate;
@@ -90,20 +80,10 @@ public abstract class Medication extends AbstractTransientModel
 	private String instructions;
 	private String specialInstructions;
 	private String comment;
-	private Boolean customInstructions;
-	private Boolean customNote;
 
 	// other
 	private String archivedReason;
 	private LocalDateTime archivedDateTime;
 	private LocalDateTime lastUpdateDateTime;
-
-	private String outsideProviderName;
-	private String outsideProviderOhip;
-	private Boolean hideFromDrugProfile;
 	private String eTreatmentType;
-	private Boolean hideFromCpp;
-	private Integer position;
-
-	public abstract String getName();
 }
