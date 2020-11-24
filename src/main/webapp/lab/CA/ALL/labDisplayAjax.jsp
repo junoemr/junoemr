@@ -177,36 +177,50 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
      			}
      		}
      	%>
-     	
-         getComment=function(labid, action) {
-            var ret = true;            
-            var text = "V" + <%=version%> + "commentText" + labid + $("providerNo").value;
-            
-            var commentVal = "";
-            
-            if( $(text) != null ) {
-            	commentVal = $(text).innerHTML;
-            	if( commentVal == null ) {
-            		commentVal = "";
-            	}
-            }
-            var commentID = "comment_" + labid;
-            
-            var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
-			
-            if( comment == null )
-                ret = false;
-            else if ( comment != null && comment.length > 0 ){
-                $(commentID).value = comment;
-            }
-            else {
-            	$(commentID).value = commentVal;
-            }
-            if(ret)
-                handleLab('acknowledgeForm_'+labid,labid,action);
 
-            return false;
-        }
+         getComment = function getComment(labId, action)
+         {
+             return new Promise((resolve, reject) =>
+             {
+                 jQuery.ajax(
+                     {
+                         url: "../ws/rs/lab/" + labId,
+                         type: "GET",
+                         success: (result) =>
+                         {
+                             resolve(result);
+
+                             var saveComment = true;
+                             var commentVal = result.body;
+                             var commentID = "comment_" + labId;
+                             var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
+
+                             if (!comment)
+                             {
+                                 saveComment = false;
+                             }
+                             else if (!comment && comment.length > 0)
+                             {
+                                 $(commentID).value = comment;
+                             }
+                             else
+                             {
+                                 $(commentID).value = commentVal;
+                             }
+                             if (saveComment)
+                             {
+                                 handleLab('acknowledgeForm_' + labId, labId, action);
+                             }
+                             return false;
+                         },
+                         error: (error) =>
+                         {
+                             reject(error);
+                         }
+                     });
+             });
+         }
+
 
          printPDF=function(doclabid){
             document.forms['acknowledgeForm_'+doclabid].action="../lab/CA/ALL/PrintPDF.do";
@@ -275,14 +289,15 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
         }
         
         function addComment(formid,labid) {
-        	var url='<%=request.getContextPath()%>'+"/oscarMDS/UpdateStatus.do?method=addComment";
+
+	        var url='<%=request.getContextPath()%>'+"/oscarMDS/UpdateStatus.do?method=addComment";
         	var status = "status_" + labid;
         	
 			if( $F(status) == "" ) {
 				$(status).value = "N";
 			}
         	var data=$(formid).serialize(true);
-        	
+
         	var label = "V" + <%=version%> + "commentLabel" + labid + $F("providerNo");
         	var text = "V" + <%=version%> + "commentText" + labid + $("providerNo").value;
 			var commentID = "comment_" + labid;
@@ -298,6 +313,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
             		alert("Comment '" + $(commentID).value + "' added!\nThis lab has been forwarded to you.");
             	}
         }});
+
         }
         
        function confirmAck(){
