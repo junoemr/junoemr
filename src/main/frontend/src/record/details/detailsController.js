@@ -293,8 +293,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
 					controller.formatLastName(); //done on page load
 					controller.formatFirstName(); //done on page load
-					// trigger validations
-					Juno.Validations.allValidationsValid(controller.validations);
 				},
 				function error(errors)
 				{
