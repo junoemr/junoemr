@@ -131,7 +131,13 @@ public class ImportExportService
 
 		org.oscarehr.demographic.model.Demographic dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, demographic);
 
+		importNotes(demographic, dbDemographic);
 		importLabs(demographic, dbDemographic);
+
+	}
+
+	private void importNotes(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)
+	{
 
 	}
 

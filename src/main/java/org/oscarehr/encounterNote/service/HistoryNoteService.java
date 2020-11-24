@@ -1,0 +1,91 @@
+/**
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
+ */
+package org.oscarehr.encounterNote.service;
+
+import org.oscarehr.encounterNote.model.CaseManagementIssue;
+import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
+import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.Issue;
+
+public class HistoryNoteService extends BaseNoteService
+{
+
+	public CaseManagementNote saveMedicalHistoryNote(CaseManagementNote note)
+	{
+		return saveHistoryNote(note, Issue.SUMMARY_CODE_MEDICAL_HISTORY);
+	}
+
+	public CaseManagementNote saveSocialHistoryNote(CaseManagementNote note)
+	{
+		return saveHistoryNote(note, Issue.SUMMARY_CODE_SOCIAL_HISTORY);
+	}
+
+	public CaseManagementNote saveFamilyHistoryNote(CaseManagementNote note)
+	{
+		return saveHistoryNote(note, Issue.SUMMARY_CODE_FAMILY_HISTORY);
+	}
+
+	public CaseManagementNote saveReminderNote(CaseManagementNote note)
+	{
+		return saveHistoryNote(note, Issue.SUMMARY_CODE_REMINDERS);
+	}
+
+	protected CaseManagementNote saveHistoryNote(CaseManagementNote note, String summaryCode)
+	{
+		CaseManagementIssue caseManagementIssue = caseManagementIssueDao.findByIssueCode(
+				note.getDemographic().getDemographicId(), summaryCode);
+
+		// save the base note
+		note.setSigned(true);
+		note.setIncludeIssueInNote(true);
+		note.setPosition(1);
+		note = saveNote(note);
+
+		// create the demographic specific issue if it does not exist
+		if(caseManagementIssue == null)
+		{
+			// grab the master issue for reference/link
+			Issue issue = issueDao.findByCode(summaryCode);
+
+			caseManagementIssue = new CaseManagementIssue();
+			caseManagementIssue.setAcute(false);
+			caseManagementIssue.setCertain(false);
+			caseManagementIssue.setMajor(false);
+			caseManagementIssue.setProgramId(programManager.getDefaultProgramId());
+			caseManagementIssue.setResolved(false);
+			caseManagementIssue.setIssue(issue);
+			caseManagementIssue.setType(issue.getRole());
+			caseManagementIssue.setDemographic(note.getDemographic());
+			caseManagementIssue.setUpdateDate(note.getUpdateDate());
+
+			caseManagementIssueDao.persist(caseManagementIssue);
+		}
+
+		// link the note and the issue
+		CaseManagementIssueNotePK caseManagementIssueNotePK = new CaseManagementIssueNotePK(caseManagementIssue, note);
+		CaseManagementIssueNote caseManagementIssueNote = new CaseManagementIssueNote(caseManagementIssueNotePK);
+		caseManagementIssueNoteDao.persist(caseManagementIssueNote);
+		return note;
+	}
+}

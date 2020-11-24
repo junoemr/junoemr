@@ -32,7 +32,7 @@ import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.model.TicklerTextSuggest;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
-import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.encounterNote.service.TicklerNoteService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.managers.TicklerManager;
@@ -78,7 +78,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	private ProgramManager2 programManager;
 
 	@Autowired
-	private EncounterNoteService encounterNoteService;
+	private TicklerNoteService ticklerNoteService;
 
 	@POST
 	@Path("/search")
@@ -315,7 +315,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 
 		if(writeEncounterNote)
 		{
-			encounterNoteService.saveTicklerNoteFromPrevious(tickler.getMessage(), tickler, loggedInProviderNo, tickler.getDemographicNo());
+			ticklerNoteService.saveTicklerNoteFromPrevious(tickler.getMessage(), tickler, loggedInProviderNo, tickler.getDemographicNo());
 		}
 		
 
@@ -363,7 +363,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 		boolean success = ticklerManager.addTickler(getLoggedInInfo(), tickler);
 		if(writeEncounterNote)
 		{
-			encounterNoteService.saveTicklerNote(tickler.getMessage(), tickler, loggedInProviderNo, tickler.getDemographicNo());
+			ticklerNoteService.saveTicklerNote(tickler.getMessage(), tickler, loggedInProviderNo, tickler.getDemographicNo());
 		}
 		GenericRESTResponse response = new GenericRESTResponse();
 		response.setSuccess(success);

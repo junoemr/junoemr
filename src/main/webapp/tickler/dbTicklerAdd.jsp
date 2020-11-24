@@ -29,12 +29,12 @@
 <%@ page import="org.oscarehr.common.dao.TicklerLinkDao"%>
 <%@ page import="org.oscarehr.common.model.Tickler"%>
 <%@ page import="org.oscarehr.common.model.TicklerLink" %>
-<%@ page import="org.oscarehr.encounterNote.service.EncounterNoteService" %>
 <%@ page import="org.oscarehr.managers.TicklerManager" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
 <%@ page import="oscar.util.UtilDateUtilities" %>
+<%@ page import="org.oscarehr.encounterNote.service.TicklerNoteService" %>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
@@ -92,8 +92,8 @@
 
 		if(writeEncounterNote)
 		{
-			EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
-			encounterNoteService.saveTicklerNote(message, tickler, doccreator, demographicNo);
+			TicklerNoteService ticklerNoteService = SpringUtils.getBean(TicklerNoteService.class);
+			ticklerNoteService.saveTicklerNote(message, tickler, doccreator, demographicNo);
 		}
 
 		if (docType != null && docId != null && !docType.trim().equals("") && !docId.trim().equals("") && !docId.equalsIgnoreCase("null"))

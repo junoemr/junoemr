@@ -38,7 +38,7 @@ import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.model.TicklerComment;
 import org.oscarehr.common.model.TicklerTextSuggest;
 import org.oscarehr.common.model.TicklerUpdate;
-import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.encounterNote.service.TicklerNoteService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -230,8 +230,8 @@ public class EditTicklerAction extends DispatchAction{
 
             if(writeEncounterNote)
             {
-                EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
-                encounterNoteService.saveTicklerNoteFromPrevious(newMessage, tickler, providerNo, tickler.getDemographicNo());
+                TicklerNoteService ticklerNoteService = SpringUtils.getBean(TicklerNoteService.class);
+                ticklerNoteService.saveTicklerNoteFromPrevious(newMessage, tickler, providerNo, tickler.getDemographicNo());
             }
         }                                    
                 

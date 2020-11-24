@@ -77,6 +77,7 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.encounterNote.service.HistoryNoteService;
 import org.oscarehr.labs.service.LabService;
 import org.oscarehr.message.service.MessageService;
 import org.oscarehr.prevention.dao.PreventionDao;
@@ -161,6 +162,9 @@ public class CoPDImportService
 
 	@Autowired
 	EncounterNoteService encounterNoteService;
+
+	@Autowired
+	HistoryNoteService historyNoteService;
 
 	@Autowired
 	DxresearchDAO dxresearchDAO;
@@ -581,7 +585,7 @@ public class CoPDImportService
 			metadataNote.setProvider(provider);
 			metadataNote.setSigningProvider(provider);
 			metadataNote.setDemographic(demographic);
-			encounterNoteService.saveMedicalHistoryNote(metadataNote);
+			historyNoteService.saveMedicalHistoryNote(metadataNote);
 		}
 	}
 
@@ -721,7 +725,7 @@ public class CoPDImportService
 			reminderNote.setProvider(provider);
 			reminderNote.setSigningProvider(provider);
 			reminderNote.setDemographic(demographic);
-			encounterNoteService.saveReminderNote(reminderNote);
+			historyNoteService.saveReminderNote(reminderNote);
 		}
 	}
 
@@ -779,21 +783,21 @@ public class CoPDImportService
 			medHistNote.setProvider(provider);
 			medHistNote.setSigningProvider(provider);
 			medHistNote.setDemographic(demographic);
-			encounterNoteService.saveMedicalHistoryNote(medHistNote);
+			historyNoteService.saveMedicalHistoryNote(medHistNote);
 		}
 		for(CaseManagementNote socHistNote : historyNoteMapper.getSocialHistoryNoteList())
 		{
 			socHistNote.setProvider(provider);
 			socHistNote.setSigningProvider(provider);
 			socHistNote.setDemographic(demographic);
-			encounterNoteService.saveSocialHistoryNote(socHistNote);
+			historyNoteService.saveSocialHistoryNote(socHistNote);
 		}
 		for(CaseManagementNote famHistNote : historyNoteMapper.getFamilyHistoryNoteList())
 		{
 			famHistNote.setProvider(provider);
 			famHistNote.setSigningProvider(provider);
 			famHistNote.setDemographic(demographic);
-			encounterNoteService.saveFamilyHistoryNote(famHistNote);
+			historyNoteService.saveFamilyHistoryNote(famHistNote);
 		}
 	}
 
