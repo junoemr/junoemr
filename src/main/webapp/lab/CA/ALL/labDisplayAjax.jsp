@@ -214,7 +214,6 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                             console.log("Error getting lab comment", error);
                          }
                      });
-
          }
 
 
