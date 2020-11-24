@@ -34,7 +34,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-@Path("/lab/{labId}")
+@Path("/lab")
 @Component("LabWebService")
 @Produces("application/json")
 public class LabWebService extends AbstractServiceImpl
@@ -42,13 +42,13 @@ public class LabWebService extends AbstractServiceImpl
 
 
     @Autowired
-    ProviderLabRoutingDao dao;
+    private ProviderLabRoutingDao providerLabRoutingDao;
 
     @GET
-    @Path("/")
+    @Path("/{labId}/comment")
     public RestResponse<String> getComment(@PathParam("labId") Integer labId)
     {
-       ProviderLabRoutingModel providerLabRoutingModel = dao.findSingleLabRoute(labId);
+       ProviderLabRoutingModel providerLabRoutingModel = providerLabRoutingDao.findSingleLabRoute(labId);
        String comment = providerLabRoutingModel.getComment();
 
         return RestResponse.successResponse(comment);

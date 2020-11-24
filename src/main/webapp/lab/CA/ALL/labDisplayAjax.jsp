@@ -180,16 +180,12 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 
          getComment = function getComment(labId, action)
          {
-             return new Promise((resolve, reject) =>
-             {
                  jQuery.ajax(
                      {
-                         url: "../ws/rs/lab/" + labId,
+                         url: "../ws/rs/lab/" + labId + "/comment",
                          type: "GET",
                          success: (result) =>
                          {
-                             resolve(result);
-
                              var saveComment = true;
                              var commentVal = result.body;
                              var commentID = "comment_" + labId;
@@ -215,10 +211,10 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                          },
                          error: (error) =>
                          {
-                             reject(error);
+                            console.log("Error getting lab comment", error);
                          }
                      });
-             });
+
          }
 
 
