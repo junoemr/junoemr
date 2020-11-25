@@ -25,6 +25,24 @@
 --%>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
+
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.demographic.service.DemographicService" %>
+<%@ page import="org.oscarehr.demographic.search.DemographicCriteriaSearch" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicDao" %>
+<%@ page import="org.oscarehr.demographic.model.Demographic" %>
+<%@ page import="java.time.temporal.ChronoUnit" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="oscar.util.ConversionUtils" %>
+<jsp:useBean id="reportMainBean" class="oscar.AppointmentMainBean"
+			 scope="session" />
+<jsp:useBean id="providerNameBean" class="oscar.Dict" scope="page" />
+<%  if(!reportMainBean.getBDoConfigure()) { %>
+<%@ include file="reportMainBeanConn.jspf"%>
+<% } %>
 <%
       String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
       boolean authed2=true;
@@ -63,26 +81,6 @@ if(!authed2) {
 	List<Demographic> demographics = demographicDao.criteriaSearch(demoSearch);
 
 %>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.managers.DemographicManager" %>
-<%@ page import="org.oscarehr.util.LoggedInInfo" %>
-<%@ page import="java.util.List" %>
-<%@ page import="org.oscarehr.demographic.service.DemographicService" %>
-<%@ page import="org.oscarehr.demographic.search.DemographicCriteriaSearch" %>
-<%@ page import="org.oscarehr.demographic.dao.DemographicDao" %>
-<%@ page import="org.oscarehr.demographic.model.Demographic" %>
-<%@ page import="java.time.temporal.ChronoUnit" %>
-<%@ page import="java.time.LocalDate" %>
-<%@ page import="oscar.util.ConversionUtils" %>
-<jsp:useBean id="reportMainBean" class="oscar.AppointmentMainBean"
-	scope="session" />
-<jsp:useBean id="providerNameBean" class="oscar.Dict" scope="page" />
-<%  if(!reportMainBean.getBDoConfigure()) { %>
-<%@ include file="reportMainBeanConn.jspf"%>
-<% } %>
-
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -130,11 +128,11 @@ if(!authed2) {
 			key="report.reportactivepatientlist.msgPhone" /></b></TH>
 	</tr>
 	<%
-		boolean bodd = false;
+		boolean isOddRow = false;
 
 		for (Demographic demographic : demographics)
 		{
-			bodd = !bodd;
+			isOddRow = !isOddRow;
 			long age = ChronoUnit.YEARS.between(demographic.getDateOfBirth(), LocalDate.now());
 
 			// Someone will inevitably complain about fields showing up as "null"
@@ -150,7 +148,7 @@ if(!authed2) {
 			String phone = demographic.getPhone() != null ? demographic.getPhone() : "";
 
 %>
-	<tr bgcolor="<%=bodd?"ivory":"white"%>">
+	<tr bgcolor="<%=isOddRow ? "ivory" : "white"%>">
 		<td nowrap><%=demographic.getLastName()%></td>
 		<td nowrap><%=demographic.getFirstName()%></td>
 		<td align="center"><%=chartNo%></td>
