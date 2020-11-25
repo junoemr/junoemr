@@ -45,8 +45,8 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 	private static final OscarProperties properties = OscarProperties.getInstance();
 
 	private static final String IMPORT_PROVIDER = properties.getProperty("copd_import_service.system_provider_no", "999900");
-	private static final String DEFAULT_PROVIDER_LAST_NAME = properties.getProperty("copd_import_service.default_provider.last_name", "CoPD-provider");
-	private static final String DEFAULT_PROVIDER_FIRST_NAME = properties.getProperty("copd_import_service.default_provider.first_name", "CoPD-missing");
+	private static final String DEFAULT_PROVIDER_LAST_NAME = properties.getProperty("copd_import_service.default_provider.last_name", "import-provider");
+	private static final String DEFAULT_PROVIDER_FIRST_NAME = properties.getProperty("copd_import_service.default_provider.first_name", "missing");
 
 	private static final HashMap<String, ProviderData> providerLookupCache = new HashMap<>();
 
@@ -66,17 +66,6 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 	{
 		logger.info("Clearing db provider cache");
 		providerLookupCache.clear();
-	}
-
-	/**
-	 * look up an existing provider record matched on first and last name, or create a new one if none is found.
-	 * If first and last name are not set, then a default will be selected. a default provider record otherwise
-	 * @param provider - the provider model to find a database object for
-	 * @return - the provider record if possible, and a default if not nullable
-	 */
-	protected ProviderData findOrCreateProviderRecord(Provider provider)
-	{
-		return findOrCreateProviderRecord(provider, false);
 	}
 
 	/**

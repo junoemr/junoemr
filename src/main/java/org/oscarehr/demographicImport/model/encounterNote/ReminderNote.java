@@ -31,4 +31,9 @@ public class ReminderNote extends BaseNote
 {
 	private LocalDate startDate;
 	private LocalDate resolutionDate;
+
+	public ReminderNote()
+	{
+		super();
+	}
 }

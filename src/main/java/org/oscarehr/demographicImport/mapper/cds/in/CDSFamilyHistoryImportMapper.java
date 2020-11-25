@@ -38,8 +38,8 @@ public class CDSFamilyHistoryImportMapper extends AbstractCDSImportMapper<Family
 		FamilyHistoryNote note = new FamilyHistoryNote();
 		note.setNoteText(importStructure.getNotes());
 
-		note.setObservationDate(toLocalDateTime(importStructure.getStartDate()));
-		note.setStartDate(toLocalDate(importStructure.getStartDate()));
+		note.setObservationDate(toNullableLocalDateTime(importStructure.getStartDate()));
+		note.setStartDate(toNullableLocalDate(importStructure.getStartDate()));
 
 		return note;
 	}

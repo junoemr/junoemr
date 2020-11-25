@@ -27,23 +27,17 @@ import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.Issue;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class HistoryNoteService extends BaseNoteService
 {
-
-	public CaseManagementNote saveMedicalHistoryNote(CaseManagementNote note)
-	{
-		return saveHistoryNote(note, Issue.SUMMARY_CODE_MEDICAL_HISTORY);
-	}
-
 	public CaseManagementNote saveSocialHistoryNote(CaseManagementNote note)
 	{
 		return saveHistoryNote(note, Issue.SUMMARY_CODE_SOCIAL_HISTORY);
-	}
-
-	public CaseManagementNote saveFamilyHistoryNote(CaseManagementNote note)
-	{
-		return saveHistoryNote(note, Issue.SUMMARY_CODE_FAMILY_HISTORY);
 	}
 
 	public CaseManagementNote saveReminderNote(CaseManagementNote note)

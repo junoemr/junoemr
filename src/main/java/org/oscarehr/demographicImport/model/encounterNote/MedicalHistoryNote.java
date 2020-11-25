@@ -32,4 +32,9 @@ public class MedicalHistoryNote extends BaseNote
 	private LocalDate startDate;
 	private LocalDate resolutionDate;
 	private LocalDate procedureDate;
+
+	public MedicalHistoryNote()
+	{
+		super();
+	}
 }

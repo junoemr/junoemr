@@ -33,6 +33,6 @@ public class ReviewerModelToDbConverter extends BaseModelToDbConverter<Reviewer,
 	@Override
 	public ProviderData convert(Reviewer input)
 	{
-		return findOrCreateProviderRecord(input);
+		return findOrCreateProviderRecord(input, false);
 	}
 }

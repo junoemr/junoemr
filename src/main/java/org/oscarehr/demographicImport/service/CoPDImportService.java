@@ -77,7 +77,9 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.encounterNote.service.FamilyHistoryNoteService;
 import org.oscarehr.encounterNote.service.HistoryNoteService;
+import org.oscarehr.encounterNote.service.MedicalHistoryNoteService;
 import org.oscarehr.labs.service.LabService;
 import org.oscarehr.message.service.MessageService;
 import org.oscarehr.prevention.dao.PreventionDao;
@@ -165,6 +167,12 @@ public class CoPDImportService
 
 	@Autowired
 	HistoryNoteService historyNoteService;
+
+	@Autowired
+	MedicalHistoryNoteService medicalHistoryNoteService;
+
+	@Autowired
+	FamilyHistoryNoteService familyHistoryNoteService;
 
 	@Autowired
 	DxresearchDAO dxresearchDAO;
@@ -585,7 +593,7 @@ public class CoPDImportService
 			metadataNote.setProvider(provider);
 			metadataNote.setSigningProvider(provider);
 			metadataNote.setDemographic(demographic);
-			historyNoteService.saveMedicalHistoryNote(metadataNote);
+			medicalHistoryNoteService.saveMedicalHistoryNote(metadataNote);
 		}
 	}
 
@@ -783,7 +791,7 @@ public class CoPDImportService
 			medHistNote.setProvider(provider);
 			medHistNote.setSigningProvider(provider);
 			medHistNote.setDemographic(demographic);
-			historyNoteService.saveMedicalHistoryNote(medHistNote);
+			medicalHistoryNoteService.saveMedicalHistoryNote(medHistNote);
 		}
 		for(CaseManagementNote socHistNote : historyNoteMapper.getSocialHistoryNoteList())
 		{
@@ -797,7 +805,7 @@ public class CoPDImportService
 			famHistNote.setProvider(provider);
 			famHistNote.setSigningProvider(provider);
 			famHistNote.setDemographic(demographic);
-			historyNoteService.saveFamilyHistoryNote(famHistNote);
+			familyHistoryNoteService.saveFamilyHistoryNote(famHistNote);
 		}
 	}
 

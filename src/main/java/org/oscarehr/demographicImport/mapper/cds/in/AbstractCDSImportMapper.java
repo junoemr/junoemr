@@ -44,7 +44,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return ReflectionToStringBuilder.toString(this);
 	}
 
-	protected LocalDateTime toLocalDateTime(DateTimeFullOrPartial fullOrPartial)
+	protected LocalDateTime toNullableLocalDateTime(DateTimeFullOrPartial fullOrPartial)
 	{
 		if(fullOrPartial != null)
 		{
@@ -57,7 +57,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return null;
 	}
 
-	protected LocalDateTime toLocalDateTime(DateFullOrPartial fullOrPartial)
+	protected LocalDateTime toNullableLocalDateTime(DateFullOrPartial fullOrPartial)
 	{
 		if(fullOrPartial != null)
 		{
@@ -69,7 +69,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return null;
 	}
 
-	protected LocalDate toLocalDate(DateFullOrPartial fullOrPartial)
+	protected LocalDate toNullableLocalDate(DateFullOrPartial fullOrPartial)
 	{
 		if(fullOrPartial != null)
 		{

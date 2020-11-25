@@ -24,15 +24,30 @@ package org.oscarehr.demographicImport.model.encounterNote;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.provider.Provider;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
-public class BaseNote extends AbstractTransientModel
+public abstract class BaseNote extends AbstractTransientModel
 {
 	private String id;
 	private String noteText;
 	private String revisionId;
-
 	private LocalDateTime observationDate;
+	private Provider provider;
+	private Provider signingProvider;
+	private List<Provider> editors;
+
+	public BaseNote()
+	{
+		this.editors = new ArrayList<>();
+	}
+
+	public void addEditor(Provider editor)
+	{
+		this.editors.add(editor);
+	}
 }

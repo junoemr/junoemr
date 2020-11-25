@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -66,6 +67,25 @@ public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverte
 			}
 		}
 
+		return providerRecord;
+	}
+
+	protected Provider findProvider(ProviderData provider)
+	{
+		Provider providerRecord = null;
+		if(provider != null)
+		{
+			String providerId = provider.getId();
+			if(providerLookupCache.containsKey(providerId))
+			{
+				providerRecord = providerLookupCache.get(providerId);
+			}
+			else
+			{
+				providerRecord = providerConverter.convert(provider);
+				providerLookupCache.put(providerId, providerRecord);
+			}
+		}
 		return providerRecord;
 	}
 }

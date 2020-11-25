@@ -20,40 +20,48 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter.out.note;
+package org.oscarehr.demographicImport.converter.in.note;
 
-import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
+import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
 import org.oscarehr.demographicImport.model.encounterNote.BaseNote;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 @Component
-public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
-		BaseDbToModelConverter<CaseManagementNote, N>
+public abstract class BaseNoteModelToDbConverter<N extends BaseNote> extends
+		BaseModelToDbConverter<N, CaseManagementNote>
 {
 
 	@Override
-	public N convert(CaseManagementNote input)
+	public CaseManagementNote convert(N input)
 	{
 		if(input == null)
 		{
 			return null;
 		}
 
-		N exportNote = getNewNoteObject();
+		CaseManagementNote dbNote = new CaseManagementNote();
 
-		exportNote.setId(String.valueOf(input.getId()));
-		exportNote.setNoteText(input.getNote());
-		exportNote.setRevisionId(input.getUuid());
-		exportNote.setObservationDate(ConversionUtils.toNullableLocalDateTime(input.getObservationDate()));
-		exportNote.setProvider(findProvider(input.getProvider()));
-		exportNote.setSigningProvider(findProvider(input.getSigningProvider()));
+		String id = input.getId();
+		if(id != null)
+		{
+			dbNote.setNoteId(Long.parseLong(id));
+		}
+		dbNote.setNote(input.getNoteText());
+		dbNote.setUuid(input.getRevisionId());
+		dbNote.setObservationDate(ConversionUtils.toNullableLegacyDateTime(input.getObservationDate()));
+		dbNote.setProvider(findOrCreateProviderRecord(input.getProvider(), false));
+		dbNote.setSigningProvider(findOrCreateProviderRecord(input.getSigningProvider(), true));
 
-		return subConvert(input, exportNote);
+		dbNote.setSigned(true); // always sign the inbound chart notes
+		if(dbNote.getSigningProvider() == null)
+		{
+			dbNote.setSigningProvider(dbNote.getProvider());
+		}
+
+		return subConvert(input, dbNote);
 	}
 
-	public abstract N getNewNoteObject();
-
-	public abstract N subConvert(CaseManagementNote input, N exportNote);
+	public abstract CaseManagementNote subConvert(N input, CaseManagementNote dbNote);
 }

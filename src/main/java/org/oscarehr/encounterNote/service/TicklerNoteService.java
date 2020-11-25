@@ -26,7 +26,12 @@ import org.oscarehr.common.model.Tickler;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.oscarehr.encounterNote.model.Issue;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class TicklerNoteService extends HistoryNoteService
 {
 	/**

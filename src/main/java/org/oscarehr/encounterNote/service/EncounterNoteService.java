@@ -24,6 +24,8 @@ package org.oscarehr.encounterNote.service;
 
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographicImport.converter.in.note.EncounterNoteModelToDbConverter;
+import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssue;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
@@ -32,13 +34,44 @@ import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.rx.model.Drug;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Service
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class EncounterNoteService extends BaseNoteService
 {
+	@Autowired
+	protected EncounterNoteModelToDbConverter encounterNoteModelToDbConverter;
+
+	public CaseManagementNote saveChartNote(EncounterNote noteModel, Demographic demographic)
+	{
+		CaseManagementNote note = encounterNoteModelToDbConverter.convert(noteModel);
+
+		note.setDemographic(demographic);
+		CaseManagementNote savedNote = saveChartNote(note, null);
+		//TODO handle partial dates?
+
+		return savedNote;
+	}
+	public List<CaseManagementNote> saveChartNotes(List<EncounterNote> noteModelList, Demographic demographic)
+	{
+		List<CaseManagementNote> dbNoteList = new ArrayList<>(noteModelList.size());
+
+		for(EncounterNote encounterNote : noteModelList)
+		{
+			dbNoteList.add(saveChartNote(encounterNote, demographic));
+		}
+		return dbNoteList;
+	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note)
 	{
 		return saveChartNote(note, null);

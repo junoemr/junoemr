@@ -37,6 +37,8 @@ import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.encounterNote.service.FamilyHistoryNoteService;
+import org.oscarehr.encounterNote.service.MedicalHistoryNoteService;
 import org.oscarehr.labs.service.LabService;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +74,12 @@ public class ImportExportService
 
 	@Autowired
 	private EncounterNoteService encounterNoteService;
+
+	@Autowired
+	private MedicalHistoryNoteService medicalHistoryNoteService;
+
+	@Autowired
+	private FamilyHistoryNoteService familyHistoryNoteService;
 
 	@Autowired
 	private LabService labService;
@@ -127,9 +135,9 @@ public class ImportExportService
 		Demographic demographic = importer.importDemographic(importFile);
 
 		// TODO handle demographic merging
-//		logger.info(ReflectionToStringBuilder.toString(demographic));
 
 		org.oscarehr.demographic.model.Demographic dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, demographic);
+		demographic.setId(dbDemographic.getId());
 
 		importNotes(demographic, dbDemographic);
 		importLabs(demographic, dbDemographic);
@@ -138,7 +146,9 @@ public class ImportExportService
 
 	private void importNotes(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)
 	{
-
+		familyHistoryNoteService.saveFamilyHistoryNote(demographic.getFamilyHistoryNoteList(), dbDemographic);
+		medicalHistoryNoteService.saveMedicalHistoryNotes(demographic.getMedicalHistoryNoteList(), dbDemographic);
+		encounterNoteService.saveChartNotes(demographic.getEncounterNoteList(), dbDemographic);
 	}
 
 	private void importLabs(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic) throws HL7Exception, IOException

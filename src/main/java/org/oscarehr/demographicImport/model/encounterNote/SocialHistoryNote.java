@@ -31,4 +31,9 @@ public class SocialHistoryNote extends BaseNote
 {
 	private LocalDate startDate;
 	private LocalDate resolutionDate;
+
+	public SocialHistoryNote()
+	{
+		super();
+	}
 }

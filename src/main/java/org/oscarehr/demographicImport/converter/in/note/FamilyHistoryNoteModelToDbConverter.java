@@ -20,24 +20,20 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model.encounterNote;
+package org.oscarehr.demographicImport.converter.in.note;
 
-import lombok.Data;
+import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-
-@Data
-public class FamilyHistoryNote extends BaseNote
+@Component
+public class FamilyHistoryNoteModelToDbConverter extends BaseNoteModelToDbConverter<FamilyHistoryNote>
 {
-	private LocalDate startDate;
-	private LocalDate resolutionDate;
-	private Long ageAtOnset;
-	private String treatment;
-	private String relationship;
-	private String lifeStage;
-
-	public FamilyHistoryNote()
+	@Override
+	public CaseManagementNote subConvert(
+			FamilyHistoryNote input,
+			CaseManagementNote dbNote)
 	{
-		super();
+		return dbNote;
 	}
 }

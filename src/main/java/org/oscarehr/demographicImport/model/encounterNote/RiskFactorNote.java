@@ -34,4 +34,9 @@ public class RiskFactorNote extends BaseNote
 	private Long ageAtOnset;
 	private String exposureDetails;
 	private String lifeStage;
+
+	public RiskFactorNote()
+	{
+		super();
+	}
 }

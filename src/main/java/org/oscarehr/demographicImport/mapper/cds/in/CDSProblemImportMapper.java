@@ -39,9 +39,9 @@ public class CDSProblemImportMapper extends AbstractCDSImportMapper<ProblemList,
 
 		note.setProblemDescription(importStructure.getProblemDescription());
 		note.setProblemStatus(importStructure.getProblemStatus());
-		note.setStartDate(toLocalDate(importStructure.getOnsetDate()));
+		note.setStartDate(toNullableLocalDate(importStructure.getOnsetDate()));
 //		note.setLifeStage(String.valueOf(importStructure.getLifeStage()));
-		note.setResolutionDate(toLocalDate(importStructure.getResolutionDate()));
+		note.setResolutionDate(toNullableLocalDate(importStructure.getResolutionDate()));
 		note.setNoteText(importStructure.getNotes());
 
 		return note;

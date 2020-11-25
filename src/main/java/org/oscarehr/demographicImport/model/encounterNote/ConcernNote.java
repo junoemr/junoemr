@@ -34,4 +34,9 @@ public class ConcernNote extends BaseNote
 	private String problemDescription;
 	private String problemStatus;
 	private String lifeStage;
+
+	public ConcernNote()
+	{
+		super();
+	}
 }

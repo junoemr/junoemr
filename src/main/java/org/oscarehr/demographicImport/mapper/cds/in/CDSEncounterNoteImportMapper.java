@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
+import org.oscarehr.demographicImport.model.provider.Provider;
 
 public class CDSEncounterNoteImportMapper extends AbstractCDSImportMapper<ClinicalNotes, EncounterNote>
 {
@@ -37,7 +38,42 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSImportMapper<Clinic
 	{
 		EncounterNote note = new EncounterNote();
 		note.setNoteText(importStructure.getMyClinicalNotesContent());
-		note.setObservationDate(toLocalDateTime(importStructure.getEventDateTime()));
+		note.setObservationDate(toNullableLocalDateTime(importStructure.getEventDateTime()));
+
+		// TODO how to choose the mrp provider when there are multiple providers or reviewers?
+		if (!importStructure.getParticipatingProviders().isEmpty())
+		{
+			for(ClinicalNotes.ParticipatingProviders participatingProvider : importStructure.getParticipatingProviders())
+			{
+				Provider provider = new Provider();
+				provider.setFirstName(participatingProvider.getName().getFirstName());
+				provider.setLastName(participatingProvider.getName().getLastName());
+				provider.setOhipNumber(participatingProvider.getOHIPPhysicianId());
+				note.addEditor(provider);
+			}
+
+			// for now, first provider will be the MRP
+			ClinicalNotes.ParticipatingProviders participatingProvider = importStructure.getParticipatingProviders().get(0);
+
+			Provider provider = new Provider();
+			provider.setFirstName(participatingProvider.getName().getFirstName());
+			provider.setLastName(participatingProvider.getName().getLastName());
+			provider.setOhipNumber(participatingProvider.getOHIPPhysicianId());
+			note.setProvider(provider);
+		}
+
+		if (!importStructure.getNoteReviewer().isEmpty())
+		{
+			// for now, first provider will be the MRP
+			ClinicalNotes.NoteReviewer noteReviewer = importStructure.getNoteReviewer().get(0);
+
+			Provider provider = new Provider();
+			provider.setFirstName(noteReviewer.getName().getFirstName());
+			provider.setLastName(noteReviewer.getName().getLastName());
+			provider.setOhipNumber(noteReviewer.getOHIPPhysicianId());
+			note.setSigningProvider(provider);
+		}
+
 
 		return note;
 	}

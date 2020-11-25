@@ -24,4 +24,8 @@ package org.oscarehr.demographicImport.model.encounterNote;
 
 public class EncounterNote extends BaseNote
 {
+	public EncounterNote()
+	{
+		super();
+	}
 }

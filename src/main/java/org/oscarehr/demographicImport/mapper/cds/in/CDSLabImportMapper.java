@@ -89,7 +89,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		lab.setAccessionNumber(importLabGroup.get(0).getAccessionNumber());
 		lab.setSendingFacility(importLabGroup.get(0).getLaboratoryName());
 		lab.setEmrReceivedDateTime(LocalDateTime.now());
-		lab.setMessageDateTime(toLocalDateTime(importLabGroup.get(0).getCollectionDateTime()));
+		lab.setMessageDateTime(toNullableLocalDateTime(importLabGroup.get(0).getCollectionDateTime()));
 
 		// now need to group labs on the lab test
 		// juno will treat these groups as observations
@@ -145,8 +145,8 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		LabObservation labObservation = new LabObservation();
 		LaboratoryResults result0 = importLabGroup.get(0); //they should all be the same, so use the first one
 		labObservation.setName(result0.getTestName());
-		labObservation.setRequestDateTime(toLocalDateTime(result0.getLabRequisitionDateTime()));
-		labObservation.setObservationDateTime(toLocalDateTime(result0.getCollectionDateTime()));
+		labObservation.setRequestDateTime(toNullableLocalDateTime(result0.getLabRequisitionDateTime()));
+		labObservation.setObservationDateTime(toNullableLocalDateTime(result0.getCollectionDateTime()));
 		labObservation.setReportStatus(getReportStatusEnum(result0));
 
 		for(LaboratoryResults importLabResults : importLabGroup)
@@ -154,7 +154,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 			LabObservationResult result = new LabObservationResult();
 			result.setName(importLabResults.getTestNameReportedByLab());
 			result.setIdentifier(importLabResults.getLabTestCode());
-			result.setObservationDateTime(toLocalDateTime(importLabResults.getCollectionDateTime()));
+			result.setObservationDateTime(toNullableLocalDateTime(importLabResults.getCollectionDateTime()));
 
 			LaboratoryResults.Result labResult = importLabResults.getResult();
 			if(labResult != null)
