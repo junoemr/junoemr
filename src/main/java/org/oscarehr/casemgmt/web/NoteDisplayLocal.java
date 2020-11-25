@@ -23,21 +23,21 @@
 
 package org.oscarehr.casemgmt.web;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.oscarehr.casemgmt.dao.CaseManagementNoteLinkDAO;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.common.dao.CaseManagementIssueNotesDao;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.util.CppUtils;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarRx.data.RxPrescriptionData;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class NoteDisplayLocal implements NoteDisplay {
 	private CaseManagementIssueNotesDao caseManagementIssueNotesDao=(CaseManagementIssueNotesDao)SpringUtils.getBean("caseManagementIssueNotesDao");
@@ -248,15 +248,23 @@ public class NoteDisplayLocal implements NoteDisplay {
 
 
 	public ArrayList<String> getIssueDescriptions() {
-		ArrayList<String> issueDescriptions = new ArrayList<String>();
+		ArrayList<String> issueDescriptions = new ArrayList<>();
 
-		for (CaseManagementIssue issue : caseManagementNote.getIssues())
+		for(CaseManagementIssue issue : caseManagementNote.getIssues())
+		{
+			// don't show ticklerNote issues
+			if(this.isTicklerNote() && Issue.SUMMARY_CODE_TICKLER_NOTE.equals(issue.getIssue().getCode()))
+			{
+				continue;
+			}
 			issueDescriptions.add(issue.getIssue().getDescription());
+		}
 
 		return (issueDescriptions);
 	}
 
-	public boolean isReadOnly() {
+	public boolean isReadOnly()
+	{
 		return readonly;
 	}
 
@@ -285,7 +293,7 @@ public class NoteDisplayLocal implements NoteDisplay {
     }
 	
 	public boolean isTicklerNote() {
-		return containsIssue("TicklerNote");
+		return containsIssue(Issue.SUMMARY_CODE_TICKLER_NOTE);
 	}
 
 	@Override

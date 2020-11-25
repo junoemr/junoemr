@@ -6,6 +6,7 @@
 	<div class="select-container">
 		<select ng-model="$ctrl.ngModel"
 		        ng-options="option.value as option.label for option in $ctrl.options"
+						ng-change="$ctrl.onSelectChange($ctrl.ngModel)"
 		        ng-disabled="$ctrl.disabled">
 			<option ng-if="$ctrl.placeholder" value="" disabled selected>
 				{{$ctrl.placeholder}}

@@ -109,11 +109,12 @@
 	String demographicNoStr = request.getParameter("demographic_no");
 	int demographicNo = Integer.parseInt(demographicNoStr);
 
-
 	/* Prepare the demographic model */
 	Demographic demographic = demographicDao.getDemographic(demographicNoStr);
 
 	String hin = request.getParameter("hin").replaceAll("[^0-9a-zA-Z]", "");
+	String ver = request.getParameter("ver");
+	String hcType = request.getParameter("hc_type");
 
 	demographic.setLastName(request.getParameter("last_name").trim());
 	demographic.setFirstName(request.getParameter("first_name").trim());
@@ -129,14 +130,14 @@
 	demographic.setMonthOfBirth(request.getParameter("month_of_birth")!=null && request.getParameter("month_of_birth").length()==1 ? "0"+request.getParameter("month_of_birth") : request.getParameter("month_of_birth"));
 	demographic.setDateOfBirth(request.getParameter("date_of_birth")!=null && request.getParameter("date_of_birth").length()==1 ? "0"+request.getParameter("date_of_birth") : request.getParameter("date_of_birth"));
 	demographic.setHin(hin);
-	demographic.setVer(request.getParameter("ver"));
+	demographic.setVer(ver);
 	demographic.setRosterStatus(request.getParameter("roster_status"));
 	demographic.setPatientStatus(request.getParameter("patient_status"));
 	demographic.setChartNo(request.getParameter("chart_no"));
 	demographic.setProviderNo(StringUtils.trimToNull(request.getParameter("provider_no")));
 	demographic.setSex(request.getParameter("sex"));
 	demographic.setPcnIndicator(request.getParameter("pcn_indicator"));
-	demographic.setHcType(request.getParameter("hc_type"));
+	demographic.setHcType(hcType);
 	demographic.setFamilyDoctor("<rdohip>" + request.getParameter("referral_doctor_no") + "</rdohip><rd>" + request.getParameter("referral_doctor_name") + "</rd>" + (request.getParameter("family_doc")!=null? ("<family_doc>" + request.getParameter("family_doc") + "</family_doc>") : ""));
 	demographic.setFamilyDoctor2("<fd>" + request.getParameter("family_doctor_no") + "</fd>" + (request.getParameter("family_doctor_name")!=null? ("<fdname>" + request.getParameter("family_doctor_name") + "</fdname>") : ""));
 	demographic.setCountryOfOrigin(request.getParameter("countryOfOrigin"));
@@ -309,8 +310,7 @@
 
 	// added check to see if patient has a bc health card and has a version code of 66, in this case you are aloud to have dup hin
 	boolean hinDupCheckException = false;
-	String hcType = request.getParameter("hc_type");
-	String ver = request.getParameter("ver");
+
 	if(hcType != null && ver != null && hcType.equals("BC") && ver.equals("66"))
 	{
 		hinDupCheckException = true;
@@ -318,23 +318,16 @@
 
 	if(request.getParameter("hin") != null && request.getParameter("hin").length() > 5 && !hinDupCheckException)
 	{
-		String paramNameHin = request.getParameter("hin").trim();
+		boolean isUnique = demographicManager.isUniqueHealthCard(loggedInInfo, hin, ver, hcType, demographicNo);
 
-		List<Demographic> hinDemoList = demographicDao.searchDemographicByHIN(paramNameHin, 100, 0, loggedInProviderNo, true);
-		for(Demographic hinDemo : hinDemoList)
-	     {
-		     if(!(hinDemo.getDemographicNo().toString().equals(demographicNoStr)))
-		     {
-			     if(hinDemo.getVer() != null && !hinDemo.getVer().equals("66"))
-			     {
+		if (!isUnique)
+		{
 %>
 				***<font color='red'><bean:message key="demographic.demographicaddarecord.msgDuplicatedHIN" /></font>
 				***<br><br><a href=# onClick="history.go(-1);return false;"><b>&lt;-<bean:message key="global.btnBack" /></b></a>
 <%
 				return;
-	            }
-	        }
-	    }
+		}
 	}
 
 	//save

@@ -114,7 +114,7 @@ angular.module("Common.Services").service("ticklerService", [
 			return deferred.promise;
 		};
 
-		service.update = function update(tickler)
+		service.update = function update(tickler, writeEncounter = false)
 		{
 			var deferred = $q.defer();
 
@@ -123,6 +123,9 @@ angular.module("Common.Services").service("ticklerService", [
 				url: service.apiPath + '/update',
 				method: "POST",
 				data: JSON.stringify(tickler),
+				params: {
+					writeEncounterNote: writeEncounter,
+				},
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
 				function success(results)
@@ -160,7 +163,7 @@ angular.module("Common.Services").service("ticklerService", [
 			return deferred.promise;
 		};
 
-		service.add = function add(tickler)
+		service.add = function add(tickler, writeEncounter = false)
 		{
 			var deferred = $q.defer();
 
@@ -169,6 +172,9 @@ angular.module("Common.Services").service("ticklerService", [
 				url: service.apiPath + '/add',
 				method: "POST",
 				data: JSON.stringify(tickler),
+				params: {
+					writeEncounterNote: writeEncounter,
+				},
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
 				function success(results)

@@ -302,7 +302,11 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			});
 		};
 
-		controller.saveChanges = function()
+		controller.saveChangesAndWriteEncounter = function()
+		{
+			return controller.saveChanges(true);
+		}
+		controller.saveChanges = function(writeEncounter = false)
 		{
 			if (tickler.message != controller.ticklerUpdate.message)
 			{
@@ -329,7 +333,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 				console.log('Post DATA: ', postData);
 
-				ticklerService.update(postData).then(function(data)
+				ticklerService.update(postData, writeEncounter).then(function(data)
 				{
 					$uibModalInstance.close(true);
 				});

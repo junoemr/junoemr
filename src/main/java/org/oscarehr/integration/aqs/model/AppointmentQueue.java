@@ -41,6 +41,7 @@ public class AppointmentQueue
 	private OffsetDateTime createdAt;
 	private QueueAvailability availability;
 	private QueueOnDemandSettings onDemandSettings;
+	private Integer defaultAppointmentDurationMinutes = 15;
 	private Boolean available;
 
 	public AppointmentQueue()

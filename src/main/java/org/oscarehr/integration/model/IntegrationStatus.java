@@ -25,7 +25,9 @@ package org.oscarehr.integration.model;
 
 import org.oscarehr.integration.myhealthaccess.dto.ClinicStatusResponseTo1;
 
-public class IntegrationStatus
+import java.io.Serializable;
+
+public class IntegrationStatus implements Serializable
 {
 	private Integration integration;
 	private ClinicStatusResponseTo1 connectionStatus;

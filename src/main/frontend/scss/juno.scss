@@ -36,8 +36,10 @@
 @import "../src/common/components/junoLoadingIndicator";
 @import "../src/common/components/modal";
 @import "../src/common/components/junoButton/junoButton";
+@import "../src/common/components/junoRoundButton/junoRoundButton";
 @import "../src/common/components/junoCheckBox/junoCheckBox";
 @import "../src/common/components/junoInput/junoInput";
+@import "../src/common/components/junoPatientSelect/junoPatientSelect";
 @import "../src/common/components/junoSelect/junoSelect";
 @import "../src/common/components/junoTab/junoTab";
 @import "../src/common/components/junoTab/components/swimLaneTab/swimLaneTab";
@@ -54,6 +56,7 @@
 @import "../src/common/modals/junoSimpleModal/junoSimpleModal";
 @import "../src/common/modals/mhaPatientDetailsModal/mhaPatientDetailsModal";
 @import "../src/common/modals/appointmentQueueModal/appointmentQueueModal";
+@import "../src/common/modals/bookAppointmentModal/bookAppointmentModal";
 @import "../src/common/modals/appointmentQueueModal/components/availabilitySettings/availabilitySettings";
 
 // Section-specific things

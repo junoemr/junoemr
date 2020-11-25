@@ -23,16 +23,19 @@
 package org.oscarehr.ws.rest.myhealthaccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.common.conversion.GenericConverter;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
+import org.oscarehr.integration.myhealthaccess.model.MHATelehealthSessionInfo;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.myhealthaccess.AppointmentTo1;
+import org.oscarehr.ws.rest.transfer.myhealthaccess.TelehealthSessionInfoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -104,5 +107,17 @@ public class AppointmentWebService extends AbstractServiceImpl
 		appointmentService.sendTelehealthAppointmentNotification(integration, loginTokenTo1.getToken(), appointmentId);
 
 		return RestResponse.successResponse(true);
+	}
+
+	@GET
+	@Path("/appointment/non_mha/{appointmentNo}/session")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<TelehealthSessionInfoDto> getTelehealthSessionInformation(
+			@PathParam("integrationId") Integer integrationId,
+			@PathParam("appointmentNo") String appointmentNo) throws IllegalAccessException, InstantiationException
+	{
+		Integration integration = integrationDao.find(integrationId);
+		GenericConverter<MHATelehealthSessionInfo, TelehealthSessionInfoDto> genericConverter = new GenericConverter<>(TelehealthSessionInfoDto.class);
+		return RestResponse.successResponse(genericConverter.convert(appointmentService.getAppointmentSessionInformation(integration, Integer.parseInt(appointmentNo))));
 	}
 }

@@ -122,7 +122,11 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			return true;
 		};
 
-		controller.save = function()
+		controller.saveWithEncounter = function()
+		{
+			return controller.save(true);
+		}
+		controller.save = function(writeEncounter = false)
 		{
 			controller.isDisabled = true; // Disable save button
 			controller.showErrors = true;
@@ -145,7 +149,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			givenDate.setMinutes(givenTime.get('minute'));
 
 			tickler.serviceDate = givenDate;
-            ticklerService.add(tickler).then(
+            ticklerService.add(tickler, writeEncounter).then(
                 (response) =>
                 {
                     $uibModalInstance.close(true);

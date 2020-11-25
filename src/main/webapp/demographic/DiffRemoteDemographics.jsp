@@ -199,13 +199,11 @@
 						<td <%=isHighlighted(highlight)%>><%=StringUtils.noNull(demographicTransfer.getHinVersion())%></td>
 					</tr>
 					
-					<%highlight = (ConformanceTestHelper.isRemoteDateDifferent(DateUtils.toGregorianCalendar(demographic.getEffDate()),demographicTransfer.getHinValidStart())); %>
 					<tr>
 						<td>HinValidStart:</td>
 						<td><%=DateUtils.formatDate(demographic.getEffDate(),request.getLocale())%></td>
 						<td <%=isHighlighted(highlight)%>><%=DateUtils.formatDate(demographicTransfer.getHinValidStart(),request.getLocale())%></td>
 					</tr>
-					<%highlight = (ConformanceTestHelper.isRemoteDateDifferent(DateUtils.toGregorianCalendar(demographic.getHcRenewDate()),demographicTransfer.getHinValidEnd())); %>
 					<tr>
 						<td>HinValidEnd:</td>
 						<td><%=DateUtils.formatDate(demographic.getHcRenewDate(),request.getLocale())%></td>

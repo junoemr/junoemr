@@ -32,6 +32,11 @@ import javax.persistence.Id;
 @Entity
 public class SnomedCore extends AbstractCodeSystemModel<Integer> implements java.io.Serializable {
 
+	public static final String CODE_NORMAL_PREGNANCY = "72892002";
+	public static final String CODE_HIGH_RISK_PREGNANCY = "47200007";
+	public static final String CODE_MULTIPLE_PREGNANCY = "16356006";
+	public static final String CODE_ECTOPIC_PREGNANCY = "34801009";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
      private Integer id;

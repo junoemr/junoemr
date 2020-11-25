@@ -171,6 +171,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 			workPhone: null,
 			cellPhone: null,
 			otherPhone: null,
+			bookingNotificationNumbers: null,
 			fax: null,
 			contactEmail: null,
 			pagerNumber: null,
@@ -231,6 +232,7 @@ angular.module('Admin.Integration').component('editProviderAdmin',
 				lastName: Juno.Validations.validationFieldRequired(ctrl.provider, 'lastName'),
 				type: Juno.Validations.validationFieldRequired(ctrl.provider, 'type'),
 				userRoles: Juno.Validations.validationCustom(() => ctrl.provider.userRoles.length >= 1),
+				bookingNotificationNumbers: Juno.Validations.validationPhone(ctrl.provider, 'bookingNotificationNumbers'),
 			};
 
 			// password field validations

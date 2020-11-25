@@ -23,13 +23,10 @@
  */
 package org.oscarehr.common.model;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+import org.oscarehr.PMmodule.model.Program;
+import org.oscarehr.util.LocaleUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,11 +44,13 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-import org.oscarehr.PMmodule.model.Program;
-import org.oscarehr.util.LocaleUtils;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
 @Entity
 @Table(name="tickler")
@@ -67,6 +66,8 @@ public class Tickler extends AbstractModel<Integer> {
 	public static final String LOW = "Low";
         
 	public static final String NOT_APPLICABLE = "N/A";
+
+	public static final String HEADER_NAME = "Tickler";
 	
 	public enum STATUS
 	{
