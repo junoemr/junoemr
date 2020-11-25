@@ -182,29 +182,26 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
          {
                  jQuery.ajax(
                      {
-                         url: "../ws/rs/lab/" + labId + "/comment",
+                         url: "../ws/rs/lab/" + labId + "/comments",
                          type: "GET",
                          success: (result) =>
                          {
-                             var saveComment = true;
-                             var commentVal = result.body;
+                             var commentVal;
+                             var providersComments = result.body;
                              var commentID = "comment_" + labId;
+
+                             for (var provider in providersComments)
+                             {
+                                 if (provider === providerNo)
+                                 {
+                                     commentVal = providersComments[providerNo];
+                                 }
+                             }
                              var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
 
-                             if (!comment)
-                             {
-                                 saveComment = false;
-                             }
-                             else if (!comment && comment.length > 0)
+                             if (comment && comment.length > 0)
                              {
                                  $(commentID).value = comment;
-                             }
-                             else
-                             {
-                                 $(commentID).value = commentVal;
-                             }
-                             if (saveComment)
-                             {
                                  handleLab('acknowledgeForm_' + labId, labId, action);
                              }
                              return false;
@@ -212,6 +209,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                          error: (error) =>
                          {
                             console.log("Error getting lab comment", error);
+                            window.alert("Failed to load comments");
                          }
                      });
          }

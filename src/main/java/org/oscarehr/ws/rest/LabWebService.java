@@ -23,8 +23,10 @@
 
 package org.oscarehr.ws.rest;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,24 +35,38 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Path("/lab")
 @Component("LabWebService")
 @Produces("application/json")
 public class LabWebService extends AbstractServiceImpl
 {
-
-
+    private static Logger logger = MiscUtils.getLogger();
     @Autowired
     private ProviderLabRoutingDao providerLabRoutingDao;
 
     @GET
-    @Path("/{labId}/comment")
-    public RestResponse<String> getComment(@PathParam("labId") Integer labId)
+    @Path("/{labId}/comments")
+    public RestResponse<Map<String, String>> getComments(@PathParam("labId") Integer labId)
     {
-       ProviderLabRoutingModel providerLabRoutingModel = providerLabRoutingDao.findSingleLabRoute(labId);
-       String comment = providerLabRoutingModel.getComment();
 
-        return RestResponse.successResponse(comment);
+       List<ProviderLabRoutingModel> providerLabRoutingModel = providerLabRoutingDao.getProviderLabRoutings(labId, "HL7");
+       Map<String, String> comments = new HashMap<>();
+        try
+        {
+            for (int i = 0; i < providerLabRoutingModel.size(); i++)
+            {
+                comments.put(providerLabRoutingModel.get(i).getProviderNo(), providerLabRoutingModel.get(i).getComment());
+            }
+            return RestResponse.successResponse(comments);
+        }
+        catch (IndexOutOfBoundsException e)
+        {
+            logger.error("Error parsing providerLabRoutingModel", e);
+            return RestResponse.errorResponse("There was an error retrieving lab comments");
+        }
     }
 }
