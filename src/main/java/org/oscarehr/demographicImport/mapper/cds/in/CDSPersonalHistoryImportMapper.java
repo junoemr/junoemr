@@ -22,6 +22,8 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonalHistory;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote;
@@ -34,6 +36,8 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_IN
 
 public class CDSPersonalHistoryImportMapper extends AbstractCDSImportMapper<PersonalHistory, SocialHistoryNote>
 {
+	private static final Logger logger = Logger.getLogger(CDSPersonalHistoryImportMapper.class);
+
 	public CDSPersonalHistoryImportMapper()
 	{
 		super();
@@ -44,6 +48,7 @@ public class CDSPersonalHistoryImportMapper extends AbstractCDSImportMapper<Pers
 	{
 		SocialHistoryNote note = new SocialHistoryNote();
 
+		String noteText = "";
 		for(ResidualInformation.DataElement dataElement : importStructure.getResidualInfo().getDataElement())
 		{
 			String name = dataElement.getName();
@@ -71,8 +76,18 @@ public class CDSPersonalHistoryImportMapper extends AbstractCDSImportMapper<Pers
 					{
 						note.setResolutionDate(ConversionUtils.toLocalDate(content)); break;
 					}
+					default:
+					{
+						noteText += name + ": " + content + "\n";
+					}
 				}
 			}
+		}
+
+		note.setNoteText(StringUtils.trimToEmpty(noteText));
+		if(note.getNoteText().isEmpty())
+		{
+			logger.warn("SocialHistoryNote has no text value");
 		}
 
 		return note;

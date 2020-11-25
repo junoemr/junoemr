@@ -24,7 +24,9 @@ package org.oscarehr.demographicImport.converter.in.note;
 
 import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
 @Component
 public class MedicalHistoryNoteModelToDbConverter extends BaseNoteModelToDbConverter<MedicalHistoryNote>
@@ -34,6 +36,39 @@ public class MedicalHistoryNoteModelToDbConverter extends BaseNoteModelToDbConve
 			MedicalHistoryNote input,
 			CaseManagementNote dbNote)
 	{
+		if(input.getStartDate() != null)
+		{
+			CaseManagementNoteExt ext = new CaseManagementNoteExt();
+			ext.setKey(CaseManagementNoteExt.STARTDATE);
+			ext.setDateValue(ConversionUtils.toLegacyDate(input.getStartDate().toLocalDate()));
+			ext.setNote(dbNote);
+			dbNote.addExtension(ext);
+		}
+		if(input.getResolutionDate() != null)
+		{
+			CaseManagementNoteExt ext = new CaseManagementNoteExt();
+			ext.setKey(CaseManagementNoteExt.RESOLUTIONDATE);
+			ext.setDateValue(ConversionUtils.toLegacyDate(input.getResolutionDate().toLocalDate()));
+			ext.setNote(dbNote);
+			dbNote.addExtension(ext);
+		}
+		if(input.getProcedureDate() != null)
+		{
+			CaseManagementNoteExt ext = new CaseManagementNoteExt();
+			ext.setKey(CaseManagementNoteExt.PROCEDUREDATE);
+			ext.setDateValue(ConversionUtils.toLegacyDate(input.getProcedureDate().toLocalDate()));
+			ext.setNote(dbNote);
+			dbNote.addExtension(ext);
+		}
+		if(input.getTreatment() != null)
+		{
+			CaseManagementNoteExt ext = new CaseManagementNoteExt();
+			ext.setKey(CaseManagementNoteExt.TREATMENT);
+			ext.setValue(String.valueOf(input.getTreatment()));
+			ext.setNote(dbNote);
+			dbNote.addExtension(ext);
+		}
+
 		return dbNote;
 	}
 }

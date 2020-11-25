@@ -33,18 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-public class HistoryNoteService extends BaseNoteService
+public abstract class HistoryNoteService extends BaseNoteService
 {
-	public CaseManagementNote saveSocialHistoryNote(CaseManagementNote note)
-	{
-		return saveHistoryNote(note, Issue.SUMMARY_CODE_SOCIAL_HISTORY);
-	}
-
-	public CaseManagementNote saveReminderNote(CaseManagementNote note)
-	{
-		return saveHistoryNote(note, Issue.SUMMARY_CODE_REMINDERS);
-	}
-
 	protected CaseManagementNote saveHistoryNote(CaseManagementNote note, String summaryCode)
 	{
 		CaseManagementIssue caseManagementIssue = caseManagementIssueDao.findByIssueCode(

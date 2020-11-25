@@ -22,11 +22,15 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.AlertsAndSpecialNeeds;
 import org.oscarehr.demographicImport.model.encounterNote.ReminderNote;
 
 public class CDSAlertImportMapper extends AbstractCDSImportMapper<AlertsAndSpecialNeeds, ReminderNote>
 {
+	private static final Logger logger = Logger.getLogger(CDSAlertImportMapper.class);
+
 	public CDSAlertImportMapper()
 	{
 		super();
@@ -35,6 +39,22 @@ public class CDSAlertImportMapper extends AbstractCDSImportMapper<AlertsAndSpeci
 	@Override
 	public ReminderNote importToJuno(AlertsAndSpecialNeeds importStructure)
 	{
-		return new ReminderNote();
+		ReminderNote reminderNote = new ReminderNote();
+		reminderNote.setStartDate(toNullablePartialDate(importStructure.getDateActive()));
+		reminderNote.setResolutionDate(toNullablePartialDate(importStructure.getEndDate()));
+
+		String noteText = StringUtils.trimToEmpty(
+				StringUtils.trimToEmpty(importStructure.getAlertDescription()) + "\n" + StringUtils.trimToEmpty(importStructure.getNotes())
+		);
+		reminderNote.setNoteText(noteText);
+
+
+		if(reminderNote.getNoteText() == null || reminderNote.getNoteText().isEmpty())
+		{
+			logger.warn("ReminderNote has no text value");
+			reminderNote.setNoteText("");
+		}
+
+		return reminderNote;
 	}
 }

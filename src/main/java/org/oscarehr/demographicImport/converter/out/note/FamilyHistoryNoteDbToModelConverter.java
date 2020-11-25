@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.converter.out.note;
 
+import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.springframework.stereotype.Component;
@@ -48,7 +49,7 @@ public class FamilyHistoryNoteDbToModelConverter extends
 		{
 			if(ext.getKey().equals(STARTDATE))
 			{
-				exportNote.setStartDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
+				exportNote.setStartDate(PartialDate.from(ConversionUtils.toNullableLocalDate(ext.getDateValue()), null));
 			}
 			if(ext.getKey().equals(RESOLUTIONDATE))
 			{

@@ -22,11 +22,15 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.FamilyHistory;
 import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
 
 public class CDSFamilyHistoryImportMapper extends AbstractCDSImportMapper<FamilyHistory, FamilyHistoryNote>
 {
+	private static final Logger logger = Logger.getLogger(CDSFamilyHistoryImportMapper.class);
+
 	public CDSFamilyHistoryImportMapper()
 	{
 		super();
@@ -36,10 +40,25 @@ public class CDSFamilyHistoryImportMapper extends AbstractCDSImportMapper<Family
 	public FamilyHistoryNote importToJuno(FamilyHistory importStructure)
 	{
 		FamilyHistoryNote note = new FamilyHistoryNote();
-		note.setNoteText(importStructure.getNotes());
 
 		note.setObservationDate(toNullableLocalDateTime(importStructure.getStartDate()));
-		note.setStartDate(toNullableLocalDate(importStructure.getStartDate()));
+		note.setStartDate(toNullablePartialDate(importStructure.getStartDate()));
+		note.setAgeAtOnset(getAgeAtOnset(importStructure.getAgeAtOnset()));
+		note.setLifeStage(getLifeStage(importStructure.getLifeStage()));
+		note.setTreatment(importStructure.getProblemDiagnosisProcedureDescription());
+		note.setRelationship(importStructure.getRelationship());
+
+		String noteText = StringUtils.trimToEmpty(
+				StringUtils.trimToEmpty(importStructure.getProblemDiagnosisProcedureDescription()) + "\n" +
+						StringUtils.trimToEmpty(importStructure.getNotes())
+		);
+		note.setNoteText(noteText);
+
+		if(note.getNoteText() == null || note.getNoteText().isEmpty())
+		{
+			logger.warn("FamilyHistoryNote has no text value");
+			note.setNoteText("");
+		}
 
 		return note;
 	}

@@ -39,9 +39,10 @@ public class CDSPastHealthImportMapper extends AbstractCDSImportMapper<PastHealt
 		note.setNoteText(importStructure.getNotes());
 
 		note.setObservationDate(toNullableLocalDateTime(importStructure.getOnsetOrEventDate()));
-		note.setStartDate(toNullableLocalDate(importStructure.getOnsetOrEventDate()));
-		note.setResolutionDate(toNullableLocalDate(importStructure.getResolvedDate()));
-		note.setProcedureDate(toNullableLocalDate(importStructure.getProcedureDate()));
+		note.setStartDate(toNullablePartialDate(importStructure.getOnsetOrEventDate()));
+		note.setResolutionDate(toNullablePartialDate(importStructure.getResolvedDate()));
+		note.setProcedureDate(toNullablePartialDate(importStructure.getProcedureDate()));
+		note.setTreatment(importStructure.getPastHealthProblemDescriptionOrProcedures());
 
 		return note;
 	}

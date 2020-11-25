@@ -78,8 +78,9 @@ import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.encounterNote.service.FamilyHistoryNoteService;
-import org.oscarehr.encounterNote.service.HistoryNoteService;
 import org.oscarehr.encounterNote.service.MedicalHistoryNoteService;
+import org.oscarehr.encounterNote.service.ReminderNoteService;
+import org.oscarehr.encounterNote.service.SocialHistoryNoteService;
 import org.oscarehr.labs.service.LabService;
 import org.oscarehr.message.service.MessageService;
 import org.oscarehr.prevention.dao.PreventionDao;
@@ -166,13 +167,16 @@ public class CoPDImportService
 	EncounterNoteService encounterNoteService;
 
 	@Autowired
-	HistoryNoteService historyNoteService;
+	ReminderNoteService reminderNoteService;
 
 	@Autowired
 	MedicalHistoryNoteService medicalHistoryNoteService;
 
 	@Autowired
 	FamilyHistoryNoteService familyHistoryNoteService;
+
+	@Autowired
+	SocialHistoryNoteService socialHistoryNoteService;
 
 	@Autowired
 	DxresearchDAO dxresearchDAO;
@@ -733,7 +737,7 @@ public class CoPDImportService
 			reminderNote.setProvider(provider);
 			reminderNote.setSigningProvider(provider);
 			reminderNote.setDemographic(demographic);
-			historyNoteService.saveReminderNote(reminderNote);
+			reminderNoteService.saveReminderNote(reminderNote);
 		}
 	}
 
@@ -798,7 +802,7 @@ public class CoPDImportService
 			socHistNote.setProvider(provider);
 			socHistNote.setSigningProvider(provider);
 			socHistNote.setDemographic(demographic);
-			historyNoteService.saveSocialHistoryNote(socHistNote);
+			socialHistoryNoteService.saveSocialHistoryNote(socHistNote);
 		}
 		for(CaseManagementNote famHistNote : historyNoteMapper.getFamilyHistoryNoteList())
 		{

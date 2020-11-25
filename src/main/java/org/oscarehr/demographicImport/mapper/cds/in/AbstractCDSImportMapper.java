@@ -25,10 +25,14 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
+import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
 import org.oscarehr.demographicImport.mapper.AbstractImportMapper;
+import org.oscarehr.demographicImport.model.common.PartialDate;
+import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import oscar.util.ConversionUtils;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -42,6 +46,78 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 	public String toString()
 	{
 		return ReflectionToStringBuilder.toString(this);
+	}
+
+	protected String getLifeStage(LifeStage lifeStage)
+	{
+		if(lifeStage != null)
+		{
+			return lifeStage.value();
+		}
+		return null;
+	}
+
+	protected Long getAgeAtOnset(BigInteger ageAtOnset)
+	{
+		if(ageAtOnset != null)
+		{
+			return ageAtOnset.longValue();
+		}
+		return null;
+	}
+
+	protected PartialDate toNullablePartialDate(DateFullOrPartial fullOrPartial)
+	{
+		if(fullOrPartial != null)
+		{
+			XMLGregorianCalendar xmlFullDate = fullOrPartial.getFullDate();
+			XMLGregorianCalendar xmlYearMonth = fullOrPartial.getYearMonth();
+			XMLGregorianCalendar xmlYearOnly = fullOrPartial.getYearOnly();
+
+			if(xmlFullDate != null)
+			{
+				return new PartialDate(xmlFullDate.getYear(), xmlFullDate.getMonth(), xmlFullDate.getDay());
+			}
+			else if (xmlYearMonth != null)
+			{
+				return new PartialDate(xmlYearMonth.getYear(), xmlYearMonth.getMonth());
+			}
+			else if(xmlYearOnly != null)
+			{
+				return new PartialDate(xmlYearOnly.getYear());
+			}
+		}
+		return null;
+	}
+
+	protected PartialDateTime toNullablePartialDateTime(DateTimeFullOrPartial fullOrPartial)
+	{
+		if(fullOrPartial != null)
+		{
+			XMLGregorianCalendar xmlFullDateTime = fullOrPartial.getFullDateTime();
+			XMLGregorianCalendar xmlFullDate = fullOrPartial.getFullDate();
+			XMLGregorianCalendar xmlYearMonth = fullOrPartial.getYearMonth();
+			XMLGregorianCalendar xmlYearOnly = fullOrPartial.getYearOnly();
+
+			if(xmlFullDateTime != null)
+			{
+				return new PartialDateTime(xmlFullDateTime.getYear(), xmlFullDateTime.getMonth(), xmlFullDateTime.getDay(),
+						xmlFullDateTime.getHour(), xmlFullDateTime.getMinute(), xmlFullDateTime.getSecond());
+			}
+			else if(xmlFullDate != null)
+			{
+				return new PartialDateTime(xmlFullDate.getYear(), xmlFullDate.getMonth(), xmlFullDate.getDay());
+			}
+			else if (xmlYearMonth != null)
+			{
+				return new PartialDateTime(xmlYearMonth.getYear(), xmlYearMonth.getMonth());
+			}
+			else if(xmlYearOnly != null)
+			{
+				return new PartialDateTime(xmlYearOnly.getYear());
+			}
+		}
+		return null;
 	}
 
 	protected LocalDateTime toNullableLocalDateTime(DateTimeFullOrPartial fullOrPartial)

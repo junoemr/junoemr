@@ -23,15 +23,15 @@
 package org.oscarehr.demographicImport.model.encounterNote;
 
 import lombok.Data;
-
-import java.time.LocalDate;
+import org.oscarehr.demographicImport.model.common.PartialDate;
 
 @Data
 public class MedicalHistoryNote extends BaseNote
 {
-	private LocalDate startDate;
-	private LocalDate resolutionDate;
-	private LocalDate procedureDate;
+	private PartialDate startDate;
+	private PartialDate resolutionDate;
+	private PartialDate procedureDate;
+	private String treatment;
 
 	public MedicalHistoryNote()
 	{

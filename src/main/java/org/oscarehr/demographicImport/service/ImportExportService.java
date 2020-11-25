@@ -39,6 +39,8 @@ import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.encounterNote.service.FamilyHistoryNoteService;
 import org.oscarehr.encounterNote.service.MedicalHistoryNoteService;
+import org.oscarehr.encounterNote.service.ReminderNoteService;
+import org.oscarehr.encounterNote.service.SocialHistoryNoteService;
 import org.oscarehr.labs.service.LabService;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +82,12 @@ public class ImportExportService
 
 	@Autowired
 	private FamilyHistoryNoteService familyHistoryNoteService;
+
+	@Autowired
+	private SocialHistoryNoteService socialHistoryNoteService;
+
+	@Autowired
+	private ReminderNoteService reminderNoteService;
 
 	@Autowired
 	private LabService labService;
@@ -134,24 +142,26 @@ public class ImportExportService
 		importer.verifyFileFormat(importFile);
 		Demographic demographic = importer.importDemographic(importFile);
 
-		// TODO handle demographic merging
+		// TODO handle demographic merging & duplicate check
 
 		org.oscarehr.demographic.model.Demographic dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, demographic);
 		demographic.setId(dbDemographic.getId());
 
-		importNotes(demographic, dbDemographic);
-		importLabs(demographic, dbDemographic);
+		persistNotes(demographic, dbDemographic);
+		persistLabs(demographic, dbDemographic);
 
 	}
 
-	private void importNotes(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)
+	private void persistNotes(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)
 	{
+		socialHistoryNoteService.saveSocialHistoryNote(demographic.getSocialHistoryNoteList(), dbDemographic);
 		familyHistoryNoteService.saveFamilyHistoryNote(demographic.getFamilyHistoryNoteList(), dbDemographic);
 		medicalHistoryNoteService.saveMedicalHistoryNotes(demographic.getMedicalHistoryNoteList(), dbDemographic);
+		reminderNoteService.saveReminderNote(demographic.getReminderNoteList(), dbDemographic);
 		encounterNoteService.saveChartNotes(demographic.getEncounterNoteList(), dbDemographic);
 	}
 
-	private void importLabs(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic) throws HL7Exception, IOException
+	private void persistLabs(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic) throws HL7Exception, IOException
 	{
 		for(Lab lab : demographic.getLabList())
 		{

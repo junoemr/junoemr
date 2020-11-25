@@ -127,6 +127,16 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		return this.toNullableDateFullOrPartial(localDate, null);
 	}
 
+	protected DateFullOrPartial toNullableDateFullOrPartial(PartialDate partialDate, LocalDate defaultDate)
+	{
+		DateFullOrPartial dateFullOrPartial = toNullableDateFullOrPartial(partialDate);
+		if(dateFullOrPartial == null)
+		{
+			dateFullOrPartial = toNullableDateFullOrPartial(defaultDate);
+		}
+		return dateFullOrPartial;
+	}
+
 	protected DateFullOrPartial toNullableDateFullOrPartial(PartialDate partialDate)
 	{
 		if(partialDate == null) return null;

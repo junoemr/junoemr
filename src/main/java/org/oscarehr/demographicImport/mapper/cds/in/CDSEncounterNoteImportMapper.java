@@ -22,12 +22,15 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.provider.Provider;
 
 public class CDSEncounterNoteImportMapper extends AbstractCDSImportMapper<ClinicalNotes, EncounterNote>
 {
+	private static final Logger logger = Logger.getLogger(CDSEncounterNoteImportMapper.class);
+
 	public CDSEncounterNoteImportMapper()
 	{
 		super();
@@ -75,6 +78,11 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSImportMapper<Clinic
 		}
 
 
+		if(note.getNoteText() == null || note.getNoteText().isEmpty())
+		{
+			logger.warn("EncounterNote has no text value");
+			note.setNoteText("");
+		}
 		return note;
 	}
 }

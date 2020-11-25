@@ -25,8 +25,11 @@ package org.oscarehr.demographicImport.converter.in.note;
 import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
 import org.oscarehr.demographicImport.model.encounterNote.BaseNote;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+
+import java.util.Date;
 
 @Component
 public abstract class BaseNoteModelToDbConverter<N extends BaseNote> extends
@@ -64,4 +67,21 @@ public abstract class BaseNoteModelToDbConverter<N extends BaseNote> extends
 	}
 
 	public abstract CaseManagementNote subConvert(N input, CaseManagementNote dbNote);
+
+	protected CaseManagementNoteExt getExt(CaseManagementNote dbNote, String key, String value)
+	{
+		CaseManagementNoteExt ext = new CaseManagementNoteExt();
+		ext.setKey(key);
+		ext.setValue(value);
+		ext.setNote(dbNote);
+		return ext;
+	}
+	protected CaseManagementNoteExt getExt(CaseManagementNote dbNote, String key, Date date)
+	{
+		CaseManagementNoteExt ext = new CaseManagementNoteExt();
+		ext.setKey(key);
+		ext.setDateValue(date);
+		ext.setNote(dbNote);
+		return ext;
+	}
 }

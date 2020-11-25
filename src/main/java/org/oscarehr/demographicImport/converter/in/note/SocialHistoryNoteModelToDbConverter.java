@@ -22,44 +22,37 @@
  */
 package org.oscarehr.demographicImport.converter.in.note;
 
-import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
+import org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 @Component
-public class FamilyHistoryNoteModelToDbConverter extends BaseNoteModelToDbConverter<FamilyHistoryNote>
+public class SocialHistoryNoteModelToDbConverter extends BaseNoteModelToDbConverter<SocialHistoryNote>
 {
 	@Override
 	public CaseManagementNote subConvert(
-			FamilyHistoryNote input,
+			SocialHistoryNote input,
 			CaseManagementNote dbNote)
 	{
 		if(input.getStartDate() != null)
 		{
-			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.STARTDATE, ConversionUtils.toLegacyDate(input.getStartDate().toLocalDate())));
+			CaseManagementNoteExt ext = new CaseManagementNoteExt();
+			ext.setKey(CaseManagementNoteExt.STARTDATE);
+			ext.setDateValue(ConversionUtils.toLegacyDate(input.getStartDate()));
+			ext.setNote(dbNote);
+			dbNote.addExtension(ext);
 		}
 		if(input.getResolutionDate() != null)
 		{
-			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.RESOLUTIONDATE, ConversionUtils.toLegacyDate(input.getResolutionDate())));
+			CaseManagementNoteExt ext = new CaseManagementNoteExt();
+			ext.setKey(CaseManagementNoteExt.RESOLUTIONDATE);
+			ext.setDateValue(ConversionUtils.toLegacyDate(input.getResolutionDate()));
+			ext.setNote(dbNote);
+			dbNote.addExtension(ext);
 		}
-		if(input.getAgeAtOnset() != null)
-		{
-			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.AGEATONSET, String.valueOf(input.getAgeAtOnset())));
-		}
-		if(input.getRelationship() != null)
-		{
-			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.RELATIONSHIP, String.valueOf(input.getRelationship())));
-		}
-		if(input.getTreatment() != null)
-		{
-			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.TREATMENT, String.valueOf(input.getTreatment())));
-		}
-		if(input.getLifeStage() != null)
-		{
-			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.LIFESTAGE, input.getLifeStage()));
-		}
+
 
 		return dbNote;
 	}
