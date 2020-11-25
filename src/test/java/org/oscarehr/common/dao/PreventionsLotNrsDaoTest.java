@@ -28,10 +28,13 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Collections;
 
+
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
@@ -151,7 +154,7 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		List<String> expectedResult = new ArrayList<>();
 		List<PreventionsLotNrs> preventionLotNrs = new ArrayList<>();
 
-		for (int i = 0; i < 50; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			String lotNr = "abcdef";
 			lotNr += String.valueOf(i);
@@ -166,7 +169,12 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 			preventionLotNrs.add(prevLotNr);
 			dao.persist(preventionLotNrs.get(i));
 		}
-		//Results from the database are ordered in reverse
+		//we need to assign one specific date to a few lotNrs to test the ordering results
+		preventionLotNrs.get(0).setLastUpdateDate(new java.util.Date(2020, 10, 30, 11, 11, 11));
+		preventionLotNrs.get(1).setLastUpdateDate(new java.util.Date(2020, 10, 30, 11, 11, 11));
+		preventionLotNrs.get(2).setLastUpdateDate(new java.util.Date(2020, 10, 30, 11, 11, 11));
+
+		//reverse the order since the results from the database are ordered to return the most recently updated lotNrs first
 		Collections.reverse(expectedResult);
 		List<String> result = dao.findLotNrs(prevention, null);
 		
