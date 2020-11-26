@@ -28,6 +28,7 @@ import {
 	JUNO_TAB_TYPE
 } from "../../../common/components/junoComponentConstants";
 import {AqsQueuesApi, AqsQueuedAppointmentApi} from "../../../../generated";
+import AppointmentBooking from "../../../common/modals/bookAppointmentModal/appointmentBooking";
 
 angular.module('Layout.Components').component('appointmentQueue', {
 	templateUrl: 'src/layout/components/appointmentQueue/appointmentQueue.jsp',
@@ -57,7 +58,6 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		// load apis
 		let aqsQueuesApi = new AqsQueuesApi($http, $httpParamSerializer,
 				'../ws/rs');
-		// load apis
 		let aqsQueuedAppointmentApi = new AqsQueuedAppointmentApi($http, $httpParamSerializer,
 				'../ws/rs');
 
@@ -87,12 +87,17 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		ctrl.resizeObserver = null;
 		// ======= Scroll Height tracking ===========
 
+		// ======= Drag N Drop ===========
+		ctrl.dragStartY = 0;
+		// ======= Drag N Drop ===========
+
+
 		ctrl.$onInit = () =>
 		{
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 
 			ctrl.listRef = angular.element(".appointment-queue .list");
-			ctrl.listContentRef = angular.element(".appointment-queue .list .list-content");
+			ctrl.listContentRef = angular.element(".appointment-queue .list .list-content ul");
 
 			// recalculate scroll height on height change
 			ctrl.resizeObserver = new ResizeObserver(() =>
@@ -240,6 +245,8 @@ angular.module('Layout.Components').component('appointmentQueue', {
 								style: () => ctrl.componentStyle,
 								queueId: () => ctrl.currentQueue.id,
 								clinicId: () => ctrl.currentQueue.items[itemIndex].clinicId,
+								siteId: () => ctrl.currentQueue.items[itemIndex].siteId,
+								isVirtual: () => ctrl.currentQueue.items[itemIndex].virtual,
 								queuedAppointmentId: () => ctrl.currentQueue.items[itemIndex].id,
 								loadQueuesCallback: () => ctrl.loadQueues,
 							}
@@ -268,6 +275,87 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		ctrl.getPrimaryBackgroundClass = () =>
 		{
 			return [ctrl.componentStyle + JUNO_BACKGROUND_STYLE.PRIMARY];
+		}
+
+		ctrl.onDragMoved = async (event, index) =>
+		{
+			// compensate for bug in dnd library
+			// https://github.com/marceljuenemann/angular-drag-and-drop-lists/issues/500
+			if (event.screenY - ctrl.dragStartY < 0)
+			{
+				index += 1
+			}
+
+			ctrl.currentQueue.items.splice(index, 1);
+		}
+
+		ctrl.onDragStart = (event) =>
+		{
+			ctrl.dragStartY = event.screenY;
+		}
+
+		// fires when item is droped in to list
+		ctrl.onDragDrop = (index, item, event) =>
+		{
+			// compensate for bug in dnd library
+			// https://github.com/marceljuenemann/angular-drag-and-drop-lists/issues/500
+			if (event.screenY - ctrl.dragStartY > 0)
+			{
+				index -= 1;
+			}
+
+			aqsQueuedAppointmentApi.moveAppointment(this.currentQueue.id, item.id, { queuePosition: index});
+			return item;
+		}
+
+		ctrl.openBookQueuedAppointmentModal = async () =>
+		{
+			try
+			{
+				let bookingData = new AppointmentBooking();
+				// default duration to queue duration.
+				bookingData.duration = ctrl.currentQueue.defaultAppointmentDurationMinutes;
+
+				await $uibModal.open(
+					{
+						component: 'bookAppointmentModal',
+						backdrop: 'static',
+						windowClass: "juno-modal",
+						resolve: {
+							style: () => JUNO_STYLE.DEFAULT,
+							title: () => "Queue Appointment",
+							bookingData: () => bookingData,
+							onCreateCallback: () => ctrl.bookNewQueuedAppointment,
+						}
+					}
+				).result;
+
+			}
+			catch(err)
+			{
+				// ESC button pressed probably
+				console.warn("Modal closed with rejection ", err);
+			}
+		}
+
+		// create a new queued appointment
+		ctrl.bookNewQueuedAppointment = async (appointmentBooking) =>
+		{
+			const queuedAppointmentBookingDto = {
+				demographicNo: appointmentBooking.demographic.demographicNo,
+				durationMinutes: parseInt(appointmentBooking.duration),
+				notes: appointmentBooking.notes,
+				reason: appointmentBooking.reason,
+				reasonType: appointmentBooking.reasonType,
+				siteId: appointmentBooking.siteId,
+				virtual: appointmentBooking.virtual,
+				critical: appointmentBooking.critical,
+			}
+
+			await aqsQueuedAppointmentApi.createQueuedAppointment(ctrl.currentQueue.id, queuedAppointmentBookingDto);
+
+			// refresh display
+			this.loadQueues();
 		}
 	}]
 });

@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.dao.DxresearchDAO;
+import org.oscarehr.common.dao.EpisodeDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.TicklerDao;
@@ -48,6 +49,7 @@ import org.oscarehr.common.hl7.copd.mapper.MapperFactory;
 import org.oscarehr.common.hl7.copd.mapper.MeasurementsMapper;
 import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
 import org.oscarehr.common.hl7.copd.mapper.MessageMapper;
+import org.oscarehr.common.hl7.copd.mapper.PregnancyMapper;
 import org.oscarehr.common.hl7.copd.mapper.PreventionMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.mapper.TicklerMapper;
@@ -58,6 +60,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Dxresearch;
+import org.oscarehr.common.model.Episode;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.MessageList;
 import org.oscarehr.common.model.MessageTbl;
@@ -107,6 +110,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -148,6 +152,9 @@ public class CoPDImportService
 	OscarAppointmentDao appointmentDao;
 
 	@Autowired
+	EpisodeDao episodeDao;
+
+	@Autowired
 	AllergyService allergyService;
 
 	@Autowired
@@ -185,6 +192,8 @@ public class CoPDImportService
 
 	private static long missingDocumentCount = 0;
 
+	private static final HashMap<String, ProviderData> providerLookupCache = new HashMap<>();
+
 	public void importFromHl7Message(String message, String documentLocation,
 	                                 IMPORT_SOURCE importSource,
 	                                 CoPDRecordData recordData,
@@ -193,6 +202,7 @@ public class CoPDImportService
 			throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Initialize HL7 parser");
+		providerLookupCache.clear();
 		HapiContext context = new DefaultHapiContext();
 		// default Obx2 types to string
 		context.getParserConfiguration().setDefaultObx2Type("ST");
@@ -315,7 +325,7 @@ public class CoPDImportService
 			instant = printDuration(instant, "importPediatricsData");
 
 			logger.info("Import Pregnancy ...");
-			importPregnancyData(zpdZtrMessage, i, assignedProvider, demographic);
+			importPregnancyData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			instant = printDuration(instant, "importPregnancyData");
 
 			logger.info("Import Allergies ...");
@@ -368,34 +378,45 @@ public class CoPDImportService
 			newProvider = getDefaultProvider();
 		}
 
-		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
-		criteriaSearch.setFirstName(newProvider.getFirstName());
-		criteriaSearch.setLastName(newProvider.getLastName());
+		String cacheKey = newProvider.getFirstName() + newProvider.getLastName();
 
 		ProviderData provider;
-		List<ProviderData> matchedProviders = providerDataDao.criteriaSearch(criteriaSearch);
-		if(matchedProviders.isEmpty())
+		if(providerLookupCache.containsKey(cacheKey))
 		{
-			provider = newProvider;
-			// providers don't have auto-generated id's, so we have to pick one
-			Integer newProviderId = providerService.getNextProviderNumberInSequence(9999, 900000);
-			newProviderId = (newProviderId == null) ? 10000 : newProviderId;
-			provider.set(String.valueOf(newProviderId));
-
-			String billCenterCode = properties.getProperty("default_bill_center","");
-			provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
-			providerRoleService.setDefaultRoleForNewProvider(provider.getProviderNo());
-
-			logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
-		}
-		else if(matchedProviders.size() == 1)
-		{
-			provider = matchedProviders.get(0);
-			logger.info("Use existing Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
+			provider = providerLookupCache.get(cacheKey);
+			logger.info("Use existing cached Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 		}
 		else
 		{
-			throw new RuntimeException("Multiple providers exist in the system with the same name (" + newProvider.getLastName() + "," + newProvider.getFirstName() + ").");
+			ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+			criteriaSearch.setFirstName(newProvider.getFirstName());
+			criteriaSearch.setLastName(newProvider.getLastName());
+
+			List<ProviderData> matchedProviders = providerDataDao.criteriaSearch(criteriaSearch);
+			if(matchedProviders.isEmpty())
+			{
+				provider = newProvider;
+				// providers don't have auto-generated id's, so we have to pick one
+				Integer newProviderId = providerService.getNextProviderNumberInSequence(9999, 900000);
+				newProviderId = (newProviderId == null) ? 10000 : newProviderId;
+				provider.set(String.valueOf(newProviderId));
+
+				String billCenterCode = properties.getProperty("default_bill_center", "");
+				provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
+				providerRoleService.setDefaultRoleForNewProvider(provider.getProviderNo());
+
+				logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
+			}
+			else if(matchedProviders.size() == 1)
+			{
+				provider = matchedProviders.get(0);
+				logger.info("Use existing uncached Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
+			}
+			else
+			{
+				throw new RuntimeException("Multiple providers exist in the system with the same name (" + newProvider.getLastName() + "," + newProvider.getFirstName() + ").");
+			}
+			providerLookupCache.put(cacheKey, provider);
 		}
 		return provider;
 	}
@@ -541,9 +562,25 @@ public class CoPDImportService
 	{
 		//TODO - not implemented
 	}
-	private void importPregnancyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	private void importPregnancyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		//TODO - not implemented
+		PregnancyMapper pregnancyMapper = MapperFactory.newPregnancyMapper(zpdZtrMessage, providerRep, importSource);
+
+		for(Episode pregnancyEpisode : pregnancyMapper.getPregnancyEpisodes())
+		{
+			pregnancyEpisode.setDemographicNo(demographic.getDemographicId());
+			pregnancyEpisode.setLastUpdateUser(provider.getId());
+			episodeDao.persist(pregnancyEpisode);
+		}
+
+		CaseManagementNote metadataNote = pregnancyMapper.getMedHistoryMetadataNote();
+		if(metadataNote != null)
+		{
+			metadataNote.setProvider(provider);
+			metadataNote.setSigningProvider(provider);
+			metadataNote.setDemographic(demographic);
+			encounterNoteService.saveMedicalHistoryNote(metadataNote);
+		}
 	}
 
 	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
@@ -721,21 +758,13 @@ public class CoPDImportService
 			}
 			CaseManagementNote encounterNote = encounterNoteMapper.getEncounterNote(i);
 			ProviderData signingProvider = encounterNoteMapper.getSigningProvider(i);
-			ProviderData noteProvider = provider;
-			if(signingProvider == null)
-			{
-				signingProvider = provider;
-			}
-			else
-			{
-				signingProvider = findOrCreateProviderRecord(signingProvider);
-			}
-			/* Wolf wants us to use the parsed provider name in the notes as the note creator and signature */
-			if(importSource.equals(IMPORT_SOURCE.WOLF))
-			{
-				noteProvider = signingProvider;
-			}
-			encounterNote.setProvider(noteProvider);
+			ProviderData creatingProvider = encounterNoteMapper.getCreatingProvider(i);
+
+			// ensure provider records are complete/loaded
+			signingProvider = (signingProvider == null) ? provider : findOrCreateProviderRecord(signingProvider);
+			creatingProvider = (creatingProvider == null) ? provider : findOrCreateProviderRecord(creatingProvider);
+
+			encounterNote.setProvider(creatingProvider);
 			encounterNote.setSigned(true);
 			encounterNote.setSigningProvider(signingProvider);
 			encounterNote.setDemographic(demographic);

@@ -67,10 +67,9 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 
 		ctrl.bookProviderNo = null;
 		ctrl.providerOptions = [];
-		ctrl.siteOptions = [];
-		ctrl.siteSelection = null;
 		ctrl.isMultisiteEnabled = false;
 		ctrl.isLoading = false;
+		ctrl.providerHasSite = false;
 
 		ctrl.$onInit = async () =>
 		{
@@ -93,15 +92,58 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			}
 		}
 
+		ctrl.checkProviderSite = async () =>
+		{
+			if (!ctrl.isMultisiteEnabled)
+			{
+				return true;
+			}
+
+			let bookingSiteId = ctrl.resolve.siteId;
+			if (!ctrl.resolve.siteId)
+			{
+				bookingSiteId = await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
+			}
+			const siteList = (await sitesApi.getSitesByProvider(ctrl.bookProviderNo)).data.body;
+
+			for (let providerSite of siteList)
+			{
+				if (providerSite.siteId === bookingSiteId)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
 		ctrl.assignToMe = async () =>
 		{
 			ctrl.bookProviderNo = (await providerService.getMe()).providerNo;
+			ctrl.providerHasSite = false;
+			ctrl.providerHasSite = await ctrl.checkProviderSite();
+		}
+
+		ctrl.onProviderSelect = async () =>
+		{
+			ctrl.providerHasSite = false;
+			ctrl.providerHasSite = await ctrl.checkProviderSite();
+			$scope.$digest();
 		}
 
 		ctrl.bookQueuedAppointment = async () =>
 		{
+			let siteId = null;
+			if (ctrl.isMultisiteEnabled)
+			{
+				siteId = ctrl.resolve.siteId
+				if (!siteId)
+				{
+					siteId = await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
+				}
+			}
+
 			let bookQueuedAppointmentTransfer = {
-				siteId: await ctrl.siteFromClinicId(ctrl.resolve.clinicId),
+				siteId: siteId,
 				providerNo: ctrl.bookProviderNo,
 			};
 
@@ -110,11 +152,9 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 				ctrl.isLoading = true;
 				return (await aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId, ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer)).data.body;
 			}
-			catch(err)
+			catch(error)
 			{
-				Juno.Common.Util.errorAlert($uibModal,
-				                            "Failed to book appointment",
-				                            "Could not schedule the queued appointment. It may have been canceled");
+				Juno.Common.Util.errorAlert($uibModal,"Failed to book appointment", error.data.error.message);
 			}
 			finally
 			{
@@ -165,6 +205,19 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		{
 			ctrl.modalInstance.close();
 		};
+
+		ctrl.bookTooltip = (okMsg) =>
+		{
+			if (!ctrl.bookProviderNo)
+			{
+				return "Select a provider"
+			}
+			else if (!ctrl.providerHasSite)
+			{
+				return "Provider is not assigned to the site of this appointment";
+			}
+			return okMsg;
+		}
 
 	}]
 });

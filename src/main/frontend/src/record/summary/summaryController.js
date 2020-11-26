@@ -480,7 +480,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			Object.keys(controller.page.selectedNoteHash).forEach(function (key) {
 				var note = controller.page.selectedNoteHash[key];
 
-				selectedNoteList.push(note);
+				selectedNoteList.push(note.noteId);
 				// iteration code
 			});
 

@@ -23,8 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.List;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -112,7 +110,6 @@ public class PatientDetailStatusService extends AbstractServiceImpl {
 		}
 		
 		//from oscar.properties
-		status.setConformanceFeaturesEnabled(oscarProperties.isPropertyActive("ENABLE_CONFORMANCE_ONLY_FEATURES"));
 		status.setWorkflowEnhance(oscarProperties.isPropertyActive("workflow_enhance"));
 		status.setBillregion(oscarProperties.getBillingType());
 		status.setDefaultView(oscarProperties.getProperty("default_view", ""));
@@ -152,15 +149,16 @@ public class PatientDetailStatusService extends AbstractServiceImpl {
 	
 	@GET
 	@Path("/isUniqueHC")
-	public GenericRESTResponse isUniqueHC(@QueryParam("hin") String healthCardNo, @QueryParam("demographicNo") Integer demographicNo) {
+	public GenericRESTResponse isUniqueHC(@QueryParam("hin") String healthCardNo,
+										  @QueryParam("ver") String version,
+										  @QueryParam("province") String hcType,
+										  @QueryParam("demographicNo") Integer demographicNo)
+	{
 		GenericRESTResponse response = new GenericRESTResponse();
-		if (healthCardNo!=null && !healthCardNo.trim().isEmpty() && demographicNo!=null) {
-			List<Demographic> demos = demographicManager.searchByHealthCard(getLoggedInInfo(), healthCardNo);
-			if (demos!=null) {
-				if (demos.size()>1 || (demos.size()==1 && !demos.get(0).getDemographicNo().equals(demographicNo))) {
-					response.setSuccess(false);
-				}
-			}
+		if (healthCardNo != null && !healthCardNo.trim().isEmpty() && demographicNo != null)
+		{
+			boolean isUnique = demographicManager.isUniqueHealthCard(getLoggedInInfo(), healthCardNo, version, hcType, demographicNo);
+			response.setSuccess(isUnique);
 		}
 		return response;
 	}

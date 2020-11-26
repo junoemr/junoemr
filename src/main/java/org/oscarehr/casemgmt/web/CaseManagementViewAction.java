@@ -1765,20 +1765,32 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 
 		String bgColour = "color:#000000;background-color:#CCCCFF;";
 
-		if (noteDisplay.isCpp()) {
+		if(noteDisplay.isCpp())
+		{
 			bgColour = "color:#FFFFFF;background-color:#" + getCppColour(noteDisplay) + ";";
-			if (noteDisplay.isTicklerNote()) {
-				bgColour = ticklerNoteColour;
-			}
-		} else if (noteDisplay.isDocument()) {
+		}
+		else if(noteDisplay.isTicklerNote())
+		{
+			bgColour = ticklerNoteColour;
+		}
+		else if(noteDisplay.isDocument())
+		{
 			bgColour = documentColour;
-		} else if (noteDisplay.isRxAnnotation()) {
+		}
+		else if(noteDisplay.isRxAnnotation())
+		{
 			bgColour = rxColour;
-		} else if (noteDisplay.isEformData()) {
+		}
+		else if(noteDisplay.isEformData())
+		{
 			bgColour = eFormsColour;
-		} else if (noteDisplay.isEncounterForm()) {
+		}
+		else if(noteDisplay.isEncounterForm())
+		{
 			bgColour = formsColour;
-		} else if (noteDisplay.isInvoice()) {
+		}
+		else if(noteDisplay.isInvoice())
+		{
 			bgColour = invoiceColour;
 		}
 

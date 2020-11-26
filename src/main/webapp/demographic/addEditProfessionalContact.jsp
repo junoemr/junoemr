@@ -49,11 +49,11 @@
 		
 		function captureParameters(id) {
 			
-			var keyword = '${ param.keyword }';
+			var keyword = "${ param.keyword }";
 			var keywordLastName = null;
 			var keywordFirstName = null;
-			var firstName = '${ pcontact.firstName }';
-			var lastName = '${ pcontact.lastName }';
+			var firstName = "${ pcontact.firstName }";
+			var lastName = "${ pcontact.lastName }";
 			
 			if( keyword && keyword.contains(",") ) {
 				keywordLastName = keyword.split(",")[0].trim();
@@ -72,11 +72,11 @@
 
 		function forwardToParent() {
 			
-			var contactId = '${ requestScope.contactId }'; // server returns the id that was saved.
-			var demographicContactId = '${ requestScope.demographicContactId }';
-			var contactRole = '${ requestScope.contactRole }';
-			var contactName = '${ requestScope.contactName }';
-			var contactType = '${ requestScope.contactType }';
+			var contactId = "${ requestScope.contactId }"; // server returns the id that was saved.
+			var demographicContactId = "${ requestScope.demographicContactId }";
+			var contactRole = "${ requestScope.contactRole }";
+			var contactName = "${ requestScope.contactName }";
+			var contactType = "${ requestScope.contactType }";
 			
 			if( contactId ) {
 				

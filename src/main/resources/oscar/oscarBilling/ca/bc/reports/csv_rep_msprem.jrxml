@@ -15,7 +15,6 @@
 	<parameter name="criteria" class="java.lang.String" isForPrompting="false"/>
 	<field name="first_name" class="java.lang.String"/>
 	<field name="last_name" class="java.lang.String"/>
-	<field name="provider_no" class="java.lang.String"/>
 	<field name="t_practitionerno" class="java.lang.String"/>
 	<field name="t_s00type" class="java.lang.String"/>
 	<field name="t_servicedate" class="java.lang.String"/>
@@ -345,7 +344,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[String.valueOf($F{first_name}) + "," + String.valueOf($F{last_name}) + "(" + String.valueOf($F{provider_no}) + ")"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[String.valueOf($F{first_name}) + "," + String.valueOf($F{last_name}) + "(" + String.valueOf($F{t_practitionerno}) + ")"]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

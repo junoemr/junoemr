@@ -280,7 +280,7 @@ public class LoginService
 	 * This method encodes the password, before setting to session.
 	 *
 	 * @param password
-	 * @return
+	 * @return encoded password
 	 * @throws Exception
 	 */
 	public String encodePassword(String password) throws Exception
@@ -343,7 +343,6 @@ public class LoginService
 	 *
 	 * @param userName
 	 * @param newPassword
-	 * @return
 	 */
 	public void persistNewPassword(String userName, String newPassword) throws Exception
 	{

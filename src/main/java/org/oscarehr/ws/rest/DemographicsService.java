@@ -122,14 +122,15 @@ public class DemographicsService extends AbstractServiceImpl
 		{
 			// first and last name searching case. force an and on the name filter
 			criteriaSearch.setFirstName(names[1].trim());
+			criteriaSearch.setLastName(names[0].trim());
 			criteriaSearch.setForceConjoinOnNames(true);
 		}
-		else
+		else if (names.length == 1)
 		{
 			criteriaSearch.setFirstName(names[0].trim());
+			criteriaSearch.setLastName(names[0].trim());
 		}
 
-		criteriaSearch.setLastName(names[0].trim());
 		criteriaSearch.setHin(query.trim());
 
 		return getSearchResponse(criteriaSearch, page, perPage);

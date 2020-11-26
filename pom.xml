@@ -1313,7 +1313,7 @@
 		<dependency>
 			<groupId>ca.cloudpractice</groupId>
 			<artifactId>aqs-java-client</artifactId>
-			<version>0.3.3</version>
+			<version>0.3.6</version>
 		</dependency>
 	</dependencies>
 
@@ -1739,7 +1739,18 @@
 					<systemProperties>
 						<systemProperty>
 							<key>openApiSpecBuilder.resourceClassCsv</key>
-							<value>org.oscarehr.ws.rest.SystemPreferenceWebService,org.oscarehr.ws.rest.ScheduleService,org.oscarehr.ws.rest.SitesService,org.oscarehr.ws.rest.AppointmentService,org.oscarehr.ws.rest.ProviderPreferenceWebService,org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService,org.oscarehr.ws.rest.myhealthaccess.DemographicWebService,org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService,org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService,org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService,org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService,org.oscarehr.ws.rest.integrations.aqs.QueueWebService</value>
+							<value>org.oscarehr.ws.rest.SystemPreferenceWebService
+								org.oscarehr.ws.rest.ScheduleService
+								org.oscarehr.ws.rest.SitesService
+								org.oscarehr.ws.rest.AppointmentService
+								org.oscarehr.ws.rest.ProviderPreferenceWebService
+								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
+								org.oscarehr.ws.rest.myhealthaccess.DemographicWebService
+								org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService
+								org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService
+								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
+								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
+								org.oscarehr.ws.rest.integrations.aqs.QueueWebService</value>
 						</systemProperty>
 						<systemProperty>
 							<key>openApiSpecBuilder.outputDirectory</key>
@@ -2307,7 +2318,10 @@
 				<!-- override with -Dmaven.tomcat.hostname=the-host-name -->
 				<maven.tomcat.hostname>${env.HOSTNAME}</maven.tomcat.hostname>
 				<!-- make the context reloadable to allow hot deploy -->
-				<maven.tomcat.contextReloadable>false</maven.tomcat.contextReloadable>
+				<maven.tomcat.contextReloadable>true</maven.tomcat.contextReloadable>
+				<!-- delay the redeployment of the webapp. If this value is to low tomcat will redeploy
+					 before compilation is complete causing it to redeploy twice -->
+				<maven.tomcat.backgroundProcessorDelay>30</maven.tomcat.backgroundProcessorDelay>
 			</properties>
 			<build>
 				<plugins>
@@ -2424,6 +2438,16 @@
 							<systemProperties>
 								<oscar.use.integration.prop.file>${oscar.use.integration.prop}</oscar.use.integration.prop.file>
 							</systemProperties>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>3.3</version>
+						<configuration combine.self="override">
+							<useIncrementalCompilation>true</useIncrementalCompilation>
+							<source>1.8</source>
+							<target>1.8</target>
 						</configuration>
 					</plugin>
 				</plugins>

@@ -50,6 +50,7 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.model.DemographicExtArchive;
 import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
@@ -122,7 +123,9 @@ public class DemographicManager {
 
 	@Autowired
 	private ProgramManager programManager;
-	
+
+	@Autowired
+	private HinValidationService hinValidationService;
 
 	@Deprecated
 	public Demographic getDemographic(LoggedInInfo loggedInInfo, Integer demographicId) throws PatientDirectiveException {
@@ -683,6 +686,41 @@ public class DemographicManager {
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 
 		return demographicDao.searchByHealthCard(hin);
+	}
+
+	/**
+	 * Given a HIN and a demographic to compare against, see if any other demographics are using the same HIN.
+	 * @param loggedInInfo currently logged in user
+	 * @param hin HIN we want to check potential duplication for
+	 * @param ver optional version code to go with HIN
+	 * @param demographicNo demographic to search for
+	 * @return false if a demographic outside of our given one has this HIN set, true otherwise
+	 */
+	public boolean isUniqueHealthCard(LoggedInInfo loggedInInfo, String hin, String ver, String province, int demographicNo)
+	{
+		// whether it's unique or not, if we allow duplicates we don't care and this has to return true
+		if (hinValidationService.isDuplicateAllowable(ver, province))
+		{
+			return true;
+		}
+
+		List<Demographic> potentialMatches = searchByHealthCard(loggedInInfo, hin);
+
+		boolean isUnique = true;
+		for (Demographic demographic : potentialMatches)
+		{
+			if (demographic.getDemographicNo() == demographicNo)
+			{
+				continue;
+			}
+
+			if (!hinValidationService.isDuplicateAllowable(demographic.getVer(), demographic.getHcType()))
+			{
+				isUnique = false;
+			}
+		}
+
+		return isUnique;
 	}
 
 	public Demographic getDemographicByNamePhoneEmail(LoggedInInfo loggedInInfo, String firstName, String lastName,

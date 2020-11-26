@@ -67,12 +67,11 @@ public class HinValidationService
 	/**
 	 * some cases exist where a duplicated health insurance number is allowable in the system.
 	 * this method is used to determine if those conditions are met
-	 * @param hin - the hin
 	 * @param versionCode - hin version code
 	 * @param provinceCode - hin province/type
 	 * @return - true if the hin can be duplicated, false otherwise
 	 */
-	public boolean isDuplicateAllowable(String hin, String versionCode, String provinceCode)
+	public boolean isDuplicateAllowable(String versionCode, String provinceCode)
 	{
 		return ("BC".equalsIgnoreCase(provinceCode) && BC_NEWBORN_CODE.equals(versionCode));
 	}
@@ -94,7 +93,7 @@ public class HinValidationService
 			{
 				throw new ValidationException("Invalid Hin");
 			}
-			if(!isDuplicateAllowable(hin, versionCode, provinceCode) && hinInSystem(hin))
+			if(!isDuplicateAllowable(versionCode, provinceCode) && hinInSystem(hin))
 			{
 				throw new ValidationException("Duplicate Hin");
 			}

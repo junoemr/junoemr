@@ -62,7 +62,7 @@ public class AddDocumentTypeAction extends DispatchAction
 
 		for (String type : EDocUtil.getDoctypes(module))
 		{
-			if (docType.equalsIgnoreCase(type))
+			if (docType.equals(type))
 			{
 				errors.put("typeexists", "dms.error.typeExists");
 				request.setAttribute("doctypeerrors", errors);

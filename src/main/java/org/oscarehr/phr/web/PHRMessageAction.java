@@ -33,10 +33,7 @@ import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
 import org.apache.struts.upload.MultipartRequestHandler;
-import org.oscarehr.PMmodule.caisi_integrator.ConformanceTestHelper;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.io.FileFactory;
-import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.DemographicManager;
@@ -60,7 +57,6 @@ import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WebUtils;
 import org.oscarehr.util.XmlUtils;
 import org.w3c.dom.Document;
-import oscar.dms.actions.AddEditDocumentAction;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarDemographic.data.DemographicData;
@@ -401,11 +397,6 @@ public class PHRMessageAction extends DispatchAction {
 		document = documentService.uploadNewDemographicDocument(document, new ByteArrayInputStream(fileBytes), demographicNo);
 		Integer documentNo = document.getDocumentNo();
 
-		if(ConformanceTestHelper.enableConformanceOnlyTestFeatures)
-		{
-			GenericFile file = FileFactory.getDocumentFile(document.getDocfilename());
-			AddEditDocumentAction.storeDocumentInDatabase(file.getFileObject(), documentNo);
-		}
 		LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
 				String.valueOf(documentNo), loggedInInfo.getIp(), document.getDocfilename());
 	}
