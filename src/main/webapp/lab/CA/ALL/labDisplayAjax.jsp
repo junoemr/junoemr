@@ -182,21 +182,13 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
          {
                  jQuery.ajax(
                      {
-                         url: "../ws/rs/lab/" + labId + "/comments",
+                         url: "../ws/rs/lab/" + labId + "/provider/providerID/labRouting",
                          type: "GET",
                          success: (result) =>
                          {
-                             var commentVal;
-                             var providersComments = result.body;
+                             var commentVal = result.body.comment;
                              var commentID = "comment_" + labId;
 
-                             for (var provider in providersComments)
-                             {
-                                 if (provider === providerNo)
-                                 {
-                                     commentVal = providersComments[providerNo];
-                                 }
-                             }
                              var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
 
                              if (comment && comment.length > 0)

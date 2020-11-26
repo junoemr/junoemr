@@ -27,7 +27,9 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.conversion.ProviderLabRoutingConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.transfer.ProviderLabRoutingTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,15 +47,18 @@ import java.util.Map;
 public class LabWebService extends AbstractServiceImpl
 {
     private static Logger logger = MiscUtils.getLogger();
+
     @Autowired
     private ProviderLabRoutingDao providerLabRoutingDao;
 
+
+
     @GET
-    @Path("/{labId}/comments")
-    public RestResponse<Map<String, String>> getComments(@PathParam("labId") Integer labId)
+    @Path("/{labID}/provider/providerID/comment")
+    public RestResponse<Map<String, String>> getComments(@PathParam("labID") Integer labID)
     {
 
-       List<ProviderLabRoutingModel> providerLabRoutingModel = providerLabRoutingDao.getProviderLabRoutings(labId, "HL7");
+       List<ProviderLabRoutingModel> providerLabRoutingModel = providerLabRoutingDao.getProviderLabRoutings(labID, "HL7");
        Map<String, String> comments = new HashMap<>();
         try
         {
@@ -68,5 +73,17 @@ public class LabWebService extends AbstractServiceImpl
             logger.error("Error parsing providerLabRoutingModel", e);
             return RestResponse.errorResponse("There was an error retrieving lab comments");
         }
+    }
+
+    @GET
+    @Path("/{labID}/provider/providerID/labRouting")
+    public RestResponse<ProviderLabRoutingTransfer> getLabRouting(@PathParam("labID") Integer labID)
+    {
+        ProviderLabRoutingModel providerLabRoutingModel = providerLabRoutingDao.findByLabNoAndLabType(labID, "HL7");
+
+        ProviderLabRoutingConverter converter = new ProviderLabRoutingConverter();
+        ProviderLabRoutingTransfer transfer = converter.convert(providerLabRoutingModel);
+
+        return RestResponse.successResponse(transfer);
     }
 }
