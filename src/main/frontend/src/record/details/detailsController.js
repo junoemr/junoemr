@@ -293,7 +293,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
 					controller.formatLastName(); //done on page load
 					controller.formatFirstName(); //done on page load
-					controller.validateHCSave();
 				},
 				function error(errors)
 				{
@@ -1024,31 +1023,9 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						{
 							alert("HIN is already in use!");
 						}
-						else if (hcType !== "ON" && doSave)
+						else if (doSave)
 						{
 							controller.save();
-						}
-						else
-						{
-							if (controller.page.demo.ver == null) controller.page.demo.ver = "";
-							patientDetailStatusService.validateHC(controller.page.demo.hin, controller.page.demo.ver).then(
-								function success(results)
-								{
-									if (results.valid == null)
-									{
-										controller.page.HCValidation = "n/a";
-									}
-									else if (!results.valid)
-									{
-										alert("Health Card Validation failed: " + results.responseDescription + " (" + results.responseCode + ")");
-										doSave = false;
-									}
-									if (doSave) controller.save();
-								},
-								function error(errors)
-								{
-									console.log(errors);
-								});
 						}
 					},
 					function error(errors)
