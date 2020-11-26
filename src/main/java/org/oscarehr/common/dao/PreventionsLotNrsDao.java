@@ -95,5 +95,15 @@ public class PreventionsLotNrsDao extends AbstractDao<PreventionsLotNrs> {
 		
 		return (pList);
 	}
+
+	public PreventionsLotNrs findActive(Integer id)
+	{
+		String sql = "SELECT x FROM PreventionsLotNrs x " +
+				"WHERE x.id=:id " +
+				"AND x.deleted=false";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("id", id);
+		return getSingleResultOrNull(query);
+	}
 }
 
