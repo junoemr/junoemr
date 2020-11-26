@@ -171,8 +171,11 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures {
 		}
 		//we need to assign one specific date to a few lotNrs to test the ordering results
 		preventionLotNrs.get(0).setLastUpdateDate(new java.util.Date(2020, 10, 30, 11, 11, 11));
+		dao.merge(preventionLotNrs.get(0));
 		preventionLotNrs.get(1).setLastUpdateDate(new java.util.Date(2020, 10, 30, 11, 11, 11));
+		dao.merge(preventionLotNrs.get(1));
 		preventionLotNrs.get(2).setLastUpdateDate(new java.util.Date(2020, 10, 30, 11, 11, 11));
+		dao.merge(preventionLotNrs.get(2));
 
 		//reverse the order since the results from the database are ordered to return the most recently updated lotNrs first
 		Collections.reverse(expectedResult);
