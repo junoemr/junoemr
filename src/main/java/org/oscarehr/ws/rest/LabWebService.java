@@ -53,7 +53,7 @@ public class LabWebService extends AbstractServiceImpl
     @Path("/{labID}/provider/{providerID}/labRouting")
     public RestResponse<ProviderLabRoutingTransfer> getProviderLabRouting(@PathParam("labID") Integer labID, @PathParam("providerID") String providerID)
     {
-        List<ProviderLabRoutingModel> providerLabRoutingModel = providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labID, "HL7", providerID);
+        List<ProviderLabRoutingModel> providerLabRoutingModel = providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labID, ProviderLabRoutingModel.LAB_TYPE_LABS, providerID);
 
         ProviderLabRoutingConverter converter = new ProviderLabRoutingConverter();
         ProviderLabRoutingTransfer transfer;
