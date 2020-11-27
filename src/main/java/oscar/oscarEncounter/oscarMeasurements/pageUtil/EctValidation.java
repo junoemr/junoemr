@@ -65,9 +65,18 @@ public class EctValidation
 	public List<Validations> getValidationType(String inputType, String mInstrc)
 	{
 		List<Validations> result = new ArrayList<Validations>();
-
 		MeasurementTypeDao dao = SpringUtils.getBean(MeasurementTypeDao.class);
-		List<MeasurementType> types = dao.findByTypeAndMeasuringInstruction(inputType, mInstrc);
+		List<MeasurementType> types;
+
+		if (inputType == "BP" || inputType == "FEET")
+		{
+			types = dao.findByTypeAndMeasuringInstruction(inputType, mInstrc);
+		}
+		else
+		{
+			types = dao.findByType(inputType);
+		}
+
 		if (types.isEmpty())
 		{
 			return result;
