@@ -31,10 +31,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
@@ -45,7 +43,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static integration.tests.AddGroupTests.addGroup;
 import static integration.tests.AddGroupTests.groupName;
 import static integration.tests.AddGroupTests.valueOfDrApple;
 import static integration.tests.AddGroupTests.valueOfDrBerry;
@@ -58,39 +55,9 @@ import static integration.tests.ScheduleSettingTests.templateTitleGeneral;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
-class ScheduleIntegrationTests
-{
-	static void setupScheduleTest(WebDriver driver) throws InterruptedException
-	{
-		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Schedule Setting");
-		String currWindowHandle = driver.getWindowHandle();
-		Set<String> oldWindowHandles = driver.getWindowHandles();
-		setupTemplate(currWindowHandle, oldWindowHandles);
-		driver.findElement(By.xpath("//input[@value='Exit']")).click();
-		setupSchedule(currWindowHandle, AuthUtils.TEST_PROVIDER_ID, templateTitleGeneral, templateTitleGeneral);
-		List<String> daySchedule = getDailySchedule();
-		Assert.assertTrue("Schedule setting for Monday is NOT completed successfully.", daySchedule.get(1).contains(templateTitleGeneral));
-		Assert.assertTrue("Schedule setting for Tuesday is NOT completed successfully.", daySchedule.get(2).contains(templateTitleGeneral));
-		driver.close();
-	}
-}
-
-class GroupViewIntegrationTests
-{
-	static void setupGroupTest(WebDriver driver)
-	{
-		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group");
-		addGroup(groupName, 2);
-		Assert.assertTrue("Group is Not added successfully.",
-				PageUtil.isExistsBy(By.name(valueOfDrApple), driver) &&
-						PageUtil.isExistsBy(By.name(valueOfDrBerry), driver));
-		driver.close();
-	}
-}
-
 public class AddAppointmentsTests extends SeleniumTestBase
 {
-	static WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+	//static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	@BeforeClass
 	public static void setup() throws Exception
 	{
@@ -109,7 +76,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 				"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
 	}
 
-	public static void appointmentDateDisplay(By appointmentDateBy, String appointmentDate)
+	public void appointmentDateDisplay(By appointmentDateBy, String appointmentDate)
 	{
 		boolean isAppointmentDateDisplayed = false;
 		isAppointmentDateDisplayed = PageUtil.isExistsBy(appointmentDateBy, driver);
@@ -120,7 +87,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		}
 	}
 
-	public static void addAppointmentWithDemo(By timeFrame, String currWindowHandle, String status)
+	public void addAppointmentWithDemo(By timeFrame, String currWindowHandle, String status)////
 	{
 		driver.findElement(timeFrame).click();
 		PageUtil.switchToLastWindow(driver);
@@ -129,7 +96,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 
 	public void	addAppointmentWithNODemo(By timeFrame, Set<String> oldWindowHandles, String currWindowHandle, String status)
 	{
-		wait.until(ExpectedConditions.elementToBeClickable(timeFrame));
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(timeFrame));
 		driver.findElement(timeFrame).click();
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 		PageUtil.switchToWindow(newWindows.get(newWindows.size() - 1), driver);
@@ -138,7 +105,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		PageUtil.switchToWindow(currWindowHandle, driver);
 	}
 
-	public static void addAppointmentPageWithDemo(String secCurrWindowHandle, String status)
+	public void addAppointmentPageWithDemo(String secCurrWindowHandle, String status)///
 	{
 		driver.findElement(By.id("searchBtn")).click();
 		driver.findElement(By.xpath(".//td[contains(., 'Test')]")).click();
@@ -153,11 +120,11 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		PageUtil.switchToWindow(secCurrWindowHandle, driver);
 	}
 
-	public static void addAppointmentsSchedulePage(String time, String currWindowHandle)
+	public void addAppointmentsSchedulePage(String time, String currWindowHandle)/////////////
 	{
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
 		addAppointmentWithDemo(By.linkText(time), currWindowHandle, "t");//To Do
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
 	}
 
 	@Test
@@ -172,7 +139,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 
 		//Add an appointment at 10:00-10:15 with NO demographic selected.
 		addAppointmentWithNODemo(By.linkText("10:00"),oldWindowHandles, currWindowHandle, "t");//To Do
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
 	}
@@ -190,7 +157,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 				"//a[contains(., 'Mon,')]/ancestor::tr/following-sibling::tr" +
 						"/descendant::td//a[@title='9:00 AM - 9:15 AM']";
 		addAppointmentWithDemo(By.xpath(xpathAt9), currWindowHandle, "t");//To Do
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
 
@@ -199,7 +166,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 				"//a[contains(., 'Tue,')]/ancestor::tr/following-sibling::tr" +
 						"/descendant::td//a[@title='10:00 AM - 10:15 AM']";
 		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");//To Do
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
 	}
@@ -235,16 +202,16 @@ public class AddAppointmentsTests extends SeleniumTestBase
 						"/following-sibling::td[@title='10:00']" +
 						"/descendant::td[@style='vertical-align:middle;']";
 		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");// To Do
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Day Page")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Day Page")));
 		driver.findElement(By.xpath("//a[contains(., '" + apptAt9DateFormated + "')]")).click();
-		wait.until(ExpectedConditions.elementToBeClickable(By.linkText("All")));
-		driver.findElement(By.linkText("All")).click();
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@title='View all providers in the group']")));
+		driver.findElement(By.xpath("//a[@title='View all providers in the group']")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
 
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
 	}
@@ -253,8 +220,17 @@ public class AddAppointmentsTests extends SeleniumTestBase
 	public void addAppointmentsSearchToolTest() throws Exception
 	{
 		String currWindowHandle = driver.getWindowHandle();
+		//Setup Schedule
+		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Schedule Setting");
+		String windowHandleScheduleSetting = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		ScheduleIntegrationTests.setupScheduleTest(driver);
+		setupTemplate(windowHandleScheduleSetting, oldWindowHandles);
+		driver.findElement(By.xpath("//input[@value='Exit']")).click();
+		setupSchedule(windowHandleScheduleSetting, AuthUtils.TEST_PROVIDER_ID, templateTitleGeneral, templateTitleGeneral);
+		List<String> daySchedule = getDailySchedule();
+		Assert.assertTrue("Schedule setting for Monday is NOT completed successfully.", daySchedule.get(1).contains(templateTitleGeneral));
+		Assert.assertTrue("Schedule setting for Tuesday is NOT completed successfully.", daySchedule.get(2).contains(templateTitleGeneral));
+		driver.close();
 
 		//Search available schedule for Wednesdays
 		PageUtil.switchToWindow(currWindowHandle, driver);
@@ -280,7 +256,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		addAppointmentWithNODemo(By.xpath(xpathNext),oldWindowHandles, secCurrWindowHandle, "H");//Here
 		driver.close();
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='weekview']")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='weekview']")));
 		driver.findElement(By.xpath("//input[@name='weekview']")).click();
 		appointmentDateDisplay(By.partialLinkText(appointmentDate), appointmentDate);
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
@@ -295,7 +271,16 @@ public class AddAppointmentsTests extends SeleniumTestBase
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		GroupViewIntegrationTests.setupGroupTest(driver);
+		//Setup Groups
+		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group");
+		//////
+		AddGroupTests addGroupTests = new AddGroupTests();
+		addGroupTests.addGroup(groupName, 2);
+		Assert.assertTrue("Group is Not added successfully.",
+				PageUtil.isExistsBy(By.name(valueOfDrApple), driver) &&
+						PageUtil.isExistsBy(By.name(valueOfDrBerry), driver));
+		driver.close();
+
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
 		dropdownSelectByValue(driver, By.id("mygroup_no"), "_grp_TestGroup");
@@ -304,7 +289,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 						"/ancestor::tr/following-sibling::tr" +
 						"/descendant::td//a[@title='9:00 AM - 9:15 AM']";
 		addAppointmentWithDemo(By.xpath(xpathAt9), currWindowHandle, "t");//To Do
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Test,Test")));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
 
@@ -321,7 +306,7 @@ public class AddAppointmentsTests extends SeleniumTestBase
 						"/ancestor::tr/following-sibling::tr" +
 						"/descendant::td//a[@title='10:00 AM - 10:15 AM']";
 		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");//To Do
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
 

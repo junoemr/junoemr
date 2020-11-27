@@ -31,30 +31,16 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.util.Set;
 
-import static integration.tests.AddAppointmentsTests.addAppointmentsSchedulePage;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
-
-class AddAppointmentIntegrationTests
-{
-	static void addAppointmentTest(WebDriver driver, String time)
-	{
-		String currWindowHandle = driver.getWindowHandle();
-		addAppointmentsSchedulePage(time, currWindowHandle);
-		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
-				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
-	}
-}
 
 public class ChangeAppointmentStatusTests extends SeleniumTestBase
 {
@@ -62,7 +48,6 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 	String statusExpectedDP = "Daysheet Printed";
 	String statusExpectedCusomized2 = "Customized 2";
 	String statusExpectedCancelled = "Cancelled";
-	WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 
 	@BeforeClass
 	public static void setup() throws Exception
@@ -86,7 +71,7 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 
 	public String apptStatusHoverOver()
 	{
-		wait.until(ExpectedConditions.elementToBeClickable(By.className("apptStatus")));
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.className("apptStatus")));
 		WebElement statusButton = driver.findElement(By.className("apptStatus"));
 		Actions builder = new Actions(driver);
 		builder.clickAndHold().moveToElement(statusButton);
@@ -101,7 +86,13 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 	public void changeAppointmentStatusTestsClassicUI() throws InterruptedException
 	{
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
-		AddAppointmentIntegrationTests.addAppointmentTest(driver, "09:00");
+		String currWindowHandle = driver.getWindowHandle();
+		//////////////////////////
+		AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
+		addAppointmentsTests.addAppointmentsSchedulePage("09:00", currWindowHandle);
+		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
+				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
+
 		WebElement statusButton = driver.findElement(By.className("apptStatus"));
 		String statusTD = apptStatusHoverOver();
 		Assert.assertEquals("Status is NOT To Do", statusExpectedTD, statusTD);
@@ -113,7 +104,6 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 		Assert.assertEquals("Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);
 
 		//Edit from "Edit An Appointment" page
-		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
 		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), "b");//Customized 2
@@ -129,9 +119,15 @@ public class ChangeAppointmentStatusTests extends SeleniumTestBase
 	{
 		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
-		AddAppointmentIntegrationTests.addAppointmentTest(driver, "10:00");
+		String currWindowHandle = driver.getWindowHandle();
+		//////////////////////////
+		AddAppointmentsTests addAppointmentsTests = new AddAppointmentsTests();
+		addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle);
+		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
+				PageUtil.isExistsBy(By.linkText("Test,Test"), driver));
+
 		accessSectionJUNOUI(driver, "Schedule");
-		wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
 		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
 		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
 		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));

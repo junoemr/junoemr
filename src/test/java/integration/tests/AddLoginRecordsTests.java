@@ -33,7 +33,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
@@ -49,19 +48,6 @@ import static integration.tests.AssignRolesTests.xpathProvider;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
-
-class AssignRolesIntegrationTests
-{
-	static void assignRolesTest(WebDriver driver, String xpathDropdown, String xpathProvider, String providerNo, String role)
-	{
-		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
-		assignRoles(xpathDropdown, xpathProvider, "admin", "//following-sibling::td/input[@value='Add']");
-		String message = "Role " + role + " is added. (" + providerNo + ")";
-		Assert.assertTrue("Admin is NOT assigned to the provider successfully.",
-				PageUtil.isExistsBy(By.xpath("//font[contains(., '" + message + "')]"), driver));
-		driver.close();
-	}
-}
 
 public class AddLoginRecordsTests extends SeleniumTestBase
 {
@@ -89,7 +75,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 		SchemaUtils.restoreTable("admission", "log", "property", "provider", "providerbillcenter", "security", "secUserRole");
 	}
 
-	public static String passwordValidation(String passwordInput)
+	public String passwordValidation(String passwordInput)
 	{
 		driver.findElement(By.xpath("//input[@name='password']")).sendKeys(passwordInput);
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
@@ -99,7 +85,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 		return alertMessage8Symbols;
 	}
 
-	public static void addLoginRecord(String password, String providerNo, String pin)
+	public void addLoginRecord(String password, String providerNo, String pin)///
 	{
 		driver.findElement(By.xpath("//input[@name='password']")).sendKeys(password);
 		driver.findElement(By.xpath("//input[@name='conPassword']")).sendKeys(password);
@@ -115,7 +101,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
 	}
 
-	public static void removeExpiryDate(String userName, String providerNo)
+	public void removeExpiryDate(String userName, String providerNo)////
 	{
 		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
 		String currWindowHandle1 = driver.getWindowHandle();
@@ -128,7 +114,7 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
 	}
 
-	public static void resetPassword(String password, String passwordUpdated)
+	public void resetPassword(String password, String passwordUpdated)
 	{
 		driver.findElement(By.xpath("//input[@name='oldPassword']")).sendKeys(password);
 		driver.findElement(By.xpath("//input[@name='newPassword']")).sendKeys(passwordUpdated);
@@ -140,7 +126,14 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 	public void addLoginRecordsClassicUITest()
 	{
 		String currWindowHandle = driver.getWindowHandle();
-		AssignRolesIntegrationTests.assignRolesTest(driver, xpathDropdown, xpathProvider, drApple.providerNo, role);
+		//Assign Roles
+		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
+		assignRoles(xpathDropdown, xpathProvider, "admin", "//following-sibling::td/input[@value='Add']");
+		String message = "Role " + role + " is added. (" + drApple.providerNo + ")";
+		Assert.assertTrue("Admin is NOT assigned to the provider successfully.",
+				PageUtil.isExistsBy(By.xpath("//font[contains(., '" + message + "')]"), driver));
+		driver.close();
+
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		accessAdministrationSectionClassicUI(driver, "User Management", "Add a Login Record");
 		driver.findElement(By.xpath("//input[@name='user_name']")).sendKeys(userNameApple);
@@ -173,7 +166,14 @@ public class AddLoginRecordsTests extends SeleniumTestBase
 	{
 		String xpathProvider = "(//td[contains(., '" + drBerry.providerNo + "')])";
 		String xpathDropdown = xpathProvider + xpathOption;
-		AssignRolesIntegrationTests.assignRolesTest(driver, xpathDropdown, xpathProvider, drBerry.providerNo, role);
+		//Assign Roles
+		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
+		assignRoles(xpathDropdown, xpathProvider, "admin", "//following-sibling::td/input[@value='Add']");
+		String message = "Role " + role + " is added. (" + drBerry.providerNo + ")";
+		Assert.assertTrue("Admin is NOT assigned to the provider successfully.",
+				PageUtil.isExistsBy(By.xpath("//font[contains(., '" + message + "')]"), driver));
+		driver.close();
+
 		Set<String> handles = driver.getWindowHandles();
 		PageUtil.switchToWindow(handles.iterator().next(), driver);
 		accessAdministrationSectionJUNOUI(driver, "User Management", "Add a Login Record");

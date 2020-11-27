@@ -31,6 +31,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
@@ -48,7 +49,7 @@ public class SeleniumTestBase
 
 	protected static WebDriver driver;
 	protected static Logger logger= MiscUtils.getLogger();
-
+	protected WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 
 	@BeforeClass
 	public static void buildWebDriver() throws SQLException, InstantiationException,
@@ -63,6 +64,7 @@ public class SeleniumTestBase
 		//practically all integration tests rely on the security table. restore it.
 		SchemaUtils.restoreTable("security");
 
+		//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	}
 
 	@Before
