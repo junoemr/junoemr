@@ -38,11 +38,19 @@ public class ProviderLabRoutingConverter extends AbstractModelConverter<Provider
     public ProviderLabRoutingTransfer convert(ProviderLabRoutingModel providerLabRouting)
     {
         ProviderLabRoutingTransfer transfer = new ProviderLabRoutingTransfer();
-        BeanUtils.copyProperties(providerLabRouting, transfer);
 
-        LocalDateTime timestamp = ConversionUtils.toLocalDateTime(providerLabRouting.getTimestamp());
-        transfer.setTimestamp(timestamp);
+        if (providerLabRouting == null)
+        {
+            return null;
+        }
+        else
+        {
+            BeanUtils.copyProperties(providerLabRouting, transfer);
 
-        return transfer;
+            LocalDateTime timestamp = ConversionUtils.toLocalDateTime(providerLabRouting.getTimestamp());
+            transfer.setTimestamp(timestamp);
+
+            return transfer;
+        }
     }
 }

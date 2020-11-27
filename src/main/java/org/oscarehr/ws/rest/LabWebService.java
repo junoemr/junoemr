@@ -32,7 +32,6 @@ import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.ProviderLabRoutingTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -49,24 +48,22 @@ public class LabWebService extends AbstractServiceImpl
     @Autowired
     private ProviderLabRoutingDao providerLabRoutingDao;
 
+    @Autowired
+    private ProviderLabRoutingConverter converter;
+
     @GET
     @Path("/{labID}/provider/{providerID}/labRouting")
     public RestResponse<ProviderLabRoutingTransfer> getProviderLabRouting(@PathParam("labID") Integer labID, @PathParam("providerID") String providerID)
     {
         List<ProviderLabRoutingModel> providerLabRoutingModel = providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labID, ProviderLabRoutingModel.LAB_TYPE_LABS, providerID);
 
-        ProviderLabRoutingConverter converter = new ProviderLabRoutingConverter();
-        ProviderLabRoutingTransfer transfer;
+        ProviderLabRoutingTransfer transfer = null;
 
-        if (providerLabRoutingModel.size() > 1)
+        if (!providerLabRoutingModel.isEmpty())
         {
-            transfer = converter.convert(providerLabRoutingModel.get(providerLabRoutingModel.size()-1));
+            transfer = converter.convert(providerLabRoutingModel.get(providerLabRoutingModel.size() - 1));
         }
-        else
-        {
-            transfer = converter.convert(providerLabRoutingModel.get(0));
-        }
-        return RestResponse.successResponse(transfer);
+
+            return RestResponse.successResponse(transfer);
     }
-
 }

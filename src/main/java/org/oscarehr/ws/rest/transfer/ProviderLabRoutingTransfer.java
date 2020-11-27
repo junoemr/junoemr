@@ -23,15 +23,12 @@
 
 package org.oscarehr.ws.rest.transfer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public class ProviderLabRoutingTransfer implements Serializable
@@ -43,75 +40,4 @@ public class ProviderLabRoutingTransfer implements Serializable
     private String comment;
     private LocalDateTime timestamp;
     private String labType;
-
-    public Integer getID()
-    {
-        return id;
-    }
-
-    public void setId(Integer id)
-    {
-        this.id = id;
-    }
-
-    public String getProviderNo()
-    {
-        return providerNo;
-    }
-
-    public void setProviderNo(String providerNo)
-    {
-        this.providerNo = providerNo;
-    }
-
-    public Integer getLabNo()
-    {
-        return labNo;
-    }
-
-    public void setLabNo(Integer labNo)
-    {
-        this.labNo = labNo;
-    }
-
-    public String getStatus()
-    {
-        return status;
-    }
-
-    public void setStatus(String status)
-    {
-        this.status = status;
-    }
-
-    public String getComment()
-    {
-        return comment;
-    }
-
-    public void setComment(String comment)
-    {
-        this.comment = comment;
-    }
-
-    public LocalDateTime getTimestamp()
-    {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp)
-    {
-        this.timestamp = timestamp;
-    }
-
-    public String getLabType()
-    {
-        return labType;
-    }
-
-    public void setLabType(String labType)
-    {
-        this.labType = labType;
-    }
-
 }
