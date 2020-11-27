@@ -24,15 +24,16 @@
 package org.oscarehr.common.dao;
 
 
-import java.util.Date;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import org.apache.commons.lang.math.NumberUtils;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 import oscar.util.StringUtils;
 import oscar.util.UtilDateUtilities;
+
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import java.util.Date;
 
 @Repository
 public class PartialDateDao extends AbstractDao<PartialDate> {
@@ -43,11 +44,12 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 	
 	public PartialDate getPartialDate(Integer tableName, Integer tableId, Integer fieldName) {
 
-		String sqlCommand = "select x from PartialDate x where x.tableName=?1 and x.tableId=?2 and x.fieldName=?3 order by x.id desc limit 1";
+		String sqlCommand = "select x from PartialDate x where x.tableName=?1 and x.tableId=?2 and x.fieldName=?3 order by x.id desc";
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter(1, tableName);
 		query.setParameter(2, tableId);
 		query.setParameter(3, fieldName);
+		query.setMaxResults(1); // limit
 
 		@SuppressWarnings("unchecked")
 		PartialDate result = null;
@@ -101,6 +103,41 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 		else partialDate.setFormat(format);
 		
 		if (partialDate!=null) persist(partialDate);
+	}
+
+	public void setPartialDate(org.oscarehr.demographicImport.model.common.PartialDate partialDateModel,
+	                           PartialDate.TABLE table, Integer tableId, Integer field)
+	{
+		String format = null;
+		if(partialDateModel.isFullDate())
+		{
+			format = PartialDate.FORMAT_FULL_DATE;
+		}
+		else if(partialDateModel.isYearMonth())
+		{
+			format = PartialDate.FORMAT_YEAR_MONTH;
+		}
+		else if(partialDateModel.isYearOnly())
+		{
+			format = PartialDate.FORMAT_YEAR_ONLY;
+		}
+
+		if(format != null)
+		{
+			setPartialDate(table.getValue(), tableId, field, format);
+		}
+	}
+	public void setPartialDateTime(org.oscarehr.demographicImport.model.common.PartialDateTime partialDateModel,
+	                           PartialDate.TABLE table, Integer tableId, Integer field)
+	{
+		if(partialDateModel.isFullDateTime())
+		{
+			setPartialDate(table.getValue(), tableId, field, PartialDate.FORMAT_FULL_DATE);
+		}
+		else
+		{
+			setPartialDate(partialDateModel, table, tableId, field);
+		}
 	}
 
 	public String getFormat(Integer tableName, Integer tableId, Integer fieldName) {

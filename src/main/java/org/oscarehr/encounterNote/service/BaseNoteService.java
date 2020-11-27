@@ -24,6 +24,7 @@ package org.oscarehr.encounterNote.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.PMmodule.service.ProgramManager;
+import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.demographic.dao.DemographicDao;
@@ -79,6 +80,9 @@ public abstract class BaseNoteService
 
 	@Autowired
 	protected DemographicDao demographicDao;
+
+	@Autowired
+	protected PartialDateDao partialDateDao;
 
 	public String getNoteHeaderText(String reason)
 	{

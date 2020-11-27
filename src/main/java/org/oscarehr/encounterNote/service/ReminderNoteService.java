@@ -22,10 +22,12 @@
  */
 package org.oscarehr.encounterNote.service;
 
+import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.note.ReminderNoteModelToDbConverter;
 import org.oscarehr.demographicImport.model.encounterNote.ReminderNote;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.oscarehr.encounterNote.model.Issue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +51,21 @@ public class ReminderNoteService extends HistoryNoteService
 
 		note.setDemographic(demographic);
 		CaseManagementNote savedNote = saveReminderNote(note);
-		//TODO handle partial dates?
+
+		// now that notes have id's, save the partial date data
+		for(CaseManagementNoteExt ext : savedNote.getNoteExtensionList())
+		{
+			if(CaseManagementNoteExt.STARTDATE.equals(ext.getKey()))
+			{
+				partialDateDao.setPartialDate(noteModel.getStartDate(),
+						PartialDate.TABLE.CASEMGMT_NOTE_EXT, Math.toIntExact(ext.getId()), PartialDate.FIELD_CASEMGMT_NOTE_EXT_VALUE);
+			}
+			if(CaseManagementNoteExt.RESOLUTIONDATE.equals(ext.getKey()))
+			{
+				partialDateDao.setPartialDate(noteModel.getResolutionDate(),
+						PartialDate.TABLE.CASEMGMT_NOTE_EXT, Math.toIntExact(ext.getId()), PartialDate.FIELD_CASEMGMT_NOTE_EXT_VALUE);
+			}
+		}
 
 		return savedNote;
 	}

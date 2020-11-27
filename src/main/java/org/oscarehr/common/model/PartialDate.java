@@ -24,14 +24,13 @@
 package org.oscarehr.common.model;
 
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  *
@@ -79,12 +78,36 @@ public class PartialDate extends AbstractModel<Integer> implements Serializable 
 	public static final Integer TABLE_DRUGS = 2;
 	public static final Integer TABLE_DXRESEARCH = 3;
 	public static final Integer TABLE_PREVENTIONS = 4;
+	public static final Integer TABLE_CASEMGMT_NOTE = 5;
+	public static final Integer TABLE_CASEMGMT_NOTE_EXT = 6;
+
+	// enum with custom values, for backwards compatibility
+	public enum TABLE {
+		ALLERGIES(1),
+		DRUGS(2),
+		DXRESEARCH(3),
+		PREVENTIONS(4),
+		CASEMGMT_NOTE(5),
+		CASEMGMT_NOTE_EXT(6)
+		;
+
+		private final int tableId;
+		TABLE(int tableId)
+		{
+			this.tableId = tableId;
+		}
+		public int getValue()
+		{
+			return tableId;
+		}
+	}
 	
 	public static final Integer ALLERGIES_STARTDATE = 1;
 	public static final Integer ALLERGIES_ENTRYDATE = 2;
 	public static final Integer DRUGS_WRITTENDATE = 3;
 	public static final Integer DXRESEARCH_STARTDATE = 4;
-	public static final Integer PREVENTION_DATE = 5;
+	public static final Integer PREVENTION_DATE = 1;
+	public static final Integer FIELD_CASEMGMT_NOTE_EXT_VALUE = 1;
 	
 	@Override
 	public Integer getId() {

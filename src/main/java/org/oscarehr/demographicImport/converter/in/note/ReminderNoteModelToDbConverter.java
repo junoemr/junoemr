@@ -39,19 +39,11 @@ public class ReminderNoteModelToDbConverter extends BaseNoteModelToDbConverter<R
 
 		if(input.getStartDate() != null)
 		{
-			CaseManagementNoteExt ext = new CaseManagementNoteExt();
-			ext.setKey(CaseManagementNoteExt.STARTDATE);
-			ext.setDateValue(ConversionUtils.toLegacyDate(input.getStartDate().toLocalDate()));
-			ext.setNote(dbNote);
-			dbNote.addExtension(ext);
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.STARTDATE, ConversionUtils.toLegacyDate(input.getStartDate().toLocalDate())));
 		}
 		if(input.getResolutionDate() != null)
 		{
-			CaseManagementNoteExt ext = new CaseManagementNoteExt();
-			ext.setKey(CaseManagementNoteExt.RESOLUTIONDATE);
-			ext.setDateValue(ConversionUtils.toLegacyDate(input.getResolutionDate().toLocalDate()));
-			ext.setNote(dbNote);
-			dbNote.addExtension(ext);
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.RESOLUTIONDATE, ConversionUtils.toLegacyDate(input.getResolutionDate().toLocalDate())));
 		}
 
 		return dbNote;
