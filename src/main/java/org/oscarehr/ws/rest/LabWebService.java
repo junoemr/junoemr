@@ -37,9 +37,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Path("/lab")
 @Component("LabWebService")
@@ -51,39 +49,24 @@ public class LabWebService extends AbstractServiceImpl
     @Autowired
     private ProviderLabRoutingDao providerLabRoutingDao;
 
-
-
     @GET
-    @Path("/{labID}/provider/providerID/comment")
-    public RestResponse<Map<String, String>> getComments(@PathParam("labID") Integer labID)
+    @Path("/{labID}/provider/{providerID}/labRouting")
+    public RestResponse<ProviderLabRoutingTransfer> getProviderLabRouting(@PathParam("labID") Integer labID, @PathParam("providerID") String providerID)
     {
-
-       List<ProviderLabRoutingModel> providerLabRoutingModel = providerLabRoutingDao.getProviderLabRoutings(labID, "HL7");
-       Map<String, String> comments = new HashMap<>();
-        try
-        {
-            for (int i = 0; i < providerLabRoutingModel.size(); i++)
-            {
-                comments.put(providerLabRoutingModel.get(i).getProviderNo(), providerLabRoutingModel.get(i).getComment());
-            }
-            return RestResponse.successResponse(comments);
-        }
-        catch (IndexOutOfBoundsException e)
-        {
-            logger.error("Error parsing providerLabRoutingModel", e);
-            return RestResponse.errorResponse("There was an error retrieving lab comments");
-        }
-    }
-
-    @GET
-    @Path("/{labID}/provider/providerID/labRouting")
-    public RestResponse<ProviderLabRoutingTransfer> getLabRouting(@PathParam("labID") Integer labID)
-    {
-        ProviderLabRoutingModel providerLabRoutingModel = providerLabRoutingDao.findByLabNoAndLabType(labID, "HL7");
+        List<ProviderLabRoutingModel> providerLabRoutingModel = providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labID, "HL7", providerID);
 
         ProviderLabRoutingConverter converter = new ProviderLabRoutingConverter();
-        ProviderLabRoutingTransfer transfer = converter.convert(providerLabRoutingModel);
+        ProviderLabRoutingTransfer transfer;
 
+        if (providerLabRoutingModel.size() > 1)
+        {
+            transfer = converter.convert(providerLabRoutingModel.get(providerLabRoutingModel.size()-1));
+        }
+        else
+        {
+            transfer = converter.convert(providerLabRoutingModel.get(0));
+        }
         return RestResponse.successResponse(transfer);
     }
+
 }

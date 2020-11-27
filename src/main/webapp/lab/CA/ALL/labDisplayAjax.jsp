@@ -182,13 +182,12 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
          {
                  jQuery.ajax(
                      {
-                         url: "../ws/rs/lab/" + labId + "/provider/providerID/labRouting",
+                         url: "../ws/rs/lab/" + labId + "/provider/" + providerNo + "/labRouting",
                          type: "GET",
                          success: (result) =>
                          {
                              var commentVal = result.body.comment;
                              var commentID = "comment_" + labId;
-
                              var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
 
                              if (comment && comment.length > 0)
