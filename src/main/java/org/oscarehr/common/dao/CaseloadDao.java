@@ -73,7 +73,7 @@ public class CaseloadDao {
 		caseloadSortQueries.put("cl_search_new_docs", "select demographic_no, count(1) as count from providerLabRouting left join patientLabRouting using (lab_no) where providerLabRouting.lab_type='DOC' and status='N' and provider_no='%s' group by demographic_no");
 		caseloadSortQueries.put("cl_search_new_ticklers", "select demographic_no, count(1) as count from tickler where status='A' group by demographic_no");
 		caseloadSortQueries.put("cl_search_new_msgs", "select demographic_no, count(1) as count from msgDemoMap left join messagelisttbl on message = messageID where status='new' group by demographic_no");		
-		caseloadSortQueries.put("cl_search_measurement", "SELECT m.demographicNo as demographic_no, dataField FROM measurements m JOIN (SELECT id, demographicNo as demographic_no, max(dateObserved) max_date FROM measurements WHERE type='%s' GROUP BY demographic_no) m2 ON m.demographicNo = m2.demographic_no AND m.dateObserved = m2.max_date AND m.id=m2.id WHERE type='%s'");
+		caseloadSortQueries.put("cl_search_measurement", "SELECT m.demographicNo AS demographic_no, m.dataField AS dataField FROM measurements m JOIN (SELECT demographicNo, MAX(dateObserved) AS dateObserved FROM measurements m1 WHERE type='%s' GROUP BY demographicNo ORDER BY dateEntered DESC) m1 ON m.demographicNo=m1.demographicNo AND m.dateObserved=m1.dateObserved WHERE m.type='%s' GROUP BY m.demographicNo");
 		
 		caseloadSortQueries.put("cl_search_lastencdate", "SELECT cn.demographic_no, cn.update_date FROM casemgmt_note cn JOIN (SELECT note_id, demographic_no, MAX(update_date) FROM casemgmt_note GROUP BY demographic_no) cn2 ON cn.note_id=cn2.note_id");
 		caseloadSortQueries.put("cl_search_lastenctype", "SELECT cn.demographic_no, cn.encounter_type FROM casemgmt_note cn JOIN (SELECT note_id, demographic_no, MAX(update_date) FROM casemgmt_note GROUP BY demographic_no) cn2 ON cn.note_id=cn2.note_id ");
@@ -113,6 +113,7 @@ public class CaseloadDao {
 		} else {
 			sortQuery = sortParams != null ? String.format(caseloadSortQueries.get(category.getQuery()), (Object[])sortParams) : caseloadSortQueries.get(category.getQuery());
 			if (category.isMeasurement()) {
+				// Note: This query in particular seems to really, really struggle when casting BP as a decimal
 				query = String.format("SELECT Y.demographic_no, Y.last_name, Y.first_name, X.%s FROM (%s) as Y LEFT JOIN (%s) as X on Y.demographic_no = X.demographic_no ORDER BY ISNULL(X.%s) ASC, CAST(X.%s as DECIMAL(10,4)) %s, Y.last_name %s, Y.first_name %s LIMIT %d, %d",
 						category.getField(), demoQuery, sortQuery, category.getField(), category.getField(), sortDir, sortDir, sortDir, page * pageSize, pageSize);
 			} else {
