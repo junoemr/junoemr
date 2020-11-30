@@ -37,7 +37,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
-import java.awt.*;
+import java.awt.AWTException;
 import java.util.List;
 import java.util.Set;
 
@@ -46,11 +46,9 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 
 public class RescheduleAppointmentsTests extends SeleniumTestBase
 {
-    //WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
     static String patientFName = "Test";
     static String patientLName = "Test";
     static String patientName = patientLName + "," + patientFName;
-    //WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 
     @BeforeClass
     public static void setup() throws Exception
@@ -141,10 +139,11 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
         driver.findElement(By.xpath("//span[contains(., '" + patientNameJUNO + "')]")).click();
         String startTimeAfterReschedule = driver.findElement(By.id("input-startTime")).getAttribute("value");
         driver.findElement(By.xpath("//button[@title='Cancel']")).click();
-        Assert.assertEquals("Appointment is NOT rescheduled from 10:00 to 10:45", timeFrameExpected.substring(0,5), startTimeAfterReschedule.substring(0,5));
+        Assert.assertEquals("Appointment is NOT rescheduled from 10:00 to 10:45",
+                timeFrameExpected.substring(0, 5), startTimeAfterReschedule.substring(0, 5));
 
         //Drag and Drop to 11:00
-        Actions act=new Actions(driver);
+        Actions act = new Actions(driver);
         String startTimeDNDExpected = "11:00:00";
         WebElement apptBeforeDND = driver.findElement(By.xpath("//span[contains(., '" + patientNameJUNO + "')]"));
         List<WebElement> schedulesRight = driver.findElements(By.className("fc-bgevent"));
@@ -160,6 +159,7 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
         }
         driver.findElement(By.xpath("//span[contains(., '" + patientNameJUNO + "')]")).click();
         String startTimeAfterDND = driver.findElement(By.id("input-startTime")).getAttribute("value");
-        Assert.assertEquals("Appointment is NOT rescheduled from 10:45 to 11:00", startTimeDNDExpected.substring(0,5), startTimeAfterDND.substring(0,5));
+        Assert.assertEquals("Appointment is NOT rescheduled from 10:45 to 11:00",
+                startTimeDNDExpected.substring(0, 5), startTimeAfterDND.substring(0, 5));
     }
 }
