@@ -25,6 +25,8 @@ package org.oscarehr.integration.mchcv;
 
 import org.apache.commons.lang.StringUtils;
 
+// Use HinValidationService
+@Deprecated
 public class SimpleHCValidator implements HCValidator {
 
     private static final String VALID_RESPONSE_CODE = "51"; 

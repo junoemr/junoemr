@@ -139,7 +139,14 @@
 				demographic.setYearOfBirth(request.getParameter("year_of_birth"));
 				demographic.setMonthOfBirth(request.getParameter("month_of_birth")!=null && request.getParameter("month_of_birth").length()==1 ? "0"+request.getParameter("month_of_birth") : request.getParameter("month_of_birth"));
 				demographic.setDateOfBirth(request.getParameter("date_of_birth")!=null && request.getParameter("date_of_birth").length()==1 ? "0"+request.getParameter("date_of_birth") : request.getParameter("date_of_birth"));
-				demographic.setHin(request.getParameter("hin"));
+
+                String hin = request.getParameter("hin");
+                if (hin != null)
+                {
+                    hin = hin.replaceAll("[^0-9a-zA-Z]", "");
+                }
+                demographic.setHin(StringUtils.trimToNull(hin));
+                
 				demographic.setVer(request.getParameter("ver"));
 				demographic.setRosterStatus(request.getParameter("roster_status"));
 				demographic.setPatientStatus(request.getParameter("patient_status"));

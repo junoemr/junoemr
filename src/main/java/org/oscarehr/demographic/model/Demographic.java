@@ -261,6 +261,7 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 
 		return dayDifference < 365;
 	}
+	
 
 	@Override
 	public Integer getId()
@@ -871,7 +872,32 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 
 	@PrePersist
 	@PreUpdate
-	public void removeControlCharacter()
+	public void sanitizeEntity()
+	{
+		removeControlCharactersFromPhone();
+		filterHinDelimiters();
+	}
+
+
+	/**
+	 * Filter out whitespace and dashes from hin numbers.
+	 */
+	private void filterHinDelimiters()
+	{
+		String hin = getHin();
+
+		if (hin != null)
+		{
+			hin = hin.replaceAll("[(\\s-)]", "");
+		}
+		setHin(hin);
+	}
+
+
+	/**
+	 * Remove control characters that prevent serialization via SOAP
+	 */
+	private void removeControlCharactersFromPhone()
 	{
 		setPhone(filterControlCharacters(this.getPhone()));
 		setPhone2(filterControlCharacters(this.getPhone2()));
