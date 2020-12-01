@@ -60,11 +60,16 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 
 	protected Provider getImportPrimaryPhysician(Demographics importStructure)
 	{
-		Provider provider = new Provider();
-		provider.setFirstName(importStructure.getPrimaryPhysician().getName().getFirstName());
-		provider.setLastName(importStructure.getPrimaryPhysician().getName().getLastName());
-		provider.setOhipNumber(importStructure.getPrimaryPhysician().getOHIPPhysicianId());
-		provider.setPractitionerNumber(importStructure.getPrimaryPhysician().getPrimaryPhysicianCPSO());
+		Provider provider = null;
+		Demographics.PrimaryPhysician mrp = importStructure.getPrimaryPhysician();
+		if(mrp != null)
+		{
+			provider = new Provider();
+			provider.setFirstName(mrp.getName().getFirstName());
+			provider.setLastName(mrp.getName().getLastName());
+			provider.setOhipNumber(mrp.getOHIPPhysicianId());
+			provider.setPractitionerNumber(mrp.getPrimaryPhysicianCPSO());
+		}
 		return provider;
 	}
 }
