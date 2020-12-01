@@ -42,6 +42,7 @@ public class Issue extends AbstractModel<Long>
 	public static final String SUMMARY_CODE_SOCIAL_HISTORY = "SocHistory";
 	public static final String SUMMARY_CODE_FAMILY_HISTORY = "FamHistory";
 	public static final String SUMMARY_CODE_REMINDERS = "Reminders";
+	public static final String SUMMARY_CODE_CONCERNS = "Concerns";
 	public static final String SUMMARY_CODE_TICKLER_NOTE = "TicklerNote";
 
 
