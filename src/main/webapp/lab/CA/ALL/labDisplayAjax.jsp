@@ -193,8 +193,8 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                              if (comment && comment.length > 0)
                              {
                                  $(commentID).value = comment;
-                                 handleLab('acknowledgeForm_' + labId, labId, action);
                              }
+                             handleLab('acknowledgeForm_' + labId, labId, action);
                              return false;
                          },
                          error: (error) =>
