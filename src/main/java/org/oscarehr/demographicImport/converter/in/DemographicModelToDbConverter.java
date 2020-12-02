@@ -51,7 +51,7 @@ public class DemographicModelToDbConverter
 		}
 
 		Demographic dbDemographic = new Demographic();
-		BeanUtils.copyProperties(input, dbDemographic, "dateOfBirth");
+		BeanUtils.copyProperties(input, dbDemographic, "dateOfBirth", "title");
 
 		dbDemographic.setDemographicId(input.getId());
 		dbDemographic.setDateOfBirth(input.getDateOfBirth());
@@ -65,6 +65,7 @@ public class DemographicModelToDbConverter
 		dbDemographic.setChartNo(input.getChartNumber());
 		dbDemographic.setRosterDate(ConversionUtils.toNullableLegacyDate(input.getRosterDate()));
 		dbDemographic.setRosterTerminationDate(ConversionUtils.toNullableLegacyDate(input.getRosterTerminationDate()));
+		dbDemographic.setTitle(input.getTitleString());
 
 		ProviderData dbProvider = findOrCreateProviderRecord(input.getMrpProvider(), true);
 		if(dbProvider != null)
@@ -81,7 +82,8 @@ public class DemographicModelToDbConverter
 			// TODO how to handle multiple addresses?
 			if(address.isCurrentAddress())
 			{
-				dbDemographic.setAddress(StringUtils.trimToNull(address.getAddressLine1() + " " + address.getAddressLine2()));
+				dbDemographic.setAddress(StringUtils.trimToNull(
+						StringUtils.trimToEmpty(address.getAddressLine1()) + " " + StringUtils.trimToEmpty(address.getAddressLine2())));
 				dbDemographic.setCity(address.getCity());
 				dbDemographic.setProvince(address.getRegionCode());
 				dbDemographic.setPostal(address.getPostalCode());

@@ -288,6 +288,7 @@ public class DemographicExportAction4 extends Action {
 
 				exportPatientFilesZip(files);
 				ffwd = "success";
+				break;
 			}
 			case CMS4 :
 				if (!Util.checkDir(tmpDir)) {

@@ -100,7 +100,7 @@ public class JunoGenericImportLabWriter extends HL7LabWriter
 		// names
 		terser.set("/.PID-5-1", demographic.getLastName());
 		terser.set("/.PID-5-2", demographic.getFirstName());
-		terser.set("/.PID-5-5", demographic.getTitle());
+		terser.set("/.PID-5-5", demographic.getTitleString());
 
 		// dob
 		terser.set("/.PID-7", ConversionUtils.toDateString(demographic.getDateOfBirth(), HL7_DATE_FORMAT));
@@ -115,12 +115,12 @@ public class JunoGenericImportLabWriter extends HL7LabWriter
 		}
 		if(homePhone != null)
 		{
-			terser.set("/.PID-13-1", homePhone.getNumber());
+			terser.set("/.PID-13-1", homePhone.getNumberFormattedHL7());
 			terser.set("/.PID-13-8", homePhone.getExtension());
 		}
 		if(workPhone != null)
 		{
-			terser.set("/.PID-14-1", workPhone.getNumber());
+			terser.set("/.PID-14-1", workPhone.getNumberFormattedHL7());
 			terser.set("/.PID-14-8", workPhone.getExtension());
 		}
 	}

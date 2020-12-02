@@ -84,7 +84,7 @@ public class LabDbToModelConverter extends
 		for(ProviderLabRoutingModel providerLabRouting : providerLabRoutingList)
 		{
 			String reviewerId = providerLabRouting.getProviderNo();
-			if(reviewerId != null)
+			if(reviewerId != null && !String.valueOf(ProviderLabRoutingDao.PROVIDER_UNMATCHED).equals(reviewerId))
 			{
 				Reviewer reviewer = Reviewer.fromProvider(findProvider(reviewerId));
 				reviewer.setReviewDateTime(ConversionUtils.toLocalDateTime(providerLabRouting.getTimestamp()));

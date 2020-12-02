@@ -39,8 +39,12 @@ public class Reviewer extends Provider
 
 	public static Reviewer fromProvider(Provider provider)
 	{
-		Reviewer reviewer = new Reviewer();
-		BeanUtils.copyProperties(provider, reviewer);
+		Reviewer reviewer = null;
+		if(provider != null)
+		{
+			reviewer = new Reviewer();
+			BeanUtils.copyProperties(provider, reviewer);
+		}
 		return reviewer;
 	}
 }

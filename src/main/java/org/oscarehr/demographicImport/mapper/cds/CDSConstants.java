@@ -45,4 +45,8 @@ public class CDSConstants
 		Y,
 		N,
 	}
+
+	//TODO where should these live?
+	public static final String COUNTRY_CODE_CANADA = "CA";
+	public static final String COUNTRY_CODE_USA = "US";
 }

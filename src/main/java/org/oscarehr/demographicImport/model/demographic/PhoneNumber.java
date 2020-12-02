@@ -28,9 +28,9 @@ import org.oscarehr.demographicImport.model.AbstractTransientModel;
 @Data
 public class PhoneNumber extends AbstractTransientModel
 {
-
 	private String number;
 	private String extension;
+	private boolean primaryContactNumber;
 
 	public PhoneNumber()
 	{
@@ -39,12 +39,27 @@ public class PhoneNumber extends AbstractTransientModel
 
 	public PhoneNumber(String number)
 	{
-		this(number, null);
+		this(number, null, false);
 	}
 
 	public PhoneNumber(String number, String extension)
 	{
+		this(number, extension, false);
+	}
+
+	public PhoneNumber(String number, String extension, boolean primaryContactNumber)
+	{
 		this.number = number;
 		this.extension = extension;
+		this.primaryContactNumber = primaryContactNumber;
+	}
+
+	public String getNumberFormattedHL7()
+	{
+		if(number != null && number.length() == 10)
+		{
+			return "(" + number.substring(0,3) + ")" + number.substring(3,6) + "-" + number.substring(6);
+		}
+		return null;
 	}
 }

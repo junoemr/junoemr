@@ -23,22 +23,23 @@
 package org.oscarehr.demographicImport.model.demographic;
 
 import lombok.Data;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 import org.oscarehr.demographicImport.model.allergy.Allergy;
-import org.oscarehr.demographicImport.model.immunization.Immunization;
-import org.oscarehr.demographicImport.model.medication.Medication;
-import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
-import org.oscarehr.demographicImport.model.document.Document;
-import org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
+import org.oscarehr.demographicImport.model.document.Document;
+import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
 import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
 import org.oscarehr.demographicImport.model.encounterNote.ReminderNote;
+import org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote;
 import org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote;
+import org.oscarehr.demographicImport.model.immunization.Immunization;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.measurement.Measurement;
+import org.oscarehr.demographicImport.model.medication.Medication;
 import org.oscarehr.demographicImport.model.provider.Provider;
 
 import java.time.LocalDate;
@@ -50,12 +51,46 @@ import java.util.List;
 @Data
 public class Demographic extends AbstractTransientModel
 {
+	public enum TITLE {
+		MISS("MISS"),
+		MRS("MRS"),
+		MS("MS"),
+		MR("MR"),
+		MSSR("MSSR"),
+		DR("DR"),
+		PROF("PROF"),
+		REEVE("REEVE"),
+		REV("REV"),
+		RT_HON("RT_HON"),
+		SEN("SEN"),
+		SGT("SGT"),
+		SR("SR");
+
+		private final String value;
+		TITLE(String value)
+		{
+			this.value = value;
+		}
+		public String getValue()
+		{
+			return value;
+		}
+		public static TITLE fromStringIgnoreCase(String enumString)
+		{
+			if(EnumUtils.isValidEnumIgnoreCase(Demographic.TITLE.class, enumString))
+			{
+				return Demographic.TITLE.valueOf(enumString.toUpperCase());
+			}
+			return null;
+		}
+	}
+
 	private Integer id;
 
 	// base info
 	private String firstName;
 	private String lastName;
-	private String title;
+	private TITLE title;
 	private LocalDate dateOfBirth;
 	private String sex;
 	private String healthNumber;
@@ -192,6 +227,15 @@ public class Demographic extends AbstractTransientModel
 	public void addLab(Lab lab)
 	{
 		this.labList.add(lab);
+	}
+
+	public String getTitleString()
+	{
+		if(this.title != null)
+		{
+			return this.title.getValue();
+		}
+		return null;
 	}
 
 	@Override

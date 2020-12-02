@@ -59,6 +59,8 @@ import oscar.util.ConversionUtils;
 
 import java.util.List;
 
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_CODE_CANADA;
+
 @Component
 public class DemographicDbToModelConverter extends
 		BaseDbToModelConverter<Demographic, org.oscarehr.demographicImport.model.demographic.Demographic>
@@ -141,7 +143,7 @@ public class DemographicDbToModelConverter extends
 		}
 
 		org.oscarehr.demographicImport.model.demographic.Demographic exportDemographic = new org.oscarehr.demographicImport.model.demographic.Demographic();
-		BeanUtils.copyProperties(input, exportDemographic, "address", "dateOfBirth");
+		BeanUtils.copyProperties(input, exportDemographic, "address", "dateOfBirth", "title");
 
 		exportDemographic.setId(input.getDemographicId());
 		exportDemographic.setDateOfBirth(input.getDateOfBirth());
@@ -159,13 +161,14 @@ public class DemographicDbToModelConverter extends
 //		exportDemographic.setReferralDoctor(findProvider(input.getProvider()));
 //		exportDemographic.setFamilyDoctor(findProvider(input.getProvider()));
 		exportDemographic.setPatientStatusDate(ConversionUtils.toNullableLocalDate(input.getPatientStatusDate()));
+		exportDemographic.setTitle(org.oscarehr.demographicImport.model.demographic.Demographic.TITLE.fromStringIgnoreCase(input.getTitle()));
 
 		Address address = new Address();
 		address.setAddressLine1(input.getAddress());
 		address.setCity(input.getCity());
 		address.setRegionCode(input.getProvince());
-		address.setCountryCode("CA"); //TODO do we even store this with demographics in juno
-		address.setPostalCode(input.getPostal());
+		address.setCountryCode(COUNTRY_CODE_CANADA); //TODO do we even store this with demographics in juno
+		address.setPostalCode(StringUtils.deleteWhitespace(input.getPostal()));
 		address.setResidencyStatusCurrent();
 		exportDemographic.addAddress(address);
 
@@ -174,20 +177,20 @@ public class DemographicDbToModelConverter extends
 		{
 			DemographicExt homePhoneExtensionExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_H_PHONE_EXT);
 			String homePhoneExtension = (homePhoneExtensionExt != null) ? StringUtils.trimToNull(homePhoneExtensionExt.getValue()) : null;
-			exportDemographic.setHomePhoneNumber(new PhoneNumber(input.getPhone(), homePhoneExtension));
+			exportDemographic.setHomePhoneNumber(buildPhoneNumber(input.getPhone(), homePhoneExtension));
 		}
 		if(input.getPhone2() != null)
 		{
 			DemographicExt workPhoneExtensionExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_W_PHONE_EXT);
 			String workPhoneExtension = (workPhoneExtensionExt != null) ? StringUtils.trimToNull(workPhoneExtensionExt.getValue()) : null;
-			exportDemographic.setWorkPhoneNumber(new PhoneNumber(input.getPhone2(), workPhoneExtension));
+			exportDemographic.setWorkPhoneNumber(buildPhoneNumber(input.getPhone2(), workPhoneExtension));
 		}
 
 		DemographicExt cellNoExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_CELL);
 		String cellPhoneNumber = (cellNoExt != null) ? StringUtils.trimToNull(cellNoExt.getValue()) : null;
 		if(cellPhoneNumber != null)
 		{
-			exportDemographic.setCellPhoneNumber(new PhoneNumber(cellPhoneNumber));
+			exportDemographic.setCellPhoneNumber(buildPhoneNumber(cellPhoneNumber, null));
 		}
 
 		//TODO how to handle lazy loading etc.?
@@ -214,6 +217,14 @@ public class DemographicDbToModelConverter extends
 		exportDemographic.setMedicationList(medicationDbToModelConverter.convert(drugs));
 
 		return exportDemographic;
+	}
+
+	private PhoneNumber buildPhoneNumber(String phoneNumber, String extension)
+	{
+		String formattedPhoneNumber = StringUtils.deleteWhitespace(phoneNumber);
+		boolean primaryPhone = phoneNumber.endsWith("*");
+		formattedPhoneNumber = formattedPhoneNumber.replaceAll("\\*", "");
+		return new PhoneNumber(formattedPhoneNumber, extension, primaryPhone);
 	}
 
 	private void setNotes(Demographic input, org.oscarehr.demographicImport.model.demographic.Demographic exportDemographic)

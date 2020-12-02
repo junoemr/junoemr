@@ -78,6 +78,10 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		demographics.setPrimaryPhysician(getExportPrimaryPhysician(exportStructure));
 		demographics.setPersonStatusCode(getExportStatusCode(exportStructure));
 		demographics.setPersonStatusDate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getPatientStatusDate()));
+		//TODO export enrollment (roster status etc.)
+		//TODO export contacts
+		//TODO export referral / family physicians
+		//TODO export preferred pharmacy
 
 		return demographics;
 	}
@@ -109,7 +113,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 
 	protected PersonNamePrefixCode getExportNamePrefix(Demographic exportStructure)
 	{
-		String title = exportStructure.getTitle();
+		String title = exportStructure.getTitleString();
 		PersonNamePrefixCode prefixCode = null;
 		if(title != null)
 		{
