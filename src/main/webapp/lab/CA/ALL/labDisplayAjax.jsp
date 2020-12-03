@@ -186,15 +186,28 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                          type: "GET",
                          success: (result) =>
                          {
-                             var commentVal = result.body.comment;
+                             var confirm = false;
+                             var commentVal;
+                             if (result.body)
+                             {
+                                 commentVal = result.body.comment;
+                             } else
+                             {
+                                 commentVal = "";
+                             }
                              var commentID = "comment_" + labId;
                              var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
 
                              if (comment && comment.length > 0)
                              {
                                  $(commentID).value = comment;
+                                 confirm = true;
                              }
-                             handleLab('acknowledgeForm_' + labId, labId, action);
+
+                             if (confirm)
+                             {
+                                 handleLab('acknowledgeForm_' + labId, labId, action);
+                             }
                              return false;
                          },
                          error: (error) =>
@@ -273,8 +286,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
         }
         
         function addComment(formid,labid) {
-
-	        var url='<%=request.getContextPath()%>'+"/oscarMDS/UpdateStatus.do?method=addComment";
+        	var url='<%=request.getContextPath()%>'+"/oscarMDS/UpdateStatus.do?method=addComment";
         	var status = "status_" + labid;
         	
 			if( $F(status) == "" ) {
@@ -297,7 +309,6 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
             		alert("Comment '" + $(commentID).value + "' added!\nThis lab has been forwarded to you.");
             	}
         }});
-
         }
         
        function confirmAck(){
@@ -760,7 +771,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                         if (multiID[j].equals(segmentID))
                                             startFlag = true;
                                         if (startFlag)
-                                            if (ackList.size() >= 0){{%>
+                                            if (ackList.size() > 0){{%>
                                                 <table width="100%" height="20" cellpadding="2" cellspacing="2">
                                                     <tr>
                                                         <% if (multiID.length > 1){ %>
