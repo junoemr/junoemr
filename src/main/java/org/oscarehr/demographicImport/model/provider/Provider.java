@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.model.provider;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
 
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class Provider extends AbstractTransientModel
+public class Provider extends AbstractTransientModel implements Person
 {
 	private String id;
 	// basic info
@@ -41,9 +42,9 @@ public class Provider extends AbstractTransientModel
 	private String lastName;
 	private String providerType;
 
-	private String sex;
+	private SEX sex;
 	private LocalDate dateOfBirth;
-	private String title;
+	private TITLE title;
 
 	// contact info
 	private List<Address> addressList;
@@ -81,5 +82,25 @@ public class Provider extends AbstractTransientModel
 			this.addressList = new ArrayList<>();
 		}
 		this.addressList.add(address);
+	}
+
+	@Override
+	public String getTitleString()
+	{
+		if(this.title != null)
+		{
+			return this.title.name();
+		}
+		return null;
+	}
+
+	@Override
+	public String getSexString()
+	{
+		if(this.sex != null)
+		{
+			return this.sex.getValue();
+		}
+		return null;
 	}
 }

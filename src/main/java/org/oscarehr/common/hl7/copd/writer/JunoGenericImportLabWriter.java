@@ -104,7 +104,7 @@ public class JunoGenericImportLabWriter extends HL7LabWriter
 
 		// dob
 		terser.set("/.PID-7", ConversionUtils.toDateString(demographic.getDateOfBirth(), HL7_DATE_FORMAT));
-		terser.set("/.PID-8", demographic.getSex());
+		terser.set("/.PID-8", demographic.getSexString());
 
 		// phone numbers
 		PhoneNumber homePhone = demographic.getHomePhoneNumber();

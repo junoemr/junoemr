@@ -24,9 +24,11 @@ package org.oscarehr.demographicImport.converter.in;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
+import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -51,10 +53,12 @@ public class DemographicModelToDbConverter
 		}
 
 		Demographic dbDemographic = new Demographic();
-		BeanUtils.copyProperties(input, dbDemographic, "dateOfBirth", "title");
+		BeanUtils.copyProperties(input, dbDemographic, "dateOfBirth", "title", "sex");
 
 		dbDemographic.setDemographicId(input.getId());
 		dbDemographic.setDateOfBirth(input.getDateOfBirth());
+		dbDemographic.setSex(input.getSexString());
+		dbDemographic.setTitle(input.getTitleString());
 		dbDemographic.setHin(input.getHealthNumber());
 		dbDemographic.setVer(input.getHealthNumberVersion());
 		dbDemographic.setHcType(input.getHealthNumberProvinceCode());
@@ -65,7 +69,6 @@ public class DemographicModelToDbConverter
 		dbDemographic.setChartNo(input.getChartNumber());
 		dbDemographic.setRosterDate(ConversionUtils.toNullableLegacyDate(input.getRosterDate()));
 		dbDemographic.setRosterTerminationDate(ConversionUtils.toNullableLegacyDate(input.getRosterTerminationDate()));
-		dbDemographic.setTitle(input.getTitleString());
 
 		ProviderData dbProvider = findOrCreateProviderRecord(input.getMrpProvider(), true);
 		if(dbProvider != null)
@@ -75,6 +78,7 @@ public class DemographicModelToDbConverter
 		}
 
 		dbDemographic.setPatientStatusDate(ConversionUtils.toNullableLegacyDate(input.getPatientStatusDate()));
+		dbDemographic.setLastUpdateUser(SYSTEM_PROVIDER_NO);
 
 		List<Address> addressList = input.getAddressList();
 		for(Address address : addressList)
@@ -109,7 +113,7 @@ public class DemographicModelToDbConverter
 		PhoneNumber workPhone = input.getWorkPhoneNumber();
 		if(workPhone != null)
 		{
-			dbDemographic.setPhone(workPhone.getNumber());
+			dbDemographic.setPhone2(workPhone.getNumber());
 
 			String extension = workPhone.getExtension();
 			if(extension != null)
@@ -119,15 +123,41 @@ public class DemographicModelToDbConverter
 			}
 		}
 
-		PhoneNumber cellPhone = input.getWorkPhoneNumber();
+		PhoneNumber cellPhone = input.getCellPhoneNumber();
 		if(cellPhone != null)
 		{
 			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_CELL, cellPhone.getNumber());
 			demographicExtList.add(ext);
 		}
-
-		dbDemographic.setLastUpdateUser(SYSTEM_PROVIDER_NO);
 		dbDemographic.setDemographicExtList(demographicExtList);
+
+		DemographicCust demographicCust = new DemographicCust();
+		demographicCust.setParsedNotes(input.getPatientNote());
+		demographicCust.setAlert(input.getPatientAlert());
+
+		List<DemographicCust> custList = new ArrayList<>(1);
+		custList.add(demographicCust);
+		dbDemographic.setDemographicCust(custList);
+
+
+		// referral doc and family doc are not real providers and need to be handled differently from regular provider lookups
+		//TODO look up in specialists table?
+		Provider referralDoc = input.getReferralDoctor();
+		if(referralDoc != null)
+		{
+			dbDemographic.setReferralDoctor("<rdohip>" + StringUtils.trimToEmpty(referralDoc.getOhipNumber()) + "</rdohip><rd>"
+					+ StringUtils.trimToEmpty(referralDoc.getLastName()) + ","
+					+ StringUtils.trimToEmpty(referralDoc.getFirstName()) + "</rd>");
+		}
+
+		Provider familyDoc = input.getFamilyDoctor();
+		if(familyDoc != null)
+		{
+			dbDemographic.setReferralDoctor("<fdname>" + StringUtils.trimToEmpty(familyDoc.getOhipNumber()) + "</fdname><fd>"
+					+ StringUtils.trimToEmpty(familyDoc.getLastName()) + ","
+					+ StringUtils.trimToEmpty(familyDoc.getFirstName()) + "</fd>");
+		}
+
 		return dbDemographic;
 	}
 }

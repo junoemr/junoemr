@@ -23,12 +23,15 @@
 package org.oscarehr.demographicImport.converter.out;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_CODE_CANADA;
 
 // can't extend the base class because the base uses this converter
 @Component
@@ -43,16 +46,18 @@ public class ProviderDbToModelConverter extends
 			return null;
 		}
 		org.oscarehr.demographicImport.model.provider.Provider exportProvider = new org.oscarehr.demographicImport.model.provider.Provider();
-		BeanUtils.copyProperties(input, exportProvider, "address", "dob");
+		BeanUtils.copyProperties(input, exportProvider, "address", "dob", "sex", "title");
 		exportProvider.setId(input.getId());
 
 		exportProvider.setDateOfBirth(ConversionUtils.toNullableLocalDate(input.getDob()));
+		exportProvider.setSex(Person.SEX.getIgnoreCase(input.getSex()));
+		exportProvider.setTitle(Person.TITLE.fromStringIgnoreCase(input.getTitle()));
 
 		Address address = new Address();
 		address.setAddressLine1(input.getAddress());
 //		address.setCity(input.getCity());
 //		address.setRegionCode(input.getProvince());
-		address.setCountryCode("CA"); //TODO do we even store this with demographics in juno
+		address.setCountryCode(COUNTRY_CODE_CANADA); //TODO do we even store this with demographics in juno
 //		address.setPostalCode(input.getPostal());
 		address.setResidencyStatusCurrent();
 		exportProvider.addAddress(address);

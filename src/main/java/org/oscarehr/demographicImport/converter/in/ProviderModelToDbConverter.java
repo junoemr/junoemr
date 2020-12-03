@@ -46,10 +46,12 @@ public class ProviderModelToDbConverter extends AbstractModelConverter<Provider,
 		}
 
 		ProviderData dbProvider = new ProviderData();
-		BeanUtils.copyProperties(input, dbProvider, "addressList");
+		BeanUtils.copyProperties(input, dbProvider, "addressList", "dob", "title", "sex");
 
 		dbProvider.set(input.getId());
 		dbProvider.setDob(ConversionUtils.toNullableLegacyDate(input.getDateOfBirth()));
+		dbProvider.setSex(input.getSexString());
+		dbProvider.setTitle(input.getTitleString());
 
 		dbProvider.setPractitionerNo(input.getPractitionerNumber());
 		dbProvider.setBillingNo(input.getBillingNumber());

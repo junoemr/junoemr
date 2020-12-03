@@ -27,10 +27,12 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
 import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
 import org.oscarehr.common.xml.cds.v5_0.model.HealthCard;
+import org.oscarehr.common.xml.cds.v5_0.model.OfficialSpokenLanguageCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePrefixCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
 import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
+import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
@@ -71,13 +73,22 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		demographic.setFirstName(importStructure.getNames().getLegalName().getFirstName().getPart());
 		demographic.setLastName(importStructure.getNames().getLegalName().getLastName().getPart());
 		demographic.setDateOfBirth(ConversionUtils.toLocalDate(importStructure.getDateOfBirth()));
-		demographic.setSex(importStructure.getGender().toString());
+		demographic.setSex(Person.SEX.getIgnoreCase(importStructure.getGender().toString()));
 
 		PersonNamePrefixCode namePrefixCode = importStructure.getNames().getNamePrefix();
 		if(namePrefixCode != null)
 		{
 			demographic.setTitle(Demographic.TITLE.fromStringIgnoreCase(namePrefixCode.value()));
 		}
+
+		OfficialSpokenLanguageCode officialLanguage = importStructure.getPreferredOfficialLanguage();
+		if(officialLanguage != null)
+		{
+			//TODO language enum/constants
+			demographic.setOfficialLanguage(OfficialSpokenLanguageCode.FRE.equals(officialLanguage) ? "French" : "English");
+		}
+		demographic.setSpokenLanguage(importStructure.getPreferredSpokenLanguage());
+		demographic.setPatientNote(importStructure.getNoteAboutPatient());
 	}
 
 	protected void mapHealthInsuranceInfo(Demographics importStructure, Demographic demographic)
@@ -186,7 +197,8 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		demographic.setPatientStatus(getPatientStatus(importStructure.getPersonStatusCode()));
 		demographic.setPatientStatusDate(LocalDate.now());
 		demographic.setDateJoined(LocalDate.now()); //TODO can we get this from import data?
-
+		demographic.setReferralDoctor(toProvider(importStructure.getReferredPhysician()));
+		demographic.setFamilyDoctor(toProvider(importStructure.getFamilyPhysician()));
 		//TODO enrollment (roster status?)
 	}
 

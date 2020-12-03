@@ -33,6 +33,7 @@ import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographicImport.converter.out.note.ConcernNoteDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.note.EncounterNoteDbToModelConverter;
@@ -41,8 +42,10 @@ import org.oscarehr.demographicImport.converter.out.note.MedicalHistoryNoteDbToM
 import org.oscarehr.demographicImport.converter.out.note.ReminderNoteDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.note.RiskFactorNoteDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.note.SocialHistoryNoteDbToModelConverter;
+import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
+import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
@@ -147,6 +150,9 @@ public class DemographicDbToModelConverter extends
 
 		exportDemographic.setId(input.getDemographicId());
 		exportDemographic.setDateOfBirth(input.getDateOfBirth());
+		exportDemographic.setTitle(Person.TITLE.fromStringIgnoreCase(input.getTitle()));
+		exportDemographic.setSex(Person.SEX.getIgnoreCase(input.getSex()));
+
 		exportDemographic.setHealthNumber(input.getHin());
 		exportDemographic.setHealthNumberVersion(input.getVer());
 		exportDemographic.setHealthNumberProvinceCode(input.getHcType());
@@ -158,10 +164,9 @@ public class DemographicDbToModelConverter extends
 		exportDemographic.setRosterDate(ConversionUtils.toNullableLocalDate(input.getRosterDate()));
 		exportDemographic.setRosterTerminationDate(ConversionUtils.toNullableLocalDate(input.getRosterTerminationDate()));
 		exportDemographic.setMrpProvider(findProvider(input.getProviderNo()));
-//		exportDemographic.setReferralDoctor(findProvider(input.getProvider()));
-//		exportDemographic.setFamilyDoctor(findProvider(input.getProvider()));
+		exportDemographic.setReferralDoctor(getReferralProvider(input));
+		exportDemographic.setFamilyDoctor(getFamilyProvider(input));
 		exportDemographic.setPatientStatusDate(ConversionUtils.toNullableLocalDate(input.getPatientStatusDate()));
-		exportDemographic.setTitle(org.oscarehr.demographicImport.model.demographic.Demographic.TITLE.fromStringIgnoreCase(input.getTitle()));
 
 		Address address = new Address();
 		address.setAddressLine1(input.getAddress());
@@ -193,6 +198,16 @@ public class DemographicDbToModelConverter extends
 			exportDemographic.setCellPhoneNumber(buildPhoneNumber(cellPhoneNumber, null));
 		}
 
+		List<DemographicCust> demoCustomList = input.getDemographicCust();
+		if(demoCustomList != null && !demoCustomList.isEmpty())
+		{
+			// in theory there is only one custom entry
+			DemographicCust demographicCustom = demoCustomList.get(0);
+			exportDemographic.setPatientNote(StringUtils.trimToNull(demographicCustom.getParsedNotes()));
+			exportDemographic.setPatientAlert(StringUtils.trimToNull(demographicCustom.getAlert()));
+			//TODO midwife/nurse,resident providers ?
+		}
+
 		//TODO how to handle lazy loading etc.?
 		List<Appointment> appointments = appointmentDao.getAllByDemographicNo(input.getDemographicId());
 		exportDemographic.setAppointmentList(appointmentConverter.convert(appointments));
@@ -221,9 +236,8 @@ public class DemographicDbToModelConverter extends
 
 	private PhoneNumber buildPhoneNumber(String phoneNumber, String extension)
 	{
-		String formattedPhoneNumber = StringUtils.deleteWhitespace(phoneNumber);
 		boolean primaryPhone = phoneNumber.endsWith("*");
-		formattedPhoneNumber = formattedPhoneNumber.replaceAll("\\*", "");
+		String formattedPhoneNumber = phoneNumber.replaceAll("[^a-zA-Z0-9]", "");
 		return new PhoneNumber(formattedPhoneNumber, extension, primaryPhone);
 	}
 
@@ -288,6 +302,33 @@ public class DemographicDbToModelConverter extends
 		{
 			exportDemographic.addConcernNote(concernNoteModelConverter.convert(note));
 		}
+	}
+
+	private Provider getReferralProvider(Demographic input)
+	{
+		return getReferralProvider(input.getReferralDoctorName(), input.getReferralDoctorNumber());
+	}
+
+	private Provider getFamilyProvider(Demographic input)
+	{
+		return getReferralProvider(input.getFamilyDoctorName(), input.getFamilyDoctorNumber());
+	}
+
+	private Provider getReferralProvider(String referralProviderName, String referralProviderNumber)
+	{
+		Provider referralProvider = null;
+		if(referralProviderName != null && referralProviderName.contains(","))
+		{
+			String[] nameArray = referralProviderName.split(",", 2);
+			String firstName = StringUtils.trimToNull(nameArray[1]);
+			String lastName = StringUtils.trimToNull(nameArray[0]);
+
+			referralProvider = new Provider();
+			referralProvider.setFirstName((firstName != null) ? firstName : "Missing");
+			referralProvider.setLastName((lastName != null) ? lastName : "Missing");
+			referralProvider.setOhipNumber(StringUtils.trimToNull(referralProviderNumber));
+		}
+		return referralProvider;
 	}
 
 	private void setLabs(Demographic input, org.oscarehr.demographicImport.model.demographic.Demographic exportDemographic)

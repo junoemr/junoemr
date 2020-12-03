@@ -125,7 +125,7 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 		if(provider != null)
 		{
 			providerKey = StringUtils.trimToEmpty(
-					StringUtils.trimToEmpty(provider.getTitle()) + " " + provider.getFirstName() + " " + provider.getLastName());
+					StringUtils.trimToEmpty(provider.getTitleString()) + " " + provider.getFirstName() + " " + provider.getLastName());
 		}
 		if(providerExportCountHash.containsKey(providerKey))
 		{

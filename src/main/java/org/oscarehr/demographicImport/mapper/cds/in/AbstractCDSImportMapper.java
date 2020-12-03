@@ -26,9 +26,11 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
+import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.demographicImport.mapper.AbstractImportMapper;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
+import org.oscarehr.demographicImport.model.provider.Provider;
 import oscar.util.ConversionUtils;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -64,6 +66,18 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 			return ageAtOnset.longValue();
 		}
 		return null;
+	}
+
+	protected Provider toProvider(PersonNameSimple personNameSimple)
+	{
+		Provider provider = null;
+		if(personNameSimple != null)
+		{
+			provider = new Provider();
+			provider.setFirstName(personNameSimple.getFirstName());
+			provider.setLastName(personNameSimple.getLastName());
+		}
+		return provider;
 	}
 
 	protected PartialDate toNullablePartialDate(DateFullOrPartial fullOrPartial)

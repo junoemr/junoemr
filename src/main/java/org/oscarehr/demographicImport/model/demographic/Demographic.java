@@ -23,11 +23,11 @@
 package org.oscarehr.demographicImport.model.demographic;
 
 import lombok.Data;
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 import org.oscarehr.demographicImport.model.allergy.Allergy;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
+import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.document.Document;
 import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
@@ -49,42 +49,8 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
-public class Demographic extends AbstractTransientModel
+public class Demographic extends AbstractTransientModel implements Person
 {
-	public enum TITLE {
-		MISS("MISS"),
-		MRS("MRS"),
-		MS("MS"),
-		MR("MR"),
-		MSSR("MSSR"),
-		DR("DR"),
-		PROF("PROF"),
-		REEVE("REEVE"),
-		REV("REV"),
-		RT_HON("RT_HON"),
-		SEN("SEN"),
-		SGT("SGT"),
-		SR("SR");
-
-		private final String value;
-		TITLE(String value)
-		{
-			this.value = value;
-		}
-		public String getValue()
-		{
-			return value;
-		}
-		public static TITLE fromStringIgnoreCase(String enumString)
-		{
-			if(EnumUtils.isValidEnumIgnoreCase(Demographic.TITLE.class, enumString))
-			{
-				return Demographic.TITLE.valueOf(enumString.toUpperCase());
-			}
-			return null;
-		}
-	}
-
 	private Integer id;
 
 	// base info
@@ -92,7 +58,7 @@ public class Demographic extends AbstractTransientModel
 	private String lastName;
 	private TITLE title;
 	private LocalDate dateOfBirth;
-	private String sex;
+	private SEX sex;
 	private String healthNumber;
 	private String healthNumberVersion;
 	private String healthNumberProvinceCode;
@@ -136,6 +102,8 @@ public class Demographic extends AbstractTransientModel
 	private String nameOfMother;
 	private String nameOfFather;
 	private String veteranNumber;
+	private String patientNote;
+	private String patientAlert;
 
 	// associations
 	private List<Appointment> appointmentList;
@@ -229,11 +197,22 @@ public class Demographic extends AbstractTransientModel
 		this.labList.add(lab);
 	}
 
+	@Override
 	public String getTitleString()
 	{
 		if(this.title != null)
 		{
-			return this.title.getValue();
+			return this.title.name();
+		}
+		return null;
+	}
+
+	@Override
+	public String getSexString()
+	{
+		if(this.sex != null)
+		{
+			return this.sex.getValue();
 		}
 		return null;
 	}

@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
@@ -29,6 +30,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.AddressType;
 import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
 import org.oscarehr.common.xml.cds.v5_0.model.Gender;
 import org.oscarehr.common.xml.cds.v5_0.model.HealthCard;
+import org.oscarehr.common.xml.cds.v5_0.model.OfficialSpokenLanguageCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePartTypeCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePrefixCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePurposeCode;
@@ -37,6 +39,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
 import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
+import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.provider.Provider;
@@ -45,10 +48,6 @@ import oscar.util.ConversionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.oscarehr.demographic.model.Demographic.GENDER_FEMALE;
-import static org.oscarehr.demographic.model.Demographic.GENDER_MALE;
-import static org.oscarehr.demographic.model.Demographic.GENDER_OTHER;
-import static org.oscarehr.demographic.model.Demographic.GENDER_TRANSGENDER;
 import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
@@ -69,19 +68,26 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 
 		demographics.setNames(getExportNames(exportStructure));
 		demographics.setDateOfBirth(ConversionUtils.toXmlGregorianCalendar(exportStructure.getDateOfBirth()));
-		demographics.setGender(getExportGender(exportStructure));
-		demographics.getAddress().addAll(getExportAddresses(exportStructure));
-		demographics.setEmail(exportStructure.getEmail());
 		demographics.setHealthCard(getExportHealthCard(exportStructure));
 		demographics.setChartNumber(exportStructure.getChartNumber());
+		demographics.setGender(getExportGender(exportStructure));
+		demographics.setUniqueVendorIdSequence(String.valueOf(exportStructure.getId()));
+		demographics.getAddress().addAll(getExportAddresses(exportStructure));
 		demographics.getPhoneNumber().addAll(getExportPhones(exportStructure));
+		demographics.setPreferredOfficialLanguage(getExportOfficialLanguage(exportStructure));
+		demographics.setPreferredSpokenLanguage(exportStructure.getSpokenLanguage());
+//		demographics.getContact().add(null); //TODO
+		demographics.setNoteAboutPatient(exportStructure.getPatientNote());
+		//TODO where to export alert, as part of patient Note?
+		demographics.setEnrolment(getEnrollment(exportStructure));
 		demographics.setPrimaryPhysician(getExportPrimaryPhysician(exportStructure));
+		demographics.setEmail(exportStructure.getEmail());
 		demographics.setPersonStatusCode(getExportStatusCode(exportStructure));
 		demographics.setPersonStatusDate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getPatientStatusDate()));
-		//TODO export enrollment (roster status etc.)
-		//TODO export contacts
-		//TODO export referral / family physicians
-		//TODO export preferred pharmacy
+		demographics.setSIN(exportStructure.getSin());
+		demographics.setReferredPhysician(toPersonNameSimple(exportStructure.getReferralDoctor()));
+		demographics.setFamilyPhysician(toPersonNameSimple(exportStructure.getFamilyDoctor()));
+		demographics.setPreferredPharmacy(null); //TODO
 
 		return demographics;
 	}
@@ -131,13 +137,14 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 
 	protected Gender getExportGender(Demographic exportStructure)
 	{
-		String sex = exportStructure.getSex();
+		Person.SEX sex = exportStructure.getSex();
 		switch(sex)
 		{
-			case GENDER_MALE: return Gender.M;
-			case GENDER_FEMALE: return Gender.F;
-			case GENDER_TRANSGENDER:
-			case GENDER_OTHER: return Gender.O;
+			case MALE: return Gender.M;
+			case FEMALE: return Gender.F;
+			case TRANSGENDER:
+			case OTHER: return Gender.O;
+			case UNKNOWN:
 			default: return Gender.U;
 		}
 	}
@@ -252,6 +259,47 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		}
 
 		return personStatusCode;
+	}
+
+	protected OfficialSpokenLanguageCode getExportOfficialLanguage(Demographic exportStructure)
+	{
+		String officialLanguage = StringUtils.trimToEmpty(exportStructure.getOfficialLanguage());
+		switch(officialLanguage)
+		{
+			case "French" : return OfficialSpokenLanguageCode.FRE;
+			case "English" : return OfficialSpokenLanguageCode.ENG;
+		}
+		return null;
+	}
+
+	// roster info
+	protected Demographics.Enrolment getEnrollment(Demographic exportStructure)
+	{
+		Demographics.Enrolment enrolment = null;
+
+		String rosterStatus = exportStructure.getRosterStatus();
+		if(rosterStatus != null)
+		{
+			enrolment = objectFactory.createDemographicsEnrolment();
+			Demographics.Enrolment.EnrolmentHistory enrolmentHistory = objectFactory.createDemographicsEnrolmentEnrolmentHistory();
+
+			if("RO".equals(rosterStatus))
+			{
+				enrolmentHistory.setEnrollmentStatus("1");
+				enrolmentHistory.setEnrollmentDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getRosterDate()));
+			}
+			else
+			{
+				enrolmentHistory.setEnrollmentStatus("0");
+				enrolmentHistory.setEnrollmentTerminationDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getRosterTerminationDate()));
+				enrolmentHistory.setTerminationReason(exportStructure.getRosterTerminationReason());
+			}
+
+			enrolment.getEnrolmentHistory().add(enrolmentHistory);
+		}
+		//TODO include history from the archive?
+
+		return enrolment;
 	}
 
 }
