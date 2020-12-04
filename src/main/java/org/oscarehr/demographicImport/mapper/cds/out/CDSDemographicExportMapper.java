@@ -48,9 +48,12 @@ import oscar.util.ConversionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.oscarehr.demographic.model.Demographic.ROSTER_STATUS_ROSTERED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_STATUS_FALSE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
 
 public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demographics, Demographic>
 {
@@ -283,14 +286,14 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 			enrolment = objectFactory.createDemographicsEnrolment();
 			Demographics.Enrolment.EnrolmentHistory enrolmentHistory = objectFactory.createDemographicsEnrolmentEnrolmentHistory();
 
-			if("RO".equals(rosterStatus))
+			if(ROSTER_STATUS_ROSTERED.equals(rosterStatus))
 			{
-				enrolmentHistory.setEnrollmentStatus("1");
+				enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_TRUE);
 				enrolmentHistory.setEnrollmentDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getRosterDate()));
 			}
 			else
 			{
-				enrolmentHistory.setEnrollmentStatus("0");
+				enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_FALSE);
 				enrolmentHistory.setEnrollmentTerminationDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getRosterTerminationDate()));
 				enrolmentHistory.setTerminationReason(exportStructure.getRosterTerminationReason());
 			}

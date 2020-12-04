@@ -105,7 +105,7 @@ public class DemographicService
 	{
 		Demographic demographic = demographicDao.find(demographicNo);
 		List<DemographicExt> demoExtras = demographic.getDemographicExtList();
-		DemographicCust demoCustom = demographic.getDemographicCust().get(0);
+		DemographicCust demoCustom = demographic.getDemographicCust();
 
 		return DemographicConverter.getAsTransferObject(demographic, demoExtras, demoCustom);
 	}
@@ -339,14 +339,7 @@ public class DemographicService
 	{
 		Demographic demographic = demographicModelToDBConverter.convert(demographicModel);
 		List<DemographicExt> demographicExtensions = demographic.getDemographicExtList();
-
-		DemographicCust demoCustom = null;
-		List<DemographicCust> custList = demographic.getDemographicCust();
-		if(custList != null && !custList.isEmpty())
-		{
-			// there is only 1 record expected, and if not (legacy data), should only use the latest
-			demoCustom = custList.get(0);
-		}
+		DemographicCust demoCustom = demographic.getDemographicCust();
 
 		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtensions);
 	}

@@ -42,11 +42,14 @@ import oscar.util.ConversionUtils;
 import javax.xml.bind.JAXBElement;
 import java.time.LocalDate;
 
+import static org.oscarehr.demographic.model.Demographic.ROSTER_STATUS_NOT_ROSTERED;
+import static org.oscarehr.demographic.model.Demographic.ROSTER_STATUS_ROSTERED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_CODE_CANADA;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
 
 public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demographics, Demographic>
 {
@@ -196,10 +199,22 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		demographic.setChartNumber(importStructure.getChartNumber());
 		demographic.setPatientStatus(getPatientStatus(importStructure.getPersonStatusCode()));
 		demographic.setPatientStatusDate(LocalDate.now());
-		demographic.setDateJoined(LocalDate.now()); //TODO can we get this from import data?
+		demographic.setDateJoined(LocalDate.now());
 		demographic.setReferralDoctor(toProvider(importStructure.getReferredPhysician()));
 		demographic.setFamilyDoctor(toProvider(importStructure.getFamilyPhysician()));
-		//TODO enrollment (roster status?)
+
+		Demographics.Enrolment enrollment = importStructure.getEnrolment();
+		if(enrollment != null)
+		{
+			//TODO how to handle multiple enrollments?
+			for(Demographics.Enrolment.EnrolmentHistory enrolmentHistory : enrollment.getEnrolmentHistory())
+			{
+				demographic.setRosterStatus(ENROLLMENT_STATUS_TRUE.equals(enrolmentHistory.getEnrollmentStatus()) ? ROSTER_STATUS_ROSTERED : ROSTER_STATUS_NOT_ROSTERED);
+				demographic.setRosterTerminationReason(enrolmentHistory.getTerminationReason());
+				demographic.setRosterDate(ConversionUtils.toNullableLocalDate(enrolmentHistory.getEnrollmentDate()));
+				demographic.setRosterTerminationDate(ConversionUtils.toNullableLocalDate(enrolmentHistory.getEnrollmentDate()));
+			}
+		}
 	}
 
 	protected String getPatientStatus(Demographics.PersonStatusCode code)

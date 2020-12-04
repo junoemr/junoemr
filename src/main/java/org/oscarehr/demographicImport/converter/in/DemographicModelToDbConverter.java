@@ -134,11 +134,7 @@ public class DemographicModelToDbConverter
 		DemographicCust demographicCust = new DemographicCust();
 		demographicCust.setParsedNotes(input.getPatientNote());
 		demographicCust.setAlert(input.getPatientAlert());
-
-		List<DemographicCust> custList = new ArrayList<>(1);
-		custList.add(demographicCust);
-		dbDemographic.setDemographicCust(custList);
-
+		dbDemographic.setDemographicCust(demographicCust);
 
 		// referral doc and family doc are not real providers and need to be handled differently from regular provider lookups
 		//TODO look up in specialists table?

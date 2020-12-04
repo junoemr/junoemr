@@ -32,7 +32,10 @@ import org.xml.sax.InputSource;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -62,8 +65,16 @@ public class DemographicCust extends AbstractModel<Integer>
 	@Column(name="content")
 	private String notes;
 
+	@OneToOne(fetch= FetchType.LAZY)
+	@JoinColumn(name="demographic_no", insertable=false, updatable=false)
+	private Demographic demographic;
+
 	public Integer getId() {
 		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public String getNurse() {
@@ -106,10 +117,6 @@ public class DemographicCust extends AbstractModel<Integer>
     	this.notes = notes;
     }
 
-	public void setId(Integer id) {
-    	this.id = id;
-    }
-
 	public String getParsedNotes()
 	{
 		try
@@ -137,7 +144,13 @@ public class DemographicCust extends AbstractModel<Integer>
 		this.notes = "<unotes>" + notes + "</unotes>";
 	}
 
+	public Demographic getDemographic()
+	{
+		return demographic;
+	}
 
-
-
+	public void setDemographic(Demographic demographic)
+	{
+		this.demographic = demographic;
+	}
 }

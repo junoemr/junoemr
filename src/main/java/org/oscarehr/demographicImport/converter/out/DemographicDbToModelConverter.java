@@ -198,11 +198,9 @@ public class DemographicDbToModelConverter extends
 			exportDemographic.setCellPhoneNumber(buildPhoneNumber(cellPhoneNumber, null));
 		}
 
-		List<DemographicCust> demoCustomList = input.getDemographicCust();
-		if(demoCustomList != null && !demoCustomList.isEmpty())
+		DemographicCust demographicCustom = input.getDemographicCust();
+		if(demographicCustom != null)
 		{
-			// in theory there is only one custom entry
-			DemographicCust demographicCustom = demoCustomList.get(0);
 			exportDemographic.setPatientNote(StringUtils.trimToNull(demographicCustom.getParsedNotes()));
 			exportDemographic.setPatientAlert(StringUtils.trimToNull(demographicCustom.getAlert()));
 			//TODO midwife/nurse,resident providers ?

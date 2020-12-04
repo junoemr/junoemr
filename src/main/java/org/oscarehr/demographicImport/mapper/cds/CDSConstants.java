@@ -49,4 +49,7 @@ public class CDSConstants
 	//TODO where should these live?
 	public static final String COUNTRY_CODE_CANADA = "CA";
 	public static final String COUNTRY_CODE_USA = "US";
+
+	public static final String ENROLLMENT_STATUS_TRUE = "1";
+	public static final String ENROLLMENT_STATUS_FALSE = "0";
 }
