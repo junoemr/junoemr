@@ -29,6 +29,8 @@ public class CDSConstants
 	public static final String RESIDUAL_INFO_DATA_NAME_OBS_DATE = "Observation Datetime";
 	public static final String RESIDUAL_INFO_DATA_NAME_START_DATE = "Start Date";
 	public static final String RESIDUAL_INFO_DATA_NAME_RESOLVE_DATE = "Resolution Date";
+	public static final String RESIDUAL_INFO_DATA_NAME_ANNOTATION = "Annotation";
+	public static final String RESIDUAL_INFO_DATA_NAME_PROVIDER = "ProviderName";
 
 	public enum RESIDUAL_INFO_DATA_TYPE
 	{

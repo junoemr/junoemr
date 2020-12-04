@@ -27,10 +27,13 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonalHistory;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote;
+import org.oscarehr.demographicImport.model.provider.Provider;
 import oscar.util.ConversionUtils;
 
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_ANNOTATION;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_NOTE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_OBS_DATE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_PROVIDER;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_RESOLVE_DATE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_START_DATE;
 
@@ -62,7 +65,7 @@ public class CDSPersonalHistoryImportMapper extends AbstractCDSImportMapper<Pers
 				{
 					case RESIDUAL_INFO_DATA_NAME_NOTE:
 					{
-						note.setNoteText(content); break;
+						noteText = content + "\n" + noteText; break;
 					}
 					case RESIDUAL_INFO_DATA_NAME_OBS_DATE:
 					{
@@ -75,6 +78,22 @@ public class CDSPersonalHistoryImportMapper extends AbstractCDSImportMapper<Pers
 					case RESIDUAL_INFO_DATA_NAME_RESOLVE_DATE:
 					{
 						note.setResolutionDate(ConversionUtils.toLocalDate(content)); break;
+					}
+					case RESIDUAL_INFO_DATA_NAME_ANNOTATION:
+					{
+						note.setAnnotation(content); break;
+					}
+					case RESIDUAL_INFO_DATA_NAME_PROVIDER:
+					{
+						if(content.contains(","))
+						{
+							String[] providerNames = content.split(",", 2);
+							Provider provider = new Provider();
+							provider.setLastName(providerNames[0]);
+							provider.setFirstName(providerNames[1]);
+							note.setProvider(provider);
+							break;
+						}
 					}
 					default:
 					{
