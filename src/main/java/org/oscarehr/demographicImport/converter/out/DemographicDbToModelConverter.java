@@ -250,7 +250,11 @@ public class DemographicDbToModelConverter extends
 		List<CaseManagementNote> encounterNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
 		for(CaseManagementNote note : encounterNotes)
 		{
-			exportDemographic.addEncounterNote(encounterNoteConverter.convert(note));
+			// only include unlinked notes. Notes linked to other modules are not basic encounter notes, and will be included elsewhere
+			if(note.getNoteLinkList() == null || note.getNoteLinkList().isEmpty())
+			{
+				exportDemographic.addEncounterNote(encounterNoteConverter.convert(note));
+			}
 		}
 
 		// get social history notes by demographic

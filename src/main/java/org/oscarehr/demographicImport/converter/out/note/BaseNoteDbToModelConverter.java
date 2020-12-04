@@ -26,7 +26,9 @@ import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.encounterNote.BaseNote;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
+import org.oscarehr.encounterNote.dao.CaseManagementNoteLinkDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,9 @@ public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 {
 	@Autowired
 	private ProviderDataDao providerDao;
+
+	@Autowired
+	private CaseManagementNoteLinkDao caseManagementNoteLinkDao;
 
 	@Override
 	public N convert(CaseManagementNote input)
@@ -81,4 +86,16 @@ public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 	public abstract N getNewNoteObject();
 
 	public abstract N subConvert(CaseManagementNote input, N exportNote);
+
+	protected String getLinkedAnnotation(CaseManagementNote input)
+	{
+		String noteString = null;
+		CaseManagementNoteLink link = caseManagementNoteLinkDao.findLatestNoteNoteLinkById(input.getId());
+		if(link != null)
+		{
+			CaseManagementNote note = link.getNote();
+			noteString = note.getNote();
+		}
+		return noteString;
+	}
 }

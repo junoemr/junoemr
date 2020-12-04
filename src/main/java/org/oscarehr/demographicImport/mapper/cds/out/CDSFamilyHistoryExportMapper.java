@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.FamilyHistory;
+import org.oscarehr.common.xml.cds.v5_0.model.StandardCoding;
 import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
 
 public class CDSFamilyHistoryExportMapper extends AbstractCDSNoteExportMapper<FamilyHistory, FamilyHistoryNote>
@@ -37,17 +38,23 @@ public class CDSFamilyHistoryExportMapper extends AbstractCDSNoteExportMapper<Fa
 	{
 		FamilyHistory familyHistory = objectFactory.createFamilyHistory();
 
-		familyHistory.setNotes(exportStructure.getNoteText());
-		familyHistory.setLifeStage(getLifeStage(exportStructure.getLifeStage()));
-		familyHistory.setAgeAtOnset(getAgeAtOnset(exportStructure.getAgeAtOnset()));
-		familyHistory.setTreatment(exportStructure.getTreatment());
-		familyHistory.setRelationship(exportStructure.getRelationship());
-
 		// use start date field if we can, otherwise use the observation date
 		familyHistory.setStartDate(toNullableDateFullOrPartial(exportStructure.getStartDate(), exportStructure.getObservationDate().toLocalDate()));
+		familyHistory.setAgeAtOnset(getAgeAtOnset(exportStructure.getAgeAtOnset()));
+		familyHistory.setLifeStage(getLifeStage(exportStructure.getLifeStage()));
+		familyHistory.setProblemDiagnosisProcedureDescription(exportStructure.getNoteText());
+		familyHistory.setDiagnosisProcedureCode(getDiagnosisProcedureCode(exportStructure));
+		familyHistory.setTreatment(exportStructure.getTreatment());
+		familyHistory.setRelationship(exportStructure.getRelationship());
+		familyHistory.setNotes(exportStructure.getAnnotation());
 
 		return familyHistory;
 	}
 
-
+	/*TODO - do we want to export DiagnosisProcedureCode at all? how do we decide on the code?
+	 *  the cds 4 exporter used a random attached issue code if there was one */
+	protected StandardCoding getDiagnosisProcedureCode(FamilyHistoryNote exportStructure)
+	{
+		return null;
+	}
 }

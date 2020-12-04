@@ -40,6 +40,8 @@ public class SocialHistoryNoteDbToModelConverter extends
 			CaseManagementNote input,
 			org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote exportNote)
 	{
+		exportNote.setAnnotation(getLinkedAnnotation(input));
+
 		for(CaseManagementNoteExt ext : input.getNoteExtensionList())
 		{
 			if(ext.getKey().equals(STARTDATE))

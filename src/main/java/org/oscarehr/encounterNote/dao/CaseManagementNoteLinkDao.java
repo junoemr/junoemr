@@ -49,6 +49,12 @@ public class CaseManagementNoteLinkDao extends AbstractDao<CaseManagementNoteLin
 		return this.findLatestByTableAndTableId(CaseManagementNoteLink.TICKLER, ticklerId);
 	}
 
+	/** because notes can have links to other notes! */
+	public CaseManagementNoteLink findLatestNoteNoteLinkById(Long noteId)
+	{
+		return this.findLatestByTableAndTableId(CaseManagementNoteLink.CASEMGMTNOTE, Math.toIntExact(noteId));
+	}
+
 	public CaseManagementNoteLink findLatestByTableAndTableId(Integer tableName, Integer tableId)
 	{
 		// select model name must match specified @Entity name in model object

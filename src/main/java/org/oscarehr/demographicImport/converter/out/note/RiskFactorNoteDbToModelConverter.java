@@ -43,6 +43,8 @@ public class RiskFactorNoteDbToModelConverter extends
 			CaseManagementNote input,
 			org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote exportNote)
 	{
+		exportNote.setAnnotation(getLinkedAnnotation(input));
+
 		for(CaseManagementNoteExt ext : input.getNoteExtensionList())
 		{
 			if(ext.getKey().equals(STARTDATE))

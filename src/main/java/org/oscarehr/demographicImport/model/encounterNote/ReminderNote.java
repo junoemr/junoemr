@@ -30,6 +30,7 @@ public class ReminderNote extends BaseNote
 {
 	private PartialDate startDate;
 	private PartialDate resolutionDate;
+	private String annotation;
 
 	public ReminderNote()
 	{

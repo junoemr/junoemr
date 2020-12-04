@@ -41,6 +41,8 @@ public class ReminderNoteDbToModelConverter extends
 			CaseManagementNote input,
 			org.oscarehr.demographicImport.model.encounterNote.ReminderNote exportNote)
 	{
+		exportNote.setAnnotation(getLinkedAnnotation(input));
+
 		for(CaseManagementNoteExt ext : input.getNoteExtensionList())
 		{
 			if(ext.getKey().equals(STARTDATE))

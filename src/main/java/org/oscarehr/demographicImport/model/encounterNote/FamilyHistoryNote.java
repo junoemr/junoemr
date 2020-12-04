@@ -36,6 +36,7 @@ public class FamilyHistoryNote extends BaseNote
 	private String treatment;
 	private String relationship;
 	private String lifeStage;
+	private String annotation;
 
 	public FamilyHistoryNote()
 	{
