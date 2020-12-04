@@ -186,28 +186,27 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                          type: "GET",
                          success: (result) =>
                          {
-                             var confirm = true;
                              var commentVal = "";
+
                              if (result.body)
                              {
                                  commentVal = result.body.comment;
                              }
+                             
                              var commentID = "comment_" + labId;
                              var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
-                             if (comment == null)
-                             {
-                                 confirm = false;
-                             }
+
                              if (comment && comment.length > 0)
                              {
                                  $(commentID).value = comment;
                              }
 
-                             if (confirm)
+                             if (comment == null)
                              {
-                                 handleLab('acknowledgeForm_' + labId, labId, action);
+                                 return false;
                              }
-                             return false;
+
+                             handleLab('acknowledgeForm_' + labId, labId, action);
                          },
                          error: (error) =>
                          {
