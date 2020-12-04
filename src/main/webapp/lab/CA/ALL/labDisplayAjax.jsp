@@ -194,7 +194,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                              }
                              var commentID = "comment_" + labId;
                              var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
-                             if (!comment)
+                             if (comment == null)
                              {
                                  confirm = false;
                              }
