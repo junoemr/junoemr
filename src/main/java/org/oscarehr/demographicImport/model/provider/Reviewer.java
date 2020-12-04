@@ -23,14 +23,13 @@
 package org.oscarehr.demographicImport.model.provider;
 
 import lombok.Data;
+import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.springframework.beans.BeanUtils;
-
-import java.time.LocalDateTime;
 
 @Data
 public class Reviewer extends Provider
 {
-	private LocalDateTime reviewDateTime;
+	private PartialDateTime reviewDateTime;
 
 	public Reviewer()
 	{

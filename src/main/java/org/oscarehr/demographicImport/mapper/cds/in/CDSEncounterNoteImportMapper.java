@@ -24,8 +24,10 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
+import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.provider.Provider;
+import org.oscarehr.demographicImport.model.provider.Reviewer;
 
 public class CDSEncounterNoteImportMapper extends AbstractCDSImportMapper<ClinicalNotes, EncounterNote>
 {
@@ -69,12 +71,14 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSImportMapper<Clinic
 		{
 			// for now, first provider will be the MRP
 			ClinicalNotes.NoteReviewer noteReviewer = importStructure.getNoteReviewer().get(0);
+			DateTimeFullOrPartial reviewDateTime = noteReviewer.getDateTimeNoteReviewed();
 
-			Provider provider = new Provider();
-			provider.setFirstName(noteReviewer.getName().getFirstName());
-			provider.setLastName(noteReviewer.getName().getLastName());
-			provider.setOhipNumber(noteReviewer.getOHIPPhysicianId());
-			note.setSigningProvider(provider);
+			Reviewer reviewer = new Reviewer();
+			reviewer.setFirstName(noteReviewer.getName().getFirstName());
+			reviewer.setLastName(noteReviewer.getName().getLastName());
+			reviewer.setOhipNumber(noteReviewer.getOHIPPhysicianId());
+			reviewer.setReviewDateTime(toNullablePartialDateTime(reviewDateTime));
+			note.setSigningProvider(reviewer);
 		}
 
 

@@ -23,15 +23,25 @@
 package org.oscarehr.demographicImport.converter.out.note;
 
 import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
+import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.encounterNote.BaseNote;
+import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 		BaseDbToModelConverter<CaseManagementNote, N>
 {
+	@Autowired
+	private ProviderDataDao providerDao;
 
 	@Override
 	public N convert(CaseManagementNote input)
@@ -48,7 +58,22 @@ public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 		exportNote.setRevisionId(input.getUuid());
 		exportNote.setObservationDate(ConversionUtils.toNullableLocalDateTime(input.getObservationDate()));
 		exportNote.setProvider(findProvider(input.getProvider()));
-		exportNote.setSigningProvider(findProvider(input.getSigningProvider()));
+
+		Reviewer reviewer = Reviewer.fromProvider(findProvider(input.getSigningProvider()));
+		if(reviewer != null)
+		{
+			// there is no reviewed date time stored for notes, so do our best
+			LocalDateTime reviewTime = ConversionUtils.toNullableLocalDateTime(input.getUpdateDate());
+			reviewTime = (reviewTime != null) ? reviewTime : LocalDateTime.now();
+			reviewer.setReviewDateTime(PartialDateTime.from(reviewTime));
+		}
+		exportNote.setSigningProvider(reviewer);
+
+		List<ProviderData> providerDataList = providerDao.findNoteEditors(input.getUuid());
+		for(ProviderData providerData : providerDataList)
+		{
+			exportNote.addEditor(findProvider(providerData));
+		}
 
 		return subConvert(input, exportNote);
 	}

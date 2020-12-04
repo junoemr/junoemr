@@ -24,6 +24,11 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
+import org.oscarehr.demographicImport.model.provider.Provider;
+import org.oscarehr.demographicImport.model.provider.Reviewer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CDSEncounterNoteExportMapper extends AbstractCDSNoteExportMapper<ClinicalNotes, EncounterNote>
 {
@@ -37,10 +42,54 @@ public class CDSEncounterNoteExportMapper extends AbstractCDSNoteExportMapper<Cl
 	{
 		ClinicalNotes clinicalNotes = objectFactory.createClinicalNotes();
 
+		clinicalNotes.setNoteType("Chart Note");
 		clinicalNotes.setMyClinicalNotesContent(exportStructure.getNoteText());
 		clinicalNotes.setEventDateTime(toFullDateTime(exportStructure.getObservationDate()));
+		clinicalNotes.getParticipatingProviders().addAll(getNoteProviders(exportStructure));
+		clinicalNotes.getNoteReviewer().addAll(getNoteReviewers(exportStructure));
 
 		return clinicalNotes;
+	}
+
+	protected List<ClinicalNotes.ParticipatingProviders> getNoteProviders(EncounterNote exportStructure)
+	{
+		List<Provider> editors = exportStructure.getEditors();
+		List<ClinicalNotes.ParticipatingProviders> providers = new ArrayList<>(editors.size());
+
+		for(Provider provider : editors)
+		{
+			providers.add(getNoteProvider(exportStructure, provider));
+		}
+
+		return providers;
+	}
+	protected ClinicalNotes.ParticipatingProviders getNoteProvider(EncounterNote exportStructure, Provider provider)
+	{
+		ClinicalNotes.ParticipatingProviders participatingProvider = null;
+		if(provider != null)
+		{
+			participatingProvider = objectFactory.createClinicalNotesParticipatingProviders();
+			participatingProvider.setName(toPersonNameSimple(provider));
+			participatingProvider.setDateTimeNoteCreated(toNullableDateTimeFullOrPartial(exportStructure.getObservationDate()));
+			participatingProvider.setOHIPPhysicianId(provider.getOhipNumber());
+		}
+		return participatingProvider;
+	}
+
+	protected List<ClinicalNotes.NoteReviewer> getNoteReviewers(EncounterNote exportStructure)
+	{
+		List<ClinicalNotes.NoteReviewer> reviewers = new ArrayList<>(1);
+
+		Reviewer signingProvider = exportStructure.getSigningProvider();
+		if(signingProvider != null)
+		{
+			ClinicalNotes.NoteReviewer reviewer = objectFactory.createClinicalNotesNoteReviewer();
+			reviewer.setName(toPersonNameSimple(signingProvider));
+			reviewer.setDateTimeNoteReviewed(toNullableDateTimeFullOrPartial(signingProvider.getReviewDateTime()));
+			reviewer.setOHIPPhysicianId(signingProvider.getOhipNumber());
+			reviewers.add(reviewer);
+		}
+		return reviewers;
 	}
 
 }

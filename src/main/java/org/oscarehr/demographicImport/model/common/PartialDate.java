@@ -94,6 +94,10 @@ public class PartialDate extends AbstractTransientModel
 		return LocalDate.of(this.year.getValue(), month, day);
 	}
 
+	public static PartialDate from(LocalDate localDate)
+	{
+		return from(localDate, null);
+	}
 	public static PartialDate from(LocalDate localDate, org.oscarehr.common.model.PartialDate dbPartialDate)
 	{
 		PartialDate partial = null;
@@ -112,7 +116,6 @@ public class PartialDate extends AbstractTransientModel
 				partial = new PartialDate(localDate.getYear());
 			}
 		}
-
 		return partial;
 	}
 }

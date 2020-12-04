@@ -79,7 +79,7 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 					LaboratoryResults.ResultReviewer resultReviewer = objectFactory.createLaboratoryResultsResultReviewer();
 					resultReviewer.setName(toPersonNameSimple(reviewProvider));
 					resultReviewer.setOHIPPhysicianId(reviewProvider.getOhipNumber());
-					resultReviewer.setDateTimeResultReviewed(toFullDateTime(reviewProvider.getReviewDateTime()));
+					resultReviewer.setDateTimeResultReviewed(toNullableDateTimeFullOrPartial(reviewProvider.getReviewDateTime()));
 
 					laboratoryResult.getResultReviewer().add(resultReviewer);
 				}

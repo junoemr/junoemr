@@ -25,6 +25,7 @@ package org.oscarehr.demographicImport.model.encounterNote;
 import lombok.Data;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 import org.oscarehr.demographicImport.model.provider.Provider;
+import org.oscarehr.demographicImport.model.provider.Reviewer;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public abstract class BaseNote extends AbstractTransientModel
 	private String revisionId;
 	private LocalDateTime observationDate;
 	private Provider provider;
-	private Provider signingProvider;
+	private Reviewer signingProvider;
 	private List<Provider> editors;
 
 	public BaseNote()

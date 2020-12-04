@@ -85,6 +85,10 @@ public class PartialDateTime extends PartialDate
 		return LocalDateTime.of(localDate, localTime);
 	}
 
+	public static PartialDateTime from(LocalDateTime localDateTime)
+	{
+		return from(localDateTime, null);
+	}
 	public static PartialDateTime from(LocalDateTime localDateTime, org.oscarehr.common.model.PartialDate dbPartialDate)
 	{
 		PartialDateTime partialDateTime = null;

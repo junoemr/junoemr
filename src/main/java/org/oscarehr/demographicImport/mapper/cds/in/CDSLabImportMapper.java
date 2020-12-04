@@ -32,7 +32,6 @@ import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
-import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -120,7 +119,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 				if(!uniqueReviewerSet.contains(reviewerKey))
 				{
 					Reviewer reviewer = new Reviewer();
-					reviewer.setReviewDateTime(ConversionUtils.toLocalDateTime(importReviewer.getDateTimeResultReviewed().getFullDateTime()));
+					reviewer.setReviewDateTime(toNullablePartialDateTime(importReviewer.getDateTimeResultReviewed()));
 					reviewer.setFirstName(importReviewer.getName().getFirstName());
 					reviewer.setLastName(importReviewer.getName().getLastName());
 					reviewer.setOhipNumber(importReviewer.getOHIPPhysicianId());

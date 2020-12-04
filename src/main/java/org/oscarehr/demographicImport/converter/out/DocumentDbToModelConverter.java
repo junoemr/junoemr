@@ -25,6 +25,7 @@ package org.oscarehr.demographicImport.converter.out;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.oscarehr.document.model.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +73,7 @@ public class DocumentDbToModelConverter extends
 		if(reviewerId != null)
 		{
 			Reviewer reviewer = Reviewer.fromProvider(findProvider(reviewerId));
-			reviewer.setReviewDateTime(ConversionUtils.toLocalDateTime(input.getReviewdatetime()));
+			reviewer.setReviewDateTime(PartialDateTime.from(ConversionUtils.toLocalDateTime(input.getReviewdatetime())));
 			exportDocument.setReviewer(reviewer);
 		}
 

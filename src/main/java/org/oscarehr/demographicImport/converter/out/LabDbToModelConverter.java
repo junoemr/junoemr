@@ -27,6 +27,7 @@ import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
+import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
@@ -87,7 +88,7 @@ public class LabDbToModelConverter extends
 			if(reviewerId != null && !String.valueOf(ProviderLabRoutingDao.PROVIDER_UNMATCHED).equals(reviewerId))
 			{
 				Reviewer reviewer = Reviewer.fromProvider(findProvider(reviewerId));
-				reviewer.setReviewDateTime(ConversionUtils.toLocalDateTime(providerLabRouting.getTimestamp()));
+				reviewer.setReviewDateTime(PartialDateTime.from(ConversionUtils.toLocalDateTime(providerLabRouting.getTimestamp())));
 				reviewers.add(reviewer);
 			}
 		}
