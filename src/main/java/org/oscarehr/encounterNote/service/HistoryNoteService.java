@@ -26,6 +26,7 @@ import org.oscarehr.encounterNote.model.CaseManagementIssue;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.oscarehr.encounterNote.model.Issue;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -71,5 +72,34 @@ public abstract class HistoryNoteService extends BaseNoteService
 		CaseManagementIssueNote caseManagementIssueNote = new CaseManagementIssueNote(caseManagementIssueNotePK);
 		caseManagementIssueNoteDao.persist(caseManagementIssueNote);
 		return note;
+	}
+
+	protected void addAnnotationLink(CaseManagementNote note, String annotationText)
+	{
+		CaseManagementNote annotationNote = saveAnnotationNote(note, annotationText);
+		if(annotationNote != null)
+		{
+			CaseManagementNoteLink annotationLink = new CaseManagementNoteLink();
+			annotationLink.setCaseManagementNote(Math.toIntExact(annotationNote.getId()));
+			annotationLink.setNote(note);
+			note.addNoteLink(annotationLink);
+		}
+	}
+
+	private CaseManagementNote saveAnnotationNote(CaseManagementNote note, String annotationText)
+	{
+		CaseManagementNote annotationNote = null;
+		if(annotationText != null)
+		{
+			annotationNote = new CaseManagementNote();
+			annotationNote.setNote(annotationText);
+			annotationNote.setProvider(note.getProvider());
+			annotationNote.setSigned(note.getSigned());
+			annotationNote.setSigningProvider(note.getSigningProvider());
+			annotationNote.setObservationDate(note.getObservationDate());
+			annotationNote.setDemographic(note.getDemographic());
+			annotationNote = saveNote(annotationNote);
+		}
+		return annotationNote;
 	}
 }
