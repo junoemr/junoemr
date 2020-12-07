@@ -24,8 +24,6 @@
 package org.oscarehr.common.printing;
 
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.oscarehr.casemgmt.service.PageNumberStamper;
 import org.oscarehr.casemgmt.service.PromoTextStamper;
@@ -64,12 +62,6 @@ public class PdfWriterFactory {
 
 		String confidentialtyStatement = OscarProperties.getConfidentialityStatement();
 		PromoTextStamper pts = new PromoTextStamper(confidentialtyStatement, 30);
-		pts.setFontSize(settings.getFontSize());
-		result.setPageEvent(pts);
-
-		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
-		String promoText = OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT") + " " + f.format(new Date());
-		pts = new PromoTextStamper(promoText, 20);
 		pts.setFontSize(settings.getFontSize());
 		result.setPageEvent(pts);
 

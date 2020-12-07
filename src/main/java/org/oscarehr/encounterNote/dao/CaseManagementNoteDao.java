@@ -28,6 +28,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
+import java.util.List;
 
 @SuppressWarnings("unchecked")
 @Transactional
@@ -51,4 +52,31 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 
 		return this.getSingleResultOrNull(query);
 	}
+
+	public List<CaseManagementNote> findByDemographicAndIssue(Integer demographicNo, Long issueId)
+	{
+		String queryString = "SELECT cm FROM model.CaseManagementNote cm " +
+				"WHERE cm.demographic.demographicId=:demographicNo " +
+				"AND :issueId = ANY (" +
+				"	SELECT cin.id.caseManagementIssue.issue.issueId " +
+				"	FROM cm.issueNoteList cin" +
+				")";
+
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("demographicNo", demographicNo);
+		query.setParameter("issueId", issueId);
+		return query.getResultList();
+	}
+
+	public List<CaseManagementNote> findAllForDemographic(Integer demographicNo)
+	{
+		String queryString = "SELECT cm FROM model.CaseManagementNote cm " +
+				"WHERE cm.demographic.demographicId=:demographicNo " +
+				"AND cm.includeIssueInNote = false";
+
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("demographicNo", demographicNo);
+		return query.getResultList();
+	}
+
 }
