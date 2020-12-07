@@ -68,16 +68,14 @@
 		linear-gradient(247deg, $color-primary-light, $color-primary-base 30%, $color-primary-base 64%, $color-primary-dark) no-repeat !important;
 
 		&.double-book {
-			background: linear-gradient(-45deg, $color-neutral-white 45%, transparent 0) no-repeat 100% 100%,
+			background: linear-gradient(-45deg, $color 45%, transparent 0) no-repeat 100% 100%,
 			linear-gradient(247deg, $color-yellow-light, $color-yellow-base 30%, $color-yellow-dark 64%, $color-yellow-darker) no-repeat !important;
 		}
 		&.double-book-prevented {
-			background: linear-gradient(-45deg, $color-neutral-white 45%, transparent 0) no-repeat 100% 100%,
+			background: linear-gradient(-45deg, $color 45%, transparent 0) no-repeat 100% 100%,
 			linear-gradient(247deg, $color-orange-light, $color-orange-base 30%, $color-orange-dark 64%, $color-orange-darker) no-repeat !important;
 		}
 	}
-
-
 }
 
 // ============ STYLES ===============
