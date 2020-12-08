@@ -36,6 +36,7 @@ import org.oscarehr.demographicImport.converter.out.DemographicDbToModelConverte
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.lab.Lab;
+import org.oscarehr.encounterNote.service.ConcernNoteService;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.encounterNote.service.FamilyHistoryNoteService;
 import org.oscarehr.encounterNote.service.MedicalHistoryNoteService;
@@ -89,6 +90,9 @@ public class ImportExportService
 
 	@Autowired
 	private RiskFactorNoteService riskFactorNoteService;
+
+	@Autowired
+	private ConcernNoteService concernNoteService;
 
 	@Autowired
 	private ReminderNoteService reminderNoteService;
@@ -163,6 +167,7 @@ public class ImportExportService
 		medicalHistoryNoteService.saveMedicalHistoryNotes(demographic.getMedicalHistoryNoteList(), dbDemographic);
 		reminderNoteService.saveReminderNote(demographic.getReminderNoteList(), dbDemographic);
 		riskFactorNoteService.saveRiskFactorNote(demographic.getRiskFactorNoteList(), dbDemographic);
+		concernNoteService.saveConcernNote(demographic.getConcernNoteList(), dbDemographic);
 		encounterNoteService.saveChartNotes(demographic.getEncounterNoteList(), dbDemographic);
 	}
 

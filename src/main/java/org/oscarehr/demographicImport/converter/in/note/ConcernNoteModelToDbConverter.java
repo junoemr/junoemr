@@ -24,7 +24,9 @@ package org.oscarehr.demographicImport.converter.in.note;
 
 import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
 @Component
 public class ConcernNoteModelToDbConverter extends BaseNoteModelToDbConverter<ConcernNote>
@@ -34,6 +36,27 @@ public class ConcernNoteModelToDbConverter extends BaseNoteModelToDbConverter<Co
 			ConcernNote input,
 			CaseManagementNote dbNote)
 	{
+		if(input.getStartDate() != null)
+		{
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.STARTDATE, ConversionUtils.toLegacyDate(input.getStartDate().toLocalDate())));
+		}
+		if(input.getResolutionDate() != null)
+		{
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.RESOLUTIONDATE, ConversionUtils.toLegacyDate(input.getResolutionDate().toLocalDate())));
+		}
+		if(input.getProblemStatus() != null)
+		{
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.PROBLEMSTATUS, String.valueOf(input.getProblemStatus())));
+		}
+		if(input.getLifeStage() != null)
+		{
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.LIFESTAGE, input.getLifeStage()));
+		}
+		if(input.getProblemDescription() != null)
+		{
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.PROBLEMDESC, input.getProblemDescription()));
+		}
+
 		return dbNote;
 	}
 }
