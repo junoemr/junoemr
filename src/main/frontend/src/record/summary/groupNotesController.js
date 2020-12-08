@@ -281,7 +281,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				{
 					$uibModalInstance.close(results.body);
 					$state.transitionTo($state.current, $stateParams, {
-						reload: true,
+						reload: false,
 						inherit: false,
 						notify: true
 					});

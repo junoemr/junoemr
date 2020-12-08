@@ -28,18 +28,18 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
+import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
@@ -52,15 +52,14 @@ import com.lowagie.text.HeaderFooter;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
-import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.ColumnText;
 import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
 
 import oscar.OscarProperties;
 import oscar.oscarClinic.ClinicData;
+import oscar.util.ConversionUtils;
 
 /**
  *
@@ -71,9 +70,7 @@ public class CaseManagementPrintPdf {
     private HttpServletRequest request;
     private OutputStream os;
 
-    private float upperYcoord;
     private Document document;
-    private PdfContentByte cb;
     private BaseFont bf;
     private Font font;
     private boolean newPage = false;
@@ -83,7 +80,6 @@ public class CaseManagementPrintPdf {
     public final int LINESPACING = 1;
     public final float LEADING = 12;
     public final float FONTSIZE = 10;
-    public final int NUMCOLS = 2;
 
     /** Creates a new instance of CaseManagementPrintPdf */
     public CaseManagementPrintPdf(HttpServletRequest request, OutputStream os) {
@@ -177,7 +173,7 @@ public class CaseManagementPrintPdf {
         document.setHeader(header);
 
         //Write title with top and bottom borders on p1
-        cb = writer.getDirectContent();
+        PdfContentByte cb = writer.getDirectContent();
         cb.setColorStroke(new Color(0,0,0));
         cb.setLineWidth(0.5f);
 
@@ -186,7 +182,7 @@ public class CaseManagementPrintPdf {
         cb.stroke();
         //cb.setFontAndSize(bf, FONTSIZE);
 
-        upperYcoord = document.top() - (font.getCalculatedLeading(LINESPACING)*2f);
+        float upperYcoord = document.top() - (font.getCalculatedLeading(LINESPACING) * 2f);
 
         ColumnText ct = new ColumnText(cb);
         Paragraph p = new Paragraph();
@@ -230,7 +226,7 @@ public class CaseManagementPrintPdf {
     public void printRx(String demoNo) throws DocumentException {
         printRx(demoNo,null);
     }
-    public void printRx(String demoNo,List<CaseManagementNote> cpp) throws DocumentException {
+    public void printRx(String demoNo,List<org.oscarehr.encounterNote.model.CaseManagementNote> cpp) throws DocumentException {
         if( demoNo == null )
             return;
 
@@ -270,7 +266,7 @@ public class CaseManagementPrintPdf {
         }
 
         if (cpp != null ){
-            List<CaseManagementNote>notes = cpp;
+            List<org.oscarehr.encounterNote.model.CaseManagementNote>notes = cpp;
             if (notes != null && notes.size() > 0){
                 p = new Paragraph();
                 p.setAlignment(Paragraph.ALIGN_LEFT);
@@ -278,198 +274,98 @@ public class CaseManagementPrintPdf {
                 p.add(phrase);
                 document.add(p);
                 newPage = false;
-                this.printNotes(notes);
+                this.printEncounterNotes(notes);
             }
 
         }
     }
 
-    public void printCPP(HashMap<String,List<CaseManagementNote> >cpp) throws DocumentException {
-        if( cpp == null )
+    public void printCPP(HashMap<String,List<org.oscarehr.encounterNote.model.CaseManagementNote> >cpp)
+            throws DocumentException
+    {
+        if (cpp == null)
+        {
             return;
+        }
 
-        if( newPage )
+        if (newPage)
+        {
             document.newPage();
+        }
         else
+        {
             newPage = true;
+        }
 
         Font obsfont = new Font(bf, FONTSIZE, Font.UNDERLINE);
 
-
-
-
-        Paragraph p = new Paragraph();
-        p.setAlignment(Paragraph.ALIGN_CENTER);
+        Paragraph paragraph = new Paragraph();
+        paragraph.setAlignment(Paragraph.ALIGN_CENTER);
         Phrase phrase = new Phrase(LEADING, "\n\n", font);
-        p.add(phrase);
+        paragraph.add(phrase);
         phrase = new Phrase(LEADING, "Patient CPP", obsfont);
-        p.add(phrase);
-        document.add(p);
-        //upperYcoord -= p.leading() * 2f;
-        //lworkingYcoord = rworkingYcoord = upperYcoord;
-        //ColumnText ct = new ColumnText(cb);
-        String[] headings = {"Social History\n","Other Meds\n", "Medical History\n", "Ongoing Concerns\n", "Reminders\n", "Family History\n", "Risk Factors\n"};
-        String[] issueCodes = {"SocHistory","OMeds","MedHistory","Concerns","Reminders","FamHistory","RiskFactors"};
-        //String[] content = {cpp.getSocialHistory(), cpp.getFamilyHistory(), cpp.getMedicalHistory(), cpp.getOngoingConcerns(), cpp.getReminders()};
+        paragraph.add(phrase);
+        document.add(paragraph);
 
-        //init column to left side of page
-        //ct.setSimpleColumn(document.left(), document.bottomMargin()+25f, document.right()/2f, lworkingYcoord);
+        Map<String, String> issueHeaders = new HashMap<>();
+        issueHeaders.put(Issue.SUMMARY_CODE_SOCIAL_HISTORY, "Social History\n");
+        issueHeaders.put(Issue.SUMMARY_CODE_OTHER_MEDS, "Other Meds\n");
+        issueHeaders.put(Issue.SUMMARY_CODE_MEDICAL_HISTORY, "Medical History\n");
+        issueHeaders.put(Issue.SUMMARY_CODE_CONCERNS, "Ongoing Concerns\n");
+        issueHeaders.put(Issue.SUMMARY_CODE_REMINDERS, "Reminders\n");
+        issueHeaders.put(Issue.SUMMARY_CODE_FAMILY_HISTORY, "Family History\n");
+        issueHeaders.put(Issue.SUMMARY_CODE_RISK_FACTORS, "Risk Factors\n");
 
-        //int column = 1;
-        //Chunk chunk;
-        //float bottom = document.bottomMargin()+25f;
-        //float middle;
-        //bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-        //cb.beginText();
-        //String headerContd;
-        //while there are cpp headings to process
-
-        for( int idx = 0; idx < headings.length; ++idx ) {
-            p = new Paragraph();
-            p.setAlignment(Paragraph.ALIGN_LEFT);
-            phrase = new Phrase(LEADING, headings[idx], obsfont);
-            p.add(phrase);
-            document.add(p);
+        for (String issue : cpp.keySet())
+        {
+            paragraph = new Paragraph();
+            paragraph.setAlignment(Paragraph.ALIGN_LEFT);
+            phrase = new Phrase(LEADING, issueHeaders.get(issue), obsfont);
+            paragraph.add(phrase);
+            document.add(paragraph);
             newPage = false;
-            this.printNotes(cpp.get(issueCodes[idx]));
+            this.printEncounterNotes(cpp.get(issue));
         }
-            //phrase.add(content[idx]);
-            //ct.addText(phrase);
 
-//            //do we need a page break?  check if we're within a fudge factor of the bottom
-//            if( lworkingYcoord <= (bottom * 1.1) && rworkingYcoord <= (bottom*1.1) ) {
-//                document.newPage();
-//                rworkingYcoord = lworkingYcoord = document.top();
-//            }
-//
-//            //Are we in right column?  if so, flip over to left column if there is room
-//            if( column % 2 == 1 ) {
-//                if( lworkingYcoord > bottom ) {
-//                    ct.setSimpleColumn(document.left(), bottom, (document.right()/2f)-10f, lworkingYcoord);
-//                    ++column;
-//                }
-//            }
-//            //Are we in left column?  if so, flip over to right column only if text will fit
-//            else {
-//                ct.setSimpleColumn((document.right()/2f)+10f, bottom, document.right(), rworkingYcoord);
-//
-//                if( ct.go(true) == ColumnText.NO_MORE_COLUMN ) {
-//                    ct.setSimpleColumn(document.left(), bottom, (document.right()/2f)-10f, lworkingYcoord);
-//                }
-//                else {
-//                    ct.setYLine(rworkingYcoord);
-//                    ++column;
-//                }
-//
-//                //ct.go(true) consumes input so we reload
-//                phrase = new Phrase(LEADING, "", font);
-//                chunk = new Chunk(headings[idx], obsfont);
-//                phrase.add(chunk);
-//                phrase.add(content[idx]);
-//                ct.setText(phrase);
-//            }
-//
-//            //while there is text to write, fill columns/page break when page full
-//            while( ct.go() == ColumnText.NO_MORE_COLUMN ) {
-//                if( column % 2 == 0 ) {
-//                    lworkingYcoord = bottom;
-//                    middle = (document.right()/4f)*3f;
-//                    headerContd = headings[idx] + " cont'd";
-//                    cb.setFontAndSize(bf, FONTSIZE);
-//                    cb.showTextAligned(PdfContentByte.ALIGN_CENTER, headerContd, middle, rworkingYcoord-phrase.leading(), 0f);
-//                    //cb.showTextAligned(PdfContentByte.ALIGN_CENTER, headings[idx] + " cont'd", middle, rworkingYcoord, 0f);
-//                    rworkingYcoord -= phrase.leading();
-//                    ct.setSimpleColumn((document.right()/2f)+10f, bottom, document.right(), rworkingYcoord);
-//                }
-//                else {
-//                    document.newPage();
-//                    rworkingYcoord = lworkingYcoord = document.top();
-//                    middle = (document.right()/4f);
-//                    headerContd = headings[idx] + " cont'd";
-//                    cb.setFontAndSize(bf, FONTSIZE);
-//                    cb.showTextAligned(PdfContentByte.ALIGN_CENTER, headerContd, middle, lworkingYcoord-phrase.leading(), 0f);
-//                    lworkingYcoord -= phrase.leading();
-//                    ct.setSimpleColumn(document.left(), bottom, (document.right()/2f)-10f, lworkingYcoord);
-//                }
-//                ++column;
-//            }
-//
-//            if( column % 2 == 0 )
-//                lworkingYcoord -= (ct.getLinesWritten() * ct.getLeading() + (ct.getLeading() * 2f));
-//            else
-//                rworkingYcoord -= (ct.getLinesWritten() * ct.getLeading() + (ct.getLeading() * 2f));
-//        }
-//        cb.endText();
     }
 
-    public void printNotes(List<CaseManagementNote>notes) throws DocumentException{
-
-        CaseManagementNote note;
+    /**
+     * Very similar to the printNotes function, except using the newer CaseManagementNote model.
+     * @param notes list of notes to print
+     * @throws DocumentException if the document in question can't be written to
+     */
+    public void printEncounterNotes(List<org.oscarehr.encounterNote.model.CaseManagementNote> notes)
+        throws DocumentException
+    {
         Font obsfont = new Font(bf, FONTSIZE, Font.UNDERLINE);
-        Paragraph p;
+        Paragraph paragraph;
         Phrase phrase;
         Chunk chunk;
 
-        if( newPage )
+        if(newPage)
+        {
             document.newPage();
+        }
         else
+        {
             newPage = true;
+        }
 
-        //Print notes
-        for( int idx = 0; idx < notes.size(); ++idx ) {
-            note = notes.get(idx);
-            p = new Paragraph();
-            //p.setSpacingBefore(font.leading(LINESPACING)*2f);
+        for (org.oscarehr.encounterNote.model.CaseManagementNote note : notes)
+        {
+            paragraph = new Paragraph();
             phrase = new Phrase(LEADING, "", font);
-            chunk = new Chunk("Documentation Date: " + formatter.format(note.getObservation_date()) + "\n", obsfont);
+            String observationDate = ConversionUtils.toDateString(note.getObservationDate());
+            chunk = new Chunk("Documentation Date: " + observationDate + "\n", obsfont);
             phrase.add(chunk);
             phrase.add(note.getNote() + "\n\n");
-            p.add(phrase);
-            document.add(p);
+            paragraph.add(phrase);
+            document.add(paragraph);
         }
     }
 
     public void finish() {
         document.close();
     }
-
-    /*
-     *Used to print footers on each page
-     */
-    class EndPage extends PdfPageEventHelper {
-        private Date now;
-        private String promoTxt;
-
-        public EndPage() {
-            now = new Date();
-            promoTxt = OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT");
-            if( promoTxt == null ) {
-                promoTxt = "";
-            }
-        }
-
-        public void onEndPage( PdfWriter writer, Document document ) {
-            //Footer contains page numbers and date printed on all pages
-            PdfContentByte cb = writer.getDirectContent();
-            cb.saveState();
-
-            String strFooter = promoTxt + " " + formatter.format(now);
-
-            float textBase = document.bottom();
-            cb.beginText();
-            cb.setFontAndSize(font.getBaseFont(),FONTSIZE);
-            Rectangle page = document.getPageSize();
-            float width = page.getWidth();
-
-            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, strFooter, (width/2.0f), textBase - 20, 0);
-
-            strFooter = "-" + writer.getPageNumber() + "-";
-            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, strFooter, (width/2.0f), textBase-10, 0);
-
-            cb.endText();
-            cb.restoreState();
-        }
-    }
-
 
 }

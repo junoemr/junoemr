@@ -25,6 +25,24 @@
 --%>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
+
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.demographic.service.DemographicService" %>
+<%@ page import="org.oscarehr.demographic.search.DemographicCriteriaSearch" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicDao" %>
+<%@ page import="org.oscarehr.demographic.model.Demographic" %>
+<%@ page import="java.time.temporal.ChronoUnit" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="oscar.util.ConversionUtils" %>
+<jsp:useBean id="reportMainBean" class="oscar.AppointmentMainBean"
+			 scope="session" />
+<jsp:useBean id="providerNameBean" class="oscar.Dict" scope="page" />
+<%  if(!reportMainBean.getBDoConfigure()) { %>
+<%@ include file="reportMainBeanConn.jspf"%>
+<% } %>
 <%
       String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
       boolean authed2=true;
@@ -39,40 +57,36 @@ if(!authed2) {
 }
 %>
 
-<%@page import="oscar.util.ConversionUtils"%>
 <%
-  
-  String strLimit1="0";
-  String strLimit2="50";  
-  if(request.getParameter("limit1")!=null) strLimit1 = request.getParameter("limit1");  
-  if(request.getParameter("limit2")!=null) strLimit2 = request.getParameter("limit2");
-%>
-<%@ page import="java.util.*, java.sql.*, oscar.*"
-	errorPage="errorpage.jsp"%>
-<jsp:useBean id="reportMainBean" class="oscar.AppointmentMainBean"
-	scope="session" />
-<jsp:useBean id="providerNameBean" class="oscar.Dict" scope="page" />
-<%  if(!reportMainBean.getBDoConfigure()) { %>
-<%@ include file="reportMainBeanConn.jspf"%>
-<% } %>
+	int offset = 0;
+	int limit = 50;
+	if(request.getParameter("offset") != null)
+	{
+		offset = Integer.parseInt(request.getParameter("offset"));
+	}
+	if(request.getParameter("limit") != null)
+	{
+		limit = Integer.parseInt(request.getParameter("limit"));
+	}
 
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
+	DemographicService demographicService = (DemographicService)SpringUtils.getBean("demographic.service.DemographicService");
+	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
+	DemographicService.STATUS_MODE statusMode = DemographicService.STATUS_MODE.active;
+	DemographicCriteriaSearch.SORT_MODE sortMode = DemographicCriteriaSearch.SORT_MODE.DemographicLastName;
+	DemographicService.SEARCH_MODE searchMode = DemographicService.SEARCH_MODE.demographicNo;
+	DemographicCriteriaSearch demoSearch = demographicService.buildDemographicSearch("", searchMode, statusMode, sortMode);
+	demoSearch.setLimit(limit);
+	demoSearch.setOffset(offset);
+
+	List<Demographic> demographics = demographicDao.criteriaSearch(demoSearch);
+
+%>
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title><bean:message key="report.reportactivepatientlist.title" />
 </title>
 <link rel="stylesheet" href="../css/receptionistapptstyle.css">
-<script language="JavaScript">
-<!--
-function setfocus() {
-//  document.titlesearch.keyword.focus();
-//  document.titlesearch.keyword.select();
-}
-//-->
-</SCRIPT>
-
 </head>
 <body onLoad="setfocus()" topmargin="0" leftmargin="0" rightmargin="0">
 
@@ -114,59 +128,58 @@ function setfocus() {
 			key="report.reportactivepatientlist.msgPhone" /></b></TH>
 	</tr>
 	<%
-  int age=0;
-  ResultSet rs=null ;
-  int[] itemp1 = new int[2];
-  itemp1[1] = Integer.parseInt(strLimit1);
-  itemp1[0] = Integer.parseInt(strLimit2);
-  rs = reportMainBean.queryResults(itemp1, "search_demo_active");
+		boolean isOddRow = false;
 
-  boolean bodd=false;
-  int nItems=0;
-  
-  while (rs.next()) {
-    bodd=bodd?false:true; //for the color of rows
-    nItems++; 
-   	int yearOfBirthInt = ConversionUtils.fromIntString(reportMainBean.getString(rs,"year_of_birth"));
-   	int monthOfBirthInt = ConversionUtils.fromIntString(reportMainBean.getString(rs,"month_of_birth"));
-   	int dateOfBirthInt = ConversionUtils.fromIntString(reportMainBean.getString(rs,"date_of_birth"));
-    if(yearOfBirthInt != 0 && monthOfBirthInt != 0 && dateOfBirthInt != 0) {
-    	age=MyDateFormat.getAge(yearOfBirthInt, monthOfBirthInt, dateOfBirthInt);
-    }
+		for (Demographic demographic : demographics)
+		{
+			isOddRow = !isOddRow;
+			long age = ChronoUnit.YEARS.between(demographic.getDateOfBirth(), LocalDate.now());
+
+			// Someone will inevitably complain about fields showing up as "null"
+			String chartNo = demographic.getChartNo() != null ? demographic.getChartNo() : "";
+			String hin = demographic.getHin() != null ? demographic.getHin() : "";
+			String ver = demographic.getVer() != null ? demographic.getVer() : "";
+			String mrp = demographic.getProviderNo() != null ? demographic.getProviderNo() : "";
+			String dateJoined = "";
+			if (demographic.getDateJoined() != null)
+			{
+				dateJoined = ConversionUtils.toDateString(demographic.getDateJoined());
+			}
+			String phone = demographic.getPhone() != null ? demographic.getPhone() : "";
+
 %>
-	<tr bgcolor="<%=bodd?"ivory":"white"%>">
-		<td nowrap><%=reportMainBean.getString(rs,"last_name")%></td>
-		<td nowrap><%=reportMainBean.getString(rs,"first_name")%></td>
-		<td align="center"><%=reportMainBean.getString(rs,"chart_no")%>
-		</td>
+	<tr bgcolor="<%=isOddRow ? "ivory" : "white"%>">
+		<td nowrap><%=demographic.getLastName()%></td>
+		<td nowrap><%=demographic.getFirstName()%></td>
+		<td align="center"><%=chartNo%></td>
 		<td align="center"><%=age%></td>
-		<td align="center"><%=reportMainBean.getString(rs,"sex")%></td>
-		<td><%=reportMainBean.getString(rs,"hin")%></td>
-		<td align="center"><%=reportMainBean.getString(rs,"ver")%></td>
-		<td><%=reportMainBean.getString(rs,"provider_no").length()>11?reportMainBean.getString(rs,"provider_no").substring(0,11):reportMainBean.getString(rs,"provider_no")%></td>
-		<td><%=reportMainBean.getString(rs,"date_joined")%></td>
-		<td><%=reportMainBean.getString(rs,"phone")%></td>
+		<td align="center"><%=demographic.getSex()%></td>
+		<td><%=hin%></td>
+		<td align="center"><%=ver%></td>
+		<td><%=mrp%></td>
+		<td><%=dateJoined%></td>
+		<td><%=phone%></td>
 	</tr>
 	<%
-  }
-
-if(reportMainBean.getBDoConfigure()) reportMainBean.setBDoConfigure();
-%>
+		}
+	%>
 
 </table>
 <br>
 <%
-  int nLastPage=0,nNextPage=0;
-  nNextPage=Integer.parseInt(strLimit2)+Integer.parseInt(strLimit1);
-  nLastPage=Integer.parseInt(strLimit1)-Integer.parseInt(strLimit2);
-  if(nLastPage>=0) {
+  int nLastPage = offset - limit;
+  int nNextPage= limit + offset;
+
+  if(nLastPage >= 0)
+  {
 %> <a
-	href="reportactivepatientlist.jsp?limit1=<%=nLastPage%>&limit2=<%=strLimit2%>"><bean:message
+	href="reportactivepatientlist.jsp?offset=<%=nLastPage%>&limit=<%=limit%>"><bean:message
 	key="report.reportactivepatientlist.msgLastPage" /></a> | <%
   }
-  if(nItems==Integer.parseInt(strLimit2)) {
+  if(demographics.size() == limit)
+  {
 %> <a
-	href="reportactivepatientlist.jsp?limit1=<%=nNextPage%>&limit2=<%=strLimit2%>">
+	href="reportactivepatientlist.jsp?offset=<%=nNextPage%>&limit=<%=limit%>">
 <bean:message key="report.reportactivepatientlist.msgNextPage" /></a> <%
   }
 %>

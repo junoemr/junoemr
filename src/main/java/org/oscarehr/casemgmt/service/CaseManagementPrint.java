@@ -32,8 +32,10 @@ import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -42,23 +44,22 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
-import org.oscarehr.PMmodule.model.ProgramProvider;
-import org.oscarehr.PMmodule.service.ProgramManager;
+import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicNote;
 import org.oscarehr.caisi_integrator.ws.DemographicWs;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
-import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.util.ExtPrint;
-import org.oscarehr.casemgmt.web.NoteDisplay;
-import org.oscarehr.casemgmt.web.NoteDisplayLocal;
 import org.oscarehr.consultations.service.ConsultationPDFCreationService;
-import org.oscarehr.managers.ProgramManager2;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
+import org.oscarehr.encounterNote.dao.IssueDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -78,13 +79,10 @@ public class CaseManagementPrint {
 	
 	private CaseManagementManager caseManagementMgr = SpringUtils.getBean(CaseManagementManager.class);
 
+	private CaseManagementNoteDao newCaseManagementNoteDao = (CaseManagementNoteDao) SpringUtils.getBean("encounterNote.dao.CaseManagementNoteDao");
 	private ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
-	private NoteService noteService = SpringUtils.getBean(NoteService.class);
-	
-	private ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
-	
-	private ProgramManager programMgr = SpringUtils.getBean(ProgramManager.class);
-
+	private DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
+	private IssueDao issueDao = (IssueDao)SpringUtils.getBean("encounterNote.dao.IssueDao");
 
 	/*
 	 *This method was in CaseManagementEntryAction but has been moved out so that both the classic Echart and the flat echart can use the same printing method.
@@ -104,30 +102,34 @@ public class CaseManagementPrint {
 			throws IOException, DocumentException
 	{
 		
-		String providerNo = loggedInInfo.getLoggedInProviderNo();
-		String demoNo = "" + demographicNo;
-
-		if (printAllNotes)
-		{
-			noteIds = getAllNoteIds(loggedInInfo, request, demoNo);
-		}
-
-		request.setAttribute("demoName", getDemoName(demoNo));
-		request.setAttribute("demoSex", getDemoSex(demoNo));
-		request.setAttribute("demoAge", getDemoAge(demoNo));
-		request.setAttribute("mrp", getMRP(request, demoNo));
-		request.setAttribute("hin", StringUtils.trimToEmpty(getDemoHIN(demoNo)));
-		String dob = getDemoDOB(demoNo);
+		String demoNo = String.valueOf(demographicNo);
+		Demographic demographic = demographicDao.find(demographicNo);
+		request.setAttribute("demoName", demographic.getFirstName() + " " + demographic.getLastName());
+		request.setAttribute("demoSex", demographic.getSex());
+		request.setAttribute("demoAge", getDemoAge(demographic));
+		request.setAttribute("mrp", getMRP(demographic));
+		request.setAttribute("hin", StringUtils.trimToEmpty(demographic.getHin()));
+		String dob = ConversionUtils.toDateString(demographic.getDateOfBirth());
 		dob = convertDateFmt(dob, request);
 		request.setAttribute("demoDOB", dob);
 
-		List<CaseManagementNote> notes = getNotesToPrint(noteIds, loggedInInfo, demoNo, startDate, endDate);
+		List<CaseManagementNote> notes;
+
+		if (printAllNotes)
+		{
+			notes = newCaseManagementNoteDao.findAllForDemographic(demographicNo);
+		}
+		else
+		{
+			notes = getNotesToPrint(noteIds, loggedInInfo, demoNo);
+			notes = filterNotesByDate(notes, startDate, endDate);
+		}
 
 		HashMap<String, List<CaseManagementNote>> cpp = null;
 
 		if (printCPP)
 		{
-			cpp = getIssueNotesToPrint(providerNo, demoNo);
+			cpp = getIssueNotesToPrint(demographicNo, startDate, endDate);
 		}
 		List<CaseManagementNote> othermeds = null;
 		if (printRx)
@@ -135,19 +137,20 @@ public class CaseManagementPrint {
 			// If we haven't already pulled out the OMeds issues, do so now
 			if (cpp == null)
 			{
-				List<Issue> issues = caseManagementMgr.getIssueInfoByCode(providerNo, "OMeds");
-				String[] issueIds = getIssueIds(issues);
-				othermeds = caseManagementMgr.getNotes(demoNo, issueIds);
+				Issue issue = issueDao.findByCode(Issue.SUMMARY_CODE_OTHER_MEDS);
+				othermeds = newCaseManagementNoteDao.findByDemographicAndIssue(demographicNo, issue.getIssueId());
 			}
 			else
 			{
-				othermeds = cpp.get("OMeds");
+				// In this case, we're printing both CPP and Rx, and we only want these notes to show up under Rx
+				othermeds = new ArrayList<>(cpp.get(Issue.SUMMARY_CODE_OTHER_MEDS));
+				cpp.remove(Issue.SUMMARY_CODE_OTHER_MEDS);
 			}
 		}
 
-		SimpleDateFormat headerFormat = new SimpleDateFormat("yyyy-MM-dd.hh.mm.ss");
-		Date now = new Date();
-		String headerDate = headerFormat.format(now);
+		// This line doesn't actually set the filename that the user sees, but to lower the possibility of there being
+		// conflicts (two people attempting to print same demographic's notes) we'll set the temp name
+		String headerDate = ConversionUtils.toDateString(new Date(), ConversionUtils.DATE_TIME_FILENAME);
 		
 		// Create new file to save form to
 		String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
@@ -167,7 +170,7 @@ public class CaseManagementPrint {
 			{
 				printer.printRx(demoNo, othermeds);
 			}
-			printer.printNotes(notes);
+			printer.printEncounterNotes(notes);
 
 			/* check extensions */
 			Enumeration requestParameterNames = request.getParameterNames();
@@ -218,11 +221,9 @@ public class CaseManagementPrint {
 	 * @param noteIds a list of note IDs we want to print
 	 * @param loggedInInfo session information for the currently logged in user
 	 * @param demoNo demographic number to print notes for
-	 * @param startDate optional start date to print notes from
-	 * @param endDate optional end date to print notes until
 	 * @return a list of CaseManagementNote entries for the demographic that we can find and print
 	 */
-	public List<CaseManagementNote> getNotesToPrint(String[] noteIds, LoggedInInfo loggedInInfo, String demoNo, Calendar startDate, Calendar endDate)
+	public List<CaseManagementNote> getNotesToPrint(String[] noteIds, LoggedInInfo loggedInInfo, String demoNo)
 		throws MalformedURLException
 	{
 		List<CaseManagementNote> notes = new ArrayList<>();
@@ -242,7 +243,7 @@ public class CaseManagementPrint {
 				Long noteId = ConversionUtils.fromLongString(note);
 				if (noteId > 0)
 				{
-					notes.add(caseManagementMgr.getNote(noteId.toString()));
+					notes.add(newCaseManagementNoteDao.find(noteId));
 				}
 			}
 		}
@@ -269,64 +270,50 @@ public class CaseManagementPrint {
 		// Notes are unordered - sort by observation date
 		OscarProperties properties = OscarProperties.getInstance();
 		String noteSort = properties.getProperty("CMESort", "");
-		notes.sort(CaseManagementNote.noteObservationDateComparator);
+		notes.sort(Comparator.comparing(
+				CaseManagementNote::getObservationDate,
+				Comparator.nullsLast(Comparator.reverseOrder())
+		));
 
 		if (noteSort.trim().equalsIgnoreCase("UP"))
 		{
 			Collections.reverse(notes);
 		}
 
-		// Now that notes are ordered, filter out any notes that do not fit within our start and end date range
-		if (startDate != null && endDate != null)
-		{
-			List<CaseManagementNote> dateFilteredList = new ArrayList<>();
-			for (CaseManagementNote cmn : notes)
-			{
-				Date start = removeTime(startDate.getTime()); // Start date with hours/mins/secs set to 0
-				Date end = removeTime(endDate.getTime()); // End date with hours/mins/secs set to 0
-				Date observation = removeTime(cmn.getObservation_date()); // Observation date with hours/mins/secs set to 0
-				if ((start.before(observation) || start.equals(observation))
-						&& (end.after(observation) || end.equals(observation)))
-				{
-					dateFilteredList.add(cmn);
-				}
-			}
-			notes = dateFilteredList;
-		}
 		return notes;
 	}
 
 	/**
-	 * Given a demographic and the currently logged in provider, grab all issue-related notes for printing.
-	 * @param providerNo logged in provider
-	 * @param demoNo demographic to pull CPP notes for
+	 * Given a demographic and a range of dates, grab all issue-related notes for printing within that range.
+	 * @param demographicNo demographic to pull CPP notes for
+	 * @param startDate date to begin looking for notes from
+	 * @param endDate date to look for notes until
 	 * @return a map containing issues as keys and any associated notes with each issue
 	 */
-	public HashMap<String, List<CaseManagementNote>> getIssueNotesToPrint(String providerNo, String demoNo)
+	private HashMap<String, List<CaseManagementNote>> getIssueNotesToPrint(Integer demographicNo, Calendar startDate, Calendar endDate)
 	{
 		HashMap<String, List<CaseManagementNote>> cpp = new HashMap<>();
-		String[] issueCodes = {
-				"OMeds",
-				"SocHistory",
-				"MedHistory",
-				"Concerns",
-				"Reminders",
-				"FamHistory",
-				"RiskFactors"
-		};
+		List<String> issueCodes = Arrays.asList(
+			Issue.SUMMARY_CODE_OTHER_MEDS,
+			Issue.SUMMARY_CODE_SOCIAL_HISTORY,
+			Issue.SUMMARY_CODE_MEDICAL_HISTORY,
+			Issue.SUMMARY_CODE_CONCERNS,
+			Issue.SUMMARY_CODE_REMINDERS,
+			Issue.SUMMARY_CODE_FAMILY_HISTORY,
+			Issue.SUMMARY_CODE_RISK_FACTORS
+		);
 
 		List<CaseManagementNote> issueNotes;
 		List<CaseManagementNote> tmpNotes;
 
 		for (String issueCode : issueCodes)
 		{
-			List<Issue> issues = caseManagementMgr.getIssueInfoByCode(providerNo, issueCode);
-			String[] issueIds = getIssueIds(issues);
-			tmpNotes = caseManagementMgr.getNotes(demoNo, issueIds);
+			Issue issue = issueDao.findByCode(issueCode);
+			tmpNotes = newCaseManagementNoteDao.findByDemographicAndIssue(demographicNo, issue.getIssueId());
 			issueNotes = new ArrayList<>();
 			for (CaseManagementNote tmpNote: tmpNotes)
 			{
-				if (!tmpNote.isLocked())
+				if (!tmpNote.getLocked())
 				{
 					List<CaseManagementNoteExt> exts = caseManagementMgr.getExtByNote(tmpNote.getId());
 					boolean exclude = false;
@@ -422,134 +409,72 @@ public class CaseManagementPrint {
 		return labResults;
 	}
 
-	public String[] getIssueIds(List<Issue> issues) {
-		String[] issueIds = new String[issues.size()];
-		int idx = 0;
-		for (Issue i : issues) {
-			issueIds[idx] = String.valueOf(i.getId());
-			++idx;
-		}
-		return issueIds;
-	}
-	
 	private CaseManagementNote getFakedNote(CachedDemographicNote remoteNote) {
 		CaseManagementNote note = new CaseManagementNote();
 
-		if (remoteNote.getObservationDate() != null) note.setObservation_date(remoteNote.getObservationDate().getTime());
+		if (remoteNote.getObservationDate() != null)
+		{
+			note.setObservationDate(remoteNote.getObservationDate().getTime());
+		}
 		note.setNote(remoteNote.getNote());
 
 		return (note);
 	}
-	
-	
-	@SuppressWarnings("unchecked")
-    private String[] getAllNoteIds(LoggedInInfo loggedInInfo,HttpServletRequest request,String demoNo) {
-		
-		HttpSession se = loggedInInfo.getSession();
-		
-		ProgramProvider pp = programManager2.getCurrentProgramInDomain(loggedInInfo,loggedInInfo.getLoggedInProviderNo());
-		String programId = null;
-		
-		if(pp !=null && pp.getProgramId() != null){
-			programId = ""+pp.getProgramId();
-		}else{
-			programId = String.valueOf(programMgr.getProgramIdByProgramName("OSCAR")); //Default to the oscar program if provider hasn't been assigned to a program
-		}
-		
-		NoteSelectionCriteria criteria = new NoteSelectionCriteria();
-		criteria.setMaxResults(Integer.MAX_VALUE);
-		criteria.setDemographicId(ConversionUtils.fromIntString(demoNo));
-		criteria.setUserRole((String) request.getSession().getAttribute("userrole"));
-		criteria.setUserName((String) request.getSession().getAttribute("user"));
-		if (request.getParameter("note_sort") != null && request.getParameter("note_sort").length() > 0) {
-			criteria.setNoteSort(request.getParameter("note_sort"));
-		}
-		if (programId != null && !programId.trim().isEmpty()) {
-			criteria.setProgramId(programId);
-		}
-		
-		
-		if (se.getAttribute("CaseManagementViewAction_filter_roles") != null) {
-			criteria.getRoles().addAll((List<String>) se.getAttribute("CaseManagementViewAction_filter_roles"));
-		}
-		
-		if (se.getAttribute("CaseManagementViewAction_filter_providers") != null) {
-			criteria.getProviders().addAll((List<String>) se.getAttribute("CaseManagementViewAction_filter_providers"));
-		}
 
-		if (se.getAttribute("CaseManagementViewAction_filter_providers") != null) {
-			criteria.getIssues().addAll((List<String>) se.getAttribute("CaseManagementViewAction_filter_issues"));
-		}
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("SEARCHING FOR NOTES WITH CRITERIA: " + criteria);
-		}
-		
-		NoteSelectionResult result = noteService.findNotes(loggedInInfo, criteria);
-		
-		
-		List<String>  buf = new ArrayList<String>();
-		for(NoteDisplay nd : result.getNotes()) {
-			if (!(nd instanceof NoteDisplayLocal)) {
-				continue;
+	/**
+	 * Given a list of notes and a date range, remove any notes that fall outside of that range.
+	 * @param notes list of notes to filter
+	 * @param startDate earliest date that we want to include notes from
+	 * @param endDate latest date that we want to include notes up to
+	 * @return list of notes that fall between the range
+	 */
+	private List<CaseManagementNote> filterNotesByDate(List<CaseManagementNote> notes, Calendar startDate, Calendar endDate)
+	{
+		// filter out any notes that do not fit within our start and end date range
+		if (notes != null && startDate != null && endDate != null)
+		{
+			List<CaseManagementNote> dateFilteredList = new ArrayList<>();
+			for (CaseManagementNote cmn : notes)
+			{
+				Date start = removeTime(startDate.getTime()); // Start date with hours/mins/secs set to 0
+				Date end = removeTime(endDate.getTime()); // End date with hours/mins/secs set to 0
+				Date observation = removeTime(cmn.getObservationDate()); // Observation date with hours/mins/secs set to 0
+				if ((start.before(observation) || start.equals(observation))
+						&& (end.after(observation) || end.equals(observation)))
+				{
+					dateFilteredList.add(cmn);
+				}
 			}
-			buf.add(nd.getNoteId().toString());
+			notes = dateFilteredList;
 		}
-		
-		
-		return buf.toArray(new String[0]);
-    }
+		return notes;
 
-	
-	protected String getDemoName(String demoNo) {
-		if (demoNo == null) {
+	}
+
+    protected String getDemoAge(Demographic demographic)
+	{
+		int age = Utility.calcAge(
+				demographic.getYearOfBirth(),
+				demographic.getMonthOfBirth(),
+				demographic.getDayOfBirth()
+		);
+		return String.valueOf(age);
+	}
+
+	protected String getMRP(Demographic demographic)
+	{
+		oscar.oscarEncounter.data.EctProviderData.Provider prov = new oscar.oscarEncounter.data.EctProviderData().getProvider(demographic.getProviderNo());
+		if (prov == null)
+		{
 			return "";
 		}
-		return caseManagementMgr.getDemoName(demoNo);
-	}
-
-	protected String getDemoSex(String demoNo) {
-            if(demoNo == null) {
-                return "";
-            }
-            return caseManagementMgr.getDemoGender(demoNo);
-        }
-
-        protected String getDemoAge(String demoNo){
-		if (demoNo==null) return "";
-		return caseManagementMgr.getDemoAge(demoNo);
-	}
-
-	protected String getDemoDOB(String demoNo){
-		if (demoNo==null) return "";
-		return caseManagementMgr.getDemoDOB(demoNo);
-	}
-
-	protected String getDemoHIN(String demoNo)
-	{
-		if (demoNo == null)
-		{
-			return null;
-		}
-		return caseManagementMgr.getDemoHIN(demoNo);
-	}
-	
-	protected String getMRP(HttpServletRequest request,String demographicNo) {
-		String strBeanName = "casemgmt_oscar_bean" + demographicNo;
-		oscar.oscarEncounter.pageUtil.EctSessionBean bean = (oscar.oscarEncounter.pageUtil.EctSessionBean) request.getSession().getAttribute(strBeanName);
-		if (bean == null) return new String("");
-		if (bean.familyDoctorNo == null) return new String("");
-		if (bean.familyDoctorNo.isEmpty()) return new String("");
-
-		oscar.oscarEncounter.data.EctProviderData.Provider prov = new oscar.oscarEncounter.data.EctProviderData().getProvider(bean.familyDoctorNo);
-		String name = prov.getFirstName() + " " + prov.getSurname();
-		return name;
+		return prov.getFirstName() + " " + prov.getSurname();
 	}
 
 	protected String convertDateFmt(String strOldDate, HttpServletRequest request) {
-		String strNewDate = new String();
+		String strNewDate = "";
 		if (strOldDate != null && strOldDate.length() > 0) {
-			SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd", request.getLocale());
+			SimpleDateFormat fmt = new SimpleDateFormat(ConversionUtils.DEFAULT_DATE_PATTERN, request.getLocale());
 			try {
 
 				Date tempDate = fmt.parse(strOldDate);
