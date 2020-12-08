@@ -49,15 +49,15 @@ public class MedicalHistoryNoteDbToModelConverter extends
 		{
 			if(ext.getKey().equals(STARTDATE))
 			{
-				exportNote.setStartDate(PartialDate.from(ConversionUtils.toNullableLocalDate(ext.getDateValue()), null));
+				exportNote.setStartDate(PartialDate.from(ConversionUtils.toNullableLocalDate(ext.getDateValue()), getExtPartialDate(ext.getId())));
 			}
 			if(ext.getKey().equals(PROCEDUREDATE))
 			{
-				exportNote.setProcedureDate(PartialDate.from(ConversionUtils.toNullableLocalDate(ext.getDateValue()), null));
+				exportNote.setProcedureDate(PartialDate.from(ConversionUtils.toNullableLocalDate(ext.getDateValue()), getExtPartialDate(ext.getId())));
 			}
 			if(ext.getKey().equals(RESOLUTIONDATE))
 			{
-				exportNote.setResolutionDate(PartialDate.from(ConversionUtils.toNullableLocalDate(ext.getDateValue()), null));
+				exportNote.setResolutionDate(PartialDate.from(ConversionUtils.toNullableLocalDate(ext.getDateValue()), getExtPartialDate(ext.getId())));
 			}
 			if(ext.getKey().equals(TREATMENT))
 			{

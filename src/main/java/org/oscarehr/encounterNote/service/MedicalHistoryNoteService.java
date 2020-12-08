@@ -26,6 +26,7 @@ import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.note.MedicalHistoryNoteModelToDbConverter;
 import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.oscarehr.encounterNote.model.Issue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +50,24 @@ public class MedicalHistoryNoteService extends HistoryNoteService
 
 		note.setDemographic(demographic);
 		CaseManagementNote savedNote = saveMedicalHistoryNote(note);
-		//TODO handle partial dates?
+		addAnnotationLink(savedNote, noteModel.getAnnotation());
+
+		// now that notes have id's, save the partial date data
+		for(CaseManagementNoteExt ext : savedNote.getNoteExtensionList())
+		{
+			if(CaseManagementNoteExt.STARTDATE.equals(ext.getKey()))
+			{
+				saveExtPartialDate(noteModel.getStartDate(), ext.getId());
+			}
+			if(CaseManagementNoteExt.RESOLUTIONDATE.equals(ext.getKey()))
+			{
+				saveExtPartialDate(noteModel.getResolutionDate(), ext.getId());
+			}
+			if(CaseManagementNoteExt.PROCEDUREDATE.equals(ext.getKey()))
+			{
+				saveExtPartialDate(noteModel.getProcedureDate(), ext.getId());
+			}
+		}
 
 		return savedNote;
 	}

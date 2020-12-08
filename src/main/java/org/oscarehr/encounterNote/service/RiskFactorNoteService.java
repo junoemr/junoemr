@@ -23,8 +23,8 @@
 package org.oscarehr.encounterNote.service;
 
 import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographicImport.converter.in.note.FamilyHistoryNoteModelToDbConverter;
-import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
+import org.oscarehr.demographicImport.converter.in.note.RiskFactorNoteModelToDbConverter;
+import org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.oscarehr.encounterNote.model.Issue;
@@ -38,18 +38,16 @@ import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-public class FamilyHistoryNoteService extends HistoryNoteService
+public class RiskFactorNoteService extends HistoryNoteService
 {
-
 	@Autowired
-	protected FamilyHistoryNoteModelToDbConverter familyHistoryNoteModelToDbConverter;
+	protected RiskFactorNoteModelToDbConverter riskFactorNoteModelToDbConverter;
 
-	public CaseManagementNote saveFamilyHistoryNote(FamilyHistoryNote noteModel, Demographic demographic)
+	public CaseManagementNote saveRiskFactorNote(RiskFactorNote noteModel, Demographic demographic)
 	{
-		CaseManagementNote note = familyHistoryNoteModelToDbConverter.convert(noteModel);
-
+		CaseManagementNote note = riskFactorNoteModelToDbConverter.convert(noteModel);
 		note.setDemographic(demographic);
-		CaseManagementNote savedNote = saveFamilyHistoryNote(note);
+		CaseManagementNote savedNote = saveRiskFactorNote(note);
 		addAnnotationLink(savedNote, noteModel.getAnnotation());
 
 		// now that notes have id's, save the partial date data
@@ -59,22 +57,26 @@ public class FamilyHistoryNoteService extends HistoryNoteService
 			{
 				saveExtPartialDate(noteModel.getStartDate(), ext.getId());
 			}
+			if(CaseManagementNoteExt.RESOLUTIONDATE.equals(ext.getKey()))
+			{
+				saveExtPartialDate(noteModel.getResolutionDate(), ext.getId());
+			}
 		}
 
 		return savedNote;
 	}
-	public List<CaseManagementNote> saveFamilyHistoryNote(List<FamilyHistoryNote> noteModelList, Demographic demographic)
+	public List<CaseManagementNote> saveRiskFactorNote(List<RiskFactorNote> noteModelList, Demographic demographic)
 	{
 		List<CaseManagementNote> dbNoteList = new ArrayList<>(noteModelList.size());
-		for(FamilyHistoryNote note : noteModelList)
+		for(RiskFactorNote note : noteModelList)
 		{
-			dbNoteList.add(saveFamilyHistoryNote(note, demographic));
+			dbNoteList.add(saveRiskFactorNote(note, demographic));
 		}
 		return dbNoteList;
 	}
 
-	public CaseManagementNote saveFamilyHistoryNote(CaseManagementNote note)
+	public CaseManagementNote saveRiskFactorNote(CaseManagementNote note)
 	{
-		return saveHistoryNote(note, Issue.SUMMARY_CODE_FAMILY_HISTORY);
+		return saveHistoryNote(note, Issue.SUMMARY_CODE_RISK_FACTORS);
 	}
 }

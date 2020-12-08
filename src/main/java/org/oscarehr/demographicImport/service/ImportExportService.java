@@ -40,6 +40,7 @@ import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.encounterNote.service.FamilyHistoryNoteService;
 import org.oscarehr.encounterNote.service.MedicalHistoryNoteService;
 import org.oscarehr.encounterNote.service.ReminderNoteService;
+import org.oscarehr.encounterNote.service.RiskFactorNoteService;
 import org.oscarehr.encounterNote.service.SocialHistoryNoteService;
 import org.oscarehr.labs.service.LabService;
 import org.oscarehr.provider.model.ProviderData;
@@ -85,6 +86,9 @@ public class ImportExportService
 
 	@Autowired
 	private SocialHistoryNoteService socialHistoryNoteService;
+
+	@Autowired
+	private RiskFactorNoteService riskFactorNoteService;
 
 	@Autowired
 	private ReminderNoteService reminderNoteService;
@@ -158,6 +162,7 @@ public class ImportExportService
 		familyHistoryNoteService.saveFamilyHistoryNote(demographic.getFamilyHistoryNoteList(), dbDemographic);
 		medicalHistoryNoteService.saveMedicalHistoryNotes(demographic.getMedicalHistoryNoteList(), dbDemographic);
 		reminderNoteService.saveReminderNote(demographic.getReminderNoteList(), dbDemographic);
+		riskFactorNoteService.saveRiskFactorNote(demographic.getRiskFactorNoteList(), dbDemographic);
 		encounterNoteService.saveChartNotes(demographic.getEncounterNoteList(), dbDemographic);
 	}
 

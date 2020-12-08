@@ -35,6 +35,22 @@ public class CDSRiskFactorImportMapper extends AbstractCDSImportMapper<RiskFacto
 	@Override
 	public RiskFactorNote importToJuno(RiskFactors importStructure)
 	{
-		return new RiskFactorNote();
+		RiskFactorNote note = new RiskFactorNote();
+
+		note.setNoteText(getNoteText(importStructure));
+		note.setExposureDetails(importStructure.getExposureDetails());
+		note.setAgeAtOnset(getAgeAtOnset(importStructure.getAgeOfOnset()));
+		note.setStartDate(toNullablePartialDate(importStructure.getStartDate()));
+		note.setResolutionDate(toNullablePartialDate(importStructure.getEndDate()));
+		note.setLifeStage(getLifeStage(importStructure.getLifeStage()));
+		note.setAnnotation(importStructure.getNotes());
+
+		return note;
+	}
+
+	protected String getNoteText(RiskFactors importStructure)
+	{
+		String riskFactorText = importStructure.getRiskFactor();
+		return (riskFactorText != null) ? riskFactorText : "No Risk Factor Text";
 	}
 }

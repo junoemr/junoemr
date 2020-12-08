@@ -37,12 +37,13 @@ public class CDSRiskFactorExportMapper extends AbstractCDSNoteExportMapper<RiskF
 	{
 		RiskFactors riskFactors = objectFactory.createRiskFactors();
 
+		riskFactors.setRiskFactor(exportStructure.getNoteText());
 		riskFactors.setExposureDetails(exportStructure.getExposureDetails());
 		riskFactors.setAgeOfOnset(getAgeAtOnset(exportStructure.getAgeAtOnset()));
 		riskFactors.setStartDate(toNullableDateFullOrPartial(exportStructure.getStartDate()));
 		riskFactors.setEndDate(toNullableDateFullOrPartial(exportStructure.getResolutionDate()));
 		riskFactors.setLifeStage(getLifeStage(exportStructure.getLifeStage()));
-		riskFactors.setNotes(exportStructure.getNoteText());
+		riskFactors.setNotes(exportStructure.getAnnotation());
 
 		return riskFactors;
 	}

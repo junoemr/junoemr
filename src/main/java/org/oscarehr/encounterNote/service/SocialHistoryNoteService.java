@@ -47,9 +47,8 @@ public class SocialHistoryNoteService extends HistoryNoteService
 	{
 		CaseManagementNote note = socialHistoryNoteModelToDbConverter.convert(noteModel);
 		note.setDemographic(demographic);
-		addAnnotationLink(note, noteModel.getAnnotation());
-
 		CaseManagementNote savedNote = saveSocialHistoryNote(note);
+		addAnnotationLink(savedNote, noteModel.getAnnotation());
 		//TODO handle partial dates?
 
 		return savedNote;

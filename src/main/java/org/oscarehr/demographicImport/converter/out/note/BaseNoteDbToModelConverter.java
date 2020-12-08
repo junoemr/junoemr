@@ -22,6 +22,8 @@
  */
 package org.oscarehr.demographicImport.converter.out.note;
 
+import org.oscarehr.common.dao.PartialDateDao;
+import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.encounterNote.BaseNote;
@@ -47,6 +49,9 @@ public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 
 	@Autowired
 	private CaseManagementNoteLinkDao caseManagementNoteLinkDao;
+
+	@Autowired
+	private PartialDateDao partialDateDao;
 
 	@Override
 	public N convert(CaseManagementNote input)
@@ -97,5 +102,13 @@ public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 			noteString = note.getNote();
 		}
 		return noteString;
+	}
+
+	protected PartialDate getExtPartialDate(Long ExtId)
+	{
+		return partialDateDao.getPartialDate(
+				org.oscarehr.common.model.PartialDate.TABLE_CASEMGMT_NOTE,
+				Math.toIntExact(ExtId),
+				org.oscarehr.common.model.PartialDate.TABLE_CASEMGMT_NOTE_EXT);
 	}
 }

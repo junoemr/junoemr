@@ -51,7 +51,7 @@ public class FamilyHistoryNoteDbToModelConverter extends
 		{
 			if(ext.getKey().equals(STARTDATE))
 			{
-				exportNote.setStartDate(PartialDate.from(ConversionUtils.toNullableLocalDate(ext.getDateValue()), null));
+				exportNote.setStartDate(PartialDate.from(ConversionUtils.toNullableLocalDate(ext.getDateValue()), getExtPartialDate(ext.getId())));
 			}
 			if(ext.getKey().equals(RESOLUTIONDATE))
 			{

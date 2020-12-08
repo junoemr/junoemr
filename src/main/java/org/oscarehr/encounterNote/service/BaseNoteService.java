@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
@@ -167,5 +168,13 @@ public abstract class BaseNoteService
 	{
 		CaseManagementNote noteToCopy = caseManagementNoteDao.find(noteId);
 		return new CaseManagementNote(noteToCopy);
+	}
+
+	public void saveExtPartialDate(org.oscarehr.demographicImport.model.common.PartialDate dateToSave, Long extensionId)
+	{
+		partialDateDao.setPartialDate(dateToSave,
+				PartialDate.TABLE.CASEMGMT_NOTE_EXT,
+				Math.toIntExact(extensionId),
+				PartialDate.FIELD_CASEMGMT_NOTE_EXT_VALUE);
 	}
 }

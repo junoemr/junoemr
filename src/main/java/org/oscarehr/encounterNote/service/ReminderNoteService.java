@@ -22,7 +22,6 @@
  */
 package org.oscarehr.encounterNote.service;
 
-import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.note.ReminderNoteModelToDbConverter;
 import org.oscarehr.demographicImport.model.encounterNote.ReminderNote;
@@ -51,19 +50,18 @@ public class ReminderNoteService extends HistoryNoteService
 
 		note.setDemographic(demographic);
 		CaseManagementNote savedNote = saveReminderNote(note);
+		addAnnotationLink(savedNote, noteModel.getAnnotation());
 
 		// now that notes have id's, save the partial date data
 		for(CaseManagementNoteExt ext : savedNote.getNoteExtensionList())
 		{
 			if(CaseManagementNoteExt.STARTDATE.equals(ext.getKey()))
 			{
-				partialDateDao.setPartialDate(noteModel.getStartDate(),
-						PartialDate.TABLE.CASEMGMT_NOTE_EXT, Math.toIntExact(ext.getId()), PartialDate.FIELD_CASEMGMT_NOTE_EXT_VALUE);
+				saveExtPartialDate(noteModel.getStartDate(), ext.getId());
 			}
 			if(CaseManagementNoteExt.RESOLUTIONDATE.equals(ext.getKey()))
 			{
-				partialDateDao.setPartialDate(noteModel.getResolutionDate(),
-						PartialDate.TABLE.CASEMGMT_NOTE_EXT, Math.toIntExact(ext.getId()), PartialDate.FIELD_CASEMGMT_NOTE_EXT_VALUE);
+				saveExtPartialDate(noteModel.getResolutionDate(), ext.getId());
 			}
 		}
 

@@ -76,17 +76,28 @@ public abstract class HistoryNoteService extends BaseNoteService
 
 	protected void addAnnotationLink(CaseManagementNote note, String annotationText)
 	{
-		CaseManagementNote annotationNote = saveAnnotationNote(note, annotationText);
-		if(annotationNote != null)
+		if(annotationText != null)
 		{
+			CaseManagementNote annotationNote = buildAnnotationNote(note, annotationText);
 			CaseManagementNoteLink annotationLink = new CaseManagementNoteLink();
-			annotationLink.setCaseManagementNote(Math.toIntExact(annotationNote.getId()));
-			annotationLink.setNote(note);
-			note.addNoteLink(annotationLink);
+			annotationLink.setCaseManagementNote(Math.toIntExact(note.getId()));
+			annotationLink.setNote(annotationNote);
+			annotationNote.addNoteLink(annotationLink);
+
+			saveNote(annotationNote);
 		}
+
+//		CaseManagementNote annotationNote = buildAnnotationNote(note, annotationText);
+//		if(annotationNote != null)
+//		{
+//			CaseManagementNoteLink annotationLink = new CaseManagementNoteLink();
+//			annotationLink.setCaseManagementNote(Math.toIntExact(annotationNote.getId()));
+//			annotationLink.setNote(note);
+//			note.addNoteLink(annotationLink);
+//		}
 	}
 
-	private CaseManagementNote saveAnnotationNote(CaseManagementNote note, String annotationText)
+	private CaseManagementNote buildAnnotationNote(CaseManagementNote note, String annotationText)
 	{
 		CaseManagementNote annotationNote = null;
 		if(annotationText != null)
@@ -98,7 +109,6 @@ public abstract class HistoryNoteService extends BaseNoteService
 			annotationNote.setSigningProvider(note.getSigningProvider());
 			annotationNote.setObservationDate(note.getObservationDate());
 			annotationNote.setDemographic(note.getDemographic());
-			annotationNote = saveNote(annotationNote);
 		}
 		return annotationNote;
 	}

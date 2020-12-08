@@ -23,14 +23,13 @@
 package org.oscarehr.demographicImport.model.encounterNote;
 
 import lombok.Data;
-
-import java.time.LocalDate;
+import org.oscarehr.demographicImport.model.common.PartialDate;
 
 @Data
 public class RiskFactorNote extends BaseNote
 {
-	private LocalDate startDate;
-	private LocalDate resolutionDate;
+	private PartialDate startDate;
+	private PartialDate resolutionDate;
 	private Long ageAtOnset;
 	private String exposureDetails;
 	private String lifeStage;
