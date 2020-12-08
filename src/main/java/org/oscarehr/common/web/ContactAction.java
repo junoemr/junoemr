@@ -63,6 +63,7 @@ import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.BeanUtils;
 
 import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
 
 public class ContactAction extends DispatchAction {
 
@@ -510,17 +511,26 @@ public class ContactAction extends DispatchAction {
 		
 		DynaValidatorForm dform = (DynaValidatorForm)form;
 		Contact contact = (Contact)dform.get("contact");
-		String id = request.getParameter("contact.id");
-		if(id != null && id.length()>0) {
+		String id = StringUtils.trimToNull(request.getParameter("contact.id"));
+		if(ConversionUtils.hasContent(id))
+		{
 			Contact savedContact = contactDao.find(Integer.parseInt(id));
-			if(savedContact != null) {
-				BeanUtils.copyProperties(contact, savedContact, new String[]{"id"});
+			if (savedContact != null)
+			{
+				String[] ignoreProps = {"id"};
+				BeanUtils.copyProperties(contact, savedContact, ignoreProps);
 				contactDao.merge(savedContact);
 			}
 		}
-		else {
+		else
+		{
+			// The ID on the request parameter is null or empty string, which
+			// gets converted to 0 by the DynaValidator parser for Integer types.
+			// To persist a new record, it needs to be null.
+			contact.setId(null);
 			contactDao.persist(contact);
 		}
+
 	   return mapping.findForward("cForm");
 	}
 
