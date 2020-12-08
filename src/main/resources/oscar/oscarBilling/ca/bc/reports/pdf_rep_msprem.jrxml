@@ -312,144 +312,144 @@
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="20" splitType="Prevent">
+		<band height="8" splitType="Prevent">
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="46" y="0" width="42" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
-                <box>
+				<reportElement key="textField" mode="Transparent" x="46" y="0" width="42" height="8" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+<!--                <box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
-				</box>
+				</box>-->
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
                     <font size="10"/>
-					<paragraph lineSpacing="Single"/>
+					<paragraph lineSpacing="Proportional" lineSpacingSize="0.6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{t_s00type}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="dd-MMM-yy" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="138" y="0" width="49" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
+				<reportElement key="textField" mode="Transparent" x="138" y="0" width="49" height="8" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+<!--				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
-				</box>
+				</box>-->
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
                     <font size="10"/>
-					<paragraph lineSpacing="Single"/>
+                    <paragraph lineSpacing="Proportional" lineSpacingSize="0.6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new SimpleDateFormat("yyyyMMdd").parse($F{t_payment})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="dd-MMM-yy" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="83" y="0" width="54" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
+				<reportElement key="textField" mode="Transparent" x="83" y="0" width="54" height="8" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+<!--				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
-				</box>
+				</box>-->
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
                     <font size="10"/>
-					<paragraph lineSpacing="Single"/>
+                    <paragraph lineSpacing="Proportional" lineSpacingSize="0.6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{t_servicedate}.equals("")?null:new SimpleDateFormat("yyyyMMdd").parse($F{t_servicedate})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="494" y="0" width="41" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
+				<reportElement key="textField" mode="Transparent" x="494" y="0" width="41" height="8" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+<!--				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
-				</box>
+				</box>-->
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
                     <font size="10"/>
-					<paragraph lineSpacing="Single"/>
+                    <paragraph lineSpacing="Proportional" lineSpacingSize="0.6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{billing_code}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="231" y="0" width="118" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
+				<reportElement key="textField" mode="Transparent" x="231" y="0" width="118" height="8" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+<!--				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
-				</box>
+				</box>-->
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
                     <font size="10"/>
-					<paragraph lineSpacing="Single"/>
+                    <paragraph lineSpacing="Proportional" lineSpacingSize="0.6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{demographic_name} + " (" + $F{demographic_no} + ")"]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="187" y="0" width="43" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
+				<reportElement key="textField" mode="Transparent" x="187" y="0" width="43" height="8" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+<!--				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
-				</box>
+				</box>-->
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
                     <font size="10"/>
-                    <paragraph lineSpacing="Single"/>
+                    <paragraph lineSpacing="Proportional" lineSpacingSize="0.6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{t_datacenter}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="439" y="0" width="55" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
+				<reportElement key="textField" mode="Transparent" x="439" y="0" width="55" height="8" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+<!--				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
-				</box>
+				</box>-->
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
                     <font size="10"/>
-					<paragraph lineSpacing="Single"/>
+                    <paragraph lineSpacing="Proportional" lineSpacingSize="0.6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{t_dataseq}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="351" y="0" width="44" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
+				<reportElement key="textField" mode="Transparent" x="351" y="0" width="44" height="8" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+<!--				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
-				</box>
+				</box>-->
 				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None">
                     <font size="10"/>
-					<paragraph lineSpacing="Single"/>
+                    <paragraph lineSpacing="Proportional" lineSpacingSize="0.6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[NumberFormat.getCurrencyInstance().format(new Double(oscar.oscarBilling.ca.bc.MSP.MSPReconcile.convCurValue($F{t_paidamt})))]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement key="textField" mode="Transparent" x="395" y="0" width="44" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
+				<reportElement key="textField" mode="Transparent" x="395" y="0" width="44" height="8" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+<!--				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
-				</box>
+				</box>-->
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
                     <font size="10"/>
-                    <paragraph lineSpacing="Single"/>
+                    <paragraph lineSpacing="Proportional" lineSpacingSize="0.6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{t_exp1}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement key="textField-1" mode="Transparent" x="0" y="0" width="40" height="10" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
+				<reportElement key="textField-1" mode="Transparent" x="0" y="0" width="40" height="8" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+<!--				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
-				</box>
+				</box>-->
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
                     <font size="10"/>
-					<paragraph lineSpacing="Single"/>
+                    <paragraph lineSpacing="Proportional" lineSpacingSize="0.6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[String.valueOf($F{t_practitionerno})]]></textFieldExpression>
 

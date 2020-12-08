@@ -76,6 +76,7 @@ import org.oscarehr.demographicImport.transfer.CoPDRecordData;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.service.ConcernNoteService;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.encounterNote.service.FamilyHistoryNoteService;
 import org.oscarehr.encounterNote.service.MedicalHistoryNoteService;
@@ -168,6 +169,9 @@ public class CoPDImportService
 
 	@Autowired
 	ReminderNoteService reminderNoteService;
+
+	@Autowired
+	ConcernNoteService concernNoteService;
 
 	@Autowired
 	MedicalHistoryNoteService medicalHistoryNoteService;
@@ -573,6 +577,13 @@ public class CoPDImportService
 			{
 				this.dxresearchDAO.save(dx);
 			}
+		}
+		for(CaseManagementNote dxNote : dxMapper.getDxResearchNoteList())
+		{
+			dxNote.setProvider(provider);
+			dxNote.setSigningProvider(provider);
+			dxNote.setDemographic(demographic);
+			concernNoteService.saveConcernNote(dxNote);
 		}
 	}
 

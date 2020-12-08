@@ -211,13 +211,16 @@ public class TicklerWebService extends AbstractServiceImpl {
 		}
 
 		TicklerResponse result = new TicklerResponse();
-		List<Tickler> comparisonSearch = ticklerService.getSearchResponse(ticklerCriteriaSearch, page, count);
 
 		ticklerConverter.setIncludeLinks(includeLinks);
 		ticklerConverter.setIncludeComments(includeComments);
 		ticklerConverter.setIncludeUpdates(includeUpdates);
 		ticklerConverter.setIncludeProgram(includeProgram);
 
+		int ticklerCount = ticklerService.getTicklerCount(ticklerCriteriaSearch);
+		result.setTotal(ticklerCount);
+
+		List<Tickler> comparisonSearch = ticklerService.getSearchResponse(ticklerCriteriaSearch, page, count);
 		result.getContent().addAll(ticklerConverter.getAllAsTransferObjects(getLoggedInInfo(), comparisonSearch));
 		
 		return result;

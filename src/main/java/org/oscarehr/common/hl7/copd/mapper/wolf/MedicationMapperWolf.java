@@ -60,7 +60,7 @@ public class MedicationMapperWolf extends MedicationMapper
 		return drug;
 	}
 
-	/** ORC-9 else ORC-15, else ZRX-3 */
+	/** ORC-9 else ORC-15, else ZRX-2 */
 	@Override
 	protected Date getWrittenDate(int rep) throws HL7Exception
 	{
@@ -88,7 +88,7 @@ public class MedicationMapperWolf extends MedicationMapper
 		return startDate;
 	}
 
-	/** ZRX-3, else calculate? else start date */
+	/** ZRX-3, else calculate? else ORC-15, else start date */
 	@Override
 	protected Date getEndDate(int rep) throws HL7Exception
 	{
@@ -96,6 +96,10 @@ public class MedicationMapperWolf extends MedicationMapper
 		if(endDate == null)
 		{
 			endDate = getCalculatedEndDate(rep, getStartDate(rep));
+		}
+		if(endDate == null)
+		{
+			endDate = getCalculatedEndDateAlternate(rep, getStartDate(rep));
 		}
 		if(endDate == null)
 		{
