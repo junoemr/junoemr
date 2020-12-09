@@ -25,6 +25,8 @@ package org.oscarehr.demographicImport.model.appointment;
 import lombok.Data;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
+import static org.oscarehr.common.model.AppointmentStatus.APPOINTMENT_STATUS_NEW;
+
 @Data
 public class AppointmentStatus extends AbstractTransientModel
 {
@@ -33,4 +35,14 @@ public class AppointmentStatus extends AbstractTransientModel
 	private String description;
 	private Boolean active;
 	private Boolean editable;
+
+	public AppointmentStatus()
+	{
+		this(APPOINTMENT_STATUS_NEW);
+	}
+
+	public AppointmentStatus(String statusCode)
+	{
+		this.setStatusCode(statusCode);
+	}
 }

@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.service;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.log4j.Logger;
+import org.oscarehr.appointment.service.Appointment;
 import org.oscarehr.common.hl7.copd.writer.JunoGenericImportLabWriter;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
 import org.oscarehr.common.io.GenericFile;
@@ -101,6 +102,9 @@ public class ImportExportService
 	private LabService labService;
 
 	@Autowired
+	private Appointment appointmentService;
+
+	@Autowired
 	private ReviewerModelToDbConverter reviewerModelToDbConverter;
 
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.IMPORTER_TYPE importType,
@@ -157,6 +161,8 @@ public class ImportExportService
 
 		persistNotes(demographic, dbDemographic);
 		persistLabs(demographic, dbDemographic);
+
+		appointmentService.saveNewAppointments(demographic.getAppointmentList(), dbDemographic);
 
 	}
 

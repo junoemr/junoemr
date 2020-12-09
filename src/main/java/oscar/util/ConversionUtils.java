@@ -736,6 +736,15 @@ public class ConversionUtils {
 				xmlGregorianCalendar.getSecond());
 	}
 
+	public static LocalTime toLocalTime(XMLGregorianCalendar xmlGregorianCalendar)
+	{
+		// TODO raise custom non-nullable exception if null?
+		return LocalTime.of(
+				xmlGregorianCalendar.getHour(),
+				xmlGregorianCalendar.getMinute(),
+				xmlGregorianCalendar.getSecond());
+	}
+
 	public static LocalDateTime toNullableLocalDateTime(XMLGregorianCalendar xmlGregorianCalendar)
 	{
 		if(xmlGregorianCalendar == null) return null;

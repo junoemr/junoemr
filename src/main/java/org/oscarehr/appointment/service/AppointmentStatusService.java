@@ -24,12 +24,16 @@ package org.oscarehr.appointment.service;
 
 import org.oscarehr.appointment.dto.CalendarAppointmentStatus;
 import org.oscarehr.appointment.model.AppointmentStatusList;
+import org.oscarehr.demographicImport.converter.out.AppointmentStatusDbToModelConverter;
+import org.oscarehr.demographicImport.model.appointment.AppointmentStatus;
 import org.oscarehr.managers.AppointmentManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -37,6 +41,9 @@ public class AppointmentStatusService
 {
 	@Autowired
 	private AppointmentManager appointmentManager;
+
+	@Autowired
+	private AppointmentStatusDbToModelConverter appointmentStatusConverter;
 
 	/**
 	 * Gets a list of appointment statuses for use in the calendar.
@@ -48,4 +55,29 @@ public class AppointmentStatusService
 
 		return appointmentStatusList.getCalendarAppointmentStatusList();
 	}
+
+	/*
+	public Map<String, AppointmentStatus> getAppointmentStatusCodeModelMap()
+	{
+		List<org.oscarehr.common.model.AppointmentStatus> apptStatusList = appointmentManager.getAppointmentStatuses();
+
+		Map<String, AppointmentStatus> statusMap = new HashMap<>(apptStatusList.size());
+		for(org.oscarehr.common.model.AppointmentStatus dbStatus : apptStatusList)
+		{
+			statusMap.put(dbStatus.getStatus(), appointmentStatusConverter.convert(dbStatus));
+		}
+		return statusMap;
+	}
+	public Map<String, AppointmentStatus> getAppointmentStatusNameModelMap()
+	{
+		List<org.oscarehr.common.model.AppointmentStatus> apptStatusList = appointmentManager.getAppointmentStatuses();
+
+		Map<String, AppointmentStatus> statusMap = new HashMap<>(apptStatusList.size());
+		for(org.oscarehr.common.model.AppointmentStatus dbStatus : apptStatusList)
+		{
+			statusMap.put(dbStatus.getDescription(), appointmentStatusConverter.convert(dbStatus));
+		}
+		return statusMap;
+	}
+	*/
 }

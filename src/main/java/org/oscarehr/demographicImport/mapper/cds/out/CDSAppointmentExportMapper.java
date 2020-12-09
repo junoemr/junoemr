@@ -23,7 +23,6 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.Appointments;
-import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
 import org.oscarehr.demographicImport.model.appointment.AppointmentStatus;
 import org.oscarehr.demographicImport.model.provider.Provider;
@@ -31,7 +30,6 @@ import oscar.util.ConversionUtils;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class CDSAppointmentExportMapper extends AbstractCDSExportMapper<Appointments, Appointment>
@@ -46,12 +44,13 @@ public class CDSAppointmentExportMapper extends AbstractCDSExportMapper<Appointm
 	{
 		Appointments appointments = objectFactory.createAppointments();
 
-		appointments.setProvider(getExportProvider(exportStructure));
-		appointments.setAppointmentDate(getExportAppointmentDate(exportStructure));
 		appointments.setAppointmentTime(getExportAppointmentTime(exportStructure));
 		appointments.setDuration(BigInteger.valueOf(exportStructure.getDurationMin()));
 		appointments.setAppointmentStatus(getExportStatus(exportStructure));
+		appointments.setAppointmentDate(toNullableDateFullOrPartial(exportStructure.getAppointmentStartDateTime().toLocalDate()));
+		appointments.setProvider(getExportProvider(exportStructure));
 		appointments.setAppointmentPurpose(exportStructure.getReason());
+		appointments.setAppointmentNotes(exportStructure.getNotes());
 
 		return appointments;
 	}
@@ -67,15 +66,6 @@ public class CDSAppointmentExportMapper extends AbstractCDSExportMapper<Appointm
 			primaryPhysician.setOHIPPhysicianId(provider.getOhipNumber());
 		}
 		return primaryPhysician;
-	}
-
-	protected DateFullOrPartial getExportAppointmentDate(Appointment exportStructure)
-	{
-		DateFullOrPartial fullOrPartial = objectFactory.createDateFullOrPartial();
-		LocalDate appointmentDate = exportStructure.getAppointmentStartDateTime().toLocalDate();
-		fullOrPartial.setFullDate(ConversionUtils.toXmlGregorianCalendar(appointmentDate));
-
-		return fullOrPartial;
 	}
 
 	protected XMLGregorianCalendar getExportAppointmentTime(Appointment exportStructure)

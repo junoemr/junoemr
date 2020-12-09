@@ -24,7 +24,19 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.Appointments;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
+import org.oscarehr.demographicImport.model.appointment.AppointmentStatus;
 import org.oscarehr.demographicImport.model.provider.Provider;
+import oscar.util.ConversionUtils;
+
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+
+import static org.oscarehr.common.model.Appointment.DEFAULT_APPOINTMENT_DURATION_MIN;
+import static org.oscarehr.common.model.AppointmentStatus.APPOINTMENT_STATUS_BILLED;
+import static org.oscarehr.common.model.AppointmentStatus.APPOINTMENT_STATUS_NEW;
 
 public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointments, Appointment>
 {
@@ -38,18 +50,53 @@ public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointm
 	{
 		Appointment appointment = new Appointment();
 
+		LocalDateTime appointmentDateTime = getAppointmentStartDateTime(importStructure);
+		appointment.setAppointmentStartDateTime(appointmentDateTime);
+		appointment.setAppointmentEndDateTime(getCalculatedEndDateTime(appointmentDateTime, importStructure.getDuration()));
+		appointment.setStatus(getStatus(importStructure.getAppointmentStatus(), appointmentDateTime));
 		appointment.setProvider(getImportProvider(importStructure));
 		appointment.setReason(importStructure.getAppointmentPurpose());
+		appointment.setNotes(importStructure.getAppointmentNotes());
 
 		return appointment;
 	}
 
+	protected LocalDateTime getAppointmentStartDateTime(Appointments importStructure)
+	{
+		LocalDate appointmentDate = toNullableLocalDate(importStructure.getAppointmentDate());
+		LocalTime appointmentTime = ConversionUtils.toLocalTime(importStructure.getAppointmentTime());
+		return LocalDateTime.of(appointmentDate, appointmentTime);
+	}
+
+	protected LocalDateTime getCalculatedEndDateTime(LocalDateTime appointmentDateTime, BigInteger duration)
+	{
+		if(duration == null)
+		{
+			duration = BigInteger.valueOf(DEFAULT_APPOINTMENT_DURATION_MIN);
+		}
+		return appointmentDateTime.plus(duration.longValue(), ChronoUnit.MINUTES);
+	}
+
 	protected Provider getImportProvider(Appointments importStructure)
 	{
-		Provider provider = new Provider();
-		provider.setFirstName(importStructure.getProvider().getName().getFirstName());
-		provider.setLastName(importStructure.getProvider().getName().getLastName());
-		provider.setOhipNumber(importStructure.getProvider().getOHIPPhysicianId());
+		Provider provider = null;
+		Appointments.Provider importProvider = importStructure.getProvider();
+		if(importProvider != null)
+		{
+			provider = toProvider(importProvider.getName());
+			provider.setOhipNumber(importProvider.getOHIPPhysicianId());
+		}
 		return provider;
+	}
+
+	protected AppointmentStatus getStatus(String importStatus, LocalDateTime appointmentDateTime)
+	{
+		// by default future appointments are NEW, and past are BILLED (complete)
+		String statusCode = (appointmentDateTime.isAfter(LocalDateTime.now())) ? APPOINTMENT_STATUS_NEW : APPOINTMENT_STATUS_BILLED;
+		if(importStatus != null)
+		{
+			//TODO map status codes?
+		}
+		return new AppointmentStatus(statusCode);
 	}
 }

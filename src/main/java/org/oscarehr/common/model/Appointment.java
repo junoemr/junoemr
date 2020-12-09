@@ -59,7 +59,9 @@ import java.util.Optional;
 @Entity
 @EntityListeners(BeanValidationEventListener.class)
 @Table(name = "appointment")
-public class Appointment extends AbstractModel<Integer> implements Serializable {
+public class Appointment extends AbstractModel<Integer> implements Serializable
+{
+	public static final int DEFAULT_APPOINTMENT_DURATION_MIN = 15;
 
 	public static final String TODO = "t";
 	public static final String CANCELLED = "C";
