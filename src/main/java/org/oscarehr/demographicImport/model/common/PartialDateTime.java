@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.model.common;
 
 import lombok.Data;
+import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -83,6 +84,18 @@ public class PartialDateTime extends PartialDate
 		LocalDate localDate = super.toLocalDate();
 		LocalTime localTime = (this.localTime != null) ? this.localTime : LocalTime.MIN;
 		return LocalDateTime.of(localDate, localTime);
+	}
+
+	@Override
+	public String toISOString()
+	{
+		String datePart = super.toISOString();
+
+		if(this.localTime != null)
+		{
+			return datePart + "T" + ConversionUtils.toTimeString(this.localTime);
+		}
+		return datePart;
 	}
 
 	public static PartialDateTime from(LocalDateTime localDateTime)

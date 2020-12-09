@@ -74,11 +74,11 @@ public class CDSPersonalHistoryImportMapper extends AbstractCDSImportMapper<Pers
 					}
 					case RESIDUAL_INFO_DATA_NAME_START_DATE:
 					{
-						note.setStartDate(PartialDate.from(ConversionUtils.toLocalDate(content))); break;
+						note.setStartDate(PartialDate.parseDate(content)); break;
 					}
 					case RESIDUAL_INFO_DATA_NAME_RESOLVE_DATE:
 					{
-						note.setResolutionDate(PartialDate.from(ConversionUtils.toLocalDate(content))); break;
+						note.setResolutionDate(PartialDate.parseDate(content)); break;
 					}
 					case RESIDUAL_INFO_DATA_NAME_ANNOTATION:
 					{

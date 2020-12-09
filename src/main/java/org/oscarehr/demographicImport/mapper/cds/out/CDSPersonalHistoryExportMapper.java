@@ -62,14 +62,12 @@ public class CDSPersonalHistoryExportMapper extends AbstractCDSNoteExportMapper<
 				ConversionUtils.toDateTimeString(exportStructure.getObservationDate()));
 		addNonNullDataElements(
 				residualInformation,
-				RESIDUAL_INFO_DATA_TYPE.DATE,
 				RESIDUAL_INFO_DATA_NAME_START_DATE,
-				ConversionUtils.toDateString(exportStructure.getStartDate()));
+				exportStructure.getStartDate());
 		addNonNullDataElements(
 				residualInformation,
-				RESIDUAL_INFO_DATA_TYPE.DATE,
 				RESIDUAL_INFO_DATA_NAME_RESOLVE_DATE,
-				ConversionUtils.toDateString(exportStructure.getResolutionDate()));
+				exportStructure.getResolutionDate());
 		addNonNullDataElements(
 				residualInformation,
 				RESIDUAL_INFO_DATA_TYPE.TEXT,

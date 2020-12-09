@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
+import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.service.ExportPreferences;
 
 import java.math.BigInteger;
@@ -53,6 +54,22 @@ public abstract class AbstractCDSNoteExportMapper<I, E> extends AbstractCDSExpor
 		if(value != null && !value.isEmpty())
 		{
 			residualInformation.getDataElement().add(createResidualInfoDataElement(dataType, name, value));
+		}
+	}
+	protected void addNonNullDataElements(ResidualInformation residualInformation, String name, PartialDate partialDate)
+	{
+		if(partialDate != null)
+		{
+			CDSConstants.RESIDUAL_INFO_DATA_TYPE dataType;
+			if(partialDate.isFullDate())
+			{
+				dataType = CDSConstants.RESIDUAL_INFO_DATA_TYPE.DATE;
+			}
+			else
+			{
+				dataType = CDSConstants.RESIDUAL_INFO_DATA_TYPE.DATE_PARTIAL;
+			}
+			addNonNullDataElements(residualInformation, dataType, name, partialDate.toISOString());
 		}
 	}
 }

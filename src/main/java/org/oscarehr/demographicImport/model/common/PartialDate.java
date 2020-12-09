@@ -94,6 +94,23 @@ public class PartialDate extends AbstractTransientModel
 		return LocalDate.of(this.year.getValue(), month, day);
 	}
 
+	public String toISOString()
+	{
+		if(this.isFullDate())
+		{
+			return this.year.getValue() + "-" + this.month.getValue() + "-" + this.getDay();
+		}
+		if(this.isYearMonth())
+		{
+			return this.year.getValue() + "-" + this.month.getValue();
+		}
+		if(this.isFullDate())
+		{
+			return String.valueOf(this.year.getValue());
+		}
+		return null;
+	}
+
 	public static PartialDate from(LocalDate localDate)
 	{
 		return from(localDate, null);
@@ -117,5 +134,31 @@ public class PartialDate extends AbstractTransientModel
 			}
 		}
 		return partial;
+	}
+
+	public static PartialDate parseDate(String isoDateString)
+	{
+		PartialDate partialDate = null;
+		if(isoDateString != null)
+		{
+			String[] parts = isoDateString.split("-");
+			if(parts.length == 3)
+			{
+				partialDate = new PartialDate(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+			}
+			else if(parts.length == 2)
+			{
+				partialDate = new PartialDate(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+			}
+			else if(parts.length == 1)
+			{
+				partialDate = new PartialDate(Integer.parseInt(parts[0]));
+			}
+			else
+			{
+				throw new IllegalArgumentException(isoDateString + "is not a valid date/partial date format");
+			}
+		}
+		return partialDate;
 	}
 }

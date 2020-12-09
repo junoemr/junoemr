@@ -39,6 +39,7 @@ public class CDSConstants
 		DATE,
 		TIME,
 		DATETIME,
+		DATE_PARTIAL,
 	}
 
 	public enum LAB_ABNORMAL_FLAG
