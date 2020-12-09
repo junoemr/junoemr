@@ -56,7 +56,6 @@ public class AppointmentStatusService
 		return appointmentStatusList.getCalendarAppointmentStatusList();
 	}
 
-	/*
 	public Map<String, AppointmentStatus> getAppointmentStatusCodeModelMap()
 	{
 		List<org.oscarehr.common.model.AppointmentStatus> apptStatusList = appointmentManager.getAppointmentStatuses();
@@ -79,5 +78,4 @@ public class AppointmentStatusService
 		}
 		return statusMap;
 	}
-	*/
 }

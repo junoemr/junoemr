@@ -26,6 +26,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.Appointments;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
 import org.oscarehr.demographicImport.model.appointment.AppointmentStatus;
 import org.oscarehr.demographicImport.model.provider.Provider;
+import org.oscarehr.demographicImport.service.AppointmentStatusCache;
 import oscar.util.ConversionUtils;
 
 import java.math.BigInteger;
@@ -92,11 +93,19 @@ public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointm
 	protected AppointmentStatus getStatus(String importStatus, LocalDateTime appointmentDateTime)
 	{
 		// by default future appointments are NEW, and past are BILLED (complete)
-		String statusCode = (appointmentDateTime.isAfter(LocalDateTime.now())) ? APPOINTMENT_STATUS_NEW : APPOINTMENT_STATUS_BILLED;
+		String defaultStatusCode = (appointmentDateTime.isAfter(LocalDateTime.now())) ? APPOINTMENT_STATUS_NEW : APPOINTMENT_STATUS_BILLED;
+
+		AppointmentStatus appointmentStatus = null;
 		if(importStatus != null)
 		{
-			//TODO map status codes?
+			appointmentStatus = AppointmentStatusCache.findByName(importStatus);
 		}
-		return new AppointmentStatus(statusCode);
+
+		// if we couldn't match it, use the default
+		if(appointmentStatus == null)
+		{
+			appointmentStatus = AppointmentStatusCache.findByCode(defaultStatusCode);
+		}
+		return appointmentStatus;
 	}
 }

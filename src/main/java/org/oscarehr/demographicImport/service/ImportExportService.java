@@ -121,6 +121,7 @@ public class ImportExportService
 		}
 		fileList.addAll(exporter.getAdditionalFiles(preferences));
 		BaseDbToModelConverter.clearProviderCache();
+		AppointmentStatusCache.clearAll();
 
 		return fileList;
 	}
@@ -163,6 +164,7 @@ public class ImportExportService
 		persistLabs(demographic, dbDemographic);
 
 		appointmentService.saveNewAppointments(demographic.getAppointmentList(), dbDemographic);
+		AppointmentStatusCache.clearAll();
 
 	}
 

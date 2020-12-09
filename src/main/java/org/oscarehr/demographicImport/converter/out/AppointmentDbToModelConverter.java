@@ -22,11 +22,9 @@
  */
 package org.oscarehr.demographicImport.converter.out;
 
-import org.oscarehr.appointment.dao.AppointmentStatusDao;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.AppointmentStatus;
+import org.oscarehr.demographicImport.service.AppointmentStatusCache;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -34,12 +32,6 @@ import oscar.util.ConversionUtils;
 public class AppointmentDbToModelConverter extends
 		BaseDbToModelConverter<Appointment, org.oscarehr.demographicImport.model.appointment.Appointment>
 {
-	@Autowired
-	private AppointmentStatusDao appointmentStatusDao;
-
-	@Autowired
-	private AppointmentStatusDbToModelConverter appointmentStatusConverter;
-
 	@Override
 	public org.oscarehr.demographicImport.model.appointment.Appointment convert(Appointment input)
 	{
@@ -63,8 +55,7 @@ public class AppointmentDbToModelConverter extends
 		appointment.setAppointmentStartDateTime(ConversionUtils.toLocalDateTime(input.getStartTimeAsFullDate()));
 		appointment.setAppointmentEndDateTime(ConversionUtils.toLocalDateTime(input.getEndTimeAsFullDate()));
 		appointment.setProvider(findProvider(input.getProviderNo()));
-		AppointmentStatus status = appointmentStatusDao.findByStatus(input.getStatus());
-		appointment.setStatus(appointmentStatusConverter.convert(status));
+		appointment.setStatus(AppointmentStatusCache.findByCode(input.getAppointmentStatus()));
 
 		return appointment;
 	}
