@@ -59,6 +59,10 @@ public class FamilyHistoryNoteService extends HistoryNoteService
 			{
 				saveExtPartialDate(noteModel.getStartDate(), ext.getId());
 			}
+			if(CaseManagementNoteExt.RESOLUTIONDATE.equals(ext.getKey()))
+			{
+				saveExtPartialDate(noteModel.getResolutionDate(), ext.getId());
+			}
 		}
 
 		return savedNote;

@@ -38,21 +38,12 @@ public class SocialHistoryNoteModelToDbConverter extends BaseNoteModelToDbConver
 	{
 		if(input.getStartDate() != null)
 		{
-			CaseManagementNoteExt ext = new CaseManagementNoteExt();
-			ext.setKey(CaseManagementNoteExt.STARTDATE);
-			ext.setDateValue(ConversionUtils.toLegacyDate(input.getStartDate()));
-			ext.setNote(dbNote);
-			dbNote.addExtension(ext);
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.STARTDATE, ConversionUtils.toLegacyDate(input.getStartDate().toLocalDate())));
 		}
 		if(input.getResolutionDate() != null)
 		{
-			CaseManagementNoteExt ext = new CaseManagementNoteExt();
-			ext.setKey(CaseManagementNoteExt.RESOLUTIONDATE);
-			ext.setDateValue(ConversionUtils.toLegacyDate(input.getResolutionDate()));
-			ext.setNote(dbNote);
-			dbNote.addExtension(ext);
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.RESOLUTIONDATE, ConversionUtils.toLegacyDate(input.getResolutionDate().toLocalDate())));
 		}
-
 
 		return dbNote;
 	}

@@ -55,7 +55,7 @@ public class FamilyHistoryNoteDbToModelConverter extends
 			}
 			if(ext.getKey().equals(RESOLUTIONDATE))
 			{
-				exportNote.setResolutionDate(ConversionUtils.toNullableLocalDate(ext.getDateValue()));
+				exportNote.setResolutionDate(PartialDate.from(ConversionUtils.toNullableLocalDate(ext.getDateValue()), getExtPartialDate(ext.getId())));
 			}
 			if(ext.getKey().equals(AGEATONSET))
 			{

@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonalHistory;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
+import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import oscar.util.ConversionUtils;
@@ -73,11 +74,11 @@ public class CDSPersonalHistoryImportMapper extends AbstractCDSImportMapper<Pers
 					}
 					case RESIDUAL_INFO_DATA_NAME_START_DATE:
 					{
-						note.setStartDate(ConversionUtils.toLocalDate(content)); break;
+						note.setStartDate(PartialDate.from(ConversionUtils.toLocalDate(content))); break;
 					}
 					case RESIDUAL_INFO_DATA_NAME_RESOLVE_DATE:
 					{
-						note.setResolutionDate(ConversionUtils.toLocalDate(content)); break;
+						note.setResolutionDate(PartialDate.from(ConversionUtils.toLocalDate(content))); break;
 					}
 					case RESIDUAL_INFO_DATA_NAME_ANNOTATION:
 					{

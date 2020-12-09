@@ -24,6 +24,7 @@
 package oscar.util;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.util.MiscUtils;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -313,6 +314,11 @@ public class ConversionUtils {
 	public static String toDateString(LocalDate date)
 	{
 		return toDateString(date, DEFAULT_DATE_PATTERN);
+	}
+
+	public static String toDateString(PartialDate date)
+	{
+		return toDateString((date != null) ? date.toLocalDate() : null);
 	}
 
 	public static String toDateTimeString(LocalDateTime date)

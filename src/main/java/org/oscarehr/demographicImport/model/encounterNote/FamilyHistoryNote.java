@@ -25,13 +25,11 @@ package org.oscarehr.demographicImport.model.encounterNote;
 import lombok.Data;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 
-import java.time.LocalDate;
-
 @Data
 public class FamilyHistoryNote extends BaseNote
 {
 	private PartialDate startDate;
-	private LocalDate resolutionDate;
+	private PartialDate resolutionDate;
 	private Long ageAtOnset;
 	private String treatment;
 	private String relationship;

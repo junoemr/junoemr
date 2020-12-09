@@ -42,7 +42,7 @@ public class FamilyHistoryNoteModelToDbConverter extends BaseNoteModelToDbConver
 		}
 		if(input.getResolutionDate() != null)
 		{
-			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.RESOLUTIONDATE, ConversionUtils.toLegacyDate(input.getResolutionDate())));
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.RESOLUTIONDATE, ConversionUtils.toLegacyDate(input.getResolutionDate().toLocalDate())));
 		}
 		if(input.getAgeAtOnset() != null)
 		{
