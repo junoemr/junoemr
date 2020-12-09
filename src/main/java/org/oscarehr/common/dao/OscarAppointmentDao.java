@@ -26,16 +26,8 @@ package org.oscarehr.common.dao;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
@@ -1119,4 +1111,44 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 
     	return query.getResultList();
     }
+
+	/**
+	 * Given a demographic, find their most recent appointment before time of query.
+	 * @param demographicNo the demographic to get an appointment for
+	 * @return the most recent appointment, or null if they've never had an appointment
+	 */
+	public Appointment findLastAppointment(int demographicNo)
+	{
+		String sql = "SELECT a FROM Appointment a " +
+				"WHERE ADDTIME(a.appointmentDate, a.startTime) < NOW() " +
+				"AND a.demographicNo=:demographicNo " +
+				"ORDER BY a.appointmentDate DESC";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("demographicNo", demographicNo);
+
+		return getSingleResultOrNull(query);
+
+	}
+
+	/**
+	 * Given a demographic, find the number of appointments that occurred within past year.
+	 * @param demographicNo demographic to find appointment count for
+	 * @return number of appointments that have occurred within last year
+	 */
+	public Integer findAppointmentsWithinLastYear(int demographicNo)
+	{
+		String sql = "SELECT a FROM Appointment a " +
+				"WHERE a.demographicNo=:demographicNo " +
+				"AND a.appointmentDate BETWEEN :startDate AND CURDATE()";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("demographicNo", demographicNo);
+		// JPA itself doesn't allow for DATE_SUB, otherwise we could do DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+		Calendar lastYear = Calendar.getInstance();
+		lastYear.add(Calendar.YEAR, -1);
+		Date previousYear = lastYear.getTime();
+		query.setParameter("startDate", previousYear);
+
+		List<Appointment> appointments = query.getResultList();
+		return appointments.size();
+	}
 }
