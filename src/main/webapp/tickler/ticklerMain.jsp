@@ -767,6 +767,10 @@
 .mbttn {background: #D7DBF2;border-bottom: 1px solid #104A7B;border-right: 1px solid #104A7B;border-left: 1px solid #AFC4D5;border-top:1px solid #AFC4D5;color:#000066;height:19px;text-decoration:none;cursor: hand}
 
 	-->
+
+	.pipe-separator {
+		padding: 0 4px;
+	}
 		</style>
 	</head>
 
@@ -1293,9 +1297,17 @@
 				<%
 					}
 				%>
-				<TD width="12%" ROWSPAN="1" class="<%=cellColour%>"><a href=#
-																	   onClick="popupPage(600,800,'../demographic/demographiccontrol.jsp?demographic_no=<%=demo.getDemographicNo()%>&displaymode=edit&dboperation=search_detail')"><%=demo.getDisplayName()%>
-				</a></TD>
+				<TD width="12%" ROWSPAN="1" class="<%=cellColour%>">
+					<a href=# onClick="popupPage(600,800,'../demographic/demographiccontrol.jsp?demographic_no=<%=demo.getDemographicNo()%>&displaymode=edit&dboperation=search_detail')">
+						<%=demo.getDisplayName()%>
+					</a>
+					<span class="pipe-separator">|</span>
+					<a title="<bean:message key="demographic.demographiceditdemographic.btnEChart"/>"
+					   href=# onClick="popupPage(710, 1024,'<c:out
+							value="${ctx}"/>/oscarEncounter/IncomingEncounter.do?providerNo=<%=user_no%>&demographicNo=<%=demo.getDemographicNo()%>')">
+						E
+					</a>
+				</TD>
 				<TD ROWSPAN="1"
 					class="<%=cellColour%>"><%=tickler.getProvider() == null ? "N/A" : tickler.getProvider().getFormattedName()%>
 				</TD>
