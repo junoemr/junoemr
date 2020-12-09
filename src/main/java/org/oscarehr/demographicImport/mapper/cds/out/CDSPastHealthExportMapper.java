@@ -36,14 +36,16 @@ public class CDSPastHealthExportMapper extends AbstractCDSNoteExportMapper<PastH
 	public PastHealth exportFromJuno(MedicalHistoryNote exportStructure)
 	{
 		PastHealth pastHealth = objectFactory.createPastHealth();
-		pastHealth.setNotes(exportStructure.getNoteText());
 
-		pastHealth.setProcedureDate(toNullableDateFullOrPartial(exportStructure.getProcedureDate()));
-		pastHealth.setResolvedDate(toNullableDateFullOrPartial(exportStructure.getResolutionDate()));
-
+		pastHealth.setPastHealthProblemDescriptionOrProcedures(exportStructure.getNoteText());
+		pastHealth.setDiagnosisProcedureCode(null);//TODO
 		// use start date field if we can, otherwise use the observation date
-		pastHealth.setOnsetOrEventDate(
-				toNullableDateFullOrPartial(exportStructure.getStartDate(), exportStructure.getObservationDate().toLocalDate()));
+		pastHealth.setOnsetOrEventDate(toNullableDateFullOrPartial(exportStructure.getStartDate(), exportStructure.getObservationDate().toLocalDate()));
+		pastHealth.setLifeStage(getLifeStage(exportStructure.getLifeStage()));
+		pastHealth.setResolvedDate(toNullableDateFullOrPartial(exportStructure.getResolutionDate()));
+		pastHealth.setProcedureDate(toNullableDateFullOrPartial(exportStructure.getProcedureDate()));
+		pastHealth.setNotes(exportStructure.getAnnotation());
+		pastHealth.setProblemStatus(exportStructure.getTreatment());
 
 		return pastHealth;
 	}

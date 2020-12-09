@@ -38,35 +38,23 @@ public class MedicalHistoryNoteModelToDbConverter extends BaseNoteModelToDbConve
 	{
 		if(input.getStartDate() != null)
 		{
-			CaseManagementNoteExt ext = new CaseManagementNoteExt();
-			ext.setKey(CaseManagementNoteExt.STARTDATE);
-			ext.setDateValue(ConversionUtils.toLegacyDate(input.getStartDate().toLocalDate()));
-			ext.setNote(dbNote);
-			dbNote.addExtension(ext);
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.STARTDATE, ConversionUtils.toLegacyDate(input.getStartDate().toLocalDate())));
 		}
 		if(input.getResolutionDate() != null)
 		{
-			CaseManagementNoteExt ext = new CaseManagementNoteExt();
-			ext.setKey(CaseManagementNoteExt.RESOLUTIONDATE);
-			ext.setDateValue(ConversionUtils.toLegacyDate(input.getResolutionDate().toLocalDate()));
-			ext.setNote(dbNote);
-			dbNote.addExtension(ext);
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.RESOLUTIONDATE, ConversionUtils.toLegacyDate(input.getResolutionDate().toLocalDate())));
 		}
 		if(input.getProcedureDate() != null)
 		{
-			CaseManagementNoteExt ext = new CaseManagementNoteExt();
-			ext.setKey(CaseManagementNoteExt.PROCEDUREDATE);
-			ext.setDateValue(ConversionUtils.toLegacyDate(input.getProcedureDate().toLocalDate()));
-			ext.setNote(dbNote);
-			dbNote.addExtension(ext);
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.PROCEDUREDATE, ConversionUtils.toLegacyDate(input.getProcedureDate().toLocalDate())));
 		}
 		if(input.getTreatment() != null)
 		{
-			CaseManagementNoteExt ext = new CaseManagementNoteExt();
-			ext.setKey(CaseManagementNoteExt.TREATMENT);
-			ext.setValue(String.valueOf(input.getTreatment()));
-			ext.setNote(dbNote);
-			dbNote.addExtension(ext);
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.TREATMENT, input.getTreatment()));
+		}
+		if(input.getLifeStage() != null)
+		{
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.LIFESTAGE, input.getLifeStage()));
 		}
 
 		return dbNote;

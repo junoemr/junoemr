@@ -41,7 +41,7 @@ public class CDSProblemExportMapper extends AbstractCDSNoteExportMapper<ProblemL
 		problemList.setDiagnosisCode(null); //TODO
 		problemList.setProblemDescription(exportStructure.getProblemDescription());
 		problemList.setProblemStatus(exportStructure.getProblemStatus());
-		problemList.setOnsetDate(toNullableDateFullOrPartial(exportStructure.getStartDate()));
+		problemList.setOnsetDate(toNullableDateFullOrPartial(exportStructure.getStartDate(), exportStructure.getObservationDate().toLocalDate()));
 		problemList.setLifeStage(getLifeStage(exportStructure.getLifeStage()));
 		problemList.setResolutionDate(toNullableDateFullOrPartial(exportStructure.getResolutionDate()));
 		problemList.setNotes(exportStructure.getAnnotation());

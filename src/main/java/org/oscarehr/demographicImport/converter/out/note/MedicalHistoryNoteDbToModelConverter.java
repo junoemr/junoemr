@@ -28,6 +28,7 @@ import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.LIFESTAGE;
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.PROCEDUREDATE;
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.RESOLUTIONDATE;
 import static org.oscarehr.encounterNote.model.CaseManagementNoteExt.STARTDATE;
@@ -62,6 +63,10 @@ public class MedicalHistoryNoteDbToModelConverter extends
 			if(ext.getKey().equals(TREATMENT))
 			{
 				exportNote.setTreatment(ext.getValue());
+			}
+			if(ext.getKey().equals(LIFESTAGE))
+			{
+				exportNote.setLifeStage(ext.getValue());
 			}
 		}
 

@@ -32,6 +32,7 @@ public class MedicalHistoryNote extends BaseNote
 	private PartialDate resolutionDate;
 	private PartialDate procedureDate;
 	private String treatment;
+	private String lifeStage;
 	private String annotation;
 
 	public MedicalHistoryNote()

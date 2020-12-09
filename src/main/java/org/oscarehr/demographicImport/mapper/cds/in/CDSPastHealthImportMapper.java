@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.PastHealth;
+import org.oscarehr.common.xml.cds.v5_0.model.StandardCoding;
 import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
 
 public class CDSPastHealthImportMapper extends AbstractCDSImportMapper<PastHealth, MedicalHistoryNote>
@@ -36,14 +37,43 @@ public class CDSPastHealthImportMapper extends AbstractCDSImportMapper<PastHealt
 	public MedicalHistoryNote importToJuno(PastHealth importStructure)
 	{
 		MedicalHistoryNote note = new MedicalHistoryNote();
-		note.setNoteText(importStructure.getNotes());
 
-		note.setObservationDate(toNullableLocalDateTime(importStructure.getOnsetOrEventDate()));
+		note.setNoteText(getNoteText(importStructure));
 		note.setStartDate(toNullablePartialDate(importStructure.getOnsetOrEventDate()));
+		note.setLifeStage(getLifeStage(importStructure.getLifeStage()));
 		note.setResolutionDate(toNullablePartialDate(importStructure.getResolvedDate()));
 		note.setProcedureDate(toNullablePartialDate(importStructure.getProcedureDate()));
-		note.setTreatment(importStructure.getPastHealthProblemDescriptionOrProcedures());
+		note.setAnnotation(importStructure.getNotes());
+		note.setTreatment(importStructure.getProblemStatus());
 
 		return note;
+	}
+
+	protected String getNoteText(PastHealth importStructure)
+	{
+		String noteText;
+		String description = importStructure.getPastHealthProblemDescriptionOrProcedures();
+		StandardCoding diagnosisCode = importStructure.getDiagnosisProcedureCode();
+		if(diagnosisCode != null)
+		{
+			String codeDescription = diagnosisCode.getStandardCodeDescription();
+			noteText = "Diagnosis Code [" + diagnosisCode.getStandardCodingSystem() + "]: " + diagnosisCode.getStandardCode()
+					+ "\n" + codeDescription;
+
+			// sometimes the two descriptions will be the same, according to spec. in that case no need to duplicate it
+			if(description != null && !description.equals(codeDescription))
+			{
+				noteText += "\n" + description;
+			}
+		}
+		else if(description != null)
+		{
+			noteText = description;
+		}
+		else
+		{
+			noteText = "Import: No description available";
+		}
+		return  noteText;
 	}
 }
