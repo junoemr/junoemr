@@ -100,11 +100,11 @@ public class PartialDate extends AbstractTransientModel
 		{
 			return this.year.getValue() + "-" + this.month.getValue() + "-" + this.getDay();
 		}
-		if(this.isYearMonth())
+		else if(this.isYearMonth())
 		{
 			return this.year.getValue() + "-" + this.month.getValue();
 		}
-		if(this.isFullDate())
+		else if(this.isYearOnly())
 		{
 			return String.valueOf(this.year.getValue());
 		}
