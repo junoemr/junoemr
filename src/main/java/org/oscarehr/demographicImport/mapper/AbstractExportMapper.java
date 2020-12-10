@@ -23,11 +23,13 @@
 package org.oscarehr.demographicImport.mapper;
 
 import org.oscarehr.demographicImport.service.ExportPreferences;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public abstract class AbstractExportMapper<I, E>
 {
 	protected final ExportPreferences exportPreferences;

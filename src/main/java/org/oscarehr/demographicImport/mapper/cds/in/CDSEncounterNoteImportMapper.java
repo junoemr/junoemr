@@ -28,7 +28,9 @@ import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSEncounterNoteImportMapper extends AbstractCDSImportMapper<ClinicalNotes, EncounterNote>
 {
 	private static final Logger logger = Logger.getLogger(CDSEncounterNoteImportMapper.class);

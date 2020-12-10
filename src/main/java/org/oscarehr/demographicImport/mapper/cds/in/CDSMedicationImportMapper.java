@@ -25,7 +25,9 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 import org.oscarehr.common.xml.cds.v5_0.model.MedicationsAndTreatments;
 import org.oscarehr.demographicImport.model.medication.CustomMedication;
 import org.oscarehr.demographicImport.model.medication.Medication;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSMedicationImportMapper extends AbstractCDSImportMapper<MedicationsAndTreatments, Medication>
 {
 	public CDSMedicationImportMapper()

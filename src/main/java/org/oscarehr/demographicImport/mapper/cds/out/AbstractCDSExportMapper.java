@@ -35,12 +35,14 @@ import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.service.ExportPreferences;
+import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Component
 public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper<I, E>
 {
 	protected final ObjectFactory objectFactory;

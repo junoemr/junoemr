@@ -31,6 +31,7 @@ import org.oscarehr.demographicImport.mapper.AbstractImportMapper;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.provider.Provider;
+import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -38,6 +39,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Component
 public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper<I, E>
 {
 	public AbstractCDSImportMapper()

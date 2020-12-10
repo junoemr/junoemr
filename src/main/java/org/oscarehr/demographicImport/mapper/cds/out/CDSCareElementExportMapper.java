@@ -32,8 +32,10 @@ import org.oscarehr.demographicImport.model.measurement.HeightMeasurement;
 import org.oscarehr.demographicImport.model.measurement.Measurement;
 import org.oscarehr.demographicImport.model.measurement.WaistCircumferenceMeasurement;
 import org.oscarehr.demographicImport.model.measurement.WeightMeasurement;
+import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+@Component
 public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElements, Measurement>
 {
 	public CDSCareElementExportMapper()

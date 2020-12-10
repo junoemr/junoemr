@@ -25,7 +25,9 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 import org.oscarehr.common.xml.cds.v5_0.model.FamilyHistory;
 import org.oscarehr.common.xml.cds.v5_0.model.StandardCoding;
 import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSFamilyHistoryExportMapper extends AbstractCDSNoteExportMapper<FamilyHistory, FamilyHistoryNote>
 {
 	public CDSFamilyHistoryExportMapper()

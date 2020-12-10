@@ -50,11 +50,13 @@ import org.oscarehr.demographicImport.model.measurement.SmokingPacksMeasurement;
 import org.oscarehr.demographicImport.model.measurement.SmokingStatusMeasurement;
 import org.oscarehr.demographicImport.model.measurement.WaistCircumferenceMeasurement;
 import org.oscarehr.demographicImport.model.measurement.WeightMeasurement;
+import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElements, List<Measurement>>
 {
 	public CDSCareElementImportMapper()

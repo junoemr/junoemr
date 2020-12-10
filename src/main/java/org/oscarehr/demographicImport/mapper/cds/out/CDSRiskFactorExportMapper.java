@@ -24,7 +24,9 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.RiskFactors;
 import org.oscarehr.demographicImport.model.encounterNote.RiskFactorNote;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSRiskFactorExportMapper extends AbstractCDSNoteExportMapper<RiskFactors, RiskFactorNote>
 {
 	public CDSRiskFactorExportMapper()

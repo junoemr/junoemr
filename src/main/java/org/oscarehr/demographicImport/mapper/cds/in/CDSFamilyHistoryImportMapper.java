@@ -26,7 +26,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.FamilyHistory;
 import org.oscarehr.demographicImport.model.encounterNote.FamilyHistoryNote;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSFamilyHistoryImportMapper extends AbstractCDSImportMapper<FamilyHistory, FamilyHistoryNote>
 {
 	private static final Logger logger = Logger.getLogger(CDSFamilyHistoryImportMapper.class);

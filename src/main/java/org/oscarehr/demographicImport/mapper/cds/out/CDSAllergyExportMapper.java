@@ -28,7 +28,9 @@ import org.oscarehr.common.xml.cds.v5_0.model.AllergiesAndAdverseReactions;
 import org.oscarehr.common.xml.cds.v5_0.model.DrugCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PropertyOfOffendingAgent;
 import org.oscarehr.demographicImport.model.allergy.Allergy;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSAllergyExportMapper extends AbstractCDSExportMapper<AllergiesAndAdverseReactions, Allergy>
 {
 	public CDSAllergyExportMapper()

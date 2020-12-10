@@ -29,9 +29,11 @@ import org.oscarehr.common.xml.cds.v5_0.model.ReportContent;
 import org.oscarehr.common.xml.cds.v5_0.model.ReportFormat;
 import org.oscarehr.common.xml.cds.v5_0.model.Reports;
 import org.oscarehr.demographicImport.model.document.Document;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Component
 public class CDSReportExportMapper extends AbstractCDSExportMapper<Reports, Document>
 {
 	public CDSReportExportMapper()

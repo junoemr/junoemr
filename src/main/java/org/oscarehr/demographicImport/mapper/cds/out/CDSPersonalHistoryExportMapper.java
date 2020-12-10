@@ -25,6 +25,7 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonalHistory;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote;
+import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_ANNOTATION;
@@ -35,6 +36,7 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_IN
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_START_DATE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_TYPE;
 
+@Component
 public class CDSPersonalHistoryExportMapper extends AbstractCDSNoteExportMapper<PersonalHistory, SocialHistoryNote>
 {
 

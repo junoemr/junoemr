@@ -37,6 +37,7 @@ import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
 import org.oscarehr.demographicImport.model.provider.Provider;
+import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import javax.xml.bind.JAXBElement;
@@ -51,6 +52,7 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_COD
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
 
+@Component
 public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demographics, Demographic>
 {
 	private static final Logger logger = Logger.getLogger(CDSDemographicImportMapper.class);

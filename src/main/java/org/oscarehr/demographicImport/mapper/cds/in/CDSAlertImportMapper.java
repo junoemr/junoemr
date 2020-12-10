@@ -26,7 +26,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.AlertsAndSpecialNeeds;
 import org.oscarehr.demographicImport.model.encounterNote.ReminderNote;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSAlertImportMapper extends AbstractCDSImportMapper<AlertsAndSpecialNeeds, ReminderNote>
 {
 	private static final Logger logger = Logger.getLogger(CDSAlertImportMapper.class);

@@ -24,7 +24,9 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.PastHealth;
 import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSPastHealthExportMapper extends AbstractCDSNoteExportMapper<PastHealth, MedicalHistoryNote>
 {
 	public CDSPastHealthExportMapper()

@@ -26,9 +26,11 @@ import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.service.ExportPreferences;
+import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 
+@Component
 public abstract class AbstractCDSNoteExportMapper<I, E> extends AbstractCDSExportMapper<I, E>
 {
 	public AbstractCDSNoteExportMapper()

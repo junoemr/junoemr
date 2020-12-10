@@ -28,12 +28,19 @@ import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.service.ExportPreferences;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic>
 {
+	public CDSExportMapper()
+	{
+		this(null);
+	}
+
 	public CDSExportMapper(ExportPreferences exportPreferences)
 	{
 		super(exportPreferences);

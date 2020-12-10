@@ -24,7 +24,9 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.AllergiesAndAdverseReactions;
 import org.oscarehr.demographicImport.model.allergy.Allergy;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAndAdverseReactions, Allergy>
 {
 	public CDSAllergyImportMapper()

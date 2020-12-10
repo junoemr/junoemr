@@ -107,6 +107,9 @@ public class ImportExportService
 	@Autowired
 	private ReviewerModelToDbConverter reviewerModelToDbConverter;
 
+	@Autowired
+	private AppointmentStatusCache appointmentStatusCache;
+
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.IMPORTER_TYPE importType,
 	                                            List<Demographic> demographicList,
 	                                            ExportPreferences preferences) throws IOException
@@ -121,7 +124,7 @@ public class ImportExportService
 		}
 		fileList.addAll(exporter.getAdditionalFiles(preferences));
 		BaseDbToModelConverter.clearProviderCache();
-		AppointmentStatusCache.clearAll();
+		appointmentStatusCache.clear();
 
 		return fileList;
 	}
@@ -164,7 +167,7 @@ public class ImportExportService
 		persistLabs(demographic, dbDemographic);
 
 		appointmentService.saveNewAppointments(demographic.getAppointmentList(), dbDemographic);
-		AppointmentStatusCache.clearAll();
+		appointmentStatusCache.clear();
 
 	}
 

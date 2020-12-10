@@ -28,7 +28,9 @@ import org.oscarehr.common.xml.cds.v5_0.model.ImmunizationType;
 import org.oscarehr.common.xml.cds.v5_0.model.Immunizations;
 import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.model.immunization.Immunization;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSImmunizationExportMapper extends AbstractCDSExportMapper<Immunizations, Immunization>
 {
 	public CDSImmunizationExportMapper()

@@ -24,37 +24,44 @@ package org.oscarehr.demographicImport.service;
 
 import org.oscarehr.appointment.service.AppointmentStatusService;
 import org.oscarehr.demographicImport.model.appointment.AppointmentStatus;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 //TODO - better way to look up intermediate objects
+@Service
 public class AppointmentStatusCache
 {
 	private static Map<String, AppointmentStatus> appointmentStatusCodeModelMap;
 	private static Map<String, AppointmentStatus> appointmentStatusNameModelMap;
 
-	public static AppointmentStatus findByCode(String code)
+	@Autowired
+	private AppointmentStatusService appointmentStatusService;
+
+	public AppointmentStatusCache()
+	{
+	}
+
+	public AppointmentStatus findByCode(String code)
 	{
 		if(appointmentStatusCodeModelMap == null)
 		{
-			AppointmentStatusService appointmentStatusService = SpringUtils.getBean(AppointmentStatusService.class);
 			appointmentStatusCodeModelMap = appointmentStatusService.getAppointmentStatusCodeModelMap();
 		}
 		return appointmentStatusCodeModelMap.get(code);
 	}
 
-	public static AppointmentStatus findByName(String name)
+	public AppointmentStatus findByName(String name)
 	{
 		if(appointmentStatusNameModelMap == null)
 		{
-			AppointmentStatusService appointmentStatusService = SpringUtils.getBean(AppointmentStatusService.class);
 			appointmentStatusNameModelMap = appointmentStatusService.getAppointmentStatusNameModelMap();
 		}
 		return appointmentStatusNameModelMap.get(name);
 	}
 
-	public static void clearAll()
+	public void clear()
 	{
 		appointmentStatusCodeModelMap = null;
 		appointmentStatusNameModelMap = null;

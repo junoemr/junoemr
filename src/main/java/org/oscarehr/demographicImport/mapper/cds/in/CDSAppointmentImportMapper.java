@@ -27,6 +27,8 @@ import org.oscarehr.demographicImport.model.appointment.Appointment;
 import org.oscarehr.demographicImport.model.appointment.AppointmentStatus;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.service.AppointmentStatusCache;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import java.math.BigInteger;
@@ -39,8 +41,12 @@ import static org.oscarehr.common.model.Appointment.DEFAULT_APPOINTMENT_DURATION
 import static org.oscarehr.common.model.AppointmentStatus.APPOINTMENT_STATUS_BILLED;
 import static org.oscarehr.common.model.AppointmentStatus.APPOINTMENT_STATUS_NEW;
 
+@Component
 public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointments, Appointment>
 {
+	@Autowired
+	private AppointmentStatusCache appointmentStatusCache;
+
 	public CDSAppointmentImportMapper()
 	{
 		super();
@@ -98,13 +104,13 @@ public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointm
 		AppointmentStatus appointmentStatus = null;
 		if(importStatus != null)
 		{
-			appointmentStatus = AppointmentStatusCache.findByName(importStatus);
+			appointmentStatus = appointmentStatusCache.findByName(importStatus);
 		}
 
 		// if we couldn't match it, use the default
 		if(appointmentStatus == null)
 		{
-			appointmentStatus = AppointmentStatusCache.findByCode(defaultStatusCode);
+			appointmentStatus = appointmentStatusCache.findByCode(defaultStatusCode);
 		}
 		return appointmentStatus;
 	}

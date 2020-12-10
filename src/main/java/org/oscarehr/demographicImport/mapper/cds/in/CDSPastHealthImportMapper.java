@@ -25,7 +25,9 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 import org.oscarehr.common.xml.cds.v5_0.model.PastHealth;
 import org.oscarehr.common.xml.cds.v5_0.model.StandardCoding;
 import org.oscarehr.demographicImport.model.encounterNote.MedicalHistoryNote;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSPastHealthImportMapper extends AbstractCDSImportMapper<PastHealth, MedicalHistoryNote>
 {
 	public CDSPastHealthImportMapper()

@@ -25,7 +25,9 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 import org.oscarehr.common.xml.cds.v5_0.model.ReportFormat;
 import org.oscarehr.common.xml.cds.v5_0.model.Reports;
 import org.oscarehr.demographicImport.model.document.Document;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSReportImportMapper extends AbstractCDSImportMapper<Reports, Document>
 {
 	public CDSReportImportMapper()

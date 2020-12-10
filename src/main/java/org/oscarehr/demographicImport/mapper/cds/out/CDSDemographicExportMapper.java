@@ -43,6 +43,7 @@ import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.demographic.Address;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.provider.Provider;
+import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_STATUS_FALSE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
 
+@Component
 public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demographics, Demographic>
 {
 	private static final Logger logger = Logger.getLogger(CDSDemographicExportMapper.class);

@@ -26,10 +26,12 @@ import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class CDSEncounterNoteExportMapper extends AbstractCDSNoteExportMapper<ClinicalNotes, EncounterNote>
 {
 	public CDSEncounterNoteExportMapper()

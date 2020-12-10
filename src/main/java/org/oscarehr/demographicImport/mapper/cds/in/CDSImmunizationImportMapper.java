@@ -24,7 +24,9 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.Immunizations;
 import org.oscarehr.demographicImport.model.immunization.Immunization;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CDSImmunizationImportMapper extends AbstractCDSImportMapper<Immunizations, Immunization>
 {
 	public CDSImmunizationImportMapper()
