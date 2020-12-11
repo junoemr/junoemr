@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.converter.in;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.demographicImport.model.medication.Medication;
 import org.oscarehr.demographicImport.model.medication.StandardMedication;
@@ -43,7 +44,8 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 
 		BeanUtils.copyProperties(input, drug,
 				"rxStartDate", "rxEndDate", "writtenDate", "createdDateTime",
-				"lastRefillDate", "archivedDateTime", "pickupDateTime", "lastUpdateDateTime");
+				"lastRefillDate", "archivedDateTime", "pickupDateTime", "lastUpdateDateTime",
+				"gcnSeqNo", "noSubs", "prn", "archived");
 
 		drug.setEndDate(ConversionUtils.toNullableLegacyDate(input.getRxEndDate()));
 		drug.setRxDate(ConversionUtils.toNullableLegacyDate(input.getRxStartDate()));
@@ -59,6 +61,19 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 		drug.setFreqCode(input.getFrequencyCode());
 		drug.setDurUnit(input.getDurationUnit());
 		drug.setSpecial(generateSpecial(input));
+
+		// these can't be null, do these manually
+		drug.setArchived(BooleanUtils.toBooleanDefaultIfNull(input.getArchived(), false));
+		drug.setDispenseInternal(BooleanUtils.toBooleanDefaultIfNull(input.getDispenseInternal(), false));
+		drug.setPosition(0);
+
+		if(input instanceof StandardMedication)
+		{
+			StandardMedication standardMedication = (StandardMedication) input;
+			drug.setGcnSeqNo(toIntDefaultIfNull(standardMedication.getGcnSeqNo(), 0));
+			drug.setNoSubs(BooleanUtils.toBooleanDefaultIfNull(standardMedication.getNoSubs(), false));
+			drug.setPrn(BooleanUtils.toBooleanDefaultIfNull(standardMedication.getPrn(), false));
+		}
 
 		return drug;
 	}
@@ -89,10 +104,6 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 		{
 			valueList.add(medication.getInstructions());
 		}
-		if (medication.getInstructions() != null)
-		{
-			valueList.add(medication.getInstructions());
-		}
 
 		String quantity = "Qty:" + (medication.getQuantity() == null ? "0" : medication.getQuantity());
 		String quantityUnits = " " + (medication.getDurationUnit() == null ? "" : medication.getDurationUnit());
@@ -100,5 +111,10 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 		valueList.add(quantity + quantityUnits + " " + repeat);
 
 		return String.join("\n", valueList);
+	}
+
+	private int toIntDefaultIfNull(Integer integer, int defaultVal)
+	{
+		return (integer != null) ? integer : defaultVal;
 	}
 }

@@ -82,6 +82,7 @@ public abstract class Medication extends AbstractTransientModel
 	private String comment;
 
 	// other
+	private Boolean archived;
 	private String archivedReason;
 	private LocalDateTime archivedDateTime;
 	private LocalDateTime lastUpdateDateTime;

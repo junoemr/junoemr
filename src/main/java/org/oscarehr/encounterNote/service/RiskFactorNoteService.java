@@ -50,16 +50,19 @@ public class RiskFactorNoteService extends HistoryNoteService
 		CaseManagementNote savedNote = saveRiskFactorNote(note);
 		addAnnotationLink(savedNote, noteModel.getAnnotation());
 
-		// now that notes have id's, save the partial date data
-		for(CaseManagementNoteExt ext : savedNote.getNoteExtensionList())
+		if(savedNote.getNoteExtensionList() != null)
 		{
-			if(CaseManagementNoteExt.STARTDATE.equals(ext.getKey()))
+			// now that notes have id's, save the partial date data
+			for(CaseManagementNoteExt ext : savedNote.getNoteExtensionList())
 			{
-				saveExtPartialDate(noteModel.getStartDate(), ext.getId());
-			}
-			if(CaseManagementNoteExt.RESOLUTIONDATE.equals(ext.getKey()))
-			{
-				saveExtPartialDate(noteModel.getResolutionDate(), ext.getId());
+				if(CaseManagementNoteExt.STARTDATE.equals(ext.getKey()))
+				{
+					saveExtPartialDate(noteModel.getStartDate(), ext.getId());
+				}
+				if(CaseManagementNoteExt.RESOLUTIONDATE.equals(ext.getKey()))
+				{
+					saveExtPartialDate(noteModel.getResolutionDate(), ext.getId());
+				}
 			}
 		}
 

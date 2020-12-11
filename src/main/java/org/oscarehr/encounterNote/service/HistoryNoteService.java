@@ -86,15 +86,6 @@ public abstract class HistoryNoteService extends BaseNoteService
 
 			saveNote(annotationNote);
 		}
-
-//		CaseManagementNote annotationNote = buildAnnotationNote(note, annotationText);
-//		if(annotationNote != null)
-//		{
-//			CaseManagementNoteLink annotationLink = new CaseManagementNoteLink();
-//			annotationLink.setCaseManagementNote(Math.toIntExact(annotationNote.getId()));
-//			annotationLink.setNote(note);
-//			note.addNoteLink(annotationLink);
-//		}
 	}
 
 	private CaseManagementNote buildAnnotationNote(CaseManagementNote note, String annotationText)

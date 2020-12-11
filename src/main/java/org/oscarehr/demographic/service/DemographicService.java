@@ -28,6 +28,7 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
+import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
 import org.oscarehr.demographic.model.Demographic;
@@ -68,6 +69,9 @@ public class DemographicService
 
 	@Autowired
 	private DemographicDao demographicDao;
+
+	@Autowired
+	private DemographicCustDao demographicCustDao;
 
 	// ONLY FOR LEGACY SUPPORT. DO NOT USE
 	@Autowired
@@ -356,7 +360,7 @@ public class DemographicService
 			// save the custom fields
 			demoCustom.setId(demographicNo);
 			demoCustom.setDemographic(demographic);
-			demographicManager.createUpdateDemographicCust(providerNoStr, demoCustom);
+			demographicCustDao.persist(demoCustom);
 		}
 		for(DemographicExt extension : demographicExtensions)
 		{
