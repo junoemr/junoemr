@@ -73,7 +73,12 @@ public class MedicationDbToModelConverter extends BaseDbToModelConverter<Drug, M
 
 		if(!input.getStartDateUnknown())
 		{
-			PartialDate startDate = PartialDate.from(ConversionUtils.toNullableLocalDate(input.getRxDate()), null); //TODO partial date lookup
+			org.oscarehr.common.model.PartialDate dbPartialStartDate = partialDateDao.getPartialDate(
+					org.oscarehr.common.model.PartialDate.TABLE_DRUGS,
+					input.getId(),
+					org.oscarehr.common.model.PartialDate.DRUGS_STARTDATE);
+
+			PartialDate startDate = PartialDate.from(ConversionUtils.toNullableLocalDate(input.getRxDate()), dbPartialStartDate);
 			medication.setRxStartDate(startDate);
 		}
 
@@ -83,6 +88,7 @@ public class MedicationDbToModelConverter extends BaseDbToModelConverter<Drug, M
 		medication.setCreatedDateTime(ConversionUtils.toNullableLocalDateTime(input.getCreateDate()));
 		medication.setLastUpdateDateTime(ConversionUtils.toNullableLocalDateTime(input.getLastUpdateDate()));
 		medication.setArchivedDateTime(ConversionUtils.toNullableLocalDateTime(input.getArchivedDate()));
+		medication.setFrequencyCode(input.getFreqCode());
 
 		medication.setDurationUnit(input.getDurUnit());
 

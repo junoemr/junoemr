@@ -46,6 +46,7 @@ import org.oscarehr.encounterNote.service.RiskFactorNoteService;
 import org.oscarehr.encounterNote.service.SocialHistoryNoteService;
 import org.oscarehr.labs.service.LabService;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.rx.service.MedicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -108,7 +109,13 @@ public class ImportExportService
 	private ReviewerModelToDbConverter reviewerModelToDbConverter;
 
 	@Autowired
+	private MedicationService medicationService;
+
+	@Autowired
 	private AppointmentStatusCache appointmentStatusCache;
+
+	@Autowired
+	private ImporterExporterFactory importerExporterFactory;
 
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.IMPORTER_TYPE importType,
 	                                            List<Demographic> demographicList,
@@ -154,7 +161,7 @@ public class ImportExportService
 	                              boolean skipMissingDocs,
 	                              boolean mergeDemographics) throws IOException, InvalidImportFileException, HL7Exception
 	{
-		DemographicImporter importer = ImporterExporterFactory.getImporter(importType, importSource, importLogger, documentLocation, skipMissingDocs);
+		DemographicImporter importer = importerExporterFactory.getImporter(importType, importSource, importLogger, documentLocation, skipMissingDocs);
 		importer.verifyFileFormat(importFile);
 		Demographic demographic = importer.importDemographic(importFile);
 
@@ -162,6 +169,7 @@ public class ImportExportService
 
 		org.oscarehr.demographic.model.Demographic dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, demographic);
 		demographic.setId(dbDemographic.getId());
+		logger.info("persisted new demographic: " + demographic.getId());
 
 		persistNotes(demographic, dbDemographic);
 		persistLabs(demographic, dbDemographic);
@@ -169,6 +177,7 @@ public class ImportExportService
 		appointmentService.saveNewAppointments(demographic.getAppointmentList(), dbDemographic);
 		appointmentStatusCache.clear();
 
+		medicationService.saveNewMedications(demographic.getMedicationList(), dbDemographic);
 	}
 
 	private void persistNotes(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)

@@ -44,4 +44,11 @@ public class StandardMedication extends Medication
 	private String dosage;
 	private String strengthAmount;
 	private String strengthUnit;
+
+
+	@Override
+	public String getDrugName()
+	{
+		return (getBrandName() != null) ? getBrandName() : getGenericName();
+	}
 }

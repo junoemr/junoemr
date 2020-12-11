@@ -25,11 +25,17 @@ package org.oscarehr.demographicImport.service;
 import org.oscarehr.demographicImport.service.cds.CDSExporter;
 import org.oscarehr.demographicImport.service.cds.CDSImportLogger;
 import org.oscarehr.demographicImport.service.cds.CDSImporter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Component
 public class ImporterExporterFactory
 {
+	@Autowired
+	private CDSImporter cdsImporter;
+
 	public enum IMPORTER_TYPE
 	{
 		CDS_5,
@@ -45,7 +51,7 @@ public class ImporterExporterFactory
 		UNKNOWN
 	}
 
-	public static ImportLogger getImportLogger(IMPORTER_TYPE type)
+	public ImportLogger getImportLogger(IMPORTER_TYPE type)
 	{
 		switch(type)
 		{
@@ -55,15 +61,15 @@ public class ImporterExporterFactory
 		}
 	}
 
-	public static DemographicImporter getImporter(IMPORTER_TYPE type,
-	                                              IMPORT_SOURCE importSource,
-	                                              ImportLogger importLogger,
-	                                              String documentLocation,
-	                                              boolean skipMissingDocs)
+	public DemographicImporter getImporter(IMPORTER_TYPE type,
+	                                       IMPORT_SOURCE importSource,
+	                                       ImportLogger importLogger,
+	                                       String documentLocation,
+	                                       boolean skipMissingDocs)
 	{
 		switch(type)
 		{
-			case CDS_5: return new CDSImporter();
+			case CDS_5: return cdsImporter;
 			case ToPD: // TODO
 			default: throw new RuntimeException(type + " importer not implemented");
 		}

@@ -355,6 +355,7 @@ public class DemographicService
 		{
 			// save the custom fields
 			demoCustom.setId(demographicNo);
+			demoCustom.setDemographic(demographic);
 			demographicManager.createUpdateDemographicCust(providerNoStr, demoCustom);
 		}
 		for(DemographicExt extension : demographicExtensions)

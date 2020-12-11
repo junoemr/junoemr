@@ -109,6 +109,6 @@ public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 		return partialDateDao.getPartialDate(
 				org.oscarehr.common.model.PartialDate.TABLE_CASEMGMT_NOTE,
 				Math.toIntExact(ExtId),
-				org.oscarehr.common.model.PartialDate.TABLE_CASEMGMT_NOTE_EXT);
+				org.oscarehr.common.model.PartialDate.FIELD_CASEMGMT_NOTE_EXT_VALUE);
 	}
 }

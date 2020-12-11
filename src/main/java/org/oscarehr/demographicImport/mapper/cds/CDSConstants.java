@@ -55,4 +55,7 @@ public class CDSConstants
 
 	public static final String ENROLLMENT_STATUS_TRUE = "1";
 	public static final String ENROLLMENT_STATUS_FALSE = "0";
+
+	public static final String Y_INDICATOR_TRUE = "T";
+	public static final String Y_INDICATOR_FALSE = "F";
 }

@@ -33,6 +33,7 @@ import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.demographicImport.service.ImportLogger;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import oscar.OscarProperties;
 
@@ -44,6 +45,7 @@ public class CommandLineImporter
 	private static final Logger logger = Logger.getLogger(CommandLineImporter.class);
 
 	private static ImportExportService importExportService;
+	private static ImporterExporterFactory importerExporterFactory;
 
 	/**
 	 * Run this in the WEB-INF folder in one of 2 ways:
@@ -127,6 +129,7 @@ public class CommandLineImporter
 		{
 			ctx = loadSpring(propertiesFileName);
 			importExportService = ctx.getBean(ImportExportService.class);
+			importerExporterFactory = ctx.getBean(ImporterExporterFactory.class);
 
 			// -------------------------------------------------------------------
 			logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
@@ -145,7 +148,7 @@ public class CommandLineImporter
 				}
 				GenericFile importFile = FileFactory.getExistingFile(file);
 
-				ImportLogger importLogger = ImporterExporterFactory.getImportLogger(importerType);
+				ImportLogger importLogger = importerExporterFactory.getImportLogger(importerType);
 				try
 				{
 					importExportService.importDemographic(importerType,

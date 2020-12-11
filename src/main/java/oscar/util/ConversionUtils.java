@@ -24,6 +24,8 @@
 package oscar.util;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.demographicImport.model.common.PartialDate;
+import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.util.MiscUtils;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -674,6 +676,15 @@ public class ConversionUtils {
 	public static Date toLegacyDate(LocalDate localDate)
 	{
 		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	}
+	public static Date toNullableLegacyDate(PartialDate partialDate)
+	{
+		return (partialDate != null) ? toLegacyDate(partialDate.toLocalDate()) : null;
+	}
+
+	public static Date toNullableLegacyDateTime(PartialDateTime partialDateTime)
+	{
+		return (partialDateTime != null) ? toLegacyDateTime(partialDateTime.toLocalDateTime()) : null;
 	}
 
 	public static Date toNullableLegacyDateTime(LocalDateTime localDateTime)

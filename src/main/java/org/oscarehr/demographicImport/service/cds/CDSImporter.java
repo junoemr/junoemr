@@ -31,13 +31,19 @@ import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
 import org.oscarehr.demographicImport.service.DemographicImporter;
 import org.oscarehr.demographicImport.service.ExportPreferences;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class CDSImporter implements DemographicImporter
 {
+	@Autowired
+	private CDSImportMapper cdsImportMapper;
+
 	public CDSImporter()
 	{
 	}
@@ -56,10 +62,9 @@ public class CDSImporter implements DemographicImporter
 	public Demographic importDemographic(GenericFile importFile) throws IOException
 	{
 		CDSFileParser parser = new CDSFileParser();
-		CDSImportMapper mapper = new CDSImportMapper();
 
 		OmdCds elem = parser.parse(importFile);
-		return mapper.importToJuno(elem);
+		return cdsImportMapper.importToJuno(elem);
 	}
 
 	@Override

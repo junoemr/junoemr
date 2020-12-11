@@ -158,7 +158,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			{
 				String key = phoneElement.getName().getLocalPart();
 				String value = phoneElement.getValue();
-				if("number".equals(key))
+				if("phoneNumber".equals(key) || "number".equals(key))
 				{
 					phoneNumber.setNumber(value);
 				}

@@ -31,6 +31,9 @@ import org.oscarehr.demographicImport.model.medication.StandardMedication;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
 
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.Y_INDICATOR_FALSE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.Y_INDICATOR_TRUE;
+
 @Component
 public class CDSMedicationExportMapper extends AbstractCDSExportMapper<MedicationsAndTreatments, Medication>
 {
@@ -44,12 +47,13 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 	{
 		MedicationsAndTreatments medicationsAndTreatments = objectFactory.createMedicationsAndTreatments();
 
+		medicationsAndTreatments.setDrugName(medication.getDrugName());
 		medicationsAndTreatments.setPrescriptionWrittenDate(toNullableDateTimeFullOrPartial(medication.getWrittenDate()));
 		medicationsAndTreatments.setStartDate(toNullableDateFullOrPartial(medication.getRxStartDate()));
 		medicationsAndTreatments.setNumberOfRefills(toStringOrNull(medication.getRefillQuantity()));
 		medicationsAndTreatments.setForm(medication.getDrugForm());
 		medicationsAndTreatments.setRoute(medication.getRoute());
-		medicationsAndTreatments.setFrequency(medication.getFreqCode());
+		medicationsAndTreatments.setFrequency(medication.getFrequencyCode());
 		medicationsAndTreatments.setDuration(medication.getDuration());
 		medicationsAndTreatments.setRefillDuration(toStringOrNull(medication.getRefillDuration()));
 		medicationsAndTreatments.setQuantity(medication.getQuantity());
@@ -95,9 +99,6 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 	protected MedicationsAndTreatments fillStandardDrugElements(MedicationsAndTreatments medicationsAndTreatments,
 	                                                            StandardMedication medication)
 	{
-		String drugName = (medication.getBrandName() != null) ? medication.getBrandName() : medication.getGenericName();
-		medicationsAndTreatments.setDrugName(drugName);
-
 		medicationsAndTreatments.setDrugIdentificationNumber(medication.getRegionalIdentifier());
 		medicationsAndTreatments.setDosage(medication.getDosage());
 		medicationsAndTreatments.setDosageUnitOfMeasure(medication.getUnit());
@@ -111,9 +112,6 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 	protected MedicationsAndTreatments fillCustomDrugElements(MedicationsAndTreatments medicationsAndTreatments,
 	                                                          CustomMedication medication)
 	{
-		medicationsAndTreatments.setDrugName(medication.getCustomName());
-
-
 		return medicationsAndTreatments;
 	}
 
@@ -152,7 +150,7 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 	}
 	protected String getSubsNotAllowedIndicator(StandardMedication exportStructure)
 	{
-		return exportStructure.getNoSubs() ? "Y" : "N";
+		return exportStructure.getNoSubs() ? Y_INDICATOR_TRUE : Y_INDICATOR_FALSE;
 	}
 
 	protected String toStringOrNull(Boolean bool)

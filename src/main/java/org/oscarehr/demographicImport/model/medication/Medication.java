@@ -61,7 +61,7 @@ public abstract class Medication extends AbstractTransientModel
 	// dosage info
 	private float takeMin;
 	private float takeMax;
-	private String freqCode;
+	private String frequencyCode;
 	private String duration;
 	private String durationUnit;
 	private String quantity;
@@ -86,4 +86,6 @@ public abstract class Medication extends AbstractTransientModel
 	private LocalDateTime archivedDateTime;
 	private LocalDateTime lastUpdateDateTime;
 	private String eTreatmentType;
+
+	public abstract String getDrugName();
 }

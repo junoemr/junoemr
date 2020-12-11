@@ -20,31 +20,24 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter.in.note;
+package org.oscarehr.demographicImport.converter.in;
 
-import org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote;
-import org.oscarehr.encounterNote.model.CaseManagementNote;
-import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
+import org.oscarehr.rx.model.Prescription;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 @Component
-public class SocialHistoryNoteModelToDbConverter extends BaseNoteModelToDbConverter<SocialHistoryNote>
+public class PrescriptionModelToDbConverter extends BaseModelToDbConverter<org.oscarehr.demographicImport.model.medication.Medication, Prescription>
 {
 	@Override
-	public CaseManagementNote subConvert(
-			SocialHistoryNote input,
-			CaseManagementNote dbNote)
+	public Prescription convert(org.oscarehr.demographicImport.model.medication.Medication input)
 	{
-		if(input.getStartDate() != null)
-		{
-			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.STARTDATE, ConversionUtils.toNullableLegacyDate(input.getStartDate())));
-		}
-		if(input.getResolutionDate() != null)
-		{
-			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.RESOLUTIONDATE, ConversionUtils.toNullableLegacyDate(input.getResolutionDate())));
-		}
+		Prescription prescription = new Prescription();
 
-		return dbNote;
+		prescription.setProviderNo(findOrCreateProviderRecord(input.getPrescribingProvider(), false).getId());
+		prescription.setDatePrescribed(ConversionUtils.toNullableLegacyDate(input.getWrittenDate()));
+		prescription.setComments(input.getComment());
+
+		return prescription;
 	}
 }

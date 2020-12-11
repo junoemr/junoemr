@@ -39,11 +39,11 @@ public class RiskFactorNoteModelToDbConverter extends BaseNoteModelToDbConverter
 
 		if(input.getStartDate() != null)
 		{
-			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.STARTDATE, ConversionUtils.toLegacyDate(input.getStartDate().toLocalDate())));
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.STARTDATE, ConversionUtils.toNullableLegacyDate(input.getStartDate())));
 		}
 		if(input.getResolutionDate() != null)
 		{
-			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.RESOLUTIONDATE, ConversionUtils.toLegacyDate(input.getResolutionDate().toLocalDate())));
+			dbNote.addExtension(getExt(dbNote, CaseManagementNoteExt.RESOLUTIONDATE, ConversionUtils.toNullableLegacyDate(input.getResolutionDate())));
 		}
 		if(input.getAgeAtOnset() != null)
 		{

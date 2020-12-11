@@ -29,4 +29,10 @@ public class CustomMedication extends Medication
 {
 	// prescription details
 	private String customName;
+
+	@Override
+	public String getDrugName()
+	{
+		return customName;
+	}
 }
