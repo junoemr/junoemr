@@ -121,7 +121,7 @@ public class ImportExportService
 	                                            List<Demographic> demographicList,
 	                                            ExportPreferences preferences) throws IOException
 	{
-		DemographicExporter exporter = ImporterExporterFactory.getExporter(importType);
+		DemographicExporter exporter = importerExporterFactory.getExporter(importType);
 		List<GenericFile> fileList = new ArrayList<>(demographicList.size() + 2);
 
 		for (Demographic demographic : demographicList)

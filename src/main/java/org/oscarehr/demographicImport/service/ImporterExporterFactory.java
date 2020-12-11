@@ -28,13 +28,14 @@ import org.oscarehr.demographicImport.service.cds.CDSImporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 @Component
 public class ImporterExporterFactory
 {
 	@Autowired
 	private CDSImporter cdsImporter;
+
+	@Autowired
+	private CDSExporter cdsExporter;
 
 	public enum IMPORTER_TYPE
 	{
@@ -75,11 +76,11 @@ public class ImporterExporterFactory
 		}
 	}
 
-	public static DemographicExporter getExporter(IMPORTER_TYPE type) throws IOException
+	public DemographicExporter getExporter(IMPORTER_TYPE type)
 	{
 		switch(type)
 		{
-			case CDS_5: return new CDSExporter();
+			case CDS_5: return cdsExporter;
 			case ToPD: // TODO
 			default: throw new RuntimeException(type + " exporter not implemented");
 		}

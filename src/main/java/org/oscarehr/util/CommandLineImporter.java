@@ -33,7 +33,6 @@ import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.demographicImport.service.ImportLogger;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import oscar.OscarProperties;
 

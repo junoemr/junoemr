@@ -33,6 +33,8 @@ import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
 import org.oscarehr.demographicImport.service.DemographicExporter;
 import org.oscarehr.demographicImport.service.ExportLogger;
 import org.oscarehr.demographicImport.service.ExportPreferences;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
 import oscar.oscarClinic.ClinicData;
 import oscar.util.ConversionUtils;
@@ -53,6 +55,7 @@ import static oscar.util.ConversionUtils.DATE_PATTERN_DAY;
 import static oscar.util.ConversionUtils.DATE_PATTERN_MONTH;
 import static oscar.util.ConversionUtils.DATE_PATTERN_YEAR;
 
+@Component
 public class CDSExporter implements DemographicExporter, ExportLogger
 {
 	private static final OscarProperties oscarProperties = OscarProperties.getInstance();
@@ -60,6 +63,9 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 
 	private final GenericFile logFile;
 	private final HashMap<String, Integer> providerExportCountHash;
+
+	@Autowired
+	private CDSExportMapper cdsExportMapper;
 
 	public CDSExporter() throws IOException
 	{
@@ -72,11 +78,11 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 	public GenericFile exportDemographic(Demographic demographic, ExportPreferences preferences) throws IOException
 	{
 		CDSFileParser parser = new CDSFileParser();
-		CDSExportMapper mapper = new CDSExportMapper(preferences);
+		cdsExportMapper.setExportPreferences(preferences);
 
 		logSummaryLine(demographic);
 		incrementProviderExportCount(demographic);
-		OmdCds omdCds = mapper.exportFromJuno(demographic);
+		OmdCds omdCds = cdsExportMapper.exportFromJuno(demographic);
 
 		GenericFile exportFile = parser.write(omdCds);
 		exportFile.rename(createExportFilename(demographic));

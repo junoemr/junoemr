@@ -34,7 +34,6 @@ import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.provider.Provider;
-import org.oscarehr.demographicImport.service.ExportPreferences;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -49,11 +48,6 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 
 	public AbstractCDSExportMapper()
 	{
-		this(null);
-	}
-	public AbstractCDSExportMapper(ExportPreferences exportPreferences)
-	{
-		super(exportPreferences);
 		this.objectFactory = new ObjectFactory();
 	}
 

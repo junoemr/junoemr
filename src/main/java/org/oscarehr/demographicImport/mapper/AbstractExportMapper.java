@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.mapper;
 
+import lombok.Data;
 import org.oscarehr.demographicImport.service.ExportPreferences;
 import org.springframework.stereotype.Component;
 
@@ -29,18 +30,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Data
 @Component
 public abstract class AbstractExportMapper<I, E>
 {
-	protected final ExportPreferences exportPreferences;
+	protected ExportPreferences exportPreferences;
 
 	public AbstractExportMapper()
 	{
-		this(null);
-	}
-	public AbstractExportMapper(ExportPreferences exportPreferences)
-	{
-		this.exportPreferences = exportPreferences;
 	}
 
 	/**

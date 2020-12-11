@@ -27,7 +27,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.lab.Lab;
-import org.oscarehr.demographicImport.service.ExportPreferences;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -36,14 +36,40 @@ import java.util.stream.Collectors;
 @Component
 public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic>
 {
+	@Autowired
+	private  CDSDemographicExportMapper cdsDemographicExportMapper;
+	@Autowired
+	private  CDSPersonalHistoryExportMapper cdsPersonalHistoryExportMapper;
+	@Autowired
+	private  CDSFamilyHistoryExportMapper cdsFamilyHistoryExportMapper;
+	@Autowired
+	private  CDSPastHealthExportMapper cdsPastHealthExportMapper;
+	@Autowired
+	private  CDSProblemExportMapper cdsProblemExportMapper;
+	@Autowired
+	private  CDSRiskFactorExportMapper cdsRiskFactorExportMapper;
+	@Autowired
+	private  CDSAllergyExportMapper cdsAllergyExportMapper;
+	@Autowired
+	private  CDSMedicationExportMapper cdsMedicationExportMapper;
+	@Autowired
+	private  CDSImmunizationExportMapper cdsImmunizationExportMapper;
+	@Autowired
+	private  CDSLabExportMapper cdsLabExportMapper;
+	@Autowired
+	private  CDSAppointmentExportMapper cdsAppointmentExportMapper;
+	@Autowired
+	private  CDSEncounterNoteExportMapper cdsEncounterNoteExportMapper;
+	@Autowired
+	private  CDSReportExportMapper cdsReportExportMapper;
+	@Autowired
+	private  CDSCareElementExportMapper cdsCareElementExportMapper;
+	@Autowired
+	private  CDSAlertExportMapper cdsAlertExportMapper;
+
 	public CDSExportMapper()
 	{
-		this(null);
-	}
-
-	public CDSExportMapper(ExportPreferences exportPreferences)
-	{
-		super(exportPreferences);
+		super();
 	}
 
 	@Override
@@ -53,47 +79,47 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 		PatientRecord patientRecord = objectFactory.createPatientRecord();
 
 		patientRecord.setDemographics(
-				new CDSDemographicExportMapper().exportFromJuno(exportStructure));
+				cdsDemographicExportMapper.exportFromJuno(exportStructure));
 
 		if(exportPreferences.isExportPersonalHistory())
 		{
 			patientRecord.getPersonalHistory().addAll(
-					new CDSPersonalHistoryExportMapper().exportAll(exportStructure.getSocialHistoryNoteList()));
+					cdsPersonalHistoryExportMapper.exportAll(exportStructure.getSocialHistoryNoteList()));
 		}
 		if(exportPreferences.isExportFamilyHistory())
 		{
 			patientRecord.getFamilyHistory().addAll(
-					new CDSFamilyHistoryExportMapper().exportAll(exportStructure.getFamilyHistoryNoteList()));
+					cdsFamilyHistoryExportMapper.exportAll(exportStructure.getFamilyHistoryNoteList()));
 		}
 		if(exportPreferences.isExportPastHealth())
 		{
 			patientRecord.getPastHealth().addAll(
-					new CDSPastHealthExportMapper().exportAll(exportStructure.getMedicalHistoryNoteList()));
+					cdsPastHealthExportMapper.exportAll(exportStructure.getMedicalHistoryNoteList()));
 		}
 		if(exportPreferences.isExportProblemList())
 		{
 			patientRecord.getProblemList().addAll(
-					new CDSProblemExportMapper().exportAll(exportStructure.getConcernNoteList()));
+					cdsProblemExportMapper.exportAll(exportStructure.getConcernNoteList()));
 		}
 		if(exportPreferences.isExportRiskFactors())
 		{
 			patientRecord.getRiskFactors().addAll(
-					new CDSRiskFactorExportMapper().exportAll(exportStructure.getRiskFactorNoteList()));
+					cdsRiskFactorExportMapper.exportAll(exportStructure.getRiskFactorNoteList()));
 		}
 		if(exportPreferences.isExportAllergiesAndAdverseReactions())
 		{
 			patientRecord.getAllergiesAndAdverseReactions().addAll(
-					new CDSAllergyExportMapper().exportAll(exportStructure.getAllergyList()));
+					cdsAllergyExportMapper.exportAll(exportStructure.getAllergyList()));
 		}
 		if(exportPreferences.isExportMedicationsAndTreatments())
 		{
 			patientRecord.getMedicationsAndTreatments().addAll(
-					new CDSMedicationExportMapper().exportAll(exportStructure.getMedicationList()));
+					cdsMedicationExportMapper.exportAll(exportStructure.getMedicationList()));
 		}
 		if(exportPreferences.isExportImmunizations())
 		{
 			patientRecord.getImmunizations().addAll(
-					new CDSImmunizationExportMapper().exportAll(exportStructure.getImmunizationList()));
+					cdsImmunizationExportMapper.exportAll(exportStructure.getImmunizationList()));
 		}
 		if(exportPreferences.isExportLaboratoryResults())
 		{
@@ -103,27 +129,27 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 		if(exportPreferences.isExportAppointments())
 		{
 			patientRecord.getAppointments().addAll(
-					new CDSAppointmentExportMapper().exportAll(exportStructure.getAppointmentList()));
+					cdsAppointmentExportMapper.exportAll(exportStructure.getAppointmentList()));
 		}
 		if(exportPreferences.isExportClinicalNotes())
 		{
 			patientRecord.getClinicalNotes().addAll(
-					new CDSEncounterNoteExportMapper().exportAll(exportStructure.getEncounterNoteList()));
+					cdsEncounterNoteExportMapper.exportAll(exportStructure.getEncounterNoteList()));
 		}
 		if(exportPreferences.isExportReportsReceived())
 		{
 			patientRecord.getReports().addAll(
-					new CDSReportExportMapper().exportAll(exportStructure.getDocumentList()));
+					cdsReportExportMapper.exportAll(exportStructure.getDocumentList()));
 		}
 		if(exportPreferences.isExportCareElements())
 		{
 			patientRecord.getCareElements().addAll(
-					new CDSCareElementExportMapper().exportAll(exportStructure.getMeasurementList()));
+					cdsCareElementExportMapper.exportAll(exportStructure.getMeasurementList()));
 		}
 		if(exportPreferences.isExportAlertsAndSpecialNeeds())
 		{
 			patientRecord.getAlertsAndSpecialNeeds().addAll(
-					new CDSAlertExportMapper().exportAll(exportStructure.getReminderNoteList()));
+					cdsAlertExportMapper.exportAll(exportStructure.getReminderNoteList()));
 		}
 
 		omdCds.setPatientRecord(patientRecord);
@@ -133,7 +159,7 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 	private List<LaboratoryResults> getLabList(List<Lab> labs)
 	{
 		// because we get a list back from the base converter, we need to flatten the list of lists
-		List<List<LaboratoryResults>> labsLists = new CDSLabExportMapper().exportAll(labs);
+		List<List<LaboratoryResults>> labsLists = cdsLabExportMapper.exportAll(labs);
 		return labsLists.stream().flatMap(List::stream).collect(Collectors.toList());
 	}
 }

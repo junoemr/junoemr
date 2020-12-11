@@ -25,7 +25,6 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.common.PartialDate;
-import org.oscarehr.demographicImport.service.ExportPreferences;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -35,11 +34,7 @@ public abstract class AbstractCDSNoteExportMapper<I, E> extends AbstractCDSExpor
 {
 	public AbstractCDSNoteExportMapper()
 	{
-		this(null);
-	}
-	public AbstractCDSNoteExportMapper(ExportPreferences exportPreferences)
-	{
-		super(exportPreferences);
+		super();
 	}
 
 	protected BigInteger getAgeAtOnset(Long onsetAge)

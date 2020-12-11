@@ -39,7 +39,7 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 		// set the search filters
 		if(getProviderNo() != null)
 		{
-			criteria.add(Restrictions.eq("demographicId", String.valueOf(getProviderNo())));
+			criteria.add(Restrictions.eq("id", String.valueOf(getProviderNo())));
 		}
 		if(getFirstName() != null)
 		{
