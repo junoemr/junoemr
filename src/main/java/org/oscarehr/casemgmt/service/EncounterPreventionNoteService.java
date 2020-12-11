@@ -141,7 +141,7 @@ public class EncounterPreventionNoteService extends EncounterSectionService
 		{
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-			HashMap<String,String> h = prevList.get(i);
+			Map<String,String> h = prevList.get(i);
 			String prevName = h.get("name");
 
 			PreventionListData preventionListData = preventionListDataMap.get(prevName);
@@ -179,7 +179,7 @@ public class EncounterPreventionNoteService extends EncounterSectionService
 			// - Show if there are no ages set but sex matches
 
 
-			boolean show = pdc.display(sectionParams.getLoggedInInfo(), h, demographic, preventionCount);
+			boolean show = pdc.display(h, demographic, preventionCount);
 
 			if(show)
 			{

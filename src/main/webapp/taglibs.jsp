@@ -43,3 +43,4 @@
 <%@ taglib uri="http://struts-menu.sf.net/tag" prefix="menu"%>
 <%@ taglib uri="http://struts-menu.sf.net/tag-el" prefix="menu-el"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>

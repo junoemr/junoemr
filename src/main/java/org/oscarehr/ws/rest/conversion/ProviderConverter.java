@@ -47,7 +47,7 @@ public class ProviderConverter extends AbstractConverter<Provider, ProviderTo1> 
 		d.setTeam(t.getTeam());
 		d.setStatus(ConversionUtils.toBoolString(t.isEnabled()));
 		d.setLastUpdateDate(t.getLastUpdateDate());
-		d.setProviderType(t.getProviderActivity());
+		d.setProviderType(t.getProviderType());
 		if (t.getSex() != null) {
 			d.setSex(t.getSex().name());
 		}
@@ -82,7 +82,7 @@ public class ProviderConverter extends AbstractConverter<Provider, ProviderTo1> 
 		t.setTeam(d.getTeam());
 		t.setEnabled(ConversionUtils.fromBoolString(d.getStatus()));
 		t.setLastUpdateDate(d.getLastUpdateDate());
-		t.setProviderType(d.getProviderActivity());
+		t.setProviderType(d.getProviderType());
 		if (d.getSex() != null) {
 			try {
 				t.setSex(Sex1.valueOf(d.getSex().toUpperCase()));

@@ -268,10 +268,8 @@
 	<bean id="clinicaidSessionManager" class="org.oscarehr.integration.clinicaid.service.ClinicaidSessionManager" autowire="byName"/>
 
     <!-- TELEHEALTH -->
-	<bean id="myHealthAppointmentService" class="org.oscarehr.integration.myhealthaccess.service.AppointmentService" autowire="byName"/>
-	<bean id="myHealthClinicService" class="org.oscarehr.integration.myhealthaccess.service.ClinicService" autowire="byName"/>
     <bean id="myHealthAccessService" class="org.oscarehr.telehealth.service.MyHealthAccessService" autowire="byName"/>
-	<bean id="myHealthPatientService" class="org.oscarehr.integration.myhealthaccess.service.PatientService" autowire="byName"/>
+	<context:component-scan base-package="org.oscarehr.integration.myhealthaccess"/>
 
    <!--Email Support -->
    <context:component-scan base-package="oscar.service"/>
@@ -353,6 +351,7 @@
 		<property name="populationReportDao" ref="populationReportDao" />
 	</bean>
 	<bean id="genericIntakeManager" class="org.oscarehr.PMmodule.service.GenericIntakeManager" autowire="byName" />
+	<bean id="loginService" class="org.oscarehr.login.service.LoginService" autowire="byName" />
 
 	<!--
 	<task:executor id="taskExecutor" />

@@ -1,0 +1,48 @@
+.add-queued-appointment-modal {
+
+	.content {
+		min-height: 152px;
+	}
+
+	h5 {
+		margin-top: 0;
+	}
+
+	.juno-divider {
+		margin: 8px 0 8px 0;
+	}
+
+	.center-options {
+		display: flex;
+		flex-wrap: wrap;
+
+		juno-button {
+			flex: 1 0 100%;
+			margin-top: 8px;
+		}
+
+		juno-typeahead {
+			flex: 1 0 100%;
+			margin-top: 0;
+		}
+	}
+
+	.buttons {
+		display: flex;
+		justify-content: flex-end;
+
+		juno-button {
+			max-width: 160px;
+			.juno-button {
+				margin-top: 0;
+				button {
+					height: 40px;
+				}
+			}
+
+			&:not(:first-child) {
+				margin-left: 8px;
+			}
+		}
+	}
+}

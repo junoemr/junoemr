@@ -29,7 +29,8 @@ import integration.tests.util.data.SiteTestData;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -45,30 +46,20 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddSitesTests extends SeleniumTestBase {
-
-
-	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+public class AddSitesTests extends SeleniumTestBase 
+{
+	@After
+	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "site");
 	}
 
-	public void addNewSites(SiteTestData site, WebDriverWait wait)
+	public void addNewSites(SiteTestData site)
 	{
-/*
-		try
-		{
-			Thread.sleep(1000000);
-		}
-		catch(Exception e)
-		{
-
-		}
-*/
 		driver.findElement(By.xpath(".//a[contains(.,'System Management')]")).click();
 		driver.findElement(By.xpath(".//a[contains(.,'Satellite-sites Admin')]")).click();
 		if (PageUtil.isExistsBy(By.id("myFrame"), driver))
@@ -79,8 +70,8 @@ public class AddSitesTests extends SeleniumTestBase {
 		{
 			driver.switchTo().frame("content-frame");
 		}
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@value='Add New Site']")));
 		driver.findElement(By.xpath("//input[@value='Add New Site']")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='site.name']")));
 		driver.findElement(By.xpath("//input[@name='site.name']")).sendKeys(site.siteName);
 		driver.findElement(By.xpath("//input[@name='site.shortName']")).sendKeys(site.shortName);
 		driver.findElement(By.xpath("//input[@name='site.bgColor']")).sendKeys(site.address);
@@ -96,8 +87,8 @@ public class AddSitesTests extends SeleniumTestBase {
 	}
 
 	@Test
-	public void addSitesClassicUITest() throws Exception {
-		SiteTestData site = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[0]);
+	public void addSitesClassicUITest() throws Exception
+	{
 		// login
 		if (!Navigation.isLoggedIn(driver)) {
 			Navigation.doLogin(
@@ -107,20 +98,23 @@ public class AddSitesTests extends SeleniumTestBase {
 					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
 					driver);
 		}
+
+		SiteTestData site = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[0]);
+
 		// open administration panel
-		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("admin-panel")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("admin-panel")));
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);
-		addNewSites(site, wait);
+		addNewSites(site);
 		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(site.siteName), driver));
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
 	}
 
+
 	@Test
 	public void addSitesJUNOUITest() throws Exception
 	{
-		SiteTestData siteJuno = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[1]);
+
 		// login
 		Navigation.doLogin(
 				AuthUtils.TEST_USER_NAME,
@@ -129,16 +123,19 @@ public class AddSitesTests extends SeleniumTestBase {
 				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
 				driver);
 
-		// open JUNO UI page
-		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
+		SiteTestData siteJuno = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[1]);
+/*
+        // open JUNO UI page
+        driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
 
-		// open administration panel
-		driver.findElement(By.linkText("More")).click();
-		driver.findElement(By.linkText("Admin")).click();
-		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
-		addNewSites(siteJuno, wait);
+        // open administration panel
+        driver.findElement(By.linkText("More")).click();
+        driver.findElement(By.linkText("Admin")).click();*/
+		accessSectionJUNOUI(driver, "Admin");
+		addNewSites(siteJuno);
 		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(siteJuno.siteName), driver));
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
+
 	}
 }
 

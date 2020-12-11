@@ -22,6 +22,7 @@
  */
 package integration.tests.util;
 
+import integration.tests.util.junoUtil.Navigation;
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -30,8 +31,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.ConfigUtils;
+import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +50,8 @@ public class SeleniumTestBase
 	@LocalServerPort
 	protected int randomTomcatPort;
 
-	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 20;
-	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 20;
+	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 60;
+	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 60;
 	private static final String GECKO_DRIVER="src/test/resources/vendor/geckodriver";
 
 	private static final String INTEGRATION_PROPERTIES_FILE = "src/test/resources/integration.properties";
@@ -59,6 +62,8 @@ public class SeleniumTestBase
 	protected static Logger logger= MiscUtils.getLogger();
 
 	protected String tomcatPort;
+
+	protected WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 
 	@BeforeClass
 	public static void buildWebDriver() throws SQLException, InstantiationException,
@@ -75,6 +80,15 @@ public class SeleniumTestBase
 
 		//practically all integration tests rely on the security table. restore it.
 		SchemaUtils.restoreTable("security");
+
+		//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+	}
+
+	@Before
+	public void login()
+	{
+		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+		driver.manage().window().maximize();
 	}
 
 	@AfterClass
@@ -92,7 +106,6 @@ public class SeleniumTestBase
 		ffo.setBinary(ffb);
 		driver = new FirefoxDriver(ffo);
 		driver.manage().timeouts().implicitlyWait(WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
-
 	}
 
 	protected static void loadSpringBeans()

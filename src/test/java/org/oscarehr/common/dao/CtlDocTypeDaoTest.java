@@ -28,6 +28,8 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import integration.tests.util.junoUtil.DatabaseUtil;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,54 +46,156 @@ public class CtlDocTypeDaoTest extends DaoTestFixtures
 	@Autowired
 	protected CtlDocTypeDao ctlDocTypeDao;
 
-	public CtlDocTypeDaoTest() {
-	}
+	private final String lower = "mydocuments";
+	private final String upper = "MyDocuments";
 
 	@Before
-	public void before() throws Exception {
+	public void setup() throws Exception
+	{
+		// ctl_doctype_maventest table comes initialized with 9 demographic doctypes and 8 provider doctypes
+		SchemaUtils.restoreTable("ctl_doctype");
+	}
+
+	@AfterClass
+	public static void restore() throws Exception
+	{
 		SchemaUtils.restoreTable("ctl_doctype");
 	}
 
 	@Test
-	public void findByStatusAndModuleTest() {
-		CtlDocType tmp = new CtlDocType();
-		tmp.setModule("provider");
-		tmp.setDocType("test1");
-		tmp.setStatus("H");
-		ctlDocTypeDao.persist(tmp);
-		assertNotNull(tmp.getId());
+	public void insert()
+	{
+		Integer id = ctlDocTypeDao.addDocType("test", CtlDocType.MODULE_PROVIDER);
+		assertNotNull(id);
+	}
 
-		tmp = new CtlDocType();
-		tmp.setModule("provider");
-		tmp.setDocType("test2");
-		tmp.setStatus("I");
-		ctlDocTypeDao.persist(tmp);
-		assertNotNull(tmp.getId());
+	// Lookup should be case sensitive on docType
+	@Test
+	public void findCaseSensitive()
+	{
+		assertNotNull(ctlDocTypeDao.addDocType(lower, CtlDocType.MODULE_DEMOGRAPHIC));
+		assertNotNull(ctlDocTypeDao.addDocType(upper, CtlDocType.MODULE_DEMOGRAPHIC));
 
-		int aCount=0;
-		List<CtlDocType> result = ctlDocTypeDao.findByStatusAndModule(new String[]{"A"}, "provider");
+		List<CtlDocType> lowerResult = ctlDocTypeDao.findByDocTypeAndModule(lower, CtlDocType.MODULE_DEMOGRAPHIC);
+		List<CtlDocType> upperResult = ctlDocTypeDao.findByDocTypeAndModule(upper, CtlDocType.MODULE_DEMOGRAPHIC);
+
+		assertEquals(1, lowerResult.size());
+		assertEquals(1, upperResult.size());
+
+		CtlDocType lowerType = lowerResult.get(0);
+		CtlDocType upperType = upperResult.get(0);
+
+		assertEquals(lower, lowerType.getDocType());
+		assertEquals(upper, upperType.getDocType());
+	}
+
+	// Updating should be case sensitive on docType
+	@Test
+	public void changeDocTypeStatusCaseSensitive()
+	{
+		assertNotNull(ctlDocTypeDao.addDocType(lower, CtlDocType.MODULE_PROVIDER));
+		assertNotNull(ctlDocTypeDao.addDocType(upper, CtlDocType.MODULE_PROVIDER));
+
+		assertEquals((Integer) 1, ctlDocTypeDao.updateDocTypeStatus(lower, CtlDocType.MODULE_PROVIDER, CtlDocType.Status.Inactive.toString()));
+
+		List<CtlDocType> lowerResult = ctlDocTypeDao.findByDocTypeAndModule(lower, CtlDocType.MODULE_PROVIDER);
+		assertEquals(lowerResult.size(), 1);
+
+		CtlDocType inactiveLower = lowerResult.get(0);
+		assertEquals(CtlDocType.Status.Inactive.toString(), inactiveLower.getStatus());
+
+		CtlDocType origUpper = ctlDocTypeDao.findByDocTypeAndModule(upper, CtlDocType.MODULE_PROVIDER).get(0);
+		assertEquals(CtlDocType.Status.Active.toString(), origUpper.getStatus());
+	}
+
+	// Updating one doctype should not change the other.
+	@Test
+	public void changeDocTypeStatusDifferentModule()
+	{
+		assertNotNull(ctlDocTypeDao.addDocType(lower, CtlDocType.MODULE_DEMOGRAPHIC));
+		assertEquals(new Integer(0), ctlDocTypeDao.updateDocTypeStatus(lower, CtlDocType.Status.Inactive.toString(), CtlDocType.MODULE_PROVIDER));
+	}
+
+
+	@Test
+	public void findByStatusAndModule()
+	{
+		List<CtlDocType> result = ctlDocTypeDao.findByStatusAndModule(new String[]{
+				CtlDocType.Status.Active.toString()
+		}, CtlDocType.MODULE_DEMOGRAPHIC);
+
 		assertNotNull(result);
-		aCount = result.size();
-
-		result = ctlDocTypeDao.findByStatusAndModule(new String[]{"A","H"}, "provider");
-		assertNotNull(result);
-		assertEquals(aCount+1,result.size());
-
-		result = ctlDocTypeDao.findByStatusAndModule(new String[]{"A","H","I"}, "provider");
-		assertNotNull(result);
-		assertEquals(aCount+2,result.size());
+		assertEquals(9, result.size());
 	}
 
 	@Test
-	public void findByDocTypeAndModuleTest() {
+	public void findByStatusAndModuleMultipleStatuses()
+	{
 		CtlDocType tmp = new CtlDocType();
-		tmp.setModule("provider");
-		tmp.setDocType("test1");
-		tmp.setStatus("H");
+		tmp.setModule(CtlDocType.MODULE_PROVIDER);
+		tmp.setDocType("testDao1Test");
+		tmp.setStatus(CtlDocType.Status.Inactive.toString());
 		ctlDocTypeDao.persist(tmp);
 		assertNotNull(tmp.getId());
 
-		assertEquals(ctlDocTypeDao.findByDocTypeAndModule("test1", "provider").size(),1);
-		assertEquals(ctlDocTypeDao.findByDocTypeAndModule("test1", "demographic").size(),0);
+		CtlDocType tmp2 = new CtlDocType();
+		tmp2.setModule(CtlDocType.MODULE_PROVIDER);
+		tmp2.setDocType("testDao2Test");
+		tmp2.setStatus(CtlDocType.Status.Inactive.toString());
+		ctlDocTypeDao.persist(tmp2);
+		assertNotNull(tmp2.getId());
+
+		int expectedProviderDocTypes = 8;
+
+		List<CtlDocType> result = ctlDocTypeDao.findByStatusAndModule(new String[]{
+				CtlDocType.Status.Active.toString()
+				}, CtlDocType.MODULE_PROVIDER);
+
+		assertNotNull(result);
+		assertEquals(8, result.size());
+
+		result = ctlDocTypeDao.findByStatusAndModule(new String[] {
+				CtlDocType.Status.Active.toString(),
+				CtlDocType.Status.Inactive.toString()
+		        }, CtlDocType.MODULE_PROVIDER);
+
+		assertNotNull(result);
+		assertEquals(expectedProviderDocTypes + 2, result.size());
+	}
+
+	@Test
+	public void findByDocTypeAndModule()
+	{
+		final String docTypeName = "testDao1Test";
+
+		CtlDocType tmp = new CtlDocType();
+		tmp.setModule(CtlDocType.MODULE_PROVIDER);
+		tmp.setDocType(docTypeName);
+		tmp.setStatus(CtlDocType.Status.Active.toString());
+		ctlDocTypeDao.persist(tmp);
+		assertNotNull(tmp.getId());
+
+		List<CtlDocType> results = ctlDocTypeDao.findByDocTypeAndModule("testDao1Test", CtlDocType.MODULE_PROVIDER);
+		assertEquals(results.size(),1);
+
+		CtlDocType docType = results.get(0);
+
+		assertEquals(docTypeName, docType.getDocType());
+		assertEquals(CtlDocType.MODULE_PROVIDER, docType.getModule());
+		assertEquals(CtlDocType.Status.Active.toString(), docType.getStatus());
+	}
+
+	@Test
+	// Module is case insensitive
+	public void findByModule()
+	{
+		List<CtlDocType> providerDocTypes = ctlDocTypeDao.findByModule(CtlDocType.MODULE_PROVIDER);
+		assertEquals(8, providerDocTypes.size());
+
+		List<CtlDocType> providerDocTypesCapitalized = ctlDocTypeDao.findByModule("Provider");
+		assertEquals(8, providerDocTypesCapitalized.size());
+
+		List<CtlDocType> demographicDocTypes = ctlDocTypeDao.findByModule(CtlDocType.MODULE_DEMOGRAPHIC);
+		assertEquals(9, demographicDocTypes.size());
 	}
 }

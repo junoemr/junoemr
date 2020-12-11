@@ -24,12 +24,12 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.data.PatientTestCollection;
 import integration.tests.util.data.PatientTestData;
 import integration.tests.util.junoUtil.Navigation;
-import integration.tests.util.data.PatientTestCollection;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
-import org.junit.BeforeClass;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -38,11 +38,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
 import static integration.tests.util.data.PatientTestCollection.patientLNames;
@@ -53,23 +53,24 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddPatientsTests extends SeleniumTestBase
 {
+	//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+	@AfterClass
+	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	{
+		SchemaUtils.restoreTable("admission", "demographic",
+				"demographicArchive", "demographiccust", "demographicExt", "demographicExtArchive", "log", "log_ws_rest",
+				"program", "provider_recent_demographic_access");
+	}
 
-	public static boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException
+	public boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow) throws InterruptedException
 	{
 		driver.findElement(searchPage).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(searchTerm));
 		WebElement searchTermField = driver.findElement(searchTerm);
 		searchTermField.sendKeys(lastName + ", " + firstName);
 		searchTermField.sendKeys(Keys.ENTER);
 		Thread.sleep(2000);
 		return PageUtil.isExistsBy(nameRow, driver);
-	}
-
-	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
-	{
-		SchemaUtils.restoreTable("admission", "demographic",
-				"demographicArchive", "demographiccust", "demographicExt", "demographicExtArchive", "log", "log_ws_rest",
-				"program", "provider_recent_demographic_access");
 	}
 
 	@Test
@@ -205,15 +206,16 @@ public class AddPatientsTests extends SeleniumTestBase
 
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title=\"Add a new Patient\"]")));
 
 		// Add a demographic record page
 		driver.findElement(By.xpath("//button[@title=\"Add a new Patient\"]")).click();
-
 		PatientTestData son = PatientTestCollection.patientMap.get(patientLNames[2]);
 		driver.findElement(By.id("input-lastName")).sendKeys(son.lastName);
 		driver.findElement(By.id("input-firstName")).sendKeys(son.firstName);
 		dropdownSelectByValue(driver, By.id("input-gender"), "string:" + son.sex);
 		driver.findElement(By.id("input-dob")).sendKeys(son.dobYear + "-" + son.dobMonth + "-" + son.dobDate);
+		driver.findElement(By.id("input-address")).click();
 		driver.findElement(By.id("input-hin")).sendKeys(son.hin);
 		dropdownSelectByValue(driver, By.id("input-hcType"), "string:" + son.hcType);
 		driver.findElement(By.id("input-address")).sendKeys(son.address);
@@ -222,7 +224,9 @@ public class AddPatientsTests extends SeleniumTestBase
 		driver.findElement(By.id("input-postal-code")).sendKeys(son.postal);
 		driver.findElement(By.id("input-email")).sendKeys(son.email);
 		driver.findElement(By.id("input-phone")).sendKeys(son.homePhone);
-		driver.findElement(By.xpath("//button[contains(., 'Add')]")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@ng-click='$ctrl.onAdd()']")));
+		driver.findElement(By.xpath("//button[@ng-click='$ctrl.onAdd()']")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title='Search']")));
 
 		Assert.assertTrue(isPatientAdded(son.lastName, son.firstName,
 				By.xpath("//button[@title='Search']"),

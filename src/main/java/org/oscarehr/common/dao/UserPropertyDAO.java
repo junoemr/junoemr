@@ -41,8 +41,6 @@ import org.springframework.stereotype.Repository;
 public class UserPropertyDAO extends AbstractDao<UserProperty>
 {
 
-	public final static String COLOR_PROPERTY = "ProviderColour";
-
 	/** Creates a new instance of UserPropertyDAO */
 	public UserPropertyDAO()
 	{

@@ -39,8 +39,6 @@
 %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@page import="org.oscarehr.casemgmt.model.*"%>
-<%@page import="java.util.ArrayList"%>
 
 <ul>
 	<c:forEach var="issue" items="${issueList}">

@@ -25,5 +25,5 @@
 
  */
 
-angular.module('Common.Components', [ 'Common.Services' ]);
+angular.module('Common.Components', [ 'Common.Services', 'Common.Components.JunoTab']);
 

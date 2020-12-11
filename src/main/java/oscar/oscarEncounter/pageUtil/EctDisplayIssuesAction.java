@@ -25,24 +25,22 @@
 
 package oscar.oscarEncounter.pageUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.util.MessageResources;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicIssue;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
-import org.oscarehr.casemgmt.service.CaseManagementIssueService;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
+import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.util.CppUtils;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-
 import oscar.util.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * retrieves info to display Disease entries for demographic
@@ -83,7 +81,15 @@ public class EctDisplayIssuesAction extends EctDisplayAction {
 		List<CaseManagementIssue> issues_unr = new ArrayList<CaseManagementIssue>();
 		//only list unresolved issues				
 		for(CaseManagementIssue issue : issues) {
-			if(CaseManagementIssueService.containsIssue(CppUtils.cppCodes,issue.getIssue().getCode())) {
+
+			// hide cpp issues
+			if(containsIssue(CppUtils.cppCodes,issue.getIssue().getCode()))
+			{
+				continue;
+			}
+			// don't show tickler issues either
+			if(containsIssue(new String[]{Issue.SUMMARY_CODE_TICKLER_NOTE}, issue.getIssue().getCode()))
+			{
 				continue;
 			}
 			if(!issue.isResolved()) {
@@ -224,7 +230,6 @@ public class EctDisplayIssuesAction extends EctDisplayAction {
 		return cmd;
 	}
 
-	/*
 	public boolean containsIssue(String[]  issues, String issueCode) {
 		for (String caseManagementIssue : issues) {
 			if (caseManagementIssue.equals(issueCode)) {
@@ -233,5 +238,4 @@ public class EctDisplayIssuesAction extends EctDisplayAction {
 		}
 		return false;
 	}
-	 */
 }

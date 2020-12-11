@@ -28,6 +28,7 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,19 +56,14 @@ public class EFormTests extends SeleniumTestBase
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 	private static String EFORM_URL = "/eform/efmformslistadd.jsp?demographic_no=1&appointment=&parentAjaxId=eforms";
 
-	@Autowired
-	private DatabaseUtil databaseUtil;
-
+	/*
+	@BeforeClass
+	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException
+	*/
 	@Before
 	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
-		SchemaUtils.restoreTable("admission", "demographic",
-				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
-				"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
-				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "eform", "eform_values");
-
 		loadSpringBeans();
-		databaseUtil.createTestDemographic();
 
 		SchemaUtils.loadFileIntoMySQL(SqlFiles.EFORM_ADD_TRAVLE_FORM_V4);
 
@@ -80,6 +76,15 @@ public class EFormTests extends SeleniumTestBase
 					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
 					driver);
 		}
+	}
+
+	@After
+	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	{
+		SchemaUtils.restoreTable("admission", "demographic",
+				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
+				"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
+				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "eform", "eform_values");
 	}
 
 	@Test

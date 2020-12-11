@@ -7,6 +7,8 @@
 		@include juno-tab-lg($tabs-height);
 		@include juno-tab-color-scheme-white(2px);
 		@include juno-font-tab;
+		overflow-y: auto;
+		overflow-x: hidden;
 
 		.form-group {
 			align-items: center;
@@ -45,7 +47,7 @@
 
 		.tab-pane {
 			overflow: auto;
-			height: calc(#{$modal-body-height} - #{$tabs-height});
+			height: calc(100% - #{$tabs-height});
 
 			.tab-bar-inputs {
 				position: absolute;

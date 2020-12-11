@@ -24,12 +24,12 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.data.ProviderTestData;
 import integration.tests.util.junoUtil.Navigation;
-import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
-import org.junit.BeforeClass;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -44,22 +44,26 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByIndex;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddProvidersTests extends SeleniumTestBase {
+public class AddProvidersTests extends SeleniumTestBase
+{
+	public static final ProviderTestData drApple = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]);
+	public static final ProviderTestData drBerry = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[1]);
+	public static final ProviderTestData drCherry = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[2]);
 
-	@BeforeClass
-	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	@AfterClass
+	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "program_provider",
 				"provider", "provider_billing", "providerbillcenter", "secUserRole");
 	}
 
 	@Test
-	public void addProvidersClassicUITest() throws Exception {
+	public void addProvidersClassicUITest() throws Exception 
+	{
 		// login
 		if (!Navigation.isLoggedIn(driver)) {
 			Navigation.doLogin(
@@ -69,13 +73,13 @@ public class AddProvidersTests extends SeleniumTestBase {
 					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
 					driver);
 		}
+
 		// open administration panel
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);
 
 		// Add a provider record page
 		driver.findElement(By.xpath(".//h5[contains(.,'Add a Provider Record')]")).click();
-		ProviderTestData drApple = ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]);
 		driver.switchTo().frame("myFrame");
 		driver.findElement(By.xpath("//input[@value='Suggest']")).click();
 		driver.findElement(By.xpath("//input[@name='provider_no']")).clear();
@@ -107,7 +111,7 @@ public class AddProvidersTests extends SeleniumTestBase {
 		driver.findElement(By.xpath("//input[@name='xml_p_specialty_code']")).sendKeys(drApple.specialtyCodeNo);
 		driver.findElement(By.xpath("//input[@name='xml_p_billinggroup_no']")).sendKeys(drApple.groupBillingNo);
 		driver.findElement(By.xpath("//input[@name='practitionerNo']")).sendKeys(drApple.cpsidNo);
-		dropdownSelectByIndex(driver, By.xpath("//select[@name='billcenter']"), 0);//dropdown empty
+		dropdownSelectByValue(driver, By.xpath("//select[@name='billcenter']"), drApple.billCenter);//dropdown empty
 		driver.findElement(By.xpath("//input[@name='xml_p_slpusername']")).sendKeys(drApple.selfLearningUsername);
 		driver.findElement(By.xpath("//input[@name='xml_p_slppassword']")).sendKeys(drApple.selfLearningPassword);
 		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), drApple.status);

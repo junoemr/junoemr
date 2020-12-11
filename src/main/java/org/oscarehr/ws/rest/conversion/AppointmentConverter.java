@@ -154,6 +154,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		//appointment.setRemarks(t.getRemarks());
 		Appointment.BookingSource bookingSource = (t.isTagSelfBooked())? Appointment.BookingSource.MYOSCAR_SELF_BOOKING : null;
 		appointment.setBookingSource(bookingSource);
+		appointment.setCreatorSecurityId(t.getCreatorSecurityId());
 
 		return appointment;
 	}
@@ -292,6 +293,10 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		calendarAppointment.setDoNotBook(appointment.getName().equals(Appointment.DONOTBOOK));
 		calendarAppointment.setAppointmentName(appointmentName);
 		calendarAppointment.setConfirmed(appointment.isConfirmed());
+		if (appointment.getBookingSource() != null)
+		{
+			calendarAppointment.setBookingSource(appointment.getBookingSource().toString());
+		}
 
 		return calendarAppointment;
 	}

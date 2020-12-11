@@ -24,10 +24,11 @@ package integration.tests;
 
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
-import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.seleniumUtil.PageUtil;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,9 +36,11 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,12 +49,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 import static integration.tests.util.seleniumUtil.PageUtil.switchToNewWindow;
+import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -60,8 +65,19 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 	@Autowired
 	private DatabaseUtil databaseUtil;
 
+	public static String templateTitleGeneral = "P:General";
+	
+	static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+
 	@Before
 	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	{
+		loadSpringBeans();
+		databaseUtil.createTestProvider();
+	}
+
+	@After
+	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "program_provider",
 				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
@@ -95,10 +111,24 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 			for (int j = 0; j < numSlotsPerHour; j++)
 			{
 				int inputPosition = startingCell + i * numCellsPerHour + j * (apptDuration / durationSelected);
-				driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[" + tr +
-						"]/td[" + inputPosition + "]/input")).sendKeys(templateCode);
+				driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr["
+						+ tr + "]/td[" + inputPosition + "]/input")).sendKeys(templateCode);
 			}
 		}
+	}
+
+	public static List<String> getDailySchedule()
+	{
+		ArrayList<String> daySchedule = new ArrayList<>();
+		for (int d = 0; d < 7; d++)
+		{
+			int tr = d + 1;
+			String dayScheduleElement =
+					driver.findElement(By.xpath("html/body/form/table/tbody/tr/td[2]/center/p[1]/table[1]/tbody/tr[3]/td["
+							+ tr + "]/a/font[3]")).getText();
+			daySchedule.add(dayScheduleElement);
+		}
+		return daySchedule;
 	}
 
 	public static void setWeeklySchedule(By weekday, By template, By addingButton)
@@ -108,10 +138,52 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		driver.findElement(addingButton).click();
 	}
 
+	public static void setupTemplate(String currWindowHandle, Set<String> oldWindowHandles) throws InterruptedException {
+		PageUtil.switchToWindow(currWindowHandle, driver);
+		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles);
+		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General");
+		driver.findElement(By.xpath("//input[@name='summary']")).sendKeys("15 mins duration");
+		//15 mins duration 9-12
+		setDailySchedule(3, 4, 7, 5, 15, 15,3,"1");
+		//30 mins breaks 12-12:30
+		driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[4]/td[2]/input")).sendKeys("b");
+		driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[4]/td[4]/input")).sendKeys("b");
+		//15 mins duration 13-15
+		setDailySchedule(3, 4, 7, 5, 15, 15,4, "1");
+		driver.findElement(By.xpath("//input[@value='Save']")).click();
+	}
+
+	public static void setupSchedule(String currWindowHandle, String providerNo, String templateTitle1, String templateTitle2)
+	{
+		PageUtil.switchToWindow(currWindowHandle, driver);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='provider_no']")));
+		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), providerNo);
+		LocalDate currentDate = LocalDate.now();
+		String month = Integer.toString(currentDate.getMonthValue());
+		String year = Integer.toString(currentDate.getYear());
+		String endYear = Integer.toString(currentDate.getYear()+1);
+		driver.findElement(By.xpath("//input[@name='syear']")).sendKeys(year);
+		driver.findElement(By.xpath("//input[@name='smonth']")).sendKeys(month);
+		driver.findElement(By.xpath("//input[@name='sday']")).sendKeys("1");
+		driver.findElement(By.xpath("//input[@name='eyear']")).sendKeys(endYear);
+		driver.findElement(By.xpath("//input[@name='emonth']")).sendKeys(month);
+		driver.findElement(By.xpath("//input[@name='eday']")).sendKeys("1");
+		setWeeklySchedule(By.xpath("//input[@name='checksun']"), By.xpath("//option[@value='"+templateTitle1+"']"), By.xpath("//input[@name='sunto1']"));
+		setWeeklySchedule(By.xpath("//input[@name='checkmon']"), By.xpath("//option[@value='"+templateTitle1+"']"), By.xpath("//input[@name='monto1']"));
+		setWeeklySchedule(By.xpath("//input[@name='checktue']"), By.xpath("//option[@value='"+templateTitle2+"']"), By.xpath("//input[@name='tueto1']"));
+		setWeeklySchedule(By.xpath("//input[@name='checkwed']"), By.xpath("//option[@value='"+templateTitle1+"']"), By.xpath("//input[@name='wedto1']"));
+		setWeeklySchedule(By.xpath("//input[@name='checkthu']"), By.xpath("//option[@value='"+templateTitle2+"']"), By.xpath("//input[@name='thuto1']"));
+		setWeeklySchedule(By.xpath("//input[@name='checkfri']"), By.xpath("//option[@value='"+templateTitle1+"']"), By.xpath("//input[@name='frito1']"));
+		setWeeklySchedule(By.xpath("//input[@name='checksat']"), By.xpath("//option[@value='"+templateTitle1+"']"), By.xpath("//input[@name='satto1']"));
+		driver.findElement(By.id("submitBTNID")).click();
+		driver.findElement(By.xpath("//a[contains(.,'next month')]")).click();
+	}
+
 	@Test
 	public void setScheduleTest() throws Exception
 	{
 		String holidayName = "Happy Monday";
+
 		// login
 		if (!Navigation.isLoggedIn(driver)) {
 			Navigation.doLogin(
@@ -122,12 +194,8 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 					driver);
 		}
 
-		// open administration panel
-		driver.findElement(By.id("admin-panel")).click();
-		PageUtil.switchToLastWindow(driver);
-		driver.findElement(By.xpath(".//a[contains(.,'Schedule Management')]")).click();
-		driver.findElement(By.xpath(".//a[contains(.,'Schedule Setting')]")).click();
-		driver.switchTo().frame("myFrame");
+		// open Schedule Template Setting page
+		accessAdministrationSectionClassicUI(driver, "Schedule Management","Schedule Setting");
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 
@@ -147,7 +215,8 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		dropdownSelectByValue(driver, By.xpath("//select[@name='code']"), "A");
 		driver.findElement(By.xpath("//input[@value='Edit']")).click();
 		driver.findElement(By.xpath("//input[@value='Delete']")).click();
-		Assert.assertFalse("Template is NOT deleted successfully.", isTemplateInDropdownOpions(By.xpath("//select[@name='code']"), "A"));
+		Assert.assertFalse("Template is NOT deleted successfully.",
+				isTemplateInDropdownOpions(By.xpath("//select[@name='code']"), "A"));
 
 		//Set "5|Dr. Apple 5 mins"
 		driver.findElement(By.xpath("//input[@name='code']")).sendKeys("5");
@@ -158,7 +227,8 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		driver.findElement(By.id("bookinglimit")).sendKeys("1");
 		driver.findElement(By.xpath("//input[@value='Wk']")).click();
 		driver.findElement(By.xpath("//input[@value='Save']")).click();
-		Assert.assertTrue("Template is NOT added successfully.", isTemplateInDropdownOpions(By.xpath("//select[@name='code']"), "5"));
+		Assert.assertTrue("Template is NOT added successfully.",
+				isTemplateInDropdownOpions(By.xpath("//select[@name='code']"), "5"));
 
 		//Edit "a|Administrative Work" to be " b|Break 30 mins"
 		dropdownSelectByValue(driver, By.xpath("//select[@name='code']"), "a");
@@ -167,36 +237,29 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		textEdit(driver, By.xpath("//input[@name='description']"), "Break 30 mins");
 		textEdit(driver, By.xpath("//input[@name='duration']"), "30");
 		driver.findElement(By.xpath("//input[@value='Save']")).click();
-		Assert.assertTrue("Template is NOT edited successfully.", isTemplateInDropdownOpions(By.xpath("//select[@name='code']"), "b"));
+		Assert.assertTrue("Template is NOT edited successfully.",
+				isTemplateInDropdownOpions(By.xpath("//select[@name='code']"), "b"));
 		driver.findElement(By.xpath("//input[@value='Exit']")).click();
 
 		//Template setting for public
-		PageUtil.switchToWindow(currWindowHandle, driver);
-		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles);
-		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General");
-		driver.findElement(By.xpath("//input[@name='summary']")).sendKeys("15 mins duration");
-		//15 mins duration 9-12
-		setDailySchedule(3, 4, 7, 5, 15, 15,3,"1");
-		//30 mins breaks 12-12:30
-		driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[4]/td[2]/input")).sendKeys("b");
-		driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[4]/td[4]/input")).sendKeys("b");
-		//15 mins duration 13-15
-		setDailySchedule(3, 4, 7, 5, 15, 15,4, "1");
-		driver.findElement(By.xpath("//input[@value='Save']")).click();
-		Assert.assertTrue("Template for public is NOT added successfully.", isTemplateInDropdownOpions(By.xpath("//select[@name='name']"), "P:General"));
+		setupTemplate(currWindowHandle, oldWindowHandles);
+		String templateTitleGeneralUpdate = "P:General-Updated";
+		String templateTitleTueThur = "Tue/Thur Schedule";
+		Assert.assertTrue("Template for public is NOT added successfully.",
+				isTemplateInDropdownOpions(By.xpath("//select[@name='name']"), templateTitleGeneral));
 
 		//Edit Template
-		dropdownSelectByValue(driver, By.xpath("//select[@name='name']"), "P:General");
+		dropdownSelectByValue(driver, By.xpath("//select[@name='name']"), templateTitleGeneral);
 		driver.findElement(By.xpath("//input[@value='Edit']")).click();
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General-Updated");
 		//30 mins break 12-12:30 -> 1 break and a 30 mins appointment
 		textEdit(driver, By.xpath("html/body/table/tbody/tr/td[2]/form[3]/table[1]/tbody/tr[4]/td/table/tbody/tr[4]/td[4]/input"), "2");
 		driver.findElement(By.xpath("//input[@value='Save']")).click();
 		Assert.assertTrue("Template for public is NOT updated successfully.",
-				isTemplateInDropdownOpions(By.xpath("//select[@name='name']"), "P:General-Updated"));
+				isTemplateInDropdownOpions(By.xpath("//select[@name='name']"), templateTitleGeneralUpdate));
 
 		//Delete Template
-		dropdownSelectByValue(driver, By.xpath("//select[@name='name']"), "P:General-Updated");
+		dropdownSelectByValue(driver, By.xpath("//select[@name='name']"), templateTitleGeneralUpdate);
 		driver.findElement(By.xpath("//input[@value='Edit']")).click();
 		driver.findElement(By.xpath("//input[@value='Delete']")).click();
 		Assert.assertFalse("Template for public is NOT deleted successfully.",
@@ -205,7 +268,8 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 
 		//Template Setting for Dr. Apple
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='providerid']"), ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]).providerNo);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='providerid']"),
+				ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]).providerNo);
 		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles);
 		dropdownSelectByValue(driver, By.xpath("//select[@name='step1']"), "5");
 		driver.findElement(By.xpath("//input[@value='Go']")).click();
@@ -230,44 +294,19 @@ public class ScheduleSettingTests extends SeleniumTestBase {
 		driver.findElement(By.xpath("//input[@value='Exit']")).click();
 
 		//Set from Provider - Dr. Apple
-		PageUtil.switchToWindow(currWindowHandle, driver);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]).providerNo);
-		LocalDate currentDate = LocalDate.now();
-		String month = Integer.toString(currentDate.getMonthValue());
-		String year = Integer.toString(currentDate.getYear());
-		String endYear = Integer.toString(currentDate.getYear()+1);
-		driver.findElement(By.xpath("//input[@name='syear']")).sendKeys(year);
-		driver.findElement(By.xpath("//input[@name='smonth']")).sendKeys(month);
-		driver.findElement(By.xpath("//input[@name='sday']")).sendKeys("1");
-		driver.findElement(By.xpath("//input[@name='eyear']")).sendKeys(endYear);
-		driver.findElement(By.xpath("//input[@name='emonth']")).sendKeys(month);
-		driver.findElement(By.xpath("//input[@name='eday']")).sendKeys("1");
-		setWeeklySchedule(By.xpath("//input[@name='checksun']"), By.xpath("//option[@value='P:General']"), By.xpath("//input[@name='sunto1']"));
-		setWeeklySchedule(By.xpath("//input[@name='checkmon']"), By.xpath("//option[@value='P:General']"), By.xpath("//input[@name='monto1']"));
-		setWeeklySchedule(By.xpath("//input[@name='checktue']"), By.xpath("//option[@value='Tue/Thur Schedule']"), By.xpath("//input[@name='tueto1']"));
-		setWeeklySchedule(By.xpath("//input[@name='checkwed']"), By.xpath("//option[@value='P:General']"), By.xpath("//input[@name='wedto1']"));
-		setWeeklySchedule(By.xpath("//input[@name='checkthu']"), By.xpath("//option[@value='Tue/Thur Schedule']"), By.xpath("//input[@name='thuto1']"));
-		setWeeklySchedule(By.xpath("//input[@name='checkfri']"), By.xpath("//option[@value='P:General']"), By.xpath("//input[@name='frito1']"));
-		setWeeklySchedule(By.xpath("//input[@name='checksat']"), By.xpath("//option[@value='P:General']"), By.xpath("//input[@name='satto1']"));
-		driver.findElement(By.id("submitBTNID")).click();
-		driver.findElement(By.xpath("//a[contains(.,'next month')]")).click();
-
-		String happenMondayScheduled = driver.findElement(By.xpath("html/body/form/table/tbody/tr/td[2]/center/p[1]/table[1]/tbody/tr[3]/td[2]/a/font[2]")).getText();
+  		setupSchedule(currWindowHandle, ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]).providerNo,
+				templateTitleGeneral, templateTitleTueThur);
+		String happenMondayScheduled =
+				driver.findElement(By.xpath("html/body/form/table/tbody/tr/td[2]/center/p[1]/table[1]/tbody/tr[3]/td[2]/a/font[2]")).getText();
 		Assert.assertEquals("Happy Monday does NOT show in schedule.", happenMondayScheduled, "Happy Monday");
-		String monSchedule = driver.findElement(By.xpath("/html/body/form/table/tbody/tr/td[2]/center/p[1]/table[1]/tbody/tr[3]/td[2]/a/font[3]")).getText();
-		String tueSchedule = driver.findElement(By.xpath("html/body/form/table/tbody/tr/td[2]/center/p[1]/table[1]/tbody/tr[3]/td[3]/a/font[3]")).getText();
-		String wedSchedule = driver.findElement(By.xpath("html/body/form/table/tbody/tr/td[2]/center/p[1]/table[1]/tbody/tr[3]/td[4]/a/font[3]")).getText();
-		String thuSchedule = driver.findElement(By.xpath("html/body/form/table/tbody/tr/td[2]/center/p[1]/table[1]/tbody/tr[3]/td[5]/a/font[3]")).getText();
-		String friSchedule = driver.findElement(By.xpath("/html/body/form/table/tbody/tr/td[2]/center/p[1]/table[1]/tbody/tr[3]/td[6]/a/font[3]")).getText();
-		String satSchedule = driver.findElement(By.xpath("html/body/form/table/tbody/tr/td[2]/center/p[1]/table[1]/tbody/tr[3]/td[7]/a/font[3]")).getText();
-		String sunSchedule = driver.findElement(By.xpath("html/body/form/table/tbody/tr/td[2]/center/p[1]/table[1]/tbody/tr[3]/td[1]/a/font[3]")).getText();
-		Assert.assertTrue("Schedule setting for Monday is NOT completed successfully.", monSchedule.contains("P:General"));
-		Assert.assertTrue("Schedule setting for Tuesday is NOT completed successfully.", tueSchedule.contains("Tue/Thur Schedule"));
-		Assert.assertTrue("Schedule setting for Wednesday is NOT completed successfully.", wedSchedule.contains("P:General"));
-		Assert.assertTrue("Schedule setting for Thursday is NOT completed successfully.", thuSchedule.contains("Tue/Thur Schedule"));
-		Assert.assertTrue("Schedule setting for Friday is NOT completed successfully.", friSchedule.contains("P:General"));
-		Assert.assertTrue("Schedule setting for Saturday is NOT completed successfully.", satSchedule.contains("P:General"));
-		Assert.assertTrue("Schedule setting for Sunday is NOT completed successfully.", sunSchedule.contains("P:General"));
+		List<String> daySchedule = getDailySchedule();
+		Assert.assertTrue("Schedule setting for Monday is NOT completed successfully.", daySchedule.get(1).contains(templateTitleGeneral));
+		Assert.assertTrue("Schedule setting for Tuesday is NOT completed successfully.", daySchedule.get(2).contains(templateTitleTueThur));
+		Assert.assertTrue("Schedule setting for Wednesday is NOT completed successfully.", daySchedule.get(3).contains(templateTitleGeneral));
+		Assert.assertTrue("Schedule setting for Thursday is NOT completed successfully.", daySchedule.get(4).contains(templateTitleTueThur));
+		Assert.assertTrue("Schedule setting for Friday is NOT completed successfully.", daySchedule.get(5).contains(templateTitleGeneral));
+		Assert.assertTrue("Schedule setting for Saturday is NOT completed successfully.", daySchedule.get(6).contains(templateTitleGeneral));
+		Assert.assertTrue("Schedule setting for Sunday is NOT completed successfully.", daySchedule.get(0).contains(templateTitleGeneral));
 		driver.findElement(By.id("submitBTNID")).click();
 		Assert.assertTrue("Schedule setting is failed.",
 				PageUtil.isExistsBy(By.xpath(".//td[contains(.,'You have finished one Schedule Setting successfully.')]"), driver));

@@ -26,16 +26,22 @@
 
  */
 
+import {SitesApi} from "../../../generated";
+
 angular.module("Common.Services").service("providerService", [
 	'$http',
 	'$q',
 	'junoHttp',
-	function($http, $q, junoHttp)
+	'$httpParamSerializer',
+	function($http, $q, junoHttp, $httpParamSerializer)
 	{
 
 		var service = {};
 
 		service.apiPath = '../ws/rs/providerService';
+
+		service.sitesApi = new SitesApi($http, $httpParamSerializer,
+			'../ws/rs');
 
 		service.getMe = function getMe()
 		{
@@ -121,6 +127,32 @@ angular.module("Common.Services").service("providerService", [
 			return deferred.promise;
 		};
 
+		service.isProviderAssignedToSite = function isProviderAssignedToSite(provNo, siteNo)
+		{
+			var deferred = $q.defer();
+
+			service.sitesApi.getSitesByProvider(provNo).then(
+
+				function success(results)
+				{
+					var assigned = false;
+					for(var result in results.data.body)
+					{
+						if (results.data.body[result].siteId === siteNo)
+						{
+							assigned = true;
+						}
+					}
+					deferred.resolve(assigned);
+				},
+				function error(errors)
+				{
+					console.log("providerService::getProviderList error", errors);
+					deferred.reject("An error occurred fetching the Provider");
+				});
+			return deferred.promise;
+		};
+
 		//TODO move to its own service
 		service.saveSettings = function saveSettings(providerNo, settings)
 		{
@@ -180,6 +212,105 @@ angular.module("Common.Services").service("providerService", [
 				function error(error) {
 					deferred.reject("An error occurred while getting RecentDemographicsViewed: " + error);
 				});
+			return deferred.promise;
+		};
+
+		// create a new provider
+		service.createProvider = function createProvider(providerTo1)
+		{
+			var deferred = $q.defer();
+
+			$http(
+					{
+						url: service.apiPath + "/provider/new",
+						method: "POST",
+						data: JSON.stringify(providerTo1),
+						headers: Juno.Common.ServiceHelper.configHeaders()
+					}).then(
+					function success(results)
+					{
+						deferred.resolve(results.data);
+					},
+					function error(errors)
+					{
+						console.log("providerService::create error", errors);
+						deferred.reject("An error occurred while creating a new provider");
+					});
+
+			return deferred.promise;
+		};
+
+		// create a new provider
+		service.editProvider = function editProvider(providerNo, providerTo1)
+		{
+			var deferred = $q.defer();
+
+			$http(
+					{
+						url: service.apiPath + "/provider/" + providerNo + "/edit",
+						method: "POST",
+						data: JSON.stringify(providerTo1),
+						headers: Juno.Common.ServiceHelper.configHeaders()
+					}).then(
+					function success(results)
+					{
+						deferred.resolve(results.data);
+					},
+					function error(errors)
+					{
+						console.log("providerService::edit error", errors);
+						deferred.reject("An error occurred while editing provider: " + providerNo);
+					});
+
+			return deferred.promise;
+		};
+
+
+		// create a new provider
+		service.getProviderEditForm = function getProviderEditForm(providerNo)
+		{
+			var deferred = $q.defer();
+
+			$http(
+					{
+						url: service.apiPath + "/provider/" + providerNo + "/edit_form",
+						method: "GET",
+						headers: Juno.Common.ServiceHelper.configHeaders()
+					}).then(
+					function success(results)
+					{
+						deferred.resolve(results.data);
+					},
+					function error(errors)
+					{
+						console.log("Failed to get provider edit form for provider: " + providerNo + " with error error", errors);
+						deferred.reject("An error occurred while fetching provider from");
+					});
+
+			return deferred.promise;
+		};
+
+		service.enableProvider = function(providerNo, enable)
+		{
+			var deferred = $q.defer();
+
+			$http(
+					{
+						url: service.apiPath + "/provider/" + providerNo + "/update_status",
+						method: "POST",
+						data: JSON.stringify(enable),
+						headers: Juno.Common.ServiceHelper.configHeaders()
+					}).then(
+					function success(results)
+					{
+						deferred.resolve(results.data);
+					},
+					function error(errors)
+					{
+						console.log("providerService::enableProvider error", errors);
+						deferred.reject("An error occurred while enabling provider: " + providerNo);
+					});
+
 			return deferred.promise;
 		};
 

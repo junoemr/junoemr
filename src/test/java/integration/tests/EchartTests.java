@@ -28,9 +28,9 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -63,13 +63,17 @@ public class EchartTests extends SeleniumTestBase
 	@Before
 	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
-		SchemaUtils.restoreTable("admission", "appointment", "demographic",
+		loadSpringBeans();
+		databaseUtil.createTestDemographic("Test", "Test", "F");
+	}
+
+	@After
+	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
+	{
+		SchemaUtils.restoreTable("admission", "demographic",
 				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
 				"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
 				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "hash_audit");
-
-		loadSpringBeans();
-		databaseUtil.createTestDemographic();
 	}
 
 	@Test
@@ -101,10 +105,12 @@ public class EchartTests extends SeleniumTestBase
 		{
 			noteId = driver.findElement(By.xpath("//textarea[@name='caseNote_note']")).getAttribute("id");
 		}
-
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		js.executeScript("window.scrollBy(0, document.body.scrollHeight)");
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("newNoteImg")));
+
+		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("newNoteImg")));
+
 		WebElement newNoteButton = driver.findElement(By.id("newNoteImg"));
 		newNoteButton.click();
 

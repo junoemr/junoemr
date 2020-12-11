@@ -32,6 +32,10 @@ body {
 	}
 }
 
+.body-normal {
+	@include juno-font-body;
+}
+
 .body-bold {
 	@include juno-font-body;
 	font-weight: bold;
@@ -45,6 +49,10 @@ body {
 .body-extra-small-bold {
 	@include juno-font-body-smallest();
 	font-weight: bold;
+}
+
+.body-smallest {
+	@include juno-font-body-smallest();
 }
 
 .hand-hover {
@@ -62,6 +70,10 @@ body {
 .align-items-center {
 	align-items: center;
 }
+.align-items-flex-end {
+	align-items: flex-end;
+}
+
 .align-items-baseline {
 	align-items: baseline;
 }
@@ -69,13 +81,16 @@ body {
 	align-items: first baseline;
 }
 .align-items-end {
-	align-items: end;
+	align-items: flex-end;
 }
 .justify-content-right {
 	justify-content: right;
 }
 .justify-content-center {
 	justify-content: center;
+}
+.justify-content-end {
+	justify-content: flex-end;
 }
 .justify-content-evenly {
 	justify-content: space-evenly;
@@ -98,6 +113,9 @@ body {
 .flex-grow {
 	flex-grow: 1;
 }
+.flex-fill-row {
+	flex: 1 1 100%;
+}
 .overflow-auto {
 	overflow: auto;
 }
@@ -109,76 +127,148 @@ body {
 	display: inline-block;
 }
 
-.no-margin-top {
-	margin-top: 0;
+.d-block {
+	display: block;
 }
 
-.md-margin-top {
-	margin-top: $margin-md;
+.d-inline-block {
+	display: inline-block;
 }
 
-.xl-margin-right {
-	margin-right: $margin-xl;
-}
+// more specific to override bootstrap
+body {
+	.no-margin-top {
+		margin-top: 0;
+	}
 
-.lg-margin-right {
-	margin-right: $margin-lg;
-}
+	.xl-margin-right {
+		margin-right: $margin-xl;
+	}
 
-.md-margin-right {
-	margin-right: $margin-md;
-}
+	.md-margin-top {
+		margin-top: $margin-md;
+	}
 
-.sm-margin-right {
-	margin-right: $margin-sm;
-}
+	.md-margin-right {
+		margin-right: $margin-md;
+	}
 
-.xl-margin-left {
-	margin-left: $margin-xl;
-}
+	.sm-margin-right {
+		margin-right: $margin-sm;
+	}
 
-.lg-margin-left {
-	margin-left: $margin-lg;
-}
+	.sm-margin-top {
+		margin-top: $margin-sm;
+	}
 
-.md-margin-left {
-	margin-left: $margin-md;
-}
+	.xl-margin-left {
+		margin-left: $margin-xl;
+	}
 
-.sm-margin-left {
-	margin-left: $margin-sm;
-}
+	.lg-margin {
+		margin: $margin-lg;
+	}
 
-.sm-margin-top {
+	.lg-margin-left {
+		margin-left: $margin-lg;
+	}
+
+	.lg-margin-right {
+		margin-right: $margin-lg;
+	}
+
+	.lg-margin-top {
+		margin-top: $margin-lg;
+	}
+
+	.lg-margin-bottom {
+		margin-bottom: $margin-lg;
+	}
+
+	.md-margin-left {
+		margin-left: $margin-md;
+	}
+
+	.md-margin-top {
+		margin-top: $margin-md;
+	}
+
+	.md-margin-bottom {
+		margin-bottom: $margin-md;
+	}
+	.sm-margin-left {
+		margin-left: $margin-sm;
+	}
+
+	.sm-margin-top {
 	margin-top: $margin-sm;
-}
+}.no-margin-bottom {
+		margin-bottom: 0;
+	}
 
-.no-margin-bottom {
-	margin-bottom: 0;
-}
+	.lg-padding {
+		padding: $padding-lg;
+	}
 
-.no-padding {
-	padding: 0;
-}
+	.lg-padding-left {
+		padding-left: $padding-lg;
+	}
 
-.no-padding-left {
+	.lg-padding-right {
+		padding-right: $padding-lg;
+	}
+
+	.lg-padding-bottom {
+		padding-bottom: $padding-lg;
+	}
+
+	.md-padding-left {
+		padding-left: $padding-md;
+	}
+
+	.md-padding-right {
+		padding-right: $padding-md;
+	}
+
+	.md-padding-bottom {
+		padding-bottom: $padding-md;
+	}
+
+	.no-padding {
+		padding: 0;
+	}
+
+	.no-padding-left {
 	padding-left: 0;
-}
+	}
 
-.no-margin {
-	margin: 0;
-}
+	.no-margin {
+		margin: 0;
+	}
 
-.icon-lg {
-	font-size: $icon-lg;
-}
+	.no-float {
+		float: none;
+	}
 
-.icon-md {
-	font-size: $icon-md;
-}
+	.float-left {
+		float: left;
+	}
 
-.icon-sm {
-	font-size: $icon-sm;
+	.float-right {
+		float: right;
+	}
+
+	.icon-lg {
+		font-size: $icon-lg;
+	}
+
+	.icon-md {
+		font-size: $icon-md;
+	}
+
+	.icon-sm {
+		font-size: $icon-sm;
+	}
 }
 
 // Makes checkbox flush with input (as long as checkbox margin is 0)
@@ -265,6 +355,30 @@ a,.clickable {
 	height: 100%;
 }
 
+.height-50 {
+	height: 50%;
+}
+
+.height-33 {
+	height: 33%;
+}
+
+.height-25 {
+	height: 25%;
+}
+
 .width-100 {
 	width: 100%;
+}
+
+.width-50 {
+	width: 50%;
+}
+
+.width-33 {
+	width: 33%;
+}
+
+.width-25 {
+	width: 25%;
 }

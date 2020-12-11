@@ -21,16 +21,40 @@
  * Canada
  */
 
+import {JUNO_STYLE} from "../junoComponentConstants";
+
 angular.module('Common.Components').component('panel',
 {
 	templateUrl: 'src/common/components/panel/panel.jsp',
-	bindings: {},
+	bindings: {
+		componentStyle: "<?",
+		noHeader: "<?"
+	},
 	transclude: {
 		'header': '?panelHeader',
 		'body':   '?panelBody'
 	},
 	controller: ['$scope', function ($scope)
 	{
+		let ctrl = this;
+
+		ctrl.$onInit = () =>
+		{
+			ctrl.noHeader = ctrl.noHeader || false;
+			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+		}
+
+		ctrl.componentClasses = () =>
+		{
+			return [ctrl.componentStyle]
+		}
+
+		ctrl.bodyClasses = () =>
+		{
+			return {
+				"no-header": ctrl.noHeader,
+			}
+		}
 
 	}]
 });

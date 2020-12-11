@@ -127,6 +127,25 @@ angular.module("Common.Services").service("providersService", [
 			return deferred.promise;
 		};
 
+		service.getAllProviderRoles = function()
+		{
+			var deferred = $q.defer();
+
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			junoHttp.get(service.apiPath + '/providerRoles', config).then(
+					function success(results)
+					{
+						deferred.resolve(results.data);
+					},
+					function error(errors)
+					{
+						console.log("providersService::providerRoles error", errors);
+						deferred.reject("An error occurred while getting provider roles data");
+					});
+
+			return deferred.promise;
+		};
+
 		return service;
 	}
 ]);

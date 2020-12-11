@@ -24,6 +24,7 @@
 
 package oscar.oscarBilling.ca.bc.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -52,9 +53,7 @@ import oscar.entities.BillingStatusType;
 import oscar.entities.PaymentType;
 import oscar.util.UtilDateUtilities;
 
-public class BillingFormData {
-	
-	private DiagnosticCodeDao diagnosticCodeDao = SpringUtils.getBean(DiagnosticCodeDao.class);
+public class BillingFormData implements Serializable {
 
 	public ArrayList<PaymentType> getPaymentTypes() {
 		ArrayList<PaymentType> types = new ArrayList<PaymentType>();
@@ -272,7 +271,8 @@ public class BillingFormData {
 
 	}
 
-	public class BillingVisit {
+	public class BillingVisit implements Serializable
+	{
 		String billingvisit = "";
 		String description = "";
 		String displayName = "";
@@ -376,6 +376,8 @@ public class BillingFormData {
 	}
 
 	public String getDiagDesc(String dx, String reg) {
+		final DiagnosticCodeDao diagnosticCodeDao = SpringUtils.getBean(DiagnosticCodeDao.class);
+
 		String dxdesc = "";
 		for (DiagnosticCode dcode : diagnosticCodeDao.findByDiagnosticCodeAndRegion(dx, reg)) {
 			dxdesc = dcode.getDescription();

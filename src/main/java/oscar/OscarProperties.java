@@ -560,6 +560,11 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("multisites");
 	}
 
+	public boolean isMyHealthAccessEnabled()
+	{
+		return isPropertyActive("myhealthaccess_telehealth_enabled");
+	}
+
 	public boolean isScheduleEnabled()
 	{
 		return isPropertyActive("schedule.enabled");
@@ -602,6 +607,17 @@ public class OscarProperties extends Properties {
 	public String getCmeJs()
 	{
 		return getProperty("cme_js");
+	}
+
+	// Methods for Google OAuth
+	public String getGoogleClientID()
+	{
+		return getProperty("google_client_id");
+	}
+
+	public String getGoogleResource()
+	{
+		return getProperty("google_resource");
 	}
 
 	// =========================================================================

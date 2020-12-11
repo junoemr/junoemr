@@ -26,8 +26,10 @@ require('ngstorage');
 require('pym.js');
 require('./scss/juno.scss');
 require('font-awesome/css/font-awesome.min.css');
-import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
+require('angular-drag-and-drop-lists');
 
+import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
+import {EDIT_PROVIDER_MODE} from "./src/admin/integration/editProviderPage/editProviderAdminConstants";
 
 var oscarApp = angular.module('oscarProviderViewModule', [
 	'ui.router',
@@ -66,7 +68,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Admin',
 	'Admin.Integration',
 	'Admin.Integration.Know2act',
-	'Admin.Integration.Fax'
+	'Admin.Integration.Fax',
 ]);
 
 oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider)
@@ -181,6 +183,43 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/activity',
 			component: 'iceFallAdminActivity'
 		})
+		.state('admin.addUser',
+		{
+			url: '/addUser',
+			component: 'editProviderAdmin',
+			params:
+			{
+				mode: EDIT_PROVIDER_MODE.ADD
+			}
+		})
+		.state('admin.editUser',
+		{
+			url: '/editUser?providerNo',
+			component: 'editProviderAdmin',
+			params:
+					{
+						mode: EDIT_PROVIDER_MODE.EDIT
+					}
+		})
+		.state('admin.viewUser',
+		{
+			url: '/viewUser?providerNo',
+			component: 'editProviderAdmin',
+			params:
+					{
+						mode: EDIT_PROVIDER_MODE.VIEW
+					}
+		})
+		.state('admin.manageUsers',
+		{
+			url: '/manageUsers',
+			component: 'manageUsersAdmin',
+		})
+		.state('admin.manageAppointmentQueues',
+			{
+				url: '/manageAppointmentQueues',
+				component: 'manageAppointmentQueuesAdmin',
+			})
 		.state('ticklers',
 		{
 			url: '/ticklers',

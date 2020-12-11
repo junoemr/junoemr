@@ -26,87 +26,93 @@
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@ page import="oscar.oscarProvider.data.*"%>
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO"%>
 <%@ page import="org.oscarehr.common.model.UserProperty"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
 
 <%
-  if(session.getValue("user") == null) response.sendRedirect("../logout.htm");
-  String curUser_no = (String) session.getAttribute("user");
+	if(session.getValue("user") == null)
+	{
+		response.sendRedirect("../logout.htm");
+	}
+	String curUser_no = (String) session.getAttribute("user");
 %>
 <html:html locale="true">
 <head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
+	<html:base />
+	<link rel="stylesheet" type="text/css" href="../oscarEncounter/encounterStyles.css">
+	<title><bean:message key="provider.editRxFax.title" /></title>
+	<script type="text/javascript">
+		function validate()
+		{
+			var msg = "<bean:message key="provider.editRxFax.msgPhoneFormat" />";
+			var strnum = document.forms[0].elements[0].value;
 
-<html:base />
-<link rel="stylesheet" type="text/css"
-	href="../oscarEncounter/encounterStyles.css">
+			if (strnum.length === 0)
+			{
+				alert("Please enter a fax number!");
+				return false;
+			}
 
-<title><bean:message key="provider.editRxFax.title" /></title>
+			if(!strnum.match(/^\d{3}-\d{3}-\d{4}$/))
+			{
+				alert(msg);
+				return false;
+			}
 
-<script type="text/javascript">
-    function validate() {        
-        var msg = "<bean:message key="provider.editRxFax.msgPhoneFormat" />";
-        var strnum = document.forms[0].elements[0].value;
-        if(strnum.length > 0 ) {
-	        if( !strnum.match(/^\d{3}-\d{3}-\d{4}$/) ) {
-	            alert(msg);
-	            return false;
-	        }
-        }
-        return true;        
-    }
-</script>
-
+			return true;
+		}
+	</script>
 </head>
 
 <body class="BodyStyle" vlink="#0000FF">
 
 <table class="MainTable" id="scrollNumber1" name="encounterTable">
 	<tr class="MainTableTopRow">
-		<td class="MainTableTopRowLeftColumn"><bean:message
-			key="provider.editRxFax.msgPrefs" /></td>
-		<td style="color: white" class="MainTableTopRowRightColumn"><bean:message
-			key="provider.editRxFax.msgProviderFaxNumber" /></td>
+		<td class="MainTableTopRowLeftColumn"><bean:message key="provider.editRxFax.msgPrefs" /></td>
+		<td style="color: white" class="MainTableTopRowRightColumn"><bean:message key="provider.editRxFax.msgProviderFaxNumber" /></td>
 	</tr>
 	<tr>
 		<td class="MainTableLeftColumn">&nbsp;</td>
 		<td class="MainTableRightColumn">
 		<%
-		UserPropertyDAO propertyDao = (UserPropertyDAO)SpringUtils.getBean("UserPropertyDAO");
-		UserProperty prop = propertyDao.getProp(curUser_no,"faxnumber");			
-		String faxNum = "";
-        if(prop!=null) {
-        	faxNum = prop.getValue();
-        }
-               
-               if( request.getAttribute("status") == null )
-               {
-      
-            %> <html:form action="/EditFaxNum.do">
 
+			UserPropertyDAO propertyDao = SpringUtils.getBean(UserPropertyDAO.class);
+			UserProperty prop = propertyDao.getProp(curUser_no, UserProperty.PROVIDER_FAXNUMBER);
+			String faxNum = "";
+			if(prop != null)
+			{
+				faxNum = prop.getValue();
+			}
 
-			<span style="color:blue">By entering in a value, you will 
-			<ul>
-			<li>Override the fax # in prescriptions</li>
-			<li> When choosing your letterhead in consult requests, the clinic fax # and your provider record's fax # will be overridden
-			</li>
-			</ul>
-			</span>
-            <br/>
+			if(request.getAttribute("status") == null)
+			{
+		%>
+			<html:form action="/EditFaxNum.do">
+				<span style="color:blue">By entering in a value, you will
+					<ul>
+						<li>Override the fax # in prescriptions</li>
+						<li> When choosing your letterhead in consult requests, the clinic fax # and your provider record's fax # will be overridden
+						</li>
+					</ul>
+				</span>
+				<br/>
+				<html:text property="faxNumber" value="<%=faxNum%>" size="40" />
+				<br>
 
-			<html:text property="faxNumber" value="<%=faxNum%>" size="40" />
-			<br>
+				<input type="submit" onclick="return validate();"
+					   value="<bean:message key="provider.editRxFax.btnSubmit"/>" />
+			</html:form>
+			<%
 
-			<input type="submit" onclick="return validate();"
-				value="<bean:message key="provider.editRxFax.btnSubmit"/>" />
-		</html:form> <%
-               }
-               else if( ((String)request.getAttribute("status")).equals("complete") ) {
-            %> <bean:message key="provider.editRxFax.msgSuccess" /> <br>
-		<%=faxNum%> <%
-               }
+			}
+			else if(request.getAttribute("status").equals("complete"))
+			{
+            %>
+			<bean:message key="provider.editRxFax.msgSuccess" /> <br><%=faxNum%>
+			<%
+			}
             %>
 		</td>
 	</tr>

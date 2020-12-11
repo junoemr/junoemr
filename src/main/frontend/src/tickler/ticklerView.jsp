@@ -41,10 +41,9 @@
 				<div class="form-group col-sm-12">
 					<label>Message</label>
 					<textarea rows="5"
-							  ng-model="ticklerViewCtrl.ticklerUpdate.message"
+							  ng-value="ticklerViewCtrl.ticklerUpdate.message"
 							  class="form-control"
-							  ng-readonly="!ticklerViewCtrl.ticklerWriteAccess">
-						{{ticklerViewCtrl.ticklerUpdate.message}}
+                              readonly>
 					</textarea>
 				</div>
 				<div class="form-group col-sm-6">
@@ -224,6 +223,10 @@
 	<button class="btn btn-success" ng-click="ticklerViewCtrl.saveChanges()"
 			ng-show="ticklerViewCtrl.ticklerWriteAccess">
 		<bean:message key="tickler.view.save" bundle="ui"/>
+	</button>
+	<button class="btn btn-success" ng-click="ticklerViewCtrl.saveChangesAndWriteEncounter()"
+	        ng-show="ticklerViewCtrl.ticklerWriteAccess">
+		<bean:message key="tickler.view.saveWithEncounter" bundle="ui"/>
 	</button>
 </div>
 

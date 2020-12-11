@@ -22,6 +22,8 @@
  */
 package org.oscarehr.integration.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 
@@ -100,6 +102,14 @@ public class IntegrationPushUpdate extends AbstractModel<Integer>
 
 	@Column(name = "json_data")
 	private String jsonData;
+
+	// The identifier of the target of the update.
+	// Can be NULL. This identifier, if not NULL
+	// is used to insure in-order delivery of updates
+	@Getter
+	@Setter
+	@Column(name = "target_id")
+	private String targetId;
 
 	@Override
 	public Integer getId()
@@ -235,6 +245,11 @@ public class IntegrationPushUpdate extends AbstractModel<Integer>
 	public void setJsonData(String jsonData)
 	{
 		this.jsonData = jsonData;
+	}
+
+	public Boolean hasTarget()
+	{
+		return this.targetId != null;
 	}
 
 	@PrePersist

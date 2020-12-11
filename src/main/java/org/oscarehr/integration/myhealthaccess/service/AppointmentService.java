@@ -28,20 +28,25 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
 import org.oscarehr.integration.myhealthaccess.ErrorHandler;
+import org.oscarehr.integration.myhealthaccess.conversion.SessionInfoInboundDtoMHATelehealthSessionInfoConverter;
+import org.oscarehr.integration.myhealthaccess.dto.AppointmentAqsLinkTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookResponseTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentBookTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
 import org.oscarehr.integration.myhealthaccess.dto.AppointmentSearchTo1;
 import org.oscarehr.integration.myhealthaccess.dto.NotificationTo1;
+import org.oscarehr.integration.myhealthaccess.dto.SessionInfoInboundDto;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.BookingException;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotUniqueException;
 import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
+import org.oscarehr.integration.myhealthaccess.model.MHATelehealthSessionInfo;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.UUID;
 
 @Service("myHealthAppointmentService")
 public class AppointmentService extends BaseService
@@ -51,6 +56,9 @@ public class AppointmentService extends BaseService
 
 	@Autowired
 	OscarAppointmentDao oscarAppointmentDao;
+
+	@Autowired
+	SessionInfoInboundDtoMHATelehealthSessionInfoConverter sessionInfoConverter;
 
 	public void updateAppointmentCache(IntegrationData integrationData, AppointmentCacheTo1 appointmentTransfer)
 	{
@@ -77,11 +85,25 @@ public class AppointmentService extends BaseService
 
 	/**
 	 * book a telehealth appointment in MHA.
-	 * @param loggedInInfo - logged in info
+	 * @param loggedInInfo - logged in info.
 	 * @param appointment - the appointment to book.
-	 * @throws InvalidIntegrationException
+	 * @param sendNotification - if true the patient is sent a notification of the appointment booking.
+	 * @throws InvalidIntegrationException - if MHA integration invalid
 	 */
 	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, boolean sendNotification) throws InvalidIntegrationException
+	{
+		bookTelehealthAppointment(loggedInInfo, appointment, sendNotification, null);
+	}
+
+	/**
+	 * book a telehealth appointment in MHA.
+	 * @param loggedInInfo - logged in info.
+	 * @param appointment - the appointment to book.
+	 * @param sendNotification - if true the patient is sent a notification of the appointment booking.
+	 * @param remoteId - if provided (can be null) this overrides demographic_no and the appointment will be booked directly for that remote patient id.
+	 * @throws InvalidIntegrationException - if MHA integration invalid
+	 */
+	public void bookTelehealthAppointment(LoggedInInfo loggedInInfo, Appointment appointment, boolean sendNotification, UUID remoteId) throws InvalidIntegrationException
 	{
 		String appointmentSite = null;
 		if (IsPropertiesOn.isMultisitesEnable())
@@ -92,7 +114,7 @@ public class AppointmentService extends BaseService
 		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointmentSite).getToken();
 		String apiKey = getApiKey(appointmentSite);
 		AppointmentBookResponseTo1 appointmentBookResponseTo1 = postWithToken(formatEndpoint("/clinic_user/appointment/book"),
-				apiKey, new AppointmentBookTo1(appointment, false, sendNotification), AppointmentBookResponseTo1.class, loginToken);
+				apiKey, new AppointmentBookTo1(appointment, false, sendNotification, remoteId), AppointmentBookResponseTo1.class, loginToken);
 		if (!appointmentBookResponseTo1.isSuccess())
 		{
 			throw new BookingException(appointmentBookResponseTo1.getMessage());
@@ -117,7 +139,7 @@ public class AppointmentService extends BaseService
 		String loginToken = clinicService.loginOrCreateClinicUser(loggedInInfo, appointmentSite).getToken();
 		String apiKey = getApiKey(appointmentSite);
 		AppointmentBookResponseTo1 appointmentBookResponseTo1 = postWithToken(formatEndpoint("/clinic_user/appointment/book"),
-				apiKey, new AppointmentBookTo1(appointment, true, sendNotification), AppointmentBookResponseTo1.class, loginToken);
+				apiKey, new AppointmentBookTo1(appointment, true, sendNotification, null), AppointmentBookResponseTo1.class, loginToken);
 		if (!appointmentBookResponseTo1.isSuccess())
 		{
 			throw new BookingException(appointmentBookResponseTo1.getMessage());
@@ -192,6 +214,47 @@ public class AppointmentService extends BaseService
 			throw new RuntimeException("Unexpected status type when looking up MHA appointment for integration [" + integration.getId() +
 					"] appointmentNo [" + appointmentNo + "]");
 		}
+	}
+
+	/**
+	 * get information about the MHA telehealth session
+	 * @param integration - integration to use when fetching the information
+	 * @param mhaAppointmentId - the appointment to get session information for.
+	 * @return telehealth session info
+	 */
+	public MHATelehealthSessionInfo getAppointmentSessionInformation(Integration integration, UUID mhaAppointmentId) throws IllegalAccessException, InstantiationException
+	{
+		String url = formatEndpoint("/clinic/%s/appointment/%s/session", integration.getRemoteId(), mhaAppointmentId);
+		return sessionInfoConverter.convert(get(url, integration.getApiKey(), SessionInfoInboundDto.class));
+	}
+
+	/**
+	 * get information about the MHA telehealth session
+	 * @param integration - integration to use when fetching the information
+	 * @param appointmentNo - the appointment no to get session information for.
+	 * @return telehealth session info
+	 */
+	public MHATelehealthSessionInfo getAppointmentSessionInformation(Integration integration, Integer appointmentNo) throws InstantiationException, IllegalAccessException
+	{
+		MHAAppointment mhaAppointment = getAppointment(integration, appointmentNo);
+		return getAppointmentSessionInformation(integration, UUID.fromString(mhaAppointment.getId()));
+	}
+
+
+	/**
+	 * link an MHA appointment with an AQS telehealth session
+	 * @param integration - integration on which to perform the link
+	 * @param loggedInInfo - logged in info
+	 * @param mhaAppointment - the MHA appointment to link
+	 * @param queuedAppointmentId - the queued appointment to link
+	 * @throws InvalidIntegrationException - if the integration is not setup correctly
+	 */
+	public void linkAppointmentToAqsTelehealth(Integration integration, LoggedInInfo loggedInInfo, MHAAppointment mhaAppointment, UUID queuedAppointmentId) throws InvalidIntegrationException
+	{
+		String loginToken = clinicService.loginOrCreateClinicUser(integration, loggedInInfo.getLoggedInSecurity().getSecurityNo()).getToken();
+		String apiKey = integration.getApiKey();
+		postWithToken(formatEndpoint("/clinic_user/self/appointment/" + mhaAppointment.getId() + "/aqs_link"),
+		              apiKey, new AppointmentAqsLinkTo1(queuedAppointmentId), null, loginToken);
 	}
 
 }

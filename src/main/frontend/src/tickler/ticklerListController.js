@@ -148,7 +148,8 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 						count: 10,// initial count per page
 						sorting: {
 							ServiceDate: "desc"
-						}
+						},
+                        paginationMinBlocks: 2
 					},
 					{
 						// total: 0, // length of data

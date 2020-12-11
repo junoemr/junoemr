@@ -3,6 +3,7 @@ import {ScheduleApi} from '../../generated/api/ScheduleApi';
 import {SitesApi} from '../../generated/api/SitesApi';
 import {ProviderPreferenceApi} from '../../generated/api/ProviderPreferenceApi';
 import {SystemPreferenceApi} from "../../generated/api/SystemPreferenceApi";
+import {MhaAppointmentApi, MhaIntegrationApi} from "../../generated";
 
 angular.module('Schedule').controller('Schedule.ScheduleController', [
 
@@ -23,6 +24,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'uiCalendarConfig',
 	'errorsService',
 	'globalStateService',
+	'mhaService',
 
 	function (
 		$scope,
@@ -41,7 +43,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		scheduleService,
 		uiCalendarConfig,
 		messagesFactory,
-		globalStateService
+		globalStateService,
+		mhaService
 	)
 	{
 		let controller = this;
@@ -61,6 +64,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.systemPreferencesApi = new SystemPreferenceApi($http, $httpParamSerializer,
 			'../ws/rs');
+
+		controller.mhaAppointmentApi = new MhaAppointmentApi($http, $httpParamSerializer,
+		                                                     '../ws/rs');
+		controller.mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer,
+		                                                     '../ws/rs');
 
 		controller.providerSettings = loadedSettings;
 		controller.calendarMinColumnWidth = 250;
@@ -354,6 +362,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			$scope.calendar().fullCalendar('prev');
 		};
+
 		$scope.stepForward = function stepForward()
 		{
 			$scope.calendar().fullCalendar('next');
@@ -531,7 +540,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			var timeStr = "08:00";
 			var preference = controller.providerSettings.startHour;
 			if (Juno.Common.Util.exists(preference) && Juno.Common.Util.isIntegerString(preference)
-				&& Number(preference) > 0 && Number(preference) < 24)
+				&& Number(preference) >= 0 && Number(preference) < 24)
 			{
 				timeStr = Juno.Common.Util.pad0(preference) + ":00";
 			}
@@ -543,9 +552,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			var timeStr = "20:00";
 			var preference = controller.providerSettings.endHour;
 			if (Juno.Common.Util.exists(preference) && Juno.Common.Util.isIntegerString(preference)
-				&& Number(preference) > 0 && Number(preference) < 24)
+				&& Number(preference) >= 0 && Number(preference) < 24)
 			{
-				timeStr = Juno.Common.Util.pad0(preference) + ":00";
+				timeStr = Juno.Common.Util.pad0(preference) + ":59";
 			}
 			return timeStr;
 		};
@@ -889,10 +898,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let eventElement = element.find('.fc-content');
 				eventElement.html(require('./view-event.html'));
 
+				let scheduleElem = eventElement.find(".schedule-event");
 				let statusElem = eventElement.find('.icon-status');
 				let labelElem = eventElement.find('.event-label');
 				let detailElem = eventElement.find('.event-details');
 				let bookingStatusElem = eventElement.find('.book-status-container');
+				let bookingStatusBox = bookingStatusElem.children(".booking-status-box");
 				let telehealthElem = eventElement.find('.event-telehealth');
 				// By default this element is hidden
 				telehealthElem.hide();
@@ -929,10 +940,29 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let eventReason = "";
 				let eventNotes = "";
 
-				// Only show telehealth icon if it's both on for the instance and the appointment has the virtual flag
+				// telehealth
 				if (controller.telehealthEnabled && event.data.virtual)
 				{
+					// Only show telehealth icon if it's both on for the instance and the appointment has the virtual flag
 					telehealthElem.show();
+
+					// On hover show telehealth status
+					telehealthElem.hover(() =>
+					{
+						$scope.getTelehealthStatusToolTip(event.data.site, event.data.appointmentNo).then(
+								(tooltip) =>
+								{
+									if (tooltip)
+									{
+										telehealthElem.attr("title", tooltip);
+									}
+									else 
+									{
+										telehealthElem.attr("title", "Patient not present");
+									}
+								}
+						);
+					});
 				}
 
 				if (event.data.doNotBook)
@@ -979,17 +1009,17 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				// TODO: Can we move this to the template?
 				if(Juno.Common.Util.exists(event.data.tagSelfBooked) && event.data.tagSelfBooked)
 				{
-					let text = bookingStatusElem.attr("title") ? bookingStatusElem.attr("title") : "";
-					bookingStatusElem.attr("title",  text + " Self Booked |");
-					bookingStatusElem.children(".booking-status-box").children(".self-booked-status").addClass("visible");
+					let text = bookingStatusBox.attr("title") ? bookingStatusBox.attr("title") : "";
+					bookingStatusBox.attr("title",  text + " Self Booked |");
+					bookingStatusBox.children(".self-booked-status").addClass("visible");
 					detailElem.parent().addClass('show-self-booked');
 				}
 
 				if (event.data.confirmed)
 				{
-					let text = bookingStatusElem.attr("title") ? bookingStatusElem.attr("title") : "";
-					bookingStatusElem.attr("title", text + " Confirmed |");
-					bookingStatusElem.children(".booking-status-box").find('.confirmed-appointment').addClass('visible');
+					let text = bookingStatusBox.attr("title") ? bookingStatusBox.attr("title") : "";
+					bookingStatusBox.attr("title", text + " Confirmed |");
+					bookingStatusBox.find('.confirmed-appointment').addClass('visible');
 				}
 
 				if (event.data.tagSelfBooked || event.data.confirmed)
@@ -1055,6 +1085,20 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 
 		};
+
+		$scope.getTelehealthStatusToolTip = async (site, appointmentNo) =>
+		{
+			let integrations = (await controller.mhaIntegrationApi.searchIntegrations(site)).data.body;
+			if (integrations.length > 0)
+			{
+				let telehealthStatus = (await controller.mhaAppointmentApi.getTelehealthSessionInformation(integrations[0].id, appointmentNo)).data.body;
+				if (telehealthStatus.patientInSession)
+				{
+					return mhaService.telehealthStatusToDisplayName(telehealthStatus.sessionStatus);
+				}
+			}
+			return null;
+		}
 
 		$scope.onViewRender = function onViewRender(view, element)
 		{

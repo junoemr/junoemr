@@ -24,13 +24,6 @@
 
 package oscar.oscarTickler.pageUtil;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.mail.EmailException;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -45,14 +38,20 @@ import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.model.TicklerComment;
 import org.oscarehr.common.model.TicklerTextSuggest;
 import org.oscarehr.common.model.TicklerUpdate;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.OscarProperties;
 import oscar.util.DateUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Date;
+import java.util.ResourceBundle;
 
 public class EditTicklerAction extends DispatchAction{
     
@@ -79,6 +78,7 @@ public class EditTicklerAction extends DispatchAction{
         String priority = request.getParameter("priority");
         String assignedTo = request.getParameter("assignedToProviders");
         String serviceDate = request.getParameter("xml_appointment_date");
+        Boolean writeEncounterNote = Boolean.parseBoolean(request.getParameter("writeEncounterNote"));
         
         if ((ticklerNo == null)
          || (status == null)
@@ -91,9 +91,9 @@ public class EditTicklerAction extends DispatchAction{
             return mapping.findForward("failure");
         }
         
-        Tickler t = ticklerManager.getTickler(loggedInInfo,ticklerNo);
+        Tickler tickler = ticklerManager.getTickler(loggedInInfo,ticklerNo);
         
-        if (t == null) {
+        if (tickler == null) {
             errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("tickler.ticklerEdit.arg.error"));
             saveErrors(request,errors);
             return mapping.findForward("failure");
@@ -112,7 +112,7 @@ public class EditTicklerAction extends DispatchAction{
 
                
                 try {
-                	ticklerManager.sendNotification(loggedInInfo,t);     
+                	ticklerManager.sendNotification(loggedInInfo,tickler);
 
                     //add tickler comment noting patient was emailed
                     TicklerComment tc = new TicklerComment();
@@ -129,7 +129,7 @@ public class EditTicklerAction extends DispatchAction{
                     tc.setUpdateDate(now);
                     tc.setProviderNo(providerNo);
 
-                    t.getComments().add(tc);
+                    tickler.getComments().add(tc);
                     isComment = true;
 
                 }catch (EmailException e) {
@@ -159,7 +159,7 @@ public class EditTicklerAction extends DispatchAction{
             tc.setUpdateDate(now);
             tc.setProviderNo(providerNo);
 
-            ticklerManager.addCommentToTickler(t, tc);
+            ticklerManager.addCommentToTickler(tickler, tc);
             isComment = true;
         }
 
@@ -169,50 +169,50 @@ public class EditTicklerAction extends DispatchAction{
         //back fill the original state of the tickler so we don't lose it  
         TicklerUpdate tuOriginal = new TicklerUpdate();
 
-        if (t.getUpdates().isEmpty()) {                                                              
-            tuOriginal.setTicklerNo(t.getId());
-            tuOriginal.setProviderNo(t.getCreator());
-            tuOriginal.setUpdateDate(t.getUpdateDate());
+        if (tickler.getUpdates().isEmpty()) {
+            tuOriginal.setTicklerNo(tickler.getId());
+            tuOriginal.setProviderNo(tickler.getCreator());
+            tuOriginal.setUpdateDate(tickler.getUpdateDate());
 
-            tuOriginal.setStatus(t.getStatus());
-            tuOriginal.setPriority(t.getPriority().toString());
-            tuOriginal.setAssignedTo(t.getTaskAssignedTo());                                
-            tuOriginal.setServiceDate(t.getServiceDate()); 
+            tuOriginal.setStatus(tickler.getStatus());
+            tuOriginal.setPriority(tickler.getPriority().toString());
+            tuOriginal.setAssignedTo(tickler.getTaskAssignedTo());
+            tuOriginal.setServiceDate(tickler.getServiceDate());
             
-            ticklerManager.addUpdateToTickler(t, tuOriginal);
+            ticklerManager.addUpdateToTickler(tickler, tuOriginal);
         }
 
         TicklerUpdate tu = new TicklerUpdate();
-        tu.setTicklerNo(t.getId());
+        tu.setTicklerNo(tickler.getId());
         tu.setUpdateDate(now);            
         tu.setProviderNo(providerNo);
 
         boolean isUpdate = false;                        
 
-        if (!status.equals(String.valueOf(t.getStatus()))){
+        if (!status.equals(String.valueOf(tickler.getStatus()))){
             tu.setStatusAsChar(status.charAt(0));
-            t.setStatusAsChar(status.charAt(0));
+            tickler.setStatusAsChar(status.charAt(0));
             isUpdate = true;            
         }
 
-        if (!priority.equals(t.getPriority())) {
+        if (!priority.equals(tickler.getPriority())) {
             tu.setPriority(priority);
-            t.setPriorityAsString(priority);
+            tickler.setPriorityAsString(priority);
             isUpdate = true;
         }
 
 
-        if (!assignedTo.equals(t.getTaskAssignedTo())){                
+        if (!assignedTo.equals(tickler.getTaskAssignedTo())){
             tu.setAssignedTo(assignedTo);
-            t.setTaskAssignedTo(assignedTo);
+            tickler.setTaskAssignedTo(assignedTo);
             isUpdate = true;
         }
 
-        if (!serviceDate.equals(t.getServiceDate())){
+        if (!serviceDate.equals(tickler.getServiceDate())){
            try {
                Date serviceDateAsDate = DateUtils.parseDate(serviceDate, request.getLocale());
                tu.setServiceDate(serviceDateAsDate);
-               t.setServiceDate(serviceDateAsDate);
+               tickler.setServiceDate(serviceDateAsDate);
                isUpdate = true;
            }
            catch (java.text.ParseException e) {
@@ -222,11 +222,17 @@ public class EditTicklerAction extends DispatchAction{
         }
 
         if (isUpdate){
-            ticklerManager.addUpdateToTickler(t, tu);
+            ticklerManager.addUpdateToTickler(tickler, tu);
         }
 
         if (isComment || isUpdate) {            
-            ticklerManager.updateTickler(loggedInInfo,t);
+            ticklerManager.updateTickler(loggedInInfo, tickler);
+
+            if(writeEncounterNote)
+            {
+                EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
+                encounterNoteService.saveTicklerNoteFromPrevious(newMessage, tickler, providerNo, tickler.getDemographicNo());
+            }
         }                                    
                 
         if (emailFailed) {

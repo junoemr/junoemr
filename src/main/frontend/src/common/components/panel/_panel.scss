@@ -1,25 +1,52 @@
-.panel-component {
-	@include juno-font-body-small();
+@mixin juno-panel-color(
+	$header-text, $header-background,
+	$body-text, $body-background,
+	$border-color)
+{
+	.panel-header {
+		color: $header-text;
+		background-color: $header-background;
+		border-color: $border-color;
+	}
+
+	.panel-body {
+		color: $body-text;
+		background-color: $body-background;
+		border-color: $border-color;
+	}
+}
+
+.juno-panel {
+	display: block !important;
+	margin-top: 8px;
+
+	@include juno-panel-color(
+					var(--theme-color-panel-header-text), var(--theme-color-panel-header-background),
+					var(--theme-color-panel-body-text), var(--theme-color-panel-body-background),
+					var(--theme-color-panel-border));
+
+	// the normal grey input style conflicts with the grey panel background
+	&.juno-style-grey > .panel-body {
+		@include juno-form-inputs-colors($color-neutral-darker, $color-neutral-white, $color-neutral-lighter,
+			$color-neutral-darker, $color-neutral-white, $color-primary-light,
+			$color-neutral-light-grey, $color-neutral-lightest, $color-neutral-lighter);
+	}
 
 	.panel-header {
-		background-color: $color-neutral-lightest;
-		border-color: $color-neutral-lightest;
-		border-width: 1px;
+		border-width: 4px;
 		border-radius: 8px;
 		border-style: solid;
 
 		border-bottom-left-radius: 0;
 		border-bottom-right-radius: 0;
 
-		padding: 8px;
+		padding: 4px;
 		padding-right: 16px;
 		padding-left: 16px;
 	}
 
 	.panel-body {
-		background-color: $color-neutral-lightest;
-		border-color: $color-neutral-lightest;
-		border-width: 1px;
+		border-width: 4px;
 		border-radius: 8px;
 		border-style: solid;
 
@@ -28,7 +55,13 @@
 		border-top-left-radius: 0;
 		border-top-right-radius: 0;
 
-		padding: 8px;
+		padding: 16px;
+
+		&.no-header {
+			border-top-left-radius: 8px;
+			border-top-right-radius: 8px;
+			border-top-width: 4px;
+		}
 	}
 
 }

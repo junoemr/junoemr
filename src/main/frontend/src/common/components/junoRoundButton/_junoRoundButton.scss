@@ -1,0 +1,10 @@
+juno-round-button {
+	width: 32px;
+	height: 32px;
+
+	.juno-button {
+		button {
+			border-radius: 50%;
+		}
+	}
+}

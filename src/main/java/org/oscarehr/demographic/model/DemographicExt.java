@@ -41,9 +41,13 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import static oscar.util.StringUtils.filterControlCharacters;
+
 @Entity
 @Table(name="demographicExt")
 public class DemographicExt extends AbstractModel<Integer> implements Serializable {
+
+	public static final String KEY_DEMO_CELL = "demo_cell";
 
 	@Transient
     private int hashCode = Integer.MIN_VALUE;// primary key
@@ -66,6 +70,7 @@ public class DemographicExt extends AbstractModel<Integer> implements Serializab
 	@PreUpdate
 	protected void prePersist() {
 		this.dateCreated = new Date();
+		setValue(filterControlCharacters(getValue()));
 	}
 	
     // constructors

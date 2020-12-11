@@ -306,8 +306,11 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 				note.setEncounter_type(bean.encType);
 			}
 
-			resetTemp(providerNo, demono, programIdString);
-
+			boolean isIssueNote = cform.getCaseNote().isIncludeissue();
+			if (!isIssueNote)
+			{
+				resetTemp(providerNo, demono, programIdString);
+			}
 		}
 		// get the last temp note?
 		else if (tmpsavenote != null && !forceNote.equals("true")) {
@@ -2673,9 +2676,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 	}
 
 	public ActionForward print(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		SimpleDateFormat headerFormat = new SimpleDateFormat("yyyy-MM-dd.hh.mm.ss");
-		Date now = new Date();
-		String headerDate = headerFormat.format(now);
+		String headerDate = ConversionUtils.toDateString(new Date(), ConversionUtils.DATE_TIME_FILENAME);
 
 		response.setContentType("application/pdf"); // octet-stream
 		response.setHeader("Content-Disposition", "attachment; filename=\"Encounter-" + headerDate + ".pdf\"");

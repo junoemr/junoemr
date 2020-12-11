@@ -24,7 +24,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 
 		// holds the patient typeahead selection
 		controller.demographicSearch = null;
-
+		controller.isDisabled = false; // Save button enabled by default
 		//=========================================================================
 		// Watches
 		//=========================================================================
@@ -122,34 +122,44 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			return true;
 		};
 
-		controller.save = function()
+		controller.saveWithEncounter = function()
 		{
+			return controller.save(true);
+		}
+		controller.save = function(writeEncounter = false)
+		{
+			controller.isDisabled = true; // Disable save button
 			controller.showErrors = true;
 			if (!controller.validate())
 			{
+				controller.isDisabled = false; // Enable save button if validation failed
 				return;
 			}
 
-			var t = {};
-			t.demographicNo = controller.tickler.demographic.demographicNo;
-			t.taskAssignedTo = controller.tickler.taskAssignedTo;
-			t.priority = controller.tickler.priority;
-			t.status = 'A';
-			t.message = controller.tickler.message;
+			var tickler = {};
+			tickler.demographicNo = controller.tickler.demographic.demographicNo;
+			tickler.taskAssignedTo = controller.tickler.taskAssignedTo;
+			tickler.priority = controller.tickler.priority;
+			tickler.status = 'A';
+			tickler.message = controller.tickler.message;
 
 			var givenDate = controller.tickler.serviceDateDate;
 			var givenTime = moment(controller.tickler.serviceDateTime, 'hh:mm A');
 			givenDate.setHours(givenTime.get('hour'));
 			givenDate.setMinutes(givenTime.get('minute'));
 
-			t.serviceDate = givenDate;
-			ticklerService.add(t).then(function(data)
-			{
-				$uibModalInstance.close(true);
-			}, function(reason)
-			{
-				alert(reason);
-			});
+			tickler.serviceDate = givenDate;
+            ticklerService.add(tickler, writeEncounter).then(
+                (response) =>
+                {
+                    $uibModalInstance.close(true);
+                }).catch((error) =>
+                {
+                    alert(error);
+                }).finally(() =>
+                {
+                    controller.isDisabled = false;
+                });
 
 
 		};

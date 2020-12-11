@@ -28,78 +28,68 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="oscar.oscarEncounter.data.*, oscar.oscarProvider.data.*, oscar.util.UtilDateUtilities" %>
 <%@ page import="org.oscarehr.util.MiscUtils"%>
-<%@ page import="java.net.URLEncoder"%>
-<%@ page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager, org.oscarehr.util.LoggedInInfo, org.oscarehr.common.model.Facility" %>
-<%@ page import="org.oscarehr.demographic.dao.DemographicExtDao" %>
-<%@ page import="org.oscarehr.demographic.model.DemographicExt" %>
+<%@ page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager"%>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="org.oscarehr.common.model.Facility" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
-<%@ page import="oscar.OscarProperties" %>
 <%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
-
-
-<%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
+<%@ page import="oscar.oscarProvider.data.ProviderColourUpdater" %>
+<%@ page import="oscar.oscarEncounter.data.EctProviderData" %>
+<%@ page import="org.oscarehr.PMmodule.utility.UtilDateUtilities" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%
-	SystemPreferenceService systemPreferenceService = (SystemPreferenceService) SpringUtils.getBean(SystemPreferenceService.class);
-	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+	SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
+	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-    oscar.oscarEncounter.pageUtil.EctSessionBean bean = null;
-    if((bean=(oscar.oscarEncounter.pageUtil.EctSessionBean)request.getSession().getAttribute("EctSessionBean"))==null) {
-        response.sendRedirect("error.jsp");
-        return;
-    }
-    
-    Facility facility = loggedInInfo.getCurrentFacility();
+	oscar.oscarEncounter.pageUtil.EctSessionBean bean = (oscar.oscarEncounter.pageUtil.EctSessionBean)request.getSession().getAttribute("EctSessionBean");
+	if (bean == null)
+	{
+		response.sendRedirect("error.jsp");
+		return;
+	}
 
-    String demoNo = bean.demographicNo;
-    EctPatientData.Patient pd = new EctPatientData().getPatient(loggedInInfo, demoNo);
-    String famDocName, famDocSurname, famDocColour, inverseUserColour, userColour;
-    String user = (String) session.getAttribute("user");
-    String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-    ProviderColourUpdater colourUpdater = new ProviderColourUpdater(user);
-    userColour = colourUpdater.getColour();
-    
-	String privateConsentEnabledProperty = OscarProperties.getInstance().getProperty("privateConsentEnabled");
-	boolean privateConsentEnabled = privateConsentEnabledProperty != null && privateConsentEnabledProperty.equals("true");
-	DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
-    DemographicExt infoExt = demographicExtDao.getDemographicExt(Integer.parseInt(demoNo), "informedConsent");
-    boolean showPopup = infoExt == null || StringUtils.isBlank(infoExt.getValue());
- 
+	Facility facility = loggedInInfo.getCurrentFacility();
 
-    //we calculate inverse of provider colour for text
-    int base = 16;
-    if( userColour == null || userColour.length() == 0 )
-        userColour = "#CCCCFF";   //default blue if no preference set
+	String demoNo = bean.demographicNo;
+	String famDocName;
+	String famDocSurname;
+	String famDocColour;
+	String user = (String) session.getAttribute("user");
+	String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
+	ProviderColourUpdater colourUpdater = new ProviderColourUpdater(user);
+	String userColour = colourUpdater.getColour();
+	//default blue if no preference set
+	if (userColour == null || userColour.isEmpty())
+	{
+		userColour = ProviderColourUpdater.DEFAULT_COLOUR_BLUE;
+	}
 
-    int num = Integer.parseInt(userColour.substring(1), base);      //strip leading # sign and convert
-    int inv = ~num;                                                 //get inverse
-    inverseUserColour = Integer.toHexString(inv).substring(2);    //strip 2 leading digits as html colour codes are 24bits
+	//we calculate inverse of provider colour for text
+	String inverseUserColour = ProviderColourUpdater.getInverseColour(userColour);
 
-    if(bean.familyDoctorNo == null || bean.familyDoctorNo.equals("")) {
-        famDocName = "";
-        famDocSurname = "";
-        famDocColour = "";
-    }
-    else {
-        EctProviderData.Provider prov = new EctProviderData().getProvider(bean.familyDoctorNo);
-        famDocName =  prov == null || prov.getFirstName() == null ? "" : prov.getFirstName();
-        famDocSurname = prov == null || prov.getSurname() == null ? "" : prov.getSurname();
-        colourUpdater = new ProviderColourUpdater(bean.familyDoctorNo);
-        famDocColour = colourUpdater.getColour();
-        if( famDocColour.length() == 0 )
-            famDocColour = "#CCCCFF";
-    }
+	if(bean.familyDoctorNo == null || bean.familyDoctorNo.isEmpty())
+	{
+		famDocName = "";
+		famDocSurname = "";
+		famDocColour = "";
+	}
+	else
+	{
+		EctProviderData.Provider prov = new EctProviderData().getProvider(bean.familyDoctorNo);
+		famDocName =  prov == null || prov.getFirstName() == null ? "" : prov.getFirstName();
+		famDocSurname = prov == null || prov.getSurname() == null ? "" : prov.getSurname();
+		colourUpdater = new ProviderColourUpdater(bean.familyDoctorNo);
+		famDocColour = colourUpdater.getColour();
+		if (famDocColour == null || famDocColour.isEmpty())
+		{
+			famDocColour = ProviderColourUpdater.DEFAULT_COLOUR_BLUE;
+		}
+	}
 
-    String patientName = pd.getFirstName()+" "+pd.getSurname();
-    String patientAge = pd.getAge();
-    String patientSex = pd.getSex();
     String pAge = Integer.toString(UtilDateUtilities.calcAge(bean.yearOfBirth,bean.monthOfBirth,bean.dateOfBirth));
-
-    java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
     %>
 
     <c:set var="ctx" value="${pageContext.request.contextPath}" scope="request"/>
@@ -156,7 +146,6 @@
 				secondsTillConsideredStale = Integer.parseInt(oscar.OscarProperties.getInstance().getProperty("seconds_till_considered_stale"));
 			}catch(Exception e){
 				MiscUtils.getLogger().error("OSCAR Property: seconds_till_considered_stale did not parse to an int",e);
-				secondsTillConsideredStale = -1;
 			}
 			
 			boolean allSynced = true;

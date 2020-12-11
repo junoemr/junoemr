@@ -61,4 +61,9 @@ public class BasicOscarTests extends SeleniumTestBase
 				driver
 		);
 	}
+
+	/*@Test
+	public void canLogin() throws Exception {
+		Navigation.doLogin(AuthUtils.TEST_USER_NAME,AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
+	}*/
 }

@@ -29,7 +29,6 @@ import org.oscarehr.common.search.AbstractCriteriaSearch;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneOffset;
 
 public class FaxInboundCriteriaSearch extends AbstractCriteriaSearch
 {
@@ -65,11 +64,11 @@ public class FaxInboundCriteriaSearch extends AbstractCriteriaSearch
 		}
 		if(getEndDate() != null)
 		{
-			criteria.add(Restrictions.le("createdAt", Timestamp.from(getEndDate().atTime(LocalTime.MAX).toInstant(ZoneOffset.UTC))));
+			criteria.add(Restrictions.le("createdAt", Timestamp.valueOf(getEndDate().atTime(LocalTime.MAX))));
 		}
 		if(getStartDate() != null)
 		{
-			criteria.add(Restrictions.ge("createdAt", Timestamp.from(getStartDate().atStartOfDay().toInstant(ZoneOffset.UTC))));
+			criteria.add(Restrictions.ge("createdAt", Timestamp.valueOf(getStartDate().atTime(LocalTime.MIN))));
 		}
 		setOrderByCriteria(criteria);
 		return criteria;

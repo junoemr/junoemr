@@ -24,7 +24,11 @@ package integration.tests.util.junoUtil;
 
 import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.data.ProviderTestData;
-import org.oscarehr.common.dao.utils.AuthUtils;
+import org.oscarehr.common.dao.ProviderSiteDao;
+import org.oscarehr.common.dao.SiteDao;
+import org.oscarehr.common.model.ProviderSite;
+import org.oscarehr.common.model.ProviderSitePK;
+import org.oscarehr.common.model.Site;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.service.DemographicService;
@@ -37,6 +41,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 import static integration.tests.util.data.ProviderTestCollection.providerLNames;
+import static integration.tests.util.data.SiteTestCollection.*;
+import static org.oscarehr.common.dao.utils.AuthUtils.TEST_PROVIDER_ID;
 
 @TestComponent
 public class DatabaseUtil
@@ -47,15 +53,22 @@ public class DatabaseUtil
 	@Autowired
 	ProviderService providerService;
 
-	public Demographic createTestDemographic()
+	@Autowired
+	SiteDao siteDao;
+
+	@Autowired
+	ProviderSiteDao providerSiteDao;
+
+	public Demographic createTestDemographic(String fName, String lName, String sex)
 	{
 		//DemographicService demoService = (DemographicService)SpringUtils.getBean("demographic.service.DemographicService");
 		Demographic demo = new Demographic();
 		demo.setDateOfBirth(LocalDate.now());
-		demo.setFirstName("test");
-		demo.setLastName("test");
-		demo.setSex("F");
-		return demoService.addNewDemographicRecord(AuthUtils.TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
+		demo.setFirstName(fName);
+		demo.setLastName(lName);
+		demo.setSex(sex);
+		demo.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
+		return demoService.addNewDemographicRecord(TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
 	}
 
 	public void createTestProvider()
@@ -68,9 +81,24 @@ public class DatabaseUtil
 			demoProvider.setProviderNo(Integer.parseInt(dr.providerNo));
 			demoProvider.setFirstName(dr.firstName);
 			demoProvider.setLastName(dr.lastName);
-			providerService.addNewProvider(AuthUtils.TEST_PROVIDER_ID, demoProvider, null);
+			providerService.addNewProvider(TEST_PROVIDER_ID, demoProvider, "");
 		}
 	}
+	public void createProviderSite()
+	{
+		Site newSite = new Site();
+		newSite.setName(siteNames[0]);
+		newSite.setBgColor(themeColors[0]);
+		newSite.setShortName(shortNames[0]);
+		newSite.setStatus((byte) 1);
+		newSite.setProvince("BC");
+		siteDao.persist(newSite);
+		Integer siteAddedId = newSite.getId();
 
-
+		ProviderSite providerAssignSite = new ProviderSite();
+		providerAssignSite.setId(new ProviderSitePK());
+		providerAssignSite.getId().setProviderNo(TEST_PROVIDER_ID);
+		providerAssignSite.getId().setSiteId(siteAddedId);
+		providerSiteDao.persist(providerAssignSite);
+	}
 }

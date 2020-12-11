@@ -53,6 +53,11 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="oscar.util.StringUtils" %>
+<%@ page import="org.oscarehr.ticklers.search.TicklerCriteriaSearch" %>
+<%@ page import="java.text.ParseException" %>
+<%@ page import="java.util.*" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 
 <%
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -263,7 +268,8 @@
 					}
 				});
 
-			});
+                changeSite(document.getElementById("site"))
+            });
 
 			function validateForm()
 			{
@@ -761,6 +767,10 @@
 .mbttn {background: #D7DBF2;border-bottom: 1px solid #104A7B;border-right: 1px solid #104A7B;border-left: 1px solid #AFC4D5;border-top:1px solid #AFC4D5;color:#000066;height:19px;text-decoration:none;cursor: hand}
 
 	-->
+
+	.pipe-separator {
+		padding: 0 4px;
+	}
 		</style>
 	</head>
 
@@ -900,64 +910,75 @@
 { // multisite start ==========================================
         	SiteDao siteDao = (SiteDao)SpringUtils.getBean("siteDao");
           	List<Site> sites = siteDao.getActiveSitesByProviderNo(user_no);
+          	List<Provider> prov = providerDao.getActiveProviders();
 %>
-						<script>
-							var _providers = [];
-							<%for (int i=0; i<sites.size(); i++) {%>
-							_providers["<%=sites.get(i).getSiteId()%>"] = "<%Iterator<Provider> iter = sites.get(i).getProviders().iterator();
+                        <script>
+                            var _providers = [];
+                            var all = "all";
+                            _providers[all] = "<option value='all' <%=assignedTo.equals("all") ? "selected" : ""%>>All Providers</option>";
+                            _providers[all] += "<% for (Provider pr : prov){%> <option value='<%=pr.getProviderNo()%>' <%=assignedTo.equals(pr.getProviderNo()) ? "selected" : ""%> > <%=pr.getLastName()%>, <%=pr.getFirstName()%></option><%}%>";
+                            <%for (int i=0; i<sites.size(); i++) {%>
+                            _providers["<%=sites.get(i).getSiteId()%>"] = "<option value=<%=sites.get(i).getName()%> <%=assignedTo.equals(sites.get(i).getName()) ? "selected" : ""%>>All Providers</option><%Iterator<Provider> iter = sites.get(i).getProviders().iterator();
 	while (iter.hasNext()) {
 		Provider p=iter.next();
 		if ("1".equals(p.getStatus())) {
 			%><option value='<%=p.getProviderNo()%>' <%=p.getProviderNo().equals(assignedTo) ? "selected" : ""%>><%=p.getLastName()%>, <%=p.getFirstName()%></option><%
 		}
 	}%>";
-							<%}%>
+                            <%}%>
 
-							function changeSite(sel)
-							{
-								sel.form.assignedTo.innerHTML = sel.value == "none" ? "" : _providers[sel.value];
-							}
-						</script>
-						<select id="site" name="site" onchange="changeSite(this)">
-							<option value="none">---select clinic---</option>
-							<%
-								for (int i = 0; i < sites.size(); i++)
-								{
-							%>
-							<option value="<%=sites.get(i).getSiteId()%>" <%=sites.get(i).getSiteId().toString().equals(request.getParameter("site")) ? "selected" : ""%>><%=sites.get(i).getName()%>
-							</option>
-							<%
-								}
-							%>
-						</select>
-						<select id="assignedTo" name="assignedTo" style="width:140px"></select>
-								<%
+                            function changeSite(sel)
+                            {
+                                switch (sel.value)
+                                {
+                                    case 'all':
+                                        sel.form.assignedTo.innerHTML = _providers[all];
+                                        break;
+                                    default:
+                                        sel.form.assignedTo.innerHTML = _providers[sel.value];
+                                }
+                            }
+                        </script>
+                        <select id="site" name="site" onchange="changeSite(this)">
+                            <option value="all" selected="selected">All Sites</option>
+                            <%
+                                for (int i = 0; i < sites.size(); i++)
+                                {
+                            %>
+                            <option value="<%=sites.get(i).getSiteId()%>" <%=sites.get(i).getSiteId().toString().equals(request.getParameter("site")) ? "selected" : ""%>><%=sites.get(i).getName()%>
+                            </option>
+                            <%
+                                }
+                            %>
+                        </select>
+                        <select id="assignedTo" name="assignedTo" style="width:140px"></select>
+                                <%
 	if (request.getParameter("assignedTo")!=null) {
 %>
-						<script>
-							changeSite(document.getElementById("site"));
-							document.getElementById("assignedTo").value = '<%=request.getParameter("assignedTo")%>';
-						</script>
-								<%
+                        <script>
+                            changeSite(document.getElementById("site"));
+                            document.getElementById("assignedTo").value = '<%=request.getParameter("assignedTo")%>';
+                        </script>
+                                <%
 	} // multisite end ==========================================
 } else {
 %>
-						<select id="assignedTo" name="assignedTo">
-							<option value="all" <%=assignedTo.equals("all") ? "selected" : ""%>>
-								<bean:message key="tickler.ticklerMain.formAllProviders"/></option>
-							<%
-								List<Provider> providersActive = providerDao.getActiveProviders();
-								for (Provider p : providersActive)
-								{
-							%>
-							<option value="<%=p.getProviderNo()%>" <%=assignedTo.equals(p.getProviderNo()) ? "selected" : ""%>><%=p.getLastName()%>
-								, <%=p.getFirstName()%>
-							</option>
-							<%
-								}
-							%>
-						</select>
-								<%
+                        <select id="assignedTo" name="assignedTo">
+                            <option value="all" <%=assignedTo.equals("all") ? "selected" : ""%>>
+                                <bean:message key="tickler.ticklerMain.formAllProviders"/></option>
+                            <%
+                                List<Provider> providersActive = providerDao.getActiveProviders();
+                                for (Provider p : providersActive)
+                                {
+                            %>
+                            <option value="<%=p.getProviderNo()%>" <%=assignedTo.equals(p.getProviderNo()) ? "selected" : ""%>><%=p.getLastName()%>
+                                , <%=p.getFirstName()%>
+                            </option>
+                            <%
+                                }
+                            %>
+                        </select>
+                                <%
 	}
 %>
 
@@ -1276,9 +1297,17 @@
 				<%
 					}
 				%>
-				<TD width="12%" ROWSPAN="1" class="<%=cellColour%>"><a href=#
-																	   onClick="popupPage(600,800,'../demographic/demographiccontrol.jsp?demographic_no=<%=demo.getDemographicNo()%>&displaymode=edit&dboperation=search_detail')"><%=demo.getDisplayName()%>
-				</a></TD>
+				<TD width="12%" ROWSPAN="1" class="<%=cellColour%>">
+					<a href=# onClick="popupPage(600,800,'../demographic/demographiccontrol.jsp?demographic_no=<%=demo.getDemographicNo()%>&displaymode=edit&dboperation=search_detail')">
+						<%=demo.getDisplayName()%>
+					</a>
+					<span class="pipe-separator">|</span>
+					<a title="<bean:message key="demographic.demographiceditdemographic.btnEChart"/>"
+					   href=# onClick="popupPage(710, 1024,'<c:out
+							value="${ctx}"/>/oscarEncounter/IncomingEncounter.do?providerNo=<%=user_no%>&demographicNo=<%=demo.getDemographicNo()%>')">
+						E
+					</a>
+				</TD>
 				<TD ROWSPAN="1"
 					class="<%=cellColour%>"><%=tickler.getProvider() == null ? "N/A" : tickler.getProvider().getFormattedName()%>
 				</TD>

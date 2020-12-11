@@ -71,19 +71,19 @@ public class MedicationMapperWolf extends MedicationMapper
 		}
 		if(createdDate == null)
 		{
-			createdDate = getAdministrationStopDate(rep);
+			createdDate = getAdministrationStartDate(rep);
 		}
 		return createdDate;
 	}
 
-	/** start date: ORC-15, else ZRX-3 */
+	/** start date: ZRX-2, else ORC-15 */
 	@Override
 	protected Date getStartDate(int rep) throws HL7Exception
 	{
-		Date startDate = getOrderEffectiveDate(rep);
+		Date startDate = getAdministrationStartDate(rep);
 		if(startDate == null)
 		{
-			startDate = getAdministrationStopDate(rep);
+			startDate = getOrderEffectiveDate(rep);
 		}
 		return startDate;
 	}

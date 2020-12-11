@@ -100,6 +100,16 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	}
 
 	/**
+	 * fetch all instances of the persistent class handled by this DAO
+	 * @return - all records
+	 */
+	public List<T> findAll()
+	{
+		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName());
+		return query.getResultList();
+	}
+
+	/**
 	 * Fetches all instances of the persistent class handled by this DAO. 
 	 * 
 	 * @return

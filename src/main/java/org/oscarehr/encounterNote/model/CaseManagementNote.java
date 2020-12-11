@@ -176,20 +176,30 @@ public class CaseManagementNote extends AbstractModel<Long>
 		this.uuid = noteToCopy.uuid;
 
 		/* also make copies of the note extensions, links, and issues */
-		this.noteExtensionList = new ArrayList<>(noteToCopy.noteExtensionList.size());
-		for(CaseManagementNoteExt extToCopy : noteToCopy.noteExtensionList)
+		if(noteToCopy.noteExtensionList != null)
 		{
-			noteExtensionList.add(new CaseManagementNoteExt(extToCopy, this));
+			this.noteExtensionList = new ArrayList<>(noteToCopy.noteExtensionList.size());
+			for(CaseManagementNoteExt extToCopy : noteToCopy.noteExtensionList)
+			{
+				noteExtensionList.add(new CaseManagementNoteExt(extToCopy, this));
+			}
 		}
-		this.noteLinkList = new ArrayList<>(noteToCopy.noteLinkList.size());
-		for(CaseManagementNoteLink linkToCopy : noteToCopy.noteLinkList)
+		if(noteToCopy.noteLinkList != null)
 		{
-			noteLinkList.add(new CaseManagementNoteLink(linkToCopy, this));
+			this.noteLinkList = new ArrayList<>(noteToCopy.noteLinkList.size());
+			for(CaseManagementNoteLink linkToCopy : noteToCopy.noteLinkList)
+			{
+				noteLinkList.add(new CaseManagementNoteLink(linkToCopy, this));
+			}
 		}
-		this.issueNoteList = new ArrayList<>(noteToCopy.issueNoteList.size());
-		for(CaseManagementIssueNote issueNoteToCopy : noteToCopy.issueNoteList)
+
+		if(noteToCopy.issueNoteList != null)
 		{
-			issueNoteList.add(new CaseManagementIssueNote(issueNoteToCopy, this));
+			this.issueNoteList = new ArrayList<>(noteToCopy.issueNoteList.size());
+			for(CaseManagementIssueNote issueNoteToCopy : noteToCopy.issueNoteList)
+			{
+				issueNoteList.add(new CaseManagementIssueNote(issueNoteToCopy, this));
+			}
 		}
 	}
 

@@ -20,7 +20,7 @@
 * Victoria, British Columbia
 * Canada
 --%>
-<div class="panel-component">
-	<div class="panel-header" ng-transclude="header"></div>
-	<div class="panel-body" ng-transclude="body"></div>
+<div class="panel-component juno-panel" ng-class="$ctrl.componentClasses()">
+	<div class="panel-header" ng-if="!$ctrl.noHeader" ng-transclude="header"></div>
+	<div class="panel-body" ng-transclude="body" ng-class="$ctrl.bodyClasses()"></div>
 </div>

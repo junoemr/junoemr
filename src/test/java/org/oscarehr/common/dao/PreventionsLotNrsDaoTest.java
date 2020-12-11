@@ -29,6 +29,8 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
+
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -150,52 +152,52 @@ public class PreventionsLotNrsDaoTest extends DaoTestFixtures
 }
 	
 	@Test
-	public void testFindLotNrs() throws Exception {
+	public void testFindLotNrs() throws Exception
+	{
 		String prevention = "Flu";
-		String lotNr1 = "abcdef1";
-		String lotNr2 = "abcdef2";
-		String lotNr3 = "abcdef3";
-				
-		PreventionsLotNrs p1 = new PreventionsLotNrs();
-		EntityDataGenerator.generateTestDataForModelClass(p1);
-		p1.setLotNr(lotNr1);
-		p1.setPreventionType(prevention);
-		p1.setProviderNo("unit_tester");
-		p1.setCreationDate(new java.util.Date());
-		p1.setDeleted(false);
-		preventionsLotNrsDao.persist(p1);
-		
-		PreventionsLotNrs p2 = new PreventionsLotNrs();
-		EntityDataGenerator.generateTestDataForModelClass(p2);
-		p2.setLotNr(lotNr2);
-		p2.setPreventionType(prevention);
-		p2.setProviderNo("unit_tester");
-		p2.setCreationDate(new java.util.Date());
-		p2.setDeleted(false);
-		preventionsLotNrsDao.persist(p2);
-		
-		PreventionsLotNrs p3 = new PreventionsLotNrs();
-		EntityDataGenerator.generateTestDataForModelClass(p3);
-		p3.setLotNr(lotNr3);
-		p3.setPreventionType(prevention);
-		p3.setProviderNo("unit_tester");
-		p3.setCreationDate(new java.util.Date());
-		p3.setDeleted(true);
-		preventionsLotNrsDao.persist(p3);
-		
-		List<String> expectedResult = new ArrayList<String>(Arrays.asList(lotNr1, lotNr2, lotNr3));
+		List<String> expectedResult = new ArrayList<>();
+		List<PreventionsLotNrs> preventionLotNrs = new ArrayList<>();
+
+		for (int i = 0; i < 5; i++)
+		{
+			String lotNr = "abcdef";
+			lotNr += String.valueOf(i);
+			expectedResult.add(lotNr);
+			PreventionsLotNrs prevLotNr = new PreventionsLotNrs();
+			EntityDataGenerator.generateTestDataForModelClass(prevLotNr);
+			prevLotNr.setLotNr(expectedResult.get(i));
+			prevLotNr.setPreventionType(prevention);
+			prevLotNr.setProviderNo("unit_test");
+			prevLotNr.setCreationDate(new java.util.Date());
+			prevLotNr.setDeleted(false);
+			preventionLotNrs.add(prevLotNr);
+			preventionsLotNrsDao.persist(preventionLotNrs.get(i));
+		}
+		//we need to assign one specific date to a few lotNrs to test the ordering results
+		preventionLotNrs.get(0).setLastUpdateDate(new java.util.Date(2020, 10, 30, 11, 11, 11));
+		preventionsLotNrsDao.merge(preventionLotNrs.get(0));
+		preventionLotNrs.get(1).setLastUpdateDate(new java.util.Date(2020, 10, 30, 11, 11, 11));
+		preventionsLotNrsDao.merge(preventionLotNrs.get(1));
+		preventionLotNrs.get(2).setLastUpdateDate(new java.util.Date(2020, 10, 30, 11, 11, 11));
+		preventionsLotNrsDao.merge(preventionLotNrs.get(2));
+
+		//reverse the order since the results from the database are ordered to return the most recently updated lotNrs first
+		Collections.reverse(expectedResult);
 		List<String> result = preventionsLotNrsDao.findLotNrs(prevention, null);
 		
 		Logger logger = MiscUtils.getLogger();
 		
-		if (result.size() != expectedResult.size()) {
+		if (result.size() != expectedResult.size())
+		{
 			logger.warn("FindLotNrs array sizes do not match.");
 			logger.warn("resultsize="+result.size()+"expectedResult.size="+expectedResult.size());
 			fail("FindLotNrs array sizes do not match.");
 		}
 
-		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
+		for (int i = 0; i < expectedResult.size(); i++)
+		{
+			if (!expectedResult.get(i).equals(result.get(i)))
+			{
 				logger.warn("FindLotNrs items do not match. All lot nr items not found.");
 				fail("FindLotNrs items do not match. All lot nr items not found.");
 			}

@@ -33,6 +33,7 @@ public class ProviderTestData
 	public String dob = "";
 	public String specialty = "Family";
 
+	public String sitesAssigned = "";
 	public String team = "Clinic";
 	public String address = "31 Bastion Square #302";
 	public String homePhone = "250-686-8560";
@@ -51,6 +52,7 @@ public class ProviderTestData
 	public String specialtyCodeNo = "Family010";
 	public String groupBillingNo = "CA-123456";
 	public String cpsidNo = "987654321";
+	public String billCenter = "";
 	public String selfLearningUsername = "druser";
 	public String selfLearningPassword = "Welcome@123";
 	public String status = "1";//active

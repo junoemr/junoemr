@@ -25,60 +25,83 @@
 
 package oscar.oscarProvider.data;
 
-import java.util.List;
-
 import org.oscarehr.common.dao.PropertyDao;
 import org.oscarehr.common.model.Property;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.util.SpringUtils;
 
 /**
- * Manages Fax number for provider 
- * 
+ * Manages provider colour for provider
+ *
  */
 public class ProviderColourUpdater {
-    
-    private String strColName;    
-    private String provider;
-    
-    /** Creates a new instance of ProviderColourUpdater */
-   public ProviderColourUpdater(String p) {
-       strColName = "ProviderColour";
-       provider = p;       
-    }
+
+	private String provider;
+	private static PropertyDao propertyDao = SpringUtils.getBean(PropertyDao.class);
+
+	public static String DEFAULT_COLOUR_BLUE = "#CCCCFF";
+	/**
+	 * Creates a new instance of ProviderColourUpdater
+	 */
+	public ProviderColourUpdater(String providerNo)
+	{
+		this.provider = providerNo;
+	}
    
-   /**
-    *Retrieve colour for current provider first by querying property table 
-    */
-   public String getColour() {
-       PropertyDao dao = SpringUtils.getBean(PropertyDao.class);
-	   List<Property> props = dao.findByNameAndProvider(strColName, provider);
-       for(Property prop : props) {
-            return prop.getValue()!=null?prop.getValue():"";
-       }
-       return "";
-   }
-      /**
-       *set colour in property table
-       */
-   public boolean setColour(String c) {
-	   PropertyDao dao = SpringUtils.getBean(PropertyDao.class);
-	   List<Property> props = dao.findByNameAndProvider(strColName, provider);
-	   Property property = null;
-	   for(Property p : props) {
-           property = p;
-           break;
-      }
-	   
-	  if (property == null) {
-		  property = new Property();
-	  }
-	   
-	  property.setValue(c);
-	  property.setName(strColName);
-	  property.setProviderNo(provider);
-	  
-	  dao.saveEntity(property);
-	   
-	  return true;
-   }
+
+	/**
+	 * Retrieve colour for current provider first by querying property table
+	 * @return ProviderColor property value associated with user, null if no setting found
+	 */
+	public String getColour()
+	{
+		Property props = propertyDao.findByNameAndProvider(UserProperty.PROVIDER_COLOUR, provider);
+		if (props != null)
+		{
+			return props.getValue();
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * set colour in property table
+	 */
+	public boolean setColour(String colour)
+	{
+		Property props = propertyDao.findByNameAndProvider(UserProperty.PROVIDER_COLOUR, provider);
+
+		if (props != null)
+		{
+			props.setValueNoNull(colour);
+			propertyDao.merge(props);
+		}
+		else
+		{
+			props = new Property();
+			props.setValue(colour);
+			props.setName(UserProperty.PROVIDER_COLOUR);
+			props.setProviderNo(provider);
+
+			propertyDao.persist(props);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Given a hex colour, invert it.
+	 * Code stripped from a couple JSP pages that were doing the same thing.
+	 * This should be revisited at some point.
+	 * @param colour hex color to invert
+	 * @return inverted colour
+	 */
+	public static String getInverseColour(String colour)
+	{
+		int base = 16;
+		int num = Integer.parseInt(colour.substring(1), base);      //strip leading # sign and convert
+		int inv = ~num;
+		return Integer.toHexString(inv).substring(2);    			//strip 2 leading digits as html colour codes are 24bits
+	}
 }

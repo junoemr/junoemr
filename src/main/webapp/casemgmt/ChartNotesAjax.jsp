@@ -733,7 +733,7 @@ int maxId = 0;
 										<%
 											ArrayList<String> issueDescriptions = note.getIssueDescriptions();
 
-											if (issueDescriptions.size() > 0)
+											if (issueDescriptions.size() > 0 && !note.isTicklerNote())
 											{
 												%>
 													<ul style="float: left; list-style: circle inside none; margin: 0px;">

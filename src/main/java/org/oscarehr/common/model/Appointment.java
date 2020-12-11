@@ -23,11 +23,15 @@
 
 package org.oscarehr.common.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.annotation.SiteLocation;
 import org.oscarehr.common.listeners.BeanValidationEventListener;
+import org.oscarehr.integration.aqs.model.QueuedAppointmentLink;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -39,6 +43,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -56,9 +61,12 @@ import java.util.Optional;
 @Table(name = "appointment")
 public class Appointment extends AbstractModel<Integer> implements Serializable {
 
+	public static final String TODO = "t";
 	public static final String CANCELLED = "C";
 	public static final String BILLED = "B";
 	public static final String NO_SHOW = "N";
+
+	public static final String URGENCY_CRITICAL = "critical";
 
 	public enum BookingSource
 	{
@@ -74,7 +82,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	public static final String DONOTBOOK = "Do_Not_Book";
 
-	public static final int DEFAULT_REASON_CODE = 17;
+	public static final String DEFAULT_REASON = "Others";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -96,7 +104,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@Column(name = "end_time")
 	private Date endTime;
 
-	private String name;
+	private String name = "";
 
 	@Column(name = "demographic_no")
 	private int demographicNo;
@@ -110,11 +118,11 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@SiteLocation
 	private String location;
 
-	private String resources;
-	private String type;
+	private String resources = "";
+	private String type = "";
 	private String style;
 	private String billing;
-	private String status;
+		private String status;
 
 	@Column(name = "imported_status")
 	private String importedStatus;
@@ -136,8 +144,13 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@JoinColumn(name="lastupdateuser", referencedColumnName="provider_no", insertable=false, updatable=false)
 	private ProviderData lastUpdateUserRecord;
 
-	private String remarks;
-	private String urgency;
+	@Getter
+	@Setter
+	@OneToOne(mappedBy="appointment", cascade = CascadeType.ALL)
+	private QueuedAppointmentLink queuedAppointmentLink;
+
+	private String remarks = "";
+	private String urgency = "";
 	private boolean isVirtual;
 	private Integer creatorSecurityId;
 	
@@ -245,6 +258,11 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	public int getDemographicNo() {
 		return demographicNo;
+	}
+
+	public boolean hasDemographic()
+	{
+		return this.demographicNo != 0;
 	}
 
 	public void setDemographicNo(int demographicNo) {

@@ -163,9 +163,6 @@ public class AppointmentManager {
 		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		appointment.setCreateDateTime(new Date());
 		appointment.setUpdateDateTime(new Date());
-		appointment.setReasonCode(Appointment.DEFAULT_REASON_CODE);
-
-		// Subtract a minute
 
 		appointmentDao.persist(appointment);
 

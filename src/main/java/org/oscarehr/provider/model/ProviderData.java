@@ -25,6 +25,8 @@
 
 package org.oscarehr.provider.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.providerBilling.model.ProviderBilling;
@@ -40,15 +42,29 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "provider")
 public class ProviderData extends AbstractModel<String> implements Serializable {
 
 	public static final String SYSTEM_PROVIDER_NO = "-1";
+
+	// tags used to extend the provider record in the comments field.
+	public static final String COMMENT_CELL_TAG 					= "xml_p_cell";
+	public static final String COMMENT_FAX_TAG 						= "xml_p_fax";
+	public static final String COMMENT_PAGER_TAG 					= "xml_p_pager";
+	public static final String COMMENT_OTHER_PHONE_TAG 		= "xml_p_phone2";
+	public static final String COMMENT_ON_SPECIALITY_CODE = "xml_p_specialty_code";
+	public static final String COMMENT_ON_BILLING_GROUP_NO = "xml_p_billinggroup_no";
+
+	public static final String PROVIDER_STATUS_ACTIVE		= "1";
+	public static final String PROVIDER_STATUS_INACTIVE = "0";
 
 	/**
 	 * default serial version id for serializable
@@ -116,6 +132,7 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	private boolean superAdmin = false;
 
 	/* -- Province specific -- */
+
 	/* AB */
 	@Column(name = "alberta_tak_no")
 	private String albertaTakNo = null;
@@ -131,6 +148,10 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	@JoinColumn(name="provider_billing_id")
 	private ProviderBilling billingOpts;
 
+	@Getter
+	@Setter
+	@Column(name = "booking_notification_numbers")
+	private String bookingNotificationNumbers;
 
 	/** returns a formatted name String in the form of 'first_name, last_name' */
 	public String getDisplayName()
@@ -441,5 +462,22 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public void setBillingOpts(ProviderBilling billingOpts)
 	{
 		this.billingOpts = billingOpts;
+	}
+
+	public List<String> getBookingNotificationNumbersList()
+	{
+		if (this.bookingNotificationNumbers != null)
+		{
+			return Arrays.stream(this.bookingNotificationNumbers.split(","))
+					.map(String::trim)
+					.filter((str) -> !str.isEmpty())
+					.collect(Collectors.toList());
+		}
+		return new ArrayList<>();
+	}
+
+	public void setBookingNotificationNumbersList(List<String> bookingNotificationNumbers)
+	{
+		this.bookingNotificationNumbers = bookingNotificationNumbers.stream().reduce("", (String acc, String str) -> acc + "," + str);
 	}
 }

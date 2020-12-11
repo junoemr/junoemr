@@ -558,29 +558,18 @@
 	</databaseap>
 	<databaseap>
 		<ap-name>ageComplex2</ap-name>
-		<ap-sql>SELECT
-			(IF ( (TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate))&lt; 365,<!--IF Less than 
-				one year Old -->
-			(IF ((TO_DAYS(CURRENT_DATE)-TO_DAYS(@bdate))&lt; 31,<!-- {IF less than 
-				31 days old -->
-			CONCAT((TO_DAYS(CURRENT_DATE)-TO_DAYS(@bdate)), ' days old'),<!-- {Print 
-				Age in Days} -->
-			(IF ((DAY(CURRENT_DATE)-DAY(@bdate))&lt;0,<!-- ELSE { print in months 
-				and week}} -->
-			CONCAT((((YEAR(CURRENT_DATE) - 1) * 12 + MONTH(CURRENT_DATE)-1) -
-			((YEAR(@bdate) - 1) * 12 + MONTH(@bdate))) - (MID(@bdate, 9, 2) &lt;
-			MID(@bdate, 9, 2)),' months ',FLOOR((DAY(CURRENT_DATE)/7)),' weeks
-			old'),
-			CONCAT((((YEAR(CURRENT_DATE) - 1) * 12 + MONTH(CURRENT_DATE)) - ((YEAR(@bdate) - 1) * 12 +
-			MONTH(@bdate))) - (MID(@bdate, 9, 2) &lt; MID(@bdate, 9, 2)),' month
-			old ',FLOOR(((DAY(CURRENT_DATE)-DAY(@bdate))/7)),' weeks old'))))),
-			CONCAT(TIMESTAMPDIFF(YEAR,@bdate,CURRENT_DATE)," years
-			",MOD(TIMESTAMPDIFF(MONTH,@bdate,CURRENT_DATE),12)," Months"))) as
-			ageComplex2 from (SELECT @bdate:=
-			DATE_FORMAT(CONCAT((demographic.year_of_birth), '-',
-			(demographic.month_of_birth), '-',
-			(demographic.date_of_birth)),'%Y-%m-%d') AS birthdate FROM
-			demographic WHERE demographic_no=${demographic}) as t
+		<ap-sql>
+            SELECT
+            CASE
+              WHEN TIMESTAMPDIFF(MONTH,t.birthdate, CURDATE()) &lt; 1
+                THEN CONCAT(TIMESTAMPDIFF(DAY, t.birthdate, CURDATE()), ' days old')
+              WHEN TIMESTAMPDIFF(YEAR, t.birthdate, CURDATE()) &lt; 1
+                THEN CONCAT(TIMESTAMPDIFF(MONTH, t.birthdate, CURDATE()), ' months ', TIMESTAMPDIFF(WEEK, DATE_ADD(t.birthdate, INTERVAL TIMESTAMPDIFF(MONTH, t.birthdate, CURDATE()) MONTH), CURDATE()), ' weeks old')
+            ELSE
+              CONCAT(TIMESTAMPDIFF(YEAR, t.birthdate, CURDATE()), " years ", MOD(TIMESTAMPDIFF(MONTH, t.birthdate, CURDATE()), 12), " months")
+            END
+            AS ageComplex2
+            FROM (SELECT DATE_FORMAT(CONCAT(d.year_of_birth, '-', d.month_of_birth, '-', d.date_of_birth), '%Y-%m-%d') AS birthdate FROM demographic d WHERE demographic_no=${demographic}) t
 		</ap-sql>
 		<ap-output>${ageComplex2}</ap-output>
 	</databaseap>
@@ -1749,7 +1738,7 @@
 			WHERE var_name='${var_name}'
 			AND fdid=
 			(SELECT MIN(fdid) FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1)
 		</ap-sql>
 		<ap-output>${var_value}</ap-output>
@@ -1760,7 +1749,7 @@
 			WHERE var_name='${var_name}'
 			AND fdid=
 			(SELECT MAX(fdid) FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1)
 		</ap-sql>
 		<ap-output>${var_value}</ap-output>
@@ -1771,7 +1760,7 @@
 			eform_values
 			WHERE fdid=
 			(SELECT MIN(fdid) FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1)
 		</ap-sql>
 		<ap-output>${fieldname}, ${fieldvalue}</ap-output>
@@ -1783,7 +1772,7 @@
 			eform_values
 			WHERE fdid=
 			(SELECT MAX(fdid) FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1)
 		</ap-sql>
 		<ap-output>${fieldname}, ${fieldvalue}</ap-output>
@@ -1795,7 +1784,7 @@
 			WHERE var_name='${var_name}' AND var_value='${var_value}'
 			AND fdid IN
 			(SELECT fdid FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1)
 		</ap-sql>
 		<ap-output>${count(0)}</ap-output>
@@ -1806,7 +1795,7 @@
 			WHERE var_name='${var_name}' AND NOT (var_value='' OR var_value IS NULL)
 			AND fdid IN
 			(SELECT fdid FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1)
 		</ap-sql>
 		<ap-output>${count(0)}</ap-output>
@@ -1820,7 +1809,7 @@
 			WHERE var_name='${ref_var_name}' AND var_value='${ref_var_value}'
 			AND fdid IN
 			(SELECT fdid FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1))
 		</ap-sql>
 		<ap-output>${count(0)}</ap-output>
@@ -1834,7 +1823,7 @@
 			WHERE var_name='${ref_var_name}' AND var_value='${ref_var_value}'
 			AND fdid IN
 			(SELECT fdid FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1))
 		</ap-sql>
 		<ap-output>${count(0)}</ap-output>
@@ -1849,7 +1838,7 @@
 			NULL)
 			AND fdid IN
 			(SELECT fdid FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1))
 		</ap-sql>
 		<ap-output>${count(0)}</ap-output>
@@ -1864,7 +1853,7 @@
 			NULL)
 			AND fdid IN
 			(SELECT fdid FROM eform_data
-			WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND
+			WHERE demographic_no='${eform_demographic}' AND fid=${fid} AND
 			status=1))
 		</ap-sql>
 		<ap-output>${count(0)}</ap-output>

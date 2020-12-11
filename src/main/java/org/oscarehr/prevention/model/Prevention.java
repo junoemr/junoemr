@@ -71,8 +71,13 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 	@Column(name = "prevention_type")
 	private String preventionType = null;
 
+	@Column(name = "deleted")
 	private char deleted = '0';
-	private char refused = '0';
+
+	@Column(name = "refused")
+	private char refused = REFUSED_STATUS_COMPLETED;
+
+	@Column(name = "never")
 	private char never = '0';
 
 	@Column(name = "next_date")
@@ -81,13 +86,32 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 
 	@Column(name = "creator")
 	private String creatorProviderNo = null;
-	
+
+	@Column(name = "lastUpdateDate")
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastUpdateDate = null;
 
 	// with cascade, these entities will be persisted when this class is.
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "prevention", cascade = CascadeType.PERSIST)
 	private List<PreventionExt> preventionExtensionList;
 
+	// The names are weird, these are all the possible values for the "refused" column
+	public static final char REFUSED_STATUS_COMPLETED = '0';
+	public static final char REFUSED_STATUS_REFUSED = '1';
+	public static final char REFUSED_STATUS_INELIGIBLE = '2';
+
+	public static final char IS_ACTIVE = '0';
+	public static final char IS_DELETED = '1';
+
+	// for the 'never' column, seems to refer to whether to send a reminder to patient
+	public static final char SEND_REMINDER = '0';
+	public static final char NEVER_SEND_REMINDER = '1';
+
+	public static final String REFUSED = "refused";
+	public static final String NEVER = "never";
+	public static final String INELIGIBLE = "ineligible";
+	public static final String PREVIOUS = "previous";
+	public static final String NEVER_REMIND = "neverRemind";
 
 	public Integer getDemographicId() {
 		return demographicId;
@@ -129,28 +153,34 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 		this.preventionType = preventionType;
 	}
 
-	public boolean isDeleted() {
-		return deleted=='1';
+	public boolean isDeleted()
+	{
+		return deleted == IS_DELETED;
 	}
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted ? '1' : '0';
+	public void setDeleted(boolean deleted)
+	{
+		this.deleted = deleted ? IS_DELETED : IS_ACTIVE;
 	}
 
-	public boolean isRefused() {
-		return refused=='1';
+	public boolean isRefused()
+	{
+		return refused == REFUSED_STATUS_REFUSED;
 	}
 	
-	public boolean isIneligible(){
-		return refused == '2';
+	public boolean isIneligible()
+	{
+		return refused == REFUSED_STATUS_INELIGIBLE;
 	}
 
-	public void setRefused(boolean refused) {
-		this.refused = refused ? '1' : '0';
+	public void setRefused(boolean refused)
+	{
+		this.refused = refused ? REFUSED_STATUS_REFUSED : REFUSED_STATUS_COMPLETED;
 	}
 	
-	public void setIneligible(boolean ineligible){
-		this.refused = ineligible ? '2' : '0';
+	public void setIneligible(boolean ineligible)
+	{
+		this.refused = ineligible ? REFUSED_STATUS_INELIGIBLE : REFUSED_STATUS_COMPLETED;
 	}
 
 	public Date getNextDate() {
@@ -166,7 +196,7 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 	}
 
 	public void setNever(boolean never) {
-		this.never = never ? '1' : '0';
+		this.never = never ? NEVER_SEND_REMINDER : SEND_REMINDER;
 	}
 
 	public String getCreatorProviderNo() {
@@ -198,7 +228,11 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 	@PrePersist
 	protected void autoSetUpdateTime()
 	{
-		lastUpdateDate=new Date();
+		lastUpdateDate = new Date();
+		if (preventionDate == null)
+		{
+			preventionDate = getCreationDate();
+		}
 	}
 	
 	public String getDeletedRawValue() {

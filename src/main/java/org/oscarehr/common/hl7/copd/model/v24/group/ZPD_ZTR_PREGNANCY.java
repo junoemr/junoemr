@@ -44,4 +44,27 @@ public class ZPD_ZTR_PREGNANCY extends AbstractGroup
 			throw new RuntimeException(var3);
 		}
 	}
+
+	public ZPG getZPG()
+	{
+		return this.getTyped("ZPG", ZPG.class);
+	}
+
+	public ZPO getZPO(int rep)
+	{
+		return this.getTyped("ZPO", rep, ZPO.class);
+	}
+
+	public int getZPOReps()
+	{
+		try
+		{
+			return this.getAll("ZPO").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
 }

@@ -144,10 +144,13 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				noteService.getIssueNote(controller.page.items[itemId].noteId).then(
 					function success(results)
 					{
-						//controller.master = angular.copy( "iNote----" +  JSON.stringify(iNote) );
 						controller.groupNotesForm.encounterNote = results.encounterNote;
-						controller.groupNotesForm.encounterNote.editorNames = mod.editorNames; // Get editor names. TODO: Add editor names to the object on the back end
+						controller.groupNotesForm.encounterNote.editorNames = mod.editorNames; // Get editor names.
 						controller.groupNotesForm.groupNoteExt = results.groupNoteExt;
+
+						controller.groupNotesForm.groupNoteExt.startDate = moment(results.groupNoteExt.startDate).toDate();
+						controller.groupNotesForm.groupNoteExt.resolutionDate = moment(results.groupNoteExt.resolutionDate).toDate();
+						controller.groupNotesForm.groupNoteExt.procedureDate = moment(results.groupNoteExt.procedureDate).toDate();
 						controller.groupNotesForm.assignedCMIssues = results.assignedCMIssues;
 
 						controller.groupNotesForm.assignedCMIssues = [];

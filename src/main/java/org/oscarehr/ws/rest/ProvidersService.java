@@ -26,12 +26,15 @@ package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.SecRole;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
+import org.oscarehr.ws.rest.to.model.UserRoleTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +44,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -52,6 +56,9 @@ public class ProvidersService extends AbstractServiceImpl
 
 	@Autowired
 	private ProviderDao providerDao;
+
+	@Autowired
+	private SecRoleDao secRoleDao;
 
 	private ProviderConverter providerConverter = new ProviderConverter();
 
@@ -119,5 +126,20 @@ public class ProvidersService extends AbstractServiceImpl
 		List<Provider> providers = providerDao.getProviders();
 		List<ProviderTo1> providersTo1 = providerConverter.getAllAsTransferObjects(getLoggedInInfo(), providers);
 		return RestSearchResponse.successResponseOnePage(providersTo1);
+	}
+
+	@GET
+	@Path("/providerRoles")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<UserRoleTo1>> getProviderRoles()
+	{
+		ArrayList<UserRoleTo1> userRoles = new ArrayList<>();
+		List<SecRole> secRoles = secRoleDao.findAll();
+		for (SecRole secRole : secRoles)
+		{
+			userRoles.add(new UserRoleTo1(secRole.getName(), secRole.getId()));
+		}
+
+		return RestResponse.successResponse(userRoles);
 	}
 }

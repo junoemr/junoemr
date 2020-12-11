@@ -59,6 +59,8 @@
 	var reloadDiv;
 	var eChartUUID = "<%=UUID.randomUUID().toString()%>";
 
+	var oldNoteIds = "";
+
 	// load echart uuid if possible from local storage. If not found
 	// save new uuid to storage.
 	function getEchartUUID()
@@ -3673,13 +3675,20 @@
 
 	}
 
+	function dateRangeFilled()
+	{
+		var sdate = $F("printStartDate");
+		var edate = $F("printEndDate");
+		return !(sdate.length === 0 || edate.length === 0 );
+	}
+
 	var printDateMsg;
 	var printDateOrderMsg;
 	function printDateRange()
 	{
 		var sdate = $F("printStartDate");
 		var edate = $F("printEndDate");
-		if (sdate.length == 0 || edate.length == 0)
+		if (sdate.length === 0 || edate.length === 0)
 		{
 			alert(printDateMsg);
 			return false;
@@ -3768,7 +3777,17 @@
 	var nothing2PrintMsg;
 	function printNotes()
 	{
-		if ($("printopDates").checked && !printDateRange())
+		if ($("printopSelected").checked)
+		{
+			// check if date range is filled
+			// ask if they're ok with this
+			if (dateRangeFilled())
+			{
+				alert("Clear date range before attempting printing.");
+				return false;
+			}
+		}
+		else if ($("printopDates").checked && !printDateRange())
 		{
 			return false;
 		}
@@ -3783,7 +3802,6 @@
 			return false;
 		}
 
-		var url = ctx + "/CaseManagementEntry.do";
 		var frm = document.forms["caseManagementEntryForm"];
 
 		frm.method.value = "print";
@@ -3791,6 +3809,11 @@
 		frm.pStartDate.value = $F("printStartDate");
 		frm.pEndDate.value = $F("printEndDate");
 		frm.submit();
+
+		if ($("printopAll").checked)
+		{
+			unsetPrintAll();
+		}
 
 		return false;
 	}
@@ -3888,31 +3911,22 @@
 
 	}
 
+	// Take out magic string and replace it with whatever we had recorded before for printing
+	// This is entirely for handling the case where we want to reprint from the page
+	function unsetPrintAll()
+	{
+		if ($("notes2print").value === "ALL_NOTES")
+		{
+			$("notes2print").value = oldNoteIds;
+		}
+	}
+
+	// Take whatever we had recorded before for printing and replace it with magic string
+	// Keep reference to value for whenever user shifts away from printing all notes
 	function printAll()
 	{
-		var idx;
-		var noteId;
-		var notesDiv;
-		var pos;
-
+		oldNoteIds = $("notes2print").value;
 		$("notes2print").value = "ALL_NOTES";
-
-		/*
-		//cycle through container divs for each note
-		for( idx = 1; idx <= maxNcId; ++idx ) {
-
-			if( $("nc" + idx) == null ) continue;
-
-			notesDiv = $("nc" + idx).down('div');
-			noteId = notesDiv.id.substr(1);  //get note id
-		  //if print img present, add note to print queue if not already there
-			if( $("print"+noteId) != null ) {
-				pos = noteIsQeued(noteId);
-				if( pos == -1 )
-					addPrintQueue(noteId);
-			}
-		}
-		*/
 	}
 
 	var editUnsignedMsg;

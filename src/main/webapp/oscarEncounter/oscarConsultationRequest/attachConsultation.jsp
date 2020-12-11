@@ -364,7 +364,8 @@ String userlastname = (String) session.getAttribute("userlastname");
 		<div class="flexV flexGrow">
 			<h2 style="text-align: center"><bean:message
 					key="oscarEncounter.oscarConsultationRequest.AttachDocPopup.preview" /></h2>
-			<iframe id="previewPane" class="flexGrow" sandbox="allow-scripts"></iframe>
+            <div id="previewPane" class="flexV flexGrow">
+            </div>
 		</div>
 	</div>
 </html:form>
