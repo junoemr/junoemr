@@ -109,8 +109,6 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 			List<ProviderData> matchedProviders = providerDataDao.criteriaSearch(criteriaSearch);
 			if(matchedProviders.isEmpty())
 			{
-				logger.info("Creating new Provider record for " + newProvider.getLastName() + "," + newProvider.getFirstName());
-
 				dbProvider = providerModelToDbConverter.convert(newProvider);
 				// providers don't have auto-generated id's, so we have to pick one
 				Integer newProviderId = providerService.getNextProviderNumberInSequence(9999, 900000);

@@ -22,6 +22,8 @@
  */
 package org.oscarehr.rx.service;
 
+import org.oscarehr.common.dao.PartialDateDao;
+import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.DrugModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.PrescriptionModelToDbConverter;
@@ -51,6 +53,9 @@ public class MedicationService
 	private DrugModelToDbConverter drugModelToDbConverter;
 
 	@Autowired
+	protected PartialDateDao partialDateDao;
+
+	@Autowired
 	private PrescriptionModelToDbConverter prescriptionModelToDbConverter;
 
 
@@ -64,6 +69,32 @@ public class MedicationService
 		prescriptionDao.persist(prescription);
 		drug.setScriptNo(prescription.getId());
 		drugDao.persist(drug);
+
+		/* save drug partial dates */
+		org.oscarehr.demographicImport.model.common.PartialDate partialStartDate = medication.getRxStartDate();
+		if(partialStartDate != null)
+		{
+			partialDateDao.setPartialDate(partialStartDate,
+					PartialDate.TABLE.DRUGS,
+					drug.getId(),
+					PartialDate.DRUGS_STARTDATE);
+		}
+		org.oscarehr.demographicImport.model.common.PartialDate partialWrittenDate = medication.getWrittenDate();
+		if(partialWrittenDate != null)
+		{
+			partialDateDao.setPartialDate(partialWrittenDate,
+					PartialDate.TABLE.DRUGS,
+					drug.getId(),
+					PartialDate.DRUGS_WRITTENDATE);
+		}
+		org.oscarehr.demographicImport.model.common.PartialDate partialEndDate = medication.getRxEndDate();
+		if(partialEndDate != null)
+		{
+			partialDateDao.setPartialDate(partialEndDate,
+					PartialDate.TABLE.DRUGS,
+					drug.getId(),
+					PartialDate.DRUGS_ENDDATE);
+		}
 	}
 
 	public void saveNewMedications(List<Medication> medicationList, Demographic demographic)

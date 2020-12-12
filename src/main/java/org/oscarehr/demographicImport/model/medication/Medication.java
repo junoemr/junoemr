@@ -41,9 +41,9 @@ public abstract class Medication extends AbstractTransientModel
 	private String outsideProviderName;
 	private String outsideProviderOhip;
 
-	private PartialDate rxStartDate;
 	private PartialDateTime writtenDate;
-	private LocalDate rxEndDate;
+	private PartialDate rxStartDate;
+	private PartialDate rxEndDate;
 	private LocalDateTime createdDateTime;
 	private Boolean patientCompliance;
 	private LocalDateTime pickupDateTime;
@@ -61,7 +61,7 @@ public abstract class Medication extends AbstractTransientModel
 	// dosage info
 	private float takeMin;
 	private float takeMax;
-	private String frequencyCode;
+	private FrequencyCode frequencyCode;
 	private String duration;
 	private String durationUnit;
 	private String quantity;
@@ -89,4 +89,16 @@ public abstract class Medication extends AbstractTransientModel
 	private String eTreatmentType;
 
 	public abstract String getDrugName();
+
+	/**
+	 * calculate medication end date based on frequency, quantity and dosage.
+	 * @param rxStartDate - the rx start date
+	 * @return - the rx end date or null if end date cannot be determined
+	 */
+	public static LocalDate calculateEndDate(LocalDate rxStartDate, FrequencyCode frequency, double amount, double dosage)
+	{
+		double frequencyScaler = frequency.toScaler();
+		long durationDays = Math.round(amount / (dosage * frequencyScaler));
+		return rxStartDate.plusDays(durationDays);
+	}
 }

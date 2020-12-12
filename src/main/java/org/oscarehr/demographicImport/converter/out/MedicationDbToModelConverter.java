@@ -26,6 +26,7 @@ import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.medication.CustomMedication;
+import org.oscarehr.demographicImport.model.medication.FrequencyCode;
 import org.oscarehr.demographicImport.model.medication.Medication;
 import org.oscarehr.demographicImport.model.medication.StandardMedication;
 import org.oscarehr.rx.model.Drug;
@@ -62,7 +63,7 @@ public class MedicationDbToModelConverter extends BaseDbToModelConverter<Drug, M
 
 		BeanUtils.copyProperties(input, medication,
 				"rxDate", "endDate", "writtenDate", "createDate",
-				"lastRefillDate", "archivedDate", "pickupDateTime", "lastUpdateDate");
+				"lastRefillDate", "archivedDate", "pickupDateTime", "lastUpdateDate", "freqCode");
 
 		org.oscarehr.common.model.PartialDate dbPartialDate = partialDateDao.getPartialDate(
 				org.oscarehr.common.model.PartialDate.TABLE_DRUGS,
@@ -82,13 +83,18 @@ public class MedicationDbToModelConverter extends BaseDbToModelConverter<Drug, M
 			medication.setRxStartDate(startDate);
 		}
 
-		medication.setRxEndDate(ConversionUtils.toNullableLocalDate(input.getEndDate()));
+		org.oscarehr.common.model.PartialDate dbPartialEndDate = partialDateDao.getPartialDate(
+				org.oscarehr.common.model.PartialDate.TABLE_DRUGS,
+				input.getId(),
+				org.oscarehr.common.model.PartialDate.DRUGS_ENDDATE);
+		medication.setRxEndDate(PartialDate.from(ConversionUtils.toNullableLocalDate(input.getEndDate()), dbPartialEndDate));
+
 		medication.setPickupDateTime(ConversionUtils.toNullableLocalDateTime(input.getPickUpDateTime()));
 		medication.setLastRefillDate(ConversionUtils.toNullableLocalDate(input.getLastRefillDate()));
 		medication.setCreatedDateTime(ConversionUtils.toNullableLocalDateTime(input.getCreateDate()));
 		medication.setLastUpdateDateTime(ConversionUtils.toNullableLocalDateTime(input.getLastUpdateDate()));
 		medication.setArchivedDateTime(ConversionUtils.toNullableLocalDateTime(input.getArchivedDate()));
-		medication.setFrequencyCode(input.getFreqCode());
+		medication.setFrequencyCode(FrequencyCode.from(input.getFreqCode()));
 
 		medication.setDurationUnit(input.getDurUnit());
 

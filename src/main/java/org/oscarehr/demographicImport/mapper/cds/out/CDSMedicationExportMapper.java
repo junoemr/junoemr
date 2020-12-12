@@ -26,6 +26,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.DrugMeasure;
 import org.oscarehr.common.xml.cds.v5_0.model.MedicationsAndTreatments;
 import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.model.medication.CustomMedication;
+import org.oscarehr.demographicImport.model.medication.FrequencyCode;
 import org.oscarehr.demographicImport.model.medication.Medication;
 import org.oscarehr.demographicImport.model.medication.StandardMedication;
 import org.oscarehr.demographicImport.model.provider.Provider;
@@ -53,7 +54,9 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		medicationsAndTreatments.setNumberOfRefills(toStringOrNull(medication.getRefillQuantity()));
 		medicationsAndTreatments.setForm(medication.getDrugForm());
 		medicationsAndTreatments.setRoute(medication.getRoute());
-		medicationsAndTreatments.setFrequency(medication.getFrequencyCode());
+
+		FrequencyCode frequencyCode = medication.getFrequencyCode();
+		medicationsAndTreatments.setFrequency((frequencyCode != null) ? frequencyCode.getCode() : null);
 		medicationsAndTreatments.setDuration(medication.getDuration());
 		medicationsAndTreatments.setRefillDuration(toStringOrNull(medication.getRefillDuration()));
 		medicationsAndTreatments.setQuantity(medication.getQuantity());

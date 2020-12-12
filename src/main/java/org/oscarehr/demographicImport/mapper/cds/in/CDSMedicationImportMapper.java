@@ -23,20 +23,28 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.DrugMeasure;
 import org.oscarehr.common.xml.cds.v5_0.model.MedicationsAndTreatments;
 import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
+import org.oscarehr.demographicImport.model.common.PartialDate;
+import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.medication.CustomMedication;
+import org.oscarehr.demographicImport.model.medication.FrequencyCode;
 import org.oscarehr.demographicImport.model.medication.Medication;
 import org.oscarehr.demographicImport.model.medication.StandardMedication;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
 
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.Y_INDICATOR_TRUE;
 
 @Component
 public class CDSMedicationImportMapper extends AbstractCDSImportMapper<MedicationsAndTreatments, Medication>
 {
+	private static final Logger logger = Logger.getLogger(CDSMedicationImportMapper.class);
+
 	public CDSMedicationImportMapper()
 	{
 		super();
@@ -73,8 +81,8 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 			medication = customMedication;
 		}
 
-		medication.setWrittenDate(toNullablePartialDateTime(importStructure.getPrescriptionWrittenDate()));
-		medication.setRxStartDate(toNullablePartialDate(importStructure.getStartDate()));
+		medication.setWrittenDate(getWrittenDate(importStructure));
+		medication.setRxStartDate(getStartDate(importStructure));
 		medication.setRefillQuantity(toIntOrNull(importStructure.getRefillQuantity()));
 		medication.setDrugForm(importStructure.getForm());
 		medication.setRoute(importStructure.getRoute());
@@ -99,16 +107,17 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		// TODO importStructure.getProblemCode();
 		// TODO importStructure.getProtocolIdentifier();
 
+		medication.setRxEndDate(getEndDate(importStructure));
 
 		return medication;
 	}
 
-	protected String getFormattedFrequency(MedicationsAndTreatments importStructure)
+	protected FrequencyCode getFormattedFrequency(MedicationsAndTreatments importStructure)
 	{
 		String freqCode = importStructure.getFrequency();
 		if(freqCode != null)
 		{
-			return StringUtils.trimToNull(freqCode.replaceAll("PRN", ""));
+			return FrequencyCode.from(StringUtils.trimToNull(freqCode.replaceAll("PRN", "")));
 		}
 		return null;
 	}
@@ -124,6 +133,53 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		}
 		return provider;
 	}
+
+	protected PartialDateTime getWrittenDate(MedicationsAndTreatments importStructure)
+	{
+		return toNullablePartialDateTime(importStructure.getPrescriptionWrittenDate());
+	}
+	protected PartialDate getStartDate(MedicationsAndTreatments importStructure)
+	{
+		return toNullablePartialDate(importStructure.getStartDate());
+	}
+	protected PartialDate getEndDate(MedicationsAndTreatments importStructure)
+	{
+		PartialDate partialDate = getStartDate(importStructure);
+		PartialDate partialEndDate = null;
+		if(partialDate == null)
+		{
+			partialDate = toNullablePartialDateTime(importStructure.getPrescriptionWrittenDate());
+		}
+		if(partialDate == null)
+		{
+			partialDate = PartialDate.from(LocalDate.now()); // it can't be null
+		}
+
+		FrequencyCode frequencyCode = getFormattedFrequency(importStructure);
+		String quantity = importStructure.getQuantity();
+		String dosageStr = importStructure.getDosage();
+
+		if(frequencyCode != null && StringUtils.isNumeric(quantity) && StringUtils.isNumeric(dosageStr))
+		{
+			try
+			{
+				double amount = Double.parseDouble(quantity);
+				double dosage = Double.parseDouble(dosageStr);
+				partialEndDate = PartialDate.from(Medication.calculateEndDate(partialDate.toLocalDate(), frequencyCode, amount, dosage));
+			}
+			catch(RuntimeException e)
+			{
+				logger.error("Error calculating medication end date", e);
+			}
+		}
+
+		if(partialEndDate == null)
+		{
+			partialEndDate = partialDate; // it also can't be null
+		}
+		return partialEndDate;
+	}
+
 
 	protected Boolean toBooleanOrNull(String indicator)
 	{

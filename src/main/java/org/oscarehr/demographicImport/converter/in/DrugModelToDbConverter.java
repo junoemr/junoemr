@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.converter.in;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.demographicImport.model.medication.FrequencyCode;
 import org.oscarehr.demographicImport.model.medication.Medication;
 import org.oscarehr.demographicImport.model.medication.StandardMedication;
 import org.oscarehr.rx.model.Drug;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -45,7 +47,7 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 		BeanUtils.copyProperties(input, drug,
 				"rxStartDate", "rxEndDate", "writtenDate", "createdDateTime",
 				"lastRefillDate", "archivedDateTime", "pickupDateTime", "lastUpdateDateTime",
-				"gcnSeqNo", "noSubs", "prn", "archived");
+				"gcnSeqNo", "noSubs", "prn", "archived", "startDateUnknown");
 
 		drug.setEndDate(ConversionUtils.toNullableLegacyDate(input.getRxEndDate()));
 		drug.setRxDate(ConversionUtils.toNullableLegacyDate(input.getRxStartDate()));
@@ -58,7 +60,8 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 
 		drug.setProviderNo(findOrCreateProviderRecord(input.getPrescribingProvider(), false).getId());
 
-		drug.setFreqCode(input.getFrequencyCode());
+		FrequencyCode frequencyCode = input.getFrequencyCode();
+		drug.setFreqCode((frequencyCode != null) ? frequencyCode.getCode() : null);
 		drug.setDurUnit(input.getDurationUnit());
 		drug.setSpecial(generateSpecial(input));
 
@@ -73,6 +76,13 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 			drug.setGcnSeqNo(toIntDefaultIfNull(standardMedication.getGcnSeqNo(), 0));
 			drug.setNoSubs(BooleanUtils.toBooleanDefaultIfNull(standardMedication.getNoSubs(), false));
 			drug.setPrn(BooleanUtils.toBooleanDefaultIfNull(standardMedication.getPrn(), false));
+		}
+
+		// unknown start date if null, but start date must be set to something in database
+		if(drug.getRxDate() == null)
+		{
+			drug.setStartDateUnknown(true);
+			drug.setRxDate(new Date());
 		}
 
 		return drug;
@@ -98,7 +108,7 @@ public class DrugModelToDbConverter extends BaseModelToDbConverter<Medication, D
 		}
 		if (medication.getFrequencyCode() != null)
 		{
-			valueList.add(medication.getFrequencyCode());
+			valueList.add(medication.getFrequencyCode().getCode());
 		}
 		if (medication.getInstructions() != null)
 		{
