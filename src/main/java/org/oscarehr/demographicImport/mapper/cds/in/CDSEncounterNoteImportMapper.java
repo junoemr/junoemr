@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.ClinicalNotes;
 import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
@@ -44,7 +45,7 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSImportMapper<Clinic
 	public EncounterNote importToJuno(ClinicalNotes importStructure)
 	{
 		EncounterNote note = new EncounterNote();
-		note.setNoteText(importStructure.getMyClinicalNotesContent());
+		String noteText = "";
 		note.setObservationDate(toNullableLocalDateTime(importStructure.getEventDateTime()));
 
 		// TODO how to choose the mrp provider when there are multiple providers or reviewers?
@@ -71,7 +72,7 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSImportMapper<Clinic
 
 		if (!importStructure.getNoteReviewer().isEmpty())
 		{
-			// for now, first provider will be the MRP
+			// for now, first provider will be the reviewer
 			ClinicalNotes.NoteReviewer noteReviewer = importStructure.getNoteReviewer().get(0);
 			DateTimeFullOrPartial reviewDateTime = noteReviewer.getDateTimeNoteReviewed();
 
@@ -83,12 +84,15 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSImportMapper<Clinic
 			note.setSigningProvider(reviewer);
 		}
 
+		noteText += StringUtils.trimToEmpty(importStructure.getNoteType()) + "\n";
+		noteText += StringUtils.trimToEmpty(importStructure.getMyClinicalNotesContent());
 
-		if(note.getNoteText() == null || note.getNoteText().isEmpty())
+		if(noteText.isEmpty())
 		{
 			logger.warn("EncounterNote has no text value");
-			note.setNoteText("");
 		}
+		note.setNoteText(StringUtils.trimToEmpty(noteText));
+
 		return note;
 	}
 }
