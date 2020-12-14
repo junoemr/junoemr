@@ -43,10 +43,10 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdmini
 
 public class AddGroupTests extends SeleniumTestBase
 {
-	public static String groupName = "TestGroup";
-	public static String valueOfDrApple = groupName + drApple.providerNo;
-	public static String valueOfDrBerry = groupName + drBerry.providerNo;
-	public static String valueOfDrCherry = groupName + drCherry.providerNo;
+	public static final String groupName = "TestGroup";
+	public static final String valueOfDrApple = groupName + drApple.providerNo;
+	public static final String valueOfDrBerry = groupName + drBerry.providerNo;
+	public static final String valueOfDrCherry = groupName + drCherry.providerNo;
 
 	@BeforeClass
 	public static void setup()
@@ -61,7 +61,7 @@ public class AddGroupTests extends SeleniumTestBase
 		SchemaUtils.restoreTable("admission", "log", "log_ws_rest", "mygroup", "provider", "providerbillcenter");
 	}
 
-	public static void addGroup(String groupName, int groupSize)
+	public void addGroup(String groupName, int groupSize)
 	{
 		driver.findElement(By.xpath("//input[@name='mygroup_no']")).sendKeys(groupName);
 		for (int i = 1; i <= groupSize; i ++)
