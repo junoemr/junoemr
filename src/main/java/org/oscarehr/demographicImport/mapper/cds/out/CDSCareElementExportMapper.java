@@ -24,16 +24,37 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.oscarehr.common.xml.cds.v5_0.model.BloodPressure;
 import org.oscarehr.common.xml.cds.v5_0.model.CareElements;
+import org.oscarehr.common.xml.cds.v5_0.model.DiabetesComplicationScreening;
+import org.oscarehr.common.xml.cds.v5_0.model.DiabetesEducationalSelfManagement;
+import org.oscarehr.common.xml.cds.v5_0.model.DiabetesMotivationalCounselling;
+import org.oscarehr.common.xml.cds.v5_0.model.DiabetesSelfManagementChallenges;
+import org.oscarehr.common.xml.cds.v5_0.model.DiabetesSelfManagementCollaborative;
 import org.oscarehr.common.xml.cds.v5_0.model.Height;
+import org.oscarehr.common.xml.cds.v5_0.model.HypoglycemicEpisodes;
+import org.oscarehr.common.xml.cds.v5_0.model.SelfMonitoringBloodGlucose;
+import org.oscarehr.common.xml.cds.v5_0.model.SmokingPacks;
+import org.oscarehr.common.xml.cds.v5_0.model.SmokingStatus;
 import org.oscarehr.common.xml.cds.v5_0.model.WaistCircumference;
 import org.oscarehr.common.xml.cds.v5_0.model.Weight;
 import org.oscarehr.demographicImport.model.measurement.BloodPressureMeasurement;
+import org.oscarehr.demographicImport.model.measurement.DiabetesComplicationsScreeningMeasurement;
+import org.oscarehr.demographicImport.model.measurement.DiabetesMotivationalCounselingMeasurement;
+import org.oscarehr.demographicImport.model.measurement.DiabetesSelfManagementChallengesMeasurement;
+import org.oscarehr.demographicImport.model.measurement.DiabetesSelfManagementCollaborativeMeasurement;
+import org.oscarehr.demographicImport.model.measurement.DiabetesSelfManagementEducationalMeasurement;
 import org.oscarehr.demographicImport.model.measurement.HeightMeasurement;
+import org.oscarehr.demographicImport.model.measurement.HypoglycemicEpisodesMeasurement;
 import org.oscarehr.demographicImport.model.measurement.Measurement;
+import org.oscarehr.demographicImport.model.measurement.SelfMonitoringBloodGlucoseMeasurement;
+import org.oscarehr.demographicImport.model.measurement.SmokingPacksMeasurement;
+import org.oscarehr.demographicImport.model.measurement.SmokingStatusMeasurement;
 import org.oscarehr.demographicImport.model.measurement.WaistCircumferenceMeasurement;
 import org.oscarehr.demographicImport.model.measurement.WeightMeasurement;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @Component
 public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElements, Measurement>
@@ -49,13 +70,21 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 		CareElements careElements = objectFactory.createCareElements();
 
 		//TODO a better pattern for this?
-		if(exportStructure instanceof HeightMeasurement)
+		if(exportStructure instanceof SmokingStatusMeasurement)
 		{
-			careElements.getHeight().add(getHeight((HeightMeasurement) exportStructure));
+			careElements.getSmokingStatus().add(getSmokingStatus((SmokingStatusMeasurement) exportStructure));
+		}
+		else if(exportStructure instanceof SmokingPacksMeasurement)
+		{
+			careElements.getSmokingPacks().add(getSmokingPacks((SmokingPacksMeasurement) exportStructure));
 		}
 		else if(exportStructure instanceof WeightMeasurement)
 		{
 			careElements.getWeight().add(getWeight((WeightMeasurement) exportStructure));
+		}
+		else if(exportStructure instanceof HeightMeasurement)
+		{
+			careElements.getHeight().add(getHeight((HeightMeasurement) exportStructure));
 		}
 		else if(exportStructure instanceof WaistCircumferenceMeasurement)
 		{
@@ -65,18 +94,52 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 		{
 			careElements.getBloodPressure().add(getBloodPressure((BloodPressureMeasurement) exportStructure));
 		}
+		else if(exportStructure instanceof DiabetesComplicationsScreeningMeasurement)
+		{
+			careElements.getDiabetesComplicationsScreening().add(getComplicationsScreening((DiabetesComplicationsScreeningMeasurement) exportStructure));
+		}
+		else if(exportStructure instanceof DiabetesMotivationalCounselingMeasurement)
+		{
+			careElements.getDiabetesMotivationalCounselling().add(getMotivationsCounseling((DiabetesMotivationalCounselingMeasurement) exportStructure));
+		}
+		else if(exportStructure instanceof DiabetesSelfManagementCollaborativeMeasurement)
+		{
+			careElements.getDiabetesSelfManagementCollaborative().add(getSelfManagementCollaborative((DiabetesSelfManagementCollaborativeMeasurement) exportStructure));
+		}
+		else if(exportStructure instanceof DiabetesSelfManagementChallengesMeasurement)
+		{
+			careElements.getDiabetesSelfManagementChallenges().add(getSelfManagementChallenges((DiabetesSelfManagementChallengesMeasurement) exportStructure));
+		}
+		else if(exportStructure instanceof DiabetesSelfManagementEducationalMeasurement)
+		{
+			careElements.getDiabetesEducationalSelfManagement().add(getEducationalSelfManagement((DiabetesSelfManagementEducationalMeasurement) exportStructure));
+		}
+		else if(exportStructure instanceof HypoglycemicEpisodesMeasurement)
+		{
+			careElements.getHypoglycemicEpisodes().add(getHypoglycemicEpisodes((HypoglycemicEpisodesMeasurement) exportStructure));
+		}
+		else if(exportStructure instanceof SelfMonitoringBloodGlucoseMeasurement)
+		{
+			careElements.getSelfMonitoringBloodGlucose().add(getSelfMonitoringBloodGlucose((SelfMonitoringBloodGlucoseMeasurement) exportStructure));
+		}
 
 		return careElements;
 	}
 
-	protected Height getHeight(HeightMeasurement exportStructure)
+	protected SmokingStatus getSmokingStatus(SmokingStatusMeasurement exportStructure)
 	{
-		Height height = objectFactory.createHeight();
-		height.setHeight(exportStructure.getMeasurementValue());
-		height.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
-		height.setHeightUnit(exportStructure.getMeasurementUnit());
+		SmokingStatus smokingStatus = objectFactory.createSmokingStatus();
+		smokingStatus.setStatus(exportStructure.getMeasurementValue());
+		smokingStatus.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		return smokingStatus;
+	}
 
-		return height;
+	protected SmokingPacks getSmokingPacks(SmokingPacksMeasurement exportStructure)
+	{
+		SmokingPacks smokingPacks = objectFactory.createSmokingPacks();
+		smokingPacks.setPerDay(BigDecimal.valueOf(Double.parseDouble(exportStructure.getMeasurementValue())));
+		smokingPacks.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		return smokingPacks;
 	}
 
 	protected Weight getWeight(WeightMeasurement exportStructure)
@@ -85,8 +148,16 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 		weight.setWeight(exportStructure.getMeasurementValue());
 		weight.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		weight.setWeightUnit(exportStructure.getMeasurementUnit());
-
 		return weight;
+	}
+
+	protected Height getHeight(HeightMeasurement exportStructure)
+	{
+		Height height = objectFactory.createHeight();
+		height.setHeight(exportStructure.getMeasurementValue());
+		height.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		height.setHeightUnit(exportStructure.getMeasurementUnit());
+		return height;
 	}
 
 	protected WaistCircumference getWaist(WaistCircumferenceMeasurement exportStructure)
@@ -95,7 +166,6 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 		waist.setWaistCircumference(exportStructure.getMeasurementValue());
 		waist.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		waist.setWaistCircumferenceUnit(exportStructure.getMeasurementUnit());
-
 		return waist;
 	}
 
@@ -106,7 +176,64 @@ public class CDSCareElementExportMapper extends AbstractCDSExportMapper<CareElem
 		bloodPressure.setDiastolicBP(exportStructure.getDiastolic());
 		bloodPressure.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
 		bloodPressure.setBPUnit(exportStructure.getMeasurementUnit());
-
 		return bloodPressure;
+	}
+
+	protected DiabetesComplicationScreening getComplicationsScreening(DiabetesComplicationsScreeningMeasurement exportStructure)
+	{
+		DiabetesComplicationScreening complicationScreening = objectFactory.createDiabetesComplicationScreening();
+		complicationScreening.setExamCode(exportStructure.getMeasurementValue());
+		complicationScreening.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		return complicationScreening;
+	}
+
+	protected DiabetesMotivationalCounselling getMotivationsCounseling(DiabetesMotivationalCounselingMeasurement exportStructure)
+	{
+		DiabetesMotivationalCounselling motivationalCounselling = objectFactory.createDiabetesMotivationalCounselling();
+		motivationalCounselling.setCounsellingPerformed(exportStructure.getMeasurementValue());
+		motivationalCounselling.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		return motivationalCounselling;
+	}
+
+	protected DiabetesSelfManagementCollaborative getSelfManagementCollaborative(DiabetesSelfManagementCollaborativeMeasurement exportStructure)
+	{
+		DiabetesSelfManagementCollaborative selfManagementCollaborative = objectFactory.createDiabetesSelfManagementCollaborative();
+		selfManagementCollaborative.setDocumentedGoals(exportStructure.getMeasurementValue());
+		selfManagementCollaborative.setCodeValue(exportStructure.getMeasurementCode());
+		selfManagementCollaborative.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		return selfManagementCollaborative;
+	}
+
+	protected DiabetesSelfManagementChallenges getSelfManagementChallenges(DiabetesSelfManagementChallengesMeasurement exportStructure)
+	{
+		DiabetesSelfManagementChallenges selfManagementChallenges = objectFactory.createDiabetesSelfManagementChallenges();
+		selfManagementChallenges.setChallengesIdentified(exportStructure.getMeasurementValue());
+		selfManagementChallenges.setCodeValue(exportStructure.getMeasurementCode());
+		selfManagementChallenges.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		return selfManagementChallenges;
+	}
+
+	protected DiabetesEducationalSelfManagement getEducationalSelfManagement(DiabetesSelfManagementEducationalMeasurement exportStructure)
+	{
+		DiabetesEducationalSelfManagement educationalSelfManagement = objectFactory.createDiabetesEducationalSelfManagement();
+		educationalSelfManagement.setEducationalTrainingPerformed(exportStructure.getMeasurementValue());
+		educationalSelfManagement.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		return educationalSelfManagement;
+	}
+
+	protected HypoglycemicEpisodes getHypoglycemicEpisodes(HypoglycemicEpisodesMeasurement exportStructure)
+	{
+		HypoglycemicEpisodes hypoglycemicEpisodes = objectFactory.createHypoglycemicEpisodes();
+		hypoglycemicEpisodes.setNumOfReportedEpisodes(BigInteger.valueOf(Long.parseLong(exportStructure.getMeasurementValue())));
+		hypoglycemicEpisodes.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		return hypoglycemicEpisodes;
+	}
+
+	protected SelfMonitoringBloodGlucose getSelfMonitoringBloodGlucose(SelfMonitoringBloodGlucoseMeasurement exportStructure)
+	{
+		SelfMonitoringBloodGlucose selfMonitoringBloodGlucose = objectFactory.createSelfMonitoringBloodGlucose();
+		selfMonitoringBloodGlucose.setSelfMonitoring(exportStructure.getMeasurementValue());
+		selfMonitoringBloodGlucose.setDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getObservationDateTime()));
+		return selfMonitoringBloodGlucose;
 	}
 }

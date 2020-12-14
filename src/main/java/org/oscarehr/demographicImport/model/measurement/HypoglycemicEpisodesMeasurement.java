@@ -35,10 +35,4 @@ public class HypoglycemicEpisodesMeasurement extends Measurement
 	{
 		super(dbModel);
 	}
-
-	@Override
-	public String getMeasurementUnit()
-	{
-		return null;
-	}
 }

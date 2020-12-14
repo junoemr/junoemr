@@ -58,5 +58,12 @@ public abstract class Measurement extends AbstractTransientModel
 		this.createdDateTime = ConversionUtils.toLocalDateTime(dbModel.getCreateDate());
 	}
 
-	public abstract String getMeasurementUnit();
+	public String getMeasurementUnit()
+	{
+		return null;
+	}
+	public String getMeasurementCode()
+	{
+		return null;
+	}
 }

@@ -35,10 +35,4 @@ public class DiabetesSelfManagementEducationalMeasurement extends Measurement
 	{
 		super(dbModel);
 	}
-
-	@Override
-	public String getMeasurementUnit()
-	{
-		return null;
-	}
 }

@@ -24,6 +24,8 @@ package org.oscarehr.demographicImport.model.measurement;
 
 import lombok.Data;
 
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_CODE_DIABETES_SELF_MANAGEMENT_CHALLENGES;
+
 @Data
 public class DiabetesSelfManagementChallengesMeasurement extends Measurement
 {
@@ -37,8 +39,8 @@ public class DiabetesSelfManagementChallengesMeasurement extends Measurement
 	}
 
 	@Override
-	public String getMeasurementUnit()
+	public String getMeasurementCode()
 	{
-		return null;
+		return MEASUREMENT_CODE_DIABETES_SELF_MANAGEMENT_CHALLENGES;
 	}
 }
