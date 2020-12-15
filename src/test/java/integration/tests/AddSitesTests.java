@@ -32,16 +32,17 @@ import org.junit.AfterClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 public class AddSitesTests extends SeleniumTestBase
 {
+	//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	@AfterClass
 	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
@@ -61,6 +62,7 @@ public class AddSitesTests extends SeleniumTestBase
 			driver.switchTo().frame("content-frame");
 		}
 		driver.findElement(By.xpath("//input[@value='Add New Site']")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='site.name']")));
 		driver.findElement(By.xpath("//input[@name='site.name']")).sendKeys(site.siteName);
 		driver.findElement(By.xpath("//input[@name='site.shortName']")).sendKeys(site.shortName);
 		driver.findElement(By.xpath("//input[@name='site.bgColor']")).sendKeys(site.address);
@@ -81,8 +83,7 @@ public class AddSitesTests extends SeleniumTestBase
 		SiteTestData site = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[0]);
 
 		// open administration panel
-		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("admin-panel")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("admin-panel")));
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);
 		addNewSites(site);
@@ -94,13 +95,14 @@ public class AddSitesTests extends SeleniumTestBase
 	public void addSitesJUNOUITest() throws Exception
 	{
 		SiteTestData siteJuno = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[1]);
-
+/*
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
 
 		// open administration panel
 		driver.findElement(By.linkText("More")).click();
-		driver.findElement(By.linkText("Admin")).click();
+		driver.findElement(By.linkText("Admin")).click();*/
+		accessSectionJUNOUI(driver, "Admin");
 		addNewSites(siteJuno);
 		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(siteJuno.siteName), driver));
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));

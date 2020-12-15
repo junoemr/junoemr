@@ -102,4 +102,24 @@ public class MsgDemoMapDao extends AbstractDao<MsgDemoMap>{
             }
             
         }
+
+	/**
+	 * Get the number of new (unread) messages associated with a demographic.
+	 * @param demographicNo demographic to search against
+	 * @param status status to use for filtering
+	 * @return number of new messages
+	 */
+	public Integer getNumMessagesWithStatus(int demographicNo, String status)
+	{
+		String sql = "SELECT x FROM MsgDemoMap x, MessageList ml " +
+				"WHERE x.id = ml.message " +
+				"AND x.demographic_no = :demographicNo " +
+				"AND ml.status=:status";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("demographicNo", demographicNo);
+		query.setParameter("status", status);
+
+		List<MsgDemoMap> numMessages = query.getResultList();
+		return numMessages.size();
+	}
 }

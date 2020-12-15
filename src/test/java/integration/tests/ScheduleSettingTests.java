@@ -33,7 +33,9 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.io.IOException;
@@ -51,7 +53,7 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdmini
 public class ScheduleSettingTests extends SeleniumTestBase
 {
 	public static String templateTitleGeneral = "P:General";
-
+	static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	@BeforeClass
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
@@ -137,6 +139,7 @@ public class ScheduleSettingTests extends SeleniumTestBase
 	public static void setupSchedule(String currWindowHandle, String providerNo, String templateTitle1, String templateTitle2)
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='provider_no']")));
 		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), providerNo);
 		LocalDate currentDate = LocalDate.now();
 		String month = Integer.toString(currentDate.getMonthValue());

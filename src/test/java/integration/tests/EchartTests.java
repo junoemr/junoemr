@@ -78,8 +78,8 @@ public class EchartTests extends SeleniumTestBase
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		js.executeScript("window.scrollBy(0, document.body.scrollHeight)");
 
-		WebDriverWait wait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("newNoteImg")));
+		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("newNoteImg")));
 		WebElement newNoteButton = driver.findElement(By.id("newNoteImg"));
 		newNoteButton.click();
 
