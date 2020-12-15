@@ -29,6 +29,8 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarAppointmentRepeating;
+import org.oscarehr.schedule.exception.ScheduleException;
+import org.oscarehr.site.service.SiteService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -63,6 +65,9 @@ public class AppointmentService extends AbstractServiceImpl
 
 	@Autowired
 	private org.oscarehr.appointment.service.Appointment appointmentService;
+
+	@Autowired
+	private SiteService siteService;
 
 	@GET
 	@Path("/{appointmentNo}")
@@ -150,22 +155,30 @@ public class AppointmentService extends AbstractServiceImpl
 		AppointmentConverter converter = new AppointmentConverter();
 		Appointment appointment = converter.getAsDomainObject(calendarAppointment);
 
-		Appointment savedAppointment = appointmentManager.updateAppointment(getLoggedInInfo(), appointment);
+		String siteName = appointment.getLocation();
+		String providerNo = appointment.getProviderNo();
 
-		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), savedAppointment.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,
-				LogConst.STATUS_SUCCESS, String.valueOf(savedAppointment.getId()), loggedInInfo.getIp());
+		boolean validSite = siteService.isProviderAssignedToSite(providerNo, siteName);
 
-		CalendarAppointment responseAppointment = converter.getAsCalendarAppointment(savedAppointment);
+		if (validSite)
+		{
+			org.oscarehr.common.model.Appointment savedAppointment = appointmentService.updateAppointment(appointment, getLoggedInInfo(), getHttpServletRequest());
+			CalendarAppointment responseAppointment = converter.getAsCalendarAppointment(savedAppointment);
 
-		responseAppointment.setBillingRegion(calendarAppointment.getBillingRegion());
-		responseAppointment.setBillingForm(calendarAppointment.getBillingForm());
-		responseAppointment.setBillingRdohip(calendarAppointment.getBillingRdohip());
-		responseAppointment.setUserProviderNo(calendarAppointment.getUserProviderNo());
-		responseAppointment.setUserFirstName(calendarAppointment.getUserFirstName());
-		responseAppointment.setUserLastName(calendarAppointment.getUserLastName());
+			responseAppointment.setBillingRegion(calendarAppointment.getBillingRegion());
+			responseAppointment.setBillingForm(calendarAppointment.getBillingForm());
+			responseAppointment.setBillingRdohip(calendarAppointment.getBillingRdohip());
+			responseAppointment.setUserProviderNo(calendarAppointment.getUserProviderNo());
+			responseAppointment.setUserFirstName(calendarAppointment.getUserFirstName());
+			responseAppointment.setUserLastName(calendarAppointment.getUserLastName());
 
-		return RestResponse.successResponse(responseAppointment);
+			return RestResponse.successResponse(responseAppointment);
+		}
+		else
+		{
+			String errorMessage = String.format("Provider is not assigned to site %s", siteName);
+			throw new ScheduleException(errorMessage);
+		}
 	}
 
 	@DELETE
