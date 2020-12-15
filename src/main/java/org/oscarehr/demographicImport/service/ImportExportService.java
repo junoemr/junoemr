@@ -25,9 +25,11 @@ package org.oscarehr.demographicImport.service;
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.log4j.Logger;
 import org.oscarehr.appointment.service.Appointment;
+import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.hl7.copd.writer.JunoGenericImportLabWriter;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.service.DemographicService;
@@ -45,6 +47,7 @@ import org.oscarehr.encounterNote.service.ReminderNoteService;
 import org.oscarehr.encounterNote.service.RiskFactorNoteService;
 import org.oscarehr.encounterNote.service.SocialHistoryNoteService;
 import org.oscarehr.labs.service.LabService;
+import org.oscarehr.measurements.service.MeasurementsService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.rx.service.MedicationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +57,7 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
+import oscar.util.ConversionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -110,6 +114,12 @@ public class ImportExportService
 
 	@Autowired
 	private MedicationService medicationService;
+
+	@Autowired
+	private MeasurementsService measurementsService;
+
+	@Autowired
+	private MeasurementDao measurementDao;
 
 	@Autowired
 	private AppointmentStatusCache appointmentStatusCache;
@@ -178,6 +188,7 @@ public class ImportExportService
 		appointmentStatusCache.clear();
 
 		medicationService.saveNewMedications(demographic.getMedicationList(), dbDemographic);
+		persistMeasurements(demographic, dbDemographic);
 	}
 
 	private void persistNotes(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)
@@ -189,6 +200,20 @@ public class ImportExportService
 		riskFactorNoteService.saveRiskFactorNote(demographic.getRiskFactorNoteList(), dbDemographic);
 		concernNoteService.saveConcernNote(demographic.getConcernNoteList(), dbDemographic);
 		encounterNoteService.saveChartNotes(demographic.getEncounterNoteList(), dbDemographic);
+	}
+
+	private void persistMeasurements(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)
+	{
+		for(org.oscarehr.demographicImport.model.measurement.Measurement measurement : demographic.getMeasurementList())
+		{
+			Measurement dbMeasurement = measurementsService.createNewMeasurement(
+					dbDemographic.getId(),
+					SYSTEM_PROVIDER_NO,
+					measurement.getTypeCode(),
+					measurement.getMeasurementValue(),
+					ConversionUtils.toLegacyDateTime(measurement.getObservationDateTime()));
+			measurementDao.persist(dbMeasurement);
+		}
 	}
 
 	private void persistLabs(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic) throws HL7Exception, IOException

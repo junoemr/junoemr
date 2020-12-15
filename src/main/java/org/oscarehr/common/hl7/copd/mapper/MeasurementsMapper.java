@@ -41,6 +41,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_BLOOD_PRESSURE;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_HEIGHT;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_MINI_MENTAL_STATE_EXAM;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_WAIST;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_WEIGHT;
+
 public class MeasurementsMapper extends AbstractMapper
 {
 	protected MeasurementsService measurementsService = SpringUtils.getBean(MeasurementsService.class);
@@ -83,27 +89,27 @@ public class MeasurementsMapper extends AbstractMapper
 
 			if (miniHealth != null)
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "MMSE", miniHealth, obsDate));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_MINI_MENTAL_STATE_EXAM, miniHealth, obsDate));
 			}
 
 			if (systolicBP != null && diastolicBP != null)
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "BP", systolicBP + "/" + diastolicBP, obsDate));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_BLOOD_PRESSURE, systolicBP + "/" + diastolicBP, obsDate));
 			}
 
 			if (height != null && !height.equals("0.0"))
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "HT", height, obsDate));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_HEIGHT, height, obsDate));
 			}
 
 			if (weight != null && !weight.equals("0.0"))
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "WT", weight, obsDate));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_WEIGHT, weight, obsDate));
 			}
 
 			if (waist != null)
 			{
-				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), "WAIS", waist, obsDate));
+				measurements.add(measurementsService.createNewMeasurement(demo.getDemographicId(), providerData.getProviderNo().toString(), MEASUREMENT_TYPE_WAIST, waist, obsDate));
 			}
 		}
 

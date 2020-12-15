@@ -24,6 +24,8 @@ package org.oscarehr.demographicImport.model.measurement;
 
 import lombok.Data;
 
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DIABETES_EDUCATION;
+
 @Data
 public class DiabetesSelfManagementEducationalMeasurement extends Measurement
 {
@@ -34,5 +36,11 @@ public class DiabetesSelfManagementEducationalMeasurement extends Measurement
 	public DiabetesSelfManagementEducationalMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
+	}
+
+	@Override
+	public String getTypeCode()
+	{
+		return MEASUREMENT_TYPE_DIABETES_EDUCATION;
 	}
 }

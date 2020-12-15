@@ -24,9 +24,13 @@ package org.oscarehr.demographicImport.model.measurement;
 
 import lombok.Data;
 
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_OTHER;
+
 @Data
 public class DiabetesMotivationalCounselingMeasurement extends Measurement
 {
+	private String typeCode;
+
 	public DiabetesMotivationalCounselingMeasurement()
 	{
 		super();
@@ -34,5 +38,12 @@ public class DiabetesMotivationalCounselingMeasurement extends Measurement
 	public DiabetesMotivationalCounselingMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
+		this.typeCode = dbModel.getType();
+	}
+
+	@Override
+	public String getTypeCode()
+	{
+		return (this.typeCode != null) ? this.typeCode : MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_OTHER;
 	}
 }

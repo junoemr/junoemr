@@ -33,16 +33,15 @@ import java.time.LocalDateTime;
 @Data
 public abstract class Measurement extends AbstractTransientModel
 {
-	private Integer id;
-	private String measurementValue;
-	private String measuringInstruction;
-	private String comments;
-	private LocalDateTime observationDateTime;
-	private LocalDateTime createdDateTime;
+	protected Integer id;
+	protected String measurementValue;
+	protected String measuringInstruction;
+	protected String comments;
+	protected LocalDateTime observationDateTime;
+	protected LocalDateTime createdDateTime;
 
-	private Provider provider;
-	private Appointment appointment;
-
+	protected Provider provider;
+	protected Appointment appointment;
 
 	public Measurement()
 	{
@@ -58,12 +57,5 @@ public abstract class Measurement extends AbstractTransientModel
 		this.createdDateTime = ConversionUtils.toLocalDateTime(dbModel.getCreateDate());
 	}
 
-	public String getMeasurementUnit()
-	{
-		return null;
-	}
-	public String getMeasurementCode()
-	{
-		return null;
-	}
+	public abstract String getTypeCode();
 }

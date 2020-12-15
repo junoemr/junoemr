@@ -37,6 +37,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.SmokingStatus;
 import org.oscarehr.common.xml.cds.v5_0.model.WaistCircumference;
 import org.oscarehr.common.xml.cds.v5_0.model.Weight;
 import org.oscarehr.demographicImport.model.measurement.BloodPressureMeasurement;
+import org.oscarehr.demographicImport.model.measurement.DiabetesComplicationsScreeningFootMeasurement;
 import org.oscarehr.demographicImport.model.measurement.DiabetesComplicationsScreeningMeasurement;
 import org.oscarehr.demographicImport.model.measurement.DiabetesMotivationalCounselingMeasurement;
 import org.oscarehr.demographicImport.model.measurement.DiabetesSelfManagementChallengesMeasurement;
@@ -120,7 +121,8 @@ public class CDSCareElementImportMapper extends AbstractCDSImportMapper<CareElem
 
 		for(DiabetesComplicationScreening complicationScreening : importStructure.getDiabetesComplicationsScreening())
 		{
-			DiabetesComplicationsScreeningMeasurement measurement = new DiabetesComplicationsScreeningMeasurement();
+			//TODO which sub-class to use? can it be based on code?
+			DiabetesComplicationsScreeningMeasurement measurement = new DiabetesComplicationsScreeningFootMeasurement();
 			measurement.setObservationDateTime(ConversionUtils.toLocalDate(complicationScreening.getDate()).atStartOfDay());
 			measurement.setMeasurementValue(complicationScreening.getExamCode());
 			measurements.add(measurement);

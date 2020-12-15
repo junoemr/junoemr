@@ -24,16 +24,16 @@ package org.oscarehr.demographicImport.model.measurement;
 
 import lombok.Data;
 
-import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_HYPOGLYCEMIC_EPISODES;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_DILATED_EYE_EXAM;
 
 @Data
-public class HypoglycemicEpisodesMeasurement extends Measurement
+public class DiabetesComplicationsScreeningEyeMeasurement extends DiabetesComplicationsScreeningMeasurement
 {
-	public HypoglycemicEpisodesMeasurement()
+	public DiabetesComplicationsScreeningEyeMeasurement()
 	{
 		super();
 	}
-	public HypoglycemicEpisodesMeasurement(org.oscarehr.common.model.Measurement dbModel)
+	public DiabetesComplicationsScreeningEyeMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
 	}
@@ -41,6 +41,6 @@ public class HypoglycemicEpisodesMeasurement extends Measurement
 	@Override
 	public String getTypeCode()
 	{
-		return MEASUREMENT_TYPE_HYPOGLYCEMIC_EPISODES;
+		return MEASUREMENT_TYPE_DILATED_EYE_EXAM;
 	}
 }

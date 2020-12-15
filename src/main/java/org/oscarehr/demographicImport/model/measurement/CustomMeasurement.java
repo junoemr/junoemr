@@ -27,8 +27,8 @@ import lombok.Data;
 @Data
 public class CustomMeasurement extends Measurement
 {
-	private String measurementType;
 	private String measurementUnit;
+	private String typeCode;
 
 	public CustomMeasurement()
 	{
@@ -38,10 +38,15 @@ public class CustomMeasurement extends Measurement
 	public CustomMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
-		this.measurementType = dbModel.getType();
+		this.typeCode = dbModel.getType();
 	}
 
 	@Override
+	public String getTypeCode()
+	{
+		return typeCode;
+	}
+
 	public String getMeasurementUnit()
 	{
 		return measurementUnit;

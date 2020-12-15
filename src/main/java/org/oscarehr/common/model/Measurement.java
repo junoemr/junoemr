@@ -51,6 +51,7 @@ public class Measurement extends AbstractModel<Integer> implements Serializable 
 	public static final String MEASUREMENT_TYPE_WAIST = "WAIS";
 	public static final String MEASUREMENT_TYPE_WC = "WC";
 	public static final String MEASUREMENT_TYPE_BLOOD_PRESSURE = "BP";
+	public static final String MEASUREMENT_TYPE_MINI_MENTAL_STATE_EXAM = "MMSE";
 	public static final String MEASUREMENT_TYPE_SMOKING_STATUS = "SKST";
 	public static final String MEASUREMENT_TYPE_SMOKING_PACKS_PER_DAY = "POSK";
 	public static final String MEASUREMENT_TYPE_SELF_MONITOR_BLOOD_GLUCOSE = "SMBG";

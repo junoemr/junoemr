@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.model.measurement;
 
 import lombok.Data;
 
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_WEIGHT;
 import static org.oscarehr.common.model.Measurement.MEASUREMENT_UNIT_KG;
 
 @Data
@@ -39,6 +40,11 @@ public class WeightMeasurement extends Measurement
 	}
 
 	@Override
+	public String getTypeCode()
+	{
+		return MEASUREMENT_TYPE_WEIGHT;
+	}
+
 	public String getMeasurementUnit()
 	{
 		return MEASUREMENT_UNIT_KG;

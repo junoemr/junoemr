@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.model.measurement;
 
 import lombok.Data;
 
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_BLOOD_PRESSURE;
 import static org.oscarehr.common.model.Measurement.MEASUREMENT_UNIT_MMHG;
 
 @Data
@@ -39,20 +40,70 @@ public class BloodPressureMeasurement extends Measurement
 	public BloodPressureMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
+		setMeasurementValue(dbModel.getDataField());
+	}
 
-		String dataField = dbModel.getDataField();
+	@Override
+	public String getTypeCode()
+	{
+		return MEASUREMENT_TYPE_BLOOD_PRESSURE;
+	}
+
+	public String getMeasurementUnit()
+	{
+		return MEASUREMENT_UNIT_MMHG;
+	}
+
+	/**
+	 * for blood pressure, this will split on the '/' character. if it is not provided, null will be set
+	 * @param value the string value
+	 */
+	@Override
+	public void setMeasurementValue(String value)
+	{
 		String splitChar = "/";
-		if(dataField != null && dataField.contains(splitChar))
+		if(value != null && value.contains(splitChar))
 		{
-			String[] systolicDiastolicBloodPressure = dbModel.getDataField().split(splitChar, 2);
-			systolic = systolicDiastolicBloodPressure[0];
-			diastolic = systolicDiastolicBloodPressure[1];
+			String[] systolicDiastolicBloodPressure = value.split(splitChar, 2);
+			setMeasurementValue(systolicDiastolicBloodPressure[0], systolicDiastolicBloodPressure[1]);
+		}
+		else
+		{
+			setMeasurementValue(null, null);
 		}
 	}
 
 	@Override
-	public String getMeasurementUnit()
+	public String getMeasurementValue()
 	{
-		return MEASUREMENT_UNIT_MMHG;
+		if(systolic != null && diastolic != null)
+		{
+			return this.getSystolic() + "/" + this.getDiastolic();
+		}
+		else if (systolic != null)
+		{
+			return systolic;
+		}
+		else if (diastolic != null)
+		{
+			return diastolic;
+		}
+		return null;
+	}
+
+	public void setMeasurementValue(String systolic, String diastolic)
+	{
+		setSystolic(systolic);
+		setDiastolic(diastolic);
+	}
+
+	public void setSystolic(String systolic)
+	{
+		this.systolic = systolic;
+	}
+
+	public void setDiastolic(String diastolic)
+	{
+		this.diastolic = diastolic;
 	}
 }

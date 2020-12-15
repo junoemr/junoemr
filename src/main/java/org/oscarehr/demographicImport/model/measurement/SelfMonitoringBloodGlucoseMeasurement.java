@@ -24,6 +24,8 @@ package org.oscarehr.demographicImport.model.measurement;
 
 import lombok.Data;
 
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_SELF_MONITOR_BLOOD_GLUCOSE;
+
 @Data
 public class SelfMonitoringBloodGlucoseMeasurement extends Measurement
 {
@@ -34,5 +36,11 @@ public class SelfMonitoringBloodGlucoseMeasurement extends Measurement
 	public SelfMonitoringBloodGlucoseMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
+	}
+
+	@Override
+	public String getTypeCode()
+	{
+		return MEASUREMENT_TYPE_SELF_MONITOR_BLOOD_GLUCOSE;
 	}
 }

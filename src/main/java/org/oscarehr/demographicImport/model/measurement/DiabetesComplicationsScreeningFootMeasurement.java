@@ -24,23 +24,26 @@ package org.oscarehr.demographicImport.model.measurement;
 
 import lombok.Data;
 
-import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_HYPOGLYCEMIC_EPISODES;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_FOOT_EXAM;
 
 @Data
-public class HypoglycemicEpisodesMeasurement extends Measurement
+public class DiabetesComplicationsScreeningFootMeasurement extends DiabetesComplicationsScreeningMeasurement
 {
-	public HypoglycemicEpisodesMeasurement()
+	private String typeCode;
+
+	public DiabetesComplicationsScreeningFootMeasurement()
 	{
 		super();
 	}
-	public HypoglycemicEpisodesMeasurement(org.oscarehr.common.model.Measurement dbModel)
+	public DiabetesComplicationsScreeningFootMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
+		this.typeCode = dbModel.getType();
 	}
 
 	@Override
 	public String getTypeCode()
 	{
-		return MEASUREMENT_TYPE_HYPOGLYCEMIC_EPISODES;
+		return (this.typeCode != null) ? this.typeCode : MEASUREMENT_TYPE_FOOT_EXAM;
 	}
 }

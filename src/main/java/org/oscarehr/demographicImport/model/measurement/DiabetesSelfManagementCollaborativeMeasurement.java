@@ -25,6 +25,7 @@ package org.oscarehr.demographicImport.model.measurement;
 import lombok.Data;
 
 import static org.oscarehr.common.model.Measurement.MEASUREMENT_CODE_DIABETES_SELF_MANAGEMENT_COLLABORATIVE;
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_COLLABORATIVE_GOAL_SETTING;
 
 @Data
 public class DiabetesSelfManagementCollaborativeMeasurement extends Measurement
@@ -40,6 +41,11 @@ public class DiabetesSelfManagementCollaborativeMeasurement extends Measurement
 	}
 
 	@Override
+	public String getTypeCode()
+	{
+		return MEASUREMENT_TYPE_COLLABORATIVE_GOAL_SETTING;
+	}
+
 	public String getMeasurementCode()
 	{
 		return MEASUREMENT_CODE_DIABETES_SELF_MANAGEMENT_COLLABORATIVE;

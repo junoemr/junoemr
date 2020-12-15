@@ -24,6 +24,8 @@ package org.oscarehr.demographicImport.model.measurement;
 
 import lombok.Data;
 
+import static org.oscarehr.common.model.Measurement.MEASUREMENT_TYPE_SMOKING_STATUS;
+
 @Data
 public class SmokingStatusMeasurement extends Measurement
 {
@@ -34,5 +36,11 @@ public class SmokingStatusMeasurement extends Measurement
 	public SmokingStatusMeasurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		super(dbModel);
+	}
+
+	@Override
+	public String getTypeCode()
+	{
+		return MEASUREMENT_TYPE_SMOKING_STATUS;
 	}
 }

@@ -63,9 +63,10 @@ public class MeasurementFactory
 			case MEASUREMENT_TYPE_BLOOD_PRESSURE:
 				return new BloodPressureMeasurement(dbModel);
 			case MEASUREMENT_TYPE_DILATED_EYE_EXAM:
+				return new DiabetesComplicationsScreeningEyeMeasurement(dbModel);
 			case MEASUREMENT_TYPE_FOOT_EXAM:
 			case MEASUREMENT_TYPE_FOOT_EXAM_TEST_LOSS_OF_SENSATION:
-				return new DiabetesComplicationsScreeningMeasurement(dbModel);
+				return new DiabetesComplicationsScreeningFootMeasurement(dbModel);
 			case MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_NUTRITION:
 			case MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_EXERCISE:
 			case MEASUREMENT_TYPE_DIABETES_MOTIVATION_COUNSELING_COMPLETED_SMOKING:

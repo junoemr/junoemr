@@ -25,7 +25,7 @@ package org.oscarehr.demographicImport.model.measurement;
 import lombok.Data;
 
 @Data
-public class DiabetesComplicationsScreeningMeasurement extends Measurement
+public abstract class DiabetesComplicationsScreeningMeasurement extends Measurement
 {
 	public DiabetesComplicationsScreeningMeasurement()
 	{
