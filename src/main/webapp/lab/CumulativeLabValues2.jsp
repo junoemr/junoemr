@@ -211,13 +211,15 @@ function addLabToList(req){
                       
                       //TEMPORARY
                       String labType = (String) h.get("labType");
+                      String identCode = (String) h.get("identCode");
    
-                      ArrayList list   = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographic_no), prevName);
+                      ArrayList list   = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographic_no), prevName, identCode);
+
                       Hashtable labsBasedOnDate = new Hashtable();
                       for (int g = 0; g < list.size(); g++){
-                          Hashtable hdata = (Hashtable) list.get(g);
-                         //String latestDate = (String) hdata.get("collDate");
-                         Date latestDate = (Date) hdata.get("collDateDate");
+                          HashMap mapdata = (HashMap) list.get(g);
+                          Hashtable hdata = new Hashtable(mapdata);
+                          Date latestDate = (Date) hdata.get("collDateDate");
                            
                          if (latestDate != null && !labTestDates.contains(latestDate)){
                              labTestDates.add(latestDate);

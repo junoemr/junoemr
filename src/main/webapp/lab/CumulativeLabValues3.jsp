@@ -53,37 +53,37 @@ LinkedHashMap nameMap = new LinkedHashMap();
 ArrayList idList = new ArrayList();
 HashMap measIdMap = new HashMap();
 ArrayList dateList = new ArrayList();
+ArrayList uniqueLabs = CommonLabTestValues.findUniqueLabsForPatient(demographic_no);
 
 try{
-    InputStream is = application.getResource("/WEB-INF/measurements.xml").openStream();
-    SAXBuilder parser = new SAXBuilder();
-    Document doc = parser.build(is);
-    is.close();
     
-    Element root = doc.getRootElement();
-    List items = root.getChildren();
-    
-/*  loop through the measurements specified in the measurements.xml file
+/*  loop through the measurements
 *   nameMap: (loinc_code, name)
 *   measIdMap: (loinc_code, IdMap)
 *   IdMap: (idHash, h)
-*   h: (lab_no, result, abn, date, type) -- retrieved in order of the date
+*   valuesTable: (lab_no, result, abn, collDate, type) -- retrieved in order of the date
 *   dateList: (dateIdHash)
 *   dateIdHash: (date, lab_no)
     */
-    
-    for (int i = 0; i < items.size(); i++){
-        Element e = (Element) items.get(i);
-        String loinc_code = e.getAttributeValue("loinc_code");
-        String name = e.getAttributeValue("name");
+
+	for (int i = 0; i < uniqueLabs.size(); i++){
+	    Hashtable ulab = (Hashtable) uniqueLabs.get(i);
+	    String labName = (String) ulab.get("testName");
+	    String labType = (String) ulab.get("labType");
+	    String loinc_code = (String) ulab.get("identCode");
+
         if (!loinc_code.equalsIgnoreCase("NULL")){
             LinkedHashMap IdMap = new LinkedHashMap();
-            ArrayList labList = CommonLabTestValues.findValuesByLoinc(demographic_no, loinc_code);
+	        ArrayList labList = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographic_no), labName, loinc_code);
+
             for (int j=0; j < labList.size(); j++){
-                Hashtable h = (Hashtable) labList.get(j);
-                String date = ( (String) h.get("date") );
-                String id = (String) h.get("lab_no");
-                IdMap.put(id, h);
+
+	            HashMap valuesMap = (HashMap) labList.get(j);
+	            Hashtable  valuesTable= new Hashtable(valuesMap);
+
+                String date = ( (String) valuesTable.get("collDate") );
+                String id = (String) valuesTable.get("lab_no");
+                IdMap.put(id, valuesTable);
                 
                 // check if this lab has already been added
                 if (!idList.contains(id)){
@@ -98,12 +98,12 @@ try{
             // add the test only if there are results for it
             if (labList.size() > 0){
                 measIdMap.put(loinc_code, IdMap);
-                nameMap.put(loinc_code, name);
+                nameMap.put(loinc_code, labName);
             }
             
         // If the first element to be displayed is a header
-        }else if(nameMap.size() == 0 && !name.equals("NULL")){
-            nameMap.put("NULL"+i, name);
+        }else if(nameMap.size() == 0 && !labName.equals("NULL")){
+            nameMap.put("NULL"+i, labName);
         // Do not allow the first element displayed to be a space
         }else if(nameMap.size() != 0){
 
@@ -113,17 +113,17 @@ try{
             
             // Do not allow more than one space or more than one header in a row
             // A space is allowed to be followed by a header
-            if ( lastKey.startsWith("NULL") && (name.equalsIgnoreCase("NULL") || !((String) nameMap.get(lastKey)).equalsIgnoreCase("NULL"))){
+            if ( lastKey.startsWith("NULL") && (labName.equalsIgnoreCase("NULL") || !((String) nameMap.get(lastKey)).equalsIgnoreCase("NULL"))){
                 nameMap.remove(lastKey);
                 
                 if (nameMapKeys.length > 1){
                     lastKey = nameMapKeys[nameMapKeys.length-2];
                     // if a header has been removed by a space remove the space before the header too
-                    if (((String) nameMap.get(lastKey)).equalsIgnoreCase("NULL") && name.equalsIgnoreCase("NULL"))
+                    if (((String) nameMap.get(lastKey)).equalsIgnoreCase("NULL") && labName.equalsIgnoreCase("NULL"))
                         nameMap.remove(lastKey);
                 }
             }
-            nameMap.put("NULL"+i, name);
+            nameMap.put("NULL"+i, labName);
         }
         
     }
@@ -341,7 +341,7 @@ function reportWindow(page) {
                                     // the latest date will be the first one
                                     Hashtable ht = (Hashtable) IdMap.get(IdMap.keySet().iterator().next());
                                     latestVal = (String) ht.get("result");
-                                    latestDate = (String) ht.get("date");
+                                    latestDate = (String) ht.get("collDate");
                                     abn = (String) ht.get("abn");
                                     // trim the date
                                     latestDate = latestDate.substring(0, 10);
