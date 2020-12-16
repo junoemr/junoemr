@@ -417,7 +417,7 @@ public class ConversionUtilsTest
 	@Test
 	public void toDateTimeString_NullParameter_ExpectEmptyString()
 	{
-		Assert.assertEquals("", ConversionUtils.toDateTimeString(null));
+		Assert.assertEquals("", ConversionUtils.toDateTimeString((LocalDateTime) null));
 	}
 
 	@Test
@@ -938,7 +938,7 @@ public class ConversionUtilsTest
 	@Test
 	public void toNullableLegacyDate_NullParameter_ExpectNull()
 	{
-		Assert.assertNull(ConversionUtils.toNullableLegacyDate(null));
+		Assert.assertNull(ConversionUtils.toNullableLegacyDate((LocalDate) null));
 	}
 
 	@Test
@@ -968,7 +968,7 @@ public class ConversionUtilsTest
 	@Test
 	public void toNullableLegacyDateTime_NullParameter_ExpectNull()
 	{
-		Assert.assertNull(ConversionUtils.toNullableLegacyDateTime(null));
+		Assert.assertNull(ConversionUtils.toNullableLegacyDateTime((LocalDateTime) null));
 	}
 
 	@Test

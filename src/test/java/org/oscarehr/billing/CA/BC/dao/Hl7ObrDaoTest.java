@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.Hl7Obr;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class Hl7ObrDaoTest extends DaoTestFixtures {
-
-	public Hl7ObrDao dao = SpringUtils.getBean(Hl7ObrDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class Hl7ObrDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public Hl7ObrDao hl7ObrDao;
 
 
 	@Before
@@ -47,12 +53,12 @@ public class Hl7ObrDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Hl7Obr entity = new Hl7Obr();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		hl7ObrDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
 	@Test
 	public void testFindByPid() {
-		assertNotNull(dao.findByPid(100));
+		assertNotNull(hl7ObrDao.findByPid(100));
 	}
 }

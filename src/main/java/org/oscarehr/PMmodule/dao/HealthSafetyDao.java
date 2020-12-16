@@ -39,7 +39,7 @@ public class HealthSafetyDao extends HibernateDaoSupport {
 
         HealthSafety result = null;
 
-        List list = this.getHibernateTemplate().find("from HealthSafety c where c.demographicNo=? order by c.updateDate desc", demographicNo);
+        List list = this.getHibernateTemplate().find("from HealthSafety c where c.demographicNo=?0 order by c.updateDate desc", demographicNo);
         if (!list.isEmpty()) result = (HealthSafety)list.get(0);
 
         if (log.isDebugEnabled()) {

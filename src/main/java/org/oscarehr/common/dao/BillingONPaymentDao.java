@@ -222,7 +222,7 @@ public class BillingONPaymentDao extends AbstractDao<BillingONPayment>{
     }
     
     public List<BillingONPayment> find3rdPartyPayRecordsByBill(BillingONCHeader1 bCh1, Date startDate, Date endDate) {
-        String sql = "select bPay from BillingONPayment bPay where bPay.billingNo = ? and bPay.paymentdate >= ? and bPay.paymentdate < ? order by bPay.paymentdate";
+        String sql = "select bPay from BillingONPayment bPay where bPay.billingNo = ?1 and bPay.paymentdate >= ?2 and bPay.paymentdate < ?3 order by bPay.paymentdate";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, bCh1.getId());    
         query.setParameter(2, startDate);

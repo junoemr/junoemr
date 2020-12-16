@@ -31,14 +31,20 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.BillingStatusTypes;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingStatusTypesDaoTest extends DaoTestFixtures {
-
-	public BillingStatusTypesDao dao = SpringUtils.getBean(BillingStatusTypesDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingStatusTypesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public BillingStatusTypesDao billingStatusTypesDao;
 
 	@Before
 	public void before() throws Exception {
@@ -47,14 +53,14 @@ public class BillingStatusTypesDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindAll() {
-		List<BillingStatusTypes> billingTypes = dao.findAll();
+		List<BillingStatusTypes> billingTypes = billingStatusTypesDao.findAll();
 		assertNotNull(billingTypes);
 		assertFalse(billingTypes.isEmpty());
 	}
 	
 	@Test
 	public void testFindByCodes() {
-		List<BillingStatusTypes> billingTypes = dao.findByCodes(Arrays.asList(new String[] {"N", "A", "H", "Z", "T"}));
+		List<BillingStatusTypes> billingTypes = billingStatusTypesDao.findByCodes(Arrays.asList(new String[] {"N", "A", "H", "Z", "T"}));
 		assertFalse(billingTypes.isEmpty());
 	}
 }

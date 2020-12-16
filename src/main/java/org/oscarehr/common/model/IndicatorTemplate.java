@@ -41,7 +41,7 @@ import javax.persistence.Transient;
 public class IndicatorTemplate extends AbstractModel<Integer> {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;	
 	
 	private Integer dashboardId;

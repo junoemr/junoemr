@@ -41,15 +41,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.PrintResourceLog;
-import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class PrintResourceLogDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PrintResourceLogDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected PrintResourceLogDao printResourceLogDao;
 
-	protected PrintResourceLogDao dao = SpringUtils.getBean(PrintResourceLogDao.class);
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 
@@ -62,7 +69,7 @@ public class PrintResourceLogDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		PrintResourceLog entity = new PrintResourceLog();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		printResourceLogDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -82,7 +89,7 @@ public class PrintResourceLogDaoTest extends DaoTestFixtures {
 		printResourceLog1.setResourceName(resourceName1);
 		Date date1 = new Date(dfm.parse("20010101").getTime());
 		printResourceLog1.setDateTime(date1);
-		dao.persist(printResourceLog1);
+		printResourceLogDao.persist(printResourceLog1);
 		
 		PrintResourceLog printResourceLog2 = new PrintResourceLog();
 		EntityDataGenerator.generateTestDataForModelClass(printResourceLog2);
@@ -90,7 +97,7 @@ public class PrintResourceLogDaoTest extends DaoTestFixtures {
 		printResourceLog2.setResourceName(resourceName2);
 		Date date2 = new Date(dfm.parse("20100101").getTime());
 		printResourceLog2.setDateTime(date2);
-		dao.persist(printResourceLog2);
+		printResourceLogDao.persist(printResourceLog2);
 		
 		PrintResourceLog printResourceLog3 = new PrintResourceLog();
 		EntityDataGenerator.generateTestDataForModelClass(printResourceLog3);
@@ -98,10 +105,10 @@ public class PrintResourceLogDaoTest extends DaoTestFixtures {
 		printResourceLog3.setResourceName(resourceName1);
 		Date date3 = new Date(dfm.parse("20080101").getTime());
 		printResourceLog3.setDateTime(date3);
-		dao.persist(printResourceLog3);
+		printResourceLogDao.persist(printResourceLog3);
 		
 		List<PrintResourceLog> expectedResult = new ArrayList<PrintResourceLog>(Arrays.asList(printResourceLog3, printResourceLog1));
-		List<PrintResourceLog> result = dao.findByResource(resourceName1, resourceId1);
+		List<PrintResourceLog> result = printResourceLogDao.findByResource(resourceName1, resourceId1);
 
 		Logger logger = MiscUtils.getLogger();
 		

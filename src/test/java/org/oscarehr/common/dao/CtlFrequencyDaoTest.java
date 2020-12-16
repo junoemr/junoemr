@@ -30,14 +30,20 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlFrequency;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlFrequencyDaoTest extends DaoTestFixtures {
-
-	protected CtlFrequencyDao dao = (CtlFrequencyDao)SpringUtils.getBean("ctlFrequencyDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlFrequencyDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlFrequencyDao ctlFrequencyDao;
 
 	@Before
 	public void before() throws Exception {
@@ -48,21 +54,21 @@ public class CtlFrequencyDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		CtlFrequency entity = new CtlFrequency();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		ctlFrequencyDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testFindAll() throws Exception {
 
-		int startNo = dao.findAll().size();
+		int startNo = ctlFrequencyDao.findAll().size();
 
 		CtlFrequency entity = new CtlFrequency();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		ctlFrequencyDao.persist(entity);
 		assertNotNull(entity.getId());
 
-		List<CtlFrequency> list = dao.findAll();
+		List<CtlFrequency> list = ctlFrequencyDao.findAll();
 
 		assertNotNull(list);
 		assertEquals(list.size(),startNo+1);

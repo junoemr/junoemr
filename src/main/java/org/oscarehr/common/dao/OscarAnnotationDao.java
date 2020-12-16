@@ -41,7 +41,7 @@ public class OscarAnnotationDao extends AbstractDao<OscarAnnotation>{
 	}
 
     public OscarAnnotation getAnnotations(String demoNo, String tableName,Long tableId){
-    	Query query = entityManager.createQuery("select a from OscarAnnotation a where a.demographicNo=? and a.tableName=? and a.tableId=?");
+    	Query query = entityManager.createQuery("select a from OscarAnnotation a where a.demographicNo=?1 and a.tableName=?2 and a.tableId=?3");
     	query.setParameter(1, demoNo);
     	query.setParameter(2, tableName);
     	query.setParameter(3, tableId);
@@ -65,7 +65,7 @@ public class OscarAnnotationDao extends AbstractDao<OscarAnnotation>{
 
 
    public int getNumberOfNotes(String demoNo, String tableName,Long tableId){
-   	Query query = entityManager.createQuery("select a from OscarAnnotation a where a.demographicNo=? and a.tableName=? and a.tableId=?");
+   	Query query = entityManager.createQuery("select a from OscarAnnotation a where a.demographicNo=?1 and a.tableName=?2 and a.tableId=?3");
    	query.setParameter(1, demoNo);
    	query.setParameter(2, tableName);
    	query.setParameter(3,tableId);

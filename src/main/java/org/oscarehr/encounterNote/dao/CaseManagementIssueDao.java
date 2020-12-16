@@ -75,4 +75,29 @@ public class CaseManagementIssueDao extends AbstractDao<CaseManagementIssue>
 
 		return getSingleResultOrNull(query);
 	}
+
+	public CaseManagementIssue findByIssueId(Integer demographicId, Long issueId)
+	{
+		// select model name must match specified @Entity name in model object
+		String queryString = "SELECT x FROM model.CaseManagementIssue x " +
+				"INNER JOIN x.issue i " +
+				"INNER JOIN x.demographic d " +
+				"WHERE d.demographicId = :demographicId " +
+				"AND x.issue.issueId = :issueId " +
+				"ORDER BY x.id ASC";
+
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("demographicId", demographicId);
+		query.setParameter("issueId", issueId);
+		query.setMaxResults(1);
+
+		// allow the case where multiples of an issue exist, but always use the lowest ID
+		List<CaseManagementIssue> resultList = query.getResultList();
+		if(resultList.isEmpty())
+		{
+			return null;
+		}
+
+		return resultList.get(0);
+	}
 }

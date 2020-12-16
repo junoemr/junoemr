@@ -27,15 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.FaxClientLog;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class FaxClientLogDaoTest extends DaoTestFixtures {
-
-	protected FaxClientLogDao dao = SpringUtils.getBean(FaxClientLogDao.class);
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class FaxClientLogDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected FaxClientLogDao faxClientLogDao;
 
 	@Before
 	public void before() throws Exception {
@@ -46,7 +51,7 @@ public class FaxClientLogDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		FaxClientLog entity = new FaxClientLog();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		faxClientLogDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

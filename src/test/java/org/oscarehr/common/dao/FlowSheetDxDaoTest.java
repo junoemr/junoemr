@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.FlowSheetDx;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class FlowSheetDxDaoTest extends DaoTestFixtures {
-
-	protected FlowSheetDxDao dao = SpringUtils.getBean(FlowSheetDxDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class FlowSheetDxDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected FlowSheetDxDao flowSheetDxDao;
 
 	public FlowSheetDxDaoTest() {
 	}
@@ -49,7 +55,7 @@ public class FlowSheetDxDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		FlowSheetDx entity = new FlowSheetDx();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		flowSheetDxDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}

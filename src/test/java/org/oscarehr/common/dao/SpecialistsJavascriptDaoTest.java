@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.SpecialistsJavascript;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SpecialistsJavascriptDaoTest extends DaoTestFixtures {
-
-	protected SpecialistsJavascriptDao dao = SpringUtils.getBean(SpecialistsJavascriptDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SpecialistsJavascriptDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SpecialistsJavascriptDao specialistsJavascriptDao;
 
 
 	@Before
@@ -46,7 +52,7 @@ public class SpecialistsJavascriptDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		SpecialistsJavascript entity = new SpecialistsJavascript();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		specialistsJavascriptDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

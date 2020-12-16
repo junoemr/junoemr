@@ -39,18 +39,25 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import com.quatro.dao.security.SecroleDao;
 
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
 
-public class ContextStartupListener implements javax.servlet.ServletContextListener {
+@Component
+@DependsOn("springUtils")
+public class ContextStartupListener implements javax.servlet.ServletContextListener
+{
 	private static final Logger logger = MiscUtils.getLogger();
 
 	@Override
-	public void contextInitialized(javax.servlet.ServletContextEvent sce) {
+	public void contextInitialized(javax.servlet.ServletContextEvent sce)
+	{
+		logger.info("SERVLET CONTEXT INITIALIZED");
 		try {
 			// ensure cxf uses log4j
 			System.setProperty("org.apache.cxf.Logger", "org.apache.cxf.common.logging.Log4jLogger");
 
-			String contextPath=sce.getServletContext().getContextPath();
+			String contextPath = sce.getServletContext().getContextPath();
 
 			logger.info("Server processes starting. context=" + contextPath);
 			
@@ -93,8 +100,9 @@ public class ContextStartupListener implements javax.servlet.ServletContextListe
 			throw (new RuntimeException(e));
 		}
 	}
-	
-	public void loadCaches() {
+
+	public void loadCaches()
+	{
 		ProgramDao programDao = (ProgramDao)SpringUtils.getBean("programDao");
 		for(Program program:programDao.getActivePrograms()) {
 			ProgramAccessCache.setAccessMap(program.getId().longValue());
@@ -103,7 +111,8 @@ public class ContextStartupListener implements javax.servlet.ServletContextListe
 	}
 	
 
-	private void createOscarProgramIfNecessary() {
+	private void createOscarProgramIfNecessary()
+	{
 		ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
 		SecroleDao secRoleDao = (SecroleDao)SpringUtils.getBean("secroleDao");
 		ProgramProviderDAO programProviderDao = (ProgramProviderDAO)SpringUtils.getBean("programProviderDAO");
@@ -127,7 +136,8 @@ public class ContextStartupListener implements javax.servlet.ServletContextListe
 		
 	}
 	@Override
-    public void contextDestroyed(javax.servlet.ServletContextEvent sce) {
+    public void contextDestroyed(javax.servlet.ServletContextEvent sce)
+	{
 		logger.info("Server processes stopping. context=" + sce.getServletContext().getContextPath());
 
 		WaitListEmailThread.stopTask();

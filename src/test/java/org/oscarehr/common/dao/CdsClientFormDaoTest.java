@@ -37,15 +37,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CdsClientForm;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CdsClientFormDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CdsClientFormDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CdsClientFormDao cdsClientFormDao;
 
-	protected CdsClientFormDao dao = SpringUtils.getBean(CdsClientFormDao.class);
 	protected DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	Logger logger = MiscUtils.getLogger();
@@ -75,10 +82,10 @@ public class CdsClientFormDaoTest extends DaoTestFixtures {
 		clientForm2.setClientId(clientId);
 		clientForm2.setFacilityId(facilityId);
 
-		dao.persist(clientForm1);
-		dao.persist(clientForm2);
+		cdsClientFormDao.persist(clientForm1);
+		cdsClientFormDao.persist(clientForm2);
 
-		CdsClientForm result = dao.findLatestByFacilityClient(facilityId, clientId);
+		CdsClientForm result = cdsClientFormDao.findLatestByFacilityClient(facilityId, clientId);
 		CdsClientForm expectedResult = clientForm1;
 		
 		assertEquals(expectedResult, result);
@@ -100,10 +107,10 @@ public class CdsClientFormDaoTest extends DaoTestFixtures {
 		clientForm2.setClientId(clientId);
 		clientForm2.setFacilityId(facilityId);
 
-		dao.persist(clientForm1);
-		dao.persist(clientForm2);
+		cdsClientFormDao.persist(clientForm1);
+		cdsClientFormDao.persist(clientForm2);
 
-		List<CdsClientForm> result = dao.findByFacilityClient(facilityId, clientId);
+		List<CdsClientForm> result = cdsClientFormDao.findByFacilityClient(facilityId, clientId);
 		List<CdsClientForm> expectedResult = new ArrayList<CdsClientForm>(Arrays.asList(
 				clientForm1,
 				clientForm2
@@ -150,11 +157,11 @@ public class CdsClientFormDaoTest extends DaoTestFixtures {
 		clientForm3.setCdsFormVersion(formVersion);
 		clientForm3.setSigned(true);
 		
-		dao.persist(clientForm1);
-		dao.persist(clientForm2);
-		dao.persist(clientForm3);
+		cdsClientFormDao.persist(clientForm1);
+		cdsClientFormDao.persist(clientForm2);
+		cdsClientFormDao.persist(clientForm3);
 		
-		List<CdsClientForm> result = dao.findSignedCdsForms(facilityId, formVersion, startDate, endDate);
+		List<CdsClientForm> result = cdsClientFormDao.findSignedCdsForms(facilityId, formVersion, startDate, endDate);
 		List<CdsClientForm> expectedResult = new ArrayList<CdsClientForm>(Arrays.asList(
 				clientForm1,
 				clientForm3

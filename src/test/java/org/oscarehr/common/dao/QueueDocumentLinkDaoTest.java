@@ -35,15 +35,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.QueueDocumentLink;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class QueueDocumentLinkDaoTest extends DaoTestFixtures {
-
-	protected QueueDocumentLinkDao dao = SpringUtils.getBean(QueueDocumentLinkDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class QueueDocumentLinkDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected QueueDocumentLinkDao queueDocumentLinkDao;
 
 	public QueueDocumentLinkDaoTest() {
 	}
@@ -58,7 +64,7 @@ public class QueueDocumentLinkDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 QueueDocumentLink entity = new QueueDocumentLink();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                queueDocumentLinkDao.persist(entity);
 
                 assertNotNull(entity.getId());
         }
@@ -68,22 +74,22 @@ public class QueueDocumentLinkDaoTest extends DaoTestFixtures {
 		
 		QueueDocumentLink queueDocLink1 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink1);
-		dao.persist(queueDocLink1);
+		queueDocumentLinkDao.persist(queueDocLink1);
 		
 		QueueDocumentLink queueDocLink2 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink2);
-		dao.persist(queueDocLink2);
+		queueDocumentLinkDao.persist(queueDocLink2);
 		
 		QueueDocumentLink queueDocLink3 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink3);
-		dao.persist(queueDocLink3);
+		queueDocumentLinkDao.persist(queueDocLink3);
 		
 		QueueDocumentLink queueDocLink4 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink4);
-		dao.persist(queueDocLink4);
+		queueDocumentLinkDao.persist(queueDocLink4);
 		
 		List<QueueDocumentLink> expectedResult = new ArrayList<QueueDocumentLink>(Arrays.asList(queueDocLink1, queueDocLink2, queueDocLink3, queueDocLink4));
-		List<QueueDocumentLink> result = dao.getQueueDocLinks();
+		List<QueueDocumentLink> result = queueDocumentLinkDao.getQueueDocLinks();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -109,25 +115,25 @@ public class QueueDocumentLinkDaoTest extends DaoTestFixtures {
 		QueueDocumentLink queueDocLink1 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink1);
 		queueDocLink1.setStatus(statusA);
-		dao.persist(queueDocLink1);
+		queueDocumentLinkDao.persist(queueDocLink1);
 		
 		QueueDocumentLink queueDocLink2 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink2);
 		queueDocLink2.setStatus(statusNotA);
-		dao.persist(queueDocLink2);
+		queueDocumentLinkDao.persist(queueDocLink2);
 		
 		QueueDocumentLink queueDocLink3 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink3);
 		queueDocLink3.setStatus(statusA);
-		dao.persist(queueDocLink3);
+		queueDocumentLinkDao.persist(queueDocLink3);
 		
 		QueueDocumentLink queueDocLink4 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink4);
 		queueDocLink4.setStatus(statusA);
-		dao.persist(queueDocLink4);
+		queueDocumentLinkDao.persist(queueDocLink4);
 		
 		List<QueueDocumentLink> expectedResult = new ArrayList<QueueDocumentLink>(Arrays.asList(queueDocLink1, queueDocLink3, queueDocLink4));
-		List<QueueDocumentLink> result = dao.getActiveQueueDocLink();
+		List<QueueDocumentLink> result = queueDocumentLinkDao.getActiveQueueDocLink();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -153,25 +159,25 @@ public class QueueDocumentLinkDaoTest extends DaoTestFixtures {
 		QueueDocumentLink queueDocLink1 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink1);
 		queueDocLink1.setDocId(dId1);
-		dao.persist(queueDocLink1);
+		queueDocumentLinkDao.persist(queueDocLink1);
 		
 		QueueDocumentLink queueDocLink2 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink2);
 		queueDocLink2.setDocId(dId2);
-		dao.persist(queueDocLink2);
+		queueDocumentLinkDao.persist(queueDocLink2);
 		
 		QueueDocumentLink queueDocLink3 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink3);
 		queueDocLink3.setDocId(dId1);
-		dao.persist(queueDocLink3);
+		queueDocumentLinkDao.persist(queueDocLink3);
 		
 		QueueDocumentLink queueDocLink4 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink4);
 		queueDocLink4.setDocId(dId1);
-		dao.persist(queueDocLink4);
+		queueDocumentLinkDao.persist(queueDocLink4);
 		
 		List<QueueDocumentLink> expectedResult = new ArrayList<QueueDocumentLink>(Arrays.asList(queueDocLink1, queueDocLink3, queueDocLink4));
-		List<QueueDocumentLink> result = dao.getQueueFromDocument(dId1);
+		List<QueueDocumentLink> result = queueDocumentLinkDao.getQueueFromDocument(dId1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -197,25 +203,25 @@ public class QueueDocumentLinkDaoTest extends DaoTestFixtures {
 		QueueDocumentLink queueDocLink1 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink1);
 		queueDocLink1.setQueueId(qId1);
-		dao.persist(queueDocLink1);
+		queueDocumentLinkDao.persist(queueDocLink1);
 		
 		QueueDocumentLink queueDocLink2 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink2);
 		queueDocLink2.setQueueId(qId2);
-		dao.persist(queueDocLink2);
+		queueDocumentLinkDao.persist(queueDocLink2);
 		
 		QueueDocumentLink queueDocLink3 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink3);
 		queueDocLink3.setQueueId(qId1);
-		dao.persist(queueDocLink3);
+		queueDocumentLinkDao.persist(queueDocLink3);
 		
 		QueueDocumentLink queueDocLink4 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink4);
 		queueDocLink4.setQueueId(qId1);
-		dao.persist(queueDocLink4);
+		queueDocumentLinkDao.persist(queueDocLink4);
 		
 		List<QueueDocumentLink> expectedResult = new ArrayList<QueueDocumentLink>(Arrays.asList(queueDocLink1, queueDocLink3, queueDocLink4));
-		List<QueueDocumentLink> result = dao.getDocumentFromQueue(qId1);
+		List<QueueDocumentLink> result = queueDocumentLinkDao.getDocumentFromQueue(qId1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -245,26 +251,26 @@ public class QueueDocumentLinkDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink1);
 		queueDocLink1.setDocId(dId1);
 		queueDocLink1.setQueueId(qId1);
-		dao.persist(queueDocLink1);
+		queueDocumentLinkDao.persist(queueDocLink1);
 		
 		QueueDocumentLink queueDocLink2 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink2);
 		queueDocLink2.setDocId(dId2);
 		queueDocLink2.setQueueId(qId2);
-		dao.persist(queueDocLink2);
+		queueDocumentLinkDao.persist(queueDocLink2);
 		
 		QueueDocumentLink queueDocLink3 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink3);
 		queueDocLink3.setQueueId(qId1);
-		dao.persist(queueDocLink3);
+		queueDocumentLinkDao.persist(queueDocLink3);
 		
 		QueueDocumentLink queueDocLink4 = new QueueDocumentLink();
 		EntityDataGenerator.generateTestDataForModelClass(queueDocLink4);
 		queueDocLink4.setDocId(dId1);
-		dao.persist(queueDocLink4);	
+		queueDocumentLinkDao.persist(queueDocLink4);
 		
 		boolean expectedResult = true;
-		boolean result = dao.hasQueueBeenLinkedWithDocument(dId1, qId1);
+		boolean result = queueDocumentLinkDao.hasQueueBeenLinkedWithDocument(dId1, qId1);
 		
 		assertEquals(expectedResult, result);
 	}

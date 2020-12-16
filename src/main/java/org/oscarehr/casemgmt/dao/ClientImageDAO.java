@@ -67,7 +67,7 @@ public class ClientImageDAO extends HibernateDaoSupport {
 
 			// get from database
 			@SuppressWarnings("unchecked")
-			List<ClientImage> results = getHibernateTemplate().find("from ClientImage i where i.demographic_no=? order by update_date desc", clientId);
+			List<ClientImage> results = (List<ClientImage>) getHibernateTemplate().find("from ClientImage i where i.demographic_no=?0 order by update_date desc", clientId);
 			if (results.size() > 0) {
 				clientImage = results.get(0);
 

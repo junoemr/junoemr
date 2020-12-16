@@ -43,7 +43,7 @@ import javax.persistence.TemporalType;
 public class Billing extends AbstractModel<Integer>{
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="billing_no")
 	private Integer id;
 

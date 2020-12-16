@@ -31,14 +31,20 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.View;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ViewDaoTest extends DaoTestFixtures {
-
-	protected ViewDao dao = SpringUtils.getBean(ViewDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ViewDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ViewDao viewDao;
 
 	public ViewDaoTest() {
 	}
@@ -53,7 +59,7 @@ public class ViewDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		View entity = new View();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		viewDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
@@ -75,18 +81,18 @@ public class ViewDaoTest extends DaoTestFixtures {
 		view1.setRole(role1);
 		view1.setView_name(viewName1);
 		view1.setName(name1);
-		dao.persist(view1);
+		viewDao.persist(view1);
 		
 		View view2 = new View();
 		EntityDataGenerator.generateTestDataForModelClass(view2);
 		view2.setRole(role2);
 		view2.setView_name(viewName2);
 		view2.setName(name2);
-		dao.persist(view2);
+		viewDao.persist(view2);
 		
 		Map<String,View> expectedResult = new HashMap<String,View>();
 		expectedResult.put(name1, view1);
-		Map<String,View> result = dao.getView(viewName1, role1);
+		Map<String,View> result = viewDao.getView(viewName1, role1);
 		
 		assertEquals(expectedResult, result);
 	}

@@ -27,13 +27,19 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.casemgmt.model.ProviderExt;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ProviderExtDaoTest extends DaoTestFixtures {
-
-	protected ProviderExtDao dao = SpringUtils.getBean(ProviderExtDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProviderExtDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProviderExtDao providerExtDao;
 
 	public ProviderExtDaoTest() {
 	}
@@ -49,7 +55,7 @@ public class ProviderExtDaoTest extends DaoTestFixtures {
 		ProviderExt entity = new ProviderExt();
 		entity.setId("999998");
 		entity.setSignature("my signature");
-		dao.persist(entity);
+		providerExtDao.persist(entity);
 
 		assertNotNull(entity);
 	}

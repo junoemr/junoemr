@@ -55,7 +55,7 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
     }
 
 	public List<ProviderInboxItem> getProvidersWithRoutingForDocument(String docType, Integer docId) {
-		Query query = entityManager.createQuery("select p from ProviderInboxItem p where p.labType = ? and p.labNo = ?");
+		Query query = entityManager.createQuery("select p from ProviderInboxItem p where p.labType = ?1 and p.labNo = ?2");
 		query.setParameter(1, docType);
 		query.setParameter(2, docId);
 
@@ -75,7 +75,7 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 	}
 
 	public boolean hasProviderBeenLinkedWithDocument(String docType, Integer docId, String providerNo) {
-		Query query = entityManager.createQuery("select p from ProviderInboxItem p where p.labType = ? and p.labNo = ? and p.providerNo=?");
+		Query query = entityManager.createQuery("select p from ProviderInboxItem p where p.labType = ?1 and p.labNo = ?2 and p.providerNo=?3");
 		query.setParameter(1, docType);
 		query.setParameter(2, docId);
 		query.setParameter(3, providerNo);
@@ -87,7 +87,7 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 	}
 
 	public int howManyDocumentsLinkedWithAProvider(String providerNo) {
-		Query query = entityManager.createQuery("select p from ProviderInboxItem p where p.providerNo=?");
+		Query query = entityManager.createQuery("select p from ProviderInboxItem p where p.providerNo=?1");
 		query.setParameter(1, providerNo);
 
 		@SuppressWarnings("unchecked")

@@ -115,7 +115,7 @@ public class MeasurementManager {
 			}
 		}
 		
-		URL path_of_resource = MeasurementFlowSheet.class.getClassLoader().getResource("/oscar/oscarEncounter/oscarMeasurements/flowsheets/html/");
+		URL path_of_resource = MeasurementFlowSheet.class.getClassLoader().getResource("oscar/oscarEncounter/oscarMeasurements/flowsheets/html/");
 		File[] files2 = new File(path_of_resource.getPath()).listFiles();
 		
 		for (File file2 : files2) {

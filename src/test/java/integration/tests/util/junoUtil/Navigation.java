@@ -29,10 +29,13 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.util.MiscUtils;
+import oscar.OscarProperties;
 
 public class Navigation
 {
-	public static final String OSCAR_URL="http://localhost:9090";
+	private static final OscarProperties properties = OscarProperties.getInstance();
+
+	public static final String OSCAR_URL="http://localhost";
 
 
 	private static Logger logger= MiscUtils.getLogger();
@@ -75,5 +78,10 @@ public class Navigation
 	{
 		Cookie session = driver.manage().getCookieNamed("JSESSIONID");
 		return session != null;
+	}
+
+	public static String getOscarUrl(String serverPort)
+	{
+		return OSCAR_URL + ":" + serverPort + "/" + properties.getProjectHome();
 	}
 }

@@ -26,11 +26,16 @@ package org.oscarehr.research.eaaps;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DxresearchDAO;
@@ -41,14 +46,29 @@ import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.util.SpringUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.OscarProperties;
 
-public class EaapsHandlerTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EaapsHandlerTest extends DaoTestFixtures
+{
+	@Rule
+	public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+	@Autowired
+	private SpringUtils springUtils;
 	
 	@Before
-	public void beforeTest() {
+	public void beforeTest()
+			throws IOException
+	{
+		File documentDir = temporaryFolder.newFolder("testDocumentDir");
+
 		OscarProperties props = OscarProperties.getInstance();
-		props.setProperty("DOCUMENT_DIR", System.getProperty("buildDirectory"));
+		props.setProperty("DOCUMENT_DIR", documentDir.getAbsolutePath());
 	}
 	
 	@BeforeClass

@@ -910,7 +910,7 @@ fieldset[disabled] .btn-primary:active
 							String onclick="";
 							if (!differentInstr)
 							{
-								onclick="onclick=\"popup(465,635,'../../servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet?type="
+								onclick="onclick=\"popup(465,635,'../servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet?type="
 										+ flowSheetInfo.get("measurement_type")
 										+ "&mInstrc="
 										+ mInstr
@@ -970,7 +970,7 @@ fieldset[disabled] .btn-primary:active
 								String onclick="";
 								if (!differentInstr)
 								{
-									onclick="onclick=\"popup(465,635,'../../servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet?type="
+									onclick="onclick=\"popup(465,635,'../servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet?type="
 											+ flowSheetInfo.get("measurement_type")
 											+ "&mInstrc="
 											+ mInstr

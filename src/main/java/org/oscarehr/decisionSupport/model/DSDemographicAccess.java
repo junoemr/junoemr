@@ -266,7 +266,7 @@ public class DSDemographicAccess {
     
     public List<dxResearchBean> getDxCodes() {
         dxResearchBeanHandler handler = new dxResearchBeanHandler(demographicNo);
-        List<dxResearchBean> dxCodes = handler.getDxResearchBeanVector();
+        List<dxResearchBean> dxCodes = handler.getDxResearchBeans();
         return dxCodes;
     }
 

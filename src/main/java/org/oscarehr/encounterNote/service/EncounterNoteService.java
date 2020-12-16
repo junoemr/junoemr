@@ -51,6 +51,8 @@ public class EncounterNoteService extends BaseNoteService
 	@Autowired
 	protected EncounterNoteModelToDbConverter encounterNoteModelToDbConverter;
 
+
+
 	public CaseManagementNote saveChartNote(EncounterNote noteModel, Demographic demographic)
 	{
 		CaseManagementNote note = encounterNoteModelToDbConverter.convert(noteModel);
@@ -76,16 +78,19 @@ public class EncounterNoteService extends BaseNoteService
 	{
 		return saveChartNote(note, null);
 	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note, String providerNo, Integer demographicNo)
 	{
 		return saveChartNote(note, null, providerNo, demographicNo);
 	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note, List<Issue> issueList, String providerNo, Integer demographicNo)
 	{
 		note.setDemographic(demographicDao.find(demographicNo));
 		note.setProvider(providerDataDao.find(providerNo));
 		return saveChartNote(note, issueList);
 	}
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note, List<Issue> issueList)
 	{
 		note.setIncludeIssueInNote(true);

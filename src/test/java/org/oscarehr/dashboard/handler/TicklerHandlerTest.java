@@ -48,7 +48,7 @@ public class TicklerHandlerTest {
 		loggedInInfo.setLoggedInProvider( provider );
 		ticklerHandler = new TicklerHandler( loggedInInfo, new TicklerManager() );
 		
-		Map<String, Object[]> parameterMap = new HashMap<String, Object[]>();
+		Map<String, String[]> parameterMap = new HashMap<String, String[]>();
 		
 		parameterMap.put("message", new String[]{"This is a message."} );
 		parameterMap.put("messageAppend", new String[]{"This is an appended message."} );

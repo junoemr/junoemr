@@ -116,13 +116,13 @@ public class OcanStaffFormDao extends AbstractDao<OcanStaffForm> {
 	
 	public OcanStaffForm findLatestByFacilityClient(Integer facilityId, Integer clientId, String ocanType) {
 
-		String sqlCommand = "select * from OcanStaffForm where facilityId=?1 and clientId=?2 and ocanType=?4 order by id desc";
+		String sqlCommand = "select * from OcanStaffForm where facilityId=?1 and clientId=?2 and ocanType=?3 order by id desc";
 
 		Query query = entityManager.createNativeQuery(sqlCommand, modelClass);
 		query.setParameter(1, facilityId);
 		query.setParameter(2, clientId);
 		//query.setParameter(3, "In Progress");
-		query.setParameter(4, ocanType);
+		query.setParameter(3, ocanType);
 		query.setMaxResults(1);
 		
 		return getSingleResultOrNull(query);
@@ -157,7 +157,7 @@ public class OcanStaffFormDao extends AbstractDao<OcanStaffForm> {
 	public List<OcanStaffForm> getLatestCbiFormsByGroupOfAdmissionId() {
 			//Get latest CBI form for each group of admissionId
 			
-			String sqlCommand = "select x1 from OcanStaffForm x1 where x1.id = (select max(x2.id) from OcanStaffForm x2 where x2.admissionId!=null and x2.admissionId=x1.admissionId and x2.ocanType=?) ";
+			String sqlCommand = "select x1 from OcanStaffForm x1 where x1.id = (select max(x2.id) from OcanStaffForm x2 where x2.admissionId!=null and x2.admissionId=x1.admissionId and x2.ocanType=?1) ";
 			
 			Query query = entityManager.createQuery(sqlCommand);		
 			query.setParameter(1, "CBI");			

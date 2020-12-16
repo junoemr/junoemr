@@ -36,15 +36,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.RaHeader;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class RaHeaderDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class RaHeaderDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected RaHeaderDao raHeaderDao;
 
-	protected RaHeaderDao dao = SpringUtils.getBean(RaHeaderDao.class);
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	@Before
@@ -56,7 +63,7 @@ public class RaHeaderDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		RaHeader ql = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(ql);
-		dao.persist(ql);
+		raHeaderDao.persist(ql);
 		assertNotNull(ql.getId());
 	}
 
@@ -74,38 +81,38 @@ public class RaHeaderDaoTest extends DaoTestFixtures {
 		raHeader1.setFilename(filename1);
 		raHeader1.setStatus(status1);
 		raHeader1.setPaymentDate("20110101");
-		dao.persist(raHeader1);
+		raHeaderDao.persist(raHeader1);
 
 		RaHeader raHeader2 = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(raHeader2);
 		raHeader2.setFilename(filename1);
 		raHeader2.setStatus(status2);
 		raHeader2.setPaymentDate("20080101");
-		dao.persist(raHeader2);
+		raHeaderDao.persist(raHeader2);
 
 		RaHeader raHeader3 = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(raHeader3);
 		raHeader3.setFilename(filename1);
 		raHeader3.setStatus(status1);
 		raHeader3.setPaymentDate("20050101");
-		dao.persist(raHeader3);
+		raHeaderDao.persist(raHeader3);
 
 		RaHeader raHeader4 = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(raHeader4);
 		raHeader4.setFilename(filename1);
 		raHeader4.setStatus(status1);
 		raHeader4.setPaymentDate("20110101");
-		dao.persist(raHeader4);
+		raHeaderDao.persist(raHeader4);
 
 		RaHeader raHeader5 = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(raHeader5);
 		raHeader5.setFilename(filename2);
 		raHeader5.setStatus(status1);
 		raHeader5.setPaymentDate("20110101");
-		dao.persist(raHeader5);
+		raHeaderDao.persist(raHeader5);
 
 		List<RaHeader> expectedResult = new ArrayList<RaHeader>(Arrays.asList(raHeader1, raHeader4));
-		List<RaHeader> result = dao.findCurrentByFilenamePaymentDate(filename1, "20110101");
+		List<RaHeader> result = raHeaderDao.findCurrentByFilenamePaymentDate(filename1, "20110101");
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -132,34 +139,34 @@ public class RaHeaderDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(raHeader1);
 		raHeader1.setFilename(filename1);
 		raHeader1.setPaymentDate("20110101");
-		dao.persist(raHeader1);
+		raHeaderDao.persist(raHeader1);
 
 		RaHeader raHeader2 = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(raHeader2);
 		raHeader2.setFilename(filename1);
 		raHeader2.setPaymentDate("20080101");
-		dao.persist(raHeader2);
+		raHeaderDao.persist(raHeader2);
 
 		RaHeader raHeader3 = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(raHeader3);
 		raHeader3.setFilename(filename1);
 		raHeader3.setPaymentDate("20050101");
-		dao.persist(raHeader3);
+		raHeaderDao.persist(raHeader3);
 
 		RaHeader raHeader4 = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(raHeader4);
 		raHeader4.setFilename(filename1);
 		raHeader4.setPaymentDate("20110101");
-		dao.persist(raHeader4);
+		raHeaderDao.persist(raHeader4);
 
 		RaHeader raHeader5 = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(raHeader5);
 		raHeader5.setFilename(filename2);
 		raHeader5.setPaymentDate("20110101");
-		dao.persist(raHeader5);
+		raHeaderDao.persist(raHeader5);
 
 		List<RaHeader> expectedResult = new ArrayList<RaHeader>(Arrays.asList(raHeader1, raHeader4));
-		List<RaHeader> result = dao.findByFilenamePaymentDate(filename1, "20110101");
+		List<RaHeader> result = raHeaderDao.findByFilenamePaymentDate(filename1, "20110101");
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -197,38 +204,38 @@ public class RaHeaderDaoTest extends DaoTestFixtures {
 		raHeader1.setStatus(status1);
 		raHeader1.setPaymentDate(paymentDate1);
 		raHeader1.setReadDate(readDate1);
-		dao.persist(raHeader1);
+		raHeaderDao.persist(raHeader1);
 
 		RaHeader raHeader2 = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(raHeader2);
 		raHeader2.setStatus(status2);
 		raHeader2.setPaymentDate(paymentDate2);
 		raHeader2.setReadDate(readDate2);
-		dao.persist(raHeader2);
+		raHeaderDao.persist(raHeader2);
 
 		RaHeader raHeader3 = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(raHeader3);
 		raHeader3.setStatus(status1);
 		raHeader3.setPaymentDate(paymentDate3);
 		raHeader3.setReadDate(readDate3);
-		dao.persist(raHeader3);
+		raHeaderDao.persist(raHeader3);
 
 		RaHeader raHeader4 = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(raHeader4);
 		raHeader4.setStatus(status2);
 		raHeader4.setPaymentDate(paymentDate4);
 		raHeader4.setReadDate(readDate4);
-		dao.persist(raHeader4);
+		raHeaderDao.persist(raHeader4);
 
 		RaHeader raHeader5 = new RaHeader();
 		EntityDataGenerator.generateTestDataForModelClass(raHeader5);
 		raHeader5.setStatus(status1);
 		raHeader5.setPaymentDate(paymentDate1);
 		raHeader5.setReadDate(readDate1);
-		dao.persist(raHeader5);
+		raHeaderDao.persist(raHeader5);
 
 		List<RaHeader> expectedResult = new ArrayList<RaHeader>(Arrays.asList(raHeader2, raHeader4));
-		List<RaHeader> result = dao.findAllExcludeStatus(status1);
+		List<RaHeader> result = raHeaderDao.findAllExcludeStatus(status1);
 
 		Logger logger = MiscUtils.getLogger();
 
@@ -247,11 +254,11 @@ public class RaHeaderDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindByHeaderDetailsAndProviderMagic() {
-		assertNotNull(dao.findByHeaderDetailsAndProviderMagic("STS", "100"));
+		assertNotNull(raHeaderDao.findByHeaderDetailsAndProviderMagic("STS", "100"));
 	}
 
     @Test
     public void testFindByStatusAndProviderMagic() {
-	    assertNotNull(dao.findByStatusAndProviderMagic("STS", "100"));
+	    assertNotNull(raHeaderDao.findByStatusAndProviderMagic("STS", "100"));
     }
 }

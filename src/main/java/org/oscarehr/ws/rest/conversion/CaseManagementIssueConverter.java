@@ -54,6 +54,23 @@ public class CaseManagementIssueConverter extends AbstractConverter<CaseManageme
 		return issueTo;
 	}
 
-	
-	
+	// Probably not great to mix models in a single converter, but I can't think of anything better at the moment.
+	public static CaseManagementIssueTo1 getAsTransferObject(org.oscarehr.encounterNote.model.CaseManagementIssue issue)
+	{
+		CaseManagementIssueTo1 issueTo = new CaseManagementIssueTo1();
+
+		issueTo.setAcute(issue.getAcute());
+		issueTo.setCertain(issue.getCertain());
+		issueTo.setDemographic_no(issue.getDemographic().getId().toString());
+		issueTo.setId(issue.getId());
+		issueTo.setIssue(IssueConverter.getAsTransferObject(issue.getIssue()));
+		issueTo.setIssue_id(issue.getIssue().getIssueId());
+		issueTo.setMajor(issue.getMajor());
+		issueTo.setProgram_id(issue.getProgramId());
+		issueTo.setResolved(issue.getResolved());
+		issueTo.setType(issue.getType());
+		issueTo.setUpdate_date(issue.getUpdateDate());
+
+		return issueTo;
+	}
 }

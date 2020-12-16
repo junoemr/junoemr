@@ -113,7 +113,7 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
     @SuppressWarnings("unchecked")
     public List<PatientLabRouting> findByLabNoAndLabType(int labNo, String labType) {
 
-    	String query = "select x from " + modelClass.getName() + " x where x.labNo=? and x.labType=?";
+    	String query = "select x from " + modelClass.getName() + " x where x.labNo=?1 and x.labType=?2";
     	Query q = entityManager.createQuery(query);
 
     	q.setParameter(1, labNo);
@@ -358,7 +358,7 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
     		sb.append("'" + StringEscapeUtils.escapeSql(t) + "'");
     	}
 
-    	String query = "select x from " + modelClass.getName() + " x where x.labNo=? and x.labType in ("+sb.toString()+")";
+    	String query = "select x from " + modelClass.getName() + " x where x.labNo=?1 and x.labType in ("+sb.toString()+")";
     	Query q = entityManager.createQuery(query);
 
     	q.setParameter(1, demographicNo);
@@ -368,7 +368,7 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
     
     @SuppressWarnings("unchecked")
     public List<Integer> findDemographicIdsSince(Date date) {    	
-    	String query = "select x.demographicNo from " + modelClass.getName() + " x where x.dateModified > ?1)";
+    	String query = "select x.demographicNo from " + modelClass.getName() + " x where x.dateModified > ?1";
     	Query q = entityManager.createQuery(query);
 
     	q.setParameter(1, date);

@@ -34,15 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.WorkFlow;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class WorkFlowDaoTest extends DaoTestFixtures {
-
-	protected WorkFlowDao dao = SpringUtils.getBean(WorkFlowDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class WorkFlowDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected WorkFlowDao workFlowDao;
 
 	@Before
 	public void before() throws Exception {
@@ -53,7 +59,7 @@ public class WorkFlowDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 WorkFlow entity = new WorkFlow();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                workFlowDao.persist(entity);
 
                 assertNotNull(entity.getId());
         }
@@ -67,20 +73,20 @@ public class WorkFlowDaoTest extends DaoTestFixtures {
 		WorkFlow workFlow1 = new WorkFlow();
 		EntityDataGenerator.generateTestDataForModelClass(workFlow1);
 		workFlow1.setWorkflowType(workflowType1);
-		dao.persist(workFlow1);
+		workFlowDao.persist(workFlow1);
 		
 		WorkFlow workFlow2 = new WorkFlow();
 		EntityDataGenerator.generateTestDataForModelClass(workFlow2);
 		workFlow2.setWorkflowType(workflowType2);
-		dao.persist(workFlow2);
+		workFlowDao.persist(workFlow2);
 		
 		WorkFlow workFlow3 = new WorkFlow();
 		EntityDataGenerator.generateTestDataForModelClass(workFlow3);
 		workFlow3.setWorkflowType(workflowType1);
-		dao.persist(workFlow3);
+		workFlowDao.persist(workFlow3);
 		
 		List<WorkFlow> expectedResult = new ArrayList<WorkFlow>(Arrays.asList(workFlow1, workFlow3));
-		List<WorkFlow> result = dao.findByWorkflowType(workflowType1);
+		List<WorkFlow> result = workFlowDao.findByWorkflowType(workflowType1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -110,28 +116,28 @@ public class WorkFlowDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(workFlow1);
 		workFlow1.setWorkflowType(workflowType1);
 		workFlow1.setCurrentState(currentState2);
-		dao.persist(workFlow1);
+		workFlowDao.persist(workFlow1);
 		
 		WorkFlow workFlow2 = new WorkFlow();
 		EntityDataGenerator.generateTestDataForModelClass(workFlow2);
 		workFlow2.setWorkflowType(workflowType2);
 		workFlow2.setCurrentState(currentState1);
-		dao.persist(workFlow2);
+		workFlowDao.persist(workFlow2);
 		
 		WorkFlow workFlow3 = new WorkFlow();
 		EntityDataGenerator.generateTestDataForModelClass(workFlow3);
 		workFlow3.setWorkflowType(workflowType1);
 		workFlow3.setCurrentState(currentState2);
-		dao.persist(workFlow3);
+		workFlowDao.persist(workFlow3);
 		
 		WorkFlow workFlow4 = new WorkFlow();
 		EntityDataGenerator.generateTestDataForModelClass(workFlow4);
 		workFlow4.setWorkflowType(workflowType1);
 		workFlow4.setCurrentState(currentState1);
-		dao.persist(workFlow4);
+		workFlowDao.persist(workFlow4);
 		
 		List<WorkFlow> expectedResult = new ArrayList<WorkFlow>(Arrays.asList(workFlow1, workFlow3));
-		List<WorkFlow> result = dao.findActiveByWorkflowType(workflowType1);
+		List<WorkFlow> result = workFlowDao.findActiveByWorkflowType(workflowType1);
 		Logger logger = MiscUtils.getLogger();
 		
 		if (result.size() != expectedResult.size()) {
@@ -164,31 +170,31 @@ public class WorkFlowDaoTest extends DaoTestFixtures {
 		workFlow1.setWorkflowType(workflowType1);
 		workFlow1.setCurrentState(currentState2);
 		workFlow1.setDemographicNo(demographicNo1);
-		dao.persist(workFlow1);
+		workFlowDao.persist(workFlow1);
 		
 		WorkFlow workFlow2 = new WorkFlow();
 		EntityDataGenerator.generateTestDataForModelClass(workFlow2);
 		workFlow2.setWorkflowType(workflowType2);
 		workFlow2.setCurrentState(currentState1);
 		workFlow2.setDemographicNo(demographicNo2);
-		dao.persist(workFlow2);
+		workFlowDao.persist(workFlow2);
 		
 		WorkFlow workFlow3 = new WorkFlow();
 		EntityDataGenerator.generateTestDataForModelClass(workFlow3);
 		workFlow3.setWorkflowType(workflowType1);
 		workFlow3.setCurrentState(currentState2);
 		workFlow3.setDemographicNo(demographicNo1);
-		dao.persist(workFlow3);
+		workFlowDao.persist(workFlow3);
 		
 		WorkFlow workFlow4 = new WorkFlow();
 		EntityDataGenerator.generateTestDataForModelClass(workFlow4);
 		workFlow4.setWorkflowType(workflowType1);
 		workFlow4.setCurrentState(currentState1);
 		workFlow4.setDemographicNo(demographicNo1);
-		dao.persist(workFlow4);
+		workFlowDao.persist(workFlow4);
 		
 		List<WorkFlow> expectedResult = new ArrayList<WorkFlow>(Arrays.asList(workFlow1, workFlow3));
-		List<WorkFlow> result = dao.findActiveByWorkflowTypeAndDemographicNo(workflowType1, demographicNo1);
+		List<WorkFlow> result = workFlowDao.findActiveByWorkflowTypeAndDemographicNo(workflowType1, demographicNo1);
 		Logger logger = MiscUtils.getLogger();
 		
 		if (result.size() != expectedResult.size()) {

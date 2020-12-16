@@ -29,16 +29,23 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.wlmatch.CriteriaBO;
 import org.oscarehr.PMmodule.wlmatch.CriteriasBO;
 import org.oscarehr.PMmodule.wlmatch.VacancyDisplayBO;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class WaitlistDaoTest extends DaoTestFixtures {
-
-	public WaitlistDao dao = SpringUtils.getBean(WaitlistDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class WaitlistDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public WaitlistDao dao;
 	
 	@Before
 	public void before() throws Exception {

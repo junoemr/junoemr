@@ -26,13 +26,21 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.SiteTestCollection;
 import integration.tests.util.data.SiteTestData;
+import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.oscarehr.JunoApplication;
+import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -40,11 +48,12 @@ import java.sql.SQLException;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
-public class AddSitesTests extends SeleniumTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class AddSitesTests extends SeleniumTestBase 
 {
-	//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
-	@AfterClass
-	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	@After
+	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		SchemaUtils.restoreTable("admission", "log", "site");
 	}
@@ -80,6 +89,16 @@ public class AddSitesTests extends SeleniumTestBase
 	@Test
 	public void addSitesClassicUITest() throws Exception
 	{
+		// login
+		if (!Navigation.isLoggedIn(driver)) {
+			Navigation.doLogin(
+					AuthUtils.TEST_USER_NAME,
+					AuthUtils.TEST_PASSWORD,
+					AuthUtils.TEST_PIN,
+					Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+					driver);
+		}
+
 		SiteTestData site = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[0]);
 
 		// open administration panel
@@ -91,21 +110,32 @@ public class AddSitesTests extends SeleniumTestBase
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
 	}
 
+
 	@Test
 	public void addSitesJUNOUITest() throws Exception
 	{
+
+		// login
+		Navigation.doLogin(
+				AuthUtils.TEST_USER_NAME,
+				AuthUtils.TEST_PASSWORD,
+				AuthUtils.TEST_PIN,
+				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
+				driver);
+
 		SiteTestData siteJuno = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[1]);
 /*
-		// open JUNO UI page
-		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
+        // open JUNO UI page
+        driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
 
-		// open administration panel
-		driver.findElement(By.linkText("More")).click();
-		driver.findElement(By.linkText("Admin")).click();*/
+        // open administration panel
+        driver.findElement(By.linkText("More")).click();
+        driver.findElement(By.linkText("Admin")).click();*/
 		accessSectionJUNOUI(driver, "Admin");
 		addNewSites(siteJuno);
 		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(siteJuno.siteName), driver));
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
+
 	}
 }
 

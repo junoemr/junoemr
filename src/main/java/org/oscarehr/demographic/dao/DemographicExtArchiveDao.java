@@ -42,7 +42,7 @@ public class DemographicExtArchiveDao extends AbstractDao<DemographicExtArchive>
 	}
 
 	public List<DemographicExtArchive> getDemographicExtArchiveByDemoAndKey(Integer demographicNo, String key) {
-		Query query = entityManager.createQuery("SELECT d from DemographicExtArchive d where d.demographicNo=? and d.key = ? order by d.dateCreated DESC");
+		Query query = entityManager.createQuery("SELECT d from DemographicExtArchive d where d.demographicNo=?1 and d.key = ?2 order by d.dateCreated DESC");
 		query.setParameter(1, demographicNo);
 		query.setParameter(2, key);
 
@@ -52,7 +52,7 @@ public class DemographicExtArchiveDao extends AbstractDao<DemographicExtArchive>
 	}
 
 	public DemographicExtArchive getDemographicExtArchiveByArchiveIdAndKey(Long archiveId, String key) {
-		Query query = entityManager.createQuery("SELECT d from DemographicExtArchive d where d.archiveId=? and d.key = ? order by d.dateCreated DESC");
+		Query query = entityManager.createQuery("SELECT d from DemographicExtArchive d where d.archiveId=?1 and d.key = ?2 order by d.dateCreated DESC");
 		query.setParameter(1, archiveId);
 		query.setParameter(2, key);
 
@@ -60,7 +60,7 @@ public class DemographicExtArchiveDao extends AbstractDao<DemographicExtArchive>
 	}
 	
 	public List<DemographicExtArchive> getDemographicExtArchiveByArchiveId(Long archiveId) {
-		Query query = entityManager.createQuery("SELECT d from DemographicExtArchive d where d.archiveId=?");
+		Query query = entityManager.createQuery("SELECT d from DemographicExtArchive d where d.archiveId=?1");
 		query.setParameter(1, archiveId);
 		
 		@SuppressWarnings("unchecked")
@@ -69,7 +69,7 @@ public class DemographicExtArchiveDao extends AbstractDao<DemographicExtArchive>
 	}
 	
 	public List<DemographicExtArchive> getDemographicExtArchiveByDemoReverseCronological(Integer demographicNo) {
-		Query query = entityManager.createQuery("SELECT d from DemographicExtArchive d where d.demographicNo=? order by d.dateCreated ASC");
+		Query query = entityManager.createQuery("SELECT d from DemographicExtArchive d where d.demographicNo=?1 order by d.dateCreated ASC");
 		query.setParameter(1, demographicNo);
 		
 		@SuppressWarnings("unchecked")

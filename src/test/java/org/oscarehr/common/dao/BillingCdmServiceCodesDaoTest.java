@@ -34,15 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BillingCdmServiceCodes;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingCdmServiceCodesDaoTest extends DaoTestFixtures {
-
-	protected BillingCdmServiceCodesDao dao = SpringUtils.getBean(BillingCdmServiceCodesDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingCdmServiceCodesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BillingCdmServiceCodesDao billingCdmServiceCodesDao;
 
 	@Before
 	public void before() throws Exception {
@@ -54,7 +60,7 @@ public class BillingCdmServiceCodesDaoTest extends DaoTestFixtures {
 		BillingCdmServiceCodes entity = new BillingCdmServiceCodes();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setId(null);
-		dao.persist(entity);
+		billingCdmServiceCodesDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -63,18 +69,18 @@ public class BillingCdmServiceCodesDaoTest extends DaoTestFixtures {
 		
 		BillingCdmServiceCodes bCSC1 = new BillingCdmServiceCodes();
 		EntityDataGenerator.generateTestDataForModelClass(bCSC1);
-		dao.persist(bCSC1);
+		billingCdmServiceCodesDao.persist(bCSC1);
 		
 		BillingCdmServiceCodes bCSC2 = new BillingCdmServiceCodes();
 		EntityDataGenerator.generateTestDataForModelClass(bCSC2);
-		dao.persist(bCSC2);
+		billingCdmServiceCodesDao.persist(bCSC2);
 		
 		BillingCdmServiceCodes bCSC3 = new BillingCdmServiceCodes();
 		EntityDataGenerator.generateTestDataForModelClass(bCSC3);
-		dao.persist(bCSC3);
+		billingCdmServiceCodesDao.persist(bCSC3);
 		
 		List<BillingCdmServiceCodes> expectedResult = new ArrayList<BillingCdmServiceCodes>(Arrays.asList(bCSC1, bCSC2, bCSC3));
-		List<BillingCdmServiceCodes> result = dao.findAll();
+		List<BillingCdmServiceCodes> result = billingCdmServiceCodesDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		

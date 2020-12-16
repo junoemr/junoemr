@@ -42,7 +42,7 @@ public class TeleplanS23Dao extends AbstractDao<TeleplanS23>{
 	
 	@SuppressWarnings("unchecked")
 	public List<TeleplanS23> search_taS23 (Integer s21Id, String type, String aji) {
-		Query q = entityManager.createQuery("select t from TeleplanS23 t where t.s21Id=? and t.s23Type<>? and t.aji like ? order by t.id");
+		Query q = entityManager.createQuery("select t from TeleplanS23 t where t.s21Id=?1 and t.s23Type<>?2 and t.aji like ?3 order by t.id");
 		q.setParameter(1, s21Id);
 		q.setParameter(2, type);
 		q.setParameter(3, aji);

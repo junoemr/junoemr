@@ -38,15 +38,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.OcanConnexOption;
-import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class OcanConnexOptionDaoTest extends DaoTestFixtures {
-
-	protected OcanConnexOptionDao dao = SpringUtils.getBean(OcanConnexOptionDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class OcanConnexOptionDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected OcanConnexOptionDao ocanConnexOptionDao;
 
 
 	@Before
@@ -58,7 +64,7 @@ public class OcanConnexOptionDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		OcanConnexOption entity = new OcanConnexOption();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		ocanConnexOptionDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -75,22 +81,22 @@ public class OcanConnexOptionDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(ocanConnexOption1);
 		ocanConnexOption1.setLHINCode(orgLHINCode1);
 		ocanConnexOption1.setOrgName(orgName1);
-		dao.persist(ocanConnexOption1);
+		ocanConnexOptionDao.persist(ocanConnexOption1);
 		
 		OcanConnexOption ocanConnexOption2 = new OcanConnexOption();
 		EntityDataGenerator.generateTestDataForModelClass(ocanConnexOption2);
 		ocanConnexOption2.setLHINCode(orgLHINCode2);
 		ocanConnexOption2.setOrgName(orgName2);
-		dao.persist(ocanConnexOption2);
+		ocanConnexOptionDao.persist(ocanConnexOption2);
 		
 		OcanConnexOption ocanConnexOption3 = new OcanConnexOption();
 		EntityDataGenerator.generateTestDataForModelClass(ocanConnexOption3);
 		ocanConnexOption3.setLHINCode(orgLHINCode1);
 		ocanConnexOption3.setOrgName(orgName3);
-		dao.persist(ocanConnexOption3);
+		ocanConnexOptionDao.persist(ocanConnexOption3);
 		
 		List<OcanConnexOption> expectedResult = new ArrayList<OcanConnexOption>(Arrays.asList(ocanConnexOption1, ocanConnexOption3));
-		List<OcanConnexOption> result = dao.findByLHINCode(orgLHINCode1);
+		List<OcanConnexOption> result = ocanConnexOptionDao.findByLHINCode(orgLHINCode1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -125,24 +131,24 @@ public class OcanConnexOptionDaoTest extends DaoTestFixtures {
 		ocanConnexOption1.setLHINCode(orgLHINCode1);
 		ocanConnexOption1.setOrgName(orgName1);
 		ocanConnexOption1.setProgramName(programName3);
-		dao.persist(ocanConnexOption1);
+		ocanConnexOptionDao.persist(ocanConnexOption1);
 		
 		OcanConnexOption ocanConnexOption2 = new OcanConnexOption();
 		EntityDataGenerator.generateTestDataForModelClass(ocanConnexOption2);
 		ocanConnexOption2.setLHINCode(orgLHINCode2);
 		ocanConnexOption2.setOrgName(orgName2);
 		ocanConnexOption2.setProgramName(programName2);
-		dao.persist(ocanConnexOption2);
+		ocanConnexOptionDao.persist(ocanConnexOption2);
 		
 		OcanConnexOption ocanConnexOption3 = new OcanConnexOption();
 		EntityDataGenerator.generateTestDataForModelClass(ocanConnexOption3);
 		ocanConnexOption3.setLHINCode(orgLHINCode1);
 		ocanConnexOption3.setOrgName(orgName1);
 		ocanConnexOption3.setProgramName(programName1);
-		dao.persist(ocanConnexOption3);
+		ocanConnexOptionDao.persist(ocanConnexOption3);
 		
 		List<OcanConnexOption> expectedResult = new ArrayList<OcanConnexOption>(Arrays.asList(ocanConnexOption3, ocanConnexOption1));
-		List<OcanConnexOption> result = dao.findByLHINCodeOrgName(orgLHINCode1, orgName1);
+		List<OcanConnexOption> result = ocanConnexOptionDao.findByLHINCodeOrgName(orgLHINCode1, orgName1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -176,24 +182,24 @@ public class OcanConnexOptionDaoTest extends DaoTestFixtures {
 		ocanConnexOption1.setLHINCode(orgLHINCode1);
 		ocanConnexOption1.setOrgName(orgName1);
 		ocanConnexOption1.setProgramName(programName1);
-		dao.persist(ocanConnexOption1);
+		ocanConnexOptionDao.persist(ocanConnexOption1);
 		
 		OcanConnexOption ocanConnexOption2 = new OcanConnexOption();
 		EntityDataGenerator.generateTestDataForModelClass(ocanConnexOption2);
 		ocanConnexOption2.setLHINCode(orgLHINCode2);
 		ocanConnexOption2.setOrgName(orgName2);
 		ocanConnexOption2.setProgramName(programName2);
-		dao.persist(ocanConnexOption2);
+		ocanConnexOptionDao.persist(ocanConnexOption2);
 		
 		OcanConnexOption ocanConnexOption3 = new OcanConnexOption();
 		EntityDataGenerator.generateTestDataForModelClass(ocanConnexOption3);
 		ocanConnexOption3.setLHINCode(orgLHINCode1);
 		ocanConnexOption3.setOrgName(orgName1);
 		ocanConnexOption3.setProgramName(programName1);
-		dao.persist(ocanConnexOption3);
+		ocanConnexOptionDao.persist(ocanConnexOption3);
 		
 		List<OcanConnexOption> expectedResult = new ArrayList<OcanConnexOption>(Arrays.asList(ocanConnexOption1, ocanConnexOption3));
-		List<OcanConnexOption> result = dao.findByLHINCodeOrgNameProgramName(orgLHINCode1, orgName1, programName1);
+		List<OcanConnexOption> result = ocanConnexOptionDao.findByLHINCodeOrgNameProgramName(orgLHINCode1, orgName1, programName1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -216,22 +222,22 @@ public class OcanConnexOptionDaoTest extends DaoTestFixtures {
 		int id = 3;
 		OcanConnexOption ocanConnexOption1 = new OcanConnexOption();
 		EntityDataGenerator.generateTestDataForModelClass(ocanConnexOption1);
-		dao.persist(ocanConnexOption1);
+		ocanConnexOptionDao.persist(ocanConnexOption1);
 		
 		OcanConnexOption ocanConnexOption2 = new OcanConnexOption();
 		EntityDataGenerator.generateTestDataForModelClass(ocanConnexOption2);
-		dao.persist(ocanConnexOption2);
+		ocanConnexOptionDao.persist(ocanConnexOption2);
 		
 		OcanConnexOption ocanConnexOption3 = new OcanConnexOption();
 		EntityDataGenerator.generateTestDataForModelClass(ocanConnexOption3);
-		dao.persist(ocanConnexOption3);
+		ocanConnexOptionDao.persist(ocanConnexOption3);
 		
 		OcanConnexOption ocanConnexOption4 = new OcanConnexOption();
 		EntityDataGenerator.generateTestDataForModelClass(ocanConnexOption4);
-		dao.persist(ocanConnexOption4);
+		ocanConnexOptionDao.persist(ocanConnexOption4);
 		
 		OcanConnexOption expectedResult = ocanConnexOption3;
-		OcanConnexOption result = dao.findByID(id);
+		OcanConnexOption result = ocanConnexOptionDao.findByID(id);
 		
 		assertEquals(expectedResult, result);
 	}

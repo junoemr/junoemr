@@ -18,7 +18,7 @@
 	-->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD//EN"
-	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping package="org.oscarehr.PMmodule.model">
 	<class name="ProgramFunctionalUser" table="program_functional_user">
 		<id column="id" name="Id" type="java.lang.Long" unsaved-value="0">

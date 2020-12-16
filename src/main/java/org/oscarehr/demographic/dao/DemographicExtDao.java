@@ -56,7 +56,7 @@ public class DemographicExtDao extends AbstractDao<DemographicExt>
  			throw new IllegalArgumentException();
  		}
 
- 		Query query = entityManager.createQuery("SELECT d from DemographicExt d where d.demographicNo=? order by d.dateCreated");
+ 		Query query = entityManager.createQuery("SELECT d from DemographicExt d where d.demographicNo=?1 order by d.dateCreated");
  		query.setParameter(1, demographicNo);
 
  	    @SuppressWarnings("unchecked")
@@ -75,7 +75,7 @@ public class DemographicExtDao extends AbstractDao<DemographicExt>
  			throw new IllegalArgumentException();
  		}
 
- 		Query query = entityManager.createQuery("SELECT d from DemographicExt d where d.demographicNo=? and d.key = ? order by d.dateCreated DESC");
+ 		Query query = entityManager.createQuery("SELECT d from DemographicExt d where d.demographicNo=?1 and d.key = ?2 order by d.dateCreated DESC");
  		query.setParameter(1, demographicNo);
  		query.setParameter(2, key);
 
@@ -91,7 +91,7 @@ public class DemographicExtDao extends AbstractDao<DemographicExt>
  	
  	public List<DemographicExt> getDemographicExtByKeyAndValue(String key,String value) {
 
- 		Query query = entityManager.createQuery("SELECT d from DemographicExt d where d.key = ? and d.value=? order by d.dateCreated DESC");
+ 		Query query = entityManager.createQuery("SELECT d from DemographicExt d where d.key = ?1 and d.value=?2 order by d.dateCreated DESC");
  		query.setParameter(1, key);
  		query.setParameter(2, value);
 
@@ -112,7 +112,7 @@ public class DemographicExtDao extends AbstractDao<DemographicExt>
  			throw new IllegalArgumentException();
  		}
 
- 		Query query = entityManager.createQuery("SELECT d from DemographicExt d where d.demographicNo=? and d.key = ? order by d.dateCreated DESC, d.id DESC");
+ 		Query query = entityManager.createQuery("SELECT d from DemographicExt d where d.demographicNo=?1 and d.key = ?2 order by d.dateCreated DESC, d.id DESC");
  		query.setParameter(1, demographicNo);
  		query.setParameter(2, key);
 
@@ -193,7 +193,7 @@ public class DemographicExtDao extends AbstractDao<DemographicExt>
 
     public Map<String,String> getAllValuesForDemo(Integer demo){
     	Map<String,String> retval =  new HashMap<String,String>();
-    	Query query = entityManager.createQuery("SELECT d from DemographicExt d where d.demographicNo=? order by d.dateCreated");
+    	Query query = entityManager.createQuery("SELECT d from DemographicExt d where d.demographicNo=?1 order by d.dateCreated");
  		query.setParameter(1, demo);
 
  		@SuppressWarnings("unchecked")
@@ -266,7 +266,7 @@ public class DemographicExtDao extends AbstractDao<DemographicExt>
      }
      
 	 public List<Integer> findDemographicIdsByKeyVal(String key, String val) {
-	 		Query query = entityManager.createQuery("SELECT distinct d.demographicNo from DemographicExt d where d.key=? and d.value=?");
+	 		Query query = entityManager.createQuery("SELECT distinct d.demographicNo from DemographicExt d where d.key=?1 and d.value=?2");
 	 		query.setParameter(1, key);
 	 		query.setParameter(2, val);
 	 		

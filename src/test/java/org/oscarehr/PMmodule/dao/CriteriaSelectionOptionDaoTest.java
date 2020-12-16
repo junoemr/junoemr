@@ -34,16 +34,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.model.CriteriaSelectionOption;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CriteriaSelectionOptionDaoTest extends DaoTestFixtures {
-
-	public CriteriaSelectionOptionDao dao = SpringUtils.getBean(CriteriaSelectionOptionDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CriteriaSelectionOptionDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public CriteriaSelectionOptionDao criteriaSelectionOptionDao;
 
 
 	@Before
@@ -55,7 +61,7 @@ public class CriteriaSelectionOptionDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		CriteriaSelectionOption entity = new CriteriaSelectionOption();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		criteriaSelectionOptionDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -67,25 +73,25 @@ public class CriteriaSelectionOptionDaoTest extends DaoTestFixtures {
 		CriteriaSelectionOption cSO1 = new CriteriaSelectionOption();
 		EntityDataGenerator.generateTestDataForModelClass(cSO1);
 		cSO1.setCriteriaId(criteriaId1);
-		dao.saveEntity(cSO1);
+		criteriaSelectionOptionDao.saveEntity(cSO1);
 		
 		CriteriaSelectionOption cSO2 = new CriteriaSelectionOption();
 		EntityDataGenerator.generateTestDataForModelClass(cSO2);
 		cSO2.setCriteriaId(criteriaId2);
-		dao.saveEntity(cSO2);
+		criteriaSelectionOptionDao.saveEntity(cSO2);
 		
 		CriteriaSelectionOption cSO3 = new CriteriaSelectionOption();
 		EntityDataGenerator.generateTestDataForModelClass(cSO3);
 		cSO3.setCriteriaId(criteriaId1);
-		dao.saveEntity(cSO3);
+		criteriaSelectionOptionDao.saveEntity(cSO3);
 		
 		CriteriaSelectionOption cSO4 = new CriteriaSelectionOption();
 		EntityDataGenerator.generateTestDataForModelClass(cSO4);
 		cSO4.setCriteriaId(criteriaId1);
-		dao.saveEntity(cSO4);
+		criteriaSelectionOptionDao.saveEntity(cSO4);
 		
 		List<CriteriaSelectionOption> expectedResult = new ArrayList<CriteriaSelectionOption>(Arrays.asList(cSO1, cSO3, cSO4));
-		List<CriteriaSelectionOption> result = dao.getCriteriaSelectedOptionsByCriteriaId(criteriaId1);
+		List<CriteriaSelectionOption> result = criteriaSelectionOptionDao.getCriteriaSelectedOptionsByCriteriaId(criteriaId1);
 
 		Logger logger = MiscUtils.getLogger();
 		

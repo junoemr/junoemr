@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.MeasurementsExt;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MeasurementsExtDaoTest extends DaoTestFixtures {
-
-	protected MeasurementsExtDao dao = SpringUtils.getBean(MeasurementsExtDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MeasurementsExtDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MeasurementsExtDao measurementsExtDao;
 
 	public MeasurementsExtDaoTest() {
 	}
@@ -49,28 +55,28 @@ public class MeasurementsExtDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		MeasurementsExt entity = new MeasurementsExt();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		measurementsExtDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
 	
 	@Test
 	public void testGetMeasurementsExtByMeasurementId () {
-		dao.getMeasurementsExtByMeasurementId(0);
+		measurementsExtDao.getMeasurementsExtByMeasurementId(0);
 	}
 	
 	@Test
 	public void testGetMeasurementsExtByMeasurementIdAndKeyVal() {
-		dao.getMeasurementsExtByMeasurementIdAndKeyVal(1, "");
+		measurementsExtDao.getMeasurementsExtByMeasurementIdAndKeyVal(1, "");
 	}
 	
 	@Test
 	public void testGetMeasurementIdByKeyValue() {
-		dao.getMeasurementIdByKeyValue("", "");
+		measurementsExtDao.getMeasurementIdByKeyValue("", "");
 	}
 	
 	@Test
 	public void testFindByKeyValue() {
-		dao.findByKeyValue("", "");
+		measurementsExtDao.findByKeyValue("", "");
 	}
 }

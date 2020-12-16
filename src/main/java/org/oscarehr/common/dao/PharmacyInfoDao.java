@@ -80,7 +80,7 @@ public class PharmacyInfoDao extends AbstractDao<PharmacyInfo>{
      }
 
     public void deletePharmacy(Integer ID){
-          String sql = "update PharmacyInfo set status = ? where id = ?";
+          String sql = "update PharmacyInfo set status = ?1 where id = ?2";
           Query query = entityManager.createQuery(sql);
           query.setParameter(1, PharmacyInfo.DELETED);
           query.setParameter(2, ID);
@@ -102,7 +102,7 @@ public class PharmacyInfoDao extends AbstractDao<PharmacyInfo>{
      }
 
     public PharmacyInfo getPharmacyByRecordID(Integer recordID){
-    	String sql = "SELECT x FROM  PharmacyInfo x where x.id = ?";
+    	String sql = "SELECT x FROM  PharmacyInfo x where x.id = ?1";
         Query query = entityManager.createQuery(sql);
         query.setParameter(1,recordID);
         @SuppressWarnings("unchecked")

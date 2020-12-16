@@ -44,7 +44,7 @@ public class EChartDao extends AbstractDao<EChart>{
 	
     public EChart getLatestChart(int demographicNo) {
         
-    	Query q = entityManager.createQuery("from EChart c where c.demographicNo = ? order by c.timestamp desc");
+    	Query q = entityManager.createQuery("from EChart c where c.demographicNo = ?1 order by c.timestamp desc");
     	q.setParameter(1, demographicNo);
     	@SuppressWarnings("unchecked")
     	List<EChart> results = 	q.getResultList();
@@ -56,7 +56,7 @@ public class EChartDao extends AbstractDao<EChart>{
 
     public String saveEchart(CaseManagementNote note, CaseManagementCPP cpp, String userName, String lastStr) {
         String demoNo = note.getDemographic_no();
-        String sql = "select e from EChart e where e.demographicNo=? order by e.id";
+        String sql = "select e from EChart e where e.demographicNo=?1 order by e.id";
         Query q = entityManager.createQuery(sql);
         q.setParameter(1, new Integer(demoNo));
         @SuppressWarnings("unchecked")
@@ -125,7 +125,7 @@ public class EChartDao extends AbstractDao<EChart>{
     
     public void updateEchartOngoing(CaseManagementCPP cpp) {
         String demoNo = cpp.getDemographic_no();
-        String sql = "select e from EChart e where e.demographicNo=? order by e.id";
+        String sql = "select e from EChart e where e.demographicNo=?1 order by e.id";
         Query q = entityManager.createQuery(sql);
         q.setParameter(1,  new Integer(demoNo));
         List<EChart> list = q.getResultList();
@@ -142,7 +142,7 @@ public class EChartDao extends AbstractDao<EChart>{
     public void saveCPPIntoEchart(CaseManagementCPP cpp, String providerNo) {
     	
         String demoNo = cpp.getDemographic_no();
-        String sql = "select e from EChart e where e.demographicNo=? order by e.id";
+        String sql = "select e from EChart e where e.demographicNo=?1 order by e.id";
         Query q= entityManager.createQuery(sql);
         q.setParameter(1, Integer.parseInt(demoNo));
         @SuppressWarnings("unchecked")

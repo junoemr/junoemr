@@ -40,7 +40,7 @@ public class ProviderStudyDao extends AbstractDao<ProviderStudy>{
 	}
 
 	public int removeByDemographicNo(Integer providerNo) {
-		Query query = entityManager.createQuery("delete x from ProviderStudy x where x.providerNo=?");
+		Query query = entityManager.createQuery("delete x from ProviderStudy x where x.providerNo=?1");
 		query.setParameter(1, providerNo);
 		return query.executeUpdate();
 	}

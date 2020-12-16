@@ -113,7 +113,7 @@ public class AppointmentStatusDao extends AbstractDao<AppointmentStatus>
 			{
 				continue;
 			}
-			sql = "select count(*) as total from appointment a where a.status like ? ";
+			sql = "select count(*) as total from appointment a where a.status like ?1 ";
 			// sql = sql + "collate latin1_general_cs";
 
 			Query q = entityManager.createNativeQuery(sql);

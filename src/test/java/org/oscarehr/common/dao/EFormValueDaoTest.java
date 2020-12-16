@@ -31,14 +31,21 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.eform.dao.EFormValueDao;
 import org.oscarehr.eform.model.EFormValue;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class EFormValueDaoTest extends DaoTestFixtures {
-
-	protected EFormValueDao eFormValueDao = (EFormValueDao) SpringUtils.getBean("EFormValueDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EFormValueDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected EFormValueDao eFormValueDao;
 
 	public EFormValueDaoTest() {
 	}

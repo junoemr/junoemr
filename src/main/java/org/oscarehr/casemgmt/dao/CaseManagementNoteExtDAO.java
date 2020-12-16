@@ -43,30 +43,30 @@ public class CaseManagementNoteExtDAO extends HibernateDaoSupport {
 
 	@SuppressWarnings("unchecked")
     public List<CaseManagementNoteExt> getExtByNote(Long noteId) {
-	    String hql = "from CaseManagementNoteExt cExt where cExt.noteId = ? order by cExt.id desc";
-	    return this.getHibernateTemplate().find(hql, noteId);
+	    String hql = "from CaseManagementNoteExt cExt where cExt.noteId = ?0 order by cExt.id desc";
+	    return (List<CaseManagementNoteExt>) this.getHibernateTemplate().find(hql, noteId);
 	}
 
 	public List getExtByKeyVal(String keyVal) {
-	    String hql = "from CaseManagementNoteExt cExt where cExt.keyVal = ?";
+	    String hql = "from CaseManagementNoteExt cExt where cExt.keyVal = ?0";
 	    return this.getHibernateTemplate().find(hql, keyVal);
 	}
 
 	public List getExtByValue(String keyVal, String value) {
 	    String[] param = {keyVal, "%"+value+"%"};
-	    String hql = "from CaseManagementNoteExt cExt where cExt.keyVal = ? and cExt.value like ?";
+	    String hql = "from CaseManagementNoteExt cExt where cExt.keyVal = ?0 and cExt.value like ?1";
 	    return this.getHibernateTemplate().find(hql, param);
 	}
 
 	public List getExtBeforeDate(String keyVal, Date dateValue) {
 	    Object[] param = {keyVal, dateValue};
-	    String hql = "from CaseManagementNoteExt cExt where cExt.keyVal = ? and cExt.dateValue <= ?";
+	    String hql = "from CaseManagementNoteExt cExt where cExt.keyVal = ?0 and cExt.dateValue <= ?1";
 	    return this.getHibernateTemplate().find(hql, param);
 	}
 
 	public List getExtAfterDate(String keyVal, Date dateValue) {
 	    Object[] param = {keyVal, dateValue};
-	    String hql = "from CaseManagementNoteExt cExt where cExt.keyVal = ? and cExt.dateValue >= ?";
+	    String hql = "from CaseManagementNoteExt cExt where cExt.keyVal = ?0 and cExt.dateValue >= ?1";
 	    return this.getHibernateTemplate().find(hql, param);
 	}
 

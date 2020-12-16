@@ -49,7 +49,7 @@ public class RoomTypeDao extends AbstractDao<RoomType> {
 	 * @return true if room type exists
 	 */
     public boolean roomTypeExists(Integer roomTypeId) {
-    	Query query = entityManager.createQuery("select count(*) from RoomType r where r.id = ?");
+    	Query query = entityManager.createQuery("select count(*) from RoomType r where r.id = ?1");
 		query.setParameter(1, roomTypeId);
 		
 		Long result = (Long)query.getSingleResult();

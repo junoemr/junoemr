@@ -27,14 +27,20 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.SurveyData;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SurveyDataDaoTest extends DaoTestFixtures {
-
-	protected SurveyDataDao dao = SpringUtils.getBean(SurveyDataDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SurveyDataDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SurveyDataDao surveyDataDao;
 
 	public SurveyDataDaoTest() {
 	}
@@ -48,7 +54,7 @@ public class SurveyDataDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		SurveyData ql = new SurveyData();
 		 EntityDataGenerator.generateTestDataForModelClass(ql);
-		 dao.persist(ql);
+		 surveyDataDao.persist(ql);
 		 assertNotNull(ql.getId());
 	}
 	
@@ -58,29 +64,29 @@ public class SurveyDataDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(ql);
 		ql.setSurveyId("test");
 		ql.setProcessed(1);
-		dao.persist(ql);
+		surveyDataDao.persist(ql);
 		
-		assertEquals(1, dao.getMaxProcessed(ql.getSurveyId()));
+		assertEquals(1, surveyDataDao.getMaxProcessed(ql.getSurveyId()));
 	}
 	
 	@Test
 	public void testGetProcessCount() {		
-		assertNotNull(dao.getProcessCount("TEST"));
+		assertNotNull(surveyDataDao.getProcessCount("TEST"));
 	}
 
     @Test
     public void testFindByDemoAndPeriod() {
-	    assertNotNull(dao.findByDemoSurveyIdAndPeriod(100, "SRV", 100));
+	    assertNotNull(surveyDataDao.findByDemoSurveyIdAndPeriod(100, "SRV", 100));
     }
 
     @Test
     public void testCountStatuses() {
-	    assertNotNull(dao.countStatuses("SRV"));
+	    assertNotNull(surveyDataDao.countStatuses("SRV"));
     }
     
     @Test
     public void testCountAnswers() {
-	    assertNotNull(dao.countAnswers("SRV"));
+	    assertNotNull(surveyDataDao.countAnswers("SRV"));
     }
 
 }

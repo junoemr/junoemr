@@ -40,7 +40,7 @@ public class CriteriaSelectionOptionDao extends AbstractDao<CriteriaSelectionOpt
 	}
 
 	public List<CriteriaSelectionOption> getCriteriaSelectedOptionsByCriteriaId(Integer criteriaId) {
-		Query query = entityManager.createQuery("select x from CriteriaSelectionOption x where x.criteriaId=?");
+		Query query = entityManager.createQuery("select x from CriteriaSelectionOption x where x.criteriaId=?1");
 		query.setParameter(1, criteriaId);
 		
 		@SuppressWarnings("unchecked")

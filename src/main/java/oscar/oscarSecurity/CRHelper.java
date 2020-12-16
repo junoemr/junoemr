@@ -77,7 +77,7 @@ public class CRHelper implements RolesProvider {
 				log.warn("No userSecRole table found!");
 				return new String[0];
 			}
-			PreparedStatement st= con.prepareStatement(sql+" WHERE provider_no=?");
+			PreparedStatement st= con.prepareStatement(sql+" WHERE provider_no=?1");
 			st.setString(1,(String)userNameToProviderNO.get(user));
 			ResultSet rs = st.executeQuery();
 			HashSet list = new HashSet();
@@ -87,7 +87,7 @@ public class CRHelper implements RolesProvider {
 			if(queryCaisiRoles(con)){
 				rs.close();
 				st.close();
-				st= con.prepareStatement(CAISI_ROLES_SQL+" WHERE provider_no=?");
+				st= con.prepareStatement(CAISI_ROLES_SQL+" WHERE provider_no=?1");
 				st.setString(1,(String)userNameToProviderNO.get(user));
 				rs = st.executeQuery();
 				while(rs.next()){

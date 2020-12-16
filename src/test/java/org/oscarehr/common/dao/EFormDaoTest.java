@@ -29,60 +29,80 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.eform.model.EForm;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class EFormDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EFormDaoTest extends DaoTestFixtures
+{
 
-	protected static Integer populatedFormId;
-	protected static EFormDao dao = (EFormDao)SpringUtils.getBean("EFormDao");
+	protected Integer populatedFormId;
+
+	@Autowired
+	protected EFormDao eFormDao;
 
 	@BeforeClass
-	public static void initSchema() throws Exception {
+	public static void initSchema() throws Exception
+	{
 		SchemaUtils.restoreTable("eform","eform_groups");
-		
-		EForm eform = new EForm();
-		EntityDataGenerator.generateTestDataForModelClass(eform);
-		eform.setFormName("NUVASHENAH");
-		dao.persist(eform);
-		
-		populatedFormId = eform.getId();
+	}
+
+	@Before
+	public void createTestEform() throws Exception
+	{
+	    if(populatedFormId == null)
+	    {
+			EForm eform = new EForm();
+			EntityDataGenerator.generateTestDataForModelClass(eform);
+			eform.setFormName("NUVASHENAH");
+			eFormDao.persist(eform);
+
+			populatedFormId = eform.getId();
+		}
 	}
 
 	@Test
-	public void testFindByStatus() {
-		List<EForm> eforms = dao.findByStatus(true, EFormSortOrder.DATE);
+	public void testFindByStatus()
+	{
+		List<EForm> eforms = eFormDao.findByStatus(true, EFormSortOrder.DATE);
 		assertFalse(eforms.isEmpty());
 		
-		eforms = dao.findByStatus(true, EFormSortOrder.FILE_NAME);
+		eforms = eFormDao.findByStatus(true, EFormSortOrder.FILE_NAME);
 		assertFalse(eforms.isEmpty());
 		
-		eforms = dao.findByStatus(true, EFormSortOrder.NAME);
+		eforms = eFormDao.findByStatus(true, EFormSortOrder.NAME);
 		assertFalse(eforms.isEmpty());
 		
-		eforms = dao.findByStatus(true, EFormSortOrder.SUBJECT);
+		eforms = eFormDao.findByStatus(true, EFormSortOrder.SUBJECT);
 		assertFalse(eforms.isEmpty());
 		
-		eforms = dao.findByStatus(false);
+		eforms = eFormDao.findByStatus(false);
 		assertNotNull(eforms.isEmpty());
 	}
 	
 	@Test
-	public void testFindMaxIdForActiveForm() {
-		Integer id = dao.findMaxIdForActiveForm("NUVASHENAH");
+	public void testFindMaxIdForActiveForm()
+	{
+		Integer id = eFormDao.findMaxIdForActiveForm("NUVASHENAH");
 		assertNotNull(id);
 		assertTrue(id > 0);
 	}
 	
 	@Test
-	public void testCountFormsOtherThanSpecified() {
-		Long count = dao.countFormsOtherThanSpecified("NUVASHENAH", populatedFormId);
+	public void testCountFormsOtherThanSpecified()
+	{
+		Long count = eFormDao.countFormsOtherThanSpecified("NUVASHENAH", populatedFormId);
 		assertNotNull(count);
 		assertTrue(count >= 0);		
 	}

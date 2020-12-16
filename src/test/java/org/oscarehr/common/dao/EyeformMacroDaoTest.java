@@ -34,16 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.EyeformMacro;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class EyeformMacroDaoTest extends DaoTestFixtures {
-
-	protected EyeformMacroDao dao = SpringUtils.getBean(EyeformMacroDao.class);
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EyeformMacroDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected EyeformMacroDao eyeformMacroDao;
 
 	@Before
 	public void before() throws Exception {
@@ -54,7 +59,7 @@ public class EyeformMacroDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 EyeformMacro entity = new EyeformMacro();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                eyeformMacroDao.persist(entity);
                 assertNotNull(entity.getId());
         }
 
@@ -68,20 +73,20 @@ public class EyeformMacroDaoTest extends DaoTestFixtures {
 		EyeformMacro eyeformMacro1 = new EyeformMacro();
 		EntityDataGenerator.generateTestDataForModelClass(eyeformMacro1);
 		eyeformMacro1.setMacroName(macroName1);
-		dao.persist(eyeformMacro1);
+		eyeformMacroDao.persist(eyeformMacro1);
 		
 		EyeformMacro eyeformMacro2 = new EyeformMacro();
 		EntityDataGenerator.generateTestDataForModelClass(eyeformMacro2);
 		eyeformMacro2.setMacroName(macroName2);
-		dao.persist(eyeformMacro2);
+		eyeformMacroDao.persist(eyeformMacro2);
 		
 		EyeformMacro eyeformMacro3 = new EyeformMacro();
 		EntityDataGenerator.generateTestDataForModelClass(eyeformMacro3);
 		eyeformMacro3.setMacroName(macroName3);
-		dao.persist(eyeformMacro3);
+		eyeformMacroDao.persist(eyeformMacro3);
 		
 		List<EyeformMacro> expectedResult = new ArrayList<EyeformMacro>(Arrays.asList(eyeformMacro3, eyeformMacro1, eyeformMacro2));
-		List<EyeformMacro> result = dao.getMacros();
+		List<EyeformMacro> result = eyeformMacroDao.getMacros();
 
 		Logger logger = MiscUtils.getLogger();
 		

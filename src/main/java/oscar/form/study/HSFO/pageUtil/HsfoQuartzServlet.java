@@ -36,16 +36,12 @@ import javax.servlet.ServletResponse;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
-import org.quartz.JobDetail;
 import org.quartz.Scheduler;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
 import oscar.OscarProperties;
 import oscar.form.study.HSFO.RecommitDAO;
 import oscar.form.study.HSFO.RecommitSchedule;
-import oscar.form.study.HSFO.pageUtil.RecommitHSFOAction.ResubmitJob;
 
 public class HsfoQuartzServlet implements Servlet
 {
@@ -74,6 +70,9 @@ public class HsfoQuartzServlet implements Servlet
 
 		scheduler.start();
 
+		// TODO: SPRINGUPGRADE: make this do something
+
+/*
 		JobDetail job = scheduler.getJobDetail(RESUBMIT_JOB,
 				Scheduler.DEFAULT_GROUP);
 		if (job != null)
@@ -87,6 +86,7 @@ public class HsfoQuartzServlet implements Servlet
 		JobDetail jobDetail = new JobDetail(RESUBMIT_JOB,
 				Scheduler.DEFAULT_GROUP, ResubmitJob.class);
 		scheduler.scheduleJob(jobDetail, trigger);
+*/
 
 	}
 

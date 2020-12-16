@@ -67,7 +67,7 @@ public class EFormGroupDao extends AbstractDao<EFormGroup> {
 	}
 
 	public List<EFormGroup> getByGroupName(String groupName) {
-		String sql = "select eg from EFormGroup eg where eg.groupName=?";
+		String sql = "select eg from EFormGroup eg where eg.groupName=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, groupName);
 

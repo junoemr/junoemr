@@ -51,7 +51,7 @@ public class ReportTempDao extends AbstractDao<ReportTemp>{
 	   
 	   
 	   public List<ReportTemp> findGreateThanEdb(Date edb, int offset, int limit) {
-	    	String sql = "select x from ReportTemp x where x.id.edb >= ?";
+	    	String sql = "select x from ReportTemp x where x.id.edb >= ?1";
 	    	Query query = entityManager.createQuery(sql);
 	    	query.setParameter(1, edb);
 	    	query.setMaxResults(limit);

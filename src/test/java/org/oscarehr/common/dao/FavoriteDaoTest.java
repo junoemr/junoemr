@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Favorite;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class FavoriteDaoTest extends DaoTestFixtures {
-
-	protected FavoriteDao dao = SpringUtils.getBean(FavoriteDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class FavoriteDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected FavoriteDao favoriteDao;
 
 	@Before
 	public void before() throws Exception {
@@ -45,15 +51,15 @@ public class FavoriteDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Favorite entity = new Favorite();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		favoriteDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
 	
 	@Test
 	public void testAll() {
-		dao.findByProviderNo("999");
-		dao.findByEverything(null, null, null, 0, null, 0, 0, null, null, null, null, 0, false, false, null, null, null, false);
+		favoriteDao.findByProviderNo("999");
+		favoriteDao.findByEverything(null, null, null, 0, null, 0, 0, null, null, null, null, 0, false, false, null, null, null, false);
 	}
 	
 	

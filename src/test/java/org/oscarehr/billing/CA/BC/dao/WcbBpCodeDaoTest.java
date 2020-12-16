@@ -30,17 +30,22 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.WcbBpCode;
 import org.oscarehr.billing.CA.dao.WcbBpCodeDao;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class WcbBpCodeDaoTest extends DaoTestFixtures {
-
-	public WcbBpCodeDao dao = SpringUtils.getBean(WcbBpCodeDao.class);
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class WcbBpCodeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public WcbBpCodeDao wcbBpCodeDao;
 
 	@Before
 	public void before() throws Exception {
@@ -59,10 +64,10 @@ public class WcbBpCodeDaoTest extends DaoTestFixtures {
 		}
 		entity.setUsagenote(sb.toString());
 		
-		dao.persist(entity);
+		wcbBpCodeDao.persist(entity);
 		assertNotNull(entity.getId());
 		
-		List<WcbBpCode> entityChecks = dao.findByCodeOrAnyLevel(entity.getCode());
+		List<WcbBpCode> entityChecks = wcbBpCodeDao.findByCodeOrAnyLevel(entity.getCode());
 		assertNotNull(entityChecks);
 		assertFalse(entityChecks.isEmpty());
 	}

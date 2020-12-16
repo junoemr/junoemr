@@ -55,6 +55,13 @@ public abstract class AbstractModel<T> implements java.io.Serializable
 						&& stack[i].getMethodName().equals("validate")) {
 					return super.hashCode();
 				}
+
+				// hashCode() appears to be called when making ManyToOne joins, but still seems to
+				// work if there is no Id (i.e. there is no child)
+				if(stack[i].getClassName().equals("org.hibernate.type.ManyToOneType")
+						&& stack[i].getMethodName().equals("resolve")) {
+					return super.hashCode();
+				}
 	        }
 			MiscUtils.getLogger().warn(OBJECT_NOT_YET_PERISTED, new Exception());
 			return(super.hashCode());

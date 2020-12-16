@@ -35,15 +35,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ClinicLocation;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ClinicLocationDaoTest extends DaoTestFixtures {
-
-	protected ClinicLocationDao dao = (ClinicLocationDao)SpringUtils.getBean(ClinicLocationDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ClinicLocationDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ClinicLocationDao clinicLocationDao;
 
 	@Before
 	public void before() throws Exception {
@@ -54,7 +60,7 @@ public class ClinicLocationDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 ClinicLocation entity = new ClinicLocation();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                clinicLocationDao.persist(entity);
                 assertNotNull(entity.getId());
         }
 
@@ -68,20 +74,20 @@ public class ClinicLocationDaoTest extends DaoTestFixtures {
 		ClinicLocation clinicLocation1 = new ClinicLocation();
 		EntityDataGenerator.generateTestDataForModelClass(clinicLocation1);
 		clinicLocation1.setClinicNo(clinicNo1);
-		dao.persist(clinicLocation1);
+		clinicLocationDao.persist(clinicLocation1);
 		
 		ClinicLocation clinicLocation2 = new ClinicLocation();
 		EntityDataGenerator.generateTestDataForModelClass(clinicLocation2);
 		clinicLocation2.setClinicNo(clinicNo2);
-		dao.persist(clinicLocation2);
+		clinicLocationDao.persist(clinicLocation2);
 		
 		ClinicLocation clinicLocation3 = new ClinicLocation();
 		EntityDataGenerator.generateTestDataForModelClass(clinicLocation3);
 		clinicLocation3.setClinicNo(clinicNo1);
-		dao.persist(clinicLocation3);
+		clinicLocationDao.persist(clinicLocation3);
 		
 		List<ClinicLocation> expectedResult = new ArrayList<ClinicLocation>(Arrays.asList(clinicLocation1, clinicLocation3));
-		List<ClinicLocation> result = dao.findByClinicNo(clinicNo1);
+		List<ClinicLocation> result = clinicLocationDao.findByClinicNo(clinicNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -113,22 +119,22 @@ public class ClinicLocationDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(clinicLocation1);
 		clinicLocation1.setClinicLocationNo(clinicNo1);
 		clinicLocation1.setClinicLocationName(clinicLocationName1);
-		dao.persist(clinicLocation1);
+		clinicLocationDao.persist(clinicLocation1);
 		
 		ClinicLocation clinicLocation2 = new ClinicLocation();
 		EntityDataGenerator.generateTestDataForModelClass(clinicLocation2);
 		clinicLocation2.setClinicLocationNo(clinicNo2);
 		clinicLocation2.setClinicLocationName(clinicLocationName2);
-		dao.persist(clinicLocation2);
+		clinicLocationDao.persist(clinicLocation2);
 		
 		ClinicLocation clinicLocation3 = new ClinicLocation();
 		EntityDataGenerator.generateTestDataForModelClass(clinicLocation3);
 		clinicLocation3.setClinicLocationNo(clinicNo3);
 		clinicLocation3.setClinicLocationName(clinicLocationName3);
-		dao.persist(clinicLocation3);
+		clinicLocationDao.persist(clinicLocation3);
 		
 		String expectedResult = clinicLocationName2;
-		String result = dao.searchVisitLocation(clinicNo2);
+		String result = clinicLocationDao.searchVisitLocation(clinicNo2);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -148,22 +154,22 @@ public class ClinicLocationDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(clinicLocation1);
 		clinicLocation1.setClinicNo(clinicNo1);
 		clinicLocation1.setClinicLocationNo(clinicLocationNo1);
-		dao.persist(clinicLocation1);
+		clinicLocationDao.persist(clinicLocation1);
 		
 		ClinicLocation clinicLocation2 = new ClinicLocation();
 		EntityDataGenerator.generateTestDataForModelClass(clinicLocation2);
 		clinicLocation2.setClinicNo(clinicNo2);
 		clinicLocation2.setClinicLocationNo(clinicLocationNo2);
-		dao.persist(clinicLocation2);
+		clinicLocationDao.persist(clinicLocation2);
 		
 		ClinicLocation clinicLocation3 = new ClinicLocation();
 		EntityDataGenerator.generateTestDataForModelClass(clinicLocation3);
 		clinicLocation3.setClinicNo(clinicNo3);
 		clinicLocation3.setClinicLocationNo(clinicLocationNo3);
-		dao.persist(clinicLocation3);
+		clinicLocationDao.persist(clinicLocation3);
 		
 		ClinicLocation expectedResult = clinicLocation2;
-		ClinicLocation result = dao.searchBillLocation(clinicNo2, clinicLocationNo2);
+		ClinicLocation result = clinicLocationDao.searchBillLocation(clinicNo2, clinicLocationNo2);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -178,22 +184,22 @@ public class ClinicLocationDaoTest extends DaoTestFixtures {
 		ClinicLocation clinicLocation1 = new ClinicLocation();
 		EntityDataGenerator.generateTestDataForModelClass(clinicLocation1);
 		clinicLocation1.setClinicLocationNo(clinicLocationNo1);
-		dao.persist(clinicLocation1);
+		clinicLocationDao.persist(clinicLocation1);
 		
 		ClinicLocation clinicLocation2 = new ClinicLocation();
 		EntityDataGenerator.generateTestDataForModelClass(clinicLocation2);
 		clinicLocation2.setClinicLocationNo(clinicLocationNo2);
-		dao.persist(clinicLocation2);
+		clinicLocationDao.persist(clinicLocation2);
 		
 		ClinicLocation clinicLocation3 = new ClinicLocation();
 		EntityDataGenerator.generateTestDataForModelClass(clinicLocation3);
 		clinicLocation3.setClinicLocationNo(clinicLocationNo3);
-		dao.persist(clinicLocation3);
+		clinicLocationDao.persist(clinicLocation3);
 		
-		dao.removeByClinicLocationNo(clinicLocationNo2);
+		clinicLocationDao.removeByClinicLocationNo(clinicLocationNo2);
 		
 		List<ClinicLocation> expectedResult = new ArrayList<ClinicLocation>(Arrays.asList(clinicLocation1, clinicLocation3));
-		List<ClinicLocation> result = dao.findAll();
+		List<ClinicLocation> result = clinicLocationDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		

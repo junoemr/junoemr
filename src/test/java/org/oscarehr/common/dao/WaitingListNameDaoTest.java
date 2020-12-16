@@ -32,6 +32,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.MyGroup;
@@ -39,10 +40,16 @@ import org.oscarehr.common.model.MyGroupPrimaryKey;
 import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class WaitingListNameDaoTest extends DaoTestFixtures {
-
-	protected WaitingListNameDao dao = SpringUtils.getBean(WaitingListNameDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class WaitingListNameDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected WaitingListNameDao waitingListNameDao;
 
 	@Before
 	public void before() throws Exception {
@@ -58,25 +65,25 @@ public class WaitingListNameDaoTest extends DaoTestFixtures {
 		WaitingListName waitingListName1 = new WaitingListName();
 		EntityDataGenerator.generateTestDataForModelClass(waitingListName1);
 		waitingListName1.setIsHistory(isNotHistory);
-		dao.persist(waitingListName1);
+		waitingListNameDao.persist(waitingListName1);
 		
 		WaitingListName waitingListName2 = new WaitingListName();
 		EntityDataGenerator.generateTestDataForModelClass(waitingListName2);
 		waitingListName2.setIsHistory(isHistory);
-		dao.persist(waitingListName2);
+		waitingListNameDao.persist(waitingListName2);
 		
 		WaitingListName waitingListName3 = new WaitingListName();
 		EntityDataGenerator.generateTestDataForModelClass(waitingListName3);
 		waitingListName3.setIsHistory(isNotHistory);
-		dao.persist(waitingListName3);
+		waitingListNameDao.persist(waitingListName3);
 		
 		WaitingListName waitingListName4 = new WaitingListName();
 		EntityDataGenerator.generateTestDataForModelClass(waitingListName4);
 		waitingListName4.setIsHistory(isNotHistory);
-		dao.persist(waitingListName4);
+		waitingListNameDao.persist(waitingListName4);
 		
 		long expectedResult = 3;
-		long result = dao.countActiveWatingListNames();
+		long result = waitingListNameDao.countActiveWatingListNames();
 		
 		assertEquals(expectedResult, result);	
 	}
@@ -98,38 +105,38 @@ public class WaitingListNameDaoTest extends DaoTestFixtures {
 		waitingListName1.setName(name1);
 		waitingListName1.setGroupNo(groupNo1);
 		waitingListName1.setIsHistory(isNotHistory);
-		dao.persist(waitingListName1);
+		waitingListNameDao.persist(waitingListName1);
 		
 		WaitingListName waitingListName2 = new WaitingListName();
 		EntityDataGenerator.generateTestDataForModelClass(waitingListName2);
 		waitingListName2.setName(name2);
 		waitingListName2.setGroupNo(groupNo1);
 		waitingListName2.setIsHistory(isHistory);
-		dao.persist(waitingListName2);
+		waitingListNameDao.persist(waitingListName2);
 		
 		WaitingListName waitingListName3 = new WaitingListName();
 		EntityDataGenerator.generateTestDataForModelClass(waitingListName3);
 		waitingListName3.setName(name1);
 		waitingListName3.setGroupNo(groupNo2);
 		waitingListName3.setIsHistory(isNotHistory);
-		dao.persist(waitingListName3);
+		waitingListNameDao.persist(waitingListName3);
 		
 		WaitingListName waitingListName4 = new WaitingListName();
 		EntityDataGenerator.generateTestDataForModelClass(waitingListName4);
 		waitingListName4.setName(name1);
 		waitingListName4.setGroupNo(groupNo1);
 		waitingListName4.setIsHistory(isNotHistory);
-		dao.persist(waitingListName4);
+		waitingListNameDao.persist(waitingListName4);
 		
 		WaitingListName waitingListName5 = new WaitingListName();
 		EntityDataGenerator.generateTestDataForModelClass(waitingListName5);
 		waitingListName5.setName(name1);
 		waitingListName5.setGroupNo(groupNo1);
 		waitingListName5.setIsHistory(isHistory);
-		dao.persist(waitingListName5);
+		waitingListNameDao.persist(waitingListName5);
 		
 		List<WaitingListName> expectedResult = new ArrayList<WaitingListName>(Arrays.asList(waitingListName1, waitingListName4));
-		List<WaitingListName> result = dao.findCurrentByNameAndGroup(name1, groupNo1);
+		List<WaitingListName> result = waitingListNameDao.findCurrentByNameAndGroup(name1, groupNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -210,33 +217,33 @@ public class WaitingListNameDaoTest extends DaoTestFixtures {
 		waitingListName1.setGroupNo("101");
 		waitingListName1.setIsHistory(isNotHistory);
 		waitingListName1.setName(name1);
-		dao.persist(waitingListName1);
+		waitingListNameDao.persist(waitingListName1);
 		
 		WaitingListName waitingListName2 = new WaitingListName();
 		EntityDataGenerator.generateTestDataForModelClass(waitingListName2);
 		waitingListName2.setGroupNo("202");
 		waitingListName2.setIsHistory(isHistory);
 		waitingListName2.setName(name2);
-		dao.persist(waitingListName2);
+		waitingListNameDao.persist(waitingListName2);
 		
 		WaitingListName waitingListName3 = new WaitingListName();
 		EntityDataGenerator.generateTestDataForModelClass(waitingListName3);
 		waitingListName3.setGroupNo("303");
 		waitingListName3.setIsHistory(isHistory);
 		waitingListName3.setName(name3);
-		dao.persist(waitingListName3);
+		waitingListNameDao.persist(waitingListName3);
 		
 		WaitingListName waitingListName4 = new WaitingListName();
 		EntityDataGenerator.generateTestDataForModelClass(waitingListName4);
 		waitingListName4.setGroupNo("404");
 		waitingListName4.setIsHistory(isNotHistory);
 		waitingListName4.setName(name4);
-		dao.persist(waitingListName4);
+		waitingListNameDao.persist(waitingListName4);
 		
 		List<MyGroup> myGroups = new ArrayList<MyGroup>(Arrays.asList(myGroup1, myGroup2, myGroup3, myGroup4));
 		
 		List<WaitingListName> expectedResult = new ArrayList<WaitingListName>(Arrays.asList(waitingListName4, waitingListName1));
-		List<WaitingListName> result = dao.findByMyGroups(myGroups);
+		List<WaitingListName> result = waitingListNameDao.findByMyGroups(myGroups);
 
 		Logger logger = MiscUtils.getLogger();
 		

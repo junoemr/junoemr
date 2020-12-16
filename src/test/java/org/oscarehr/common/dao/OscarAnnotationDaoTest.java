@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.OscarAnnotation;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class OscarAnnotationDaoTest extends DaoTestFixtures {
-
-	protected OscarAnnotationDao dao = SpringUtils.getBean(OscarAnnotationDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class OscarAnnotationDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected OscarAnnotationDao oscarAnnotationDao;
 
 	public OscarAnnotationDaoTest() {
 	}
@@ -49,7 +55,7 @@ public class OscarAnnotationDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		OscarAnnotation entity = new OscarAnnotation();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		oscarAnnotationDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}

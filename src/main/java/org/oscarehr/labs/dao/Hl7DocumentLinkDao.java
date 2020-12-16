@@ -45,7 +45,7 @@ public class Hl7DocumentLinkDao extends AbstractDao<Hl7DocumentLink>
 	 */
 	public List<Hl7DocumentLink> getDocumentsForLab(Integer labNo)
 	{
-		String sql = "Select h FROM hl7DocumentLink h WHERE labNo=?";
+		String sql = "Select h FROM hl7DocumentLink h WHERE labNo=?1";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, labNo);
 

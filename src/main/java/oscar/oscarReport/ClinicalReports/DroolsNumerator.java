@@ -78,7 +78,7 @@ public class DroolsNumerator implements Numerator{
             RuleBase ruleBase = loadMeasurementRuleBase(file);
             
 //            EctMeasurementsDataBeanHandler ect = new EctMeasurementsDataBeanHandler(demographicNo, measurement);
-//           Collection v = ect.getMeasurementsDataVector();
+//           Collection v = ect.getMeasurementsData();
 //           measurementList.add(new ArrayList(v));
 
             MeasurementDSHelper dshelper = new MeasurementDSHelper(loggedInInfo, demographicNo);

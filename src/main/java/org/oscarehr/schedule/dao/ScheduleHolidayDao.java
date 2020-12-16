@@ -50,7 +50,7 @@ public class ScheduleHolidayDao extends AbstractDao<ScheduleHoliday>
 
 	public List<ScheduleHoliday> findAfterDate(Date date)
 	{
-		Query query = entityManager.createQuery("select s from ScheduleHoliday s where s.id > ?");
+		Query query = entityManager.createQuery("select s from ScheduleHoliday s where s.id > ?1");
 		query.setParameter(1, date);
 
 		@SuppressWarnings("unchecked")

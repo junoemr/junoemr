@@ -25,15 +25,21 @@ package org.oscarehr.common.dao;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.dao.ProgramProviderDAO;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ProgramProviderDaoTest extends DaoTestFixtures {
-
-	protected ProgramProviderDAO dao = SpringUtils.getBean(ProgramProviderDAO.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProgramProviderDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProgramProviderDAO programProviderDAO;
 
 	@Before
 	public void before() throws Exception {
@@ -46,8 +52,8 @@ public class ProgramProviderDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(pp);
 		pp.setId(null);
 		
-		dao.saveProgramProvider(pp);
+		programProviderDAO.saveProgramProvider(pp);
 		
-		dao.updateProviderRoles(pp.getId(), 19999l);
+		programProviderDAO.updateProviderRoles(pp.getId(), 19999l);
 	}
 }

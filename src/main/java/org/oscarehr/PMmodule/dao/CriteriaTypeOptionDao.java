@@ -49,7 +49,7 @@ public class CriteriaTypeOptionDao extends AbstractDao<CriteriaTypeOption> {
 	}
 	
 	public List<CriteriaTypeOption> getCriteriaTypeOptionByTypeId(Integer typeId) {
-		Query query = entityManager.createQuery("select x from CriteriaTypeOption x where x.criteriaTypeId=?");
+		Query query = entityManager.createQuery("select x from CriteriaTypeOption x where x.criteriaTypeId=?1");
 		query.setParameter(1, typeId);
 		
 		@SuppressWarnings("unchecked")
@@ -59,14 +59,14 @@ public class CriteriaTypeOptionDao extends AbstractDao<CriteriaTypeOption> {
 	}
 	
 	public CriteriaTypeOption getByValue(String optionValue) {
-		Query query = entityManager.createQuery("select x from CriteriaTypeOption x where x.optionValue=?");
+		Query query = entityManager.createQuery("select x from CriteriaTypeOption x where x.optionValue=?1");
 		query.setParameter(1, optionValue);
 		
 		return this.getSingleResultOrNull(query);
 	}
 	
 	public CriteriaTypeOption getByValueAndTypeId(String optionValue, Integer typeId) {
-		Query query = entityManager.createQuery("select x from CriteriaTypeOption x where x.optionValue=? and x.criteriaTypeId=?");
+		Query query = entityManager.createQuery("select x from CriteriaTypeOption x where x.optionValue=?1 and x.criteriaTypeId=?2");
 		query.setParameter(1, optionValue);
 		query.setParameter(2, typeId);
 

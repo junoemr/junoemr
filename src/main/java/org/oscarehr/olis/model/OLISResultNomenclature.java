@@ -18,7 +18,7 @@ import org.oscarehr.common.model.AbstractModel;
 @Entity
 public class OLISResultNomenclature extends AbstractModel<String> {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private String id;
 	private String name;
 	private String nameId;

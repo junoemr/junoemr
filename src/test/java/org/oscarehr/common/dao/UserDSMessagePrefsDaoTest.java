@@ -33,14 +33,21 @@ import java.util.Hashtable;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.UserDSMessagePrefs;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class UserDSMessagePrefsDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class UserDSMessagePrefsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected UserDSMessagePrefsDao userDSMessagePrefsDao;
 
-	protected UserDSMessagePrefsDao dao = SpringUtils.getBean(UserDSMessagePrefsDao.class);
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	@Before
@@ -52,7 +59,7 @@ public class UserDSMessagePrefsDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		UserDSMessagePrefs entity = new UserDSMessagePrefs();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		userDSMessagePrefsDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
@@ -73,24 +80,24 @@ public class UserDSMessagePrefsDaoTest extends DaoTestFixtures {
 		userDSMessagePrefs1.setProviderNo(providerNo1);
 		userDSMessagePrefs1.setResourceType(resourceType1);
 		userDSMessagePrefs1.setArchived(isArchived);
-		dao.persist(userDSMessagePrefs1);
+		userDSMessagePrefsDao.persist(userDSMessagePrefs1);
 		
 		UserDSMessagePrefs userDSMessagePrefs2 = new UserDSMessagePrefs();
 		EntityDataGenerator.generateTestDataForModelClass(userDSMessagePrefs2);
 		userDSMessagePrefs2.setProviderNo(providerNo2);
 		userDSMessagePrefs2.setResourceType(resourceType2);
 		userDSMessagePrefs2.setArchived(isArchived);
-		dao.persist(userDSMessagePrefs2);
+		userDSMessagePrefsDao.persist(userDSMessagePrefs2);
 		
 		UserDSMessagePrefs userDSMessagePrefs3 = new UserDSMessagePrefs();
 		EntityDataGenerator.generateTestDataForModelClass(userDSMessagePrefs3);
 		userDSMessagePrefs3.setProviderNo(providerNo1);
 		userDSMessagePrefs3.setResourceType(resourceType1);
 		userDSMessagePrefs3.setArchived(!isArchived);
-		dao.persist(userDSMessagePrefs3);
+		userDSMessagePrefsDao.persist(userDSMessagePrefs3);
 		
 		UserDSMessagePrefs expectedResult = userDSMessagePrefs1;
-		UserDSMessagePrefs result = dao.getMessagePrefsOnType(providerNo1, resourceType1);
+		UserDSMessagePrefs result = userDSMessagePrefsDao.getMessagePrefsOnType(providerNo1, resourceType1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -120,7 +127,7 @@ public class UserDSMessagePrefsDaoTest extends DaoTestFixtures {
 		userDSMessagePrefs1.setResourceType(resourceType1);
 		userDSMessagePrefs1.setArchived(isArchived);
 		userDSMessagePrefs1.setResourceUpdatedDate(resourceUpdatedDate1);
-		dao.persist(userDSMessagePrefs1);
+		userDSMessagePrefsDao.persist(userDSMessagePrefs1);
 		
 		UserDSMessagePrefs userDSMessagePrefs2 = new UserDSMessagePrefs();
 		EntityDataGenerator.generateTestDataForModelClass(userDSMessagePrefs2);
@@ -129,7 +136,7 @@ public class UserDSMessagePrefsDaoTest extends DaoTestFixtures {
 		userDSMessagePrefs2.setResourceType(resourceType2);
 		userDSMessagePrefs2.setArchived(isArchived);
 		userDSMessagePrefs2.setResourceUpdatedDate(resourceUpdatedDate2);
-		dao.persist(userDSMessagePrefs2);
+		userDSMessagePrefsDao.persist(userDSMessagePrefs2);
 		
 		UserDSMessagePrefs userDSMessagePrefs3 = new UserDSMessagePrefs();
 		EntityDataGenerator.generateTestDataForModelClass(userDSMessagePrefs3);
@@ -138,13 +145,13 @@ public class UserDSMessagePrefsDaoTest extends DaoTestFixtures {
 		userDSMessagePrefs3.setResourceType(resourceType1);
 		userDSMessagePrefs3.setArchived(!isArchived);
 		userDSMessagePrefs3.setResourceUpdatedDate(resourceUpdatedDate3);
-		dao.persist(userDSMessagePrefs3);
+		userDSMessagePrefsDao.persist(userDSMessagePrefs3);
 		
 		long longDate = resourceUpdatedDate1.getTime();
 		
 		Hashtable<String,Long> expectedResult = new Hashtable<String,Long>();
 		expectedResult.put(resourceType1+resourceId1, longDate);
-		Hashtable<String,Long> result = dao.getHashofMessages(providerNo1, resourceType1);
+		Hashtable<String,Long> result = userDSMessagePrefsDao.getHashofMessages(providerNo1, resourceType1);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -169,7 +176,7 @@ public class UserDSMessagePrefsDaoTest extends DaoTestFixtures {
 		userDSMessagePrefs1.setResourceType(resourceType1);
 		userDSMessagePrefs1.setArchived(isArchived);
 		userDSMessagePrefs1.setResourceId(resourceId1);
-		dao.persist(userDSMessagePrefs1);
+		userDSMessagePrefsDao.persist(userDSMessagePrefs1);
 		
 		UserDSMessagePrefs userDSMessagePrefs2 = new UserDSMessagePrefs();
 		EntityDataGenerator.generateTestDataForModelClass(userDSMessagePrefs2);
@@ -177,7 +184,7 @@ public class UserDSMessagePrefsDaoTest extends DaoTestFixtures {
 		userDSMessagePrefs2.setResourceType(resourceType2);
 		userDSMessagePrefs2.setArchived(isArchived);
 		userDSMessagePrefs2.setResourceId(resourceId2);
-		dao.persist(userDSMessagePrefs2);
+		userDSMessagePrefsDao.persist(userDSMessagePrefs2);
 		
 		UserDSMessagePrefs userDSMessagePrefs3 = new UserDSMessagePrefs();
 		EntityDataGenerator.generateTestDataForModelClass(userDSMessagePrefs3);
@@ -185,7 +192,7 @@ public class UserDSMessagePrefsDaoTest extends DaoTestFixtures {
 		userDSMessagePrefs3.setResourceType(resourceType1);
 		userDSMessagePrefs3.setArchived(!isArchived);
 		userDSMessagePrefs3.setResourceId(resourceId1);
-		dao.persist(userDSMessagePrefs3);
+		userDSMessagePrefsDao.persist(userDSMessagePrefs3);
 		
 		UserDSMessagePrefs userDSMessagePrefs4 = new UserDSMessagePrefs();
 		EntityDataGenerator.generateTestDataForModelClass(userDSMessagePrefs4);
@@ -193,7 +200,7 @@ public class UserDSMessagePrefsDaoTest extends DaoTestFixtures {
 		userDSMessagePrefs4.setResourceType(resourceType1);
 		userDSMessagePrefs4.setArchived(isArchived);
 		userDSMessagePrefs4.setResourceId(resourceId1);
-		dao.persist(userDSMessagePrefs4);
+		userDSMessagePrefsDao.persist(userDSMessagePrefs4);
 		
 		UserDSMessagePrefs userDSMessagePrefs5 = new UserDSMessagePrefs();
 		EntityDataGenerator.generateTestDataForModelClass(userDSMessagePrefs5);
@@ -201,10 +208,10 @@ public class UserDSMessagePrefsDaoTest extends DaoTestFixtures {
 		userDSMessagePrefs5.setResourceType(resourceType1);
 		userDSMessagePrefs5.setArchived(isArchived);
 		userDSMessagePrefs5.setResourceId(resourceId2);
-		dao.persist(userDSMessagePrefs5);
+		userDSMessagePrefsDao.persist(userDSMessagePrefs5);
 		
 		UserDSMessagePrefs expectedResult = userDSMessagePrefs1;
-		UserDSMessagePrefs result = dao.getDsMessage(providerNo1, resourceType1, resourceId1, isArchived);
+		UserDSMessagePrefs result = userDSMessagePrefsDao.getDsMessage(providerNo1, resourceType1, resourceId1, isArchived);
 		
 		assertEquals(expectedResult, result);
 	}

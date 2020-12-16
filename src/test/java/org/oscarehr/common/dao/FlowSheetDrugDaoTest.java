@@ -34,15 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.FlowSheetDrug;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class FlowSheetDrugDaoTest extends DaoTestFixtures {
-
-	protected FlowSheetDrugDao dao = SpringUtils.getBean(FlowSheetDrugDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class FlowSheetDrugDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected FlowSheetDrugDao flowSheetDrugDao;
 
 	@Before
 	public void before() throws Exception {
@@ -53,7 +59,7 @@ public class FlowSheetDrugDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 FlowSheetDrug entity = new FlowSheetDrug();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                flowSheetDrugDao.persist(entity);
 
                 assertNotNull(entity.getId());
         }
@@ -74,24 +80,24 @@ public class FlowSheetDrugDaoTest extends DaoTestFixtures {
 		flowSheetDrug1.setFlowsheet(flowsheet1);
 		flowSheetDrug1.setArchived(!isArchived);
 		flowSheetDrug1.setDemographicNo(demographicNo1);
-		dao.persist(flowSheetDrug1);
+		flowSheetDrugDao.persist(flowSheetDrug1);
 		
 		FlowSheetDrug flowSheetDrug2 = new FlowSheetDrug();
 		EntityDataGenerator.generateTestDataForModelClass(flowSheetDrug2);
 		flowSheetDrug2.setFlowsheet(flowsheet2);
 		flowSheetDrug2.setArchived(!isArchived);
 		flowSheetDrug2.setDemographicNo(demographicNo2);
-		dao.persist(flowSheetDrug2);
+		flowSheetDrugDao.persist(flowSheetDrug2);
 		
 		FlowSheetDrug flowSheetDrug3 = new FlowSheetDrug();
 		EntityDataGenerator.generateTestDataForModelClass(flowSheetDrug3);
 		flowSheetDrug3.setFlowsheet(flowsheet1);
 		flowSheetDrug3.setArchived(!isArchived);
 		flowSheetDrug3.setDemographicNo(demographicNo1);
-		dao.persist(flowSheetDrug3);
+		flowSheetDrugDao.persist(flowSheetDrug3);
 		
 		List<FlowSheetDrug> expectedResult = new ArrayList<FlowSheetDrug>(Arrays.asList(flowSheetDrug1, flowSheetDrug3));
-		List<FlowSheetDrug> result = dao.getFlowSheetDrugs(flowsheet1, demographicNo1);
+		List<FlowSheetDrug> result = flowSheetDrugDao.getFlowSheetDrugs(flowsheet1, demographicNo1);
 		
 		Logger logger = MiscUtils.getLogger();
 		

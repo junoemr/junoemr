@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.FileUploadCheck;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class FileUploadCheckDaoTest extends DaoTestFixtures {
-
-	protected FileUploadCheckDao dao = SpringUtils.getBean(FileUploadCheckDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class FileUploadCheckDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected FileUploadCheckDao fileUploadCheckDao;
 
 	@Before
 	public void before() throws Exception {
@@ -45,12 +51,12 @@ public class FileUploadCheckDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		FileUploadCheck entity = new FileUploadCheck();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		fileUploadCheckDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testFind() {
-		assertNotNull(dao.findByMd5Sum("MD"));
+		assertNotNull(fileUploadCheckDao.findByMd5Sum("MD"));
 	}
 }

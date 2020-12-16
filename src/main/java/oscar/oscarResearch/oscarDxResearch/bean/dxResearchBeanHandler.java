@@ -72,7 +72,7 @@ public class dxResearchBeanHandler {
 		return verdict;
 	}
 
-	public Vector<dxResearchBean> getDxResearchBeanVector() {
+	public Vector<dxResearchBean> getDxResearchBeans() {
 		return dxResearchBeanVector;
 	}
 

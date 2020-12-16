@@ -33,15 +33,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlRelationships;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlRelationshipsDaoTest extends DaoTestFixtures {
-
-	protected CtlRelationshipsDao dao = SpringUtils.getBean(CtlRelationshipsDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlRelationshipsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlRelationshipsDao ctlRelationshipsDao;
 
 	@Before
 	public void before() throws Exception {
@@ -53,7 +59,7 @@ public class CtlRelationshipsDaoTest extends DaoTestFixtures {
 		CtlRelationships entity = new CtlRelationships();
 		entity.setValue("value");
 		entity.setLabel("label");
-		dao.persist(entity);
+		ctlRelationshipsDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -65,20 +71,20 @@ public class CtlRelationshipsDaoTest extends DaoTestFixtures {
 		CtlRelationships ctlRelation1 = new CtlRelationships();
 		EntityDataGenerator.generateTestDataForModelClass(ctlRelation1);
 		ctlRelation1.setActive(isActive);
-		dao.persist(ctlRelation1);
+		ctlRelationshipsDao.persist(ctlRelation1);
 		
 		CtlRelationships ctlRelation2 = new CtlRelationships();
 		EntityDataGenerator.generateTestDataForModelClass(ctlRelation2);
 		ctlRelation2.setActive(!isActive);
-		dao.persist(ctlRelation2);
+		ctlRelationshipsDao.persist(ctlRelation2);
 		
 		CtlRelationships ctlRelation3 = new CtlRelationships();
 		EntityDataGenerator.generateTestDataForModelClass(ctlRelation3);
 		ctlRelation3.setActive(isActive);
-		dao.persist(ctlRelation3);
+		ctlRelationshipsDao.persist(ctlRelation3);
 		
 		List<CtlRelationships> expectedResult = new ArrayList<CtlRelationships>(Arrays.asList(ctlRelation1, ctlRelation3));
-		List<CtlRelationships> result = dao.findAllActive();
+		List<CtlRelationships> result = ctlRelationshipsDao.findAllActive();
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -107,22 +113,22 @@ public class CtlRelationshipsDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(ctlRelation1);
 		ctlRelation1.setActive(!isActive);
 		ctlRelation1.setValue(value1);
-		dao.persist(ctlRelation1);
+		ctlRelationshipsDao.persist(ctlRelation1);
 		
 		CtlRelationships ctlRelation2 = new CtlRelationships();
 		EntityDataGenerator.generateTestDataForModelClass(ctlRelation2);
 		ctlRelation2.setActive(isActive);
 		ctlRelation2.setValue(value2);
-		dao.persist(ctlRelation2);
+		ctlRelationshipsDao.persist(ctlRelation2);
 		
 		CtlRelationships ctlRelation3 = new CtlRelationships();
 		EntityDataGenerator.generateTestDataForModelClass(ctlRelation3);
 		ctlRelation3.setActive(isActive);
 		ctlRelation3.setValue(value1);
-		dao.persist(ctlRelation3);
+		ctlRelationshipsDao.persist(ctlRelation3);
 		
 		CtlRelationships expectedResult = ctlRelation3;
-		CtlRelationships result = dao.findByValue(value1);
+		CtlRelationships result = ctlRelationshipsDao.findByValue(value1);
 		
 		assertEquals(expectedResult, result);				
 	}

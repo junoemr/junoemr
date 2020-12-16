@@ -69,4 +69,18 @@ public class CaseManagementNoteLinkDao extends AbstractDao<CaseManagementNoteLin
 
 		return this.getSingleResultOrNull(query);
 	}
+	public CaseManagementNoteLink getNoteLinkByTableIdAndTableName(Integer noteId, Integer tableName)
+	{
+		String jpql = "SELECT c \n" +
+				"FROM model_CaseManagementNoteLink c \n" +
+				"WHERE c.tableId = :noteId\n" +
+				"AND c.tableName = :tableName\n";
+
+		Query query = entityManager.createQuery(jpql);
+		query.setParameter("noteId", noteId);
+		query.setParameter("tableName", tableName);
+		query.setMaxResults(1);
+
+		return this.getSingleResultOrNull(query);
+	}
 }

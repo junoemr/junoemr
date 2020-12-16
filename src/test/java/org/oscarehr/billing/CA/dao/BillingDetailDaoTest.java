@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.model.BillingDetail;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingDetailDaoTest extends DaoTestFixtures {
-
-	public BillingDetailDao dao = SpringUtils.getBean(BillingDetailDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingDetailDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public BillingDetailDao billingDetailDao;
 
 	public BillingDetailDaoTest() {
 	}
@@ -49,12 +55,12 @@ public class BillingDetailDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		BillingDetail entity = new BillingDetail();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		billingDetailDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testFindByBillingNoAndStatus() {
-		assertNotNull(dao.findByBillingNoAndStatus(100, "STS"));
+		assertNotNull(billingDetailDao.findByBillingNoAndStatus(100, "STS"));
 	}
 }

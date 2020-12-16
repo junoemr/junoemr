@@ -54,7 +54,7 @@ public class ProgramQueueDao extends HibernateDaoSupport {
             throw new IllegalArgumentException();
         }
 
-        String queryStr = " FROM ProgramQueue q WHERE q.ProgramId=? ORDER BY  q.Id  ";
+        String queryStr = " FROM ProgramQueue q WHERE q.ProgramId=?0 ORDER BY  q.Id  ";
         List results = getHibernateTemplate().find(queryStr, programId);
 
         if (log.isDebugEnabled()) {
@@ -69,7 +69,7 @@ public class ProgramQueueDao extends HibernateDaoSupport {
             throw new IllegalArgumentException();
         }
 
-        List results = this.getHibernateTemplate().find("from ProgramQueue pq where pq.ProgramId = ? and pq.Status = 'active' order by pq.ReferralDate", Long.valueOf(programId));
+        List results = this.getHibernateTemplate().find("from ProgramQueue pq where pq.ProgramId = ?0 and pq.Status = 'active' order by pq.ReferralDate", Long.valueOf(programId));
 
         if (log.isDebugEnabled()) {
             log.debug("getActiveProgramQueuesByProgramId: programId=" + programId + ",# of results=" + results.size());
@@ -100,7 +100,7 @@ public class ProgramQueueDao extends HibernateDaoSupport {
         }
 
         ProgramQueue result = null;
-        List results = this.getHibernateTemplate().find("from ProgramQueue pq where pq.ProgramId = ? and pq.ClientId = ?",
+        List results = this.getHibernateTemplate().find("from ProgramQueue pq where pq.ProgramId = ?0 and pq.ClientId = ?1",
                 new Object[]{Long.valueOf(programId), Long.valueOf(clientId)});
 
         if (!results.isEmpty()) {
@@ -124,7 +124,7 @@ public class ProgramQueueDao extends HibernateDaoSupport {
 
         ProgramQueue result = null;
 
-        List results = this.getHibernateTemplate().find("from ProgramQueue pq where pq.ProgramId = ? and pq.ClientId = ? and pq.Status='active'",
+        List results = this.getHibernateTemplate().find("from ProgramQueue pq where pq.ProgramId = ?0 and pq.ClientId = ?1 and pq.Status='active'",
                 new Object[]{programId, demographicNo});
         if (!results.isEmpty()) {
             result = (ProgramQueue) results.get(0);

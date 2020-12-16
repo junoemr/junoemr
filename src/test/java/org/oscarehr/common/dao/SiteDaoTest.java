@@ -30,6 +30,7 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
@@ -38,10 +39,16 @@ import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.ProviderSitePK;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SiteDaoTest extends DaoTestFixtures {
-
-	protected SiteDao dao = SpringUtils.getBean(SiteDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SiteDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected SiteDao siteDao;
 
 	public SiteDaoTest() {
 	}
@@ -57,9 +64,9 @@ public class SiteDaoTest extends DaoTestFixtures {
 		Site entity = new Site();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setStatus((byte)1);
-		dao.persist(entity);
+		siteDao.persist(entity);
 		assertNotNull(entity.getId());
-		assertNotNull(dao.find(entity.getId()));
+		assertNotNull(siteDao.find(entity.getId()));
 	}
 
 	@Test
@@ -68,7 +75,7 @@ public class SiteDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setStatus((byte)1);
 		entity.setShortName("name1");
-		dao.persist(entity);
+		siteDao.persist(entity);
 		assertNotNull(entity.getId());
 		Integer siteId1 = entity.getId();
 
@@ -76,7 +83,7 @@ public class SiteDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setStatus((byte)1);
 		entity.setShortName("name2");
-		dao.persist(entity);
+		siteDao.persist(entity);
 		assertNotNull(entity.getId());
 		Integer siteId2 = entity.getId();
 
@@ -107,7 +114,7 @@ public class SiteDaoTest extends DaoTestFixtures {
 		ps.getId().setSiteId(siteId2);
 		providerSiteDao.persist(ps);
 
-		Site s = dao.find(siteId1);
+		Site s = siteDao.find(siteId1);
 		assertNotNull(s.getProviders());
 		assertEquals(s.getProviders().size(),1);
 	}

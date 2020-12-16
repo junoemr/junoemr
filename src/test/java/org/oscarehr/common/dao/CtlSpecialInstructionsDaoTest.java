@@ -34,15 +34,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlSpecialInstructions;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlSpecialInstructionsDaoTest extends DaoTestFixtures {
-
-	protected CtlSpecialInstructionsDao dao = (CtlSpecialInstructionsDao)SpringUtils.getBean("ctlSpecialInstructionsDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlSpecialInstructionsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlSpecialInstructionsDao ctlSpecialInstructionsDao;
 
 	@Before
 	public void before() throws Exception {
@@ -53,7 +59,7 @@ public class CtlSpecialInstructionsDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 CtlSpecialInstructions entity = new CtlSpecialInstructions();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                ctlSpecialInstructionsDao.persist(entity);
                 assertNotNull(entity.getId());
         }
 
@@ -62,26 +68,26 @@ public class CtlSpecialInstructionsDaoTest extends DaoTestFixtures {
 
 		CtlSpecialInstructions ctlSpecialInstructions1 = new CtlSpecialInstructions();
 		EntityDataGenerator.generateTestDataForModelClass(ctlSpecialInstructions1);
-		dao.persist(ctlSpecialInstructions1);
+		ctlSpecialInstructionsDao.persist(ctlSpecialInstructions1);
 		
 		CtlSpecialInstructions ctlSpecialInstructions2 = new CtlSpecialInstructions();
 		EntityDataGenerator.generateTestDataForModelClass(ctlSpecialInstructions2);
-		dao.persist(ctlSpecialInstructions2);
+		ctlSpecialInstructionsDao.persist(ctlSpecialInstructions2);
 		
 		CtlSpecialInstructions ctlSpecialInstructions3 = new CtlSpecialInstructions();
 		EntityDataGenerator.generateTestDataForModelClass(ctlSpecialInstructions3);
-		dao.persist(ctlSpecialInstructions3);
+		ctlSpecialInstructionsDao.persist(ctlSpecialInstructions3);
 		
 		CtlSpecialInstructions ctlSpecialInstructions4 = new CtlSpecialInstructions();
 		EntityDataGenerator.generateTestDataForModelClass(ctlSpecialInstructions4);
-		dao.persist(ctlSpecialInstructions4);
+		ctlSpecialInstructionsDao.persist(ctlSpecialInstructions4);
 		
 		CtlSpecialInstructions ctlSpecialInstructions5 = new CtlSpecialInstructions();
 		EntityDataGenerator.generateTestDataForModelClass(ctlSpecialInstructions5);
-		dao.persist(ctlSpecialInstructions5);
+		ctlSpecialInstructionsDao.persist(ctlSpecialInstructions5);
 		
 		List<CtlSpecialInstructions> expectedResult = new ArrayList<CtlSpecialInstructions>(Arrays.asList(ctlSpecialInstructions1, ctlSpecialInstructions2, ctlSpecialInstructions3, ctlSpecialInstructions4, ctlSpecialInstructions5));
-		List<CtlSpecialInstructions> result = dao.findAll();
+		List<CtlSpecialInstructions> result = ctlSpecialInstructionsDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		

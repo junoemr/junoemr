@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Appointment;
@@ -39,12 +40,21 @@ import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.util.SpringUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.util.ConversionUtils;
 
-public class WaitingListDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class WaitingListDaoTest extends DaoTestFixtures
+{
 
-	protected WaitingListDao dao = SpringUtils.getBean(WaitingListDao.class);
-	protected DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	@Autowired
+	protected WaitingListDao dao;
+
+	@Autowired
+	protected DemographicDao demographicDao;
 
 	private WaitingListName wn;
 	private Demographic demographic;

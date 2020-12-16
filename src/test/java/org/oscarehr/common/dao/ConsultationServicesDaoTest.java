@@ -32,14 +32,20 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ConsultationServices;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ConsultationServicesDaoTest extends DaoTestFixtures {
-
-	protected ConsultationServiceDao dao = (ConsultationServiceDao) SpringUtils.getBean("consultationServiceDao");
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ConsultationServicesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ConsultationServiceDao consultationServiceDao;
 
 	@Before
 	public void before() throws Exception {
@@ -50,7 +56,7 @@ public class ConsultationServicesDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		ConsultationServices entity = new ConsultationServices();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		consultationServiceDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -62,10 +68,10 @@ public class ConsultationServicesDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(consultation2);
 		ConsultationServices consultation3 = new ConsultationServices();
 		EntityDataGenerator.generateTestDataForModelClass(consultation3);
-		dao.persist(consultation1);
-		dao.persist(consultation2);
-		dao.persist(consultation3);
-		List<ConsultationServices> result = dao.findAll();
+		consultationServiceDao.persist(consultation1);
+		consultationServiceDao.persist(consultation2);
+		consultationServiceDao.persist(consultation3);
+		List<ConsultationServices> result = consultationServiceDao.findAll();
 		List<ConsultationServices> expectedResult = new ArrayList<ConsultationServices>(Arrays.asList(consultation1, consultation2, consultation3));
 
 		assertTrue(result.containsAll(expectedResult));
@@ -79,9 +85,9 @@ public class ConsultationServicesDaoTest extends DaoTestFixtures {
 		ConsultationServices inactiveConsult = new ConsultationServices();
 		EntityDataGenerator.generateTestDataForModelClass(activeConsult);
 		activeConsult.setActive("0");
-		dao.persist(activeConsult);
-		dao.persist(inactiveConsult);
-		List<ConsultationServices> all = dao.findAll();
+		consultationServiceDao.persist(activeConsult);
+		consultationServiceDao.persist(inactiveConsult);
+		List<ConsultationServices> all = consultationServiceDao.findAll();
 		assertTrue(all.contains(inactiveConsult));
 	}
 

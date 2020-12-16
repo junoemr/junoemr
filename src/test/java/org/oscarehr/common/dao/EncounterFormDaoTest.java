@@ -33,15 +33,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.EncounterForm;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class EncounterFormDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EncounterFormDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected EncounterFormDao encounterFormDao;
 
-	protected EncounterFormDao dao = (EncounterFormDao)SpringUtils.getBean(EncounterFormDao.class);
 	Logger logger = MiscUtils.getLogger();
 
 	@Before
@@ -70,11 +77,11 @@ public class EncounterFormDaoTest extends DaoTestFixtures {
 		form3.setFormName("FormB");
 		form3.setFormValue("3");
 
-		dao.persist(form1);
-		dao.persist(form2);
-		dao.persist(form3);
+		encounterFormDao.persist(form1);
+		encounterFormDao.persist(form2);
+		encounterFormDao.persist(form3);
 
-		List<EncounterForm> result = dao.findAll();
+		List<EncounterForm> result = encounterFormDao.findAll();
 		List<EncounterForm> expectedResult = new ArrayList<EncounterForm>(Arrays.asList(
 				form1, form3, form2
 				));
@@ -120,11 +127,11 @@ public class EncounterFormDaoTest extends DaoTestFixtures {
 		form3.setFormName(formName);
 		form3.setFormValue("3");
 		
-		dao.persist(form1);
-		dao.persist(form2);
-		dao.persist(form3);
+		encounterFormDao.persist(form1);
+		encounterFormDao.persist(form2);
+		encounterFormDao.persist(form3);
 
-		List<EncounterForm> result = dao.findByFormName(formName);
+		List<EncounterForm> result = encounterFormDao.findByFormName(formName);
 		List<EncounterForm> expectedResult = new ArrayList<EncounterForm>(Arrays.asList(
 				form1, form3
 				));

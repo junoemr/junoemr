@@ -128,7 +128,7 @@ public class UserPropertyDAO extends AbstractDao<UserProperty>
 
 	public UserProperty getProp(String prov, String name)
 	{
-		Query query = entityManager.createQuery("select p from UserProperty p where p.providerNo = ? and p.name = ?");
+		Query query = entityManager.createQuery("select p from UserProperty p where p.providerNo = ?1 and p.name = ?2");
 		query.setParameter(1, prov);
 		query.setParameter(2, name);
 
@@ -147,7 +147,7 @@ public class UserPropertyDAO extends AbstractDao<UserProperty>
 
 	public UserProperty getProp(String name)
 	{
-		Query query = entityManager.createQuery("select p from UserProperty p where p.name = ?");
+		Query query = entityManager.createQuery("select p from UserProperty p where p.name = ?1");
 		query.setParameter(1, name);
 
 		@SuppressWarnings("unchecked")
@@ -165,7 +165,7 @@ public class UserPropertyDAO extends AbstractDao<UserProperty>
 
 	public List<UserProperty> getDemographicProperties(String providerNo)
 	{
-		Query query = entityManager.createQuery("select p from UserProperty p where p.providerNo = ?");
+		Query query = entityManager.createQuery("select p from UserProperty p where p.providerNo = ?1");
 		query.setParameter(1, providerNo);
 
 		@SuppressWarnings("unchecked")
@@ -178,7 +178,7 @@ public class UserPropertyDAO extends AbstractDao<UserProperty>
 	{
 		Map<String, String> map = new HashMap<String, String>();
 
-		Query query = entityManager.createQuery("select p from UserProperty p where p.providerNo = ?");
+		Query query = entityManager.createQuery("select p from UserProperty p where p.providerNo = ?1");
 		query.setParameter(1, providerNo);
 
 		@SuppressWarnings("unchecked")

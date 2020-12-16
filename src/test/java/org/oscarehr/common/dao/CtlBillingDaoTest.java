@@ -30,12 +30,18 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlBillingDaoTest extends DaoTestFixtures {
-
-	protected CtlBillingServiceDao dao = SpringUtils.getBean(CtlBillingServiceDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlBillingDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlBillingServiceDao ctlBillingServiceDao;
 
 	@Before
 	public void before() throws Exception {
@@ -44,7 +50,7 @@ public class CtlBillingDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testGetUniqueServiceTypes() {
-		List<Object[]> serviceTypes = dao.getUniqueServiceTypes();
+		List<Object[]> serviceTypes = ctlBillingServiceDao.getUniqueServiceTypes();
 
 		assertNotNull(serviceTypes);
 		assertFalse(serviceTypes.isEmpty());

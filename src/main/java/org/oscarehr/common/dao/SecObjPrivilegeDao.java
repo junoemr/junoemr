@@ -67,7 +67,7 @@ public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege> {
 	}
 
 	public List<SecObjPrivilege> findByRoleUserGroup(String roleUserGroup) {
-		String sql = "select s FROM SecObjPrivilege s WHERE s.id.roleUserGroup like ? order by s.id.roleUserGroup, s.id.objectName";
+		String sql = "select s FROM SecObjPrivilege s WHERE s.id.roleUserGroup like ?1 order by s.id.roleUserGroup, s.id.objectName";
 
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, roleUserGroup);
@@ -78,7 +78,7 @@ public class SecObjPrivilegeDao extends AbstractDao<SecObjPrivilege> {
 	}
 
 	public List<SecObjPrivilege> findByObjectName(String objectName) {
-		String sql = "select s FROM SecObjPrivilege s WHERE s.id.objectName like ? order by s.id.objectName, s.id.roleUserGroup";
+		String sql = "select s FROM SecObjPrivilege s WHERE s.id.objectName like ?1 order by s.id.objectName, s.id.roleUserGroup";
 
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, objectName);

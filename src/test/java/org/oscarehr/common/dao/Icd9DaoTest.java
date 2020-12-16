@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Icd9;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class Icd9DaoTest extends DaoTestFixtures {
-
-	protected Icd9Dao dao = SpringUtils.getBean(Icd9Dao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class Icd9DaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected Icd9Dao icd9Dao;
 
 	public Icd9DaoTest() {
 	}
@@ -49,13 +55,13 @@ public class Icd9DaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Icd9 entity = new Icd9();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		icd9Dao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
 	
 	@Test
 	public void testFindByCodingSystem() {
-		dao.findByCodingSystem("CS");
+		icd9Dao.findByCodingSystem("CS");
 	}
 }

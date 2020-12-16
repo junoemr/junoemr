@@ -235,7 +235,7 @@ public class FluReport implements PreventionReport {
              }else{
                 EctMeasurementsDataBeanHandler measurementData = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
                 log.debug("getting FLUF data for "+prd.demographicNo);
-                Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsDataVector();
+                Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsData();
 
                 if ( fluFollowupData.size() > 0 ){
                       EctMeasurementsDataBean fluData = fluFollowupData.iterator().next();
@@ -401,7 +401,7 @@ public class FluReport implements PreventionReport {
               EctMeasurementsDataBeanHandler measurementData = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
               log.debug("getting FLUF data for "+prd.demographicNo);
 
-              Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsDataVector();
+              Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsData();
               //NO Contact
 
               if ( fluFollowupData.size() == 0 ){
@@ -441,7 +441,7 @@ public class FluReport implements PreventionReport {
           }else if ("Refused".equals(prd.state)){  //Not sure what to do about refused
               EctMeasurementsDataBeanHandler measurementData = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
               log.debug("getting FLUF data for "+prd.demographicNo);
-              Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsDataVector();
+              Collection<EctMeasurementsDataBean> fluFollowupData = measurementData.getMeasurementsData();
 
               if ( fluFollowupData.size() > 0 ){
                   EctMeasurementsDataBean fluData = fluFollowupData.iterator().next();
@@ -458,7 +458,7 @@ public class FluReport implements PreventionReport {
                 //Do nothing
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,"FLUF");
               log.debug("getting followup data for "+prd.demographicNo);
-              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsData();
 
               if ( followupData.size() > 0 ){
                   EctMeasurementsDataBean measurementData = followupData.iterator().next();

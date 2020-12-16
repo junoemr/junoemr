@@ -32,15 +32,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.TicklerLink;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class TicklerLinkDaoTest extends DaoTestFixtures {
-
-	protected TicklerLinkDao dao = SpringUtils.getBean(TicklerLinkDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class TicklerLinkDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected TicklerLinkDao ticklerLinkDao;
 
 	@Before
 	public void before() throws Exception {
@@ -51,7 +57,7 @@ public class TicklerLinkDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		TicklerLink entity = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		ticklerLinkDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -68,28 +74,28 @@ public class TicklerLinkDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink1);
 		ticklerLink1.setTableName(tableName1);
 		ticklerLink1.setTableId(tableId1);
-		dao.persist(ticklerLink1);
+		ticklerLinkDao.persist(ticklerLink1);
 		
 		TicklerLink ticklerLink2 = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink2);
 		ticklerLink2.setTableName(tableName2);
 		ticklerLink2.setTableId(tableId1);
-		dao.persist(ticklerLink2);
+		ticklerLinkDao.persist(ticklerLink2);
 		
 		TicklerLink ticklerLink3 = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink3);
 		ticklerLink3.setTableName(tableName1);
 		ticklerLink3.setTableId(tableId1);
-		dao.persist(ticklerLink3);
+		ticklerLinkDao.persist(ticklerLink3);
 		
 		TicklerLink ticklerLink4 = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink4);
 		ticklerLink4.setTableName(tableName1);
 		ticklerLink4.setTableId(tableId2);
-		dao.persist(ticklerLink4);
+		ticklerLinkDao.persist(ticklerLink4);
 		
 		List<TicklerLink> expectedResult = new ArrayList<TicklerLink>(Arrays.asList(ticklerLink1, ticklerLink3));		
-		List<TicklerLink> result = dao.getLinkByTableId(tableName1, tableId1);
+		List<TicklerLink> result = ticklerLinkDao.getLinkByTableId(tableName1, tableId1);
 		
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {
@@ -115,25 +121,25 @@ public class TicklerLinkDaoTest extends DaoTestFixtures {
 		TicklerLink ticklerLink1 = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink1);
 		ticklerLink1.setTicklerNo(ticklerNo1);
-		dao.persist(ticklerLink1);
+		ticklerLinkDao.persist(ticklerLink1);
 		
 		TicklerLink ticklerLink2 = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink2);
 		ticklerLink2.setTicklerNo(ticklerNo2);
-		dao.persist(ticklerLink2);
+		ticklerLinkDao.persist(ticklerLink2);
 		
 		TicklerLink ticklerLink3 = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink3);
 		ticklerLink3.setTicklerNo(ticklerNo1);
-		dao.persist(ticklerLink3);
+		ticklerLinkDao.persist(ticklerLink3);
 		
 		TicklerLink ticklerLink4 = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink4);
 		ticklerLink4.setTicklerNo(ticklerNo1);
-		dao.persist(ticklerLink4);
+		ticklerLinkDao.persist(ticklerLink4);
 		
 		List<TicklerLink> expectedResult = new ArrayList<TicklerLink>(Arrays.asList(ticklerLink1, ticklerLink3, ticklerLink4));		
-		List<TicklerLink> result = dao.getLinkByTickler(ticklerNo1);
+		List<TicklerLink> result = ticklerLinkDao.getLinkByTickler(ticklerNo1);
 		
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {

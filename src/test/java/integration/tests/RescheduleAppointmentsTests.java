@@ -26,8 +26,10 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -36,6 +38,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.awt.AWTException;
 import java.util.List;
@@ -50,17 +53,20 @@ public class RescheduleAppointmentsTests extends SeleniumTestBase
     static String patientLName = "Test";
     static String patientName = patientLName + "," + patientFName;
 
-    @BeforeClass
-    public static void setup() throws Exception
+    @Autowired
+    DatabaseUtil databaseUtil;
+
+    @Before
+    public void setup() throws Exception
     {
         loadSpringBeans();
-        DatabaseUtil.createTestDemographic(patientFName, patientLName, "F");
-        DatabaseUtil.createTestProvider();
-        DatabaseUtil.createProviderSite();
+        databaseUtil.createTestDemographic(patientFName, patientLName, "F");
+        databaseUtil.createTestProvider();
+        databaseUtil.createProviderSite();
     }
 
-    @AfterClass
-    public static void cleanup() throws Exception
+    @After
+    public void cleanup() throws Exception
     {
         SchemaUtils.restoreTable("admission", "appointment","appointmentArchive", "billingservice", "caisi_role",
                 "demographic", "documentDescriptionTemplate", "Facility", "issue", "log", "log_ws_rest", "LookupList",

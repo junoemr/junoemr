@@ -28,14 +28,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Diseases;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DiseasesDaoTest extends DaoTestFixtures {
-
-	protected DiseasesDao dao = SpringUtils.getBean(DiseasesDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DiseasesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DiseasesDao diseasesDao;
 
 	public DiseasesDaoTest() {
 	}
@@ -50,7 +56,7 @@ public class DiseasesDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Diseases entity = new Diseases();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		diseasesDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
@@ -60,9 +66,9 @@ public class DiseasesDaoTest extends DaoTestFixtures {
 		Diseases entity = new Diseases();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographicNo(1);
-		dao.persist(entity);
+		diseasesDao.persist(entity);
 
-		assertEquals(1,dao.findByDemographicNo(1).size());
+		assertEquals(1, diseasesDao.findByDemographicNo(1).size());
 	}
 
 	@Test
@@ -71,8 +77,8 @@ public class DiseasesDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographicNo(1);
 		entity.setIcd9Entry("250");
-		dao.persist(entity);
+		diseasesDao.persist(entity);
 
-		assertEquals(1,dao.findByIcd9("250").size());
+		assertEquals(1, diseasesDao.findByIcd9("250").size());
 	}
 }

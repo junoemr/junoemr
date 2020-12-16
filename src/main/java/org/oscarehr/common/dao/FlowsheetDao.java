@@ -49,7 +49,7 @@ public class FlowsheetDao extends AbstractDao<Flowsheet>{
 	}
 	
 	public Flowsheet findByName(String name) {
-		Query query = entityManager.createQuery("select f from Flowsheet f where f.name=?");
+		Query query = entityManager.createQuery("select f from Flowsheet f where f.name=?1");
 		query.setParameter(1, name);
 		
 		return getSingleResultOrNull(query);

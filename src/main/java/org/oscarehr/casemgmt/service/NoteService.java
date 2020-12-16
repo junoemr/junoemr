@@ -24,6 +24,7 @@
 package org.oscarehr.casemgmt.service;
 
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.ws.rest.to.model.NoteSelectionTo1;
 
 /**
  * Defines contract for retrieving notes for a demographic record.
@@ -40,4 +41,6 @@ public interface NoteService {
 	 */
 	NoteSelectionResult findNotes(LoggedInInfo loggedInInfo, NoteSelectionCriteria criteria);
 
+
+	NoteSelectionTo1 searchEncounterNotes(LoggedInInfo loggedInInfo, NoteSelectionCriteria criteria);
 }

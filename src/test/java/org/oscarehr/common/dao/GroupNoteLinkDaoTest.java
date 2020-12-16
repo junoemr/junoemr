@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.GroupNoteLink;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class GroupNoteLinkDaoTest extends DaoTestFixtures {
-
-	protected GroupNoteLinkDao dao = SpringUtils.getBean(GroupNoteLinkDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class GroupNoteLinkDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected GroupNoteLinkDao groupNoteLinkDao;
 
 
 	@Before
@@ -46,7 +52,7 @@ public class GroupNoteLinkDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		GroupNoteLink entity = new GroupNoteLink();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		groupNoteLinkDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

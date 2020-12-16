@@ -32,15 +32,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.LabRequestReportLink;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class LabRequestReportLinkDaoTest extends DaoTestFixtures {
-
-	protected LabRequestReportLinkDao dao = SpringUtils.getBean(LabRequestReportLinkDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class LabRequestReportLinkDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected LabRequestReportLinkDao labRequestReportLinkDao;
 
 
 	@Before
@@ -52,7 +58,7 @@ public class LabRequestReportLinkDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		LabRequestReportLink entity = new LabRequestReportLink();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		labRequestReportLinkDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -66,40 +72,40 @@ public class LabRequestReportLinkDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(lRRL1);
 		lRRL1.setReportTable(reportTable2);
 		lRRL1.setReportId(reportId1);
-		dao.persist(lRRL1);
+		labRequestReportLinkDao.persist(lRRL1);
 		
 		LabRequestReportLink lRRL2 = new LabRequestReportLink();
 		EntityDataGenerator.generateTestDataForModelClass(lRRL2);
 		lRRL2.setReportTable(reportTable1);
 		lRRL2.setReportId(reportId1);
-		dao.persist(lRRL2);
+		labRequestReportLinkDao.persist(lRRL2);
 		
 		LabRequestReportLink lRRL3 = new LabRequestReportLink();
 		EntityDataGenerator.generateTestDataForModelClass(lRRL3);
 		lRRL3.setReportTable(reportTable1);
 		lRRL3.setReportId(reportId2);
-		dao.persist(lRRL3);
+		labRequestReportLinkDao.persist(lRRL3);
 		
 		LabRequestReportLink lRRL4 = new LabRequestReportLink();
 		EntityDataGenerator.generateTestDataForModelClass(lRRL4);
 		lRRL4.setReportTable(reportTable1);
 		lRRL4.setReportId(reportId1);
-		dao.persist(lRRL4);
+		labRequestReportLinkDao.persist(lRRL4);
 		
 		LabRequestReportLink lRRL5 = new LabRequestReportLink();
 		EntityDataGenerator.generateTestDataForModelClass(lRRL5);
 		lRRL5.setReportTable(reportTable2);
 		lRRL5.setReportId(reportId2);
-		dao.persist(lRRL5);
+		labRequestReportLinkDao.persist(lRRL5);
 		
 		LabRequestReportLink lRRL6 = new LabRequestReportLink();
 		EntityDataGenerator.generateTestDataForModelClass(lRRL6);
 		lRRL6.setReportTable(reportTable1);
 		lRRL6.setReportId(reportId1);
-		dao.persist(lRRL6);
+		labRequestReportLinkDao.persist(lRRL6);
 		
 		List<LabRequestReportLink> expectedResult = new ArrayList<LabRequestReportLink>(Arrays.asList(lRRL2, lRRL4, lRRL6));
-		List<LabRequestReportLink> result = dao.findByReportTableAndReportId(reportTable1, reportId1);
+		List<LabRequestReportLink> result = labRequestReportLinkDao.findByReportTableAndReportId(reportTable1, reportId1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -126,40 +132,40 @@ public class LabRequestReportLinkDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(lRRL1);
 		lRRL1.setRequestTable(requestTable2);
 		lRRL1.setRequestId(requestId1);
-		dao.persist(lRRL1);
+		labRequestReportLinkDao.persist(lRRL1);
 		
 		LabRequestReportLink lRRL2 = new LabRequestReportLink();
 		EntityDataGenerator.generateTestDataForModelClass(lRRL2);
 		lRRL2.setRequestTable(requestTable1);
 		lRRL2.setRequestId(requestId1);
-		dao.persist(lRRL2);
+		labRequestReportLinkDao.persist(lRRL2);
 		
 		LabRequestReportLink lRRL3 = new LabRequestReportLink();
 		EntityDataGenerator.generateTestDataForModelClass(lRRL3);
 		lRRL3.setRequestTable(requestTable1);
 		lRRL3.setRequestId(requestId2);
-		dao.persist(lRRL3);
+		labRequestReportLinkDao.persist(lRRL3);
 		
 		LabRequestReportLink lRRL4 = new LabRequestReportLink();
 		EntityDataGenerator.generateTestDataForModelClass(lRRL4);
 		lRRL4.setRequestTable(requestTable1);
 		lRRL4.setRequestId(requestId1);
-		dao.persist(lRRL4);
+		labRequestReportLinkDao.persist(lRRL4);
 		
 		LabRequestReportLink lRRL5 = new LabRequestReportLink();
 		EntityDataGenerator.generateTestDataForModelClass(lRRL5);
 		lRRL5.setRequestTable(requestTable2);
 		lRRL5.setRequestId(requestId2);
-		dao.persist(lRRL5);
+		labRequestReportLinkDao.persist(lRRL5);
 		
 		LabRequestReportLink lRRL6 = new LabRequestReportLink();
 		EntityDataGenerator.generateTestDataForModelClass(lRRL6);
 		lRRL6.setRequestTable(requestTable1);
 		lRRL6.setRequestId(requestId1);
-		dao.persist(lRRL6);
+		labRequestReportLinkDao.persist(lRRL6);
 		
 		List<LabRequestReportLink> expectedResult = new ArrayList<LabRequestReportLink>(Arrays.asList(lRRL2, lRRL4, lRRL6));
-		List<LabRequestReportLink> result = dao.findByRequestTableAndRequestId(requestTable1, requestId1);
+		List<LabRequestReportLink> result = labRequestReportLinkDao.findByRequestTableAndRequestId(requestTable1, requestId1);
 
 		Logger logger = MiscUtils.getLogger();
 		

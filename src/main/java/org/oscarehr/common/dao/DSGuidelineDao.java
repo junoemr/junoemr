@@ -39,7 +39,7 @@ public class DSGuidelineDao extends AbstractDao<DSGuideline>{
 	
 
     public DSGuideline findByUUID(String uuid) {
-        String sql = "select c from DSGuideline c where c.uuid = ? and c.status = 'A' order by c.dateStart desc";
+        String sql = "select c from DSGuideline c where c.uuid = ?1 and c.status = 'A' order by c.dateStart desc";
 
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, uuid);
@@ -56,7 +56,7 @@ public class DSGuidelineDao extends AbstractDao<DSGuideline>{
 
  
     public List<DSGuideline> getDSGuidelinesByProvider(String providerNo) {
-        String sql ="select c from DSGuideline c, DSGuidelineProviderMapping m where c.uuid = m.guidelineUUID and m.providerNo = ? and c.status = 'A'";
+        String sql ="select c from DSGuideline c, DSGuidelineProviderMapping m where c.uuid = m.guidelineUUID and m.providerNo = ?1 and c.status = 'A'";
         
         Query query = entityManager.createQuery(sql);
         query.setParameter(1, providerNo);

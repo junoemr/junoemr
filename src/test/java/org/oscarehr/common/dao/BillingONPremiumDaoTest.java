@@ -36,15 +36,22 @@ import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BillingONPremium;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingONPremiumDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingONPremiumDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BillingONPremiumDao billingONPremiumDao;
 
-	protected BillingONPremiumDao dao = (BillingONPremiumDao)SpringUtils.getBean(BillingONPremiumDao.class);
 	protected DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	@Before
@@ -105,19 +112,19 @@ public class BillingONPremiumDaoTest extends DaoTestFixtures {
 		billONPrem6.setPayDate(date6);
 		billONPrem6.setStatus(true);
 
-		dao.persist(billONPrem1);
-		dao.persist(billONPrem2);
-		dao.persist(billONPrem3);
-		dao.persist(billONPrem4);
-		dao.persist(billONPrem5);
-		dao.persist(billONPrem6);
+		billingONPremiumDao.persist(billONPrem1);
+		billingONPremiumDao.persist(billONPrem2);
+		billingONPremiumDao.persist(billONPrem3);
+		billingONPremiumDao.persist(billONPrem4);
+		billingONPremiumDao.persist(billONPrem5);
+		billingONPremiumDao.persist(billONPrem6);
 
 		List<BillingONPremium> expectedList = new ArrayList<BillingONPremium>(Arrays.asList(
 				billONPrem2,
 				billONPrem4
 				));
 
-		List<BillingONPremium> resultList = dao.getActiveRAPremiumsByPayDate(startDate, endDate, locale);
+		List<BillingONPremium> resultList = billingONPremiumDao.getActiveRAPremiumsByPayDate(startDate, endDate, locale);
 
 		// fail if list sizes aren't the same
 		if (resultList.size() != expectedList.size()) {
@@ -187,18 +194,18 @@ public class BillingONPremiumDaoTest extends DaoTestFixtures {
 		billONPrem5.setProviderNo("1");
 		billONPrem5.setStatus(true);
 
-		dao.persist(billONPrem1);
-		dao.persist(billONPrem2);
-		dao.persist(billONPrem3);
-		dao.persist(billONPrem4);
-		dao.persist(billONPrem5);
+		billingONPremiumDao.persist(billONPrem1);
+		billingONPremiumDao.persist(billONPrem2);
+		billingONPremiumDao.persist(billONPrem3);
+		billingONPremiumDao.persist(billONPrem4);
+		billingONPremiumDao.persist(billONPrem5);
 
 		List<BillingONPremium> expectedList = new ArrayList<BillingONPremium>(Arrays.asList(
 				billONPrem1,
 				billONPrem3
 				));
 
-		List<BillingONPremium> resultList = dao.getActiveRAPremiumsByProvider(provider, startDate, endDate, locale);
+		List<BillingONPremium> resultList = billingONPremiumDao.getActiveRAPremiumsByProvider(provider, startDate, endDate, locale);
 
 		// fail if list sizes aren't the same
 		if (resultList.size() != expectedList.size()) {
@@ -233,17 +240,17 @@ public class BillingONPremiumDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(billONPrem4);
 		billONPrem4.setRAHeaderNo(1);
 
-		dao.persist(billONPrem1);
-		dao.persist(billONPrem2);
-		dao.persist(billONPrem3);
-		dao.persist(billONPrem4);
+		billingONPremiumDao.persist(billONPrem1);
+		billingONPremiumDao.persist(billONPrem2);
+		billingONPremiumDao.persist(billONPrem3);
+		billingONPremiumDao.persist(billONPrem4);
 
 		List<BillingONPremium> expectedList = new ArrayList<BillingONPremium>(Arrays.asList(
 				billONPrem2,
 				billONPrem4
 				));
 
-		List<BillingONPremium> resultList = dao.getRAPremiumsByRaHeaderNo(raHeaderNo);
+		List<BillingONPremium> resultList = billingONPremiumDao.getRAPremiumsByRaHeaderNo(raHeaderNo);
 
 		// fail if list sizes aren't the same
 		if (resultList.size() != expectedList.size()) {
@@ -279,17 +286,17 @@ public class BillingONPremiumDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(billONPrem4);
 		billONPrem4.setRAHeaderNo(-1);
 
-		dao.persist(billONPrem1);
-		dao.persist(billONPrem2);
-		dao.persist(billONPrem3);
-		dao.persist(billONPrem4);
+		billingONPremiumDao.persist(billONPrem1);
+		billingONPremiumDao.persist(billONPrem2);
+		billingONPremiumDao.persist(billONPrem3);
+		billingONPremiumDao.persist(billONPrem4);
 
 		List<BillingONPremium> expectedList = new ArrayList<BillingONPremium>(Arrays.asList(
 				billONPrem2,
 				billONPrem4
 				));
 
-		List<BillingONPremium> resultList = dao.getRAPremiumsByRaHeaderNo(raHeaderNo);
+		List<BillingONPremium> resultList = billingONPremiumDao.getRAPremiumsByRaHeaderNo(raHeaderNo);
 
 		// fail if list sizes aren't the same
 		if (resultList.size() != expectedList.size()) {

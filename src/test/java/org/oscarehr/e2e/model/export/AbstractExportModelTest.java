@@ -26,9 +26,12 @@ package org.oscarehr.e2e.model.export;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.e2e.constant.Constants;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 public abstract class AbstractExportModelTest extends DaoTestFixtures {
 	@BeforeClass

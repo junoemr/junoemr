@@ -38,7 +38,7 @@ public class ProgramClientStatusDAO extends HibernateDaoSupport {
     private Logger log=MiscUtils.getLogger();
 
     public List<ProgramClientStatus> getProgramClientStatuses(Integer programId) {
-        return this.getHibernateTemplate().find("from ProgramClientStatus pcs where pcs.programId=?", programId);
+        return (List<ProgramClientStatus>) this.getHibernateTemplate().find("from ProgramClientStatus pcs where pcs.programId=?0", programId);
     }
 
     public void saveProgramClientStatus(ProgramClientStatus status) {
@@ -96,7 +96,7 @@ public class ProgramClientStatusDAO extends HibernateDaoSupport {
             throw new IllegalArgumentException();
         }
 
-        List<Admission> results = this.getHibernateTemplate().find("from Admission a where a.ProgramId = ? and a.TeamId = ? and a.AdmissionStatus='current'", new Object[] {programId, statusId});
+        List<Admission> results = (List<Admission>) this.getHibernateTemplate().find("from Admission a where a.ProgramId = ?0 and a.TeamId = ?1 and a.AdmissionStatus='current'", new Object[] {programId, statusId});
 
         if (log.isDebugEnabled()) {
             log.debug("getAdmissionsInTeam: programId= " + programId + ",statusId=" + statusId + ",# results=" + results.size());

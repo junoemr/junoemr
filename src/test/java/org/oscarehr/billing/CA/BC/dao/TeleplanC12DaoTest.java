@@ -27,15 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.TeleplanC12;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class TeleplanC12DaoTest extends DaoTestFixtures {
-
-	public TeleplanC12Dao dao = SpringUtils.getBean(TeleplanC12Dao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class TeleplanC12DaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public TeleplanC12Dao teleplanC12Dao;
 
 	public TeleplanC12DaoTest() {
 	}
@@ -49,22 +55,22 @@ public class TeleplanC12DaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		TeleplanC12 entity = new TeleplanC12();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		teleplanC12Dao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
 	@Test
 	public void testFindCurrent() {
-		assertNotNull(dao.findCurrent());
+		assertNotNull(teleplanC12Dao.findCurrent());
 	}
 	
 	@Test
 	public void testFindByOfficeClaimNo() {
-		assertNotNull(dao.findByOfficeClaimNo("100"));
+		assertNotNull(teleplanC12Dao.findByOfficeClaimNo("100"));
 	}
 	
 	@Test
 	public void testFindRejected() {
-		assertNotNull(dao.findRejected());
+		assertNotNull(teleplanC12Dao.findRejected());
 	}
 }

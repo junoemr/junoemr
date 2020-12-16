@@ -27,8 +27,6 @@ package oscar.oscarEncounter.oscarMeasurements;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -57,6 +55,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.InitializingBean;
 
+import org.springframework.core.io.Resource;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctValidationsBean;
@@ -74,7 +73,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 
     private static Logger log = MiscUtils.getLogger();
 
-    private List<File> flowSheets;
+    private List<Resource> flowSheets;
 
     ArrayList<String> dxTriggers = new ArrayList<String>();
     ArrayList<String> programTriggers = new ArrayList<String>();
@@ -255,12 +254,14 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
         //TODO: Will change this when there are more flowsheets
         log.debug("LOADING FLOWSSHEETS");
-        for (File flowSheet : flowSheets)
+        for (Resource flowSheet : flowSheets)
         {
             InputStream is = null;
             try
             {
-                is = new FileInputStream(flowSheet);
+                //is = new FileInputStream(flowSheet);
+                is = flowSheet.getInputStream();
+
                 MeasurementFlowSheet measurementFlowsheet = createflowsheet(mType, is);
 
                 //If the system flowsheet is not in the database, then load it normally. Otherwise, it has been overwritten, so only load it once from the database
@@ -902,11 +903,11 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         return flowsheets.get(flowsheetName);
     }
 
-    public List<File> getFlowSheets() {
+    public List<Resource> getFlowSheets() {
         return flowSheets;
     }
 
-    public void setFlowSheets(List<File> flowSheets) {
+    public void setFlowSheets(List<Resource> flowSheets) {
         log.debug("SETTING FLOWSHEETS");
         this.flowSheets = flowSheets;
     }

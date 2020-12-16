@@ -33,14 +33,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.StudyLogin;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class StudyLoginDaoTest extends DaoTestFixtures {
-	protected StudyLoginDao dao = SpringUtils.getBean(StudyLoginDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class StudyLoginDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected StudyLoginDao studyLoginDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -64,31 +71,31 @@ public class StudyLoginDaoTest extends DaoTestFixtures {
 		studyLogin1.setProviderNo(providerNo1);
 		studyLogin1.setStudyNo(studyNo1);
 		studyLogin1.setCurrent1(current1);
-		dao.persist(studyLogin1);
+		studyLoginDao.persist(studyLogin1);
 		
 		StudyLogin studyLogin2 = new StudyLogin();
 		EntityDataGenerator.generateTestDataForModelClass(studyLogin2);
 		studyLogin2.setProviderNo(providerNo2);
 		studyLogin2.setStudyNo(studyNo2);
 		studyLogin2.setCurrent1(current2);
-		dao.persist(studyLogin2);
+		studyLoginDao.persist(studyLogin2);
 		
 		StudyLogin studyLogin3 = new StudyLogin();
 		EntityDataGenerator.generateTestDataForModelClass(studyLogin3);
 		studyLogin3.setProviderNo(providerNo1);
 		studyLogin3.setStudyNo(studyNo1);
 		studyLogin3.setCurrent1(current1);
-		dao.persist(studyLogin3);
+		studyLoginDao.persist(studyLogin3);
 		
 		StudyLogin studyLogin4 = new StudyLogin();
 		EntityDataGenerator.generateTestDataForModelClass(studyLogin4);
 		studyLogin4.setProviderNo(providerNo1);
 		studyLogin4.setStudyNo(studyNo1);
 		studyLogin4.setCurrent1(current2);
-		dao.persist(studyLogin4);
+		studyLoginDao.persist(studyLogin4);
 		
 		List<StudyLogin> expectedResult = new ArrayList<StudyLogin>(Arrays.asList(studyLogin1, studyLogin3));
-		List<StudyLogin> result = dao.find(providerNo1, studyNo1);
+		List<StudyLogin> result = studyLoginDao.find(providerNo1, studyNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		

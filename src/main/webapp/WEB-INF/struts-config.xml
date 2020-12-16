@@ -599,6 +599,8 @@
         <form-bean name="ValidateSwipeCard" type="org.oscarehr.integration.mchcv.ValidateSwipeCard" />
         <form-bean name="bpmh" type="oscar.form.pharmaForms.formBPMH.bean.BpmhFormBean" />
 
+		<form-bean name="junoEncounterForm" type="org.oscarehr.casemgmt.web.formbeans.JunoEncounterFormBean" />
+
 	</form-beans>
 
 	<global-forwards>
@@ -842,14 +844,24 @@
 			<forward name="failure" path="/oscarEncounter/error.jsp" />
 			<forward name="success" path="/oscarEncounter/Index.jsp" />
 			<forward name="success2" path="/oscarEncounter/Index2.jsp" />
+			<forward name="junoEncounter" path="/oscarEncounter/junoEncounter.do" />
 			<forward name="domain-error" path="/casemgmt/domain-error.jsp" />
 		</action>
+		<action name="junoEncounterForm" scope="request" parameter="method" path="/oscarEncounter/junoEncounter" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="view" path="/oscarEncounter/junoEncounter.jsp" />
+			<forward name="error" path="/casemgmt/error.jsp" />
+		</action>
+		<!--
+				<action name="junoEncounterForm" scope="request" parameter="method" path="/oscarEncounter/junoEncounter" type="org.oscarehr.casemgmt.web.JunoEncounterAction">
+					<forward name="view" path="/oscarEncounter/junoEncounter.jsp" />
+				</action>
+		-->
 
 		<action name="FrmForm" path="/dms/inboxManage" scope="request"  parameter="method" type="org.springframework.web.struts.DelegatingActionProxy">
-            <forward name="dms_index" path="/oscarMDS/Index.jsp" />
-            <forward name="dms_page" path="/oscarMDS/Page.jsp" />
-            <forward name="document_in_queues"  path="/oscarMDS/documentsInQueues.jsp" />
-        </action>
+			<forward name="dms_index" path="/oscarMDS/Index.jsp" />
+			<forward name="dms_page" path="/oscarMDS/Page.jsp" />
+			<forward name="document_in_queues"  path="/oscarMDS/documentsInQueues.jsp" />
+		</action>
 
 		<action input="/oscarRx/ChooseDrug.jsp" path="/oscarRx/chooseDrug" scope="request" type="oscar.oscarRx.pageUtil.RxChooseDrugAction">
 			<forward name="success" path="/oscarRx/WriteScript.jsp" />
@@ -872,8 +884,8 @@
 		<action input="/oscarRx/SearchDrug3.jsp" path="/oscarRx/UpdateScript" scope="request" parameter="parameterValue" type="oscar.oscarRx.pageUtil.RxWriteScriptAction">
 		</action>
 		<!--action input="/oscarRx/WriteScript.jsp" name="RxStashForm" path="/oscarRx/stash" scope="request" type="oscar.oscarRx.pageUtil.RxStashAction">
-            <forward name="success" path="/oscarRx/WriteScript.jsp" />
-        </action-->
+			<forward name="success" path="/oscarRx/WriteScript.jsp" />
+		</action-->
 
 		<action name="RxUseFavoriteForm" path="/oscarRx/useFavorite" scope="request" parameter="parameterValue" type="oscar.oscarRx.pageUtil.RxUseFavoriteAction">
 			<forward name="success" path="/oscarRx/WriteScript.jsp" />
@@ -1212,9 +1224,6 @@
 		<action input="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormFaxAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
 			<forward name="error" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
-		</action>
-		<action input="/oscarEncounter/oscarConsultationRequest/attachmentReport.jsp" name="FrmForm" path="/oscarEncounter/oscarConsultation/printAttached" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationPrintDocsAction">
-			<forward name="noprint" path="/oscarEncounter/oscarConsultationRequest/nothingtoPrint.jsp" />
 		</action>
 		<action input="/oscarConsultationRequest/config/EnableRequestResponse.jsp" name="EctConEnableReqRespForm" path="/oscarEncounter/EnableConRequestResponse" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConEnableReqRespAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/config/EnableRequestResponse.jsp" />
@@ -2925,7 +2934,7 @@
 			<forward name="failure" path="/billing/CA/ON/billingLreport.jsp" />
 		</action> 			
 		<action input="/billing/CA/ON/viewMOHFiles.jsp" scope="request" path="/billing/CA/ON/moveMOHFiles" type="org.oscarehr.billing.CA.ON.web.ArchiveMOHFileAction">
-			<forward name="showInbox" path="/billing/CA/ON/viewMOHFiles.jsp" />
+			<forward name="showInbox" path="/billing/CA/ON/viewMOHFiles.jsp1G" />
 		</action>
 		<action input="/billing/CA/ON/billingON3rdInv.jsp" name="FrmForm" path="/billing/ca/on/DisplayInvoiceLogo" scope="request" type="org.oscarehr.billing.CA.ON.util.DisplayInvoiceLogo"></action>
 
@@ -2933,8 +2942,12 @@
 			<forward name="successAdd" path="/demographic/demographicSuccess.jsp"></forward>
 			<forward name="validationFail" path="/demographic/demographicaddrecordcustom.jsp"></forward>
 		</action>
+		<action path="/" type="">
+
+		</action>
 	</action-mappings>
-	<controller processorClass="org.apache.struts.tiles.TilesRequestProcessor" maxFileSize="100M" ></controller>
+	<controller processorClass="org.springframework.web.struts.DelegatingTilesRequestProcessor" maxFileSize="100M" ></controller>
+<!--	<controller processorClass="org.springframework.web.struts.AutowiringTilesRequestProcessor" maxFileSize="100M" ></controller>-->
 	<message-resources parameter="oscarResources" null="false" />
 	<message-resources parameter="HelpResources" key="help" null="false" />
 	<message-resources parameter="MessageResources_program" key="pmm" null="false" />

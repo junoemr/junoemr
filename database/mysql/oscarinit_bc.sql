@@ -980,7 +980,7 @@ CREATE TABLE IF NOT EXISTS formBCAR2012(
   ar2_tweakA	varchar(3),
   ar2_tweakK	varchar(3),
   PRIMARY KEY (ID)
-);
+) ENGINE=MyISAM;
 
 --
 -- Table structure for table 'formBCAR'
@@ -1682,7 +1682,7 @@ CREATE TABLE formBCAR(
   pg3_consultName varchar(60),
   pg3_signature varchar(60),
   PRIMARY KEY (ID)
-);
+) ENGINE=MyISAM;
 
 --
 -- Table structure for table 'formBCAR2007'
@@ -2504,7 +2504,7 @@ CREATE TABLE formBCAR2007(
   ar2_tweakA	varchar(3),
   ar2_tweakK	varchar(3),
   PRIMARY KEY (ID)
-);
+) ENGINE=MyISAM;
 
 --
 -- Table structure for table 'formBCBirthSumMo'
@@ -3086,7 +3086,7 @@ CREATE TABLE formBCNewBorn(
   pg3_11List13 varchar(200),
   pg3_Signature varchar(80),  
   PRIMARY KEY (ID)
-) ;
+) ENGINE=MyISAM ;
 
 
 --
@@ -3973,7 +3973,7 @@ CREATE TABLE `formBCNewBorn2008` (
   `c_phyMid` varchar(70),
   `pg1_formDate` varchar(12) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-);
+) ENGINE=MyISAM;
 
 --
 -- Table structure for table 'formWCB'
@@ -5300,5 +5300,5 @@ CREATE TABLE `formBCClientChartChecklist` (
   `c3rd53` varchar(40) default NULL,
   `c3rd54` varchar(40) default NULL,
   PRIMARY KEY  (`ID`)
-) ;
+) ENGINE=MyISAM ;
 

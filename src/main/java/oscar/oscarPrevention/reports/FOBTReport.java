@@ -314,7 +314,7 @@ public class FOBTReport implements PreventionReport{
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
               log.debug("getting followup data for "+prd.demographicNo);
 
-              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection<EctMeasurementsDataBean> followupData = measurementDataHandler.getMeasurementsData();
               //NO Contact
 
               if ( followupData.size() == 0 ){

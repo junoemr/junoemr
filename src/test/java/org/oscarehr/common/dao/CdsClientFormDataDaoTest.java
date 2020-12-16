@@ -33,15 +33,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CdsClientFormData;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CdsClientFormDataDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CdsClientFormDataDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CdsClientFormDataDao cdsClientFormDataDao;
 
-	protected CdsClientFormDataDao dao = (CdsClientFormDataDao)SpringUtils.getBean(CdsClientFormDataDao.class);
 	Logger logger = MiscUtils.getLogger();
 	
 	@Before
@@ -72,11 +79,11 @@ public class CdsClientFormDataDaoTest extends DaoTestFixtures {
 		formData3.setQuestion(question);
 		formData3.setAnswer("Test answer");
 		
-		dao.persist(formData1);
-		dao.persist(formData2);
-		dao.persist(formData3);
+		cdsClientFormDataDao.persist(formData1);
+		cdsClientFormDataDao.persist(formData2);
+		cdsClientFormDataDao.persist(formData3);
 		
-		List<CdsClientFormData> result = dao.findByQuestion(cdsClientFormId, question);
+		List<CdsClientFormData> result = cdsClientFormDataDao.findByQuestion(cdsClientFormId, question);
 		List<CdsClientFormData> expectedResult = new ArrayList<CdsClientFormData>(Arrays.asList(
 				formData2,
 				formData3
@@ -101,10 +108,10 @@ public class CdsClientFormDataDaoTest extends DaoTestFixtures {
 		formData2.setCdsClientFormId(cdsClientFormId);
 		formData2.setAnswer(answer);
 		
-		dao.persist(formData1);
-		dao.persist(formData2);
+		cdsClientFormDataDao.persist(formData1);
+		cdsClientFormDataDao.persist(formData2);
 		
-		CdsClientFormData result = dao.findByAnswer(cdsClientFormId, answer);
+		CdsClientFormData result = cdsClientFormDataDao.findByAnswer(cdsClientFormId, answer);
 		CdsClientFormData expectedResult = formData2;
 		
 		assertEquals(result, expectedResult);

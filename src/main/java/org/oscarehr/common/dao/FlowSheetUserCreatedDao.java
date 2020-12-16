@@ -39,7 +39,7 @@ public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated> {
 	}
 	
 	public List<FlowSheetUserCreated> getAllUserCreatedFlowSheets(){
-        Query query = entityManager.createQuery("SELECT f FROM FlowSheetUserCreated f WHERE f.archived=?");
+        Query query = entityManager.createQuery("SELECT f FROM FlowSheetUserCreated f WHERE f.archived=?1");
         query.setParameter(1, false);
         
         //@SuppressWarnings("unchecked")
@@ -47,7 +47,7 @@ public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated> {
      }
 
 	public FlowSheetUserCreated findByName(String name) {
-		Query query = entityManager.createQuery("select f from FlowSheetUserCreated f where f.name=?");
+		Query query = entityManager.createQuery("select f from FlowSheetUserCreated f where f.name=?1");
 		query.setParameter(1, name);
 
 		return getSingleResultOrNull(query);

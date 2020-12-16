@@ -28,15 +28,21 @@ import static org.junit.Assert.assertNotNull;
 import org.bouncycastle.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.RemoteDataLog;
 import org.oscarehr.common.model.RemoteDataLog.Action;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class RemoteDataLogDaoTest extends DaoTestFixtures {
-
-	protected RemoteDataLogDao dao = SpringUtils.getBean(RemoteDataLogDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class RemoteDataLogDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected RemoteDataLogDao remoteDataLogDao;
 
 
 	@Before
@@ -52,7 +58,7 @@ public class RemoteDataLogDaoTest extends DaoTestFixtures {
 		byte[] b = new byte[1024];
 		Arrays.fill(b,(byte) 0x01);
 		entity.setDocumentContents(b);
-		dao.persist(entity);
+		remoteDataLogDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

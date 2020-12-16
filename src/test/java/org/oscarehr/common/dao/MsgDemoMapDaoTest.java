@@ -27,13 +27,19 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.MsgDemoMap;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MsgDemoMapDaoTest extends DaoTestFixtures {
-
-	protected MsgDemoMapDao dao = SpringUtils.getBean(MsgDemoMapDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MsgDemoMapDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MsgDemoMapDao msgDemoMapDao;
 
 	public MsgDemoMapDaoTest() {
 	}
@@ -51,18 +57,18 @@ public class MsgDemoMapDaoTest extends DaoTestFixtures {
 		entity.setDemographic_no(1);
                 entity.setMessageID(1);
 		
-		dao.persist(entity);
+		msgDemoMapDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testGetMessagesAndDemographicsByMessageId()  {
-		assertNotNull(dao.getMessagesAndDemographicsByMessageId(100));
+		assertNotNull(msgDemoMapDao.getMessagesAndDemographicsByMessageId(100));
 	}
 	
 	@Test
 	public void testGetMapAndMessagesByDemographicNo()  {
-		assertNotNull(dao.getMapAndMessagesByDemographicNo(100));
+		assertNotNull(msgDemoMapDao.getMapAndMessagesByDemographicNo(100));
 	}
 }

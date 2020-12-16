@@ -50,7 +50,7 @@ public class IchppccodeDao extends AbstractCodeSystemDao<Ichppccode>{
 	}
 	
 	public List<Ichppccode> getIchppccodeCode(String term){
-		Query query = entityManager.createQuery("select i from Ichppccode i where i.id=?");
+		Query query = entityManager.createQuery("select i from Ichppccode i where i.id=?1");
 		query.setParameter(1, term);
 
 		@SuppressWarnings("unchecked")
@@ -61,7 +61,7 @@ public class IchppccodeDao extends AbstractCodeSystemDao<Ichppccode>{
 
 
     public List<Ichppccode> getIchppccode(String query) {
-		Query q = entityManager.createQuery("select i from Ichppccode i where i.id like ? or i.description like ? order by i.description");
+		Query q = entityManager.createQuery("select i from Ichppccode i where i.id like ?1 or i.description like ?2 order by i.description");
 		q.setParameter(1, "%"+query+"%");
 		q.setParameter(2, "%"+query+"%");
 
@@ -95,7 +95,7 @@ public class IchppccodeDao extends AbstractCodeSystemDao<Ichppccode>{
 	
 	@SuppressWarnings("unchecked")
 	public List<Ichppccode> search_research_code(String code, String code1, String code2, String desc, String desc1, String desc2) {
-		Query query = entityManager.createQuery("select i from Ichppccode i where i.id like ? or i.id like ? or i.id like ? or i.description like ? or i.description like ? or i.description like ?");
+		Query query = entityManager.createQuery("select i from Ichppccode i where i.id like ?1 or i.id like ?2 or i.id like ?3 or i.description like ?4 or i.description like ?5 or i.description like ?6");
 		query.setParameter(1, code);
 		query.setParameter(2, code1);
 		query.setParameter(3, code2);

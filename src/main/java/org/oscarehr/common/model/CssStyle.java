@@ -56,7 +56,7 @@ public class CssStyle extends AbstractModel<Integer> implements Serializable {
 
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(unique=true, nullable=false)
 	public Integer getId() {
 		return this.id;

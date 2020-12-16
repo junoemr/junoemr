@@ -40,7 +40,7 @@ public class CtlBillingTypeDao extends AbstractDao<CtlBillingType>{
 	}
 	
 	 public List<CtlBillingType> findByServiceType(String serviceType) {
-         Query query = entityManager.createQuery("select b from CtlBillingType b where b.id like ?");
+         Query query = entityManager.createQuery("select b from CtlBillingType b where b.id like ?1");
          query.setParameter(1, serviceType);
          
          @SuppressWarnings("unchecked")

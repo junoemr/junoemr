@@ -29,15 +29,22 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.MyGroup;
 import org.oscarehr.common.model.MyGroupPrimaryKey;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class MyGroupDaoTest extends DaoTestFixtures {
-
-	protected MyGroupDao dao = SpringUtils.getBean(MyGroupDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MyGroupDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected MyGroupDao dao;
 
 	public MyGroupDaoTest() {
 	}

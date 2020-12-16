@@ -65,7 +65,7 @@ public class ProviderSiteDao extends AbstractDao<ProviderSite>{
 	}
 
 	public List<String> findByProviderNoBySiteName(String siteName) {
-	    	String sql = "select x.id.providerNo from ProviderSite x, Site s where x.id.siteId=s.siteId and s.name=?";
+	    	String sql = "select x.id.providerNo from ProviderSite x, Site s where x.id.siteId=s.siteId and s.name=?1";
     		Query query = entityManager.createQuery(sql);
    	 	query.setParameter(1,siteName);
 
@@ -75,7 +75,7 @@ public class ProviderSiteDao extends AbstractDao<ProviderSite>{
     }
 		
 	public List<ProviderSite> findBySiteId(Integer siteId) {
-		String sql = "select x from ProviderSite x where x.id.siteId=?";
+		String sql = "select x from ProviderSite x where x.id.siteId=?1";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1,siteId);
 

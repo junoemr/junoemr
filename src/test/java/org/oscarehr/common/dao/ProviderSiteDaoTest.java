@@ -34,16 +34,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.ProviderSitePK;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ProviderSiteDaoTest extends DaoTestFixtures {
-
-	protected ProviderSiteDao dao = SpringUtils.getBean(ProviderSiteDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProviderSiteDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProviderSiteDao providerSiteDao;
 
 	@Before
 	public void before() throws Exception {
@@ -56,9 +62,9 @@ public class ProviderSiteDaoTest extends DaoTestFixtures {
 		entity.setId(new ProviderSitePK());
 		entity.getId().setProviderNo("000001");
 		entity.getId().setSiteId(1);
-		dao.persist(entity);
+		providerSiteDao.persist(entity);
 		assertNotNull(entity.getId());
-		assertNotNull(dao.find(entity.getId()));
+		assertNotNull(providerSiteDao.find(entity.getId()));
 	}
 
 	@Test
@@ -71,16 +77,16 @@ public class ProviderSiteDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(providerSite1);
 		providerSite1.setId(new ProviderSitePK());
 		providerSite1.getId().setProviderNo(providerNo1);
-		dao.persist(providerSite1);
+		providerSiteDao.persist(providerSite1);
 		
 		ProviderSite providerSite2 = new ProviderSite();
 		EntityDataGenerator.generateTestDataForModelClass(providerSite2);
 		providerSite2.setId(new ProviderSitePK());
 		providerSite2.getId().setProviderNo(providerNo2);
-		dao.persist(providerSite2);
+		providerSiteDao.persist(providerSite2);
 		
 		List<ProviderSite> expectedResult = new ArrayList<ProviderSite>(Arrays.asList(providerSite1));
-		List<ProviderSite> result = dao.findByProviderNo(providerNo1);
+		List<ProviderSite> result = providerSiteDao.findByProviderNo(providerNo1);
 
 		Logger logger = MiscUtils.getLogger();
 		
@@ -99,6 +105,6 @@ public class ProviderSiteDaoTest extends DaoTestFixtures {
 
     @Test
     public void testFindActiveProvidersWithSites() {
-	    assertNotNull(dao.findActiveProvidersWithSites("100"));
+	    assertNotNull(providerSiteDao.findActiveProvidersWithSites("100"));
     }
 }

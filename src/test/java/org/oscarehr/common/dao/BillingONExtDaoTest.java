@@ -32,16 +32,23 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BillingONCHeader1;
 import org.oscarehr.common.model.BillingONExt;
 import org.oscarehr.common.model.BillingONPayment;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillingONExtDaoTest extends DaoTestFixtures {
-
-	protected BillingONExtDao dao = (BillingONExtDao)SpringUtils.getBean(BillingONExtDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillingONExtDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BillingONExtDao billingONExtDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -66,9 +73,9 @@ public class BillingONExtDaoTest extends DaoTestFixtures {
 		extraBillingPayment.setPaymentId(1);
 	
 		paymentDao.persist(paymentRecord);
-		dao.persist(extraBillingPayment);
+		billingONExtDao.persist(extraBillingPayment);
 		
-		BigDecimal payment = dao.getPayment(paymentRecord);
+		BigDecimal payment = billingONExtDao.getPayment(paymentRecord);
 		assertEquals(new BigDecimal("10"), payment);
 	}
 	
@@ -131,8 +138,8 @@ public class BillingONExtDaoTest extends DaoTestFixtures {
 		extraBillingPayment.setKeyVal("notpayment");
 		
 		paymentDao.persist(paymentRecord);
-		dao.persist(extraBillingPayment);
-		BigDecimal payment = dao.getPayment(paymentRecord);
+		billingONExtDao.persist(extraBillingPayment);
+		BigDecimal payment = billingONExtDao.getPayment(paymentRecord);
 		assertEquals(new BigDecimal("0.00"), payment);
 	}
 	
@@ -155,9 +162,9 @@ public class BillingONExtDaoTest extends DaoTestFixtures {
 		extraBillingPayment.setPaymentId(1);
 		
 		paymentDao.persist(paymentRecord);
-		dao.persist(extraBillingPayment);
+		billingONExtDao.persist(extraBillingPayment);
 		
-		BigDecimal payment = dao.getPayment(paymentRecord);
+		BigDecimal payment = billingONExtDao.getPayment(paymentRecord);
 		assertEquals(new BigDecimal("0.00"), payment);
 	}
 	
@@ -179,9 +186,9 @@ public class BillingONExtDaoTest extends DaoTestFixtures {
 		extraBillingPayment.setPaymentId(1);
 		
 		paymentDao.persist(paymentRecord);
-		dao.persist(extraBillingPayment);
+		billingONExtDao.persist(extraBillingPayment);
 		
-		BigDecimal refund = dao.getRefund(paymentRecord);
+		BigDecimal refund = billingONExtDao.getRefund(paymentRecord);
 		assertEquals(new BigDecimal("10"), refund);
 	}
 	
@@ -244,9 +251,9 @@ public class BillingONExtDaoTest extends DaoTestFixtures {
 		extraBillingPayment.setKeyVal("notpayment");
 		
 		paymentDao.persist(paymentRecord);
-		dao.persist(extraBillingPayment);
+		billingONExtDao.persist(extraBillingPayment);
 		
-		BigDecimal refund = dao.getRefund(paymentRecord);
+		BigDecimal refund = billingONExtDao.getRefund(paymentRecord);
 		assertEquals(new BigDecimal("0.00"), refund);
 	}
 	
@@ -269,9 +276,9 @@ public class BillingONExtDaoTest extends DaoTestFixtures {
 		extraBillingPayment.setPaymentId(1);
 		
 		paymentDao.persist(paymentRecord);
-		dao.persist(extraBillingPayment);
+		billingONExtDao.persist(extraBillingPayment);
 		
-		BigDecimal refund = dao.getRefund(paymentRecord);
+		BigDecimal refund = billingONExtDao.getRefund(paymentRecord);
 		assertEquals(new BigDecimal("0.00"), refund);
 	}
 	
@@ -292,9 +299,9 @@ public class BillingONExtDaoTest extends DaoTestFixtures {
 		extraBillingPayment.setPaymentId(1);
 		
 		cHeader1Dao.persist(cHeader1);
-		dao.persist(extraBillingPayment);
+		billingONExtDao.persist(extraBillingPayment);
 		
-		BillingONExt billingRecord = dao.getRemitTo(cHeader1);
+		BillingONExt billingRecord = billingONExtDao.getRemitTo(cHeader1);
 		assertEquals(extraBillingPayment, billingRecord);
 	}
 	
@@ -319,9 +326,9 @@ public class BillingONExtDaoTest extends DaoTestFixtures {
 		extraBillingPayment.setKeyVal("remitTo");
 		
 		cHeader1Dao.persist(cHeader1);
-		dao.persist(extraBillingPayment);
+		billingONExtDao.persist(extraBillingPayment);
 		
-		BillingONExt billingRecord = dao.getRemitTo(cHeader1);
+		BillingONExt billingRecord = billingONExtDao.getRemitTo(cHeader1);
 		assertNull(billingRecord);
 	}
 	
@@ -376,9 +383,9 @@ public class BillingONExtDaoTest extends DaoTestFixtures {
 		extraBillingPayment.setPaymentId(1);
 		
 		cHeader1Dao.persist(cHeader1);
-		dao.persist(extraBillingPayment);
+		billingONExtDao.persist(extraBillingPayment);
 		
-		BillingONExt billingRecord = dao.getBillTo(cHeader1);
+		BillingONExt billingRecord = billingONExtDao.getBillTo(cHeader1);
 		assertEquals(extraBillingPayment, billingRecord);
 	}
 	
@@ -403,9 +410,9 @@ public class BillingONExtDaoTest extends DaoTestFixtures {
 		extraBillingPayment.setKeyVal("billTo");
 		
 		cHeader1Dao.persist(cHeader1);
-		dao.persist(extraBillingPayment);
+		billingONExtDao.persist(extraBillingPayment);
 		
-		BillingONExt billingRecord = dao.getBillTo(cHeader1);
+		BillingONExt billingRecord = billingONExtDao.getBillTo(cHeader1);
 		assertNull(billingRecord);
 	}
 	
@@ -460,9 +467,9 @@ public class BillingONExtDaoTest extends DaoTestFixtures {
 		extraBillingPayment.setPaymentId(1);
 		
 		cHeader1Dao.persist(cHeader1);
-		dao.persist(extraBillingPayment);
+		billingONExtDao.persist(extraBillingPayment);
 		
-		BillingONExt billingRecord = dao.getBillToInactive(cHeader1);
+		BillingONExt billingRecord = billingONExtDao.getBillToInactive(cHeader1);
 		assertEquals(extraBillingPayment, billingRecord);
 	}
 	
@@ -487,15 +494,15 @@ public class BillingONExtDaoTest extends DaoTestFixtures {
 		extraBillingPayment.setKeyVal("billTo");
 		
 		cHeader1Dao.persist(cHeader1);
-		dao.persist(extraBillingPayment);
+		billingONExtDao.persist(extraBillingPayment);
 		
-		BillingONExt billingRecord = dao.getBillToInactive(cHeader1);
+		BillingONExt billingRecord = billingONExtDao.getBillToInactive(cHeader1);
 		assertNull(billingRecord);
 	}
 	
 	@Test
 	public void testFind() {
-		assertNotNull(dao.find(100, "KEY", new Date(), new Date()));
+		assertNotNull(billingONExtDao.find(100, "KEY", new Date(), new Date()));
 	}
 	
 //	@Test @Ignore

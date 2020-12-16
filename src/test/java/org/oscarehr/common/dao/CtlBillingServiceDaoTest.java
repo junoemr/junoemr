@@ -30,13 +30,19 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CtlBillingService;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlBillingServiceDaoTest extends DaoTestFixtures {
-
-	protected CtlBillingServiceDao dao = SpringUtils.getBean(CtlBillingServiceDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlBillingServiceDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CtlBillingServiceDao ctlBillingServiceDao;
 
 	@Before
 	public void before() throws Exception {
@@ -45,37 +51,37 @@ public class CtlBillingServiceDaoTest extends DaoTestFixtures {
 	
 	@Test
 	public void testAllServiceTypes() {
-		List<Object[]> serviceTypes = dao.getAllServiceTypes();
+		List<Object[]> serviceTypes = ctlBillingServiceDao.getAllServiceTypes();
 		assertNotNull(serviceTypes);
 		assertFalse(serviceTypes.isEmpty());
 	}
 	
 	@Test
 	public void testFindByServiceGroupAndServiceType() {
-		List<CtlBillingService> services = dao.findByServiceGroupAndServiceType("Group2", null);
+		List<CtlBillingService> services = ctlBillingServiceDao.findByServiceGroupAndServiceType("Group2", null);
 		assertFalse(services.isEmpty());
 		
-		services = dao.findByServiceGroupAndServiceType("Group1", "MFP");
+		services = ctlBillingServiceDao.findByServiceGroupAndServiceType("Group1", "MFP");
 		assertFalse(services.isEmpty());
 	}
 
     @Test
     public void testFindUniqueServiceTypesByCode() {
-	    assertNotNull(dao.findUniqueServiceTypesByCode("CODE"));
+	    assertNotNull(ctlBillingServiceDao.findUniqueServiceTypesByCode("CODE"));
     }
     
     @Test
     public void testFindServiceTypes() {
-	    assertNotNull(dao.findServiceTypes());
+	    assertNotNull(ctlBillingServiceDao.findServiceTypes());
     }
     
     @Test
     public void testFindServiceCodesByType() {
-	    assertNotNull(dao.findServiceCodesByType("SRV_TY"));
+	    assertNotNull(ctlBillingServiceDao.findServiceCodesByType("SRV_TY"));
     }
 
     @Test
     public void testFindServiceTypesByStatus() {
-	    assertNotNull(dao.findServiceTypesByStatus("A"));
+	    assertNotNull(ctlBillingServiceDao.findServiceTypesByStatus("A"));
     }
 }

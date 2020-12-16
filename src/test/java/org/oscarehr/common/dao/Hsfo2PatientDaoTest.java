@@ -37,14 +37,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Hsfo2Patient;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class Hsfo2PatientDaoTest extends DaoTestFixtures {
-	protected Hsfo2PatientDao dao = (Hsfo2PatientDao)SpringUtils.getBean(Hsfo2PatientDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class Hsfo2PatientDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected Hsfo2PatientDao hsfo2PatientDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -60,20 +67,20 @@ public class Hsfo2PatientDaoTest extends DaoTestFixtures {
 		Hsfo2Patient hsfo2Patient1 = new Hsfo2Patient();
 		EntityDataGenerator.generateTestDataForModelClass(hsfo2Patient1);
 		hsfo2Patient1.setPatient_Id(patientId1);
-		dao.persist(hsfo2Patient1);
+		hsfo2PatientDao.persist(hsfo2Patient1);
 		
 		Hsfo2Patient hsfo2Patient2 = new Hsfo2Patient();
 		EntityDataGenerator.generateTestDataForModelClass(hsfo2Patient2);
 		hsfo2Patient2.setPatient_Id(patientId2);
-		dao.persist(hsfo2Patient2);
+		hsfo2PatientDao.persist(hsfo2Patient2);
 
 		Hsfo2Patient hsfo2Patient3 = new Hsfo2Patient();
 		EntityDataGenerator.generateTestDataForModelClass(hsfo2Patient3);
 		hsfo2Patient3.setPatient_Id(patientId1);
-		dao.persist(hsfo2Patient3);
+		hsfo2PatientDao.persist(hsfo2Patient3);
 		
 		Hsfo2Patient expectedResult = hsfo2Patient3;
-		Hsfo2Patient result = dao.getHsfoPatientByPatientId(patientId1);
+		Hsfo2Patient result = hsfo2PatientDao.getHsfoPatientByPatientId(patientId1);
 	
 		assertEquals(expectedResult, result);
 	}
@@ -87,20 +94,20 @@ public class Hsfo2PatientDaoTest extends DaoTestFixtures {
 		Hsfo2Patient hsfo2Patient1 = new Hsfo2Patient();
 		EntityDataGenerator.generateTestDataForModelClass(hsfo2Patient1);
 		hsfo2Patient1.setPatient_Id(patientId1);
-		dao.persist(hsfo2Patient1);
+		hsfo2PatientDao.persist(hsfo2Patient1);
 		
 		Hsfo2Patient hsfo2Patient2 = new Hsfo2Patient();
 		EntityDataGenerator.generateTestDataForModelClass(hsfo2Patient2);
 		hsfo2Patient2.setPatient_Id(patientId2);
-		dao.persist(hsfo2Patient2);
+		hsfo2PatientDao.persist(hsfo2Patient2);
 
 		Hsfo2Patient hsfo2Patient3 = new Hsfo2Patient();
 		EntityDataGenerator.generateTestDataForModelClass(hsfo2Patient3);
 		hsfo2Patient3.setPatient_Id(patientId1);
-		dao.persist(hsfo2Patient3);
+		hsfo2PatientDao.persist(hsfo2Patient3);
 				
 		List<Hsfo2Patient> expectedResult = new ArrayList<Hsfo2Patient>(Arrays.asList(hsfo2Patient1, hsfo2Patient2, hsfo2Patient3));
-		List<Hsfo2Patient> result = dao.getAllHsfoPatients();
+		List<Hsfo2Patient> result = hsfo2PatientDao.getAllHsfoPatients();
 
 		Logger logger = MiscUtils.getLogger();
 		

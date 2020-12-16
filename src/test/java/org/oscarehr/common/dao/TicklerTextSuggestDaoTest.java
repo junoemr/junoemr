@@ -36,15 +36,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.TicklerTextSuggest;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class TicklerTextSuggestDaoTest extends DaoTestFixtures {
-	
-	protected TicklerTextSuggestDao dao = (TicklerTextSuggestDao)SpringUtils.getBean(TicklerTextSuggestDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class TicklerTextSuggestDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected TicklerTextSuggestDao ticklerTextSuggestDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -63,22 +69,22 @@ public class TicklerTextSuggestDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(tickler1);
 		tickler1.setActive(isActive);
 		tickler1.setSuggestedText(suggestedTextActive1);
-		dao.persist(tickler1);
+		ticklerTextSuggestDao.persist(tickler1);
 		
 		TicklerTextSuggest tickler2 = new TicklerTextSuggest();
 		EntityDataGenerator.generateTestDataForModelClass(tickler2);
 		tickler2.setActive(isActive);
 		tickler2.setSuggestedText(suggestedTextActive2);
-		dao.persist(tickler2);
+		ticklerTextSuggestDao.persist(tickler2);
 		
 		TicklerTextSuggest tickler3 = new TicklerTextSuggest();
 		EntityDataGenerator.generateTestDataForModelClass(tickler3);
 		tickler3.setActive(!isActive);
 		tickler3.setSuggestedText(suggestedTextNotActive1);
-		dao.persist(tickler3);
+		ticklerTextSuggestDao.persist(tickler3);
 		
 		List<TicklerTextSuggest> expectedResult = new ArrayList<TicklerTextSuggest>(Arrays.asList(tickler1, tickler2));
-		List<TicklerTextSuggest> result = dao.getActiveTicklerTextSuggests();
+		List<TicklerTextSuggest> result = ticklerTextSuggestDao.getActiveTicklerTextSuggests();
 		
 		Logger logger = MiscUtils.getLogger();
 		
@@ -107,22 +113,22 @@ public class TicklerTextSuggestDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(tickler1);
 		tickler1.setActive(isActive);
 		tickler1.setSuggestedText(suggestedTextActive1);
-		dao.persist(tickler1);
+		ticklerTextSuggestDao.persist(tickler1);
 		
 		TicklerTextSuggest tickler2 = new TicklerTextSuggest();
 		EntityDataGenerator.generateTestDataForModelClass(tickler2);
 		tickler2.setActive(isActive);
 		tickler2.setSuggestedText(suggestedTextActive2);
-		dao.persist(tickler2);
+		ticklerTextSuggestDao.persist(tickler2);
 		
 		TicklerTextSuggest tickler3 = new TicklerTextSuggest();
 		EntityDataGenerator.generateTestDataForModelClass(tickler3);
 		tickler3.setActive(!isActive);
 		tickler3.setSuggestedText(suggestedTextNotActive1);
-		dao.persist(tickler3);
+		ticklerTextSuggestDao.persist(tickler3);
 		
 		List<TicklerTextSuggest> expectedResult = new ArrayList<TicklerTextSuggest>(Arrays.asList(tickler2, tickler1));
-		List<TicklerTextSuggest> result = dao.getInactiveTicklerTextSuggests();
+		List<TicklerTextSuggest> result = ticklerTextSuggestDao.getInactiveTicklerTextSuggests();
 		
 		Logger logger = MiscUtils.getLogger();
 		

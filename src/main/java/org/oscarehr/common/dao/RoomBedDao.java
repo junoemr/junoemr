@@ -44,7 +44,7 @@ public class RoomBedDao extends AbstractDao<RoomBed>{
 	
    
     public boolean bedExists(Integer roomId) {
-    	Query query = entityManager.createQuery("select count(*) from RoomBed rb where rb.id.roomId = ?");
+    	Query query = entityManager.createQuery("select count(*) from RoomBed rb where rb.id.roomId = ?1");
 		query.setParameter(1, roomId);
 		
 		Long result = (Long)query.getSingleResult();
@@ -54,7 +54,7 @@ public class RoomBedDao extends AbstractDao<RoomBed>{
 
    
     public boolean roomExists(Integer bedId) {
-    	Query query = entityManager.createQuery("select count(*) from RoomBed rb where rb.id.bedId = ?");
+    	Query query = entityManager.createQuery("select count(*) from RoomBed rb where rb.id.bedId = ?1");
 		query.setParameter(1, bedId);
 		
 		Long result = (Long)query.getSingleResult();
@@ -64,7 +64,7 @@ public class RoomBedDao extends AbstractDao<RoomBed>{
 
    
     public RoomBed getRoomBedByRoom(Integer roomId) {
-    	Query query = entityManager.createQuery("select bd from RoomBed bd where bd.id.roomId = ?");
+    	Query query = entityManager.createQuery("select bd from RoomBed bd where bd.id.roomId = ?1");
     	query.setParameter(1, roomId);
     	
     	@SuppressWarnings("unchecked")
@@ -83,7 +83,7 @@ public class RoomBedDao extends AbstractDao<RoomBed>{
 
   
     public RoomBed getRoomBedByBed(Integer bedId) {
-    	Query query = entityManager.createQuery("select bd from RoomBed bd where bd.id.bedId = ?");
+    	Query query = entityManager.createQuery("select bd from RoomBed bd where bd.id.bedId = ?1");
     	query.setParameter(1, bedId);
     	
     	@SuppressWarnings("unchecked")
@@ -124,7 +124,7 @@ public class RoomBedDao extends AbstractDao<RoomBed>{
     }
 
     boolean roomBedExists(RoomBedPK id) {
-    	Query query = entityManager.createQuery("select count(*) from RoomBed rb where rb.id.roomId = ? and rb.id.bedId = ?");
+    	Query query = entityManager.createQuery("select count(*) from RoomBed rb where rb.id.roomId = ?1 and rb.id.bedId = ?2");
 		query.setParameter(1, id.getRoomId());
 		query.setParameter(1, id.getBedId());
 		

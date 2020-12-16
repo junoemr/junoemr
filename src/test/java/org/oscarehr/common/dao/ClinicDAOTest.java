@@ -27,14 +27,20 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Clinic;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ClinicDAOTest extends DaoTestFixtures {
-
-	protected ClinicDAO dao = (ClinicDAO)SpringUtils.getBean(ClinicDAO.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ClinicDAOTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ClinicDAO clinicDAO;
 
 	@Before
 	public void before() throws Exception {
@@ -45,7 +51,7 @@ public class ClinicDAOTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		Clinic entity = new Clinic();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		clinicDAO.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
@@ -54,18 +60,18 @@ public class ClinicDAOTest extends DaoTestFixtures {
 		
 		Clinic clinic1 = new Clinic();
 		EntityDataGenerator.generateTestDataForModelClass(clinic1);
-		dao.persist(clinic1);
+		clinicDAO.persist(clinic1);
 		
 		Clinic clinic2 = new Clinic();
 		EntityDataGenerator.generateTestDataForModelClass(clinic2);
-		dao.persist(clinic2);
+		clinicDAO.persist(clinic2);
 		
 		Clinic clinic3 = new Clinic();
 		EntityDataGenerator.generateTestDataForModelClass(clinic3);
-		dao.persist(clinic3);
+		clinicDAO.persist(clinic3);
 		
 		Clinic expectedResult = clinic1;
-		Clinic result = dao.getClinic();
+		Clinic result = clinicDAO.getClinic();
 		
 		assertEquals(expectedResult, result);
 	}

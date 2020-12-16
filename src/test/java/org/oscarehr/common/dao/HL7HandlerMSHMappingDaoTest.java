@@ -28,14 +28,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.HL7HandlerMSHMapping;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class HL7HandlerMSHMappingDaoTest extends DaoTestFixtures {
-
-	protected HL7HandlerMSHMappingDao dao = SpringUtils.getBean(HL7HandlerMSHMappingDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class HL7HandlerMSHMappingDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected HL7HandlerMSHMappingDao hl7HandlerMSHMappingDao;
 
 
 	@Before
@@ -47,7 +53,7 @@ public class HL7HandlerMSHMappingDaoTest extends DaoTestFixtures {
         public void testCreate() throws Exception {
                 HL7HandlerMSHMapping entity = new HL7HandlerMSHMapping();
                 EntityDataGenerator.generateTestDataForModelClass(entity);
-                dao.persist(entity);
+                hl7HandlerMSHMappingDao.persist(entity);
                 assertNotNull(entity.getId());
         }
 
@@ -61,20 +67,20 @@ public class HL7HandlerMSHMappingDaoTest extends DaoTestFixtures {
 		HL7HandlerMSHMapping hl7HandlerMSHMapping1 = new HL7HandlerMSHMapping();
 		EntityDataGenerator.generateTestDataForModelClass(hl7HandlerMSHMapping1);
 		hl7HandlerMSHMapping1.setFacility(facility1);
-		dao.persist(hl7HandlerMSHMapping1);
+		hl7HandlerMSHMappingDao.persist(hl7HandlerMSHMapping1);
 		
 		HL7HandlerMSHMapping hl7HandlerMSHMapping2 = new HL7HandlerMSHMapping();
 		EntityDataGenerator.generateTestDataForModelClass(hl7HandlerMSHMapping2);
 		hl7HandlerMSHMapping2.setFacility(facility2);
-		dao.persist(hl7HandlerMSHMapping2);
+		hl7HandlerMSHMappingDao.persist(hl7HandlerMSHMapping2);
 		
 		HL7HandlerMSHMapping hl7HandlerMSHMapping3 = new HL7HandlerMSHMapping();
 		EntityDataGenerator.generateTestDataForModelClass(hl7HandlerMSHMapping3);
 		hl7HandlerMSHMapping3.setFacility(facility3);
-		dao.persist(hl7HandlerMSHMapping3);
+		hl7HandlerMSHMappingDao.persist(hl7HandlerMSHMapping3);
 		
 		HL7HandlerMSHMapping expectedResult = hl7HandlerMSHMapping2;
-		HL7HandlerMSHMapping result = dao.findByFacility(facility2);
+		HL7HandlerMSHMapping result = hl7HandlerMSHMappingDao.findByFacility(facility2);
 		
 		assertEquals(expectedResult, result);
 	}

@@ -27,13 +27,19 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class WcbNoiCodeDaoTest extends DaoTestFixtures {
-
-	public WcbNoiCodeDao dao = SpringUtils.getBean(WcbNoiCodeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class WcbNoiCodeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public WcbNoiCodeDao wcbNoiCodeDao;
 
 	@Before
 	public void before() throws Exception {
@@ -42,6 +48,6 @@ public class WcbNoiCodeDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindByDemographic() {
-		assertNotNull(dao.findByCodeOrLevel("BLAH"));
+		assertNotNull(wcbNoiCodeDao.findByCodeOrLevel("BLAH"));
 	}
 }

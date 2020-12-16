@@ -27,18 +27,27 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CustomFilter;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 
-public class CustomFilterDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CustomFilterDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CustomFilterDao customFilterDao;
 
-	protected CustomFilterDao dao = SpringUtils.getBean(CustomFilterDao.class);
-	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	@Autowired
+	private ProviderDao providerDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -58,9 +67,9 @@ public class CustomFilterDaoTest extends DaoTestFixtures {
 		Provider p = providerDao.getProvider("999998");
 		 entity.getAssignees().add(p);
 		 
-		 dao.persist(entity);
+		 customFilterDao.persist(entity);
 		 
-		 CustomFilter cf = dao.find(entity.getId());
+		 CustomFilter cf = customFilterDao.find(entity.getId());
 		 assertTrue(cf != null);
 		 assertTrue(cf.getProgram() != null);
 		 assertTrue(cf.getAssignees().size() == 1);

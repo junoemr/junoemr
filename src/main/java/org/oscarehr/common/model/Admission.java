@@ -94,7 +94,7 @@ public class Admission extends AbstractModel<Integer> implements Serializable {
 				
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="am_id", unique=true, nullable=false)
 	private Integer id;
 

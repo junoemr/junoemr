@@ -211,7 +211,7 @@ public class PreventionDao extends AbstractDao<Prevention>
 	@NativeSql("preventions")
 	public List<Integer> findNewPreventionsSinceDemoKey(String keyName) {
 		
-		String sql = "select distinct dr.demographic_no from preventions dr,demographic d,demographicExt e where dr.demographic_no = d.demographic_no and d.demographic_no = e.demographic_no and e.key_val=? and dr.lastUpdateDate > e.value";
+		String sql = "select distinct dr.demographic_no from preventions dr,demographic d,demographicExt e where dr.demographic_no = d.demographic_no and d.demographic_no = e.demographic_no and e.key_val=?1 and dr.lastUpdateDate > e.value";
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter(1,keyName);
 		return query.getResultList();

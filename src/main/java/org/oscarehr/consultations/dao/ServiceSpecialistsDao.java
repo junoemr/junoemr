@@ -41,7 +41,7 @@ public class ServiceSpecialistsDao extends AbstractDao<ServiceSpecialists>
 	}
 	
 	public List<ServiceSpecialists> findByServiceId(int serviceId) {
-		Query q = entityManager.createQuery("select x from ServiceSpecialists x where x.id.serviceId = ?");
+		Query q = entityManager.createQuery("select x from ServiceSpecialists x where x.id.serviceId = ?1");
 		q.setParameter(1, serviceId);
 
 		@SuppressWarnings("unchecked")

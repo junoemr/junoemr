@@ -25,38 +25,35 @@
 
 package org.oscarehr.phr.dao;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.phr.model.PHRAction;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 
 public class PHRActionDAO extends HibernateDaoSupport {
 	private static Logger logger = MiscUtils.getLogger();
 
 	public List<PHRAction> getQueuedActions(String providerNo) {
-		String sql = "from PHRAction a where (a.senderOscar = ? OR (a.receiverOscar = ? AND phr_classification = ?)) and a.status = " + PHRAction.STATUS_SEND_PENDING;
+		String sql = "from PHRAction a where (a.senderOscar = ?0 OR (a.receiverOscar = ?1 AND phr_classification = ?2)) and a.status = " + PHRAction.STATUS_SEND_PENDING;
 		String[] f = new String[3];
 		f[0] = providerNo;
 		f[1] = providerNo;
 		f[2] = "RELATIONSHIP";
-		List<PHRAction> list = getHibernateTemplate().find(sql, f);
+		List<PHRAction> list = (List<PHRAction>) getHibernateTemplate().find(sql, f);
 		return list;
 	}
 
 	public List<PHRAction> getActionByPhrIndex(String phrIndex) {
-		String sql = "from PHRAction a where a.phrIndex=?";
-		List<PHRAction> list = getHibernateTemplate().find(sql, new String(phrIndex));
+		String sql = "from PHRAction a where a.phrIndex=?0";
+		List<PHRAction> list = (List<PHRAction>) getHibernateTemplate().find(sql, new String(phrIndex));
 		if (list == null || list.isEmpty()) {
 			return null;
 		} else return list;
@@ -70,9 +67,9 @@ public class PHRActionDAO extends HibernateDaoSupport {
 	}
 
 	public PHRAction getActionById(String id) {
-		String sql = "from PHRAction a where a.id = ? ";
+		String sql = "from PHRAction a where a.id = ?0 ";
 
-		List<PHRAction> list = getHibernateTemplate().find(sql, new Integer(id));
+		List<PHRAction> list = (List<PHRAction>) getHibernateTemplate().find(sql, new Integer(id));
 
 		if (list == null || list.size() == 0) {
 			return null;
@@ -83,14 +80,14 @@ public class PHRActionDAO extends HibernateDaoSupport {
 
 	// actionType = -1 for all actions
 	public List<PHRAction> getPendingActionsByProvider(String classification, int actionType, String providerNo) {
-		String sql = "FROM PHRAction a WHERE a.phrClassification = ? AND a.senderOscar = ? AND a.status != " + PHRAction.STATUS_SENT + " AND a.status != " + PHRAction.STATUS_NOT_SENT_DELETED;
+		String sql = "FROM PHRAction a WHERE a.phrClassification = ?0 AND a.senderOscar = ?1 AND a.status != " + PHRAction.STATUS_SENT + " AND a.status != " + PHRAction.STATUS_NOT_SENT_DELETED;
 		if (actionType != -1) {
 			sql = sql + " AND a.actionType = " + actionType;
 		}
 		String[] f = new String[2];
 		f[0] = classification;
 		f[1] = providerNo;
-		List<PHRAction> list = getHibernateTemplate().find(sql, f);
+		List<PHRAction> list = (List<PHRAction>) getHibernateTemplate().find(sql, f);
 
 		if (list == null) {
 			return new ArrayList<PHRAction>();
@@ -100,13 +97,13 @@ public class PHRActionDAO extends HibernateDaoSupport {
 	}
 
 	public List<PHRAction> getPendingActionsByProvider(int actionType, String providerNo) {
-		String sql = "FROM PHRAction a WHERE a.senderOscar = ? AND a.status != " + PHRAction.STATUS_SENT + " AND a.status != " + PHRAction.STATUS_NOT_SENT_DELETED;
+		String sql = "FROM PHRAction a WHERE a.senderOscar = ?0 AND a.status != " + PHRAction.STATUS_SENT + " AND a.status != " + PHRAction.STATUS_NOT_SENT_DELETED;
 		if (actionType != -1) {
 			sql = sql + " AND a.actionType = " + actionType;
 		}
 		String[] f = new String[2];
 		f[0] = providerNo;
-		List<PHRAction> list = getHibernateTemplate().find(sql, f);
+		List<PHRAction> list = (List<PHRAction>) getHibernateTemplate().find(sql, f);
 
 		if (list == null) {
 			return new ArrayList<PHRAction>();
@@ -117,10 +114,10 @@ public class PHRActionDAO extends HibernateDaoSupport {
 	}
 
 	public List<PHRAction> getActionsByStatus(int status, String providerNo) {
-		String sql = "FROM PHRAction a WHERE a.receiverOscar = ? AND a.status = " + status;
+		String sql = "FROM PHRAction a WHERE a.receiverOscar = ?0 AND a.status = " + status;
 		String[] f = new String[1];
 		f[0] = providerNo;
-		List<PHRAction> list = getHibernateTemplate().find(sql, f);
+		List<PHRAction> list = (List<PHRAction>) getHibernateTemplate().find(sql, f);
 
 		if (list == null) {
 			return new ArrayList<PHRAction>();
@@ -129,11 +126,11 @@ public class PHRActionDAO extends HibernateDaoSupport {
 	}
 
 	public List<PHRAction> getActionsByStatus(int status, String providerNo, String classification) {
-		String sql = "FROM PHRAction a WHERE a.receiverOscar = ? AND a.phrClassification = ? AND a.status = " + status;
+		String sql = "FROM PHRAction a WHERE a.receiverOscar = ?0 AND a.phrClassification = ?1 AND a.status = " + status;
 		String[] f = new String[2];
 		f[0] = providerNo;
 		f[1] = classification;
-		List<PHRAction> list = getHibernateTemplate().find(sql, f);
+		List<PHRAction> list = (List<PHRAction>) getHibernateTemplate().find(sql, f);
 
 		if (list == null) {
 			return new ArrayList<PHRAction>();
@@ -142,7 +139,7 @@ public class PHRActionDAO extends HibernateDaoSupport {
 	}
 
 	public List<PHRAction> getActionsByStatus(List<Integer> statuses, String providerNo, String classification) {
-		String sql = "FROM PHRAction a WHERE a.receiverOscar = ? AND a.phrClassification = ?";
+		String sql = "FROM PHRAction a WHERE a.receiverOscar = ?0 AND a.phrClassification = ?1";
 		if (statuses != null && !statuses.isEmpty()) {
 			sql += " AND (";
 			for (int i = 0; i < statuses.size(); i++) {
@@ -156,7 +153,7 @@ public class PHRActionDAO extends HibernateDaoSupport {
 		String[] f = new String[2];
 		f[0] = providerNo;
 		f[1] = classification;
-		List<PHRAction> list = getHibernateTemplate().find(sql, f);
+		List<PHRAction> list = (List<PHRAction>) getHibernateTemplate().find(sql, f);
 
 		if (list == null) {
 			return new ArrayList<PHRAction>();
@@ -182,12 +179,12 @@ public class PHRActionDAO extends HibernateDaoSupport {
 
 	public void updatePhrIndexes(String classification, String oscarId, String providerNo, String newPhrIndex) {
 		HibernateTemplate ht = getHibernateTemplate();
-		String sql = "FROM PHRAction a WHERE a.phrClassification = ? AND a.oscarId = ? AND a.senderOscar = ? AND a.status = " + PHRAction.STATUS_SEND_PENDING;
+		String sql = "FROM PHRAction a WHERE a.phrClassification = ?0 AND a.oscarId = ?1 AND a.senderOscar = ?2 AND a.status = " + PHRAction.STATUS_SEND_PENDING;
 		String[] f = new String[3];
 		f[0] = classification;
 		f[1] = oscarId;
 		f[2] = providerNo;
-		List<PHRAction> list = ht.find(sql, f);
+		List<PHRAction> list = (List<PHRAction>) ht.find(sql, f);
 		for (PHRAction action : list) {
 			action.setPhrIndex(newPhrIndex);
 			ht.update(action);
@@ -197,7 +194,22 @@ public class PHRActionDAO extends HibernateDaoSupport {
 	// get indivo idx
 
 	// checks to see whether this document has been sent to indivo before (for update/add decision)
-	public boolean isIndivoRegistered(final String classification, final String oscarId) {
+	public boolean isIndivoRegistered(final String classification, final String oscarId)
+	{
+		Session session = getSession();
+
+		Query q = session.createQuery("select count(*) from PHRAction a where a.phrClassification = '" + classification + "' and a.oscarId = '" + oscarId + "'");
+		q.setCacheable(true);
+		Long num = (Long) q.uniqueResult();
+
+		if (num > 0)
+		{
+			return true;
+		}
+
+		return false;
+
+/*
 		Long num = (Long) getHibernateTemplate().execute(new HibernateCallback() {
 			public Object doInHibernate(Session session) throws HibernateException, SQLException {
 				Query q = session.createQuery("select count(*) from PHRAction a where a.phrClassification = '" + classification + "' and a.oscarId = '" + oscarId + "'");
@@ -207,10 +219,28 @@ public class PHRActionDAO extends HibernateDaoSupport {
 		});
 		if (num > 0) return true;
 		return false;
+*/
 
 	}
 
-	public String getPhrIndex(final String classification, final String oscarId) {
+	public String getPhrIndex(final String classification, final String oscarId)
+	{
+		Session session = getSession();
+
+		Criteria criteria = session.createCriteria(PHRAction.class);
+		criteria.add(Restrictions.eq("phrClassification", classification));
+		criteria.add(Restrictions.eq("oscarId", oscarId));
+		criteria.add(Restrictions.eq("status", PHRAction.STATUS_SENT));
+		criteria.setMaxResults(1);
+		List<PHRAction> list = criteria.list();
+
+		if (list.size() > 0)
+		{
+			return list.get(0).getPhrIndex().toString();
+		}
+
+		return null;
+/*
 		List<PHRAction> list = (List<PHRAction>) getHibernateTemplate().execute(new HibernateCallback() {
 			public Object doInHibernate(Session session) throws HibernateException, SQLException {
 				Criteria criteria = session.createCriteria(PHRAction.class);
@@ -223,6 +253,7 @@ public class PHRActionDAO extends HibernateDaoSupport {
 		});
 		if (list.size() > 0) return list.get(0).getPhrIndex();
 		return null;
+*/
 
 		/*
 		 * Criteria criteria = this.getSession().createCriteria(PHRAction.class); criteria.add(Restrictions.eq("phrClassification", classification)); criteria.add(Restrictions.eq("oscarId", oscarId)); criteria.add(Restrictions.eq("sent",

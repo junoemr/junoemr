@@ -27,13 +27,19 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BillCenter;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillCenterDaoTest extends DaoTestFixtures {
-	
-	protected BillCenterDao dao = SpringUtils.getBean(BillCenterDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillCenterDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BillCenterDao billCenterDao;
 
 	public BillCenterDaoTest() {
 	}
@@ -48,7 +54,7 @@ public class BillCenterDaoTest extends DaoTestFixtures {
 		BillCenter entity = new BillCenter();
 		entity.setBillCenterCode("AA");
 		entity.setBillCenterDesc("descr");
-		dao.persist(entity);
+		billCenterDao.persist(entity);
 		assertNotNull(entity);
 	}
 }

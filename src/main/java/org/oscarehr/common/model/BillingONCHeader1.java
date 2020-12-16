@@ -52,7 +52,7 @@ public class BillingONCHeader1 extends AbstractModel<Integer> implements Seriali
         public static final String DELETED = "D";
         
 	@Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Integer id;
 	@Column(name = "header_id", nullable = false)
 	private Integer headerId;

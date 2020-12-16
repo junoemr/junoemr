@@ -36,15 +36,22 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.dao.BillActivityDao;
 import org.oscarehr.billing.CA.model.BillActivity;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BillActivityDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BillActivityDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BillActivityDao billActivityDao;
 
-	protected BillActivityDao dao = (BillActivityDao)SpringUtils.getBean(BillActivityDao.class);
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
 	@Before
@@ -56,7 +63,7 @@ public class BillActivityDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		BillActivity entity = new BillActivity();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		billActivityDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -124,14 +131,14 @@ public class BillActivityDaoTest extends DaoTestFixtures {
 		billActivity6.setStatus("A");
 		billActivity6.setBatchCount(6);
 
-		dao.persist(billActivity1);
-		dao.persist(billActivity2);
-		dao.persist(billActivity3);
-		dao.persist(billActivity4);
-		dao.persist(billActivity5);
-		dao.persist(billActivity6);
+		billActivityDao.persist(billActivity1);
+		billActivityDao.persist(billActivity2);
+		billActivityDao.persist(billActivity3);
+		billActivityDao.persist(billActivity4);
+		billActivityDao.persist(billActivity5);
+		billActivityDao.persist(billActivity6);
 
-		List<BillActivity> result = dao.findCurrentByMonthCodeAndGroupNo(monthCode, groupNo, updateDateTime);
+		List<BillActivity> result = billActivityDao.findCurrentByMonthCodeAndGroupNo(monthCode, groupNo, updateDateTime);
 		List<BillActivity> expectedResult = new ArrayList<BillActivity>(Arrays.asList(
 				billActivity6, billActivity1));
 
@@ -185,12 +192,12 @@ public class BillActivityDaoTest extends DaoTestFixtures {
 		billActivity4.setUpdateDateTime(date4);
 		billActivity4.setStatus("A");
 		
-		dao.persist(billActivity1);
-		dao.persist(billActivity2);
-		dao.persist(billActivity3);
-		dao.persist(billActivity4);
+		billActivityDao.persist(billActivity1);
+		billActivityDao.persist(billActivity2);
+		billActivityDao.persist(billActivity3);
+		billActivityDao.persist(billActivity4);
 		
-		List<BillActivity> result = dao.findCurrentByDateRange(startDate, endDate);
+		List<BillActivity> result = billActivityDao.findCurrentByDateRange(startDate, endDate);
 		List<BillActivity> expectedResult = new ArrayList<BillActivity>(Arrays.asList(
 				billActivity3,billActivity2, billActivity1));
 

@@ -44,7 +44,7 @@ public class FacilityDao extends AbstractDao<Facility> {
 	{
 		StringBuilder sb=new StringBuilder();
 		sb.append("select x from Facility x");
-		if (active!=null) sb.append(" where x.disabled=?");
+		if (active!=null) sb.append(" where x.disabled=?1");
 		sb.append(" order by x.name");
 		
 		Query query = entityManager.createQuery(sb.toString());

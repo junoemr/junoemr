@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.EChart;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class EChartDaoTest extends DaoTestFixtures {
-
-	protected EChartDao dao = SpringUtils.getBean(EChartDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EChartDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected EChartDao eChartDao;
 
 	@Before
 	public void before() throws Exception {
@@ -45,7 +51,7 @@ public class EChartDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		EChart entity = new EChart();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		eChartDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
@@ -53,20 +59,20 @@ public class EChartDaoTest extends DaoTestFixtures {
 	public void testGetMaxId() throws Exception {
 		EChart entity = new EChart();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		eChartDao.persist(entity);
 
-		Integer id = dao.getMaxIdForDemographic(entity.getDemographicNo());
+		Integer id = eChartDao.getMaxIdForDemographic(entity.getDemographicNo());
 		assertNotNull(id);
 	}
 
 	@Test
 	public void testGetChartsForDemographic() {
-		assertNotNull(dao.getChartsForDemographic(100));
+		assertNotNull(eChartDao.getChartsForDemographic(100));
 	}
 	
 	@Test
 	public void testFindByDemoIdAndSubject() {
-		assertNotNull(dao.findByDemoIdAndSubject(100, "SUBJ"));
+		assertNotNull(eChartDao.findByDemoIdAndSubject(100, "SUBJ"));
 	}
 	
 }

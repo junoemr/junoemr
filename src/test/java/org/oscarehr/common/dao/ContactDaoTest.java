@@ -33,15 +33,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Contact;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ContactDaoTest extends DaoTestFixtures {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ContactDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ContactDao contactDao;
 
-	protected ContactDao dao = (ContactDao)SpringUtils.getBean(ContactDao.class);
 	Logger logger = MiscUtils.getLogger();
 
 	@Override
@@ -81,11 +88,11 @@ public class ContactDaoTest extends DaoTestFixtures {
 		contact3.setLastName("Smith");
 		contact3.setFirstName("Jim");
 
-		dao.persist(contact1);
-		dao.persist(contact2);
-		dao.persist(contact3);
+		contactDao.persist(contact1);
+		contactDao.persist(contact2);
+		contactDao.persist(contact3);
 
-		List<Contact> result = dao.search(searchMode, orderBy, keyword); 
+		List<Contact> result = contactDao.search(searchMode, orderBy, keyword);
 		List<Contact> expectedResult = new ArrayList<Contact>(Arrays.asList(
 				contact1,
 				contact2
@@ -121,19 +128,19 @@ public class ContactDaoTest extends DaoTestFixtures {
 		Contact contact1 = new Contact();
 		EntityDataGenerator.generateTestDataForModelClass(contact1);
 		contact1.setLastName("Smith");
-		dao.persist(contact1);
+		contactDao.persist(contact1);
 		
 		Contact contact2 = new Contact();
 		EntityDataGenerator.generateTestDataForModelClass(contact2);
 		contact2.setLastName("Jackson");
-		dao.persist(contact2);
+		contactDao.persist(contact2);
 		
 		Contact contact3 = new Contact();
 		EntityDataGenerator.generateTestDataForModelClass(contact3);
 		contact3.setLastName("Smith");
-		dao.persist(contact3);
+		contactDao.persist(contact3);
 
-		List<Contact> result = dao.search(searchMode, orderBy, keyword); 
+		List<Contact> result = contactDao.search(searchMode, orderBy, keyword);
 		List<Contact> expectedResult = new ArrayList<Contact>(Arrays.asList(
 				contact1,
 				contact3
@@ -179,11 +186,11 @@ public class ContactDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(contact3);
 		contact3.setProvince("ON");
 
-		dao.persist(contact1);
-		dao.persist(contact2);
-		dao.persist(contact3);
+		contactDao.persist(contact1);
+		contactDao.persist(contact2);
+		contactDao.persist(contact3);
 
-		List<Contact> result = dao.search(searchMode, orderBy, keyword); 
+		List<Contact> result = contactDao.search(searchMode, orderBy, keyword);
 		List<Contact> expectedResult = new ArrayList<Contact>(Arrays.asList(
 				contact2,
 				contact3

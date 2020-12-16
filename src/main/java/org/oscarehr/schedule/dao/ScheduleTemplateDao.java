@@ -111,7 +111,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
     }
 
 	public List<ScheduleTemplate> findByProviderNoAndName(String providerNo, String name) {
-		Query query = entityManager.createQuery("SELECT e FROM ScheduleTemplate e WHERE e.id.providerNo=? and e.id.name=? ");
+		Query query = entityManager.createQuery("SELECT e FROM ScheduleTemplate e WHERE e.id.providerNo=?1 and e.id.name=?2 ");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, name);
 
@@ -120,7 +120,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 	}
 	
 	public List<ScheduleTemplate> findByProviderNo(String providerNo) {
-		Query query = entityManager.createQuery("SELECT e FROM ScheduleTemplate e WHERE e.id.providerNo=? order by e.id.name");
+		Query query = entityManager.createQuery("SELECT e FROM ScheduleTemplate e WHERE e.id.providerNo=?1 order by e.id.name");
 		query.setParameter(1, providerNo);
 		
         List<ScheduleTemplate> results = query.getResultList();

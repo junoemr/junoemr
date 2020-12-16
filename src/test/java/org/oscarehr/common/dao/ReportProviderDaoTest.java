@@ -36,15 +36,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ReportProvider;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ReportProviderDaoTest extends DaoTestFixtures {
-	
-	protected ReportProviderDao dao = (ReportProviderDao)SpringUtils.getBean(ReportProviderDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ReportProviderDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ReportProviderDao reportProviderDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -60,20 +66,20 @@ public class ReportProviderDaoTest extends DaoTestFixtures {
 		ReportProvider reportProvider1 = new ReportProvider();
 		EntityDataGenerator.generateTestDataForModelClass(reportProvider1);
 		reportProvider1.setAction(action1);
-		dao.persist(reportProvider1);
+		reportProviderDao.persist(reportProvider1);
 		
 		ReportProvider reportProvider2 = new ReportProvider();
 		EntityDataGenerator.generateTestDataForModelClass(reportProvider2);
 		reportProvider2.setAction(action2);
-		dao.persist(reportProvider2);
+		reportProviderDao.persist(reportProvider2);
 		
 		ReportProvider reportProvider3 = new ReportProvider();
 		EntityDataGenerator.generateTestDataForModelClass(reportProvider3);
 		reportProvider3.setAction(action1);
-		dao.persist(reportProvider3);
+		reportProviderDao.persist(reportProvider3);
 		
 		List<ReportProvider> expectedResult = new ArrayList<ReportProvider>(Arrays.asList(reportProvider1, reportProvider3));
-		List<ReportProvider> result = dao.findByAction(action1);
+		List<ReportProvider> result = reportProviderDao.findByAction(action1);
 
 		Logger logger = MiscUtils.getLogger();
 		

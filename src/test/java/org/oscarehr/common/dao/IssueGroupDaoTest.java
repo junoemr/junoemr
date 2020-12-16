@@ -33,15 +33,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.IssueGroup;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class IssueGroupDaoTest extends DaoTestFixtures {
-
-	protected IssueGroupDao dao = SpringUtils.getBean(IssueGroupDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class IssueGroupDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected IssueGroupDao issueGroupDao;
 
 
 	@Before
@@ -54,22 +60,22 @@ public class IssueGroupDaoTest extends DaoTestFixtures {
 		
 		IssueGroup issueGroup1 = new IssueGroup();
 		EntityDataGenerator.generateTestDataForModelClass(issueGroup1);
-		dao.persist(issueGroup1);
+		issueGroupDao.persist(issueGroup1);
 		
 		IssueGroup issueGroup2 = new IssueGroup();
 		EntityDataGenerator.generateTestDataForModelClass(issueGroup2);
-		dao.persist(issueGroup2);
+		issueGroupDao.persist(issueGroup2);
 		
 		IssueGroup issueGroup3 = new IssueGroup();
 		EntityDataGenerator.generateTestDataForModelClass(issueGroup3);
-		dao.persist(issueGroup3);
+		issueGroupDao.persist(issueGroup3);
 		
 		IssueGroup issueGroup4 = new IssueGroup();
 		EntityDataGenerator.generateTestDataForModelClass(issueGroup4);
-		dao.persist(issueGroup4);
+		issueGroupDao.persist(issueGroup4);
 		
 		List<IssueGroup> expectedResult = new ArrayList<IssueGroup>(Arrays.asList(issueGroup1, issueGroup2, issueGroup3, issueGroup4));
-		List<IssueGroup> result = dao.findAll();
+		List<IssueGroup> result = issueGroupDao.findAll();
 
 		Logger logger = MiscUtils.getLogger();
 		

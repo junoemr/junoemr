@@ -34,7 +34,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-@Entity(name = "model.CaseManagementNoteLink")
+@Entity(name = "model_CaseManagementNoteLink")
 @Table(name = "casemgmt_note_link")
 public class CaseManagementNoteLink extends AbstractModel<Long>
 {

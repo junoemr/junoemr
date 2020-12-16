@@ -89,6 +89,7 @@ public class EctIncomingEncounterAction extends Action {
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
+
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String demoNo = request.getParameter("demographicNo");
 
@@ -260,6 +261,16 @@ public class EctIncomingEncounterAction extends Action {
 				}
 			}
 
+		}
+
+		if(
+			OscarProperties.getInstance().isJunoEncounterEnabled() && (
+				request.getParameter("old_encounter") == null ||
+				!request.getParameter("old_encounter").equals("1")
+			)
+		)
+		{
+			return (mapping.findForward("junoEncounter"));
 		}
 
 		ArrayList newDocArr = (ArrayList) request.getSession().getServletContext().getAttribute("newDocArr");

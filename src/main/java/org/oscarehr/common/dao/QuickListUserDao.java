@@ -40,7 +40,7 @@ public class QuickListUserDao extends AbstractDao<QuickListUser>{
 	}
 	
 	public List<QuickListUser> findByNameAndProviderNo(String name, String providerNo) {
-		Query q = entityManager.createQuery("SELECT x FROM QuickListUser x WHERE x.quickListName=? AND x.providerNo=?");
+		Query q = entityManager.createQuery("SELECT x FROM QuickListUser x WHERE x.quickListName=?1 AND x.providerNo=?2");
 		q.setParameter(1, name);
 		q.setParameter(2, providerNo);
 		

@@ -30,14 +30,20 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.DiagnosticCode;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class DiagnosticCodeDaoTest extends DaoTestFixtures {
-
-	protected DiagnosticCodeDao dao = SpringUtils.getBean(DiagnosticCodeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DiagnosticCodeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected DiagnosticCodeDao diagnosticCodeDao;
 
 	public DiagnosticCodeDaoTest() {
 	}
@@ -52,7 +58,7 @@ public class DiagnosticCodeDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		DiagnosticCode entity = new DiagnosticCode();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		diagnosticCodeDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
@@ -62,9 +68,9 @@ public class DiagnosticCodeDaoTest extends DaoTestFixtures {
 		DiagnosticCode entity = new DiagnosticCode();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDiagnosticCode("a");
-		dao.persist(entity);
+		diagnosticCodeDao.persist(entity);
 
-		assertEquals(1,dao.findByDiagnosticCode(entity.getDiagnosticCode()).size());
+		assertEquals(1, diagnosticCodeDao.findByDiagnosticCode(entity.getDiagnosticCode()).size());
 	}
 
 	@Test
@@ -73,19 +79,20 @@ public class DiagnosticCodeDaoTest extends DaoTestFixtures {
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDiagnosticCode("a");
 		entity.setRegion("b");
-		dao.persist(entity);
+		diagnosticCodeDao.persist(entity);
 
-		assertEquals(1,dao.findByDiagnosticCodeAndRegion(entity.getDiagnosticCode(),entity.getRegion()).size());
+		assertEquals(1,
+				diagnosticCodeDao.findByDiagnosticCodeAndRegion(entity.getDiagnosticCode(),entity.getRegion()).size());
 	}
 	
 	@Test
 	public void testFindByRegionAndType() {
-		List<DiagnosticCode> codes = dao.findByRegionAndType("REG", "TYPE");
+		List<DiagnosticCode> codes = diagnosticCodeDao.findByRegionAndType("REG", "TYPE");
 		assertNotNull(codes);
 	}
 
     @Test
     public void testFindDiagnosictsAndCtlDiagCodesByServiceType() {
-	    assertNotNull(dao.findDiagnosictsAndCtlDiagCodesByServiceType("TYPE"));
+	    assertNotNull(diagnosticCodeDao.findDiagnosictsAndCtlDiagCodesByServiceType("TYPE"));
     }
 }

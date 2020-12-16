@@ -27,14 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.EncounterTemplate;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class EncounterTemplateDaoTest extends DaoTestFixtures {
-
-	protected EncounterTemplateDao dao = SpringUtils.getBean(EncounterTemplateDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EncounterTemplateDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected EncounterTemplateDao encounterTemplateDao;
 
 	public EncounterTemplateDaoTest() {
 
@@ -50,7 +56,7 @@ public class EncounterTemplateDaoTest extends DaoTestFixtures {
 		EncounterTemplate entity = new EncounterTemplate();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setEncounterTemplateName("test");
-		dao.persist(entity);
+		encounterTemplateDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 

@@ -30,15 +30,21 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.Hl7Link;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class Hl7LinkDaoTest extends DaoTestFixtures {
-
-	public Hl7LinkDao dao = SpringUtils.getBean(Hl7LinkDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class Hl7LinkDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public Hl7LinkDao hl7LinkDao;
 
 	@Before
 	public void before() throws Exception {
@@ -51,30 +57,30 @@ public class Hl7LinkDaoTest extends DaoTestFixtures {
 		Hl7Link entity = new Hl7Link();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setId(1);
-		dao.persist(entity);
+		hl7LinkDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 	
 	@Test
 	public void testFindLabs() {
-		assertNotNull(dao.findLabs());
+		assertNotNull(hl7LinkDao.findLabs());
 	}
 	
 	@Test
 	public void testFindMagicLinks() {
-		assertNotNull(dao.findMagicLinks());
+		assertNotNull(hl7LinkDao.findMagicLinks());
 	}
 	
     @Test
     public void testFindLinksAndRequestDates() {
-	    assertNotNull(dao.findLinksAndRequestDates(100));
+	    assertNotNull(hl7LinkDao.findLinksAndRequestDates(100));
     }
 
     @Test
     public void testFindReports() {
-	    assertNotNull(dao.findReports(new Date(), new Date(), "-ULL", "patient_name", "CMD"));
-	    assertNotNull(dao.findReports(new Date(), new Date(), "-APL", "patient_name", "CMD"));
-	    assertNotNull(dao.findReports(new Date(), new Date(), "-UAP", "patient_name", "CMD"));
+	    assertNotNull(hl7LinkDao.findReports(new Date(), new Date(), "-ULL", "patient_name", "CMD"));
+	    assertNotNull(hl7LinkDao.findReports(new Date(), new Date(), "-APL", "patient_name", "CMD"));
+	    assertNotNull(hl7LinkDao.findReports(new Date(), new Date(), "-UAP", "patient_name", "CMD"));
     }
     
 	@Override

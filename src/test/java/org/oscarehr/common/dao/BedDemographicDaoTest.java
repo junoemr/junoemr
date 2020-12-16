@@ -27,15 +27,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.BedDemographic;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class BedDemographicDaoTest extends DaoTestFixtures {
-
-	protected BedDemographicDao dao = SpringUtils.getBean(BedDemographicDao.class);
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BedDemographicDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected BedDemographicDao bedDemographicDao;
 
 	@Before
 	public void before() throws Exception {
@@ -49,7 +54,7 @@ public class BedDemographicDaoTest extends DaoTestFixtures {
 		entity.getId().setBedId(1);
 		entity.getId().setDemographicNo(1);
 		
-		dao.persist(entity);
+		bedDemographicDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

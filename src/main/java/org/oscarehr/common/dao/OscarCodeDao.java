@@ -39,7 +39,7 @@ public class OscarCodeDao extends AbstractCodeSystemDao<OscarCode>{
 	}
 
 	public List<OscarCode> getIcd9Code(String icdCode){
-		Query query = entityManager.createQuery("select i from OscarCode i where i.oscarCode=?");
+		Query query = entityManager.createQuery("select i from OscarCode i where i.oscarCode=?1");
 		query.setParameter(1, icdCode);
 
 		@SuppressWarnings("unchecked")
@@ -50,7 +50,7 @@ public class OscarCodeDao extends AbstractCodeSystemDao<OscarCode>{
 
 
     public List<OscarCode> getOscarCode(String query) {
-		Query q = entityManager.createQuery("select i from OscarCode i where i.oscarCode like ? or i.description like ? order by i.description");
+		Query q = entityManager.createQuery("select i from OscarCode i where i.oscarCode like ?1 or i.description like ?2 order by i.description");
 		q.setParameter(1, "%"+query+"%");
 		q.setParameter(2, "%"+query+"%");
 

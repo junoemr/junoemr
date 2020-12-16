@@ -28,14 +28,20 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.CountryCode;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CountryCodeDaoTest extends DaoTestFixtures {
-
-	protected CountryCodeDao dao = SpringUtils.getBean(CountryCodeDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CountryCodeDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected CountryCodeDao countryCodeDao;
 
 	public CountryCodeDaoTest() {
 
@@ -50,24 +56,24 @@ public class CountryCodeDaoTest extends DaoTestFixtures {
 	public void testCreate() throws Exception {
 		CountryCode entity = new CountryCode();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		countryCodeDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 
 	@Test
 	public void testGetAllCountryCodes() throws Exception {
-		int initialSize = dao.findAll().size();
+		int initialSize = countryCodeDao.findAll().size();
 		CountryCode entity = new CountryCode();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		countryCodeDao.persist(entity);
 
-		assertEquals(dao.findAll().size(), initialSize + 1);
+		assertEquals(countryCodeDao.findAll().size(), initialSize + 1);
 	}
 
 	public void testGetCountryCode() throws Exception {
 		CountryCode country = new CountryCode();
 		EntityDataGenerator.generateTestDataForModelClass(country);
-		country = dao.getCountryCode("CA");
+		country = countryCodeDao.getCountryCode("CA");
 		assertEquals("Canada", country.getCountryName());
 	}
 

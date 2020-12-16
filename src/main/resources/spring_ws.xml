@@ -365,6 +365,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DiseaseRegistryService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormsService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.EncounterSectionsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxAccountWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxInboundWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxOutboundWebService"/>

@@ -35,15 +35,21 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.StudyData;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class StudyDataDaoTest extends DaoTestFixtures {
-	
-	protected StudyDataDao dao = (StudyDataDao)SpringUtils.getBean(StudyDataDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class StudyDataDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected StudyDataDao studyDataDao;
 	
 	@Before
 	public void before() throws Exception {
@@ -59,24 +65,24 @@ public class StudyDataDaoTest extends DaoTestFixtures {
 		StudyData studyData1 = new StudyData();
 		EntityDataGenerator.generateTestDataForModelClass(studyData1);
 		studyData1.setContent(content1);
-		dao.persist(studyData1);
+		studyDataDao.persist(studyData1);
 		
 		StudyData studyData2 = new StudyData();
 		EntityDataGenerator.generateTestDataForModelClass(studyData2);
 		studyData2.setContent(content2);
-		dao.persist(studyData2);
+		studyDataDao.persist(studyData2);
 		
 		StudyData studyData3 = new StudyData();
 		EntityDataGenerator.generateTestDataForModelClass(studyData3);
 		studyData3.setContent(content1);
-		dao.persist(studyData3);
+		studyDataDao.persist(studyData3);
 		
 		StudyData studyData4 = new StudyData();
 		EntityDataGenerator.generateTestDataForModelClass(studyData4);
 		studyData4.setContent(content1);
-		dao.persist(studyData4);
+		studyDataDao.persist(studyData4);
 		
-		List<StudyData> result = dao.findByContent(content1);
+		List<StudyData> result = studyDataDao.findByContent(content1);
 		List<StudyData> expectedResult = new ArrayList<StudyData>(Arrays.asList(studyData1, studyData3, studyData4));
 		
 		Logger logger = MiscUtils.getLogger();
@@ -103,20 +109,20 @@ public class StudyDataDaoTest extends DaoTestFixtures {
 		StudyData studyData1 = new StudyData();
 		EntityDataGenerator.generateTestDataForModelClass(studyData1);
 		studyData1.setContent(content1);
-		dao.persist(studyData1);
+		studyDataDao.persist(studyData1);
 		
 		StudyData studyData2 = new StudyData();
 		EntityDataGenerator.generateTestDataForModelClass(studyData2);
 		studyData2.setContent(content2);
-		dao.persist(studyData2);
+		studyDataDao.persist(studyData2);
 		
 		StudyData studyData3 = new StudyData();
 		EntityDataGenerator.generateTestDataForModelClass(studyData3);
 		studyData3.setContent(content1);
-		dao.persist(studyData3);
+		studyDataDao.persist(studyData3);
 		
 		StudyData expectedResult = studyData2;
-		StudyData result = dao.findSingleByContent(content2);
+		StudyData result = studyDataDao.findSingleByContent(content2);
 		
 		assertEquals(expectedResult, result);
 	}
@@ -135,23 +141,23 @@ public class StudyDataDaoTest extends DaoTestFixtures {
 		studyData1.setDeleted(false);
 		studyData1.setDemographicNo(demoNo1);
 		studyData1.setStudyNo(studyNo1);
-		dao.persist(studyData1);
+		studyDataDao.persist(studyData1);
 		
 		StudyData studyData2 = new StudyData();
 		EntityDataGenerator.generateTestDataForModelClass(studyData2);
 		studyData2.setDeleted(false);
 		studyData2.setDemographicNo(demoNo2);
 		studyData2.setStudyNo(studyNo2);
-		dao.persist(studyData2);
+		studyDataDao.persist(studyData2);
 		
 		StudyData studyData3 = new StudyData();
 		EntityDataGenerator.generateTestDataForModelClass(studyData3);
 		studyData3.setDeleted(false);
 		studyData3.setDemographicNo(demoNo1);
 		studyData3.setStudyNo(studyNo1);
-		dao.persist(studyData3);
+		studyDataDao.persist(studyData3);
 		
-		List<StudyData> result = dao.findByDemoAndStudy(demoNo1, studyNo1);
+		List<StudyData> result = studyDataDao.findByDemoAndStudy(demoNo1, studyNo1);
 		List<StudyData> expectedResult = new ArrayList<StudyData>(Arrays.asList(studyData1, studyData3));
 		
 		Logger logger = MiscUtils.getLogger();

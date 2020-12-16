@@ -53,8 +53,8 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
 
     	if (results==null)
     	{
-    		String q = "select pp from ProgramProvider pp where pp.ProgramId=? and pp.ProviderNo=?";
-    		results=getHibernateTemplate().find(q, new Object[] {programId, providerNo});
+    		String q = "select pp from ProgramProvider pp where pp.ProgramId=?0 and pp.ProviderNo=?1";
+    		results= (List<ProgramProvider>) getHibernateTemplate().find(q, new Object[] {programId, providerNo});
 			if (results != null) programProviderByProviderProgramIdCache.put(cacheKey, results);
     	}
 
@@ -63,13 +63,13 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
 
 	@SuppressWarnings("unchecked")
 	public List<ProgramProvider> getAllProgramProviders() {
-		return getHibernateTemplate().find("FROM ProgramProvider");
+		return (List<ProgramProvider>) getHibernateTemplate().find("FROM ProgramProvider");
 	}
 
     @SuppressWarnings("unchecked")
     public List<ProgramProvider> getProgramProviderByProviderNo(String providerNo) {
-        String q = "select pp from ProgramProvider pp where pp.ProviderNo=?";
-        return getHibernateTemplate().find(q, providerNo);
+        String q = "select pp from ProgramProvider pp where pp.ProviderNo=?0";
+        return (List<ProgramProvider>) getHibernateTemplate().find(q, providerNo);
     }
 
     public List<ProgramProvider> getProgramProviders(Long programId) {
@@ -78,7 +78,7 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
         }
 
         @SuppressWarnings("unchecked")
-        List<ProgramProvider> results = this.getHibernateTemplate().find("from ProgramProvider pp where pp.ProgramId = ?", programId);
+        List<ProgramProvider> results = (List<ProgramProvider>) this.getHibernateTemplate().find("from ProgramProvider pp where pp.ProgramId = ?0", programId);
 
         if (log.isDebugEnabled()) {
             log.debug("getProgramProviders: programId=" + programId + ",# of results=" + results.size());
@@ -91,7 +91,7 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
             throw new IllegalArgumentException();
         }
 
-        List<ProgramProvider> results = this.getHibernateTemplate().find("from ProgramProvider pp where pp.ProviderNo = ?", providerNo);
+        List<ProgramProvider> results = (List<ProgramProvider>) this.getHibernateTemplate().find("from ProgramProvider pp where pp.ProviderNo = ?0", providerNo);
 
         if (log.isDebugEnabled()) {
             log.debug("getProgramProvidersByProvider: providerNo=" + providerNo + ",# of results=" + results.size());
@@ -104,8 +104,8 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
             throw new IllegalArgumentException();
         }
 
-        String queryStr = "from ProgramProvider pp where pp.ProviderNo = ? and pp.ProgramId in " +
-                      "(select s.id from Program s where s.facilityId=? or s.facilityId is null)";
+        String queryStr = "from ProgramProvider pp where pp.ProviderNo = ?0 and pp.ProgramId in " +
+                      "(select s.id from Program s where s.facilityId=?1 or s.facilityId is null)";
         List results = getHibernateTemplate().find(queryStr, new Object[] { providerNo, facilityId });
 
         if (log.isDebugEnabled()) {
@@ -137,7 +137,7 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
         }
 
         ProgramProvider result = null;
-        List results = this.getHibernateTemplate().find("from ProgramProvider pp where pp.ProviderNo = ? and pp.ProgramId = ?", new Object[] { providerNo, programId });
+        List results = this.getHibernateTemplate().find("from ProgramProvider pp where pp.ProviderNo = ?0 and pp.ProgramId = ?1", new Object[] { providerNo, programId });
         if (!results.isEmpty()) {
             result = (ProgramProvider) results.get(0);
         }
@@ -154,7 +154,7 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
     	ProgramProvider result = null;
 
     	@SuppressWarnings("unchecked")
-        List<ProgramProvider> results = getHibernateTemplate().find("from ProgramProvider pp where pp.ProviderNo = ? and pp.ProgramId = ? and pp.RoleId=?", new Object[] { providerNo, programId, roleId });
+        List<ProgramProvider> results = (List<ProgramProvider>) getHibernateTemplate().find("from ProgramProvider pp where pp.ProviderNo = ?0 and pp.ProgramId = ?1 and pp.RoleId=?2", new Object[] { providerNo, programId, roleId });
 
         if (!results.isEmpty()) {
             result = results.get(0);
@@ -222,7 +222,7 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
         }
         Long pId = programId.longValue();
 
-        List<ProgramProvider> results = this.getHibernateTemplate().find("select pp from ProgramProvider pp left join pp.teams as team where pp.ProgramId = ? and team.id = ?", new Object[] {pId, teamId});
+        List<ProgramProvider> results = (List<ProgramProvider>) this.getHibernateTemplate().find("select pp from ProgramProvider pp left join pp.teams as team where pp.ProgramId = ?0 and team.id = ?1", new Object[] {pId, teamId});
 
         if (log.isDebugEnabled()) {
             log.debug("getProgramProvidersInTeam: programId=" + programId + ",teamId=" + teamId + ",# of results=" + results.size());
@@ -239,7 +239,7 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
             throw new IllegalArgumentException();
         }
 
-        List results = this.getHibernateTemplate().find("from ProgramProvider pp where pp.ProviderNo = ?", providerNo);
+        List results = this.getHibernateTemplate().find("from ProgramProvider pp where pp.ProviderNo = ?0", providerNo);
 
         if (log.isDebugEnabled()) {
             log.debug("getProgramDomain: providerNo=" + providerNo + ",# of results=" + results.size());
@@ -252,7 +252,7 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
             throw new IllegalArgumentException();
         }
 
-        List results = this.getHibernateTemplate().find("select pp from ProgramProvider pp, Program p where pp.ProgramId=p.id and p.programStatus='active' and pp.ProviderNo = ?", providerNo);
+        List results = this.getHibernateTemplate().find("select pp from ProgramProvider pp, Program p where pp.ProgramId=p.id and p.programStatus='active' and pp.ProviderNo = ?0", providerNo);
 
         if (log.isDebugEnabled()) {
             log.debug("getProgramDomain: providerNo=" + providerNo + ",# of results=" + results.size());
@@ -265,8 +265,8 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
             throw new IllegalArgumentException();
         }
 
-        String queryStr = "from ProgramProvider pp where pp.ProviderNo = ? and pp.ProgramId in " +
-                    "(select s.id from Program s where s.facilityId=? or s.facilityId is null)";
+        String queryStr = "from ProgramProvider pp where pp.ProviderNo = ?0 and pp.ProgramId in " +
+                    "(select s.id from Program s where s.facilityId=?1 or s.facilityId is null)";
         List results = getHibernateTemplate().find(queryStr, new Object[] { providerNo, facilityId });
 
         if (log.isDebugEnabled()) {
@@ -282,7 +282,7 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
 			throw new IllegalArgumentException();
 		}
 
-		String queryStr = "from ProgramProvider pp where pp.ProviderNo = ? and pp.ProgramId = ?";
+		String queryStr = "from ProgramProvider pp where pp.ProviderNo = ?0 and pp.ProgramId = ?1";
 		List results = getHibernateTemplate().find(queryStr, new Object[]{providerNo, Long.valueOf(programId.longValue())});
 		if(results!=null && results.size()>0) {
 			return true;
@@ -298,7 +298,7 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
         if (providerNo == null || Long.valueOf(providerNo) == null) {
             throw new IllegalArgumentException();
         }
-        List results = this.getHibernateTemplate().find("select distinct f from Facility f, Room r, ProgramProvider pp where pp.ProgramId = r.programId and f.id = r.facilityId and pp.ProviderNo = ?", providerNo);
+        List results = this.getHibernateTemplate().find("select distinct f from Facility f, Room r, ProgramProvider pp where pp.ProgramId = r.programId and f.id = r.facilityId and pp.ProviderNo = ?0", providerNo);
 
         return results;
     }
@@ -306,6 +306,6 @@ public class ProgramProviderDAO extends HibernateDaoSupport {
 
 
 	public void updateProviderRoles(Long providerId, Long roleId) {
-		getHibernateTemplate().bulkUpdate("UPDATE ProgramProvider pp SET pp.RoleId = ? WHERE pp.Id = ?", new Object[] { roleId, providerId });
+		getHibernateTemplate().bulkUpdate("UPDATE ProgramProvider pp SET pp.RoleId = ?0 WHERE pp.Id = ?1", new Object[] { roleId, providerId });
 	}
 }

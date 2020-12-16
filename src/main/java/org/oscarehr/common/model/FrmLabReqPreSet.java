@@ -42,7 +42,7 @@ import javax.persistence.Table;
 @Table(name="frm_labreq_preset")
 public class FrmLabReqPreSet extends AbstractModel<Integer> implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "preset_id", nullable = false)
     private Integer id;
     

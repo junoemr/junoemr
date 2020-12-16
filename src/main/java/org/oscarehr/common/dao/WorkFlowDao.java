@@ -39,7 +39,7 @@ public class WorkFlowDao extends AbstractDao<WorkFlow>{
 	}
 	
 	public List<WorkFlow> findByWorkflowType(String type) {
-		Query q = entityManager.createQuery("SELECT w FROM WorkFlow w WHERE w.workflowType=?");
+		Query q = entityManager.createQuery("SELECT w FROM WorkFlow w WHERE w.workflowType=?1");
 		q.setParameter(1, type);
 		
 		@SuppressWarnings("unchecked")
@@ -49,7 +49,7 @@ public class WorkFlowDao extends AbstractDao<WorkFlow>{
 	}
 	
 	public List<WorkFlow> findActiveByWorkflowType(String type) {
-		Query q = entityManager.createQuery("SELECT w FROM WorkFlow w WHERE w.workflowType=? AND w.currentState <> ?");
+		Query q = entityManager.createQuery("SELECT w FROM WorkFlow w WHERE w.workflowType=?1 AND w.currentState <> ?2");
 		q.setParameter(1, type);
 		q.setParameter(2, "C");
 		
@@ -60,7 +60,7 @@ public class WorkFlowDao extends AbstractDao<WorkFlow>{
 	}
 	
 	public List<WorkFlow> findActiveByWorkflowTypeAndDemographicNo(String type, String demographicNo) {
-		Query q = entityManager.createQuery("SELECT w FROM WorkFlow w WHERE w.workflowType=? AND w.demographicNo=? AND w.currentState <> ?");
+		Query q = entityManager.createQuery("SELECT w FROM WorkFlow w WHERE w.workflowType=?1 AND w.demographicNo=?2 AND w.currentState <> ?3");
 		q.setParameter(1, type);
 		q.setParameter(2, demographicNo);
 		q.setParameter(3, "C");
