@@ -330,7 +330,7 @@ public class OutgoingFaxService
 					// if the remote status is sent, update accordingly.
 					if(SRFaxApiConnector.RESPONSE_STATUS_SENT.equalsIgnoreCase(remoteSentStatus))
 					{
-						Date dateDelivered = ConversionUtils.fromDateString(result.getDateSent(), "MMM dd/yy hh:mm a");
+						Date dateDelivered = ConversionUtils.fromEpochStringSeconds(result.getEpochTime());
 						faxOutbound.setExternalDeliveryDate(dateDelivered);
 						faxOutbound.setStatusMessage(STATUS_MESSAGE_COMPLETED);
 						faxOutbound.setArchived(true);
