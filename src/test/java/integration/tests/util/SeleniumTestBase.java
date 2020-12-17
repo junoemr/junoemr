@@ -52,7 +52,7 @@ public class SeleniumTestBase
 	protected WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 
 	@BeforeClass
-	public static void buildWebDriver() throws SQLException, InstantiationException,
+	synchronized public static void buildWebDriver() throws SQLException, InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException
 	{
 		//load database (during the integration-test phase this will only populate table creation maps)
@@ -75,12 +75,12 @@ public class SeleniumTestBase
 	}
 
 	@AfterClass
-	public static void closeWebDriver()
+	synchronized public static void closeWebDriver()
 	{
 		driver.quit();
 	}
 
-	private static void createWebDriver()
+	synchronized private static void createWebDriver()
 	{
 		System.setProperty("webdriver.gecko.driver", GECKO_DRIVER);
 		FirefoxBinary ffb = new FirefoxBinary();

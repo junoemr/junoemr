@@ -24,9 +24,14 @@ package integration.tests.util.seleniumUtil;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import static integration.tests.util.SeleniumTestBase.WEB_DRIVER_EXPLICIT_TIMEOUT;
 
 public class SectionAccessUtil
 {
+
 	public static void accessAdministrationSectionClassicUI(WebDriver driver, String sectionName, String subSectionName)
 	{
 		driver.findElement(By.id("admin-panel")).click();
@@ -39,11 +44,13 @@ public class SectionAccessUtil
 
 	public static void accessAdministrationSectionJUNOUI(WebDriver driver, String sectionName, String subSectionName)
 	{
+		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
 
 		// open administration panel
 		driver.manage().window().maximize();
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Admin")));
 		driver.findElement(By.linkText("Admin")).click();
 		driver.findElement(By.linkText(sectionName)).click();
 		driver.findElement(By.linkText(subSectionName)).click();
