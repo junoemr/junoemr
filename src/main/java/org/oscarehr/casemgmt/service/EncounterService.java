@@ -34,7 +34,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.WebApplicationContext;
 import oscar.OscarProperties;
 import oscar.oscarEncounter.data.EctProviderData;
 import oscar.oscarProvider.data.ProviderColourUpdater;
@@ -53,9 +52,6 @@ import java.util.List;
 public class EncounterService
 {
 	Logger logger = MiscUtils.getLogger();
-
-	@Autowired
-	WebApplicationContext appContext;
 
 	@Autowired
 	private EncounterPreventionNoteService encounterPreventionNoteService;

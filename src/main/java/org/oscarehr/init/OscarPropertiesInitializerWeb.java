@@ -49,15 +49,15 @@ import java.io.IOException;
  *                      refreshed while the app is running vs ones that can't (i.e. value is read and stored)
  */
 @Component
-public class OscarPropertiesInitializer implements ApplicationContextInitializer<ConfigurableWebApplicationContext>
+public class OscarPropertiesInitializerWeb implements ApplicationContextInitializer<ConfigurableWebApplicationContext>
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
+	private static final oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
 
-	private final String TOMCAT_LOCATION_ENVIRONMENT_VARIABLE_NAME = "CATALINA_HOME";
-	private final String TOMCAT_DEFAULT_LOCATION = "/usr/share/tomcat";
-	private final String ENVIRONMENT_VARIABLE_NAME = "JUNO_PROPERTIES_FILENAME";
-	private final String PROPERTIES_FILE_ARGUMENT_NAME = "juno.propertiesFilename";
+	private static final String TOMCAT_LOCATION_ENVIRONMENT_VARIABLE_NAME = "CATALINA_HOME";
+	private static final String TOMCAT_DEFAULT_LOCATION = "/usr/share/tomcat";
+	private static final String ENVIRONMENT_VARIABLE_NAME = "JUNO_PROPERTIES_FILENAME";
+	private static final String PROPERTIES_FILE_ARGUMENT_NAME = "juno.propertiesFilename";
 
 	@Autowired
 	private Environment environment;

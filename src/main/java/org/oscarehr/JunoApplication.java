@@ -24,15 +24,18 @@
 package org.oscarehr;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.init.OscarPropertiesInitializer;
+import org.oscarehr.init.OscarPropertiesInitializerHeadless;
+import org.oscarehr.init.OscarPropertiesInitializerWeb;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
+
+import java.io.IOException;
 
 
 @SpringBootApplication
@@ -53,16 +56,31 @@ public class JunoApplication extends SpringBootServletInitializer
 
 		return application
 				.sources(JunoApplication.class)
-				.initializers(new OscarPropertiesInitializer());
+				.initializers(new OscarPropertiesInitializerWeb());
 	}
 
-	public static void main(String[] args)
+	public static void main(String[] args) throws IOException
 	{
-		logger.info("Starting Juno with a new SpringApplication");
+		if(args.length != 0)
+		{
+			logger.info("Starting Juno with a new SpringApplication in headless mode");
 
-		SpringApplication application = new SpringApplication(JunoApplication.class);
-		application.addInitializers(new OscarPropertiesInitializer());
-		application.run(args);
+			new OscarPropertiesInitializerHeadless().initialize();
+			new SpringApplicationBuilder(JunoApplication.class)
+					.web(WebApplicationType.NONE)
+					.sources(JunoApplication.class)
+					.run(args);
+		}
+		else
+		{
+			logger.info("Starting Juno with a new SpringApplication");
+
+			new SpringApplicationBuilder(JunoApplication.class)
+					.web(WebApplicationType.SERVLET)
+					.sources(JunoApplication.class)
+					.initializers(new OscarPropertiesInitializerWeb())
+					.run(args);
+		}
 	}
 
 
