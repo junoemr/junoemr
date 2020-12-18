@@ -266,7 +266,7 @@ public class EncounterService
 
 			colourUpdater = new ProviderColourUpdater(familyDoctorNo);
 			familyDoctorColour = colourUpdater.getColour();
-			if (familyDoctorColour.length() == 0)
+			if (familyDoctorColour == null || familyDoctorColour.length() == 0)
 			{
 				familyDoctorColour= "#CCCCFF";
 			}

@@ -20,42 +20,24 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.util.task;
+package org.oscarehr.util.task.args;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.util.JunoCommandLineRunner;
-import org.oscarehr.util.task.args.CommandLineArg;
-import org.oscarehr.util.task.args.StringArg;
-import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-@Component
-public class CommandLineExporter implements CommandLineTask
+public class BooleanArg extends CommandLineArg<Boolean>
 {
-	private static final Logger logger = Logger.getLogger(JunoCommandLineRunner.class);
-
-	public String taskName()
+	public BooleanArg(String name, Boolean defaultValue, boolean required)
 	{
-		return "export";
-	}
-	public List<CommandLineArg<?>> argsList()
-	{
-		return Arrays.asList(
-				new StringArg("type", null, true),
-				new StringArg("patientSet", null, true)
-		);
+		super(name, defaultValue, required);
 	}
 
-	public void run(Map<String, CommandLineArg<?>> args)
+	@Override
+	protected Boolean toValue(List<String> valueList)
 	{
-		logger.info("init exporter");
-
-		String type = (String) args.get("type").getValue();
-		String patientSet = (String) args.get("patientSet").getValue();
-
-		logger.info("args: " + type + "," + patientSet);
+		if(valueList != null && !valueList.isEmpty())
+		{
+			return Boolean.parseBoolean(valueList.get(0));
+		}
+		return null;
 	}
 }

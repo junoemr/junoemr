@@ -66,14 +66,22 @@ public class JunoCommandLineRunner implements ApplicationRunner
 			logger.info(optionName + "=" + args.getOptionValues(optionName));
 		});*/
 
-
-		if(args.getNonOptionArgs().isEmpty())
+		try
 		{
-			throw new InvalidCommandLineArgumentsException("A task must be specified");
+			if(args.getNonOptionArgs().isEmpty())
+			{
+				throw new InvalidCommandLineArgumentsException("A task must be specified");
+			}
+			String taskName = args.getNonOptionArgs().get(0);
+			CommandLineTask task = findTask(taskName);
+			task.run(toArgsMap(task, args));
 		}
-		String taskName = args.getNonOptionArgs().get(0);
-		CommandLineTask task = findTask(taskName);
-		task.run(toArgsMap(task, args));
+		catch(InvalidCommandLineArgumentsException e)
+		{
+			logger.error(e.getMessage());
+			System.exit(1);
+		}
+		System.exit(0);
 	}
 
 	private List<CommandLineTask> taskList()

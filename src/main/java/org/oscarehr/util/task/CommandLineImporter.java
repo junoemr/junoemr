@@ -23,9 +23,8 @@
 package org.oscarehr.util.task;
 
 import org.apache.commons.lang3.EnumUtils;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.oscarehr.casemgmt.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
@@ -33,12 +32,11 @@ import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.demographicImport.service.ImportLogger;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
-import org.oscarehr.util.SpringUtils;
+import org.oscarehr.util.task.args.BooleanArg;
 import org.oscarehr.util.task.args.CommandLineArg;
 import org.oscarehr.util.task.args.StringArg;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.OscarProperties;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,8 +49,11 @@ public class CommandLineImporter implements CommandLineTask
 {
 	private static final Logger logger = Logger.getLogger(CommandLineImporter.class);
 
-	private static ImportExportService importExportService;
-	private static ImporterExporterFactory importerExporterFactory;
+	@Autowired
+	private ImportExportService importExportService;
+
+	@Autowired
+	private ImporterExporterFactory importerExporterFactory;
 
 	public String taskName()
 	{
@@ -64,73 +65,44 @@ public class CommandLineImporter implements CommandLineTask
 				new StringArg("type", null, true),
 				new StringArg("fileLocation", null, true),
 				new StringArg("documentLocation", null, false),
-				new StringArg("sourceType", null, false)
+				new StringArg("sourceType", null, false),
+				new BooleanArg("skipMissingDocs", false, false),
+				new BooleanArg("mergeDemographics", false, false)
 		);
 	}
 
 	public void run(Map<String, CommandLineArg<?>> args)
 	{
-		logger.info("RUN IMPORTER!");
-	}
+		logger.info("init importer");
 
-	/**
-	 * Run this in the WEB-INF folder in one of 2 ways:
-	 *
-	 * deployed: in ~tomcat/webapps/context_path/WEB-INF
-	 * un-deployed: in [code_source]/target/oscar-14.0.0-SNAPSHOT/WEB-INF
-	 * java -cp "classes/:lib/*:/usr/java/apache-tomcat/lib/*" org.oscarehr.util.CommandLineRunner
-	 *   [logger_config.properties] [oscar_config.properties] [topd_files_directory] [topd_documents_directory]
-	 */
-	public static void main (String [] args)
-	{
-		if(args == null || args.length != 8)
-		{
-			BasicConfigurator.configure();
-			logger.error("Invalid argument count");
-			return;
-		}
-
-		String logLocation = args[0];
-		String propertiesFileName = args[1];
-		String importType = args[2];
-		String importFileLocation = args[3];
-		String importDocumentLocation = args[4];
-		String importSourceStr = args[5];
-		// flag to allow importing demographics with missing document files by skipping those records.
-		boolean skipMissingDocs = Boolean.parseBoolean(args[6]);
-		boolean mergeDemographics = Boolean.parseBoolean(args[7]);
-
-		if(!(new File(logLocation).exists()))
-		{
-			BasicConfigurator.configure();
-			logger.warn("Invalid log configuration file. Default logger initialized");
-		}
-		else
-		{
-			// set up the logger
-			PropertyConfigurator.configure(args[0]);
-			logger.info("Log properties loaded success");
-		}
+		String importType = (String) args.get("type").getValue();
+		String importFileLocation = (String) args.get("fileLocation").getValue();
+		String importDocumentLocation = (String) args.get("documentLocation").getValue();
+		String importSourceStr = (String) args.get("sourceType").getValue();
+		Boolean skipMissingDocs = (Boolean) args.get("skipMissingDocs").getValue();
+		Boolean mergeDemographics = (Boolean) args.get("mergeDemographics").getValue();
 
 		File importFileDirectory = new File(importFileLocation);
 		if(!(importFileDirectory.exists() && importFileDirectory.isDirectory()))
 		{
-			logger.error("Invalid import directory: " + importFileLocation);
-			return;
+			throw new InvalidCommandLineArgumentsException("Invalid import directory: " + importFileLocation);
 		}
 
+		// default docs directory to the file directory if missing
+		if(importDocumentLocation == null)
+		{
+			importDocumentLocation = importFileLocation;
+		}
 		File importDocumentDirectory = new File(importDocumentLocation);
 		if(!(importDocumentDirectory.exists() && importDocumentDirectory.isDirectory()))
 		{
-			logger.error("Invalid document directory: " + importDocumentLocation);
-			return;
+			throw new InvalidCommandLineArgumentsException("Invalid document directory: " + importDocumentLocation);
 		}
 
 		if(!EnumUtils.isValidEnum(ImporterExporterFactory.IMPORTER_TYPE.class, importType))
 		{
-			logger.error(importType + " is not a valid IMPORTER_TYPE enum. must be one of " +
+			throw new InvalidCommandLineArgumentsException(importType + " is not a valid IMPORTER_TYPE enum. must be one of " +
 					java.util.Arrays.asList(ImporterExporterFactory.IMPORTER_TYPE.values()));
-			return;
 		}
 		ImporterExporterFactory.IMPORTER_TYPE importerType = ImporterExporterFactory.IMPORTER_TYPE.valueOf(importType);
 
@@ -146,18 +118,12 @@ public class CommandLineImporter implements CommandLineTask
 			importSource = ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN;
 		}
 
-		ClassPathXmlApplicationContext ctx = null;
 		long importCount = 0;
 		long failureCount = 0;
 		long fileCounter = 0;
 
 		try
 		{
-			ctx = loadSpring(propertiesFileName);
-			importExportService = ctx.getBean(ImportExportService.class);
-			importerExporterFactory = ctx.getBean(ImporterExporterFactory.class);
-
-			// -------------------------------------------------------------------
 			logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
 
 			File[] fileList = importFileDirectory.listFiles();
@@ -213,38 +179,8 @@ public class CommandLineImporter implements CommandLineTask
 			// always clear the provider cache after an import to unload resources
 			// TODO a better way to handle this? only the service should be dealing with converters
 			BaseModelToDbConverter.clearProviderCache();
-			if(ctx != null)
-			{
-				ctx.close();
-			}
 		}
-
-//		if(skipMissingDocs)
-//		{
-//			long totalSkippedDocuments = importService.getMissingDocumentCount();
-//			logger.info(totalSkippedDocuments + " documents failed to upload and were skipped.");
-//		}
 		logger.info("IMPORT PROCESS COMPLETE (" + importCount + " files imported. " + failureCount + " failures)");
-	}
-
-	/**
-	 * load spring beans.
-	 * @param propertiesFileName the name of the oscar properties file to use during loading
-	 * @throws IOException
-	 */
-	public static ClassPathXmlApplicationContext loadSpring(String propertiesFileName) throws IOException{
-		// load properties from file
-		OscarProperties properties = OscarProperties.getInstance();
-		// This has been used to look in the users home directory that started tomcat
-		properties.readFromFile(propertiesFileName);
-		logger.info("loading properties from " + propertiesFileName);
-
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
-		context.setConfigLocations(new String[]{"/applicationContext.xml"});
-		context.refresh();
-		SpringUtils.beanFactory = context;
-
-		return context;
 	}
 
 	private static void moveToFailed(GenericFile genericFile, File baseDir)
