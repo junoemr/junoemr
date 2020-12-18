@@ -1,1 +1,1 @@
-UPDATE provider SET first_name = 'Juno', last_Name = 'EMR' WHERE provider_no = '999900';
+UPDATE provider SET first_name = 'Juno', last_name = 'EMR' WHERE provider_no = '999900';
