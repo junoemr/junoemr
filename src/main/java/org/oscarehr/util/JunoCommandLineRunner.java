@@ -39,6 +39,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Juno custom command line interface.
+ * you can run a task on the command line with this argument structure:
+ * java [vm options] war_file.war {task name} --{task_name}.option1=value1 --{task_name}.option2=value2 ...
+ */
 @Component
 @ConditionalOnNotWebApplication
 public class JunoCommandLineRunner implements ApplicationRunner
@@ -54,18 +59,6 @@ public class JunoCommandLineRunner implements ApplicationRunner
 	@Override
 	public void run(ApplicationArguments args)
 	{
-		/*logger.info("# NonOptionArgs: " + args.getNonOptionArgs().size());
-
-		logger.info("NonOptionArgs:");
-		args.getNonOptionArgs().forEach(logger::info);
-
-		logger.info("# OptionArgs: " + args.getOptionNames().size());
-		logger.info("OptionArgs:");
-
-		args.getOptionNames().forEach(optionName -> {
-			logger.info(optionName + "=" + args.getOptionValues(optionName));
-		});*/
-
 		try
 		{
 			if(args.getNonOptionArgs().isEmpty())

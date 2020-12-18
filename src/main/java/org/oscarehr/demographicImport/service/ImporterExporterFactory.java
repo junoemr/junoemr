@@ -43,6 +43,11 @@ public class ImporterExporterFactory
 		ToPD,
 	}
 
+	public enum EXPORTER_TYPE
+	{
+		CDS_5,
+	}
+
 	public enum IMPORT_SOURCE
 	{
 		WOLF,
@@ -76,12 +81,11 @@ public class ImporterExporterFactory
 		}
 	}
 
-	public DemographicExporter getExporter(IMPORTER_TYPE type)
+	public DemographicExporter getExporter(EXPORTER_TYPE type)
 	{
 		switch(type)
 		{
 			case CDS_5: return cdsExporter;
-			case ToPD: // TODO
 			default: throw new RuntimeException(type + " exporter not implemented");
 		}
 	}

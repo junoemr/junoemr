@@ -127,7 +127,7 @@ public class ImportExportService
 	@Autowired
 	private ImporterExporterFactory importerExporterFactory;
 
-	public List<GenericFile> exportDemographics(ImporterExporterFactory.IMPORTER_TYPE importType,
+	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE importType,
 	                                            List<Demographic> demographicList,
 	                                            ExportPreferences preferences) throws IOException
 	{
@@ -146,7 +146,7 @@ public class ImportExportService
 		return fileList;
 	}
 
-	public List<GenericFile> exportDemographicsWithLookup(ImporterExporterFactory.IMPORTER_TYPE importType,
+	public List<GenericFile> exportDemographicsWithLookup(ImporterExporterFactory.EXPORTER_TYPE importType,
 	                                                      List<String> demographicIdList,
 	                                                      ExportPreferences preferences) throws IOException
 	{

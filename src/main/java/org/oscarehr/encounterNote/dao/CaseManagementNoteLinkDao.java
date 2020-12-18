@@ -58,7 +58,7 @@ public class CaseManagementNoteLinkDao extends AbstractDao<CaseManagementNoteLin
 	public CaseManagementNoteLink findLatestByTableAndTableId(Integer tableName, Integer tableId)
 	{
 		// select model name must match specified @Entity name in model object
-		String queryString = "SELECT x FROM model.CaseManagementNoteLink x " +
+		String queryString = "SELECT x FROM model_CaseManagementNoteLink x " +
 				"WHERE x.tableName=:tableName " +
 				"AND x.tableId=:tableId " +
 				"ORDER BY x.note.noteId DESC";

@@ -169,6 +169,7 @@ public class GenericFile
 
 	public boolean deleteFile() throws IOException
 	{
+		logger.info("delete file: " + this.javaFile.toPath());
 		return Files.deleteIfExists(this.javaFile.toPath());
 	}
 
@@ -298,6 +299,11 @@ public class GenericFile
 		return javaFile.getName();
 	}
 
+	public String getPath()
+	{
+		return javaFile.getPath();
+	}
+
 	public String getExtension()
 	{
 		return FilenameUtils.getExtension(javaFile.getName());
@@ -318,7 +324,11 @@ public class GenericFile
 	}
 	public byte[] toBase64ByteArray() throws IOException
 	{
-		return Base64.encodeBase64(FileUtils.readFileToByteArray(javaFile));
+		return Base64.encodeBase64(toByteArray());
+	}
+	public byte[] toByteArray() throws IOException
+	{
+		return FileUtils.readFileToByteArray(javaFile);
 	}
 
 	/**
