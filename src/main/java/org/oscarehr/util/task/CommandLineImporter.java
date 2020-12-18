@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.util;
+package org.oscarehr.util.task;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.BasicConfigurator;
@@ -33,18 +33,45 @@ import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.demographicImport.service.ImportLogger;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
+import org.oscarehr.util.SpringUtils;
+import org.oscarehr.util.task.args.CommandLineArg;
+import org.oscarehr.util.task.args.StringArg;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
-public class CommandLineImporter
+@Component
+public class CommandLineImporter implements CommandLineTask
 {
 	private static final Logger logger = Logger.getLogger(CommandLineImporter.class);
 
 	private static ImportExportService importExportService;
 	private static ImporterExporterFactory importerExporterFactory;
+
+	public String taskName()
+	{
+		return "import";
+	}
+	public List<CommandLineArg<?>> argsList()
+	{
+		return Arrays.asList(
+				new StringArg("type", null, true),
+				new StringArg("fileLocation", null, true),
+				new StringArg("documentLocation", null, false),
+				new StringArg("sourceType", null, false)
+		);
+	}
+
+	public void run(Map<String, CommandLineArg<?>> args)
+	{
+		logger.info("RUN IMPORTER!");
+	}
 
 	/**
 	 * Run this in the WEB-INF folder in one of 2 ways:

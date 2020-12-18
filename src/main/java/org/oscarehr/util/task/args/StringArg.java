@@ -20,22 +20,24 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.util;
+package org.oscarehr.util.task.args;
 
-import org.apache.log4j.Logger;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication;
-import org.springframework.stereotype.Component;
+import java.util.List;
 
-@Component
-@ConditionalOnNotWebApplication
-public class MyRunner implements CommandLineRunner
+public class StringArg extends CommandLineArg<String>
 {
-	private static final Logger logger = Logger.getLogger(MyRunner.class);
+	public StringArg(String name, String defaultValue, boolean required)
+	{
+		super(name, defaultValue, required);
+	}
 
 	@Override
-	public void run(String... args) throws Exception
+	protected String toValue(List<String> valueList)
 	{
-		logger.info("Hello World!");
+		if(valueList != null && !valueList.isEmpty())
+		{
+			return valueList.get(0);
+		}
+		return null;
 	}
 }
