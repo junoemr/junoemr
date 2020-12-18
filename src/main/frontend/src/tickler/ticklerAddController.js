@@ -147,6 +147,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			var givenTime = moment(controller.tickler.serviceDateTime, 'hh:mm A');
 			givenDate.setHours(givenTime.get('hour'));
 			givenDate.setMinutes(givenTime.get('minute'));
+			givenDate.setSeconds(givenTime.get('second'));
 
 			tickler.serviceDate = givenDate;
             ticklerService.add(tickler, writeEncounter).then(
