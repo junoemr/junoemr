@@ -23,7 +23,7 @@
 package org.oscarehr.util.task.args;
 
 import lombok.Getter;
-import org.oscarehr.casemgmt.exception.InvalidCommandLineArgumentsException;
+import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 
 import java.util.HashMap;
 import java.util.List;

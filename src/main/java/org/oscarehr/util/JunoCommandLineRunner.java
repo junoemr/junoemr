@@ -23,7 +23,7 @@
 package org.oscarehr.util;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.casemgmt.exception.InvalidCommandLineArgumentsException;
+import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.util.task.CommandLineExporter;
 import org.oscarehr.util.task.CommandLineImporter;
 import org.oscarehr.util.task.CommandLineTask;

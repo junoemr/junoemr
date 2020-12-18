@@ -24,7 +24,7 @@ package org.oscarehr.util.task;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.casemgmt.exception.InvalidCommandLineArgumentsException;
+import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;

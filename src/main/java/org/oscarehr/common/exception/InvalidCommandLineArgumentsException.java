@@ -21,7 +21,7 @@
  * Canada
  */
 
-package org.oscarehr.casemgmt.exception;
+package org.oscarehr.common.exception;
 
 public class InvalidCommandLineArgumentsException extends RuntimeException
 {
