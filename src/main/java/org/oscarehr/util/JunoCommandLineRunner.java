@@ -72,6 +72,11 @@ public class JunoCommandLineRunner implements ApplicationRunner
 		catch(InvalidCommandLineArgumentsException e)
 		{
 			logger.error(e.getMessage());
+			System.exit(2);
+		}
+		catch(Exception e)
+		{
+			logger.error("Unknown Error", e);
 			System.exit(1);
 		}
 		System.exit(0);

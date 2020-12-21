@@ -108,20 +108,7 @@ public class PartialDateDao extends AbstractDao<PartialDate> {
 	public void setPartialDate(org.oscarehr.demographicImport.model.common.PartialDate partialDateModel,
 	                           PartialDate.TABLE table, Integer tableId, Integer field)
 	{
-		String format = null;
-		if(partialDateModel.isFullDate())
-		{
-			format = PartialDate.FORMAT_FULL_DATE;
-		}
-		else if(partialDateModel.isYearMonth())
-		{
-			format = PartialDate.FORMAT_YEAR_MONTH;
-		}
-		else if(partialDateModel.isYearOnly())
-		{
-			format = PartialDate.FORMAT_YEAR_ONLY;
-		}
-
+		String format = partialDateModel.getFormatString();
 		if(format != null)
 		{
 			setPartialDate(table.getValue(), tableId, field, format);

@@ -61,7 +61,7 @@ public class AllergyDbToModelConverter extends
 
 		PartialDate startDatePartial = PartialDate.from(ConversionUtils.toNullableLocalDate(input.getStartDate()), dbPartialDate);
 		allergy.setStartDate(startDatePartial);
-		allergy.setEntryDate(ConversionUtils.toNullableLocalDate(input.getEntryDate()));
+		allergy.setEntryDateTime(ConversionUtils.toNullableLocalDateTime(input.getEntryDate()));
 		allergy.setDrugIdentificationNumber(input.getRegionalIdentifier());
 		allergy.setProvider(findProvider(input.getProviderNo()));
 		allergy.setAgeOfOnset(Long.parseLong(input.getAgeOfOnset()));

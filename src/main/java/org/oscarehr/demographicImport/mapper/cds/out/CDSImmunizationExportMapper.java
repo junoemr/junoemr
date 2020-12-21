@@ -30,6 +30,8 @@ import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.model.immunization.Immunization;
 import org.springframework.stereotype.Component;
 
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DRUG_IDENTIFICATION_NUMBER;
+
 @Component
 public class CDSImmunizationExportMapper extends AbstractCDSExportMapper<Immunizations, Immunization>
 {
@@ -55,7 +57,7 @@ public class CDSImmunizationExportMapper extends AbstractCDSExportMapper<Immuniz
 		if(din != null && !din.isEmpty())
 		{
 			Code drugCode = objectFactory.createCode();
-			drugCode.setCodingSystem("DIN");
+			drugCode.setCodingSystem(DRUG_IDENTIFICATION_NUMBER);
 			drugCode.setDescription(null); //TODO
 			drugCode.setValue(din);
 			immunizations.setImmunizationCode(drugCode);

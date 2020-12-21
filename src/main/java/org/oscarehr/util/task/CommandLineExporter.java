@@ -64,8 +64,8 @@ public class CommandLineExporter implements CommandLineTask
 	{
 		return Arrays.asList(
 				new StringArg("type", null, true),
-				new StringArg("patientSet", null, true),
-				new StringArg("exportDirectory", "/tmp", false),
+				new StringArg("patient-set", null, true),
+				new StringArg("directory", "/tmp", false),
 				new BooleanArg("include-alerts", true, false),
 				new BooleanArg("include-allergies", true, false),
 				new BooleanArg("include-appointments", true, false),
@@ -88,8 +88,8 @@ public class CommandLineExporter implements CommandLineTask
 		logger.info("init exporter");
 
 		String type = (String) args.get("type").getValue();
-		String patientSet = (String) args.get("patientSet").getValue();
-		String exportDirectory = (String) args.get("exportDirectory").getValue();
+		String patientSet = (String) args.get("patient-set").getValue();
+		String exportDirectory = (String) args.get("directory").getValue();
 
 		if(!EnumUtils.isValidEnum(ImporterExporterFactory.EXPORTER_TYPE.class, type))
 		{
@@ -115,22 +115,24 @@ public class CommandLineExporter implements CommandLineTask
 		exportPreferences.setExportReportsReceived((Boolean) args.get("include-reports").getValue());
 		exportPreferences.setExportRiskFactors((Boolean) args.get("include-risk-factors").getValue());
 
+		logger.info("BEGIN EXPORT");
 		try
 		{
 			List<GenericFile> exportFiles = importExportService.exportDemographicsWithLookup(
 					ImporterExporterFactory.EXPORTER_TYPE.CDS_5, demographicIdList, exportPreferences);
 			ZIPFile zipFile = FileFactory.packageZipFile(exportFiles, true);
 
-			zipFile.moveFile(exportDirectory);
 			String exportZipName = "export_" + ConversionUtils.toDateTimeString(LocalDateTime.now(), DATE_TIME_FILENAME) + "_" + patientSet + ".zip";
 			zipFile.rename(ZIPFile.getSanitizedFileName(exportZipName));
+			zipFile.moveFile(exportDirectory);
 
 			logger.info("Created zip file: " + zipFile.getPath() + zipFile.getName());
 		}
 		catch(IOException e)
 		{
-			logger.error("IO Error", e);
 			throw new RuntimeException(e);
 		}
+
+		logger.info("EXPORT COMPLETED");
 	}
 }

@@ -94,6 +94,24 @@ public class PartialDate extends AbstractTransientModel
 		return LocalDate.of(this.year.getValue(), month, day);
 	}
 
+	public String getFormatString()
+	{
+		String format = null;
+		if(this.isFullDate())
+		{
+			format = org.oscarehr.common.model.PartialDate.FORMAT_FULL_DATE;
+		}
+		else if(this.isYearMonth())
+		{
+			format = org.oscarehr.common.model.PartialDate.FORMAT_YEAR_MONTH;
+		}
+		else if(this.isYearOnly())
+		{
+			format = org.oscarehr.common.model.PartialDate.FORMAT_YEAR_ONLY;
+		}
+		return format;
+	}
+
 	public String toISOString()
 	{
 		if(this.isFullDate())

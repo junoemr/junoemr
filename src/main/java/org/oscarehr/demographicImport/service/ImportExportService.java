@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.service;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.log4j.Logger;
+import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.appointment.service.Appointment;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.hl7.copd.writer.JunoGenericImportLabWriter;
@@ -72,6 +73,9 @@ import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
 public class ImportExportService
 {
 	private static final Logger logger = Logger.getLogger(ImportExportService.class);
+
+	@Autowired
+	private AllergyService allergyService;
 
 	@Autowired
 	private DemographicDao demographicDao;
@@ -189,6 +193,8 @@ public class ImportExportService
 
 		medicationService.saveNewMedications(demographic.getMedicationList(), dbDemographic);
 		persistMeasurements(demographic, dbDemographic);
+
+		allergyService.saveNewAllergies(demographic.getAllergyList(), dbDemographic);
 	}
 
 	private void persistNotes(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)

@@ -63,9 +63,9 @@ public class CommandLineImporter implements CommandLineTask
 	{
 		return Arrays.asList(
 				new StringArg("type", null, true),
-				new StringArg("fileLocation", null, true),
-				new StringArg("documentLocation", null, false),
-				new StringArg("sourceType", null, false),
+				new StringArg("file-directory", null, true),
+				new StringArg("document-directory", null, false),
+				new StringArg("source-type", null, false),
 				new BooleanArg("skipMissingDocs", false, false),
 				new BooleanArg("mergeDemographics", false, false)
 		);
@@ -76,9 +76,9 @@ public class CommandLineImporter implements CommandLineTask
 		logger.info("init importer");
 
 		String importType = (String) args.get("type").getValue();
-		String importFileLocation = (String) args.get("fileLocation").getValue();
-		String importDocumentLocation = (String) args.get("documentLocation").getValue();
-		String importSourceStr = (String) args.get("sourceType").getValue();
+		String importFileLocation = (String) args.get("file-directory").getValue();
+		String importDocumentLocation = (String) args.get("document-directory").getValue();
+		String importSourceStr = (String) args.get("source-type").getValue();
 		Boolean skipMissingDocs = (Boolean) args.get("skipMissingDocs").getValue();
 		Boolean mergeDemographics = (Boolean) args.get("mergeDemographics").getValue();
 

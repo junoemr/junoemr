@@ -30,6 +30,12 @@ import org.oscarehr.common.xml.cds.v5_0.model.PropertyOfOffendingAgent;
 import org.oscarehr.demographicImport.model.allergy.Allergy;
 import org.springframework.stereotype.Component;
 
+import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_MILD;
+import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_MODERATE;
+import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_SEVERE;
+import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_UNKNOWN;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DRUG_IDENTIFICATION_NUMBER;
+
 @Component
 public class CDSAllergyExportMapper extends AbstractCDSExportMapper<AllergiesAndAdverseReactions, Allergy>
 {
@@ -44,37 +50,70 @@ public class CDSAllergyExportMapper extends AbstractCDSExportMapper<AllergiesAnd
 		AllergiesAndAdverseReactions allergiesAndAdverseReactions = objectFactory.createAllergiesAndAdverseReactions();
 
 		allergiesAndAdverseReactions.setOffendingAgentDescription(exportStructure.getDescription());
-		allergiesAndAdverseReactions.setPropertyOfOffendingAgent(PropertyOfOffendingAgent.DR); //TODO how to determine this
-
-		String din = exportStructure.getDrugIdentificationNumber();
-		if(din != null && !din.isEmpty())
-		{
-			DrugCode drugCode = objectFactory.createDrugCode();
-			drugCode.setCodeType("DIN");
-			drugCode.setCodeValue(din);
-			allergiesAndAdverseReactions.setCode(drugCode);
-		}
-
-		allergiesAndAdverseReactions.setReactionType(AdverseReactionType.AL); //TODO how to determine this
+		allergiesAndAdverseReactions.setPropertyOfOffendingAgent(getPropertyOfOffendingAgent(exportStructure));
+		allergiesAndAdverseReactions.setCode(getDrugCode(exportStructure));
+		allergiesAndAdverseReactions.setReactionType(getReactionType(exportStructure));
 		allergiesAndAdverseReactions.setStartDate(toNullableDateFullOrPartial(exportStructure.getStartDate()));
 		allergiesAndAdverseReactions.setLifeStage(getLifeStage(exportStructure.getLifeStage()));
-
 		allergiesAndAdverseReactions.setSeverity(getSeverity(exportStructure.getSeverityOfReaction()));
 		allergiesAndAdverseReactions.setReaction(exportStructure.getReaction());
-		allergiesAndAdverseReactions.setRecordedDate(toNullableDateTimeFullOrPartial(exportStructure.getEntryDate()));
+		allergiesAndAdverseReactions.setRecordedDate(toNullableDateTimeFullOrPartial(exportStructure.getEntryDateTime()));
 		allergiesAndAdverseReactions.setNotes(exportStructure.getAnnotation());
 
 		return allergiesAndAdverseReactions;
 	}
 
+	protected DrugCode getDrugCode(Allergy exportStructure)
+	{
+		String din = exportStructure.getDrugIdentificationNumber();
+		if(din != null && !din.isEmpty())
+		{
+			DrugCode drugCode = objectFactory.createDrugCode();
+			drugCode.setCodeType(DRUG_IDENTIFICATION_NUMBER);
+			drugCode.setCodeValue(din);
+			return drugCode;
+		}
+		return null;
+	}
+
 	protected AdverseReactionSeverity getSeverity(String severity)
 	{
-		switch(severity)
+		if(severity != null)
 		{
-			case "1" : return AdverseReactionSeverity.MI;
-			case "2" : return AdverseReactionSeverity.MO;
-			case "3" : return AdverseReactionSeverity.LT;
-			default: return AdverseReactionSeverity.NO;
+			switch(severity)
+			{
+				case SEVERITY_CODE_MILD : return AdverseReactionSeverity.MI;
+				case SEVERITY_CODE_MODERATE : return AdverseReactionSeverity.MO;
+				case SEVERITY_CODE_SEVERE : return AdverseReactionSeverity.LT;
+				case SEVERITY_CODE_UNKNOWN:
+				default: return AdverseReactionSeverity.NO;
+			}
 		}
+		return null;
+	}
+
+	protected PropertyOfOffendingAgent getPropertyOfOffendingAgent(Allergy exportStructure)
+	{
+		Integer typeCode = exportStructure.getTypeCode();
+		PropertyOfOffendingAgent propertyOfOffendingAgent = null;
+
+		if(typeCode != null)
+		{
+			switch(typeCode)
+			{
+				// where do these come from?
+				case 0: propertyOfOffendingAgent = PropertyOfOffendingAgent.ND; break;
+				case 13: propertyOfOffendingAgent = PropertyOfOffendingAgent.DR; break;
+				default: propertyOfOffendingAgent = PropertyOfOffendingAgent.UK; break;
+			}
+		}
+		return propertyOfOffendingAgent;
+	}
+
+	protected AdverseReactionType getReactionType(Allergy exportStructure)
+	{
+		return null;
+		//AdverseReactionType.AL or AdverseReactionType.AR
+		// TODO how to determine this?
 	}
 }

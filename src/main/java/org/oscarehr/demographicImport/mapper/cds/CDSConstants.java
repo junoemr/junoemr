@@ -58,4 +58,6 @@ public class CDSConstants
 
 	public static final String Y_INDICATOR_TRUE = "Y";
 	public static final String Y_INDICATOR_FALSE = "N";
+
+	public static final String DRUG_IDENTIFICATION_NUMBER = "DIN";
 }

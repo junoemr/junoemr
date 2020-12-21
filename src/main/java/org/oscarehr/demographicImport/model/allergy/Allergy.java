@@ -27,7 +27,7 @@ import org.oscarehr.demographicImport.model.AbstractTransientModel;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.provider.Provider;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class Allergy extends AbstractTransientModel
@@ -35,14 +35,14 @@ public class Allergy extends AbstractTransientModel
 	private Integer id;
 	private String description;
 	private String reaction;
-	private String typeCode;
+	private Integer typeCode;
 	private Long ageOfOnset;
 	private String lifeStage;
 	private String severityOfReaction;
 	private String onsetOfReaction;
 	private String drugIdentificationNumber;
 
-	private LocalDate entryDate;
+	private LocalDateTime entryDateTime;
 	private PartialDate startDate;
 
 	private Provider provider;

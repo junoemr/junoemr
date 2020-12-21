@@ -26,21 +26,69 @@ import org.oscarehr.allergy.dao.AllergyDao;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.common.model.PartialDate;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographicImport.converter.in.AllergyModelToDbConverter;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.service.ProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 @Service("allergy.service.AllergyService")
 @Transactional
 public class AllergyService
 {
 	@Autowired
-	AllergyDao allergyDao;
+	private AllergyDao allergyDao;
 
 	@Autowired
-	PartialDateDao partialDateDao;
+	private PartialDateDao partialDateDao;
+
+	@Autowired
+	private ProviderService providerService;
+
+	@Autowired
+	private AllergyModelToDbConverter allergyModelToDbConverter;
+
+	@Autowired
+	private EncounterNoteService encounterNoteService;
+
+	public void saveNewAllergy(org.oscarehr.demographicImport.model.allergy.Allergy allergy, Demographic dbDemographic)
+	{
+		Allergy dbAllergy = allergyModelToDbConverter.convert(allergy);
+		dbAllergy.setDemographicNo(dbDemographic.getId());
+		addNewAllergy(dbAllergy);
+
+		if(allergy.getStartDate() != null)
+		{
+			dbAllergy.setStartDateFormat(allergy.getStartDate().getFormatString());
+		}
+
+		String annotation = allergy.getAnnotation();
+		if (annotation != null)
+		{
+			ProviderData providerData = providerService.getProvider(dbAllergy.getProviderNo());
+			CaseManagementNote allergyNote = new CaseManagementNote();
+			allergyNote.setProvider(providerData);
+			allergyNote.setSigningProvider(providerData);
+			allergyNote.setDemographic(dbDemographic);
+			allergyNote.setNote(annotation);
+			encounterNoteService.saveAllergyNote(allergyNote, dbAllergy);
+		}
+	}
+
+	public void saveNewAllergies(List<org.oscarehr.demographicImport.model.allergy.Allergy> allergyList, Demographic dbDemographic)
+	{
+		for(org.oscarehr.demographicImport.model.allergy.Allergy allergy : allergyList)
+		{
+			saveNewAllergy(allergy, dbDemographic);
+		}
+	}
 
 	public Allergy addNewAllergy(Allergy allergy)
 	{
