@@ -27,6 +27,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
+import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.mapper.AbstractImportMapper;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
@@ -38,6 +39,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @Component
 public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper<I, E>
@@ -66,6 +68,40 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		if(ageAtOnset != null)
 		{
 			return ageAtOnset.longValue();
+		}
+		return null;
+	}
+
+	protected ResidualInformation.DataElement getResidualDataElement(ResidualInformation residualInformation, String ... keys)
+	{
+		if(residualInformation != null && keys != null)
+		{
+			for(ResidualInformation.DataElement dataElement : residualInformation.getDataElement())
+			{
+				if(Arrays.stream(keys).anyMatch(dataElement.getName()::equals))
+				{
+					return dataElement;
+				}
+			}
+		}
+		return null;
+	}
+
+	protected Long getResidualDataElementAsLong(ResidualInformation residualInformation, String ... keys)
+	{
+		ResidualInformation.DataElement dataElement = getResidualDataElement(residualInformation, keys);
+		if(dataElement != null)
+		{
+			return Long.parseLong(dataElement.getContent());
+		}
+		return null;
+	}
+	protected String getResidualDataElementAsString(ResidualInformation residualInformation, String ... keys)
+	{
+		ResidualInformation.DataElement dataElement = getResidualDataElement(residualInformation, keys);
+		if(dataElement != null)
+		{
+			return dataElement.getContent();
 		}
 		return null;
 	}

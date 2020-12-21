@@ -115,7 +115,7 @@ public class CommandLineExporter implements CommandLineTask
 		exportPreferences.setExportReportsReceived((Boolean) args.get("include-reports").getValue());
 		exportPreferences.setExportRiskFactors((Boolean) args.get("include-risk-factors").getValue());
 
-		logger.info("BEGIN EXPORT");
+		logger.info("BEGIN EXPORT [ Patient Set: '" + patientSet + "']");
 		try
 		{
 			List<GenericFile> exportFiles = importExportService.exportDemographicsWithLookup(

@@ -27,6 +27,8 @@ import org.oscarehr.common.xml.cds.v5_0.model.AdverseReactionType;
 import org.oscarehr.common.xml.cds.v5_0.model.AllergiesAndAdverseReactions;
 import org.oscarehr.common.xml.cds.v5_0.model.DrugCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PropertyOfOffendingAgent;
+import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
+import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.allergy.Allergy;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +37,8 @@ import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_MODERATE;
 import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_SEVERE;
 import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_UNKNOWN;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DRUG_IDENTIFICATION_NUMBER;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_ONSET_REACTION;
 
 @Component
 public class CDSAllergyExportMapper extends AbstractCDSExportMapper<AllergiesAndAdverseReactions, Allergy>
@@ -59,6 +63,25 @@ public class CDSAllergyExportMapper extends AbstractCDSExportMapper<AllergiesAnd
 		allergiesAndAdverseReactions.setReaction(exportStructure.getReaction());
 		allergiesAndAdverseReactions.setRecordedDate(toNullableDateTimeFullOrPartial(exportStructure.getEntryDateTime()));
 		allergiesAndAdverseReactions.setNotes(exportStructure.getAnnotation());
+
+		String ageOfOnset = exportStructure.getAgeOfOnset() != null ? String.valueOf(exportStructure.getAgeOfOnset()) : null;
+		Allergy.REACTION_ONSET onsetOfReaction = exportStructure.getOnsetOfReaction();
+
+		if(ageOfOnset != null || onsetOfReaction != null)
+		{
+			ResidualInformation residualInformation = objectFactory.createResidualInformation();
+			addNonNullDataElements(
+					residualInformation,
+					CDSConstants.RESIDUAL_INFO_DATA_TYPE.NUMERIC,
+					RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET,
+					ageOfOnset);
+			addNonNullDataElements(
+					residualInformation,
+					CDSConstants.RESIDUAL_INFO_DATA_TYPE.TEXT,
+					RESIDUAL_INFO_DATA_NAME_ONSET_REACTION,
+					onsetOfReaction.getDescription());
+			allergiesAndAdverseReactions.setResidualInfo(residualInformation);
+		}
 
 		return allergiesAndAdverseReactions;
 	}

@@ -33,6 +33,8 @@ import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_MILD;
 import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_MODERATE;
 import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_SEVERE;
 import static org.oscarehr.allergy.model.Allergy.SEVERITY_CODE_UNKNOWN;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_ONSET_REACTION;
 
 @Component
 public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAndAdverseReactions, Allergy>
@@ -57,6 +59,10 @@ public class CDSAllergyImportMapper extends AbstractCDSImportMapper<AllergiesAnd
 		allergy.setReaction(importStructure.getReaction());
 		allergy.setEntryDateTime(toNullableLocalDateTime(importStructure.getRecordedDate()));
 		allergy.setAnnotation(importStructure.getNotes());
+
+		allergy.setAgeOfOnset(getResidualDataElementAsLong(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET));
+		String onsetOfReaction = getResidualDataElementAsString(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_ONSET_REACTION);
+		allergy.setOnsetOfReaction(Allergy.REACTION_ONSET.fromDescription(onsetOfReaction));
 
 		return allergy;
 	}

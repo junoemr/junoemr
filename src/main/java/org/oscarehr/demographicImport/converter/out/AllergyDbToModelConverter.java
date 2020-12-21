@@ -52,7 +52,8 @@ public class AllergyDbToModelConverter extends
 			return null;
 		}
 		org.oscarehr.demographicImport.model.allergy.Allergy allergy = new org.oscarehr.demographicImport.model.allergy.Allergy();
-		BeanUtils.copyProperties(input, allergy, "entryDate", "startDate", "providerNo", "ageOfOnset", "regionalIdentifier");
+		BeanUtils.copyProperties(input, allergy, "entryDate", "startDate", "providerNo",
+				"ageOfOnset", "regionalIdentifier", "onsetOfReaction");
 
 		org.oscarehr.common.model.PartialDate dbPartialDate = partialDateDao.getPartialDate(
 				org.oscarehr.common.model.PartialDate.TABLE_ALLERGIES,
@@ -66,6 +67,8 @@ public class AllergyDbToModelConverter extends
 		allergy.setProvider(findProvider(input.getProviderNo()));
 		allergy.setAgeOfOnset(Long.parseLong(input.getAgeOfOnset()));
 		allergy.setAnnotation(getNote(input));
+		allergy.setOnsetOfReaction(org.oscarehr.demographicImport.model.allergy.Allergy.REACTION_ONSET.fromCodeString(
+				Integer.parseInt(input.getOnsetOfReaction())));
 
 		return allergy;
 	}

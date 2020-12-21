@@ -35,13 +35,25 @@ public class AllergyModelToDbConverter extends BaseModelToDbConverter<org.oscare
 	public Allergy convert(org.oscarehr.demographicImport.model.allergy.Allergy input)
 	{
 		Allergy allergy = new Allergy();
-		BeanUtils.copyProperties(input, allergy, "entryDateTime", "startDate", "provider", "ageOfOnset", "drugIdentificationNumber");
+		BeanUtils.copyProperties(input, allergy, "entryDateTime", "startDate", "provider",
+				"ageOfOnset", "drugIdentificationNumber", "onsetOfReaction");
 
 		allergy.setEntryDate(ConversionUtils.toNullableLegacyDateTime(input.getEntryDateTime()));
 		allergy.setStartDate(ConversionUtils.toNullableLegacyDate(input.getStartDate()));
 		allergy.setProviderNo(findOrCreateProviderRecord(input.getProvider(), false).getId());
 		allergy.setAgeOfOnset((input.getAgeOfOnset()) != null ? String.valueOf(input.getAgeOfOnset()) : null);
 		allergy.setRegionalIdentifier(input.getDrugIdentificationNumber());
+
+		org.oscarehr.demographicImport.model.allergy.Allergy.REACTION_ONSET reactionOnset = input.getOnsetOfReaction();
+		if(reactionOnset != null)
+		{
+			allergy.setOnsetOfReaction(String.valueOf(reactionOnset.getOnsetCode()));
+		}
+
+		if(allergy.getTypeCode() == null)
+		{
+			allergy.setTypeCode(0); // can't bew null in db
+		}
 
 		return allergy;
 	}

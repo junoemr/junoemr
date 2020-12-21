@@ -32,6 +32,9 @@ public class CDSConstants
 	public static final String RESIDUAL_INFO_DATA_NAME_ANNOTATION = "Annotation";
 	public static final String RESIDUAL_INFO_DATA_NAME_PROVIDER = "ProviderName";
 
+	public static final String RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET = "Age Of Onset";
+	public static final String RESIDUAL_INFO_DATA_NAME_ONSET_REACTION = "Onset Of Reaction";
+
 	public enum RESIDUAL_INFO_DATA_TYPE
 	{
 		TEXT,

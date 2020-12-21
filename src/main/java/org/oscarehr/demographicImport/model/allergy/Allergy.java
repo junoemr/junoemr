@@ -28,10 +28,70 @@ import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.provider.Provider;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class Allergy extends AbstractTransientModel
 {
+	// enum with custom values, for backwards compatibility
+	public enum REACTION_ONSET {
+		IMMEDIATE(1, "Immediate"),
+		GRADUAL(2, "Gradual"),
+		SLOW(3, "Slow"),
+		UNKNOWN(4, "Unknown")
+		;
+
+		private final int onsetCode;
+		private final String description;
+
+		REACTION_ONSET(int onsetCode, String description)
+		{
+			this.onsetCode = onsetCode;
+			this.description = description;
+		}
+		public int getOnsetCode()
+		{
+			return onsetCode;
+		}
+		public String getDescription()
+		{
+			return description;
+		}
+
+		//Lookup table
+		private static final Map<Integer, REACTION_ONSET> codeLookup = new HashMap<>();
+		private static final Map<String, REACTION_ONSET> descriptionLookup = new HashMap<>();
+
+		//Populate the lookup table on loading time
+		static
+		{
+			for(REACTION_ONSET onset : REACTION_ONSET.values())
+			{
+				codeLookup.put(onset.getOnsetCode(), onset);
+				descriptionLookup.put(onset.getDescription(), onset);
+			}
+		}
+
+		public static REACTION_ONSET fromCodeString(Integer code)
+		{
+			if(code != null)
+			{
+				return codeLookup.get(code);
+			}
+			return null;
+		}
+		public static REACTION_ONSET fromDescription(String description)
+		{
+			if(description != null)
+			{
+				return descriptionLookup.get(description);
+			}
+			return null;
+		}
+	}
+
+
 	private Integer id;
 	private String description;
 	private String reaction;
@@ -39,7 +99,7 @@ public class Allergy extends AbstractTransientModel
 	private Long ageOfOnset;
 	private String lifeStage;
 	private String severityOfReaction;
-	private String onsetOfReaction;
+	private REACTION_ONSET onsetOfReaction;
 	private String drugIdentificationNumber;
 
 	private LocalDateTime entryDateTime;
