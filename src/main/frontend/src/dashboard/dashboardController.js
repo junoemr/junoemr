@@ -262,7 +262,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
             ticklerService.search(
                 {
                     status: 'A',
-                    creator: controller.me.providerNo,
+                    assignee: controller.me.providerNo,
                     overdueOnly: 'property'
                 }, 0, 6).then(
                 function success(results)

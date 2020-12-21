@@ -331,7 +331,7 @@ angular.module('Layout').component("primaryNavigation", {
 			ticklerService.search(
 				{
 					status: 'A',
-					creator: ctrl.me.providerNo,
+					assignee: ctrl.me.providerNo,
 					overdueOnly: 'property'
 				}, 0, 6).then(
 				function success(results)
