@@ -62,12 +62,12 @@ public class AllergyService
 	{
 		Allergy dbAllergy = allergyModelToDbConverter.convert(allergy);
 		dbAllergy.setDemographicNo(dbDemographic.getId());
-		addNewAllergy(dbAllergy);
 
 		if(allergy.getStartDate() != null)
 		{
 			dbAllergy.setStartDateFormat(allergy.getStartDate().getFormatString());
 		}
+		addNewAllergy(dbAllergy);
 
 		String annotation = allergy.getAnnotation();
 		if (annotation != null)
