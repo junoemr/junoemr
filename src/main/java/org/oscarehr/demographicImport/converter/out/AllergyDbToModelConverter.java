@@ -65,10 +65,10 @@ public class AllergyDbToModelConverter extends
 		allergy.setEntryDateTime(ConversionUtils.toNullableLocalDateTime(input.getEntryDate()));
 		allergy.setDrugIdentificationNumber(input.getRegionalIdentifier());
 		allergy.setProvider(findProvider(input.getProviderNo()));
-		allergy.setAgeOfOnset(Long.parseLong(input.getAgeOfOnset()));
+		allergy.setAgeOfOnset(input.getAgeOfOnset() != null ? Long.parseLong(input.getAgeOfOnset()) : null);
 		allergy.setAnnotation(getNote(input));
 		allergy.setOnsetOfReaction(org.oscarehr.demographicImport.model.allergy.Allergy.REACTION_ONSET.fromCodeString(
-				Integer.parseInt(input.getOnsetOfReaction())));
+				(input.getOnsetOfReaction() != null) ? Integer.parseInt(input.getOnsetOfReaction()) : null));
 
 		return allergy;
 	}

@@ -26,7 +26,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.DrugMeasure;
 import org.oscarehr.common.xml.cds.v5_0.model.MedicationsAndTreatments;
-import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.medication.CustomMedication;
@@ -37,8 +36,6 @@ import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-
-import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.Y_INDICATOR_TRUE;
 
 @Component
 public class CDSMedicationImportMapper extends AbstractCDSImportMapper<MedicationsAndTreatments, Medication>

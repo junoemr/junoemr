@@ -22,9 +22,6 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
-import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
-import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;

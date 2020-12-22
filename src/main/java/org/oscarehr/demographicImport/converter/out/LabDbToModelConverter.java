@@ -27,11 +27,16 @@ import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
+import org.oscarehr.demographicImport.converter.out.note.EncounterNoteDbToModelConverter;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
+import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
+import org.oscarehr.encounterNote.dao.CaseManagementNoteLinkDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.oscarLab.ca.all.parsers.Factory;
@@ -48,6 +53,12 @@ public class LabDbToModelConverter extends
 	@Autowired
 	private ProviderLabRoutingDao providerLabRoutingDao;
 
+	@Autowired
+	private CaseManagementNoteLinkDao caseManagementNoteLinkDao;
+
+	@Autowired
+	private EncounterNoteDbToModelConverter encounterNoteDbToModelConverter;
+
 
 	@Override
 	public org.oscarehr.demographicImport.model.lab.Lab convert(Hl7TextInfo hl7TextInfo)
@@ -60,6 +71,7 @@ public class LabDbToModelConverter extends
 		MessageHandler labHandler = Factory.getHandler(hl7TextInfo.getLabNumber());
 		Lab exportLab = new Lab();
 
+		exportLab.setId(hl7TextMessage.getId());
 		exportLab.setAccessionNumber(labHandler.getAccessionNum());
 		exportLab.setVersion(labHandler.getFillerOrderNumber());
 		exportLab.setMessageDateTime(ConversionUtils.toLocalDateTime(labHandler.getMsgDate()));
@@ -68,7 +80,7 @@ public class LabDbToModelConverter extends
 
 		for(int i = 0; i < labHandler.getOBRCount(); i++)
 		{
-			exportLab.addObservation(getObservations(labHandler, i));
+			exportLab.addObservation(getObservations(hl7TextMessage, labHandler, i));
 		}
 
 		exportLab.setReviewers(getReviewers(hl7TextInfo));
@@ -95,7 +107,7 @@ public class LabDbToModelConverter extends
 		return reviewers;
 	}
 
-	private LabObservation getObservations(MessageHandler labHandler, int obrIndex)
+	private LabObservation getObservations(Hl7TextMessage hl7TextMessage, MessageHandler labHandler, int obrIndex)
 	{
 		LabObservation observation = new LabObservation();
 		observation.setName(labHandler.getOBRName(obrIndex));
@@ -107,7 +119,7 @@ public class LabDbToModelConverter extends
 
 		for(int i = 0; i < labHandler.getOBXCount(obrIndex); i++)
 		{
-			observation.addResult(getObservationResult(labHandler, obrIndex, i));
+			observation.addResult(getObservationResult(hl7TextMessage, labHandler, obrIndex, i));
 		}
 
 		for(int i = 0; i < labHandler.getOBRCommentCount(obrIndex); i++)
@@ -119,7 +131,7 @@ public class LabDbToModelConverter extends
 	}
 
 
-	private LabObservationResult getObservationResult(MessageHandler labHandler, int obrIndex, int obxIndex)
+	private LabObservationResult getObservationResult(Hl7TextMessage hl7TextMessage, MessageHandler labHandler, int obrIndex, int obxIndex)
 	{
 		LabObservationResult result = new LabObservationResult();
 		result.setAbnormal(labHandler.isOBXAbnormal(obrIndex, obxIndex));
@@ -139,7 +151,27 @@ public class LabDbToModelConverter extends
 		{
 			result.addComment(labHandler.getOBXComment(obrIndex, obxIndex, i));
 		}
+		result.setAnnotation(getAnnotationNote(hl7TextMessage.getId(), obrIndex, obxIndex));
 
 		return result;
+	}
+
+	private EncounterNote getAnnotationNote(Integer parentNoteId, int obrIndex, int obxIndex)
+	{
+		if(parentNoteId == null)
+		{
+			return null;
+		}
+
+		CaseManagementNoteLink noteLink = caseManagementNoteLinkDao.getNoteLinkByTableIdAndTableName(
+				parentNoteId, CaseManagementNoteLink.HL7LAB, obrIndex + "-" + obxIndex);
+
+		CaseManagementNote note = null;
+		if(noteLink != null)
+		{
+			note = noteLink.getNote();
+		}
+
+		return encounterNoteDbToModelConverter.convert(note);
 	}
 }

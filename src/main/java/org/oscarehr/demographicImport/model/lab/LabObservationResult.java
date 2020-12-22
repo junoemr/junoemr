@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.model.lab;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class LabObservationResult extends AbstractTransientModel
 	private LocalDateTime observationDateTime;
 	private String notes;
 	private List<String> comments;
+	private EncounterNote annotation;
 
 	public LabObservationResult()
 	{

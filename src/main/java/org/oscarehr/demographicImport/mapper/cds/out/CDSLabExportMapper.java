@@ -25,6 +25,7 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 import org.oscarehr.common.xml.cds.v5_0.model.LaboratoryResults;
 import org.oscarehr.common.xml.cds.v5_0.model.ResultNormalAbnormalFlag;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
+import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
@@ -74,7 +75,7 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 				laboratoryResult.setReferenceRange(referenceRange);
 
 				laboratoryResult.setLabRequisitionDateTime(toFullDateTime(labObr.getRequestDateTime()));
-				laboratoryResult.setCollectionDateTime(toFullDateTime(exportLab.getEmrReceivedDateTime()));
+				laboratoryResult.setCollectionDateTime(toFullDateTime(exportLab.getMessageDateTime()));
 
 				for(Reviewer reviewProvider : exportLab.getReviewers())
 				{
@@ -87,8 +88,11 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 				}
 
 				laboratoryResult.setResultNormalAbnormalFlag(getAbnormalFlag(labObrResult.getAbnormal()));
+				laboratoryResult.setTestResultsInformationReportedByTheLab(getLabComments(labObrResult));
 				laboratoryResult.setNotesFromLab(labObrResult.getNotes());
+				laboratoryResult.setPhysiciansNotes(getPhysiciansNotes(labObrResult));
 				laboratoryResult.setTestResultStatus(labObrResult.getResultStatus());
+				laboratoryResult.setBlockedTestResult(null); //TODO how to determine this?
 
 				laboratoryResults.add(laboratoryResult);
 			}
@@ -117,5 +121,25 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 		resultNormalAbnormalFlag.setResultNormalAbnormalFlagAsEnum(abnormalEnum.name());
 
 		return resultNormalAbnormalFlag;
+	}
+
+	protected String getPhysiciansNotes(LabObservationResult labObrResult)
+	{
+		EncounterNote annotationNote = labObrResult.getAnnotation();
+		if(annotationNote != null)
+		{
+			return annotationNote.getNoteText();
+		}
+		return null;
+	}
+
+	protected String getLabComments(LabObservationResult labObrResult)
+	{
+		List<String> comments = labObrResult.getComments();
+		if(comments != null && !comments.isEmpty())
+		{
+			return String.join("\n", comments);
+		}
+		return null;
 	}
 }

@@ -28,6 +28,7 @@ import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.xml.cds.v5_0.model.LaboratoryResults;
 import org.oscarehr.common.xml.cds.v5_0.model.ResultNormalAbnormalFlag;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
+import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
@@ -192,16 +193,26 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 				result.setAbnormal(CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum())
 						|| CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsPlainText())
 				);
+				//TODO handle free text abnormal values
 			}
 
+			String testResultInfoFromLab = importLabResults.getTestResultsInformationReportedByTheLab();
+			if(testResultInfoFromLab != null)
+			{
+				result.addComment(testResultInfoFromLab);
+			}
 			result.setNotes(importLabResults.getNotesFromLab());
 
-			String physicianNotes = StringUtils.trimToNull(importLabResults.getPhysiciansNotes());
-			if(physicianNotes != null)
-			{
-				labObservation.addComment(physicianNotes);
-			}
 			result.setResultStatus(importLabResults.getTestResultStatus());
+
+			String physiciansNotes = StringUtils.trimToNull(importLabResults.getPhysiciansNotes());
+			if(physiciansNotes != null)
+			{
+				EncounterNote annotation = new EncounterNote();
+				annotation.setNoteText(physiciansNotes);
+				result.setAnnotation(annotation);
+			}
+			//TODO blocked result?
 
 			labObservation.addResult(result);
 		}

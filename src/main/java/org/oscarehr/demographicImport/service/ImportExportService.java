@@ -30,6 +30,7 @@ import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.hl7.copd.writer.JunoGenericImportLabWriter;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.demographic.dao.DemographicDao;
@@ -40,7 +41,10 @@ import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.DemographicDbToModelConverter;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.lab.Lab;
+import org.oscarehr.demographicImport.model.lab.LabObservation;
+import org.oscarehr.demographicImport.model.lab.LabObservationResult;
 import org.oscarehr.encounterNote.service.ConcernNoteService;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.encounterNote.service.FamilyHistoryNoteService;
@@ -285,8 +289,26 @@ public class ImportExportService
 				}
 				List<ProviderData> filteredReviewers = new ArrayList<>(duplicateMap.values());
 
-				labService.persistNewHL7Lab(parser, labHl7, "Juno-Import", 0, dbDemographic, filteredReviewers, ProviderInboxItem.FILE);
+				Hl7TextMessage hl7TextMessage = labService.persistNewHL7Lab(parser, labHl7, "Juno-Import", 0, dbDemographic, filteredReviewers, ProviderInboxItem.FILE);
 				parser.postUpload();
+
+				// indexes are assumed to line up since this is the same iteration happening in the JunoGenericImportLabWriter
+				// TODO find a better way to get indexes?
+				int obrIndex = 0;
+				for(LabObservation labObservation : lab.getLabObservationList())
+				{
+					int obxIndex = 0;
+					for(LabObservationResult result : labObservation.getResults())
+					{
+						EncounterNote annotationNote = result.getAnnotation();
+						if(annotationNote != null)
+						{
+							encounterNoteService.saveLabObxNote(annotationNote, dbDemographic, hl7TextMessage, obrIndex, obxIndex);
+						}
+						obxIndex++;
+					}
+					obrIndex++;
+				}
 			}
 			else
 			{

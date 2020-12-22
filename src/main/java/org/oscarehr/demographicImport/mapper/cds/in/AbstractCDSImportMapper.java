@@ -133,7 +133,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 	protected Provider toProviderNames(String providerNameString)
 	{
 		Provider provider = null;
-		if(providerNameString.contains(","))
+		if(providerNameString != null && providerNameString.contains(","))
 		{
 			String[] providerNames = providerNameString.split(",", 2);
 			provider = new Provider();

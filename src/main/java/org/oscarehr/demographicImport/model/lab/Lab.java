@@ -36,6 +36,7 @@ import java.util.List;
 @Data
 public class Lab extends AbstractTransientModel
 {
+	private Integer id;
 	private String accessionNumber;
 	private String version;
 

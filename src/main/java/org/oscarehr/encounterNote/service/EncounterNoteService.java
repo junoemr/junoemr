@@ -23,6 +23,7 @@
 package org.oscarehr.encounterNote.service;
 
 import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.note.EncounterNoteModelToDbConverter;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
@@ -154,6 +155,30 @@ public class EncounterNoteService extends BaseNoteService
 		CaseManagementNoteLink link = new CaseManagementNoteLink();
 		link.setNote(note);
 		link.setDrug(drug.getId());
+		caseManagementNoteLinkDao.persist(link);
+
+		return note;
+	}
+
+	public CaseManagementNote saveLabObxNote(EncounterNote noteModel, Demographic demographic, Hl7TextMessage hl7TextMessage, int obrIndex, int obxIndex)
+	{
+		CaseManagementNote note = encounterNoteModelToDbConverter.convert(noteModel);
+		note.setDemographic(demographic);
+		return saveLabObxNote(note, hl7TextMessage, obrIndex, obxIndex);
+	}
+
+	public CaseManagementNote saveLabObxNote(CaseManagementNote note, Hl7TextMessage hl7TextMessage, int obrIndex, int obxIndex)
+	{
+		note.setIncludeIssueInNote(true);
+		note.setSigned(true);
+		note.setArchived(false);
+
+		note = saveNote(note);
+
+		CaseManagementNoteLink link = new CaseManagementNoteLink();
+		link.setNote(note);
+		link.setHl7Lab(hl7TextMessage.getId());
+		link.setOtherId(obrIndex + "-" + obxIndex);
 		caseManagementNoteLinkDao.persist(link);
 
 		return note;
