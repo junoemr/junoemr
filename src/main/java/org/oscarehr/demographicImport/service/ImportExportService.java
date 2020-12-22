@@ -34,6 +34,7 @@ import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographicImport.converter.in.PreventionModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.ReviewerModelToDbConverter;
 import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.DemographicDbToModelConverter;
@@ -49,6 +50,10 @@ import org.oscarehr.encounterNote.service.RiskFactorNoteService;
 import org.oscarehr.encounterNote.service.SocialHistoryNoteService;
 import org.oscarehr.labs.service.LabService;
 import org.oscarehr.measurements.service.MeasurementsService;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.dao.PreventionExtDao;
+import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.model.PreventionExt;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.rx.service.MedicationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,6 +131,15 @@ public class ImportExportService
 	private MeasurementDao measurementDao;
 
 	@Autowired
+	private PreventionDao preventionDao;
+
+	@Autowired
+	private PreventionExtDao preventionExtDao;
+
+	@Autowired
+	private PreventionModelToDbConverter preventionModelToDbConverter;
+
+	@Autowired
 	private AppointmentStatusCache appointmentStatusCache;
 
 	@Autowired
@@ -195,6 +209,8 @@ public class ImportExportService
 		persistMeasurements(demographic, dbDemographic);
 
 		allergyService.saveNewAllergies(demographic.getAllergyList(), dbDemographic);
+
+		persistPreventions(demographic, dbDemographic);
 	}
 
 	private void persistNotes(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)
@@ -219,6 +235,22 @@ public class ImportExportService
 					measurement.getMeasurementValue(),
 					ConversionUtils.toLegacyDateTime(measurement.getObservationDateTime()));
 			measurementDao.persist(dbMeasurement);
+		}
+	}
+
+	private void persistPreventions(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)
+	{
+		List<Prevention> preventions = preventionModelToDbConverter.convert(demographic.getImmunizationList());
+
+		for(Prevention prevention : preventions)
+		{
+			prevention.setDemographicId(dbDemographic.getId());
+			preventionDao.persist(prevention);
+
+			for(PreventionExt ext : prevention.getPreventionExtensionList())
+			{
+				preventionExtDao.persist(ext);
+			}
 		}
 	}
 

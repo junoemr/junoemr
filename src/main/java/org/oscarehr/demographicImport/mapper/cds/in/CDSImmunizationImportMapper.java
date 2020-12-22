@@ -22,13 +22,32 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.xml.cds.v5_0.model.Code;
+import org.oscarehr.common.xml.cds.v5_0.model.ImmunizationType;
 import org.oscarehr.common.xml.cds.v5_0.model.Immunizations;
 import org.oscarehr.demographicImport.model.immunization.Immunization;
+import org.oscarehr.prevention.service.PreventionManager;
+import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_NEXT_DATE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE;
 
 @Component
 public class CDSImmunizationImportMapper extends AbstractCDSImportMapper<Immunizations, Immunization>
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
+	private static final String DEFAULT_PREVENTION_TYPE = "OtherA";
+
+	@Autowired
+	private PreventionManager preventionManager;
+
 	public CDSImmunizationImportMapper()
 	{
 		super();
@@ -37,6 +56,59 @@ public class CDSImmunizationImportMapper extends AbstractCDSImportMapper<Immuniz
 	@Override
 	public Immunization importToJuno(Immunizations importStructure)
 	{
-		return new Immunization();
+		Immunization immunization = new Immunization();
+
+		immunization.setName(importStructure.getImmunizationName());
+		immunization.setPreventionType(getPreventionCode(importStructure));
+		immunization.setManufacture(importStructure.getManufacturer());
+		immunization.setLot(importStructure.getLotNumber());
+		immunization.setRoute(importStructure.getRoute());
+		immunization.setLocation(importStructure.getSite());
+		immunization.setDose(importStructure.getDose());
+		immunization.setDrugIdentificationNumber(getDin(importStructure));
+		immunization.setAdministrationDate(toNullablePartialDateTime(importStructure.getDate()));
+		immunization.setRefused(getYIndicator(importStructure.getRefusedFlag()));
+
+		String commentStr = StringUtils.trimToNull(
+				StringUtils.trimToEmpty(importStructure.getInstructions()) + "\n" +
+						StringUtils.trimToEmpty(importStructure.getNotes())
+		);
+		immunization.setComments(commentStr);
+
+		immunization.setNextDate(getResidualDataElementAsDate(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_NEXT_DATE));
+
+		return immunization;
+	}
+
+	protected String getDin(Immunizations importStructure)
+	{
+		String din = null;
+		Code code = importStructure.getImmunizationCode();
+		if(code != null)
+		{
+			din = code.getValue();
+		}
+		return din;
+	}
+
+	protected String getPreventionCode(Immunizations importStructure)
+	{
+		String codeValue;
+		ImmunizationType immunizationType = importStructure.getImmunizationType();
+		if(immunizationType != null)
+		{
+			codeValue = importStructure.getImmunizationType().value();
+		}
+		else
+		{
+			codeValue = getResidualDataElementAsString(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE);
+		}
+		ArrayList<String> typeList = preventionManager.getPreventionTypeList();
+		if(codeValue == null || !typeList.contains(codeValue))
+		{
+			logger.warn("Unknown or invalid prevention type: " + codeValue);
+			return DEFAULT_PREVENTION_TYPE;
+		}
+		return codeValue;
 	}
 }

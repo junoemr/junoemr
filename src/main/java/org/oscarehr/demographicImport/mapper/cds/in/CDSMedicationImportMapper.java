@@ -208,21 +208,4 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		}
 		return null;
 	}
-
-	protected Boolean getYIndicator(YnIndicator ynIndicator)
-	{
-		if(ynIndicator != null)
-		{
-			String yIndicatorValue = ynIndicator.getYnIndicatorsimple();
-			if(yIndicatorValue != null)
-			{
-				return yIndicatorValue.equals(Y_INDICATOR_TRUE);
-			}
-			else
-			{
-				return ynIndicator.isBoolean();
-			}
-		}
-		return null;
-	}
 }

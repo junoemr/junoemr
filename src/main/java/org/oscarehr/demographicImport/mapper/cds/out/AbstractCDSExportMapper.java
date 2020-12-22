@@ -76,6 +76,10 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 			residualInformation.getDataElement().add(createResidualInfoDataElement(dataType, name, value));
 		}
 	}
+	protected void addNonNullDataElements(ResidualInformation residualInformation, String name, LocalDate localDate)
+	{
+		addNonNullDataElements(residualInformation, CDSConstants.RESIDUAL_INFO_DATA_TYPE.DATE, name, ConversionUtils.toDateString(localDate));
+	}
 	protected void addNonNullDataElements(ResidualInformation residualInformation, String name, PartialDate partialDate)
 	{
 		if(partialDate != null)

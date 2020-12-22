@@ -26,11 +26,17 @@ import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.common.xml.cds.v5_0.model.Code;
 import org.oscarehr.common.xml.cds.v5_0.model.ImmunizationType;
 import org.oscarehr.common.xml.cds.v5_0.model.Immunizations;
+import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
+import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.immunization.Immunization;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DRUG_IDENTIFICATION_NUMBER;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_NEXT_DATE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE;
 
 @Component
 public class CDSImmunizationExportMapper extends AbstractCDSExportMapper<Immunizations, Immunization>
@@ -58,14 +64,35 @@ public class CDSImmunizationExportMapper extends AbstractCDSExportMapper<Immuniz
 		{
 			Code drugCode = objectFactory.createCode();
 			drugCode.setCodingSystem(DRUG_IDENTIFICATION_NUMBER);
-			drugCode.setDescription(null); //TODO
+			drugCode.setDescription(null); // not mentioned in spec, and we don't have this. maybe could be pulled from somewhere
 			drugCode.setValue(din);
 			immunizations.setImmunizationCode(drugCode);
 		}
 		immunizations.setDate(toNullableDateTimeFullOrPartial(exportStructure.getAdministrationDate()));
 		immunizations.setRefusedFlag(getRefusalFlag(exportStructure));
-		immunizations.setInstructions(null); //TODO
+		immunizations.setInstructions(null); // we don't have a separate instructions section.
 		immunizations.setNotes(exportStructure.getComments());
+
+		LocalDate nextDate = exportStructure.getNextDate();
+		ImmunizationType immunizationType = immunizations.getImmunizationType();
+		if(nextDate != null || immunizationType == null)
+		{
+			ResidualInformation residualInformation = objectFactory.createResidualInformation();
+			addNonNullDataElements(
+					residualInformation,
+					RESIDUAL_INFO_DATA_NAME_NEXT_DATE,
+					nextDate);
+			/* if the prevention code is not in the standard list, write it as residual info. */
+			if(immunizationType == null)
+			{
+				addNonNullDataElements(
+						residualInformation,
+						CDSConstants.RESIDUAL_INFO_DATA_TYPE.TEXT,
+						RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE,
+						exportStructure.getPreventionType());
+			}
+			immunizations.setResidualInfo(residualInformation);
+		}
 
 		return immunizations;
 	}
@@ -74,11 +101,12 @@ public class CDSImmunizationExportMapper extends AbstractCDSExportMapper<Immuniz
 	{
 		ImmunizationType immunizationType = null;
 		String preventionType = exportStructure.getPreventionType();
-		if(EnumUtils.isValidEnum(ImmunizationType.class, preventionType))
+		if(EnumUtils.isValidEnumIgnoreCase(ImmunizationType.class, preventionType))
 		{
-			immunizationType = ImmunizationType.fromValue(preventionType);
+			immunizationType = ImmunizationType.valueOf(preventionType.toUpperCase());
 		}
-		// might need to do some mapping here for additional values
+		// additional values will be exported under the residual info section.
+		// many type codes in Juno are not present in the CDS enum
 
 		return immunizationType;
 	}

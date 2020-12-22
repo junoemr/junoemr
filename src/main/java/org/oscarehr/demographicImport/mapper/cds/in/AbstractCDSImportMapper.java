@@ -28,6 +28,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
+import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.mapper.AbstractImportMapper;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
@@ -40,6 +41,8 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.Y_INDICATOR_TRUE;
 
 @Component
 public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper<I, E>
@@ -96,6 +99,15 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		}
 		return null;
 	}
+	protected LocalDate getResidualDataElementAsDate(ResidualInformation residualInformation, String ... keys)
+	{
+		ResidualInformation.DataElement dataElement = getResidualDataElement(residualInformation, keys);
+		if(dataElement != null)
+		{
+			return ConversionUtils.toLocalDate(dataElement.getContent());
+		}
+		return null;
+	}
 	protected String getResidualDataElementAsString(ResidualInformation residualInformation, String ... keys)
 	{
 		ResidualInformation.DataElement dataElement = getResidualDataElement(residualInformation, keys);
@@ -116,6 +128,23 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 			provider.setLastName(personNameSimple.getLastName());
 		}
 		return provider;
+	}
+
+	protected Boolean getYIndicator(YnIndicator ynIndicator)
+	{
+		if(ynIndicator != null)
+		{
+			String yIndicatorValue = ynIndicator.getYnIndicatorsimple();
+			if(yIndicatorValue != null)
+			{
+				return yIndicatorValue.equals(Y_INDICATOR_TRUE);
+			}
+			else
+			{
+				return ynIndicator.isBoolean();
+			}
+		}
+		return null;
 	}
 
 	protected PartialDate toNullablePartialDate(DateFullOrPartial fullOrPartial)
