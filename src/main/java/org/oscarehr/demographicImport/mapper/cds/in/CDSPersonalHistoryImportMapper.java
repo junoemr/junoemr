@@ -28,7 +28,6 @@ import org.oscarehr.common.xml.cds.v5_0.model.PersonalHistory;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.encounterNote.SocialHistoryNote;
-import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -88,15 +87,7 @@ public class CDSPersonalHistoryImportMapper extends AbstractCDSImportMapper<Pers
 					}
 					case RESIDUAL_INFO_DATA_NAME_PROVIDER:
 					{
-						if(content.contains(","))
-						{
-							String[] providerNames = content.split(",", 2);
-							Provider provider = new Provider();
-							provider.setLastName(providerNames[0]);
-							provider.setFirstName(providerNames[1]);
-							note.setProvider(provider);
-							break;
-						}
+						note.setProvider(toProviderNames(content)); break;
 					}
 					default:
 					{

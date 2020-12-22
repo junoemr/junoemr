@@ -35,7 +35,7 @@ public class CDSConstants
 	public static final String RESIDUAL_INFO_DATA_NAME_AGE_OF_ONSET = "Age Of Onset";
 	public static final String RESIDUAL_INFO_DATA_NAME_ONSET_REACTION = "Onset Of Reaction";
 
-	public static final String RESIDUAL_INFO_DATA_NAME_NEXT_DATE = "Next Date";
+	public static final String RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_NEXT_DATE = "Next Immunization Date";
 	public static final String RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE = "ImmunizationType";
 
 	public enum RESIDUAL_INFO_DATA_TYPE

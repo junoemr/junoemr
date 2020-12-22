@@ -42,9 +42,9 @@ import java.util.List;
 public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverter<I, E>
 {
 	protected static final OscarProperties properties = OscarProperties.getInstance();
-	protected static final String IMPORT_PROVIDER = properties.getProperty("copd_import_service.system_provider_no", "999900");
-	protected static final String DEFAULT_PROVIDER_LAST_NAME = properties.getProperty("copd_import_service.default_provider.last_name", "import-provider");
-	protected static final String DEFAULT_PROVIDER_FIRST_NAME = properties.getProperty("copd_import_service.default_provider.first_name", "missing");
+	protected static final String IMPORT_PROVIDER = properties.getProperty("import_service.system_provider_no", "999900");
+	protected static final String DEFAULT_PROVIDER_LAST_NAME = properties.getProperty("import_service.default_provider.last_name", "import");
+	protected static final String DEFAULT_PROVIDER_FIRST_NAME = properties.getProperty("import_service.default_provider.first_name", "provider");
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final HashMap<String, ProviderData> providerLookupCache = new HashMap<>();

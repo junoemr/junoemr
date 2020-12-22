@@ -35,8 +35,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
-import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_NEXT_DATE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_NEXT_DATE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_PROVIDER;
 
 @Component
 public class CDSImmunizationImportMapper extends AbstractCDSImportMapper<Immunizations, Immunization>
@@ -75,7 +76,8 @@ public class CDSImmunizationImportMapper extends AbstractCDSImportMapper<Immuniz
 		);
 		immunization.setComments(commentStr);
 
-		immunization.setNextDate(getResidualDataElementAsDate(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_NEXT_DATE));
+		immunization.setNextDate(getResidualDataElementAsDate(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_NEXT_DATE));
+		immunization.setProvider(toProviderNames(getResidualDataElementAsString(importStructure.getResidualInfo(), RESIDUAL_INFO_DATA_NAME_PROVIDER)));
 
 		return immunization;
 	}

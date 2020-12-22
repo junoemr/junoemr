@@ -68,7 +68,8 @@ public class PreventionDbToModelConverter extends BaseDbToModelConverter<Prevent
 		immunization.setAdministrationDate(PartialDateTime.from(ConversionUtils.toNullableLocalDateTime(input.getPreventionDate()), dbPartialDate));
 
 		immunization.setCreatedAt(ConversionUtils.toNullableLocalDateTime(input.getCreationDate()));
-		immunization.setCreatedBy(findProvider(input.getProviderNo()));
+		immunization.setCreatedBy(findProvider(input.getCreatorProviderNo()));
+		immunization.setProvider(findProvider(input.getProviderNo()));
 
 		immunization.setRefused(input.isRefused());
 		immunization.setNever(input.isNever());

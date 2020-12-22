@@ -130,6 +130,19 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return provider;
 	}
 
+	protected Provider toProviderNames(String providerNameString)
+	{
+		Provider provider = null;
+		if(providerNameString.contains(","))
+		{
+			String[] providerNames = providerNameString.split(",", 2);
+			provider = new Provider();
+			provider.setLastName(providerNames[0]);
+			provider.setFirstName(providerNames[1]);
+		}
+		return provider;
+	}
+
 	protected Boolean getYIndicator(YnIndicator ynIndicator)
 	{
 		if(ynIndicator != null)

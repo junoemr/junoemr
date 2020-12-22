@@ -32,11 +32,10 @@ import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
 import org.oscarehr.demographicImport.model.immunization.Immunization;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DRUG_IDENTIFICATION_NUMBER;
-import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_NEXT_DATE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_NEXT_DATE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.RESIDUAL_INFO_DATA_NAME_PROVIDER;
 
 @Component
 public class CDSImmunizationExportMapper extends AbstractCDSExportMapper<Immunizations, Immunization>
@@ -73,26 +72,33 @@ public class CDSImmunizationExportMapper extends AbstractCDSExportMapper<Immuniz
 		immunizations.setInstructions(null); // we don't have a separate instructions section.
 		immunizations.setNotes(exportStructure.getComments());
 
-		LocalDate nextDate = exportStructure.getNextDate();
-		ImmunizationType immunizationType = immunizations.getImmunizationType();
-		if(nextDate != null || immunizationType == null)
+		ResidualInformation residualInformation = objectFactory.createResidualInformation();
+
+
+		// add next immunization date
+		addNonNullDataElements(
+				residualInformation,
+				RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_NEXT_DATE,
+				exportStructure.getNextDate());
+
+		// add provider info
+		addNonNullDataElements(
+				residualInformation,
+				CDSConstants.RESIDUAL_INFO_DATA_TYPE.TEXT,
+				RESIDUAL_INFO_DATA_NAME_PROVIDER,
+				exportStructure.getProvider().getLastName() + "," + exportStructure.getProvider().getFirstName());
+
+		/* write type as residual info only if it is not in the standard list */
+		if(immunizations.getImmunizationType() == null)
 		{
-			ResidualInformation residualInformation = objectFactory.createResidualInformation();
 			addNonNullDataElements(
 					residualInformation,
-					RESIDUAL_INFO_DATA_NAME_NEXT_DATE,
-					nextDate);
-			/* if the prevention code is not in the standard list, write it as residual info. */
-			if(immunizationType == null)
-			{
-				addNonNullDataElements(
-						residualInformation,
-						CDSConstants.RESIDUAL_INFO_DATA_TYPE.TEXT,
-						RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE,
-						exportStructure.getPreventionType());
-			}
-			immunizations.setResidualInfo(residualInformation);
+					CDSConstants.RESIDUAL_INFO_DATA_TYPE.TEXT,
+					RESIDUAL_INFO_DATA_NAME_IMMUNIZATION_TYPE,
+					exportStructure.getPreventionType());
 		}
+
+		immunizations.setResidualInfo(residualInformation);
 
 		return immunizations;
 	}
