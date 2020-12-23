@@ -60,13 +60,8 @@ public class JunoGenericImportLabWriter extends HL7LabWriter
 		terser.set("/.MSH-4", labModel.getSendingFacility());
 		terser.set("/.MSH-7", ConversionUtils.toDateString(labModel.getMessageDateTime(), HL7_DATE_FORMAT)); // set message date
 
-		/*TODO - how do we want to handle the sending facility? sending facility often determines which lab handler we use in the labHandlerFactory,
-		 * in order to load Juno labs, it must match a specific namespaceID (hence the constant), but incoming labs may be marked as CLS, DynaCare etc.
-		 * for now I am putting that information in the MSH-3-2 "Universal Id" segment instead, but that is not technically correct. */
-
 		// populate patient PID segment info from the demographic record
 		buildPID(demographic);
-
 
 		// populate lab info
 		String accessionNumber = labModel.getAccessionNumber();

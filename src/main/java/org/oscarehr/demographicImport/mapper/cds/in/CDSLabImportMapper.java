@@ -244,9 +244,9 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		}
 		return flag;
 	}
-	protected Boolean getAbnormalFlagFromText(String abnormalFlag)
+	protected boolean getAbnormalFlagFromText(String abnormalFlag)
 	{
-		Boolean flag = null;
+		boolean flag = false;
 		if(abnormalFlag != null)
 		{
 			flag = CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag);

@@ -43,7 +43,6 @@ public class JunoGenericLabHandler extends ORU_R01MessageHandler
 			MSH messageHeaderSegment = msh.getMSH();
 
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getHd1_NamespaceID().getValue();
-			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getHd1_NamespaceID().getValue();
 
 			return sendingApplication.equals(JunoCoPDLabWriter.SENDING_APP) ||
 					sendingApplication.equals(JunoGenericImportLabWriter.SENDING_APP);
@@ -100,7 +99,12 @@ public class JunoGenericLabHandler extends ORU_R01MessageHandler
 	@Override
 	public String getPatientLocation()
 	{
-		return "JUNOGenericLab";
+		String location = getString(get("/.MSH-4")); // sending facility
+		if(location.isEmpty())
+		{
+			location = "JUNOGenericLab"; // default if there is no data
+		}
+		return location;
 	}
 
 	@Override
