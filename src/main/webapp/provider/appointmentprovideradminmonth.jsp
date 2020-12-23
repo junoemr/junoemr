@@ -467,7 +467,7 @@ function refreshTabAlerts(id) {
 <table BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
 	<tr>
 	<td align="center" >
-		<a href="../web/" title="OSCAR EMR"><img src="<%=request.getContextPath()%>/images/logo-primary.png" border="0" title="Go to Juno UI"></a>
+		<a href="../web/"><img src="<%=request.getContextPath()%>/images/logo-primary.png" border="0" title="Go to Juno UI"></a>
 	</td>
 		<td>
 		<ul id="navlist">
