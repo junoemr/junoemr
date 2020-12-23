@@ -22,21 +22,22 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.out;
 
-import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.xml.cds.v5_0.model.ReportClass;
 import org.oscarehr.common.xml.cds.v5_0.model.ReportContent;
 import org.oscarehr.common.xml.cds.v5_0.model.ReportFormat;
 import org.oscarehr.common.xml.cds.v5_0.model.Reports;
 import org.oscarehr.demographicImport.model.document.Document;
+import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
-public class CDSReportExportMapper extends AbstractCDSExportMapper<Reports, Document>
+public class CDSReportDocumentExportMapper extends AbstractCDSReportExportMapper<Document>
 {
-	public CDSReportExportMapper()
+	public CDSReportDocumentExportMapper()
 	{
 		super();
 	}
@@ -46,8 +47,9 @@ public class CDSReportExportMapper extends AbstractCDSExportMapper<Reports, Docu
 	{
 		Reports reports = objectFactory.createReports();
 
-		// all Juno documents will be treated as binary reports
-		reports.setFormat(ReportFormat.BINARY);
+		reports.setMedia(null); //TODO do we have anything for this?
+		reports.setFormat(ReportFormat.BINARY);	// all Juno documents will be treated as binary reports
+
 		try
 		{
 			GenericFile documentFile = exportStructure.getFile();
@@ -56,7 +58,7 @@ public class CDSReportExportMapper extends AbstractCDSExportMapper<Reports, Docu
 			reportContent.setMedia(documentFile.toBase64ByteArray());
 			reports.setContent(reportContent);
 
-			reports.setFileExtensionAndVersion(documentFile.getExtension());
+			reports.setFileExtensionAndVersion(documentFile.getExtension().toLowerCase());
 		}
 		catch(IOException e)
 		{
@@ -72,22 +74,40 @@ public class CDSReportExportMapper extends AbstractCDSExportMapper<Reports, Docu
 		sourceAuthorPhysician.setAuthorName(toPersonNameSimple(exportStructure.getCreatedBy()));
 		reports.setSourceAuthorPhysician(sourceAuthorPhysician);
 
-		reports.setSourceFacility(exportStructure.getSourceFacility());
+		reports.getReportReviewed().addAll(getReportReviewedList(exportStructure));
+		reports.setNotes(exportStructure.getAnnotation());
+
+		// the following can be omitted for non-hrm documents:
+		/*  1.SourceFacility
+			2.SendingFacilityID
+			3.SendingFacilityReport
+			4.OBRContent/AccompanyingSubClass
+			5.OBRContent/ AccompanyingMnemonic
+			6.OBRContent/AccompanyingDescription
+			7.OBRContent/ObservationDateTime
+			8.HRMResultStatus
+			9.MessageUniqueID
+			*/
+		/* only populate RecipientName and DateTimeSent if the report was sent to another physician.
+		* This does not apply to standard documents the way Juno uses them */
 
 		return reports;
 	}
 
-	protected ReportClass toReportClass(String docClass)
+	protected List<Reports.ReportReviewed> getReportReviewedList(Document exportStructure)
 	{
-		ReportClass reportClass;
-		if(EnumUtils.isValidEnum(ReportClass.class, docClass))
+		List<Reports.ReportReviewed> reviewedList = new ArrayList<>();
+
+		Reviewer reviewer = exportStructure.getReviewer();
+		if(reviewer != null)
 		{
-			reportClass = ReportClass.valueOf(docClass);
+			Reports.ReportReviewed reportReviewed = objectFactory.createReportsReportReviewed();
+			reportReviewed.setName(toPersonNameSimple(reviewer));
+			reportReviewed.setDateTimeReportReviewed(toNullableDateFullOrPartial(reviewer.getReviewDateTime()));
+			reportReviewed.setReviewingOHIPPhysicianId(reviewer.getOhipNumber());
+
+			reviewedList.add(reportReviewed);
 		}
-		else
-		{
-			reportClass = ReportClass.OTHER_LETTER;
-		}
-		return reportClass;
+		return reviewedList;
 	}
 }

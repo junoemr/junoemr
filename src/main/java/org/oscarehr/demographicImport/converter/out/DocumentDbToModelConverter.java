@@ -28,6 +28,10 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.provider.Reviewer;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.encounterNote.dao.CaseManagementNoteLinkDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
+import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -43,6 +47,9 @@ public class DocumentDbToModelConverter extends
 
 	@Autowired
 	private AppointmentDbToModelConverter appointmentConverter;
+
+	@Autowired
+	private CaseManagementNoteLinkDao caseManagementNoteLinkDao;
 
 	@Override
 	public org.oscarehr.demographicImport.model.document.Document convert(Document input)
@@ -92,6 +99,18 @@ public class DocumentDbToModelConverter extends
 		{
 			//TODO handle missing documents?
 			throw new RuntimeException("Missing Document File", e);
+		}
+
+		CaseManagementNoteLink noteLink = caseManagementNoteLinkDao.getNoteLinkByTableIdAndTableName(input.getId(), CaseManagementNoteLink.DOCUMENT);
+		if(noteLink != null)
+		{
+			CaseManagementNote note = noteLink.getNote();
+
+			// don't export system created notes
+			if(!note.getProvider().getId().equals(ProviderData.SYSTEM_PROVIDER_NO))
+			{
+				exportDocument.setAnnotation(note.getNote());
+			}
 		}
 
 		return exportDocument;

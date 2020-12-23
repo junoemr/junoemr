@@ -61,7 +61,11 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 	@Autowired
 	private  CDSEncounterNoteExportMapper cdsEncounterNoteExportMapper;
 	@Autowired
-	private  CDSReportExportMapper cdsReportExportMapper;
+	private CDSReportDocumentExportMapper cdsReportDocumentExportMapper;
+	@Autowired
+	private CDSReportHrmExportMapper cdsReportHRMExportMapper;
+	@Autowired
+	private CDSReportEFormExportMapper cdsReportEFormExportMapper;
 	@Autowired
 	private  CDSCareElementExportMapper cdsCareElementExportMapper;
 	@Autowired
@@ -138,8 +142,13 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 		}
 		if(exportPreferences.isExportReportsReceived())
 		{
+			//TODO add more properties for these to export individually
 			patientRecord.getReports().addAll(
-					cdsReportExportMapper.exportAll(exportStructure.getDocumentList()));
+					cdsReportDocumentExportMapper.exportAll(exportStructure.getDocumentList()));
+			patientRecord.getReports().addAll(
+					cdsReportHRMExportMapper.exportAll(exportStructure.getHrmDocumentList()));
+			patientRecord.getReports().addAll(
+					cdsReportEFormExportMapper.exportAll(exportStructure.getEFormListList()));
 		}
 		if(exportPreferences.isExportCareElements())
 		{

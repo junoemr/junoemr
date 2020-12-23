@@ -74,7 +74,8 @@ public class CaseManagementNoteLinkDao extends AbstractDao<CaseManagementNoteLin
 		String jpql = "SELECT c \n" +
 				"FROM model_CaseManagementNoteLink c \n" +
 				"WHERE c.tableId = :noteId\n" +
-				"AND c.tableName = :tableName\n";
+				"AND c.tableName = :tableName\n" +
+				"ORDER BY c.id DESC";
 
 		Query query = entityManager.createQuery(jpql);
 		query.setParameter("noteId", noteId);
@@ -89,7 +90,8 @@ public class CaseManagementNoteLinkDao extends AbstractDao<CaseManagementNoteLin
 				"FROM model_CaseManagementNoteLink c \n" +
 				"WHERE c.tableId = :noteId\n" +
 				"AND c.tableName = :tableName\n" +
-				"AND c.otherId = :otherId\n";
+				"AND c.otherId = :otherId\n" +
+				"ORDER BY c.id DESC";
 
 		Query query = entityManager.createQuery(jpql);
 		query.setParameter("noteId", noteId);

@@ -23,17 +23,12 @@
 package org.oscarehr.demographicImport.model.document;
 
 import lombok.Data;
-import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
-import org.oscarehr.demographicImport.model.appointment.Appointment;
-import org.oscarehr.demographicImport.model.provider.Reviewer;
-import org.oscarehr.demographicImport.model.provider.Provider;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-public class Document extends AbstractTransientModel
+public class HrmDocument extends AbstractTransientModel
 {
 	public enum STATUS
 	{
@@ -43,25 +38,20 @@ public class Document extends AbstractTransientModel
 
 	private Integer id;
 
-	private String description;
-	private String documentType;
-	private String documentClass;
-	private String documentSubClass;
-	private LocalDate observationDate;
+	private LocalDateTime reportDateTime;
+	private LocalDateTime receivedDateTime;
 
-	private GenericFile file;
-
-	private String source;
+	private String reportType;
+	private String reportHash;
+	private String reportLessTransactionInfoHash;
+	private String reportLessDemographicInfoHash;
+	private STATUS reportStatus;
+	private String reportFile;
 	private String sourceFacility;
-	private LocalDateTime updatedAt;
-	private STATUS status;
-	private LocalDateTime createdAt;
-	private Boolean publicDocument;
-	private Appointment appointment;
 
-	private Provider createdBy;
-	private Provider responsible;
-	private Reviewer reviewer;
-
-	private String annotation;
+	private String unmatchedProviders;
+	private Integer numDuplicatesReceived;
+	private Integer parentReport;
+	private Integer hrmCategoryId;
+	private String description;
 }
