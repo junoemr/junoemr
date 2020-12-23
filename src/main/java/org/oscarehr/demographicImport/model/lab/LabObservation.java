@@ -42,7 +42,9 @@ public class LabObservation extends AbstractTransientModel
 	private LocalDateTime requestDateTime;
 	private Hl7TextInfo.REPORT_STATUS reportStatus;
 
+	// comments represents the NTE section under OBR
 	private List<String> comments;
+	// results represents the OBX segments
 	private List<LabObservationResult> results;
 
 	public LabObservation()

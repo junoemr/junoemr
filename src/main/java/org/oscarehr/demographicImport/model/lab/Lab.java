@@ -46,7 +46,7 @@ public class Lab extends AbstractTransientModel
 	private LocalDateTime messageDateTime;
 	private LocalDateTime emrReceivedDateTime;
 
-
+	// observations represent the OBR segments
 	private List<LabObservation> labObservationList;
 	private List<Reviewer> reviewers;
 

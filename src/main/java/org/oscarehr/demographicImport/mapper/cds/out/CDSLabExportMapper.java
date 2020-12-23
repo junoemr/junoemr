@@ -88,8 +88,8 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 				}
 
 				laboratoryResult.setResultNormalAbnormalFlag(getAbnormalFlag(labObrResult.getAbnormal()));
-				laboratoryResult.setTestResultsInformationReportedByTheLab(getLabComments(labObrResult));
-				laboratoryResult.setNotesFromLab(labObrResult.getNotes());
+				laboratoryResult.setTestResultsInformationReportedByTheLab(getLabObrComments(labObr));
+				laboratoryResult.setNotesFromLab(getLabObxComments(labObrResult));
 				laboratoryResult.setPhysiciansNotes(getPhysiciansNotes(labObrResult));
 				laboratoryResult.setTestResultStatus(labObrResult.getResultStatus());
 				laboratoryResult.setBlockedTestResult(null); //TODO how to determine this?
@@ -133,9 +133,18 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 		return null;
 	}
 
-	protected String getLabComments(LabObservationResult labObrResult)
+	protected String getLabObxComments(LabObservationResult labObrResult)
 	{
 		List<String> comments = labObrResult.getComments();
+		if(comments != null && !comments.isEmpty())
+		{
+			return String.join("\n", comments);
+		}
+		return null;
+	}
+	protected String getLabObrComments(LabObservation labObr)
+	{
+		List<String> comments = labObr.getComments();
 		if(comments != null && !comments.isEmpty())
 		{
 			return String.join("\n", comments);

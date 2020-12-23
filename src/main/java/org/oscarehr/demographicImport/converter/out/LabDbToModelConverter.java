@@ -145,7 +145,7 @@ public class LabDbToModelConverter extends
 		result.setResultStatus(labHandler.getOBXResultStatus(obrIndex, obxIndex));
 		result.setUnits(labHandler.getOBXUnits(obrIndex, obxIndex));
 		result.setValue(labHandler.getOBXResult(obrIndex, obxIndex));
-		result.setNotes(labHandler.getNteForOBX(obrIndex, obxIndex));
+//		result.setNotes(labHandler.getNteForOBX(obrIndex, obxIndex));
 
 		for(int i = 0; i < labHandler.getOBXCommentCount(obrIndex, obxIndex); i++)
 		{

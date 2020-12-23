@@ -165,43 +165,20 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 				result.setUnits(labResult.getUnitOfMeasure());
 			}
 
-			LaboratoryResults.ReferenceRange referenceRange = importLabResults.getReferenceRange();
-			if(referenceRange != null)
-			{
-				String lowLimit = referenceRange.getLowLimit();
-				String highLimit = referenceRange.getLowLimit();
-				String rangeText;
-				if(lowLimit != null || highLimit != null)
-				{
-					rangeText = StringUtils.trimToEmpty(lowLimit) + "-" + StringUtils.trimToEmpty(highLimit);
-				}
-				else
-				{
-					rangeText = referenceRange.getReferenceRangeText();
-				}
-				result.setRange(rangeText);
-			}
+			result.setRange(getReferenceRange(importLabResults.getReferenceRange()));
+			result.setAbnormal(getAbnormalFlag(importLabResults.getResultNormalAbnormalFlag()));
 
-			ResultNormalAbnormalFlag abnormalFlag = importLabResults.getResultNormalAbnormalFlag();
-			if(abnormalFlag == null
-					|| CDSConstants.LAB_ABNORMAL_FLAG.U.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum()))
-			{
-				result.setAbnormal(null);
-			}
-			else
-			{
-				result.setAbnormal(CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum())
-						|| CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsPlainText())
-				);
-				//TODO handle free text abnormal values
-			}
-
+			//TODO should these go elsewhere?
 			String testResultInfoFromLab = importLabResults.getTestResultsInformationReportedByTheLab();
 			if(testResultInfoFromLab != null)
 			{
 				result.addComment(testResultInfoFromLab);
 			}
-			result.setNotes(importLabResults.getNotesFromLab());
+			String labNotes = importLabResults.getNotesFromLab();
+			if(labNotes != null)
+			{
+				result.addComment(labNotes);
+			}
 
 			result.setResultStatus(importLabResults.getTestResultStatus());
 
@@ -220,7 +197,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		return labObservation;
 	}
 
-	private Hl7TextInfo.REPORT_STATUS getReportStatusEnum(LaboratoryResults laboratoryResults)
+	protected Hl7TextInfo.REPORT_STATUS getReportStatusEnum(LaboratoryResults laboratoryResults)
 	{
 		String statusStr = laboratoryResults.getTestResultStatus();
 		if(EnumUtils.isValidEnum(Hl7TextInfo.REPORT_STATUS.class, statusStr))
@@ -232,5 +209,49 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 			// TODO could map additional statuses here manually to the enum
 			return Hl7TextInfo.REPORT_STATUS.F; // unknown status is final, since labs will never get updates, are probably old.
 		}
+	}
+
+	protected String getReferenceRange(LaboratoryResults.ReferenceRange referenceRange)
+	{
+		String rangeText = null;
+		if(referenceRange != null)
+		{
+			String lowLimit = referenceRange.getLowLimit();
+			String highLimit = referenceRange.getLowLimit();
+			if(lowLimit != null || highLimit != null)
+			{
+				rangeText = StringUtils.trimToEmpty(lowLimit) + "-" + StringUtils.trimToEmpty(highLimit);
+			}
+			else
+			{
+				rangeText = referenceRange.getReferenceRangeText();
+			}
+		}
+		return rangeText;
+	}
+
+	protected Boolean getAbnormalFlag(ResultNormalAbnormalFlag abnormalFlag)
+	{
+		Boolean flag;
+		if(abnormalFlag == null || CDSConstants.LAB_ABNORMAL_FLAG.U.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum()))
+		{
+			flag = null;
+		}
+		else
+		{
+			flag = CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag.getResultNormalAbnormalFlagAsEnum())
+					|| getAbnormalFlagFromText(abnormalFlag.getResultNormalAbnormalFlagAsPlainText());
+		}
+		return flag;
+	}
+	protected Boolean getAbnormalFlagFromText(String abnormalFlag)
+	{
+		Boolean flag = null;
+		if(abnormalFlag != null)
+		{
+			flag = CDSConstants.LAB_ABNORMAL_FLAG.Y.name().equals(abnormalFlag);
+			//TODO handle additional free text abnormal values
+		}
+		return flag;
 	}
 }

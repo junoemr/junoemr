@@ -56,8 +56,8 @@ public class JunoGenericImportLabWriter extends HL7LabWriter
 		//initialize an MSH header segment with some custom values
 		oru_r01.initQuickstart("ORU", "R01", "P");
 		terser.set("/.MSH-3", SENDING_APP); // set sending application so lab can be identified
-		terser.set("/.MSH-3-2", labModel.getSendingFacility()); // so it's not lost.
-		terser.set("/.MSH-4", labModel.getSendingApplication());
+		terser.set("/.MSH-3-2", labModel.getSendingApplication()); // so it's not lost.
+		terser.set("/.MSH-4", labModel.getSendingFacility());
 		terser.set("/.MSH-7", ConversionUtils.toDateString(labModel.getMessageDateTime(), HL7_DATE_FORMAT)); // set message date
 
 		/*TODO - how do we want to handle the sending facility? sending facility often determines which lab handler we use in the labHandlerFactory,
@@ -185,14 +185,6 @@ public class JunoGenericImportLabWriter extends HL7LabWriter
 
 		// notes info
 		int nteIndex = 0;
-		String obxNotes = result.getNotes();
-		if(obxNotes != null && !obxNotes.isEmpty())
-		{
-			String ntePath = obxPath + ".NTE(" + nteIndex + ")-";
-			terser.set(ntePath + "1", String.valueOf(nteIndex + 1)); // force set the SetId
-			terser.set(ntePath + "3", obxNotes);
-			nteIndex++;
-		}
 		for(String noteText : result.getComments())
 		{
 			String ntePath = obxPath + ".NTE(" + nteIndex + ")-";

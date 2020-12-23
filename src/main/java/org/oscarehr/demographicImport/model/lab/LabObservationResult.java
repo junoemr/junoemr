@@ -44,8 +44,9 @@ public class LabObservationResult extends AbstractTransientModel
 	private String resultStatus;
 	private Boolean abnormal;
 	private LocalDateTime observationDateTime;
-	private String notes;
+	// comments represents the NTE section under OBX
 	private List<String> comments;
+	// annotation is a linked chart note
 	private EncounterNote annotation;
 
 	public LabObservationResult()
