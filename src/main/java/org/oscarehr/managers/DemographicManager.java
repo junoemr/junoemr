@@ -918,15 +918,16 @@ public class DemographicManager {
 			error_string += "yearOfBirth is a required field.  ";
 			has_error = true;
 		}
-		else {
+		else if (!StringUtils.isNumeric(demographic.getYearOfBirth()))
+		{
+			error_string += "yearOfBirth should be a numeric value. ";
+			has_error = true;
+		}
+		else
+		{
+			// Convert the string value of the birth year to an int and ensure that it is 4 digits long.
 			int yearOfBirth = ConversionUtils.fromIntString(demographic.getYearOfBirth());
-			if (yearOfBirth == 0)
-			{
-				error_string += "yearOfBirth should be a numeric value. ";
-				has_error = true;
-			}
-			else if (yearOfBirth < 1000
-					|| yearOfBirth >= 10000)
+			if (yearOfBirth < 1000 || yearOfBirth >= 10000)
 			{
 				error_string += "yearOfBirth is expected to be a 4-digit number.";
 				has_error = true;
