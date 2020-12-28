@@ -36,7 +36,8 @@ package oscar.oscarLab.ca.all.util;
 
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Hashtable;
+
+import java.util.Map;
 
 import oscar.util.UtilDateUtilities;
 
@@ -49,11 +50,11 @@ import oscar.util.UtilDateUtilities;
  *
  * @author wrighd
  */
-public class CumulativeLabValuesComparator implements Comparator{
+public class CumulativeLabValuesComparator implements Comparator<Map>{
     
-    public int compare(Object o1, Object o2) {
-        Date dateA = UtilDateUtilities.getDateFromString((String) ((Hashtable) o1).get("date") , "yyyy-MM-dd HH:mm:ss");
-        Date dateB = UtilDateUtilities.getDateFromString((String) ((Hashtable) o2).get("date") , "yyyy-MM-dd HH:mm:ss");
+    public int compare(Map o1, Map o2) {
+        Date dateA = UtilDateUtilities.getDateFromString((String) o1.get("date") , "yyyy-MM-dd HH:mm:ss");
+        Date dateB = UtilDateUtilities.getDateFromString((String) o2.get("date") , "yyyy-MM-dd HH:mm:ss");
         int ret = 0;
         
         if (dateA.after( dateB )){

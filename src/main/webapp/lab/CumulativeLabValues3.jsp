@@ -49,14 +49,13 @@ if(!authed) {
 
 String demographic_no = request.getParameter("demographic_no");
 
-LinkedHashMap nameMap = new LinkedHashMap();
-ArrayList idList = new ArrayList();
-HashMap measIdMap = new HashMap();
-ArrayList dateList = new ArrayList();
-ArrayList uniqueLabs = CommonLabTestValues.findUniqueLabsForPatient(demographic_no);
+Map<String, String> nameMap = new LinkedHashMap<String, String>();
+List<String> idList = new ArrayList<String>();
+Map<String, Serializable> measIdMap = new HashMap<String, Serializable>();
+List<HashMap<String, String>> dateList = new ArrayList<HashMap<String, String>>();
+ArrayList<Hashtable<String, Serializable>> uniqueLabs = CommonLabTestValues.findUniqueLabsForPatient(demographic_no);
 
 try{
-    
 /*  loop through the measurements
 *   nameMap: (loinc_code, name)
 *   measIdMap: (loinc_code, IdMap)
@@ -67,37 +66,35 @@ try{
     */
 
 	for (int i = 0; i < uniqueLabs.size(); i++){
-	    Hashtable ulab = (Hashtable) uniqueLabs.get(i);
+	    Hashtable<String, Serializable> ulab =  uniqueLabs.get(i);
 	    String labName = (String) ulab.get("testName");
 	    String labType = (String) ulab.get("labType");
 	    String loinc_code = (String) ulab.get("identCode");
 
         if (!loinc_code.equalsIgnoreCase("NULL")){
-            LinkedHashMap IdMap = new LinkedHashMap();
-	        ArrayList labList = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographic_no), labName, loinc_code);
+            Map<String, HashMap<String, Serializable>> IdMap = new LinkedHashMap<String, HashMap<String, Serializable>>();
+	        ArrayList<Map<String, Serializable>> labValueList = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographic_no), labName, loinc_code);
 
-            for (int j=0; j < labList.size(); j++){
+            for (Map<String, Serializable> labValue : labValueList){
 
-	            HashMap valuesMap = (HashMap) labList.get(j);
-	            Hashtable  valuesTable= new Hashtable(valuesMap);
-
-                String date = ( (String) valuesTable.get("collDate") );
+	            HashMap<String, Serializable> valuesTable = (HashMap) labValue;
+                String date = ((String) valuesTable.get("collDate"));
                 String id = (String) valuesTable.get("lab_no");
                 IdMap.put(id, valuesTable);
                 
                 // check if this lab has already been added
                 if (!idList.contains(id)){
                     idList.add(id);
-                    Hashtable dateIdHash = new Hashtable();
+                    Map<String, String> dateIdHash = new HashMap<String, String>();
                     dateIdHash.put("date", date);
                     dateIdHash.put("id", id);
-                    dateList.add(dateIdHash);
+                    dateList.add((HashMap<String, String>) dateIdHash);
                 }
             }
             
             // add the test only if there are results for it
-            if (labList.size() > 0){
-                measIdMap.put(loinc_code, IdMap);
+            if (labValueList.size() > 0){
+                measIdMap.put(loinc_code, (Serializable) IdMap);
                 nameMap.put(loinc_code, labName);
             }
             
@@ -113,13 +110,13 @@ try{
             
             // Do not allow more than one space or more than one header in a row
             // A space is allowed to be followed by a header
-            if ( lastKey.startsWith("NULL") && (labName.equalsIgnoreCase("NULL") || !((String) nameMap.get(lastKey)).equalsIgnoreCase("NULL"))){
+            if ( lastKey.startsWith("NULL") && (labName.equalsIgnoreCase("NULL") || !(nameMap.get(lastKey)).equalsIgnoreCase("NULL"))){
                 nameMap.remove(lastKey);
                 
                 if (nameMapKeys.length > 1){
                     lastKey = nameMapKeys[nameMapKeys.length-2];
                     // if a header has been removed by a space remove the space before the header too
-                    if (((String) nameMap.get(lastKey)).equalsIgnoreCase("NULL") && labName.equalsIgnoreCase("NULL"))
+                    if ((nameMap.get(lastKey)).equalsIgnoreCase("NULL") && labName.equalsIgnoreCase("NULL"))
                         nameMap.remove(lastKey);
                 }
             }
@@ -144,7 +141,9 @@ try{
 
 
 
-<%@page import="org.oscarehr.util.MiscUtils"%><html:html locale="true">
+<%@page import="org.oscarehr.util.MiscUtils"%>
+<%@ page import="java.io.Serializable" %>
+<html:html locale="true">
 
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -303,13 +302,10 @@ function reportWindow(page) {
                             CumulativeLabValuesComparator comp = new CumulativeLabValuesComparator();
                             Collections.sort(dateList, comp);
                             for (int i=0; i < dateList.size(); i++){
-                                Hashtable dateIdHash = (Hashtable) dateList.get(i);
-                                String dateString = (String) dateIdHash.get("date");
+                                HashMap<String, String> dateIdHash = dateList.get(i);
+                                String dateString = dateIdHash.get("date");
                                 Date labDate= UtilDateUtilities.StringToDate(dateString, "yyyy-MM-dd HH:mm:ss");
-                                //Hashtable idHash = (Hashtable) dateIdHash.get("idHash");
-                                //String lab_no = (String) idHash.get("lab_no");
-                                //String lab_type = (String) idHash.get("lab_type");
-                                String lab_no = (String) dateIdHash.get("id");
+                                String lab_no = dateIdHash.get("id");
                                 
                                 CommonLabResultData data = new CommonLabResultData();
                                 String multiId = data.getMatchingLabs(lab_no, "HL7");
@@ -326,8 +322,8 @@ function reportWindow(page) {
                         while (iter.hasNext()){
                             // Display the test name
                             String loinc_code = (String) iter.next();
-                            String testName = (String) nameMap.get(loinc_code);
-                            LinkedHashMap IdMap = (LinkedHashMap) measIdMap.get(loinc_code);
+                            String testName = nameMap.get(loinc_code);
+                            LinkedHashMap<String, Serializable> IdMap =  (LinkedHashMap) measIdMap.get(loinc_code);
                             
                             //preserve spaces in the test names
                             testName = testName.replaceAll("\\s", "&#160;");
@@ -339,7 +335,7 @@ function reportWindow(page) {
                                 String abn = "N";
                                 if (IdMap.size() > 0){
                                     // the latest date will be the first one
-                                    Hashtable ht = (Hashtable) IdMap.get(IdMap.keySet().iterator().next());
+                                    HashMap<String, Serializable> ht = (HashMap) IdMap.get(IdMap.keySet().iterator().next());
                                     latestVal = (String) ht.get("result");
                                     latestDate = (String) ht.get("collDate");
                                     abn = (String) ht.get("abn");
@@ -354,11 +350,11 @@ function reportWindow(page) {
 				<%
                             // display all of values from all the labs for the given test
                             for (int i = 0; i < dateList.size(); i++){
-                                    Hashtable dateIdHash = (Hashtable) dateList.get(i);
+                                    HashMap<String, String> dateIdHash = dateList.get(i);
                                     String labVal = "";
                                     abn = "N";
                                     if (IdMap.size() > 0 ){
-                                        Hashtable ht = (Hashtable) IdMap.get(dateIdHash.get("id"));
+                                        HashMap<String, Serializable> ht = (HashMap) IdMap.get(dateIdHash.get("id"));
                                         if (ht != null){
                                             labVal = (String) ht.get("result");
                                             abn = (String) ht.get("abn");
