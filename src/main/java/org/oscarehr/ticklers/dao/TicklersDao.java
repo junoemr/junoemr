@@ -23,18 +23,21 @@
  */
 package org.oscarehr.ticklers.dao;
 
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.Session;
 import org.oscarehr.common.PaginationQuery;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.search.TicklerCriteriaSearch;
 import org.oscarehr.ticklers.web.TicklerQuery;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.List;
 
 @Repository
 public class TicklersDao extends AbstractDao<Tickler> {
@@ -187,4 +190,26 @@ public class TicklersDao extends AbstractDao<Tickler> {
 
 		query.executeUpdate();
 	}
+
+	@SuppressWarnings("unchecked")
+	public List<Tickler> criteriaSearch(TicklerCriteriaSearch criteriaSearch)
+	{
+		Session session = (Session) entityManager.getDelegate();
+		Criteria criteria = session.createCriteria(Tickler.class);
+		criteria = criteriaSearch.setCriteriaProperties(criteria);
+
+		criteria.setFetchMode("ticklerCategory", FetchMode.LAZY);
+		criteria.setFetchMode("updates", FetchMode.LAZY);
+		criteria.setFetchMode("comments", FetchMode.LAZY);
+		criteria.setFetchMode("demographic", FetchMode.LAZY);
+		criteria.setFetchMode("provider", FetchMode.LAZY);
+		criteria.setFetchMode("assignee", FetchMode.LAZY);
+		criteria.setFetchMode("program", FetchMode.LAZY);
+
+		criteria.setMaxResults(criteriaSearch.getLimit());
+		criteria.setFirstResult(criteriaSearch.getOffset());
+
+		return criteria.list();
+	}
+
 }
