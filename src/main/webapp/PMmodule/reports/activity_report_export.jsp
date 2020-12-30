@@ -76,7 +76,7 @@
 	//       print monthly data
 
 	session.removeAttribute("progressStatus");
-	ProgressStatus progressStatus=new ProgressStatus();
+	ProgressStatus progressStatus = new ProgressStatus();
 	session.setAttribute("progressStatus", progressStatus);
 	
 	PopulationReportUIBean populationReportUIBean = new PopulationReportUIBean(loggedInInfo);
@@ -108,16 +108,28 @@
 		sb.append(',');
 		sb.append("Total Unique Clients");
 		
-		response.setHeader("Content-Disposition", "attachment; filename=activity_report_" + agencyName+"_"+dateFormatter.format(startCalendar.getTime())+"_"+dateFormatter.format(endCalendar.getTime())+".csv");
+		response.setHeader("Content-Disposition", "attachment; filename=activity_report_"
+				+ agencyName + "_" + dateFormatter.format(startCalendar.getTime())
+				+ "_" + dateFormatter.format(endCalendar.getTime()) + ".csv");
 
 		out.write(sb.toString());
 		out.write('\n');
 	}
 
-	long months=(endCalendar.getTimeInMillis()-startCalendar.getTimeInMillis())/(org.apache.commons.lang.time.DateUtils.MILLIS_PER_DAY*30);
-	long total=populationReportUIBean.getAllPrograms().size()*populationReportUIBean.getSecRoles().size()*4*months;
-	progressStatus.total="Estimated total "+total+" rows ("+populationReportUIBean.getAllPrograms().size()+" programs * "+populationReportUIBean.getSecRoles().size()+" roles * 4 encounter Types * "+months+" months)";
-	int rowsProcessed=0;
+	long months = (endCalendar.getTimeInMillis() - startCalendar.getTimeInMillis())
+			/ (org.apache.commons.lang.time.DateUtils.MILLIS_PER_DAY * 30);
+
+	long total = populationReportUIBean.getAllPrograms().size()
+			* populationReportUIBean.getSecRoles().size()
+			* 4 * months;
+
+	progressStatus.total = "Estimated total " + total
+			+ " rows (" + populationReportUIBean.getAllPrograms().size()
+			+ " programs * " + populationReportUIBean.getSecRoles().size()
+			+ " roles * 4 encounter Types * "
+			+ months + " months)";
+
+	int rowsProcessed = 0;
 	
 	for (Program program : populationReportUIBean.getAllPrograms())
 	{
@@ -125,7 +137,7 @@
 
 		if (!program.isBed() && !program.isService()) continue;
 
-		// this line is here to ensure the calendar is materialised before cloning, it's a known "issue" in java and not considered a bug....
+		// this line ensures the calendar is materialised before cloning, it's a known "issue" in java and not considered a bug....
 		startCalendar.getTimeInMillis();
 		Calendar tempStartCalendar = (Calendar)startCalendar.clone();
 		tempStartCalendar.clear(Calendar.DAY_OF_MONTH);
@@ -172,9 +184,12 @@
 					out.write('\n');
 					
 					rowsProcessed++;
-					progressStatus.processed=""+rowsProcessed+" rows processed";
-					progressStatus.percentComplete=(int)(rowsProcessed*100/total);
-					progressStatus.currentItem=""+program.getName()+" "+dateFormatter.format(tempStartCalendar.getTime())+" "+roleEntry.getKey().getName();
+					progressStatus.processed = String.format("%d rows processed", rowsProcessed);
+					progressStatus.percentComplete = (int) (rowsProcessed * 100 / total);
+					progressStatus.currentItem = String.format("%s %s %s",
+							program.getName(),
+							dateFormatter.format(tempStartCalendar.getTime()),
+							roleEntry.getKey().getName());
 				}
 			}
 			
@@ -183,5 +198,5 @@
 		}
 	}
 	
-	progressStatus.completed=true;
+	progressStatus.completed = true;
 %>
