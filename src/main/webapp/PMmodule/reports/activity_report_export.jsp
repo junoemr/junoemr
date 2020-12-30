@@ -115,8 +115,8 @@
 	}
 
 	long months=(endCalendar.getTimeInMillis()-startCalendar.getTimeInMillis())/(org.apache.commons.lang.time.DateUtils.MILLIS_PER_DAY*30);
-	long total=populationReportUIBean.getAllPrograms().size()*populationReportUIBean.getSecRoles().size()*3*months;
-	progressStatus.total="Estimated total "+total+" rows ("+populationReportUIBean.getAllPrograms().size()+" programs * "+populationReportUIBean.getSecRoles().size()+" roles * 3 encounter Types * "+months+" months)";
+	long total=populationReportUIBean.getAllPrograms().size()*populationReportUIBean.getSecRoles().size()*4*months;
+	progressStatus.total="Estimated total "+total+" rows ("+populationReportUIBean.getAllPrograms().size()+" programs * "+populationReportUIBean.getSecRoles().size()+" roles * 4 encounter Types * "+months+" months)";
 	int rowsProcessed=0;
 	
 	for (Program program : populationReportUIBean.getAllPrograms())
