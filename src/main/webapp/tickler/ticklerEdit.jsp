@@ -205,7 +205,7 @@
 			}
 
 			var submitted = false;
-			function submitting(writeNote = false)
+			function submitNote(writeNote = false)
 			{
 				if(!submitted && validateForm())
 				{
@@ -216,7 +216,7 @@
 			}
 			function updateAndWriteEncounterNote()
 			{
-				return submitting(true);
+				return submitNote(true);
 			}
 		</script>
 	</head>
@@ -412,8 +412,8 @@
 			</tr>
 
 			<tr>
-				<td colspan="2" rowspan="3" style="text-align:right"><textarea cols="50"
-																			  id="newMessage" name="newMessage"></textarea>
+				<td colspan="2" rowspan="3" style="text-align:right">
+					<textarea cols="50" id="newMessage" name="newMessage"></textarea>
 				</td>
 				<th colspan="2" style="background-color: #666699;color:white;"><bean:message
 						key="tickler.ticklerEdit.assignedTo"/></th>
@@ -477,7 +477,7 @@
 					       onClick="updateAndWriteEncounterNote();"/>
 					<input type="button" name="updateTickler"
 						   value="<bean:message key="tickler.ticklerEdit.update"/>"
-						   onClick="submitting();"/>
+						   onClick="submitNote();"/>
 					<input type="button" name="cancelChangeTickler"
 						   value="<bean:message key="tickler.ticklerEdit.cancel"/>"
 						   onClick="window.close()"/>

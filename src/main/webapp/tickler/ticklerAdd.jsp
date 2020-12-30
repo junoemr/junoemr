@@ -241,7 +241,7 @@
 			}
 
 			var submitted = false;
-			function submitting(writeNote = false)
+			function submitNote(writeNote = false)
 			{
 				if(!submitted && validateForm())
 				{
@@ -252,7 +252,7 @@
 			}
 			function submitAndWriteEncounterNote()
 			{
-				return submitting(true);
+				return submitNote(true);
 			}
 			//-->
 		</script>
@@ -541,7 +541,7 @@ else
 				<td>
 					<input type="button" name="Button"
 						   value="<bean:message key="tickler.ticklerAdd.btnSubmit"/>"
-						   onClick="submitting()">
+						   onClick="submitNote()">
 					<input type="button" name="Button"
 				           value="<bean:message key="tickler.ticklerAdd.btnSubmitEncounter"/>"
 				           onClick="submitAndWriteEncounterNote()">
