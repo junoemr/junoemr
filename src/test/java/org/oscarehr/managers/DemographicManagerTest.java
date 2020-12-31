@@ -1,6 +1,5 @@
 package org.oscarehr.managers;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -41,7 +40,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_Pass()
+	public void addDemographicWithValidation_Pass()
 	{
 		try
 		{
@@ -62,7 +61,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_NullFirstName_Fail()
+	public void addDemographicWithValidation_NullFirstName_Fail()
 	{
 		String expectedMessage = DemographicManager.FIRST_NAME_REQUIRED;
 		demo.setFirstName(null);
@@ -71,7 +70,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_EmptyFirstName_Fail()
+	public void addDemographicWithValidation_EmptyFirstName_Fail()
 	{
 		String expectedMessage = DemographicManager.FIRST_NAME_REQUIRED;
 		String badFirstName = "";
@@ -81,7 +80,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_NullLastName_Fail()
+	public void addDemographicWithValidation_NullLastName_Fail()
 	{
 		String expectedMessage = DemographicManager.LAST_NAME_REQUIRED;
 		demo.setLastName(null);
@@ -90,7 +89,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_EmptyLastName_Fail()
+	public void addDemographicWithValidation_EmptyLastName_Fail()
 	{
 		String expectedMessage = DemographicManager.LAST_NAME_REQUIRED;
 		String badLastName = "";
@@ -100,7 +99,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_NullSex_Fail()
+	public void addDemographicWithValidation_NullSex_Fail()
 	{
 		String expectedMessage = DemographicManager.SEX_REQUIRED;
 		demo.setSex(null);
@@ -109,17 +108,17 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_InvalidSex_Fail()
+	public void addDemographicWithValidation_InvalidSex_Fail()
 	{
 		String badSex = "badSex";
 		demo.setSex(badSex);
-		String expectedMessage = String.format(DemographicManager.SEX_INVALID, demo.getSex());
+		String expectedMessage = DemographicManager.SEX_INVALID;
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_NullYearOfBirth_Fail()
+	public void addDemographicWithValidation_NullYearOfBirth_Fail()
 	{
 		String expectedMessage = DemographicManager.YEAR_OF_BIRTH_REQUIRED;
 		demo.setYearOfBirth(null);
@@ -128,7 +127,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_InvalidYearOfBirth_Fail()
+	public void addDemographicWithValidation_InvalidYearOfBirth_Fail()
 	{
 		String expectedMessage = DemographicManager.YEAR_OF_BIRTH_NUMERIC;
 		String badYear = "bad year";
@@ -138,7 +137,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_YearOfBirthTooLow_Fail()
+	public void addDemographicWithValidation_YearOfBirthTooLow_Fail()
 	{
 		String expectedMessage = DemographicManager.YEAR_OF_BIRTH_4_DIGIT;
 		String badYear = "999";
@@ -148,7 +147,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_YearOfBirthTooHigh_Fail()
+	public void addDemographicWithValidation_YearOfBirthTooHigh_Fail()
 	{
 		String expectedMessage = DemographicManager.YEAR_OF_BIRTH_4_DIGIT;
 		String badYear = "10000";
@@ -158,7 +157,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_NullMonthOfBirth_Fail()
+	public void addDemographicWithValidation_NullMonthOfBirth_Fail()
 	{
 		String expectedMessage = DemographicManager.MONTH_OF_BIRTH_REQUIRED;
 		demo.setMonthOfBirth(null);
@@ -167,7 +166,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_InvalidMonthOfBirth_Fail()
+	public void addDemographicWithValidation_InvalidMonthOfBirth_Fail()
 	{
 		String expectedMessage = DemographicManager.MONTH_OF_BIRTH_INVALID;
 		String badMonth = "badMonth";
@@ -177,7 +176,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_MonthOfBirthTooLow_Fail()
+	public void addDemographicWithValidation_MonthOfBirthTooLow_Fail()
 	{
 		String expectedMessage = DemographicManager.MONTH_OF_BIRTH_INVALID;
 		String badMonth = "0";
@@ -187,7 +186,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_MonthOfBirthTooHigh_Fail()
+	public void addDemographicWithValidation_MonthOfBirthTooHigh_Fail()
 	{
 		String expectedMessage = DemographicManager.MONTH_OF_BIRTH_INVALID;
 		String badMonth = "13";
@@ -197,7 +196,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_NullDateOfBirth_Fail()
+	public void addDemographicWithValidation_NullDateOfBirth_Fail()
 	{
 		String expectedMessage = DemographicManager.DATE_OF_BIRTH_REQUIRED;
 		demo.setDateOfBirth((String) null);
@@ -206,7 +205,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_InvalidDateOfBirth_Fail()
+	public void addDemographicWithValidation_InvalidDateOfBirth_Fail()
 	{
 		String expectedMessage = DemographicManager.DATE_OF_BIRTH_INVALID;
 		String badDate = "badDate";
@@ -216,7 +215,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_DateOfBirthTooLow_Fail()
+	public void addDemographicWithValidation_DateOfBirthTooLow_Fail()
 	{
 		String expectedMessage = DemographicManager.DATE_OF_BIRTH_INVALID;
 		String badDate = "0";
@@ -236,7 +235,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_InvalidBirthday_Fail()
+	public void addDemographicWithValidation_InvalidBirthday_Fail()
 	{
 		String expectedMessage = DemographicManager.BIRTHDAY_INVALID;
 		String badYear = "2001";
@@ -250,7 +249,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void DemographicManagerTest_AddDemographicWithValidation_InvalidFamilyDoctor_Fail()
+	public void addDemographicWithValidation_InvalidFamilyDoctor_Fail()
 	{
 		String expectedMessage = DemographicManager.FAMILY_DOCTOR_INVALID;
 		demo.setFamilyDoctor("Badly formmated");

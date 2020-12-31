@@ -89,7 +89,7 @@ public class DemographicManager {
 	public static final String FIRST_NAME_REQUIRED = "firstName is a required field.  ";
 	public static final String LAST_NAME_REQUIRED = "lastName is a required field.  ";
 	public static final String SEX_REQUIRED = "sex is a required field.  ";
-	public static final String SEX_INVALID = "sex must be either \"M\" or \"F\" (received %s).  ";
+	public static final String SEX_INVALID = "sex must be either \"M\" or \"F\".  ";
 	public static final String YEAR_OF_BIRTH_REQUIRED = "yearOfBirth is a required field.  ";
 	public static final String YEAR_OF_BIRTH_NUMERIC = "yearOfBirth should be a numeric value. ";
 	public static final String YEAR_OF_BIRTH_4_DIGIT = "yearOfBirth is expected to be a 4-digit number.";
@@ -934,7 +934,7 @@ public class DemographicManager {
 		else if (!demographic.getSex().equals("M")
 				&& !demographic.getSex().equals("F"))
 		{
-			error_string += String.format(SEX_INVALID, demographic.getSex());
+			error_string += SEX_INVALID;
 			has_error = true;
 		}
 
