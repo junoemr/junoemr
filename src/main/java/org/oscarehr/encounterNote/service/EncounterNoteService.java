@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.demographic.dao.DemographicDao;
@@ -159,12 +160,64 @@ public class EncounterNoteService
 		noteTo.setNoteId(note.getNoteId().intValue());
 		try
 		{
-			noteTo.setAppointmentNo(note.getAppointment().getId().intValue());
+			Appointment appointment = note.getAppointment();
+			if(appointment != null)
+			{
+				noteTo.setAppointmentNo(appointment.getId().intValue());
+			}
 		}
 		catch(EntityNotFoundException e)
 		{
 			// Do nothing
 		}
+
+		// Tickler notes and rx annotations can be edited, so they are checked and set in the transfer object.
+		// The other statuses (cpp note, document, etc) aren't checked because they aren't editable.
+		// TODO: add the other types?
+
+		// Check if it's a tickler note (checked when copying case management issues)
+        boolean isTicklerNote = false;
+
+		// Check if it's an rx annotation
+		boolean isRxAnnotation = false;
+
+		CaseManagementNoteLink noteLink = caseManagementNoteLinkDao.getNoteLinkByNoteIdAndTableName(
+				note, CaseManagementNoteLink.DRUGS);
+
+		if(noteLink != null)
+		{
+			isRxAnnotation = true;
+		}
+
+
+		//assigned issues..remove the CPP one.
+		List<CaseManagementIssueNote> issueNotes = new ArrayList<>(note.getIssueNoteList());
+
+		List<CaseManagementIssueTo1> issueTos = new ArrayList<>();
+		for(CaseManagementIssueNote issueNote : issueNotes)
+		{
+			CaseManagementIssueNotePK id = issueNote.getId();
+
+			if(id != null)
+			{
+
+				CaseManagementIssue caseManagementIssue = id.getCaseManagementIssue();
+
+				issueTos.add(CaseManagementIssueConverter.getAsTransferObject(caseManagementIssue));
+
+				// A tickler note is identified by an attached issue
+				if(caseManagementIssue != null)
+				{
+					Issue issue = caseManagementIssue.getIssue();
+
+					if(Issue.SUMMARY_CODE_TICKLER_NOTE.equals(issue.getCode()))
+					{
+						isTicklerNote = true;
+					}
+				}
+			}
+		}
+
 		noteTo.setObservationDate(note.getObservationDate());
 		noteTo.setProviderNo(note.getProvider().getProviderNo().toString());
 		Program program = programDao.getProgram(Integer.parseInt(note.getProgramNo()));
@@ -185,11 +238,11 @@ public class EncounterNoteService
 		noteTo.setNote(note.getNote());
 		noteTo.setDocument(false);
 		noteTo.setDeleted(false);
-		noteTo.setRxAnnotation(false);
+		noteTo.setRxAnnotation(isRxAnnotation);
 		noteTo.setEformData(false);
 		noteTo.setEncounterForm(false);
 		noteTo.setInvoice(false);
-		noteTo.setTicklerNote(false);
+		noteTo.setTicklerNote(isTicklerNote);
 		noteTo.setEncounterType(note.getEncounterType());
 
 		noteTo.setEditorNames(new ArrayList<String>(caseManagementNoteDao.getEditorNames(note.getUuid())));
@@ -200,16 +253,6 @@ public class EncounterNoteService
 		noteTo.setCpp(false);
 		noteTo.setEncounterTime(note.getEncounterTime());
 		noteTo.setEncounterTransportationTime(note.getEncounterTransportationTime());
-
-
-		//assigned issues..remove the CPP one.
-		List<CaseManagementIssueNote> issueNotes = new ArrayList<>(note.getIssueNoteList());
-
-		List<CaseManagementIssueTo1> issueTos = new ArrayList<>();
-		for(CaseManagementIssueNote issueNote : issueNotes)
-		{
-			issueTos.add(CaseManagementIssueConverter.getAsTransferObject(issueNote.getId().getCaseManagementIssue()));
-		}
 
 		//set NoteIssue to return
 		NoteIssueTo1 noteIssue = new NoteIssueTo1();

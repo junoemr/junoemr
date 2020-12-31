@@ -23,6 +23,7 @@
 package org.oscarehr.encounterNote.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +64,21 @@ public class CaseManagementNoteLinkDao extends AbstractDao<CaseManagementNoteLin
 		Query query = entityManager.createQuery(queryString);
 		query.setParameter("tableName", tableName);
 		query.setParameter("tableId", tableId);
+		query.setMaxResults(1);
+
+		return this.getSingleResultOrNull(query);
+	}
+
+	public CaseManagementNoteLink getNoteLinkByNoteIdAndTableName(CaseManagementNote note, Integer tableName)
+	{
+		String jpql = "SELECT c \n" +
+				"FROM model_CaseManagementNoteLink c \n" +
+				"WHERE c.note = :note\n" +
+				"AND c.tableName = :tableName\n";
+
+		Query query = entityManager.createQuery(jpql);
+		query.setParameter("note", note);
+		query.setParameter("tableName", tableName);
 		query.setMaxResults(1);
 
 		return this.getSingleResultOrNull(query);

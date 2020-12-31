@@ -312,18 +312,22 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 	public CaseManagementNote getLatestUnsignedNote(int demographicNo, int providerNo)
 	{
 		//language=MariaDB
-		String sql = "SELECT DISTINCT cmn.note_id\n" +
+		String sql = "SELECT cmn_outer.note_id\n" +
+				"FROM casemgmt_note AS cmn_outer\n" +
+				"JOIN " +
+				"(\n" +
+				"SELECT DISTINCT cmn.note_id\n" +
 				"FROM casemgmt_note cmn\n" +
 				"LEFT JOIN casemgmt_note AS cmn_filter \n" +
 				"  ON cmn_filter.uuid = cmn.uuid\n" +
-				"  AND NOT cmn.signed\n" +
+				"  AND NOT cmn_filter.signed\n" +
 				"AND (cmn.update_date < cmn_filter.update_date " +
 				"OR (cmn.update_date = cmn_filter.update_date AND cmn.note_id < cmn_filter.note_id))\n" +
 				"LEFT JOIN casemgmt_issue_notes cmin ON cmin.note_id = cmn.note_id\n" +
 				"LEFT JOIN casemgmt_issue cmi ON cmin.id = cmi.id\n" +
 				"LEFT JOIN issue i\n" +
 				"  ON i.issue_id = cmi.issue_id\n" +
-				"  AND i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication','TicklerNote')\n" +
+				"  AND i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication')\n" +
 				"LEFT JOIN casemgmt_note_link cnl ON cnl.note_id = cmn.note_id\n" +
 				"WHERE NOT cmn.signed\n" +
 				"AND cmn_filter.note_id IS NULL\n" +
@@ -331,7 +335,12 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"AND cnl.id IS NULL\n" +
 				"AND cmn.demographic_no = :demographicNo\n" +
 				"AND cmn.provider_no = :providerNo\n" +
-				"ORDER BY cmn.update_date DESC\n";
+				"ORDER BY cmn.update_date DESC\n" +
+				"    " +
+				") AS latest_notes\n" +
+				"ON cmn_outer.note_id = latest_notes.note_id\n" +
+				"WHERE cmn_outer.signed\n" +
+				"\n";
 
 		Query query = entityManager.createNativeQuery(sql);
 

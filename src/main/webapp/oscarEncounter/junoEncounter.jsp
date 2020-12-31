@@ -1093,7 +1093,7 @@
 									   title='<bean:message key="oscarEncounter.Index.btnSave"/>'>&nbsp;
 								<input tabindex="18" type='image'
 									   src="<c:out value="${ctx}/oscarEncounter/graphics/document-new.png"/>"
-									   id="newNoteImg" onclick="newNote(event); return false;"
+									   id="newNoteImg" onclick="Event.stop(event); return encounterNote.createNewNote(); return false;"
 									   title='<bean:message key="oscarEncounter.Index.btnNew"/>'>&nbsp;
 								<input tabindex="19" type='image'
 									   src="<c:out value="${ctx}/oscarEncounter/graphics/note-save.png"/>"
