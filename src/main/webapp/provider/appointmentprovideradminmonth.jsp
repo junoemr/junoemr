@@ -39,6 +39,10 @@
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="org.oscarehr.schedule.dao.ScheduleDateDao" %>
 <%@ page import="org.oscarehr.schedule.model.ScheduleDate" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
+<%@ page import="org.oscarehr.provider.controller.MenuBar" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="java.util.GregorianCalendar" %>
 
 <%
 	UserPropertyDAO userPropertyDao = SpringUtils.getBean(UserPropertyDAO.class);
@@ -78,8 +82,10 @@ private String getSiteHTML(String reason, List<Site> sites) {
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
-
+<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
+<%@ taglib uri="http://www.caisi.ca/plugin-tag" prefix="plugin" %>
 
 <%
   String curUser_no, curProvider_no,userfirstname,userlastname,mygroupno,n_t_w_w="";
@@ -243,6 +249,12 @@ if (bMultisites) {
     	resourcehelpHtml = rbuHtml.getValue();
     }
 
+	MenuBar menuBarController = new MenuBar(request, session);
+	pageContext.setAttribute("menuBarController", menuBarController);
+
+	// Required for menu bar
+	LoggedInInfo loggedInInfo1=LoggedInInfo.getLoggedInInfoFromSession(request);
+
 	GregorianCalendar now=new GregorianCalendar();
   int curYear = now.get(Calendar.YEAR); //curYear should be the real now date
   int curMonth = (now.get(Calendar.MONTH)+1);
@@ -355,7 +367,7 @@ if (bMultisites) {
 <script type="text/javascript" src="../share/javascript/prototype.js"></script>
 <script language="javascript" type="text/javascript" src="../share/javascript/Oscar.js" ></script>
 <script language="JavaScript">
-<!--
+
 function setfocus() {
   document.jumptodate.year.focus();
   document.jumptodate.year.select();
@@ -374,7 +386,6 @@ function popupOscarRx(vheight,vwidth,varpage) { //open a new popup window
   }
 }
 //<!--/oscarMessenger code block -->
-
 
     function selectprovider(s) {
         if(s.options[s.selectedIndex].value.indexOf("_grp_")!=-1 ) 
@@ -466,38 +477,43 @@ function refreshTabAlerts(id) {
 
 <table BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
 	<tr>
-	<td align="center" >
+	<td style="width: 50px;padding: ">
 		<a href="../web/"><img src="<%=request.getContextPath()%>/images/logo-primary.png" border="0" title="Go to Juno UI"></a>
 	</td>
-		<td>
+	<td>
 		<ul id="navlist">
-			<li><a href='providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1'><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a></li>
-			 <li>
-			 <a href='providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&caseload=1&clProv=<%=curUser_no%>'><bean:message key="global.caseload"/></a>
-			 </li>
-			<li><a href="#"
-				ONCLICK="popupOscarRx(550,687,'<%=resourcebaseurl%>');return false;"
-				title="<bean:message key="provider.appointmentProviderAdminDay.viewResources"/>"
-				onmouseover="window.status='<bean:message key="provider.appointmentProviderAdminDay.viewResources"/>';return true"><bean:message
-				key="oscarEncounter.Index.clinicalResources" /></a></li>
-			<li><caisi:isModuleLoad moduleName="caisi">
+			<!--Schedule-->
+			<li>
+				<a href='providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1'><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
+			</li>
+			<!--Caseload-->
+		 	<li>
+				<a href='providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&caseload=1&clProv=<%=curUser_no%>'><bean:message key="global.caseload"/></a>
+			</li>
+			<!--Search-->
+			<li>
+				<caisi:isModuleLoad moduleName="caisi">
 				<a HREF="../PMmodule/ClientSearch2.do"
 					TITLE='<bean:message key="global.searchPatientRecords"/>'
 					OnMouseOver="window.status='<bean:message key="global.searchPatientRecords"/>' ; return true"><bean:message
 					key="provider.appointmentProviderAdminDay.search" /></a>
-			</caisi:isModuleLoad> <caisi:isModuleLoad moduleName="caisi" reverse="true">
+				</caisi:isModuleLoad> <caisi:isModuleLoad moduleName="caisi" reverse="true">
 				<a HREF="#"
 					ONCLICK="popupOscarRx(550,687,'../demographic/search.jsp');return false;"
 					TITLE='<bean:message key="global.searchPatientRecords"/>'
 					OnMouseOver="window.status='<bean:message key="global.searchPatientRecords"/>' ; return true"><bean:message
 					key="provider.appointmentProviderAdminDay.search" /></a>
-			</caisi:isModuleLoad></li>
-			<li><a HREF="#"
-				ONCLICK="popupOscarRx(650,1024,'../report/reportindex.jsp','reportPage');return false;"
-				TITLE='<bean:message key="global.genReport"/>'
-				OnMouseOver="window.status='<bean:message key="global.genReport"/>' ; return true"><bean:message
-				key="global.report" /></a></li>
-			
+			</caisi:isModuleLoad>
+			</li>
+			<!--Report-->
+			<li>
+				<a HREF="#"
+					ONCLICK="popupOscarRx(650,1024,'../report/reportindex.jsp','reportPage');return false;"
+					TITLE='<bean:message key="global.genReport"/>'
+					OnMouseOver="window.status='<bean:message key="global.genReport"/>' ; return true"><bean:message
+					key="global.report" /></a>
+			</li>
+			<!--Billing-->
 			<security:oscarSec roleName="<%=roleName$%>" objectName="_billing" rights="r">
 			<li>
 				<a HREF="#"
@@ -510,23 +526,30 @@ function refreshTabAlerts(id) {
 			
 			<security:oscarSec roleName="<%=roleName$%>"
 				objectName="_appointment.doctorLink" rights="r">
-				<li><a HREF="#"
+			<li>
+				<a HREF="#"
 					ONCLICK="popupOscarRx(600,1024,'../dms/inboxManage.do?method=prepareForIndexPage&providerNo=<%=curUser_no%>', '<bean:message key="global.inbox"/>');return false;"
 					TITLE='<bean:message key="provider.appointmentProviderAdminDay.viewLabReports"/>'>
 				<span id="oscar_new_lab"></span> </a> <oscar:newUnclaimedLab>
-					<a class="tabalert" HREF="#"
-						ONCLICK="popupOscarRx(600,1024,'../dms/inboxManage.do?method=prepareForIndexPage&providerNo=0&searchProviderNo=0&status=N&lname=&fname=&hnum=&pageNum=1&startIndex=0', '<bean:message key="global.lab"/>');return false;"
-						TITLE='<bean:message key="provider.appointmentProviderAdminDay.viewLabReports"/>'>*</a>
-				</oscar:newUnclaimedLab></li>
+				<a class="tabalert" HREF="#"
+					ONCLICK="popupOscarRx(600,1024,'../dms/inboxManage.do?method=prepareForIndexPage&providerNo=0&searchProviderNo=0&status=N&lname=&fname=&hnum=&pageNum=1&startIndex=0', '<bean:message key="global.lab"/>');return false;"
+					TITLE='<bean:message key="provider.appointmentProviderAdminDay.viewLabReports"/>'>*</a>
+				</oscar:newUnclaimedLab>
+			</li>
 			</security:oscarSec>
-			<li><a HREF="#"
+
+			<li>
+				<a HREF="#"
 				ONCLICK="popupOscarRx(600,1024,'../oscarMessenger/DisplayMessages.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userfirstname+" "+userlastname)%>')"
 				title="<bean:message key="global.messenger"/>"> <span
-				id="oscar_new_msg"></span></a></li>
-			<li><a HREF="#"
-				ONCLICK="popupOscarRx(625,1024,'../oscarEncounter/IncomingConsultation.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userfirstname+" "+userlastname)%>')"
-				title="<bean:message key="provider.appointmentProviderAdminDay.viewConReq"/>"><bean:message
-				key="global.con" /></a></li>
+				id="oscar_new_msg"></span></a>
+			</li>
+			<li>
+				<a HREF="#"
+					ONCLICK="popupOscarRx(625,1024,'../oscarEncounter/IncomingConsultation.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userfirstname+" "+userlastname)%>')"
+					title="<bean:message key="provider.appointmentProviderAdminDay.viewConReq"/>"><bean:message
+					key="global.con" /></a>
+			</li>
 			<li><!-- remove this and let providerpreference check --> <caisi:isModuleLoad
 				moduleName="ticklerplus">
 				<a href="#"
@@ -540,11 +563,13 @@ function refreshTabAlerts(id) {
 					TITLE='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>'
 					OnMouseOver="window.status='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>' ; return true"><bean:message
 					key="global.pref" /></a>
-			</caisi:isModuleLoad></li>
+			</caisi:isModuleLoad>
+			</li>
 			<li><a HREF="#"
 				onclick="popupOscarRx('700', '1024', '../dms/documentReport.jsp?function=provider&functionid=<%=curUser_no%>&curUser=<%=curUser_no%>', 'edocView');"
 				TITLE='<bean:message key="provider.appointmentProviderAdminDay.viewEdoc"/>'><bean:message
-				key="global.edoc" /></a></li>
+				key="global.edoc" /></a>
+			</li>
 			<li><caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
 				<a HREF="#"
 					ONCLICK="popupOscarRx(550,687,'../tickler/ticklerMain.jsp','<bean:message key="global.tickler"/>');return false;"
@@ -554,19 +579,59 @@ function refreshTabAlerts(id) {
 				<a HREF="#"
 					ONCLICK="popupOscarRx(550,687,'../Tickler.do','<bean:message key="global.tickler"/>');return false;"
 					TITLE='Tickler+'> <span id="oscar_new_tickler"></span></a>
-			</caisi:isModuleLoad></li>
+			</caisi:isModuleLoad>
+			</li>
 			<oscar:oscarPropertiesCheck property="WORKFLOW" value="yes">
-				<li><a
-					href="javascript: function myFunction() {return false; }"
-					onClick="popupOscarRx(700,1024,'../oscarWorkflow/WorkFlowList.jsp','<bean:message key="global.workflow"/>')"><bean:message
-					key="global.btnworkflow" /></a></li>
+			<li>
+				<a
+				href="javascript: function myFunction() {return false; }"
+				onClick="popupOscarRx(700,1024,'../oscarWorkflow/WorkFlowList.jsp','<bean:message key="global.workflow"/>')"><bean:message
+				key="global.btnworkflow" /></a>
+			</li>
 			</oscar:oscarPropertiesCheck>
-			<security:oscarSec roleName="<%=roleName$%>"
-				objectName="_admin,_admin.userAdmin,_admin.schedule,_admin.billing,_admin.resource,_admin.reporting,_admin.backup,_admin.messenger,_admin.eform,_admin.encounter,_admin.misc"
-				rights="r">
-				<li><a HREF="#"
+
+			<!--MyHealthAccess-->
+			<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
+				<li id="admin2">
+					<a href="../integrations/myhealthaccess.do?method=connectOrList"
+					   id="myhealthaccess"
+					   title='MyHealthAccess'
+					   target="_blank">MyHealthAccess</a>
+				</li>
+			</c:if>
+
+			<!--Administration-->
+			<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.userAdmin,_admin.schedule,_admin.billing,_admin.resource,_admin.reporting,_admin.backup,_admin.messenger,_admin.eform,_admin.encounter,_admin.misc,_admin.fax" rights="r">
+				<li>
+					<a HREF="#"
 					ONCLICK="newWindow('<%= request.getContextPath() %>/administration/', 'admin');return false;"><bean:message
-					key="global.admin" /></a></li>
+					key="global.admin" /></a>
+				</li>
+
+				<!--Dashboard-->
+				<security:oscarSec roleName="<%=roleName$%>" objectName="_dashboardDisplay" rights="r">
+					<oscar:oscarPropertiesCheck property="enable_dashboards" value="true">
+						<oscar:oscarPropertiesCheck property="instance_type" value="BC">
+							<li id="dashboardList">
+								<div class="dropdown">
+									<a href="#" class="dashboardBtn">Dashboard</a>
+									<div class="dashboardDropdown">
+										<c:forEach items="${ menuBarController.dashboards }" var="dashboard" >
+											<a href="javascript:void(0)" onclick="newWindow('<%=request.getContextPath()%>/web/dashboard/display/DashboardDisplay.do?method=getDashboard&dashboardId=${ dashboard.id }','admin')">
+												<c:out value="${ dashboard.name }" />
+											</a>
+										</c:forEach>
+									</div>
+								</div>
+							</li>
+						</oscar:oscarPropertiesCheck>
+					</oscar:oscarPropertiesCheck>
+				</security:oscarSec>
+
+				<!-- Added logout link for mobile version -->
+				<li id="logoutMobile">
+					<a href="../logout.jsp"><bean:message key="global.btnLogout"/></a>
+				</li>
 			</security:oscarSec>
 
 			<%int menuTagNumber=0; %>
@@ -575,9 +640,9 @@ function refreshTabAlerts(id) {
 				<% menuTagNumber++ ; %>
 				</li>
 			</caisi:isModuleLoad>
-		</ul>
-		</td>
 
+		</ul>
+	</td>
 		
 		<td align="right" valign="bottom">
 		
