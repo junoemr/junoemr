@@ -251,6 +251,18 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		}
 		return null;
 	}
+	protected LocalDate toNullableLocalDate(DateTimeFullOrPartial fullOrPartial)
+	{
+		if(fullOrPartial != null)
+		{
+			LocalDateTime dateTime = fillPartialCalendar(
+					fullOrPartial.getFullDate(),
+					fullOrPartial.getYearMonth(),
+					fullOrPartial.getYearOnly());
+			return dateTime.toLocalDate();
+		}
+		return null;
+	}
 
 	private LocalDateTime fillPartialCalendar(
 			XMLGregorianCalendar fullDateTime,

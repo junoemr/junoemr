@@ -45,6 +45,7 @@ import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.service.ConcernNoteService;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.encounterNote.service.FamilyHistoryNoteService;
@@ -91,6 +92,9 @@ public class ImportExportService
 
 	@Autowired
 	private DemographicService demographicService;
+
+	@Autowired
+	private DocumentService documentService;
 
 	@Autowired
 	private DemographicDbToModelConverter modelToExportConverter;
@@ -215,6 +219,8 @@ public class ImportExportService
 		allergyService.saveNewAllergies(demographic.getAllergyList(), dbDemographic);
 
 		persistPreventions(demographic, dbDemographic);
+
+		documentService.uploadAllNewDemographicDocument(demographic.getDocumentList(), dbDemographic.getDemographicId());
 	}
 
 	private void persistNotes(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)

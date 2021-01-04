@@ -98,6 +98,22 @@ public class PartialDateTime extends PartialDate
 		return datePart;
 	}
 
+	public static PartialDateTime from(PartialDate partialDate)
+	{
+		if(partialDate != null)
+		{
+			return from(partialDate.toLocalDate());
+		}
+		return null;
+	}
+	public static PartialDateTime from(LocalDate localDate)
+	{
+		if(localDate != null)
+		{
+			return from(LocalDateTime.of(localDate, LocalTime.MIN));
+		}
+		return null;
+	}
 	public static PartialDateTime from(LocalDateTime localDateTime)
 	{
 		return from(localDateTime, null);

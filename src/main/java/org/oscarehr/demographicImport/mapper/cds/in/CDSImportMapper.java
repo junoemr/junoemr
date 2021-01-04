@@ -25,6 +25,7 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 import org.oscarehr.common.xml.cds.v5_0.model.CareElements;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
+import org.oscarehr.common.xml.cds.v5_0.model.Reports;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.measurement.Measurement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,9 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic
 	@Autowired
 	private CDSEncounterNoteImportMapper cdsEncounterNoteImportMapper;
 	@Autowired
-	private CDSReportImportMapper cdsReportImportMapper;
+	private CDSReportDocumentImportMapper cdsReportDocumentImportMapper;
+	@Autowired
+	private CDSReportHrmImportMapper cdsReportHrmImportMapper;
 	@Autowired
 	private CDSCareElementImportMapper cdsCareElementImportMapper;
 	@Autowired
@@ -89,7 +92,8 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic
 		demographic.setLabList(cdsLabImportMapper.importToJuno(patientRecord.getLaboratoryResults()));
 		demographic.setAppointmentList(cdsAppointmentImportMapper.importAll(patientRecord.getAppointments()));
 		demographic.setEncounterNoteList(cdsEncounterNoteImportMapper.importAll(patientRecord.getClinicalNotes()));
-		demographic.setDocumentList(cdsReportImportMapper.importAll(patientRecord.getReports()));
+		demographic.setDocumentList(cdsReportDocumentImportMapper.importAll(getDocumentReports(patientRecord.getReports())));
+		demographic.setHrmDocumentList(cdsReportHrmImportMapper.importAll(getHrmReports(patientRecord.getReports())));
 		demographic.setMeasurementList(getMeasurementsList(patientRecord.getCareElements()));
 		demographic.setReminderNoteList(cdsAlertImportMapper.importAll(patientRecord.getAlertsAndSpecialNeeds()));
 
@@ -101,5 +105,16 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic
 		// because we get a list back from the base converter, we need to flatten the list of lists
 		List<List<Measurement>> measurementLists = cdsCareElementImportMapper.importAll(careElements);
 		return measurementLists.stream().flatMap(List::stream).collect(Collectors.toList());
+	}
+
+	private List<Reports> getDocumentReports(List<Reports> reports)
+	{
+		// include all reports that do not contain the HRM status
+		return reports.stream().filter(report -> report.getHRMResultStatus() == null).collect(Collectors.toList());
+	}
+	private List<Reports> getHrmReports(List<Reports> reports)
+	{
+		// include all reports that contain the HRM status
+		return reports.stream().filter(report -> report.getHRMResultStatus() != null).collect(Collectors.toList());
 	}
 }

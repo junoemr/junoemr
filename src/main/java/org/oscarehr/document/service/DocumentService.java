@@ -32,6 +32,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.PatientLabRouting;
+import org.oscarehr.demographicImport.converter.in.DocumentModelToDbConverter;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.CtlDocument;
@@ -79,6 +80,9 @@ public class DocumentService
 	@Autowired
 	ProgramManager programManager;
 
+	@Autowired
+	private DocumentModelToDbConverter documentModelToDbConverter;
+
 	/**
 	 * Create a new document from the given document model and a file
 	 * This method will move the file to the documents directory and persist the record
@@ -96,6 +100,20 @@ public class DocumentService
 		file.forceSetValidation(true);
 		return uploadNewDemographicDocumentLogic(document, file, demographicNo);
 	}
+
+	public Document uploadNewDemographicDocument(org.oscarehr.demographicImport.model.document.Document documentModel, Integer demographicNo) throws IOException
+	{
+		return uploadNewDemographicDocument(documentModelToDbConverter.convert(documentModel), documentModel.getFile(), demographicNo);
+	}
+
+	public void uploadAllNewDemographicDocument(List<org.oscarehr.demographicImport.model.document.Document> documentModels, Integer demographicNo) throws IOException
+	{
+		for(org.oscarehr.demographicImport.model.document.Document documentModel : documentModels)
+		{
+			uploadNewDemographicDocument(documentModel, demographicNo);
+		}
+	}
+
 	/**
 	 * Create a new document from the given document model and a file input stream.
 	 * This method will write the file from the stream and persist the document record.

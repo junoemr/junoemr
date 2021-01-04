@@ -24,21 +24,21 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.xml.cds.v5_0.model.ReportFormat;
 import org.oscarehr.common.xml.cds.v5_0.model.Reports;
-import org.oscarehr.demographicImport.model.document.Document;
+import org.oscarehr.demographicImport.model.document.HrmDocument;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CDSReportImportMapper extends AbstractCDSImportMapper<Reports, Document>
+public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmDocument>
 {
-	public CDSReportImportMapper()
+	public CDSReportHrmImportMapper()
 	{
 		super();
 	}
 
 	@Override
-	public Document importToJuno(Reports importStructure)
+	public HrmDocument importToJuno(Reports importStructure)
 	{
-		Document document = new Document();
+		HrmDocument document = new HrmDocument();
 
 		ReportFormat format = importStructure.getFormat();
 		if(format.equals(ReportFormat.BINARY))
