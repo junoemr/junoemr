@@ -25,7 +25,7 @@
 --%>
 
 <%@page
-	import="oscar.oscarDemographic.data.*,java.util.*,java.sql.Connection,oscar.oscarPrevention.*,oscar.oscarLab.ca.on.*,oscar.util.*,oscar.oscarLab.*,oscar.oscarLab.ca.all.util.CumulativeLabValuesComparator,org.jdom.*,oscar.oscarDB.*,org.jdom.input.*,java.io.InputStream"%>
+	import="oscar.oscarDemographic.data.*,java.util.*,java.sql.Connection,oscar.oscarPrevention.*,oscar.oscarLab.ca.on.*,oscar.util.*,oscar.oscarLab.*,oscar.oscarLab.ca.all.util.LabValuesByReverseDateComparator,org.jdom.*,oscar.oscarDB.*,org.jdom.input.*,java.io.InputStream"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
@@ -65,8 +65,9 @@ try{
 *   dateIdHash: (date, lab_no)
     */
 
+
 	for (int i = 0; i < uniqueLabs.size(); i++){
-	    Hashtable<String, Serializable> ulab =  uniqueLabs.get(i);
+		Hashtable<String, Serializable> ulab =  uniqueLabs.get(i);
 	    String labName = (String) ulab.get("testName");
 	    String labType = (String) ulab.get("labType");
 	    String loinc_code = (String) ulab.get("identCode");
@@ -143,6 +144,7 @@ try{
 
 <%@page import="org.oscarehr.util.MiscUtils"%>
 <%@ page import="java.io.Serializable" %>
+<%@ page import="oscar.oscarLab.ca.all.util.LabValuesByReverseDateComparator" %>
 <html:html locale="true">
 
 <head>
@@ -298,13 +300,13 @@ function reportWindow(page) {
 				<th>Last Done</th>
 				<!-- Dates start here. Need to have all the dates of the different labs -->
 				<%
-                            // use a custom comparator to compare the Hashtables in the array
-                            CumulativeLabValuesComparator comp = new CumulativeLabValuesComparator();
+                            // use a custom comparator to compare the HashMaps in the array
+					LabValuesByReverseDateComparator comp = new LabValuesByReverseDateComparator();
                             Collections.sort(dateList, comp);
                             for (int i=0; i < dateList.size(); i++){
                                 HashMap<String, String> dateIdHash = dateList.get(i);
                                 String dateString = dateIdHash.get("date");
-                                Date labDate= UtilDateUtilities.StringToDate(dateString, "yyyy-MM-dd HH:mm:ss");
+                                Date labDate= ConversionUtils.fromDateString(dateString, "yyyy-MM-dd HH:mm:ss");
                                 String lab_no = dateIdHash.get("id");
                                 
                                 CommonLabResultData data = new CommonLabResultData();

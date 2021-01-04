@@ -39,10 +39,10 @@ import java.util.Date;
 
 import java.util.Map;
 
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
 
 /**
- *  A custom comparator used to compare the Hashtables within an array by the 
+ *  A custom comparator used to compare the HashMaps within an array by the
  *  date value.
  *
  *  Used by /oscar/lab/CumulativeLabValues3.jsp
@@ -50,20 +50,14 @@ import oscar.util.UtilDateUtilities;
  *
  * @author wrighd
  */
-public class CumulativeLabValuesComparator implements Comparator<Map>{
-    
-    public int compare(Map o1, Map o2) {
-        Date dateA = UtilDateUtilities.getDateFromString((String) o1.get("date") , "yyyy-MM-dd HH:mm:ss");
-        Date dateB = UtilDateUtilities.getDateFromString((String) o2.get("date") , "yyyy-MM-dd HH:mm:ss");
-        int ret = 0;
-        
-        if (dateA.after( dateB )){
-            ret = -1;
-        }else if(dateA.before( dateB )){
-            ret = 1;
-        }
-        
-        return ret;
+public class LabValuesByReverseDateComparator implements Comparator<Map>
+{
+    public int compare(Map o1, Map o2)
+    {
+        Date dateA = ConversionUtils.fromDateString((String) o1.get("date") , ConversionUtils.DEFAULT_TS_PATTERN);
+        Date dateB = ConversionUtils.fromDateString((String) o2.get("date") , ConversionUtils.DEFAULT_TS_PATTERN);
+
+        return dateA.compareTo(dateB) * -1;
     }
     
 }
