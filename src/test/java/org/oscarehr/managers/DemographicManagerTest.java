@@ -1,42 +1,80 @@
+/**
+ * Copyright (c) 2012-2021. CloudPractice Inc. All Rights Reserved.
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
+ */
 package org.oscarehr.managers;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.times;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.oscarehr.common.dao.DaoTestFixtures;
+import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.SpringUtils;
-
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class DemographicManagerTest extends DaoTestFixtures
 {
+	@Autowired
+	@InjectMocks
+	private DemographicManager manager;
 
-	DemographicManager manager = SpringUtils.getBean(DemographicManager.class);
-	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod();
-	Demographic demo;
+	@Mock
+	private SecurityInfoManager securityInfoManager;
+
+	@Mock
+	private DemographicDao demographicDao;
+
+	LoggedInInfo loggedInInfo;
+	Demographic demographic;
 
 	@Before
-	public void setupTest()
+	public void setUp()
 	{
+		MockitoAnnotations.initMocks(this);
+
 		Provider provider = new Provider();
 		provider.setProviderNo("999998"); // Admin Provider No.
 		loggedInInfo = new LoggedInInfo();
 		loggedInInfo.setLoggedInProvider(provider);
 
-		demo = new Demographic();
+		Mockito.doNothing().when(securityInfoManager).requireOnePrivilege(provider.getProviderNo(), SecurityInfoManager.WRITE, null, "_demographic");
+		Mockito.doNothing().when(demographicDao).save(demographic);
 
-		demo.setFirstName("Joe");
-		demo.setLastName("Exotic");
-		demo.setSex("M");
-		demo.setYearOfBirth("1970");
-		demo.setMonthOfBirth("01");
-		demo.setDateOfBirth("01");
+		demographic = new Demographic();
+
+		demographic.setFirstName("Joe");
+		demographic.setLastName("Exotic");
+		demographic.setSex("M");
+		demographic.setYearOfBirth("1970");
+		demographic.setMonthOfBirth("01");
+		demographic.setDateOfBirth("01");
 	}
 
 	@Test
@@ -44,27 +82,21 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		try
 		{
-			manager.addDemographicWithValidation(loggedInInfo, demo);
+			manager.addDemographicWithValidation(loggedInInfo, demographic);
 		}
 		catch (Exception e)
 		{
 			fail(e.getMessage());
 		}
-		List<Demographic> demos = manager.getDemographicWithLastFirstDOB(loggedInInfo,
-				demo.getLastName(),
-				demo.getFirstName(),
-				demo.getYearOfBirth(),
-				demo.getMonthOfBirth(),
-				demo.getDateOfBirth());
 
-		assertFalse(demos.isEmpty());
+		Mockito.verify(demographicDao, times(1)).save(demographic);
 	}
 
 	@Test
 	public void addDemographicWithValidation_NullFirstName_Fail()
 	{
 		String expectedMessage = DemographicManager.FIRST_NAME_REQUIRED;
-		demo.setFirstName(null);
+		demographic.setFirstName(null);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -74,7 +106,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.FIRST_NAME_REQUIRED;
 		String badFirstName = "";
-		demo.setFirstName(badFirstName);
+		demographic.setFirstName(badFirstName);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -83,7 +115,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	public void addDemographicWithValidation_NullLastName_Fail()
 	{
 		String expectedMessage = DemographicManager.LAST_NAME_REQUIRED;
-		demo.setLastName(null);
+		demographic.setLastName(null);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -93,7 +125,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.LAST_NAME_REQUIRED;
 		String badLastName = "";
-		demo.setLastName(badLastName);
+		demographic.setLastName(badLastName);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -102,7 +134,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	public void addDemographicWithValidation_NullSex_Fail()
 	{
 		String expectedMessage = DemographicManager.SEX_REQUIRED;
-		demo.setSex(null);
+		demographic.setSex(null);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -111,7 +143,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	public void addDemographicWithValidation_InvalidSex_Fail()
 	{
 		String badSex = "badSex";
-		demo.setSex(badSex);
+		demographic.setSex(badSex);
 		String expectedMessage = DemographicManager.SEX_INVALID;
 
 		actAndAssertExceptionMessage(expectedMessage);
@@ -121,7 +153,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	public void addDemographicWithValidation_NullYearOfBirth_Fail()
 	{
 		String expectedMessage = DemographicManager.YEAR_OF_BIRTH_REQUIRED;
-		demo.setYearOfBirth(null);
+		demographic.setYearOfBirth(null);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -131,7 +163,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.YEAR_OF_BIRTH_NUMERIC;
 		String badYear = "bad year";
-		demo.setYearOfBirth(badYear);
+		demographic.setYearOfBirth(badYear);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -141,7 +173,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.YEAR_OF_BIRTH_4_DIGIT;
 		String badYear = "999";
-		demo.setYearOfBirth(badYear);
+		demographic.setYearOfBirth(badYear);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -151,7 +183,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.YEAR_OF_BIRTH_4_DIGIT;
 		String badYear = "10000";
-		demo.setYearOfBirth(badYear);
+		demographic.setYearOfBirth(badYear);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -160,7 +192,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	public void addDemographicWithValidation_NullMonthOfBirth_Fail()
 	{
 		String expectedMessage = DemographicManager.MONTH_OF_BIRTH_REQUIRED;
-		demo.setMonthOfBirth(null);
+		demographic.setMonthOfBirth(null);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -170,7 +202,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.MONTH_OF_BIRTH_INVALID;
 		String badMonth = "badMonth";
-		demo.setMonthOfBirth(badMonth);
+		demographic.setMonthOfBirth(badMonth);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -180,7 +212,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.MONTH_OF_BIRTH_INVALID;
 		String badMonth = "0";
-		demo.setMonthOfBirth(badMonth);
+		demographic.setMonthOfBirth(badMonth);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -190,7 +222,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.MONTH_OF_BIRTH_INVALID;
 		String badMonth = "13";
-		demo.setMonthOfBirth(badMonth);
+		demographic.setMonthOfBirth(badMonth);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -199,7 +231,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	public void addDemographicWithValidation_NullDateOfBirth_Fail()
 	{
 		String expectedMessage = DemographicManager.DATE_OF_BIRTH_REQUIRED;
-		demo.setDateOfBirth((String) null);
+		demographic.setDateOfBirth((String) null);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -209,7 +241,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.DATE_OF_BIRTH_INVALID;
 		String badDate = "badDate";
-		demo.setDateOfBirth(badDate);
+		demographic.setDateOfBirth(badDate);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -219,7 +251,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.DATE_OF_BIRTH_INVALID;
 		String badDate = "0";
-		demo.setDateOfBirth(badDate);
+		demographic.setDateOfBirth(badDate);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -229,7 +261,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.DATE_OF_BIRTH_INVALID;
 		String badDate = "32";
-		demo.setDateOfBirth(badDate);
+		demographic.setDateOfBirth(badDate);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -241,9 +273,9 @@ public class DemographicManagerTest extends DaoTestFixtures
 		String badYear = "2001";
 		String badMonth = "2";
 		String badDate = "29";
-		demo.setYearOfBirth(badYear);
-		demo.setMonthOfBirth(badMonth);
-		demo.setDateOfBirth(badDate);
+		demographic.setYearOfBirth(badYear);
+		demographic.setMonthOfBirth(badMonth);
+		demographic.setDateOfBirth(badDate);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -252,7 +284,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	public void addDemographicWithValidation_InvalidFamilyDoctor_Fail()
 	{
 		String expectedMessage = DemographicManager.FAMILY_DOCTOR_INVALID;
-		demo.setFamilyDoctor("Badly formmated");
+		demographic.setFamilyDoctor("Badly formmated");
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -262,7 +294,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.FIELD_UNSAFE;
 		String badCity = "<text>Victoria</text>";
-		demo.setCity(badCity);
+		demographic.setCity(badCity);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -272,7 +304,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.FIELD_UNSAFE;
 		String badCity = "\"Victoria\"";
-		demo.setCity(badCity);
+		demographic.setCity(badCity);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -282,7 +314,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		String expectedMessage = DemographicManager.FIELD_UNSAFE;
 		String badCity = "Victoria;";
-		demo.setCity(badCity);
+		demographic.setCity(badCity);
 
 		actAndAssertExceptionMessage(expectedMessage);
 	}
@@ -291,12 +323,13 @@ public class DemographicManagerTest extends DaoTestFixtures
 	{
 		try
 		{
-			manager.addDemographicWithValidation(loggedInInfo, demo);
+			manager.addDemographicWithValidation(loggedInInfo, demographic);
 			fail("Did not throw an exception.");
 		}
 		catch (Exception e)
 		{
 			assertTrue(e.getMessage().contains(expectedMessage));
+			Mockito.verify(demographicDao, times(0)).save(demographic);
 		}
 	}
 }
