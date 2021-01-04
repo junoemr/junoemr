@@ -104,6 +104,16 @@ $(function ()  {
 
 });
 
+
+  $(document).ready(function ()
+  {
+	  // On tab change, resize the iframe to fit its full contents.
+	  jQuery('.nav a').on('shown.bs.tab', function ()
+	  {
+		  resizeIFrame(document.querySelector("div.tab-pane.active div iframe"));
+	  });
+  });
+
 </script>
 
 <body>
@@ -120,31 +130,35 @@ $(function ()  {
 <li><a href="#import">Import</a></li>
 <li><a href="#download">Download</a></li>
 </ul>
- 
-<div class="tab-content">
-<div class="tab-pane" id="upload">
-<div class="well">
 
-<iframe id="uploadFrame" name="uploadFrame" frameborder="0" width="100%" height="auto" scrolling="no" src="<%=request.getContextPath()%>/eform/partials/upload.jsp"></iframe>
+<div class="tab-content" id="eFormTabs">
+    <div class="tab-pane" id="upload">
+        <div class="well">
 
-</div>
-</div>
+            <iframe id="uploadFrame" name="uploadFrame" frameborder="0" width="100%"
+                    height="auto" scrolling="no" src="<%=request.getContextPath()%>/eform/partials/upload.jsp"></iframe>
 
-<div class="tab-pane" id="import">
-<div class="well">
-                        
-<iframe id="importFrame" name="importFrame" frameborder="0" width="100%" height="auto" src="<%=request.getContextPath()%>/eform/partials/import.jsp"></iframe>
+        </div>
+    </div>
 
-</div>
-</div>
+    <div class="tab-pane" id="import">
+        <div class="well">
 
-<div class="tab-pane" id="download">
-<div class="well">
-                        
-<iframe id="downloadFrame" name="downloadFrame" onload="downloadFrameLoaded()" frameborder="0" width="100%" height="auto" scrolling="no" src="<%=request.getContextPath()%>/eform/partials/download.jsp"></iframe>
+            <iframe id="importFrame" name="importFrame" frameborder="0" width="100%"
+                    height="auto" src="<%=request.getContextPath()%>/eform/partials/import.jsp"></iframe>
 
-</div>
-</div>
+        </div>
+    </div>
+
+    <div class="tab-pane" id="download">
+        <div class="well">
+
+            <iframe id="downloadFrame" name="downloadFrame" frameborder="0" width="100%"
+                    height="auto" scrolling="no"
+                    src="<%=request.getContextPath()%>/eform/partials/download.jsp"></iframe>
+
+        </div>
+    </div>
 
 </div><!-- tab content eformOptions -->
     
@@ -223,13 +237,13 @@ $(function ()  {
     $(this).tab('show');
     });
 
-	function downloadFrameLoaded() {
-		var iFrame = document.getElementById('downloadFrame');
-		if(iFrame) {
-            iFrame.height = "";
-            iFrame.height = iFrame.contentWindow.document.body.scrollHeight + "px";
-      	}   
-  	}
+  	function resizeIFrame(iFrame)
+    {
+    	if(iFrame) {
+    		iFrame.height = "";
+		    iFrame.height = iFrame.contentWindow.document.body.scrollHeight + "px";
+        }
+    }
   
 registerFormSubmit('eformImportForm', 'dynamic-content');
 
