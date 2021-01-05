@@ -81,7 +81,7 @@ $(function() {
 
 Select data in zip format:<br /> 
 
-<input type="file" name="file1" value="">
+<input type="file" name="file1" accept=".zip" value="">
 <span title="<bean:message key="global.uploadWarningBody"/>" style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer"><img border="0" src="../images/icon_alertsml.gif"/></span></span>
         
  <input type="submit" name="Submit" class="btn btn-primary" value="Import">
