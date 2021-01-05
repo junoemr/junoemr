@@ -110,11 +110,16 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic
 	private List<Reports> getDocumentReports(List<Reports> reports)
 	{
 		// include all reports that do not contain the HRM status
-		return reports.stream().filter(report -> report.getHRMResultStatus() == null).collect(Collectors.toList());
+		return reports.stream().filter(report -> !isHrmDocument(report)).collect(Collectors.toList());
 	}
 	private List<Reports> getHrmReports(List<Reports> reports)
 	{
 		// include all reports that contain the HRM status
-		return reports.stream().filter(report -> report.getHRMResultStatus() != null).collect(Collectors.toList());
+		return reports.stream().filter(this::isHrmDocument).collect(Collectors.toList());
+	}
+
+	private boolean isHrmDocument(Reports report)
+	{
+		return (report.getHRMResultStatus() != null || !report.getOBRContent().isEmpty());
 	}
 }

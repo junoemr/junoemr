@@ -63,22 +63,22 @@ import static oscar.util.StringUtils.filled;
 public class DocumentService
 {
 	private static final OscarProperties props = OscarProperties.getInstance();
-	private static Logger logger = MiscUtils.getLogger();
+	private static final Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	DocumentDao documentDao;
+	private DocumentDao documentDao;
 
 	@Autowired
-	CtlDocumentDao ctlDocumentDao;
+	private CtlDocumentDao ctlDocumentDao;
 
 	@Autowired
-	ProviderInboxRoutingDao providerInboxRoutingDao;
+	private ProviderInboxRoutingDao providerInboxRoutingDao;
 
 	@Autowired
-	PatientLabRoutingDao patientLabRoutingDao;
+	private PatientLabRoutingDao patientLabRoutingDao;
 
 	@Autowired
-	ProgramManager programManager;
+	private ProgramManager programManager;
 
 	@Autowired
 	private DocumentModelToDbConverter documentModelToDbConverter;
@@ -98,6 +98,11 @@ public class DocumentService
 	{
 		// force this file to be treated as valid, as validation is only performed for new files
 		file.forceSetValidation(true);
+
+		// make sure we format the file the same as other uploads
+		String formattedFileName = GenericFile.getFormattedFileName(file.getName());
+		file.rename(formattedFileName);
+
 		return uploadNewDemographicDocumentLogic(document, file, demographicNo);
 	}
 

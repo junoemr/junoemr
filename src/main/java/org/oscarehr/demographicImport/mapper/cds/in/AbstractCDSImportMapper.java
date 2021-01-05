@@ -247,7 +247,10 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 					fullOrPartial.getFullDate(),
 					fullOrPartial.getYearMonth(),
 					fullOrPartial.getYearOnly());
-			return dateTime.toLocalDate();
+			if(dateTime != null)
+			{
+				return dateTime.toLocalDate();
+			}
 		}
 		return null;
 	}
@@ -259,7 +262,10 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 					fullOrPartial.getFullDate(),
 					fullOrPartial.getYearMonth(),
 					fullOrPartial.getYearOnly());
-			return dateTime.toLocalDate();
+			if(dateTime != null)
+			{
+				return dateTime.toLocalDate();
+			}
 		}
 		return null;
 	}

@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.common.xml.cds.v5_0.model.ReportClass;
 import org.oscarehr.common.xml.cds.v5_0.model.ReportFormat;
 import org.oscarehr.common.xml.cds.v5_0.model.Reports;
@@ -107,7 +108,7 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 	{
 		if(clazz != null)
 		{
-			return clazz.toString();
+			return clazz.value();
 		}
 		return null;
 	}
@@ -117,7 +118,15 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 		Provider provider = null;
 		if(authorPhysician != null)
 		{
-			provider = toProvider(authorPhysician.getAuthorName());
+			PersonNameSimple personNameSimple = authorPhysician.getAuthorName();
+			if(personNameSimple != null)
+			{
+				provider = toProvider(authorPhysician.getAuthorName());
+			}
+			else
+			{
+				provider = toProviderNames(authorPhysician.getAuthorFreeText());
+			}
 		}
 		return provider;
 	}
@@ -138,7 +147,6 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 	protected String getDocDescription(Reports importStructure)
 	{
 		String clazz = getDocClass(importStructure.getClazz());
-
-		return "Imported " + ((clazz != null) ? clazz : "Report");
+		return (clazz != null) ? clazz : "Imported Report";
 	}
 }
