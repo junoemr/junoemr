@@ -39,7 +39,6 @@ import org.oscarehr.demographicImport.converter.in.PreventionModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.ReviewerModelToDbConverter;
 import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.DemographicDbToModelConverter;
-import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.lab.Lab;
@@ -155,7 +154,7 @@ public class ImportExportService
 
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE importType,
 	                                            List<Demographic> demographicList,
-	                                            ExportPreferences preferences) throws IOException
+	                                            ExportPreferences preferences) throws Exception
 	{
 		DemographicExporter exporter = importerExporterFactory.getExporter(importType);
 		List<GenericFile> fileList = new ArrayList<>(demographicList.size() + 2);
@@ -174,7 +173,7 @@ public class ImportExportService
 
 	public List<GenericFile> exportDemographicsWithLookup(ImporterExporterFactory.EXPORTER_TYPE importType,
 	                                                      List<String> demographicIdList,
-	                                                      ExportPreferences preferences) throws IOException
+	                                                      ExportPreferences preferences) throws Exception
 	{
 		//TODO batch query get demographics
 		List<Demographic> demographicList = new ArrayList<>(demographicIdList.size());
@@ -195,7 +194,7 @@ public class ImportExportService
 	                              GenericFile importFile,
 	                              String documentLocation,
 	                              boolean skipMissingDocs,
-	                              boolean mergeDemographics) throws IOException, InvalidImportFileException, HL7Exception
+	                              boolean mergeDemographics) throws Exception
 	{
 		DemographicImporter importer = importerExporterFactory.getImporter(importType, importSource, importLogger, documentLocation, skipMissingDocs);
 		importer.verifyFileFormat(importFile);

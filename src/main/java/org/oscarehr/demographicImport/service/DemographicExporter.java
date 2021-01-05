@@ -30,7 +30,7 @@ import java.util.List;
 
 public interface DemographicExporter
 {
-	GenericFile exportDemographic(Demographic demographic, ExportPreferences preferences) throws IOException;
+	GenericFile exportDemographic(Demographic demographic, ExportPreferences preferences) throws Exception;
 
 	List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException;
 }

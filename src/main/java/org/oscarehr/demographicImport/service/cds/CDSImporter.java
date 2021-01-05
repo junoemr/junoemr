@@ -59,7 +59,7 @@ public class CDSImporter implements DemographicImporter
 		throw new InvalidImportFileException();
 	}
 
-	public Demographic importDemographic(GenericFile importFile) throws IOException
+	public Demographic importDemographic(GenericFile importFile) throws Exception
 	{
 		CDSFileParser parser = new CDSFileParser();
 

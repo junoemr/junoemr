@@ -40,7 +40,6 @@ import org.springframework.stereotype.Component;
 import oscar.oscarReport.data.DemographicSetManager;
 import oscar.util.ConversionUtils;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +53,7 @@ public class CommandLineExporter implements CommandLineTask
 	private static final Logger logger = Logger.getLogger(JunoCommandLineRunner.class);
 
 	@Autowired
-	ImportExportService importExportService;
+	private ImportExportService importExportService;
 
 	public String taskName()
 	{
@@ -128,7 +127,7 @@ public class CommandLineExporter implements CommandLineTask
 
 			logger.info("Created zip file: " + zipFile.getPath() + zipFile.getName());
 		}
-		catch(IOException e)
+		catch(Exception e)
 		{
 			throw new RuntimeException(e);
 		}

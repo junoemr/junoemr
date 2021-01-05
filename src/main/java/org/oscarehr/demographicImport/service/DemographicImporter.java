@@ -33,7 +33,7 @@ public interface DemographicImporter
 {
 	void verifyFileFormat(GenericFile importFile) throws InvalidImportFileException;
 
-	Demographic importDemographic(GenericFile importFile) throws IOException;
+	Demographic importDemographic(GenericFile importFile) throws Exception;
 
 	List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException;
 }

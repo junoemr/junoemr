@@ -77,7 +77,7 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 	}
 
 	@Override
-	public OmdCds exportFromJuno(Demographic exportStructure)
+	public OmdCds exportFromJuno(Demographic exportStructure) throws Exception
 	{
 		OmdCds omdCds = objectFactory.createOmdCds();
 		PatientRecord patientRecord = objectFactory.createPatientRecord();
@@ -165,7 +165,7 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 		return omdCds;
 	}
 
-	private List<LaboratoryResults> getLabList(List<Lab> labs)
+	private List<LaboratoryResults> getLabList(List<Lab> labs) throws Exception
 	{
 		// because we get a list back from the base converter, we need to flatten the list of lists
 		List<List<LaboratoryResults>> labsLists = cdsLabExportMapper.exportAll(labs);

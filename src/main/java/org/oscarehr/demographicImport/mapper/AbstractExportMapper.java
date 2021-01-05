@@ -26,9 +26,9 @@ import lombok.Data;
 import org.oscarehr.demographicImport.service.ExportPreferences;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @Component
@@ -45,10 +45,16 @@ public abstract class AbstractExportMapper<I, E>
 	 * this method creates a new object to use as the import structure.
 	 * @param exportStructure
 	 */
-	public abstract I exportFromJuno(E exportStructure);
+	public abstract I exportFromJuno(E exportStructure) throws Exception;
 
-	public List<I> exportAll(Collection<E> entities)
+	public List<I> exportAll(Collection<E> exportStructures) throws Exception
 	{
-		return entities.stream().map(this::exportFromJuno).collect(Collectors.toList());
+		List<I> list = new ArrayList<>();
+		for(E exportStructure : exportStructures)
+		{
+			I importStructure = exportFromJuno(exportStructure);
+			list.add(importStructure);
+		}
+		return list;
 	}
 }

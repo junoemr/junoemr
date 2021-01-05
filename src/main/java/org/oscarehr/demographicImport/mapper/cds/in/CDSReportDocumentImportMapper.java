@@ -48,17 +48,11 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 	}
 
 	@Override
-	public Document importToJuno(Reports importStructure)
+	public Document importToJuno(Reports importStructure) throws IOException, InterruptedException
 	{
 		Document document = new Document();
-		try
-		{
-			document.setFile(getDocumentFile(importStructure));
-		}
-		catch(IOException | InterruptedException e)
-		{
-			throw new RuntimeException(e);
-		}
+
+		document.setFile(getDocumentFile(importStructure));
 
 		document.setDocumentClass(getDocClass(importStructure.getClazz()));
 		document.setDocumentSubClass(importStructure.getSubClass());

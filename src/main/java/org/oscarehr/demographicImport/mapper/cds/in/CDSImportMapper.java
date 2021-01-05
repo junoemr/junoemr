@@ -27,10 +27,13 @@ import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.common.xml.cds.v5_0.model.Reports;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.document.Document;
 import org.oscarehr.demographicImport.model.measurement.Measurement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,7 +79,7 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic
 	}
 
 	@Override
-	public Demographic importToJuno(OmdCds importStructure)
+	public Demographic importToJuno(OmdCds importStructure) throws Exception
 	{
 		PatientRecord patientRecord = importStructure.getPatientRecord();
 		Demographic demographic = cdsDemographicImportMapper.importToJuno(patientRecord.getDemographics());
@@ -92,7 +95,7 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic
 		demographic.setLabList(cdsLabImportMapper.importToJuno(patientRecord.getLaboratoryResults()));
 		demographic.setAppointmentList(cdsAppointmentImportMapper.importAll(patientRecord.getAppointments()));
 		demographic.setEncounterNoteList(cdsEncounterNoteImportMapper.importAll(patientRecord.getClinicalNotes()));
-		demographic.setDocumentList(cdsReportDocumentImportMapper.importAll(getDocumentReports(patientRecord.getReports())));
+		demographic.setDocumentList(getDocuments(patientRecord.getReports()));
 		demographic.setHrmDocumentList(cdsReportHrmImportMapper.importAll(getHrmReports(patientRecord.getReports())));
 		demographic.setMeasurementList(getMeasurementsList(patientRecord.getCareElements()));
 		demographic.setReminderNoteList(cdsAlertImportMapper.importAll(patientRecord.getAlertsAndSpecialNeeds()));
@@ -100,11 +103,33 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic
 		return demographic;
 	}
 
-	private List<Measurement> getMeasurementsList(List<CareElements> careElements)
+	private List<Measurement> getMeasurementsList(List<CareElements> careElements) throws Exception
 	{
 		// because we get a list back from the base converter, we need to flatten the list of lists
 		List<List<Measurement>> measurementLists = cdsCareElementImportMapper.importAll(careElements);
 		return measurementLists.stream().flatMap(List::stream).collect(Collectors.toList());
+	}
+
+	private List<Document> getDocuments(List<Reports> reports) throws Exception
+	{
+		List<Reports> documentReports = getDocumentReports(reports);
+		List<Document> documentList = new ArrayList<>(documentReports.size());
+		for(Reports report : documentReports)
+		{
+			try
+			{
+				documentList.add(cdsReportDocumentImportMapper.importToJuno(report));
+			}
+			catch(FileNotFoundException e)
+			{
+				importProperties.getImportLogger().log("Missing External Document: " + report.getFilePath());
+				if(!importProperties.isSkipMissingDocs())
+				{
+					throw e;
+				}
+			}
+		}
+		return documentList;
 	}
 
 	private List<Reports> getDocumentReports(List<Reports> reports)

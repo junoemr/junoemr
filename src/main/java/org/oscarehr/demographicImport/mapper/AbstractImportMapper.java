@@ -26,9 +26,9 @@ import org.oscarehr.demographicImport.service.ImportProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public abstract class AbstractImportMapper<I, E>
@@ -41,10 +41,16 @@ public abstract class AbstractImportMapper<I, E>
 	 * this method creates a new object to use as the export structure.
 	 * @param importStructure
 	 */
-	public abstract E importToJuno(I importStructure);
+	public abstract E importToJuno(I importStructure) throws Exception;
 
-	public List<E> importAll(Collection<I> entities)
+	public List<E> importAll(Collection<I> importStructures) throws Exception
 	{
-		return entities.stream().map(this::importToJuno).collect(Collectors.toList());
+		List<E> list = new ArrayList<>();
+		for(I importStructure : importStructures)
+		{
+			E exportStructure = importToJuno(importStructure);
+			list.add(exportStructure);
+		}
+		return list;
 	}
 }

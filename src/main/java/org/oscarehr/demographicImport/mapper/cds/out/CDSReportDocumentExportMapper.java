@@ -43,27 +43,20 @@ public class CDSReportDocumentExportMapper extends AbstractCDSReportExportMapper
 	}
 
 	@Override
-	public Reports exportFromJuno(Document exportStructure)
+	public Reports exportFromJuno(Document exportStructure) throws IOException
 	{
 		Reports reports = objectFactory.createReports();
 
 		reports.setMedia(null); //TODO do we have anything for this?
 		reports.setFormat(ReportFormat.BINARY);	// all Juno documents will be treated as binary reports
 
-		try
-		{
-			GenericFile documentFile = exportStructure.getFile();
+		GenericFile documentFile = exportStructure.getFile();
 
-			ReportContent reportContent = objectFactory.createReportContent();
-			reportContent.setMedia(documentFile.toBase64ByteArray());
-			reports.setContent(reportContent);
+		ReportContent reportContent = objectFactory.createReportContent();
+		reportContent.setMedia(documentFile.toBase64ByteArray());
+		reports.setContent(reportContent);
 
-			reports.setFileExtensionAndVersion(documentFile.getExtension().toLowerCase());
-		}
-		catch(IOException e)
-		{
-			throw new RuntimeException("Failed Document Conversion", e);
-		}
+		reports.setFileExtensionAndVersion(documentFile.getExtension().toLowerCase());
 
 		reports.setClazz(toReportClass(exportStructure.getDocumentClass()));
 		reports.setSubClass(exportStructure.getDocumentSubClass());

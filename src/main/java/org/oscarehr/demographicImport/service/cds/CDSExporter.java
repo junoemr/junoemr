@@ -75,7 +75,7 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 		logSummaryHeaderLine();
 	}
 
-	public GenericFile exportDemographic(Demographic demographic, ExportPreferences preferences) throws IOException
+	public GenericFile exportDemographic(Demographic demographic, ExportPreferences preferences) throws Exception
 	{
 		CDSFileParser parser = new CDSFileParser();
 		cdsExportMapper.setExportPreferences(preferences);
