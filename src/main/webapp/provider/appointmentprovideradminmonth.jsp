@@ -41,7 +41,6 @@
 <%@ page import="org.oscarehr.schedule.model.ScheduleDate" %>
 <%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
 <%@ page import="org.oscarehr.provider.controller.MenuBar" %>
-<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="java.util.GregorianCalendar" %>
 
 <%
@@ -252,20 +251,17 @@ if (bMultisites) {
 	MenuBar menuBarController = new MenuBar(request, session);
 	pageContext.setAttribute("menuBarController", menuBarController);
 
-	// Required for menu bar
-	LoggedInInfo loggedInInfo1=LoggedInInfo.getLoggedInInfoFromSession(request);
-
 	GregorianCalendar now=new GregorianCalendar();
-  int curYear = now.get(Calendar.YEAR); //curYear should be the real now date
-  int curMonth = (now.get(Calendar.MONTH)+1);
-  int curDay = now.get(Calendar.DAY_OF_MONTH);
-  int year = Integer.parseInt((request.getParameter("year")).trim());
-  int month = Integer.parseInt((request.getParameter("month")).trim());
-  int day = Integer.parseInt((request.getParameter("day")).trim());
-  String strYear=null, strMonth=null, strDay=null;
-  String strDayOfWeek=null;
-  java.util.ResourceBundle prop = ResourceBundle.getBundle("oscarResources", request.getLocale());
-  String[] arrayDayOfWeek = new String[] {prop.getString("provider.appointmentprovideradminmonth.msgSun"),
+	int curYear = now.get(Calendar.YEAR); //curYear should be the real now date
+	int curMonth = (now.get(Calendar.MONTH)+1);
+	int curDay = now.get(Calendar.DAY_OF_MONTH);
+	int year = Integer.parseInt((request.getParameter("year")).trim());
+	int month = Integer.parseInt((request.getParameter("month")).trim());
+	int day = Integer.parseInt((request.getParameter("day")).trim());
+	String strYear=null, strMonth=null, strDay=null;
+	String strDayOfWeek=null;
+	java.util.ResourceBundle prop = ResourceBundle.getBundle("oscarResources", request.getLocale());
+	String[] arrayDayOfWeek = new String[] {prop.getString("provider.appointmentprovideradminmonth.msgSun"),
                                           prop.getString("provider.appointmentprovideradminmonth.msgMon"),
                                           prop.getString("provider.appointmentprovideradminmonth.msgTue"),
                                           prop.getString("provider.appointmentprovideradminmonth.msgWed"),
@@ -273,7 +269,7 @@ if (bMultisites) {
                                           prop.getString("provider.appointmentprovideradminmonth.msgFri"),
                                           prop.getString("provider.appointmentprovideradminmonth.msgSat")
                                           };
-  String[] arrayMonthOfYear = new String[] {
+	String[] arrayMonthOfYear = new String[] {
                                             prop.getString("provider.appointmentprovideradminmonth.msgJanuary"),
                                             prop.getString("provider.appointmentprovideradminmonth.msgFebruary"),
                                             prop.getString("provider.appointmentprovideradminmonth.msgMarch"),
@@ -288,41 +284,42 @@ if (bMultisites) {
                                             prop.getString("provider.appointmentprovideradminmonth.msgDecember"),
                                            };
 
-  //verify the input date is really existed 
+	//verify the input date is really existed
 	now=new GregorianCalendar(year,(month-1),day);
-  year = now.get(Calendar.YEAR); //month should be the current main display date, not the real now date
-  month = (now.get(Calendar.MONTH)+1);
-  day = now.get(Calendar.DAY_OF_MONTH);
-  int dayOfWeek = now.get(Calendar.DAY_OF_WEEK);
-  strDayOfWeek=arrayDayOfWeek[dayOfWeek-1];
-  strYear=""+year;
-  strMonth=month>9?(""+month):("0"+month);
-  strDay=day>9?(""+day):("0"+day);
+	year = now.get(Calendar.YEAR); //month should be the current main display date, not the real now date
+	month = (now.get(Calendar.MONTH)+1);
+	day = now.get(Calendar.DAY_OF_MONTH);
+	int dayOfWeek = now.get(Calendar.DAY_OF_WEEK);
+	strDayOfWeek=arrayDayOfWeek[dayOfWeek-1];
+	strYear=""+year;
+	strMonth=month>9?(""+month):("0"+month);
+	strDay=day>9?(""+day):("0"+day);
 
-  List<Map<String, Object>> resultList = null;
-  //initial holiday bean
-  if(scheduleHolidayBean.isEmpty() ) {
-	 for(ScheduleHoliday sd: scheduleHolidayDao.findAfterDate(ConversionUtils.fromDateString((year-1)+"-"+month+"-01"))) {
-		 scheduleHolidayBean.put(ConversionUtils.toDateString(sd.getId()), new HScheduleHoliday(sd.getHolidayName()));
-	 } 
-  }
-  //declare display schedule string
-  StringBuffer bgcolor = new StringBuffer();
-  StringBuffer strHolidayName = new StringBuffer();
-  StringBuffer strHour = new StringBuffer();
-  StringBuffer strReason = new StringBuffer();
-  HScheduleHoliday aHScheduleHoliday = null;
-  HScheduleDate aHScheduleDate = null;
-  
-  //initial myGrp bean
-  if(providerview.startsWith("_grp_",0)) {
-	String curGrp = providerview.substring(5);
-	for(MyGroup g:myGroupDao.getGroupByGroupNo(curGrp)) {
-		myGrpBean.setProperty(g.getId().getProviderNo(), curGrp);	
+	List<Map<String, Object>> resultList = null;
+	//initial holiday bean
+	if (scheduleHolidayBean.isEmpty())
+	{
+		for(ScheduleHoliday sd: scheduleHolidayDao.findAfterDate(ConversionUtils.fromDateString((year-1)+"-"+month+"-01"))) {
+			scheduleHolidayBean.put(ConversionUtils.toDateString(sd.getId()), new HScheduleHoliday(sd.getHolidayName()));
+		}
 	}
-	
-  }
-  java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);   
+	//declare display schedule string
+	StringBuffer bgcolor = new StringBuffer();
+	StringBuffer strHolidayName = new StringBuffer();
+	StringBuffer strHour = new StringBuffer();
+	StringBuffer strReason = new StringBuffer();
+	HScheduleHoliday aHScheduleHoliday = null;
+	HScheduleDate aHScheduleDate = null;
+  
+	//initial myGrp bean
+	if(providerview.startsWith("_grp_",0))
+	{
+		String curGrp = providerview.substring(5);
+		for(MyGroup g:myGroupDao.getGroupByGroupNo(curGrp)) {
+			myGrpBean.setProperty(g.getId().getProviderNo(), curGrp);
+		}
+	}
+	java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
 %>
 
 
@@ -477,208 +474,195 @@ function refreshTabAlerts(id) {
 
 <table BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
 	<tr>
-	<td style="width: 50px;padding: ">
-		<a href="../web/"><img src="<%=request.getContextPath()%>/images/logo-primary.png" border="0" title="Go to Juno UI"></a>
-	</td>
-	<td>
-		<ul id="navlist">
-			<!--Schedule-->
-			<li>
-				<a href='providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1'><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
-			</li>
-			<!--Caseload-->
-		 	<li>
-				<a href='providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&caseload=1&clProv=<%=curUser_no%>'><bean:message key="global.caseload"/></a>
-			</li>
-			<!--Search-->
-			<li>
-				<caisi:isModuleLoad moduleName="caisi">
-				<a HREF="../PMmodule/ClientSearch2.do"
-					TITLE='<bean:message key="global.searchPatientRecords"/>'
-					OnMouseOver="window.status='<bean:message key="global.searchPatientRecords"/>' ; return true"><bean:message
-					key="provider.appointmentProviderAdminDay.search" /></a>
-				</caisi:isModuleLoad> <caisi:isModuleLoad moduleName="caisi" reverse="true">
-				<a HREF="#"
-					ONCLICK="popupOscarRx(550,687,'../demographic/search.jsp');return false;"
-					TITLE='<bean:message key="global.searchPatientRecords"/>'
-					OnMouseOver="window.status='<bean:message key="global.searchPatientRecords"/>' ; return true"><bean:message
-					key="provider.appointmentProviderAdminDay.search" /></a>
-			</caisi:isModuleLoad>
-			</li>
-			<!--Report-->
-			<li>
-				<a HREF="#"
-					ONCLICK="popupOscarRx(650,1024,'../report/reportindex.jsp','reportPage');return false;"
-					TITLE='<bean:message key="global.genReport"/>'
-					OnMouseOver="window.status='<bean:message key="global.genReport"/>' ; return true"><bean:message
-					key="global.report" /></a>
-			</li>
-			<!--Billing-->
-			<security:oscarSec roleName="<%=roleName$%>" objectName="_billing" rights="r">
-			<li>
-				<a HREF="#"
-					ONCLICK="popupOscarRx(550,687,'../billing/CA/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;"
-					TITLE='<bean:message key="global.genBillReport"/>'
-					onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message
-					key="global.billing" /></a>
-			</li>
-			</security:oscarSec>
-			
-			<security:oscarSec roleName="<%=roleName$%>"
-				objectName="_appointment.doctorLink" rights="r">
-			<li>
-				<a HREF="#"
-					ONCLICK="popupOscarRx(600,1024,'../dms/inboxManage.do?method=prepareForIndexPage&providerNo=<%=curUser_no%>', '<bean:message key="global.inbox"/>');return false;"
-					TITLE='<bean:message key="provider.appointmentProviderAdminDay.viewLabReports"/>'>
-				<span id="oscar_new_lab"></span> </a> <oscar:newUnclaimedLab>
-				<a class="tabalert" HREF="#"
-					ONCLICK="popupOscarRx(600,1024,'../dms/inboxManage.do?method=prepareForIndexPage&providerNo=0&searchProviderNo=0&status=N&lname=&fname=&hnum=&pageNum=1&startIndex=0', '<bean:message key="global.lab"/>');return false;"
-					TITLE='<bean:message key="provider.appointmentProviderAdminDay.viewLabReports"/>'>*</a>
-				</oscar:newUnclaimedLab>
-			</li>
-			</security:oscarSec>
+		<td style="width: 50px;padding: ">
+			<a href="../web/"><img src="<%=request.getContextPath()%>/images/logo-primary.png" border="0" title="Go to Juno UI"></a>
+		</td>
+		<td>
+			<ul id="navlist">
+				<!--Schedule-->
+				<li>
+					<a href='providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1'><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a>
+				</li>
+				<!--Caseload-->
+				<li>
+					<a href='providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&caseload=1&clProv=<%=curUser_no%>'><bean:message key="global.caseload"/></a>
+				</li>
+				<!--Search-->
+				<li>
+					<caisi:isModuleLoad moduleName="caisi">
+					<a href="../PMmodule/ClientSearch2.do"
+						title='<bean:message key="global.searchPatientRecords"/>'
+						OnMouseOver="window.status='<bean:message key="global.searchPatientRecords"/>' ; return true"><bean:message
+						key="provider.appointmentProviderAdminDay.search" /></a>
+					</caisi:isModuleLoad> <caisi:isModuleLoad moduleName="caisi" reverse="true">
+					<a href="#"
+						onclick="popupOscarRx(550,687,'../demographic/search.jsp');return false;"
+						title='<bean:message key="global.searchPatientRecords"/>'
+						OnMouseOver="window.status='<bean:message key="global.searchPatientRecords"/>' ; return true"><bean:message
+						key="provider.appointmentProviderAdminDay.search" /></a>
+				</caisi:isModuleLoad>
+				</li>
+				<!--Report-->
+				<li>
+					<a href="#"
+						onclick="popupOscarRx(650,1024,'../report/reportindex.jsp','reportPage');return false;"
+						title='<bean:message key="global.genReport"/>'
+						OnMouseOver="window.status='<bean:message key="global.genReport"/>' ; return true"><bean:message
+						key="global.report" /></a>
+				</li>
+				<!--Billing-->
+				<security:oscarSec roleName="<%=roleName$%>" objectName="_billing" rights="r">
+				<li>
+					<a href="#"
+						onclick="popupOscarRx(550,687,'../billing/CA/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;"
+						title='<bean:message key="global.genBillReport"/>'
+						onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message
+						key="global.billing" /></a>
+				</li>
+				</security:oscarSec>
 
-			<li>
-				<a HREF="#"
-				ONCLICK="popupOscarRx(600,1024,'../oscarMessenger/DisplayMessages.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userfirstname+" "+userlastname)%>')"
-				title="<bean:message key="global.messenger"/>"> <span
-				id="oscar_new_msg"></span></a>
-			</li>
-			<li>
-				<a HREF="#"
-					ONCLICK="popupOscarRx(625,1024,'../oscarEncounter/IncomingConsultation.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userfirstname+" "+userlastname)%>')"
-					title="<bean:message key="provider.appointmentProviderAdminDay.viewConReq"/>"><bean:message
-					key="global.con" /></a>
-			</li>
-			<li><!-- remove this and let providerpreference check --> <caisi:isModuleLoad
-				moduleName="ticklerplus">
-				<a href="#"
-					onClick="popupOscarRx(715,680,'providerpreference.jsp');return false;"
-					TITLE='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>'
-					OnMouseOver="window.status='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>' ; return true"><bean:message
-					key="global.pref" /></a>
-			</caisi:isModuleLoad> <caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
-				<a href="#"
-					onClick="popupOscarRx(715,680,'providerpreference.jsp');return false;"
-					TITLE='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>'
-					OnMouseOver="window.status='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>' ; return true"><bean:message
-					key="global.pref" /></a>
-			</caisi:isModuleLoad>
-			</li>
-			<li><a HREF="#"
-				onclick="popupOscarRx('700', '1024', '../dms/documentReport.jsp?function=provider&functionid=<%=curUser_no%>&curUser=<%=curUser_no%>', 'edocView');"
-				TITLE='<bean:message key="provider.appointmentProviderAdminDay.viewEdoc"/>'><bean:message
-				key="global.edoc" /></a>
-			</li>
-			<li><caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
-				<a HREF="#"
-					ONCLICK="popupOscarRx(550,687,'../tickler/ticklerMain.jsp','<bean:message key="global.tickler"/>');return false;"
-					TITLE='<bean:message key="global.tickler"/>'> <span
-					id="oscar_new_tickler"></span></a>
-			</caisi:isModuleLoad> <caisi:isModuleLoad moduleName="ticklerplus">
-				<a HREF="#"
-					ONCLICK="popupOscarRx(550,687,'../Tickler.do','<bean:message key="global.tickler"/>');return false;"
-					TITLE='Tickler+'> <span id="oscar_new_tickler"></span></a>
-			</caisi:isModuleLoad>
-			</li>
-			<oscar:oscarPropertiesCheck property="WORKFLOW" value="yes">
-			<li>
-				<a
-				href="javascript: function myFunction() {return false; }"
-				onClick="popupOscarRx(700,1024,'../oscarWorkflow/WorkFlowList.jsp','<bean:message key="global.workflow"/>')"><bean:message
-				key="global.btnworkflow" /></a>
-			</li>
-			</oscar:oscarPropertiesCheck>
+				<security:oscarSec roleName="<%=roleName$%>"
+					objectName="_appointment.doctorLink" rights="r">
+				<li>
+					<a href="#"
+						onclick="popupOscarRx(600,1024,'../dms/inboxManage.do?method=prepareForIndexPage&providerNo=<%=curUser_no%>', '<bean:message key="global.inbox"/>');return false;"
+						title='<bean:message key="provider.appointmentProviderAdminDay.viewLabReports"/>'>
+					<span id="oscar_new_lab"></span> </a> <oscar:newUnclaimedLab>
+					<a class="tabalert" href="#"
+						onclick="popupOscarRx(600,1024,'../dms/inboxManage.do?method=prepareForIndexPage&providerNo=0&searchProviderNo=0&status=N&lname=&fname=&hnum=&pageNum=1&startIndex=0', '<bean:message key="global.lab"/>');return false;"
+						title='<bean:message key="provider.appointmentProviderAdminDay.viewLabReports"/>'>*</a>
+					</oscar:newUnclaimedLab>
+				</li>
+				</security:oscarSec>
 
-			<!--MyHealthAccess-->
-			<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
+				<li>
+					<a href="#"
+					onclick="popupOscarRx(600,1024,'../oscarMessenger/DisplayMessages.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userfirstname+" "+userlastname)%>')"
+					title="<bean:message key="global.messenger"/>"> <span
+					id="oscar_new_msg"></span></a>
+				</li>
+				<li>
+					<a href="#"
+						onclick="popupOscarRx(625,1024,'../oscarEncounter/IncomingConsultation.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userfirstname+" "+userlastname)%>')"
+						title="<bean:message key="provider.appointmentProviderAdminDay.viewConReq"/>"><bean:message
+						key="global.con" /></a>
+				</li>
+				<li><!-- remove this and let providerpreference check --> <caisi:isModuleLoad
+					moduleName="ticklerplus">
+					<a href="#"
+						onclick="popupOscarRx(715,680,'providerpreference.jsp');return false;"
+						title='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>'
+						OnMouseOver="window.status='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>' ; return true"><bean:message
+						key="global.pref" /></a>
+				</caisi:isModuleLoad> <caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
+					<a href="#"
+						onclick="popupOscarRx(715,680,'providerpreference.jsp');return false;"
+						title='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>'
+						OnMouseOver="window.status='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>' ; return true"><bean:message
+						key="global.pref" /></a>
+				</caisi:isModuleLoad>
+				</li>
+				<li>
+					<a href="#"
+					onclick="popupOscarRx('700', '1024', '../dms/documentReport.jsp?function=provider&functionid=<%=curUser_no%>&curUser=<%=curUser_no%>', 'edocView');"
+					title='<bean:message key="provider.appointmentProviderAdminDay.viewEdoc"/>'><bean:message
+					key="global.edoc" /></a>
+				</li>
+				<li><caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
+					<a href="#"
+						onclick="popupOscarRx(550,687,'../tickler/ticklerMain.jsp','<bean:message key="global.tickler"/>');return false;"
+						title='<bean:message key="global.tickler"/>'> <span
+						id="oscar_new_tickler"></span></a>
+				</caisi:isModuleLoad> <caisi:isModuleLoad moduleName="ticklerplus">
+					<a href="#"
+						onclick="popupOscarRx(550,687,'../Tickler.do','<bean:message key="global.tickler"/>');return false;"
+						title='Tickler+'> <span id="oscar_new_tickler"></span></a>
+				</caisi:isModuleLoad>
+				</li>
+				<oscar:oscarPropertiesCheck property="WORKFLOW" value="yes">
+				<li>
+					<a
+					href="javascript: function myFunction() {return false; }"
+					onclick="popupOscarRx(700,1024,'../oscarWorkflow/WorkFlowList.jsp','<bean:message key="global.workflow"/>')"><bean:message
+					key="global.btnworkflow" /></a>
+				</li>
+				</oscar:oscarPropertiesCheck>
+
+				<!--MyHealthAccess-->
+				<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
 				<li id="admin2">
 					<a href="../integrations/myhealthaccess.do?method=connectOrList"
 					   id="myhealthaccess"
 					   title='MyHealthAccess'
 					   target="_blank">MyHealthAccess</a>
 				</li>
-			</c:if>
+				</c:if>
 
-			<!--Administration-->
-			<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.userAdmin,_admin.schedule,_admin.billing,_admin.resource,_admin.reporting,_admin.backup,_admin.messenger,_admin.eform,_admin.encounter,_admin.misc,_admin.fax" rights="r">
-				<li>
-					<a HREF="#"
-					ONCLICK="newWindow('<%= request.getContextPath() %>/administration/', 'admin');return false;"><bean:message
-					key="global.admin" /></a>
-				</li>
+				<!--Administration-->
+				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.userAdmin,_admin.schedule,_admin.billing,_admin.resource,_admin.reporting,_admin.backup,_admin.messenger,_admin.eform,_admin.encounter,_admin.misc,_admin.fax" rights="r">
+					<li>
+						<a href="#"
+						onclick="newWindow('<%= request.getContextPath() %>/administration/', 'admin');return false;"><bean:message
+						key="global.admin" /></a>
+					</li>
 
-				<!--Dashboard-->
-				<security:oscarSec roleName="<%=roleName$%>" objectName="_dashboardDisplay" rights="r">
-					<oscar:oscarPropertiesCheck property="enable_dashboards" value="true">
-						<oscar:oscarPropertiesCheck property="instance_type" value="BC">
-							<li id="dashboardList">
-								<div class="dropdown">
-									<a href="#" class="dashboardBtn">Dashboard</a>
-									<div class="dashboardDropdown">
-										<c:forEach items="${ menuBarController.dashboards }" var="dashboard" >
-											<a href="javascript:void(0)" onclick="newWindow('<%=request.getContextPath()%>/web/dashboard/display/DashboardDisplay.do?method=getDashboard&dashboardId=${ dashboard.id }','admin')">
-												<c:out value="${ dashboard.name }" />
-											</a>
-										</c:forEach>
+					<!--Dashboard-->
+					<security:oscarSec roleName="<%=roleName$%>" objectName="_dashboardDisplay" rights="r">
+						<oscar:oscarPropertiesCheck property="enable_dashboards" value="true">
+							<oscar:oscarPropertiesCheck property="instance_type" value="BC">
+								<li id="dashboardList">
+									<div class="dropdown">
+										<a href="#" class="dashboardBtn">Dashboard</a>
+										<div class="dashboardDropdown">
+											<c:forEach items="${ menuBarController.dashboards }" var="dashboard" >
+												<a href="javascript:void(0)" onclick="newWindow('<%=request.getContextPath()%>/web/dashboard/display/DashboardDisplay.do?method=getDashboard&dashboardId=${ dashboard.id }','admin')">
+													<c:out value="${ dashboard.name }" />
+												</a>
+											</c:forEach>
+										</div>
 									</div>
-								</div>
-							</li>
+								</li>
+							</oscar:oscarPropertiesCheck>
 						</oscar:oscarPropertiesCheck>
-					</oscar:oscarPropertiesCheck>
+					</security:oscarSec>
+
+					<!-- Added logout link for mobile version -->
+					<li id="logoutMobile">
+						<a href="../logout.jsp"><bean:message key="global.btnLogout"/></a>
+					</li>
 				</security:oscarSec>
 
-				<!-- Added logout link for mobile version -->
-				<li id="logoutMobile">
-					<a href="../logout.jsp"><bean:message key="global.btnLogout"/></a>
-				</li>
-			</security:oscarSec>
-
-			<%int menuTagNumber=0; %>
-			<caisi:isModuleLoad moduleName="caisi">
-				<li><a href='<html:rewrite page="/PMmodule/ProviderInfo.do"/>'>Program</a>
-				<% menuTagNumber++ ; %>
-				</li>
-			</caisi:isModuleLoad>
-
-		</ul>
-	</td>
-		
+				<%int menuTagNumber=0; %>
+				<caisi:isModuleLoad moduleName="caisi">
+					<li><a href='<html:rewrite page="/PMmodule/ProviderInfo.do"/>'>Program</a>
+					<% menuTagNumber++ ; %>
+					</li>
+				</caisi:isModuleLoad>
+			</ul>
+		</td>
 		<td align="right" valign="bottom">
-		
-		  <a href="javascript: function myFunction() {return false; }" onClick="popup(700,1000,'../scratch/index.jsp','scratch')"><span id="oscar_scratch"></span></a>&nbsp;
-		  
-			<%if(resourcehelpHtml==""){ %>
-				<a href=# onClick="popupPage(700,1024,'<%=resourcebaseurl%>')">
+			  <a href="javascript: function myFunction() {return false; }" onclick="popup(700,1000,'../scratch/index.jsp','scratch')"><span id="oscar_scratch"></span></a>&nbsp;
+
+				<%if(resourcehelpHtml==""){ %>
+					<a href=# onclick="popupPage(700,1024,'<%=resourcebaseurl%>')">
 					<img src="<%=request.getContextPath()%>/images/life-buoy-icon-small.png" border="0" align="absbottom" title="Help"></a>
-
-				<a id="helpLink" href="javascript:void(0)" onClick ="popupPage(600,750,'<%=resourcebaseurl%>')"><bean:message key="global.help"/></a>
-			<%}else{%>
-			<div id="help-link">
-				
-				    <a href="javascript:void(0)" onclick="document.getElementById('helpHtml').style.display='block';document.getElementById('helpHtml').style.right='0px';"><bean:message key="global.help"/></a>
-			
-				<div id="helpHtml">
-				<div class="help-title">Help</div>
-				
-				<div class="help-body">
-				
-				<%=resourcehelpHtml%>
-				</div>
-				<a href="javascript:void(0)" class="help-close" onclick="document.getElementById('helpHtml').style.right='-280px';document.getElementById('helpHtml').style.display='none'">(X)</a>
+					<a id="helpLink" href="javascript:void(0)" onclick ="popupPage(600,750,'<%=resourcebaseurl%>')"><bean:message key="global.help"/></a>
+				<%}else{%>
+				<div id="help-link">
+					<a href="javascript:void(0)" onclick="document.getElementById('helpHtml').style.display='block';document.getElementById('helpHtml').style.right='0px';"><bean:message key="global.help"/></a>
+					<div id="helpHtml">
+						<div class="help-title">Help</div>
+						<div class="help-body">
+							<%=resourcehelpHtml%>
+						</div>
+						<a href="javascript:void(0)" class="help-close" onclick="document.getElementById('helpHtml').style.right='-280px';document.getElementById('helpHtml').style.display='none'">(X)</a>
 					</div>
-			
-			</div>
-			<%}%>
-			
-			
-			| <a href="../logout.jsp"><bean:message key="provider.appointmentprovideradminmonth.btnlogOut" />  &nbsp;</a>
-
-			</td>
-		
+				</div>
+				<%}%>
+				| <a href="../logout.jsp"><bean:message key="provider.appointmentprovideradminmonth.btnlogOut" />  &nbsp;</a>
+		</td>
 	</tr>
 </table>
-
 
 <table BORDER="0" CELLPADDING="1" CELLSPACING="0" WIDTH="100%"
 	BGCOLOR="#C0C0C0">
@@ -699,7 +683,7 @@ function refreshTabAlerts(id) {
 					
 				| <a
 				href="providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>"
-				TITLE='<bean:message key="provider.appointmentProviderAdminDay.viewDaySched"/>'
+				title='<bean:message key="provider.appointmentProviderAdminDay.viewDaySched"/>'
 				OnMouseOver="window.status='<bean:message key="provider.appointmentProviderAdminDay.viewDaySched"/>' ; return true"><bean:message key="global.today" /></a>	
 				
 				| <span style="color:#333">Month</span>
@@ -846,8 +830,6 @@ function refreshTabAlerts(id) {
    	GregorianCalendar cal = new GregorianCalendar(year,(month-1),1);
    	cal.add(GregorianCalendar.MONTH,1);
 
-   		
-
    	List<ScheduleDate> sds = null;
    	if (isTeamOnly && (providerview.equals("all") || providerview.startsWith("_grp_"))) {
    		// only display providers that has the same team field value.
@@ -860,26 +842,24 @@ function refreshTabAlerts(id) {
         sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),"A",ps);   
    		
    	} else
-    if(providerview.equals("all") || providerview.startsWith("_grp_",0)) {
+    if(providerview.equals("all") || providerview.startsWith("_grp_",0))
+    {
 	      param[0] = year+"-"+month+"-"+"1";
 	      param[1] = cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"1";
-		  if (selectedSite == null) {  
+		  if (selectedSite == null)
+		  {
 		      sds = scheduleDateDao.search_scheduledate_datep(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),"A");
-	    	}
-	    	else	{
+		  } else {
 	    	  List<String> ps = providerSiteDao.findByProviderNoBySiteName(selectedSite);
-	    	  sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),"A",ps);   
-	     		
-	      }
+	    	  sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),"A",ps);
+		  }
     } else {
       String[] param1 = new String[3];
       param1[0] = year+"-"+month+"-"+"1";
       param1[1] = cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"1";
       param1[2] = providerview;
-      sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),"A",Arrays.asList(new String[]{providerview}));   
-   	
+      sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),"A",Arrays.asList(new String[]{providerview}));
     }
-
               Iterator<ScheduleDate> it = sds.iterator();
               ScheduleDate date = null;
               for (int i=0; i<dateGrid.length; i++) {
