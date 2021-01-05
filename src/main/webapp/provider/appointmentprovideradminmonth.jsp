@@ -200,8 +200,8 @@ if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.Is
 			curUserSites = sites;
 		}
 
-		for (Site s : curUserSites) {
-			CurrentSiteMap.put(s.getName(),"Y");
+		for (Site site : curUserSites) {
+			CurrentSiteMap.put(site.getName(), "Y");
 		}
 
 		CurrentSiteMap.put("NONE", "Y"); // added by vic for the reason that some provider could work in multiple clinics in same day, when the schedule template will set the default location to NONE.
@@ -215,8 +215,8 @@ if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.Is
 		}
 
 		//get all sites bgColors
-		for (Site st : sites) {
-			siteBgColor.put(st.getName(),st.getBgColor());
+		for (Site site : sites) {
+			siteBgColor.put(site.getName(), site.getBgColor());
 		}
 	}
 	//multisite ends =======================
@@ -265,7 +265,7 @@ if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.Is
 	String strYear = null;
 	String strMonth = null;
 	String strDay = null;
-	String strDayOfWeek=null;
+	String strDayOfWeek = null;
 	java.util.ResourceBundle prop = ResourceBundle.getBundle("oscarResources", request.getLocale());
 	String[] arrayDayOfWeek = new String[] {prop.getString("provider.appointmentprovideradminmonth.msgSun"),
                                           prop.getString("provider.appointmentprovideradminmonth.msgMon"),
@@ -296,10 +296,10 @@ if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.Is
 	month = (now.get(Calendar.MONTH) + 1);
 	day = now.get(Calendar.DAY_OF_MONTH);
 	int dayOfWeek = now.get(Calendar.DAY_OF_WEEK);
-	strDayOfWeek = arrayDayOfWeek[dayOfWeek-1];
+	strDayOfWeek = arrayDayOfWeek[dayOfWeek - 1];
 	strYear = "" + year;
-	strMonth = month > 9 ? ("" + month):("0" + month);
-	strDay = day > 9 ? ("" + day):("0" + day);
+	strMonth = month > 9 ? ("" + month) : ("0" + month);
+	strDay = day > 9 ? ("" + day) : ("0" + day);
 
 	List<Map<String, Object>> resultList = null;
 	//initial holiday bean
@@ -414,15 +414,16 @@ function popupOscarRx(vheight,vwidth,varpage) { //open a new popup window
 
 
   
-function refresh1() {
-	var u = self.location.href;
-	if(u.lastIndexOf("&providerview=") > 0)
+function refresh1()
+{
+	var currentUrl = self.location.href;
+	if(currentUrl.lastIndexOf("&providerview=") > 0)
 	{
-		self.location.href = u.substring(0,u.lastIndexOf("&providerview=")) ;
+		self.location.href = currentUrl.substring(0, currentUrl.lastIndexOf("&providerview="));
 	}
-	if(u.lastIndexOf("&mygroup_no=") > 0)
+	if(currentUrl.lastIndexOf("&mygroup_no=") > 0)
 	{ // group switch should be treated same as provider switch
-		self.location.href = u.substring(0,u.lastIndexOf("&mygroup_no=")) ;
+		self.location.href = currentUrl.substring(0, currentUrl.lastIndexOf("&mygroup_no="));
 	} else {
 		history.go(0);
 	}
@@ -1157,20 +1158,34 @@ function refreshTabAlerts(id) {
 // keycode shortcut block added by phc
 // pasted from appointmentprovideradminday.jsp 
 // please check documentation there
-document.onkeypress=function(e){
+document.onkeypress=function(e)
+{
 	evt = e || window.event;  // window.event is the IE equivalent
 	if (evt.altKey)
 	{
 		//use if (evt.altKey || evt.metaKey) Alt+A (and)/or for Mac when the browser supports it, Command+A
 		switch(evt.keyCode)
 		{
-			case <bean:message key="global.adminShortcut"/> : popupOscarRx(700,687,'../admin/admin.jsp');  return false;  //run code for 'A'dmin
-			case <bean:message key="global.billingShortcut"/> : popupOscarRx(600,1024,'../billing/CA/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;  //code for 'B'illing
-			case <bean:message key="global.calendarShortcut"/> : popupOscarRx(425,430,'../share/CalendarPopup.jsp?urlfrom=../provider/providercontrol.jsp&year=<%=strYear%>&month=<%=strMonth%>&param=<%=URLEncoder.encode("&view=0&displaymode=day&dboperation=searchappointmentday","UTF-8")%>');  return false;  //run code for 'C'alendar
-			case <bean:message key="global.edocShortcut"/> : popupOscarRx('700', '1024', '../dms/documentReport.jsp?function=provider&functionid=<%=curUser_no%>&curUser=<%=curUser_no%>', 'edocView');  return false;  //run code for e'D'oc
-			case <bean:message key="global.resourcesShortcut"/> : popupOscarRx(550,687,'<%=resourcebaseurl%>'); return false; // code for R'e'sources
-			case <bean:message key="global.helpShortcut"/> : popupOscarRx(600,750,'<%=resourcebaseurl%>');  return false;  //run code for 'H'elp
-			case <bean:message key="global.ticklerShortcut"/> : {  
+			case <bean:message key="global.adminShortcut"/>:
+				popupOscarRx(700,687,'../admin/admin.jsp');
+				return false;  //run code for 'A'dmin
+			case <bean:message key="global.billingShortcut"/>:
+				popupOscarRx(600,1024,'../billing/CA/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');
+				return false;  //code for 'B'illing
+			case <bean:message key="global.calendarShortcut"/>:
+				popupOscarRx(425,430,'../share/CalendarPopup.jsp?urlfrom=../provider/providercontrol.jsp&year=<%=strYear%>&month=<%=strMonth%>&param=<%=URLEncoder.encode("&view=0&displaymode=day&dboperation=searchappointmentday","UTF-8")%>');
+				return false;  //run code for 'C'alendar
+			case <bean:message key="global.edocShortcut"/>:
+				popupOscarRx('700', '1024', '../dms/documentReport.jsp?function=provider&functionid=<%=curUser_no%>&curUser=<%=curUser_no%>', 'edocView');
+				return false;  //run code for e'D'oc
+			case <bean:message key="global.resourcesShortcut"/>:
+				popupOscarRx(550,687,'<%=resourcebaseurl%>');
+				return false; // code for R'e'sources
+			case <bean:message key="global.helpShortcut"/>:
+				popupOscarRx(600,750,'<%=resourcebaseurl%>');
+				return false;  //run code for 'H'elp
+			case <bean:message key="global.ticklerShortcut"/>:
+			{
 				<caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
 					popupOscarRx(700,1024,'../tickler/ticklerMain.jsp','<bean:message key="global.tickler"/>') //run code for t'I'ckler
 				</caisi:isModuleLoad>
@@ -1179,41 +1194,63 @@ document.onkeypress=function(e){
 				</caisi:isModuleLoad>
 				return false;
 			}
-			case <bean:message key="global.labShortcut"/> : popupOscarRx(600,1024,'../dms/inboxManage.do?method=prepareForIndexPage&providerNo=<%=curUser_no%>', '<bean:message key="global.lab"/>');  return false;  //run code for 'L'ab
-			case <bean:message key="global.msgShortcut"/> : popupOscarRx(600,1024,'../oscarMessenger/DisplayMessages.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userfirstname+" "+userlastname)%>'); return false;  //run code for 'M'essage
-			case <bean:message key="global.monthShortcut"/> : window.open("providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=1&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=month&dboperation=searchappointmentmonth","_self"); return false ;  //run code for Mo'n'th
-			case <bean:message key="global.conShortcut"/> : popupOscarRx(625,1024,'../oscarEncounter/IncomingConsultation.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userfirstname+" "+userlastname)%>');  return false;  //run code for c'O'nsultation
-			case <bean:message key="global.reportShortcut"/> : popupOscarRx(650,1024,'../report/reportindex.jsp','reportPage');  return false;  //run code for 'R'eports
-			case <bean:message key="global.prefShortcut"/> : {
-				    <caisi:isModuleLoad moduleName="ticklerplus">
+			case <bean:message key="global.labShortcut"/>:
+				popupOscarRx(600,1024,'../dms/inboxManage.do?method=prepareForIndexPage&providerNo=<%=curUser_no%>', '<bean:message key="global.lab"/>');
+				return false;  //run code for 'L'ab
+			case <bean:message key="global.msgShortcut"/>:
+				popupOscarRx(600,1024,'../oscarMessenger/DisplayMessages.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userfirstname + " " + userlastname)%>');
+				return false;  //run code for 'M'essage
+			case <bean:message key="global.monthShortcut"/>:
+				window.open("providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=1&view=<%=view==0?"0":("1&curProvider=" + request.getParameter("curProvider") + "&curProviderName=" + request.getParameter("curProviderName"))%>&displaymode=month&dboperation=searchappointmentmonth","_self");
+				return false ;  //run code for Mo'n'th
+			case <bean:message key="global.conShortcut"/>:
+				popupOscarRx(625,1024,'../oscarEncounter/IncomingConsultation.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userfirstname + " " + userlastname)%>');
+				return false;  //run code for c'O'nsultation
+			case <bean:message key="global.reportShortcut"/>:
+				popupOscarRx(650,1024,'../report/reportindex.jsp','reportPage');
+				return false;  //run code for 'R'eports
+			case <bean:message key="global.prefShortcut"/>:
+			{
+				<caisi:isModuleLoad moduleName="ticklerplus">
 					popupOscarRx(715,680,'providerpreference.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&mygroup_no=<%=mygroupno%>&new_tickler_warning_window=<%=newticklerwarningwindow%>&default_pmm=<%=default_pmm%>'); //run code for tickler+ 'P'references
-					return false;   
-				    </caisi:isModuleLoad>	
-			            <caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
+					return false;
+				</caisi:isModuleLoad>
+				<caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
 					popupOscarRx(715,680,'providerpreference.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&mygroup_no=<%=mygroupno%>'); //run code for 'P'references
-					return false; 
-			            </caisi:isModuleLoad>
+					return false;
+				</caisi:isModuleLoad>
 			}
-			case <bean:message key="global.searchShortcut"/> : popupOscarRx(550,687,'../demographic/search.jsp');  return false;  //run code for 'S'earch
-			case <bean:message key="global.dayShortcut"/> : window.open("providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=day&dboperation=searchappointmentday","_self") ;  return false;  //run code for 'T'oday                       
-			case <bean:message key="global.viewShortcut"/> : {
-				<% if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals("1") ) { %>
-				         review('0');  return false; //scheduled providers 'V'iew 
+			case <bean:message key="global.searchShortcut"/>:
+				popupOscarRx(550,687,'../demographic/search.jsp');
+				return false;  //run code for 'S'earch
+			case <bean:message key="global.dayShortcut"/>:
+				window.open("providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=<%=view == 0 ? "0" : ("1&curProvider=" + request.getParameter("curProvider") + "&curProviderName=" + request.getParameter("curProviderName"))%>&displaymode=day&dboperation=searchappointmentday","_self");
+				return false;  //run code for 'T'oday
+			case <bean:message key="global.viewShortcut"/>:
+			{
+				<% if(request.getParameter("viewall") != null && request.getParameter("viewall").equals("1") ) { %>
+					 review('0');  return false; //scheduled providers 'V'iew
 				<% } else {  %>
-				         review('1');  return false; //all providers 'V'iew 
+					 review('1');  return false; //all providers 'V'iew
 				<% } %>
 			}
-			case <bean:message key="global.workflowShortcut"/> : popupOscarRx(700,1024,'../oscarWorkflow/WorkFlowList.jsp','<bean:message key="global.workflow"/>'); return false ; //code for 'W'orkflow
-			case <bean:message key="global.phrShortcut"/> : popupOscarRx('600', '1024','../phr/PhrMessage.do?method=viewMessages','INDIVOMESSENGER2<%=curUser_no%>')
+			case <bean:message key="global.workflowShortcut"/>:
+				popupOscarRx(700,1024,'../oscarWorkflow/WorkFlowList.jsp','<bean:message key="global.workflow"/>');
+				return false ; //code for 'W'orkflow
+			case <bean:message key="global.phrShortcut"/>:
+				popupOscarRx('600', '1024','../phr/PhrMessage.do?method=viewMessages','INDIVOMESSENGER2<%=curUser_no%>');
 			default : return;
-	    }
+		}
 	}
 	if (evt.ctrlKey)
 	{
 	   switch(evt.keyCode || evt.charCode)
 	   {
-		case <bean:message key="global.btnLogoutShortcut"/> : window.open('../logout.jsp','_self');  return false;  // 'Q'uit/log out
-		default : return;
+		case <bean:message key="global.btnLogoutShortcut"/>:
+			window.open('../logout.jsp','_self');
+			return false;  // 'Q'uit/log out
+		default:
+			return;
 	   }
 	}
 }
