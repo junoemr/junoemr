@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
@@ -65,6 +66,7 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 		document.setCreatedAt(toNullableLocalDateTime(importStructure.getReceivedDateTime()));
 
 		document.setCreatedBy(getAuthorPhysician(importStructure.getSourceAuthorPhysician()));
+		document.setResponsible(document.getCreatedBy());
 		document.setReviewer(getReviewer(importStructure.getReportReviewed()));
 
 		document.setAnnotation(importStructure.getNotes());
@@ -79,27 +81,25 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 		GenericFile tempFile;
 
 		ReportFormat format = importStructure.getFormat();
-		if(format.equals(ReportFormat.BINARY))
+		if(format.equals(ReportFormat.BINARY)) //Document file
 		{
-			//Document
-			String fileExtension = importStructure.getFileExtensionAndVersion();
-
 			String filePath = importStructure.getFilePath();
-			if(filePath != null)
+			if(filePath != null) // external document
 			{
-				// TODO read external file
-				tempFile = FileFactory.createTempFile("." + fileExtension.toLowerCase());
+				GenericFile externalFile = FileFactory.getExistingFile(importProperties.getExternalDocumentPath(), filePath);
+				tempFile = FileFactory.createTempFile(externalFile.asFileInputStream(), "." + externalFile.getExtension().toLowerCase());
 			}
 			else
 			{
+				String fileExtension = importStructure.getFileExtensionAndVersion();
 				byte[] base64Media = importStructure.getContent().getMedia();
 				tempFile = FileFactory.createTempFile(new ByteArrayInputStream(base64Media), "." + fileExtension.toLowerCase());
 			}
 		}
-		else
+		else //text report
 		{
-			//text report
-			tempFile = FileFactory.createTempFile(".txt");
+			String textContent = importStructure.getContent().getTextContent();
+			tempFile = FileFactory.createTempFile(new ByteArrayInputStream(textContent.getBytes(StandardCharsets.UTF_8)), ".txt");
 		}
 		return tempFile;
 	}

@@ -37,6 +37,9 @@ public class ImporterExporterFactory
 	@Autowired
 	private CDSExporter cdsExporter;
 
+	@Autowired
+	private ImportProperties importProperties;
+
 	public enum IMPORTER_TYPE
 	{
 		CDS_5,
@@ -73,6 +76,11 @@ public class ImporterExporterFactory
 	                                       String documentLocation,
 	                                       boolean skipMissingDocs)
 	{
+		importProperties.setImportSource(importSource);
+		importProperties.setImportLogger(importLogger);
+		importProperties.setExternalDocumentPath(documentLocation);
+		importProperties.setSkipMissingDocs(skipMissingDocs);
+
 		switch(type)
 		{
 			case CDS_5: return cdsImporter;

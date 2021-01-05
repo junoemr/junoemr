@@ -22,6 +22,8 @@
  */
 package org.oscarehr.demographicImport.mapper;
 
+import org.oscarehr.demographicImport.service.ImportProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -31,6 +33,9 @@ import java.util.stream.Collectors;
 @Component
 public abstract class AbstractImportMapper<I, E>
 {
+	@Autowired
+	protected ImportProperties importProperties;
+
 	/**
 	 * build the export structure from the provided import structure.
 	 * this method creates a new object to use as the export structure.

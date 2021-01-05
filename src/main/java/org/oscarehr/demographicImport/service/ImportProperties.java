@@ -20,43 +20,17 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper.cds.in;
+package org.oscarehr.demographicImport.service;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.ReportFormat;
-import org.oscarehr.common.xml.cds.v5_0.model.Reports;
-import org.oscarehr.demographicImport.model.document.HrmDocument;
-import org.oscarehr.util.MiscUtils;
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
+@Data
 @Component
-public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmDocument>
+public class ImportProperties
 {
-	private static final Logger logger = MiscUtils.getLogger();
-
-	public CDSReportHrmImportMapper()
-	{
-		super();
-	}
-
-	@Override
-	public HrmDocument importToJuno(Reports importStructure)
-	{
-		HrmDocument document = new HrmDocument();
-
-		ReportFormat format = importStructure.getFormat();
-		if(format.equals(ReportFormat.BINARY))
-		{
-			//Document
-		}
-		else
-		{
-			//text report
-		}
-
-		//TODO finish HRM document import when HRM documents are re-worked
-		logger.error("HRM Document found in CDS, but conversion is not implemented");
-
-		return document;
-	}
+	private ImportLogger importLogger;
+	private String externalDocumentPath;
+	private boolean skipMissingDocs;
+	private ImporterExporterFactory.IMPORT_SOURCE importSource;
 }
