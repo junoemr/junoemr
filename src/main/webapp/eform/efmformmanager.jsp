@@ -44,68 +44,93 @@
 
 </head>
 <script language="javascript">
-  function checkFormAndDisable(){
-    if(document.forms[0].formHtml.value==""){
+  function checkFormAndDisable()
+  {
+    if(document.forms[0].formHtml.value=="")
+    {
       alert("<bean:message key="eform.uploadhtml.msgFileMissing"/>");
-    } else {
-      document.forms[0].subm.value = "<bean:message key="eform.uploadimages.processing"/>";
-      document.forms[0].subm.disabled = true;
-      document.forms[0].submit();
+    }
+    else
+    {
+	    document.forms[0].subm.value = "<bean:message key="eform.uploadimages.processing"/>";
+	    document.forms[0].subm.disabled = true;
+	    document.forms[0].submit();
     }
   }
 
-  function newWindow(url, id) {
-        Popup = window.open(url,id,'toolbar=no,location=no,status=yes,menubar=no, scrollbars=yes,resizable=yes,width=900,height=600,left=200,top=0');
+  function newWindow(url, id)
+  {
+	  Popup = window.open(url, id, 'toolbar=no,location=no,status=yes,menubar=no, scrollbars=yes,resizable=yes,width=900,height=600,left=200,top=0');
   }
-  function confirmNDelete(url) {
-    if (confirm("<bean:message key="eform.uploadhtml.confirmDelete"/>")) {
-        document.location = url;
-    }
+
+  function confirmNDelete(url)
+  {
+	  if (confirm("<bean:message key="eform.uploadhtml.confirmDelete"/>"))
+	  {
+		  document.location = url;
+	  }
   }
 
   var normalStyle = "eformInputHeading"
   var activeStyle = "eformInputHeading eformInputHeadingActive"
-  function closeInputs() {
+  function closeInputs()
+  {
       document.getElementById("uploadDiv").style.display = 'none';
       document.getElementById("importDiv").style.display = 'none';
       document.getElementById("uploadHeading").className = normalStyle;
       document.getElementById("importHeading").className = normalStyle;
   }
 
-  function openUpload() {
+  function openUpload()
+  {
       closeInputs();
       document.getElementById("uploadHeading").className = activeStyle;
       document.getElementById("uploadDiv").style.display = 'block';
   }
 
-  function openImport() {
+  function openImport()
+  {
       closeInputs();
       document.getElementById("importHeading").className = activeStyle;
       document.getElementById("importDiv").style.display = 'block';
   }
   
-  function openDownload() {
+  function openDownload()
+  {
       closeInputs();
       document.getElementById("downloadHeading").className = activeStyle;
       document.getElementById("downloadDiv").style.display = 'block';
   }
 
-  function doOnLoad() {
-    <%String input = request.getParameter("input");
-    if (input == null) input = (String) request.getAttribute("input");
-    if (input != null && input.equals("import")) {%>
-    openImport();
-    <%}%>
+  function doOnLoad()
+  {
+	  <%String input = request.getParameter("input");
+            if (input == null)
+            {
+                input = (String) request.getAttribute("input");
+            }
+      if (input != null && input.equals("import"))
+      {%>
+	  openImport();
+	  <%}%>
   }
 
-$(function ()  { 
+  // Resizes an iFrame so that it can fit all its contents.
+  // Source: stackoverflow.com/a/9976309
+  function resizeIFrame(iFrame)
+  {
+	  if(iFrame) {
+		  iFrame.height = "";
+		  iFrame.height = iFrame.contentWindow.document.body.scrollHeight + "px";
+	  }
+  }
 
-	  $("[rel=popover]").popover(); 
+  jQuery(function ()
+  {
+	  jQuery("[rel=popover]").popover();
+  });
 
-});
-
-
-  $(document).ready(function ()
+  jQuery(document).ready(function ()
   {
 	  // On tab change, resize the iframe to fit its full contents.
 	  jQuery('.nav a').on('shown.bs.tab', function ()
@@ -201,26 +226,41 @@ $(function ()  {
     <tr>
         <td><i class="icon-file" title="<%=escapedFileName%>"></i></td>
         <td title="<%=escapedFormName%>">
-        <a href="#" onclick="newWindow('<%= request.getContextPath() %>/eform/efmshowform_data.jsp?fid=<%=curForm.get("fid")%>', '<%="Form"+i%>'); return false;"><%=escapedFormName%></a>
+            <a href="#"
+               onclick="newWindow('<%= request.getContextPath() %>/eform/efmshowform_data.jsp?fid=<%=curForm.get("fid")%>', '<%="Form"+i%>'); return false;"><%=escapedFormName%>
+            </a>
         </td>
-        <td><%=escapedFormSubject%> </td>
-        <td align='center' ><%=curForm.get("formDate")%></td>
-        <td align='center' ><%=curForm.get("formTime")%></td>
-        <td align='center' ><%=roleType%></td>
+        <td><%=escapedFormSubject%>
+        </td>
+        <td align='center'><%=curForm.get("formDate")%>
+        </td>
+        <td align='center'><%=curForm.get("formTime")%>
+        </td>
+        <td align='center'><%=roleType%>
+        </td>
         <td align='center'>
-                    
-                
-<a href="<%= request.getContextPath() %>/eform/efmformmanageredit.jsp?fid=<%= curForm.get("fid")%>" class="contentLink" style="padding-right:6px" title='<bean:message key="eform.uploadhtml.editform" /><%=escapedFormName%>'><i class="icon-pencil" title="<bean:message key="eform.uploadhtml.editform" />"></i></a>
 
-                 
-<a href='<%= request.getContextPath() %>/eform/manageEForm.do?method=exportEForm&fid=<%=curForm.get("fid")%>' style="padding-right:6px" title='<bean:message key="eform.uploadhtml.btnExport" /> <%=escapedFormName%>' ><i class="icon-download-alt" title="<bean:message key="eform.uploadhtml.btnExport" />"></i></a>
-                    
 
-<a href='<%= request.getContextPath() %>/eform/delEForm.do?fid=<%=curForm.get("fid")%>' style="padding-right:6px" title='<bean:message key="eform.uploadhtml.btnDelete" /> <%=escapedFormName%>' class="contentLink"><i class="icon-trash" title="<bean:message key="eform.uploadhtml.btnDelete" />"></i></a>
-		</td>			
-		
-		<td align='center'><a href="<%= request.getContextPath() %>/eform/efmSendform.jsp?fid=<%=curForm.get("fid")%>" title='Send <%=escapedFormName%> to Emporium' class="contentLink"><i class="icon-share" title="send"></i></a>
-					
+            <a href="<%= request.getContextPath() %>/eform/efmformmanageredit.jsp?fid=<%= curForm.get("fid")%>"
+               class="contentLink" style="padding-right:6px"
+               title='<bean:message key="eform.uploadhtml.editform" /><%=escapedFormName%>'><i class="icon-pencil"
+                                                                                               title="<bean:message key="eform.uploadhtml.editform" />"></i></a>
+
+
+            <a href='<%= request.getContextPath() %>/eform/manageEForm.do?method=exportEForm&fid=<%=curForm.get("fid")%>'
+               style="padding-right:6px" title='<bean:message key="eform.uploadhtml.btnExport" /> <%=escapedFormName%>'><i
+                    class="icon-download-alt" title="<bean:message key="eform.uploadhtml.btnExport" />"></i></a>
+
+
+            <a href='<%= request.getContextPath() %>/eform/delEForm.do?fid=<%=curForm.get("fid")%>'
+               style="padding-right:6px" title='<bean:message key="eform.uploadhtml.btnDelete" /> <%=escapedFormName%>'
+               class="contentLink"><i class="icon-trash" title="<bean:message key="eform.uploadhtml.btnDelete" />"></i></a>
+        </td>
+
+        <td align='center'><a href="<%= request.getContextPath() %>/eform/efmSendform.jsp?fid=<%=curForm.get("fid")%>"
+                              title='Send <%=escapedFormName%> to Emporium' class="contentLink"><i class="icon-share"
+                                                                                                   title="send"></i></a>
+
     </tr>
     <% } %>
 </tbody>
@@ -229,28 +269,22 @@ $(function ()  {
 <%@ include file="efmFooter.jspf"%>
 
 <script>
-    $('#eformOptions a').click(function (e) {
-    e.preventDefault();
-    if(this.href.indexOf('download') != -1) {
-    	document.getElementById("downloadFrame").src = document.getElementById("downloadFrame").src;
-    }
-    $(this).tab('show');
-    });
+	jQuery('#eformOptions a').click(function (e)
+	{
+		e.preventDefault();
+		if (this.href.indexOf('download') != -1)
+		{
+			document.getElementById("downloadFrame").src = document.getElementById("downloadFrame").src;
+		}
+		jQuery(this).tab('show');
+	});
 
-  	function resizeIFrame(iFrame)
-    {
-    	if(iFrame) {
-    		iFrame.height = "";
-		    iFrame.height = iFrame.contentWindow.document.body.scrollHeight + "px";
-        }
-    }
-  
-registerFormSubmit('eformImportForm', 'dynamic-content');
+	registerFormSubmit('eformImportForm', 'dynamic-content');
 
-$('#eformTbl').dataTable({
-	"bPaginate": false,
-	"aoColumnDefs": [{"bSortable":false, "aTargets":[0]}]
-});
+	jQuery('#eformTbl').dataTable({
+		"bPaginate": false,
+		"aoColumnDefs": [{"bSortable": false, "aTargets": [0]}]
+	});
 </script>
 </body>
 </html:html>
