@@ -22,71 +22,71 @@ angular.module('Patient').component('addDemographicModal', {
 			demographicService,
 			programService,
 			providerService)
-		{
-			let ctrl = this;
-			ctrl.genders = staticDataService.getGenders();
-			ctrl.provinces = staticDataService.getProvinces();
-			ctrl.provincesCA = staticDataService.getCanadaProvinces();
-			ctrl.newDemographicData = {};
+	{
+		let ctrl = this;
+		ctrl.genders = staticDataService.getGenders();
+		ctrl.provinces = staticDataService.getProvinces();
+		ctrl.provincesCA = staticDataService.getCanadaProvinces();
+		ctrl.newDemographicData = {};
 
-			ctrl.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
-				'../ws/rs');
+		ctrl.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
+			'../ws/rs');
 
-			// personal data
-			ctrl.newDemographicData.lastName = "";
-			ctrl.newDemographicData.firstName = "";
-			ctrl.newDemographicData.sex = "";
-			ctrl.newDemographicData.dateOfBirth = "";
-			ctrl.newDemographicData.hin = "";
-			ctrl.newDemographicData.ver = "";
-			ctrl.newDemographicData.hcType = "BC";
+		// personal data
+		ctrl.newDemographicData.lastName = "";
+		ctrl.newDemographicData.firstName = "";
+		ctrl.newDemographicData.sex = "";
+		ctrl.newDemographicData.dateOfBirth = "";
+		ctrl.newDemographicData.hin = "";
+		ctrl.newDemographicData.ver = "";
+		ctrl.newDemographicData.hcType = "BC";
 
-			// address data
-			ctrl.newDemographicData.address = {
-				address: "",
-				city: "",
-				province: "BC",
-				postal: "",
-			};
-			ctrl.newDemographicData.email = "";
-			ctrl.newDemographicData.phone = "";
+		// address data
+		ctrl.newDemographicData.address = {
+			address: "",
+			city: "",
+			province: "BC",
+			postal: "",
+		};
+		ctrl.newDemographicData.email = "";
+		ctrl.newDemographicData.phone = "";
 
-			// validation
-			ctrl.invalidLastName = false;
-			ctrl.invalidFirstName = false;
-			ctrl.invalidSex = false;
-			ctrl.invalidDob = false;
+		// validation
+		ctrl.invalidLastName = false;
+		ctrl.invalidFirstName = false;
+		ctrl.invalidSex = false;
+		ctrl.invalidDob = false;
 
-			//get programs to be selected
-			programService.getPrograms().then(
-				function success(results)
+		//get programs to be selected
+		programService.getPrograms().then(
+			function success(results)
+			{
+				ctrl.programs = results;
+				if (ctrl.programs.length === 1)
 				{
-					ctrl.programs = results;
-					if (ctrl.programs.length === 1)
-					{
-						ctrl.newDemographicData.admissionProgramId = ctrl.programs[0].id;
-					}
-				},
-				function error(errors)
-				{
-					console.log(errors);
+					ctrl.newDemographicData.admissionProgramId = ctrl.programs[0].id;
 				}
-			);
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			}
+		);
 
-			// Pull phone prefix from Oscar Properties file
-			ctrl.systemPreferenceApi.getPropertyValue("phoneprefix", "").then(
-				function success(results)
-				{
-					ctrl.newDemographicData.phone = results.data.body;
-				},
-				function error(errors)
-				{
-					console.log("errors::" + errors);
-				}
-			);
+		// Pull phone prefix from Oscar Properties file
+		ctrl.systemPreferenceApi.getPropertyValue("phoneprefix", "").then(
+			function success(results)
+			{
+				ctrl.newDemographicData.phone = results.data.body;
+			},
+			function error(errors)
+			{
+				console.log("errors::" + errors);
+			}
+		);
 
-			// set defaults based on provider settings
-			providerService.getSettings().then(
+		// set defaults based on provider settings
+		providerService.getSettings().then(
 				function success(result)
 				{
 					ctrl.newDemographicData.sex = result.defaultSex;
@@ -115,57 +115,57 @@ angular.module('Patient').component('addDemographicModal', {
 				{
 					console.error("Failed to fetch Provider settings with error: " + errors);
 				}
-			);
+		);
 
-			ctrl.validateDemographic = function ()
+		ctrl.validateDemographic = function ()
+		{
+			let dateOfBirthValid = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth).isValid();
+
+			ctrl.invalidLastName = !ctrl.newDemographicData.lastName;
+			ctrl.invalidFirstName = !ctrl.newDemographicData.firstName;
+			ctrl.invalidSex = !ctrl.newDemographicData.sex;
+			ctrl.invalidDob = !dateOfBirthValid;
+
+			return !(ctrl.invalidLastName || ctrl.invalidFirstName || ctrl.invalidSex || ctrl.invalidDob);
+		};
+
+		ctrl.onCancel = function()
+		{
+			ctrl.modalInstance.dismiss("cancel");
+		};
+
+		let buttonClicked = false;
+		let onAddFinished = false;
+		ctrl.onAdd = function ()
+		{
+			// Only let the user click the button once
+			if (buttonClicked && !onAddFinished)
 			{
-				let dateOfBirthValid = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth).isValid();
-
-				ctrl.invalidLastName = !ctrl.newDemographicData.lastName;
-				ctrl.invalidFirstName = !ctrl.newDemographicData.firstName;
-				ctrl.invalidSex = !ctrl.newDemographicData.sex;
-				ctrl.invalidDob = !dateOfBirthValid;
-
-				return !(ctrl.invalidLastName || ctrl.invalidFirstName || ctrl.invalidSex || ctrl.invalidDob);
-			};
-
-			ctrl.onCancel = function()
-			{
-				ctrl.modalInstance.dismiss("cancel");
-			};
-
-			let buttonClicked = false;
-			let onAddFinished = false;
-			ctrl.onAdd = function ()
-			{
-				// Only let the user click the button once
-				if (buttonClicked && !onAddFinished)
-				{
-					return;
-				}
-
-				if (Juno.Common.Util.exists(ctrl.newDemographicData.hin))
-				{
-					ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
-				}
-
-				if (ctrl.validateDemographic())
-				{
-					buttonClicked = true;
-					demographicService.saveDemographic(ctrl.newDemographicData).then(
-						function success(results)
-						{
-							ctrl.modalInstance.close(results);
-							onAddFinished = true;
-						},
-						function error(errors)
-						{
-							alert(errors);
-							console.error(errors);
-							onAddFinished = true;
-						}
-					);
-				}
+				return;
 			}
-		}]
+
+		    if (Juno.Common.Util.exists(ctrl.newDemographicData.hin))
+            {
+                ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
+            }
+
+			if (ctrl.validateDemographic())
+			{
+				buttonClicked = true;
+				demographicService.saveDemographic(ctrl.newDemographicData).then(
+					function success(results)
+					{
+						ctrl.modalInstance.close(results);
+						onAddFinished = true;
+					},
+					function error(errors)
+					{
+						alert(errors);
+						console.error(errors);
+						onAddFinished = true;
+					}
+				);
+			}
+		}
+	}]
 });
