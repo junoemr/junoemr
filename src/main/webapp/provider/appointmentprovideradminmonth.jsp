@@ -171,53 +171,55 @@ if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.Is
 </security:oscarSec>
 
 <% 
-if (bMultisites) {
-	SiteDao siteDao = (SiteDao)SpringUtils.getBean("siteDao");
-	sites = siteDao.getAllActiveSites(); 
-	
-	String requestSite = request.getParameter("site") ;
-	if (requestSite!=null) 
+	if (bMultisites)
 	{
-		requestSite = (requestSite.equals("none") ? null : requestSite);
-		session.setAttribute("site_selected", requestSite );
-	}
-	selectedSite = (requestSite == null ? (String)session.getAttribute("site_selected") : requestSite) ;
-	
-	if (isSiteAccessPrivacy || isTeamAccessPrivacy) {
-		//user has Access Privacy, set user provider and group list
-		String siteManagerProviderNo = (String) session.getAttribute("user");
-		curUserSites = siteDao.getActiveSitesByProviderNo(siteManagerProviderNo);
-		if (selectedSite==null) {
-			siteProviderNos = siteDao.getProviderNoBySiteManagerProviderNo(siteManagerProviderNo);
-			siteGroups = siteDao.getGroupBySiteManagerProviderNo(siteManagerProviderNo);
+		SiteDao siteDao = (SiteDao)SpringUtils.getBean("siteDao");
+		sites = siteDao.getAllActiveSites();
+
+		String requestSite = request.getParameter("site");
+		if (requestSite != null)
+		{
+			requestSite = (requestSite.equals("none") ? null : requestSite);
+			session.setAttribute("site_selected", requestSite );
+		}
+		selectedSite = (requestSite == null ? (String)session.getAttribute("site_selected") : requestSite) ;
+
+		if (isSiteAccessPrivacy || isTeamAccessPrivacy)
+		{
+			//user has Access Privacy, set user provider and group list
+			String siteManagerProviderNo = (String) session.getAttribute("user");
+			curUserSites = siteDao.getActiveSitesByProviderNo(siteManagerProviderNo);
+			if (selectedSite == null)
+			{
+				siteProviderNos = siteDao.getProviderNoBySiteManagerProviderNo(siteManagerProviderNo);
+				siteGroups = siteDao.getGroupBySiteManagerProviderNo(siteManagerProviderNo);
+			}
+		}
+		else {
+			//get all active site as user site list
+			curUserSites = sites;
+		}
+
+		for (Site s : curUserSites) {
+			CurrentSiteMap.put(s.getName(),"Y");
+		}
+
+		CurrentSiteMap.put("NONE", "Y"); // added by vic for the reason that some provider could work in multiple clinics in same day, when the schedule template will set the default location to NONE.
+
+		// a site has been seleceted
+		if (selectedSite != null)
+		{
+			//get site provider list
+			siteProviderNos = siteDao.getProviderNoBySiteLocation(selectedSite);
+			siteGroups = siteDao.getGroupBySiteLocation(selectedSite);
+		}
+
+		//get all sites bgColors
+		for (Site st : sites) {
+			siteBgColor.put(st.getName(),st.getBgColor());
 		}
 	}
-	else {
-		//get all active site as user site list
-		curUserSites = sites;
-	}
-	
-	for (Site s : curUserSites) {
-		CurrentSiteMap.put(s.getName(),"Y");
-	}
-	
-	CurrentSiteMap.put("NONE", "Y"); // added by vic for the reason that some provider could work in multiple clinics in same day, when the schedule template will set the default location to NONE.
-
-	// a site has been seleceted
-	if (selectedSite != null) {
-		//get site provider list
-		siteProviderNos = siteDao.getProviderNoBySiteLocation(selectedSite);
-		siteGroups = siteDao.getGroupBySiteLocation(selectedSite);
-	}
-	
-	//get all sites bgColors
-	for (Site st : sites) {
-		siteBgColor.put(st.getName(),st.getBgColor());
-	}
-	
-
-}
-//multisite ends =======================
+	//multisite ends =======================
 %>
 <%@ page import="oscar.dao.*" %>
 <%@ page
@@ -234,17 +236,19 @@ if (bMultisites) {
 
 
 <%
-	String prov =  oscarVariables.getBillingTypeUpperCase();
-	String resourcebaseurl =  oscarVariables.getProperty("resource_base_url");
+	String prov = oscarVariables.getBillingTypeUpperCase();
+	String resourcebaseurl = oscarVariables.getProperty("resource_base_url");
 	
 	UserProperty rbu = userPropertyDao.getProp("resource_baseurl");
-	if(rbu != null) {
+	if(rbu != null)
+	{
 		resourcebaseurl = rbu.getValue();
 	}
 	    
     String resourcehelpHtml = ""; 
     UserProperty rbuHtml = userPropertyDao.getProp("resource_helpHtml");
-    if(rbuHtml != null) {
+    if(rbuHtml != null)
+    {
     	resourcehelpHtml = rbuHtml.getValue();
     }
 
@@ -258,7 +262,9 @@ if (bMultisites) {
 	int year = Integer.parseInt((request.getParameter("year")).trim());
 	int month = Integer.parseInt((request.getParameter("month")).trim());
 	int day = Integer.parseInt((request.getParameter("day")).trim());
-	String strYear=null, strMonth=null, strDay=null;
+	String strYear = null;
+	String strMonth = null;
+	String strDay = null;
 	String strDayOfWeek=null;
 	java.util.ResourceBundle prop = ResourceBundle.getBundle("oscarResources", request.getLocale());
 	String[] arrayDayOfWeek = new String[] {prop.getString("provider.appointmentprovideradminmonth.msgSun"),
@@ -285,22 +291,22 @@ if (bMultisites) {
                                            };
 
 	//verify the input date is really existed
-	now=new GregorianCalendar(year,(month-1),day);
+	now = new GregorianCalendar(year, (month - 1), day);
 	year = now.get(Calendar.YEAR); //month should be the current main display date, not the real now date
-	month = (now.get(Calendar.MONTH)+1);
+	month = (now.get(Calendar.MONTH) + 1);
 	day = now.get(Calendar.DAY_OF_MONTH);
 	int dayOfWeek = now.get(Calendar.DAY_OF_WEEK);
-	strDayOfWeek=arrayDayOfWeek[dayOfWeek-1];
-	strYear=""+year;
-	strMonth=month>9?(""+month):("0"+month);
-	strDay=day>9?(""+day):("0"+day);
+	strDayOfWeek = arrayDayOfWeek[dayOfWeek-1];
+	strYear = "" + year;
+	strMonth = month > 9 ? ("" + month):("0" + month);
+	strDay = day > 9 ? ("" + day):("0" + day);
 
 	List<Map<String, Object>> resultList = null;
 	//initial holiday bean
 	if (scheduleHolidayBean.isEmpty())
 	{
-		for(ScheduleHoliday sd: scheduleHolidayDao.findAfterDate(ConversionUtils.fromDateString((year-1)+"-"+month+"-01"))) {
-			scheduleHolidayBean.put(ConversionUtils.toDateString(sd.getId()), new HScheduleHoliday(sd.getHolidayName()));
+		for(ScheduleHoliday scheduleHoliday: scheduleHolidayDao.findAfterDate(ConversionUtils.fromDateString((year - 1) + "-" + month + "-01"))) {
+			scheduleHolidayBean.put(ConversionUtils.toDateString(scheduleHoliday.getId()), new HScheduleHoliday(scheduleHoliday.getHolidayName()));
 		}
 	}
 	//declare display schedule string
@@ -312,11 +318,11 @@ if (bMultisites) {
 	HScheduleDate aHScheduleDate = null;
   
 	//initial myGrp bean
-	if(providerview.startsWith("_grp_",0))
+	if(providerview.startsWith("_grp_", 0))
 	{
 		String curGrp = providerview.substring(5);
-		for(MyGroup g:myGroupDao.getGroupByGroupNo(curGrp)) {
-			myGrpBean.setProperty(g.getId().getProviderNo(), curGrp);
+		for(MyGroup myGroup:myGroupDao.getGroupByGroupNo(curGrp)) {
+			myGrpBean.setProperty(myGroup.getId().getProviderNo(), curGrp);
 		}
 	}
 	java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
@@ -385,7 +391,7 @@ function popupOscarRx(vheight,vwidth,varpage) { //open a new popup window
 //<!--/oscarMessenger code block -->
 
     function selectprovider(s) {
-        if(s.options[s.selectedIndex].value.indexOf("_grp_")!=-1 ) 
+        if(s.options[s.selectedIndex].value.indexOf("_grp_") != -1 )
         {
             var newGroupNo = s.options[s.selectedIndex].value.substring(5) ;
             <%if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.IsPropertiesOn.isTicklerPlusEnable()){%>
@@ -409,15 +415,17 @@ function popupOscarRx(vheight,vwidth,varpage) { //open a new popup window
 
   
 function refresh1() {
-  var u = self.location.href;
-  if(u.lastIndexOf("&providerview=") > 0) {
-    self.location.href = u.substring(0,u.lastIndexOf("&providerview=")) ;
-  } 
-  if(u.lastIndexOf("&mygroup_no=") > 0) { // group switch should be treated same as provider switch
-		    self.location.href = u.substring(0,u.lastIndexOf("&mygroup_no=")) ;
-  } else {
-  history.go(0);
-  }
+	var u = self.location.href;
+	if(u.lastIndexOf("&providerview=") > 0)
+	{
+		self.location.href = u.substring(0,u.lastIndexOf("&providerview=")) ;
+	}
+	if(u.lastIndexOf("&mygroup_no=") > 0)
+	{ // group switch should be treated same as provider switch
+		self.location.href = u.substring(0,u.lastIndexOf("&mygroup_no=")) ;
+	} else {
+		history.go(0);
+	}
 }
 
 <%-- Refresh tab alerts --%>
@@ -842,23 +850,23 @@ function refreshTabAlerts(id) {
         sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),"A",ps);   
    		
    	} else
-    if(providerview.equals("all") || providerview.startsWith("_grp_",0))
+    if(providerview.equals("all") || providerview.startsWith("_grp_", 0))
     {
-	      param[0] = year+"-"+month+"-"+"1";
-	      param[1] = cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"1";
+	      param[0] = year + "-" + month + "-" + "1";
+	      param[1] = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + "1";
 		  if (selectedSite == null)
 		  {
-		      sds = scheduleDateDao.search_scheduledate_datep(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),"A");
+		      sds = scheduleDateDao.search_scheduledate_datep(ConversionUtils.fromDateString(year + "-" + month + "-" + "01"), ConversionUtils.fromDateString(cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + "01"), "A");
 		  } else {
 	    	  List<String> ps = providerSiteDao.findByProviderNoBySiteName(selectedSite);
-	    	  sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),"A",ps);
+	    	  sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year + "-" + month + "-" + "01"), ConversionUtils.fromDateString(cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + "01"), "A", ps);
 		  }
     } else {
       String[] param1 = new String[3];
-      param1[0] = year+"-"+month+"-"+"1";
-      param1[1] = cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"1";
+      param1[0] = year + "-" + month + "-" + "1";
+      param1[1] = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + "1";
       param1[2] = providerview;
-      sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year+"-"+month+"-"+"01"),ConversionUtils.fromDateString(cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+"01"),"A",Arrays.asList(new String[]{providerview}));
+      sds = scheduleDateDao.search_scheduledate_teamp(ConversionUtils.fromDateString(year + "-" + month + "-" + "01"), ConversionUtils.fromDateString(cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + "01"), "A", Arrays.asList(new String[]{providerview}));
     }
               Iterator<ScheduleDate> it = sds.iterator();
               ScheduleDate date = null;
@@ -919,11 +927,11 @@ function refreshTabAlerts(id) {
 				<table width="98%" border="1" cellspacing="1" cellpadding="6"
 					bgcolor="#99cccc">
 					<tr bgcolor="#CCCCCC">
-						<%  	now=new GregorianCalendar(year,(month-2),day);
+						<%  	now=new GregorianCalendar(year, (month - 2), day);
                   year = now.get(Calendar.YEAR); //month should be the current main display date, not the real now date
-                  month = (now.get(Calendar.MONTH)+1);
+                  month = (now.get(Calendar.MONTH) + 1);
                   day = now.get(Calendar.DAY_OF_MONTH);
-                  aDate = new DateInMonthTable(year, month-1, 1);
+                  aDate = new DateInMonthTable(year, month - 1, 1);
                   dateGrid = aDate.getMonthDateGrid();
             %>
 						<td><b> <a
@@ -1017,16 +1025,16 @@ function refreshTabAlerts(id) {
                 out.println("</tr>");
               }
             %>
-
 						</table>
 						</td>
-						<%  	now=new GregorianCalendar(year,(month+1),day);
-                  year = now.get(Calendar.YEAR); //month should be the current main display date, not the real now date
-                  month = (now.get(Calendar.MONTH)+1);
-                  day = now.get(Calendar.DAY_OF_MONTH);
-                  aDate = new DateInMonthTable(year, month-1, 1);
-                  dateGrid = aDate.getMonthDateGrid();
-            %>
+						<%
+							now = new GregorianCalendar(year,(month + 1), day);
+							year = now.get(Calendar.YEAR); //month should be the current main display date, not the real now date
+							month = (now.get(Calendar.MONTH) + 1);
+							day = now.get(Calendar.DAY_OF_MONTH);
+							aDate = new DateInMonthTable(year, month - 1, 1);
+							dateGrid = aDate.getMonthDateGrid();
+            			%>
 						<td align='right'><b><%= arrayMonthOfYear[(month+11)%12]%>&nbsp;
 						&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <%=year%>-<%=month%> </b><a
 							href="providercontrol.jsp?year=<%=year%>&month=<%=(month)%>&day=<%=day%>&displaymode=month&dboperation=searchappointmentmonth&viewall=<%=viewall%>"
@@ -1119,26 +1127,25 @@ function refreshTabAlerts(id) {
             %>
 
 						</table>
-
 						</td>
 					</tr>
 				</table>
-
 				</td>
 			</tr>
 			<tr>
-				<td BGCOLOR="ivory" width="33%"><a
-					href="providercontrol.jsp?year=<%=year%>&month=<%=(month-1)%>&day=<%=(day)%>&displaymode=month&dboperation=searchappointmentmonth&viewall=<%=viewall%>">
-				&nbsp;&nbsp;<img src="../images/previous.gif" WIDTH="10" HEIGHT="9"
+				<td BGCOLOR="ivory" width="33%">
+					<a href="providercontrol.jsp?year=<%=year%>&month=<%=(month-1)%>&day=<%=(day)%>&displaymode=month&dboperation=searchappointmentmonth&viewall=<%=viewall%>">
+				&nbsp;&nbsp;	<img src="../images/previous.gif" WIDTH="10" HEIGHT="9"
 					BORDER="0" ALT="View Previous MONTH" vspace="2"></a> <b><span
 					CLASS=title><%=strYear%>-<%=strMonth%></span></b> <a
 					href="providercontrol.jsp?year=<%=year%>&month=<%=(month+1)%>&day=<%=day%>&displaymode=month&dboperation=searchappointmentmonth&viewall=<%=viewall%>">
-				<img src="../images/next.gif" WIDTH="10" HEIGHT="9" BORDER="0"
-					ALT="View Next MONTH" vspace="2">&nbsp;&nbsp;</a></td>
+					<img src="../images/next.gif" WIDTH="10" HEIGHT="9" BORDER="0"
+					ALT="View Next MONTH" vspace="2">&nbsp;&nbsp;</a>
+				</td>
 				<TD ALIGN="center" BGCOLOR="ivory" width="33%"></TD>
 				<td ALIGN="RIGHT" BGCOLOR="Ivory">| <a href="../logout.jsp"><bean:message
-					key="provider.appointmentprovideradminmonth.btnlogOut" /> &nbsp;</a></td>
-					
+					key="provider.appointmentprovideradminmonth.btnlogOut" /> &nbsp;</a>
+				</td>
 			</tr>
 		</table>
 		</td>
@@ -1152,9 +1159,11 @@ function refreshTabAlerts(id) {
 // please check documentation there
 document.onkeypress=function(e){
 	evt = e || window.event;  // window.event is the IE equivalent
-	if (evt.altKey) {
+	if (evt.altKey)
+	{
 		//use if (evt.altKey || evt.metaKey) Alt+A (and)/or for Mac when the browser supports it, Command+A
-		switch(evt.keyCode) {
+		switch(evt.keyCode)
+		{
 			case <bean:message key="global.adminShortcut"/> : popupOscarRx(700,687,'../admin/admin.jsp');  return false;  //run code for 'A'dmin
 			case <bean:message key="global.billingShortcut"/> : popupOscarRx(600,1024,'../billing/CA/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;  //code for 'B'illing
 			case <bean:message key="global.calendarShortcut"/> : popupOscarRx(425,430,'../share/CalendarPopup.jsp?urlfrom=../provider/providercontrol.jsp&year=<%=strYear%>&month=<%=strMonth%>&param=<%=URLEncoder.encode("&view=0&displaymode=day&dboperation=searchappointmentday","UTF-8")%>');  return false;  //run code for 'C'alendar
@@ -1197,16 +1206,16 @@ document.onkeypress=function(e){
 			case <bean:message key="global.workflowShortcut"/> : popupOscarRx(700,1024,'../oscarWorkflow/WorkFlowList.jsp','<bean:message key="global.workflow"/>'); return false ; //code for 'W'orkflow
 			case <bean:message key="global.phrShortcut"/> : popupOscarRx('600', '1024','../phr/PhrMessage.do?method=viewMessages','INDIVOMESSENGER2<%=curUser_no%>')
 			default : return;
-               }
+	    }
 	}
-	if (evt.ctrlKey) {
-               switch(evt.keyCode || evt.charCode) {
-			case <bean:message key="global.btnLogoutShortcut"/> : window.open('../logout.jsp','_self');  return false;  // 'Q'uit/log out
-			default : return;
-               }        
-
-        }
+	if (evt.ctrlKey)
+	{
+	   switch(evt.keyCode || evt.charCode)
+	   {
+		case <bean:message key="global.btnLogoutShortcut"/> : window.open('../logout.jsp','_self');  return false;  // 'Q'uit/log out
+		default : return;
+	   }
+	}
 }
-
 </script>
 </html:html>
