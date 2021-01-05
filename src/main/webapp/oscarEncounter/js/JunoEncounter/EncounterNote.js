@@ -317,7 +317,6 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.getNoteColour = function getNoteColour(note)
 	{
-	    console.log(note);
 		if (note.eformData)
 		{
 			return '#008000';
@@ -779,6 +778,15 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	{
 		var deferred = jQuery.Deferred();
 
+		console.log(this.pageState.savingNote);
+		if(this.pageState.savingNote)
+		{
+			deferred.resolve();
+			return deferred.promise();
+		}
+
+		this.pageState.savingNote = true;
+
 		// Clear state
 		this.clearNoteError();
 		this.clearNoteStatus();
@@ -820,8 +828,6 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			issueIdArray.push(jQuery(this).val());
 		});
 
-		// XXX: position, issues flag
-
 		var me = this;
 		junoEncounter.getAssignedIssueArray(issueIdArray, async).then(function(assignedIssueArray)
 		{
@@ -843,7 +849,10 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 					else
 					{
 						// Set the saved note as the current note
-						me.updateNoteInPageState(noteData, assignedIssueArray);
+						me.updateNoteInPageState(response.body, assignedIssueArray);
+						var currentlyEditedNoteDiv = jQuery('div#n' + noteId).parent();
+						me.replaceNoteEntry(currentlyEditedNoteDiv, pageState.currentNoteData, assignedIssueArray, demographicNo, true);
+
 						lastTmpSaveNote = null;
 						me.checkNoteChanged();
 
@@ -858,6 +867,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 						me.setNoteStatus("Note successfully saved");
 
+						me.pageState.savingNote = false;
 						deferred.resolve(response.body);
 					}
 				},
@@ -865,6 +875,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 				{
 					me.setNoteError("Error saving note");
 
+					me.pageState.savingNote = false;
 					deferred.reject();
 				}
 			});
@@ -872,35 +883,6 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 		return deferred.promise();
 	};
-
-	/*
-	this.monitorCaseNote = function monitorCaseNote(e)
-	{
-		var caseNote = 'caseNote_note' + pageState.currentNoteData.noteId;
-
-		var MAXCHARS = 78;
-		var MINCHARS = -10;
-		var newChars = $(caseNote).value.length - numChars;
-		var newline = false;
-
-		if (e.keyCode === 13)
-			newline = true;
-
-		if (newline)
-		{
-			this.adjustCaseNote();
-		}
-		else if (newChars >= MAXCHARS)
-		{
-			this.adjustCaseNote();
-		}
-		else if (newChars <= MINCHARS)
-		{
-			this.adjustCaseNote();
-		}
-
-	};
-	 */
 
 	this.setCaretPosition = function setCaretPosition(input, pos)
 	{
@@ -950,13 +932,13 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			var me = this;
 			this.notesLoader(
 				this.pageData.contextPath,
-				pageState.notesOffset,
+				this.pageState.notesOffset,
 				this.pageData.notesIncrement,
 				demographicNo,
 				false
 			).then(function ()
 			{
-				pageState.notesOffset += me.pageData.notesIncrement;
+				this.pageState.notesOffset += me.pageData.notesIncrement;
 			});
 		}
 	};
@@ -967,35 +949,35 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		var url = "../ws/rs/notes/" + demographicNo + "/all?numToReturn=" + numToReturn +
 		"&offset=" + offset;
 
-		if(jQuery.isArray(pageState.filteredProviders))
+		if(jQuery.isArray(this.pageState.filteredProviders))
 		{
 			//for(var i = 0; i < filteredProviders.length; i++)
-			jQuery.each(pageState.filteredProviders, function(index, value)
+			jQuery.each(this.pageState.filteredProviders, function(index, value)
 			{
 				url += "&providerNoFilter=" + encodeURIComponent(value);
 			});
 		}
 
-		if(jQuery.isArray(pageState.filteredRoles))
+		if(jQuery.isArray(this.pageState.filteredRoles))
 		{
-			jQuery.each(pageState.filteredRoles, function(index, value)
+			jQuery.each(this.pageState.filteredRoles, function(index, value)
 			{
 				url += "&roleNoFilter=" + encodeURIComponent(value);
 			});
 		}
 
-		if(jQuery.isArray(pageState.filteredIssues))
+		if(jQuery.isArray(this.pageState.filteredIssues))
 		{
 			//for(var i = 0; i < filteredIssues.length; i++)
-			jQuery.each(pageState.filteredIssues, function(index, value)
+			jQuery.each(this.pageState.filteredIssues, function(index, value)
 			{
 				url += "&issueFilter=" + encodeURIComponent(value);
 			});
 		}
 
-		if(pageState.filterSort)
+		if(this.pageState.filterSort)
 		{
-			url += "&sortType=" + encodeURIComponent(pageState.filterSort);
+			url += "&sortType=" + encodeURIComponent(this.pageState.filterSort);
 		}
 
 		return url;

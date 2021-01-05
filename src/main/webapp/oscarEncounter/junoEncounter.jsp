@@ -203,6 +203,12 @@
 				notesScrollCheckInterval: null,
 				currentAssignedCMIssues: [],
 				openWindows: new Object(),
+				savingNote: false,
+				filterShows: false,
+				filterSort: null,
+				filteredProviders: [],
+				filteredRoles: [],
+				filteredIssues: [],
 			};
 
 
@@ -996,10 +1002,10 @@
 										<option value="http://search.nlm.nih.gov/medlineplus/query?DISAMBIGUATION=true&amp;FUNCTION=search&amp;SERVER2=server2&amp;SERVER1=server1&amp;PARAMETER=">
 											<bean:message
 													key="global.medlineplus"/></option>
-										<option value="tripsearch.jsp?searchterm=">
+										<option value="../casemgmt/tripsearch.jsp?searchterm=">
 											Trip Database
 										</option>
-										<option value="macplussearch.jsp?searchterm=">
+										<option value="../casemgmt/macplussearch.jsp?searchterm=">
 											MacPlus Database
 										</option>
 									</select>
