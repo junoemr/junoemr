@@ -1540,7 +1540,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 						<tr>
 							<td class="stat"><html:radio property="status" value="1" />
 							</td>
-							<td class="stat"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgNoth" />:
+							<td class="stat"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgNoth" />
 							</td>
 						</tr>
 					</table>
@@ -1579,6 +1579,39 @@ var requestIdKey = "<%=signatureRequestId %>";
 							<td class="stat"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgCompleted" /></td>
 						</tr>
 					</table>
+					</td>
+				</tr>
+				<tr>
+					<td class="tite4" colspan="2">
+						<table>
+							<tr>
+								<td class="stat"><html:radio property="status" value="5" />
+								</td>
+								<td class="stat"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgCancelled" /></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td class="tite4" colspan="2">
+						<table>
+							<tr>
+								<td class="stat"><html:radio property="status" value="6" />
+								</td>
+								<td class="stat"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgApptBooked" /></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td class="tite4" colspan="2">
+						<table>
+							<tr>
+								<td class="stat"><html:radio property="status" value="7" />
+								</td>
+								<td class="stat"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgDeleted" /></td>
+							</tr>
+						</table>
 					</td>
 				</tr>
 				<tr>

@@ -620,18 +620,36 @@
 										{ %>
 										<bean:message
 												key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgND"/>
-										<% } else if (status.equals("2"))
+										<% }
+										else if (status.equals("2"))
 										{ %>
 										<bean:message
 												key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgSR"/>
-										<% } else if (status.equals("3"))
+										<% }
+										else if (status.equals("3"))
 										{ %>
 										<bean:message
 												key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgPR"/>
-										<% } else if (status.equals("4"))
+										<% }
+										else if (status.equals("4"))
 										{ %>
 										<bean:message
 												key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgDONE"/>
+										<% }
+										else if (status.equals("5"))
+										{ %>
+										<bean:message
+												key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgCANCEL"/>
+										<% }
+										else if (status.equals("6"))
+										{ %>
+										<bean:message
+												key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgBOOK"/>
+										<% }
+										else if (status.equals("7"))
+										{ %>
+										<bean:message
+												key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgDEL"/>
 										<% } %>
 									</td>
 									<td class="stat<%=status%>">
