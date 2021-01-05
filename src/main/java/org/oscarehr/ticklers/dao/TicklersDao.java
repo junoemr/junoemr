@@ -196,9 +196,11 @@ public class TicklersDao extends AbstractDao<Tickler> {
 	public List<Tickler> criteriaSearch(AbstractCriteriaSearch criteriaSearch)
 	{
 		Session session = (Session) entityManager.getDelegate();
+
 		Criteria criteria = session.createCriteria(Tickler.class);
 		criteria = criteriaSearch.setCriteriaProperties(criteria);
 
+		criteria.setFetchSize(10);
 		criteria.setFetchMode("ticklerCategory", FetchMode.SELECT);
 		criteria.setFetchMode("updates", FetchMode.SELECT);
 		criteria.setFetchMode("comments", FetchMode.SELECT);
