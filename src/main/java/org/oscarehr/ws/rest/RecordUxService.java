@@ -457,7 +457,6 @@ public class RecordUxService extends AbstractServiceImpl {
 			if(startCal != null && endCal != null){
 				printAllNotesType = true;
 			}
-			
 		}
 		final Calendar startCalf = startCal;
 		final Calendar endCalf = endCal;

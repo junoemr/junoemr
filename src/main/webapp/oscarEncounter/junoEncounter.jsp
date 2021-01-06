@@ -1027,7 +1027,7 @@
 								</security:oscarSec>
 
 								<security:oscarSec roleName="${junoEncounterForm.pageData.roleName}" objectName="_newCasemgmt.templates" rights="r">
-									<select style="width:100px;" onchange="javascript:popupPage(700,700,'Templates',this.value);">
+									<select style="width:100px;" onchange="junoEncounter.openTemplatePage(this.value); return false;">
 										<option value="-1"><bean:message key="oscarEncounter.Header.Templates"/></option>
 										<option value="-1">------------------</option>
 										<security:oscarSec roleName="${junoEncounterForm.pageData.roleName}" objectName="_newCasemgmt.templates" rights="w">

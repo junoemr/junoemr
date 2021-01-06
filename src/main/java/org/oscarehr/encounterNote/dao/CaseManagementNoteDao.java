@@ -986,7 +986,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 
 	public List<CaseManagementNote> findByDemographicAndIssue(Integer demographicNo, Long issueId)
 	{
-		String queryString = "SELECT cm FROM model.CaseManagementNote cm " +
+		String queryString = "SELECT cm FROM model_CaseManagementNote cm " +
 				"WHERE cm.demographic.demographicId=:demographicNo " +
 				"AND :issueId = ANY (" +
 				"	SELECT cin.id.caseManagementIssue.issue.issueId " +
@@ -1001,9 +1001,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 
 	public List<CaseManagementNote> findAllForDemographic(Integer demographicNo)
 	{
-		String queryString = "SELECT cm FROM model.CaseManagementNote cm " +
-				"WHERE cm.demographic.demographicId=:demographicNo " +
-				"AND cm.includeIssueInNote = false";
+		String queryString = "SELECT cm FROM model_CaseManagementNote cm " +
+				"WHERE cm.demographic.demographicId=:demographicNo";
 
 		Query query = entityManager.createQuery(queryString);
 		query.setParameter("demographicNo", demographicNo);

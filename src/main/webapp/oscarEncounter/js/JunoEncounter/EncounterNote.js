@@ -778,7 +778,6 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	{
 		var deferred = jQuery.Deferred();
 
-		console.log(this.pageState.savingNote);
 		if(this.pageState.savingNote)
 		{
 			deferred.resolve();

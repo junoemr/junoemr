@@ -144,8 +144,8 @@ if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncou
 
 	this.printInfo = function printInfo(img, item)
 	{
-		var selected = this.pageData + "/oscarEncounter/graphics/printerGreen.png";
-		var unselected = ctx + "/oscarEncounter/graphics/printer.png";
+		var selected = this.pageData.contextPath + "/oscarEncounter/graphics/printerGreen.png";
+		var unselected = this.pageData.contextPath + "/oscarEncounter/graphics/printer.png";
 
 		if ($F(item) === "true")
 		{
@@ -189,7 +189,7 @@ if (!Juno.OscarEncounter.JunoEncounter.PrintNotes) Juno.OscarEncounter.JunoEncou
 
 	this.removePrintQueue = function removePrintQueue(noteId, idx)
 	{
-		var unselected = ctx + "/oscarEncounter/graphics/printer.png";
+		var unselected = this.pageData.contextPath + "/oscarEncounter/graphics/printer.png";
 		var imgId = "print" + noteId;
 		var tmp = "";
 		var idx2;

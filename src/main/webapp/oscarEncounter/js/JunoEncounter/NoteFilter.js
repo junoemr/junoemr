@@ -225,14 +225,5 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 		console.log(value);
 		console.log(jQuery("input[name='filter_issues'][value='" + value + "']"));
 		jQuery("input[name='filter_issues'][value='" + value + "']").prop("checked", true);
-
-		/*
-	.each(function(index, object)
-		{
-			console.log(object);
-			object.prop("checked", true);
-		});
-
-		 */
 	}
 };
