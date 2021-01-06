@@ -161,9 +161,11 @@ public class CLSHandler extends AHSHandler
 		unstructuredTypes.add(DATA_TYPE_TEXT);
 		unstructuredTypes.add(DATA_TYPE_STRING);
 
-		for (int j = 0; j < this.getOBRCount(); j++) {
-			for(int k=0; k < this.getOBXCount(j); k++) {
-				String obxValueType = getOBXValueType(j,k);
+		for (int j = 0; j < this.getOBRCount(); j++)
+		{
+			for(int k = 0; k < this.getOBXCount(j); k++)
+			{
+				String obxValueType = getOBXValueType(j, k);
 
 				if (!unstructuredTypes.contains(obxValueType))
 				{
