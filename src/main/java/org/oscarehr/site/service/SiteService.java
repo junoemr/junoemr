@@ -24,12 +24,17 @@
 package org.oscarehr.site.service;
 
 import org.oscarehr.common.dao.ProviderSiteDao;
+import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.ProviderSitePK;
+import org.oscarehr.common.model.Site;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SiteService
@@ -37,6 +42,9 @@ public class SiteService
 
 	@Autowired
 	private ProviderSiteDao providerSiteDao;
+
+	@Autowired
+	private SiteDao siteDao;
 
 	/**
 	 * assign the provider to the specified sites.
@@ -104,5 +112,48 @@ public class SiteService
 				}
 			}
 		}
+	}
+
+	/**
+	 * Return a list of active sites to which the specified provider has been assigned
+	 *
+	 * @param providerNo providerNo
+	 * @return List of sites
+	 */
+	public List<Site> getActiveSitesForProvider(String providerNo)
+	{
+		List<ProviderSite> providerSites = providerSiteDao.findByProviderNo(providerNo);
+		Set<Integer> providerSiteIds = providerSites.stream().map(ps -> ps.getId().getSiteId()).collect(Collectors.toSet());
+
+		List<Site> activeSites = siteDao.getAllActiveSites();
+		activeSites = activeSites.stream().filter(s -> providerSiteIds.contains(s.getId())).collect(Collectors.toList());
+		activeSites.sort(Comparator.comparing(Site::getName));
+
+		return activeSites;
+	}
+
+
+	/**
+	 * Determine if the provider is assigned to the specified site.  This method
+	 * will only return true if the provider is assigned to the site, and the site is
+	 * active.
+	 *
+	 * @param siteName name of site
+	 * @param providerId ProviderNo
+	 * @return True if the provider is assigned to the site
+	 */
+	public boolean isProviderAssignedToSite(String providerId, String siteName)
+	{
+		List<Site> providerSites = getActiveSitesForProvider(providerId);
+
+		for (Site providerSite : providerSites)
+		{
+			if (siteName.equals(providerSite.getName()))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
