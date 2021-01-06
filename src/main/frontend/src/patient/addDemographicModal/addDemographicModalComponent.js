@@ -135,15 +135,14 @@ angular.module('Patient').component('addDemographicModal', {
 		};
 
 		let buttonClicked = false;
-		let onAddFinished = false;
 		ctrl.onAdd = function ()
 		{
 			// Only let the user click the button once
-			if (buttonClicked && !onAddFinished)
+			if (buttonClicked)
 			{
 				return;
 			}
-
+			buttonClicked = true;
 		    if (Juno.Common.Util.exists(ctrl.newDemographicData.hin))
             {
                 ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
@@ -151,20 +150,20 @@ angular.module('Patient').component('addDemographicModal', {
 
 			if (ctrl.validateDemographic())
 			{
-				buttonClicked = true;
 				demographicService.saveDemographic(ctrl.newDemographicData).then(
 					function success(results)
 					{
 						ctrl.modalInstance.close(results);
-						onAddFinished = true;
 					},
 					function error(errors)
 					{
 						alert(errors);
 						console.error(errors);
-						onAddFinished = true;
+						buttonClicked = false;
 					}
 				);
+			} else {
+				buttonClicked = false;
 			}
 		}
 	}]
