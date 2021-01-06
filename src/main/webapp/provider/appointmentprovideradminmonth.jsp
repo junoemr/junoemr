@@ -131,7 +131,7 @@ if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.Is
 	  	ectFormNames = ectFormNames.append("&encounterFormName=" + formName);
 	  }
   }
-  
+
   
   boolean isMygroupnoNumber = true;
   
@@ -221,9 +221,11 @@ if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.Is
 	}
 	//multisite ends =======================
 %>
-<%@ page import="oscar.dao.*" %>
 <%@ page
-	import="java.lang.*, java.util.*, java.text.*,java.net.*,java.sql.*,oscar.*"
+	import="java.lang.String, java.util.List, java.util.HashMap, java.util.ArrayList,
+			java.util.Collection, oscar.HScheduleHoliday, oscar.MyDateFormat, oscar.OscarProperties,
+			java.net.URLEncoder, java.util.Calendar, java.util.ResourceBundle, java.util.Arrays,
+			java.util.Map, java.util.Iterator, oscar.HScheduleDate, oscar.DateInMonthTable"
 	errorPage="errorpage.jsp"%>
 <% 
 	oscar.OscarProperties oscarVariables = OscarProperties.getInstance();
@@ -255,9 +257,9 @@ if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.Is
 	MenuBar menuBarController = new MenuBar(request, session);
 	pageContext.setAttribute("menuBarController", menuBarController);
 
-	GregorianCalendar now=new GregorianCalendar();
+	GregorianCalendar now = new GregorianCalendar();
 	int curYear = now.get(Calendar.YEAR); //curYear should be the real now date
-	int curMonth = (now.get(Calendar.MONTH)+1);
+	int curMonth = (now.get(Calendar.MONTH) + 1);
 	int curDay = now.get(Calendar.DAY_OF_MONTH);
 	int year = Integer.parseInt((request.getParameter("year")).trim());
 	int month = Integer.parseInt((request.getParameter("month")).trim());
