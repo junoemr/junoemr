@@ -1,4 +1,5 @@
 import {SystemPreferenceApi} from "../../../generated/api/SystemPreferenceApi";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../common/components/junoComponentConstants";
 
 angular.module('Patient').component('addDemographicModal', {
 	templateUrl: 'src/patient/addDemographicModal/addDemographicModal.jsp',
@@ -56,6 +57,10 @@ angular.module('Patient').component('addDemographicModal', {
 		ctrl.invalidFirstName = false;
 		ctrl.invalidSex = false;
 		ctrl.invalidDob = false;
+
+		ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+		ctrl.buttonClicked = false;
 
 		//get programs to be selected
 		programService.getPrograms().then(
@@ -134,15 +139,10 @@ angular.module('Patient').component('addDemographicModal', {
 			ctrl.modalInstance.dismiss("cancel");
 		};
 
-		let buttonClicked = false;
+		//let buttonClicked = false;
 		ctrl.onAdd = function ()
 		{
-			// Only let the user click the button once
-			if (buttonClicked)
-			{
-				return;
-			}
-			buttonClicked = true;
+			ctrl.buttonClicked = true;
 		    if (Juno.Common.Util.exists(ctrl.newDemographicData.hin))
             {
                 ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
@@ -159,11 +159,13 @@ angular.module('Patient').component('addDemographicModal', {
 					{
 						alert(errors);
 						console.error(errors);
-						buttonClicked = false;
+						ctrl.buttonClicked = false;
 					}
 				);
-			} else {
-				buttonClicked = false;
+			}
+			else
+			{
+				ctrl.buttonClicked = false;
 			}
 		}
 	}]

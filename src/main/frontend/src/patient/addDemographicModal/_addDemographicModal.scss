@@ -1,6 +1,9 @@
 #add-demographic-modal {
 	@include juno-font-default();
-
+	juno-button{
+		max-width: 112px;
+		max-height: 32px;
+	}
 	.add-demographic-content {
 		padding: 10px;
 

@@ -154,7 +154,13 @@
 
 	<modal-footer>
 		<div class="flex flex-row justify-content-center">
-			<button class="btn btn-primary" ng-click="$ctrl.onAdd()">Add</button>
+			<juno-button title="Add"
+						 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+						 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+						 ng-click="$ctrl.onAdd()"
+						 disabled="$ctrl.buttonClicked">
+				Add
+			</juno-button>
 		</div>
 	</modal-footer>
 </juno-modal>
