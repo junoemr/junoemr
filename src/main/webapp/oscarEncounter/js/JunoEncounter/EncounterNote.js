@@ -8,6 +8,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	function EncounterNote(pageData, pageState, junoEncounter)
 {
 	this.pageData = pageData;
+	this.pageState = pageState;
 	this.junoEncounter = junoEncounter;
 
 	var AUTO_SAVE_DELAY = 5000;
@@ -55,6 +56,20 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		pageState.currentNoteData = jQuery.extend(true, {}, noteData);
 		pageState.currentAssignedCMIssues = jQuery.extend(true, [], assignedIssueArray);
 	};
+
+	this.createNewNote = function createNewNote()
+	{
+		var currentNoteId = jQuery("input#editNoteId").val();
+		var noteData = this.getNoteDataById(currentNoteId);
+
+		if(noteData.noteId === 0 && noteData.note.trim() === pageState.currentNoteData.note.trim())
+		{
+			// do nothing, this is already an new, empty note
+			return false;
+		}
+
+		return this.editEncounterNote(null, 0);
+	}
 
 	this.editEncounterNote = function editEncounterNote(event, noteId)
 	{
@@ -107,30 +122,47 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		// Show a warning and offer to save the note if
 		var demographicNo = this.pageData.demographicNo;
 
-		var me = this;
-
-		jQuery.ajax({
-			type: "GET",
-			contentType: "application/json",
-			dataType: "json",
-			url: "../ws/rs/notes/" + demographicNo + "/getNoteToEdit/" + noteId,
-			success: function (result)
+		if(noteId === 0)
+		{
+		    // If there is a note with noteId 0, just create and select it, it's not a real note yet
+			var emptyNote = this.getEmptyNote(this.pageData.providerNo, this.pageData.appointmentNo);
+			var blankIssues = [];
+			var noteDiv = jQuery('div#n' + noteId);
+			if(!noteDiv.length)
 			{
-				var note = result.body.encounterNote;
-				var issues = result.body.assignedCMIssues;
-
-
-				// Show a warning if an unsigned note was created by a different provider
-				var editWarn = (!note.isSigned && note.providerNo !== me.pageData.providerNo);
-
-				if (editWarn && !confirm(pageData.editUnsignedMsg))
-				{
-					return false;
-				}
-
-				me.enableEditMode(noteId, demographicNo, note, issues);
+				var containerDiv = jQuery('div#encMainDiv');
+				var newNoteNode = this.appendNoteEntry(containerDiv, noteId, emptyNote, blankIssues, demographicNo, false);
+				newNoteNode[0].scrollIntoView();
 			}
-		});
+			this.enableEditMode(noteId, demographicNo, emptyNote, blankIssues);
+		}
+		else
+		{
+			var me = this;
+
+			jQuery.ajax({
+				type: "GET",
+				contentType: "application/json",
+				dataType: "json",
+				url: "../ws/rs/notes/" + demographicNo + "/getNoteToEdit/" + noteId,
+				success: function (result)
+				{
+					var note = result.body.encounterNote;
+					var issues = result.body.assignedCMIssues;
+
+
+					// Show a warning if an unsigned note was created by a different provider
+					var editWarn = (!note.isSigned && note.providerNo !== me.pageData.providerNo);
+
+					if (editWarn && !confirm(pageData.editUnsignedMsg))
+					{
+						return false;
+					}
+
+					me.enableEditMode(noteId, demographicNo, note, issues);
+				}
+			});
+		}
 
 		return false;
 	};
@@ -140,6 +172,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		// Disable any notes currently being edited
 		var currentlyEditedNoteId = jQuery('input#editNoteId').val();
 		var currentlyEditedNoteDiv = jQuery('div#n' + currentlyEditedNoteId).parent();
+
 
 		this.replaceNoteEntry(currentlyEditedNoteDiv, pageState.currentNoteData, null, demographicNo, false);
 
@@ -151,6 +184,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 		this.adjustCaseNote();
 		this.observeTextArea();
+		this.focusTextArea();
 		this.setSaveButtonVisibility();
 	};
 
@@ -158,7 +192,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	{
 		var textAreaName = this.getEditTextAreaName();
 
-		if(textAreaName != null)
+		if(textAreaName != null && $(textAreaName) != undefined)
 		{
 			Element.observe(textAreaName, 'keyup', this.adjustCaseNote);
 		}
@@ -168,9 +202,19 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	{
 		var textAreaName = this.getEditTextAreaName();
 
-		if(textAreaName != null)
+		if(textAreaName != null && $(textAreaName) != undefined)
 		{
 			Element.stopObserving(textAreaName, 'keyup', this.adjustCaseNote);
+		}
+	};
+
+	this.focusTextArea = function focusTextArea()
+	{
+		var textAreaName = this.getEditTextAreaName();
+
+		if(textAreaName != null && $(textAreaName) != undefined)
+		{
+			this.setCaretPosition($(textAreaName), $(textAreaName).value.length);
 		}
 	};
 
@@ -209,7 +253,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			return null;
 		}
 
-		var index = elementId.substring(1);
+		var index = elementId.substring(2);
 		var newNode = this.buildNoteEntry(index, note, issues, demographicNo, enableEdit);
 		var returnNode = nodeToReplace.replaceWith(newNode);
 
@@ -264,16 +308,14 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	{
 		return !(
 			note.document ||
-			note.rxAnnotation ||
 			note.eformData ||
 			note.encounterForm ||
 			note.invoice ||
-			note.ticklerNote ||
-			note.cpp
+			(note.cpp && !note.ticklerNote)
 		);
 	};
 
-	this.getNoteColor = function getNoteColor(note)
+	this.getNoteColour = function getNoteColour(note)
 	{
 		if (note.eformData)
 		{
@@ -309,7 +351,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			return '#996633';
 		}
 
-		return '#000000';
+		return '#CCCCFF';
 	};
 
 	this.getEncounterSectionUrl = function getEncounterSectionUrl(sectionName, demographicNo, appointmentNo, limit, offset)
@@ -331,7 +373,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			appointmentNo + limitString + offsetString;
 	};
 
-	this.displayNotes = function displayNotes(demographicNo, noteArray, noteToEdit, issues, scrollToBottom, offset)
+	this.displayNotes = function displayNotes(demographicNo, noteArray, noteToEdit, tmpSave, issues, scrollToBottom, offset)
 	{
 		var containerDiv = jQuery('div#encMainDiv');
 
@@ -351,19 +393,28 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			if (me.isEncounterNote(note))
 			{
 				var noteData = note;
-				var noteIssues = null;
-				var editThisNote = (offset === 0 && note.uuid === noteToEditUuid);
-				if (editThisNote)
+				var noteIssues = [];
+				var editThisNote = false;
+				if (offset === 0 && note.uuid === noteToEditUuid)
 				{
 					foundNoteToEdit = true;
+					editThisNote = true;
 					noteData = noteToEdit;
 					noteIssues = issues;
 				}
+				else if(tmpSave && tmpSave.noteId === note.noteId)
+				{
+					foundNoteToEdit = true;
+					editThisNote = true;
+					noteData.noteId = tmpSave.noteId;
+					noteData.note = tmpSave.note;
+				}
+
 				noteNode = me.prependNoteEntry(containerDiv, index + offset + 1, noteData, noteIssues, demographicNo, editThisNote);
 			}
 			else
 			{
-				noteNode = me.buildNonNoteEntry(containerDiv, index + offset, note, demographicNo);
+				noteNode = me.prependNonNoteEntry(containerDiv, index + offset, note, demographicNo);
 			}
 
 			if (firstNoteNode === null)
@@ -398,7 +449,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	};
 
 
-	this.buildNonNoteEntry = function buildNonNoteEntry(containerDiv, index, note, demographicNo)
+	this.prependNonNoteEntry = function prependNonNoteEntry(containerDiv, index, note, demographicNo)
 	{
 		var appointmentNo = this.pageData.appointmentNo;
 
@@ -463,7 +514,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		var templateParameters = {
 			index: index,
 			note: note,
-			colour: this.getNoteColor(note),
+			colour: this.getNoteColour(note),
 			noteLineArray: note.note.split("\n"),
 			formattedObservationDate: date.format('DD-MMM-YYYY H:mm'),
 			onClickString: onClickString,
@@ -480,6 +531,11 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	this.buildNoteEntry = function buildNoteEntry(index, note, issues, demographicNo, enableEdit)
 	{
+	    if(enableEdit)
+		{
+			this.updateNoteInPageState(note, issues);
+		}
+
 		var date = moment(note.observationDate);
 		var formattedDate = "";
 		var formattedDateTime = "";
@@ -490,10 +546,6 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		}
 		var hideBeforeMoment = moment(this.pageData.encounterNoteHideBeforeDate);
 		var observationMoment = moment(note.observationDate);
-		console.log(date);
-		console.log(observationMoment);
-		console.log(hideBeforeMoment);
-		console.log(hideBeforeMoment.isAfter(observationMoment));
 
 		// Make annotation url
 		var annotationLabel = "anno" + moment().unix();
@@ -510,6 +562,8 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		{
 			selectedEncounterType = note.encounterType;
 		}
+
+		var noteColour = this.getNoteColour(note);
 
 		var templateParameters = {
 			index: index,
@@ -529,6 +583,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			assignedIssuesTitle: this.pageData.assignedIssuesTitle,
 			referenceResolvedIssuesTitle: this.pageData.referenceResolvedIssuesTitle,
 			referenceUnresolvedIssuesTitle: this.pageData.referenceUnresolvedIssuesTitle,
+			colour: noteColour,
 		};
 
 		return jQuery('#encounterNoteTemplate').tmpl(templateParameters);
@@ -723,6 +778,14 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	{
 		var deferred = jQuery.Deferred();
 
+		if(this.pageState.savingNote)
+		{
+			deferred.resolve();
+			return deferred.promise();
+		}
+
+		this.pageState.savingNote = true;
+
 		// Clear state
 		this.clearNoteError();
 		this.clearNoteStatus();
@@ -761,11 +824,8 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			"#noteIssueIdList input:checkbox[name=issue_id]:checked, #noteIssues input:checkbox[name=issue_id]:checked"
 		).each(function()
 		{
-			console.log(jQuery(this).val());
 			issueIdArray.push(jQuery(this).val());
 		});
-
-		// XXX: position, issues flag
 
 		var me = this;
 		junoEncounter.getAssignedIssueArray(issueIdArray, async).then(function(assignedIssueArray)
@@ -788,7 +848,10 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 					else
 					{
 						// Set the saved note as the current note
-						me.updateNoteInPageState(noteData, assignedIssueArray);
+						me.updateNoteInPageState(response.body, assignedIssueArray);
+						var currentlyEditedNoteDiv = jQuery('div#n' + noteId).parent();
+						me.replaceNoteEntry(currentlyEditedNoteDiv, pageState.currentNoteData, assignedIssueArray, demographicNo, true);
+
 						lastTmpSaveNote = null;
 						me.checkNoteChanged();
 
@@ -803,14 +866,15 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 						me.setNoteStatus("Note successfully saved");
 
+						me.pageState.savingNote = false;
 						deferred.resolve(response.body);
 					}
 				},
 				error: function (response)
 				{
 					me.setNoteError("Error saving note");
-					console.log(response);
 
+					me.pageState.savingNote = false;
 					deferred.reject();
 				}
 			});
@@ -818,35 +882,6 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 		return deferred.promise();
 	};
-
-	/*
-	this.monitorCaseNote = function monitorCaseNote(e)
-	{
-		var caseNote = 'caseNote_note' + pageState.currentNoteData.noteId;
-
-		var MAXCHARS = 78;
-		var MINCHARS = -10;
-		var newChars = $(caseNote).value.length - numChars;
-		var newline = false;
-
-		if (e.keyCode === 13)
-			newline = true;
-
-		if (newline)
-		{
-			this.adjustCaseNote();
-		}
-		else if (newChars >= MAXCHARS)
-		{
-			this.adjustCaseNote();
-		}
-		else if (newChars <= MINCHARS)
-		{
-			this.adjustCaseNote();
-		}
-
-	};
-	 */
 
 	this.setCaretPosition = function setCaretPosition(input, pos)
 	{
@@ -896,13 +931,13 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			var me = this;
 			this.notesLoader(
 				this.pageData.contextPath,
-				pageState.notesOffset,
+				this.pageState.notesOffset,
 				this.pageData.notesIncrement,
 				demographicNo,
 				false
 			).then(function ()
 			{
-				pageState.notesOffset += me.pageData.notesIncrement;
+				this.pageState.notesOffset += me.pageData.notesIncrement;
 			});
 		}
 	};
@@ -913,35 +948,35 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		var url = "../ws/rs/notes/" + demographicNo + "/all?numToReturn=" + numToReturn +
 		"&offset=" + offset;
 
-		if(jQuery.isArray(pageState.filteredProviders))
+		if(jQuery.isArray(this.pageState.filteredProviders))
 		{
 			//for(var i = 0; i < filteredProviders.length; i++)
-			jQuery.each(pageState.filteredProviders, function(index, value)
+			jQuery.each(this.pageState.filteredProviders, function(index, value)
 			{
 				url += "&providerNoFilter=" + encodeURIComponent(value);
 			});
 		}
 
-		if(jQuery.isArray(pageState.filteredRoles))
+		if(jQuery.isArray(this.pageState.filteredRoles))
 		{
-			jQuery.each(pageState.filteredRoles, function(index, value)
+			jQuery.each(this.pageState.filteredRoles, function(index, value)
 			{
 				url += "&roleNoFilter=" + encodeURIComponent(value);
 			});
 		}
 
-		if(jQuery.isArray(pageState.filteredIssues))
+		if(jQuery.isArray(this.pageState.filteredIssues))
 		{
 			//for(var i = 0; i < filteredIssues.length; i++)
-			jQuery.each(pageState.filteredIssues, function(index, value)
+			jQuery.each(this.pageState.filteredIssues, function(index, value)
 			{
 				url += "&issueFilter=" + encodeURIComponent(value);
 			});
 		}
 
-		if(pageState.filterSort)
+		if(this.pageState.filterSort)
 		{
-			url += "&sortType=" + encodeURIComponent(pageState.filterSort);
+			url += "&sortType=" + encodeURIComponent(this.pageState.filterSort);
 		}
 
 		return url;
@@ -1008,21 +1043,17 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 					noteToEdit.note = me.getFormattedReason();
 				}
 
-				if(tmpSave)
-				{
-					noteToEdit.note = tmpSave;
-				}
-
 				me.updateNoteInPageState(noteToEdit, issues);
 
 				$("notesLoading").style.display = "none";
-				me.displayNotes(demographicNo, response.body.notelist, noteToEdit, issues,
+				me.displayNotes(demographicNo, response.body.notelist, noteToEdit, tmpSave, issues,
 					scrollToBottom, offset);
 
 				me.adjustCaseNote();
 				me.observeTextArea();
 				me.setSaveButtonVisibility();
 				me.setTmpSaveTimer();
+				me.focusTextArea();
 
 				if (typeof response !== undefined && 'body' in response)
 				{

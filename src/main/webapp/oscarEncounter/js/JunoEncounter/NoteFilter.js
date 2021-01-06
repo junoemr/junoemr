@@ -8,18 +8,19 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 	function NoteFilter(pageData, pageState, encounterNote)
 {
 	this.pageData = pageData;
+	this.pageState = pageState;
 	this.encounterNote = encounterNote;
 
-	var filterShows = false;
-	var filterSort = null;
-	var filteredProviders = [];
-	var filteredRoles = [];
-	var filteredIssues = [];
+	//var filterShows = false;
+	//var filterSort = null;
+	//var filteredProviders = [];
+	//var filteredRoles = [];
+	//var filteredIssues = [];
 
 	this.showFilter = function showFilter()
 	{
 
-		if (filterShows)
+		if (this.pageState.filterShows)
 		{
 			new Effect.BlindUp('filter');
 		}
@@ -28,15 +29,15 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 			new Effect.BlindDown('filter');
 		}
 
-		filterShows = !filterShows;
+		this.pageState.filterShows = !this.pageState.filterShows;
 	};
 
 	this.hideFilter = function hideFilter()
 	{
-		if(filterShows)
+		if(this.pageState.filterShows)
 		{
 			jQuery('#filter').hide();
-			filterShows = false;
+			this.pageState.filterShows = false;
 		}
 	};
 
@@ -98,11 +99,12 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 
 
 		// Clear filters
-		filterSort = null;
-		filteredProviders = [];
-		filteredRoles = [];
-		filteredIssues = [];
+		this.pageState.filterSort = null;
+		this.pageState.filteredProviders = [];
+		this.pageState.filteredRoles = [];
+		this.pageState.filteredIssues = [];
 
+		var me = this;
 		jQuery("input[name=filter_providers]:checked").each(function(index, object)
 		{
 			if(object.value === 'a')
@@ -110,7 +112,7 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 				return;
 			}
 
-			filteredProviders.push(object.value);
+			me.pageState.filteredProviders.push(object.value);
 		});
 
 		jQuery("input[name=filter_roles]:checked").each(function(index, object)
@@ -120,7 +122,7 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 				return;
 			}
 
-			filteredRoles.push(object.value);
+			me.pageState.filteredRoles.push(object.value);
 		});
 
 		jQuery("input[name=filter_issues]:checked").each(function(index, object)
@@ -130,14 +132,14 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 				return;
 			}
 
-			filteredIssues.push(object.value);
+			me.pageState.filteredIssues.push(object.value);
 		});
 
 		var note_sort = jQuery("input[name=note_sort]:checked");
 
 		if(note_sort.val())
 		{
-			filterSort = note_sort.val();
+			me.pageState.filterSort = note_sort.val();
 		}
 
 		// Clear current encounter notes
@@ -172,22 +174,22 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 	{
 		this.showFiltersOfType(
 			"appliedFiltersProviders",
-			filteredProviders,
+			this.pageState.filteredProviders,
 			"#filter_provider_name"
 		);
 		this.showFiltersOfType(
 			"appliedFiltersRoles",
-			filteredRoles,
+			this.pageState.filteredRoles,
 			"#filter_role_name"
 		);
 		this.showFiltersOfType(
 			"appliedFiltersSort",
-			[filterSort],
+			[this.pageState.filterSort],
 			"#filter_sort_name"
 		);
 		this.showFiltersOfType(
 			"appliedFiltersIssues",
-			filteredIssues,
+			this.pageState.filteredIssues,
 			"#filter_issue_name"
 		);
 	};
@@ -223,14 +225,5 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 		console.log(value);
 		console.log(jQuery("input[name='filter_issues'][value='" + value + "']"));
 		jQuery("input[name='filter_issues'][value='" + value + "']").prop("checked", true);
-
-		/*
-	.each(function(index, object)
-		{
-			console.log(object);
-			object.prop("checked", true);
-		});
-
-		 */
 	}
 };

@@ -23,6 +23,7 @@
 package org.oscarehr.encounterNote.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,11 +72,12 @@ public class CaseManagementNoteLinkDao extends AbstractDao<CaseManagementNoteLin
 	}
 	public CaseManagementNoteLink getNoteLinkByTableIdAndTableName(Integer noteId, Integer tableName)
 	{
-		String jpql = "SELECT c \n" +
-				"FROM model_CaseManagementNoteLink c \n" +
-				"WHERE c.tableId = :noteId\n" +
-				"AND c.tableName = :tableName\n" +
-				"ORDER BY c.id DESC";
+		// select model name must match specified @Entity name in model object
+		String jpql = "SELECT x \n" +
+				"FROM model_CaseManagementNoteLink x \n" +
+				"WHERE x.tableId = :noteId\n" +
+				"AND x.tableName = :tableName\n" +
+				"ORDER BY x.note.noteId DESC";
 
 		Query query = entityManager.createQuery(jpql);
 		query.setParameter("noteId", noteId);
@@ -86,17 +88,33 @@ public class CaseManagementNoteLinkDao extends AbstractDao<CaseManagementNoteLin
 	}
 	public CaseManagementNoteLink getNoteLinkByTableIdAndTableName(Integer noteId, Integer tableName, String otherId)
 	{
-		String jpql = "SELECT c \n" +
-				"FROM model_CaseManagementNoteLink c \n" +
-				"WHERE c.tableId = :noteId\n" +
-				"AND c.tableName = :tableName\n" +
-				"AND c.otherId = :otherId\n" +
-				"ORDER BY c.id DESC";
+		// select model name must match specified @Entity name in model object
+		String jpql = "SELECT x \n" +
+				"FROM model_CaseManagementNoteLink x \n" +
+				"WHERE x.tableId = :noteId\n" +
+				"AND x.tableName = :tableName\n" +
+				"AND x.otherId = :otherId\n" +
+				"ORDER BY x.note.noteId DESC";
 
 		Query query = entityManager.createQuery(jpql);
 		query.setParameter("noteId", noteId);
 		query.setParameter("tableName", tableName);
 		query.setParameter("otherId", otherId);
+		query.setMaxResults(1);
+
+		return this.getSingleResultOrNull(query);
+	}
+
+	public CaseManagementNoteLink getNoteLinkByNoteIdAndTableName(CaseManagementNote note, Integer tableName)
+	{
+		String jpql = "SELECT c \n" +
+				"FROM model_CaseManagementNoteLink c \n" +
+				"WHERE c.note = :note\n" +
+				"AND c.tableName = :tableName\n";
+
+		Query query = entityManager.createQuery(jpql);
+		query.setParameter("note", note);
+		query.setParameter("tableName", tableName);
 		query.setMaxResults(1);
 
 		return this.getSingleResultOrNull(query);

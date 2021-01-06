@@ -122,8 +122,9 @@ public class CaseManagementPrint {
 		else
 		{
 			notes = getNotesToPrint(noteIds, loggedInInfo, demoNo);
-			notes = filterNotesByDate(notes, startDate, endDate);
 		}
+
+		notes = filterNotesByDate(notes, startDate, endDate);
 
 		HashMap<String, List<CaseManagementNote>> cpp = null;
 

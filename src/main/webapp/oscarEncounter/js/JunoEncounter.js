@@ -543,4 +543,12 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 			delay: 100
 		});
 	};
+
+	this.openTemplatePage = function openTemplatePage(selectedValue)
+	{
+	    if(selectedValue !== "-1")
+		{
+			popupPage(700,700,'Templates',selectedValue);
+		}
+	};
 };

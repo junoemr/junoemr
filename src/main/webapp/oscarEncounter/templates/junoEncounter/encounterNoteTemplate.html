@@ -24,6 +24,7 @@
                 onclick="printNotes.togglePrint('\${note.noteId}', event)"
                 style="float: right; margin-right: 5px; margin-top: 2px;"
                 src="\${contextPath}/oscarEncounter/graphics/printer.png" />
+        {{if !note.ticklerNote}}
         <a
                 title="Edit"
                 id="minimizedEdit\${note.noteId}"
@@ -33,6 +34,7 @@
 
             Edit
         </a>
+        {{/if}}
         <input
                 type="image"
                 id="minimizedAnno\${note.noteId}"
@@ -132,7 +134,7 @@
             </div>
         {{/if}}
 
-        <div id="sig\${note.noteId}" class="sig" style="clear:both;color:#000000;background-color:#CCCCFF;">
+        <div id="sig\${note.noteId}" class="sig" style="clear:both;color:#000000;background-color:\${colour};">
             <div id="sumary\${note.noteId}">
                 <div id="observation\${note.noteId}" style="font-size: 11px; float: right; margin-right: 3px;">
                     Encounter Date:&nbsp;

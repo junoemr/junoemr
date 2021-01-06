@@ -203,6 +203,12 @@
 				notesScrollCheckInterval: null,
 				currentAssignedCMIssues: [],
 				openWindows: new Object(),
+				savingNote: false,
+				filterShows: false,
+				filterSort: null,
+				filteredProviders: [],
+				filteredRoles: [],
+				filteredIssues: [],
 			};
 
 
@@ -996,10 +1002,10 @@
 										<option value="http://search.nlm.nih.gov/medlineplus/query?DISAMBIGUATION=true&amp;FUNCTION=search&amp;SERVER2=server2&amp;SERVER1=server1&amp;PARAMETER=">
 											<bean:message
 													key="global.medlineplus"/></option>
-										<option value="tripsearch.jsp?searchterm=">
+										<option value="../casemgmt/tripsearch.jsp?searchterm=">
 											Trip Database
 										</option>
-										<option value="macplussearch.jsp?searchterm=">
+										<option value="../casemgmt/macplussearch.jsp?searchterm=">
 											MacPlus Database
 										</option>
 									</select>
@@ -1021,7 +1027,7 @@
 								</security:oscarSec>
 
 								<security:oscarSec roleName="${junoEncounterForm.pageData.roleName}" objectName="_newCasemgmt.templates" rights="r">
-									<select style="width:100px;" onchange="javascript:popupPage(700,700,'Templates',this.value);">
+									<select style="width:100px;" onchange="junoEncounter.openTemplatePage(this.value); return false;">
 										<option value="-1"><bean:message key="oscarEncounter.Header.Templates"/></option>
 										<option value="-1">------------------</option>
 										<security:oscarSec roleName="${junoEncounterForm.pageData.roleName}" objectName="_newCasemgmt.templates" rights="w">
@@ -1093,7 +1099,7 @@
 									   title='<bean:message key="oscarEncounter.Index.btnSave"/>'>&nbsp;
 								<input tabindex="18" type='image'
 									   src="<c:out value="${ctx}/oscarEncounter/graphics/document-new.png"/>"
-									   id="newNoteImg" onclick="newNote(event); return false;"
+									   id="newNoteImg" onclick="Event.stop(event); return encounterNote.createNewNote(); return false;"
 									   title='<bean:message key="oscarEncounter.Index.btnNew"/>'>&nbsp;
 								<input tabindex="19" type='image'
 									   src="<c:out value="${ctx}/oscarEncounter/graphics/note-save.png"/>"

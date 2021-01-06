@@ -485,7 +485,7 @@ div.encMainDiv input.observationDate {
 	border: none;
 	width: 140px;
 	color: #000000;
-	background-color: #CCCCFF;
+	background-color: inherit;
 }
 
 .encounter_timer_container {

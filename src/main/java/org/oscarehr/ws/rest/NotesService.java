@@ -51,6 +51,7 @@ import org.oscarehr.casemgmt.web.NoteDisplayLocal;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.encounterNote.converter.CaseManagementTmpSaveConverter;
 import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
@@ -67,6 +68,7 @@ import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.TicklerNoteResponse;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
+import org.oscarehr.ws.rest.to.model.CaseManagementTmpSaveTo1;
 import org.oscarehr.ws.rest.to.model.IssueTo1;
 import org.oscarehr.ws.rest.to.model.NoteExtTo1;
 import org.oscarehr.ws.rest.to.model.NoteIssueTo1;
@@ -156,6 +158,9 @@ public class NotesService extends AbstractServiceImpl
 
 	@Autowired
 	CaseManagementTmpSaveDao caseManagementTmpSaveDao;
+
+	@Autowired
+	CaseManagementTmpSaveConverter caseManagementTmpSaveConverter;
 
 	
 	@GET
@@ -890,7 +895,7 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/{demographicNo}/tmpSave")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<String> getTmpSave(@PathParam("demographicNo") Integer demographicNo)
+	public RestResponse<CaseManagementTmpSaveTo1> getTmpSave(@PathParam("demographicNo") Integer demographicNo)
 	{
 		LoggedInInfo loggedInInfo =  getLoggedInInfo();
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
@@ -898,11 +903,7 @@ public class NotesService extends AbstractServiceImpl
 
 		CaseManagementTmpSave tmpSave = caseManagementTmpSaveDao.find(providerNo, demographicNo, programId);
 
-		String note = null;
-		if(tmpSave != null)
-		{
-			note = tmpSave.getNote();
-		}
+		CaseManagementTmpSaveTo1 note = caseManagementTmpSaveConverter.convertCasemanagementTmpSaveToCaseManagementTmpSaveTo1(tmpSave);
 
 		return RestResponse.successResponse(note);
 	}
