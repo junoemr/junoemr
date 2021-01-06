@@ -39,7 +39,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class DemographicManagerTest extends DaoTestFixtures
+public class DemographicManagerTest
 {
 	@Autowired
 	@InjectMocks
@@ -51,13 +51,14 @@ public class DemographicManagerTest extends DaoTestFixtures
 	@Mock
 	private DemographicDao demographicDao;
 
-	LoggedInInfo loggedInInfo;
-	Demographic demographic;
+	private LoggedInInfo loggedInInfo;
+	private Demographic demographic;
 
 	@Before
 	public void setUp()
 	{
 		MockitoAnnotations.initMocks(this);
+		DaoTestFixtures.setupBeanFactory();
 
 		Provider provider = new Provider();
 		provider.setProviderNo("999998"); // Admin Provider No.
@@ -75,6 +76,7 @@ public class DemographicManagerTest extends DaoTestFixtures
 		demographic.setYearOfBirth("1970");
 		demographic.setMonthOfBirth("01");
 		demographic.setDateOfBirth("01");
+		demographic.setDemographicNo(123456789);
 	}
 
 	@Test
