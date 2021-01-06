@@ -62,6 +62,9 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 	public static final String STATUS_APPT_BOOK = "6";
 	public static final String STATUS_DELETE = "7";
 
+	public static final String URGENCY_URGENT = "1";
+	public static final String URGENCY_NON_URGENT = "2";
+	public static final String URGENCY_RETURN = "3";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
