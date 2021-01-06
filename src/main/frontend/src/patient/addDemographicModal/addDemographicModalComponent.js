@@ -139,7 +139,6 @@ angular.module('Patient').component('addDemographicModal', {
 			ctrl.modalInstance.dismiss("cancel");
 		};
 
-		//let buttonClicked = false;
 		ctrl.onAdd = function ()
 		{
 			ctrl.buttonClicked = true;
