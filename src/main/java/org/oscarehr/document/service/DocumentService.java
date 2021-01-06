@@ -32,11 +32,16 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.PatientLabRouting;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.DocumentModelToDbConverter;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,6 +58,7 @@ import oscar.util.ConversionUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -83,6 +89,12 @@ public class DocumentService
 	@Autowired
 	private DocumentModelToDbConverter documentModelToDbConverter;
 
+	@Autowired
+	private EncounterNoteService encounterNoteService;
+
+	@Autowired
+	private ProviderService providerService;
+
 	/**
 	 * Create a new document from the given document model and a file
 	 * This method will move the file to the documents directory and persist the record
@@ -106,16 +118,40 @@ public class DocumentService
 		return uploadNewDemographicDocumentLogic(document, file, demographicNo);
 	}
 
-	public Document uploadNewDemographicDocument(org.oscarehr.demographicImport.model.document.Document documentModel, Integer demographicNo) throws IOException
+	public Document uploadNewDemographicDocument(org.oscarehr.demographicImport.model.document.Document documentModel, Demographic demographic) throws IOException
 	{
-		return uploadNewDemographicDocument(documentModelToDbConverter.convert(documentModel), documentModel.getFile(), demographicNo);
+		Document dbDocument = uploadNewDemographicDocument(documentModelToDbConverter.convert(documentModel), documentModel.getFile(), demographic.getId());
+
+		String annotation = documentModel.getAnnotation();
+		if (annotation != null)
+		{
+			ProviderData providerData = providerService.getProvider(dbDocument.getDoccreator());
+			CaseManagementNote documentNote = new CaseManagementNote();
+			documentNote.setProvider(providerData);
+			documentNote.setSigningProvider(providerData);
+			documentNote.setDemographic(demographic);
+			documentNote.setNote(annotation);
+			documentNote.setObservationDate(dbDocument.getObservationdate());
+			encounterNoteService.saveDocumentNote(documentNote, dbDocument);
+		}
+
+		if(dbDocument.getReviewer() != null)
+		{
+			this.routeToProviderInbox(dbDocument.getDocumentNo(), true, dbDocument.getDoccreator(), dbDocument.getResponsible(), dbDocument.getReviewer());
+		}
+		else
+		{
+			this.routeToProviderInbox(dbDocument.getDocumentNo(), true, dbDocument.getDoccreator(), dbDocument.getResponsible());
+		}
+
+		return dbDocument;
 	}
 
-	public void uploadAllNewDemographicDocument(List<org.oscarehr.demographicImport.model.document.Document> documentModels, Integer demographicNo) throws IOException
+	public void uploadAllNewDemographicDocument(List<org.oscarehr.demographicImport.model.document.Document> documentModels, Demographic demographic) throws IOException
 	{
 		for(org.oscarehr.demographicImport.model.document.Document documentModel : documentModels)
 		{
-			uploadNewDemographicDocument(documentModel, demographicNo);
+			uploadNewDemographicDocument(documentModel, demographic);
 		}
 	}
 

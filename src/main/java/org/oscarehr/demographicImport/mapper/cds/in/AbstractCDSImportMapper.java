@@ -259,6 +259,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		if(fullOrPartial != null)
 		{
 			LocalDateTime dateTime = fillPartialCalendar(
+					fullOrPartial.getFullDateTime(),
 					fullOrPartial.getFullDate(),
 					fullOrPartial.getYearMonth(),
 					fullOrPartial.getYearOnly());

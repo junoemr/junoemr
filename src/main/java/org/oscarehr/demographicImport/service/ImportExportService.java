@@ -219,7 +219,7 @@ public class ImportExportService
 
 		persistPreventions(demographic, dbDemographic);
 
-		documentService.uploadAllNewDemographicDocument(demographic.getDocumentList(), dbDemographic.getDemographicId());
+		documentService.uploadAllNewDemographicDocument(demographic.getDocumentList(), dbDemographic);
 	}
 
 	private void persistNotes(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)

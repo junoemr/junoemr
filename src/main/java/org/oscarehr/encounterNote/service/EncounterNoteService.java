@@ -27,6 +27,7 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.note.EncounterNoteModelToDbConverter;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.model.CaseManagementIssue;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
@@ -155,6 +156,22 @@ public class EncounterNoteService extends BaseNoteService
 		CaseManagementNoteLink link = new CaseManagementNoteLink();
 		link.setNote(note);
 		link.setDrug(drug.getId());
+		caseManagementNoteLinkDao.persist(link);
+
+		return note;
+	}
+
+	public CaseManagementNote saveDocumentNote(CaseManagementNote note, Document document)
+	{
+		note.setIncludeIssueInNote(true);
+		note.setSigned(true);
+		note.setArchived(false);
+
+		note = saveNote(note);
+
+		CaseManagementNoteLink link = new CaseManagementNoteLink();
+		link.setNote(note);
+		link.setDocument(document.getId());
 		caseManagementNoteLinkDao.persist(link);
 
 		return note;
