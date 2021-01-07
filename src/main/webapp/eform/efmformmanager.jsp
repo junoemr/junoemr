@@ -122,7 +122,7 @@
 	  if (iFrame)
 	  {
 		  var newHeight = 0;
-		  if (iFrame.contentWindow.document.body.scrollHeight)
+		  if (iFrame.contentWindow?.document?.body?.scrollHeight)
 		  {
 			  newHeight = iFrame.contentWindow.document.body.scrollHeight;
 		  }
