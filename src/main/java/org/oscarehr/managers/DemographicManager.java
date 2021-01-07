@@ -913,6 +913,12 @@ public class DemographicManager {
 			has_error = true;
 		}
 
+		if (demographic.getDateJoined() == null)t add
+		{
+			Date newDateJoined = new Date();
+			demographic.setDateJoined(newDateJoined);
+		}
+
 		if (demographic.getYearOfBirth() == null)
 		{
 			error_string += "yearOfBirth is a required field.  ";
