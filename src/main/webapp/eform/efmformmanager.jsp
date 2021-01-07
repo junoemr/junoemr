@@ -119,9 +119,14 @@
   // Source: stackoverflow.com/a/9976309
   function resizeIFrame(iFrame)
   {
-	  if(iFrame) {
-		  iFrame.height = "";
-		  iFrame.height = iFrame.contentWindow.document.body.scrollHeight + "px";
+	  if (iFrame)
+	  {
+		  var newHeight = 0;
+		  if (iFrame.contentWindow.document.body.scrollHeight)
+		  {
+			  newHeight = iFrame.contentWindow.document.body.scrollHeight;
+		  }
+		  iFrame.height = newHeight + "px";
 	  }
   }
 
