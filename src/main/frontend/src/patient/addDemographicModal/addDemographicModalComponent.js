@@ -143,34 +143,25 @@ angular.module('Patient').component('addDemographicModal', {
 		{
 			ctrl.buttonClicked = true;
 
-			try
+			if (Juno.Common.Util.exists(ctrl.newDemographicData.hin))
 			{
-				if (Juno.Common.Util.exists(ctrl.newDemographicData.hin))
-				{
-					ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
-				}
+				ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
+			}
 
-				if (ctrl.validateDemographic())
-				{
-					demographicService.saveDemographic(ctrl.newDemographicData).then(
-						function success(results)
-						{
-							ctrl.modalInstance.close(results);
-						},
-						function error(errors)
-						{
-							alert(errors);
-							console.error(errors);
-							ctrl.buttonClicked = false;
-						}
-					);
-				}
-			}
-			catch (e)
+			if (ctrl.validateDemographic())
 			{
-				throw e;
+				demographicService.saveDemographic(ctrl.newDemographicData).then(
+					function success(results)
+					{
+						ctrl.modalInstance.close(results);
+					}
+				)
+				.catch((errors) => {
+						alert(errors);
+						console.error(errors);
+				})
 			}
-			finally
+			else // Need this to reset button if validation fails
 			{
 				ctrl.buttonClicked = false;
 			}
