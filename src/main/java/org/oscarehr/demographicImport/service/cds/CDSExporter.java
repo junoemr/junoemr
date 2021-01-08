@@ -31,8 +31,8 @@ import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
 import org.oscarehr.demographicImport.service.DemographicExporter;
-import org.oscarehr.demographicImport.service.ExportLogger;
 import org.oscarehr.demographicImport.service.ExportPreferences;
+import org.oscarehr.demographicImport.service.ExportProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
@@ -42,9 +42,6 @@ import oscar.util.ConversionUtils;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,31 +53,28 @@ import static oscar.util.ConversionUtils.DATE_PATTERN_MONTH;
 import static oscar.util.ConversionUtils.DATE_PATTERN_YEAR;
 
 @Component
-public class CDSExporter implements DemographicExporter, ExportLogger
+public class CDSExporter implements DemographicExporter
 {
 	private static final OscarProperties oscarProperties = OscarProperties.getInstance();
-	private static final int LOG_COLUMN_WIDTH = 14;
 
-	private final GenericFile logFile;
 	private final HashMap<String, Integer> providerExportCountHash;
 
 	@Autowired
 	private CDSExportMapper cdsExportMapper;
 
-	public CDSExporter() throws IOException
+	@Autowired
+	private ExportProperties exportProperties;
+
+	public CDSExporter()
 	{
 		providerExportCountHash = new HashMap<>();
-		logFile = FileFactory.createTempFile(".log");
-		logFile.rename("ExportEvent.log");
-		logSummaryHeaderLine();
 	}
 
-	public GenericFile exportDemographic(Demographic demographic, ExportPreferences preferences) throws Exception
+	public GenericFile exportDemographic(Demographic demographic) throws Exception
 	{
 		CDSFileParser parser = new CDSFileParser();
-		cdsExportMapper.setExportPreferences(preferences);
 
-		logSummaryLine(demographic);
+		exportProperties.getExportLogger().logSummaryLine(demographic);
 		incrementProviderExportCount(demographic);
 		OmdCds omdCds = cdsExportMapper.exportFromJuno(demographic);
 
@@ -93,22 +87,10 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 	public List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException
 	{
 		List<GenericFile> additionalExportFiles = new ArrayList<>(2);
-		additionalExportFiles.add(logFile);
+		additionalExportFiles.add(exportProperties.getExportLogger().getLogFile());
 		additionalExportFiles.add(createReadme());
 
 		return additionalExportFiles;
-	}
-
-	@Override
-	public void log(String message) throws IOException
-	{
-		Files.write(Paths.get(logFile.getFileObject().getPath()), message.getBytes(), StandardOpenOption.APPEND);
-	}
-
-	@Override
-	public GenericFile getLogFile()
-	{
-		return this.logFile;
 	}
 
 	/**
@@ -166,83 +148,6 @@ public class CDSExporter implements DemographicExporter, ExportLogger
 
 		readme.rename("ReadMe.txt");
 		return readme;
-	}
-
-	protected void logSummaryHeaderLine() throws IOException
-	{
-		String summaryLine = buildSummaryLine("Patient ID", "Family", "Past Health", "Problem List",
-				"Risk Factor", "Allergy &", "Medication", "Immunization",
-				"Labs", "Appointments", "Clinical", "Reports", "Reports",
-				"Care Elements", "Alerts and");
-		String summaryLine2 = buildSummaryLine("", "History", "", "",
-				"", "Adv. Reaction", "", "",
-				"", "", "Notes", "Text", "Binary",
-				"", "Special Needs");
-
-		this.log(summaryLine);
-		this.log(summaryLine2);
-
-		int summaryItemCount = 15; // number of columns in the summary line above
-		this.log(StringUtils.rightPad("-", (LOG_COLUMN_WIDTH * summaryItemCount) + summaryItemCount, "-") + "\n");
-	}
-
-	protected void logSummaryLine(Demographic demographic) throws IOException
-	{
-		String summaryLine = buildSummaryLine(
-				String.valueOf(demographic.getId()),
-				String.valueOf(demographic.getFamilyHistoryNoteList().size()),
-				String.valueOf(demographic.getMedicalHistoryNoteList().size()),
-				String.valueOf(demographic.getConcernNoteList().size()),
-				String.valueOf(demographic.getRiskFactorNoteList().size()),
-				String.valueOf(demographic.getAllergyList().size()),
-				String.valueOf(demographic.getMedicationList().size()),
-				String.valueOf(demographic.getImmunizationList().size()),
-				String.valueOf(demographic.getLabList().size()),
-				String.valueOf(demographic.getAppointmentList().size()),
-				String.valueOf(demographic.getEncounterNoteList().size()),
-				String.valueOf(demographic.getDocumentList().size()),
-				String.valueOf(demographic.getDocumentList().size()),
-				String.valueOf(demographic.getMeasurementList().size()),
-				String.valueOf(demographic.getReminderNoteList().size()));
-		this.log(summaryLine);
-	}
-
-	private String buildSummaryLine(String patientId,
-	                                String familyHistCount,
-	                                String pastHealth,
-	                                String problems,
-	                                String riskFactor,
-	                                String allergy,
-	                                String medications,
-	                                String immunizations,
-	                                String labs,
-	                                String appointments,
-	                                String clinicalNotes,
-	                                String reportsText,
-	                                String reportsBinary,
-	                                String careElements,
-	                                String alerts)
-	{
-		return paddedSummaryItem(patientId) +
-				paddedSummaryItem(familyHistCount) +
-				paddedSummaryItem(pastHealth) +
-				paddedSummaryItem(problems) +
-				paddedSummaryItem(riskFactor) +
-				paddedSummaryItem(allergy) +
-				paddedSummaryItem(medications) +
-				paddedSummaryItem(immunizations) +
-				paddedSummaryItem(labs) +
-				paddedSummaryItem(appointments) +
-				paddedSummaryItem(clinicalNotes) +
-				paddedSummaryItem(reportsText) +
-				paddedSummaryItem(reportsBinary) +
-				paddedSummaryItem(careElements) +
-				paddedSummaryItem(alerts) + "\n";
-	}
-
-	private String paddedSummaryItem(String name)
-	{
-		return StringUtils.rightPad(name, LOG_COLUMN_WIDTH) + "|";
 	}
 
 	private String paddedReadmeLine(String name, String value)
