@@ -155,7 +155,8 @@ angular.module('Patient').component('addDemographicModal', {
 					{
 						ctrl.modalInstance.close(results);
 					})
-					.catch((errors) => {
+					.catch((errors) =>
+					{
 						alert(errors);
 						console.error(errors);
 					})
