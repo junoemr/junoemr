@@ -154,11 +154,13 @@
 
 	<modal-footer>
 		<div class="flex flex-row justify-content-center">
-			<juno-button title="Add"
-						 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-						 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-						 ng-click="$ctrl.onAdd()"
-						 disabled="$ctrl.buttonClicked">
+			<juno-button
+				 class="add-demographic-button"
+				 title="Add"
+				 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+				 ng-click="$ctrl.onAdd()"
+				 disabled="$ctrl.buttonClicked">
 				Add
 			</juno-button>
 		</div>
