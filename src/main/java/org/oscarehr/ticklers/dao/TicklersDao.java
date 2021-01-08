@@ -200,14 +200,13 @@ public class TicklersDao extends AbstractDao<Tickler> {
 		Criteria criteria = session.createCriteria(Tickler.class);
 		criteria = criteriaSearch.setCriteriaProperties(criteria);
 
-		criteria.setFetchSize(10);
-		criteria.setFetchMode("ticklerCategory", FetchMode.SELECT);
-		criteria.setFetchMode("updates", FetchMode.SELECT);
-		criteria.setFetchMode("comments", FetchMode.SELECT);
-		criteria.setFetchMode("demographic", FetchMode.SELECT);
-		criteria.setFetchMode("provider", FetchMode.SELECT);
-		criteria.setFetchMode("assignee", FetchMode.SELECT);
-		criteria.setFetchMode("program", FetchMode.SELECT);
+		criteria.setFetchMode("ticklerCategory", FetchMode.LAZY);
+		criteria.setFetchMode("updates", FetchMode.LAZY);
+		criteria.setFetchMode("comments", FetchMode.LAZY);
+		criteria.setFetchMode("demographic", FetchMode.LAZY);
+		criteria.setFetchMode("provider", FetchMode.LAZY);
+		criteria.setFetchMode("assignee", FetchMode.LAZY);
+		criteria.setFetchMode("program", FetchMode.LAZY);
 
 		criteria.setMaxResults(criteriaSearch.getLimit());
 		criteria.setFirstResult(criteriaSearch.getOffset());
