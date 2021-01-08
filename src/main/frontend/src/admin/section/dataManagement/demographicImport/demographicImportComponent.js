@@ -1,3 +1,5 @@
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+
 /**
  * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
@@ -23,35 +25,74 @@
 angular.module('Admin.Section.DataManagement').component('demographicImport',
 	{
 		templateUrl: 'src/admin/section/dataManagement/demographicImport/demographicImport.jsp',
-		bindings: {},
+		bindings: {
+			componentStyle: "<?",
+		},
 		controller: [
 			'$scope',
-			'$stateParams',
-			'$http',
-			'$httpParamSerializer',
-			'$location',
-			'$uibModal',
-			'staticDataService',
-			'providersService',
-			'providerService',
-			'billingService',
-			function (
-				$scope,
-				$stateParams,
-				$http,
-				$httpParamSerializer,
-				$location,
-				$uibModal,
-				staticDataService,
-				providersService,
-				providerService,
-				billingService)
+			function ($scope)
 			{
 				let ctrl = this;
 
+				$scope.LABEL_POSITION = LABEL_POSITION;
+				$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+				$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+
+
+				ctrl.mergeOptions = Object.freeze(
+					[
+						{
+							label: 'Skip duplicates',
+							value: 'skip',
+						},
+						{
+							label: 'Add new',
+							value: 'new',
+						},
+						{
+							label: 'Replace existing',
+							value: 'replace',
+						},
+					]
+				);
+
+				ctrl.importSourceOptions = Object.freeze(
+					[
+						{
+							label: 'unknown',
+							value: 'UNKNOWN',
+						},
+						{
+							label: 'Juno',
+							value: 'JUNO',
+						},
+						{
+							label: 'Wolf',
+							value: 'WOLF',
+						},
+					]
+				);
+
+
+				ctrl.selectedImportSource = ctrl.importSourceOptions[0].value;
+				ctrl.selectedMergeStrategy = ctrl.mergeOptions[0].value;
+				ctrl.selectedFiles = [];
+
 				ctrl.$onInit = function inInit()
 				{
-					console.info("import ctrl init");
+					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 				}
+
+				ctrl.onRunImport = function onRunImport()
+				{
+					console.info("onRunImport", ctrl.selectedFiles);
+				}
+
+				ctrl.onFileSelected = (files) =>
+				{
+					ctrl.selectedFiles = files;
+					$scope.$apply();
+				}
+
 			}]
 	});

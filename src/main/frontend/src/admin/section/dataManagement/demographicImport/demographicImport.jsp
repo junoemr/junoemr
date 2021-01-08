@@ -21,5 +21,64 @@
 * Canada
 --%>
 <div id="admin-demographic-import">
-	<h1>TEST IMPORT PAGE!</h1>
+	<panel id="cds-import-panel"
+	       component-style="$ctrl.componentStyle">
+		<panel-header>
+			<h6>CDS Import</h6>
+		</panel-header>
+		<panel-body>
+			<div class="row">
+				<div class="col-md-12">
+					<juno-file-chooser label="Choose Import File"
+					                   label-position="LABEL_POSITION.TOP"
+					                   component-style="$ctrl.componentStyle"
+					                   placeholder="Choose Import File"
+					                   change="$ctrl.onFileSelected(files)"
+					></juno-file-chooser>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<div ng-repeat="file in $ctrl.selectedFiles">
+						<span>{{file.name}}</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<%--	import source --%>
+					<juno-select ng-model="$ctrl.selectedImportSource"
+					             options="$ctrl.importSourceOptions"
+					             label="Select Import Source"
+					             label-position="LABEL_POSITION.TOP"
+					             component-style="$ctrl.componentStyle"
+					></juno-select>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<%--	merge strategy --%>
+					<juno-select ng-model="$ctrl.selectedMergeStrategy"
+					             options="$ctrl.mergeOptions"
+					             label="Select Merge Strategy"
+					             label-position="LABEL_POSITION.TOP"
+					             component-style="$ctrl.componentStyle"
+					></juno-select>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<juno-button ng-click="$ctrl.onRunImport()"
+					             button-color="JUNO_BUTTON_COLOR.PRIMARY"
+					             button-color-pattern = JUNO_BUTTON_COLOR_PATTERN.FILL;>
+						Run Import
+					</juno-button>
+				</div>
+			</div>
+		</panel-body>
+	</panel>
 </div>
