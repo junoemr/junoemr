@@ -937,7 +937,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 				false
 			).then(function ()
 			{
-				this.pageState.notesOffset += me.pageData.notesIncrement;
+				me.pageState.notesOffset += me.pageData.notesIncrement;
 			});
 		}
 	};
@@ -1130,6 +1130,21 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 	this.maxView = function maxView(e, nodeId)
 	{
 		this.toggleShrunkNote(e, nodeId, false);
+	};
+
+	this.expandAllNotes = function expandAllNotes()
+	{
+		var shrunkNotes = jQuery("[id^=minimizedNote]").filter(":visible");
+
+		var me = this;
+		shrunkNotes.each(function()
+		{
+			if (/^minimizedNote\d*$/.test(this.id))
+			{
+				var noteId = this.id.substring(13);
+				me.toggleShrunkNote(null, noteId, false)
+			}
+		});
 	};
 
 	this.toggleShrunkNote = function toggleShrunkNote(e, nodeId, shrink)

@@ -453,6 +453,7 @@ public class NotesService extends AbstractServiceImpl
 			NoteExtTo1 noteExtTo1 = noteIssue.getGroupNoteExt();
 			IssueTo1 issueTo1 = noteIssue.getIssue();
 			List<CaseManagementIssueTo1> assignedCMIssues = noteIssue.getAssignedCMIssues();
+			String annotationAttribute = noteIssue.getAnnotation_attrib();
 
 			String noteTxt = StringUtils.trimToNull(note.getNote());
 			// if there is not a note to save, exit immediately
@@ -465,6 +466,7 @@ public class NotesService extends AbstractServiceImpl
 			Provider provider = loggedInInfo.getLoggedInProvider();
 			String providerName = provider != null ? provider.getFullName() : "";
 
+			Integer oldNoteId = note.getNoteId();
 			String demographicNoStr = "" + demographicNo;
 			String noteIdStr = String.valueOf(note.getNoteId());
 			String uuid = note.getUuid();
@@ -802,6 +804,46 @@ public class NotesService extends AbstractServiceImpl
 			String saveStatus = (caseMangementNote.getId() != null) ? LogConst.STATUS_SUCCESS : LogConst.STATUS_FAILURE;
 			LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_CME_NOTE, saveStatus,
 					String.valueOf(caseMangementNote.getId()), getLoggedInInfo().getIp(), caseMangementNote.getAuditString());
+
+
+			// Save Annotation
+			if (newNote)
+			{
+				if (annotationAttribute != null)
+				{
+					HttpSession session = loggedInInfo.getSession();
+
+					CaseManagementNote annotationNote = (CaseManagementNote) session.getAttribute(annotationAttribute);
+
+					if (annotationNote != null)
+					{
+						// new annotation created and got it in session attribute
+						caseManagementMgr.saveNoteSimple(annotationNote);
+						CaseManagementNoteLink cml = new CaseManagementNoteLink(CaseManagementNoteLink.CASEMGMTNOTE,
+								newNoteId, annotationNote.getId());
+
+						caseManagementMgr.saveNoteLink(cml);
+
+						String annotationSaveStatus = (annotationNote.getId() != null) ? LogConst.STATUS_SUCCESS : LogConst.STATUS_FAILURE;
+						LogAction.addLogEntry(
+								providerNo,
+								demographicNo,
+								LogConst.ANNOTATE,
+								LogConst.CON_CME_NOTE,
+								annotationSaveStatus,
+								String.valueOf(annotationNote.getId()),
+								getLoggedInInfo().getIp(),
+								caseMangementNote.getAuditString()
+						);
+
+						session.removeAttribute(annotationAttribute);
+					}
+				}
+			}
+			else
+			{
+				caseManagementMgr.addExistingAnnotation(oldNoteId.longValue(), newNoteId);
+			}
 		}
 		catch(Exception e) {
 			logger.error("Error saving Issue Note", e);
@@ -809,9 +851,9 @@ public class NotesService extends AbstractServiceImpl
 		}
 		return RestResponse.successResponse(noteIssue);
 	}
-	
-	
-	
+
+
+
 	protected CaseManagementCPP copyNote2cpp(CaseManagementCPP cpp, String note, String code) {
 		//TODO: change this back to a loop
 		StringBuilder text = new StringBuilder();

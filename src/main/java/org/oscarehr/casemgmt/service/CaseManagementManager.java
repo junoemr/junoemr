@@ -2233,36 +2233,41 @@ private String updateApptStatus(String status, String type) {
 		}
 		
 		
-		if (old_note_id != null) {
+		if (old_note_id != null)
+		{
 			// Not a new note, look for old annotation
-
-			CaseManagementNoteLink cml_anno = null;
-			CaseManagementNoteLink cml_dump = null;
-			List<CaseManagementNoteLink> cmll = getLinkByTableIdDesc(CaseManagementNoteLink.CASEMGMTNOTE, old_note_id);
-			for (CaseManagementNoteLink link : cmll) {
-				CaseManagementNote cmmn = getNote(link.getNoteId().toString());
-				if (cmmn == null) continue;
-
-				if (cmmn.getNote().startsWith("imported.cms4.2011.06")) {
-					if (cml_dump == null) cml_dump = link;
-				} else {
-					if (cml_anno == null) cml_anno = link;
-				}
-				if (cml_anno != null && cml_dump != null) break;
-			}
-
-			if (cml_anno != null) {// old annotation exists - create new link
-				CaseManagementNoteLink cml_n = new CaseManagementNoteLink(CaseManagementNoteLink.CASEMGMTNOTE, note.getId(), cml_anno.getNoteId());
-				saveNoteLink(cml_n);
-			}
-			if (cml_dump != null) {// old dump exists - create new link
-				CaseManagementNoteLink cml_n = new CaseManagementNoteLink(CaseManagementNoteLink.CASEMGMTNOTE, note.getId(), cml_dump.getNoteId());
-				saveNoteLink(cml_n);
-			}
+			addExistingAnnotation(old_note_id, note.getId());
 		}
 		return note;
 	}
-	
+
+	public void addExistingAnnotation(Long oldNoteId, Long newNoteId)
+	{
+		CaseManagementNoteLink cml_anno = null;
+		CaseManagementNoteLink cml_dump = null;
+		List<CaseManagementNoteLink> cmll = getLinkByTableIdDesc(CaseManagementNoteLink.CASEMGMTNOTE, oldNoteId);
+		for (CaseManagementNoteLink link : cmll) {
+			CaseManagementNote cmmn = getNote(link.getNoteId().toString());
+			if (cmmn == null) continue;
+
+			if (cmmn.getNote().startsWith("imported.cms4.2011.06")) {
+				if (cml_dump == null) cml_dump = link;
+			} else {
+				if (cml_anno == null) cml_anno = link;
+			}
+			if (cml_anno != null && cml_dump != null) break;
+		}
+
+		if (cml_anno != null) {// old annotation exists - create new link
+			CaseManagementNoteLink cml_n = new CaseManagementNoteLink(CaseManagementNoteLink.CASEMGMTNOTE, newNoteId, cml_anno.getNoteId());
+			saveNoteLink(cml_n);
+		}
+		if (cml_dump != null) {// old dump exists - create new link
+			CaseManagementNoteLink cml_n = new CaseManagementNoteLink(CaseManagementNoteLink.CASEMGMTNOTE, newNoteId, cml_dump.getNoteId());
+			saveNoteLink(cml_n);
+		}
+	}
+
 	public void setCPPMedicalHistory(CaseManagementCPP cpp, String providerNo,List accessRight)	{
 
 		if (greaterEqualLevel(3, providerNo))	{
