@@ -150,16 +150,15 @@ angular.module('Patient').component('addDemographicModal', {
 
 			if (ctrl.validateDemographic())
 			{
-				demographicService.saveDemographic(ctrl.newDemographicData).then(
-					function success(results)
+				demographicService.saveDemographic(ctrl.newDemographicData)
+					.then((results) =>
 					{
 						ctrl.modalInstance.close(results);
-					}
-				)
-				.catch((errors) => {
+					})
+					.catch((errors) => {
 						alert(errors);
 						console.error(errors);
-				})
+					})
 			}
 			else // Need this to reset button if validation fails
 			{
