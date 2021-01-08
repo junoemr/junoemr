@@ -70,6 +70,7 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.demographic.dao.DemographicExtDao;
+import org.oscarehr.demographicImport.service.ExportLogger;
 import org.oscarehr.demographicImport.service.ExportPreferences;
 import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
@@ -260,6 +261,8 @@ public class DemographicExportAction4 extends Action {
 			case CDS5_0:
 			{
 				ImportExportService importExportService = SpringUtils.getBean(ImportExportService.class);
+				ImporterExporterFactory importerExporterFactory = SpringUtils.getBean(ImporterExporterFactory.class);
+
 				ArrayList<File> files = new ArrayList<>();
 				ExportPreferences exportPreferences = new ExportPreferences();
 				exportPreferences.setExportAlertsAndSpecialNeeds(exAlertsAndSpecialNeeds);
@@ -277,8 +280,9 @@ public class DemographicExportAction4 extends Action {
 				exportPreferences.setExportReportsReceived(exReportsReceived);
 				exportPreferences.setExportRiskFactors(exRiskFactors);
 
+				ExportLogger exportLogger = importerExporterFactory.getExportLogger(ImporterExporterFactory.EXPORTER_TYPE.CDS_5);
 				List<GenericFile> exportFiles = importExportService.exportDemographicsWithLookup(
-						ImporterExporterFactory.EXPORTER_TYPE.CDS_5, list, exportPreferences);
+						ImporterExporterFactory.EXPORTER_TYPE.CDS_5, exportLogger, list, exportPreferences);
 
 				//TODO refactor this. we could zip genericFiles directly
 				for(GenericFile genericFile : exportFiles)

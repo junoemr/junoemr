@@ -28,6 +28,7 @@ import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.ZIPFile;
+import org.oscarehr.demographicImport.service.ExportLogger;
 import org.oscarehr.demographicImport.service.ExportPreferences;
 import org.oscarehr.demographicImport.service.ImportExportService;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
@@ -54,6 +55,9 @@ public class CommandLineExporter implements CommandLineTask
 
 	@Autowired
 	private ImportExportService importExportService;
+
+	@Autowired
+	private ImporterExporterFactory importerExporterFactory;
 
 	public String taskName()
 	{
@@ -117,8 +121,9 @@ public class CommandLineExporter implements CommandLineTask
 		logger.info("BEGIN EXPORT [ Patient Set: '" + patientSet + "']");
 		try
 		{
+			ExportLogger exportLogger = importerExporterFactory.getExportLogger(ImporterExporterFactory.EXPORTER_TYPE.CDS_5);
 			List<GenericFile> exportFiles = importExportService.exportDemographicsWithLookup(
-					ImporterExporterFactory.EXPORTER_TYPE.CDS_5, demographicIdList, exportPreferences);
+					ImporterExporterFactory.EXPORTER_TYPE.CDS_5, exportLogger, demographicIdList, exportPreferences);
 			ZIPFile zipFile = FileFactory.packageZipFile(exportFiles, true);
 
 			String exportZipName = "export_" + ConversionUtils.toDateTimeString(LocalDateTime.now(), DATE_TIME_FILENAME) + "_" + patientSet + ".zip";

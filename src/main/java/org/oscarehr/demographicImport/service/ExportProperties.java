@@ -20,43 +20,15 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.mapper;
+package org.oscarehr.demographicImport.service;
 
 import lombok.Data;
-import org.oscarehr.demographicImport.service.ExportProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 @Data
 @Component
-public abstract class AbstractExportMapper<I, E>
+public class ExportProperties
 {
-	@Autowired
-	protected ExportProperties exportProperties;
-
-	public AbstractExportMapper()
-	{
-	}
-
-	/**
-	 * build the import structure from the provided export structure.
-	 * this method creates a new object to use as the import structure.
-	 * @param exportStructure
-	 */
-	public abstract I exportFromJuno(E exportStructure) throws Exception;
-
-	public List<I> exportAll(Collection<E> exportStructures) throws Exception
-	{
-		List<I> list = new ArrayList<>();
-		for(E exportStructure : exportStructures)
-		{
-			I importStructure = exportFromJuno(exportStructure);
-			list.add(importStructure);
-		}
-		return list;
-	}
+	private ExportLogger exportLogger;
+	private ExportPreferences exportPreferences;
 }

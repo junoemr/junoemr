@@ -27,6 +27,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.lab.Lab;
+import org.oscarehr.demographicImport.service.ExportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -81,6 +82,7 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 	{
 		OmdCds omdCds = objectFactory.createOmdCds();
 		PatientRecord patientRecord = objectFactory.createPatientRecord();
+		ExportPreferences exportPreferences = exportProperties.getExportPreferences();
 
 		patientRecord.setDemographics(
 				cdsDemographicExportMapper.exportFromJuno(exportStructure));

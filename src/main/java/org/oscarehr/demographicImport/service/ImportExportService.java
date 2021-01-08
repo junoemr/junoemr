@@ -153,15 +153,17 @@ public class ImportExportService
 	private ImporterExporterFactory importerExporterFactory;
 
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE importType,
+	                                            ExportLogger exportLogger,
 	                                            List<Demographic> demographicList,
 	                                            ExportPreferences preferences) throws Exception
 	{
-		DemographicExporter exporter = importerExporterFactory.getExporter(importType);
+		exportLogger.logSummaryHeaderLine();
+		DemographicExporter exporter = importerExporterFactory.getExporter(importType, exportLogger, preferences);
 		List<GenericFile> fileList = new ArrayList<>(demographicList.size() + 2);
 
 		for (Demographic demographic : demographicList)
 		{
-			GenericFile file = exporter.exportDemographic(demographic, preferences);
+			GenericFile file = exporter.exportDemographic(demographic);
 			fileList.add(file);
 		}
 		fileList.addAll(exporter.getAdditionalFiles(preferences));
@@ -172,6 +174,7 @@ public class ImportExportService
 	}
 
 	public List<GenericFile> exportDemographicsWithLookup(ImporterExporterFactory.EXPORTER_TYPE importType,
+	                                                      ExportLogger exportLogger,
 	                                                      List<String> demographicIdList,
 	                                                      ExportPreferences preferences) throws Exception
 	{
@@ -185,7 +188,7 @@ public class ImportExportService
 			demographicList.add(exportDemographic);
 		}
 
-		return exportDemographics(importType, demographicList, preferences);
+		return exportDemographics(importType, exportLogger, demographicList, preferences);
 	}
 
 	public void importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,

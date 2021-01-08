@@ -34,7 +34,6 @@ import org.oscarehr.demographicImport.service.ExportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,7 +67,7 @@ public class CDSImporter implements DemographicImporter
 	}
 
 	@Override
-	public List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException
+	public List<GenericFile> getAdditionalFiles(ExportPreferences preferences)
 	{
 		return new ArrayList<>();
 	}

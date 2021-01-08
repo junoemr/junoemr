@@ -22,11 +22,14 @@
  */
 package org.oscarehr.demographicImport.service;
 
+import org.oscarehr.demographicImport.service.cds.CDSExportLogger;
 import org.oscarehr.demographicImport.service.cds.CDSExporter;
 import org.oscarehr.demographicImport.service.cds.CDSImportLogger;
 import org.oscarehr.demographicImport.service.cds.CDSImporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Component
 public class ImporterExporterFactory
@@ -39,6 +42,9 @@ public class ImporterExporterFactory
 
 	@Autowired
 	private ImportProperties importProperties;
+
+	@Autowired
+	private ExportProperties exportProperties;
 
 	public enum IMPORTER_TYPE
 	{
@@ -70,6 +76,15 @@ public class ImporterExporterFactory
 		}
 	}
 
+	public ExportLogger getExportLogger(EXPORTER_TYPE type) throws IOException
+	{
+		switch(type)
+		{
+			case CDS_5: return new CDSExportLogger();
+			default: throw new RuntimeException(type + " logger not implemented");
+		}
+	}
+
 	public DemographicImporter getImporter(IMPORTER_TYPE type,
 	                                       IMPORT_SOURCE importSource,
 	                                       ImportLogger importLogger,
@@ -89,8 +104,11 @@ public class ImporterExporterFactory
 		}
 	}
 
-	public DemographicExporter getExporter(EXPORTER_TYPE type)
+	public DemographicExporter getExporter(EXPORTER_TYPE type, ExportLogger exportLogger, ExportPreferences exportPreferences)
 	{
+		exportProperties.setExportLogger(exportLogger);
+		exportProperties.setExportPreferences(exportPreferences);
+
 		switch(type)
 		{
 			case CDS_5: return cdsExporter;
