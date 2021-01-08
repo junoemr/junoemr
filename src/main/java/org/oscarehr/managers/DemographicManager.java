@@ -80,7 +80,8 @@ import java.util.regex.Pattern;
  */
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-public class DemographicManager {
+public class DemographicManager
+{
 	public static final String PHR_VERIFICATION_LEVEL_3 = "+3";
 	public static final String PHR_VERIFICATION_LEVEL_2 = "+2";
 	public static final String PHR_VERIFICATION_LEVEL_1 = "+1";
@@ -114,7 +115,7 @@ public class DemographicManager {
 
 	@Autowired
 	private AdmissionDao admissionDao;
-	
+
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 
@@ -128,34 +129,44 @@ public class DemographicManager {
 	private HinValidationService hinValidationService;
 
 	@Deprecated
-	public Demographic getDemographic(LoggedInInfo loggedInInfo, Integer demographicId) throws PatientDirectiveException {
-		return getDemographic(loggedInInfo.getLoggedInProviderNo() , demographicId);
+	public Demographic getDemographic(LoggedInInfo loggedInInfo, Integer demographicId) throws PatientDirectiveException
+	{
+		return getDemographic(loggedInInfo.getLoggedInProviderNo(), demographicId);
 	}
-	public Demographic getDemographic(String providerNo, Integer demographicId) throws PatientDirectiveException {
+
+	public Demographic getDemographic(String providerNo, Integer demographicId) throws PatientDirectiveException
+	{
 		checkPrivilege(providerNo, SecurityInfoManager.READ, demographicId);
 
 		return demographicDao.getDemographicById(demographicId);
 	}
-		
-	public Demographic getDemographic(LoggedInInfo loggedInInfo, String demographicNo) {
+
+	public Demographic getDemographic(LoggedInInfo loggedInInfo, String demographicNo)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		Integer demographicId = null;
-		try {
+		try
+		{
 			demographicId = Integer.parseInt(demographicNo);
-		} catch(NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return null;
 		}
-		return getDemographic(loggedInInfo,demographicId);
-		
+		return getDemographic(loggedInInfo, demographicId);
+
 	}
-	
-	
-	public Demographic getDemographicWithExt(LoggedInInfo loggedInInfo, Integer demographicId) {
+
+
+	public Demographic getDemographicWithExt(LoggedInInfo loggedInInfo, Integer demographicId)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		Demographic result = getDemographic(loggedInInfo, demographicId);
-		if (result!=null) {
-			List<DemographicExt> demoExts = getDemographicExts(loggedInInfo,demographicId);
-			if (demoExts!=null && !demoExts.isEmpty()) {
+		if (result != null)
+		{
+			List<DemographicExt> demoExts = getDemographicExts(loggedInInfo, demographicId);
+			if (demoExts != null && !demoExts.isEmpty())
+			{
 				DemographicExt[] demoExtArray = demoExts.toArray(new DemographicExt[demoExts.size()]);
 				result.setExtras(demoExtArray);
 			}
@@ -163,16 +174,19 @@ public class DemographicManager {
 		return result;
 	}
 
-	public String getDemographicFormattedName(LoggedInInfo loggedInInfo, Integer demographicId) {
+	public String getDemographicFormattedName(LoggedInInfo loggedInInfo, Integer demographicId)
+	{
 		Demographic result = getDemographic(loggedInInfo, demographicId);
 		String name = null;
-		if (result != null) {
+		if (result != null)
+		{
 			name = result.getLastName() + ", " + result.getFirstName();
 		}
 		return (name);
 	}
 
-	public Demographic getDemographicByMyOscarUserName(LoggedInInfo loggedInInfo, String myOscarUserName) {
+	public Demographic getDemographicByMyOscarUserName(LoggedInInfo loggedInInfo, String myOscarUserName)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		return demographicDao.getDemographicByMyOscarUserName(myOscarUserName);
 	}
@@ -182,12 +196,14 @@ public class DemographicManager {
 		return demographicDao.getDemographicsByHealthNum(hin);
 	}
 
-	public List<Demographic> searchDemographicByName(LoggedInInfo loggedInInfo, String searchString, int startIndex, int itemsToReturn) {
+	public List<Demographic> searchDemographicByName(LoggedInInfo loggedInInfo, String searchString, int startIndex, int itemsToReturn)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-		
+
 		List<Demographic> results = demographicDao.searchDemographicByNameString(searchString, startIndex, itemsToReturn);
 
-		if (logger.isDebugEnabled()) {
+		if (logger.isDebugEnabled())
+		{
 			logger.debug("searchDemographicByName, searchString=" + searchString + ", result.size=" + results.size());
 		}
 
@@ -198,13 +214,15 @@ public class DemographicManager {
 	{
 		return getDemographicExts(loggedInInfo.getLoggedInProviderNo(), id);
 	}
+
 	public List<DemographicExt> getDemographicExts(String providerNo, Integer id)
 	{
 		checkPrivilege(providerNo, SecurityInfoManager.READ);
 		return demographicExtDao.getDemographicExtByDemographicNo(id);
 	}
 
-	public DemographicExt getDemographicExt(LoggedInInfo loggedInInfo, Integer demographicNo, String key) {
+	public DemographicExt getDemographicExt(LoggedInInfo loggedInInfo, Integer demographicNo, String key)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		return demographicExtDao.getDemographicExt(demographicNo, key);
 	}
@@ -213,6 +231,7 @@ public class DemographicManager {
 	{
 		return getDemographicCust(loggedInInfo.getLoggedInProviderNo(), id);
 	}
+
 	public DemographicCust getDemographicCust(String providerNo, Integer id)
 	{
 		checkPrivilege(providerNo, SecurityInfoManager.READ);
@@ -227,13 +246,13 @@ public class DemographicManager {
 	public void createUpdateDemographicCust(String providerNo, DemographicCust demoCust)
 	{
 		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
-		if(demoCust != null)
+		if (demoCust != null)
 		{
 			//Archive previous demoCust
 			DemographicCust prevCust = demographicCustDao.find(demoCust.getId());
-			if(prevCust != null)
+			if (prevCust != null)
 			{
-				if(!(StringUtils.equals(prevCust.getAlert(), demoCust.getAlert()) &&
+				if (!(StringUtils.equals(prevCust.getAlert(), demoCust.getAlert()) &&
 						StringUtils.equals(prevCust.getMidwife(), demoCust.getMidwife()) &&
 						StringUtils.equals(prevCust.getNurse(), demoCust.getNurse()) &&
 						StringUtils.equals(prevCust.getResident(), demoCust.getResident()) &&
@@ -247,16 +266,18 @@ public class DemographicManager {
 		}
 	}
 
-	public List<DemographicContact> getDemographicContacts(LoggedInInfo loggedInInfo, Integer id) {
+	public List<DemographicContact> getDemographicContacts(LoggedInInfo loggedInInfo, Integer id)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		return demographicContactDao.findActiveByDemographicNo(id);
 	}
 
 	/**
 	 * Given a demographic and the type of contact, get all active demographic contact entries
-	 * @param loggedInInfo user's logged in information so we can authenticate
+	 *
+	 * @param loggedInInfo  user's logged in information so we can authenticate
 	 * @param demographicNo demographic to get contacts for
-	 * @param type the type of contact to pull
+	 * @param type          the type of contact to pull
 	 * @return list of matching DemographicContact entries
 	 */
 	public List<DemographicContact> getDemographicContactsByType(LoggedInInfo loggedInInfo, Integer demographicNo, Integer type)
@@ -265,7 +286,8 @@ public class DemographicManager {
 		return demographicContactDao.findByDemographicNoAndType(demographicNo, type);
 	}
 
-	public List<Demographic> getDemographicsByProvider(LoggedInInfo loggedInInfo, Provider provider) {
+	public List<Demographic> getDemographicsByProvider(LoggedInInfo loggedInInfo, Provider provider)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		List<Demographic> result = demographicDao.getDemographicByProvider(provider.getProviderNo(), true);
 
@@ -276,19 +298,24 @@ public class DemographicManager {
 	{
 		createDemographic(loggedInInfo.getLoggedInProviderNo(), demographic, admissionProgramId);
 	}
-	public void createDemographic(String providerNo, Demographic demographic, Integer admissionProgramId) {
+
+	public void createDemographic(String providerNo, Demographic demographic, Integer admissionProgramId)
+	{
 		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
-		try {
+		try
+		{
 			demographic.getBirthDay();
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			throw new IllegalArgumentException("Birth date was specified for " + demographic.getFullName() + ": " + demographic.getBirthDayAsString());
 		}
 
-		if(demographic.getPatientStatus() == null)
+		if (demographic.getPatientStatus() == null)
 		{
 			demographic.setPatientStatus(PatientStatus.AC.name());
 		}
-		if(demographic.getFamilyDoctor().isEmpty())
+		if (demographic.getFamilyDoctor().isEmpty())
 		{
 			demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
 		}
@@ -311,18 +338,24 @@ public class DemographicManager {
 
 		admissionDao.saveAdmission(admission);
 
-		if (demographic.getExtras() != null) {
-			for (DemographicExt ext : demographic.getExtras()) {
+		if (demographic.getExtras() != null)
+		{
+			for (DemographicExt ext : demographic.getExtras())
+			{
 				createExtension(providerNo, ext);
 			}
 		}
 	}
 
-	public void updateDemographic(LoggedInInfo loggedInInfo, Demographic demographic) {
+	public void updateDemographic(LoggedInInfo loggedInInfo, Demographic demographic)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.UPDATE);
-		try {
+		try
+		{
 			demographic.getBirthDay();
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			throw new IllegalArgumentException("Birth date was specified for " + demographic.getFullName() + ": " + demographic.getBirthDayAsString());
 		}
 
@@ -332,7 +365,7 @@ public class DemographicManager {
 
 		//retain merge info
 		demographic.setSubRecord(prevDemo.getSubRecord());
-		
+
 		//save current demo
 		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		//remove control characters for existing records.
@@ -343,8 +376,10 @@ public class DemographicManager {
 		// update MyHealthAccess connection status.
 		demographicService.queueMHAPatientUpdates(demographic, prevDemo, loggedInInfo);
 
-		if (demographic.getExtras() != null) {
-			for (DemographicExt ext : demographic.getExtras()) {
+		if (demographic.getExtras() != null)
+		{
+			for (DemographicExt ext : demographic.getExtras())
+			{
 
 				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicNo(), ext.getKey());
 				if (existingExt != null)
@@ -356,12 +391,16 @@ public class DemographicManager {
 			}
 		}
 	}
-	
-	public void addDemographic(LoggedInInfo loggedInInfo, Demographic demographic) {
+
+	public void addDemographic(LoggedInInfo loggedInInfo, Demographic demographic)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
-		try {
+		try
+		{
 			demographic.getBirthDay();
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			throw new IllegalArgumentException("Birth date was specified for " + demographic.getFullName() + ": " + demographic.getBirthDayAsString());
 		}
 
@@ -369,30 +408,37 @@ public class DemographicManager {
 		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		demographicDao.save(demographic);
 
-		if (demographic.getExtras() != null) {
-			for (DemographicExt ext : demographic.getExtras()) {
+		if (demographic.getExtras() != null)
+		{
+			for (DemographicExt ext : demographic.getExtras())
+			{
 				updateExtension(loggedInInfo, ext);
 			}
 		}
 	}
-	
 
-	public void createExtension(String providerNo, DemographicExt ext) {
+
+	public void createExtension(String providerNo, DemographicExt ext)
+	{
 		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
 		demographicExtDao.saveEntity(ext);
 	}
 
-	public void updateExtension(LoggedInInfo loggedInInfo, DemographicExt ext) {
+	public void updateExtension(LoggedInInfo loggedInInfo, DemographicExt ext)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.UPDATE);
 		archiveExtension(ext);
 		demographicExtDao.saveEntity(ext);
 	}
 
-	public void archiveExtension(DemographicExt ext) {
+	public void archiveExtension(DemographicExt ext)
+	{
 		//TODO: this needs a loggedInInfo
-		if (ext != null && ext.getId() != null) {
+		if (ext != null && ext.getId() != null)
+		{
 			DemographicExt prevExt = demographicExtDao.find(ext.getId());
-			if (!(ext.getKey().equals(prevExt.getKey()) && ext.getValue().equals(prevExt.getValue()))) {
+			if (!(ext.getKey().equals(prevExt.getKey()) && ext.getValue().equals(prevExt.getValue())))
+			{
 				demographicExtArchiveDao.archiveDemographicExt(prevExt);
 			}
 		}
@@ -400,12 +446,13 @@ public class DemographicManager {
 
 	/**
 	 * Saves the list of demographicExt objects to the ext database and ext archive
+	 *
 	 * @param demographicArchiveId - id of the archived demographic record
-	 * @param extensions - list of objects to update/insert
+	 * @param extensions           - list of objects to update/insert
 	 */
 	public void saveAndArchiveDemographicExt(Long demographicArchiveId, List<DemographicExt> extensions)
 	{
-		for(DemographicExt extension : extensions)
+		for (DemographicExt extension : extensions)
 		{
 			// update/insert extension entries
 			demographicExtDao.saveEntity(extension);
@@ -417,34 +464,40 @@ public class DemographicManager {
 		}
 	}
 
-	public void createUpdateDemographicContact(LoggedInInfo loggedInInfo, DemographicContact demoContact) {
+	public void createUpdateDemographicContact(LoggedInInfo loggedInInfo, DemographicContact demoContact)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
-		
+
 		demographicContactDao.merge(demoContact);
 	}
 
-	public void deleteDemographic(LoggedInInfo loggedInInfo, Demographic demographic) {
+	public void deleteDemographic(LoggedInInfo loggedInInfo, Demographic demographic)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
-		
+
 		demographicArchiveDao.archiveRecord(demographic);
 		demographic.setPatientStatus(Demographic.PatientStatus.DE.name());
 		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		demographicDao.save(demographic);
 
-		for (DemographicExt ext : getDemographicExts(loggedInInfo, demographic.getDemographicNo())) {
+		for (DemographicExt ext : getDemographicExts(loggedInInfo, demographic.getDemographicNo()))
+		{
 			deleteExtension(loggedInInfo, ext);
 		}
 	}
 
-	public void deleteExtension(LoggedInInfo loggedInInfo, DemographicExt ext) {
+	public void deleteExtension(LoggedInInfo loggedInInfo, DemographicExt ext)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
 		archiveExtension(ext);
 		demographicExtDao.removeDemographicExt(ext.getId());
 	}
 
-	public void mergeDemographics(LoggedInInfo loggedInInfo, Integer parentId, List<Integer> children) {
+	public void mergeDemographics(LoggedInInfo loggedInInfo, Integer parentId, List<Integer> children)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
-		for (Integer child : children) {
+		for (Integer child : children)
+		{
 			DemographicMerged dm = new DemographicMerged();
 			dm.setDemographicNo(child);
 			dm.setMergedTo(parentId);
@@ -481,43 +534,52 @@ public class DemographicManager {
 		}
 	}
 
-	public Long getActiveDemographicCount(LoggedInInfo loggedInInfo) {
+	public Long getActiveDemographicCount(LoggedInInfo loggedInInfo)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		return demographicDao.getActiveDemographicCount();
 	}
 
-	public List<Demographic> getActiveDemographics(LoggedInInfo loggedInInfo, int offset, int limit) {
+	public List<Demographic> getActiveDemographics(LoggedInInfo loggedInInfo, int offset, int limit)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		return demographicDao.getActiveDemographics(offset, limit);
 	}
 
 	/**
-	 * Gets all merged demographic for the specified parent record ID 
-	 * 
-	 * @param parentId
-	 * 		ID of the parent demographic record 
-	 * @return
-	 * 		Returns all merged demographic records for the specified parent id.
+	 * Gets all merged demographic for the specified parent record ID
+	 *
+	 * @param parentId ID of the parent demographic record
+	 * @return Returns all merged demographic records for the specified parent id.
 	 */
-	public List<DemographicMerged> getMergedDemographics(LoggedInInfo loggedInInfo, Integer parentId) {
+	public List<DemographicMerged> getMergedDemographics(LoggedInInfo loggedInInfo, Integer parentId)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		return demographicMergedDao.findCurrentByMergedTo(parentId);
 	}
 
-	public PHRVerification getLatestPhrVerificationByDemographicId(LoggedInInfo loggedInInfo, Integer demographicId) {
+	public PHRVerification getLatestPhrVerificationByDemographicId(LoggedInInfo loggedInInfo, Integer demographicId)
+	{
 		return phrVerificationDao.findLatestByDemographicId(demographicId);
 	}
 
-	public String getPhrVerificationLevelByDemographicId(LoggedInInfo loggedInInfo, Integer demographicId) {
+	public String getPhrVerificationLevelByDemographicId(LoggedInInfo loggedInInfo, Integer demographicId)
+	{
 		PHRVerification phrVerification = getLatestPhrVerificationByDemographicId(loggedInInfo, demographicId);
 
-		if (phrVerification != null) {
+		if (phrVerification != null)
+		{
 			String authLevel = phrVerification.getVerificationLevel();
-			if (PHRVerification.VERIFICATION_METHOD_FAX.equals(authLevel) || PHRVerification.VERIFICATION_METHOD_MAIL.equals(authLevel) || PHRVerification.VERIFICATION_METHOD_EMAIL.equals(authLevel)) {
+			if (PHRVerification.VERIFICATION_METHOD_FAX.equals(authLevel) || PHRVerification.VERIFICATION_METHOD_MAIL.equals(authLevel) || PHRVerification.VERIFICATION_METHOD_EMAIL.equals(authLevel))
+			{
 				return PHR_VERIFICATION_LEVEL_1;
-			} else if (PHRVerification.VERIFICATION_METHOD_TEL.equals(authLevel) || PHRVerification.VERIFICATION_METHOD_VIDEOPHONE.equals(authLevel)) {
+			}
+			else if (PHRVerification.VERIFICATION_METHOD_TEL.equals(authLevel) || PHRVerification.VERIFICATION_METHOD_VIDEOPHONE.equals(authLevel))
+			{
 				return PHR_VERIFICATION_LEVEL_2;
-			} else if (PHRVerification.VERIFICATION_METHOD_INPERSON.equals(authLevel)) {
+			}
+			else if (PHRVerification.VERIFICATION_METHOD_INPERSON.equals(authLevel))
+			{
 				return PHR_VERIFICATION_LEVEL_3;
 			}
 		}
@@ -529,7 +591,8 @@ public class DemographicManager {
 	/**
 	 * This method should only return true if the demographic passed in is "phr verified" to a sufficient level to allow a provider to send this phr account messages.
 	 */
-	public boolean isPhrVerifiedToSendMessages(LoggedInInfo loggedInInfo, Integer demographicId) {
+	public boolean isPhrVerifiedToSendMessages(LoggedInInfo loggedInInfo, Integer demographicId)
+	{
 		String level = getPhrVerificationLevelByDemographicId(loggedInInfo, demographicId);
 		// hard coded to 3 until some one tells me how to configure/check this
 		if (PHR_VERIFICATION_LEVEL_3.equals(level))
@@ -545,7 +608,8 @@ public class DemographicManager {
 	/**
 	 * This method should only return true if the demographic passed in is "phr verified" to a sufficient level to allow a provider to send this phr account medicalData.
 	 */
-	public boolean isPhrVerifiedToSendMedicalData(LoggedInInfo loggedInInfo, Integer demographicId) {
+	public boolean isPhrVerifiedToSendMedicalData(LoggedInInfo loggedInInfo, Integer demographicId)
+	{
 		String level = getPhrVerificationLevelByDemographicId(loggedInInfo, demographicId);
 		// hard coded to 3 until some one tells me how to configure/check this
 		if (PHR_VERIFICATION_LEVEL_3.equals(level))
@@ -561,13 +625,16 @@ public class DemographicManager {
 	/**
 	 * @deprecated there should be a generic call for getDemographicExt(Integer demoId, String key) instead. Then the caller should assemble what it needs from the demographic and ext call itself.
 	 */
-	public String getDemographicWorkPhoneAndExtension(LoggedInInfo loggedInInfo, Integer demographicNo) {
+	public String getDemographicWorkPhoneAndExtension(LoggedInInfo loggedInInfo, Integer demographicNo)
+	{
 
 		Demographic result = demographicDao.getDemographicById(demographicNo);
 		String workPhone = result.getPhone2();
-		if (workPhone != null && workPhone.length() > 0) {
+		if (workPhone != null && workPhone.length() > 0)
+		{
 			String value = demographicExtDao.getValueForDemoKey(demographicNo, "wPhoneExt");
-			if (value != null && value.length() > 0) {
+			if (value != null && value.length() > 0)
+			{
 				workPhone += "x" + value;
 			}
 		}
@@ -578,23 +645,27 @@ public class DemographicManager {
 	/**
 	 * see DemographicDao.findByAttributes for parameter details
 	 */
-	public List<Demographic> searchDemographicsByAttributes(LoggedInInfo loggedInInfo, String hin, String firstName, String lastName, Gender gender, Calendar dateOfBirth, String city, String province, String phone, String email, String alias, int startIndex, int itemsToReturn) {
+	public List<Demographic> searchDemographicsByAttributes(LoggedInInfo loggedInInfo, String hin, String firstName, String lastName, Gender gender, Calendar dateOfBirth, String city, String province, String phone, String email, String alias, int startIndex, int itemsToReturn)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		return demographicDao.findByAttributes(hin, firstName, lastName, gender, dateOfBirth, city, province, phone, email, alias, startIndex, itemsToReturn);
 	}
 
-	public List<String> getPatientStatusList() {
+	public List<String> getPatientStatusList()
+	{
 		return demographicDao.search_ptstatus();
 	}
 
-	public List<String> getRosterStatusList() {
+	public List<String> getRosterStatusList()
+	{
 		return demographicDao.getRosterStatuses();
 	}
 
 	/**
 	 * programId can be null for all/any program
 	 */
-	public List<Integer> getAdmittedDemographicIdsByProgramAndProvider(LoggedInInfo loggedInInfo, Integer programId, String providerNo) {
+	public List<Integer> getAdmittedDemographicIdsByProgramAndProvider(LoggedInInfo loggedInInfo, Integer programId, String providerNo)
+	{
 		if (loggedInInfo == null)
 		{
 			throw (new SecurityException("user not logged in?"));
@@ -604,8 +675,9 @@ public class DemographicManager {
 
 		return (demographicIds);
 	}
-	
-	public List<Integer> getDemographicIdsWithMyOscarAccounts(LoggedInInfo loggedInInfo, Integer startDemographicIdExclusive, int itemsToReturn) {
+
+	public List<Integer> getDemographicIdsWithMyOscarAccounts(LoggedInInfo loggedInInfo, Integer startDemographicIdExclusive, int itemsToReturn)
+	{
 		if (loggedInInfo == null)
 		{
 			throw (new SecurityException("user not logged in?"));
@@ -616,9 +688,10 @@ public class DemographicManager {
 		return (demographicIds);
 	}
 
-	public List<Demographic> getDemographics(LoggedInInfo loggedInInfo, List<Integer> demographicIds) {
+	public List<Demographic> getDemographics(LoggedInInfo loggedInInfo, List<Integer> demographicIds)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-		
+
 		if (loggedInInfo == null)
 		{
 			throw (new SecurityException("user not logged in?"));
@@ -628,8 +701,9 @@ public class DemographicManager {
 
 		return (demographics);
 	}
-	
-	public List<Demographic> searchDemographic(LoggedInInfo loggedInInfo, String searchStr) {
+
+	public List<Demographic> searchDemographic(LoggedInInfo loggedInInfo, String searchStr)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		if (loggedInInfo == null)
 		{
@@ -640,20 +714,22 @@ public class DemographicManager {
 
 		return (demographics);
 	}
-	
-	public List<Demographic> getActiveDemosByHealthCardNo(LoggedInInfo loggedInInfo, String hcn, String hcnType) {
+
+	public List<Demographic> getActiveDemosByHealthCardNo(LoggedInInfo loggedInInfo, String hcn, String hcnType)
+	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		if (loggedInInfo == null)
 		{
 			throw (new SecurityException("user not logged in?"));
 		}
-		
+
 		List<Demographic> demographics = demographicDao.getActiveDemosByHealthCardNo(hcn, hcnType);
-		
+
 		return (demographics);
 	}
 
-	public List<Integer> getMergedDemographicIds(LoggedInInfo loggedInInfo, Integer demographicNo) {
+	public List<Integer> getMergedDemographicIds(LoggedInInfo loggedInInfo, Integer demographicNo)
+	{
 		if (loggedInInfo == null)
 		{
 			throw (new SecurityException("user not logged in?"));
@@ -665,10 +741,13 @@ public class DemographicManager {
 	}
 
 	@Deprecated
-	public List<Demographic> getDemosByChartNo(LoggedInInfo loggedInInfo, String chartNo) {
+	public List<Demographic> getDemosByChartNo(LoggedInInfo loggedInInfo, String chartNo)
+	{
 		return getDemosByChartNo(loggedInInfo.getLoggedInProviderNo(), chartNo);
 	}
-	public List<Demographic> getDemosByChartNo(String loggedInProviderNo, String chartNo) {
+
+	public List<Demographic> getDemosByChartNo(String loggedInProviderNo, String chartNo)
+	{
 		checkPrivilege(loggedInProviderNo, SecurityInfoManager.READ);
 		if (loggedInProviderNo == null)
 		{
@@ -678,7 +757,8 @@ public class DemographicManager {
 		return demographicDao.getClientsByChartNo(chartNo);
 	}
 
-	public List<Demographic> searchByHealthCard(LoggedInInfo loggedInInfo, String hin) {
+	public List<Demographic> searchByHealthCard(LoggedInInfo loggedInInfo, String hin)
+	{
 		if (loggedInInfo == null)
 		{
 			throw (new SecurityException("user not logged in?"));
@@ -690,9 +770,10 @@ public class DemographicManager {
 
 	/**
 	 * Given a HIN and a demographic to compare against, see if any other demographics are using the same HIN.
-	 * @param loggedInInfo currently logged in user
-	 * @param hin HIN we want to check potential duplication for
-	 * @param ver optional version code to go with HIN
+	 *
+	 * @param loggedInInfo  currently logged in user
+	 * @param hin           HIN we want to check potential duplication for
+	 * @param ver           optional version code to go with HIN
 	 * @param demographicNo demographic to search for
 	 * @return false if a demographic outside of our given one has this HIN set, true otherwise
 	 */
@@ -724,7 +805,8 @@ public class DemographicManager {
 	}
 
 	public Demographic getDemographicByNamePhoneEmail(LoggedInInfo loggedInInfo, String firstName, String lastName,
-			String hPhone, String wPhone, String email) {
+													  String hPhone, String wPhone, String email)
+	{
 		if (loggedInInfo == null)
 		{
 			throw (new SecurityException("user not logged in?"));
@@ -735,7 +817,8 @@ public class DemographicManager {
 	}
 
 	public List<Demographic> getDemographicWithLastFirstDOB(LoggedInInfo loggedInInfo, String lastname,
-			String firstname, String year_of_birth, String month_of_birth, String date_of_birth) {
+															String firstname, String year_of_birth, String month_of_birth, String date_of_birth)
+	{
 		if (loggedInInfo == null)
 		{
 			throw (new SecurityException("user not logged in?"));
@@ -749,11 +832,14 @@ public class DemographicManager {
 	{
 		checkPrivilege(loggedInInfo.getLoggedInProviderNo(), privilege);
 	}
-	private void checkPrivilege(String providerNo, String privilege) {
+
+	private void checkPrivilege(String providerNo, String privilege)
+	{
 		securityInfoManager.requireOnePrivilege(providerNo, privilege, null, "_demographic");
 	}
 
-	private void checkPrivilege(String providerNo, String privilege, int demographicNo) {
+	private void checkPrivilege(String providerNo, String privilege, int demographicNo)
+	{
 		securityInfoManager.requireOnePrivilege(providerNo, privilege, demographicNo, "_demographic");
 	}
 
@@ -764,13 +850,19 @@ public class DemographicManager {
 		validateDemographic(demographic);
 		filterDemographic(demographic);
 
+		if (demographic.getDateJoined() == null)
+		{
+			Date newDateJoined = new Date();
+			demographic.setDateJoined(newDateJoined);
+		}
+
 		demographicDao.save(demographic);
 
 		LogAction.addLogEntrySynchronous("DemographicManager.addDemographicWithValidation", "demographicId=" + demographic.getDemographicNo());
 	}
 
 	public void addDemographicExts(LoggedInInfo loggedInInfo, Demographic demographic,
-									  DemographicTransfer demographicTransfer)
+								   DemographicTransfer demographicTransfer)
 	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
 
@@ -913,12 +1005,6 @@ public class DemographicManager {
 			has_error = true;
 		}
 
-		if (demographic.getDateJoined() == null)t add
-		{
-			Date newDateJoined = new Date();
-			demographic.setDateJoined(newDateJoined);
-		}
-
 		if (demographic.getYearOfBirth() == null)
 		{
 			error_string += "yearOfBirth is a required field.  ";
@@ -962,8 +1048,8 @@ public class DemographicManager {
 			has_error = true;
 		}
 		else if (ConversionUtils.fromIntString(demographic.getDateOfBirth()) < 1
-		|| ConversionUtils.fromIntString(demographic.getDateOfBirth()) > 31
-		|| (demographic.getDateOfBirth().length() != 1 && demographic.getDateOfBirth().length() != 2))
+				|| ConversionUtils.fromIntString(demographic.getDateOfBirth()) > 31
+				|| (demographic.getDateOfBirth().length() != 1 && demographic.getDateOfBirth().length() != 2))
 		{
 			error_string += "dateOfBirth should be a number between 1 and 31 (depending on month).";
 			has_error = true;
@@ -1044,7 +1130,7 @@ public class DemographicManager {
 						!oscar.util.StringUtils.isStringSafe(demographic.getVeteranNo()) ||
 						!oscar.util.StringUtils.isStringSafe(demographic.getNameOfFather()) ||
 						!oscar.util.StringUtils.isStringSafe(demographic.getNameOfMother())
-				)
+		)
 		{
 			error_string += "No html tags and no quotes, line breaks ";
 			error_string += "or semicolons are allowed.";
@@ -1090,5 +1176,4 @@ public class DemographicManager {
 	{
 		return this.demographicDao.getDemographicByHealthNumber(healthNumber);
 	}
-
 }
