@@ -30,6 +30,7 @@ import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.caisi_integrator.ws.DemographicTransfer;
 import org.oscarehr.caisi_integrator.ws.MatchingDemographicParameters;
 import org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore;
+import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
@@ -42,11 +43,13 @@ import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.oscarehr.ws.rest.to.model.StatusValueTo1;
+import org.oscarehr.ws.rest.transfer.common.FileTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -271,6 +274,21 @@ public class DemographicsService extends AbstractServiceImpl
 			logger.error("Error", e);
 		}
 		return RestResponse.errorResponse("Error");
+	}
+
+	@POST
+	@Path("/import")
+	public RestResponse<String> demographicImport(@QueryParam("type") String type,
+	                                              @QueryParam("source") String importSource,
+	                                              @QueryParam("merge") String mergeStrategy,
+	                                              List<FileTransfer> fileListTransfer)
+	{
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
+
+		logger.info(fileListTransfer);
+
+		return RestResponse.successResponse("success");
 	}
 
 

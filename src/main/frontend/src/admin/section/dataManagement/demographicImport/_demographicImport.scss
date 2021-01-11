@@ -3,5 +3,10 @@
 
 	.row {
 		margin-bottom: 16px;
+
+		p {
+			@include juno-font-default-size(10px);
+			padding: 0 8px;
+		}
 	}
 }

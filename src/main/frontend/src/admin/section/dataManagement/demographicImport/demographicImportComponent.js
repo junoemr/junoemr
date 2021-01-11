@@ -30,7 +30,8 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 		},
 		controller: [
 			'$scope',
-			function ($scope)
+			'demographicsService',
+			function ($scope, demographicsService)
 			{
 				let ctrl = this;
 
@@ -38,7 +39,14 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 				$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 				$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 
-
+				ctrl.importTypeOptions = Object.freeze(
+					[
+						{
+							label: 'CDS 5.0',
+							value: 'CDS_5',
+						},
+					]
+				);
 				ctrl.mergeOptions = Object.freeze(
 					[
 						{
@@ -59,7 +67,7 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 				ctrl.importSourceOptions = Object.freeze(
 					[
 						{
-							label: 'unknown',
+							label: 'default',
 							value: 'UNKNOWN',
 						},
 						{
@@ -76,22 +84,78 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 
 				ctrl.selectedImportSource = ctrl.importSourceOptions[0].value;
 				ctrl.selectedMergeStrategy = ctrl.mergeOptions[0].value;
+				ctrl.selectedImportType = ctrl.importTypeOptions[0].value;
 				ctrl.selectedFiles = [];
+
+				ctrl.importRunning = false;
 
 				ctrl.$onInit = function inInit()
 				{
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 				}
 
-				ctrl.onRunImport = function onRunImport()
+				ctrl.onRunImport = async function onRunImport()
 				{
-					console.info("onRunImport", ctrl.selectedFiles);
+					ctrl.importRunning = true;
+
+					let formattedFileList = await ctrl.formatSelectedFiles();
+					console.info("formattedFileList", formattedFileList);
+
+					demographicsService.demographicImport(
+						ctrl.selectedImportType,
+						ctrl.selectedImportSource,
+						ctrl.selectedMergeStrategy,
+						formattedFileList).then((response) =>
+						{
+							console.info("files uploaded success");
+						}
+					).finally(() =>
+					{
+						ctrl.importRunning = false;
+					});
+				}
+
+				ctrl.formatSelectedFiles = async function formatSelectedFiles()
+				{
+					const encodedFiles = await Promise.all(Array.from(this.selectedFiles).map( async (file) =>
+					{
+						return {
+							name: file.name,
+							type: file.type,
+							size: file.size,
+							data: await this.toBase64(file),
+						};
+					}));
+
+					return encodedFiles;
+				}
+
+				ctrl.toBase64 = function toBase64(file)
+				{
+					return new Promise((resolve, reject) =>
+					{
+						const reader = new FileReader();
+						reader.readAsDataURL(file);
+
+						reader.onload = () =>
+						{
+							// only get the base 64 data, omit the meta info
+							const base64result = reader.result;
+							const base64resultData = base64result.split(",")[1];
+							resolve(base64resultData);
+						};
+						reader.onerror = (error) => reject(error);
+					});
 				}
 
 				ctrl.onFileSelected = (files) =>
 				{
 					ctrl.selectedFiles = files;
 					$scope.$apply();
+				}
+				ctrl.canRunImport = () =>
+				{
+					return ctrl.selectedFiles && ctrl.selectedFiles.length > 0;
 				}
 
 			}]

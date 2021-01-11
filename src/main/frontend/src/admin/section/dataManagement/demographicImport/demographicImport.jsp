@@ -29,10 +29,22 @@
 		<panel-body>
 			<div class="row">
 				<div class="col-md-12">
-					<juno-file-chooser label="Choose Import File"
+					<%--	import type --%>
+					<juno-select ng-model="$ctrl.selectedImportType"
+					             options="$ctrl.importTypeOptions"
+					             label="Import Type"
+					             label-position="LABEL_POSITION.TOP"
+					             component-style="$ctrl.componentStyle"
+					></juno-select>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<juno-file-chooser label="Choose Import Files"
 					                   label-position="LABEL_POSITION.TOP"
 					                   component-style="$ctrl.componentStyle"
-					                   placeholder="Choose Import File"
+					                   placeholder="Choose Import Files"
 					                   change="$ctrl.onFileSelected(files)"
 					></juno-file-chooser>
 				</div>
@@ -57,6 +69,13 @@
 					></juno-select>
 				</div>
 			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<p>* Some import sources provide additional data or spicific format changes that require customized handling.
+						Selecting a specific source will improve the import results.
+					</p>
+				</div>
+			</div>
 
 			<div class="row">
 				<div class="col-md-12">
@@ -69,10 +88,19 @@
 					></juno-select>
 				</div>
 			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<p>* The merge strategy determines how the importer will handle demographic conflicts.
+						A merge conflict will occur if an import record has a matching similar Health Number, or a matching date of birth, first and last name combination.
+						In this case, the merge strategy will determine how the data is imported.
+					</p>
+				</div>
+			</div>
 
 			<div class="row">
 				<div class="col-md-12">
 					<juno-button ng-click="$ctrl.onRunImport()"
+					             disabled="!$ctrl.canRunImport() || $ctrl.importRunning"
 					             button-color="JUNO_BUTTON_COLOR.PRIMARY"
 					             button-color-pattern = JUNO_BUTTON_COLOR_PATTERN.FILL;>
 						Run Import

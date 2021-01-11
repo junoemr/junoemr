@@ -89,23 +89,25 @@ angular.module('Common.Util').service("junoHttp", [
                 return http_util.request(request_hash);
             };
 
-            http_util.post = function post(url,data)
+            http_util.post = function post(url,data,config={})
             {
                 var request_hash = {
                     method: 'POST',
                     url: url,
                     data: data
                 };
+                Juno.Common.Util.mergeHash(request_hash, config);
                 return http_util.request(request_hash);
             };
 
-            http_util.put = function put(url,data)
+            http_util.put = function put(url,data,config={})
             {
                 var request_hash = {
                     method: 'PUT',
                     url: url,
                     data: data
                 };
+                Juno.Common.Util.mergeHash(request_hash, config);
                 return http_util.request(request_hash);
             };
 

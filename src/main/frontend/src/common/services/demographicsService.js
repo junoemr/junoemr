@@ -160,6 +160,31 @@ angular.module("Common.Services").service("demographicsService", [
 			return deferred.promise;
 		};
 
+		service.demographicImport = function demographicImport(type, source, mergeStrategy, files)
+		{
+			var deferred = $q.defer();
+
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.params = {
+				type: type,
+				source: source,
+				merge: mergeStrategy,
+			};
+
+			junoHttp.post(service.apiPath + '/import', files, config).then(
+				function success(results)
+				{
+					deferred.resolve(results);
+				},
+				function error(errors)
+				{
+					console.log("demographicsService::importDemographic error", errors);
+					deferred.reject("An error occurred while importing demographics");
+				});
+
+			return deferred.promise;
+		};
+
 		// add the default roster statuses to the roster status list.
 		service.addDefaultRosterStatuses = (rosterList) =>
 		{
