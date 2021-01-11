@@ -168,6 +168,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/panelManagement',
 			component: 'panelManagementAdmin'
 		})
+        .state('admin.iMDHealth',
+        {
+            url: '/imdHealth',
+            component: 'imdHealthAdmin',
+        })
 		.state('admin.iceFall',
 		{
 			url: '/iceFall',

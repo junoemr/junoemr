@@ -604,6 +604,11 @@ public class AdminNavService
 
 		integrationGroup.setName(resourceBundle.getString("admin.admin.Integration"));
 
+		if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_SUPERADMIN_IMDHEALTH_ENABLED, false))
+		{
+			integrationItems.add(new AdminNavItemTo1("iMD Health", "imdHealth"));
+		}
+
 		integrationItems.add(new AdminNavItemTo1("REST Clients", "frame?frameUrl=" + contextPath + "/admin/api/clients.jsp"));
 		integrationItems.add(new AdminNavItemTo1("REST API", "frame?frameUrl=" + contextPath + "/admin/api/api.jsp"));
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("provider.btnSetIntegratorPreferences"), "frame?frameUrl=" + contextPath + URLEncoder.encode("/setProviderStaleDate.do?method=viewIntegratorProperties")));

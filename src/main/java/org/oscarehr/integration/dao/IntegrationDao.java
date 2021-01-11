@@ -122,5 +122,22 @@ public class IntegrationDao extends AbstractDao<Integration>
         }
     }
 
+	/**
+	 * Retrieve an integration by it's type and site id.  If more than one row exists in the database, an exception will
+	 * be thrown.  If no entry exists, this method will return null.
+	 *
+	 * @param integrationType Integration type
+	 * @param siteId site id
+	 * @return A single result if found, or null if no entries exist.
+	 * @throws javax.persistence.NonUniqueResultException if more than one entry found.
+	 */
+	public Integration findByIntegrationTypeAndSiteId(String integrationType, Integer siteId)
+	{
+		String sql = "SELECT i FROM Integration i WHERE i.integrationType = :integrationType AND i.site.siteId = :siteId";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("integrationType", integrationType);
+		query.setParameter("siteId", siteId);
 
+		return getSingleResultOrNull(query);
+	}
 }

@@ -51,7 +51,13 @@ angular.module('Admin.Integration').component('integrationModules',
 				enabled: false,
 				propertyName: "aqs_enabled",
 				configUrl: "#!/admin/manageAppointmentQueues",
-			}
+			},
+            {
+                name: "iMD Health",
+                enabled: false,
+                propertyName: "superadmin.integration.imdHealth.enabled",
+                configUrl: ""
+            }
 		];
 
 		ctrl.$onInit = function()
