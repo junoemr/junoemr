@@ -33,7 +33,8 @@ angular.module('Common.Components').component('junoButton', {
 		buttonColor: "<?",
 		buttonColorPattern: "<?",
 		buttonColorOverride: "<?",
-		disabled: "<?"
+		disabled: "<?",
+		onClick: "&?"
 	},
 	transclude: true,
 	controller: [ function () {
@@ -45,6 +46,14 @@ angular.module('Common.Components').component('junoButton', {
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.buttonColor = ctrl.buttonColor || JUNO_BUTTON_COLOR.PRIMARY;
 			ctrl.buttonColorPattern = ctrl.buttonColorPattern || JUNO_BUTTON_COLOR_PATTERN.DEFAULT;
+		};
+
+		ctrl.clickHandler = () =>
+		{
+			if (!ctrl.disabled && ctrl.onClick())
+			{
+				ctrl.onClick({});
+			}
 		};
 
 		ctrl.labelClasses = () =>

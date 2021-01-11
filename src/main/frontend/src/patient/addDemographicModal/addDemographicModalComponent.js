@@ -122,15 +122,6 @@ angular.module('Patient').component('addDemographicModal', {
 				}
 		);
 
-		ctrl.onClick = function ()
-		{
-			if (!ctrl.buttonClicked)
-			{
-				ctrl.buttonClicked = true;
-				ctrl.onAdd();
-			}
-		}
-
 		ctrl.validateDemographic = function ()
 		{
 			let dateOfBirthValid = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth).isValid();
@@ -150,6 +141,8 @@ angular.module('Patient').component('addDemographicModal', {
 
 		ctrl.onAdd = function ()
 		{
+			ctrl.buttonClicked = true;
+
 			if (Juno.Common.Util.exists(ctrl.newDemographicData.hin))
 			{
 				ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
@@ -166,6 +159,7 @@ angular.module('Patient').component('addDemographicModal', {
 					{
 						alert(errors);
 						console.error(errors);
+						ctrl.buttonClicked = false;
 					})
 			}
 			else // Need this to reset button if validation fails
