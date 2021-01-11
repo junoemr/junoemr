@@ -25,7 +25,6 @@ package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import net.sf.json.JSONObject;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.caisi_integrator.ws.DemographicTransfer;
@@ -58,7 +57,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

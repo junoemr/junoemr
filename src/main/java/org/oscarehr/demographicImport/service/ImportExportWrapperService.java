@@ -104,10 +104,6 @@ public class ImportExportWrapperService
 				}
 			}
 		}
-		catch(Exception e)
-		{
-			logger.error("Unknown Error", e);
-		}
 		finally
 		{
 			// always clear the provider cache after an import to unload resources

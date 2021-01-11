@@ -71,7 +71,7 @@
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<p>* Some import sources provide additional data or spicific format changes that require customized handling.
+					<p>* Some import sources provide additional data or specific format changes that require customized handling.
 						Selecting a specific source will improve the import results.
 					</p>
 				</div>
