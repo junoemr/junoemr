@@ -159,7 +159,7 @@
 				 title="Add"
 				 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 				 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-				 on-click="$ctrl.onAdd()"
+				 click="$ctrl.onAdd()"
 				 disabled="$ctrl.buttonClicked">
 				Add
 			</juno-button>

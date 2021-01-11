@@ -34,7 +34,7 @@ angular.module('Common.Components').component('junoButton', {
 		buttonColorPattern: "<?",
 		buttonColorOverride: "<?",
 		disabled: "<?",
-		onClick: "&?"
+		click: "&?"
 	},
 	transclude: true,
 	controller: [ function () {
@@ -50,9 +50,9 @@ angular.module('Common.Components').component('junoButton', {
 
 		ctrl.clickHandler = () =>
 		{
-			if (!ctrl.disabled && ctrl.onClick)
+			if (!ctrl.disabled && ctrl.click)
 			{
-				ctrl.onClick({});
+				ctrl.click({});
 			}
 		};
 
