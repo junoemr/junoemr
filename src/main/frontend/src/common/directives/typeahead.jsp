@@ -41,6 +41,7 @@
 	       ng-model-options="typeaheadModelOptions"
 	       ng-change="onChange()"
 	       ng-blur="onBlur()"
+           ng-disabled="isDisabled"
 	       uib-typeahead="match for match in findMatches($viewValue)"
 	       typeahead-template-url="{{ optionsTemplateUrl }}"
 	       typeahead-input-formatter="formatMatch($model)"
@@ -63,6 +64,7 @@
 	       ng-model-options="typeaheadModelOptions"
 	       ng-change="onChange()"
 	       ng-blur="onBlur()"
+           ng-disabled="isDisabled"
 	       uib-typeahead="match as typeaheadLabel(match) for match in findMatches($viewValue)"
 	       typeahead-input-formatter="formatMatch($model)"
 	       typeahead-on-select="onSelect($item, $model, $label, $event)"
@@ -75,13 +77,13 @@
 	       aria-describedby="patient-typeahead"
 	/>
 
-	<span ng-if="hasButtons()"
-				class="input-group-btn">
+	<span ng-if="hasButtons()" class="input-group-btn">
 		<button ng-if="hasSearchButton()"
 			type="button"
 			class="btn btn-default btn-search"
 			ng-click="onSearch()"
-			title="{{searchButtonTitle}}">
+			title="{{searchButtonTitle}}"
+            ng-disabled="isDisabled">
 			<span class="glyphicon glyphicon-search" ></span>
 		</button>
 
@@ -89,7 +91,8 @@
 			type="button"
 			class="btn btn-default" 
 			ng-click="onAdd()"
-			title="{{addButtonTitle}}">
+			title="{{addButtonTitle}}"
+            ng-disabled="isDisabled">
 			<span class="glyphicon glyphicon-plus"></span>
 		</button>
 	</span>

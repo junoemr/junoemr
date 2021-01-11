@@ -1154,6 +1154,9 @@ if(wLReadonly.equals("")){
 						<li><a href="#" onmouseover='this.style.color="black"' onmouseout='this.style.color="white"' onclick="return add2url('<bean:message key="oscarEncounter.telephoneEnc.title"/>');"><bean:message key="oscarEncounter.telephoneEnc.title"/>
 						</a><br>
 						</li>
+						<li><a href="#" onmouseover='this.style.color="black"' onmouseout='this.style.color="white"' onclick="return add2url('<bean:message key="oscarEncounter.videoEnc.title"/>');"><bean:message key="oscarEncounter.videoEnc.title"/>
+						</a><br>
+						</li>
 						<li><a href="#" onmouseover='this.style.color="black"' onmouseout='this.style.color="white"' onclick="return add2url('<bean:message key="oscarEncounter.noClientEnc.title"/>');"><bean:message key="oscarEncounter.noClientEnc.title"/>
 						</a><br>
 						</li>

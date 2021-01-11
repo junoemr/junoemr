@@ -1,5 +1,4 @@
 /**
- *
  * Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
@@ -22,24 +21,38 @@
  */
 package org.oscarehr.util;
 
-public class EncounterUtil {
-    public enum EncounterType {
-        FACE_TO_FACE_WITH_CLIENT("face to face encounter with client"), TELEPHONE_WITH_CLIENT("telephone encounter with client"), ENCOUNTER_WITH_OUT_CLIENT("encounter without client"), EMAIL_WITH_CLIENT("email encounter with client");
+public class EncounterUtil
+{
+	public enum EncounterType
+	{
+		FACE_TO_FACE_WITH_CLIENT("face to face encounter with client"),
+		TELEPHONE_WITH_CLIENT("telephone encounter with client"),
+		ENCOUNTER_WITH_OUT_CLIENT("encounter without client"),
+		EMAIL_WITH_CLIENT("email encounter with client"),
+		VIDEO_WITH_CLIENT("video encounter with client");
 
-        private String oldDbValue = null;
+		private String oldDbValue = null;
 
-        EncounterType(String oldDbValue) {
-            this.oldDbValue = oldDbValue;
+		EncounterType(String oldDbValue)
+		{
+			this.oldDbValue = oldDbValue;
+		}
+
+		public String getOldDbValue()
+		{
+			return (oldDbValue);
+		}
+	}
+
+	public static EncounterType getEncounterTypeFromOldDbValue(String oldDbValue)
+	{
+        for (EncounterType encounterType : EncounterType.values())
+        {
+            if (encounterType.getOldDbValue().equals(oldDbValue))
+            {
+                return (encounterType);
+            }
         }
-
-        public String getOldDbValue() {
-            return(oldDbValue);
-        }
-    }
-    
-    public static EncounterType getEncounterTypeFromOldDbValue(String oldDbValue)
-    {
-    	for (EncounterType encounterType : EncounterType.values()) if (encounterType.getOldDbValue().equals(oldDbValue)) return(encounterType);
-    	return(null);
-    }
+		return (null);
+	}
 }

@@ -42,28 +42,39 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <% java.util.Properties oscarVariables = oscar.OscarProperties.getInstance(); %>
-<%   
-  if(session.getValue("user") == null)
-    response.sendRedirect("../../logout.jsp");
-  String user_no;
-  user_no = (String) session.getAttribute("user");
-           String docdownload = oscarVariables.getProperty("project_home") ;;
-           session.setAttribute("homepath", docdownload);      
-
+<%
+    if (session.getValue("user") == null)
+    {
+        response.sendRedirect("../../logout.jsp");
+    }
+    String docdownload = oscarVariables.getProperty("project_home");
+    session.setAttribute("homepath", docdownload);
 %>
 <html:html>
-<head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title><bean:message key="admin.admin.btnImportFormData" /></title>
-<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/js/jquery_css/smoothness/jquery-ui-1.10.2.custom.min.css"/>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
-<script>
-$(function() {
-    $( document ).tooltip();
-  });
-</script>
-</head>
+    <head>
+        <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+        <title><bean:message key="admin.admin.btnImportFormData"/></title>
+
+            <%-- Sometimes this page may be loaded as an iFrame and sometimes it isn't.
+                When loaded as an iFrame, the parent document already has jQuery loaded, so we shouldn't reload it.
+                When not an iFrame, we must include jQuery. --%>
+        <script type="text/javascript">
+		    if (typeof jQuery === 'undefined')
+		    {
+			    document.write('<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"><\/script>');
+		    }
+        </script>
+
+        <link rel="stylesheet" type="text/css"
+              href="<%= request.getContextPath() %>/js/jquery_css/smoothness/jquery-ui-1.10.2.custom.min.css"/>
+        <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
+        <script>
+			$(function ()
+			{
+				$(document).tooltip();
+			});
+        </script>
+    </head>
 
 <body>
 
@@ -79,12 +90,12 @@ $(function() {
 
 
 
-Select data in zip format:<br /> 
+Select data in zip format:<br />
 
-<input type="file" name="file1" value="">
-<span title="<bean:message key="global.uploadWarningBody"/>" style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer"><img border="0" src="../images/icon_alertsml.gif"/></span></span>
-        
- <input type="submit" name="Submit" class="btn btn-primary" value="Import">
+<input type="file" name="file1" accept=".zip" value="">
+<span title="<bean:message key="global.uploadWarningBody"/>" style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer"><img border="0" src="../images/icon_alertsml.gif"/></span>
+
+    <input type="submit" name="Submit" class="btn btn-primary" value="Import">
 
 <p><i class="icon-info-sign"></i> Use this function to import data for a specific form into the OSCAR database</p>
 		
