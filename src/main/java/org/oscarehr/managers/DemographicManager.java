@@ -847,14 +847,13 @@ public class DemographicManager
 	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
 
+        if (demographic.getDateJoined() == null)
+        {
+            Date newDateJoined = new Date();
+            demographic.setDateJoined(newDateJoined);
+        }
 		validateDemographic(demographic);
 		filterDemographic(demographic);
-
-		if (demographic.getDateJoined() == null)
-		{
-			Date newDateJoined = new Date();
-			demographic.setDateJoined(newDateJoined);
-		}
 
 		demographicDao.save(demographic);
 
