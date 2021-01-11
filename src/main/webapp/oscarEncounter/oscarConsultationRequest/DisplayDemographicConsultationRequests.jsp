@@ -188,6 +188,12 @@ function popupOscarConS(vheight,vwidth,varpage) { //open a new popup window
 							key="oscarEncounter.oscarConsultationRequest.DisplayDemographicConsultationRequests.msgPatCall" />
 						<% }else if(status.equals("4")) { %> <bean:message
 							key="oscarEncounter.oscarConsultationRequest.DisplayDemographicConsultationRequests.msgAppMade" />
+						<% }else if(status.equals("5")) { %> <bean:message
+							key="oscarEncounter.oscarConsultationRequest.DisplayDemographicConsultationRequests.msgCancelled" />
+						<% }else if(status.equals("6")) { %> <bean:message
+							key="oscarEncounter.oscarConsultationRequest.DisplayDemographicConsultationRequests.msgAppBooked" />
+						<% }else if(status.equals("7")) { %> <bean:message
+							key="oscarEncounter.oscarConsultationRequest.DisplayDemographicConsultationRequests.msgDeleted" />
 						<% } %>
 						</td>
 						<td class="stat<%=status%>"><a

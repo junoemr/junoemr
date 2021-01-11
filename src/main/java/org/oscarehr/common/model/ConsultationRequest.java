@@ -58,7 +58,13 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 	public static final String STATUS_PEND_SPECIAL = "2";
 	public static final String STATUS_PEND_PATIENT = "3";
 	public static final String STATUS_COMPLETE = "4";
+	public static final String STATUS_CANCEL = "5";
+	public static final String STATUS_APPT_BOOK = "6";
+	public static final String STATUS_DELETE = "7";
 
+	public static final String URGENCY_URGENT = "1";
+	public static final String URGENCY_NON_URGENT = "2";
+	public static final String URGENCY_RETURN = "3";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

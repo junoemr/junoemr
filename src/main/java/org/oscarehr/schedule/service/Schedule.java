@@ -47,6 +47,7 @@ import org.oscarehr.schedule.dto.UserDateSchedule;
 import org.oscarehr.schedule.model.RSchedule;
 import org.oscarehr.schedule.model.ScheduleDate;
 import org.oscarehr.schedule.model.ScheduleHoliday;
+import org.oscarehr.site.service.SiteService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ScheduleSlotDto;
@@ -126,6 +127,9 @@ public class Schedule
 
 	@Autowired
 	SiteDao siteDao;
+
+	@Autowired
+	SiteService siteService;
 
 	private static final Logger logger = MiscUtils.getLogger();
 
@@ -390,7 +394,7 @@ public class Schedule
 
 		if (viewAll && site != null)
 		{
-			if (!isProviderAssignedToSite(site, providerNo))
+			if (!siteService.isProviderAssignedToSite(providerNo, site))
 			{ // skip this provider
 				return new ResourceSchedule(userDateSchedules);
 			}
@@ -459,7 +463,7 @@ public class Schedule
 				//in view all we filter by site assigned to provider
 				if (site != null)
 				{
-					if (!isProviderAssignedToSite(site, result.getId().getProviderNo()))
+					if (!siteService.isProviderAssignedToSite(result.getId().getProviderNo(), site))
 					{ // skip this provider
 						continue;
 					}
@@ -638,7 +642,7 @@ public class Schedule
 		List<String> providerIdList;
 		boolean visibleSchedules = false;
 
-		if(siteName == null || isProviderAssignedToSite(siteName, String.valueOf(providerId)))
+		if(siteName == null || siteService.isProviderAssignedToSite(String.valueOf(providerId), siteName))
 		{
 			providerIdList = new ArrayList<>(1);
 			providerIdList.add(String.valueOf(providerId));
@@ -768,7 +772,7 @@ public class Schedule
 			// filter by site selection if applicable
 			if(siteName != null)
 			{
-				if (!isProviderAssignedToSite(siteName, providerIdStr))
+				if (!siteService.isProviderAssignedToSite(providerIdStr, siteName))
 				{ // skip this provider
 					continue;
 				}
@@ -905,18 +909,5 @@ public class Schedule
 		}
 
 		return providerSlotMap;
-	}
-
-	private boolean isProviderAssignedToSite(String siteName, String providerId)
-	{
-		List<Site> providerSites = siteDao.getActiveSitesByProviderNo(providerId);
-		for (Site providerSite : providerSites)
-		{
-			if (siteName.equals(providerSite.getName()))
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 }
