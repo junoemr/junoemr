@@ -50,7 +50,7 @@ angular.module('Common.Components').component('junoButton', {
 
 		ctrl.clickHandler = () =>
 		{
-			if (!ctrl.disabled && ctrl.onClick())
+			if (!ctrl.disabled && ctrl.onClick)
 			{
 				ctrl.onClick({});
 			}
