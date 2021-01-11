@@ -20,26 +20,13 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.transfer.common;
+package org.oscarehr.demographicImport.service;
 
-import lombok.Data;
-import org.apache.commons.codec.binary.Base64;
+import org.oscarehr.common.io.GenericFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.Serializable;
-
-@Data
-public class FileTransfer implements Serializable
+public interface ImportCallback
 {
-	private String data;
-	private String name;
-	private String type;
-	private Integer size;
-
-	public InputStream toInputStream()
-	{
-		byte[] decoded = Base64.decodeBase64(data);
-		return new ByteArrayInputStream(decoded);
-	}
+	void onFileImportSuccess(GenericFile genericFile);
+	void onFileImportFailure(GenericFile genericFile);
+	void onImportComplete(long successCount, long failureCount);
 }

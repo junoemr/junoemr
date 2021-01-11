@@ -304,6 +304,11 @@ public class GenericFile
 		return javaFile.getPath();
 	}
 
+	public String getDirectory()
+	{
+		return javaFile.getAbsoluteFile().getParent();
+	}
+
 	public String getExtension()
 	{
 		return FilenameUtils.getExtension(javaFile.getName());

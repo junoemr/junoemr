@@ -25,15 +25,19 @@ package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import net.sf.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.caisi_integrator.ws.DemographicTransfer;
 import org.oscarehr.caisi_integrator.ws.MatchingDemographicParameters;
 import org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographicImport.service.ImportExportWrapperService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
@@ -54,6 +58,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -81,6 +87,9 @@ public class DemographicsService extends AbstractServiceImpl
 
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
+
+	@Autowired
+	private ImportExportWrapperService importExportWrapperService;
 
 	/**
 	 * quick search demographics, performs an OR on the restrictions rather than an AND.
@@ -281,12 +290,30 @@ public class DemographicsService extends AbstractServiceImpl
 	public RestResponse<String> demographicImport(@QueryParam("type") String type,
 	                                              @QueryParam("source") String importSource,
 	                                              @QueryParam("merge") String mergeStrategy,
-	                                              List<FileTransfer> fileListTransfer)
+	                                              List<FileTransfer> fileListTransfer) throws IOException, InterruptedException
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
 
 		logger.info(fileListTransfer);
+
+		List<GenericFile> genericFileList = new ArrayList<>();
+		String documentLocation = System.getProperty("java.io.tmpdir");
+
+		//TODO handle invalid files, zip files, etc.
+		for(FileTransfer file : fileListTransfer)
+		{
+			genericFileList.add(FileFactory.createTempFile(file.toInputStream(), ".xml"));
+		}
+
+		importExportWrapperService.importDemographics(
+				type,
+				importSource,
+				genericFileList,
+				documentLocation,
+				false,
+				false,
+				null);
 
 		return RestResponse.successResponse("success");
 	}

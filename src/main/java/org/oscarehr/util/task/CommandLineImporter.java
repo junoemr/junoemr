@@ -27,10 +27,8 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
-import org.oscarehr.demographicImport.exception.InvalidImportFileException;
-import org.oscarehr.demographicImport.service.ImportExportService;
-import org.oscarehr.demographicImport.service.ImportLogger;
+import org.oscarehr.demographicImport.service.ImportCallback;
+import org.oscarehr.demographicImport.service.ImportExportWrapperService;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.oscarehr.util.task.args.BooleanArg;
 import org.oscarehr.util.task.args.CommandLineArg;
@@ -40,20 +38,18 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 @Component
-public class CommandLineImporter implements CommandLineTask
+public class CommandLineImporter implements CommandLineTask, ImportCallback
 {
 	private static final Logger logger = Logger.getLogger(CommandLineImporter.class);
 
 	@Autowired
-	private ImportExportService importExportService;
-
-	@Autowired
-	private ImporterExporterFactory importerExporterFactory;
+	private ImportExportWrapperService importExportWrapperService;
 
 	public String taskName()
 	{
@@ -118,94 +114,65 @@ public class CommandLineImporter implements CommandLineTask
 			importSource = ImporterExporterFactory.IMPORT_SOURCE.UNKNOWN;
 		}
 
-		long importCount = 0;
-		long failureCount = 0;
-		long fileCounter = 0;
-
 		try
 		{
-			logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
+			List<GenericFile> genericFileList = new ArrayList<>();
 
 			File[] fileList = importFileDirectory.listFiles();
 			for(File file : fileList)
 			{
-				fileCounter++;
-				logger.info("==== Process file " + fileCounter + "/" + fileList.length + " ====");
-
 				// skip sub directories
 				if(file.isDirectory())
 				{
 					logger.info("Skip Directory: " + file.getName());
 					continue;
 				}
-				GenericFile importFile = FileFactory.getExistingFile(file);
-
-				ImportLogger importLogger = importerExporterFactory.getImportLogger(importerType);
-				try
-				{
-					importExportService.importDemographic(importerType,
-							importSource,
-							importLogger,
-							importFile,
-							importDocumentLocation,
-							skipMissingDocs,
-							mergeDemographics);
-
-					importCount++;
-					moveToCompleted(importFile, importFileDirectory);
-				}
-				catch(InvalidImportFileException e)
-				{
-					logger.info("Skip (invalid import file): " + importFile.getName());
-				}
-				catch(Exception e)
-				{
-					logger.error("Failed to import: " + importFile.getName(), e);
-					failureCount++;
-					moveToFailed(importFile, importFileDirectory);
-				}
-				finally
-				{
-					importLogger.flush();
-				}
+				genericFileList.add(FileFactory.getExistingFile(file));
 			}
+
+			importExportWrapperService.importDemographics(
+					importerType,
+					importSource,
+					genericFileList,
+					importDocumentLocation,
+					skipMissingDocs,
+					mergeDemographics,
+					this);
 		}
 		catch(Exception e)
 		{
-			logger.error("Unknown Error", e);
+			logger.error("Error", e);
 		}
-		finally
-		{
-			// always clear the provider cache after an import to unload resources
-			// TODO a better way to handle this? only the service should be dealing with converters
-			BaseModelToDbConverter.clearProviderCache();
-		}
-		logger.info("IMPORT PROCESS COMPLETE (" + importCount + " files imported. " + failureCount + " failures)");
 	}
 
-	private static void moveToFailed(GenericFile genericFile, File baseDir)
+	private static void moveTo(GenericFile genericFile, String baseDir, String subfolder)
 	{
-		File failedDir = new File(baseDir, "failed");
+		File failedDir = new File(baseDir, subfolder);
 		try
 		{
 			genericFile.moveFile(failedDir);
 		}
 		catch(IOException e)
 		{
-			logger.error("IO ERROR: Failed to move " + genericFile.getName() + " to failed folder!", e);
+			logger.error("IO ERROR: Failed to move " + genericFile.getName() + " to " + subfolder + " folder!", e);
 		}
 	}
 
-	private static void moveToCompleted(GenericFile genericFile, File baseDir)
+	@Override
+	public void onFileImportSuccess(GenericFile genericFile)
 	{
-		File failedDir = new File(baseDir, "completed");
-		try
-		{
-			genericFile.moveFile(failedDir);
-		}
-		catch(IOException e)
-		{
-			logger.error("IO ERROR: Failed to move " + genericFile.getName() + " to completed folder!", e);
-		}
+		moveTo(genericFile, genericFile.getDirectory(), "completed");
+	}
+
+	@Override
+	public void onFileImportFailure(GenericFile genericFile)
+	{
+		moveTo(genericFile, genericFile.getDirectory(), "failed");
+	}
+
+	@Override
+	public void onImportComplete(long successCount, long failureCount)
+	{
+		logger.info("IMPORT PROCESS COMPLETE (" + successCount + " files imported. " + failureCount + " failures)");
 	}
 }
