@@ -485,7 +485,7 @@ public class ONAREnhancedFormToXML {
 
 	void populatePregnancyHistory(PregnancyHistory pregnancyHistory)  {
 
-		//TODO:null?
+		//TODO-legacy:null?
 		if(props.getProperty("pg1_menLMP", "").length()>0){
 			try {
 				pregnancyHistory.setLMP(createDate(dateFormatter.parse(props.getProperty("pg1_menLMP"))));

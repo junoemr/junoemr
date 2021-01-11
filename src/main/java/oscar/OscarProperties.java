@@ -123,7 +123,7 @@ public class OscarProperties extends Properties {
 	
 	// =========================================================================
 	// Methods for accessing general properties in various ways
-	// TODO: make these private and access all properties through the specific 
+	// TODO-legacy: make these private and access all properties through the specific
 	//       methods below
 	// =========================================================================
 	

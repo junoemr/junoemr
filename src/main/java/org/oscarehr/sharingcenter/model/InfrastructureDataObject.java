@@ -80,7 +80,7 @@ public class InfrastructureDataObject extends AbstractModel<Integer> implements 
 	
 	@Override
     public Integer getId() {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 	    return this.id;
     }
 

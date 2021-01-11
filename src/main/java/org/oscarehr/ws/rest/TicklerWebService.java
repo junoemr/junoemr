@@ -284,7 +284,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 			throw new RuntimeException("Tickler not found");
 		}
 		
-		//TODO: verify it's good data associations
+		//TODO-legacy: verify it's good data associations
 		tickler.setTaskAssignedTo(json.getString("taskAssignedTo"));
 	
 		tickler.setStatusAsChar(json.getString("status").charAt(0));

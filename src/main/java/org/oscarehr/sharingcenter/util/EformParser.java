@@ -67,7 +67,7 @@ public class EformParser extends DefaultHandler implements LexicalHandler { //Th
 			p.parse(inputSource);
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// TODO-legacy Auto-generated catch block
 		}
 
 		return rebuiltHtml.toString();

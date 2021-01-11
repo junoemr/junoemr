@@ -31,7 +31,7 @@ public class CaseManagementIssueConverter extends AbstractConverter<CaseManageme
 	
 	@Override
 	public CaseManagementIssue getAsDomainObject(LoggedInInfo loggedInInfo, CaseManagementIssueTo1 t) throws ConversionException {
-	// TODO Auto-generated method stub
+	// TODO-legacy Auto-generated method stub
 	return null;
 	}
 

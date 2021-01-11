@@ -51,7 +51,7 @@ public class Wcb extends AbstractModel<Integer>{
 	@Column(name="demographic_no")
 	private int demographicNo;
 	
-	//TODO: change to string
+	//TODO-legacy: change to string
 	@Column(name="provider_no")
 	private int providerNo;
 	

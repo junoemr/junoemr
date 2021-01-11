@@ -118,7 +118,7 @@ public class PreventionDS {
         
         
         if (!fileFound){                  
-         URL url = PreventionDS.class.getResource( "/oscar/oscarPrevention/prevention.drl" );  //TODO: change this so it is configurable;
+         URL url = PreventionDS.class.getResource( "/oscar/oscarPrevention/prevention.drl" );  //TODO-legacy: change this so it is configurable;
          log.debug("loading from URL "+url.getFile());            
          ruleBase = RuleBaseLoader.loadFromUrl( url );
         }

@@ -67,7 +67,7 @@ public class ConsultationAttachmentService
 
 	private List<EFormData> getEFormList(Integer demographicNo, Integer consultId, boolean findAttached)
 	{
-		// TODO this could be refined to a single query
+		// TODO-legacy this could be refined to a single query
 		List<EFormData> eForms = EFormUtil.listPatientEFormsShowLatestOnly(demographicNo.toString());
 		if(consultId == null && !findAttached)
 		{
@@ -149,7 +149,7 @@ public class ConsultationAttachmentService
 	}
 	public List<LabResultData> getAllLabs(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
 	{
-		//TODO refactor to single get when lab logic is re-worked
+		//TODO-legacy refactor to single get when lab logic is re-worked
 		/* This relies on the unattached lab version being filtered (only latest is shown) but attached labs being unfiltered,
 		there is a case where old lab versions are attached and if those are filtered out,
 		they will not appear. It may look like a duplicate in this case. */
@@ -159,7 +159,7 @@ public class ConsultationAttachmentService
 		return allLabs;
 	}
 	/* This filters lab versions using the old logic from the jsp, so that only the latest version appears
-	 * TODO - refactor all this to the DAO */
+	 * TODO-legacy - refactor all this to the DAO */
 	private List<LabResultData> filterLabVersions(List<LabResultData> unfilteredLabs)
 	{
 		List<LabResultData> filteredLabs = new ArrayList<>(unfilteredLabs.size());

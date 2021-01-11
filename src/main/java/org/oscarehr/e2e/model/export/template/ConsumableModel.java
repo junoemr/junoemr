@@ -104,7 +104,7 @@ public class ConsumableModel {
 		return lot;
 	}
 
-	// TODO [MARC-HI] Add e2e namespace extension fields
+	// TODO-legacy [MARC-HI] Add e2e namespace extension fields
 	public Consumable getConsumable(Drug drug) {
 		if(drug == null) {
 			drug = new Drug();

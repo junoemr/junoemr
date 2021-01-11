@@ -128,7 +128,7 @@ public class ReportEvaluator {
     }
 
 
-    //TODO:HACK for now! replace with something more flexible
+    //TODO-legacy:HACK for now! replace with something more flexible
     public  String getCSV(){
         String csv = null;
         if (denominator.hasReplaceableValues()){

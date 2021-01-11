@@ -48,7 +48,7 @@ public class BornSOAPHeaderInterceptor extends AbstractPhaseInterceptor<Message>
 
 	public void handleMessage(Message message) throws Fault {
 
-		// TODO: The following will add the eho:endpointID to the SOAP Header of all outgoing requests
+		// TODO-legacy: The following will add the eho:endpointID to the SOAP Header of all outgoing requests
 		// Not sure about the workflow, but perhaps we can check for the EHO endpoint URL if it will not change.. then add the header
 		
 		SOAPMessage msg = message.getContent(SOAPMessage.class);

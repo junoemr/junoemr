@@ -249,7 +249,7 @@ public class NextAppointmentSearchHelper {
 					}
 					ScheduleTemplateCode templateCode = codeList.get(String.valueOf(slot));
 
-					//TODO: is there a default appt length somewhere?					
+					//TODO-legacy: is there a default appt length somewhere?
 					int duration = 15;
 					//load the template code
 					if(templateCode == null)

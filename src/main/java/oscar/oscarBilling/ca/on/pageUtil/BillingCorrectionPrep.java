@@ -577,7 +577,7 @@ public class BillingCorrectionPrep {
 			try {
 				billTrans.setAdmissionDate(billCheader1.getAdmissionDate());
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				// TODO-legacy Auto-generated catch block
 				billTrans.setAdmissionDate(null);
 			}
 			billTrans.setBillingDate(billCheader1.getBillingDate());
@@ -613,7 +613,7 @@ public class BillingCorrectionPrep {
 				try {
 					billTrans.setAdmissionDate(billCheader1.getAdmissionDate());
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
+					// TODO-legacy Auto-generated catch block
 					billTrans.setAdmissionDate(null);
 				}
 				billTrans.setBillingDate(billCheader1.getBillingDate());

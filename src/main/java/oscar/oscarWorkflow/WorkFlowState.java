@@ -49,7 +49,7 @@ public class WorkFlowState {
     public WorkFlowState() {
     }
     
-    //TODO: need to add which provider added it  OR i could just logg it as well
+    //TODO-legacy: need to add which provider added it  OR i could just logg it as well
     public int addToWorkFlow(String workflowType,String providerNo, String demographicNo, Date endDate,String current_state){
         org.oscarehr.common.model.WorkFlow wf = new  org.oscarehr.common.model.WorkFlow();
         wf.setWorkflowType(workflowType);

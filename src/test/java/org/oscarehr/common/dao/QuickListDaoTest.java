@@ -47,7 +47,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class QuickListDaoTest extends DaoTestFixtures
 {
-	// TODO Make it protected when test ignores are merged in
+	// TODO-legacy Make it protected when test ignores are merged in
 	@Autowired
 	private QuickListDao quickListDao;
 

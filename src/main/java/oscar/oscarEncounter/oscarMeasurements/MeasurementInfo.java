@@ -232,7 +232,7 @@ public class MeasurementInfo {
 
     public int getLastValueAsInt(String measurement){
 
-        int value = -1; //TODO not sure how to handle a non int value.
+        int value = -1; //TODO-legacy not sure how to handle a non int value.
         ArrayList list = getMeasurementData(measurement);
         Hashtable h =  null;
         if ( list != null && list.size() > 0){

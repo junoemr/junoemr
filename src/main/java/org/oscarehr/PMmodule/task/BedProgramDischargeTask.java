@@ -46,7 +46,7 @@ public class BedProgramDischargeTask extends TimerTask {
 
 	private static final Logger log=MiscUtils.getLogger();
 
-	// TODO IC Bedlog bedProgram.getDischargeTime();
+	// TODO-legacy IC Bedlog bedProgram.getDischargeTime();
 	private static final String DISCHARGE_TIME = "8:00 AM";
 	private static final long PERIOD = 3600000;
 

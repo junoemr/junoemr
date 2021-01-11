@@ -192,7 +192,7 @@ public class NotesService extends AbstractServiceImpl
 			logger.info("skipping domain check..provider is a moderator");
 		}
 		else if(
-			// TODO: speed this up
+			// TODO-legacy: speed this up
 			!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) &&
 			!caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo)
 		)
@@ -266,7 +266,7 @@ public class NotesService extends AbstractServiceImpl
 		return note;
 	}
 
-	//TODO -- POST shouldn't return a transfer object
+	//TODO-legacy -- POST shouldn't return a transfer object
 	/**
 	 * Save a new note
 	 * @param demographicNo
@@ -441,7 +441,7 @@ public class NotesService extends AbstractServiceImpl
 	}
 
 
-	//TODO -- POST shouldn't return a transfer object
+	//TODO-legacy -- POST shouldn't return a transfer object
 	@POST
 	@Path("/{demographicNo}/saveIssueNote")
 	@Consumes("application/json")
@@ -855,7 +855,7 @@ public class NotesService extends AbstractServiceImpl
 
 
 	protected CaseManagementCPP copyNote2cpp(CaseManagementCPP cpp, String note, String code) {
-		//TODO: change this back to a loop
+		//TODO-legacy: change this back to a loop
 		StringBuilder text = new StringBuilder();
 		Date d = new Date();
 		String separator = "\n-----[[" + d + "]]-----\n";
@@ -1285,7 +1285,7 @@ public class NotesService extends AbstractServiceImpl
 		return noteExt;
 	}
 	
-	//TODO
+	//TODO-legacy
 	@GET
 	@Path("/getIssueId/{issueCode}")	
 	@Produces("application/json")

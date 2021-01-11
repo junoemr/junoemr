@@ -113,7 +113,7 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 	 *      When true, all routes will be set as filed. Otherwise default routing rules are applied
 	 * 
 	 */
-	// TODO Replace labType parameter with an enum
+	// TODO-legacy Replace labType parameter with an enum
 	@SuppressWarnings("unchecked")
     public void addToProviderInbox(String providerNo, Integer labNo, String labType, boolean alwaysFileLabs)
 	{

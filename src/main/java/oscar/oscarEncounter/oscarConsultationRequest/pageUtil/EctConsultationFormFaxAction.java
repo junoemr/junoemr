@@ -109,7 +109,7 @@ public class EctConsultationFormFaxAction extends Action
 				CommonLabResultData consultLabs = new CommonLabResultData();
 				attachedDocuments = EDocUtil.listResponseDocs(loggedInInfo, demoNo, reqId, EDocUtil.ATTACHED);
 				attachedLabs = consultLabs.populateLabResultsDataConsultResponse(loggedInInfo, demoNo, reqId, CommonLabResultData.ATTACHED);
-				attachedEForms = new ArrayList<>(0); //TODO populate eform attachments
+				attachedEForms = new ArrayList<>(0); //TODO-legacy populate eform attachments
 
 				String consultResponsePDF = ConsultResponsePDFCreator.create(consultResponsePage);
 				GenericFile tempFile = FileFactory.getExistingFile(consultResponsePDF);

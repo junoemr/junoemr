@@ -68,7 +68,7 @@ public class SecurityTag implements Tag {
         Vector v = OscarRoleObjectPrivilege.getPrivilegeProp(objectName);
         // if (checkPrivilege(roleName, (Properties) getPrivilegeProp(objectName).get(0), (Vector) getPrivilegeProp(
         ///        objectName).get(1)))
-    	/*TODO: temporily allow current security work, the if statement should be removed */
+    	/*TODO-legacy: temporily allow current security work, the if statement should be removed */
         if (roleName == null) 
         {
         	

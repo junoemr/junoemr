@@ -156,8 +156,8 @@ public class CLSComplianceTest {
 			assertTrue("1001745".equals(orderingProviderId) || 
 					"1000000".equals(orderingProviderId));
 			
-			// FIXME verify how to obtain copy-to provider info -- handler.getCCDocs()
-			// FIXME verify if the name / id breakdown is correct
+			// FIXME-legacy verify how to obtain copy-to provider info -- handler.getCCDocs()
+			// FIXME-legacy verify if the name / id breakdown is correct
 			
 			i++;
 			logger.info("Completed physician info compliance check for lab " + i + " successfully");

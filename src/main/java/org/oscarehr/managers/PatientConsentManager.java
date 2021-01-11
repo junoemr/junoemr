@@ -296,7 +296,7 @@ public class PatientConsentManager {
 	 */
 	public List<Consent> getConsentsByTypeAndEditDate( LoggedInInfo loggedinInfo, ConsentType consentType, Date editedAfter ) {
 
-		// TODO Integrator uses this method. Not sure how to handle situations when Integrator is using the -1 system id.
+		// TODO-legacy Integrator uses this method. Not sure how to handle situations when Integrator is using the -1 system id.
 		// At current none of these entries reveal any private patient information.
 //		if ( ! securityInfoManager.hasPrivilege(loggedinInfo, "_demographic", SecurityInfoManager.READ, null) ) {
 //			return null;

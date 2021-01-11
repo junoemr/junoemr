@@ -525,7 +525,7 @@ public class BpmhFormHandler {
 					// retrieved from DrugRef.
 					// using this uses wayyyy too many resources, but it is the only way to 
 					// ensure this form is extensible with other Oscar changes.
-					//TODO: fix once othe parts merged in
+					//TODO-legacy: fix once othe parts merged in
 					/*
 					if( ! StringUtils.isBlank(drugDIN) ) {
 						

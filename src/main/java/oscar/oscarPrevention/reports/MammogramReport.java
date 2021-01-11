@@ -260,7 +260,7 @@ public class MammogramReport implements PreventionReport{
        return noFutureItems;
    }
 
-   //TODO: THIS MAY NEED TO BE REFACTORED AT SOME POINT IF MAM and PAP are exactly the same
+   //TODO-legacy: THIS MAY NEED TO BE REFACTORED AT SOME POINT IF MAM and PAP are exactly the same
    //If they don't have a MAM Test with guidelines
  //Get contact methods
    //NO contact

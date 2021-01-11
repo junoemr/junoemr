@@ -87,7 +87,7 @@ public class ClinicInfoDataObject extends AbstractModel<Integer> implements Seri
 
 	@Override
 	public Integer getId() {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 	    return id;
 	}
 

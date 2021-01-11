@@ -136,7 +136,7 @@ public class DefaultNoteService implements NoteService {
 		long intTime = System.currentTimeMillis();
 
 		//Gets some of the note data, no relationships, not the note/history..just enough
-		// TODO: Include this in query
+		// TODO-legacy: Include this in query
 		List<Map<String, Object>> notes = caseManagementNoteDao.getRawNoteInfoMapByDemographic(demoNo);
 		Map<String, Object> filteredNotes = new LinkedHashMap<String, Object>();
 
@@ -182,7 +182,6 @@ public class DefaultNoteService implements NoteService {
 		 */
 		intTime = System.currentTimeMillis();
 
-		// TODO: Include this in query *** NOT GONNA INCLUDE THIS, LOOKS LIKE CAISI
 		List<GroupNoteLink> groupNotesInfo = this.getGroupNoteIds(loggedInInfo, demographicId);
 		if (groupNotesInfo != null) {
 			for (GroupNoteLink note : groupNotesInfo) {
@@ -202,7 +201,7 @@ public class DefaultNoteService implements NoteService {
 		intTime = System.currentTimeMillis();
 
 		String roleName = criteria.getUserRole() + "," + criteria.getUserName();
-		// TODO: Include this in query
+		// TODO-legacy: Include this in query
 		ArrayList<HashMap<String, ? extends Object>> eForms = EFormUtil.listPatientEFormsNoData(demoNo, roleName);
 		for (HashMap<String, ? extends Object> eform : eForms) {
 			EChartNoteEntry e = new EChartNoteEntry();
@@ -223,8 +222,8 @@ public class DefaultNoteService implements NoteService {
 		logger.debug("FETCHED " + eForms.size() + " EFORMS META IN " + (System.currentTimeMillis() - intTime) + "ms");
 		intTime = System.currentTimeMillis();
 
-		// TODO: speed up
-		// TODO: Include this in query
+		// TODO-legacy: speed up
+		// TODO-legacy: Include this in query
 		ArrayList<PatientForm> allPatientForms = EctFormData.getGroupedPatientFormsFromAllTables(demographicId);
 		for (PatientForm patientForm : allPatientForms) {
 			EChartNoteEntry e = new EChartNoteEntry();
@@ -244,7 +243,7 @@ public class DefaultNoteService implements NoteService {
 
 		List<Map<String, Object>> bills = null;
 		if (oscar.OscarProperties.getInstance().isOntarioBillingType()) {
-			// TODO: Include this in query
+			// TODO-legacy: Include this in query
 			bills = billingONCHeader1Dao.getInvoicesMeta(Integer.parseInt(demoNo));
 			for (Map<String, Object> h1 : bills) {
 				EChartNoteEntry e = new EChartNoteEntry();
@@ -291,7 +290,7 @@ public class DefaultNoteService implements NoteService {
 		logger.debug("FILTER NOTES (CAISI) " + (System.currentTimeMillis() - intTime) + "ms entries size "+entries.size());
 		intTime = System.currentTimeMillis();
 
-		//TODO: role based filter for eforms?
+		//TODO-legacy: role based filter for eforms?
 
 		//apply provider filter
 		entries = applyProviderFilter(entries, criteria.getProviders());
@@ -341,7 +340,7 @@ public class DefaultNoteService implements NoteService {
 				}
 			}
 
-			// TODO: speed this up
+			// TODO-legacy: speed this up
 			List<CaseManagementNote> localNotes = caseManagementNoteDao.getNotes(localNoteIds);
 
 			logger.debug("FETCHED " + localNotes.size() + " NOTES IN " + (System.currentTimeMillis() - intTime) + "ms");
@@ -369,10 +368,10 @@ public class DefaultNoteService implements NoteService {
 			logger.debug("FETCHED " + invoices.size() + " INVOICES IN " + (System.currentTimeMillis() - intTime) + "ms");
 			intTime = System.currentTimeMillis();
 
-			// TODO: speed this up
+			// TODO-legacy: speed this up
 			caseManagementManager.getEditors(localNotes);
 
-			// TODO: speed up NoteDisplayLocal init
+			// TODO-legacy: speed up NoteDisplayLocal init
 			for (EChartNoteEntry entry : slice) {
 				if (entry.getType().equals("local_note")) {
 					notesToDisplay.add(new NoteDisplayLocal(loggedInInfo, findNote((Long) entry.getId(), localNotes)));
@@ -507,7 +506,7 @@ public class DefaultNoteService implements NoteService {
 		}
 
 		if (CaisiIntegratorManager.isIntegratorOffline(loggedInInfo.getSession())) {
-			// TODO: No idea how this works
+			// TODO-legacy: No idea how this works
 			// linkedNotes = IntegratorFallBackManager.getLinkedNotes(demographicNo);
 		}
 

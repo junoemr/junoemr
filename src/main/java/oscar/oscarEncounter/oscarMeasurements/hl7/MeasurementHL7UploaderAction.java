@@ -117,7 +117,7 @@ public class MeasurementHL7UploaderAction extends DispatchActionSupport {
 			String msgId = msh.getMessageControlID().getValue();
 			logger.info("HL7 message [" + msgId + "] received from: " + sender + " to: " + receiver + " on " + dateEntered);
 
-			// TODO: handle multiple responses in one upload, right now only
+			// TODO-legacy: handle multiple responses in one upload, right now only
 			// assumes 1 per upload
 			ORU_R01_RESPONSE resp = msg.getRESPONSE();
 
@@ -187,7 +187,7 @@ public class MeasurementHL7UploaderAction extends DispatchActionSupport {
 			try {
 				response.getWriter().println("Invalid HL7 ORU_R01 format/request: " + e.getMessage());
 			} catch (IOException e1) {
-				// TODO Auto-generated catch blockMiscUtils.getLogger().error("Error", e1);
+				// TODO-legacy Auto-generated catch blockMiscUtils.getLogger().error("Error", e1);
 			}
 			return null;
 		}

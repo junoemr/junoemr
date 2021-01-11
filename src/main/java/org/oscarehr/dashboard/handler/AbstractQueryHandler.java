@@ -77,7 +77,7 @@ public abstract class AbstractQueryHandler extends HibernateDaoSupport {
 		logger.debug( "Thread " + Thread.currentThread().getName() +  "[" + Thread.currentThread().getId()
 				+ "] Query results " + results );
 
-		//TODO work on method to detect and exclude demographic files that are 
+		//TODO-legacy work on method to detect and exclude demographic files that are
 		// defined in the securityInfoManager object.
 		
 		setResultList( results );			

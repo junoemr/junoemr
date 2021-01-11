@@ -298,7 +298,7 @@ public class SharingCenterUtil {
 
         IDocumentRetrieveable communicator = XdStarUtility.createCommunicatorByInteraction(config, IDocumentRetrieveable.class);
 
-        // TODO: Home community id
+        // TODO-legacy: Home community id
         DocumentMetaData metaData = new DocumentMetaData(doc.getUniqueDocumentId(), doc.getRepositoryUniqueId());
         metaData.setPatient(createPatientDemographic(Integer.parseInt(demographicId)));
 

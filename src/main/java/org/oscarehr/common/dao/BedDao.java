@@ -201,6 +201,6 @@ public class BedDao extends AbstractDao<Bed>{
 	    }
 
 	    void updateHistory(Bed bed) {
-	        // TODO IC Bedlog Historical - if room to bed association has changed, create historical record
+	        // TODO-legacy IC Bedlog Historical - if room to bed association has changed, create historical record
 	    }
 }
