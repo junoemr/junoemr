@@ -24,6 +24,8 @@
 package org.oscarehr.integration.imdhealth.service;
 
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.oscarehr.integration.imdhealth.transfer.inbound.BearerToken;
 import org.oscarehr.integration.imdhealth.transfer.inbound.SSOCredentials;
@@ -60,7 +62,11 @@ class IMDCommunicationService extends RESTClient
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.add(HEADER_AUTHORIZATION, "Basic " + authHeader);
 
-		BearerToken response = doPost(url, headers, null, BearerToken.class);
+		Map<String, String> requestBody = new HashMap<>();
+		requestBody.put("grant_type", "client_credentials");
+		requestBody.put("scope", "sso");
+
+		BearerToken response = doPost(url, headers, requestBody, BearerToken.class);
 
 		return response;
 	}

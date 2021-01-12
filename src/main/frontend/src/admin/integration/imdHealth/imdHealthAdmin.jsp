@@ -43,5 +43,12 @@
                 component-style="$ctrl.componentStyle">
             Update Credentials
         </juno-button>
+        <juno-button
+                ng-click="$ctrl.testSSO()"
+                button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL"
+                button-color="JUNO_BUTTON_COLOR.PRIMARY"
+                component-style="$ctrl.componentStyle">
+            TEST SSO LINK
+        </juno-button>
     </div>
 </div>

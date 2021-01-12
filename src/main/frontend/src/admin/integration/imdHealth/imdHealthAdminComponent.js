@@ -62,5 +62,21 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                     });
 
             };
+
+            ctrl.testSSO = () =>
+            {
+                console.log("testing SSO");
+                imdHealthWebService.getSSOLink(null)
+                    .then((response) =>
+                    {
+                        const result = response.data.body;
+                        console.log("test link success: " + result);
+                    })
+                    .catch((error) =>
+                    {
+                        console.log("test link error");
+                        console.log(error);
+                    })
+            }
         }]
     });

@@ -133,10 +133,22 @@ public class IntegrationDao extends AbstractDao<Integration>
 	 */
 	public Integration findByIntegrationTypeAndSiteId(String integrationType, Integer siteId)
 	{
-		String sql = "SELECT i FROM Integration i WHERE i.integrationType = :integrationType AND i.site.siteId = :siteId";
-		Query query = entityManager.createQuery(sql);
-		query.setParameter("integrationType", integrationType);
-		query.setParameter("siteId", siteId);
+		Query query;
+
+		// TODO refactor into criteria search or figure out a better way to do this
+		if (siteId == null)
+		{
+			String sql = "SELECT i FROM Integration i WHERE i.integrationType = :integrationType AND i.site IS NULL";
+			query = entityManager.createQuery(sql);
+			query.setParameter("integrationType", integrationType);
+		}
+		else
+		{
+			String sql = "SELECT i FROM Integration i WHERE i.integrationType = :integrationType AND i.site.siteId = :siteId";
+			query = entityManager.createQuery(sql);
+			query.setParameter("integrationType", integrationType);
+			query.setParameter("siteId", siteId);
+		}
 
 		return getSingleResultOrNull(query);
 	}

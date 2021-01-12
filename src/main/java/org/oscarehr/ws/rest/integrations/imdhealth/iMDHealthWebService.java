@@ -44,6 +44,7 @@ import javax.ws.rs.core.MediaType;
 @Path("/integrations/iMDHealth")
 @Component("IMDHealthWebService")
 @Tag(name = "iMDHealth")
+@Produces(MediaType.APPLICATION_JSON)
 public class iMDHealthWebService extends AbstractServiceImpl
 {
 	@Autowired
@@ -79,8 +80,7 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	}
 
 	@POST
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("imdHealth/TestIntegration")
+	@Path("/TestIntegration")
 	public RestResponse<Boolean> testIntegration(@QueryParam("site") String siteId)
 	{
 		// TODO: Stub, permissions
