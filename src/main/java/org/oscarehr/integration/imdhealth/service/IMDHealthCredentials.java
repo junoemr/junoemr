@@ -46,13 +46,28 @@ public class IMDHealthCredentials implements Serializable
 
 	IMDHealthCredentials () {}
 
+	/**
+	 * Retrieve IMDHealthCredentials stored on the user session
+	 * @param session user session
+	 * @return IMDHealthCredentials if found, null otherwise
+	 */
 	static IMDHealthCredentials getFromSession(HttpSession session)
 	{
 		return (IMDHealthCredentials) session.getAttribute(IMD_CREDENTIALS_KEY);
 	}
 
+	/**
+	 * Remove any existing IMDHealthCredentials from the session
+	 * @param session user session
+	 */
+	static void removeFromSession(HttpSession session)
+	{
+		session.removeAttribute(IMD_CREDENTIALS_KEY);
+	}
+
 	void saveToSession(HttpSession session)
 	{
+		// TODO:  To fully impement multisites this will need to be refactored into a HashMap<siteID, credential> rather than just the credential object
 		session.setAttribute(IMD_CREDENTIALS_KEY, this);
 	}
 

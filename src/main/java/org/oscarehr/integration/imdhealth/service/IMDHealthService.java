@@ -25,12 +25,16 @@ package org.oscarehr.integration.imdhealth.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.encryption.StringEncryptor;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.integration.dao.IntegrationDao;
+import org.oscarehr.integration.imdhealth.exception.IMDHealthException;
+import org.oscarehr.integration.imdhealth.exception.SSOBearerException;
+import org.oscarehr.integration.imdhealth.exception.SSOLoginException;
 import org.oscarehr.integration.imdhealth.transfer.inbound.BearerToken;
 import org.oscarehr.integration.imdhealth.transfer.inbound.SSOCredentials;
 import org.oscarehr.integration.imdhealth.transfer.outbound.SSOOrganization;
@@ -39,11 +43,13 @@ import org.oscarehr.integration.imdhealth.transfer.outbound.SSOUser;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Service
@@ -67,12 +73,14 @@ public class IMDHealthService
 	protected static final String HOST_URL = "v5.app.imdhealth.com";      // Production: https://app.imdhealth.com
 	protected static final String DEFAULT_SCHEME= "https";
 
+	private static final Logger logger = MiscUtils.getLogger();
+
 	/**
 	 * Persist new IMDHealth SSO credentials
 	 * @param clientId
 	 * @param clientSecret
 	 */
-	public Integration updateSSOCredentials(String clientId, String clientSecret, @Nullable Integer siteId)
+	public Integration updateSSOCredentials(HttpSession session, String clientId, String clientSecret, @Nullable Integer siteId)
 	{
 		Integration existingIntegration = integrationService.findIntegrationByTypeAndSite(Integration.INTEGRATION_TYPE_IMD_HEALTH, siteId);
 
@@ -84,6 +92,7 @@ public class IMDHealthService
 			existingIntegration.setRemoteId(clientId);
 			existingIntegration.setApiKey(encryptedSecret);
 			integrationDao.merge(existingIntegration);
+			IMDHealthCredentials.removeFromSession(session);
 
 			return existingIntegration;
 		}
@@ -106,14 +115,13 @@ public class IMDHealthService
 	 * 1)  The user is not logged in to iMDHealth
 	 * 2)  The SSO credentials have expired
 	 *
-	 * @param request HTTPServletRequest
+	 * @param session User session
 	 * @param siteId {Optional} siteId to use to login.  If not needed, use null
 	 *
 	 * @return URL formatted link to iMDHealth with SSO login credentials applied
 	 */
-	public String getSSOLink(HttpServletRequest request, @Nullable Integer siteId)
+	public String getSSOLink(HttpSession session, @Nullable Integer siteId) throws IMDHealthException
 	{
-		HttpSession session = request.getSession();
 		IMDHealthCredentials credentials = IMDHealthCredentials.getFromSession(session);
 
 		if (credentials == null) // TODO: check 24 hour time limit on token, check if any part of the credentials are null, empty, etc
@@ -147,7 +155,7 @@ public class IMDHealthService
 	 *
 	 * @return iMDHealth SSO credentials
 	 */
-	private IMDHealthCredentials login(Integration imdHealthIntegration, HttpSession session, Integer siteId)
+	private IMDHealthCredentials login(Integration imdHealthIntegration, HttpSession session, Integer siteId) throws IMDHealthException
 	{
 		IMDHealthCredentials credentials = new IMDHealthCredentials();
 
@@ -163,36 +171,52 @@ public class IMDHealthService
 		return credentials;
 	}
 
-	private BearerToken getBearerToken(Integration imdHealthIntegration)
+	private BearerToken getBearerToken(Integration imdHealthIntegration) throws SSOBearerException
 	{
-		String decryptedSecret = StringEncryptor.decrypt(imdHealthIntegration.getApiKey());
-		String clientId = imdHealthIntegration.getRemoteId();
+		try
+		{
+			String decryptedSecret = StringEncryptor.decrypt(imdHealthIntegration.getApiKey());
+			String clientId = imdHealthIntegration.getRemoteId();
+			return communicationService.getBearerToken(clientId, decryptedSecret);
+		}
+		catch (HttpClientErrorException | HttpServerErrorException ex)
+		{
+			logger.error("Error retrieving bearer token", ex);
+			throw new SSOBearerException("IMDHealth Authentication error");
+		}
 
-		return communicationService.getBearerToken(clientId, decryptedSecret);
 	}
 
 	private SSOCredentials getSSOCredentials(BearerToken token,
 	                                         LoggedInInfo loggedInInfo,
 	                                         String practiceId,
-	                                         @Nullable Integer siteId)
+	                                         @Nullable Integer siteId) throws SSOLoginException
 	{
-		SSOUser user = SSOUser.fromLoggedInInfo(loggedInInfo);
-
-		SSOOrganization organization;
-		if (siteId == null)
+		try
 		{
-			Clinic clinic = clinicDao.getClinic();
-			organization = SSOOrganization.fromClinic(clinic, practiceId);
+			SSOUser user = SSOUser.fromLoggedInInfo(loggedInInfo);
+
+			SSOOrganization organization;
+			if (siteId == null)
+			{
+				Clinic clinic = clinicDao.getClinic();
+				organization = SSOOrganization.fromClinic(clinic, practiceId);
+			}
+			else
+			{
+				// TODO: Not yet implemented
+				Site site = siteDao.find(siteId);
+				organization = SSOOrganization.fromSite(site, practiceId);
+			}
+
+			SSORequest ssoRequest = new SSORequest(user, organization);
+			return communicationService.SSOLogin(token, ssoRequest);
 		}
-		else
+		catch (HttpClientErrorException | HttpServerErrorException ex)
 		{
-			// TODO: Not yet implemented
-			Site site = siteDao.find(siteId);
-			organization = SSOOrganization.fromSite(site, practiceId);
+			logger.error("Error during SSO login", ex);
+			throw new SSOLoginException("IMDHealth Login error");
 		}
 
-		SSORequest ssoRequest = new SSORequest(user, organization);
-
-		return communicationService.SSOLogin(token, ssoRequest);
 	}
 }

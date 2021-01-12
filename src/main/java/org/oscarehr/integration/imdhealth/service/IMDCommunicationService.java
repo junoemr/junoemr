@@ -33,14 +33,13 @@ import org.oscarehr.integration.imdhealth.transfer.outbound.SSORequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+
 import oscar.util.RESTClient;
 
 @Service
 class IMDCommunicationService extends RESTClient
 {
 	protected static String apiUrl = "ca-v5.api.imdhealth.com";   // Production: api.imdhealth.com
-
-
 	private static final String HEADER_AUTHORIZATION = "Authorization";
 
 	/**
@@ -67,7 +66,6 @@ class IMDCommunicationService extends RESTClient
 		requestBody.put("scope", "sso");
 
 		BearerToken response = doPost(url, headers, requestBody, BearerToken.class);
-
 		return response;
 	}
 

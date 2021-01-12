@@ -24,6 +24,7 @@
 package org.oscarehr.ws.rest.integrations.imdhealth;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.integration.imdhealth.exception.IMDHealthException;
 import org.oscarehr.integration.imdhealth.service.IMDHealthService;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.service.IntegrationService;
@@ -65,9 +66,9 @@ public class iMDHealthWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/SSOLink")
-	public RestResponse<String> getSSOLink(@QueryParam("siteId") Integer siteId)
+	public RestResponse<String> getSSOLink(@QueryParam("siteId") Integer siteId) throws IMDHealthException
 	{
-		String ssoLink = imdHealthService.getSSOLink(getHttpServletRequest(), siteId);
+		String ssoLink = imdHealthService.getSSOLink(getHttpServletRequest().getSession(), siteId);
 		return RestResponse.successResponse(ssoLink);
 	}
 
@@ -76,7 +77,10 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	public RestResponse<IntegrationTo1> updateIntegration(IMDHealthCredentialsTo1 credentials)
 	{
 		// TODO: security permissions
-		imdHealthService.updateSSOCredentials(credentials.getClientId(), credentials.getClientSecret(), credentials.getSiteId());
+		imdHealthService.updateSSOCredentials(getHttpServletRequest().getSession(),
+		                                      credentials.getClientId(),
+		                                      credentials.getClientSecret(),
+		                                      credentials.getSiteId());
 		return RestResponse.successResponse(null); // TODO stub
 	}
 
