@@ -28,6 +28,8 @@ import oscar.util.ConversionUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
+import java.time.Year;
 
 @Data
 public class PartialDateTime extends PartialDate
@@ -63,6 +65,11 @@ public class PartialDateTime extends PartialDate
 		super(year, month, day);
 		this.localTime = time;
 	}
+	public PartialDateTime(Year year, Month month, Integer day, LocalTime time)
+	{
+		super(year, month, day);
+		this.localTime = time;
+	}
 	public PartialDateTime(PartialDate partialDate, LocalTime time)
 	{
 		super(partialDate.getYear(), partialDate.getMonth(), partialDate.getDay());
@@ -91,7 +98,7 @@ public class PartialDateTime extends PartialDate
 	{
 		String datePart = super.toISOString();
 
-		if(this.localTime != null)
+		if(this.isFullDateTime())
 		{
 			return datePart + "T" + ConversionUtils.toTimeString(this.localTime);
 		}
@@ -102,7 +109,7 @@ public class PartialDateTime extends PartialDate
 	{
 		if(partialDate != null)
 		{
-			return from(partialDate.toLocalDate());
+			return new PartialDateTime(partialDate.getYear(), partialDate.getMonth(), partialDate.getDay(), LocalTime.MIN);
 		}
 		return null;
 	}

@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.model.common;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
 import java.time.LocalDate;
@@ -116,11 +117,14 @@ public class PartialDate extends AbstractTransientModel
 	{
 		if(this.isFullDate())
 		{
-			return this.year.getValue() + "-" + this.month.getValue() + "-" + this.getDay();
+			return this.year.getValue() + "-" +
+					StringUtils.leftPad(String.valueOf(this.month.getValue()), 2, "0") + "-" +
+					StringUtils.leftPad(String.valueOf(this.getDay()), 2, "0");
 		}
 		else if(this.isYearMonth())
 		{
-			return this.year.getValue() + "-" + this.month.getValue();
+			return this.year.getValue() + "-" +
+					StringUtils.leftPad(String.valueOf(this.month.getValue()), 2, "0");
 		}
 		else if(this.isYearOnly())
 		{

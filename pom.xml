@@ -1834,10 +1834,7 @@
 						</goals>
 						<phase>test</phase>
 						<configuration>
-<!--
 							<skipTests>false</skipTests>
--->
-                            <skipTests>true</skipTests>
 							<argLine>-Xms1024m -Xmx1024m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
 							<excludes>
 								<exclude>**/AR2005*.java</exclude>
