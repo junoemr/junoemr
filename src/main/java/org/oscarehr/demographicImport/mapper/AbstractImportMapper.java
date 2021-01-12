@@ -22,7 +22,7 @@
  */
 package org.oscarehr.demographicImport.mapper;
 
-import org.oscarehr.demographicImport.service.ImportProperties;
+import org.oscarehr.demographicImport.util.ImportProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

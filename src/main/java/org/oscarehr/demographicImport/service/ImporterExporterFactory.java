@@ -22,10 +22,15 @@
  */
 package org.oscarehr.demographicImport.service;
 
-import org.oscarehr.demographicImport.service.cds.CDSExportLogger;
+import org.oscarehr.demographicImport.logger.ExportLogger;
+import org.oscarehr.demographicImport.logger.ImportLogger;
+import org.oscarehr.demographicImport.logger.cds.CDSExportLogger;
 import org.oscarehr.demographicImport.service.cds.CDSExporter;
-import org.oscarehr.demographicImport.service.cds.CDSImportLogger;
+import org.oscarehr.demographicImport.logger.cds.CDSImportLogger;
 import org.oscarehr.demographicImport.service.cds.CDSImporter;
+import org.oscarehr.demographicImport.util.ExportPreferences;
+import org.oscarehr.demographicImport.util.ExportProperties;
+import org.oscarehr.demographicImport.util.ImportProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

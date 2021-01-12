@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.service.ImportCallback;
+import org.oscarehr.demographicImport.util.ImportCallback;
 import org.oscarehr.demographicImport.service.ImportExportWrapperService;
 import org.oscarehr.demographicImport.service.ImporterExporterFactory;
 import org.oscarehr.util.task.args.BooleanArg;

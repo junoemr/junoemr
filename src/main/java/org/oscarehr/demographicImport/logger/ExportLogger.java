@@ -20,25 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.service;
+package org.oscarehr.demographicImport.logger;
 
-import lombok.Data;
+import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.demographicImport.model.demographic.Demographic;
 
-@Data
-public class ExportPreferences
+import java.io.IOException;
+
+public interface ExportLogger
 {
-	boolean exportAlertsAndSpecialNeeds;
-	boolean exportAllergiesAndAdverseReactions;
-	boolean exportAppointments;
-	boolean exportCareElements;
-	boolean exportClinicalNotes;
-	boolean exportFamilyHistory;
-	boolean exportImmunizations;
-	boolean exportLaboratoryResults;
-	boolean exportMedicationsAndTreatments;
-	boolean exportPastHealth;
-	boolean exportPersonalHistory;
-	boolean exportProblemList;
-	boolean exportReportsReceived;
-	boolean exportRiskFactors;
+	void log(String message) throws IOException;
+
+	void logSummaryHeaderLine() throws IOException;
+	void logSummaryLine(Demographic demographic) throws IOException;
+
+	GenericFile getLogFile();
 }

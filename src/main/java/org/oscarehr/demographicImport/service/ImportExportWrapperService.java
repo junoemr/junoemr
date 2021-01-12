@@ -28,6 +28,8 @@ import org.oscarehr.common.exception.InvalidCommandLineArgumentsException;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
+import org.oscarehr.demographicImport.logger.ImportLogger;
+import org.oscarehr.demographicImport.util.ImportCallback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;

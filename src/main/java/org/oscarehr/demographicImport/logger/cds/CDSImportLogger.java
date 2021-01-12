@@ -20,19 +20,34 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.service;
+package org.oscarehr.demographicImport.logger.cds;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.logger.ImportLogger;
+import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
 
-public interface ExportLogger
+public class CDSImportLogger implements ImportLogger
 {
-	void log(String message) throws IOException;
+	private static final Logger logger = MiscUtils.getLogger();
 
-	void logSummaryHeaderLine() throws IOException;
-	void logSummaryLine(Demographic demographic) throws IOException;
+	@Override
+	public void log(String message) throws IOException
+	{
+		logger.info(message);
+	}
 
-	GenericFile getLogFile();
+	@Override
+	public void flush()
+	{
+
+	}
+
+	@Override
+	public GenericFile getLogFile()
+	{
+		return null;
+	}
 }

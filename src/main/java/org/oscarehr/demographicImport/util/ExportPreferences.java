@@ -20,15 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.service;
+package org.oscarehr.demographicImport.util;
 
 import lombok.Data;
-import org.springframework.stereotype.Component;
 
 @Data
-@Component
-public class ExportProperties
+public class ExportPreferences
 {
-	private ExportLogger exportLogger;
-	private ExportPreferences exportPreferences;
+	boolean exportAlertsAndSpecialNeeds;
+	boolean exportAllergiesAndAdverseReactions;
+	boolean exportAppointments;
+	boolean exportCareElements;
+	boolean exportClinicalNotes;
+	boolean exportFamilyHistory;
+	boolean exportImmunizations;
+	boolean exportLaboratoryResults;
+	boolean exportMedicationsAndTreatments;
+	boolean exportPastHealth;
+	boolean exportPersonalHistory;
+	boolean exportProblemList;
+	boolean exportReportsReceived;
+	boolean exportRiskFactors;
 }

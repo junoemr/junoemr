@@ -20,28 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.service;
+package org.oscarehr.demographicImport.util;
 
-import org.oscarehr.common.io.GenericFile;
+import lombok.Data;
+import org.oscarehr.demographicImport.logger.ImportLogger;
+import org.oscarehr.demographicImport.service.ImporterExporterFactory;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
-public interface ImportLogger
+@Data
+@Component
+public class ImportProperties
 {
-	/**
-	 * 	adds a log statement to the import log
-	 * @param message - the statement to log
- 	 */
-	void log(String message) throws IOException;
-
-	/**
-	 * forces all unwritten log data to be written to the log file.
-	 * This may be useful for loggers that need to collect amalgamated data before writing it to the log.
-	 */
-	void flush();
-
-	/**
-	 * @return - the log file
-	 */
-	GenericFile getLogFile();
+	private ImportLogger importLogger;
+	private String externalDocumentPath;
+	private boolean skipMissingDocs;
+	private ImporterExporterFactory.IMPORT_SOURCE importSource;
 }

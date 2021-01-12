@@ -30,7 +30,7 @@ import org.oscarehr.demographicImport.mapper.cds.in.CDSImportMapper;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
 import org.oscarehr.demographicImport.service.DemographicImporter;
-import org.oscarehr.demographicImport.service.ExportPreferences;
+import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

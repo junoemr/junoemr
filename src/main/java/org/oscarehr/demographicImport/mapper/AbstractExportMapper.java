@@ -23,7 +23,7 @@
 package org.oscarehr.demographicImport.mapper;
 
 import lombok.Data;
-import org.oscarehr.demographicImport.service.ExportProperties;
+import org.oscarehr.demographicImport.util.ExportProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

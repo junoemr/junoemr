@@ -20,34 +20,28 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.service.cds;
+package org.oscarehr.demographicImport.logger;
 
-import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.service.ImportLogger;
-import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
 
-public class CDSImportLogger implements ImportLogger
+public interface ImportLogger
 {
-	private static final Logger logger = MiscUtils.getLogger();
+	/**
+	 * 	adds a log statement to the import log
+	 * @param message - the statement to log
+ 	 */
+	void log(String message) throws IOException;
 
-	@Override
-	public void log(String message) throws IOException
-	{
-		logger.info(message);
-	}
+	/**
+	 * forces all unwritten log data to be written to the log file.
+	 * This may be useful for loggers that need to collect amalgamated data before writing it to the log.
+	 */
+	void flush();
 
-	@Override
-	public void flush()
-	{
-
-	}
-
-	@Override
-	public GenericFile getLogFile()
-	{
-		return null;
-	}
+	/**
+	 * @return - the log file
+	 */
+	GenericFile getLogFile();
 }

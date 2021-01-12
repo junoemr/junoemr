@@ -32,6 +32,7 @@ import org.oscarehr.caisi_integrator.ws.MatchingDemographicParameters;
 import org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
@@ -98,15 +99,16 @@ public class DemographicsService extends AbstractServiceImpl
 	 */
 	@GET
 	@Path("/quickSearch")
-	public RestSearchResponse<DemographicSearchResult> quickSearch(@QueryParam("page")
-	                                                               @DefaultValue("1")
-	                                                               @Parameter(description = "Requested result page")
-			                                                               Integer page,
-	                                                               @QueryParam("perPage")
-	                                                               @DefaultValue("10")
-	                                                               @Parameter(description = "Number of results per page")
-			                                                               Integer perPage,
-	                                                               @QueryParam("query") String query)
+	public RestSearchResponse<DemographicSearchResult> quickSearch(
+			@QueryParam("page")
+			@DefaultValue("1")
+			@Parameter(description = "Requested result page")
+					Integer page,
+			@QueryParam("perPage")
+			@DefaultValue("10")
+			@Parameter(description = "Number of results per page")
+					Integer perPage,
+			@QueryParam("query") String query)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, "_demographic");
@@ -296,22 +298,37 @@ public class DemographicsService extends AbstractServiceImpl
 		logger.info(fileListTransfer);
 
 		List<GenericFile> genericFileList = new ArrayList<>();
+		List<GenericFile> importFileList = new ArrayList<>();
 		String documentLocation = System.getProperty("java.io.tmpdir");
 
-		//TODO handle invalid files, zip files, etc.
 		for(FileTransfer file : fileListTransfer)
 		{
-			genericFileList.add(FileFactory.createTempFile(file.toInputStream(), ".xml"));
+			GenericFile tempfile = FileFactory.createTempFile(file.toInputStream(), ".tmp");
+			tempfile.rename(file.getName()); //might be a referenced document. make sure it uses the original name
+			genericFileList.add(tempfile);
+
+			// only attempt to import from xml files
+			if(tempfile instanceof XMLFile)
+			{
+				importFileList.add(tempfile);
+			}
+			//TODO handle zip files?
 		}
 
 		importExportWrapperService.importDemographics(
 				type,
 				importSource,
-				genericFileList,
+				importFileList,
 				documentLocation,
 				false,
 				false,
 				null);
+
+		// clean up temp files
+		for(GenericFile tempFile : genericFileList)
+		{
+			tempFile.deleteFile();
+		}
 
 		return RestResponse.successResponse("success");
 	}

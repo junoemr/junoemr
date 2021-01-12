@@ -20,17 +20,13 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.service;
+package org.oscarehr.demographicImport.util;
 
-import lombok.Data;
-import org.springframework.stereotype.Component;
+import org.oscarehr.common.io.GenericFile;
 
-@Data
-@Component
-public class ImportProperties
+public interface ImportCallback
 {
-	private ImportLogger importLogger;
-	private String externalDocumentPath;
-	private boolean skipMissingDocs;
-	private ImporterExporterFactory.IMPORT_SOURCE importSource;
+	void onFileImportSuccess(GenericFile genericFile);
+	void onFileImportFailure(GenericFile genericFile);
+	void onImportComplete(long successCount, long failureCount);
 }

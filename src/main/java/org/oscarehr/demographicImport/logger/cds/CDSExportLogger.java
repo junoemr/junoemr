@@ -20,14 +20,14 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.service.cds;
+package org.oscarehr.demographicImport.logger.cds;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
-import org.oscarehr.demographicImport.service.ExportLogger;
+import org.oscarehr.demographicImport.logger.ExportLogger;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
