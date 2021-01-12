@@ -63,9 +63,9 @@ public class iMDHealthWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/SSOLink")
-	public RestResponse<String> getSSOLink()
+	public RestResponse<String> getSSOLink(@QueryParam("siteId") Integer siteId)
 	{
-		String ssoLink = imdHealthService.getSSOLink(getHttpServletRequest());
+		String ssoLink = imdHealthService.getSSOLink(getHttpServletRequest(), siteId);
 		return RestResponse.successResponse(ssoLink);
 	}
 
