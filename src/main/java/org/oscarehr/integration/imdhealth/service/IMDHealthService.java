@@ -23,6 +23,8 @@
 
 package org.oscarehr.integration.imdhealth.service;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.encryption.StringEncryptor;
@@ -62,7 +64,8 @@ public class IMDHealthService
 	@Autowired
 	SiteDao siteDao;
 
-	protected static String appUrl = "v5.app.imdhealth.com";      // Production: app.imdhealth.com
+	protected static final String HOST_URL = "v5.app.imdhealth.com";      // Production: https://app.imdhealth.com
+	protected static final String DEFAULT_SCHEME= "https";
 
 	/**
 	 * Persist new IMDHealth SSO credentials
@@ -97,8 +100,11 @@ public class IMDHealthService
 	}
 
 	/**
-	 * Generate the SSO link needed to connect to iMDHealth.  If the current user is not logged into iMDHealth or if
-	 * the login session is expired, (re-)login to establish SSO session.
+	 * Generate the SSO link needed to connect to iMDHealth, logging in if necessary.
+	 *
+	 * A login will be performed if:
+	 * 1)  The user is not logged in to iMDHealth
+	 * 2)  The SSO credentials have expired
 	 *
 	 * @param request HTTPServletRequest
 	 * @param siteId {Optional} siteId to use to login.  If not needed, use null
@@ -110,18 +116,32 @@ public class IMDHealthService
 		HttpSession session = request.getSession();
 		IMDHealthCredentials credentials = IMDHealthCredentials.getFromSession(session);
 
-		if (credentials == null) // TODO: check 24 hour time limit on token
+		if (credentials == null) // TODO: check 24 hour time limit on token, check if any part of the credentials are null, empty, etc
 		{
 			Integration imdIntegration = integrationDao.findByIntegrationTypeAndSiteId(Integration.INTEGRATION_TYPE_IMD_HEALTH, siteId);
 			credentials = login(imdIntegration, session, siteId);
 		}
 
-		return "";      // TODO work this out
+		URIBuilder builder = new URIBuilder()
+				.setScheme(DEFAULT_SCHEME)
+				.setHost(HOST_URL)
+				.setParameter("access_token", credentials.getAccessToken())
+				.setParameter("membership_id", StringUtils.trimToEmpty(credentials.getMembershipId()))
+				.setParameter("organization_id", StringUtils.trimToEmpty(credentials.getOrganizationId()));
+
+		return builder.toString();
 	}
 
 
 	/**
-	 * Log in via the iMDHealth SSO api and store the credentials on the session
+	 * Log in via the iMDHealth SSO api and store the credentials on the session.
+	 *
+	 * The user is determined by the current logged in user.
+	 *
+	 * The organization is identified by first by the Juno context path (practice id), and then
+	 * if needed, differentiated by siteId.  This makes the iMDCredentials compatible if regardless
+	 * if issued organizationally (ie: to all of CloudPractice), or on a per-clinic basis.
+	 *
 	 * @param imdHealthIntegration iMDHealth integration to use to login
 	 * @param session User session
 	 *
@@ -135,7 +155,7 @@ public class IMDHealthService
 		credentials.setBearerToken(token);
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(session);
-		String junoPracticeId = session.getServletContext().getServletContextName();
+		String junoPracticeId = session.getServletContext().getContextPath().replaceAll("^/", "");
 		SSOCredentials ssoInfo = getSSOCredentials(token, loggedInInfo, junoPracticeId, siteId);
 		credentials.loadSSOCredentials(ssoInfo);
 
@@ -166,7 +186,7 @@ public class IMDHealthService
 		}
 		else
 		{
-			// Not yet implemented
+			// TODO: Not yet implemented
 			Site site = siteDao.find(siteId);
 			organization = SSOOrganization.fromSite(site, practiceId);
 		}

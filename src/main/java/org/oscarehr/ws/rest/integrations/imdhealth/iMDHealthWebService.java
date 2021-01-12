@@ -57,6 +57,7 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/")
 	public RestResponse<IMDHealthCredentialsTo1> getIntegration(@QueryParam("siteId") Integer siteId)
 	{
+		// TODO security permissions
 		Integration integration = integrationService.findIntegrationByTypeAndSite(Integration.INTEGRATION_TYPE_IMD_HEALTH, siteId);
 		IMDHealthCredentialsTo1 response = new IMDHealthCredentialsTo1(integration);
 		return RestResponse.successResponse(response);
@@ -74,17 +75,17 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/")
 	public RestResponse<IntegrationTo1> updateIntegration(IMDHealthCredentialsTo1 credentials)
 	{
-		imdHealthService.updateSSOCredentials(credentials.getClientId(), credentials.getClientSecret(), credentials.getSiteId());
 		// TODO: security permissions
-		return RestResponse.successResponse(null);
+		imdHealthService.updateSSOCredentials(credentials.getClientId(), credentials.getClientSecret(), credentials.getSiteId());
+		return RestResponse.successResponse(null); // TODO stub
 	}
 
 	@POST
-	@Path("/TestIntegration")
+	@Path("/Test")
 	public RestResponse<Boolean> testIntegration(@QueryParam("site") String siteId)
 	{
 		// TODO: Stub, permissions
-		return RestResponse.successResponse(false);
+		return RestResponse.successResponse(false);  // TODO stub
 	}
 
 	// TODO: search integrations (multisite)

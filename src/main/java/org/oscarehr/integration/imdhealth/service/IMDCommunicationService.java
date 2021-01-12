@@ -86,7 +86,7 @@ class IMDCommunicationService extends RESTClient
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add(HEADER_AUTHORIZATION, "Bearer " + token);
+		headers.add(HEADER_AUTHORIZATION, "Bearer " + token.getAccessToken());
 
 		SSOCredentials response = doPost(url, headers, ssoRequest, SSOCredentials.class);
 
