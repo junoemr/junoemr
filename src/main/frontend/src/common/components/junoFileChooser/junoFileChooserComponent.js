@@ -75,7 +75,10 @@ angular.module('Common.Components').component('junoFileChooser', {
 
 		ctrl.onButtonClick = function onButtonClick()
 		{
-			angular.element(document.querySelector('#file-select')).click();
+			if(!ctrl.disabled)
+			{
+				angular.element(document.querySelector('#file-select')).click();
+			}
 		}
 	}]
 });

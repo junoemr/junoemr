@@ -4,6 +4,10 @@
 	</label>
 	<juno-button component-style="$ctrl.componentStyle"
 	             ng-click="$ctrl.onButtonClick()"
+	             button-color="$ctrl.buttonColor"
+	             button-color-pattern="$ctrl.buttonColorPattern"
+	             button-color-override="$ctrl.buttonColorOverride"
+	             disabled="$ctrl.disabled"
 	>
 		{{$ctrl.buttonLabel}}
 	</juno-button>

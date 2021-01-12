@@ -24,7 +24,7 @@
 	<panel id="cds-import-panel"
 	       component-style="$ctrl.componentStyle">
 		<panel-header>
-			<h6>CDS Import</h6>
+			<h6 class="juno-text">CDS Import</h6>
 		</panel-header>
 		<panel-body>
 			<div class="row">
@@ -71,7 +71,7 @@
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<p>* Some import sources provide additional data or specific format changes that require customized handling.
+					<p class="juno-text">* Some import sources provide additional data or specific format changes that require customized handling.
 						Selecting a specific source will improve the import results.
 					</p>
 				</div>
@@ -90,7 +90,7 @@
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<p>* The merge strategy determines how the importer will handle demographic conflicts.
+					<p class="juno-text">* The merge strategy determines how the importer will handle demographic conflicts.
 						A merge conflict will occur if an import record has a matching similar Health Number, or a matching date of birth, first and last name combination.
 						In this case, the merge strategy will determine how the data is imported.
 					</p>

@@ -64,6 +64,7 @@ public class ImporterExporterFactory
 
 	public enum IMPORT_SOURCE
 	{
+		JUNO,
 		WOLF,
 		MEDIPLAN,
 		MEDACCESS,

@@ -78,6 +78,18 @@ angular.module('Admin.Section.DataManagement').component('demographicImport',
 							label: 'Wolf',
 							value: 'WOLF',
 						},
+						{
+							label: 'Mediplan',
+							value: 'MEDIPLAN',
+						},
+						{
+							label: 'Medaccess',
+							value: 'MEDACCESS',
+						},
+						{
+							label: 'Accuro',
+							value: 'ACCURO',
+						},
 					]
 				);
 
