@@ -20,11 +20,10 @@
  * Victoria, British Columbia
  * Canada
  */
-package oscar.demographicImport.model.common;
+package org.oscarehr.demographicImport.model.common;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.oscarehr.demographicImport.model.common.PartialDate;
 
 import java.time.LocalDate;
 
