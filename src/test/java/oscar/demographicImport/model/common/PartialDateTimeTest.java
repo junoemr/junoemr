@@ -47,6 +47,7 @@ public class PartialDateTimeTest
 		assertFalse(partialDateTime.isYearMonth());
 		assertFalse(partialDateTime.isYearOnly());
 	}
+
 	@Test
 	public void testPartialDateTimeFullDateCheck()
 	{
@@ -124,7 +125,7 @@ public class PartialDateTimeTest
 	@Test
 	public void testPartialDateTimeFromPartialDateFullDate()
 	{
-		PartialDate partialDate = new PartialDate(2021, 4,21);
+		PartialDate partialDate = new PartialDate(2021, 4, 21);
 		PartialDateTime partialDateTime = PartialDateTime.from(partialDate);
 		assertEquals("2021-04-21T00:00:00", partialDateTime.toISOString());
 	}
