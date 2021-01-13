@@ -40,7 +40,7 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                 clientSecret: ""
             };
 
-            ctrl.LABEL_POSITION = LABEL_POSITION;
+            ctrl.LABEL_POSITION = LABEL_POSITION.LEFT;
             ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
             ctrl.componentStyle = JUNO_STYLE.GREY;
 
@@ -53,7 +53,7 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                         const result = response.data.body;
                         console.log("update success");
                         console.log("result:");
-                        console.log(response);
+                        console.log(result);
                     })
                     .catch((error) =>
                     {

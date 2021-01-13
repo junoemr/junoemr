@@ -21,19 +21,22 @@
 * Canada
 --%>
 <div id="imdhealth-admin">
-    <h1>iMD Health Administration</h1>
-    <div id="imdhealth-credentials-container">
-        <p>Lorem ipsum.... Marketing blurb</p>
+    <h1>Patient Engagment by iMD Health</h1>
+    <div class="marketing-container">
+        <p>iMD Health is designed for healthcare professionals at every level of care to better engage, inform and educate patients about their conditions and treatment plans. </p>
+        <p><a href="https://www.imdhealth.com" target="_blank">Visit iMD Health</a></p>
+    </div>
+    <div class="credentials-container">
         <juno-input
             ng-model="$ctrl.credentials.clientId"
             label="Client ID"
-            label-position="$ctrl.LABEL_POSITION.TOP"
+            label-position="$ctrl.LABEL_POSITION"
             component-style="$ctrl.componentStyle">
         </juno-input>
         <juno-input
             ng-model="$ctrl.credentials.clientSecret"
             label="Client Secret"
-            label-position="$ctrl.LABEL_POSITION.TOP"
+            label-position="$ctrl.LABEL_POSITION"
             component-style="$ctrl.componentStyle">
         </juno-input>
         <juno-button
@@ -50,5 +53,8 @@
                 component-style="$ctrl.componentStyle">
             TEST SSO LINK
         </juno-button>
+    </div>
+    <div class="integrations-container">
+        <p>Integrations go here</p>
     </div>
 </div>

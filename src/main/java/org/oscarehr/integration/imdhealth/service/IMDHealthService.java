@@ -164,6 +164,13 @@ public class IMDHealthService
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(session);
 		String junoPracticeId = session.getServletContext().getContextPath().replaceAll("^/", "");
+
+		// TODO: Remove after figuring out something better for embedded tomcat
+		if (StringUtils.isEmpty(junoPracticeId))
+		{
+			junoPracticeId = "CloudPracticeDefault";
+		}
+
 		SSOCredentials ssoInfo = getSSOCredentials(token, loggedInInfo, junoPracticeId, siteId);
 		credentials.loadSSOCredentials(ssoInfo);
 

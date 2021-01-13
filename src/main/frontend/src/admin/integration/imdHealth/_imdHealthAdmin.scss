@@ -1,3 +1,64 @@
 #imdhealth-admin {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  height: 100%;
 
+  .title {
+    color: $color-primary-base;
+  }
+
+  .marketing-container
+  {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    margin-top: 16px;
+    flex: 1 1 auto;
+    margin-bottom: 16px;
+    @include juno-font-body();
+  }
+
+  .credentials-container
+  {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+
+    background-color: #ADD8E6;
+    flex: 2 1 auto;
+    margin-bottom: 16px;
+  }
+
+  .integrations-container
+  {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    flex: 3 1 auto;
+  }
+
+  juno-input {
+
+    :last-child {
+    }
+
+    label {
+      width: 80px;
+      margin-right: 8px;
+    }
+  }
 }
+/*
+
+.juno-input {
+  width: 248px;
+
+  input {
+    padding: 0 8px 0 16px;
+  }*/
