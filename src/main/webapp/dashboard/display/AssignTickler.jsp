@@ -34,7 +34,7 @@
 
 
 <%--
-	TODO-legacy: Use angular datepickers instead of jquery
+	TODO: Use angular datepickers instead of jquery
 	Replace with angular
 
 <script type="text/javascript">
