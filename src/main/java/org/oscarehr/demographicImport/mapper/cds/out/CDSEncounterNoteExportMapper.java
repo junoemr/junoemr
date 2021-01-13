@@ -46,7 +46,7 @@ public class CDSEncounterNoteExportMapper extends AbstractCDSNoteExportMapper<Cl
 
 		clinicalNotes.setNoteType("Chart Note");
 		clinicalNotes.setMyClinicalNotesContent(exportStructure.getNoteText());
-		clinicalNotes.setEventDateTime(toFullDateTime(exportStructure.getObservationDate()));
+		clinicalNotes.setEventDateTime(toNullableDateTimeFullOrPartial(exportStructure.getObservationDate()));
 		clinicalNotes.getParticipatingProviders().addAll(getNoteProviders(exportStructure));
 		clinicalNotes.getNoteReviewer().addAll(getNoteReviewers(exportStructure));
 

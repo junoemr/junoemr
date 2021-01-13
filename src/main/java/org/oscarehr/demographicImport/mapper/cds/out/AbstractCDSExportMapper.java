@@ -97,13 +97,6 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		}
 	}
 
-	protected DateTimeFullOrPartial toFullDateTime(LocalDateTime localDateTime)
-	{
-		DateTimeFullOrPartial dateTimeFullOrPartial = objectFactory.createDateTimeFullOrPartial();
-		dateTimeFullOrPartial.setFullDateTime(ConversionUtils.toNullableXmlGregorianCalendar(localDateTime));
-		return dateTimeFullOrPartial;
-	}
-
 	protected DateTimeFullOrPartial toNullableDateTimeFullOrPartial(LocalDateTime localDateTime, LocalDateTime defaultDateTime)
 	{
 		DateTimeFullOrPartial dateTimeFullOrPartial = null;
@@ -111,7 +104,7 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		if(calendar != null)
 		{
 			dateTimeFullOrPartial = objectFactory.createDateTimeFullOrPartial();
-			dateTimeFullOrPartial.setFullDate(calendar);
+			dateTimeFullOrPartial.setFullDateTime(calendar);
 		}
 		else if(defaultDateTime != null)
 		{
@@ -140,7 +133,7 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 			dateFullOrPartial = objectFactory.createDateFullOrPartial();
 			dateFullOrPartial.setFullDate(calendar);
 		}
-		else if(localDate != null)
+		else if(defaultDate != null)
 		{
 			dateFullOrPartial = this.toNullableDateFullOrPartial(defaultDate, null);
 		}

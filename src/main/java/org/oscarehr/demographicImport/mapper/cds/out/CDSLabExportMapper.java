@@ -74,8 +74,8 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 				referenceRange.setReferenceRangeText(range);
 				laboratoryResult.setReferenceRange(referenceRange);
 
-				laboratoryResult.setLabRequisitionDateTime(toFullDateTime(labObr.getRequestDateTime()));
-				laboratoryResult.setCollectionDateTime(toFullDateTime(exportLab.getMessageDateTime()));
+				laboratoryResult.setLabRequisitionDateTime(toNullableDateTimeFullOrPartial(labObr.getRequestDateTime()));
+				laboratoryResult.setCollectionDateTime(toNullableDateTimeFullOrPartial(exportLab.getMessageDateTime()));
 
 				for(Reviewer reviewProvider : exportLab.getReviewers())
 				{

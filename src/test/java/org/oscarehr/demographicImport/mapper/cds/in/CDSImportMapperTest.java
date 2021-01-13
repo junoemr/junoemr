@@ -66,7 +66,7 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testLifeStageNull()
+	public void testLifeStage_Null()
 	{
 		assertNull(cdsImportMapper.getLifeStage(null));
 	}
@@ -82,7 +82,7 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testAgeAtOnsetNull()
+	public void testAgeAtOnset_Null()
 	{
 		assertNull(cdsImportMapper.getAgeAtOnset(null));
 	}
@@ -96,13 +96,13 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testToProviderNull()
+	public void testToProvider_Null()
 	{
 		assertNull(cdsImportMapper.toProvider(null));
 	}
 
 	@Test
-	public void testToProviderConversionPersonSimple()
+	public void testToProvider_PersonSimple()
 	{
 		String expectedFirstName = "first";
 		String expectedLastName = "last";
@@ -119,13 +119,13 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testToProviderNamesNull()
+	public void testToProviderNames_Null()
 	{
 		assertNull(cdsImportMapper.toProviderNames(null));
 	}
 
 	@Test
-	public void testToProviderNamesConversion()
+	public void testToProviderNames_String()
 	{
 		String expectedFirstName = "first";
 		String expectedLastName = "last";
@@ -139,13 +139,13 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testYIndicatorConversionNull()
+	public void testYIndicatorConversion_Null()
 	{
 		assertNull(cdsImportMapper.getYIndicator(null));
 	}
 
 	@Test
-	public void testYIndicatorConversionBooleanTrue()
+	public void testYIndicatorConversion_BooleanTrue()
 	{
 		ObjectFactory objectFactory = new ObjectFactory();
 		YnIndicator yIndicator = objectFactory.createYnIndicator();
@@ -155,7 +155,7 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testYIndicatorConversionBooleanFalse()
+	public void testYIndicatorConversion_BooleanFalse()
 	{
 		ObjectFactory objectFactory = new ObjectFactory();
 		YnIndicator yIndicator = objectFactory.createYnIndicator();
@@ -165,7 +165,7 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testYIndicatorConversionSimpleTrue()
+	public void testYIndicatorConversion_SimpleTrue()
 	{
 		ObjectFactory objectFactory = new ObjectFactory();
 		YnIndicator yIndicator = objectFactory.createYnIndicator();
@@ -175,7 +175,7 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testYIndicatorConversionSimpleFalse()
+	public void testYIndicatorConversion_SimpleFalse()
 	{
 		ObjectFactory objectFactory = new ObjectFactory();
 		YnIndicator yIndicator = objectFactory.createYnIndicator();
@@ -185,7 +185,7 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testYIndicatorConversionSimpleInvalid()
+	public void testYIndicatorConversion_SimpleInvalid()
 	{
 		ObjectFactory objectFactory = new ObjectFactory();
 		YnIndicator yIndicator = objectFactory.createYnIndicator();
@@ -195,7 +195,7 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testResidualDataElementAsLongNull()
+	public void testResidualDataElementAsLong_Null()
 	{
 		assertNull(cdsImportMapper.getResidualDataElementAsLong(null, "key"));
 	}
@@ -219,7 +219,7 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testResidualDataElementAsDateNull()
+	public void testResidualDataElementAsDate_Null()
 	{
 		assertNull(cdsImportMapper.getResidualDataElementAsDate(null, "key"));
 	}
@@ -243,7 +243,7 @@ public class CDSImportMapperTest
 	}
 
 	@Test
-	public void testResidualDataElementAsStringNull()
+	public void testResidualDataElementAsString_Null()
 	{
 		assertNull(cdsImportMapper.getResidualDataElementAsString(null, "key"));
 	}
