@@ -114,7 +114,7 @@ dojo.date.isLeapYear = function(/*Date*/dateObject){
 	return (year%400 == 0) ? true : (year%100 == 0) ? false : (year%4 == 0) ? true : false; // Boolean
 }
 
-// FIXME: This is not localized
+// FIXME-legacy: This is not localized
 dojo.date.getTimezoneName = function(/*Date*/dateObject){
 // summary:
 //	Get the user's time zone as provided by the browser
@@ -164,7 +164,7 @@ dojo.date.getTimezoneName = function(/*Date*/dateObject){
 }
 
 
-//FIXME: not localized
+//FIXME-legacy: not localized
 dojo.date.getOrdinal = function(dateObject){
 	// summary: returns the appropriate suffix (English only) for the day of the month, e.g. 'st' for 1, 'nd' for 2, etc.)
 	var date = dateObject.getDate();
@@ -189,7 +189,7 @@ dojo.date.compare=function(/* Date */ dateA, /* Date */ dateB, /* dojo.date.comp
 	var dA=dateA;
 	var dB=dateB||new Date();
 	var now=new Date();
-	//FIXME: shorten this code
+	//FIXME-legacy: shorten this code
 	with(dojo.date.compareTypes){
 		var opt=options||(DATE|TIME);
 		var d1=new Date(
@@ -238,7 +238,7 @@ dojo.date.add = function(/* Date */ dt, /* dojo.date.dateParts */ interv, /* int
 //		How much to add to the date
 
 	if(typeof dt == 'number'){dt = new Date(dt);} // Allow timestamps
-//FIXME: what's the reason behind this?	incr = incr || 1;
+//FIXME-legacy: what's the reason behind this?	incr = incr || 1;
 
 	function fixOvershoot(){
 		if (sum.getDate() < dt.getDate()){
@@ -271,7 +271,7 @@ dojo.date.add = function(/* Date */ dt, /* dojo.date.dateParts */ interv, /* int
 				sum.setDate(dt.getDate() + incr);
 				break;
 			case WEEKDAY:
-				//FIXME: assumes Saturday/Sunday weekend, but even this is not fixed.  There are CLDR entries to localize this.
+				//FIXME-legacy: assumes Saturday/Sunday weekend, but even this is not fixed.  There are CLDR entries to localize this.
 				var dat = dt.getDate();
 				var weeks = 0;
 				var days = 0;

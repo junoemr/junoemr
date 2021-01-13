@@ -499,7 +499,7 @@ td#searchResultsContainer table tr td .DivContentSectionHead {
 
 /* String Data Table Styles
  * 	   Styles with NA are for rows that contain no data.
- * TODO: collapse most of these into the same class or classes - there's a lot of repetition
+ * TODO-legacy: collapse most of these into the same class or classes - there's a lot of repetition
  * most of these aren't even being used...
  */
 .StrDataTableHeader1 {

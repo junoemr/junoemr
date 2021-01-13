@@ -34,7 +34,7 @@ dojo.uri = new function() {
 		//  to the current document use
 		//      new dojo.uri.Uri(document.baseURI, uri)
 
-		// TODO: support for IPv6, see RFC 2732
+		// TODO-legacy: support for IPv6, see RFC 2732
 
 		// resolve uri components relative to each other
 		var uri = arguments[0];

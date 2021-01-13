@@ -39,7 +39,7 @@ dojo.widget.defineWidget(
 		setValue: function(value) {
 			// summary
 			//	Sets the value of the combobox.
-			//	TODO: this doesn't work correctly when a URL is specified, because we can't
+			//	TODO-legacy: this doesn't work correctly when a URL is specified, because we can't
 			//	set the label automatically (based on the specified value)
 			this.comboBoxValue.value = value;
 			dojo.widget.html.stabile.setState(this.widgetId, this.getState(), true);
@@ -48,7 +48,7 @@ dojo.widget.defineWidget(
 
 		setLabel: function(value){
 			// summary
-			//	FIXME, not sure what to do here!
+			//	FIXME-legacy, not sure what to do here!
 			//	Users shouldn't call this function; they should be calling setValue() instead
 			this.comboBoxSelectionValue.value = value;
 			if (this.textInputNode.value != value) { // prevent mucking up of selection

@@ -257,7 +257,7 @@
 
     int codeIdx = 0;
 	for(int idx2 = 0; idx2 < size; ++idx2) {
-		//TODO: only one perc code allowed, otherwise error msg
+		//TODO-legacy: only one perc code allowed, otherwise error msg
 		BillingPercLimitDao bplDao = SpringUtils.getBean(BillingPercLimitDao.class);
 		for(BillingPercLimit bpl : bplDao.findByServiceCode("" + vecServiceCodePerc.get(codeIdx))) {
 			aLimits[idx2] = true;

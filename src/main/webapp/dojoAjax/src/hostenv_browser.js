@@ -15,14 +15,14 @@ if(typeof window != 'undefined'){
 		// before we get any further with the config options, try to pick them out
 		// of the URL. Most of this code is from NW
 		if(djConfig.allowQueryConfig){
-			var baseUrl = document.location.toString(); // FIXME: use location.query instead?
+			var baseUrl = document.location.toString(); // FIXME-legacy: use location.query instead?
 			var params = baseUrl.split("?", 2);
 			if(params.length > 1){
 				var paramStr = params[1];
 				var pairs = paramStr.split("&");
 				for(var x in pairs){
 					var sp = pairs[x].split("=");
-					// FIXME: is this eval dangerous?
+					// FIXME-legacy: is this eval dangerous?
 					if((sp[0].length > 9)&&(sp[0].substr(0, 9) == "djConfig.")){
 						var opt = sp[0].substr(9);
 						try{
@@ -91,7 +91,7 @@ if(typeof window != 'undefined'){
 		var cm = document["compatMode"];
 		drh.quirks = (cm == "BackCompat")||(cm == "QuirksMode")||drh.ie55||drh.ie50;
 
-		// TODO: is the HTML LANG attribute relevant?
+		// TODO-legacy: is the HTML LANG attribute relevant?
 		dojo.locale = dojo.locale || (drh.ie ? navigator.userLanguage : navigator.language).toLowerCase();
 
 		dr.vml.capable=drh.ie;

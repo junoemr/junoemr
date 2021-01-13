@@ -126,7 +126,7 @@ TODAY=$(date)
 SRC=~/git/oscar
 
 
-# TODO Check the dir from which you are being called
+# TODO-legacy Check the dir from which you are being called
 
 
 DEBNAME="oscar_emr$VERSION-$REVISION"

@@ -401,6 +401,6 @@ dojo.mixin(dojo.gfx.matrix, {
 		return dojo.gfx.matrix._sandwich(dojo.gfx.matrix.skewYg(degree), a.x, a.y); // dojo.gfx.matrix.Matrix2D
 	}
 	
-	// TODO: rect-to-rect mapping, scale-to-fit (isotropic and anisotropic versions)
+	// TODO-legacy: rect-to-rect mapping, scale-to-fit (isotropic and anisotropic versions)
 	
 });

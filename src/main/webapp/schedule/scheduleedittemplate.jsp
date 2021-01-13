@@ -79,7 +79,7 @@
 	//save or delete the settings
 	int rowsAffected = 0;
 
-	//TODO move this to an action file
+	//TODO-legacy move this to an action file
 	if(dboperation != null) {
 		if (dboperation.equals(" Save ")) {
 			// remove old template by same name/provider. it will be replaced

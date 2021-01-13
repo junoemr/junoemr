@@ -50,10 +50,10 @@
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
 
 <%--
- //TODO: Mother's Information Doesn't save
- //TODO: Reason for injection needs to save better
- //TODO: Injection Input Needs styling
- //TODO: Page shuts when saving an Injection
+ //TODO-legacy: Mother's Information Doesn't save
+ //TODO-legacy: Reason for injection needs to save better
+ //TODO-legacy: Injection Input Needs styling
+ //TODO-legacy: Page shuts when saving an Injection
 
  This Form works in two modes  no form started mode and started
  

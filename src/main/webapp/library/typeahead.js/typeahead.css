@@ -43,7 +43,7 @@
   top: 100%;
   left: 0;
   z-index: 100;
-  /* TODO: need default z-index, should be configurable */
+  /* TODO-legacy: need default z-index, should be configurable */
 
   display: none;
 }

@@ -143,7 +143,7 @@ dojo.widget.defineWidget(
 			var o={};
 			for(var i=0; i<this.columns.length;i++){
 				if(this.columns[i].sortType=="__markup__"){
-					//	FIXME: should we parse this instead?  Because if the user may not get back the markup they put in...
+					//	FIXME-legacy: should we parse this instead?  Because if the user may not get back the markup they put in...
 					o[this.columns[i].getField()]=cells[i].innerHTML;
 				}else{
 					var text=dojo.html.renderedTextContent(cells[i]);
@@ -302,7 +302,7 @@ dojo.widget.defineWidget(
 				for(var j=0; j<this.columns.length; j++){
 					var field=this.columns[j].getField();
 					if(this.columns[j].sortType=="__markup__"){
-						//	FIXME: parse this?
+						//	FIXME-legacy: parse this?
 						o[field]=cells[j].innerHTML;
 					}else{
 						var type=this.columns[j].getType();
@@ -321,7 +321,7 @@ dojo.widget.defineWidget(
 				if(dojo.html.hasAttribute(rows[i],"value")&&!o[this.valueField]){
 					o[this.valueField]=dojo.html.getAttribute(rows[i],"value");
 				}
-				//	FIXME: add code to preserve row attributes in __metadata__ field?
+				//	FIXME-legacy: add code to preserve row attributes in __metadata__ field?
 				this.data.push(o);
 				
 				//	add it to the selections if selected="true" is present.

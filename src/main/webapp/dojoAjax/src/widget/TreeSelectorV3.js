@@ -24,7 +24,7 @@ dojo.widget.defineWidget(
 		this.lastClicked = {}
 	},
 {
-	// TODO: add multiselect
+	// TODO-legacy: add multiselect
 
 	listenTreeEvents: ["afterTreeCreate","afterCollapse","afterChangeTree", "afterDetach", "beforeTreeDestroy"],
 	listenNodeFilter: function(elem) { return elem instanceof dojo.widget.Widget},	

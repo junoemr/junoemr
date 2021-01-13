@@ -110,7 +110,7 @@ dojo.widget.defineWidget(
 			var messages = dojo.i18n.getLocalization("dojo.widget", "DropdownDatePicker", this.lang);
 			this.iconAlt = messages.selectDate;
 
-			//FIXME: should this be if/else/else?
+			//FIXME-legacy: should this be if/else/else?
 			if(typeof(this.value)=='string'&&this.value.toLowerCase()=='today'){
 				this.value = new Date();
 			}
@@ -207,7 +207,7 @@ dojo.widget.defineWidget(
 				}
 			}
 			// If the date entered didn't parse, reset to the old date.  KISS, for now.
-			//TODO: usability?  should we provide more feedback somehow? an error notice?
+			//TODO-legacy: usability?  should we provide more feedback somehow? an error notice?
 			// seems redundant to do this if the parse failed, but at least until we have validation,
 			// this will fix up the display of entries like 01/32/2006
 			if(input){ this._updateText(); }

@@ -14,7 +14,7 @@ dojo.require("dojo.lang.common");
 if(dojo.render.svg.capable){
 	dojo.require("dojo.svg");
 
-	//	TODO for 0.5: look at replacing manual plotting with dojo.gfx.
+	//	TODO-legacy for 0.5: look at replacing manual plotting with dojo.gfx.
 
 	//	Mixin the SVG-specific plotter object.
 	dojo.mixin(dojo.charting.Plotters, {

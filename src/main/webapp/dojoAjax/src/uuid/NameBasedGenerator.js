@@ -24,12 +24,12 @@ dojo.uuid.NameBasedGenerator = new function() {
 
 		dojo.unimplemented('dojo.uuid.NameBasedGenerator.generate');
 		
-		// FIXME:
+		// FIXME-legacy:
 		// For an algorithm to generate name-based UUIDs, 
 		// see sections 4.3 of RFC 4122:
 		//  http://www.ietf.org/rfc/rfc4122.txt
 		
-		var returnValue = "00000000-0000-0000-0000-000000000000"; // FIXME
+		var returnValue = "00000000-0000-0000-0000-000000000000"; // FIXME-legacy
 		if (returnType && (returnType != String)) {
 			returnValue = new returnType(returnValue);
 		}

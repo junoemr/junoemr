@@ -42,7 +42,7 @@ dojo.ns = {
 		if((ns)&&(this.loaded[name])){return ns;} // Ns
 		if(!this.allow(name)){return false;} // Boolean
  		if(this.loading[name]){
-			// FIXME: do we really ever have re-entrancy situation? this would appear to be really bad
+			// FIXME-legacy: do we really ever have re-entrancy situation? this would appear to be really bad
 			// original code did not throw an exception, although that seems the only course
 			// adding debug output here to track if this occurs.
 			dojo.debug('dojo.namespace.require: re-entrant request to load namespace "' + name + '" must fail.'); 

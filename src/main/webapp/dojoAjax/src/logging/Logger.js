@@ -47,9 +47,9 @@ dojo.require("dojo.lang.declare");
 		type
 		level
 */
-// TODO: define DTD for XML-formatted log messages
-// TODO: write XML Formatter class
-// TODO: write HTTP Handler which uses POST to send log lines/sections
+// TODO-legacy: define DTD for XML-formatted log messages
+// TODO-legacy: write XML Formatter class
+// TODO-legacy: write HTTP Handler which uses POST to send log lines/sections
 
 
 dojo.logging.Record = function(/*Integer*/logLevel, /*String||Array*/message){
@@ -77,7 +77,7 @@ dojo.logging.Record = function(/*Integer*/logLevel, /*String||Array*/message){
 	}else{
 		this.message = message;
 	}
-	// FIXME: what other information can we receive/discover here?
+	// FIXME-legacy: what other information can we receive/discover here?
 }
 
 dojo.logging.LogFilter = function(loggerChain){
@@ -89,7 +89,7 @@ dojo.logging.LogFilter = function(loggerChain){
 	//		chain.
 	this.passChain = loggerChain || "";
 	this.filter = function(record){
-		// FIXME: need to figure out a way to enforce the loggerChain
+		// FIXME-legacy: need to figure out a way to enforce the loggerChain
 		// restriction
 		return true; // pass all records
 	}
@@ -210,7 +210,7 @@ dojo.extend(dojo.logging.Logger,{
 			   this.handlers[x].handle(rec);
 			}
 		}
-		// FIXME: not sure what to do about records to be propagated that may have
+		// FIXME-legacy: not sure what to do about records to be propagated that may have
 		// been modified by the handlers or the filters at this logger. Should
 		// parents always have pristine copies? or is passing the modified record
 		// OK?
@@ -227,7 +227,7 @@ dojo.extend(dojo.logging.Logger,{
 			this.parent.log(lvl, msg);
 			return false;
 		}
-		// FIXME: need to call logging providers here!
+		// FIXME-legacy: need to call logging providers here!
 		this.handle(new dojo.logging.Record(lvl, msg));
 		return true;
 	},
@@ -274,7 +274,7 @@ dojo.extend(dojo.logging.Logger,{
 		//		level. If squelch is true, also prevent bubbling of the
 		//		exception.
 
-		// FIXME: this needs to be modified to put the exception in the msg
+		// FIXME-legacy: this needs to be modified to put the exception in the msg
 		// if we're on Moz, we can get the following from the exception object:
 		//		lineNumber
 		//		message
@@ -327,7 +327,7 @@ dojo.extend(dojo.logging.Logger,{
 // the Handler class
 dojo.logging.LogHandler = function(level){
 	this.cutOffLevel = (level) ? level : 0;
-	this.formatter = null; // FIXME: default formatter?
+	this.formatter = null; // FIXME-legacy: default formatter?
 	this.data = [];
 	this.filters = [];
 }
@@ -445,7 +445,7 @@ dojo.declare("dojo.logging.MemoryLogHandler",
 			dojo.logging.LogHandler.call(this, level);
 			// default is unlimited
 			this.numRecords = (typeof djConfig['loggingNumRecords'] != 'undefined') ? djConfig['loggingNumRecords'] : ((recordsToKeep) ? recordsToKeep : -1);
-			// 0=count, 1=time, -1=don't post TODO: move this to a better location for prefs
+			// 0=count, 1=time, -1=don't post TODO-legacy: move this to a better location for prefs
 			this.postType = (typeof djConfig['loggingPostType'] != 'undefined') ? djConfig['loggingPostType'] : ( postType || -1);
 			// milliseconds for time, interger for number of records, -1 for non-posting,
 			this.postInterval = (typeof djConfig['loggingPostInterval'] != 'undefined') ? djConfig['loggingPostInterval'] : ( postType || -1);

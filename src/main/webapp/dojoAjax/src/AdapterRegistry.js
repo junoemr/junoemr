@@ -73,7 +73,7 @@ dojo.lang.extend(dojo.AdapterRegistry, {
 	unregister: function(name){
 		// summary: Remove a named adapter from the registry
 
-		// FIXME: this is kind of a dumb way to handle this. On a large
+		// FIXME-legacy: this is kind of a dumb way to handle this. On a large
 		// registry this will be slow-ish and we can use the name as a lookup
 		// should we choose to trade memory for speed.
 		for(var i = 0; i < this.pairs.length; i++){

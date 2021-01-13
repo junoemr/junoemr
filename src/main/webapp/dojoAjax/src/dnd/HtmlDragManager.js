@@ -88,7 +88,7 @@ dojo.declare("dojo.dnd.HtmlDragManager", dojo.dnd.DragManager, {
 		//dojo.profile.start("register DragSource");
 
 		if(ds["domNode"]){
-			// FIXME: dragSource objects SHOULD have some sort of property that
+			// FIXME-legacy: dragSource objects SHOULD have some sort of property that
 			// references their DOM node, we shouldn't just be passing nodes and
 			// expecting it to work.
 			//dojo.profile.start("register DragSource 1");
@@ -305,7 +305,7 @@ dojo.declare("dojo.dnd.HtmlDragManager", dojo.dnd.DragManager, {
 		}
 		//dojo.profile.end("DNDManager updateoffset");
 
-		// TODO: do not recalculate, only adjust coordinates
+		// TODO-legacy: do not recalculate, only adjust coordinates
 		if (this.dragObjects.length) {
 			this.cacheTargetLocations();
 		}
@@ -397,7 +397,7 @@ dojo.declare("dojo.dnd.HtmlDragManager", dojo.dnd.DragManager, {
 			this.cacheTargetLocations();
 		}
 
-		// FIXME: we need to add dragSources and dragObjects to e
+		// FIXME-legacy: we need to add dragSources and dragObjects to e
 		dojo.lang.forEach(this.dragObjects, function(dragObj){
 			if(dragObj){ dragObj.onDragMove(e); }
 		});
@@ -418,7 +418,7 @@ dojo.declare("dojo.dnd.HtmlDragManager", dojo.dnd.DragManager, {
 				this.currentDropTarget.onDragMove(e, this.dragObjects);
 			}
 		}else{
-			// FIXME: need to fix the event object!
+			// FIXME-legacy: need to fix the event object!
 			// see if we can find a better drop target
 			var bestBox = this.findBestTarget(e);
 
@@ -493,14 +493,14 @@ dojo.dnd.dragManager = new dojo.dnd.HtmlDragManager();
 (function(){
 	var d = document;
 	var dm = dojo.dnd.dragManager;
-	//TODO: when focus manager is ready, dragManager should be rewritten to use it
+	//TODO-legacy: when focus manager is ready, dragManager should be rewritten to use it
 	// set up event handlers on the document (or no?)
 	dojo.event.connect(d, "onkeydown", dm, "onKeyDown");
 	dojo.event.connect(d, "onmouseover", dm, "onMouseOver");
 	dojo.event.connect(d, "onmouseout", dm, "onMouseOut");
 	dojo.event.connect(d, "onmousedown", dm, "onMouseDown");
 	dojo.event.connect(d, "onmouseup", dm, "onMouseUp");
-	// TODO: process scrolling of elements, not only window (focus manager would 
+	// TODO-legacy: process scrolling of elements, not only window (focus manager would
 	// probably come to rescue here as well)
 	dojo.event.connect(window, "onscroll", dm, "onScroll");
 })();

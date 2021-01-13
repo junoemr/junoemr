@@ -69,7 +69,7 @@ if(!dojo.hostenv.library_script_uri_){
 dojo.hostenv.loadUri = function(uri){
 	// spidermonkey load() evaluates the contents into the global scope (which
 	// is what we want).
-	// TODO: sigh, load() does not return a useful value. 
+	// TODO-legacy: sigh, load() does not return a useful value.
 	// Perhaps it is returning the value of the last thing evaluated?
 	var ok = load(uri);
 	// dojo.debug("spidermonkey load(", uri, ") returned ", ok);

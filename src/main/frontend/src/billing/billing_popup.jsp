@@ -25,7 +25,7 @@
 --%>
 
 <%--
-    TODO: This template must be refactored to use angular
+    TODO-legacy: This template must be refactored to use angular
     instead of opening a window this way
     because this template is preloaded in index.jsp via templates.jsp
 

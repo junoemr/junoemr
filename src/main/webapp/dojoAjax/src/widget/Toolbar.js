@@ -383,7 +383,7 @@ dojo.widget.defineWidget(
 		return this._icon;
 	},
 
-	// TODO: update the label node (this.labelNode?)
+	// TODO-legacy: update the label node (this.labelNode?)
 	_label: "",
 	getLabel: function() { return this._label; },
 	setLabel: function(value) {
@@ -810,7 +810,7 @@ dojo.widget.defineWidget(
 // arguments can be IMG nodes, Image() instances or URLs -- enabled is the only one required
 dojo.widget.Icon = function(enabled, disabled, hovered, selected){
 	if(!arguments.length){
-		// FIXME: should this be dojo.raise?
+		// FIXME-legacy: should this be dojo.raise?
 		throw new Error("Icon must have at least an enabled state");
 	}
 	var states = ["enabled", "disabled", "hovered", "selected"];

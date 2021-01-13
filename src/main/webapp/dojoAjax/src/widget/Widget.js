@@ -106,7 +106,7 @@ dojo.declare("dojo.widget.Widget", null,
 		this.disabled = true;
 	},
 
-	// TODO:
+	// TODO-legacy:
 	//	1) this would be better in HtmlWidget rather than here?
 	//	2) since many widgets don't care if they've been resized, maybe this should be a mixin?
 	onResized: function(){
@@ -229,7 +229,7 @@ dojo.declare("dojo.widget.Widget", null,
 		//		is this function being called part of global environment
 		//		tear-down?
 
-		// FIXME: this is woefully incomplete
+		// FIXME-legacy: this is woefully incomplete
 		if(this.parent){
 			this.parent.removeChild(this);
 		}
@@ -316,7 +316,7 @@ dojo.declare("dojo.widget.Widget", null,
 		// dojo.profile.start("satisfyPropertySets");
 		// get the default propsets for our component type
 		/*
-		var typePropSets = []; // FIXME: need to pull these from somewhere!
+		var typePropSets = []; // FIXME-legacy: need to pull these from somewhere!
 		var localPropSets = []; // pull out propsets from the parser's return structure
 
 		// for(var x=0; x<args.length; x++){
@@ -395,7 +395,7 @@ dojo.declare("dojo.widget.Widget", null,
 		// problematic assignments and bugs in the future and will need to be
 		// documented with big bright neon lights.
 
-		// FIXME: fails miserably if a mixin property has a default value of null in 
+		// FIXME-legacy: fails miserably if a mixin property has a default value of null in 
 		// a widget
 
 		// NOTE: caching lower-cased args in the prototype is only 
@@ -428,12 +428,12 @@ dojo.declare("dojo.widget.Widget", null,
 					if(dojo.lang.isString(this[x])){
 						this[x] = args[x];
 					}else if(dojo.lang.isNumber(this[x])){
-						this[x] = new Number(args[x]); // FIXME: what if NaN is the result?
+						this[x] = new Number(args[x]); // FIXME-legacy: what if NaN is the result?
 					}else if(dojo.lang.isBoolean(this[x])){
 						this[x] = (args[x].toLowerCase()=="false") ? false : true;
 					}else if(dojo.lang.isFunction(this[x])){
 
-						// FIXME: need to determine if always over-writing instead
+						// FIXME-legacy: need to determine if always over-writing instead
 						// of attaching here is appropriate. I suspect that we
 						// might want to only allow attaching w/ action items.
 						
@@ -469,7 +469,7 @@ dojo.declare("dojo.widget.Widget", null,
 					} else if (this[x] instanceof Date) {
 						this[x] = new Date(Number(args[x])); // assume timestamp
 					}else if(typeof this[x] == "object"){ 
-						// FIXME: should we be allowing extension here to handle
+						// FIXME-legacy: should we be allowing extension here to handle
 						// other object types intelligently?
 
 						// if a plain string is passed to a property of type dojo.uri.Uri,
@@ -477,7 +477,7 @@ dojo.declare("dojo.widget.Widget", null,
 						if (this[x] instanceof dojo.uri.Uri){
 							this[x] = dojo.uri.dojoUri(args[x]);
 						}else{
-							// FIXME: unlike all other types, we do not replace the
+							// FIXME-legacy: unlike all other types, we do not replace the
 							// object with a new one here. Should we change that?
 							var pairs = args[x].split(";");
 							for(var y=0; y<pairs.length; y++){
@@ -613,11 +613,11 @@ dojo.declare("dojo.widget.Widget", null,
 // want
 dojo.widget.lcArgsCache = {};
 
-// TODO: should have a more general way to add tags or tag libraries?
-// TODO: need a default tags class to inherit from for things like getting propertySets
-// TODO: parse properties/propertySets into component attributes
-// TODO: parse subcomponents
-// TODO: copy/clone raw markup fragments/nodes as appropriate
+// TODO-legacy: should have a more general way to add tags or tag libraries?
+// TODO-legacy: need a default tags class to inherit from for things like getting propertySets
+// TODO-legacy: parse properties/propertySets into component attributes
+// TODO-legacy: parse subcomponents
+// TODO-legacy: copy/clone raw markup fragments/nodes as appropriate
 dojo.widget.tags = {};
 dojo.widget.tags.addParseTreeHandler = function(/*String*/type){
 	// summary: deprecated!
@@ -637,18 +637,18 @@ dojo.widget.tags.addParseTreeHandler = function(/*String*/type){
 //dojo.widget.tags.addParseTreeHandler("dojo:widget");
 
 dojo.widget.tags["dojo:propertyset"] = function(fragment, widgetParser, parentComp){
-	// FIXME: Is this needed?
-	// FIXME: Not sure that this parses into the structure that I want it to parse into...
-	// FIXME: add support for nested propertySets
+	// FIXME-legacy: Is this needed?
+	// FIXME-legacy: Not sure that this parses into the structure that I want it to parse into...
+	// FIXME-legacy: add support for nested propertySets
 	var properties = widgetParser.parseProperties(fragment["dojo:propertyset"]);
 }
 
-// FIXME: need to add the <dojo:connect />
+// FIXME-legacy: need to add the <dojo:connect />
 dojo.widget.tags["dojo:connect"] = function(fragment, widgetParser, parentComp){
 	var properties = widgetParser.parseProperties(fragment["dojo:connect"]);
 }
 
-// FIXME: if we know the insertion point (to a reasonable location), why then do we:
+// FIXME-legacy: if we know the insertion point (to a reasonable location), why then do we:
 //	- create a template node
 //	- clone the template node
 //	- render the clone and set properties
@@ -667,12 +667,12 @@ dojo.widget.buildWidgetFromParseTree = function(/*String*/				type,
 	// test for accessibility mode 
 	dojo.a11y.setAccessibleMode();
 	//dojo.profile.start("buildWidgetFromParseTree");
-	// FIXME: for codepath from createComponentFromScript, we are now splitting a path 
+	// FIXME-legacy: for codepath from createComponentFromScript, we are now splitting a path 
 	// that we already split and then joined
 	var stype = type.split(":");
 	stype = (stype.length == 2) ? stype[1] : type;
 	
-	// FIXME: we don't seem to be doing anything with this!
+	// FIXME-legacy: we don't seem to be doing anything with this!
 	// var propertySets = parser.getPropertySets(frag);
 	var localProperties = localProps || parser.parseProperties(frag[frag["ns"]+":"+stype]);
 	var twidget = dojo.widget.manager.getImplementation(stype,null,null,frag["ns"]);
@@ -682,7 +682,7 @@ dojo.widget.buildWidgetFromParseTree = function(/*String*/				type,
 		throw new Error('"' + type + '" widget object has no "create" method and does not appear to implement *Widget');
 	}
 	localProperties["dojoinsertionindex"] = insertionIndex;
-	// FIXME: we lose no less than 5ms in construction!
+	// FIXME-legacy: we lose no less than 5ms in construction!
 	var ret = twidget.create(localProperties, frag, parentComp, frag["ns"]);
 	// dojo.profile.end("buildWidgetFromParseTree");
 	return ret;
@@ -733,7 +733,7 @@ dojo.widget.defineWidget = function(widgetClass, renderer, superclasses, init, p
 dojo.widget.defineWidget.renderers = "html|svg|vml";
 
 dojo.widget._defineWidget = function(widgetClass /*string*/, renderer /*string*/, superclasses /*function||array*/, init /*function*/, props /*object*/){
-	// FIXME: uncomment next line to test parameter juggling ... remove when confidence improves
+	// FIXME-legacy: uncomment next line to test parameter juggling ... remove when confidence improves
 	// dojo.debug('(c:)' + widgetClass + '\n\n(r:)' + renderer + '\n\n(i:)' + init + '\n\n(p:)' + props);
 	// widgetClass takes the form foo.bar.baz<.renderer>.WidgetName (e.g. foo.bar.baz.WidgetName or foo.bar.baz.html.WidgetName)
 	var module = widgetClass.split(".");
@@ -748,7 +748,7 @@ dojo.widget._defineWidget = function(widgetClass /*string*/, renderer /*string*/
 	var pos = module.indexOf(".");
 	var nsName = (pos > -1) ? module.substring(0,pos) : module;
 
-	// FIXME: hrm, this might make things simpler
+	// FIXME-legacy: hrm, this might make things simpler
 	//dojo.widget.tags.addParseTreeHandler(nsName+":"+type.toLowerCase());
 	
 	props=(props)||{};

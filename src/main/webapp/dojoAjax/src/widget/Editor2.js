@@ -280,11 +280,11 @@ dojo.widget.defineWidget(
 		displayCloseAction: true,
 
 		// contentFile: String
-		//	TODO
+		//	TODO-legacy
 		contentFile: "",
 		
 		// contentClass: String
-		//	TODO
+		//	TODO-legacy
 		contentClass: "",
 
 		fillInTemplate: function(args, frag){
@@ -537,7 +537,7 @@ dojo.widget.defineWidget(
 			//		This event is for plugins to use
 		},
 
-		//TODO: provide a query mechanism about loaded plugins?
+		//TODO-legacy: provide a query mechanism about loaded plugins?
 		registerLoadedPlugin: function(/*Object*/obj){
 			// summary: Register a plugin which is loaded for this instance
 			if(!this.loadedPlugins){
@@ -686,7 +686,7 @@ dojo.widget.defineWidget(
 			if((!this.isLoaded)||(!this.toolbarWidget)){ return; }
 
 			// keeps the toolbar from updating too frequently
-			// TODO: generalize this functionality?
+			// TODO-legacy: generalize this functionality?
 			var diff = new Date() - this._updateToolbarLastRan;
 			if( (!force)&&(this._updateToolbarLastRan)&&
 				((diff < this._updateToolbarFrequency)) ){
@@ -728,7 +728,7 @@ dojo.widget.defineWidget(
 		onLoad: function(){
 			try{
 				dojo.widget.Editor2.superclass.onLoad.call(this);
-			}catch(e){ // FIXME: debug why this is throwing errors in IE!
+			}catch(e){ // FIXME-legacy: debug why this is throwing errors in IE!
 				dojo.debug(e);
 			}
 			this.editorOnLoad();
@@ -784,9 +784,9 @@ dojo.widget.defineWidget(
 //			this.addKeyHandler("s", ctrl, function () { this.save(true); });
 		}
 		/*,
-		// FIXME: probably not needed any more with new design, but need to verify
+		// FIXME-legacy: probably not needed any more with new design, but need to verify
 		_save: function(e){
-			// FIXME: how should this behave when there's a larger form in play?
+			// FIXME-legacy: how should this behave when there's a larger form in play?
 			if(!this.isClosed){
 				dojo.debug("save attempt");
 				if(this.saveUrl.length){

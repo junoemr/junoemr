@@ -99,7 +99,7 @@
 				//if you are editing previous billing, the previous billing should be deleted(flag "D") after edit (insert a new billing)�      
 		%>
 			
-			<jsp:include page="billingDeleteWithBillNo.jsp"/><!-- TODO: look at handling of actions from different submits -->
+			<jsp:include page="billingDeleteWithBillNo.jsp"/><!-- TODO-legacy: look at handling of actions from different submits -->
 			<!-- let billingDeleteWithBillNo.jsp handle messages at this point to prevent duplicate or contradicting msgs-->  
 			
 		<% if (request.getParameter("submit") != null && "Save & Add Another Bill".equals(request.getParameter("submit"))) { %>

@@ -159,7 +159,7 @@ if (heading != null){
                 if (cml!=null) {p_cmn = caseManagementManager.getNote(cml.getNoteId().toString());}
                 if (p_cmn!=null){isPrevAnnotation=true;}
 
-                if (request.getParameter("status") != null) { //TODO: Redo this in a better way
+                if (request.getParameter("status") != null) { //TODO-legacy: Redo this in a better way
                     String stat = request.getParameter("status");
                     if (stat.equals("active") && !prescriptDrug.isLongTerm() && !prescriptDrug.isCurrent()) {
                         continue;

@@ -26,7 +26,7 @@ dojo.lang.hitch = function(/*Object*/thisObject, /*Function|String*/method){
 	//		dojo.lang.hitch(foo, "bar")(); // runs foo.bar() in the scope of foo
 	//		dojo.lang.hitch(foo, myFunction); // returns a function that runs myFunction in the scope of foo
 
-	// FIXME:
+	// FIXME-legacy:
 	//		should this be extended to "fixate" arguments in a manner similar
 	//		to dojo.lang.curry, but without the default execution of curry()?
 	var fcn = (dojo.lang.isString(method) ? thisObject[method] : method) || function(){};
@@ -123,7 +123,7 @@ dojo.lang.curry = function(thisObj, func /* args ... */){
 	//			// debugs: "one two three"
 
 
-	// FIXME: the order of func and thisObj should be changed!!!
+	// FIXME-legacy: the order of func and thisObj should be changed!!!
 	var outerArgs = [];
 	thisObj = thisObj||dj_global;
 	if(dojo.lang.isString(func)){

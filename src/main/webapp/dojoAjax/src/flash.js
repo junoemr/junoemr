@@ -272,7 +272,7 @@ dojo.flash = function(){
 	//	'addLoadingListener' and 'addInstallingListener'.
 	//		
 	//	-------------------
-	//	Todo/Known Issues
+	//	Todo-legacy/Known Issues
 	//	-------------------
 	//
 	//	There are several tasks I was not able to do, or did not need to fix

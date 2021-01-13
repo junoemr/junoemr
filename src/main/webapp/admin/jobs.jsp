@@ -296,7 +296,7 @@ java.util.Map<Integer,java.util.concurrent.ScheduledFuture<Object>> futures = or
 			modal: true,
 			buttons: {
 				"Save": function() {	
-					//TODO: validate the fields.
+					//TODO-legacy: validate the fields.
 					//submit the crontab-form , close the dialog.
 					$.post('../ws/rs/jobs/saveCrontabExpression',$('#crontab-form').serialize(),function(data){listJobs();});	
 					$( this ).dialog( "close" );	

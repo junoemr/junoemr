@@ -163,7 +163,7 @@ dojo.gfx.Colorspace.prototype.getWhitePoint = function(){
 	var t = 0;
 
 	// ref: http://en.wikipedia.org/wiki/White_point
-	// TODO: i need some good/better white point values
+	// TODO-legacy: i need some good/better white point values
 
 	switch(this.stdObserver){
 		case '2' :

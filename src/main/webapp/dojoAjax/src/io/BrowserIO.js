@@ -66,7 +66,7 @@ dojo.io.formFilter = function(/*DOMNode*/node) {
 		&& !dojo.lang.inArray(["file", "submit", "image", "reset", "button"], type); //boolean
 }
 
-// TODO: Move to htmlUtils
+// TODO-legacy: Move to htmlUtils
 dojo.io.encodeForm = function(/*DOMNode*/formNode, /*String?*/encoding, /*Function?*/formFilter){
 	//summary: Converts the names and values of form elements into an URL-encoded
 	//string (name=value&name=value...).
@@ -242,11 +242,11 @@ dojo.io.XMLHTTPTransport = new function(){
 	//summary: The object that implements the dojo.io.bind transport for XMLHttpRequest.
 	var _this = this;
 
-	var _cache = {}; // FIXME: make this public? do we even need to?
+	var _cache = {}; // FIXME-legacy: make this public? do we even need to?
 	this.useCache = false; // if this is true, we'll cache unless kwArgs.useCache = false
 	this.preventCache = false; // if this is true, we'll always force GET requests to cache
 
-	// FIXME: Should this even be a function? or do we just hard code it in the next 2 functions?
+	// FIXME-legacy: Should this even be a function? or do we just hard code it in the next 2 functions?
 	function getCacheKey(url, query, method) {
 		return url + "|" + query + "|" + method.toLowerCase();
 	}
@@ -403,7 +403,7 @@ dojo.io.XMLHTTPTransport = new function(){
 		//use for the particular type of request. This type of transport cannot
 		//handle forms that have an input type="file" element.
 
-		// FIXME: we need to determine when form values need to be
+		// FIXME-legacy: we need to determine when form values need to be
 		// multi-part mime encoded and avoid using this transport for those
 		// requests.
 		return hasXmlHttp
@@ -602,7 +602,7 @@ dojo.io.XMLHTTPTransport = new function(){
 		// build a handler function that calls back to the handler obj
 		if(async){
 			var startTime = 
-			// FIXME: setting up this callback handler leaks on IE!!!
+			// FIXME-legacy: setting up this callback handler leaks on IE!!!
 			this.inFlight.push({
 				"req":		kwArgs,
 				"http":		http,
@@ -618,7 +618,7 @@ dojo.io.XMLHTTPTransport = new function(){
 		}
 
 		if(kwArgs.method.toLowerCase() == "post"){
-			// FIXME: need to hack in more flexible Content-Type setting here!
+			// FIXME-legacy: need to hack in more flexible Content-Type setting here!
 			if (!kwArgs.user) {
 				http.open("POST", url, async);
 			}else{

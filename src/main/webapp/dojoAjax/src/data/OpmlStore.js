@@ -16,7 +16,7 @@ dojo.require("dojo.json");
 
 dojo.require("dojo.experimental");
 dojo.experimental("dojo.data.OpmlStore");
-// FIXME: The OpmlStore works in Firefox but does not yet work in IE.
+// FIXME-legacy: The OpmlStore works in Firefox but does not yet work in IE.
 
 dojo.declare("dojo.data.OpmlStore", dojo.data.core.Read, {
 	/* summary:
@@ -107,7 +107,7 @@ dojo.declare("dojo.data.OpmlStore", dojo.data.core.Read, {
 				array.push(item.childNodes[i]);
 			}
 			return array; // Array
-			// return item.childNodes; // FIXME: this isn't really an Array
+			// return item.childNodes; // FIXME-legacy: this isn't really an Array
 		} else {
 			return [item.getAttribute(attribute)]; // Array
 		}
@@ -186,7 +186,7 @@ dojo.declare("dojo.data.OpmlStore", dojo.data.core.Read, {
 					result.oncompleted.call(scope, result);
 				}
 			} else if(type == "error" || type == 'timeout') {
-				// todo: how to handle timeout?
+				// todo-legacy: how to handle timeout?
 				var errorObject = data;
 				// dojo.debug("error in dojo.data.OpmlStore.find(): " + dojo.json.serialize(errorObject));
 				if (result.onerror) {
