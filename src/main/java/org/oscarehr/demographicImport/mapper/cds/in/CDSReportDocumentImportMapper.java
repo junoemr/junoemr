@@ -39,6 +39,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DEFAULT_DOCUMENT_DESCRIPTION;
+
 @Component
 public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper<Document>
 {
@@ -54,7 +56,7 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 
 		document.setFile(getDocumentFile(importStructure));
 
-		document.setDocumentClass(getDocClass(importStructure.getClazz()));
+		document.setDocumentClass(getReportClass(importStructure.getClazz()));
 		document.setDocumentSubClass(importStructure.getSubClass());
 		document.setObservationDate(toNullableLocalDate(importStructure.getEventDateTime()));
 		document.setCreatedAt(toNullableLocalDateTime(importStructure.getReceivedDateTime()));
@@ -65,7 +67,7 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 
 		document.setAnnotation(importStructure.getNotes());
 		document.setStatus(Document.STATUS.ACTIVE);
-		document.setDescription(getDocDescription(importStructure));
+		document.setDescription(getDocumentDescription(importStructure));
 
 		return document;
 	}
@@ -98,7 +100,7 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 		return tempFile;
 	}
 
-	protected String getDocClass(ReportClass clazz)
+	protected String getReportClass(ReportClass clazz)
 	{
 		if(clazz != null)
 		{
@@ -138,9 +140,9 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 		return reviewer;
 	}
 
-	protected String getDocDescription(Reports importStructure)
+	protected String getDocumentDescription(Reports importStructure)
 	{
-		String clazz = getDocClass(importStructure.getClazz());
-		return (clazz != null) ? clazz : "Imported Report";
+		String clazz = getReportClass(importStructure.getClazz());
+		return (clazz != null) ? clazz : DEFAULT_DOCUMENT_DESCRIPTION;
 	}
 }

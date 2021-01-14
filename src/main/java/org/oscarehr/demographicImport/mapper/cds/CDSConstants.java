@@ -24,6 +24,7 @@ package org.oscarehr.demographicImport.mapper.cds;
 
 public class CDSConstants
 {
+	public static final String DEFAULT_DOCUMENT_DESCRIPTION = "Imported Report";
 
 	public static final String RESIDUAL_INFO_DATA_NAME_NOTE = "Note";
 	public static final String RESIDUAL_INFO_DATA_NAME_OBS_DATE = "Observation Datetime";
