@@ -291,12 +291,12 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 			if(ROSTER_STATUS_ROSTERED.equals(rosterStatus))
 			{
 				enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_TRUE);
-				enrolmentHistory.setEnrollmentDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getRosterDate()));
+				enrolmentHistory.setEnrollmentDate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getRosterDate()));
 			}
 			else
 			{
 				enrolmentHistory.setEnrollmentStatus(ENROLLMENT_STATUS_FALSE);
-				enrolmentHistory.setEnrollmentTerminationDate(ConversionUtils.toXmlGregorianCalendar(exportStructure.getRosterTerminationDate()));
+				enrolmentHistory.setEnrollmentTerminationDate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getRosterTerminationDate()));
 				enrolmentHistory.setTerminationReason(exportStructure.getRosterTerminationReason());
 			}
 
