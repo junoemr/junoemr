@@ -15,7 +15,7 @@ dojo.require("dojo.date.format");
 dojo.require("dojo.validate.datetime");
 
 // summary: A TextBox which tests for a valid date
-//TODO: combine date and time widgets?
+//TODO-legacy: combine date and time widgets?
 dojo.widget.defineWidget(
 	"dojo.widget.DateTextbox",
 	dojo.widget.ValidationTextbox,
@@ -30,7 +30,7 @@ dojo.widget.defineWidget(
 		//	alternate to displayFormat, to format date as short/medium/long.  see dojo.date.format
 		formatLength: "short",
 
-//TODO: add date, saveFormat attributes like DropdownDatePicker?
+//TODO-legacy: add date, saveFormat attributes like DropdownDatePicker?
 
 		mixInProperties: function(/*Object*/localProperties){
 			// summary: see dojo.widget.Widget

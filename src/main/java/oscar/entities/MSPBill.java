@@ -35,7 +35,7 @@ import oscar.util.UtilDateUtilities;
 /**
  *
  * Represents a Bill in the BC Billing module
- * @todo This class should be renamed since it represents any type of bill(ICBC,WCB,Private)
+ * @todo-legacy This class should be renamed since it represents any type of bill(ICBC,WCB,Private)
  * Furthermore, it is based on the MSPReconcile.Bill inner class which wasn't written to the Java Bean standard
  * (public accessors/modifiers and private members). Therefore, for backwards compatibility the members of this class are public.
  * This class needs to be refactored
@@ -517,7 +517,6 @@ public class MSPBill {
 
   /**
    * Returns a formatted summary of the explanation code for a specific rejected bill
-   * @todo This really ought to go into a presentation class
    * @return String
    */
   public String getExpSum() {

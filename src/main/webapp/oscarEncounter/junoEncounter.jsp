@@ -628,7 +628,7 @@
 												onmouseout="this.className='links ${fn:join(note.titleClasses, ' ')}'"
 												href="#"
 												onclick="${note.onClick};return false;"
-												title="Flu=Influenza vaccine"
+												title="${note.text}"
 										>
 											<c:out value="${note.text}"/>
 										</a>
@@ -649,7 +649,7 @@
 												onmouseout="this.className='links'"
 												href="#"
 												onclick="${note.onClick};return false;"
-												title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
+												title="${note.text}"
 										>
 												<c:out value="${note.value}"/>
 												<c:out value="${updateDate}"/>
@@ -1169,7 +1169,7 @@
 								<button type="button" onclick="encounterNote.spellCheck();">
 									Spell Check
 								</button> &nbsp;
-								<button type="button" onclick="javascript:toggleFullViewForAll(this.form);">
+								<button type="button" onclick="encounterNote.expandAllNotes();">
 									<bean:message key="eFormGenerator.expandAll"/>
 									<bean:message key="Appointment.formNotes"/>
 								</button>

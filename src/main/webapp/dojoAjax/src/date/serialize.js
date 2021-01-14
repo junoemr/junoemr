@@ -135,7 +135,7 @@ dojo.date.toRfc3339 = function(/*Date?*/dateObject, /*String?*/selector){
 //		"dateOnly" or "timeOnly" to format selected portions of the Date object.
 //		Date and time will be formatted by default.
 
-//FIXME: tolerate Number, string input?
+//FIXME-legacy: tolerate Number, string input?
 	if(!dateObject){
 		dateObject = new Date();
 	}

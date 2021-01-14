@@ -69,7 +69,7 @@ public class FrmToXMLUtil{
    
     public static String convertToXml(LoggedInInfo loggedInInfo, Vector measurementTypes, Properties nameProps, Properties dataProps){
              
-        // TODO code application logic here            
+        // TODO-legacy code application logic here
         String _dateFormat = "yyyy-MM-dd hh:mm:ss";
         String dateEntered = UtilDateUtilities.DateToString(new Date(),_dateFormat);
         ProviderData prData = new ProviderData(dataProps.getProperty("provider_no"));
@@ -328,7 +328,7 @@ public class FrmToXMLUtil{
              setValueMethod.invoke(obj, new Object[] {c});       
          }
          
-         //TODO need way to change String Date into a Calendar instance                 
+         //TODO-legacy need way to change String Date into a Calendar instance
       }catch (NoSuchMethodException noSuchMethod3){}
       
       try{

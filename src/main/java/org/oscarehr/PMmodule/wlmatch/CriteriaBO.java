@@ -37,7 +37,7 @@ public class CriteriaBO {
 	public double weight=1;
 	
 	double score(PotentialMatchBO pot) {
-		// TODO place-holder for complex scoring, always returns 100% match * weight right now 
+		// TODO-legacy place-holder for complex scoring, always returns 100% match * weight right now
 		return weight;
 	}
 }

@@ -314,7 +314,7 @@ public class BillingBillingManager implements Serializable {
 			//make sure to load private fee if required,but default to MSP fee if Private fee unavailable
 			if("pri".equalsIgnoreCase(billType))
 			{
-				//TODO rewrite this query method
+				//TODO-legacy rewrite this query method
 				List<BillingService> bss = dao.findByServiceCodes(Arrays.asList(new String[]{service_code, "A" + service_code}));
 				if (!bss.isEmpty())
 				{

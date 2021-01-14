@@ -1446,8 +1446,7 @@ ALTER TABLE demographicExt ADD CONSTRAINT uk_demo_ext UNIQUE (demographic_no, ke
 --  The procedure changed to allow for that
 --  also it fails if there is the same providers but different date_time
 --  eg demographic 10162 duplicate rxInteractionWarningLevel with same date_time!!
---  alas -- 
---  TODO -- fix Done
+--  alas --
 
 -- update-2013-05-04 moved to procedure
 
@@ -2629,7 +2628,7 @@ ALTER TABLE `raheader` CHANGE `filename` `filename` VARCHAR( 30 )NOT NULL;
 -- update-2014-4-16
 alter table program add `enableOCAN` tinyint(1) not null;
 
--- from update-2014-05-09.sql - TODO measurements check
+-- from update-2014-05-09.sql - TODO-legacy measurements check
 ALTER TABLE `measurementType` ADD UNIQUE INDEX `type_instruction`(`type`, `measuringInstruction`);
 
 
@@ -4248,7 +4247,7 @@ CREATE TABLE `consultResponseDoc` (
   `providerNo` varchar(6) NOT NULL
 );
 
--- update-2015-02-13.sql  -- TODO check why this is commented out in the OSCAR-EMR upgrade script
+-- update-2015-02-13.sql  -- TODO-legacy check why this is commented out in the OSCAR-EMR upgrade script
 alter table professionalSpecialists add privatePhoneNumber varchar(30);
 alter table professionalSpecialists add cellPhoneNumber varchar(30);
 alter table professionalSpecialists add pagerNumber varchar(30);

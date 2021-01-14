@@ -62,7 +62,7 @@ if(!authed) {
 
 
 	Calendar timeConsideredStale = Calendar.getInstance();
-	//TODO: 
+	//TODO-legacy:
 	timeConsideredStale.add(Calendar.SECOND, -secondsTillConsideredStale);
 %>
 

@@ -73,7 +73,7 @@ public class OscarDbPropertiesListener implements ServletContextListener {
 	}
 
 	public void contextDestroyed(ServletContextEvent arg0) {
-		// TODO Auto-generated method stub
+		// TODO-legacy Auto-generated method stub
 
 	}
 

@@ -11,7 +11,7 @@
 dojo.provide("dojo.event.browser");
 dojo.require("dojo.event.common");
 
-// FIXME: any particular reason this is in the global scope?
+// FIXME-legacy: any particular reason this is in the global scope?
 dojo._ie_clobber = new function(){
 	this.clobberNodes = [];
 
@@ -19,7 +19,7 @@ dojo._ie_clobber = new function(){
 		// try{ node.removeAttribute(prop); 	}catch(e){ /* squelch */ }
 		try{ node[prop] = null; 			}catch(e){ /* squelch */ }
 		try{ delete node[prop]; 			}catch(e){ /* squelch */ }
-		// FIXME: JotLive needs this, but I'm not sure if it's too slow or not
+		// FIXME-legacy: JotLive needs this, but I'm not sure if it's too slow or not
 		try{ node.removeAttribute(prop);	}catch(e){ /* squelch */ }
 	}
 
@@ -172,7 +172,7 @@ dojo.event.browser = new function(){
 			evtName = "onkeypress";
 		}
 		if(evtName.substr(0,2)=="on"){ evtName = evtName.substr(2); }
-		// FIXME: this is mostly a punt, we aren't actually doing anything on IE
+		// FIXME-legacy: this is mostly a punt, we aren't actually doing anything on IE
 		if(node.removeEventListener){
 			node.removeEventListener(evtName, fp, capture);
 		}
@@ -194,7 +194,7 @@ dojo.event.browser = new function(){
 		//		Optional. Should we avoid registering a new closure around the
 		//		listener to enable fixEvent for dispatch of the registered
 		//		function?
-		if(!node){ return; } // FIXME: log and/or bail?
+		if(!node){ return; } // FIXME-legacy: log and/or bail?
 		if(!capture){ var capture = false; }
 		evtName = dojo.event.browser.normalizedEventName(evtName);
 		if( (evtName == "onkey") || (evtName == "key") ){
@@ -244,7 +244,7 @@ dojo.event.browser = new function(){
 		// summary: 
 		//		Tries to determine whether or not the object is a DOM event.
 
-		// FIXME: event detection hack ... could test for additional attributes
+		// FIXME-legacy: event detection hack ... could test for additional attributes
 		// if necessary
 		return (typeof obj != "undefined")&&(obj)&&(typeof Event != "undefined")&&(obj.eventPhase); // Boolean
 		// Event does not support instanceof in Opera, otherwise:
@@ -357,7 +357,7 @@ dojo.event.browser = new function(){
 		
 		if((evt["type"])&&(evt["type"].indexOf("key") == 0)){ // key events
 			evt.keys = this.revKeys;
-			// FIXME: how can we eliminate this iteration?
+			// FIXME-legacy: how can we eliminate this iteration?
 			for(var key in this.keys){
 				evt[key] = this.keys[key];
 			}
@@ -515,7 +515,7 @@ dojo.event.browser = new function(){
 			if(!evt.currentTarget){ evt.currentTarget = (sender ? sender : evt.srcElement); }
 			if(!evt.layerX){ evt.layerX = evt.offsetX; }
 			if(!evt.layerY){ evt.layerY = evt.offsetY; }
-			// FIXME: scroll position query is duped from dojo.html to avoid dependency on that entire module
+			// FIXME-legacy: scroll position query is duped from dojo.html to avoid dependency on that entire module
 			// DONOT replace the following to use dojo.body(), in IE, document.documentElement should be used
 			// here rather than document.body
 			var doc = (evt.srcElement && evt.srcElement.ownerDocument) ? evt.srcElement.ownerDocument : document;

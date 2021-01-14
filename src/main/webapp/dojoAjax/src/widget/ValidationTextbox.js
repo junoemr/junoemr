@@ -183,7 +183,7 @@ dojo.widget.defineWidget(
 
 			// Attach isMissing and isValid methods to the textbox.
 			// We may use them later in connection with a submit button widget.
-			// TODO: this is unorthodox; it seems better to do it another way -- Bill
+			// TODO-legacy: this is unorthodox; it seems better to do it another way -- Bill
 			this.textbox.isValid = function() { this.isValid.call(this); };
 			this.textbox.isMissing = function() { this.isMissing.call(this); };
 			this.textbox.isInRange = function() { this.isInRange.call(this); };
@@ -194,7 +194,7 @@ dojo.widget.defineWidget(
 			this.filter();
 
 			// set table to be inlined (technique varies by browser)
-			// TODO: use method in dojo.html that does this
+			// TODO-legacy: use method in dojo.html that does this
 			if(dojo.render.html.ie){ dojo.html.addClass(this.domNode, "ie"); }
 			if(dojo.render.html.moz){ dojo.html.addClass(this.domNode, "moz"); }
 			if(dojo.render.html.opera){ dojo.html.addClass(this.domNode, "opera"); }

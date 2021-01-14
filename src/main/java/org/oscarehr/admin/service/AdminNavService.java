@@ -223,7 +223,7 @@ public class AdminNavService
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.gstReport"), "frame?frameUrl=" + contextPath + "/admin/gstreport.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnAddBillingLocation"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/manageBillingLocation.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnManageBillingForm"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/manageBillingform.jsp"));
-			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSimulationOHIPDiskette"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingOHIPsimulation.jsp&useCompat=true"));// TODO Fix
+			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnSimulationOHIPDiskette"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingOHIPsimulation.jsp&useCompat=true"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGenerateOHIPDiskette"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingOHIPreport.jsp"));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnBillingCorrection"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/billingCorrection.jsp?admin&billing_no="));
 			billingItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnBatchBilling"), "frame?frameUrl=" + contextPath + "/billing/CA/ON/batchBilling.jsp?service_code=all"));

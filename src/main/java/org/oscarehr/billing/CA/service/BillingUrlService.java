@@ -51,6 +51,7 @@ public class BillingUrlService
 	@Autowired
 	private DemographicDao demographicDao;
 
+	private oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
 
 	public String buildUrl(
 			String providerNo,
@@ -128,8 +129,8 @@ public class BillingUrlService
 			}
 		}
 
-		// XXX: url encode everything
-		String url = "/billing.do?billRegion=" + StringUtils.encodeUrlParam(region)
+		String contextPath = oscarProperties.getProjectHome();
+		String url = "/" + contextPath + "/billing.do?billRegion=" + StringUtils.encodeUrlParam(region)
 				+ "&billForm=" + StringUtils.encodeUrlParam(defaultView)
 				+ "&hotclick="
 				+ "&appointment_no=" + StringUtils.encodeUrlParam(appointmentNo)

@@ -330,8 +330,8 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		//Prepare Annotation Window & Extra Fields
 		var now = new Date();
 		document.getElementById('annotation_attrib').value = "anno" + now.getTime();
-		var obj = {};
-		Element.observe('anno', 'click', this.junoEncounter.openAnnotation.bindAsEventListener(obj, noteId, "issue", demoNo));
+		//var obj = {};
+		Element.observe('anno', 'click', this.junoEncounter.openAnnotation.bindAsEventListener(this, noteId, "issue", demoNo));
 
 		this.prepareExtraFields(cppDisplay, extraFields);
 

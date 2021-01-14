@@ -270,7 +270,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			controller.groupNotesForm.encounterNote.editable = true;
 			controller.groupNotesForm.encounterNote.isSigned = true;
 			controller.groupNotesForm.encounterNote.observationDate = new Date();
-			controller.groupNotesForm.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO: make this dynamic so it changes on edit
+			controller.groupNotesForm.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO-legacy: make this dynamic so it changes on edit
 			controller.groupNotesForm.encounterNote.encounterType = "";
 			controller.groupNotesForm.encounterNote.encounterTime = "";
 			controller.groupNotesForm.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;

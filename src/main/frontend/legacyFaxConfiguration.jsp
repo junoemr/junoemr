@@ -122,7 +122,7 @@
 					<h4>{{faxAccount.coverLetterOption}}</h4>
 				</div>
 				<button type="button" class="btn btn-default"
-				        <%-- TODO disable button for non-admin users? --%>
+				        <%-- TODO-legacy disable button for non-admin users? --%>
 				        ng-click="faxController.editFaxAccount(faxAccount)"
 						ng-disabled="faxController.masterFaxDisabled">
 					<bean:message bundle="ui" key="admin.fax.acct.btn-EditAccount"/>

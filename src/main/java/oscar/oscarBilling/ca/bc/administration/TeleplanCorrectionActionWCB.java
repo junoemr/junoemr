@@ -189,7 +189,7 @@ public class TeleplanCorrectionActionWCB extends org.apache.struts.action.Action
 
             
             for(Wcb wcb : wcbDao.findByBillingNo(Integer.parseInt(billingNo))) {
-            	//TODO: This has to be eventually changed to a string
+            	//TODO-legacy: This has to be eventually changed to a string
             	wcb.setProviderNo(Integer.parseInt(providerNo));
             	wcb.setPayeeNo(payee);
             	wcb.setPracNo(pracno);

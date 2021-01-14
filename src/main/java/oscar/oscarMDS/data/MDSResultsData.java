@@ -180,7 +180,7 @@ public class MDSResultsData {
 				lbData.healthNumber = lpp.getPatientHin();
 				lbData.patientName = lpp.getPatientFullName();
 				lbData.sex = lpp.getPatientSex();
-				lbData.resultStatus = "0"; //TODO
+				lbData.resultStatus = "0"; //TODO-legacy
 				// solve lbData.resultStatus.add(db.getString(rs,"abnormalFlag"));
 
 				lbData.dateTime = lpp.getCollectionDate();

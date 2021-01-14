@@ -44,7 +44,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class DxresearchDAOTest extends DaoTestFixtures
 {
 
-	// TODO Make it protected when test ignores are merged in
+	// TODO-legacy Make it protected when test ignores are merged in
 	@Autowired
 	private DxresearchDAO dxresearchDAO;
 

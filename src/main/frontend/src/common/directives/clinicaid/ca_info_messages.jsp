@@ -1,6 +1,6 @@
 <div>
 
-	<!-- TODO remove -->
+	<!-- TODO-legacy remove -->
 	<div class="alert alert-success" ng-show="success_message.length > 0">
 		{{success_message}}
 	</div>

@@ -109,7 +109,7 @@
 <%--                            <a href="${ctx}/integrations/myhealthaccess.do?method=connect&siteName=<%=siteName%>"><%=siteName%></a>--%>
 <%--                        </div>--%>
 <%--                        <div class="col-md-4"><%=integration.getRemoteId()%></div>--%>
-<%--                        <div class="col-md-4">TODO: $STATUS</div>--%>
+<%--                        <div class="col-md-4">TODO-legacy: $STATUS</div>--%>
 <%--                    </div>--%>
         <%
                     }

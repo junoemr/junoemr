@@ -186,7 +186,7 @@ dojo.date.format = function(/*Date*/dateObject, /*Object?*/options){
 				case 'S':
 					s = Math.round(dateObject.getMilliseconds() * Math.pow(10, l-3));
 					break;
-				case 'v': // FIXME: don't know what this is. seems to be same as z?
+				case 'v': // FIXME-legacy: don't know what this is. seems to be same as z?
 				case 'z':
 					// We only have one timezone to offer; the one from the browser
 					s = dojo.date.getTimezoneName(dateObject);
@@ -238,7 +238,7 @@ dojo.date.format = function(/*Date*/dateObject, /*Object?*/options){
 		var timePattern = options.timePattern || info["timeFormat-"+formatLength];
 		if(timePattern){str.push(_processPattern(timePattern, sauce));}
 	}
-	var result = str.join(" "); //TODO: use locale-specific pattern to assemble date + time
+	var result = str.join(" "); //TODO-legacy: use locale-specific pattern to assemble date + time
 	return result; /*String*/
 };
 
@@ -285,7 +285,7 @@ dojo.date.parse = function(/*String*/value, /*Object?*/options){
 	else if(options.selector == 'timeOnly'){
 		pattern = timePattern;
 	}else if(options.selector == 'dateTime'){
-		pattern = datePattern + ' ' + timePattern; //TODO: use locale-specific pattern to assemble date + time
+		pattern = datePattern + ' ' + timePattern; //TODO-legacy: use locale-specific pattern to assemble date + time
 	}else{
 		var msg = "dojo.date.parse: Unknown selector param passed: '" + options.selector + "'.";
 		msg += " Defaulting to date pattern.";
@@ -383,7 +383,7 @@ dojo.date.parse = function(/*String*/value, /*Object?*/options){
 						days[j] = days[j].toLowerCase();
 					}
 					if(v == days[j]){
-						//TODO: not sure what to actually do with this input,
+						//TODO-legacy: not sure what to actually do with this input,
 						//in terms of setting something on the Date obj...?
 						//without more context, can't affect the actual date
 						break;
@@ -423,7 +423,7 @@ dojo.date.parse = function(/*String*/value, /*Object?*/options){
 			case 'h': //hour (1-12)
 			case 'H': //hour (0-23)
 			case 'k': //hour (0-11)
-				//TODO: strict bounds checking, padding
+				//TODO-legacy: strict bounds checking, padding
 				if(v>23){
 					dojo.debug("dojo.date.parse: Illegal hours value");
 					return null;
@@ -461,7 +461,7 @@ dojo.date.parse = function(/*String*/value, /*Object?*/options){
 		return null;
 	}
 
-	//TODO: implement a getWeekday() method in order to test 
+	//TODO-legacy: implement a getWeekday() method in order to test
 	//validity of input strings containing 'EEE' or 'EEEE'...
 
 	return result; /*Date*/
@@ -541,14 +541,14 @@ function _buildDateTimeRE(groups, info, options, pattern){
 
 		if(groups){ groups.push(match); }
 
-//FIXME: replace whitespace within final regexp with more flexible whitespace match instead?
+//FIXME-legacy: replace whitespace within final regexp with more flexible whitespace match instead?
 		//tolerate whitespace
 		return '\\s*(' + s + ')\\s*';
 	});
 }
 })();
 
-//TODO: try to common strftime and format code somehow?
+//TODO-legacy: try to common strftime and format code somehow?
 
 dojo.date.strftime = function(/*Date*/dateObject, /*String*/format, /*String?*/locale){
 //
@@ -856,7 +856,7 @@ dojo.date.getMonthShortName = function(/*Date*/dateObject, /*String?*/locale){
 	return dojo.date.getNames('months', 'abbr', 'format', locale)[dateObject.getMonth()]; /*String*/
 };
 
-//FIXME: not localized
+//FIXME-legacy: not localized
 dojo.date.toRelativeString = function(/*Date*/dateObject){
 // summary:
 //	Returns an description in English of the date relative to the current date.  Note: this is not localized yet.  English only.
@@ -900,7 +900,7 @@ dojo.date.toRelativeString = function(/*Date*/dateObject){
 	return dojo.date.format(dateObject); // String
 };
 
-//FIXME: SQL methods can probably be moved to a different module without i18n deps
+//FIXME-legacy: SQL methods can probably be moved to a different module without i18n deps
 
 dojo.date.toSql = function(/*Date*/dateObject, /*Boolean?*/noTime){
 // summary:

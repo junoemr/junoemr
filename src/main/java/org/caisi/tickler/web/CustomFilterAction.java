@@ -80,7 +80,7 @@ public class CustomFilterAction extends DispatchAction {
 		return list(mapping,form,request,response);
 	}
 
-	//TODO: need to forward to TicklerAction
+	//TODO-legacy: need to forward to TicklerAction
 	public ActionForward run(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		log.debug("run");

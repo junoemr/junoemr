@@ -681,7 +681,7 @@ public class TeleplanCorrectionFormWCB
 
     }
 
-    //TODO check to see if this works.  i think if you escape a prepared statement you end up with double escaped text
+    //TODO-legacy check to see if this works.  i think if you escape a prepared statement you end up with double escaped text
     public String[] getWcb(LoggedInInfo loggedInInfo, String billamt) {
 
         MiscUtils.getLogger().debug("reseting wcb with bill amount " + billamt);

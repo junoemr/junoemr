@@ -389,7 +389,7 @@ public class TicklerDao extends AbstractDao<Tickler>{
 			query = query + " and t.serviceDate <= ?" + paramList.size();
 		}
 
-		//TODO: IN clause
+		//TODO-legacy: IN clause
 		if (includeProviderClause) {
 			query = query + " and t.creator IN (";
 			Set<Provider> pset = filter.getProviders();
@@ -404,7 +404,7 @@ public class TicklerDao extends AbstractDao<Tickler>{
 			query += ")";
 		}
 
-		//TODO: IN clause
+		//TODO-legacy: IN clause
 		if (includeAssigneeClause) {
 			query = query + " and t.taskAssignedTo IN (";
 			Set<Provider> pset = filter.getAssignees();

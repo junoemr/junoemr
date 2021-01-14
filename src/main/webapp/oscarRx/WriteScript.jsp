@@ -358,7 +358,7 @@ LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
           if (b) {
              //regexDebug(b);
              if(b.index == 0){  //frequency is at the start of the line
-                //TODO should I add method if it is not there??
+                //TODO-legacy should I add method if it is not there??
                 addWarning(frm.method.options[frm.method.selectedIndex].text+ " Not Added");
              }else{ // frequency is not at the start of the line words come before
                 var beforeFirstDigit = origMinusName.substring(0,b.index);
@@ -398,12 +398,12 @@ LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
                 var betweenFirstAndSecondDigit = afterFirstDigit.substring(0,d.index+1);
                 var afterSecondDigit = afterFirstDigit.substring(d.index+d[0].length);
 
-                //Replace units and frequency Unit  //TODO Pull this from Database
+                //Replace units and frequency Unit  //TODO-legacy Pull this from Database
 
                 var findUnitRegExp = /(Tabs|mL|Squirts|gm|mg|µg|Drops|Patch|Puffs|Units|Inhalations)/;
                 var findU = findUnitRegExp.exec(betweenFirstAndSecondDigit);
                 if (findU){
-                  //todo make it like !findU
+                  //todo-legacy make it like !findU
                 }else{
                    if (frm.unit.options[frm.unit.selectedIndex].text != ""){
                       addWarning("Could not find place to put "+frm.unit.options[frm.unit.selectedIndex].text);
@@ -413,7 +413,7 @@ LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
                 var findUnitRegExp = /(PO|SL|IM|SC|PATCH|TOP.|INH|SUPP|O.D.|O.S.|O.U.)/;
                 var findU = findUnitRegExp.exec(betweenFirstAndSecondDigit);
                 if (findU){
-                  //todo make it like !findU
+                  //todo-legacy make it like !findU
                 }else{
                    if (frm.route.options[frm.route.selectedIndex].text != ""){
                       addWarning("Could not find place to put "+frm.route.options[frm.route.selectedIndex].text);
@@ -423,7 +423,7 @@ LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
                 var findFreqRegExp = /(OD|BID|TID|QID|Q1H|Q2H|Q1-2H|Q3-4H|Q4H|Q4-6H|Q6H|Q8H|Q12H|QAM|QPM|QHS|Q1Week|Q2Week|Q1Month|Q3Month)/;
                 var findFreq = findFreqRegExp.exec(betweenFirstAndSecondDigit);
                 if (findFreq){
-                  //todo make it like !findFreq
+                  //todo-legacy make it like !findFreq
                 }else{
                    addWarning("Could not find place to put "+frm.frequencyCode.value);
                 }
@@ -439,7 +439,7 @@ LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
                 var findDurationRegExp = /(Days|Weeks|Months)/;
                 var e = findDurationRegExp.exec(afterSecondDigit);
                 if (e){
-                  //todo make it like !e
+                  //todo-legacy make it like !e
                 }else{
                    addWarning("Could not find place to put "+getDurationUnit());
                 }

@@ -71,7 +71,7 @@ public class WorkFlowDSFactory {
         
             if (!fileFound){  
                 MiscUtils.getLogger().debug("/oscar/oscarWorkFlow/rules/"+string);
-                URL url = WorkFlowDSFactory.class.getResource( "/oscar/oscarWorkflow/rules/"+string );  //TODO: change this so it is configurable;
+                URL url = WorkFlowDSFactory.class.getResource( "/oscar/oscarWorkflow/rules/"+string );  //TODO-legacy: change this so it is configurable;
                 MiscUtils.getLogger().debug("is URL instantiated "+url);            
                 MiscUtils.getLogger().debug("loading from URL "+url.getFile());            
                 ruleBase = RuleBaseLoader.loadFromUrl( url );

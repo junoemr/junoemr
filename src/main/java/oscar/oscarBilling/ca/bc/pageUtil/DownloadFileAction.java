@@ -53,7 +53,7 @@ public class DownloadFileAction extends DownloadAction{
                                        HttpServletRequest request, 
                                        HttpServletResponse response)
             throws Exception {
-        //TODO:NEED TO CHECK TO SEE IF THEY HAVE admin or admin.billing privies
+        //TODO-legacy:NEED TO CHECK TO SEE IF THEY HAVE admin or admin.billing privies
         
         String contentType = "application/octet-stream";
         String home_dir = OscarProperties.getInstance().getProperty("HOME_DIR");

@@ -29,7 +29,7 @@ dojo.widget.defineWidget(
 	fillInTemplate: function(args, frag){
 		this.textAreaNode = this.getFragNodeRef(frag).cloneNode(true);
 
-		// FIXME: Safari apparently needs this!
+		// FIXME-legacy: Safari apparently needs this!
 		dojo.body().appendChild(this.domNode);
 
 		this.rootLayout = dojo.widget.createWidget(
@@ -41,7 +41,7 @@ dojo.widget.defineWidget(
 			this.rootLayoutNode
 		);
 
-		// TODO: all this code should be replaced with a template
+		// TODO-legacy: all this code should be replaced with a template
 		// (especially now that templates can contain subwidgets)
 		this.textAreaContainer = dojo.widget.createWidget(
 			"LayoutContainer",

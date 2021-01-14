@@ -267,7 +267,7 @@ public class FOBTReport implements PreventionReport{
    }
 
 
-   //TODO: THIS MAY NEED TO BE REFACTORED AT SOME POINT IF MAM and PAP are exactly the same
+   //TODO-legacy: THIS MAY NEED TO BE REFACTORED AT SOME POINT IF MAM and PAP are exactly the same
    //If they don't have a FOBT Test with guidelines
  //Get contact methods
    //NO contact

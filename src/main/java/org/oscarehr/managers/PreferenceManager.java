@@ -125,7 +125,7 @@ public class PreferenceManager {
 		return true;
 	}
 
-	//TODO: look at appending the spaces 
+	//TODO-legacy: look at appending the spaces
 	public String getCppExtsItem(LoggedInInfo loggedInInfo, List<CaseManagementNoteExt> noteExtList, String issueCode){	
 
 		StringBuilder sb = new StringBuilder();

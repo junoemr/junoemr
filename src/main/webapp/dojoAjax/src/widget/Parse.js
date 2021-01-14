@@ -46,7 +46,7 @@ dojo.widget.Parse = function(/*Object*/fragment){
 				var tna = String(frag.tagName).split(";");
 				for(var x=0; x<tna.length; x++){
 					var ltn = tna[x].replace(/^\s+|\s+$/g, "").toLowerCase();
-					// FIXME: unsure what this does
+					// FIXME-legacy: unsure what this does
 					frag.tagName = ltn;
 					var ret;
 					if(djTags[ltn]){
@@ -58,7 +58,7 @@ dojo.widget.Parse = function(/*Object*/fragment){
 						if(ltn.indexOf(":") == -1){
 							ltn = "dojo:"+ltn;
 						}
-						// FIXME: handling failure condition correctly?
+						// FIXME-legacy: handling failure condition correctly?
 						// ret = djTags[ltn](frag, this, parentComp, frag.index);
 						ret = dojo.widget.buildWidgetFromParseTree(ltn, frag, this, parentComp, frag.index);
 						if(ret){
@@ -110,7 +110,7 @@ dojo.widget.Parse = function(/*Object*/fragment){
 				propertySets.push(fragment[item]);
 			}
 		}
-		// FIXME: should we store these propertySets somewhere for later retrieval
+		// FIXME-legacy: should we store these propertySets somewhere for later retrieval
 		this.propertySetsList.push(propertySets);
 		return propertySets;
 		*/
@@ -121,20 +121,20 @@ dojo.widget.Parse = function(/*Object*/fragment){
 		//	properties, and returns a hash of properties that it finds.
 		var properties = {};
 		for(var item in fragment){
-			// FIXME: need to check for undefined?
+			// FIXME-legacy: need to check for undefined?
 			// case: its a tagName or nodeRef
 			if((fragment[item] == fragment.tagName)||(fragment[item] == fragment.nodeRef)){
 				// do nothing
 			}else{
 				var frag = fragment[item];
 				if(frag.tagName && dojo.widget.tags[frag.tagName.toLowerCase()]){
-					// TODO: it isn't a property or property set, it's a fragment, 
+					// TODO-legacy: it isn't a property or property set, it's a fragment, 
 					// so do something else
-					// FIXME: needs to be a better/stricter check
-					// TODO: handle xlink:href for external property sets
+					// FIXME-legacy: needs to be a better/stricter check
+					// TODO-legacy: handle xlink:href for external property sets
 				}else if(frag[0] && frag[0].value!="" && frag[0].value!=null){
 					try{
-						// FIXME: need to allow more than one provider
+						// FIXME-legacy: need to allow more than one provider
 						if(item.toLowerCase() == "dataprovider"){
 							var _this = this;
 							this.getDataProvider(_this, frag[0].value);
@@ -142,7 +142,7 @@ dojo.widget.Parse = function(/*Object*/fragment){
 						}
 						properties[item] = frag[0].value;
 						var nestedProperties = this.parseProperties(frag);
-						// FIXME: this kind of copying is expensive and inefficient!
+						// FIXME-legacy: this kind of copying is expensive and inefficient!
 						for(var property in nestedProperties){
 							properties[property] = nestedProperties[property];
 						}
@@ -162,7 +162,7 @@ dojo.widget.Parse = function(/*Object*/fragment){
 	}
 
 	this.getDataProvider = function(/*Object*/objRef, /*String*/dataUrl){
-		// FIXME: this is currently sync.  To make this async, we made need to move 
+		// FIXME-legacy: this is currently sync.  To make this async, we made need to move 
 		//this step into the widget ctor, so that it is loaded when it is needed 
 		// to populate the widget
 		dojo.io.bind({
@@ -187,7 +187,7 @@ dojo.widget.Parse = function(/*Object*/fragment){
 		return ""; // String
 	}
 	
-	//FIXME: doesn't use the componentType param?
+	//FIXME-legacy: doesn't use the componentType param?
 	this.getPropertySetsByType = function(componentType){
 		// summary: returns the propertySet(s) that match(es) the
 	 	// provided componentClass
@@ -195,7 +195,7 @@ dojo.widget.Parse = function(/*Object*/fragment){
 		var propertySets = [];
 		for(var x=0; x < this.propertySetsList.length; x++){
 			var cpl = this.propertySetsList[x];
-			var cpcc = cpl.componentClass || cpl.componentType || null; //FIXME: is componentType supposed to be an indirect reference?
+			var cpcc = cpl.componentClass || cpl.componentType || null; //FIXME-legacy: is componentType supposed to be an indirect reference?
 			var propertySetId = this.propertySetsList[x]["id"][0].value;
 			if(cpcc && (propertySetId == cpcc[0].value)){
 				propertySets.push(cpl);
@@ -212,10 +212,10 @@ dojo.widget.Parse = function(/*Object*/fragment){
 		var tagname = fragment.tagName;
 		if(fragment[ppl]){ 
 			var propertyProviderIds = fragment[ppl].value.split(" ");
-			// FIXME: should the propertyProviderList attribute contain #
+			// FIXME-legacy: should the propertyProviderList attribute contain #
 			// 		  syntax for reference to ids or not?
-			// FIXME: need a better test to see if this is local or external
-			// FIXME: doesn't handle nested propertySets, or propertySets that
+			// FIXME-legacy: need a better test to see if this is local or external
+			// FIXME-legacy: doesn't handle nested propertySets, or propertySets that
 			// 		  just contain information about css documents, etc.
 			for(var propertySetId in propertyProviderIds){
 				if((propertySetId.indexOf("..")==-1)&&(propertySetId.indexOf("://")==-1)){
@@ -225,7 +225,7 @@ dojo.widget.Parse = function(/*Object*/fragment){
 						propertySets.push(propertySet);
 					}
 				}else{
-					// FIXME: add code to parse and return a propertySet from
+					// FIXME-legacy: add code to parse and return a propertySet from
 					// another document
 					// alex: is this even necessaray? Do we care? If so, why?
 				}
@@ -245,7 +245,7 @@ dojo.widget.Parse = function(/*Object*/fragment){
 		// ns: the namespace of the widget.  Defaults to "dojo"
 
 		properties.fastMixIn = true;			
-		// FIXME: we pulled it apart and now we put it back together ... 
+		// FIXME-legacy: we pulled it apart and now we put it back together ... 
 		var ltn = (ns || "dojo") + ":" + componentName.toLowerCase();
 		if(dojo.widget.tags[ltn]){
 			return [dojo.widget.tags[ltn](properties, this, null, null, properties)]; // Array
@@ -289,7 +289,7 @@ dojo.widget.createWidget = function(/*String*/name, /*String*/props, /*Node*/ref
 	if((arguments.length == 1) && (isNode || !isNameStr)){
 		// we got a DOM node 
 		var xp = new dojo.xml.Parse(); 
-		// FIXME: we should try to find the parent! 
+		// FIXME-legacy: we should try to find the parent! 
 		var tn = isNode ? dojo.byId(name) : name; 
 		return dojo.widget.getParser().createComponents(xp.parseElement(tn, null, true))[0]; 
 	}

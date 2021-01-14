@@ -12,7 +12,7 @@ dojo.provide("dojo.widget.Editor2Plugin.FindReplace");
 
 dojo.require("dojo.widget.Editor2");
 
-//TODO replace, better GUI
+//TODO-legacy replace, better GUI
 
 dojo.declare("dojo.widget.Editor2Plugin.FindCommand", dojo.widget.Editor2DialogCommand,{
 	SearchOption: {

@@ -320,7 +320,7 @@ public class AR2005XMLTest {
 
 	void populatePregnancyHistory(PregnancyHistory pregnancyHistory)  {
 
-		//TODO:null?
+		//TODO-legacy:null?
 		pregnancyHistory.setLMP(null);
 		pregnancyHistory.setLMPCertain(this.getYesNoNullType(Boolean.FALSE));
 		pregnancyHistory.setMenCycle("30");

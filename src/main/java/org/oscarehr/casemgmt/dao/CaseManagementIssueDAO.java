@@ -142,7 +142,7 @@ public class CaseManagementIssueDAO extends HibernateDaoSupport {
     	
     	for(CaseManagementIssue cmi : issuelist) {
         	cmi.setUpdate_date(new Date());
-        	checkDemoIssueId(cmi);// TODO remove this once duplication error resolved
+        	checkDemoIssueId(cmi);// TODO-legacy remove this once duplication error resolved
         	if(cmi.getId()!=null && cmi.getId().longValue()>0) {
         		logger.info("MERGE casemgmt issue: [id:" + cmi.getId() + ", demoNo:" + cmi.getDemographic_no() + ", issue_id:" + cmi.getIssue_id() + "]");
         		getHibernateTemplate().merge(cmi);
@@ -156,7 +156,7 @@ public class CaseManagementIssueDAO extends HibernateDaoSupport {
 
     public void saveIssue(CaseManagementIssue issue) {
     	issue.setUpdate_date(new Date());
-    	checkDemoIssueId(issue);// TODO remove this once duplication error resolved
+    	checkDemoIssueId(issue);// TODO-legacy remove this once duplication error resolved
         logger.info("SAVE OR UPDATE casemgmt issue: [id:" + issue.getId() + ", demoNo:" + issue.getDemographic_no() + ", issue_id:" + issue.getIssue_id() + "]");
         getHibernateTemplate().saveOrUpdate(issue);
     }

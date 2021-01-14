@@ -35,7 +35,7 @@ dojo.declare(
 
 		this.searchUrl = options.dataUrl;
 
-		// TODO: cache doesn't work
+		// TODO-legacy: cache doesn't work
 		this._cache = {};
 
 		this._inFlight = false;
@@ -43,8 +43,8 @@ dojo.declare(
 
 		// allowCache: Boolean
 		//	Setting to use/not use cache for previously seen values
-		//	TODO: caching doesn't work.
-		//	TODO: read the setting for this value from the widget parameters
+		//	TODO-legacy: caching doesn't work.
+		//	TODO-legacy: read the setting for this value from the widget parameters
 		this.allowCache = false;
 	},
 	{
@@ -66,7 +66,7 @@ dojo.declare(
 			//		[ ["Alabama","AL"], ["Alaska","AK"], ["American Samoa","AS"] ]
 
 			if(this._inFlight){
-				// FIXME: implement backoff!
+				// FIXME-legacy: implement backoff!
 			}
 			var tss = encodeURIComponent(searchStr);
 			var realUrl = dojo.string.substituteParams(this.searchUrl, {"searchString": tss});
@@ -134,18 +134,18 @@ dojo.declare(
 
 		// searchLimit: Integer
 		//		Maximum number of results to return.
-		//		TODO: need to read this value from the widget parameters
+		//		TODO-legacy: need to read this value from the widget parameters
 		this.searchLimit = 30;
 
 		// searchType: String
 		//		Defines what values match the search string; see searchType parameter
 		//		of ComboBox for details
-		//		TODO: need to read this value from the widget parameters; the setting in ComboBox is being ignored.
+		//		TODO-legacy: need to read this value from the widget parameters; the setting in ComboBox is being ignored.
 		this.searchType = "STARTSTRING";
 
 		// caseSensitive: Boolean
 		//		Should search be case sensitive?
-		//		TODO: this should be a parameter to combobox?
+		//		TODO-legacy: this should be a parameter to combobox?
 		this.caseSensitive = false;
 
 		if(!dj_undef("dataUrl", options) && !dojo.string.isBlank(options.dataUrl)){
@@ -197,7 +197,7 @@ dojo.declare(
 			//		array of label/value pairs (the value is used for the Select widget).  Example:
 			//		[ ["Alabama","AL"], ["Alaska","AK"], ["American Samoa","AS"] ]
 
-			// FIXME: need to add timeout handling here!!
+			// FIXME-legacy: need to add timeout handling here!!
 			this._performSearch(searchStr, callback);
 		},
 
@@ -209,7 +209,7 @@ dojo.declare(
 			//	a search.
 			//
 			var st = this.searchType;
-			// FIXME: this is just an example search, which means that we implement
+			// FIXME-legacy: this is just an example search, which means that we implement
 			// only a linear search without any of the attendant (useful!) optimizations
 			var ret = [];
 			if(!this.caseSensitive){
@@ -219,7 +219,7 @@ dojo.declare(
 				if((this.searchLimit > 0)&&(ret.length >= this.searchLimit)){
 					break;
 				}
-				// FIXME: we should avoid copies if possible!
+				// FIXME-legacy: we should avoid copies if possible!
 				var dataLabel = new String((!this.caseSensitive) ? this._data[x][0].toLowerCase() : this._data[x][0]);
 				if(dataLabel.length < searchStr.length){
 					// this won't ever be a good search, will it? What if we start
@@ -257,7 +257,7 @@ dojo.declare(
 						// make sure the match either starts whole string, or
 						// follows a space, or follows some punctuation
 						if(" ,/(".indexOf(dataLabel.charAt(idx-1)) != -1){
-							// FIXME: what about tab chars?
+							// FIXME-legacy: what about tab chars?
 							matches = true; break;
 						}
 						idx = dataLabel.indexOf(searchStr, idx+1);
@@ -410,7 +410,7 @@ dojo.widget.defineWidget(
 		_getCaretPos: function(/*DomNode*/ element){
 			// khtml 3.5.2 has selection* methods as does webkit nightlies from 2005-06-22
 			if(dojo.lang.isNumber(element.selectionStart)){
-				// FIXME: this is totally borked on Moz < 1.3. Any recourse?
+				// FIXME-legacy: this is totally borked on Moz < 1.3. Any recourse?
 				return element.selectionStart;
 			}else if(dojo.render.html.ie){
 				// in the case of a mouse click in a popup being handled,
@@ -576,8 +576,8 @@ dojo.widget.defineWidget(
 			//		This sets a hidden value associated w/the displayed value.
 			//		The hidden value (and this function) shouldn't be used; if
 			//		you need a hidden value then use Select widget instead of ComboBox.
-			// TODO: remove?
-			// FIXME, not sure what to do here!
+			// TODO-legacy: remove?
+			// FIXME-legacy, not sure what to do here!
 			this.comboBoxSelectionValue.value = value;
 		},
 
@@ -697,7 +697,7 @@ dojo.widget.defineWidget(
 			dojo.event.connect(this.optionsListNode, 'onmouseover', this, '_onMouseOver');
 			dojo.event.connect(this.optionsListNode, 'onmouseout', this, '_onMouseOut');
 
-			// TODO: why does onmouseover and onmouseout connect to two separate handlers???
+			// TODO-legacy: why does onmouseover and onmouseout connect to two separate handlers???
 			dojo.event.connect(this.optionsListNode, "onmouseover", this, "_itemMouseOver");
 			dojo.event.connect(this.optionsListNode, "onmouseout", this, "_itemMouseOut");
 		},
@@ -891,7 +891,7 @@ dojo.widget.defineWidget(
 						height = "";
 					}else{
 						//show it first to get the correct dojo.style.getOuterHeight(childs[0])
-						//FIXME: shall we cache the height of the item?
+						//FIXME-legacy: shall we cache the height of the item?
 						height = visibleCount * dojo.html.getMarginBox(childs[0]).height +"px";
 					}
 					width = (dojo.html.getMarginBox(this.domNode).width-2)+"px";
@@ -934,7 +934,7 @@ dojo.widget.defineWidget(
 		postCreate: function(){
 			this.onResize();
 
-			// TODO: add these attach events to template
+			// TODO-legacy: add these attach events to template
 			dojo.event.connect(this.textInputNode, "onblur", this, "_onBlurInput");
 			dojo.event.connect(this.textInputNode, "onfocus", this, "_onFocusInput");
 

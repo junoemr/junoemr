@@ -68,9 +68,9 @@ public class LabService
 
 	public void persistNewHL7Lab(MessageHandler messageHandler, String hl7Message, String serviceName, int fileId) throws UnsupportedEncodingException
 	{
-		//TODO find demographic for routing
+		//TODO-legacy find demographic for routing
 
-		//TODO find providers for routing
+		//TODO-legacy find providers for routing
 
 		persistNewHL7Lab(messageHandler, hl7Message, serviceName, fileId, null, null, null);
 	}

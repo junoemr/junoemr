@@ -53,7 +53,7 @@ dojo.data.old.provider.Delicious = function() {
 dojo.inherits(dojo.data.old.provider.Delicious, dojo.data.old.provider.FlatFile);
 
 /********************************************************************
- * FIXME: the rest of this is work in progress
+ * FIXME-legacy: the rest of this is work in progress
  *
  
 dojo.data.old.provider.Delicious.prototype.getNewItemToLoad = function() {

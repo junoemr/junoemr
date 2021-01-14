@@ -158,7 +158,7 @@ public class BillingmasterDAO {
 		return getBillingmaster(billingNo);
 	}
 
-	public int markListAsBilled(List<String> list) { //TODO: Should be set form CONST var
+	public int markListAsBilled(List<String> list) { //TODO-legacy: Should be set form CONST var
 		if(list.size()==0) {
 			return 0;
 		}

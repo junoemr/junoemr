@@ -18,7 +18,7 @@ dojo.require("dojo.Deferred");
 dojo.require("dojo.DeferredList");
 
 /*
- * TODO:
+ * TODO-legacy:
  *
  * Package summary needs to compensate for "is"
  * Handle host environments

@@ -86,7 +86,7 @@ public class BillingService extends AbstractModel<Integer> implements Serializab
 
 	@Override
     public Integer getId() {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 	    return billingserviceNo;
     }
 

@@ -306,7 +306,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				var page = params.url().page;
 
 				// shouldn't need these anymore
-				//TODO refactor out of all uses here (I think these are used elsewhere).
+				//TODO-legacy refactor out of all uses here (I think these are used elsewhere).
 				controller.search.startIndex = ((page - 1) * count);
 				controller.search.numToReturn = parseInt(count);
 

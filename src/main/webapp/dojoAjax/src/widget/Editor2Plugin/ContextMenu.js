@@ -54,7 +54,7 @@ dojo.widget.Editor2Plugin.ContextMenuManager = {
 			case 'Link':
 			case 'Image':
 				return new dojo.widget.Editor2Plugin[name+"ContextMenuGroup"](contextmenuplugin);
-			//TODO
+			//TODO-legacy
 			case 'Anchor':
 			case 'List':
 		}

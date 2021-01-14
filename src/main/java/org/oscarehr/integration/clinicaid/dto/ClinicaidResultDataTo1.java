@@ -32,7 +32,7 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClinicaidResultDataTo1 implements Serializable
 {
-	// TODO: invoice and other data to be added here as those are integrated
+	// TODO-legacy: invoice and other data to be added here as those are integrated
 
 	@JsonUnwrapped
 	private PatientEligibilityDataTo1 eligibilityData;

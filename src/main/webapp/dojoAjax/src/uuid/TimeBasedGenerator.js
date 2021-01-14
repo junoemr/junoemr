@@ -154,7 +154,7 @@ dojo.uuid.TimeBasedGenerator = new function() {
 		// summary: 
 		//   Returns a randomly generated 8-character string of hex digits.
 
-		// FIXME: This probably isn't a very high quality random number.
+		// FIXME-legacy: This probably isn't a very high quality random number.
 	
 		// Make random32bitNumber be a randomly generated floating point number
 		// between 0 and (4,294,967,296 - 1), inclusive.

@@ -2116,7 +2116,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	 */
 	public List<Integer> getBORNKidsMissingExtKey(String keyName) {
 		Calendar cal = Calendar.getInstance();
-		//TODO: change this to use a similar AGE calculation like in RptDemographicQueryBuilder
+		//TODO-legacy: change this to use a similar AGE calculation like in RptDemographicQueryBuilder
 		int year = cal.get(Calendar.YEAR) - 8;
 		Session session = getSession();
 		try {

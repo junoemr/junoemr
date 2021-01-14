@@ -994,7 +994,7 @@ function navigatePage(p){
 	}
 }
 
-// TODO: Remove unused function.
+// TODO-legacy: Remove unused function.
 function changeNavigationBar(){
 	var pagenum=parseInt($('currentPageNum').innerHTML);
 	if(current_numberofpages==1){

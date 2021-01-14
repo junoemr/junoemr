@@ -163,7 +163,7 @@ public class DroolsNumerator2 implements Numerator{
             }
 
             if (!fileFound){
-             URL url = MeasurementFlowSheet.class.getResource( "/oscar/oscarEncounter/oscarMeasurements/flowsheets/decisionSupport/"+string );  //TODO: change this so it is configurable;
+             URL url = MeasurementFlowSheet.class.getResource( "/oscar/oscarEncounter/oscarMeasurements/flowsheets/decisionSupport/"+string );  //TODO-legacy: change this so it is configurable;
              MiscUtils.getLogger().debug("loading from URL "+url.getFile());
              measurementRuleBase = RuleBaseLoader.loadFromUrl( url );
             }

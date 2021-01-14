@@ -128,7 +128,7 @@ public class BORNWbCsdXmlGenerator {
 			return false;
 		}
 				
-		//TODO: xml validation - how can we report the problem better??
+		//TODO-legacy: xml validation - how can we report the problem better??
 		XmlOptions m_validationOptions = new XmlOptions();
 		ArrayList<Object> validationErrors = new ArrayList<Object>();
 		m_validationOptions.setErrorListener(validationErrors);
@@ -154,7 +154,7 @@ public class BORNWbCsdXmlGenerator {
 		//get all the dx entries, and put into 'date' buckets
 		//get all drugs, and put into 'date' buckets
 		
-		//TODO:do we need to filter by statuses?
+		//TODO-legacy:do we need to filter by statuses?
 		List<Drug> drugs = drugDao.findByDemographicId(demographicNo);
 		
 		Map<String,List<Object>> map = new HashMap<String,List<Object>>();

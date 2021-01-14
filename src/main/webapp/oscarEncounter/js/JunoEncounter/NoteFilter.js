@@ -222,8 +222,6 @@ if (!Juno.OscarEncounter.JunoEncounter.NoteFilter) Juno.OscarEncounter.JunoEncou
 
 	this.selectIssueFilterValue = function selectIssueFilterValue(value)
 	{
-		console.log(value);
-		console.log(jQuery("input[name='filter_issues'][value='" + value + "']"));
 		jQuery("input[name='filter_issues'][value='" + value + "']").prop("checked", true);
 	}
 };

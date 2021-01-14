@@ -12,8 +12,8 @@ dojo.provide("dojo.io.ScriptSrcIO");
 dojo.require("dojo.io.BrowserIO");
 dojo.require("dojo.undo.browser");
 
-//FIXME: should constantParams be JS object?
-//FIXME: check dojo.io calls. Can we move the BrowserIO defined calls somewhere
+//FIXME-legacy: should constantParams be JS object?
+//FIXME-legacy: check dojo.io calls. Can we move the BrowserIO defined calls somewhere
 //       else so that we don't depend on BrowserIO at all? The dependent calls
 //       have to do with dealing with forms and making query params from JS object.
 /**

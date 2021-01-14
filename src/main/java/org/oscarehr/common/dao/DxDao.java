@@ -134,7 +134,7 @@ public class DxDao extends AbstractDao<DxAssociation> {
 			query.setParameter("code", code);
 			return query.getResultList();
 		} catch (Exception e) {
-			// TODO Add exclude to the test instead when it's merged  
+			// TODO-legacy Add exclude to the test instead when it's merged
 			return new ArrayList<Object[]>();
 		}
     }

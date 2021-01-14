@@ -705,7 +705,7 @@ import java.util.zip.ZipInputStream;
         if (StringUtils.filled(demographicNo))
         {
         	logger.info("IMPORT FOR DEMOGRAPHIC " + demographicNo);
-            //TODO: Course - Admit to student program
+            //TODO-legacy: Course - Admit to student program
 
             entries.put(PATIENTID+importNo, Integer.valueOf(demographicNo));
 

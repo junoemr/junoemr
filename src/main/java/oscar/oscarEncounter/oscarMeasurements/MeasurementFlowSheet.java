@@ -127,7 +127,7 @@ public class MeasurementFlowSheet {
     }
 
     public void parseDxTriggers(String s) {
-        dxTriggers = s.split(","); //TODO: what do about different coding systems.
+        dxTriggers = s.split(","); //TODO-legacy: what do about different coding systems.
     }
 
     public void parseProgramTriggers(String s) {
@@ -421,7 +421,7 @@ public class MeasurementFlowSheet {
             }
 
             if (!fileFound) {
-                URL url = MeasurementFlowSheet.class.getResource("/oscar/oscarEncounter/oscarMeasurements/flowsheets/" + string);  //TODO: change this so it is configurable;
+                URL url = MeasurementFlowSheet.class.getResource("/oscar/oscarEncounter/oscarMeasurements/flowsheets/" + string);  //TODO-legacy: change this so it is configurable;
                 log.debug("loading from URL " + url.getFile());
                 ruleBase = RuleBaseLoader.loadFromUrl(url);
             }
@@ -483,7 +483,7 @@ public class MeasurementFlowSheet {
             }
 
             if (!fileFound) {
-                URL url = MeasurementFlowSheet.class.getResource("/oscar/oscarEncounter/oscarMeasurements/flowsheets/decisionSupport/" + string);  //TODO: change this so it is configurable;
+                URL url = MeasurementFlowSheet.class.getResource("/oscar/oscarEncounter/oscarMeasurements/flowsheets/decisionSupport/" + string);  //TODO-legacy: change this so it is configurable;
                 log.debug("loading from URL " + url.getFile());
                 measurementRuleBase = RuleBaseLoader.loadFromUrl(url);
             }

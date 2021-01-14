@@ -902,7 +902,7 @@ function(
 	};
 
 	// This gets the view name, but if it's resourceDay, it will get agendaDay.
-	// TODO Not sure why this works this way.  Maybe it uses it to get a day of events for each
+	// TODO-legacy Not sure why this works this way.  Maybe it uses it to get a day of events for each
 	//      resource in the resource list?
 	$scope.calendar_view_name = function calendar_view_name()
 	{
@@ -1155,7 +1155,7 @@ function(
 						// Get the possible resources by inferring that the group is a provider
 						// by checking if the array has one entry and matches the identifier
 						// Also uses fields specific to Juno.
-						// TODO: CHANGE THIS!!
+						// TODO-legacy: CHANGE THIS!!
 						if(
 							angular.isArray(schedule_data.providerNos) &&
 							schedule_data.providerNos.length == 1 &&
@@ -1179,7 +1179,7 @@ function(
 		return deferred.promise;
 	};
 
-	// TODO: change this, perhaps?  It is getting the resource details from the groups
+	// TODO-legacy: change this, perhaps?  It is getting the resource details from the groups
 	$scope.build_selected_resources = function build_selected_resources(providerNos)
 	{
 		var selected_resources = [];
@@ -1203,7 +1203,7 @@ function(
 			angular.isArray($scope.selected_schedule.providerNos)
 		)
 		{
-			// TODO: this is really gross and I don't like it
+			// TODO-legacy: this is really gross and I don't like it
 			// Potentially put this in the calendarApiAdapter
 			angular.forEach($scope.selected_schedule.providerNos, function(providerNo)
 			{
@@ -1272,7 +1272,7 @@ function(
 	// Schedule config methods
 	// ===============================================================================================
 
-	// TODO: is this used anywhere?
+	// TODO-legacy: is this used anywhere?
 	$scope.set_schedule_hour_range = function set_schedule_hour_range()
 	{
 		// restrict day view if user preferences are set

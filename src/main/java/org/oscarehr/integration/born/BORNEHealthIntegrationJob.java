@@ -213,7 +213,7 @@ public class BORNEHealthIntegrationJob implements OscarRunnable {
 	}
 
 	/**
-	 * TODO: Load this from somewhere.
+	 * TODO-legacy: Load this from somewhere.
 	 * @return
 	 */
 	private BornHialProperties getBornHialProperties() {

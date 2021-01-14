@@ -678,7 +678,7 @@ public class TRUENORTHHandler extends ORU_R01MessageHandler
 
 	@Override
     public String getNteForPID() {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 	    return "";
     }
 }

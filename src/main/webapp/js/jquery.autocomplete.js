@@ -168,7 +168,7 @@ $.Autocompleter = function(input, options) {
 			onChange(0, true);
 		}
 	}).bind("search", function() {
-		// TODO why not just specifying both arguments?
+		// TODO-legacy why not just specifying both arguments?
 		var fn = (arguments.length > 1) ? arguments[1] : null;
 		function findValueCallback(q, data) {
 			var result;
@@ -223,7 +223,7 @@ $.Autocompleter = function(input, options) {
 					progress += seperator;
 				});
 				words[wordAt] = v;
-				// TODO this should set the cursor to the right position, but it gets overriden somewhere
+				// TODO-legacy this should set the cursor to the right position, but it gets overriden somewhere
 				//$.Autocompleter.Selection(input, progress + seperator, progress + seperator);
 				v = words.join( options.multipleSeparator );
 			}
@@ -602,7 +602,7 @@ $.Autocompleter.Select = function (options, input, select, config) {
 		}).click(function(event) {
 			$(target(event)).addClass(CLASSES.ACTIVE);
 			select();
-			// TODO provide option to avoid setting focus again after selection? useful for cleanup-on-focus
+			// TODO-legacy provide option to avoid setting focus again after selection? useful for cleanup-on-focus
 			input.focus();
 			return false;
 		}).mousedown(function() {

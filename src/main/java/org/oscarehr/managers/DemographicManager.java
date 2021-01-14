@@ -391,7 +391,7 @@ public class DemographicManager {
 	}
 
 	public void archiveExtension(DemographicExt ext) {
-		//TODO: this needs a loggedInInfo
+		//TODO-legacy: this needs a loggedInInfo
 		if (ext != null && ext.getId() != null) {
 			DemographicExt prevExt = demographicExtDao.find(ext.getId());
 			if (!(ext.getKey().equals(prevExt.getKey()) && ext.getValue().equals(prevExt.getValue()))) {

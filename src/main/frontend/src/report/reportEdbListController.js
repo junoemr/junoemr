@@ -17,7 +17,7 @@ angular.module('Report').controller('Report.ReportEdbListController', [
 			endDate: Juno.Common.Util.formatMomentDate(moment()),
 			version: '',
 			region: 'ON'
-		}; //todo: grab region from somewhere
+		}; //todo-legacy: grab region from somewhere
 
 		controller.generateReport = function generateReport()
 		{

@@ -45,9 +45,9 @@ dojo.i18n.currency.format = function(value, iso, flags /*optional*/, locale /*op
 	var sym = formatData.symbol;
 	if (formatData.adjSpace == "symbol"){ 
 		if (formatData.placement == "after"){
-			sym = " " + sym;// TODO: nbsp?
+			sym = " " + sym;// TODO-legacy: nbsp?
 		}else{
-			sym = sym + " ";// TODO: nbsp?
+			sym = sym + " ";// TODO-legacy: nbsp?
 		}
 	}
 
@@ -59,7 +59,7 @@ dojo.i18n.currency.format = function(value, iso, flags /*optional*/, locale /*op
 		}
 	}
 
-	var spc = (formatData.adjSpace == "number") ? " " : ""; // TODO: nbsp?
+	var spc = (formatData.adjSpace == "number") ? " " : ""; // TODO-legacy: nbsp?
 	if (formatData.placement == "after"){
 		result = result + spc + sym;
 	}else{
@@ -105,7 +105,7 @@ dojo.i18n.currency.parse = function(value, iso, locale, flags /*optional*/){
 
 	var formatData = dojo.i18n.currency._mapToLocalizedFormatData(dojo.i18n.currency.FORMAT_TABLE, iso, locale);
 	abs = abs.replace(new RegExp("\\" + formatData.symbol), "");
-	//TODO: trim?
+	//TODO-legacy: trim?
 
 	var number = dojo.i18n.number.parse(abs, locale, flags);
 	if (sign){number = number * -1;}
@@ -155,7 +155,7 @@ dojo.i18n.currency.isCurrency = function(value, iso, locale /*optional*/, flags)
 	if (typeof flags.symbol == "undefined") {flags.symbol = formatData.symbol;}
 	else if (dojo.lang.isArray(flags.symbol) && flags.symbol.length == 0){flags.symbol = [formatData.symbol,""];}
 	if (typeof flags.placement == "undefined") {flags.placement = formatData.placement;}
-	//TODO more... or mixin?
+	//TODO-legacy more... or mixin?
 
 	var re = new RegExp("^" + dojo.regexp.currency(flags) + "$");
 //dojo.debug(value+":"+dojo.regexp.currency(flags)+"="+re.test(value));
@@ -178,8 +178,8 @@ dojo.i18n.currency._mapToLocalizedFormatData = function(table, iso, locale /*opt
 
 //Q: Do European countries still use their old ISO symbols instead of just EUR?
 //Q: are signPlacement and currency symbol placement ISO-dependent or are they really locale-dependent?
-//TODO: htmlSymbol is for html entities, need images? (IBM: why? why can't we just use unicode everywhere?)
-//TODO: hide visibility of this table?
+//TODO-legacy: htmlSymbol is for html entities, need images? (IBM: why? why can't we just use unicode everywhere?)
+//TODO-legacy: hide visibility of this table?
 //for html entities, need a image for arabic symbol "BHD" as "DZD", "EGP", "JOD", "KWD" "LBP", "MAD", "OMR", "QAR", "SAR", "SYP", "TND", "AED", "YER"
 //Note: html entities not used at the moment
 //placement: placement of currency symbol, before or after number
@@ -198,7 +198,7 @@ dojo.i18n.currency.FORMAT_TABLE = {
 	BEF: euroAfter,	//Belgium using "EUR"
 	//Old BHD: {symbol: "\u062C", signPlacement: "end", places: 3, htmlSymbol: "?"},
 	BHD: arabic,
-	//TODO: I'm suspicious that all the other entries have locale-specific data in them, too?
+	//TODO-legacy: I'm suspicious that all the other entries have locale-specific data in them, too?
 	//Q: which attributes are iso-specific and which are locale specific?
 	CAD: [{
 			'*' : {symbol: "$"},

@@ -71,7 +71,7 @@ public class ProviderInboxRoutingDaoTest extends DaoTestFixtures
 		} catch (PersistenceException e) {
 			fail("Error related to JPA configuration");
 		} catch (Exception e) {
-			// TODO add proper pre-initialization populate lab routing rules, result data, provider data and make sure that the routing works   
+			// TODO-legacy add proper pre-initialization populate lab routing rules, result data, provider data and make sure that the routing works
 			// just swallow for now
 		}
 	}

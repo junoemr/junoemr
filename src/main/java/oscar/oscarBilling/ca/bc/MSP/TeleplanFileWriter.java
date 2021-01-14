@@ -172,7 +172,7 @@ public class TeleplanFileWriter {
                     log.debug("Billing # :"+billing_no+" Data Center :"+dataCenterId+ " ICBC / MSP BILL");
                     c = createMSPICBCLines(billing_no,dataCenterId,demoName);   
                 }else if(billType.equals("WCB")){
-                    //TODO:Should pass dataCenterId to WCB but it looks it up in the properties currently, fix in the future
+                    //TODO-legacy:Should pass dataCenterId to WCB but it looks it up in the properties currently, fix in the future
                     log.debug("Billing # :"+billing_no+" Data Center :"+dataCenterId+ " WCB BILL");
                     c = createWCB2(loggedInInfo, billing_no);            
                 }
@@ -242,7 +242,7 @@ public class TeleplanFileWriter {
             appendToHTML(html);
             return null;
         }
-           //TODO: DOES THIS DO ANYTHING appendToHTML(checkData.printWarningMsg(""))
+           //TODO-legacy: DOES THIS DO ANYTHING appendToHTML(checkData.printWarningMsg(""))
            
            Claims claims = new Claims();
            claims.increaseClaims();
@@ -308,7 +308,7 @@ public class TeleplanFileWriter {
            WcbSb sb = new WcbSb(billing_no);
            appendToHTML(sb.getHtmlLine());
            appendToHTML(sb.validate());
-           //TODO: DOES THIS DO ANYTHING appendToHTML(checkData.printWarningMsg(""))
+           //TODO-legacy: DOES THIS DO ANYTHING appendToHTML(checkData.printWarningMsg(""))
            
            Claims claims = new Claims();
            claims.increaseClaims();
@@ -411,7 +411,7 @@ public class TeleplanFileWriter {
     }
 
     
-    //TODO: DATA CENTER NUMBER IS HERE?? should that be from property?
+    //TODO-legacy: DATA CENTER NUMBER IS HERE?? should that be from property?
     public String getNoteRecord(Billingmaster bm, String seqNo) {
        MSPBillingNote note = new MSPBillingNote();
        return MSPBillingNote.getN01(bm.getDatacenter(),seqNo,bm.getPayeeNo(),bm.getPractitionerNo(), "A", note.getNote(""+bm.getBillingmasterNo()));

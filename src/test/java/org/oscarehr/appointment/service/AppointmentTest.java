@@ -170,7 +170,7 @@ public class AppointmentTest
 				"Last1",
 				LocalDate.of(2000,1,1),
 				"Last1, First1",
-				null, // TODO get phone number
+				null, // TODO-legacy get phone number
 				1,
 				null,
 				LocalDateTime.of(2018,1,1,0,0,0),
@@ -288,7 +288,7 @@ public class AppointmentTest
 						"Last1",
 						LocalDate.of(2000,1,1),
 						"Last1, First1",
-						null, // TODO get phone number
+						null, // TODO-legacy get phone number
 						1,
 						null,
 						LocalDateTime.of(2018,1,1,0,0,0),
@@ -411,7 +411,7 @@ public class AppointmentTest
 
 				LocalDate.of(2000,1,1),
 				"Last1, First1",
-				null, // TODO get phone number
+				null, // TODO-legacy get phone number
 				1,
 				null,
 				LocalDateTime.of(2018,1,1,0,0,0),
@@ -534,9 +534,9 @@ public class AppointmentTest
 				null,
 				LocalDate.of(2000,1,1),
 				"Last1, First1",
-				null, // TODO get phone number
+				null, // TODO-legacy get phone number
 				1,
-				null, // TODO get patient's doctor
+				null, // TODO-legacy get patient's doctor
 				LocalDateTime.of(2018,1,1,0,0,0),
 				LocalDateTime.of(2018,1,1,1,0,0),
 				"A",

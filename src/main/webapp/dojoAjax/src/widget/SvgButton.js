@@ -8,7 +8,7 @@
 		http://dojotoolkit.org/community/licensing.shtml
 */
 
-// FIXME: not yet functional
+// FIXME-legacy: not yet functional
 
 dojo.provide("dojo.widget.SvgButton");
 
@@ -16,14 +16,14 @@ dojo.require("dojo.experimental");
 dojo.experimental("dojo.widget.SvgButton");
 
 dojo.widget.SvgButton = function(){
-	// FIXME: this is incomplete and doesn't work yet
+	// FIXME-legacy: this is incomplete and doesn't work yet
 	// if DOMButton turns into a mixin, we should subclass Button instead and
 	// just mix in the DOMButton properties.
 
 	dojo.widget.DomButton.call(this);
 	dojo.widget.SvgWidget.call(this);
 
-	// FIXME: freaking implement this already!
+	// FIXME-legacy: freaking implement this already!
 	this.onFoo = function(){ alert("bar"); }
 
 	this.label = "huzzah!";
@@ -40,13 +40,13 @@ dojo.widget.SvgButton = function(){
 				//textNode.setAttribute("y", coords[7]);
 				break;
 			case "rectangle":
-				//FIXME: implement
+				//FIXME-legacy: implement
 				textString = "";
 				//textNode.setAttribute("x", coords[6]);
 				//textNode.setAttribute("y", coords[7]);
 				break;
 			case "circle":
-				//FIXME: implement
+				//FIXME-legacy: implement
 				textString = "";
 				//textNode.setAttribute("x", coords[6]);
 				//textNode.setAttribute("y", coords[7]);
@@ -62,7 +62,7 @@ dojo.widget.SvgButton = function(){
 		// the idea is to set the text to the appropriate place given its length
 		// and the template shape
 		
-		// FIXME: For now, assuming text sizes are integers in SVG units
+		// FIXME-legacy: For now, assuming text sizes are integers in SVG units
 		this.textSize = textSize || 12;
 		this.label = label;
 		// FIXEME: for now, I'm going to fake this... need to come up with a real way to 
@@ -74,7 +74,7 @@ dojo.widget.SvgButton = function(){
 
 dojo.inherits(dojo.widget.SvgButton, dojo.widget.DomButton);
 
-// FIXME
+// FIXME-legacy
 dojo.widget.SvgButton.prototype.shapeString = function(x, y, textSize, label, shape) {
 	switch(shape) {
 		case "ellipse":
@@ -82,12 +82,12 @@ dojo.widget.SvgButton.prototype.shapeString = function(x, y, textSize, label, sh
 			return "<ellipse cx='"+ coords[4]+"' cy='"+ coords[5]+"' rx='"+ coords[2]+"' ry='"+ coords[3]+"'/>";
 			break;
 		case "rect":
-			//FIXME: implement
+			//FIXME-legacy: implement
 			return "";
 			//return "<rect x='110' y='45' width='70' height='30'/>";
 			break;
 		case "circle":
-			//FIXME: implement
+			//FIXME-legacy: implement
 			return "";
 			//return "<circle cx='210' cy='60' r='23'/>";
 			break;
@@ -108,11 +108,11 @@ dojo.widget.SvgButton.prototype.coordinates = function(x, y, textSize, label, sh
 			return [buttonWidth, buttonHeight, rx, ry, cx, cy, textX, textY];
 			break;
 		case "rectangle":
-			//FIXME: implement
+			//FIXME-legacy: implement
 			return "";
 			break;
 		case "circle":
-			//FIXME: implement
+			//FIXME-legacy: implement
 			return "";
 			break;
 	}
@@ -126,11 +126,11 @@ dojo.widget.SvgButton.prototype.labelString = function(x, y, textSize, label, sh
 			textString = "<text x='"+ coords[6] + "' y='"+ coords[7] + "'>"+ label + "</text>";
 			break;
 		case "rectangle":
-			//FIXME: implement
+			//FIXME-legacy: implement
 			textString = "";
 			break;
 		case "circle":
-			//FIXME: implement
+			//FIXME-legacy: implement
 			textString = "";
 			break;
 	}

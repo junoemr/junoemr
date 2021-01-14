@@ -43,7 +43,7 @@
     </iframe>
 </div>
 
-<%-- TODO replace with angular
+<%-- TODO-legacy replace with angular
 
 <script>
 $("#save-all").click(function(){

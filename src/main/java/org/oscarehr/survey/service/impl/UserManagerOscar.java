@@ -37,7 +37,7 @@ public class UserManagerOscar implements UserManager {
 	}
 
 	public String getUsername(HttpServletRequest request) {
-		// TODO Auto-generated method stub
+		// TODO-legacy Auto-generated method stub
 		return null;
 	}
 

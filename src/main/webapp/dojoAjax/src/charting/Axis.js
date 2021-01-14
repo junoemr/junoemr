@@ -31,7 +31,7 @@ dojo.charting.Axis = function(/* string? */label, /* string? */scale, /* array? 
 dojo.charting.Axis.count = 0;
 
 dojo.extend(dojo.charting.Axis, {
-	//	TODO: implement log scaling.
+	//	TODO-legacy: implement log scaling.
 	getCoord: function(
 		/* float */val, 
 		/* dojo.charting.PlotArea */plotArea, 
@@ -43,7 +43,7 @@ dojo.extend(dojo.charting.Axis, {
 		var area = plotArea.getArea();
 		if(plot.axisX == this){
 			var offset = 0 - this.range.lower;
-			var min = this.range.lower + offset;	//	FIXME: check this.
+			var min = this.range.lower + offset;	//	FIXME-legacy: check this.
 			var max = this.range.upper + offset;
 			val += offset;
 			return (val*((area.right-area.left)/max))+area.left;	//	float

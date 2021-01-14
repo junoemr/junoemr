@@ -66,7 +66,6 @@ public abstract class MDM_T11MessageHandler extends MessageHandler
 	@Override
 	public String getFillerOrderNumber()
 	{
-		//TODO better solution?
 		return getString(get("/.EVN-2"));
 	}
 
