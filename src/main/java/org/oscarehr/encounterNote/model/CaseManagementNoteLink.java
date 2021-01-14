@@ -85,47 +85,54 @@ public class CaseManagementNoteLink extends AbstractModel<Long>
 		this.tableName = linkToCopy.tableName;
 	}
 
-	public void setCaseManagementNote(int noteId)
+	public CaseManagementNoteLink(CaseManagementNote referenceNote)
+	{
+		this.id = null;
+		this.note = referenceNote;
+		referenceNote.addNoteLink(this);
+	}
+
+	public void setLinkedCaseManagementNoteId(int noteId)
 	{
 		setTableIdLink(noteId, CASEMGMTNOTE);
 	}
 
-	public void setAllergy(int allergyId)
+	public void setLinkedAllergyId(int allergyId)
 	{
 		setTableIdLink(allergyId, ALLERGIES);
 	}
 
-	public void setDrug(int drugId)
+	public void setLinkedDrugId(int drugId)
 	{
 		setTableIdLink(drugId, DRUGS);
 	}
 
-	public void setHl7Lab(int labId)
+	public void setLinkedHl7LabId(int labId)
 	{
 		setTableIdLink(labId, HL7LAB);
 	}
 
-	public void setDocument(int documentId)
+	public void setLinkedDocumentId(int documentId)
 	{
 		setTableIdLink(documentId, DOCUMENT);
 	}
 
-	public void setEForm(int eformId)
+	public void setLinkedEFormId(int eformId)
 	{
 		setTableIdLink(eformId, EFORMDATA);
 	}
 
-	public void setDemographic(int demographicId)
+	public void setLinkedDemographicId(int demographicId)
 	{
 		setTableIdLink(demographicId, DEMOGRAPHIC);
 	}
 
-	public void setPrevention(int preventionId)
+	public void setLinkedPreventionId(int preventionId)
 	{
 		setTableIdLink(preventionId, PREVENTIONS);
 	}
 
-	public void setTickler(int ticklerId)
+	public void setLinkedTicklerId(int ticklerId)
 	{
 		setTableIdLink(ticklerId, TICKLER);
 	}

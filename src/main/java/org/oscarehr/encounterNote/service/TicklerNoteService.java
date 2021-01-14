@@ -125,7 +125,7 @@ public class TicklerNoteService extends HistoryNoteService
 
 		CaseManagementNoteLink link = new CaseManagementNoteLink();
 		link.setNote(note);
-		link.setTickler(tickler.getId());
+		link.setLinkedTicklerId(tickler.getId());
 		caseManagementNoteLinkDao.persist(link);
 
 		return note;

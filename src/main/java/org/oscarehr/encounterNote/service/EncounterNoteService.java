@@ -135,14 +135,9 @@ public class EncounterNoteService extends BaseNoteService
 		note.setSigned(true);
 		note.setArchived(false);
 
-		note = saveNote(note);
-
-		CaseManagementNoteLink link = new CaseManagementNoteLink();
-		link.setNote(note);
-		link.setAllergy(allergy.getAllergyId());
-		caseManagementNoteLinkDao.persist(link);
-
-		return note;
+		CaseManagementNoteLink link = new CaseManagementNoteLink(note);
+		link.setLinkedAllergyId(allergy.getAllergyId());
+		return saveNote(note);
 	}
 
 	public CaseManagementNote saveDrugNote(CaseManagementNote note, Drug drug)
@@ -151,14 +146,10 @@ public class EncounterNoteService extends BaseNoteService
 		note.setSigned(true);
 		note.setArchived(false);
 
-		note = saveNote(note);
+		CaseManagementNoteLink link = new CaseManagementNoteLink(note);
+		link.setLinkedDrugId(drug.getId());
 
-		CaseManagementNoteLink link = new CaseManagementNoteLink();
-		link.setNote(note);
-		link.setDrug(drug.getId());
-		caseManagementNoteLinkDao.persist(link);
-
-		return note;
+		return saveNote(note);
 	}
 
 	public CaseManagementNote saveDocumentNote(CaseManagementNote note, Document document)
@@ -167,14 +158,10 @@ public class EncounterNoteService extends BaseNoteService
 		note.setSigned(true);
 		note.setArchived(false);
 
-		note = saveNote(note);
+		CaseManagementNoteLink link = new CaseManagementNoteLink(note);
+		link.setLinkedDocumentId(document.getId());
 
-		CaseManagementNoteLink link = new CaseManagementNoteLink();
-		link.setNote(note);
-		link.setDocument(document.getId());
-		caseManagementNoteLinkDao.persist(link);
-
-		return note;
+		return saveNote(note);
 	}
 
 	public CaseManagementNote saveLabObxNote(EncounterNote noteModel, Demographic demographic, Hl7TextMessage hl7TextMessage, int obrIndex, int obxIndex)
@@ -190,15 +177,11 @@ public class EncounterNoteService extends BaseNoteService
 		note.setSigned(true);
 		note.setArchived(false);
 
-		note = saveNote(note);
-
-		CaseManagementNoteLink link = new CaseManagementNoteLink();
-		link.setNote(note);
-		link.setHl7Lab(hl7TextMessage.getId());
+		CaseManagementNoteLink link = new CaseManagementNoteLink(note);
+		link.setLinkedHl7LabId(hl7TextMessage.getId());
 		link.setOtherId(obrIndex + "-" + obxIndex);
-		caseManagementNoteLinkDao.persist(link);
 
-		return note;
+		return saveNote(note);
 	}
 
 	/**
