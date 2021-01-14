@@ -150,7 +150,7 @@ public class AppointmentService extends AbstractServiceImpl
 	@Path("/")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<CalendarAppointment> updateAppointment(CalendarAppointment calendarAppointment) throws Throwable
+	public RestResponse<CalendarAppointment> updateAppointment(CalendarAppointment calendarAppointment) throws ScheduleException
 	{
 		AppointmentConverter converter = new AppointmentConverter();
 		Appointment appointment = converter.getAsDomainObject(calendarAppointment);
@@ -158,9 +158,10 @@ public class AppointmentService extends AbstractServiceImpl
 		String siteName = appointment.getLocation();
 		String providerNo = appointment.getProviderNo();
 
-		boolean validSite = siteService.isProviderAssignedToSite(providerNo, siteName);
+		boolean isMultiSite = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
+		boolean isValidTargetSite = !isMultiSite || siteService.isProviderAssignedToSite(providerNo, siteName);
 
-		if (validSite)
+		if (isValidTargetSite)
 		{
 			org.oscarehr.common.model.Appointment savedAppointment = appointmentService.updateAppointment(appointment, getLoggedInInfo(), getHttpServletRequest());
 			CalendarAppointment responseAppointment = converter.getAsCalendarAppointment(savedAppointment);
