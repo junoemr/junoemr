@@ -25,6 +25,7 @@ package oscar.util;
 
 import junit.framework.Assert;
 import org.junit.Test;
+import org.oscarehr.demographicImport.model.common.PartialDate;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -425,6 +426,15 @@ public class ConversionUtilsTest
 	{
 		LocalDateTime now = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ConversionUtils.DEFAULT_TS_PATTERN);
+		String expectedString = now.format(formatter);
+		Assert.assertEquals(expectedString, ConversionUtils.toDateTimeString(now));
+	}
+
+	@Test
+	public void toDateTimeString_ZonedDateTimeOfNow_ExpectDateTimeString()
+	{
+		ZonedDateTime now = ZonedDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
 		String expectedString = now.format(formatter);
 		Assert.assertEquals(expectedString, ConversionUtils.toDateTimeString(now));
 	}
@@ -939,6 +949,7 @@ public class ConversionUtilsTest
 	public void toNullableLegacyDate_NullParameter_ExpectNull()
 	{
 		Assert.assertNull(ConversionUtils.toNullableLegacyDate((LocalDate) null));
+		Assert.assertNull(ConversionUtils.toNullableLegacyDate((PartialDate) null));
 	}
 
 	@Test
@@ -952,6 +963,20 @@ public class ConversionUtilsTest
 		Date expectedDate = today.getTime();
 
 		LocalDate comparisonDate = expectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		assertThat(expectedDate, is(ConversionUtils.toNullableLegacyDate(comparisonDate)));
+	}
+
+	@Test
+	public void toNullableLegacyDate_PartialDateAtNow_ExpectDate()
+	{
+		Calendar today = new GregorianCalendar();
+		today.set(Calendar.HOUR_OF_DAY, 0);
+		today.set(Calendar.MINUTE, 0);
+		today.set(Calendar.SECOND, 0);
+		today.set(Calendar.MILLISECOND, 0);
+		Date expectedDate = today.getTime();
+
+		PartialDate comparisonDate = PartialDate.from(expectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 		assertThat(expectedDate, is(ConversionUtils.toNullableLegacyDate(comparisonDate)));
 	}
 
@@ -1092,6 +1117,26 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void toLocalDateTime_DateTimeString_ExpectLocalDateTime()
+	{
+		String dateString = "2021-04-30 21:45:15";
+		LocalDateTime expectedDateTime = LocalDateTime.of(2021, 4, 30, 21, 45, 15);
+		assertThat(expectedDateTime, is(ConversionUtils.toLocalDateTime(dateString)));
+	}
+
+	@Test
+	public void toLocalDateTime_NullXmlGregorianCalendar_ExpectNull()
+	{
+		assertNull(ConversionUtils.toNullableLocalDateTime((XMLGregorianCalendar) null));
+	}
+
+	@Test
+	public void toLocalDateTime_NullDateTimeString_ExpectNull()
+	{
+		assertNull(ConversionUtils.toNullableLocalDateTime((String) null));
+	}
+
+	@Test
 	public void toZonedLocalDate_FixedDate_ExpectLocalDate()
 	{
 		LocalDate expectedLocalDate = LocalDate.of(2019, 4,30);
@@ -1101,6 +1146,12 @@ public class ConversionUtilsTest
 		expectedTime.set(Calendar.DAY_OF_MONTH, 30);
 		Date fixedDate = expectedTime.getTime();
 		assertThat(expectedLocalDate, is(ConversionUtils.toZonedLocalDate(fixedDate)));
+	}
+
+	@Test
+	public void toNullableZonedLocalDate_NullString_ExpectNull()
+	{
+		assertNull(ConversionUtils.toNullableZonedLocalDate((String) null));
 	}
 
 	@Test
@@ -1124,8 +1175,7 @@ public class ConversionUtilsTest
 	@Test
 	public void toNullableLocalDateTime_NullParameter_ExpectNull()
 	{
-		Date date = null;
-		Assert.assertNull(ConversionUtils.toNullableLocalDateTime(date));
+		assertNull(ConversionUtils.toNullableLocalDateTime((Date) null));
 	}
 
 	@Test
@@ -1261,6 +1311,17 @@ public class ConversionUtilsTest
 		String dateString = "21:45:00";
 		LocalTime expectedTime = LocalTime.of(21, 45, 0);
 		assertThat(expectedTime, is(ConversionUtils.toLocalTime(dateString, DateTimeFormatter.ISO_TIME)));
+	}
+
+	@Test
+	public void toLocalTime_XMLGregorianCalendar_ExpectLocalTime() throws DatatypeConfigurationException
+	{
+		String dateTimeString = "2019-04-30T12:45:15";
+		XMLGregorianCalendar xmlGregorianCalendar =
+				DatatypeFactory.newInstance().newXMLGregorianCalendar(dateTimeString);
+
+		LocalTime expectedTime = LocalTime.of(12, 45, 15);
+		assertThat(expectedTime, is(ConversionUtils.toLocalTime(xmlGregorianCalendar)));
 	}
 
 	@Test
