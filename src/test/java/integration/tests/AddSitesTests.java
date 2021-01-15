@@ -33,6 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.io.IOException;
@@ -43,6 +44,7 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 
 public class AddSitesTests extends SeleniumTestBase
 {
+	static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	@BeforeClass
 	public static void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
 		//SchemaUtils.restoreTable("admission", "log", "site");
@@ -82,7 +84,7 @@ public class AddSitesTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addSitesClassicUITest() throws Exception
+	public void addSitesClassicUITest()
 	{
 		SiteTestData site = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[0]);
 
@@ -96,16 +98,9 @@ public class AddSitesTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addSitesJUNOUITest() throws Exception
+	public void addSitesJUNOUITest()
 	{
 		SiteTestData siteJuno = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[1]);
-/*
-		// open JUNO UI page
-		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
-
-		// open administration panel
-		driver.findElement(By.linkText("More")).click();
-		driver.findElement(By.linkText("Admin")).click();*/
 		accessSectionJUNOUI(driver, "Admin");
 		addNewSites(siteJuno);
 		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(siteJuno.siteName), driver));

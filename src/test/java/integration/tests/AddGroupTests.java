@@ -31,6 +31,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
@@ -64,6 +65,7 @@ public class AddGroupTests extends SeleniumTestBase
 
 	public void addGroup(String groupName, int groupSize)
 	{
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='mygroup_no']")));
 		driver.findElement(By.xpath("//input[@name='mygroup_no']")).sendKeys(groupName);
 		for (int i = 1; i <= groupSize; i ++)
 		{
