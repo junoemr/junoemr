@@ -29,6 +29,7 @@ import integration.tests.util.data.SiteTestData;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -42,7 +43,10 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 
 public class AddSitesTests extends SeleniumTestBase
 {
-	//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+	@BeforeClass
+	public static void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+		//SchemaUtils.restoreTable("admission", "log", "site");
+	}
 	@AfterClass
 	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{

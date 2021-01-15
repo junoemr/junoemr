@@ -49,8 +49,9 @@ public class AddGroupTests extends SeleniumTestBase
 	public static final String valueOfDrCherry = groupName + drCherry.providerNo;
 
 	@BeforeClass
-	public static void setup()
-	{
+	public static void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+
+		SchemaUtils.restoreTable("admission", "log", "log_ws_rest", "mygroup", "provider", "providerbillcenter");
 		loadSpringBeans();
 		DatabaseUtil.createTestProvider();
 	}
@@ -113,8 +114,7 @@ public class AddGroupTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void addGroupsJUNOUITest()
-	{
+	public void addGroupsJUNOUITest() throws InterruptedException {
 		accessAdministrationSectionJUNOUI(driver, "Schedule Management", "Add a Group");
 
 		//Add a New Group with two providers: Dr. Apple and Dr. Berry

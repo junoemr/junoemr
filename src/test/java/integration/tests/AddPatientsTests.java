@@ -44,7 +44,6 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 
 public class AddPatientsTests extends SeleniumTestBase
 {
-	//WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	@AfterClass
 	public static void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{

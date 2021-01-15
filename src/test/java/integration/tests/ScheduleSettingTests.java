@@ -33,9 +33,7 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.io.IOException;
@@ -53,12 +51,16 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdmini
 public class ScheduleSettingTests extends SeleniumTestBase
 {
 	public static String templateTitleGeneral = "P:General";
-	static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
+	//static WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	@BeforeClass
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
+		SchemaUtils.restoreTable("admission", "log", "program_provider",
+				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
+				"scheduledate", "scheduleholiday", "scheduletemplate", "scheduletemplatecode");
 		loadSpringBeans();
 		DatabaseUtil.createTestProvider();
+
 	}
 
 	@AfterClass
@@ -136,10 +138,10 @@ public class ScheduleSettingTests extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@value='Save']")).click();
 	}
 
-	public static void setupSchedule(String currWindowHandle, String providerNo, String templateTitle1, String templateTitle2)
-	{
+	public static void setupSchedule(String currWindowHandle, String providerNo, String templateTitle1, String templateTitle2) throws InterruptedException {
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='provider_no']")));
+		//webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='provider_no']")));
+		Thread.sleep(1000);
 		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), providerNo);
 		LocalDate currentDate = LocalDate.now();
 		String month = Integer.toString(currentDate.getMonthValue());
