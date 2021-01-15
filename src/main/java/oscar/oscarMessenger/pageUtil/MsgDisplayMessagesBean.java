@@ -384,7 +384,6 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 					"ON map.demographic_no = demo.demographic_no " +
 					"WHERE msgList.status != 'del' AND remoteLocation = '" + getCurrentLocationId() + "' " +
 					"AND map.demographic_no = '" + demographic_no + "' " +
-					"GROUP BY msgTbl.messageid " +
 					getSQLSearchFilter(searchCols) + " ORDER BY " + getOrderBy(orderby);
 			FormsDao dao = SpringUtils.getBean(FormsDao.class);
 			List<Object[]> os = dao.runNativeQuery(sql);
