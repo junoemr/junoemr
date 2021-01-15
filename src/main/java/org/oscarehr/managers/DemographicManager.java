@@ -992,9 +992,7 @@ public class DemographicManager {
 		}
 
 		// Ensure that the proposed date is actually a valid date
-		String possibleBirthday = demographic.getYearOfBirth() + "-"
-				+ demographic.getMonthOfBirth() + "-"
-				+ demographic.getDateOfBirth();
+		String possibleBirthday = demographic.getBirthDayAsString();
 		Date validDate = ConversionUtils.fromDateString(possibleBirthday);
 		if (validDate == null)
 		{
