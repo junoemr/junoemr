@@ -151,7 +151,6 @@ public class CLSHandler extends AHSHandler
 		return get("/.OBR-20");
 	}
 
-	////this.isUnstructuredDoc = "TX".equals(handler.getOBXValueType(0,0));
 	public boolean isUnstructured()
 	{
 		String DATA_TYPE_TEXT = "TX";
@@ -166,8 +165,10 @@ public class CLSHandler extends AHSHandler
 			for(int k = 0; k < this.getOBXCount(j); k++)
 			{
 				String obxValueType = getOBXValueType(j, k);
-
-				if (!unstructuredTypes.contains(obxValueType))
+				if (!unstructuredTypes.contains(obxValueType)
+						|| !getOBXReferenceRange(j, k).isEmpty()
+						|| isAbnormal()
+						|| !getOBXUnits(j, k).isEmpty())
 				{
 					return false;
 				}
