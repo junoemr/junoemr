@@ -34,18 +34,19 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.Site;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import oscar.util.ConversionUtils;
 
-/**
- *
- * @author Victor Weng
- */
 @Repository
 public class SiteDao extends AbstractDao<Site> {
 
-	/** Creates a new instance of UserPropertyDAO */
+	@Autowired
+	private ProviderSiteDao providerSiteDao;
+
+	@Autowired
+	private ProviderDao providerDao;
+
 	public SiteDao() {
 		super(Site.class);
 	}
@@ -83,8 +84,7 @@ public class SiteDao extends AbstractDao<Site> {
 		}
 
 		Set<Provider> providers = new HashSet<Provider>();
-		ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
-		ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+
 		List<ProviderSite> psList = providerSiteDao.findBySiteId(s.getSiteId());
 		for(ProviderSite ps : psList) {
 			Provider p = providerDao.getProvider(ps.getId().getProviderNo());
@@ -115,8 +115,8 @@ public class SiteDao extends AbstractDao<Site> {
 		return rs;
 	}
 
+	@Deprecated  // Use SiteService.getActiveSitesForProvider instead
 	public List<Site> getActiveSitesByProviderNo(String provider_no) {
-		ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
 		List<ProviderSite> pss = providerSiteDao.findByProviderNo(provider_no);
 
 		List<Site> rs = new ArrayList<Site>();

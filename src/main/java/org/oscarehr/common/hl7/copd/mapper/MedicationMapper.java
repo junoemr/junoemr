@@ -67,6 +67,7 @@ public class MedicationMapper extends AbstractMapper
 		Q8H,		// Every 8 hours
 		QAM,		// Every morning
 		QD,			// Once daily
+		OD,			// Once daily
 		QHS,		// Every day at bedtime
 		QID,		// Four times daily
 		QNOON,  // Every day at noon
@@ -300,10 +301,24 @@ public class MedicationMapper extends AbstractMapper
 	{
 		try
 		{
-			Double dosage = Double.parseDouble(getDosage(rep, 0, 0));
+			String dosageStr = getDosage(rep, 0, 0);
+			if(dosageStr.isEmpty())
+			{
+				logger.warn("[" + rep + "] dosage data is missing, cannot calculate medication end date by frequency, quantity, dosage");
+				return null;
+			}
+
+			double dosage = Double.parseDouble(dosageStr);
 			if (isDosageRange(rep, 0))
 			{
-				Double secondDosage = Double.parseDouble(getDosage(rep, 0, 1));
+				String secondDosageStr = getDosage(rep, 0, 1);
+				if(secondDosageStr.isEmpty())
+				{
+					logger.warn("[" + rep + "] second dosage data is missing, cannot calculate medication end date by frequency, quantity, dosage");
+					return null;
+				}
+
+				double secondDosage = Double.parseDouble(secondDosageStr);
 				if (secondDosage > dosage)
 				{
 					dosage = secondDosage;
@@ -313,7 +328,7 @@ public class MedicationMapper extends AbstractMapper
 			Double frequencyScaler = frequencyCodeToScaler(getFrequencyCode(rep, 0));
 			Double amount = getRequestedDispenseAmount(rep);
 
-			if (frequencyScaler != -1)
+			if (amount != null && frequencyScaler != -1)
 			{
 				int durationDays = Math.toIntExact(Math.round(amount / (dosage * frequencyScaler)));
 
@@ -325,7 +340,7 @@ public class MedicationMapper extends AbstractMapper
 		}
 		catch (RuntimeException re)
 		{
-			MiscUtils.getLogger().warn(re.toString(), re);
+			logger.warn(re.toString(), re);
 		}
 
 		return null;
@@ -339,13 +354,19 @@ public class MedicationMapper extends AbstractMapper
 	 */
 	private Double frequencyCodeToScaler(String frequencyCode)
 	{
+		if(frequencyCode == null || frequencyCode.isEmpty())
+		{
+			throw new RuntimeException("Frequency code conversion error. Missing frequency code!");
+		}
+
 		try
 		{
-			MEDICATION_FREQUENCY_CODES freq = MEDICATION_FREQUENCY_CODES.valueOf(frequencyCode.replace("-", "_"));
+			MEDICATION_FREQUENCY_CODES freq = MEDICATION_FREQUENCY_CODES.valueOf(frequencyCode.replace("-", "_").toUpperCase());
 
 			switch (freq)
 			{
 				case QD:
+				case OD:
 				case QPM:
 				case QNOON:
 				case QHS:
@@ -393,12 +414,14 @@ public class MedicationMapper extends AbstractMapper
 					case "ID":
 						return num;
 					case "D":
+					case "Days":
 						return 1.0 / num;
 					case "H":
 						return 24.0 / num;
 					case "L":
 						return 1.0 / (30.0 * num);
 					case "M":
+					case "Months":
 						return 1440.0 / num;
 					case "S":
 						return 86400.0 / num;

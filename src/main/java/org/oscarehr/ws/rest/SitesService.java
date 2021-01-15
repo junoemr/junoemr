@@ -28,6 +28,7 @@ import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.ProviderSitePK;
 import org.oscarehr.common.model.Site;
+import org.oscarehr.site.service.SiteService;
 import org.oscarehr.site.transfer.ProviderSiteBillingTransfer;
 import org.oscarehr.ws.rest.conversion.SiteConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -55,6 +56,9 @@ public class SitesService extends AbstractServiceImpl
 
 	@Autowired
 	ProviderSiteDao providerSiteDao;
+
+	@Autowired
+	SiteService siteService;
 
 	@GET
 	public RestSearchResponse<SiteTransfer> getSiteList()
@@ -90,7 +94,7 @@ public class SitesService extends AbstractServiceImpl
 	@Path("/provider/{providerNo}")
 	public RestSearchResponse<SiteTransfer> getSitesByProvider(@PathParam("providerNo") String providerNo)
 	{
-		List<Site> sites = siteDao.getActiveSitesByProviderNo(providerNo);
+		List<Site> sites = siteService.getActiveSitesForProvider(providerNo);
 
 		SiteConverter converter = new SiteConverter();
 		List<SiteTransfer> transferList = converter.getAllAsTransferObjects(null, sites);

@@ -127,13 +127,19 @@
 			</div>
 		</div>
 
-		<input type="file" name="formHtml" id="formHtml" class="check" size="50" required>
+		<input type="file" name="formHtml" id="formHtml" class="check" size="50" accept=".html" required>
 		<span title="<bean:message key="global.uploadWarningBody"/>"
 		      style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer"><img
 				border="0" src="../../images/icon_alertsml.gif"/></span></span>
 
 
-		<input type="submit" name="subm" class="btn btn-primary upload" value="<bean:message key="eform.uploadhtml.btnUpload"/>" disabled>
+		<input type="submit" name="subm" class="btn btn-primary upload"
+			   value="<bean:message key="eform.uploadhtml.btnUpload"/>" disabled>
+		<br>
+		<span class="label label-info">Info: </span>
+		<strong>
+			<bean:message key='global.uploadHtmlOnly'/>
+		</strong>
 
 	</html:form>
 	<%}%>

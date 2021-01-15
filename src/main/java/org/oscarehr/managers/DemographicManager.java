@@ -85,6 +85,33 @@ public class DemographicManager {
 	public static final String PHR_VERIFICATION_LEVEL_2 = "+2";
 	public static final String PHR_VERIFICATION_LEVEL_1 = "+1";
 
+	//region ValidationErrorMessages
+	public static final String FIRST_NAME_REQUIRED = "firstName is a required field.  ";
+	public static final String LAST_NAME_REQUIRED = "lastName is a required field.  ";
+	public static final String SEX_REQUIRED = "sex is a required field.  ";
+	public static final String SEX_INVALID = "sex must be either \"M\" or \"F\".  ";
+	public static final String YEAR_OF_BIRTH_REQUIRED = "yearOfBirth is a required field.  ";
+	public static final String YEAR_OF_BIRTH_NUMERIC = "yearOfBirth should be a numeric value. ";
+	public static final String YEAR_OF_BIRTH_4_DIGIT = "yearOfBirth is expected to be a 4-digit number.";
+	public static final String MONTH_OF_BIRTH_REQUIRED = "monthOfBirth is a required field.  ";
+	public static final String MONTH_OF_BIRTH_INVALID = "monthOfBirth should be a number between 1 and 12. ";
+	public static final String DATE_OF_BIRTH_REQUIRED = "dateOfBirth is a required field.  ";
+	public static final String DATE_OF_BIRTH_INVALID = "dateOfBirth should be a number between 1 and 31 (depending on month).";
+	public static final String BIRTHDAY_INVALID = "Need a valid birth date.";
+	public static final String FAMILY_DOCTOR_INVALID = "familyDoctor is formatted incorrectly.  It must " +
+			"be a string like <rdohip>{referral doctor number}" +
+			"</rdohip><rd>{last name},{first name}</rd>.  " +
+			"Also no other tags and no quotes, line breaks " +
+			"or semicolons are allowed.";
+	public static final String FAMILY_DOCTOR_2_INVALID = "familyDoctor2 is formatted incorrectly.  It must " +
+			"be a string like <fd>{family doctor number}" +
+			"</fd><fdname>{last name},{first name}</fdname>.  " +
+			"Also no other tags and no quotes, line breaks " +
+			"or semicolons are allowed.";
+	public static final String FIELD_UNSAFE = "No html tags and no quotes, line breaks " +
+			"or semicolons are allowed.";
+	//endregion
+
 	private static Logger logger = MiscUtils.getLogger();
 
 	@Autowired
@@ -761,6 +788,11 @@ public class DemographicManager {
 	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
 
+        if (demographic.getDateJoined() == null)
+        {
+            Date newDateJoined = new Date();
+            demographic.setDateJoined(newDateJoined);
+        }
 		validateDemographic(demographic);
 		filterDemographic(demographic);
 
@@ -950,17 +982,12 @@ public class DemographicManager {
 			error_string += "dateOfBirth is a required field.  ";
 			has_error = true;
 		}
-		else if (ConversionUtils.fromIntString(demographic.getDateOfBirth()) <= 0)
-		{
-			error_string += "dateOfBirth should be a numeric value. ";
-			has_error = true;
-		}
-		else if (ConversionUtils.fromIntString(demographic.getDateOfBirth()) < 1
-		|| ConversionUtils.fromIntString(demographic.getDateOfBirth()) > 31
-		|| (demographic.getDateOfBirth().length() != 1 && demographic.getDateOfBirth().length() != 2))
-		{
-			error_string += "dateOfBirth should be a number between 1 and 31 (depending on month).";
-			has_error = true;
+		else {
+			int dateOfBirth = ConversionUtils.fromIntString(demographic.getDateOfBirth());
+			if (dateOfBirth < 1 || dateOfBirth > 31) {
+				error_string += DATE_OF_BIRTH_INVALID;
+				has_error = true;
+			}
 		}
 
 		// Ensure that the proposed date is actually a valid date
