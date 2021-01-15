@@ -26,9 +26,12 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 import static org.oscarehr.common.model.PartialDate.FORMAT_FULL_DATE;
 import static org.oscarehr.common.model.PartialDate.FORMAT_YEAR_MONTH;
@@ -54,15 +57,28 @@ public class PartialDate extends AbstractTransientModel
 	}
 	public PartialDate(Integer year, Integer month, Integer day)
 	{
-		this.year = (year != null) ? Year.of(year) : null;
-		this.month = (month != null) ? Month.of(month) : null;
-		this.day = day;
+		this((year != null) ? Year.of(year) : null, (month != null) ? Month.of(month) : null, day);
 	}
 	public PartialDate(Year year, Month month, Integer day)
 	{
 		this.year = year;
 		this.month = month;
 		this.day = day;
+
+		if(month != null && year == null)
+		{
+			throw new DateTimeException("Year must be set if Month is set");
+		}
+
+		if(day != null && month == null)
+		{
+			throw new DateTimeException("Month must be set if day is set");
+		}
+
+		if(day != null && day > month.length(year.isLeap()))
+		{
+			throw new DateTimeException( day + " is not a valid day for the month of " + month.getDisplayName(TextStyle.FULL, Locale.getDefault()) + ", " + year.getValue());
+		}
 	}
 
 	public boolean isFullDate()

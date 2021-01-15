@@ -24,8 +24,12 @@ package org.oscarehr.demographicImport.model.common;
 
 import org.junit.Test;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.Year;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -36,6 +40,119 @@ import static org.oscarehr.common.model.PartialDate.FORMAT_YEAR_ONLY;
 
 public class PartialDateTimeTest
 {
+	@Test
+	public void testPartialDateTimeConstructor_Year()
+	{
+		PartialDateTime partialDateTime = new PartialDateTime(2021);
+		assertEquals(2021, partialDateTime.getYear().getValue());
+	}
+	@Test
+	public void testPartialDateTimeConstructor_YearMonth()
+	{
+		PartialDateTime partialDateTime = new PartialDateTime(2021, 6);
+		assertEquals(2021, partialDateTime.getYear().getValue());
+		assertEquals(6, partialDateTime.getMonth().getValue());
+	}
+	@Test
+	public void testPartialDateTimeConstructor_YearMonthDay()
+	{
+		PartialDateTime partialDateTime = new PartialDateTime(2021, 6, 24);
+		assertEquals(2021, partialDateTime.getYear().getValue());
+		assertEquals(6, partialDateTime.getMonth().getValue());
+		assertEquals((Integer) 24, partialDateTime.getDay());
+	}
+	@Test
+	public void testPartialDateTimeConstructor_YearMonthDayObjects()
+	{
+		PartialDateTime partialDateTime = new PartialDateTime(Year.of(2021), Month.of(6), 24);
+		assertEquals(2021, partialDateTime.getYear().getValue());
+		assertEquals(6, partialDateTime.getMonth().getValue());
+		assertEquals((Integer) 24, partialDateTime.getDay());
+	}
+
+	@Test
+	public void testPartialDateTimeConstructor_YearMonthDayHour()
+	{
+		PartialDateTime partialDateTime = new PartialDateTime(2021, 6, 24, 12);
+		assertEquals(2021, partialDateTime.getYear().getValue());
+		assertEquals(6, partialDateTime.getMonth().getValue());
+		assertEquals((Integer) 24, partialDateTime.getDay());
+		assertEquals(LocalTime.of(12, 0, 0), partialDateTime.getLocalTime());
+	}
+	@Test
+	public void testPartialDateTimeConstructor_YearMonthDayHourMinute()
+	{
+		PartialDateTime partialDateTime = new PartialDateTime(2021, 6, 24, 12, 30);
+		assertEquals(2021, partialDateTime.getYear().getValue());
+		assertEquals(6, partialDateTime.getMonth().getValue());
+		assertEquals((Integer) 24, partialDateTime.getDay());
+		assertEquals(LocalTime.of(12, 30, 0), partialDateTime.getLocalTime());
+	}
+	@Test
+	public void testPartialDateTimeConstructor_YearMonthDayHourMinuteSecond()
+	{
+		PartialDateTime partialDateTime = new PartialDateTime(2021, 6, 24, 12, 30, 15);
+		assertEquals(2021, partialDateTime.getYear().getValue());
+		assertEquals(6, partialDateTime.getMonth().getValue());
+		assertEquals((Integer) 24, partialDateTime.getDay());
+		assertEquals(LocalTime.of(12, 30, 15), partialDateTime.getLocalTime());
+	}
+
+	@Test
+	public void testPartialDateTimeConstructor_YearMonthDayLocalTime()
+	{
+		PartialDateTime partialDateTime = new PartialDateTime(2021, 6, 24, LocalTime.of(12, 30, 15));
+		assertEquals(2021, partialDateTime.getYear().getValue());
+		assertEquals(6, partialDateTime.getMonth().getValue());
+		assertEquals((Integer) 24, partialDateTime.getDay());
+		assertEquals(LocalTime.of(12, 30, 15), partialDateTime.getLocalTime());
+	}
+	@Test
+	public void testPartialDateTimeConstructor_YearMonthDayObjectsLocalTime()
+	{
+		PartialDateTime partialDateTime = new PartialDateTime(Year.of(2021), Month.of(6), 24, LocalTime.of(12, 30, 15));
+		assertEquals(2021, partialDateTime.getYear().getValue());
+		assertEquals(6, partialDateTime.getMonth().getValue());
+		assertEquals((Integer) 24, partialDateTime.getDay());
+		assertEquals(LocalTime.of(12, 30, 15), partialDateTime.getLocalTime());
+	}
+
+	@Test(expected = DateTimeException.class)
+	public void testPartialDateTimeConstructor_InvalidYear()
+	{
+		new PartialDateTime(Year.of(Integer.MIN_VALUE), Month.of(6), 24);
+	}
+
+	@Test(expected = DateTimeException.class)
+	public void testPartialDateTimeConstructor_InvalidMonth()
+	{
+		new PartialDateTime(Year.of(2021), Month.of(60), 24);
+	}
+
+	@Test(expected = DateTimeException.class)
+	public void testPartialDateTimeConstructor_InvalidDay()
+	{
+		new PartialDateTime(Year.of(2021), Month.of(2), 29);
+	}
+
+	@Test(expected = DateTimeException.class)
+	public void testPartialDateTimeConstructor_InvalidPartialYear()
+	{
+		new PartialDateTime(null, 2);
+	}
+
+	@Test(expected = DateTimeException.class)
+	public void testPartialDateTimeConstructor_InvalidPartialMonth()
+	{
+		new PartialDateTime(2021, null, 29);
+	}
+
+	@Test(expected = DateTimeException.class)
+	public void testPartialDateTimeConstructor_InvalidTime()
+	{
+		new PartialDateTime(Year.of(2021), Month.of(2), 28, LocalTime.of(24, 99, 0));
+	}
+
 	@Test
 	public void testPartialDateTimeFullDateTimeCheck()
 	{

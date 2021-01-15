@@ -22,15 +22,17 @@
  */
 package org.oscarehr.demographicImport.model.common;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.oscarehr.common.model.PartialDate.FORMAT_FULL_DATE;
 import static org.oscarehr.common.model.PartialDate.FORMAT_YEAR_MONTH;
 import static org.oscarehr.common.model.PartialDate.FORMAT_YEAR_ONLY;
@@ -38,7 +40,68 @@ import static org.oscarehr.common.model.PartialDate.FORMAT_YEAR_ONLY;
 public class PartialDateTest
 {
 	@Test
-	public void testPartialDateFullDateCheck()
+	public void testPartialDateTimeConstructor_Year()
+	{
+		PartialDate partialDate = new PartialDate(2021);
+		assertEquals(2021, partialDate.getYear().getValue());
+	}
+	@Test
+	public void testPartialDateTimeConstructor_YearMonth()
+	{
+		PartialDate partialDate = new PartialDate(2021, 6);
+		assertEquals(2021, partialDate.getYear().getValue());
+		assertEquals(6, partialDate.getMonth().getValue());
+	}
+	@Test
+	public void testPartialDateTimeConstructor_YearMonthDay()
+	{
+		PartialDate partialDate = new PartialDate(2021, 6, 24);
+		assertEquals(2021, partialDate.getYear().getValue());
+		assertEquals(6, partialDate.getMonth().getValue());
+		assertEquals((Integer) 24, partialDate.getDay());
+	}
+
+	@Test
+	public void testPartialDateTimeConstructor_YearMonthDayObjects()
+	{
+		PartialDate partialDate = new PartialDate(Year.of(2021), Month.of(6), 24);
+		assertEquals(2021, partialDate.getYear().getValue());
+		assertEquals(6, partialDate.getMonth().getValue());
+		assertEquals((Integer) 24, partialDate.getDay());
+	}
+
+	@Test(expected = DateTimeException.class)
+	public void testPartialDateConstructor_InvalidYear()
+	{
+		new PartialDate(Year.of(Integer.MIN_VALUE), Month.of(6), 24);
+	}
+
+	@Test(expected = DateTimeException.class)
+	public void testPartialDateConstructor_InvalidMonth()
+	{
+		new PartialDate(Year.of(2021), Month.of(60), 24);
+	}
+
+	@Test(expected = DateTimeException.class)
+	public void testPartialDateConstructor_InvalidDay()
+	{
+		new PartialDate(Year.of(2021), Month.of(2), 29);
+	}
+
+	@Test(expected = DateTimeException.class)
+	public void testPartialDateConstructor_InvalidPartialYear()
+	{
+		new PartialDate(null, 2);
+	}
+
+	@Test(expected = DateTimeException.class)
+	public void testPartialDateConstructor_InvalidPartialMonth()
+	{
+		new PartialDate(2021, null, 29);
+	}
+
+	@Test
+	public void testPartialDate_FullDateCheck()
 	{
 		PartialDate partialDate = new PartialDate(2021, 6, 24);
 		assertTrue(partialDate.isFullDate());
@@ -47,7 +110,7 @@ public class PartialDateTest
 	}
 
 	@Test
-	public void testPartialDateYearMonthDateCheck()
+	public void testPartialDate_YearMonthDateCheck()
 	{
 		PartialDate partialDate = new PartialDate(2021, 6);
 		assertFalse(partialDate.isFullDate());
@@ -56,7 +119,7 @@ public class PartialDateTest
 	}
 
 	@Test
-	public void testPartialDateYearOnlyDateCheck()
+	public void testPartialDate_YearOnlyDateCheck()
 	{
 		PartialDate partialDate = new PartialDate(2021);
 		assertFalse(partialDate.isFullDate());
@@ -65,7 +128,7 @@ public class PartialDateTest
 	}
 
 	@Test
-	public void testPartialDateToLocalDate()
+	public void testPartialDate_ToLocalDate()
 	{
 		LocalDate localDate = LocalDate.of(2021, 4, 21);
 		PartialDate partialDate = new PartialDate(2021, 4, 21);
@@ -73,28 +136,28 @@ public class PartialDateTest
 	}
 
 	@Test
-	public void testPartialDateToISOStringFullDate()
+	public void testPartialDateToISOString_FullDate()
 	{
 		PartialDate partialDate = new PartialDate(2021, 4, 8);
 		assertEquals("2021-04-08", partialDate.toISOString());
 	}
 
 	@Test
-	public void testPartialDateToISOStringYearMonth()
+	public void testPartialDateToISOString_YearMonth()
 	{
 		PartialDate partialDate = new PartialDate(2021, 4);
 		assertEquals("2021-04", partialDate.toISOString());
 	}
 
 	@Test
-	public void testPartialDateToISOStringYearOnly()
+	public void testPartialDateToISOString_YearOnly()
 	{
 		PartialDate partialDate = new PartialDate(2021);
 		assertEquals("2021", partialDate.toISOString());
 	}
 
 	@Test
-	public void testPartialDateFromLocalDateFullDate()
+	public void testPartialDateFromLocalDate_FullDate()
 	{
 		LocalDate localDate = LocalDate.of(2021, 4, 21);
 		PartialDate partialDate = PartialDate.from(localDate);
@@ -102,7 +165,7 @@ public class PartialDateTest
 	}
 
 	@Test
-	public void testPartialDateFromLocalDateFullDateWithModel()
+	public void testPartialDateFromLocalDate_FullDateWithModel()
 	{
 		LocalDate localDate = LocalDate.of(2021, 4, 21);
 		org.oscarehr.common.model.PartialDate partialDateModel = new org.oscarehr.common.model.PartialDate(0, 0, 0, FORMAT_FULL_DATE);
@@ -111,7 +174,7 @@ public class PartialDateTest
 	}
 
 	@Test
-	public void testPartialDateFromLocalDateYearMonth()
+	public void testPartialDateFromLocalDate_YearMonth()
 	{
 		LocalDate localDate = LocalDate.of(2021, 4, 21);
 		org.oscarehr.common.model.PartialDate partialDateModel = new org.oscarehr.common.model.PartialDate(0, 0, 0, FORMAT_YEAR_MONTH);
@@ -120,7 +183,7 @@ public class PartialDateTest
 	}
 
 	@Test
-	public void testPartialDateFromLocalDateYearOnly()
+	public void testPartialDateFromLocalDate_YearOnly()
 	{
 		LocalDate localDate = LocalDate.of(2021, 4, 21);
 		org.oscarehr.common.model.PartialDate partialDateModel = new org.oscarehr.common.model.PartialDate(0, 0, 0, FORMAT_YEAR_ONLY);
@@ -129,37 +192,41 @@ public class PartialDateTest
 	}
 
 	@Test
-	public void testPartialDateParseDateFullDate()
+	public void testPartialDateParseDate_FullDate()
 	{
 		PartialDate partialDate = PartialDate.parseDate("2021-04-21");
 		assertEquals("2021-04-21", partialDate.toISOString());
 	}
 
 	@Test
-	public void testPartialDateParseDateYearMonth()
+	public void testPartialDateParseDate_YearMonth()
 	{
 		PartialDate partialDate = PartialDate.parseDate("2021-04");
 		assertEquals("2021-04", partialDate.toISOString());
 	}
 
 	@Test
-	public void testPartialDateParseDateYearOnly()
+	public void testPartialDateParseDate_YearOnly()
 	{
 		PartialDate partialDate = PartialDate.parseDate("2021");
 		assertEquals("2021", partialDate.toISOString());
 	}
 
 	@Test
-	public void testPartialDateParseDateInvalid()
+	public void testPartialDateParseDate_Null()
 	{
-		try
-		{
-			PartialDate.parseDate("not a date");
-			fail();
-		}
-		catch(Exception e)
-		{
-			Assert.assertTrue(true);
-		}
+		assertNull(PartialDate.parseDate(null));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testPartialDateParseDate_Empty()
+	{
+		PartialDate.parseDate("");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testPartialDateParseDate_Invalid()
+	{
+		PartialDate.parseDate("not a date");
 	}
 }

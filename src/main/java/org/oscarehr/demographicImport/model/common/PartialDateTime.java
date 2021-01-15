@@ -34,7 +34,7 @@ import java.time.Year;
 @Data
 public class PartialDateTime extends PartialDate
 {
-	LocalTime localTime;
+	protected LocalTime localTime;
 
 	public PartialDateTime(Integer year)
 	{
@@ -47,6 +47,10 @@ public class PartialDateTime extends PartialDate
 	public PartialDateTime(Integer year, Integer month, Integer day)
 	{
 		this(year, month, day, (LocalTime) null);
+	}
+	public PartialDateTime(Year year, Month month, Integer day)
+	{
+		this(year, month, day, null);
 	}
 	public PartialDateTime(Integer year, Integer month, Integer day, Integer hours)
 	{
