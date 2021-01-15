@@ -164,14 +164,21 @@ public class ImportExportService
 		DemographicExporter exporter = importerExporterFactory.getExporter(importType, exportLogger, preferences);
 		List<GenericFile> fileList = new ArrayList<>(demographicList.size() + 2);
 
-		for (Demographic demographic : demographicList)
+		try
 		{
-			GenericFile file = exporter.exportDemographic(demographic);
-			fileList.add(file);
+			for(Demographic demographic : demographicList)
+			{
+				logger.info("Export Demographic " + demographic.getId());
+				GenericFile file = exporter.exportDemographic(demographic);
+				fileList.add(file);
+			}
+			fileList.addAll(exporter.getAdditionalFiles(preferences));
 		}
-		fileList.addAll(exporter.getAdditionalFiles(preferences));
-		BaseDbToModelConverter.clearProviderCache();
-		appointmentStatusCache.clear();
+		finally
+		{
+			BaseDbToModelConverter.clearProviderCache();
+			appointmentStatusCache.clear();
+		}
 
 		return fileList;
 	}
@@ -185,6 +192,7 @@ public class ImportExportService
 		List<Demographic> demographicList = new ArrayList<>(demographicIdList.size());
 		for(String demographicIdStr : demographicIdList)
 		{
+			logger.info("Load Demographic " + demographicIdStr);
 			Integer demographicId = Integer.parseInt(demographicIdStr);
 			org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
 			Demographic exportDemographic = modelToExportConverter.convert(demographic);

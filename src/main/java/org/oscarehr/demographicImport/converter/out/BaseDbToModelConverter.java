@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.converter.out;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.demographicImport.model.provider.Provider;
@@ -54,6 +55,7 @@ public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverte
 	protected Provider findProvider(String providerId)
 	{
 		Provider providerRecord = null;
+		providerId = StringUtils.trimToNull(providerId);
 		if(providerId != null)
 		{
 			if(providerLookupCache.containsKey(providerId))
@@ -75,16 +77,7 @@ public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverte
 		Provider providerRecord = null;
 		if(provider != null)
 		{
-			String providerId = provider.getId();
-			if(providerLookupCache.containsKey(providerId))
-			{
-				providerRecord = providerLookupCache.get(providerId);
-			}
-			else
-			{
-				providerRecord = providerConverter.convert(provider);
-				providerLookupCache.put(providerId, providerRecord);
-			}
+			providerRecord = findProvider(provider.getId());
 		}
 		return providerRecord;
 	}
