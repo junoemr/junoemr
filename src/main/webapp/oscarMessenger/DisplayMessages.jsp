@@ -46,20 +46,26 @@ if(!authed) {
 %>
 
 <%
-int pageType = 0;
-String boxType = request.getParameter("boxType");
-if (boxType == null || boxType.equals("")){
-    pageType = 0;
-}else if (boxType.equals("1")){
-    pageType = 1;
-}else if (boxType.equals("2")){
-    pageType = 2;
-}else if (boxType.equals("3")){
-    pageType = 3;    
-}else{
-    pageType = 0;
-}   //messageid
+    final int PAGE_TYPE_DEFAULT = 0;
+    final int PAGE_TYPE_SENT = 1;
+    final int PAGE_TYPE_DELETED = 2;
+    final int PAGE_TYPE_DEMOGRAPHIC = 3;
 
+    int pageType = PAGE_TYPE_DEFAULT;
+
+    String boxType = request.getParameter("boxType");
+    if ("1".equals(boxType))
+    {
+        pageType = PAGE_TYPE_SENT;
+    }
+    else if ("2".equals(boxType))
+    {
+        pageType = PAGE_TYPE_DELETED;
+    }
+    else if ("3".equals(boxType))
+    {
+        pageType = PAGE_TYPE_DEMOGRAPHIC;
+    }
 
 String demographic_no = request.getParameter("demographic_no");
 String demographic_name = "";
@@ -187,19 +193,19 @@ function checkAll(formId){
                            String sentStyle = "messengerButtonsA";
                            String delStyle  = "messengerButtonsA";
                         switch(pageType){
-                            case 0: %>
+                            case PAGE_TYPE_DEFAULT: %>
      		                    <div class="DivContentTitle"><bean:message key="oscarMessenger.DisplayMessages.msgInbox"/></div>
                         <%      inbxStyle = "messengerButtonsD";
                             break;
-                            case 1: %>
+                            case PAGE_TYPE_SENT: %>
                                 <div class="DivContentTitle"><bean:message key="oscarMessenger.DisplayMessages.msgSentTitle"/></div>
                         <%      sentStyle = "messengerButtonsD";
                             break;
-                            case 2: %>
+                            case PAGE_TYPE_DELETED: %>
                                 <div class="DivContentTitle"><bean:message key="oscarMessenger.DisplayMessages.msgArchived"/></div>
                         <%      delStyle =  "messengerButtonsD";
                             break;
-                            case 3: %>
+                            case PAGE_TYPE_DEMOGRAPHIC: %>
                                 <div class="DivContentTitle">Messages related to <%=demographic_name%> </div> 
                         <%      delStyle =  "messengerButtonsD";
                             break;
@@ -272,7 +278,7 @@ function checkAll(formId){
                         </td>
                     </tr>
                     <%String strutsAction = "/oscarMessenger/DisplayMessages";
-                        if (pageType == 2){
+                        if (pageType == PAGE_TYPE_DELETED){
                             strutsAction = "/oscarMessenger/ReDisplayMessages";
                         }
                     %>
@@ -281,16 +287,16 @@ function checkAll(formId){
                     <%
                            java.util.Vector theMessages2 = new java.util.Vector() ;
                         switch(pageType){
-                            case 0:
+                            case PAGE_TYPE_DEFAULT:
                                 theMessages2 = DisplayMessagesBeanId.estInbox(orderby,pageNum);
                             break;
-                            case 1:
+                            case PAGE_TYPE_SENT:
                                 theMessages2 = DisplayMessagesBeanId.estSentItemsInbox(orderby,pageNum);
                             break;
-                            case 2:
+                            case PAGE_TYPE_DELETED:
                                 theMessages2 = DisplayMessagesBeanId.estDeletedInbox(orderby,pageNum);
                             break;
-                            case 3:
+                            case PAGE_TYPE_DEMOGRAPHIC:
                                 theMessages2 = DisplayMessagesBeanId.estDemographicInbox(orderby,demographic_no);
                             break;
                         }   //messageid
@@ -304,9 +310,9 @@ function checkAll(formId){
                     <table style="width:100%;">
                     <tr>
                         <td>
-                            <%if (pageType == 0){%>
+                            <%if (pageType == PAGE_TYPE_DEFAULT){%>
                                     <input name="btnDelete" type="submit" value="<bean:message key="oscarMessenger.DisplayMessages.formArchive"/>">
-                            <%}else if (pageType == 2){%>
+                            <%}else if (pageType == PAGE_TYPE_DELETED){%>
                                     <input type="submit" value="<bean:message key="oscarMessenger.DisplayMessages.formUnarchive"/>">
                             <%}%>
                             &nbsp;
@@ -323,8 +329,8 @@ function checkAll(formId){
 		                    	search = true;
 		                    }
 		                    
-		                    if (pageType != 3){
-		                    
+		                    if (pageType != PAGE_TYPE_DEMOGRAPHIC){
+
 		                    int totalMsgs = DisplayMessagesBeanId.getTotalMessages(pageType);
 		                    
 		                    int totalPages = totalMsgs / recordsToDisplay + (totalMsgs % recordsToDisplay == 0 ? 0 : 1);
@@ -346,7 +352,7 @@ function checkAll(formId){
                    
                                 <tr>
                                     <th align="left" bgcolor="#DDDDFF" width="75">
-                                    <%if( pageType!=1 ) {%>
+                                    <%if( pageType!=PAGE_TYPE_SENT ) {%>
                                        <input type="checkbox" name="checkAll2" onclick="checkAll('msgList')" id="checkA" />
                                     <%} %>   
                                     </th>
@@ -356,7 +362,7 @@ function checkAll(formId){
                                         </html:link>
                                     </th>
                                     <th align="left" bgcolor="#DDDDFF">
-                                      <%if( pageType == 1 ) {%>
+                                      <%if( pageType == PAGE_TYPE_SENT ) {%>
                                                 <html:link page="/oscarMessenger/DisplayMessages.jsp?orderby=sentto" paramId="boxType" paramName="pageType">
                                                 <bean:message key="oscarMessenger.DisplayMessages.msgTo"/>
                                                 </html:link>
@@ -398,7 +404,7 @@ function checkAll(formId){
                                 <tr>
                                 <%}%>
                                     <td bgcolor="#EEEEFF"  width="75">
-                                    <%if (pageType != 1){%>
+                                    <%if (pageType != PAGE_TYPE_SENT){%>
                                         <html:checkbox property="messageNo" value="<%=dm.messageId %>" />
                                      <% } %>
                                     &nbsp;
@@ -416,7 +422,7 @@ function checkAll(formId){
                                     </td>
                                     <td bgcolor="#EEEEFF">
                                         <%
-                                            if( pageType == 1 ) {
+                                            if( pageType == PAGE_TYPE_SENT ) {
                                                 int pos = dm.sentto.indexOf(",");
                                                 if( pos == -1 )
                                                     out.print(dm.sentto);
@@ -452,16 +458,16 @@ function checkAll(formId){
                                <table width="100%">
                                 <tr>
                                     <td>
-                                         <%if (pageType == 0){%>
+                                         <%if (pageType == PAGE_TYPE_DEFAULT){%>
                                             <input name="btnDelete" type="submit" value="<bean:message key="oscarMessenger.DisplayMessages.formArchive"/>">
-                                             <%}else if (pageType == 2){%>
+                                             <%}else if (pageType == PAGE_TYPE_DELETED){%>
                                             <input type="submit" value="<bean:message key="oscarMessenger.DisplayMessages.formUnarchive"/>">
                                             <%}%>  
                                     </td>
 
                                     <td align="right">
                                     <%                                    	
-                                    if(pageType!=3){
+                                    if(pageType!=PAGE_TYPE_DEMOGRAPHIC){
                                     	out.print(previous + next);
                                     }
                                     %>    
