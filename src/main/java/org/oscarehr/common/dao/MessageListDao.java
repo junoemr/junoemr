@@ -138,46 +138,18 @@ public class MessageListDao extends AbstractDao<MessageList> {
 
 	/**
 	 * Dao call to get total number of corresponding messages.
-	 * Note: This should really be split up into three different functions.
-	 * @param type type of message to be
 	 * @param providerNo requesting provider no
 	 * @param remoteLocation location message sent from
 	 * @param searchFilter any optional phrases to include
-	 * @return number of relevant messages
+	 * @return number of sent messages associated with the given provider
 	 */
-	public Integer messagesTotal(int type, String providerNo, Integer remoteLocation, String searchFilter)
+	public Integer getTotalMessagesSent(String providerNo, Integer remoteLocation, String searchFilter)
 	{
 		searchFilter = "%" + searchFilter + "%";
-
-		String sql;
-
-		switch (type)
-		{
-			case 1:
-				// sent
-				sql = "SELECT COUNT(mt) FROM MessageTbl mt " +
-						"WHERE mt.sentByNo= :providerNo " +
-					"AND mt.sentByLocation = :remoteLocation " +
-					"AND (mt.subject LIKE :filter1 OR mt.message LIKE :filter2 OR mt.sentBy LIKE :filter3 OR mt.sentTo LIKE :filter4)";
-				break;
-			case 2:
-				// deleted
-				sql = "SELECT COUNT(mt) FROM MessageTbl mt, MessageList ml " +
-						"WHERE ml.status LIKE 'del' AND ml.message = mt.id " +
-						"AND ml.providerNo= :providerNo " +
-						"AND ml.remoteLocation = :remoteLocation " +
-						"AND (mt.subject LIKE :filter1 OR mt.message LIKE :filter2 OR mt.sentBy LIKE :filter3 OR mt.sentTo LIKE :filter4)";
-				break;
-			default:
-				// inbox
-				sql = "SELECT COUNT(mt) FROM MessageList ml, MessageTbl mt " +
-						"WHERE ml.status != 'del' " +
-						"AND ml.message = mt.id " +
-						"AND ml.providerNo= :providerNo " +
-						"AND ml.remoteLocation = :remoteLocation " +
-						"AND (mt.subject LIKE :filter1 OR mt.message LIKE :filter2 OR mt.sentBy LIKE :filter3 OR mt.sentTo LIKE :filter4)";
-				break;
-		}
+		String sql = "SELECT COUNT(mt) FROM MessageTbl mt " +
+				"WHERE mt.sentByNo= :providerNo " +
+				"AND mt.sentByLocation = :remoteLocation " +
+				"AND (mt.subject LIKE :filter1 OR mt.message LIKE :filter2 OR mt.sentBy LIKE :filter3 OR mt.sentTo LIKE :filter4)";
 
 		Query query = entityManager.createQuery(sql);
 
@@ -192,4 +164,64 @@ public class MessageListDao extends AbstractDao<MessageList> {
 		return ((Long)query.getSingleResult()).intValue();
 	}
 
+	/**
+	 * Dao call to get total number of corresponding messages.
+	 * @param providerNo requesting provider no
+	 * @param remoteLocation location message sent from
+	 * @param searchFilter any optional phrases to include
+	 * @return number of deleted messages associated with the given provider
+	 */
+	public Integer getTotalMessagesDeleted(String providerNo, Integer remoteLocation, String searchFilter)
+	{
+		searchFilter = "%" + searchFilter + "%";
+
+		String sql = "SELECT COUNT(mt) FROM MessageTbl mt, MessageList ml " +
+				"WHERE ml.status LIKE 'del' AND ml.message = mt.id " +
+				"AND ml.providerNo= :providerNo " +
+				"AND ml.remoteLocation = :remoteLocation " +
+				"AND (mt.subject LIKE :filter1 OR mt.message LIKE :filter2 OR mt.sentBy LIKE :filter3 OR mt.sentTo LIKE :filter4)";
+
+		Query query = entityManager.createQuery(sql);
+
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("remoteLocation", remoteLocation);
+
+		query.setParameter("filter1", searchFilter);
+		query.setParameter("filter2", searchFilter);
+		query.setParameter("filter3", searchFilter);
+		query.setParameter("filter4", searchFilter);
+
+		return ((Long)query.getSingleResult()).intValue();
+	}
+
+	/**
+	 * Dao call to get total number of corresponding messages.
+	 * @param providerNo requesting provider no
+	 * @param remoteLocation location message sent from
+	 * @param searchFilter any optional phrases to include
+	 * @return number of non-deleted (active) messages associated with the given provider
+	 */
+	public Integer getTotalMessages(String providerNo, Integer remoteLocation, String searchFilter)
+	{
+		searchFilter = "%" + searchFilter + "%";
+
+		String sql = "SELECT COUNT(mt) FROM MessageList ml, MessageTbl mt " +
+				"WHERE ml.status != 'del' " +
+				"AND ml.message = mt.id " +
+				"AND ml.providerNo= :providerNo " +
+				"AND ml.remoteLocation = :remoteLocation " +
+				"AND (mt.subject LIKE :filter1 OR mt.message LIKE :filter2 OR mt.sentBy LIKE :filter3 OR mt.sentTo LIKE :filter4)";
+
+		Query query = entityManager.createQuery(sql);
+
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("remoteLocation", remoteLocation);
+
+		query.setParameter("filter1", searchFilter);
+		query.setParameter("filter2", searchFilter);
+		query.setParameter("filter3", searchFilter);
+		query.setParameter("filter4", searchFilter);
+
+		return ((Long)query.getSingleResult()).intValue();
+	}
 }

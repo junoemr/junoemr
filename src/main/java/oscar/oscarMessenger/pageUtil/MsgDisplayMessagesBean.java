@@ -49,6 +49,9 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final int TYPE_SENT = 1;
+	private static final int TYPE_DELETED = 2;
+
 	private Vector<String> messageid;
 	private Vector<String> messagePosition;
 	private Vector<String> status;
@@ -444,10 +447,20 @@ public class MsgDisplayMessagesBean implements java.io.Serializable {
 		return estDeletedInbox(null, 1);
 	}
 
-	public int getTotalMessages(int type){
+	public int getTotalMessages(int type)
+	{
 		String providerNo = LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod().getLoggedInProviderNo();
 		MessageListDao messageListDao = SpringUtils.getBean(MessageListDao.class);
-		return messageListDao.messagesTotal(type, providerNo, Integer.parseInt(getCurrentLocationId()), filter);
+		Integer location = Integer.parseInt(getCurrentLocationId());
+		switch(type)
+		{
+			case TYPE_SENT:
+				return messageListDao.getTotalMessagesSent(providerNo, location, filter);
+			case TYPE_DELETED:
+				return messageListDao.getTotalMessagesDeleted(providerNo, location, filter);
+			default:
+				return messageListDao.getTotalMessages(providerNo, location, filter);
+		}
 	}
 
 	public Vector<MsgDisplayMessage> estDeletedInbox(String orderby, int page) {
