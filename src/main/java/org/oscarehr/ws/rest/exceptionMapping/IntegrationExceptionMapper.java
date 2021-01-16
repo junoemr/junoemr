@@ -21,18 +21,32 @@
  * Canada
  */
 
-package org.oscarehr.ws.rest.integrations.imdhealth.transfer;
+package org.oscarehr.ws.rest.exceptionMapping;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.log4j.Logger;
+import org.oscarehr.integration.exception.IntegrationException;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.response.RestResponse;
 
-@Data
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class IMDHealthCredentialsTo1
+public class IntegrationExceptionMapper implements ExceptionMapper<IntegrationException>
 {
-	private String clientId;
-	private String clientSecret;
-	private Integer siteId;
+	private static final Logger logger = MiscUtils.getLogger();
+
+	@Override
+	public Response toResponse(IntegrationException exception)
+	{
+		String message = exception.getMessage();
+		logger.error(message);
+
+		RestResponse<String> response = RestResponse.errorResponse(message);
+
+		return Response.status(Response.Status.BAD_REQUEST).entity(response)
+		               .type(MediaType.APPLICATION_JSON).build();
+	}
 }

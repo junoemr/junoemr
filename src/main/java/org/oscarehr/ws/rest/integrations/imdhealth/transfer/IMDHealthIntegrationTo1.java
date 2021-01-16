@@ -26,13 +26,43 @@ package org.oscarehr.ws.rest.integrations.imdhealth.transfer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.oscarehr.integration.model.Integration;
+
+import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class IMDHealthCredentialsTo1
+@JsonIgnoreProperties
+public class IMDHealthIntegrationTo1 implements Serializable
 {
+	private Integer integrationId;
 	private String clientId;
-	private String clientSecret;
 	private Integer siteId;
+	private String siteName;
+
+	/**
+	 * Maps the generic Integration class to it's usage for IMDHealth.
+	 * @param integration Integration as stored in the database
+	 * @return integration as used by IMDHealth
+	 * @throws RuntimeException if integration is not an IMDHealth integration
+	 */
+	public static IMDHealthIntegrationTo1 fromIntegration(Integration integration)
+	{
+		if (!integration.getIntegrationType().equals(Integration.INTEGRATION_TYPE_IMD_HEALTH))
+		{
+			throw new RuntimeException();
+		}
+
+		IMDHealthIntegrationTo1 iMDIntegration = new IMDHealthIntegrationTo1();
+		iMDIntegration.integrationId = integration.getId();
+		iMDIntegration.clientId = integration.getRemoteId();
+
+		if (integration.getSite() != null)
+		{
+			iMDIntegration.siteId = integration.getSite().getId();
+			iMDIntegration.siteName = integration.getSite().getName();
+		}
+
+		return iMDIntegration;
+	}
 }

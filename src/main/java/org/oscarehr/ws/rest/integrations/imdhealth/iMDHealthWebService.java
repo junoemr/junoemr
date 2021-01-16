@@ -24,23 +24,27 @@
 package org.oscarehr.ws.rest.integrations.imdhealth;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.integration.imdhealth.exception.IMDHealthException;
+import org.oscarehr.integration.exception.IntegrationException;
 import org.oscarehr.integration.imdhealth.service.IMDHealthService;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.integrations.imdhealth.transfer.IMDHealthCredentialsTo1;
+import org.oscarehr.ws.rest.integrations.imdhealth.transfer.IMDHealthIntegrationTo1;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.transfer.myhealthaccess.IntegrationTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
+import java.util.List;
 
 @Path("/integrations/iMDHealth")
 @Component("IMDHealthWebService")
@@ -56,41 +60,60 @@ public class iMDHealthWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/")
-	public RestResponse<IMDHealthCredentialsTo1> getIntegration(@QueryParam("siteId") Integer siteId)
+	public RestResponse<List<IMDHealthIntegrationTo1>> getIMAHealthIntegrations()
 	{
 		// TODO security permissions
-		Integration integration = integrationService.findIntegrationByTypeAndSite(Integration.INTEGRATION_TYPE_IMD_HEALTH, siteId);
-		IMDHealthCredentialsTo1 response = new IMDHealthCredentialsTo1(integration);
+		List<Integration> integrations = integrationService.findIntegrationsByType(Integration.INTEGRATION_TYPE_IMD_HEALTH);
+
+		List<IMDHealthIntegrationTo1> response = new ArrayList<>();
+		integrations.forEach(integration -> response.add(IMDHealthIntegrationTo1.fromIntegration(integration)));
+
 		return RestResponse.successResponse(response);
 	}
 
 	@GET
 	@Path("/SSOLink")
-	public RestResponse<String> getSSOLink(@QueryParam("siteId") Integer siteId) throws IMDHealthException
+	public RestResponse<String> getSSOLink(@QueryParam("siteId") Integer siteId) throws IntegrationException
 	{
+		// TODO security permissions
 		String ssoLink = imdHealthService.getSSOLink(getHttpServletRequest().getSession(), siteId);
 		return RestResponse.successResponse(ssoLink);
 	}
 
-	@POST
+	@PUT
 	@Path("/")
-	public RestResponse<IntegrationTo1> updateIntegration(IMDHealthCredentialsTo1 credentials)
+	public RestResponse<Integer> updateIntegration(IMDHealthCredentialsTo1 credentials)
 	{
 		// TODO: security permissions
-		imdHealthService.updateSSOCredentials(getHttpServletRequest().getSession(),
+		Integration integration = imdHealthService.updateSSOCredentials(getHttpServletRequest().getSession(),
 		                                      credentials.getClientId(),
 		                                      credentials.getClientSecret(),
 		                                      credentials.getSiteId());
-		return RestResponse.successResponse(null); // TODO stub
+
+		return RestResponse.successResponse(integration.getId());
 	}
 
-	@POST
-	@Path("/Test")
-	public RestResponse<Boolean> testIntegration(@QueryParam("site") String siteId)
+	@DELETE
+	@Path("/{integrationId}")
+	public RestResponse<Integer> deleteIntegration(@PathParam("integrationId") Integer integrationId) throws IntegrationException
 	{
-		// TODO: Stub, permissions
-		return RestResponse.successResponse(false);  // TODO stub
+		// TODO security permissions
+		Integer returnValue = null;
+		Integration integration = imdHealthService.removeIntegration(integrationId);
+
+		if (integration != null)
+		{
+			returnValue = integration.getId();
+		}
+
+		return RestResponse.successResponse(returnValue);
 	}
 
-	// TODO: search integrations (multisite)
+	@PUT
+	@Path("/{integrationId}/Test")
+	public RestResponse<Boolean> testIntegration(@PathParam("integrationId") Integer integrationId) throws IntegrationException
+	{
+		boolean credentialsValid = imdHealthService.testIntegration(integrationId);
+		return RestResponse.successResponse(credentialsValid);
+	}
 }

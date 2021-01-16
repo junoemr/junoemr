@@ -146,4 +146,9 @@ public class IntegrationService
 	{
 		return integrationDao.findByIntegrationTypeAndSiteId(integrationType, siteId);
 	}
+
+	public List<Integration> findIntegrationsByType(String integrationType)
+	{
+		return integrationDao.findByIntegrationType(integrationType);
+	}
 }

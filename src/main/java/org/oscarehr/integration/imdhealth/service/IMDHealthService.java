@@ -32,6 +32,7 @@ import org.oscarehr.common.encryption.StringEncryptor;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.integration.dao.IntegrationDao;
+import org.oscarehr.integration.exception.IntegrationException;
 import org.oscarehr.integration.imdhealth.exception.IMDHealthException;
 import org.oscarehr.integration.imdhealth.exception.SSOBearerException;
 import org.oscarehr.integration.imdhealth.exception.SSOLoginException;
@@ -122,24 +123,102 @@ public class IMDHealthService
 	 */
 	public String getSSOLink(HttpSession session, @Nullable Integer siteId) throws IMDHealthException
 	{
+		IMDHealthCredentials credentials = fetchCredentials(session, siteId);
+		String returnString = "";
+
+		if (credentials != null)
+		{
+			URIBuilder builder = new URIBuilder()
+					.setScheme(DEFAULT_SCHEME)
+					.setHost(HOST_URL)
+					.setParameter("access_token", credentials.getAccessToken())
+					.setParameter("membership_id", StringUtils.trimToEmpty(credentials.getMembershipId()))
+					.setParameter("organization_id", StringUtils.trimToEmpty(credentials.getOrganizationId()));
+
+			returnString = builder.toString();
+		}
+
+		return returnString;
+	}
+
+	/**
+	 * Test an IMDIntegration for a site by attempting to use the credentials stored on the integration to
+	 * retrieve a bearer token from the SSO api.  Any non-empty token is considered a positive response.
+	 *
+	 * @param integrationId integration to test
+	 *
+	 * @return true if a non-empty token is retrieved from the API, false in all other cases.
+	 */
+	public boolean testIntegration(Integer integrationId) throws IntegrationException
+	{
+		try
+		{
+			Integration imdIntegration = integrationDao.find(integrationId);
+
+			if (!imdIntegration.getIntegrationType().equals(Integration.INTEGRATION_TYPE_IMD_HEALTH))
+			{
+				throw new IntegrationException("Invalid iMDHealth integration");
+			}
+
+			BearerToken token = getBearerToken(imdIntegration);
+			return token != null && !StringUtils.isEmpty(token.getAccessToken());
+		}
+		catch (SSOBearerException ex)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Remove an iMD Health integration from the database, returning it if found.  If not found, returns null
+	 *
+	 * @param integrationId id of the iMD Health integration to delete
+	 * @return Integration removed if found, null otherwise
+	 * @throws IntegrationException if the integration specified by integrationId is not an iMD Health integration.
+	 */
+	public Integration removeIntegration(Integer integrationId) throws IntegrationException
+	{
+		Integration integration = integrationDao.find(integrationId);
+
+		if (integration != null && !integration.getIntegrationType().equals(Integration.INTEGRATION_TYPE_IMD_HEALTH))
+		{
+			throw new IntegrationException("Integration is not a valid iMD Health Integration");
+		}
+		else
+		{
+			integrationDao.remove(integrationId);
+		}
+
+		return integration;
+	}
+
+
+	/**
+	 * Fetch IMD credentials, either from the session or the database, with priority given to the session.  If found in the database,
+	 * they will be loaded onto the session for future use.
+	 *
+	 * @param session user session
+	 * @param siteId {optional} if searching for credentials associated with a site, the id of that site.  If single-site or not
+	 *               needed, leave null.
+	 *
+	 * @return IMDHealth credentials if found, null otherwise;
+	 */
+	private IMDHealthCredentials fetchCredentials(HttpSession session, @Nullable Integer siteId) throws IMDHealthException
+	{
 		IMDHealthCredentials credentials = IMDHealthCredentials.getFromSession(session);
 
 		if (credentials == null) // TODO: check 24 hour time limit on token, check if any part of the credentials are null, empty, etc
 		{
 			Integration imdIntegration = integrationDao.findByIntegrationTypeAndSiteId(Integration.INTEGRATION_TYPE_IMD_HEALTH, siteId);
-			credentials = login(imdIntegration, session, siteId);
+
+			if (imdIntegration != null)
+			{
+				credentials = login(imdIntegration, session, siteId);
+			}
 		}
 
-		URIBuilder builder = new URIBuilder()
-				.setScheme(DEFAULT_SCHEME)
-				.setHost(HOST_URL)
-				.setParameter("access_token", credentials.getAccessToken())
-				.setParameter("membership_id", StringUtils.trimToEmpty(credentials.getMembershipId()))
-				.setParameter("organization_id", StringUtils.trimToEmpty(credentials.getOrganizationId()));
-
-		return builder.toString();
+		return credentials;
 	}
-
 
 	/**
 	 * Log in via the iMDHealth SSO api and store the credentials on the session.

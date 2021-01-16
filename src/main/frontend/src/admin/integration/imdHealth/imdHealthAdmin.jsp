@@ -21,7 +21,7 @@
 * Canada
 --%>
 <div id="imdhealth-admin">
-    <h1>Patient Engagment by iMD Health</h1>
+    <h1>Patient Education by iMD Health</h1>
     <div class="marketing-container">
         <p>iMD Health is designed for healthcare professionals at every level of care to better engage, inform and educate patients about their conditions and treatment plans. </p>
         <p><a href="https://www.imdhealth.com" target="_blank">Visit iMD Health</a></p>
@@ -30,31 +30,54 @@
         <juno-input
             ng-model="$ctrl.credentials.clientId"
             label="Client ID"
-            label-position="$ctrl.LABEL_POSITION"
+            label-position="$ctrl.LABEL_POSITION.TOP"
             component-style="$ctrl.componentStyle">
         </juno-input>
         <juno-input
             ng-model="$ctrl.credentials.clientSecret"
             label="Client Secret"
-            label-position="$ctrl.LABEL_POSITION"
+            label-position="$ctrl.LABEL_POSITION.TOP"
             component-style="$ctrl.componentStyle">
         </juno-input>
         <juno-button
                 ng-click="$ctrl.onSave()"
-                button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL"
-                button-color="JUNO_BUTTON_COLOR.PRIMARY"
+                button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED"
+                button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
                 component-style="$ctrl.componentStyle">
             Update Credentials
         </juno-button>
-        <juno-button
-                ng-click="$ctrl.testSSO()"
-                button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL"
-                button-color="JUNO_BUTTON_COLOR.PRIMARY"
-                component-style="$ctrl.componentStyle">
-            TEST SSO LINK
-        </juno-button>
     </div>
     <div class="integrations-container">
-        <p>Integrations go here</p>
+        <panel ng-if="$ctrl.imdIntegrations" component-style="$ctrl.componentStyle">
+            <panel-header>
+                <div>
+                    <h6>Active Integrations</h6>
+                </div>
+            </panel-header>
+            <panel-body>
+                <div class="imd-integration" ng-repeat="integration in $ctrl.imdIntegrations">
+                    <div class="imd-integration-name">
+                        <label>
+                            Client ID:
+                            <span> {{ integration.clientId }} </span>
+                        </label>
+                    </div>
+                    <div class="imd-integration-controls">
+                        <juno-button
+                            ng-click="$ctrl.testSSO(integration.integrationId)"
+                            button-color="$ctrl.JUNO_BUTTON_COLOR.INFO"
+                            button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED"">
+                            Test
+                        </juno-button>
+                        <juno-button
+                            ng-click="$ctrl.removeIntegration(integration.integrationId)"
+                            button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
+                            button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED">
+                            Delete
+                        </juno-button>
+                    </div>
+                </div>
+            </panel-body>
+        </panel>
     </div>
 </div>

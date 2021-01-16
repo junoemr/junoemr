@@ -21,7 +21,8 @@
 * Canada
 --%>
 
-<div id="imdHealth-home" ng-init="$ctrl.onPageLoad()">
-    blah blah
-    <p ng-hide="!$ctrl.message">{{ $ctrl.message }}</p>
+<div id="imd-health-landing" ng-init="$ctrl.onPageLoad()">
+    <div ng-hide="!$ctrl.message">
+        <p>{{ $ctrl.message }}</p>
+    </div>
 </div>

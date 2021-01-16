@@ -21,18 +21,30 @@
  * Canada
  */
 
-package org.oscarehr.ws.rest.integrations.imdhealth.transfer;
+package org.oscarehr.integration.exception;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
-@Data
-@NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class IMDHealthCredentialsTo1
+public class IntegrationException extends Exception
 {
-	private String clientId;
-	private String clientSecret;
-	private Integer siteId;
+	public static final Logger logger = MiscUtils.getLogger();
+
+	public IntegrationException()
+	{
+		super();
+		logger.error("IntegrationException");
+	}
+
+	public IntegrationException(String msg)
+	{
+		super(msg);
+		logger.error(msg);
+	}
+
+	public IntegrationException(Exception e)
+	{
+		super(e);
+		logger.error(e.getMessage(), e);
+	}
 }

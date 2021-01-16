@@ -40,9 +40,16 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                 clientSecret: ""
             };
 
-            ctrl.LABEL_POSITION = LABEL_POSITION.LEFT;
+            ctrl.imdIntegrations = null;
+
+            ctrl.LABEL_POSITION = LABEL_POSITION;
             ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+            ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
             ctrl.componentStyle = JUNO_STYLE.GREY;
+
+            ctrl.$onInit = () => {
+                ctrl.fetchIntegrations();
+            };
 
             ctrl.onSave = () =>
             {
@@ -51,30 +58,64 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                     .then((response) =>
                     {
                         const result = response.data.body;
-                        console.log("update success");
-                        console.log("result:");
-                        console.log(result);
+                        ctrl.fetchIntegrations();
                     })
                     .catch((error) =>
                     {
-                        console.log("update error");
+                        alert("Could not update integration");
                         console.log(error);
                     });
 
             };
 
-            ctrl.testSSO = () =>
+            ctrl.fetchIntegrations = () =>
             {
-                console.log("testing SSO");
-                imdHealthWebService.getSSOLink(null)
+                imdHealthWebService.getIMAHealthIntegrations()
                     .then((response) =>
                     {
-                        const result = response.data.body;
-                        console.log("test link success: " + result);
+                        ctrl.imdIntegrations = response.data.body;
                     })
                     .catch((error) =>
                     {
-                        console.log("test link error");
+                        console.log(error);
+                    })
+            };
+
+            ctrl.removeIntegration = (integrationId) =>
+            {
+                if (confirm("Are you sure you want to delete this integration?"))
+                {
+                    imdHealthWebService.deleteIntegration(integrationId)
+                        .then((response) =>
+                        {
+                            ctrl.fetchIntegrations();
+                        })
+                        .catch((error) =>
+                        {
+                            alert("Could not remove integration");
+                            console.log(error);
+                        })
+                }
+            };
+
+            ctrl.testSSO = (integrationId) =>
+            {
+                imdHealthWebService.testIntegration(integrationId)
+                    .then((response) =>
+                    {
+                        const payload = response.data.body;
+
+                        if (payload)
+                        {
+                            alert("Integration is valid");
+                        }
+                        else
+                        {
+                            alert("Integration is invalid");
+                        }
+                    })
+                    .catch((error) =>
+                    {
                         console.log(error);
                     })
             }

@@ -23,7 +23,9 @@
 
 package org.oscarehr.integration.imdhealth.exception;
 
-public abstract class IMDHealthException extends Exception
+import org.oscarehr.integration.exception.IntegrationException;
+
+public abstract class IMDHealthException extends IntegrationException
 {
 	IMDHealthException()
 	{

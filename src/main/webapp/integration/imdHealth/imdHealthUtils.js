@@ -25,6 +25,6 @@ Juno.Integration.iMDHealth.onFetchLink = function onFetchLink(response)
 
 Juno.Integration.iMDHealth.onFail = function onFail(error)
 {
-    alert("Could not connect to iMDHealth.\nPlease check your integration settings and try again");
+    alert("Could not connect to iMD Health.\nPlease check your integration settings and try again");
 };
 

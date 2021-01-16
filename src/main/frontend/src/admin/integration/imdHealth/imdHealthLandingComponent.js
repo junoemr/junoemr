@@ -25,14 +25,14 @@ import {IMDHealthApi} from "../../../../generated";
 
 angular.module('Admin.Integration').component('imdHealthLanding',
     {
-        templateUrl: 'src/admin/integration/imdHealth/imdHealthHome.jsp',
+        templateUrl: 'src/admin/integration/imdHealth/imdHealthLanding.jsp',
         bindings: {},
         controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state) {
 
             let ctrl = this;
             let imdHealthWebService = new IMDHealthApi ($http, $httpParamSerializer, '../ws/rs');
 
-            ctrl.message = "Message placeholder";
+            ctrl.message = "";
 
             ctrl.onPageLoad = () =>
             {
@@ -41,11 +41,21 @@ angular.module('Admin.Integration').component('imdHealthLanding',
                     .then((response) =>
                     {
                         const ssoLink = response.data.body;
-                        window.open(ssoLink, "_blank");
+
+                        if (ssoLink)
+                        {
+                            window.open(ssoLink, "_blank");
+                        }
+                        else
+                        {
+                            this.message = "Missing credentials.\nPlease configure your iMD Integration";
+                        }
+
 
                     })
                     .catch((error) =>
                     {
+                        console.log(error);
                         this.message = "There was a problem connecting to iMD Health.\nPlease check your integration settings and try again"
                     })
             }

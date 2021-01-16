@@ -152,4 +152,14 @@ public class IntegrationDao extends AbstractDao<Integration>
 
 		return getSingleResultOrNull(query);
 	}
+
+	public List<Integration> findByIntegrationType(String integrationType)
+	{
+		String sql = "SELECT i FROM Integration i WHERE i.integrationType = :integrationType";
+
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("integrationType", integrationType);
+
+		return query.getResultList();
+	}
 }
