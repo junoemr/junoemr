@@ -26,8 +26,8 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
-import org.oscarehr.demographicImport.model.demographic.Address;
-import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
+import org.oscarehr.demographicImport.model.common.Address;
+import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
@@ -97,7 +97,7 @@ public class DemographicModelToDbConverter
 		List<DemographicExt> demographicExtList = new ArrayList<>();
 
 		// phone conversions
-		PhoneNumber homePhone = input.getHomePhoneNumber();
+		PhoneNumber homePhone = input.getHomePhone();
 		if(homePhone != null)
 		{
 			dbDemographic.setPhone(homePhone.getNumber());
@@ -110,7 +110,7 @@ public class DemographicModelToDbConverter
 			}
 		}
 
-		PhoneNumber workPhone = input.getWorkPhoneNumber();
+		PhoneNumber workPhone = input.getWorkPhone();
 		if(workPhone != null)
 		{
 			dbDemographic.setPhone2(workPhone.getNumber());
@@ -123,7 +123,7 @@ public class DemographicModelToDbConverter
 			}
 		}
 
-		PhoneNumber cellPhone = input.getCellPhoneNumber();
+		PhoneNumber cellPhone = input.getCellPhone();
 		if(cellPhone != null)
 		{
 			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_CELL, cellPhone.getNumber());

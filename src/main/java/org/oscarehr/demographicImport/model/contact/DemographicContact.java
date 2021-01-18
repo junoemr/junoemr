@@ -20,46 +20,33 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model.demographic;
+package org.oscarehr.demographicImport.model.contact;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.provider.Provider;
+
+import java.time.LocalDateTime;
 
 @Data
-public class PhoneNumber extends AbstractTransientModel
+public class DemographicContact extends AbstractTransientModel
 {
-	private String number;
-	private String extension;
-	private boolean primaryContactNumber;
+	private Contact contact;
+	private String role;
+	private String note;
+	private Boolean consentToContact;
+	private Boolean ec;
+	private Boolean sdm;
+	private Boolean mrp;
 
-	public PhoneNumber()
-	{
-		this(null, null);
-	}
+	private LocalDateTime updateDateTime;
+	private Boolean deleted;
+	private Provider createdBy;
+	private LocalDateTime createdAt;
 
-	public PhoneNumber(String number)
-	{
-		this(number, null, false);
-	}
 
-	public PhoneNumber(String number, String extension)
+	public DemographicContact(Contact contact)
 	{
-		this(number, extension, false);
-	}
 
-	public PhoneNumber(String number, String extension, boolean primaryContactNumber)
-	{
-		this.number = number;
-		this.extension = extension;
-		this.primaryContactNumber = primaryContactNumber;
-	}
-
-	public String getNumberFormattedHL7()
-	{
-		if(number != null && number.length() == 10)
-		{
-			return "(" + number.substring(0,3) + ")" + number.substring(3,6) + "-" + number.substring(6);
-		}
-		return null;
 	}
 }

@@ -33,9 +33,9 @@ import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
 import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
 import org.oscarehr.demographicImport.model.common.Person;
-import org.oscarehr.demographicImport.model.demographic.Address;
+import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
-import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
+import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -175,15 +175,15 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			PhoneNumberType type = importNumber.getPhoneNumberType();
 			if(PhoneNumberType.R.equals(type))
 			{
-				demographic.setHomePhoneNumber(phoneNumber);
+				demographic.setHomePhone(phoneNumber);
 			}
 			else if(PhoneNumberType.W.equals(type))
 			{
-				demographic.setWorkPhoneNumber(phoneNumber);
+				demographic.setWorkPhone(phoneNumber);
 			}
 			else if(PhoneNumberType.C.equals(type))
 			{
-				demographic.setCellPhoneNumber(phoneNumber);
+				demographic.setCellPhone(phoneNumber);
 			}
 			else
 			{

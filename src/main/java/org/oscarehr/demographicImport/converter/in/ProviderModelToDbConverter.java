@@ -24,7 +24,7 @@ package org.oscarehr.demographicImport.converter.in;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.demographicImport.model.demographic.Address;
+import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;

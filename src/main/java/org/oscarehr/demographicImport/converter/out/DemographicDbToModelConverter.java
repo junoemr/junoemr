@@ -43,8 +43,8 @@ import org.oscarehr.demographicImport.converter.out.note.ReminderNoteDbToModelCo
 import org.oscarehr.demographicImport.converter.out.note.RiskFactorNoteDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.note.SocialHistoryNoteDbToModelConverter;
 import org.oscarehr.demographicImport.model.common.Person;
-import org.oscarehr.demographicImport.model.demographic.Address;
-import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
+import org.oscarehr.demographicImport.model.common.Address;
+import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
@@ -182,20 +182,20 @@ public class DemographicDbToModelConverter extends
 		{
 			DemographicExt homePhoneExtensionExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_H_PHONE_EXT);
 			String homePhoneExtension = (homePhoneExtensionExt != null) ? StringUtils.trimToNull(homePhoneExtensionExt.getValue()) : null;
-			exportDemographic.setHomePhoneNumber(buildPhoneNumber(input.getPhone(), homePhoneExtension));
+			exportDemographic.setHomePhone(buildPhoneNumber(input.getPhone(), homePhoneExtension));
 		}
 		if(input.getPhone2() != null)
 		{
 			DemographicExt workPhoneExtensionExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_W_PHONE_EXT);
 			String workPhoneExtension = (workPhoneExtensionExt != null) ? StringUtils.trimToNull(workPhoneExtensionExt.getValue()) : null;
-			exportDemographic.setWorkPhoneNumber(buildPhoneNumber(input.getPhone2(), workPhoneExtension));
+			exportDemographic.setWorkPhone(buildPhoneNumber(input.getPhone2(), workPhoneExtension));
 		}
 
 		DemographicExt cellNoExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_CELL);
 		String cellPhoneNumber = (cellNoExt != null) ? StringUtils.trimToNull(cellNoExt.getValue()) : null;
 		if(cellPhoneNumber != null)
 		{
-			exportDemographic.setCellPhoneNumber(buildPhoneNumber(cellPhoneNumber, null));
+			exportDemographic.setCellPhone(buildPhoneNumber(cellPhoneNumber, null));
 		}
 
 		DemographicCust demographicCustom = input.getDemographicCust();

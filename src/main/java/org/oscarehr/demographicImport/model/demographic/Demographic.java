@@ -27,7 +27,11 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 import org.oscarehr.demographicImport.model.allergy.Allergy;
 import org.oscarehr.demographicImport.model.appointment.Appointment;
+import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.Person;
+import org.oscarehr.demographicImport.model.common.PhoneNumber;
+import org.oscarehr.demographicImport.model.contact.Contact;
+import org.oscarehr.demographicImport.model.contact.DemographicContact;
 import org.oscarehr.demographicImport.model.document.Document;
 import org.oscarehr.demographicImport.model.document.HrmDocument;
 import org.oscarehr.demographicImport.model.encounterNote.ConcernNote;
@@ -51,7 +55,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
-public class Demographic extends AbstractTransientModel implements Person
+public class Demographic extends AbstractTransientModel implements Person, Contact
 {
 	private Integer id;
 
@@ -76,9 +80,9 @@ public class Demographic extends AbstractTransientModel implements Person
 	//contact info
 	private List<Address> addressList;
 	private String email;
-	private PhoneNumber homePhoneNumber;
-	private PhoneNumber workPhoneNumber;
-	private PhoneNumber cellPhoneNumber;
+	private PhoneNumber homePhone;
+	private PhoneNumber workPhone;
+	private PhoneNumber cellPhone;
 
 	// physician info
 	private Provider mrpProvider;
@@ -126,6 +130,7 @@ public class Demographic extends AbstractTransientModel implements Person
 	private List<ConcernNote> concernNoteList;
 	private List<RiskFactorNote> riskFactorNoteList;
 	private List<Measurement> measurementList;
+	private List<DemographicContact> contactList;
 
 	public Demographic()
 	{
@@ -146,6 +151,7 @@ public class Demographic extends AbstractTransientModel implements Person
 		this.concernNoteList = new ArrayList<>();
 		this.riskFactorNoteList = new ArrayList<>();
 		this.measurementList = new ArrayList<>();
+		this.contactList = new ArrayList<>();
 	}
 
 	public void addAddress(Address address)
@@ -203,6 +209,11 @@ public class Demographic extends AbstractTransientModel implements Person
 		this.labList.add(lab);
 	}
 
+	public void addContact(DemographicContact contact)
+	{
+		this.contactList.add(contact);
+	}
+
 	@Override
 	public String getTitleString()
 	{
@@ -221,6 +232,20 @@ public class Demographic extends AbstractTransientModel implements Person
 			return this.sex.getValue();
 		}
 		return null;
+	}
+
+	public Address getAddress()
+	{
+		if(this.addressList != null && !this.addressList.isEmpty())
+		{
+			return this.addressList.get(0);
+		}
+		return null;
+	}
+
+	public void setAddress(Address address)
+	{
+		this.addAddress(address);
 	}
 
 	@Override

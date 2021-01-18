@@ -24,8 +24,8 @@ package org.oscarehr.demographicImport.converter.out;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.demographicImport.model.common.Person;
-import org.oscarehr.demographicImport.model.demographic.Address;
-import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
+import org.oscarehr.demographicImport.model.common.Address;
+import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;

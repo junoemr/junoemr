@@ -24,9 +24,10 @@ package org.oscarehr.demographicImport.model.provider;
 
 import lombok.Data;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
+import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.Person;
-import org.oscarehr.demographicImport.model.demographic.Address;
-import org.oscarehr.demographicImport.model.demographic.PhoneNumber;
+import org.oscarehr.demographicImport.model.common.PhoneNumber;
+import org.oscarehr.demographicImport.model.contact.Contact;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class Provider extends AbstractTransientModel implements Person
+public class Provider extends AbstractTransientModel implements Person, Contact
 {
 	private String id;
 	// basic info
@@ -82,6 +83,20 @@ public class Provider extends AbstractTransientModel implements Person
 			this.addressList = new ArrayList<>();
 		}
 		this.addressList.add(address);
+	}
+
+	public Address getAddress()
+	{
+		if(this.addressList != null && !this.addressList.isEmpty())
+		{
+			return this.addressList.get(0);
+		}
+		return null;
+	}
+
+	public void setAddress(Address address)
+	{
+		this.addAddress(address);
 	}
 
 	@Override

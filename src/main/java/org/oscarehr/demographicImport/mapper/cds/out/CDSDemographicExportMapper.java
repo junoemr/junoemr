@@ -40,7 +40,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
 import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
 import org.oscarehr.demographicImport.model.common.Person;
-import org.oscarehr.demographicImport.model.demographic.Address;
+import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
@@ -194,9 +194,9 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 	{
 		List<PhoneNumber> exportPhoneList = new ArrayList<>(3);
 
-		org.oscarehr.demographicImport.model.demographic.PhoneNumber homePhone = exportStructure.getHomePhoneNumber();
-		org.oscarehr.demographicImport.model.demographic.PhoneNumber workPhone = exportStructure.getWorkPhoneNumber();
-		org.oscarehr.demographicImport.model.demographic.PhoneNumber cellPhone = exportStructure.getCellPhoneNumber();
+		org.oscarehr.demographicImport.model.common.PhoneNumber homePhone = exportStructure.getHomePhone();
+		org.oscarehr.demographicImport.model.common.PhoneNumber workPhone = exportStructure.getWorkPhone();
+		org.oscarehr.demographicImport.model.common.PhoneNumber cellPhone = exportStructure.getCellPhone();
 		if(homePhone != null)
 		{
 			exportPhoneList.add(getExportPhone(PhoneNumberType.R, homePhone));
@@ -212,7 +212,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		return exportPhoneList;
 	}
 
-	protected PhoneNumber getExportPhone(PhoneNumberType type, 	org.oscarehr.demographicImport.model.demographic.PhoneNumber phoneNumber)
+	protected PhoneNumber getExportPhone(PhoneNumberType type, 	org.oscarehr.demographicImport.model.common.PhoneNumber phoneNumber)
 	{
 		String number = phoneNumber.getNumber();
 		String extension = phoneNumber.getExtension();
