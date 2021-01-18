@@ -363,7 +363,7 @@ Varicella Immunoglobulin	VarIg
 
 	<item 
 		resultDesc=""
-		desc="Mammorgram" name="MAM" link="" layout="PAPMAM" minAge="50"
+		desc="Mammogram" name="MAM" link="" layout="PAPMAM" minAge="50"
 		maxAge="70" sex="F" showIfMinRecordNum="1" />
 
 	<item 
@@ -449,15 +449,26 @@ Varicella Immunoglobulin	VarIg
 		desc="H1N1 Vaccination" name="H1N1" layout="h1n1"
             minAge="0" atc="J07BB02" />
 
+    <item
+            resultDesc=""
+            desc="COVID-19 Immunization"
+            name="COVID-19"
+            healthCanadaType="COVID-19"
+            layout="injection"
+            link="https://www.canada.ca/en/health-canada/services/drugs-health-products/covid19-industry/drugs-vaccines-treatments/vaccines.html"
+            showIfMinRecordNum="1" />
+
 	<item 
 		resultDesc=""
 		desc="Other Layout A" name="OtherA" link="" layout="injection"
 		showIfMinRecordNum="1" />
 
-	<item 
+	<item
 		resultDesc=""
 		desc="Other Layout B" name="OtherB" link="" layout="PAPMAM"
 		showIfMinRecordNum="1" />
+
+
 
 </preventions>
 
