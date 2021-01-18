@@ -170,13 +170,14 @@ public class IMDHealthService
 	}
 
 	/**
-	 * Remove an iMD Health integration from the database, returning it if found.  If not found, returns null
+	 * Remove an iMD Health integration from the database, returning it if found.  If not found, returns null.
+	 * Also removes the associated data from the session.
 	 *
 	 * @param integrationId id of the iMD Health integration to delete
 	 * @return Integration removed if found, null otherwise
 	 * @throws IntegrationException if the integration specified by integrationId is not an iMD Health integration.
 	 */
-	public Integration removeIntegration(Integer integrationId) throws IntegrationException
+	public Integration removeIntegration(HttpSession session, Integer integrationId) throws IntegrationException
 	{
 		Integration integration = integrationDao.find(integrationId);
 
@@ -187,6 +188,7 @@ public class IMDHealthService
 		else
 		{
 			integrationDao.remove(integrationId);
+			IMDHealthCredentials.removeFromSession(session);
 		}
 
 		return integration;

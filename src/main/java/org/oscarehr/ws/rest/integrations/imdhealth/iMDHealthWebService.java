@@ -99,7 +99,7 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	{
 		// TODO security permissions
 		Integer returnValue = null;
-		Integration integration = imdHealthService.removeIntegration(integrationId);
+		Integration integration = imdHealthService.removeIntegration(getHttpServletRequest().getSession(), integrationId);
 
 		if (integration != null)
 		{
