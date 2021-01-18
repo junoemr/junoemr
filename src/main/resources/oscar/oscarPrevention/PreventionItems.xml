@@ -568,4 +568,13 @@ Varicella Immunoglobulin	VarIg
 		layout="PAPMAM"
 		showIfMinRecordNum="1" />
 
+	<item
+		resultDesc=""
+		desc="COVID-19"
+		name="COVID-19"
+		healthCanadaType="COVID-19"
+		layout="injection"
+		link="https://www.canada.ca/en/health-canada/services/drugs-health-products/covid19-industry/drugs-vaccines-treatments/vaccines.html"
+		showIfMinRecordNum="1" />
+
 </preventions>

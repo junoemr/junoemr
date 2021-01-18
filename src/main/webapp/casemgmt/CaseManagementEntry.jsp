@@ -476,6 +476,7 @@ if (pId==null) pId="";
 					<html:option value="telephone encounter weekdays 8am-6pm"><bean:message key="casemanagementEntry.telephoneencounterweekdays" /></html:option>
 					<html:option value="telephone encounter weekends or 6pm-8am"><bean:message key="casemanagementEntry.telephoneencounterweekends" /></html:option>
 				</oscarProp:oscarPropertiesCheck>
+				<html:option value="video encounter with client"><bean:message key="casemanagementEntry.videoencounterwithclient"/></html:option>
 				<html:option value="encounter without client"><bean:message key="casemanagementEntry.encounterwithoutclient" /></html:option>
 			</html:select></td>
 		</tr>

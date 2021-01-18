@@ -120,4 +120,14 @@ public class Integration extends AbstractModel<Integer> implements Serializable
     {
         this.integrationType = integrationType;
     }
+
+    public boolean isCloudMd()
+    {
+        return this.getIntegrationType().equals(INTEGRATION_TYPE_CLOUD_MD);
+    }
+
+    public boolean isMha()
+    {
+        return this.getIntegrationType().equals(INTEGRATION_TYPE_MHA);
+    }
 }

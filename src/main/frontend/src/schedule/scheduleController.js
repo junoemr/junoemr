@@ -682,11 +682,19 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				this.appointmentApi.updateAppointment(calendarAppointment).then(
 					function success(result)
 					{
-						deferred.resolve(result.data);
+					    deferred.resolve(result.data);
 					},
 					function failure(result)
 					{
-						$scope.displayMessages.add_standard_error("Failed to update appointment");
+					    let messageTemplate = "Failed to update appointment";
+                        const error = result.data.error;
+
+                        if (error && error.message)
+                        {
+                           messageTemplate += `: ${error.message}`;
+                        }
+
+                        $scope.displayMessages.add_standard_error(messageTemplate);
 						deferred.reject(result.data);
 					}
 				);
@@ -746,6 +754,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.saveEvent(true, movedAppointment).then(
 				function success(data)
 				{
+				    if (data.status === "ERROR")
+                    {
+                        deferred.reject(data.body);
+                    }
 					deferred.resolve(data.body);
 				},
 				function failure(data)

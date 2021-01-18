@@ -797,7 +797,7 @@
 					<!-- 3rd Party Billing No -->
 					<ca-field-text
 									ca-name="thirdPartyBillingNo"
-									ca-title="3'rd Party Billing #"
+									ca-title="3rd Party Billing #"
 									ca-model="$ctrl.provider.thirdPartyBillingNo"
 									ca-rows="1"
 									ca-text-placeholder=""

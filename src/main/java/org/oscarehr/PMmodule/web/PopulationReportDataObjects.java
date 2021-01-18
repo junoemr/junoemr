@@ -47,7 +47,7 @@ public class PopulationReportDataObjects {
 	}
 
 	/**
-	 * This object should hold a EncounterTypeDataRow for every encounter type in the system. (about 3 at the time of this writing).
+	 * This object should hold a EncounterTypeDataRow for every encounter type in the system. (about 4 at the time of this writing).
 	 */
 	public static class EncounterTypeDataGrid extends TreeMap<EncounterUtil.EncounterType, EncounterTypeDataRow>
 	{

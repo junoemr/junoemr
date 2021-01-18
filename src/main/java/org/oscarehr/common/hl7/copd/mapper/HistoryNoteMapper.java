@@ -92,6 +92,11 @@ public class HistoryNoteMapper extends AbstractMapper
 		return provider.getZHFReps();
 	}
 
+	public int getNumDemographicContacts()
+	{
+		return provider.getNK1Reps();
+	}
+
 	public List<CaseManagementNote> getSocialHistoryNoteList() throws HL7Exception
 	{
 		int numNotes = getNumSocialHistoryNotes();
@@ -110,10 +115,19 @@ public class HistoryNoteMapper extends AbstractMapper
 	public List<CaseManagementNote> getFamilyHistoryNoteList() throws HL7Exception
 	{
 		int numNotes = getNumFamilyHistoryNotes();
-		List<CaseManagementNote> noteList = new ArrayList<>(numNotes);
+		int numContacts = getNumDemographicContacts();
+		List<CaseManagementNote> noteList = new ArrayList<>(numNotes + numContacts);
 		for (int i = 0; i < numNotes; i++)
 		{
 			CaseManagementNote note = getFamilyHistoryNote(i);
+			if (note != null)
+			{
+				noteList.add(note);
+			}
+		}
+		for (int i = 0; i < numContacts; i++)
+		{
+			CaseManagementNote note = getContactAsNote(i);
 			if (note != null)
 			{
 				noteList.add(note);
@@ -215,13 +229,6 @@ public class HistoryNoteMapper extends AbstractMapper
 		Date diagnosisDate = getFamHistDiagnosisDate(rep);
 		if(diagnosisDate == null)
 		{
-			/* Wolf has stated that this field gets used for relationships & family related diseases,
-			 * and that if the date is missing or the description is 'unknown', the data can be ignored,
-			 * since it indicates a relationship that does not have enough info for the transfer */
-			if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
-			{
-				return null;
-			}
 			diagnosisDate = oldestEncounterNoteDate;
 		}
 
@@ -273,6 +280,59 @@ public class HistoryNoteMapper extends AbstractMapper
 		}
 		note.setNote(noteText + " - " + ConversionUtils.toDateString(procedureDate));
 
+		return note;
+	}
+
+	protected CaseManagementNote getContactAsNote(int rep) throws HL7Exception
+	{
+		String contactNoteText = "";
+
+		String contactFirstName = getContactFirstName(rep);
+		String contactLastName = getContactLastName(rep);
+		String contactAddress = getContactAddressLine(rep);
+		String contactRelationship = getContactRelationship(rep);
+		String contactPhone = getContactPhone(rep);
+		String contactRole = getContactRole(rep);
+		String contactOther = getOtherContactInfo(rep);
+
+		if(contactFirstName != null || contactLastName != null)
+		{
+			String contactTitle = getContactNamePrefix(rep);
+			contactNoteText += StringUtils.trimToEmpty(StringUtils.trimToEmpty(contactTitle) + " " +
+							StringUtils.trimToEmpty(StringUtils.trimToEmpty(contactFirstName) + " " + StringUtils.trimToEmpty(contactLastName))) + "\n";
+		}
+		if(contactRelationship != null)
+		{
+			contactNoteText += contactRelationship;
+		}
+		if(contactRole != null)
+		{
+			contactNoteText += contactRole;
+		}
+		if(contactOther != null)
+		{
+			contactNoteText += contactOther;
+		}
+		if(contactAddress != null)
+		{
+			contactNoteText += contactAddress;
+		}
+		if(contactPhone != null)
+		{
+			contactNoteText += contactPhone;
+		}
+
+		// if there is text, make the note
+		CaseManagementNote note = null;
+		if(StringUtils.trimToNull(contactNoteText) != null)
+		{
+			note = new CaseManagementNote();
+			note.setNote(contactNoteText);
+
+			// no date field in NK1 segment, so we have to pick something
+			note.setObservationDate(oldestEncounterNoteDate);
+			note.setUpdateDate(oldestEncounterNoteDate);
+		}
 		return note;
 	}
 
@@ -352,6 +412,49 @@ public class HistoryNoteMapper extends AbstractMapper
 	public String getFamHistComments(int rep) throws HL7Exception
 	{
 		return StringUtils.trimToNull(provider.getZHF(rep).getZhf8_comments().getValue());
+	}
+
+	protected String getContactFirstName(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getNK1(rep).getNk12_NKName(0).getXpn2_GivenName().getValue());
+	}
+	protected String getContactLastName(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getNK1(rep).getNk12_NKName(0).getXpn1_FamilyName().getFn1_Surname().getValue());
+	}
+	protected String getContactNamePrefix(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getNK1(rep).getNk12_NKName(0).getXpn5_PrefixEgDR().getValue());
+	}
+	protected String getContactRelationship(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getNK1(rep).getNk13_Relationship().getCe1_Identifier().getValue());
+	}
+	protected String getContactAddressLine(int rep) throws HL7Exception
+	{
+		String streetAddr = StringUtils.trimToEmpty(provider.getNK1(rep).getNk14_Address(0).getStreetAddress().getSad1_StreetOrMailingAddress().getValue());
+		String streetNum = StringUtils.trimToEmpty(provider.getNK1(rep).getNk14_Address(0).getStreetAddress().getSad2_StreetName().getValue());
+		String dwellingNum = StringUtils.trimToEmpty(provider.getNK1(rep).getNk14_Address(0).getStreetAddress().getSad3_DwellingNumber().getValue());
+		String city = StringUtils.trimToEmpty(provider.getNK1(rep).getNk14_Address(0).getXad3_City().getValue());
+		String province = StringUtils.trimToEmpty(provider.getNK1(rep).getNk14_Address(0).getXad4_StateOrProvince().getValue());
+		String country = StringUtils.trimToEmpty(provider.getNK1(rep).getNk14_Address(0).getXad6_Country().getValue());
+
+		return StringUtils.trimToNull(String.join(" ", streetAddr, streetNum, dwellingNum, city, province, country));
+	}
+	protected String getContactPhone(int rep) throws HL7Exception
+	{
+		String areaCode = StringUtils.trimToEmpty(provider.getNK1(rep).getNk15_PhoneNumber(0).getXtn6_AreaCityCode().getValue());
+		String number = StringUtils.trimToEmpty(provider.getNK1(rep).getNk15_PhoneNumber(0).getXtn7_PhoneNumber().getValue());
+
+		return StringUtils.trimToNull(areaCode + number);
+	}
+	protected String getContactRole(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getNK1(rep).getNk17_ContactRole().getCe1_Identifier().getValue());
+	}
+	protected String getOtherContactInfo(int rep) throws HL7Exception
+	{
+		return null;
 	}
 
 	static
