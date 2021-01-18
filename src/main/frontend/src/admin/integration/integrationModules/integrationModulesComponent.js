@@ -55,8 +55,8 @@ angular.module('Admin.Integration').component('integrationModules',
             {
                 name: "iMD Health",
                 enabled: false,
-                propertyName: "superadmin.integration.imdHealth.enabled",
-                configUrl: ""
+                propertyName: "integration.imdHealth.enabled",
+                configUrl: "#!/admin/imdHealth"
             }
 		];
 

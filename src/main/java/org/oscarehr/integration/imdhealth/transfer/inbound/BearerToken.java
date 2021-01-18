@@ -28,6 +28,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Data
@@ -40,4 +42,23 @@ public class BearerToken implements Serializable
 	private String tokenType;
 	@JsonProperty("created_at")
 	private Date createdAt;
+
+	private static final int EXPIRY_TIME_HOURS = 24;
+	
+	/**
+	 * Check if the bearer token is expired.  According to the latest documentation, a bearer token is valid
+	 * for 24 hours after the created_at date.
+	 * 
+	 * @return true if expired, false otherwise
+	 */
+	public boolean isExpired()
+	{
+		if (createdAt == null)
+		{
+			return true;
+		}
+
+		Instant expiryTime = createdAt.toInstant().plus(EXPIRY_TIME_HOURS, ChronoUnit.HOURS);
+		return Instant.now().isAfter(expiryTime);
+	}
 }

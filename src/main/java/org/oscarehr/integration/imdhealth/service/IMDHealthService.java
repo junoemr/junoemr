@@ -77,9 +77,14 @@ public class IMDHealthService
 	private static final Logger logger = MiscUtils.getLogger();
 
 	/**
-	 * Persist new IMDHealth SSO credentials
-	 * @param clientId
-	 * @param clientSecret
+	 * Create an iMD Health integration or update an existing iMD Health integration to the database.
+	 *
+	 * @param session user session
+	 * @param clientId iMD Health client id
+	 * @param clientSecret iMD Health client secret
+	 * @param siteId Optional Juno site id, null for single site instances, or to share an integration across all sites.
+	 *
+	 * @return Updated Juno integration object
 	 */
 	public Integration updateSSOCredentials(HttpSession session, String clientId, String clientSecret, @Nullable Integer siteId)
 	{
@@ -121,7 +126,7 @@ public class IMDHealthService
 	 *
 	 * @return URL formatted link to iMDHealth with SSO login credentials applied
 	 */
-	public String getSSOLink(HttpSession session, @Nullable Integer siteId) throws IMDHealthException
+	public String getSSOLink(HttpSession session, @Nullable Integer siteId) throws IntegrationException
 	{
 		IMDHealthCredentials credentials = fetchCredentials(session, siteId);
 		String returnString = "";
@@ -173,6 +178,7 @@ public class IMDHealthService
 	 * Remove an iMD Health integration from the database, returning it if found.  If not found, returns null.
 	 * Also removes the associated data from the session.
 	 *
+	 * @param session user session
 	 * @param integrationId id of the iMD Health integration to delete
 	 * @return Integration removed if found, null otherwise
 	 * @throws IntegrationException if the integration specified by integrationId is not an iMD Health integration.
@@ -181,12 +187,9 @@ public class IMDHealthService
 	{
 		Integration integration = integrationDao.find(integrationId);
 
-		if (integration != null && !integration.getIntegrationType().equals(Integration.INTEGRATION_TYPE_IMD_HEALTH))
+		if (integration != null)
 		{
-			throw new IntegrationException("Integration is not a valid iMD Health Integration");
-		}
-		else
-		{
+			checkIntegrationIsIMDType(integration);
 			integrationDao.remove(integrationId);
 			IMDHealthCredentials.removeFromSession(session);
 		}
@@ -209,7 +212,7 @@ public class IMDHealthService
 	{
 		IMDHealthCredentials credentials = IMDHealthCredentials.getFromSession(session);
 
-		if (credentials == null) // TODO: check 24 hour time limit on token, check if any part of the credentials are null, empty, etc
+		if (credentials == null || credentials.getBearerToken().isExpired())
 		{
 			Integration imdIntegration = integrationDao.findByIntegrationTypeAndSiteId(Integration.INTEGRATION_TYPE_IMD_HEALTH, siteId);
 
@@ -233,6 +236,7 @@ public class IMDHealthService
 	 *
 	 * @param imdHealthIntegration iMDHealth integration to use to login
 	 * @param session User session
+	 * @param siteId {optional} Juno site Id
 	 *
 	 * @return iMDHealth SSO credentials
 	 */
@@ -292,7 +296,7 @@ public class IMDHealthService
 			}
 			else
 			{
-				// TODO: Not yet implemented
+				// NOT YET IMPLEMENTED, WILL THROW RUNTIME EXCEPTION //
 				Site site = siteDao.find(siteId);
 				organization = SSOOrganization.fromSite(site, practiceId);
 			}
@@ -306,5 +310,16 @@ public class IMDHealthService
 			throw new SSOLoginException("IMDHealth Login error");
 		}
 
+	}
+
+	private static void checkIntegrationIsIMDType(Integration integration) throws IntegrationException
+	{
+		if (integration != null)
+		{
+			if (!integration.getIntegrationType().equals(Integration.INTEGRATION_TYPE_IMD_HEALTH))
+			{
+				throw new IntegrationException("Integration is not a valid iMDHealth integration");
+			}
+		}
 	}
 }

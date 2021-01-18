@@ -67,7 +67,8 @@ public class IMDHealthCredentials implements Serializable
 
 	void saveToSession(HttpSession session)
 	{
-		// TODO:  To fully impement multisites this will need to be refactored into a HashMap<siteID, credential> rather than just the credential object
+		// To fully impement multisites this will need to be refactored
+		// into a HashMap<siteID, credential> rather than just the credential object
 		session.setAttribute(IMD_CREDENTIALS_KEY, this);
 	}
 

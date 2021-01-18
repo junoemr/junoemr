@@ -39,7 +39,7 @@ public class SSOOrganization implements Serializable
 	private String countryCode = "CA";
 
 	@JsonProperty("external_id")
-	private String external_id;
+	private String externalId;
 
 	private String municipality;
 
@@ -56,7 +56,7 @@ public class SSOOrganization implements Serializable
 
 	public static SSOOrganization fromClinic(Clinic clinic, String practiceId)
 	{
-		if (StringUtils.isEmpty(practiceId))
+		if (StringUtils.isBlank(practiceId))
 		{
 			throw new RuntimeException();
 		}
@@ -67,7 +67,7 @@ public class SSOOrganization implements Serializable
 		// if the iMDHealth credentials are issued to CloudPractice instead of to each individual clinic.
 		// This also allows demo and live instances to connect to the same iMDHealth organization, provided
 		// that the practice id is constant between the two.
-		org.setExternal_id(practiceId);
+		org.setExternalId(practiceId);
 		org.setMunicipality(clinic.getClinicCity());
 		org.setName(clinic.getClinicName());
 		org.setSubdivisionCode(clinic.getClinicProvince());

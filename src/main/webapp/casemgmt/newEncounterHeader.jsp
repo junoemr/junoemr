@@ -177,7 +177,7 @@
 <td align=right>
 	<span class="HelpAboutLogout">
 		<%
-            if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_SUPERADMIN_IMDHEALTH_ENABLED, false))
+            if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_IMDHEALTH_ENABLED, false))
             {
         %>
                 <script src="../integration/imdHealth/imdHealthUtils.js"></script>

@@ -154,9 +154,9 @@ public class RecordUxService extends AbstractServiceImpl {
 
 		menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Health Tracker", Arrays.asList("record.tracker")));
 
-		if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_SUPERADMIN_IMDHEALTH_ENABLED, false))
+		if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_IMDHEALTH_ENABLED, false))
 		{
-			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Patient Education", Arrays.asList("record.patientEngagement")));
+			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Patient Education", Arrays.asList("record.patientEducation")));
 		}
 
 		//PHR

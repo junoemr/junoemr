@@ -28,6 +28,7 @@ import org.oscarehr.integration.exception.IntegrationException;
 import org.oscarehr.integration.imdhealth.service.IMDHealthService;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.service.IntegrationService;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.integrations.imdhealth.transfer.IMDHealthCredentialsTo1;
 import org.oscarehr.ws.rest.integrations.imdhealth.transfer.IMDHealthIntegrationTo1;
@@ -60,9 +61,8 @@ public class iMDHealthWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/")
-	public RestResponse<List<IMDHealthIntegrationTo1>> getIMAHealthIntegrations()
+	public RestResponse<List<IMDHealthIntegrationTo1>> getIMDHealthIntegrations()
 	{
-		// TODO security permissions
 		List<Integration> integrations = integrationService.findIntegrationsByType(Integration.INTEGRATION_TYPE_IMD_HEALTH);
 
 		List<IMDHealthIntegrationTo1> response = new ArrayList<>();
@@ -84,7 +84,8 @@ public class iMDHealthWebService extends AbstractServiceImpl
 	@Path("/")
 	public RestResponse<Integer> updateIntegration(IMDHealthCredentialsTo1 credentials)
 	{
-		// TODO: security permissions
+		requireSecurityOnEndpoint("_admin", SecurityInfoManager.PRIVILEGE_LEVEL.WRITE);
+
 		Integration integration = imdHealthService.updateSSOCredentials(getHttpServletRequest().getSession(),
 		                                      credentials.getClientId(),
 		                                      credentials.getClientSecret(),
@@ -93,11 +94,20 @@ public class iMDHealthWebService extends AbstractServiceImpl
 		return RestResponse.successResponse(integration.getId());
 	}
 
+	@PUT
+	@Path("/{integrationId}/Test")
+	public RestResponse<Boolean> testIntegration(@PathParam("integrationId") Integer integrationId) throws IntegrationException
+	{
+		boolean credentialsValid = imdHealthService.testIntegration(integrationId);
+		return RestResponse.successResponse(credentialsValid);
+	}
+
 	@DELETE
 	@Path("/{integrationId}")
 	public RestResponse<Integer> deleteIntegration(@PathParam("integrationId") Integer integrationId) throws IntegrationException
 	{
-		// TODO security permissions
+		requireSecurityOnEndpoint("_admin", SecurityInfoManager.PRIVILEGE_LEVEL.WRITE);
+
 		Integer returnValue = null;
 		Integration integration = imdHealthService.removeIntegration(getHttpServletRequest().getSession(), integrationId);
 
@@ -107,13 +117,5 @@ public class iMDHealthWebService extends AbstractServiceImpl
 		}
 
 		return RestResponse.successResponse(returnValue);
-	}
-
-	@PUT
-	@Path("/{integrationId}/Test")
-	public RestResponse<Boolean> testIntegration(@PathParam("integrationId") Integer integrationId) throws IntegrationException
-	{
-		boolean credentialsValid = imdHealthService.testIntegration(integrationId);
-		return RestResponse.successResponse(credentialsValid);
 	}
 }

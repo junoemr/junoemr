@@ -589,9 +589,9 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			templateUrl: 'src/record/tracker/tracker.jsp',
 			controller: 'Record.Tracker.TrackerController as trackerCtrl'
 		})
-        .state('record.patientEngagement',
+        .state('record.patientEducation',
         {
-            url: '/patientEngagement',
+            url: '/patientEducation',
             component: 'imdHealthLanding'
         })
 		.state('record.phr',

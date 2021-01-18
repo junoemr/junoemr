@@ -28,7 +28,7 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
     {
         templateUrl: 'src/admin/integration/imdHealth/imdHealthAdmin.jsp',
         bindings: {},
-        controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
+        controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$uibModal', function ($scope, $http, $httpParamSerializer, $state, $uibModal)
         {
             let ctrl = this;
             let imdHealthWebService = new IMDHealthApi ($http, $httpParamSerializer,
@@ -62,15 +62,16 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                     })
                     .catch((error) =>
                     {
-                        alert("Could not update integration");
+                        Juno.Common.Util.errorAlert($uibModal, "Error", "Could not update integration");
                         console.log(error);
                     });
 
             };
 
+
             ctrl.fetchIntegrations = () =>
             {
-                imdHealthWebService.getIMAHealthIntegrations()
+                imdHealthWebService.getIMDHealthIntegrations()
                     .then((response) =>
                     {
                         ctrl.imdIntegrations = response.data.body;
@@ -92,7 +93,7 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                         })
                         .catch((error) =>
                         {
-                            alert("Could not remove integration");
+                            Juno.Common.Util.errorAlert($uibModal, "Error", "Could not remove integration");
                             console.log(error);
                         })
                 }
@@ -107,11 +108,11 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
 
                         if (payload)
                         {
-                            alert("Integration is valid");
+                            Juno.Common.Util.successAlert($uibModal,"Success", "This iMD Health integration is valid");
                         }
                         else
                         {
-                            alert("Integration is invalid");
+                            Juno.Common.Util.errorAlert($uibModal, "Failure", "This iMD Health integration is invalid");
                         }
                     })
                     .catch((error) =>

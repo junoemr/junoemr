@@ -604,7 +604,7 @@ public class AdminNavService
 
 		integrationGroup.setName(resourceBundle.getString("admin.admin.Integration"));
 
-		if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_SUPERADMIN_IMDHEALTH_ENABLED, false))
+		if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_IMDHEALTH_ENABLED, false))
 		{
 			integrationItems.add(new AdminNavItemTo1("iMD Health", "imdHealth"));
 		}
