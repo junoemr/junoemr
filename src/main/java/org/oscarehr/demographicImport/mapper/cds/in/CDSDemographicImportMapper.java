@@ -32,16 +32,21 @@ import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePrefixCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
 import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
-import org.oscarehr.demographicImport.model.common.Person;
+import org.oscarehr.common.xml.cds.v5_0.model.PurposeEnumOrPlainText;
 import org.oscarehr.demographicImport.model.common.Address;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
+import org.oscarehr.demographicImport.model.contact.DemographicContact;
+import org.oscarehr.demographicImport.model.contact.ExternalContact;
+import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import javax.xml.bind.JAXBElement;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.oscarehr.demographic.model.Demographic.ROSTER_STATUS_NOT_ROSTERED;
 import static org.oscarehr.demographic.model.Demographic.ROSTER_STATUS_ROSTERED;
@@ -70,6 +75,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		mapHealthInsuranceInfo(importStructure, demographic);
 		mapContactInfo(importStructure, demographic);
 		mapCareTeamInfo(importStructure, demographic);
+		mapContacts(importStructure, demographic);
 		return demographic;
 	}
 
@@ -151,47 +157,21 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 
 		for(org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber importNumber : importStructure.getPhoneNumber())
 		{
-			PhoneNumber phoneNumber = new PhoneNumber();
+			PhoneNumber phoneNumber = getPhoneNumber(importNumber);
 
-			//TODO handle discrete phone number cases
-			for(JAXBElement<String> phoneElement : importNumber.getContent())
-			{
-				String key = phoneElement.getName().getLocalPart();
-				String value = phoneElement.getValue();
-				if("phoneNumber".equals(key) || "number".equals(key))
-				{
-					phoneNumber.setNumber(value);
-				}
-				else if("extension".equals(key))
-				{
-					phoneNumber.setExtension(value);
-				}
-				else
-				{
-					logger.error("Unknown Phone number component key: '" + key + "'");
-				}
-			}
-
-			PhoneNumberType type = importNumber.getPhoneNumberType();
-			if(PhoneNumberType.R.equals(type))
+			if(phoneNumber.isTypeHome())
 			{
 				demographic.setHomePhone(phoneNumber);
 			}
-			else if(PhoneNumberType.W.equals(type))
+			else if(phoneNumber.isTypeWork())
 			{
 				demographic.setWorkPhone(phoneNumber);
 			}
-			else if(PhoneNumberType.C.equals(type))
+			else if(phoneNumber.isTypeCell())
 			{
 				demographic.setCellPhone(phoneNumber);
 			}
-			else
-			{
-				logger.error("Invalid Phone Number Type: " + type);
-			}
 		}
-
-		//TODO map contacts (other demographic?, relations, etc.)
 	}
 
 	protected void mapCareTeamInfo(Demographics importStructure, Demographic demographic)
@@ -219,6 +199,48 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		}
 	}
 
+	protected void mapContacts(Demographics importStructure, Demographic demographic)
+	{
+		for(Demographics.Contact importContact : importStructure.getContact())
+		{
+			ExternalContact contact = new ExternalContact();
+			contact.setFirstName(importContact.getName().getFirstName());
+			// contact middle name not imported for now.
+			contact.setLastName(importContact.getName().getLastName());
+			contact.setEmail(importContact.getEmailAddress());
+
+			for(org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber importNumber : importStructure.getPhoneNumber())
+			{
+				PhoneNumber phoneNumber = getPhoneNumber(importNumber);
+
+				if(phoneNumber.isTypeHome())
+				{
+					contact.setHomePhone(phoneNumber);
+				}
+				else if(phoneNumber.isTypeWork())
+				{
+					contact.setWorkPhone(phoneNumber);
+				}
+				else if(phoneNumber.isTypeCell())
+				{
+					contact.setCellPhone(phoneNumber);
+				}
+			}
+
+			DemographicContact demographicContact = new DemographicContact(contact);
+			demographicContact.setRole(getContactRole(importContact.getContactPurpose()));
+			demographicContact.setEmergencyContact(isEmergencyContact(importContact.getContactPurpose()));
+			demographicContact.setSubstituteDecisionMaker(isSubstituteDecisionMaker(importContact.getContactPurpose()));
+			demographicContact.setNote(importContact.getNote());
+			demographicContact.setCategoryPersonal();
+			demographicContact.setConsentToContact(false);
+			demographicContact.setCreatedAt(LocalDateTime.now());
+			demographicContact.setUpdateDateTime(LocalDateTime.now());
+
+			demographic.addContact(demographicContact);
+		}
+	}
+
 	protected String getPatientStatus(Demographics.PersonStatusCode code)
 	{
 		String status = STATUS_ACTIVE;
@@ -239,14 +261,13 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			{
 				switch(plainTextCode)
 				{
-					//TODO additional mappings as we encounter them from external sources
 					case "I": status = STATUS_INACTIVE; break;
 					case "D": status = STATUS_DECEASED; break;
 					case "A": status = STATUS_ACTIVE; break;
 					default:
 					{
 						status = STATUS_ACTIVE;
-						logger.warn("Unknown patient status string: '" + plainTextCode + "'. patient status set to active");
+						logger.warn("Unknown patient status string: '" + plainTextCode + "'. Patient status set to active");
 						break;
 					}
 				}
@@ -276,5 +297,122 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			provider.setPractitionerNumber(mrp.getPrimaryPhysicianCPSO());
 		}
 		return provider;
+	}
+
+	protected PhoneNumber getPhoneNumber(org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber importNumber)
+	{
+		if(importNumber == null)
+		{
+			return null;
+		}
+		PhoneNumber phoneNumber = new PhoneNumber();
+
+		//TODO handle discrete phone number cases
+		for(JAXBElement<String> phoneElement : importNumber.getContent())
+		{
+			String key = phoneElement.getName().getLocalPart();
+			String value = phoneElement.getValue();
+			if("phoneNumber".equals(key) || "number".equals(key))
+			{
+				phoneNumber.setNumber(value);
+			}
+			else if("extension".equals(key))
+			{
+				phoneNumber.setExtension(value);
+			}
+			else
+			{
+				logger.error("Unknown Phone number component key: '" + key + "'");
+			}
+		}
+
+		PhoneNumberType type = importNumber.getPhoneNumberType();
+		if(PhoneNumberType.R.equals(type))
+		{
+			phoneNumber.setPhoneTypeHome();
+		}
+		else if(PhoneNumberType.W.equals(type))
+		{
+			phoneNumber.setPhoneTypeWork();
+		}
+		else if(PhoneNumberType.C.equals(type))
+		{
+			phoneNumber.setPhoneTypeCell();
+		}
+		else
+		{
+			logger.error("Invalid Phone Number Type: " + type);
+		}
+
+		return phoneNumber;
+	}
+
+	protected String getContactRole(List<PurposeEnumOrPlainText> purposeList)
+	{
+		String role = null;
+		for(PurposeEnumOrPlainText purpose : purposeList)
+		{
+			// why is the enum also a string?
+			String purposeStr = purpose.getPurposeAsEnum();
+			if(purposeStr == null)
+			{
+				purposeStr = purpose.getPurposeAsPlainText();
+			}
+
+			switch(purposeStr)
+			{
+				// cases copied from oscars cds 4 importer.
+				case "EC" : break; // special case value
+				case "SDM" : break; // special case value
+				case "NK" : role = "Next of Kin"; break;
+				case "AS" : role = "Administrative Staff"; break;
+				case "CG" : role = "Care Giver"; break;
+				case "PA" : role = "Power of Attorney"; break;
+				case "IN" : role = "Insurance"; break;
+				case "GT" : role = "Guarantor"; break;
+				default: role = purposeStr; break;
+			}
+		}
+
+		return role;
+	}
+
+
+	protected boolean isEmergencyContact(List<PurposeEnumOrPlainText> purposeList)
+	{
+		boolean result = false;
+		for(PurposeEnumOrPlainText purpose : purposeList)
+		{
+			String purposeStr = purpose.getPurposeAsEnum();
+			if(purposeStr == null)
+			{
+				purposeStr = purpose.getPurposeAsPlainText();
+			}
+			if("EC".equalsIgnoreCase(purposeStr) || "Emergency contact".equalsIgnoreCase(purposeStr))
+			{
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
+
+	protected boolean isSubstituteDecisionMaker(List<PurposeEnumOrPlainText> purposeList)
+	{
+		boolean result = false;
+		for(PurposeEnumOrPlainText purpose : purposeList)
+		{
+			String purposeStr = purpose.getPurposeAsEnum();
+			if(purposeStr == null)
+			{
+				purposeStr = purpose.getPurposeAsPlainText();
+			}
+			if("SDM".equalsIgnoreCase(purposeStr) || "Substitute decision maker".equalsIgnoreCase(purposeStr))
+			{
+				result = true;
+				break;
+			}
+		}
+		return result;
 	}
 }

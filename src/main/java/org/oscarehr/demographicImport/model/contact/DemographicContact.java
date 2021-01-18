@@ -31,22 +31,48 @@ import java.time.LocalDateTime;
 @Data
 public class DemographicContact extends AbstractTransientModel
 {
+	public enum CATEGORY
+	{
+		PERSONAL,
+		PROFESSIONAL,
+	}
+
 	private Contact contact;
 	private String role;
 	private String note;
-	private Boolean consentToContact;
-	private Boolean ec;
-	private Boolean sdm;
-	private Boolean mrp;
+	private CATEGORY category;
+	private boolean consentToContact;
+	private boolean emergencyContact;
+	private boolean substituteDecisionMaker;
 
 	private LocalDateTime updateDateTime;
-	private Boolean deleted;
+	private boolean deleted;
 	private Provider createdBy;
 	private LocalDateTime createdAt;
 
 
 	public DemographicContact(Contact contact)
 	{
+		this.contact = contact;
+	}
 
+	public void setCategoryPersonal()
+	{
+		this.setCategory(CATEGORY.PERSONAL);
+	}
+
+	public void setCategoryProfessional()
+	{
+		this.setCategory(CATEGORY.PROFESSIONAL);
+	}
+
+	public boolean isCategoryPersonal()
+	{
+		return CATEGORY.PERSONAL.equals(this.category);
+	}
+
+	public boolean isCategoryProfessional()
+	{
+		return CATEGORY.PROFESSIONAL.equals(this.category);
 	}
 }

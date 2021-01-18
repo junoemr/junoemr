@@ -34,6 +34,7 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.service.DemographicContactService;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographicImport.converter.in.PreventionModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.ReviewerModelToDbConverter;
@@ -94,6 +95,9 @@ public class ImportExportService
 
 	@Autowired
 	private DemographicService demographicService;
+
+	@Autowired
+	private DemographicContactService demographicContactService;
 
 	@Autowired
 	private DocumentService documentService;
@@ -220,6 +224,7 @@ public class ImportExportService
 		demographic.setId(dbDemographic.getId());
 		logger.info("persisted new demographic: " + demographic.getId());
 
+		demographicContactService.addNewContacts(demographic.getContactList(), dbDemographic);
 		persistNotes(demographic, dbDemographic);
 		persistLabs(demographic, dbDemographic);
 

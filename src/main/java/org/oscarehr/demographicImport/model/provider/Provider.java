@@ -89,7 +89,14 @@ public class Provider extends AbstractTransientModel implements Person, Contact
 	{
 		if(this.addressList != null && !this.addressList.isEmpty())
 		{
-			return this.addressList.get(0);
+			for(Address address : addressList)
+			{
+				// return the first current address found
+				if(address.isCurrentAddress())
+				{
+					return address;
+				}
+			}
 		}
 		return null;
 	}
@@ -97,6 +104,12 @@ public class Provider extends AbstractTransientModel implements Person, Contact
 	public void setAddress(Address address)
 	{
 		this.addAddress(address);
+	}
+
+	@Override
+	public String getIdString()
+	{
+		return getId();
 	}
 
 	@Override

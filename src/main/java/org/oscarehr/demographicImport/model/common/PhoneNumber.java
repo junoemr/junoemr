@@ -28,9 +28,16 @@ import org.oscarehr.demographicImport.model.AbstractTransientModel;
 @Data
 public class PhoneNumber extends AbstractTransientModel
 {
+	public enum PHONE_TYPE {
+		HOME,
+		WORK,
+		CELL,
+	}
+
 	private String number;
 	private String extension;
 	private boolean primaryContactNumber;
+	private PHONE_TYPE phoneType;
 
 	public PhoneNumber()
 	{
@@ -61,5 +68,31 @@ public class PhoneNumber extends AbstractTransientModel
 			return "(" + number.substring(0,3) + ")" + number.substring(3,6) + "-" + number.substring(6);
 		}
 		return null;
+	}
+
+	public void setPhoneTypeHome()
+	{
+		this.setPhoneType(PHONE_TYPE.HOME);
+	}
+	public void setPhoneTypeWork()
+	{
+		this.setPhoneType(PHONE_TYPE.WORK);
+	}
+	public void setPhoneTypeCell()
+	{
+		this.setPhoneType(PHONE_TYPE.CELL);
+	}
+
+	public boolean isTypeHome()
+	{
+		return (PHONE_TYPE.HOME.equals(this.getPhoneType()));
+	}
+	public boolean isTypeWork()
+	{
+		return (PHONE_TYPE.WORK.equals(this.getPhoneType()));
+	}
+	public boolean isTypeCell()
+	{
+		return (PHONE_TYPE.CELL.equals(this.getPhoneType()));
 	}
 }

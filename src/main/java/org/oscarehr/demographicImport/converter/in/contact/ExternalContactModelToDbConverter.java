@@ -20,33 +20,30 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model.contact;
+package org.oscarehr.demographicImport.converter.in.contact;
 
-import org.oscarehr.demographicImport.model.common.Address;
-import org.oscarehr.demographicImport.model.common.PhoneNumber;
+import org.oscarehr.common.model.Contact;
+import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
+import org.oscarehr.demographicImport.model.contact.ExternalContact;
+import org.springframework.stereotype.Component;
 
-public interface Contact
+@Component
+public class ExternalContactModelToDbConverter
+		extends BaseModelToDbConverter<ExternalContact, Contact>
 {
-	String getIdString();
+	@Override
+	public Contact convert(ExternalContact input)
+	{
+		Contact contact = new Contact();
 
-	String getFirstName();
-	void setFirstName(String firstName);
+		if(input.getId() != null)
+		{
+			contact.setId(Integer.parseInt(input.getId()));
+		}
+		contact.setFirstName(input.getFirstName());
+		contact.setLastName(input.getLastName());
+		contact.setEmail(input.getEmail());
 
-	String getLastName();
-	void setLastName(String lastName);
-
-	Address getAddress();
-	void setAddress(Address address);
-
-	PhoneNumber getHomePhone();
-	void setHomePhone(PhoneNumber phone);
-
-	PhoneNumber getWorkPhone();
-	void setWorkPhone(PhoneNumber phone);
-
-	PhoneNumber getCellPhone();
-	void setCellPhone(PhoneNumber phone);
-
-	String getEmail();
-	void setEmail(String email);
+		return contact;
+	}
 }

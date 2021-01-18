@@ -157,7 +157,7 @@
 			<li id="${ dContact.id }" class="hovereffect ${ rowclass }" >
 			
 				<span class="label"> 
-					<c:out value="${ dContact.role }" />					
+					<c:out value="${ dContact.role }" />
 				</span>
 				
 				<c:if test="${ workPhone eq internal }" > 
@@ -197,10 +197,10 @@
 					<td class="alignRight alignTop smallText">Fax: </td>
 					<td class="alignLeft alignTop smallText"><c:out value="${ not empty dContact.details.fax ? dContact.details.fax : unknown }" /></td>
 				</tr>
-				<tr>
-					<td class="alignRight alignTop smallText">CPSO: </td>
-					<td><c:out value="${ dContact.details.cpso }" /></td>
-				</tr>
+<%--				<tr>--%>
+<%--					<td class="alignRight alignTop smallText">CPSO: </td>--%>
+<%--					<td><c:out value="${ dContact.details.cpso }" /></td>--%>
+<%--				</tr>--%>
 			</table>
 			
 		</c:forEach>

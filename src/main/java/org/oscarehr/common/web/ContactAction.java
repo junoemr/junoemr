@@ -697,6 +697,8 @@ public class ContactAction extends DispatchAction {
 				contact = buildContact( professionalSpecialist );
 				c.setDetails(contact);
 			}
+
+			logger.info("contact has details? " + c.getDetails() != null ? "true" : "false");
 		}
 
 		return contacts;

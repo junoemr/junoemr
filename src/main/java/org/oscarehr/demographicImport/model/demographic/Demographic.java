@@ -215,6 +215,12 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 	}
 
 	@Override
+	public String getIdString()
+	{
+		return String.valueOf(getId());
+	}
+
+	@Override
 	public String getTitleString()
 	{
 		if(this.title != null)
@@ -238,7 +244,14 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 	{
 		if(this.addressList != null && !this.addressList.isEmpty())
 		{
-			return this.addressList.get(0);
+			for(Address address : addressList)
+			{
+				// return the first current address found
+				if(address.isCurrentAddress())
+				{
+					return address;
+				}
+			}
 		}
 		return null;
 	}

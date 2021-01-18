@@ -29,8 +29,9 @@ import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import java.time.LocalDateTime;
 
 @Data
-public abstract class ExternalContact implements Contact
+public class ExternalContact implements Contact
 {
+	private String id;
 	private String lastName;
 	private String firstName;
 	private Address address;
@@ -43,4 +44,10 @@ public abstract class ExternalContact implements Contact
 
 	boolean deleted;
 	private LocalDateTime updateDate;
+
+	@Override
+	public String getIdString()
+	{
+		return getId();
+	}
 }
