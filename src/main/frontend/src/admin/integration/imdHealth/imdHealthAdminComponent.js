@@ -40,7 +40,7 @@ angular.module('Admin.Integration').component('imdHealthAdmin',
                 clientSecret: ""
             };
 
-            ctrl.imdIntegrations = null;
+            ctrl.imdIntegrations = [];
 
             ctrl.LABEL_POSITION = LABEL_POSITION;
             ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;

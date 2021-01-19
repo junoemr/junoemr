@@ -48,7 +48,7 @@ angular.module('Admin.Integration').component('imdHealthLanding',
                         }
                         else
                         {
-                            this.message = "Missing credentials.\nPlease configure your iMD Integration";
+                            ctrl.message = "Missing credentials.\nPlease configure your iMD Integration";
                         }
 
 
@@ -56,7 +56,7 @@ angular.module('Admin.Integration').component('imdHealthLanding',
                     .catch((error) =>
                     {
                         console.log(error);
-                        this.message = "There was a problem connecting to iMD Health.\nPlease check your integration settings and try again"
+                        ctrl.message = "There was a problem connecting to iMD Health.\nPlease check your integration settings and try again"
                     })
             }
         }]

@@ -48,7 +48,7 @@
         </juno-button>
     </div>
     <div class="integrations-container">
-        <panel ng-if="$ctrl.imdIntegrations" component-style="$ctrl.componentStyle">
+        <panel ng-if="$ctrl.imdIntegrations.length > 0" component-style="$ctrl.componentStyle">
             <panel-header>
                 <div>
                     <h6>Active Integrations</h6>
