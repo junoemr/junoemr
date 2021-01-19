@@ -34,13 +34,16 @@ import org.oscarehr.common.xml.cds.v5_0.model.OfficialSpokenLanguageCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePartTypeCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePrefixCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePurposeCode;
+import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimpleWithMiddleName;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameStandard;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
 import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
-import org.oscarehr.demographicImport.model.common.Person;
+import org.oscarehr.common.xml.cds.v5_0.model.PurposeEnumOrPlainText;
 import org.oscarehr.demographicImport.model.common.Address;
+import org.oscarehr.demographicImport.model.common.Person;
+import org.oscarehr.demographicImport.model.contact.DemographicContact;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
@@ -53,6 +56,8 @@ import static org.oscarehr.demographic.model.Demographic.ROSTER_STATUS_ROSTERED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_STATUS_FALSE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
 
@@ -81,9 +86,8 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		demographics.getPhoneNumber().addAll(getExportPhones(exportStructure));
 		demographics.setPreferredOfficialLanguage(getExportOfficialLanguage(exportStructure));
 		demographics.setPreferredSpokenLanguage(exportStructure.getSpokenLanguage());
-//		demographics.getContact().add(null); //TODO
+		demographics.getContact().addAll(getContacts(exportStructure.getContactList()));
 		demographics.setNoteAboutPatient(exportStructure.getPatientNote());
-		//TODO where to export alert, as part of patient Note?
 		demographics.setEnrolment(getEnrollment(exportStructure));
 		demographics.setPrimaryPhysician(getExportPrimaryPhysician(exportStructure));
 		demographics.setEmail(exportStructure.getEmail());
@@ -305,6 +309,63 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		//TODO include history from the archive?
 
 		return enrolment;
+	}
+
+	protected List<Demographics.Contact> getContacts(List<DemographicContact> demographicContactList)
+	{
+		List<Demographics.Contact> contactList = new ArrayList<>();
+		for(DemographicContact demographicContact : demographicContactList)
+		{
+			Demographics.Contact contact = objectFactory.createDemographicsContact();
+			PersonNameSimpleWithMiddleName personNameSimpleWithMiddleName = objectFactory.createPersonNameSimpleWithMiddleName();
+			personNameSimpleWithMiddleName.setFirstName(demographicContact.getContact().getFirstName());
+			personNameSimpleWithMiddleName.setLastName(demographicContact.getContact().getLastName());
+			// no middle names to export in Juno
+
+			contact.setName(personNameSimpleWithMiddleName);
+			contact.setEmailAddress(demographicContact.getContact().getEmail());
+			contact.setNote(demographicContact.getNote());
+
+			//contact phone conversion
+			org.oscarehr.demographicImport.model.common.PhoneNumber homePhone = demographicContact.getContact().getHomePhone();
+			org.oscarehr.demographicImport.model.common.PhoneNumber workPhone = demographicContact.getContact().getWorkPhone();
+			org.oscarehr.demographicImport.model.common.PhoneNumber cellPhone = demographicContact.getContact().getCellPhone();
+			if(homePhone != null)
+			{
+				contact.getPhoneNumber().add(getExportPhone(PhoneNumberType.R, homePhone));
+			}
+			if(workPhone != null)
+			{
+				contact.getPhoneNumber().add(getExportPhone(PhoneNumberType.W, workPhone));
+			}
+			if(cellPhone != null)
+			{
+				contact.getPhoneNumber().add(getExportPhone(PhoneNumberType.C, cellPhone));
+			}
+
+			// contact reason/purpose
+			PurposeEnumOrPlainText purposeEnumOrPlainText = objectFactory.createPurposeEnumOrPlainText();
+			purposeEnumOrPlainText.setPurposeAsPlainText(demographicContact.getRole());
+			contact.getContactPurpose().add(purposeEnumOrPlainText);
+
+			if(demographicContact.isEmergencyContact())
+			{
+				// add a second purpose to indicate emergency contact designation
+				PurposeEnumOrPlainText purposeText = objectFactory.createPurposeEnumOrPlainText();
+				purposeEnumOrPlainText.setPurposeAsPlainText(DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE);
+				contact.getContactPurpose().add(purposeText);
+			}
+			if(demographicContact.isSubstituteDecisionMaker())
+			{
+				// add a second purpose to indicate emergency contact designation
+				PurposeEnumOrPlainText purposeText = objectFactory.createPurposeEnumOrPlainText();
+				purposeEnumOrPlainText.setPurposeAsPlainText(DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE);
+				contact.getContactPurpose().add(purposeText);
+			}
+
+			contactList.add(contact);
+		}
+		return contactList;
 	}
 
 }

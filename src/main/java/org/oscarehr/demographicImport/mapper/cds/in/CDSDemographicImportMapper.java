@@ -55,6 +55,8 @@ import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_CODE_CANADA;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
 
 @Component
@@ -362,8 +364,8 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			switch(purposeStr)
 			{
 				// cases copied from oscars cds 4 importer.
-				case "EC" : break; // special case value
-				case "SDM" : break; // special case value
+				case DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE : break; // special case value
+				case DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE : break; // special case value
 				case "NK" : role = "Next of Kin"; break;
 				case "AS" : role = "Administrative Staff"; break;
 				case "CG" : role = "Care Giver"; break;
@@ -388,7 +390,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			{
 				purposeStr = purpose.getPurposeAsPlainText();
 			}
-			if("EC".equalsIgnoreCase(purposeStr) || "Emergency contact".equalsIgnoreCase(purposeStr))
+			if(DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE.equalsIgnoreCase(purposeStr) || "Emergency contact".equalsIgnoreCase(purposeStr))
 			{
 				result = true;
 				break;
@@ -407,7 +409,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			{
 				purposeStr = purpose.getPurposeAsPlainText();
 			}
-			if("SDM".equalsIgnoreCase(purposeStr) || "Substitute decision maker".equalsIgnoreCase(purposeStr))
+			if(DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE.equalsIgnoreCase(purposeStr) || "Substitute decision maker".equalsIgnoreCase(purposeStr))
 			{
 				result = true;
 				break;

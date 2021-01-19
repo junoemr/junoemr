@@ -67,4 +67,7 @@ public class CDSConstants
 	public static final String Y_INDICATOR_FALSE = "N";
 
 	public static final String DRUG_IDENTIFICATION_NUMBER = "DIN";
+
+	public static final String DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE = "EC";
+	public static final String DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE = "SDM";
 }
