@@ -119,8 +119,7 @@ String labStatus = "";
 if (ackList != null){
     for (int i=0; i < ackList.size(); i++){
         ReportStatus reportStatus = (ReportStatus) ackList.get(i);
-        //added this to avoid NullPointerException in special circumstance when reportStatus.getProviderNo is null.  Happened in dr_iriarte with funny labs
-        if ( reportStatus.getProviderNo() != null && reportStatus.getProviderNo().equals(providerNo) ) {
+        if ( reportStatus.getProviderNo().equals(providerNo) ) {
             labStatus = reportStatus.getStatus();
             if(labStatus.equals("A") ){
             	ackFlag = true;
@@ -196,7 +195,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                              
                              var commentID = "comment_" + labId;
                              var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
-                             console.log("hello from lanDisplayAjax.jsp");
+
                              if (comment && comment.length > 0)
                              {
                                  $(commentID).value = comment;
