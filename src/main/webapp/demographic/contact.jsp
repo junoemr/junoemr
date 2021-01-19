@@ -67,7 +67,7 @@
 		<option value="Other">Other</option>
 	</select>
 
-	<input type="text" name="contact_<%=id%>.customRole" id="contact_<%=id%>.customRole" size="20" style="display: hidden"/>
+	<input type="text" name="contact_<%=id%>.customRole" id="contact_<%=id%>.customRole" size="20" style="display: none"/>
 
 
 	&nbsp;

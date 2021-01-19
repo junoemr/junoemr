@@ -209,7 +209,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			contact.setLastName(importContact.getName().getLastName());
 			contact.setEmail(importContact.getEmailAddress());
 
-			for(org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber importNumber : importStructure.getPhoneNumber())
+			for(org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber importNumber : importContact.getPhoneNumber())
 			{
 				PhoneNumber phoneNumber = getPhoneNumber(importNumber);
 

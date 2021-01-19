@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.model.common;
 
 import lombok.Data;
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
 @Data
@@ -58,5 +59,11 @@ public class Address extends AbstractTransientModel
 	public boolean isPastAddress()
 	{
 		return this.residencyStatus.equals(RESIDENCY_STATUS.PAST);
+	}
+
+	public String getAddressLinesString()
+	{
+		return StringUtils.trimToNull(
+				StringUtils.trimToEmpty(getAddressLine1()) + " " + StringUtils.trimToEmpty(getAddressLine2()));
 	}
 }

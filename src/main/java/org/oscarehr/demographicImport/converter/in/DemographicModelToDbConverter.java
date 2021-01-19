@@ -86,8 +86,7 @@ public class DemographicModelToDbConverter
 			// TODO how to handle multiple addresses?
 			if(address.isCurrentAddress())
 			{
-				dbDemographic.setAddress(StringUtils.trimToNull(
-						StringUtils.trimToEmpty(address.getAddressLine1()) + " " + StringUtils.trimToEmpty(address.getAddressLine2())));
+				dbDemographic.setAddress(address.getAddressLinesString());
 				dbDemographic.setCity(address.getCity());
 				dbDemographic.setProvince(address.getRegionCode());
 				dbDemographic.setPostal(address.getPostalCode());

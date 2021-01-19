@@ -24,6 +24,8 @@ package org.oscarehr.demographicImport.converter.in.contact;
 
 import org.oscarehr.common.model.Contact;
 import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
+import org.oscarehr.demographicImport.model.common.Address;
+import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.contact.ExternalContact;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +45,37 @@ public class ExternalContactModelToDbConverter
 		contact.setFirstName(input.getFirstName());
 		contact.setLastName(input.getLastName());
 		contact.setEmail(input.getEmail());
+
+		Address address = input.getAddress();
+		if(address != null)
+		{
+			contact.setAddress(address.getAddressLine1());
+			contact.setAddress2(address.getAddressLine2());
+			contact.setCity(address.getCity());
+			contact.setProvince(address.getRegionCode());
+			contact.setCountry(address.getCountryCode());
+			contact.setPostal(address.getPostalCode());
+		}
+
+		// phone conversions
+		PhoneNumber homePhone = input.getHomePhone();
+		if(homePhone != null)
+		{
+			contact.setResidencePhone(homePhone.getNumber());
+		}
+
+		PhoneNumber cellPhone = input.getCellPhone();
+		if(cellPhone != null)
+		{
+			contact.setCellPhone(cellPhone.getNumber());
+		}
+
+		PhoneNumber workPhone = input.getWorkPhone();
+		if(workPhone != null)
+		{
+			contact.setWorkPhone(workPhone.getNumber());
+			contact.setWorkPhoneExtension(workPhone.getExtension());
+		}
 
 		return contact;
 	}
