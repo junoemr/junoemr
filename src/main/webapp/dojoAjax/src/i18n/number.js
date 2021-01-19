@@ -65,7 +65,7 @@ dojo.i18n.number.format = function(value, flags /*optional*/, locale /*optional*
 		output = output + whole;
 	}
 
-//TODO: what if flags.places is Infinity?
+//TODO-legacy: what if flags.places is Infinity?
 	if (flags.places > 0){
 	//Q: Is it safe to convert to a string and split on ".", or might that be locale dependent?  Use Math for now.
 		var fract = value - Math.floor(value);
@@ -73,7 +73,7 @@ dojo.i18n.number.format = function(value, flags /*optional*/, locale /*optional*
 		output = output + flags.decimal + fract;
 	}
 
-//TODO: exp
+//TODO-legacy: exp
 
 	return output;
 };
@@ -110,7 +110,7 @@ dojo.i18n.number.parse = function(value, locale /*optional*/, flags /*optional*/
 	var whole = Number(numbers[0].replace(new RegExp("\\" + flags.separator, "g"), ""));
 	var fract = (numbers.length == 1) ? 0 : Number(numbers[1]) / Math.pow(10, String(numbers[1]).length); // could also do Number(whole + "." + numbers[1]) if whole != NaN
 
-//TODO: exp
+//TODO-legacy: exp
 
 	return whole + fract;
 };
@@ -178,8 +178,8 @@ dojo.i18n.number.isReal = function(value, locale /*optional*/, flags /*optional*
 	return re.test(value);
 };
 
-//TODO: hide in a closure?
-//TODO: change to use hashes and mixins, rather than arrays
+//TODO-legacy: hide in a closure?
+//TODO-legacy: change to use hashes and mixins, rather than arrays
 //Q: fallback algorithm/how to structure table:
 // does it make sense to look by country code most of the time (wildcard match on
 // language, except where it's relevant) and provide default country when only
@@ -284,8 +284,8 @@ dojo.i18n.number.FORMAT_TABLE = {
 
 dojo.i18n.number._mapToLocalizedFormatData = function(table, locale){
 	locale = dojo.hostenv.normalizeLocale(locale);
-//TODO: most- to least-specific search? search by country code?
-//TODO: implement aliases to simplify and shorten tables
+//TODO-legacy: most- to least-specific search? search by country code?
+//TODO-legacy: implement aliases to simplify and shorten tables
 	var data = table[locale];
 	if (typeof data == 'undefined'){data = table['*'];}
 	return data;

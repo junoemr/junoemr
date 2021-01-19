@@ -6,7 +6,7 @@
 <!--
   -
   This jsp fragment displays the Bill Type drop down which is used by the MSP and WCB "corrections" screens.
-  TODO: Localize Strings
+  TODO-legacy: Localize Strings
 -->
 <%
   BillingFormData billForm = new BillingFormData();

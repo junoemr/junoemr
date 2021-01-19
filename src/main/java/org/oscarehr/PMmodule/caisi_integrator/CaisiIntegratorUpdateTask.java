@@ -705,7 +705,7 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 				pushDxresearchs(lastDataUpdated, facility, demographicService, demographicId);
 				benchTimer.tag("pushDxresearchs");
 
-				// TODO Need additional methods for other billing regions here.
+				// TODO-legacy Need additional methods for other billing regions here.
 				if( OscarProperties.getInstance().isOntarioBillingType() ) {
 					pushBillingItems(lastDataUpdated, facility, demographicService, demographicId);
 					benchTimer.tag("pushBillingItems");
@@ -768,14 +768,14 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 		logger.debug("Total pushAllDemographics :" + (System.currentTimeMillis() - startTime));
 	}
 
-	//TODO: DemographicExt are not sent?
+	//TODO-legacy: DemographicExt are not sent?
 	private void pushDemographic(Date lastDataUpdated, Facility facility, DemographicWs service, Integer demographicId, Integer facilityId) throws ShutdownException {
 		DemographicTransfer demographicTransfer = new DemographicTransfer();
 
 		// set demographic info
 		Demographic demographic = demographicDao.getDemographicById(demographicId);
 
-		//TODO: we can remove this once we know our demographic id list is good
+		//TODO-legacy: we can remove this once we know our demographic id list is good
 		if(demographic.getLastUpdateDate().before(lastDataUpdated)) return;
 
 
@@ -965,7 +965,7 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 			cachedAdmission.setCaisiProgramId(admission.getProgramId());
 			cachedAdmission.setDischargeDate(DateUtils.toCalendar(admission.getDischargeDate()));
 			cachedAdmission.setDischargeNotes(admission.getDischargeNotes());
-			//TODO:missing status from the whole transfer?
+			//TODO-legacy:missing status from the whole transfer?
 
 			cachedAdmissions.add(cachedAdmission);
 
@@ -1179,7 +1179,7 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 	private void pushForms(Date lastDataUpdated, Facility facility, DemographicWs demographicWs, Integer demographicId) throws ShutdownException, SQLException, IOException, ParseException {
 		logger.debug("pushing demographic forms facilityId:" + facility.getId() + ", demographicId:" + demographicId);
 
-		// TODO add additional methods for other forms here
+		// TODO-legacy add additional methods for other forms here
 		
 		if( OscarProperties.getInstance().isOntarioInstanceType() ) {
 			// LabReq2007 and up is only used in Ontario
@@ -1565,7 +1565,7 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 		logger.debug("pushing billingitems facilityId:" + facility.getId() + ", demographicId:" + demographicId);
 
 		List<BillingONCHeader1> billingCh1s = billingONItemDao.getCh1ByDemographicNoSince(demographicId, lastDataUpdated);
-		//TODO: don't think we need this based on my tests, but ideally, you'd want to check the timestamps of the billing items, and make sure you have a
+		//TODO-legacy: don't think we need this based on my tests, but ideally, you'd want to check the timestamps of the billing items, and make sure you have a
 		//full list of billing headers..but I couldn't replicate editing a bill without the header being updated..so i'll just leave this
 		//as a note.
 

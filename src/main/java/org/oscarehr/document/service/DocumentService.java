@@ -234,7 +234,7 @@ public class DocumentService
 	                           Integer programId
 	) throws IOException, InterruptedException
 	{
-		//TODO - replace AddEditDocumentForm with transfer object
+		//TODO-legacy - replace AddEditDocumentForm with transfer object
 
 		// load existing models & retrieve file object
 		Document documentModel = documentDao.find(documentNo);

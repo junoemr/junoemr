@@ -357,8 +357,8 @@ public class Appointment
 					endDateTime,
 					details.getJunoColor(),
 					null,
-					"text-dark",       // TODO remove?
-					providerId, // TODO remove?
+					"text-dark",       // TODO-legacy remove?
+					providerId, // TODO-legacy remove?
 					null,
 					null,
 					appointment

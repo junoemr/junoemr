@@ -44,7 +44,7 @@ public class VacancyTemplateData {
 	private List<Range> ranges = new ArrayList<Range>();
 	private boolean option;
 	private boolean range;
-	//TODO: Probably want to use the Gender object here. I'm not sure where these values are coming from at this time
+	//TODO-legacy: Probably want to use the Gender object here. I'm not sure where these values are coming from at this time
 	private List<String> transaGender = Arrays.asList("male","female","m","f","transgender");
 
 	public int matches(String value) {

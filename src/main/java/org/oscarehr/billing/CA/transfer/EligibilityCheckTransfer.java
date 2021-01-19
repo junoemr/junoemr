@@ -41,7 +41,7 @@ public class EligibilityCheckTransfer implements Serializable
 	private String message;
 	private ValidationStatus validationStatus = ValidationStatus.INCOMPLETE;
 
-	//TODO refactor this out of the transfer object
+	//TODO-legacy refactor this out of the transfer object
 	@XmlTransient
 	private String realFilename;
 

@@ -96,7 +96,7 @@ public class HtmlToPdfServlet extends HttpServlet
 				over.setFontAndSize(font, 10);
 				float center = reader.getPageSize(i).getWidth() / 2.0f;
 
-				// TODO Consider refactoring this into is own class 
+				// TODO-legacy Consider refactoring this into is own class
 				printText(over, "Page " + i + " of " + reader.getNumberOfPages(), center, 35);
 				printText(over, OscarProperties.getConfidentialityStatement(), center, 25);
 			}

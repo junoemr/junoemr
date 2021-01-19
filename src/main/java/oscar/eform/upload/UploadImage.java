@@ -84,10 +84,10 @@ public class UploadImage extends HttpServlet{
                 }
             }
         } catch (FileUploadException e) {
-            // TODO Auto-generated catch block
+            // TODO-legacy Auto-generated catch block
             MiscUtils.getLogger().error("Error", e);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            // TODO-legacy Auto-generated catch block
             MiscUtils.getLogger().error("Error", e);
         }   
         

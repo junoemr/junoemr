@@ -427,7 +427,7 @@ public class AdmissionDao extends AbstractDao<Admission> {
     }
 
     
-    // TODO: rewrite
+    // TODO-legacy: rewrite
     @SuppressWarnings("unchecked")
     public Admission getCurrentBedProgramAdmission(ProgramDao programDAO, Integer demographicNo) {
         if (programDAO == null) {
@@ -463,7 +463,7 @@ public class AdmissionDao extends AbstractDao<Admission> {
         return null;
     }
 
-    // TODO: rewrite
+    // TODO-legacy: rewrite
     @SuppressWarnings("unchecked")
     public List<Admission> getCurrentServiceProgramAdmission(ProgramDao programDAO, Integer demographicNo) {
         if (programDAO == null) {

@@ -369,7 +369,7 @@ public class OscarFormManager {
 		List<CaisiFormInstance> result = caisiFormInstanceDao.findByFormId(formId);
 		
 		
-		//TODO: combine the two variables into a set..single call
+		//TODO-legacy: combine the two variables into a set..single call
 		//questions description,location (1_0_1)
 		Map<String,String> questions = getQuestionDescriptions(form);		
 		//question types

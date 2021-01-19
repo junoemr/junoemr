@@ -34,7 +34,7 @@ angular.module("Common.Services").service("eFormService", [
 
 		service.apiPath = '../ws/rs/eform';
 
-		//TODO this file is not used anywhere and requires testing
+		//TODO-legacy this file is not used anywhere and requires testing
 		service.saveEForm = function saveEForm()
 		{
 			var deferred = $q.defer();

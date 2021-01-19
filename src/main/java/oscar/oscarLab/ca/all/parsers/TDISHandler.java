@@ -535,7 +535,7 @@ public class TDISHandler extends ORU_R01MessageHandler
 			ca.uhn.hl7v2.model.v25.segment.OBX obx_res = obr_res.get(j);
 
 			//int obx_res_reps = obx_res.getNatureOfAbnormalTestReps();
-			//TODO: fix so that it can handle multiple nature results
+			//TODO-legacy: fix so that it can handle multiple nature results
 			/*
 			for (int k=0; k<obx_res_reps; k++){
 				ca.uhn.hl7v2.model.v25.datatype.ID nature = res.getNatureOfAbnormalTest(k);
@@ -935,7 +935,7 @@ public class TDISHandler extends ORU_R01MessageHandler
 
 	@Override
     public String getRequestDate(int i) {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 	    return null;
     }
     public String getNteForPID(){

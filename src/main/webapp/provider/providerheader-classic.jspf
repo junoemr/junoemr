@@ -172,7 +172,7 @@ function popupPage2(varpage) {
  <a href='<%=request.getContextPath()%>/provider/providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&caseload=1&clProv=<%=curUser_no%>'>Caseload</a>
  </li>
 
-<!-- TODO:mobile version code excluded here re-visit -->
+<!-- TODO-legacy:mobile version code excluded here re-visit -->
 
 <caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
  <security:oscarSec roleName="<%=roleName$%>" objectName="_resource" rights="r">

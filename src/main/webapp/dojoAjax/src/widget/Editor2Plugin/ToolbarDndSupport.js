@@ -8,7 +8,7 @@
 		http://dojotoolkit.org/community/licensing.shtml
 */
 
-/*TODO:
+/*TODO-legacy:
  * Add a command to toggle DnD support for a toolbar
  * Save/restore order of toolbar/item
  */

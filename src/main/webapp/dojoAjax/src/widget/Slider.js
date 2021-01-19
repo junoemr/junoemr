@@ -79,7 +79,7 @@ dojo.widget.defineWidget (
 		snapValuesY: 0,
 
 		// should the handle snap to the grid or remain where it was dragged to?
-		// FIXME: snapToGrid=false is logically in conflict with setting snapValuesX and snapValuesY
+		// FIXME-legacy: snapToGrid=false is logically in conflict with setting snapValuesX and snapValuesY
 		_snapToGrid: true,
 
 		// isEnableX: Boolean
@@ -688,7 +688,7 @@ dojo.widget.defineWidget (
 
 		// initialValue: Number
 		//	sets initialValueX.
-		//	TODO: should be called "value".  Also, common attributes between SliderHorizontal/SliderVertical
+		//	TODO-legacy: should be called "value".  Also, common attributes between SliderHorizontal/SliderVertical
 		//	should be consolidated to Slider1D base class
 		initialValue: "",
 

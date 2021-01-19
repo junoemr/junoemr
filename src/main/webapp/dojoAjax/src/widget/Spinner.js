@@ -432,7 +432,7 @@ dojo.widget.defineWidget(
 	},
 
 	adjustValue: function(/*Number*/ direction, /*Number*/ x){
-	//FIXME: formatting should make use of dojo.date.format?
+	//FIXME-legacy: formatting should make use of dojo.date.format?
 		var val = this.getValue();
 		var format = (this.flags.format && this.flags.format.search(/[Hhmst]/) >= 0) ? this.flags.format : "hh:mm:ss t";
 		if(direction == 0 || !val.length || !this.isValid()){ return; }

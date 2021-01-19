@@ -56,7 +56,7 @@ public class BillingOnTransactionDao extends AbstractDao<BillingOnTransaction> {
 		try {
 			billTrans.setAdmissionDate(admissionDateFormat.parse(String.valueOf(cheader1.getAdmissionDate())));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// TODO-legacy Auto-generated catch block
 			MiscUtils.getLogger().info(e.toString());
 			billTrans.setAdmissionDate(null);
 		}
@@ -97,14 +97,14 @@ public class BillingOnTransactionDao extends AbstractDao<BillingOnTransaction> {
 		try {
 			billTrans.setAdmissionDate(admissionDateFormat.parse(cheader1.getAdmission_date()));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// TODO-legacy Auto-generated catch block
 			MiscUtils.getLogger().info(e.toString());
 			billTrans.setAdmissionDate(null);
 		}
 		try {
 			billTrans.setBillingDate(admissionDateFormat.parse(cheader1.getBilling_date()));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
+			// TODO-legacy Auto-generated catch block
 			MiscUtils.getLogger().info(e.toString());
 			billTrans.setBillingDate(null);
 		}

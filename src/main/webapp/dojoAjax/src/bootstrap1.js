@@ -159,7 +159,7 @@ dojo.evalObjPath = function(/*String*/ path, /*Boolean?*/ create){
 dojo.errorToString = function(/*Error*/ exception){
 	// summary: Return an exception's 'message', 'description' or text.
 
-	// TODO: overriding Error.prototype.toString won't accomplish this?
+	// TODO-legacy: overriding Error.prototype.toString won't accomplish this?
  	// 		... since natively generated Error objects do not always reflect such things?
 	if(!dj_undef("message", exception)){
 		return exception.message;		// String

@@ -63,7 +63,7 @@ public class BackupDownload extends GenericDownload {
 		download(bDownload, res, dir, filename, null);
 	}
 
-	//TODO: Refactor this out of the security tag.
+	//TODO-legacy: Refactor this out of the security tag.
 	private String rights = "r";
 
 	private Object[] getPrivilegeProp(String objName) {

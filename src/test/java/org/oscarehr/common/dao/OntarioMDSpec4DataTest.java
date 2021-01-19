@@ -1118,7 +1118,7 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
         CaseManagementNote jeremyDoeAlzeimersNote = getCaseManagementNote(tenYearsAgo,jeremyDoe,drw.getProviderNo(),"Alzheimers at age 63",oscarProgramID, caseManagementIssueJeremyDoeDM);
         caseManagementNoteDAO.saveNote(jeremyDoeAlzeimersNote);
 
-        //TODO: follow up age of onset isn't in ongoing concerns
+        //TODO-legacy: follow up age of onset isn't in ongoing concerns
 
 
 
@@ -1261,12 +1261,12 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
         lii.setLoggedInProvider(new Provider("999998"));
         ticklerManager.addTickler(lii,tickler);
 
-        //TODO:  Overdue Referral: Geriatrician
+        //TODO-legacy:  Overdue Referral: Geriatrician
 
         //<%!  %>Outstanding Lab Request:  one GFR, one Bilirubin, one Glucose Fasting and one HbA1C  (see Lab Reports / Lab Results)
         FrmLabReq07Record labReqDao = new FrmLabReq07Record();
         try{
-        	labReqDao.saveFormRecord(getLabReqProperties()); //:TODO Need to pass changing data to getLabReqProperties
+        	labReqDao.saveFormRecord(getLabReqProperties()); //:TODO-legacy Need to pass changing data to getLabReqProperties
         }catch(Exception juneElderLabReq){
         	MiscUtils.getLogger().error("Error",juneElderLabReq);
         }
@@ -2964,10 +2964,10 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 
 
     	//medications
-        //TODO:need multiple dosage column
+        //TODO-legacy:need multiple dosage column
 
     	//immunizations
-        //TODO:Need preventionExt
+        //TODO-legacy:Need preventionExt
         prevention = getPrevention(getDate("2008-01-01"),"TB",coleenCopper.getDemographicNo(),drs.getProviderNo(),false,false);
 
     	preventionDao.persist(prevention);
@@ -3233,7 +3233,7 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
         caseManagementNoteExtDAO.save(silviuSilverOngoingConcernsdm2Ext);
 
         //immunizations
-        //TODO:Need preventionExt
+        //TODO-legacy:Need preventionExt
 
 
       //measurements
@@ -3759,7 +3759,7 @@ Past Medical and Surgical History:	TAH  BSO at 48 yo (menometrorrhagia)
     	measurements=  getMeasurement("ECG",eightMinus3,debbieDiabetes.getDemographicNo(),"Yes",drs.getProviderNo());
     	measurementsDao.persist(measurements);
 
-    	//Psychosocial  Screening TODO: where does this go?
+    	//Psychosocial  Screening TODO-legacy: where does this go?
 
     	//referenceMinus1Week
     	//fourMinus1Week

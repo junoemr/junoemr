@@ -99,8 +99,8 @@ public class QrCodeUtils {
 	}
 
 	/**
-	 * TODO - re-write and refactor this method. This was cobbled together from example code after a library version upgrade broke it.
-	 * TODO - This needs to be tested
+	 * TODO-legacy - re-write and refactor this method. This was cobbled together from example code after a library version upgrade broke it.
+	 * TODO-legacy - This needs to be tested
 	 */
 	public static BufferedImage toSingleQrCodeBufferedImage(String content, ErrorCorrectionLevel errorCorrection, int scaleFactor) throws WriterException
 	{

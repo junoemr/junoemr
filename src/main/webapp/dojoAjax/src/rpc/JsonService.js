@@ -26,7 +26,7 @@ dojo.rpc.JsonService = function(args){
 			// we assume it's an SMD file to be processed, since this was the
 			// earlier function signature
 
-			// FIXME: also accept dojo.uri.Uri objects?
+			// FIXME-legacy: also accept dojo.uri.Uri objects?
 			this.connect(args);
 		}else{
 			// otherwise we assume it's an arguments object with the following

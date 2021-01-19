@@ -72,7 +72,7 @@ dojo.widget.defineWidget(
 			selectedTime: "selectedItem"
 		};
 		
-		this.any = "any"; //FIXME: never used?
+		this.any = "any"; //FIXME-legacy: never used?
 		
 		// dom node indecies for selected hour, minute, amPm, and "any time option"
 		this.selectedTime = {
@@ -120,10 +120,10 @@ dojo.widget.defineWidget(
 	},
 
 	initData: function() {
-		// FIXME: doesn't currently validate the time before trying to set it
+		// FIXME-legacy: doesn't currently validate the time before trying to set it
 		// Determine the date/time from stored info, or by default don't 
 		//  have a set time
-		// FIXME: should normalize against whitespace on storedTime... for now 
+		// FIXME-legacy: should normalize against whitespace on storedTime... for now 
 		// just a lame hack
 		if(this.storedTime.indexOf("T")!=-1 && this.storedTime.split("T")[1] && this.storedTime!=" " && this.storedTime.split("T")[1]!="any"){
 			this.time = dojo.widget.TimePicker.util.fromRfcDateTime(this.storedTime, this.useDefaultMinutes, this.selectedTime.anyTime);
@@ -351,7 +351,7 @@ dojo.widget.TimePicker.util = new function() {
 			jsDate = new Date();
 		}
 		jsDate.setSeconds(0);
-		return dojo.date.strftime(jsDate, "%Y-%m-%dT%H:%M:00%z"); //FIXME: use dojo.date.toRfc3339 instead
+		return dojo.date.strftime(jsDate, "%Y-%m-%dT%H:%M:00%z"); //FIXME-legacy: use dojo.date.toRfc3339 instead
 	}
 
 	this.fromRfcDateTime = function(rfcDate, useDefaultMinutes, isAnyTime) {

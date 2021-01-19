@@ -93,7 +93,7 @@ public class SQLReporter implements Reporter
 			nativeSQL = reportByTemplateService.getTemplateSQL(templateId, request.getParameterMap());
 			logger.info("SQL: " + nativeSQL);
 
-			//TODO re-design or fully remove this new functionality??
+			//TODO-legacy re-design or fully remove this new functionality??
 //			if(curReport.isSequence()) {
 //				return generateSequencedReport(request);
 //			}

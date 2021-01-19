@@ -203,7 +203,7 @@ public class ThirdApptTimeReporter implements Reporter
             } //end while
             
         	if (schedDate != null) {
-        		// TODO refactor to use ConversionUtils when commit makes it thorugh
+        		// TODO-legacy refactor to use ConversionUtils when commit makes it thorugh
         		long msInDay = 1000 * 60 * 60 * 24;
         		numDays = (int) (Math.abs(schedDate.getTime() - ConversionUtils.fromDateString(date_from).getTime()) / msInDay);
         	}

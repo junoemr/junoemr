@@ -1011,7 +1011,7 @@ rangy.createModule("DomUtil", function(api, module) {
 
     /**
      * Currently iterates through all nodes in the range on creation until I think of a decent way to do it
-     * TODO: Look into making this a proper iterator, not requiring preloading everything first
+     * TODO-legacy: Look into making this a proper iterator, not requiring preloading everything first
      * @constructor
      */
     function RangeNodeIterator(range, nodeTypes, filter) {
@@ -1946,7 +1946,7 @@ rangy.createModule("DomUtil", function(api, module) {
 
         // Sometimes collapsing a TextRange that's at the start of a text node can move it into the previous node, so
         // check for that
-        // TODO: Find out when. Workaround for wholeRangeContainerElement may break this
+        // TODO-legacy: Find out when. Workaround for wholeRangeContainerElement may break this
         if (!dom.isAncestorOf(wholeRangeContainerElement, containerElement, true)) {
             containerElement = wholeRangeContainerElement;
 
@@ -2174,7 +2174,7 @@ rangy.createModule("DomUtil", function(api, module) {
                 return this.nativeRange.cloneContents();
             };
 
-            // TODO: Until I can find a way to programmatically trigger the Firefox bug (apparently long-standing, still
+            // TODO-legacy: Until I can find a way to programmatically trigger the Firefox bug (apparently long-standing, still
             // present in 3.6.8) that throws "Index or size is negative or greater than the allowed amount" for
             // insertNode in some circumstances, all browsers will have to use the Rangy's own implementation of
             // insertNode, which works but is almost certainly slower than the native implementation.
@@ -4982,7 +4982,7 @@ wysihtml5.dom.parse = (function() {
     for (attributeName in attributes) {
       // Setting attributes can cause a js error in IE under certain circumstances
       // eg. on a <img> under https when it's new attribute value is non-https
-      // TODO: Investigate this further and check for smarter handling
+      // TODO-legacy: Investigate this further and check for smarter handling
       try {
         newNode.setAttribute(attributeName, attributes[attributeName]);
       } catch(e) {}
@@ -5020,7 +5020,7 @@ wysihtml5.dom.parse = (function() {
     } else if (HAS_GET_ATTRIBUTE_BUG && "outerHTML" in node) {
       // Don't trust getAttribute/hasAttribute in IE 6-8, instead check the element's outerHTML
       var outerHTML      = node.outerHTML.toLowerCase(),
-          // TODO: This might not work for attributes without value: <input disabled>
+          // TODO-legacy: This might not work for attributes without value: <input disabled>
           hasAttribute   = outerHTML.indexOf(" " + attributeName +  "=") != -1;
       
       return hasAttribute ? node.getAttribute(attributeName) : null;
@@ -5031,7 +5031,7 @@ wysihtml5.dom.parse = (function() {
   
   /**
    * Check whether the given node is a proper loaded image
-   * FIXME: Returns undefined when unknown (Chrome, Safari)
+   * FIXME-legacy: Returns undefined when unknown (Chrome, Safari)
    */
   function _isLoadedImage(node) {
     try {
@@ -5461,7 +5461,7 @@ wysihtml5.dom.replaceWithChildNodes = function(node) {
 
       // Catch js errors and pass them to the parent's onerror event
       // addEventListener("error") doesn't work properly in some browsers
-      // TODO: apparently this doesn't work in IE9!
+      // TODO-legacy: apparently this doesn't work in IE9!
       iframeWindow.onerror = function(errorMessage, fileName, lineNumber) {
         throw new Error("wysihtml5.Sandbox: " + errorMessage, fileName, lineNumber);
       };
@@ -5650,7 +5650,7 @@ wysihtml5.dom.replaceWithChildNodes = function(node) {
  * @author Christopher Blum
  */
 wysihtml5.quirks.cleanPastedHTML = (function() {
-  // TODO: We probably need more rules here
+  // TODO-legacy: We probably need more rules here
   var defaultRules = {
     // When pasting underlined links <a> into a contentEditable, IE thinks, it has to insert <u> to keep the styling
     "a u": wysihtml5.dom.replaceWithChildNodes
@@ -6188,7 +6188,7 @@ wysihtml5.quirks.cleanPastedHTML = (function() {
 
     /**
      * Scroll the current caret position into the view
-     * FIXME: This is a bit hacky, there might be a smarter way of doing this
+     * FIXME-legacy: This is a bit hacky, there might be a smarter way of doing this
      *
      * @example
      *    selection.scrollIntoView();
@@ -6944,7 +6944,7 @@ wysihtml5.Commands = Base.extend(
   
   wysihtml5.commands.createLink = {
     /**
-     * TODO: Use HTMLApplier or formatInline here
+     * TODO-legacy: Use HTMLApplier or formatInline here
      *
      * Turns selection into a link
      * If selection is already a link, it removes the link and wraps it with a <code> element
@@ -7868,7 +7868,7 @@ wysihtml5.Commands = Base.extend(
   });
 })(wysihtml5);
 /**
- * TODO: the following methods still need unit test coverage
+ * TODO-legacy: the following methods still need unit test coverage
  */
 wysihtml5.views.View = Base.extend(
   /** @scope wysihtml5.views.View.prototype */ {

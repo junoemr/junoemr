@@ -285,7 +285,7 @@ public class ChildImmunizationReport implements PreventionReport{
 
 
 
-   //TODO: THIS MAY NEED TO BE REFACTORED AT SOME POINT IF MAM and PAP are exactly the same
+   //TODO-legacy: THIS MAY NEED TO BE REFACTORED AT SOME POINT IF MAM and PAP are exactly the same
 
                 //Get last contact method?
                     //NO contact

@@ -25,7 +25,7 @@
 --%>
 
 <%--
-	TODO: This template must be refactored to not use jstl taglibs,
+	TODO-legacy: This template must be refactored to not use jstl taglibs,
 	e.g. c:forEach c:set c:redirect c:out
 	Replace with angular
 --%>

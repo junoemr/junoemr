@@ -123,7 +123,7 @@ public class GenerateTeleplanFileAction extends Action{
     }
 }
 /*
- // TODO:
+ // TODO-legacy:
  
  *-should i create a BillingDAO object? i think so
  *-should i create a billactivity primary key? i think so done

@@ -493,7 +493,7 @@ public class BillingCreateBillingAction extends Action {
   }
 
   /**
-   * @todo Document Me
+   * @todo-legacy Document Me
    * @param errors ActionMessages
    * @param demo Demographic
    */

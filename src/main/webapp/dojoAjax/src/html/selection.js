@@ -99,7 +99,7 @@ dojo.html.selectInputText = function(/*DomNode*/element){
 		range.select();
 	}else if(_window["getSelection"]){
 		var selection = _window.getSelection();
-		// FIXME: does this work on Safari?
+		// FIXME-legacy: does this work on Safari?
 		element.setSelectionRange(0, element.value.length);
 	}
 	element.focus();
@@ -266,7 +266,7 @@ dojo.lang.mixin(dojo.html.selection, {
 			}
 		}else if(_window["getSelection"]){
 			var selection = _window.getSelection();
-			// FIXME: does this work on Safari?
+			// FIXME-legacy: does this work on Safari?
 			if(selection["removeAllRanges"]){ // Mozilla
 				var range = _document.createRange() ;
 				range.selectNode(element) ;

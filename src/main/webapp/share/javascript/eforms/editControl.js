@@ -355,7 +355,7 @@ function Select(selectname)
 function loadTemplate(selectname)
 {
 	//change the iframe src to that selected in the template select box
-	//TODO fix the eventlistener! in the meantime just set the dirty flag
+	//TODO-legacy fix the eventlistener! in the meantime just set the dirty flag
 	setDirtyFlag();
   	var cursel = document.getElementById(selectname).selectedIndex;
   	

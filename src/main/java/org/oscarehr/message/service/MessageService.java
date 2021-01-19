@@ -104,7 +104,7 @@ public class MessageService
 			ml.setMessage(message.getId());
 			ml.setProviderNo(provider.getId());
 			ml.setStatus(messageStatus);
-			//TODO do I need to set the location?
+			//TODO-legacy do I need to set the location?
 			messageListDao.persist(ml);
 		}
 

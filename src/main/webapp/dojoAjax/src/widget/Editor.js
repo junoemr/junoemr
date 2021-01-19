@@ -8,7 +8,7 @@
 		http://dojotoolkit.org/community/licensing.shtml
 */
 
-/* TODO:
+/* TODO-legacy:
  * - font selector
  * - test, bug fix, more features :)
 */
@@ -116,7 +116,7 @@ dojo.lang.extend(dojo.widget.Editor, {
 			case "forecolor":
 			case "hilitecolor":
 				props.name = name;
-				props.toggleItem = true; // FIXME: they aren't exactly toggle items
+				props.toggleItem = true; // FIXME-legacy: they aren't exactly toggle items
 				props.icon = this.getCommandImage(name);
 				break;
 
@@ -346,7 +346,7 @@ dojo.lang.extend(dojo.widget.Editor, {
 		if(!this._toolbarContainer) { return; }
 
 		// keeps the toolbar from updating too frequently
-		// TODO: generalize this functionality?
+		// TODO-legacy: generalize this functionality?
 		var diff = new Date() - this._updateToolbarLastRan;
 		if(!force && this._updateToolbarLastRan && (diff < this._updateToolbarFrequency)) {
 			clearTimeout(this._updateToolbarTimer);
@@ -385,7 +385,7 @@ dojo.lang.extend(dojo.widget.Editor, {
 								value = null;
 							}
 						}
-						if(!value) { value = "justifyleft"; } // TODO: query actual style
+						if(!value) { value = "justifyleft"; } // TODO-legacy: query actual style
 						item.setValue(value, false, true);
 					}
 				} catch(err) {}
@@ -421,7 +421,7 @@ dojo.lang.extend(dojo.widget.Editor, {
 	supportedCommands: dojo.widget.Editor.supportedCommands.concat(),
 
 	isSupportedCommand: function(cmd) {
-		// FIXME: how do we check for ActiveX?
+		// FIXME-legacy: how do we check for ActiveX?
 		var yes = dojo.lang.inArray(cmd, this.supportedCommands);
 		if(!yes) {
 			try {
@@ -449,7 +449,7 @@ dojo.lang.extend(dojo.widget.Editor, {
 	},
 
 	_save: function(e){
-		// FIXME: how should this behave when there's a larger form in play?
+		// FIXME-legacy: how should this behave when there's a larger form in play?
 		if(!this._richText.isClosed){
 			if(this.saveUrl.length){
 				var content = {};

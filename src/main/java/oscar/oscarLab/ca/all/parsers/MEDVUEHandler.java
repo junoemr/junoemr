@@ -628,7 +628,7 @@ public class MEDVUEHandler extends ORU_R01MessageHandler
 
 	@Override
     public String getRequestDate(int i) {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 	    return null;
     }
 	

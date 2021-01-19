@@ -181,7 +181,7 @@ public class LoginFilter implements Filter {
 					Date thisRequestDate = new Date();	
 					long timeSinceLastRequest = -1;
 					if (lastRequestDate != null){ 
-						long timeBeforeExpire = 60 * 1000 * minLimit; //TODO need to use this Also need to get it from a property
+						long timeBeforeExpire = 60 * 1000 * minLimit; //TODO-legacy need to use this Also need to get it from a property
 						long lastRequest = lastRequestDate.getTime();
 						long thisRequest = thisRequestDate.getTime();
 						timeSinceLastRequest = thisRequest - lastRequest;

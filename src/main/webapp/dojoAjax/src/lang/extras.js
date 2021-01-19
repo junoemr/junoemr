@@ -42,7 +42,7 @@ dojo.lang.setTimeout = function(/*Function*/func, /*int*/delay /*, ...*/){
 dojo.lang.clearTimeout = function(/*int*/timer){
 	// summary: clears timer by number from the execution queue
 
-	// FIXME:
+	// FIXME-legacy:
 	//		why do we have this function? It's not portable outside of browser
 	//		environments and it's a stupid wrapper on something that browsers
 	//		provide anyway.
@@ -125,7 +125,7 @@ dojo.lang.setObjPathValue = function(/*String*/objpath, /*anything*/value, /*Obj
 	//	context: if not specified, dj_global is used
 	//	create: if true, undefined objects in the path are created.
 
-	// FIXME: why is this function valuable? It should be scheduled for
+	// FIXME-legacy: why is this function valuable? It should be scheduled for
 	// removal on the grounds that dojo.parseObjPath does most of it's work and
 	// is more straightforward and has fewer dependencies. Also, the order of
 	// arguments is bone-headed. "context" should clearly come after "create".

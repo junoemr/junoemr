@@ -428,7 +428,7 @@ padding-left:10px;
 }
 </style>
 
-<%//todo: temp hack
+<%//todo-legacy: temp hack
 String tracker = "";
 if( request.getParameter("tracker")!=null && request.getParameter("tracker").equals("slim") ){ 
 tracker="&tracker=slim";
@@ -551,7 +551,7 @@ div.preventionSection {
     	<%}%>
     }
     
-//TODO: Most likely this will be removed
+//TODO-legacy: Most likely this will be removed
 	function newSite(s,d) {
 		var url = "<%=request.getContextPath()%>/oscarEncounter/GraphMeasurements.do?demographic_no=<%=demographic_no%>&type="+s;
 		$("#graphModalLabel").html(d);
@@ -1481,7 +1481,7 @@ function createAddAll(d,t){
     	<li><a href="#templates" data-toggle="tab" title="new forms to be completed"><bean:message key="global.templates" /></a></li>
     	
     	
-    	<%if(temp.toUpperCase().equals("PHV")){ //temp for PHV TODO: make generic so the below links will be user added/managed %>
+    	<%if(temp.toUpperCase().equals("PHV")){ //temp for PHV TODO-legacy: make generic so the below links will be user added/managed %>
     	<li><a href="#resources" data-toggle="tab" title="">Resources</a></li>
 		<%} %>
     </ul>
@@ -1748,7 +1748,7 @@ $(document).ready(function () {
         //$(window).resize(checkWidth);
 	}
 
-	//TODO:these will change generic so this function can be re-used
+	//TODO-legacy:these will change generic so this function can be re-used
 	$("input:radio[name=SmokingStatus]").click(function() {
 	    var value = $(this).val().toLowerCase();
 	    if(value=="yes"){
@@ -1875,7 +1875,7 @@ $(document).ready(function () {
     		$(this).addClass('input-error');
     		$(this).removeClass('input-success');
 
-    		//TODO: when able to save individual measurments 
+    		//TODO-legacy: when able to save individual measurments
     		 //$('#save_'+id).attr('disabled','disabled');
     		return false;
     		
@@ -1884,7 +1884,7 @@ $(document).ready(function () {
            			$(this).removeClass('input-error');
                 	$(this).addClass('input-success');
 
-            	////TODO: when able to save individual measurments 
+            	//TODO-legacy: when able to save individual measurments
             	//$('#save_'+id).removeAttr('disabled');
 
             	
@@ -1939,7 +1939,7 @@ $(document).ready(function () {
 
 		$('#'+type).removeClass(' input-error').addClass(' input-success');
 		
-		//TODO: post single measurments instead of passing complete form
+		//TODO-legacy: post single measurments instead of passing complete form
 	 	//alert("input type: "+inputType+" not empty" + type + link+qs1+qs2);
 		/*
         $.ajax({

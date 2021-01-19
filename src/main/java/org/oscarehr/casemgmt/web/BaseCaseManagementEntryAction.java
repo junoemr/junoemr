@@ -263,7 +263,7 @@ public class BaseCaseManagementEntryAction extends DispatchAction {
 		caseManagementMgr.updateCurrentIssueToCPP(demoNo, caseiss);
 	}
 
-	//TODO: update access model
+	//TODO-legacy: update access model
 	public void setCPPMedicalHistory(CaseManagementCPP cpp, String providerNo,List accessRight)	{
 
 		if (caseManagementMgr.greaterEqualLevel(3, providerNo))	{

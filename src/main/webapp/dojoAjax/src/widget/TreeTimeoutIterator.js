@@ -29,7 +29,7 @@ dojo.require("dojo.widget.TreeCommon");
  *
  * finishFunc/finishObj called at the end
  *
- * TODO: it should work only sync-way to solve CPU-hungry tasks 
+ * TODO-legacy: it should work only sync-way to solve CPU-hungry tasks 
  */
  dojo.declare(
  	"dojo.widget.TreeTimeoutIterator",

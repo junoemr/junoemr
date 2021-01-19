@@ -418,7 +418,7 @@ public class JdbcBillingCorrection {
 		try {
 			billTrans.setAdmissionDate(new SimpleDateFormat("yyyy-MM-dd").parse(billHeader.getAdmission_date()));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// TODO-legacy Auto-generated catch block
 			billTrans.setAdmissionDate(null);
 		}
 		try {
@@ -470,7 +470,7 @@ public class JdbcBillingCorrection {
 		try {
 			billTrans.setAdmissionDate(new SimpleDateFormat("yyyy-MM-dd").parse(billHeader.getAdmission_date()));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// TODO-legacy Auto-generated catch block
 			billTrans.setAdmissionDate(null);
 		}
 		try {

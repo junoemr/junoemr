@@ -252,7 +252,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         flowsheetSettings = new HashMap<String,Flowsheet>();
 
         EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
-        //TODO: Will change this when there are more flowsheets
+        //TODO-legacy: Will change this when there are more flowsheets
         log.debug("LOADING FLOWSSHEETS");
         for (Resource flowSheet : flowSheets)
         {
@@ -1099,7 +1099,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
                             item.addContent(rules);
                         }
 
-                        FlowSheetItem fsi = mFlowsheet.getFlowSheetItem(mstring);  //TODO: MOVE THIS UP AND REPLACE THE CODE ABOVE
+                        FlowSheetItem fsi = mFlowsheet.getFlowSheetItem(mstring);  //TODO-legacy: MOVE THIS UP AND REPLACE THE CODE ABOVE
                         List<TargetColour> targetColour =fsi.getTargetColour();
                         log.debug("TARGET COLOURS"+targetColour);
 

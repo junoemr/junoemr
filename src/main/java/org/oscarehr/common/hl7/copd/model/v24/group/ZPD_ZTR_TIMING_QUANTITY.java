@@ -36,7 +36,7 @@ public class ZPD_ZTR_TIMING_QUANTITY extends AbstractGroup
 		super(parent, factory);
 		try
 		{
-			// TODO -- figure out why this is v25 and up????
+			// TODO-legacy -- figure out why this is v25 and up????
 			this.add(TQ1.class, true, true);
 			this.add(TQ2.class, false, false);
 		}

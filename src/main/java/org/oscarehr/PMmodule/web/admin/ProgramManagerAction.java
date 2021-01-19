@@ -945,7 +945,7 @@ public class ProgramManagerAction extends DispatchAction {
 			}	
 				
 			//Call Match Manager
-			//TODO do the testing
+			//TODO-legacy do the testing
 			try {
 		        matchManager.processEvent(vacancy, IMatchManager.Event.VACANCY_CREATED);
 	        } catch (MatchManagerException e) {

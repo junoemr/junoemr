@@ -247,7 +247,7 @@ public class PhsStarHandler extends BasePhsStarHandler {
 		demo.setProvince(getProvince());
 		demo.setSex(getSex());
 
-		//TODO: will this overwrite other values? should probably parse the XML and add if missing
+		//TODO-legacy: will this overwrite other values? should probably parse the XML and add if missing
 		if(this.getPrimaryPractitionerId() != null && this.getPrimaryPractitionerId().length()>0) {
 			demo.setFamilyDoctor("<rdohip>"+getPrimaryPractitionerId()+"</rdohip><rd>" + this.getPrimaryPractitionerLastName() + ", "+this.getPrimaryPractitionerFirstName()+"</rd>");
 		}
@@ -343,7 +343,7 @@ public class PhsStarHandler extends BasePhsStarHandler {
 		}
 		*/
 
-		//TODO: fix the bug in schedule
+		//TODO-legacy: fix the bug in schedule
 		appt.setProgramId(0);
 
 		appt.setNotes("");
@@ -474,7 +474,7 @@ public class PhsStarHandler extends BasePhsStarHandler {
 				throw new HL7Exception("System not configured to accept messages for runit " + getApptResourceUnit());
 			}
 		}
-		//TODO: fix the bug in schedule
+		//TODO-legacy: fix the bug in schedule
 		appt.setProgramId(0);
 
 

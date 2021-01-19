@@ -59,7 +59,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 /**
- * TODO: Error handling, and access checks.
+ * TODO-legacy: Error handling, and access checks.
  *
  * @author marc
  *

@@ -437,7 +437,7 @@ JSZip.prototype = (function () {
       "\x00\x00" +
       // disk number start
       "\x00\x00" +
-      // internal file attributes TODO
+      // internal file attributes TODO-legacy
       "\x00\x00" +
       // external file attributes
       (file.options.dir===true?"\x10\x00\x00\x00":"\x00\x00\x00\x00")+

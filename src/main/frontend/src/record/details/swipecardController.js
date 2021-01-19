@@ -27,7 +27,7 @@ angular.module('Record.Details').controller('Record.Details.SwipecardController'
 			{
 				var cardInfo = Oscar.HealthCardParser.parse(dataString);
 
-				//TODO detect and display any errors
+				//TODO-legacy detect and display any errors
 				$uibModalInstance.close(cardInfo);
 			}
 		};

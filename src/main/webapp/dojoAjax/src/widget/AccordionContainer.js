@@ -53,7 +53,7 @@ dojo.require("dojo.widget.PageContainer");
  *		...
  *	</div>
  *
- * TODO:
+ * TODO-legacy:
  *	* this widget should extend PageContainer
  */
  dojo.widget.defineWidget(

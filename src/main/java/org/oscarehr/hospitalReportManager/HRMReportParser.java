@@ -107,7 +107,7 @@ public class HRMReportParser {
 			} catch (ParserConfigurationException e) {
 				logger.error("PARSER ERROR PARSING XML " + e);
 			} catch (JAXBException e) {
-				// TODO Auto-generated catch block
+				// TODO-legacy Auto-generated catch block
 				logger.error("error",e);
 
 			}

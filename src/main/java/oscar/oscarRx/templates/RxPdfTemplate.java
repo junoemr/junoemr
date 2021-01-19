@@ -98,7 +98,7 @@ public abstract class RxPdfTemplate {
 	 */
 	protected abstract void buildPdfLayout(Document document, PdfWriter writer) throws DocumentException, IOException;
 
-	//TODO this is stupid, make it not stupid
+	//TODO-legacy this is stupid, make it not stupid
 	protected HashMap<String, String> parseSCAddress(String s)
 	{
 		logger.debug("Parse Address HTML:\n" + s);

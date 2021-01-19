@@ -42,7 +42,7 @@
 //
 trusted truejava.lang.Boolean ? i think
 
- TODO:
+ TODO-legacy:
  -track id, updated_at.  Allow someone to hide warnings they no longer require but reshow them if the updated_at date changes
 
  if we add the id+update_at timestamp to a table. we could use that as a way to see if that had been used already.

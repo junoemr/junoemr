@@ -132,7 +132,7 @@ public final class Factory {
 		}
 		catch(HL7Exception e)
 		{
-			//TODO - the error should not get caught here but most of oscar does not expect a checked exception when calling this method
+			//TODO-legacy - the error should not get caught here but most of oscar does not expect a checked exception when calling this method
 			logger.error("Parse Error", e);
 			throw new RuntimeException("Hl7 Parse Error");
 		}

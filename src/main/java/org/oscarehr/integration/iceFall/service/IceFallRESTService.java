@@ -140,7 +140,6 @@ public class IceFallRESTService
 
 	private String getIceFallUrlBase()
 	{
-		//TODO property setting. or perhaps option
 		return "https://api-qa.canopygrowthweb.com";
 	}
 }

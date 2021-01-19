@@ -140,30 +140,30 @@ public final class OruR01Handler extends ChainnedMessageAdapter<ORU_R01> {
 
 	@Override
     public String getFillerOrderNumber() {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 	    return null;
     }
 
 	@Override
     public String getEncounterId() {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 	    return null;
     }
 
 	@Override
     public String getRadiologistInfo() {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 	    return null;
     }
 
 	@Override
     public String getNteForOBX(int i, int j) {
-	    // TODO Auto-generated method stub
+	    // TODO-legacy Auto-generated method stub
 	    return null;
     }
 	@Override
     public String getNteForPID(){
-		// TODO Auto-generated method stub
+		// TODO-legacy Auto-generated method stub
 	    return null;
     }
 }

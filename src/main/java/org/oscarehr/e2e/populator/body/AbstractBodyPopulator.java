@@ -67,7 +67,7 @@ public abstract class AbstractBodyPopulator<T> extends AbstractPopulator {
 	}
 
 	abstract public ClinicalStatement populateClinicalStatement(List<T> list);
-	// TODO [MARC-HI] Wait for Null Cascade support refactor
+	// TODO-legacy [MARC-HI] Wait for Null Cascade support refactor
 	abstract public ClinicalStatement populateNullFlavorClinicalStatement();
 	abstract public List<String> populateText();
 

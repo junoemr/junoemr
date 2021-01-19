@@ -73,7 +73,7 @@ dojo.declare("dojo.dnd.HtmlDragMoveObject", dojo.dnd.HtmlDragObject, {
 	},
 
 	setAbsolutePosition: function(x, y){
-		// summary: Set the top & left style attributes of the drag node (TODO: function is poorly named)
+		// summary: Set the top & left style attributes of the drag node (TODO-legacy: function is poorly named)
 		if(!this.disableY) { this.domNode.style.top = y + "px"; }
 		if(!this.disableX) { this.domNode.style.left = x + "px"; }
 	},

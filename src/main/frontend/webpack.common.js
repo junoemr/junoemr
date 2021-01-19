@@ -128,7 +128,7 @@ module.exports = {
 			'./node_modules/cp-calendar/controller.js',
 			'./node_modules/cp-calendar/event_controller.js',
 			'./node_modules/cp-calendar/util.js',*/
-			// TODO: move this back to node_modules after development
+			// TODO-legacy: move this back to node_modules after development
 			/*
 			'./cp-calendar/module.js',
 			'./cp-calendar/directive.js',

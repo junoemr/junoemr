@@ -231,7 +231,7 @@ if(!authed) {
                 <input type=button value="Close" onclick="javascript: CloseWindow();"/>
             </td>
 
-            <!-- TODO: sateliteFlag -->
+            <!-- TODO-legacy: sateliteFlag -->
 
 
             </tr>

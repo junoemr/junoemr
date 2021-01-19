@@ -340,7 +340,7 @@ dojo.storage.manager = new function(){
 		//		Returns whether the storage system is initialized and ready to
 		//		be used. 
 
-		// FIXME: This should REALLY not be in here, but it fixes a tricky
+		// FIXME-legacy: This should REALLY not be in here, but it fixes a tricky
 		// Flash timing bug
 		if(this.currentProvider.getType() == "dojo.storage.browser.FlashStorageProvider"
 			&& dojo.flash.ready == false){

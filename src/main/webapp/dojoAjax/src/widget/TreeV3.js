@@ -15,7 +15,7 @@
 */
 
 /**
- * TODO: use domNode.cloneNode instead of createElement for grid
+ * TODO-legacy: use domNode.cloneNode instead of createElement for grid
  * Should be faster (lyxsus)
  */
 dojo.provide("dojo.widget.TreeV3");
@@ -115,7 +115,7 @@ dojo.widget.defineWidget(
 		data.tree = this.widgetId;		
 		
 		if (data.widgetName) {
-			// TODO: check if such widget has createSimple			
+			// TODO-legacy: check if such widget has createSimple			
 			return dojo.widget.createWidget(data.widgetName, data);		
 		} else if (this.defaultChildWidget.prototype.createSimple) {			
 			return this.defaultChildWidget.prototype.createSimple(data);					
@@ -161,7 +161,7 @@ dojo.widget.defineWidget(
 		/**
 		 * IE<7 does not support min-height properly so I have to rely
 		 * on this hack
-		 * FIXME: do it in CSS only
+		 * FIXME-legacy: do it in CSS only
 		 */
 		if (dojo.render.html.ie && !dojo.render.html.ie70) {
 			clazz = clazz + ' ' + this.classPrefix+"IEContent";

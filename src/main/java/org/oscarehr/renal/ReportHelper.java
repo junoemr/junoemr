@@ -434,7 +434,7 @@ public class ReportHelper {
 		calculateScreenPercs(r);
 		getCKDStages(r);
 
-		//TODO: forms10
+		//TODO-legacy: forms10
 		List<FormLabReq07> forms07 = labReq07Dao.findCreatinine();
 		r.setEgfrTestsOrdered(forms07.size());
 		
@@ -518,7 +518,7 @@ public class ReportHelper {
 			}
 		}
 		
-		//TODO:do it for CKD too
+		//TODO-legacy:do it for CKD too
 		
 		
 		/*

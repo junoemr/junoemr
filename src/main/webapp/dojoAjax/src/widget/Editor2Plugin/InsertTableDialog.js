@@ -131,7 +131,7 @@ dojo.widget.defineWidget(
 				tmpnode.appendChild(cnode);
 				outertbody = tmpnode.innerHTML;
 			}
-			//TODO: save current selection and restore it later
+			//TODO-legacy: save current selection and restore it later
 			dojo.withGlobal(curInst.window, "selectElement", dojo.html.selection, [this.tableNode]);
 		}else{
 			var cols = "<tr>";

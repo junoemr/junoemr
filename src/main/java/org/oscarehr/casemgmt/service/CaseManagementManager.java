@@ -883,7 +883,7 @@ public class CaseManagementManager {
 		return false;
 	}
 
-	// TODO terrible performance here. TERRIBLE. at LEAST cache this - rwd
+	// TODO-legacy terrible performance here. TERRIBLE. at LEAST cache this - rwd
 	public List<AccessType> getAccessRight(String providerNo, String demoNo, String programId) {
 		List<Integer> progList = new ArrayList<Integer>();
 
@@ -1475,7 +1475,7 @@ public class CaseManagementManager {
 	/**
 	 * Filters a list of CaseManagementIssue objects based on role.
 	 */
-	// TODO: speed this up
+	// TODO-legacy: speed this up
 	public List<CaseManagementIssue> filterIssues(LoggedInInfo loggedInInfo, String providerNo, List<CaseManagementIssue> issues, String programId) {
 
 		List<CaseManagementIssue> filteredIssues = new ArrayList<CaseManagementIssue>();
@@ -1886,7 +1886,7 @@ public class CaseManagementManager {
 				map.put("ROLENAME", rolename);
 
 				if (type == this.SIGNATURE_SIGNED) {
-					// TODO: In the future pull this from a USER/PROGRAM preference.
+					// TODO-legacy: In the future pull this from a USER/PROGRAM preference.
 					String signLine = OscarProperties.getInstance().getProperty("ECHART_SIGN_LINE");
 					signature = getTemplateSignature(signLine, resourceBundle, map);
 				} else if (type == this.SIGNATURE_VERIFY) {

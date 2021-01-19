@@ -44,7 +44,7 @@
 	<div class="modal-body">
 		<%--Remove this?--%>
 		<%--<div class="row">			
-			<!-- TODO: what happens here if there is a long list of notes??? -->
+			<!-- TODO-legacy: what happens here if there is a long list of notes??? -->
 			<div class="col-sm-10 col-sm-offset-1">
 				<div class="well well-note">
 					<ul data-brackets-id="12674" id="sortable" class="list-unstyled ui-sortable" >
@@ -318,7 +318,7 @@
 	</div><!-- modal-body -->		
 		
 	<div class="modal-footer">
-		<!-- TODO: see what of these can be functions inline or maybe obsolete???
+		<!-- TODO-legacy: see what of these can be functions inline or maybe obsolete???
 		<input type="image"	src="<c:out value="${ctx}/oscarEncounter/graphics/copy.png"/>" title='<bean:message key="oscarEncounter.Index.btnCopy"/>' onclick="copyCppToCurrentNote(); return false;"> 
 		<input type="image"	src="<c:out value="${ctx}/oscarEncounter/graphics/annotation.png"/>" title='<bean:message key="oscarEncounter.Index.btnAnnotation"/>' id="anno" style="padding-right: 10px;"> 
 		<input type="image"	src="<c:out value="${ctx}/oscarEncounter/graphics/edit-cut.png"/>" title='<bean:message key="oscarEncounter.Index.btnArchive"/>' onclick="$('archived').value='true';" style="padding-right: 10px;">-->

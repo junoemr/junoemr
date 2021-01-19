@@ -632,7 +632,7 @@ public class ProgramManagerViewAction extends DispatchAction {
 		
 		programQueueManager.rejectQueue(programId, clientId, notes, rejectionReason);
 
-		//TODO: WL notification
+		//TODO-legacy: WL notification
 		ClientReferralDAO clientReferralDao = SpringUtils.getBean(ClientReferralDAO.class);
 		Facility facility = loggedInInfo.getCurrentFacility();
 		if(facility.getAssignRejectedVacancyApplicant() != null && facility.getAssignRejectedVacancyApplicant().length()>0) {
@@ -666,7 +666,7 @@ public class ProgramManagerViewAction extends DispatchAction {
 		//int numMembers = program.getNumOfMembers().intValue();
 		//int maxMem = program.getMaxAllowed().intValue();
 		//int familySize = clientManager.getDependents(new Long(clientId)).size();
-		// TODO: add warning if this admission ( w/ dependents) will exceed the maxMem
+		// TODO-legacy: add warning if this admission ( w/ dependents) will exceed the maxMem
 
 		/*
 		 * If the user is currently enrolled in a bed program, we must warn the provider that this will also be a discharge

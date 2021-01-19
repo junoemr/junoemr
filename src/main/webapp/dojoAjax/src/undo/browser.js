@@ -44,8 +44,8 @@ dojo.undo.browser = {
 		this.initialState = this._createState(this.initialHref, args, this.initialHash);
 	},
 
-	//FIXME: Would like to support arbitrary back/forward jumps. Have to rework iframeLoaded among other things.
-	//FIXME: is there a slight race condition in moz using change URL with the timer check and when
+	//FIXME-legacy: Would like to support arbitrary back/forward jumps. Have to rework iframeLoaded among other things.
+	//FIXME-legacy: is there a slight race condition in moz using change URL with the timer check and when
 	//       the hash gets set? I think I have seen a back/forward call in quick succession, but not consistent.
 	addToHistory: function(args){
 		//summary: adds a state object (args) to the history list. You must set
@@ -76,7 +76,7 @@ dojo.undo.browser = {
 		//	back button "works" fine, however it's not possible to actually
 		//	DETECT that you've moved backwards by inspecting window.location.
 		//	Unless there is some other means of locating.
-		//	FIXME: perhaps we can poll on history.length?
+		//	FIXME-legacy: perhaps we can poll on history.length?
 		//	Safari 2.0.3+ (and probably 1.3.2+):
 		//	works fine, except when changeUrl is used. When changeUrl is used,
 		//	Safari jumps all the way back to whatever page was shown before
@@ -203,7 +203,7 @@ dojo.undo.browser = {
 			var hsl = this.historyStack.length;
 
 			if((window.location.hash == this.initialHash||window.location.href == this.initialHref)&&(hsl == 1)){
-				// FIXME: could this ever be a forward button?
+				// FIXME-legacy: could this ever be a forward button?
 				// we can't clear it because we still need to check for forwards. Ugg.
 				// clearInterval(this.locationTimer);
 				this.handleBackButton();

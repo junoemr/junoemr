@@ -127,7 +127,7 @@ dojo.html.getElementsByClass = function(
 	//	summary
 	//	Returns an array of nodes for the given classStr, children of a
 	//	parent, and optionally of a certain nodeType
-	// FIXME: temporarily set to false because of several dojo tickets related
+	// FIXME-legacy: temporarily set to false because of several dojo tickets related
 	// to the xpath version not working consistently in firefox.
 	useNonXpath = false;
 	var _document = dojo.doc();
@@ -234,7 +234,7 @@ dojo.html.getComputedStyle = function(/* HTMLElement */node, /* string */cssSele
 	} else if (document.defaultView && dojo.html.isDescendantOf(node, node.ownerDocument)){ // W3, gecko, KHTML
 		try{
 			// mozilla segfaults when margin-* and node is removed from doc
-			// FIXME: need to figure out a if there is quicker workaround
+			// FIXME-legacy: need to figure out a if there is quicker workaround
 			var cs = document.defaultView.getComputedStyle(node, "");
 			if(cs){
 				return cs.getPropertyValue(cssSelector);	//	integer
@@ -309,7 +309,7 @@ dojo.html.getUnitValue = function(/* HTMLElement */node, /* string */cssSelector
 	if((!s)||((s == 'auto')&&(autoIsZero))){ 
 		return { value: 0, units: 'px' };	//	object 
 	}
-	// FIXME: is regex inefficient vs. parseInt or some manual test? 
+	// FIXME-legacy: is regex inefficient vs. parseInt or some manual test? 
 	var match = s.match(/(\-?[\d.]+)([a-z%]*)/i);
 	if (!match){return dojo.html.getUnitValue.bad;}
 	return { value: Number(match[1]), units: match[2].toLowerCase() };	//	object
@@ -320,11 +320,11 @@ dojo.html.getPixelValue = function(/* HTMLElement */node, /* string */cssSelecto
 	//	summary
 	//	Get the value of passed selector in pixels.
 	var result = dojo.html.getUnitValue(node, cssSelector, autoIsZero);
-	// FIXME: there is serious debate as to whether or not this is the right solution
+	// FIXME-legacy: there is serious debate as to whether or not this is the right solution
 	if(isNaN(result.value)){ 
 		return 0; //	integer 
 	}	
-	// FIXME: code exists for converting other units to px (see Dean Edward's IE7) 
+	// FIXME-legacy: code exists for converting other units to px (see Dean Edward's IE7) 
 	// but there are cross-browser complexities
 	if((result.value)&&(result.units != 'px')){ 
 		return NaN;	//	integer 
@@ -342,7 +342,7 @@ dojo.html.setPositivePixelValue = function(/* HTMLElement */node, /* string */se
 
 dojo.html.styleSheet = null;
 
-// FIXME: this is a really basic stub for adding and removing cssRules, but
+// FIXME-legacy: this is a really basic stub for adding and removing cssRules, but
 // it assumes that you know the index of the cssRule that you want to add 
 // or remove, making it less than useful.  So we need something that can 
 // search for the selector that you you want to remove.
@@ -353,7 +353,7 @@ dojo.html.insertCssRule = function(/* string */selector, /* string */declaration
 		if (document.createStyleSheet) { // IE
 			dojo.html.styleSheet = document.createStyleSheet();
 		} else if (document.styleSheets[0]) { // rest
-			// FIXME: should create a new style sheet here
+			// FIXME-legacy: should create a new style sheet here
 			// fall back on an exsiting style sheet
 			dojo.html.styleSheet = document.styleSheets[0];
 		} else { 
@@ -494,7 +494,7 @@ dojo.html.fixPathsInCssText = function(/* string */cssStr, /* string */URI){
 	regexTrim = new RegExp("^[\\s]*(['\"]?)("+urlChrs+")\\1[\\s]*?$");
 	if(dojo.render.html.ie55 || dojo.render.html.ie60){
 		var regexIe = new RegExp("AlphaImageLoader\\((.*)src\=['\"]("+urlChrs+")['\"]");
-		// TODO: need to decide how to handle relative paths and AlphaImageLoader see #1441
+		// TODO-legacy: need to decide how to handle relative paths and AlphaImageLoader see #1441
 		// current implementation breaks on build with intern_strings
 		while(match = regexIe.exec(cssStr)){
 			url = match[2].replace(regexTrim, "$2");

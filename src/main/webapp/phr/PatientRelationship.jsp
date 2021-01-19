@@ -24,7 +24,7 @@
 
 --%>
 
-<%-- TODO:Only works for local patients right now. Not sure if that's a big deal. Probably should be a warning that this isn't a local patient --%>
+<%-- TODO-legacy:Only works for local patients right now. Not sure if that's a big deal. Probably should be a warning that this isn't a local patient --%>
 <%@page import="org.oscarehr.myoscar.client.ws_manager.AccountManager"%>
 <%@page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo"%>
 <%@page import="org.apache.http.HttpRequest"%>

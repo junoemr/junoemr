@@ -61,7 +61,7 @@ public class MergedDemographicInterceptor implements MethodInterceptor {
 
 	@SuppressWarnings("rawtypes")
 	private void setDemographicId(Integer mergedId, Object[] arguments) {
-		// TODO add support for multiple params
+		// TODO-legacy add support for multiple params
 		Class entryType = arguments.getClass().getComponentType();
 		if (String.class.isAssignableFrom(entryType)) {
 			arguments[0] = mergedId.toString();
@@ -73,7 +73,7 @@ public class MergedDemographicInterceptor implements MethodInterceptor {
 	}
 
 	private Integer getDemographicId(Object[] arguments) {
-		// TODO add support for multiple params 
+		// TODO-legacy add support for multiple params
 		if (arguments.length == 1) return Integer.parseInt("" + arguments[0]);
 		throw new IllegalArgumentException("Parameter must be a single item!");
 	}

@@ -203,7 +203,7 @@ public class DashboardManager {
 			IndicatorTemplateHandler templateHandler = new IndicatorTemplateHandler();
 			templateHandler.read( bytearray );
 			
-			//TODO: need to validate the SQL
+			//TODO-legacy: need to validate the SQL
 			
 			// check Indicator query
 			
@@ -457,13 +457,13 @@ public class DashboardManager {
 	}
 	
 	
-	// TODO add additional error check / filter class to carry out the following methods.
+	// TODO-legacy add additional error check / filter class to carry out the following methods.
 	
-	// TODO add check queries method.
+	// TODO-legacy add check queries method.
 	
-	// TODO add duplicate Indicator Template upload check.
+	// TODO-legacy add duplicate Indicator Template upload check.
 	
-	// TODO add duplicate Dashboard name check.
+	// TODO-legacy add duplicate Dashboard name check.
 	
 	private boolean securityCheck(LoggedInInfo loggedInInfo, String module, String access_rights) {
 		boolean pass = securityInfoManager.hasPrivilege(loggedInInfo, module, access_rights, null);

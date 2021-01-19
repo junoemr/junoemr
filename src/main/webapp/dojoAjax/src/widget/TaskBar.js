@@ -66,7 +66,7 @@ dojo.widget.defineWidget(
 	// summary:
 	//	Displays an icon for each associated floating pane, like Windows task bar
 
-	// TODO: this class extends floating pane merely to get the shadow;
+	// TODO-legacy: this class extends floating pane merely to get the shadow;
 	//	it should extend HtmlWidget and then just call the shadow code directly
 
 	resizable: false,
@@ -74,7 +74,7 @@ dojo.widget.defineWidget(
 
 	addChild: function(/*Widget*/ child) {
 		// summary: add taskbar item for specified FloatingPane
-		// TODO: this should not be called addChild(), as that has another meaning.
+		// TODO-legacy: this should not be called addChild(), as that has another meaning.
 		if(!this.containerNode){ 
 			this._addChildStack.push(child);
 		}else if(this._addChildStack.length > 0){

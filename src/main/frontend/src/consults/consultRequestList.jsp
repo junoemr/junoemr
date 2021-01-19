@@ -47,7 +47,7 @@
 
 <div class="consult-page-header"
      ng-if="consultRequestListCtrl.hideSearchPatient != true">
-	<!-- TODO -->
+	<!-- TODO-legacy -->
 </div>
 <div ng-show="consultRequestListCtrl.consultReadAccess" class="col-lg-12">
 

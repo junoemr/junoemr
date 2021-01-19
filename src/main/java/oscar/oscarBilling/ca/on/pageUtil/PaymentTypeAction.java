@@ -99,7 +99,7 @@ public class PaymentTypeAction extends DispatchAction {
 				json = JSONObject.fromObject(retMap);
 				servletResponse.getWriter().write(json.toString());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				// TODO-legacy Auto-generated catch block
 				MiscUtils.getLogger().info(e.toString());
 			}
 		}
@@ -140,7 +140,7 @@ public class PaymentTypeAction extends DispatchAction {
 				json = JSONObject.fromObject(retMap);
 				servletResponse.getWriter().write(json.toString());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				// TODO-legacy Auto-generated catch block
 				MiscUtils.getLogger().info(e.toString());
 			}
 		}
