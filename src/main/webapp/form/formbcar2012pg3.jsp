@@ -889,25 +889,28 @@ function calToday(field) {
     <tr>
         <td align="left">
             <%
-            if (!bView) {
+            if (!bView)
+            {
             %>
-            <input type="submit" style="width:40px;" value="Save" onclick="javascript:return onSave();" />
-            <input type="submit" value="Save and Exit" onclick="javascript:return onSaveExit();"/>
+                <input type="submit" style="width:80px;" value="Save" onclick="javascript:return onSave();" />
+                <input type="submit" style="width:120px;" value="Save and Exit" onclick="javascript:return onSaveExit();"/>
             <%
             }
             %>
-            <input type="submit" style="width:40px;" value="Exit"  name="exitButton" />
-            <input type="submit" style="width:50px;" value="Print" onclick="javascript:return onPrint();"/>
-            <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
-            <input type="submit" style="width:75px;" value="Print All" onclick="javascript:return onPrintAll();"/>
+                <input type="submit" style="width:60px;" value="Exit"  name="exitButton" />
+                <input type="submit" style="width:80px;" value="Print" onclick="javascript:return onPrint();"/>
+                <input type="submit" style="width:140px;" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
+                <input type="submit" style="width:90px;" value="Print All" onclick="javascript:return onPrintAll();"/>
             <%
-                if (faxEnabled)
-                {
+            if (faxEnabled)
+            {
             %>
-            <input type="button" style="width: 65px;" value="Fax All"
-                   onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>&faxAll', 'fax_recipients');"/>
+                <input type="button" style="width:120px;" value="Fax AR1 & AR2"
+                       onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>&faxAR1AR2=true', 'fax_recipients');"/>
+                <input type="button" style="width:80px;" value="Fax All"
+                       onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>&faxAll', 'fax_recipients');"/>
             <%
-                }
+            }
             %>
         </td>
         
@@ -2506,25 +2509,28 @@ function calToday(field) {
     <tr>
         <td align="left">
             <%
-            if (!bView) {
+            if (!bView)
+            {
             %>
-            <input type="submit" style="width:40px;" value="Save" onclick="javascript:return onSave();" />
-            <input type="submit" value="Save and Exit" onclick="javascript:return onSaveExit();"/>
+                <input type="submit" style="width:80px;" value="Save" onclick="javascript:return onSave();" />
+                <input type="submit" style="width:120px;" value="Save and Exit" onclick="javascript:return onSaveExit();"/>
             <%
             }
             %>
-            <input type="submit" style="width:40px;" value="Exit"  name="exitButton" />
-            <input type="submit" style="width:50px;" value="Print" onclick="javascript:return onPrint();"/>
-            <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
-            <input type="submit" style="width:75px;" value="Print All" onclick="javascript:return onPrintAll();"/>
+                <input type="submit" style="width:60px;" value="Exit"  name="exitButton" />
+                <input type="submit" style="width:80px;" value="Print" onclick="javascript:return onPrint();"/>
+                <input type="submit" style="width:140px;" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
+                <input type="submit" style="width:90px;" value="Print All" onclick="javascript:return onPrintAll();"/>
             <%
-                if (faxEnabled)
-                {
+            if (faxEnabled)
+            {
             %>
-            <input type="button" style="width: 65px;" value="Fax All"
-                   onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>&faxAll', 'fax_recipients');"/>
+                <input type="button" style="width:120px;" value="Fax AR1 & AR2"
+                       onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>&faxAR1AR2=true', 'fax_recipients');"/>
+                <input type="button" style="width:80px;" value="Fax All"
+                       onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>&faxAll', 'fax_recipients');"/>
             <%
-                }
+            }
             %>
         </td>
         

@@ -54,10 +54,12 @@
 <%@ page import="org.oscarehr.provider.model.ProviderData" %>
 <%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>
 <%@ page import="oscar.OscarProperties" %>
+<%@ page import="org.oscarehr.common.model.ConsultationRequest" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%
 	String curProvider_no = (String) session.getAttribute("user");
@@ -616,37 +618,65 @@
 								%>
 								<tr <%=overdue ? "style='color:red;'" : ""%>>
 									<td class="stat<%=status%>">
-										<% if (status.equals("1"))
-										{ %>
-										<bean:message
-												key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgND"/>
-										<% } else if (status.equals("2"))
-										{ %>
-										<bean:message
-												key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgSR"/>
-										<% } else if (status.equals("3"))
-										{ %>
-										<bean:message
-												key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgPR"/>
-										<% } else if (status.equals("4"))
-										{ %>
-										<bean:message
-												key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgDONE"/>
-										<% } %>
+										<c:choose>
+
+											<c:when test="<%=ConsultationRequest.STATUS_ACTIVE.equals(status)%>">
+												<bean:message
+														key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgND"/>
+											</c:when>
+
+											<c:when test="<%=ConsultationRequest.STATUS_PEND_SPECIAL.equals(status)%>">
+												<bean:message
+														key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgSR"/>
+											</c:when>
+
+											<c:when test="<%=ConsultationRequest.STATUS_PEND_PATIENT.equals(status)%>">
+												<bean:message
+														key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgPR"/>
+											</c:when>
+
+											<c:when test="<%=ConsultationRequest.STATUS_COMPLETE.equals(status)%>">
+												<bean:message
+														key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgDONE"/>
+											</c:when>
+
+											<c:when test="<%=ConsultationRequest.STATUS_CANCEL.equals(status)%>">
+												<bean:message
+														key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgCANCEL"/>
+											</c:when>
+
+											<c:when test="<%=ConsultationRequest.STATUS_APPT_BOOK.equals(status)%>">
+												<bean:message
+														key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgBOOK"/>
+											</c:when>
+
+											<c:when test="<%=ConsultationRequest.STATUS_DELETE.equals(status)%>">
+												<bean:message
+														key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgDEL"/>
+											</c:when>
+
+											<c:otherwise/>
+
+										</c:choose>
 									</td>
 									<td class="stat<%=status%>">
-										<% if (urgency.equals("1"))
-										{ %>
-										<div style="color:red;"> Urgent</div>
-										<% } else if (urgency.equals("2"))
-										{ %>
-										Non-Urgent
-										<% } else if (urgency.equals("3"))
-										{ %>
-										Return
-										<% } %>
+										<c:choose>
 
+											<c:when test="<%=ConsultationRequest.URGENCY_URGENT.equals(urgency)%>">
+												Urgent
+											</c:when>
 
+											<c:when test="<%=ConsultationRequest.URGENCY_NON_URGENT.equals(urgency)%>">
+												Non-Urgent
+											</c:when>
+
+											<c:when test="<%=ConsultationRequest.URGENCY_RETURN.equals(urgency)%>">
+												Return
+											</c:when>
+
+											<c:otherwise/>
+
+										</c:choose>
 									</td>
 									<td class="stat<%=status%>">
 										<a href="javascript:popupOscarRx(700,960,'<%=request.getContextPath()%>/oscarEncounter/ViewRequest.do?requestId=<%=id%>')">

@@ -31,6 +31,7 @@ import org.oscarehr.common.hl7.copd.mapper.medaccess.HistoryNoteMapperMedaccess;
 import org.oscarehr.common.hl7.copd.mapper.mediplan.AlertMapperMediplan;
 import org.oscarehr.common.hl7.copd.mapper.mediplan.HistoryNoteMapperMediplan;
 import org.oscarehr.common.hl7.copd.mapper.wolf.EncounterNoteMapperWolf;
+import org.oscarehr.common.hl7.copd.mapper.wolf.HistoryNoteMapperWolf;
 import org.oscarehr.common.hl7.copd.mapper.wolf.MedicationMapperWolf;
 import org.oscarehr.common.hl7.copd.mapper.wolf.MessageMapperWolf;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
@@ -176,6 +177,10 @@ public class MapperFactory
 			{
 				return new HistoryNoteMapperMediplan(message, providerRep, recordData);
 			}
+			case WOLF:
+			{
+				return new HistoryNoteMapperWolf(message, providerRep, recordData);
+			}
 			default:
 			{
 				return new HistoryNoteMapper(message, providerRep, importSource, recordData);
@@ -275,5 +280,17 @@ public class MapperFactory
 	public static MeasurementsMapper newMeasurementsMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
 		return new MeasurementsMapper(message, providerRep, importSource);
+	}
+
+	/**
+	 * new allergy mapper
+	 * @param message - message to import
+	 * @param providerRep - rep of provider
+	 * @param importSource - source of import
+	 * @return - new allergy mapper
+	 */
+	public static PregnancyMapper newPregnancyMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	{
+		return new PregnancyMapper(message, providerRep);
 	}
 }

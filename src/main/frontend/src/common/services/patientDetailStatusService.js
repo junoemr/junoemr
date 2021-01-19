@@ -71,11 +71,13 @@ angular.module("Common.Services").service("patientDetailStatusService", [
 			return deferred.promise;
 		};
 
-		service.isUniqueHC = function isUniqueHC(healthCardNo, demographicNo)
+		service.isUniqueHC = function isUniqueHC(healthCardNo, version, province, demographicNo)
 		{
 			var deferred = $q.defer();
 			$http.get(service.apiPath + "/isUniqueHC?hin=" +
-				encodeURIComponent(healthCardNo) + "&demographicNo=" +
+				encodeURIComponent(healthCardNo) + "&ver=" +
+				encodeURIComponent(version) + "&province=" +
+				encodeURIComponent(province) + "&demographicNo=" +
 				encodeURIComponent(demographicNo),
 				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(results)

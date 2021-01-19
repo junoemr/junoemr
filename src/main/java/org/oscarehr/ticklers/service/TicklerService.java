@@ -178,4 +178,8 @@ public class TicklerService extends AbstractServiceImpl
 		return resultList;
 	}
 
+	public int getTicklerCount(TicklerCriteriaSearch criteriaSearch)
+	{
+		return TicklerDao.criteriaSearchCount(criteriaSearch);
+	}
 }

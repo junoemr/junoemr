@@ -1,4 +1,5 @@
 import {SystemPreferenceApi} from "../../../generated/api/SystemPreferenceApi";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../common/components/junoComponentConstants";
 
 angular.module('Patient').component('addDemographicModal', {
 	templateUrl: 'src/patient/addDemographicModal/addDemographicModal.jsp',
@@ -56,6 +57,10 @@ angular.module('Patient').component('addDemographicModal', {
 		ctrl.invalidFirstName = false;
 		ctrl.invalidSex = false;
 		ctrl.invalidDob = false;
+
+		ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+		ctrl.buttonClicked = false;
 
 		//get programs to be selected
 		programService.getPrograms().then(
@@ -136,21 +141,31 @@ angular.module('Patient').component('addDemographicModal', {
 
 		ctrl.onAdd = function ()
 		{
+			ctrl.buttonClicked = true;
+
+			if (Juno.Common.Util.exists(ctrl.newDemographicData.hin))
+			{
+				ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
+			}
+
 			if (ctrl.validateDemographic())
 			{
-				demographicService.saveDemographic(ctrl.newDemographicData).then(
-					function success(results)
+				demographicService.saveDemographic(ctrl.newDemographicData)
+					.then((results) =>
 					{
 						ctrl.modalInstance.close(results);
-					},
-					function error(errors)
+					})
+					.catch((errors) =>
 					{
 						alert(errors);
 						console.error(errors);
-					}
-				);
+						ctrl.buttonClicked = false;
+					})
+			}
+			else // Need this to reset button if validation fails
+			{
+				ctrl.buttonClicked = false;
 			}
 		}
-
 	}]
 });

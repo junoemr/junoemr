@@ -169,6 +169,7 @@
 	boolean locationEnabled = caisiEnabled && (useProgramLocation != null && useProgramLocation.equals("true"));
 %>
 <%@page import="java.util.GregorianCalendar" %>
+<%@page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="org.oscarehr.common.IsPropertiesOn" %>
@@ -781,7 +782,10 @@
 							<INPUT TYPE="TEXT" NAME="keyword"
 								   tabindex="1"
 								   VALUE="<%=bFirstDisp?nameSb.toString():request.getParameter("name")%>"
-								   width="25">
+								   width="25"
+                                   <%= appt.getIsVirtual() ? "disabled='disabled'" : "" %>
+                                   <%= appt.getIsVirtual() ? "title=\"Demographics can't be changed for virtual appointments\"" : "" %>
+                            >
 						</div>
 						<div class="space">&nbsp;</div>
 						<div class="label">
@@ -802,7 +806,10 @@
 							<!--input type="hidden" name="displaymode" value="Search " -->
 							<input type="submit" style="width:auto;"
 								   onclick="document.forms['EDITAPPT'].displaymode.value='Search '"
-								   value="<bean:message key="appointment.editappointment.btnSearch"/>">
+								   value="<bean:message key="appointment.editappointment.btnSearch"/>"
+                                   <%= appt.getIsVirtual() ? "disabled='disabled'" : ""%>
+                                   <%= appt.getIsVirtual() ? "title=\"Demographics can't be changed for virtual appointments\"" : "" %>
+                            >
 						</div>
 						<div class="input">
 							<input type="TEXT"
@@ -838,7 +845,7 @@
 									for (LookupListItem reasonCode : reasonCodes.getItems()) {
 									    boolean isApptReason = reasonCode.getId().equals(apptReasonCode);
 									    if (reasonCode.isActive() || isApptReason) { %>
-								<option value="<%=reasonCode.getId()%>" <%=isApptReason ? "selected=\"selected\"" : "" %>><%=StringEscapeUtils.escapeHtml(reasonCode.getValue())%></option>
+								<option value="<%=reasonCode.getId()%>" <%=isApptReason ? "selected=\"selected\"" : "" %>><%=StringEscapeUtils.escapeHtml(reasonCode.getLabel())%></option>
 								<%		}
 									}
 								} else { %>

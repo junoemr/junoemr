@@ -69,7 +69,7 @@
 	}
     function onPrintStatureWeight(num) {
         //document.forms[0].submit.value="print";
-        var ret = checkAllDates();
+        var ret = isAllInputNumber();
         if(ret==true) {
             document.forms[0].action = "../form/formGrowth0_36Print.jsp?print=" + num + "&__title=GrowthCharts&__cfgfile=<%=bGirl?"growthGirlLength0_36Print":"growthBoyLength0_36Print"%>&__cfgGraphicFile=<%=bGirl?"growthGirlLength0_36Graphic":"growthBoyLength0_36Graphic"%>&__cfgGraphicFile=<%=bGirl?"growthGirlLength0_36Graphic2":"growthBoyLength0_36Graphic2"%>&__template=<%=bGirl?"growthGirlLength0_36":"growthBoyLength0_36"%>";
             document.forms[0].target="_blank";
@@ -78,7 +78,7 @@
     }
     function onPrintHeadCirc(num) {
         //document.forms[0].submit.value="print";
-        var ret = checkAllDates();
+        var ret = isAllInputNumber();
         if(ret==true) {
             document.forms[0].action = "../form/formGrowth0_36Print.jsp?print=" + num + "&__title=GrowthCharts&__cfgfile=<%=bGirl?"growthGirlHead0_36Print":"growthBoyHead0_36Print"%>&__cfgGraphicFile=<%=bGirl?"growthGirlHead0_36Graphic":"growthBoyHead0_36Graphic"%>&__cfgGraphicFile=<%=bGirl?"growthGirlHead0_36Graphic2":"growthBoyHead0_36Graphic2"%>&__template=<%=bGirl?"growthGirlHead0_36":"growthBoyHead0_36"%>";
             document.forms[0].target="_blank";
@@ -86,7 +86,7 @@
         return ret;
     }
     function onPrintStatureWeight1() {
-        var ret = checkAllDates();
+        var ret = isAllInputNumber();
         if(ret==true) {
             document.forms[0].action = "../form/formGrowthChartPrint.jsp?print=1&__title=GrowthCharts&__cfgfile=<%=bGirl?"growthChartGirlPrint":"growthChartBoyPrint"%>&__cfgGraphicFile=<%=bGirl?"growthChartGirlGraphic":"growthChartBoyGraphic"%>&__cfgGraphicFile=<%=bGirl?"growthChartGirlGraphic2":"growthChartBoyGraphic2"%>&__template=<%=bGirl?"growthChartGirlStatureWeight":"growthChartBoyStatureWeight"%>";
             document.forms[0].target="_blank";
@@ -94,7 +94,7 @@
         return ret;
     }
     function onPrintStatureWeight2() {
-        var ret = checkAllDates();
+        var ret = isAllInputNumber();
         if(ret==true) {
             document.forms[0].action = "../form/formGrowthChartPrint.jsp?print=2&__title=GrowthCharts&__cfgfile=<%=bGirl?"growthChartGirlPrint":"growthChartBoyPrint"%>&__cfgGraphicFile=<%=bGirl?"growthChartGirlGraphic":"growthChartBoyGraphic"%>&__cfgGraphicFile=<%=bGirl?"growthChartGirlGraphic2":"growthChartBoyGraphic2"%>&__template=<%=bGirl?"growthChartGirlStatureWeight":"growthChartBoyStatureWeight"%>";
             document.forms[0].target="_blank";
@@ -106,7 +106,7 @@
 
     function onSave() {
         document.forms[0].submit.value="save";
-        var ret = checkAllDates();
+        var ret = isAllInputNumber();
         if(ret==true) {
             reset();
             ret = confirm("Are you sure you want to save this form?");
@@ -116,7 +116,7 @@
     
     function onSaveExit() {
         //document.forms[0].submit.value="exit";
-        var ret = checkAllDates();
+        var ret = isAllInputNumber();
         if(ret == true) {
             reset();
             ret = confirm("Are you sure you wish to save and close this window?");
@@ -162,16 +162,27 @@
           alert ("You must type in a number in the field.");
         }
     }
-    function checkAllDates(){
-        var b = true;
-
-        for (var i =0; i <document.forms[0].elements.length; i++) {
-            if (document.forms[0].elements[i].name.indexOf("age_")>=0 || document.forms[0].elements[i].name.indexOf("stature_")>=0 || document.forms[0].elements[i].name.indexOf("bmi_")>=0) {
-               if(!isNumber(document.forms[0].elements[i]))
-                 b=false;
-    	    }
-	    }
-        return b;
+    function isAllInputNumber()
+	{
+        var isValidNum = true;
+		var number_class = document.forms[0].getElementsByClassName("number_input");
+		for (var i = 0; i < number_class.length; i++)
+		{
+			if(isNaN(number_class[i].value))
+			{
+		   		isValidNum = false;
+		   		number_class[i].style.backgroundColor = "red";
+			}
+			else
+			{
+				number_class[i].style.backgroundColor = "white";
+			}
+		}
+        if (!isValidNum)
+		{
+			alert("Please correct these highlighted field, and enter number only.");
+		}
+        return isValidNum;
     }
 function wtEnglish2Metric(source) {
 	if(isNumber(source) ) {
@@ -401,18 +412,18 @@ function htEnglish2Metric(source) {
 						value="<%= props.getProperty("date_"+i, "") %>" @oscar.formDB
 						dbType="date" /> <img src="../images/cal.gif" id="date_<%=i%>_cal">
 					</td>
-					<td><input type="text" name="age_<%=i%>"
+					<td><input type="text" class="number_input" name="age_<%=i%>"
 						onDblClick="calcAge(this)" size="1" maxlength="5"
 						value="<%= props.getProperty("age_"+i, "") %>" @oscar.formDB /></td>
-					<td><input type="text" name="weight_<%=i%>"
+					<td><input type="text" class="number_input" name="weight_<%=i%>"
 						onDblClick="wtEnglish2Metric(this)" size="3" maxlength="6"
 						value="<%= props.getProperty("weight_"+i, "") %>" @oscar.formDB />
 					</td>
-					<td><input type="text" name="length_<%=i%>"
+					<td><input type="text" class="number_input" name="length_<%=i%>"
 						onDblClick="htEnglish2Metric(this)" size="3" maxlength="6"
 						value="<%= props.getProperty("length_"+i, "") %>" @oscar.formDB />
 					</td>
-					<td><input type="text" name="headCirc_<%=i%>"
+					<td><input type="text" class="number_input" name="headCirc_<%=i%>"
 						onDblClick="htEnglish2Metric(this)" size="3" maxlength="6"
 						value="<%= props.getProperty("headCirc_"+i, "") %>" @oscar.formDB />
 					</td>
@@ -461,18 +472,18 @@ function htEnglish2Metric(source) {
 						value="<%= props.getProperty("date_"+i, "") %>" @oscar.formDB
 						dbType="date" /> <img src="../images/cal.gif" id="date_<%=i%>_cal">
 					</td>
-					<td><input type="text" name="age_<%=i%>"
+					<td><input type="text"  class="number_input" name="age_<%=i%>"
 						onDblClick="calcAge(this)" size="1" maxlength="5"
 						value="<%= props.getProperty("age_"+i, "") %>" @oscar.formDB /></td>
-					<td><input type="text" name="weight_<%=i%>"
+					<td><input type="text"  class="number_input" name="weight_<%=i%>"
 						onDblClick="wtEnglish2Metric(this)" size="3" maxlength="6"
 						value="<%= props.getProperty("weight_"+i, "") %>" @oscar.formDB />
 					</td>
-					<td><input type="text" name="length_<%=i%>"
+					<td><input type="text"  class="number_input" name="length_<%=i%>"
 						onDblClick="htEnglish2Metric(this)" size="3" maxlength="6"
 						value="<%= props.getProperty("length_"+i, "") %>" @oscar.formDB />
 					</td>
-					<td><input type="text" name="headCirc_<%=i%>"
+					<td><input type="text"  class="number_input" name="headCirc_<%=i%>"
 						onDblClick="htEnglish2Metric(this)" size="3" maxlength="6"
 						value="<%= props.getProperty("headCirc_"+i, "") %>" @oscar.formDB />
 					</td>

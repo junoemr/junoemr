@@ -68,7 +68,7 @@ public class PreventionsLotNrsDao extends AbstractDao<PreventionsLotNrs> {
 		StringBuilder sb=new StringBuilder();
 		sb.append("select x.lotNr from PreventionsLotNrs x where x.preventionType=?1");
 		if (bDeleted!=null) sb.append(" and x.deleted=?2");
-		sb.append(" order by x.lastUpdateDate desc");
+		sb.append(" order by x.lastUpdateDate desc, x.id desc");
 		Query query = entityManager.createQuery(sb.toString());
 		query.setParameter(1, prevention);
 		if (bDeleted!=null) query.setParameter(2, bDeleted);
@@ -94,6 +94,16 @@ public class PreventionsLotNrsDao extends AbstractDao<PreventionsLotNrs> {
         List<PreventionsLotNrs> pList = query.getResultList();
 		
 		return (pList);
+	}
+
+	public PreventionsLotNrs findActive(Integer id)
+	{
+		String sql = "SELECT x FROM PreventionsLotNrs x " +
+				"WHERE x.id=:id " +
+				"AND x.deleted=false";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("id", id);
+		return getSingleResultOrNull(query);
 	}
 }
 

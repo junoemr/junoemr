@@ -23,6 +23,7 @@
  */
 package oscar.util;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
@@ -70,6 +71,10 @@ public class ConversionUtils {
 	public static final String TIME_PATTERN_NO_SEC = "HH:mm";
 	public static final String DEFAULT_TS_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	public static final String DATE_TIME_ZONE_OFFSET_X_PATTERN = "yyyy-MM-dd HH:mm:ss X";
+	public static final String DATE_TIME_FILENAME = "yyyy-MM-dd.HH.mm.ss";
+
+	public static final String DISPLAY_DATE_PATTERN = "dd-MMM-yyyy";
+	public static final String DISPLAY_DATE_TIME_PATTERN = "dd-MMM-yyyy H:mm";
 
 	public static final String HL7_V2_DATE_TIME_OFFICIAL_PATTERN = "yyyyMMddHHmmssX";
 	public static final String HL7_DATE_TIME_DEFAULT_IN_PATTERN = "yyyyMMddHHmmss";
@@ -197,6 +202,21 @@ public class ConversionUtils {
 		{
 			return null;
 		}
+	}
+
+	/**
+	 * Parse the specified epoch string and convert it to a Java date.
+	 * If the string is null or unparseable, returns midnight, Jan 1 1970.
+	 *
+	 * @param epochString String representing an epoch time, interpreted as seconds since 1970-01-01 00:00:00
+	 * @return Java zonedate corresponding to the epoch string,
+	 */
+	public static Date fromEpochStringSeconds(String epochString)
+	{
+		Long epochTime = NumberUtils.toLong(epochString, 0L);
+		Date epochDate = new Date(epochTime * 1000);
+
+		return epochDate;
 	}
 
 	/**

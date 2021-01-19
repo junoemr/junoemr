@@ -50,6 +50,7 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.model.DemographicExtArchive;
 import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
@@ -83,6 +84,33 @@ public class DemographicManager {
 	public static final String PHR_VERIFICATION_LEVEL_3 = "+3";
 	public static final String PHR_VERIFICATION_LEVEL_2 = "+2";
 	public static final String PHR_VERIFICATION_LEVEL_1 = "+1";
+
+	//region ValidationErrorMessages
+	public static final String FIRST_NAME_REQUIRED = "firstName is a required field.  ";
+	public static final String LAST_NAME_REQUIRED = "lastName is a required field.  ";
+	public static final String SEX_REQUIRED = "sex is a required field.  ";
+	public static final String SEX_INVALID = "sex must be either \"M\" or \"F\".  ";
+	public static final String YEAR_OF_BIRTH_REQUIRED = "yearOfBirth is a required field.  ";
+	public static final String YEAR_OF_BIRTH_NUMERIC = "yearOfBirth should be a numeric value. ";
+	public static final String YEAR_OF_BIRTH_4_DIGIT = "yearOfBirth is expected to be a 4-digit number.";
+	public static final String MONTH_OF_BIRTH_REQUIRED = "monthOfBirth is a required field.  ";
+	public static final String MONTH_OF_BIRTH_INVALID = "monthOfBirth should be a number between 1 and 12. ";
+	public static final String DATE_OF_BIRTH_REQUIRED = "dateOfBirth is a required field.  ";
+	public static final String DATE_OF_BIRTH_INVALID = "dateOfBirth should be a number between 1 and 31 (depending on month).";
+	public static final String BIRTHDAY_INVALID = "Need a valid birth date.";
+	public static final String FAMILY_DOCTOR_INVALID = "familyDoctor is formatted incorrectly.  It must " +
+			"be a string like <rdohip>{referral doctor number}" +
+			"</rdohip><rd>{last name},{first name}</rd>.  " +
+			"Also no other tags and no quotes, line breaks " +
+			"or semicolons are allowed.";
+	public static final String FAMILY_DOCTOR_2_INVALID = "familyDoctor2 is formatted incorrectly.  It must " +
+			"be a string like <fd>{family doctor number}" +
+			"</fd><fdname>{last name},{first name}</fdname>.  " +
+			"Also no other tags and no quotes, line breaks " +
+			"or semicolons are allowed.";
+	public static final String FIELD_UNSAFE = "No html tags and no quotes, line breaks " +
+			"or semicolons are allowed.";
+	//endregion
 
 	private static Logger logger = MiscUtils.getLogger();
 
@@ -122,7 +150,9 @@ public class DemographicManager {
 
 	@Autowired
 	private ProgramManager programManager;
-	
+
+	@Autowired
+	private HinValidationService hinValidationService;
 
 	@Deprecated
 	public Demographic getDemographic(LoggedInInfo loggedInInfo, Integer demographicId) throws PatientDirectiveException {
@@ -685,6 +715,41 @@ public class DemographicManager {
 		return demographicDao.searchByHealthCard(hin);
 	}
 
+	/**
+	 * Given a HIN and a demographic to compare against, see if any other demographics are using the same HIN.
+	 * @param loggedInInfo currently logged in user
+	 * @param hin HIN we want to check potential duplication for
+	 * @param ver optional version code to go with HIN
+	 * @param demographicNo demographic to search for
+	 * @return false if a demographic outside of our given one has this HIN set, true otherwise
+	 */
+	public boolean isUniqueHealthCard(LoggedInInfo loggedInInfo, String hin, String ver, String province, int demographicNo)
+	{
+		// whether it's unique or not, if we allow duplicates we don't care and this has to return true
+		if (hinValidationService.isDuplicateAllowable(ver, province))
+		{
+			return true;
+		}
+
+		List<Demographic> potentialMatches = searchByHealthCard(loggedInInfo, hin);
+
+		boolean isUnique = true;
+		for (Demographic demographic : potentialMatches)
+		{
+			if (demographic.getDemographicNo() == demographicNo)
+			{
+				continue;
+			}
+
+			if (!hinValidationService.isDuplicateAllowable(demographic.getVer(), demographic.getHcType()))
+			{
+				isUnique = false;
+			}
+		}
+
+		return isUnique;
+	}
+
 	public Demographic getDemographicByNamePhoneEmail(LoggedInInfo loggedInInfo, String firstName, String lastName,
 			String hPhone, String wPhone, String email) {
 		if (loggedInInfo == null)
@@ -723,6 +788,11 @@ public class DemographicManager {
 	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
 
+        if (demographic.getDateJoined() == null)
+        {
+            Date newDateJoined = new Date();
+            demographic.setDateJoined(newDateJoined);
+        }
 		validateDemographic(demographic);
 		filterDemographic(demographic);
 
@@ -848,112 +918,98 @@ public class DemographicManager {
 	{
 		boolean has_error = false;
 		String error_string = "";
-		if (demographic.getFirstName() == null)
+		if (StringUtils.isEmpty(demographic.getFirstName()))
 		{
-			error_string += "firstName is a required field.  ";
+			error_string += FIRST_NAME_REQUIRED;
 			has_error = true;
 		}
 
-		if (demographic.getLastName() == null)
+		if (StringUtils.isEmpty(demographic.getLastName()))
 		{
-			error_string += "lastName is a required field.  ";
+			error_string += LAST_NAME_REQUIRED;
 			has_error = true;
 		}
 
 		if (demographic.getSex() == null)
 		{
-			error_string += "sex is a required field.  ";
+			error_string += SEX_REQUIRED;
 			has_error = true;
 		}
 
 		else if (!demographic.getSex().equals("M")
 				&& !demographic.getSex().equals("F"))
 		{
-			error_string += "sex must be either \"M\" or \"F\" (received " +
-					demographic.getSex() + ").  ";
-
+			error_string += SEX_INVALID;
 			has_error = true;
 		}
 
 		if (demographic.getYearOfBirth() == null)
 		{
-			error_string += "yearOfBirth is a required field.  ";
+			error_string += YEAR_OF_BIRTH_REQUIRED;
 			has_error = true;
 		}
-		else if (ConversionUtils.fromIntString(demographic.getYearOfBirth()) == 0)
+		else if (!StringUtils.isNumeric(demographic.getYearOfBirth()))
 		{
-			error_string += "yearOfBirth should be should be a numeric value. ";
+			error_string += YEAR_OF_BIRTH_NUMERIC;
 			has_error = true;
 		}
-		else if (demographic.getYearOfBirth().length() != 4
-				|| ConversionUtils.fromIntString(demographic.getYearOfBirth()) < 1000
-				|| ConversionUtils.fromIntString(demographic.getYearOfBirth()) > 10000)
+		else
 		{
-			error_string += "yearOfBirth is expected to be a 4-digit number.";
-			has_error = true;
+			// Convert the string value of the birth year to an int and ensure that it is 4 digits long.
+			int yearOfBirth = ConversionUtils.fromIntString(demographic.getYearOfBirth());
+			if (yearOfBirth < 1000 || yearOfBirth >= 10000)
+			{
+				error_string += YEAR_OF_BIRTH_4_DIGIT;
+				has_error = true;
+			}
 		}
 
 		if (demographic.getMonthOfBirth() == null)
 		{
-			error_string += "monthOfBirth is a required field.  ";
+			error_string += MONTH_OF_BIRTH_REQUIRED;
 			has_error = true;
 		}
-		else if (ConversionUtils.fromIntString(demographic.getMonthOfBirth()) <= 0
-				|| ConversionUtils.fromIntString(demographic.getMonthOfBirth()) > 12
-				|| (demographic.getMonthOfBirth().length() != 1 && demographic.getMonthOfBirth().length() != 2)
-		)
-		{
-			error_string += "monthOfBirth should be a number between 1 and 12. ";
-			has_error = true;
+		else {
+			int monthOfBirth = ConversionUtils.fromIntString(demographic.getMonthOfBirth());
+			if (monthOfBirth < 1 || monthOfBirth > 12)
+			{
+				error_string += MONTH_OF_BIRTH_INVALID;
+				has_error = true;
+			}
 		}
 
 		if (demographic.getDateOfBirth() == null)
 		{
-			error_string += "dateOfBirth is a required field.  ";
+			error_string += DATE_OF_BIRTH_REQUIRED;
 			has_error = true;
 		}
-		else if (ConversionUtils.fromIntString(demographic.getDateOfBirth()) <= 0)
-		{
-			error_string += "dateOfBirth should be a numeric value. ";
-			has_error = true;
-		}
-		else if (ConversionUtils.fromIntString(demographic.getDateOfBirth()) < 1
-		|| ConversionUtils.fromIntString(demographic.getDateOfBirth()) > 31
-		|| (demographic.getDateOfBirth().length() != 1 && demographic.getDateOfBirth().length() != 2))
-		{
-			error_string += "dateOfBirth should be a number between 1 and 31 (depending on month).";
-			has_error = true;
+		else {
+			int dateOfBirth = ConversionUtils.fromIntString(demographic.getDateOfBirth());
+			if (dateOfBirth < 1 || dateOfBirth > 31) {
+				error_string += DATE_OF_BIRTH_INVALID;
+				has_error = true;
+			}
 		}
 
 		// Ensure that the proposed date is actually a valid date
-		String possibleBirthday = ConversionUtils.fromIntString(demographic.getYearOfBirth()).toString() + "-"
-				+ ConversionUtils.fromIntString(demographic.getMonthOfBirth()).toString() + "-"
-				+ ConversionUtils.fromIntString(demographic.getDateOfBirth());
+		String possibleBirthday = demographic.getBirthDayAsString();
 		Date validDate = ConversionUtils.fromDateString(possibleBirthday);
 		if (validDate == null)
 		{
-			error_string += "Need a valid birth date.";
+			error_string += BIRTHDAY_INVALID;
 			has_error = true;
 		}
 
 		String familyDoctor = demographic.getFamilyDoctor();
-		if (!StringUtils.isBlank(familyDoctor) && !validatePattern(familyDoctor, "<rdohip>(.*)<\\/rdohip><rd>(.*)<\\/rd>"))
+		if (StringUtils.isNotBlank(familyDoctor) && !validatePattern(familyDoctor, "<rdohip>(.*)<\\/rdohip><rd>(.*)<\\/rd>"))
 		{
-			error_string += "familyDoctor is formatted incorrectly.  It must ";
-			error_string += "be a string like <rdohip>{referral doctor number}";
-			error_string += "</rdohip><rd>{last name},{first name}</rd>.  ";
-			error_string += "Also no other tags and no quotes, line breaks ";
-			error_string += "or semicolons are allowed.";
+			error_string += FAMILY_DOCTOR_INVALID;
 			has_error = true;
 		}
 
 		if (!validatePattern(demographic.getFamilyDoctor2(), "<fd>(.*)<\\/fd><fdname>(.*)<\\/fdname>"))
 		{
-			error_string += "familyDoctor2 is formatted incorrectly.  It must ";
-			error_string += "be a string like <fd>{family doctor number}";
-			error_string += "</fd><fdname>{last name},{first name}</fdname>.  ";
-			error_string += "Also no other tags and no quotes, line breaks ";
-			error_string += "or semicolons are allowed.";
+			error_string += FAMILY_DOCTOR_2_INVALID;
 			has_error = true;
 		}
 
@@ -1002,8 +1058,7 @@ public class DemographicManager {
 						!oscar.util.StringUtils.isStringSafe(demographic.getNameOfMother())
 				)
 		{
-			error_string += "No html tags and no quotes, line breaks ";
-			error_string += "or semicolons are allowed.";
+			error_string += FIELD_UNSAFE;
 			has_error = true;
 		}
 

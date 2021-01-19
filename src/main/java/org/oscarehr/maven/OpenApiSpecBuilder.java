@@ -44,9 +44,10 @@ public class OpenApiSpecBuilder
 		String outputDirectory = System.getProperty("openApiSpecBuilder.outputDirectory");
 		String filename = outputDirectory + "/" + FILENAME;
 
-		SwaggerConfiguration oasConfig = new SwaggerConfiguration()
-			.resourceClasses(Stream.of(resourceClassCsv.split(",")).collect(Collectors.toSet()));
-
+		SwaggerConfiguration oasConfig = new SwaggerConfiguration().resourceClasses(
+				(Stream.of(resourceClassCsv.split("\n")))
+				.map(str -> str.replaceAll("\\s+", ""))
+				.collect(Collectors.toSet()));
 		try
 		{
 			OpenAPI openAPI = new JaxrsOpenApiContextBuilder()

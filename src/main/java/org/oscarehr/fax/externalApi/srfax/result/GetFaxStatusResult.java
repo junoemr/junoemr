@@ -38,12 +38,26 @@ public class GetFaxStatusResult
 	private String detailsId;
 	@JsonProperty("SentStatus")
 	private String sentStatus;
+
+	/**
+	 * Datetime the fax was queued, format is determined by account preference
+	 */
 	@JsonProperty("DateQueued")
 	private String dateQueued;
+
+	/**
+	 * Datetime the fax was sent, format is determined by account preference.
+	 * A consistent format for this field found in GetFaxStatusResult.epochTime
+	 */
 	@JsonProperty("DateSent")
 	private String dateSent;
+
+	/**
+	 * Datetime the fax was sent, as seconds since the UNIX epoch.
+	 */
 	@JsonProperty("EpochTime")
-	private Long epochTime;
+	private String epochTime;
+	
 	@JsonProperty("ToFaxNumber")
 	private String toFaxNumber;
 	@JsonProperty("Pages")
@@ -112,12 +126,12 @@ public class GetFaxStatusResult
 		this.dateSent = dateSent;
 	}
 
-	public Long getEpochTime()
+	public String getEpochTime()
 	{
 		return epochTime;
 	}
 
-	public void setEpochTime(Long epochTime)
+	public void setEpochTime(String epochTime)
 	{
 		this.epochTime = epochTime;
 	}

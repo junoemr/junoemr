@@ -432,32 +432,31 @@ function disableSubmitButton()
 	%>
 
 	<script type="text/javascript">
-		function submission()
-		{
+        function submission(event)
+        {
+            var isAlternateChecked = "<%=  bOrigAlt || bAlternate %>";
+            if(isAlternateChecked === "true" )
+            {
+                addDataStringB();
+            }
 
-			var isAlternateChecked = "<%=  bOrigAlt || bAlternate %>";
-			if(isAlternateChecked === "true" )
-			{
-				addDataStringB();
-			}
+            if(inputValidation() === true)
+            {
+                //prevent spam hitting submission, only allow one submission.
+                disableSubmitButton();
+                return true;
+            }
 
-			if(inputValidation() === true)
-			{
-				//prevent spam hitting submission, only allow one submission.
-				disableSubmitButton();
-				return true;
-			}
-
-			return false;
-
-		}
+            event.preventDefault();
+            return false;
+        }
 	</script>
 
 <body bgcolor="ivory" bgproperties="fixed" onLoad="setfocus()"
 	topmargin="0" leftmargin="0" rightmargin="0">
 
 <form method="post" name="schedule" action="schedulecreatedate.jsp"
-	  onSubmit="submission()">
+	  onSubmit="return submission(event)">
 
 <table border="0" width="100%">
 	<!-- <tr>

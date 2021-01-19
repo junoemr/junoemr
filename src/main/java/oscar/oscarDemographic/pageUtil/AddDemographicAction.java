@@ -122,7 +122,14 @@ public class AddDemographicAction extends Action
 		demographic.setPhone2(filterControlCharacters(StringUtils.trimToNull(request.getParameter("phone2"))));
 		demographic.setEmail(StringUtils.trimToNull(request.getParameter("email")));
 		demographic.setDateOfBirth(dateOfBirth);
-		demographic.setHin(StringUtils.trimToNull(request.getParameter("hin")));
+
+		String hin = request.getParameter("hin");
+		if (hin != null)
+		{
+			hin = hin.replaceAll("[^0-9a-zA-Z]", "");
+		}
+		demographic.setHin(StringUtils.trimToNull(hin));
+
 		demographic.setVer(StringUtils.trimToNull(request.getParameter("ver")));
 		demographic.setRosterStatus(StringUtils.trimToNull(request.getParameter("roster_status")));
 		demographic.setPatientStatus(StringUtils.trimToNull(request.getParameter("patient_status")));

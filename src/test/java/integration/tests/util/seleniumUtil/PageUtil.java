@@ -131,6 +131,7 @@ public class PageUtil
 		allHandles.remove(allHandles.iterator().next());
 		String lastHandle = allHandles.iterator().next();
 		driver.switchTo().window(lastHandle);
+		driver.manage().window().maximize();
 	}
 
 	public static void switchToNewWindow(WebDriver driver, By textlink, Set<String> oldWindowHandles) throws InterruptedException {

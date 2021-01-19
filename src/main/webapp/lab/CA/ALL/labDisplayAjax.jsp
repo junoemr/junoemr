@@ -177,45 +177,43 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
      			}
      		}
      	%>
+     	
+         getComment = function getComment(segmentID, action)
+             {
+                 var saveComment = true;
+                 var comment = "";
 
-         getComment = function getComment(labId, action)
-         {
-                 jQuery.ajax(
+                 var text = "V" + <%=version%> + "commentText" + segmentID;
+		         if ($(text) != null)
+                 {
+                     comment = $(text).innerHTML;
+                     if (!comment)
                      {
-                         url: "../ws/rs/lab/" + labId + "/provider/" + providerNo + "/labRouting",
-                         type: "GET",
-                         success: (result) =>
-                         {
-                             var commentVal = "";
+                         comment = "";
+                     }
+                 }
+                 var commentVal = prompt('<bean:message key = "oscarMDS.segmentDisplay.msgComment"/>', comment);
 
-                             if (result.body)
-                             {
-                                 commentVal = result.body.comment;
-                             }
-                             
-                             var commentID = "comment_" + labId;
-                             var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
+                 if (!commentVal)
+                 {
+                     saveComment = false;
+                 }
+                 else if (commentVal && commentVal.length > 0)
+                 {
+                     document.forms['acknowledgeForm_' + segmentID].comment.value = commentVal;
+                 }
+                 else
+                 {
+                     document.forms['acknowledgeForm_' + segmentID].comment.value = comment;
+                 }
 
-                             if (comment && comment.length > 0)
-                             {
-                                 $(commentID).value = comment;
-                             }
+                 if (saveComment)
+                 {
+                     handleLab('acknowledgeForm_' + segmentID, segmentID, action);
+                 }
 
-                             if (comment == null)
-                             {
-                                 return false;
-                             }
-
-                             handleLab('acknowledgeForm_' + labId, labId, action);
-                         },
-                         error: (error) =>
-                         {
-                            console.log("Error getting lab comment", error);
-                            window.alert("Failed to load comments");
-                         }
-                     });
-         }
-
+                 return false;
+             }
 
          printPDF=function(doclabid){
             document.forms['acknowledgeForm_'+doclabid].action="../lab/CA/ALL/PrintPDF.do";
