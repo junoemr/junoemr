@@ -39,10 +39,10 @@ import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographicImport.converter.in.PreventionModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.ReviewerModelToDbConverter;
 import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
-import org.oscarehr.demographicImport.converter.out.DemographicDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.PatientRecordModelConverter;
 import org.oscarehr.demographicImport.logger.ExportLogger;
 import org.oscarehr.demographicImport.logger.ImportLogger;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
@@ -103,9 +103,6 @@ public class ImportExportService
 	private DocumentService documentService;
 
 	@Autowired
-	private DemographicDbToModelConverter modelToExportConverter;
-
-	@Autowired
 	private EncounterNoteService encounterNoteService;
 
 	@Autowired
@@ -159,21 +156,24 @@ public class ImportExportService
 	@Autowired
 	private ImporterExporterFactory importerExporterFactory;
 
+	@Autowired
+	private PatientRecordModelConverter patientRecordModelConverter;
+
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE importType,
 	                                            ExportLogger exportLogger,
-	                                            List<Demographic> demographicList,
+	                                            List<PatientRecord> patientRecords,
 	                                            ExportPreferences preferences) throws Exception
 	{
 		exportLogger.logSummaryHeaderLine();
 		DemographicExporter exporter = importerExporterFactory.getExporter(importType, exportLogger, preferences);
-		List<GenericFile> fileList = new ArrayList<>(demographicList.size() + 2);
+		List<GenericFile> fileList = new ArrayList<>(patientRecords.size() + 2);
 
 		try
 		{
-			for(Demographic demographic : demographicList)
+			for(PatientRecord patientRecord : patientRecords)
 			{
-				logger.info("Export Demographic " + demographic.getId());
-				GenericFile file = exporter.exportDemographic(demographic);
+				logger.info("Export Demographic " + patientRecord.getDemographic().getId());
+				GenericFile file = exporter.exportDemographic(patientRecord);
 				fileList.add(file);
 			}
 			fileList.addAll(exporter.getAdditionalFiles(preferences));
@@ -193,17 +193,17 @@ public class ImportExportService
 	                                                      ExportPreferences preferences) throws Exception
 	{
 		//TODO batch query get demographics
-		List<Demographic> demographicList = new ArrayList<>(demographicIdList.size());
+		List<PatientRecord> patientRecords = new ArrayList<>(demographicIdList.size());
 		for(String demographicIdStr : demographicIdList)
 		{
 			logger.info("Load Demographic " + demographicIdStr);
 			Integer demographicId = Integer.parseInt(demographicIdStr);
 			org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
-			Demographic exportDemographic = modelToExportConverter.convert(demographic);
-			demographicList.add(exportDemographic);
+			PatientRecord patientRecord = patientRecordModelConverter.convert(demographic);
+			patientRecords.add(patientRecord);
 		}
 
-		return exportDemographics(importType, exportLogger, demographicList, preferences);
+		return exportDemographics(importType, exportLogger, patientRecords, preferences);
 	}
 
 	public void importDemographic(ImporterExporterFactory.IMPORTER_TYPE importType,
@@ -216,45 +216,45 @@ public class ImportExportService
 	{
 		DemographicImporter importer = importerExporterFactory.getImporter(importType, importSource, importLogger, documentLocation, skipMissingDocs);
 		importer.verifyFileFormat(importFile);
-		Demographic demographic = importer.importDemographic(importFile);
+		PatientRecord patientRecord = importer.importDemographic(importFile);
 
 		// TODO handle demographic merging & duplicate check
 
-		org.oscarehr.demographic.model.Demographic dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, demographic);
-		demographic.setId(dbDemographic.getId());
-		logger.info("persisted new demographic: " + demographic.getId());
+		org.oscarehr.demographic.model.Demographic dbDemographic = demographicService.addNewDemographicRecord(SYSTEM_PROVIDER_NO, patientRecord.getDemographic());
+		patientRecord.getDemographic().setId(dbDemographic.getId());
+		logger.info("persisted new demographic: " + patientRecord.getDemographic().getId());
 
-		demographicContactService.addNewContacts(demographic.getContactList(), dbDemographic);
-		persistNotes(demographic, dbDemographic);
-		persistLabs(demographic, dbDemographic);
+		demographicContactService.addNewContacts(patientRecord.getContactList(), dbDemographic);
+		persistNotes(patientRecord, dbDemographic);
+		persistLabs(patientRecord, dbDemographic);
 
-		appointmentService.saveNewAppointments(demographic.getAppointmentList(), dbDemographic);
+		appointmentService.saveNewAppointments(patientRecord.getAppointmentList(), dbDemographic);
 		appointmentStatusCache.clear();
 
-		medicationService.saveNewMedications(demographic.getMedicationList(), dbDemographic);
-		persistMeasurements(demographic, dbDemographic);
+		medicationService.saveNewMedications(patientRecord.getMedicationList(), dbDemographic);
+		persistMeasurements(patientRecord, dbDemographic);
 
-		allergyService.saveNewAllergies(demographic.getAllergyList(), dbDemographic);
+		allergyService.saveNewAllergies(patientRecord.getAllergyList(), dbDemographic);
 
-		persistPreventions(demographic, dbDemographic);
+		persistPreventions(patientRecord, dbDemographic);
 
-		documentService.uploadAllNewDemographicDocument(demographic.getDocumentList(), dbDemographic);
+		documentService.uploadAllNewDemographicDocument(patientRecord.getDocumentList(), dbDemographic);
 	}
 
-	private void persistNotes(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)
+	private void persistNotes(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
 	{
-		socialHistoryNoteService.saveSocialHistoryNote(demographic.getSocialHistoryNoteList(), dbDemographic);
-		familyHistoryNoteService.saveFamilyHistoryNote(demographic.getFamilyHistoryNoteList(), dbDemographic);
-		medicalHistoryNoteService.saveMedicalHistoryNotes(demographic.getMedicalHistoryNoteList(), dbDemographic);
-		reminderNoteService.saveReminderNote(demographic.getReminderNoteList(), dbDemographic);
-		riskFactorNoteService.saveRiskFactorNote(demographic.getRiskFactorNoteList(), dbDemographic);
-		concernNoteService.saveConcernNote(demographic.getConcernNoteList(), dbDemographic);
-		encounterNoteService.saveChartNotes(demographic.getEncounterNoteList(), dbDemographic);
+		socialHistoryNoteService.saveSocialHistoryNote(patientRecord.getSocialHistoryNoteList(), dbDemographic);
+		familyHistoryNoteService.saveFamilyHistoryNote(patientRecord.getFamilyHistoryNoteList(), dbDemographic);
+		medicalHistoryNoteService.saveMedicalHistoryNotes(patientRecord.getMedicalHistoryNoteList(), dbDemographic);
+		reminderNoteService.saveReminderNote(patientRecord.getReminderNoteList(), dbDemographic);
+		riskFactorNoteService.saveRiskFactorNote(patientRecord.getRiskFactorNoteList(), dbDemographic);
+		concernNoteService.saveConcernNote(patientRecord.getConcernNoteList(), dbDemographic);
+		encounterNoteService.saveChartNotes(patientRecord.getEncounterNoteList(), dbDemographic);
 	}
 
-	private void persistMeasurements(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)
+	private void persistMeasurements(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
 	{
-		for(org.oscarehr.demographicImport.model.measurement.Measurement measurement : demographic.getMeasurementList())
+		for(org.oscarehr.demographicImport.model.measurement.Measurement measurement : patientRecord.getMeasurementList())
 		{
 			Measurement dbMeasurement = measurementsService.createNewMeasurement(
 					dbDemographic.getId(),
@@ -266,9 +266,9 @@ public class ImportExportService
 		}
 	}
 
-	private void persistPreventions(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic)
+	private void persistPreventions(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
 	{
-		List<Prevention> preventions = preventionModelToDbConverter.convert(demographic.getImmunizationList());
+		List<Prevention> preventions = preventionModelToDbConverter.convert(patientRecord.getImmunizationList());
 
 		for(Prevention prevention : preventions)
 		{
@@ -282,11 +282,11 @@ public class ImportExportService
 		}
 	}
 
-	private void persistLabs(Demographic demographic, org.oscarehr.demographic.model.Demographic dbDemographic) throws HL7Exception, IOException
+	private void persistLabs(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic) throws HL7Exception, IOException
 	{
-		for(Lab lab : demographic.getLabList())
+		for(Lab lab : patientRecord.getLabList())
 		{
-			HL7LabWriter labWriter = new JunoGenericImportLabWriter(demographic, lab);
+			HL7LabWriter labWriter = new JunoGenericImportLabWriter(patientRecord.getDemographic(), lab);
 			String labHl7 = labWriter.encode();
 
 			MessageHandler parser = Factory.getHandler(JunoGenericLabHandler.LAB_TYPE_VALUE, labHl7);

@@ -25,7 +25,6 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 import org.oscarehr.common.xml.cds.v5_0.model.LaboratoryResults;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic>
+public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, org.oscarehr.demographicImport.model.PatientRecord>
 {
 	@Autowired
 	private  CDSDemographicExportMapper cdsDemographicExportMapper;
@@ -78,7 +77,7 @@ public class CDSExportMapper extends AbstractCDSExportMapper<OmdCds, Demographic
 	}
 
 	@Override
-	public OmdCds exportFromJuno(Demographic exportStructure) throws Exception
+	public OmdCds exportFromJuno(org.oscarehr.demographicImport.model.PatientRecord exportStructure) throws Exception
 	{
 		OmdCds omdCds = objectFactory.createOmdCds();
 		PatientRecord patientRecord = objectFactory.createPatientRecord();

@@ -23,7 +23,7 @@
 package org.oscarehr.demographicImport.service;
 
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.util.List;
 
 public interface DemographicExporter
 {
-	GenericFile exportDemographic(Demographic demographic) throws Exception;
+	GenericFile exportDemographic(PatientRecord patientRecord) throws Exception;
 
 	List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException;
 }

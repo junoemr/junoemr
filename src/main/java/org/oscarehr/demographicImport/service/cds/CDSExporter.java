@@ -27,6 +27,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.demographicImport.mapper.cds.out.CDSExportMapper;
+import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
@@ -70,13 +71,14 @@ public class CDSExporter implements DemographicExporter
 		providerExportCountHash = new HashMap<>();
 	}
 
-	public GenericFile exportDemographic(Demographic demographic) throws Exception
+	public GenericFile exportDemographic(PatientRecord patientRecord) throws Exception
 	{
+		Demographic demographic = patientRecord.getDemographic();
 		CDSFileParser parser = new CDSFileParser();
 
-		exportProperties.getExportLogger().logSummaryLine(demographic);
+		exportProperties.getExportLogger().logSummaryLine(patientRecord);
 		incrementProviderExportCount(demographic);
-		OmdCds omdCds = cdsExportMapper.exportFromJuno(demographic);
+		OmdCds omdCds = cdsExportMapper.exportFromJuno(patientRecord);
 
 		GenericFile exportFile = parser.write(omdCds);
 		exportFile.rename(createExportFilename(demographic));

@@ -23,19 +23,23 @@
 package org.oscarehr.demographicImport.mapper.cds.in;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
+import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.mapper.AbstractImportMapper;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
+import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -47,6 +51,8 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.Y_INDICATOR
 @Component
 public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper<I, E>
 {
+	private static final Logger logger = Logger.getLogger(AbstractCDSImportMapper.class);
+
 	public AbstractCDSImportMapper()
 	{
 	}
@@ -158,6 +164,54 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 			}
 		}
 		return null;
+	}
+
+	protected PhoneNumber getPhoneNumber(org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber importNumber)
+	{
+		if(importNumber == null)
+		{
+			return null;
+		}
+		PhoneNumber phoneNumber = new PhoneNumber();
+
+		//TODO handle discrete phone number cases
+		for(JAXBElement<String> phoneElement : importNumber.getContent())
+		{
+			String key = phoneElement.getName().getLocalPart();
+			String value = phoneElement.getValue();
+			if("phoneNumber".equals(key) || "number".equals(key))
+			{
+				phoneNumber.setNumber(value);
+			}
+			else if("extension".equals(key))
+			{
+				phoneNumber.setExtension(value);
+			}
+			else
+			{
+				logger.error("Unknown Phone number component key: '" + key + "'");
+			}
+		}
+
+		PhoneNumberType type = importNumber.getPhoneNumberType();
+		if(PhoneNumberType.R.equals(type))
+		{
+			phoneNumber.setPhoneTypeHome();
+		}
+		else if(PhoneNumberType.W.equals(type))
+		{
+			phoneNumber.setPhoneTypeWork();
+		}
+		else if(PhoneNumberType.C.equals(type))
+		{
+			phoneNumber.setPhoneTypeCell();
+		}
+		else
+		{
+			logger.error("Invalid Phone Number Type: " + type);
+		}
+
+		return phoneNumber;
 	}
 
 	protected PartialDate toNullablePartialDate(DateFullOrPartial fullOrPartial)

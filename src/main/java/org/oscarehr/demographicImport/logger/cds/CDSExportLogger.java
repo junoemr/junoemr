@@ -26,8 +26,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.logger.ExportLogger;
+import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
@@ -81,24 +81,24 @@ public class CDSExportLogger implements ExportLogger
 	}
 
 	@Override
-	public void logSummaryLine(Demographic demographic) throws IOException
+	public void logSummaryLine(PatientRecord patientRecord) throws IOException
 	{
 		String summaryLine = buildSummaryLine(
-				String.valueOf(demographic.getId()),
-				String.valueOf(demographic.getFamilyHistoryNoteList().size()),
-				String.valueOf(demographic.getMedicalHistoryNoteList().size()),
-				String.valueOf(demographic.getConcernNoteList().size()),
-				String.valueOf(demographic.getRiskFactorNoteList().size()),
-				String.valueOf(demographic.getAllergyList().size()),
-				String.valueOf(demographic.getMedicationList().size()),
-				String.valueOf(demographic.getImmunizationList().size()),
-				String.valueOf(demographic.getLabList().size()),
-				String.valueOf(demographic.getAppointmentList().size()),
-				String.valueOf(demographic.getEncounterNoteList().size()),
-				String.valueOf(demographic.getDocumentList().size()),
-				String.valueOf(demographic.getDocumentList().size()),
-				String.valueOf(demographic.getMeasurementList().size()),
-				String.valueOf(demographic.getReminderNoteList().size()));
+				String.valueOf(patientRecord.getDemographic().getId()),
+				String.valueOf(patientRecord.getFamilyHistoryNoteList().size()),
+				String.valueOf(patientRecord.getMedicalHistoryNoteList().size()),
+				String.valueOf(patientRecord.getConcernNoteList().size()),
+				String.valueOf(patientRecord.getRiskFactorNoteList().size()),
+				String.valueOf(patientRecord.getAllergyList().size()),
+				String.valueOf(patientRecord.getMedicationList().size()),
+				String.valueOf(patientRecord.getImmunizationList().size()),
+				String.valueOf(patientRecord.getLabList().size()),
+				String.valueOf(patientRecord.getAppointmentList().size()),
+				String.valueOf(patientRecord.getEncounterNoteList().size()),
+				String.valueOf(patientRecord.getDocumentList().size()),
+				String.valueOf(patientRecord.getDocumentList().size()),
+				String.valueOf(patientRecord.getMeasurementList().size()),
+				String.valueOf(patientRecord.getReminderNoteList().size()));
 		this.log(summaryLine);
 	}
 

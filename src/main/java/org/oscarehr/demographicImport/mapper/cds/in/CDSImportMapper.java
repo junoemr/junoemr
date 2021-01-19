@@ -26,7 +26,6 @@ import org.oscarehr.common.xml.cds.v5_0.model.CareElements;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.common.xml.cds.v5_0.model.PatientRecord;
 import org.oscarehr.common.xml.cds.v5_0.model.Reports;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
 import org.oscarehr.demographicImport.model.document.Document;
 import org.oscarehr.demographicImport.model.measurement.Measurement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +37,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic>
+public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscarehr.demographicImport.model.PatientRecord>
 {
 	@Autowired
 	private CDSDemographicImportMapper cdsDemographicImportMapper;
+	@Autowired
+	private CDSContactImportMapper cdsContactImportMapper;
 	@Autowired
 	private CDSPersonalHistoryImportMapper cdsPersonalHistoryImportMapper;
 	@Autowired
@@ -79,28 +80,30 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, Demographic
 	}
 
 	@Override
-	public Demographic importToJuno(OmdCds importStructure) throws Exception
+	public org.oscarehr.demographicImport.model.PatientRecord importToJuno(OmdCds importStructure) throws Exception
 	{
+		org.oscarehr.demographicImport.model.PatientRecord patientModel = new org.oscarehr.demographicImport.model.PatientRecord();
+
 		PatientRecord patientRecord = importStructure.getPatientRecord();
-		Demographic demographic = cdsDemographicImportMapper.importToJuno(patientRecord.getDemographics());
+		patientModel.setDemographic(cdsDemographicImportMapper.importToJuno(patientRecord.getDemographics()));
+		patientModel.setContactList(cdsContactImportMapper.importAll(patientRecord.getDemographics().getContact()));
+		patientModel.setSocialHistoryNoteList(cdsPersonalHistoryImportMapper.importAll(patientRecord.getPersonalHistory()));
+		patientModel.setFamilyHistoryNoteList(cdsFamilyHistoryImportMapper.importAll(patientRecord.getFamilyHistory()));
+		patientModel.setMedicalHistoryNoteList(cdsPastHealthImportMapper.importAll(patientRecord.getPastHealth()));
+		patientModel.setConcernNoteList(cdsProblemImportMapper.importAll(patientRecord.getProblemList()));
+		patientModel.setRiskFactorNoteList(cdsRiskFactorImportMapper.importAll(patientRecord.getRiskFactors()));
+		patientModel.setAllergyList(cdsAllergyImportMapper.importAll(patientRecord.getAllergiesAndAdverseReactions()));
+		patientModel.setMedicationList(cdsMedicationImportMapper.importAll(patientRecord.getMedicationsAndTreatments()));
+		patientModel.setImmunizationList(cdsImmunizationImportMapper.importAll(patientRecord.getImmunizations()));
+		patientModel.setLabList(cdsLabImportMapper.importToJuno(patientRecord.getLaboratoryResults()));
+		patientModel.setAppointmentList(cdsAppointmentImportMapper.importAll(patientRecord.getAppointments()));
+		patientModel.setEncounterNoteList(cdsEncounterNoteImportMapper.importAll(patientRecord.getClinicalNotes()));
+		patientModel.setDocumentList(getDocuments(patientRecord.getReports()));
+		patientModel.setHrmDocumentList(cdsReportHrmImportMapper.importAll(getHrmReports(patientRecord.getReports())));
+		patientModel.setMeasurementList(getMeasurementsList(patientRecord.getCareElements()));
+		patientModel.setReminderNoteList(cdsAlertImportMapper.importAll(patientRecord.getAlertsAndSpecialNeeds()));
 
-		demographic.setSocialHistoryNoteList(cdsPersonalHistoryImportMapper.importAll(patientRecord.getPersonalHistory()));
-		demographic.setFamilyHistoryNoteList(cdsFamilyHistoryImportMapper.importAll(patientRecord.getFamilyHistory()));
-		demographic.setMedicalHistoryNoteList(cdsPastHealthImportMapper.importAll(patientRecord.getPastHealth()));
-		demographic.setConcernNoteList(cdsProblemImportMapper.importAll(patientRecord.getProblemList()));
-		demographic.setRiskFactorNoteList(cdsRiskFactorImportMapper.importAll(patientRecord.getRiskFactors()));
-		demographic.setAllergyList(cdsAllergyImportMapper.importAll(patientRecord.getAllergiesAndAdverseReactions()));
-		demographic.setMedicationList(cdsMedicationImportMapper.importAll(patientRecord.getMedicationsAndTreatments()));
-		demographic.setImmunizationList(cdsImmunizationImportMapper.importAll(patientRecord.getImmunizations()));
-		demographic.setLabList(cdsLabImportMapper.importToJuno(patientRecord.getLaboratoryResults()));
-		demographic.setAppointmentList(cdsAppointmentImportMapper.importAll(patientRecord.getAppointments()));
-		demographic.setEncounterNoteList(cdsEncounterNoteImportMapper.importAll(patientRecord.getClinicalNotes()));
-		demographic.setDocumentList(getDocuments(patientRecord.getReports()));
-		demographic.setHrmDocumentList(cdsReportHrmImportMapper.importAll(getHrmReports(patientRecord.getReports())));
-		demographic.setMeasurementList(getMeasurementsList(patientRecord.getCareElements()));
-		demographic.setReminderNoteList(cdsAlertImportMapper.importAll(patientRecord.getAlertsAndSpecialNeeds()));
-
-		return demographic;
+		return patientModel;
 	}
 
 	private List<Measurement> getMeasurementsList(List<CareElements> careElements) throws Exception

@@ -24,7 +24,7 @@ package org.oscarehr.demographicImport.service;
 
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ public interface DemographicImporter
 {
 	void verifyFileFormat(GenericFile importFile) throws InvalidImportFileException;
 
-	Demographic importDemographic(GenericFile importFile) throws Exception;
+	PatientRecord importDemographic(GenericFile importFile) throws Exception;
 
 	List<GenericFile> getAdditionalFiles(ExportPreferences preferences) throws IOException;
 }

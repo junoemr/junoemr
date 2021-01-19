@@ -27,7 +27,7 @@ import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.xml.cds.v5_0.model.OmdCds;
 import org.oscarehr.demographicImport.exception.InvalidImportFileException;
 import org.oscarehr.demographicImport.mapper.cds.in.CDSImportMapper;
-import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.parser.cds.CDSFileParser;
 import org.oscarehr.demographicImport.service.DemographicImporter;
 import org.oscarehr.demographicImport.util.ExportPreferences;
@@ -58,7 +58,7 @@ public class CDSImporter implements DemographicImporter
 		throw new InvalidImportFileException();
 	}
 
-	public Demographic importDemographic(GenericFile importFile) throws Exception
+	public PatientRecord importDemographic(GenericFile importFile) throws Exception
 	{
 		CDSFileParser parser = new CDSFileParser();
 

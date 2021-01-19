@@ -41,6 +41,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
 import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PurposeEnumOrPlainText;
+import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.contact.DemographicContact;
@@ -62,7 +63,7 @@ import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
 
 @Component
-public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demographics, Demographic>
+public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demographics, PatientRecord>
 {
 	private static final Logger logger = Logger.getLogger(CDSDemographicExportMapper.class);
 
@@ -72,30 +73,31 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 	}
 
 	@Override
-	public Demographics exportFromJuno(Demographic exportStructure)
+	public Demographics exportFromJuno(PatientRecord exportStructure)
 	{
+		Demographic exportDemographic = exportStructure.getDemographic();
 		Demographics demographics = objectFactory.createDemographics();
 
-		demographics.setNames(getExportNames(exportStructure));
-		demographics.setDateOfBirth(ConversionUtils.toXmlGregorianCalendar(exportStructure.getDateOfBirth()));
-		demographics.setHealthCard(getExportHealthCard(exportStructure));
-		demographics.setChartNumber(exportStructure.getChartNumber());
-		demographics.setGender(getExportGender(exportStructure));
-		demographics.setUniqueVendorIdSequence(String.valueOf(exportStructure.getId()));
-		demographics.getAddress().addAll(getExportAddresses(exportStructure));
-		demographics.getPhoneNumber().addAll(getExportPhones(exportStructure));
-		demographics.setPreferredOfficialLanguage(getExportOfficialLanguage(exportStructure));
-		demographics.setPreferredSpokenLanguage(exportStructure.getSpokenLanguage());
+		demographics.setNames(getExportNames(exportDemographic));
+		demographics.setDateOfBirth(ConversionUtils.toXmlGregorianCalendar(exportDemographic.getDateOfBirth()));
+		demographics.setHealthCard(getExportHealthCard(exportDemographic));
+		demographics.setChartNumber(exportDemographic.getChartNumber());
+		demographics.setGender(getExportGender(exportDemographic));
+		demographics.setUniqueVendorIdSequence(String.valueOf(exportDemographic.getId()));
+		demographics.getAddress().addAll(getExportAddresses(exportDemographic));
+		demographics.getPhoneNumber().addAll(getExportPhones(exportDemographic));
+		demographics.setPreferredOfficialLanguage(getExportOfficialLanguage(exportDemographic));
+		demographics.setPreferredSpokenLanguage(exportDemographic.getSpokenLanguage());
 		demographics.getContact().addAll(getContacts(exportStructure.getContactList()));
-		demographics.setNoteAboutPatient(exportStructure.getPatientNote());
-		demographics.setEnrolment(getEnrollment(exportStructure));
-		demographics.setPrimaryPhysician(getExportPrimaryPhysician(exportStructure));
-		demographics.setEmail(exportStructure.getEmail());
-		demographics.setPersonStatusCode(getExportStatusCode(exportStructure));
-		demographics.setPersonStatusDate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getPatientStatusDate()));
-		demographics.setSIN(exportStructure.getSin());
-		demographics.setReferredPhysician(toPersonNameSimple(exportStructure.getReferralDoctor()));
-		demographics.setFamilyPhysician(toPersonNameSimple(exportStructure.getFamilyDoctor()));
+		demographics.setNoteAboutPatient(exportDemographic.getPatientNote());
+		demographics.setEnrolment(getEnrollment(exportDemographic));
+		demographics.setPrimaryPhysician(getExportPrimaryPhysician(exportDemographic));
+		demographics.setEmail(exportDemographic.getEmail());
+		demographics.setPersonStatusCode(getExportStatusCode(exportDemographic));
+		demographics.setPersonStatusDate(ConversionUtils.toNullableXmlGregorianCalendar(exportDemographic.getPatientStatusDate()));
+		demographics.setSIN(exportDemographic.getSin());
+		demographics.setReferredPhysician(toPersonNameSimple(exportDemographic.getReferralDoctor()));
+		demographics.setFamilyPhysician(toPersonNameSimple(exportDemographic.getFamilyDoctor()));
 		demographics.setPreferredPharmacy(null); //TODO
 
 		return demographics;

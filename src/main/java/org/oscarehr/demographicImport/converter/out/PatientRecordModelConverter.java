@@ -1,0 +1,243 @@
+/**
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
+ */
+package org.oscarehr.demographicImport.converter.out;
+
+import org.oscarehr.allergy.dao.AllergyDao;
+import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.dao.MeasurementDao;
+import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.common.model.Measurement;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographicImport.converter.out.note.ConcernNoteDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.note.EncounterNoteDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.note.FamilyHistoryNoteDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.note.MedicalHistoryNoteDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.note.ReminderNoteDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.note.RiskFactorNoteDbToModelConverter;
+import org.oscarehr.demographicImport.converter.out.note.SocialHistoryNoteDbToModelConverter;
+import org.oscarehr.demographicImport.model.PatientRecord;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.model.Document;
+import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.search.CaseManagementNoteCriteriaSearch;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.rx.dao.DrugDao;
+import org.oscarehr.rx.model.Drug;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class PatientRecordModelConverter extends
+		BaseDbToModelConverter<Demographic, PatientRecord>
+{
+	@Autowired
+	private OscarAppointmentDao appointmentDao;
+
+	@Autowired
+	private AppointmentDbToModelConverter appointmentConverter;
+
+	@Autowired
+	private AllergyDao allergyDao;
+
+	@Autowired
+	private AllergyDbToModelConverter allergyDbToModelConverter;
+
+	@Autowired
+	private CaseManagementNoteDao caseManagementNoteDao;
+
+	@Autowired
+	private DocumentDao documentDao;
+
+	@Autowired
+	private DocumentDbToModelConverter documentDbToModelConverter;
+
+	@Autowired
+	private EncounterNoteDbToModelConverter encounterNoteConverter;
+
+	@Autowired
+	private FamilyHistoryNoteDbToModelConverter familyHistoryNoteConverter;
+
+	@Autowired
+	private SocialHistoryNoteDbToModelConverter socialHistoryNoteMapper;
+
+	@Autowired
+	private LabDbToModelConverter labDbToModelConverter;
+
+	@Autowired
+	private Hl7TextInfoDao hl7TextInfoDao;
+
+	@Autowired
+	private MeasurementDao measurementDao;
+
+	@Autowired
+	private MeasurementDbToModelConverter measurementDbToModelConverter;
+
+	@Autowired
+	private MedicalHistoryNoteDbToModelConverter medicalHistoryNoteConverter;
+
+	@Autowired
+	private ReminderNoteDbToModelConverter reminderNoteModelConverter;
+
+	@Autowired
+	private RiskFactorNoteDbToModelConverter riskFactorNoteModelConverter;
+
+	@Autowired
+	private ConcernNoteDbToModelConverter concernNoteModelConverter;
+
+	@Autowired
+	private PreventionDao preventionDao;
+
+	@Autowired
+	private PreventionDbToModelConverter preventionConverter;
+
+	@Autowired
+	private DrugDao drugDao;
+
+	@Autowired
+	private MedicationDbToModelConverter medicationDbToModelConverter;
+
+	@Autowired
+	private DemographicDbToModelConverter demographicDbToModelConverter;
+
+	@Override
+	public PatientRecord convert(Demographic input)
+	{
+		if(input == null)
+		{
+			return null;
+		}
+
+		PatientRecord patientRecord = new PatientRecord();
+		patientRecord.setDemographic(demographicDbToModelConverter.convert(input));
+
+		//TODO how to handle lazy loading etc.?
+		List<Appointment> appointments = appointmentDao.getAllByDemographicNo(input.getDemographicId());
+		patientRecord.setAppointmentList(appointmentConverter.convert(appointments));
+
+		setNotes(input, patientRecord);
+
+		List<Measurement> measurements = measurementDao.findByDemographicId(input.getDemographicId());
+		patientRecord.setMeasurementList(measurementDbToModelConverter.convert(measurements));
+
+		setLabs(input, patientRecord);
+
+		List<Document> documents = documentDao.findByDemographicId(String.valueOf(input.getDemographicId()));
+		patientRecord.setDocumentList(documentDbToModelConverter.convert(documents));
+
+		List<Allergy> allergies = allergyDao.findActiveAllergies(input.getDemographicId());
+		patientRecord.setAllergyList(allergyDbToModelConverter.convert(allergies));
+
+		List<Prevention> preventions = preventionDao.findActiveByDemoId(input.getDemographicId());
+		patientRecord.setImmunizationList(preventionConverter.convert(preventions));
+
+		List<Drug> drugs = drugDao.findByDemographicId(input.getDemographicId());
+		patientRecord.setMedicationList(medicationDbToModelConverter.convert(drugs));
+
+		return patientRecord;
+	}
+
+	private void setNotes(Demographic input, PatientRecord patientRecord)
+	{
+		CaseManagementNoteCriteriaSearch criteriaSearch = new CaseManagementNoteCriteriaSearch();
+		criteriaSearch.setDemographicId(input.getId());
+		criteriaSearch.setIssueCodeNone();
+		criteriaSearch.setNoLimit();
+
+		// get encounter notes by demographic
+		List<CaseManagementNote> encounterNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : encounterNotes)
+		{
+			// only include unlinked notes. Notes linked to other modules are not basic encounter notes, and will be included elsewhere
+			if(note.getNoteLinkList() == null || note.getNoteLinkList().isEmpty())
+			{
+				patientRecord.addEncounterNote(encounterNoteConverter.convert(note));
+			}
+		}
+
+		// get social history notes by demographic
+		criteriaSearch.setIssueCodeSocialHistory();
+		List<CaseManagementNote> socialHistoryNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : socialHistoryNotes)
+		{
+			patientRecord.addSocialHistoryNote(socialHistoryNoteMapper.convert(note));
+		}
+
+		// get family history notes by demographic
+		criteriaSearch.setIssueCodeFamilyHistory();
+		List<CaseManagementNote> familyHistoryNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : familyHistoryNotes)
+		{
+			patientRecord.addFamilyHistoryNote(familyHistoryNoteConverter.convert(note));
+		}
+
+		// get medical history notes by demographic
+		criteriaSearch.setIssueCodeMedicalHistory();
+		List<CaseManagementNote> medicalHistoryNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : medicalHistoryNotes)
+		{
+			patientRecord.addMedicalHistoryNote(medicalHistoryNoteConverter.convert(note));
+		}
+
+		// get reminder notes by demographic
+		criteriaSearch.setIssueCodeReminders();
+		List<CaseManagementNote> reminderNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : reminderNotes)
+		{
+			patientRecord.addReminderNote(reminderNoteModelConverter.convert(note));
+		}
+
+		// get risk factor notes by demographic
+		criteriaSearch.setIssueCodeRiskFactors();
+		List<CaseManagementNote> riskFactorNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : riskFactorNotes)
+		{
+			patientRecord.addRiskFactorNote(riskFactorNoteModelConverter.convert(note));
+		}
+
+		// get concerns notes by demographic
+		criteriaSearch.setIssueCodeConcerns();
+		List<CaseManagementNote> concernNotes = caseManagementNoteDao.criteriaSearch(criteriaSearch);
+		for(CaseManagementNote note : concernNotes)
+		{
+			patientRecord.addConcernNote(concernNoteModelConverter.convert(note));
+		}
+	}
+
+	private void setLabs(Demographic input, PatientRecord patientRecord)
+	{
+		//TODO this getter needs an update
+		List<Object[]> infos = hl7TextInfoDao.findByDemographicId(input.getDemographicId());
+		for (Object[] info : infos)
+		{
+			Hl7TextInfo hl7TxtInfo = (Hl7TextInfo) info[0];
+			patientRecord.addLab(labDbToModelConverter.convert(hl7TxtInfo));
+		}
+	}
+}
