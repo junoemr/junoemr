@@ -196,16 +196,16 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                              var commentID = "comment_" + labId;
                              var comment = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', commentVal);
 
+                             if (comment == null)
+                             {
+                                 return;
+                             }
+
                              if (comment && comment.length > 0)
                              {
                                  $(commentID).value = comment;
                              }
-
-                             if (comment == null)
-                             {
-                                 return false;
-                             }
-
+                             
                              handleLab('acknowledgeForm_' + labId, labId, action);
                          },
                          error: (error) =>
