@@ -28,13 +28,29 @@ import org.oscarehr.demographicImport.model.provider.Provider;
 
 import java.time.LocalDateTime;
 
+import static org.oscarehr.common.model.DemographicContact.CATEGORY_PERSONAL;
+import static org.oscarehr.common.model.DemographicContact.CATEGORY_PROFESSIONAL;
+
+
 @Data
 public class DemographicContact extends AbstractTransientModel
 {
 	public enum CATEGORY
 	{
-		PERSONAL,
-		PROFESSIONAL,
+		PERSONAL(CATEGORY_PERSONAL),
+		PROFESSIONAL(CATEGORY_PROFESSIONAL);
+
+		private final String value;
+
+		CATEGORY(String value)
+		{
+			this.value = value;
+		}
+
+		public String getValue()
+		{
+			return value;
+		}
 	}
 
 	private Contact contact;

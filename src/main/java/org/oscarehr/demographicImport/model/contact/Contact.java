@@ -25,9 +25,33 @@ package org.oscarehr.demographicImport.model.contact;
 import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 
+import static org.oscarehr.common.model.DemographicContact.TYPE_CONTACT;
+import static org.oscarehr.common.model.DemographicContact.TYPE_DEMOGRAPHIC;
+import static org.oscarehr.common.model.DemographicContact.TYPE_PROFESSIONALSPECIALIST;
+import static org.oscarehr.common.model.DemographicContact.TYPE_PROVIDER;
+
 public interface Contact
 {
+	enum TYPE
+	{
+		PROVIDER(TYPE_PROVIDER),
+		DEMOGRAPHIC(TYPE_DEMOGRAPHIC),
+		CONTACT(TYPE_CONTACT),
+		SPECIALIST(TYPE_PROFESSIONALSPECIALIST);
+
+		private final int value;
+		TYPE(int value)
+		{
+			this.value = value;
+		}
+		public int getValue()
+		{
+			return value;
+		}
+	}
+
 	String getIdString();
+	TYPE getContactType();
 
 	String getFirstName();
 	void setFirstName(String firstName);

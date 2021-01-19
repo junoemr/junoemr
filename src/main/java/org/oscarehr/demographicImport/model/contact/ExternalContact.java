@@ -50,4 +50,10 @@ public class ExternalContact implements Contact
 	{
 		return getId();
 	}
+
+	@Override
+	public TYPE getContactType()
+	{
+		return TYPE.CONTACT;
+	}
 }

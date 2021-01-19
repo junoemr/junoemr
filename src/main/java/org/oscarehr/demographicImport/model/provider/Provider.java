@@ -107,6 +107,12 @@ public class Provider extends AbstractTransientModel implements Person, Contact
 	}
 
 	@Override
+	public TYPE getContactType()
+	{
+		return TYPE.PROVIDER;
+	}
+
+	@Override
 	public String getIdString()
 	{
 		return getId();

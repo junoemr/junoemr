@@ -23,11 +23,8 @@
 package org.oscarehr.demographicImport.converter.in.contact;
 
 import org.oscarehr.common.model.DemographicContact;
-import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.in.BaseModelToDbConverter;
 import org.oscarehr.demographicImport.model.contact.Contact;
-import org.oscarehr.demographicImport.model.contact.ExternalContact;
-import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -42,7 +39,7 @@ public class DemographicContactModelToDbConverter
 		DemographicContact convertedDemoContact = new DemographicContact();
 		convertedDemoContact.setNote(input.getNote());
 		convertedDemoContact.setRole(input.getRole());
-		convertedDemoContact.setCategory(input.isCategoryProfessional() ? DemographicContact.CATEGORY_PROFESSIONAL : DemographicContact.CATEGORY_PERSONAL);
+		convertedDemoContact.setCategory(input.getCategory().getValue());
 		convertedDemoContact.setEc(String.valueOf(input.isEmergencyContact()));
 		convertedDemoContact.setSdm(String.valueOf(input.isSubstituteDecisionMaker()));
 		convertedDemoContact.setConsentToContact(input.isConsentToContact());
@@ -50,23 +47,7 @@ public class DemographicContactModelToDbConverter
 		convertedDemoContact.setCreator(findOrCreateProviderRecord(input.getCreatedBy(), false).getId());
 		convertedDemoContact.setCreated(ConversionUtils.toNullableLegacyDateTime(input.getCreatedAt()));
 		convertedDemoContact.setUpdateDate(ConversionUtils.toNullableLegacyDateTime(input.getUpdateDateTime()));
-
-		int type = -1;
-		if(inputContact instanceof Provider)
-		{
-			type = DemographicContact.TYPE_PROVIDER;
-		}
-		else if(inputContact instanceof Demographic)
-		{
-			type = DemographicContact.TYPE_DEMOGRAPHIC;
-		}
-		else if(inputContact instanceof ExternalContact)
-		{
-			type = DemographicContact.TYPE_CONTACT;
-		}
-		// TODO type of specialists
-
-		convertedDemoContact.setType(type);
+		convertedDemoContact.setType(inputContact.getContactType().getValue());
 		convertedDemoContact.setContactId(inputContact.getIdString());
 
 		return convertedDemoContact;

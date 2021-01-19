@@ -262,6 +262,12 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 	}
 
 	@Override
+	public TYPE getContactType()
+	{
+		return TYPE.DEMOGRAPHIC;
+	}
+
+	@Override
 	public String toString()
 	{
 		return new ReflectionToStringBuilder(this).toString();
