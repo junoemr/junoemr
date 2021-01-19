@@ -117,7 +117,7 @@ public class CaseManagementPrint {
 
 		if (printAllNotes)
 		{
-			notes = newCaseManagementNoteDao.findAllForDemographic(demographicNo);
+			notes = newCaseManagementNoteDao.findAllCurrentNotesForDemographic(demographicNo);
 		}
 		else
 		{

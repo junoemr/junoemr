@@ -68,15 +68,23 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		return query.getResultList();
 	}
 
-	public List<CaseManagementNote> findAllForDemographic(Integer demographicNo)
+	public List<CaseManagementNote> findAllCurrentNotesForDemographic(Integer demographicNo)
 	{
-		String queryString = "SELECT cm FROM model.CaseManagementNote cm " +
-				"WHERE cm.demographic.demographicId=:demographicNo " +
-				"AND cm.includeIssueInNote = false";
+		String queryString = "SELECT cm.* " +
+				"FROM casemgmt_note cm " +
+				"LEFT JOIN casemgmt_note cm2 " +
+				"ON cm.uuid = cm2.uuid " +
+				"AND cm2.update_date > cm.update_date " +
+				"WHERE cm.demographic_no=:demographicNo " +
+				"AND cm2.uuid IS NULL " +
+				"AND cm.include_issue_innote = false " +
+				"GROUP BY cm.uuid " +
+				"ORDER BY cm.update_date ASC";
 
-		Query query = entityManager.createQuery(queryString);
+		Query query = entityManager.createNativeQuery(queryString, CaseManagementNote.class);
 		query.setParameter("demographicNo", demographicNo);
-		return query.getResultList();
-	}
+		List<CaseManagementNote> results = query.getResultList();
 
+		return results;
+	}
 }
