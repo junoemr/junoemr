@@ -58,7 +58,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		var unindexed_array = $form.serializeArray();
 		var indexed_array = {};
 
-		jQuery.map(unindexed_array, function (n, i)
+		junoJQuery.map(unindexed_array, function (n, i)
 		{
 			indexed_array[n['name']] = n['value'];
 		});
@@ -68,7 +68,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 
 	this.getCPPObjectFromForm = function getCPPObjectFromForm(form, issueIdArray)
 	{
-		var deferred = jQuery.Deferred();
+		var deferred = junoJQuery.Deferred();
 
 		var noteId = 0;
 		if (form.noteEditId)
@@ -124,13 +124,13 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 	this.updateCPPNote = function updateCPPNote()
 	{
 		var demographicNo = this.pageData.demographicNo;
-		var form = jQuery('#frmIssueNotes');
+		var form = junoJQuery('#frmIssueNotes');
 		var formData = this.getFormData(form);
 
 		var issueIdArray = [];
-		jQuery("#issueIdList input:checkbox[name=issue_id]:checked").each(function ()
+		junoJQuery("#issueIdList input:checkbox[name=issue_id]:checked").each(function ()
 		{
-			issueIdArray.push(jQuery(this).val());
+			issueIdArray.push(junoJQuery(this).val());
 		});
 
 		var me = this;
@@ -138,7 +138,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		{
 			var jsonString = JSON.stringify(restData);
 
-			jQuery.ajax({
+			junoJQuery.ajax({
 				type: "POST",
 				contentType: "application/json",
 				dataType: "json",
@@ -158,7 +158,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 					} else
 					{
 						// Show error
-						jQuery('#editNoteError').html(response.error.message);
+						junoJQuery('#editNoteError').html(response.error.message);
 					}
 				}
 			});
@@ -180,7 +180,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		if (note != null)
 		{
 			var me = this;
-			jQuery.ajax({
+			junoJQuery.ajax({
 				type: "GET",
 				contentType: "application/json",
 				dataType: "json",
@@ -241,7 +241,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		var editElement = "showEditNote";
 
 		// Clear Errors
-		jQuery('#editNoteError').html("");
+		junoJQuery('#editNoteError').html("");
 
 
 		// Set hidden data values
@@ -346,7 +346,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		}
 
 		// Add options for this list
-		var numNotes = jQuery("#" + summaryCode + "list li").length;
+		var numNotes = junoJQuery("#" + summaryCode + "list li").length;
 		for(var j = 1; j <= numNotes + 1; j++)
 		{
 			var optId = "popt" + j;

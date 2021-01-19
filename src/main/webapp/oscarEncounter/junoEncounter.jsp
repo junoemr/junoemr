@@ -164,6 +164,9 @@
 				]
 			}
 
+			// A renamed jQuery.  See the init() method for more info.
+			var junoJQuery = null;
+
 			var pageData = {
 				contextPath: "<c:out value='${pageContext.request.contextPath}' />",
 				demographicNo: "<c:out value='${junoEncounterForm.pageData.demographicNo}' />",
@@ -274,6 +277,11 @@
 			<%-- this runs on $(document).ready() --%>
 			function init()
 			{
+				// Save a copy of the initially-loaded jQuery before the Ocean Toolbar can replace it.
+				// Use this for query calls, especially ones that use plugins, like templating, because they don't get
+				// loaded by the Ocean-toolbar version of jQuery.
+				junoJQuery = jQuery;
+
 				junoEncounter.monkeyPatches();
 
 				junoEncounter.initOceanToolbar();
@@ -1149,7 +1157,7 @@
 									   type="button"
 									   id="changeIssues"
 									   style="display: none;"
-									   onclick="caseManagementIssue.changeIssue({jQuery: jQuery}); return false;"
+									   onclick="caseManagementIssue.changeIssue({jQuery: junoJQuery}); return false;"
 									   value="<bean:message key="oscarEncounter.change.title"/>">
 								<span id="busy" style="display: none">
 									<img style="position: absolute;"
