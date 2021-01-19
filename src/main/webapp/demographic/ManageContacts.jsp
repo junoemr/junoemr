@@ -24,9 +24,8 @@
 
 --%>
 
+<%@ page import="org.oscarehr.common.model.DemographicContact"%>
 <%@ page import="java.util.List"%>
-<%@ page import="org.oscarehr.common.model.Contact"%>
-<%@page import="org.oscarehr.common.model.DemographicContact"%>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
@@ -232,9 +231,37 @@ function search_professionalSpecialist(nameEl, valueEl) {
 }
 
 
-function setSelect(id,type,name,val) {
-	jQuery("select[name='"+type+"_"+id+"."+name+"']").each(function() {
+function setSelect(id, type, name, val)
+{
+	jQuery("select[name='" + type + "_" + id + "." + name + "']").each(function ()
+	{
 		jQuery(this).val(val);
+	});
+}
+
+function setSelectExistingRole(id,type,val)
+{
+	jQuery("select[name='" + type + "_" + id + ".role']").each(function ()
+	{
+		var optionValues = [];
+		jQuery(this).find("option").each(function()
+		{
+			optionValues.push(jQuery(this).val());
+		})
+
+		// if the select contains the given value, just set that
+		if(optionValues.includes(val))
+		{
+			jQuery(this).val(val);
+		}
+		else // other with custom text value
+		{
+			jQuery(this).val("Other");
+			jQuery("input[name='"+type+"_"+id+".customRole']").each(function() {
+				jQuery(this).val(val);
+				jQuery(this).css("display", "block");
+			});
+		}
 	});
 }
 
@@ -272,7 +299,7 @@ jQuery(document).ready(function() {
 					addContactExisting();
 					var num = jQuery("#contact_num").val();
 					setInput(num,'contact','id','<%=dc.getId()%>');
-					setSelect(num,'contact','role','<%=dc.getRole()%>');
+					setSelectExistingRole(num,'contact','<%=dc.getRole()%>');
 					setSelectExisting(num,'contact','type','<%=dc.getType()%>');
 					setSelect(num,'contact','consentToContact','<%=dc.isConsentToContact()?"1":"0"%>');
 					setSelect(num,'contact','active','<%=dc.isActive()?"1":"0"%>');
@@ -293,7 +320,7 @@ jQuery(document).ready(function() {
 					addProContactExisting();
 					var num = jQuery("#procontact_num").val();
 					setInput(num,'procontact','id','<%=dc.getId()%>');
-					setSelect(num,'procontact','role','<%=dc.getRole()%>');
+					setSelectExistingRole(num,'procontact','<%=dc.getRole()%>');
 					setSelect(num,'procontact','consentToContact','<%=dc.isConsentToContact()?"1":"0"%>');
 					setSelect(num,'procontact','active','<%=dc.isActive()?"1":"0"%>');
 					setSelectExisting(num,'procontact','type','<%=dc.getType()%>');

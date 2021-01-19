@@ -24,16 +24,14 @@
 
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="java.util.List, org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.apache.commons.lang.StringUtils, org.oscarehr.common.dao.ContactSpecialtyDao" %>
+<%@ page import="org.oscarehr.common.dao.DemographicDao" %>
+<%@ page import="org.oscarehr.common.model.ContactSpecialty" %>
+<%@ page import="org.oscarehr.common.model.Demographic" %>
+<%@ page import="org.oscarehr.common.model.DemographicContact" %>
 <%@ page import="org.oscarehr.common.web.ContactAction" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.common.model.Provider" %>
-<%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@ page import="org.oscarehr.common.model.DemographicContact" %>
-<%@ page import="org.oscarehr.common.model.Demographic" %>
-<%@ page import="org.oscarehr.common.dao.DemographicDao" %>
-<%@ page import="org.oscarehr.common.dao.ContactSpecialtyDao" %>
-<%@ page import="org.oscarehr.common.model.ContactSpecialty" %>
+<%@ page import="java.util.List" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 
 <security:oscarSec roleName="${ sessionScope.userrole }" objectName="_demographic" rights="r" reverse="${ false }">
