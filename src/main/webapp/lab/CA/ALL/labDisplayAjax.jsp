@@ -184,7 +184,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                      {
                          url: "../ws/rs/lab/" + labId + "/provider/" + providerNo + "/labRouting",
                          type: "GET",
-                         success: (result) =>
+                         success: function(result)
                          {
                              var commentVal = "";
 
@@ -200,15 +200,14 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                              {
                                  return;
                              }
-
-                             if (comment && comment.length > 0)
+                             if (comment)
                              {
                                  $(commentID).value = comment;
                              }
-                             
+
                              handleLab('acknowledgeForm_' + labId, labId, action);
                          },
-                         error: (error) =>
+                         error: function(error)
                          {
                             console.log("Error getting lab comment", error);
                             window.alert("Failed to load comments");
