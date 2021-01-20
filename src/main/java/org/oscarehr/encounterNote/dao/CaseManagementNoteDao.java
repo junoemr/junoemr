@@ -69,24 +69,22 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 	}
 
 	/**
-	* Returns the list of latest-updated CaseManagementNotes
-	 * from the database by converting a native SQL query
-	 * into a list of CaseManagementNotes
+	* Return the demographic's notes. For each note, return only the latest revision.
+	 * Also prints CPP notes if the option is selected and there are notes to print.
 	 * @param demographicNo the demographic number of the patient in question
 	 * @return <code>List<CaseManagementNote></code> if there are 1 or more existing notes;
 	 * 		   <code>null</code> otherwise.
 	 */
 	public List<CaseManagementNote> findLatestRevisionOfAllNotes(Integer demographicNo)
 	{
-		String queryString = "SELECT cm.* " +
-				"FROM casemgmt_note cm " +
-				"LEFT JOIN casemgmt_note cm2 " +
-				"ON cm.uuid = cm2.uuid " +
-				"AND cm2.update_date > cm.update_date " +
-				"WHERE cm.demographic_no = :demographicNo " +
-				"AND cm.include_issue_innote = false " +
-				"GROUP BY cm.uuid " +
-				"ORDER BY cm.update_date ASC";
+		String queryString = "SELECT cm.* FROM casemgmt_note cm\n" +
+		"LEFT JOIN casemgmt_note cm_filter\n" +
+		"ON cm.uuid = cm_filter.uuid\n" +
+		"AND (cm_filter.update_date > cm.update_date\n" +
+			"OR (cm_filter.update_date = cm.update_date AND cm_filter.note_id > cm.note_id))\n" +
+		"WHERE cm.demographic_no = :demographicNo\n" +
+		"AND cm_filter.note_id IS NULL\n" +
+		"ORDER BY cm.observation_date ASC";
 
 		Query query = entityManager.createNativeQuery(queryString, CaseManagementNote.class);
 		query.setParameter("demographicNo", demographicNo);
