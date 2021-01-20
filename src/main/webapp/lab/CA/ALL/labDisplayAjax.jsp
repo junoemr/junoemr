@@ -200,6 +200,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                              {
                                  return;
                              }
+                             //The empty string case is handled in addComment()
                              if (comment)
                              {
                                  $(commentID).value = comment;
