@@ -68,15 +68,22 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		return query.getResultList();
 	}
 
-	public List<CaseManagementNote> findAllCurrentNotesForDemographic(Integer demographicNo)
+	/**
+	* Returns the list of latest-updated CaseManagementNotes
+	 * from the database by converting a native SQL query
+	 * into a list of CaseManagementNotes
+	 * @param demographicNo the demographic number of the patient in question
+	 * @return <code>List<CaseManagementNote></code> if there are 1 or more existing notes;
+	 * 		   <code>null</code> otherwise.
+	 */
+	public List<CaseManagementNote> findLatestRevisionOfAllNotes(Integer demographicNo)
 	{
 		String queryString = "SELECT cm.* " +
 				"FROM casemgmt_note cm " +
 				"LEFT JOIN casemgmt_note cm2 " +
 				"ON cm.uuid = cm2.uuid " +
 				"AND cm2.update_date > cm.update_date " +
-				"WHERE cm.demographic_no=:demographicNo " +
-				"AND cm2.uuid IS NULL " +
+				"WHERE cm.demographic_no = :demographicNo " +
 				"AND cm.include_issue_innote = false " +
 				"GROUP BY cm.uuid " +
 				"ORDER BY cm.update_date ASC";
