@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.oscarehr.common.xml.cds.v5_0.model.AddressType;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
@@ -33,6 +34,7 @@ import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
+import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.provider.Provider;
@@ -71,6 +73,38 @@ public class CDSExportMapperTest
 		assertEquals(LifeStage.C, cdsExportMapper.getLifeStage("C"));
 		assertEquals(LifeStage.T, cdsExportMapper.getLifeStage("T"));
 		assertEquals(LifeStage.A, cdsExportMapper.getLifeStage("A"));
+	}
+
+	@Test
+	public void testToCdsAddress_Null()
+	{
+		assertNull(cdsExportMapper.toCdsAddress(null, AddressType.R));
+	}
+
+	@Test
+	public void testToCdsAddress_Filled()
+	{
+		String expectedAddressLine1 = "line 1";
+		String expectedAddressLine2 = "line 2";
+		String expectedCity = "city1";
+		String expectedProvince = "BC";
+		String expectedCountry = "CA";
+		String expectedPostal = "V8V0T0";
+
+		Address address = new Address();
+		address.setAddressLine1(expectedAddressLine1);
+		address.setAddressLine2(expectedAddressLine2);
+		address.setCity(expectedCity);
+		address.setRegionCode(expectedProvince);
+		address.setCountryCode(expectedCountry);
+		address.setPostalCode(expectedPostal);
+
+		org.oscarehr.common.xml.cds.v5_0.model.Address resultAddress = cdsExportMapper.toCdsAddress(address, AddressType.R);
+		assertEquals(expectedAddressLine1, resultAddress.getStructured().getLine1());
+		assertEquals(expectedAddressLine2, resultAddress.getStructured().getLine2());
+		assertEquals(expectedCity, resultAddress.getStructured().getCity());
+		assertEquals(expectedProvince, resultAddress.getStructured().getCountrySubdivisionCode());
+		assertEquals(expectedPostal, resultAddress.getStructured().getPostalZipCode().getPostalCode());
 	}
 
 	@Test

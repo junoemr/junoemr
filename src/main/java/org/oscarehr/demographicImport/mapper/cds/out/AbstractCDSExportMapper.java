@@ -23,14 +23,18 @@
 package org.oscarehr.demographicImport.mapper.cds.out;
 
 import org.apache.commons.lang3.EnumUtils;
+import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
+import org.oscarehr.common.xml.cds.v5_0.model.AddressType;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
 import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
+import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.demographicImport.mapper.AbstractExportMapper;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
+import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.provider.Provider;
@@ -58,6 +62,28 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 	}
 
 	/* ==== common helper methods for cds ==== */
+
+	protected org.oscarehr.common.xml.cds.v5_0.model.Address toCdsAddress(Address addressModel, AddressType addressType)
+	{
+		org.oscarehr.common.xml.cds.v5_0.model.Address cdsAddress = null;
+		if(addressModel != null)
+		{
+			cdsAddress = objectFactory.createAddress();
+			AddressStructured structured = objectFactory.createAddressStructured();
+			PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
+			postalZipCode.setPostalCode(addressModel.getPostalCode());
+
+			structured.setLine1(addressModel.getAddressLine1());
+			structured.setLine2(addressModel.getAddressLine2());
+			structured.setCity(addressModel.getCity());
+			structured.setCountrySubdivisionCode(addressModel.getRegionCode());
+			structured.setPostalZipCode(postalZipCode);
+
+			cdsAddress.setStructured(structured);
+			cdsAddress.setAddressType(addressType);
+		}
+		return cdsAddress;
+	}
 
 	protected ResidualInformation.DataElement createResidualInfoDataElement(CDSConstants.RESIDUAL_INFO_DATA_TYPE dataType, String name, String value)
 	{

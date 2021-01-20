@@ -25,13 +25,17 @@ package org.oscarehr.demographicImport.converter.out;
 import org.oscarehr.allergy.dao.AllergyDao;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.DemographicContactDao;
+import org.oscarehr.common.dao.DemographicPharmacyDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.PharmacyInfoDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.common.model.DemographicPharmacy;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.PharmacyInfo;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographicImport.converter.out.contact.DemographicContactDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.note.ConcernNoteDbToModelConverter;
@@ -135,6 +139,15 @@ public class PatientRecordModelConverter extends
 	@Autowired
 	private DemographicDbToModelConverter demographicDbToModelConverter;
 
+	@Autowired
+	private PharmacyInfoDao pharmacyInfoDao;
+
+	@Autowired
+	private DemographicPharmacyDao demographicPharmacyDao;
+
+	@Autowired
+	private PharmacyDbToModelConverter pharmacyDbToModelConverter;
+
 	@Override
 	public PatientRecord convert(Demographic input)
 	{
@@ -171,6 +184,14 @@ public class PatientRecordModelConverter extends
 
 		List<Drug> drugs = drugDao.findByDemographicId(input.getDemographicId());
 		patientRecord.setMedicationList(medicationDbToModelConverter.convert(drugs));
+
+		//TODO replace with new prescribeIT system
+		List<DemographicPharmacy> demographicPharmacies = demographicPharmacyDao.findByDemographicId(input.getDemographicId());
+		if(demographicPharmacies != null && !demographicPharmacies.isEmpty())
+		{
+			PharmacyInfo preferredPharmacyInfo = pharmacyInfoDao.find(demographicPharmacies.get(0).getPharmacyId());
+			patientRecord.setPreferredPharmacy(pharmacyDbToModelConverter.convert(preferredPharmacyInfo));
+		}
 
 		return patientRecord;
 	}

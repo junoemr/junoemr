@@ -46,7 +46,7 @@ public class PhoneNumber extends AbstractTransientModel
 
 	public PhoneNumber(String number)
 	{
-		this(number, null, false);
+		this(number, null);
 	}
 
 	public PhoneNumber(String number, String extension)
@@ -94,5 +94,22 @@ public class PhoneNumber extends AbstractTransientModel
 	public boolean isTypeCell()
 	{
 		return (PHONE_TYPE.CELL.equals(this.getPhoneType()));
+	}
+
+	public static PhoneNumber of(String number)
+	{
+		return PhoneNumber.of(number, null, false);
+	}
+	public static PhoneNumber of(String number, String extension)
+	{
+		return PhoneNumber.of(number, extension, false);
+	}
+	public static PhoneNumber of(String number, String extension, boolean primaryContactNumber)
+	{
+		if(number != null)
+		{
+			return new PhoneNumber(number, extension, primaryContactNumber);
+		}
+		return null;
 	}
 }

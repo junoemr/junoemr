@@ -20,40 +20,33 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.model.contact;
+package org.oscarehr.demographicImport.model.pharmacy;
 
 import lombok.Data;
+import org.oscarehr.demographicImport.model.AbstractTransientModel;
 import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 
 import java.time.LocalDateTime;
 
 @Data
-public class ExternalContact implements Contact
+public class Pharmacy extends AbstractTransientModel
 {
-	private String id;
-	private String lastName;
-	private String firstName;
-	private Address address;
-	private PhoneNumber homePhone;
-	private PhoneNumber workPhone;
-	private PhoneNumber cellPhone;
-	private PhoneNumber fax;
+	public enum STATUS {
+		ACTIVE,
+		DELETED,
+	}
+
+	private Integer id;
+	private String name;
 	private String email;
-	private String note;
+	private Address address;
+	private PhoneNumber phone1;
+	private PhoneNumber phone2;
+	private PhoneNumber fax;
+	private LocalDateTime createdDateTime;
+	private String notes;
 
-	boolean deleted;
-	private LocalDateTime updateDate;
-
-	@Override
-	public String getIdString()
-	{
-		return getId();
-	}
-
-	@Override
-	public TYPE getContactType()
-	{
-		return TYPE.CONTACT;
-	}
+	private String serviceLocationIdentifier;
+	private STATUS status;
 }

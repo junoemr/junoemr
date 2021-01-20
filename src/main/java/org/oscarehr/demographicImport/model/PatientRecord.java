@@ -42,6 +42,7 @@ import org.oscarehr.demographicImport.model.immunization.Immunization;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.measurement.Measurement;
 import org.oscarehr.demographicImport.model.medication.Medication;
+import org.oscarehr.demographicImport.model.pharmacy.Pharmacy;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,6 +55,7 @@ import java.util.List;
 public class PatientRecord extends AbstractTransientModel
 {
 	private Demographic demographic;
+	private Pharmacy preferredPharmacy;
 	private List<Appointment> appointmentList;
 	private List<FamilyHistoryNote> familyHistoryNoteList;
 	private List<SocialHistoryNote> socialHistoryNoteList;

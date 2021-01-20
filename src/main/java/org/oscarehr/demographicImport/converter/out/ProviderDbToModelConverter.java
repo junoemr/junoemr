@@ -23,8 +23,8 @@
 package org.oscarehr.demographicImport.converter.out;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.common.Address;
+import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
@@ -57,7 +57,7 @@ public class ProviderDbToModelConverter extends
 		address.setAddressLine1(input.getAddress());
 //		address.setCity(input.getCity());
 //		address.setRegionCode(input.getProvince());
-		address.setCountryCode(COUNTRY_CODE_CANADA); //TODO do we even store this with demographics in juno
+		address.setCountryCode(COUNTRY_CODE_CANADA);
 //		address.setPostalCode(input.getPostal());
 		address.setResidencyStatusCurrent();
 		exportProvider.addAddress(address);
@@ -68,18 +68,9 @@ public class ProviderDbToModelConverter extends
 		exportProvider.setHsoNumber(input.getHsoNo());
 		exportProvider.setOhipNumber(input.getOhipNo());
 
-		if(input.getPhone() != null)
-		{
-			exportProvider.setHomePhone(new PhoneNumber(input.getPhone()));
-		}
-		if(input.getWorkPhone() != null)
-		{
-			exportProvider.setWorkPhone(new PhoneNumber(input.getWorkPhone()));
-		}
-		if(input.getCellPhone() != null)
-		{
-			exportProvider.setCellPhone(new PhoneNumber(input.getCellPhone()));
-		}
+		exportProvider.setHomePhone(PhoneNumber.of(input.getPhone()));
+		exportProvider.setWorkPhone(PhoneNumber.of(input.getWorkPhone()));
+		exportProvider.setCellPhone(PhoneNumber.of(input.getCellPhone()));
 
 		return exportProvider;
 	}

@@ -50,7 +50,6 @@ public class ExternalContactDbToModelConverter extends
 		externalContact.setLastName(input.getLastName());
 		externalContact.setNote(input.getNote());
 		externalContact.setEmail(input.getEmail());
-		externalContact.setFax(input.getFax());
 		externalContact.setDeleted(input.isDeleted());
 		externalContact.setUpdateDate(ConversionUtils.toNullableLocalDateTime(input.getUpdateDate()));
 
@@ -58,19 +57,12 @@ public class ExternalContactDbToModelConverter extends
 		String cellPhone = StringUtils.trimToNull(input.getCellPhone());
 		String workPhone = StringUtils.trimToNull(input.getWorkPhone());
 		String workExtension = StringUtils.trimToNull(input.getWorkPhoneExtension());
+		String fax = StringUtils.trimToNull(input.getFax());
 
-		if(homePhone != null)
-		{
-			externalContact.setHomePhone(new PhoneNumber(homePhone));
-		}
-		if(cellPhone != null)
-		{
-			externalContact.setCellPhone(new PhoneNumber(cellPhone));
-		}
-		if(workPhone != null)
-		{
-			externalContact.setWorkPhone(new PhoneNumber(workPhone, workExtension));
-		}
+		externalContact.setHomePhone(PhoneNumber.of(homePhone));
+		externalContact.setCellPhone(PhoneNumber.of(cellPhone));
+		externalContact.setWorkPhone(PhoneNumber.of(workPhone, workExtension));
+		externalContact.setFax(PhoneNumber.of(fax));
 
 		Address address = new Address();
 		address.setAddressLine1(input.getAddress());

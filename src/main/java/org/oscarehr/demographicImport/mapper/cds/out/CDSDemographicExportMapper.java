@@ -25,7 +25,6 @@ package org.oscarehr.demographicImport.mapper.cds.out;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
 import org.oscarehr.common.xml.cds.v5_0.model.AddressType;
 import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
 import org.oscarehr.common.xml.cds.v5_0.model.Gender;
@@ -39,13 +38,13 @@ import org.oscarehr.common.xml.cds.v5_0.model.PersonNameStandard;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
-import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PurposeEnumOrPlainText;
 import org.oscarehr.demographicImport.model.PatientRecord;
 import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.contact.DemographicContact;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
+import org.oscarehr.demographicImport.model.pharmacy.Pharmacy;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -98,7 +97,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		demographics.setSIN(exportDemographic.getSin());
 		demographics.setReferredPhysician(toPersonNameSimple(exportDemographic.getReferralDoctor()));
 		demographics.setFamilyPhysician(toPersonNameSimple(exportDemographic.getFamilyDoctor()));
-		demographics.setPreferredPharmacy(null); //TODO
+		demographics.setPreferredPharmacy(getPreferredPharmacy(exportStructure.getPreferredPharmacy()));
 
 		return demographics;
 	}
@@ -178,20 +177,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 
 		for(Address address : addressList)
 		{
-			org.oscarehr.common.xml.cds.v5_0.model.Address cdsAddress = objectFactory.createAddress();
-			AddressStructured structured = objectFactory.createAddressStructured();
-			PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
-			postalZipCode.setPostalCode(address.getPostalCode());
-
-			structured.setLine1(address.getAddressLine1());
-			structured.setLine2(address.getAddressLine2());
-			structured.setCity(address.getCity());
-			structured.setCountrySubdivisionCode(address.getRegionCode());
-			structured.setPostalZipCode(postalZipCode);
-
-			cdsAddress.setStructured(structured);
-			cdsAddress.setAddressType(AddressType.R);
-			exportAddressList.add(cdsAddress);
+			exportAddressList.add(toCdsAddress(address, AddressType.R));
 		}
 		return exportAddressList;
 	}
@@ -370,4 +356,23 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		return contactList;
 	}
 
+	protected Demographics.PreferredPharmacy getPreferredPharmacy(Pharmacy exportPharmacy)
+	{
+		Demographics.PreferredPharmacy preferredPharmacy = null;
+		if(exportPharmacy != null)
+		{
+			preferredPharmacy = objectFactory.createDemographicsPreferredPharmacy();
+			preferredPharmacy.setName(exportPharmacy.getName());
+			preferredPharmacy.setEmailAddress(exportPharmacy.getEmail());
+			preferredPharmacy.setAddress(toCdsAddress(exportPharmacy.getAddress(), AddressType.M));
+
+			// note: the spec says this handles multiple numbers, but the schema file structure does not
+			org.oscarehr.demographicImport.model.common.PhoneNumber phoneNumber = exportPharmacy.getPhone1();
+			if(phoneNumber != null)
+			{
+				preferredPharmacy.setPhoneNumber(getExportPhone(PhoneNumberType.W, phoneNumber));
+			}
+		}
+		return preferredPharmacy;
+	}
 }
