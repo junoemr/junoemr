@@ -23,6 +23,7 @@
 package org.oscarehr.demographicImport.model.contact;
 
 import lombok.Data;
+import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 import org.oscarehr.demographicImport.model.provider.Provider;
 
@@ -50,6 +51,15 @@ public class DemographicContact extends AbstractTransientModel
 		public String getValue()
 		{
 			return value;
+		}
+
+		public static CATEGORY fromStringIgnoreCase(String enumString)
+		{
+			if(EnumUtils.isValidEnumIgnoreCase(CATEGORY.class, enumString))
+			{
+				return CATEGORY.valueOf(enumString.toUpperCase());
+			}
+			return null;
 		}
 	}
 

@@ -24,13 +24,16 @@ package org.oscarehr.demographicImport.converter.out;
 
 import org.oscarehr.allergy.dao.AllergyDao;
 import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.common.dao.DemographicContactDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographicImport.converter.out.contact.DemographicContactDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.note.ConcernNoteDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.note.EncounterNoteDbToModelConverter;
 import org.oscarehr.demographicImport.converter.out.note.FamilyHistoryNoteDbToModelConverter;
@@ -77,6 +80,12 @@ public class PatientRecordModelConverter extends
 
 	@Autowired
 	private DocumentDbToModelConverter documentDbToModelConverter;
+
+	@Autowired
+	private DemographicContactDao demographicContactDao;
+
+	@Autowired
+	private DemographicContactDbToModelConverter demographicContactDbToModelConverter;
 
 	@Autowired
 	private EncounterNoteDbToModelConverter encounterNoteConverter;
@@ -136,6 +145,9 @@ public class PatientRecordModelConverter extends
 
 		PatientRecord patientRecord = new PatientRecord();
 		patientRecord.setDemographic(demographicDbToModelConverter.convert(input));
+
+		List<DemographicContact> demographicContacts = demographicContactDao.findActiveByDemographicNo(input.getDemographicId());
+		patientRecord.setContactList(demographicContactDbToModelConverter.convert(demographicContacts));
 
 		//TODO how to handle lazy loading etc.?
 		List<Appointment> appointments = appointmentDao.getAllByDemographicNo(input.getDemographicId());
