@@ -73,6 +73,8 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscareh
 	private CDSCareElementImportMapper cdsCareElementImportMapper;
 	@Autowired
 	private CDSAlertImportMapper cdsAlertImportMapper;
+	@Autowired
+	private CDSPharmacyImportMapper cdsPharmacyImportMapper;
 
 	public CDSImportMapper()
 	{
@@ -86,6 +88,7 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscareh
 
 		PatientRecord patientRecord = importStructure.getPatientRecord();
 		patientModel.setDemographic(cdsDemographicImportMapper.importToJuno(patientRecord.getDemographics()));
+		patientModel.setPreferredPharmacy(cdsPharmacyImportMapper.importToJuno(patientRecord.getDemographics().getPreferredPharmacy()));
 		patientModel.setContactList(cdsContactImportMapper.importAll(patientRecord.getDemographics().getContact()));
 		patientModel.setSocialHistoryNoteList(cdsPersonalHistoryImportMapper.importAll(patientRecord.getPersonalHistory()));
 		patientModel.setFamilyHistoryNoteList(cdsFamilyHistoryImportMapper.importAll(patientRecord.getFamilyHistory()));

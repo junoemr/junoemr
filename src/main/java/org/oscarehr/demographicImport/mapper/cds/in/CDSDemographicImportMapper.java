@@ -22,16 +22,12 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
 import org.oscarehr.common.xml.cds.v5_0.model.Demographics;
 import org.oscarehr.common.xml.cds.v5_0.model.HealthCard;
 import org.oscarehr.common.xml.cds.v5_0.model.OfficialSpokenLanguageCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNamePrefixCode;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonStatus;
-import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
-import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.Person;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.demographic.Demographic;
@@ -46,8 +42,6 @@ import static org.oscarehr.demographic.model.Demographic.ROSTER_STATUS_ROSTERED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
 import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
 import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
-import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_CODE_CANADA;
-import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
 
 @Component
@@ -112,39 +106,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 
 		for(org.oscarehr.common.xml.cds.v5_0.model.Address importAddr : importStructure.getAddress())
 		{
-			Address address = new Address();
-			AddressStructured structured = importAddr.getStructured();
-			if(structured != null)
-			{
-				address.setAddressLine1(structured.getLine1());
-				address.setAddressLine2(StringUtils.trimToNull(
-						StringUtils.trimToEmpty(structured.getLine2()) + "\n" + StringUtils.trimToEmpty(structured.getLine3())));
-				address.setCity(structured.getCity());
-				address.setRegionCode(structured.getCountrySubdivisionCode());
-
-				PostalZipCode postalZipCode = structured.getPostalZipCode();
-				if(postalZipCode != null)
-				{
-					String postalCode = postalZipCode.getPostalCode();
-					String zipCode = postalZipCode.getZipCode();
-					if(postalCode != null)
-					{
-						address.setCountryCode(COUNTRY_CODE_CANADA);
-						address.setPostalCode(postalCode);
-					}
-					else if(zipCode != null)
-					{
-						address.setCountryCode(COUNTRY_CODE_USA);
-						address.setPostalCode(zipCode);
-					}
-				}
-			}
-			else
-			{
-				address.setAddressLine1(importAddr.getFormatted());
-			}
-			address.setResidencyStatusCurrent(); //TODO how to tell if this is the main address
-			demographic.addAddress(address);
+			demographic.addAddress(getAddress(importAddr));
 		}
 
 		for(org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber importNumber : importStructure.getPhoneNumber())

@@ -22,16 +22,20 @@
  */
 package org.oscarehr.demographicImport.mapper.cds.in;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
 import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
+import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.mapper.AbstractImportMapper;
+import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
@@ -46,6 +50,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_CODE_CANADA;
+import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
 import static org.oscarehr.demographicImport.mapper.cds.CDSConstants.Y_INDICATOR_TRUE;
 
 @Component
@@ -172,26 +178,40 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		{
 			return null;
 		}
-		PhoneNumber phoneNumber = new PhoneNumber();
 
-		//TODO handle discrete phone number cases
+		String area = null;
+		String exchange = null;
+		String number = null;
+		String extension = null;
+
 		for(JAXBElement<String> phoneElement : importNumber.getContent())
 		{
 			String key = phoneElement.getName().getLocalPart();
 			String value = phoneElement.getValue();
 			if("phoneNumber".equals(key) || "number".equals(key))
 			{
-				phoneNumber.setNumber(value);
+				number = value;
 			}
 			else if("extension".equals(key))
 			{
-				phoneNumber.setExtension(value);
+				extension = value;
+			}
+			else if("areaCode".equals(key))
+			{
+				area = value;
+			}
+			else if("exchange".equals(key))
+			{
+				exchange = value;
 			}
 			else
 			{
 				logger.error("Unknown Phone number component key: '" + key + "'");
 			}
 		}
+
+		String fullNumber = StringUtils.trimToEmpty(area) + StringUtils.trimToEmpty(exchange) + StringUtils.trimToEmpty(number);
+		PhoneNumber phoneNumber = PhoneNumber.of(fullNumber, extension);
 
 		PhoneNumberType type = importNumber.getPhoneNumberType();
 		if(PhoneNumberType.R.equals(type))
@@ -212,6 +232,47 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		}
 
 		return phoneNumber;
+	}
+
+	protected Address getAddress(org.oscarehr.common.xml.cds.v5_0.model.Address importAddress)
+	{
+		Address address = null;
+		if(importAddress != null)
+		{
+			address = new Address();
+			AddressStructured structured = importAddress.getStructured();
+			if(structured != null)
+			{
+				address.setAddressLine1(structured.getLine1());
+				address.setAddressLine2(StringUtils.trimToNull(
+						StringUtils.trimToEmpty(structured.getLine2()) + "\n" + StringUtils.trimToEmpty(structured.getLine3())));
+				address.setCity(structured.getCity());
+				address.setRegionCode(structured.getCountrySubdivisionCode());
+
+				PostalZipCode postalZipCode = structured.getPostalZipCode();
+				if(postalZipCode != null)
+				{
+					String postalCode = postalZipCode.getPostalCode();
+					String zipCode = postalZipCode.getZipCode();
+					if(postalCode != null)
+					{
+						address.setCountryCode(COUNTRY_CODE_CANADA);
+						address.setPostalCode(postalCode);
+					}
+					else if(zipCode != null)
+					{
+						address.setCountryCode(COUNTRY_CODE_USA);
+						address.setPostalCode(zipCode);
+					}
+				}
+			}
+			else
+			{
+				address.setAddressLine1(importAddress.getFormatted());
+			}
+			address.setResidencyStatusCurrent(); //TODO how to tell if this is the main address
+		}
+		return address;
 	}
 
 	protected PartialDate toNullablePartialDate(DateFullOrPartial fullOrPartial)

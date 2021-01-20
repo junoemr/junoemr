@@ -20,11 +20,10 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.converter.out;
+package org.oscarehr.demographicImport.converter.in;
 
-import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.model.PharmacyInfo;
-import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
+import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
 import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.pharmacy.Pharmacy;
@@ -32,37 +31,52 @@ import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 @Component
-public class PharmacyDbToModelConverter extends
-		BaseDbToModelConverter<PharmacyInfo, Pharmacy>
+public class PharmacyModelToDbConverter extends
+		BaseDbToModelConverter<Pharmacy, PharmacyInfo>
 {
 	@Override
-	public Pharmacy convert(PharmacyInfo input)
+	public PharmacyInfo convert(Pharmacy input)
 	{
 		if(input == null)
 		{
 			return null;
 		}
-		Pharmacy pharmacy = new Pharmacy();
+		PharmacyInfo pharmacyInfo = new PharmacyInfo();
 
-		pharmacy.setId(input.getId());
-		pharmacy.setName(input.getName());
-		pharmacy.setEmail(input.getEmail());
-		pharmacy.setNotes(input.getNotes());
-		pharmacy.setServiceLocationIdentifier(input.getServiceLocationIdentifier());
-		pharmacy.setCreatedDateTime(ConversionUtils.toNullableLocalDateTime(input.getAddDate()));
+		pharmacyInfo.setId(input.getId());
+		pharmacyInfo.setName(input.getName());
+		pharmacyInfo.setEmail(input.getEmail());
+		pharmacyInfo.setNotes(input.getNotes());
+		pharmacyInfo.setServiceLocationIdentifier(input.getServiceLocationIdentifier());
+		pharmacyInfo.setAddDate(ConversionUtils.toNullableLegacyDateTime(input.getCreatedDateTime()));
 
-		Address address = new Address();
-		address.setAddressLine1(input.getAddress());
-		address.setCity(input.getCity());
-		address.setRegionCode(input.getProvince());
-		address.setCountryCode(CDSConstants.COUNTRY_CODE_CANADA);
-		address.setPostalCode(input.getPostalCode());
-		pharmacy.setAddress(address);
+		Address address = input.getAddress();
 
-		pharmacy.setPhone1(PhoneNumber.of(StringUtils.trimToNull(input.getPhone1())));
-		pharmacy.setPhone2(PhoneNumber.of(StringUtils.trimToNull(input.getPhone2())));
-		pharmacy.setFax(PhoneNumber.of(StringUtils.trimToNull(input.getFax())));
+		if(address != null)
+		{
+			pharmacyInfo.setAddress(address.getAddressLinesString());
+			pharmacyInfo.setCity(address.getCity());
+			pharmacyInfo.setProvince(address.getRegionCode());
+			pharmacyInfo.setPostalCode(address.getPostalCode());
+		}
 
-		return pharmacy;
+		PhoneNumber phone1 = input.getPhone1();
+		PhoneNumber phone2 = input.getPhone2();
+		PhoneNumber fax = input.getFax();
+
+		if(phone1 != null)
+		{
+			pharmacyInfo.setPhone1(phone1.getNumber());
+		}
+		if(phone2 != null)
+		{
+			pharmacyInfo.setPhone2(phone2.getNumber());
+		}
+		if(fax != null)
+		{
+			pharmacyInfo.setFax(fax.getNumber());
+		}
+
+		return pharmacyInfo;
 	}
 }

@@ -26,20 +26,26 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.oscarehr.common.xml.cds.v5_0.model.AddressStructured;
 import org.oscarehr.common.xml.cds.v5_0.model.DateFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.DateTimeFullOrPartial;
 import org.oscarehr.common.xml.cds.v5_0.model.LifeStage;
 import org.oscarehr.common.xml.cds.v5_0.model.ObjectFactory;
 import org.oscarehr.common.xml.cds.v5_0.model.PersonNameSimple;
+import org.oscarehr.common.xml.cds.v5_0.model.PhoneNumberType;
+import org.oscarehr.common.xml.cds.v5_0.model.PostalZipCode;
 import org.oscarehr.common.xml.cds.v5_0.model.ResidualInformation;
 import org.oscarehr.common.xml.cds.v5_0.model.YnIndicator;
 import org.oscarehr.demographicImport.mapper.cds.CDSConstants;
+import org.oscarehr.demographicImport.model.common.Address;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
+import org.oscarehr.demographicImport.model.common.PhoneNumber;
 import org.oscarehr.demographicImport.model.provider.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.util.ConversionUtils;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -93,6 +99,303 @@ public class CDSImportMapperTest
 		Long expectedLong = 32L;
 		BigInteger bigInteger = BigInteger.valueOf(expectedLong);
 		assertEquals(expectedLong, cdsImportMapper.getAgeAtOnset(bigInteger));
+	}
+
+	@Test
+	public void testGetAddress_Null()
+	{
+		assertNull(cdsImportMapper.getAddress(null));
+	}
+
+	@Test
+	public void testGetAddress_StructuredCA()
+	{
+		String expectedAddressLine1 = "line 1";
+		String expectedAddressLine2 = "line 2";
+		String expectedCity = "city1";
+		String expectedProvince = "BC";
+		String expectedCountry = "CA";
+		String expectedPostal = "V8V0T0";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = objectFactory.createAddress();
+		AddressStructured addressStructured = objectFactory.createAddressStructured();
+		PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
+
+		addressStructured.setLine1(expectedAddressLine1);
+		addressStructured.setLine2(expectedAddressLine2);
+		addressStructured.setCity(expectedCity);
+		addressStructured.setCountrySubdivisionCode(expectedProvince);
+		postalZipCode.setPostalCode(expectedPostal);
+		addressStructured.setPostalZipCode(postalZipCode);
+		importAddress.setStructured(addressStructured);
+
+		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+
+		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
+		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
+		assertEquals(expectedCity, resultAddress.getCity());
+		assertEquals(expectedProvince, resultAddress.getRegionCode());
+		assertEquals(expectedCountry, resultAddress.getCountryCode());
+		assertEquals(expectedPostal, resultAddress.getPostalCode());
+	}
+
+	@Test
+	public void testGetAddress_StructuredUS()
+	{
+		String expectedAddressLine1 = "line 1";
+		String expectedAddressLine2 = "line 2";
+		String expectedCity = "city1";
+		String expectedState = "NY";
+		String expectedCountry = "US";
+		String expectedZip = "99750-0077";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = objectFactory.createAddress();
+		AddressStructured addressStructured = objectFactory.createAddressStructured();
+		PostalZipCode postalZipCode = objectFactory.createPostalZipCode();
+
+		addressStructured.setLine1(expectedAddressLine1);
+		addressStructured.setLine2(expectedAddressLine2);
+		addressStructured.setCity(expectedCity);
+		addressStructured.setCountrySubdivisionCode(expectedState);
+		postalZipCode.setZipCode(expectedZip);
+		addressStructured.setPostalZipCode(postalZipCode);
+		importAddress.setStructured(addressStructured);
+
+		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+
+		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
+		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
+		assertEquals(expectedCity, resultAddress.getCity());
+		assertEquals(expectedState, resultAddress.getRegionCode());
+		assertEquals(expectedCountry, resultAddress.getCountryCode());
+		assertEquals(expectedZip, resultAddress.getPostalCode());
+	}
+
+	@Test
+	public void testGetAddress_Formatted()
+	{
+		String expectedFormattedAddress = "any address string";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.Address importAddress = objectFactory.createAddress();
+		importAddress.setFormatted(expectedFormattedAddress);
+
+		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+
+		assertEquals(expectedFormattedAddress, resultAddress.getAddressLine1());
+	}
+
+	@Test
+	public void testGetPhoneNumber_Null()
+	{
+		assertNull(cdsImportMapper.getPhoneNumber(null));
+	}
+
+	@Test
+	public void testGetPhoneNumber_2Part_NumberOnly()
+	{
+		String expectedNumber = "2505551111";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
+
+		// add the number element
+		JAXBElement<String> number = objectFactory.createPhoneNumberPhoneNumber(expectedNumber);
+		phoneNumber.getContent().add(number);
+
+		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		assertEquals(expectedNumber, resultNumber.getNumber());
+		assertNull(resultNumber.getExtension());
+	}
+
+	@Test
+	public void testGetPhoneNumber_2Part_NumberExtension()
+	{
+		String expectedNumber = "2505551111";
+		String expectedExtension = "123";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
+
+		// add the number element
+		JAXBElement<String> number = objectFactory.createPhoneNumberPhoneNumber(expectedNumber);
+		phoneNumber.getContent().add(number);
+
+		// add extension element
+		JAXBElement<String> extension = objectFactory.createPhoneNumberExtension(expectedExtension);
+		phoneNumber.getContent().add(extension);
+
+		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		assertEquals(expectedNumber, resultNumber.getNumber());
+		assertEquals(expectedExtension, resultNumber.getExtension());
+	}
+
+	@Test
+	public void testGetPhoneNumber_Discrete_AreaNumber()
+	{
+		String expectedArea = "250";
+		String expectedNumber = "5551111";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
+
+		// add area code element
+		JAXBElement<String> area = objectFactory.createPhoneNumberAreaCode(expectedArea);
+		phoneNumber.getContent().add(area);
+
+		// add the number element
+		JAXBElement<String> number = objectFactory.createPhoneNumberNumber(expectedNumber);
+		phoneNumber.getContent().add(number);
+
+		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		assertEquals(expectedArea + expectedNumber, resultNumber.getNumber());
+	}
+
+	@Test
+	public void testGetPhoneNumber_Discrete_AreaNumberExtension()
+	{
+		String expectedArea = "250";
+		String expectedNumber = "5551111";
+		String expectedExtension = "123";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
+
+		// add area code element
+		JAXBElement<String> area = objectFactory.createPhoneNumberAreaCode(expectedArea);
+		phoneNumber.getContent().add(area);
+
+		// add the number element
+		JAXBElement<String> number = objectFactory.createPhoneNumberNumber(expectedNumber);
+		phoneNumber.getContent().add(number);
+
+		// add extension element
+		JAXBElement<String> extension = objectFactory.createPhoneNumberExtension(expectedExtension);
+		phoneNumber.getContent().add(extension);
+
+		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		assertEquals(expectedArea + expectedNumber, resultNumber.getNumber());
+		assertEquals(expectedExtension, resultNumber.getExtension());
+	}
+
+	@Test
+	public void testGetPhoneNumber_Discrete_AreaNumberExchange()
+	{
+		String expectedArea = "250";
+		String expectedExchange = "555";
+		String expectedNumber = "1111";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
+
+		// add area code element
+		JAXBElement<String> area = objectFactory.createPhoneNumberAreaCode(expectedArea);
+		phoneNumber.getContent().add(area);
+
+		// add the number element
+		JAXBElement<String> number = objectFactory.createPhoneNumberNumber(expectedNumber);
+		phoneNumber.getContent().add(number);
+
+		// add exchange element
+		JAXBElement<String> exchange = objectFactory.createPhoneNumberExchange(expectedExchange);
+		phoneNumber.getContent().add(exchange);
+
+		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		assertEquals(expectedArea + expectedExchange + expectedNumber, resultNumber.getNumber());
+	}
+
+	@Test
+	public void testGetPhoneNumber_Discrete_AreaNumberExtensionExchange()
+	{
+		String expectedArea = "250";
+		String expectedExchange = "555";
+		String expectedNumber = "1111";
+		String expectedExtension = "123";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
+
+		// add area code element
+		JAXBElement<String> area = objectFactory.createPhoneNumberAreaCode(expectedArea);
+		phoneNumber.getContent().add(area);
+
+		// add the number element
+		JAXBElement<String> number = objectFactory.createPhoneNumberNumber(expectedNumber);
+		phoneNumber.getContent().add(number);
+
+		// add extension element
+		JAXBElement<String> extension = objectFactory.createPhoneNumberExtension(expectedExtension);
+		phoneNumber.getContent().add(extension);
+
+		// add exchange element
+		JAXBElement<String> exchange = objectFactory.createPhoneNumberExchange(expectedExchange);
+		phoneNumber.getContent().add(exchange);
+
+		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		assertEquals(expectedArea + expectedExchange + expectedNumber, resultNumber.getNumber());
+		assertEquals(expectedExtension, resultNumber.getExtension());
+	}
+
+	@Test
+	public void testGetPhoneNumber_TypeR()
+	{
+		String expectedNumber = "2505551111";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+
+		// add the number element
+		JAXBElement<String> number = objectFactory.createPhoneNumberPhoneNumber(expectedNumber);
+		phoneNumber.getContent().add(number);
+
+		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
+
+		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		assertEquals(PhoneNumber.PHONE_TYPE.HOME, resultNumber.getPhoneType());
+	}
+
+	@Test
+	public void testGetPhoneNumber_TypeW()
+	{
+		String expectedNumber = "2505551111";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+
+		// add the number element
+		JAXBElement<String> number = objectFactory.createPhoneNumberPhoneNumber(expectedNumber);
+		phoneNumber.getContent().add(number);
+
+		phoneNumber.setPhoneNumberType(PhoneNumberType.W);
+
+		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		assertEquals(PhoneNumber.PHONE_TYPE.WORK, resultNumber.getPhoneType());
+	}
+
+	@Test
+	public void testGetPhoneNumber_TypeC()
+	{
+		String expectedNumber = "2505551111";
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.oscarehr.common.xml.cds.v5_0.model.PhoneNumber phoneNumber = objectFactory.createPhoneNumber();
+
+		// add the number element
+		JAXBElement<String> number = objectFactory.createPhoneNumberPhoneNumber(expectedNumber);
+		phoneNumber.getContent().add(number);
+
+		phoneNumber.setPhoneNumberType(PhoneNumberType.C);
+
+		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		assertEquals(PhoneNumber.PHONE_TYPE.CELL, resultNumber.getPhoneType());
 	}
 
 	@Test

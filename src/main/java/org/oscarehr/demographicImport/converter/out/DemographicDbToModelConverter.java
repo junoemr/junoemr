@@ -80,7 +80,7 @@ public class DemographicDbToModelConverter extends
 		address.setAddressLine1(input.getAddress());
 		address.setCity(input.getCity());
 		address.setRegionCode(input.getProvince());
-		address.setCountryCode(COUNTRY_CODE_CANADA); //TODO do we even store this with demographics in juno
+		address.setCountryCode(COUNTRY_CODE_CANADA);
 		address.setPostalCode(StringUtils.deleteWhitespace(input.getPostal()));
 		address.setResidencyStatusCurrent();
 		exportDemographic.addAddress(address);

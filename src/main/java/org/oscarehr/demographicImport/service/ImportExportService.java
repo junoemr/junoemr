@@ -26,16 +26,21 @@ import ca.uhn.hl7v2.HL7Exception;
 import org.apache.log4j.Logger;
 import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.appointment.service.Appointment;
+import org.oscarehr.common.dao.DemographicPharmacyDao;
 import org.oscarehr.common.dao.MeasurementDao;
+import org.oscarehr.common.dao.PharmacyInfoDao;
 import org.oscarehr.common.hl7.copd.writer.JunoGenericImportLabWriter;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.DemographicPharmacy;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.PharmacyInfo;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.service.DemographicContactService;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographicImport.converter.in.PharmacyModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.PreventionModelToDbConverter;
 import org.oscarehr.demographicImport.converter.in.ReviewerModelToDbConverter;
 import org.oscarehr.demographicImport.converter.out.BaseDbToModelConverter;
@@ -75,6 +80,7 @@ import oscar.util.ConversionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,6 +165,15 @@ public class ImportExportService
 	@Autowired
 	private PatientRecordModelConverter patientRecordModelConverter;
 
+	@Autowired
+	private PharmacyInfoDao pharmacyInfoDao;
+
+	@Autowired
+	private DemographicPharmacyDao demographicPharmacyDao;
+
+	@Autowired
+	private PharmacyModelToDbConverter pharmacyModelToDbConverter;
+
 	public List<GenericFile> exportDemographics(ImporterExporterFactory.EXPORTER_TYPE importType,
 	                                            ExportLogger exportLogger,
 	                                            List<PatientRecord> patientRecords,
@@ -239,6 +254,8 @@ public class ImportExportService
 		persistPreventions(patientRecord, dbDemographic);
 
 		documentService.uploadAllNewDemographicDocument(patientRecord.getDocumentList(), dbDemographic);
+
+		persistPharmacy(patientRecord, dbDemographic);
 	}
 
 	private void persistNotes(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
@@ -339,5 +356,29 @@ public class ImportExportService
 				logger.warn("Hl7 Lab Could Not be Uploaded");
 			}
 		}
+	}
+
+	private void persistPharmacy(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
+	{
+		//TODO replace this with prescribeIt lookup/save when available
+		PharmacyInfo pharmacyInfo = pharmacyModelToDbConverter.convert(patientRecord.getPreferredPharmacy());
+		PharmacyInfo existingPharmacyInfo = pharmacyInfoDao.findMatchingPharmacy(pharmacyInfo);
+
+		Integer pharmacyId;
+		if(existingPharmacyInfo == null)
+		{
+			pharmacyInfoDao.persist(pharmacyInfo);
+			pharmacyId = pharmacyInfo.getId();
+		}
+		else
+		{
+			pharmacyId = existingPharmacyInfo.getId();
+		}
+
+		DemographicPharmacy demographicPharmacy = new DemographicPharmacy();
+		demographicPharmacy.setAddDate(new Date());
+		demographicPharmacy.setDemographicNo(dbDemographic.getId());
+		demographicPharmacy.setPharmacyId(pharmacyId);
+		demographicPharmacyDao.persist(demographicPharmacy);
 	}
 }
