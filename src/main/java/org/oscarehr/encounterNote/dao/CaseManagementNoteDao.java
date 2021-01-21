@@ -90,7 +90,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"LEFT JOIN (\n" +
 				"  SELECT " +
 				"    note.note_id, \n" +
-				"    SUM(i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors', 'OcularMedication', 'TicklerNote')) > 0 AS is_cpp_note, \n" +
+				"    SUM(i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors', 'OcularMedication', 'TicklerNote')) > 0 AS is_cpp_note\n" +
 				"  FROM casemgmt_note note\n" +
 				"           JOIN casemgmt_issue_notes cinotes on note.note_id = cinotes.note_id\n" +
 				"           JOIN casemgmt_issue ci on cinotes.id = ci.id\n" +
