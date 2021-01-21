@@ -48,6 +48,7 @@ public class CDSPharmacyImportMapper extends AbstractCDSImportMapper<Demographic
 		pharmacy.setPhone1(getPhoneNumber(importStructure.getPhoneNumber()));
 		pharmacy.setFax(getPhoneNumber(importStructure.getFaxNumber()));
 		pharmacy.setEmail(importStructure.getEmailAddress());
+		pharmacy.setStatusActive();
 
 		return pharmacy;
 	}

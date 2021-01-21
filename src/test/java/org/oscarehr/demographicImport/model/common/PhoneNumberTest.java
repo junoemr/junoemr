@@ -70,6 +70,26 @@ public class PhoneNumberTest
 	}
 
 	@Test
+	public void testStaticConstructorOf_Number_withInvalidChars()
+	{
+		String number = "(250) 555-4567*";
+		String expected = "2505554567";
+
+		PhoneNumber result = PhoneNumber.of(number);
+		assertEquals(expected, result.getNumber());
+	}
+	@Test
+	public void testStaticConstructorOf_Extension_withInvalidChars()
+	{
+		String number = "2505554567";
+		String extension = "(12-3)";
+		String expected = "123";
+
+		PhoneNumber result = PhoneNumber.of(number, extension);
+		assertEquals(expected, result.getExtension());
+	}
+
+	@Test
 	public void testGetNumberFormattedHL7_Null()
 	{
 		PhoneNumber phoneNumber = new PhoneNumber();

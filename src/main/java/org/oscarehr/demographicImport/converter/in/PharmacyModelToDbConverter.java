@@ -30,6 +30,8 @@ import org.oscarehr.demographicImport.model.pharmacy.Pharmacy;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+import java.util.Date;
+
 @Component
 public class PharmacyModelToDbConverter extends
 		BaseDbToModelConverter<Pharmacy, PharmacyInfo>
@@ -48,7 +50,14 @@ public class PharmacyModelToDbConverter extends
 		pharmacyInfo.setEmail(input.getEmail());
 		pharmacyInfo.setNotes(input.getNotes());
 		pharmacyInfo.setServiceLocationIdentifier(input.getServiceLocationIdentifier());
-		pharmacyInfo.setAddDate(ConversionUtils.toNullableLegacyDateTime(input.getCreatedDateTime()));
+		pharmacyInfo.setStatus(input.isStatusDeleted() ? PharmacyInfo.DELETED : PharmacyInfo.ACTIVE);
+
+		Date addDate = ConversionUtils.toNullableLegacyDateTime(input.getCreatedDateTime());
+		if(addDate == null)
+		{
+			addDate = new Date();
+		}
+		pharmacyInfo.setAddDate(addDate);
 
 		Address address = input.getAddress();
 

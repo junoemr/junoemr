@@ -56,9 +56,21 @@ public class PhoneNumber extends AbstractTransientModel
 
 	public PhoneNumber(String number, String extension, boolean primaryContactNumber)
 	{
-		this.number = number;
-		this.extension = extension;
+		this.setNumber(number);
+		this.setExtension(extension);
 		this.primaryContactNumber = primaryContactNumber;
+	}
+
+	public void setNumber(String number)
+	{
+		// only valid digits allowed
+		this.number = stripInvalidChars(number);
+	}
+
+	public void setExtension(String extension)
+	{
+		// only valid digits allowed
+		this.extension = stripInvalidChars(extension);
 	}
 
 	public String getNumberFormattedHL7()
@@ -111,5 +123,10 @@ public class PhoneNumber extends AbstractTransientModel
 			return new PhoneNumber(number, extension, primaryContactNumber);
 		}
 		return null;
+	}
+
+	private String stripInvalidChars(String value)
+	{
+		return (value == null) ? null : value.replaceAll("[^a-zA-Z0-9]", "");
 	}
 }

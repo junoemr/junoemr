@@ -119,8 +119,7 @@ public class DemographicDbToModelConverter extends
 	private PhoneNumber buildPhoneNumber(String phoneNumber, String extension)
 	{
 		boolean primaryPhone = phoneNumber.endsWith("*");
-		String formattedPhoneNumber = phoneNumber.replaceAll("[^a-zA-Z0-9]", "");
-		return PhoneNumber.of(formattedPhoneNumber, extension, primaryPhone);
+		return PhoneNumber.of(phoneNumber, extension, primaryPhone);
 	}
 
 	private Provider getReferralProvider(Demographic input)

@@ -52,6 +52,7 @@ import org.oscarehr.demographicImport.model.encounterNote.EncounterNote;
 import org.oscarehr.demographicImport.model.lab.Lab;
 import org.oscarehr.demographicImport.model.lab.LabObservation;
 import org.oscarehr.demographicImport.model.lab.LabObservationResult;
+import org.oscarehr.demographicImport.model.pharmacy.Pharmacy;
 import org.oscarehr.demographicImport.util.ExportPreferences;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.service.ConcernNoteService;
@@ -80,7 +81,6 @@ import oscar.util.ConversionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -361,7 +361,8 @@ public class ImportExportService
 	private void persistPharmacy(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
 	{
 		//TODO replace this with prescribeIt lookup/save when available
-		PharmacyInfo pharmacyInfo = pharmacyModelToDbConverter.convert(patientRecord.getPreferredPharmacy());
+		Pharmacy pharmacy = patientRecord.getPreferredPharmacy();
+		PharmacyInfo pharmacyInfo = pharmacyModelToDbConverter.convert(pharmacy);
 		PharmacyInfo existingPharmacyInfo = pharmacyInfoDao.findMatchingPharmacy(pharmacyInfo);
 
 		Integer pharmacyId;
@@ -376,9 +377,11 @@ public class ImportExportService
 		}
 
 		DemographicPharmacy demographicPharmacy = new DemographicPharmacy();
-		demographicPharmacy.setAddDate(new Date());
+		demographicPharmacy.setAddDate(ConversionUtils.toNullableLegacyDateTime(pharmacy.getCreatedDateTime()));
 		demographicPharmacy.setDemographicNo(dbDemographic.getId());
 		demographicPharmacy.setPharmacyId(pharmacyId);
+		demographicPharmacy.setStatus(DemographicPharmacy.ACTIVE);
+		demographicPharmacy.setPreferredOrder(1);
 		demographicPharmacyDao.persist(demographicPharmacy);
 	}
 }

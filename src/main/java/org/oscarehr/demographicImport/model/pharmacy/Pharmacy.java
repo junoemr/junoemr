@@ -49,4 +49,21 @@ public class Pharmacy extends AbstractTransientModel
 
 	private String serviceLocationIdentifier;
 	private STATUS status;
+
+	public void setStatusActive()
+	{
+		setStatus(STATUS.ACTIVE);
+	}
+	public void setStatusDeleted()
+	{
+		setStatus(STATUS.DELETED);
+	}
+	public boolean isStatusActive()
+	{
+		return STATUS.ACTIVE.equals(this.status);
+	}
+	public boolean isStatusDeleted()
+	{
+		return STATUS.DELETED.equals(this.status);
+	}
 }
