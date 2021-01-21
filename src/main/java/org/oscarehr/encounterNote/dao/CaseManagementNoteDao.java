@@ -70,21 +70,42 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 
 	/**
 	* Return the demographic's notes. For each note, return only the latest revision.
-	 * Also prints CPP notes if the option is selected and there are notes to print.
+	 * Also filters out CPP notes in the second LEFT JOIN statement
 	 * @param demographicNo the demographic number of the patient in question
 	 * @return <code>List<CaseManagementNote></code> if there are 1 or more existing notes;
 	 * 		   <code>null</code> otherwise.
 	 */
 	public List<CaseManagementNote> findLatestRevisionOfAllNotes(Integer demographicNo)
 	{
-		String queryString = "SELECT cm.* FROM casemgmt_note cm\n" +
-		"LEFT JOIN casemgmt_note cm_filter\n" +
-		"ON cm.uuid = cm_filter.uuid\n" +
-		"AND (cm_filter.update_date > cm.update_date\n" +
-			"OR (cm_filter.update_date = cm.update_date AND cm_filter.note_id > cm.note_id))\n" +
-		"WHERE cm.demographic_no = :demographicNo\n" +
-		"AND cm_filter.note_id IS NULL\n" +
-		"ORDER BY cm.observation_date ASC";
+		String queryString =
+				"SELECT cm.note_id, cm.update_date, cm.observation_date, cm.demographic_no, cm.provider_no, cm.note,\n" +
+						"cm.signed, cm.include_issue_innote, cm.signing_provider_no, cm.encounter_type, cm.billing_code, cm.program_no, cm.reporter_caisi_role,\n" +
+						"cm.reporter_program_team, cm.history, cm.password, cm.locked, cm.archived, cm.position, cm.uuid, cm.appointmentNo,\n" +
+						"cm.hourOfEncounterTime, cm.minuteOfEncounterTime, cm.hourOfEncTransportationTime, cm.minuteOfEncTransportationTime\n" +
+				"FROM casemgmt_note cm\n" +
+				"LEFT JOIN casemgmt_note cm_filter\n" +
+				"ON cm.uuid = cm_filter.uuid\n" +
+				"AND (cm_filter.update_date > cm.update_date\n" +
+					"OR (cm_filter.update_date = cm.update_date AND cm_filter.note_id > cm.note_id))\n" +
+				"LEFT JOIN (\n" +
+				"  SELECT " +
+				"    note.note_id, \n" +
+				"    SUM(i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication','TicklerNote')) > 0 AS is_cpp_note, \n" +
+				// This uses a non-character separator because it is is going to be separated
+				// below.  This is not ideal and is done for performance.
+				"    GROUP_CONCAT(i.description SEPARATOR 0x1D) AS issue_descriptions\n" +
+				"  FROM casemgmt_note note\n" +
+				"           JOIN casemgmt_issue_notes cinotes on note.note_id = cinotes.note_id\n" +
+				"           JOIN casemgmt_issue ci on cinotes.id = ci.id\n" +
+				"           JOIN issue i ON ci.issue_id = i.issue_id\n" +
+				"  WHERE note.demographic_no = :demographicNo\n" +
+				"  GROUP BY note.note_id\n" +
+				")\n" +
+				"  AS cpp_note ON cpp_note.note_id = cm.note_id\n" +
+				"WHERE cm.demographic_no = :demographicNo\n" +
+				"AND cm_filter.note_id IS NULL\n" +
+				"AND cpp_note.is_cpp_note IS NULL\n" +
+				"ORDER BY cm.observation_date ASC";
 
 		Query query = entityManager.createNativeQuery(queryString, CaseManagementNote.class);
 		query.setParameter("demographicNo", demographicNo);
