@@ -193,6 +193,16 @@ public class EncounterSectionNote extends MultiSearchResult
 		return (this.titleClasses != null && this.titleClasses.length > 0);
 	}
 
+	public String getLinkTitle()
+	{
+		if(this.title != null)
+		{
+			return this.title;
+		}
+
+		return this.text;
+	}
+
 	public static int compare(Object o1, Object o2, boolean asc, boolean truncateToDate, boolean sortTextOpposite, boolean blankHighest)
 	{
 		EncounterSectionNote i1 = (EncounterSectionNote)o1;

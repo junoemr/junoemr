@@ -636,7 +636,7 @@
 												onmouseout="this.className='links ${fn:join(note.titleClasses, ' ')}'"
 												href="#"
 												onclick="${note.onClick};return false;"
-												title="${note.text}"
+												title="${note.linkTitle}"
 										>
 											<c:out value="${note.text}"/>
 										</a>
@@ -657,7 +657,7 @@
 												onmouseout="this.className='links'"
 												href="#"
 												onclick="${note.onClick};return false;"
-												title="${note.text}"
+												title="${note.linkTitle}"
 										>
 												<c:out value="${note.value}"/>
 												<c:out value="${updateDate}"/>

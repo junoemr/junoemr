@@ -23,6 +23,7 @@
 
 package org.oscarehr.casemgmt.service;
 
+import com.quatro.service.security.SecurityManager;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionMenuItem;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
@@ -161,7 +162,7 @@ public class EncounterMeasurementsService extends EncounterSectionService
 			return EncounterNotes.noNotes();
 		}
 
-		com.quatro.service.security.SecurityManager securityMgr = new com.quatro.service.security.SecurityManager();
+		SecurityManager securityMgr = new SecurityManager();
 
 		ArrayList<String> flowsheets = MeasurementTemplateFlowSheetConfig.getInstance().getUniveralFlowsheets();
 
@@ -185,7 +186,7 @@ public class EncounterMeasurementsService extends EncounterSectionService
 					}
 				}
 
-				String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
+				String fullDisplayName = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
 
 				String winName = flowsheetName + sectionParams.getDemographicNo();
 				String uuid = UUID.randomUUID().toString();
@@ -198,9 +199,10 @@ public class EncounterMeasurementsService extends EncounterSectionService
 				String onClickString = "popupPage(700,1000,'" + hash + "','" + url + "');";
 				sectionNote.setOnClick(onClickString);
 
-				dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-				sectionNote.setText(dispname);
+				String displayName = StringUtils.maxLenString(fullDisplayName, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
+				sectionNote.setText(displayName);
 
+				sectionNote.setTitle(fullDisplayName);
 
 				out.add(sectionNote);
 			}
@@ -317,8 +319,8 @@ public class EncounterMeasurementsService extends EncounterSectionService
 
 		//finally we add specific measurements to module item list
 		Integer demo = Integer.valueOf(sectionParams.getDemographicNo());
-		oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler hd =
-				new oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler(demo);
+		EctMeasurementsDataBeanHandler hd =
+				new EctMeasurementsDataBeanHandler(demo);
 		List<EctMeasurementsDataBean> measureTypes = hd.getMeasurementsData();
 
 

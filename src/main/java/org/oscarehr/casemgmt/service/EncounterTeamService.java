@@ -200,6 +200,8 @@ public class EncounterTeamService extends EncounterSectionService
 						((workPhone.length()>0)?StringUtils.maxLenString("  "+workPhone, 17, 14, ELLIPSES):"");
 
 				sectionNote.setText((contact.isConsentToContact()?"":"*") + itemHeader);
+				String consent = contact.isConsentToContact()?"Ok to contact":"Do not contact";
+				sectionNote.setTitle(name + " " + specialty + " " + workPhone + " " + consent);
 
 				String winName = "AddContact" + sectionParams.getDemographicNo();
 				int hash = Math.abs(winName.hashCode());

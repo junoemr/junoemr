@@ -117,6 +117,8 @@ public class EncounterMessengerService extends EncounterSectionService
 			LocalDate date = ConversionUtils.toLocalDate(msgDate);
 			sectionNote.setUpdateDate(date.atStartOfDay());
 
+			sectionNote.setTitle(msgData.getSubject() + " " + ConversionUtils.toDateString(date));
+
 			String winName = "SendMsg" + sectionParams.getDemographicNo();
 			int hash = winName.hashCode();
 			hash = hash < 0 ? hash * -1 : hash;

@@ -147,6 +147,8 @@ public class EncounterEFormService extends EncounterSectionService
 
 			sectionNote.setText(strTitle);
 
+			sectionNote.setTitle(eFormData.getSubject());
+
 			LocalDate date = ConversionUtils.toNullableLocalDate(eFormData.getFormDate());
 			sectionNote.setUpdateDate(date.atStartOfDay());
 

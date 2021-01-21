@@ -31,6 +31,7 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.managers.TicklerManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -161,6 +162,9 @@ public class EncounterTicklerService extends EncounterSectionService
 			// title
 			String itemHeader = StringUtils.maxLenString(t.getMessage(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 			sectionNote.setText(itemHeader);
+
+			// Link title
+			sectionNote.setTitle(t.getMessage() + " " + ConversionUtils.toDateTimeString(serviceDate, ConversionUtils.DEFAULT_DATE_PATTERN));
 
 			// onClick
 			String winName = StringUtils.maxLenString(t.getMessage(), MAX_LEN_TITLE, MAX_LEN_TITLE, "");

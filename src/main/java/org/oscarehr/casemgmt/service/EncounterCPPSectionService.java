@@ -37,6 +37,7 @@ import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.ws.rest.NotesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 import java.util.ArrayList;
@@ -141,13 +142,17 @@ public abstract class EncounterCPPSectionService extends EncounterSectionService
 
 		for(EncounterCPPNote note: notes)
 		{
+			String title = "Rev:" + note.getRevision() + " - Last update:" +
+					ConversionUtils.toDateTimeString(note.getUpdateDate(), ConversionUtils.DEFAULT_DATE_PATTERN);
 
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 			sectionNote.setText(note.getNote());
 			sectionNote.setTextLineArray(note.getNote().split("\\r?\\n"));
+			sectionNote.setTitle(title);
 			sectionNote.setEditors(note.getEditors());
 			sectionNote.setRevision(note.getRevision());
 			sectionNote.setObservationDate(note.getObservationDate());
+			sectionNote.setUpdateDate(note.getUpdateDate());
 			sectionNote.setNoteIssuesString(getNoteIssueString(note));
 			sectionNote.setNoteExtsString(getNoteExtString(note));
 			sectionNote.setOnClick(getShowEditJavascriptCallString(note, notes.size(), sectionParams, cppIssues));

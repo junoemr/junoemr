@@ -203,6 +203,7 @@ public class EncounterPregnancyService extends EncounterSectionService
 
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 			sectionNote.setText(itemHeader);
+			sectionNote.setTitle("");
 			sectionNote.setObservationDate(LocalDateTime.ofInstant(episode.getStartDate().toInstant(), ZoneId.systemDefault()));
 			sectionNote.setOnClick(onClickString);
 
@@ -221,8 +222,15 @@ public class EncounterPregnancyService extends EncounterSectionService
 			String itemHeader = StringUtils.maxLenString(episode.getDescription(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 			String onClickString = "return false;";
 
+			String linkTitle = "";
+			if(episode.getNotes() != null)
+			{
+				linkTitle = episode.getNotes();
+			}
+
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 			sectionNote.setText(itemHeader);
+			sectionNote.setTitle(linkTitle);
 			sectionNote.setColour(COLOUR_RED);
 			sectionNote.setObservationDate(LocalDateTime.ofInstant(episode.getStartDate().toInstant(), ZoneId.systemDefault()));
 			sectionNote.setOnClick(onClickString);

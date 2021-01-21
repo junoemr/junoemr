@@ -26,8 +26,11 @@ package org.oscarehr.casemgmt.service;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import oscar.oscarRx.data.RxPrescriptionData.Prescription;
+import oscar.util.ConversionUtils;
+import oscar.util.DateUtils;
 import oscar.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,6 +125,10 @@ public class EncounterMedicationService extends EncounterSectionService
 
 			sectionNote.setText(title);
 			sectionNote.setTitleClasses(getTitleClasses(drug, now, month).toArray(new String[0]));
+
+			String startDate = ConversionUtils.toDateString(drug.getRxDate());
+			String endDate = ConversionUtils.toDateString(drug.getEndDate());
+			sectionNote.setTitle(fullTitle + " " + startDate + " - " + drug.getEndDate());
 
 			out.add(sectionNote);
 		}

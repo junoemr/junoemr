@@ -29,6 +29,7 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBean;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler;
+import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -126,6 +127,9 @@ public class EncounterDiseaseRegistryService extends EncounterSectionService
 			// Title
 			String strTitle = StringUtils.maxLenString(dxBean.getDescription(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 			sectionNote.setText(strTitle);
+
+			// Link title
+			sectionNote.setTitle(dxBean.getDescription() + " " + ConversionUtils.toDateTimeString(date, ConversionUtils.DEFAULT_DATE_PATTERN));
 
 			out.add(sectionNote);
 		}
