@@ -91,9 +91,6 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"  SELECT " +
 				"    note.note_id, \n" +
 				"    SUM(i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication','TicklerNote')) > 0 AS is_cpp_note, \n" +
-				// This uses a non-character separator because it is is going to be separated
-				// below.  This is not ideal and is done for performance.
-				"    GROUP_CONCAT(i.description SEPARATOR 0x1D) AS issue_descriptions\n" +
 				"  FROM casemgmt_note note\n" +
 				"           JOIN casemgmt_issue_notes cinotes on note.note_id = cinotes.note_id\n" +
 				"           JOIN casemgmt_issue ci on cinotes.id = ci.id\n" +
