@@ -172,6 +172,18 @@ public class FrequencyCode extends AbstractTransientModel
 			return freq;
 		}
 
+		freq = toScalerByParseEvery(code);
+		if(freq != null)
+		{
+			return freq;
+		}
+
+		freq = getFrequencySpecialCaseLookup(code);
+		if(freq != null)
+		{
+			return freq;
+		}
+
 		throw new InvalidFrequencyCodeException("Frequency code conversion error. Cannot dynamically map '" + code + "'");
 	}
 
@@ -183,23 +195,7 @@ public class FrequencyCode extends AbstractTransientModel
 		{
 			double num = Double.parseDouble(match.group(1));
 			String unit = match.group(2);
-			switch (unit)
-			{
-				case "ID":
-					return num;
-				case "L": // months
-					return 1 / (DAYS_IN_MONTH * num);
-				case "W": // weeks
-					return 1 / (DAYS_IN_WEEK * num);
-				case "D": // days
-					return 1.0 / num;
-				case "H": // hours
-					return HOURS_IN_DAY / num;
-				case "M": // minutes
-					return MINUTES_IN_DAY / num;
-				case "S": // seconds
-					return SECONDS_IN_DAY / num;
-			}
+			return getFrequencyEveryUnit(num, unit);
 		}
 		return null;
 	}
@@ -207,39 +203,103 @@ public class FrequencyCode extends AbstractTransientModel
 	private Double toScalerByParseTimes(String code)
 	{
 		// match this pattern for something like 'n times daily'
-		Matcher match2 = Pattern.compile("(\\d+)\\s*times?\\s*(\\w+)").matcher(code);
-		if (match2.matches())
+		Matcher match = Pattern.compile("(\\d+)\\s*times?\\s*(\\w+)").matcher(code);
+		if (match.matches())
 		{
-			double num = Double.parseDouble(match2.group(1));
-			String unit = match2.group(2).toLowerCase();
+			double num = Double.parseDouble(match.group(1));
+			String unit = match.group(2).toLowerCase();
+			return getFrequencyPerUnit(num, unit);
+		}
+		return null;
+	}
 
-			switch (unit.toUpperCase())
-			{
-				case "L":
-				case "MONTHS":
-				case "MONTHLY":
-					return num / DAYS_IN_MONTH;
-				case "W":
-				case "WEEKS":
-				case "WEEKLY":
-					return num / DAYS_IN_WEEK;
-				case "D":
-				case "DAYS":
-				case "DAILY" :
-					return num;
-				case "H":
-				case "HOURS":
-				case "HOURLY":
-					return HOURS_IN_DAY * num;
-				case "M":
-				case "MINUTE":
-				case "MINUTES":
-					return MINUTES_IN_DAY * num;
-				case "S":
-				case "SECOND":
-				case "SECONDS":
-					return SECONDS_IN_DAY * num;
-			}
+	private Double toScalerByParseEvery(String code)
+	{
+		// match this pattern for something like 'every n days' or 'every n-m days'
+		Matcher match = Pattern.compile("every\\s*((\\d+-)?(\\d+))\\s*(\\w+)").matcher(code);
+		if (match.matches())
+		{
+			double num = Double.parseDouble(match.group(3));
+			String unit = match.group(4).toLowerCase();
+			return getFrequencyEveryUnit(num, unit);
+		}
+		return null;
+	}
+
+	private Double getFrequencyPerUnit(double num, String unit)
+	{
+		switch (unit.toUpperCase())
+		{
+			case "L":
+			case "MONTHS":
+			case "MONTHLY":
+				return num / DAYS_IN_MONTH;
+			case "W":
+			case "WEEKS":
+			case "WEEKLY":
+				return num / DAYS_IN_WEEK;
+			case "D":
+			case "ID":
+			case "DAYS":
+			case "DAILY" :
+				return num;
+			case "H":
+			case "HOURS":
+			case "HOURLY":
+				return HOURS_IN_DAY * num;
+			case "M":
+			case "MINUTE":
+			case "MINUTES":
+				return MINUTES_IN_DAY * num;
+			case "S":
+			case "SECOND":
+			case "SECONDS":
+				return SECONDS_IN_DAY * num;
+		}
+		return null;
+	}
+
+	private Double getFrequencyEveryUnit(double num, String unit)
+	{
+		switch (unit.toUpperCase())
+		{
+			case "L":
+			case "MONTHS":
+			case "MONTHLY":
+				return 1 / (DAYS_IN_MONTH * num);
+			case "W":
+			case "WEEKS":
+			case "WEEKLY":
+				return 1 / (DAYS_IN_WEEK * num);
+			case "D":
+			case "ID":
+			case "DAYS":
+			case "DAILY" :
+				return 1 / num;
+			case "H":
+			case "HOURS":
+			case "HOURLY":
+				return HOURS_IN_DAY / num;
+			case "M":
+			case "MINUTE":
+			case "MINUTES":
+				return MINUTES_IN_DAY / num;
+			case "S":
+			case "SECOND":
+			case "SECONDS":
+				return SECONDS_IN_DAY / num;
+		}
+		return null;
+	}
+
+	private Double getFrequencySpecialCaseLookup(String code)
+	{
+		switch (code.toLowerCase())
+		{
+			case "every morning":
+			case "every day at bedtime": return 1.0;
+			case "now":
+			case "one time only": return -1.0;
 		}
 		return null;
 	}

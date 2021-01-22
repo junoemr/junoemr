@@ -209,4 +209,54 @@ public class FrequencyCodeTest
 		assertEquals(expectedFrequency, FrequencyCode.from("1 time monthly").toScaler());
 	}
 
+	@Test
+	public void testToScaler_Parse_EveryOneHours()
+	{
+		Double expectedFrequency = 24.0;
+		assertEquals(expectedFrequency, FrequencyCode.from("every 1 hours").toScaler());
+	}
+
+	@Test
+	public void testToScaler_Parse_EveryTwoHours()
+	{
+		Double expectedFrequency = 12.0;
+		assertEquals(expectedFrequency, FrequencyCode.from("every 2 hours").toScaler());
+	}
+
+	@Test
+	public void testToScaler_Parse_EveryFourHours()
+	{
+		Double expectedFrequency = 6.0;
+		assertEquals(expectedFrequency, FrequencyCode.from("every 4 hours").toScaler());
+	}
+
+	@Test
+	public void testToScaler_Parse_EveryFourToSixHours()
+	{
+		Double expectedFrequency = 4.0;
+		assertEquals(expectedFrequency, FrequencyCode.from("every 4-6 hours").toScaler());
+	}
+
+	@Test
+	public void testToScaler_Parse_Now()
+	{
+		Double expectedFrequency = -1.0;
+		assertEquals(expectedFrequency, FrequencyCode.from("now").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("one time only").toScaler());
+	}
+
+	@Test
+	public void testToScaler_Parse_AtBedtime()
+	{
+		Double expectedFrequency = 1.0;
+		assertEquals(expectedFrequency, FrequencyCode.from("every day at bedtime").toScaler());
+	}
+
+	@Test
+	public void testToScaler_Parse_EveryMorning()
+	{
+		Double expectedFrequency = 1.0;
+		assertEquals(expectedFrequency, FrequencyCode.from("every morning").toScaler());
+	}
+
 }

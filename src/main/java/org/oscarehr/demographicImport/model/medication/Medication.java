@@ -97,6 +97,10 @@ public abstract class Medication extends AbstractTransientModel
 	 */
 	public static LocalDate calculateEndDate(LocalDate rxStartDate, FrequencyCode frequency, double amount, double dosage)
 	{
+		if(rxStartDate == null || frequency == null)
+		{
+			return null;
+		}
 		double frequencyScaler = frequency.toScaler();
 		long durationDays = Math.round(amount / (dosage * frequencyScaler));
 		return rxStartDate.plusDays(durationDays);
