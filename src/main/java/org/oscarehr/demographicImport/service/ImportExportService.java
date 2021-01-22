@@ -362,26 +362,29 @@ public class ImportExportService
 	{
 		//TODO replace this with prescribeIt lookup/save when available
 		Pharmacy pharmacy = patientRecord.getPreferredPharmacy();
-		PharmacyInfo pharmacyInfo = pharmacyModelToDbConverter.convert(pharmacy);
-		PharmacyInfo existingPharmacyInfo = pharmacyInfoDao.findMatchingPharmacy(pharmacyInfo);
-
-		Integer pharmacyId;
-		if(existingPharmacyInfo == null)
+		if(pharmacy != null)
 		{
-			pharmacyInfoDao.persist(pharmacyInfo);
-			pharmacyId = pharmacyInfo.getId();
-		}
-		else
-		{
-			pharmacyId = existingPharmacyInfo.getId();
-		}
+			PharmacyInfo pharmacyInfo = pharmacyModelToDbConverter.convert(pharmacy);
+			PharmacyInfo existingPharmacyInfo = pharmacyInfoDao.findMatchingPharmacy(pharmacyInfo);
 
-		DemographicPharmacy demographicPharmacy = new DemographicPharmacy();
-		demographicPharmacy.setAddDate(ConversionUtils.toNullableLegacyDateTime(pharmacy.getCreatedDateTime()));
-		demographicPharmacy.setDemographicNo(dbDemographic.getId());
-		demographicPharmacy.setPharmacyId(pharmacyId);
-		demographicPharmacy.setStatus(DemographicPharmacy.ACTIVE);
-		demographicPharmacy.setPreferredOrder(1);
-		demographicPharmacyDao.persist(demographicPharmacy);
+			Integer pharmacyId;
+			if(existingPharmacyInfo == null)
+			{
+				pharmacyInfoDao.persist(pharmacyInfo);
+				pharmacyId = pharmacyInfo.getId();
+			}
+			else
+			{
+				pharmacyId = existingPharmacyInfo.getId();
+			}
+
+			DemographicPharmacy demographicPharmacy = new DemographicPharmacy();
+			demographicPharmacy.setAddDate(ConversionUtils.toNullableLegacyDateTime(pharmacy.getCreatedDateTime()));
+			demographicPharmacy.setDemographicNo(dbDemographic.getId());
+			demographicPharmacy.setPharmacyId(pharmacyId);
+			demographicPharmacy.setStatus(DemographicPharmacy.ACTIVE);
+			demographicPharmacy.setPreferredOrder(1);
+			demographicPharmacyDao.persist(demographicPharmacy);
+		}
 	}
 }
