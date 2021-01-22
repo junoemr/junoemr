@@ -102,6 +102,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"WHERE cm.demographic_no = :demographicNo\n" +
 				"AND cm_filter.note_id IS NULL\n" +
 				"AND cpp_note.is_cpp_note IS NULL\n" +
+				"AND cm.archived = false\n" +
 				"ORDER BY cm.observation_date ASC";
 
 		Query query = entityManager.createNativeQuery(queryString, CaseManagementNote.class);
