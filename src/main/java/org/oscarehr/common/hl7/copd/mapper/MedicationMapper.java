@@ -300,7 +300,7 @@ public class MedicationMapper extends AbstractMapper
 			FrequencyCode frequencyCode = FrequencyCode.from(frequencyCodeStr);
 			if(frequencyCode != null)
 			{
-				Double frequencyScaler = frequencyCode.toScaler();
+				Double frequencyScaler = frequencyCode.toScalar();
 				Double amount = getRequestedDispenseAmount(rep);
 
 				if(amount != null && frequencyScaler != -1)

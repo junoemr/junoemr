@@ -101,7 +101,7 @@ public abstract class Medication extends AbstractTransientModel
 		{
 			return null;
 		}
-		double frequencyScaler = frequency.toScaler();
+		double frequencyScaler = frequency.toScalar();
 		long durationDays = Math.round(amount / (dosage * frequencyScaler));
 		return rxStartDate.plusDays(durationDays);
 	}

@@ -39,224 +39,224 @@ public class FrequencyCodeTest
 	}
 
 	@Test(expected = InvalidFrequencyCodeException.class)
-	public void testToScaler_Null()
+	public void testToScalar_Null()
 	{
-		new FrequencyCode(null).toScaler();
+		new FrequencyCode(null).toScalar();
 	}
 
 	@Test(expected = InvalidFrequencyCodeException.class)
-	public void testToScaler_Empty()
+	public void testToScalar_Empty()
 	{
-		new FrequencyCode("").toScaler();
+		new FrequencyCode("").toScalar();
 	}
 
 	@Test
-	public void testToScaler_Enum_OneTimeDaily()
+	public void testToScalar_Enum_OneTimeDaily()
 	{
 		Double expectedFrequency = 1.0;
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("QD").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("OD").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("QAM").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("QPM").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("QNOON").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("QHS").toScaler());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("QD").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("OD").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("QAM").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("QPM").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("QNOON").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("QHS").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Enum_TwoTimesDaily()
+	public void testToScalar_Enum_TwoTimesDaily()
 	{
 		Double expectedFrequency = 2.0;
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("BID").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q12H").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q8_12H").toScaler());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("BID").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q12H").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q8_12H").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Enum_EveryOneHour()
+	public void testToScalar_Enum_EveryOneHour()
 	{
 		Double expectedFrequency = 24.0;
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q1H").toScaler());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q1H").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Enum_EveryTwoHours()
+	public void testToScalar_Enum_EveryTwoHours()
 	{
 		Double expectedFrequency = 12.0;
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q2H").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q1_2H").toScaler());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q2H").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q1_2H").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Enum_EveryThreeHours()
+	public void testToScalar_Enum_EveryThreeHours()
 	{
 		Double expectedFrequency = 8.0;
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q3H").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q2_3H").toScaler());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q3H").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q2_3H").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Enum_EveryFourHours()
+	public void testToScalar_Enum_EveryFourHours()
 	{
 		Double expectedFrequency = 6.0;
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q4H").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q3_4H").toScaler());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q4H").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q3_4H").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Enum_EverySixHours()
+	public void testToScalar_Enum_EverySixHours()
 	{
 		Double expectedFrequency = 4.0;
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("QID").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q6H").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q4_6H").toScaler());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("QID").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q6H").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q4_6H").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Enum_EveryEightHours()
+	public void testToScalar_Enum_EveryEightHours()
 	{
 		Double expectedFrequency = 3.0;
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("TID").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q8H").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q6_8H").toScaler());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("TID").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q8H").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q6_8H").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Enum_EveryOtherDay()
+	public void testToScalar_Enum_EveryOtherDay()
 	{
 		Double expectedFrequency = 0.5;
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q2D").toScaler());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("Q2D").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Enum_Once()
+	public void testToScalar_Enum_Once()
 	{
 		Double expectedFrequency = -1.0;
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("STAT").toScaler());
-		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("ONCE").toScaler());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("STAT").toScalar());
+		assertEquals(INVALID_ENUM_MAPPING, expectedFrequency, FrequencyCode.from("ONCE").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_EveryOtherDay()
+	public void testToScalar_Parse_EveryOtherDay()
 	{
 		Double expectedFrequency = 0.5;
-		assertEquals(expectedFrequency, FrequencyCode.from("2D").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("2D").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_EveryThirdDay()
+	public void testToScalar_Parse_EveryThirdDay()
 	{
 		Double expectedFrequency = (1.0/3.0);
-		assertEquals(expectedFrequency, FrequencyCode.from("3D").toScaler());
-		assertEquals(expectedFrequency, FrequencyCode.from("Q3D").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("3D").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("Q3D").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_OneTimeDaily()
+	public void testToScalar_Parse_OneTimeDaily()
 	{
 		Double expectedFrequency = 1.0;
-		assertEquals(expectedFrequency, FrequencyCode.from("1 time daily").toScaler());
-		assertEquals(expectedFrequency, FrequencyCode.from("1 times daily").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("1 time daily").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("1 times daily").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_TwoTimeDaily()
+	public void testToScalar_Parse_TwoTimeDaily()
 	{
 		Double expectedFrequency = 2.0;
-		assertEquals(expectedFrequency, FrequencyCode.from("12H").toScaler());
-		assertEquals(expectedFrequency, FrequencyCode.from("2 time daily").toScaler());
-		assertEquals(expectedFrequency, FrequencyCode.from("2 times daily").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("12H").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("2 time daily").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("2 times daily").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_ThreeTimeDaily()
+	public void testToScalar_Parse_ThreeTimeDaily()
 	{
 		Double expectedFrequency = 3.0;
-		assertEquals(expectedFrequency, FrequencyCode.from("8H").toScaler());
-		assertEquals(expectedFrequency, FrequencyCode.from("3 time daily").toScaler());
-		assertEquals(expectedFrequency, FrequencyCode.from("3 times daily").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("8H").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("3 time daily").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("3 times daily").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_FourTimeDaily()
+	public void testToScalar_Parse_FourTimeDaily()
 	{
 		Double expectedFrequency = 4.0;
-		assertEquals(expectedFrequency, FrequencyCode.from("6H").toScaler());
-		assertEquals(expectedFrequency, FrequencyCode.from("4 time daily").toScaler());
-		assertEquals(expectedFrequency, FrequencyCode.from("4 times daily").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("6H").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("4 time daily").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("4 times daily").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_OnceWeekly()
+	public void testToScalar_Parse_OnceWeekly()
 	{
 		Double expectedFrequency = (1.0/7.0);
-		assertEquals(expectedFrequency, FrequencyCode.from("1W").toScaler());
-		assertEquals(expectedFrequency, FrequencyCode.from("1 time weekly").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("1W").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("1 time weekly").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_TwiceWeekly()
+	public void testToScalar_Parse_TwiceWeekly()
 	{
 		Double expectedFrequency = (2.0/7.0);
-		assertEquals(expectedFrequency, FrequencyCode.from("2 times weekly").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("2 times weekly").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_OnceMonthly()
+	public void testToScalar_Parse_OnceMonthly()
 	{
 		Double expectedFrequency = (1.0/30.0);
-		assertEquals(expectedFrequency, FrequencyCode.from("1L").toScaler());
-		assertEquals(expectedFrequency, FrequencyCode.from("Q1L").toScaler());
-		assertEquals(expectedFrequency, FrequencyCode.from("1 time monthly").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("1L").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("Q1L").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("1 time monthly").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_EveryOneHours()
+	public void testToScalar_Parse_EveryOneHours()
 	{
 		Double expectedFrequency = 24.0;
-		assertEquals(expectedFrequency, FrequencyCode.from("every 1 hours").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("every 1 hours").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_EveryTwoHours()
+	public void testToScalar_Parse_EveryTwoHours()
 	{
 		Double expectedFrequency = 12.0;
-		assertEquals(expectedFrequency, FrequencyCode.from("every 2 hours").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("every 2 hours").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_EveryFourHours()
+	public void testToScalar_Parse_EveryFourHours()
 	{
 		Double expectedFrequency = 6.0;
-		assertEquals(expectedFrequency, FrequencyCode.from("every 4 hours").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("every 4 hours").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_EveryFourToSixHours()
+	public void testToScalar_Parse_EveryFourToSixHours()
 	{
 		Double expectedFrequency = 4.0;
-		assertEquals(expectedFrequency, FrequencyCode.from("every 4-6 hours").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("every 4-6 hours").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_Now()
+	public void testToScalar_Parse_Now()
 	{
 		Double expectedFrequency = -1.0;
-		assertEquals(expectedFrequency, FrequencyCode.from("now").toScaler());
-		assertEquals(expectedFrequency, FrequencyCode.from("one time only").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("now").toScalar());
+		assertEquals(expectedFrequency, FrequencyCode.from("one time only").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_AtBedtime()
+	public void testToScalar_Parse_AtBedtime()
 	{
 		Double expectedFrequency = 1.0;
-		assertEquals(expectedFrequency, FrequencyCode.from("every day at bedtime").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("every day at bedtime").toScalar());
 	}
 
 	@Test
-	public void testToScaler_Parse_EveryMorning()
+	public void testToScalar_Parse_EveryMorning()
 	{
 		Double expectedFrequency = 1.0;
-		assertEquals(expectedFrequency, FrequencyCode.from("every morning").toScaler());
+		assertEquals(expectedFrequency, FrequencyCode.from("every morning").toScalar());
 	}
 
 }

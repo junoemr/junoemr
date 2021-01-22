@@ -51,7 +51,7 @@ public class MedicationTest
 		double dosage = 1.0; // ex 1 pill at a time
 		double amount = 10.0; // ex 10 pills
 
-		double expectedDuration = Math.round(amount / (dosage * frequency.toScaler()));
+		double expectedDuration = Math.round(amount / (dosage * frequency.toScalar()));
 		LocalDate expectedEndDate = LocalDate.of(2021, 1, 11);
 
 		LocalDate result = Medication.calculateEndDate(startDate, frequency, amount, dosage);
@@ -66,7 +66,7 @@ public class MedicationTest
 		double dosage = 2.0; // ex 2 pill at a time
 		double amount = 16.0; // ex 16 pills
 
-		double expectedDuration = Math.round(amount / (dosage * frequency.toScaler()));
+		double expectedDuration = Math.round(amount / (dosage * frequency.toScalar()));
 		LocalDate expectedEndDate = LocalDate.of(2021, 1, 5);
 
 		LocalDate result = Medication.calculateEndDate(startDate, frequency, amount, dosage);

@@ -83,7 +83,7 @@ public class FrequencyCode extends AbstractTransientModel
 	/**
 	 * @return the frequency as a scalar double value in days
 	 */
-	public Double toScaler()
+	public Double toScalar()
 	{
 		if(code == null || code.isEmpty())
 		{
@@ -93,11 +93,11 @@ public class FrequencyCode extends AbstractTransientModel
 		String formattedCode = code.replace("-", "_").toUpperCase();
 		if(EnumUtils.isValidEnum(MEDICATION_FREQUENCY_CODES.class, formattedCode))
 		{
-			return toScalerFromEnumCode(MEDICATION_FREQUENCY_CODES.valueOf(formattedCode));
+			return toScalarFromEnumCode(MEDICATION_FREQUENCY_CODES.valueOf(formattedCode));
 		}
 		else
 		{
-			return toScalerByDynamicMatching(code);
+			return toScalarByDynamicMatching(code);
 		}
 	}
 
@@ -111,7 +111,7 @@ public class FrequencyCode extends AbstractTransientModel
 		return frequencyCode;
 	}
 
-	private double toScalerFromEnumCode(MEDICATION_FREQUENCY_CODES freq)
+	private double toScalarFromEnumCode(MEDICATION_FREQUENCY_CODES freq)
 	{
 		if(freq != null)
 		{
@@ -158,21 +158,21 @@ public class FrequencyCode extends AbstractTransientModel
 		throw new InvalidFrequencyCodeException("Frequency code conversion error. Missing frequency code!");
 	}
 
-	private double toScalerByDynamicMatching(String code)
+	private double toScalarByDynamicMatching(String code)
 	{
-		Double freq = toScalerByParseQString(code);
+		Double freq = toScalarByParseMedicalShortForm(code);
 		if(freq != null)
 		{
 			return freq;
 		}
 
-		freq = toScalerByParseTimes(code);
+		freq = toScalarByParseTimes(code);
 		if(freq != null)
 		{
 			return freq;
 		}
 
-		freq = toScalerByParseEvery(code);
+		freq = toScalarByParseEvery(code);
 		if(freq != null)
 		{
 			return freq;
@@ -187,7 +187,7 @@ public class FrequencyCode extends AbstractTransientModel
 		throw new InvalidFrequencyCodeException("Frequency code conversion error. Cannot dynamically map '" + code + "'");
 	}
 
-	private Double toScalerByParseQString(String code)
+	private Double toScalarByParseMedicalShortForm(String code)
 	{
 		// may be dynamic code type. Try dynamic matching
 		Matcher match = Pattern.compile("Q?(\\d+)(\\w+)").matcher(code);
@@ -200,7 +200,7 @@ public class FrequencyCode extends AbstractTransientModel
 		return null;
 	}
 
-	private Double toScalerByParseTimes(String code)
+	private Double toScalarByParseTimes(String code)
 	{
 		// match this pattern for something like 'n times daily'
 		Matcher match = Pattern.compile("(\\d+)\\s*times?\\s*(\\w+)").matcher(code);
@@ -213,7 +213,7 @@ public class FrequencyCode extends AbstractTransientModel
 		return null;
 	}
 
-	private Double toScalerByParseEvery(String code)
+	private Double toScalarByParseEvery(String code)
 	{
 		// match this pattern for something like 'every n days' or 'every n-m days'
 		Matcher match = Pattern.compile("every\\s*((\\d+-)?(\\d+))\\s*(\\w+)").matcher(code);
