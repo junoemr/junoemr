@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.xml.cds.v5_0.model.DrugMeasure;
 import org.oscarehr.common.xml.cds.v5_0.model.MedicationsAndTreatments;
+import org.oscarehr.demographicImport.exception.InvalidFrequencyCodeException;
 import org.oscarehr.demographicImport.model.common.PartialDate;
 import org.oscarehr.demographicImport.model.common.PartialDateTime;
 import org.oscarehr.demographicImport.model.medication.CustomMedication;
@@ -163,6 +164,10 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 				double amount = Double.parseDouble(quantity);
 				double dosage = Double.parseDouble(dosageStr);
 				partialEndDate = PartialDate.from(Medication.calculateEndDate(partialDate.toLocalDate(), frequencyCode, amount, dosage));
+			}
+			catch(InvalidFrequencyCodeException e)
+			{
+				logger.error(e.getMessage());
 			}
 			catch(RuntimeException e)
 			{

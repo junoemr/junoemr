@@ -94,6 +94,9 @@ public class ImportExportWrapperService
 				catch(Exception e)
 				{
 					logger.error("Failed to import: " + importFile.getName(), e);
+
+					// clear the provider cache on failures for now so that un-persisted providers are not referenced by future lookups
+					BaseModelToDbConverter.clearProviderCache();
 					failureCount++;
 					if(importCallback != null)
 					{

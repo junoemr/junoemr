@@ -23,6 +23,8 @@
 package org.oscarehr.demographicImport.model.medication;
 
 import lombok.Data;
+import org.apache.commons.lang3.EnumUtils;
+import org.oscarehr.demographicImport.exception.InvalidFrequencyCodeException;
 import org.oscarehr.demographicImport.model.AbstractTransientModel;
 
 import java.util.regex.Matcher;
@@ -76,17 +78,39 @@ public class FrequencyCode extends AbstractTransientModel
 	{
 		if(code == null || code.isEmpty())
 		{
-			throw new RuntimeException("Frequency code conversion error. Missing frequency code!");
+			throw new InvalidFrequencyCodeException("Frequency code conversion error. Missing frequency code!");
 		}
 
-		try
+		String formattedCode = code.replace("-", "_").toUpperCase();
+		if(EnumUtils.isValidEnum(MEDICATION_FREQUENCY_CODES.class, formattedCode))
 		{
-			MEDICATION_FREQUENCY_CODES freq = MEDICATION_FREQUENCY_CODES.valueOf(code.replace("-", "_").toUpperCase());
+			return toScalerFromEnumCode(MEDICATION_FREQUENCY_CODES.valueOf(formattedCode));
+		}
+		else
+		{
+			return toScalerByDynamicMatching(code);
+		}
+	}
 
-			switch (freq)
+	public static FrequencyCode from(String code)
+	{
+		FrequencyCode frequencyCode = null;
+		if(code != null)
+		{
+			frequencyCode = new FrequencyCode(code);
+		}
+		return frequencyCode;
+	}
+
+	private double toScalerFromEnumCode(MEDICATION_FREQUENCY_CODES freq)
+	{
+		if(freq != null)
+		{
+			switch(freq)
 			{
 				case QD:
 				case OD:
+				case QAM:
 				case QPM:
 				case QNOON:
 				case QHS:
@@ -119,48 +143,67 @@ public class FrequencyCode extends AbstractTransientModel
 				case STAT:
 				case ONCE:
 					return -1.0;
+				default: throw new InvalidFrequencyCodeException("Frequency code conversion error. No mapping for '" + freq + "'");
 			}
 		}
-		catch (IllegalArgumentException e)
-		{
-			// may be dynamic code type. Try dynamic matching
-			Matcher match = Pattern.compile("Q?(\\d+)(\\w)").matcher(code);
-			if (match.matches())
-			{
-				Double num = Double.parseDouble(match.group(1));
-				String unit = match.group(2);
-				switch (unit)
-				{
-					case "ID":
-						return num;
-					case "D":
-					case "Days":
-						return 1.0 / num;
-					case "H":
-						return 24.0 / num;
-					case "L":
-						return 1.0 / (30.0 * num);
-					case "M":
-					case "Months":
-						return 1440.0 / num;
-					case "S":
-						return 86400.0 / num;
-					case "W":
-						return 1 / (7.0 * num);
-				}
-			}
-		}
-
-		throw new RuntimeException("Frequency code conversion error. No mapping for [" + code + "]!");
+		throw new InvalidFrequencyCodeException("Frequency code conversion error. Missing frequency code!");
 	}
 
-	public static FrequencyCode from(String code)
+	private double toScalerByDynamicMatching(String code)
 	{
-		FrequencyCode frequencyCode = null;
-		if(code != null)
+		// may be dynamic code type. Try dynamic matching
+		Matcher match = Pattern.compile("Q?(\\d+)(\\w+)").matcher(code);
+		if (match.matches())
 		{
-			frequencyCode = new FrequencyCode(code);
+			double num = Double.parseDouble(match.group(1));
+			String unit = match.group(2);
+			return toScalerByStringLookup(num, unit);
 		}
-		return frequencyCode;
+
+		// match this pattern for something like 'n times daily'
+		Matcher match2 = Pattern.compile("(\\d+)\\s*times?\\s*(\\w+)").matcher(code);
+		if (match2.matches())
+		{
+			double num = Double.parseDouble(match2.group(1));
+			String unit = match2.group(2).toLowerCase();
+			return toScalerByStringLookup(num, unit);
+		}
+
+		throw new InvalidFrequencyCodeException("Frequency code conversion error. Cannot dynamically map '" + code + "'");
+	}
+
+	private double toScalerByStringLookup(double num, String unit)
+	{
+		switch (unit.toUpperCase())
+		{
+			case "ID":
+				return num;
+			case "D":
+			case "DAYS":
+			case "DAILY" :
+				return 1.0 / num;
+			case "H":
+			case "HOURS":
+			case "HOURLY":
+				return 24.0 / num;
+			case "L":
+			case "MONTHS":
+			case "MONTHLY":
+				return 1.0 / (30.0 * num);
+			case "M":
+			case "MINUTE":
+			case "MINUTES":
+				return 1440.0 / num;
+			case "S":
+			case "SECOND":
+			case "SECONDS":
+				return 86400.0 / num;
+			case "W":
+			case "WEEKS":
+			case "WEEKLY":
+				return 1 / (7.0 * num);
+		}
+
+		throw new InvalidFrequencyCodeException("Frequency code conversion error. No dynamic mapping for unit '" + unit + "'");
 	}
 }
