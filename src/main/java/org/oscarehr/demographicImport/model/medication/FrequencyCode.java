@@ -33,6 +33,12 @@ import java.util.regex.Pattern;
 @Data
 public class FrequencyCode extends AbstractTransientModel
 {
+	private static final double DAYS_IN_MONTH = 30.0; // approximated
+	private static final double DAYS_IN_WEEK = 7.0;
+	private static final double HOURS_IN_DAY = 24.0;
+	private static final double MINUTES_IN_DAY = 1440.0;
+	private static final double SECONDS_IN_DAY = 86400.0;
+
 	private String code;
 
 	public FrequencyCode()
@@ -46,34 +52,37 @@ public class FrequencyCode extends AbstractTransientModel
 
 	enum MEDICATION_FREQUENCY_CODES
 	{
-		BID, 		// Two times daily
-		ONCE, 	// One time only
-		Q1_2H, 	// Every 1 to 2 hours
-		Q12H, 	// Every 12 hours
-		Q1H,		// Every hour
-		Q2_3H,	// Every 2 to 3 hours
-		Q2D,		// Every other day
-		Q2H,		// Every 2 hours
-		Q3_4H,	// Every 3 to 4 hours
-		Q3H,		// Every 3 hours
-		Q4_6H,	// Every 4 to 6 hours
-		Q4H,		// Every 4 hours
-		Q6_8H,	// Every 6 to 8 hours
-		Q6H,		// Every 6 hours
-		Q8_12H, // Every 8 to 12 hours
-		Q8H,		// Every 8 hours
-		QAM,		// Every morning
-		QD,			// Once daily
-		OD,			// Once daily
-		QHS,		// Every day at bedtime
-		QID,		// Four times daily
-		QNOON,  // Every day at noon
-		QPM,		// Every evening
-		STAT,   // NOW
-		TID  		// Three times a day
+		BID,        // Two times daily
+		ONCE,       // One time only
+		Q1_2H,      // Every 1 to 2 hours
+		Q12H,       // Every 12 hours
+		Q1H,        // Every hour
+		Q2_3H,      // Every 2 to 3 hours
+		Q2D,        // Every other day
+		Q2H,        // Every 2 hours
+		Q3_4H,      // Every 3 to 4 hours
+		Q3H,        // Every 3 hours
+		Q4_6H,      // Every 4 to 6 hours
+		Q4H,        // Every 4 hours
+		Q6_8H,      // Every 6 to 8 hours
+		Q6H,        // Every 6 hours
+		Q8_12H,     // Every 8 to 12 hours
+		Q8H,        // Every 8 hours
+		QAM,        // Every morning
+		QD,         // Once daily
+		OD,         // Once daily
+		QHS,        // Every day at bedtime
+		QID,        // Four times daily
+		QNOON,      // Every day at noon
+		QPM,        // Every evening
+		STAT,       // NOW
+		TID         // Three times a day
 	}
 
 
+	/**
+	 * @return the frequency as a scalar double value in days
+	 */
 	public Double toScaler()
 	{
 		if(code == null || code.isEmpty())
@@ -151,59 +160,87 @@ public class FrequencyCode extends AbstractTransientModel
 
 	private double toScalerByDynamicMatching(String code)
 	{
+		Double freq = toScalerByParseQString(code);
+		if(freq != null)
+		{
+			return freq;
+		}
+
+		freq = toScalerByParseTimes(code);
+		if(freq != null)
+		{
+			return freq;
+		}
+
+		throw new InvalidFrequencyCodeException("Frequency code conversion error. Cannot dynamically map '" + code + "'");
+	}
+
+	private Double toScalerByParseQString(String code)
+	{
 		// may be dynamic code type. Try dynamic matching
 		Matcher match = Pattern.compile("Q?(\\d+)(\\w+)").matcher(code);
 		if (match.matches())
 		{
 			double num = Double.parseDouble(match.group(1));
 			String unit = match.group(2);
-			return toScalerByStringLookup(num, unit);
+			switch (unit)
+			{
+				case "ID":
+					return num;
+				case "L": // months
+					return 1 / (DAYS_IN_MONTH * num);
+				case "W": // weeks
+					return 1 / (DAYS_IN_WEEK * num);
+				case "D": // days
+					return 1.0 / num;
+				case "H": // hours
+					return HOURS_IN_DAY / num;
+				case "M": // minutes
+					return MINUTES_IN_DAY / num;
+				case "S": // seconds
+					return SECONDS_IN_DAY / num;
+			}
 		}
+		return null;
+	}
 
+	private Double toScalerByParseTimes(String code)
+	{
 		// match this pattern for something like 'n times daily'
 		Matcher match2 = Pattern.compile("(\\d+)\\s*times?\\s*(\\w+)").matcher(code);
 		if (match2.matches())
 		{
 			double num = Double.parseDouble(match2.group(1));
 			String unit = match2.group(2).toLowerCase();
-			return toScalerByStringLookup(num, unit);
+
+			switch (unit.toUpperCase())
+			{
+				case "L":
+				case "MONTHS":
+				case "MONTHLY":
+					return num / DAYS_IN_MONTH;
+				case "W":
+				case "WEEKS":
+				case "WEEKLY":
+					return num / DAYS_IN_WEEK;
+				case "D":
+				case "DAYS":
+				case "DAILY" :
+					return num;
+				case "H":
+				case "HOURS":
+				case "HOURLY":
+					return HOURS_IN_DAY * num;
+				case "M":
+				case "MINUTE":
+				case "MINUTES":
+					return MINUTES_IN_DAY * num;
+				case "S":
+				case "SECOND":
+				case "SECONDS":
+					return SECONDS_IN_DAY * num;
+			}
 		}
-
-		throw new InvalidFrequencyCodeException("Frequency code conversion error. Cannot dynamically map '" + code + "'");
-	}
-
-	private double toScalerByStringLookup(double num, String unit)
-	{
-		switch (unit.toUpperCase())
-		{
-			case "ID":
-				return num;
-			case "D":
-			case "DAYS":
-			case "DAILY" :
-				return 1.0 / num;
-			case "H":
-			case "HOURS":
-			case "HOURLY":
-				return 24.0 / num;
-			case "L":
-			case "MONTHS":
-			case "MONTHLY":
-				return 1.0 / (30.0 * num);
-			case "M":
-			case "MINUTE":
-			case "MINUTES":
-				return 1440.0 / num;
-			case "S":
-			case "SECOND":
-			case "SECONDS":
-				return 86400.0 / num;
-			case "W":
-			case "WEEKS":
-			case "WEEKLY":
-				return 1 / (7.0 * num);
-		}
-
-		throw new InvalidFrequencyCodeException("Frequency code conversion error. No dynamic mapping for unit '" + unit + "'");
+		return null;
 	}
 }
