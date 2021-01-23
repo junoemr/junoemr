@@ -52,11 +52,13 @@ public class SSOUser implements Serializable
 
 	*/
 
-	public static SSOUser fromLoggedInInfo(LoggedInInfo loggedInInfo)
+	public static SSOUser fromLoggedInInfo(LoggedInInfo loggedInInfo, String practiceId)
 	{
 		SSOUser user = new SSOUser();
 
-		user.externalId = loggedInInfo.getLoggedInProviderNo();
+		// externalId must be globally unique across the credential.  This implementation should be safe
+		// regardless of whether we decide to go with issuing the credential to cloudpractice vs individual clinics
+		user.externalId = "juno_" + practiceId + "_" + loggedInInfo.getLoggedInProviderNo();
 		user.firstName = loggedInInfo.getLoggedInProvider().getFirstName();
 		user.lastName = loggedInInfo.getLoggedInProvider().getLastName();
 

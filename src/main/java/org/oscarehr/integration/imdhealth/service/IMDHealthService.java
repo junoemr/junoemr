@@ -286,7 +286,7 @@ public class IMDHealthService
 	{
 		try
 		{
-			SSOUser user = SSOUser.fromLoggedInInfo(loggedInInfo);
+			SSOUser user = SSOUser.fromLoggedInInfo(loggedInInfo, practiceId);
 
 			SSOOrganization organization;
 			if (siteId == null)

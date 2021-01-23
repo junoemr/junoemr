@@ -67,7 +67,7 @@ public class SSOOrganization implements Serializable
 		// if the iMDHealth credentials are issued to CloudPractice instead of to each individual clinic.
 		// This also allows demo and live instances to connect to the same iMDHealth organization, provided
 		// that the practice id is constant between the two.
-		org.setExternalId(practiceId);
+		org.setExternalId("juno_"+ practiceId);
 		org.setMunicipality(clinic.getClinicCity());
 		org.setName(clinic.getClinicName());
 		org.setSubdivisionCode(clinic.getClinicProvince());

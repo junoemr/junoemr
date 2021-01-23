@@ -27,12 +27,13 @@ angular.module('Admin.Integration').component('imdHealthLanding',
     {
         templateUrl: 'src/admin/integration/imdHealth/imdHealthLanding.jsp',
         bindings: {},
-        controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state) {
+        controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$sce', function ($scope, $http, $httpParamSerializer, $state, $sce) {
 
             let ctrl = this;
             let imdHealthWebService = new IMDHealthApi ($http, $httpParamSerializer, '../ws/rs');
 
             ctrl.message = "";
+            ctrl.imdHealthUrl = "";
 
             ctrl.onPageLoad = () =>
             {
@@ -44,7 +45,8 @@ angular.module('Admin.Integration').component('imdHealthLanding',
 
                         if (ssoLink)
                         {
-                            window.open(ssoLink, "_blank");
+                            ctrl.message = "";
+                            ctrl.imdHealthUrl = $sce.trustAsResourceUrl(ssoLink);
                         }
                         else
                         {

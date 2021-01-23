@@ -22,7 +22,10 @@
 --%>
 
 <div id="imd-health-landing" ng-init="$ctrl.onPageLoad()">
-    <div ng-hide="!$ctrl.message">
+    <div ng-if="$ctrl.message">
         <p>{{ $ctrl.message }}</p>
+    </div>
+    <div ng-if="!$ctrl.message && $ctrl.imdHealthUrl" class=frame-container>
+        <iframe ng-src="{{ $ctrl.imdHealthUrl }}"></iframe>
     </div>
 </div>
