@@ -76,6 +76,7 @@ public class EncounterPageData
 	private String encounterWindowWidth;
 	private boolean encounterWindowMaximize;
 	private boolean clientImagePresent;
+	private boolean linkToOldEncounterPageEnabled;
 
 
 	public String getUserColour()
@@ -506,6 +507,16 @@ public class EncounterPageData
 	public void setClientImagePresent(boolean clientImagePresent)
 	{
 		this.clientImagePresent = clientImagePresent;
+	}
+
+	public boolean isLinkToOldEncounterPageEnabled()
+	{
+		return linkToOldEncounterPageEnabled;
+	}
+
+	public void setLinkToOldEncounterPageEnabled(boolean linkToOldEncounterPageEnabled)
+	{
+		this.linkToOldEncounterPageEnabled = linkToOldEncounterPageEnabled;
 	}
 
 	//=============================================================================
