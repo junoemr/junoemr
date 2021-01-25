@@ -81,7 +81,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		demographics.setDateOfBirth(ConversionUtils.toXmlGregorianCalendar(exportDemographic.getDateOfBirth()));
 		demographics.setHealthCard(getExportHealthCard(exportDemographic));
 		demographics.setChartNumber(exportDemographic.getChartNumber());
-		demographics.setGender(getExportGender(exportDemographic));
+		demographics.setGender(getExportGender(exportDemographic.getSex()));
 		demographics.setUniqueVendorIdSequence(String.valueOf(exportDemographic.getId()));
 		demographics.getAddress().addAll(getExportAddresses(exportDemographic));
 		demographics.getPhoneNumber().addAll(getExportPhones(exportDemographic));
@@ -92,7 +92,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		demographics.setEnrolment(getEnrollment(exportDemographic));
 		demographics.setPrimaryPhysician(getExportPrimaryPhysician(exportDemographic));
 		demographics.setEmail(exportDemographic.getEmail());
-		demographics.setPersonStatusCode(getExportStatusCode(exportDemographic));
+		demographics.setPersonStatusCode(getExportStatusCode(exportDemographic.getPatientStatus()));
 		demographics.setPersonStatusDate(ConversionUtils.toNullableXmlGregorianCalendar(exportDemographic.getPatientStatusDate()));
 		demographics.setSIN(exportDemographic.getSin());
 		demographics.setReferredPhysician(toPersonNameSimple(exportDemographic.getReferralDoctor()));
@@ -145,9 +145,8 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		return prefixCode;
 	}
 
-	protected Gender getExportGender(Demographic exportStructure)
+	protected Gender getExportGender(Person.SEX sex)
 	{
-		Person.SEX sex = exportStructure.getSex();
 		switch(sex)
 		{
 			case MALE: return Gender.M;
@@ -232,10 +231,13 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<Demograp
 		}
 		return primaryPhysician;
 	}
-	protected Demographics.PersonStatusCode getExportStatusCode(Demographic exportStructure)
+	protected Demographics.PersonStatusCode getExportStatusCode(String patientStatus)
 	{
+		if(patientStatus == null)
+		{
+			patientStatus = STATUS_ACTIVE;
+		}
 		Demographics.PersonStatusCode personStatusCode = objectFactory.createDemographicsPersonStatusCode();
-		String patientStatus = exportStructure.getPatientStatus();
 
 		PersonStatus personStatus = null;
 		switch(patientStatus)
