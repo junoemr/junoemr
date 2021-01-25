@@ -142,15 +142,15 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 	}
 	protected PartialDate getEndDate(MedicationsAndTreatments importStructure)
 	{
-		PartialDate partialDate = getStartDate(importStructure);
+		PartialDate partialStartDate = getStartDate(importStructure);
 		PartialDate partialEndDate = null;
-		if(partialDate == null)
+		if(partialStartDate == null)
 		{
-			partialDate = toNullablePartialDateTime(importStructure.getPrescriptionWrittenDate());
+			partialStartDate = toNullablePartialDateTime(importStructure.getPrescriptionWrittenDate());
 		}
-		if(partialDate == null)
+		if(partialStartDate == null)
 		{
-			partialDate = PartialDate.from(LocalDate.now()); // it can't be null
+			partialStartDate = PartialDate.from(LocalDate.now()); // it can't be null
 		}
 
 		FrequencyCode frequencyCode = getFormattedFrequency(importStructure);
@@ -163,7 +163,7 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 			{
 				double amount = Double.parseDouble(quantity);
 				double dosage = Double.parseDouble(dosageStr);
-				partialEndDate = PartialDate.from(Medication.calculateEndDate(partialDate.toLocalDate(), frequencyCode, amount, dosage));
+				partialEndDate = PartialDate.from(Medication.calculateEndDate(partialStartDate.toLocalDate(), frequencyCode, amount, dosage));
 			}
 			catch(InvalidFrequencyCodeException e)
 			{
@@ -177,7 +177,7 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 
 		if(partialEndDate == null)
 		{
-			partialEndDate = partialDate; // it also can't be null
+			partialEndDate = partialStartDate; // it also can't be null
 		}
 		return partialEndDate;
 	}
